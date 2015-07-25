@@ -1,11 +1,14 @@
 package main
 
 import (
+	"compress/gzip"
+	"flag"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os/exec"
+	"path"
 	"regexp"
 	"strings"
 )
@@ -13,9 +16,11 @@ import (
 type gitHandler struct {
 	method      string
 	regexp      *regexp.Regexp
-	handle_func func(string, http.ResponseWriter, *http.Request)
+	handle_func func(string, string, http.ResponseWriter, *http.Request)
 	rpc         string
 }
+
+var repo_root string
 
 var git_handlers = [...]gitHandler{
 	gitHandler{"GET", regexp.MustCompile(`\A(/..*)/info/refs\z`), handle_get_info_refs, ""},
@@ -24,6 +29,9 @@ var git_handlers = [...]gitHandler{
 }
 
 func main() {
+	flag.Parse()
+	repo_root = flag.Arg(0)
+	log.Printf("repo_root: %s", repo_root)
 	http.HandleFunc("/", git_handler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
@@ -31,8 +39,9 @@ func main() {
 func git_handler(w http.ResponseWriter, r *http.Request) {
 	log.Print(r)
 	for _, g := range git_handlers {
-		if r.Method == g.method && g.regexp.MatchString(r.URL.Path) {
-			g.handle_func(g.rpc, w, r)
+		m := g.regexp.FindStringSubmatch(r.URL.Path)
+		if r.Method == g.method && m != nil {
+			g.handle_func(g.rpc, path.Join(repo_root, m[1]), w, r)
 			return
 		}
 	}
@@ -40,11 +49,12 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(404)
 }
 
-func handle_get_info_refs(_ string, w http.ResponseWriter, r *http.Request) {
+func handle_get_info_refs(_ string, path string, w http.ResponseWriter, r *http.Request) {
 	rpc := r.URL.Query().Get("service")
 	switch rpc {
 	case "git-upload-pack", "git-receive-pack":
-		cmd := exec.Command("git", strings.TrimPrefix(rpc, "git-"), "--stateless-rpc", "--advertise-refs", "data/foo/bar.git")
+		cmd := exec.Command("git", strings.TrimPrefix(rpc, "git-"), "--stateless-rpc", "--advertise-refs", path)
+		log.Print(cmd.Args)
 		stdout, err := cmd.StdoutPipe()
 		if err != nil {
 			fail_500(w, err)
@@ -70,8 +80,20 @@ func handle_get_info_refs(_ string, w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func handle_post_rpc(rpc string, w http.ResponseWriter, r *http.Request) {
-	cmd := exec.Command("git", strings.TrimPrefix(rpc, "git-"), "--stateless-rpc", "data/foo/bar.git")
+func handle_post_rpc(rpc string, path string, w http.ResponseWriter, r *http.Request) {
+	var body io.Reader
+	var err error
+	if r.Header.Get("Content-Encoding") == "gzip" {
+		body, err = gzip.NewReader(r.Body)
+		if err != nil {
+			fail_500(w, err)
+			return
+		}
+	} else {
+		body = r.Body
+	}
+	cmd := exec.Command("git", strings.TrimPrefix(rpc, "git-"), "--stateless-rpc", path)
+	log.Print(cmd.Args)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		fail_500(w, err)
@@ -88,7 +110,7 @@ func handle_post_rpc(rpc string, w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-result", rpc))
 	no_cache(w)
-	if _, err := io.Copy(stdin, r.Body); err != nil {
+	if _, err := io.Copy(stdin, body); err != nil {
 		fail_500(w, err)
 		return
 	}
