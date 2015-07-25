@@ -106,7 +106,7 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 			// Validate the path to the Git repository
 			found_path := path_match[1]
 			if !valid_path(found_path) {
-				http.Error(w, "Not found", 404)
+				http.Error(w, "Not Found", 404)
 				return
 			}
 
@@ -114,7 +114,7 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	http.Error(w, "Not found", 404)
+	http.Error(w, "Not Found", 404)
 	return
 }
 
@@ -183,7 +183,7 @@ func handle_get_info_refs(user string, _ string, path string, w http.ResponseWri
 		}
 	case "":
 		// The 'dumb' Git HTTP protocol is not supported
-		http.Error(w, "Not found", 404)
+		http.Error(w, "Not Found", 404)
 		return
 	}
 }
