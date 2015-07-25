@@ -74,13 +74,6 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 	for _, g := range git_services {
 		path_match := g.regexp.FindStringSubmatch(r.URL.Path)
 		if r.Method == g.method && path_match != nil {
-			// Validate the path to the Git repository
-			found_path := path_match[1]
-			if !valid_path(found_path) {
-				http.Error(w, "Not found", 404)
-				return
-			}
-
 			// Ask the auth backend if the request is allowed, and what the
 			// user ID (GL_ID) is.
 			auth_response, err := do_auth_request(r)
@@ -107,6 +100,13 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 			// information from the auth response body.
 			if _, err := fmt.Fscan(auth_response.Body, &user); err != nil {
 				fail_500(w, err)
+				return
+			}
+
+			// Validate the path to the Git repository
+			found_path := path_match[1]
+			if !valid_path(found_path) {
+				http.Error(w, "Not found", 404)
 				return
 			}
 
