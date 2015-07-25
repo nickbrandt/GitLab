@@ -1,12 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"compress/gzip"
 	"flag"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
 	"path"
 	"regexp"
@@ -16,11 +18,13 @@ import (
 type gitHandler struct {
 	method      string
 	regexp      *regexp.Regexp
-	handle_func func(string, string, http.ResponseWriter, *http.Request)
+	handle_func func(string, string, string, http.ResponseWriter, *http.Request)
 	rpc         string
 }
 
+var http_client = &http.Client{}
 var repo_root string
+var listen_addr = flag.String("listen_addr", "localhost:8181", "Listen address for HTTP server")
 
 var git_handlers = [...]gitHandler{
 	gitHandler{"GET", regexp.MustCompile(`\A(/..*)/info/refs\z`), handle_get_info_refs, ""},
@@ -33,15 +37,28 @@ func main() {
 	repo_root = flag.Arg(0)
 	log.Printf("repo_root: %s", repo_root)
 	http.HandleFunc("/", git_handler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(*listen_addr, nil))
 }
 
 func git_handler(w http.ResponseWriter, r *http.Request) {
-	log.Print(r)
+	log.Print(r.Method, " ", r.URL)
 	for _, g := range git_handlers {
 		m := g.regexp.FindStringSubmatch(r.URL.Path)
 		if r.Method == g.method && m != nil {
-			g.handle_func(g.rpc, path.Join(repo_root, m[1]), w, r)
+			response := validation_request(r)
+			if response.StatusCode != 200 {
+				w.Header().Set("WWW-Authenticate", response.Header.Get("WWW-Authenticate"))
+				w.WriteHeader(response.StatusCode)
+				return
+			}
+			buf := new(bytes.Buffer)
+			_, err := buf.ReadFrom(response.Body)
+			if err != nil {
+				fail_500(w, err)
+				return
+			}
+			user := buf.String()
+			g.handle_func(user, g.rpc, path.Join(repo_root, m[1]), w, r)
 			return
 		}
 	}
@@ -49,12 +66,34 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(404)
 }
 
-func handle_get_info_refs(_ string, path string, w http.ResponseWriter, r *http.Request) {
+func validation_request(r *http.Request) *http.Response {
+	var err error
+	result := &http.Response{}
+	url := fmt.Sprintf("http://localhost:8080%s", r.URL.RequestURI())
+	vreq, err := http.NewRequest(r.Method, url, nil)
+	if err != nil {
+		result.StatusCode = 500
+		return result
+	}
+	for k, v := range r.Header {
+		vreq.Header[k] = v
+	}
+	user, password, _ := r.BasicAuth()
+	vreq.SetBasicAuth(user, password)
+	result, err = http_client.Do(vreq)
+	if err != nil {
+		result.StatusCode = 500
+		return result
+	}
+	return result
+}
+
+func handle_get_info_refs(user string, _ string, path string, w http.ResponseWriter, r *http.Request) {
 	rpc := r.URL.Query().Get("service")
 	switch rpc {
 	case "git-upload-pack", "git-receive-pack":
 		cmd := exec.Command("git", strings.TrimPrefix(rpc, "git-"), "--stateless-rpc", "--advertise-refs", path)
-		log.Print(cmd.Args)
+		cmd.Env = []string{fmt.Sprintf("PATH=%s", os.Getenv("PATH")), fmt.Sprintf("GL_ID=%s", user)}
 		stdout, err := cmd.StdoutPipe()
 		if err != nil {
 			fail_500(w, err)
@@ -80,7 +119,7 @@ func handle_get_info_refs(_ string, path string, w http.ResponseWriter, r *http.
 	}
 }
 
-func handle_post_rpc(rpc string, path string, w http.ResponseWriter, r *http.Request) {
+func handle_post_rpc(user string, rpc string, path string, w http.ResponseWriter, r *http.Request) {
 	var body io.Reader
 	var err error
 	if r.Header.Get("Content-Encoding") == "gzip" {
@@ -93,7 +132,7 @@ func handle_post_rpc(rpc string, path string, w http.ResponseWriter, r *http.Req
 		body = r.Body
 	}
 	cmd := exec.Command("git", strings.TrimPrefix(rpc, "git-"), "--stateless-rpc", path)
-	log.Print(cmd.Args)
+	cmd.Env = []string{fmt.Sprintf("PATH=%s", os.Getenv("PATH")), fmt.Sprintf("GL_ID=%s", user)}
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		fail_500(w, err)
