@@ -25,7 +25,7 @@ var http_client = &http.Client{}
 var path_traversal = regexp.MustCompile(`/../`)
 
 // Command-line options
-var repo_root = "."
+var repo_root string
 var listen_addr = flag.String("listen_addr", "localhost:8181", "Listen address for HTTP server")
 var auth_backend = flag.String("auth_backend", "http://localhost:8080", "Authentication/authorization backend")
 
@@ -37,8 +37,17 @@ var git_services = [...]gitService{
 
 func main() {
 	// Parse the command-line
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "\n  %s [OPTIONS] REPO_ROOT\n\nOptions:\n", os.Args[0])
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 	repo_root = flag.Arg(0)
+	if repo_root == "" {
+		flag.Usage()
+		os.Exit(1)
+	}
 	log.Printf("repo_root: %s", repo_root)
 
 	http.HandleFunc("/", git_handler)
