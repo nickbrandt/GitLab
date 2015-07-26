@@ -67,20 +67,17 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 
 func do_auth_request(r *http.Request) *http.Response {
 	var err error
-	result := &http.Response{}
 	url := fmt.Sprintf("http://localhost:8080%s", r.URL.RequestURI())
 	auth_req, err := http.NewRequest(r.Method, url, nil)
 	if err != nil {
-		result.StatusCode = 500
-		return result
+		return &http.Response{StatusCode: 500}
 	}
 	for k, v := range r.Header {
 		auth_req.Header[k] = v
 	}
-	result, err = http_client.Do(auth_req)
+	result, err := http_client.Do(auth_req)
 	if err != nil {
-		result.StatusCode = 500
-		return result
+		return &http.Response{StatusCode: 500}
 	}
 	return result
 }
