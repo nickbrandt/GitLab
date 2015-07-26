@@ -24,6 +24,7 @@ type gitHandler struct {
 var http_client = &http.Client{}
 var repo_root string
 var listen_addr = flag.String("listen_addr", "localhost:8181", "Listen address for HTTP server")
+var auth_backend = flag.String("auth_backend", "http://localhost:8080", "Authentication/authorization backend")
 
 var git_handlers = [...]gitHandler{
 	gitHandler{"GET", regexp.MustCompile(`\A(/..*)/info/refs\z`), handle_get_info_refs, ""},
@@ -67,7 +68,7 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 
 func do_auth_request(r *http.Request) *http.Response {
 	var err error
-	url := fmt.Sprintf("http://localhost:8080%s", r.URL.RequestURI())
+	url := fmt.Sprintf("%s%s", *auth_backend, r.URL.RequestURI())
 	auth_req, err := http.NewRequest(r.Method, url, nil)
 	if err != nil {
 		return &http.Response{StatusCode: 500}
