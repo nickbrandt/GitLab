@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"compress/gzip"
 	"flag"
 	"fmt"
@@ -41,24 +40,24 @@ func main() {
 }
 
 func git_handler(w http.ResponseWriter, r *http.Request) {
+	var user string
 	log.Print(r.Method, " ", r.URL)
 	for _, g := range git_handlers {
-		m := g.regexp.FindStringSubmatch(r.URL.Path)
-		if r.Method == g.method && m != nil {
-			response := validation_request(r)
-			if response.StatusCode != 200 {
-				w.Header().Set("WWW-Authenticate", response.Header.Get("WWW-Authenticate"))
-				w.WriteHeader(response.StatusCode)
+		path_match := g.regexp.FindStringSubmatch(r.URL.Path)
+		if r.Method == g.method && path_match != nil {
+			auth_response := do_auth_request(r)
+			if auth_response.StatusCode != 200 {
+				for k, v := range auth_response.Header {
+					w.Header()[k] = v
+				}
+				w.WriteHeader(auth_response.StatusCode)
+				io.Copy(w, auth_response.Body)
 				return
 			}
-			buf := new(bytes.Buffer)
-			_, err := buf.ReadFrom(response.Body)
-			if err != nil {
+			if _, err := fmt.Fscan(auth_response.Body, user); err != nil {
 				fail_500(w, err)
-				return
 			}
-			user := buf.String()
-			g.handle_func(user, g.rpc, path.Join(repo_root, m[1]), w, r)
+			g.handle_func(user, g.rpc, path.Join(repo_root, path_match[1]), w, r)
 			return
 		}
 	}
@@ -66,21 +65,19 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(404)
 }
 
-func validation_request(r *http.Request) *http.Response {
+func do_auth_request(r *http.Request) *http.Response {
 	var err error
 	result := &http.Response{}
 	url := fmt.Sprintf("http://localhost:8080%s", r.URL.RequestURI())
-	vreq, err := http.NewRequest(r.Method, url, nil)
+	auth_req, err := http.NewRequest(r.Method, url, nil)
 	if err != nil {
 		result.StatusCode = 500
 		return result
 	}
 	for k, v := range r.Header {
-		vreq.Header[k] = v
+		auth_req.Header[k] = v
 	}
-	user, password, _ := r.BasicAuth()
-	vreq.SetBasicAuth(user, password)
-	result, err = http_client.Do(vreq)
+	result, err = http_client.Do(auth_req)
 	if err != nil {
 		result.StatusCode = 500
 		return result
