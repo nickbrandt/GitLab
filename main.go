@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-type gitHandler struct {
+type gitService struct {
 	method      string
 	regexp      *regexp.Regexp
 	handle_func func(string, string, string, http.ResponseWriter, *http.Request)
@@ -25,14 +25,14 @@ var http_client = &http.Client{}
 var path_traversal = regexp.MustCompile(`/../`)
 
 // Command-line options
-var repo_root string
+var repo_root = "."
 var listen_addr = flag.String("listen_addr", "localhost:8181", "Listen address for HTTP server")
 var auth_backend = flag.String("auth_backend", "http://localhost:8080", "Authentication/authorization backend")
 
-var git_handlers = [...]gitHandler{
-	gitHandler{"GET", regexp.MustCompile(`\A(/..*)/info/refs\z`), handle_get_info_refs, ""},
-	gitHandler{"POST", regexp.MustCompile(`\A(/..*)/git-upload-pack\z`), handle_post_rpc, "git-upload-pack"},
-	gitHandler{"POST", regexp.MustCompile(`\A(/..*)/git-receive-pack\z`), handle_post_rpc, "git-receive-pack"},
+var git_services = [...]gitService{
+	gitService{"GET", regexp.MustCompile(`\A(/..*)/info/refs\z`), handle_get_info_refs, ""},
+	gitService{"POST", regexp.MustCompile(`\A(/..*)/git-upload-pack\z`), handle_post_rpc, "git-upload-pack"},
+	gitService{"POST", regexp.MustCompile(`\A(/..*)/git-receive-pack\z`), handle_post_rpc, "git-receive-pack"},
 }
 
 func main() {
@@ -50,7 +50,7 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 
 	log.Print(r.Method, " ", r.URL)
 
-	for _, g := range git_handlers {
+	for _, g := range git_services {
 		path_match := g.regexp.FindStringSubmatch(r.URL.Path)
 		if r.Method == g.method && path_match != nil {
 			found_path := path_match[1]
@@ -64,9 +64,11 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			if auth_response.StatusCode != 200 {
-				// The Git request is not allowed by the backend. Maybe the client
-				// needs to send HTTP Basic credentials.
-				// Forward the response from the auth backend to our client
+				// The Git request is not allowed by the backend. Maybe the
+				// client needs to send HTTP Basic credentials.  Forward the
+				// response from the auth backend to our client. This includes
+				// the 'WWW-Authentication' header that acts as a hint that
+				// Basic auth credentials are needed.
 				for k, v := range auth_response.Header {
 					w.Header()[k] = v
 				}
@@ -75,6 +77,8 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			// The auth backend told us who the user is according to them
+			// (GL_ID). We must extract this information from the auth response
+			// body.
 			if _, err := fmt.Fscan(auth_response.Body, &user); err != nil {
 				fail_500(w, err)
 				return
@@ -84,6 +88,7 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	http.Error(w, "Not found", 404)
+	return
 }
 
 func valid_path(p string) bool {
@@ -91,6 +96,8 @@ func valid_path(p string) bool {
 		log.Printf("path traversal detected in %s", p)
 		return false
 	}
+	// If /path/to/foo.git/objects exist then let's assume it is a valid Git
+	// repository.
 	if _, err := os.Stat(path.Join(repo_root, p, "objects")); err != nil {
 		log.Print(err)
 		return false
@@ -104,21 +111,19 @@ func do_auth_request(r *http.Request) (result *http.Response, err error) {
 	if err != nil {
 		return nil, err
 	}
+	// Forward all headers from our client to the auth backend. This includes
+	// HTTP Basic authentication credentials (the 'Authorization' header).
 	for k, v := range r.Header {
 		auth_req.Header[k] = v
 	}
-	result, err = http_client.Do(auth_req)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
+	return http_client.Do(auth_req)
 }
 
 func handle_get_info_refs(user string, _ string, path string, w http.ResponseWriter, r *http.Request) {
 	rpc := r.URL.Query().Get("service")
 	switch rpc {
 	case "git-upload-pack", "git-receive-pack":
-		cmd := exec.Command("git", strings.TrimPrefix(rpc, "git-"), "--stateless-rpc", "--advertise-refs", path)
+		cmd := exec.Command("git", sub_command(rpc), "--stateless-rpc", "--advertise-refs", path)
 		set_cmd_env(cmd, user)
 		stdout, err := cmd.StdoutPipe()
 		if err != nil {
@@ -131,7 +136,7 @@ func handle_get_info_refs(user string, _ string, path string, w http.ResponseWri
 			return
 		}
 		w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
-		no_cache(w)
+		header_no_cache(w)
 		w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just panic
 		if err := pkt_line(w, fmt.Sprintf("# service=%s\n", rpc)); err != nil {
 			panic(err)
@@ -140,15 +145,19 @@ func handle_get_info_refs(user string, _ string, path string, w http.ResponseWri
 			panic(err)
 		}
 		if _, err := io.Copy(w, stdout); err != nil {
-			panic(err) // No point in sending 500 to the client
+			panic(err)
 		}
 		if err := cmd.Wait(); err != nil {
-			panic(err) // No point in sending 500 to the client
+			panic(err)
 		}
 	case "":
 		// The 'dumb' Git HTTP protocol is not supported
 		http.Error(w, "Not found", 404)
 	}
+}
+
+func sub_command(rpc string) string {
+	return strings.TrimPrefix(rpc, "git-")
 }
 
 func set_cmd_env(cmd *exec.Cmd, user string) {
@@ -168,7 +177,8 @@ func handle_post_rpc(user string, rpc string, path string, w http.ResponseWriter
 	} else {
 		body = r.Body
 	}
-	cmd := exec.Command("git", strings.TrimPrefix(rpc, "git-"), "--stateless-rpc", path)
+
+	cmd := exec.Command("git", sub_command(rpc), "--stateless-rpc", path)
 	set_cmd_env(cmd, user)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -193,13 +203,13 @@ func handle_post_rpc(user string, rpc string, path string, w http.ResponseWriter
 	stdin.Close()
 
 	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-result", rpc))
-	no_cache(w)
+	header_no_cache(w)
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just panic
 	if _, err := io.Copy(w, stdout); err != nil {
-		panic(err) // No point in sending 500 to the client
+		panic(err)
 	}
 	if err := cmd.Wait(); err != nil {
-		panic(err) // No point in sending 500 to the client
+		panic(err)
 	}
 }
 
@@ -218,6 +228,6 @@ func fail_500(w http.ResponseWriter, err error) {
 	log.Print(err)
 }
 
-func no_cache(w http.ResponseWriter) {
+func header_no_cache(w http.ResponseWriter) {
 	w.Header().Add("Cache-Control", "no-cache")
 }
