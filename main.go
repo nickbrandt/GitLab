@@ -114,7 +114,7 @@ func handle_get_info_refs(user string, _ string, path string, w http.ResponseWri
 		}
 		w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
 		no_cache(w)
-		w.WriteHeader(200)
+		w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just panic
 		if err := pkt_line(w, fmt.Sprintf("# service=%s\n", rpc)); err != nil {
 			panic(err)
 		}
@@ -176,7 +176,7 @@ func handle_post_rpc(user string, rpc string, path string, w http.ResponseWriter
 
 	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-result", rpc))
 	no_cache(w)
-	w.WriteHeader(200)
+	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just panic
 	if _, err := io.Copy(w, stdout); err != nil {
 		panic(err) // No point in sending 500 to the client
 	}
