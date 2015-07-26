@@ -107,6 +107,7 @@ func handle_get_info_refs(user string, _ string, path string, w http.ResponseWri
 			fail_500(w, err)
 			return
 		}
+		defer stdout.Close()
 		if err := cmd.Start(); err != nil {
 			fail_500(w, err)
 			return
@@ -156,11 +157,13 @@ func handle_post_rpc(user string, rpc string, path string, w http.ResponseWriter
 		fail_500(w, err)
 		return
 	}
+	defer stdout.Close()
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
 		fail_500(w, err)
 		return
 	}
+	defer stdin.Close()
 	if err := cmd.Start(); err != nil {
 		fail_500(w, err)
 		return
