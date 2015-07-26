@@ -1,3 +1,15 @@
+/*
+gitlab-git-http-server handles 'smart' Git HTTP requests for GitLab
+
+This HTTP server can service 'git clone', 'git push' etc. commands
+from Git clients that use the 'smart' Git HTTP protocol (git-upload-pack
+and git-receive-pack). It is intended to be deployed behind NGINX
+(for request routing and SSL termination) with access to a GitLab
+backend (for authentication and authorization) and local disk access
+to Git repositories managed by GitLab.
+
+This HTTP server replaces gitlab-grack.
+*/
 package main
 
 import (
