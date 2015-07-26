@@ -114,7 +114,12 @@ func handle_get_info_refs(user string, _ string, path string, w http.ResponseWri
 		w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
 		no_cache(w)
 		w.WriteHeader(200)
-		fmt.Fprintf(w, "%s0000", pkt_line(fmt.Sprintf("# service=%s\n", rpc)))
+		if err := pkt_line(w, fmt.Sprintf("# service=%s\n", rpc)); err != nil {
+			panic(err)
+		}
+		if err := pkt_flush(w); err != nil {
+			panic(err)
+		}
 		if _, err := io.Copy(w, stdout); err != nil {
 			panic(err) // No point in sending 500 to the client
 		}
@@ -177,8 +182,14 @@ func handle_post_rpc(user string, rpc string, path string, w http.ResponseWriter
 	}
 }
 
-func pkt_line(s string) string {
-	return fmt.Sprintf("%04x%s", len(s)+4, s)
+func pkt_line(w io.Writer, s string) error {
+	_, err := fmt.Fprintf(w, "%04x%s", len(s)+4, s)
+	return err
+}
+
+func pkt_flush(w io.Writer) error {
+	_, err := fmt.Fprint(w, "0000")
+	return err
 }
 
 func fail_500(w http.ResponseWriter, err error) {
