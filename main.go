@@ -22,6 +22,7 @@ type gitHandler struct {
 }
 
 var http_client = &http.Client{}
+var path_traversal = regexp.MustCompile(`/../`)
 
 // Command-line options
 var repo_root string
@@ -52,6 +53,11 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 	for _, g := range git_handlers {
 		path_match := g.regexp.FindStringSubmatch(r.URL.Path)
 		if r.Method == g.method && path_match != nil {
+			found_path := path_match[1]
+			if !valid_path(found_path) {
+				http.Error(w, "Not found", 404)
+				return
+			}
 			auth_response, err := do_auth_request(r)
 			if err != nil {
 				fail_500(w, err)
@@ -73,11 +79,23 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 				fail_500(w, err)
 				return
 			}
-			g.handle_func(user, g.rpc, path.Join(repo_root, path_match[1]), w, r)
+			g.handle_func(user, g.rpc, path.Join(repo_root, found_path), w, r)
 			return
 		}
 	}
 	http.Error(w, "Not found", 404)
+}
+
+func valid_path(p string) bool {
+	if path_traversal.MatchString(p) {
+		log.Printf("path traversal detected in %s", p)
+		return false
+	}
+	if _, err := os.Stat(path.Join(repo_root, p, "objects")); err != nil {
+		log.Print(err)
+		return false
+	}
+	return true
 }
 
 func do_auth_request(r *http.Request) (result *http.Response, err error) {
