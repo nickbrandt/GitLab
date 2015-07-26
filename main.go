@@ -80,8 +80,7 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Not found", 404)
 }
 
-func do_auth_request(r *http.Request) (*http.Response, error) {
-	var err error
+func do_auth_request(r *http.Request) (result *http.Response, err error) {
 	url := fmt.Sprintf("%s%s", *auth_backend, r.URL.RequestURI())
 	auth_req, err := http.NewRequest(r.Method, url, nil)
 	if err != nil {
@@ -90,7 +89,7 @@ func do_auth_request(r *http.Request) (*http.Response, error) {
 	for k, v := range r.Header {
 		auth_req.Header[k] = v
 	}
-	result, err := http_client.Do(auth_req)
+	result, err = http_client.Do(auth_req)
 	if err != nil {
 		return nil, err
 	}
