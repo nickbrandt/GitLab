@@ -46,7 +46,11 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 	for _, g := range git_handlers {
 		path_match := g.regexp.FindStringSubmatch(r.URL.Path)
 		if r.Method == g.method && path_match != nil {
-			auth_response := do_auth_request(r)
+			auth_response, err := do_auth_request(r)
+			if err != nil {
+				fail_500(w, err)
+				return
+			}
 			if auth_response.StatusCode != 200 {
 				for k, v := range auth_response.Header {
 					w.Header()[k] = v
@@ -55,8 +59,9 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 				io.Copy(w, auth_response.Body)
 				return
 			}
-			if _, err := fmt.Fscan(auth_response.Body, user); err != nil {
+			if _, err := fmt.Fscan(auth_response.Body, &user); err != nil {
 				fail_500(w, err)
+				return
 			}
 			g.handle_func(user, g.rpc, path.Join(repo_root, path_match[1]), w, r)
 			return
@@ -66,21 +71,21 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(404)
 }
 
-func do_auth_request(r *http.Request) *http.Response {
+func do_auth_request(r *http.Request) (*http.Response, error) {
 	var err error
 	url := fmt.Sprintf("%s%s", *auth_backend, r.URL.RequestURI())
 	auth_req, err := http.NewRequest(r.Method, url, nil)
 	if err != nil {
-		return &http.Response{StatusCode: 500}
+		return nil, err
 	}
 	for k, v := range r.Header {
 		auth_req.Header[k] = v
 	}
 	result, err := http_client.Do(auth_req)
 	if err != nil {
-		return &http.Response{StatusCode: 500}
+		return nil, err
 	}
-	return result
+	return nil, err
 }
 
 func handle_get_info_refs(user string, _ string, path string, w http.ResponseWriter, r *http.Request) {
