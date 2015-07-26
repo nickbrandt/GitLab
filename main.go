@@ -85,7 +85,7 @@ func do_auth_request(r *http.Request) (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	return nil, err
+	return result, nil
 }
 
 func handle_get_info_refs(user string, _ string, path string, w http.ResponseWriter, r *http.Request) {
