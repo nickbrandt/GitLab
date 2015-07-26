@@ -101,7 +101,7 @@ func handle_get_info_refs(user string, _ string, path string, w http.ResponseWri
 	switch rpc {
 	case "git-upload-pack", "git-receive-pack":
 		cmd := exec.Command("git", strings.TrimPrefix(rpc, "git-"), "--stateless-rpc", "--advertise-refs", path)
-		cmd.Env = []string{fmt.Sprintf("PATH=%s", os.Getenv("PATH")), fmt.Sprintf("GL_ID=%s", user)}
+		set_cmd_env(cmd, user)
 		stdout, err := cmd.StdoutPipe()
 		if err != nil {
 			fail_500(w, err)
@@ -127,6 +127,10 @@ func handle_get_info_refs(user string, _ string, path string, w http.ResponseWri
 	}
 }
 
+func set_cmd_env(cmd *exec.Cmd, user string) {
+	cmd.Env = []string{fmt.Sprintf("PATH=%s", os.Getenv("PATH")), fmt.Sprintf("GL_ID=%s", user)}
+}
+
 func handle_post_rpc(user string, rpc string, path string, w http.ResponseWriter, r *http.Request) {
 	var body io.Reader
 	var err error
@@ -141,7 +145,7 @@ func handle_post_rpc(user string, rpc string, path string, w http.ResponseWriter
 		body = r.Body
 	}
 	cmd := exec.Command("git", strings.TrimPrefix(rpc, "git-"), "--stateless-rpc", path)
-	cmd.Env = []string{fmt.Sprintf("PATH=%s", os.Getenv("PATH")), fmt.Sprintf("GL_ID=%s", user)}
+	set_cmd_env(cmd, user)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		fail_500(w, err)
