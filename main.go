@@ -53,11 +53,15 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 	for _, g := range git_services {
 		path_match := g.regexp.FindStringSubmatch(r.URL.Path)
 		if r.Method == g.method && path_match != nil {
+			// Validate the path to the Git repository
 			found_path := path_match[1]
 			if !valid_path(found_path) {
 				http.Error(w, "Not found", 404)
 				return
 			}
+
+			// Ask the auth backend if the request is allowed, and what the
+			// user ID (GL_ID) is.
 			auth_response, err := do_auth_request(r)
 			if err != nil {
 				fail_500(w, err)
@@ -76,13 +80,15 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 				io.Copy(w, auth_response.Body)
 				return
 			}
-			// The auth backend told us who the user is according to them
-			// (GL_ID). We must extract this information from the auth response
-			// body.
+
+			// The auth backend validated the client request and told us who
+			// the user is according to them (GL_ID). We must extract this
+			// information from the auth response body.
 			if _, err := fmt.Fscan(auth_response.Body, &user); err != nil {
 				fail_500(w, err)
 				return
 			}
+
 			g.handle_func(user, g.rpc, path.Join(repo_root, found_path), w, r)
 			return
 		}
@@ -96,7 +102,8 @@ func valid_path(p string) bool {
 		log.Printf("path traversal detected in %s", p)
 		return false
 	}
-	// If /path/to/foo.git/objects exist then let's assume it is a valid Git
+
+	// If /path/to/foo.git/objects exists then let's assume it is a valid Git
 	// repository.
 	if _, err := os.Stat(path.Join(repo_root, p, "objects")); err != nil {
 		log.Print(err)
@@ -123,6 +130,7 @@ func handle_get_info_refs(user string, _ string, path string, w http.ResponseWri
 	rpc := r.URL.Query().Get("service")
 	switch rpc {
 	case "git-upload-pack", "git-receive-pack":
+		// Prepare our Git subprocess
 		cmd := exec.Command("git", sub_command(rpc), "--stateless-rpc", "--advertise-refs", path)
 		set_cmd_env(cmd, user)
 		stdout, err := cmd.StdoutPipe()
@@ -135,6 +143,8 @@ func handle_get_info_refs(user string, _ string, path string, w http.ResponseWri
 			fail_500(w, err)
 			return
 		}
+
+		// Start writing the response
 		w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
 		header_no_cache(w)
 		w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just panic
@@ -153,6 +163,7 @@ func handle_get_info_refs(user string, _ string, path string, w http.ResponseWri
 	case "":
 		// The 'dumb' Git HTTP protocol is not supported
 		http.Error(w, "Not found", 404)
+		return
 	}
 }
 
@@ -161,13 +172,17 @@ func sub_command(rpc string) string {
 }
 
 func set_cmd_env(cmd *exec.Cmd, user string) {
-	cmd.Env = []string{fmt.Sprintf("PATH=%s", os.Getenv("PATH")), fmt.Sprintf("GL_ID=%s", user)}
+	cmd.Env = []string{
+		fmt.Sprintf("PATH=%s", os.Getenv("PATH")),
+		fmt.Sprintf("GL_ID=%s", user),
+	}
 }
 
 func handle_post_rpc(user string, rpc string, path string, w http.ResponseWriter, r *http.Request) {
 	var body io.Reader
 	var err error
 
+	// The client request body may have been gzipped.
 	if r.Header.Get("Content-Encoding") == "gzip" {
 		body, err = gzip.NewReader(r.Body)
 		if err != nil {
@@ -178,6 +193,7 @@ func handle_post_rpc(user string, rpc string, path string, w http.ResponseWriter
 		body = r.Body
 	}
 
+	// Prepare our Git subprocess
 	cmd := exec.Command("git", sub_command(rpc), "--stateless-rpc", path)
 	set_cmd_env(cmd, user)
 	stdout, err := cmd.StdoutPipe()
@@ -196,12 +212,15 @@ func handle_post_rpc(user string, rpc string, path string, w http.ResponseWriter
 		fail_500(w, err)
 		return
 	}
+
+	// Write the client request body to Git's standard input
 	if _, err := io.Copy(stdin, body); err != nil {
 		fail_500(w, err)
 		return
 	}
 	stdin.Close()
 
+	// Start writing the response
 	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-result", rpc))
 	header_no_cache(w)
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just panic
