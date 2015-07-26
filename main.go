@@ -67,8 +67,7 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	log.Print("Reached end of dispatch for loop")
-	w.WriteHeader(404)
+	http.Error(w, "Not found", 404)
 }
 
 func do_auth_request(r *http.Request) (*http.Response, error) {
@@ -105,17 +104,17 @@ func handle_get_info_refs(user string, _ string, path string, w http.ResponseWri
 		}
 		w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
 		no_cache(w)
+		w.WriteHeader(200)
 		fmt.Fprintf(w, "%s0000", pkt_line(fmt.Sprintf("# service=%s\n", rpc)))
 		if _, err := io.Copy(w, stdout); err != nil {
-			fail_500(w, err)
-			return
+			panic(err) // No point in sending 500 to the client
 		}
 		if err := cmd.Wait(); err != nil {
-			fail_500(w, err)
-			return
+			panic(err) // No point in sending 500 to the client
 		}
 	case "":
-		log.Print("dumb info refs")
+		// The 'dumb' Git HTTP protocol is not supported
+		http.Error(w, "Not found", 404)
 	}
 }
 
@@ -147,20 +146,20 @@ func handle_post_rpc(user string, rpc string, path string, w http.ResponseWriter
 		fail_500(w, err)
 		return
 	}
-	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-result", rpc))
-	no_cache(w)
 	if _, err := io.Copy(stdin, body); err != nil {
 		fail_500(w, err)
 		return
 	}
 	stdin.Close()
+
+	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-result", rpc))
+	no_cache(w)
+	w.WriteHeader(200)
 	if _, err := io.Copy(w, stdout); err != nil {
-		fail_500(w, err)
-		return
+		panic(err) // No point in sending 500 to the client
 	}
 	if err := cmd.Wait(); err != nil {
-		fail_500(w, err)
-		return
+		panic(err) // No point in sending 500 to the client
 	}
 }
 
@@ -169,7 +168,7 @@ func pkt_line(s string) string {
 }
 
 func fail_500(w http.ResponseWriter, err error) {
-	w.WriteHeader(500)
+	http.Error(w, "Internal server error", 500)
 	log.Print(err)
 }
 
