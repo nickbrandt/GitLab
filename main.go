@@ -149,42 +149,41 @@ func do_auth_request(r *http.Request) (result *http.Response, err error) {
 
 func handle_get_info_refs(gl_id string, _ string, path string, w http.ResponseWriter, r *http.Request) {
 	rpc := r.URL.Query().Get("service")
-	switch rpc {
-	case "git-upload-pack", "git-receive-pack":
-		// Prepare our Git subprocess
-		cmd := exec.Command("git", sub_command(rpc), "--stateless-rpc", "--advertise-refs", path)
-		set_cmd_env(cmd, gl_id)
-		stdout, err := cmd.StdoutPipe()
-		if err != nil {
-			fail_500(w, err)
-			return
-		}
-		defer stdout.Close()
-		if err := cmd.Start(); err != nil {
-			fail_500(w, err)
-			return
-		}
-
-		// Start writing the response
-		w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
-		header_no_cache(w)
-		w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just panic
-		if err := pkt_line(w, fmt.Sprintf("# service=%s\n", rpc)); err != nil {
-			panic(err)
-		}
-		if err := pkt_flush(w); err != nil {
-			panic(err)
-		}
-		if _, err := io.Copy(w, stdout); err != nil {
-			panic(err)
-		}
-		if err := cmd.Wait(); err != nil {
-			panic(err)
-		}
-	case "":
+	if !(rpc == "git-upload-pack" || rpc == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
 		http.Error(w, "Not Found", 404)
 		return
+	}
+
+	// Prepare our Git subprocess
+	cmd := exec.Command("git", sub_command(rpc), "--stateless-rpc", "--advertise-refs", path)
+	set_cmd_env(cmd, gl_id)
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		fail_500(w, err)
+		return
+	}
+	defer stdout.Close()
+	if err := cmd.Start(); err != nil {
+		fail_500(w, err)
+		return
+	}
+
+	// Start writing the response
+	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
+	header_no_cache(w)
+	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just panic
+	if err := pkt_line(w, fmt.Sprintf("# service=%s\n", rpc)); err != nil {
+		panic(err)
+	}
+	if err := pkt_flush(w); err != nil {
+		panic(err)
+	}
+	if _, err := io.Copy(w, stdout); err != nil {
+		panic(err)
+	}
+	if err := cmd.Wait(); err != nil {
+		panic(err)
 	}
 }
 
