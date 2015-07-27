@@ -68,54 +68,62 @@ func main() {
 
 func git_handler(w http.ResponseWriter, r *http.Request) {
 	var gl_id string
+	var path_match []string
+	var g gitService
+	var found_service bool
 
 	log.Print(r.Method, " ", r.URL)
 
-	for _, g := range git_services {
-		path_match := g.regexp.FindStringSubmatch(r.URL.Path)
+	// Look for a matching Git service
+	for _, g = range git_services {
+		path_match = g.regexp.FindStringSubmatch(r.URL.Path)
 		if r.Method == g.method && path_match != nil {
-			// Ask the auth backend if the request is allowed, and what the
-			// user ID (GL_ID) is.
-			auth_response, err := do_auth_request(r)
-			if err != nil {
-				fail_500(w, err)
-				return
-			}
-			if auth_response.StatusCode != 200 {
-				// The Git request is not allowed by the backend. Maybe the
-				// client needs to send HTTP Basic credentials.  Forward the
-				// response from the auth backend to our client. This includes
-				// the 'WWW-Authentication' header that acts as a hint that
-				// Basic auth credentials are needed.
-				for k, v := range auth_response.Header {
-					w.Header()[k] = v
-				}
-				w.WriteHeader(auth_response.StatusCode)
-				io.Copy(w, auth_response.Body)
-				return
-			}
-
-			// The auth backend validated the client request and told us who
-			// the user is according to them (GL_ID). We must extract this
-			// information from the auth response body.
-			if _, err := fmt.Fscan(auth_response.Body, &gl_id); err != nil {
-				fail_500(w, err)
-				return
-			}
-
-			// Validate the path to the Git repository
-			found_path := path_match[1]
-			if !valid_path(found_path) {
-				http.Error(w, "Not Found", 404)
-				return
-			}
-
-			g.handle_func(gl_id, g.rpc, path.Join(repo_root, found_path), w, r)
-			return
+			found_service = true
+			break
 		}
 	}
-	http.Error(w, "Not Found", 404)
-	return
+	if !found_service {
+		http.Error(w, "Not Found", 404)
+		return
+	}
+
+	// Ask the auth backend if the request is allowed, and what the
+	// user ID (GL_ID) is.
+	auth_response, err := do_auth_request(r)
+	if err != nil {
+		fail_500(w, err)
+		return
+	}
+	if auth_response.StatusCode != 200 {
+		// The Git request is not allowed by the backend. Maybe the
+		// client needs to send HTTP Basic credentials.  Forward the
+		// response from the auth backend to our client. This includes
+		// the 'WWW-Authentication' header that acts as a hint that
+		// Basic auth credentials are needed.
+		for k, v := range auth_response.Header {
+			w.Header()[k] = v
+		}
+		w.WriteHeader(auth_response.StatusCode)
+		io.Copy(w, auth_response.Body)
+		return
+	}
+
+	// The auth backend validated the client request and told us who
+	// the user is according to them (GL_ID). We must extract this
+	// information from the auth response body.
+	if _, err := fmt.Fscan(auth_response.Body, &gl_id); err != nil {
+		fail_500(w, err)
+		return
+	}
+
+	// Validate the path to the Git repository
+	found_path := path_match[1]
+	if !valid_path(found_path) {
+		http.Error(w, "Not Found", 404)
+		return
+	}
+
+	g.handle_func(gl_id, g.rpc, path.Join(repo_root, found_path), w, r)
 }
 
 func valid_path(p string) bool {
