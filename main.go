@@ -67,7 +67,7 @@ func main() {
 }
 
 func git_handler(w http.ResponseWriter, r *http.Request) {
-	var user string
+	var gl_id string
 
 	log.Print(r.Method, " ", r.URL)
 
@@ -98,7 +98,7 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 			// The auth backend validated the client request and told us who
 			// the user is according to them (GL_ID). We must extract this
 			// information from the auth response body.
-			if _, err := fmt.Fscan(auth_response.Body, &user); err != nil {
+			if _, err := fmt.Fscan(auth_response.Body, &gl_id); err != nil {
 				fail_500(w, err)
 				return
 			}
@@ -110,7 +110,7 @@ func git_handler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			g.handle_func(user, g.rpc, path.Join(repo_root, found_path), w, r)
+			g.handle_func(gl_id, g.rpc, path.Join(repo_root, found_path), w, r)
 			return
 		}
 	}
@@ -147,13 +147,13 @@ func do_auth_request(r *http.Request) (result *http.Response, err error) {
 	return http_client.Do(auth_req)
 }
 
-func handle_get_info_refs(user string, _ string, path string, w http.ResponseWriter, r *http.Request) {
+func handle_get_info_refs(gl_id string, _ string, path string, w http.ResponseWriter, r *http.Request) {
 	rpc := r.URL.Query().Get("service")
 	switch rpc {
 	case "git-upload-pack", "git-receive-pack":
 		// Prepare our Git subprocess
 		cmd := exec.Command("git", sub_command(rpc), "--stateless-rpc", "--advertise-refs", path)
-		set_cmd_env(cmd, user)
+		set_cmd_env(cmd, gl_id)
 		stdout, err := cmd.StdoutPipe()
 		if err != nil {
 			fail_500(w, err)
@@ -192,14 +192,14 @@ func sub_command(rpc string) string {
 	return strings.TrimPrefix(rpc, "git-")
 }
 
-func set_cmd_env(cmd *exec.Cmd, user string) {
+func set_cmd_env(cmd *exec.Cmd, gl_id string) {
 	cmd.Env = []string{
 		fmt.Sprintf("PATH=%s", os.Getenv("PATH")),
-		fmt.Sprintf("GL_ID=%s", user),
+		fmt.Sprintf("GL_ID=%s", gl_id),
 	}
 }
 
-func handle_post_rpc(user string, rpc string, path string, w http.ResponseWriter, r *http.Request) {
+func handle_post_rpc(gl_id string, rpc string, path string, w http.ResponseWriter, r *http.Request) {
 	var body io.Reader
 	var err error
 
@@ -216,7 +216,7 @@ func handle_post_rpc(user string, rpc string, path string, w http.ResponseWriter
 
 	// Prepare our Git subprocess
 	cmd := exec.Command("git", sub_command(rpc), "--stateless-rpc", path)
-	set_cmd_env(cmd, user)
+	set_cmd_env(cmd, gl_id)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		fail_500(w, err)
