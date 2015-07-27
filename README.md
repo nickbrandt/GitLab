@@ -22,3 +22,7 @@ change in GitLab / NGINX to make this work.
 - ....end git-receive-pack process
 - ..end POST to gitlab-git-http-server
 - end POST to NGINX
+
+## License
+
+This code is distributed under the MIT license, see the LICENSE file.
