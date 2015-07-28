@@ -14,6 +14,7 @@ package main
 
 import (
 	"compress/gzip"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -29,8 +30,12 @@ import (
 type gitService struct {
 	method     string
 	regexp     *regexp.Regexp
-	handleFunc func(string, string, string, http.ResponseWriter, *http.Request)
+	handleFunc func(gitEnv, string, string, http.ResponseWriter, *http.Request)
 	rpc        string
+}
+
+type gitEnv struct {
+	GL_ID string
 }
 
 var httpClient = &http.Client{}
@@ -67,7 +72,7 @@ func main() {
 }
 
 func gitHandler(w http.ResponseWriter, r *http.Request) {
-	var gl_id string
+	var env gitEnv
 	var pathMatch []string
 	var g gitService
 	var foundService bool
@@ -111,7 +116,8 @@ func gitHandler(w http.ResponseWriter, r *http.Request) {
 	// The auth backend validated the client request and told us who
 	// the user is according to them (GL_ID). We must extract this
 	// information from the auth response body.
-	if _, err := fmt.Fscan(authResponse.Body, &gl_id); err != nil {
+	dec := json.NewDecoder(authResponse.Body)
+	if err := dec.Decode(&env); err != nil {
 		fail500(w, err)
 		return
 	}
@@ -123,7 +129,7 @@ func gitHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	g.handleFunc(gl_id, g.rpc, path.Join(repoRoot, foundPath), w, r)
+	g.handleFunc(env, g.rpc, path.Join(repoRoot, foundPath), w, r)
 }
 
 func validPath(p string) bool {
@@ -155,7 +161,7 @@ func doAuthRequest(r *http.Request) (result *http.Response, err error) {
 	return httpClient.Do(authReq)
 }
 
-func handleGetInfoRefs(gl_id string, _ string, path string, w http.ResponseWriter, r *http.Request) {
+func handleGetInfoRefs(env gitEnv, _ string, path string, w http.ResponseWriter, r *http.Request) {
 	rpc := r.URL.Query().Get("service")
 	if !(rpc == "git-upload-pack" || rpc == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
@@ -165,7 +171,7 @@ func handleGetInfoRefs(gl_id string, _ string, path string, w http.ResponseWrite
 
 	// Prepare our Git subprocess
 	cmd := exec.Command("git", subCommand(rpc), "--stateless-rpc", "--advertise-refs", path)
-	setCmdEnv(cmd, gl_id)
+	setCmdEnv(cmd, env)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		fail500(w, err)
@@ -200,14 +206,14 @@ func subCommand(rpc string) string {
 	return strings.TrimPrefix(rpc, "git-")
 }
 
-func setCmdEnv(cmd *exec.Cmd, gl_id string) {
+func setCmdEnv(cmd *exec.Cmd, env gitEnv) {
 	cmd.Env = []string{
 		fmt.Sprintf("PATH=%s", os.Getenv("PATH")),
-		fmt.Sprintf("GL_ID=%s", gl_id),
+		fmt.Sprintf("GL_ID=%s", env.GL_ID),
 	}
 }
 
-func handlePostRPC(gl_id string, rpc string, path string, w http.ResponseWriter, r *http.Request) {
+func handlePostRPC(env gitEnv, rpc string, path string, w http.ResponseWriter, r *http.Request) {
 	var body io.Reader
 	var err error
 
@@ -224,7 +230,7 @@ func handlePostRPC(gl_id string, rpc string, path string, w http.ResponseWriter,
 
 	// Prepare our Git subprocess
 	cmd := exec.Command("git", subCommand(rpc), "--stateless-rpc", path)
-	setCmdEnv(cmd, gl_id)
+	setCmdEnv(cmd, env)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		fail500(w, err)
