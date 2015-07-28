@@ -176,6 +176,7 @@ func handle_get_info_refs(gl_id string, _ string, path string, w http.ResponseWr
 		fail_500(w, err)
 		return
 	}
+	defer cmd.Wait()
 
 	// Start writing the response
 	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
@@ -240,6 +241,7 @@ func handle_post_rpc(gl_id string, rpc string, path string, w http.ResponseWrite
 		fail_500(w, err)
 		return
 	}
+	defer cmd.Wait()
 
 	// Write the client request body to Git's standard input
 	if _, err := io.Copy(stdin, body); err != nil {
