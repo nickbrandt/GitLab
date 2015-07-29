@@ -25,6 +25,7 @@ import (
 	"path"
 	"regexp"
 	"strings"
+	"syscall"
 )
 
 type gitService struct {
@@ -176,8 +177,7 @@ func handleGetInfoRefs(env gitEnv, _ string, path string, w http.ResponseWriter,
 	}
 
 	// Prepare our Git subprocess
-	cmd := exec.Command("git", subCommand(rpc), "--stateless-rpc", "--advertise-refs", path)
-	setCmdEnv(cmd, env)
+	cmd := gitCommand(env, "git", subCommand(rpc), "--stateless-rpc", "--advertise-refs", path)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		fail500(w, err)
@@ -212,11 +212,16 @@ func subCommand(rpc string) string {
 	return strings.TrimPrefix(rpc, "git-")
 }
 
-func setCmdEnv(cmd *exec.Cmd, env gitEnv) {
+func gitCommand(env gitEnv, name string, args ...string) *exec.Cmd {
+	cmd := exec.Command(name, args...)
+	// Start the command in its own process group (nice for signalling)
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	// Explicitly set the environment for the Git command
 	cmd.Env = []string{
 		fmt.Sprintf("PATH=%s", os.Getenv("PATH")),
 		fmt.Sprintf("GL_ID=%s", env.GL_ID),
 	}
+	return cmd
 }
 
 func handlePostRPC(env gitEnv, rpc string, path string, w http.ResponseWriter, r *http.Request) {
@@ -235,8 +240,7 @@ func handlePostRPC(env gitEnv, rpc string, path string, w http.ResponseWriter, r
 	}
 
 	// Prepare our Git subprocess
-	cmd := exec.Command("git", subCommand(rpc), "--stateless-rpc", path)
-	setCmdEnv(cmd, env)
+	cmd := gitCommand(env, "git", subCommand(rpc), "--stateless-rpc", path)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		fail500(w, err)
