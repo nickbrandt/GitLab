@@ -38,11 +38,13 @@ type gitEnv struct {
 	GL_ID string
 }
 
+var Version string
 var httpClient = &http.Client{}
 var pathTraversal = regexp.MustCompile(`/../`)
 
 // Command-line options
 var repoRoot string
+var printVersion = flag.Bool("version", false, "Print version and exit")
 var listenAddr = flag.String("listenAddr", "localhost:8181", "Listen address for HTTP server")
 var authBackend = flag.String("authBackend", "http://localhost:8080", "Authentication/authorization backend")
 
@@ -60,6 +62,10 @@ func main() {
 		flag.PrintDefaults()
 	}
 	flag.Parse()
+if *printVersion {
+fmt.Printf("gitlab-git-http-server %s\n", Version)
+os.Exit(0)
+}
 	repoRoot = flag.Arg(0)
 	if repoRoot == "" {
 		flag.Usage()
