@@ -10,6 +10,11 @@ auth request to GitLab Rails app) -> git-upload-pack
 There are two patches in the repo that show what would need to
 change in GitLab / NGINX to make this work.
 
+## Installation
+
+To install into `/usr/local/bin` run `make install`. To install
+into `/foo/bin` run `make install PREFIX=/foo`.
+
 ## Try it out
 
 You can try out the Git server without authentication as follows:
