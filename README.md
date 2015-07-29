@@ -7,9 +7,6 @@ and authorization logic is still handled by the GitLab Rails app.
 Architecture: Git client -> NGINX -> gitlab-git-http-server (makes
 auth request to GitLab Rails app) -> git-upload-pack
 
-There are two patches in the repo that show what would need to
-change in GitLab / NGINX to make this work.
-
 ## Installation
 
 To install into `/usr/local/bin` run `make install`. To install
