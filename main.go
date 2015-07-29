@@ -62,10 +62,10 @@ func main() {
 		flag.PrintDefaults()
 	}
 	flag.Parse()
-if *printVersion {
-fmt.Printf("gitlab-git-http-server %s\n", Version)
-os.Exit(0)
-}
+	if *printVersion {
+		fmt.Printf("gitlab-git-http-server %s\n", Version)
+		os.Exit(0)
+	}
 	repoRoot = flag.Arg(0)
 	if repoRoot == "" {
 		flag.Usage()
