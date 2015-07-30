@@ -188,8 +188,7 @@ func handleGetInfoRefs(env gitEnv, _ string, path string, w http.ResponseWriter,
 		fail500(w, err)
 		return
 	}
-	defer cmd.Wait()
-	defer sigKillProcessGroup(cmd) // Ensure brute force subprocess clean-up
+	defer cleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
 
 	// Start writing the response
 	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
@@ -258,8 +257,7 @@ func handlePostRPC(env gitEnv, rpc string, path string, w http.ResponseWriter, r
 		fail500(w, err)
 		return
 	}
-	defer cmd.Wait()
-	defer sigKillProcessGroup(cmd) // Ensure brute force subprocess clean-up
+	defer cleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
 
 	// Write the client request body to Git's standard input
 	if _, err := io.Copy(stdin, body); err != nil {
@@ -299,18 +297,17 @@ func setHeaderNoCache(w http.ResponseWriter) {
 	w.Header().Add("Cache-Control", "no-cache")
 }
 
-func sigKillProcessGroup(cmd *exec.Cmd) {
+func cleanUpProcessGroup(cmd *exec.Cmd) {
 	if cmd == nil {
 		return
 	}
 
 	process := cmd.Process
-	if process == nil {
-		return
-	}
-
-	if process.Pid > 0 {
+	if process != nil && process.Pid > 0 {
 		// Send SIGKILL (kill -9) to the process group of cmd
 		syscall.Kill(-process.Pid, syscall.SIGKILL)
 	}
+
+	// reap our child process
+	cmd.Wait()
 }
