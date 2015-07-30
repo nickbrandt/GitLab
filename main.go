@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
@@ -47,6 +48,7 @@ var pathTraversal = regexp.MustCompile(`/../`)
 var repoRoot string
 var printVersion = flag.Bool("version", false, "Print version and exit")
 var listenAddr = flag.String("listenAddr", "localhost:8181", "Listen address for HTTP server")
+var listenNetwork = flag.String("listenNetwork", "tcp", "Listen 'network' (protocol)")
 var authBackend = flag.String("authBackend", "http://localhost:8080", "Authentication/authorization backend")
 
 var gitServices = [...]gitService{
@@ -75,7 +77,11 @@ func main() {
 	log.Printf("repoRoot: %s", repoRoot)
 
 	http.HandleFunc("/", gitHandler)
-	log.Fatal(http.ListenAndServe(*listenAddr, nil))
+	listener, err := net.Listen(*listenNetwork, *listenAddr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Fatal(http.Serve(listener, nil))
 }
 
 func gitHandler(w http.ResponseWriter, r *http.Request) {
