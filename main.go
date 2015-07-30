@@ -81,7 +81,7 @@ func main() {
 
 	// Good housekeeping for Unix sockets: unlink before binding
 	if *listenNetwork == "unix" {
-		if err := os.Remove(*listenAddr); err != nil {
+		if err := os.Remove(*listenAddr); err != nil && !os.IsNotExist(err) {
 			log.Fatal(err)
 		}
 	}
