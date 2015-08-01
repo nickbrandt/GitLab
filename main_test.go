@@ -23,6 +23,12 @@ const testRepo = "test.git"
 var remote = fmt.Sprintf("http://%s/%s", servAddr, testRepo)
 
 func TestAllowedClone(t *testing.T) {
+	// Prepare clone directory
+	if err := os.RemoveAll(scratchDir); err != nil {
+		t.Fatal(err)
+	}
+
+	// Prepare test server and backend
 	ts := testAuthServer(200, `{"GL_ID":"user-123"}`)
 	defer ts.Close()
 	cmd, err := startServer(ts)
@@ -30,9 +36,11 @@ func TestAllowedClone(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer cleanUpProcessGroup(cmd)
-	if err := os.RemoveAll(scratchDir); err != nil {
+	if err := waitServer(); err != nil {
 		t.Fatal(err)
 	}
+
+	// Do the git clone
 	cloneCmd := exec.Command("git", "clone", remote, path.Join(scratchDir, "test"))
 	if out, err := cloneCmd.CombinedOutput(); err != nil {
 		t.Logf("%s", out)
@@ -67,6 +75,9 @@ func TestAllowedPush(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer cleanUpProcessGroup(cmd)
+	if err := waitServer(); err != nil {
+		t.Fatal(err)
+	}
 
 	// Perform the git push
 	pushCmd := exec.Command("git", "push", remote, branch)
@@ -84,29 +95,22 @@ func testAuthServer(code int, body string) *httptest.Server {
 	}))
 }
 
-func startServer(ts *httptest.Server) (cmd *exec.Cmd, err error) {
+func startServer(ts *httptest.Server) (*exec.Cmd, error) {
+	cmd := exec.Command("go", "run", "main.go", fmt.Sprintf("-authBackend=%s", ts.URL), fmt.Sprintf("-listenAddr=%s", servAddr), testRepoRoot)
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	return cmd, cmd.Start()
+}
+
+func waitServer() (err error) {
 	var conn net.Conn
 
-	// Start our server process
-	cmd = exec.Command("go", "run", "main.go", fmt.Sprintf("-authBackend=%s", ts.URL), fmt.Sprintf("-listenAddr=%s", servAddr), testRepoRoot)
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	err = cmd.Start()
-	if err != nil {
-		return
-	}
-
-	// Wait for the server to start accepting TCP connections
 	for i := 0; i < servWaitListen/servWaitSleep; i++ {
 		conn, err = net.Dial("tcp", servAddr)
 		if err == nil {
 			conn.Close()
-			break
+			return
 		}
 		time.Sleep(servWaitSleep * time.Millisecond)
 	}
-	if err != nil {
-		cleanUpProcessGroup(cmd)
-	}
-
 	return
 }
