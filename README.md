@@ -9,8 +9,19 @@ auth request to GitLab Rails app) -> git-upload-pack
 
 ## Installation
 
-To install into `/usr/local/bin` run `make install`. To install
-into `/foo/bin` run `make install PREFIX=/foo`.
+To install into `/usr/local/bin` run `make install`.
+
+```
+make install
+```
+
+To install into `/foo/bin` run `make install PREFIX=/foo`.
+
+## Tests
+
+```
+make clean test
+```
 
 ## Try it out
 
