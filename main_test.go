@@ -71,7 +71,9 @@ func TestDeniedClone(t *testing.T) {
 
 	// Do the git clone
 	cloneCmd := exec.Command("git", "clone", remote, checkoutDir)
-	if err := cloneCmd.Run(); err == nil {
+	out, err := cloneCmd.CombinedOutput()
+	t.Logf("%s", out)
+	if err == nil {
 		t.Fatal("git clone should have failed")
 	}
 }
@@ -115,7 +117,9 @@ func TestDeniedPush(t *testing.T) {
 	// Perform the git push
 	pushCmd := exec.Command("git", "push", remote, branch)
 	pushCmd.Dir = checkoutDir
-	if err := pushCmd.Run(); err == nil {
+	out, err := pushCmd.CombinedOutput()
+	t.Logf("%s", out)
+	if err == nil {
 		t.Fatal("git push should have failed")
 	}
 }
@@ -163,8 +167,9 @@ func waitServer() (err error) {
 }
 
 func runOrFail(t *testing.T, cmd *exec.Cmd) {
-	if out, err := cmd.CombinedOutput(); err != nil {
-		t.Logf("%s", out)
+	out, err := cmd.CombinedOutput()
+	t.Logf("%s", out)
+	if err != nil {
 		t.Fatal(err)
 	}
 }
