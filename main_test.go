@@ -18,11 +18,12 @@ const servWaitListen = 10000 // milliseconds to wait for server to start listeni
 const servWaitSleep = 100    // milliseconds sleep interval
 const scratchDir = "test/scratch"
 const testRepoRoot = "test/data"
+const testRepo = "test.git"
+
+var remote = fmt.Sprintf("http://%s/%s", servAddr, testRepo)
 
 func TestAllowedClone(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `{"GL_ID":"user-123"}`)
-	}))
+	ts := testAuthServer(200, `{"GL_ID":"user-123"}`)
 	defer ts.Close()
 	cmd, err := startServer(ts)
 	if err != nil {
@@ -32,11 +33,55 @@ func TestAllowedClone(t *testing.T) {
 	if err := os.RemoveAll(scratchDir); err != nil {
 		t.Fatal(err)
 	}
-	cloneCmd := exec.Command("git", "clone", fmt.Sprintf("http://%s/test.git", servAddr), path.Join(scratchDir, "test"))
+	cloneCmd := exec.Command("git", "clone", remote, path.Join(scratchDir, "test"))
 	if out, err := cloneCmd.CombinedOutput(); err != nil {
 		t.Logf("%s", out)
 		t.Fatal(err)
 	}
+}
+
+func TestAllowedPush(t *testing.T) {
+	// Prepare the repo to push from
+	checkoutDir := path.Join(scratchDir, "test")
+	if err := os.RemoveAll(scratchDir); err != nil {
+		t.Fatal(err)
+	}
+	cloneCmd := exec.Command("git", "clone", path.Join(testRepoRoot, testRepo), checkoutDir)
+	if out, err := cloneCmd.CombinedOutput(); err != nil {
+		t.Logf("%s", out)
+		t.Fatal(err)
+	}
+	branch := fmt.Sprintf("branch-%d", time.Now().Unix())
+	branchCmd := exec.Command("git", "branch", branch)
+	branchCmd.Dir = checkoutDir
+	if out, err := branchCmd.CombinedOutput(); err != nil {
+		t.Logf("%s", out)
+		t.Fatal(err)
+	}
+
+	// Prepare the test server and backend
+	ts := testAuthServer(200, `{"GL_ID":"user-123"}`)
+	defer ts.Close()
+	cmd, err := startServer(ts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer cleanUpProcessGroup(cmd)
+
+	// Perform the git push
+	pushCmd := exec.Command("git", "push", remote, branch)
+	pushCmd.Dir = checkoutDir
+	if out, err := pushCmd.CombinedOutput(); err != nil {
+		t.Logf("%s", out)
+		t.Fatal(err)
+	}
+}
+
+func testAuthServer(code int, body string) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(code)
+		fmt.Fprint(w, body)
+	}))
 }
 
 func startServer(ts *httptest.Server) (cmd *exec.Cmd, err error) {
