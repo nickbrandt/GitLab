@@ -43,6 +43,11 @@ func TestAllowedClone(t *testing.T) {
 	// Do the git clone
 	cloneCmd := exec.Command("git", "clone", remote, path.Join(scratchDir, "test"))
 	runOrFail(t, cloneCmd)
+
+	// We may have cloned an 'empty' repository, 'git show' will fail in it
+	showCmd := exec.Command("git", "show")
+	showCmd.Dir = path.Join(scratchDir, "test")
+	runOrFail(t, showCmd)
 }
 
 func TestDeniedClone(t *testing.T) {
