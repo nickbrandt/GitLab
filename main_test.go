@@ -58,7 +58,7 @@ func TestDeniedClone(t *testing.T) {
 	}
 
 	// Prepare test server and backend
-	ts := testAuthServer(403, `{"GL_ID":"user-123"}`)
+	ts := testAuthServer(403, "Access denied")
 	defer ts.Close()
 	cmd, err := startServer(ts)
 	if err != nil {
