@@ -32,14 +32,7 @@ func TestAllowedClone(t *testing.T) {
 	// Prepare test server and backend
 	ts := testAuthServer(200, `{"GL_ID":"user-123"}`)
 	defer ts.Close()
-	cmd, err := startServer(ts)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer cleanUpProcessGroup(cmd)
-	if err := waitServer(); err != nil {
-		t.Fatal(err)
-	}
+	defer cleanUpProcessGroup(startServerOrFail(t, ts))
 
 	// Do the git clone
 	cloneCmd := exec.Command("git", "clone", remote, checkoutDir)
@@ -60,14 +53,7 @@ func TestDeniedClone(t *testing.T) {
 	// Prepare test server and backend
 	ts := testAuthServer(403, "Access denied")
 	defer ts.Close()
-	cmd, err := startServer(ts)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer cleanUpProcessGroup(cmd)
-	if err := waitServer(); err != nil {
-		t.Fatal(err)
-	}
+	defer cleanUpProcessGroup(startServerOrFail(t, ts))
 
 	// Do the git clone
 	cloneCmd := exec.Command("git", "clone", remote, checkoutDir)
@@ -84,14 +70,7 @@ func TestAllowedPush(t *testing.T) {
 	// Prepare the test server and backend
 	ts := testAuthServer(200, `{"GL_ID":"user-123"}`)
 	defer ts.Close()
-	cmd, err := startServer(ts)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer cleanUpProcessGroup(cmd)
-	if err := waitServer(); err != nil {
-		t.Fatal(err)
-	}
+	defer cleanUpProcessGroup(startServerOrFail(t, ts))
 
 	// Perform the git push
 	pushCmd := exec.Command("git", "push", remote, fmt.Sprintf("master:%s", newBranch()))
@@ -105,14 +84,7 @@ func TestDeniedPush(t *testing.T) {
 	// Prepare the test server and backend
 	ts := testAuthServer(403, "Access denied")
 	defer ts.Close()
-	cmd, err := startServer(ts)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer cleanUpProcessGroup(cmd)
-	if err := waitServer(); err != nil {
-		t.Fatal(err)
-	}
+	defer cleanUpProcessGroup(startServerOrFail(t, ts))
 
 	// Perform the git push
 	pushCmd := exec.Command("git", "push", "-v", remote, fmt.Sprintf("master:%s", newBranch()))
@@ -144,12 +116,21 @@ func testAuthServer(code int, body string) *httptest.Server {
 	}))
 }
 
-func startServer(ts *httptest.Server) (*exec.Cmd, error) {
+func startServerOrFail(t *testing.T, ts *httptest.Server) *exec.Cmd {
 	cmd := exec.Command("go", "run", "main.go", fmt.Sprintf("-authBackend=%s", ts.URL), fmt.Sprintf("-listenAddr=%s", servAddr), testRepoRoot)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	return cmd, cmd.Start()
+	if err := cmd.Start(); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := waitServer(); err != nil {
+		cleanUpProcessGroup(cmd)
+		t.Fatal(err)
+	}
+
+	return cmd
 }
 
 func waitServer() (err error) {
