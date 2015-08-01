@@ -45,6 +45,31 @@ func TestAllowedClone(t *testing.T) {
 	runOrFail(t, cloneCmd)
 }
 
+func TestDeniedClone(t *testing.T) {
+	// Prepare clone directory
+	if err := os.RemoveAll(scratchDir); err != nil {
+		t.Fatal(err)
+	}
+
+	// Prepare test server and backend
+	ts := testAuthServer(403, "Denied")
+	defer ts.Close()
+	cmd, err := startServer(ts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer cleanUpProcessGroup(cmd)
+	if err := waitServer(); err != nil {
+		t.Fatal(err)
+	}
+
+	// Do the git clone
+	cloneCmd := exec.Command("git", "clone", remote, path.Join(scratchDir, "test"))
+	if err := cloneCmd.Run(); err == nil {
+		t.Fatal("git clone should have failed")
+	}
+}
+
 func TestAllowedPush(t *testing.T) {
 	// Prepare the repo to push from
 	checkoutDir := path.Join(scratchDir, "test")
