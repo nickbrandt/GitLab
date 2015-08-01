@@ -41,12 +41,16 @@ func TestAllowedClone(t *testing.T) {
 
 func startServer(ts *httptest.Server) (cmd *exec.Cmd, err error) {
 	var conn net.Conn
+
+	// Start our server process
 	cmd = exec.Command("go", "run", "main.go", fmt.Sprintf("-authBackend=%s", ts.URL), fmt.Sprintf("-listenAddr=%s", servAddr), testRepoRoot)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	err = cmd.Start()
 	if err != nil {
 		return
 	}
+
+	// Wait for the server to start accepting TCP connections
 	for i := 0; i < servWaitListen/servWaitSleep; i++ {
 		conn, err = net.Dial("tcp", servAddr)
 		if err == nil {
