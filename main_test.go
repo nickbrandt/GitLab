@@ -143,6 +143,8 @@ func testAuthServer(code int, body string) *httptest.Server {
 func startServer(ts *httptest.Server) (*exec.Cmd, error) {
 	cmd := exec.Command("go", "run", "main.go", fmt.Sprintf("-authBackend=%s", ts.URL), fmt.Sprintf("-listenAddr=%s", servAddr), testRepoRoot)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 	return cmd, cmd.Start()
 }
 
