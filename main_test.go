@@ -45,10 +45,10 @@ func TestAllowedClone(t *testing.T) {
 	cloneCmd := exec.Command("git", "clone", remote, checkoutDir)
 	runOrFail(t, cloneCmd)
 
-	// We may have cloned an 'empty' repository, 'git show' will fail in it
-	showCmd := exec.Command("git", "show")
-	showCmd.Dir = checkoutDir
-	runOrFail(t, showCmd)
+	// We may have cloned an 'empty' repository, 'git log' will fail in it
+	logCmd := exec.Command("git", "log", "-1", "--oneline")
+	logCmd.Dir = checkoutDir
+	runOrFail(t, logCmd)
 }
 
 func TestDeniedClone(t *testing.T) {
