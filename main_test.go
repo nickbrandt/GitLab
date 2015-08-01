@@ -77,16 +77,7 @@ func TestDeniedClone(t *testing.T) {
 }
 
 func TestAllowedPush(t *testing.T) {
-	// Prepare the repo to push from
-	if err := os.RemoveAll(scratchDir); err != nil {
-		t.Fatal(err)
-	}
-	cloneCmd := exec.Command("git", "clone", path.Join(testRepoRoot, testRepo), checkoutDir)
-	runOrFail(t, cloneCmd)
-	branch := fmt.Sprintf("branch-%d", time.Now().UnixNano())
-	branchCmd := exec.Command("git", "branch", branch)
-	branchCmd.Dir = checkoutDir
-	runOrFail(t, branchCmd)
+	branch := preparePushRepo(t)
 
 	// Prepare the test server and backend
 	ts := testAuthServer(200, `{"GL_ID":"user-123"}`)
@@ -104,6 +95,42 @@ func TestAllowedPush(t *testing.T) {
 	pushCmd := exec.Command("git", "push", remote, branch)
 	pushCmd.Dir = checkoutDir
 	runOrFail(t, pushCmd)
+}
+
+func TestDeniedPush(t *testing.T) {
+	branch := preparePushRepo(t)
+
+	// Prepare the test server and backend
+	ts := testAuthServer(403, "Access denied")
+	defer ts.Close()
+	cmd, err := startServer(ts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer cleanUpProcessGroup(cmd)
+	if err := waitServer(); err != nil {
+		t.Fatal(err)
+	}
+
+	// Perform the git push
+	pushCmd := exec.Command("git", "push", remote, branch)
+	pushCmd.Dir = checkoutDir
+	if err := pushCmd.Run(); err == nil {
+		t.Fatal("git push should have failed")
+	}
+}
+
+func preparePushRepo(t *testing.T) string {
+	if err := os.RemoveAll(scratchDir); err != nil {
+		t.Fatal(err)
+	}
+	cloneCmd := exec.Command("git", "clone", path.Join(testRepoRoot, testRepo), checkoutDir)
+	runOrFail(t, cloneCmd)
+	branch := fmt.Sprintf("branch-%d", time.Now().UnixNano())
+	branchCmd := exec.Command("git", "branch", branch)
+	branchCmd.Dir = checkoutDir
+	runOrFail(t, branchCmd)
+	return branch
 }
 
 func testAuthServer(code int, body string) *httptest.Server {
