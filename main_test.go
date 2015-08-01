@@ -51,7 +51,7 @@ func TestAllowedPush(t *testing.T) {
 		t.Logf("%s", out)
 		t.Fatal(err)
 	}
-	branch := fmt.Sprintf("branch-%d", time.Now().Unix())
+	branch := fmt.Sprintf("branch-%d", time.Now().UnixNano())
 	branchCmd := exec.Command("git", "branch", branch)
 	branchCmd.Dir = checkoutDir
 	if out, err := branchCmd.CombinedOutput(); err != nil {
