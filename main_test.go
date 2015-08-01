@@ -21,6 +21,7 @@ const testRepoRoot = "test/data"
 const testRepo = "test.git"
 
 var remote = fmt.Sprintf("http://%s/%s", servAddr, testRepo)
+var checkoutDir = path.Join(scratchDir, "test")
 
 func TestAllowedClone(t *testing.T) {
 	// Prepare clone directory
@@ -41,12 +42,12 @@ func TestAllowedClone(t *testing.T) {
 	}
 
 	// Do the git clone
-	cloneCmd := exec.Command("git", "clone", remote, path.Join(scratchDir, "test"))
+	cloneCmd := exec.Command("git", "clone", remote, checkoutDir)
 	runOrFail(t, cloneCmd)
 
 	// We may have cloned an 'empty' repository, 'git show' will fail in it
 	showCmd := exec.Command("git", "show")
-	showCmd.Dir = path.Join(scratchDir, "test")
+	showCmd.Dir = checkoutDir
 	runOrFail(t, showCmd)
 }
 
@@ -69,7 +70,7 @@ func TestDeniedClone(t *testing.T) {
 	}
 
 	// Do the git clone
-	cloneCmd := exec.Command("git", "clone", remote, path.Join(scratchDir, "test"))
+	cloneCmd := exec.Command("git", "clone", remote, checkoutDir)
 	if err := cloneCmd.Run(); err == nil {
 		t.Fatal("git clone should have failed")
 	}
@@ -77,7 +78,6 @@ func TestDeniedClone(t *testing.T) {
 
 func TestAllowedPush(t *testing.T) {
 	// Prepare the repo to push from
-	checkoutDir := path.Join(scratchDir, "test")
 	if err := os.RemoveAll(scratchDir); err != nil {
 		t.Fatal(err)
 	}
