@@ -9,7 +9,7 @@ install: gitlab-git-http-server
 
 .PHONY: test
 test: test/data/test.git
-	go test
+	go test -v
 
 test/data/test.git: test/data
 	git clone --bare https://gitlab.com/gitlab-org/gitlab-test.git test/data/test.git
