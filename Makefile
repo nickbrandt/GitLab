@@ -16,3 +16,8 @@ test/data/test.git: test/data
 
 test/data:
 	mkdir -p test/data
+
+.PHONY: clean
+clean:
+	rm -f gitlab-git-http-server
+	rm -rf test/data test/scratch
