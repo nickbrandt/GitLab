@@ -42,10 +42,7 @@ func TestAllowedClone(t *testing.T) {
 
 	// Do the git clone
 	cloneCmd := exec.Command("git", "clone", remote, path.Join(scratchDir, "test"))
-	if out, err := cloneCmd.CombinedOutput(); err != nil {
-		t.Logf("%s", out)
-		t.Fatal(err)
-	}
+	runOrFail(t, cloneCmd)
 }
 
 func TestAllowedPush(t *testing.T) {
@@ -55,17 +52,11 @@ func TestAllowedPush(t *testing.T) {
 		t.Fatal(err)
 	}
 	cloneCmd := exec.Command("git", "clone", path.Join(testRepoRoot, testRepo), checkoutDir)
-	if out, err := cloneCmd.CombinedOutput(); err != nil {
-		t.Logf("%s", out)
-		t.Fatal(err)
-	}
+	runOrFail(t, cloneCmd)
 	branch := fmt.Sprintf("branch-%d", time.Now().UnixNano())
 	branchCmd := exec.Command("git", "branch", branch)
 	branchCmd.Dir = checkoutDir
-	if out, err := branchCmd.CombinedOutput(); err != nil {
-		t.Logf("%s", out)
-		t.Fatal(err)
-	}
+	runOrFail(t, branchCmd)
 
 	// Prepare the test server and backend
 	ts := testAuthServer(200, `{"GL_ID":"user-123"}`)
@@ -82,10 +73,7 @@ func TestAllowedPush(t *testing.T) {
 	// Perform the git push
 	pushCmd := exec.Command("git", "push", remote, branch)
 	pushCmd.Dir = checkoutDir
-	if out, err := pushCmd.CombinedOutput(); err != nil {
-		t.Logf("%s", out)
-		t.Fatal(err)
-	}
+	runOrFail(t, pushCmd)
 }
 
 func testAuthServer(code int, body string) *httptest.Server {
@@ -113,4 +101,11 @@ func waitServer() (err error) {
 		time.Sleep(servWaitSleep * time.Millisecond)
 	}
 	return
+}
+
+func runOrFail(t *testing.T, cmd *exec.Cmd) {
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Logf("%s", out)
+		t.Fatal(err)
+	}
 }
