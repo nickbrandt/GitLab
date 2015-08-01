@@ -24,7 +24,11 @@ func TestAllowedClone(t *testing.T) {
 		fmt.Fprintln(w, `{"GL_ID":"user-123"}`)
 	}))
 	defer ts.Close()
-	defer cleanUpProcessGroup(startServer(t, ts))
+	cmd, err := startServer(ts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer cleanUpProcessGroup(cmd)
 	if err := os.RemoveAll(scratchDir); err != nil {
 		t.Fatal(err)
 	}
@@ -35,13 +39,13 @@ func TestAllowedClone(t *testing.T) {
 	}
 }
 
-func startServer(t *testing.T, ts *httptest.Server) (cmd *exec.Cmd) {
+func startServer(ts *httptest.Server) (cmd *exec.Cmd, err error) {
 	var conn net.Conn
-	var err error
 	cmd = exec.Command("go", "run", "main.go", fmt.Sprintf("-authBackend=%s", ts.URL), fmt.Sprintf("-listenAddr=%s", servAddr), testRepoRoot)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	if err := cmd.Start(); err != nil {
-		t.Fatal(err)
+	err = cmd.Start()
+	if err != nil {
+		return
 	}
 	for i := 0; i < servWaitListen/servWaitSleep; i++ {
 		conn, err = net.Dial("tcp", servAddr)
@@ -50,9 +54,6 @@ func startServer(t *testing.T, ts *httptest.Server) (cmd *exec.Cmd) {
 			break
 		}
 		time.Sleep(servWaitSleep * time.Millisecond)
-	}
-	if err != nil {
-		t.Fatal(err)
 	}
 	return
 }
