@@ -59,5 +59,9 @@ func startServer(ts *httptest.Server) (cmd *exec.Cmd, err error) {
 		}
 		time.Sleep(servWaitSleep * time.Millisecond)
 	}
+	if err != nil {
+		cleanUpProcessGroup(cmd)
+	}
+
 	return
 }
