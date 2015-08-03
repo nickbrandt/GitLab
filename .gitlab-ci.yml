@@ -1,2 +1,2 @@
 test:
-  script: make clean est
+  script: make clean test
