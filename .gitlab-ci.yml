@@ -1,2 +1,2 @@
 test:
-	make clean test
+  make clean est
