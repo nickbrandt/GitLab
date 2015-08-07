@@ -125,6 +125,8 @@ func gitHandler(w http.ResponseWriter, r *http.Request) {
 		fail500(w, err)
 		return
 	}
+	defer authResponse.Body.Close()
+
 	if authResponse.StatusCode != 200 {
 		// The Git request is not allowed by the backend. Maybe the
 		// client needs to send HTTP Basic credentials.  Forward the
