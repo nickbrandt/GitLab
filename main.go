@@ -101,11 +101,11 @@ func gitHandler(w http.ResponseWriter, r *http.Request) {
 	var env gitEnv
 	var pathMatch []string
 	var g gitService
-	var foundService bool
 
 	log.Print(r.Method, " ", r.URL)
 
 	// Look for a matching Git service
+	foundService := false
 	for _, g = range gitServices {
 		pathMatch = g.regexp.FindStringSubmatch(r.URL.Path)
 		if r.Method == g.method && pathMatch != nil {
