@@ -149,6 +149,8 @@ func gitHandler(w http.ResponseWriter, r *http.Request) {
 		fail500(w, err)
 		return
 	}
+	// Don't hog a TCP connection in CLOSE_WAIT, we can already close it now
+	authResponse.Body.Close()
 
 	// Validate the path to the Git repository
 	foundPath := pathMatch[1]
