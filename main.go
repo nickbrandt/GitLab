@@ -114,7 +114,9 @@ func gitHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if !foundService {
-		http.Error(w, "Not Found", 404)
+		// The protocol spec in git/Documentation/technical/http-protocol.txt
+		// says we must return 403 if no matching service is found.
+		http.Error(w, "Forbidden", 403)
 		return
 	}
 
