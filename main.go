@@ -42,7 +42,7 @@ type gitEnv struct {
 
 var Version string
 var httpClient = &http.Client{}
-var pathTraversal = regexp.MustCompile(`/../`)
+var pathTraversal = regexp.MustCompile(`/\.\./`)
 
 // Command-line options
 var repoRoot string
