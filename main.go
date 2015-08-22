@@ -150,25 +150,26 @@ func gitHandler(w http.ResponseWriter, r *http.Request) {
 	// Don't hog a TCP connection in CLOSE_WAIT, we can already close it now
 	authResponse.Body.Close()
 
-	// Validate the path to the Git repository
-	foundPath := strings.TrimSuffix(r.URL.Path, g.suffix)
-	if !validPath(foundPath) {
+	// About path traversal: the Go net/http HTTP server, or
+	// rather ServeMux, makes the following promise: "ServeMux
+	// also takes care of sanitizing the URL request path, redirecting
+	// any request containing . or .. elements to an equivalent
+	// .- and ..-free URL.". In other words, we may assume that
+	// r.URL.Path does not contain '/../', so there is no possibility
+	// of path traversal here.
+	repoPath := path.Join(repoRoot, strings.TrimSuffix(r.URL.Path, g.suffix))
+	if !looksLikeRepo(repoPath) {
 		http.Error(w, "Not Found", 404)
 		return
 	}
 
-	g.handleFunc(env, g.rpc, path.Join(repoRoot, foundPath), w, r)
+	g.handleFunc(env, g.rpc, repoPath, w, r)
 }
 
-func validPath(p string) bool {
-	if strings.Contains(p, "/../") {
-		log.Printf("path traversal detected in %s", p)
-		return false
-	}
-
+func looksLikeRepo(p string) bool {
 	// If /path/to/foo.git/objects exists then let's assume it is a valid Git
 	// repository.
-	if _, err := os.Stat(path.Join(repoRoot, p, "objects")); err != nil {
+	if _, err := os.Stat(path.Join(p, "objects")); err != nil {
 		log.Print(err)
 		return false
 	}
