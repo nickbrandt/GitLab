@@ -39,7 +39,7 @@ type gitEnv struct {
 	GL_ID string
 }
 
-var Version string
+var Version string // Set at build time in the Makefile
 var httpClient = &http.Client{}
 
 // Command-line options
@@ -50,6 +50,7 @@ var listenNetwork = flag.String("listenNetwork", "tcp", "Listen 'network' (proto
 var listenUmask = flag.Int("listenUmask", 022, "Umask for Unix socket, default: 022")
 var authBackend = flag.String("authBackend", "http://localhost:8080", "Authentication/authorization backend")
 
+// Routing table
 var gitServices = [...]gitService{
 	gitService{"GET", "/info/refs", handleGetInfoRefs, ""},
 	gitService{"POST", "/git-upload-pack", handlePostRPC, "git-upload-pack"},
@@ -75,8 +76,6 @@ func main() {
 	}
 	log.Printf("repoRoot: %s", repoRoot)
 
-	http.HandleFunc("/", gitHandler)
-
 	// Good housekeeping for Unix sockets: unlink before binding
 	if *listenNetwork == "unix" {
 		if err := os.Remove(*listenAddr); err != nil && !os.IsNotExist(err) {
@@ -92,6 +91,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	http.HandleFunc("/", gitHandler)
 	log.Fatal(http.Serve(listener, nil))
 }
 
@@ -214,7 +214,7 @@ func handleGetInfoRefs(env gitEnv, _ string, path string, w http.ResponseWriter,
 
 	// Start writing the response
 	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
-	setHeaderNoCache(w)
+	w.Header().Add("Cache-Control", "no-cache")
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just panic
 	if err := pktLine(w, fmt.Sprintf("# service=%s\n", rpc)); err != nil {
 		panic(err)
@@ -228,22 +228,6 @@ func handleGetInfoRefs(env gitEnv, _ string, path string, w http.ResponseWriter,
 	if err := cmd.Wait(); err != nil {
 		panic(err)
 	}
-}
-
-func subCommand(rpc string) string {
-	return strings.TrimPrefix(rpc, "git-")
-}
-
-func gitCommand(env gitEnv, name string, args ...string) *exec.Cmd {
-	cmd := exec.Command(name, args...)
-	// Start the command in its own process group (nice for signalling)
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	// Explicitly set the environment for the Git command
-	cmd.Env = []string{
-		fmt.Sprintf("PATH=%s", os.Getenv("PATH")),
-		fmt.Sprintf("GL_ID=%s", env.GL_ID),
-	}
-	return cmd
 }
 
 func handlePostRPC(env gitEnv, rpc string, path string, w http.ResponseWriter, r *http.Request) {
@@ -290,7 +274,7 @@ func handlePostRPC(env gitEnv, rpc string, path string, w http.ResponseWriter, r
 
 	// Start writing the response
 	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-result", rpc))
-	setHeaderNoCache(w)
+	w.Header().Add("Cache-Control", "no-cache")
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just panic
 	if _, err := io.Copy(w, stdout); err != nil {
 		panic(err)
@@ -300,23 +284,26 @@ func handlePostRPC(env gitEnv, rpc string, path string, w http.ResponseWriter, r
 	}
 }
 
-func pktLine(w io.Writer, s string) error {
-	_, err := fmt.Fprintf(w, "%04x%s", len(s)+4, s)
-	return err
-}
-
-func pktFlush(w io.Writer) error {
-	_, err := fmt.Fprint(w, "0000")
-	return err
-}
-
 func fail500(w http.ResponseWriter, err error) {
 	http.Error(w, "Internal server error", 500)
 	log.Print(err)
 }
 
-func setHeaderNoCache(w http.ResponseWriter) {
-	w.Header().Add("Cache-Control", "no-cache")
+// Git subprocess helpers
+func subCommand(rpc string) string {
+	return strings.TrimPrefix(rpc, "git-")
+}
+
+func gitCommand(env gitEnv, name string, args ...string) *exec.Cmd {
+	cmd := exec.Command(name, args...)
+	// Start the command in its own process group (nice for signalling)
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	// Explicitly set the environment for the Git command
+	cmd.Env = []string{
+		fmt.Sprintf("PATH=%s", os.Getenv("PATH")),
+		fmt.Sprintf("GL_ID=%s", env.GL_ID),
+	}
+	return cmd
 }
 
 func cleanUpProcessGroup(cmd *exec.Cmd) {
@@ -332,4 +319,15 @@ func cleanUpProcessGroup(cmd *exec.Cmd) {
 
 	// reap our child process
 	cmd.Wait()
+}
+
+// Git HTTP line protocol functions
+func pktLine(w io.Writer, s string) error {
+	_, err := fmt.Fprintf(w, "%04x%s", len(s)+4, s)
+	return err
+}
+
+func pktFlush(w io.Writer) error {
+	_, err := fmt.Fprint(w, "0000")
+	return err
 }
