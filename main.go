@@ -24,14 +24,13 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"regexp"
 	"strings"
 	"syscall"
 )
 
 type gitService struct {
 	method     string
-	regexp     *regexp.Regexp
+	suffix     string
 	handleFunc func(gitEnv, string, string, http.ResponseWriter, *http.Request)
 	rpc        string
 }
@@ -42,7 +41,6 @@ type gitEnv struct {
 
 var Version string
 var httpClient = &http.Client{}
-var pathTraversal = regexp.MustCompile(`/\.\./`)
 
 // Command-line options
 var repoRoot string
@@ -53,9 +51,9 @@ var listenUmask = flag.Int("listenUmask", 022, "Umask for Unix socket, default: 
 var authBackend = flag.String("authBackend", "http://localhost:8080", "Authentication/authorization backend")
 
 var gitServices = [...]gitService{
-	gitService{"GET", regexp.MustCompile(`\A(/..*)/info/refs\z`), handleGetInfoRefs, ""},
-	gitService{"POST", regexp.MustCompile(`\A(/..*)/git-upload-pack\z`), handlePostRPC, "git-upload-pack"},
-	gitService{"POST", regexp.MustCompile(`\A(/..*)/git-receive-pack\z`), handlePostRPC, "git-receive-pack"},
+	gitService{"GET", "/info/refs", handleGetInfoRefs, ""},
+	gitService{"POST", "/git-upload-pack", handlePostRPC, "git-upload-pack"},
+	gitService{"POST", "/git-receive-pack", handlePostRPC, "git-receive-pack"},
 }
 
 func main() {
@@ -99,7 +97,6 @@ func main() {
 
 func gitHandler(w http.ResponseWriter, r *http.Request) {
 	var env gitEnv
-	var pathMatch []string
 	var g gitService
 
 	log.Print(r.Method, " ", r.URL)
@@ -107,8 +104,7 @@ func gitHandler(w http.ResponseWriter, r *http.Request) {
 	// Look for a matching Git service
 	foundService := false
 	for _, g = range gitServices {
-		pathMatch = g.regexp.FindStringSubmatch(r.URL.Path)
-		if r.Method == g.method && pathMatch != nil {
+		if r.Method == g.method && strings.HasSuffix(r.URL.Path, g.suffix) {
 			foundService = true
 			break
 		}
@@ -155,7 +151,7 @@ func gitHandler(w http.ResponseWriter, r *http.Request) {
 	authResponse.Body.Close()
 
 	// Validate the path to the Git repository
-	foundPath := pathMatch[1]
+	foundPath := strings.TrimSuffix(r.URL.Path, g.suffix)
 	if !validPath(foundPath) {
 		http.Error(w, "Not Found", 404)
 		return
@@ -165,7 +161,7 @@ func gitHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func validPath(p string) bool {
-	if pathTraversal.MatchString(p) {
+	if strings.Contains(p, "/../") {
 		log.Printf("path traversal detected in %s", p)
 		return false
 	}
