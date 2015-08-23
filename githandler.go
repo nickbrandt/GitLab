@@ -52,7 +52,7 @@ func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var env gitEnv
 	var g gitService
 
-	log.Print(r.Method, " ", r.URL)
+	log.Printf("%s %q", r.Method, r.URL)
 
 	// Look for a matching Git service
 	foundService := false
@@ -73,7 +73,7 @@ func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// user ID (GL_ID) is.
 	authResponse, err := h.doAuthRequest(r)
 	if err != nil {
-		fail500(w, err)
+		fail500(w, "doAuthRequest", err)
 		return
 	}
 	defer authResponse.Body.Close()
@@ -97,7 +97,7 @@ func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// information from the auth response body.
 	dec := json.NewDecoder(authResponse.Body)
 	if err := dec.Decode(&env); err != nil {
-		fail500(w, err)
+		fail500(w, "decode JSON GL_ID", err)
 		return
 	}
 	// Don't hog a TCP connection in CLOSE_WAIT, we can already close it now
@@ -155,12 +155,12 @@ func handleGetInfoRefs(env gitEnv, _ string, path string, w http.ResponseWriter,
 	cmd := gitCommand(env, "git", subCommand(rpc), "--stateless-rpc", "--advertise-refs", path)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		fail500(w, err)
+		fail500(w, "handleGetInfoRefs", err)
 		return
 	}
 	defer stdout.Close()
 	if err := cmd.Start(); err != nil {
-		fail500(w, err)
+		fail500(w, "handleGetInfoRefs", err)
 		return
 	}
 	defer cleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
@@ -168,18 +168,22 @@ func handleGetInfoRefs(env gitEnv, _ string, path string, w http.ResponseWriter,
 	// Start writing the response
 	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
 	w.Header().Add("Cache-Control", "no-cache")
-	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just panic
+	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 	if err := pktLine(w, fmt.Sprintf("# service=%s\n", rpc)); err != nil {
-		panic(err)
+		logContext("handleGetInfoRefs response", err)
+		return
 	}
 	if err := pktFlush(w); err != nil {
-		panic(err)
+		logContext("handleGetInfoRefs response", err)
+		return
 	}
 	if _, err := io.Copy(w, stdout); err != nil {
-		panic(err)
+		logContext("handleGetInfoRefs read from subprocess", err)
+		return
 	}
 	if err := cmd.Wait(); err != nil {
-		panic(err)
+		logContext("handleGetInfoRefs wait for subprocess", err)
+		return
 	}
 }
 
@@ -191,7 +195,7 @@ func handlePostRPC(env gitEnv, rpc string, path string, w http.ResponseWriter, r
 	if r.Header.Get("Content-Encoding") == "gzip" {
 		body, err = gzip.NewReader(r.Body)
 		if err != nil {
-			fail500(w, err)
+			fail500(w, "handlePostRPC", err)
 			return
 		}
 	} else {
@@ -202,25 +206,25 @@ func handlePostRPC(env gitEnv, rpc string, path string, w http.ResponseWriter, r
 	cmd := gitCommand(env, "git", subCommand(rpc), "--stateless-rpc", path)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		fail500(w, err)
+		fail500(w, "handlePostRPC", err)
 		return
 	}
 	defer stdout.Close()
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
-		fail500(w, err)
+		fail500(w, "handlePostRPC", err)
 		return
 	}
 	defer stdin.Close()
 	if err := cmd.Start(); err != nil {
-		fail500(w, err)
+		fail500(w, "handlePostRPC", err)
 		return
 	}
 	defer cleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
 
 	// Write the client request body to Git's standard input
 	if _, err := io.Copy(stdin, body); err != nil {
-		fail500(w, err)
+		fail500(w, "handlePostRPC write to subprocess", err)
 		return
 	}
 	stdin.Close()
@@ -228,18 +232,24 @@ func handlePostRPC(env gitEnv, rpc string, path string, w http.ResponseWriter, r
 	// Start writing the response
 	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-result", rpc))
 	w.Header().Add("Cache-Control", "no-cache")
-	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just panic
+	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 	if _, err := io.Copy(w, stdout); err != nil {
-		panic(err)
+		logContext("handlePostRPC read from subprocess", err)
+		return
 	}
 	if err := cmd.Wait(); err != nil {
-		panic(err)
+		logContext("handlePostRPC wait for subprocess", err)
+		return
 	}
 }
 
-func fail500(w http.ResponseWriter, err error) {
+func fail500(w http.ResponseWriter, context string, err error) {
 	http.Error(w, "Internal server error", 500)
-	log.Print(err)
+	logContext(context, err)
+}
+
+func logContext(context string, err error) {
+	log.Printf("%s: %v", context, err)
 }
 
 // Git subprocess helpers
