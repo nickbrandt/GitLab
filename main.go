@@ -28,6 +28,12 @@ import (
 	"syscall"
 )
 
+type gitHandler struct {
+	httpClient  *http.Client
+	repoRoot    string
+	authBackend string
+}
+
 type gitService struct {
 	method     string
 	suffix     string
@@ -40,10 +46,8 @@ type gitEnv struct {
 }
 
 var Version string // Set at build time in the Makefile
-var httpClient = &http.Client{}
 
 // Command-line options
-var repoRoot string
 var printVersion = flag.Bool("version", false, "Print version and exit")
 var listenAddr = flag.String("listenAddr", "localhost:8181", "Listen address for HTTP server")
 var listenNetwork = flag.String("listenNetwork", "tcp", "Listen 'network' (protocol)")
@@ -69,7 +73,7 @@ func main() {
 		fmt.Printf("gitlab-git-http-server %s\n", Version)
 		os.Exit(0)
 	}
-	repoRoot = flag.Arg(0)
+	repoRoot := flag.Arg(0)
 	if repoRoot == "" {
 		flag.Usage()
 		os.Exit(1)
@@ -91,11 +95,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	http.HandleFunc("/", gitHandler)
+	http.Handle("/", newGitHandler(repoRoot, *authBackend))
 	log.Fatal(http.Serve(listener, nil))
 }
 
-func gitHandler(w http.ResponseWriter, r *http.Request) {
+func newGitHandler(repoRoot, authBackend string) *gitHandler {
+	return &gitHandler{&http.Client{}, repoRoot, authBackend}
+}
+
+func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var env gitEnv
 	var g gitService
 
@@ -118,7 +126,7 @@ func gitHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Ask the auth backend if the request is allowed, and what the
 	// user ID (GL_ID) is.
-	authResponse, err := doAuthRequest(r)
+	authResponse, err := h.doAuthRequest(r)
 	if err != nil {
 		fail500(w, err)
 		return
@@ -157,7 +165,7 @@ func gitHandler(w http.ResponseWriter, r *http.Request) {
 	// .- and ..-free URL.". In other words, we may assume that
 	// r.URL.Path does not contain '/../', so there is no possibility
 	// of path traversal here.
-	repoPath := path.Join(repoRoot, strings.TrimSuffix(r.URL.Path, g.suffix))
+	repoPath := path.Join(h.repoRoot, strings.TrimSuffix(r.URL.Path, g.suffix))
 	if !looksLikeRepo(repoPath) {
 		http.Error(w, "Not Found", 404)
 		return
@@ -176,8 +184,8 @@ func looksLikeRepo(p string) bool {
 	return true
 }
 
-func doAuthRequest(r *http.Request) (result *http.Response, err error) {
-	url := fmt.Sprintf("%s%s", *authBackend, r.URL.RequestURI())
+func (h *gitHandler) doAuthRequest(r *http.Request) (result *http.Response, err error) {
+	url := h.authBackend + r.URL.RequestURI()
 	authReq, err := http.NewRequest(r.Method, url, nil)
 	if err != nil {
 		return nil, err
@@ -187,7 +195,7 @@ func doAuthRequest(r *http.Request) (result *http.Response, err error) {
 	for k, v := range r.Header {
 		authReq.Header[k] = v
 	}
-	return httpClient.Do(authReq)
+	return h.httpClient.Do(authReq)
 }
 
 func handleGetInfoRefs(env gitEnv, _ string, path string, w http.ResponseWriter, r *http.Request) {
