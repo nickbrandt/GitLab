@@ -31,7 +31,7 @@ You can try out the Git server without authentication as follows:
 # Start a fake auth backend that allows everything/everybody
 go run support/say-yes.go &
 # Start gitlab-git-http-server
-go run main.go /path/to/git-repos
+go build && ./gitlab-git-http-server /path/to/git-repos
 ```
 
 Now if you have a Git repository in `/path/to/git-repos/my-repo.git`,

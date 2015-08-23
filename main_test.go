@@ -117,7 +117,7 @@ func testAuthServer(code int, body string) *httptest.Server {
 }
 
 func startServerOrFail(t *testing.T, ts *httptest.Server) *exec.Cmd {
-	cmd := exec.Command("go", "run", "main.go", fmt.Sprintf("-authBackend=%s", ts.URL), fmt.Sprintf("-listenAddr=%s", servAddr), testRepoRoot)
+	cmd := exec.Command("go", "run", "main.go", "githandler.go", fmt.Sprintf("-authBackend=%s", ts.URL), fmt.Sprintf("-listenAddr=%s", servAddr), testRepoRoot)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
