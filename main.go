@@ -47,13 +47,6 @@ type gitEnv struct {
 
 var Version string // Set at build time in the Makefile
 
-// Command-line options
-var printVersion = flag.Bool("version", false, "Print version and exit")
-var listenAddr = flag.String("listenAddr", "localhost:8181", "Listen address for HTTP server")
-var listenNetwork = flag.String("listenNetwork", "tcp", "Listen 'network' (protocol)")
-var listenUmask = flag.Int("listenUmask", 022, "Umask for Unix socket, default: 022")
-var authBackend = flag.String("authBackend", "http://localhost:8080", "Authentication/authorization backend")
-
 // Routing table
 var gitServices = [...]gitService{
 	gitService{"GET", "/info/refs", handleGetInfoRefs, ""},
@@ -62,17 +55,23 @@ var gitServices = [...]gitService{
 }
 
 func main() {
-	// Parse the command-line
+	printVersion := flag.Bool("version", false, "Print version and exit")
+	listenAddr := flag.String("listenAddr", "localhost:8181", "Listen address for HTTP server")
+	listenNetwork := flag.String("listenNetwork", "tcp", "Listen 'network' (protocol)")
+	listenUmask := flag.Int("listenUmask", 022, "Umask for Unix socket, default: 022")
+	authBackend := flag.String("authBackend", "http://localhost:8080", "Authentication/authorization backend")
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
 		fmt.Fprintf(os.Stderr, "\n  %s [OPTIONS] REPO_ROOT\n\nOptions:\n", os.Args[0])
 		flag.PrintDefaults()
 	}
 	flag.Parse()
+
 	if *printVersion {
 		fmt.Printf("gitlab-git-http-server %s\n", Version)
 		os.Exit(0)
 	}
+
 	repoRoot := flag.Arg(0)
 	if repoRoot == "" {
 		flag.Usage()
