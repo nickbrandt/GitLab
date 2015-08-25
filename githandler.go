@@ -276,8 +276,8 @@ func cleanUpProcessGroup(cmd *exec.Cmd) {
 
 	process := cmd.Process
 	if process != nil && process.Pid > 0 {
-		// Send SIGKILL (kill -9) to the process group of cmd
-		syscall.Kill(-process.Pid, syscall.SIGKILL)
+		// Send SIGTERM to the process group of cmd
+		syscall.Kill(-process.Pid, syscall.SIGTERM)
 	}
 
 	// reap our child process
