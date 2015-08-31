@@ -20,6 +20,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"syscall"
 )
@@ -32,6 +33,7 @@ func main() {
 	listenNetwork := flag.String("listenNetwork", "tcp", "Listen 'network' (tcp, tcp4, tcp6, unix)")
 	listenUmask := flag.Int("listenUmask", 022, "Umask for Unix socket, default: 022")
 	authBackend := flag.String("authBackend", "http://localhost:8080", "Authentication/authorization backend")
+	pprofListenAddr := flag.String("pprofListenAddr", "", "pprof listening address, e.g. 'localhost:6060'")
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
 		fmt.Fprintf(os.Stderr, "\n  %s [OPTIONS] REPO_ROOT\n\nOptions:\n", os.Args[0])
@@ -66,6 +68,19 @@ func main() {
 		log.Fatal(err)
 	}
 
-	http.Handle("/", newGitHandler(repoRoot, *authBackend))
-	log.Fatal(http.Serve(listener, nil))
+	// The profiler will only be activated by HTTP requests. HTTP
+	// requests can only reach the profiler if we start a listener. So by
+	// having no profiler HTTP listener by default, the profiler is
+	// effectively disabled by default.
+	if *pprofListenAddr != "" {
+		go func() {
+			log.Print(http.ListenAndServe(*pprofListenAddr, nil))
+		}()
+	}
+
+	// Because net/http/pprof installs itself in the DefaultServeMux
+	// we create a fresh one for the Git server.
+	serveMux := http.NewServeMux()
+	serveMux.Handle("/", newGitHandler(repoRoot, *authBackend))
+	log.Fatal(http.Serve(listener, serveMux))
 }
