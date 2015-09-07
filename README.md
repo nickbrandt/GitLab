@@ -7,6 +7,36 @@ and authorization logic is still handled by the GitLab Rails app.
 Architecture: Git client -> NGINX -> gitlab-git-http-server (makes
 auth request to GitLab Rails app) -> git-upload-pack
 
+## Usage
+
+```
+  gitlab-git-http-server [OPTIONS] REPO_ROOT
+
+Options:
+  -authBackend string
+    	Authentication/authorization backend (default "http://localhost:8080")
+  -listenAddr string
+    	Listen address for HTTP server (default "localhost:8181")
+  -listenNetwork string
+    	Listen 'network' (tcp, tcp4, tcp6, unix) (default "tcp")
+  -listenUmask int
+    	Umask for Unix socket, default: 022 (default 18)
+  -pprofListenAddr string
+    	pprof listening address, e.g. 'localhost:6060'
+  -version
+    	Print version and exit
+```
+
+gitlab-git-http-server allows Git HTTP clients to push and pull to and from Git
+repositories under REPO_ROOT. Each incoming request is first replayed (with an
+empty request body) to an external authentication/authorization HTTP server:
+the 'auth backend'. The auth backend is expected to be a GitLab Unicorn
+process.
+
+gitlab-git-http-server can listen on either a TCP or a Unix domain socket. It
+can also open a second listening TCP listening socket with the Go
+[net/http/pprof profiler server](http://golang.org/pkg/net/http/pprof/).
+
 ## Installation
 
 To install into `/usr/local/bin` run `make install`.
@@ -15,7 +45,11 @@ To install into `/usr/local/bin` run `make install`.
 make install
 ```
 
-To install into `/foo/bin` run `make install PREFIX=/foo`.
+To install into `/foo/bin` set the PREFIX variable.
+
+```
+make install PREFIX=/foo
+```
 
 ## Tests
 
