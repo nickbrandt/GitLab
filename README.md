@@ -1,7 +1,7 @@
 # gitlab-git-http-server
 
-This is a proof of concept for unloading Git HTTP traffic from the
-GitLab Rails app (Unicorn) to a separate daemon. All authentication
+gitlab-git-http-server was designed to unload Git HTTP traffic from
+the GitLab Rails app (Unicorn) to a separate daemon. All authentication
 and authorization logic is still handled by the GitLab Rails app.
 
 Architecture: Git client -> NGINX -> gitlab-git-http-server (makes
