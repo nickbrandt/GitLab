@@ -266,6 +266,8 @@ func gitCommand(env gitEnv, name string, args ...string) *exec.Cmd {
 		fmt.Sprintf("PATH=%s", os.Getenv("PATH")),
 		fmt.Sprintf("GL_ID=%s", env.GL_ID),
 	}
+	// If we don't do something with cmd.Stderr, Git errors will be lost
+	cmd.Stderr = os.Stderr
 	return cmd
 }
 
