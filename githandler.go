@@ -140,6 +140,9 @@ func (h *gitHandler) doAuthRequest(r *http.Request) (result *http.Response, err 
 	for k, v := range r.Header {
 		authReq.Header[k] = v
 	}
+	// Set custom user agent for the request. This can be used in some
+	// configurations (Passenger) to solve auth request routing problems.
+	authReq.Header.Set("User-Agent", "gitlab-git-http-server")
 	return h.httpClient.Do(authReq)
 }
 
