@@ -34,7 +34,8 @@ type gitService struct {
 }
 
 type gitEnv struct {
-	GL_ID string
+	GL_ID       string
+	ArchivePath string
 }
 
 // Routing table
@@ -42,6 +43,10 @@ var gitServices = [...]gitService{
 	gitService{"GET", "/info/refs", handleGetInfoRefs, ""},
 	gitService{"POST", "/git-upload-pack", handlePostRPC, "git-upload-pack"},
 	gitService{"POST", "/git-receive-pack", handlePostRPC, "git-receive-pack"},
+	gitService{"GET", "/repository/archive.zip", handleGetArchive, "zip"},
+	gitService{"GET", "/repository/archive.tar", handleGetArchive, "tar"},
+	gitService{"GET", "/repository/archive.tar.gz", handleGetArchive, "tar.gz"},
+	gitService{"GET", "/repository/archive.tar.bz2", handleGetArchive, "tar.bz2"},
 }
 
 func newGitHandler(repoRoot, authBackend string) *gitHandler {
@@ -111,10 +116,6 @@ func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// r.URL.Path does not contain '/../', so there is no possibility
 	// of path traversal here.
 	repoPath := path.Join(h.repoRoot, strings.TrimSuffix(r.URL.Path, g.suffix))
-	if !looksLikeRepo(repoPath) {
-		http.Error(w, "Not Found", 404)
-		return
-	}
 
 	g.handleFunc(env, g.rpc, repoPath, w, r)
 }
@@ -143,7 +144,12 @@ func (h *gitHandler) doAuthRequest(r *http.Request) (result *http.Response, err 
 	return h.httpClient.Do(authReq)
 }
 
-func handleGetInfoRefs(env gitEnv, _ string, path string, w http.ResponseWriter, r *http.Request) {
+func handleGetInfoRefs(env gitEnv, _ string, repoPath string, w http.ResponseWriter, r *http.Request) {
+	if !looksLikeRepo(repoPath) {
+		http.Error(w, "Not Found", 404)
+		return
+	}
+
 	rpc := r.URL.Query().Get("service")
 	if !(rpc == "git-upload-pack" || rpc == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
@@ -152,7 +158,7 @@ func handleGetInfoRefs(env gitEnv, _ string, path string, w http.ResponseWriter,
 	}
 
 	// Prepare our Git subprocess
-	cmd := gitCommand(env, "git", subCommand(rpc), "--stateless-rpc", "--advertise-refs", path)
+	cmd := gitCommand(env, "git", subCommand(rpc), "--stateless-rpc", "--advertise-refs", repoPath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		fail500(w, "handleGetInfoRefs", err)
@@ -187,9 +193,104 @@ func handleGetInfoRefs(env gitEnv, _ string, path string, w http.ResponseWriter,
 	}
 }
 
-func handlePostRPC(env gitEnv, rpc string, path string, w http.ResponseWriter, r *http.Request) {
+func handleGetArchive(env gitEnv, format string, almostPath string, w http.ResponseWriter, r *http.Request) {
+	ref := r.URL.Query().Get("ref")
+	if ref == "" {
+		ref = "HEAD"
+	}
+
+	repoPath := almostPath + ".git"
+	if !looksLikeRepo(repoPath) {
+		http.Error(w, "Not Found", 404)
+		return
+	}
+
+	var compressCmd *exec.Cmd
+	var archiveFormat string
+	switch format {
+	case "tar":
+		archiveFormat = "tar"
+		compressCmd = nil
+	case "tar.gz":
+		archiveFormat = "tar"
+		compressCmd = exec.Command("gzip", "-c")
+	case "tar.bz2":
+		archiveFormat = "tar"
+		compressCmd = exec.Command("bzip2", "-c")
+	case "zip":
+		archiveFormat = "zip"
+		compressCmd = nil
+	}
+
+	archiveCmd := gitCommand(env, "git", "--git-dir="+repoPath, "archive", "--format="+archiveFormat, ref)
+	archiveStdout, err := archiveCmd.StdoutPipe()
+	if err != nil {
+		fail500(w, "handleGetArchive", err)
+		return
+	}
+	defer archiveStdout.Close()
+	if err := archiveCmd.Start(); err != nil {
+		fail500(w, "handleGetArchive", err)
+		return
+	}
+	defer cleanUpProcessGroup(archiveCmd) // Ensure brute force subprocess clean-up
+
+	var stdout io.ReadCloser
+	if compressCmd == nil {
+		stdout = archiveStdout
+	} else {
+		compressCmd.Stdin = archiveStdout
+
+		stdout, err = compressCmd.StdoutPipe()
+		if err != nil {
+			fail500(w, "handleGetArchive compressCmd stdout pipe", err)
+			return
+		}
+		defer stdout.Close()
+
+		if err := compressCmd.Start(); err != nil {
+			fail500(w, "handleGetArchive start compressCmd process", err)
+			return
+		}
+		defer compressCmd.Wait()
+
+		archiveStdout.Close()
+	}
+
+	// Start writing the response
+	if format == "zip" {
+		w.Header().Add("Content-Type", "application/zip")
+	} else {
+		w.Header().Add("Content-Type", "application/octet-stream")
+	}
+	w.Header().Add("Content-Transfer-Encoding", "binary")
+	w.Header().Add("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, path.Base(env.ArchivePath)))
+	w.Header().Add("Cache-Control", "private")
+	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
+	if _, err := io.Copy(w, stdout); err != nil {
+		logContext("handleGetArchive read from subprocess", err)
+		return
+	}
+	if err := archiveCmd.Wait(); err != nil {
+		logContext("handleGetArchive wait for archiveCmd", err)
+		return
+	}
+	if compressCmd != nil {
+		if err := compressCmd.Wait(); err != nil {
+			logContext("handleGetArchive wait for compressCmd", err)
+			return
+		}
+	}
+}
+
+func handlePostRPC(env gitEnv, rpc string, repoPath string, w http.ResponseWriter, r *http.Request) {
 	var body io.Reader
 	var err error
+
+	if !looksLikeRepo(repoPath) {
+		http.Error(w, "Not Found", 404)
+		return
+	}
 
 	// The client request body may have been gzipped.
 	if r.Header.Get("Content-Encoding") == "gzip" {
@@ -203,7 +304,7 @@ func handlePostRPC(env gitEnv, rpc string, path string, w http.ResponseWriter, r
 	}
 
 	// Prepare our Git subprocess
-	cmd := gitCommand(env, "git", subCommand(rpc), "--stateless-rpc", path)
+	cmd := gitCommand(env, "git", subCommand(rpc), "--stateless-rpc", repoPath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		fail500(w, "handlePostRPC", err)
