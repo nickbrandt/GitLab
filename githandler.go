@@ -22,7 +22,6 @@ import (
 
 type gitHandler struct {
 	httpClient  *http.Client
-	repoRoot    string
 	authBackend string
 }
 
@@ -35,6 +34,7 @@ type gitService struct {
 
 type gitEnv struct {
 	GL_ID       string
+	RepoPath    string
 	ArchivePath string
 }
 
@@ -49,8 +49,8 @@ var gitServices = [...]gitService{
 	gitService{"GET", "/repository/archive.tar.bz2", handleGetArchive, "tar.bz2"},
 }
 
-func newGitHandler(repoRoot, authBackend string) *gitHandler {
-	return &gitHandler{&http.Client{}, repoRoot, authBackend}
+func newGitHandler(authBackend string) *gitHandler {
+	return &gitHandler{&http.Client{}, authBackend}
 }
 
 func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -108,14 +108,11 @@ func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Don't hog a TCP connection in CLOSE_WAIT, we can already close it now
 	authResponse.Body.Close()
 
-	// About path traversal: the Go net/http HTTP server, or
-	// rather ServeMux, makes the following promise: "ServeMux
-	// also takes care of sanitizing the URL request path, redirecting
-	// any request containing . or .. elements to an equivalent
-	// .- and ..-free URL.". In other words, we may assume that
-	// r.URL.Path does not contain '/../', so there is no possibility
-	// of path traversal here.
-	repoPath := path.Join(h.repoRoot, strings.TrimSuffix(r.URL.Path, g.suffix))
+	repoPath := env.RepoPath
+	if !looksLikeRepo(repoPath) {
+		http.Error(w, "Not Found", 404)
+		return
+	}
 
 	g.handleFunc(env, g.rpc, repoPath, w, r)
 }
@@ -145,11 +142,6 @@ func (h *gitHandler) doAuthRequest(r *http.Request) (result *http.Response, err 
 }
 
 func handleGetInfoRefs(env gitEnv, _ string, repoPath string, w http.ResponseWriter, r *http.Request) {
-	if !looksLikeRepo(repoPath) {
-		http.Error(w, "Not Found", 404)
-		return
-	}
-
 	rpc := r.URL.Query().Get("service")
 	if !(rpc == "git-upload-pack" || rpc == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
@@ -193,16 +185,10 @@ func handleGetInfoRefs(env gitEnv, _ string, repoPath string, w http.ResponseWri
 	}
 }
 
-func handleGetArchive(env gitEnv, format string, almostPath string, w http.ResponseWriter, r *http.Request) {
+func handleGetArchive(env gitEnv, format string, repoPath string, w http.ResponseWriter, r *http.Request) {
 	ref := r.URL.Query().Get("ref")
 	if ref == "" {
 		ref = "HEAD"
-	}
-
-	repoPath := almostPath + ".git"
-	if !looksLikeRepo(repoPath) {
-		http.Error(w, "Not Found", 404)
-		return
 	}
 
 	var compressCmd *exec.Cmd
@@ -286,11 +272,6 @@ func handleGetArchive(env gitEnv, format string, almostPath string, w http.Respo
 func handlePostRPC(env gitEnv, rpc string, repoPath string, w http.ResponseWriter, r *http.Request) {
 	var body io.Reader
 	var err error
-
-	if !looksLikeRepo(repoPath) {
-		http.Error(w, "Not Found", 404)
-		return
-	}
 
 	// The client request body may have been gzipped.
 	if r.Header.Get("Content-Encoding") == "gzip" {

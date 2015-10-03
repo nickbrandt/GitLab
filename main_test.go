@@ -31,7 +31,7 @@ func TestAllowedClone(t *testing.T) {
 	}
 
 	// Prepare test server and backend
-	ts := testAuthServer(200, `{"GL_ID":"user-123"}`)
+	ts := testAuthServer(200, gitOkBody(t))
 	defer ts.Close()
 	defer cleanUpProcessGroup(startServerOrFail(t, ts))
 
@@ -69,7 +69,7 @@ func TestAllowedPush(t *testing.T) {
 	preparePushRepo(t)
 
 	// Prepare the test server and backend
-	ts := testAuthServer(200, `{"GL_ID":"user-123"}`)
+	ts := testAuthServer(200, gitOkBody(t))
 	defer ts.Close()
 	defer cleanUpProcessGroup(startServerOrFail(t, ts))
 
@@ -102,7 +102,7 @@ func TestAllowedDownloadZip(t *testing.T) {
 
 	// Prepare test server and backend
 	archiveName := "foobar.zip"
-	ts := testAuthServer(200, fmt.Sprintf(`{"ArchivePath":"/tmp/%s"}`, archiveName))
+	ts := testAuthServer(200, archiveOkBody(t, archiveName))
 	defer ts.Close()
 	defer cleanUpProcessGroup(startServerOrFail(t, ts))
 
@@ -120,7 +120,7 @@ func TestAllowedDownloadTar(t *testing.T) {
 
 	// Prepare test server and backend
 	archiveName := "foobar.tar"
-	ts := testAuthServer(200, fmt.Sprintf(`{"ArchivePath":"/tmp/%s"}`, archiveName))
+	ts := testAuthServer(200, archiveOkBody(t, archiveName))
 	defer ts.Close()
 	defer cleanUpProcessGroup(startServerOrFail(t, ts))
 
@@ -138,7 +138,7 @@ func TestAllowedDownloadTarGz(t *testing.T) {
 
 	// Prepare test server and backend
 	archiveName := "foobar.tar.gz"
-	ts := testAuthServer(200, fmt.Sprintf(`{"ArchivePath":"/tmp/%s"}`, archiveName))
+	ts := testAuthServer(200, archiveOkBody(t, archiveName))
 	defer ts.Close()
 	defer cleanUpProcessGroup(startServerOrFail(t, ts))
 
@@ -156,7 +156,7 @@ func TestAllowedDownloadTarBz2(t *testing.T) {
 
 	// Prepare test server and backend
 	archiveName := "foobar.tar.bz2"
-	ts := testAuthServer(200, fmt.Sprintf(`{"ArchivePath":"/tmp/%s"}`, archiveName))
+	ts := testAuthServer(200, archiveOkBody(t, archiveName))
 	defer ts.Close()
 	defer cleanUpProcessGroup(startServerOrFail(t, ts))
 
@@ -199,7 +199,7 @@ func testAuthServer(code int, body string) *httptest.Server {
 }
 
 func startServerOrFail(t *testing.T, ts *httptest.Server) *exec.Cmd {
-	cmd := exec.Command("go", "run", "main.go", "githandler.go", fmt.Sprintf("-authBackend=%s", ts.URL), fmt.Sprintf("-listenAddr=%s", servAddr), testRepoRoot)
+	cmd := exec.Command("go", "run", "main.go", "githandler.go", fmt.Sprintf("-authBackend=%s", ts.URL), fmt.Sprintf("-listenAddr=%s", servAddr))
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -235,4 +235,20 @@ func runOrFail(t *testing.T, cmd *exec.Cmd) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func gitOkBody(t *testing.T) string {
+	return fmt.Sprintf(`{"GL_ID":"user-123","RepoPath":"%s"}`, repoPath(t))
+}
+
+func archiveOkBody(t *testing.T, archiveName string) string {
+	return fmt.Sprintf(`{"RepoPath":"%s","ArchivePath":"/tmp/%s"}`, repoPath(t), archiveName)
+}
+
+func repoPath(t *testing.T) string {
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	return path.Join(cwd, testRepoRoot, testRepo)
 }
