@@ -191,7 +191,7 @@ func handleGetInfoRefs(env gitEnv, _ string, path string, w http.ResponseWriter,
 }
 
 func handlePostRPC(env gitEnv, rpc string, path string, w http.ResponseWriter, r *http.Request) {
-	var body io.Reader
+	var body io.ReadCloser
 	var err error
 
 	// The client request body may have been gzipped.
@@ -204,6 +204,7 @@ func handlePostRPC(env gitEnv, rpc string, path string, w http.ResponseWriter, r
 	} else {
 		body = r.Body
 	}
+	defer body.Close()
 
 	// Prepare our Git subprocess
 	cmd := gitCommand(env, "git", subCommand(rpc), "--stateless-rpc", path)
@@ -230,12 +231,22 @@ func handlePostRPC(env gitEnv, rpc string, path string, w http.ResponseWriter, r
 		fail500(w, "handlePostRPC write to subprocess", err)
 		return
 	}
+	// Signal to the Git subprocess that no more data is coming
 	stdin.Close()
+
+	// It may take a while before we return and the deferred closes happen
+	// so let's free up some resources already.
+	r.Body.Close()
+	// If the body was compressed, body != r.Body and this frees up the
+	// gzip.Reader.
+	body.Close()
 
 	// Start writing the response
 	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-result", rpc))
 	w.Header().Add("Cache-Control", "no-cache")
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
+
+	// This io.Copy may take a long time, both for Git push and pull.
 	if _, err := io.Copy(w, stdout); err != nil {
 		logContext("handlePostRPC read from subprocess", err)
 		return
