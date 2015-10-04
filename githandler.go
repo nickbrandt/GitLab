@@ -199,7 +199,7 @@ func handleGetArchive(env gitEnv, format string, repoPath string, w http.Respons
 		compressCmd = nil
 	case "tar.gz":
 		archiveFormat = "tar"
-		compressCmd = exec.Command("gzip", "-c")
+		compressCmd = exec.Command("gzip", "-c", "-n")
 	case "tar.bz2":
 		archiveFormat = "tar"
 		compressCmd = exec.Command("bzip2", "-c")
