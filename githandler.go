@@ -36,6 +36,7 @@ type gitEnv struct {
 	GL_ID       string
 	RepoPath    string
 	ArchivePath string
+	CommitId    string
 }
 
 // Routing table
@@ -187,11 +188,6 @@ func handleGetInfoRefs(env gitEnv, _ string, repoPath string, w http.ResponseWri
 }
 
 func handleGetArchive(env gitEnv, format string, repoPath string, w http.ResponseWriter, r *http.Request) {
-	ref := r.URL.Query().Get("ref")
-	if ref == "" {
-		ref = "HEAD"
-	}
-
 	var compressCmd *exec.Cmd
 	var archiveFormat string
 	switch format {
@@ -209,7 +205,10 @@ func handleGetArchive(env gitEnv, format string, repoPath string, w http.Respons
 		compressCmd = nil
 	}
 
-	archiveCmd := gitCommand(env, "git", "--git-dir="+repoPath, "archive", "--format="+archiveFormat, ref)
+	archiveFilename := path.Base(env.ArchivePath)
+	archivePrefix := strings.TrimSuffix(archiveFilename, "."+format) + "/"
+
+	archiveCmd := gitCommand(env, "git", "--git-dir="+repoPath, "archive", "--format="+archiveFormat, "--prefix="+archivePrefix, env.CommitId)
 	archiveStdout, err := archiveCmd.StdoutPipe()
 	if err != nil {
 		fail500(w, "handleGetArchive", err)
@@ -251,7 +250,7 @@ func handleGetArchive(env gitEnv, format string, repoPath string, w http.Respons
 		w.Header().Add("Content-Type", "application/octet-stream")
 	}
 	w.Header().Add("Content-Transfer-Encoding", "binary")
-	w.Header().Add("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, path.Base(env.ArchivePath)))
+	w.Header().Add("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, archiveFilename))
 	w.Header().Add("Cache-Control", "private")
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 	if _, err := io.Copy(w, stdout); err != nil {
