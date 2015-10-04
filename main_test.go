@@ -169,6 +169,24 @@ func TestAllowedDownloadTarBz2(t *testing.T) {
 	runOrFail(t, extractCmd)
 }
 
+func TestAllowedApiDownloadZip(t *testing.T) {
+	prepareDownloadDir(t)
+
+	// Prepare test server and backend
+	archiveName := "foobar.zip"
+	ts := testAuthServer(200, archiveOkBody(t, archiveName))
+	defer ts.Close()
+	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+
+	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("http://%s/api/v3/projects/123/repository/archive.zip", servAddr))
+	downloadCmd.Dir = scratchDir
+	runOrFail(t, downloadCmd)
+
+	extractCmd := exec.Command("unzip", archiveName)
+	extractCmd.Dir = scratchDir
+	runOrFail(t, extractCmd)
+}
+
 func prepareDownloadDir(t *testing.T) {
 	if err := os.RemoveAll(scratchDir); err != nil {
 		t.Fatal(err)
