@@ -43,6 +43,7 @@ var gitServices = [...]gitService{
 	gitService{"GET", "/info/refs", handleGetInfoRefs, ""},
 	gitService{"POST", "/git-upload-pack", handlePostRPC, "git-upload-pack"},
 	gitService{"POST", "/git-receive-pack", handlePostRPC, "git-receive-pack"},
+	gitService{"GET", "/repository/archive", handleGetArchive, "tar.gz"},
 	gitService{"GET", "/repository/archive.zip", handleGetArchive, "zip"},
 	gitService{"GET", "/repository/archive.tar", handleGetArchive, "tar"},
 	gitService{"GET", "/repository/archive.tar.gz", handleGetArchive, "tar.gz"},
