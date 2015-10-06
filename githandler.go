@@ -103,6 +103,15 @@ func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Don't hog a TCP connection in CLOSE_WAIT, we can already close it now
 	authResponse.Body.Close()
 
+	// Negotiate authentication (Kerberos) may need to return a WWW-Authenticate
+	// header to the client even in case of success as per RFC4559.
+	for k, v := range authResponse.Header {
+                // Case-insensitive comparison as per RFC7230
+		if strings.EqualFold(k, "WWW-Authenticate") {
+			w.Header()[k] = v
+		}
+	}
+
 	// About path traversal: the Go net/http HTTP server, or
 	// rather ServeMux, makes the following promise: "ServeMux
 	// also takes care of sanitizing the URL request path, redirecting
