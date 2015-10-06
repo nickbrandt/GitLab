@@ -260,7 +260,7 @@ func gitOkBody(t *testing.T) string {
 }
 
 func archiveOkBody(t *testing.T, archiveName string) string {
-	return fmt.Sprintf(`{"RepoPath":"%s","ArchivePath":"/tmp/%s"}`, repoPath(t), archiveName)
+	return fmt.Sprintf(`{"RepoPath":"%s","ArchivePath":"/tmp/%s","CommitId":"c7fbe50c7c7419d9701eebe64b1fdacc3df5b9dd"}`, repoPath(t), archiveName)
 }
 
 func repoPath(t *testing.T) string {
