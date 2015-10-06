@@ -149,6 +149,10 @@ func (h *gitHandler) doAuthRequest(r *http.Request) (result *http.Response, err 
 	for k, v := range r.Header {
 		authReq.Header[k] = v
 	}
+	// Also forward the Host header, which is excluded from the Header map by the http libary.
+	// This allows the Host header received by the backend to be consistent with other
+	// requests not going through gitlab-git-http-server.
+	authReq.Host = r.Host
 	// Set custom user agent for the request. This can be used in some
 	// configurations (Passenger) to solve auth request routing problems.
 	authReq.Header.Set("User-Agent", "gitlab-git-http-server")
