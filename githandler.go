@@ -110,6 +110,15 @@ func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Don't hog a TCP connection in CLOSE_WAIT, we can already close it now
 	authResponse.Body.Close()
 
+	// Negotiate authentication (Kerberos) may need to return a WWW-Authenticate
+	// header to the client even in case of success as per RFC4559.
+	for k, v := range authResponse.Header {
+                // Case-insensitive comparison as per RFC7230
+		if strings.EqualFold(k, "WWW-Authenticate") {
+			w.Header()[k] = v
+		}
+	}
+
 	repoPath := env.RepoPath
 	if !looksLikeRepo(repoPath) {
 		http.Error(w, "Not Found", 404)
@@ -140,6 +149,13 @@ func (h *gitHandler) doAuthRequest(r *http.Request) (result *http.Response, err 
 	for k, v := range r.Header {
 		authReq.Header[k] = v
 	}
+	// Also forward the Host header, which is excluded from the Header map by the http libary.
+	// This allows the Host header received by the backend to be consistent with other
+	// requests not going through gitlab-git-http-server.
+	authReq.Host = r.Host
+	// Set custom user agent for the request. This can be used in some
+	// configurations (Passenger) to solve auth request routing problems.
+	authReq.Header.Set("User-Agent", "gitlab-git-http-server")
 	return h.httpClient.Do(authReq)
 }
 
@@ -270,7 +286,7 @@ func handleGetArchive(env gitEnv, format string, repoPath string, w http.Respons
 }
 
 func handlePostRPC(env gitEnv, rpc string, repoPath string, w http.ResponseWriter, r *http.Request) {
-	var body io.Reader
+	var body io.ReadCloser
 	var err error
 
 	// The client request body may have been gzipped.
@@ -283,6 +299,7 @@ func handlePostRPC(env gitEnv, rpc string, repoPath string, w http.ResponseWrite
 	} else {
 		body = r.Body
 	}
+	defer body.Close()
 
 	// Prepare our Git subprocess
 	cmd := gitCommand(env, "git", subCommand(rpc), "--stateless-rpc", repoPath)
@@ -309,12 +326,22 @@ func handlePostRPC(env gitEnv, rpc string, repoPath string, w http.ResponseWrite
 		fail500(w, "handlePostRPC write to subprocess", err)
 		return
 	}
+	// Signal to the Git subprocess that no more data is coming
 	stdin.Close()
+
+	// It may take a while before we return and the deferred closes happen
+	// so let's free up some resources already.
+	r.Body.Close()
+	// If the body was compressed, body != r.Body and this frees up the
+	// gzip.Reader.
+	body.Close()
 
 	// Start writing the response
 	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-result", rpc))
 	w.Header().Add("Cache-Control", "no-cache")
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
+
+	// This io.Copy may take a long time, both for Git push and pull.
 	if _, err := io.Copy(w, stdout); err != nil {
 		logContext("handlePostRPC read from subprocess", err)
 		return
