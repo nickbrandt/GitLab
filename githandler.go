@@ -33,10 +33,11 @@ type gitService struct {
 }
 
 type gitEnv struct {
-	GL_ID       string
-	RepoPath    string
-	ArchivePath string
-	CommitId    string
+	GL_ID         string
+	RepoPath      string
+	ArchivePath   string
+	ArchivePrefix string
+	CommitId      string
 }
 
 // Routing table
@@ -113,7 +114,7 @@ func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Negotiate authentication (Kerberos) may need to return a WWW-Authenticate
 	// header to the client even in case of success as per RFC4559.
 	for k, v := range authResponse.Header {
-                // Case-insensitive comparison as per RFC7230
+		// Case-insensitive comparison as per RFC7230
 		if strings.EqualFold(k, "WWW-Authenticate") {
 			w.Header()[k] = v
 		}
@@ -222,9 +223,8 @@ func handleGetArchive(env gitEnv, format string, repoPath string, w http.Respons
 	}
 
 	archiveFilename := path.Base(env.ArchivePath)
-	archivePrefix := strings.TrimSuffix(archiveFilename, "."+format) + "/"
 
-	archiveCmd := gitCommand(env, "git", "--git-dir="+repoPath, "archive", "--format="+archiveFormat, "--prefix="+archivePrefix, env.CommitId)
+	archiveCmd := gitCommand(env, "git", "--git-dir="+repoPath, "archive", "--format="+archiveFormat, "--prefix="+env.ArchivePrefix+"/", env.CommitId)
 	archiveStdout, err := archiveCmd.StdoutPipe()
 	if err != nil {
 		fail500(w, "handleGetArchive", err)

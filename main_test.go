@@ -260,7 +260,18 @@ func gitOkBody(t *testing.T) string {
 }
 
 func archiveOkBody(t *testing.T, archiveName string) string {
-	return fmt.Sprintf(`{"RepoPath":"%s","ArchivePath":"/tmp/%s","CommitId":"c7fbe50c7c7419d9701eebe64b1fdacc3df5b9dd"}`, repoPath(t), archiveName)
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	archivePath := path.Join(cwd, scratchDir, "cache", archiveName)
+	jsonString := `{
+		"RepoPath":"%s",
+		"ArchivePath":"/tmp/%s",
+		"CommitId":"c7fbe50c7c7419d9701eebe64b1fdacc3df5b9dd",
+		"ArchivePrefix":"foobar123"
+	}`
+	return fmt.Sprintf(jsonString, repoPath(t), archivePath)
 }
 
 func repoPath(t *testing.T) string {
