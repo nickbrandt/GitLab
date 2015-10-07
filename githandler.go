@@ -18,6 +18,7 @@ import (
 	"path"
 	"strings"
 	"syscall"
+	"time"
 )
 
 type gitHandler struct {
@@ -205,6 +206,23 @@ func handleGetInfoRefs(env gitEnv, _ string, repoPath string, w http.ResponseWri
 }
 
 func handleGetArchive(env gitEnv, format string, repoPath string, w http.ResponseWriter, r *http.Request) {
+	archiveFilename := path.Base(env.ArchivePath)
+	w.Header().Add("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, archiveFilename))
+	if format == "zip" {
+		w.Header().Add("Content-Type", "application/zip")
+	} else {
+		w.Header().Add("Content-Type", "application/octet-stream")
+	}
+	w.Header().Add("Content-Transfer-Encoding", "binary")
+	w.Header().Add("Cache-Control", "private")
+
+	if f, err := os.Open(env.ArchivePath); err == nil {
+		defer f.Close()
+		log.Printf("Serving cached file %q", env.ArchivePath)
+		http.ServeContent(w, r, archiveFilename, time.Unix(0, 0), f)
+		return
+	}
+
 	var compressCmd *exec.Cmd
 	var archiveFormat string
 	switch format {
@@ -221,8 +239,6 @@ func handleGetArchive(env gitEnv, format string, repoPath string, w http.Respons
 		archiveFormat = "zip"
 		compressCmd = nil
 	}
-
-	archiveFilename := path.Base(env.ArchivePath)
 
 	archiveCmd := gitCommand(env, "git", "--git-dir="+repoPath, "archive", "--format="+archiveFormat, "--prefix="+env.ArchivePrefix+"/", env.CommitId)
 	archiveStdout, err := archiveCmd.StdoutPipe()
@@ -260,14 +276,6 @@ func handleGetArchive(env gitEnv, format string, repoPath string, w http.Respons
 	}
 
 	// Start writing the response
-	if format == "zip" {
-		w.Header().Add("Content-Type", "application/zip")
-	} else {
-		w.Header().Add("Content-Type", "application/octet-stream")
-	}
-	w.Header().Add("Content-Transfer-Encoding", "binary")
-	w.Header().Add("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, archiveFilename))
-	w.Header().Add("Cache-Control", "private")
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 	if _, err := io.Copy(w, stdout); err != nil {
 		logContext("handleGetArchive read from subprocess", err)

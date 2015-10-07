@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -23,6 +25,7 @@ const testProject = "test"
 
 var remote = fmt.Sprintf("http://%s/%s", servAddr, testRepo)
 var checkoutDir = path.Join(scratchDir, "test")
+var cacheDir = path.Join(scratchDir, "cache")
 
 func TestAllowedClone(t *testing.T) {
 	// Prepare clone directory
@@ -187,6 +190,36 @@ func TestAllowedApiDownloadZip(t *testing.T) {
 	runOrFail(t, extractCmd)
 }
 
+func TestDownloadCacheHit(t *testing.T) {
+	prepareDownloadDir(t)
+
+	// Prepare test server and backend
+	archiveName := "foobar.zip"
+	ts := testAuthServer(200, archiveOkBody(t, archiveName))
+	defer ts.Close()
+	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+
+	if err := os.MkdirAll(cacheDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	cachedContent := []byte{'c', 'a', 'c', 'h', 'e', 'd'}
+	if err := ioutil.WriteFile(path.Join(cacheDir, archiveName), cachedContent, 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("http://%s/api/v3/projects/123/repository/archive.zip", servAddr))
+	downloadCmd.Dir = scratchDir
+	runOrFail(t, downloadCmd)
+
+	actual, err := ioutil.ReadFile(path.Join(scratchDir, archiveName))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if bytes.Compare(actual, cachedContent) != 0 {
+		t.Fatal("Unexpected file contents in download")
+	}
+}
+
 func prepareDownloadDir(t *testing.T) {
 	if err := os.RemoveAll(scratchDir); err != nil {
 		t.Fatal(err)
@@ -264,10 +297,10 @@ func archiveOkBody(t *testing.T, archiveName string) string {
 	if err != nil {
 		t.Fatal(err)
 	}
-	archivePath := path.Join(cwd, scratchDir, "cache", archiveName)
+	archivePath := path.Join(cwd, cacheDir, archiveName)
 	jsonString := `{
 		"RepoPath":"%s",
-		"ArchivePath":"/tmp/%s",
+		"ArchivePath":"%s",
 		"CommitId":"c7fbe50c7c7419d9701eebe64b1fdacc3df5b9dd",
 		"ArchivePrefix":"foobar123"
 	}`
