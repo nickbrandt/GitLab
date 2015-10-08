@@ -220,6 +220,25 @@ func TestDownloadCacheHit(t *testing.T) {
 	}
 }
 
+func TestDownloadCacheCreate(t *testing.T) {
+	prepareDownloadDir(t)
+
+	// Prepare test server and backend
+	archiveName := "foobar.zip"
+	ts := testAuthServer(200, archiveOkBody(t, archiveName))
+	defer ts.Close()
+	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+
+	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("http://%s/api/v3/projects/123/repository/archive.zip", servAddr))
+	downloadCmd.Dir = scratchDir
+	runOrFail(t, downloadCmd)
+
+	compareCmd := exec.Command("cmp", path.Join(cacheDir, archiveName), path.Join(scratchDir, archiveName))
+	if err := compareCmd.Run(); err != nil {
+		t.Fatalf("Comparison between downloaded file and cache item failed: %s", err)
+	}
+}
+
 func prepareDownloadDir(t *testing.T) {
 	if err := os.RemoveAll(scratchDir); err != nil {
 		t.Fatal(err)

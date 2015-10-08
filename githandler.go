@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -216,12 +217,26 @@ func handleGetArchive(env gitEnv, format string, repoPath string, w http.Respons
 	w.Header().Add("Content-Transfer-Encoding", "binary")
 	w.Header().Add("Cache-Control", "private")
 
-	if f, err := os.Open(env.ArchivePath); err == nil {
-		defer f.Close()
+	if cachedArchive, err := os.Open(env.ArchivePath); err == nil {
+		defer cachedArchive.Close()
 		log.Printf("Serving cached file %q", env.ArchivePath)
-		http.ServeContent(w, r, archiveFilename, time.Unix(0, 0), f)
+		http.ServeContent(w, r, "", time.Unix(0, 0), cachedArchive)
 		return
 	}
+
+	// Prepare tempfile to create cached archive
+	cacheDir := path.Dir(env.ArchivePath)
+	if err := os.MkdirAll(cacheDir, 0700); err != nil {
+		fail500(w, "handleGetArchive create archive cache directory", err)
+		return
+	}
+	tempFile, err := ioutil.TempFile(cacheDir, archiveFilename)
+	if err != nil {
+		fail500(w, "handleGetArchive create tempfile for archive", err)
+		return
+	}
+	defer tempFile.Close()
+	defer os.Remove(tempFile.Name())
 
 	var compressCmd *exec.Cmd
 	var archiveFormat string
@@ -277,7 +292,7 @@ func handleGetArchive(env gitEnv, format string, repoPath string, w http.Respons
 
 	// Start writing the response
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
-	if _, err := io.Copy(w, stdout); err != nil {
+	if _, err := io.Copy(w, io.TeeReader(stdout, tempFile)); err != nil {
 		logContext("handleGetArchive read from subprocess", err)
 		return
 	}
@@ -290,6 +305,16 @@ func handleGetArchive(env gitEnv, format string, repoPath string, w http.Respons
 			logContext("handleGetArchive wait for compressCmd", err)
 			return
 		}
+	}
+
+	// Finalize cached archive
+	if err := tempFile.Close(); err != nil {
+		logContext("handleGetArchive close cached archive", err)
+		return
+	}
+	if err := os.Link(tempFile.Name(), env.ArchivePath); err != nil {
+		logContext("handleGetArchive link (finalize) cached archive", err)
+		return
 	}
 }
 
