@@ -208,18 +208,10 @@ func handleGetInfoRefs(env gitEnv, _ string, repoPath string, w http.ResponseWri
 
 func handleGetArchive(env gitEnv, format string, repoPath string, w http.ResponseWriter, r *http.Request) {
 	archiveFilename := path.Base(env.ArchivePath)
-	w.Header().Add("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, archiveFilename))
-	if format == "zip" {
-		w.Header().Add("Content-Type", "application/zip")
-	} else {
-		w.Header().Add("Content-Type", "application/octet-stream")
-	}
-	w.Header().Add("Content-Transfer-Encoding", "binary")
-	w.Header().Add("Cache-Control", "private")
-
 	if cachedArchive, err := os.Open(env.ArchivePath); err == nil {
 		defer cachedArchive.Close()
 		log.Printf("Serving cached file %q", env.ArchivePath)
+		setArchiveHeaders(w, format, archiveFilename)
 		http.ServeContent(w, r, "", time.Unix(0, 0), cachedArchive)
 		return
 	}
@@ -291,6 +283,7 @@ func handleGetArchive(env gitEnv, format string, repoPath string, w http.Respons
 	}
 
 	// Start writing the response
+	setArchiveHeaders(w, format, archiveFilename)
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 	if _, err := io.Copy(w, io.TeeReader(stdout, tempFile)); err != nil {
 		logContext("handleGetArchive read from subprocess", err)
@@ -316,6 +309,17 @@ func handleGetArchive(env gitEnv, format string, repoPath string, w http.Respons
 		logContext("handleGetArchive link (finalize) cached archive", err)
 		return
 	}
+}
+
+func setArchiveHeaders(w http.ResponseWriter, format string, archiveFilename string) {
+	w.Header().Add("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, archiveFilename))
+	if format == "zip" {
+		w.Header().Add("Content-Type", "application/zip")
+	} else {
+		w.Header().Add("Content-Type", "application/octet-stream")
+	}
+	w.Header().Add("Content-Transfer-Encoding", "binary")
+	w.Header().Add("Cache-Control", "private")
 }
 
 func handlePostRPC(env gitEnv, rpc string, repoPath string, w http.ResponseWriter, r *http.Request) {
