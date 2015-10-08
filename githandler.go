@@ -208,6 +208,7 @@ func handleGetInfoRefs(env gitEnv, _ string, repoPath string, w http.ResponseWri
 
 func handleGetArchive(env gitEnv, format string, repoPath string, w http.ResponseWriter, r *http.Request) {
 	archiveFilename := path.Base(env.ArchivePath)
+
 	if cachedArchive, err := os.Open(env.ArchivePath); err == nil {
 		defer cachedArchive.Close()
 		log.Printf("Serving cached file %q", env.ArchivePath)
@@ -216,36 +217,14 @@ func handleGetArchive(env gitEnv, format string, repoPath string, w http.Respons
 		return
 	}
 
-	// Prepare tempfile to create cached archive
-	cacheDir := path.Dir(env.ArchivePath)
-	if err := os.MkdirAll(cacheDir, 0700); err != nil {
-		fail500(w, "handleGetArchive create archive cache directory", err)
-		return
-	}
-	tempFile, err := ioutil.TempFile(cacheDir, archiveFilename)
+	tempFile, err := prepareArchiveTempfile(path.Dir(env.ArchivePath), archiveFilename)
 	if err != nil {
 		fail500(w, "handleGetArchive create tempfile for archive", err)
-		return
 	}
 	defer tempFile.Close()
 	defer os.Remove(tempFile.Name())
 
-	var compressCmd *exec.Cmd
-	var archiveFormat string
-	switch format {
-	case "tar":
-		archiveFormat = "tar"
-		compressCmd = nil
-	case "tar.gz":
-		archiveFormat = "tar"
-		compressCmd = exec.Command("gzip", "-c", "-n")
-	case "tar.bz2":
-		archiveFormat = "tar"
-		compressCmd = exec.Command("bzip2", "-c")
-	case "zip":
-		archiveFormat = "zip"
-		compressCmd = nil
-	}
+	compressCmd, archiveFormat := parseArchiveFormat(format)
 
 	archiveCmd := gitCommand(env, "git", "--git-dir="+repoPath, "archive", "--format="+archiveFormat, "--prefix="+env.ArchivePrefix+"/", env.CommitId)
 	archiveStdout, err := archiveCmd.StdoutPipe()
@@ -300,13 +279,8 @@ func handleGetArchive(env gitEnv, format string, repoPath string, w http.Respons
 		}
 	}
 
-	// Finalize cached archive
-	if err := tempFile.Close(); err != nil {
-		logContext("handleGetArchive close cached archive", err)
-		return
-	}
-	if err := os.Link(tempFile.Name(), env.ArchivePath); err != nil {
-		logContext("handleGetArchive link (finalize) cached archive", err)
+	if err := finalizeCachedArchive(tempFile, env.ArchivePath); err != nil {
+		logContext("handleGetArchive finalize cached archive", err)
 		return
 	}
 }
@@ -320,6 +294,34 @@ func setArchiveHeaders(w http.ResponseWriter, format string, archiveFilename str
 	}
 	w.Header().Add("Content-Transfer-Encoding", "binary")
 	w.Header().Add("Cache-Control", "private")
+}
+
+func parseArchiveFormat(format string) (*exec.Cmd, string) {
+	switch format {
+	case "tar":
+		return nil, "tar"
+	case "tar.gz":
+		return exec.Command("gzip", "-c", "-n"), "tar"
+	case "tar.bz2":
+		return exec.Command("bzip2", "-c"), "tar"
+	case "zip":
+		return nil, "zip"
+	}
+	return nil, "unknown"
+}
+
+func prepareArchiveTempfile(dir string, prefix string) (*os.File, error) {
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		return nil, err
+	}
+	return ioutil.TempFile(dir, prefix)
+}
+
+func finalizeCachedArchive(tempFile *os.File, archivePath string) error {
+	if err := tempFile.Close(); err != nil {
+		return err
+	}
+	return os.Link(tempFile.Name(), archivePath)
 }
 
 func handlePostRPC(env gitEnv, rpc string, repoPath string, w http.ResponseWriter, r *http.Request) {
