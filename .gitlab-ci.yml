@@ -1,5 +1,2 @@
-before_script:
-  - apt-get install unzip bzip2
-
 test:
   script: make clean test
