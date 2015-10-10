@@ -213,11 +213,19 @@ func handleGetArchive(env gitEnv, format string, repoPath string, w http.Respons
 		defer cachedArchive.Close()
 		log.Printf("Serving cached file %q", env.ArchivePath)
 		setArchiveHeaders(w, format, archiveFilename)
+		// Even if somebody deleted the cachedArchive from disk since we opened
+		// the file, Unix file semantics guarantee we can still read from the
+		// open file in this process.
 		http.ServeContent(w, r, "", time.Unix(0, 0), cachedArchive)
 		return
 	}
 
-	tempFile, err := prepareArchiveTempfile(path.Dir(env.ArchivePath), archiveFilename)
+	// We assume the tempFile has a unique name so that concurrent requests are
+	// safe. We create the tempfile in the same directory as the final cached
+	// archive we want to create so that we can use an atomic link(2) operation
+	// to finalize the cached archive.
+	tempFile, err := prepareArchiveTempfile(path.Dir(env.ArchivePath),
+		archiveFilename)
 	if err != nil {
 		fail500(w, "handleGetArchive create tempfile for archive", err)
 	}
