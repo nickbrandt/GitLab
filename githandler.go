@@ -30,11 +30,11 @@ type gitHandler struct {
 type gitService struct {
 	method     string
 	suffix     string
-	handleFunc func(gitEnv, string, http.ResponseWriter, *http.Request)
+	handleFunc func(requestMetadata, string, http.ResponseWriter, *http.Request)
 	rpc        string
 }
 
-type gitEnv struct {
+type requestMetadata struct {
 	GL_ID         string
 	RepoPath      string
 	ArchivePath   string
@@ -59,7 +59,7 @@ func newGitHandler(authBackend string) *gitHandler {
 }
 
 func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var env gitEnv
+	var md requestMetadata
 	var g gitService
 
 	log.Printf("%s %q", r.Method, r.URL)
@@ -106,7 +106,7 @@ func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// the user is according to them (GL_ID). We must extract this
 	// information from the auth response body.
 	dec := json.NewDecoder(authResponse.Body)
-	if err := dec.Decode(&env); err != nil {
+	if err := dec.Decode(&md); err != nil {
 		fail500(w, "decode JSON GL_ID", err)
 		return
 	}
@@ -122,12 +122,12 @@ func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if !looksLikeRepo(env.RepoPath) {
+	if !looksLikeRepo(md.RepoPath) {
 		http.Error(w, "Not Found", 404)
 		return
 	}
 
-	g.handleFunc(env, g.rpc, w, r)
+	g.handleFunc(md, g.rpc, w, r)
 }
 
 func looksLikeRepo(p string) bool {
@@ -161,7 +161,7 @@ func (h *gitHandler) doAuthRequest(r *http.Request) (result *http.Response, err 
 	return h.httpClient.Do(authReq)
 }
 
-func handleGetInfoRefs(env gitEnv, _ string, w http.ResponseWriter, r *http.Request) {
+func handleGetInfoRefs(md requestMetadata, _ string, w http.ResponseWriter, r *http.Request) {
 	rpc := r.URL.Query().Get("service")
 	if !(rpc == "git-upload-pack" || rpc == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
@@ -170,7 +170,7 @@ func handleGetInfoRefs(env gitEnv, _ string, w http.ResponseWriter, r *http.Requ
 	}
 
 	// Prepare our Git subprocess
-	cmd := gitCommand(env.GL_ID, "git", subCommand(rpc), "--stateless-rpc", "--advertise-refs", env.RepoPath)
+	cmd := gitCommand(md.GL_ID, "git", subCommand(rpc), "--stateless-rpc", "--advertise-refs", md.RepoPath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		fail500(w, "handleGetInfoRefs", err)
@@ -205,12 +205,12 @@ func handleGetInfoRefs(env gitEnv, _ string, w http.ResponseWriter, r *http.Requ
 	}
 }
 
-func handleGetArchive(env gitEnv, format string, w http.ResponseWriter, r *http.Request) {
-	archiveFilename := path.Base(env.ArchivePath)
+func handleGetArchive(md requestMetadata, format string, w http.ResponseWriter, r *http.Request) {
+	archiveFilename := path.Base(md.ArchivePath)
 
-	if cachedArchive, err := os.Open(env.ArchivePath); err == nil {
+	if cachedArchive, err := os.Open(md.ArchivePath); err == nil {
 		defer cachedArchive.Close()
-		log.Printf("Serving cached file %q", env.ArchivePath)
+		log.Printf("Serving cached file %q", md.ArchivePath)
 		setArchiveHeaders(w, format, archiveFilename)
 		// Even if somebody deleted the cachedArchive from disk since we opened
 		// the file, Unix file semantics guarantee we can still read from the
@@ -223,7 +223,7 @@ func handleGetArchive(env gitEnv, format string, w http.ResponseWriter, r *http.
 	// safe. We create the tempfile in the same directory as the final cached
 	// archive we want to create so that we can use an atomic link(2) operation
 	// to finalize the cached archive.
-	tempFile, err := prepareArchiveTempfile(path.Dir(env.ArchivePath),
+	tempFile, err := prepareArchiveTempfile(path.Dir(md.ArchivePath),
 		archiveFilename)
 	if err != nil {
 		fail500(w, "handleGetArchive create tempfile for archive", err)
@@ -233,7 +233,7 @@ func handleGetArchive(env gitEnv, format string, w http.ResponseWriter, r *http.
 
 	compressCmd, archiveFormat := parseArchiveFormat(format)
 
-	archiveCmd := gitCommand("", "git", "--git-dir="+env.RepoPath, "archive", "--format="+archiveFormat, "--prefix="+env.ArchivePrefix+"/", env.CommitId)
+	archiveCmd := gitCommand("", "git", "--git-dir="+md.RepoPath, "archive", "--format="+archiveFormat, "--prefix="+md.ArchivePrefix+"/", md.CommitId)
 	archiveStdout, err := archiveCmd.StdoutPipe()
 	if err != nil {
 		fail500(w, "handleGetArchive", err)
@@ -289,7 +289,7 @@ func handleGetArchive(env gitEnv, format string, w http.ResponseWriter, r *http.
 		}
 	}
 
-	if err := finalizeCachedArchive(tempFile, env.ArchivePath); err != nil {
+	if err := finalizeCachedArchive(tempFile, md.ArchivePath); err != nil {
 		logContext("handleGetArchive finalize cached archive", err)
 		return
 	}
@@ -334,7 +334,7 @@ func finalizeCachedArchive(tempFile *os.File, archivePath string) error {
 	return os.Link(tempFile.Name(), archivePath)
 }
 
-func handlePostRPC(env gitEnv, rpc string, w http.ResponseWriter, r *http.Request) {
+func handlePostRPC(md requestMetadata, rpc string, w http.ResponseWriter, r *http.Request) {
 	var body io.ReadCloser
 	var err error
 
@@ -351,7 +351,7 @@ func handlePostRPC(env gitEnv, rpc string, w http.ResponseWriter, r *http.Reques
 	defer body.Close()
 
 	// Prepare our Git subprocess
-	cmd := gitCommand(env.GL_ID, "git", subCommand(rpc), "--stateless-rpc", env.RepoPath)
+	cmd := gitCommand(md.GL_ID, "git", subCommand(rpc), "--stateless-rpc", md.RepoPath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		fail500(w, "handlePostRPC", err)
