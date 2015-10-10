@@ -170,7 +170,7 @@ func handleGetInfoRefs(env gitEnv, _ string, w http.ResponseWriter, r *http.Requ
 	}
 
 	// Prepare our Git subprocess
-	cmd := gitCommand(env, "git", subCommand(rpc), "--stateless-rpc", "--advertise-refs", env.RepoPath)
+	cmd := gitCommand(env.GL_ID, "git", subCommand(rpc), "--stateless-rpc", "--advertise-refs", env.RepoPath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		fail500(w, "handleGetInfoRefs", err)
@@ -233,7 +233,7 @@ func handleGetArchive(env gitEnv, format string, w http.ResponseWriter, r *http.
 
 	compressCmd, archiveFormat := parseArchiveFormat(format)
 
-	archiveCmd := gitCommand(env, "git", "--git-dir="+env.RepoPath, "archive", "--format="+archiveFormat, "--prefix="+env.ArchivePrefix+"/", env.CommitId)
+	archiveCmd := gitCommand("", "git", "--git-dir="+env.RepoPath, "archive", "--format="+archiveFormat, "--prefix="+env.ArchivePrefix+"/", env.CommitId)
 	archiveStdout, err := archiveCmd.StdoutPipe()
 	if err != nil {
 		fail500(w, "handleGetArchive", err)
@@ -351,7 +351,7 @@ func handlePostRPC(env gitEnv, rpc string, w http.ResponseWriter, r *http.Reques
 	defer body.Close()
 
 	// Prepare our Git subprocess
-	cmd := gitCommand(env, "git", subCommand(rpc), "--stateless-rpc", env.RepoPath)
+	cmd := gitCommand(env.GL_ID, "git", subCommand(rpc), "--stateless-rpc", env.RepoPath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		fail500(w, "handlePostRPC", err)
@@ -415,14 +415,14 @@ func subCommand(rpc string) string {
 	return strings.TrimPrefix(rpc, "git-")
 }
 
-func gitCommand(env gitEnv, name string, args ...string) *exec.Cmd {
+func gitCommand(gl_id string, name string, args ...string) *exec.Cmd {
 	cmd := exec.Command(name, args...)
 	// Start the command in its own process group (nice for signalling)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	// Explicitly set the environment for the Git command
 	cmd.Env = []string{
 		fmt.Sprintf("PATH=%s", os.Getenv("PATH")),
-		fmt.Sprintf("GL_ID=%s", env.GL_ID),
+		fmt.Sprintf("GL_ID=%s", gl_id),
 	}
 	// If we don't do something with cmd.Stderr, Git errors will be lost
 	cmd.Stderr = os.Stderr
