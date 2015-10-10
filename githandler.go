@@ -260,11 +260,14 @@ func handleGetArchive(env gitEnv, format string, repoPath string, w http.Respons
 
 		archiveStdout.Close()
 	}
+	// Every Read() from stdout will be synchronously written to tempFile
+	// before it comes out the TeeReader.
+	archiveReader := io.TeeReader(stdout, tempFile)
 
 	// Start writing the response
 	setArchiveHeaders(w, format, archiveFilename)
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
-	if _, err := io.Copy(w, io.TeeReader(stdout, tempFile)); err != nil {
+	if _, err := io.Copy(w, archiveReader); err != nil {
 		logContext("handleGetArchive read from subprocess", err)
 		return
 	}
