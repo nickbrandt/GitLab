@@ -1,5 +1,14 @@
 # Changelog for gitlab-git-http-server
 
+0.3.0
+
+In 0.3.0 we also handle 'git archive' downloads for GitLab 8.1+.
+This has lead to some breaking API changes, making 0.3.0 incompatible
+with GitLab 8.0.  We now expect the 'auth backend' (GitLab) to
+provide us with much more information about each request, such as
+the path on disk to the Git repository the client is requesting.
+This makes the REPO_ROOT command line argument obsolete.
+
 0.2.14
 
 This is the last version that works with GitLab 8.0.
