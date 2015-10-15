@@ -36,22 +36,18 @@ func main() {
 	pprofListenAddr := flag.String("pprofListenAddr", "", "pprof listening address, e.g. 'localhost:6060'")
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-		fmt.Fprintf(os.Stderr, "\n  %s [OPTIONS] REPO_ROOT\n\nOptions:\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "\n  %s [OPTIONS]\n\nOptions:\n", os.Args[0])
 		flag.PrintDefaults()
 	}
 	flag.Parse()
 
+	version := fmt.Sprintf("gitlab-git-http-server %s", Version)
 	if *printVersion {
-		fmt.Printf("gitlab-git-http-server %s\n", Version)
+		fmt.Println(version)
 		os.Exit(0)
 	}
 
-	repoRoot := flag.Arg(0)
-	if repoRoot == "" {
-		flag.Usage()
-		os.Exit(1)
-	}
-	log.Printf("repoRoot: %s", repoRoot)
+	log.Printf("Starting %s", version)
 
 	// Good housekeeping for Unix sockets: unlink before binding
 	if *listenNetwork == "unix" {
@@ -81,6 +77,6 @@ func main() {
 	// Because net/http/pprof installs itself in the DefaultServeMux
 	// we create a fresh one for the Git server.
 	serveMux := http.NewServeMux()
-	serveMux.Handle("/", newGitHandler(repoRoot, *authBackend))
+	serveMux.Handle("/", newGitHandler(*authBackend))
 	log.Fatal(http.Serve(listener, serveMux))
 }

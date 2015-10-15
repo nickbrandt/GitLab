@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -19,9 +21,11 @@ const servWaitSleep = 100    // milliseconds sleep interval
 const scratchDir = "test/scratch"
 const testRepoRoot = "test/data"
 const testRepo = "test.git"
+const testProject = "test"
 
 var remote = fmt.Sprintf("http://%s/%s", servAddr, testRepo)
 var checkoutDir = path.Join(scratchDir, "test")
+var cacheDir = path.Join(scratchDir, "cache")
 
 func TestAllowedClone(t *testing.T) {
 	// Prepare clone directory
@@ -30,7 +34,7 @@ func TestAllowedClone(t *testing.T) {
 	}
 
 	// Prepare test server and backend
-	ts := testAuthServer(200, `{"GL_ID":"user-123"}`)
+	ts := testAuthServer(200, gitOkBody(t))
 	defer ts.Close()
 	defer cleanUpProcessGroup(startServerOrFail(t, ts))
 
@@ -68,7 +72,7 @@ func TestAllowedPush(t *testing.T) {
 	preparePushRepo(t)
 
 	// Prepare the test server and backend
-	ts := testAuthServer(200, `{"GL_ID":"user-123"}`)
+	ts := testAuthServer(200, gitOkBody(t))
 	defer ts.Close()
 	defer cleanUpProcessGroup(startServerOrFail(t, ts))
 
@@ -96,6 +100,154 @@ func TestDeniedPush(t *testing.T) {
 	}
 }
 
+func TestAllowedDownloadZip(t *testing.T) {
+	prepareDownloadDir(t)
+
+	// Prepare test server and backend
+	archiveName := "foobar.zip"
+	ts := testAuthServer(200, archiveOkBody(t, archiveName))
+	defer ts.Close()
+	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+
+	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("http://%s/%s/repository/archive.zip", servAddr, testProject))
+	downloadCmd.Dir = scratchDir
+	runOrFail(t, downloadCmd)
+
+	extractCmd := exec.Command("unzip", archiveName)
+	extractCmd.Dir = scratchDir
+	runOrFail(t, extractCmd)
+}
+
+func TestAllowedDownloadTar(t *testing.T) {
+	prepareDownloadDir(t)
+
+	// Prepare test server and backend
+	archiveName := "foobar.tar"
+	ts := testAuthServer(200, archiveOkBody(t, archiveName))
+	defer ts.Close()
+	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+
+	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("http://%s/%s/repository/archive.tar", servAddr, testProject))
+	downloadCmd.Dir = scratchDir
+	runOrFail(t, downloadCmd)
+
+	extractCmd := exec.Command("tar", "xf", archiveName)
+	extractCmd.Dir = scratchDir
+	runOrFail(t, extractCmd)
+}
+
+func TestAllowedDownloadTarGz(t *testing.T) {
+	prepareDownloadDir(t)
+
+	// Prepare test server and backend
+	archiveName := "foobar.tar.gz"
+	ts := testAuthServer(200, archiveOkBody(t, archiveName))
+	defer ts.Close()
+	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+
+	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("http://%s/%s/repository/archive.tar.gz", servAddr, testProject))
+	downloadCmd.Dir = scratchDir
+	runOrFail(t, downloadCmd)
+
+	extractCmd := exec.Command("tar", "zxf", archiveName)
+	extractCmd.Dir = scratchDir
+	runOrFail(t, extractCmd)
+}
+
+func TestAllowedDownloadTarBz2(t *testing.T) {
+	prepareDownloadDir(t)
+
+	// Prepare test server and backend
+	archiveName := "foobar.tar.bz2"
+	ts := testAuthServer(200, archiveOkBody(t, archiveName))
+	defer ts.Close()
+	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+
+	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("http://%s/%s/repository/archive.tar.bz2", servAddr, testProject))
+	downloadCmd.Dir = scratchDir
+	runOrFail(t, downloadCmd)
+
+	extractCmd := exec.Command("tar", "jxf", archiveName)
+	extractCmd.Dir = scratchDir
+	runOrFail(t, extractCmd)
+}
+
+func TestAllowedApiDownloadZip(t *testing.T) {
+	prepareDownloadDir(t)
+
+	// Prepare test server and backend
+	archiveName := "foobar.zip"
+	ts := testAuthServer(200, archiveOkBody(t, archiveName))
+	defer ts.Close()
+	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+
+	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("http://%s/api/v3/projects/123/repository/archive.zip", servAddr))
+	downloadCmd.Dir = scratchDir
+	runOrFail(t, downloadCmd)
+
+	extractCmd := exec.Command("unzip", archiveName)
+	extractCmd.Dir = scratchDir
+	runOrFail(t, extractCmd)
+}
+
+func TestDownloadCacheHit(t *testing.T) {
+	prepareDownloadDir(t)
+
+	// Prepare test server and backend
+	archiveName := "foobar.zip"
+	ts := testAuthServer(200, archiveOkBody(t, archiveName))
+	defer ts.Close()
+	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+
+	if err := os.MkdirAll(cacheDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	cachedContent := []byte{'c', 'a', 'c', 'h', 'e', 'd'}
+	if err := ioutil.WriteFile(path.Join(cacheDir, archiveName), cachedContent, 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("http://%s/api/v3/projects/123/repository/archive.zip", servAddr))
+	downloadCmd.Dir = scratchDir
+	runOrFail(t, downloadCmd)
+
+	actual, err := ioutil.ReadFile(path.Join(scratchDir, archiveName))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if bytes.Compare(actual, cachedContent) != 0 {
+		t.Fatal("Unexpected file contents in download")
+	}
+}
+
+func TestDownloadCacheCreate(t *testing.T) {
+	prepareDownloadDir(t)
+
+	// Prepare test server and backend
+	archiveName := "foobar.zip"
+	ts := testAuthServer(200, archiveOkBody(t, archiveName))
+	defer ts.Close()
+	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+
+	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("http://%s/api/v3/projects/123/repository/archive.zip", servAddr))
+	downloadCmd.Dir = scratchDir
+	runOrFail(t, downloadCmd)
+
+	compareCmd := exec.Command("cmp", path.Join(cacheDir, archiveName), path.Join(scratchDir, archiveName))
+	if err := compareCmd.Run(); err != nil {
+		t.Fatalf("Comparison between downloaded file and cache item failed: %s", err)
+	}
+}
+
+func prepareDownloadDir(t *testing.T) {
+	if err := os.RemoveAll(scratchDir); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(scratchDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func preparePushRepo(t *testing.T) {
 	if err := os.RemoveAll(scratchDir); err != nil {
 		t.Fatal(err)
@@ -117,7 +269,7 @@ func testAuthServer(code int, body string) *httptest.Server {
 }
 
 func startServerOrFail(t *testing.T, ts *httptest.Server) *exec.Cmd {
-	cmd := exec.Command("go", "run", "main.go", "githandler.go", fmt.Sprintf("-authBackend=%s", ts.URL), fmt.Sprintf("-listenAddr=%s", servAddr), testRepoRoot)
+	cmd := exec.Command("go", "run", "main.go", "githandler.go", fmt.Sprintf("-authBackend=%s", ts.URL), fmt.Sprintf("-listenAddr=%s", servAddr))
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -153,4 +305,31 @@ func runOrFail(t *testing.T, cmd *exec.Cmd) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func gitOkBody(t *testing.T) string {
+	return fmt.Sprintf(`{"GL_ID":"user-123","RepoPath":"%s"}`, repoPath(t))
+}
+
+func archiveOkBody(t *testing.T, archiveName string) string {
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	archivePath := path.Join(cwd, cacheDir, archiveName)
+	jsonString := `{
+		"RepoPath":"%s",
+		"ArchivePath":"%s",
+		"CommitId":"c7fbe50c7c7419d9701eebe64b1fdacc3df5b9dd",
+		"ArchivePrefix":"foobar123"
+	}`
+	return fmt.Sprintf(jsonString, repoPath(t), archivePath)
+}
+
+func repoPath(t *testing.T) string {
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	return path.Join(cwd, testRepoRoot, testRepo)
 }

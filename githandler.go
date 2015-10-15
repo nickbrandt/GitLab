@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -18,23 +19,40 @@ import (
 	"path"
 	"strings"
 	"syscall"
+	"time"
 )
 
 type gitHandler struct {
 	httpClient  *http.Client
-	repoRoot    string
 	authBackend string
 }
 
 type gitService struct {
 	method     string
 	suffix     string
-	handleFunc func(gitEnv, string, string, http.ResponseWriter, *http.Request)
+	handleFunc func(w http.ResponseWriter, r *gitRequest, rpc string)
 	rpc        string
 }
 
-type gitEnv struct {
+// A gitReqest is an *http.Request decorated with attributes returned by the
+// GitLab Rails application.
+type gitRequest struct {
+	*http.Request
+	// GL_ID is an environment variable used by gitlab-shell hooks during 'git
+	// push' and 'git pull'
 	GL_ID string
+	// RepoPath is the full path on disk to the Git repository the request is
+	// about
+	RepoPath string
+	// ArchivePath is the full path where we should find/create a cached copy
+	// of a requested archive
+	ArchivePath string
+	// ArchivePrefix is used to put extracted archive contents in a
+	// subdirectory
+	ArchivePrefix string
+	// CommitId is used do prevent race conditions between the 'time of check'
+	// in the GitLab Rails app and the 'time of use' in gitlab-git-http-server.
+	CommitId string
 }
 
 // Routing table
@@ -42,14 +60,18 @@ var gitServices = [...]gitService{
 	gitService{"GET", "/info/refs", handleGetInfoRefs, ""},
 	gitService{"POST", "/git-upload-pack", handlePostRPC, "git-upload-pack"},
 	gitService{"POST", "/git-receive-pack", handlePostRPC, "git-receive-pack"},
+	gitService{"GET", "/repository/archive", handleGetArchive, "tar.gz"},
+	gitService{"GET", "/repository/archive.zip", handleGetArchive, "zip"},
+	gitService{"GET", "/repository/archive.tar", handleGetArchive, "tar"},
+	gitService{"GET", "/repository/archive.tar.gz", handleGetArchive, "tar.gz"},
+	gitService{"GET", "/repository/archive.tar.bz2", handleGetArchive, "tar.bz2"},
 }
 
-func newGitHandler(repoRoot, authBackend string) *gitHandler {
-	return &gitHandler{&http.Client{}, repoRoot, authBackend}
+func newGitHandler(authBackend string) *gitHandler {
+	return &gitHandler{&http.Client{}, authBackend}
 }
 
 func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var env gitEnv
 	var g gitService
 
 	log.Printf("%s %q", r.Method, r.URL)
@@ -92,11 +114,11 @@ func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// The auth backend validated the client request and told us who
-	// the user is according to them (GL_ID). We must extract this
-	// information from the auth response body.
-	dec := json.NewDecoder(authResponse.Body)
-	if err := dec.Decode(&env); err != nil {
+	// The auth backend validated the client request and told us additional
+	// request metadata. We must extract this information from the auth
+	// response body.
+	gitReq := &gitRequest{Request: r}
+	if err := json.NewDecoder(authResponse.Body).Decode(gitReq); err != nil {
 		fail500(w, "decode JSON GL_ID", err)
 		return
 	}
@@ -106,26 +128,18 @@ func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Negotiate authentication (Kerberos) may need to return a WWW-Authenticate
 	// header to the client even in case of success as per RFC4559.
 	for k, v := range authResponse.Header {
-                // Case-insensitive comparison as per RFC7230
+		// Case-insensitive comparison as per RFC7230
 		if strings.EqualFold(k, "WWW-Authenticate") {
 			w.Header()[k] = v
 		}
 	}
 
-	// About path traversal: the Go net/http HTTP server, or
-	// rather ServeMux, makes the following promise: "ServeMux
-	// also takes care of sanitizing the URL request path, redirecting
-	// any request containing . or .. elements to an equivalent
-	// .- and ..-free URL.". In other words, we may assume that
-	// r.URL.Path does not contain '/../', so there is no possibility
-	// of path traversal here.
-	repoPath := path.Join(h.repoRoot, strings.TrimSuffix(r.URL.Path, g.suffix))
-	if !looksLikeRepo(repoPath) {
+	if !looksLikeRepo(gitReq.RepoPath) {
 		http.Error(w, "Not Found", 404)
 		return
 	}
 
-	g.handleFunc(env, g.rpc, repoPath, w, r)
+	g.handleFunc(w, gitReq, g.rpc)
 }
 
 func looksLikeRepo(p string) bool {
@@ -159,7 +173,7 @@ func (h *gitHandler) doAuthRequest(r *http.Request) (result *http.Response, err 
 	return h.httpClient.Do(authReq)
 }
 
-func handleGetInfoRefs(env gitEnv, _ string, path string, w http.ResponseWriter, r *http.Request) {
+func handleGetInfoRefs(w http.ResponseWriter, r *gitRequest, _ string) {
 	rpc := r.URL.Query().Get("service")
 	if !(rpc == "git-upload-pack" || rpc == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
@@ -168,7 +182,7 @@ func handleGetInfoRefs(env gitEnv, _ string, path string, w http.ResponseWriter,
 	}
 
 	// Prepare our Git subprocess
-	cmd := gitCommand(env, "git", subCommand(rpc), "--stateless-rpc", "--advertise-refs", path)
+	cmd := gitCommand(r.GL_ID, "git", subCommand(rpc), "--stateless-rpc", "--advertise-refs", r.RepoPath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		fail500(w, "handleGetInfoRefs", err)
@@ -203,7 +217,136 @@ func handleGetInfoRefs(env gitEnv, _ string, path string, w http.ResponseWriter,
 	}
 }
 
-func handlePostRPC(env gitEnv, rpc string, path string, w http.ResponseWriter, r *http.Request) {
+func handleGetArchive(w http.ResponseWriter, r *gitRequest, format string) {
+	archiveFilename := path.Base(r.ArchivePath)
+
+	if cachedArchive, err := os.Open(r.ArchivePath); err == nil {
+		defer cachedArchive.Close()
+		log.Printf("Serving cached file %q", r.ArchivePath)
+		setArchiveHeaders(w, format, archiveFilename)
+		// Even if somebody deleted the cachedArchive from disk since we opened
+		// the file, Unix file semantics guarantee we can still read from the
+		// open file in this process.
+		http.ServeContent(w, r.Request, "", time.Unix(0, 0), cachedArchive)
+		return
+	}
+
+	// We assume the tempFile has a unique name so that concurrent requests are
+	// safe. We create the tempfile in the same directory as the final cached
+	// archive we want to create so that we can use an atomic link(2) operation
+	// to finalize the cached archive.
+	tempFile, err := prepareArchiveTempfile(path.Dir(r.ArchivePath),
+		archiveFilename)
+	if err != nil {
+		fail500(w, "handleGetArchive create tempfile for archive", err)
+	}
+	defer tempFile.Close()
+	defer os.Remove(tempFile.Name())
+
+	compressCmd, archiveFormat := parseArchiveFormat(format)
+
+	archiveCmd := gitCommand("", "git", "--git-dir="+r.RepoPath, "archive", "--format="+archiveFormat, "--prefix="+r.ArchivePrefix+"/", r.CommitId)
+	archiveStdout, err := archiveCmd.StdoutPipe()
+	if err != nil {
+		fail500(w, "handleGetArchive", err)
+		return
+	}
+	defer archiveStdout.Close()
+	if err := archiveCmd.Start(); err != nil {
+		fail500(w, "handleGetArchive", err)
+		return
+	}
+	defer cleanUpProcessGroup(archiveCmd) // Ensure brute force subprocess clean-up
+
+	var stdout io.ReadCloser
+	if compressCmd == nil {
+		stdout = archiveStdout
+	} else {
+		compressCmd.Stdin = archiveStdout
+
+		stdout, err = compressCmd.StdoutPipe()
+		if err != nil {
+			fail500(w, "handleGetArchive compressCmd stdout pipe", err)
+			return
+		}
+		defer stdout.Close()
+
+		if err := compressCmd.Start(); err != nil {
+			fail500(w, "handleGetArchive start compressCmd process", err)
+			return
+		}
+		defer compressCmd.Wait()
+
+		archiveStdout.Close()
+	}
+	// Every Read() from stdout will be synchronously written to tempFile
+	// before it comes out the TeeReader.
+	archiveReader := io.TeeReader(stdout, tempFile)
+
+	// Start writing the response
+	setArchiveHeaders(w, format, archiveFilename)
+	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
+	if _, err := io.Copy(w, archiveReader); err != nil {
+		logContext("handleGetArchive read from subprocess", err)
+		return
+	}
+	if err := archiveCmd.Wait(); err != nil {
+		logContext("handleGetArchive wait for archiveCmd", err)
+		return
+	}
+	if compressCmd != nil {
+		if err := compressCmd.Wait(); err != nil {
+			logContext("handleGetArchive wait for compressCmd", err)
+			return
+		}
+	}
+
+	if err := finalizeCachedArchive(tempFile, r.ArchivePath); err != nil {
+		logContext("handleGetArchive finalize cached archive", err)
+		return
+	}
+}
+
+func setArchiveHeaders(w http.ResponseWriter, format string, archiveFilename string) {
+	w.Header().Add("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, archiveFilename))
+	if format == "zip" {
+		w.Header().Add("Content-Type", "application/zip")
+	} else {
+		w.Header().Add("Content-Type", "application/octet-stream")
+	}
+	w.Header().Add("Content-Transfer-Encoding", "binary")
+	w.Header().Add("Cache-Control", "private")
+}
+
+func parseArchiveFormat(format string) (*exec.Cmd, string) {
+	switch format {
+	case "tar":
+		return nil, "tar"
+	case "tar.gz":
+		return exec.Command("gzip", "-c", "-n"), "tar"
+	case "tar.bz2":
+		return exec.Command("bzip2", "-c"), "tar"
+	case "zip":
+		return nil, "zip"
+	}
+	return nil, "unknown"
+}
+
+func prepareArchiveTempfile(dir string, prefix string) (*os.File, error) {
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		return nil, err
+	}
+	return ioutil.TempFile(dir, prefix)
+}
+
+func finalizeCachedArchive(tempFile *os.File, archivePath string) error {
+	if err := tempFile.Close(); err != nil {
+		return err
+	}
+	return os.Link(tempFile.Name(), archivePath)
+}
+
+func handlePostRPC(w http.ResponseWriter, r *gitRequest, rpc string) {
 	var body io.ReadCloser
 	var err error
 
@@ -220,7 +363,7 @@ func handlePostRPC(env gitEnv, rpc string, path string, w http.ResponseWriter, r
 	defer body.Close()
 
 	// Prepare our Git subprocess
-	cmd := gitCommand(env, "git", subCommand(rpc), "--stateless-rpc", path)
+	cmd := gitCommand(r.GL_ID, "git", subCommand(rpc), "--stateless-rpc", r.RepoPath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		fail500(w, "handlePostRPC", err)
@@ -284,14 +427,14 @@ func subCommand(rpc string) string {
 	return strings.TrimPrefix(rpc, "git-")
 }
 
-func gitCommand(env gitEnv, name string, args ...string) *exec.Cmd {
+func gitCommand(gl_id string, name string, args ...string) *exec.Cmd {
 	cmd := exec.Command(name, args...)
 	// Start the command in its own process group (nice for signalling)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	// Explicitly set the environment for the Git command
 	cmd.Env = []string{
 		fmt.Sprintf("PATH=%s", os.Getenv("PATH")),
-		fmt.Sprintf("GL_ID=%s", env.GL_ID),
+		fmt.Sprintf("GL_ID=%s", gl_id),
 	}
 	// If we don't do something with cmd.Stderr, Git errors will be lost
 	cmd.Stderr = os.Stderr

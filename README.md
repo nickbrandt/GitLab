@@ -1,8 +1,9 @@
 # gitlab-git-http-server
 
 gitlab-git-http-server was designed to unload Git HTTP traffic from
-the GitLab Rails app (Unicorn) to a separate daemon. All authentication
-and authorization logic is still handled by the GitLab Rails app.
+the GitLab Rails app (Unicorn) to a separate daemon.  It also serves
+'git archive' downloads for GitLab.  All authentication and
+authorization logic is still handled by the GitLab Rails app.
 
 Architecture: Git client -> NGINX -> gitlab-git-http-server (makes
 auth request to GitLab Rails app) -> git-upload-pack
@@ -10,7 +11,7 @@ auth request to GitLab Rails app) -> git-upload-pack
 ## Usage
 
 ```
-  gitlab-git-http-server [OPTIONS] REPO_ROOT
+  gitlab-git-http-server [OPTIONS]
 
 Options:
   -authBackend string
@@ -27,11 +28,13 @@ Options:
     	Print version and exit
 ```
 
-gitlab-git-http-server allows Git HTTP clients to push and pull to and from Git
-repositories under REPO_ROOT. Each incoming request is first replayed (with an
-empty request body) to an external authentication/authorization HTTP server:
-the 'auth backend'. The auth backend is expected to be a GitLab Unicorn
-process.
+gitlab-git-http-server allows Git HTTP clients to push and pull to
+and from Git repositories. Each incoming request is first replayed
+(with an empty request body) to an external authentication/authorization
+HTTP server: the 'auth backend'. The auth backend is expected to
+be a GitLab Unicorn process.  The 'auth response' is a JSON message
+which tells gitlab-git-http-server the path of the Git repository
+to read from/write to.
 
 gitlab-git-http-server can listen on either a TCP or a Unix domain socket. It
 can also open a second listening TCP listening socket with the Go
@@ -63,14 +66,19 @@ You can try out the Git server without authentication as follows:
 
 ```
 # Start a fake auth backend that allows everything/everybody
-go run support/say-yes.go &
+make test/data/test.git
+go run support/fake-auth-backend.go ~+/test/data/test.git &
 # Start gitlab-git-http-server
-go build && ./gitlab-git-http-server /path/to/git-repos
+make
+./gitlab-git-http-server
 ```
 
-Now if you have a Git repository in `/path/to/git-repos/my-repo.git`,
-you can push to and pull from it at the URL
-`http://localhost:8181/my-repo.git`.
+Now you can try things like:
+
+```
+git clone http://localhost:8181/test.git
+curl -JO http://localhost:8181/test/repository/archive.zip
+```
 
 ## Example request flow
 
