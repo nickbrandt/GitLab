@@ -67,8 +67,8 @@ var gitServices = [...]gitService{
 	gitService{"GET", "/repository/archive.tar.bz2", handleGetArchive, "tar.bz2"},
 }
 
-func newGitHandler(authBackend string) *gitHandler {
-	return &gitHandler{&http.Client{}, authBackend}
+func newGitHandler(authBackend string, authTransport http.RoundTripper) *gitHandler {
+	return &gitHandler{&http.Client{Transport: authTransport}, authBackend}
 }
 
 func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

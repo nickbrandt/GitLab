@@ -23,6 +23,7 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"syscall"
+	"time"
 )
 
 var Version string // Set at build time in the Makefile
@@ -33,6 +34,7 @@ func main() {
 	listenNetwork := flag.String("listenNetwork", "tcp", "Listen 'network' (tcp, tcp4, tcp6, unix)")
 	listenUmask := flag.Int("listenUmask", 022, "Umask for Unix socket, default: 022")
 	authBackend := flag.String("authBackend", "http://localhost:8080", "Authentication/authorization backend")
+	authSocket := flag.String("authSocket", "", "Optional: Unix domain socket to dial authBackend at")
 	pprofListenAddr := flag.String("pprofListenAddr", "", "pprof listening address, e.g. 'localhost:6060'")
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
@@ -64,6 +66,20 @@ func main() {
 		log.Fatal(err)
 	}
 
+	var authTransport http.RoundTripper
+	if *authSocket != "" {
+		dialer := &net.Dialer{
+			// The values below are taken from http.DefaultTransport
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}
+		authTransport = &http.Transport{
+			Dial: func(_, _ string) (net.Conn, error) {
+				return dialer.Dial("unix", *authSocket)
+			},
+		}
+	}
+
 	// The profiler will only be activated by HTTP requests. HTTP
 	// requests can only reach the profiler if we start a listener. So by
 	// having no profiler HTTP listener by default, the profiler is
@@ -77,6 +93,6 @@ func main() {
 	// Because net/http/pprof installs itself in the DefaultServeMux
 	// we create a fresh one for the Git server.
 	serveMux := http.NewServeMux()
-	serveMux.Handle("/", newGitHandler(*authBackend))
+	serveMux.Handle("/", newGitHandler(*authBackend, authTransport))
 	log.Fatal(http.Serve(listener, serveMux))
 }

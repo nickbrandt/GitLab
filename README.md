@@ -16,6 +16,8 @@ auth request to GitLab Rails app) -> git-upload-pack
 Options:
   -authBackend string
     	Authentication/authorization backend (default "http://localhost:8080")
+  -authSocket string
+    	Optional: Unix domain socket to dial authBackend at
   -listenAddr string
     	Listen address for HTTP server (default "localhost:8181")
   -listenNetwork string
