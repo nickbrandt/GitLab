@@ -1,5 +1,9 @@
 # Changelog for gitlab-git-http-server
 
+0.3.1
+
+Add support for Unix domain socket connections to the authBackend.
+
 0.3.0
 
 In 0.3.0 we also handle 'git archive' downloads for GitLab 8.1+.
