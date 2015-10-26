@@ -51,7 +51,7 @@ type gitRequest struct {
 	// subdirectory
 	ArchivePrefix string
 	// CommitId is used do prevent race conditions between the 'time of check'
-	// in the GitLab Rails app and the 'time of use' in gitlab-git-http-server.
+	// in the GitLab Rails app and the 'time of use' in gitlab-workhorse.
 	CommitId string
 }
 
@@ -165,7 +165,7 @@ func (h *gitHandler) doAuthRequest(r *http.Request) (result *http.Response, err 
 	}
 	// Also forward the Host header, which is excluded from the Header map by the http libary.
 	// This allows the Host header received by the backend to be consistent with other
-	// requests not going through gitlab-git-http-server.
+	// requests not going through gitlab-workhorse.
 	authReq.Host = r.Host
 	// Set a custom header for the request. This can be used in some
 	// configurations (Passenger) to solve auth request routing problems.

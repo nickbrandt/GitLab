@@ -1,5 +1,5 @@
 /*
-gitlab-git-http-server handles 'smart' Git HTTP requests for GitLab
+gitlab-workhorse handles 'smart' Git HTTP requests for GitLab
 
 This HTTP server can service 'git clone', 'git push' etc. commands
 from Git clients that use the 'smart' Git HTTP protocol (git-upload-pack
@@ -43,7 +43,7 @@ func main() {
 	}
 	flag.Parse()
 
-	version := fmt.Sprintf("gitlab-git-http-server %s", Version)
+	version := fmt.Sprintf("gitlab-workhorse %s", Version)
 	if *printVersion {
 		fmt.Println(version)
 		os.Exit(0)

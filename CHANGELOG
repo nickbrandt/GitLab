@@ -1,4 +1,11 @@
-# Changelog for gitlab-git-http-server
+# Changelog for gitlab-workhorse
+
+Formerly known as 'gitlab-git-http-server'.
+
+0.4.0
+
+Rename the project to gitlab-workhorse. The old name had become too
+specific.
 
 0.3.1
 
