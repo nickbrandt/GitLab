@@ -1,5 +1,14 @@
 # gitlab-git-http-server
 
+## Renaming to gitlab-workhorse
+
+Starting with GitLab 8.2, this project has been renamed to
+gitlab-workhorse. The new URL is
+https://gitlab.com/gitlab-org/gitlab-workhorse . The code in this
+repository will no longer be updated.
+
+## Original preamble
+
 gitlab-git-http-server was designed to unload Git HTTP traffic from
 the GitLab Rails app (Unicorn) to a separate daemon.  It also serves
 'git archive' downloads for GitLab.  All authentication and
