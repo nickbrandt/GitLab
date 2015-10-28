@@ -30,6 +30,7 @@ func gitCommand(gl_id string, name string, args ...string) *exec.Cmd {
 	// Explicitly set the environment for the Git command
 	cmd.Env = []string{
 		fmt.Sprintf("PATH=%s", os.Getenv("PATH")),
+		fmt.Sprintf("LD_LIBRARY_PATH=%s", os.Getenv("LD_LIBRARY_PATH")),
 		fmt.Sprintf("GL_ID=%s", gl_id),
 	}
 	// If we don't do something with cmd.Stderr, Git errors will be lost
