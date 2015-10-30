@@ -59,7 +59,13 @@ var gitServices = [...]gitService{
 	gitService{"GET", "/repository/archive.tar", handleGetArchive, "tar"},
 	gitService{"GET", "/repository/archive.tar.gz", handleGetArchive, "tar.gz"},
 	gitService{"GET", "/repository/archive.tar.bz2", handleGetArchive, "tar.bz2"},
+	gitService{"PUT", "/gitlab-lfs/objects", handleStoreLfsObject, "lfs-object-receive"},
 }
+
+var (
+	errHashMismatch = errors.New("Content hash does not match OID")
+	errSizeMismatch = errors.New("Content size does not match")
+)
 
 func newGitHandler(authBackend string, authTransport http.RoundTripper) *gitHandler {
 	return &gitHandler{&http.Client{Transport: authTransport}, authBackend}
@@ -73,7 +79,7 @@ func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Look for a matching Git service
 	foundService := false
 	for _, g = range gitServices {
-		if r.Method == g.method && strings.HasSuffix(r.URL.Path, g.suffix) {
+		if r.Method == g.method && strings.Contains(r.URL.Path, g.suffix) {
 			foundService = true
 			break
 		}
