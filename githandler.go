@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"regexp"
 	"strings"
 )
 
@@ -23,7 +24,7 @@ type gitHandler struct {
 
 type gitService struct {
 	method     string
-	suffix     string
+	regex      *regexp.Regexp
 	handleFunc func(w http.ResponseWriter, r *gitRequest, rpc string)
 	rpc        string
 }
@@ -51,14 +52,14 @@ type gitRequest struct {
 
 // Routing table
 var gitServices = [...]gitService{
-	gitService{"GET", "/info/refs", handleGetInfoRefs, ""},
-	gitService{"POST", "/git-upload-pack", handlePostRPC, "git-upload-pack"},
-	gitService{"POST", "/git-receive-pack", handlePostRPC, "git-receive-pack"},
-	gitService{"GET", "/repository/archive", handleGetArchive, "tar.gz"},
-	gitService{"GET", "/repository/archive.zip", handleGetArchive, "zip"},
-	gitService{"GET", "/repository/archive.tar", handleGetArchive, "tar"},
-	gitService{"GET", "/repository/archive.tar.gz", handleGetArchive, "tar.gz"},
-	gitService{"GET", "/repository/archive.tar.bz2", handleGetArchive, "tar.bz2"},
+	gitService{"GET", regexp.MustCompile(`/info/refs\z`), handleGetInfoRefs, ""},
+	gitService{"POST", regexp.MustCompile(`/git-upload-pack\z`), handlePostRPC, "git-upload-pack"},
+	gitService{"POST", regexp.MustCompile(`/git-receive-pack\z`), handlePostRPC, "git-receive-pack"},
+	gitService{"GET", regexp.MustCompile(`/repository/archive\z`), handleGetArchive, "tar.gz"},
+	gitService{"GET", regexp.MustCompile(`/repository/archive.zip\z`), handleGetArchive, "zip"},
+	gitService{"GET", regexp.MustCompile(`/repository/archive.tar\z`), handleGetArchive, "tar"},
+	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.gz\z`), handleGetArchive, "tar.gz"},
+	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.bz2\z`), handleGetArchive, "tar.bz2"},
 }
 
 func newGitHandler(authBackend string, authTransport http.RoundTripper) *gitHandler {
@@ -73,7 +74,7 @@ func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Look for a matching Git service
 	foundService := false
 	for _, g = range gitServices {
-		if r.Method == g.method && strings.HasSuffix(r.URL.Path, g.suffix) {
+		if r.Method == g.method && g.regex.MatchString(r.URL.Path) {
 			foundService = true
 			break
 		}
