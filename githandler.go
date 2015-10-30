@@ -98,10 +98,15 @@ func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		// The Git request is not allowed by the backend. Maybe the
 		// client needs to send HTTP Basic credentials.  Forward the
 		// response from the auth backend to our client. This includes
-		// the 'WWW-Authentication' header that acts as a hint that
+		// the 'WWW-Authenticate' header that acts as a hint that
 		// Basic auth credentials are needed.
 		for k, v := range authResponse.Header {
-			w.Header()[k] = v
+			// Accomodate broken clients that do case-sensitive header lookup
+			if k == "Www-Authenticate" {
+				w.Header()["WWW-Authenticate"] = v
+			} else {
+				w.Header()[k] = v
+			}
 		}
 		w.WriteHeader(authResponse.StatusCode)
 		io.Copy(w, authResponse.Body)
