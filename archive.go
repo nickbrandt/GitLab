@@ -17,6 +17,11 @@ import (
 )
 
 func handleGetArchive(w http.ResponseWriter, r *gitRequest, format string) {
+	if !looksLikeRepo(r.RepoPath) {
+		http.Error(w, "Not Found", 404)
+		return
+	}
+
 	archiveFilename := path.Base(r.ArchivePath)
 
 	if cachedArchive, err := os.Open(r.ArchivePath); err == nil {

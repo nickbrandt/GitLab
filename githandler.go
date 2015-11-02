@@ -11,8 +11,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
-	"path"
 	"regexp"
 	"strings"
 )
@@ -48,6 +46,10 @@ type gitRequest struct {
 	// CommitId is used do prevent race conditions between the 'time of check'
 	// in the GitLab Rails app and the 'time of use' in gitlab-workhorse.
 	CommitId string
+	// ContentPath is a file on disk we can serve to the client
+	ContentPath string
+	// ContentDisposition is used to set the Content-Disposition header
+	ContentDisposition string
 }
 
 // Routing table
@@ -60,6 +62,7 @@ var gitServices = [...]gitService{
 	gitService{"GET", regexp.MustCompile(`/repository/archive.tar\z`), handleGetArchive, "tar"},
 	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.gz\z`), handleGetArchive, "tar.gz"},
 	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.bz2\z`), handleGetArchive, "tar.bz2"},
+	gitService{"GET", regexp.MustCompile(`/uploads/`), handleGetUpload, ""},
 }
 
 func newGitHandler(authBackend string, authTransport http.RoundTripper) *gitHandler {
@@ -95,7 +98,7 @@ func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	defer authResponse.Body.Close()
 
-	if authResponse.StatusCode != 200 {
+	if authResponse.StatusCode != 200 || authResponse.Header.Get("GitLab-Workhorse") == "reject" {
 		// The Git request is not allowed by the backend. Maybe the
 		// client needs to send HTTP Basic credentials.  Forward the
 		// response from the auth backend to our client. This includes
@@ -134,22 +137,7 @@ func (h *gitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if !looksLikeRepo(gitReq.RepoPath) {
-		http.Error(w, "Not Found", 404)
-		return
-	}
-
 	g.handleFunc(w, gitReq, g.rpc)
-}
-
-func looksLikeRepo(p string) bool {
-	// If /path/to/foo.git/objects exists then let's assume it is a valid Git
-	// repository.
-	if _, err := os.Stat(path.Join(p, "objects")); err != nil {
-		log.Print(err)
-		return false
-	}
-	return true
 }
 
 func (h *gitHandler) doAuthRequest(r *http.Request) (result *http.Response, err error) {

@@ -13,6 +13,11 @@ import (
 )
 
 func handleGetInfoRefs(w http.ResponseWriter, r *gitRequest, _ string) {
+	if !looksLikeRepo(r.RepoPath) {
+		http.Error(w, "Not Found", 404)
+		return
+	}
+
 	rpc := r.URL.Query().Get("service")
 	if !(rpc == "git-upload-pack" || rpc == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
@@ -57,6 +62,11 @@ func handleGetInfoRefs(w http.ResponseWriter, r *gitRequest, _ string) {
 }
 
 func handlePostRPC(w http.ResponseWriter, r *gitRequest, rpc string) {
+	if !looksLikeRepo(r.RepoPath) {
+		http.Error(w, "Not Found", 404)
+		return
+	}
+
 	var body io.ReadCloser
 	var err error
 
