@@ -47,6 +47,9 @@ type gitRequest struct {
 	// CommitId is used do prevent race conditions between the 'time of check'
 	// in the GitLab Rails app and the 'time of use' in gitlab-workhorse.
 	CommitId string
+
+	// TODO: say something about this
+	StoreLFSPath string
 }
 
 // Routing table
@@ -60,12 +63,8 @@ var gitServices = [...]gitService{
 	gitService{"GET", "/repository/archive.tar.gz", handleGetArchive, "tar.gz"},
 	gitService{"GET", "/repository/archive.tar.bz2", handleGetArchive, "tar.bz2"},
 	gitService{"PUT", "/gitlab-lfs/objects", handleStoreLfsObject, "lfs-object-receive"},
+	gitService{"GET", "/gitlab-lfs/objects", handleRetreiveLfsObject, "lfs-object-upload"},
 }
-
-var (
-	errHashMismatch = errors.New("Content hash does not match OID")
-	errSizeMismatch = errors.New("Content size does not match")
-)
 
 func newGitHandler(authBackend string, authTransport http.RoundTripper) *gitHandler {
 	return &gitHandler{&http.Client{Transport: authTransport}, authBackend}
