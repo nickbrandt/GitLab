@@ -1,5 +1,5 @@
 /*
-gitlab-git-http-server handles 'smart' Git HTTP requests for GitLab
+gitlab-workhorse handles slow requests for GitLab
 
 This HTTP server can service 'git clone', 'git push' etc. commands
 from Git clients that use the 'smart' Git HTTP protocol (git-upload-pack
@@ -9,8 +9,7 @@ backend (for authentication and authorization) and local disk access
 to Git repositories managed by GitLab. In GitLab, this role was previously
 performed by gitlab-grack.
 
-This file contains the main() function. Actual Git HTTP requests are handled by
-the gitHandler type, implemented in githandler.go.
+In this file we start the web server and hand off to the gitHandler type.
 */
 package main
 
@@ -43,7 +42,7 @@ func main() {
 	}
 	flag.Parse()
 
-	version := fmt.Sprintf("gitlab-git-http-server %s", Version)
+	version := fmt.Sprintf("gitlab-workhorse %s", Version)
 	if *printVersion {
 		fmt.Println(version)
 		os.Exit(0)

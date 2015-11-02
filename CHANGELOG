@@ -1,4 +1,17 @@
-# Changelog for gitlab-git-http-server
+# Changelog for gitlab-workhorse
+
+Formerly known as 'gitlab-git-http-server'.
+
+0.4.0
+
+Rename the project to gitlab-workhorse. The old name had become too
+specific.
+
+Other changes:
+
+- pass LD_LIBRARY_PATH to Git commands
+- accomodate broken HTTP clients by spelling 'Www-Authenticate' as
+  'WWW-Authenticate'
 
 0.3.1
 
