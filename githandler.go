@@ -63,8 +63,8 @@ var gitServices = [...]gitService{
 	gitService{"GET", regexp.MustCompile(`/repository/archive.tar\z`), handleGetArchive, "tar"},
 	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.gz\z`), handleGetArchive, "tar.gz"},
 	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.bz2\z`), handleGetArchive, "tar.bz2"},
-	gitService{"PUT", "/gitlab-lfs/objects", handleStoreLfsObject, "lfs-object-receive"},
-	gitService{"GET", "/gitlab-lfs/objects", handleRetreiveLfsObject, "lfs-object-upload"},
+	gitService{"PUT", regexp.MustCompile(`/gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), handleStoreLfsObject, "lfs-object-receive"},
+	gitService{"GET", regexp.MustCompile(`/gitlab-lfs/objects/([0-9a-f]{64})\z`), handleRetreiveLfsObject, "lfs-object-upload"},
 }
 
 func newGitHandler(authBackend string, authTransport http.RoundTripper) *gitHandler {
