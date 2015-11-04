@@ -60,7 +60,7 @@ func xSendFile(u *upstream, w http.ResponseWriter, r *http.Request, _ func(http.
 
 	fi, err := content.Stat()
 	if err != nil {
-		fail500(w, "handleGetUpload get mtime", err)
+		fail500(w, "xSendFile get mtime", err)
 		return
 	}
 	http.ServeContent(w, r, "", fi.ModTime(), content)
