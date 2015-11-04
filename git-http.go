@@ -5,7 +5,6 @@ In this file we handle the Git 'smart HTTP' protocol
 package main
 
 import (
-	"compress/gzip"
 	"fmt"
 	"io"
 	"net/http"
@@ -58,7 +57,6 @@ func handleGetInfoRefs(w http.ResponseWriter, r *gitRequest) {
 }
 
 func handlePostRPC(w http.ResponseWriter, r *gitRequest) {
-	var body io.ReadCloser
 	var err error
 
 	// Get Git action from URL
@@ -68,18 +66,6 @@ func handlePostRPC(w http.ResponseWriter, r *gitRequest) {
 		fail500(w, "handlePostRPC", err)
 		return
 	}
-
-	// The client request body may have been gzipped.
-	if r.Header.Get("Content-Encoding") == "gzip" {
-		body, err = gzip.NewReader(r.Body)
-		if err != nil {
-			fail500(w, "handlePostRPC", err)
-			return
-		}
-	} else {
-		body = r.Body
-	}
-	defer body.Close()
 
 	// Prepare our Git subprocess
 	cmd := gitCommand(r.GL_ID, "git", subCommand(action), "--stateless-rpc", r.RepoPath)
@@ -102,7 +88,7 @@ func handlePostRPC(w http.ResponseWriter, r *gitRequest) {
 	defer cleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
 
 	// Write the client request body to Git's standard input
-	if _, err := io.Copy(stdin, body); err != nil {
+	if _, err := io.Copy(stdin, r.Body); err != nil {
 		fail500(w, "handlePostRPC write to subprocess", err)
 		return
 	}
@@ -112,9 +98,6 @@ func handlePostRPC(w http.ResponseWriter, r *gitRequest) {
 	// It may take a while before we return and the deferred closes happen
 	// so let's free up some resources already.
 	r.Body.Close()
-	// If the body was compressed, body != r.Body and this frees up the
-	// gzip.Reader.
-	body.Close()
 
 	// Start writing the response
 	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-result", action))

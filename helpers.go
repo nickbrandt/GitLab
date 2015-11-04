@@ -6,12 +6,21 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
+	"strings"
 	"syscall"
 )
+
+func fail400(w http.ResponseWriter, context string, err error) {
+	http.Error(w, "Bad request", 400)
+	logContext(context, err)
+}
 
 func fail500(w http.ResponseWriter, context string, err error) {
 	http.Error(w, "Internal server error", 500)
@@ -51,4 +60,22 @@ func cleanUpProcessGroup(cmd *exec.Cmd) {
 
 	// reap our child process
 	cmd.Wait()
+}
+
+func forwardResponseToClient(w http.ResponseWriter, r *http.Response) {
+	log.Printf("PROXY:%s %q %d", r.Request.Method, r.Request.URL, r.StatusCode)
+
+	for k, v := range r.Header {
+		w.Header()[k] = v
+	}
+
+	w.WriteHeader(r.StatusCode)
+	io.Copy(w, r.Body)
+}
+
+func setHttpPostForm(r *http.Request, values url.Values) {
+	dataBuffer := strings.NewReader(values.Encode())
+	r.Body = ioutil.NopCloser(dataBuffer)
+	r.ContentLength = int64(dataBuffer.Len())
+	r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 }
