@@ -23,7 +23,7 @@ var (
 	errSizeMismatch = errors.New("Content size does not match")
 )
 
-func handleStoreLfsObject(w http.ResponseWriter, r *gitRequest, rpc string) {
+func handleStoreLfsObject(w http.ResponseWriter, r *gitRequest, rpc string) (callback *gitRequest){
 	var body io.ReadCloser
 	var err error
 
@@ -106,10 +106,11 @@ func handleStoreLfsObject(w http.ResponseWriter, r *gitRequest, rpc string) {
 
 	log.Printf("Received the LFS object from client, oid: %s", oid)
 
-	return
+	return r
+
 }
 
-func handleRetreiveLfsObject(w http.ResponseWriter, r *gitRequest, rpc string) {
+func handleRetreiveLfsObject(w http.ResponseWriter, r *gitRequest, rpc string) (callback *gitRequest){
 	log.Printf("I should download %s", r)
 
 	urlPath := r.URL.Path

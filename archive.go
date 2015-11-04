@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-func handleGetArchive(w http.ResponseWriter, r *gitRequest, format string) {
+func handleGetArchive(w http.ResponseWriter, r *gitRequest, format string) (callback *gitRequest){
 	archiveFilename := path.Base(r.ArchivePath)
 
 	if cachedArchive, err := os.Open(r.ArchivePath); err == nil {
@@ -103,6 +103,8 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest, format string) {
 		logContext("handleGetArchive finalize cached archive", err)
 		return
 	}
+
+	return
 }
 
 func setArchiveHeaders(w http.ResponseWriter, format string, archiveFilename string) {

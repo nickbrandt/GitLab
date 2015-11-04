@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-func handleGetInfoRefs(w http.ResponseWriter, r *gitRequest, _ string) {
+func handleGetInfoRefs(w http.ResponseWriter, r *gitRequest, _ string) (callback *gitRequest){
 	rpc := r.URL.Query().Get("service")
 	if !(rpc == "git-upload-pack" || rpc == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
@@ -54,9 +54,11 @@ func handleGetInfoRefs(w http.ResponseWriter, r *gitRequest, _ string) {
 		logContext("handleGetInfoRefs wait for subprocess", err)
 		return
 	}
+
+	return
 }
 
-func handlePostRPC(w http.ResponseWriter, r *gitRequest, rpc string) {
+func handlePostRPC(w http.ResponseWriter, r *gitRequest, rpc string) (callback *gitRequest){
 	var body io.ReadCloser
 	var err error
 
@@ -121,6 +123,8 @@ func handlePostRPC(w http.ResponseWriter, r *gitRequest, rpc string) {
 		logContext("handlePostRPC wait for subprocess", err)
 		return
 	}
+
+	return
 }
 
 func subCommand(rpc string) string {
