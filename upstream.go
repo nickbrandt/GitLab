@@ -61,6 +61,7 @@ var gitServices = [...]gitService{
 	gitService{"GET", regexp.MustCompile(`/repository/archive.tar\z`), repoPreAuth, handleGetArchive, "tar"},
 	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.gz\z`), repoPreAuth, handleGetArchive, "tar.gz"},
 	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.bz2\z`), repoPreAuth, handleGetArchive, "tar.bz2"},
+	gitService{"GET", regexp.MustCompile(`/uploads/`), xSendFile, nil, ""},
 }
 
 func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream {
@@ -91,27 +92,13 @@ func (u *upstream) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func repoPreAuth(u *upstream, w http.ResponseWriter, r *http.Request, handleFunc func(w http.ResponseWriter, r *gitRequest, rpc string), rpc string) {
-	url := u.authBackend + r.URL.RequestURI()
-	authReq, err := http.NewRequest(r.Method, url, nil)
+	authReq, err := u.newUpstreamRequest(r)
 	if err != nil {
-		fail500(w, "doAuthRequest", err)
+		fail500(w, "newUpstreamRequest", err)
 		return
 	}
-	// Forward all headers from our client to the auth backend. This includes
-	// HTTP Basic authentication credentials (the 'Authorization' header).
-	for k, v := range r.Header {
-		authReq.Header[k] = v
-	}
-	// Also forward the Host header, which is excluded from the Header map by the http libary.
-	// This allows the Host header received by the backend to be consistent with other
-	// requests not going through gitlab-workhorse.
-	authReq.Host = r.Host
-	// Set a custom header for the request. This can be used in some
-	// configurations (Passenger) to solve auth request routing problems.
-	authReq.Header.Set("GitLab-Git-HTTP-Server", Version)
 
 	authResponse, err := u.httpClient.Do(authReq)
-
 	if err != nil {
 		fail500(w, "doAuthRequest", err)
 		return
@@ -173,4 +160,26 @@ func looksLikeRepo(p string) bool {
 		return false
 	}
 	return true
+}
+
+func (u *upstream) newUpstreamRequest(r *http.Request) (*http.Request, error) {
+	url := u.authBackend + r.URL.RequestURI()
+	authReq, err := http.NewRequest(r.Method, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	// Forward all headers from our client to the auth backend. This includes
+	// HTTP Basic authentication credentials (the 'Authorization' header).
+	for k, v := range r.Header {
+		authReq.Header[k] = v
+	}
+	// Also forward the Host header, which is excluded from the Header map by the http libary.
+	// This allows the Host header received by the backend to be consistent with other
+	// requests not going through gitlab-workhorse.
+	authReq.Host = r.Host
+	// Set a custom header for the request. This can be used in some
+	// configurations (Passenger) to solve auth request routing problems.
+	authReq.Header.Set("GitLab-Git-HTTP-Server", Version)
+
+	return authReq, nil
 }

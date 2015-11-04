@@ -10,19 +10,8 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"path"
 	"syscall"
 )
-
-func looksLikeRepo(p string) bool {
-	// If /path/to/foo.git/objects exists then let's assume it is a valid Git
-	// repository.
-	if _, err := os.Stat(path.Join(p, "objects")); err != nil {
-		log.Print(err)
-		return false
-	}
-	return true
-}
 
 func fail500(w http.ResponseWriter, context string, err error) {
 	http.Error(w, "Internal server error", 500)
