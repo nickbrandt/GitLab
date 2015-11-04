@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-func handleGetInfoRefs(w http.ResponseWriter, r *gitRequest, _ string) (callback *gitRequest){
+func handleGetInfoRefs(w http.ResponseWriter, r *gitRequest, _ string) (callback *gitRequest) {
 	rpc := r.URL.Query().Get("service")
 	if !(rpc == "git-upload-pack" || rpc == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
@@ -58,7 +58,7 @@ func handleGetInfoRefs(w http.ResponseWriter, r *gitRequest, _ string) (callback
 	return
 }
 
-func handlePostRPC(w http.ResponseWriter, r *gitRequest, rpc string) (callback *gitRequest){
+func handlePostRPC(w http.ResponseWriter, r *gitRequest, rpc string) (callback *gitRequest) {
 	var body io.ReadCloser
 	var err error
 

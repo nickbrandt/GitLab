@@ -25,7 +25,7 @@ type gitHandler struct {
 type gitService struct {
 	method     string
 	regex      *regexp.Regexp
-	handleFunc func(w http.ResponseWriter, r *gitRequest, rpc string)(*gitRequest)
+	handleFunc func(w http.ResponseWriter, r *gitRequest, rpc string) *gitRequest
 	rpc        string
 }
 
@@ -169,13 +169,23 @@ func looksLikeRepo(p string) bool {
 
 func (h *gitHandler) doAuthRequest(r *http.Request) (result *http.Response, err error) {
 	url := h.authBackend + r.URL.RequestURI()
-
-	authReq := doRequest(r, url)
-	if authReq != nil {
-		return h.httpClient.Do(authReq)
+	authReq, err := http.NewRequest(r.Method, url, nil)
+	if err != nil {
+		return nil, err
 	}
-
-	return
+	// Forward all headers from our client to the auth backend. This includes
+	// HTTP Basic authentication credentials (the 'Authorization' header).
+	for k, v := range r.Header {
+		authReq.Header[k] = v
+	}
+	// Also forward the Host header, which is excluded from the Header map by the http libary.
+	// This allows the Host header received by the backend to be consistent with other
+	// requests not going through gitlab-workhorse.
+	authReq.Host = r.Host
+	// Set a custom header for the request. This can be used in some
+	// configurations (Passenger) to solve auth request routing problems.
+	authReq.Header.Set("GitLab-Git-HTTP-Server", Version)
+	return h.httpClient.Do(authReq)
 }
 
 func (h *gitHandler) doCallback(w http.ResponseWriter, r *gitRequest) (result *http.Response, err error) {
