@@ -9,7 +9,7 @@ backend (for authentication and authorization) and local disk access
 to Git repositories managed by GitLab. In GitLab, this role was previously
 performed by gitlab-grack.
 
-In this file we start the web server and hand off to the gitHandler type.
+In this file we start the web server and hand off to the upstream type.
 */
 package main
 
@@ -92,6 +92,6 @@ func main() {
 	// Because net/http/pprof installs itself in the DefaultServeMux
 	// we create a fresh one for the Git server.
 	serveMux := http.NewServeMux()
-	serveMux.Handle("/", newGitHandler(*authBackend, authTransport))
+	serveMux.Handle("/", newUpstream(*authBackend, authTransport))
 	log.Fatal(http.Serve(listener, serveMux))
 }
