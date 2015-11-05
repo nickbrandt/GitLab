@@ -179,4 +179,3 @@ func looksLikeRepo(p string) bool {
 	}
 	return true
 }
-
