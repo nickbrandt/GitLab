@@ -287,7 +287,7 @@ func TestDeniedXSendfileDownload(t *testing.T) {
 			t.Fatalf(`X-Sendfile-Type want "X-Sendfile" got %q`, xSendfileType)
 		}
 		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, contentFilename))
-		w.WriteHeader(404)
+		w.WriteHeader(200)
 		fmt.Fprint(w, "Denied")
 	}))
 	defer ts.Close()

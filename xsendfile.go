@@ -38,7 +38,7 @@ func xSendFile(u *upstream, w http.ResponseWriter, r *http.Request, _ func(http.
 	}
 
 	// Use accelerated file serving
-	if sendfile == "" && upResponse.StatusCode/100 != 2 {
+	if sendfile == "" {
 		// Copy request body otherwise
 		w.WriteHeader(upResponse.StatusCode)
 
