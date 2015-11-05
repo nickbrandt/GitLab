@@ -26,7 +26,6 @@ type gitService struct {
 	method     string
 	regex      *regexp.Regexp
 	handleFunc serviceHandleFunc
-	rpc        string
 }
 
 type authorizationResponse struct {
@@ -53,20 +52,19 @@ type gitRequest struct {
 	*http.Request
 	authorizationResponse
 	u   *upstream
-	rpc string
 }
 
 // Routing table
 var gitServices = [...]gitService{
-	gitService{"GET", regexp.MustCompile(`/info/refs\z`), repoPreAuthorizeHandler(handleGetInfoRefs), ""},
-	gitService{"POST", regexp.MustCompile(`/git-upload-pack\z`), repoPreAuthorizeHandler(handlePostRPC), "git-upload-pack"},
-	gitService{"POST", regexp.MustCompile(`/git-receive-pack\z`), repoPreAuthorizeHandler(handlePostRPC), "git-receive-pack"},
-	gitService{"GET", regexp.MustCompile(`/repository/archive\z`), repoPreAuthorizeHandler(handleGetArchive), "tar.gz"},
-	gitService{"GET", regexp.MustCompile(`/repository/archive.zip\z`), repoPreAuthorizeHandler(handleGetArchive), "zip"},
-	gitService{"GET", regexp.MustCompile(`/repository/archive.tar\z`), repoPreAuthorizeHandler(handleGetArchive), "tar"},
-	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.gz\z`), repoPreAuthorizeHandler(handleGetArchive), "tar.gz"},
-	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.bz2\z`), repoPreAuthorizeHandler(handleGetArchive), "tar.bz2"},
-	gitService{"GET", regexp.MustCompile(`/uploads/`), handleSendFile, ""},
+	gitService{"GET", regexp.MustCompile(`/info/refs\z`), repoPreAuthorizeHandler(handleGetInfoRefs)},
+	gitService{"POST", regexp.MustCompile(`/git-upload-pack\z`), repoPreAuthorizeHandler(handlePostRPC)},
+	gitService{"POST", regexp.MustCompile(`/git-receive-pack\z`), repoPreAuthorizeHandler(handlePostRPC)},
+	gitService{"GET", regexp.MustCompile(`/repository/archive\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	gitService{"GET", regexp.MustCompile(`/repository/archive.zip\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	gitService{"GET", regexp.MustCompile(`/repository/archive.tar\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.gz\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.bz2\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	gitService{"GET", regexp.MustCompile(`/uploads/`), handleSendFile},
 }
 
 func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream {
@@ -96,7 +94,6 @@ func (u *upstream) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	request := gitRequest{
 		Request: r,
 		u:       u,
-		rpc:     g.rpc,
 	}
 
 	g.handleFunc(w, &request)

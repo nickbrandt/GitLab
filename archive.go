@@ -14,15 +14,31 @@ import (
 	"os/exec"
 	"path"
 	"time"
+	"path/filepath"
+	"errors"
 )
 
 func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
+	var format string
+	switch filepath.Base(r.URL.Path) {
+	case "archive.zip":
+		format = "zip"
+	case "archive.tar":
+		format = "tar"
+	case "archive", "archive.tar.gz":
+		format = "tar.gz"
+	case "archive.tar.bz2":
+		format = "tar.bz2"
+	default:
+		fail500(w, "handleGetArchive", errors.New("invalid archive format"))
+	}
+
 	archiveFilename := path.Base(r.ArchivePath)
 
 	if cachedArchive, err := os.Open(r.ArchivePath); err == nil {
 		defer cachedArchive.Close()
 		log.Printf("Serving cached file %q", r.ArchivePath)
-		setArchiveHeaders(w, r.rpc, archiveFilename)
+		setArchiveHeaders(w, format, archiveFilename)
 		// Even if somebody deleted the cachedArchive from disk since we opened
 		// the file, Unix file semantics guarantee we can still read from the
 		// open file in this process.
@@ -41,7 +57,7 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 	defer tempFile.Close()
 	defer os.Remove(tempFile.Name())
 
-	compressCmd, archiveFormat := parseArchiveFormat(r.rpc)
+	compressCmd, archiveFormat := parseArchiveFormat(format)
 
 	archiveCmd := gitCommand("", "git", "--git-dir="+r.RepoPath, "archive", "--format="+archiveFormat, "--prefix="+r.ArchivePrefix+"/", r.CommitId)
 	archiveStdout, err := archiveCmd.StdoutPipe()
@@ -82,7 +98,7 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 	archiveReader := io.TeeReader(stdout, tempFile)
 
 	// Start writing the response
-	setArchiveHeaders(w, r.rpc, archiveFilename)
+	setArchiveHeaders(w, format, archiveFilename)
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 	if _, err := io.Copy(w, archiveReader); err != nil {
 		logContext("handleGetArchive read from subprocess", err)
