@@ -67,7 +67,7 @@ func preAuthorizeHandler(handleFunc serviceHandleFunc, suffix string) serviceHan
 
 func repoPreAuthorizeHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
 	return preAuthorizeHandler(func(w http.ResponseWriter, r *gitRequest) {
-		if r.GL_ID == "" || r.RepoPath == "" {
+		if r.RepoPath == "" {
 			fail500(w, "repoPreAuthorizeHandler", errors.New("missing authorization response"))
 			return
 		}
