@@ -10,9 +10,10 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"path/filepath"
 )
 
-func handleGetInfoRefs(w http.ResponseWriter, r *gitRequest, _ string) {
+func handleGetInfoRefs(w http.ResponseWriter, r *gitRequest) {
 	rpc := r.URL.Query().Get("service")
 	if !(rpc == "git-upload-pack" || rpc == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
@@ -56,9 +57,17 @@ func handleGetInfoRefs(w http.ResponseWriter, r *gitRequest, _ string) {
 	}
 }
 
-func handlePostRPC(w http.ResponseWriter, r *gitRequest, rpc string) {
+func handlePostRPC(w http.ResponseWriter, r *gitRequest) {
 	var body io.ReadCloser
 	var err error
+
+	// Get Git action from URL
+	action := filepath.Base(r.URL.Path)
+	if !(action == "git-upload-pack" || action == "git-receive-pack") {
+		// The 'dumb' Git HTTP protocol is not supported
+		fail500(w, "handlePostRPC", err)
+		return
+	}
 
 	// The client request body may have been gzipped.
 	if r.Header.Get("Content-Encoding") == "gzip" {
@@ -73,7 +82,7 @@ func handlePostRPC(w http.ResponseWriter, r *gitRequest, rpc string) {
 	defer body.Close()
 
 	// Prepare our Git subprocess
-	cmd := gitCommand(r.GL_ID, "git", subCommand(rpc), "--stateless-rpc", r.RepoPath)
+	cmd := gitCommand(r.GL_ID, "git", subCommand(action), "--stateless-rpc", r.RepoPath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		fail500(w, "handlePostRPC", err)
@@ -108,7 +117,7 @@ func handlePostRPC(w http.ResponseWriter, r *gitRequest, rpc string) {
 	body.Close()
 
 	// Start writing the response
-	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-result", rpc))
+	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-result", action))
 	w.Header().Add("Cache-Control", "no-cache")
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 

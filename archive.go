@@ -14,9 +14,25 @@ import (
 	"os/exec"
 	"path"
 	"time"
+	"path/filepath"
+	"errors"
 )
 
-func handleGetArchive(w http.ResponseWriter, r *gitRequest, format string) {
+func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
+	var format string
+	switch filepath.Base(r.URL.Path) {
+	case "archive.zip":
+		format = "zip"
+	case "archive.tar":
+		format = "tar"
+	case "archive", "archive.tar.gz":
+		format = "tar.gz"
+	case "archive.tar.bz2":
+		format = "tar.bz2"
+	default:
+		fail500(w, "handleGetArchive", errors.New("invalid archive format"))
+	}
+
 	archiveFilename := path.Base(r.ArchivePath)
 
 	if cachedArchive, err := os.Open(r.ArchivePath); err == nil {

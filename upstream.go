@@ -7,15 +7,15 @@ In this file we handle request routing and interaction with the authBackend.
 package main
 
 import (
-	"encoding/json"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"path"
 	"regexp"
-	"strings"
 )
+
+type serviceHandleFunc func(w http.ResponseWriter, r *gitRequest)
 
 type upstream struct {
 	httpClient  *http.Client
@@ -23,17 +23,12 @@ type upstream struct {
 }
 
 type gitService struct {
-	method         string
-	regex          *regexp.Regexp
-	middlewareFunc func(u *upstream, w http.ResponseWriter, r *http.Request, handleFunc func(w http.ResponseWriter, r *gitRequest, rpc string), rpc string)
-	handleFunc     func(w http.ResponseWriter, r *gitRequest, rpc string)
-	rpc            string
+	method     string
+	regex      *regexp.Regexp
+	handleFunc serviceHandleFunc
 }
 
-// A gitReqest is an *http.Request decorated with attributes returned by the
-// GitLab Rails application.
-type gitRequest struct {
-	*http.Request
+type authorizationResponse struct {
 	// GL_ID is an environment variable used by gitlab-shell hooks during 'git
 	// push' and 'git pull'
 	GL_ID string
@@ -51,17 +46,25 @@ type gitRequest struct {
 	CommitId string
 }
 
+// A gitReqest is an *http.Request decorated with attributes returned by the
+// GitLab Rails application.
+type gitRequest struct {
+	*http.Request
+	authorizationResponse
+	u   *upstream
+}
+
 // Routing table
 var gitServices = [...]gitService{
-	gitService{"GET", regexp.MustCompile(`/info/refs\z`), repoPreAuth, handleGetInfoRefs, ""},
-	gitService{"POST", regexp.MustCompile(`/git-upload-pack\z`), repoPreAuth, handlePostRPC, "git-upload-pack"},
-	gitService{"POST", regexp.MustCompile(`/git-receive-pack\z`), repoPreAuth, handlePostRPC, "git-receive-pack"},
-	gitService{"GET", regexp.MustCompile(`/repository/archive\z`), repoPreAuth, handleGetArchive, "tar.gz"},
-	gitService{"GET", regexp.MustCompile(`/repository/archive.zip\z`), repoPreAuth, handleGetArchive, "zip"},
-	gitService{"GET", regexp.MustCompile(`/repository/archive.tar\z`), repoPreAuth, handleGetArchive, "tar"},
-	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.gz\z`), repoPreAuth, handleGetArchive, "tar.gz"},
-	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.bz2\z`), repoPreAuth, handleGetArchive, "tar.bz2"},
-	gitService{"GET", regexp.MustCompile(`/uploads/`), xSendFile, nil, ""},
+	gitService{"GET", regexp.MustCompile(`/info/refs\z`), repoPreAuthorizeHandler(handleGetInfoRefs)},
+	gitService{"POST", regexp.MustCompile(`/git-upload-pack\z`), repoPreAuthorizeHandler(handlePostRPC)},
+	gitService{"POST", regexp.MustCompile(`/git-receive-pack\z`), repoPreAuthorizeHandler(handlePostRPC)},
+	gitService{"GET", regexp.MustCompile(`/repository/archive\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	gitService{"GET", regexp.MustCompile(`/repository/archive.zip\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	gitService{"GET", regexp.MustCompile(`/repository/archive.tar\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.gz\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.bz2\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	gitService{"GET", regexp.MustCompile(`/uploads/`), handleSendFile},
 }
 
 func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream {
@@ -88,68 +91,12 @@ func (u *upstream) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	g.middlewareFunc(u, w, r, g.handleFunc, g.rpc)
-}
-
-func repoPreAuth(u *upstream, w http.ResponseWriter, r *http.Request, handleFunc func(w http.ResponseWriter, r *gitRequest, rpc string), rpc string) {
-	authReq, err := u.newUpstreamRequest(r)
-	if err != nil {
-		fail500(w, "newUpstreamRequest", err)
-		return
+	request := gitRequest{
+		Request: r,
+		u:       u,
 	}
 
-	authResponse, err := u.httpClient.Do(authReq)
-	if err != nil {
-		fail500(w, "doAuthRequest", err)
-		return
-	}
-	defer authResponse.Body.Close()
-
-	if authResponse.StatusCode != 200 {
-		// The Git request is not allowed by the backend. Maybe the
-		// client needs to send HTTP Basic credentials.  Forward the
-		// response from the auth backend to our client. This includes
-		// the 'WWW-Authenticate' header that acts as a hint that
-		// Basic auth credentials are needed.
-		for k, v := range authResponse.Header {
-			// Accomodate broken clients that do case-sensitive header lookup
-			if k == "Www-Authenticate" {
-				w.Header()["WWW-Authenticate"] = v
-			} else {
-				w.Header()[k] = v
-			}
-		}
-		w.WriteHeader(authResponse.StatusCode)
-		io.Copy(w, authResponse.Body)
-		return
-	}
-
-	// The auth backend validated the client request and told us additional
-	// request metadata. We must extract this information from the auth
-	// response body.
-	gitReq := &gitRequest{Request: r}
-	if err := json.NewDecoder(authResponse.Body).Decode(gitReq); err != nil {
-		fail500(w, "decode JSON GL_ID", err)
-		return
-	}
-	// Don't hog a TCP connection in CLOSE_WAIT, we can already close it now
-	authResponse.Body.Close()
-
-	// Negotiate authentication (Kerberos) may need to return a WWW-Authenticate
-	// header to the client even in case of success as per RFC4559.
-	for k, v := range authResponse.Header {
-		// Case-insensitive comparison as per RFC7230
-		if strings.EqualFold(k, "WWW-Authenticate") {
-			w.Header()[k] = v
-		}
-	}
-
-	if !looksLikeRepo(gitReq.RepoPath) {
-		http.Error(w, "Not Found", 404)
-		return
-	}
-
-	handleFunc(w, gitReq, rpc)
+	g.handleFunc(w, &request)
 }
 
 func looksLikeRepo(p string) bool {
@@ -162,9 +109,9 @@ func looksLikeRepo(p string) bool {
 	return true
 }
 
-func (u *upstream) newUpstreamRequest(r *http.Request) (*http.Request, error) {
-	url := u.authBackend + r.URL.RequestURI()
-	authReq, err := http.NewRequest(r.Method, url, nil)
+func (u *upstream) newUpstreamRequest(r *http.Request, body io.Reader, suffix string) (*http.Request, error) {
+	url := u.authBackend + r.URL.RequestURI() + suffix
+	authReq, err := http.NewRequest(r.Method, url, body)
 	if err != nil {
 		return nil, err
 	}
@@ -173,6 +120,16 @@ func (u *upstream) newUpstreamRequest(r *http.Request) (*http.Request, error) {
 	for k, v := range r.Header {
 		authReq.Header[k] = v
 	}
+
+	// Clean some headers when issuing a new request without body
+	if body == nil {
+		authReq.Header.Del("Content-Type")
+		authReq.Header.Del("Content-Encoding")
+		authReq.Header.Del("Content-Length")
+		authReq.Header.Del("Accept-Encoding")
+		authReq.Header.Del("Transfer-Encoding")
+	}
+
 	// Also forward the Host header, which is excluded from the Header map by the http libary.
 	// This allows the Host header received by the backend to be consistent with other
 	// requests not going through gitlab-workhorse.
