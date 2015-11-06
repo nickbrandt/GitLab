@@ -287,7 +287,7 @@ func TestDeniedXSendfileDownload(t *testing.T) {
 			t.Fatalf(`X-Sendfile-Type want "X-Sendfile" got %q`, xSendfileType)
 		}
 		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, contentFilename))
-		w.WriteHeader(404)
+		w.WriteHeader(200)
 		fmt.Fprint(w, "Denied")
 	}))
 	defer ts.Close()
@@ -336,7 +336,8 @@ func testAuthServer(code int, body string) *httptest.Server {
 }
 
 func startServerOrFail(t *testing.T, ts *httptest.Server) *exec.Cmd {
-	cmd := exec.Command("go", "run", "main.go", "upstream.go", "archive.go", "git-http.go", "helpers.go", "lfs.go", "xsendfile.go", fmt.Sprintf("-authBackend=%s", ts.URL), fmt.Sprintf("-listenAddr=%s", servAddr))
+	cmd := exec.Command("go", "run", "main.go", "upstream.go", "archive.go", "git-http.go", "helpers.go", "xsendfile.go",
+		"authorization.go", "lfs.go", fmt.Sprintf("-authBackend=%s", ts.URL), fmt.Sprintf("-listenAddr=%s", servAddr))
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

@@ -13,15 +13,16 @@ import (
 	"os"
 )
 
-func xSendFile(u *upstream, w http.ResponseWriter, r *http.Request, _ func(http.ResponseWriter, *gitRequest, string), _ string) {
-	upRequest, err := u.newUpstreamRequest(r)
+func handleSendFile(w http.ResponseWriter, r *gitRequest) {
+	upRequest, err := r.u.newUpstreamRequest(r.Request, r.Body, "")
 	if err != nil {
 		fail500(w, "newUpstreamRequest", err)
 		return
 	}
 
 	upRequest.Header.Set("X-Sendfile-Type", "X-Sendfile")
-	upResponse, err := u.httpClient.Do(upRequest)
+	upResponse, err := r.u.httpClient.Do(upRequest)
+	r.Body.Close()
 	if err != nil {
 		fail500(w, "do upstream request", err)
 		return
@@ -38,7 +39,7 @@ func xSendFile(u *upstream, w http.ResponseWriter, r *http.Request, _ func(http.
 	}
 
 	// Use accelerated file serving
-	if sendfile == "" && upResponse.StatusCode/100 != 2 {
+	if sendfile == "" {
 		// Copy request body otherwise
 		w.WriteHeader(upResponse.StatusCode)
 
@@ -63,5 +64,5 @@ func xSendFile(u *upstream, w http.ResponseWriter, r *http.Request, _ func(http.
 		fail500(w, "xSendFile get mtime", err)
 		return
 	}
-	http.ServeContent(w, r, "", fi.ModTime(), content)
+	http.ServeContent(w, r.Request, "", fi.ModTime(), content)
 }
