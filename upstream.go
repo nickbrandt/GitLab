@@ -65,7 +65,7 @@ var gitServices = [...]gitService{
 	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.gz\z`), repoPreAuth, handleGetArchive, "tar.gz"},
 	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.bz2\z`), repoPreAuth, handleGetArchive, "tar.bz2"},
 	gitService{"PUT", regexp.MustCompile(`/gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), repoPreAuth, handleStoreLfsObject, "lfs-object-receive"},
-	gitService{"GET", regexp.MustCompile(`/gitlab-lfs/objects/([0-9a-f]{64})\z`), repoPreAuth, handleRetreiveLfsObject, "lfs-object-upload"},
+	gitService{"GET", regexp.MustCompile(`/gitlab-lfs/objects/([0-9a-f]{64})\z`), xSendFile, nil, "lfs-object-upload"},
 	gitService{"GET", regexp.MustCompile(`/uploads/`), xSendFile, nil, ""},
 }
 

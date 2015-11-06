@@ -113,35 +113,6 @@ func handleStoreLfsObject(w http.ResponseWriter, r *gitRequest, rpc string) {
 
 }
 
-func handleRetreiveLfsObject(w http.ResponseWriter, r *gitRequest, rpc string) {
-	log.Printf("I should download %s", r)
-
-	urlPath := r.URL.Path
-	regExp := regexp.MustCompile(`([0-9a-f]{64})\z`)
-	oid := regExp.FindString(urlPath)
-
-	if len(oid) == 0 {
-		log.Printf("Found no object for download: %s", urlPath)
-		return
-	}
-
-	log.Printf("Found oid: %s", oid)
-	path := filepath.Join(r.StoreLFSPath, transformKey(oid))
-
-	content, err := os.Open(path)
-	if err != nil {
-		fail500(w, "Cannot get file: ", err)
-		return
-	}
-	defer content.Close()
-
-	io.Copy(w, content)
-
-	log.Printf("Sent the LFS object to client, oid: %s", oid)
-
-	return
-}
-
 func transformKey(key string) string {
 	if len(key) < 5 {
 		return key
