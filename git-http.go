@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 	"path/filepath"
+	"strings"
 )
 
 func handleGetInfoRefs(w http.ResponseWriter, r *gitRequest) {

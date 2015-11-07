@@ -5,6 +5,7 @@ In this file we handle 'git archive' downloads
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -13,9 +14,8 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"time"
 	"path/filepath"
-	"errors"
+	"time"
 )
 
 func handleGetArchive(w http.ResponseWriter, r *gitRequest) {

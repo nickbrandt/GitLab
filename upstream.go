@@ -45,7 +45,8 @@ type authorizationResponse struct {
 	// in the GitLab Rails app and the 'time of use' in gitlab-workhorse.
 	CommitId string
 
-	// TODO: say something about this
+	// StoreLFSPath is provided by the GitLab Rails application
+	// to mark where the tmp file should be placed
 	StoreLFSPath string
 }
 
@@ -54,7 +55,7 @@ type authorizationResponse struct {
 type gitRequest struct {
 	*http.Request
 	authorizationResponse
-	u   *upstream
+	u *upstream
 }
 
 // Routing table
@@ -68,7 +69,7 @@ var gitServices = [...]gitService{
 	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.gz\z`), repoPreAuthorizeHandler(handleGetArchive)},
 	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.bz2\z`), repoPreAuthorizeHandler(handleGetArchive)},
 	gitService{"GET", regexp.MustCompile(`/uploads/`), handleSendFile},
-	gitService{"PUT", regexp.MustCompile(`/gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), repoPreAuthorizeHandler(handleStoreLfsObject)},
+	gitService{"PUT", regexp.MustCompile(`/gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfsAuthorizeHandler(handleStoreLfsObject(lfsCallback))},
 	gitService{"GET", regexp.MustCompile(`/gitlab-lfs/objects/([0-9a-f]{64})\z`), handleSendFile},
 }
 
