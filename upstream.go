@@ -136,7 +136,7 @@ func (u *upstream) newUpstreamRequest(r *http.Request, body io.Reader, suffix st
 	authReq.Host = r.Host
 	// Set a custom header for the request. This can be used in some
 	// configurations (Passenger) to solve auth request routing problems.
-	authReq.Header.Set("GitLab-Git-HTTP-Server", Version)
+	authReq.Header.Set("Gitlab-Workhorse", Version)
 
 	return authReq, nil
 }
