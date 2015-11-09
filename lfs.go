@@ -10,11 +10,9 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strconv"
 )
 
@@ -31,43 +29,40 @@ func lfsAuthorizeHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
 			return
 		}
 
+		if r.LfsOid == "" {
+			fail500(w, "lfsAuthorizeHandler", errors.New("Lfs object oid not specified."))
+			return
+		}
+
+		if r.LfsSize == "" {
+			fail500(w, "lfsAuthorizeHandler", errors.New("Lfs object size not specified."))
+			return
+		}
+
+		tmpDir := r.StoreLFSPath
+		if _, err := os.Stat(tmpDir); os.IsNotExist(err) {
+			if err := os.Mkdir(tmpDir, 0700); err != nil {
+				fail500(w, "Couldn't create directory for storing LFS tmp objects.", err)
+				return
+			}
+		}
+
 		handleFunc(w, r)
 	}, "")
 }
 
 func handleStoreLfsObject(handleFunc serviceHandleFunc) serviceHandleFunc {
 	return func(w http.ResponseWriter, r *gitRequest) {
-
-		urlPath := r.URL.Path
-		regExp := regexp.MustCompile(`([0-9a-f]{64})/([0-9]+)`)
-		matches := regExp.FindStringSubmatch(urlPath)
-
-		if matches == nil {
-			log.Printf("Found no object info in path: %s", urlPath)
-			return
-		}
-
-		oid := matches[1]
-		size := matches[2]
-		log.Printf("Found oid: %s and size: %s", oid, size)
-
-		sha := sha256.New()
-		sha.Write([]byte(oid))
-		tmp_hash := hex.EncodeToString(sha.Sum(nil))
-		tmpPath := filepath.Join(r.StoreLFSPath, "tmp")
+		oid := r.LfsOid
+		size := r.LfsSize
 
 		var body io.ReadCloser
 
 		body = r.Body
 		defer body.Close()
 
-		dir := filepath.Dir(tmpPath)
-		if err := os.MkdirAll(dir, 0700); err != nil {
-			fail500(w, "Couldn't create directory for storing LFS objects.", err)
-			return
-		}
-
-		file, err := ioutil.TempFile(tmpPath, tmp_hash)
+		tmpPath := r.StoreLFSPath
+		file, err := ioutil.TempFile(tmpPath, "")
 		if err != nil {
 			fail500(w, "Couldn't open tmp file for writing.", err)
 			return

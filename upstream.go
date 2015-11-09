@@ -44,10 +44,13 @@ type authorizationResponse struct {
 	// CommitId is used do prevent race conditions between the 'time of check'
 	// in the GitLab Rails app and the 'time of use' in gitlab-workhorse.
 	CommitId string
-
 	// StoreLFSPath is provided by the GitLab Rails application
 	// to mark where the tmp file should be placed
 	StoreLFSPath string
+	// LFS object id
+	LfsOid string
+	// LFS object size
+	LfsSize string
 }
 
 // A gitReqest is an *http.Request decorated with attributes returned by the
