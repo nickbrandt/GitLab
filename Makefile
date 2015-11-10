@@ -8,7 +8,7 @@ install: gitlab-workhorse
 	install gitlab-workhorse ${PREFIX}/bin/
 
 .PHONY: test
-test: test/data/test.git
+test: test/data/test.git gitlab-workhorse
 	go fmt | awk '{ print "Please run go fmt"; exit 1 }'
 	go test
 
@@ -19,6 +19,8 @@ test/data:
 	mkdir -p test/data
 
 .PHONY: clean
-clean:
-	rm -f gitlab-workhorse
+clean:	clean-workhorse
 	rm -rf test/data test/scratch
+
+clean-workhorse:
+	rm -f gitlab-workhorse
