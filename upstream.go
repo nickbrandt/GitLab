@@ -44,6 +44,13 @@ type authorizationResponse struct {
 	// CommitId is used do prevent race conditions between the 'time of check'
 	// in the GitLab Rails app and the 'time of use' in gitlab-workhorse.
 	CommitId string
+	// StoreLFSPath is provided by the GitLab Rails application
+	// to mark where the tmp file should be placed
+	StoreLFSPath string
+	// LFS object id
+	LfsOid string
+	// LFS object size
+	LfsSize int64
 }
 
 // A gitReqest is an *http.Request decorated with attributes returned by the
@@ -65,6 +72,8 @@ var gitServices = [...]gitService{
 	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.gz\z`), repoPreAuthorizeHandler(handleGetArchive)},
 	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.bz2\z`), repoPreAuthorizeHandler(handleGetArchive)},
 	gitService{"GET", regexp.MustCompile(`/uploads/`), handleSendFile},
+	gitService{"PUT", regexp.MustCompile(`/gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfsAuthorizeHandler(handleStoreLfsObject)},
+	gitService{"GET", regexp.MustCompile(`/gitlab-lfs/objects/([0-9a-f]{64})\z`), handleSendFile},
 }
 
 func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream {

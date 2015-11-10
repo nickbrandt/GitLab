@@ -241,69 +241,18 @@ func TestDownloadCacheCreate(t *testing.T) {
 
 func TestAllowedXSendfileDownload(t *testing.T) {
 	contentFilename := "my-content"
-	contentPath := path.Join(cacheDir, contentFilename)
+	url := fmt.Sprintf("http://%s/foo/uploads/bar", servAddr)
 	prepareDownloadDir(t)
 
-	// Prepare test server and backend
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if xSendfileType := r.Header.Get("X-Sendfile-Type"); xSendfileType != "X-Sendfile" {
-			t.Fatalf(`X-Sendfile-Type want "X-Sendfile" got %q`, xSendfileType)
-		}
-		w.Header().Set("X-Sendfile", contentPath)
-		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, contentFilename))
-		w.WriteHeader(200)
-	}))
-	defer ts.Close()
-	defer cleanUpProcessGroup(startServerOrFail(t, ts))
-
-	if err := os.MkdirAll(cacheDir, 0755); err != nil {
-		t.Fatal(err)
-	}
-	contentBytes := []byte{'c', 'o', 'n', 't', 'e', 'n', 't'}
-	if err := ioutil.WriteFile(contentPath, contentBytes, 0644); err != nil {
-		t.Fatal(err)
-	}
-
-	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("http://%s/foo/uploads/bar", servAddr))
-	downloadCmd.Dir = scratchDir
-	runOrFail(t, downloadCmd)
-
-	actual, err := ioutil.ReadFile(path.Join(scratchDir, contentFilename))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if bytes.Compare(actual, contentBytes) != 0 {
-		t.Fatal("Unexpected file contents in download")
-	}
+	allowedXSendfileDownload(t, contentFilename, url)
 }
 
 func TestDeniedXSendfileDownload(t *testing.T) {
 	contentFilename := "my-content"
+	url := fmt.Sprintf("http://%s/foo/uploads/bar", servAddr)
 	prepareDownloadDir(t)
 
-	// Prepare test server and backend
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if xSendfileType := r.Header.Get("X-Sendfile-Type"); xSendfileType != "X-Sendfile" {
-			t.Fatalf(`X-Sendfile-Type want "X-Sendfile" got %q`, xSendfileType)
-		}
-		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, contentFilename))
-		w.WriteHeader(200)
-		fmt.Fprint(w, "Denied")
-	}))
-	defer ts.Close()
-	defer cleanUpProcessGroup(startServerOrFail(t, ts))
-
-	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("http://%s/foo/uploads/bar", servAddr))
-	downloadCmd.Dir = scratchDir
-	runOrFail(t, downloadCmd)
-
-	actual, err := ioutil.ReadFile(path.Join(scratchDir, contentFilename))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if bytes.Compare(actual, []byte{'D', 'e', 'n', 'i', 'e', 'd'}) != 0 {
-		t.Fatal("Unexpected file contents in download")
-	}
+	deniedXSendfileDownload(t, contentFilename, url)
 }
 
 func prepareDownloadDir(t *testing.T) {
@@ -337,7 +286,7 @@ func testAuthServer(code int, body string) *httptest.Server {
 
 func startServerOrFail(t *testing.T, ts *httptest.Server) *exec.Cmd {
 	cmd := exec.Command("go", "run", "main.go", "upstream.go", "archive.go", "git-http.go", "helpers.go", "xsendfile.go",
-		"authorization.go", fmt.Sprintf("-authBackend=%s", ts.URL), fmt.Sprintf("-listenAddr=%s", servAddr))
+		"authorization.go", "lfs.go", fmt.Sprintf("-authBackend=%s", ts.URL), fmt.Sprintf("-listenAddr=%s", servAddr))
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -400,4 +349,86 @@ func repoPath(t *testing.T) string {
 		t.Fatal(err)
 	}
 	return path.Join(cwd, testRepoRoot, testRepo)
+}
+
+func TestDeniedLfsDownload(t *testing.T) {
+	contentFilename := "b68143e6463773b1b6c6fd009a76c32aeec041faff32ba2ed42fd7f708a17f80"
+	url := fmt.Sprintf("http://%s/gitlab-lfs/objects/%s", servAddr, contentFilename)
+
+	prepareDownloadDir(t)
+	deniedXSendfileDownload(t, contentFilename, url)
+}
+
+func TestAllowedLfsDownload(t *testing.T) {
+	contentFilename := "b68143e6463773b1b6c6fd009a76c32aeec041faff32ba2ed42fd7f708a17f80"
+	url := fmt.Sprintf("http://%s/gitlab-lfs/objects/%s", servAddr, contentFilename)
+
+	prepareDownloadDir(t)
+	allowedXSendfileDownload(t, contentFilename, url)
+}
+
+func allowedXSendfileDownload(t *testing.T, contentFilename string, url string) {
+	contentPath := path.Join(cacheDir, contentFilename)
+	prepareDownloadDir(t)
+
+	// Prepare test server and backend
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if xSendfileType := r.Header.Get("X-Sendfile-Type"); xSendfileType != "X-Sendfile" {
+			t.Fatalf(`X-Sendfile-Type want "X-Sendfile" got %q`, xSendfileType)
+		}
+		w.Header().Set("X-Sendfile", contentPath)
+		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, contentFilename))
+		w.Header().Set("Content-Type", fmt.Sprintf(`application/octet-stream`))
+		w.WriteHeader(200)
+	}))
+	defer ts.Close()
+	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+
+	if err := os.MkdirAll(cacheDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	contentBytes := []byte{'c', 'o', 'n', 't', 'e', 'n', 't'}
+	if err := ioutil.WriteFile(contentPath, contentBytes, 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	downloadCmd := exec.Command("curl", "-J", "-O", url)
+	downloadCmd.Dir = scratchDir
+	runOrFail(t, downloadCmd)
+
+	actual, err := ioutil.ReadFile(path.Join(scratchDir, contentFilename))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if bytes.Compare(actual, contentBytes) != 0 {
+		t.Fatal("Unexpected file contents in download")
+	}
+}
+
+func deniedXSendfileDownload(t *testing.T, contentFilename string, url string) {
+	prepareDownloadDir(t)
+
+	// Prepare test server and backend
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if xSendfileType := r.Header.Get("X-Sendfile-Type"); xSendfileType != "X-Sendfile" {
+			t.Fatalf(`X-Sendfile-Type want "X-Sendfile" got %q`, xSendfileType)
+		}
+		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, contentFilename))
+		w.WriteHeader(200)
+		fmt.Fprint(w, "Denied")
+	}))
+	defer ts.Close()
+	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+
+	downloadCmd := exec.Command("curl", "-J", "-O", url)
+	downloadCmd.Dir = scratchDir
+	runOrFail(t, downloadCmd)
+
+	actual, err := ioutil.ReadFile(path.Join(scratchDir, contentFilename))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if bytes.Compare(actual, []byte{'D', 'e', 'n', 'i', 'e', 'd'}) != 0 {
+		t.Fatal("Unexpected file contents in download")
+	}
 }
