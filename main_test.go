@@ -4,26 +4,21 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"net"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"os/exec"
 	"path"
-	"syscall"
 	"testing"
 	"time"
 )
 
-const servAddr = "127.0.0.1:8181"
-const servWaitListen = 10000 // milliseconds to wait for server to start listening
-const servWaitSleep = 100    // milliseconds sleep interval
 const scratchDir = "test/scratch"
 const testRepoRoot = "test/data"
 const testRepo = "test.git"
 const testProject = "test"
 
-var remote = fmt.Sprintf("http://%s/%s", servAddr, testRepo)
 var checkoutDir = path.Join(scratchDir, "test")
 var cacheDir = path.Join(scratchDir, "cache")
 
@@ -36,10 +31,11 @@ func TestAllowedClone(t *testing.T) {
 	// Prepare test server and backend
 	ts := testAuthServer(200, gitOkBody(t))
 	defer ts.Close()
-	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
 
 	// Do the git clone
-	cloneCmd := exec.Command("git", "clone", remote, checkoutDir)
+	cloneCmd := exec.Command("git", "clone", fmt.Sprintf("%s/%s", ws.URL, testRepo), checkoutDir)
 	runOrFail(t, cloneCmd)
 
 	// We may have cloned an 'empty' repository, 'git log' will fail in it
@@ -57,10 +53,11 @@ func TestDeniedClone(t *testing.T) {
 	// Prepare test server and backend
 	ts := testAuthServer(403, "Access denied")
 	defer ts.Close()
-	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
 
 	// Do the git clone
-	cloneCmd := exec.Command("git", "clone", remote, checkoutDir)
+	cloneCmd := exec.Command("git", "clone", fmt.Sprintf("%s/%s", ws.URL, testRepo), checkoutDir)
 	out, err := cloneCmd.CombinedOutput()
 	t.Logf("%s", out)
 	if err == nil {
@@ -74,10 +71,11 @@ func TestAllowedPush(t *testing.T) {
 	// Prepare the test server and backend
 	ts := testAuthServer(200, gitOkBody(t))
 	defer ts.Close()
-	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
 
 	// Perform the git push
-	pushCmd := exec.Command("git", "push", remote, fmt.Sprintf("master:%s", newBranch()))
+	pushCmd := exec.Command("git", "push", fmt.Sprintf("%s/%s", ws.URL, testRepo), fmt.Sprintf("master:%s", newBranch()))
 	pushCmd.Dir = checkoutDir
 	runOrFail(t, pushCmd)
 }
@@ -88,10 +86,11 @@ func TestDeniedPush(t *testing.T) {
 	// Prepare the test server and backend
 	ts := testAuthServer(403, "Access denied")
 	defer ts.Close()
-	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
 
 	// Perform the git push
-	pushCmd := exec.Command("git", "push", "-v", remote, fmt.Sprintf("master:%s", newBranch()))
+	pushCmd := exec.Command("git", "push", "-v", fmt.Sprintf("%s/%s", ws.URL, testRepo), fmt.Sprintf("master:%s", newBranch()))
 	pushCmd.Dir = checkoutDir
 	out, err := pushCmd.CombinedOutput()
 	t.Logf("%s", out)
@@ -107,9 +106,10 @@ func TestAllowedDownloadZip(t *testing.T) {
 	archiveName := "foobar.zip"
 	ts := testAuthServer(200, archiveOkBody(t, archiveName))
 	defer ts.Close()
-	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
 
-	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("http://%s/%s/repository/archive.zip", servAddr, testProject))
+	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("%s/%s/repository/archive.zip", ws.URL, testProject))
 	downloadCmd.Dir = scratchDir
 	runOrFail(t, downloadCmd)
 
@@ -125,9 +125,10 @@ func TestAllowedDownloadTar(t *testing.T) {
 	archiveName := "foobar.tar"
 	ts := testAuthServer(200, archiveOkBody(t, archiveName))
 	defer ts.Close()
-	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
 
-	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("http://%s/%s/repository/archive.tar", servAddr, testProject))
+	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("%s/%s/repository/archive.tar", ws.URL, testProject))
 	downloadCmd.Dir = scratchDir
 	runOrFail(t, downloadCmd)
 
@@ -143,9 +144,10 @@ func TestAllowedDownloadTarGz(t *testing.T) {
 	archiveName := "foobar.tar.gz"
 	ts := testAuthServer(200, archiveOkBody(t, archiveName))
 	defer ts.Close()
-	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
 
-	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("http://%s/%s/repository/archive.tar.gz", servAddr, testProject))
+	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("%s/%s/repository/archive.tar.gz", ws.URL, testProject))
 	downloadCmd.Dir = scratchDir
 	runOrFail(t, downloadCmd)
 
@@ -161,9 +163,10 @@ func TestAllowedDownloadTarBz2(t *testing.T) {
 	archiveName := "foobar.tar.bz2"
 	ts := testAuthServer(200, archiveOkBody(t, archiveName))
 	defer ts.Close()
-	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
 
-	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("http://%s/%s/repository/archive.tar.bz2", servAddr, testProject))
+	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("%s/%s/repository/archive.tar.bz2", ws.URL, testProject))
 	downloadCmd.Dir = scratchDir
 	runOrFail(t, downloadCmd)
 
@@ -179,9 +182,10 @@ func TestAllowedApiDownloadZip(t *testing.T) {
 	archiveName := "foobar.zip"
 	ts := testAuthServer(200, archiveOkBody(t, archiveName))
 	defer ts.Close()
-	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
 
-	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("http://%s/api/v3/projects/123/repository/archive.zip", servAddr))
+	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("%s/api/v3/projects/123/repository/archive.zip", ws.URL))
 	downloadCmd.Dir = scratchDir
 	runOrFail(t, downloadCmd)
 
@@ -197,7 +201,8 @@ func TestDownloadCacheHit(t *testing.T) {
 	archiveName := "foobar.zip"
 	ts := testAuthServer(200, archiveOkBody(t, archiveName))
 	defer ts.Close()
-	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
 
 	if err := os.MkdirAll(cacheDir, 0755); err != nil {
 		t.Fatal(err)
@@ -207,7 +212,7 @@ func TestDownloadCacheHit(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("http://%s/api/v3/projects/123/repository/archive.zip", servAddr))
+	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("%s/api/v3/projects/123/repository/archive.zip", ws.URL))
 	downloadCmd.Dir = scratchDir
 	runOrFail(t, downloadCmd)
 
@@ -227,9 +232,10 @@ func TestDownloadCacheCreate(t *testing.T) {
 	archiveName := "foobar.zip"
 	ts := testAuthServer(200, archiveOkBody(t, archiveName))
 	defer ts.Close()
-	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
 
-	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("http://%s/api/v3/projects/123/repository/archive.zip", servAddr))
+	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("%s/api/v3/projects/123/repository/archive.zip", ws.URL))
 	downloadCmd.Dir = scratchDir
 	runOrFail(t, downloadCmd)
 
@@ -241,18 +247,16 @@ func TestDownloadCacheCreate(t *testing.T) {
 
 func TestAllowedXSendfileDownload(t *testing.T) {
 	contentFilename := "my-content"
-	url := fmt.Sprintf("http://%s/foo/uploads/bar", servAddr)
 	prepareDownloadDir(t)
 
-	allowedXSendfileDownload(t, contentFilename, url)
+	allowedXSendfileDownload(t, contentFilename, "foo/uploads/bar")
 }
 
 func TestDeniedXSendfileDownload(t *testing.T) {
 	contentFilename := "my-content"
-	url := fmt.Sprintf("http://%s/foo/uploads/bar", servAddr)
 	prepareDownloadDir(t)
 
-	deniedXSendfileDownload(t, contentFilename, url)
+	deniedXSendfileDownload(t, contentFilename, "foo/uploads/bar")
 }
 
 func prepareDownloadDir(t *testing.T) {
@@ -279,41 +283,14 @@ func newBranch() string {
 
 func testAuthServer(code int, body string) *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println("UPSTREAM", r.Method, r.URL, code)
 		w.WriteHeader(code)
 		fmt.Fprint(w, body)
 	}))
 }
 
-func startServerOrFail(t *testing.T, ts *httptest.Server) *exec.Cmd {
-	cmd := exec.Command("go", "run", "main.go", "upstream.go", "archive.go", "git-http.go", "helpers.go", "xsendfile.go",
-		"authorization.go", "lfs.go", fmt.Sprintf("-authBackend=%s", ts.URL), fmt.Sprintf("-listenAddr=%s", servAddr))
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Start(); err != nil {
-		t.Fatal(err)
-	}
-
-	if err := waitServer(); err != nil {
-		cleanUpProcessGroup(cmd)
-		t.Fatal(err)
-	}
-
-	return cmd
-}
-
-func waitServer() (err error) {
-	var conn net.Conn
-
-	for i := 0; i < servWaitListen/servWaitSleep; i++ {
-		conn, err = net.Dial("tcp", servAddr)
-		if err == nil {
-			conn.Close()
-			return
-		}
-		time.Sleep(servWaitSleep * time.Millisecond)
-	}
-	return
+func startWorkhorseServer(authBackend string) *httptest.Server {
+	return httptest.NewServer(newUpstream(authBackend, nil))
 }
 
 func runOrFail(t *testing.T, cmd *exec.Cmd) {
@@ -353,7 +330,7 @@ func repoPath(t *testing.T) string {
 
 func TestDeniedLfsDownload(t *testing.T) {
 	contentFilename := "b68143e6463773b1b6c6fd009a76c32aeec041faff32ba2ed42fd7f708a17f80"
-	url := fmt.Sprintf("http://%s/gitlab-lfs/objects/%s", servAddr, contentFilename)
+	url := fmt.Sprintf("gitlab-lfs/objects/%s", contentFilename)
 
 	prepareDownloadDir(t)
 	deniedXSendfileDownload(t, contentFilename, url)
@@ -361,18 +338,19 @@ func TestDeniedLfsDownload(t *testing.T) {
 
 func TestAllowedLfsDownload(t *testing.T) {
 	contentFilename := "b68143e6463773b1b6c6fd009a76c32aeec041faff32ba2ed42fd7f708a17f80"
-	url := fmt.Sprintf("http://%s/gitlab-lfs/objects/%s", servAddr, contentFilename)
+	url := fmt.Sprintf("gitlab-lfs/objects/%s", contentFilename)
 
 	prepareDownloadDir(t)
 	allowedXSendfileDownload(t, contentFilename, url)
 }
 
-func allowedXSendfileDownload(t *testing.T, contentFilename string, url string) {
+func allowedXSendfileDownload(t *testing.T, contentFilename string, filePath string) {
 	contentPath := path.Join(cacheDir, contentFilename)
 	prepareDownloadDir(t)
 
 	// Prepare test server and backend
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println("UPSTREAM", r.Method, r.URL)
 		if xSendfileType := r.Header.Get("X-Sendfile-Type"); xSendfileType != "X-Sendfile" {
 			t.Fatalf(`X-Sendfile-Type want "X-Sendfile" got %q`, xSendfileType)
 		}
@@ -382,7 +360,8 @@ func allowedXSendfileDownload(t *testing.T, contentFilename string, url string) 
 		w.WriteHeader(200)
 	}))
 	defer ts.Close()
-	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
 
 	if err := os.MkdirAll(cacheDir, 0755); err != nil {
 		t.Fatal(err)
@@ -392,7 +371,7 @@ func allowedXSendfileDownload(t *testing.T, contentFilename string, url string) 
 		t.Fatal(err)
 	}
 
-	downloadCmd := exec.Command("curl", "-J", "-O", url)
+	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("%s/%s", ws.URL, filePath))
 	downloadCmd.Dir = scratchDir
 	runOrFail(t, downloadCmd)
 
@@ -405,11 +384,12 @@ func allowedXSendfileDownload(t *testing.T, contentFilename string, url string) 
 	}
 }
 
-func deniedXSendfileDownload(t *testing.T, contentFilename string, url string) {
+func deniedXSendfileDownload(t *testing.T, contentFilename string, filePath string) {
 	prepareDownloadDir(t)
 
 	// Prepare test server and backend
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println("UPSTREAM", r.Method, r.URL)
 		if xSendfileType := r.Header.Get("X-Sendfile-Type"); xSendfileType != "X-Sendfile" {
 			t.Fatalf(`X-Sendfile-Type want "X-Sendfile" got %q`, xSendfileType)
 		}
@@ -418,9 +398,10 @@ func deniedXSendfileDownload(t *testing.T, contentFilename string, url string) {
 		fmt.Fprint(w, "Denied")
 	}))
 	defer ts.Close()
-	defer cleanUpProcessGroup(startServerOrFail(t, ts))
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
 
-	downloadCmd := exec.Command("curl", "-J", "-O", url)
+	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("%s/%s", ws.URL, filePath))
 	downloadCmd.Dir = scratchDir
 	runOrFail(t, downloadCmd)
 
