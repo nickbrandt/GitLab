@@ -48,11 +48,6 @@ func lfsAuthorizeHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
 }
 
 func handleStoreLfsObject(w http.ResponseWriter, r *gitRequest) {
-	var body io.ReadCloser
-
-	body = r.Body
-	defer body.Close()
-
 	file, err := ioutil.TempFile(r.StoreLFSPath, r.LfsOid)
 	if err != nil {
 		fail500(w, "Couldn't open tmp file for writing.", err)
@@ -64,7 +59,7 @@ func handleStoreLfsObject(w http.ResponseWriter, r *gitRequest) {
 	hash := sha256.New()
 	hw := io.MultiWriter(hash, file)
 
-	written, err := io.Copy(hw, body)
+	written, err := io.Copy(hw, r.Body)
 	if err != nil {
 		fail500(w, "Failed to save received LFS object.", err)
 		return
