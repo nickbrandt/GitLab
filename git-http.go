@@ -55,8 +55,6 @@ func handleGetInfoRefs(w http.ResponseWriter, r *gitRequest) {
 		logContext("handleGetInfoRefs wait for subprocess", err)
 		return
 	}
-
-	return
 }
 
 func handlePostRPC(w http.ResponseWriter, r *gitRequest) {
@@ -132,8 +130,6 @@ func handlePostRPC(w http.ResponseWriter, r *gitRequest) {
 		logContext("handlePostRPC wait for subprocess", err)
 		return
 	}
-
-	return
 }
 
 func subCommand(rpc string) string {

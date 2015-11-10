@@ -119,8 +119,6 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 		logContext("handleGetArchive finalize cached archive", err)
 		return
 	}
-
-	return
 }
 
 func setArchiveHeaders(w http.ResponseWriter, format string, archiveFilename string) {

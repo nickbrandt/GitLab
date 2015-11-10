@@ -38,12 +38,9 @@ func lfsAuthorizeHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
 			return
 		}
 
-		tmpDir := r.StoreLFSPath
-		if _, err := os.Stat(tmpDir); os.IsNotExist(err) {
-			if err := os.Mkdir(tmpDir, 0700); err != nil {
-				fail500(w, "Couldn't create directory for storing LFS tmp objects.", err)
-				return
-			}
+		if err := os.Mkdir(r.StoreLFSPath, 0700); err != nil {
+			fail500(w, "Couldn't create directory for storing LFS tmp objects.", err)
+			return
 		}
 
 		handleFunc(w, r)
@@ -56,13 +53,12 @@ func handleStoreLfsObject(w http.ResponseWriter, r *gitRequest) {
 	body = r.Body
 	defer body.Close()
 
-	tmpPath := r.StoreLFSPath
-	file, err := ioutil.TempFile(tmpPath, r.LfsOid)
+	file, err := ioutil.TempFile(r.StoreLFSPath, r.LfsOid)
 	if err != nil {
 		fail500(w, "Couldn't open tmp file for writing.", err)
 		return
 	}
-	defer os.Remove(tmpPath)
+	defer os.Remove(file.Name())
 	defer file.Close()
 
 	hash := sha256.New()
