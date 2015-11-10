@@ -9,6 +9,7 @@ install: gitlab-workhorse
 
 .PHONY: test
 test: test/data/test.git
+	go fmt | awk '{ print "Please run go fmt"; exit 1 }'
 	go test
 
 test/data/test.git: test/data
