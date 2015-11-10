@@ -38,7 +38,7 @@ func lfsAuthorizeHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
 			return
 		}
 
-		if err := os.Mkdir(r.StoreLFSPath, 0700); err != nil {
+		if err := os.MkdirAll(r.StoreLFSPath, 0700); err != nil {
 			fail500(w, "Couldn't create directory for storing LFS tmp objects.", err)
 			return
 		}
