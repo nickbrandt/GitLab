@@ -50,7 +50,7 @@ type authorizationResponse struct {
 	// LFS object id
 	LfsOid string
 	// LFS object size
-	LfsSize string
+	LfsSize int64
 }
 
 // A gitReqest is an *http.Request decorated with attributes returned by the
@@ -72,7 +72,7 @@ var gitServices = [...]gitService{
 	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.gz\z`), repoPreAuthorizeHandler(handleGetArchive)},
 	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.bz2\z`), repoPreAuthorizeHandler(handleGetArchive)},
 	gitService{"GET", regexp.MustCompile(`/uploads/`), handleSendFile},
-	gitService{"PUT", regexp.MustCompile(`/gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfsAuthorizeHandler(handleStoreLfsObject(lfsCallback))},
+	gitService{"PUT", regexp.MustCompile(`/gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfsAuthorizeHandler(handleStoreLfsObject)},
 	gitService{"GET", regexp.MustCompile(`/gitlab-lfs/objects/([0-9a-f]{64})\z`), handleSendFile},
 }
 

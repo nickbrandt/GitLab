@@ -13,7 +13,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strconv"
 )
 
 var (
@@ -34,7 +33,7 @@ func lfsAuthorizeHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
 			return
 		}
 
-		if r.LfsSize == "" {
+		if r.LfsSize == 0 {
 			fail500(w, "lfsAuthorizeHandler", errors.New("Lfs object size not specified."))
 			return
 		}
@@ -48,62 +47,47 @@ func lfsAuthorizeHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
 		}
 
 		handleFunc(w, r)
-	}, "")
+	}, "/authorize")
 }
 
-func handleStoreLfsObject(handleFunc serviceHandleFunc) serviceHandleFunc {
-	return func(w http.ResponseWriter, r *gitRequest) {
-		oid := r.LfsOid
-		size := r.LfsSize
+func handleStoreLfsObject(w http.ResponseWriter, r *gitRequest) {
+	var body io.ReadCloser
 
-		var body io.ReadCloser
+	body = r.Body
+	defer body.Close()
 
-		body = r.Body
-		defer body.Close()
-
-		tmpPath := r.StoreLFSPath
-		file, err := ioutil.TempFile(tmpPath, "")
-		if err != nil {
-			fail500(w, "Couldn't open tmp file for writing.", err)
-			return
-		}
-		defer os.Remove(tmpPath)
-		defer file.Close()
-
-		hash := sha256.New()
-		hw := io.MultiWriter(hash, file)
-
-		written, err := io.Copy(hw, body)
-		if err != nil {
-			fail500(w, "Failed to save received LFS object.", err)
-			return
-		}
-		file.Close()
-
-		sizeInt, err := strconv.ParseInt(size, 10, 64)
-		if err != nil {
-			fail500(w, "Couldn't read size: ", err)
-			return
-		}
-
-		if written != sizeInt {
-			fail500(w, "Inconsistent size: ", errSizeMismatch)
-			return
-		}
-
-		shaStr := hex.EncodeToString(hash.Sum(nil))
-		if shaStr != oid {
-			fail500(w, "Inconsistent size: ", errSizeMismatch)
-			return
-		}
-		r.Header.Set("X-GitLab-Lfs-Tmp", filepath.Base(file.Name()))
-
-		handleFunc(w, r)
+	tmpPath := r.StoreLFSPath
+	file, err := ioutil.TempFile(tmpPath, r.LfsOid)
+	if err != nil {
+		fail500(w, "Couldn't open tmp file for writing.", err)
+		return
 	}
-}
+	defer os.Remove(tmpPath)
+	defer file.Close()
 
-func lfsCallback(w http.ResponseWriter, r *gitRequest) {
-	authReq, err := r.u.newUpstreamRequest(r.Request, nil, "/authorize")
+	hash := sha256.New()
+	hw := io.MultiWriter(hash, file)
+
+	written, err := io.Copy(hw, body)
+	if err != nil {
+		fail500(w, "Failed to save received LFS object.", err)
+		return
+	}
+	file.Close()
+
+	if written != r.LfsSize {
+		fail500(w, "Inconsistent size: ", errSizeMismatch)
+		return
+	}
+
+	shaStr := hex.EncodeToString(hash.Sum(nil))
+	if shaStr != r.LfsOid {
+		fail500(w, "Inconsistent size: ", errSizeMismatch)
+		return
+	}
+	r.Header.Set("X-GitLab-Lfs-Tmp", filepath.Base(file.Name()))
+
+	authReq, err := r.u.newUpstreamRequest(r.Request, nil, "")
 	if err != nil {
 		fail500(w, "newUpstreamRequestlfsCallback", err)
 		return
@@ -115,5 +99,6 @@ func lfsCallback(w http.ResponseWriter, r *gitRequest) {
 		return
 	}
 	defer authResponse.Body.Close()
+
 	return
 }
