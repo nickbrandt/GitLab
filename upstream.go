@@ -51,7 +51,7 @@ type authorizationResponse struct {
 type gitRequest struct {
 	*http.Request
 	authorizationResponse
-	u   *upstream
+	u *upstream
 }
 
 // Routing table
