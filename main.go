@@ -25,7 +25,7 @@ import (
 	"time"
 )
 
-var Version string // Set at build time in the Makefile
+var Version = "(unknown version)" // Set at build time in the Makefile
 
 func main() {
 	printVersion := flag.Bool("version", false, "Print version and exit")
