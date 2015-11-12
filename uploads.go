@@ -59,7 +59,7 @@ func rewriteFormFilesFromMultipart(r *gitRequest, writer *multipart.Writer) (cle
 
 			// Add file entry
 			writer.WriteField(name+".path", file.Name())
-			writer.WriteField(name+".file", filename)
+			writer.WriteField(name+".name", filename)
 			files = append(files, file.Name())
 
 			_, err = io.Copy(file, p)

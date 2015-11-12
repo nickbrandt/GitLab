@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -10,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"regexp"
 	"testing"
 	"time"
 )
@@ -29,7 +31,7 @@ func TestAllowedClone(t *testing.T) {
 	}
 
 	// Prepare test server and backend
-	ts := testAuthServer(200, gitOkBody(t))
+	ts := testAuthServer(nil, 200, gitOkBody(t))
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -51,7 +53,7 @@ func TestDeniedClone(t *testing.T) {
 	}
 
 	// Prepare test server and backend
-	ts := testAuthServer(403, "Access denied")
+	ts := testAuthServer(nil, 403, "Access denied")
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -69,7 +71,7 @@ func TestAllowedPush(t *testing.T) {
 	preparePushRepo(t)
 
 	// Prepare the test server and backend
-	ts := testAuthServer(200, gitOkBody(t))
+	ts := testAuthServer(nil, 200, gitOkBody(t))
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -84,7 +86,7 @@ func TestDeniedPush(t *testing.T) {
 	preparePushRepo(t)
 
 	// Prepare the test server and backend
-	ts := testAuthServer(403, "Access denied")
+	ts := testAuthServer(nil, 403, "Access denied")
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -104,7 +106,7 @@ func TestAllowedDownloadZip(t *testing.T) {
 
 	// Prepare test server and backend
 	archiveName := "foobar.zip"
-	ts := testAuthServer(200, archiveOkBody(t, archiveName))
+	ts := testAuthServer(nil, 200, archiveOkBody(t, archiveName))
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -123,7 +125,7 @@ func TestAllowedDownloadTar(t *testing.T) {
 
 	// Prepare test server and backend
 	archiveName := "foobar.tar"
-	ts := testAuthServer(200, archiveOkBody(t, archiveName))
+	ts := testAuthServer(nil, 200, archiveOkBody(t, archiveName))
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -142,7 +144,7 @@ func TestAllowedDownloadTarGz(t *testing.T) {
 
 	// Prepare test server and backend
 	archiveName := "foobar.tar.gz"
-	ts := testAuthServer(200, archiveOkBody(t, archiveName))
+	ts := testAuthServer(nil, 200, archiveOkBody(t, archiveName))
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -161,7 +163,7 @@ func TestAllowedDownloadTarBz2(t *testing.T) {
 
 	// Prepare test server and backend
 	archiveName := "foobar.tar.bz2"
-	ts := testAuthServer(200, archiveOkBody(t, archiveName))
+	ts := testAuthServer(nil, 200, archiveOkBody(t, archiveName))
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -180,7 +182,7 @@ func TestAllowedApiDownloadZip(t *testing.T) {
 
 	// Prepare test server and backend
 	archiveName := "foobar.zip"
-	ts := testAuthServer(200, archiveOkBody(t, archiveName))
+	ts := testAuthServer(nil, 200, archiveOkBody(t, archiveName))
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -199,7 +201,7 @@ func TestDownloadCacheHit(t *testing.T) {
 
 	// Prepare test server and backend
 	archiveName := "foobar.zip"
-	ts := testAuthServer(200, archiveOkBody(t, archiveName))
+	ts := testAuthServer(nil, 200, archiveOkBody(t, archiveName))
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -230,7 +232,7 @@ func TestDownloadCacheCreate(t *testing.T) {
 
 	// Prepare test server and backend
 	archiveName := "foobar.zip"
-	ts := testAuthServer(200, archiveOkBody(t, archiveName))
+	ts := testAuthServer(nil, 200, archiveOkBody(t, archiveName))
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -281,12 +283,47 @@ func newBranch() string {
 	return fmt.Sprintf("branch-%d", time.Now().UnixNano())
 }
 
-func testAuthServer(code int, body string) *httptest.Server {
+func testServerWithHandler(url *regexp.Regexp, handler http.HandlerFunc) *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if url != nil && !url.MatchString(r.URL.Path) {
+			log.Println("UPSTREAM", r.Method, r.URL, "DENY")
+			w.WriteHeader(404)
+			return
+		}
+
+		if version := r.Header.Get("Gitlab-Workhorse"); version == "" {
+			log.Println("UPSTREAM", r.Method, r.URL, "DENY")
+			w.WriteHeader(403)
+			return
+		}
+
+		handler(w, r)
+	}))
+}
+
+func testAuthServer(url *regexp.Regexp, code int, body interface{}) *httptest.Server {
+	return testServerWithHandler(url, func(w http.ResponseWriter, r *http.Request) {
+		// Write pure string
+		if data, ok := body.(string); ok {
+			log.Println("UPSTREAM", r.Method, r.URL, code)
+			w.WriteHeader(code)
+			fmt.Fprint(w, data)
+			return
+		}
+
+		// Write json string
+		data, err := json.Marshal(body)
+		if err != nil {
+			log.Println("UPSTREAM", r.Method, r.URL, "FAILURE", err)
+			w.WriteHeader(503)
+			fmt.Fprint(w, err)
+			return
+		}
+
 		log.Println("UPSTREAM", r.Method, r.URL, code)
 		w.WriteHeader(code)
-		fmt.Fprint(w, body)
-	}))
+		w.Write(data)
+	})
 }
 
 func startWorkhorseServer(authBackend string) *httptest.Server {
@@ -301,23 +338,26 @@ func runOrFail(t *testing.T, cmd *exec.Cmd) {
 	}
 }
 
-func gitOkBody(t *testing.T) string {
-	return fmt.Sprintf(`{"GL_ID":"user-123","RepoPath":"%s"}`, repoPath(t))
+func gitOkBody(t *testing.T) interface{} {
+	return &authorizationResponse{
+		GL_ID:    "user-123",
+		RepoPath: repoPath(t),
+	}
 }
 
-func archiveOkBody(t *testing.T, archiveName string) string {
+func archiveOkBody(t *testing.T, archiveName string) interface{} {
 	cwd, err := os.Getwd()
 	if err != nil {
 		t.Fatal(err)
 	}
 	archivePath := path.Join(cwd, cacheDir, archiveName)
-	jsonString := `{
-		"RepoPath":"%s",
-		"ArchivePath":"%s",
-		"CommitId":"c7fbe50c7c7419d9701eebe64b1fdacc3df5b9dd",
-		"ArchivePrefix":"foobar123"
-	}`
-	return fmt.Sprintf(jsonString, repoPath(t), archivePath)
+
+	return &authorizationResponse{
+		RepoPath:      repoPath(t),
+		ArchivePath:   archivePath,
+		CommitId:      "c7fbe50c7c7419d9701eebe64b1fdacc3df5b9dd",
+		ArchivePrefix: "foobar123",
+	}
 }
 
 func repoPath(t *testing.T) string {
