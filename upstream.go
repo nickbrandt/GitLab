@@ -51,6 +51,9 @@ type authorizationResponse struct {
 	LfsOid string
 	// LFS object size
 	LfsSize int64
+	// TmpPath is the path where we should store temporary files
+	// This is set by authorization middleware
+	TempPath string
 }
 
 // A gitReqest is an *http.Request decorated with attributes returned by the
@@ -64,16 +67,24 @@ type gitRequest struct {
 // Routing table
 var gitServices = [...]gitService{
 	gitService{"GET", regexp.MustCompile(`/info/refs\z`), repoPreAuthorizeHandler(handleGetInfoRefs)},
-	gitService{"POST", regexp.MustCompile(`/git-upload-pack\z`), repoPreAuthorizeHandler(handlePostRPC)},
-	gitService{"POST", regexp.MustCompile(`/git-receive-pack\z`), repoPreAuthorizeHandler(handlePostRPC)},
+	gitService{"POST", regexp.MustCompile(`/git-upload-pack\z`), repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
+	gitService{"POST", regexp.MustCompile(`/git-receive-pack\z`), repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
 	gitService{"GET", regexp.MustCompile(`/repository/archive\z`), repoPreAuthorizeHandler(handleGetArchive)},
 	gitService{"GET", regexp.MustCompile(`/repository/archive.zip\z`), repoPreAuthorizeHandler(handleGetArchive)},
 	gitService{"GET", regexp.MustCompile(`/repository/archive.tar\z`), repoPreAuthorizeHandler(handleGetArchive)},
 	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.gz\z`), repoPreAuthorizeHandler(handleGetArchive)},
 	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.bz2\z`), repoPreAuthorizeHandler(handleGetArchive)},
 	gitService{"GET", regexp.MustCompile(`/uploads/`), handleSendFile},
+
+	// Git LFS
 	gitService{"PUT", regexp.MustCompile(`/gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfsAuthorizeHandler(handleStoreLfsObject)},
 	gitService{"GET", regexp.MustCompile(`/gitlab-lfs/objects/([0-9a-f]{64})\z`), handleSendFile},
+
+	// CI artifacts
+	gitService{"GET", regexp.MustCompile(`/builds/download\z`), handleSendFile},
+	gitService{"GET", regexp.MustCompile(`/ci/api/v1/builds/[0-9]+/artifacts\z`), handleSendFile},
+	gitService{"POST", regexp.MustCompile(`/ci/api/v1/builds/[0-9]+/artifacts\z`), artifactsAuthorizeHandler(contentEncodingHandler(handleFileUploads))},
+	gitService{"DELETE", regexp.MustCompile(`/ci/api/v1/builds/[0-9]+/artifacts\z`), proxyRequest},
 }
 
 func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream {
@@ -135,6 +146,7 @@ func (u *upstream) newUpstreamRequest(r *http.Request, body io.Reader, suffix st
 		authReq.Header.Del("Content-Type")
 		authReq.Header.Del("Content-Encoding")
 		authReq.Header.Del("Content-Length")
+		authReq.Header.Del("Content-Disposition")
 		authReq.Header.Del("Accept-Encoding")
 		authReq.Header.Del("Transfer-Encoding")
 	}
