@@ -2,6 +2,16 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+0.4.1
+
+Add support for Build Artifacts and Git LFS. The GitLab-Workhorse 
+offloads file uploading and downloading by providing support for
+rewriting multipart form data and X-Sendfile.
+
+Other changes:
+- add header Gitlab-Workhorse to all requests to indicate from where
+  they originated
+
 0.4.0
 
 Rename the project to gitlab-workhorse. The old name had become too
