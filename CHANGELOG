@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+0.4.2
+
+Return response to client when uploading Git LFS object.
+
 0.4.1
 
 Add support for Build Artifacts and Git LFS. The GitLab-Workhorse 
