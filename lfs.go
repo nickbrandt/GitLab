@@ -78,18 +78,18 @@ func handleStoreLfsObject(w http.ResponseWriter, r *gitRequest) {
 	}
 	r.Header.Set("X-GitLab-Lfs-Tmp", filepath.Base(file.Name()))
 
-	authReq, err := r.u.newUpstreamRequest(r.Request, nil, "")
+	storeReq, err := r.u.newUpstreamRequest(r.Request, nil, "")
 	if err != nil {
-		fail500(w, "newUpstreamRequestlfsCallback", err)
+		fail500(w, "newUpstreamRequestLfsStoreCallback", err)
 		return
 	}
 
-	authResponse, err := r.u.httpClient.Do(authReq)
+	storeResponse, err := r.u.httpClient.Do(storeReq)
 	if err != nil {
-		fail500(w, "doRequestlfsCallback", err)
+		fail500(w, "doRequestLfsStoreCallback", err)
 		return
 	}
-	defer authResponse.Body.Close()
+	defer storeResponse.Body.Close()
 
-	return
+	forwardResponseToClient(w, storeResponse)
 }
