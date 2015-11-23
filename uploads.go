@@ -111,25 +111,11 @@ func handleFileUploads(w http.ResponseWriter, r *gitRequest) {
 	// Close writer
 	writer.Close()
 
-	// Create request
-	upstreamRequest, err := r.u.newUpstreamRequest(r.Request, nil, "")
-	if err != nil {
-		fail500(w, fmt.Errorf("handleFileUploads: newUpstreamRequest: %v", err))
-		return
-	}
+	// Hijack the request
+	r.Body = ioutil.NopCloser(&body)
+	r.ContentLength = int64(body.Len())
+	r.Header.Set("Content-Type", writer.FormDataContentType())
 
-	// Set multipart form data
-	upstreamRequest.Body = ioutil.NopCloser(&body)
-	upstreamRequest.ContentLength = int64(body.Len())
-	upstreamRequest.Header.Set("Content-Type", writer.FormDataContentType())
-
-	// Forward request to backend
-	upstreamResponse, err := r.u.httpClient.Do(upstreamRequest)
-	if err != nil {
-		fail500(w, fmt.Errorf("handleFileUploads: do request %v: %v", upstreamRequest.URL.Path, err))
-		return
-	}
-	defer upstreamResponse.Body.Close()
-
-	forwardResponseToClient(w, upstreamResponse)
+	// Proxy the request
+	proxyRequest(w, r)
 }

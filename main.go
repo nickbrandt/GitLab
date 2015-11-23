@@ -21,20 +21,56 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"os"
+	"regexp"
 	"syscall"
 	"time"
 )
 
 var Version = "(unknown version)" // Set at build time in the Makefile
 
+var printVersion = flag.Bool("version", false, "Print version and exit")
+var listenAddr = flag.String("listenAddr", "localhost:8181", "Listen address for HTTP server")
+var listenNetwork = flag.String("listenNetwork", "tcp", "Listen 'network' (tcp, tcp4, tcp6, unix)")
+var listenUmask = flag.Int("listenUmask", 022, "Umask for Unix socket, default: 022")
+var authBackend = flag.String("authBackend", "http://localhost:8080", "Authentication/authorization backend")
+var authSocket = flag.String("authSocket", "", "Optional: Unix domain socket to dial authBackend at")
+var pprofListenAddr = flag.String("pprofListenAddr", "", "pprof listening address, e.g. 'localhost:6060'")
+
+type httpRoute struct {
+	method     string
+	regex      *regexp.Regexp
+	handleFunc serviceHandleFunc
+}
+
+// Routing table
+var httpRoutes = [...]httpRoute{
+	httpRoute{"GET", regexp.MustCompile(`/info/refs\z`), repoPreAuthorizeHandler(handleGetInfoRefs)},
+	httpRoute{"POST", regexp.MustCompile(`/git-upload-pack\z`), repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
+	httpRoute{"POST", regexp.MustCompile(`/git-receive-pack\z`), repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
+	httpRoute{"GET", regexp.MustCompile(`/repository/archive\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(`/repository/archive.zip\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(`/repository/archive.tar\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(`/repository/archive.tar.gz\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(`/repository/archive.tar.bz2\z`), repoPreAuthorizeHandler(handleGetArchive)},
+
+	// Git LFS
+	httpRoute{"PUT", regexp.MustCompile(`/gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfsAuthorizeHandler(handleStoreLfsObject)},
+
+	// CI artifacts
+	httpRoute{"POST", regexp.MustCompile(`^/ci/api/v1/builds/[0-9]+/artifacts\z`), artifactsAuthorizeHandler(contentEncodingHandler(handleFileUploads))},
+
+	// Explicitly proxy API
+	httpRoute{"", regexp.MustCompile(`^/api/`), proxyRequest},
+	httpRoute{"", regexp.MustCompile(`^/ci/api/`), proxyRequest},
+
+	// Serve static files and forward otherwise
+	httpRoute{"", nil, handleServeFile("public",
+		handleDeployPage("public/index.html",
+			handleRailsError(proxyRequest),
+		))},
+}
+
 func main() {
-	printVersion := flag.Bool("version", false, "Print version and exit")
-	listenAddr := flag.String("listenAddr", "localhost:8181", "Listen address for HTTP server")
-	listenNetwork := flag.String("listenNetwork", "tcp", "Listen 'network' (tcp, tcp4, tcp6, unix)")
-	listenUmask := flag.Int("listenUmask", 022, "Umask for Unix socket, default: 022")
-	authBackend := flag.String("authBackend", "http://localhost:8080", "Authentication/authorization backend")
-	authSocket := flag.String("authSocket", "", "Optional: Unix domain socket to dial authBackend at")
-	pprofListenAddr := flag.String("pprofListenAddr", "", "pprof listening address, e.g. 'localhost:6060'")
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
 		fmt.Fprintf(os.Stderr, "\n  %s [OPTIONS]\n\nOptions:\n", os.Args[0])

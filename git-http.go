@@ -5,12 +5,42 @@ In this file we handle the Git 'smart HTTP' protocol
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"os"
+	"path"
 	"path/filepath"
 	"strings"
 )
+
+func looksLikeRepo(p string) bool {
+	// If /path/to/foo.git/objects exists then let's assume it is a valid Git
+	// repository.
+	if _, err := os.Stat(path.Join(p, "objects")); err != nil {
+		log.Print(err)
+		return false
+	}
+	return true
+}
+
+func repoPreAuthorizeHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
+	return preAuthorizeHandler(func(w http.ResponseWriter, r *gitRequest) {
+		if r.RepoPath == "" {
+			fail500(w, errors.New("repoPreAuthorizeHandler: RepoPath empty"))
+			return
+		}
+
+		if !looksLikeRepo(r.RepoPath) {
+			http.Error(w, "Not Found", 404)
+			return
+		}
+
+		handleFunc(w, r)
+	}, "")
+}
 
 func handleGetInfoRefs(w http.ResponseWriter, r *gitRequest) {
 	rpc := r.URL.Query().Get("service")
