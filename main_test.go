@@ -209,7 +209,7 @@ func TestDownloadCacheHit(t *testing.T) {
 	if err := os.MkdirAll(cacheDir, 0755); err != nil {
 		t.Fatal(err)
 	}
-	cachedContent := []byte{'c', 'a', 'c', 'h', 'e', 'd'}
+	cachedContent := []byte("cached")
 	if err := ioutil.WriteFile(path.Join(cacheDir, archiveName), cachedContent, 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -406,7 +406,7 @@ func allowedXSendfileDownload(t *testing.T, contentFilename string, filePath str
 	if err := os.MkdirAll(cacheDir, 0755); err != nil {
 		t.Fatal(err)
 	}
-	contentBytes := []byte{'c', 'o', 'n', 't', 'e', 'n', 't'}
+	contentBytes := []byte("content")
 	if err := ioutil.WriteFile(contentPath, contentBytes, 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -449,7 +449,7 @@ func deniedXSendfileDownload(t *testing.T, contentFilename string, filePath stri
 	if err != nil {
 		t.Fatal(err)
 	}
-	if bytes.Compare(actual, []byte{'D', 'e', 'n', 'i', 'e', 'd'}) != 0 {
+	if bytes.Compare(actual, []byte("Denied")) != 0 {
 		t.Fatal("Unexpected file contents in download")
 	}
 }
