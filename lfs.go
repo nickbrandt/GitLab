@@ -33,11 +33,6 @@ func lfsAuthorizeHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
 			return
 		}
 
-		if r.LfsSize == 0 {
-			fail500(w, "lfsAuthorizeHandler", errors.New("Lfs object size not specified."))
-			return
-		}
-
 		if err := os.MkdirAll(r.StoreLFSPath, 0700); err != nil {
 			fail500(w, "Couldn't create directory for storing LFS tmp objects.", err)
 			return
