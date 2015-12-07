@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -12,13 +13,13 @@ func preAuthorizeHandler(handleFunc serviceHandleFunc, suffix string) serviceHan
 	return func(w http.ResponseWriter, r *gitRequest) {
 		authReq, err := r.u.newUpstreamRequest(r.Request, nil, suffix)
 		if err != nil {
-			fail500(w, "newUpstreamRequest", err)
+			fail500(w, fmt.Errorf("preAuthorizeHandler: newUpstreamRequest: %v", err))
 			return
 		}
 
 		authResponse, err := r.u.httpClient.Do(authReq)
 		if err != nil {
-			fail500(w, "doAuthRequest", err)
+			fail500(w, fmt.Errorf("preAuthorizeHandler: do %v: %v", authReq.URL.Path, err))
 			return
 		}
 		defer authResponse.Body.Close()
@@ -46,7 +47,7 @@ func preAuthorizeHandler(handleFunc serviceHandleFunc, suffix string) serviceHan
 		// request metadata. We must extract this information from the auth
 		// response body.
 		if err := json.NewDecoder(authResponse.Body).Decode(&r.authorizationResponse); err != nil {
-			fail500(w, "decode authorization response", err)
+			fail500(w, fmt.Errorf("preAuthorizeHandler: decode authorization response: %v", err))
 			return
 		}
 		// Don't hog a TCP connection in CLOSE_WAIT, we can already close it now
@@ -68,7 +69,7 @@ func preAuthorizeHandler(handleFunc serviceHandleFunc, suffix string) serviceHan
 func repoPreAuthorizeHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
 	return preAuthorizeHandler(func(w http.ResponseWriter, r *gitRequest) {
 		if r.RepoPath == "" {
-			fail500(w, "repoPreAuthorizeHandler", errors.New("missing authorization response"))
+			fail500(w, errors.New("repoPreAuthorizeHandler: RepoPath empty"))
 			return
 		}
 

@@ -8,6 +8,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -15,31 +16,21 @@ import (
 	"path/filepath"
 )
 
-var (
-	errHashMismatch = errors.New("Content hash does not match OID")
-	errSizeMismatch = errors.New("Content size does not match")
-)
-
 func lfsAuthorizeHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
 	return preAuthorizeHandler(func(w http.ResponseWriter, r *gitRequest) {
 
 		if r.StoreLFSPath == "" {
-			fail500(w, "lfsAuthorizeHandler", errors.New("Don't know where to store object, no store path specified."))
+			fail500(w, errors.New("lfsAuthorizeHandler: StoreLFSPath empty"))
 			return
 		}
 
 		if r.LfsOid == "" {
-			fail500(w, "lfsAuthorizeHandler", errors.New("Lfs object oid not specified."))
-			return
-		}
-
-		if r.LfsSize == 0 {
-			fail500(w, "lfsAuthorizeHandler", errors.New("Lfs object size not specified."))
+			fail500(w, errors.New("lfsAuthorizeHandler: LfsOid empty"))
 			return
 		}
 
 		if err := os.MkdirAll(r.StoreLFSPath, 0700); err != nil {
-			fail500(w, "Couldn't create directory for storing LFS tmp objects.", err)
+			fail500(w, fmt.Errorf("lfsAuthorizeHandler: mkdir StoreLFSPath: %v", err))
 			return
 		}
 
@@ -50,7 +41,7 @@ func lfsAuthorizeHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
 func handleStoreLfsObject(w http.ResponseWriter, r *gitRequest) {
 	file, err := ioutil.TempFile(r.StoreLFSPath, r.LfsOid)
 	if err != nil {
-		fail500(w, "Couldn't open tmp file for writing.", err)
+		fail500(w, fmt.Errorf("handleStoreLfsObject: create tempfile: %v", err))
 		return
 	}
 	defer os.Remove(file.Name())
@@ -61,32 +52,32 @@ func handleStoreLfsObject(w http.ResponseWriter, r *gitRequest) {
 
 	written, err := io.Copy(hw, r.Body)
 	if err != nil {
-		fail500(w, "Failed to save received LFS object.", err)
+		fail500(w, fmt.Errorf("handleStoreLfsObject: write tempfile: %v", err))
 		return
 	}
 	file.Close()
 
 	if written != r.LfsSize {
-		fail500(w, "Inconsistent size: ", errSizeMismatch)
+		fail500(w, fmt.Errorf("handleStoreLfsObject: expected size %d, wrote %d", r.LfsSize, written))
 		return
 	}
 
 	shaStr := hex.EncodeToString(hash.Sum(nil))
 	if shaStr != r.LfsOid {
-		fail500(w, "Inconsistent size: ", errSizeMismatch)
+		fail500(w, fmt.Errorf("handleStoreLfsObject: expected sha256 %s, got %s", r.LfsOid, shaStr))
 		return
 	}
 	r.Header.Set("X-GitLab-Lfs-Tmp", filepath.Base(file.Name()))
 
 	storeReq, err := r.u.newUpstreamRequest(r.Request, nil, "")
 	if err != nil {
-		fail500(w, "newUpstreamRequestLfsStoreCallback", err)
+		fail500(w, fmt.Errorf("handleStoreLfsObject: newUpstreamRequest: %v", err))
 		return
 	}
 
 	storeResponse, err := r.u.httpClient.Do(storeReq)
 	if err != nil {
-		fail500(w, "doRequestLfsStoreCallback", err)
+		fail500(w, fmt.Errorf("handleStoreLfsObject: do %v: %v", storeReq.URL.Path, err))
 		return
 	}
 	defer storeResponse.Body.Close()
