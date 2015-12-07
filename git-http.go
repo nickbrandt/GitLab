@@ -111,7 +111,7 @@ func handlePostRPC(w http.ResponseWriter, r *gitRequest) {
 		return
 	}
 	if err := cmd.Wait(); err != nil {
-		log.Printf("handlePostRPC wait for %v: %v", err)
+		log.Printf("handlePostRPC wait for %v: %v", cmd.Args, err)
 		return
 	}
 }

@@ -126,7 +126,7 @@ func handleFileUploads(w http.ResponseWriter, r *gitRequest) {
 	// Forward request to backend
 	upstreamResponse, err := r.u.httpClient.Do(upstreamRequest)
 	if err != nil {
-		fail500(w, fmt.Errorf("handleFileUploads: do request %v", upstreamRequest.URL.Path, err))
+		fail500(w, fmt.Errorf("handleFileUploads: do request %v: %v", upstreamRequest.URL.Path, err))
 		return
 	}
 	defer upstreamResponse.Body.Close()

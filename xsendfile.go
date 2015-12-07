@@ -25,7 +25,7 @@ func handleSendFile(w http.ResponseWriter, r *gitRequest) {
 	upResponse, err := r.u.httpClient.Do(upRequest)
 	r.Body.Close()
 	if err != nil {
-		fail500(w, fmt.Errorf("handleSendfile:do upstream request: %v", err))
+		fail500(w, fmt.Errorf("handleSendfile: do upstream request: %v", err))
 		return
 	}
 
