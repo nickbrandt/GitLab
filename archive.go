@@ -31,6 +31,7 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 		format = "tar.bz2"
 	default:
 		fail500(w, fmt.Errorf("handleGetArchive: invalid format: %s", urlPath))
+		return
 	}
 
 	archiveFilename := path.Base(r.ArchivePath)
@@ -53,6 +54,7 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 	tempFile, err := prepareArchiveTempfile(path.Dir(r.ArchivePath), archiveFilename)
 	if err != nil {
 		fail500(w, fmt.Errorf("handleGetArchive: create tempfile: %v", err))
+		return
 	}
 	defer tempFile.Close()
 	defer os.Remove(tempFile.Name())
