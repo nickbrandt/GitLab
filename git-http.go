@@ -7,7 +7,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -40,19 +39,19 @@ func handleGetInfoRefs(w http.ResponseWriter, r *gitRequest) {
 	w.Header().Add("Cache-Control", "no-cache")
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 	if err := pktLine(w, fmt.Sprintf("# service=%s\n", rpc)); err != nil {
-		log.Printf("handleGetInfoRefs: pktLine: %v", err)
+		logError(fmt.Errorf("handleGetInfoRefs: pktLine: %v", err))
 		return
 	}
 	if err := pktFlush(w); err != nil {
-		log.Printf("handleGetInfoRefs: pktFlush: %v", err)
+		logError(fmt.Errorf("handleGetInfoRefs: pktFlush: %v", err))
 		return
 	}
 	if _, err := io.Copy(w, stdout); err != nil {
-		log.Printf("handleGetInfoRefs: read from %v: %v", cmd.Args, err)
+		logError(fmt.Errorf("handleGetInfoRefs: read from %v: %v", cmd.Args, err))
 		return
 	}
 	if err := cmd.Wait(); err != nil {
-		log.Printf("handleGetInfoRefs: wait for %v: %v", cmd.Args, err)
+		logError(fmt.Errorf("handleGetInfoRefs: wait for %v: %v", cmd.Args, err))
 		return
 	}
 }
@@ -107,11 +106,11 @@ func handlePostRPC(w http.ResponseWriter, r *gitRequest) {
 
 	// This io.Copy may take a long time, both for Git push and pull.
 	if _, err := io.Copy(w, stdout); err != nil {
-		log.Printf("handlePostRPC read from %v:%v", cmd.Args, err)
+		logError(fmt.Errorf("handlePostRPC read from %v: %v", cmd.Args, err))
 		return
 	}
 	if err := cmd.Wait(); err != nil {
-		log.Printf("handlePostRPC wait for %v: %v", cmd.Args, err)
+		logError(fmt.Errorf("handlePostRPC wait for %v: %v", cmd.Args, err))
 		return
 	}
 }

@@ -19,12 +19,16 @@ import (
 
 func fail400(w http.ResponseWriter, err error) {
 	http.Error(w, "Bad request", 400)
-	log.Print(err)
+	logError(err)
 }
 
 func fail500(w http.ResponseWriter, err error) {
 	http.Error(w, "Internal server error", 500)
-	log.Print(err)
+	logError(err)
+}
+
+func logError(err error) {
+	log.Printf("error: %v", err)
 }
 
 // Git subprocess helpers
