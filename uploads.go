@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -84,7 +85,7 @@ func rewriteFormFilesFromMultipart(r *gitRequest, writer *multipart.Writer) (cle
 
 func handleFileUploads(w http.ResponseWriter, r *gitRequest) {
 	if r.TempPath == "" {
-		fail500(w, "handleUploadFile", errors.New("missing temporary path"))
+		fail500(w, errors.New("handleFileUploads: TempPath empty"))
 		return
 	}
 
@@ -98,7 +99,7 @@ func handleFileUploads(w http.ResponseWriter, r *gitRequest) {
 		if err == http.ErrNotMultipart {
 			proxyRequest(w, r)
 		} else {
-			fail500(w, "Couldn't handle upload request.", err)
+			fail500(w, fmt.Errorf("handleFileUploads: extract files from multipart: %v", err))
 		}
 		return
 	}
@@ -113,7 +114,7 @@ func handleFileUploads(w http.ResponseWriter, r *gitRequest) {
 	// Create request
 	upstreamRequest, err := r.u.newUpstreamRequest(r.Request, nil, "")
 	if err != nil {
-		fail500(w, "Couldn't handle artifacts upload request.", err)
+		fail500(w, fmt.Errorf("handleFileUploads: newUpstreamRequest: %v", err))
 		return
 	}
 
@@ -125,7 +126,7 @@ func handleFileUploads(w http.ResponseWriter, r *gitRequest) {
 	// Forward request to backend
 	upstreamResponse, err := r.u.httpClient.Do(upstreamRequest)
 	if err != nil {
-		fail500(w, "do upstream request", err)
+		fail500(w, fmt.Errorf("handleFileUploads: do request %v: %v", upstreamRequest.URL.Path, err))
 		return
 	}
 	defer upstreamResponse.Body.Close()

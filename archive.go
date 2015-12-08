@@ -5,7 +5,6 @@ In this file we handle 'git archive' downloads
 package main
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -20,7 +19,8 @@ import (
 
 func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 	var format string
-	switch filepath.Base(r.URL.Path) {
+	urlPath := r.URL.Path
+	switch filepath.Base(urlPath) {
 	case "archive.zip":
 		format = "zip"
 	case "archive.tar":
@@ -30,7 +30,8 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 	case "archive.tar.bz2":
 		format = "tar.bz2"
 	default:
-		fail500(w, "handleGetArchive", errors.New("invalid archive format"))
+		fail500(w, fmt.Errorf("handleGetArchive: invalid format: %s", urlPath))
+		return
 	}
 
 	archiveFilename := path.Base(r.ArchivePath)
@@ -52,7 +53,8 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 	// to finalize the cached archive.
 	tempFile, err := prepareArchiveTempfile(path.Dir(r.ArchivePath), archiveFilename)
 	if err != nil {
-		fail500(w, "handleGetArchive create tempfile for archive", err)
+		fail500(w, fmt.Errorf("handleGetArchive: create tempfile: %v", err))
+		return
 	}
 	defer tempFile.Close()
 	defer os.Remove(tempFile.Name())
@@ -62,12 +64,12 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 	archiveCmd := gitCommand("", "git", "--git-dir="+r.RepoPath, "archive", "--format="+archiveFormat, "--prefix="+r.ArchivePrefix+"/", r.CommitId)
 	archiveStdout, err := archiveCmd.StdoutPipe()
 	if err != nil {
-		fail500(w, "handleGetArchive", err)
+		fail500(w, fmt.Errorf("handleGetArchive: archive stdout: %v", err))
 		return
 	}
 	defer archiveStdout.Close()
 	if err := archiveCmd.Start(); err != nil {
-		fail500(w, "handleGetArchive", err)
+		fail500(w, fmt.Errorf("handleGetArchive: start %v: %v", archiveCmd.Args, err))
 		return
 	}
 	defer cleanUpProcessGroup(archiveCmd) // Ensure brute force subprocess clean-up
@@ -80,13 +82,13 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 
 		stdout, err = compressCmd.StdoutPipe()
 		if err != nil {
-			fail500(w, "handleGetArchive compressCmd stdout pipe", err)
+			fail500(w, fmt.Errorf("handleGetArchive: compress stdout: %v", err))
 			return
 		}
 		defer stdout.Close()
 
 		if err := compressCmd.Start(); err != nil {
-			fail500(w, "handleGetArchive start compressCmd process", err)
+			fail500(w, fmt.Errorf("handleGetArchive: start %v: %v", compressCmd.Args, err))
 			return
 		}
 		defer compressCmd.Wait()
@@ -101,22 +103,22 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 	setArchiveHeaders(w, format, archiveFilename)
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 	if _, err := io.Copy(w, archiveReader); err != nil {
-		logContext("handleGetArchive read from subprocess", err)
+		logError(fmt.Errorf("handleGetArchive: read: %v", err))
 		return
 	}
 	if err := archiveCmd.Wait(); err != nil {
-		logContext("handleGetArchive wait for archiveCmd", err)
+		logError(fmt.Errorf("handleGetArchive: archiveCmd: %v", err))
 		return
 	}
 	if compressCmd != nil {
 		if err := compressCmd.Wait(); err != nil {
-			logContext("handleGetArchive wait for compressCmd", err)
+			logError(fmt.Errorf("handleGetArchive: compressCmd: %v", err))
 			return
 		}
 	}
 
 	if err := finalizeCachedArchive(tempFile, r.ArchivePath); err != nil {
-		logContext("handleGetArchive finalize cached archive", err)
+		logError(fmt.Errorf("handleGetArchive: finalize cached archive: %v", err))
 		return
 	}
 }

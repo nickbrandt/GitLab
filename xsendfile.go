@@ -7,6 +7,7 @@ via the X-Sendfile mechanism. All that is needed in the Rails code is the
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -16,7 +17,7 @@ import (
 func handleSendFile(w http.ResponseWriter, r *gitRequest) {
 	upRequest, err := r.u.newUpstreamRequest(r.Request, r.Body, "")
 	if err != nil {
-		fail500(w, "newUpstreamRequest", err)
+		fail500(w, fmt.Errorf("handleSendFile: newUpstreamRequest: %v", err))
 		return
 	}
 
@@ -24,7 +25,7 @@ func handleSendFile(w http.ResponseWriter, r *gitRequest) {
 	upResponse, err := r.u.httpClient.Do(upRequest)
 	r.Body.Close()
 	if err != nil {
-		fail500(w, "do upstream request", err)
+		fail500(w, fmt.Errorf("handleSendfile: do upstream request: %v", err))
 		return
 	}
 
@@ -45,7 +46,7 @@ func handleSendFile(w http.ResponseWriter, r *gitRequest) {
 
 		// Copy body from Rails upResponse
 		if _, err := io.Copy(w, upResponse.Body); err != nil {
-			fail500(w, "Couldn't finalize X-File download request.", err)
+			fail500(w, fmt.Errorf("handleSendFile: copy upstream response: %v", err))
 		}
 		return
 	}
@@ -54,14 +55,14 @@ func handleSendFile(w http.ResponseWriter, r *gitRequest) {
 	upResponse.Body.Close()
 	content, err := os.Open(sendfile)
 	if err != nil {
-		fail500(w, "open sendfile", err)
+		fail500(w, fmt.Errorf("handleSendile: open sendfile: %v", err))
 		return
 	}
 	defer content.Close()
 
 	fi, err := content.Stat()
 	if err != nil {
-		fail500(w, "xSendFile get mtime", err)
+		fail500(w, fmt.Errorf("handleSendfile: get mtime: %v", err))
 		return
 	}
 	http.ServeContent(w, r.Request, "", fi.ModTime(), content)

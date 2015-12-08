@@ -24,7 +24,7 @@ func contentEncodingHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
 		}
 
 		if err != nil {
-			fail500(w, "contentEncodingHandler", err)
+			fail500(w, fmt.Errorf("contentEncodingHandler: %v", err))
 			return
 		}
 		defer body.Close()

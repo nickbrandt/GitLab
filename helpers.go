@@ -17,18 +17,18 @@ import (
 	"syscall"
 )
 
-func fail400(w http.ResponseWriter, context string, err error) {
+func fail400(w http.ResponseWriter, err error) {
 	http.Error(w, "Bad request", 400)
-	logContext(context, err)
+	logError(err)
 }
 
-func fail500(w http.ResponseWriter, context string, err error) {
+func fail500(w http.ResponseWriter, err error) {
 	http.Error(w, "Internal server error", 500)
-	logContext(context, err)
+	logError(err)
 }
 
-func logContext(context string, err error) {
-	log.Printf("%s: %v", context, err)
+func logError(err error) {
+	log.Printf("error: %v", err)
 }
 
 // Git subprocess helpers
