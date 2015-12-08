@@ -19,7 +19,6 @@ func contentEncodingHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
 			body = r.Body
 		case "gzip":
 			body, err = gzip.NewReader(r.Body)
-			defer body.Close()
 		default:
 			err = fmt.Errorf("unsupported content encoding: %s", contentEncoding)
 		}
@@ -28,6 +27,7 @@ func contentEncodingHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
 			fail500(w, fmt.Errorf("contentEncodingHandler: %v", err))
 			return
 		}
+		defer body.Close()
 
 		r.Body = body
 		r.Header.Del("Content-Encoding")
