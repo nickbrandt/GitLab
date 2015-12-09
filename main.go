@@ -22,6 +22,7 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"regexp"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -35,6 +36,7 @@ var listenUmask = flag.Int("listenUmask", 022, "Umask for Unix socket, default: 
 var authBackend = flag.String("authBackend", "http://localhost:8080", "Authentication/authorization backend")
 var authSocket = flag.String("authSocket", "", "Optional: Unix domain socket to dial authBackend at")
 var pprofListenAddr = flag.String("pprofListenAddr", "", "pprof listening address, e.g. 'localhost:6060'")
+var relativeUrlRoot = flag.String("relativeUrlRoot", "/", "GitLab relative URL root")
 
 type httpRoute struct {
 	method     string
@@ -84,6 +86,10 @@ func main() {
 		os.Exit(0)
 	}
 
+	if !strings.HasSuffix(*relativeUrlRoot, "/") {
+		*relativeUrlRoot += "/"
+	}
+
 	log.Printf("Starting %s", version)
 
 	// Good housekeeping for Unix sockets: unlink before binding
@@ -128,6 +134,6 @@ func main() {
 	// Because net/http/pprof installs itself in the DefaultServeMux
 	// we create a fresh one for the Git server.
 	serveMux := http.NewServeMux()
-	serveMux.Handle("/", newUpstream(*authBackend, authTransport))
+	serveMux.Handle(*relativeUrlRoot, newUpstream(*authBackend, authTransport))
 	log.Fatal(http.Serve(listener, serveMux))
 }

@@ -22,8 +22,8 @@ type sendFileResponseWriter struct {
 
 func newSendFileResponseWriter(rw http.ResponseWriter, req *http.Request) *sendFileResponseWriter {
 	s := &sendFileResponseWriter{
-		rw:     rw,
-		req:    req,
+		rw:  rw,
+		req: req,
 	}
 	req.Header.Set("X-Sendfile-Type", "X-Sendfile")
 	return s

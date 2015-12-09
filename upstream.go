@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
 )
 
 type serviceHandleFunc func(w http.ResponseWriter, r *gitRequest)
@@ -53,6 +54,7 @@ type authorizationResponse struct {
 // GitLab Rails application.
 type gitRequest struct {
 	*http.Request
+	relativeUriPath string
 	authorizationResponse
 	u *upstream
 }
@@ -78,6 +80,9 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	w := newLoggingResponseWriter(ow)
 	defer w.Log(r)
 
+	// Strip prefix and add "/"
+	relativeUriPath := "/" + strings.TrimPrefix(r.RequestURI, *relativeUrlRoot)
+
 	// Look for a matching Git service
 	foundService := false
 	for _, g = range httpRoutes {
@@ -85,7 +90,7 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		if g.regex == nil || g.regex.MatchString(r.URL.Path) {
+		if g.regex == nil || g.regex.MatchString(relativeUriPath) {
 			foundService = true
 			break
 		}
@@ -98,8 +103,9 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	}
 
 	request := gitRequest{
-		Request: r,
-		u:       u,
+		Request:         r,
+		relativeUriPath: relativeUriPath,
+		u:               u,
 	}
 
 	g.handleFunc(w, &request)

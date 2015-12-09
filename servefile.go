@@ -16,7 +16,7 @@ func handleServeFile(rootDir string, notFoundHandler serviceHandleFunc) serviceH
 	}
 
 	return func(w http.ResponseWriter, r *gitRequest) {
-		file := filepath.Join(rootDir, r.URL.Path)
+		file := filepath.Join(rootDir, r.relativeUriPath)
 		file, err := filepath.Abs(file)
 		if err != nil {
 			fail500(w, fmt.Errorf("invalid path:"+file, err))
