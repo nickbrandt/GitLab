@@ -54,9 +54,11 @@ type authorizationResponse struct {
 // GitLab Rails application.
 type gitRequest struct {
 	*http.Request
-	relativeUriPath string
 	authorizationResponse
 	u *upstream
+
+	// This field contains the URL.Path stripped from RelativeUrlRoot
+	relativeUriPath string
 }
 
 func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream {
@@ -81,7 +83,9 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	defer w.Log(r)
 
 	// Strip prefix and add "/"
-	relativeUriPath := "/" + strings.TrimPrefix(r.RequestURI, *relativeUrlRoot)
+	// To match against non-relative URL
+	// Making it simpler for our matcher
+	relativeUriPath := "/" + strings.TrimPrefix(r.URL.Path, *relativeUrlRoot)
 
 	// Look for a matching Git service
 	foundService := false
@@ -98,7 +102,7 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	if !foundService {
 		// The protocol spec in git/Documentation/technical/http-protocol.txt
 		// says we must return 403 if no matching service is found.
-		http.Error(w, "Forbidden", 403)
+		http.Error(&w, "Forbidden", 403)
 		return
 	}
 
@@ -108,5 +112,5 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 		u:               u,
 	}
 
-	g.handleFunc(w, &request)
+	g.handleFunc(&w, &request)
 }

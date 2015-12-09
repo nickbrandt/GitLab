@@ -23,5 +23,5 @@ func proxyRequest(w http.ResponseWriter, r *gitRequest) {
 	req.Header.Set("Gitlab-Workhorse", Version)
 	rw := newSendFileResponseWriter(w, &req)
 	defer rw.Flush()
-	r.u.httpProxy.ServeHTTP(rw, &req)
+	r.u.httpProxy.ServeHTTP(&rw, &req)
 }

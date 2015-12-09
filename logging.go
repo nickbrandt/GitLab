@@ -13,8 +13,8 @@ type loggingResponseWriter struct {
 	started time.Time
 }
 
-func newLoggingResponseWriter(rw http.ResponseWriter) *loggingResponseWriter {
-	return &loggingResponseWriter{
+func newLoggingResponseWriter(rw http.ResponseWriter) loggingResponseWriter {
+	return loggingResponseWriter{
 		rw:      rw,
 		started: time.Now(),
 	}

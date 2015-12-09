@@ -20,8 +20,8 @@ type sendFileResponseWriter struct {
 	req      *http.Request
 }
 
-func newSendFileResponseWriter(rw http.ResponseWriter, req *http.Request) *sendFileResponseWriter {
-	s := &sendFileResponseWriter{
+func newSendFileResponseWriter(rw http.ResponseWriter, req *http.Request) sendFileResponseWriter {
+	s := sendFileResponseWriter{
 		rw:  rw,
 		req: req,
 	}

@@ -9,21 +9,12 @@ import (
 	"strings"
 )
 
-func handleServeFile(rootDir string, notFoundHandler serviceHandleFunc) serviceHandleFunc {
-	rootDir, err := filepath.Abs(rootDir)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
+func handleServeFile(documentRoot *string, notFoundHandler serviceHandleFunc) serviceHandleFunc {
 	return func(w http.ResponseWriter, r *gitRequest) {
-		file := filepath.Join(rootDir, r.relativeUriPath)
-		file, err := filepath.Abs(file)
-		if err != nil {
-			fail500(w, fmt.Errorf("invalid path:"+file, err))
-			return
-		}
+		file := filepath.Join(*documentRoot, r.relativeUriPath)
 
-		if !strings.HasPrefix(file, rootDir) {
+		// The filepath.Join does Clean traversing directories up
+		if !strings.HasPrefix(file, *documentRoot) {
 			fail500(w, fmt.Errorf("invalid path: "+file, os.ErrInvalid))
 			return
 		}

@@ -37,6 +37,9 @@ var authBackend = flag.String("authBackend", "http://localhost:8080", "Authentic
 var authSocket = flag.String("authSocket", "", "Optional: Unix domain socket to dial authBackend at")
 var pprofListenAddr = flag.String("pprofListenAddr", "", "pprof listening address, e.g. 'localhost:6060'")
 var relativeUrlRoot = flag.String("relativeUrlRoot", "/", "GitLab relative URL root")
+var documentRoot = flag.String("documentRoot", "public", "Path to static files content")
+var deployPage = flag.String("deployPage", "public/index.html", "Path to file that will always be served if present")
+var errorPages = flag.String("errorPages", "public/index.html", "The folder containing custom error pages, ie.: 500.html")
 
 type httpRoute struct {
 	method     string
@@ -45,6 +48,8 @@ type httpRoute struct {
 }
 
 // Routing table
+// We match against URI not containing the relativeUrlRoot:
+// see upstream.ServeHTTP
 var httpRoutes = [...]httpRoute{
 	httpRoute{"GET", regexp.MustCompile(`/info/refs\z`), repoPreAuthorizeHandler(handleGetInfoRefs)},
 	httpRoute{"POST", regexp.MustCompile(`/git-upload-pack\z`), repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
@@ -66,10 +71,11 @@ var httpRoutes = [...]httpRoute{
 	httpRoute{"", regexp.MustCompile(`^/ci/api/`), proxyRequest},
 
 	// Serve static files and forward otherwise
-	httpRoute{"", nil, handleServeFile("public",
-		handleDeployPage("public/index.html",
-			handleRailsError(proxyRequest),
-		))},
+	httpRoute{"", nil, handleServeFile(documentRoot,
+		handleDeployPage(deployPage,
+			handleRailsError(errorPages,
+				proxyRequest,
+			)))},
 }
 
 func main() {

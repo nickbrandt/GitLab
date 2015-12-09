@@ -5,19 +5,14 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"path/filepath"
 )
 
 type errorPageResponseWriter struct {
-	rw       http.ResponseWriter
-	status   int
-	hijacked bool
-}
-
-func newErrorPageResponseWriter(rw http.ResponseWriter) *errorPageResponseWriter {
-	s := &errorPageResponseWriter{
-		rw: rw,
-	}
-	return s
+	rw         http.ResponseWriter
+	status     int
+	hijacked   bool
+	errorPages *string
 }
 
 func (s *errorPageResponseWriter) Header() http.Header {
@@ -41,22 +36,20 @@ func (s *errorPageResponseWriter) WriteHeader(status int) {
 
 	s.status = status
 
-	switch s.status {
-	case 404, 422, 500, 502:
-		data, err := ioutil.ReadFile(fmt.Sprintf("public/%d.html", s.status))
-		if err != nil {
-			break
+	if 400 <= s.status && s.status <= 599 {
+		errorPageFile := filepath.Join(*errorPages, fmt.Sprintf("%d.html", s.status))
+
+		// check if custom error page exists, serve this page instead
+		if data, err := ioutil.ReadFile(errorPageFile); err == nil {
+			s.hijacked = true
+
+			log.Printf("ErrorPage: serving predefined error page: %d", s.status)
+			setNoCacheHeaders(s.rw.Header())
+			s.rw.Header().Set("Content-Type", "text/html; charset=utf-8")
+			s.rw.WriteHeader(s.status)
+			s.rw.Write(data)
+			return
 		}
-
-		log.Printf("ErroPage: serving predefined error page: %d", s.status)
-		s.hijacked = true
-		s.rw.Header().Set("Content-Type", "text/html")
-		s.rw.WriteHeader(s.status)
-		s.rw.Write(data)
-		return
-
-	default:
-		break
 	}
 
 	s.rw.WriteHeader(status)
@@ -66,10 +59,13 @@ func (s *errorPageResponseWriter) Flush() {
 	s.WriteHeader(http.StatusOK)
 }
 
-func handleRailsError(handler serviceHandleFunc) serviceHandleFunc {
+func handleRailsError(errorPages *string, handler serviceHandleFunc) serviceHandleFunc {
 	return func(w http.ResponseWriter, r *gitRequest) {
-		rw := newErrorPageResponseWriter(w)
+		rw := errorPageResponseWriter{
+			rw:         w,
+			errorPages: errorPages,
+		}
 		defer rw.Flush()
-		handler(rw, r)
+		handler(&rw, r)
 	}
 }
