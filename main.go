@@ -113,7 +113,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var authTransport http.RoundTripper
+	// Create Proxy Transport
+	authTransport := http.DefaultTransport
 	if *authSocket != "" {
 		dialer := &net.Dialer{
 			// The values below are taken from http.DefaultTransport
@@ -126,6 +127,7 @@ func main() {
 			},
 		}
 	}
+	proxyTransport := &proxyRoundTripper{transport: authTransport}
 
 	// The profiler will only be activated by HTTP requests. HTTP
 	// requests can only reach the profiler if we start a listener. So by
@@ -137,7 +139,7 @@ func main() {
 		}()
 	}
 
-	upstream := newUpstream(*authBackend, authTransport)
+	upstream := newUpstream(*authBackend, proxyTransport)
 	upstream.SetRelativeUrlRoot(*relativeUrlRoot)
 	upstream.SetProxyTimeout(*proxyTimeout)
 

@@ -1,8 +1,36 @@
 package main
 
 import (
+	"bytes"
+	"io/ioutil"
 	"net/http"
 )
+
+type proxyRoundTripper struct {
+	transport http.RoundTripper
+}
+
+func (p *proxyRoundTripper) RoundTrip(r *http.Request) (res *http.Response, err error) {
+	res, err = p.transport.RoundTrip(r)
+
+	// Map error to 502 response
+	if err != nil {
+		res = &http.Response{
+			StatusCode: 502,
+			Status:     err.Error(),
+
+			Request:    r,
+			ProtoMajor: r.ProtoMajor,
+			ProtoMinor: r.ProtoMinor,
+			Proto:      r.Proto,
+			Header:     make(http.Header),
+			Trailer:    make(http.Header),
+			Body:       ioutil.NopCloser(&bytes.Buffer{}),
+		}
+		err = nil
+	}
+	return
+}
 
 func headerClone(h http.Header) http.Header {
 	h2 := make(http.Header, len(h))
