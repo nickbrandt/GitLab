@@ -1,16 +1,16 @@
 package main
 
 import (
-	"testing"
-	"fmt"
-	"path"
-	"net/http/httptest"
-	"net/http"
-	"log"
-	"os"
-	"io/ioutil"
-	"os/exec"
 	"bytes"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"os/exec"
+	"path"
+	"testing"
 )
 
 func TestDeniedLfsDownload(t *testing.T) {
@@ -98,4 +98,3 @@ func deniedXSendfileDownload(t *testing.T, contentFilename string, filePath stri
 		t.Fatal("Unexpected file contents in download")
 	}
 }
-

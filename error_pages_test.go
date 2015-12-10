@@ -1,13 +1,13 @@
 package main
 
 import (
-	"testing"
+	"fmt"
 	"io/ioutil"
-	"path/filepath"
+	"net/http"
 	"net/http/httptest"
 	"os"
-	"net/http"
-	"fmt"
+	"path/filepath"
+	"testing"
 )
 
 func TestIfErrorPageIsPresented(t *testing.T) {
@@ -59,4 +59,3 @@ func TestIfErrorPassedIfNoErrorPageIsFound(t *testing.T) {
 		t.Error("Page should be response error: ", w.Body.String())
 	}
 }
-

@@ -37,7 +37,7 @@ var authSocket = flag.String("authSocket", "", "Optional: Unix domain socket to 
 var pprofListenAddr = flag.String("pprofListenAddr", "", "pprof listening address, e.g. 'localhost:6060'")
 var relativeUrlRoot = flag.String("relativeUrlRoot", "/", "GitLab relative URL root")
 var documentRoot = flag.String("documentRoot", "public", "Path to static files content")
-var proxyTimeout = flag.Duration("proxyTimeout", 5 * time.Minute, "Proxy request timeout")
+var proxyTimeout = flag.Duration("proxyTimeout", 5*time.Minute, "Proxy request timeout")
 
 type httpRoute struct {
 	method     string

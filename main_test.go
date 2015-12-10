@@ -366,4 +366,3 @@ func repoPath(t *testing.T) string {
 	}
 	return path.Join(cwd, testRepoRoot, testRepo)
 }
-

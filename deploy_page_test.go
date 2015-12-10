@@ -1,12 +1,12 @@
 package main
 
 import (
-	"testing"
 	"io/ioutil"
-	"os"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
+	"testing"
 )
 
 func TestIfNoDeployPageExist(t *testing.T) {

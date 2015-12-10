@@ -15,9 +15,9 @@ func handleServeFile(documentRoot *string, notFoundHandler serviceHandleFunc) se
 		// The filepath.Join does Clean traversing directories up
 		if !strings.HasPrefix(file, *documentRoot) {
 			fail500(w, &os.PathError{
-				Op: "open",
+				Op:   "open",
 				Path: file,
-				Err: os.ErrInvalid,
+				Err:  os.ErrInvalid,
 			})
 			return
 		}

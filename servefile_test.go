@@ -1,11 +1,12 @@
 package main
+
 import (
 	"io/ioutil"
-	"testing"
+	"net/http"
 	"net/http/httptest"
 	"os"
-	"net/http"
 	"path/filepath"
+	"testing"
 )
 
 func TestServingNonExistingFile(t *testing.T) {
@@ -76,7 +77,7 @@ func TestServingTheActualFile(t *testing.T) {
 
 	httpRequest, _ := http.NewRequest("GET", "/file", nil)
 	request := &gitRequest{
-		Request: httpRequest,
+		Request:         httpRequest,
 		relativeUriPath: "/file",
 	}
 
