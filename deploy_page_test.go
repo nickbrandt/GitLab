@@ -48,10 +48,6 @@ func TestIfDeployPageExist(t *testing.T) {
 	}
 	w.Flush()
 
-	if w.Code != 200 {
-		t.Error("Page should be 200")
-	}
-	if w.Body.String() != deployPage {
-		t.Error("Page should be deploy: ", w.Body.String())
-	}
+	assertResponseCode(t, w, 200)
+	assertResponseBody(t, w, deployPage)
 }

@@ -26,6 +26,7 @@ import (
 	"time"
 )
 
+// Current version of GitLab Workhorse
 var Version = "(unknown version)" // Set at build time in the Makefile
 
 var printVersion = flag.Bool("version", false, "Print version and exit")
@@ -35,9 +36,9 @@ var listenUmask = flag.Int("listenUmask", 022, "Umask for Unix socket, default: 
 var authBackend = flag.String("authBackend", "http://localhost:8080", "Authentication/authorization backend")
 var authSocket = flag.String("authSocket", "", "Optional: Unix domain socket to dial authBackend at")
 var pprofListenAddr = flag.String("pprofListenAddr", "", "pprof listening address, e.g. 'localhost:6060'")
-var relativeUrlRoot = flag.String("relativeUrlRoot", "/", "GitLab relative URL root")
+var relativeURLRoot = flag.String("relativeURLRoot", "/", "GitLab relative URL root")
 var documentRoot = flag.String("documentRoot", "public", "Path to static files content")
-var proxyTimeout = flag.Duration("proxyTimeout", 5*time.Minute, "Proxy request timeout")
+var responseHeadersTimeout = flag.Duration("proxyHeadersTimeout", time.Minute, "How long to wait for response headers when proxying the request")
 
 type httpRoute struct {
 	method     string
@@ -45,36 +46,46 @@ type httpRoute struct {
 	handleFunc serviceHandleFunc
 }
 
+const projectPattern = `^/[^/]+/[^/]+/`
+const gitProjectPattern = `^/[^/]+/[^/]+\.git/`
+
+const apiPattern = `^/api/`
+const projectsAPIPattern = `^/api/v3/projects/[^/]+/`
+
+const ciAPIPattern = `^/ci/api/`
+
 // Routing table
 // We match against URI not containing the relativeUrlRoot:
 // see upstream.ServeHTTP
 var httpRoutes = [...]httpRoute{
 	// Git Clone
-	httpRoute{"GET", regexp.MustCompile(`^/[^/]+/[^/]+\.git/info/refs\z`), repoPreAuthorizeHandler(handleGetInfoRefs)},
-	httpRoute{"POST", regexp.MustCompile(`/[^/]+/[^/]+\.git/git-upload-pack\z`), repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
-	httpRoute{"POST", regexp.MustCompile(`/[^/]+/[^/]+\.git/git-receive-pack\z`), repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
-	httpRoute{"GET", regexp.MustCompile(`/[^/]+/[^/]+/repository/archive\z`), repoPreAuthorizeHandler(handleGetArchive)},
-	httpRoute{"GET", regexp.MustCompile(`/[^/]+/[^/]+/repository/archive.zip\z`), repoPreAuthorizeHandler(handleGetArchive)},
-	httpRoute{"GET", regexp.MustCompile(`/[^/]+/[^/]+/repository/archive.tar\z`), repoPreAuthorizeHandler(handleGetArchive)},
-	httpRoute{"GET", regexp.MustCompile(`/[^/]+/[^/]+/repository/archive.tar.gz\z`), repoPreAuthorizeHandler(handleGetArchive)},
-	httpRoute{"GET", regexp.MustCompile(`/[^/]+/[^/]+/repository/archive.tar.bz2\z`), repoPreAuthorizeHandler(handleGetArchive)},
-	httpRoute{"GET", regexp.MustCompile(`/api/v3/projects/[^/]+/repository/archive\z`), repoPreAuthorizeHandler(handleGetArchive)},
-	httpRoute{"GET", regexp.MustCompile(`/api/v3/projects/[^/]+/repository/archive.zip\z`), repoPreAuthorizeHandler(handleGetArchive)},
-	httpRoute{"GET", regexp.MustCompile(`/api/v3/projects/[^/]+/repository/archive.tar\z`), repoPreAuthorizeHandler(handleGetArchive)},
-	httpRoute{"GET", regexp.MustCompile(`/api/v3/projects/[^/]+/repository/archive.tar.gz\z`), repoPreAuthorizeHandler(handleGetArchive)},
-	httpRoute{"GET", regexp.MustCompile(`/api/v3/projects/[^/]+/repository/archive.tar.bz2\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(gitProjectPattern + `info/refs\z`), repoPreAuthorizeHandler(handleGetInfoRefs)},
+	httpRoute{"POST", regexp.MustCompile(gitProjectPattern + `git-upload-pack\z`), repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
+	httpRoute{"POST", regexp.MustCompile(gitProjectPattern + `git-receive-pack\z`), repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
+	httpRoute{"PUT", regexp.MustCompile(gitProjectPattern + `gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfsAuthorizeHandler(handleStoreLfsObject)},
 
-	// Git LFS
-	httpRoute{"PUT", regexp.MustCompile(`/[^/]+/[^/]+\.git/gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfsAuthorizeHandler(handleStoreLfsObject)},
+	// Repository Archive
+	httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.zip\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar.gz\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar.bz2\z`), repoPreAuthorizeHandler(handleGetArchive)},
 
-	// CI artifacts
-	httpRoute{"POST", regexp.MustCompile(`^/ci/api/v1/builds/[0-9]+/artifacts\z`), artifactsAuthorizeHandler(contentEncodingHandler(handleFileUploads))},
+	// Repository Archive API
+	httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.zip\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.gz\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.bz2\z`), repoPreAuthorizeHandler(handleGetArchive)},
 
-	// Explicitly proxy API
-	httpRoute{"", regexp.MustCompile(`^/api/`), proxyRequest},
-	httpRoute{"", regexp.MustCompile(`^/ci/api/`), proxyRequest},
+	// CI Artifacts API
+	httpRoute{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), artifactsAuthorizeHandler(contentEncodingHandler(handleFileUploads))},
 
-	// Serve static files and forward otherwise
+	// Explicitly proxy API requests
+	httpRoute{"", regexp.MustCompile(apiPattern), proxyRequest},
+	httpRoute{"", regexp.MustCompile(ciAPIPattern), proxyRequest},
+
+	// Serve static files or forward the requests
 	httpRoute{"", nil, handleServeFile(documentRoot,
 		handleDeployPage(documentRoot,
 			handleRailsError(documentRoot,
@@ -125,6 +136,7 @@ func main() {
 			Dial: func(_, _ string) (net.Conn, error) {
 				return dialer.Dial("unix", *authSocket)
 			},
+			ResponseHeaderTimeout: *responseHeadersTimeout,
 		}
 	}
 	proxyTransport := &proxyRoundTripper{transport: authTransport}
@@ -140,12 +152,11 @@ func main() {
 	}
 
 	upstream := newUpstream(*authBackend, proxyTransport)
-	upstream.SetRelativeUrlRoot(*relativeUrlRoot)
-	upstream.SetProxyTimeout(*proxyTimeout)
+	upstream.SetRelativeURLRoot(*relativeURLRoot)
 
 	// Because net/http/pprof installs itself in the DefaultServeMux
 	// we create a fresh one for the Git server.
 	serveMux := http.NewServeMux()
-	serveMux.Handle(upstream.relativeUrlRoot, upstream)
+	serveMux.Handle(upstream.relativeURLRoot, upstream)
 	log.Fatal(http.Serve(listener, serveMux))
 }

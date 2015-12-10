@@ -12,7 +12,6 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"strings"
-	"time"
 )
 
 type serviceHandleFunc func(w http.ResponseWriter, r *gitRequest)
@@ -21,7 +20,7 @@ type upstream struct {
 	httpClient      *http.Client
 	httpProxy       *httputil.ReverseProxy
 	authBackend     string
-	relativeUrlRoot string
+	relativeURLRoot string
 }
 
 type authorizationResponse struct {
@@ -60,7 +59,7 @@ type gitRequest struct {
 	u *upstream
 
 	// This field contains the URL.Path stripped from RelativeUrlRoot
-	relativeUriPath string
+	relativeURIPath string
 }
 
 func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream {
@@ -73,22 +72,18 @@ func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream 
 		authBackend:     authBackend,
 		httpClient:      &http.Client{Transport: authTransport},
 		httpProxy:       httputil.NewSingleHostReverseProxy(u),
-		relativeUrlRoot: "/",
+		relativeURLRoot: "/",
 	}
 	up.httpProxy.Transport = authTransport
 	return up
 }
 
-func (u *upstream) SetRelativeUrlRoot(relativeUrlRoot string) {
-	u.relativeUrlRoot = relativeUrlRoot
+func (u *upstream) SetRelativeURLRoot(relativeURLRoot string) {
+	u.relativeURLRoot = relativeURLRoot
 
-	if !strings.HasSuffix(u.relativeUrlRoot, "/") {
-		u.relativeUrlRoot += "/"
+	if !strings.HasSuffix(u.relativeURLRoot, "/") {
+		u.relativeURLRoot += "/"
 	}
-}
-
-func (u *upstream) SetProxyTimeout(timeout time.Duration) {
-	u.httpClient.Timeout = timeout
 }
 
 func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
@@ -100,7 +95,7 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	// Strip prefix and add "/"
 	// To match against non-relative URL
 	// Making it simpler for our matcher
-	relativeUriPath := "/" + strings.TrimPrefix(r.URL.Path, u.relativeUrlRoot)
+	relativeURIPath := "/" + strings.TrimPrefix(r.URL.Path, u.relativeURLRoot)
 
 	// Look for a matching Git service
 	foundService := false
@@ -109,7 +104,7 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		if g.regex == nil || g.regex.MatchString(relativeUriPath) {
+		if g.regex == nil || g.regex.MatchString(relativeURIPath) {
 			foundService = true
 			break
 		}
@@ -123,7 +118,7 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 
 	request := gitRequest{
 		Request:         r,
-		relativeUriPath: relativeUriPath,
+		relativeURIPath: relativeURIPath,
 		u:               u,
 	}
 

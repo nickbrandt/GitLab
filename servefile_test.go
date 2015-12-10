@@ -12,14 +12,12 @@ import (
 func TestServingNonExistingFile(t *testing.T) {
 	dir := "/path/to/non/existing/directory"
 	request := &gitRequest{
-		relativeUriPath: "/static/file",
+		relativeURIPath: "/static/file",
 	}
 
 	w := httptest.NewRecorder()
 	handleServeFile(&dir, nil)(w, request)
-	if w.Code != 404 {
-		t.Fatal("Expected to receive 404, since no default handler is provided")
-	}
+	assertResponseCode(t, w, 404)
 }
 
 func TestServingDirectory(t *testing.T) {
@@ -30,33 +28,29 @@ func TestServingDirectory(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	request := &gitRequest{
-		relativeUriPath: "/",
+		relativeURIPath: "/",
 	}
 
 	w := httptest.NewRecorder()
 	handleServeFile(&dir, nil)(w, request)
-	if w.Code != 404 {
-		t.Fatal("Expected to receive 404, since we will serve the directory")
-	}
+	assertResponseCode(t, w, 404)
 }
 
 func TestServingMalformedUri(t *testing.T) {
 	dir := "/path/to/non/existing/directory"
 	request := &gitRequest{
-		relativeUriPath: "/../../../static/file",
+		relativeURIPath: "/../../../static/file",
 	}
 
 	w := httptest.NewRecorder()
 	handleServeFile(&dir, nil)(w, request)
-	if w.Code != 500 {
-		t.Fatal("Expected to receive 500, since client provided invalid URI")
-	}
+	assertResponseCode(t, w, 500)
 }
 
 func TestExecutingHandlerWhenNoFileFound(t *testing.T) {
 	dir := "/path/to/non/existing/directory"
 	request := &gitRequest{
-		relativeUriPath: "/static/file",
+		relativeURIPath: "/static/file",
 	}
 
 	executed := false
@@ -78,17 +72,15 @@ func TestServingTheActualFile(t *testing.T) {
 	httpRequest, _ := http.NewRequest("GET", "/file", nil)
 	request := &gitRequest{
 		Request:         httpRequest,
-		relativeUriPath: "/file",
+		relativeURIPath: "/file",
 	}
 
-	fileContent := "DEPLOY"
+	fileContent := "STATIC"
 	ioutil.WriteFile(filepath.Join(dir, "file"), []byte(fileContent), 0600)
 
 	w := httptest.NewRecorder()
 	handleServeFile(&dir, nil)(w, request)
-	if w.Code != 200 {
-		t.Fatal("Expected to receive 200, since we serve existing file")
-	}
+	assertResponseCode(t, w, 200)
 	if w.Body.String() != fileContent {
 		t.Error("We should serve the file: ", w.Body.String())
 	}

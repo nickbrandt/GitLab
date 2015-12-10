@@ -10,3 +10,9 @@ func assertResponseCode(t *testing.T, response *httptest.ResponseRecorder, expec
 		t.Fatalf("for HTTP request expected to get %d, got %d instead", expectedCode, response.Code)
 	}
 }
+
+func assertResponseBody(t *testing.T, response *httptest.ResponseRecorder, expectedBody string) {
+	if response.Body.String() != expectedBody {
+		t.Fatalf("for HTTP request expected to receive %q, got %q instead as body", expectedBody, response.Body.String())
+	}
+}

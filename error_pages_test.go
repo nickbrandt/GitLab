@@ -28,12 +28,8 @@ func TestIfErrorPageIsPresented(t *testing.T) {
 	})(w, nil)
 	w.Flush()
 
-	if w.Code != 404 {
-		t.Error("Page should be 404")
-	}
-	if w.Body.String() != errorPage {
-		t.Error("Page should be custom error page: ", w.Body.String())
-	}
+	assertResponseCode(t, w, 404)
+	assertResponseBody(t, w, errorPage)
 }
 
 func TestIfErrorPassedIfNoErrorPageIsFound(t *testing.T) {
@@ -52,10 +48,6 @@ func TestIfErrorPassedIfNoErrorPageIsFound(t *testing.T) {
 	})(w, nil)
 	w.Flush()
 
-	if w.Code != 404 {
-		t.Error("Page should be 400")
-	}
-	if w.Body.String() != errorResponse {
-		t.Error("Page should be response error: ", w.Body.String())
-	}
+	assertResponseCode(t, w, 404)
+	assertResponseBody(t, w, errorResponse)
 }

@@ -16,8 +16,8 @@ func (p *proxyRoundTripper) RoundTrip(r *http.Request) (res *http.Response, err 
 	// Map error to 502 response
 	if err != nil {
 		res = &http.Response{
-			StatusCode: 502,
-			Status:     err.Error(),
+			StatusCode: http.StatusBadGateway,
+			Status:     http.StatusText(http.StatusBadGateway),
 
 			Request:    r,
 			ProtoMajor: r.ProtoMajor,
@@ -25,8 +25,9 @@ func (p *proxyRoundTripper) RoundTrip(r *http.Request) (res *http.Response, err 
 			Proto:      r.Proto,
 			Header:     make(http.Header),
 			Trailer:    make(http.Header),
-			Body:       ioutil.NopCloser(&bytes.Buffer{}),
+			Body:       ioutil.NopCloser(bytes.NewBufferString(err.Error())),
 		}
+		res.Header.Set("Content-Type", "text/plain")
 		err = nil
 	}
 	return

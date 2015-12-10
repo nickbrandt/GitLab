@@ -10,7 +10,7 @@ import (
 
 func handleServeFile(documentRoot *string, notFoundHandler serviceHandleFunc) serviceHandleFunc {
 	return func(w http.ResponseWriter, r *gitRequest) {
-		file := filepath.Join(*documentRoot, r.relativeUriPath)
+		file := filepath.Join(*documentRoot, r.relativeURIPath)
 
 		// The filepath.Join does Clean traversing directories up
 		if !strings.HasPrefix(file, *documentRoot) {
