@@ -12,42 +12,44 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"strings"
+	"time"
 )
 
 type serviceHandleFunc func(w http.ResponseWriter, r *gitRequest)
 
 type upstream struct {
-	httpClient  *http.Client
-	authBackend string
-	httpProxy   *httputil.ReverseProxy
+	httpClient      *http.Client
+	httpProxy       *httputil.ReverseProxy
+	authBackend     string
+	relativeUrlRoot string
 }
 
 type authorizationResponse struct {
 	// GL_ID is an environment variable used by gitlab-shell hooks during 'git
 	// push' and 'git pull'
-	GL_ID string
+	GL_ID         string
 	// RepoPath is the full path on disk to the Git repository the request is
 	// about
-	RepoPath string
+	RepoPath      string
 	// ArchivePath is the full path where we should find/create a cached copy
 	// of a requested archive
-	ArchivePath string
+	ArchivePath   string
 	// ArchivePrefix is used to put extracted archive contents in a
 	// subdirectory
 	ArchivePrefix string
 	// CommitId is used do prevent race conditions between the 'time of check'
 	// in the GitLab Rails app and the 'time of use' in gitlab-workhorse.
-	CommitId string
+	CommitId      string
 	// StoreLFSPath is provided by the GitLab Rails application
 	// to mark where the tmp file should be placed
-	StoreLFSPath string
+	StoreLFSPath  string
 	// LFS object id
-	LfsOid string
+	LfsOid        string
 	// LFS object size
-	LfsSize int64
+	LfsSize       int64
 	// TmpPath is the path where we should store temporary files
 	// This is set by authorization middleware
-	TempPath string
+	TempPath      string
 }
 
 // A gitRequest is an *http.Request decorated with attributes returned by the
@@ -55,7 +57,7 @@ type authorizationResponse struct {
 type gitRequest struct {
 	*http.Request
 	authorizationResponse
-	u *upstream
+	u               *upstream
 
 	// This field contains the URL.Path stripped from RelativeUrlRoot
 	relativeUriPath string
@@ -71,9 +73,22 @@ func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream 
 		authBackend: authBackend,
 		httpClient:  &http.Client{Transport: authTransport},
 		httpProxy:   httputil.NewSingleHostReverseProxy(u),
+		relativeUrlRoot: "/",
 	}
 	up.httpProxy.Transport = authTransport
 	return up
+}
+
+func (u *upstream) SetRelativeUrlRoot(relativeUrlRoot string) {
+	u.relativeUrlRoot = relativeUrlRoot
+
+	if !strings.HasSuffix(u.relativeUrlRoot, "/") {
+		u.relativeUrlRoot += "/"
+	}
+}
+
+func (u *upstream) SetProxyTimeout(timeout time.Duration) {
+	u.httpClient.Timeout = timeout
 }
 
 func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
@@ -85,7 +100,7 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	// Strip prefix and add "/"
 	// To match against non-relative URL
 	// Making it simpler for our matcher
-	relativeUriPath := "/" + strings.TrimPrefix(r.URL.Path, *relativeUrlRoot)
+	relativeUriPath := "/" + strings.TrimPrefix(r.URL.Path, u.relativeUrlRoot)
 
 	// Look for a matching Git service
 	foundService := false

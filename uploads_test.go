@@ -41,7 +41,7 @@ func TestUploadHandlerForwardingRawData(t *testing.T) {
 		fmt.Fprint(w, "RESPONSE")
 	})
 
-	httpRequest, err := http.NewRequest("PATCH", ts.URL+"/url/path", bytes.NewBufferString("REQUEST"))
+	httpRequest, err := http.NewRequest("PATCH", ts.URL + "/url/path", bytes.NewBufferString("REQUEST"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -123,7 +123,7 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	fmt.Fprint(file, "test")
 	writer.Close()
 
-	httpRequest, err := http.NewRequest("PUT", ts.URL+"/url/path", nil)
+	httpRequest, err := http.NewRequest("PUT", ts.URL + "/url/path", nil)
 	if err != nil {
 		t.Fatal(err)
 	}

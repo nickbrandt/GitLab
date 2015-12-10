@@ -9,10 +9,10 @@ import (
 )
 
 type errorPageResponseWriter struct {
-	rw         http.ResponseWriter
-	status     int
-	hijacked   bool
-	errorPages *string
+	rw       http.ResponseWriter
+	status   int
+	hijacked bool
+	path     *string
 }
 
 func (s *errorPageResponseWriter) Header() http.Header {
@@ -37,7 +37,7 @@ func (s *errorPageResponseWriter) WriteHeader(status int) {
 	s.status = status
 
 	if 400 <= s.status && s.status <= 599 {
-		errorPageFile := filepath.Join(*errorPages, fmt.Sprintf("%d.html", s.status))
+		errorPageFile := filepath.Join(*s.path, fmt.Sprintf("%d.html", s.status))
 
 		// check if custom error page exists, serve this page instead
 		if data, err := ioutil.ReadFile(errorPageFile); err == nil {
@@ -59,11 +59,11 @@ func (s *errorPageResponseWriter) Flush() {
 	s.WriteHeader(http.StatusOK)
 }
 
-func handleRailsError(errorPages *string, handler serviceHandleFunc) serviceHandleFunc {
+func handleRailsError(documentRoot *string, handler serviceHandleFunc) serviceHandleFunc {
 	return func(w http.ResponseWriter, r *gitRequest) {
 		rw := errorPageResponseWriter{
-			rw:         w,
-			errorPages: errorPages,
+			rw:   w,
+			path: documentRoot,
 		}
 		defer rw.Flush()
 		handler(&rw, r)

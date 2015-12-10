@@ -22,7 +22,6 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"regexp"
-	"strings"
 	"syscall"
 	"time"
 )
@@ -38,8 +37,7 @@ var authSocket = flag.String("authSocket", "", "Optional: Unix domain socket to 
 var pprofListenAddr = flag.String("pprofListenAddr", "", "pprof listening address, e.g. 'localhost:6060'")
 var relativeUrlRoot = flag.String("relativeUrlRoot", "/", "GitLab relative URL root")
 var documentRoot = flag.String("documentRoot", "public", "Path to static files content")
-var deployPage = flag.String("deployPage", "public/index.html", "Path to file that will always be served if present")
-var errorPages = flag.String("errorPages", "public/index.html", "The folder containing custom error pages, ie.: 500.html")
+var proxyTimeout = flag.Duration("proxyTimeout", 5 * time.Minute, "Proxy request timeout")
 
 type httpRoute struct {
 	method     string
@@ -51,17 +49,23 @@ type httpRoute struct {
 // We match against URI not containing the relativeUrlRoot:
 // see upstream.ServeHTTP
 var httpRoutes = [...]httpRoute{
-	httpRoute{"GET", regexp.MustCompile(`/info/refs\z`), repoPreAuthorizeHandler(handleGetInfoRefs)},
-	httpRoute{"POST", regexp.MustCompile(`/git-upload-pack\z`), repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
-	httpRoute{"POST", regexp.MustCompile(`/git-receive-pack\z`), repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
-	httpRoute{"GET", regexp.MustCompile(`/repository/archive\z`), repoPreAuthorizeHandler(handleGetArchive)},
-	httpRoute{"GET", regexp.MustCompile(`/repository/archive.zip\z`), repoPreAuthorizeHandler(handleGetArchive)},
-	httpRoute{"GET", regexp.MustCompile(`/repository/archive.tar\z`), repoPreAuthorizeHandler(handleGetArchive)},
-	httpRoute{"GET", regexp.MustCompile(`/repository/archive.tar.gz\z`), repoPreAuthorizeHandler(handleGetArchive)},
-	httpRoute{"GET", regexp.MustCompile(`/repository/archive.tar.bz2\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	// Git Clone
+	httpRoute{"GET", regexp.MustCompile(`^/[^/]+/[^/]+\.git/info/refs\z`), repoPreAuthorizeHandler(handleGetInfoRefs)},
+	httpRoute{"POST", regexp.MustCompile(`/[^/]+/[^/]+\.git/git-upload-pack\z`), repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
+	httpRoute{"POST", regexp.MustCompile(`/[^/]+/[^/]+\.git/git-receive-pack\z`), repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
+	httpRoute{"GET", regexp.MustCompile(`/[^/]+/[^/]+/repository/archive\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(`/[^/]+/[^/]+/repository/archive.zip\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(`/[^/]+/[^/]+/repository/archive.tar\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(`/[^/]+/[^/]+/repository/archive.tar.gz\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(`/[^/]+/[^/]+/repository/archive.tar.bz2\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(`/api/v3/projects/[^/]+/repository/archive\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(`/api/v3/projects/[^/]+/repository/archive.zip\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(`/api/v3/projects/[^/]+/repository/archive.tar\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(`/api/v3/projects/[^/]+/repository/archive.tar.gz\z`), repoPreAuthorizeHandler(handleGetArchive)},
+	httpRoute{"GET", regexp.MustCompile(`/api/v3/projects/[^/]+/repository/archive.tar.bz2\z`), repoPreAuthorizeHandler(handleGetArchive)},
 
 	// Git LFS
-	httpRoute{"PUT", regexp.MustCompile(`/gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfsAuthorizeHandler(handleStoreLfsObject)},
+	httpRoute{"PUT", regexp.MustCompile(`/[^/]+/[^/]+\.git/gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfsAuthorizeHandler(handleStoreLfsObject)},
 
 	// CI artifacts
 	httpRoute{"POST", regexp.MustCompile(`^/ci/api/v1/builds/[0-9]+/artifacts\z`), artifactsAuthorizeHandler(contentEncodingHandler(handleFileUploads))},
@@ -72,8 +76,8 @@ var httpRoutes = [...]httpRoute{
 
 	// Serve static files and forward otherwise
 	httpRoute{"", nil, handleServeFile(documentRoot,
-		handleDeployPage(deployPage,
-			handleRailsError(errorPages,
+		handleDeployPage(documentRoot,
+			handleRailsError(documentRoot,
 				proxyRequest,
 			)))},
 }
@@ -90,10 +94,6 @@ func main() {
 	if *printVersion {
 		fmt.Println(version)
 		os.Exit(0)
-	}
-
-	if !strings.HasSuffix(*relativeUrlRoot, "/") {
-		*relativeUrlRoot += "/"
 	}
 
 	log.Printf("Starting %s", version)
@@ -137,9 +137,13 @@ func main() {
 		}()
 	}
 
+	upstream := newUpstream(*authBackend, authTransport)
+	upstream.SetRelativeUrlRoot(*relativeUrlRoot)
+	upstream.SetProxyTimeout(*proxyTimeout)
+
 	// Because net/http/pprof installs itself in the DefaultServeMux
 	// we create a fresh one for the Git server.
 	serveMux := http.NewServeMux()
-	serveMux.Handle(*relativeUrlRoot, newUpstream(*authBackend, authTransport))
+	serveMux.Handle(upstream.relativeUrlRoot, upstream)
 	log.Fatal(http.Serve(listener, serveMux))
 }

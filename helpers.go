@@ -14,11 +14,6 @@ import (
 	"syscall"
 )
 
-func fail400(w http.ResponseWriter, err error) {
-	http.Error(w, "Bad request", 400)
-	logError(err)
-}
-
 func fail500(w http.ResponseWriter, err error) {
 	http.Error(w, "Internal server error", 500)
 	logError(err)

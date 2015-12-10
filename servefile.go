@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -15,7 +14,11 @@ func handleServeFile(documentRoot *string, notFoundHandler serviceHandleFunc) se
 
 		// The filepath.Join does Clean traversing directories up
 		if !strings.HasPrefix(file, *documentRoot) {
-			fail500(w, fmt.Errorf("invalid path: "+file, os.ErrInvalid))
+			fail500(w, &os.PathError{
+				Op: "open",
+				Path: file,
+				Err: os.ErrInvalid,
+			})
 			return
 		}
 
