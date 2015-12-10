@@ -7,10 +7,8 @@ via the X-Sendfile mechanism. All that is needed in the Rails code is the
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
-	"os"
 )
 
 type sendFileResponseWriter struct {
@@ -65,18 +63,12 @@ func (s *sendFileResponseWriter) WriteHeader(status int) {
 
 	// Serve the file
 	log.Printf("SendFile: serving %q", file)
-	content, err := os.Open(file)
+	content, fi, err := openFile(file)
 	if err != nil {
 		http.NotFound(s.rw, s.req)
 		return
 	}
 	defer content.Close()
-
-	fi, err := content.Stat()
-	if err != nil || fi.IsDir() {
-		fail500(s.rw, fmt.Errorf("handleSendfile: get mtime: %v", err))
-		return
-	}
 
 	http.ServeContent(s.rw, s.req, "", fi.ModTime(), content)
 }

@@ -19,7 +19,7 @@ func handleServeFile(documentRoot *string, notFoundHandler serviceHandleFunc) se
 			return
 		}
 
-		content, err := os.Open(file)
+		content, fi, err := openFile(file)
 		if err != nil {
 			if notFoundHandler != nil {
 				notFoundHandler(w, r)
@@ -29,21 +29,6 @@ func handleServeFile(documentRoot *string, notFoundHandler serviceHandleFunc) se
 			return
 		}
 		defer content.Close()
-
-		fi, err := content.Stat()
-		if err != nil {
-			fail500(w, fmt.Errorf("handleServeFileHandler", err))
-			return
-		}
-
-		if fi.IsDir() {
-			if notFoundHandler != nil {
-				notFoundHandler(w, r)
-			} else {
-				http.NotFound(w, r.Request)
-			}
-			return
-		}
 
 		log.Printf("StaticFile: serving %q", file)
 		http.ServeContent(w, r.Request, filepath.Base(file), fi.ModTime(), content)
