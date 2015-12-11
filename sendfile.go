@@ -62,7 +62,7 @@ func (s *sendFileResponseWriter) WriteHeader(status int) {
 	s.hijacked = true
 
 	// Serve the file
-	log.Printf("SendFile: serving %q", file)
+	log.Printf("Send file %q for %s %q", file, s.req.Method, s.req.RequestURI)
 	content, fi, err := openFile(file)
 	if err != nil {
 		http.NotFound(s.rw, s.req)
