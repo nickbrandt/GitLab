@@ -13,7 +13,12 @@ type proxyRoundTripper struct {
 func (p *proxyRoundTripper) RoundTrip(r *http.Request) (res *http.Response, err error) {
 	res, err = p.transport.RoundTrip(r)
 
-	// Map error to 502 response
+	// httputil.ReverseProxy translates all errors from this
+	// RoundTrip function into 500 errors. But the most likely error
+	// is that the Rails app is not responding, in which case users
+	// and administrators expect to see a 502 error. To show 502s
+	// instead of 500s we catch the RoundTrip error here and inject a
+	// 502 response.
 	if err != nil {
 		res = &http.Response{
 			StatusCode: http.StatusBadGateway,
