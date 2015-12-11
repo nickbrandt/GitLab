@@ -39,6 +39,7 @@ var pprofListenAddr = flag.String("pprofListenAddr", "", "pprof listening addres
 var relativeURLRoot = flag.String("relativeURLRoot", "/", "GitLab relative URL root")
 var documentRoot = flag.String("documentRoot", "public", "Path to static files content")
 var responseHeadersTimeout = flag.Duration("proxyHeadersTimeout", time.Minute, "How long to wait for response headers when proxying the request")
+var developmentMode = flag.Bool("developmentMode", false, "Allow to serve assets from Rails app")
 
 type httpRoute struct {
 	method     string
@@ -84,6 +85,19 @@ var httpRoutes = [...]httpRoute{
 	// Explicitly proxy API requests
 	httpRoute{"", regexp.MustCompile(apiPattern), proxyRequest},
 	httpRoute{"", regexp.MustCompile(ciAPIPattern), proxyRequest},
+
+	// Serve assets
+	httpRoute{"", regexp.MustCompile(`^/assets/`),
+		handleServeFile(documentRoot, CacheExpireMax,
+			handleDevelopmentMode(developmentMode,
+				handleDeployPage(documentRoot,
+					handleRailsError(documentRoot,
+						proxyRequest,
+					),
+				),
+			),
+		),
+	},
 
 	// Serve static files or forward the requests
 	httpRoute{"", nil,

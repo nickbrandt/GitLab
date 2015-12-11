@@ -16,3 +16,9 @@ func assertResponseBody(t *testing.T, response *httptest.ResponseRecorder, expec
 		t.Fatalf("for HTTP request expected to receive %q, got %q instead as body", expectedBody, response.Body.String())
 	}
 }
+
+func assertResponseHeader(t *testing.T, response *httptest.ResponseRecorder, header string, expectedValue string) {
+	if response.Header().Get(header) != expectedValue {
+		t.Fatalf("for HTTP request expected to receive the header %q with %q, got %q", header, expectedValue, response.Header().Get(header))
+	}
+}
