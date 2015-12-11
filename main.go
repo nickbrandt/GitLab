@@ -86,11 +86,15 @@ var httpRoutes = [...]httpRoute{
 	httpRoute{"", regexp.MustCompile(ciAPIPattern), proxyRequest},
 
 	// Serve static files or forward the requests
-	httpRoute{"", nil, handleServeFile(documentRoot,
-		handleDeployPage(documentRoot,
-			handleRailsError(documentRoot,
-				proxyRequest,
-			)))},
+	httpRoute{"", nil,
+		handleServeFile(documentRoot, CacheDisabled,
+			handleDeployPage(documentRoot,
+				handleRailsError(documentRoot,
+					proxyRequest,
+				),
+			),
+		),
+	},
 }
 
 func main() {
