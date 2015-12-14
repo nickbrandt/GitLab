@@ -26,8 +26,10 @@ func logError(err error) {
 
 func httpError(w http.ResponseWriter, r *http.Request, error string, code int) {
 	if r.ProtoAtLeast(1, 1) {
+		// Force client to disconnect if we render request error
 		w.Header().Set("Connection", "close")
 	}
+
 	http.Error(w, error, code)
 }
 
