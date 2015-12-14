@@ -171,10 +171,5 @@ func main() {
 
 	upstream := newUpstream(*authBackend, proxyTransport)
 	upstream.SetRelativeURLRoot(*relativeURLRoot)
-
-	// Because net/http/pprof installs itself in the DefaultServeMux
-	// we create a fresh one for the Git server.
-	serveMux := http.NewServeMux()
-	serveMux.Handle(upstream.relativeURLRoot, upstream)
-	log.Fatal(http.Serve(listener, serveMux))
+	log.Fatal(http.Serve(listener, upstream))
 }

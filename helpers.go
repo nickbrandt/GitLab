@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"syscall"
+	"path"
 )
 
 func fail500(w http.ResponseWriter, err error) {
@@ -21,6 +22,13 @@ func fail500(w http.ResponseWriter, err error) {
 
 func logError(err error) {
 	log.Printf("error: %v", err)
+}
+
+func httpError(w http.ResponseWriter, r *http.Request, error string, code int) {
+	if r.ProtoAtLeast(1, 1) {
+		w.Header().Set("Connection", "close")
+	}
+	http.Error(w, error, code)
 }
 
 // Git subprocess helpers
@@ -89,4 +97,22 @@ func openFile(path string) (file *os.File, fi os.FileInfo, err error) {
 	}
 
 	return
+}
+
+// Borrowed from: net/http/server.go
+// Return the canonical path for p, eliminating . and .. elements.
+func cleanURIPath(p string) string {
+	if p == "" {
+		return "/"
+	}
+	if p[0] != '/' {
+		p = "/" + p
+	}
+	np := path.Clean(p)
+	// path.Clean removes trailing slash except for root;
+	// put the trailing slash back if necessary.
+	if p[len(p)-1] == '/' && np != "/" {
+		np += "/"
+	}
+	return np
 }

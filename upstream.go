@@ -12,6 +12,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"strings"
+	"fmt"
 )
 
 type serviceHandleFunc func(w http.ResponseWriter, r *gitRequest)
@@ -26,29 +27,29 @@ type upstream struct {
 type authorizationResponse struct {
 	// GL_ID is an environment variable used by gitlab-shell hooks during 'git
 	// push' and 'git pull'
-	GL_ID string
+	GL_ID         string
 	// RepoPath is the full path on disk to the Git repository the request is
 	// about
-	RepoPath string
+	RepoPath      string
 	// ArchivePath is the full path where we should find/create a cached copy
 	// of a requested archive
-	ArchivePath string
+	ArchivePath   string
 	// ArchivePrefix is used to put extracted archive contents in a
 	// subdirectory
 	ArchivePrefix string
 	// CommitId is used do prevent race conditions between the 'time of check'
 	// in the GitLab Rails app and the 'time of use' in gitlab-workhorse.
-	CommitId string
+	CommitId      string
 	// StoreLFSPath is provided by the GitLab Rails application
 	// to mark where the tmp file should be placed
-	StoreLFSPath string
+	StoreLFSPath  string
 	// LFS object id
-	LfsOid string
+	LfsOid        string
 	// LFS object size
-	LfsSize int64
+	LfsSize       int64
 	// TmpPath is the path where we should store temporary files
 	// This is set by authorization middleware
-	TempPath string
+	TempPath      string
 }
 
 // A gitRequest is an *http.Request decorated with attributes returned by the
@@ -56,7 +57,7 @@ type authorizationResponse struct {
 type gitRequest struct {
 	*http.Request
 	authorizationResponse
-	u *upstream
+	u               *upstream
 
 	// This field contains the URL.Path stripped from RelativeUrlRoot
 	relativeURIPath string
@@ -92,10 +93,29 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	w := newLoggingResponseWriter(ow)
 	defer w.Log(r)
 
+	// Drop WebSocket connection and CONNECT method
+	if r.RequestURI == "*" {
+		httpError(&w, r, "Connection upgrade not allowed", http.StatusBadRequest)
+		return
+	}
+
+	// Disallow connect
+	if r.Method == "CONNECT" {
+		httpError(&w, r, "CONNECT not allowed", http.StatusBadRequest)
+		return
+	}
+
+	// Check URL Root
+	URIPath := cleanURIPath(r.URL.Path)
+	if !strings.HasPrefix(URIPath, u.relativeURLRoot) {
+		httpError(&w, r, fmt.Sprintf("Not found %q", URIPath), http.StatusNotFound)
+		return
+	}
+
 	// Strip prefix and add "/"
 	// To match against non-relative URL
 	// Making it simpler for our matcher
-	relativeURIPath := "/" + strings.TrimPrefix(r.URL.Path, u.relativeURLRoot)
+	relativeURIPath := cleanURIPath(strings.TrimPrefix(URIPath, u.relativeURLRoot))
 
 	// Look for a matching Git service
 	foundService := false
@@ -112,7 +132,7 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	if !foundService {
 		// The protocol spec in git/Documentation/technical/http-protocol.txt
 		// says we must return 403 if no matching service is found.
-		http.Error(&w, "Forbidden", 403)
+		httpError(&w, r, "Forbidden", http.StatusForbidden)
 		return
 	}
 
