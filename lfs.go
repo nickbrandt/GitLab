@@ -5,6 +5,7 @@ In this file we handle git lfs objects downloads and uploads
 package main
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
@@ -67,20 +68,12 @@ func handleStoreLfsObject(w http.ResponseWriter, r *gitRequest) {
 		fail500(w, fmt.Errorf("handleStoreLfsObject: expected sha256 %s, got %s", r.LfsOid, shaStr))
 		return
 	}
+
+	// Inject header and body
 	r.Header.Set("X-GitLab-Lfs-Tmp", filepath.Base(file.Name()))
+	r.Body = ioutil.NopCloser(&bytes.Buffer{})
+	r.ContentLength = 0
 
-	storeReq, err := r.u.newUpstreamRequest(r.Request, nil, "")
-	if err != nil {
-		fail500(w, fmt.Errorf("handleStoreLfsObject: newUpstreamRequest: %v", err))
-		return
-	}
-
-	storeResponse, err := r.u.httpClient.Do(storeReq)
-	if err != nil {
-		fail500(w, fmt.Errorf("handleStoreLfsObject: do %v: %v", storeReq.URL.Path, err))
-		return
-	}
-	defer storeResponse.Body.Close()
-
-	forwardResponseToClient(w, storeResponse)
+	// And proxy the request
+	proxyRequest(w, r)
 }

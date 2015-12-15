@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"regexp"
 	"testing"
+	"time"
 )
 
 func TestProxyRequest(t *testing.T) {
@@ -42,15 +44,94 @@ func TestProxyRequest(t *testing.T) {
 		u:       newUpstream(ts.URL, nil),
 	}
 
-	response := httptest.NewRecorder()
-	proxyRequest(response, &request)
-	assertResponseCode(t, response, 202)
+	w := httptest.NewRecorder()
+	proxyRequest(w, &request)
+	assertResponseCode(t, w, 202)
+	assertResponseBody(t, w, "RESPONSE")
 
-	if response.Body.String() != "RESPONSE" {
-		t.Fatal("Expected RESPONSE in response body:", response.Body.String())
-	}
-
-	if response.Header().Get("Custom-Response-Header") != "test" {
+	if w.Header().Get("Custom-Response-Header") != "test" {
 		t.Fatal("Expected custom response header")
 	}
+}
+
+func TestProxyError(t *testing.T) {
+	httpRequest, err := http.NewRequest("POST", "/url/path", bytes.NewBufferString("REQUEST"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	httpRequest.Header.Set("Custom-Header", "test")
+
+	transport := proxyRoundTripper{
+		transport: http.DefaultTransport,
+	}
+
+	request := gitRequest{
+		Request: httpRequest,
+		u:       newUpstream("http://localhost:655575/", &transport),
+	}
+
+	w := httptest.NewRecorder()
+	proxyRequest(w, &request)
+	assertResponseCode(t, w, 502)
+	assertResponseBody(t, w, "dial tcp: invalid port 655575")
+}
+
+func TestProxyReadTimeout(t *testing.T) {
+	ts := testServerWithHandler(nil, func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(time.Minute)
+	})
+
+	httpRequest, err := http.NewRequest("POST", "http://localhost/url/path", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	transport := &proxyRoundTripper{
+		transport: &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
+			Dial: (&net.Dialer{
+				Timeout:   30 * time.Second,
+				KeepAlive: 30 * time.Second,
+			}).Dial,
+			TLSHandshakeTimeout:   10 * time.Second,
+			ResponseHeaderTimeout: time.Millisecond,
+		},
+	}
+
+	request := gitRequest{
+		Request: httpRequest,
+		u:       newUpstream(ts.URL, transport),
+	}
+
+	w := httptest.NewRecorder()
+	proxyRequest(w, &request)
+	assertResponseCode(t, w, 502)
+	assertResponseBody(t, w, "net/http: timeout awaiting response headers")
+}
+
+func TestProxyHandlerTimeout(t *testing.T) {
+	ts := testServerWithHandler(nil,
+		http.TimeoutHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			time.Sleep(time.Second)
+		}), time.Millisecond, "Request took too long").ServeHTTP,
+	)
+
+	httpRequest, err := http.NewRequest("POST", "http://localhost/url/path", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	transport := &proxyRoundTripper{
+		transport: http.DefaultTransport,
+	}
+
+	request := gitRequest{
+		Request: httpRequest,
+		u:       newUpstream(ts.URL, transport),
+	}
+
+	w := httptest.NewRecorder()
+	proxyRequest(w, &request)
+	assertResponseCode(t, w, 503)
+	assertResponseBody(t, w, "Request took too long")
 }

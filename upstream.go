@@ -7,25 +7,21 @@ In this file we handle request routing and interaction with the authBackend.
 package main
 
 import (
-	"io"
+	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"path"
-	"regexp"
+	"net/http/httputil"
+	"net/url"
+	"strings"
 )
 
 type serviceHandleFunc func(w http.ResponseWriter, r *gitRequest)
 
 type upstream struct {
-	httpClient  *http.Client
-	authBackend string
-}
-
-type gitService struct {
-	method     string
-	regex      *regexp.Regexp
-	handleFunc serviceHandleFunc
+	httpClient      *http.Client
+	httpProxy       *httputil.ReverseProxy
+	authBackend     string
+	relativeURLRoot string
 }
 
 type authorizationResponse struct {
@@ -56,50 +52,79 @@ type authorizationResponse struct {
 	TempPath string
 }
 
-// A gitReqest is an *http.Request decorated with attributes returned by the
+// A gitRequest is an *http.Request decorated with attributes returned by the
 // GitLab Rails application.
 type gitRequest struct {
 	*http.Request
 	authorizationResponse
 	u *upstream
-}
 
-// Routing table
-var gitServices = [...]gitService{
-	gitService{"GET", regexp.MustCompile(`/info/refs\z`), repoPreAuthorizeHandler(handleGetInfoRefs)},
-	gitService{"POST", regexp.MustCompile(`/git-upload-pack\z`), repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
-	gitService{"POST", regexp.MustCompile(`/git-receive-pack\z`), repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
-	gitService{"GET", regexp.MustCompile(`/repository/archive\z`), repoPreAuthorizeHandler(handleGetArchive)},
-	gitService{"GET", regexp.MustCompile(`/repository/archive.zip\z`), repoPreAuthorizeHandler(handleGetArchive)},
-	gitService{"GET", regexp.MustCompile(`/repository/archive.tar\z`), repoPreAuthorizeHandler(handleGetArchive)},
-	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.gz\z`), repoPreAuthorizeHandler(handleGetArchive)},
-	gitService{"GET", regexp.MustCompile(`/repository/archive.tar.bz2\z`), repoPreAuthorizeHandler(handleGetArchive)},
-	gitService{"GET", regexp.MustCompile(`/uploads/`), handleSendFile},
-
-	// Git LFS
-	gitService{"PUT", regexp.MustCompile(`/gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfsAuthorizeHandler(handleStoreLfsObject)},
-	gitService{"GET", regexp.MustCompile(`/gitlab-lfs/objects/([0-9a-f]{64})\z`), handleSendFile},
-
-	// CI artifacts
-	gitService{"GET", regexp.MustCompile(`/builds/download\z`), handleSendFile},
-	gitService{"GET", regexp.MustCompile(`/ci/api/v1/builds/[0-9]+/artifacts\z`), handleSendFile},
-	gitService{"POST", regexp.MustCompile(`/ci/api/v1/builds/[0-9]+/artifacts\z`), artifactsAuthorizeHandler(contentEncodingHandler(handleFileUploads))},
-	gitService{"DELETE", regexp.MustCompile(`/ci/api/v1/builds/[0-9]+/artifacts\z`), proxyRequest},
+	// This field contains the URL.Path stripped from RelativeUrlRoot
+	relativeURIPath string
 }
 
 func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream {
-	return &upstream{&http.Client{Transport: authTransport}, authBackend}
+	u, err := url.Parse(authBackend)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	up := &upstream{
+		authBackend:     authBackend,
+		httpClient:      &http.Client{Transport: authTransport},
+		httpProxy:       httputil.NewSingleHostReverseProxy(u),
+		relativeURLRoot: "/",
+	}
+	up.httpProxy.Transport = authTransport
+	return up
 }
 
-func (u *upstream) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var g gitService
+func (u *upstream) SetRelativeURLRoot(relativeURLRoot string) {
+	u.relativeURLRoot = relativeURLRoot
 
-	log.Printf("%s %q", r.Method, r.URL)
+	if !strings.HasSuffix(u.relativeURLRoot, "/") {
+		u.relativeURLRoot += "/"
+	}
+}
+
+func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
+	var g httpRoute
+
+	w := newLoggingResponseWriter(ow)
+	defer w.Log(r)
+
+	// Drop WebSocket connection and CONNECT method
+	if r.RequestURI == "*" {
+		httpError(&w, r, "Connection upgrade not allowed", http.StatusBadRequest)
+		return
+	}
+
+	// Disallow connect
+	if r.Method == "CONNECT" {
+		httpError(&w, r, "CONNECT not allowed", http.StatusBadRequest)
+		return
+	}
+
+	// Check URL Root
+	URIPath := cleanURIPath(r.URL.Path)
+	if !strings.HasPrefix(URIPath, u.relativeURLRoot) {
+		httpError(&w, r, fmt.Sprintf("Not found %q", URIPath), http.StatusNotFound)
+		return
+	}
+
+	// Strip prefix and add "/"
+	// To match against non-relative URL
+	// Making it simpler for our matcher
+	relativeURIPath := cleanURIPath(strings.TrimPrefix(URIPath, u.relativeURLRoot))
 
 	// Look for a matching Git service
 	foundService := false
-	for _, g = range gitServices {
-		if r.Method == g.method && g.regex.MatchString(r.URL.Path) {
+	for _, g = range httpRoutes {
+		if g.method != "" && r.Method != g.method {
+			continue
+		}
+
+		if g.regex == nil || g.regex.MatchString(relativeURIPath) {
 			foundService = true
 			break
 		}
@@ -107,57 +132,15 @@ func (u *upstream) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if !foundService {
 		// The protocol spec in git/Documentation/technical/http-protocol.txt
 		// says we must return 403 if no matching service is found.
-		http.Error(w, "Forbidden", 403)
+		httpError(&w, r, "Forbidden", http.StatusForbidden)
 		return
 	}
 
 	request := gitRequest{
-		Request: r,
-		u:       u,
+		Request:         r,
+		relativeURIPath: relativeURIPath,
+		u:               u,
 	}
 
-	g.handleFunc(w, &request)
-}
-
-func looksLikeRepo(p string) bool {
-	// If /path/to/foo.git/objects exists then let's assume it is a valid Git
-	// repository.
-	if _, err := os.Stat(path.Join(p, "objects")); err != nil {
-		log.Print(err)
-		return false
-	}
-	return true
-}
-
-func (u *upstream) newUpstreamRequest(r *http.Request, body io.Reader, suffix string) (*http.Request, error) {
-	url := u.authBackend + r.URL.RequestURI() + suffix
-	authReq, err := http.NewRequest(r.Method, url, body)
-	if err != nil {
-		return nil, err
-	}
-	// Forward all headers from our client to the auth backend. This includes
-	// HTTP Basic authentication credentials (the 'Authorization' header).
-	for k, v := range r.Header {
-		authReq.Header[k] = v
-	}
-
-	// Clean some headers when issuing a new request without body
-	if body == nil {
-		authReq.Header.Del("Content-Type")
-		authReq.Header.Del("Content-Encoding")
-		authReq.Header.Del("Content-Length")
-		authReq.Header.Del("Content-Disposition")
-		authReq.Header.Del("Accept-Encoding")
-		authReq.Header.Del("Transfer-Encoding")
-	}
-
-	// Also forward the Host header, which is excluded from the Header map by the http libary.
-	// This allows the Host header received by the backend to be consistent with other
-	// requests not going through gitlab-workhorse.
-	authReq.Host = r.Host
-	// Set a custom header for the request. This can be used in some
-	// configurations (Passenger) to solve auth request routing problems.
-	authReq.Header.Set("Gitlab-Workhorse", Version)
-
-	return authReq, nil
+	g.handleFunc(&w, &request)
 }

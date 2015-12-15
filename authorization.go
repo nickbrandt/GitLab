@@ -2,12 +2,54 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
 )
+
+func (u *upstream) newUpstreamRequest(r *http.Request, body io.Reader, suffix string) (*http.Request, error) {
+	url := u.authBackend + r.URL.RequestURI() + suffix
+	authReq, err := http.NewRequest(r.Method, url, body)
+	if err != nil {
+		return nil, err
+	}
+	// Forward all headers from our client to the auth backend. This includes
+	// HTTP Basic authentication credentials (the 'Authorization' header).
+	for k, v := range r.Header {
+		authReq.Header[k] = v
+	}
+
+	// Clean some headers when issuing a new request without body
+	if body == nil {
+		authReq.Header.Del("Content-Type")
+		authReq.Header.Del("Content-Encoding")
+		authReq.Header.Del("Content-Length")
+		authReq.Header.Del("Content-Disposition")
+		authReq.Header.Del("Accept-Encoding")
+
+		// Hop-by-hop headers. These are removed when sent to the backend.
+		// http://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html
+		authReq.Header.Del("Transfer-Encoding")
+		authReq.Header.Del("Connection")
+		authReq.Header.Del("Keep-Alive")
+		authReq.Header.Del("Proxy-Authenticate")
+		authReq.Header.Del("Proxy-Authorization")
+		authReq.Header.Del("Te")
+		authReq.Header.Del("Trailers")
+		authReq.Header.Del("Upgrade")
+	}
+
+	// Also forward the Host header, which is excluded from the Header map by the http libary.
+	// This allows the Host header received by the backend to be consistent with other
+	// requests not going through gitlab-workhorse.
+	authReq.Host = r.Host
+	// Set a custom header for the request. This can be used in some
+	// configurations (Passenger) to solve auth request routing problems.
+	authReq.Header.Set("Gitlab-Workhorse", Version)
+
+	return authReq, nil
+}
 
 func preAuthorizeHandler(handleFunc serviceHandleFunc, suffix string) serviceHandleFunc {
 	return func(w http.ResponseWriter, r *gitRequest) {
@@ -64,20 +106,4 @@ func preAuthorizeHandler(handleFunc serviceHandleFunc, suffix string) serviceHan
 
 		handleFunc(w, r)
 	}
-}
-
-func repoPreAuthorizeHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
-	return preAuthorizeHandler(func(w http.ResponseWriter, r *gitRequest) {
-		if r.RepoPath == "" {
-			fail500(w, errors.New("repoPreAuthorizeHandler: RepoPath empty"))
-			return
-		}
-
-		if !looksLikeRepo(r.RepoPath) {
-			http.Error(w, "Not Found", 404)
-			return
-		}
-
-		handleFunc(w, r)
-	}, "")
 }

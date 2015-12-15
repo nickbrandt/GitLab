@@ -8,12 +8,17 @@ install: gitlab-workhorse
 	install gitlab-workhorse ${PREFIX}/bin/
 
 .PHONY: test
-test: test/data/test.git clean-workhorse gitlab-workhorse
+test: test/data/group/test.git clean-workhorse gitlab-workhorse
 	go fmt | awk '{ print "Please run go fmt"; exit 1 }'
 	go test
 
-test/data/test.git: test/data
-	git clone --bare https://gitlab.com/gitlab-org/gitlab-test.git test/data/test.git
+coverage: test/data/group/test.git
+	go test -cover -coverprofile=test.coverage
+	go tool cover -html=test.coverage -o coverage.html
+	rm -f test.coverage
+
+test/data/group/test.git: test/data
+	git clone --bare https://gitlab.com/gitlab-org/gitlab-test.git test/data/group/test.git
 
 test/data:
 	mkdir -p test/data
