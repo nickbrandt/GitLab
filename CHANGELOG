@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+0.5.0
+
+Send ALL GitLab requests through gitlab-workhorse.
+
 0.4.2
 
 Return response to client when uploading Git LFS object.
