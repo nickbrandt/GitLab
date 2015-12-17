@@ -42,6 +42,16 @@ gitlab-workhorse can listen on either a TCP or a Unix domain socket. It
 can also open a second listening TCP listening socket with the Go
 [net/http/pprof profiler server](http://golang.org/pkg/net/http/pprof/).
 
+### Relative URL support
+
+If you are mounting GitLab at a relative URL, e.g.
+`example.com/gitlab`, then you should also use this relative URL in
+the `authBackend` setting:
+
+```
+gitlab-workhorse -authBackend http://localhost:8080/gitlab
+```
+
 ## Installation
 
 To install into `/usr/local/bin` run `make install`.
