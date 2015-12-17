@@ -64,27 +64,28 @@ type gitRequest struct {
 }
 
 func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream {
-	u, err := url.Parse(authBackend)
+	gitlabURL, err := url.Parse(authBackend)
 	if err != nil {
 		log.Fatalln(err)
 	}
+	relativeURLRoot := gitlabURL.Path
+	if !strings.HasSuffix(relativeURLRoot, "/") {
+		relativeURLRoot += "/"
+	}
+
+	// If the relative URL is '/foobar' and we tell httputil.ReverseProxy to proxy
+	// to 'http://example.com/foobar' then we get a redirect loop, so we clear the
+	// Path field here.
+	gitlabURL.Path = ""
 
 	up := &upstream{
 		authBackend:     authBackend,
 		httpClient:      &http.Client{Transport: authTransport},
-		httpProxy:       httputil.NewSingleHostReverseProxy(u),
-		relativeURLRoot: "/",
+		httpProxy:       httputil.NewSingleHostReverseProxy(gitlabURL),
+		relativeURLRoot: relativeURLRoot,
 	}
 	up.httpProxy.Transport = authTransport
 	return up
-}
-
-func (u *upstream) SetRelativeURLRoot(relativeURLRoot string) {
-	u.relativeURLRoot = relativeURLRoot
-
-	if !strings.HasSuffix(u.relativeURLRoot, "/") {
-		u.relativeURLRoot += "/"
-	}
 }
 
 func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
@@ -107,7 +108,7 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 
 	// Check URL Root
 	URIPath := cleanURIPath(r.URL.Path)
-	if !strings.HasPrefix(URIPath, u.relativeURLRoot) {
+	if !strings.HasPrefix(URIPath, u.relativeURLRoot) && URIPath+"/" != u.relativeURLRoot {
 		httpError(&w, r, fmt.Sprintf("Not found %q", URIPath), http.StatusNotFound)
 		return
 	}

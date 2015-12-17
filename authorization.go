@@ -9,7 +9,7 @@ import (
 )
 
 func (u *upstream) newUpstreamRequest(r *http.Request, body io.Reader, suffix string) (*http.Request, error) {
-	url := u.authBackend + r.URL.RequestURI() + suffix
+	url := u.authBackend + "/" + strings.TrimPrefix(r.URL.RequestURI(), u.relativeURLRoot) + suffix
 	authReq, err := http.NewRequest(r.Method, url, body)
 	if err != nil {
 		return nil, err
