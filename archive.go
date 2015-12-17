@@ -17,7 +17,7 @@ import (
 	"time"
 )
 
-func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
+func handleGetArchive(w http.ResponseWriter, r *http.Request, a *authorizationResponse) {
 	var format string
 	urlPath := r.URL.Path
 	switch filepath.Base(urlPath) {
@@ -34,16 +34,16 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 		return
 	}
 
-	archiveFilename := path.Base(r.ArchivePath)
+	archiveFilename := path.Base(a.ArchivePath)
 
-	if cachedArchive, err := os.Open(r.ArchivePath); err == nil {
+	if cachedArchive, err := os.Open(a.ArchivePath); err == nil {
 		defer cachedArchive.Close()
-		log.Printf("Serving cached file %q", r.ArchivePath)
+		log.Printf("Serving cached file %q", a.ArchivePath)
 		setArchiveHeaders(w, format, archiveFilename)
 		// Even if somebody deleted the cachedArchive from disk since we opened
 		// the file, Unix file semantics guarantee we can still read from the
 		// open file in this process.
-		http.ServeContent(w, r.Request, "", time.Unix(0, 0), cachedArchive)
+		http.ServeContent(w, r, "", time.Unix(0, 0), cachedArchive)
 		return
 	}
 
@@ -51,7 +51,7 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 	// safe. We create the tempfile in the same directory as the final cached
 	// archive we want to create so that we can use an atomic link(2) operation
 	// to finalize the cached archive.
-	tempFile, err := prepareArchiveTempfile(path.Dir(r.ArchivePath), archiveFilename)
+	tempFile, err := prepareArchiveTempfile(path.Dir(a.ArchivePath), archiveFilename)
 	if err != nil {
 		fail500(w, fmt.Errorf("handleGetArchive: create tempfile: %v", err))
 		return
@@ -61,7 +61,7 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 
 	compressCmd, archiveFormat := parseArchiveFormat(format)
 
-	archiveCmd := gitCommand("", "git", "--git-dir="+r.RepoPath, "archive", "--format="+archiveFormat, "--prefix="+r.ArchivePrefix+"/", r.CommitId)
+	archiveCmd := gitCommand("", "git", "--git-dir="+a.RepoPath, "archive", "--format="+archiveFormat, "--prefix="+a.ArchivePrefix+"/", a.CommitId)
 	archiveStdout, err := archiveCmd.StdoutPipe()
 	if err != nil {
 		fail500(w, fmt.Errorf("handleGetArchive: archive stdout: %v", err))
@@ -117,7 +117,7 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 		}
 	}
 
-	if err := finalizeCachedArchive(tempFile, r.ArchivePath); err != nil {
+	if err := finalizeCachedArchive(tempFile, a.ArchivePath); err != nil {
 		logError(fmt.Errorf("handleGetArchive: finalize cached archive: %v", err))
 		return
 	}

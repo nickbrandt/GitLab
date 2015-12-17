@@ -15,7 +15,7 @@ import (
 	"strings"
 )
 
-type serviceHandleFunc func(w http.ResponseWriter, r *gitRequest)
+type serviceHandleFunc func(http.ResponseWriter, *http.Request, *authorizationResponse)
 
 type upstream struct {
 	httpClient      *http.Client
@@ -50,13 +50,6 @@ type authorizationResponse struct {
 	// TmpPath is the path where we should store temporary files
 	// This is set by authorization middleware
 	TempPath string
-}
-
-// A gitRequest is an *http.Request decorated with attributes returned by the
-// GitLab Rails application.
-type gitRequest struct {
-	*http.Request
-	authorizationResponse
 }
 
 func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream {

@@ -18,29 +18,29 @@ import (
 )
 
 func (u *upstream) lfsAuthorizeHandler(handleFunc serviceHandleFunc) httpHandleFunc {
-	return u.preAuthorizeHandler(func(w http.ResponseWriter, r *gitRequest) {
+	return u.preAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *authorizationResponse) {
 
-		if r.StoreLFSPath == "" {
+		if a.StoreLFSPath == "" {
 			fail500(w, errors.New("lfsAuthorizeHandler: StoreLFSPath empty"))
 			return
 		}
 
-		if r.LfsOid == "" {
+		if a.LfsOid == "" {
 			fail500(w, errors.New("lfsAuthorizeHandler: LfsOid empty"))
 			return
 		}
 
-		if err := os.MkdirAll(r.StoreLFSPath, 0700); err != nil {
-			fail500(w, fmt.Errorf("lfsAuthorizeHandler: mkdir StoreLFSPath: %v", err))
+		if err := os.MkdirAll(a.StoreLFSPath, 0700); err != nil {
+			fail500(w, fmt.Errorf("lfsAuthorizeHandler: mkdia StoreLFSPath: %v", err))
 			return
 		}
 
-		handleFunc(w, r)
+		handleFunc(w, r, a)
 	}, "/authorize")
 }
 
-func (u *upstream) handleStoreLfsObject(w http.ResponseWriter, r *gitRequest) {
-	file, err := ioutil.TempFile(r.StoreLFSPath, r.LfsOid)
+func (u *upstream) handleStoreLfsObject(w http.ResponseWriter, r *http.Request, a *authorizationResponse) {
+	file, err := ioutil.TempFile(a.StoreLFSPath, a.LfsOid)
 	if err != nil {
 		fail500(w, fmt.Errorf("handleStoreLfsObject: create tempfile: %v", err))
 		return
@@ -58,14 +58,14 @@ func (u *upstream) handleStoreLfsObject(w http.ResponseWriter, r *gitRequest) {
 	}
 	file.Close()
 
-	if written != r.LfsSize {
-		fail500(w, fmt.Errorf("handleStoreLfsObject: expected size %d, wrote %d", r.LfsSize, written))
+	if written != a.LfsSize {
+		fail500(w, fmt.Errorf("handleStoreLfsObject: expected size %d, wrote %d", a.LfsSize, written))
 		return
 	}
 
 	shaStr := hex.EncodeToString(hash.Sum(nil))
-	if shaStr != r.LfsOid {
-		fail500(w, fmt.Errorf("handleStoreLfsObject: expected sha256 %s, got %s", r.LfsOid, shaStr))
+	if shaStr != a.LfsOid {
+		fail500(w, fmt.Errorf("handleStoreLfsObject: expected sha256 %s, got %s", a.LfsOid, shaStr))
 		return
 	}
 
@@ -75,5 +75,5 @@ func (u *upstream) handleStoreLfsObject(w http.ResponseWriter, r *gitRequest) {
 	r.ContentLength = 0
 
 	// And proxy the request
-	u.proxyRequest(w, r.Request)
+	u.proxyRequest(w, r)
 }

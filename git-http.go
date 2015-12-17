@@ -27,22 +27,22 @@ func looksLikeRepo(p string) bool {
 }
 
 func (u *upstream) repoPreAuthorizeHandler(handleFunc serviceHandleFunc) httpHandleFunc {
-	return u.preAuthorizeHandler(func(w http.ResponseWriter, r *gitRequest) {
-		if r.RepoPath == "" {
+	return u.preAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *authorizationResponse) {
+		if a.RepoPath == "" {
 			fail500(w, errors.New("repoPreAuthorizeHandler: RepoPath empty"))
 			return
 		}
 
-		if !looksLikeRepo(r.RepoPath) {
+		if !looksLikeRepo(a.RepoPath) {
 			http.Error(w, "Not Found", 404)
 			return
 		}
 
-		handleFunc(w, r)
+		handleFunc(w, r, a)
 	}, "")
 }
 
-func handleGetInfoRefs(w http.ResponseWriter, r *gitRequest) {
+func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *authorizationResponse) {
 	rpc := r.URL.Query().Get("service")
 	if !(rpc == "git-upload-pack" || rpc == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
@@ -51,7 +51,7 @@ func handleGetInfoRefs(w http.ResponseWriter, r *gitRequest) {
 	}
 
 	// Prepare our Git subprocess
-	cmd := gitCommand(r.GL_ID, "git", subCommand(rpc), "--stateless-rpc", "--advertise-refs", r.RepoPath)
+	cmd := gitCommand(a.GL_ID, "git", subCommand(rpc), "--stateless-rpc", "--advertise-refs", a.RepoPath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		fail500(w, fmt.Errorf("handleGetInfoRefs: stdout: %v", err))
@@ -86,7 +86,7 @@ func handleGetInfoRefs(w http.ResponseWriter, r *gitRequest) {
 	}
 }
 
-func handlePostRPC(w http.ResponseWriter, r *gitRequest) {
+func handlePostRPC(w http.ResponseWriter, r *http.Request, a *authorizationResponse) {
 	var err error
 
 	// Get Git action from URL
@@ -98,7 +98,7 @@ func handlePostRPC(w http.ResponseWriter, r *gitRequest) {
 	}
 
 	// Prepare our Git subprocess
-	cmd := gitCommand(r.GL_ID, "git", subCommand(action), "--stateless-rpc", r.RepoPath)
+	cmd := gitCommand(a.GL_ID, "git", subCommand(action), "--stateless-rpc", a.RepoPath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		fail500(w, fmt.Errorf("handlePostRPC: stdout: %v", err))

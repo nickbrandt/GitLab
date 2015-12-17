@@ -5,9 +5,8 @@ import (
 )
 
 func (u *upstream) artifactsAuthorizeHandler(h httpHandleFunc) httpHandleFunc {
-	return u.preAuthorizeHandler(func(w http.ResponseWriter, r *gitRequest) {
-		req := r.Request
-		req.Header.Set(tempPathHeader, r.TempPath)
-		h(w, req)
+	return u.preAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *authorizationResponse) {
+		r.Header.Set(tempPathHeader, a.TempPath)
+		h(w, r)
 	}, "/authorize")
 }

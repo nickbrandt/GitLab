@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func okHandler(w http.ResponseWriter, r *gitRequest) {
+func okHandler(w http.ResponseWriter, _ *http.Request, _ *authorizationResponse) {
 	w.WriteHeader(201)
 	fmt.Fprint(w, "{\"status\":\"ok\"}")
 }

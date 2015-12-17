@@ -85,11 +85,11 @@ func (u *upstream) preAuthorizeHandler(h serviceHandleFunc, suffix string) httpH
 			return
 		}
 
-		g := &gitRequest{Request: r}
+		a := &authorizationResponse{}
 		// The auth backend validated the client request and told us additional
 		// request metadata. We must extract this information from the auth
 		// response body.
-		if err := json.NewDecoder(authResponse.Body).Decode(&g.authorizationResponse); err != nil {
+		if err := json.NewDecoder(authResponse.Body).Decode(a); err != nil {
 			fail500(w, fmt.Errorf("preAuthorizeHandler: decode authorization response: %v", err))
 			return
 		}
@@ -105,6 +105,6 @@ func (u *upstream) preAuthorizeHandler(h serviceHandleFunc, suffix string) httpH
 			}
 		}
 
-		h(w, g)
+		h(w, r, a)
 	}
 }
