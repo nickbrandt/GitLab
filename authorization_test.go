@@ -23,14 +23,13 @@ func runPreAuthorizeHandler(t *testing.T, suffix string, url *regexp.Regexp, aut
 	if err != nil {
 		t.Fatal(err)
 	}
-
+	u := newUpstream(ts.URL, nil)
 	request := gitRequest{
 		Request: httpRequest,
-		u:       newUpstream(ts.URL, nil),
 	}
 
 	response := httptest.NewRecorder()
-	preAuthorizeHandler(okHandler, suffix)(response, &request)
+	u.preAuthorizeHandler(okHandler, suffix)(response, &request)
 	assertResponseCode(t, response, expectedCode)
 	return response
 }

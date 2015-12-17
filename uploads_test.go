@@ -21,7 +21,7 @@ func TestUploadTempPathRequirement(t *testing.T) {
 			TempPath: "",
 		},
 	}
-	handleFileUploads(response, &request)
+	newUpstream("http://localhost", nil).handleFileUploads(response, &request)
 	assertResponseCode(t, response, 500)
 }
 
@@ -55,12 +55,13 @@ func TestUploadHandlerForwardingRawData(t *testing.T) {
 	response := httptest.NewRecorder()
 	request := gitRequest{
 		Request: httpRequest,
-		u:       newUpstream(ts.URL, nil),
 		authorizationResponse: authorizationResponse{
 			TempPath: tempPath,
 		},
 	}
-	handleFileUploads(response, &request)
+	u := newUpstream(ts.URL, nil)
+
+	u.handleFileUploads(response, &request)
 	assertResponseCode(t, response, 202)
 	if response.Body.String() != "RESPONSE" {
 		t.Fatal("Expected RESPONSE in response body")
@@ -135,12 +136,13 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	response := httptest.NewRecorder()
 	request := gitRequest{
 		Request: httpRequest,
-		u:       newUpstream(ts.URL, nil),
 		authorizationResponse: authorizationResponse{
 			TempPath: tempPath,
 		},
 	}
-	handleFileUploads(response, &request)
+	u := newUpstream(ts.URL, nil)
+
+	u.handleFileUploads(response, &request)
 	assertResponseCode(t, response, 202)
 
 	if _, err := os.Stat(filePath); !os.IsNotExist(err) {

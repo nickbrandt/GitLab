@@ -57,7 +57,6 @@ type authorizationResponse struct {
 type gitRequest struct {
 	*http.Request
 	authorizationResponse
-	u *upstream
 
 	// This field contains the URL.Path stripped from RelativeUrlRoot
 	relativeURIPath string
@@ -140,7 +139,6 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	request := gitRequest{
 		Request:         r,
 		relativeURIPath: relativeURIPath,
-		u:               u,
 	}
 
 	g.handleFunc(&w, &request)

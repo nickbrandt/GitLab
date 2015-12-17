@@ -1,5 +1,5 @@
 package main
 
-func artifactsAuthorizeHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
-	return preAuthorizeHandler(handleFunc, "/authorize")
+func (u *upstream) artifactsAuthorizeHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
+	return u.preAuthorizeHandler(handleFunc, "/authorize")
 }

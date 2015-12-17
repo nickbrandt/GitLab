@@ -59,34 +59,34 @@ const ciAPIPattern = `^/ci/api/`
 // see upstream.ServeHTTP
 var httpRoutes []httpRoute
 
-func compileRoutes() {
+func compileRoutes(u *upstream) {
 	httpRoutes = []httpRoute{
 		// Git Clone
-		httpRoute{"GET", regexp.MustCompile(gitProjectPattern + `info/refs\z`), repoPreAuthorizeHandler(handleGetInfoRefs)},
-		httpRoute{"POST", regexp.MustCompile(gitProjectPattern + `git-upload-pack\z`), repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
-		httpRoute{"POST", regexp.MustCompile(gitProjectPattern + `git-receive-pack\z`), repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
-		httpRoute{"PUT", regexp.MustCompile(gitProjectPattern + `gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfsAuthorizeHandler(handleStoreLfsObject)},
+		httpRoute{"GET", regexp.MustCompile(gitProjectPattern + `info/refs\z`), u.repoPreAuthorizeHandler(handleGetInfoRefs)},
+		httpRoute{"POST", regexp.MustCompile(gitProjectPattern + `git-upload-pack\z`), u.repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
+		httpRoute{"POST", regexp.MustCompile(gitProjectPattern + `git-receive-pack\z`), u.repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
+		httpRoute{"PUT", regexp.MustCompile(gitProjectPattern + `gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), u.lfsAuthorizeHandler(u.handleStoreLfsObject)},
 
 		// Repository Archive
-		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive\z`), repoPreAuthorizeHandler(handleGetArchive)},
-		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.zip\z`), repoPreAuthorizeHandler(handleGetArchive)},
-		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar\z`), repoPreAuthorizeHandler(handleGetArchive)},
-		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar.gz\z`), repoPreAuthorizeHandler(handleGetArchive)},
-		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar.bz2\z`), repoPreAuthorizeHandler(handleGetArchive)},
+		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive\z`), u.repoPreAuthorizeHandler(handleGetArchive)},
+		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.zip\z`), u.repoPreAuthorizeHandler(handleGetArchive)},
+		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar\z`), u.repoPreAuthorizeHandler(handleGetArchive)},
+		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar.gz\z`), u.repoPreAuthorizeHandler(handleGetArchive)},
+		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar.bz2\z`), u.repoPreAuthorizeHandler(handleGetArchive)},
 
 		// Repository Archive API
-		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive\z`), repoPreAuthorizeHandler(handleGetArchive)},
-		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.zip\z`), repoPreAuthorizeHandler(handleGetArchive)},
-		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar\z`), repoPreAuthorizeHandler(handleGetArchive)},
-		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.gz\z`), repoPreAuthorizeHandler(handleGetArchive)},
-		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.bz2\z`), repoPreAuthorizeHandler(handleGetArchive)},
+		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive\z`), u.repoPreAuthorizeHandler(handleGetArchive)},
+		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.zip\z`), u.repoPreAuthorizeHandler(handleGetArchive)},
+		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar\z`), u.repoPreAuthorizeHandler(handleGetArchive)},
+		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.gz\z`), u.repoPreAuthorizeHandler(handleGetArchive)},
+		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.bz2\z`), u.repoPreAuthorizeHandler(handleGetArchive)},
 
 		// CI Artifacts API
-		httpRoute{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), artifactsAuthorizeHandler(contentEncodingHandler(handleFileUploads))},
+		httpRoute{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), u.artifactsAuthorizeHandler(contentEncodingHandler(u.handleFileUploads))},
 
 		// Explicitly proxy API requests
-		httpRoute{"", regexp.MustCompile(apiPattern), proxyRequest},
-		httpRoute{"", regexp.MustCompile(ciAPIPattern), proxyRequest},
+		httpRoute{"", regexp.MustCompile(apiPattern), u.proxyRequest},
+		httpRoute{"", regexp.MustCompile(ciAPIPattern), u.proxyRequest},
 
 		// Serve assets
 		httpRoute{"", regexp.MustCompile(`^/assets/`),
@@ -94,7 +94,7 @@ func compileRoutes() {
 				handleDevelopmentMode(developmentMode,
 					handleDeployPage(documentRoot,
 						handleRailsError(documentRoot,
-							proxyRequest,
+							u.proxyRequest,
 						),
 					),
 				),
@@ -106,7 +106,7 @@ func compileRoutes() {
 			handleServeFile(documentRoot, CacheDisabled,
 				handleDeployPage(documentRoot,
 					handleRailsError(documentRoot,
-						proxyRequest,
+						u.proxyRequest,
 					),
 				),
 			),
@@ -173,6 +173,6 @@ func main() {
 	}
 
 	upstream := newUpstream(*authBackend, proxyTransport)
-	compileRoutes()
+	compileRoutes(upstream)
 	log.Fatal(http.Serve(listener, upstream))
 }

@@ -41,11 +41,11 @@ func TestProxyRequest(t *testing.T) {
 
 	request := gitRequest{
 		Request: httpRequest,
-		u:       newUpstream(ts.URL, nil),
 	}
 
+	u := newUpstream(ts.URL, nil)
 	w := httptest.NewRecorder()
-	proxyRequest(w, &request)
+	u.proxyRequest(w, &request)
 	assertResponseCode(t, w, 202)
 	assertResponseBody(t, w, "RESPONSE")
 
@@ -67,11 +67,11 @@ func TestProxyError(t *testing.T) {
 
 	request := gitRequest{
 		Request: httpRequest,
-		u:       newUpstream("http://localhost:655575/", &transport),
 	}
 
+	u := newUpstream("http://localhost:655575/", &transport)
 	w := httptest.NewRecorder()
-	proxyRequest(w, &request)
+	u.proxyRequest(w, &request)
 	assertResponseCode(t, w, 502)
 	assertResponseBody(t, w, "dial tcp: invalid port 655575")
 }
@@ -100,11 +100,11 @@ func TestProxyReadTimeout(t *testing.T) {
 
 	request := gitRequest{
 		Request: httpRequest,
-		u:       newUpstream(ts.URL, transport),
 	}
+	u := newUpstream(ts.URL, transport)
 
 	w := httptest.NewRecorder()
-	proxyRequest(w, &request)
+	u.proxyRequest(w, &request)
 	assertResponseCode(t, w, 502)
 	assertResponseBody(t, w, "net/http: timeout awaiting response headers")
 }
@@ -127,11 +127,11 @@ func TestProxyHandlerTimeout(t *testing.T) {
 
 	request := gitRequest{
 		Request: httpRequest,
-		u:       newUpstream(ts.URL, transport),
 	}
+	u := newUpstream(ts.URL, transport)
 
 	w := httptest.NewRecorder()
-	proxyRequest(w, &request)
+	u.proxyRequest(w, &request)
 	assertResponseCode(t, w, 503)
 	assertResponseBody(t, w, "Request took too long")
 }

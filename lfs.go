@@ -17,8 +17,8 @@ import (
 	"path/filepath"
 )
 
-func lfsAuthorizeHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
-	return preAuthorizeHandler(func(w http.ResponseWriter, r *gitRequest) {
+func (u *upstream) lfsAuthorizeHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
+	return u.preAuthorizeHandler(func(w http.ResponseWriter, r *gitRequest) {
 
 		if r.StoreLFSPath == "" {
 			fail500(w, errors.New("lfsAuthorizeHandler: StoreLFSPath empty"))
@@ -39,7 +39,7 @@ func lfsAuthorizeHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
 	}, "/authorize")
 }
 
-func handleStoreLfsObject(w http.ResponseWriter, r *gitRequest) {
+func (u *upstream) handleStoreLfsObject(w http.ResponseWriter, r *gitRequest) {
 	file, err := ioutil.TempFile(r.StoreLFSPath, r.LfsOid)
 	if err != nil {
 		fail500(w, fmt.Errorf("handleStoreLfsObject: create tempfile: %v", err))
@@ -75,5 +75,5 @@ func handleStoreLfsObject(w http.ResponseWriter, r *gitRequest) {
 	r.ContentLength = 0
 
 	// And proxy the request
-	proxyRequest(w, r)
+	u.proxyRequest(w, r)
 }

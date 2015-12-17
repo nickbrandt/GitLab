@@ -326,8 +326,9 @@ func testAuthServer(url *regexp.Regexp, code int, body interface{}) *httptest.Se
 }
 
 func startWorkhorseServer(authBackend string) *httptest.Server {
-	compileRoutes()
-	return httptest.NewServer(newUpstream(authBackend, nil))
+	u := newUpstream(authBackend, nil)
+	compileRoutes(u)
+	return httptest.NewServer(u)
 }
 
 func runOrFail(t *testing.T, cmd *exec.Cmd) {

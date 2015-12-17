@@ -51,15 +51,15 @@ func (u *upstream) newUpstreamRequest(r *http.Request, body io.Reader, suffix st
 	return authReq, nil
 }
 
-func preAuthorizeHandler(handleFunc serviceHandleFunc, suffix string) serviceHandleFunc {
+func (u *upstream) preAuthorizeHandler(handleFunc serviceHandleFunc, suffix string) serviceHandleFunc {
 	return func(w http.ResponseWriter, r *gitRequest) {
-		authReq, err := r.u.newUpstreamRequest(r.Request, nil, suffix)
+		authReq, err := u.newUpstreamRequest(r.Request, nil, suffix)
 		if err != nil {
 			fail500(w, fmt.Errorf("preAuthorizeHandler: newUpstreamRequest: %v", err))
 			return
 		}
 
-		authResponse, err := r.u.httpClient.Do(authReq)
+		authResponse, err := u.httpClient.Do(authReq)
 		if err != nil {
 			fail500(w, fmt.Errorf("preAuthorizeHandler: do %v: %v", authReq.URL.Path, err))
 			return

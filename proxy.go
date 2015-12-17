@@ -51,7 +51,7 @@ func headerClone(h http.Header) http.Header {
 	return h2
 }
 
-func proxyRequest(w http.ResponseWriter, r *gitRequest) {
+func (u *upstream) proxyRequest(w http.ResponseWriter, r *gitRequest) {
 	// Clone request
 	req := *r.Request
 	req.Header = headerClone(r.Header)
@@ -61,5 +61,5 @@ func proxyRequest(w http.ResponseWriter, r *gitRequest) {
 	rw := newSendFileResponseWriter(w, &req)
 	defer rw.Flush()
 
-	r.u.httpProxy.ServeHTTP(&rw, &req)
+	u.httpProxy.ServeHTTP(&rw, &req)
 }

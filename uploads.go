@@ -83,7 +83,7 @@ func rewriteFormFilesFromMultipart(r *gitRequest, writer *multipart.Writer) (cle
 	return cleanup, nil
 }
 
-func handleFileUploads(w http.ResponseWriter, r *gitRequest) {
+func (u *upstream) handleFileUploads(w http.ResponseWriter, r *gitRequest) {
 	if r.TempPath == "" {
 		fail500(w, errors.New("handleFileUploads: TempPath empty"))
 		return
@@ -97,7 +97,7 @@ func handleFileUploads(w http.ResponseWriter, r *gitRequest) {
 	cleanup, err := rewriteFormFilesFromMultipart(r, writer)
 	if err != nil {
 		if err == http.ErrNotMultipart {
-			proxyRequest(w, r)
+			u.proxyRequest(w, r)
 		} else {
 			fail500(w, fmt.Errorf("handleFileUploads: extract files from multipart: %v", err))
 		}
@@ -117,5 +117,5 @@ func handleFileUploads(w http.ResponseWriter, r *gitRequest) {
 	r.Header.Set("Content-Type", writer.FormDataContentType())
 
 	// Proxy the request
-	proxyRequest(w, r)
+	u.proxyRequest(w, r)
 }
