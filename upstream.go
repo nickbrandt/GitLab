@@ -68,23 +68,20 @@ func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream 
 	if err != nil {
 		log.Fatalln(err)
 	}
+	relativeURLRoot := u.Path
+	if !strings.HasSuffix(relativeURLRoot, "/") {
+		relativeURLRoot += "/"
+	}
+	u.Path = "" // Would cause redirect loop in ReverseProxy
 
 	up := &upstream{
 		authBackend:     authBackend,
 		httpClient:      &http.Client{Transport: authTransport},
 		httpProxy:       httputil.NewSingleHostReverseProxy(u),
-		relativeURLRoot: "/",
+		relativeURLRoot: relativeURLRoot,
 	}
 	up.httpProxy.Transport = authTransport
 	return up
-}
-
-func (u *upstream) SetRelativeURLRoot(relativeURLRoot string) {
-	u.relativeURLRoot = relativeURLRoot
-
-	if !strings.HasSuffix(u.relativeURLRoot, "/") {
-		u.relativeURLRoot += "/"
-	}
 }
 
 func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
