@@ -53,12 +53,13 @@ func headerClone(h http.Header) http.Header {
 
 func (u *upstream) proxyRequest(w http.ResponseWriter, r *http.Request) {
 	// Clone request
-	r.Header = headerClone(r.Header)
+	req := r
+	req.Header = headerClone(r.Header)
 
 	// Set Workhorse version
-	r.Header.Set("Gitlab-Workhorse", Version)
-	rw := newSendFileResponseWriter(w, r)
+	req.Header.Set("Gitlab-Workhorse", Version)
+	rw := newSendFileResponseWriter(w, req)
 	defer rw.Flush()
 
-	u.httpProxy.ServeHTTP(&rw, r)
+	u.httpProxy.ServeHTTP(&rw, req)
 }
