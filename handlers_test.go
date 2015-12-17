@@ -27,7 +27,7 @@ func TestGzipEncoding(t *testing.T) {
 	}
 	req.Header.Set("Content-Encoding", "gzip")
 
-	contentEncodingHandler(func(w http.ResponseWriter, r *http.Request) {
+	contentEncodingHandler(func(_ http.ResponseWriter, r *http.Request) {
 		if _, ok := r.Body.(*gzip.Reader); !ok {
 			t.Fatal("Expected gzip reader for body, but it's:", reflect.TypeOf(r.Body))
 		}
