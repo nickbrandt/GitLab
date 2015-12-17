@@ -64,20 +64,24 @@ type gitRequest struct {
 }
 
 func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream {
-	u, err := url.Parse(authBackend)
+	gitlabURL, err := url.Parse(authBackend)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	relativeURLRoot := u.Path
+	relativeURLRoot := gitlabURL.Path
 	if !strings.HasSuffix(relativeURLRoot, "/") {
 		relativeURLRoot += "/"
 	}
-	u.Path = "" // Would cause redirect loop in ReverseProxy
+
+	// If the relative URL is '/foobar' and we tell httputil.ReverseProxy to proxy
+	// to 'http://example.com/foobar' then we get a redirect loop, so we clear the
+	// Path field here.
+	gitlabURL.Path = ""
 
 	up := &upstream{
 		authBackend:     authBackend,
 		httpClient:      &http.Client{Transport: authTransport},
-		httpProxy:       httputil.NewSingleHostReverseProxy(u),
+		httpProxy:       httputil.NewSingleHostReverseProxy(gitlabURL),
 		relativeURLRoot: relativeURLRoot,
 	}
 	up.httpProxy.Transport = authTransport
