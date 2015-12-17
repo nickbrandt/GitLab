@@ -50,7 +50,7 @@ func TestUploadHandlerForwardingRawData(t *testing.T) {
 
 	response := httptest.NewRecorder()
 
-	httpRequest.Header.Set("Gitlab-Workhorse-Temp-Path", tempPath)
+	httpRequest.Header.Set(tempPathHeader, tempPath)
 	u := newUpstream(ts.URL, nil)
 
 	u.handleFileUploads(response, httpRequest)
@@ -124,7 +124,7 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	httpRequest.Body = ioutil.NopCloser(&buffer)
 	httpRequest.ContentLength = int64(buffer.Len())
 	httpRequest.Header.Set("Content-Type", writer.FormDataContentType())
-	httpRequest.Header.Set("Gitlab-Workhorse-Temp-Path", tempPath)
+	httpRequest.Header.Set(tempPathHeader, tempPath)
 	response := httptest.NewRecorder()
 	u := newUpstream(ts.URL, nil)
 

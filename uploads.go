@@ -11,6 +11,8 @@ import (
 	"os"
 )
 
+const tempPathHeader = "Gitlab-Workhorse-Temp-Path"
+
 func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, tempPath string) (cleanup func(), err error) {
 	// Create multipart reader
 	reader, err := r.MultipartReader()
@@ -84,11 +86,12 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 }
 
 func (u *upstream) handleFileUploads(w http.ResponseWriter, r *http.Request) {
-	tempPath := r.Header.Get("Gitlab-Workhorse-Temp-Path")
+	tempPath := r.Header.Get(tempPathHeader)
 	if tempPath == "" {
 		fail500(w, errors.New("handleFileUploads: TempPath empty"))
 		return
 	}
+	r.Header.Del(tempPathHeader)
 
 	var body bytes.Buffer
 	writer := multipart.NewWriter(&body)
