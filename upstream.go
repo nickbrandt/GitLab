@@ -17,8 +17,14 @@ import (
 
 type serviceHandleFunc func(http.ResponseWriter, *http.Request, *authorizationResponse)
 
+type API struct {
+	*http.Client
+	*url.URL
+}
+
+
 type upstream struct {
-	httpClient      *http.Client
+	*API
 	httpProxy       *httputil.ReverseProxy
 	authBackend     string
 	relativeURLRoot string
@@ -53,24 +59,24 @@ type authorizationResponse struct {
 }
 
 func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream {
-	gitlabURL, err := url.Parse(authBackend)
+	parsedURL, err := url.Parse(authBackend)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	relativeURLRoot := gitlabURL.Path
+
+	relativeURLRoot := parsedURL.Path
 	if !strings.HasSuffix(relativeURLRoot, "/") {
 		relativeURLRoot += "/"
 	}
 
-	// If the relative URL is '/foobar' and we tell httputil.ReverseProxy to proxy
-	// to 'http://example.com/foobar' then we get a redirect loop, so we clear the
-	// Path field here.
-	gitlabURL.Path = ""
+	// Modify a copy of parsedURL
+	proxyURL := *parsedURL
+	proxyURL.Path = ""
 
 	up := &upstream{
 		authBackend:     authBackend,
-		httpClient:      &http.Client{Transport: authTransport},
-		httpProxy:       httputil.NewSingleHostReverseProxy(gitlabURL),
+		API:             &API{Client: &http.Client{Transport: authTransport}, URL: parsedURL},
+		httpProxy:       httputil.NewSingleHostReverseProxy(&proxyURL),
 		relativeURLRoot: relativeURLRoot,
 	}
 	up.httpProxy.Transport = authTransport

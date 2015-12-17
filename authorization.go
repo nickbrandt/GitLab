@@ -4,20 +4,21 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"strings"
 )
 
-func (u *upstream) newUpstreamRequest(r *http.Request, body io.Reader, suffix string) (*http.Request, error) {
-	url := u.authBackend + "/" + strings.TrimPrefix(r.URL.RequestURI(), u.relativeURLRoot) + suffix
-	authReq, err := http.NewRequest(r.Method, url, body)
-	if err != nil {
-		return nil, err
+func (api *API) newUpstreamRequest(r *http.Request, body io.Reader, suffix string) (*http.Request, error) {
+	url := *api.URL
+	url.Path = r.URL.RequestURI() + suffix
+	authReq := &http.Request{
+		Method: r.Method,
+		URL:    &url,
+		Header: headerClone(r.Header),
 	}
-	// Forward all headers from our client to the auth backend. This includes
-	// HTTP Basic authentication credentials (the 'Authorization' header).
-	for k, v := range r.Header {
-		authReq.Header[k] = v
+	if body != nil {
+		authReq.Body = ioutil.NopCloser(body)
 	}
 
 	// Clean some headers when issuing a new request without body
@@ -51,15 +52,15 @@ func (u *upstream) newUpstreamRequest(r *http.Request, body io.Reader, suffix st
 	return authReq, nil
 }
 
-func (u *upstream) preAuthorizeHandler(h serviceHandleFunc, suffix string) httpHandleFunc {
+func (api *API) preAuthorizeHandler(h serviceHandleFunc, suffix string) httpHandleFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		authReq, err := u.newUpstreamRequest(r, nil, suffix)
+		authReq, err := api.newUpstreamRequest(r, nil, suffix)
 		if err != nil {
 			fail500(w, fmt.Errorf("preAuthorizeHandler: newUpstreamRequest: %v", err))
 			return
 		}
 
-		authResponse, err := u.httpClient.Do(authReq)
+		authResponse, err := api.Do(authReq)
 		if err != nil {
 			fail500(w, fmt.Errorf("preAuthorizeHandler: do %v: %v", authReq.URL.Path, err))
 			return

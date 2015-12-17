@@ -17,8 +17,8 @@ import (
 	"path/filepath"
 )
 
-func (u *upstream) lfsAuthorizeHandler(handleFunc serviceHandleFunc) httpHandleFunc {
-	return u.preAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *authorizationResponse) {
+func (api *API) lfsAuthorizeHandler(handleFunc serviceHandleFunc) httpHandleFunc {
+	return api.preAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *authorizationResponse) {
 
 		if a.StoreLFSPath == "" {
 			fail500(w, errors.New("lfsAuthorizeHandler: StoreLFSPath empty"))

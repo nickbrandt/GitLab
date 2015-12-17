@@ -23,10 +23,10 @@ func runPreAuthorizeHandler(t *testing.T, suffix string, url *regexp.Regexp, aut
 	if err != nil {
 		t.Fatal(err)
 	}
-	u := newUpstream(ts.URL, nil)
+	api := newUpstream(ts.URL, nil).API
 
 	response := httptest.NewRecorder()
-	u.preAuthorizeHandler(okHandler, suffix)(response, httpRequest)
+	api.preAuthorizeHandler(okHandler, suffix)(response, httpRequest)
 	assertResponseCode(t, response, expectedCode)
 	return response
 }
