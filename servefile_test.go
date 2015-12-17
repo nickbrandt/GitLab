@@ -11,12 +11,14 @@ import (
 	"testing"
 )
 
+var dummyUpstream = newUpstream("http://localhost", nil)
+
 func TestServingNonExistingFile(t *testing.T) {
 	dir := "/path/to/non/existing/directory"
 	httpRequest, _ := http.NewRequest("GET", "/file", nil)
 
 	w := httptest.NewRecorder()
-	newUpstream("http://localhost", nil).handleServeFile(&dir, CacheDisabled, nil)(w, httpRequest)
+	dummyUpstream.handleServeFile(&dir, CacheDisabled, nil)(w, httpRequest)
 	assertResponseCode(t, w, 404)
 }
 
@@ -29,7 +31,7 @@ func TestServingDirectory(t *testing.T) {
 
 	httpRequest, _ := http.NewRequest("GET", "/file", nil)
 	w := httptest.NewRecorder()
-	newUpstream("http://localhost", nil).handleServeFile(&dir, CacheDisabled, nil)(w, httpRequest)
+	dummyUpstream.handleServeFile(&dir, CacheDisabled, nil)(w, httpRequest)
 	assertResponseCode(t, w, 404)
 }
 
@@ -38,7 +40,7 @@ func TestServingMalformedUri(t *testing.T) {
 	httpRequest, _ := http.NewRequest("GET", "/../../../static/file", nil)
 
 	w := httptest.NewRecorder()
-	newUpstream("http://localhost", nil).handleServeFile(&dir, CacheDisabled, nil)(w, httpRequest)
+	dummyUpstream.handleServeFile(&dir, CacheDisabled, nil)(w, httpRequest)
 	assertResponseCode(t, w, 404)
 }
 
@@ -47,7 +49,7 @@ func TestExecutingHandlerWhenNoFileFound(t *testing.T) {
 	httpRequest, _ := http.NewRequest("GET", "/file", nil)
 
 	executed := false
-	newUpstream("http://localhost", nil).handleServeFile(&dir, CacheDisabled, func(_ http.ResponseWriter, r *http.Request) {
+	dummyUpstream.handleServeFile(&dir, CacheDisabled, func(_ http.ResponseWriter, r *http.Request) {
 		executed = (r == httpRequest)
 	})(nil, httpRequest)
 	if !executed {
@@ -68,7 +70,7 @@ func TestServingTheActualFile(t *testing.T) {
 	ioutil.WriteFile(filepath.Join(dir, "file"), []byte(fileContent), 0600)
 
 	w := httptest.NewRecorder()
-	newUpstream("http://localhost", nil).handleServeFile(&dir, CacheDisabled, nil)(w, httpRequest)
+	dummyUpstream.handleServeFile(&dir, CacheDisabled, nil)(w, httpRequest)
 	assertResponseCode(t, w, 200)
 	if w.Body.String() != fileContent {
 		t.Error("We should serve the file: ", w.Body.String())
@@ -99,7 +101,7 @@ func testServingThePregzippedFile(t *testing.T, enableGzip bool) {
 	ioutil.WriteFile(filepath.Join(dir, "file"), []byte(fileContent), 0600)
 
 	w := httptest.NewRecorder()
-	newUpstream("http://localhost", nil).handleServeFile(&dir, CacheDisabled, nil)(w, httpRequest)
+	dummyUpstream.handleServeFile(&dir, CacheDisabled, nil)(w, httpRequest)
 	assertResponseCode(t, w, 200)
 	if enableGzip {
 		assertResponseHeader(t, w, "Content-Encoding", "gzip")
