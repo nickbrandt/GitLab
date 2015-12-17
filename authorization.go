@@ -51,7 +51,7 @@ func (u *upstream) newUpstreamRequest(r *http.Request, body io.Reader, suffix st
 	return authReq, nil
 }
 
-func (u *upstream) preAuthorizeHandler(h serviceHandleFunc, suffix string) handleFunc {
+func (u *upstream) preAuthorizeHandler(h serviceHandleFunc, suffix string) httpHandleFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		authReq, err := u.newUpstreamRequest(r, nil, suffix)
 		if err != nil {

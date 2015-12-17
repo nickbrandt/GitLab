@@ -16,7 +16,7 @@ const (
 	CacheExpireMax
 )
 
-func (u *upstream) handleServeFile(documentRoot *string, cache CacheMode, notFoundHandler handleFunc) handleFunc {
+func (u *upstream) handleServeFile(documentRoot *string, cache CacheMode, notFoundHandler httpHandleFunc) httpHandleFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		file := filepath.Join(*documentRoot, u.relativeURIPath(cleanURIPath(r.URL.Path)))
 

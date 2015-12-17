@@ -2,7 +2,7 @@ package main
 
 import "net/http"
 
-func handleDevelopmentMode(developmentMode *bool, handler handleFunc) handleFunc {
+func handleDevelopmentMode(developmentMode *bool, handler httpHandleFunc) httpHandleFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if !*developmentMode {
 			http.NotFound(w, r)

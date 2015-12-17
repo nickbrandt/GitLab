@@ -43,10 +43,10 @@ var developmentMode = flag.Bool("developmentMode", false, "Allow to serve assets
 type httpRoute struct {
 	method     string
 	regex      *regexp.Regexp
-	handleFunc handleFunc
+	handleFunc httpHandleFunc
 }
 
-type handleFunc func(http.ResponseWriter, *http.Request)
+type httpHandleFunc func(http.ResponseWriter, *http.Request)
 
 const projectPattern = `^/[^/]+/[^/]+/`
 const gitProjectPattern = `^/[^/]+/[^/]+\.git/`

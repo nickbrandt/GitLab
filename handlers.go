@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func contentEncodingHandler(h handleFunc) handleFunc {
+func contentEncodingHandler(h httpHandleFunc) httpHandleFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var body io.ReadCloser
 		var err error

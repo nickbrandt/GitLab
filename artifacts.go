@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-func (u *upstream) artifactsAuthorizeHandler(h handleFunc) handleFunc {
+func (u *upstream) artifactsAuthorizeHandler(h httpHandleFunc) httpHandleFunc {
 	return u.preAuthorizeHandler(func(w http.ResponseWriter, r *gitRequest) {
 		req := r.Request
 		req.Header.Set(tempPathHeader, r.TempPath)
