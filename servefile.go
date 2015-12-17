@@ -16,9 +16,9 @@ const (
 	CacheExpireMax
 )
 
-func handleServeFile(documentRoot *string, cache CacheMode, notFoundHandler serviceHandleFunc) serviceHandleFunc {
+func (u *upstream) handleServeFile(documentRoot *string, cache CacheMode, notFoundHandler serviceHandleFunc) serviceHandleFunc {
 	return func(w http.ResponseWriter, r *gitRequest) {
-		file := filepath.Join(*documentRoot, r.relativeURIPath)
+		file := filepath.Join(*documentRoot, u.relativeURIPath(cleanURIPath(r.URL.Path)))
 
 		// The filepath.Join does Clean traversing directories up
 		if !strings.HasPrefix(file, *documentRoot) {

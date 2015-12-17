@@ -90,7 +90,7 @@ func compileRoutes(u *upstream) {
 
 		// Serve assets
 		httpRoute{"", regexp.MustCompile(`^/assets/`),
-			handleServeFile(documentRoot, CacheExpireMax,
+			u.handleServeFile(documentRoot, CacheExpireMax,
 				handleDevelopmentMode(developmentMode,
 					handleDeployPage(documentRoot,
 						handleRailsError(documentRoot,
@@ -103,7 +103,7 @@ func compileRoutes(u *upstream) {
 
 		// Serve static files or forward the requests
 		httpRoute{"", nil,
-			handleServeFile(documentRoot, CacheDisabled,
+			u.handleServeFile(documentRoot, CacheDisabled,
 				handleDeployPage(documentRoot,
 					handleRailsError(documentRoot,
 						u.proxyRequest,

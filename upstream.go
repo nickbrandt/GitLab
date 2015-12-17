@@ -57,9 +57,6 @@ type authorizationResponse struct {
 type gitRequest struct {
 	*http.Request
 	authorizationResponse
-
-	// This field contains the URL.Path stripped from RelativeUrlRoot
-	relativeURIPath string
 }
 
 func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream {
@@ -87,6 +84,10 @@ func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream 
 	return up
 }
 
+func (u *upstream) relativeURIPath(p string) string {
+	return cleanURIPath(strings.TrimPrefix(p, u.relativeURLRoot))
+}
+
 func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	var g httpRoute
 
@@ -112,11 +113,6 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Strip prefix and add "/"
-	// To match against non-relative URL
-	// Making it simpler for our matcher
-	relativeURIPath := cleanURIPath(strings.TrimPrefix(URIPath, u.relativeURLRoot))
-
 	// Look for a matching Git service
 	foundService := false
 	for _, g = range httpRoutes {
@@ -124,7 +120,7 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		if g.regex == nil || g.regex.MatchString(relativeURIPath) {
+		if g.regex == nil || g.regex.MatchString(u.relativeURIPath(URIPath)) {
 			foundService = true
 			break
 		}
@@ -138,7 +134,6 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 
 	request := gitRequest{
 		Request:         r,
-		relativeURIPath: relativeURIPath,
 	}
 
 	g.handleFunc(&w, &request)
