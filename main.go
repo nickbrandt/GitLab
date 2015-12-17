@@ -43,8 +43,10 @@ var developmentMode = flag.Bool("developmentMode", false, "Allow to serve assets
 type httpRoute struct {
 	method     string
 	regex      *regexp.Regexp
-	handleFunc serviceHandleFunc
+	handleFunc handleFunc
 }
+
+type handleFunc func(http.ResponseWriter, *http.Request)
 
 const projectPattern = `^/[^/]+/[^/]+/`
 const gitProjectPattern = `^/[^/]+/[^/]+\.git/`
@@ -63,8 +65,8 @@ func compileRoutes(u *upstream) {
 	httpRoutes = []httpRoute{
 		// Git Clone
 		httpRoute{"GET", regexp.MustCompile(gitProjectPattern + `info/refs\z`), u.repoPreAuthorizeHandler(handleGetInfoRefs)},
-		httpRoute{"POST", regexp.MustCompile(gitProjectPattern + `git-upload-pack\z`), u.repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
-		httpRoute{"POST", regexp.MustCompile(gitProjectPattern + `git-receive-pack\z`), u.repoPreAuthorizeHandler(contentEncodingHandler(handlePostRPC))},
+		httpRoute{"POST", regexp.MustCompile(gitProjectPattern + `git-upload-pack\z`), contentEncodingHandler(u.repoPreAuthorizeHandler(handlePostRPC))},
+		httpRoute{"POST", regexp.MustCompile(gitProjectPattern + `git-receive-pack\z`), contentEncodingHandler(u.repoPreAuthorizeHandler(handlePostRPC))},
 		httpRoute{"PUT", regexp.MustCompile(gitProjectPattern + `gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), u.lfsAuthorizeHandler(u.handleStoreLfsObject)},
 
 		// Repository Archive
@@ -82,7 +84,7 @@ func compileRoutes(u *upstream) {
 		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.bz2\z`), u.repoPreAuthorizeHandler(handleGetArchive)},
 
 		// CI Artifacts API
-		httpRoute{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), u.artifactsAuthorizeHandler(contentEncodingHandler(u.handleFileUploads))},
+		httpRoute{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), contentEncodingHandler(u.artifactsAuthorizeHandler(u.handleFileUploads))},
 
 		// Explicitly proxy API requests
 		httpRoute{"", regexp.MustCompile(apiPattern), u.proxyRequest},

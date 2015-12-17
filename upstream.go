@@ -132,9 +132,5 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	request := gitRequest{
-		Request:         r,
-	}
-
-	g.handleFunc(&w, &request)
+	g.handleFunc(&w, r)
 }

@@ -13,9 +13,9 @@ func TestDevelopmentModeEnabled(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	executed := false
-	handleDevelopmentMode(&developmentMode, func(w http.ResponseWriter, r *gitRequest) {
+	handleDevelopmentMode(&developmentMode, func(_ http.ResponseWriter, _ *http.Request) {
 		executed = true
-	})(w, &gitRequest{Request: r})
+	})(w, r)
 	if !executed {
 		t.Error("The handler should get executed")
 	}
@@ -28,9 +28,9 @@ func TestDevelopmentModeDisabled(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	executed := false
-	handleDevelopmentMode(&developmentMode, func(w http.ResponseWriter, r *gitRequest) {
+	handleDevelopmentMode(&developmentMode, func(_ http.ResponseWriter, _ *http.Request) {
 		executed = true
-	})(w, &gitRequest{Request: r})
+	})(w, r)
 	if executed {
 		t.Error("The handler should not get executed")
 	}

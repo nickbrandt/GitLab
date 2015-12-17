@@ -51,9 +51,9 @@ func (u *upstream) newUpstreamRequest(r *http.Request, body io.Reader, suffix st
 	return authReq, nil
 }
 
-func (u *upstream) preAuthorizeHandler(handleFunc serviceHandleFunc, suffix string) serviceHandleFunc {
-	return func(w http.ResponseWriter, r *gitRequest) {
-		authReq, err := u.newUpstreamRequest(r.Request, nil, suffix)
+func (u *upstream) preAuthorizeHandler(h serviceHandleFunc, suffix string) handleFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		authReq, err := u.newUpstreamRequest(r, nil, suffix)
 		if err != nil {
 			fail500(w, fmt.Errorf("preAuthorizeHandler: newUpstreamRequest: %v", err))
 			return
@@ -85,10 +85,11 @@ func (u *upstream) preAuthorizeHandler(handleFunc serviceHandleFunc, suffix stri
 			return
 		}
 
+		g := &gitRequest{Request: r}
 		// The auth backend validated the client request and told us additional
 		// request metadata. We must extract this information from the auth
 		// response body.
-		if err := json.NewDecoder(authResponse.Body).Decode(&r.authorizationResponse); err != nil {
+		if err := json.NewDecoder(authResponse.Body).Decode(&g.authorizationResponse); err != nil {
 			fail500(w, fmt.Errorf("preAuthorizeHandler: decode authorization response: %v", err))
 			return
 		}
@@ -104,6 +105,6 @@ func (u *upstream) preAuthorizeHandler(handleFunc serviceHandleFunc, suffix stri
 			}
 		}
 
-		handleFunc(w, r)
+		h(w, g)
 	}
 }

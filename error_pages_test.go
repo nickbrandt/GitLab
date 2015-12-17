@@ -22,7 +22,7 @@ func TestIfErrorPageIsPresented(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	handleRailsError(&dir, func(w http.ResponseWriter, r *gitRequest) {
+	handleRailsError(&dir, func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(404)
 		fmt.Fprint(w, "Not Found")
 	})(w, nil)
@@ -42,7 +42,7 @@ func TestIfErrorPassedIfNoErrorPageIsFound(t *testing.T) {
 	w := httptest.NewRecorder()
 	errorResponse := "ERROR"
 
-	handleRailsError(&dir, func(w http.ResponseWriter, r *gitRequest) {
+	handleRailsError(&dir, func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(404)
 		fmt.Fprint(w, errorResponse)
 	})(w, nil)

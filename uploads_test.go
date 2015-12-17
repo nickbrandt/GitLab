@@ -16,12 +16,8 @@ import (
 
 func TestUploadTempPathRequirement(t *testing.T) {
 	response := httptest.NewRecorder()
-	request := gitRequest{
-		authorizationResponse: authorizationResponse{
-			TempPath: "",
-		},
-	}
-	newUpstream("http://localhost", nil).handleFileUploads(response, &request)
+	request := &http.Request{}
+	newUpstream("http://localhost", nil).handleFileUploads(response, request)
 	assertResponseCode(t, response, 500)
 }
 
@@ -53,15 +49,11 @@ func TestUploadHandlerForwardingRawData(t *testing.T) {
 	defer os.RemoveAll(tempPath)
 
 	response := httptest.NewRecorder()
-	request := gitRequest{
-		Request: httpRequest,
-		authorizationResponse: authorizationResponse{
-			TempPath: tempPath,
-		},
-	}
+
+	httpRequest.Header.Set("Gitlab-Workhorse-Temp-Path", tempPath)
 	u := newUpstream(ts.URL, nil)
 
-	u.handleFileUploads(response, &request)
+	u.handleFileUploads(response, httpRequest)
 	assertResponseCode(t, response, 202)
 	if response.Body.String() != "RESPONSE" {
 		t.Fatal("Expected RESPONSE in response body")
@@ -132,17 +124,11 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	httpRequest.Body = ioutil.NopCloser(&buffer)
 	httpRequest.ContentLength = int64(buffer.Len())
 	httpRequest.Header.Set("Content-Type", writer.FormDataContentType())
-
+	httpRequest.Header.Set("Gitlab-Workhorse-Temp-Path", tempPath)
 	response := httptest.NewRecorder()
-	request := gitRequest{
-		Request: httpRequest,
-		authorizationResponse: authorizationResponse{
-			TempPath: tempPath,
-		},
-	}
 	u := newUpstream(ts.URL, nil)
 
-	u.handleFileUploads(response, &request)
+	u.handleFileUploads(response, httpRequest)
 	assertResponseCode(t, response, 202)
 
 	if _, err := os.Stat(filePath); !os.IsNotExist(err) {

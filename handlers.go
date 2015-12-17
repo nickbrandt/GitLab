@@ -7,8 +7,8 @@ import (
 	"net/http"
 )
 
-func contentEncodingHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
-	return func(w http.ResponseWriter, r *gitRequest) {
+func contentEncodingHandler(h handleFunc) handleFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		var body io.ReadCloser
 		var err error
 
@@ -32,6 +32,6 @@ func contentEncodingHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
 		r.Body = body
 		r.Header.Del("Content-Encoding")
 
-		handleFunc(w, r)
+		h(w, r)
 	}
 }

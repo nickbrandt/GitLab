@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 )
 
-func handleDeployPage(documentRoot *string, handler serviceHandleFunc) serviceHandleFunc {
-	return func(w http.ResponseWriter, r *gitRequest) {
+func handleDeployPage(documentRoot *string, handler handleFunc) handleFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		deployPage := filepath.Join(*documentRoot, "index.html")
 		data, err := ioutil.ReadFile(deployPage)
 		if err != nil {

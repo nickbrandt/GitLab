@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-func rewriteFormFilesFromMultipart(r *gitRequest, writer *multipart.Writer) (cleanup func(), err error) {
+func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, tempPath string) (cleanup func(), err error) {
 	// Create multipart reader
 	reader, err := r.MultipartReader()
 	if err != nil {
@@ -47,12 +47,12 @@ func rewriteFormFilesFromMultipart(r *gitRequest, writer *multipart.Writer) (cle
 		// Copy form field
 		if filename := p.FileName(); filename != "" {
 			// Create temporary directory where the uploaded file will be stored
-			if err := os.MkdirAll(r.TempPath, 0700); err != nil {
+			if err := os.MkdirAll(tempPath, 0700); err != nil {
 				return cleanup, err
 			}
 
 			// Create temporary file in path returned by Authorization filter
-			file, err := ioutil.TempFile(r.TempPath, "upload_")
+			file, err := ioutil.TempFile(tempPath, "upload_")
 			if err != nil {
 				return cleanup, err
 			}
@@ -83,8 +83,9 @@ func rewriteFormFilesFromMultipart(r *gitRequest, writer *multipart.Writer) (cle
 	return cleanup, nil
 }
 
-func (u *upstream) handleFileUploads(w http.ResponseWriter, r *gitRequest) {
-	if r.TempPath == "" {
+func (u *upstream) handleFileUploads(w http.ResponseWriter, r *http.Request) {
+	tempPath := r.Header.Get("Gitlab-Workhorse-Temp-Path")
+	if tempPath == "" {
 		fail500(w, errors.New("handleFileUploads: TempPath empty"))
 		return
 	}
@@ -94,7 +95,7 @@ func (u *upstream) handleFileUploads(w http.ResponseWriter, r *gitRequest) {
 	defer writer.Close()
 
 	// Rewrite multipart form data
-	cleanup, err := rewriteFormFilesFromMultipart(r, writer)
+	cleanup, err := rewriteFormFilesFromMultipart(r, writer, tempPath)
 	if err != nil {
 		if err == http.ErrNotMultipart {
 			u.proxyRequest(w, r)

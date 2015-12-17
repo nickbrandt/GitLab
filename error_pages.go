@@ -59,8 +59,8 @@ func (s *errorPageResponseWriter) Flush() {
 	s.WriteHeader(http.StatusOK)
 }
 
-func handleRailsError(documentRoot *string, handler serviceHandleFunc) serviceHandleFunc {
-	return func(w http.ResponseWriter, r *gitRequest) {
+func handleRailsError(documentRoot *string, handler handleFunc) handleFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		rw := errorPageResponseWriter{
 			rw:   w,
 			path: documentRoot,

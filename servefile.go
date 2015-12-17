@@ -16,8 +16,8 @@ const (
 	CacheExpireMax
 )
 
-func (u *upstream) handleServeFile(documentRoot *string, cache CacheMode, notFoundHandler serviceHandleFunc) serviceHandleFunc {
-	return func(w http.ResponseWriter, r *gitRequest) {
+func (u *upstream) handleServeFile(documentRoot *string, cache CacheMode, notFoundHandler handleFunc) handleFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		file := filepath.Join(*documentRoot, u.relativeURIPath(cleanURIPath(r.URL.Path)))
 
 		// The filepath.Join does Clean traversing directories up
@@ -50,7 +50,7 @@ func (u *upstream) handleServeFile(documentRoot *string, cache CacheMode, notFou
 			if notFoundHandler != nil {
 				notFoundHandler(w, r)
 			} else {
-				http.NotFound(w, r.Request)
+				http.NotFound(w, r)
 			}
 			return
 		}
@@ -65,6 +65,6 @@ func (u *upstream) handleServeFile(documentRoot *string, cache CacheMode, notFou
 		}
 
 		log.Printf("Send static file %q (%q) for %s %q", file, w.Header().Get("Content-Encoding"), r.Method, r.RequestURI)
-		http.ServeContent(w, r.Request, filepath.Base(file), fi.ModTime(), content)
+		http.ServeContent(w, r, filepath.Base(file), fi.ModTime(), content)
 	}
 }

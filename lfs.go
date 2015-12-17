@@ -17,7 +17,7 @@ import (
 	"path/filepath"
 )
 
-func (u *upstream) lfsAuthorizeHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
+func (u *upstream) lfsAuthorizeHandler(handleFunc serviceHandleFunc) handleFunc {
 	return u.preAuthorizeHandler(func(w http.ResponseWriter, r *gitRequest) {
 
 		if r.StoreLFSPath == "" {
@@ -75,5 +75,5 @@ func (u *upstream) handleStoreLfsObject(w http.ResponseWriter, r *gitRequest) {
 	r.ContentLength = 0
 
 	// And proxy the request
-	u.proxyRequest(w, r)
+	u.proxyRequest(w, r.Request)
 }

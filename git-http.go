@@ -26,7 +26,7 @@ func looksLikeRepo(p string) bool {
 	return true
 }
 
-func (u *upstream) repoPreAuthorizeHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
+func (u *upstream) repoPreAuthorizeHandler(handleFunc serviceHandleFunc) handleFunc {
 	return u.preAuthorizeHandler(func(w http.ResponseWriter, r *gitRequest) {
 		if r.RepoPath == "" {
 			fail500(w, errors.New("repoPreAuthorizeHandler: RepoPath empty"))
