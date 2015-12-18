@@ -86,7 +86,7 @@ func (api *API) preAuthorizeHandler(h serviceHandleFunc, suffix string) httpHand
 			return
 		}
 
-		a := &authorizationResponse{}
+		a := &apiResponse{}
 		// The auth backend validated the client request and told us additional
 		// request metadata. We must extract this information from the auth
 		// response body.

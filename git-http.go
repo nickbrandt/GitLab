@@ -27,7 +27,7 @@ func looksLikeRepo(p string) bool {
 }
 
 func (api *API) repoPreAuthorizeHandler(handleFunc serviceHandleFunc) httpHandleFunc {
-	return api.preAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *authorizationResponse) {
+	return api.preAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *apiResponse) {
 		if a.RepoPath == "" {
 			fail500(w, errors.New("repoPreAuthorizeHandler: RepoPath empty"))
 			return
@@ -42,7 +42,7 @@ func (api *API) repoPreAuthorizeHandler(handleFunc serviceHandleFunc) httpHandle
 	}, "")
 }
 
-func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *authorizationResponse) {
+func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *apiResponse) {
 	rpc := r.URL.Query().Get("service")
 	if !(rpc == "git-upload-pack" || rpc == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
@@ -86,7 +86,7 @@ func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *authorizationR
 	}
 }
 
-func handlePostRPC(w http.ResponseWriter, r *http.Request, a *authorizationResponse) {
+func handlePostRPC(w http.ResponseWriter, r *http.Request, a *apiResponse) {
 	var err error
 
 	// Get Git action from URL

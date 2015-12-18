@@ -17,7 +17,7 @@ import (
 	"time"
 )
 
-func handleGetArchive(w http.ResponseWriter, r *http.Request, a *authorizationResponse) {
+func handleGetArchive(w http.ResponseWriter, r *http.Request, a *apiResponse) {
 	var format string
 	urlPath := r.URL.Path
 	switch filepath.Base(urlPath) {

@@ -18,7 +18,7 @@ import (
 )
 
 func (api *API) lfsAuthorizeHandler(handleFunc serviceHandleFunc) httpHandleFunc {
-	return api.preAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *authorizationResponse) {
+	return api.preAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *apiResponse) {
 
 		if a.StoreLFSPath == "" {
 			fail500(w, errors.New("lfsAuthorizeHandler: StoreLFSPath empty"))
@@ -39,7 +39,7 @@ func (api *API) lfsAuthorizeHandler(handleFunc serviceHandleFunc) httpHandleFunc
 	}, "/authorize")
 }
 
-func (u *upstream) handleStoreLfsObject(w http.ResponseWriter, r *http.Request, a *authorizationResponse) {
+func (u *upstream) handleStoreLfsObject(w http.ResponseWriter, r *http.Request, a *apiResponse) {
 	file, err := ioutil.TempFile(a.StoreLFSPath, a.LfsOid)
 	if err != nil {
 		fail500(w, fmt.Errorf("handleStoreLfsObject: create tempfile: %v", err))

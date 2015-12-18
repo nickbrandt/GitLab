@@ -15,7 +15,7 @@ import (
 	"strings"
 )
 
-type serviceHandleFunc func(http.ResponseWriter, *http.Request, *authorizationResponse)
+type serviceHandleFunc func(http.ResponseWriter, *http.Request, *apiResponse)
 
 type API struct {
 	*http.Client
@@ -29,7 +29,7 @@ type upstream struct {
 	relativeURLRoot string
 }
 
-type authorizationResponse struct {
+type apiResponse struct {
 	// GL_ID is an environment variable used by gitlab-shell hooks during 'git
 	// push' and 'git pull'
 	GL_ID string

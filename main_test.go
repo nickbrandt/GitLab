@@ -340,7 +340,7 @@ func runOrFail(t *testing.T, cmd *exec.Cmd) {
 }
 
 func gitOkBody(t *testing.T) interface{} {
-	return &authorizationResponse{
+	return &apiResponse{
 		GL_ID:    "user-123",
 		RepoPath: repoPath(t),
 	}
@@ -353,7 +353,7 @@ func archiveOkBody(t *testing.T, archiveName string) interface{} {
 	}
 	archivePath := path.Join(cwd, cacheDir, archiveName)
 
-	return &authorizationResponse{
+	return &apiResponse{
 		RepoPath:      repoPath(t),
 		ArchivePath:   archivePath,
 		CommitId:      "c7fbe50c7c7419d9701eebe64b1fdacc3df5b9dd",

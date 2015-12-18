@@ -8,14 +8,14 @@ import (
 	"testing"
 )
 
-func okHandler(w http.ResponseWriter, _ *http.Request, _ *authorizationResponse) {
+func okHandler(w http.ResponseWriter, _ *http.Request, _ *apiResponse) {
 	w.WriteHeader(201)
 	fmt.Fprint(w, "{\"status\":\"ok\"}")
 }
 
-func runPreAuthorizeHandler(t *testing.T, suffix string, url *regexp.Regexp, authorizationResponse interface{}, returnCode, expectedCode int) *httptest.ResponseRecorder {
+func runPreAuthorizeHandler(t *testing.T, suffix string, url *regexp.Regexp, apiResponse interface{}, returnCode, expectedCode int) *httptest.ResponseRecorder {
 	// Prepare test server and backend
-	ts := testAuthServer(url, returnCode, authorizationResponse)
+	ts := testAuthServer(url, returnCode, apiResponse)
 	defer ts.Close()
 
 	// Create http request
@@ -35,7 +35,7 @@ func TestPreAuthorizeHappyPath(t *testing.T) {
 	runPreAuthorizeHandler(
 		t, "/authorize",
 		regexp.MustCompile(`/authorize\z`),
-		&authorizationResponse{},
+		&apiResponse{},
 		200, 201)
 }
 
@@ -43,7 +43,7 @@ func TestPreAuthorizeSuffix(t *testing.T) {
 	runPreAuthorizeHandler(
 		t, "/different-authorize",
 		regexp.MustCompile(`/authorize\z`),
-		&authorizationResponse{},
+		&apiResponse{},
 		200, 404)
 }
 
