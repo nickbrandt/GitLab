@@ -1,12 +1,14 @@
 package main
 
 import (
+	"./internal/proxy"
 	"bytes"
 	"fmt"
 	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"regexp"
 	"testing"
 	"time"
@@ -39,7 +41,7 @@ func TestProxyRequest(t *testing.T) {
 	}
 	httpRequest.Header.Set("Custom-Header", "test")
 
-	u := newUpstream(ts.URL, nil)
+	u := newUpstream(ts.URL, "")
 	w := httptest.NewRecorder()
 	u.Proxy.ServeHTTP(w, httpRequest)
 	assertResponseCode(t, w, 202)
@@ -57,11 +59,7 @@ func TestProxyError(t *testing.T) {
 	}
 	httpRequest.Header.Set("Custom-Header", "test")
 
-	transport := proxyRoundTripper{
-		transport: http.DefaultTransport,
-	}
-
-	u := newUpstream("http://localhost:655575/", &transport)
+	u := newUpstream("http://localhost:655575/", "")
 	w := httptest.NewRecorder()
 	u.Proxy.ServeHTTP(w, httpRequest)
 	assertResponseCode(t, w, 502)
@@ -78,8 +76,8 @@ func TestProxyReadTimeout(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	transport := &proxyRoundTripper{
-		transport: &http.Transport{
+	transport := proxy.NewRoundTripper(
+		&http.Transport{
 			Proxy: http.ProxyFromEnvironment,
 			Dial: (&net.Dialer{
 				Timeout:   30 * time.Second,
@@ -88,9 +86,14 @@ func TestProxyReadTimeout(t *testing.T) {
 			TLSHandshakeTimeout:   10 * time.Second,
 			ResponseHeaderTimeout: time.Millisecond,
 		},
-	}
+	)
 
-	u := newUpstream(ts.URL, transport)
+	u := newUpstream(ts.URL, "")
+	url, err := url.Parse(ts.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	u.Proxy = proxy.NewProxy(url, transport, "123")
 
 	w := httptest.NewRecorder()
 	u.Proxy.ServeHTTP(w, httpRequest)
@@ -110,11 +113,7 @@ func TestProxyHandlerTimeout(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	transport := &proxyRoundTripper{
-		transport: http.DefaultTransport,
-	}
-
-	u := newUpstream(ts.URL, transport)
+	u := newUpstream(ts.URL, "")
 
 	w := httptest.NewRecorder()
 	u.Proxy.ServeHTTP(w, httpRequest)

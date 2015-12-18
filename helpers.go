@@ -5,9 +5,8 @@ Miscellaneous helpers: logging, errors, subprocesses
 package main
 
 import (
-	"errors"
+	"./internal/helper"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -17,11 +16,7 @@ import (
 
 func fail500(w http.ResponseWriter, err error) {
 	http.Error(w, "Internal server error", 500)
-	logError(err)
-}
-
-func logError(err error) {
-	log.Printf("error: %v", err)
+	helper.LogError(err)
 }
 
 func httpError(w http.ResponseWriter, r *http.Request, error string, code int) {
@@ -69,36 +64,6 @@ func setNoCacheHeaders(header http.Header) {
 	header.Set("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate")
 	header.Set("Pragma", "no-cache")
 	header.Set("Expires", "Fri, 01 Jan 1990 00:00:00 GMT")
-}
-
-func openFile(path string) (file *os.File, fi os.FileInfo, err error) {
-	file, err = os.Open(path)
-	if err != nil {
-		return
-	}
-
-	defer func() {
-		if err != nil {
-			file.Close()
-		}
-	}()
-
-	fi, err = file.Stat()
-	if err != nil {
-		return
-	}
-
-	// The os.Open can also open directories
-	if fi.IsDir() {
-		err = &os.PathError{
-			Op:   "open",
-			Path: path,
-			Err:  errors.New("path is directory"),
-		}
-		return
-	}
-
-	return
 }
 
 // Borrowed from: net/http/server.go

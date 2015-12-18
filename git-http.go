@@ -5,6 +5,7 @@ In this file we handle the Git 'smart HTTP' protocol
 package main
 
 import (
+	"./internal/helper"
 	"errors"
 	"fmt"
 	"io"
@@ -69,19 +70,19 @@ func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *apiResponse) {
 	w.Header().Add("Cache-Control", "no-cache")
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 	if err := pktLine(w, fmt.Sprintf("# service=%s\n", rpc)); err != nil {
-		logError(fmt.Errorf("handleGetInfoRefs: pktLine: %v", err))
+		helper.LogError(fmt.Errorf("handleGetInfoRefs: pktLine: %v", err))
 		return
 	}
 	if err := pktFlush(w); err != nil {
-		logError(fmt.Errorf("handleGetInfoRefs: pktFlush: %v", err))
+		helper.LogError(fmt.Errorf("handleGetInfoRefs: pktFlush: %v", err))
 		return
 	}
 	if _, err := io.Copy(w, stdout); err != nil {
-		logError(fmt.Errorf("handleGetInfoRefs: read from %v: %v", cmd.Args, err))
+		helper.LogError(fmt.Errorf("handleGetInfoRefs: read from %v: %v", cmd.Args, err))
 		return
 	}
 	if err := cmd.Wait(); err != nil {
-		logError(fmt.Errorf("handleGetInfoRefs: wait for %v: %v", cmd.Args, err))
+		helper.LogError(fmt.Errorf("handleGetInfoRefs: wait for %v: %v", cmd.Args, err))
 		return
 	}
 }
@@ -136,11 +137,11 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *apiResponse) {
 
 	// This io.Copy may take a long time, both for Git push and pull.
 	if _, err := io.Copy(w, stdout); err != nil {
-		logError(fmt.Errorf("handlePostRPC read from %v: %v", cmd.Args, err))
+		helper.LogError(fmt.Errorf("handlePostRPC read from %v: %v", cmd.Args, err))
 		return
 	}
 	if err := cmd.Wait(); err != nil {
-		logError(fmt.Errorf("handlePostRPC wait for %v: %v", cmd.Args, err))
+		helper.LogError(fmt.Errorf("handlePostRPC wait for %v: %v", cmd.Args, err))
 		return
 	}
 }

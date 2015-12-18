@@ -51,7 +51,7 @@ func TestUploadHandlerForwardingRawData(t *testing.T) {
 	response := httptest.NewRecorder()
 
 	httpRequest.Header.Set(tempPathHeader, tempPath)
-	u := newUpstream(ts.URL, nil)
+	u := newUpstream(ts.URL, "")
 
 	handleFileUploads(u.Proxy).ServeHTTP(response, httpRequest)
 	assertResponseCode(t, response, 202)
@@ -126,7 +126,7 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	httpRequest.Header.Set("Content-Type", writer.FormDataContentType())
 	httpRequest.Header.Set(tempPathHeader, tempPath)
 	response := httptest.NewRecorder()
-	u := newUpstream(ts.URL, nil)
+	u := newUpstream(ts.URL, "")
 
 	handleFileUploads(u.Proxy).ServeHTTP(response, httpRequest)
 	assertResponseCode(t, response, 202)

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./internal/proxy"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -15,7 +16,7 @@ func (api *API) newUpstreamRequest(r *http.Request, body io.Reader, suffix strin
 	authReq := &http.Request{
 		Method: r.Method,
 		URL:    &url,
-		Header: headerClone(r.Header),
+		Header: proxy.HeaderClone(r.Header),
 	}
 	if body != nil {
 		authReq.Body = ioutil.NopCloser(body)

@@ -23,7 +23,7 @@ func runPreAuthorizeHandler(t *testing.T, suffix string, url *regexp.Regexp, api
 	if err != nil {
 		t.Fatal(err)
 	}
-	api := newUpstream(ts.URL, nil).API
+	api := newUpstream(ts.URL, "").API
 
 	response := httptest.NewRecorder()
 	api.preAuthorizeHandler(okHandler, suffix)(response, httpRequest)

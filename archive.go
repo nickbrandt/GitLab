@@ -5,6 +5,7 @@ In this file we handle 'git archive' downloads
 package main
 
 import (
+	"./internal/helper"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -103,22 +104,22 @@ func handleGetArchive(w http.ResponseWriter, r *http.Request, a *apiResponse) {
 	setArchiveHeaders(w, format, archiveFilename)
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 	if _, err := io.Copy(w, archiveReader); err != nil {
-		logError(fmt.Errorf("handleGetArchive: read: %v", err))
+		helper.LogError(fmt.Errorf("handleGetArchive: read: %v", err))
 		return
 	}
 	if err := archiveCmd.Wait(); err != nil {
-		logError(fmt.Errorf("handleGetArchive: archiveCmd: %v", err))
+		helper.LogError(fmt.Errorf("handleGetArchive: archiveCmd: %v", err))
 		return
 	}
 	if compressCmd != nil {
 		if err := compressCmd.Wait(); err != nil {
-			logError(fmt.Errorf("handleGetArchive: compressCmd: %v", err))
+			helper.LogError(fmt.Errorf("handleGetArchive: compressCmd: %v", err))
 			return
 		}
 	}
 
 	if err := finalizeCachedArchive(tempFile, a.ArchivePath); err != nil {
-		logError(fmt.Errorf("handleGetArchive: finalize cached archive: %v", err))
+		helper.LogError(fmt.Errorf("handleGetArchive: finalize cached archive: %v", err))
 		return
 	}
 }

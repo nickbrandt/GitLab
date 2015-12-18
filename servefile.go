@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./internal/helper"
 	"log"
 	"net/http"
 	"os"
@@ -36,7 +37,7 @@ func (u *upstream) handleServeFile(documentRoot *string, cache CacheMode, notFou
 
 		// Serve pre-gzipped assets
 		if acceptEncoding := r.Header.Get("Accept-Encoding"); strings.Contains(acceptEncoding, "gzip") {
-			content, fi, err = openFile(file + ".gz")
+			content, fi, err = helper.OpenFile(file + ".gz")
 			if err == nil {
 				w.Header().Set("Content-Encoding", "gzip")
 			}
@@ -44,7 +45,7 @@ func (u *upstream) handleServeFile(documentRoot *string, cache CacheMode, notFou
 
 		// If not found, open the original file
 		if content == nil || err != nil {
-			content, fi, err = openFile(file)
+			content, fi, err = helper.OpenFile(file)
 		}
 		if err != nil {
 			if notFoundHandler != nil {

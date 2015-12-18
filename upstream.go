@@ -7,12 +7,14 @@ In this file we handle request routing and interaction with the authBackend.
 package main
 
 import (
+	"./internal/proxy"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"strings"
+	"time"
 )
 
 type serviceHandleFunc func(http.ResponseWriter, *http.Request, *apiResponse)
@@ -24,13 +26,9 @@ type API struct {
 
 type upstream struct {
 	API             *API
-	Proxy           *Proxy
+	Proxy           *proxy.Proxy
 	authBackend     string
 	relativeURLRoot string
-}
-
-type Proxy struct {
-	ReverseProxy *httputil.ReverseProxy
 }
 
 type apiResponse struct {
@@ -61,16 +59,7 @@ type apiResponse struct {
 	TempPath string
 }
 
-func newProxy(url *url.URL, transport http.RoundTripper) *Proxy {
-	// Modify a copy of url
-	proxyURL := *url
-	proxyURL.Path = ""
-	proxy := Proxy{ReverseProxy: httputil.NewSingleHostReverseProxy(&proxyURL)}
-	proxy.ReverseProxy.Transport = transport
-	return &proxy
-}
-
-func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream {
+func newUpstream(authBackend string, authSocket string) *upstream {
 	parsedURL, err := url.Parse(authBackend)
 	if err != nil {
 		log.Fatalln(err)
@@ -81,10 +70,27 @@ func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream 
 		relativeURLRoot += "/"
 	}
 
+	// Create Proxy Transport
+	authTransport := http.DefaultTransport
+	if authSocket != "" {
+		dialer := &net.Dialer{
+			// The values below are taken from http.DefaultTransport
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}
+		authTransport = &http.Transport{
+			Dial: func(_, _ string) (net.Conn, error) {
+				return dialer.Dial("unix", authSocket)
+			},
+			ResponseHeaderTimeout: *responseHeadersTimeout,
+		}
+	}
+	proxyTransport := proxy.NewRoundTripper(authTransport)
+
 	up := &upstream{
 		authBackend:     authBackend,
-		API:             &API{Client: &http.Client{Transport: authTransport}, URL: parsedURL},
-		Proxy:           newProxy(parsedURL, authTransport),
+		API:             &API{Client: &http.Client{Transport: proxyTransport}, URL: parsedURL},
+		Proxy:           proxy.NewProxy(parsedURL, proxyTransport, Version),
 		relativeURLRoot: relativeURLRoot,
 	}
 

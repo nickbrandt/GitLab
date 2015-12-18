@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-var dummyUpstream = newUpstream("http://localhost", nil)
+var dummyUpstream = newUpstream("http://localhost", "")
 
 func TestServingNonExistingFile(t *testing.T) {
 	dir := "/path/to/non/existing/directory"
