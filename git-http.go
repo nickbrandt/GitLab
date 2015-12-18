@@ -26,7 +26,7 @@ func looksLikeRepo(p string) bool {
 	return true
 }
 
-func (api *API) repoPreAuthorizeHandler(handleFunc serviceHandleFunc) httpHandleFunc {
+func repoPreAuthorizeHandler(api *API, handleFunc serviceHandleFunc) httpHandleFunc {
 	return api.preAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *apiResponse) {
 		if a.RepoPath == "" {
 			fail500(w, errors.New("repoPreAuthorizeHandler: RepoPath empty"))

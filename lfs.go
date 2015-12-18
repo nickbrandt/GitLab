@@ -17,7 +17,7 @@ import (
 	"path/filepath"
 )
 
-func (api *API) lfsAuthorizeHandler(handleFunc serviceHandleFunc) httpHandleFunc {
+func lfsAuthorizeHandler(api *API, handleFunc serviceHandleFunc) httpHandleFunc {
 	return api.preAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *apiResponse) {
 
 		if a.StoreLFSPath == "" {
@@ -39,41 +39,43 @@ func (api *API) lfsAuthorizeHandler(handleFunc serviceHandleFunc) httpHandleFunc
 	}, "/authorize")
 }
 
-func (p *Proxy) handleStoreLfsObject(w http.ResponseWriter, r *http.Request, a *apiResponse) {
-	file, err := ioutil.TempFile(a.StoreLFSPath, a.LfsOid)
-	if err != nil {
-		fail500(w, fmt.Errorf("handleStoreLfsObject: create tempfile: %v", err))
-		return
+func handleStoreLfsObject(h http.Handler) serviceHandleFunc {
+	return func(w http.ResponseWriter, r *http.Request, a *apiResponse) {
+		file, err := ioutil.TempFile(a.StoreLFSPath, a.LfsOid)
+		if err != nil {
+			fail500(w, fmt.Errorf("handleStoreLfsObject: create tempfile: %v", err))
+			return
+		}
+		defer os.Remove(file.Name())
+		defer file.Close()
+
+		hash := sha256.New()
+		hw := io.MultiWriter(hash, file)
+
+		written, err := io.Copy(hw, r.Body)
+		if err != nil {
+			fail500(w, fmt.Errorf("handleStoreLfsObject: write tempfile: %v", err))
+			return
+		}
+		file.Close()
+
+		if written != a.LfsSize {
+			fail500(w, fmt.Errorf("handleStoreLfsObject: expected size %d, wrote %d", a.LfsSize, written))
+			return
+		}
+
+		shaStr := hex.EncodeToString(hash.Sum(nil))
+		if shaStr != a.LfsOid {
+			fail500(w, fmt.Errorf("handleStoreLfsObject: expected sha256 %s, got %s", a.LfsOid, shaStr))
+			return
+		}
+
+		// Inject header and body
+		r.Header.Set("X-GitLab-Lfs-Tmp", filepath.Base(file.Name()))
+		r.Body = ioutil.NopCloser(&bytes.Buffer{})
+		r.ContentLength = 0
+
+		// And proxy the request
+		h.ServeHTTP(w, r)
 	}
-	defer os.Remove(file.Name())
-	defer file.Close()
-
-	hash := sha256.New()
-	hw := io.MultiWriter(hash, file)
-
-	written, err := io.Copy(hw, r.Body)
-	if err != nil {
-		fail500(w, fmt.Errorf("handleStoreLfsObject: write tempfile: %v", err))
-		return
-	}
-	file.Close()
-
-	if written != a.LfsSize {
-		fail500(w, fmt.Errorf("handleStoreLfsObject: expected size %d, wrote %d", a.LfsSize, written))
-		return
-	}
-
-	shaStr := hex.EncodeToString(hash.Sum(nil))
-	if shaStr != a.LfsOid {
-		fail500(w, fmt.Errorf("handleStoreLfsObject: expected sha256 %s, got %s", a.LfsOid, shaStr))
-		return
-	}
-
-	// Inject header and body
-	r.Header.Set("X-GitLab-Lfs-Tmp", filepath.Base(file.Name()))
-	r.Body = ioutil.NopCloser(&bytes.Buffer{})
-	r.ContentLength = 0
-
-	// And proxy the request
-	p.ServeHTTP(w, r)
 }

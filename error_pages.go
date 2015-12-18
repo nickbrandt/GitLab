@@ -59,13 +59,13 @@ func (s *errorPageResponseWriter) Flush() {
 	s.WriteHeader(http.StatusOK)
 }
 
-func handleRailsError(documentRoot *string, handler httpHandleFunc) httpHandleFunc {
+func handleRailsError(documentRoot *string, handler http.Handler) httpHandleFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		rw := errorPageResponseWriter{
 			rw:   w,
 			path: documentRoot,
 		}
 		defer rw.Flush()
-		handler(&rw, r)
+		handler.ServeHTTP(&rw, r)
 	}
 }
