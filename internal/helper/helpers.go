@@ -16,6 +16,12 @@ func LogError(err error) {
 	log.Printf("error: %v", err)
 }
 
+func SetNoCacheHeaders(header http.Header) {
+	header.Set("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate")
+	header.Set("Pragma", "no-cache")
+	header.Set("Expires", "Fri, 01 Jan 1990 00:00:00 GMT")
+}
+
 func OpenFile(path string) (file *os.File, fi os.FileInfo, err error) {
 	file, err = os.Open(path)
 	if err != nil {

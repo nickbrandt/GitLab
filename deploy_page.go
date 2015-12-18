@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./internal/helper"
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
@@ -15,7 +16,7 @@ func handleDeployPage(documentRoot *string, handler http.Handler) http.HandlerFu
 			return
 		}
 
-		setNoCacheHeaders(w.Header())
+		helper.SetNoCacheHeaders(w.Header())
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
 		w.Write(data)

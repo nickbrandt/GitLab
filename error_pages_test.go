@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./internal/errorpage"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -25,7 +26,7 @@ func TestIfErrorPageIsPresented(t *testing.T) {
 		w.WriteHeader(404)
 		fmt.Fprint(w, "Not Found")
 	})
-	handleRailsError(&dir, h)(w, nil)
+	errorpage.Inject(dir, h)(w, nil)
 	w.Flush()
 
 	assertResponseCode(t, w, 404)
@@ -45,7 +46,7 @@ func TestIfErrorPassedIfNoErrorPageIsFound(t *testing.T) {
 		w.WriteHeader(404)
 		fmt.Fprint(w, errorResponse)
 	})
-	handleRailsError(&dir, h)(w, nil)
+	errorpage.Inject(dir, h)(w, nil)
 	w.Flush()
 
 	assertResponseCode(t, w, 404)

@@ -54,12 +54,6 @@ func cleanUpProcessGroup(cmd *exec.Cmd) {
 	cmd.Wait()
 }
 
-func setNoCacheHeaders(header http.Header) {
-	header.Set("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate")
-	header.Set("Pragma", "no-cache")
-	header.Set("Expires", "Fri, 01 Jan 1990 00:00:00 GMT")
-}
-
 // Borrowed from: net/http/server.go
 // Return the canonical path for p, eliminating . and .. elements.
 func cleanURIPath(p string) string {

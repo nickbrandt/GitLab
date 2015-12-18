@@ -14,6 +14,7 @@ In this file we start the web server and hand off to the upstream type.
 package main
 
 import (
+	"./internal/errorpage"
 	"flag"
 	"fmt"
 	"log"
@@ -95,7 +96,7 @@ func compileRoutes(u *upstream) {
 			u.handleServeFile(documentRoot, CacheExpireMax,
 				handleDevelopmentMode(developmentMode,
 					handleDeployPage(documentRoot,
-						handleRailsError(documentRoot,
+						errorpage.Inject(*documentRoot,
 							proxy,
 						),
 					),
@@ -107,7 +108,7 @@ func compileRoutes(u *upstream) {
 		httpRoute{"", nil,
 			u.handleServeFile(documentRoot, CacheDisabled,
 				handleDeployPage(documentRoot,
-					handleRailsError(documentRoot,
+					errorpage.Inject(*documentRoot,
 						proxy,
 					),
 				),
