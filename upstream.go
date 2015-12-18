@@ -22,11 +22,11 @@ import (
 )
 
 type upstream struct {
-	API             *api.API
-	Proxy           *proxy.Proxy
-	DocumentRoot    string
-	relativeURLRoot string
-	routes          []route
+	API          *api.API
+	Proxy        *proxy.Proxy
+	DocumentRoot string
+	urlPrefix    urlPrefix
+	routes       []route
 }
 
 type route struct {
@@ -79,7 +79,7 @@ func (u *upstream) compileRoutes() {
 
 		// Serve assets
 		route{"", regexp.MustCompile(`^/assets/`),
-			u.handleServeFile(u.DocumentRoot, CacheExpireMax,
+			handleServeFile(u.DocumentRoot, u.urlPrefix, CacheExpireMax,
 				handleDevelopmentMode(developmentMode,
 					handleDeployPage(u.DocumentRoot,
 						errorpage.Inject(u.DocumentRoot,
@@ -92,7 +92,7 @@ func (u *upstream) compileRoutes() {
 
 		// Serve static files or forward the requests
 		route{"", nil,
-			u.handleServeFile(u.DocumentRoot, CacheDisabled,
+			handleServeFile(u.DocumentRoot, u.urlPrefix, CacheDisabled,
 				handleDeployPage(u.DocumentRoot,
 					errorpage.Inject(u.DocumentRoot,
 						u.Proxy,
@@ -137,15 +137,11 @@ func newUpstream(authBackend string, authSocket string) *upstream {
 			URL:     parsedURL,
 			Version: Version,
 		},
-		Proxy:           proxy.NewProxy(parsedURL, proxyTransport, Version),
-		relativeURLRoot: relativeURLRoot,
+		Proxy:     proxy.NewProxy(parsedURL, proxyTransport, Version),
+		urlPrefix: urlPrefix(relativeURLRoot),
 	}
 	up.compileRoutes()
 	return up
-}
-
-func (u *upstream) relativeURIPath(p string) string {
-	return cleanURIPath(strings.TrimPrefix(p, u.relativeURLRoot))
 }
 
 func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
@@ -168,7 +164,8 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 
 	// Check URL Root
 	URIPath := cleanURIPath(r.URL.Path)
-	if !strings.HasPrefix(URIPath, u.relativeURLRoot) && URIPath+"/" != u.relativeURLRoot {
+	prefix := u.urlPrefix
+	if !prefix.match(URIPath) {
 		httpError(&w, r, fmt.Sprintf("Not found %q", URIPath), http.StatusNotFound)
 		return
 	}
@@ -180,7 +177,7 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		if g.regex == nil || g.regex.MatchString(u.relativeURIPath(URIPath)) {
+		if g.regex == nil || g.regex.MatchString(prefix.strip(URIPath)) {
 			foundService = true
 			break
 		}
