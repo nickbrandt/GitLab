@@ -80,5 +80,7 @@ func main() {
 		}()
 	}
 
-	log.Fatal(http.Serve(listener, newUpstream(*authBackend, *authSocket)))
+	upstream := newUpstream(*authBackend, *authSocket)
+	upstream.DocumentRoot = *documentRoot
+	log.Fatal(http.Serve(listener, upstream))
 }

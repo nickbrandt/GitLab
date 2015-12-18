@@ -17,12 +17,12 @@ const (
 	CacheExpireMax
 )
 
-func (u *upstream) handleServeFile(documentRoot *string, cache CacheMode, notFoundHandler http.HandlerFunc) http.HandlerFunc {
+func (u *upstream) handleServeFile(documentRoot string, cache CacheMode, notFoundHandler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		file := filepath.Join(*documentRoot, u.relativeURIPath(cleanURIPath(r.URL.Path)))
+		file := filepath.Join(documentRoot, u.relativeURIPath(cleanURIPath(r.URL.Path)))
 
 		// The filepath.Join does Clean traversing directories up
-		if !strings.HasPrefix(file, *documentRoot) {
+		if !strings.HasPrefix(file, documentRoot) {
 			helper.Fail500(w, &os.PathError{
 				Op:   "open",
 				Path: file,

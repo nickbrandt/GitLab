@@ -20,7 +20,7 @@ func TestIfNoDeployPageExist(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	executed := false
-	handleDeployPage(&dir, http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
+	handleDeployPage(dir, http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
 		executed = true
 	}))(w, nil)
 	if !executed {
@@ -41,7 +41,7 @@ func TestIfDeployPageExist(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	executed := false
-	handleDeployPage(&dir, http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
+	handleDeployPage(dir, http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
 		executed = true
 	}))(w, nil)
 	if executed {

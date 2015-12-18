@@ -24,6 +24,7 @@ import (
 type upstream struct {
 	API             *api.API
 	Proxy           *proxy.Proxy
+	DocumentRoot    string
 	authBackend     string
 	relativeURLRoot string
 	routes          []route
@@ -79,10 +80,10 @@ func (u *upstream) compileRoutes() {
 
 		// Serve assets
 		route{"", regexp.MustCompile(`^/assets/`),
-			u.handleServeFile(documentRoot, CacheExpireMax,
+			u.handleServeFile(u.DocumentRoot, CacheExpireMax,
 				handleDevelopmentMode(developmentMode,
-					handleDeployPage(documentRoot,
-						errorpage.Inject(*documentRoot,
+					handleDeployPage(u.DocumentRoot,
+						errorpage.Inject(u.DocumentRoot,
 							u.Proxy,
 						),
 					),
@@ -92,9 +93,9 @@ func (u *upstream) compileRoutes() {
 
 		// Serve static files or forward the requests
 		route{"", nil,
-			u.handleServeFile(documentRoot, CacheDisabled,
-				handleDeployPage(documentRoot,
-					errorpage.Inject(*documentRoot,
+			u.handleServeFile(u.DocumentRoot, CacheDisabled,
+				handleDeployPage(u.DocumentRoot,
+					errorpage.Inject(u.DocumentRoot,
 						u.Proxy,
 					),
 				),
