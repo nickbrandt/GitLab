@@ -25,7 +25,6 @@ type upstream struct {
 	API             *api.API
 	Proxy           *proxy.Proxy
 	DocumentRoot    string
-	authBackend     string
 	relativeURLRoot string
 	routes          []route
 }
@@ -133,7 +132,6 @@ func newUpstream(authBackend string, authSocket string) *upstream {
 	proxyTransport := proxy.NewRoundTripper(authTransport)
 
 	up := &upstream{
-		authBackend: authBackend,
 		API: &api.API{
 			Client:  &http.Client{Transport: proxyTransport},
 			URL:     parsedURL,
