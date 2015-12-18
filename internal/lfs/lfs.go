@@ -2,11 +2,12 @@
 In this file we handle git lfs objects downloads and uploads
 */
 
-package main
+package lfs
 
 import (
-	"./internal/api"
-	"./internal/helper"
+	"../api"
+	"../helper"
+"../proxy"
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
@@ -18,6 +19,10 @@ import (
 	"os"
 	"path/filepath"
 )
+
+func PutStore(a *api.API, p *proxy.Proxy) http.HandlerFunc {
+	return lfsAuthorizeHandler(a, handleStoreLfsObject(p))
+}
 
 func lfsAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.HandlerFunc {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {

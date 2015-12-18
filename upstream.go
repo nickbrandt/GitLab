@@ -10,6 +10,7 @@ import (
 	"./internal/api"
 	"./internal/errorpage"
 	"./internal/git"
+	"./internal/lfs"
 	"./internal/proxy"
 	"fmt"
 	"log"
@@ -54,7 +55,7 @@ func (u *upstream) compileRoutes() {
 		route{"GET", regexp.MustCompile(gitProjectPattern + `info/refs\z`), git.GetInfoRefs(u.API)},
 		route{"POST", regexp.MustCompile(gitProjectPattern + `git-upload-pack\z`), contentEncodingHandler(git.PostRPC(u.API))},
 		route{"POST", regexp.MustCompile(gitProjectPattern + `git-receive-pack\z`), contentEncodingHandler(git.PostRPC(u.API))},
-		route{"PUT", regexp.MustCompile(gitProjectPattern + `gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfsAuthorizeHandler(u.API, handleStoreLfsObject(u.Proxy))},
+		route{"PUT", regexp.MustCompile(gitProjectPattern + `gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfs.PutStore(u.API, u.Proxy)},
 
 		// Repository Archive
 		route{"GET", regexp.MustCompile(projectPattern + `repository/archive\z`), git.GetArchive(u.API)},
