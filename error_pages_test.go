@@ -21,7 +21,7 @@ func TestIfErrorPageIsPresented(t *testing.T) {
 	ioutil.WriteFile(filepath.Join(dir, "404.html"), []byte(errorPage), 0600)
 
 	w := httptest.NewRecorder()
-	h := httpHandleFunc(func(w http.ResponseWriter, _ *http.Request) {
+	h := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(404)
 		fmt.Fprint(w, "Not Found")
 	})
@@ -41,7 +41,7 @@ func TestIfErrorPassedIfNoErrorPageIsFound(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	errorResponse := "ERROR"
-	h := httpHandleFunc(func(w http.ResponseWriter, _ *http.Request) {
+	h := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(404)
 		fmt.Fprint(w, errorResponse)
 	})

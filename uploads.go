@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./internal/helper"
 	"bytes"
 	"errors"
 	"fmt"
@@ -85,11 +86,11 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 	return cleanup, nil
 }
 
-func handleFileUploads(h http.Handler) httpHandleFunc {
+func handleFileUploads(h http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tempPath := r.Header.Get(tempPathHeader)
 		if tempPath == "" {
-			fail500(w, errors.New("handleFileUploads: TempPath empty"))
+			helper.Fail500(w, errors.New("handleFileUploads: TempPath empty"))
 			return
 		}
 		r.Header.Del(tempPathHeader)
@@ -104,7 +105,7 @@ func handleFileUploads(h http.Handler) httpHandleFunc {
 			if err == http.ErrNotMultipart {
 				h.ServeHTTP(w, r)
 			} else {
-				fail500(w, fmt.Errorf("handleFileUploads: extract files from multipart: %v", err))
+				helper.Fail500(w, fmt.Errorf("handleFileUploads: extract files from multipart: %v", err))
 			}
 			return
 		}

@@ -7,6 +7,7 @@ In this file we handle request routing and interaction with the authBackend.
 package main
 
 import (
+	"./internal/api"
 	"./internal/proxy"
 	"fmt"
 	"log"
@@ -17,46 +18,11 @@ import (
 	"time"
 )
 
-type serviceHandleFunc func(http.ResponseWriter, *http.Request, *apiResponse)
-
-type API struct {
-	*http.Client
-	*url.URL
-}
-
 type upstream struct {
-	API             *API
+	API             *api.API
 	Proxy           *proxy.Proxy
 	authBackend     string
 	relativeURLRoot string
-}
-
-type apiResponse struct {
-	// GL_ID is an environment variable used by gitlab-shell hooks during 'git
-	// push' and 'git pull'
-	GL_ID string
-	// RepoPath is the full path on disk to the Git repository the request is
-	// about
-	RepoPath string
-	// ArchivePath is the full path where we should find/create a cached copy
-	// of a requested archive
-	ArchivePath string
-	// ArchivePrefix is used to put extracted archive contents in a
-	// subdirectory
-	ArchivePrefix string
-	// CommitId is used do prevent race conditions between the 'time of check'
-	// in the GitLab Rails app and the 'time of use' in gitlab-workhorse.
-	CommitId string
-	// StoreLFSPath is provided by the GitLab Rails application
-	// to mark where the tmp file should be placed
-	StoreLFSPath string
-	// LFS object id
-	LfsOid string
-	// LFS object size
-	LfsSize int64
-	// TmpPath is the path where we should store temporary files
-	// This is set by authorization middleware
-	TempPath string
 }
 
 func newUpstream(authBackend string, authSocket string) *upstream {
@@ -88,8 +54,12 @@ func newUpstream(authBackend string, authSocket string) *upstream {
 	proxyTransport := proxy.NewRoundTripper(authTransport)
 
 	up := &upstream{
-		authBackend:     authBackend,
-		API:             &API{Client: &http.Client{Transport: proxyTransport}, URL: parsedURL},
+		authBackend: authBackend,
+		API: &api.API{
+			Client:  &http.Client{Transport: proxyTransport},
+			URL:     parsedURL,
+			Version: Version,
+		},
 		Proxy:           proxy.NewProxy(parsedURL, proxyTransport, Version),
 		relativeURLRoot: relativeURLRoot,
 	}

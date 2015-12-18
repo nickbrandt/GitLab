@@ -5,6 +5,7 @@ In this file we handle the Git 'smart HTTP' protocol
 package main
 
 import (
+	"./internal/api"
 	"./internal/helper"
 	"errors"
 	"fmt"
@@ -27,10 +28,10 @@ func looksLikeRepo(p string) bool {
 	return true
 }
 
-func repoPreAuthorizeHandler(api *API, handleFunc serviceHandleFunc) httpHandleFunc {
-	return api.preAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *apiResponse) {
+func repoPreAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.HandlerFunc {
+	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		if a.RepoPath == "" {
-			fail500(w, errors.New("repoPreAuthorizeHandler: RepoPath empty"))
+			helper.Fail500(w, errors.New("repoPreAuthorizeHandler: RepoPath empty"))
 			return
 		}
 
@@ -43,7 +44,7 @@ func repoPreAuthorizeHandler(api *API, handleFunc serviceHandleFunc) httpHandleF
 	}, "")
 }
 
-func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *apiResponse) {
+func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	rpc := r.URL.Query().Get("service")
 	if !(rpc == "git-upload-pack" || rpc == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
@@ -55,12 +56,12 @@ func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *apiResponse) {
 	cmd := gitCommand(a.GL_ID, "git", subCommand(rpc), "--stateless-rpc", "--advertise-refs", a.RepoPath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		fail500(w, fmt.Errorf("handleGetInfoRefs: stdout: %v", err))
+		helper.Fail500(w, fmt.Errorf("handleGetInfoRefs: stdout: %v", err))
 		return
 	}
 	defer stdout.Close()
 	if err := cmd.Start(); err != nil {
-		fail500(w, fmt.Errorf("handleGetInfoRefs: start %v: %v", cmd.Args, err))
+		helper.Fail500(w, fmt.Errorf("handleGetInfoRefs: start %v: %v", cmd.Args, err))
 		return
 	}
 	defer cleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
@@ -87,14 +88,14 @@ func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *apiResponse) {
 	}
 }
 
-func handlePostRPC(w http.ResponseWriter, r *http.Request, a *apiResponse) {
+func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	var err error
 
 	// Get Git action from URL
 	action := filepath.Base(r.URL.Path)
 	if !(action == "git-upload-pack" || action == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
-		fail500(w, fmt.Errorf("handlePostRPC: unsupported action: %s", r.URL.Path))
+		helper.Fail500(w, fmt.Errorf("handlePostRPC: unsupported action: %s", r.URL.Path))
 		return
 	}
 
@@ -102,25 +103,25 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *apiResponse) {
 	cmd := gitCommand(a.GL_ID, "git", subCommand(action), "--stateless-rpc", a.RepoPath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		fail500(w, fmt.Errorf("handlePostRPC: stdout: %v", err))
+		helper.Fail500(w, fmt.Errorf("handlePostRPC: stdout: %v", err))
 		return
 	}
 	defer stdout.Close()
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
-		fail500(w, fmt.Errorf("handlePostRPC: stdin: %v", err))
+		helper.Fail500(w, fmt.Errorf("handlePostRPC: stdin: %v", err))
 		return
 	}
 	defer stdin.Close()
 	if err := cmd.Start(); err != nil {
-		fail500(w, fmt.Errorf("handlePostRPC: start %v: %v", cmd.Args, err))
+		helper.Fail500(w, fmt.Errorf("handlePostRPC: start %v: %v", cmd.Args, err))
 		return
 	}
 	defer cleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
 
 	// Write the client request body to Git's standard input
 	if _, err := io.Copy(stdin, r.Body); err != nil {
-		fail500(w, fmt.Errorf("handlePostRPC write to %v: %v", cmd.Args, err))
+		helper.Fail500(w, fmt.Errorf("handlePostRPC write to %v: %v", cmd.Args, err))
 		return
 	}
 	// Signal to the Git subprocess that no more data is coming

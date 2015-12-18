@@ -5,7 +5,6 @@ Miscellaneous helpers: logging, errors, subprocesses
 package main
 
 import (
-	"./internal/helper"
 	"fmt"
 	"net/http"
 	"os"
@@ -13,11 +12,6 @@ import (
 	"path"
 	"syscall"
 )
-
-func fail500(w http.ResponseWriter, err error) {
-	http.Error(w, "Internal server error", 500)
-	helper.LogError(err)
-}
 
 func httpError(w http.ResponseWriter, r *http.Request, error string, code int) {
 	if r.ProtoAtLeast(1, 1) {

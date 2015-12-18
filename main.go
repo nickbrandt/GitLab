@@ -46,12 +46,6 @@ type httpRoute struct {
 	handler http.Handler
 }
 
-type httpHandleFunc func(http.ResponseWriter, *http.Request)
-
-func (h httpHandleFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h(w, r)
-}
-
 const projectPattern = `^/[^/]+/[^/]+/`
 const gitProjectPattern = `^/[^/]+/[^/]+\.git/`
 

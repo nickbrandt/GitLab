@@ -5,6 +5,7 @@ In this file we handle 'git archive' downloads
 package main
 
 import (
+	"./internal/api"
 	"./internal/helper"
 	"fmt"
 	"io"
@@ -18,7 +19,7 @@ import (
 	"time"
 )
 
-func handleGetArchive(w http.ResponseWriter, r *http.Request, a *apiResponse) {
+func handleGetArchive(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	var format string
 	urlPath := r.URL.Path
 	switch filepath.Base(urlPath) {
@@ -31,7 +32,7 @@ func handleGetArchive(w http.ResponseWriter, r *http.Request, a *apiResponse) {
 	case "archive.tar.bz2":
 		format = "tar.bz2"
 	default:
-		fail500(w, fmt.Errorf("handleGetArchive: invalid format: %s", urlPath))
+		helper.Fail500(w, fmt.Errorf("handleGetArchive: invalid format: %s", urlPath))
 		return
 	}
 
@@ -54,7 +55,7 @@ func handleGetArchive(w http.ResponseWriter, r *http.Request, a *apiResponse) {
 	// to finalize the cached archive.
 	tempFile, err := prepareArchiveTempfile(path.Dir(a.ArchivePath), archiveFilename)
 	if err != nil {
-		fail500(w, fmt.Errorf("handleGetArchive: create tempfile: %v", err))
+		helper.Fail500(w, fmt.Errorf("handleGetArchive: create tempfile: %v", err))
 		return
 	}
 	defer tempFile.Close()
@@ -65,12 +66,12 @@ func handleGetArchive(w http.ResponseWriter, r *http.Request, a *apiResponse) {
 	archiveCmd := gitCommand("", "git", "--git-dir="+a.RepoPath, "archive", "--format="+archiveFormat, "--prefix="+a.ArchivePrefix+"/", a.CommitId)
 	archiveStdout, err := archiveCmd.StdoutPipe()
 	if err != nil {
-		fail500(w, fmt.Errorf("handleGetArchive: archive stdout: %v", err))
+		helper.Fail500(w, fmt.Errorf("handleGetArchive: archive stdout: %v", err))
 		return
 	}
 	defer archiveStdout.Close()
 	if err := archiveCmd.Start(); err != nil {
-		fail500(w, fmt.Errorf("handleGetArchive: start %v: %v", archiveCmd.Args, err))
+		helper.Fail500(w, fmt.Errorf("handleGetArchive: start %v: %v", archiveCmd.Args, err))
 		return
 	}
 	defer cleanUpProcessGroup(archiveCmd) // Ensure brute force subprocess clean-up
@@ -83,13 +84,13 @@ func handleGetArchive(w http.ResponseWriter, r *http.Request, a *apiResponse) {
 
 		stdout, err = compressCmd.StdoutPipe()
 		if err != nil {
-			fail500(w, fmt.Errorf("handleGetArchive: compress stdout: %v", err))
+			helper.Fail500(w, fmt.Errorf("handleGetArchive: compress stdout: %v", err))
 			return
 		}
 		defer stdout.Close()
 
 		if err := compressCmd.Start(); err != nil {
-			fail500(w, fmt.Errorf("handleGetArchive: start %v: %v", compressCmd.Args, err))
+			helper.Fail500(w, fmt.Errorf("handleGetArchive: start %v: %v", compressCmd.Args, err))
 			return
 		}
 		defer compressCmd.Wait()

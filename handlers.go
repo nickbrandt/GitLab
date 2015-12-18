@@ -1,13 +1,14 @@
 package main
 
 import (
+	"./internal/helper"
 	"compress/gzip"
 	"fmt"
 	"io"
 	"net/http"
 )
 
-func contentEncodingHandler(h httpHandleFunc) httpHandleFunc {
+func contentEncodingHandler(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var body io.ReadCloser
 		var err error
@@ -24,7 +25,7 @@ func contentEncodingHandler(h httpHandleFunc) httpHandleFunc {
 		}
 
 		if err != nil {
-			fail500(w, fmt.Errorf("contentEncodingHandler: %v", err))
+			helper.Fail500(w, fmt.Errorf("contentEncodingHandler: %v", err))
 			return
 		}
 		defer body.Close()

@@ -3,8 +3,14 @@ package helper
 import (
 	"errors"
 	"log"
+	"net/http"
 	"os"
 )
+
+func Fail500(w http.ResponseWriter, err error) {
+	http.Error(w, "Internal server error", 500)
+	LogError(err)
+}
 
 func LogError(err error) {
 	log.Printf("error: %v", err)

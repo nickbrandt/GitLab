@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./internal/api"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -8,7 +9,7 @@ import (
 	"testing"
 )
 
-func okHandler(w http.ResponseWriter, _ *http.Request, _ *apiResponse) {
+func okHandler(w http.ResponseWriter, _ *http.Request, _ *api.Response) {
 	w.WriteHeader(201)
 	fmt.Fprint(w, "{\"status\":\"ok\"}")
 }
@@ -26,7 +27,7 @@ func runPreAuthorizeHandler(t *testing.T, suffix string, url *regexp.Regexp, api
 	api := newUpstream(ts.URL, "").API
 
 	response := httptest.NewRecorder()
-	api.preAuthorizeHandler(okHandler, suffix)(response, httpRequest)
+	api.PreAuthorizeHandler(okHandler, suffix)(response, httpRequest)
 	assertResponseCode(t, response, expectedCode)
 	return response
 }
@@ -35,7 +36,7 @@ func TestPreAuthorizeHappyPath(t *testing.T) {
 	runPreAuthorizeHandler(
 		t, "/authorize",
 		regexp.MustCompile(`/authorize\z`),
-		&apiResponse{},
+		&api.Response{},
 		200, 201)
 }
 
@@ -43,7 +44,7 @@ func TestPreAuthorizeSuffix(t *testing.T) {
 	runPreAuthorizeHandler(
 		t, "/different-authorize",
 		regexp.MustCompile(`/authorize\z`),
-		&apiResponse{},
+		&api.Response{},
 		200, 404)
 }
 

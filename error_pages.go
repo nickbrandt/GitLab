@@ -59,7 +59,7 @@ func (s *errorPageResponseWriter) Flush() {
 	s.WriteHeader(http.StatusOK)
 }
 
-func handleRailsError(documentRoot *string, handler http.Handler) httpHandleFunc {
+func handleRailsError(documentRoot *string, handler http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		rw := errorPageResponseWriter{
 			rw:   w,

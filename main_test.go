@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./internal/api"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -340,7 +341,7 @@ func runOrFail(t *testing.T, cmd *exec.Cmd) {
 }
 
 func gitOkBody(t *testing.T) interface{} {
-	return &apiResponse{
+	return &api.Response{
 		GL_ID:    "user-123",
 		RepoPath: repoPath(t),
 	}
@@ -353,7 +354,7 @@ func archiveOkBody(t *testing.T, archiveName string) interface{} {
 	}
 	archivePath := path.Join(cwd, cacheDir, archiveName)
 
-	return &apiResponse{
+	return &api.Response{
 		RepoPath:      repoPath(t),
 		ArchivePath:   archivePath,
 		CommitId:      "c7fbe50c7c7419d9701eebe64b1fdacc3df5b9dd",
