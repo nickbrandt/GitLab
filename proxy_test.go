@@ -41,7 +41,7 @@ func TestProxyRequest(t *testing.T) {
 
 	u := newUpstream(ts.URL, nil)
 	w := httptest.NewRecorder()
-	u.proxyRequest(w, httpRequest)
+	u.Proxy.ServeHTTP(w, httpRequest)
 	assertResponseCode(t, w, 202)
 	assertResponseBody(t, w, "RESPONSE")
 
@@ -63,7 +63,7 @@ func TestProxyError(t *testing.T) {
 
 	u := newUpstream("http://localhost:655575/", &transport)
 	w := httptest.NewRecorder()
-	u.proxyRequest(w, httpRequest)
+	u.Proxy.ServeHTTP(w, httpRequest)
 	assertResponseCode(t, w, 502)
 	assertResponseBody(t, w, "dial tcp: invalid port 655575")
 }
@@ -93,7 +93,7 @@ func TestProxyReadTimeout(t *testing.T) {
 	u := newUpstream(ts.URL, transport)
 
 	w := httptest.NewRecorder()
-	u.proxyRequest(w, httpRequest)
+	u.Proxy.ServeHTTP(w, httpRequest)
 	assertResponseCode(t, w, 502)
 	assertResponseBody(t, w, "net/http: timeout awaiting response headers")
 }
@@ -117,7 +117,7 @@ func TestProxyHandlerTimeout(t *testing.T) {
 	u := newUpstream(ts.URL, transport)
 
 	w := httptest.NewRecorder()
-	u.proxyRequest(w, httpRequest)
+	u.Proxy.ServeHTTP(w, httpRequest)
 	assertResponseCode(t, w, 503)
 	assertResponseBody(t, w, "Request took too long")
 }

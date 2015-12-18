@@ -17,7 +17,7 @@ import (
 func TestUploadTempPathRequirement(t *testing.T) {
 	response := httptest.NewRecorder()
 	request := &http.Request{}
-	newUpstream("http://localhost", nil).handleFileUploads(response, request)
+	dummyUpstream.Proxy.handleFileUploads(response, request)
 	assertResponseCode(t, response, 500)
 }
 
@@ -53,7 +53,7 @@ func TestUploadHandlerForwardingRawData(t *testing.T) {
 	httpRequest.Header.Set(tempPathHeader, tempPath)
 	u := newUpstream(ts.URL, nil)
 
-	u.handleFileUploads(response, httpRequest)
+	u.Proxy.handleFileUploads(response, httpRequest)
 	assertResponseCode(t, response, 202)
 	if response.Body.String() != "RESPONSE" {
 		t.Fatal("Expected RESPONSE in response body")
@@ -128,7 +128,7 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	response := httptest.NewRecorder()
 	u := newUpstream(ts.URL, nil)
 
-	u.handleFileUploads(response, httpRequest)
+	u.Proxy.handleFileUploads(response, httpRequest)
 	assertResponseCode(t, response, 202)
 
 	if _, err := os.Stat(filePath); !os.IsNotExist(err) {

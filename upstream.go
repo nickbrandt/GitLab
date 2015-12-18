@@ -23,10 +23,14 @@ type API struct {
 }
 
 type upstream struct {
-	*API
-	httpProxy       *httputil.ReverseProxy
+	API             *API
+	Proxy           *Proxy
 	authBackend     string
 	relativeURLRoot string
+}
+
+type Proxy struct {
+	ReverseProxy *httputil.ReverseProxy
 }
 
 type apiResponse struct {
@@ -57,6 +61,15 @@ type apiResponse struct {
 	TempPath string
 }
 
+func newProxy(url *url.URL, transport http.RoundTripper) *Proxy {
+	// Modify a copy of url
+	proxyURL := *url
+	proxyURL.Path = ""
+	proxy := Proxy{ReverseProxy: httputil.NewSingleHostReverseProxy(&proxyURL)}
+	proxy.ReverseProxy.Transport = transport
+	return &proxy
+}
+
 func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream {
 	parsedURL, err := url.Parse(authBackend)
 	if err != nil {
@@ -68,17 +81,13 @@ func newUpstream(authBackend string, authTransport http.RoundTripper) *upstream 
 		relativeURLRoot += "/"
 	}
 
-	// Modify a copy of parsedURL
-	proxyURL := *parsedURL
-	proxyURL.Path = ""
-
 	up := &upstream{
 		authBackend:     authBackend,
 		API:             &API{Client: &http.Client{Transport: authTransport}, URL: parsedURL},
-		httpProxy:       httputil.NewSingleHostReverseProxy(&proxyURL),
+		Proxy:           newProxy(parsedURL, authTransport),
 		relativeURLRoot: relativeURLRoot,
 	}
-	up.httpProxy.Transport = authTransport
+
 	return up
 }
 

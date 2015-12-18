@@ -63,12 +63,13 @@ var httpRoutes []httpRoute
 
 func compileRoutes(u *upstream) {
 	api := u.API
+	proxy := u.Proxy
 	httpRoutes = []httpRoute{
 		// Git Clone
 		httpRoute{"GET", regexp.MustCompile(gitProjectPattern + `info/refs\z`), api.repoPreAuthorizeHandler(handleGetInfoRefs)},
 		httpRoute{"POST", regexp.MustCompile(gitProjectPattern + `git-upload-pack\z`), contentEncodingHandler(api.repoPreAuthorizeHandler(handlePostRPC))},
 		httpRoute{"POST", regexp.MustCompile(gitProjectPattern + `git-receive-pack\z`), contentEncodingHandler(api.repoPreAuthorizeHandler(handlePostRPC))},
-		httpRoute{"PUT", regexp.MustCompile(gitProjectPattern + `gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), api.lfsAuthorizeHandler(u.handleStoreLfsObject)},
+		httpRoute{"PUT", regexp.MustCompile(gitProjectPattern + `gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), api.lfsAuthorizeHandler(proxy.handleStoreLfsObject)},
 
 		// Repository Archive
 		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive\z`), api.repoPreAuthorizeHandler(handleGetArchive)},
@@ -85,11 +86,11 @@ func compileRoutes(u *upstream) {
 		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.bz2\z`), api.repoPreAuthorizeHandler(handleGetArchive)},
 
 		// CI Artifacts API
-		httpRoute{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), contentEncodingHandler(u.artifactsAuthorizeHandler(u.handleFileUploads))},
+		httpRoute{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), contentEncodingHandler(api.artifactsAuthorizeHandler(proxy.handleFileUploads))},
 
 		// Explicitly proxy API requests
-		httpRoute{"", regexp.MustCompile(apiPattern), u.proxyRequest},
-		httpRoute{"", regexp.MustCompile(ciAPIPattern), u.proxyRequest},
+		httpRoute{"", regexp.MustCompile(apiPattern), proxy.ServeHTTP},
+		httpRoute{"", regexp.MustCompile(ciAPIPattern), proxy.ServeHTTP},
 
 		// Serve assets
 		httpRoute{"", regexp.MustCompile(`^/assets/`),
@@ -97,7 +98,7 @@ func compileRoutes(u *upstream) {
 				handleDevelopmentMode(developmentMode,
 					handleDeployPage(documentRoot,
 						handleRailsError(documentRoot,
-							u.proxyRequest,
+							proxy.ServeHTTP,
 						),
 					),
 				),
@@ -109,7 +110,7 @@ func compileRoutes(u *upstream) {
 			u.handleServeFile(documentRoot, CacheDisabled,
 				handleDeployPage(documentRoot,
 					handleRailsError(documentRoot,
-						u.proxyRequest,
+						proxy.ServeHTTP,
 					),
 				),
 			),

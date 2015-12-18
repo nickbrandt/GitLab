@@ -51,7 +51,7 @@ func headerClone(h http.Header) http.Header {
 	return h2
 }
 
-func (u *upstream) proxyRequest(w http.ResponseWriter, r *http.Request) {
+func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Clone request
 	req := *r
 	req.Header = headerClone(r.Header)
@@ -61,5 +61,5 @@ func (u *upstream) proxyRequest(w http.ResponseWriter, r *http.Request) {
 	rw := newSendFileResponseWriter(w, &req)
 	defer rw.Flush()
 
-	u.httpProxy.ServeHTTP(&rw, &req)
+	p.ReverseProxy.ServeHTTP(&rw, &req)
 }

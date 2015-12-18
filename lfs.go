@@ -39,7 +39,7 @@ func (api *API) lfsAuthorizeHandler(handleFunc serviceHandleFunc) httpHandleFunc
 	}, "/authorize")
 }
 
-func (u *upstream) handleStoreLfsObject(w http.ResponseWriter, r *http.Request, a *apiResponse) {
+func (p *Proxy) handleStoreLfsObject(w http.ResponseWriter, r *http.Request, a *apiResponse) {
 	file, err := ioutil.TempFile(a.StoreLFSPath, a.LfsOid)
 	if err != nil {
 		fail500(w, fmt.Errorf("handleStoreLfsObject: create tempfile: %v", err))
@@ -75,5 +75,5 @@ func (u *upstream) handleStoreLfsObject(w http.ResponseWriter, r *http.Request, 
 	r.ContentLength = 0
 
 	// And proxy the request
-	u.proxyRequest(w, r)
+	p.ServeHTTP(w, r)
 }
