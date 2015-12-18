@@ -85,41 +85,43 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 	return cleanup, nil
 }
 
-func (p *Proxy) handleFileUploads(w http.ResponseWriter, r *http.Request) {
-	tempPath := r.Header.Get(tempPathHeader)
-	if tempPath == "" {
-		fail500(w, errors.New("handleFileUploads: TempPath empty"))
-		return
-	}
-	r.Header.Del(tempPathHeader)
-
-	var body bytes.Buffer
-	writer := multipart.NewWriter(&body)
-	defer writer.Close()
-
-	// Rewrite multipart form data
-	cleanup, err := rewriteFormFilesFromMultipart(r, writer, tempPath)
-	if err != nil {
-		if err == http.ErrNotMultipart {
-			p.ServeHTTP(w, r)
-		} else {
-			fail500(w, fmt.Errorf("handleFileUploads: extract files from multipart: %v", err))
+func handleFileUploads(h http.Handler) httpHandleFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tempPath := r.Header.Get(tempPathHeader)
+		if tempPath == "" {
+			fail500(w, errors.New("handleFileUploads: TempPath empty"))
+			return
 		}
-		return
+		r.Header.Del(tempPathHeader)
+
+		var body bytes.Buffer
+		writer := multipart.NewWriter(&body)
+		defer writer.Close()
+
+		// Rewrite multipart form data
+		cleanup, err := rewriteFormFilesFromMultipart(r, writer, tempPath)
+		if err != nil {
+			if err == http.ErrNotMultipart {
+				h.ServeHTTP(w, r)
+			} else {
+				fail500(w, fmt.Errorf("handleFileUploads: extract files from multipart: %v", err))
+			}
+			return
+		}
+
+		if cleanup != nil {
+			defer cleanup()
+		}
+
+		// Close writer
+		writer.Close()
+
+		// Hijack the request
+		r.Body = ioutil.NopCloser(&body)
+		r.ContentLength = int64(body.Len())
+		r.Header.Set("Content-Type", writer.FormDataContentType())
+
+		// Proxy the request
+		h.ServeHTTP(w, r)
 	}
-
-	if cleanup != nil {
-		defer cleanup()
-	}
-
-	// Close writer
-	writer.Close()
-
-	// Hijack the request
-	r.Body = ioutil.NopCloser(&body)
-	r.ContentLength = int64(body.Len())
-	r.Header.Set("Content-Type", writer.FormDataContentType())
-
-	// Proxy the request
-	p.ServeHTTP(w, r)
 }

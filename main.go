@@ -48,6 +48,10 @@ type httpRoute struct {
 
 type httpHandleFunc func(http.ResponseWriter, *http.Request)
 
+func (h httpHandleFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h(w, r)
+}
+
 const projectPattern = `^/[^/]+/[^/]+/`
 const gitProjectPattern = `^/[^/]+/[^/]+\.git/`
 
@@ -86,7 +90,7 @@ func compileRoutes(u *upstream) {
 		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.bz2\z`), api.repoPreAuthorizeHandler(handleGetArchive)},
 
 		// CI Artifacts API
-		httpRoute{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), contentEncodingHandler(api.artifactsAuthorizeHandler(proxy.handleFileUploads))},
+		httpRoute{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), contentEncodingHandler(api.artifactsAuthorizeHandler(handleFileUploads(proxy)))},
 
 		// Explicitly proxy API requests
 		httpRoute{"", regexp.MustCompile(apiPattern), proxy.ServeHTTP},
