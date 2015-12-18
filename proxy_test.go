@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./internal/helper"
 	"./internal/proxy"
 	"bytes"
 	"fmt"
@@ -44,8 +45,8 @@ func TestProxyRequest(t *testing.T) {
 	u := newUpstream(ts.URL, "")
 	w := httptest.NewRecorder()
 	u.Proxy.ServeHTTP(w, httpRequest)
-	assertResponseCode(t, w, 202)
-	assertResponseBody(t, w, "RESPONSE")
+	helper.AssertResponseCode(t, w, 202)
+	helper.AssertResponseBody(t, w, "RESPONSE")
 
 	if w.Header().Get("Custom-Response-Header") != "test" {
 		t.Fatal("Expected custom response header")
@@ -62,8 +63,8 @@ func TestProxyError(t *testing.T) {
 	u := newUpstream("http://localhost:655575/", "")
 	w := httptest.NewRecorder()
 	u.Proxy.ServeHTTP(w, httpRequest)
-	assertResponseCode(t, w, 502)
-	assertResponseBody(t, w, "dial tcp: invalid port 655575")
+	helper.AssertResponseCode(t, w, 502)
+	helper.AssertResponseBody(t, w, "dial tcp: invalid port 655575")
 }
 
 func TestProxyReadTimeout(t *testing.T) {
@@ -97,8 +98,8 @@ func TestProxyReadTimeout(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	u.Proxy.ServeHTTP(w, httpRequest)
-	assertResponseCode(t, w, 502)
-	assertResponseBody(t, w, "net/http: timeout awaiting response headers")
+	helper.AssertResponseCode(t, w, 502)
+	helper.AssertResponseBody(t, w, "net/http: timeout awaiting response headers")
 }
 
 func TestProxyHandlerTimeout(t *testing.T) {
@@ -117,6 +118,6 @@ func TestProxyHandlerTimeout(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	u.Proxy.ServeHTTP(w, httpRequest)
-	assertResponseCode(t, w, 503)
-	assertResponseBody(t, w, "Request took too long")
+	helper.AssertResponseCode(t, w, 503)
+	helper.AssertResponseBody(t, w, "Request took too long")
 }

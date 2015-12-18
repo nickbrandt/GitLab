@@ -1,7 +1,7 @@
 package errorpage
 
 import (
-"../helper"
+	"../helper"
 	"fmt"
 	"io/ioutil"
 	"log"

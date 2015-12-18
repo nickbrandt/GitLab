@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./internal/helper"
 	"bytes"
 	"fmt"
 	"io"
@@ -18,7 +19,7 @@ func TestUploadTempPathRequirement(t *testing.T) {
 	response := httptest.NewRecorder()
 	request := &http.Request{}
 	handleFileUploads(dummyUpstream.Proxy).ServeHTTP(response, request)
-	assertResponseCode(t, response, 500)
+	helper.AssertResponseCode(t, response, 500)
 }
 
 func TestUploadHandlerForwardingRawData(t *testing.T) {
@@ -54,7 +55,7 @@ func TestUploadHandlerForwardingRawData(t *testing.T) {
 	u := newUpstream(ts.URL, "")
 
 	handleFileUploads(u.Proxy).ServeHTTP(response, httpRequest)
-	assertResponseCode(t, response, 202)
+	helper.AssertResponseCode(t, response, 202)
 	if response.Body.String() != "RESPONSE" {
 		t.Fatal("Expected RESPONSE in response body")
 	}
@@ -129,7 +130,7 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	u := newUpstream(ts.URL, "")
 
 	handleFileUploads(u.Proxy).ServeHTTP(response, httpRequest)
-	assertResponseCode(t, response, 202)
+	helper.AssertResponseCode(t, response, 202)
 
 	if _, err := os.Stat(filePath); !os.IsNotExist(err) {
 		t.Fatal("expected the file to be deleted")

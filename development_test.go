@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./internal/helper"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -34,5 +35,5 @@ func TestDevelopmentModeDisabled(t *testing.T) {
 	if executed {
 		t.Error("The handler should not get executed")
 	}
-	assertResponseCode(t, w, 404)
+	helper.AssertResponseCode(t, w, 404)
 }

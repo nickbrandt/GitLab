@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./internal/helper"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -48,6 +49,6 @@ func TestIfDeployPageExist(t *testing.T) {
 	}
 	w.Flush()
 
-	assertResponseCode(t, w, 200)
-	assertResponseBody(t, w, deployPage)
+	helper.AssertResponseCode(t, w, 200)
+	helper.AssertResponseBody(t, w, deployPage)
 }

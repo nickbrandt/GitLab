@@ -1,7 +1,7 @@
-package main
+package errorpage
 
 import (
-	"./internal/errorpage"
+	"../helper"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -26,11 +26,11 @@ func TestIfErrorPageIsPresented(t *testing.T) {
 		w.WriteHeader(404)
 		fmt.Fprint(w, "Not Found")
 	})
-	errorpage.Inject(dir, h)(w, nil)
+	Inject(dir, h)(w, nil)
 	w.Flush()
 
-	assertResponseCode(t, w, 404)
-	assertResponseBody(t, w, errorPage)
+	helper.AssertResponseCode(t, w, 404)
+	helper.AssertResponseBody(t, w, errorPage)
 }
 
 func TestIfErrorPassedIfNoErrorPageIsFound(t *testing.T) {
@@ -46,9 +46,9 @@ func TestIfErrorPassedIfNoErrorPageIsFound(t *testing.T) {
 		w.WriteHeader(404)
 		fmt.Fprint(w, errorResponse)
 	})
-	errorpage.Inject(dir, h)(w, nil)
+	Inject(dir, h)(w, nil)
 	w.Flush()
 
-	assertResponseCode(t, w, 404)
-	assertResponseBody(t, w, errorResponse)
+	helper.AssertResponseCode(t, w, 404)
+	helper.AssertResponseBody(t, w, errorResponse)
 }

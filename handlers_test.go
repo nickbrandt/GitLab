@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./internal/helper"
 	"bytes"
 	"compress/gzip"
 	"fmt"
@@ -36,7 +37,7 @@ func TestGzipEncoding(t *testing.T) {
 		}
 	})(resp, req)
 
-	assertResponseCode(t, resp, 200)
+	helper.AssertResponseCode(t, resp, 200)
 }
 
 func TestNoEncoding(t *testing.T) {
@@ -60,7 +61,7 @@ func TestNoEncoding(t *testing.T) {
 		}
 	})(resp, req)
 
-	assertResponseCode(t, resp, 200)
+	helper.AssertResponseCode(t, resp, 200)
 }
 
 func TestInvalidEncoding(t *testing.T) {
@@ -76,5 +77,5 @@ func TestInvalidEncoding(t *testing.T) {
 		t.Fatal("it shouldn't be executed")
 	})(resp, req)
 
-	assertResponseCode(t, resp, 500)
+	helper.AssertResponseCode(t, resp, 500)
 }

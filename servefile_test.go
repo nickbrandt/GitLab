@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./internal/helper"
 	"bytes"
 	"compress/gzip"
 	"io/ioutil"
@@ -19,7 +20,7 @@ func TestServingNonExistingFile(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	dummyUpstream.handleServeFile(&dir, CacheDisabled, nil)(w, httpRequest)
-	assertResponseCode(t, w, 404)
+	helper.AssertResponseCode(t, w, 404)
 }
 
 func TestServingDirectory(t *testing.T) {
@@ -32,7 +33,7 @@ func TestServingDirectory(t *testing.T) {
 	httpRequest, _ := http.NewRequest("GET", "/file", nil)
 	w := httptest.NewRecorder()
 	dummyUpstream.handleServeFile(&dir, CacheDisabled, nil)(w, httpRequest)
-	assertResponseCode(t, w, 404)
+	helper.AssertResponseCode(t, w, 404)
 }
 
 func TestServingMalformedUri(t *testing.T) {
@@ -41,7 +42,7 @@ func TestServingMalformedUri(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	dummyUpstream.handleServeFile(&dir, CacheDisabled, nil)(w, httpRequest)
-	assertResponseCode(t, w, 404)
+	helper.AssertResponseCode(t, w, 404)
 }
 
 func TestExecutingHandlerWhenNoFileFound(t *testing.T) {
@@ -71,7 +72,7 @@ func TestServingTheActualFile(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	dummyUpstream.handleServeFile(&dir, CacheDisabled, nil)(w, httpRequest)
-	assertResponseCode(t, w, 200)
+	helper.AssertResponseCode(t, w, 200)
 	if w.Body.String() != fileContent {
 		t.Error("We should serve the file: ", w.Body.String())
 	}
@@ -102,15 +103,15 @@ func testServingThePregzippedFile(t *testing.T, enableGzip bool) {
 
 	w := httptest.NewRecorder()
 	dummyUpstream.handleServeFile(&dir, CacheDisabled, nil)(w, httpRequest)
-	assertResponseCode(t, w, 200)
+	helper.AssertResponseCode(t, w, 200)
 	if enableGzip {
-		assertResponseHeader(t, w, "Content-Encoding", "gzip")
+		helper.AssertResponseHeader(t, w, "Content-Encoding", "gzip")
 		if bytes.Compare(w.Body.Bytes(), fileGzipContent.Bytes()) != 0 {
 			t.Error("We should serve the pregzipped file")
 		}
 	} else {
-		assertResponseCode(t, w, 200)
-		assertResponseHeader(t, w, "Content-Encoding", "")
+		helper.AssertResponseCode(t, w, 200)
+		helper.AssertResponseHeader(t, w, "Content-Encoding", "")
 		if w.Body.String() != fileContent {
 			t.Error("We should serve the file: ", w.Body.String())
 		}
