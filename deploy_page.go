@@ -6,12 +6,12 @@ import (
 	"path/filepath"
 )
 
-func handleDeployPage(documentRoot *string, handler http.HandlerFunc) http.HandlerFunc {
+func handleDeployPage(documentRoot *string, handler http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		deployPage := filepath.Join(*documentRoot, "index.html")
 		data, err := ioutil.ReadFile(deployPage)
 		if err != nil {
-			handler(w, r)
+			handler.ServeHTTP(w, r)
 			return
 		}
 
