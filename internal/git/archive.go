@@ -2,11 +2,11 @@
 In this file we handle 'git archive' downloads
 */
 
-package main
+package git
 
 import (
-	"./internal/api"
-	"./internal/helper"
+	"../api"
+	"../helper"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -19,6 +19,9 @@ import (
 	"time"
 )
 
+func GetArchive(a *api.API) http.Handler {
+	return repoPreAuthorizeHandler(a, handleGetArchive)
+}
 func handleGetArchive(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	var format string
 	urlPath := r.URL.Path

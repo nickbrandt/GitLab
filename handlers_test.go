@@ -28,14 +28,14 @@ func TestGzipEncoding(t *testing.T) {
 	}
 	req.Header.Set("Content-Encoding", "gzip")
 
-	contentEncodingHandler(func(_ http.ResponseWriter, r *http.Request) {
+	contentEncodingHandler(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
 		if _, ok := r.Body.(*gzip.Reader); !ok {
 			t.Fatal("Expected gzip reader for body, but it's:", reflect.TypeOf(r.Body))
 		}
 		if r.Header.Get("Content-Encoding") != "" {
 			t.Fatal("Content-Encoding should be deleted")
 		}
-	})(resp, req)
+	}))(resp, req)
 
 	helper.AssertResponseCode(t, resp, 200)
 }
@@ -52,14 +52,14 @@ func TestNoEncoding(t *testing.T) {
 	}
 	req.Header.Set("Content-Encoding", "")
 
-	contentEncodingHandler(func(_ http.ResponseWriter, r *http.Request) {
+	contentEncodingHandler(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
 		if r.Body != body {
 			t.Fatal("Expected the same body")
 		}
 		if r.Header.Get("Content-Encoding") != "" {
 			t.Fatal("Content-Encoding should be deleted")
 		}
-	})(resp, req)
+	}))(resp, req)
 
 	helper.AssertResponseCode(t, resp, 200)
 }
@@ -73,9 +73,9 @@ func TestInvalidEncoding(t *testing.T) {
 	}
 	req.Header.Set("Content-Encoding", "application/unknown")
 
-	contentEncodingHandler(func(_ http.ResponseWriter, _ *http.Request) {
+	contentEncodingHandler(http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
 		t.Fatal("it shouldn't be executed")
-	})(resp, req)
+	}))(resp, req)
 
 	helper.AssertResponseCode(t, resp, 500)
 }

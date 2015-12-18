@@ -2,11 +2,11 @@
 In this file we handle the Git 'smart HTTP' protocol
 */
 
-package main
+package git
 
 import (
-	"./internal/api"
-	"./internal/helper"
+	"../api"
+	"../helper"
 	"errors"
 	"fmt"
 	"io"
@@ -17,6 +17,14 @@ import (
 	"path/filepath"
 	"strings"
 )
+
+func GetInfoRefs(a *api.API) http.Handler {
+	return repoPreAuthorizeHandler(a, handleGetInfoRefs)
+}
+
+func PostRPC(a *api.API) http.Handler {
+	return repoPreAuthorizeHandler(a, handlePostRPC)
+}
 
 func looksLikeRepo(p string) bool {
 	// If /path/to/foo.git/objects exists then let's assume it is a valid Git

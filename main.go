@@ -15,6 +15,7 @@ package main
 
 import (
 	"./internal/errorpage"
+	"./internal/git"
 	"flag"
 	"fmt"
 	"log"
@@ -65,24 +66,24 @@ func compileRoutes(u *upstream) {
 	proxy := u.Proxy
 	httpRoutes = []httpRoute{
 		// Git Clone
-		httpRoute{"GET", regexp.MustCompile(gitProjectPattern + `info/refs\z`), repoPreAuthorizeHandler(api, handleGetInfoRefs)},
-		httpRoute{"POST", regexp.MustCompile(gitProjectPattern + `git-upload-pack\z`), contentEncodingHandler(repoPreAuthorizeHandler(api, handlePostRPC))},
-		httpRoute{"POST", regexp.MustCompile(gitProjectPattern + `git-receive-pack\z`), contentEncodingHandler(repoPreAuthorizeHandler(api, handlePostRPC))},
+		httpRoute{"GET", regexp.MustCompile(gitProjectPattern + `info/refs\z`), git.GetInfoRefs(api)},
+		httpRoute{"POST", regexp.MustCompile(gitProjectPattern + `git-upload-pack\z`), contentEncodingHandler(git.PostRPC(api))},
+		httpRoute{"POST", regexp.MustCompile(gitProjectPattern + `git-receive-pack\z`), contentEncodingHandler(git.PostRPC(api))},
 		httpRoute{"PUT", regexp.MustCompile(gitProjectPattern + `gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfsAuthorizeHandler(api, handleStoreLfsObject(proxy))},
 
 		// Repository Archive
-		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive\z`), repoPreAuthorizeHandler(api, handleGetArchive)},
-		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.zip\z`), repoPreAuthorizeHandler(api, handleGetArchive)},
-		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar\z`), repoPreAuthorizeHandler(api, handleGetArchive)},
-		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar.gz\z`), repoPreAuthorizeHandler(api, handleGetArchive)},
-		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar.bz2\z`), repoPreAuthorizeHandler(api, handleGetArchive)},
+		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive\z`), git.GetArchive(api)},
+		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.zip\z`), git.GetArchive(api)},
+		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar\z`), git.GetArchive(api)},
+		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar.gz\z`), git.GetArchive(api)},
+		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar.bz2\z`), git.GetArchive(api)},
 
 		// Repository Archive API
-		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive\z`), repoPreAuthorizeHandler(api, handleGetArchive)},
-		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.zip\z`), repoPreAuthorizeHandler(api, handleGetArchive)},
-		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar\z`), repoPreAuthorizeHandler(api, handleGetArchive)},
-		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.gz\z`), repoPreAuthorizeHandler(api, handleGetArchive)},
-		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.bz2\z`), repoPreAuthorizeHandler(api, handleGetArchive)},
+		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive\z`), git.GetArchive(api)},
+		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.zip\z`), git.GetArchive(api)},
+		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar\z`), git.GetArchive(api)},
+		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.gz\z`), git.GetArchive(api)},
+		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.bz2\z`), git.GetArchive(api)},
 
 		// CI Artifacts API
 		httpRoute{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), contentEncodingHandler(artifactsAuthorizeHandler(api, handleFileUploads(proxy)))},
