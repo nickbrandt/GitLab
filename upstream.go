@@ -22,7 +22,6 @@ type API struct {
 	*url.URL
 }
 
-
 type upstream struct {
 	*API
 	httpProxy       *httputil.ReverseProxy
