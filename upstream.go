@@ -139,5 +139,5 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	g.handleFunc(&w, r)
+	g.handler.ServeHTTP(&w, r)
 }

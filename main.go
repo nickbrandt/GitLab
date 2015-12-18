@@ -41,9 +41,9 @@ var responseHeadersTimeout = flag.Duration("proxyHeadersTimeout", time.Minute, "
 var developmentMode = flag.Bool("developmentMode", false, "Allow to serve assets from Rails app")
 
 type httpRoute struct {
-	method     string
-	regex      *regexp.Regexp
-	handleFunc httpHandleFunc
+	method  string
+	regex   *regexp.Regexp
+	handler http.Handler
 }
 
 type httpHandleFunc func(http.ResponseWriter, *http.Request)
@@ -93,8 +93,8 @@ func compileRoutes(u *upstream) {
 		httpRoute{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), contentEncodingHandler(api.artifactsAuthorizeHandler(handleFileUploads(proxy)))},
 
 		// Explicitly proxy API requests
-		httpRoute{"", regexp.MustCompile(apiPattern), proxy.ServeHTTP},
-		httpRoute{"", regexp.MustCompile(ciAPIPattern), proxy.ServeHTTP},
+		httpRoute{"", regexp.MustCompile(apiPattern), proxy},
+		httpRoute{"", regexp.MustCompile(ciAPIPattern), proxy},
 
 		// Serve assets
 		httpRoute{"", regexp.MustCompile(`^/assets/`),
