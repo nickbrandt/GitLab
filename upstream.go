@@ -8,12 +8,15 @@ package main
 
 import (
 	"./internal/api"
+	"./internal/errorpage"
+	"./internal/git"
 	"./internal/proxy"
 	"fmt"
 	"log"
 	"net"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -23,6 +26,81 @@ type upstream struct {
 	Proxy           *proxy.Proxy
 	authBackend     string
 	relativeURLRoot string
+	routes          []route
+}
+
+type route struct {
+	method  string
+	regex   *regexp.Regexp
+	handler http.Handler
+}
+
+const projectPattern = `^/[^/]+/[^/]+/`
+const gitProjectPattern = `^/[^/]+/[^/]+\.git/`
+
+const apiPattern = `^/api/`
+const projectsAPIPattern = `^/api/v3/projects/[^/]+/`
+
+const ciAPIPattern = `^/ci/api/`
+
+// Routing table
+// We match against URI not containing the relativeUrlRoot:
+// see upstream.ServeHTTP
+var routes []route
+
+func (u *upstream) compileRoutes() {
+	u.routes = []route{
+		// Git Clone
+		route{"GET", regexp.MustCompile(gitProjectPattern + `info/refs\z`), git.GetInfoRefs(u.API)},
+		route{"POST", regexp.MustCompile(gitProjectPattern + `git-upload-pack\z`), contentEncodingHandler(git.PostRPC(u.API))},
+		route{"POST", regexp.MustCompile(gitProjectPattern + `git-receive-pack\z`), contentEncodingHandler(git.PostRPC(u.API))},
+		route{"PUT", regexp.MustCompile(gitProjectPattern + `gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfsAuthorizeHandler(u.API, handleStoreLfsObject(u.Proxy))},
+
+		// Repository Archive
+		route{"GET", regexp.MustCompile(projectPattern + `repository/archive\z`), git.GetArchive(u.API)},
+		route{"GET", regexp.MustCompile(projectPattern + `repository/archive.zip\z`), git.GetArchive(u.API)},
+		route{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar\z`), git.GetArchive(u.API)},
+		route{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar.gz\z`), git.GetArchive(u.API)},
+		route{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar.bz2\z`), git.GetArchive(u.API)},
+
+		// Repository Archive API
+		route{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive\z`), git.GetArchive(u.API)},
+		route{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.zip\z`), git.GetArchive(u.API)},
+		route{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar\z`), git.GetArchive(u.API)},
+		route{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.gz\z`), git.GetArchive(u.API)},
+		route{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.bz2\z`), git.GetArchive(u.API)},
+
+		// CI Artifacts API
+		route{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), contentEncodingHandler(artifactsAuthorizeHandler(u.API, handleFileUploads(u.Proxy)))},
+
+		// Explicitly u.Proxy API requests
+		route{"", regexp.MustCompile(apiPattern), u.Proxy},
+		route{"", regexp.MustCompile(ciAPIPattern), u.Proxy},
+
+		// Serve assets
+		route{"", regexp.MustCompile(`^/assets/`),
+			u.handleServeFile(documentRoot, CacheExpireMax,
+				handleDevelopmentMode(developmentMode,
+					handleDeployPage(documentRoot,
+						errorpage.Inject(*documentRoot,
+							u.Proxy,
+						),
+					),
+				),
+			),
+		},
+
+		// Serve static files or forward the requests
+		route{"", nil,
+			u.handleServeFile(documentRoot, CacheDisabled,
+				handleDeployPage(documentRoot,
+					errorpage.Inject(*documentRoot,
+						u.Proxy,
+					),
+				),
+			),
+		},
+	}
 }
 
 func newUpstream(authBackend string, authSocket string) *upstream {
@@ -63,7 +141,7 @@ func newUpstream(authBackend string, authSocket string) *upstream {
 		Proxy:           proxy.NewProxy(parsedURL, proxyTransport, Version),
 		relativeURLRoot: relativeURLRoot,
 	}
-
+	up.compileRoutes()
 	return up
 }
 
@@ -72,7 +150,7 @@ func (u *upstream) relativeURIPath(p string) string {
 }
 
 func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
-	var g httpRoute
+	var g route
 
 	w := newLoggingResponseWriter(ow)
 	defer w.Log(r)
@@ -98,7 +176,7 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 
 	// Look for a matching Git service
 	foundService := false
-	for _, g = range httpRoutes {
+	for _, g = range u.routes {
 		if g.method != "" && r.Method != g.method {
 			continue
 		}

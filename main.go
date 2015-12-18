@@ -14,8 +14,6 @@ In this file we start the web server and hand off to the upstream type.
 package main
 
 import (
-	"./internal/errorpage"
-	"./internal/git"
 	"flag"
 	"fmt"
 	"log"
@@ -23,7 +21,6 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"os"
-	"regexp"
 	"syscall"
 	"time"
 )
@@ -41,82 +38,6 @@ var pprofListenAddr = flag.String("pprofListenAddr", "", "pprof listening addres
 var documentRoot = flag.String("documentRoot", "public", "Path to static files content")
 var responseHeadersTimeout = flag.Duration("proxyHeadersTimeout", time.Minute, "How long to wait for response headers when proxying the request")
 var developmentMode = flag.Bool("developmentMode", false, "Allow to serve assets from Rails app")
-
-type httpRoute struct {
-	method  string
-	regex   *regexp.Regexp
-	handler http.Handler
-}
-
-const projectPattern = `^/[^/]+/[^/]+/`
-const gitProjectPattern = `^/[^/]+/[^/]+\.git/`
-
-const apiPattern = `^/api/`
-const projectsAPIPattern = `^/api/v3/projects/[^/]+/`
-
-const ciAPIPattern = `^/ci/api/`
-
-// Routing table
-// We match against URI not containing the relativeUrlRoot:
-// see upstream.ServeHTTP
-var httpRoutes []httpRoute
-
-func compileRoutes(u *upstream) {
-	api := u.API
-	proxy := u.Proxy
-	httpRoutes = []httpRoute{
-		// Git Clone
-		httpRoute{"GET", regexp.MustCompile(gitProjectPattern + `info/refs\z`), git.GetInfoRefs(api)},
-		httpRoute{"POST", regexp.MustCompile(gitProjectPattern + `git-upload-pack\z`), contentEncodingHandler(git.PostRPC(api))},
-		httpRoute{"POST", regexp.MustCompile(gitProjectPattern + `git-receive-pack\z`), contentEncodingHandler(git.PostRPC(api))},
-		httpRoute{"PUT", regexp.MustCompile(gitProjectPattern + `gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfsAuthorizeHandler(api, handleStoreLfsObject(proxy))},
-
-		// Repository Archive
-		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive\z`), git.GetArchive(api)},
-		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.zip\z`), git.GetArchive(api)},
-		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar\z`), git.GetArchive(api)},
-		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar.gz\z`), git.GetArchive(api)},
-		httpRoute{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar.bz2\z`), git.GetArchive(api)},
-
-		// Repository Archive API
-		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive\z`), git.GetArchive(api)},
-		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.zip\z`), git.GetArchive(api)},
-		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar\z`), git.GetArchive(api)},
-		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.gz\z`), git.GetArchive(api)},
-		httpRoute{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.bz2\z`), git.GetArchive(api)},
-
-		// CI Artifacts API
-		httpRoute{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), contentEncodingHandler(artifactsAuthorizeHandler(api, handleFileUploads(proxy)))},
-
-		// Explicitly proxy API requests
-		httpRoute{"", regexp.MustCompile(apiPattern), proxy},
-		httpRoute{"", regexp.MustCompile(ciAPIPattern), proxy},
-
-		// Serve assets
-		httpRoute{"", regexp.MustCompile(`^/assets/`),
-			u.handleServeFile(documentRoot, CacheExpireMax,
-				handleDevelopmentMode(developmentMode,
-					handleDeployPage(documentRoot,
-						errorpage.Inject(*documentRoot,
-							proxy,
-						),
-					),
-				),
-			),
-		},
-
-		// Serve static files or forward the requests
-		httpRoute{"", nil,
-			u.handleServeFile(documentRoot, CacheDisabled,
-				handleDeployPage(documentRoot,
-					errorpage.Inject(*documentRoot,
-						proxy,
-					),
-				),
-			),
-		},
-	}
-}
 
 func main() {
 	flag.Usage = func() {
@@ -159,7 +80,5 @@ func main() {
 		}()
 	}
 
-	upstream := newUpstream(*authBackend, *authSocket)
-	compileRoutes(upstream)
-	log.Fatal(http.Serve(listener, upstream))
+	log.Fatal(http.Serve(listener, newUpstream(*authBackend, *authSocket)))
 }
