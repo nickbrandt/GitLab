@@ -7,11 +7,8 @@ In this file we handle request routing and interaction with the authBackend.
 package upstream
 
 import (
-	"../api"
 	"../badgateway"
 	"../helper"
-	"../proxy"
-	"../staticpages"
 	"../urlprefix"
 	"fmt"
 	"net/http"
@@ -31,12 +28,6 @@ type Upstream struct {
 	DevelopmentMode       bool
 	ResponseHeaderTimeout time.Duration
 
-	_api             *api.API
-	configureAPIOnce sync.Once
-
-	_proxy             *proxy.Proxy
-	configureProxyOnce sync.Once
-
 	urlPrefix              urlprefix.Prefix
 	configureURLPrefixOnce sync.Once
 
@@ -45,22 +36,6 @@ type Upstream struct {
 
 	roundtripper              *badgateway.RoundTripper
 	configureRoundTripperOnce sync.Once
-
-	_static             *staticpages.Static
-	configureStaticOnce sync.Once
-}
-
-func (u *Upstream) API() *api.API {
-	u.configureAPIOnce.Do(u.configureAPI)
-	return u._api
-}
-
-func (u *Upstream) configureAPI() {
-	u._api = &api.API{
-		Client:  &http.Client{Transport: u.RoundTripper()},
-		URL:     u.Backend,
-		Version: u.Version,
-	}
 }
 
 func (u *Upstream) URLPrefix() urlprefix.Prefix {

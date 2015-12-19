@@ -1,6 +1,7 @@
 package api
 
 import (
+	"../badgateway"
 	"../helper"
 	"../proxy"
 	"encoding/json"
@@ -10,12 +11,25 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 )
 
 type API struct {
-	*http.Client
-	URL     *url.URL
-	Version string
+	_client             *http.Client
+	configureClientOnce sync.Once
+	URL                 *url.URL
+	Version             string
+	RoundTripper        *badgateway.RoundTripper
+}
+
+func (a *API) client() *http.Client {
+	a.configureClientOnce.Do(func() {
+		a._client = &http.Client{Transport: &badgateway.RoundTripper{}}
+		if a.RoundTripper != nil {
+			a._client.Transport = a.RoundTripper
+		}
+	})
+	return a._client
 }
 
 type HandleFunc func(http.ResponseWriter, *http.Request, *Response)
@@ -99,7 +113,7 @@ func (api *API) PreAuthorizeHandler(h HandleFunc, suffix string) http.HandlerFun
 			return
 		}
 
-		authResponse, err := api.Do(authReq)
+		authResponse, err := api.client().Do(authReq)
 		if err != nil {
 			helper.Fail500(w, fmt.Errorf("preAuthorizeHandler: do %v: %v", authReq.URL.Path, err))
 			return
