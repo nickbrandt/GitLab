@@ -1,9 +1,9 @@
 package main
 
 import (
+	"./internal/badgateway"
 	"./internal/helper"
 	"./internal/proxy"
-	"./internal/upstream"
 	"bytes"
 	"fmt"
 	"io"
@@ -15,8 +15,8 @@ import (
 	"time"
 )
 
-func newUpstream(url string) *upstream.Upstream {
-	return &upstream.Upstream{Backend: helper.URLMustParse(url), Version: "123"}
+func newProxy(url string) *proxy.Proxy {
+	return &proxy.Proxy{URL: helper.URLMustParse(url), Version: "123"}
 }
 
 func TestProxyRequest(t *testing.T) {
@@ -46,9 +46,8 @@ func TestProxyRequest(t *testing.T) {
 	}
 	httpRequest.Header.Set("Custom-Header", "test")
 
-	u := newUpstream(ts.URL)
 	w := httptest.NewRecorder()
-	u.Proxy().ServeHTTP(w, httpRequest)
+	newProxy(ts.URL).ServeHTTP(w, httpRequest)
 	helper.AssertResponseCode(t, w, 202)
 	helper.AssertResponseBody(t, w, "RESPONSE")
 
@@ -64,9 +63,8 @@ func TestProxyError(t *testing.T) {
 	}
 	httpRequest.Header.Set("Custom-Header", "test")
 
-	u := newUpstream("http://localhost:655575/")
 	w := httptest.NewRecorder()
-	u.Proxy().ServeHTTP(w, httpRequest)
+	newProxy("http://localhost:655575/").ServeHTTP(w, httpRequest)
 	helper.AssertResponseCode(t, w, 502)
 	helper.AssertResponseBody(t, w, "dial tcp: invalid port 655575")
 }
@@ -81,8 +79,8 @@ func TestProxyReadTimeout(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	transport := &proxy.RoundTripper{
-		&http.Transport{
+	rt := &badgateway.RoundTripper{
+		Transport: &http.Transport{
 			Proxy: http.ProxyFromEnvironment,
 			Dial: (&net.Dialer{
 				Timeout:   30 * time.Second,
@@ -93,8 +91,8 @@ func TestProxyReadTimeout(t *testing.T) {
 		},
 	}
 
-	p := &proxy.Proxy{URL: helper.URLMustParse(ts.URL), Transport: transport, Version: "123"}
-
+	p := newProxy(ts.URL)
+	p.RoundTripper = rt
 	w := httptest.NewRecorder()
 	p.ServeHTTP(w, httpRequest)
 	helper.AssertResponseCode(t, w, 502)
@@ -113,10 +111,8 @@ func TestProxyHandlerTimeout(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	u := newUpstream(ts.URL)
-
 	w := httptest.NewRecorder()
-	u.Proxy().ServeHTTP(w, httpRequest)
+	newProxy(ts.URL).ServeHTTP(w, httpRequest)
 	helper.AssertResponseCode(t, w, 503)
 	helper.AssertResponseBody(t, w, "Request took too long")
 }

@@ -14,6 +14,7 @@ In this file we start the web server and hand off to the upstream type.
 package main
 
 import (
+	"./internal/badgateway"
 	"./internal/upstream"
 	"flag"
 	"fmt"
@@ -36,7 +37,7 @@ var authBackend = URLFlag("authBackend", upstream.DefaultBackend, "Authenticatio
 var authSocket = flag.String("authSocket", "", "Optional: Unix domain socket to dial authBackend at")
 var pprofListenAddr = flag.String("pprofListenAddr", "", "pprof listening address, e.g. 'localhost:6060'")
 var documentRoot = flag.String("documentRoot", "public", "Path to static files content")
-var responseHeadersTimeout = flag.Duration("proxyHeadersTimeout", upstream.DefaultTransport.ResponseHeaderTimeout, "How long to wait for response headers when proxying the request")
+var responseHeadersTimeout = flag.Duration("proxyHeadersTimeout", badgateway.DefaultTransport.ResponseHeaderTimeout, "How long to wait for response headers when proxying the request")
 var developmentMode = flag.Bool("developmentMode", false, "Allow to serve assets from Rails app")
 
 func main() {

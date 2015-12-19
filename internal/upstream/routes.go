@@ -3,6 +3,7 @@ package upstream
 import (
 	"../git"
 	"../lfs"
+	pr "../proxy"
 	"../staticpages"
 	"../upload"
 	"net/http"
@@ -34,12 +35,13 @@ func (u *Upstream) Routes() []route {
 
 func (u *Upstream) configureRoutes() {
 	static := &staticpages.Static{u.DocumentRoot}
+	proxy := &pr.Proxy{URL: u.Backend, Version: u.Version, RoundTripper: u.RoundTripper()}
 	u.routes = []route{
 		// Git Clone
 		route{"GET", regexp.MustCompile(gitProjectPattern + `info/refs\z`), git.GetInfoRefs(u.API())},
 		route{"POST", regexp.MustCompile(gitProjectPattern + `git-upload-pack\z`), contentEncodingHandler(git.PostRPC(u.API()))},
 		route{"POST", regexp.MustCompile(gitProjectPattern + `git-receive-pack\z`), contentEncodingHandler(git.PostRPC(u.API()))},
-		route{"PUT", regexp.MustCompile(gitProjectPattern + `gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfs.PutStore(u.API(), u.Proxy())},
+		route{"PUT", regexp.MustCompile(gitProjectPattern + `gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfs.PutStore(u.API(), proxy)},
 
 		// Repository Archive
 		route{"GET", regexp.MustCompile(projectPattern + `repository/archive\z`), git.GetArchive(u.API())},
@@ -56,17 +58,17 @@ func (u *Upstream) configureRoutes() {
 		route{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.bz2\z`), git.GetArchive(u.API())},
 
 		// CI Artifacts API
-		route{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), contentEncodingHandler(upload.Artifacts(u.API(), u.Proxy()))},
+		route{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), contentEncodingHandler(upload.Artifacts(u.API(), proxy))},
 
 		// Explicitly proxy API requests
-		route{"", regexp.MustCompile(apiPattern), u.Proxy()},
-		route{"", regexp.MustCompile(ciAPIPattern), u.Proxy()},
+		route{"", regexp.MustCompile(apiPattern), proxy},
+		route{"", regexp.MustCompile(ciAPIPattern), proxy},
 
 		// Serve assets
 		route{"", regexp.MustCompile(`^/assets/`),
 			static.ServeExisting(u.URLPrefix(), staticpages.CacheExpireMax,
 				NotFoundUnless(u.DevelopmentMode,
-					u.Proxy(),
+					proxy,
 				),
 			),
 		},
@@ -76,7 +78,7 @@ func (u *Upstream) configureRoutes() {
 			static.ServeExisting(u.URLPrefix(), staticpages.CacheDisabled,
 				static.DeployPage(
 					static.ErrorPages(
-						u.Proxy(),
+						proxy,
 					),
 				),
 			),

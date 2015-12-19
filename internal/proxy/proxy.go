@@ -1,10 +1,7 @@
 package proxy
 
 import (
-	"../helper"
-	"bytes"
-	"fmt"
-	"io/ioutil"
+	"../badgateway"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -14,55 +11,23 @@ import (
 type Proxy struct {
 	URL                       *url.URL
 	Version                   string
-	Transport                 http.RoundTripper
+	RoundTripper              *badgateway.RoundTripper
 	_reverseProxy             *httputil.ReverseProxy
 	configureReverseProxyOnce sync.Once
 }
 
 func (p *Proxy) reverseProxy() *httputil.ReverseProxy {
-	p.configureReverseProxyOnce.Do(p.configureReverseProxy)
-	return p._reverseProxy
-}
-
-func (p *Proxy) configureReverseProxy() {
-	u := *p.URL // Make a copy of p.URL
-	u.Path = ""
-	p._reverseProxy = httputil.NewSingleHostReverseProxy(&u)
-	p._reverseProxy.Transport = p.Transport
-}
-
-type RoundTripper struct {
-	Transport http.RoundTripper
-}
-
-func (rt *RoundTripper) RoundTrip(r *http.Request) (res *http.Response, err error) {
-	res, err = rt.Transport.RoundTrip(r)
-
-	// httputil.ReverseProxy translates all errors from this
-	// RoundTrip function into 500 errors. But the most likely error
-	// is that the Rails app is not responding, in which case users
-	// and administrators expect to see a 502 error. To show 502s
-	// instead of 500s we catch the RoundTrip error here and inject a
-	// 502 response.
-	if err != nil {
-		helper.LogError(fmt.Errorf("proxyRoundTripper: %s %q failed with: %q", r.Method, r.RequestURI, err))
-
-		res = &http.Response{
-			StatusCode: http.StatusBadGateway,
-			Status:     http.StatusText(http.StatusBadGateway),
-
-			Request:    r,
-			ProtoMajor: r.ProtoMajor,
-			ProtoMinor: r.ProtoMinor,
-			Proto:      r.Proto,
-			Header:     make(http.Header),
-			Trailer:    make(http.Header),
-			Body:       ioutil.NopCloser(bytes.NewBufferString(err.Error())),
+	p.configureReverseProxyOnce.Do(func() {
+		u := *p.URL // Make a copy of p.URL
+		u.Path = ""
+		p._reverseProxy = httputil.NewSingleHostReverseProxy(&u)
+		if p.RoundTripper != nil {
+			p._reverseProxy.Transport = p.RoundTripper
+		} else {
+			p._reverseProxy.Transport = &badgateway.RoundTripper{}
 		}
-		res.Header.Set("Content-Type", "text/plain")
-		err = nil
-	}
-	return
+	})
+	return p._reverseProxy
 }
 
 func HeaderClone(h http.Header) http.Header {

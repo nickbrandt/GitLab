@@ -8,6 +8,7 @@ package upstream
 
 import (
 	"../api"
+	"../badgateway"
 	"../helper"
 	"../proxy"
 	"../staticpages"
@@ -42,20 +43,11 @@ type Upstream struct {
 	routes              []route
 	configureRoutesOnce sync.Once
 
-	transport              http.RoundTripper
-	configureTransportOnce sync.Once
+	roundtripper              *badgateway.RoundTripper
+	configureRoundTripperOnce sync.Once
 
 	_static             *staticpages.Static
 	configureStaticOnce sync.Once
-}
-
-func (u *Upstream) Proxy() *proxy.Proxy {
-	u.configureProxyOnce.Do(u.configureProxy)
-	return u._proxy
-}
-
-func (u *Upstream) configureProxy() {
-	u._proxy = &proxy.Proxy{URL: u.Backend, Transport: u.Transport(), Version: u.Version}
 }
 
 func (u *Upstream) API() *api.API {
@@ -65,7 +57,7 @@ func (u *Upstream) API() *api.API {
 
 func (u *Upstream) configureAPI() {
 	u._api = &api.API{
-		Client:  &http.Client{Transport: u.Transport()},
+		Client:  &http.Client{Transport: u.RoundTripper()},
 		URL:     u.Backend,
 		Version: u.Version,
 	}
@@ -87,12 +79,15 @@ func (u *Upstream) configureURLPrefix() {
 	u.urlPrefix = urlprefix.Prefix(relativeURLRoot)
 }
 
-// func (u *Upstream) Static() *static.Static {
-// 	u.configureStaticOnce.Do(func() {
-// 		u._static = &static.Static{u.DocumentRoot}
-// 	})
-// 	return u._static
-// }
+func (u *Upstream) RoundTripper() *badgateway.RoundTripper {
+	u.configureRoundTripperOnce.Do(func() {
+		u.roundtripper = &badgateway.RoundTripper{
+			Socket:                u.Socket,
+			ResponseHeaderTimeout: u.ResponseHeaderTimeout,
+		}
+	})
+	return u.roundtripper
+}
 
 func (u *Upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	w := newLoggingResponseWriter(ow)
