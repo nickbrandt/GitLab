@@ -19,8 +19,8 @@ import (
 	"time"
 )
 
-const scratchDir = "test/scratch"
-const testRepoRoot = "test/data"
+const scratchDir = "testdata/scratch"
+const testRepoRoot = "testdata/data"
 const testRepo = "group/test.git"
 const testProject = "group/test"
 
