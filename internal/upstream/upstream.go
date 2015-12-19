@@ -14,20 +14,20 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"path"
 	"strings"
-"path"
 	"time"
 )
 
 type Upstream struct {
-	Version string
-	API          *api.API
-	Proxy        *proxy.Proxy
-	DocumentRoot string
-	DevelopmentMode	bool
+	Version                string
+	API                    *api.API
+	Proxy                  *proxy.Proxy
+	DocumentRoot           string
+	DevelopmentMode        bool
 	ResponseHeadersTimeout time.Duration
-	urlPrefix    urlPrefix
-	routes       []route
+	urlPrefix              urlPrefix
+	routes                 []route
 }
 
 func New(authBackend string, authSocket string, version string, responseHeadersTimeout time.Duration) *Upstream {

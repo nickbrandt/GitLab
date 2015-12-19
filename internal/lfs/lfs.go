@@ -7,7 +7,7 @@ package lfs
 import (
 	"../api"
 	"../helper"
-"../proxy"
+	"../proxy"
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"

@@ -1,11 +1,11 @@
 package helper
 
 import (
+	"log"
+	"net/http"
 	"net/http/httptest"
-"net/http"
+	"regexp"
 	"testing"
-"regexp"
-"log"
 )
 
 func AssertResponseCode(t *testing.T, response *httptest.ResponseRecorder, expectedCode int) {
