@@ -39,19 +39,18 @@ type Upstream struct {
 }
 
 func (u *Upstream) URLPrefix() urlprefix.Prefix {
-	u.configureURLPrefixOnce.Do(u.configureURLPrefix)
-	return u.urlPrefix
-}
+	u.configureURLPrefixOnce.Do(func() {
+		if u.Backend == nil {
+			u.Backend = DefaultBackend
+		}
+		relativeURLRoot := u.Backend.Path
+		if !strings.HasSuffix(relativeURLRoot, "/") {
+			relativeURLRoot += "/"
+		}
+		u.urlPrefix = urlprefix.Prefix(relativeURLRoot)
+	})
 
-func (u *Upstream) configureURLPrefix() {
-	if u.Backend == nil {
-		u.Backend = DefaultBackend
-	}
-	relativeURLRoot := u.Backend.Path
-	if !strings.HasSuffix(relativeURLRoot, "/") {
-		relativeURLRoot += "/"
-	}
-	u.urlPrefix = urlprefix.Prefix(relativeURLRoot)
+	return u.urlPrefix
 }
 
 func (u *Upstream) RoundTripper() *badgateway.RoundTripper {
@@ -61,6 +60,7 @@ func (u *Upstream) RoundTripper() *badgateway.RoundTripper {
 			ResponseHeaderTimeout: u.ResponseHeaderTimeout,
 		}
 	})
+
 	return u.roundtripper
 }
 
