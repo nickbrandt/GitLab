@@ -1,7 +1,7 @@
-package main
+package upstream
 
 import (
-	"./internal/helper"
+	"../helper"
 	"bytes"
 	"fmt"
 	"io"
@@ -13,17 +13,20 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+	"time"
 )
+
+var nilHandler = http.HandlerFunc(func(http.ResponseWriter, *http.Request) {})
 
 func TestUploadTempPathRequirement(t *testing.T) {
 	response := httptest.NewRecorder()
 	request := &http.Request{}
-	handleFileUploads(dummyUpstream.Proxy).ServeHTTP(response, request)
+	handleFileUploads(nilHandler).ServeHTTP(response, request)
 	helper.AssertResponseCode(t, response, 500)
 }
 
 func TestUploadHandlerForwardingRawData(t *testing.T) {
-	ts := testServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
+	ts := helper.TestServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "PATCH" {
 			t.Fatal("Expected PATCH request")
 		}
@@ -52,9 +55,8 @@ func TestUploadHandlerForwardingRawData(t *testing.T) {
 	response := httptest.NewRecorder()
 
 	httpRequest.Header.Set(tempPathHeader, tempPath)
-	u := newUpstream(ts.URL, "")
 
-	handleFileUploads(u.Proxy).ServeHTTP(response, httpRequest)
+	handleFileUploads(New(ts.URL, "", "123", time.Second).Proxy).ServeHTTP(response, httpRequest)
 	helper.AssertResponseCode(t, response, 202)
 	if response.Body.String() != "RESPONSE" {
 		t.Fatal("Expected RESPONSE in response body")
@@ -70,7 +72,7 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	}
 	defer os.RemoveAll(tempPath)
 
-	ts := testServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
+	ts := helper.TestServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "PUT" {
 			t.Fatal("Expected PUT request")
 		}
@@ -127,7 +129,7 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	httpRequest.Header.Set("Content-Type", writer.FormDataContentType())
 	httpRequest.Header.Set(tempPathHeader, tempPath)
 	response := httptest.NewRecorder()
-	u := newUpstream(ts.URL, "")
+	u := New(ts.URL, "", "123", time.Second)
 
 	handleFileUploads(u.Proxy).ServeHTTP(response, httpRequest)
 	helper.AssertResponseCode(t, response, 202)

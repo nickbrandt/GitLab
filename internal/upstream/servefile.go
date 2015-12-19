@@ -1,7 +1,7 @@
-package main
+package upstream
 
 import (
-	"./internal/helper"
+	"../helper"
 	"log"
 	"net/http"
 	"os"

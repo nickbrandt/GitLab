@@ -1,9 +1,9 @@
-package main
+package upstream
 
 import (
-	"./internal/errorpage"
-	"./internal/git"
-	"./internal/lfs"
+	"../errorpage"
+	"../git"
+	"../lfs"
 	"net/http"
 	"regexp"
 )
@@ -27,7 +27,7 @@ const ciAPIPattern = `^/ci/api/`
 // see upstream.ServeHTTP
 var routes []route
 
-func (u *upstream) compileRoutes() {
+func (u *Upstream) compileRoutes() {
 	u.routes = []route{
 		// Git Clone
 		route{"GET", regexp.MustCompile(gitProjectPattern + `info/refs\z`), git.GetInfoRefs(u.API)},
@@ -59,7 +59,7 @@ func (u *upstream) compileRoutes() {
 		// Serve assets
 		route{"", regexp.MustCompile(`^/assets/`),
 			handleServeFile(u.DocumentRoot, u.urlPrefix, CacheExpireMax,
-				handleDevelopmentMode(developmentMode,
+				handleDevelopmentMode(u.DevelopmentMode,
 					handleDeployPage(u.DocumentRoot,
 						errorpage.Inject(u.DocumentRoot,
 							u.Proxy,

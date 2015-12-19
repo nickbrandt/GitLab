@@ -2,6 +2,8 @@ package main
 
 import (
 	"./internal/api"
+	"./internal/helper"
+	"./internal/upstream"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -283,26 +285,8 @@ func newBranch() string {
 	return fmt.Sprintf("branch-%d", time.Now().UnixNano())
 }
 
-func testServerWithHandler(url *regexp.Regexp, handler http.HandlerFunc) *httptest.Server {
-	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if url != nil && !url.MatchString(r.URL.Path) {
-			log.Println("UPSTREAM", r.Method, r.URL, "DENY")
-			w.WriteHeader(404)
-			return
-		}
-
-		if version := r.Header.Get("Gitlab-Workhorse"); version == "" {
-			log.Println("UPSTREAM", r.Method, r.URL, "DENY")
-			w.WriteHeader(403)
-			return
-		}
-
-		handler(w, r)
-	}))
-}
-
 func testAuthServer(url *regexp.Regexp, code int, body interface{}) *httptest.Server {
-	return testServerWithHandler(url, func(w http.ResponseWriter, r *http.Request) {
+	return helper.TestServerWithHandler(url, func(w http.ResponseWriter, r *http.Request) {
 		// Write pure string
 		if data, ok := body.(string); ok {
 			log.Println("UPSTREAM", r.Method, r.URL, code)
@@ -327,7 +311,7 @@ func testAuthServer(url *regexp.Regexp, code int, body interface{}) *httptest.Se
 }
 
 func startWorkhorseServer(authBackend string) *httptest.Server {
-	u := newUpstream(authBackend, "")
+	u := upstream.New(authBackend, "", "123", time.Second)
 	return httptest.NewServer(u)
 }
 

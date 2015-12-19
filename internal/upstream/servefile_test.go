@@ -1,7 +1,7 @@
-package main
+package upstream
 
 import (
-	"./internal/helper"
+	"../helper"
 	"bytes"
 	"compress/gzip"
 	"io/ioutil"
@@ -11,8 +11,6 @@ import (
 	"path/filepath"
 	"testing"
 )
-
-var dummyUpstream = newUpstream("http://localhost", "")
 
 func TestServingNonExistingFile(t *testing.T) {
 	dir := "/path/to/non/existing/directory"

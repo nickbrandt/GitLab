@@ -4,29 +4,33 @@ The upstream type implements http.Handler.
 In this file we handle request routing and interaction with the authBackend.
 */
 
-package main
+package upstream
 
 import (
-	"./internal/api"
-	"./internal/proxy"
+	"../api"
+	"../proxy"
 	"fmt"
 	"log"
 	"net"
 	"net/http"
 	"net/url"
 	"strings"
+"path"
 	"time"
 )
 
-type upstream struct {
+type Upstream struct {
+	Version string
 	API          *api.API
 	Proxy        *proxy.Proxy
 	DocumentRoot string
+	DevelopmentMode	bool
+	ResponseHeadersTimeout time.Duration
 	urlPrefix    urlPrefix
 	routes       []route
 }
 
-func newUpstream(authBackend string, authSocket string) *upstream {
+func New(authBackend string, authSocket string, version string, responseHeadersTimeout time.Duration) *Upstream {
 	parsedURL, err := url.Parse(authBackend)
 	if err != nil {
 		log.Fatalln(err)
@@ -49,25 +53,25 @@ func newUpstream(authBackend string, authSocket string) *upstream {
 			Dial: func(_, _ string) (net.Conn, error) {
 				return dialer.Dial("unix", authSocket)
 			},
-			ResponseHeaderTimeout: *responseHeadersTimeout,
+			ResponseHeaderTimeout: responseHeadersTimeout,
 		}
 	}
 	proxyTransport := proxy.NewRoundTripper(authTransport)
 
-	up := &upstream{
+	up := &Upstream{
 		API: &api.API{
 			Client:  &http.Client{Transport: proxyTransport},
 			URL:     parsedURL,
-			Version: Version,
+			Version: version,
 		},
-		Proxy:     proxy.NewProxy(parsedURL, proxyTransport, Version),
+		Proxy:     proxy.NewProxy(parsedURL, proxyTransport, version),
 		urlPrefix: urlPrefix(relativeURLRoot),
 	}
 	up.compileRoutes()
 	return up
 }
 
-func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
+func (u *Upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	w := newLoggingResponseWriter(ow)
 	defer w.Log(r)
 
@@ -112,4 +116,31 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	}
 
 	ro.handler.ServeHTTP(&w, r)
+}
+
+func httpError(w http.ResponseWriter, r *http.Request, error string, code int) {
+	if r.ProtoAtLeast(1, 1) {
+		// Force client to disconnect if we render request error
+		w.Header().Set("Connection", "close")
+	}
+
+	http.Error(w, error, code)
+}
+
+// Borrowed from: net/http/server.go
+// Return the canonical path for p, eliminating . and .. elements.
+func cleanURIPath(p string) string {
+	if p == "" {
+		return "/"
+	}
+	if p[0] != '/' {
+		p = "/" + p
+	}
+	np := path.Clean(p)
+	// path.Clean removes trailing slash except for root;
+	// put the trailing slash back if necessary.
+	if p[len(p)-1] == '/' && np != "/" {
+		np += "/"
+	}
+	return np
 }

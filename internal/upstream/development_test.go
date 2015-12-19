@@ -1,7 +1,7 @@
-package main
+package upstream
 
 import (
-	"./internal/helper"
+	"../helper"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -14,7 +14,7 @@ func TestDevelopmentModeEnabled(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	executed := false
-	handleDevelopmentMode(&developmentMode, func(_ http.ResponseWriter, _ *http.Request) {
+	handleDevelopmentMode(developmentMode, func(_ http.ResponseWriter, _ *http.Request) {
 		executed = true
 	})(w, r)
 	if !executed {
@@ -29,7 +29,7 @@ func TestDevelopmentModeDisabled(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	executed := false
-	handleDevelopmentMode(&developmentMode, func(_ http.ResponseWriter, _ *http.Request) {
+	handleDevelopmentMode(developmentMode, func(_ http.ResponseWriter, _ *http.Request) {
 		executed = true
 	})(w, r)
 	if executed {

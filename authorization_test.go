@@ -3,11 +3,13 @@ package main
 import (
 	"./internal/api"
 	"./internal/helper"
+	"./internal/upstream"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"regexp"
 	"testing"
+	"time"
 )
 
 func okHandler(w http.ResponseWriter, _ *http.Request, _ *api.Response) {
@@ -25,7 +27,7 @@ func runPreAuthorizeHandler(t *testing.T, suffix string, url *regexp.Regexp, api
 	if err != nil {
 		t.Fatal(err)
 	}
-	api := newUpstream(ts.URL, "").API
+	api := upstream.New(ts.URL, "", "123", time.Second).API
 
 	response := httptest.NewRecorder()
 	api.PreAuthorizeHandler(okHandler, suffix)(response, httpRequest)

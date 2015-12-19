@@ -14,6 +14,7 @@ In this file we start the web server and hand off to the upstream type.
 package main
 
 import (
+	"./internal/upstream"
 	"flag"
 	"fmt"
 	"log"
@@ -80,7 +81,9 @@ func main() {
 		}()
 	}
 
-	upstream := newUpstream(*authBackend, *authSocket)
-	upstream.DocumentRoot = *documentRoot
-	log.Fatal(http.Serve(listener, upstream))
+	up := upstream.New(*authBackend, *authSocket, Version, *responseHeadersTimeout)
+	up.DocumentRoot = *documentRoot
+	up.DevelopmentMode = *developmentMode
+
+	log.Fatal(http.Serve(listener, up))
 }

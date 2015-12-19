@@ -1,7 +1,7 @@
-package main
+package upstream
 
 import (
-	"./internal/helper"
+	"../helper"
 	"io/ioutil"
 	"net/http"
 	"path/filepath"

@@ -3,6 +3,7 @@ package main
 import (
 	"./internal/helper"
 	"./internal/proxy"
+	"./internal/upstream"
 	"bytes"
 	"fmt"
 	"io"
@@ -15,8 +16,12 @@ import (
 	"time"
 )
 
+func newUpstream(url string) *upstream.Upstream {
+	return upstream.New(url, "", "123", time.Second)
+}
+
 func TestProxyRequest(t *testing.T) {
-	ts := testServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
+	ts := helper.TestServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			t.Fatal("Expected POST request")
 		}
@@ -42,7 +47,7 @@ func TestProxyRequest(t *testing.T) {
 	}
 	httpRequest.Header.Set("Custom-Header", "test")
 
-	u := newUpstream(ts.URL, "")
+	u := newUpstream(ts.URL)
 	w := httptest.NewRecorder()
 	u.Proxy.ServeHTTP(w, httpRequest)
 	helper.AssertResponseCode(t, w, 202)
@@ -60,7 +65,7 @@ func TestProxyError(t *testing.T) {
 	}
 	httpRequest.Header.Set("Custom-Header", "test")
 
-	u := newUpstream("http://localhost:655575/", "")
+	u := newUpstream("http://localhost:655575/")
 	w := httptest.NewRecorder()
 	u.Proxy.ServeHTTP(w, httpRequest)
 	helper.AssertResponseCode(t, w, 502)
@@ -68,7 +73,7 @@ func TestProxyError(t *testing.T) {
 }
 
 func TestProxyReadTimeout(t *testing.T) {
-	ts := testServerWithHandler(nil, func(w http.ResponseWriter, r *http.Request) {
+	ts := helper.TestServerWithHandler(nil, func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(time.Minute)
 	})
 
@@ -89,7 +94,7 @@ func TestProxyReadTimeout(t *testing.T) {
 		},
 	)
 
-	u := newUpstream(ts.URL, "")
+	u := newUpstream(ts.URL)
 	url, err := url.Parse(ts.URL)
 	if err != nil {
 		t.Fatal(err)
@@ -103,7 +108,7 @@ func TestProxyReadTimeout(t *testing.T) {
 }
 
 func TestProxyHandlerTimeout(t *testing.T) {
-	ts := testServerWithHandler(nil,
+	ts := helper.TestServerWithHandler(nil,
 		http.TimeoutHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			time.Sleep(time.Second)
 		}), time.Millisecond, "Request took too long").ServeHTTP,
@@ -114,7 +119,7 @@ func TestProxyHandlerTimeout(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	u := newUpstream(ts.URL, "")
+	u := newUpstream(ts.URL)
 
 	w := httptest.NewRecorder()
 	u.Proxy.ServeHTTP(w, httpRequest)

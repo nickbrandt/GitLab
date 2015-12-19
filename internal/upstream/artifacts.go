@@ -1,7 +1,7 @@
-package main
+package upstream
 
 import (
-	"./internal/api"
+	"../api"
 	"net/http"
 )
 

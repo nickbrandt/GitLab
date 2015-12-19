@@ -2,7 +2,10 @@ package helper
 
 import (
 	"net/http/httptest"
+"net/http"
 	"testing"
+"regexp"
+"log"
 )
 
 func AssertResponseCode(t *testing.T, response *httptest.ResponseRecorder, expectedCode int) {
@@ -21,4 +24,22 @@ func AssertResponseHeader(t *testing.T, response *httptest.ResponseRecorder, hea
 	if response.Header().Get(header) != expectedValue {
 		t.Fatalf("for HTTP request expected to receive the header %q with %q, got %q", header, expectedValue, response.Header().Get(header))
 	}
+}
+
+func TestServerWithHandler(url *regexp.Regexp, handler http.HandlerFunc) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if url != nil && !url.MatchString(r.URL.Path) {
+			log.Println("UPSTREAM", r.Method, r.URL, "DENY")
+			w.WriteHeader(404)
+			return
+		}
+
+		if version := r.Header.Get("Gitlab-Workhorse"); version == "" {
+			log.Println("UPSTREAM", r.Method, r.URL, "DENY")
+			w.WriteHeader(403)
+			return
+		}
+
+		handler(w, r)
+	}))
 }
