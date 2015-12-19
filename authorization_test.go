@@ -9,7 +9,6 @@ import (
 	"net/http/httptest"
 	"regexp"
 	"testing"
-	"time"
 )
 
 func okHandler(w http.ResponseWriter, _ *http.Request, _ *api.Response) {
@@ -27,7 +26,7 @@ func runPreAuthorizeHandler(t *testing.T, suffix string, url *regexp.Regexp, api
 	if err != nil {
 		t.Fatal(err)
 	}
-	api := upstream.New(helper.URLMustParse(ts.URL), "", "123", time.Second).API
+	api := (&upstream.Upstream{Backend: helper.URLMustParse(ts.URL), Version: "123"}).API()
 
 	response := httptest.NewRecorder()
 	api.PreAuthorizeHandler(okHandler, suffix)(response, httpRequest)

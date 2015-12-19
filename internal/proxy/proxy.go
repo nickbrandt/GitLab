@@ -32,15 +32,11 @@ func (p *Proxy) configureReverseProxy() {
 }
 
 type RoundTripper struct {
-	transport http.RoundTripper
-}
-
-func NewRoundTripper(transport http.RoundTripper) *RoundTripper {
-	return &RoundTripper{transport: transport}
+	Transport http.RoundTripper
 }
 
 func (rt *RoundTripper) RoundTrip(r *http.Request) (res *http.Response, err error) {
-	res, err = rt.transport.RoundTrip(r)
+	res, err = rt.Transport.RoundTrip(r)
 
 	// httputil.ReverseProxy translates all errors from this
 	// RoundTrip function into 500 errors. But the most likely error

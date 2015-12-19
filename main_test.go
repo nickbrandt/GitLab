@@ -311,7 +311,7 @@ func testAuthServer(url *regexp.Regexp, code int, body interface{}) *httptest.Se
 }
 
 func startWorkhorseServer(authBackend string) *httptest.Server {
-	u := upstream.New(helper.URLMustParse(authBackend), "", "123", time.Second)
+	u := &upstream.Upstream{Backend: helper.URLMustParse(authBackend), Version: "123"}
 	return httptest.NewServer(u)
 }
 

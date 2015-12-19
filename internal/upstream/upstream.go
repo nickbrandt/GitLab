@@ -8,61 +8,62 @@ package upstream
 
 import (
 	"../api"
+	"../helper"
 	"../proxy"
 	"fmt"
-	"net"
 	"net/http"
 	"net/url"
 	"path"
-	"strings"
+	"sync"
 	"time"
 )
 
+var DefaultBackend = helper.URLMustParse("http://localhost:8080")
+
 type Upstream struct {
-	Version                string
-	API                    *api.API
-	Proxy                  *proxy.Proxy
-	DocumentRoot           string
-	DevelopmentMode        bool
-	ResponseHeadersTimeout time.Duration
+	Backend               *url.URL
+	Version               string
+	Socket                string
+	DocumentRoot          string
+	DevelopmentMode       bool
+	ResponseHeaderTimeout time.Duration
+
+	_api             *api.API
+	configureAPIOnce sync.Once
+
+	_proxy             *proxy.Proxy
+	configureProxyOnce sync.Once
+
 	urlPrefix              urlPrefix
-	routes                 []route
+	configureURLPrefixOnce sync.Once
+
+	routes              []route
+	configureRoutesOnce sync.Once
+
+	transport              http.RoundTripper
+	configureTransportOnce sync.Once
 }
 
-func New(authBackend *url.URL, authSocket string, version string, responseHeadersTimeout time.Duration) *Upstream {
-	relativeURLRoot := authBackend.Path
-	if !strings.HasSuffix(relativeURLRoot, "/") {
-		relativeURLRoot += "/"
-	}
+func (u *Upstream) Proxy() *proxy.Proxy {
+	u.configureProxyOnce.Do(u.configureProxy)
+	return u._proxy
+}
 
-	// Create Proxy Transport
-	authTransport := http.DefaultTransport
-	if authSocket != "" {
-		dialer := &net.Dialer{
-			// The values below are taken from http.DefaultTransport
-			Timeout:   30 * time.Second,
-			KeepAlive: 30 * time.Second,
-		}
-		authTransport = &http.Transport{
-			Dial: func(_, _ string) (net.Conn, error) {
-				return dialer.Dial("unix", authSocket)
-			},
-			ResponseHeaderTimeout: responseHeadersTimeout,
-		}
-	}
-	proxyTransport := proxy.NewRoundTripper(authTransport)
+func (u *Upstream) configureProxy() {
+	u._proxy = &proxy.Proxy{URL: u.Backend, Transport: u.Transport(), Version: u.Version}
+}
 
-	up := &Upstream{
-		API: &api.API{
-			Client:  &http.Client{Transport: proxyTransport},
-			URL:     authBackend,
-			Version: version,
-		},
-		Proxy:     &proxy.Proxy{URL: authBackend, Transport: proxyTransport, Version: version},
-		urlPrefix: urlPrefix(relativeURLRoot),
+func (u *Upstream) API() *api.API {
+	u.configureAPIOnce.Do(u.configureAPI)
+	return u._api
+}
+
+func (u *Upstream) configureAPI() {
+	u._api = &api.API{
+		Client:  &http.Client{Transport: u.Transport()},
+		URL:     u.Backend,
+		Version: u.Version,
 	}
-	up.compileRoutes()
-	return up
 }
 
 func (u *Upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
@@ -83,7 +84,7 @@ func (u *Upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 
 	// Check URL Root
 	URIPath := cleanURIPath(r.URL.Path)
-	prefix := u.urlPrefix
+	prefix := u.URLPrefix()
 	if !prefix.match(URIPath) {
 		httpError(&w, r, fmt.Sprintf("Not found %q", URIPath), http.StatusNotFound)
 		return
@@ -92,7 +93,7 @@ func (u *Upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	// Look for a matching Git service
 	var ro route
 	foundService := false
-	for _, ro = range u.routes {
+	for _, ro = range u.Routes() {
 		if ro.method != "" && r.Method != ro.method {
 			continue
 		}

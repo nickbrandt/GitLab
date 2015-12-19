@@ -16,7 +16,7 @@ import (
 )
 
 func newUpstream(url string) *upstream.Upstream {
-	return upstream.New(helper.URLMustParse(url), "", "123", time.Second)
+	return &upstream.Upstream{Backend: helper.URLMustParse(url), Version: "123"}
 }
 
 func TestProxyRequest(t *testing.T) {
@@ -48,7 +48,7 @@ func TestProxyRequest(t *testing.T) {
 
 	u := newUpstream(ts.URL)
 	w := httptest.NewRecorder()
-	u.Proxy.ServeHTTP(w, httpRequest)
+	u.Proxy().ServeHTTP(w, httpRequest)
 	helper.AssertResponseCode(t, w, 202)
 	helper.AssertResponseBody(t, w, "RESPONSE")
 
@@ -66,7 +66,7 @@ func TestProxyError(t *testing.T) {
 
 	u := newUpstream("http://localhost:655575/")
 	w := httptest.NewRecorder()
-	u.Proxy.ServeHTTP(w, httpRequest)
+	u.Proxy().ServeHTTP(w, httpRequest)
 	helper.AssertResponseCode(t, w, 502)
 	helper.AssertResponseBody(t, w, "dial tcp: invalid port 655575")
 }
@@ -81,7 +81,7 @@ func TestProxyReadTimeout(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	transport := proxy.NewRoundTripper(
+	transport := &proxy.RoundTripper{
 		&http.Transport{
 			Proxy: http.ProxyFromEnvironment,
 			Dial: (&net.Dialer{
@@ -91,7 +91,7 @@ func TestProxyReadTimeout(t *testing.T) {
 			TLSHandshakeTimeout:   10 * time.Second,
 			ResponseHeaderTimeout: time.Millisecond,
 		},
-	)
+	}
 
 	p := &proxy.Proxy{URL: helper.URLMustParse(ts.URL), Transport: transport, Version: "123"}
 
@@ -116,7 +116,7 @@ func TestProxyHandlerTimeout(t *testing.T) {
 	u := newUpstream(ts.URL)
 
 	w := httptest.NewRecorder()
-	u.Proxy.ServeHTTP(w, httpRequest)
+	u.Proxy().ServeHTTP(w, httpRequest)
 	helper.AssertResponseCode(t, w, 503)
 	helper.AssertResponseBody(t, w, "Request took too long")
 }
