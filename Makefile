@@ -9,7 +9,7 @@ install: gitlab-workhorse
 
 .PHONY: test
 test: test/data/group/test.git clean-workhorse gitlab-workhorse
-	go fmt | awk '{ print "Please run go fmt"; exit 1 }'
+	go fmt . ./internal/... | awk '{ print } END { if (NR > 0) { print "Please run go fmt"; exit 1 } }'
 	go test ./internal/...
 	go test
 
