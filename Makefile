@@ -11,6 +11,7 @@ install: gitlab-workhorse
 test: testdata/data/group/test.git clean-workhorse gitlab-workhorse
 	go fmt ./... | awk '{ print } END { if (NR > 0) { print "Please run go fmt"; exit 1 } }'
 	go test ./...
+	@echo SUCCESS
 
 coverage: testdata/data/group/test.git
 	go test -cover -coverprofile=test.coverage
