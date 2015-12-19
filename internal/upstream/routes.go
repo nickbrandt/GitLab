@@ -26,7 +26,6 @@ const ciAPIPattern = `^/ci/api/`
 // Routing table
 // We match against URI not containing the relativeUrlRoot:
 // see upstream.ServeHTTP
-var routes []route
 
 func (u *Upstream) compileRoutes() {
 	u.routes = []route{
