@@ -10,10 +10,12 @@ import (
 	"../api"
 	"../helper"
 	"../proxy"
+	"../staticpages"
+	"../urlprefix"
 	"fmt"
 	"net/http"
 	"net/url"
-	"path"
+	"strings"
 	"sync"
 	"time"
 )
@@ -34,7 +36,7 @@ type Upstream struct {
 	_proxy             *proxy.Proxy
 	configureProxyOnce sync.Once
 
-	urlPrefix              urlPrefix
+	urlPrefix              urlprefix.Prefix
 	configureURLPrefixOnce sync.Once
 
 	routes              []route
@@ -42,6 +44,9 @@ type Upstream struct {
 
 	transport              http.RoundTripper
 	configureTransportOnce sync.Once
+
+	_static             *staticpages.Static
+	configureStaticOnce sync.Once
 }
 
 func (u *Upstream) Proxy() *proxy.Proxy {
@@ -66,6 +71,29 @@ func (u *Upstream) configureAPI() {
 	}
 }
 
+func (u *Upstream) URLPrefix() urlprefix.Prefix {
+	u.configureURLPrefixOnce.Do(u.configureURLPrefix)
+	return u.urlPrefix
+}
+
+func (u *Upstream) configureURLPrefix() {
+	if u.Backend == nil {
+		u.Backend = DefaultBackend
+	}
+	relativeURLRoot := u.Backend.Path
+	if !strings.HasSuffix(relativeURLRoot, "/") {
+		relativeURLRoot += "/"
+	}
+	u.urlPrefix = urlprefix.Prefix(relativeURLRoot)
+}
+
+// func (u *Upstream) Static() *static.Static {
+// 	u.configureStaticOnce.Do(func() {
+// 		u._static = &static.Static{u.DocumentRoot}
+// 	})
+// 	return u._static
+// }
+
 func (u *Upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	w := newLoggingResponseWriter(ow)
 	defer w.Log(r)
@@ -83,9 +111,9 @@ func (u *Upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check URL Root
-	URIPath := cleanURIPath(r.URL.Path)
+	URIPath := urlprefix.CleanURIPath(r.URL.Path)
 	prefix := u.URLPrefix()
-	if !prefix.match(URIPath) {
+	if !prefix.Match(URIPath) {
 		httpError(&w, r, fmt.Sprintf("Not found %q", URIPath), http.StatusNotFound)
 		return
 	}
@@ -98,7 +126,7 @@ func (u *Upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		if ro.regex == nil || ro.regex.MatchString(prefix.strip(URIPath)) {
+		if ro.regex == nil || ro.regex.MatchString(prefix.Strip(URIPath)) {
 			foundService = true
 			break
 		}
@@ -120,22 +148,4 @@ func httpError(w http.ResponseWriter, r *http.Request, error string, code int) {
 	}
 
 	http.Error(w, error, code)
-}
-
-// Borrowed from: net/http/server.go
-// Return the canonical path for p, eliminating . and .. elements.
-func cleanURIPath(p string) string {
-	if p == "" {
-		return "/"
-	}
-	if p[0] != '/' {
-		p = "/" + p
-	}
-	np := path.Clean(p)
-	// path.Clean removes trailing slash except for root;
-	// put the trailing slash back if necessary.
-	if p[len(p)-1] == '/' && np != "/" {
-		np += "/"
-	}
-	return np
 }

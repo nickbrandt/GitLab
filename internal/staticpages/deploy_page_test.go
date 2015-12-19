@@ -1,4 +1,4 @@
-package upstream
+package staticpages
 
 import (
 	"../helper"
@@ -20,9 +20,10 @@ func TestIfNoDeployPageExist(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	executed := false
-	handleDeployPage(dir, http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
+	st := &Static{dir}
+	st.DeployPage(http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
 		executed = true
-	}))(w, nil)
+	})).ServeHTTP(w, nil)
 	if !executed {
 		t.Error("The handler should get executed")
 	}
@@ -41,9 +42,10 @@ func TestIfDeployPageExist(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	executed := false
-	handleDeployPage(dir, http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
+	st := &Static{dir}
+	st.DeployPage(http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
 		executed = true
-	}))(w, nil)
+	})).ServeHTTP(w, nil)
 	if executed {
 		t.Error("The handler should not get executed")
 	}

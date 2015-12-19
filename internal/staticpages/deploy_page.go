@@ -1,4 +1,4 @@
-package upstream
+package staticpages
 
 import (
 	"../helper"
@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 )
 
-func handleDeployPage(documentRoot string, handler http.Handler) http.HandlerFunc {
-	deployPage := filepath.Join(documentRoot, "index.html")
+func (s *Static) DeployPage(handler http.Handler) http.Handler {
+	deployPage := filepath.Join(s.DocumentRoot, "index.html")
 
-	return func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		data, err := ioutil.ReadFile(deployPage)
 		if err != nil {
 			handler.ServeHTTP(w, r)
@@ -21,5 +21,5 @@ func handleDeployPage(documentRoot string, handler http.Handler) http.HandlerFun
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
 		w.Write(data)
-	}
+	})
 }

@@ -1,9 +1,9 @@
 package upstream
 
 import (
-	"../errorpage"
 	"../git"
 	"../lfs"
+	"../staticpages"
 	"../upload"
 	"net/http"
 	"regexp"
@@ -33,6 +33,7 @@ func (u *Upstream) Routes() []route {
 }
 
 func (u *Upstream) configureRoutes() {
+	static := &staticpages.Static{u.DocumentRoot}
 	u.routes = []route{
 		// Git Clone
 		route{"GET", regexp.MustCompile(gitProjectPattern + `info/refs\z`), git.GetInfoRefs(u.API())},
@@ -63,7 +64,7 @@ func (u *Upstream) configureRoutes() {
 
 		// Serve assets
 		route{"", regexp.MustCompile(`^/assets/`),
-			handleServeFile(u.DocumentRoot, u.URLPrefix(), CacheExpireMax,
+			static.ServeExisting(u.URLPrefix(), staticpages.CacheExpireMax,
 				NotFoundUnless(u.DevelopmentMode,
 					u.Proxy(),
 				),
@@ -72,9 +73,9 @@ func (u *Upstream) configureRoutes() {
 
 		// Serve static files or forward the requests
 		route{"", nil,
-			handleServeFile(u.DocumentRoot, u.URLPrefix(), CacheDisabled,
-				handleDeployPage(u.DocumentRoot,
-					errorpage.Inject(u.DocumentRoot,
+			static.ServeExisting(u.URLPrefix(), staticpages.CacheDisabled,
+				static.DeployPage(
+					static.ErrorPages(
 						u.Proxy(),
 					),
 				),

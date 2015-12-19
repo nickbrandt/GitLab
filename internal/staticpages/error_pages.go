@@ -1,4 +1,4 @@
-package errorpage
+package staticpages
 
 import (
 	"../helper"
@@ -60,13 +60,13 @@ func (s *errorPageResponseWriter) Flush() {
 	s.WriteHeader(http.StatusOK)
 }
 
-func Inject(documentRoot string, handler http.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (st *Static) ErrorPages(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rw := errorPageResponseWriter{
 			rw:   w,
-			path: documentRoot,
+			path: st.DocumentRoot,
 		}
 		defer rw.Flush()
 		handler.ServeHTTP(&rw, r)
-	}
+	})
 }

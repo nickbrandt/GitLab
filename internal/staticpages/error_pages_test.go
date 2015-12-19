@@ -1,4 +1,4 @@
-package errorpage
+package staticpages
 
 import (
 	"../helper"
@@ -26,7 +26,8 @@ func TestIfErrorPageIsPresented(t *testing.T) {
 		w.WriteHeader(404)
 		fmt.Fprint(w, "Not Found")
 	})
-	Inject(dir, h)(w, nil)
+	st := &Static{dir}
+	st.ErrorPages(h).ServeHTTP(w, nil)
 	w.Flush()
 
 	helper.AssertResponseCode(t, w, 404)
@@ -46,7 +47,8 @@ func TestIfErrorPassedIfNoErrorPageIsFound(t *testing.T) {
 		w.WriteHeader(404)
 		fmt.Fprint(w, errorResponse)
 	})
-	Inject(dir, h)(w, nil)
+	st := &Static{dir}
+	st.ErrorPages(h).ServeHTTP(w, nil)
 	w.Flush()
 
 	helper.AssertResponseCode(t, w, 404)

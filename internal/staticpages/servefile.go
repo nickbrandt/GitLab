@@ -1,7 +1,8 @@
-package upstream
+package staticpages
 
 import (
 	"../helper"
+	"../urlprefix"
 	"log"
 	"net/http"
 	"os"
@@ -17,12 +18,12 @@ const (
 	CacheExpireMax
 )
 
-func handleServeFile(documentRoot string, prefix urlPrefix, cache CacheMode, notFoundHandler http.Handler) http.Handler {
+func (s *Static) ServeExisting(prefix urlprefix.Prefix, cache CacheMode, notFoundHandler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		file := filepath.Join(documentRoot, prefix.strip(r.URL.Path))
+		file := filepath.Join(s.DocumentRoot, prefix.Strip(r.URL.Path))
 
 		// The filepath.Join does Clean traversing directories up
-		if !strings.HasPrefix(file, documentRoot) {
+		if !strings.HasPrefix(file, s.DocumentRoot) {
 			helper.Fail500(w, &os.PathError{
 				Op:   "open",
 				Path: file,
