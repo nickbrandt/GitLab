@@ -64,7 +64,7 @@ func (u *Upstream) configureRoutes() {
 		// Serve assets
 		route{"", regexp.MustCompile(`^/assets/`),
 			handleServeFile(u.DocumentRoot, u.URLPrefix(), CacheExpireMax,
-				handleDevelopmentMode(u.DevelopmentMode,
+				NotFoundUnless(u.DevelopmentMode,
 					handleDeployPage(u.DocumentRoot,
 						errorpage.Inject(u.DocumentRoot,
 							u.Proxy(),

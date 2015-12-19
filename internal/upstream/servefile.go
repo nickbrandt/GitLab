@@ -17,8 +17,8 @@ const (
 	CacheExpireMax
 )
 
-func handleServeFile(documentRoot string, prefix urlPrefix, cache CacheMode, notFoundHandler http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func handleServeFile(documentRoot string, prefix urlPrefix, cache CacheMode, notFoundHandler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		file := filepath.Join(documentRoot, prefix.strip(r.URL.Path))
 
 		// The filepath.Join does Clean traversing directories up
@@ -49,7 +49,7 @@ func handleServeFile(documentRoot string, prefix urlPrefix, cache CacheMode, not
 		}
 		if err != nil {
 			if notFoundHandler != nil {
-				notFoundHandler(w, r)
+				notFoundHandler.ServeHTTP(w, r)
 			} else {
 				http.NotFound(w, r)
 			}
@@ -67,5 +67,5 @@ func handleServeFile(documentRoot string, prefix urlPrefix, cache CacheMode, not
 
 		log.Printf("Send static file %q (%q) for %s %q", file, w.Header().Get("Content-Encoding"), r.Method, r.RequestURI)
 		http.ServeContent(w, r, filepath.Base(file), fi.ModTime(), content)
-	}
+	})
 }

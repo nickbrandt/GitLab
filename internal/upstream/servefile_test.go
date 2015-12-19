@@ -17,7 +17,7 @@ func TestServingNonExistingFile(t *testing.T) {
 	httpRequest, _ := http.NewRequest("GET", "/file", nil)
 
 	w := httptest.NewRecorder()
-	handleServeFile(dir, "/", CacheDisabled, nil)(w, httpRequest)
+	handleServeFile(dir, "/", CacheDisabled, nil).ServeHTTP(w, httpRequest)
 	helper.AssertResponseCode(t, w, 404)
 }
 
@@ -30,7 +30,7 @@ func TestServingDirectory(t *testing.T) {
 
 	httpRequest, _ := http.NewRequest("GET", "/file", nil)
 	w := httptest.NewRecorder()
-	handleServeFile(dir, "/", CacheDisabled, nil)(w, httpRequest)
+	handleServeFile(dir, "/", CacheDisabled, nil).ServeHTTP(w, httpRequest)
 	helper.AssertResponseCode(t, w, 404)
 }
 
@@ -39,7 +39,7 @@ func TestServingMalformedUri(t *testing.T) {
 	httpRequest, _ := http.NewRequest("GET", "/../../../static/file", nil)
 
 	w := httptest.NewRecorder()
-	handleServeFile(dir, "/", CacheDisabled, nil)(w, httpRequest)
+	handleServeFile(dir, "/", CacheDisabled, nil).ServeHTTP(w, httpRequest)
 	helper.AssertResponseCode(t, w, 404)
 }
 
@@ -48,9 +48,9 @@ func TestExecutingHandlerWhenNoFileFound(t *testing.T) {
 	httpRequest, _ := http.NewRequest("GET", "/file", nil)
 
 	executed := false
-	handleServeFile(dir, "/", CacheDisabled, func(_ http.ResponseWriter, r *http.Request) {
+	handleServeFile(dir, "/", CacheDisabled, http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
 		executed = (r == httpRequest)
-	})(nil, httpRequest)
+	})).ServeHTTP(nil, httpRequest)
 	if !executed {
 		t.Error("The handler should get executed")
 	}
@@ -69,7 +69,7 @@ func TestServingTheActualFile(t *testing.T) {
 	ioutil.WriteFile(filepath.Join(dir, "file"), []byte(fileContent), 0600)
 
 	w := httptest.NewRecorder()
-	handleServeFile(dir, "/", CacheDisabled, nil)(w, httpRequest)
+	handleServeFile(dir, "/", CacheDisabled, nil).ServeHTTP(w, httpRequest)
 	helper.AssertResponseCode(t, w, 200)
 	if w.Body.String() != fileContent {
 		t.Error("We should serve the file: ", w.Body.String())
@@ -100,7 +100,7 @@ func testServingThePregzippedFile(t *testing.T, enableGzip bool) {
 	ioutil.WriteFile(filepath.Join(dir, "file"), []byte(fileContent), 0600)
 
 	w := httptest.NewRecorder()
-	handleServeFile(dir, "/", CacheDisabled, nil)(w, httpRequest)
+	handleServeFile(dir, "/", CacheDisabled, nil).ServeHTTP(w, httpRequest)
 	helper.AssertResponseCode(t, w, 200)
 	if enableGzip {
 		helper.AssertResponseHeader(t, w, "Content-Encoding", "gzip")
