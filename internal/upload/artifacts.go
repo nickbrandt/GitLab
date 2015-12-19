@@ -1,13 +1,13 @@
-package upstream
+package upload
 
 import (
 	"../api"
 	"net/http"
 )
 
-func artifactsAuthorizeHandler(myAPI *api.API, h http.HandlerFunc) http.HandlerFunc {
+func Artifacts(myAPI *api.API, h http.Handler) http.Handler {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		r.Header.Set(tempPathHeader, a.TempPath)
-		h(w, r)
+		h.ServeHTTP(w, r)
 	}, "/authorize")
 }

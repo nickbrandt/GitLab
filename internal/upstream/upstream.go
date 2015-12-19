@@ -64,7 +64,7 @@ func New(authBackend string, authSocket string, version string, responseHeadersT
 			URL:     parsedURL,
 			Version: version,
 		},
-		Proxy:     proxy.NewProxy(parsedURL, proxyTransport, version),
+		Proxy:     &proxy.Proxy{URL: authBackend, Transport: proxyTransport, Version: version},
 		urlPrefix: urlPrefix(relativeURLRoot),
 	}
 	up.compileRoutes()

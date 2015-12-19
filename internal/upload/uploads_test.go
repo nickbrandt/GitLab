@@ -1,7 +1,8 @@
-package upstream
+package upload
 
 import (
 	"../helper"
+	"../proxy"
 	"bytes"
 	"fmt"
 	"io"
@@ -13,7 +14,6 @@ import (
 	"regexp"
 	"strings"
 	"testing"
-	"time"
 )
 
 var nilHandler = http.HandlerFunc(func(http.ResponseWriter, *http.Request) {})
@@ -40,6 +40,7 @@ func TestUploadHandlerForwardingRawData(t *testing.T) {
 		w.WriteHeader(202)
 		fmt.Fprint(w, "RESPONSE")
 	})
+	defer ts.Close()
 
 	httpRequest, err := http.NewRequest("PATCH", ts.URL+"/url/path", bytes.NewBufferString("REQUEST"))
 	if err != nil {
@@ -56,7 +57,7 @@ func TestUploadHandlerForwardingRawData(t *testing.T) {
 
 	httpRequest.Header.Set(tempPathHeader, tempPath)
 
-	handleFileUploads(New(ts.URL, "", "123", time.Second).Proxy).ServeHTTP(response, httpRequest)
+	handleFileUploads(&proxy.Proxy{URL: ts.URL, Version: "123"}).ServeHTTP(response, httpRequest)
 	helper.AssertResponseCode(t, response, 202)
 	if response.Body.String() != "RESPONSE" {
 		t.Fatal("Expected RESPONSE in response body")
@@ -129,9 +130,8 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	httpRequest.Header.Set("Content-Type", writer.FormDataContentType())
 	httpRequest.Header.Set(tempPathHeader, tempPath)
 	response := httptest.NewRecorder()
-	u := New(ts.URL, "", "123", time.Second)
 
-	handleFileUploads(u.Proxy).ServeHTTP(response, httpRequest)
+	handleFileUploads(&proxy.Proxy{URL: ts.URL, Version: "123"}).ServeHTTP(response, httpRequest)
 	helper.AssertResponseCode(t, response, 202)
 
 	if _, err := os.Stat(filePath); !os.IsNotExist(err) {

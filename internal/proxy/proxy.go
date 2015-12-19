@@ -5,23 +5,35 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"sync"
 )
 
 type Proxy struct {
-	reverseProxy *httputil.ReverseProxy
-	version      string
+	URL                       string
+	Version                   string
+	Transport                 http.RoundTripper
+	_reverseProxy             *httputil.ReverseProxy
+	configureReverseProxyOnce sync.Once
 }
 
-func NewProxy(url *url.URL, transport http.RoundTripper, version string) *Proxy {
+func (p *Proxy) reverseProxy() *httputil.ReverseProxy {
+	p.configureReverseProxyOnce.Do(p.configureReverseProxy)
+	return p._reverseProxy
+}
+
+func (p *Proxy) configureReverseProxy() {
 	// Modify a copy of url
-	proxyURL := *url
-	proxyURL.Path = ""
-	p := Proxy{reverseProxy: httputil.NewSingleHostReverseProxy(&proxyURL), version: version}
-	p.reverseProxy.Transport = transport
-	return &p
+	url, err := url.Parse(p.URL)
+	if err != nil {
+		log.Fatalf("configureReverseProxy: %v", err)
+	}
+	url.Path = ""
+	p._reverseProxy = httputil.NewSingleHostReverseProxy(url)
+	p._reverseProxy.Transport = p.Transport
 }
 
 type RoundTripper struct {
@@ -78,9 +90,9 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	req.Header = HeaderClone(r.Header)
 
 	// Set Workhorse version
-	req.Header.Set("Gitlab-Workhorse", p.version)
+	req.Header.Set("Gitlab-Workhorse", p.Version)
 	rw := newSendFileResponseWriter(w, &req)
 	defer rw.Flush()
 
-	p.reverseProxy.ServeHTTP(&rw, &req)
+	p.reverseProxy().ServeHTTP(&rw, &req)
 }

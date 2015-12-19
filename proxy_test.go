@@ -10,7 +10,6 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"regexp"
 	"testing"
 	"time"
@@ -94,15 +93,10 @@ func TestProxyReadTimeout(t *testing.T) {
 		},
 	)
 
-	u := newUpstream(ts.URL)
-	url, err := url.Parse(ts.URL)
-	if err != nil {
-		t.Fatal(err)
-	}
-	u.Proxy = proxy.NewProxy(url, transport, "123")
+	p := &proxy.Proxy{URL: ts.URL, Transport: transport, Version: "123"}
 
 	w := httptest.NewRecorder()
-	u.Proxy.ServeHTTP(w, httpRequest)
+	p.ServeHTTP(w, httpRequest)
 	helper.AssertResponseCode(t, w, 502)
 	helper.AssertResponseBody(t, w, "net/http: timeout awaiting response headers")
 }

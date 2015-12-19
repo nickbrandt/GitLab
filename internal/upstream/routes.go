@@ -4,6 +4,7 @@ import (
 	"../errorpage"
 	"../git"
 	"../lfs"
+	"../upload"
 	"net/http"
 	"regexp"
 )
@@ -50,7 +51,7 @@ func (u *Upstream) compileRoutes() {
 		route{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.bz2\z`), git.GetArchive(u.API)},
 
 		// CI Artifacts API
-		route{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), contentEncodingHandler(artifactsAuthorizeHandler(u.API, handleFileUploads(u.Proxy)))},
+		route{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), contentEncodingHandler(upload.Artifacts(u.API, u.Proxy))},
 
 		// Explicitly u.Proxy API requests
 		route{"", regexp.MustCompile(apiPattern), u.Proxy},
