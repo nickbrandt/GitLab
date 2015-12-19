@@ -16,7 +16,7 @@ import (
 )
 
 func newUpstream(url string) *upstream.Upstream {
-	return upstream.New(url, "", "123", time.Second)
+	return upstream.New(helper.URLMustParse(url), "", "123", time.Second)
 }
 
 func TestProxyRequest(t *testing.T) {
@@ -93,7 +93,7 @@ func TestProxyReadTimeout(t *testing.T) {
 		},
 	)
 
-	p := &proxy.Proxy{URL: ts.URL, Transport: transport, Version: "123"}
+	p := &proxy.Proxy{URL: helper.URLMustParse(ts.URL), Transport: transport, Version: "123"}
 
 	w := httptest.NewRecorder()
 	p.ServeHTTP(w, httpRequest)

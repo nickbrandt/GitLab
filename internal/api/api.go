@@ -14,7 +14,7 @@ import (
 
 type API struct {
 	*http.Client
-	*url.URL
+	URL     *url.URL
 	Version string
 }
 
@@ -49,7 +49,7 @@ type Response struct {
 }
 
 func (api *API) newRequest(r *http.Request, body io.Reader, suffix string) (*http.Request, error) {
-	url := *api.URL
+	url := *api.URL // Make a copy of api.URL
 	url.Path = r.URL.RequestURI() + suffix
 	authReq := &http.Request{
 		Method: r.Method,

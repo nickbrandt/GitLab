@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 )
 
@@ -50,4 +51,12 @@ func OpenFile(path string) (file *os.File, fi os.FileInfo, err error) {
 	}
 
 	return
+}
+
+func URLMustParse(s string) *url.URL {
+	u, err := url.Parse(s)
+	if err != nil {
+		log.Fatalf("urlMustParse: %q %v", s, err)
+	}
+	return u
 }

@@ -10,7 +10,6 @@ import (
 	"../api"
 	"../proxy"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"net/url"
@@ -30,13 +29,8 @@ type Upstream struct {
 	routes                 []route
 }
 
-func New(authBackend string, authSocket string, version string, responseHeadersTimeout time.Duration) *Upstream {
-	parsedURL, err := url.Parse(authBackend)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	relativeURLRoot := parsedURL.Path
+func New(authBackend *url.URL, authSocket string, version string, responseHeadersTimeout time.Duration) *Upstream {
+	relativeURLRoot := authBackend.Path
 	if !strings.HasSuffix(relativeURLRoot, "/") {
 		relativeURLRoot += "/"
 	}
@@ -61,7 +55,7 @@ func New(authBackend string, authSocket string, version string, responseHeadersT
 	up := &Upstream{
 		API: &api.API{
 			Client:  &http.Client{Transport: proxyTransport},
-			URL:     parsedURL,
+			URL:     authBackend,
 			Version: version,
 		},
 		Proxy:     &proxy.Proxy{URL: authBackend, Transport: proxyTransport, Version: version},

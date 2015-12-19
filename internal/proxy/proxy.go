@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -13,7 +12,7 @@ import (
 )
 
 type Proxy struct {
-	URL                       string
+	URL                       *url.URL
 	Version                   string
 	Transport                 http.RoundTripper
 	_reverseProxy             *httputil.ReverseProxy
@@ -26,13 +25,9 @@ func (p *Proxy) reverseProxy() *httputil.ReverseProxy {
 }
 
 func (p *Proxy) configureReverseProxy() {
-	// Modify a copy of url
-	url, err := url.Parse(p.URL)
-	if err != nil {
-		log.Fatalf("configureReverseProxy: %v", err)
-	}
-	url.Path = ""
-	p._reverseProxy = httputil.NewSingleHostReverseProxy(url)
+	u := *p.URL // Make a copy of p.URL
+	u.Path = ""
+	p._reverseProxy = httputil.NewSingleHostReverseProxy(&u)
 	p._reverseProxy.Transport = p.Transport
 }
 
