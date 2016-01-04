@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -18,6 +19,7 @@ import (
 
 const scratchDir = "test/scratch"
 const testRepoRoot = "test/data"
+const testDocumentRoot = "test/public"
 const testRepo = "group/test.git"
 const testProject = "group/test"
 
@@ -44,6 +46,46 @@ func TestAllowedClone(t *testing.T) {
 	logCmd := exec.Command("git", "log", "-1", "--oneline")
 	logCmd.Dir = checkoutDir
 	runOrFail(t, logCmd)
+}
+
+func TestDeniedStaticFile(t *testing.T) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	*documentRoot = path.Join(cwd, testDocumentRoot)
+	fileDir := path.Join(*documentRoot, "uploads")
+	if err := os.MkdirAll(fileDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	static_file := path.Join(fileDir, "static.txt")
+	if err := ioutil.WriteFile(static_file, []byte("PRIVATE"), 0666); err != nil {
+		t.Fatal(err)
+	}
+	proxied := false
+	ts := testServerWithHandler(regexp.MustCompile(`^/uploads/static.txt$`), func(w http.ResponseWriter, _ *http.Request) {
+		proxied = true
+		w.WriteHeader(404)
+	})
+	defer ts.Close()
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	resp, err := http.Get(ws.URL + "/uploads/static.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	buf := &bytes.Buffer{}
+	if _, err := io.Copy(buf, resp.Body); err != nil {
+		t.Fatal(err)
+	}
+	if buf.String() == "PRIVATE" {
+		t.Fatal("Got private file contents which should have been blocked by upstream")
+	}
+	if resp.StatusCode != 404 {
+		t.Fatalf("expected 404, got %d", resp.StatusCode)
+	}
 }
 
 func TestDeniedClone(t *testing.T) {

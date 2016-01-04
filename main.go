@@ -99,6 +99,16 @@ var httpRoutes = [...]httpRoute{
 		),
 	},
 
+	// For legacy reasons, user uploads are stored under the document root.
+	// To prevent anybody who knows/guesses the URL of a user-uploaded file
+	// from downloading it we make sure requests to /uploads/ do _not_ pass
+	// through handleServeFile.
+	httpRoute{"", regexp.MustCompile(`^/uploads/`),
+		handleRailsError(documentRoot,
+			proxyRequest,
+		),
+	},
+
 	// Serve static files or forward the requests
 	httpRoute{"", nil,
 		handleServeFile(documentRoot, CacheDisabled,
