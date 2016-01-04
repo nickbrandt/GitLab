@@ -12,6 +12,7 @@ import (
 	"os/exec"
 	"path"
 	"regexp"
+	"strings"
 	"testing"
 	"time"
 )
@@ -188,6 +189,29 @@ func TestAllowedApiDownloadZip(t *testing.T) {
 	defer ws.Close()
 
 	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("%s/api/v3/projects/123/repository/archive.zip", ws.URL))
+	downloadCmd.Dir = scratchDir
+	runOrFail(t, downloadCmd)
+
+	extractCmd := exec.Command("unzip", archiveName)
+	extractCmd.Dir = scratchDir
+	runOrFail(t, extractCmd)
+}
+
+func TestAllowedApiDownloadZipWithSlash(t *testing.T) {
+	prepareDownloadDir(t)
+
+	// Prepare test server and backend
+	archiveName := "foobar.zip"
+	ts := testAuthServer(nil, 200, archiveOkBody(t, archiveName))
+	defer ts.Close()
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	// Use foo%2Fbar instead of a numeric ID
+	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("%s/api/v3/projects/foo%%2Fbar/repository/archive.zip", ws.URL))
+	if !strings.Contains(downloadCmd.Args[3], `projects/foo%2Fbar/repository`) {
+		t.Fatalf("Cannot find percent-2F: %v", downloadCmd.Args)
+	}
 	downloadCmd.Dir = scratchDir
 	runOrFail(t, downloadCmd)
 

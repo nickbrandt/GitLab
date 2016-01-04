@@ -107,7 +107,7 @@ func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check URL Root
-	URIPath := cleanURIPath(r.URL.Path)
+	URIPath := cleanURIPath(r.URL.EscapedPath())
 	if !strings.HasPrefix(URIPath, u.relativeURLRoot) && URIPath+"/" != u.relativeURLRoot {
 		httpError(&w, r, fmt.Sprintf("Not found %q", URIPath), http.StatusNotFound)
 		return
