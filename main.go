@@ -50,7 +50,9 @@ const projectPattern = `^/[^/]+/[^/]+/`
 const gitProjectPattern = `^/[^/]+/[^/]+\.git/`
 
 const apiPattern = `^/api/`
-const projectsAPIPattern = `^/api/v3/projects/[^/]+/`
+
+// A project ID in an API request is either a number or two strings 'namespace/project'
+const projectsAPIPattern = `^/api/v3/projects/(\d+)|([^/]+/[^/]+)/`
 
 const ciAPIPattern = `^/ci/api/`
 

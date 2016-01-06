@@ -49,46 +49,6 @@ func TestAllowedClone(t *testing.T) {
 	runOrFail(t, logCmd)
 }
 
-func TestDeniedStaticFile(t *testing.T) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-	*documentRoot = path.Join(cwd, testDocumentRoot)
-	fileDir := path.Join(*documentRoot, "uploads")
-	if err := os.MkdirAll(fileDir, 0755); err != nil {
-		t.Fatal(err)
-	}
-	static_file := path.Join(fileDir, "static.txt")
-	if err := ioutil.WriteFile(static_file, []byte("PRIVATE"), 0666); err != nil {
-		t.Fatal(err)
-	}
-	proxied := false
-	ts := testServerWithHandler(regexp.MustCompile(`^/uploads/static.txt$`), func(w http.ResponseWriter, _ *http.Request) {
-		proxied = true
-		w.WriteHeader(404)
-	})
-	defer ts.Close()
-	ws := startWorkhorseServer(ts.URL)
-	defer ws.Close()
-
-	resp, err := http.Get(ws.URL + "/uploads/static.txt")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer resp.Body.Close()
-	buf := &bytes.Buffer{}
-	if _, err := io.Copy(buf, resp.Body); err != nil {
-		t.Fatal(err)
-	}
-	if buf.String() == "PRIVATE" {
-		t.Fatal("Got private file contents which should have been blocked by upstream")
-	}
-	if resp.StatusCode != 404 {
-		t.Fatalf("expected 404, got %d", resp.StatusCode)
-	}
-}
-
 func TestDeniedClone(t *testing.T) {
 	// Prepare clone directory
 	if err := os.RemoveAll(scratchDir); err != nil {
@@ -325,6 +285,141 @@ func TestDeniedXSendfileDownload(t *testing.T) {
 	prepareDownloadDir(t)
 
 	deniedXSendfileDownload(t, contentFilename, "foo/uploads/bar")
+}
+
+func TestAllowedStaticFile(t *testing.T) {
+	content := "PUBLIC"
+	if err := setupStaticFile("static file.txt", content); err != nil {
+		t.Fatalf("create public/static file.txt: %v", err)
+	}
+
+	proxied := false
+	ts := testServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
+		proxied = true
+		w.WriteHeader(404)
+	})
+	defer ts.Close()
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	for _, resource := range []string{
+		"/static%20file.txt",
+		"/static file.txt",
+	} {
+		resp, err := http.Get(ws.URL + resource)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer resp.Body.Close()
+		buf := &bytes.Buffer{}
+		if _, err := io.Copy(buf, resp.Body); err != nil {
+			t.Fatal(err)
+		}
+		if buf.String() != content {
+			t.Fatalf("GET %q: Expected %q, got %q", resource, content, buf.String())
+		}
+		if resp.StatusCode != 200 {
+			t.Fatalf("GET %q: expected 200, got %d", resource, resp.StatusCode)
+		}
+		if proxied {
+			t.Fatalf("GET %q: should not have made it to backend", resource)
+		}
+	}
+}
+
+func TestAllowedPublicUploadsFile(t *testing.T) {
+	if err := setupStaticFile("uploads/static file.txt", "PRIVATE"); err != nil {
+		t.Fatalf("create public/uploads/static file.txt: %v", err)
+	}
+
+	proxied := false
+	ts := testServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
+		proxied = true
+		w.Header().Add("X-Sendfile", *documentRoot+r.URL.Path)
+		w.WriteHeader(200)
+	})
+	defer ts.Close()
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	for _, resource := range []string{
+		"/uploads/static%20file.txt",
+		"/uploads/static file.txt",
+	} {
+		resp, err := http.Get(ws.URL + resource)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer resp.Body.Close()
+		buf := &bytes.Buffer{}
+		if _, err := io.Copy(buf, resp.Body); err != nil {
+			t.Fatal(err)
+		}
+		if buf.String() != "PRIVATE" {
+			t.Fatalf("GET %q: Expected PRIVATE, got %q", resource, buf.String())
+		}
+		if resp.StatusCode != 200 {
+			t.Fatalf("GET %q: expected 200, got %d", resource, resp.StatusCode)
+		}
+		if !proxied {
+			t.Fatalf("GET %q: never made it to backend", resource)
+		}
+	}
+}
+
+func TestDeniedPublicUploadsFile(t *testing.T) {
+	if err := setupStaticFile("uploads/static.txt", "PRIVATE"); err != nil {
+		t.Fatalf("create public/uploads/static.txt: %v", err)
+	}
+
+	proxied := false
+	ts := testServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, _ *http.Request) {
+		proxied = true
+		w.WriteHeader(404)
+	})
+	defer ts.Close()
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	for _, resource := range []string{
+		"/uploads/static.txt",
+		"/uploads%2Fstatic.txt",
+	} {
+		resp, err := http.Get(ws.URL + resource)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer resp.Body.Close()
+		buf := &bytes.Buffer{}
+		if _, err := io.Copy(buf, resp.Body); err != nil {
+			t.Fatal(err)
+		}
+		if buf.String() == "PRIVATE" {
+			t.Fatalf("GET %q: Got private file contents which should have been blocked by upstream", resource)
+		}
+		if resp.StatusCode != 404 {
+			t.Fatalf("GET %q: expected 404, got %d", resource, resp.StatusCode)
+		}
+		if !proxied {
+			t.Fatalf("GET %q: never made it to backend", resource)
+		}
+	}
+}
+
+func setupStaticFile(fpath, content string) error {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	*documentRoot = path.Join(cwd, testDocumentRoot)
+	if err := os.MkdirAll(path.Join(*documentRoot, path.Dir(fpath)), 0755); err != nil {
+		return err
+	}
+	static_file := path.Join(*documentRoot, fpath)
+	if err := ioutil.WriteFile(static_file, []byte(content), 0666); err != nil {
+		return err
+	}
+	return nil
 }
 
 func prepareDownloadDir(t *testing.T) {
