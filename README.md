@@ -35,7 +35,9 @@ Options:
     	Print version and exit
 ```
 
-The 'auth backend' refers to the GitLab Rails applicatoin. The name is a holdover from when gitlab-workhorse only handled Git push/pull over HTTP. 
+The 'auth backend' refers to the GitLab Rails applicatoin. The name is
+a holdover from when gitlab-workhorse only handled Git push/pull over
+HTTP.
 
 Gitlab-workhorse can listen on either a TCP or a Unix domain socket. It
 can also open a second listening TCP listening socket with the Go
