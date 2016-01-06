@@ -36,7 +36,6 @@ var listenUmask = flag.Int("listenUmask", 022, "Umask for Unix socket, default: 
 var authBackend = flag.String("authBackend", "http://localhost:8080", "Authentication/authorization backend")
 var authSocket = flag.String("authSocket", "", "Optional: Unix domain socket to dial authBackend at")
 var pprofListenAddr = flag.String("pprofListenAddr", "", "pprof listening address, e.g. 'localhost:6060'")
-var relativeURLRoot = flag.String("relativeURLRoot", "/", "GitLab relative URL root")
 var documentRoot = flag.String("documentRoot", "public", "Path to static files content")
 var responseHeadersTimeout = flag.Duration("proxyHeadersTimeout", time.Minute, "How long to wait for response headers when proxying the request")
 var developmentMode = flag.Bool("developmentMode", false, "Allow to serve assets from Rails app")
@@ -180,6 +179,5 @@ func main() {
 	}
 
 	upstream := newUpstream(*authBackend, proxyTransport)
-	upstream.SetRelativeURLRoot(*relativeURLRoot)
 	log.Fatal(http.Serve(listener, upstream))
 }

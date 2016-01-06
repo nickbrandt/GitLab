@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+0.5.1
+
+Deprecate -relativeURLRoot option, use -authBackend instead.
+
 0.5.0
 
 Send ALL GitLab requests through gitlab-workhorse.
