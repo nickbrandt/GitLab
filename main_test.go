@@ -328,7 +328,8 @@ func TestAllowedStaticFile(t *testing.T) {
 }
 
 func TestAllowedPublicUploadsFile(t *testing.T) {
-	if err := setupStaticFile("uploads/static file.txt", "PRIVATE"); err != nil {
+	content := "PRIVATE but allowed"
+	if err := setupStaticFile("uploads/static file.txt", content); err != nil {
 		t.Fatalf("create public/uploads/static file.txt: %v", err)
 	}
 
@@ -355,8 +356,8 @@ func TestAllowedPublicUploadsFile(t *testing.T) {
 		if _, err := io.Copy(buf, resp.Body); err != nil {
 			t.Fatal(err)
 		}
-		if buf.String() != "PRIVATE" {
-			t.Fatalf("GET %q: Expected PRIVATE, got %q", resource, buf.String())
+		if buf.String() != content {
+			t.Fatalf("GET %q: Expected %q, got %q", resource, content, buf.String())
 		}
 		if resp.StatusCode != 200 {
 			t.Fatalf("GET %q: expected 200, got %d", resource, resp.StatusCode)
@@ -368,7 +369,8 @@ func TestAllowedPublicUploadsFile(t *testing.T) {
 }
 
 func TestDeniedPublicUploadsFile(t *testing.T) {
-	if err := setupStaticFile("uploads/static.txt", "PRIVATE"); err != nil {
+	content := "PRIVATE"
+	if err := setupStaticFile("uploads/static.txt", content); err != nil {
 		t.Fatalf("create public/uploads/static.txt: %v", err)
 	}
 
@@ -394,7 +396,7 @@ func TestDeniedPublicUploadsFile(t *testing.T) {
 		if _, err := io.Copy(buf, resp.Body); err != nil {
 			t.Fatal(err)
 		}
-		if buf.String() == "PRIVATE" {
+		if buf.String() == content {
 			t.Fatalf("GET %q: Got private file contents which should have been blocked by upstream", resource)
 		}
 		if resp.StatusCode != 404 {
