@@ -16,6 +16,9 @@ const (
 	CacheExpireMax
 )
 
+// BUG/QUIRK: If a client requests 'foo%2Fbar' and 'foo/bar' exists,
+// handleServeFile will serve foo/bar instead of passing the request
+// upstream.
 func handleServeFile(documentRoot *string, cache CacheMode, notFoundHandler serviceHandleFunc) serviceHandleFunc {
 	return func(w http.ResponseWriter, r *gitRequest) {
 		file := filepath.Join(*documentRoot, r.relativeURIPath)
