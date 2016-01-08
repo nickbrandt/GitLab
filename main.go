@@ -105,7 +105,7 @@ var httpRoutes = [...]httpRoute{
 	// from downloading it we make sure requests to /uploads/ do _not_ pass
 	// through handleServeFile.
 	httpRoute{"", regexp.MustCompile(`^/uploads/`),
-		handleRailsError(documentRoot,
+		handleRailsError(documentRoot, developmentMode,
 			proxyRequest,
 		),
 	},
