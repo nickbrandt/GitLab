@@ -14,7 +14,6 @@ In this file we start the web server and hand off to the upstream type.
 package main
 
 import (
-	"./internal/badgateway"
 	"./internal/upstream"
 	"flag"
 	"fmt"
@@ -24,6 +23,7 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"syscall"
+	"time"
 )
 
 // Current version of GitLab Workhorse
@@ -37,7 +37,7 @@ var authBackend = URLFlag("authBackend", upstream.DefaultBackend, "Authenticatio
 var authSocket = flag.String("authSocket", "", "Optional: Unix domain socket to dial authBackend at")
 var pprofListenAddr = flag.String("pprofListenAddr", "", "pprof listening address, e.g. 'localhost:6060'")
 var documentRoot = flag.String("documentRoot", "public", "Path to static files content")
-var responseHeadersTimeout = flag.Duration("proxyHeadersTimeout", badgateway.DefaultTransport.ResponseHeaderTimeout, "How long to wait for response headers when proxying the request")
+var proxyHeadersTimeout = flag.Duration("proxyHeadersTimeout", time.Minute, "How long to wait for response headers when proxying the request")
 var developmentMode = flag.Bool("developmentMode", false, "Allow to serve assets from Rails app")
 
 func main() {
@@ -82,12 +82,12 @@ func main() {
 	}
 
 	up := &upstream.Upstream{
-		Backend:               authBackend,
-		Socket:                *authSocket,
-		Version:               Version,
-		ResponseHeaderTimeout: *responseHeadersTimeout,
-		DocumentRoot:          *documentRoot,
-		DevelopmentMode:       *developmentMode,
+		Backend:             authBackend,
+		Socket:              *authSocket,
+		Version:             Version,
+		ProxyHeadersTimeout: *proxyHeadersTimeout,
+		DocumentRoot:        *documentRoot,
+		DevelopmentMode:     *developmentMode,
 	}
 
 	log.Fatal(http.Serve(listener, up))

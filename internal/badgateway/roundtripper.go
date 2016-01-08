@@ -18,15 +18,14 @@ var DefaultDialer = &net.Dialer{
 }
 
 var DefaultTransport = &http.Transport{
-	Proxy: http.ProxyFromEnvironment, // from http.DefaultTransport
-	Dial:  DefaultDialer.Dial,        // from http.DefaultTransport
-	ResponseHeaderTimeout: time.Minute,      // custom
-	TLSHandshakeTimeout:   10 * time.Second, // from http.DefaultTransport
+	Proxy:               http.ProxyFromEnvironment, // from http.DefaultTransport
+	Dial:                DefaultDialer.Dial,        // from http.DefaultTransport
+	TLSHandshakeTimeout: 10 * time.Second,          // from http.DefaultTransport
 }
 
 type RoundTripper struct {
 	Socket                    string
-	ResponseHeaderTimeout     time.Duration
+	ProxyHeadersTimeout       time.Duration
 	Transport                 *http.Transport
 	configureRoundTripperOnce sync.Once
 }
@@ -69,10 +68,7 @@ func (t *RoundTripper) configureRoundTripper() {
 	}
 
 	tr := *DefaultTransport
-
-	if t.ResponseHeaderTimeout != 0 {
-		tr.ResponseHeaderTimeout = t.ResponseHeaderTimeout
-	}
+	tr.ResponseHeaderTimeout = t.ProxyHeadersTimeout
 
 	if t.Socket != "" {
 		tr.Dial = func(_, _ string) (net.Conn, error) {

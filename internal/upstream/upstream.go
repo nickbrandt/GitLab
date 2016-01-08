@@ -21,12 +21,12 @@ import (
 var DefaultBackend = helper.URLMustParse("http://localhost:8080")
 
 type Upstream struct {
-	Backend               *url.URL
-	Version               string
-	Socket                string
-	DocumentRoot          string
-	DevelopmentMode       bool
-	ResponseHeaderTimeout time.Duration
+	Backend             *url.URL
+	Version             string
+	Socket              string
+	DocumentRoot        string
+	DevelopmentMode     bool
+	ProxyHeadersTimeout time.Duration
 
 	urlPrefix              urlprefix.Prefix
 	configureURLPrefixOnce sync.Once
@@ -56,8 +56,8 @@ func (u *Upstream) URLPrefix() urlprefix.Prefix {
 func (u *Upstream) RoundTripper() *badgateway.RoundTripper {
 	u.configureRoundTripperOnce.Do(func() {
 		u.roundtripper = &badgateway.RoundTripper{
-			Socket:                u.Socket,
-			ResponseHeaderTimeout: u.ResponseHeaderTimeout,
+			Socket:              u.Socket,
+			ProxyHeadersTimeout: u.ProxyHeadersTimeout,
 		}
 	})
 
