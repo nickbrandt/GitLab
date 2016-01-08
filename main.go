@@ -50,7 +50,9 @@ const projectPattern = `^/[^/]+/[^/]+/`
 const gitProjectPattern = `^/[^/]+/[^/]+\.git/`
 
 const apiPattern = `^/api/`
-const projectsAPIPattern = `^/api/v3/projects/[^/]+/`
+
+// A project ID in an API request is either a number or two strings 'namespace/project'
+const projectsAPIPattern = `^/api/v3/projects/(\d+)|([^/]+/[^/]+)/`
 
 const ciAPIPattern = `^/ci/api/`
 
@@ -95,6 +97,16 @@ var httpRoutes = [...]httpRoute{
 					),
 				),
 			),
+		),
+	},
+
+	// For legacy reasons, user uploads are stored under the document root.
+	// To prevent anybody who knows/guesses the URL of a user-uploaded file
+	// from downloading it we make sure requests to /uploads/ do _not_ pass
+	// through handleServeFile.
+	httpRoute{"", regexp.MustCompile(`^/uploads/`),
+		handleRailsError(documentRoot,
+			proxyRequest,
 		),
 	},
 
