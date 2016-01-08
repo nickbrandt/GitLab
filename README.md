@@ -29,8 +29,6 @@ Options:
     	pprof listening address, e.g. 'localhost:6060'
   -proxyHeadersTimeout duration
     	How long to wait for response headers when proxying the request (default 1m0s)
-  -relativeURLRoot string
-    	GitLab relative URL root (default "/")
   -version
     	Print version and exit
 ```
