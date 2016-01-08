@@ -86,8 +86,8 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 	return cleanup, nil
 }
 
-func handleFileUploads(h http.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func handleFileUploads(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tempPath := r.Header.Get(tempPathHeader)
 		if tempPath == "" {
 			helper.Fail500(w, errors.New("handleFileUploads: TempPath empty"))
@@ -124,5 +124,5 @@ func handleFileUploads(h http.Handler) http.HandlerFunc {
 
 		// Proxy the request
 		h.ServeHTTP(w, r)
-	}
+	})
 }

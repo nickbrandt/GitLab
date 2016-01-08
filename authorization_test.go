@@ -28,7 +28,7 @@ func runPreAuthorizeHandler(t *testing.T, suffix string, url *regexp.Regexp, api
 	a := &api.API{URL: helper.URLMustParse(ts.URL), Version: "123"}
 
 	response := httptest.NewRecorder()
-	a.PreAuthorizeHandler(okHandler, suffix)(response, httpRequest)
+	a.PreAuthorizeHandler(okHandler, suffix).ServeHTTP(response, httpRequest)
 	helper.AssertResponseCode(t, response, expectedCode)
 	return response
 }

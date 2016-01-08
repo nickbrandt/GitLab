@@ -35,7 +35,7 @@ func TestGzipEncoding(t *testing.T) {
 		if r.Header.Get("Content-Encoding") != "" {
 			t.Fatal("Content-Encoding should be deleted")
 		}
-	}))(resp, req)
+	})).ServeHTTP(resp, req)
 
 	helper.AssertResponseCode(t, resp, 200)
 }
@@ -59,7 +59,7 @@ func TestNoEncoding(t *testing.T) {
 		if r.Header.Get("Content-Encoding") != "" {
 			t.Fatal("Content-Encoding should be deleted")
 		}
-	}))(resp, req)
+	})).ServeHTTP(resp, req)
 
 	helper.AssertResponseCode(t, resp, 200)
 }
@@ -75,7 +75,7 @@ func TestInvalidEncoding(t *testing.T) {
 
 	contentEncodingHandler(http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
 		t.Fatal("it shouldn't be executed")
-	}))(resp, req)
+	})).ServeHTTP(resp, req)
 
 	helper.AssertResponseCode(t, resp, 500)
 }

@@ -105,8 +105,8 @@ func (api *API) newRequest(r *http.Request, body io.Reader, suffix string) (*htt
 	return authReq, nil
 }
 
-func (api *API) PreAuthorizeHandler(h HandleFunc, suffix string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (api *API) PreAuthorizeHandler(h HandleFunc, suffix string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authReq, err := api.newRequest(r, nil, suffix)
 		if err != nil {
 			helper.Fail500(w, fmt.Errorf("preAuthorizeHandler: newUpstreamRequest: %v", err))
@@ -160,5 +160,5 @@ func (api *API) PreAuthorizeHandler(h HandleFunc, suffix string) http.HandlerFun
 		}
 
 		h(w, r, a)
-	}
+	})
 }

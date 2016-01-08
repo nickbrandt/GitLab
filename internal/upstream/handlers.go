@@ -8,8 +8,8 @@ import (
 	"net/http"
 )
 
-func contentEncodingHandler(h http.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func contentEncodingHandler(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var body io.ReadCloser
 		var err error
 
@@ -34,5 +34,5 @@ func contentEncodingHandler(h http.Handler) http.HandlerFunc {
 		r.Header.Del("Content-Encoding")
 
 		h.ServeHTTP(w, r)
-	}
+	})
 }

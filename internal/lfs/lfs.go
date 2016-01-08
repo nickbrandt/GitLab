@@ -20,11 +20,11 @@ import (
 	"path/filepath"
 )
 
-func PutStore(a *api.API, p *proxy.Proxy) http.HandlerFunc {
+func PutStore(a *api.API, p *proxy.Proxy) http.Handler {
 	return lfsAuthorizeHandler(a, handleStoreLfsObject(p))
 }
 
-func lfsAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.HandlerFunc {
+func lfsAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.Handler {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
 
 		if a.StoreLFSPath == "" {
