@@ -14,6 +14,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"syscall"
 	"time"
 )
 
@@ -79,6 +80,7 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 		stdout = archiveStdout
 	} else {
 		compressCmd.Stdin = archiveStdout
+		compressCmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
 		stdout, err = compressCmd.StdoutPipe()
 		if err != nil {
@@ -91,7 +93,7 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 			fail500(w, fmt.Errorf("handleGetArchive: start %v: %v", compressCmd.Args, err))
 			return
 		}
-		defer compressCmd.Wait()
+		defer cleanUpProcessGroup(compressCmd)
 
 		archiveStdout.Close()
 	}
