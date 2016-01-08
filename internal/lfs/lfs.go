@@ -38,7 +38,7 @@ func lfsAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.Handler
 		}
 
 		if err := os.MkdirAll(a.StoreLFSPath, 0700); err != nil {
-			helper.Fail500(w, fmt.Errorf("lfsAuthorizeHandler: mkdia StoreLFSPath: %v", err))
+			helper.Fail500(w, fmt.Errorf("lfsAuthorizeHandler: mkdir StoreLFSPath: %v", err))
 			return
 		}
 
