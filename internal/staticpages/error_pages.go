@@ -60,7 +60,10 @@ func (s *errorPageResponseWriter) Flush() {
 	s.WriteHeader(http.StatusOK)
 }
 
-func (st *Static) ErrorPages(handler http.Handler) http.Handler {
+func (st *Static) ErrorPages(enabled bool, handler http.Handler) http.Handler {
+	if !enabled {
+		return handler
+	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rw := errorPageResponseWriter{
 			rw:   w,

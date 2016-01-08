@@ -88,7 +88,7 @@ func (u *Upstream) configureRoutes() {
 		route{"", nil,
 			static.ServeExisting(u.URLPrefix(), staticpages.CacheDisabled,
 				static.DeployPage(
-					static.ErrorPages(
+					static.ErrorPages(u.DevelopmentMode,
 						proxy,
 					),
 				),

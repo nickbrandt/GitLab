@@ -1,12 +1,9 @@
 # gitlab-workhorse
 
-gitlab-workhorse was designed to unload Git HTTP traffic from
-the GitLab Rails app (Unicorn) to a separate daemon.  It also serves
-'git archive' downloads for GitLab.  All authentication and
-authorization logic is still handled by the GitLab Rails app.
+Gitlab-workhorse is a smart reverse proxy for GitLab. It handles
+"large" HTTP requests such as file downloads, file uploads, Git
+push/pull and Git archive downloads.
 
-Architecture: Git client -> NGINX -> gitlab-workhorse (makes
-auth request to GitLab Rails app) -> git-upload-pack
 
 ## Usage
 
@@ -18,6 +15,10 @@ Options:
     	Authentication/authorization backend (default "http://localhost:8080")
   -authSocket string
     	Optional: Unix domain socket to dial authBackend at
+  -developmentMode
+    	Allow to serve assets from Rails app
+  -documentRoot string
+    	Path to static files content (default "public")
   -listenAddr string
     	Listen address for HTTP server (default "localhost:8181")
   -listenNetwork string
@@ -26,19 +27,17 @@ Options:
     	Umask for Unix socket, default: 022 (default 18)
   -pprofListenAddr string
     	pprof listening address, e.g. 'localhost:6060'
+  -proxyHeadersTimeout duration
+    	How long to wait for response headers when proxying the request (default 1m0s)
   -version
     	Print version and exit
 ```
 
-gitlab-workhorse allows Git HTTP clients to push and pull to
-and from Git repositories. Each incoming request is first replayed
-(with an empty request body) to an external authentication/authorization
-HTTP server: the 'auth backend'. The auth backend is expected to
-be a GitLab Unicorn process.  The 'auth response' is a JSON message
-which tells gitlab-workhorse the path of the Git repository
-to read from/write to.
+The 'auth backend' refers to the GitLab Rails applicatoin. The name is
+a holdover from when gitlab-workhorse only handled Git push/pull over
+HTTP.
 
-gitlab-workhorse can listen on either a TCP or a Unix domain socket. It
+Gitlab-workhorse can listen on either a TCP or a Unix domain socket. It
 can also open a second listening TCP listening socket with the Go
 [net/http/pprof profiler server](http://golang.org/pkg/net/http/pprof/).
 
