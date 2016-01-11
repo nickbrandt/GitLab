@@ -311,21 +311,21 @@ func TestAllowedStaticFile(t *testing.T) {
 	} {
 		resp, err := http.Get(ws.URL + resource)
 		if err != nil {
-			t.Fatal(err)
+			t.Error(err)
 		}
 		defer resp.Body.Close()
 		buf := &bytes.Buffer{}
 		if _, err := io.Copy(buf, resp.Body); err != nil {
-			t.Fatal(err)
+			t.Error(err)
 		}
 		if buf.String() != content {
-			t.Fatalf("GET %q: Expected %q, got %q", resource, content, buf.String())
+			t.Errorf("GET %q: Expected %q, got %q", resource, content, buf.String())
 		}
 		if resp.StatusCode != 200 {
-			t.Fatalf("GET %q: expected 200, got %d", resource, resp.StatusCode)
+			t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
 		}
 		if proxied {
-			t.Fatalf("GET %q: should not have made it to backend", resource)
+			t.Errorf("GET %q: should not have made it to backend", resource)
 		}
 	}
 }
