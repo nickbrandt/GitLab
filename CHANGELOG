@@ -2,6 +2,17 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+0.5.3
+
+Fixes merge error in 0.5.2.
+
+0.5.2 (broken!)
+
+- Always check with upstream if files in /uploads/ may be served
+- Fix project%2Fnamespace API project ID's
+- Prevent archive zombies when using gzip or bzip2
+- Don't show pretty error pages in development mode
+
 0.5.1
 
 Deprecate -relativeURLRoot option, use -authBackend instead.

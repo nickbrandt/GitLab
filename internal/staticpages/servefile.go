@@ -18,6 +18,9 @@ const (
 	CacheExpireMax
 )
 
+// BUG/QUIRK: If a client requests 'foo%2Fbar' and 'foo/bar' exists,
+// handleServeFile will serve foo/bar instead of passing the request
+// upstream.
 func (s *Static) ServeExisting(prefix urlprefix.Prefix, cache CacheMode, notFoundHandler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		file := filepath.Join(s.DocumentRoot, prefix.Strip(r.URL.Path))
