@@ -17,12 +17,6 @@ var DefaultDialer = &net.Dialer{
 	KeepAlive: 30 * time.Second,
 }
 
-var DefaultTransport = &http.Transport{
-	Proxy:               http.ProxyFromEnvironment, // from http.DefaultTransport
-	Dial:                DefaultDialer.Dial,        // from http.DefaultTransport
-	TLSHandshakeTimeout: 10 * time.Second,          // from http.DefaultTransport
-}
-
 type RoundTripper struct {
 	Socket                    string
 	ProxyHeadersTimeout       time.Duration
@@ -67,7 +61,8 @@ func (t *RoundTripper) configureRoundTripper() {
 		return
 	}
 
-	tr := *DefaultTransport
+	// Clone http.DefaultTransport. Needs a cast from http.RoundTripper to *http.Transport.
+	tr := *(http.DefaultTransport.(*http.Transport))
 	tr.ResponseHeaderTimeout = t.ProxyHeadersTimeout
 
 	if t.Socket != "" {
