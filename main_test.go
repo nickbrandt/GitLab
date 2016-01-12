@@ -282,9 +282,9 @@ func TestRegularProjectsAPI(t *testing.T) {
 
 	for _, resource := range []string{
 		"/api/v3/projects/123/repository/not/special",
-		"/api/v3/projects/foo/bar/repository/not/special",
+		"/api/v3/projects/foo%2Fbar/repository/not/special",
 		"/api/v3/projects/123/not/special",
-		"/api/v3/projects/foo/bar/not/special",
+		"/api/v3/projects/foo%2Fbar/not/special",
 	} {
 		resp, err := http.Get(ws.URL + resource)
 		if err != nil {
