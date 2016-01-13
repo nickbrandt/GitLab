@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+0.5.4
+
+Fix /api/v3/projects routing bug introduced in 0.5.2-0.5.3.
+
 0.5.3
 
 Fixes merge error in 0.5.2.

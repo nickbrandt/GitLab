@@ -276,6 +276,37 @@ func TestDownloadCacheCreate(t *testing.T) {
 	}
 }
 
+func TestRegularProjectsAPI(t *testing.T) {
+	apiResponse := "API RESPONSE"
+	ts := testAuthServer(nil, 200, apiResponse)
+	defer ts.Close()
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	for _, resource := range []string{
+		"/api/v3/projects/123/repository/not/special",
+		"/api/v3/projects/foo%2Fbar/repository/not/special",
+		"/api/v3/projects/123/not/special",
+		"/api/v3/projects/foo%2Fbar/not/special",
+	} {
+		resp, err := http.Get(ws.URL + resource)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer resp.Body.Close()
+		buf := &bytes.Buffer{}
+		if _, err := io.Copy(buf, resp.Body); err != nil {
+			t.Error(err)
+		}
+		if buf.String() != apiResponse {
+			t.Errorf("GET %q: Expected %q, got %q", resource, apiResponse, buf.String())
+		}
+		if resp.StatusCode != 200 {
+			t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
+		}
+	}
+}
+
 func TestAllowedXSendfileDownload(t *testing.T) {
 	contentFilename := "my-content"
 	prepareDownloadDir(t)
