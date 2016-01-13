@@ -2,11 +2,11 @@ package upstream
 
 import (
 	apipkg "../api"
+	"../artifacts"
 	"../git"
 	"../lfs"
 	proxypkg "../proxy"
 	"../staticpages"
-	"../upload"
 	"net/http"
 	"regexp"
 )
@@ -23,7 +23,7 @@ const gitProjectPattern = `^/[^/]+/[^/]+\.git/`
 const apiPattern = `^/api/`
 
 // A project ID in an API request is either a number or two strings 'namespace/project'
-const projectsAPIPattern = `^/api/v3/projects/((\d+)|([^/]+/[^/]+))/`
+const projectsAPIPattern = `^/api/v3/projects/(\d+)|([^/]+/[^/]+)/`
 const ciAPIPattern = `^/ci/api/`
 
 // Routing table
@@ -64,8 +64,9 @@ func (u *Upstream) configureRoutes() {
 		route{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.gz\z`), git.GetArchive(api)},
 		route{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.bz2\z`), git.GetArchive(api)},
 
-		// CI Artifacts API
-		route{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), contentEncodingHandler(upload.Artifacts(api, proxy))},
+		// CI Artifacts
+		route{"GET", regexp.MustCompile(projectPattern + `builds/[0-9]+/file/`), contentEncodingHandler(artifacts.DownloadArtifact(api))},
+		route{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), contentEncodingHandler(artifacts.UploadArtifacts(api, proxy))},
 
 		// Explicitly proxy API requests
 		route{"", regexp.MustCompile(apiPattern), proxy},
