@@ -57,7 +57,7 @@ func TestUploadHandlerForwardingRawData(t *testing.T) {
 
 	httpRequest.Header.Set(tempPathHeader, tempPath)
 
-	handleFileUploads(&proxy.Proxy{URL: helper.URLMustParse(ts.URL), Version: "123"}).ServeHTTP(response, httpRequest)
+	handleFileUploads(proxy.NewProxy(helper.URLMustParse(ts.URL), "123", nil)).ServeHTTP(response, httpRequest)
 	helper.AssertResponseCode(t, response, 202)
 	if response.Body.String() != "RESPONSE" {
 		t.Fatal("Expected RESPONSE in response body")
@@ -131,7 +131,7 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	httpRequest.Header.Set(tempPathHeader, tempPath)
 	response := httptest.NewRecorder()
 
-	handleFileUploads(&proxy.Proxy{URL: helper.URLMustParse(ts.URL), Version: "123"}).ServeHTTP(response, httpRequest)
+	handleFileUploads(proxy.NewProxy(helper.URLMustParse(ts.URL), "123", nil)).ServeHTTP(response, httpRequest)
 	helper.AssertResponseCode(t, response, 202)
 
 	if _, err := os.Stat(filePath); !os.IsNotExist(err) {

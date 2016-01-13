@@ -14,35 +14,29 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"sync"
 	"time"
 )
 
 var DefaultBackend = helper.URLMustParse("http://localhost:8080")
 
 type Upstream struct {
-	Backend             *url.URL
-	Version             string
-	Socket              string
-	DocumentRoot        string
-	DevelopmentMode     bool
-	ProxyHeadersTimeout time.Duration
+	Backend         *url.URL
+	Version         string
+	DocumentRoot    string
+	DevelopmentMode bool
 
-	URLPrefix urlprefix.Prefix
-	Routes    []route
-
-	roundtripper              *badgateway.RoundTripper
-	configureRoundTripperOnce sync.Once
+	URLPrefix    urlprefix.Prefix
+	Routes       []route
+	RoundTripper *badgateway.RoundTripper
 }
 
 func NewUpstream(backend *url.URL, socket string, version string, documentRoot string, developmentMode bool, proxyHeadersTimeout time.Duration) *Upstream {
 	up := Upstream{
-		Backend:             backend,
-		Socket:              socket,
-		Version:             version,
-		DocumentRoot:        documentRoot,
-		DevelopmentMode:     developmentMode,
-		ProxyHeadersTimeout: proxyHeadersTimeout,
+		Backend:         backend,
+		Version:         version,
+		DocumentRoot:    documentRoot,
+		DevelopmentMode: developmentMode,
+		RoundTripper:    badgateway.NewRoundTripper(socket, proxyHeadersTimeout),
 	}
 	if backend == nil {
 		up.Backend = DefaultBackend
@@ -58,14 +52,6 @@ func (u *Upstream) configureURLPrefix() {
 		relativeURLRoot += "/"
 	}
 	u.URLPrefix = urlprefix.Prefix(relativeURLRoot)
-}
-
-func (u *Upstream) RoundTripper() *badgateway.RoundTripper {
-	u.configureRoundTripperOnce.Do(func() {
-		u.roundtripper = badgateway.NewRoundTripper(u.Socket, u.ProxyHeadersTimeout)
-	})
-
-	return u.roundtripper
 }
 
 func (u *Upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {

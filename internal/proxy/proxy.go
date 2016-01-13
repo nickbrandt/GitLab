@@ -5,29 +5,24 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"sync"
 )
 
 type Proxy struct {
-	URL                       *url.URL
-	Version                   string
-	RoundTripper              *badgateway.RoundTripper
-	_reverseProxy             *httputil.ReverseProxy
-	configureReverseProxyOnce sync.Once
+	Version      string
+	reverseProxy *httputil.ReverseProxy
 }
 
-func (p *Proxy) reverseProxy() *httputil.ReverseProxy {
-	p.configureReverseProxyOnce.Do(func() {
-		u := *p.URL // Make a copy of p.URL
-		u.Path = ""
-		p._reverseProxy = httputil.NewSingleHostReverseProxy(&u)
-		if p.RoundTripper != nil {
-			p._reverseProxy.Transport = p.RoundTripper
-		} else {
-			p._reverseProxy.Transport = badgateway.NewRoundTripper("", 0)
-		}
-	})
-	return p._reverseProxy
+func NewProxy(myURL *url.URL, version string, roundTripper *badgateway.RoundTripper) *Proxy {
+	p := Proxy{Version: version}
+	u := *myURL // Make a copy of p.URL
+	u.Path = ""
+	p.reverseProxy = httputil.NewSingleHostReverseProxy(&u)
+	if roundTripper != nil {
+		p.reverseProxy.Transport = roundTripper
+	} else {
+		p.reverseProxy.Transport = badgateway.NewRoundTripper("", 0)
+	}
+	return &p
 }
 
 func HeaderClone(h http.Header) http.Header {
@@ -50,5 +45,5 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	rw := newSendFileResponseWriter(w, &req)
 	defer rw.Flush()
 
-	p.reverseProxy().ServeHTTP(&rw, &req)
+	p.reverseProxy.ServeHTTP(&rw, &req)
 }

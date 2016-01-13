@@ -34,14 +34,14 @@ func (u *Upstream) configureRoutes() {
 	api := apipkg.NewAPI(
 		u.Backend,
 		u.Version,
-		u.RoundTripper(),
+		u.RoundTripper,
 	)
 	static := &staticpages.Static{u.DocumentRoot}
-	proxy := &proxypkg.Proxy{
-		URL:          u.Backend,
-		Version:      u.Version,
-		RoundTripper: u.RoundTripper(),
-	}
+	proxy := proxypkg.NewProxy(
+		u.Backend,
+		u.Version,
+		u.RoundTripper,
+	)
 
 	u.Routes = []route{
 		// Git Clone

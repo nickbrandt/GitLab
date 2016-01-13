@@ -15,8 +15,8 @@ import (
 	"time"
 )
 
-func newProxy(url string) *proxy.Proxy {
-	return &proxy.Proxy{URL: helper.URLMustParse(url), Version: "123"}
+func newProxy(url string, rt *badgateway.RoundTripper) *proxy.Proxy {
+	return proxy.NewProxy(helper.URLMustParse(url), "123", rt)
 }
 
 func TestProxyRequest(t *testing.T) {
@@ -47,7 +47,7 @@ func TestProxyRequest(t *testing.T) {
 	httpRequest.Header.Set("Custom-Header", "test")
 
 	w := httptest.NewRecorder()
-	newProxy(ts.URL).ServeHTTP(w, httpRequest)
+	newProxy(ts.URL, nil).ServeHTTP(w, httpRequest)
 	helper.AssertResponseCode(t, w, 202)
 	helper.AssertResponseBody(t, w, "RESPONSE")
 
@@ -64,7 +64,7 @@ func TestProxyError(t *testing.T) {
 	httpRequest.Header.Set("Custom-Header", "test")
 
 	w := httptest.NewRecorder()
-	newProxy("http://localhost:655575/").ServeHTTP(w, httpRequest)
+	newProxy("http://localhost:655575/", nil).ServeHTTP(w, httpRequest)
 	helper.AssertResponseCode(t, w, 502)
 	helper.AssertResponseBody(t, w, "dial tcp: invalid port 655575")
 }
@@ -91,8 +91,7 @@ func TestProxyReadTimeout(t *testing.T) {
 		},
 	}
 
-	p := newProxy(ts.URL)
-	p.RoundTripper = rt
+	p := newProxy(ts.URL, rt)
 	w := httptest.NewRecorder()
 	p.ServeHTTP(w, httpRequest)
 	helper.AssertResponseCode(t, w, 502)
@@ -112,7 +111,7 @@ func TestProxyHandlerTimeout(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	newProxy(ts.URL).ServeHTTP(w, httpRequest)
+	newProxy(ts.URL, nil).ServeHTTP(w, httpRequest)
 	helper.AssertResponseCode(t, w, 503)
 	helper.AssertResponseBody(t, w, "Request took too long")
 }
