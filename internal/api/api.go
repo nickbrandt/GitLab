@@ -19,16 +19,15 @@ type API struct {
 	Version string
 }
 
-func NewAPI(myURL *url.URL, version string, roundtripper *badgateway.RoundTripper) *API {
-	a := API{
-		Client:  &http.Client{Transport: &badgateway.RoundTripper{}},
+func NewAPI(myURL *url.URL, version string, roundTripper *badgateway.RoundTripper) *API {
+	if roundTripper == nil {
+		roundTripper = badgateway.NewRoundTripper("", 0)
+	}
+	return &API{
+		Client:  &http.Client{Transport: roundTripper},
 		URL:     myURL,
 		Version: version,
 	}
-	if roundtripper != nil {
-		a.Client.Transport = roundtripper
-	}
-	return &a
 }
 
 type HandleFunc func(http.ResponseWriter, *http.Request, *Response)

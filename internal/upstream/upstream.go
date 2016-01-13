@@ -62,10 +62,7 @@ func (u *Upstream) configureURLPrefix() {
 
 func (u *Upstream) RoundTripper() *badgateway.RoundTripper {
 	u.configureRoundTripperOnce.Do(func() {
-		u.roundtripper = &badgateway.RoundTripper{
-			Socket:              u.Socket,
-			ProxyHeadersTimeout: u.ProxyHeadersTimeout,
-		}
+		u.roundtripper = badgateway.NewRoundTripper(u.Socket, u.ProxyHeadersTimeout)
 	})
 
 	return u.roundtripper

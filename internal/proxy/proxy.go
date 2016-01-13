@@ -24,7 +24,7 @@ func (p *Proxy) reverseProxy() *httputil.ReverseProxy {
 		if p.RoundTripper != nil {
 			p._reverseProxy.Transport = p.RoundTripper
 		} else {
-			p._reverseProxy.Transport = &badgateway.RoundTripper{}
+			p._reverseProxy.Transport = badgateway.NewRoundTripper("", 0)
 		}
 	})
 	return p._reverseProxy

@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"sync"
 	"time"
 )
 
@@ -24,15 +23,22 @@ var DefaultTransport = &http.Transport{
 }
 
 type RoundTripper struct {
-	Socket                    string
-	ProxyHeadersTimeout       time.Duration
-	Transport                 *http.Transport
-	configureRoundTripperOnce sync.Once
+	Transport *http.Transport
+}
+
+func NewRoundTripper(socket string, proxyHeadersTimeout time.Duration) *RoundTripper {
+	tr := *DefaultTransport
+	tr.ResponseHeaderTimeout = proxyHeadersTimeout
+
+	if socket != "" {
+		tr.Dial = func(_, _ string) (net.Conn, error) {
+			return DefaultDialer.Dial("unix", socket)
+		}
+	}
+	return &RoundTripper{Transport: &tr}
 }
 
 func (t *RoundTripper) RoundTrip(r *http.Request) (res *http.Response, err error) {
-	t.configureRoundTripperOnce.Do(t.configureRoundTripper)
-
 	res, err = t.Transport.RoundTrip(r)
 
 	// httputil.ReverseProxy translates all errors from this
@@ -60,21 +66,4 @@ func (t *RoundTripper) RoundTrip(r *http.Request) (res *http.Response, err error
 		err = nil
 	}
 	return
-}
-
-func (t *RoundTripper) configureRoundTripper() {
-	if t.Transport != nil {
-		return
-	}
-
-	tr := *DefaultTransport
-	tr.ResponseHeaderTimeout = t.ProxyHeadersTimeout
-
-	if t.Socket != "" {
-		tr.Dial = func(_, _ string) (net.Conn, error) {
-			return DefaultDialer.Dial("unix", t.Socket)
-		}
-	}
-
-	t.Transport = &tr
 }
