@@ -5,7 +5,8 @@ gitlab-workhorse: $(wildcard *.go)
 	go build -ldflags "-X main.Version=${VERSION}" -o gitlab-workhorse
 
 install: gitlab-workhorse
-	install gitlab-workhorse ${PREFIX}/bin/
+	mkdir -p $(DESTDIR)${PREFIX}/bin/
+	install gitlab-workhorse ${DESTDIR}${PREFIX}/bin/
 
 .PHONY: test
 test: test/data/group/test.git clean-workhorse gitlab-workhorse
