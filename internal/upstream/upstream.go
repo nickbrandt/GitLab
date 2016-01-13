@@ -28,10 +28,8 @@ type Upstream struct {
 	DevelopmentMode     bool
 	ProxyHeadersTimeout time.Duration
 
-	urlPrefix              urlprefix.Prefix
-	configureURLPrefixOnce sync.Once
-
-	Routes []route
+	URLPrefix urlprefix.Prefix
+	Routes    []route
 
 	roundtripper              *badgateway.RoundTripper
 	configureRoundTripperOnce sync.Once
@@ -46,23 +44,20 @@ func NewUpstream(backend *url.URL, socket string, version string, documentRoot s
 		DevelopmentMode:     developmentMode,
 		ProxyHeadersTimeout: proxyHeadersTimeout,
 	}
+	if backend == nil {
+		up.Backend = DefaultBackend
+	}
 	up.configureRoutes()
+	up.configureURLPrefix()
 	return &up
 }
 
-func (u *Upstream) URLPrefix() urlprefix.Prefix {
-	u.configureURLPrefixOnce.Do(func() {
-		if u.Backend == nil {
-			u.Backend = DefaultBackend
-		}
-		relativeURLRoot := u.Backend.Path
-		if !strings.HasSuffix(relativeURLRoot, "/") {
-			relativeURLRoot += "/"
-		}
-		u.urlPrefix = urlprefix.Prefix(relativeURLRoot)
-	})
-
-	return u.urlPrefix
+func (u *Upstream) configureURLPrefix() {
+	relativeURLRoot := u.Backend.Path
+	if !strings.HasSuffix(relativeURLRoot, "/") {
+		relativeURLRoot += "/"
+	}
+	u.URLPrefix = urlprefix.Prefix(relativeURLRoot)
 }
 
 func (u *Upstream) RoundTripper() *badgateway.RoundTripper {
@@ -94,7 +89,7 @@ func (u *Upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 
 	// Check URL Root
 	URIPath := urlprefix.CleanURIPath(r.URL.Path)
-	prefix := u.URLPrefix()
+	prefix := u.URLPrefix
 	if !prefix.Match(URIPath) {
 		httpError(&w, r, fmt.Sprintf("Not found %q", URIPath), http.StatusNotFound)
 		return

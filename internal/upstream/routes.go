@@ -73,7 +73,7 @@ func (u *Upstream) configureRoutes() {
 
 		// Serve assets
 		route{"", regexp.MustCompile(`^/assets/`),
-			static.ServeExisting(u.URLPrefix(), staticpages.CacheExpireMax,
+			static.ServeExisting(u.URLPrefix, staticpages.CacheExpireMax,
 				NotFoundUnless(u.DevelopmentMode,
 					proxy,
 				),
@@ -88,7 +88,7 @@ func (u *Upstream) configureRoutes() {
 
 		// Serve static files or forward the requests
 		route{"", nil,
-			static.ServeExisting(u.URLPrefix(), staticpages.CacheDisabled,
+			static.ServeExisting(u.URLPrefix, staticpages.CacheDisabled,
 				static.DeployPage(
 					static.ErrorPages(u.DevelopmentMode,
 						proxy,
