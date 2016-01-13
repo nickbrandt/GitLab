@@ -30,11 +30,6 @@ const ciAPIPattern = `^/ci/api/`
 // We match against URI not containing the relativeUrlRoot:
 // see upstream.ServeHTTP
 
-func (u *Upstream) Routes() []route {
-	u.configureRoutesOnce.Do(u.configureRoutes)
-	return u.routes
-}
-
 func (u *Upstream) configureRoutes() {
 	api := &apipkg.API{
 		RoundTripper: u.RoundTripper(),
@@ -48,7 +43,7 @@ func (u *Upstream) configureRoutes() {
 		RoundTripper: u.RoundTripper(),
 	}
 
-	u.routes = []route{
+	u.Routes = []route{
 		// Git Clone
 		route{"GET", regexp.MustCompile(gitProjectPattern + `info/refs\z`), git.GetInfoRefs(api)},
 		route{"POST", regexp.MustCompile(gitProjectPattern + `git-upload-pack\z`), contentEncodingHandler(git.PostRPC(api))},

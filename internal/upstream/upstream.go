@@ -31,11 +31,23 @@ type Upstream struct {
 	urlPrefix              urlprefix.Prefix
 	configureURLPrefixOnce sync.Once
 
-	routes              []route
-	configureRoutesOnce sync.Once
+	Routes []route
 
 	roundtripper              *badgateway.RoundTripper
 	configureRoundTripperOnce sync.Once
+}
+
+func NewUpstream(backend *url.URL, socket string, version string, documentRoot string, developmentMode bool, proxyHeadersTimeout time.Duration) *Upstream {
+	up := Upstream{
+		Backend:             backend,
+		Socket:              socket,
+		Version:             version,
+		DocumentRoot:        documentRoot,
+		DevelopmentMode:     developmentMode,
+		ProxyHeadersTimeout: proxyHeadersTimeout,
+	}
+	up.configureRoutes()
+	return &up
 }
 
 func (u *Upstream) URLPrefix() urlprefix.Prefix {
@@ -91,7 +103,7 @@ func (u *Upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	// Look for a matching Git service
 	var ro route
 	foundService := false
-	for _, ro = range u.Routes() {
+	for _, ro = range u.Routes {
 		if ro.method != "" && r.Method != ro.method {
 			continue
 		}

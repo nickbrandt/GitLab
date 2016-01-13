@@ -81,14 +81,14 @@ func main() {
 		}()
 	}
 
-	up := &upstream.Upstream{
-		Backend:             authBackend,
-		Socket:              *authSocket,
-		Version:             Version,
-		ProxyHeadersTimeout: *proxyHeadersTimeout,
-		DocumentRoot:        *documentRoot,
-		DevelopmentMode:     *developmentMode,
-	}
+	up := upstream.NewUpstream(
+		authBackend,
+		*authSocket,
+		Version,
+		*documentRoot,
+		*developmentMode,
+		*proxyHeadersTimeout,
+	)
 
 	log.Fatal(http.Serve(listener, up))
 }

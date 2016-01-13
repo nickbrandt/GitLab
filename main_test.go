@@ -505,11 +505,14 @@ func testAuthServer(url *regexp.Regexp, code int, body interface{}) *httptest.Se
 }
 
 func startWorkhorseServer(authBackend string) *httptest.Server {
-	u := &upstream.Upstream{
-		Backend:      helper.URLMustParse(authBackend),
-		Version:      "123",
-		DocumentRoot: testDocumentRoot,
-	}
+	u := upstream.NewUpstream(
+		helper.URLMustParse(authBackend),
+		"",
+		"123",
+		testDocumentRoot,
+		false,
+		time.Minute,
+	)
 	return httptest.NewServer(u)
 }
 
