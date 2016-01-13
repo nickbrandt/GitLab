@@ -31,11 +31,11 @@ const ciAPIPattern = `^/ci/api/`
 // see upstream.ServeHTTP
 
 func (u *Upstream) configureRoutes() {
-	api := &apipkg.API{
-		RoundTripper: u.RoundTripper(),
-		URL:          u.Backend,
-		Version:      u.Version,
-	}
+	api := apipkg.NewAPI(
+		u.Backend,
+		u.Version,
+		u.RoundTripper(),
+	)
 	static := &staticpages.Static{u.DocumentRoot}
 	proxy := &proxypkg.Proxy{
 		URL:          u.Backend,

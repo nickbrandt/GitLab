@@ -11,25 +11,24 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"sync"
 )
 
 type API struct {
-	_client             *http.Client
-	configureClientOnce sync.Once
-	URL                 *url.URL
-	Version             string
-	RoundTripper        *badgateway.RoundTripper
+	Client  *http.Client
+	URL     *url.URL
+	Version string
 }
 
-func (a *API) client() *http.Client {
-	a.configureClientOnce.Do(func() {
-		a._client = &http.Client{Transport: &badgateway.RoundTripper{}}
-		if a.RoundTripper != nil {
-			a._client.Transport = a.RoundTripper
-		}
-	})
-	return a._client
+func NewAPI(myURL *url.URL, version string, roundtripper *badgateway.RoundTripper) *API {
+	a := API{
+		Client:  &http.Client{Transport: &badgateway.RoundTripper{}},
+		URL:     myURL,
+		Version: version,
+	}
+	if roundtripper != nil {
+		a.Client.Transport = roundtripper
+	}
+	return &a
 }
 
 type HandleFunc func(http.ResponseWriter, *http.Request, *Response)
@@ -113,7 +112,7 @@ func (api *API) PreAuthorizeHandler(h HandleFunc, suffix string) http.Handler {
 			return
 		}
 
-		authResponse, err := api.client().Do(authReq)
+		authResponse, err := api.Client.Do(authReq)
 		if err != nil {
 			helper.Fail500(w, fmt.Errorf("preAuthorizeHandler: do %v: %v", authReq.URL.Path, err))
 			return
