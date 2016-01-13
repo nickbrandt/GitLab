@@ -10,6 +10,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -439,6 +440,50 @@ func TestDeniedPublicUploadsFile(t *testing.T) {
 		if !proxied {
 			t.Fatalf("GET %q: never made it to backend", resource)
 		}
+	}
+}
+
+func TestArtifactsUpload(t *testing.T) {
+	reqBody := &bytes.Buffer{}
+	writer := multipart.NewWriter(reqBody)
+	file, err := writer.CreateFormFile("file", "my.file")
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Fprint(file, "SHOULD BE ON DISK, NOT IN MULTIPART")
+	writer.Close()
+
+	ts := helper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasSuffix(r.URL.Path, "/authorize") {
+			if _, err := fmt.Fprintf(w, `{"TempPath":"%s"}`, scratchDir); err != nil {
+				t.Fatal(err)
+			}
+			return
+		}
+		err := r.ParseMultipartForm(100000)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(r.MultipartForm.Value) != 2 { // 1 file name, 1 file path
+			t.Error("Expected to receive exactly 2 values")
+		}
+		if len(r.MultipartForm.File) != 0 {
+			t.Error("Expected to not receive any files")
+		}
+		w.WriteHeader(200)
+	})
+	defer ts.Close()
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	resource := `/ci/api/v1/builds/123/artifacts`
+	resp, err := http.Post(ws.URL+resource, writer.FormDataContentType(), reqBody)
+	if err != nil {
+		t.Error(err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
 	}
 }
 

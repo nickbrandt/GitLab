@@ -8,6 +8,6 @@ import (
 func Artifacts(myAPI *api.API, h http.Handler) http.Handler {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		r.Header.Set(tempPathHeader, a.TempPath)
-		h.ServeHTTP(w, r)
+		handleFileUploads(h).ServeHTTP(w, r)
 	}, "/authorize")
 }
