@@ -5,7 +5,9 @@ import (
 	"net/url"
 )
 
-type urlFlag struct{ *url.URL }
+type urlFlag struct {
+	*url.URL
+}
 
 func (u *urlFlag) Set(s string) error {
 	myURL, err := url.Parse(s)
@@ -16,8 +18,8 @@ func (u *urlFlag) Set(s string) error {
 	return nil
 }
 
-func URLFlag(name string, value *url.URL, usage string) *url.URL {
-	f := urlFlag{value}
-	flag.CommandLine.Var(&f, name, usage)
-	return f.URL
+func URLFlag(name string, value *url.URL, usage string) **url.URL {
+	f := &urlFlag{value}
+	flag.CommandLine.Var(f, name, usage)
+	return &f.URL
 }

@@ -82,7 +82,7 @@ func main() {
 	}
 
 	up := upstream.NewUpstream(
-		authBackend,
+		*authBackend,
 		*authSocket,
 		Version,
 		*documentRoot,
