@@ -60,12 +60,39 @@ type Response struct {
 	TempPath string
 }
 
+// singleJoiningSlash is taken from reverseproxy.go:NewSingleHostReverseProxy
+func singleJoiningSlash(a, b string) string {
+	aslash := strings.HasSuffix(a, "/")
+	bslash := strings.HasPrefix(b, "/")
+	switch {
+	case aslash && bslash:
+		return a + b[1:]
+	case !aslash && !bslash:
+		return a + "/" + b
+	}
+	return a + b
+}
+
+// rebaseUrl is taken from reverseproxy.go:NewSingleHostReverseProxy
+func rebaseUrl(url *url.URL, onto *url.URL, suffix string) *url.URL {
+	newUrl := *url
+	newUrl.Scheme = onto.Scheme
+	newUrl.Host = onto.Host
+	if suffix != "" {
+		newUrl.Path = singleJoiningSlash(url.Path, suffix)
+	}
+	if onto.RawQuery == "" || newUrl.RawQuery == "" {
+		newUrl.RawQuery = onto.RawQuery + newUrl.RawQuery
+	} else {
+		newUrl.RawQuery = onto.RawQuery + "&" + newUrl.RawQuery
+	}
+	return &newUrl
+}
+
 func (api *API) newRequest(r *http.Request, body io.Reader, suffix string) (*http.Request, error) {
-	url := *api.URL // Make a copy of api.URL
-	url.Path = r.URL.RequestURI() + suffix
 	authReq := &http.Request{
 		Method: r.Method,
-		URL:    &url,
+		URL:    rebaseUrl(r.URL, api.URL, suffix),
 		Header: proxy.HeaderClone(r.Header),
 	}
 	if body != nil {
