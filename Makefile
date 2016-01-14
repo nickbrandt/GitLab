@@ -1,7 +1,7 @@
 PREFIX=/usr/local
 VERSION=$(shell git describe)-$(shell date -u +%Y%m%d.%H%M%S)
 
-gitlab-workhorse: $(wildcard *.go)
+gitlab-workhorse: $(shell find . -name '*.go')
 	go build -ldflags "-X main.Version=${VERSION}" -o gitlab-workhorse
 
 install: gitlab-workhorse
