@@ -60,8 +60,8 @@ type Response struct {
 	TempPath string
 	// Archive is the path where the artifacts archive is stored
 	Archive string `json:"archive"`
-	// Path is the filename inside the archive to extracted file
-	Path string `json:"path"`
+	// Entry is a filename inside the archive point to file that needs to be extracted
+	Entry string `json:"entry"`
 }
 
 // singleJoiningSlash is taken from reverseproxy.go:NewSingleHostReverseProxy

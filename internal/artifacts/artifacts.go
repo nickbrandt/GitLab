@@ -2,17 +2,17 @@ package artifacts
 
 import (
 	"../api"
-	"../upload"
-	"net/http"
 	"../helper"
-	"errors"
-	"os"
+	"../upload"
 	"archive/zip"
 	"encoding/base64"
-	"strconv"
-	"mime"
-	"path/filepath"
+	"errors"
 	"io"
+	"mime"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strconv"
 )
 
 func UploadArtifacts(myAPI *api.API, h http.Handler) http.Handler {
@@ -29,12 +29,12 @@ func UploadArtifacts(myAPI *api.API, h http.Handler) http.Handler {
 // Artifacts downloader doesn't support ranges when downloading a single file
 func DownloadArtifact(myAPI *api.API) http.Handler {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
-		if a.Archive == "" || a.Path == "" {
+		if a.Archive == "" || a.Entry == "" {
 			helper.Fail500(w, errors.New("DownloadArtifact: Archive or Path is empty"))
 			return
 		}
 
-		fileNameDecoded, err := base64.StdEncoding.DecodeString(a.Path)
+		fileNameDecoded, err := base64.StdEncoding.DecodeString(a.Entry)
 		if err != nil {
 			helper.Fail500(w, err)
 			return
@@ -70,7 +70,7 @@ func DownloadArtifact(myAPI *api.API) http.Handler {
 
 		w.Header().Set("Content-Length", strconv.FormatInt(int64(file.UncompressedSize64), 10))
 		w.Header().Set("Content-Type", contentType)
-		w.Header().Set("Content-Disposition", "attachment; filename=" + filepath.Base(file.Name))
+		w.Header().Set("Content-Disposition", "attachment; filename="+filepath.Base(file.Name))
 
 		reader, err := file.Open()
 		if err != nil {

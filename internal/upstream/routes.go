@@ -65,7 +65,7 @@ func (u *Upstream) configureRoutes() {
 		route{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.bz2\z`), git.GetArchive(api)},
 
 		// CI Artifacts
-		route{"GET", regexp.MustCompile(projectPattern + `builds/[0-9]+/file/`), contentEncodingHandler(artifacts.DownloadArtifact(api))},
+		route{"GET", regexp.MustCompile(projectPattern + `builds/[0-9]+/artifacts/file/`), contentEncodingHandler(artifacts.DownloadArtifact(api))},
 		route{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), contentEncodingHandler(artifacts.UploadArtifacts(api, proxy))},
 
 		// Explicitly proxy API requests
