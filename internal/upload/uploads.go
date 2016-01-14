@@ -78,7 +78,7 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 			file.Close()
 
 			if filter != nil {
-				err = filter.FilterFile(name, filename, writer)
+				err = filter.FilterFile(name, file.Name(), writer)
 				if err != nil {
 					return cleanup, err
 				}
