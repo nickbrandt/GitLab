@@ -1,6 +1,8 @@
-package main
+package upload
 
 import (
+	"../helper"
+	"../proxy"
 	"bytes"
 	"fmt"
 	"io"
@@ -14,19 +16,17 @@ import (
 	"testing"
 )
 
+var nilHandler = http.HandlerFunc(func(http.ResponseWriter, *http.Request) {})
+
 func TestUploadTempPathRequirement(t *testing.T) {
 	response := httptest.NewRecorder()
-	request := gitRequest{
-		authorizationResponse: authorizationResponse{
-			TempPath: "",
-		},
-	}
-	handleFileUploads(response, &request)
-	assertResponseCode(t, response, 500)
+	request := &http.Request{}
+	handleFileUploads(nilHandler).ServeHTTP(response, request)
+	helper.AssertResponseCode(t, response, 500)
 }
 
 func TestUploadHandlerForwardingRawData(t *testing.T) {
-	ts := testServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
+	ts := helper.TestServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "PATCH" {
 			t.Fatal("Expected PATCH request")
 		}
@@ -40,6 +40,7 @@ func TestUploadHandlerForwardingRawData(t *testing.T) {
 		w.WriteHeader(202)
 		fmt.Fprint(w, "RESPONSE")
 	})
+	defer ts.Close()
 
 	httpRequest, err := http.NewRequest("PATCH", ts.URL+"/url/path", bytes.NewBufferString("REQUEST"))
 	if err != nil {
@@ -53,15 +54,11 @@ func TestUploadHandlerForwardingRawData(t *testing.T) {
 	defer os.RemoveAll(tempPath)
 
 	response := httptest.NewRecorder()
-	request := gitRequest{
-		Request: httpRequest,
-		u:       newUpstream(ts.URL, nil),
-		authorizationResponse: authorizationResponse{
-			TempPath: tempPath,
-		},
-	}
-	handleFileUploads(response, &request)
-	assertResponseCode(t, response, 202)
+
+	httpRequest.Header.Set(tempPathHeader, tempPath)
+
+	handleFileUploads(proxy.NewProxy(helper.URLMustParse(ts.URL), "123", nil)).ServeHTTP(response, httpRequest)
+	helper.AssertResponseCode(t, response, 202)
 	if response.Body.String() != "RESPONSE" {
 		t.Fatal("Expected RESPONSE in response body")
 	}
@@ -76,7 +73,7 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	}
 	defer os.RemoveAll(tempPath)
 
-	ts := testServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
+	ts := helper.TestServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "PUT" {
 			t.Fatal("Expected PUT request")
 		}
@@ -131,17 +128,11 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	httpRequest.Body = ioutil.NopCloser(&buffer)
 	httpRequest.ContentLength = int64(buffer.Len())
 	httpRequest.Header.Set("Content-Type", writer.FormDataContentType())
-
+	httpRequest.Header.Set(tempPathHeader, tempPath)
 	response := httptest.NewRecorder()
-	request := gitRequest{
-		Request: httpRequest,
-		u:       newUpstream(ts.URL, nil),
-		authorizationResponse: authorizationResponse{
-			TempPath: tempPath,
-		},
-	}
-	handleFileUploads(response, &request)
-	assertResponseCode(t, response, 202)
+
+	handleFileUploads(proxy.NewProxy(helper.URLMustParse(ts.URL), "123", nil)).ServeHTTP(response, httpRequest)
+	helper.AssertResponseCode(t, response, 202)
 
 	if _, err := os.Stat(filePath); !os.IsNotExist(err) {
 		t.Fatal("expected the file to be deleted")

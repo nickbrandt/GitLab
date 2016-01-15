@@ -1,6 +1,7 @@
-package main
+package staticpages
 
 import (
+	"../helper"
 	"bytes"
 	"compress/gzip"
 	"io/ioutil"
@@ -14,14 +15,11 @@ import (
 func TestServingNonExistingFile(t *testing.T) {
 	dir := "/path/to/non/existing/directory"
 	httpRequest, _ := http.NewRequest("GET", "/file", nil)
-	request := &gitRequest{
-		Request:         httpRequest,
-		relativeURIPath: "/static/file",
-	}
 
 	w := httptest.NewRecorder()
-	handleServeFile(&dir, CacheDisabled, nil)(w, request)
-	assertResponseCode(t, w, 404)
+	st := &Static{dir}
+	st.ServeExisting("/", CacheDisabled, nil).ServeHTTP(w, httpRequest)
+	helper.AssertResponseCode(t, w, 404)
 }
 
 func TestServingDirectory(t *testing.T) {
@@ -32,41 +30,31 @@ func TestServingDirectory(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	httpRequest, _ := http.NewRequest("GET", "/file", nil)
-	request := &gitRequest{
-		Request:         httpRequest,
-		relativeURIPath: "/",
-	}
-
 	w := httptest.NewRecorder()
-	handleServeFile(&dir, CacheDisabled, nil)(w, request)
-	assertResponseCode(t, w, 404)
+	st := &Static{dir}
+	st.ServeExisting("/", CacheDisabled, nil).ServeHTTP(w, httpRequest)
+	helper.AssertResponseCode(t, w, 404)
 }
 
 func TestServingMalformedUri(t *testing.T) {
 	dir := "/path/to/non/existing/directory"
-	httpRequest, _ := http.NewRequest("GET", "/file", nil)
-	request := &gitRequest{
-		Request:         httpRequest,
-		relativeURIPath: "/../../../static/file",
-	}
+	httpRequest, _ := http.NewRequest("GET", "/../../../static/file", nil)
 
 	w := httptest.NewRecorder()
-	handleServeFile(&dir, CacheDisabled, nil)(w, request)
-	assertResponseCode(t, w, 500)
+	st := &Static{dir}
+	st.ServeExisting("/", CacheDisabled, nil).ServeHTTP(w, httpRequest)
+	helper.AssertResponseCode(t, w, 404)
 }
 
 func TestExecutingHandlerWhenNoFileFound(t *testing.T) {
 	dir := "/path/to/non/existing/directory"
 	httpRequest, _ := http.NewRequest("GET", "/file", nil)
-	request := &gitRequest{
-		Request:         httpRequest,
-		relativeURIPath: "/static/file",
-	}
 
 	executed := false
-	handleServeFile(&dir, CacheDisabled, func(w http.ResponseWriter, r *gitRequest) {
-		executed = (r == request)
-	})(nil, request)
+	st := &Static{dir}
+	st.ServeExisting("/", CacheDisabled, http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
+		executed = (r == httpRequest)
+	})).ServeHTTP(nil, httpRequest)
 	if !executed {
 		t.Error("The handler should get executed")
 	}
@@ -80,17 +68,14 @@ func TestServingTheActualFile(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	httpRequest, _ := http.NewRequest("GET", "/file", nil)
-	request := &gitRequest{
-		Request:         httpRequest,
-		relativeURIPath: "/file",
-	}
 
 	fileContent := "STATIC"
 	ioutil.WriteFile(filepath.Join(dir, "file"), []byte(fileContent), 0600)
 
 	w := httptest.NewRecorder()
-	handleServeFile(&dir, CacheDisabled, nil)(w, request)
-	assertResponseCode(t, w, 200)
+	st := &Static{dir}
+	st.ServeExisting("/", CacheDisabled, nil).ServeHTTP(w, httpRequest)
+	helper.AssertResponseCode(t, w, 200)
 	if w.Body.String() != fileContent {
 		t.Error("We should serve the file: ", w.Body.String())
 	}
@@ -104,10 +89,6 @@ func testServingThePregzippedFile(t *testing.T, enableGzip bool) {
 	defer os.RemoveAll(dir)
 
 	httpRequest, _ := http.NewRequest("GET", "/file", nil)
-	request := &gitRequest{
-		Request:         httpRequest,
-		relativeURIPath: "/file",
-	}
 
 	if enableGzip {
 		httpRequest.Header.Set("Accept-Encoding", "gzip, deflate")
@@ -124,16 +105,17 @@ func testServingThePregzippedFile(t *testing.T, enableGzip bool) {
 	ioutil.WriteFile(filepath.Join(dir, "file"), []byte(fileContent), 0600)
 
 	w := httptest.NewRecorder()
-	handleServeFile(&dir, CacheDisabled, nil)(w, request)
-	assertResponseCode(t, w, 200)
+	st := &Static{dir}
+	st.ServeExisting("/", CacheDisabled, nil).ServeHTTP(w, httpRequest)
+	helper.AssertResponseCode(t, w, 200)
 	if enableGzip {
-		assertResponseHeader(t, w, "Content-Encoding", "gzip")
+		helper.AssertResponseHeader(t, w, "Content-Encoding", "gzip")
 		if bytes.Compare(w.Body.Bytes(), fileGzipContent.Bytes()) != 0 {
 			t.Error("We should serve the pregzipped file")
 		}
 	} else {
-		assertResponseCode(t, w, 200)
-		assertResponseHeader(t, w, "Content-Encoding", "")
+		helper.AssertResponseCode(t, w, 200)
+		helper.AssertResponseHeader(t, w, "Content-Encoding", "")
 		if w.Body.String() != fileContent {
 			t.Error("We should serve the file: ", w.Body.String())
 		}

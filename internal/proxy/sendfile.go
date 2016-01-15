@@ -4,9 +4,10 @@ via the X-Sendfile mechanism. All that is needed in the Rails code is the
 'send_file' method.
 */
 
-package main
+package proxy
 
 import (
+	"../helper"
 	"log"
 	"net/http"
 )
@@ -63,7 +64,7 @@ func (s *sendFileResponseWriter) WriteHeader(status int) {
 
 	// Serve the file
 	log.Printf("Send file %q for %s %q", file, s.req.Method, s.req.RequestURI)
-	content, fi, err := openFile(file)
+	content, fi, err := helper.OpenFile(file)
 	if err != nil {
 		http.NotFound(s.rw, s.req)
 		return

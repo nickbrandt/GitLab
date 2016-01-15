@@ -1,6 +1,7 @@
-package main
+package staticpages
 
 import (
+	"../helper"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -21,16 +22,16 @@ func TestIfErrorPageIsPresented(t *testing.T) {
 	ioutil.WriteFile(filepath.Join(dir, "404.html"), []byte(errorPage), 0600)
 
 	w := httptest.NewRecorder()
-
-	enabled := true
-	handleRailsError(&dir, &enabled, func(w http.ResponseWriter, r *gitRequest) {
+	h := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(404)
 		fmt.Fprint(w, "Not Found")
-	})(w, nil)
+	})
+	st := &Static{dir}
+	st.ErrorPages(true, h).ServeHTTP(w, nil)
 	w.Flush()
 
-	assertResponseCode(t, w, 404)
-	assertResponseBody(t, w, errorPage)
+	helper.AssertResponseCode(t, w, 404)
+	helper.AssertResponseBody(t, w, errorPage)
 }
 
 func TestIfErrorPassedIfNoErrorPageIsFound(t *testing.T) {
@@ -42,16 +43,16 @@ func TestIfErrorPassedIfNoErrorPageIsFound(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	errorResponse := "ERROR"
-
-	enabled := true
-	handleRailsError(&dir, &enabled, func(w http.ResponseWriter, r *gitRequest) {
+	h := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(404)
 		fmt.Fprint(w, errorResponse)
-	})(w, nil)
+	})
+	st := &Static{dir}
+	st.ErrorPages(true, h).ServeHTTP(w, nil)
 	w.Flush()
 
-	assertResponseCode(t, w, 404)
-	assertResponseBody(t, w, errorResponse)
+	helper.AssertResponseCode(t, w, 404)
+	helper.AssertResponseBody(t, w, errorResponse)
 }
 
 func TestIfErrorPageIsIgnoredInDevelopment(t *testing.T) {
@@ -65,15 +66,14 @@ func TestIfErrorPageIsIgnoredInDevelopment(t *testing.T) {
 	ioutil.WriteFile(filepath.Join(dir, "500.html"), []byte(errorPage), 0600)
 
 	w := httptest.NewRecorder()
-
-	enabled := false
 	serverError := "Interesting Server Error"
-	handleRailsError(&dir, &enabled, func(w http.ResponseWriter, r *gitRequest) {
+	h := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(500)
 		fmt.Fprint(w, serverError)
-	})(w, nil)
+	})
+	st := &Static{dir}
+	st.ErrorPages(false, h).ServeHTTP(w, nil)
 	w.Flush()
-
-	assertResponseCode(t, w, 500)
-	assertResponseBody(t, w, serverError)
+	helper.AssertResponseCode(t, w, 500)
+	helper.AssertResponseBody(t, w, serverError)
 }

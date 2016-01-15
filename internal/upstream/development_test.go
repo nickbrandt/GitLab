@@ -1,6 +1,7 @@
-package main
+package upstream
 
 import (
+	"../helper"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,9 +14,9 @@ func TestDevelopmentModeEnabled(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	executed := false
-	handleDevelopmentMode(&developmentMode, func(w http.ResponseWriter, r *gitRequest) {
+	NotFoundUnless(developmentMode, http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
 		executed = true
-	})(w, &gitRequest{Request: r})
+	})).ServeHTTP(w, r)
 	if !executed {
 		t.Error("The handler should get executed")
 	}
@@ -28,11 +29,11 @@ func TestDevelopmentModeDisabled(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	executed := false
-	handleDevelopmentMode(&developmentMode, func(w http.ResponseWriter, r *gitRequest) {
+	NotFoundUnless(developmentMode, http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
 		executed = true
-	})(w, &gitRequest{Request: r})
+	})).ServeHTTP(w, r)
 	if executed {
 		t.Error("The handler should not get executed")
 	}
-	assertResponseCode(t, w, 404)
+	helper.AssertResponseCode(t, w, 404)
 }

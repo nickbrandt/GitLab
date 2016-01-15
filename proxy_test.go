@@ -1,6 +1,9 @@
 package main
 
 import (
+	"./internal/badgateway"
+	"./internal/helper"
+	"./internal/proxy"
 	"bytes"
 	"fmt"
 	"io"
@@ -12,8 +15,12 @@ import (
 	"time"
 )
 
+func newProxy(url string, rt *badgateway.RoundTripper) *proxy.Proxy {
+	return proxy.NewProxy(helper.URLMustParse(url), "123", rt)
+}
+
 func TestProxyRequest(t *testing.T) {
-	ts := testServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
+	ts := helper.TestServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			t.Fatal("Expected POST request")
 		}
@@ -39,15 +46,10 @@ func TestProxyRequest(t *testing.T) {
 	}
 	httpRequest.Header.Set("Custom-Header", "test")
 
-	request := gitRequest{
-		Request: httpRequest,
-		u:       newUpstream(ts.URL, nil),
-	}
-
 	w := httptest.NewRecorder()
-	proxyRequest(w, &request)
-	assertResponseCode(t, w, 202)
-	assertResponseBody(t, w, "RESPONSE")
+	newProxy(ts.URL, nil).ServeHTTP(w, httpRequest)
+	helper.AssertResponseCode(t, w, 202)
+	helper.AssertResponseBody(t, w, "RESPONSE")
 
 	if w.Header().Get("Custom-Response-Header") != "test" {
 		t.Fatal("Expected custom response header")
@@ -61,23 +63,14 @@ func TestProxyError(t *testing.T) {
 	}
 	httpRequest.Header.Set("Custom-Header", "test")
 
-	transport := proxyRoundTripper{
-		transport: http.DefaultTransport,
-	}
-
-	request := gitRequest{
-		Request: httpRequest,
-		u:       newUpstream("http://localhost:655575/", &transport),
-	}
-
 	w := httptest.NewRecorder()
-	proxyRequest(w, &request)
-	assertResponseCode(t, w, 502)
-	assertResponseBody(t, w, "dial tcp: invalid port 655575")
+	newProxy("http://localhost:655575/", nil).ServeHTTP(w, httpRequest)
+	helper.AssertResponseCode(t, w, 502)
+	helper.AssertResponseBody(t, w, "dial tcp: invalid port 655575")
 }
 
 func TestProxyReadTimeout(t *testing.T) {
-	ts := testServerWithHandler(nil, func(w http.ResponseWriter, r *http.Request) {
+	ts := helper.TestServerWithHandler(nil, func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(time.Minute)
 	})
 
@@ -86,8 +79,8 @@ func TestProxyReadTimeout(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	transport := &proxyRoundTripper{
-		transport: &http.Transport{
+	rt := &badgateway.RoundTripper{
+		Transport: &http.Transport{
 			Proxy: http.ProxyFromEnvironment,
 			Dial: (&net.Dialer{
 				Timeout:   30 * time.Second,
@@ -98,19 +91,15 @@ func TestProxyReadTimeout(t *testing.T) {
 		},
 	}
 
-	request := gitRequest{
-		Request: httpRequest,
-		u:       newUpstream(ts.URL, transport),
-	}
-
+	p := newProxy(ts.URL, rt)
 	w := httptest.NewRecorder()
-	proxyRequest(w, &request)
-	assertResponseCode(t, w, 502)
-	assertResponseBody(t, w, "net/http: timeout awaiting response headers")
+	p.ServeHTTP(w, httpRequest)
+	helper.AssertResponseCode(t, w, 502)
+	helper.AssertResponseBody(t, w, "net/http: timeout awaiting response headers")
 }
 
 func TestProxyHandlerTimeout(t *testing.T) {
-	ts := testServerWithHandler(nil,
+	ts := helper.TestServerWithHandler(nil,
 		http.TimeoutHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			time.Sleep(time.Second)
 		}), time.Millisecond, "Request took too long").ServeHTTP,
@@ -121,17 +110,8 @@ func TestProxyHandlerTimeout(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	transport := &proxyRoundTripper{
-		transport: http.DefaultTransport,
-	}
-
-	request := gitRequest{
-		Request: httpRequest,
-		u:       newUpstream(ts.URL, transport),
-	}
-
 	w := httptest.NewRecorder()
-	proxyRequest(w, &request)
-	assertResponseCode(t, w, 503)
-	assertResponseBody(t, w, "Request took too long")
+	newProxy(ts.URL, nil).ServeHTTP(w, httpRequest)
+	helper.AssertResponseCode(t, w, 503)
+	helper.AssertResponseBody(t, w, "Request took too long")
 }

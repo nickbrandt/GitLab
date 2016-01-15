@@ -1,4 +1,4 @@
-package main
+package helper
 
 import (
 	"fmt"
@@ -6,25 +6,25 @@ import (
 	"time"
 )
 
-type loggingResponseWriter struct {
+type LoggingResponseWriter struct {
 	rw      http.ResponseWriter
 	status  int
 	written int64
 	started time.Time
 }
 
-func newLoggingResponseWriter(rw http.ResponseWriter) loggingResponseWriter {
-	return loggingResponseWriter{
+func NewLoggingResponseWriter(rw http.ResponseWriter) LoggingResponseWriter {
+	return LoggingResponseWriter{
 		rw:      rw,
 		started: time.Now(),
 	}
 }
 
-func (l *loggingResponseWriter) Header() http.Header {
+func (l *LoggingResponseWriter) Header() http.Header {
 	return l.rw.Header()
 }
 
-func (l *loggingResponseWriter) Write(data []byte) (n int, err error) {
+func (l *LoggingResponseWriter) Write(data []byte) (n int, err error) {
 	if l.status == 0 {
 		l.WriteHeader(http.StatusOK)
 	}
@@ -33,7 +33,7 @@ func (l *loggingResponseWriter) Write(data []byte) (n int, err error) {
 	return
 }
 
-func (l *loggingResponseWriter) WriteHeader(status int) {
+func (l *LoggingResponseWriter) WriteHeader(status int) {
 	if l.status != 0 {
 		return
 	}
@@ -42,7 +42,7 @@ func (l *loggingResponseWriter) WriteHeader(status int) {
 	l.rw.WriteHeader(status)
 }
 
-func (l *loggingResponseWriter) Log(r *http.Request) {
+func (l *LoggingResponseWriter) Log(r *http.Request) {
 	duration := time.Since(l.started)
 	fmt.Printf("%s %s - - [%s] %q %d %d %q %q %f\n",
 		r.Host, r.RemoteAddr, l.started,

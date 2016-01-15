@@ -2,9 +2,11 @@
 In this file we handle 'git archive' downloads
 */
 
-package main
+package git
 
 import (
+	"../api"
+	"../helper"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -18,7 +20,10 @@ import (
 	"time"
 )
 
-func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
+func GetArchive(a *api.API) http.Handler {
+	return repoPreAuthorizeHandler(a, handleGetArchive)
+}
+func handleGetArchive(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	var format string
 	urlPath := r.URL.Path
 	switch filepath.Base(urlPath) {
@@ -31,20 +36,20 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 	case "archive.tar.bz2":
 		format = "tar.bz2"
 	default:
-		fail500(w, fmt.Errorf("handleGetArchive: invalid format: %s", urlPath))
+		helper.Fail500(w, fmt.Errorf("handleGetArchive: invalid format: %s", urlPath))
 		return
 	}
 
-	archiveFilename := path.Base(r.ArchivePath)
+	archiveFilename := path.Base(a.ArchivePath)
 
-	if cachedArchive, err := os.Open(r.ArchivePath); err == nil {
+	if cachedArchive, err := os.Open(a.ArchivePath); err == nil {
 		defer cachedArchive.Close()
-		log.Printf("Serving cached file %q", r.ArchivePath)
+		log.Printf("Serving cached file %q", a.ArchivePath)
 		setArchiveHeaders(w, format, archiveFilename)
 		// Even if somebody deleted the cachedArchive from disk since we opened
 		// the file, Unix file semantics guarantee we can still read from the
 		// open file in this process.
-		http.ServeContent(w, r.Request, "", time.Unix(0, 0), cachedArchive)
+		http.ServeContent(w, r, "", time.Unix(0, 0), cachedArchive)
 		return
 	}
 
@@ -52,9 +57,9 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 	// safe. We create the tempfile in the same directory as the final cached
 	// archive we want to create so that we can use an atomic link(2) operation
 	// to finalize the cached archive.
-	tempFile, err := prepareArchiveTempfile(path.Dir(r.ArchivePath), archiveFilename)
+	tempFile, err := prepareArchiveTempfile(path.Dir(a.ArchivePath), archiveFilename)
 	if err != nil {
-		fail500(w, fmt.Errorf("handleGetArchive: create tempfile: %v", err))
+		helper.Fail500(w, fmt.Errorf("handleGetArchive: create tempfile: %v", err))
 		return
 	}
 	defer tempFile.Close()
@@ -62,15 +67,15 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 
 	compressCmd, archiveFormat := parseArchiveFormat(format)
 
-	archiveCmd := gitCommand("", "git", "--git-dir="+r.RepoPath, "archive", "--format="+archiveFormat, "--prefix="+r.ArchivePrefix+"/", r.CommitId)
+	archiveCmd := gitCommand("", "git", "--git-dir="+a.RepoPath, "archive", "--format="+archiveFormat, "--prefix="+a.ArchivePrefix+"/", a.CommitId)
 	archiveStdout, err := archiveCmd.StdoutPipe()
 	if err != nil {
-		fail500(w, fmt.Errorf("handleGetArchive: archive stdout: %v", err))
+		helper.Fail500(w, fmt.Errorf("handleGetArchive: archive stdout: %v", err))
 		return
 	}
 	defer archiveStdout.Close()
 	if err := archiveCmd.Start(); err != nil {
-		fail500(w, fmt.Errorf("handleGetArchive: start %v: %v", archiveCmd.Args, err))
+		helper.Fail500(w, fmt.Errorf("handleGetArchive: start %v: %v", archiveCmd.Args, err))
 		return
 	}
 	defer cleanUpProcessGroup(archiveCmd) // Ensure brute force subprocess clean-up
@@ -84,13 +89,13 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 
 		stdout, err = compressCmd.StdoutPipe()
 		if err != nil {
-			fail500(w, fmt.Errorf("handleGetArchive: compress stdout: %v", err))
+			helper.Fail500(w, fmt.Errorf("handleGetArchive: compress stdout: %v", err))
 			return
 		}
 		defer stdout.Close()
 
 		if err := compressCmd.Start(); err != nil {
-			fail500(w, fmt.Errorf("handleGetArchive: start %v: %v", compressCmd.Args, err))
+			helper.Fail500(w, fmt.Errorf("handleGetArchive: start %v: %v", compressCmd.Args, err))
 			return
 		}
 		defer cleanUpProcessGroup(compressCmd)
@@ -105,22 +110,22 @@ func handleGetArchive(w http.ResponseWriter, r *gitRequest) {
 	setArchiveHeaders(w, format, archiveFilename)
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 	if _, err := io.Copy(w, archiveReader); err != nil {
-		logError(fmt.Errorf("handleGetArchive: read: %v", err))
+		helper.LogError(fmt.Errorf("handleGetArchive: read: %v", err))
 		return
 	}
 	if err := archiveCmd.Wait(); err != nil {
-		logError(fmt.Errorf("handleGetArchive: archiveCmd: %v", err))
+		helper.LogError(fmt.Errorf("handleGetArchive: archiveCmd: %v", err))
 		return
 	}
 	if compressCmd != nil {
 		if err := compressCmd.Wait(); err != nil {
-			logError(fmt.Errorf("handleGetArchive: compressCmd: %v", err))
+			helper.LogError(fmt.Errorf("handleGetArchive: compressCmd: %v", err))
 			return
 		}
 	}
 
-	if err := finalizeCachedArchive(tempFile, r.ArchivePath); err != nil {
-		logError(fmt.Errorf("handleGetArchive: finalize cached archive: %v", err))
+	if err := finalizeCachedArchive(tempFile, a.ArchivePath); err != nil {
+		helper.LogError(fmt.Errorf("handleGetArchive: finalize cached archive: %v", err))
 		return
 	}
 }

@@ -1,12 +1,16 @@
 package main
 
 import (
+	"./internal/api"
+	"./internal/helper"
+	"./internal/upstream"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -18,9 +22,9 @@ import (
 	"time"
 )
 
-const scratchDir = "test/scratch"
-const testRepoRoot = "test/data"
-const testDocumentRoot = "test/public"
+const scratchDir = "testdata/scratch"
+const testRepoRoot = "testdata/data"
+const testDocumentRoot = "testdata/public"
 const testRepo = "group/test.git"
 const testProject = "group/test"
 
@@ -325,7 +329,7 @@ func TestAllowedStaticFile(t *testing.T) {
 	}
 
 	proxied := false
-	ts := testServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
+	ts := helper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
 		proxied = true
 		w.WriteHeader(404)
 	})
@@ -339,21 +343,21 @@ func TestAllowedStaticFile(t *testing.T) {
 	} {
 		resp, err := http.Get(ws.URL + resource)
 		if err != nil {
-			t.Fatal(err)
+			t.Error(err)
 		}
 		defer resp.Body.Close()
 		buf := &bytes.Buffer{}
 		if _, err := io.Copy(buf, resp.Body); err != nil {
-			t.Fatal(err)
+			t.Error(err)
 		}
 		if buf.String() != content {
-			t.Fatalf("GET %q: Expected %q, got %q", resource, content, buf.String())
+			t.Errorf("GET %q: Expected %q, got %q", resource, content, buf.String())
 		}
 		if resp.StatusCode != 200 {
-			t.Fatalf("GET %q: expected 200, got %d", resource, resp.StatusCode)
+			t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
 		}
 		if proxied {
-			t.Fatalf("GET %q: should not have made it to backend", resource)
+			t.Errorf("GET %q: should not have made it to backend", resource)
 		}
 	}
 }
@@ -365,7 +369,7 @@ func TestAllowedPublicUploadsFile(t *testing.T) {
 	}
 
 	proxied := false
-	ts := testServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
+	ts := helper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
 		proxied = true
 		w.Header().Add("X-Sendfile", *documentRoot+r.URL.Path)
 		w.WriteHeader(200)
@@ -406,7 +410,7 @@ func TestDeniedPublicUploadsFile(t *testing.T) {
 	}
 
 	proxied := false
-	ts := testServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, _ *http.Request) {
+	ts := helper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, _ *http.Request) {
 		proxied = true
 		w.WriteHeader(404)
 	})
@@ -436,6 +440,50 @@ func TestDeniedPublicUploadsFile(t *testing.T) {
 		if !proxied {
 			t.Fatalf("GET %q: never made it to backend", resource)
 		}
+	}
+}
+
+func TestArtifactsUpload(t *testing.T) {
+	reqBody := &bytes.Buffer{}
+	writer := multipart.NewWriter(reqBody)
+	file, err := writer.CreateFormFile("file", "my.file")
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Fprint(file, "SHOULD BE ON DISK, NOT IN MULTIPART")
+	writer.Close()
+
+	ts := helper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasSuffix(r.URL.Path, "/authorize") {
+			if _, err := fmt.Fprintf(w, `{"TempPath":"%s"}`, scratchDir); err != nil {
+				t.Fatal(err)
+			}
+			return
+		}
+		err := r.ParseMultipartForm(100000)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(r.MultipartForm.Value) != 2 { // 1 file name, 1 file path
+			t.Error("Expected to receive exactly 2 values")
+		}
+		if len(r.MultipartForm.File) != 0 {
+			t.Error("Expected to not receive any files")
+		}
+		w.WriteHeader(200)
+	})
+	defer ts.Close()
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	resource := `/ci/api/v1/builds/123/artifacts`
+	resp, err := http.Post(ws.URL+resource, writer.FormDataContentType(), reqBody)
+	if err != nil {
+		t.Error(err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
 	}
 }
 
@@ -476,26 +524,8 @@ func newBranch() string {
 	return fmt.Sprintf("branch-%d", time.Now().UnixNano())
 }
 
-func testServerWithHandler(url *regexp.Regexp, handler http.HandlerFunc) *httptest.Server {
-	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if url != nil && !url.MatchString(r.URL.Path) {
-			log.Println("UPSTREAM", r.Method, r.URL, "DENY")
-			w.WriteHeader(404)
-			return
-		}
-
-		if version := r.Header.Get("Gitlab-Workhorse"); version == "" {
-			log.Println("UPSTREAM", r.Method, r.URL, "DENY")
-			w.WriteHeader(403)
-			return
-		}
-
-		handler(w, r)
-	}))
-}
-
 func testAuthServer(url *regexp.Regexp, code int, body interface{}) *httptest.Server {
-	return testServerWithHandler(url, func(w http.ResponseWriter, r *http.Request) {
+	return helper.TestServerWithHandler(url, func(w http.ResponseWriter, r *http.Request) {
 		// Write pure string
 		if data, ok := body.(string); ok {
 			log.Println("UPSTREAM", r.Method, r.URL, code)
@@ -520,7 +550,15 @@ func testAuthServer(url *regexp.Regexp, code int, body interface{}) *httptest.Se
 }
 
 func startWorkhorseServer(authBackend string) *httptest.Server {
-	return httptest.NewServer(newUpstream(authBackend, nil))
+	u := upstream.NewUpstream(
+		helper.URLMustParse(authBackend),
+		"",
+		"123",
+		testDocumentRoot,
+		false,
+		0,
+	)
+	return httptest.NewServer(u)
 }
 
 func runOrFail(t *testing.T, cmd *exec.Cmd) {
@@ -532,7 +570,7 @@ func runOrFail(t *testing.T, cmd *exec.Cmd) {
 }
 
 func gitOkBody(t *testing.T) interface{} {
-	return &authorizationResponse{
+	return &api.Response{
 		GL_ID:    "user-123",
 		RepoPath: repoPath(t),
 	}
@@ -545,7 +583,7 @@ func archiveOkBody(t *testing.T, archiveName string) interface{} {
 	}
 	archivePath := path.Join(cwd, cacheDir, archiveName)
 
-	return &authorizationResponse{
+	return &api.Response{
 		RepoPath:      repoPath(t),
 		ArchivePath:   archivePath,
 		CommitId:      "c7fbe50c7c7419d9701eebe64b1fdacc3df5b9dd",

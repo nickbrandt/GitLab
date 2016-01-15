@@ -1,14 +1,15 @@
-package main
+package upstream
 
 import (
+	"../helper"
 	"compress/gzip"
 	"fmt"
 	"io"
 	"net/http"
 )
 
-func contentEncodingHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
-	return func(w http.ResponseWriter, r *gitRequest) {
+func contentEncodingHandler(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var body io.ReadCloser
 		var err error
 
@@ -24,7 +25,7 @@ func contentEncodingHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
 		}
 
 		if err != nil {
-			fail500(w, fmt.Errorf("contentEncodingHandler: %v", err))
+			helper.Fail500(w, fmt.Errorf("contentEncodingHandler: %v", err))
 			return
 		}
 		defer body.Close()
@@ -32,6 +33,6 @@ func contentEncodingHandler(handleFunc serviceHandleFunc) serviceHandleFunc {
 		r.Body = body
 		r.Header.Del("Content-Encoding")
 
-		handleFunc(w, r)
-	}
+		h.ServeHTTP(w, r)
+	})
 }

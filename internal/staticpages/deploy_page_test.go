@@ -1,6 +1,7 @@
-package main
+package staticpages
 
 import (
+	"../helper"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -19,9 +20,10 @@ func TestIfNoDeployPageExist(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	executed := false
-	handleDeployPage(&dir, func(w http.ResponseWriter, r *gitRequest) {
+	st := &Static{dir}
+	st.DeployPage(http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
 		executed = true
-	})(w, nil)
+	})).ServeHTTP(w, nil)
 	if !executed {
 		t.Error("The handler should get executed")
 	}
@@ -40,14 +42,15 @@ func TestIfDeployPageExist(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	executed := false
-	handleDeployPage(&dir, func(w http.ResponseWriter, r *gitRequest) {
+	st := &Static{dir}
+	st.DeployPage(http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
 		executed = true
-	})(w, nil)
+	})).ServeHTTP(w, nil)
 	if executed {
 		t.Error("The handler should not get executed")
 	}
 	w.Flush()
 
-	assertResponseCode(t, w, 200)
-	assertResponseBody(t, w, deployPage)
+	helper.AssertResponseCode(t, w, 200)
+	helper.AssertResponseBody(t, w, deployPage)
 }

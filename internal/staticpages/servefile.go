@@ -1,6 +1,8 @@
-package main
+package staticpages
 
 import (
+	"../helper"
+	"../urlprefix"
 	"log"
 	"net/http"
 	"os"
@@ -19,13 +21,13 @@ const (
 // BUG/QUIRK: If a client requests 'foo%2Fbar' and 'foo/bar' exists,
 // handleServeFile will serve foo/bar instead of passing the request
 // upstream.
-func handleServeFile(documentRoot *string, cache CacheMode, notFoundHandler serviceHandleFunc) serviceHandleFunc {
-	return func(w http.ResponseWriter, r *gitRequest) {
-		file := filepath.Join(*documentRoot, r.relativeURIPath)
+func (s *Static) ServeExisting(prefix urlprefix.Prefix, cache CacheMode, notFoundHandler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		file := filepath.Join(s.DocumentRoot, prefix.Strip(r.URL.Path))
 
 		// The filepath.Join does Clean traversing directories up
-		if !strings.HasPrefix(file, *documentRoot) {
-			fail500(w, &os.PathError{
+		if !strings.HasPrefix(file, s.DocumentRoot) {
+			helper.Fail500(w, &os.PathError{
 				Op:   "open",
 				Path: file,
 				Err:  os.ErrInvalid,
@@ -39,7 +41,7 @@ func handleServeFile(documentRoot *string, cache CacheMode, notFoundHandler serv
 
 		// Serve pre-gzipped assets
 		if acceptEncoding := r.Header.Get("Accept-Encoding"); strings.Contains(acceptEncoding, "gzip") {
-			content, fi, err = openFile(file + ".gz")
+			content, fi, err = helper.OpenFile(file + ".gz")
 			if err == nil {
 				w.Header().Set("Content-Encoding", "gzip")
 			}
@@ -47,13 +49,13 @@ func handleServeFile(documentRoot *string, cache CacheMode, notFoundHandler serv
 
 		// If not found, open the original file
 		if content == nil || err != nil {
-			content, fi, err = openFile(file)
+			content, fi, err = helper.OpenFile(file)
 		}
 		if err != nil {
 			if notFoundHandler != nil {
-				notFoundHandler(w, r)
+				notFoundHandler.ServeHTTP(w, r)
 			} else {
-				http.NotFound(w, r.Request)
+				http.NotFound(w, r)
 			}
 			return
 		}
@@ -68,6 +70,6 @@ func handleServeFile(documentRoot *string, cache CacheMode, notFoundHandler serv
 		}
 
 		log.Printf("Send static file %q (%q) for %s %q", file, w.Header().Get("Content-Encoding"), r.Method, r.RequestURI)
-		http.ServeContent(w, r.Request, filepath.Base(file), fi.ModTime(), content)
-	}
+		http.ServeContent(w, r, filepath.Base(file), fi.ModTime(), content)
+	})
 }

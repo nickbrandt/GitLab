@@ -1,6 +1,7 @@
-package main
+package upstream
 
 import (
+	"../helper"
 	"bytes"
 	"compress/gzip"
 	"fmt"
@@ -27,17 +28,16 @@ func TestGzipEncoding(t *testing.T) {
 	}
 	req.Header.Set("Content-Encoding", "gzip")
 
-	request := gitRequest{Request: req}
-	contentEncodingHandler(func(w http.ResponseWriter, r *gitRequest) {
+	contentEncodingHandler(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
 		if _, ok := r.Body.(*gzip.Reader); !ok {
 			t.Fatal("Expected gzip reader for body, but it's:", reflect.TypeOf(r.Body))
 		}
 		if r.Header.Get("Content-Encoding") != "" {
 			t.Fatal("Content-Encoding should be deleted")
 		}
-	})(resp, &request)
+	})).ServeHTTP(resp, req)
 
-	assertResponseCode(t, resp, 200)
+	helper.AssertResponseCode(t, resp, 200)
 }
 
 func TestNoEncoding(t *testing.T) {
@@ -52,17 +52,16 @@ func TestNoEncoding(t *testing.T) {
 	}
 	req.Header.Set("Content-Encoding", "")
 
-	request := gitRequest{Request: req}
-	contentEncodingHandler(func(w http.ResponseWriter, r *gitRequest) {
+	contentEncodingHandler(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
 		if r.Body != body {
 			t.Fatal("Expected the same body")
 		}
 		if r.Header.Get("Content-Encoding") != "" {
 			t.Fatal("Content-Encoding should be deleted")
 		}
-	})(resp, &request)
+	})).ServeHTTP(resp, req)
 
-	assertResponseCode(t, resp, 200)
+	helper.AssertResponseCode(t, resp, 200)
 }
 
 func TestInvalidEncoding(t *testing.T) {
@@ -74,10 +73,9 @@ func TestInvalidEncoding(t *testing.T) {
 	}
 	req.Header.Set("Content-Encoding", "application/unknown")
 
-	request := gitRequest{Request: req}
-	contentEncodingHandler(func(w http.ResponseWriter, r *gitRequest) {
+	contentEncodingHandler(http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
 		t.Fatal("it shouldn't be executed")
-	})(resp, &request)
+	})).ServeHTTP(resp, req)
 
-	assertResponseCode(t, resp, 500)
+	helper.AssertResponseCode(t, resp, 500)
 }
