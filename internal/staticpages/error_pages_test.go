@@ -1,7 +1,7 @@
 package staticpages
 
 import (
-	"../helper"
+	"../testhelper"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -30,8 +30,8 @@ func TestIfErrorPageIsPresented(t *testing.T) {
 	st.ErrorPages(true, h).ServeHTTP(w, nil)
 	w.Flush()
 
-	helper.AssertResponseCode(t, w, 404)
-	helper.AssertResponseBody(t, w, errorPage)
+	testhelper.AssertResponseCode(t, w, 404)
+	testhelper.AssertResponseBody(t, w, errorPage)
 }
 
 func TestIfErrorPassedIfNoErrorPageIsFound(t *testing.T) {
@@ -51,8 +51,8 @@ func TestIfErrorPassedIfNoErrorPageIsFound(t *testing.T) {
 	st.ErrorPages(true, h).ServeHTTP(w, nil)
 	w.Flush()
 
-	helper.AssertResponseCode(t, w, 404)
-	helper.AssertResponseBody(t, w, errorResponse)
+	testhelper.AssertResponseCode(t, w, 404)
+	testhelper.AssertResponseBody(t, w, errorResponse)
 }
 
 func TestIfErrorPageIsIgnoredInDevelopment(t *testing.T) {
@@ -74,6 +74,6 @@ func TestIfErrorPageIsIgnoredInDevelopment(t *testing.T) {
 	st := &Static{dir}
 	st.ErrorPages(false, h).ServeHTTP(w, nil)
 	w.Flush()
-	helper.AssertResponseCode(t, w, 500)
-	helper.AssertResponseBody(t, w, serverError)
+	testhelper.AssertResponseCode(t, w, 500)
+	testhelper.AssertResponseBody(t, w, serverError)
 }

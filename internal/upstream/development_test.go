@@ -1,7 +1,7 @@
 package upstream
 
 import (
-	"../helper"
+	"../testhelper"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -35,5 +35,5 @@ func TestDevelopmentModeDisabled(t *testing.T) {
 	if executed {
 		t.Error("The handler should not get executed")
 	}
-	helper.AssertResponseCode(t, w, 404)
+	testhelper.AssertResponseCode(t, w, 404)
 }

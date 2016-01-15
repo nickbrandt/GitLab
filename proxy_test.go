@@ -4,6 +4,7 @@ import (
 	"./internal/badgateway"
 	"./internal/helper"
 	"./internal/proxy"
+	"./internal/testhelper"
 	"bytes"
 	"fmt"
 	"io"
@@ -20,7 +21,7 @@ func newProxy(url string, rt *badgateway.RoundTripper) *proxy.Proxy {
 }
 
 func TestProxyRequest(t *testing.T) {
-	ts := helper.TestServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			t.Fatal("Expected POST request")
 		}
@@ -48,8 +49,8 @@ func TestProxyRequest(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	newProxy(ts.URL, nil).ServeHTTP(w, httpRequest)
-	helper.AssertResponseCode(t, w, 202)
-	helper.AssertResponseBody(t, w, "RESPONSE")
+	testhelper.AssertResponseCode(t, w, 202)
+	testhelper.AssertResponseBody(t, w, "RESPONSE")
 
 	if w.Header().Get("Custom-Response-Header") != "test" {
 		t.Fatal("Expected custom response header")
@@ -65,12 +66,12 @@ func TestProxyError(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	newProxy("http://localhost:655575/", nil).ServeHTTP(w, httpRequest)
-	helper.AssertResponseCode(t, w, 502)
-	helper.AssertResponseBody(t, w, "dial tcp: invalid port 655575")
+	testhelper.AssertResponseCode(t, w, 502)
+	testhelper.AssertResponseBody(t, w, "dial tcp: invalid port 655575")
 }
 
 func TestProxyReadTimeout(t *testing.T) {
-	ts := helper.TestServerWithHandler(nil, func(w http.ResponseWriter, r *http.Request) {
+	ts := testhelper.TestServerWithHandler(nil, func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(time.Minute)
 	})
 
@@ -94,12 +95,12 @@ func TestProxyReadTimeout(t *testing.T) {
 	p := newProxy(ts.URL, rt)
 	w := httptest.NewRecorder()
 	p.ServeHTTP(w, httpRequest)
-	helper.AssertResponseCode(t, w, 502)
-	helper.AssertResponseBody(t, w, "net/http: timeout awaiting response headers")
+	testhelper.AssertResponseCode(t, w, 502)
+	testhelper.AssertResponseBody(t, w, "net/http: timeout awaiting response headers")
 }
 
 func TestProxyHandlerTimeout(t *testing.T) {
-	ts := helper.TestServerWithHandler(nil,
+	ts := testhelper.TestServerWithHandler(nil,
 		http.TimeoutHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			time.Sleep(time.Second)
 		}), time.Millisecond, "Request took too long").ServeHTTP,
@@ -112,6 +113,6 @@ func TestProxyHandlerTimeout(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	newProxy(ts.URL, nil).ServeHTTP(w, httpRequest)
-	helper.AssertResponseCode(t, w, 503)
-	helper.AssertResponseBody(t, w, "Request took too long")
+	testhelper.AssertResponseCode(t, w, 503)
+	testhelper.AssertResponseBody(t, w, "Request took too long")
 }

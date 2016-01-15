@@ -3,6 +3,7 @@ package main
 import (
 	"./internal/api"
 	"./internal/helper"
+	"./internal/testhelper"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -29,7 +30,7 @@ func runPreAuthorizeHandler(t *testing.T, suffix string, url *regexp.Regexp, api
 
 	response := httptest.NewRecorder()
 	a.PreAuthorizeHandler(okHandler, suffix).ServeHTTP(response, httpRequest)
-	helper.AssertResponseCode(t, response, expectedCode)
+	testhelper.AssertResponseCode(t, response, expectedCode)
 	return response
 }
 
