@@ -2,6 +2,8 @@ package proxy
 
 import (
 	"../badgateway"
+	"../helper"
+	"../senddata"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -25,24 +27,14 @@ func NewProxy(myURL *url.URL, version string, roundTripper *badgateway.RoundTrip
 	return &p
 }
 
-func HeaderClone(h http.Header) http.Header {
-	h2 := make(http.Header, len(h))
-	for k, vv := range h {
-		vv2 := make([]string, len(vv))
-		copy(vv2, vv)
-		h2[k] = vv2
-	}
-	return h2
-}
-
 func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Clone request
 	req := *r
-	req.Header = HeaderClone(r.Header)
+	req.Header = helper.HeaderClone(r.Header)
 
 	// Set Workhorse version
 	req.Header.Set("Gitlab-Workhorse", p.Version)
-	rw := newSendFileResponseWriter(w, &req)
+	rw := senddata.NewSendFileResponseWriter(w, &req)
 	defer rw.Flush()
 
 	p.reverseProxy.ServeHTTP(&rw, &req)

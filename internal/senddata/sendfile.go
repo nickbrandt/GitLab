@@ -4,9 +4,10 @@ via the X-Sendfile mechanism. All that is needed in the Rails code is the
 'send_file' method.
 */
 
-package proxy
+package senddata
 
 import (
+	"../git"
 	"../helper"
 	"log"
 	"net/http"
@@ -19,7 +20,7 @@ type sendFileResponseWriter struct {
 	req      *http.Request
 }
 
-func newSendFileResponseWriter(rw http.ResponseWriter, req *http.Request) sendFileResponseWriter {
+func NewSendFileResponseWriter(rw http.ResponseWriter, req *http.Request) sendFileResponseWriter {
 	s := sendFileResponseWriter{
 		rw:  rw,
 		req: req,
@@ -48,30 +49,45 @@ func (s *sendFileResponseWriter) WriteHeader(status int) {
 	}
 
 	s.status = status
-
-	// Check X-Sendfile header
-	file := s.Header().Get("X-Sendfile")
-	s.Header().Del("X-Sendfile")
-
-	// If file is empty or status is not 200 pass through header
-	if file == "" || s.status != http.StatusOK {
+	if s.status != http.StatusOK {
 		s.rw.WriteHeader(s.status)
 		return
 	}
 
-	// Mark this connection as hijacked
-	s.hijacked = true
+	if file := s.Header().Get("X-Sendfile"); file != "" {
+		s.Header().Del("X-Sendfile")
 
-	// Serve the file
-	log.Printf("Send file %q for %s %q", file, s.req.Method, s.req.RequestURI)
+		// Mark this connection as hijacked
+		s.hijacked = true
+
+		// Serve the file
+		sendFileFromDisk(s.rw, s.req, file)
+		return
+	} else if repoPath := s.Header().Get("Gitlab-Workhorse-Repo-Path"); repoPath != "" {
+		s.hijacked = true
+
+		s.Header().Del("Gitlab-Workhorse-Repo-Path")
+		sendBlob := s.Header().Get("Gitlab-Workhorse-Send-Blob")
+		s.Header().Del("Gitlab-Workhorse-Send-Blob")
+
+		git.SendGitBlob(s.rw, s.req, repoPath, sendBlob)
+		return
+	} else {
+		s.rw.WriteHeader(s.status)
+		return
+	}
+}
+
+func sendFileFromDisk(w http.ResponseWriter, r *http.Request, file string) {
+	log.Printf("Send file %q for %s %q", file, r.Method, r.RequestURI)
 	content, fi, err := helper.OpenFile(file)
 	if err != nil {
-		http.NotFound(s.rw, s.req)
+		http.NotFound(w, r)
 		return
 	}
 	defer content.Close()
 
-	http.ServeContent(s.rw, s.req, "", fi.ModTime(), content)
+	http.ServeContent(w, r, "", fi.ModTime(), content)
 }
 
 func (s *sendFileResponseWriter) Flush() {
