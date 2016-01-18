@@ -1,7 +1,7 @@
 package staticpages
 
 import (
-	"../helper"
+	"../testhelper"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -51,6 +51,6 @@ func TestIfDeployPageExist(t *testing.T) {
 	}
 	w.Flush()
 
-	helper.AssertResponseCode(t, w, 200)
-	helper.AssertResponseBody(t, w, deployPage)
+	testhelper.AssertResponseCode(t, w, 200)
+	testhelper.AssertResponseBody(t, w, deployPage)
 }

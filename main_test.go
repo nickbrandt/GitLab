@@ -3,6 +3,7 @@ package main
 import (
 	"./internal/api"
 	"./internal/helper"
+	"./internal/testhelper"
 	"./internal/upstream"
 	"bytes"
 	"encoding/json"
@@ -329,7 +330,7 @@ func TestAllowedStaticFile(t *testing.T) {
 	}
 
 	proxied := false
-	ts := helper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
 		proxied = true
 		w.WriteHeader(404)
 	})
@@ -369,7 +370,7 @@ func TestAllowedPublicUploadsFile(t *testing.T) {
 	}
 
 	proxied := false
-	ts := helper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
 		proxied = true
 		w.Header().Add("X-Sendfile", *documentRoot+r.URL.Path)
 		w.WriteHeader(200)
@@ -410,7 +411,7 @@ func TestDeniedPublicUploadsFile(t *testing.T) {
 	}
 
 	proxied := false
-	ts := helper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, _ *http.Request) {
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, _ *http.Request) {
 		proxied = true
 		w.WriteHeader(404)
 	})
@@ -453,7 +454,7 @@ func TestArtifactsUpload(t *testing.T) {
 	fmt.Fprint(file, "SHOULD BE ON DISK, NOT IN MULTIPART")
 	writer.Close()
 
-	ts := helper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasSuffix(r.URL.Path, "/authorize") {
 			if _, err := fmt.Fprintf(w, `{"TempPath":"%s"}`, scratchDir); err != nil {
 				t.Fatal(err)
@@ -525,7 +526,7 @@ func newBranch() string {
 }
 
 func testAuthServer(url *regexp.Regexp, code int, body interface{}) *httptest.Server {
-	return helper.TestServerWithHandler(url, func(w http.ResponseWriter, r *http.Request) {
+	return testhelper.TestServerWithHandler(url, func(w http.ResponseWriter, r *http.Request) {
 		// Write pure string
 		if data, ok := body.(string); ok {
 			log.Println("UPSTREAM", r.Method, r.URL, code)

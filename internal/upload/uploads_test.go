@@ -3,6 +3,7 @@ package upload
 import (
 	"../helper"
 	"../proxy"
+	"../testhelper"
 	"bytes"
 	"fmt"
 	"io"
@@ -22,11 +23,11 @@ func TestUploadTempPathRequirement(t *testing.T) {
 	response := httptest.NewRecorder()
 	request := &http.Request{}
 	handleFileUploads(nilHandler).ServeHTTP(response, request)
-	helper.AssertResponseCode(t, response, 500)
+	testhelper.AssertResponseCode(t, response, 500)
 }
 
 func TestUploadHandlerForwardingRawData(t *testing.T) {
-	ts := helper.TestServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "PATCH" {
 			t.Fatal("Expected PATCH request")
 		}
@@ -58,7 +59,7 @@ func TestUploadHandlerForwardingRawData(t *testing.T) {
 	httpRequest.Header.Set(tempPathHeader, tempPath)
 
 	handleFileUploads(proxy.NewProxy(helper.URLMustParse(ts.URL), "123", nil)).ServeHTTP(response, httpRequest)
-	helper.AssertResponseCode(t, response, 202)
+	testhelper.AssertResponseCode(t, response, 202)
 	if response.Body.String() != "RESPONSE" {
 		t.Fatal("Expected RESPONSE in response body")
 	}
@@ -73,7 +74,7 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	}
 	defer os.RemoveAll(tempPath)
 
-	ts := helper.TestServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`/url/path\z`), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "PUT" {
 			t.Fatal("Expected PUT request")
 		}
@@ -132,7 +133,7 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	response := httptest.NewRecorder()
 
 	handleFileUploads(proxy.NewProxy(helper.URLMustParse(ts.URL), "123", nil)).ServeHTTP(response, httpRequest)
-	helper.AssertResponseCode(t, response, 202)
+	testhelper.AssertResponseCode(t, response, 202)
 
 	if _, err := os.Stat(filePath); !os.IsNotExist(err) {
 		t.Fatal("expected the file to be deleted")

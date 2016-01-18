@@ -1,7 +1,7 @@
 package upstream
 
 import (
-	"../helper"
+	"../testhelper"
 	"bytes"
 	"compress/gzip"
 	"fmt"
@@ -37,7 +37,7 @@ func TestGzipEncoding(t *testing.T) {
 		}
 	})).ServeHTTP(resp, req)
 
-	helper.AssertResponseCode(t, resp, 200)
+	testhelper.AssertResponseCode(t, resp, 200)
 }
 
 func TestNoEncoding(t *testing.T) {
@@ -61,7 +61,7 @@ func TestNoEncoding(t *testing.T) {
 		}
 	})).ServeHTTP(resp, req)
 
-	helper.AssertResponseCode(t, resp, 200)
+	testhelper.AssertResponseCode(t, resp, 200)
 }
 
 func TestInvalidEncoding(t *testing.T) {
@@ -77,5 +77,5 @@ func TestInvalidEncoding(t *testing.T) {
 		t.Fatal("it shouldn't be executed")
 	})).ServeHTTP(resp, req)
 
-	helper.AssertResponseCode(t, resp, 500)
+	testhelper.AssertResponseCode(t, resp, 500)
 }
