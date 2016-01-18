@@ -70,7 +70,7 @@ func DownloadArtifact(myAPI *api.API) http.Handler {
 
 		w.Header().Set("Content-Length", strconv.FormatInt(int64(file.UncompressedSize64), 10))
 		w.Header().Set("Content-Type", contentType)
-		w.Header().Set("Content-Disposition", "attachment; filename="+filepath.Base(file.Name))
+		w.Header().Set("Content-Disposition", "attachment; filename=\""+filepath.Base(file.Name)+"\"")
 
 		reader, err := file.Open()
 		if err != nil {
