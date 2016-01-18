@@ -1,13 +1,16 @@
 package artifacts
+
 import (
 	"archive/zip"
-	"io"
 	"encoding/binary"
 	"encoding/json"
+	"io"
+	"strconv"
 )
 
 type metadata struct {
-	Modified uint16 `json:"modified"`
+	Modified int64  `json:"modified"`
+	Mode     string `json:"mode"`
 	CRC      uint32 `json:"crc,omitempty"`
 	Size     uint64 `json:"size,omitempty"`
 	Zipped   uint64 `json:"zipped,omitempty"`
@@ -16,10 +19,11 @@ type metadata struct {
 
 func newMetadata(file *zip.File) metadata {
 	return metadata{
-		Modified: file.ModifiedDate,
+		Modified: file.ModTime().Unix(),
+		Mode:     strconv.FormatUint(uint64(file.Mode().Perm()), 8),
 		CRC:      file.CRC32,
-		Size:     file.CompressedSize64,
-		Zipped:   file.UncompressedSize64,
+		Size:     file.UncompressedSize64,
+		Zipped:   file.CompressedSize64,
 		Comment:  file.Comment,
 	}
 }
@@ -34,7 +38,7 @@ func (m metadata) write(output io.Writer) error {
 }
 
 func generateZipMetadata(output io.Writer, archive *zip.Reader) error {
-	err := writeString(output, "GitLab Build Artifacts Metadata 0.0.1\n")
+	err := writeString(output, "GitLab Build Artifacts Metadata 0.0.2\n")
 	if err != nil {
 		return err
 	}
