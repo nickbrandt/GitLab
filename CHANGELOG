@@ -2,6 +2,12 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+0.6.0
+
+Overhauled the source code organization; no user-facing changes
+(intended). The application code is now split into Go 'packages'
+(modules).
+
 0.5.4
 
 Fix /api/v3/projects routing bug introduced in 0.5.2-0.5.3.
