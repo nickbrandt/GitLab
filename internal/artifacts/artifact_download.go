@@ -58,10 +58,12 @@ func unpackFileFromZip(archiveFileName, fileName string, headers http.Header, ou
 	}
 	defer reader.Close()
 
+	basename := filepath.Base(fileName)
+
 	// Write http headers about the file
 	headers.Set("Content-Length", strconv.FormatInt(int64(file.UncompressedSize64), 10))
 	headers.Set("Content-Type", detectFileContentType(file.Name))
-	headers.Set("Content-Disposition", "attachment; filename=\""+filepath.Base(file.Name)+"\"")
+	headers.Set("Content-Disposition", "attachment; filename=\""+escapeQuotes(basename)+"\"")
 
 	// Copy file body to client
 	_, err = io.Copy(output, reader)
