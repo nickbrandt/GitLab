@@ -84,13 +84,13 @@ func (u *Upstream) configureRoutes() {
 		// To prevent anybody who knows/guesses the URL of a user-uploaded file
 		// from downloading it we make sure requests to /uploads/ do _not_ pass
 		// through static.ServeExisting.
-		route{"", regexp.MustCompile(`^/uploads/`), static.ErrorPages(u.DevelopmentMode, proxy)},
+		route{"", regexp.MustCompile(`^/uploads/`), static.ErrorPagesUnless(u.DevelopmentMode, proxy)},
 
 		// Serve static files or forward the requests
 		route{"", nil,
 			static.ServeExisting(u.URLPrefix, staticpages.CacheDisabled,
 				static.DeployPage(
-					static.ErrorPages(u.DevelopmentMode,
+					static.ErrorPagesUnless(u.DevelopmentMode,
 						proxy,
 					),
 				),

@@ -27,7 +27,7 @@ func TestIfErrorPageIsPresented(t *testing.T) {
 		fmt.Fprint(w, "Not Found")
 	})
 	st := &Static{dir}
-	st.ErrorPages(true, h).ServeHTTP(w, nil)
+	st.ErrorPagesUnless(false, h).ServeHTTP(w, nil)
 	w.Flush()
 
 	testhelper.AssertResponseCode(t, w, 404)
@@ -48,7 +48,7 @@ func TestIfErrorPassedIfNoErrorPageIsFound(t *testing.T) {
 		fmt.Fprint(w, errorResponse)
 	})
 	st := &Static{dir}
-	st.ErrorPages(true, h).ServeHTTP(w, nil)
+	st.ErrorPagesUnless(false, h).ServeHTTP(w, nil)
 	w.Flush()
 
 	testhelper.AssertResponseCode(t, w, 404)
@@ -72,7 +72,7 @@ func TestIfErrorPageIsIgnoredInDevelopment(t *testing.T) {
 		fmt.Fprint(w, serverError)
 	})
 	st := &Static{dir}
-	st.ErrorPages(false, h).ServeHTTP(w, nil)
+	st.ErrorPagesUnless(true, h).ServeHTTP(w, nil)
 	w.Flush()
 	testhelper.AssertResponseCode(t, w, 500)
 	testhelper.AssertResponseBody(t, w, serverError)
