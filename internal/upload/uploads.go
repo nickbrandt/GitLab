@@ -11,14 +11,12 @@ import (
 	"os"
 )
 
-const tempPathHeader = "Gitlab-Workhorse-Temp-Path"
-
-type MultipartFormFilter interface {
-	FilterFile(formName, fileName string, writer *multipart.Writer) error
-	FilterField(formName string, writer *multipart.Writer) error
+type MultipartFormProcessor interface {
+	ProcessFile(formName, fileName string, writer *multipart.Writer) error
+	ProcessField(formName string, writer *multipart.Writer) error
 }
 
-func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, tempPath string, filter MultipartFormFilter) (cleanup func(), err error) {
+func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, tempPath string, filter MultipartFormProcessor) (cleanup func(), err error) {
 	// Create multipart reader
 	reader, err := r.MultipartReader()
 	if err != nil {
@@ -78,7 +76,7 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 			file.Close()
 
 			if filter != nil {
-				err = filter.FilterFile(name, file.Name(), writer)
+				err = filter.ProcessFile(name, file.Name(), writer)
 				if err != nil {
 					return cleanup, err
 				}
@@ -95,7 +93,7 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 			}
 
 			if filter != nil {
-				err = filter.FilterField(name, writer)
+				err = filter.ProcessField(name, writer)
 				if err != nil {
 					return cleanup, err
 				}
@@ -105,7 +103,12 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 	return cleanup, nil
 }
 
-func HandleFileUploads(w http.ResponseWriter, r *http.Request, h http.Handler, tempPath string, filter MultipartFormFilter) {
+func HandleFileUploads(w http.ResponseWriter, r *http.Request, h http.Handler, tempPath string, filter MultipartFormProcessor) {
+	if tempPath == "" {
+		helper.Fail500(w, fmt.Errorf("handleFileUploads: temporary path not defined"))
+		return
+	}
+
 	var body bytes.Buffer
 	writer := multipart.NewWriter(&body)
 	defer writer.Close()
