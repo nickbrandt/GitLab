@@ -75,11 +75,8 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 
 			file.Close()
 
-			if filter != nil {
-				err = filter.ProcessFile(name, file.Name(), writer)
-				if err != nil {
-					return cleanup, err
-				}
+			if err := filter.ProcessFile(name, file.Name(), writer); err != nil {
+				return cleanup, err
 			}
 		} else {
 			np, err := writer.CreatePart(p.Header)
@@ -92,11 +89,8 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 				return cleanup, err
 			}
 
-			if filter != nil {
-				err = filter.ProcessField(name, writer)
-				if err != nil {
-					return cleanup, err
-				}
+			if err := filter.ProcessField(name, writer); err != nil {
+				return cleanup, err
 			}
 		}
 	}

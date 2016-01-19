@@ -12,18 +12,19 @@ import (
 	"os"
 )
 
-// The artifactsFormFilter allows to pass only the `file` as file in body
 type artifactsUploadProcessor struct {
 	TempPath     string
 	metadataFile string
 }
 
 func (a *artifactsUploadProcessor) ProcessFile(formName, fileName string, writer *multipart.Writer) error {
+	//  ProcessFile for artifacts requires file form-data field name to eq `file`
+
 	if formName != "file" {
 		return fmt.Errorf("Invalid form field: %q", formName)
 	}
 	if a.metadataFile != "" {
-		return fmt.Errorf("Multiple files")
+		return fmt.Errorf("Artifacts request contains more than one file!")
 	}
 
 	// Create temporary file for metadata and store it's path

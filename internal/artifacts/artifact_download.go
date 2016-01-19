@@ -6,6 +6,7 @@ import (
 	"archive/zip"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"io"
 	"mime"
 	"net/http"
@@ -89,7 +90,7 @@ func DownloadArtifact(myAPI *api.API) http.Handler {
 			http.NotFound(w, r)
 			return
 		} else if err != nil {
-			helper.Fail500(w, err)
+			helper.Fail500(w, fmt.Errorf("DownloadArtifact: %v", err))
 		}
 	}, "")
 }

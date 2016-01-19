@@ -29,7 +29,7 @@ func testArtifactDownloadServer(t *testing.T, archive string, entry string) *htt
 			Entry:   base64.StdEncoding.EncodeToString([]byte(entry)),
 		})
 		if err != nil {
-			t.Fatal("Expected to marshal")
+			t.Fatal(err)
 		}
 		w.Write(data)
 	})
@@ -69,7 +69,14 @@ func TestDownloadingFromValidArchive(t *testing.T) {
 
 	response := testDownloadArtifact(t, ts)
 	testhelper.AssertResponseCode(t, response, 200)
-	testhelper.AssertResponseHeader(t, response, "Content-Type", "text/plain; charset=utf-8")
+
+	testhelper.AssertResponseHeader(t, response,
+		"Content-Type",
+		"text/plain; charset=utf-8")
+	testhelper.AssertResponseHeader(t, response,
+		"Content-Disposition",
+		"attachment; filename=\"test.txt\"")
+
 	testhelper.AssertResponseBody(t, response, "testtest")
 }
 
