@@ -3,6 +3,7 @@ package git
 import (
 	"../helper"
 	"encoding/base64"
+	"log"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,6 +15,7 @@ func SendGitBlob(w http.ResponseWriter, r *http.Request, repoPath string, blobId
 		helper.Fail500(w, fmt.Errorf("SendGitBlob: decode commit id + path: %v", err))
 		return
 	}
+	log.Printf("SendGitBlob: sending %q for %q", blobSpec, r.URL.Path)
 
 	gitShowCmd := gitCommand("", "git", "--git-dir="+repoPath, "show", string(blobSpec))
 	stdout, err := gitShowCmd.StdoutPipe()
