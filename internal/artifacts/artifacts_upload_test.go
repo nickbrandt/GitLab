@@ -71,7 +71,7 @@ func testArtifactsUploadServer(t *testing.T, tempPath string) *httptest.Server {
 			w.WriteHeader(404)
 			return
 		}
-		if !bytes.HasPrefix(metadata[4:], []byte(metadataHeader)) {
+		if !bytes.HasPrefix(metadata, []byte(metadataHeaderPrefix+metadataHeader)) {
 			w.WriteHeader(400)
 			return
 		}

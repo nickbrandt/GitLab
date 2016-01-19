@@ -19,6 +19,7 @@ type metadata struct {
 	Comment  string `json:"comment,omitempty"`
 }
 
+const metadataHeaderPrefix = "\x00\x00\x00&" // length of string below, encoded properly
 const metadataHeader = "GitLab Build Artifacts Metadata 0.0.2\n"
 
 func newMetadata(file *zip.File) metadata {
