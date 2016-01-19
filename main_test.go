@@ -6,6 +6,7 @@ import (
 	"./internal/testhelper"
 	"./internal/upstream"
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -485,6 +486,40 @@ func TestArtifactsUpload(t *testing.T) {
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
 		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
+	}
+}
+
+func TestArtifactsGetSingleFile(t *testing.T) {
+	// We manually created this zip file in the gitlab-workhorse Git repository
+	archivePath := `testdata/artifacts-archive.zip`
+	fileName := "myfile"
+	fileContents := "MY FILE"
+	resourcePath := `/namespace/project/builds/123/artifacts/file/` + fileName
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`\A`+resourcePath+`\z`), func(w http.ResponseWriter, r *http.Request) {
+		encodedFilename := base64.StdEncoding.EncodeToString([]byte(fileName))
+		if _, err := fmt.Fprintf(w, `{"Archive":"%s","Entry":"%s"}`, archivePath, encodedFilename); err != nil {
+			t.Fatal(err)
+		}
+		return
+	})
+	defer ts.Close()
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	resp, err := http.Get(ws.URL + resourcePath)
+	if err != nil {
+		t.Error(err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		t.Errorf("GET %q: expected 200, got %d", resourcePath, resp.StatusCode)
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(body) != fileContents {
+		t.Fatalf("Expected file contents %q, got %q", fileContents, body)
 	}
 }
 
