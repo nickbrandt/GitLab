@@ -145,6 +145,7 @@ func TestUploadHandlerForUnsupportedArchive(t *testing.T) {
 	writer.Close()
 
 	response := testUploadArtifacts(writer.FormDataContentType(), &buffer, t, ts)
+	// 502 is a custom response code from the mock server in testUploadArtifacts
 	testhelper.AssertResponseCode(t, response, 502)
 }
 
