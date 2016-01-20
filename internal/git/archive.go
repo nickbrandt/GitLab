@@ -23,6 +23,7 @@ import (
 func GetArchive(a *api.API) http.Handler {
 	return repoPreAuthorizeHandler(a, handleGetArchive)
 }
+
 func handleGetArchive(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	var format string
 	urlPath := r.URL.Path
