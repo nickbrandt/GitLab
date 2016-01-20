@@ -72,7 +72,7 @@ func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *api.Response) 
 		helper.Fail500(w, fmt.Errorf("handleGetInfoRefs: start %v: %v", cmd.Args, err))
 		return
 	}
-	defer cleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
+	defer helper.CleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
 
 	// Start writing the response
 	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
@@ -125,7 +125,7 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		helper.Fail500(w, fmt.Errorf("handlePostRPC: start %v: %v", cmd.Args, err))
 		return
 	}
-	defer cleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
+	defer helper.CleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
 
 	// Write the client request body to Git's standard input
 	if _, err := io.Copy(stdin, r.Body); err != nil {

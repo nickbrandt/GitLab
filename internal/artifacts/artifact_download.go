@@ -3,7 +3,6 @@ package artifacts
 import (
 	"../api"
 	"../helper"
-	"archive/zip"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -11,9 +10,12 @@ import (
 	"mime"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
-	"strconv"
+	"syscall"
 )
+
+const exitStatusNotFound = 2
 
 func decodeFileEntry(entry string) (string, error) {
 	decoded, err := base64.StdEncoding.DecodeString(entry)
@@ -31,44 +33,38 @@ func detectFileContentType(fileName string) string {
 	return contentType
 }
 
-func findFileInZip(fileName string, archive *zip.Reader) *zip.File {
-	for _, file := range archive.File {
-		if file.Name == fileName {
-			return file
-		}
-	}
-	return nil
-}
-
 func unpackFileFromZip(archiveFileName, fileName string, headers http.Header, output io.Writer) error {
-	archive, err := zip.OpenReader(archiveFileName)
+	catFile := exec.Command("gitlab-zip-cat", archiveFileName, fileName)
+	catFile.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	stdout, err := catFile.StdoutPipe()
 	if err != nil {
-		return err
-	}
-	defer archive.Close()
-
-	file := findFileInZip(fileName, &archive.Reader)
-	if file == nil {
-		return os.ErrNotExist
+		return fmt.Errorf("create gitlab-zip-cat stdout pipe: %v", err)
 	}
 
-	// Start decompressing the file
-	reader, err := file.Open()
-	if err != nil {
-		return err
+	if err := catFile.Start(); err != nil {
+		return fmt.Errorf("start %v: %v", catFile.Args, err)
 	}
-	defer reader.Close()
-
+	defer helper.CleanUpProcessGroup(catFile)
 	basename := filepath.Base(fileName)
 
 	// Write http headers about the file
-	headers.Set("Content-Length", strconv.FormatInt(int64(file.UncompressedSize64), 10))
-	headers.Set("Content-Type", detectFileContentType(file.Name))
+	headers.Set("Content-Type", detectFileContentType(fileName))
 	headers.Set("Content-Disposition", "attachment; filename=\""+escapeQuotes(basename)+"\"")
 
 	// Copy file body to client
-	_, err = io.Copy(output, reader)
-	return err
+	if _, err := io.Copy(output, stdout); err != nil {
+		return fmt.Errorf("copy %v stdout: %v", catFile.Args, err)
+	}
+
+	if err := catFile.Wait(); err != nil {
+		if st, ok := helper.ExitStatus(err); ok && st == exitStatusNotFound {
+			return os.ErrNotExist
+		}
+
+		return fmt.Errorf("wait for %v to finish: %v", catFile.Args, err)
+	}
+
+	return nil
 }
 
 // Artifacts downloader doesn't support ranges when downloading a single file
