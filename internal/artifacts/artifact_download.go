@@ -3,6 +3,7 @@ package artifacts
 import (
 	"../api"
 	"../helper"
+	"bufio"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -12,10 +13,13 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"syscall"
 )
 
 const exitStatusNotFound = 2
+
+var notFoundString = fmt.Sprintf("%d", -exitStatusNotFound)
 
 func decodeFileEntry(entry string) (string, error) {
 	decoded, err := base64.StdEncoding.DecodeString(entry)
@@ -45,14 +49,24 @@ func unpackFileFromZip(archiveFileName, fileName string, headers http.Header, ou
 		return fmt.Errorf("start %v: %v", catFile.Args, err)
 	}
 	defer helper.CleanUpProcessGroup(catFile)
+
 	basename := filepath.Base(fileName)
+	reader := bufio.NewReader(stdout)
+	contentLength, err := reader.ReadString('\n')
+	if err != nil {
+		return fmt.Errorf("read content-length: %v", err)
+	}
+	contentLength = strings.TrimSuffix(contentLength, "\n")
+	if contentLength == notFoundString {
+		return os.ErrNotExist
+	}
 
 	// Write http headers about the file
+	headers.Set("Content-Length", contentLength)
 	headers.Set("Content-Type", detectFileContentType(fileName))
 	headers.Set("Content-Disposition", "attachment; filename=\""+escapeQuotes(basename)+"\"")
-
 	// Copy file body to client
-	if _, err := io.Copy(output, stdout); err != nil {
+	if _, err := io.Copy(output, reader); err != nil {
 		return fmt.Errorf("copy %v stdout: %v", catFile.Args, err)
 	}
 

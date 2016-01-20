@@ -30,14 +30,14 @@ func main() {
 	archive, err := zip.OpenReader(archiveFileName)
 	if err != nil {
 		printError(fmt.Errorf("open %q: %v", archiveFileName, err))
-		os.Exit(notFound)
+		exitNotFound()
 	}
 	defer archive.Close()
 
 	file := findFileInZip(fileName, &archive.Reader)
 	if file == nil {
 		printError(fmt.Errorf("find %q in %q: not found", fileName, archiveFileName))
-		os.Exit(notFound)
+		exitNotFound()
 	}
 	// Start decompressing the file
 	reader, err := file.Open()
@@ -45,10 +45,14 @@ func main() {
 		fatalError(fmt.Errorf("open %q in %q: %v", fileName, archiveFileName, err))
 	}
 	defer reader.Close()
+
+	if _, err := fmt.Printf("%d\n", file.UncompressedSize64); err != nil {
+		fatalError(fmt.Errorf("write file size: %v", err))
+	}
+
 	if _, err := io.Copy(os.Stdout, reader); err != nil {
 		fatalError(fmt.Errorf("write %q from %q to stdout: %v", fileName, archiveFileName, err))
 	}
-
 }
 
 func findFileInZip(fileName string, archive *zip.Reader) *zip.File {
@@ -67,4 +71,9 @@ func printError(err error) {
 func fatalError(err error) {
 	printError(err)
 	os.Exit(1)
+}
+
+func exitNotFound() {
+	fmt.Printf("%d\n", -notFound) // for the content-length reader
+	os.Exit(notFound)
 }
