@@ -1,4 +1,6 @@
-test/data
-test/scratch
 gitlab-workhorse
-test/public
+testdata/data
+testdata/scratch
+testdata/public
+gitlab-zip-cat
+gitlab-zip-metadata

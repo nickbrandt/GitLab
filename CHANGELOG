@@ -2,6 +2,21 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+0.6.1
+
+Add support for generating zip artifacts metadata and serving single
+files from zip archives.
+
+Gitlab-workhorse now consists of multiple executables. We also fixed a
+routing bug introduced by the 0.6.0 refactor that broke relative URL
+support.
+
+0.6.0
+
+Overhauled the source code organization; no user-facing changes
+(intended). The application code is now split into Go 'packages'
+(modules). As of 0.6.0 gitlab-workhorse requires Go 1.5 or newer.
+
 0.5.4
 
 Fix /api/v3/projects routing bug introduced in 0.5.2-0.5.3.
