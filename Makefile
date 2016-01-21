@@ -13,8 +13,8 @@ gitlab-zip-metadata:	$(shell find cmd/gitlab-zip-metadata/ -name '*.go')
 gitlab-workhorse: $(shell find . -name '*.go')
 	${GOBUILD} -o $@
 
-install: gitlab-workhorse gitlab-zip-cat
-	install gitlab-workhorse gitlab-zip-cat ${PREFIX}/bin/
+install: gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata
+	install gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata ${PREFIX}/bin/
 
 .PHONY: test
 test: testdata/data/group/test.git clean-workhorse all
