@@ -1,4 +1,4 @@
-package artifacts
+package zipartifacts
 
 import (
 	"archive/zip"
@@ -19,8 +19,8 @@ type metadata struct {
 	Comment  string `json:"comment,omitempty"`
 }
 
-const metadataHeaderPrefix = "\x00\x00\x00&" // length of string below, encoded properly
-const metadataHeader = "GitLab Build Artifacts Metadata 0.0.2\n"
+const MetadataHeaderPrefix = "\x00\x00\x00&" // length of string below, encoded properly
+const MetadataHeader = "GitLab Build Artifacts Metadata 0.0.2\n"
 
 func newMetadata(file *zip.File) metadata {
 	return metadata{
@@ -56,7 +56,7 @@ func writeZipEntryMetadata(output io.Writer, entry *zip.File) error {
 }
 
 func generateZipMetadata(output io.Writer, archive *zip.Reader) error {
-	err := writeString(output, metadataHeader)
+	err := writeString(output, MetadataHeader)
 	if err != nil {
 		return err
 	}
@@ -77,7 +77,7 @@ func generateZipMetadata(output io.Writer, archive *zip.Reader) error {
 	return nil
 }
 
-func generateZipMetadataFromFile(fileName string, w io.Writer) error {
+func GenerateZipMetadataFromFile(fileName string, w io.Writer) error {
 	archive, err := zip.OpenReader(fileName)
 	if err != nil {
 		// Ignore non-zip archives

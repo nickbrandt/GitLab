@@ -23,18 +23,3 @@ func gitCommand(gl_id string, name string, args ...string) *exec.Cmd {
 	cmd.Stderr = os.Stderr
 	return cmd
 }
-
-func cleanUpProcessGroup(cmd *exec.Cmd) {
-	if cmd == nil {
-		return
-	}
-
-	process := cmd.Process
-	if process != nil && process.Pid > 0 {
-		// Send SIGTERM to the process group of cmd
-		syscall.Kill(-process.Pid, syscall.SIGTERM)
-	}
-
-	// reap our child process
-	cmd.Wait()
-}

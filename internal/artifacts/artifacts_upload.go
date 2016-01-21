@@ -4,12 +4,15 @@ import (
 	"../api"
 	"../helper"
 	"../upload"
+	"../zipartifacts"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
+	"os/exec"
+	"syscall"
 )
 
 type artifactsUploadProcessor struct {
@@ -36,10 +39,19 @@ func (a *artifactsUploadProcessor) ProcessFile(formName, fileName string, writer
 	a.metadataFile = tempFile.Name()
 
 	// Generate metadata and save to file
-	err = generateZipMetadataFromFile(fileName, tempFile)
-	if err == os.ErrInvalid {
-		return nil
-	} else if err != nil {
+	zipMd := exec.Command("gitlab-zip-metadata", fileName)
+	zipMd.Stderr = os.Stderr
+	zipMd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	zipMd.Stdout = tempFile
+
+	if err := zipMd.Start(); err != nil {
+		return err
+	}
+	defer helper.CleanUpProcessGroup(zipMd)
+	if err := zipMd.Wait(); err != nil {
+		if st, ok := helper.ExitStatus(err); ok && st == zipartifacts.StatusNotZip {
+			return nil
+		}
 		return err
 	}
 

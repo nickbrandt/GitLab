@@ -79,7 +79,7 @@ func handleGetArchive(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		helper.Fail500(w, fmt.Errorf("handleGetArchive: start %v: %v", archiveCmd.Args, err))
 		return
 	}
-	defer cleanUpProcessGroup(archiveCmd) // Ensure brute force subprocess clean-up
+	defer helper.CleanUpProcessGroup(archiveCmd) // Ensure brute force subprocess clean-up
 
 	var stdout io.ReadCloser
 	if compressCmd == nil {
@@ -99,7 +99,7 @@ func handleGetArchive(w http.ResponseWriter, r *http.Request, a *api.Response) {
 			helper.Fail500(w, fmt.Errorf("handleGetArchive: start %v: %v", compressCmd.Args, err))
 			return
 		}
-		defer cleanUpProcessGroup(compressCmd)
+		defer helper.CleanUpProcessGroup(compressCmd)
 
 		archiveStdout.Close()
 	}

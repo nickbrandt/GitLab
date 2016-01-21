@@ -3,25 +3,19 @@ package artifacts
 import (
 	"../api"
 	"../helper"
-	"archive/zip"
-	"encoding/base64"
+	"../zipartifacts"
+	"bufio"
 	"errors"
 	"fmt"
 	"io"
 	"mime"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
-	"strconv"
+	"strings"
+	"syscall"
 )
-
-func decodeFileEntry(entry string) (string, error) {
-	decoded, err := base64.StdEncoding.DecodeString(entry)
-	if err != nil {
-		return "", err
-	}
-	return string(decoded), nil
-}
 
 func detectFileContentType(fileName string) string {
 	contentType := mime.TypeByExtension(filepath.Ext(fileName))
@@ -31,44 +25,59 @@ func detectFileContentType(fileName string) string {
 	return contentType
 }
 
-func findFileInZip(fileName string, archive *zip.Reader) *zip.File {
-	for _, file := range archive.File {
-		if file.Name == fileName {
-			return file
-		}
-	}
-	return nil
-}
-
-func unpackFileFromZip(archiveFileName, fileName string, headers http.Header, output io.Writer) error {
-	archive, err := zip.OpenReader(archiveFileName)
+func unpackFileFromZip(archiveFileName, encodedFilename string, headers http.Header, output io.Writer) error {
+	fileName, err := zipartifacts.DecodeFileEntry(encodedFilename)
 	if err != nil {
 		return err
 	}
-	defer archive.Close()
 
-	file := findFileInZip(fileName, &archive.Reader)
-	if file == nil {
-		return os.ErrNotExist
-	}
-
-	// Start decompressing the file
-	reader, err := file.Open()
+	catFile := exec.Command("gitlab-zip-cat", archiveFileName, encodedFilename)
+	catFile.Stderr = os.Stderr
+	catFile.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	stdout, err := catFile.StdoutPipe()
 	if err != nil {
-		return err
+		return fmt.Errorf("create gitlab-zip-cat stdout pipe: %v", err)
 	}
-	defer reader.Close()
+
+	if err := catFile.Start(); err != nil {
+		return fmt.Errorf("start %v: %v", catFile.Args, err)
+	}
+	defer helper.CleanUpProcessGroup(catFile)
 
 	basename := filepath.Base(fileName)
+	reader := bufio.NewReader(stdout)
+	contentLength, err := reader.ReadString('\n')
+	if err != nil {
+		if catFileErr := waitCatFile(catFile); catFileErr != nil {
+			return catFileErr
+		}
+		return fmt.Errorf("read content-length: %v", err)
+	}
+	contentLength = strings.TrimSuffix(contentLength, "\n")
 
 	// Write http headers about the file
-	headers.Set("Content-Length", strconv.FormatInt(int64(file.UncompressedSize64), 10))
-	headers.Set("Content-Type", detectFileContentType(file.Name))
+	headers.Set("Content-Length", contentLength)
+	headers.Set("Content-Type", detectFileContentType(fileName))
 	headers.Set("Content-Disposition", "attachment; filename=\""+escapeQuotes(basename)+"\"")
-
 	// Copy file body to client
-	_, err = io.Copy(output, reader)
-	return err
+	if _, err := io.Copy(output, reader); err != nil {
+		return fmt.Errorf("copy %v stdout: %v", catFile.Args, err)
+	}
+
+	return waitCatFile(catFile)
+}
+
+func waitCatFile(cmd *exec.Cmd) error {
+	err := cmd.Wait()
+	if err == nil {
+		return nil
+	}
+
+	if st, ok := helper.ExitStatus(err); ok && st == zipartifacts.StatusEntryNotFound {
+		return os.ErrNotExist
+	}
+	return fmt.Errorf("wait for %v to finish: %v", cmd.Args, err)
+
 }
 
 // Artifacts downloader doesn't support ranges when downloading a single file
@@ -79,13 +88,7 @@ func DownloadArtifact(myAPI *api.API) http.Handler {
 			return
 		}
 
-		fileName, err := decodeFileEntry(a.Entry)
-		if err != nil {
-			helper.Fail500(w, err)
-			return
-		}
-
-		err = unpackFileFromZip(a.Archive, fileName, w.Header(), w)
+		err := unpackFileFromZip(a.Archive, a.Entry, w.Header(), w)
 		if os.IsNotExist(err) {
 			http.NotFound(w, r)
 			return
