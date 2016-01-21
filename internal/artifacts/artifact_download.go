@@ -17,8 +17,6 @@ import (
 	"syscall"
 )
 
-var notFoundString = fmt.Sprintf("%d", -zipartifacts.StatusEntryNotFound)
-
 func detectFileContentType(fileName string) string {
 	contentType := mime.TypeByExtension(filepath.Ext(fileName))
 	if contentType == "" {
@@ -50,12 +48,12 @@ func unpackFileFromZip(archiveFileName, encodedFilename string, headers http.Hea
 	reader := bufio.NewReader(stdout)
 	contentLength, err := reader.ReadString('\n')
 	if err != nil {
+		if catFileErr := waitCatFile(catFile); catFileErr != nil {
+			return catFileErr
+		}
 		return fmt.Errorf("read content-length: %v", err)
 	}
 	contentLength = strings.TrimSuffix(contentLength, "\n")
-	if contentLength == notFoundString {
-		return os.ErrNotExist
-	}
 
 	// Write http headers about the file
 	headers.Set("Content-Length", contentLength)
@@ -66,15 +64,20 @@ func unpackFileFromZip(archiveFileName, encodedFilename string, headers http.Hea
 		return fmt.Errorf("copy %v stdout: %v", catFile.Args, err)
 	}
 
-	if err := catFile.Wait(); err != nil {
-		if st, ok := helper.ExitStatus(err); ok && st == zipartifacts.StatusEntryNotFound {
-			return os.ErrNotExist
-		}
+	return waitCatFile(catFile)
+}
 
-		return fmt.Errorf("wait for %v to finish: %v", catFile.Args, err)
+func waitCatFile(cmd *exec.Cmd) error {
+	err := cmd.Wait()
+	if err == nil {
+		return nil
 	}
 
-	return nil
+	if st, ok := helper.ExitStatus(err); ok && st == zipartifacts.StatusEntryNotFound {
+		return os.ErrNotExist
+	}
+	return fmt.Errorf("wait for %v to finish: %v", cmd.Args, err)
+
 }
 
 // Artifacts downloader doesn't support ranges when downloading a single file

@@ -39,15 +39,13 @@ func main() {
 
 	archive, err := zip.OpenReader(archiveFileName)
 	if err != nil {
-		printError(fmt.Errorf("open %q: %v", archiveFileName, err))
-		exitNotFound()
+		notFoundError(fmt.Errorf("open %q: %v", archiveFileName, err))
 	}
 	defer archive.Close()
 
 	file := findFileInZip(fileName, &archive.Reader)
 	if file == nil {
-		printError(fmt.Errorf("find %q in %q: not found", fileName, archiveFileName))
-		exitNotFound()
+		notFoundError(fmt.Errorf("find %q in %q: not found", fileName, archiveFileName))
 	}
 	// Start decompressing the file
 	reader, err := file.Open()
@@ -83,7 +81,7 @@ func fatalError(err error) {
 	os.Exit(1)
 }
 
-func exitNotFound() {
-	fmt.Printf("%d\n", -zipartifacts.StatusEntryNotFound) // for the content-length reader
+func notFoundError(err error) {
+	printError(err)
 	os.Exit(zipartifacts.StatusEntryNotFound)
 }
