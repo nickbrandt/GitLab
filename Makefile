@@ -19,7 +19,7 @@ install: gitlab-workhorse gitlab-zip-cat
 .PHONY: test
 test: testdata/data/group/test.git clean-workhorse all
 	go fmt ./... | awk '{ print } END { if (NR > 0) { print "Please run go fmt"; exit 1 } }'
-	support/path-add-current go test ./...
+	support/path go test ./...
 	@echo SUCCESS
 
 coverage: testdata/data/group/test.git
