@@ -6,7 +6,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"log"
 	"os"
 )
 
@@ -73,7 +72,7 @@ func findFileInZip(fileName string, archive *zip.Reader) *zip.File {
 }
 
 func printError(err error) {
-	log.Printf("%s: %v", progName, err)
+	fmt.Fprintf(os.Stderr, "%s: %v", progName, err)
 }
 
 func fatalError(err error) {
