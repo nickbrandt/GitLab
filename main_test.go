@@ -466,8 +466,9 @@ func TestArtifactsUpload(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if len(r.MultipartForm.Value) != 2 { // 1 file name, 1 file path
-			t.Error("Expected to receive exactly 2 values")
+		nValues := 2 // filename + path for just the upload (no metadata because we are not POSTing a valid zip file)
+		if len(r.MultipartForm.Value) != nValues {
+			t.Errorf("Expected to receive exactly %d values", nValues)
 		}
 		if len(r.MultipartForm.File) != 0 {
 			t.Error("Expected to not receive any files")

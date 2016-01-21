@@ -39,6 +39,7 @@ func detectFileContentType(fileName string) string {
 
 func unpackFileFromZip(archiveFileName, fileName string, headers http.Header, output io.Writer) error {
 	catFile := exec.Command("gitlab-zip-cat", archiveFileName, fileName)
+	catFile.Stderr = os.Stderr
 	catFile.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	stdout, err := catFile.StdoutPipe()
 	if err != nil {

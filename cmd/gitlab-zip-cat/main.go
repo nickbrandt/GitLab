@@ -25,6 +25,11 @@ func main() {
 		os.Exit(0)
 	}
 
+	if len(os.Args) != 3 {
+		fmt.Fprintf(os.Stderr, "Usage: %s FILE.ZIP ENTRY", progName)
+		os.Exit(1)
+	}
+
 	archiveFileName := os.Args[1]
 	fileName := os.Args[2]
 	archive, err := zip.OpenReader(archiveFileName)

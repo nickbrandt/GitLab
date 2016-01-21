@@ -5,6 +5,7 @@ import (
 	"../helper"
 	"../proxy"
 	"../testhelper"
+	"../zipmetadata"
 	"archive/zip"
 	"bytes"
 	"compress/gzip"
@@ -71,7 +72,7 @@ func testArtifactsUploadServer(t *testing.T, tempPath string) *httptest.Server {
 			w.WriteHeader(404)
 			return
 		}
-		if !bytes.HasPrefix(metadata, []byte(metadataHeaderPrefix+metadataHeader)) {
+		if !bytes.HasPrefix(metadata, []byte(zipmetadata.HeaderPrefix+zipmetadata.Header)) {
 			w.WriteHeader(400)
 			return
 		}

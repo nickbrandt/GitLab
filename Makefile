@@ -2,11 +2,14 @@ PREFIX=/usr/local
 VERSION=$(shell git describe)-$(shell date -u +%Y%m%d.%H%M%S)
 GOBUILD=go build -ldflags "-X main.Version=${VERSION}"
 
-all: gitlab-zip-cat gitlab-workhorse
+all: gitlab-zip-cat gitlab-zip-metadata gitlab-workhorse
 
 gitlab-zip-cat:	$(shell find cmd/gitlab-zip-cat/ -name '*.go')
 	${GOBUILD} -o $@ ./cmd/$@
 	
+gitlab-zip-metadata:	$(shell find cmd/gitlab-zip-metadata/ -name '*.go')
+	${GOBUILD} -o $@ ./cmd/$@
+
 gitlab-workhorse: $(shell find . -name '*.go')
 	${GOBUILD} -o $@
 
@@ -14,7 +17,7 @@ install: gitlab-workhorse gitlab-zip-cat
 	install gitlab-workhorse gitlab-zip-cat ${PREFIX}/bin/
 
 .PHONY: test
-test: testdata/data/group/test.git clean-workhorse gitlab-workhorse gitlab-zip-cat
+test: testdata/data/group/test.git clean-workhorse all
 	go fmt ./... | awk '{ print } END { if (NR > 0) { print "Please run go fmt"; exit 1 } }'
 	support/path-add-current go test ./...
 	@echo SUCCESS
@@ -36,4 +39,4 @@ clean:	clean-workhorse
 
 .PHONY:	clean-workhorse
 clean-workhorse:
-	rm -f gitlab-workhorse gitlab-zip-cat
+	rm -f gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata
