@@ -1,6 +1,7 @@
 package main
 
 import (
+	"../../internal/zipartifacts"
 	"archive/zip"
 	"flag"
 	"fmt"
@@ -9,7 +10,6 @@ import (
 	"os"
 )
 
-const notFound = 2
 const progName = "gitlab-zip-cat"
 
 var Version = "unknown"
@@ -79,6 +79,6 @@ func fatalError(err error) {
 }
 
 func exitNotFound() {
-	fmt.Printf("%d\n", -notFound) // for the content-length reader
-	os.Exit(notFound)
+	fmt.Printf("%d\n", -zipartifacts.StatusEntryNotFound) // for the content-length reader
+	os.Exit(zipartifacts.StatusEntryNotFound)
 }

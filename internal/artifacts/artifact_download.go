@@ -3,6 +3,7 @@ package artifacts
 import (
 	"../api"
 	"../helper"
+	"../zipartifacts"
 	"bufio"
 	"encoding/base64"
 	"errors"
@@ -17,9 +18,7 @@ import (
 	"syscall"
 )
 
-const exitStatusNotFound = 2
-
-var notFoundString = fmt.Sprintf("%d", -exitStatusNotFound)
+var notFoundString = fmt.Sprintf("%d", -zipartifacts.StatusEntryNotFound)
 
 func decodeFileEntry(entry string) (string, error) {
 	decoded, err := base64.StdEncoding.DecodeString(entry)
@@ -72,7 +71,7 @@ func unpackFileFromZip(archiveFileName, fileName string, headers http.Header, ou
 	}
 
 	if err := catFile.Wait(); err != nil {
-		if st, ok := helper.ExitStatus(err); ok && st == exitStatusNotFound {
+		if st, ok := helper.ExitStatus(err); ok && st == zipartifacts.StatusEntryNotFound {
 			return os.ErrNotExist
 		}
 

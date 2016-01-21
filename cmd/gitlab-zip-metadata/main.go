@@ -1,7 +1,7 @@
 package main
 
 import (
-	"../../internal/zipmetadata"
+	"../../internal/zipartifacts"
 	"flag"
 	"fmt"
 	"os"
@@ -26,10 +26,10 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Usage: %s FILE.ZIP", progName)
 		os.Exit(1)
 	}
-	if err := zipmetadata.GenerateZipMetadataFromFile(os.Args[1], os.Stdout); err != nil {
+	if err := zipartifacts.GenerateZipMetadataFromFile(os.Args[1], os.Stdout); err != nil {
 		fmt.Fprintf(os.Stderr, "%s: %v\n", progName, err)
 		if err == os.ErrInvalid {
-			os.Exit(zipmetadata.StatusNotZip)
+			os.Exit(zipartifacts.StatusNotZip)
 		}
 		os.Exit(1)
 	}

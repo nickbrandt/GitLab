@@ -4,7 +4,7 @@ import (
 	"../api"
 	"../helper"
 	"../upload"
-	"../zipmetadata"
+	"../zipartifacts"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -49,7 +49,7 @@ func (a *artifactsUploadProcessor) ProcessFile(formName, fileName string, writer
 	}
 	defer helper.CleanUpProcessGroup(zipMd)
 	if err := zipMd.Wait(); err != nil {
-		if st, ok := helper.ExitStatus(err); ok && st == zipmetadata.StatusNotZip {
+		if st, ok := helper.ExitStatus(err); ok && st == zipartifacts.StatusNotZip {
 			return nil
 		}
 		return err
