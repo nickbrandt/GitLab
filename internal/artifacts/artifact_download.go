@@ -5,7 +5,6 @@ import (
 	"../helper"
 	"../zipartifacts"
 	"bufio"
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"io"
@@ -20,14 +19,6 @@ import (
 
 var notFoundString = fmt.Sprintf("%d", -zipartifacts.StatusEntryNotFound)
 
-func decodeFileEntry(entry string) (string, error) {
-	decoded, err := base64.StdEncoding.DecodeString(entry)
-	if err != nil {
-		return "", err
-	}
-	return string(decoded), nil
-}
-
 func detectFileContentType(fileName string) string {
 	contentType := mime.TypeByExtension(filepath.Ext(fileName))
 	if contentType == "" {
@@ -36,8 +27,13 @@ func detectFileContentType(fileName string) string {
 	return contentType
 }
 
-func unpackFileFromZip(archiveFileName, fileName string, headers http.Header, output io.Writer) error {
-	catFile := exec.Command("gitlab-zip-cat", archiveFileName, fileName)
+func unpackFileFromZip(archiveFileName, encodedFilename string, headers http.Header, output io.Writer) error {
+	fileName, err := zipartifacts.DecodeFileEntry(encodedFilename)
+	if err != nil {
+		return err
+	}
+
+	catFile := exec.Command("gitlab-zip-cat", archiveFileName, encodedFilename)
 	catFile.Stderr = os.Stderr
 	catFile.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	stdout, err := catFile.StdoutPipe()
@@ -89,13 +85,7 @@ func DownloadArtifact(myAPI *api.API) http.Handler {
 			return
 		}
 
-		fileName, err := decodeFileEntry(a.Entry)
-		if err != nil {
-			helper.Fail500(w, err)
-			return
-		}
-
-		err = unpackFileFromZip(a.Archive, fileName, w.Header(), w)
+		err := unpackFileFromZip(a.Archive, a.Entry, w.Header(), w)
 		if os.IsNotExist(err) {
 			http.NotFound(w, r)
 			return

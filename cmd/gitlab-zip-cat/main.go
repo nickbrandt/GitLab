@@ -31,7 +31,12 @@ func main() {
 	}
 
 	archiveFileName := os.Args[1]
-	fileName := os.Args[2]
+
+	fileName, err := zipartifacts.DecodeFileEntry(os.Args[2])
+	if err != nil {
+		fatalError(fmt.Errorf("decode entry %q: %v", os.Args[2], err))
+	}
+
 	archive, err := zip.OpenReader(archiveFileName)
 	if err != nil {
 		printError(fmt.Errorf("open %q: %v", archiveFileName, err))
