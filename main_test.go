@@ -364,6 +364,37 @@ func TestAllowedStaticFile(t *testing.T) {
 	}
 }
 
+func TestStaticFileRelativeURL(t *testing.T) {
+	content := "PUBLIC"
+	if err := setupStaticFile("static.txt", content); err != nil {
+		t.Fatalf("create public/static.txt: %v", err)
+	}
+
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), http.HandlerFunc(http.NotFound))
+	defer ts.Close()
+	backendURLString := ts.URL + "/my-relative-url"
+	log.Print(backendURLString)
+	ws := startWorkhorseServer(backendURLString)
+	defer ws.Close()
+
+	resource := "/my-relative-url/static.txt"
+	resp, err := http.Get(ws.URL + resource)
+	if err != nil {
+		t.Error(err)
+	}
+	defer resp.Body.Close()
+	buf := &bytes.Buffer{}
+	if _, err := io.Copy(buf, resp.Body); err != nil {
+		t.Error(err)
+	}
+	if buf.String() != content {
+		t.Errorf("GET %q: Expected %q, got %q", resource, content, buf.String())
+	}
+	if resp.StatusCode != 200 {
+		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
+	}
+}
+
 func TestAllowedPublicUploadsFile(t *testing.T) {
 	content := "PRIVATE but allowed"
 	if err := setupStaticFile("uploads/static file.txt", content); err != nil {

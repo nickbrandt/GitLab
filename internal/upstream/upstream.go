@@ -41,8 +41,8 @@ func NewUpstream(backend *url.URL, socket string, version string, documentRoot s
 	if backend == nil {
 		up.Backend = DefaultBackend
 	}
-	up.configureRoutes()
 	up.configureURLPrefix()
+	up.configureRoutes()
 	return &up
 }
 
