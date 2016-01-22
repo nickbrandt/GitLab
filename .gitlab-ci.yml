@@ -1,8 +1,8 @@
 before_script:
-  - test -f /.dockerinit && apt-get update -qq && apt-get install -y curl unzip bzip2
-  - curl -O https://storage.googleapis.com/golang/go1.5.2.linux-amd64.tar.gz
-  - echo 'cae87ed095e8d94a81871281d35da7829bd1234e  go1.5.2.linux-amd64.tar.gz' | shasum -c -
-  - test -f /.dockerinit && rm -rf /usr/local/go && tar -C /usr/local -xzf go1.5.2.linux-amd64.tar.gz
+  - apt-get update -qq && apt-get install -y curl unzip bzip2
+  - curl -O https://storage.googleapis.com/golang/go1.5.3.linux-amd64.tar.gz
+  - echo '43afe0c5017e502630b1aea4d44b8a7f059bf60d7f29dfd58db454d4e4e0ae53  go1.5.3.linux-amd64.tar.gz' | shasum -c -a256 -
+  - rm -rf /usr/local/go && tar -C /usr/local -xzf go1.5.3.linux-amd64.tar.gz
   - export PATH=/usr/local/go/bin:$PATH
 
 test:
