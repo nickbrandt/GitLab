@@ -14,7 +14,8 @@ gitlab-workhorse: $(shell find . -name '*.go')
 	${GOBUILD} -o $@
 
 install: gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata
-	install gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata ${PREFIX}/bin/
+	mkdir -p $(DESTDIR)${PREFIX}/bin/
+	install gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata ${DESTDIR}${PREFIX}/bin/
 
 .PHONY: test
 test: testdata/data/group/test.git clean-workhorse all
