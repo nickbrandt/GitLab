@@ -3,9 +3,9 @@ package git
 import (
 	"../helper"
 	"encoding/base64"
-	"log"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 )
 
@@ -27,7 +27,7 @@ func SendGitBlob(w http.ResponseWriter, r *http.Request, repoPath string, blobId
 		helper.Fail500(w, fmt.Errorf("SendGitBlob: start %v: %v", gitShowCmd, err))
 		return
 	}
-	defer cleanUpProcessGroup(gitShowCmd)
+	defer helper.CleanUpProcessGroup(gitShowCmd)
 
 	if _, err := io.Copy(w, stdout); err != nil {
 		helper.LogError(fmt.Errorf("SendGitBlob: copy git show stdout: %v", err))
