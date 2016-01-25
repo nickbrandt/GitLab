@@ -8,6 +8,8 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"strings"
+	"time"
 )
 
 type metadata struct {
@@ -55,22 +57,60 @@ func writeZipEntryMetadata(output io.Writer, entry *zip.File) error {
 	return nil
 }
 
+func handleZipEntryMetadata(output io.Writer, entry *zip.File, entries []*zip.File) error {
+	var dirNodes []string
+
+	var calculateEntryNodes func(string)
+	calculateEntryNodes = func(str string) {
+		idx := strings.LastIndex(str, "/")
+		if idx < 0 {
+			return
+		}
+		dir := str[:idx]
+		dirNodes = append([]string{dir + "/"}, dirNodes...)
+		calculateEntryNodes(dir)
+	}
+	calculateEntryNodes(entry.Name)
+
+	for _, d := range dirNodes {
+		if !hasZipPathEntry(d, entries) {
+			var missingHeader zip.FileHeader
+			missingHeader.Name = d
+			missingHeader.SetModTime(time.Now())
+			missingHeader.SetMode(os.FileMode(uint32(0755)))
+			missingEntry := &zip.File{FileHeader: missingHeader}
+
+			writeZipEntryMetadata(output, missingEntry)
+		}
+	}
+
+	err := writeZipEntryMetadata(output, entry)
+	return err
+}
+
+func hasZipPathEntry(path string, entries []*zip.File) bool {
+	for _, e := range entries {
+		if e.Name == path {
+			return true
+		}
+	}
+
+	return false
+}
+
 func generateZipMetadata(output io.Writer, archive *zip.Reader) error {
-	err := writeString(output, MetadataHeader)
-	if err != nil {
+	if err := writeString(output, MetadataHeader); err != nil {
 		return err
 	}
 
 	// Write empty error string
-	err = writeString(output, "{}")
-	if err != nil {
+	if err := writeString(output, "{}"); err != nil {
 		return err
 	}
 
 	// Write all files
 	for _, entry := range archive.File {
-		err = writeZipEntryMetadata(output, entry)
-		if err != nil {
+		if err := handleZipEntryMetadata(output, entry, archive.File); err != nil {
 			return err
 		}
 	}
