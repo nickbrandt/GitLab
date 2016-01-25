@@ -89,7 +89,7 @@ func handleZipEntryMetadata(output io.Writer, entry *zip.File, fileMap zipFileMa
 }
 
 func generateZipFileMap(zipEntries []*zip.File) zipFileMap {
-	fileMap := make(map[string]*zip.File)
+	fileMap := make(zipFileMap, len(zipEntries))
 
 	for _, entry := range zipEntries {
 		fileMap[entry.Name] = entry
