@@ -61,7 +61,7 @@ func handleStoreLfsObject(h http.Handler) api.HandleFunc {
 
 		written, err := io.Copy(hw, r.Body)
 		if err != nil {
-			helper.Fail500(w, fmt.Errorf("handleStoreLfsObject: write tempfile: %v", err))
+			helper.Fail500(w, fmt.Errorf("handleStoreLfsObject: copy body to tempfile: %v", err))
 			return
 		}
 		file.Close()

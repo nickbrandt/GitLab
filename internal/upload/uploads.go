@@ -20,7 +20,11 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 	// Create multipart reader
 	reader, err := r.MultipartReader()
 	if err != nil {
-		return nil, err
+		if err == http.ErrNotMultipart {
+			// We want to be able to recognize http.ErrNotMultipart elsewhere so no fmt.Errorf
+			return nil, http.ErrNotMultipart
+		}
+		return nil, fmt.Errorf("get multipart reader: %v", err)
 	}
 
 	var files []string
@@ -53,13 +57,13 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 		if filename := p.FileName(); filename != "" {
 			// Create temporary directory where the uploaded file will be stored
 			if err := os.MkdirAll(tempPath, 0700); err != nil {
-				return cleanup, err
+				return cleanup, fmt.Errorf("mkdir for tempfile: %v", err)
 			}
 
 			// Create temporary file in path returned by Authorization filter
 			file, err := ioutil.TempFile(tempPath, "upload_")
 			if err != nil {
-				return cleanup, err
+				return cleanup, fmt.Errorf("create tempfile: %v", err)
 			}
 			defer file.Close()
 
@@ -70,7 +74,7 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 
 			_, err = io.Copy(file, p)
 			if err != nil {
-				return cleanup, err
+				return cleanup, fmt.Errorf("copy from multipart to tempfile: %v", err)
 			}
 
 			file.Close()
@@ -81,16 +85,16 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 		} else {
 			np, err := writer.CreatePart(p.Header)
 			if err != nil {
-				return cleanup, err
+				return cleanup, fmt.Errorf("create multipart field: %v", err)
 			}
 
 			_, err = io.Copy(np, p)
 			if err != nil {
-				return cleanup, err
+				return cleanup, fmt.Errorf("duplicate multipart field: %v", err)
 			}
 
 			if err := filter.ProcessField(name, writer); err != nil {
-				return cleanup, err
+				return cleanup, fmt.Errorf("process multipart field: %v", err)
 			}
 		}
 	}
@@ -99,7 +103,7 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 
 func HandleFileUploads(w http.ResponseWriter, r *http.Request, h http.Handler, tempPath string, filter MultipartFormProcessor) {
 	if tempPath == "" {
-		helper.Fail500(w, fmt.Errorf("handleFileUploads: temporary path not defined"))
+		helper.Fail500(w, fmt.Errorf("handleFileUploads: tempPath empty"))
 		return
 	}
 

@@ -61,7 +61,7 @@ func unpackFileFromZip(archiveFileName, encodedFilename string, headers http.Hea
 	headers.Set("Content-Disposition", "attachment; filename=\""+escapeQuotes(basename)+"\"")
 	// Copy file body to client
 	if _, err := io.Copy(output, reader); err != nil {
-		return fmt.Errorf("copy %v stdout: %v", catFile.Args, err)
+		return fmt.Errorf("copy stdout of %v: %v", catFile.Args, err)
 	}
 
 	return waitCatFile(catFile)

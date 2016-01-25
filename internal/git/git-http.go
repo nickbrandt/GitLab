@@ -87,7 +87,7 @@ func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *api.Response) 
 		return
 	}
 	if _, err := io.Copy(w, stdout); err != nil {
-		helper.LogError(fmt.Errorf("handleGetInfoRefs: read from %v: %v", cmd.Args, err))
+		helper.LogError(fmt.Errorf("handleGetInfoRefs: copy output of %v: %v", cmd.Args, err))
 		return
 	}
 	if err := cmd.Wait(); err != nil {
@@ -146,7 +146,7 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 
 	// This io.Copy may take a long time, both for Git push and pull.
 	if _, err := io.Copy(w, stdout); err != nil {
-		helper.LogError(fmt.Errorf("handlePostRPC read from %v: %v", cmd.Args, err))
+		helper.LogError(fmt.Errorf("handlePostRPC copy output of %v: %v", cmd.Args, err))
 		return
 	}
 	if err := cmd.Wait(); err != nil {

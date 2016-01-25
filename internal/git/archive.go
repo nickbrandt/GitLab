@@ -111,7 +111,7 @@ func handleGetArchive(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	setArchiveHeaders(w, format, archiveFilename)
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 	if _, err := io.Copy(w, archiveReader); err != nil {
-		helper.LogError(fmt.Errorf("handleGetArchive: read: %v", err))
+		helper.LogError(fmt.Errorf("handleGetArchive: copy 'git archive' output: %v", err))
 		return
 	}
 	if err := archiveCmd.Wait(); err != nil {
