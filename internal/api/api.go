@@ -57,6 +57,10 @@ type Response struct {
 	// TmpPath is the path where we should store temporary files
 	// This is set by authorization middleware
 	TempPath string
+	// Archive is the path where the artifacts archive is stored
+	Archive string `json:"archive"`
+	// Entry is a filename inside the archive point to file that needs to be extracted
+	Entry string `json:"entry"`
 }
 
 // singleJoiningSlash is taken from reverseproxy.go:NewSingleHostReverseProxy

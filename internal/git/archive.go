@@ -23,6 +23,7 @@ import (
 func GetArchive(a *api.API) http.Handler {
 	return repoPreAuthorizeHandler(a, handleGetArchive)
 }
+
 func handleGetArchive(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	var format string
 	urlPath := r.URL.Path
@@ -78,7 +79,7 @@ func handleGetArchive(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		helper.Fail500(w, fmt.Errorf("handleGetArchive: start %v: %v", archiveCmd.Args, err))
 		return
 	}
-	defer cleanUpProcessGroup(archiveCmd) // Ensure brute force subprocess clean-up
+	defer helper.CleanUpProcessGroup(archiveCmd) // Ensure brute force subprocess clean-up
 
 	var stdout io.ReadCloser
 	if compressCmd == nil {
@@ -98,7 +99,7 @@ func handleGetArchive(w http.ResponseWriter, r *http.Request, a *api.Response) {
 			helper.Fail500(w, fmt.Errorf("handleGetArchive: start %v: %v", compressCmd.Args, err))
 			return
 		}
-		defer cleanUpProcessGroup(compressCmd)
+		defer helper.CleanUpProcessGroup(compressCmd)
 
 		archiveStdout.Close()
 	}
@@ -110,7 +111,7 @@ func handleGetArchive(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	setArchiveHeaders(w, format, archiveFilename)
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 	if _, err := io.Copy(w, archiveReader); err != nil {
-		helper.LogError(fmt.Errorf("handleGetArchive: read: %v", err))
+		helper.LogError(fmt.Errorf("handleGetArchive: copy 'git archive' output: %v", err))
 		return
 	}
 	if err := archiveCmd.Wait(); err != nil {

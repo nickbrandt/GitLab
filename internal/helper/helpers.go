@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
+	"syscall"
 )
 
 func Fail500(w http.ResponseWriter, err error) {
@@ -78,4 +80,33 @@ func HeaderClone(h http.Header) http.Header {
 		h2[k] = vv2
 	}
 	return h2
+}
+
+func CleanUpProcessGroup(cmd *exec.Cmd) {
+	if cmd == nil {
+		return
+	}
+
+	process := cmd.Process
+	if process != nil && process.Pid > 0 {
+		// Send SIGTERM to the process group of cmd
+		syscall.Kill(-process.Pid, syscall.SIGTERM)
+	}
+
+	// reap our child process
+	cmd.Wait()
+}
+
+func ExitStatus(err error) (int, bool) {
+	exitError, ok := err.(*exec.ExitError)
+	if !ok {
+		return 0, false
+	}
+
+	waitStatus, ok := exitError.Sys().(syscall.WaitStatus)
+	if !ok {
+		return 0, false
+	}
+
+	return waitStatus.ExitStatus(), true
 }

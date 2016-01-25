@@ -6,6 +6,7 @@ import (
 	"./internal/testhelper"
 	"./internal/upstream"
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -363,6 +364,37 @@ func TestAllowedStaticFile(t *testing.T) {
 	}
 }
 
+func TestStaticFileRelativeURL(t *testing.T) {
+	content := "PUBLIC"
+	if err := setupStaticFile("static.txt", content); err != nil {
+		t.Fatalf("create public/static.txt: %v", err)
+	}
+
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), http.HandlerFunc(http.NotFound))
+	defer ts.Close()
+	backendURLString := ts.URL + "/my-relative-url"
+	log.Print(backendURLString)
+	ws := startWorkhorseServer(backendURLString)
+	defer ws.Close()
+
+	resource := "/my-relative-url/static.txt"
+	resp, err := http.Get(ws.URL + resource)
+	if err != nil {
+		t.Error(err)
+	}
+	defer resp.Body.Close()
+	buf := &bytes.Buffer{}
+	if _, err := io.Copy(buf, resp.Body); err != nil {
+		t.Error(err)
+	}
+	if buf.String() != content {
+		t.Errorf("GET %q: Expected %q, got %q", resource, content, buf.String())
+	}
+	if resp.StatusCode != 200 {
+		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
+	}
+}
+
 func TestAllowedPublicUploadsFile(t *testing.T) {
 	content := "PRIVATE but allowed"
 	if err := setupStaticFile("uploads/static file.txt", content); err != nil {
@@ -465,8 +497,9 @@ func TestArtifactsUpload(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if len(r.MultipartForm.Value) != 2 { // 1 file name, 1 file path
-			t.Error("Expected to receive exactly 2 values")
+		nValues := 2 // filename + path for just the upload (no metadata because we are not POSTing a valid zip file)
+		if len(r.MultipartForm.Value) != nValues {
+			t.Errorf("Expected to receive exactly %d values", nValues)
 		}
 		if len(r.MultipartForm.File) != 0 {
 			t.Error("Expected to not receive any files")
@@ -485,6 +518,40 @@ func TestArtifactsUpload(t *testing.T) {
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
 		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
+	}
+}
+
+func TestArtifactsGetSingleFile(t *testing.T) {
+	// We manually created this zip file in the gitlab-workhorse Git repository
+	archivePath := `testdata/artifacts-archive.zip`
+	fileName := "myfile"
+	fileContents := "MY FILE"
+	resourcePath := `/namespace/project/builds/123/artifacts/file/` + fileName
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`\A`+resourcePath+`\z`), func(w http.ResponseWriter, r *http.Request) {
+		encodedFilename := base64.StdEncoding.EncodeToString([]byte(fileName))
+		if _, err := fmt.Fprintf(w, `{"Archive":"%s","Entry":"%s"}`, archivePath, encodedFilename); err != nil {
+			t.Fatal(err)
+		}
+		return
+	})
+	defer ts.Close()
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	resp, err := http.Get(ws.URL + resourcePath)
+	if err != nil {
+		t.Error(err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		t.Errorf("GET %q: expected 200, got %d", resourcePath, resp.StatusCode)
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(body) != fileContents {
+		t.Fatalf("Expected file contents %q, got %q", fileContents, body)
 	}
 }
 

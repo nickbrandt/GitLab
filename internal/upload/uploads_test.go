@@ -5,6 +5,7 @@ import (
 	"../proxy"
 	"../testhelper"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -19,10 +20,27 @@ import (
 
 var nilHandler = http.HandlerFunc(func(http.ResponseWriter, *http.Request) {})
 
+type testFormProcessor struct {
+}
+
+func (a *testFormProcessor) ProcessFile(formName, fileName string, writer *multipart.Writer) error {
+	if formName != "file" && fileName != "my.file" {
+		return errors.New("illegal file")
+	}
+	return nil
+}
+
+func (a *testFormProcessor) ProcessField(formName string, writer *multipart.Writer) error {
+	if formName != "token" {
+		return errors.New("illegal field")
+	}
+	return nil
+}
+
 func TestUploadTempPathRequirement(t *testing.T) {
 	response := httptest.NewRecorder()
 	request := &http.Request{}
-	handleFileUploads(nilHandler).ServeHTTP(response, request)
+	HandleFileUploads(response, request, nilHandler, "", nil)
 	testhelper.AssertResponseCode(t, response, 500)
 }
 
@@ -56,9 +74,8 @@ func TestUploadHandlerForwardingRawData(t *testing.T) {
 
 	response := httptest.NewRecorder()
 
-	httpRequest.Header.Set(tempPathHeader, tempPath)
-
-	handleFileUploads(proxy.NewProxy(helper.URLMustParse(ts.URL), "123", nil)).ServeHTTP(response, httpRequest)
+	handler := proxy.NewProxy(helper.URLMustParse(ts.URL), "123", nil)
+	HandleFileUploads(response, httpRequest, handler, tempPath, nil)
 	testhelper.AssertResponseCode(t, response, 202)
 	if response.Body.String() != "RESPONSE" {
 		t.Fatal("Expected RESPONSE in response body")
@@ -129,13 +146,65 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	httpRequest.Body = ioutil.NopCloser(&buffer)
 	httpRequest.ContentLength = int64(buffer.Len())
 	httpRequest.Header.Set("Content-Type", writer.FormDataContentType())
-	httpRequest.Header.Set(tempPathHeader, tempPath)
 	response := httptest.NewRecorder()
 
-	handleFileUploads(proxy.NewProxy(helper.URLMustParse(ts.URL), "123", nil)).ServeHTTP(response, httpRequest)
+	handler := proxy.NewProxy(helper.URLMustParse(ts.URL), "123", nil)
+	HandleFileUploads(response, httpRequest, handler, tempPath, &testFormProcessor{})
 	testhelper.AssertResponseCode(t, response, 202)
 
 	if _, err := os.Stat(filePath); !os.IsNotExist(err) {
 		t.Fatal("expected the file to be deleted")
 	}
+}
+
+func TestUploadProcessingField(t *testing.T) {
+	tempPath, err := ioutil.TempDir("", "uploads")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tempPath)
+
+	var buffer bytes.Buffer
+
+	writer := multipart.NewWriter(&buffer)
+	writer.WriteField("token2", "test")
+	writer.Close()
+
+	httpRequest, err := http.NewRequest("PUT", "/url/path", &buffer)
+	if err != nil {
+		t.Fatal(err)
+	}
+	httpRequest.Header.Set("Content-Type", writer.FormDataContentType())
+
+	response := httptest.NewRecorder()
+	HandleFileUploads(response, httpRequest, nilHandler, tempPath, &testFormProcessor{})
+	testhelper.AssertResponseCode(t, response, 500)
+}
+
+func TestUploadProcessingFile(t *testing.T) {
+	tempPath, err := ioutil.TempDir("", "uploads")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tempPath)
+
+	var buffer bytes.Buffer
+
+	writer := multipart.NewWriter(&buffer)
+	file, err := writer.CreateFormFile("file2", "my.file")
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Fprint(file, "test")
+	writer.Close()
+
+	httpRequest, err := http.NewRequest("PUT", "/url/path", &buffer)
+	if err != nil {
+		t.Fatal(err)
+	}
+	httpRequest.Header.Set("Content-Type", writer.FormDataContentType())
+
+	response := httptest.NewRecorder()
+	HandleFileUploads(response, httpRequest, nilHandler, tempPath, &testFormProcessor{})
+	testhelper.AssertResponseCode(t, response, 500)
 }
