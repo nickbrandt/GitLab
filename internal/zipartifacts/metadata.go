@@ -7,8 +7,8 @@ import (
 	"encoding/json"
 	"io"
 	"os"
+	"path"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -20,6 +20,8 @@ type metadata struct {
 	Zipped   uint64 `json:"zipped,omitempty"`
 	Comment  string `json:"comment,omitempty"`
 }
+
+type zipFileMap map[string]*zip.File
 
 const MetadataHeaderPrefix = "\x00\x00\x00&" // length of string below, encoded properly
 const MetadataHeader = "GitLab Build Artifacts Metadata 0.0.2\n"
@@ -57,28 +59,26 @@ func writeZipEntryMetadata(output io.Writer, entry *zip.File) error {
 	return nil
 }
 
-func handleZipEntryMetadata(output io.Writer, entry *zip.File, entries []*zip.File) error {
+func handleZipEntryMetadata(output io.Writer, entry *zip.File, fileMap zipFileMap) error {
 	var dirNodes []string
+	entryPath := entry.Name
 
-	var calculateEntryNodes func(string)
-	calculateEntryNodes = func(str string) {
-		idx := strings.LastIndex(str, "/")
-		if idx < 0 {
-			return
+	for {
+		entryPath = path.Dir(entryPath)
+		if entryPath == "." || entryPath == "/" {
+			break
 		}
-		dir := str[:idx]
-		dirNodes = append([]string{dir + "/"}, dirNodes...)
-		calculateEntryNodes(dir)
+		dirNodes = append([]string{entryPath + "/"}, dirNodes...)
 	}
-	calculateEntryNodes(entry.Name)
 
 	for _, d := range dirNodes {
-		if !hasZipPathEntry(d, entries) {
+		if _, ok := fileMap[d]; !ok {
 			var missingHeader zip.FileHeader
 			missingHeader.Name = d
 			missingHeader.SetModTime(time.Now())
 			missingHeader.SetMode(os.FileMode(uint32(0755)))
 			missingEntry := &zip.File{FileHeader: missingHeader}
+			fileMap[d] = missingEntry
 
 			writeZipEntryMetadata(output, missingEntry)
 		}
@@ -88,14 +88,14 @@ func handleZipEntryMetadata(output io.Writer, entry *zip.File, entries []*zip.Fi
 	return err
 }
 
-func hasZipPathEntry(path string, entries []*zip.File) bool {
-	for _, e := range entries {
-		if e.Name == path {
-			return true
-		}
+func generateZipFileMap(zipEntries []*zip.File) zipFileMap {
+	fileMap := make(map[string]*zip.File)
+
+	for _, entry := range zipEntries {
+		fileMap[entry.Name] = entry
 	}
 
-	return false
+	return fileMap
 }
 
 func generateZipMetadata(output io.Writer, archive *zip.Reader) error {
@@ -108,9 +108,10 @@ func generateZipMetadata(output io.Writer, archive *zip.Reader) error {
 		return err
 	}
 
+	fileMap := generateZipFileMap(archive.File)
 	// Write all files
 	for _, entry := range archive.File {
-		if err := handleZipEntryMetadata(output, entry, archive.File); err != nil {
+		if err := handleZipEntryMetadata(output, entry, fileMap); err != nil {
 			return err
 		}
 	}
