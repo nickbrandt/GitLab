@@ -8,8 +8,8 @@ import (
 	"io"
 	"os"
 	"path"
+	"sort"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -21,8 +21,6 @@ type metadata struct {
 	Zipped   uint64 `json:"zipped,omitempty"`
 	Comment  string `json:"comment,omitempty"`
 }
-
-type zipDirMap map[string]*zip.File
 
 const MetadataHeaderPrefix = "\x00\x00\x00&" // length of string below, encoded properly
 const MetadataHeader = "GitLab Build Artifacts Metadata 0.0.2\n"
@@ -70,44 +68,43 @@ func generateZipMetadata(output io.Writer, archive *zip.Reader) error {
 		return err
 	}
 
-	// Create map od directories in zip archive
-	dirMap := make(zipDirMap, len(archive.File))
-	for _, entry := range archive.File {
-		if strings.HasSuffix(entry.Name, "/") {
-			dirMap[entry.Name] = entry
-		}
-	}
+	// Create map of files in zip archive
+	zipMap := make(map[string]*zip.File, len(archive.File))
 
 	// Add missing entries
-	var missingEntries []*zip.File
-
 	for _, entry := range archive.File {
+		zipMap[entry.Name] = entry
 		entryPath := entry.Name
 
 		for {
 			entryPath = path.Dir(entryPath)
+			entryDir := entryPath + "/"
 			if entryPath == "." || entryPath == "/" {
 				break
 			}
 
-			if _, ok := dirMap[entryPath]; !ok {
+			if _, ok := zipMap[entryDir]; !ok {
 				var missingHeader zip.FileHeader
-				missingHeader.Name = entryPath
+				missingHeader.Name = entryDir
 				missingHeader.SetModTime(time.Now())
 				missingHeader.SetMode(os.FileMode(uint32(0755)))
 				missingEntry := &zip.File{FileHeader: missingHeader}
 
-				dirMap[entryPath] = missingEntry
-				missingEntries = append(missingEntries, missingEntry)
+				zipMap[entryDir] = missingEntry
 			}
 		}
 	}
 
-	archive.File = append(archive.File, missingEntries...)
+	// Sort paths
+	var sortedPaths []string
+	for path, _ := range zipMap {
+		sortedPaths = append(sortedPaths, path)
+	}
+	sort.Strings(sortedPaths)
 
 	// Write all files
-	for _, entry := range archive.File {
-		if err := writeZipEntryMetadata(output, entry); err != nil {
+	for _, path := range sortedPaths {
+		if err := writeZipEntryMetadata(output, zipMap[path]); err != nil {
 			return err
 		}
 	}
