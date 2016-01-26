@@ -2,6 +2,11 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+0.6.2
+
+We now fill in missing directory entries in archize zip metadata
+files; also some other minor changes.
+
 0.6.1
 
 Add support for generating zip artifacts metadata and serving single
