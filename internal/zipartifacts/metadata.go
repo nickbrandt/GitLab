@@ -77,8 +77,8 @@ func generateZipMetadata(output io.Writer, archive *zip.Reader) error {
 	for _, entry := range archive.File {
 		zipMap[entry.Name] = entry
 
-		for entryPath := path.Dir(entry.Name); entryPath != "." && entryPath != "/"; entryPath = path.Dir(entryPath) {
-			entryDir := entryPath + "/"
+		for d := path.Dir(entry.Name); d != "." && d != "/"; d = path.Dir(d) {
+			entryDir := d + "/"
 			if _, ok := zipMap[entryDir]; !ok {
 				zipMap[entryDir] = nil
 			}
