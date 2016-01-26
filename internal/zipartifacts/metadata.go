@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -21,7 +22,7 @@ type metadata struct {
 	Comment  string `json:"comment,omitempty"`
 }
 
-type zipFileMap map[string]*zip.File
+type zipDirMap map[string]*zip.File
 
 const MetadataHeaderPrefix = "\x00\x00\x00&" // length of string below, encoded properly
 const MetadataHeader = "GitLab Build Artifacts Metadata 0.0.2\n"
@@ -47,71 +48,66 @@ func (m metadata) writeEncoded(output io.Writer) error {
 }
 
 func writeZipEntryMetadata(output io.Writer, entry *zip.File) error {
-	err := writeString(output, entry.Name)
-	if err != nil {
+	if err := writeString(output, entry.Name); err != nil {
 		return err
 	}
 
-	err = newMetadata(entry).writeEncoded(output)
-	if err != nil {
+	if err := newMetadata(entry).writeEncoded(output); err != nil {
 		return err
 	}
+
 	return nil
 }
 
-func handleZipEntryMetadata(output io.Writer, entry *zip.File, fileMap zipFileMap) error {
-	var dirNodes []string
-	entryPath := entry.Name
-
-	for {
-		entryPath = path.Dir(entryPath)
-		if entryPath == "." || entryPath == "/" {
-			break
-		}
-		dirNodes = append([]string{entryPath + "/"}, dirNodes...)
-	}
-
-	for _, d := range dirNodes {
-		if _, ok := fileMap[d]; !ok {
-			var missingHeader zip.FileHeader
-			missingHeader.Name = d
-			missingHeader.SetModTime(time.Now())
-			missingHeader.SetMode(os.FileMode(uint32(0755)))
-			missingEntry := &zip.File{FileHeader: missingHeader}
-			fileMap[d] = missingEntry
-
-			writeZipEntryMetadata(output, missingEntry)
-		}
-	}
-
-	err := writeZipEntryMetadata(output, entry)
-	return err
-}
-
-func generateZipFileMap(zipEntries []*zip.File) zipFileMap {
-	fileMap := make(zipFileMap, len(zipEntries))
-
-	for _, entry := range zipEntries {
-		fileMap[entry.Name] = entry
-	}
-
-	return fileMap
-}
-
 func generateZipMetadata(output io.Writer, archive *zip.Reader) error {
+	// Write metadata header
 	if err := writeString(output, MetadataHeader); err != nil {
 		return err
 	}
 
-	// Write empty error string
+	// Write empty error header
 	if err := writeString(output, "{}"); err != nil {
 		return err
 	}
 
-	fileMap := generateZipFileMap(archive.File)
+	// Create map od directories in zip archive
+	dirMap := make(zipDirMap, len(archive.File))
+	for _, entry := range archive.File {
+		if strings.HasSuffix(entry.Name, "/") {
+			dirMap[entry.Name] = entry
+		}
+	}
+
+	// Add missing entries
+	var missingEntries []*zip.File
+
+	for _, entry := range archive.File {
+		entryPath := entry.Name
+
+		for {
+			entryPath = path.Dir(entryPath)
+			if entryPath == "." || entryPath == "/" {
+				break
+			}
+
+			if _, ok := dirMap[entryPath]; !ok {
+				var missingHeader zip.FileHeader
+				missingHeader.Name = entryPath
+				missingHeader.SetModTime(time.Now())
+				missingHeader.SetMode(os.FileMode(uint32(0755)))
+				missingEntry := &zip.File{FileHeader: missingHeader}
+
+				dirMap[entryPath] = missingEntry
+				missingEntries = append(missingEntries, missingEntry)
+			}
+		}
+	}
+
+	archive.File = append(archive.File, missingEntries...)
+
 	// Write all files
 	for _, entry := range archive.File {
-		if err := handleZipEntryMetadata(output, entry, fileMap); err != nil {
+		if err := writeZipEntryMetadata(output, entry); err != nil {
 			return err
 		}
 	}
