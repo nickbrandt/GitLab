@@ -79,9 +79,11 @@ func generateZipMetadata(output io.Writer, archive *zip.Reader) error {
 
 		for d := path.Dir(entry.Name); d != "." && d != "/"; d = path.Dir(d) {
 			entryDir := d + "/"
-			if _, ok := zipMap[entryDir]; !ok {
-				zipMap[entryDir] = nil
+			// If entryDir is already in the zipMap then so are all its parent directories
+			if _, ok := zipMap[entryDir]; ok {
+				break
 			}
+			zipMap[entryDir] = nil
 		}
 	}
 

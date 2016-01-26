@@ -13,28 +13,29 @@ func TestMissingMetadataEntries(t *testing.T) {
 
 	archive := zip.NewWriter(&zipBuffer)
 
-	firstFile, err := archive.Create("file1")
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Fprint(firstFile, "test12")
+	files := []string{"file1", "some/file/dir/file2", "../../test12/test",
+		"/usr/bin/test", `c:\windows\win32.exe`, `c:/windows/win.dll`, "./f/asd", "/"}
 
-	secondFile, err := archive.Create("some/file/dir/file2")
-	if err != nil {
-		t.Fatal(err)
+	for _, file := range files {
+		archiveFile, err := archive.Create(file)
+		if err != nil {
+			t.Fatal(err)
+		}
+		fmt.Fprint(archiveFile, file)
 	}
-	fmt.Fprint(secondFile, "test125678")
 
 	archive.Close()
 
 	zipReader := bytes.NewReader(zipBuffer.Bytes())
 	zipArchiveReader, _ := zip.NewReader(zipReader, int64(binary.Size(zipBuffer.Bytes())))
-	err = generateZipMetadata(&metaBuffer, zipArchiveReader)
+	if err := generateZipMetadata(&metaBuffer, zipArchiveReader); err != nil {
+		t.Fatal("zipartifacts: generateZipMetadata failed", err)
+	}
 
 	paths := []string{"file1", "some/", "some/file/", "some/file/dir", "some/file/dir/file2"}
 	for _, path := range paths {
 		if !bytes.Contains(metaBuffer.Bytes(), []byte(path)) {
-			t.Fatalf("zipartifacts: metadata for path %s not found!", path)
+			t.Fatal("zipartifacts: metadata for path", path, "not found")
 		}
 	}
 }
