@@ -13,7 +13,8 @@ func TestMissingMetadataEntries(t *testing.T) {
 
 	archive := zip.NewWriter(&zipBuffer)
 
-	files := []string{"file1", "some/file/dir/file2", "../../test12/test",
+	// non-POSIX paths are here just to test if we never enter infinite loop
+	files := []string{"file1", "some/file/dir/", "some/file/dir/file2", "../../test12/test",
 		"/usr/bin/test", `c:\windows\win32.exe`, `c:/windows/win.dll`, "./f/asd", "/"}
 
 	for _, file := range files {
@@ -32,9 +33,9 @@ func TestMissingMetadataEntries(t *testing.T) {
 		t.Fatal("zipartifacts: generateZipMetadata failed", err)
 	}
 
-	paths := []string{"file1", "some/", "some/file/", "some/file/dir", "some/file/dir/file2"}
+	paths := []string{"file1", "some/", "some/file/", "some/file/dir/", "some/file/dir/file2"}
 	for _, path := range paths {
-		if !bytes.Contains(metaBuffer.Bytes(), []byte(path)) {
+		if !bytes.Contains(metaBuffer.Bytes(), []byte(path+"\x00")) {
 			t.Fatal("zipartifacts: metadata for path", path, "not found")
 		}
 	}
