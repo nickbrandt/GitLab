@@ -11,6 +11,7 @@ import (
 	"../helper"
 	"log"
 	"net/http"
+	"strings"
 )
 
 type sendFileResponseWriter struct {
@@ -44,6 +45,13 @@ func (s *sendFileResponseWriter) Write(data []byte) (n int, err error) {
 }
 
 func (s *sendFileResponseWriter) WriteHeader(status int) {
+	// Never pass these headers to the client
+	defer func() {
+		s.Header().Del("X-Sendfile")
+		s.Header().Del("Gitlab-Workhorse-Send-Data")
+
+	}()
+
 	if s.status != 0 {
 		return
 	}
@@ -55,27 +63,21 @@ func (s *sendFileResponseWriter) WriteHeader(status int) {
 	}
 
 	if file := s.Header().Get("X-Sendfile"); file != "" {
-		s.Header().Del("X-Sendfile")
-
 		// Mark this connection as hijacked
 		s.hijacked = true
 
 		// Serve the file
 		sendFileFromDisk(s.rw, s.req, file)
 		return
-	} else if repoPath := s.Header().Get("Gitlab-Workhorse-Repo-Path"); repoPath != "" {
+	}
+	if sendData := s.Header().Get("Gitlab-Workhorse-Send-Data"); strings.HasPrefix(sendData, "git-blob:") {
 		s.hijacked = true
-
-		s.Header().Del("Gitlab-Workhorse-Repo-Path")
-		sendBlob := s.Header().Get("Gitlab-Workhorse-Send-Blob")
-		s.Header().Del("Gitlab-Workhorse-Send-Blob")
-
-		git.SendGitBlob(s.rw, s.req, repoPath, sendBlob)
-		return
-	} else {
-		s.rw.WriteHeader(s.status)
+		git.SendBlob(s.rw, s.req, sendData)
 		return
 	}
+
+	s.rw.WriteHeader(s.status)
+	return
 }
 
 func sendFileFromDisk(w http.ResponseWriter, r *http.Request, file string) {
