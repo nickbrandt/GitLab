@@ -558,10 +558,11 @@ func TestArtifactsGetSingleFile(t *testing.T) {
 func TestGetGitBlob(t *testing.T) {
 	blobId := "50b27c6518be44c42c4d87966ae2481ce895624c" // the LICENSE file in the test repository
 	blobLength := 1075
+	headerKey := http.CanonicalHeaderKey("Gitlab-Workhorse-Send-Data")
 	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
 		responseJSON := fmt.Sprintf(`{"RepoPath":"%s","BlobId":"%s"}`, path.Join(testRepoRoot, testRepo), blobId)
 		encodedJSON := base64.StdEncoding.EncodeToString([]byte(responseJSON))
-		w.Header().Set("Gitlab-Workhorse-Send-Data", "git-blob:"+encodedJSON)
+		w.Header().Set(headerKey, "git-blob:"+encodedJSON)
 		// Prevent the Go HTTP server from setting the Content-Length to 0.
 		w.Header().Set("Transfer-Encoding", "chunked")
 		if _, err := fmt.Fprintf(w, "GNU General Public License"); err != nil {
@@ -580,6 +581,9 @@ func TestGetGitBlob(t *testing.T) {
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
 		t.Errorf("GET %q: expected 200, got %d", resourcePath, resp.StatusCode)
+	}
+	if len(resp.Header[headerKey]) != 0 {
+		t.Fatalf("Unexpected response header: %s: %q", headerKey, resp.Header.Get(headerKey))
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

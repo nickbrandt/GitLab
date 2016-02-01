@@ -14,6 +14,8 @@ import (
 	"strings"
 )
 
+const sendDataHeader = "Gitlab-Workhorse-Send-Data"
+
 type sendFileResponseWriter struct {
 	rw       http.ResponseWriter
 	status   int
@@ -45,13 +47,6 @@ func (s *sendFileResponseWriter) Write(data []byte) (n int, err error) {
 }
 
 func (s *sendFileResponseWriter) WriteHeader(status int) {
-	// Never pass these headers to the client
-	defer func() {
-		s.Header().Del("X-Sendfile")
-		s.Header().Del("Gitlab-Workhorse-Send-Data")
-
-	}()
-
 	if s.status != 0 {
 		return
 	}
@@ -63,6 +58,7 @@ func (s *sendFileResponseWriter) WriteHeader(status int) {
 	}
 
 	if file := s.Header().Get("X-Sendfile"); file != "" {
+		s.Header().Del("X-Sendfile")
 		// Mark this connection as hijacked
 		s.hijacked = true
 
@@ -70,7 +66,8 @@ func (s *sendFileResponseWriter) WriteHeader(status int) {
 		sendFileFromDisk(s.rw, s.req, file)
 		return
 	}
-	if sendData := s.Header().Get("Gitlab-Workhorse-Send-Data"); strings.HasPrefix(sendData, git.SendBlobPrefix) {
+	if sendData := s.Header().Get(sendDataHeader); strings.HasPrefix(sendData, git.SendBlobPrefix) {
+		s.Header().Del(sendDataHeader)
 		s.hijacked = true
 		git.SendBlob(s.rw, s.req, sendData)
 		return
