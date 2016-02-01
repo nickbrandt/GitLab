@@ -14,7 +14,10 @@ import (
 	"strings"
 )
 
-const sendDataHeader = "Gitlab-Workhorse-Send-Data"
+const (
+	sendDataResponseHeader = "Gitlab-Workhorse-Send-Data"
+	sendFileResponseHeader = "X-Sendfile"
+)
 
 type sendFileResponseWriter struct {
 	rw       http.ResponseWriter
@@ -28,6 +31,7 @@ func NewSendFileResponseWriter(rw http.ResponseWriter, req *http.Request) sendFi
 		rw:  rw,
 		req: req,
 	}
+	// Advertise to upstream (Rails) that we support X-Sendfile
 	req.Header.Set("X-Sendfile-Type", "X-Sendfile")
 	return s
 }
@@ -57,8 +61,8 @@ func (s *sendFileResponseWriter) WriteHeader(status int) {
 		return
 	}
 
-	if file := s.Header().Get("X-Sendfile"); file != "" {
-		s.Header().Del("X-Sendfile")
+	if file := s.Header().Get(sendFileResponseHeader); file != "" {
+		s.Header().Del(sendFileResponseHeader)
 		// Mark this connection as hijacked
 		s.hijacked = true
 
@@ -66,8 +70,8 @@ func (s *sendFileResponseWriter) WriteHeader(status int) {
 		sendFileFromDisk(s.rw, s.req, file)
 		return
 	}
-	if sendData := s.Header().Get(sendDataHeader); strings.HasPrefix(sendData, git.SendBlobPrefix) {
-		s.Header().Del(sendDataHeader)
+	if sendData := s.Header().Get(sendDataResponseHeader); strings.HasPrefix(sendData, git.SendBlobPrefix) {
+		s.Header().Del(sendDataResponseHeader)
 		s.hijacked = true
 		git.SendBlob(s.rw, s.req, sendData)
 		return
