@@ -26,10 +26,10 @@ func SendBlob(w http.ResponseWriter, r *http.Request, sendData string) {
 	}
 	log.Printf("SendBlob: sending %q for %q", params.BlobId, r.URL.Path)
 
-	gitShowCmd := gitCommand("", "git", "--git-dir="+params.RepoPath, "show", params.BlobId)
+	gitShowCmd := gitCommand("", "git", "--git-dir="+params.RepoPath, "cat-file", "blob", "--", params.BlobId)
 	stdout, err := gitShowCmd.StdoutPipe()
 	if err != nil {
-		helper.Fail500(w, fmt.Errorf("SendBlob: git show stdout: %v", err))
+		helper.Fail500(w, fmt.Errorf("SendBlob: git  stdout: %v", err))
 		return
 	}
 	if err := gitShowCmd.Start(); err != nil {
@@ -39,11 +39,11 @@ func SendBlob(w http.ResponseWriter, r *http.Request, sendData string) {
 	defer helper.CleanUpProcessGroup(gitShowCmd)
 
 	if _, err := io.Copy(w, stdout); err != nil {
-		helper.LogError(fmt.Errorf("SendBlob: copy git show stdout: %v", err))
+		helper.LogError(fmt.Errorf("SendBlob: copy git cat-file stdout: %v", err))
 		return
 	}
 	if err := gitShowCmd.Wait(); err != nil {
-		helper.LogError(fmt.Errorf("SendBlob: wait for git show: %v", err))
+		helper.LogError(fmt.Errorf("SendBlob: wait for git cat-file: %v", err))
 		return
 	}
 }
