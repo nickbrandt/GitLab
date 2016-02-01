@@ -33,7 +33,7 @@ Options:
     	Print version and exit
 ```
 
-The 'auth backend' refers to the GitLab Rails applicatoin. The name is
+The 'auth backend' refers to the GitLab Rails application. The name is
 a holdover from when gitlab-workhorse only handled Git push/pull over
 HTTP.
 
