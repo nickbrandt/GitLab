@@ -70,7 +70,7 @@ func (s *sendFileResponseWriter) WriteHeader(status int) {
 		sendFileFromDisk(s.rw, s.req, file)
 		return
 	}
-	if sendData := s.Header().Get("Gitlab-Workhorse-Send-Data"); strings.HasPrefix(sendData, "git-blob:") {
+	if sendData := s.Header().Get("Gitlab-Workhorse-Send-Data"); strings.HasPrefix(sendData, git.SendBlobPrefix) {
 		s.hijacked = true
 		git.SendBlob(s.rw, s.req, sendData)
 		return
