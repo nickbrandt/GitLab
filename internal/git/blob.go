@@ -11,19 +11,15 @@ import (
 	"strings"
 )
 
-type blobParams struct {
-	RepoPath string
-	BlobId   string
-}
-
 const SendBlobPrefix = "git-blob:"
 
 func SendBlob(w http.ResponseWriter, r *http.Request, sendData string) {
-	params, err := unpackSendData(sendData)
-	if err != nil {
+	var params struct{ RepoPath, BlobId string }
+	if err := unpackSendData(&params, sendData, SendBlobPrefix); err != nil {
 		helper.Fail500(w, fmt.Errorf("SendBlob: unpack sendData: %v", err))
 		return
 	}
+
 	log.Printf("SendBlob: sending %q for %q", params.BlobId, r.URL.Path)
 
 	gitShowCmd := gitCommand("", "git", "--git-dir="+params.RepoPath, "cat-file", "blob", params.BlobId)
@@ -48,14 +44,13 @@ func SendBlob(w http.ResponseWriter, r *http.Request, sendData string) {
 	}
 }
 
-func unpackSendData(sendData string) (*blobParams, error) {
-	jsonBytes, err := base64.URLEncoding.DecodeString(strings.TrimPrefix(sendData, SendBlobPrefix))
+func unpackSendData(result interface{}, sendData string, prefix string) error {
+	jsonBytes, err := base64.URLEncoding.DecodeString(strings.TrimPrefix(sendData, prefix))
 	if err != nil {
-		return nil, err
+		return err
 	}
-	result := &blobParams{}
 	if err := json.Unmarshal([]byte(jsonBytes), result); err != nil {
-		return nil, err
+		return err
 	}
-	return result, nil
+	return nil
 }

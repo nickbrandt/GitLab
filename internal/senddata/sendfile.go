@@ -70,11 +70,21 @@ func (s *sendFileResponseWriter) WriteHeader(status int) {
 		sendFileFromDisk(s.rw, s.req, file)
 		return
 	}
-	if sendData := s.Header().Get(sendDataResponseHeader); strings.HasPrefix(sendData, git.SendBlobPrefix) {
-		s.Header().Del(sendDataResponseHeader)
-		s.hijacked = true
-		git.SendBlob(s.rw, s.req, sendData)
-		return
+
+	sendData := s.Header().Get(sendDataResponseHeader)
+	s.Header().Del(sendDataResponseHeader)
+	for _, handler := range []struct {
+		prefix string
+		f      func(http.ResponseWriter, *http.Request, string)
+	}{
+		{git.SendBlobPrefix, git.SendBlob},
+		{git.SendArchivePrefix, git.SendArchive},
+	} {
+		if strings.HasPrefix(sendData, handler.prefix) {
+			s.hijacked = true
+			handler.f(s.rw, s.req, sendData)
+			return
+		}
 	}
 
 	s.rw.WriteHeader(s.status)
