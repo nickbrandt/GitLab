@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+0.6.3
+
+Add support for sending Git raw git blobs via gitlab-workhorse.
+
 0.6.2
 
 We now fill in missing directory entries in archize zip metadata
