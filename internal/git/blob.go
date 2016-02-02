@@ -2,20 +2,20 @@ package git
 
 import (
 	"../helper"
-	"encoding/base64"
-	"encoding/json"
+	"../senddata"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"strings"
 )
 
-const SendBlobPrefix = "git-blob:"
+type blob struct{ senddata.Prefix }
 
-func SendBlob(w http.ResponseWriter, r *http.Request, sendData string) {
+var SendBlob = &blob{"git-blob:"}
+
+func (b *blob) Handle(w http.ResponseWriter, r *http.Request, sendData string) {
 	var params struct{ RepoPath, BlobId string }
-	if err := unpackSendData(&params, sendData, SendBlobPrefix); err != nil {
+	if err := b.Unpack(&params, sendData); err != nil {
 		helper.Fail500(w, fmt.Errorf("SendBlob: unpack sendData: %v", err))
 		return
 	}
@@ -42,15 +42,4 @@ func SendBlob(w http.ResponseWriter, r *http.Request, sendData string) {
 		helper.LogError(fmt.Errorf("SendBlob: wait for git cat-file: %v", err))
 		return
 	}
-}
-
-func unpackSendData(result interface{}, sendData string, prefix string) error {
-	jsonBytes, err := base64.URLEncoding.DecodeString(strings.TrimPrefix(sendData, prefix))
-	if err != nil {
-		return err
-	}
-	if err := json.Unmarshal([]byte(jsonBytes), result); err != nil {
-		return err
-	}
-	return nil
 }

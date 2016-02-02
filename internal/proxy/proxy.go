@@ -3,7 +3,7 @@ package proxy
 import (
 	"../badgateway"
 	"../helper"
-	"../senddata"
+	"../inject"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -34,7 +34,7 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// Set Workhorse version
 	req.Header.Set("Gitlab-Workhorse", p.Version)
-	rw := senddata.NewSendFileResponseWriter(w, &req)
+	rw := inject.NewSendFileResponseWriter(w, &req)
 	defer rw.Flush()
 
 	p.reverseProxy.ServeHTTP(&rw, &req)

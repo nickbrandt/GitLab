@@ -6,6 +6,7 @@ package git
 
 import (
 	"../helper"
+	"../senddata"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -19,16 +20,18 @@ import (
 	"time"
 )
 
-const SendArchivePrefix = "git-archive:"
+type archive struct{ senddata.Prefix }
 
-func SendArchive(w http.ResponseWriter, r *http.Request, sendData string) {
+var SendArchive = &archive{"git-archive:"}
+
+func (a *archive) Handle(w http.ResponseWriter, r *http.Request, sendData string) {
 	var params struct {
 		RepoPath      string
 		ArchivePath   string
 		ArchivePrefix string
 		CommitId      string
 	}
-	if err := unpackSendData(&params, sendData, SendArchivePrefix); err != nil {
+	if err := a.Unpack(&params, sendData); err != nil {
 		helper.Fail500(w, fmt.Errorf("SendArchive: unpack sendData: %v", err))
 		return
 	}

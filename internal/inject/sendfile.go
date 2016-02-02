@@ -4,20 +4,17 @@ via the X-Sendfile mechanism. All that is needed in the Rails code is the
 'send_file' method.
 */
 
-package senddata
+package inject
 
 import (
 	"../git"
 	"../helper"
+	"../senddata"
 	"log"
 	"net/http"
-	"strings"
 )
 
-const (
-	sendDataResponseHeader = "Gitlab-Workhorse-Send-Data"
-	sendFileResponseHeader = "X-Sendfile"
-)
+const sendFileResponseHeader = "X-Sendfile"
 
 type sendFileResponseWriter struct {
 	rw       http.ResponseWriter
@@ -71,18 +68,15 @@ func (s *sendFileResponseWriter) WriteHeader(status int) {
 		return
 	}
 
-	sendData := s.Header().Get(sendDataResponseHeader)
-	s.Header().Del(sendDataResponseHeader)
-	for _, handler := range []struct {
-		prefix string
-		f      func(http.ResponseWriter, *http.Request, string)
-	}{
-		{git.SendBlobPrefix, git.SendBlob},
-		{git.SendArchivePrefix, git.SendArchive},
+	header := s.Header().Get(senddata.Header)
+	s.Header().Del(senddata.Header)
+	for _, handler := range []senddata.Handler{
+		git.SendBlob,
+		git.SendArchive,
 	} {
-		if strings.HasPrefix(sendData, handler.prefix) {
+		if handler.Match(header) {
 			s.hijacked = true
-			handler.f(s.rw, s.req, sendData)
+			handler.Handle(s.rw, s.req, header)
 			return
 		}
 	}
