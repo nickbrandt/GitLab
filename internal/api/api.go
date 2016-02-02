@@ -3,7 +3,6 @@ package api
 import (
 	"../badgateway"
 	"../helper"
-	"../proxy"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -97,7 +96,7 @@ func (api *API) newRequest(r *http.Request, body io.Reader, suffix string) (*htt
 	authReq := &http.Request{
 		Method: r.Method,
 		URL:    rebaseUrl(r.URL, api.URL, suffix),
-		Header: proxy.HeaderClone(r.Header),
+		Header: helper.HeaderClone(r.Header),
 	}
 	if body != nil {
 		authReq.Body = ioutil.NopCloser(body)
