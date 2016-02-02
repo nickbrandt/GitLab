@@ -68,16 +68,17 @@ func (s *sendFileResponseWriter) WriteHeader(status int) {
 		return
 	}
 
-	header := s.Header().Get(senddata.Header)
-	s.Header().Del(senddata.Header)
-	for _, handler := range []senddata.Handler{
-		git.SendBlob,
-		git.SendArchive,
-	} {
-		if handler.Match(header) {
-			s.hijacked = true
-			handler.Handle(s.rw, s.req, header)
-			return
+	if header := s.Header().Get(senddata.Header); header != "" {
+		s.Header().Del(senddata.Header)
+		for _, handler := range []senddata.Handler{
+			git.SendBlob,
+			git.SendArchive,
+		} {
+			if handler.Match(header) {
+				s.hijacked = true
+				handler.Handle(s.rw, s.req, header)
+				return
+			}
 		}
 	}
 
