@@ -7,9 +7,9 @@ import (
 	"strings"
 )
 
-type Handler interface {
+type Injecter interface {
 	Match(string) bool
-	Handle(http.ResponseWriter, *http.Request, string)
+	Inject(http.ResponseWriter, *http.Request, string)
 }
 
 type Prefix string

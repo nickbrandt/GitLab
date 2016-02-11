@@ -24,7 +24,7 @@ type archive struct{ senddata.Prefix }
 
 var SendArchive = &archive{"git-archive:"}
 
-func (a *archive) Handle(w http.ResponseWriter, r *http.Request, sendData string) {
+func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
 	var params struct {
 		RepoPath      string
 		ArchivePath   string
