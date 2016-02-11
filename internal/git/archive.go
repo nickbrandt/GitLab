@@ -21,16 +21,17 @@ import (
 )
 
 type archive struct{ senddata.Prefix }
+type archiveParams struct {
+	RepoPath      string
+	ArchivePath   string
+	ArchivePrefix string
+	CommitId      string
+}
 
 var SendArchive = &archive{"git-archive:"}
 
 func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
-	var params struct {
-		RepoPath      string
-		ArchivePath   string
-		ArchivePrefix string
-		CommitId      string
-	}
+	var params archiveParams
 	if err := a.Unpack(&params, sendData); err != nil {
 		helper.Fail500(w, fmt.Errorf("SendArchive: unpack sendData: %v", err))
 		return

@@ -10,11 +10,12 @@ import (
 )
 
 type blob struct{ senddata.Prefix }
+type blobParams struct{ RepoPath, BlobId string }
 
 var SendBlob = &blob{"git-blob:"}
 
 func (b *blob) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
-	var params struct{ RepoPath, BlobId string }
+	var params blobParams
 	if err := b.Unpack(&params, sendData); err != nil {
 		helper.Fail500(w, fmt.Errorf("SendBlob: unpack sendData: %v", err))
 		return
