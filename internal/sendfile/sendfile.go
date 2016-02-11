@@ -4,12 +4,10 @@ via the X-Sendfile mechanism. All that is needed in the Rails code is the
 'send_file' method.
 */
 
-package inject
+package sendfile
 
 import (
-	"../git"
 	"../helper"
-	"../senddata"
 	"log"
 	"net/http"
 )
@@ -23,14 +21,17 @@ type sendFileResponseWriter struct {
 	req      *http.Request
 }
 
-func NewSendFileResponseWriter(rw http.ResponseWriter, req *http.Request) sendFileResponseWriter {
-	s := sendFileResponseWriter{
-		rw:  rw,
-		req: req,
-	}
-	// Advertise to upstream (Rails) that we support X-Sendfile
-	req.Header.Set("X-Sendfile-Type", "X-Sendfile")
-	return s
+func SendFile(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		s := &sendFileResponseWriter{
+			rw:  rw,
+			req: req,
+		}
+		// Advertise to upstream (Rails) that we support X-Sendfile
+		req.Header.Set("X-Sendfile-Type", "X-Sendfile")
+		defer s.Flush()
+		h.ServeHTTP(s, req)
+	})
 }
 
 func (s *sendFileResponseWriter) Header() http.Header {
@@ -66,20 +67,6 @@ func (s *sendFileResponseWriter) WriteHeader(status int) {
 		// Serve the file
 		sendFileFromDisk(s.rw, s.req, file)
 		return
-	}
-
-	if header := s.Header().Get(senddata.Header); header != "" {
-		s.Header().Del(senddata.Header)
-		for _, handler := range []senddata.Injecter{
-			git.SendBlob,
-			git.SendArchive,
-		} {
-			if handler.Match(header) {
-				s.hijacked = true
-				handler.Inject(s.rw, s.req, header)
-				return
-			}
-		}
 	}
 
 	s.rw.WriteHeader(s.status)

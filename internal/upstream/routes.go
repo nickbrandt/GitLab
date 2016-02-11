@@ -6,6 +6,8 @@ import (
 	"../git"
 	"../lfs"
 	proxypkg "../proxy"
+	"../senddata"
+	"../sendfile"
 	"../staticpages"
 	"net/http"
 	"regexp"
@@ -37,10 +39,14 @@ func (u *Upstream) configureRoutes() {
 		u.RoundTripper,
 	)
 	static := &staticpages.Static{u.DocumentRoot}
-	proxy := proxypkg.NewProxy(
-		u.Backend,
-		u.Version,
-		u.RoundTripper,
+	proxy := senddata.SendData(
+		sendfile.SendFile(proxypkg.NewProxy(
+			u.Backend,
+			u.Version,
+			u.RoundTripper,
+		)),
+		git.SendArchive,
+		git.SendBlob,
 	)
 
 	u.Routes = []route{

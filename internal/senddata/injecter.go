@@ -14,7 +14,7 @@ type Injecter interface {
 
 type Prefix string
 
-const Header = "Gitlab-Workhorse-Send-Data"
+const HeaderKey = "Gitlab-Workhorse-Send-Data"
 
 func (p Prefix) Match(s string) bool {
 	return strings.HasPrefix(s, string(p))
