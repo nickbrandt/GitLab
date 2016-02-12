@@ -2,9 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
-0.6.4 (unreleased)
+0.6.4
 
-Increase default ProxyHeadersTimeout to 5 minutes.
+Increase default ProxyHeadersTimeout to 5 minutes. Fix injecting raw
+blobs for /api/v3 requetsts.
 
 0.6.3
 
