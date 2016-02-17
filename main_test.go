@@ -677,8 +677,6 @@ func archiveOKServer(t *testing.T, archiveName string) *httptest.Server {
 		}
 		encodedJSON := base64.StdEncoding.EncodeToString(jsonData)
 		w.Header().Set("Gitlab-Workhorse-Send-Data", "git-archive:"+encodedJSON)
-		// Prevent the Go HTTP server from setting the Content-Length to 0.
-		w.Header().Set("Transfer-Encoding", "chunked")
 	})
 }
 
