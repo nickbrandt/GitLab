@@ -52,16 +52,20 @@ func (s *sendDataResponseWriter) WriteHeader(status int) {
 }
 
 func (s *sendDataResponseWriter) tryInject() bool {
-	if header := s.Header().Get(HeaderKey); header != "" {
-		s.Header().Del(HeaderKey)
-		for _, injecter := range s.injecters {
-			if injecter.Match(header) {
-				s.hijacked = true
-				injecter.Inject(s.rw, s.req, header)
-				return true
-			}
+	header := s.Header().Get(HeaderKey)
+	s.Header().Del(HeaderKey)
+	if header == "" {
+		return false
+	}
+
+	for _, injecter := range s.injecters {
+		if injecter.Match(header) {
+			s.hijacked = true
+			injecter.Inject(s.rw, s.req, header)
+			return true
 		}
 	}
+
 	return false
 }
 
