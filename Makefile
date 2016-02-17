@@ -28,6 +28,9 @@ coverage: testdata/data/group/test.git
 	go tool cover -html=test.coverage -o coverage.html
 	rm -f test.coverage
 
+fmt:
+	go fmt ./...
+
 testdata/data/group/test.git: testdata/data
 	git clone --bare https://gitlab.com/gitlab-org/gitlab-test.git $@
 

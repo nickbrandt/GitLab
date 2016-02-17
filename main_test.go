@@ -115,7 +115,7 @@ func TestAllowedDownloadZip(t *testing.T) {
 
 	// Prepare test server and backend
 	archiveName := "foobar.zip"
-	ts := testAuthServer(nil, 200, archiveOkBody(t, archiveName))
+	ts := archiveOKServer(t, archiveName)
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -134,7 +134,7 @@ func TestAllowedDownloadTar(t *testing.T) {
 
 	// Prepare test server and backend
 	archiveName := "foobar.tar"
-	ts := testAuthServer(nil, 200, archiveOkBody(t, archiveName))
+	ts := archiveOKServer(t, archiveName)
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -153,7 +153,7 @@ func TestAllowedDownloadTarGz(t *testing.T) {
 
 	// Prepare test server and backend
 	archiveName := "foobar.tar.gz"
-	ts := testAuthServer(nil, 200, archiveOkBody(t, archiveName))
+	ts := archiveOKServer(t, archiveName)
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -172,7 +172,7 @@ func TestAllowedDownloadTarBz2(t *testing.T) {
 
 	// Prepare test server and backend
 	archiveName := "foobar.tar.bz2"
-	ts := testAuthServer(nil, 200, archiveOkBody(t, archiveName))
+	ts := archiveOKServer(t, archiveName)
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -191,7 +191,7 @@ func TestAllowedApiDownloadZip(t *testing.T) {
 
 	// Prepare test server and backend
 	archiveName := "foobar.zip"
-	ts := testAuthServer(nil, 200, archiveOkBody(t, archiveName))
+	ts := archiveOKServer(t, archiveName)
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -210,7 +210,7 @@ func TestAllowedApiDownloadZipWithSlash(t *testing.T) {
 
 	// Prepare test server and backend
 	archiveName := "foobar.zip"
-	ts := testAuthServer(nil, 200, archiveOkBody(t, archiveName))
+	ts := archiveOKServer(t, archiveName)
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -233,7 +233,7 @@ func TestDownloadCacheHit(t *testing.T) {
 
 	// Prepare test server and backend
 	archiveName := "foobar.zip"
-	ts := testAuthServer(nil, 200, archiveOkBody(t, archiveName))
+	ts := archiveOKServer(t, archiveName)
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -264,7 +264,7 @@ func TestDownloadCacheCreate(t *testing.T) {
 
 	// Prepare test server and backend
 	archiveName := "foobar.zip"
-	ts := testAuthServer(nil, 200, archiveOkBody(t, archiveName))
+	ts := archiveOKServer(t, archiveName)
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -657,6 +657,29 @@ func testAuthServer(url *regexp.Regexp, code int, body interface{}) *httptest.Se
 	})
 }
 
+func archiveOKServer(t *testing.T, archiveName string) *httptest.Server {
+	return testhelper.TestServerWithHandler(regexp.MustCompile("."), func(w http.ResponseWriter, r *http.Request) {
+		cwd, err := os.Getwd()
+		if err != nil {
+			t.Fatal(err)
+		}
+		archivePath := path.Join(cwd, cacheDir, archiveName)
+
+		params := struct{ RepoPath, ArchivePath, CommitId, ArchivePrefix string }{
+			repoPath(t),
+			archivePath,
+			"c7fbe50c7c7419d9701eebe64b1fdacc3df5b9dd",
+			"foobar123",
+		}
+		jsonData, err := json.Marshal(params)
+		if err != nil {
+			t.Fatal(err)
+		}
+		encodedJSON := base64.StdEncoding.EncodeToString(jsonData)
+		w.Header().Set("Gitlab-Workhorse-Send-Data", "git-archive:"+encodedJSON)
+	})
+}
+
 func startWorkhorseServer(authBackend string) *httptest.Server {
 	u := upstream.NewUpstream(
 		helper.URLMustParse(authBackend),
@@ -681,21 +704,6 @@ func gitOkBody(t *testing.T) interface{} {
 	return &api.Response{
 		GL_ID:    "user-123",
 		RepoPath: repoPath(t),
-	}
-}
-
-func archiveOkBody(t *testing.T, archiveName string) interface{} {
-	cwd, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-	archivePath := path.Join(cwd, cacheDir, archiveName)
-
-	return &api.Response{
-		RepoPath:      repoPath(t),
-		ArchivePath:   archivePath,
-		CommitId:      "c7fbe50c7c7419d9701eebe64b1fdacc3df5b9dd",
-		ArchivePrefix: "foobar123",
 	}
 }
 

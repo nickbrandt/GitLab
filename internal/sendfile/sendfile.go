@@ -4,20 +4,15 @@ via the X-Sendfile mechanism. All that is needed in the Rails code is the
 'send_file' method.
 */
 
-package senddata
+package sendfile
 
 import (
-	"../git"
 	"../helper"
 	"log"
 	"net/http"
-	"strings"
 )
 
-const (
-	sendDataResponseHeader = "Gitlab-Workhorse-Send-Data"
-	sendFileResponseHeader = "X-Sendfile"
-)
+const sendFileResponseHeader = "X-Sendfile"
 
 type sendFileResponseWriter struct {
 	rw       http.ResponseWriter
@@ -26,14 +21,17 @@ type sendFileResponseWriter struct {
 	req      *http.Request
 }
 
-func NewSendFileResponseWriter(rw http.ResponseWriter, req *http.Request) sendFileResponseWriter {
-	s := sendFileResponseWriter{
-		rw:  rw,
-		req: req,
-	}
-	// Advertise to upstream (Rails) that we support X-Sendfile
-	req.Header.Set("X-Sendfile-Type", "X-Sendfile")
-	return s
+func SendFile(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		s := &sendFileResponseWriter{
+			rw:  rw,
+			req: req,
+		}
+		// Advertise to upstream (Rails) that we support X-Sendfile
+		req.Header.Set("X-Sendfile-Type", "X-Sendfile")
+		defer s.Flush()
+		h.ServeHTTP(s, req)
+	})
 }
 
 func (s *sendFileResponseWriter) Header() http.Header {
@@ -68,12 +66,6 @@ func (s *sendFileResponseWriter) WriteHeader(status int) {
 
 		// Serve the file
 		sendFileFromDisk(s.rw, s.req, file)
-		return
-	}
-	if sendData := s.Header().Get(sendDataResponseHeader); strings.HasPrefix(sendData, git.SendBlobPrefix) {
-		s.Header().Del(sendDataResponseHeader)
-		s.hijacked = true
-		git.SendBlob(s.rw, s.req, sendData)
 		return
 	}
 

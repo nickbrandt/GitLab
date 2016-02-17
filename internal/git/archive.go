@@ -5,8 +5,8 @@ In this file we handle 'git archive' downloads
 package git
 
 import (
-	"../api"
 	"../helper"
+	"../senddata"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -20,11 +20,23 @@ import (
 	"time"
 )
 
-func GetArchive(a *api.API) http.Handler {
-	return repoPreAuthorizeHandler(a, handleGetArchive)
+type archive struct{ senddata.Prefix }
+type archiveParams struct {
+	RepoPath      string
+	ArchivePath   string
+	ArchivePrefix string
+	CommitId      string
 }
 
-func handleGetArchive(w http.ResponseWriter, r *http.Request, a *api.Response) {
+var SendArchive = &archive{"git-archive:"}
+
+func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
+	var params archiveParams
+	if err := a.Unpack(&params, sendData); err != nil {
+		helper.Fail500(w, fmt.Errorf("SendArchive: unpack sendData: %v", err))
+		return
+	}
+
 	var format string
 	urlPath := r.URL.Path
 	switch filepath.Base(urlPath) {
@@ -41,11 +53,11 @@ func handleGetArchive(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		return
 	}
 
-	archiveFilename := path.Base(a.ArchivePath)
+	archiveFilename := path.Base(params.ArchivePath)
 
-	if cachedArchive, err := os.Open(a.ArchivePath); err == nil {
+	if cachedArchive, err := os.Open(params.ArchivePath); err == nil {
 		defer cachedArchive.Close()
-		log.Printf("Serving cached file %q", a.ArchivePath)
+		log.Printf("Serving cached file %q", params.ArchivePath)
 		setArchiveHeaders(w, format, archiveFilename)
 		// Even if somebody deleted the cachedArchive from disk since we opened
 		// the file, Unix file semantics guarantee we can still read from the
@@ -58,7 +70,7 @@ func handleGetArchive(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	// safe. We create the tempfile in the same directory as the final cached
 	// archive we want to create so that we can use an atomic link(2) operation
 	// to finalize the cached archive.
-	tempFile, err := prepareArchiveTempfile(path.Dir(a.ArchivePath), archiveFilename)
+	tempFile, err := prepareArchiveTempfile(path.Dir(params.ArchivePath), archiveFilename)
 	if err != nil {
 		helper.Fail500(w, fmt.Errorf("handleGetArchive: create tempfile: %v", err))
 		return
@@ -68,7 +80,7 @@ func handleGetArchive(w http.ResponseWriter, r *http.Request, a *api.Response) {
 
 	compressCmd, archiveFormat := parseArchiveFormat(format)
 
-	archiveCmd := gitCommand("", "git", "--git-dir="+a.RepoPath, "archive", "--format="+archiveFormat, "--prefix="+a.ArchivePrefix+"/", a.CommitId)
+	archiveCmd := gitCommand("", "git", "--git-dir="+params.RepoPath, "archive", "--format="+archiveFormat, "--prefix="+params.ArchivePrefix+"/", params.CommitId)
 	archiveStdout, err := archiveCmd.StdoutPipe()
 	if err != nil {
 		helper.Fail500(w, fmt.Errorf("handleGetArchive: archive stdout: %v", err))
@@ -125,13 +137,14 @@ func handleGetArchive(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		}
 	}
 
-	if err := finalizeCachedArchive(tempFile, a.ArchivePath); err != nil {
+	if err := finalizeCachedArchive(tempFile, params.ArchivePath); err != nil {
 		helper.LogError(fmt.Errorf("handleGetArchive: finalize cached archive: %v", err))
 		return
 	}
 }
 
 func setArchiveHeaders(w http.ResponseWriter, format string, archiveFilename string) {
+	w.Header().Del("Content-Length")
 	w.Header().Add("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, archiveFilename))
 	if format == "zip" {
 		w.Header().Add("Content-Type", "application/zip")

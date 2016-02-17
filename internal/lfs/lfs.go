@@ -7,7 +7,6 @@ package lfs
 import (
 	"../api"
 	"../helper"
-	"../proxy"
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
@@ -20,8 +19,8 @@ import (
 	"path/filepath"
 )
 
-func PutStore(a *api.API, p *proxy.Proxy) http.Handler {
-	return lfsAuthorizeHandler(a, handleStoreLfsObject(p))
+func PutStore(a *api.API, h http.Handler) http.Handler {
+	return lfsAuthorizeHandler(a, handleStoreLfsObject(h))
 }
 
 func lfsAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.Handler {

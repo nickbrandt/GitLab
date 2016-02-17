@@ -38,15 +38,6 @@ type Response struct {
 	// RepoPath is the full path on disk to the Git repository the request is
 	// about
 	RepoPath string
-	// ArchivePath is the full path where we should find/create a cached copy
-	// of a requested archive
-	ArchivePath string
-	// ArchivePrefix is used to put extracted archive contents in a
-	// subdirectory
-	ArchivePrefix string
-	// CommitId is used do prevent race conditions between the 'time of check'
-	// in the GitLab Rails app and the 'time of use' in gitlab-workhorse.
-	CommitId string
 	// StoreLFSPath is provided by the GitLab Rails application
 	// to mark where the tmp file should be placed
 	StoreLFSPath string

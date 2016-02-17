@@ -2,28 +2,25 @@ package git
 
 import (
 	"../helper"
-	"encoding/base64"
-	"encoding/json"
+	"../senddata"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"strings"
 )
 
-type blobParams struct {
-	RepoPath string
-	BlobId   string
-}
+type blob struct{ senddata.Prefix }
+type blobParams struct{ RepoPath, BlobId string }
 
-const SendBlobPrefix = "git-blob:"
+var SendBlob = &blob{"git-blob:"}
 
-func SendBlob(w http.ResponseWriter, r *http.Request, sendData string) {
-	params, err := unpackSendData(sendData)
-	if err != nil {
+func (b *blob) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
+	var params blobParams
+	if err := b.Unpack(&params, sendData); err != nil {
 		helper.Fail500(w, fmt.Errorf("SendBlob: unpack sendData: %v", err))
 		return
 	}
+
 	log.Printf("SendBlob: sending %q for %q", params.BlobId, r.URL.Path)
 
 	gitShowCmd := gitCommand("", "git", "--git-dir="+params.RepoPath, "cat-file", "blob", params.BlobId)
@@ -48,16 +45,4 @@ func SendBlob(w http.ResponseWriter, r *http.Request, sendData string) {
 		helper.LogError(fmt.Errorf("SendBlob: wait for git cat-file: %v", err))
 		return
 	}
-}
-
-func unpackSendData(sendData string) (*blobParams, error) {
-	jsonBytes, err := base64.URLEncoding.DecodeString(strings.TrimPrefix(sendData, SendBlobPrefix))
-	if err != nil {
-		return nil, err
-	}
-	result := &blobParams{}
-	if err := json.Unmarshal([]byte(jsonBytes), result); err != nil {
-		return nil, err
-	}
-	return result, nil
 }

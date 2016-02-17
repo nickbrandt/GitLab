@@ -6,6 +6,8 @@ import (
 	"../git"
 	"../lfs"
 	proxypkg "../proxy"
+	"../senddata"
+	"../sendfile"
 	"../staticpages"
 	"net/http"
 	"regexp"
@@ -37,10 +39,14 @@ func (u *Upstream) configureRoutes() {
 		u.RoundTripper,
 	)
 	static := &staticpages.Static{u.DocumentRoot}
-	proxy := proxypkg.NewProxy(
-		u.Backend,
-		u.Version,
-		u.RoundTripper,
+	proxy := senddata.SendData(
+		sendfile.SendFile(proxypkg.NewProxy(
+			u.Backend,
+			u.Version,
+			u.RoundTripper,
+		)),
+		git.SendArchive,
+		git.SendBlob,
 	)
 
 	u.Routes = []route{
@@ -49,20 +55,6 @@ func (u *Upstream) configureRoutes() {
 		route{"POST", regexp.MustCompile(gitProjectPattern + `git-upload-pack\z`), contentEncodingHandler(git.PostRPC(api))},
 		route{"POST", regexp.MustCompile(gitProjectPattern + `git-receive-pack\z`), contentEncodingHandler(git.PostRPC(api))},
 		route{"PUT", regexp.MustCompile(gitProjectPattern + `gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfs.PutStore(api, proxy)},
-
-		// Repository Archive
-		route{"GET", regexp.MustCompile(projectPattern + `repository/archive\z`), git.GetArchive(api)},
-		route{"GET", regexp.MustCompile(projectPattern + `repository/archive.zip\z`), git.GetArchive(api)},
-		route{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar\z`), git.GetArchive(api)},
-		route{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar.gz\z`), git.GetArchive(api)},
-		route{"GET", regexp.MustCompile(projectPattern + `repository/archive.tar.bz2\z`), git.GetArchive(api)},
-
-		// Repository Archive API
-		route{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive\z`), git.GetArchive(api)},
-		route{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.zip\z`), git.GetArchive(api)},
-		route{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar\z`), git.GetArchive(api)},
-		route{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.gz\z`), git.GetArchive(api)},
-		route{"GET", regexp.MustCompile(projectsAPIPattern + `repository/archive.tar.bz2\z`), git.GetArchive(api)},
 
 		// CI Artifacts
 		route{"GET", regexp.MustCompile(projectPattern + `builds/[0-9]+/artifacts/file/`), contentEncodingHandler(artifacts.DownloadArtifact(api))},
