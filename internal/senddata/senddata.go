@@ -42,26 +42,27 @@ func (s *sendDataResponseWriter) WriteHeader(status int) {
 	if s.status != 0 {
 		return
 	}
-
 	s.status = status
-	if s.status != http.StatusOK {
-		s.rw.WriteHeader(s.status)
+
+	if s.status == http.StatusOK && s.tryInject() {
 		return
 	}
 
+	s.rw.WriteHeader(s.status)
+}
+
+func (s *sendDataResponseWriter) tryInject() bool {
 	if header := s.Header().Get(HeaderKey); header != "" {
 		s.Header().Del(HeaderKey)
 		for _, injecter := range s.injecters {
 			if injecter.Match(header) {
 				s.hijacked = true
 				injecter.Inject(s.rw, s.req, header)
-				return
+				return true
 			}
 		}
 	}
-
-	s.rw.WriteHeader(s.status)
-	return
+	return false
 }
 
 func (s *sendDataResponseWriter) Flush() {
