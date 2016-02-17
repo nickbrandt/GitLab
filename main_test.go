@@ -563,8 +563,6 @@ func TestGetGitBlob(t *testing.T) {
 		responseJSON := fmt.Sprintf(`{"RepoPath":"%s","BlobId":"%s"}`, path.Join(testRepoRoot, testRepo), blobId)
 		encodedJSON := base64.StdEncoding.EncodeToString([]byte(responseJSON))
 		w.Header().Set(headerKey, "git-blob:"+encodedJSON)
-		// Prevent the Go HTTP server from setting the Content-Length to 0.
-		w.Header().Set("Transfer-Encoding", "chunked")
 		if _, err := fmt.Fprintf(w, "GNU General Public License"); err != nil {
 			t.Fatal(err)
 		}

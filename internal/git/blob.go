@@ -35,6 +35,8 @@ func (b *blob) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
 	}
 	defer helper.CleanUpProcessGroup(gitShowCmd)
 
+	// Ignore incorrect Content-Length that may have been set by Rails
+	w.Header().Del("Content-Length")
 	if _, err := io.Copy(w, stdout); err != nil {
 		helper.LogError(fmt.Errorf("SendBlob: copy git cat-file stdout: %v", err))
 		return

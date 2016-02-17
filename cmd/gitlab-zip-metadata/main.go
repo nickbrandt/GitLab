@@ -23,7 +23,7 @@ func main() {
 	}
 
 	if len(os.Args) != 2 {
-		fmt.Fprintf(os.Stderr, "Usage: %s FILE.ZIP", progName)
+		fmt.Fprintf(os.Stderr, "Usage: %s FILE.ZIP\n", progName)
 		os.Exit(1)
 	}
 	if err := zipartifacts.GenerateZipMetadataFromFile(os.Args[1], os.Stdout); err != nil {
