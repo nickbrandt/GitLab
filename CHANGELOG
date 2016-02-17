@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+0.6.5
+
+Inject 'git archive' data the same way as Git blob data.
+
 0.6.4
 
 Increase default ProxyHeadersTimeout to 5 minutes. Fix injecting raw
