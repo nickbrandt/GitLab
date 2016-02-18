@@ -70,42 +70,21 @@ make install PREFIX=/foo
 
 ## Tests
 
+Run the tests with:
+
 ```
 make clean test
 ```
 
-## Try it out
+### Coverage / what to test
 
-You can try out the Git server without authentication as follows:
+Each feature in gitlab-workhorse should have an integration test that
+verifies that the feature 'kicks in' on the right requests and leaves
+other requests unaffected. It is better to also have package-level tests
+for specific behavior but the high-level integration tests should have
+the first priority during development.
 
-```
-# Start a fake auth backend that allows everything/everybody
-make test/data/test.git
-go run support/fake-auth-backend.go ~+/test/data/test.git &
-# Start gitlab-workhorse
-make
-./gitlab-workhorse
-```
-
-Now you can try things like:
-
-```
-git clone http://localhost:8181/test.git
-curl -JO http://localhost:8181/test/repository/archive.zip
-```
-
-## Example request flow
-
-- start POST repo.git/git-receive-pack to NGINX
-- ..start POST repo.git/git-receive-pack to gitlab-workhorse
-- ....start POST repo.git/git-receive-pack to Unicorn for auth
-- ....end POST to Unicorn for auth
-- ....start git-receive-pack process from gitlab-workhorse
-- ......start POST /api/v3/internal/allowed to Unicorn from Git hook (check protected branches)
-- ......end POST to Unicorn from Git hook
-- ....end git-receive-pack process
-- ..end POST to gitlab-workhorse
-- end POST to NGINX
+It is OK if a feature is only covered by integration tests.
 
 ## License
 
