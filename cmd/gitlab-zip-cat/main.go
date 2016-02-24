@@ -25,7 +25,7 @@ func main() {
 	}
 
 	if len(os.Args) != 3 {
-		fmt.Fprintf(os.Stderr, "Usage: %s FILE.ZIP ENTRY", progName)
+		fmt.Fprintf(os.Stderr, "Usage: %s FILE.ZIP ENTRY\n", progName)
 		os.Exit(1)
 	}
 
