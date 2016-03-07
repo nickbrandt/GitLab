@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 )
 
 type blob struct{ senddata.Prefix }
@@ -23,10 +24,16 @@ func (b *blob) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
 
 	log.Printf("SendBlob: sending %q for %q", params.BlobId, r.URL.Path)
 
+	sizeOutput, err := gitCommand("", "git", "--git-dir="+params.RepoPath, "cat-file", "-s", params.BlobId).Output()
+	if err != nil {
+		helper.Fail500(w, fmt.Errorf("SendBlob: get blob size: %v", err))
+		return
+	}
+
 	gitShowCmd := gitCommand("", "git", "--git-dir="+params.RepoPath, "cat-file", "blob", params.BlobId)
 	stdout, err := gitShowCmd.StdoutPipe()
 	if err != nil {
-		helper.Fail500(w, fmt.Errorf("SendBlob: git  stdout: %v", err))
+		helper.Fail500(w, fmt.Errorf("SendBlob: git cat-file stdout: %v", err))
 		return
 	}
 	if err := gitShowCmd.Start(); err != nil {
@@ -35,8 +42,7 @@ func (b *blob) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
 	}
 	defer helper.CleanUpProcessGroup(gitShowCmd)
 
-	// Ignore incorrect Content-Length that may have been set by Rails
-	w.Header().Del("Content-Length")
+	w.Header().Set("Content-Length", strings.TrimSpace(string(sizeOutput)))
 	if _, err := io.Copy(w, stdout); err != nil {
 		helper.LogError(fmt.Errorf("SendBlob: copy git cat-file stdout: %v", err))
 		return
