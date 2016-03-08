@@ -590,6 +590,9 @@ func TestGetGitBlob(t *testing.T) {
 	if len(body) != blobLength {
 		t.Fatalf("Expected body of %d bytes, got %d", blobLength, len(body))
 	}
+	if cl := resp.Header.Get("Content-Length"); cl != fmt.Sprintf("%d", blobLength) {
+		t.Fatalf("Expected Content-Length %v, got %q", blobLength, cl)
+	}
 	if !strings.HasPrefix(string(body), "The MIT License (MIT)") {
 		t.Fatalf("Expected MIT license, got %q", body)
 	}
