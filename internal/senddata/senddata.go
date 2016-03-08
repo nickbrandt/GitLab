@@ -48,6 +48,7 @@ func (s *sendDataResponseWriter) WriteHeader(status int) {
 		return
 	}
 
+	s.Header().Del(HeaderKey)
 	s.rw.WriteHeader(s.status)
 }
 
