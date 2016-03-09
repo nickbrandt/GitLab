@@ -34,7 +34,7 @@ func NewResponseWriter(w http.ResponseWriter) *ResponseWriter {
 }
 
 func (rw *ResponseWriter) Write(buf []byte) (int, error) {
-	if !rw.flushed && len(buf) <= rw.cap-rw.bufWritten {
+	if !rw.flushed && len(buf)+rw.bufWritten <= rw.cap {
 		n, err := rw.buffer.Write(buf)
 		rw.bufWritten += n
 		return n, err
