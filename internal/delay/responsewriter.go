@@ -71,5 +71,6 @@ func (rw *ResponseWriter) Flush() error {
 	}
 
 	_, err := io.Copy(rw.writer, rw.buffer)
+	rw.buffer = nil // "Release" the buffer for GC
 	return err
 }
