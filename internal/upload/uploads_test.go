@@ -1,12 +1,12 @@
 package upload
 
 import (
-	"../helper"
-	"../proxy"
-	"../testhelper"
 	"bytes"
 	"errors"
 	"fmt"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 	"io"
 	"io/ioutil"
 	"mime/multipart"

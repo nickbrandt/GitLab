@@ -7,10 +7,10 @@ In this file we handle request routing and interaction with the authBackend.
 package upstream
 
 import (
-	"../badgateway"
-	"../helper"
-	"../urlprefix"
 	"fmt"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/urlprefix"
 	"net/http"
 	"net/url"
 	"strings"

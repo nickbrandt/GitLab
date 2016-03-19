@@ -1,8 +1,8 @@
 package staticpages
 
 import (
-	"../helper"
-	"../urlprefix"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/urlprefix"
 	"log"
 	"net/http"
 	"os"

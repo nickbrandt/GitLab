@@ -1,8 +1,8 @@
 package staticpages
 
 import (
-	"../helper"
 	"fmt"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"io/ioutil"
 	"log"
 	"net/http"

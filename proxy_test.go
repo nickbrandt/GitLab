@@ -1,12 +1,12 @@
 package main
 
 import (
-	"./internal/badgateway"
-	"./internal/helper"
-	"./internal/proxy"
-	"./internal/testhelper"
 	"bytes"
 	"fmt"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 	"io"
 	"net"
 	"net/http"

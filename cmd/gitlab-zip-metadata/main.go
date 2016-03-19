@@ -1,9 +1,9 @@
 package main
 
 import (
-	"../../internal/zipartifacts"
 	"flag"
 	"fmt"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 	"os"
 )
 

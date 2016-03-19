@@ -1,9 +1,9 @@
 package staticpages
 
 import (
-	"../testhelper"
 	"bytes"
 	"compress/gzip"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"

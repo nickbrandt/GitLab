@@ -5,9 +5,9 @@ In this file we handle 'git archive' downloads
 package git
 
 import (
-	"../helper"
-	"../senddata"
 	"fmt"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 	"io"
 	"io/ioutil"
 	"log"

@@ -1,13 +1,13 @@
 package artifacts
 
 import (
-	"../api"
-	"../helper"
-	"../testhelper"
 	"archive/zip"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"

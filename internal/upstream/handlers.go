@@ -1,9 +1,9 @@
 package upstream
 
 import (
-	"../helper"
 	"compress/gzip"
 	"fmt"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"io"
 	"net/http"
 )

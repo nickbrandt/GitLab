@@ -1,16 +1,16 @@
 package artifacts
 
 import (
-	"../api"
-	"../helper"
-	"../proxy"
-	"../testhelper"
-	"../zipartifacts"
 	"archive/zip"
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 	"io"
 	"io/ioutil"
 	"mime/multipart"

@@ -1,9 +1,9 @@
 package upload
 
 import (
-	"../helper"
 	"bytes"
 	"fmt"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"io"
 	"io/ioutil"
 	"mime/multipart"

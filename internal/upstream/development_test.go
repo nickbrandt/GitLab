@@ -1,7 +1,7 @@
 package upstream
 
 import (
-	"../testhelper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 	"net/http"
 	"net/http/httptest"
 	"testing"

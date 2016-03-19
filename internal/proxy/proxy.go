@@ -1,8 +1,8 @@
 package proxy
 
 import (
-	"../badgateway"
-	"../helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"net/http"
 	"net/http/httputil"
 	"net/url"

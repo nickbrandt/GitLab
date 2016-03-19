@@ -1,9 +1,9 @@
 package git
 
 import (
-	"../helper"
-	"../senddata"
 	"fmt"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 	"io"
 	"log"
 	"net/http"

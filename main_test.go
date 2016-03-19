@@ -1,14 +1,14 @@
 package main
 
 import (
-	"./internal/api"
-	"./internal/helper"
-	"./internal/testhelper"
-	"./internal/upstream"
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream"
 	"io"
 	"io/ioutil"
 	"log"

@@ -5,13 +5,13 @@ In this file we handle git lfs objects downloads and uploads
 package lfs
 
 import (
-	"../api"
-	"../helper"
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"io"
 	"io/ioutil"
 	"net/http"

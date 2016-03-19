@@ -1,12 +1,12 @@
 package artifacts
 
 import (
-	"../api"
-	"../helper"
-	"../zipartifacts"
 	"bufio"
 	"errors"
 	"fmt"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 	"io"
 	"mime"
 	"net/http"

@@ -5,11 +5,11 @@ In this file we handle the Git 'smart HTTP' protocol
 package git
 
 import (
-	"../api"
-	"../delay"
-	"../helper"
 	"errors"
 	"fmt"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/delay"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"io"
 	"log"
 	"net/http"
