@@ -21,8 +21,7 @@ install: gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata
 
 _build:
 	mkdir -p $@/src/${PKG}
-	tar -cf - --exclude $@ --exclude .git . | \
-	  (cd $@/src/${PKG} && tar -xf -)
+	tar -cf - --exclude $@ --exclude .git . | (cd $@/src/${PKG} && tar -xf -)
 	touch $@
 
 .PHONY: test
