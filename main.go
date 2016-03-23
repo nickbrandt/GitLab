@@ -16,7 +16,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream"
 	"log"
 	"net"
 	"net/http"
@@ -24,6 +23,8 @@ import (
 	"os"
 	"syscall"
 	"time"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream"
 )
 
 // Current version of GitLab Workhorse

@@ -6,11 +6,6 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -18,6 +13,12 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 )
 
 func testArtifactsUploadServer(t *testing.T, tempPath string) *httptest.Server {

@@ -7,9 +7,6 @@ package git
 import (
 	"errors"
 	"fmt"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/delay"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"io"
 	"log"
 	"net/http"
@@ -17,6 +14,10 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/delay"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
 func GetInfoRefs(a *api.API) http.Handler {

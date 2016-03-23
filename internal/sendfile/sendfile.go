@@ -7,9 +7,10 @@ via the X-Sendfile mechanism. All that is needed in the Rails code is the
 package sendfile
 
 import (
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"log"
 	"net/http"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
 const sendFileResponseHeader = "X-Sendfile"

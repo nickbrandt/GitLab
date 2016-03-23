@@ -3,8 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 	"os"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 )
 
 const progName = "gitlab-zip-metadata"

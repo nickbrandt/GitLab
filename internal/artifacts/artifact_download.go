@@ -4,9 +4,6 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 	"io"
 	"mime"
 	"net/http"
@@ -15,6 +12,10 @@ import (
 	"path/filepath"
 	"strings"
 	"syscall"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 )
 
 func detectFileContentType(fileName string) string {

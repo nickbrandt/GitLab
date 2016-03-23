@@ -3,11 +3,12 @@ package badgateway
 import (
 	"bytes"
 	"fmt"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"time"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
 // Values from http.DefaultTransport

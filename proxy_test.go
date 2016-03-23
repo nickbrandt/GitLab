@@ -3,10 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 	"io"
 	"net"
 	"net/http"
@@ -14,6 +10,11 @@ import (
 	"regexp"
 	"testing"
 	"time"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
 
 func newProxy(url string, rt *badgateway.RoundTripper) *proxy.Proxy {

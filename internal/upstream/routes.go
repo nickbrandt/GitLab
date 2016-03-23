@@ -1,6 +1,9 @@
 package upstream
 
 import (
+	"net/http"
+	"regexp"
+
 	apipkg "gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/artifacts"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/git"
@@ -9,8 +12,6 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/sendfile"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/staticpages"
-	"net/http"
-	"regexp"
 )
 
 type route struct {

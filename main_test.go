@@ -5,10 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream"
 	"io"
 	"io/ioutil"
 	"log"
@@ -22,6 +18,11 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream"
 )
 
 const scratchDir = "testdata/scratch"

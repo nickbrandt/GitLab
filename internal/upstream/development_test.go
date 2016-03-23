@@ -1,10 +1,11 @@
 package upstream
 
 import (
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
 
 func TestDevelopmentModeEnabled(t *testing.T) {

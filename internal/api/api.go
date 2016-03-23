@@ -3,13 +3,14 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
 type API struct {

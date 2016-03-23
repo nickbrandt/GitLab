@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"compress/gzip"
 	"fmt"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
 
 func TestGzipEncoding(t *testing.T) {

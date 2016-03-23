@@ -6,8 +6,6 @@ package git
 
 import (
 	"fmt"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 	"io"
 	"io/ioutil"
 	"log"
@@ -18,6 +16,9 @@ import (
 	"path/filepath"
 	"syscall"
 	"time"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 )
 
 type archive struct{ senddata.Prefix }

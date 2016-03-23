@@ -2,13 +2,14 @@ package staticpages
 
 import (
 	"fmt"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
 
 func TestIfErrorPageIsPresented(t *testing.T) {

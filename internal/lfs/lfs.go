@@ -10,13 +10,14 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
 func PutStore(a *api.API, h http.Handler) http.Handler {

@@ -3,12 +3,13 @@ package upload
 import (
 	"bytes"
 	"fmt"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
 type MultipartFormProcessor interface {
