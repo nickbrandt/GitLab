@@ -52,6 +52,6 @@ clean:	clean-workhorse clean-build
 clean-workhorse:
 	rm -f gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata
 
-.PhONY:	clean-build
+.PHONY:	clean-build
 clean-build:
 	rm -rf _build
