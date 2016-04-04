@@ -1,7 +1,7 @@
 PREFIX=/usr/local
 VERSION=$(shell git describe)-$(shell date -u +%Y%m%d.%H%M%S)
-GOPATH=$(shell pwd)/_build
-GOBUILD=GOPATH=${GOPATH} go build -ldflags "-X main.Version=${VERSION}"
+export GOPATH=$(shell pwd)/_build
+GOBUILD=go build -ldflags "-X main.Version=${VERSION}"
 PKG=gitlab.com/gitlab-org/gitlab-workhorse
 
 all: clean-build gitlab-zip-cat gitlab-zip-metadata gitlab-workhorse
@@ -26,8 +26,8 @@ _build:
 
 .PHONY: test
 test: testdata/data/group/test.git clean-build clean-workhorse all
-	GOPATH=${GOPATH} go fmt ${PKG}/... | awk '{ print } END { if (NR > 0) { print "Please run go fmt"; exit 1 } }'
-	GOPATH=${GOPATH} support/path go test ${PKG}/...
+	go fmt ${PKG}/... | awk '{ print } END { if (NR > 0) { print "Please run go fmt"; exit 1 } }'
+	support/path go test ${PKG}/...
 	@echo SUCCESS
 
 coverage: testdata/data/group/test.git
