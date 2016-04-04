@@ -1,16 +1,17 @@
 package upstream
 
 import (
-	apipkg "../api"
-	"../artifacts"
-	"../git"
-	"../lfs"
-	proxypkg "../proxy"
-	"../senddata"
-	"../sendfile"
-	"../staticpages"
 	"net/http"
 	"regexp"
+
+	apipkg "gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/artifacts"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/git"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/lfs"
+	proxypkg "gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/sendfile"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/staticpages"
 )
 
 type route struct {

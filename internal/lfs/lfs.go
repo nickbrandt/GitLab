@@ -5,8 +5,6 @@ In this file we handle git lfs objects downloads and uploads
 package lfs
 
 import (
-	"../api"
-	"../helper"
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
@@ -17,6 +15,9 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
 func PutStore(a *api.API, h http.Handler) http.Handler {

@@ -1,12 +1,13 @@
 package main
 
 import (
-	"../../internal/zipartifacts"
 	"archive/zip"
 	"flag"
 	"fmt"
 	"io"
 	"os"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 )
 
 const progName = "gitlab-zip-cat"

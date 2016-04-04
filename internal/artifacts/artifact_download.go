@@ -1,9 +1,6 @@
 package artifacts
 
 import (
-	"../api"
-	"../helper"
-	"../zipartifacts"
 	"bufio"
 	"errors"
 	"fmt"
@@ -15,6 +12,10 @@ import (
 	"path/filepath"
 	"strings"
 	"syscall"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 )
 
 func detectFileContentType(fileName string) string {

@@ -1,11 +1,12 @@
 package upstream
 
 import (
-	"../helper"
 	"compress/gzip"
 	"fmt"
 	"io"
 	"net/http"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
 func contentEncodingHandler(h http.Handler) http.Handler {

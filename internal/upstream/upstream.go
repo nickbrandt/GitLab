@@ -7,14 +7,15 @@ In this file we handle request routing and interaction with the authBackend.
 package upstream
 
 import (
-	"../badgateway"
-	"../helper"
-	"../urlprefix"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/urlprefix"
 )
 
 var DefaultBackend = helper.URLMustParse("http://localhost:8080")

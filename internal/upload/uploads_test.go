@@ -1,9 +1,6 @@
 package upload
 
 import (
-	"../helper"
-	"../proxy"
-	"../testhelper"
 	"bytes"
 	"errors"
 	"fmt"
@@ -16,6 +13,10 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
 
 var nilHandler = http.HandlerFunc(func(http.ResponseWriter, *http.Request) {})

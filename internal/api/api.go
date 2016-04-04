@@ -1,8 +1,6 @@
 package api
 
 import (
-	"../badgateway"
-	"../helper"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,6 +8,9 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
 type API struct {

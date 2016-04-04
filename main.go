@@ -14,7 +14,6 @@ In this file we start the web server and hand off to the upstream type.
 package main
 
 import (
-	"./internal/upstream"
 	"flag"
 	"fmt"
 	"log"
@@ -24,6 +23,8 @@ import (
 	"os"
 	"syscall"
 	"time"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream"
 )
 
 // Current version of GitLab Workhorse

@@ -1,10 +1,6 @@
 package artifacts
 
 import (
-	"../api"
-	"../helper"
-	"../upload"
-	"../zipartifacts"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -13,6 +9,11 @@ import (
 	"os"
 	"os/exec"
 	"syscall"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upload"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 )
 
 type artifactsUploadProcessor struct {

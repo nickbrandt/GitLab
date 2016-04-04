@@ -1,12 +1,13 @@
 package staticpages
 
 import (
-	"../helper"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"path/filepath"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
 type errorPageResponseWriter struct {

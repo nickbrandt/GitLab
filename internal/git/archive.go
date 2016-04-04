@@ -5,8 +5,6 @@ In this file we handle 'git archive' downloads
 package git
 
 import (
-	"../helper"
-	"../senddata"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -18,6 +16,9 @@ import (
 	"path/filepath"
 	"syscall"
 	"time"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 )
 
 type archive struct{ senddata.Prefix }

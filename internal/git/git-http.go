@@ -5,9 +5,6 @@ In this file we handle the Git 'smart HTTP' protocol
 package git
 
 import (
-	"../api"
-	"../delay"
-	"../helper"
 	"errors"
 	"fmt"
 	"io"
@@ -17,6 +14,10 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/delay"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
 func GetInfoRefs(a *api.API) http.Handler {

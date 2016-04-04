@@ -4,3 +4,4 @@ testdata/scratch
 testdata/public
 gitlab-zip-cat
 gitlab-zip-metadata
+_build

@@ -1,7 +1,6 @@
 package staticpages
 
 import (
-	"../testhelper"
 	"bytes"
 	"compress/gzip"
 	"io/ioutil"
@@ -10,6 +9,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
 
 func TestServingNonExistingFile(t *testing.T) {

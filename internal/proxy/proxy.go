@@ -1,11 +1,12 @@
 package proxy
 
 import (
-	"../badgateway"
-	"../helper"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
 type Proxy struct {

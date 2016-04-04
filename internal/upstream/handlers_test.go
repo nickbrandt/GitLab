@@ -1,7 +1,6 @@
 package upstream
 
 import (
-	"../testhelper"
 	"bytes"
 	"compress/gzip"
 	"fmt"
@@ -10,6 +9,8 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"testing"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
 
 func TestGzipEncoding(t *testing.T) {

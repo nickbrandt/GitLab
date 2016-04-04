@@ -1,13 +1,14 @@
 package git
 
 import (
-	"../helper"
-	"../senddata"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"strings"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 )
 
 type blob struct{ senddata.Prefix }
