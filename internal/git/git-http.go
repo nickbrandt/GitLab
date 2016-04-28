@@ -16,7 +16,6 @@ import (
 	"strings"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/delay"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
@@ -54,10 +53,7 @@ func repoPreAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.Han
 	}, "")
 }
 
-func handleGetInfoRefs(_w http.ResponseWriter, r *http.Request, a *api.Response) {
-	w := delay.NewResponseWriter(_w)
-	defer w.Flush()
-
+func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	rpc := r.URL.Query().Get("service")
 	if !(rpc == "git-upload-pack" || rpc == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
@@ -82,28 +78,26 @@ func handleGetInfoRefs(_w http.ResponseWriter, r *http.Request, a *api.Response)
 	// Start writing the response
 	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
 	w.Header().Add("Cache-Control", "no-cache")
+	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 	if err := pktLine(w, fmt.Sprintf("# service=%s\n", rpc)); err != nil {
-		helper.Fail500(w, fmt.Errorf("handleGetInfoRefs: pktLine: %v", err))
+		helper.LogError(fmt.Errorf("handleGetInfoRefs: pktLine: %v", err))
 		return
 	}
 	if err := pktFlush(w); err != nil {
-		helper.Fail500(w, fmt.Errorf("handleGetInfoRefs: pktFlush: %v", err))
+		helper.LogError(fmt.Errorf("handleGetInfoRefs: pktFlush: %v", err))
 		return
 	}
 	if _, err := io.Copy(w, stdout); err != nil {
-		helper.Fail500(w, fmt.Errorf("handleGetInfoRefs: copy output of %v: %v", cmd.Args, err))
+		helper.LogError(fmt.Errorf("handleGetInfoRefs: copy output of %v: %v", cmd.Args, err))
 		return
 	}
 	if err := cmd.Wait(); err != nil {
-		helper.Fail500(w, fmt.Errorf("handleGetInfoRefs: wait for %v: %v", cmd.Args, err))
+		helper.LogError(fmt.Errorf("handleGetInfoRefs: wait for %v: %v", cmd.Args, err))
 		return
 	}
 }
 
-func handlePostRPC(_w http.ResponseWriter, r *http.Request, a *api.Response) {
-	w := delay.NewResponseWriter(_w)
-	defer w.Flush()
-
+func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	var err error
 
 	// Get Git action from URL
@@ -149,14 +143,15 @@ func handlePostRPC(_w http.ResponseWriter, r *http.Request, a *api.Response) {
 	// Start writing the response
 	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-result", action))
 	w.Header().Add("Cache-Control", "no-cache")
+	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 
 	// This io.Copy may take a long time, both for Git push and pull.
 	if _, err := io.Copy(w, stdout); err != nil {
-		helper.Fail500(w, fmt.Errorf("handlePostRPC copy output of %v: %v", cmd.Args, err))
+		helper.LogError(fmt.Errorf("handlePostRPC copy output of %v: %v", cmd.Args, err))
 		return
 	}
 	if err := cmd.Wait(); err != nil {
-		helper.Fail500(w, fmt.Errorf("handlePostRPC wait for %v: %v", cmd.Args, err))
+		helper.LogError(fmt.Errorf("handlePostRPC wait for %v: %v", cmd.Args, err))
 		return
 	}
 }
