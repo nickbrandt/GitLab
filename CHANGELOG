@@ -2,6 +2,11 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v0.7.3 (unreleased)
+
+Revert 'buffer Git HTTP responses'. Set default listen socket
+permissions to world read/writeable.
+
 v0.7.2 DO NOT USE
 
 Integrate with GOPATH during development (remove relative imports

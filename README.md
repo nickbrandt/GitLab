@@ -24,7 +24,7 @@ Options:
   -listenNetwork string
     	Listen 'network' (tcp, tcp4, tcp6, unix) (default "tcp")
   -listenUmask int
-    	Umask for Unix socket, default: 022 (default 18)
+    	Umask for Unix socket (default 0)
   -pprofListenAddr string
     	pprof listening address, e.g. 'localhost:6060'
   -proxyHeadersTimeout duration
