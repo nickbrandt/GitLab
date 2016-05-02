@@ -56,6 +56,28 @@ func TestAllowedClone(t *testing.T) {
 	runOrFail(t, logCmd)
 }
 
+func TestAllowedShallowClone(t *testing.T) {
+	// Prepare clone directory
+	if err := os.RemoveAll(scratchDir); err != nil {
+		t.Fatal(err)
+	}
+
+	// Prepare test server and backend
+	ts := testAuthServer(nil, 200, gitOkBody(t))
+	defer ts.Close()
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	// Shallow git clone (depth 1)
+	cloneCmd := exec.Command("git", "clone", "--depth", "1", fmt.Sprintf("%s/%s", ws.URL, testRepo), checkoutDir)
+	runOrFail(t, cloneCmd)
+
+	// We may have cloned an 'empty' repository, 'git log' will fail in it
+	logCmd := exec.Command("git", "log", "-1", "--oneline")
+	logCmd.Dir = checkoutDir
+	runOrFail(t, logCmd)
+}
+
 func TestDeniedClone(t *testing.T) {
 	// Prepare clone directory
 	if err := os.RemoveAll(scratchDir); err != nil {
