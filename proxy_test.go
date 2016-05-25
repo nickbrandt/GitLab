@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"regexp"
+	"strings"
 	"testing"
 	"time"
 
@@ -17,8 +18,10 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
 
+const testVersion = "123"
+
 func newProxy(url string, rt *badgateway.RoundTripper) *proxy.Proxy {
-	return proxy.NewProxy(helper.URLMustParse(url), "123", rt)
+	return proxy.NewProxy(helper.URLMustParse(url), testVersion, rt)
 }
 
 func TestProxyRequest(t *testing.T) {
@@ -29,6 +32,14 @@ func TestProxyRequest(t *testing.T) {
 
 		if r.Header.Get("Custom-Header") != "test" {
 			t.Fatal("Missing custom header")
+		}
+
+		if h := r.Header.Get("Gitlab-Workhorse"); h != testVersion {
+			t.Fatalf("Missing GitLab-Workhorse header: want %q, got %q", testVersion, h)
+		}
+
+		if h := r.Header.Get("Gitlab-Worhorse-Proxy-Start"); !strings.HasPrefix(h, "1") {
+			t.Fatalf("Expect Gitlab-Worhorse-Proxy-Start to start with 1, got %q", h)
 		}
 
 		var body bytes.Buffer

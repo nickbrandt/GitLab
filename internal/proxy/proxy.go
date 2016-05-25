@@ -1,9 +1,11 @@
 package proxy
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"time"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
@@ -34,6 +36,7 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// Set Workhorse version
 	req.Header.Set("Gitlab-Workhorse", p.Version)
+	req.Header.Set("Gitlab-Worhorse-Proxy-Start", fmt.Sprintf("%d", time.Now().UnixNano()))
 
 	p.reverseProxy.ServeHTTP(w, &req)
 }
