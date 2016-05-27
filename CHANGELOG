@@ -2,7 +2,12 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
-v0.7.3 (unreleased)
+v0.7.4
+
+Pass a timestamp when forwarding requests to Rails. Hopefully this
+will give us insight into Unicorn queueing behavior.
+
+v0.7.3
 
 Revert 'buffer Git HTTP responses'. Set default listen socket
 permissions to world read/writeable.
