@@ -610,10 +610,10 @@ func TestGetGitDiff(t *testing.T) {
 		w.Header().Set(headerKey, "git-diff:"+encodedJSON)
 		return
 	})
+	defer ts.Close()
 
-	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
-	defer ts.Close()
+	defer ws.Close()
 
 	resourcePath := "/something"
 	resp, err := http.Get(ws.URL + resourcePath)
@@ -635,6 +635,11 @@ func TestGetGitDiff(t *testing.T) {
 
 	if !strings.HasPrefix(string(body), "diff --git a/README b/README") {
 		t.Fatalf("diff --git a/README b/README, got %q", body)
+	}
+
+	bodyLengthBytes := len(body)
+	if bodyLengthBytes != 155 {
+		t.Fatal("Expected the body to consist of 155 bytes, got %v", bodyLengthBytes)
 	}
 }
 

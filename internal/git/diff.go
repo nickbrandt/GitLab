@@ -28,24 +28,26 @@ func (d *diff) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
 
 	log.Printf("SendDiff: sending diff between %q and %q for %q", params.ShaFrom, params.ShaTo, r.URL.Path)
 
-	gitShowCmd := gitCommand("", "git", "--git-dir="+params.RepoPath, "diff", params.ShaFrom, params.ShaTo)
-	stdout, err := gitShowCmd.StdoutPipe()
+	gitDiffCmd := gitCommand("", "git", "--git-dir="+params.RepoPath, "diff", params.ShaFrom, params.ShaTo)
+	stdout, err := gitDiffCmd.StdoutPipe()
 	if err != nil {
-		helper.Fail500(w, fmt.Errorf("SendDiff: git diff %q %q stdout: %v", params.ShaFrom, params.ShaTo, err))
+		helper.Fail500(w, fmt.Errorf("SendDiff: create stdout pipe: %v", err))
 		return
 	}
-	if err := gitShowCmd.Start(); err != nil {
-		helper.Fail500(w, fmt.Errorf("SendDiff: git diff %q %q stdout: %v", params.ShaFrom, params.ShaTo, err))
-		return
-	}
-	defer helper.CleanUpProcessGroup(gitShowCmd)
 
-	if _, err := io.Copy(w, stdout); err != nil {
-		helper.LogError(fmt.Errorf("SendDiff: git diff %q %q stdout: %v", err))
+	if err := gitDiffCmd.Start(); err != nil {
+		helper.Fail500(w, fmt.Errorf("SendDiff: start %v: %v", gitDiffCmd, err))
 		return
 	}
-	if err := gitShowCmd.Wait(); err != nil {
-		helper.LogError(fmt.Errorf("SendDiff: git diff %q %q stdout: %v", err))
+	defer helper.CleanUpProcessGroup(gitDiffCmd)
+
+	w.Header().Del("Content-Length")
+	if _, err := io.Copy(w, stdout); err != nil {
+		helper.LogError(fmt.Errorf("SendDiff: copy %v stdout: %v", gitDiffCmd, err))
+		return
+	}
+	if err := gitDiffCmd.Wait(); err != nil {
+		helper.LogError(fmt.Errorf("SendDiff: wait for %v: %v", gitDiffCmd, err))
 		return
 	}
 }
