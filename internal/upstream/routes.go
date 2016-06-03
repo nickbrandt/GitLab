@@ -48,6 +48,7 @@ func (u *Upstream) configureRoutes() {
 		)),
 		git.SendArchive,
 		git.SendBlob,
+		git.SendDiff,
 	)
 
 	u.Routes = []route{
