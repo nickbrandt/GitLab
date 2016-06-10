@@ -17,7 +17,7 @@ type patchParams struct {
 	ShaTo    string
 }
 
-var SendPatch = &diff{"git-format-patch:"}
+var SendPatch = &patch{"git-format-patch:"}
 
 func (p *patch) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
 	var params patchParams
