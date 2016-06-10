@@ -1,9 +1,7 @@
-before_script:
-  - apt-get update -qq && apt-get install -y curl unzip bzip2
-  - curl -O https://storage.googleapis.com/golang/go1.6.2.linux-amd64.tar.gz
-  - echo 'e40c36ae71756198478624ed1bb4ce17597b3c19d243f3f0899bb5740d56212a  go1.6.2.linux-amd64.tar.gz' | shasum -c -a256 -
-  - rm -rf /usr/local/go && tar -C /usr/local -xzf go1.6.2.linux-amd64.tar.gz
-  - export PATH=/usr/local/go/bin:$PATH
+image: golang:1.6.2
 
 test:
-  script: make clean test
+  script: 
+    - apt-get update -qq && apt-get install -y unzip bzip2
+    - make test
+
