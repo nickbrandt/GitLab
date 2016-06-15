@@ -665,6 +665,51 @@ func TestGetGitDiff(t *testing.T) {
 	}
 }
 
+func TestGetGitPatch(t *testing.T) {
+	fromSha := "be93687618e4b132087f430a4d8fc3a609c9b77c"
+	toSha := "54fcc214b94e78d7a41a9a8fe6d87a5e59500e51"
+	headerKey := http.CanonicalHeaderKey("Gitlab-Workhorse-Send-Data")
+
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
+		responseJSON := fmt.Sprintf(`{"RepoPath":"%s","ShaFrom":"%s","ShaTo":"%s"}`, path.Join(testRepoRoot, testRepo), fromSha, toSha)
+		encodedJSON := base64.StdEncoding.EncodeToString([]byte(responseJSON))
+		w.Header().Set(headerKey, "git-format-patch:"+encodedJSON)
+		return
+	})
+	defer ts.Close()
+
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	resourcePath := "/something"
+	resp, err := http.Get(ws.URL + resourcePath)
+	if err != nil {
+		t.Error(err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		t.Errorf("GET %q: expected 200, got %d", resourcePath, resp.StatusCode)
+	}
+	if len(resp.Header[headerKey]) != 0 {
+		t.Fatalf("Unexpected response header: %s: %q", headerKey, resp.Header.Get(headerKey))
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !strings.HasPrefix(string(body), "From 54fcc214b94e78d7a41a9a8fe6d87a5e59500e51 Mon Sep 17 00:00:00 2001") {
+		t.Fatalf("Expected: From 54fcc214b94e78d7a41a9a8fe6d87a5e59500e51 Mon Sep 17 00:00:00 2001, got: %v", body)
+	}
+
+	bodyLengthBytes := len(body)
+	if bodyLengthBytes != 449 {
+		t.Fatal("Expected the body to consist of 449 bytes, got %v", bodyLengthBytes)
+	}
+}
+
 func setupStaticFile(fpath, content string) error {
 	cwd, err := os.Getwd()
 	if err != nil {
