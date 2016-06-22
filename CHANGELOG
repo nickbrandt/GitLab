@@ -6,6 +6,9 @@ v0.7.6
 
 Add the capability to inject `git format-patch` output.
 
+Add the protocol used (HTTP) to the gitCommand call in order to check
+for restricted protocol access on GitLab's side.
+
 v0.7.5
 
 Add the capability to inject `git diff` output as HTTP response bodies
