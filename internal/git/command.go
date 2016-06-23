@@ -18,6 +18,7 @@ func gitCommand(gl_id string, name string, args ...string) *exec.Cmd {
 		fmt.Sprintf("PATH=%s", os.Getenv("PATH")),
 		fmt.Sprintf("LD_LIBRARY_PATH=%s", os.Getenv("LD_LIBRARY_PATH")),
 		fmt.Sprintf("GL_ID=%s", gl_id),
+		fmt.Sprintf("GL_PROTOCOL=http"),
 	}
 	// If we don't do something with cmd.Stderr, Git errors will be lost
 	cmd.Stderr = os.Stderr
