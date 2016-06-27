@@ -56,7 +56,8 @@ gitlab-workhorse -authBackend http://localhost:8080/gitlab
 ## Installation
 
 To install gitlab-workhorse you need [Go 1.5 or
-newer](https://golang.org/dl).
+newer](https://golang.org/dl) and [GNU
+Make](https://www.gnu.org/software/make/).
 
 To install into `/usr/local/bin` run `make install`.
 
@@ -69,6 +70,9 @@ To install into `/foo/bin` set the PREFIX variable.
 ```
 make install PREFIX=/foo
 ```
+
+If you are not using Linux or OS X you may have to use `gmake` instead
+of `make`.
 
 ## Tests
 
