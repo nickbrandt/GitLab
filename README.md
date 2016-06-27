@@ -71,8 +71,8 @@ To install into `/foo/bin` set the PREFIX variable.
 make install PREFIX=/foo
 ```
 
-If you are not using Linux or OS X you may have to use `gmake` instead
-of `make`.
+On some operating systems, such as FreeBSD, you may have to use
+`gmake` instead of `make`.
 
 ## Tests
 
