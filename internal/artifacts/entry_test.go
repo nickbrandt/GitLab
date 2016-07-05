@@ -14,7 +14,6 @@ import (
 )
 
 func testEntryServer(t *testing.T, archive string, entry string) *httptest.ResponseRecorder {
-
 	mux := http.NewServeMux()
 	mux.HandleFunc("/url/path", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
