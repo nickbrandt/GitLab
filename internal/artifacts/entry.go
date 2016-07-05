@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"mime"
 	"net/http"
 	"os"
@@ -13,10 +14,39 @@ import (
 	"strings"
 	"syscall"
 
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 )
+
+type entry struct{ senddata.Prefix }
+type entryParams struct{ Archive, Entry string }
+
+var SendEntry = &entry{"artifacts-entry:"}
+
+// Artifacts downloader doesn't support ranges when downloading a single file
+func (e *entry) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
+	var params entryParams
+	if err := e.Unpack(&params, sendData); err != nil {
+		helper.Fail500(w, fmt.Errorf("SendEntry: unpack sendData: %v", err))
+		return
+	}
+
+	log.Printf("SendEntry: sending %q for %q", params.Archive, r.URL.Path)
+
+	if params.Archive == "" || params.Entry == "" {
+		helper.Fail500(w, errors.New("SendEntry: Archive or Entry is empty"))
+		return
+	}
+
+	err := unpackFileFromZip(params.Archive, params.Entry, w.Header(), w)
+
+	if os.IsNotExist(err) {
+		http.NotFound(w, r)
+	} else if err != nil {
+		helper.Fail500(w, fmt.Errorf("SendEntry: %v", err))
+	}
+}
 
 func detectFileContentType(fileName string) string {
 	contentType := mime.TypeByExtension(filepath.Ext(fileName))
@@ -79,22 +109,4 @@ func waitCatFile(cmd *exec.Cmd) error {
 	}
 	return fmt.Errorf("wait for %v to finish: %v", cmd.Args, err)
 
-}
-
-// Artifacts downloader doesn't support ranges when downloading a single file
-func DownloadArtifact(myAPI *api.API) http.Handler {
-	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
-		if a.Archive == "" || a.Entry == "" {
-			helper.Fail500(w, errors.New("DownloadArtifact: Archive or Path is empty"))
-			return
-		}
-
-		err := unpackFileFromZip(a.Archive, a.Entry, w.Header(), w)
-		if os.IsNotExist(err) {
-			http.NotFound(w, r)
-			return
-		} else if err != nil {
-			helper.Fail500(w, fmt.Errorf("DownloadArtifact: %v", err))
-		}
-	}, "")
 }
