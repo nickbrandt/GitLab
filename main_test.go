@@ -552,9 +552,9 @@ func TestArtifactsGetSingleFile(t *testing.T) {
 	resourcePath := `/namespace/project/builds/123/artifacts/file/` + fileName
 	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`\A`+resourcePath+`\z`), func(w http.ResponseWriter, r *http.Request) {
 		encodedFilename := base64.StdEncoding.EncodeToString([]byte(fileName))
-		if _, err := fmt.Fprintf(w, `{"Archive":"%s","Entry":"%s"}`, archivePath, encodedFilename); err != nil {
-			t.Fatal(err)
-		}
+		jsonParams := fmt.Sprintf(`{"Archive":"%s","Entry":"%s"}`, archivePath, encodedFilename)
+		data := base64.URLEncoding.EncodeToString([]byte(jsonParams))
+		w.Header().Set("Gitlab-Workhorse-Send-Data", "artifacts-entry:"+data)
 		return
 	})
 	defer ts.Close()

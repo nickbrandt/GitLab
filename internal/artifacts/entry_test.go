@@ -3,7 +3,6 @@ package artifacts
 import (
 	"archive/zip"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -11,40 +10,29 @@ import (
 	"os"
 	"testing"
 
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
 
-func testArtifactDownloadServer(t *testing.T, archive string, entry string) *httptest.Server {
+func testEntryServer(t *testing.T, archive string, entry string) *httptest.ResponseRecorder {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/url/path", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			t.Fatal("Expected GET request")
 		}
 
-		w.Header().Set("Content-Type", "application/json")
+		encodedEntry := base64.StdEncoding.EncodeToString([]byte(entry))
+		jsonParams := fmt.Sprintf(`{"Archive":"%s","Entry":"%s"}`, archive, encodedEntry)
+		data := base64.URLEncoding.EncodeToString([]byte(jsonParams))
 
-		data, err := json.Marshal(&api.Response{
-			Archive: archive,
-			Entry:   base64.StdEncoding.EncodeToString([]byte(entry)),
-		})
-		if err != nil {
-			t.Fatal(err)
-		}
-		w.Write(data)
+		SendEntry.Inject(w, r, data)
 	})
-	return testhelper.TestServerWithHandler(nil, mux.ServeHTTP)
-}
 
-func testDownloadArtifact(t *testing.T, ts *httptest.Server) *httptest.ResponseRecorder {
-	httpRequest, err := http.NewRequest("GET", ts.URL+"/url/path", nil)
+	httpRequest, err := http.NewRequest("GET", "/url/path", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	response := httptest.NewRecorder()
-	apiClient := api.NewAPI(helper.URLMustParse(ts.URL), "123", nil)
-	DownloadArtifact(apiClient).ServeHTTP(response, httpRequest)
+	mux.ServeHTTP(response, httpRequest)
 	return response
 }
 
@@ -65,10 +53,8 @@ func TestDownloadingFromValidArchive(t *testing.T) {
 	fmt.Fprint(fileInArchive, "testtest")
 	archive.Close()
 
-	ts := testArtifactDownloadServer(t, tempFile.Name(), "test.txt")
-	defer ts.Close()
+	response := testEntryServer(t, tempFile.Name(), "test.txt")
 
-	response := testDownloadArtifact(t, ts)
 	testhelper.AssertResponseCode(t, response, 200)
 
 	testhelper.AssertResponseHeader(t, response,
@@ -93,25 +79,16 @@ func TestDownloadingNonExistingFile(t *testing.T) {
 	defer archive.Close()
 	archive.Close()
 
-	ts := testArtifactDownloadServer(t, tempFile.Name(), "test")
-	defer ts.Close()
-
-	response := testDownloadArtifact(t, ts)
+	response := testEntryServer(t, tempFile.Name(), "test")
 	testhelper.AssertResponseCode(t, response, 404)
 }
 
 func TestDownloadingFromInvalidArchive(t *testing.T) {
-	ts := testArtifactDownloadServer(t, "path/to/non/existing/file", "test")
-	defer ts.Close()
-
-	response := testDownloadArtifact(t, ts)
+	response := testEntryServer(t, "path/to/non/existing/file", "test")
 	testhelper.AssertResponseCode(t, response, 404)
 }
 
 func TestIncompleteApiResponse(t *testing.T) {
-	ts := testArtifactDownloadServer(t, "", "")
-	defer ts.Close()
-
-	response := testDownloadArtifact(t, ts)
+	response := testEntryServer(t, "", "")
 	testhelper.AssertResponseCode(t, response, 500)
 }

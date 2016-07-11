@@ -50,6 +50,7 @@ func (u *Upstream) configureRoutes() {
 		git.SendBlob,
 		git.SendDiff,
 		git.SendPatch,
+		artifacts.SendEntry,
 	)
 
 	u.Routes = []route{
@@ -60,7 +61,6 @@ func (u *Upstream) configureRoutes() {
 		route{"PUT", regexp.MustCompile(gitProjectPattern + `gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`), lfs.PutStore(api, proxy)},
 
 		// CI Artifacts
-		route{"GET", regexp.MustCompile(projectPattern + `builds/[0-9]+/artifacts/file/`), contentEncodingHandler(artifacts.DownloadArtifact(api))},
 		route{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), contentEncodingHandler(artifacts.UploadArtifacts(api, proxy))},
 
 		// Explicitly proxy API requests
