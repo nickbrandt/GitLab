@@ -32,7 +32,7 @@ func (e *entry) Inject(w http.ResponseWriter, r *http.Request, sendData string) 
 		return
 	}
 
-	log.Printf("SendEntry: sending %q for %q", params.Archive, r.URL.Path)
+	log.Printf("SendEntry: sending %q from %q for %q", params.Entry, params.Archive, r.URL.Path)
 
 	if params.Archive == "" || params.Entry == "" {
 		helper.Fail500(w, errors.New("SendEntry: Archive or Entry is empty"))
