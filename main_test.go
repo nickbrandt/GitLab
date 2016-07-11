@@ -584,7 +584,7 @@ func TestGetGitBlob(t *testing.T) {
 	headerKey := http.CanonicalHeaderKey("Gitlab-Workhorse-Send-Data")
 	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
 		responseJSON := fmt.Sprintf(`{"RepoPath":"%s","BlobId":"%s"}`, path.Join(testRepoRoot, testRepo), blobId)
-		encodedJSON := base64.StdEncoding.EncodeToString([]byte(responseJSON))
+		encodedJSON := base64.URLEncoding.EncodeToString([]byte(responseJSON))
 		w.Header().Set(headerKey, "git-blob:"+encodedJSON)
 		if _, err := fmt.Fprintf(w, "GNU General Public License"); err != nil {
 			t.Fatal(err)
@@ -628,7 +628,7 @@ func TestGetGitDiff(t *testing.T) {
 
 	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
 		responseJSON := fmt.Sprintf(`{"RepoPath":"%s","ShaFrom":"%s","ShaTo":"%s"}`, path.Join(testRepoRoot, testRepo), fromSha, toSha)
-		encodedJSON := base64.StdEncoding.EncodeToString([]byte(responseJSON))
+		encodedJSON := base64.URLEncoding.EncodeToString([]byte(responseJSON))
 		w.Header().Set(headerKey, "git-diff:"+encodedJSON)
 		return
 	})
@@ -672,7 +672,7 @@ func TestGetGitPatch(t *testing.T) {
 
 	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
 		responseJSON := fmt.Sprintf(`{"RepoPath":"%s","ShaFrom":"%s","ShaTo":"%s"}`, path.Join(testRepoRoot, testRepo), fromSha, toSha)
-		encodedJSON := base64.StdEncoding.EncodeToString([]byte(responseJSON))
+		encodedJSON := base64.URLEncoding.EncodeToString([]byte(responseJSON))
 		w.Header().Set(headerKey, "git-format-patch:"+encodedJSON)
 		return
 	})
@@ -790,7 +790,7 @@ func archiveOKServer(t *testing.T, archiveName string) *httptest.Server {
 		if err != nil {
 			t.Fatal(err)
 		}
-		encodedJSON := base64.StdEncoding.EncodeToString(jsonData)
+		encodedJSON := base64.URLEncoding.EncodeToString(jsonData)
 		w.Header().Set("Gitlab-Workhorse-Send-Data", "git-archive:"+encodedJSON)
 	})
 }
