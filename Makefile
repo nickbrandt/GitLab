@@ -25,24 +25,18 @@ _build:
 	touch $@
 
 .PHONY: test
-test: testdata/data/group/test.git clean-build clean-workhorse all
+test:	clean-build clean-workhorse all
 	go fmt ${PKG}/... | awk '{ print } END { if (NR > 0) { print "Please run go fmt"; exit 1 } }'
-	support/path go test ${PKG}/...
+	_support/path go test ${PKG}/...
 	@echo SUCCESS
 
-coverage: testdata/data/group/test.git
+coverage:
 	go test -cover -coverprofile=test.coverage
 	go tool cover -html=test.coverage -o coverage.html
 	rm -f test.coverage
 
 fmt:
 	go fmt ./...
-
-testdata/data/group/test.git: testdata/data
-	git clone --bare https://gitlab.com/gitlab-org/gitlab-test.git $@
-
-testdata/data:
-	mkdir -p $@
 
 .PHONY: clean
 clean:	clean-workhorse clean-build

@@ -34,6 +34,22 @@ const testProject = "group/test"
 var checkoutDir = path.Join(scratchDir, "test")
 var cacheDir = path.Join(scratchDir, "cache")
 
+func TestMain(m *testing.M) {
+	source := "https://gitlab.com/gitlab-org/gitlab-test.git"
+	clonePath := path.Join(testRepoRoot, testRepo)
+	if _, err := os.Stat(clonePath); err != nil {
+		testCmd := exec.Command("git", "clone", "--bare", source, clonePath)
+		testCmd.Stdout = os.Stdout
+		testCmd.Stderr = os.Stderr
+
+		if err := testCmd.Run(); err != nil {
+			os.Exit(-1)
+		}
+	}
+
+	os.Exit(m.Run())
+}
+
 func TestAllowedClone(t *testing.T) {
 	// Prepare clone directory
 	if err := os.RemoveAll(scratchDir); err != nil {
