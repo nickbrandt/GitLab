@@ -14,6 +14,7 @@ import (
 	"strings"
 	"testing"
 
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
@@ -75,7 +76,7 @@ func TestUploadHandlerForwardingRawData(t *testing.T) {
 
 	response := httptest.NewRecorder()
 
-	handler := proxy.NewProxy(helper.URLMustParse(ts.URL), "123", nil)
+	handler := proxy.NewProxy(helper.URLMustParse(ts.URL), "123", badgateway.TestRoundTripper)
 	HandleFileUploads(response, httpRequest, handler, tempPath, nil)
 	testhelper.AssertResponseCode(t, response, 202)
 	if response.Body.String() != "RESPONSE" {
@@ -149,7 +150,7 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	httpRequest.Header.Set("Content-Type", writer.FormDataContentType())
 	response := httptest.NewRecorder()
 
-	handler := proxy.NewProxy(helper.URLMustParse(ts.URL), "123", nil)
+	handler := proxy.NewProxy(helper.URLMustParse(ts.URL), "123", badgateway.TestRoundTripper)
 	HandleFileUploads(response, httpRequest, handler, tempPath, &testFormProcessor{})
 	testhelper.AssertResponseCode(t, response, 202)
 

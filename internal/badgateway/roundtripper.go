@@ -23,6 +23,8 @@ var DefaultTransport = &http.Transport{
 	TLSHandshakeTimeout: 10 * time.Second,          // from http.DefaultTransport
 }
 
+var TestRoundTripper = NewRoundTripper("", 0)
+
 type RoundTripper struct {
 	Transport *http.Transport
 }

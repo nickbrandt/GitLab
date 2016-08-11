@@ -15,6 +15,7 @@ import (
 	"testing"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
@@ -90,8 +91,8 @@ func testUploadArtifacts(contentType string, body io.Reader, t *testing.T, ts *h
 	}
 	httpRequest.Header.Set("Content-Type", contentType)
 	response := httptest.NewRecorder()
-	apiClient := api.NewAPI(helper.URLMustParse(ts.URL), "123", nil)
-	proxyClient := proxy.NewProxy(helper.URLMustParse(ts.URL), "123", nil)
+	apiClient := api.NewAPI(helper.URLMustParse(ts.URL), "123", badgateway.TestRoundTripper)
+	proxyClient := proxy.NewProxy(helper.URLMustParse(ts.URL), "123", badgateway.TestRoundTripper)
 	UploadArtifacts(apiClient, proxyClient).ServeHTTP(response, httpRequest)
 	return response
 }

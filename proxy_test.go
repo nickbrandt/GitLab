@@ -21,6 +21,9 @@ import (
 const testVersion = "123"
 
 func newProxy(url string, rt *badgateway.RoundTripper) *proxy.Proxy {
+	if rt == nil {
+		rt = badgateway.TestRoundTripper
+	}
 	return proxy.NewProxy(helper.URLMustParse(url), testVersion, rt)
 }
 
