@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"time"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
@@ -23,22 +24,45 @@ var DefaultTransport = &http.Transport{
 	TLSHandshakeTimeout: 10 * time.Second,          // from http.DefaultTransport
 }
 
-var TestRoundTripper = NewRoundTripper("", 0)
-
 type RoundTripper struct {
 	Transport *http.Transport
 }
 
-func NewRoundTripper(socket string, proxyHeadersTimeout time.Duration) *RoundTripper {
+func TestRoundTripper(backend *url.URL) *RoundTripper {
+	return NewRoundTripper(backend, "", 0)
+}
+
+func NewRoundTripper(backend *url.URL, socket string, proxyHeadersTimeout time.Duration) *RoundTripper {
 	tr := *DefaultTransport
 	tr.ResponseHeaderTimeout = proxyHeadersTimeout
 
-	if socket != "" {
+	if backend != nil && socket == "" {
+		address := mustParseAddress(backend.Host, backend.Scheme)
+		tr.Dial = func(_, _ string) (net.Conn, error) {
+			return DefaultDialer.Dial("tcp", address)
+		}
+	} else if socket != "" {
 		tr.Dial = func(_, _ string) (net.Conn, error) {
 			return DefaultDialer.Dial("unix", socket)
 		}
+	} else {
+		panic("backend is nil and socket is empty")
 	}
+
 	return &RoundTripper{Transport: &tr}
+}
+
+func mustParseAddress(address, scheme string) string {
+	if host, port, err := net.SplitHostPort(address); err == nil {
+		return host + ":" + port
+	}
+
+	address = fmt.Sprintf("%s:%s", address, scheme)
+	if host, port, err := net.SplitHostPort(address); err == nil {
+		return host + ":" + port
+	}
+
+	panic("could not parse host/port from  addres / scheme")
 }
 
 func (t *RoundTripper) RoundTrip(r *http.Request) (res *http.Response, err error) {

@@ -21,10 +21,11 @@ import (
 const testVersion = "123"
 
 func newProxy(url string, rt *badgateway.RoundTripper) *proxy.Proxy {
+	parsedURL := helper.URLMustParse(url)
 	if rt == nil {
-		rt = badgateway.TestRoundTripper
+		rt = badgateway.TestRoundTripper(parsedURL)
 	}
-	return proxy.NewProxy(helper.URLMustParse(url), testVersion, rt)
+	return proxy.NewProxy(parsedURL, testVersion, rt)
 }
 
 func TestProxyRequest(t *testing.T) {
