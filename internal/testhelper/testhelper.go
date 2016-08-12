@@ -1,12 +1,25 @@
 package testhelper
 
 import (
+	"errors"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"os/exec"
+	"path"
 	"regexp"
+	"runtime"
 	"testing"
 )
+
+var executables = []string{
+	"gitlab-workhorse",
+	"gitlab-zip-cat",
+	"gitlab-zip-metadata",
+}
 
 func AssertResponseCode(t *testing.T, response *httptest.ResponseRecorder, expectedCode int) {
 	if response.Code != expectedCode {
@@ -42,4 +55,68 @@ func TestServerWithHandler(url *regexp.Regexp, handler http.HandlerFunc) *httpte
 
 		handler(w, r)
 	}))
+}
+
+func BuildExecutables() (func(), error) {
+	_, currentFile, _, ok := runtime.Caller(0)
+	if !ok {
+		return nil, errors.New("BuildExecutables: calling runtime.Caller failed")
+	}
+	rootDir := path.Join(path.Dir(currentFile), "../..")
+
+	// This method will be invoked more than once due to Go test
+	// parallelization. We must use a unique temp directory for each
+	// invokation so that they do not trample each other's builds.
+	testDir, err := ioutil.TempDir("", "gitlab-workhorse-test")
+	if err != nil {
+		return nil, errors.New("could not create temp directory")
+	}
+
+	for _, executable := range executables {
+		utilPath := path.Join(testDir, executable)
+		if err := os.Remove(utilPath); err != nil && !os.IsNotExist(err) {
+			return nil, fmt.Errorf("failed to remove: %v", utilPath)
+		}
+	}
+
+	makeCmd := exec.Command("make", "BUILD_DIR="+testDir)
+	makeCmd.Dir = rootDir
+	makeCmd.Stderr = os.Stderr
+	makeCmd.Stdout = os.Stdout
+	if err := makeCmd.Run(); err != nil {
+		return nil, fmt.Errorf("failed to run %v in %v", makeCmd, rootDir)
+	}
+
+	for _, executable := range executables {
+		utilPath := path.Join(testDir, executable)
+		if _, err := os.Stat(utilPath); err != nil {
+			return nil, fmt.Errorf("could not stat %v", utilPath)
+		}
+	}
+
+	// Try to ensure the list of executables is complete by asking "make" to only build files in the list.
+	cleanArgs := append([]string{"clean-workhorse"}, executables...)
+	cleanArgs = append(cleanArgs, "BUILD_DIR="+testDir)
+	makeCmd = exec.Command("make", cleanArgs...)
+	makeCmd.Dir = rootDir
+	makeCmd.Stderr = os.Stderr
+	makeCmd.Stdout = os.Stdout
+	if err := makeCmd.Run(); err != nil {
+		return nil, fmt.Errorf("failed to run %v in %v", makeCmd, rootDir)
+	}
+
+	oldPath := os.Getenv("PATH")
+	testPath := fmt.Sprintf("%s:%s", testDir, oldPath)
+	for _, setting := range []struct{ key, value string }{
+		{"PATH", testPath},
+	} {
+		if err := os.Setenv(setting.key, setting.value); err != nil {
+			return nil, fmt.Errorf("failed to set %v to %v", setting.key, setting.value)
+		}
+	}
+
+	return func() {
+		os.Setenv("PATH", oldPath)
+		os.RemoveAll(testDir)
+	}, nil
 }

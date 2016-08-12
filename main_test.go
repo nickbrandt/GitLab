@@ -43,11 +43,21 @@ func TestMain(m *testing.M) {
 		testCmd.Stderr = os.Stderr
 
 		if err := testCmd.Run(); err != nil {
+			log.Printf("Test setup: failed to run %v", testCmd)
 			os.Exit(-1)
 		}
 	}
 
-	os.Exit(m.Run())
+	cleanup, err := testhelper.BuildExecutables()
+	if err != nil {
+		log.Printf("Test setup: failed to build executables: %v", err)
+		os.Exit(1)
+	}
+
+	os.Exit(func() int {
+		defer cleanup()
+		return m.Run()
+	}())
 }
 
 func TestAllowedClone(t *testing.T) {

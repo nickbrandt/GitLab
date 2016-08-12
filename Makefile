@@ -1,33 +1,34 @@
 PREFIX=/usr/local
 VERSION=$(shell git describe)-$(shell date -u +%Y%m%d.%H%M%S)
-export GOPATH=$(shell pwd)/_build
+BUILD_DIR = $(shell pwd)
+export GOPATH=${BUILD_DIR}/_build
 GOBUILD=go build -ldflags "-X main.Version=${VERSION}"
 PKG=gitlab.com/gitlab-org/gitlab-workhorse
 
 all: clean-build gitlab-zip-cat gitlab-zip-metadata gitlab-workhorse
 
-gitlab-zip-cat:	_build $(shell find cmd/gitlab-zip-cat/ -name '*.go')
-	${GOBUILD} -o $@ ${PKG}/cmd/$@
+gitlab-zip-cat:	${BUILD_DIR}/_build $(shell find cmd/gitlab-zip-cat/ -name '*.go')
+	${GOBUILD} -o ${BUILD_DIR}/$@ ${PKG}/cmd/$@
 	
-gitlab-zip-metadata:	_build $(shell find cmd/gitlab-zip-metadata/ -name '*.go')
-	${GOBUILD} -o $@ ${PKG}/cmd/$@
+gitlab-zip-metadata:	${BUILD_DIR}/_build $(shell find cmd/gitlab-zip-metadata/ -name '*.go')
+	${GOBUILD} -o ${BUILD_DIR}/$@ ${PKG}/cmd/$@
 
-gitlab-workhorse: _build $(shell find . -name '*.go' | grep -v '^\./_')
-	${GOBUILD} -o $@ ${PKG}
+gitlab-workhorse: ${BUILD_DIR}/_build $(shell find . -name '*.go' | grep -v '^\./_')
+	${GOBUILD} -o ${BUILD_DIR}/$@ ${PKG}
 
 install: gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata
 	mkdir -p $(DESTDIR)${PREFIX}/bin/
-	install gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata ${DESTDIR}${PREFIX}/bin/
+	cd ${BUILD_DIR} && install gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata ${DESTDIR}${PREFIX}/bin/
 
-_build:
+${BUILD_DIR}/_build:
 	mkdir -p $@/src/${PKG}
-	tar -cf - --exclude $@ --exclude .git . | (cd $@/src/${PKG} && tar -xf -)
+	tar -cf - --exclude _build --exclude .git . | (cd $@/src/${PKG} && tar -xf -)
 	touch $@
 
 .PHONY: test
 test:	clean-build clean-workhorse all
 	go fmt ${PKG}/... | awk '{ print } END { if (NR > 0) { print "Please run go fmt"; exit 1 } }'
-	_support/path go test ${PKG}/...
+	go test ${PKG}/...
 	@echo SUCCESS
 
 coverage:
@@ -44,8 +45,8 @@ clean:	clean-workhorse clean-build
 
 .PHONY:	clean-workhorse
 clean-workhorse:
-	rm -f gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata
+	cd ${BUILD_DIR} && rm -f gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata
 
 .PHONY:	clean-build
 clean-build:
-	rm -rf _build
+	rm -rf ${BUILD_DIR}/_build
