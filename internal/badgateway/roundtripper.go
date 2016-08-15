@@ -57,7 +57,7 @@ func mustParseAddress(address, scheme string) string {
 		return host + ":" + port
 	}
 
-	address = fmt.Sprintf("%s:%s", address, scheme)
+	address = address + ":" + scheme
 	if host, port, err := net.SplitHostPort(address); err == nil {
 		return host + ":" + port
 	}
