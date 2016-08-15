@@ -15,12 +15,6 @@ import (
 	"testing"
 )
 
-var executables = []string{
-	"gitlab-workhorse",
-	"gitlab-zip-cat",
-	"gitlab-zip-metadata",
-}
-
 func AssertResponseCode(t *testing.T, response *httptest.ResponseRecorder, expectedCode int) {
 	if response.Code != expectedCode {
 		t.Fatalf("for HTTP request expected to get %d, got %d instead", expectedCode, response.Code)
@@ -72,32 +66,7 @@ func BuildExecutables() (func(), error) {
 		return nil, errors.New("could not create temp directory")
 	}
 
-	for _, executable := range executables {
-		utilPath := path.Join(testDir, executable)
-		if err := os.Remove(utilPath); err != nil && !os.IsNotExist(err) {
-			return nil, fmt.Errorf("failed to remove: %v", utilPath)
-		}
-	}
-
 	makeCmd := exec.Command("make", "BUILD_DIR="+testDir)
-	makeCmd.Dir = rootDir
-	makeCmd.Stderr = os.Stderr
-	makeCmd.Stdout = os.Stdout
-	if err := makeCmd.Run(); err != nil {
-		return nil, fmt.Errorf("failed to run %v in %v", makeCmd, rootDir)
-	}
-
-	for _, executable := range executables {
-		utilPath := path.Join(testDir, executable)
-		if _, err := os.Stat(utilPath); err != nil {
-			return nil, fmt.Errorf("could not stat %v", utilPath)
-		}
-	}
-
-	// Try to ensure the list of executables is complete by asking "make" to only build files in the list.
-	cleanArgs := append([]string{"clean-workhorse"}, executables...)
-	cleanArgs = append(cleanArgs, "BUILD_DIR="+testDir)
-	makeCmd = exec.Command("make", cleanArgs...)
 	makeCmd.Dir = rootDir
 	makeCmd.Stderr = os.Stderr
 	makeCmd.Stdout = os.Stdout
@@ -107,12 +76,8 @@ func BuildExecutables() (func(), error) {
 
 	oldPath := os.Getenv("PATH")
 	testPath := fmt.Sprintf("%s:%s", testDir, oldPath)
-	for _, setting := range []struct{ key, value string }{
-		{"PATH", testPath},
-	} {
-		if err := os.Setenv(setting.key, setting.value); err != nil {
-			return nil, fmt.Errorf("failed to set %v to %v", setting.key, setting.value)
-		}
+	if err := os.Setenv("PATH", testPath); err != nil {
+		return nil, fmt.Errorf("failed to set PATH to %v", testPath)
 	}
 
 	return func() {
