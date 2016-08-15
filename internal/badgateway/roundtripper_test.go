@@ -1,7 +1,6 @@
 package badgateway
 
 import (
-	"log"
 	"testing"
 )
 
@@ -30,7 +29,7 @@ func TestMustParseAddress(t *testing.T) {
 					t.Errorf("expected panic for %v but none occurred", panicExample)
 				}
 			}()
-			log.Print(mustParseAddress(panicExample.address, panicExample.scheme))
+			t.Log(mustParseAddress(panicExample.address, panicExample.scheme))
 		}()
 	}
 }
