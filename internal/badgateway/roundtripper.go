@@ -57,13 +57,11 @@ func mustParseAddress(address, scheme string) string {
 		panic("TLS is not supported for backend connections")
 	}
 
-	if host, port, err := net.SplitHostPort(address); err == nil && host != "" && port != "" {
-		return host + ":" + port
-	}
-
-	address = address + ":" + scheme
-	if host, port, err := net.SplitHostPort(address); err == nil && host != "" && port != "" {
-		return host + ":" + port
+	for _, suffix := range []string{"", ":" + scheme} {
+		address += suffix
+		if host, port, err := net.SplitHostPort(address); err == nil && host != "" && port != "" {
+			return host + ":" + port
+		}
 	}
 
 	panic("could not parse host:port from address and scheme")
