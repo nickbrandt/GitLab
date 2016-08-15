@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v0.7.9
+
+Hard-wire backend host when using TCP.
+
 v0.7.8
 
 Send artifact zip file entries via the 'senddata' mechanism.
