@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
@@ -27,7 +28,8 @@ func runPreAuthorizeHandler(t *testing.T, suffix string, url *regexp.Regexp, api
 	if err != nil {
 		t.Fatal(err)
 	}
-	a := api.NewAPI(helper.URLMustParse(ts.URL), "123", nil)
+	parsedURL := helper.URLMustParse(ts.URL)
+	a := api.NewAPI(parsedURL, "123", badgateway.TestRoundTripper(parsedURL))
 
 	response := httptest.NewRecorder()
 	a.PreAuthorizeHandler(okHandler, suffix).ServeHTTP(response, httpRequest)

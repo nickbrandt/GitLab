@@ -37,11 +37,11 @@ func NewUpstream(backend *url.URL, socket string, version string, documentRoot s
 		Version:         version,
 		DocumentRoot:    documentRoot,
 		DevelopmentMode: developmentMode,
-		RoundTripper:    badgateway.NewRoundTripper(socket, proxyHeadersTimeout),
 	}
 	if backend == nil {
 		up.Backend = DefaultBackend
 	}
+	up.RoundTripper = badgateway.NewRoundTripper(up.Backend, socket, proxyHeadersTimeout)
 	up.configureURLPrefix()
 	up.configureRoutes()
 	return &up

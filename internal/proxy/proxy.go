@@ -21,11 +21,7 @@ func NewProxy(myURL *url.URL, version string, roundTripper *badgateway.RoundTrip
 	u := *myURL // Make a copy of p.URL
 	u.Path = ""
 	p.reverseProxy = httputil.NewSingleHostReverseProxy(&u)
-	if roundTripper != nil {
-		p.reverseProxy.Transport = roundTripper
-	} else {
-		p.reverseProxy.Transport = badgateway.NewRoundTripper("", 0)
-	}
+	p.reverseProxy.Transport = roundTripper
 	return &p
 }
 
