@@ -53,16 +53,20 @@ func NewRoundTripper(backend *url.URL, socket string, proxyHeadersTimeout time.D
 }
 
 func mustParseAddress(address, scheme string) string {
-	if host, port, err := net.SplitHostPort(address); err == nil {
+	if scheme == "https" {
+		panic("TLS is not supported for backend connections")
+	}
+
+	if host, port, err := net.SplitHostPort(address); err == nil && host != "" && port != "" {
 		return host + ":" + port
 	}
 
 	address = address + ":" + scheme
-	if host, port, err := net.SplitHostPort(address); err == nil {
+	if host, port, err := net.SplitHostPort(address); err == nil && host != "" && port != "" {
 		return host + ":" + port
 	}
 
-	panic("could not parse host/port from  addres / scheme")
+	panic("could not parse host:port from address and scheme")
 }
 
 func (t *RoundTripper) RoundTrip(r *http.Request) (res *http.Response, err error) {
