@@ -15,15 +15,20 @@ import (
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upload"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/urlprefix"
 )
 
-var DefaultBackend = helper.URLMustParse("http://localhost:8080")
+var (
+	DefaultBackend         = helper.URLMustParse("http://localhost:8080")
+	requestHeaderBlacklist = []string{
+		upload.RewrittenFieldsHeader,
+	}
+)
 
 type Config struct {
 	Backend             *url.URL
 	Version             string
-	SecretPath          string
 	DocumentRoot        string
 	DevelopmentMode     bool
 	Socket              string
@@ -101,6 +106,10 @@ func (u *Upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 		// says we must return 403 if no matching service is found.
 		helper.HTTPError(w, r, "Forbidden", http.StatusForbidden)
 		return
+	}
+
+	for _, h := range requestHeaderBlacklist {
+		r.Header.Del(h)
 	}
 
 	route.handler.ServeHTTP(w, r)

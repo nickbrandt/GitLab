@@ -10,6 +10,7 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 
 	"github.com/dgrijalva/jwt-go"
@@ -32,7 +33,8 @@ func runPreAuthorizeHandler(t *testing.T, ts *httptest.Server, suffix string, ur
 		t.Fatal(err)
 	}
 	parsedURL := helper.URLMustParse(ts.URL)
-	a := api.NewAPI(parsedURL, "123", testhelper.SecretPath(), badgateway.TestRoundTripper(parsedURL))
+	testhelper.ConfigureSecret()
+	a := api.NewAPI(parsedURL, "123", badgateway.TestRoundTripper(parsedURL))
 
 	response := httptest.NewRecorder()
 	a.PreAuthorizeHandler(okHandler, suffix).ServeHTTP(response, httpRequest)
@@ -86,7 +88,8 @@ func TestPreAuthorizeJWT(t *testing.T) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 			}
-			secretBytes, err := (&api.Secret{Path: testhelper.SecretPath()}).Bytes()
+			testhelper.ConfigureSecret()
+			secretBytes, err := secret.Bytes()
 			if err != nil {
 				return nil, fmt.Errorf("read secret from file: %v", err)
 			}

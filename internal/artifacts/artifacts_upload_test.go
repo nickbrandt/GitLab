@@ -93,7 +93,8 @@ func testUploadArtifacts(contentType string, body io.Reader, t *testing.T, ts *h
 	response := httptest.NewRecorder()
 	parsedURL := helper.URLMustParse(ts.URL)
 	roundTripper := badgateway.TestRoundTripper(parsedURL)
-	apiClient := api.NewAPI(parsedURL, "123", testhelper.SecretPath(), roundTripper)
+	testhelper.ConfigureSecret()
+	apiClient := api.NewAPI(parsedURL, "123", roundTripper)
 	proxyClient := proxy.NewProxy(parsedURL, "123", roundTripper)
 	UploadArtifacts(apiClient, proxyClient).ServeHTTP(response, httpRequest)
 	return response

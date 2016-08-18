@@ -16,10 +16,12 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
 )
 
-func SecretPath() string {
-	return path.Join(RootDir(), "testdata/test-secret")
+func ConfigureSecret() {
+	secret.SetPath(path.Join(RootDir(), "testdata/test-secret"))
 }
 
 var extractPatchSeriesMatcher = regexp.MustCompile(`^From (\w+)`)
