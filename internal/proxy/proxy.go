@@ -32,7 +32,7 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// Set Workhorse version
 	req.Header.Set("Gitlab-Workhorse", p.Version)
-	req.Header.Set("Gitlab-Worhorse-Proxy-Start", fmt.Sprintf("%d", time.Now().UnixNano()))
+	req.Header.Set("Gitlab-Workhorse-Proxy-Start", fmt.Sprintf("%d", time.Now().UnixNano()))
 
 	p.reverseProxy.ServeHTTP(w, &req)
 }
