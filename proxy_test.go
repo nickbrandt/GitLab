@@ -42,8 +42,8 @@ func TestProxyRequest(t *testing.T) {
 			t.Fatalf("Missing GitLab-Workhorse header: want %q, got %q", testVersion, h)
 		}
 
-		if h := r.Header.Get("Gitlab-Worhorse-Proxy-Start"); !strings.HasPrefix(h, "1") {
-			t.Fatalf("Expect Gitlab-Worhorse-Proxy-Start to start with 1, got %q", h)
+		if h := r.Header.Get("Gitlab-Workhorse-Proxy-Start"); !strings.HasPrefix(h, "1") {
+			t.Fatalf("Expect Gitlab-Workhorse-Proxy-Start to start with 1, got %q", h)
 		}
 
 		var body bytes.Buffer
