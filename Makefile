@@ -2,7 +2,6 @@ PREFIX=/usr/local
 VERSION=$(shell git describe)-$(shell date -u +%Y%m%d.%H%M%S)
 BUILD_DIR = $(shell pwd)
 export GOPATH=${BUILD_DIR}/_build
-
 GOBUILD=go build -ldflags "-X main.Version=${VERSION}"
 PKG=gitlab.com/gitlab-org/gitlab-workhorse
 
