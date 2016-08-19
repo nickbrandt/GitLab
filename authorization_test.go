@@ -30,7 +30,7 @@ func runPreAuthorizeHandler(t *testing.T, ts *httptest.Server, suffix string, ur
 		t.Fatal(err)
 	}
 	parsedURL := helper.URLMustParse(ts.URL)
-	a := api.NewAPI(parsedURL, "123", badgateway.TestRoundTripper(parsedURL))
+	a := api.NewAPI(parsedURL, "123", testhelper.SecretFile(), badgateway.TestRoundTripper(parsedURL))
 
 	response := httptest.NewRecorder()
 	a.PreAuthorizeHandler(okHandler, suffix).ServeHTTP(response, httpRequest)

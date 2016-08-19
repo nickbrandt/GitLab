@@ -2,6 +2,7 @@ PREFIX=/usr/local
 VERSION=$(shell git describe)-$(shell date -u +%Y%m%d.%H%M%S)
 BUILD_DIR = $(shell pwd)
 export GOPATH=${BUILD_DIR}/_build
+
 GOBUILD=go build -ldflags "-X main.Version=${VERSION}"
 PKG=gitlab.com/gitlab-org/gitlab-workhorse
 
@@ -23,6 +24,8 @@ install: gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata
 ${BUILD_DIR}/_build:
 	mkdir -p $@/src/${PKG}
 	tar -cf - --exclude _build --exclude .git . | (cd $@/src/${PKG} && tar -xf -)
+	PATH="${GOPATH}/bin:${PATH}" command -v godep || go get github.com/tools/godep
+	(cd $@/src/${PKG} && PATH="${GOPATH}/bin:${PATH}" godep restore)
 	touch $@
 
 .PHONY: test
