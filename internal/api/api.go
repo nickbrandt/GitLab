@@ -13,6 +13,9 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
+// Custom content type for API responses, to catch routing / programming mistakes
+const ResponseContentType = "application/vnd.gitlab-workhorse+json"
+
 type API struct {
 	Client  *http.Client
 	URL     *url.URL
@@ -138,11 +141,6 @@ func (api *API) PreAuthorizeHandler(h HandleFunc, suffix string) http.Handler {
 		defer authResponse.Body.Close()
 
 		if authResponse.StatusCode != 200 {
-			// The Git request is not allowed by the backend. Maybe the
-			// client needs to send HTTP Basic credentials.  Forward the
-			// response from the auth backend to our client. This includes
-			// the 'WWW-Authenticate' header that acts as a hint that
-			// Basic auth credentials are needed.
 			for k, v := range authResponse.Header {
 				// Accomodate broken clients that do case-sensitive header lookup
 				if k == "Www-Authenticate" {
@@ -153,6 +151,11 @@ func (api *API) PreAuthorizeHandler(h HandleFunc, suffix string) http.Handler {
 			}
 			w.WriteHeader(authResponse.StatusCode)
 			io.Copy(w, authResponse.Body)
+			return
+		}
+
+		if contentType := authResponse.Header.Get("Content-Type"); contentType != ResponseContentType {
+			helper.Fail500(w, fmt.Errorf("preAuthorizeHandler: API responded with wrong content type: %v", contentType))
 			return
 		}
 

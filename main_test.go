@@ -537,6 +537,7 @@ func TestArtifactsUpload(t *testing.T) {
 
 	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasSuffix(r.URL.Path, "/authorize") {
+			w.Header().Set("Content-Type", api.ResponseContentType)
 			if _, err := fmt.Fprintf(w, `{"TempPath":"%s"}`, scratchDir); err != nil {
 				t.Fatal(err)
 			}
@@ -775,6 +776,8 @@ func newBranch() string {
 
 func testAuthServer(url *regexp.Regexp, code int, body interface{}) *httptest.Server {
 	return testhelper.TestServerWithHandler(url, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", api.ResponseContentType)
+
 		// Write pure string
 		if data, ok := body.(string); ok {
 			log.Println("UPSTREAM", r.Method, r.URL, code)

@@ -29,7 +29,7 @@ func testArtifactsUploadServer(t *testing.T, tempPath string) *httptest.Server {
 			t.Fatal("Expected POST request")
 		}
 
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Content-Type", api.ResponseContentType)
 
 		data, err := json.Marshal(&api.Response{
 			TempPath: tempPath,
