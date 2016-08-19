@@ -15,26 +15,22 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-const (
-	// Custom content type for API responses, to catch routing / programming mistakes
-	ResponseContentType = "application/vnd.gitlab-workhorse+json"
-	// Block size for HMAC SHA256
-	numSecretBytes = 64
-)
+// Custom content type for API responses, to catch routing / programming mistakes
+const ResponseContentType = "application/vnd.gitlab-workhorse+json"
 
 type API struct {
-	Client     *http.Client
-	URL        *url.URL
-	Version    string
-	SecretFile string
+	Client  *http.Client
+	URL     *url.URL
+	Version string
+	Secret  *Secret
 }
 
 func NewAPI(myURL *url.URL, version, secretFile string, roundTripper *badgateway.RoundTripper) *API {
 	return &API{
-		Client:     &http.Client{Transport: roundTripper},
-		URL:        myURL,
-		Version:    version,
-		SecretFile: secretFile,
+		Client:  &http.Client{Transport: roundTripper},
+		URL:     myURL,
+		Version: version,
+		Secret:  &Secret{File: secretFile},
 	}
 }
 
@@ -130,18 +126,15 @@ func (api *API) newRequest(r *http.Request, body io.Reader, suffix string) (*htt
 	// configurations (Passenger) to solve auth request routing problems.
 	authReq.Header.Set("Gitlab-Workhorse", api.Version)
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{Issuer: "gitlab-workhorse"})
-	secretBytes, err := ioutil.ReadFile(api.SecretFile)
+	secretBytes, err := api.Secret.Bytes()
 	if err != nil {
-		return nil, fmt.Errorf("read secretFile: %v", err)
-	}
-	if n := len(secretBytes); n != numSecretBytes {
-		return nil, fmt.Errorf("expected %d bytes in %s, found %d", numSecretBytes, api.SecretFile, n)
+		return nil, fmt.Errorf("newRequest: %v", err)
 	}
 
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{Issuer: "gitlab-workhorse"})
 	tokenString, err := token.SignedString(secretBytes)
 	if err != nil {
-		return nil, fmt.Errorf("sign JWT: %v", err)
+		return nil, fmt.Errorf("newRequest: sign JWT: %v", err)
 	}
 	authReq.Header.Set("Gitlab-Workhorse-Api-Request", tokenString)
 
