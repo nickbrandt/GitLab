@@ -330,8 +330,14 @@ func TestDownloadCacheCreate(t *testing.T) {
 
 func TestRegularProjectsAPI(t *testing.T) {
 	apiResponse := "API RESPONSE"
-	ts := testAuthServer(nil, 200, apiResponse)
+
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, _ *http.Request) {
+		if _, err := w.Write([]byte(apiResponse)); err != nil {
+			t.Fatalf("write upstream response: %v", err)
+		}
+	})
 	defer ts.Close()
+
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
 
@@ -734,6 +740,39 @@ func TestGetGitPatch(t *testing.T) {
 	bodyLengthBytes := len(body)
 	if bodyLengthBytes != 449 {
 		t.Fatal("Expected the body to consist of 449 bytes, got %v", bodyLengthBytes)
+	}
+}
+
+func TestApiContentTypeBlock(t *testing.T) {
+	wrongResponse := `{"hello":"world"}`
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", api.ResponseContentType)
+		if _, err := w.Write([]byte(wrongResponse)); err != nil {
+			t.Fatalf("write upstream response: %v", err)
+		}
+	})
+	defer ts.Close()
+
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	resourcePath := "/something"
+	resp, err := http.Get(ws.URL + resourcePath)
+	if err != nil {
+		t.Error(err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 500 {
+		t.Errorf("GET %q: expected 500, got %d", resourcePath, resp.StatusCode)
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if strings.Contains(string(body), "world") {
+		t.Errorf("unexpected response body: %q", body)
 	}
 }
 
