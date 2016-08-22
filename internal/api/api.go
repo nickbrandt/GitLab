@@ -18,6 +18,8 @@ import (
 // Custom content type for API responses, to catch routing / programming mistakes
 const ResponseContentType = "application/vnd.gitlab-workhorse+json"
 
+const RequestHeader = "Gitlab-Workhorse-Api-Request"
+
 type API struct {
 	Client  *http.Client
 	URL     *url.URL
@@ -136,7 +138,7 @@ func (api *API) newRequest(r *http.Request, body io.Reader, suffix string) (*htt
 	if err != nil {
 		return nil, fmt.Errorf("newRequest: sign JWT: %v", err)
 	}
-	authReq.Header.Set("Gitlab-Workhorse-Api-Request", tokenString)
+	authReq.Header.Set(RequestHeader, tokenString)
 
 	return authReq, nil
 }

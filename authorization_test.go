@@ -11,6 +11,8 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 func okHandler(w http.ResponseWriter, _ *http.Request, _ *api.Response) {
@@ -75,4 +77,45 @@ func TestPreAuthorizeContentTypeFailure(t *testing.T) {
 		regexp.MustCompile(`/authorize\z`),
 		"",
 		200, 500)
+}
+
+func TestPreAuthorizeJWT(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token, err := jwt.Parse(r.Header.Get(api.RequestHeader), func(token *jwt.Token) (interface{}, error) {
+			// Don't forget to validate the alg is what you expect:
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			}
+			secretBytes, err := (&api.Secret{File: testhelper.SecretFile()}).Bytes()
+			if err != nil {
+				return nil, fmt.Errorf("read secret from file: %v", err)
+			}
+
+			return secretBytes, nil
+		})
+		if err != nil {
+			t.Fatalf("decode token: %v", err)
+		}
+
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok || !token.Valid {
+			t.Fatal("claims cast failed or token invalid")
+		}
+
+		if claims["iss"] != "gitlab-workhorse" {
+			t.Fatalf("execpted issuer gitlab-workhorse, got %q", claims["iss"])
+		}
+
+		w.Header().Set("Content-Type", api.ResponseContentType)
+		if _, err := w.Write([]byte(`{"hello":"world"}`)); err != nil {
+			t.Fatalf("write auth response: %v", err)
+		}
+	}))
+	defer ts.Close()
+
+	runPreAuthorizeHandler(
+		t, ts, "/authorize",
+		regexp.MustCompile(`/authorize\z`),
+		"",
+		200, 201)
 }
