@@ -23,8 +23,6 @@ install: gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata
 ${BUILD_DIR}/_build:
 	mkdir -p $@/src/${PKG}
 	tar -cf - --exclude _build --exclude .git . | (cd $@/src/${PKG} && tar -xf -)
-	PATH="${GOPATH}/bin:${PATH}" command -v godep || go get github.com/tools/godep
-	(cd $@/src/${PKG} && PATH="${GOPATH}/bin:${PATH}" godep restore)
 	touch $@
 
 .PHONY: test
