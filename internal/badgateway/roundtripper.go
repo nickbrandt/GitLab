@@ -64,7 +64,7 @@ func mustParseAddress(address, scheme string) string {
 		}
 	}
 
-	panic("could not parse host:port from address and scheme")
+	panic(fmt.Errorf("could not parse host:port from address %q and scheme %q", address, scheme))
 }
 
 func (t *RoundTripper) RoundTrip(r *http.Request) (res *http.Response, err error) {
