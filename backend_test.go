@@ -10,6 +10,7 @@ func TestParseAuthBackend(t *testing.T) {
 		"ftp://localhost",
 		"https://example.com",
 	}
+
 	for _, example := range failures {
 		if _, err := parseAuthBackend(example); err == nil {
 			t.Errorf("error expected for %q", example)
