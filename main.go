@@ -34,7 +34,7 @@ var printVersion = flag.Bool("version", false, "Print version and exit")
 var listenAddr = flag.String("listenAddr", "localhost:8181", "Listen address for HTTP server")
 var listenNetwork = flag.String("listenNetwork", "tcp", "Listen 'network' (tcp, tcp4, tcp6, unix)")
 var listenUmask = flag.Int("listenUmask", 0, "Umask for Unix socket")
-var authBackend = URLFlag("authBackend", upstream.DefaultBackend, "Authentication/authorization backend")
+var authBackend = flag.String("authBackend", upstream.DefaultBackend.String(), "Authentication/authorization backend")
 var authSocket = flag.String("authSocket", "", "Optional: Unix domain socket to dial authBackend at")
 var pprofListenAddr = flag.String("pprofListenAddr", "", "pprof listening address, e.g. 'localhost:6060'")
 var documentRoot = flag.String("documentRoot", "public", "Path to static files content")
@@ -53,6 +53,12 @@ func main() {
 	if *printVersion {
 		fmt.Println(version)
 		os.Exit(0)
+	}
+
+	backendURL, err := parseAuthBackend(*authBackend)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "invalid authBackend: %v\n", err)
+		os.Exit(1)
 	}
 
 	log.Printf("Starting %s", version)
@@ -83,7 +89,7 @@ func main() {
 	}
 
 	up := upstream.NewUpstream(
-		*authBackend,
+		backendURL,
 		*authSocket,
 		Version,
 		*documentRoot,
