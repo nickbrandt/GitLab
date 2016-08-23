@@ -32,12 +32,11 @@ func TestParseAuthBackend(t *testing.T) {
 		}
 
 		if result.Host != example.host {
-			t.Errorf("expected %q, got %q", example.host, result.Host)
+			t.Errorf("example %q: expected %q, got %q", example.input, example.host, result.Host)
 		}
 
 		if result.Scheme != example.scheme {
-			t.Errorf("expected %q, got %q", example.scheme, result.Scheme)
-
+			t.Errorf("example %q: expected %q, got %q", example.input, example.scheme, result.Scheme)
 		}
 	}
 }
