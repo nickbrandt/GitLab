@@ -98,8 +98,12 @@ func TestPreAuthorizeJWT(t *testing.T) {
 		}
 
 		claims, ok := token.Claims.(jwt.MapClaims)
-		if !ok || !token.Valid {
-			t.Fatal("claims cast failed or token invalid")
+		if !ok {
+			t.Fatal("claims cast failed")
+		}
+
+		if !token.Valid {
+			t.Fatal("JWT token invalid")
 		}
 
 		if claims["iss"] != "gitlab-workhorse" {
