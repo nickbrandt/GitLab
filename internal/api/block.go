@@ -21,6 +21,8 @@ type blocker struct {
 	status   int
 }
 
+// Prevent internal API responses intended for gitlab-workhorse from
+// leaking to the end user
 func (b *blocker) Header() http.Header {
 	return b.rw.Header()
 }
