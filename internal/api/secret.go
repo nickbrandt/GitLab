@@ -1,12 +1,13 @@
 package api
 
 import (
+	"encoding/base64"
 	"fmt"
 	"io/ioutil"
 	"sync"
 )
 
-const numSecretBytes = 64
+const numSecretBytes = 32
 
 type Secret struct {
 	File  string
@@ -29,17 +30,24 @@ func (s *Secret) getBytes() []byte {
 }
 
 func (s *Secret) setBytes() ([]byte, error) {
-	bytes, err := ioutil.ReadFile(s.File)
+	base64Bytes, err := ioutil.ReadFile(s.File)
 	if err != nil {
 		return nil, fmt.Errorf("read Secret.File: %v", err)
 	}
-	if n := len(bytes); n != numSecretBytes {
-		return nil, fmt.Errorf("expected %d bytes in %s, found %d", bytes, s.File, n)
+
+	secretBytes := make([]byte, base64.StdEncoding.DecodedLen(len(base64Bytes)))
+	n, err := base64.StdEncoding.Decode(secretBytes, base64Bytes)
+	if err != nil {
+		return nil, fmt.Errorf("decode secret: %v", err)
+	}
+
+	if n != numSecretBytes {
+		return nil, fmt.Errorf("expected %d secretBytes in %s, found %d", numSecretBytes, s.File, n)
 	}
 
 	s.Lock()
 	defer s.Unlock()
-	s.bytes = bytes
+	s.bytes = secretBytes
 
-	return bytes, nil
+	return secretBytes, nil
 }
