@@ -7,6 +7,8 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
+// Prevent internal API responses intended for gitlab-workhorse from
+// leaking to the end user
 func Block(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rw := &blocker{rw: w}
@@ -21,8 +23,6 @@ type blocker struct {
 	status   int
 }
 
-// Prevent internal API responses intended for gitlab-workhorse from
-// leaking to the end user
 func (b *blocker) Header() http.Header {
 	return b.rw.Header()
 }
