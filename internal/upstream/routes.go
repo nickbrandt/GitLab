@@ -37,7 +37,7 @@ func (u *Upstream) configureRoutes() {
 	api := apipkg.NewAPI(
 		u.Backend,
 		u.Version,
-		u.SecretFile,
+		u.SecretPath,
 		u.RoundTripper,
 	)
 	static := &staticpages.Static{u.DocumentRoot}

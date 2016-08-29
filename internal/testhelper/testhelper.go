@@ -15,7 +15,7 @@ import (
 	"testing"
 )
 
-func SecretFile() string {
+func SecretPath() string {
 	return path.Join(RootDir(), "testdata/test-secret")
 }
 

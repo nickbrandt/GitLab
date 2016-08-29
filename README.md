@@ -31,7 +31,7 @@ Options:
     	pprof listening address, e.g. 'localhost:6060'
   -proxyHeadersTimeout duration
     	How long to wait for response headers when proxying the request (default 5m0s)
-  -secretFile string
+  -secretPath string
     	File with secret key to authenticate with authBackend (default "./.gitlab_workhorse_secret")
   -version
     	Print version and exit

@@ -868,7 +868,7 @@ func startWorkhorseServer(authBackend string) *httptest.Server {
 		helper.URLMustParse(authBackend),
 		"",
 		"123",
-		testhelper.SecretFile(),
+		testhelper.SecretPath(),
 		testDocumentRoot,
 		false,
 		0,

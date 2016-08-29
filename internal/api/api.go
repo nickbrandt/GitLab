@@ -27,12 +27,12 @@ type API struct {
 	Secret  *Secret
 }
 
-func NewAPI(myURL *url.URL, version, secretFile string, roundTripper *badgateway.RoundTripper) *API {
+func NewAPI(myURL *url.URL, version, secretPath string, roundTripper *badgateway.RoundTripper) *API {
 	return &API{
 		Client:  &http.Client{Transport: roundTripper},
 		URL:     myURL,
 		Version: version,
-		Secret:  &Secret{File: secretFile},
+		Secret:  &Secret{Path: secretPath},
 	}
 }
 

@@ -32,7 +32,7 @@ func runPreAuthorizeHandler(t *testing.T, ts *httptest.Server, suffix string, ur
 		t.Fatal(err)
 	}
 	parsedURL := helper.URLMustParse(ts.URL)
-	a := api.NewAPI(parsedURL, "123", testhelper.SecretFile(), badgateway.TestRoundTripper(parsedURL))
+	a := api.NewAPI(parsedURL, "123", testhelper.SecretPath(), badgateway.TestRoundTripper(parsedURL))
 
 	response := httptest.NewRecorder()
 	a.PreAuthorizeHandler(okHandler, suffix).ServeHTTP(response, httpRequest)
@@ -86,7 +86,7 @@ func TestPreAuthorizeJWT(t *testing.T) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 			}
-			secretBytes, err := (&api.Secret{File: testhelper.SecretFile()}).Bytes()
+			secretBytes, err := (&api.Secret{Path: testhelper.SecretPath()}).Bytes()
 			if err != nil {
 				return nil, fmt.Errorf("read secret from file: %v", err)
 			}

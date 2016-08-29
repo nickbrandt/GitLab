@@ -23,7 +23,7 @@ var DefaultBackend = helper.URLMustParse("http://localhost:8080")
 type Upstream struct {
 	Backend         *url.URL
 	Version         string
-	SecretFile      string
+	SecretPath      string
 	DocumentRoot    string
 	DevelopmentMode bool
 
@@ -36,7 +36,7 @@ func NewUpstream(backend *url.URL, socket, version, secretFile, documentRoot str
 	up := Upstream{
 		Backend:         backend,
 		Version:         version,
-		SecretFile:      secretFile,
+		SecretPath:      secretFile,
 		DocumentRoot:    documentRoot,
 		DevelopmentMode: developmentMode,
 	}

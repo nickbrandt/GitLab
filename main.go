@@ -40,7 +40,7 @@ var pprofListenAddr = flag.String("pprofListenAddr", "", "pprof listening addres
 var documentRoot = flag.String("documentRoot", "public", "Path to static files content")
 var proxyHeadersTimeout = flag.Duration("proxyHeadersTimeout", 5*time.Minute, "How long to wait for response headers when proxying the request")
 var developmentMode = flag.Bool("developmentMode", false, "Allow to serve assets from Rails app")
-var secretFile = flag.String("secretFile", "./.gitlab_workhorse_secret", "File with secret key to authenticate with authBackend")
+var secretPath = flag.String("secretPath", "./.gitlab_workhorse_secret", "File with secret key to authenticate with authBackend")
 
 func main() {
 	flag.Usage = func() {
@@ -87,7 +87,7 @@ func main() {
 		*authBackend,
 		*authSocket,
 		Version,
-		*secretFile,
+		*secretPath,
 		*documentRoot,
 		*developmentMode,
 		*proxyHeadersTimeout,
