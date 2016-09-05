@@ -33,6 +33,13 @@ func (s *Secret) getBytes() []byte {
 }
 
 func (s *Secret) setBytes() ([]byte, error) {
+	s.Lock()
+	defer s.Unlock()
+
+	if s.bytes != nil {
+		return s.bytes, nil
+	}
+
 	base64Bytes, err := ioutil.ReadFile(s.Path)
 	if err != nil {
 		return nil, fmt.Errorf("read Secret.Path: %v", err)
@@ -48,9 +55,6 @@ func (s *Secret) setBytes() ([]byte, error) {
 		return nil, fmt.Errorf("expected %d secretBytes in %s, found %d", numSecretBytes, s.Path, n)
 	}
 
-	s.Lock()
-	defer s.Unlock()
 	s.bytes = secretBytes
-
-	return secretBytes, nil
+	return s.bytes, nil
 }
