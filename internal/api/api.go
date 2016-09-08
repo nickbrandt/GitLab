@@ -11,19 +11,28 @@ import (
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+
+	"github.com/dgrijalva/jwt-go"
 )
+
+// Custom content type for API responses, to catch routing / programming mistakes
+const ResponseContentType = "application/vnd.gitlab-workhorse+json"
+
+const RequestHeader = "Gitlab-Workhorse-Api-Request"
 
 type API struct {
 	Client  *http.Client
 	URL     *url.URL
 	Version string
+	Secret  *Secret
 }
 
-func NewAPI(myURL *url.URL, version string, roundTripper *badgateway.RoundTripper) *API {
+func NewAPI(myURL *url.URL, version, secretPath string, roundTripper *badgateway.RoundTripper) *API {
 	return &API{
 		Client:  &http.Client{Transport: roundTripper},
 		URL:     myURL,
 		Version: version,
+		Secret:  &Secret{Path: secretPath},
 	}
 }
 
@@ -119,6 +128,18 @@ func (api *API) newRequest(r *http.Request, body io.Reader, suffix string) (*htt
 	// configurations (Passenger) to solve auth request routing problems.
 	authReq.Header.Set("Gitlab-Workhorse", api.Version)
 
+	secretBytes, err := api.Secret.Bytes()
+	if err != nil {
+		return nil, fmt.Errorf("newRequest: %v", err)
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{Issuer: "gitlab-workhorse"})
+	tokenString, err := token.SignedString(secretBytes)
+	if err != nil {
+		return nil, fmt.Errorf("newRequest: sign JWT: %v", err)
+	}
+	authReq.Header.Set(RequestHeader, tokenString)
+
 	return authReq, nil
 }
 
@@ -138,11 +159,6 @@ func (api *API) PreAuthorizeHandler(h HandleFunc, suffix string) http.Handler {
 		defer authResponse.Body.Close()
 
 		if authResponse.StatusCode != 200 {
-			// The Git request is not allowed by the backend. Maybe the
-			// client needs to send HTTP Basic credentials.  Forward the
-			// response from the auth backend to our client. This includes
-			// the 'WWW-Authenticate' header that acts as a hint that
-			// Basic auth credentials are needed.
 			for k, v := range authResponse.Header {
 				// Accomodate broken clients that do case-sensitive header lookup
 				if k == "Www-Authenticate" {
@@ -153,6 +169,11 @@ func (api *API) PreAuthorizeHandler(h HandleFunc, suffix string) http.Handler {
 			}
 			w.WriteHeader(authResponse.StatusCode)
 			io.Copy(w, authResponse.Body)
+			return
+		}
+
+		if contentType := authResponse.Header.Get("Content-Type"); contentType != ResponseContentType {
+			helper.Fail500(w, fmt.Errorf("preAuthorizeHandler: API responded with wrong content type: %v", contentType))
 			return
 		}
 

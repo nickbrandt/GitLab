@@ -26,11 +26,13 @@ Options:
   -listenNetwork string
     	Listen 'network' (tcp, tcp4, tcp6, unix) (default "tcp")
   -listenUmask int
-    	Umask for Unix socket (default 0)
+    	Umask for Unix socket
   -pprofListenAddr string
     	pprof listening address, e.g. 'localhost:6060'
   -proxyHeadersTimeout duration
-    	How long to wait for response headers when proxying the request (default 1m0s)
+    	How long to wait for response headers when proxying the request (default 5m0s)
+  -secretPath string
+    	File with secret key to authenticate with authBackend (default "./.gitlab_workhorse_secret")
   -version
     	Print version and exit
 ```

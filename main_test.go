@@ -330,8 +330,14 @@ func TestDownloadCacheCreate(t *testing.T) {
 
 func TestRegularProjectsAPI(t *testing.T) {
 	apiResponse := "API RESPONSE"
-	ts := testAuthServer(nil, 200, apiResponse)
+
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, _ *http.Request) {
+		if _, err := w.Write([]byte(apiResponse)); err != nil {
+			t.Fatalf("write upstream response: %v", err)
+		}
+	})
 	defer ts.Close()
+
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
 
@@ -537,6 +543,7 @@ func TestArtifactsUpload(t *testing.T) {
 
 	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasSuffix(r.URL.Path, "/authorize") {
+			w.Header().Set("Content-Type", api.ResponseContentType)
 			if _, err := fmt.Fprintf(w, `{"TempPath":"%s"}`, scratchDir); err != nil {
 				t.Fatal(err)
 			}
@@ -736,6 +743,39 @@ func TestGetGitPatch(t *testing.T) {
 	}
 }
 
+func TestApiContentTypeBlock(t *testing.T) {
+	wrongResponse := `{"hello":"world"}`
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", api.ResponseContentType)
+		if _, err := w.Write([]byte(wrongResponse)); err != nil {
+			t.Fatalf("write upstream response: %v", err)
+		}
+	})
+	defer ts.Close()
+
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	resourcePath := "/something"
+	resp, err := http.Get(ws.URL + resourcePath)
+	if err != nil {
+		t.Error(err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 500 {
+		t.Errorf("GET %q: expected 500, got %d", resourcePath, resp.StatusCode)
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if strings.Contains(string(body), "world") {
+		t.Errorf("unexpected response body: %q", body)
+	}
+}
+
 func setupStaticFile(fpath, content string) error {
 	cwd, err := os.Getwd()
 	if err != nil {
@@ -775,6 +815,8 @@ func newBranch() string {
 
 func testAuthServer(url *regexp.Regexp, code int, body interface{}) *httptest.Server {
 	return testhelper.TestServerWithHandler(url, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", api.ResponseContentType)
+
 		// Write pure string
 		if data, ok := body.(string); ok {
 			log.Println("UPSTREAM", r.Method, r.URL, code)
@@ -826,6 +868,7 @@ func startWorkhorseServer(authBackend string) *httptest.Server {
 		helper.URLMustParse(authBackend),
 		"",
 		"123",
+		testhelper.SecretPath(),
 		testDocumentRoot,
 		false,
 		0,

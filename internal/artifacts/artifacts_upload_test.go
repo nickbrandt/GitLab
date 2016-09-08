@@ -29,7 +29,7 @@ func testArtifactsUploadServer(t *testing.T, tempPath string) *httptest.Server {
 			t.Fatal("Expected POST request")
 		}
 
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Content-Type", api.ResponseContentType)
 
 		data, err := json.Marshal(&api.Response{
 			TempPath: tempPath,
@@ -93,7 +93,7 @@ func testUploadArtifacts(contentType string, body io.Reader, t *testing.T, ts *h
 	response := httptest.NewRecorder()
 	parsedURL := helper.URLMustParse(ts.URL)
 	roundTripper := badgateway.TestRoundTripper(parsedURL)
-	apiClient := api.NewAPI(parsedURL, "123", roundTripper)
+	apiClient := api.NewAPI(parsedURL, "123", testhelper.SecretPath(), roundTripper)
 	proxyClient := proxy.NewProxy(parsedURL, "123", roundTripper)
 	UploadArtifacts(apiClient, proxyClient).ServeHTTP(response, httpRequest)
 	return response

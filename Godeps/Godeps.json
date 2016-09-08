@@ -1,0 +1,15 @@
+{
+	"ImportPath": "gitlab.com/gitlab-org/gitlab-workhorse",
+	"GoVersion": "go1.7",
+	"GodepVersion": "v74",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/dgrijalva/jwt-go",
+			"Comment": "v3.0.0",
+			"Rev": "d2709f9f1f31ebcda9651b03077758c1f3a0018c"
+		}
+	]
+}

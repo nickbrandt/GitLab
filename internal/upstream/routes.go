@@ -37,15 +37,18 @@ func (u *Upstream) configureRoutes() {
 	api := apipkg.NewAPI(
 		u.Backend,
 		u.Version,
+		u.SecretPath,
 		u.RoundTripper,
 	)
 	static := &staticpages.Static{u.DocumentRoot}
 	proxy := senddata.SendData(
-		sendfile.SendFile(proxypkg.NewProxy(
-			u.Backend,
-			u.Version,
-			u.RoundTripper,
-		)),
+		sendfile.SendFile(
+			apipkg.Block(
+				proxypkg.NewProxy(
+					u.Backend,
+					u.Version,
+					u.RoundTripper,
+				))),
 		git.SendArchive,
 		git.SendBlob,
 		git.SendDiff,

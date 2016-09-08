@@ -15,6 +15,10 @@ import (
 	"testing"
 )
 
+func SecretPath() string {
+	return path.Join(RootDir(), "testdata/test-secret")
+}
+
 func AssertResponseCode(t *testing.T, response *httptest.ResponseRecorder, expectedCode int) {
 	if response.Code != expectedCode {
 		t.Fatalf("for HTTP request expected to get %d, got %d instead", expectedCode, response.Code)
@@ -52,11 +56,7 @@ func TestServerWithHandler(url *regexp.Regexp, handler http.HandlerFunc) *httpte
 }
 
 func BuildExecutables() (func(), error) {
-	_, currentFile, _, ok := runtime.Caller(0)
-	if !ok {
-		return nil, errors.New("BuildExecutables: calling runtime.Caller failed")
-	}
-	rootDir := path.Join(path.Dir(currentFile), "../..")
+	rootDir := RootDir()
 
 	// This method will be invoked more than once due to Go test
 	// parallelization. We must use a unique temp directory for each
@@ -84,4 +84,12 @@ func BuildExecutables() (func(), error) {
 		os.Setenv("PATH", oldPath)
 		os.RemoveAll(testDir)
 	}, nil
+}
+
+func RootDir() string {
+	_, currentFile, _, ok := runtime.Caller(0)
+	if !ok {
+		panic(errors.New("RootDir: calling runtime.Caller failed"))
+	}
+	return path.Join(path.Dir(currentFile), "../..")
 }
