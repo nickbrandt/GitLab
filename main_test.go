@@ -737,9 +737,13 @@ func TestGetGitPatch(t *testing.T) {
 		t.Fatalf("Expected: From 54fcc214b94e78d7a41a9a8fe6d87a5e59500e51 Mon Sep 17 00:00:00 2001, got: %v", body)
 	}
 
-	bodyLengthBytes := len(body)
-	if bodyLengthBytes != 449 {
-		t.Fatal("Expected the body to consist of 449 bytes, got %v", bodyLengthBytes)
+	// The contents of the last line of the patch depend on the version of
+	// Git used during the test run. Ignore that data and look at the line
+	// that should terminate the diff.
+	lastPatchIndex := 442
+	endOfPatch := string(body[lastPatchIndex-5 : lastPatchIndex])
+	if endOfPatch != "\n-- \n" {
+		t.Fatalf("Expected end of patch at %d, found %q", lastPatchIndex, endOfPatch)
 	}
 }
 
