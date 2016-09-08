@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v0.8.0
+
+Add JWT signed communication between gitlab-workhorse and gitlab-rails.
+
 v0.7.11
 
 Fix 'nil dereference' crash on Go 1.7 when parsing authBackend
