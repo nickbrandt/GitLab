@@ -8,6 +8,8 @@ import (
 	"os"
 	"os/exec"
 	"syscall"
+
+	"github.com/getsentry/raven-go"
 )
 
 func Fail500(w http.ResponseWriter, err error) {
@@ -16,6 +18,7 @@ func Fail500(w http.ResponseWriter, err error) {
 }
 
 func LogError(err error) {
+	raven.CaptureError(err, nil)
 	log.Printf("error: %v", err)
 }
 
