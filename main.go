@@ -52,6 +52,7 @@ func main() {
 	}
 	flag.Parse()
 
+	raven.DefaultClient.SetRelease(Version)
 	version := fmt.Sprintf("gitlab-workhorse %s", Version)
 	if *printVersion {
 		fmt.Println(version)
