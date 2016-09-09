@@ -52,7 +52,6 @@ func main() {
 	}
 	flag.Parse()
 
-	raven.DefaultClient.SetRelease(Version)
 	version := fmt.Sprintf("gitlab-workhorse %s", Version)
 	if *printVersion {
 		fmt.Println(version)
@@ -92,6 +91,11 @@ func main() {
 		}()
 	}
 
+	// Use a custom environment variable (not SENTRY_DSN) to prevent
+	// clashes with gitlab-rails.
+	raven.SetDSN(os.Getenv("GITLAB_WORKHORSE_SENTRY_DSN"))
+	raven.DefaultClient.SetRelease(Version)
+
 	up := wrapRaven(
 		upstream.NewUpstream(
 			backendURL,
@@ -107,9 +111,5 @@ func main() {
 }
 
 func wrapRaven(h http.Handler) http.Handler {
-	// Use a custom environment variable (not SENTRY_DSN) to prevent
-	// clashes with gitlab-rails.
-	raven.SetDSN(os.Getenv("GITLAB_WORKHORSE_SENTRY_DSN"))
-
 	return http.HandlerFunc(raven.RecoveryHandler(h.ServeHTTP))
 }
