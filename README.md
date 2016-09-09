@@ -76,6 +76,12 @@ make install PREFIX=/foo
 On some operating systems, such as FreeBSD, you may have to use
 `gmake` instead of `make`.
 
+## Error tracking
+
+GitLab-Workhorse supports remote error tracking with
+[Sentry](https://sentry.io). To enable this feature set the
+GITLAB_WORKHORSE_SENTRY_DSN environment variable.
+
 ## Tests
 
 Run the tests with:

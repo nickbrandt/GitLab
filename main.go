@@ -106,5 +106,9 @@ func main() {
 }
 
 func wrapRaven(h http.Handler) http.Handler {
+	// Use a custom environment variable (not SENTRY_DSN) to prevent
+	// clashes with gitlab-rails.
+	raven.SetDSN(os.Getenv("GITLAB_WORKHORSE_SENTRY_DSN"))
+
 	return http.HandlerFunc(raven.RecoveryHandler(h.ServeHTTP))
 }
