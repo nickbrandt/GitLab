@@ -25,6 +25,8 @@ import (
 	"time"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream"
+
+	"github.com/getsentry/raven-go"
 )
 
 // Current version of GitLab Workhorse
@@ -89,15 +91,20 @@ func main() {
 		}()
 	}
 
-	up := upstream.NewUpstream(
-		backendURL,
-		*authSocket,
-		Version,
-		*secretPath,
-		*documentRoot,
-		*developmentMode,
-		*proxyHeadersTimeout,
-	)
+	up := wrapRaven(
+		upstream.NewUpstream(
+			backendURL,
+			*authSocket,
+			Version,
+			*secretPath,
+			*documentRoot,
+			*developmentMode,
+			*proxyHeadersTimeout,
+		))
 
 	log.Fatal(http.Serve(listener, up))
+}
+
+func wrapRaven(h http.Handler) http.Handler {
+	return http.HandlerFunc(raven.RecoveryHandler(h.ServeHTTP))
 }
