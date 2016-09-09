@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v0.8.1
+
+Add Sentry (raven-go) for remote error tracking.
+
 v0.8.0
 
 Add JWT signed communication between gitlab-workhorse and gitlab-rails.
