@@ -82,6 +82,18 @@ GitLab-Workhorse supports remote error tracking with
 [Sentry](https://sentry.io). To enable this feature set the
 GITLAB_WORKHORSE_SENTRY_DSN environment variable.
 
+Omnibus (`/etc/gitlab/gitlab.rb`):
+
+```
+gitlab_workhorse['env'] = {'GITLAB_WORKHORSE_SENTRY_DSN' => 'https://foobar'}
+```
+
+Source installations (`/etc/default/gitlab`):
+
+```
+export GITLAB_WORKHORSE_SENTRY_DSN='https://foobar'
+```
+
 ## Tests
 
 Run the tests with:
