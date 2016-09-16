@@ -2,7 +2,7 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
-v0.8.2 (not released yet)
+v0.8.2
 
 Recognize more archive formats in git.SendArchive. Make 502 errors
 (failed proxy requests to Unicorn) easier to recognize in Sentry.
