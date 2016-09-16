@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v0.8.2 (not released yet)
+
+Recognize more archive formats in git.SendArchive.
+
 v0.8.1
 
 Add Sentry (raven-go) for remote error tracking.

@@ -40,16 +40,8 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 
 	var format string
 	urlPath := r.URL.Path
-	switch filepath.Base(urlPath) {
-	case "archive.zip":
-		format = "zip"
-	case "archive.tar":
-		format = "tar"
-	case "archive", "archive.tar.gz":
-		format = "tar.gz"
-	case "archive.tar.bz2":
-		format = "tar.bz2"
-	default:
+	format, ok := parseBasename(filepath.Base(urlPath))
+	if !ok {
 		helper.Fail500(w, fmt.Errorf("handleGetArchive: invalid format: %s", urlPath))
 		return
 	}
@@ -182,4 +174,23 @@ func finalizeCachedArchive(tempFile *os.File, archivePath string) error {
 		return err
 	}
 	return os.Link(tempFile.Name(), archivePath)
+}
+
+func parseBasename(basename string) (string, bool) {
+	var format string
+
+	switch basename {
+	case "archive.zip":
+		format = "zip"
+	case "archive.tar":
+		format = "tar"
+	case "archive", "archive.tar.gz", "archive.tgz", "archive.gz":
+		format = "tar.gz"
+	case "archive.tar.bz2", "archive.tbz", "archive.tbz2", "archive.tb2", "archive.bz2":
+		format = "tar.bz2"
+	default:
+		return "", false
+	}
+
+	return format, true
 }
