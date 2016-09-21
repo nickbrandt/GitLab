@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/requesterror"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 )
 
@@ -22,7 +23,7 @@ var SendPatch = &patch{"git-format-patch:"}
 func (p *patch) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
 	var params patchParams
 	if err := p.Unpack(&params, sendData); err != nil {
-		helper.Fail500(w, fmt.Errorf("SendPatch: unpack sendData: %v", err))
+		helper.Fail500(w, requesterror.New("SendPatch", r, "unpack sendData: %v", err))
 		return
 	}
 
@@ -33,23 +34,23 @@ func (p *patch) Inject(w http.ResponseWriter, r *http.Request, sendData string) 
 
 	stdout, err := gitPatchCmd.StdoutPipe()
 	if err != nil {
-		helper.Fail500(w, fmt.Errorf("SendPatch: create stdout pipe: %v", err))
+		helper.Fail500(w, requesterror.New("SendPatch", r, "create stdout pipe: %v", err))
 		return
 	}
 
 	if err := gitPatchCmd.Start(); err != nil {
-		helper.Fail500(w, fmt.Errorf("SendPatch: start %v: %v", gitPatchCmd, err))
+		helper.Fail500(w, requesterror.New("SendPatch", r, "start %v: %v", gitPatchCmd.Args, err))
 		return
 	}
 	defer helper.CleanUpProcessGroup(gitPatchCmd)
 
 	w.Header().Del("Content-Length")
 	if _, err := io.Copy(w, stdout); err != nil {
-		helper.LogError(fmt.Errorf("SendPatch: copy %v stdout: %v", gitPatchCmd, err))
+		helper.LogError(&copyError{requesterror.New("SendPatch", r, "copy %v stdout: %v", gitPatchCmd.Args, err)})
 		return
 	}
 	if err := gitPatchCmd.Wait(); err != nil {
-		helper.LogError(fmt.Errorf("SendPatch: wait for %v: %v", gitPatchCmd, err))
+		helper.LogError(requesterror.New("SendPatch", r, "wait for %v: %v", gitPatchCmd.Args, err))
 		return
 	}
 }

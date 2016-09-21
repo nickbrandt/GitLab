@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/requesterror"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 )
 
@@ -34,7 +35,7 @@ var SendArchive = &archive{"git-archive:"}
 func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
 	var params archiveParams
 	if err := a.Unpack(&params, sendData); err != nil {
-		helper.Fail500(w, fmt.Errorf("SendArchive: unpack sendData: %v", err))
+		helper.Fail500(w, requesterror.New("SendArchive", r, "unpack sendData: %v", err))
 		return
 	}
 
@@ -42,7 +43,7 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 	urlPath := r.URL.Path
 	format, ok := parseBasename(filepath.Base(urlPath))
 	if !ok {
-		helper.Fail500(w, fmt.Errorf("handleGetArchive: invalid format: %s", urlPath))
+		helper.Fail500(w, requesterror.New("SendArchive", r, "invalid format: %s", urlPath))
 		return
 	}
 
@@ -65,7 +66,7 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 	// to finalize the cached archive.
 	tempFile, err := prepareArchiveTempfile(path.Dir(params.ArchivePath), archiveFilename)
 	if err != nil {
-		helper.Fail500(w, fmt.Errorf("handleGetArchive: create tempfile: %v", err))
+		helper.Fail500(w, requesterror.New("SendArchive", r, "create tempfile: %v", err))
 		return
 	}
 	defer tempFile.Close()
@@ -76,12 +77,12 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 	archiveCmd := gitCommand("", "git", "--git-dir="+params.RepoPath, "archive", "--format="+archiveFormat, "--prefix="+params.ArchivePrefix+"/", params.CommitId)
 	archiveStdout, err := archiveCmd.StdoutPipe()
 	if err != nil {
-		helper.Fail500(w, fmt.Errorf("handleGetArchive: archive stdout: %v", err))
+		helper.Fail500(w, requesterror.New("SendArchive", r, "archive stdout: %v", err))
 		return
 	}
 	defer archiveStdout.Close()
 	if err := archiveCmd.Start(); err != nil {
-		helper.Fail500(w, fmt.Errorf("handleGetArchive: start %v: %v", archiveCmd.Args, err))
+		helper.Fail500(w, requesterror.New("SendArchive", r, "start %v: %v", archiveCmd.Args, err))
 		return
 	}
 	defer helper.CleanUpProcessGroup(archiveCmd) // Ensure brute force subprocess clean-up
@@ -95,13 +96,13 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 
 		stdout, err = compressCmd.StdoutPipe()
 		if err != nil {
-			helper.Fail500(w, fmt.Errorf("handleGetArchive: compress stdout: %v", err))
+			helper.Fail500(w, requesterror.New("SendArchive", r, "compress stdout: %v", err))
 			return
 		}
 		defer stdout.Close()
 
 		if err := compressCmd.Start(); err != nil {
-			helper.Fail500(w, fmt.Errorf("handleGetArchive: start %v: %v", compressCmd.Args, err))
+			helper.Fail500(w, requesterror.New("SendArchive", r, "start %v: %v", compressCmd.Args, err))
 			return
 		}
 		defer helper.CleanUpProcessGroup(compressCmd)
@@ -116,22 +117,24 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 	setArchiveHeaders(w, format, archiveFilename)
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 	if _, err := io.Copy(w, archiveReader); err != nil {
-		helper.LogError(fmt.Errorf("handleGetArchive: copy 'git archive' output: %v", err))
+		helper.LogError(&copyError{
+			requesterror.New("SendArchive", r, "copy 'git archive' output: %v", err),
+		})
 		return
 	}
 	if err := archiveCmd.Wait(); err != nil {
-		helper.LogError(fmt.Errorf("handleGetArchive: archiveCmd: %v", err))
+		helper.LogError(requesterror.New("SendArchive", r, "archiveCmd: %v", err))
 		return
 	}
 	if compressCmd != nil {
 		if err := compressCmd.Wait(); err != nil {
-			helper.LogError(fmt.Errorf("handleGetArchive: compressCmd: %v", err))
+			helper.LogError(requesterror.New("SendArchive", r, "compressCmd: %v", err))
 			return
 		}
 	}
 
 	if err := finalizeCachedArchive(tempFile, params.ArchivePath); err != nil {
-		helper.LogError(fmt.Errorf("handleGetArchive: finalize cached archive: %v", err))
+		helper.LogError(requesterror.New("SendArchive", r, "finalize cached archive: %v", err))
 		return
 	}
 }

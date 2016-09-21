@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/requesterror"
 )
 
 func contentEncodingHandler(h http.Handler) http.Handler {
@@ -26,7 +27,7 @@ func contentEncodingHandler(h http.Handler) http.Handler {
 		}
 
 		if err != nil {
-			helper.Fail500(w, fmt.Errorf("contentEncodingHandler: %v", err))
+			helper.Fail500(w, requesterror.New("contentEncodingHandler", r, "%v", err))
 			return
 		}
 		defer body.Close()

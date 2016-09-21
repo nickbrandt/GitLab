@@ -1,7 +1,6 @@
 package artifacts
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"mime/multipart"
@@ -12,6 +11,7 @@ import (
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/requesterror"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upload"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 )
@@ -75,7 +75,7 @@ func (a *artifactsUploadProcessor) Cleanup() {
 func UploadArtifacts(myAPI *api.API, h http.Handler) http.Handler {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		if a.TempPath == "" {
-			helper.Fail500(w, errors.New("UploadArtifacts: TempPath is empty"))
+			helper.Fail500(w, requesterror.New("UploadArtifacts", r, "TempPath is empty"))
 			return
 		}
 

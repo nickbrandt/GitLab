@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/requesterror"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/urlprefix"
 )
 
@@ -28,11 +29,11 @@ func (s *Static) ServeExisting(prefix urlprefix.Prefix, cache CacheMode, notFoun
 
 		// The filepath.Join does Clean traversing directories up
 		if !strings.HasPrefix(file, s.DocumentRoot) {
-			helper.Fail500(w, &os.PathError{
+			helper.Fail500(w, requesterror.New("ServeExisting", r, "%v", &os.PathError{
 				Op:   "open",
 				Path: file,
 				Err:  os.ErrInvalid,
-			})
+			}))
 			return
 		}
 
