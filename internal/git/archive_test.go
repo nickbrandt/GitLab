@@ -1,6 +1,7 @@
 package git
 
 import (
+	"io/ioutil"
 	"testing"
 )
 
@@ -25,5 +26,19 @@ func TestParseBasename(t *testing.T) {
 		if out != testCase.out {
 			t.Fatalf("expected %q, got %q", testCase.out, out)
 		}
+	}
+}
+
+func TestFinalizeArchive(t *testing.T) {
+	tempFile, err := ioutil.TempFile("", "gitlab-workhorse-test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tempFile.Close()
+
+	// Deliberately cause an EEXIST error: we know tempFile.Name() already exists
+	err = finalizeCachedArchive(tempFile, tempFile.Name())
+	if err != nil {
+		t.Fatalf("expected nil from finalizeCachedArchive, received %v", err)
 	}
 }

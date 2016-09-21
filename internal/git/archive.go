@@ -173,7 +173,11 @@ func finalizeCachedArchive(tempFile *os.File, archivePath string) error {
 	if err := tempFile.Close(); err != nil {
 		return err
 	}
-	return os.Link(tempFile.Name(), archivePath)
+	if err := os.Link(tempFile.Name(), archivePath); err != nil && !os.IsExist(err) {
+		return err
+	}
+
+	return nil
 }
 
 func parseBasename(basename string) (string, bool) {
