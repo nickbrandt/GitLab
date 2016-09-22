@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/requesterror"
 )
 
 // Values from http.DefaultTransport
@@ -82,9 +81,10 @@ func (t *RoundTripper) RoundTrip(r *http.Request) (res *http.Response, err error
 	// instead of 500s we catch the RoundTrip error here and inject a
 	// 502 response.
 	if err != nil {
-		helper.LogError(&Error{
-			requesterror.New("badgateway", r, "failed after %.3fs: %v", time.Since(start).Seconds(), err),
-		})
+		helper.LogError(
+			r,
+			&Error{fmt.Errorf("badgateway: failed after %.3fs: %v", time.Since(start).Seconds(), err)},
+		)
 
 		res = &http.Response{
 			StatusCode: http.StatusBadGateway,

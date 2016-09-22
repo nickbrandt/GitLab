@@ -1,10 +1,10 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/requesterror"
 )
 
 // Prevent internal API responses intended for gitlab-workhorse from
@@ -48,7 +48,7 @@ func (b *blocker) WriteHeader(status int) {
 		b.status = 500
 		b.Header().Del("Content-Length")
 		b.hijacked = true
-		helper.Fail500(b.rw, requesterror.New("api.blocker", b.r, "forbidden content-type: %q", ResponseContentType))
+		helper.Fail500(b.rw, b.r, fmt.Errorf("api.blocker: forbidden content-type: %q", ResponseContentType))
 		return
 	}
 

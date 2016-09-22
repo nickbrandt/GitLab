@@ -16,7 +16,6 @@ import (
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/requesterror"
 )
 
 func GetInfoRefs(a *api.API) http.Handler {
@@ -40,7 +39,7 @@ func looksLikeRepo(p string) bool {
 func repoPreAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.Handler {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		if a.RepoPath == "" {
-			helper.Fail500(w, requesterror.New("repoPreAuthorizeHandler", r, "RepoPath empty"))
+			helper.Fail500(w, r, fmt.Errorf("repoPreAuthorizeHandler: RepoPath empty"))
 			return
 		}
 
@@ -65,12 +64,12 @@ func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *api.Response) 
 	cmd := gitCommand(a.GL_ID, "git", subCommand(rpc), "--stateless-rpc", "--advertise-refs", a.RepoPath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		helper.Fail500(w, requesterror.New("handleGetInfoRefs", r, "stdout: %v", err))
+		helper.Fail500(w, r, fmt.Errorf("handleGetInfoRefs: stdout: %v", err))
 		return
 	}
 	defer stdout.Close()
 	if err := cmd.Start(); err != nil {
-		helper.Fail500(w, requesterror.New("handleGetInfoRefs", r, "start %v: %v", cmd.Args, err))
+		helper.Fail500(w, r, fmt.Errorf("handleGetInfoRefs: start %v: %v", cmd.Args, err))
 		return
 	}
 	defer helper.CleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
@@ -80,21 +79,22 @@ func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *api.Response) 
 	w.Header().Add("Cache-Control", "no-cache")
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 	if err := pktLine(w, fmt.Sprintf("# service=%s\n", rpc)); err != nil {
-		helper.LogError(requesterror.New("handleGetInfoRefs", r, "pktLine: %v", err))
+		helper.LogError(r, fmt.Errorf("handleGetInfoRefs: pktLine: %v", err))
 		return
 	}
 	if err := pktFlush(w); err != nil {
-		helper.LogError(requesterror.New("handleGetInfoRefs", r, "pktFlush: %v", err))
+		helper.LogError(r, fmt.Errorf("handleGetInfoRefs: pktFlush: %v", err))
 		return
 	}
 	if _, err := io.Copy(w, stdout); err != nil {
-		helper.LogError(&copyError{
-			requesterror.New("handleGetInfoRefs", r, "copy output of %v: %v", cmd.Args, err),
-		})
+		helper.LogError(
+			r,
+			&copyError{fmt.Errorf("handleGetInfoRefs: copy output of %v: %v", cmd.Args, err)},
+		)
 		return
 	}
 	if err := cmd.Wait(); err != nil {
-		helper.LogError(requesterror.New("handleGetInfoRefs", r, "wait for %v: %v", cmd.Args, err))
+		helper.LogError(r, fmt.Errorf("handleGetInfoRefs: wait for %v: %v", cmd.Args, err))
 		return
 	}
 }
@@ -106,7 +106,7 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	action := filepath.Base(r.URL.Path)
 	if !(action == "git-upload-pack" || action == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
-		helper.Fail500(w, requesterror.New("handlePostRPC", r, "unsupported action: %s", r.URL.Path))
+		helper.Fail500(w, r, fmt.Errorf("handlePostRPC: unsupported action: %s", r.URL.Path))
 		return
 	}
 
@@ -114,25 +114,25 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	cmd := gitCommand(a.GL_ID, "git", subCommand(action), "--stateless-rpc", a.RepoPath)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		helper.Fail500(w, requesterror.New("handlePostRPC", r, "stdout: %v", err))
+		helper.Fail500(w, r, fmt.Errorf("handlePostRPC: stdout: %v", err))
 		return
 	}
 	defer stdout.Close()
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
-		helper.Fail500(w, requesterror.New("handlePostRPC", r, "stdin: %v", err))
+		helper.Fail500(w, r, fmt.Errorf("handlePostRPC: stdin: %v", err))
 		return
 	}
 	defer stdin.Close()
 	if err := cmd.Start(); err != nil {
-		helper.Fail500(w, requesterror.New("handlePostRPC", r, "start %v: %v", cmd.Args, err))
+		helper.Fail500(w, r, fmt.Errorf("handlePostRPC: start %v: %v", cmd.Args, err))
 		return
 	}
 	defer helper.CleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
 
 	// Write the client request body to Git's standard input
 	if _, err := io.Copy(stdin, r.Body); err != nil {
-		helper.Fail500(w, requesterror.New("handlePostRPC", r, "write to %v: %v", cmd.Args, err))
+		helper.Fail500(w, r, fmt.Errorf("handlePostRPC: write to %v: %v", cmd.Args, err))
 		return
 	}
 	// Signal to the Git subprocess that no more data is coming
@@ -149,13 +149,14 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 
 	// This io.Copy may take a long time, both for Git push and pull.
 	if _, err := io.Copy(w, stdout); err != nil {
-		helper.LogError(&copyError{
-			requesterror.New("handlePostRPC", r, "copy output of %v: %v", cmd.Args, err),
-		})
+		helper.LogError(
+			r,
+			&copyError{fmt.Errorf("handlePostRPC: copy output of %v: %v", cmd.Args, err)},
+		)
 		return
 	}
 	if err := cmd.Wait(); err != nil {
-		helper.LogError(requesterror.New("handlePostRPC", r, "wait for %v: %v", cmd.Args, err))
+		helper.LogError(r, fmt.Errorf("handlePostRPC: wait for %v: %v", cmd.Args, err))
 		return
 	}
 }

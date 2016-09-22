@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -16,7 +17,6 @@ import (
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/requesterror"
 )
 
 func PutStore(a *api.API, h http.Handler) http.Handler {
@@ -27,17 +27,17 @@ func lfsAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.Handler
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
 
 		if a.StoreLFSPath == "" {
-			helper.Fail500(w, requesterror.New("lfsAuthorizeHandler", r, "StoreLFSPath empty"))
+			helper.Fail500(w, r, fmt.Errorf("lfsAuthorizeHandler: StoreLFSPath empty"))
 			return
 		}
 
 		if a.LfsOid == "" {
-			helper.Fail500(w, requesterror.New("lfsAuthorizeHandler", r, "LfsOid empty"))
+			helper.Fail500(w, r, fmt.Errorf("lfsAuthorizeHandler: LfsOid empty"))
 			return
 		}
 
 		if err := os.MkdirAll(a.StoreLFSPath, 0700); err != nil {
-			helper.Fail500(w, requesterror.New("lfsAuthorizeHandler", r, "mkdir StoreLFSPath: %v", err))
+			helper.Fail500(w, r, fmt.Errorf("lfsAuthorizeHandler: mkdir StoreLFSPath: %v", err))
 			return
 		}
 
@@ -49,7 +49,7 @@ func handleStoreLfsObject(h http.Handler) api.HandleFunc {
 	return func(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		file, err := ioutil.TempFile(a.StoreLFSPath, a.LfsOid)
 		if err != nil {
-			helper.Fail500(w, requesterror.New("handleStoreLfsObject", r, "create tempfile: %v", err))
+			helper.Fail500(w, r, fmt.Errorf("handleStoreLfsObject: create tempfile: %v", err))
 			return
 		}
 		defer os.Remove(file.Name())
@@ -60,19 +60,19 @@ func handleStoreLfsObject(h http.Handler) api.HandleFunc {
 
 		written, err := io.Copy(hw, r.Body)
 		if err != nil {
-			helper.Fail500(w, requesterror.New("handleStoreLfsObject", r, "copy body to tempfile: %v", err))
+			helper.Fail500(w, r, fmt.Errorf("handleStoreLfsObject: copy body to tempfile: %v", err))
 			return
 		}
 		file.Close()
 
 		if written != a.LfsSize {
-			helper.Fail500(w, requesterror.New("handleStoreLfsObject", r, "expected size %d, wrote %d", a.LfsSize, written))
+			helper.Fail500(w, r, fmt.Errorf("handleStoreLfsObject: expected size %d, wrote %d", a.LfsSize, written))
 			return
 		}
 
 		shaStr := hex.EncodeToString(hash.Sum(nil))
 		if shaStr != a.LfsOid {
-			helper.Fail500(w, requesterror.New("handleStoreLfsObject", r, "expected sha256 %s, got %s", a.LfsOid, shaStr))
+			helper.Fail500(w, r, fmt.Errorf("handleStoreLfsObject: expected sha256 %s, got %s", a.LfsOid, shaStr))
 			return
 		}
 
