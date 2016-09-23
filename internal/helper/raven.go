@@ -3,10 +3,14 @@ package helper
 import (
 	"net/http"
 	"reflect"
-	"strings"
 
 	"github.com/getsentry/raven-go"
 )
+
+var ravenHeaderBlacklist = []string{
+	"Authorization",
+	"Private-Token",
+}
 
 func captureRavenError(r *http.Request, err error) {
 	client := raven.DefaultClient
@@ -29,9 +33,13 @@ func captureRavenError(r *http.Request, err error) {
 }
 
 func CleanHeadersForRaven(r *http.Request) {
-	if auth := r.Header.Get("Authorization"); auth != "" {
-		if authSplit := strings.Split(auth, " "); authSplit != nil {
-			r.Header.Set("Authorization", authSplit[0]+" [redacted]")
+	if r == nil {
+		return
+	}
+
+	for _, key := range ravenHeaderBlacklist {
+		if r.Header.Get(key) != "" {
+			r.Header.Set(key, "[redacted]")
 		}
 	}
 }
