@@ -20,30 +20,34 @@ import (
 
 var DefaultBackend = helper.URLMustParse("http://localhost:8080")
 
-type Upstream struct {
-	Backend         *url.URL
-	Version         string
-	SecretPath      string
-	DocumentRoot    string
-	DevelopmentMode bool
+type Config struct {
+	Backend             *url.URL
+	Version             string
+	SecretPath          string
+	DocumentRoot        string
+	DevelopmentMode     bool
+	Socket              string
+	ProxyHeadersTimeout time.Duration
+	APILimit            int
+	APIQueueLimit       int
+	APIQueueTimeout     time.Duration
+}
 
+type Upstream struct {
+	Config
 	URLPrefix    urlprefix.Prefix
 	Routes       []route
 	RoundTripper *badgateway.RoundTripper
 }
 
-func NewUpstream(backend *url.URL, socket, version, secretFile, documentRoot string, developmentMode bool, proxyHeadersTimeout time.Duration) *Upstream {
+func NewUpstream(config Config) *Upstream {
 	up := Upstream{
-		Backend:         backend,
-		Version:         version,
-		SecretPath:      secretFile,
-		DocumentRoot:    documentRoot,
-		DevelopmentMode: developmentMode,
+		Config: config,
 	}
-	if backend == nil {
+	if up.Backend == nil {
 		up.Backend = DefaultBackend
 	}
-	up.RoundTripper = badgateway.NewRoundTripper(up.Backend, socket, proxyHeadersTimeout)
+	up.RoundTripper = badgateway.NewRoundTripper(up.Backend, up.Socket, up.ProxyHeadersTimeout)
 	up.configureURLPrefix()
 	up.configureRoutes()
 	return &up

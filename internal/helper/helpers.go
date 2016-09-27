@@ -21,6 +21,18 @@ func LogError(r *http.Request, err error) {
 	printError(r, err)
 }
 
+func ServiceUnavailable(w http.ResponseWriter, r *http.Request, err error) {
+	http.Error(w, "Service Unavailable", http.StatusServiceUnavailable)
+	captureRavenError(r, err)
+	printError(r, err)
+}
+
+func TooManyRequests(w http.ResponseWriter, r *http.Request, err error) {
+	http.Error(w, "Too Many Requests", http.StatusTooManyRequests)
+	captureRavenError(r, err)
+	printError(r, err)
+}
+
 func printError(r *http.Request, err error) {
 	if r != nil {
 		log.Printf("error: %s %q: %v", r.Method, r.RequestURI, err)
