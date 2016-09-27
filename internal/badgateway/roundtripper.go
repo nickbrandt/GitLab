@@ -25,7 +25,7 @@ var DefaultTransport = &http.Transport{
 }
 
 // Custom error for pretty Sentry 'issues'
-type Error502 error
+type Error struct{ error }
 
 type RoundTripper struct {
 	Transport *http.Transport
@@ -81,9 +81,10 @@ func (t *RoundTripper) RoundTrip(r *http.Request) (res *http.Response, err error
 	// instead of 500s we catch the RoundTrip error here and inject a
 	// 502 response.
 	if err != nil {
-		helper.LogError(Error502(fmt.Errorf("badgateway: %s %q failed after %.3fs: %v",
-			r.Method, r.RequestURI, time.Since(start).Seconds(), err,
-		)))
+		helper.LogError(
+			r,
+			&Error{fmt.Errorf("badgateway: failed after %.3fs: %v", time.Since(start).Seconds(), err)},
+		)
 
 		res = &http.Response{
 			StatusCode: http.StatusBadGateway,

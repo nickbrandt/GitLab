@@ -25,8 +25,6 @@ import (
 	"time"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream"
-
-	"github.com/getsentry/raven-go"
 )
 
 // Current version of GitLab Workhorse
@@ -91,11 +89,6 @@ func main() {
 		}()
 	}
 
-	// Use a custom environment variable (not SENTRY_DSN) to prevent
-	// clashes with gitlab-rails.
-	raven.SetDSN(os.Getenv("GITLAB_WORKHORSE_SENTRY_DSN"))
-	raven.DefaultClient.SetRelease(Version)
-
 	up := wrapRaven(
 		upstream.NewUpstream(
 			backendURL,
@@ -108,8 +101,4 @@ func main() {
 		))
 
 	log.Fatal(http.Serve(listener, up))
-}
-
-func wrapRaven(h http.Handler) http.Handler {
-	return http.HandlerFunc(raven.RecoveryHandler(h.ServeHTTP))
 }
