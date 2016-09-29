@@ -23,7 +23,7 @@ type Queue struct {
 func NewQueue(limit, queueLimit uint) *Queue {
 	return &Queue{
 		busyCh:    make(chan struct{}, limit),
-		waitingCh: make(chan struct{}, queueLimit),
+		waitingCh: make(chan struct{}, limit+queueLimit),
 	}
 }
 

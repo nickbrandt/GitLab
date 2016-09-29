@@ -21,7 +21,7 @@ func slowHttpHandler(closeCh chan struct{}) http.Handler {
 
 func TestQueueRequests(t *testing.T) {
 	w := httptest.NewRecorder()
-	h := QueueRequests(httpHandler, 1, 2, time.Second)
+	h := QueueRequests(httpHandler, 1, 1, time.Second)
 	h.ServeHTTP(w, nil)
 	if w.Code != 200 {
 		t.Fatal("QueueRequests should process request")
@@ -51,7 +51,7 @@ func testSlowRequestProcessing(count, limit, queueLimit uint, queueTimeout time.
 }
 
 func TestQueueingTimeout(t *testing.T) {
-	w := testSlowRequestProcessing(2, 1, 2, time.Microsecond)
+	w := testSlowRequestProcessing(2, 1, 1, time.Microsecond)
 
 	if w.Code != 503 {
 		t.Fatal("QueueRequests should timeout queued request")
@@ -59,7 +59,7 @@ func TestQueueingTimeout(t *testing.T) {
 }
 
 func TestQueuedRequests(t *testing.T) {
-	w := testSlowRequestProcessing(3, 1, 2, time.Minute)
+	w := testSlowRequestProcessing(3, 1, 1, time.Minute)
 
 	if w.Code != 429 {
 		t.Fatal("QueueRequests should return immediately and return too many requests")

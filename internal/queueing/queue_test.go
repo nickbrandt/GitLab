@@ -6,7 +6,7 @@ import (
 )
 
 func TestNormalQueueing(t *testing.T) {
-	q := NewQueue(2, 3)
+	q := NewQueue(2, 1)
 	err1 := q.Acquire(time.Microsecond)
 	if err1 != nil {
 		t.Fatal("we should acquire a new slot")
@@ -31,7 +31,7 @@ func TestNormalQueueing(t *testing.T) {
 }
 
 func TestQueueLimit(t *testing.T) {
-	q := NewQueue(1, 1)
+	q := NewQueue(1, 0)
 	err1 := q.Acquire(time.Microsecond)
 	if err1 != nil {
 		t.Fatal("we should acquire a new slot")
@@ -44,7 +44,7 @@ func TestQueueLimit(t *testing.T) {
 }
 
 func TestQueueProcessing(t *testing.T) {
-	q := NewQueue(1, 2)
+	q := NewQueue(1, 1)
 	err1 := q.Acquire(time.Microsecond)
 	if err1 != nil {
 		t.Fatal("we should acquire a new slot")
