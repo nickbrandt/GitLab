@@ -28,7 +28,7 @@ func TestQueueRequests(t *testing.T) {
 	}
 }
 
-func testSlowRequestProcessing(count, limit, queueLimit int, queueTimeout time.Duration) *httptest.ResponseRecorder {
+func testSlowRequestProcessing(count, limit, queueLimit uint, queueTimeout time.Duration) *httptest.ResponseRecorder {
 	closeCh := make(chan struct{})
 	defer close(closeCh)
 

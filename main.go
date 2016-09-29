@@ -42,8 +42,8 @@ var documentRoot = flag.String("documentRoot", "public", "Path to static files c
 var proxyHeadersTimeout = flag.Duration("proxyHeadersTimeout", 5*time.Minute, "How long to wait for response headers when proxying the request")
 var developmentMode = flag.Bool("developmentMode", false, "Allow to serve assets from Rails app")
 var secretPath = flag.String("secretPath", "./.gitlab_workhorse_secret", "File with secret key to authenticate with authBackend")
-var apiLimit = flag.Int("apiLimit", 0, "Number of API requests allowed at single time")
-var apiQueueLimit = flag.Int("apiQueueLimit", 0, "Number of API requests allowed to be queued")
+var apiLimit = flag.Uint("apiLimit", 0, "Number of API requests allowed at single time")
+var apiQueueLimit = flag.Uint("apiQueueLimit", 0, "Number of API requests allowed to be queued")
 var apiQueueTimeout = flag.Duration("apiQueueDuration", queueing.DefaultTimeout, "Maximum queueing duration of requests")
 
 func main() {

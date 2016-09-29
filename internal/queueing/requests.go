@@ -9,8 +9,8 @@ import (
 
 const DefaultTimeout = 30 * time.Second
 
-func QueueRequests(h http.Handler, limit, queueLimit int, queueTimeout time.Duration) http.Handler {
-	if queueLimit == 0 || limit == 0 {
+func QueueRequests(h http.Handler, limit, queueLimit uint, queueTimeout time.Duration) http.Handler {
+	if limit == 0 {
 		return h
 	}
 	if queueTimeout == 0 {

@@ -20,7 +20,7 @@ type Queue struct {
 // limit specifies number of requests run concurrently
 // queueLimit specifies maximum number of requests that can be queued
 // if the number of requests is above the limit
-func NewQueue(limit, queueLimit int) *Queue {
+func NewQueue(limit, queueLimit uint) *Queue {
 	return &Queue{
 		busyCh:    make(chan struct{}, limit),
 		waitingCh: make(chan struct{}, queueLimit),

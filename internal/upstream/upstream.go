@@ -28,8 +28,8 @@ type Config struct {
 	DevelopmentMode     bool
 	Socket              string
 	ProxyHeadersTimeout time.Duration
-	APILimit            int
-	APIQueueLimit       int
+	APILimit            uint
+	APIQueueLimit       uint
 	APIQueueTimeout     time.Duration
 }
 
