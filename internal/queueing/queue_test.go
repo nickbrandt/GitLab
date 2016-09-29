@@ -1,10 +1,8 @@
-package queueing_test
+package queueing
 
 import (
 	"testing"
 	"time"
-
-	. "gitlab.com/gitlab-org/gitlab-workhorse/internal/queueing"
 )
 
 func TestNormalQueueing(t *testing.T) {

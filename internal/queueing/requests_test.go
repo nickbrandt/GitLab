@@ -1,4 +1,4 @@
-package queueing_test
+package queueing
 
 import (
 	"fmt"
@@ -6,8 +6,6 @@ import (
 	"net/http/httptest"
 	"testing"
 	"time"
-
-	. "gitlab.com/gitlab-org/gitlab-workhorse/internal/queueing"
 )
 
 var httpHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
