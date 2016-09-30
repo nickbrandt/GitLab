@@ -20,13 +20,6 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
-// In the request body for POST /git-upload-pack, the client is telling
-// git-upload-pack which objects is wants and which objects it already
-// has. Each 'want' or 'have' is about 30 bytes. Limiting the total
-// git-upload-pack request body size at 1000000 means that we allow for
-// about 33000 want/have messages.
-const uploadPackRequestLimit = 1000000
-
 func GetInfoRefs(a *api.API) http.Handler {
 	return repoPreAuthorizeHandler(a, handleGetInfoRefs)
 }
@@ -122,18 +115,22 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	}
 
 	if action == "git-upload-pack" {
-		buffer, err := bufferUploadPackRequest(r.Body)
+		buffer := &bytes.Buffer{}
+		// Only sniff on the first 4096 bytes: we assume that if we find no
+		// 'deepen' message in the first 4096 bytes there won't be one later
+		// either.
+		_, err = io.Copy(buffer, io.LimitReader(r.Body, 4096))
 		if err != nil {
 			helper.Fail500(w, r, &copyError{fmt.Errorf("handlePostRPC: buffer git-upload-pack body: %v")})
 			return
 		}
 
 		isShallowClone, err = scanDeepen(bytes.NewReader(buffer.Bytes()))
-		body = buffer
+		body = io.MultiReader(buffer, r.Body)
 		if err != nil {
 			// Do not pass on the error: our failure to parse the
 			// request body should not abort the request.
-			helper.LogError(r, fmt.Errorf("parseBody: %v", err))
+			helper.LogError(r, fmt.Errorf("parseBody (non-fatal): %v", err))
 		}
 
 	} else {
@@ -198,13 +195,4 @@ func isExitError(err error) bool {
 
 func subCommand(rpc string) string {
 	return strings.TrimPrefix(rpc, "git-")
-}
-
-func bufferUploadPackRequest(body io.Reader) (*bytes.Buffer, error) {
-	buffer := &bytes.Buffer{}
-	n, err := io.Copy(buffer, &io.LimitedReader{R: body, N: uploadPackRequestLimit})
-	if err == nil && n == uploadPackRequestLimit {
-		err = fmt.Errorf("request body too large (more than %d bytes)", uploadPackRequestLimit-1)
-	}
-	return buffer, err
 }
