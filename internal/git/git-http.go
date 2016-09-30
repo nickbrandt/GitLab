@@ -20,6 +20,8 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
+const uploadPackRequestLimit = 1000000
+
 func GetInfoRefs(a *api.API) http.Handler {
 	return repoPreAuthorizeHandler(a, handleGetInfoRefs)
 }
@@ -115,8 +117,8 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	}
 
 	if action == "git-upload-pack" {
-		buffer := &bytes.Buffer{}
-		if _, err := io.Copy(buffer, r.Body); err != nil {
+		buffer, err := bufferPostBody(r.Body)
+		if err != nil {
 			helper.Fail500(w, r, &copyError{fmt.Errorf("handlePostRPC: buffer git-upload-pack body: %v")})
 			return
 		}
@@ -191,4 +193,13 @@ func isExitError(err error) bool {
 
 func subCommand(rpc string) string {
 	return strings.TrimPrefix(rpc, "git-")
+}
+
+func bufferPostBody(body io.Reader) (*bytes.Buffer, error) {
+	buffer := &bytes.Buffer{}
+	n, err := io.Copy(buffer, &io.LimitedReader{R: body, N: uploadPackRequestLimit})
+	if err == nil && n == uploadPackRequestLimit {
+		err = fmt.Errorf("request body too large (more than %d bytes)", uploadPackRequestLimit-1)
+	}
+	return buffer, err
 }
