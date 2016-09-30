@@ -34,9 +34,14 @@ func scanDeepen(body io.Reader) (bool, error) {
 }
 
 func pktLineSplitter(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	truncatedData := data
+	if len(data) > 100 {
+		truncatedData = truncatedData[:100]
+	}
+
 	if len(data) < 4 {
 		if atEOF && len(data) > 0 {
-			return 0, nil, fmt.Errorf("pktLineSplitter: incomplete length prefix on %q", data)
+			return 0, nil, fmt.Errorf("pktLineSplitter: incomplete length prefix on %q", truncatedData)
 		}
 		return 0, nil, nil // want more data
 	}
@@ -62,7 +67,7 @@ func pktLineSplitter(data []byte, atEOF bool) (advance int, token []byte, err er
 
 	if len(data) < pktLength {
 		if atEOF {
-			return 0, nil, fmt.Errorf("pktLineSplitter: less than %d bytes in input %q", pktLength, data)
+			return 0, nil, fmt.Errorf("pktLineSplitter: less than %d bytes in input %q", pktLength, truncatedData)
 		}
 		return 0, nil, nil // want more data
 	}
