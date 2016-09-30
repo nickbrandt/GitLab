@@ -20,6 +20,11 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
+// In the request body for POST /git-upload-pack, the client is telling
+// git-upload-pack which objects is wants and which objects it already
+// has. Each 'want' or 'have' is about 30 bytes. Limiting the total
+// git-upload-pack request body size at 1000000 means that we allow for
+// about 33000 want/have messages.
 const uploadPackRequestLimit = 1000000
 
 func GetInfoRefs(a *api.API) http.Handler {
@@ -117,7 +122,7 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	}
 
 	if action == "git-upload-pack" {
-		buffer, err := bufferPostBody(r.Body)
+		buffer, err := bufferUploadPackRequest(r.Body)
 		if err != nil {
 			helper.Fail500(w, r, &copyError{fmt.Errorf("handlePostRPC: buffer git-upload-pack body: %v")})
 			return
@@ -195,7 +200,7 @@ func subCommand(rpc string) string {
 	return strings.TrimPrefix(rpc, "git-")
 }
 
-func bufferPostBody(body io.Reader) (*bytes.Buffer, error) {
+func bufferUploadPackRequest(body io.Reader) (*bytes.Buffer, error) {
 	buffer := &bytes.Buffer{}
 	n, err := io.Copy(buffer, &io.LimitedReader{R: body, N: uploadPackRequestLimit})
 	if err == nil && n == uploadPackRequestLimit {

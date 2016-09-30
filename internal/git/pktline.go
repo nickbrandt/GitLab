@@ -43,7 +43,7 @@ func pktLineSplitter(data []byte, atEOF bool) (advance int, token []byte, err er
 
 	if bytes.HasPrefix(data, []byte("0000")) {
 		// special case: "0000" terminator packet: return empty token
-		return 4, data[4:4], nil
+		return 4, data[:0], nil
 	}
 
 	// We have at least 4 bytes available so we can decode the 4-hex digit
@@ -53,6 +53,7 @@ func pktLineSplitter(data []byte, atEOF bool) (advance int, token []byte, err er
 		return 0, nil, fmt.Errorf("pktLineSplitter: decode length: %v", err)
 	}
 
+	// Cast is safe because we requested an int-size number from strconv.ParseInt
 	pktLength := int(pktLength64)
 
 	if pktLength < 0 {
@@ -66,5 +67,6 @@ func pktLineSplitter(data []byte, atEOF bool) (advance int, token []byte, err er
 		return 0, nil, nil // want more data
 	}
 
+	// return "pkt" token without length prefix
 	return pktLength, data[4:pktLength], nil
 }
