@@ -25,7 +25,6 @@ func TestSuccessfulScanDeepen(t *testing.T) {
 			t.Fatalf("scanDeepen %q: expected %v, got %v", example.input, example.output, ok)
 		}
 	}
-
 }
 
 func TestFailedScanDeepen(t *testing.T) {
