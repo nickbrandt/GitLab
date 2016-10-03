@@ -5,11 +5,13 @@ In this file we handle the Git 'smart HTTP' protocol
 package git
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
@@ -101,6 +103,8 @@ func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *api.Response) 
 
 func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	var err error
+	var body io.Reader
+	var isShallowClone bool
 
 	// Get Git action from URL
 	action := filepath.Base(r.URL.Path)
@@ -108,6 +112,29 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		// The 'dumb' Git HTTP protocol is not supported
 		helper.Fail500(w, r, fmt.Errorf("handlePostRPC: unsupported action: %s", r.URL.Path))
 		return
+	}
+
+	if action == "git-upload-pack" {
+		buffer := &bytes.Buffer{}
+		// Only sniff on the first 4096 bytes: we assume that if we find no
+		// 'deepen' message in the first 4096 bytes there won't be one later
+		// either.
+		_, err = io.Copy(buffer, io.LimitReader(r.Body, 4096))
+		if err != nil {
+			helper.Fail500(w, r, &copyError{fmt.Errorf("handlePostRPC: buffer git-upload-pack body: %v", err)})
+			return
+		}
+
+		isShallowClone, err = scanDeepen(bytes.NewReader(buffer.Bytes()))
+		body = io.MultiReader(buffer, r.Body)
+		if err != nil {
+			// Do not pass on the error: our failure to parse the
+			// request body should not abort the request.
+			helper.LogError(r, fmt.Errorf("parseBody (non-fatal): %v", err))
+		}
+
+	} else {
+		body = r.Body
 	}
 
 	// Prepare our Git subprocess
@@ -131,7 +158,7 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	defer helper.CleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
 
 	// Write the client request body to Git's standard input
-	if _, err := io.Copy(stdin, r.Body); err != nil {
+	if _, err := io.Copy(stdin, body); err != nil {
 		helper.Fail500(w, r, fmt.Errorf("handlePostRPC: write to %v: %v", cmd.Args, err))
 		return
 	}
@@ -155,22 +182,17 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		)
 		return
 	}
-	if err := cmd.Wait(); err != nil {
+	if err := cmd.Wait(); err != nil && !(isExitError(err) && isShallowClone) {
 		helper.LogError(r, fmt.Errorf("handlePostRPC: wait for %v: %v", cmd.Args, err))
 		return
 	}
 }
 
+func isExitError(err error) bool {
+	_, ok := err.(*exec.ExitError)
+	return ok
+}
+
 func subCommand(rpc string) string {
 	return strings.TrimPrefix(rpc, "git-")
-}
-
-func pktLine(w io.Writer, s string) error {
-	_, err := fmt.Fprintf(w, "%04x%s", len(s)+4, s)
-	return err
-}
-
-func pktFlush(w io.Writer) error {
-	_, err := fmt.Fprint(w, "0000")
-	return err
 }
