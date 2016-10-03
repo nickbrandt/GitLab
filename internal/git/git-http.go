@@ -121,7 +121,7 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		// either.
 		_, err = io.Copy(buffer, io.LimitReader(r.Body, 4096))
 		if err != nil {
-			helper.Fail500(w, r, &copyError{fmt.Errorf("handlePostRPC: buffer git-upload-pack body: %v")})
+			helper.Fail500(w, r, &copyError{fmt.Errorf("handlePostRPC: buffer git-upload-pack body: %v", err)})
 			return
 		}
 
