@@ -12,14 +12,14 @@ var httpHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) 
 	fmt.Fprintln(w, "OK")
 })
 
-func slowHttpHandler(closeCh chan struct{}) http.Handler {
+func pausedHttpHandler(pauseCh chan struct{}) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		<-closeCh
+		<-pauseCh
 		fmt.Fprintln(w, "OK")
 	})
 }
 
-func TestQueueRequests(t *testing.T) {
+func TestNormalRequestProcessing(t *testing.T) {
 	w := httptest.NewRecorder()
 	h := QueueRequests(httpHandler, 1, 1, time.Second)
 	h.ServeHTTP(w, nil)
@@ -28,28 +28,34 @@ func TestQueueRequests(t *testing.T) {
 	}
 }
 
+// testSlowRequestProcessing creates a new queue,
+// then it runs a number of requests that are going through queue,
+// we return the response of first finished request,
+// where status of request can be 200, 429 or 503
 func testSlowRequestProcessing(count, limit, queueLimit uint, queueTimeout time.Duration) *httptest.ResponseRecorder {
-	closeCh := make(chan struct{})
-	defer close(closeCh)
+	pauseCh := make(chan struct{})
+	defer close(pauseCh)
 
-	handler := QueueRequests(slowHttpHandler(closeCh), limit, queueLimit, queueTimeout)
+	handler := QueueRequests(pausedHttpHandler(pauseCh), limit, queueLimit, queueTimeout)
 
 	respCh := make(chan *httptest.ResponseRecorder, count)
 
 	// queue requests to use up the queue
-	for count > 0 {
+	for i := 0; i < count; i++ {
 		go func() {
 			w := httptest.NewRecorder()
 			handler.ServeHTTP(w, nil)
 			respCh <- w
 		}()
-		count--
 	}
 
 	// dequeue first request
 	return <-respCh
 }
 
+// TestQueueingTimeout performs 2 requests
+// the queue limit and length is 1,
+// the second request gets timed-out
 func TestQueueingTimeout(t *testing.T) {
 	w := testSlowRequestProcessing(2, 1, 1, time.Microsecond)
 
@@ -58,7 +64,10 @@ func TestQueueingTimeout(t *testing.T) {
 	}
 }
 
-func TestQueuedRequests(t *testing.T) {
+// TestQueueingTooManyRequests performs 3 requests
+// the queue limit and length is 1,
+// so the third request has to be rejected with 429
+func TestQueueingTooManyRequests(t *testing.T) {
 	w := testSlowRequestProcessing(3, 1, 1, time.Minute)
 
 	if w.Code != 429 {

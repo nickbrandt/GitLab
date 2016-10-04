@@ -13,6 +13,12 @@ gitlab-workhorse'][brief-history-blog].
   gitlab-workhorse [OPTIONS]
 
 Options:
+  -apiLimit uint
+        Number of API requests allowed at single time
+  -apiQueueDuration duration
+        Maximum queueing duration of requests (default 30s)
+  -apiQueueLimit uint
+        Number of API requests allowed to be queued
   -authBackend string
     	Authentication/authorization backend (default "http://localhost:8080")
   -authSocket string
