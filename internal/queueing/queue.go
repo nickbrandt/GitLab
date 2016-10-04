@@ -23,7 +23,7 @@ type Queue struct {
 func NewQueue(limit, queueLimit uint) *Queue {
 	return &Queue{
 		busyCh:    make(chan struct{}, limit),
-		waitingCh: make(chan struct{}, queueLimit),
+		waitingCh: make(chan struct{}, limit+queueLimit),
 	}
 }
 
@@ -41,7 +41,9 @@ func (s *Queue) Acquire(timeout time.Duration) (err error) {
 	}
 
 	defer func() {
-		<-s.waitingCh
+		if err != nil {
+			<-s.waitingCh
+		}
 	}()
 
 	// fast path: push item to current processed items (non-blocking)
@@ -69,5 +71,6 @@ func (s *Queue) Acquire(timeout time.Duration) (err error) {
 // It triggers next request to be processed if it's in queue
 func (s *Queue) Release() {
 	// dequeue from queue to allow next request to be processed
+	<-s.waitingCh
 	<-s.busyCh
 }

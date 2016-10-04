@@ -32,7 +32,7 @@ func TestNormalRequestProcessing(t *testing.T) {
 // then it runs a number of requests that are going through queue,
 // we return the response of first finished request,
 // where status of request can be 200, 429 or 503
-func testSlowRequestProcessing(count, limit, queueLimit uint, queueTimeout time.Duration) *httptest.ResponseRecorder {
+func testSlowRequestProcessing(count int, limit, queueLimit uint, queueTimeout time.Duration) *httptest.ResponseRecorder {
 	pauseCh := make(chan struct{})
 	defer close(pauseCh)
 
