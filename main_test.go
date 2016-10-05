@@ -868,15 +868,14 @@ func archiveOKServer(t *testing.T, archiveName string) *httptest.Server {
 }
 
 func startWorkhorseServer(authBackend string) *httptest.Server {
-	u := upstream.NewUpstream(
-		helper.URLMustParse(authBackend),
-		"",
-		"123",
-		testhelper.SecretPath(),
-		testDocumentRoot,
-		false,
-		0,
-	)
+	config := upstream.Config{
+		Backend:      helper.URLMustParse(authBackend),
+		Version:      "123",
+		SecretPath:   testhelper.SecretPath(),
+		DocumentRoot: testDocumentRoot,
+	}
+
+	u := upstream.NewUpstream(config)
 	return httptest.NewServer(u)
 }
 
