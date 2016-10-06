@@ -1,6 +1,7 @@
 .test_template: &test_definition
   script:
   - apt-get update -qq && apt-get install -y unzip bzip2
+  - go version
   - make test
 
 test:go1.5.4:
