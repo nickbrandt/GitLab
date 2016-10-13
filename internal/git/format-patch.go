@@ -28,7 +28,7 @@ func (p *patch) Inject(w http.ResponseWriter, r *http.Request, sendData string) 
 
 	log.Printf("SendPatch: sending patch between %q and %q for %q", params.ShaFrom, params.ShaTo, r.URL.Path)
 
-	gitRange := fmt.Sprintf("%v...%v", params.ShaFrom, params.ShaTo)
+	gitRange := fmt.Sprintf("%s..%s", params.ShaFrom, params.ShaTo)
 	gitPatchCmd := gitCommand("", "git", "--git-dir="+params.RepoPath, "format-patch", gitRange, "--stdout")
 
 	stdout, err := gitPatchCmd.StdoutPipe()
