@@ -18,19 +18,16 @@ func pktFlush(w io.Writer) error {
 	return err
 }
 
-func scanDeepen(body io.Reader) (bool, error) {
-	hasDeepen := false
-
+func scanDeepen(body io.Reader) bool {
 	scanner := bufio.NewScanner(body)
 	scanner.Split(pktLineSplitter)
 	for scanner.Scan() {
-		if bytes.HasPrefix(scanner.Bytes(), []byte("deepen")) {
-			hasDeepen = true
-			break
+		if bytes.HasPrefix(scanner.Bytes(), []byte("deepen")) && scanner.Err() == nil {
+			return true
 		}
 	}
 
-	return hasDeepen, scanner.Err()
+	return false
 }
 
 func pktLineSplitter(data []byte, atEOF bool) (advance int, token []byte, err error) {

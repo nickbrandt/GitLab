@@ -16,10 +16,7 @@ func TestSuccessfulScanDeepen(t *testing.T) {
 	}
 
 	for _, example := range examples {
-		hasDeepen, err := scanDeepen(bytes.NewReader([]byte(example.input)))
-		if err != nil {
-			t.Fatalf("error scanning %q: %v", example.input, err)
-		}
+		hasDeepen := scanDeepen(bytes.NewReader([]byte(example.input)))
 
 		if hasDeepen != example.output {
 			t.Fatalf("scanDeepen %q: expected %v, got %v", example.input, example.output, hasDeepen)
@@ -35,14 +32,7 @@ func TestFailedScanDeepen(t *testing.T) {
 	}
 
 	for _, example := range examples {
-		hasDeepen, err := scanDeepen(bytes.NewReader([]byte(example)))
-		if err == nil {
-			t.Fatalf("expected error scanning %q", example)
-		}
-
-		t.Log(err)
-
-		if hasDeepen == true {
+		if scanDeepen(bytes.NewReader([]byte(example))) == true {
 			t.Fatalf("scanDeepen %q: expected result to be false, got true", example)
 		}
 	}

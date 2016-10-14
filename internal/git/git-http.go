@@ -125,14 +125,8 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 			return
 		}
 
-		isShallowClone, err = scanDeepen(bytes.NewReader(buffer.Bytes()))
+		isShallowClone = scanDeepen(bytes.NewReader(buffer.Bytes()))
 		body = io.MultiReader(buffer, r.Body)
-		if err != nil {
-			// Do not pass on the error: our failure to parse the
-			// request body should not abort the request.
-			helper.LogError(r, fmt.Errorf("parseBody (non-fatal): %v", err))
-		}
-
 	} else {
 		body = r.Body
 	}
