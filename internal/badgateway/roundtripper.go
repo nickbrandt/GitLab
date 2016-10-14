@@ -83,7 +83,7 @@ func (t *RoundTripper) RoundTrip(r *http.Request) (res *http.Response, err error
 	if err != nil {
 		helper.LogError(
 			r,
-			&Error{fmt.Errorf("badgateway: failed after %.3fs: %v", time.Since(start).Seconds(), err)},
+			&Error{fmt.Errorf("badgateway: failed after %.fs: %v", time.Since(start).Seconds(), err)},
 		)
 
 		res = &http.Response{
