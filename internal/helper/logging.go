@@ -2,9 +2,22 @@ package helper
 
 import (
 	"fmt"
+	"io"
+	"log"
 	"net/http"
+	"os"
 	"time"
 )
+
+var responseLogger *log.Logger
+
+func init() {
+	SetCustomResponseLogger(os.Stderr)
+}
+
+func SetCustomResponseLogger(writer io.Writer) {
+	responseLogger = log.New(writer, "", 0)
+}
 
 type LoggingResponseWriter struct {
 	rw      http.ResponseWriter
@@ -44,7 +57,7 @@ func (l *LoggingResponseWriter) WriteHeader(status int) {
 
 func (l *LoggingResponseWriter) Log(r *http.Request) {
 	duration := time.Since(l.started)
-	fmt.Printf("%s %s - - [%s] %q %d %d %q %q %f\n",
+	responseLogger.Printf("%s %s - - [%s] %q %d %d %q %q %f\n",
 		r.Host, r.RemoteAddr, l.started,
 		fmt.Sprintf("%s %s %s", r.Method, r.RequestURI, r.Proto),
 		l.status, l.written, r.Referer(), r.UserAgent(), duration.Seconds(),
