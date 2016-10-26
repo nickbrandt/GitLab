@@ -9,6 +9,10 @@
 			"Rev": "ec89d50f00d39494f5b3ec5cf2fe75c53467a937"
 		},
 		{
+			"ImportPath": "github.com/client9/reopen",
+			"Rev": "4b86f9c0ead51cc410d05655596e30f281ed9071"
+		},
+		{
 			"ImportPath": "github.com/dgrijalva/jwt-go",
 			"Comment": "v3.0.0",
 			"Rev": "d2709f9f1f31ebcda9651b03077758c1f3a0018c"

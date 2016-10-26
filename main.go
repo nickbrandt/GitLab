@@ -45,6 +45,7 @@ var secretPath = flag.String("secretPath", "./.gitlab_workhorse_secret", "File w
 var apiLimit = flag.Uint("apiLimit", 0, "Number of API requests allowed at single time")
 var apiQueueLimit = flag.Uint("apiQueueLimit", 0, "Number of API requests allowed to be queued")
 var apiQueueTimeout = flag.Duration("apiQueueDuration", queueing.DefaultTimeout, "Maximum queueing duration of requests")
+var logFile = flag.String("logFile", "", "Log file to be used")
 
 func main() {
 	flag.Usage = func() {
@@ -60,10 +61,11 @@ func main() {
 		os.Exit(0)
 	}
 
+	startLogging(*logFile)
+
 	backendURL, err := parseAuthBackend(*authBackend)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "invalid authBackend: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("invalid authBackend: %v", err)
 	}
 
 	log.Printf("Starting %s", version)
