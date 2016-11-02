@@ -178,6 +178,8 @@ func TestRegularProjectsAPI(t *testing.T) {
 		"/api/v3/projects/foo%2Fbar/repository/not/special",
 		"/api/v3/projects/123/not/special",
 		"/api/v3/projects/foo%2Fbar/not/special",
+		"/api/v3/projects/foo%2Fbar%2Fbaz/repository/not/special",
+		"/api/v3/projects/foo%2Fbar%2Fbaz%2Fqux/repository/not/special",
 	} {
 		resp, err := http.Get(ws.URL + resource)
 		if err != nil {

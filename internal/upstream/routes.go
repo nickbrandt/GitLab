@@ -30,14 +30,12 @@ type routeEntry struct {
 	matchers []matcherFunc
 }
 
-const projectPattern = `^/[^/]+/[^/]+/`
-const gitProjectPattern = `^/[^/]+/[^/]+\.git/`
-
-const apiPattern = `^/api/`
-
-// A project ID in an API request is either a number or two strings 'namespace/project'
-const projectsAPIPattern = `^/api/v3/projects/((\d+)|([^/]+/[^/]+))/`
-const ciAPIPattern = `^/ci/api/`
+const (
+	apiPattern        = `^/api/`
+	ciAPIPattern      = `^/ci/api/`
+	gitProjectPattern = `^/([^/]+/){1,}[^/]+\.git/`
+	projectPattern    = `^/([^/]+/){1,}[^/]+/`
+)
 
 func compileRegexp(regexpStr string) *regexp.Regexp {
 	if len(regexpStr) == 0 {
