@@ -4,6 +4,27 @@ Gitlab-workhorse is a smart reverse proxy for GitLab. It handles
 "large" HTTP requests such as file downloads, file uploads, Git
 push/pull and Git archive downloads.
 
+## Quick facts (how does Workhorse work)
+
+-   Workhorse can handle some requests without involving Rails at all:
+    for example, Javascript files and CSS files are served straight
+    from disk.
+-   Workhorse can modify responses sent by Rails: for example if you use
+    `send_file` in Rails then gitlab-workhorse will open the file on
+    disk and send its contents as the response body to the client.
+-   Workhorse can take over requests after asking permission from Rails.
+    Example: handling `git clone`.
+-   Workhorse can modify requests before passing them to Rails. Example:
+    when handling a Git LFS upload Workhorse first asks permission from
+    Rails, then it stores the request body in a tempfile, then it sends
+    a modified request containing the tempfile path to Rails.
+-   Workhorse does not connect to Redis or Postgres, only to Rails.
+-   We assume that all requests that reach Workhorse pass through an
+    upstream proxy such as NGINX or Apache first.
+-   Workhorse does not accept HTTPS connections.
+-   Workhorse does not clean up idle client connections.
+-   We assume that all requests to Rails pass through Workhorse.
+
 For more information see ['A brief history of
 gitlab-workhorse'][brief-history-blog].
 
