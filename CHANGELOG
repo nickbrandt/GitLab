@@ -2,6 +2,13 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v1.0.0
+
+- Workhorse is now v1.0.0, according to Semantic Versioning. No breaking
+  changes were made.
+- Add support for logging to file, and logfile rotation with SIGHUP.
+- Improve error messages.
+
 v0.8.5
 
 Simplify revspec for 'git format-patch'.
@@ -151,7 +158,7 @@ Return response to client when uploading Git LFS object.
 
 0.4.1
 
-Add support for Build Artifacts and Git LFS. The GitLab-Workhorse 
+Add support for Build Artifacts and Git LFS. The GitLab-Workhorse
 offloads file uploading and downloading by providing support for
 rewriting multipart form data and X-Sendfile.
 
