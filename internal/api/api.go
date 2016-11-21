@@ -59,6 +59,8 @@ type Response struct {
 	Archive string `json:"archive"`
 	// Entry is a filename inside the archive point to file that needs to be extracted
 	Entry string `json:"entry"`
+	// Used to communicate terminal session details
+	Terminal *TerminalSettings
 }
 
 // singleJoiningSlash is taken from reverseproxy.go:NewSingleHostReverseProxy
@@ -143,23 +145,60 @@ func (api *API) newRequest(r *http.Request, body io.Reader, suffix string) (*htt
 	return authReq, nil
 }
 
-func (api *API) PreAuthorizeHandler(h HandleFunc, suffix string) http.Handler {
+// Perform a pre-authorization check against the API for the given HTTP request
+//
+// If `outErr` is set, the other fields will be nil and it should be treated as
+// a 500 error.
+//
+// If httpResponse is present, the caller is responsible for closing its body
+//
+// authResponse will only be present if the authorization check was successful
+func (api *API) PreAuthorize(suffix string, r *http.Request) (httpResponse *http.Response, authResponse *Response, outErr error) {
+	authReq, err := api.newRequest(r, nil, suffix)
+	if err != nil {
+		return nil, nil, fmt.Errorf("preAuthorizeHandler newUpstreamRequest: %v", err)
+	}
+
+	httpResponse, err = api.Client.Do(authReq)
+	if err != nil {
+		return nil, nil, fmt.Errorf("preAuthorizeHandler: do request: %v", err)
+	}
+	defer func() {
+		if outErr != nil {
+			httpResponse.Body.Close()
+			httpResponse = nil
+		}
+	}()
+
+	if httpResponse.StatusCode != http.StatusOK {
+		return httpResponse, nil, nil
+	}
+
+	if contentType := httpResponse.Header.Get("Content-Type"); contentType != ResponseContentType {
+		return httpResponse, nil, fmt.Errorf("preAuthorizeHandler: API responded with wrong content type: %v", contentType)
+	}
+
+	authResponse = &Response{}
+	// The auth backend validated the client request and told us additional
+	// request metadata. We must extract this information from the auth
+	// response body.
+	if err := json.NewDecoder(httpResponse.Body).Decode(authResponse); err != nil {
+		return httpResponse, nil, fmt.Errorf("preAuthorizeHandler: decode authorization response: %v", err)
+	}
+
+	return httpResponse, authResponse, nil
+}
+
+func (api *API) PreAuthorizeHandler(next HandleFunc, suffix string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		authReq, err := api.newRequest(r, nil, suffix)
+		httpResponse, authResponse, err := api.PreAuthorize(suffix, r)
 		if err != nil {
-			helper.Fail500(w, r, fmt.Errorf("preAuthorizeHandler newUpstreamRequest: %v", err))
+			helper.Fail500(w, r, err)
 			return
 		}
 
-		authResponse, err := api.Client.Do(authReq)
-		if err != nil {
-			helper.Fail500(w, r, fmt.Errorf("preAuthorizeHandler: do request: %v", err))
-			return
-		}
-		defer authResponse.Body.Close()
-
-		if authResponse.StatusCode != 200 {
-			for k, v := range authResponse.Header {
+		if httpResponse.StatusCode != http.StatusOK {
+			for k, v := range httpResponse.Header {
 				// Accomodate broken clients that do case-sensitive header lookup
 				if k == "Www-Authenticate" {
 					w.Header()["WWW-Authenticate"] = v
@@ -167,36 +206,25 @@ func (api *API) PreAuthorizeHandler(h HandleFunc, suffix string) http.Handler {
 					w.Header()[k] = v
 				}
 			}
-			w.WriteHeader(authResponse.StatusCode)
-			io.Copy(w, authResponse.Body)
-			return
-		}
+			w.WriteHeader(httpResponse.StatusCode)
+			io.Copy(w, httpResponse.Body)
+			httpResponse.Body.Close()
 
-		if contentType := authResponse.Header.Get("Content-Type"); contentType != ResponseContentType {
-			helper.Fail500(w, r, fmt.Errorf("preAuthorizeHandler: API responded with wrong content type: %v", contentType))
 			return
 		}
-
-		a := &Response{}
-		// The auth backend validated the client request and told us additional
-		// request metadata. We must extract this information from the auth
-		// response body.
-		if err := json.NewDecoder(authResponse.Body).Decode(a); err != nil {
-			helper.Fail500(w, r, fmt.Errorf("preAuthorizeHandler: decode authorization response: %v", err))
-			return
-		}
-		// Don't hog a TCP connection in CLOSE_WAIT, we can already close it now
-		authResponse.Body.Close()
+		// Close the body immediately, rather than waiting for the next handler
+		// to complete
+		httpResponse.Body.Close()
 
 		// Negotiate authentication (Kerberos) may need to return a WWW-Authenticate
 		// header to the client even in case of success as per RFC4559.
-		for k, v := range authResponse.Header {
+		for k, v := range httpResponse.Header {
 			// Case-insensitive comparison as per RFC7230
 			if strings.EqualFold(k, "WWW-Authenticate") {
 				w.Header()[k] = v
 			}
 		}
 
-		h(w, r, a)
+		next(w, r, authResponse)
 	})
 }
