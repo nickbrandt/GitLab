@@ -77,8 +77,8 @@ func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *api.Response) 
 	defer helper.CleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
 
 	// Start writing the response
-	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
-	w.Header().Add("Cache-Control", "no-cache")
+	w.Header().Set("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
+	w.Header().Set("Cache-Control", "no-cache")
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 	if err := pktLine(w, fmt.Sprintf("# service=%s\n", rpc)); err != nil {
 		helper.LogError(r, fmt.Errorf("handleGetInfoRefs: pktLine: %v", err))
@@ -164,8 +164,8 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	r.Body.Close()
 
 	// Start writing the response
-	w.Header().Add("Content-Type", fmt.Sprintf("application/x-%s-result", action))
-	w.Header().Add("Cache-Control", "no-cache")
+	w.Header().Set("Content-Type", fmt.Sprintf("application/x-%s-result", action))
+	w.Header().Set("Cache-Control", "no-cache")
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 
 	// This io.Copy may take a long time, both for Git push and pull.

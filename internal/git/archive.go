@@ -138,14 +138,14 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 
 func setArchiveHeaders(w http.ResponseWriter, format string, archiveFilename string) {
 	w.Header().Del("Content-Length")
-	w.Header().Add("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, archiveFilename))
+	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, archiveFilename))
 	if format == "zip" {
-		w.Header().Add("Content-Type", "application/zip")
+		w.Header().Set("Content-Type", "application/zip")
 	} else {
-		w.Header().Add("Content-Type", "application/octet-stream")
+		w.Header().Set("Content-Type", "application/octet-stream")
 	}
-	w.Header().Add("Content-Transfer-Encoding", "binary")
-	w.Header().Add("Cache-Control", "private")
+	w.Header().Set("Content-Transfer-Encoding", "binary")
+	w.Header().Set("Cache-Control", "private")
 }
 
 func parseArchiveFormat(format string) (*exec.Cmd, string) {

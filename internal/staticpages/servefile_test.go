@@ -116,7 +116,7 @@ func testServingThePregzippedFile(t *testing.T, enableGzip bool) {
 		}
 	} else {
 		testhelper.AssertResponseCode(t, w, 200)
-		testhelper.AssertResponseHeader(t, w, "Content-Encoding", "")
+		testhelper.AssertResponseHeader(t, w, "Content-Encoding")
 		if w.Body.String() != fileContent {
 			t.Error("We should serve the file: ", w.Body.String())
 		}

@@ -63,9 +63,17 @@ func AssertResponseBody(t *testing.T, response *httptest.ResponseRecorder, expec
 	}
 }
 
-func AssertResponseHeader(t *testing.T, response *httptest.ResponseRecorder, header string, expectedValue string) {
-	if response.Header().Get(header) != expectedValue {
-		t.Fatalf("for HTTP request expected to receive the header %q with %q, got %q", header, expectedValue, response.Header().Get(header))
+func AssertResponseHeader(t *testing.T, w http.ResponseWriter, header string, expected ...string) {
+	actual := w.Header()[http.CanonicalHeaderKey(header)]
+
+	if len(expected) != len(actual) {
+		t.Fatalf("for HTTP request expected to receive the header %q with %+v, got %+v", header, expected, actual)
+	}
+
+	for i, value := range expected {
+		if value != actual[i] {
+			t.Fatalf("for HTTP request expected to receive the header %q with %+v, got %+v", header, expected, actual)
+		}
 	}
 }
 
