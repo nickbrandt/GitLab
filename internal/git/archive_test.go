@@ -2,7 +2,10 @@ package git
 
 import (
 	"io/ioutil"
+	"net/http/httptest"
 	"testing"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
 
 func TestParseBasename(t *testing.T) {
@@ -40,5 +43,29 @@ func TestFinalizeArchive(t *testing.T) {
 	err = finalizeCachedArchive(tempFile, tempFile.Name())
 	if err != nil {
 		t.Fatalf("expected nil from finalizeCachedArchive, received %v", err)
+	}
+}
+
+func TestSetArchiveHeaders(t *testing.T) {
+	for _, testCase := range []struct{ in, out string }{
+		{"zip", "application/zip"},
+		{"zippy", "application/octet-stream"},
+		{"rezip", "application/octet-stream"},
+		{"_anything_", "application/octet-stream"},
+	} {
+		w := httptest.NewRecorder()
+
+		// These should be replaced, not appended to
+		w.Header().Set("Content-Type", "test")
+		w.Header().Set("Content-Length", "test")
+		w.Header().Set("Content-Disposition", "test")
+		w.Header().Set("Cache-Control", "test")
+
+		setArchiveHeaders(w, testCase.in, "filename")
+
+		testhelper.AssertResponseHeader(t, w, "Content-Type", testCase.out)
+		testhelper.AssertResponseHeader(t, w, "Content-Length")
+		testhelper.AssertResponseHeader(t, w, "Content-Disposition", `attachment; filename="filename"`)
+		testhelper.AssertResponseHeader(t, w, "Cache-Control", "private")
 	}
 }
