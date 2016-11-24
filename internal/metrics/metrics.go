@@ -6,13 +6,13 @@ import (
 
 var (
 	RequestsActive = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "http_requests_active",
-		Help: "Number of HTTP requests currently being handled.",
+		Name: "gitlab_workhorse_requests_active",
+		Help: "Number of HTTP requests currently being handled by gitlab-workhorse.",
 	})
 	RequestsTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "http_requests_total",
-			Help: "How many HTTP requests processed, partitioned by status code and HTTP method.",
+			Name: "gitlab_workhorse_requests_total",
+			Help: "How many HTTP requests have been processed by gitlab-workhorse, partitioned by status code and HTTP method.",
 		},
 		[]string{"code", "method"},
 	)
