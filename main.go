@@ -26,6 +26,8 @@ import (
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/queueing"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // Current version of GitLab Workhorse
@@ -46,6 +48,7 @@ var apiLimit = flag.Uint("apiLimit", 0, "Number of API requests allowed at singl
 var apiQueueLimit = flag.Uint("apiQueueLimit", 0, "Number of API requests allowed to be queued")
 var apiQueueTimeout = flag.Duration("apiQueueDuration", queueing.DefaultTimeout, "Maximum queueing duration of requests")
 var logFile = flag.String("logFile", "", "Log file to be used")
+var prometheusListenAddr = flag.String("prometheusListenAddr", "", "Prometheus listening address, e.g. ':9100'")
 
 func main() {
 	flag.Usage = func() {
@@ -92,6 +95,14 @@ func main() {
 	if *pprofListenAddr != "" {
 		go func() {
 			log.Print(http.ListenAndServe(*pprofListenAddr, nil))
+		}()
+	}
+
+	if *prometheusListenAddr != "" {
+		promMux := http.NewServeMux()
+		promMux.Handle("/metrics", promhttp.Handler())
+		go func() {
+			log.Print(http.ListenAndServe(*prometheusListenAddr, promMux))
 		}()
 	}
 
