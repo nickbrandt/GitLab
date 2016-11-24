@@ -6,7 +6,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/metrics"
 )
 
 var responseLogger *log.Logger
@@ -27,6 +30,7 @@ type LoggingResponseWriter struct {
 }
 
 func NewLoggingResponseWriter(rw http.ResponseWriter) LoggingResponseWriter {
+	metrics.RequestsActive.Inc()
 	return LoggingResponseWriter{
 		rw:      rw,
 		started: time.Now(),
@@ -62,4 +66,7 @@ func (l *LoggingResponseWriter) Log(r *http.Request) {
 		fmt.Sprintf("%s %s %s", r.Method, r.RequestURI, r.Proto),
 		l.status, l.written, r.Referer(), r.UserAgent(), duration.Seconds(),
 	)
+
+	metrics.RequestsActive.Dec()
+	metrics.RequestsTotal.WithLabelValues(strconv.Itoa(l.status), r.Method).Inc()
 }
