@@ -362,6 +362,9 @@ func TestRegularProjectsAPI(t *testing.T) {
 		if resp.StatusCode != 200 {
 			t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
 		}
+		if h := resp.Header.Get(helper.NginxResponseBufferHeader); h != "" {
+			t.Errorf("GET %q: Expected %s not to be present, got %q", resource, helper.NginxResponseBufferHeader, h)
+		}
 	}
 }
 
@@ -415,6 +418,9 @@ func TestAllowedStaticFile(t *testing.T) {
 		}
 		if proxied {
 			t.Errorf("GET %q: should not have made it to backend", resource)
+		}
+		if h := resp.Header.Get(helper.NginxResponseBufferHeader); h != "no" {
+			t.Errorf("GET %q: Expected %s to equal %q, got %q", resource, helper.NginxResponseBufferHeader, "no", h)
 		}
 	}
 }
@@ -487,6 +493,9 @@ func TestAllowedPublicUploadsFile(t *testing.T) {
 		}
 		if !proxied {
 			t.Fatalf("GET %q: never made it to backend", resource)
+		}
+		if h := resp.Header.Get(helper.NginxResponseBufferHeader); h != "no" {
+			t.Errorf("GET %q: Expected %s to equal %q, got %q", resource, helper.NginxResponseBufferHeader, "no", h)
 		}
 	}
 }
@@ -642,6 +651,10 @@ func TestArtifactsGetSingleFile(t *testing.T) {
 	if string(body) != fileContents {
 		t.Fatalf("Expected file contents %q, got %q", fileContents, body)
 	}
+
+	if h := resp.Header.Get(helper.NginxResponseBufferHeader); h != "no" {
+		t.Errorf("GET %q: Expected %s to equal %q, got %q", resourcePath, helper.NginxResponseBufferHeader, "no", h)
+	}
 }
 
 func TestGetGitBlob(t *testing.T) {
@@ -669,6 +682,10 @@ func TestGetGitBlob(t *testing.T) {
 	if !strings.HasPrefix(string(body), "The MIT License (MIT)") {
 		t.Fatalf("Expected MIT license, got %q", body)
 	}
+
+	if h := resp.Header.Get(helper.NginxResponseBufferHeader); h != "no" {
+		t.Errorf("Expected %s to equal %q, got %q", helper.NginxResponseBufferHeader, "no", h)
+	}
 }
 
 func TestGetGitDiff(t *testing.T) {
@@ -693,6 +710,10 @@ func TestGetGitDiff(t *testing.T) {
 	if bodyLengthBytes != 155 {
 		t.Fatal("Expected the body to consist of 155 bytes, got %v", bodyLengthBytes)
 	}
+
+	if h := resp.Header.Get(helper.NginxResponseBufferHeader); h != "no" {
+		t.Errorf("Expected %s to equal %q, got %q", helper.NginxResponseBufferHeader, "no", h)
+	}
 }
 
 func TestGetGitPatch(t *testing.T) {
@@ -712,6 +733,10 @@ func TestGetGitPatch(t *testing.T) {
 
 	// Only the two commits on the fix branch should be included
 	testhelper.AssertPatchSeries(t, body, "12d65c8dd2b2676fa3ac47d955accc085a37a9c1", toSha)
+
+	if h := resp.Header.Get(helper.NginxResponseBufferHeader); h != "no" {
+		t.Errorf("Expected %s to equal %q, got %q", helper.NginxResponseBufferHeader, "no", h)
+	}
 }
 
 func TestApiContentTypeBlock(t *testing.T) {

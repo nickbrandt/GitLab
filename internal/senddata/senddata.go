@@ -2,6 +2,8 @@ package senddata
 
 import (
 	"net/http"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
 type sendDataResponseWriter struct {
@@ -62,6 +64,7 @@ func (s *sendDataResponseWriter) tryInject() bool {
 	for _, injecter := range s.injecters {
 		if injecter.Match(header) {
 			s.hijacked = true
+			helper.DisableResponseBuffering(s.rw)
 			injecter.Inject(s.rw, s.req, header)
 			return true
 		}

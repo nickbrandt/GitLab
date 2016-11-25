@@ -10,6 +10,8 @@ import (
 	"syscall"
 )
 
+const NginxResponseBufferHeader = "X-Accel-Buffering"
+
 func Fail500(w http.ResponseWriter, r *http.Request, err error) {
 	http.Error(w, "Internal server error", 500)
 	captureRavenError(r, err)
@@ -131,4 +133,12 @@ func ExitStatus(err error) (int, bool) {
 	}
 
 	return waitStatus.ExitStatus(), true
+}
+
+func DisableResponseBuffering(w http.ResponseWriter) {
+	w.Header().Set(NginxResponseBufferHeader, "no")
+}
+
+func AllowResponseBuffering(w http.ResponseWriter) {
+	w.Header().Del(NginxResponseBufferHeader)
 }

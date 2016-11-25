@@ -66,6 +66,7 @@ func (s *sendFileResponseWriter) WriteHeader(status int) {
 		s.hijacked = true
 
 		// Serve the file
+		helper.DisableResponseBuffering(s.rw)
 		sendFileFromDisk(s.rw, s.req, file)
 		return
 	}
