@@ -65,6 +65,8 @@ func (u *Upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	w := helper.NewLoggingResponseWriter(ow)
 	defer w.Log(r)
 
+	helper.DisableResponseBuffering(&w)
+
 	// Drop WebSocket connection and CONNECT method
 	if r.RequestURI == "*" {
 		helper.HTTPError(&w, r, "Connection upgrade not allowed", http.StatusBadRequest)
