@@ -6,17 +6,41 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
-var responseLogger *log.Logger
+var (
+	responseLogger *log.Logger
+
+	sessionsActive = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "gitlab_workhorse_http_sessions_active",
+		Help: "Number of HTTP request-response cycles currently being handled by gitlab-workhorse.",
+	})
+
+	requestsTotal = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "gitlab_workhorse_http_requests_total",
+			Help: "How many HTTP requests have been processed by gitlab-workhorse, partitioned by status code and HTTP method.",
+		},
+		[]string{"code", "method"},
+	)
+)
 
 func init() {
 	SetCustomResponseLogger(os.Stderr)
+	registerPrometheusMetrics()
 }
 
 func SetCustomResponseLogger(writer io.Writer) {
 	responseLogger = log.New(writer, "", 0)
+}
+
+func registerPrometheusMetrics() {
+	prometheus.MustRegister(sessionsActive)
+	prometheus.MustRegister(requestsTotal)
 }
 
 type LoggingResponseWriter struct {
@@ -27,6 +51,7 @@ type LoggingResponseWriter struct {
 }
 
 func NewLoggingResponseWriter(rw http.ResponseWriter) LoggingResponseWriter {
+	sessionsActive.Inc()
 	return LoggingResponseWriter{
 		rw:      rw,
 		started: time.Now(),
@@ -62,4 +87,7 @@ func (l *LoggingResponseWriter) Log(r *http.Request) {
 		fmt.Sprintf("%s %s %s", r.Method, r.RequestURI, r.Proto),
 		l.status, l.written, r.Referer(), r.UserAgent(), duration.Seconds(),
 	)
+
+	sessionsActive.Dec()
+	requestsTotal.WithLabelValues(strconv.Itoa(l.status), r.Method).Inc()
 }
