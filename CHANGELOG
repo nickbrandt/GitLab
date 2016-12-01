@@ -2,6 +2,12 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v1.1.0
+
+- Prometheus metrics listener via `-prometheusListenAddr` option
+- Tell NGINX to not buffer Git HTTP responses etc. with X-Accel-Buffering
+- Fix double content type bug on archive downloads
+
 v1.0.0
 
 - Workhorse is now v1.0.0, according to Semantic Versioning. No breaking
