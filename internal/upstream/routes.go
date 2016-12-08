@@ -56,7 +56,7 @@ func (u *Upstream) configureRoutes() {
 		git.SendPatch,
 		artifacts.SendEntry,
 	)
-	apiProxyQueue := queueing.QueueRequests(proxy, u.APILimit, u.APIQueueLimit, u.APIQueueTimeout)
+	ciAPIProxyQueue := queueing.QueueRequests(proxy, u.APILimit, u.APIQueueLimit, u.APIQueueTimeout)
 
 	u.Routes = []route{
 		// Git Clone
@@ -68,9 +68,12 @@ func (u *Upstream) configureRoutes() {
 		// CI Artifacts
 		route{"POST", regexp.MustCompile(ciAPIPattern + `v1/builds/[0-9]+/artifacts\z`), contentEncodingHandler(artifacts.UploadArtifacts(api, proxy))},
 
+		// Limit capacity given to builds/register.json
+		route{"", regexp.MustCompile(ciAPIPattern + `v1/builds/register.json\z`), ciAPIProxyQueue},
+
 		// Explicitly proxy API requests
-		route{"", regexp.MustCompile(apiPattern), apiProxyQueue},
-		route{"", regexp.MustCompile(ciAPIPattern), apiProxyQueue},
+		route{"", regexp.MustCompile(apiPattern), proxy},
+		route{"", regexp.MustCompile(ciAPIPattern), proxy},
 
 		// Serve assets
 		route{"", regexp.MustCompile(`^/assets/`),
