@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v1.1.1
+
+- Restrict effect of API rate limiting to /ci/api/v1/builds/register.json
+
 v1.1.0
 
 - Prometheus metrics listener via `-prometheusListenAddr` option
