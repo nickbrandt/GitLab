@@ -36,6 +36,14 @@ var (
 		},
 		[]string{"ci"},
 	)
+
+	cloneFetchBytes = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "gitlab_workhorse_git_clone_fetch_bytes",
+			Help: "How many Git clone/fetch bytes for CI have been send by gitlab-workhorse, partitioned by CI yes/no status.",
+		},
+		[]string{"ci"},
+	)
 )
 
 func init() {
@@ -51,6 +59,7 @@ func registerPrometheusMetrics() {
 	prometheus.MustRegister(sessionsActive)
 	prometheus.MustRegister(requestsTotal)
 	prometheus.MustRegister(cloneFetchRequests)
+	prometheus.MustRegister(cloneFetchBytes)
 }
 
 type LoggingResponseWriter struct {
@@ -118,4 +127,5 @@ func (l *LoggingResponseWriter) countCloneFetchRequests(r *http.Request) {
 	}
 
 	cloneFetchRequests.WithLabelValues(forCi).Inc()
+	cloneFetchBytes.WithLabelValues(forCi).Add(float64(l.written))
 }
