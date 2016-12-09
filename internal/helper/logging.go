@@ -1,9 +1,11 @@
 package helper
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"strconv"
@@ -43,26 +45,49 @@ func registerPrometheusMetrics() {
 	prometheus.MustRegister(requestsTotal)
 }
 
-type LoggingResponseWriter struct {
+type LoggingResponseWriter interface {
+	http.ResponseWriter
+
+	Log(r *http.Request)
+}
+
+type loggingResponseWriter struct {
 	rw      http.ResponseWriter
 	status  int
 	written int64
 	started time.Time
 }
 
+type hijackingResponseWriter struct {
+	loggingResponseWriter
+}
+
 func NewLoggingResponseWriter(rw http.ResponseWriter) LoggingResponseWriter {
 	sessionsActive.Inc()
-	return LoggingResponseWriter{
+	out := loggingResponseWriter{
 		rw:      rw,
 		started: time.Now(),
 	}
+
+	if _, ok := rw.(http.Hijacker); ok {
+		return &hijackingResponseWriter{out}
+	}
+
+	return &out
 }
 
-func (l *LoggingResponseWriter) Header() http.Header {
+func (l *hijackingResponseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	// The only way to gethere is through NewLoggingResponseWriter(), which
+	// checks that this cast will be valid.
+	hijacker := l.rw.(http.Hijacker)
+	return hijacker.Hijack()
+}
+
+func (l *loggingResponseWriter) Header() http.Header {
 	return l.rw.Header()
 }
 
-func (l *LoggingResponseWriter) Write(data []byte) (n int, err error) {
+func (l *loggingResponseWriter) Write(data []byte) (n int, err error) {
 	if l.status == 0 {
 		l.WriteHeader(http.StatusOK)
 	}
@@ -71,7 +96,7 @@ func (l *LoggingResponseWriter) Write(data []byte) (n int, err error) {
 	return
 }
 
-func (l *LoggingResponseWriter) WriteHeader(status int) {
+func (l *loggingResponseWriter) WriteHeader(status int) {
 	if l.status != 0 {
 		return
 	}
@@ -80,7 +105,7 @@ func (l *LoggingResponseWriter) WriteHeader(status int) {
 	l.rw.WriteHeader(status)
 }
 
-func (l *LoggingResponseWriter) Log(r *http.Request) {
+func (l *loggingResponseWriter) Log(r *http.Request) {
 	duration := time.Since(l.started)
 	responseLogger.Printf("%s %s - - [%s] %q %d %d %q %q %f\n",
 		r.Host, r.RemoteAddr, l.started,

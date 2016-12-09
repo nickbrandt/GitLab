@@ -36,7 +36,7 @@ type Config struct {
 type Upstream struct {
 	Config
 	URLPrefix    urlprefix.Prefix
-	Routes       []route
+	Routes       []routeEntry
 	RoundTripper *badgateway.RoundTripper
 }
 
@@ -65,17 +65,17 @@ func (u *Upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	w := helper.NewLoggingResponseWriter(ow)
 	defer w.Log(r)
 
-	helper.DisableResponseBuffering(&w)
+	helper.DisableResponseBuffering(w)
 
-	// Drop WebSocket connection and CONNECT method
+	// Drop RequestURI == "*" (FIXME: why?)
 	if r.RequestURI == "*" {
-		helper.HTTPError(&w, r, "Connection upgrade not allowed", http.StatusBadRequest)
+		helper.HTTPError(w, r, "Connection upgrade not allowed", http.StatusBadRequest)
 		return
 	}
 
 	// Disallow connect
 	if r.Method == "CONNECT" {
-		helper.HTTPError(&w, r, "CONNECT not allowed", http.StatusBadRequest)
+		helper.HTTPError(w, r, "CONNECT not allowed", http.StatusBadRequest)
 		return
 	}
 
@@ -83,29 +83,25 @@ func (u *Upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
 	URIPath := urlprefix.CleanURIPath(r.URL.Path)
 	prefix := u.URLPrefix
 	if !prefix.Match(URIPath) {
-		helper.HTTPError(&w, r, fmt.Sprintf("Not found %q", URIPath), http.StatusNotFound)
+		helper.HTTPError(w, r, fmt.Sprintf("Not found %q", URIPath), http.StatusNotFound)
 		return
 	}
 
-	// Look for a matching Git service
-	var ro route
-	foundService := false
-	for _, ro = range u.Routes {
-		if ro.method != "" && r.Method != ro.method {
-			continue
-		}
-
-		if ro.regex == nil || ro.regex.MatchString(prefix.Strip(URIPath)) {
-			foundService = true
+	// Look for a matching route
+	var route *routeEntry
+	for _, ro := range u.Routes {
+		if ro.isMatch(prefix.Strip(URIPath), r) {
+			route = &ro
 			break
 		}
 	}
-	if !foundService {
+
+	if route == nil {
 		// The protocol spec in git/Documentation/technical/http-protocol.txt
 		// says we must return 403 if no matching service is found.
-		helper.HTTPError(&w, r, "Forbidden", http.StatusForbidden)
+		helper.HTTPError(w, r, "Forbidden", http.StatusForbidden)
 		return
 	}
 
-	ro.handler.ServeHTTP(&w, r)
+	route.handler.ServeHTTP(w, r)
 }

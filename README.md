@@ -18,6 +18,8 @@ push/pull and Git archive downloads.
     when handling a Git LFS upload Workhorse first asks permission from
     Rails, then it stores the request body in a tempfile, then it sends
     a modified request containing the tempfile path to Rails.
+-   Workhorse can manage long-lived WebSocket connections for Rails.
+    Example: handling the terminal websocket for environments.
 -   Workhorse does not connect to Redis or Postgres, only to Rails.
 -   We assume that all requests that reach Workhorse pass through an
     upstream proxy such as NGINX or Apache first.

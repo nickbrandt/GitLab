@@ -1,7 +1,10 @@
 {
 	"ImportPath": "gitlab.com/gitlab-org/gitlab-workhorse",
-	"GoVersion": "go1.7",
+	"GoVersion": "go1.5",
 	"GodepVersion": "v74",
+	"Packages": [
+		"./..."
+	],
 	"Deps": [
 		{
 			"ImportPath": "github.com/beorn7/perks/quantile",
@@ -28,6 +31,11 @@
 		{
 			"ImportPath": "github.com/golang/protobuf/proto",
 			"Rev": "8ee79997227bf9b34611aee7946ae64735e6fd93"
+		},
+		{
+			"ImportPath": "github.com/gorilla/websocket",
+			"Comment": "v1.0.0-39-ge8f0f8a",
+			"Rev": "e8f0f8aaa98dfb6586cbdf2978d511e3199a960a"
 		},
 		{
 			"ImportPath": "github.com/matttproud/golang_protobuf_extensions/pbutil",
