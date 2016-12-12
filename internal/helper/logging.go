@@ -91,7 +91,3 @@ func (l *LoggingResponseWriter) Log(r *http.Request) {
 	sessionsActive.Dec()
 	requestsTotal.WithLabelValues(strconv.Itoa(l.status), r.Method).Inc()
 }
-
-func (l *LoggingResponseWriter) Size() int64 {
-	return l.written
-}

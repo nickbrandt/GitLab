@@ -18,20 +18,18 @@ import (
 )
 
 var (
-	artifactsUploadRequests = prometheus.NewCounterVec(
+	artifactsUploadRequests = prometheus.NewCounter(
 		prometheus.CounterOpts{
 			Name: "gitlab_workhorse_artifacts_upload_requests",
 			Help: "How many artifacts upload requests have been processed by gitlab-workhorse.",
 		},
-		nil,
 	)
 
-	artifactsUploadBytes = prometheus.NewCounterVec(
+	artifactsUploadBytes = prometheus.NewCounter(
 		prometheus.CounterOpts{
 			Name: "gitlab_workhorse_artifacts_upload_bytes",
-			Help: "How many artifacts upload bytes have been send by gitlab-workhorse.",
+			Help: "How many artifacts upload bytes have been sent by gitlab-workhorse.",
 		},
-		nil,
 	)
 )
 
@@ -98,9 +96,9 @@ func (a *artifactsUploadProcessor) Cleanup() {
 
 func UploadArtifacts(myAPI *api.API, h http.Handler) http.Handler {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
-		artifactsUploadRequests.WithLabelValues().Inc()
+		artifactsUploadRequests.Inc()
 		defer func() {
-			artifactsUploadBytes.WithLabelValues().Add(float64(r.ContentLength))
+			artifactsUploadBytes.Add(float64(r.ContentLength))
 		}()
 
 		if a.TempPath == "" {

@@ -26,17 +26,17 @@ var (
 	gitHTTPRequests = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "gitlab_workhorse_git_http_requests",
-			Help: "How many Git HTTP requests have been processed by gitlab-workhorse, partitioned by CI yes/no status.",
+			Help: "How many Git HTTP requests have been processed by gitlab-workhorse, partitioned by request type and agent.",
 		},
-		[]string{"ci"},
+		[]string{"request_type", "agent"},
 	)
 
 	gitHTTPBytes = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "gitlab_workhorse_git_http_bytes",
-			Help: "How many Git HTTP bytes have been send by gitlab-workhorse, partitioned by CI yes/no status.",
+			Help: "How many Git HTTP bytes have been sent by gitlab-workhorse, partitioned by request type, agent and direction.",
 		},
-		[]string{"ci"},
+		[]string{"request_type", "agent", "direction"},
 	)
 )
 
@@ -63,25 +63,19 @@ func looksLikeRepo(p string) bool {
 	return true
 }
 
-func forCI(r *http.Request) string {
+func getRequestAgent(r *http.Request) string {
 	u, _, ok := r.BasicAuth()
 	if ok && u == "gitlab-ci-token" {
-		return "1"
+		return "gitlab-ci"
+	} else if ok {
+		return "logged"
 	} else {
-		return "0"
+		return "anonymous"
 	}
 }
 
 func repoPreAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.Handler {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
-		gitHTTPRequests.WithLabelValues(forCI(r)).Inc()
-		defer func() {
-			lw, ok := w.(*helper.LoggingResponseWriter)
-			if ok {
-				gitHTTPBytes.WithLabelValues(forCI(r)).Add(float64(lw.Size()))
-			}
-		}()
-
 		if a.RepoPath == "" {
 			helper.Fail500(w, r, fmt.Errorf("repoPreAuthorizeHandler: RepoPath empty"))
 			return
@@ -103,6 +97,13 @@ func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *api.Response) 
 		http.Error(w, "Not Found", 404)
 		return
 	}
+
+	requestType := "get-info-refs"
+	gitHTTPRequests.WithLabelValues(requestType, getRequestAgent(r)).Inc()
+	var writtenOut int64
+	defer func() {
+		gitHTTPBytes.WithLabelValues(requestType, getRequestAgent(r), "out").Add(float64(writtenOut))
+	}()
 
 	// Prepare our Git subprocess
 	cmd := gitCommand(a.GL_ID, "git", subCommand(rpc), "--stateless-rpc", "--advertise-refs", a.RepoPath)
@@ -130,7 +131,7 @@ func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *api.Response) 
 		helper.LogError(r, fmt.Errorf("handleGetInfoRefs: pktFlush: %v", err))
 		return
 	}
-	if _, err := io.Copy(w, stdout); err != nil {
+	if writtenOut, err = io.Copy(w, stdout); err != nil {
 		helper.LogError(
 			r,
 			&copyError{fmt.Errorf("handleGetInfoRefs: copy output of %v: %v", cmd.Args, err)},
@@ -155,6 +156,14 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		helper.Fail500(w, r, fmt.Errorf("handlePostRPC: unsupported action: %s", r.URL.Path))
 		return
 	}
+
+	requestType := "post-" + action
+	gitHTTPRequests.WithLabelValues(requestType, getRequestAgent(r)).Inc()
+	var writtenIn, writtenOut int64
+	defer func() {
+		gitHTTPBytes.WithLabelValues(requestType, getRequestAgent(r), "in").Add(float64(writtenIn))
+		gitHTTPBytes.WithLabelValues(requestType, getRequestAgent(r), "out").Add(float64(writtenOut))
+	}()
 
 	if action == "git-upload-pack" {
 		buffer := &bytes.Buffer{}
@@ -194,7 +203,7 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	defer helper.CleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
 
 	// Write the client request body to Git's standard input
-	if _, err := io.Copy(stdin, body); err != nil {
+	if writtenIn, err = io.Copy(stdin, body); err != nil {
 		helper.Fail500(w, r, fmt.Errorf("handlePostRPC: write to %v: %v", cmd.Args, err))
 		return
 	}
@@ -211,7 +220,7 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 
 	// This io.Copy may take a long time, both for Git push and pull.
-	if _, err := io.Copy(w, stdout); err != nil {
+	if writtenOut, err = io.Copy(w, stdout); err != nil {
 		helper.LogError(
 			r,
 			&copyError{fmt.Errorf("handlePostRPC: copy output of %v: %v", cmd.Args, err)},

@@ -30,7 +30,7 @@ var (
 	sendFileBytes = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "gitlab_workhorse_sendfile_bytes",
-			Help: "How many X-Sendfile bytes have been send by gitlab-workhorse, partitioned by sendfile type.",
+			Help: "How many X-Sendfile bytes have been sent by gitlab-workhorse, partitioned by sendfile type.",
 		},
 		[]string{"type"},
 	)
@@ -125,9 +125,7 @@ func countSendFileMetrics(size int64, r *http.Request) {
 	}
 
 	sendFileRequests.WithLabelValues(requestType).Inc()
-	defer func() {
-		sendFileBytes.WithLabelValues(requestType).Add(float64(size))
-	}()
+	sendFileBytes.WithLabelValues(requestType).Add(float64(size))
 }
 
 func (s *sendFileResponseWriter) Flush() {
