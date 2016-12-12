@@ -16,9 +16,34 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
+
+var (
+	gitHTTPRequests = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "gitlab_workhorse_git_http_requests",
+			Help: "How many Git HTTP requests have been processed by gitlab-workhorse, partitioned by CI yes/no status.",
+		},
+		[]string{"ci"},
+	)
+
+	gitHTTPBytes = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "gitlab_workhorse_git_http_bytes",
+			Help: "How many Git HTTP bytes have been send by gitlab-workhorse, partitioned by CI yes/no status.",
+		},
+		[]string{"ci"},
+	)
+)
+
+func init() {
+	prometheus.MustRegister(gitHTTPRequests)
+	prometheus.MustRegister(gitHTTPBytes)
+}
 
 func GetInfoRefs(a *api.API) http.Handler {
 	return repoPreAuthorizeHandler(a, handleGetInfoRefs)
@@ -38,8 +63,25 @@ func looksLikeRepo(p string) bool {
 	return true
 }
 
+func forCI(r *http.Request) string {
+	u, _, ok := r.BasicAuth()
+	if ok && u == "gitlab-ci-token" {
+		return "1"
+	} else {
+		return "0"
+	}
+}
+
 func repoPreAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.Handler {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
+		gitHTTPRequests.WithLabelValues(forCI(r)).Inc()
+		defer func() {
+			lw, ok := w.(*helper.LoggingResponseWriter)
+			if ok {
+				gitHTTPBytes.WithLabelValues(forCI(r)).Add(float64(lw.Size()))
+			}
+		}()
+
 		if a.RepoPath == "" {
 			helper.Fail500(w, r, fmt.Errorf("repoPreAuthorizeHandler: RepoPath empty"))
 			return

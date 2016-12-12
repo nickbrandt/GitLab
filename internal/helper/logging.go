@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -28,22 +27,6 @@ var (
 		},
 		[]string{"code", "method"},
 	)
-
-	cloneFetchRequests = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "gitlab_workhorse_git_clone_fetch_requests",
-			Help: "How many Git clone/fetch requests for CI have been processed by gitlab-workhorse, partitioned by CI yes/no status.",
-		},
-		[]string{"ci"},
-	)
-
-	cloneFetchBytes = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "gitlab_workhorse_git_clone_fetch_bytes",
-			Help: "How many Git clone/fetch bytes for CI have been send by gitlab-workhorse, partitioned by CI yes/no status.",
-		},
-		[]string{"ci"},
-	)
 )
 
 func init() {
@@ -58,8 +41,6 @@ func SetCustomResponseLogger(writer io.Writer) {
 func registerPrometheusMetrics() {
 	prometheus.MustRegister(sessionsActive)
 	prometheus.MustRegister(requestsTotal)
-	prometheus.MustRegister(cloneFetchRequests)
-	prometheus.MustRegister(cloneFetchBytes)
 }
 
 type LoggingResponseWriter struct {
@@ -107,25 +88,10 @@ func (l *LoggingResponseWriter) Log(r *http.Request) {
 		l.status, l.written, r.Referer(), r.UserAgent(), duration.Seconds(),
 	)
 
-	l.countCloneFetchRequests(r)
-
 	sessionsActive.Dec()
 	requestsTotal.WithLabelValues(strconv.Itoa(l.status), r.Method).Inc()
 }
 
-func (l *LoggingResponseWriter) countCloneFetchRequests(r *http.Request) {
-	if l.status == 401 || !strings.Contains(r.RequestURI, "/info/refs?service=git-upload-pack") {
-		return
-	}
-
-	u, _, ok := r.BasicAuth()
-	var forCi string
-	if ok && u == "gitlab-ci-token" {
-		forCi = "1"
-	} else {
-		forCi = "0"
-	}
-
-	cloneFetchRequests.WithLabelValues(forCi).Inc()
-	cloneFetchBytes.WithLabelValues(forCi).Add(float64(l.written))
+func (l *LoggingResponseWriter) Size() int64 {
+	return l.written
 }
