@@ -16,34 +16,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/prometheus/client_golang/prometheus"
-
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
-
-var (
-	gitHTTPRequests = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "gitlab_workhorse_git_http_requests",
-			Help: "How many Git HTTP requests have been processed by gitlab-workhorse, partitioned by request type and agent.",
-		},
-		[]string{"request_type", "agent"},
-	)
-
-	gitHTTPBytes = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "gitlab_workhorse_git_http_bytes",
-			Help: "How many Git HTTP bytes have been sent by gitlab-workhorse, partitioned by request type, agent and direction.",
-		},
-		[]string{"request_type", "agent", "direction"},
-	)
-)
-
-func init() {
-	prometheus.MustRegister(gitHTTPRequests)
-	prometheus.MustRegister(gitHTTPBytes)
-}
 
 func GetInfoRefs(a *api.API) http.Handler {
 	return repoPreAuthorizeHandler(a, handleGetInfoRefs)
@@ -63,17 +38,6 @@ func looksLikeRepo(p string) bool {
 	return true
 }
 
-func getRequestAgent(r *http.Request) string {
-	u, _, ok := r.BasicAuth()
-	if ok && u == "gitlab-ci-token" {
-		return "gitlab-ci"
-	} else if ok {
-		return "logged"
-	} else {
-		return "anonymous"
-	}
-}
-
 func repoPreAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.Handler {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		if a.RepoPath == "" {
@@ -90,20 +54,17 @@ func repoPreAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.Han
 	}, "")
 }
 
-func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *api.Response) {
-	rpc := r.URL.Query().Get("service")
+func handleGetInfoRefs(rw http.ResponseWriter, r *http.Request, a *api.Response) {
+	w := NewGitHttpResponseWriter(rw)
+	// Log 0 bytes in because we ignore the request body (and there usually is none anyway).
+	defer w.Log(r, 0)
+
+	rpc := getService(r)
 	if !(rpc == "git-upload-pack" || rpc == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
 		http.Error(w, "Not Found", 404)
 		return
 	}
-
-	requestType := "get-info-refs"
-	gitHTTPRequests.WithLabelValues(requestType, getRequestAgent(r)).Inc()
-	var writtenOut int64
-	defer func() {
-		gitHTTPBytes.WithLabelValues(requestType, getRequestAgent(r), "out").Add(float64(writtenOut))
-	}()
 
 	// Prepare our Git subprocess
 	cmd := gitCommand(a.GL_ID, "git", subCommand(rpc), "--stateless-rpc", "--advertise-refs", a.RepoPath)
@@ -131,7 +92,7 @@ func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *api.Response) 
 		helper.LogError(r, fmt.Errorf("handleGetInfoRefs: pktFlush: %v", err))
 		return
 	}
-	if writtenOut, err = io.Copy(w, stdout); err != nil {
+	if _, err := io.Copy(w, stdout); err != nil {
 		helper.LogError(
 			r,
 			&copyError{fmt.Errorf("handleGetInfoRefs: copy output of %v: %v", cmd.Args, err)},
@@ -144,26 +105,23 @@ func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *api.Response) 
 	}
 }
 
-func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
+func handlePostRPC(rw http.ResponseWriter, r *http.Request, a *api.Response) {
 	var err error
 	var body io.Reader
 	var isShallowClone bool
+	var writtenIn int64
 
-	// Get Git action from URL
-	action := filepath.Base(r.URL.Path)
+	w := NewGitHttpResponseWriter(rw)
+	defer func() {
+		w.Log(r, writtenIn)
+	}()
+
+	action := getService(r)
 	if !(action == "git-upload-pack" || action == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
 		helper.Fail500(w, r, fmt.Errorf("handlePostRPC: unsupported action: %s", r.URL.Path))
 		return
 	}
-
-	requestType := "post-" + action
-	gitHTTPRequests.WithLabelValues(requestType, getRequestAgent(r)).Inc()
-	var writtenIn, writtenOut int64
-	defer func() {
-		gitHTTPBytes.WithLabelValues(requestType, getRequestAgent(r), "in").Add(float64(writtenIn))
-		gitHTTPBytes.WithLabelValues(requestType, getRequestAgent(r), "out").Add(float64(writtenOut))
-	}()
 
 	if action == "git-upload-pack" {
 		buffer := &bytes.Buffer{}
@@ -220,7 +178,7 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 
 	// This io.Copy may take a long time, both for Git push and pull.
-	if writtenOut, err = io.Copy(w, stdout); err != nil {
+	if _, err := io.Copy(w, stdout); err != nil {
 		helper.LogError(
 			r,
 			&copyError{fmt.Errorf("handlePostRPC: copy output of %v: %v", cmd.Args, err)},
@@ -231,6 +189,13 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		helper.LogError(r, fmt.Errorf("handlePostRPC: wait for %v: %v", cmd.Args, err))
 		return
 	}
+}
+
+func getService(r *http.Request) string {
+	if r.Method == "GET" {
+		return r.URL.Query().Get("service")
+	}
+	return filepath.Base(r.URL.Path)
 }
 
 func isExitError(err error) bool {

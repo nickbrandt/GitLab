@@ -34,6 +34,8 @@ var (
 		},
 		[]string{"type"},
 	)
+
+	artifactsSendFile = regexp.MustCompile("builds/[0-9]+/artifacts")
 )
 
 type sendFileResponseWriter struct {
@@ -118,7 +120,7 @@ func sendFileFromDisk(w http.ResponseWriter, r *http.Request, file string) {
 func countSendFileMetrics(size int64, r *http.Request) {
 	var requestType string
 	switch {
-	case regexp.MustCompile("builds/[0-9]+/artifacts").MatchString(r.RequestURI):
+	case artifactsSendFile.MatchString(r.RequestURI):
 		requestType = "artifacts"
 	default:
 		requestType = "other"
