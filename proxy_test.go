@@ -112,7 +112,7 @@ func TestProxyReadTimeout(t *testing.T) {
 	w := httptest.NewRecorder()
 	p.ServeHTTP(w, httpRequest)
 	testhelper.AssertResponseCode(t, w, 502)
-	testhelper.AssertResponseBody(t, w, "net/http: timeout awaiting response headers")
+	testhelper.AssertResponseBody(t, w, "GitLab is not responding")
 }
 
 func TestProxyHandlerTimeout(t *testing.T) {

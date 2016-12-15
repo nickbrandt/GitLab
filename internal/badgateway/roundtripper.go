@@ -28,14 +28,15 @@ var DefaultTransport = &http.Transport{
 type Error struct{ error }
 
 type RoundTripper struct {
-	Transport *http.Transport
+	Transport       *http.Transport
+	developmentMode bool
 }
 
 func TestRoundTripper(backend *url.URL) *RoundTripper {
-	return NewRoundTripper(backend, "", 0)
+	return NewRoundTripper(backend, "", 0, true)
 }
 
-func NewRoundTripper(backend *url.URL, socket string, proxyHeadersTimeout time.Duration) *RoundTripper {
+func NewRoundTripper(backend *url.URL, socket string, proxyHeadersTimeout time.Duration, developmentMode bool) *RoundTripper {
 	tr := *DefaultTransport
 	tr.ResponseHeaderTimeout = proxyHeadersTimeout
 
@@ -52,7 +53,7 @@ func NewRoundTripper(backend *url.URL, socket string, proxyHeadersTimeout time.D
 		panic("backend is nil and socket is empty")
 	}
 
-	return &RoundTripper{Transport: &tr}
+	return &RoundTripper{Transport: &tr, developmentMode: developmentMode}
 }
 
 func mustParseAddress(address, scheme string) string {
@@ -86,6 +87,11 @@ func (t *RoundTripper) RoundTrip(r *http.Request) (res *http.Response, err error
 			&Error{fmt.Errorf("badgateway: failed after %.fs: %v", time.Since(start).Seconds(), err)},
 		)
 
+		message := "GitLab is not responding"
+		if t.developmentMode {
+			message = err.Error()
+		}
+
 		res = &http.Response{
 			StatusCode: http.StatusBadGateway,
 			Status:     http.StatusText(http.StatusBadGateway),
@@ -96,7 +102,7 @@ func (t *RoundTripper) RoundTrip(r *http.Request) (res *http.Response, err error
 			Proto:      r.Proto,
 			Header:     make(http.Header),
 			Trailer:    make(http.Header),
-			Body:       ioutil.NopCloser(bytes.NewBufferString(err.Error())),
+			Body:       ioutil.NopCloser(bytes.NewBufferString(message)),
 		}
 		res.Header.Set("Content-Type", "text/plain")
 		err = nil
