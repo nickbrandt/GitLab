@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/queueing"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -106,11 +107,11 @@ func main() {
 		}()
 	}
 
+	secret.SetPath(*secretPath)
 	upConfig := upstream.Config{
 		Backend:             backendURL,
 		Socket:              *authSocket,
 		Version:             Version,
-		SecretPath:          *secretPath,
 		DocumentRoot:        *documentRoot,
 		DevelopmentMode:     *developmentMode,
 		ProxyHeadersTimeout: *proxyHeadersTimeout,

@@ -8,7 +8,6 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -371,52 +370,6 @@ func TestDeniedPublicUploadsFile(t *testing.T) {
 	}
 }
 
-func TestArtifactsUpload(t *testing.T) {
-	reqBody := &bytes.Buffer{}
-	writer := multipart.NewWriter(reqBody)
-	file, err := writer.CreateFormFile("file", "my.file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Fprint(file, "SHOULD BE ON DISK, NOT IN MULTIPART")
-	writer.Close()
-
-	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasSuffix(r.URL.Path, "/authorize") {
-			w.Header().Set("Content-Type", api.ResponseContentType)
-			if _, err := fmt.Fprintf(w, `{"TempPath":"%s"}`, scratchDir); err != nil {
-				t.Fatal(err)
-			}
-			return
-		}
-		err := r.ParseMultipartForm(100000)
-		if err != nil {
-			t.Fatal(err)
-		}
-		nValues := 2 // filename + path for just the upload (no metadata because we are not POSTing a valid zip file)
-		if len(r.MultipartForm.Value) != nValues {
-			t.Errorf("Expected to receive exactly %d values", nValues)
-		}
-		if len(r.MultipartForm.File) != 0 {
-			t.Error("Expected to not receive any files")
-		}
-		w.WriteHeader(200)
-	})
-	defer ts.Close()
-	ws := startWorkhorseServer(ts.URL)
-	defer ws.Close()
-
-	resource := `/ci/api/v1/builds/123/artifacts`
-	resp, err := http.Post(ws.URL+resource, writer.FormDataContentType(), reqBody)
-	if err != nil {
-		t.Error(err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
-	}
-}
-
 var sendDataHeader = "Gitlab-Workhorse-Send-Data"
 
 func sendDataResponder(command string, literalJSON string) *httptest.Server {
@@ -691,10 +644,10 @@ func archiveOKServer(t *testing.T, archiveName string) *httptest.Server {
 }
 
 func startWorkhorseServer(authBackend string) *httptest.Server {
+	testhelper.ConfigureSecret()
 	config := upstream.Config{
 		Backend:      helper.URLMustParse(authBackend),
 		Version:      "123",
-		SecretPath:   testhelper.SecretPath(),
 		DocumentRoot: testDocumentRoot,
 	}
 

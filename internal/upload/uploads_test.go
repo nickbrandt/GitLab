@@ -22,8 +22,7 @@ import (
 
 var nilHandler = http.HandlerFunc(func(http.ResponseWriter, *http.Request) {})
 
-type testFormProcessor struct {
-}
+type testFormProcessor struct{}
 
 func (a *testFormProcessor) ProcessFile(formName, fileName string, writer *multipart.Writer) error {
 	if formName != "file" && fileName != "my.file" {
@@ -36,6 +35,10 @@ func (a *testFormProcessor) ProcessField(formName string, writer *multipart.Writ
 	if formName != "token" {
 		return errors.New("illegal field")
 	}
+	return nil
+}
+
+func (a *testFormProcessor) Finalize() error {
 	return nil
 }
 
@@ -212,6 +215,47 @@ func TestUploadProcessingFile(t *testing.T) {
 	response := httptest.NewRecorder()
 	HandleFileUploads(response, httpRequest, nilHandler, tempPath, &testFormProcessor{})
 	testhelper.AssertResponseCode(t, response, 500)
+}
+
+func TestInvalidFileNames(t *testing.T) {
+	testhelper.ConfigureSecret()
+
+	tempPath, err := ioutil.TempDir("", "uploads")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tempPath)
+
+	for _, testCase := range []struct {
+		filename string
+		code     int
+	}{
+		{"foobar", 200}, // sanity check for test setup below
+		{"foo/bar", 500},
+		{"/../../foobar", 500},
+		{".", 500},
+		{"..", 500},
+	} {
+		buffer := &bytes.Buffer{}
+
+		writer := multipart.NewWriter(buffer)
+		file, err := writer.CreateFormFile("file", testCase.filename)
+		if err != nil {
+			t.Fatal(err)
+		}
+		fmt.Fprint(file, "test")
+		writer.Close()
+
+		httpRequest, err := http.NewRequest("POST", "/example", buffer)
+		if err != nil {
+			t.Fatal(err)
+		}
+		httpRequest.Header.Set("Content-Type", writer.FormDataContentType())
+
+		response := httptest.NewRecorder()
+		HandleFileUploads(response, httpRequest, nilHandler, tempPath, &savedFileTracker{request: httpRequest})
+		testhelper.AssertResponseCode(t, response, testCase.code)
+	}
 }
 
 func newProxy(url string) *proxy.Proxy {

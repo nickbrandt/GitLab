@@ -2,6 +2,7 @@ package upstream
 
 import (
 	"net/http"
+	"path"
 	"regexp"
 
 	"github.com/gorilla/websocket"
@@ -17,6 +18,7 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/sendfile"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/staticpages"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/terminal"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upload"
 )
 
 type matcherFunc func(*http.Request) bool
@@ -91,7 +93,6 @@ func (u *Upstream) configureRoutes() {
 	api := apipkg.NewAPI(
 		u.Backend,
 		u.Version,
-		u.SecretPath,
 		u.RoundTripper,
 	)
 	static := &staticpages.Static{u.DocumentRoot}
@@ -109,7 +110,9 @@ func (u *Upstream) configureRoutes() {
 		git.SendPatch,
 		artifacts.SendEntry,
 	)
-	ciAPIProxyQueue := queueing.QueueRequests(proxy, u.APILimit, u.APIQueueLimit, u.APIQueueTimeout)
+
+	uploadAccelerateProxy := upload.Accelerate(path.Join(u.DocumentRoot, "uploads/tmp"), proxy)
+	ciAPIProxyQueue := queueing.QueueRequests(uploadAccelerateProxy, u.APILimit, u.APIQueueLimit, u.APIQueueTimeout)
 
 	u.Routes = []routeEntry{
 		// Git Clone
@@ -153,7 +156,7 @@ func (u *Upstream) configureRoutes() {
 			static.ServeExisting(
 				u.URLPrefix,
 				staticpages.CacheDisabled,
-				static.DeployPage(static.ErrorPagesUnless(u.DevelopmentMode, proxy)),
+				static.DeployPage(static.ErrorPagesUnless(u.DevelopmentMode, uploadAccelerateProxy)),
 			),
 		),
 	}

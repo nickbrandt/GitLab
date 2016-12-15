@@ -65,6 +65,10 @@ func (a *artifactsUploadProcessor) ProcessField(formName string, writer *multipa
 	return nil
 }
 
+func (a *artifactsUploadProcessor) Finalize() error {
+	return nil
+}
+
 func (a *artifactsUploadProcessor) Cleanup() {
 	if a.metadataFile != "" {
 		os.Remove(a.metadataFile)

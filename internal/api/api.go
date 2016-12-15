@@ -11,8 +11,7 @@ import (
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
-
-	"github.com/dgrijalva/jwt-go"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
 )
 
 // Custom content type for API responses, to catch routing / programming mistakes
@@ -24,15 +23,13 @@ type API struct {
 	Client  *http.Client
 	URL     *url.URL
 	Version string
-	Secret  *Secret
 }
 
-func NewAPI(myURL *url.URL, version, secretPath string, roundTripper *badgateway.RoundTripper) *API {
+func NewAPI(myURL *url.URL, version string, roundTripper *badgateway.RoundTripper) *API {
 	return &API{
 		Client:  &http.Client{Transport: roundTripper},
 		URL:     myURL,
 		Version: version,
-		Secret:  &Secret{Path: secretPath},
 	}
 }
 
@@ -130,13 +127,7 @@ func (api *API) newRequest(r *http.Request, body io.Reader, suffix string) (*htt
 	// configurations (Passenger) to solve auth request routing problems.
 	authReq.Header.Set("Gitlab-Workhorse", api.Version)
 
-	secretBytes, err := api.Secret.Bytes()
-	if err != nil {
-		return nil, fmt.Errorf("newRequest: %v", err)
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{Issuer: "gitlab-workhorse"})
-	tokenString, err := token.SignedString(secretBytes)
+	tokenString, err := secret.JWTTokenString(secret.DefaultClaims)
 	if err != nil {
 		return nil, fmt.Errorf("newRequest: sign JWT: %v", err)
 	}

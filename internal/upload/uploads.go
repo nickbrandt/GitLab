@@ -8,13 +8,17 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"path"
+	"strings"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
+// These methods are allowed to have thread-unsafe implementations.
 type MultipartFormProcessor interface {
 	ProcessFile(formName, fileName string, writer *multipart.Writer) error
 	ProcessField(formName string, writer *multipart.Writer) error
+	Finalize() error
 }
 
 func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, tempPath string, filter MultipartFormProcessor) (cleanup func(), err error) {
@@ -28,11 +32,11 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 		return nil, fmt.Errorf("get multipart reader: %v", err)
 	}
 
-	var files []string
+	var directories []string
 
 	cleanup = func() {
-		for _, file := range files {
-			os.Remove(file)
+		for _, dir := range directories {
+			os.RemoveAll(dir)
 		}
 	}
 
@@ -56,22 +60,30 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 
 		// Copy form field
 		if filename := p.FileName(); filename != "" {
+			if strings.Contains(filename, "/") || filename == "." || filename == ".." {
+				return cleanup, fmt.Errorf("illegal filename: %q", filename)
+			}
+
 			// Create temporary directory where the uploaded file will be stored
 			if err := os.MkdirAll(tempPath, 0700); err != nil {
 				return cleanup, fmt.Errorf("mkdir for tempfile: %v", err)
 			}
 
-			// Create temporary file in path returned by Authorization filter
-			file, err := ioutil.TempFile(tempPath, "upload_")
+			tempDir, err := ioutil.TempDir(tempPath, "multipart-")
 			if err != nil {
-				return cleanup, fmt.Errorf("create tempfile: %v", err)
+				return cleanup, fmt.Errorf("create tempdir: %v", err)
+			}
+			directories = append(directories, tempDir)
+
+			file, err := os.OpenFile(path.Join(tempDir, filename), os.O_WRONLY|os.O_CREATE, 0600)
+			if err != nil {
+				return cleanup, fmt.Errorf("rewriteFormFilesFromMultipart: temp file: %v", err)
 			}
 			defer file.Close()
 
 			// Add file entry
 			writer.WriteField(name+".path", file.Name())
 			writer.WriteField(name+".name", filename)
-			files = append(files, file.Name())
 
 			_, err = io.Copy(file, p)
 			if err != nil {
@@ -134,6 +146,11 @@ func HandleFileUploads(w http.ResponseWriter, r *http.Request, h http.Handler, t
 	r.Body = ioutil.NopCloser(&body)
 	r.ContentLength = int64(body.Len())
 	r.Header.Set("Content-Type", writer.FormDataContentType())
+
+	if err := filter.Finalize(); err != nil {
+		helper.Fail500(w, r, fmt.Errorf("handleFileUploads: Finalize: %v", err))
+		return
+	}
 
 	// Proxy the request
 	h.ServeHTTP(w, r)
