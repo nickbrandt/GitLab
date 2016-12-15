@@ -2,6 +2,11 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v1.2.0
+
+- Add terminal websocket proxy endpoint
+- Rewrite all incoming multipart requests: write 'file' parts to tempfiles
+
 v1.1.1
 
 - Restrict effect of API rate limiting to /ci/api/v1/builds/register.json
