@@ -8,7 +8,10 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
+
+	"github.com/prometheus/client_golang/prometheus"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
@@ -24,6 +27,27 @@ type API struct {
 	Client  *http.Client
 	URL     *url.URL
 	Version string
+}
+
+var (
+	requestsCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "gitlab_workhorse_internal_api_requests",
+			Help: "How many internal API requests have been completed by gitlab-workhorse, partitioned by status code and HTTP method.",
+		},
+		[]string{"code", "method"},
+	)
+	bytesTotal = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "gitlab_workhorse_internal_api_failure_response_bytes",
+			Help: "How many bytes have been returned by upstream GitLab in API failure/rejection response bodies.",
+		},
+	)
+)
+
+func init() {
+	prometheus.MustRegister(requestsCounter)
+	prometheus.MustRegister(bytesTotal)
 }
 
 func NewAPI(myURL *url.URL, version string, roundTripper *badgateway.RoundTripper) *API {
@@ -161,6 +185,7 @@ func (api *API) PreAuthorize(suffix string, r *http.Request) (httpResponse *http
 			httpResponse = nil
 		}
 	}()
+	requestsCounter.WithLabelValues(strconv.Itoa(httpResponse.StatusCode), authReq.Method).Inc()
 
 	if httpResponse.StatusCode != http.StatusOK {
 		return httpResponse, nil, nil
@@ -205,6 +230,7 @@ func (api *API) PreAuthorizeHandler(next HandleFunc, suffix string) http.Handler
 				helper.Fail500(w, r, err)
 			}
 			httpResponse.Body.Close() // Free up the Unicorn worker
+			bytesTotal.Add(float64(responseBody.Len()))
 
 			for k, v := range httpResponse.Header {
 				// Accomodate broken clients that do case-sensitive header lookup
@@ -215,7 +241,9 @@ func (api *API) PreAuthorizeHandler(next HandleFunc, suffix string) http.Handler
 				}
 			}
 			w.WriteHeader(httpResponse.StatusCode)
-			io.Copy(w, responseBody)
+			if _, err := io.Copy(w, responseBody); err != nil {
+				helper.LogError(r, err)
+			}
 
 			return
 		}
