@@ -25,7 +25,7 @@ var (
 	multipartFileUploadBytes = prometheus.NewCounter(
 		prometheus.CounterOpts{
 			Name: "gitlab_workhorse_multipart_upload_bytes",
-			Help: "How many disk bytes of multipart file parts have been written by gitlab-workhorse.",
+			Help: "How many disk bytes of multipart file parts have been succesfully written by gitlab-workhorse.",
 		},
 	)
 
