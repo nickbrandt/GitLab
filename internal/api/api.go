@@ -18,10 +18,15 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
 )
 
-// Custom content type for API responses, to catch routing / programming mistakes
-const ResponseContentType = "application/vnd.gitlab-workhorse+json"
+const (
+	// Custom content type for API responses, to catch routing / programming mistakes
+	ResponseContentType = "application/vnd.gitlab-workhorse+json"
 
-const RequestHeader = "Gitlab-Workhorse-Api-Request"
+	// This header carries the JWT token for gitlab-rails
+	RequestHeader = "Gitlab-Workhorse-Api-Request"
+
+	failureResponseLimit = 32768
+)
 
 type API struct {
 	Client  *http.Client
@@ -224,8 +229,7 @@ func (api *API) PreAuthorizeHandler(next HandleFunc, suffix string) http.Handler
 			// X-Accel-Buffering: no) but we still want to free up the Unicorn worker
 			// that generated httpResponse as fast as possible. To do this we buffer
 			// the entire response body in memory before sending it on.
-			responseBody := &bytes.Buffer{}
-			_, err := io.Copy(responseBody, httpResponse.Body)
+			responseBody, err := bufferResponse(httpResponse.Body)
 			if err != nil {
 				helper.Fail500(w, r, err)
 			}
@@ -261,4 +265,18 @@ func (api *API) PreAuthorizeHandler(next HandleFunc, suffix string) http.Handler
 
 		next(w, r, authResponse)
 	})
+}
+
+func bufferResponse(r io.Reader) (*bytes.Buffer, error) {
+	responseBody := &bytes.Buffer{}
+	n, err := io.Copy(responseBody, io.LimitReader(r, failureResponseLimit))
+	if err != nil {
+		return nil, err
+	}
+
+	if n == failureResponseLimit {
+		return nil, fmt.Errorf("response body exceeded maximum buffer size (%d bytes)", failureResponseLimit)
+	}
+
+	return responseBody, nil
 }
