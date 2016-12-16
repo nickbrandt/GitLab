@@ -48,6 +48,9 @@ clean:	clean-workhorse clean-build
 clean-workhorse:
 	cd ${BUILD_DIR} && rm -f gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata
 
+release:
+	sh _support/release.sh
+
 .PHONY:	clean-build
 clean-build:
 	rm -rf ${BUILD_DIR}/_build
