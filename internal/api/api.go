@@ -1,28 +1,58 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
+
+	"github.com/prometheus/client_golang/prometheus"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
 )
 
-// Custom content type for API responses, to catch routing / programming mistakes
-const ResponseContentType = "application/vnd.gitlab-workhorse+json"
+const (
+	// Custom content type for API responses, to catch routing / programming mistakes
+	ResponseContentType = "application/vnd.gitlab-workhorse+json"
 
-const RequestHeader = "Gitlab-Workhorse-Api-Request"
+	// This header carries the JWT token for gitlab-rails
+	RequestHeader = "Gitlab-Workhorse-Api-Request"
+
+	failureResponseLimit = 32768
+)
 
 type API struct {
 	Client  *http.Client
 	URL     *url.URL
 	Version string
+}
+
+var (
+	requestsCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "gitlab_workhorse_internal_api_requests",
+			Help: "How many internal API requests have been completed by gitlab-workhorse, partitioned by status code and HTTP method.",
+		},
+		[]string{"code", "method"},
+	)
+	bytesTotal = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "gitlab_workhorse_internal_api_failure_response_bytes",
+			Help: "How many bytes have been returned by upstream GitLab in API failure/rejection response bodies.",
+		},
+	)
+)
+
+func init() {
+	prometheus.MustRegister(requestsCounter)
+	prometheus.MustRegister(bytesTotal)
 }
 
 func NewAPI(myURL *url.URL, version string, roundTripper *badgateway.RoundTripper) *API {
@@ -160,6 +190,7 @@ func (api *API) PreAuthorize(suffix string, r *http.Request) (httpResponse *http
 			httpResponse = nil
 		}
 	}()
+	requestsCounter.WithLabelValues(strconv.Itoa(httpResponse.StatusCode), authReq.Method).Inc()
 
 	if httpResponse.StatusCode != http.StatusOK {
 		return httpResponse, nil, nil
@@ -187,8 +218,24 @@ func (api *API) PreAuthorizeHandler(next HandleFunc, suffix string) http.Handler
 			helper.Fail500(w, r, err)
 			return
 		}
+		if httpResponse != nil {
+			defer func() {
+				httpResponse.Body.Close()
+			}()
+		}
 
 		if httpResponse.StatusCode != http.StatusOK {
+			// NGINX response buffering is disabled on this path (with
+			// X-Accel-Buffering: no) but we still want to free up the Unicorn worker
+			// that generated httpResponse as fast as possible. To do this we buffer
+			// the entire response body in memory before sending it on.
+			responseBody, err := bufferResponse(httpResponse.Body)
+			if err != nil {
+				helper.Fail500(w, r, err)
+			}
+			httpResponse.Body.Close() // Free up the Unicorn worker
+			bytesTotal.Add(float64(responseBody.Len()))
+
 			for k, v := range httpResponse.Header {
 				// Accomodate broken clients that do case-sensitive header lookup
 				if k == "Www-Authenticate" {
@@ -198,14 +245,14 @@ func (api *API) PreAuthorizeHandler(next HandleFunc, suffix string) http.Handler
 				}
 			}
 			w.WriteHeader(httpResponse.StatusCode)
-			io.Copy(w, httpResponse.Body)
-			httpResponse.Body.Close()
+			if _, err := io.Copy(w, responseBody); err != nil {
+				helper.LogError(r, err)
+			}
 
 			return
 		}
-		// Close the body immediately, rather than waiting for the next handler
-		// to complete
-		httpResponse.Body.Close()
+
+		httpResponse.Body.Close() // Free up the Unicorn worker
 
 		// Negotiate authentication (Kerberos) may need to return a WWW-Authenticate
 		// header to the client even in case of success as per RFC4559.
@@ -218,4 +265,18 @@ func (api *API) PreAuthorizeHandler(next HandleFunc, suffix string) http.Handler
 
 		next(w, r, authResponse)
 	})
+}
+
+func bufferResponse(r io.Reader) (*bytes.Buffer, error) {
+	responseBody := &bytes.Buffer{}
+	n, err := io.Copy(responseBody, io.LimitReader(r, failureResponseLimit))
+	if err != nil {
+		return nil, err
+	}
+
+	if n == failureResponseLimit {
+		return nil, fmt.Errorf("response body exceeded maximum buffer size (%d bytes)", failureResponseLimit)
+	}
+
+	return responseBody, nil
 }
