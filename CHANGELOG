@@ -2,6 +2,12 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v1.2.1
+
+- More Prometheus metrics
+- Hide 502 internal errors from text-mode clients
+- Buffer internal API responses up to a 32kB hard limit
+
 v1.2.0
 
 - Add terminal websocket proxy endpoint
