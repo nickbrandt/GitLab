@@ -93,7 +93,7 @@ func (l *loggingResponseWriter) Write(data []byte) (n int, err error) {
 	}
 	n, err = l.rw.Write(data)
 	l.written += int64(n)
-	return
+	return n, err
 }
 
 func (l *loggingResponseWriter) WriteHeader(status int) {

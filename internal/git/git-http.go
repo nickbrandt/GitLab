@@ -54,8 +54,12 @@ func repoPreAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.Han
 	}, "")
 }
 
-func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *api.Response) {
-	rpc := r.URL.Query().Get("service")
+func handleGetInfoRefs(rw http.ResponseWriter, r *http.Request, a *api.Response) {
+	w := NewGitHttpResponseWriter(rw)
+	// Log 0 bytes in because we ignore the request body (and there usually is none anyway).
+	defer w.Log(r, 0)
+
+	rpc := getService(r)
 	if !(rpc == "git-upload-pack" || rpc == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
 		http.Error(w, "Not Found", 404)
@@ -101,13 +105,18 @@ func handleGetInfoRefs(w http.ResponseWriter, r *http.Request, a *api.Response) 
 	}
 }
 
-func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
+func handlePostRPC(rw http.ResponseWriter, r *http.Request, a *api.Response) {
 	var err error
 	var body io.Reader
 	var isShallowClone bool
+	var writtenIn int64
 
-	// Get Git action from URL
-	action := filepath.Base(r.URL.Path)
+	w := NewGitHttpResponseWriter(rw)
+	defer func() {
+		w.Log(r, writtenIn)
+	}()
+
+	action := getService(r)
 	if !(action == "git-upload-pack" || action == "git-receive-pack") {
 		// The 'dumb' Git HTTP protocol is not supported
 		helper.Fail500(w, r, fmt.Errorf("handlePostRPC: unsupported action: %s", r.URL.Path))
@@ -152,7 +161,7 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 	defer helper.CleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
 
 	// Write the client request body to Git's standard input
-	if _, err := io.Copy(stdin, body); err != nil {
+	if writtenIn, err = io.Copy(stdin, body); err != nil {
 		helper.Fail500(w, r, fmt.Errorf("handlePostRPC: write to %v: %v", cmd.Args, err))
 		return
 	}
@@ -180,6 +189,13 @@ func handlePostRPC(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		helper.LogError(r, fmt.Errorf("handlePostRPC: wait for %v: %v", cmd.Args, err))
 		return
 	}
+}
+
+func getService(r *http.Request) string {
+	if r.Method == "GET" {
+		return r.URL.Query().Get("service")
+	}
+	return filepath.Base(r.URL.Path)
 }
 
 func isExitError(err error) bool {

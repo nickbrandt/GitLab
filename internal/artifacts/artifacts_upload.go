@@ -9,11 +9,34 @@ import (
 	"os/exec"
 	"syscall"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upload"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 )
+
+var (
+	artifactsUploadRequests = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "gitlab_workhorse_artifacts_upload_requests",
+			Help: "How many artifacts upload requests have been processed by gitlab-workhorse.",
+		},
+	)
+
+	artifactsUploadBytes = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "gitlab_workhorse_artifacts_upload_bytes",
+			Help: "How many artifacts upload bytes have been sent by gitlab-workhorse.",
+		},
+	)
+)
+
+func init() {
+	prometheus.MustRegister(artifactsUploadRequests)
+	prometheus.MustRegister(artifactsUploadBytes)
+}
 
 type artifactsUploadProcessor struct {
 	TempPath     string
@@ -77,6 +100,11 @@ func (a *artifactsUploadProcessor) Cleanup() {
 
 func UploadArtifacts(myAPI *api.API, h http.Handler) http.Handler {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
+		artifactsUploadRequests.Inc()
+		defer func() {
+			artifactsUploadBytes.Add(float64(r.ContentLength))
+		}()
+
 		if a.TempPath == "" {
 			helper.Fail500(w, r, fmt.Errorf("UploadArtifacts: TempPath is empty"))
 			return
