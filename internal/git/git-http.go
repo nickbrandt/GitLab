@@ -17,11 +17,19 @@ import (
 	"strings"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
-func GetInfoRefs(a *api.API) http.Handler {
-	return repoPreAuthorizeHandler(a, handleGetInfoRefs)
+func GetInfoRefsHandler(a *api.API, cfg *config.Config) http.Handler {
+	return repoPreAuthorizeHandler(a, func(rw http.ResponseWriter, r *http.Request, apiResponse *api.Response) {
+		if apiResponse.GitalySocketPath == "" {
+			handleGetInfoRefs(rw, r, apiResponse)
+		} else {
+			handleGetInfoRefsWithGitaly(rw, r, apiResponse, gitaly.NewClient(apiResponse.GitalySocketPath, cfg))
+		}
+	})
 }
 
 func PostRPC(a *api.API) http.Handler {
@@ -52,6 +60,17 @@ func repoPreAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.Han
 
 		handleFunc(w, r, a)
 	}, "")
+}
+
+func handleGetInfoRefsWithGitaly(rw http.ResponseWriter, r *http.Request, a *api.Response, gitalyClient *gitaly.Client) {
+	req := *r // Make a copy of r
+	req.Header = helper.HeaderClone(r.Header)
+	req.Header.Add("Gitaly-Repo-Path", a.RepoPath)
+	req.Header.Add("Gitaly-GL-Id", a.GL_ID)
+	req.URL.Path = path.Join(a.GitalyResourcePath, subCommand(getService(r)))
+	req.URL.RawQuery = ""
+
+	gitalyClient.Proxy.ServeHTTP(rw, &req)
 }
 
 func handleGetInfoRefs(rw http.ResponseWriter, r *http.Request, a *api.Response) {

@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -19,6 +20,7 @@ import (
 	"time"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream"
@@ -556,6 +558,70 @@ func TestApiContentTypeBlock(t *testing.T) {
 	}
 }
 
+func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
+	content := "0000"
+	apiResponse := gitOkBody(t)
+	apiResponse.GitalyResourcePath = "/projects/1/git-http/info-refs"
+
+	gitalyPath := path.Join(apiResponse.GitalyResourcePath, "upload-pack")
+	gitaly := startGitalyServer(regexp.MustCompile(gitalyPath), content)
+	defer gitaly.Close()
+
+	apiResponse.GitalySocketPath = gitaly.Listener.Addr().String()
+	ts := testAuthServer(nil, 200, apiResponse)
+	defer ts.Close()
+
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	resource := "/gitlab-org/gitlab-test.git/info/refs?service=git-upload-pack"
+	resp, err := http.Get(ws.URL + resource)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	responseBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if !bytes.Equal(responseBody, []byte(content)) {
+		t.Errorf("GET %q: Expected %q, got %q", resource, content, responseBody)
+	}
+}
+
+func TestGetInfoRefsHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
+	gitaly := startGitalyServer(nil, "Gitaly response: should never reach the client")
+	defer gitaly.Close()
+
+	apiResponse := gitOkBody(t)
+	apiResponse.GitalySocketPath = ""
+	ts := testAuthServer(nil, 200, apiResponse)
+	defer ts.Close()
+
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	resource := "/gitlab-org/gitlab-test.git/info/refs?service=git-upload-pack"
+	resp, err := http.Get(ws.URL + resource)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	responseBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if resp.StatusCode != 200 {
+		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
+	}
+
+	if bytes.Contains(responseBody, []byte("Gitaly response")) {
+		t.Errorf("GET %q: request should not have been proxied to Gitaly", resource)
+	}
+}
+
 func setupStaticFile(fpath, content string) error {
 	cwd, err := os.Getwd()
 	if err != nil {
@@ -643,16 +709,45 @@ func archiveOKServer(t *testing.T, archiveName string) *httptest.Server {
 	})
 }
 
-func startWorkhorseServer(authBackend string) *httptest.Server {
-	testhelper.ConfigureSecret()
-	config := upstream.Config{
-		Backend:      helper.URLMustParse(authBackend),
+func newUpstreamConfig(authBackend string) *config.Config {
+	return &config.Config{
 		Version:      "123",
 		DocumentRoot: testDocumentRoot,
+		Backend:      helper.URLMustParse(authBackend),
 	}
+}
 
-	u := upstream.NewUpstream(config)
+func startWorkhorseServer(authBackend string) *httptest.Server {
+	return startWorkhorseServerWithConfig(newUpstreamConfig(authBackend))
+}
+
+func startWorkhorseServerWithConfig(cfg *config.Config) *httptest.Server {
+	testhelper.ConfigureSecret()
+	u := upstream.NewUpstream(*cfg)
+
 	return httptest.NewServer(u)
+}
+
+func startGitalyServer(url *regexp.Regexp, body string) *httptest.Server {
+	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if url != nil && !url.MatchString(r.URL.Path) {
+			log.Println("Gitaly", r.Method, r.URL, "DENY")
+			w.WriteHeader(404)
+			return
+		}
+
+		fmt.Fprint(w, body)
+	}))
+
+	listener, err := net.Listen("unix", path.Join(scratchDir, "gitaly.sock"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	ts.Listener = listener
+
+	ts.Start()
+	return ts
 }
 
 func runOrFail(t *testing.T, cmd *exec.Cmd) {
@@ -663,7 +758,7 @@ func runOrFail(t *testing.T, cmd *exec.Cmd) {
 	}
 }
 
-func gitOkBody(t *testing.T) interface{} {
+func gitOkBody(t *testing.T) *api.Response {
 	return &api.Response{
 		GL_ID:    "user-123",
 		RepoPath: repoPath(t),
