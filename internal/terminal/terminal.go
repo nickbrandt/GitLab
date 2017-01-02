@@ -2,9 +2,7 @@ package terminal
 
 import (
 	"log"
-	"net"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -102,15 +100,7 @@ func pingLoop(conn Connection) {
 func connectToServer(terminal *api.TerminalSettings, r *http.Request) (Connection, error) {
 	terminal = terminal.Clone()
 
-	// Pass along X-Forwarded-For, appending request.RemoteAddr, to the server
-	// we're connecting to.
-	if ip, _, err := net.SplitHostPort(r.RemoteAddr); err == nil {
-		if chains, ok := r.Header["X-Forwarded-For"]; ok {
-			terminal.Header.Set("X-Forwarded-For", strings.Join(chains, ", ")+", "+ip)
-		} else {
-			terminal.Header.Set("X-Forwarded-For", ip)
-		}
-	}
+	helper.SetForwardedFor(&terminal.Header, r)
 
 	conn, _, err := terminal.Dial()
 	if err != nil {
