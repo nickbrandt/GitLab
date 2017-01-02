@@ -55,3 +55,7 @@ func (s *savedFileTracker) Finalize() error {
 	s.request.Header.Set(RewrittenFieldsHeader, tokenString)
 	return nil
 }
+
+func (a *savedFileTracker) Name() string {
+	return "accelerate"
+}
