@@ -157,6 +157,8 @@ func (api *API) newRequest(r *http.Request, body io.Reader, suffix string) (*htt
 	// configurations (Passenger) to solve auth request routing problems.
 	authReq.Header.Set("Gitlab-Workhorse", api.Version)
 
+	helper.SetForwardedFor(&authReq.Header, r)
+
 	tokenString, err := secret.JWTTokenString(secret.DefaultClaims)
 	if err != nil {
 		return nil, fmt.Errorf("newRequest: sign JWT: %v", err)

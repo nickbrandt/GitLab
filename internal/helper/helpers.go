@@ -3,10 +3,12 @@ package helper
 import (
 	"errors"
 	"log"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
 	"os/exec"
+	"strings"
 	"syscall"
 )
 
@@ -141,4 +143,20 @@ func DisableResponseBuffering(w http.ResponseWriter) {
 
 func AllowResponseBuffering(w http.ResponseWriter) {
 	w.Header().Del(NginxResponseBufferHeader)
+}
+
+func SetForwardedFor(newHeaders *http.Header, originalRequest *http.Request) {
+	if clientIP, _, err := net.SplitHostPort(originalRequest.RemoteAddr); err == nil {
+		var header string
+
+		// If we aren't the first proxy retain prior
+		// X-Forwarded-For information as a comma+space
+		// separated list and fold multiple headers into one.
+		if prior, ok := originalRequest.Header["X-Forwarded-For"]; ok {
+			header = strings.Join(prior, ", ") + ", " + clientIP
+		} else {
+			header = clientIP
+		}
+		newHeaders.Set("X-Forwarded-For", header)
+	}
 }
