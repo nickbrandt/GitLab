@@ -14,26 +14,29 @@ import (
 )
 
 var (
-	multipartUploadRequests = prometheus.NewCounter(
+	multipartUploadRequests = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 
 			Name: "gitlab_workhorse_multipart_upload_requests",
-			Help: "How many multipart upload requests have been processed by gitlab-workhorse.",
+			Help: "How many multipart upload requests have been processed by gitlab-workhorse. Partitioned by type.",
 		},
+		[]string{"type"},
 	)
 
-	multipartFileUploadBytes = prometheus.NewCounter(
+	multipartFileUploadBytes = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "gitlab_workhorse_multipart_upload_bytes",
-			Help: "How many disk bytes of multipart file parts have been succesfully written by gitlab-workhorse.",
+			Help: "How many disk bytes of multipart file parts have been succesfully written by gitlab-workhorse. Partitioned by type.",
 		},
+		[]string{"type"},
 	)
 
-	multipartFiles = prometheus.NewCounter(
+	multipartFiles = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "gitlab_workhorse_multipart_upload_files",
-			Help: "How many multipart file parts have been processed by gitlab-workhorse.",
+			Help: "How many multipart file parts have been processed by gitlab-workhorse. Partitioned by type.",
 		},
+		[]string{"type"},
 	)
 )
 
@@ -61,7 +64,7 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 		return nil, fmt.Errorf("get multipart reader: %v", err)
 	}
 
-	multipartUploadRequests.Inc()
+	multipartUploadRequests.WithLabelValues(filter.Name()).Inc()
 
 	rew := &rewriter{
 		writer:   writer,
@@ -109,7 +112,8 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 }
 
 func (rew *rewriter) handleFilePart(name string, p *multipart.Part) error {
-	multipartFiles.Inc()
+	multipartFiles.WithLabelValues(rew.filter.Name()).Inc()
+
 	filename := p.FileName()
 
 	if strings.Contains(filename, "/") || filename == "." || filename == ".." {
@@ -141,7 +145,7 @@ func (rew *rewriter) handleFilePart(name string, p *multipart.Part) error {
 	if err != nil {
 		return fmt.Errorf("copy from multipart to tempfile: %v", err)
 	}
-	multipartFileUploadBytes.Add(float64(written))
+	multipartFileUploadBytes.WithLabelValues(rew.filter.Name()).Add(float64(written))
 
 	file.Close()
 

@@ -15,6 +15,7 @@ type MultipartFormProcessor interface {
 	ProcessFile(formName, fileName string, writer *multipart.Writer) error
 	ProcessField(formName string, writer *multipart.Writer) error
 	Finalize() error
+	Name() string
 }
 
 func HandleFileUploads(w http.ResponseWriter, r *http.Request, h http.Handler, tempPath string, filter MultipartFormProcessor) {

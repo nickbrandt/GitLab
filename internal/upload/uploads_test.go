@@ -42,6 +42,10 @@ func (a *testFormProcessor) Finalize() error {
 	return nil
 }
 
+func (a *testFormProcessor) Name() string {
+	return ""
+}
+
 func TestUploadTempPathRequirement(t *testing.T) {
 	response := httptest.NewRecorder()
 	request, err := http.NewRequest("", "", nil)
