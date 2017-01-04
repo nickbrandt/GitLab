@@ -87,8 +87,11 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 
 	for {
 		p, err := reader.NextPart()
-		if err == io.EOF {
-			break
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return cleanup, err
 		}
 
 		name := p.FormName()
@@ -108,6 +111,7 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 			return cleanup, err
 		}
 	}
+
 	return cleanup, nil
 }
 
