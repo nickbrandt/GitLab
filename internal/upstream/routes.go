@@ -1,6 +1,7 @@
 package upstream
 
 import (
+	"mime"
 	"net/http"
 	"path"
 	"regexp"
@@ -63,6 +64,14 @@ func wsRoute(regexpStr string, handler http.Handler, matchers ...matcherFunc) ro
 	}
 }
 
+// Creates matcherFuncs for a particular content type.
+func isContentType(contentType string) func(*http.Request) bool {
+	return func(r *http.Request) bool {
+		parsed, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+		return err == nil && contentType == parsed
+	}
+}
+
 func (ro *routeEntry) isMatch(cleanedPath string, req *http.Request) bool {
 	if ro.method != "" && req.Method != ro.method {
 		return false
@@ -115,9 +124,9 @@ func (u *Upstream) configureRoutes() {
 	u.Routes = []routeEntry{
 		// Git Clone
 		route("GET", gitProjectPattern+`info/refs\z`, git.GetInfoRefsHandler(api, &u.Config)),
-		route("POST", gitProjectPattern+`git-upload-pack\z`, contentEncodingHandler(git.PostRPC(api))),
-		route("POST", gitProjectPattern+`git-receive-pack\z`, contentEncodingHandler(git.PostRPC(api))),
-		route("PUT", gitProjectPattern+`gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`, lfs.PutStore(api, proxy)),
+		route("POST", gitProjectPattern+`git-upload-pack\z`, contentEncodingHandler(git.PostRPC(api)), isContentType("application/x-git-upload-pack-request")),
+		route("POST", gitProjectPattern+`git-receive-pack\z`, contentEncodingHandler(git.PostRPC(api)), isContentType("application/x-git-receive-pack-request")),
+		route("PUT", gitProjectPattern+`gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`, lfs.PutStore(api, proxy), isContentType("application/octet-stream")),
 
 		// CI Artifacts
 		route("POST", ciAPIPattern+`v1/builds/[0-9]+/artifacts\z`, contentEncodingHandler(artifacts.UploadArtifacts(api, proxy))),
