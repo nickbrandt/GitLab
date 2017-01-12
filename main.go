@@ -24,6 +24,7 @@ import (
 	"syscall"
 	"time"
 
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/queueing"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream"
@@ -108,7 +109,7 @@ func main() {
 	}
 
 	secret.SetPath(*secretPath)
-	upConfig := upstream.Config{
+	cfg := config.Config{
 		Backend:             backendURL,
 		Socket:              *authSocket,
 		Version:             Version,
@@ -120,7 +121,7 @@ func main() {
 		APIQueueTimeout:     *apiQueueTimeout,
 	}
 
-	up := wrapRaven(upstream.NewUpstream(upConfig))
+	up := wrapRaven(upstream.NewUpstream(cfg))
 
 	log.Fatal(http.Serve(listener, up))
 }

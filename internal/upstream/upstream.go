@@ -9,11 +9,10 @@ package upstream
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 	"strings"
-	"time"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upload"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/urlprefix"
@@ -26,33 +25,21 @@ var (
 	}
 )
 
-type Config struct {
-	Backend             *url.URL
-	Version             string
-	DocumentRoot        string
-	DevelopmentMode     bool
-	Socket              string
-	ProxyHeadersTimeout time.Duration
-	APILimit            uint
-	APIQueueLimit       uint
-	APIQueueTimeout     time.Duration
-}
-
 type Upstream struct {
-	Config
+	config.Config
 	URLPrefix    urlprefix.Prefix
 	Routes       []routeEntry
 	RoundTripper *badgateway.RoundTripper
 }
 
-func NewUpstream(config Config) *Upstream {
+func NewUpstream(cfg config.Config) *Upstream {
 	up := Upstream{
-		Config: config,
+		Config: cfg,
 	}
 	if up.Backend == nil {
 		up.Backend = DefaultBackend
 	}
-	up.RoundTripper = badgateway.NewRoundTripper(up.Backend, up.Socket, up.ProxyHeadersTimeout, config.DevelopmentMode)
+	up.RoundTripper = badgateway.NewRoundTripper(up.Backend, up.Socket, up.ProxyHeadersTimeout, cfg.DevelopmentMode)
 	up.configureURLPrefix()
 	up.configureRoutes()
 	return &up

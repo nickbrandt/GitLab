@@ -88,6 +88,10 @@ type Response struct {
 	Entry string `json:"entry"`
 	// Used to communicate terminal session details
 	Terminal *TerminalSettings
+	// Path to Gitaly Socket
+	GitalySocketPath string
+	// Path to Gitaly HTTP resource
+	GitalyResourcePath string
 }
 
 // singleJoiningSlash is taken from reverseproxy.go:NewSingleHostReverseProxy

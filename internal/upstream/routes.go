@@ -116,7 +116,7 @@ func (u *Upstream) configureRoutes() {
 
 	u.Routes = []routeEntry{
 		// Git Clone
-		route("GET", gitProjectPattern+`info/refs\z`, git.GetInfoRefs(api)),
+		route("GET", gitProjectPattern+`info/refs\z`, git.GetInfoRefsHandler(api, &u.Config)),
 		route("POST", gitProjectPattern+`git-upload-pack\z`, contentEncodingHandler(git.PostRPC(api))),
 		route("POST", gitProjectPattern+`git-receive-pack\z`, contentEncodingHandler(git.PostRPC(api))),
 		route("PUT", gitProjectPattern+`gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`, lfs.PutStore(api, proxy)),
