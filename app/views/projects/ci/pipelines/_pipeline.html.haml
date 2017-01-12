@@ -89,7 +89,7 @@
                       %span= build.name
           - if artifacts.present?
             .btn-group
-              %button.dropdown-toggle.btn.btn-default.build-artifacts.has-tooltip.js-pipeline-dropdown-download{ type: 'button', title: 'Artifacts', data: { toggle: 'dropdown', placement: 'top' }, 'aria-label' => 'Artifacts' }
+              %button.dropdown-toggle.btn.btn-default.build-artifacts.has-tooltip.js-pipeline-dropdown-download{ type: 'button', title: 'Artifacts', data: { toggle: 'dropdown', placement: 'top' }, 'aria-label': 'Artifacts' }
                 = icon("download")
                 = icon('caret-down')
               %ul.dropdown-menu.dropdown-menu-align-right
