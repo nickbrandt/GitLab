@@ -2,6 +2,7 @@ package git
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -36,13 +37,22 @@ func createTestPayload() []byte {
 	return data
 }
 
-func TestRunUploadPack(t *testing.T) {
+func TestHandleUploadPack(t *testing.T) {
+	testHandlePostRpc(t, "git-upload-pack")
+}
+
+func TestHandleReceivePack(t *testing.T) {
+	testHandlePostRpc(t, "git-receive-pack")
+}
+
+func testHandlePostRpc(t *testing.T, action string) {
 	execCommand = fakeExecCommand
 	defer func() { execCommand = exec.Command }()
 
 	testInput := createTestPayload()
 	body := bytes.NewReader([]byte(testInput))
-	req, err := http.NewRequest("GET", "/gitlab/gitlab-ce.git/?service=git-upload-pack", body)
+	url := fmt.Sprintf("/gitlab/gitlab-ce.git/?service=%s", action)
+	req, err := http.NewRequest("GET", url, body)
 
 	if err != nil {
 		t.Fatal(err)
@@ -59,11 +69,12 @@ func TestRunUploadPack(t *testing.T) {
 			http.StatusOK, status)
 	}
 
+	ct := fmt.Sprintf("application/x-%s-result", action)
 	headers := []struct {
 		key   string
 		value string
 	}{
-		{"Content-Type", "application/x-git-upload-pack-result"},
+		{"Content-Type", ct},
 		{"Cache-Control", "no-cache"},
 	}
 
@@ -81,6 +92,15 @@ func TestRunUploadPack(t *testing.T) {
 	}
 }
 
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
+}
+
 func TestGitCommandProcess(t *testing.T) {
 	if os.Getenv("GL_ID") != GL_ID {
 		return
@@ -88,12 +108,18 @@ func TestGitCommandProcess(t *testing.T) {
 
 	defer os.Exit(0)
 
-	// First, send a large payload to stdout so that this executable will be blocked
-	// until the reader consumes the data
-	testInput := createTestPayload()
-	body := bytes.NewReader([]byte(testInput))
-	io.Copy(os.Stdout, body)
+	uploadPack := stringInSlice("upload-pack", os.Args)
 
-	// Now consume all the data to unblock the sender
-	ioutil.ReadAll(os.Stdin)
+	if uploadPack {
+		// First, send a large payload to stdout so that this executable will be blocked
+		// until the reader consumes the data
+		testInput := createTestPayload()
+		body := bytes.NewReader([]byte(testInput))
+		io.Copy(os.Stdout, body)
+
+		// Now consume all the data to unblock the sender
+		ioutil.ReadAll(os.Stdin)
+	} else {
+		io.Copy(os.Stdout, os.Stdin)
+	}
 }
