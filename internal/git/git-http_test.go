@@ -87,7 +87,7 @@ func testHandlePostRpc(t *testing.T, action string) {
 	}
 
 	if rr.Body.String() != string(testInput) {
-		t.Errorf("handler did not echo back properly: got %d, expected %d bytes",
+		t.Errorf("handler did not receive expected data: got %d, expected %d bytes",
 			len(rr.Body.String()), len(testInput))
 	}
 }
