@@ -26,13 +26,7 @@ func fakeExecCommand(command string, args ...string) *exec.Cmd {
 }
 
 func createTestPayload() []byte {
-	data := make([]byte, expectedBytes)
-
-	for i := 0; i < expectedBytes; i++ {
-		data[i] = '0'
-	}
-
-	return data
+	return bytes.Repeat([]byte{'0'}, expectedBytes)
 }
 
 func TestRunUploadPack(t *testing.T) {
