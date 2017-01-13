@@ -11,7 +11,7 @@ all: clean-build gitlab-zip-cat gitlab-zip-metadata gitlab-workhorse
 
 gitlab-zip-cat:	${BUILD_DIR}/_build $(shell find cmd/gitlab-zip-cat/ -name '*.go')
 	${GOBUILD} -o ${BUILD_DIR}/$@ ${PKG}/cmd/$@
-	
+
 gitlab-zip-metadata:	${BUILD_DIR}/_build $(shell find cmd/gitlab-zip-metadata/ -name '*.go')
 	${GOBUILD} -o ${BUILD_DIR}/$@ ${PKG}/cmd/$@
 

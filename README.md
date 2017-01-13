@@ -62,6 +62,8 @@ Options:
     	How long to wait for response headers when proxying the request (default 5m0s)
   -secretPath string
     	File with secret key to authenticate with authBackend (default "./.gitlab_workhorse_secret")
+  -config string
+    	File that hold configuration. Currently only for redis. File is in TOML-format (default "")
   -version
     	Print version and exit
 ```
@@ -73,6 +75,37 @@ HTTP.
 Gitlab-workhorse can listen on either a TCP or a Unix domain socket. It
 can also open a second listening TCP listening socket with the Go
 [net/http/pprof profiler server](http://golang.org/pkg/net/http/pprof/).
+
+Gitlab-workhorse can listen on redis events (currently only builds/register
+for runners). This requires you to pass a valid TOML config file via
+`-config` flag.  
+For regular setups it only requires the following (replacing the string 
+with the actual socket)
+```
+[redis]
+URL = "unix:///var/run/gitlab/redis.sock"
+Password = "my_awesome_password"
+Sentinel = [ "tcp://sentinel1:23456", "tcp://sentinel2:23456" ]
+SentinelMaster = "mymaster"
+```
+
+- `URL` takes a string in the format `unix://path/to/redis.sock` or
+`tcp://host:port`.
+- `Password` is only required if your redis instance is password-protected
+- `Sentinel` is used if you are using Sentinel.
+  *NOTE* that if both `Sentinel` and `URL` are given, only `Sentinel` will be used
+
+Optional fields are as follows:
+```
+[redis]
+ReadTimeout = 1000
+MaxIdle = 1
+MaxActive = 1
+```
+
+- `ReadTimeout` is how many milliseconds that a redis read-command can take. Defaults to `1000`
+- `MaxIdle` is how many idle connections can be in the redis-pool at once. Defaults to 1
+- `MaxActive` is how many connections the pool can keep. Defaults to 1
 
 ### Relative URL support
 
