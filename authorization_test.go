@@ -78,7 +78,7 @@ func TestPreAuthorizeContentTypeFailure(t *testing.T) {
 		t, ts, "/authorize",
 		regexp.MustCompile(`/authorize\z`),
 		"",
-		200, 500)
+		200, 200)
 }
 
 func TestPreAuthorizeJWT(t *testing.T) {
