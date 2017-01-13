@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -15,6 +16,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
@@ -155,6 +157,17 @@ func handlePostRPC(rw http.ResponseWriter, r *http.Request, a *api.Response) {
 
 		isShallowClone = scanDeepen(bytes.NewReader(buffer.Bytes()))
 		body = io.MultiReader(buffer, r.Body)
+
+		// Read out the full HTTP request body so that we can reply
+		buf, err := ioutil.ReadAll(body)
+
+		if err != nil {
+			helper.Fail500(w, r, &copyError{fmt.Errorf("handlePostRPC: full buffer git-upload-pack body: %v", err)})
+			return
+		}
+
+		body = ioutil.NopCloser(bytes.NewBuffer(buf))
+		r.Body.Close()
 	} else {
 		body = r.Body
 	}
@@ -179,6 +192,28 @@ func handlePostRPC(rw http.ResponseWriter, r *http.Request, a *api.Response) {
 	}
 	defer helper.CleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
 
+	stdoutError := make(chan error, 1)
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	if action == "git-upload-pack" {
+		// Start writing the response
+		writePostRPCHeader(w, action)
+
+		go func() {
+			defer wg.Done()
+
+			if _, err := io.Copy(w, stdout); err != nil {
+				helper.LogError(
+					r,
+					&copyError{fmt.Errorf("handlePostRPC: copy output of %v: %v", cmd.Args, err)},
+				)
+				stdoutError <- err
+				return
+			}
+		}()
+	}
+
 	// Write the client request body to Git's standard input
 	if writtenIn, err = io.Copy(stdin, body); err != nil {
 		helper.Fail500(w, r, fmt.Errorf("handlePostRPC: write to %v: %v", cmd.Args, err))
@@ -187,27 +222,38 @@ func handlePostRPC(rw http.ResponseWriter, r *http.Request, a *api.Response) {
 	// Signal to the Git subprocess that no more data is coming
 	stdin.Close()
 
-	// It may take a while before we return and the deferred closes happen
-	// so let's free up some resources already.
-	r.Body.Close()
+	if action == "git-upload-pack" {
+		wg.Wait()
 
-	// Start writing the response
-	w.Header().Set("Content-Type", fmt.Sprintf("application/x-%s-result", action))
-	w.Header().Set("Cache-Control", "no-cache")
-	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
+		if len(stdoutError) > 0 {
+			return
+		}
+	} else {
+		// It may take a while before we return and the deferred closes happen
+		// so let's free up some resources already.
+		r.Body.Close()
 
-	// This io.Copy may take a long time, both for Git push and pull.
-	if _, err := io.Copy(w, stdout); err != nil {
-		helper.LogError(
-			r,
-			&copyError{fmt.Errorf("handlePostRPC: copy output of %v: %v", cmd.Args, err)},
-		)
-		return
+		writePostRPCHeader(w, action)
+
+		// This io.Copy may take a long time, both for Git push and pull.
+		if _, err := io.Copy(w, stdout); err != nil {
+			helper.LogError(
+				r,
+				&copyError{fmt.Errorf("handlePostRPC: copy output of %v: %v", cmd.Args, err)},
+			)
+			return
+		}
 	}
 	if err := cmd.Wait(); err != nil && !(isExitError(err) && isShallowClone) {
 		helper.LogError(r, fmt.Errorf("handlePostRPC: wait for %v: %v", cmd.Args, err))
 		return
 	}
+}
+
+func writePostRPCHeader(w http.ResponseWriter, action string) {
+	w.Header().Set("Content-Type", fmt.Sprintf("application/x-%s-result", action))
+	w.Header().Set("Cache-Control", "no-cache")
+	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 }
 
 func getService(r *http.Request) string {
