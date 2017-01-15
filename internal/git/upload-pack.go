@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"sync"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
@@ -51,23 +50,19 @@ func handleUploadPack(action string, w *GitHttpResponseWriter, r *http.Request, 
 	defer helper.CleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
 
 	stdoutError := make(chan error, 1)
-	var wg sync.WaitGroup
-	wg.Add(1)
 
 	// Start writing the response
 	writePostRPCHeader(w, action)
 
 	go func() {
-		defer wg.Done()
-
-		if _, err := io.Copy(w, stdout); err != nil {
+		_, err := io.Copy(w, stdout)
+		if err != nil {
 			helper.LogError(
 				r,
 				&copyError{fmt.Errorf("handleUploadPack: copy output of %v: %v", cmd.Args, err)},
 			)
-			stdoutError <- err
-			return
 		}
+		stdoutError <- err
 	}()
 
 	// Write the client request body to Git's standard input
@@ -78,10 +73,9 @@ func handleUploadPack(action string, w *GitHttpResponseWriter, r *http.Request, 
 
 	// Signal to the Git subprocess that no more data is coming
 	stdin.Close()
-	wg.Wait()
 
-	if len(stdoutError) > 0 {
-		return
+	if err := <-stdoutError; err != nil {
+		return writtenIn, err
 	}
 
 	err = cmd.Wait()
