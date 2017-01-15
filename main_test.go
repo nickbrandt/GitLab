@@ -178,6 +178,8 @@ func TestRegularProjectsAPI(t *testing.T) {
 		"/api/v3/projects/foo%2Fbar/repository/not/special",
 		"/api/v3/projects/123/not/special",
 		"/api/v3/projects/foo%2Fbar/not/special",
+		"/api/v3/projects/foo%2Fbar%2Fbaz/repository/not/special",
+		"/api/v3/projects/foo%2Fbar%2Fbaz%2Fqux/repository/not/special",
 	} {
 		resp, err := http.Get(ws.URL + resource)
 		if err != nil {
@@ -619,6 +621,73 @@ func TestGetInfoRefsHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 
 	if bytes.Contains(responseBody, []byte("Gitaly response")) {
 		t.Errorf("GET %q: request should not have been proxied to Gitaly", resource)
+	}
+}
+
+func TestAPIFalsePositivesAreProxied(t *testing.T) {
+	goodResponse := []byte(`<html></html>`)
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get(api.RequestHeader) != "" && r.Method != "GET" {
+			w.WriteHeader(500)
+			w.Write([]byte("non-GET request went through PreAuthorize handler"))
+		} else {
+			w.Header().Set("Content-Type", "text/html")
+			if _, err := w.Write(goodResponse); err != nil {
+				t.Fatalf("write upstream response: %v", err)
+			}
+		}
+	})
+	defer ts.Close()
+
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	// Each of these cases is a specially-handled path in Workhorse that may
+	// actually be a request to be sent to gitlab-rails.
+	for _, tc := range []struct {
+		method string
+		path   string
+	}{
+		{"GET", "/nested/group/project/blob/master/foo.git/info/refs"},
+		{"POST", "/nested/group/project/blob/master/foo.git/git-upload-pack"},
+		{"POST", "/nested/group/project/blob/master/foo.git/git-receive-pack"},
+		{"PUT", "/nested/group/project/blob/master/foo.git/gitlab-lfs/objects/0000000000000000000000000000000000000000000000000000000000000000/0"},
+		{"GET", "/nested/group/project/blob/master/environments/1/terminal.ws"},
+	} {
+		req, err := http.NewRequest(tc.method, ws.URL+tc.path, nil)
+		if err != nil {
+			t.Logf("Creating response for %+v failed: %v", tc, err)
+			t.Fail()
+			continue
+		}
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			t.Logf("Reading response from workhorse for %+v failed: %s", tc, err)
+			t.Fail()
+			continue
+		}
+		defer resp.Body.Close()
+
+		respBody, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			t.Logf("Reading response from workhorse for %+v failed: %s", tc, err)
+			t.Fail()
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			t.Logf("Expected HTTP 200 response for %+v, got %d. Body: %s", tc, resp.StatusCode, string(respBody))
+			t.Fail()
+		}
+
+		if resp.Header.Get("Content-Type") != "text/html" {
+			t.Logf("Unexpected response content type for %+v: %s", tc, resp.Header.Get("Content-Type"))
+			t.Fail()
+		}
+
+		if bytes.Compare(respBody, goodResponse) != 0 {
+			t.Logf("Unexpected response body for %+v: %s", tc, string(respBody))
+			t.Fail()
+		}
 	}
 }
 

@@ -1,6 +1,7 @@
 package upstream
 
 import (
+	"mime"
 	"net/http"
 	"path"
 	"regexp"
@@ -30,14 +31,12 @@ type routeEntry struct {
 	matchers []matcherFunc
 }
 
-const projectPattern = `^/[^/]+/[^/]+/`
-const gitProjectPattern = `^/[^/]+/[^/]+\.git/`
-
-const apiPattern = `^/api/`
-
-// A project ID in an API request is either a number or two strings 'namespace/project'
-const projectsAPIPattern = `^/api/v3/projects/((\d+)|([^/]+/[^/]+))/`
-const ciAPIPattern = `^/ci/api/`
+const (
+	apiPattern        = `^/api/`
+	ciAPIPattern      = `^/ci/api/`
+	gitProjectPattern = `^/([^/]+/){1,}[^/]+\.git/`
+	projectPattern    = `^/([^/]+/){1,}[^/]+/`
+)
 
 func compileRegexp(regexpStr string) *regexp.Regexp {
 	if len(regexpStr) == 0 {
@@ -62,6 +61,14 @@ func wsRoute(regexpStr string, handler http.Handler, matchers ...matcherFunc) ro
 		regex:    compileRegexp(regexpStr),
 		handler:  handler,
 		matchers: append(matchers, websocket.IsWebSocketUpgrade),
+	}
+}
+
+// Creates matcherFuncs for a particular content type.
+func isContentType(contentType string) func(*http.Request) bool {
+	return func(r *http.Request) bool {
+		parsed, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+		return err == nil && contentType == parsed
 	}
 }
 
@@ -117,9 +124,9 @@ func (u *Upstream) configureRoutes() {
 	u.Routes = []routeEntry{
 		// Git Clone
 		route("GET", gitProjectPattern+`info/refs\z`, git.GetInfoRefsHandler(api, &u.Config)),
-		route("POST", gitProjectPattern+`git-upload-pack\z`, contentEncodingHandler(git.PostRPC(api))),
-		route("POST", gitProjectPattern+`git-receive-pack\z`, contentEncodingHandler(git.PostRPC(api))),
-		route("PUT", gitProjectPattern+`gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`, lfs.PutStore(api, proxy)),
+		route("POST", gitProjectPattern+`git-upload-pack\z`, contentEncodingHandler(git.PostRPC(api)), isContentType("application/x-git-upload-pack-request")),
+		route("POST", gitProjectPattern+`git-receive-pack\z`, contentEncodingHandler(git.PostRPC(api)), isContentType("application/x-git-receive-pack-request")),
+		route("PUT", gitProjectPattern+`gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`, lfs.PutStore(api, proxy), isContentType("application/octet-stream")),
 
 		// CI Artifacts
 		route("POST", ciAPIPattern+`v1/builds/[0-9]+/artifacts\z`, contentEncodingHandler(artifacts.UploadArtifacts(api, proxy))),

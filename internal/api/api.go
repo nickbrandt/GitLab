@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -198,12 +199,10 @@ func (api *API) PreAuthorize(suffix string, r *http.Request) (httpResponse *http
 	}()
 	requestsCounter.WithLabelValues(strconv.Itoa(httpResponse.StatusCode), authReq.Method).Inc()
 
-	if httpResponse.StatusCode != http.StatusOK {
+	// This may be a false positive, e.g. for .../info/refs, rather than a
+	// failure, so pass the response back
+	if httpResponse.StatusCode != http.StatusOK || !validResponseContentType(httpResponse) {
 		return httpResponse, nil, nil
-	}
-
-	if contentType := httpResponse.Header.Get("Content-Type"); contentType != ResponseContentType {
-		return httpResponse, nil, fmt.Errorf("preAuthorizeHandler: API responded with wrong content type: %v", contentType)
 	}
 
 	authResponse = &Response{}
@@ -220,17 +219,18 @@ func (api *API) PreAuthorize(suffix string, r *http.Request) (httpResponse *http
 func (api *API) PreAuthorizeHandler(next HandleFunc, suffix string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		httpResponse, authResponse, err := api.PreAuthorize(suffix, r)
+		if httpResponse != nil {
+			defer httpResponse.Body.Close()
+		}
+
 		if err != nil {
 			helper.Fail500(w, r, err)
 			return
 		}
-		if httpResponse != nil {
-			defer func() {
-				httpResponse.Body.Close()
-			}()
-		}
 
-		if httpResponse.StatusCode != http.StatusOK {
+		// The response couldn't be interpreted as a valid auth response, so
+		// pass it back (mostly) unmodified
+		if httpResponse != nil && authResponse == nil {
 			// NGINX response buffering is disabled on this path (with
 			// X-Accel-Buffering: no) but we still want to free up the Unicorn worker
 			// that generated httpResponse as fast as possible. To do this we buffer
@@ -285,4 +285,9 @@ func bufferResponse(r io.Reader) (*bytes.Buffer, error) {
 	}
 
 	return responseBody, nil
+}
+
+func validResponseContentType(resp *http.Response) bool {
+	parsed, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+	return err == nil && parsed == ResponseContentType
 }
