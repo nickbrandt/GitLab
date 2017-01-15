@@ -22,7 +22,7 @@ func handleUploadPack(action string, w *GitHttpResponseWriter, r *http.Request, 
 	_, err = io.Copy(buffer, io.LimitReader(r.Body, 4096))
 	if err != nil {
 		helper.Fail500(w, r, &copyError{fmt.Errorf("handleUploadPack: buffer git-upload-pack body: %v", err)})
-		return
+		return writtenIn, err
 	}
 
 	isShallowClone = scanDeepen(bytes.NewReader(buffer.Bytes()))
@@ -33,7 +33,7 @@ func handleUploadPack(action string, w *GitHttpResponseWriter, r *http.Request, 
 
 	if err != nil {
 		helper.Fail500(w, r, &copyError{fmt.Errorf("handleUploadPack: full buffer git-upload-pack body: %v", err)})
-		return
+		return writtenIn, err
 	}
 
 	body = ioutil.NopCloser(bytes.NewBuffer(buf))
@@ -42,7 +42,7 @@ func handleUploadPack(action string, w *GitHttpResponseWriter, r *http.Request, 
 	cmd, stdin, stdout, err := setupGitCommand(action, a, w, r)
 
 	if err != nil {
-		return
+		return writtenIn, err
 	}
 
 	defer stdout.Close()
@@ -68,7 +68,7 @@ func handleUploadPack(action string, w *GitHttpResponseWriter, r *http.Request, 
 	// Write the client request body to Git's standard input
 	if writtenIn, err = io.Copy(stdin, body); err != nil {
 		helper.Fail500(w, r, fmt.Errorf("handleUploadPack: write to %v: %v", cmd.Args, err))
-		return
+		return writtenIn, err
 	}
 
 	// Signal to the Git subprocess that no more data is coming
@@ -82,7 +82,7 @@ func handleUploadPack(action string, w *GitHttpResponseWriter, r *http.Request, 
 
 	if err != nil && !(isExitError(err) && isShallowClone) {
 		helper.LogError(r, fmt.Errorf("handleUploadPack: wait for %v: %v", cmd.Args, err))
-		return
+		return writtenIn, err
 	}
 
 	return writtenIn, nil
