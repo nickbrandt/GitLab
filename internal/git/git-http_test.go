@@ -32,14 +32,14 @@ func createTestPayload() []byte {
 }
 
 func TestHandleUploadPack(t *testing.T) {
-	testHandlePostRpc(t, "git-upload-pack")
+	testHandlePostRpc(t, "git-upload-pack", handleUploadPack)
 }
 
 func TestHandleReceivePack(t *testing.T) {
-	testHandlePostRpc(t, "git-receive-pack")
+	testHandlePostRpc(t, "git-receive-pack", handleReceivePack)
 }
 
-func testHandlePostRpc(t *testing.T, action string) {
+func testHandlePostRpc(t *testing.T, action string, handler func(*GitHttpResponseWriter, *http.Request, *api.Response) (int64, error)) {
 	execCommand = fakeExecCommand
 	defer func() { execCommand = exec.Command }()
 
@@ -55,7 +55,7 @@ func testHandlePostRpc(t *testing.T, action string) {
 	resp := &api.Response{GL_ID: GL_ID}
 
 	rr := httptest.NewRecorder()
-	handlePostRPC(rr, req, resp)
+	handler(NewGitHttpResponseWriter(rr), req, resp)
 
 	// Check HTTP status code
 	if status := rr.Code; status != http.StatusOK {

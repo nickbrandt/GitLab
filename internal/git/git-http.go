@@ -19,8 +19,29 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
-func PostRPC(a *api.API) http.Handler {
-	return repoPreAuthorizeHandler(a, handlePostRPC)
+func ReceivePack(a *api.API) http.Handler {
+	return postRPCHandler(a, "handleReceivePack", handleReceivePack)
+}
+
+func UploadPack(a *api.API) http.Handler {
+	return postRPCHandler(a, "handleUploadPack", handleUploadPack)
+}
+
+func postRPCHandler(a *api.API, name string, handler func(*GitHttpResponseWriter, *http.Request, *api.Response) (int64, error)) http.Handler {
+	return repoPreAuthorizeHandler(a, func(rw http.ResponseWriter, r *http.Request, ar *api.Response) {
+		var writtenIn int64
+		var err error
+
+		w := NewGitHttpResponseWriter(rw)
+		defer func() {
+			w.Log(r, writtenIn)
+		}()
+
+		writtenIn, err = handler(w, r, ar)
+		if err != nil {
+			helper.LogError(r, fmt.Errorf("%s: %v", name, err))
+		}
+	})
 }
 
 func looksLikeRepo(p string) bool {
@@ -47,28 +68,6 @@ func repoPreAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.Han
 
 		handleFunc(w, r, a)
 	}, "")
-}
-
-func handlePostRPC(rw http.ResponseWriter, r *http.Request, a *api.Response) {
-	var writtenIn int64
-
-	w := NewGitHttpResponseWriter(rw)
-	defer func() {
-		w.Log(r, writtenIn)
-	}()
-
-	action := getService(r)
-	if !(action == "git-upload-pack" || action == "git-receive-pack") {
-		// The 'dumb' Git HTTP protocol is not supported
-		helper.Fail500(w, r, fmt.Errorf("handlePostRPC: unsupported action: %s", r.URL.Path))
-		return
-	}
-
-	if action == "git-receive-pack" {
-		writtenIn, _ = handleReceivePack(action, w, r, a)
-	} else {
-		writtenIn, _ = handleUploadPack(action, w, r, a)
-	}
 }
 
 func setupGitCommand(action string, a *api.Response, w *GitHttpResponseWriter, r *http.Request) (cmd *exec.Cmd, stdin io.WriteCloser, stdout io.ReadCloser, err error) {

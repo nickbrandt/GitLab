@@ -9,12 +9,13 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
-func handleReceivePack(action string, w *GitHttpResponseWriter, r *http.Request, a *api.Response) (writtenIn int64, err error) {
+func handleReceivePack(w *GitHttpResponseWriter, r *http.Request, a *api.Response) (writtenIn int64, err error) {
 	body := r.Body
+	action := getService(r)
 	cmd, stdin, stdout, err := setupGitCommand(action, a, w, r)
 
 	if err != nil {
-		return
+		return writtenIn, fmt.Errorf("setupGitCommand: %v", err)
 	}
 
 	defer stdout.Close()
@@ -25,8 +26,8 @@ func handleReceivePack(action string, w *GitHttpResponseWriter, r *http.Request,
 	writtenIn, err = io.Copy(stdin, body)
 
 	if err != nil {
-		helper.Fail500(w, r, fmt.Errorf("handleReceivePack: write to %v: %v", cmd.Args, err))
-		return
+		fail500(w)
+		return writtenIn, fmt.Errorf("write to %v: %v", cmd.Args, err)
 	}
 	// Signal to the Git subprocess that no more data is coming
 	stdin.Close()
@@ -41,18 +42,13 @@ func handleReceivePack(action string, w *GitHttpResponseWriter, r *http.Request,
 	_, err = io.Copy(w, stdout)
 
 	if err != nil {
-		helper.LogError(
-			r,
-			&copyError{fmt.Errorf("handleReceivePack: copy output of %v: %v", cmd.Args, err)},
-		)
-		return
+		return writtenIn, &copyError{fmt.Errorf("copy output of %v: %v", cmd.Args, err)}
 	}
 
 	err = cmd.Wait()
 
 	if err != nil {
-		helper.LogError(r, fmt.Errorf("handleReceivePack: wait for %v: %v", cmd.Args, err))
-		return
+		return writtenIn, fmt.Errorf("wait for %v: %v", cmd.Args, err)
 	}
 
 	return writtenIn, nil

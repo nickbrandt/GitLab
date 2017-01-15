@@ -11,7 +11,7 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
-func handleUploadPack(action string, w *GitHttpResponseWriter, r *http.Request, a *api.Response) (writtenIn int64, err error) {
+func handleUploadPack(w *GitHttpResponseWriter, r *http.Request, a *api.Response) (writtenIn int64, err error) {
 	var isShallowClone bool
 	var body io.Reader
 
@@ -21,8 +21,8 @@ func handleUploadPack(action string, w *GitHttpResponseWriter, r *http.Request, 
 	// either.
 	_, err = io.Copy(buffer, io.LimitReader(r.Body, 4096))
 	if err != nil {
-		helper.Fail500(w, r, &copyError{fmt.Errorf("handleUploadPack: buffer git-upload-pack body: %v", err)})
-		return writtenIn, err
+		fail500(w)
+		return writtenIn, &copyError{fmt.Errorf("buffer git-upload-pack body: %v", err)}
 	}
 
 	isShallowClone = scanDeepen(bytes.NewReader(buffer.Bytes()))
@@ -32,17 +32,19 @@ func handleUploadPack(action string, w *GitHttpResponseWriter, r *http.Request, 
 	buf, err := ioutil.ReadAll(body)
 
 	if err != nil {
-		helper.Fail500(w, r, &copyError{fmt.Errorf("handleUploadPack: full buffer git-upload-pack body: %v", err)})
-		return writtenIn, err
+		fail500(w)
+		return writtenIn, &copyError{fmt.Errorf("full buffer git-upload-pack body: %v", err)}
 	}
 
 	body = ioutil.NopCloser(bytes.NewBuffer(buf))
 	r.Body.Close()
 
+	action := getService(r)
 	cmd, stdin, stdout, err := setupGitCommand(action, a, w, r)
 
 	if err != nil {
-		return writtenIn, err
+		fail500(w)
+		return writtenIn, fmt.Errorf("setupGitCommand: %v", err)
 	}
 
 	defer stdout.Close()
@@ -56,34 +58,32 @@ func handleUploadPack(action string, w *GitHttpResponseWriter, r *http.Request, 
 
 	go func() {
 		_, err := io.Copy(w, stdout)
-		if err != nil {
-			helper.LogError(
-				r,
-				&copyError{fmt.Errorf("handleUploadPack: copy output of %v: %v", cmd.Args, err)},
-			)
-		}
+		// This error may be lost if some other error prevents us from <-ing on this channel.
 		stdoutError <- err
 	}()
 
 	// Write the client request body to Git's standard input
 	if writtenIn, err = io.Copy(stdin, body); err != nil {
-		helper.Fail500(w, r, fmt.Errorf("handleUploadPack: write to %v: %v", cmd.Args, err))
-		return writtenIn, err
+		fail500(w)
+		return writtenIn, fmt.Errorf("write to %v: %v", cmd.Args, err)
 	}
 
 	// Signal to the Git subprocess that no more data is coming
 	stdin.Close()
 
 	if err := <-stdoutError; err != nil {
-		return writtenIn, err
+		return writtenIn, &copyError{fmt.Errorf("copy output of %v: %v", cmd.Args, err)}
 	}
 
 	err = cmd.Wait()
 
 	if err != nil && !(isExitError(err) && isShallowClone) {
-		helper.LogError(r, fmt.Errorf("handleUploadPack: wait for %v: %v", cmd.Args, err))
-		return writtenIn, err
+		return writtenIn, fmt.Errorf("wait for %v: %v", cmd.Args, err)
 	}
 
 	return writtenIn, nil
+}
+
+func fail500(w http.ResponseWriter) {
+	helper.Fail500(w, nil, nil)
 }
