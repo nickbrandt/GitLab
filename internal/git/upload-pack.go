@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"os"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
@@ -26,10 +25,10 @@ func handleUploadPack(w *GitHttpResponseWriter, r *http.Request, a *api.Response
 
 	// We must drain the request body before writing the response, to avoid
 	// upsetting NGINX.
-	remainder, err := bufferInTempfile(r.Body)
+	remainder, err := helper.ReadAllTempfile(r.Body)
 	if err != nil {
 		fail500(w)
-		return writtenIn, fmt.Errorf("bufferInTempfile: %v", err)
+		return writtenIn, fmt.Errorf("ReadAllTempfile: %v", err)
 	}
 	defer remainder.Close()
 
@@ -82,25 +81,4 @@ func handleUploadPack(w *GitHttpResponseWriter, r *http.Request, a *api.Response
 
 func fail500(w http.ResponseWriter) {
 	helper.Fail500(w, nil, nil)
-}
-
-func bufferInTempfile(r io.Reader) (io.ReadCloser, error) {
-	buffer, err := ioutil.TempFile("", "gitlab-workhorse-git-request-body")
-	if err != nil {
-		return nil, err
-	}
-
-	if err := os.Remove(buffer.Name()); err != nil {
-		return nil, err
-	}
-
-	if _, err := io.Copy(buffer, r); err != nil {
-		return nil, err
-	}
-
-	if _, err := buffer.Seek(0, 0); err != nil {
-		return nil, err
-	}
-
-	return buffer, nil
 }
