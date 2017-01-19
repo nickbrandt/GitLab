@@ -6,12 +6,14 @@ import (
 	"os"
 )
 
-func ReadAllTempfile(r io.Reader) (_ io.ReadCloser, err error) {
-	tempfile, err := ioutil.TempFile("", "gitlab-workhorse-read-all-tempfile")
+func ReadAllTempfile(r io.Reader) (tempfile *os.File, err error) {
+	tempfile, err = ioutil.TempFile("", "gitlab-workhorse-read-all-tempfile")
 	if err != nil {
 		return nil, err
 	}
+
 	defer func() {
+		// Avoid leaking an open file if the function returns with an error
 		if err != nil {
 			tempfile.Close()
 		}
