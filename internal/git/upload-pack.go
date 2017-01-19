@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
@@ -32,7 +31,7 @@ func handleUploadPack(w *GitHttpResponseWriter, r *http.Request, a *api.Response
 	}
 	defer remainder.Close()
 
-	body := ioutil.NopCloser(io.MultiReader(buffer, remainder))
+	body := io.MultiReader(buffer, remainder)
 	r.Body.Close()
 
 	action := getService(r)
