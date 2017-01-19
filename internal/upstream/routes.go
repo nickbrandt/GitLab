@@ -122,8 +122,8 @@ func (u *Upstream) configureRoutes() {
 	u.Routes = []routeEntry{
 		// Git Clone
 		route("GET", gitProjectPattern+`info/refs\z`, git.GetInfoRefsHandler(api, &u.Config)),
-		route("POST", gitProjectPattern+`git-upload-pack\z`, contentEncodingHandler(git.PostRPC(api)), isContentType("application/x-git-upload-pack-request")),
-		route("POST", gitProjectPattern+`git-receive-pack\z`, contentEncodingHandler(git.PostRPC(api)), isContentType("application/x-git-receive-pack-request")),
+		route("POST", gitProjectPattern+`git-upload-pack\z`, contentEncodingHandler(git.UploadPack(api)), isContentType("application/x-git-upload-pack-request")),
+		route("POST", gitProjectPattern+`git-receive-pack\z`, contentEncodingHandler(git.ReceivePack(api)), isContentType("application/x-git-receive-pack-request")),
 		route("PUT", gitProjectPattern+`gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`, lfs.PutStore(api, proxy), isContentType("application/octet-stream")),
 
 		// CI Artifacts

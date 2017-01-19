@@ -2,7 +2,9 @@ package git
 
 import (
 	"bytes"
+	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -29,13 +31,22 @@ func createTestPayload() []byte {
 	return bytes.Repeat([]byte{'0'}, expectedBytes)
 }
 
-func TestRunUploadPack(t *testing.T) {
+func TestHandleUploadPack(t *testing.T) {
+	testHandlePostRpc(t, "git-upload-pack", handleUploadPack)
+}
+
+func TestHandleReceivePack(t *testing.T) {
+	testHandlePostRpc(t, "git-receive-pack", handleReceivePack)
+}
+
+func testHandlePostRpc(t *testing.T, action string, handler func(*GitHttpResponseWriter, *http.Request, *api.Response) (int64, error)) {
 	execCommand = fakeExecCommand
 	defer func() { execCommand = exec.Command }()
 
 	testInput := createTestPayload()
 	body := bytes.NewReader([]byte(testInput))
-	req, err := http.NewRequest("GET", "/gitlab/gitlab-ce.git/?service=git-upload-pack", body)
+	url := fmt.Sprintf("/gitlab/gitlab-ce.git/?service=%s", action)
+	req, err := http.NewRequest("GET", url, body)
 
 	if err != nil {
 		t.Fatal(err)
@@ -44,7 +55,7 @@ func TestRunUploadPack(t *testing.T) {
 	resp := &api.Response{GL_ID: GL_ID}
 
 	rr := httptest.NewRecorder()
-	handlePostRPC(rr, req, resp)
+	handler(NewGitHttpResponseWriter(rr), req, resp)
 
 	// Check HTTP status code
 	if status := rr.Code; status != http.StatusOK {
@@ -52,11 +63,12 @@ func TestRunUploadPack(t *testing.T) {
 			http.StatusOK, status)
 	}
 
+	ct := fmt.Sprintf("application/x-%s-result", action)
 	headers := []struct {
 		key   string
 		value string
 	}{
-		{"Content-Type", "application/x-git-upload-pack-result"},
+		{"Content-Type", ct},
 		{"Cache-Control", "no-cache"},
 	}
 
@@ -69,9 +81,18 @@ func TestRunUploadPack(t *testing.T) {
 	}
 
 	if rr.Body.String() != string(testInput) {
-		t.Errorf("handler did not echo back properly: got %d, expected %d bytes",
+		t.Errorf("handler did not receive expected data: got %d, expected %d bytes",
 			len(rr.Body.String()), len(testInput))
 	}
+}
+
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
 }
 
 func TestGitCommandProcess(t *testing.T) {
@@ -81,6 +102,18 @@ func TestGitCommandProcess(t *testing.T) {
 
 	defer os.Exit(0)
 
-	// Echo back the input to test sender
-	io.Copy(os.Stdout, os.Stdin)
+	uploadPack := stringInSlice("upload-pack", os.Args)
+
+	if uploadPack {
+		// First, send a large payload to stdout so that this executable will be blocked
+		// until the reader consumes the data
+		testInput := createTestPayload()
+		body := bytes.NewReader([]byte(testInput))
+		io.Copy(os.Stdout, body)
+
+		// Now consume all the data to unblock the sender
+		ioutil.ReadAll(os.Stdin)
+	} else {
+		io.Copy(os.Stdout, os.Stdin)
+	}
 }

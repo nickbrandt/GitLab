@@ -5,7 +5,6 @@ In this file we handle the Git 'smart HTTP' protocol
 package git
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -17,23 +16,32 @@ import (
 	"strings"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
-func GetInfoRefsHandler(a *api.API, cfg *config.Config) http.Handler {
-	return repoPreAuthorizeHandler(a, func(rw http.ResponseWriter, r *http.Request, apiResponse *api.Response) {
-		if apiResponse.GitalySocketPath == "" {
-			handleGetInfoRefs(rw, r, apiResponse)
-		} else {
-			handleGetInfoRefsWithGitaly(rw, r, apiResponse, gitaly.NewClient(apiResponse.GitalySocketPath, cfg))
-		}
-	})
+func ReceivePack(a *api.API) http.Handler {
+	return postRPCHandler(a, "handleReceivePack", handleReceivePack)
 }
 
-func PostRPC(a *api.API) http.Handler {
-	return repoPreAuthorizeHandler(a, handlePostRPC)
+func UploadPack(a *api.API) http.Handler {
+	return postRPCHandler(a, "handleUploadPack", handleUploadPack)
+}
+
+func postRPCHandler(a *api.API, name string, handler func(*GitHttpResponseWriter, *http.Request, *api.Response) (int64, error)) http.Handler {
+	return repoPreAuthorizeHandler(a, func(rw http.ResponseWriter, r *http.Request, ar *api.Response) {
+		var writtenIn int64
+		var err error
+
+		w := NewGitHttpResponseWriter(rw)
+		defer func() {
+			w.Log(r, writtenIn)
+		}()
+
+		writtenIn, err = handler(w, r, ar)
+		if err != nil {
+			helper.LogError(r, fmt.Errorf("%s: %v", name, err))
+		}
+	})
 }
 
 func looksLikeRepo(p string) bool {
@@ -62,152 +70,46 @@ func repoPreAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.Han
 	}, "")
 }
 
-func handleGetInfoRefsWithGitaly(rw http.ResponseWriter, r *http.Request, a *api.Response, gitalyClient *gitaly.Client) {
-	req := *r // Make a copy of r
-	req.Header = helper.HeaderClone(r.Header)
-	req.Header.Add("Gitaly-Repo-Path", a.RepoPath)
-	req.Header.Add("Gitaly-GL-Id", a.GL_ID)
-	req.URL.Path = path.Join(a.GitalyResourcePath, subCommand(getService(r)))
-	req.URL.RawQuery = ""
-
-	gitalyClient.Proxy.ServeHTTP(rw, &req)
-}
-
-func handleGetInfoRefs(rw http.ResponseWriter, r *http.Request, a *api.Response) {
-	w := NewGitHttpResponseWriter(rw)
-	// Log 0 bytes in because we ignore the request body (and there usually is none anyway).
-	defer w.Log(r, 0)
-
-	rpc := getService(r)
-	if !(rpc == "git-upload-pack" || rpc == "git-receive-pack") {
-		// The 'dumb' Git HTTP protocol is not supported
-		http.Error(w, "Not Found", 404)
-		return
-	}
-
-	// Prepare our Git subprocess
-	cmd := gitCommand(a.GL_ID, "git", subCommand(rpc), "--stateless-rpc", "--advertise-refs", a.RepoPath)
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		helper.Fail500(w, r, fmt.Errorf("handleGetInfoRefs: stdout: %v", err))
-		return
-	}
-	defer stdout.Close()
-	if err := cmd.Start(); err != nil {
-		helper.Fail500(w, r, fmt.Errorf("handleGetInfoRefs: start %v: %v", cmd.Args, err))
-		return
-	}
-	defer helper.CleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
-
-	// Start writing the response
-	w.Header().Set("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
-	w.Header().Set("Cache-Control", "no-cache")
-	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
-	if err := pktLine(w, fmt.Sprintf("# service=%s\n", rpc)); err != nil {
-		helper.LogError(r, fmt.Errorf("handleGetInfoRefs: pktLine: %v", err))
-		return
-	}
-	if err := pktFlush(w); err != nil {
-		helper.LogError(r, fmt.Errorf("handleGetInfoRefs: pktFlush: %v", err))
-		return
-	}
-	if _, err := io.Copy(w, stdout); err != nil {
-		helper.LogError(
-			r,
-			&copyError{fmt.Errorf("handleGetInfoRefs: copy output of %v: %v", cmd.Args, err)},
-		)
-		return
-	}
-	if err := cmd.Wait(); err != nil {
-		helper.LogError(r, fmt.Errorf("handleGetInfoRefs: wait for %v: %v", cmd.Args, err))
-		return
-	}
-}
-
-func handlePostRPC(rw http.ResponseWriter, r *http.Request, a *api.Response) {
-	var err error
-	var body io.Reader
-	var isShallowClone bool
-	var writtenIn int64
-
-	w := NewGitHttpResponseWriter(rw)
+func setupGitCommand(action string, a *api.Response, options ...string) (cmd *exec.Cmd, stdin io.WriteCloser, stdout io.ReadCloser, err error) {
+	// Don't leak pipes when we return early after an error
 	defer func() {
-		w.Log(r, writtenIn)
-	}()
-
-	action := getService(r)
-	if !(action == "git-upload-pack" || action == "git-receive-pack") {
-		// The 'dumb' Git HTTP protocol is not supported
-		helper.Fail500(w, r, fmt.Errorf("handlePostRPC: unsupported action: %s", r.URL.Path))
-		return
-	}
-
-	if action == "git-upload-pack" {
-		buffer := &bytes.Buffer{}
-		// Only sniff on the first 4096 bytes: we assume that if we find no
-		// 'deepen' message in the first 4096 bytes there won't be one later
-		// either.
-		_, err = io.Copy(buffer, io.LimitReader(r.Body, 4096))
-		if err != nil {
-			helper.Fail500(w, r, &copyError{fmt.Errorf("handlePostRPC: buffer git-upload-pack body: %v", err)})
+		if err == nil {
 			return
 		}
-
-		isShallowClone = scanDeepen(bytes.NewReader(buffer.Bytes()))
-		body = io.MultiReader(buffer, r.Body)
-	} else {
-		body = r.Body
-	}
+		if stdin != nil {
+			stdin.Close()
+		}
+		if stdout != nil {
+			stdout.Close()
+		}
+	}()
 
 	// Prepare our Git subprocess
-	cmd := gitCommand(a.GL_ID, "git", subCommand(action), "--stateless-rpc", a.RepoPath)
-	stdout, err := cmd.StdoutPipe()
+	args := []string{subCommand(action), "--stateless-rpc"}
+	args = append(args, options...)
+	args = append(args, a.RepoPath)
+	cmd = gitCommand(a.GL_ID, "git", args...)
+	stdout, err = cmd.StdoutPipe()
 	if err != nil {
-		helper.Fail500(w, r, fmt.Errorf("handlePostRPC: stdout: %v", err))
-		return
+		return nil, nil, nil, fmt.Errorf("stdout pipe: %v", err)
 	}
-	defer stdout.Close()
-	stdin, err := cmd.StdinPipe()
+
+	stdin, err = cmd.StdinPipe()
 	if err != nil {
-		helper.Fail500(w, r, fmt.Errorf("handlePostRPC: stdin: %v", err))
-		return
+		return nil, nil, nil, fmt.Errorf("stdin pipe: %v", err)
 	}
-	defer stdin.Close()
-	if err := cmd.Start(); err != nil {
-		helper.Fail500(w, r, fmt.Errorf("handlePostRPC: start %v: %v", cmd.Args, err))
-		return
+
+	if err = cmd.Start(); err != nil {
+		return nil, nil, nil, fmt.Errorf("start %v: %v", cmd.Args, err)
 	}
-	defer helper.CleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
 
-	// Write the client request body to Git's standard input
-	if writtenIn, err = io.Copy(stdin, body); err != nil {
-		helper.Fail500(w, r, fmt.Errorf("handlePostRPC: write to %v: %v", cmd.Args, err))
-		return
-	}
-	// Signal to the Git subprocess that no more data is coming
-	stdin.Close()
+	return cmd, stdin, stdout, nil
+}
 
-	// It may take a while before we return and the deferred closes happen
-	// so let's free up some resources already.
-	r.Body.Close()
-
-	// Start writing the response
+func writePostRPCHeader(w http.ResponseWriter, action string) {
 	w.Header().Set("Content-Type", fmt.Sprintf("application/x-%s-result", action))
 	w.Header().Set("Cache-Control", "no-cache")
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
-
-	// This io.Copy may take a long time, both for Git push and pull.
-	if _, err := io.Copy(w, stdout); err != nil {
-		helper.LogError(
-			r,
-			&copyError{fmt.Errorf("handlePostRPC: copy output of %v: %v", cmd.Args, err)},
-		)
-		return
-	}
-	if err := cmd.Wait(); err != nil && !(isExitError(err) && isShallowClone) {
-		helper.LogError(r, fmt.Errorf("handlePostRPC: wait for %v: %v", cmd.Args, err))
-		return
-	}
 }
 
 func getService(r *http.Request) string {
