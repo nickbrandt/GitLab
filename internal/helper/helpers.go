@@ -3,6 +3,7 @@ package helper
 import (
 	"errors"
 	"log"
+	"mime"
 	"net"
 	"net/http"
 	"net/url"
@@ -159,4 +160,9 @@ func SetForwardedFor(newHeaders *http.Header, originalRequest *http.Request) {
 		}
 		newHeaders.Set("X-Forwarded-For", header)
 	}
+}
+
+func IsContentType(expected, actual string) bool {
+	parsed, _, err := mime.ParseMediaType(actual)
+	return err == nil && parsed == expected
 }

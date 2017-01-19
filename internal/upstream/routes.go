@@ -1,7 +1,6 @@
 package upstream
 
 import (
-	"mime"
 	"net/http"
 	"path"
 	"regexp"
@@ -67,8 +66,7 @@ func wsRoute(regexpStr string, handler http.Handler, matchers ...matcherFunc) ro
 // Creates matcherFuncs for a particular content type.
 func isContentType(contentType string) func(*http.Request) bool {
 	return func(r *http.Request) bool {
-		parsed, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
-		return err == nil && contentType == parsed
+		return helper.IsContentType(contentType, r.Header.Get("Content-Type"))
 	}
 }
 

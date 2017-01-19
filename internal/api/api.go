@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"mime"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -288,6 +287,5 @@ func bufferResponse(r io.Reader) (*bytes.Buffer, error) {
 }
 
 func validResponseContentType(resp *http.Response) bool {
-	parsed, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-	return err == nil && parsed == ResponseContentType
+	return helper.IsContentType(ResponseContentType, resp.Header.Get("Content-Type"))
 }
