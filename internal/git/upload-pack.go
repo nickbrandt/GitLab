@@ -35,7 +35,7 @@ func handleUploadPack(w *GitHttpResponseWriter, r *http.Request, a *api.Response
 	r.Body.Close()
 
 	action := getService(r)
-	cmd, stdin, stdout, err := setupGitCommand(action, a, w, r)
+	cmd, stdin, stdout, err := setupGitCommand(action, a)
 
 	if err != nil {
 		fail500(w)

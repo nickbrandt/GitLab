@@ -70,7 +70,7 @@ func repoPreAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.Han
 	}, "")
 }
 
-func setupGitCommand(action string, a *api.Response, w *GitHttpResponseWriter, r *http.Request) (cmd *exec.Cmd, stdin io.WriteCloser, stdout io.ReadCloser, err error) {
+func setupGitCommand(action string, a *api.Response, options ...string) (cmd *exec.Cmd, stdin io.WriteCloser, stdout io.ReadCloser, err error) {
 	// Don't leak pipes when we return early after an error
 	defer func() {
 		if err == nil {
@@ -85,22 +85,22 @@ func setupGitCommand(action string, a *api.Response, w *GitHttpResponseWriter, r
 	}()
 
 	// Prepare our Git subprocess
-	cmd = gitCommand(a.GL_ID, "git", subCommand(action), "--stateless-rpc", a.RepoPath)
+	args := []string{subCommand(action), "--stateless-rpc"}
+	args = append(args, options...)
+	args = append(args, a.RepoPath)
+	cmd = gitCommand(a.GL_ID, "git", args...)
 	stdout, err = cmd.StdoutPipe()
 	if err != nil {
-		helper.Fail500(w, r, fmt.Errorf("setupGitCommand: stdout: %v", err))
-		return nil, nil, nil, err
+		return nil, nil, nil, fmt.Errorf("stdout pipe: %v", err)
 	}
 
 	stdin, err = cmd.StdinPipe()
 	if err != nil {
-		helper.Fail500(w, r, fmt.Errorf("setupGitCommand: stdin: %v", err))
-		return nil, nil, nil, err
+		return nil, nil, nil, fmt.Errorf("stdin pipe: %v", err)
 	}
 
 	if err = cmd.Start(); err != nil {
-		helper.Fail500(w, r, fmt.Errorf("setupGitCommand: start %v: %v", cmd.Args, err))
-		return nil, nil, nil, err
+		return nil, nil, nil, fmt.Errorf("start %v: %v", cmd.Args, err)
 	}
 
 	return cmd, stdin, stdout, nil

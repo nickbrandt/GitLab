@@ -12,9 +12,10 @@ import (
 func handleReceivePack(w *GitHttpResponseWriter, r *http.Request, a *api.Response) (writtenIn int64, err error) {
 	body := r.Body
 	action := getService(r)
-	cmd, stdin, stdout, err := setupGitCommand(action, a, w, r)
+	cmd, stdin, stdout, err := setupGitCommand(action, a)
 
 	if err != nil {
+		fail500(w)
 		return writtenIn, fmt.Errorf("setupGitCommand: %v", err)
 	}
 

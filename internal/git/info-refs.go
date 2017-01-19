@@ -45,19 +45,14 @@ func handleGetInfoRefs(rw http.ResponseWriter, r *http.Request, a *api.Response)
 		return
 	}
 
-	// Prepare our Git subprocess
-	cmd := gitCommand(a.GL_ID, "git", subCommand(rpc), "--stateless-rpc", "--advertise-refs", a.RepoPath)
-	stdout, err := cmd.StdoutPipe()
+	cmd, stdin, stdout, err := setupGitCommand(rpc, a, "--advertise-refs")
 	if err != nil {
-		helper.Fail500(w, r, fmt.Errorf("handleGetInfoRefs: stdout: %v", err))
-		return
-	}
-	defer stdout.Close()
-	if err := cmd.Start(); err != nil {
-		helper.Fail500(w, r, fmt.Errorf("handleGetInfoRefs: start %v: %v", cmd.Args, err))
+		helper.Fail500(w, r, fmt.Errorf("handleGetInfoRefs: setupGitCommand: %v", err))
 		return
 	}
 	defer helper.CleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
+	stdin.Close()                         // Not needed for this request
+	defer stdout.Close()
 
 	// Start writing the response
 	w.Header().Set("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
