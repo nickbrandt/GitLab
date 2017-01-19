@@ -10,7 +10,10 @@ import (
 )
 
 func handleUploadPack(w *GitHttpResponseWriter, r *http.Request, a *api.Response) (writtenIn int64, err error) {
-	buffer, err := helper.ReadAllTempfile(r.Body)
+	// The body will consist almost entirely of 'have XXX' and 'want XXX'
+	// lines; these are about 50 bytes long. With a limit of 10MB the client
+	// can send over 200,000 have/want lines.
+	buffer, err := helper.ReadAllTempfile(io.LimitReader(r.Body, 10*1024*1024))
 	if err != nil {
 		fail500(w)
 		return writtenIn, fmt.Errorf("ReadAllTempfile: %v", err)
