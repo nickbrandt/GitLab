@@ -44,7 +44,7 @@ func (b *blocker) WriteHeader(status int) {
 		return
 	}
 
-	if b.Header().Get("Content-Type") == ResponseContentType {
+	if helper.IsContentType(ResponseContentType, b.Header().Get("Content-Type")) {
 		b.status = 500
 		b.Header().Del("Content-Length")
 		b.hijacked = true
