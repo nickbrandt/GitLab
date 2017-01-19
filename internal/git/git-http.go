@@ -71,6 +71,19 @@ func repoPreAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.Han
 }
 
 func setupGitCommand(action string, a *api.Response, w *GitHttpResponseWriter, r *http.Request) (cmd *exec.Cmd, stdin io.WriteCloser, stdout io.ReadCloser, err error) {
+	// Don't leak pipes when we return early after an error
+	defer func() {
+		if err == nil {
+			return
+		}
+		if stdin != nil {
+			stdin.Close()
+		}
+		if stdout != nil {
+			stdout.Close()
+		}
+	}()
+
 	// Prepare our Git subprocess
 	cmd = gitCommand(a.GL_ID, "git", subCommand(action), "--stateless-rpc", a.RepoPath)
 	stdout, err = cmd.StdoutPipe()
