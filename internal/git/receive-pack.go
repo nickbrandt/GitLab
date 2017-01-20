@@ -10,7 +10,6 @@ import (
 )
 
 func handleReceivePack(w *GitHttpResponseWriter, r *http.Request, a *api.Response) (writtenIn int64, err error) {
-	body := r.Body
 	action := getService(r)
 	cmd, stdin, stdout, err := setupGitCommand(action, a)
 
@@ -23,8 +22,7 @@ func handleReceivePack(w *GitHttpResponseWriter, r *http.Request, a *api.Respons
 	defer stdin.Close()
 	defer helper.CleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
 
-	// Write the client request body to Git's standard input
-	writtenIn, err = io.Copy(stdin, body)
+	writtenIn, err = io.Copy(stdin, r.Body)
 
 	if err != nil {
 		fail500(w)
