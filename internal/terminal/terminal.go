@@ -1,6 +1,8 @@
 package terminal
 
 import (
+	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -26,7 +28,7 @@ func Handler(myAPI *api.API) http.Handler {
 			return
 		}
 
-		proxy := NewProxy(1) // one stopper: auth checker
+		proxy := NewProxy(2) // two stoppers: auth checker, max time
 		checker := NewAuthChecker(
 			authCheckFunc(myAPI, r, "authorize"),
 			a.Terminal,
@@ -34,6 +36,7 @@ func Handler(myAPI *api.API) http.Handler {
 		)
 		defer checker.Close()
 		go checker.Loop(ReauthenticationInterval)
+		go closeAfterMaxTime(proxy, a.Terminal.MaxSessionTime)
 
 		ProxyTerminal(w, r, a.Terminal, proxy)
 	}, "authorize")
@@ -108,4 +111,18 @@ func connectToServer(terminal *api.TerminalSettings, r *http.Request) (Connectio
 	}
 
 	return Wrap(conn, conn.Subprotocol()), nil
+}
+
+func closeAfterMaxTime(proxy *Proxy, maxSessionTime int) {
+	if maxSessionTime == 0 {
+		return
+	}
+
+	<-time.After(time.Duration(maxSessionTime) * time.Second)
+	proxy.StopCh <- errors.New(
+		fmt.Sprintf(
+			"Connection closed: session time greater than maximum time allowed - %v seconds",
+			maxSessionTime,
+		),
+	)
 }

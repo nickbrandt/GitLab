@@ -12,6 +12,7 @@ import (
 	"path"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/gorilla/websocket"
 
@@ -68,6 +69,26 @@ func TestTerminalBadTLS(t *testing.T) {
 	if err == nil {
 		log.Println("TLS negotiation should have failed!")
 		defer client.Close()
+	}
+}
+
+func TestTerminalSessionTimeout(t *testing.T) {
+	serverConns, clientURL, close := wireupTerminal(timeout, "channel.k8s.io")
+	defer close()
+
+	client, _, err := dialWebsocket(clientURL, nil, "terminal.gitlab.com")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	sc := <-serverConns
+	defer sc.conn.Close()
+
+	client.SetReadDeadline(time.Now().Add(time.Duration(2) * time.Second))
+	_, _, err = client.ReadMessage()
+
+	if !websocket.IsCloseError(err, websocket.CloseAbnormalClosure) {
+		t.Fatalf("Client connection was not closed, got %v", err)
 	}
 }
 
@@ -151,9 +172,10 @@ func startWebsocketServer(subprotocols ...string) (chan connWithReq, *httptest.S
 func terminalOkBody(remote *httptest.Server, header http.Header, subprotocols ...string) *api.Response {
 	out := &api.Response{
 		Terminal: &api.TerminalSettings{
-			Url:          websocketURL(remote.URL),
-			Header:       header,
-			Subprotocols: subprotocols,
+			Url:            websocketURL(remote.URL),
+			Header:         header,
+			Subprotocols:   subprotocols,
+			MaxSessionTime: 0,
 		},
 	}
 
@@ -168,6 +190,10 @@ func terminalOkBody(remote *httptest.Server, header http.Header, subprotocols ..
 
 func badCA(authResponse *api.Response) {
 	authResponse.Terminal.CAPem = "Bad CA"
+}
+
+func timeout(authResponse *api.Response) {
+	authResponse.Terminal.MaxSessionTime = 1
 }
 
 func setHeader(hdr http.Header) func(*api.Response) {

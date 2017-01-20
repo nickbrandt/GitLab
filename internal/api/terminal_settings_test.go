@@ -7,14 +7,22 @@ import (
 
 func terminal(url string, subprotocols ...string) *TerminalSettings {
 	return &TerminalSettings{
-		Url:          url,
-		Subprotocols: subprotocols,
+		Url:            url,
+		Subprotocols:   subprotocols,
+		MaxSessionTime: 0,
 	}
 }
 
 func ca(term *TerminalSettings) *TerminalSettings {
 	term = term.Clone()
 	term.CAPem = "Valid CA data"
+
+	return term
+}
+
+func timeout(term *TerminalSettings) *TerminalSettings {
+	term = term.Clone()
+	term.MaxSessionTime = 600
 
 	return term
 }
@@ -134,6 +142,7 @@ func TestIsEqual(t *testing.T) {
 		{term, ca(term), false},
 		{ca(header(term)), ca(header(term)), true},
 		{term_ca2, ca(term), false},
+		{term, timeout(term), false},
 	} {
 		if actual := tc.termA.IsEqual(tc.termB); tc.expected != actual {
 			t.Fatalf(
