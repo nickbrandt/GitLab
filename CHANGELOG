@@ -2,6 +2,17 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v1.3.0
+
+- Fix stalled HTTP fetches with large payloads. !110
+- Correctly parse content types in HTTP requests and responses !114
+- Catch _all_ multipart NextPart() errors. !108
+- Replace 'gitlab_workhorse_artifacts_upload_*' with labeled version of
+  'gitlab_workhorse_multipart_upload_*'. !106
+- Allow GET /info/refs to be proxied to Gitaly. !105
+- Set correct value of X-Forwarded-For header in PreAuthorize request. !104
+- Allow nested namespaces in git URLs. !80
+
 v1.2.1
 
 - More Prometheus metrics
