@@ -173,7 +173,11 @@ class Note < ActiveRecord::Base
   end
 
   def for_personal_snippet?
-    noteable_type == "Snippet" && noteable.type == 'PersonalSnippet'
+    noteable.is_a?(PersonalSnippet)
+  end
+
+  def skip_project_check?
+    for_personal_snippet?
   end
 
   # override to return commits, which are not active record
@@ -229,6 +233,10 @@ class Note < ActiveRecord::Base
 
   def award_emoji_name
     note.match(Banzai::Filter::EmojiFilter.emoji_pattern)[1]
+  end
+
+  def to_ability_name
+    for_personal_snippet? ? 'personal_snippet' : noteable_type.underscore
   end
 
   private
