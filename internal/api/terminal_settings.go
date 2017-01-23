@@ -26,6 +26,10 @@ type TerminalSettings struct {
 	// The CA roots to validate the remote endpoint with, for wss:// URLs. The
 	// system-provided CA pool will be used if this is blank. PEM-encoded data.
 	CAPem string
+
+	// The value is specified in seconds. It is converted to time.Duration
+	// later.
+	MaxSessionTime int
 }
 
 func (t *TerminalSettings) URL() (*url.URL, error) {
@@ -112,5 +116,7 @@ func (t *TerminalSettings) IsEqual(other *TerminalSettings) bool {
 		}
 	}
 
-	return t.Url == other.Url && t.CAPem == other.CAPem
+	return t.Url == other.Url &&
+		t.CAPem == other.CAPem &&
+		t.MaxSessionTime == other.MaxSessionTime
 }
