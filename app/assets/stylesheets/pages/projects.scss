@@ -960,6 +960,9 @@ a.allowed-to-push {
 }
 
 .variables-table {
+  &.table-responsive {
+    border: none;
+  }
   table-layout: fixed;
 
   .variable-key {
