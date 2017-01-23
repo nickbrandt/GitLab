@@ -979,6 +979,15 @@ a.allowed-to-push {
       max-width: 150px;
     }
   }
+
+  .variable-value {
+    @media(max-width: $screen-xs-max) {
+      width: 150px;
+      max-width: 150px;
+      overflow: hidden;
+      word-wrap: break-word;
+    }
+  }
 }
 
 #modal-geo-info .modal-dialog {
