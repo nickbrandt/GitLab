@@ -2,7 +2,6 @@ package git
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 	"path"
 
@@ -45,36 +44,31 @@ func handleGetInfoRefs(rw http.ResponseWriter, r *http.Request, a *api.Response)
 		return
 	}
 
-	cmd, stdin, stdout, err := setupGitCommand(rpc, a, "--advertise-refs")
-	if err != nil {
-		helper.Fail500(w, r, fmt.Errorf("handleGetInfoRefs: setupGitCommand: %v", err))
-		return
-	}
-	defer helper.CleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
-	stdin.Close()                         // Not needed for this request
-	defer stdout.Close()
-
-	// Start writing the response
 	w.Header().Set("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
 	w.Header().Set("Cache-Control", "no-cache")
-	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
+
+	if err := writeBody(w, a, rpc); err != nil {
+		helper.LogError(r, fmt.Errorf("handleGetInfoRefs: %v", err))
+	}
+}
+
+func writeBody(w http.ResponseWriter, a *api.Response, rpc string) error {
 	if err := pktLine(w, fmt.Sprintf("# service=%s\n", rpc)); err != nil {
-		helper.LogError(r, fmt.Errorf("handleGetInfoRefs: pktLine: %v", err))
-		return
+		return fmt.Errorf("pktLine: %v", err)
 	}
 	if err := pktFlush(w); err != nil {
-		helper.LogError(r, fmt.Errorf("handleGetInfoRefs: pktFlush: %v", err))
-		return
+		return fmt.Errorf("pktFlush: %v", err)
 	}
-	if _, err := io.Copy(w, stdout); err != nil {
-		helper.LogError(
-			r,
-			&copyError{fmt.Errorf("handleGetInfoRefs: copy output of %v: %v", cmd.Args, err)},
-		)
-		return
+
+	cmd, err := startGitCommand(a, nil, w, rpc, "--advertise-refs")
+	if err != nil {
+		return fmt.Errorf("startGitCommand: %v", err)
 	}
+	defer helper.CleanUpProcessGroup(cmd) // Ensure brute force subprocess clean-up
+
 	if err := cmd.Wait(); err != nil {
-		helper.LogError(r, fmt.Errorf("handleGetInfoRefs: wait for %v: %v", cmd.Args, err))
-		return
+		return fmt.Errorf("wait for %v: %v", cmd.Args, err)
 	}
+
+	return nil
 }
