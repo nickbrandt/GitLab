@@ -21,9 +21,13 @@ import (
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream"
+
+	pb "gitlab.com/gitlab-org/gitaly/protos/go"
+	"google.golang.org/grpc"
 )
 
 const scratchDir = "testdata/scratch"
@@ -34,6 +38,7 @@ const testProject = "group/test"
 
 var checkoutDir = path.Join(scratchDir, "test")
 var cacheDir = path.Join(scratchDir, "cache")
+var gitalySocketPath = path.Join(scratchDir, "gitaly.sock")
 
 func TestMain(m *testing.M) {
 	source := "https://gitlab.com/gitlab-org/gitlab-test.git"
@@ -561,15 +566,16 @@ func TestApiContentTypeBlock(t *testing.T) {
 }
 
 func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
-	content := "0000"
 	apiResponse := gitOkBody(t)
 	apiResponse.GitalyResourcePath = "/projects/1/git-http/info-refs"
 
-	gitalyPath := path.Join(apiResponse.GitalyResourcePath, "upload-pack")
-	gitaly := startGitalyServer(regexp.MustCompile(gitalyPath), content)
-	defer gitaly.Close()
+	gitalyServer := startGitalyServer(t)
+	defer func() {
+		gitalyServer.Stop()
+		gitaly.CloseConnections()
+	}()
 
-	apiResponse.GitalySocketPath = gitaly.Listener.Addr().String()
+	apiResponse.GitalySocketPath = gitalySocketPath
 	ts := testAuthServer(nil, 200, apiResponse)
 	defer ts.Close()
 
@@ -587,14 +593,18 @@ func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 		t.Error(err)
 	}
 
-	if !bytes.Equal(responseBody, []byte(content)) {
-		t.Errorf("GET %q: Expected %q, got %q", resource, content, responseBody)
+	expectedContent := testhelper.GitalyInfoRefsResponseMock
+	if !bytes.Equal(responseBody, []byte(expectedContent)) {
+		t.Errorf("GET %q: Expected %q, got %q", resource, expectedContent, responseBody)
 	}
 }
 
 func TestGetInfoRefsHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
-	gitaly := startGitalyServer(nil, "Gitaly response: should never reach the client")
-	defer gitaly.Close()
+	gitalyServer := startGitalyServer(t)
+	defer func() {
+		gitalyServer.Stop()
+		gitaly.CloseConnections()
+	}()
 
 	apiResponse := gitOkBody(t)
 	apiResponse.GitalySocketPath = ""
@@ -619,7 +629,8 @@ func TestGetInfoRefsHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
 	}
 
-	if bytes.Contains(responseBody, []byte("Gitaly response")) {
+	expectedContent := testhelper.GitalyInfoRefsResponseMock
+	if bytes.Contains(responseBody, []byte(expectedContent)) {
 		t.Errorf("GET %q: request should not have been proxied to Gitaly", resource)
 	}
 }
@@ -797,26 +808,18 @@ func startWorkhorseServerWithConfig(cfg *config.Config) *httptest.Server {
 	return httptest.NewServer(u)
 }
 
-func startGitalyServer(url *regexp.Regexp, body string) *httptest.Server {
-	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		if url != nil && !url.MatchString(r.URL.Path) {
-			log.Println("Gitaly", r.Method, r.URL, "DENY")
-			w.WriteHeader(404)
-			return
-		}
-
-		fmt.Fprint(w, body)
-	}))
-
-	listener, err := net.Listen("unix", path.Join(scratchDir, "gitaly.sock"))
+func startGitalyServer(t *testing.T) *grpc.Server {
+	server := grpc.NewServer()
+	listener, err := net.Listen("unix", gitalySocketPath)
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
-	ts.Listener = listener
 
-	ts.Start()
-	return ts
+	pb.RegisterSmartHTTPServer(server, testhelper.NewGitalyServer())
+
+	go server.Serve(listener)
+
+	return server
 }
 
 func runOrFail(t *testing.T, cmd *exec.Cmd) {

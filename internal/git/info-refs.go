@@ -3,33 +3,14 @@ package git
 import (
 	"fmt"
 	"net/http"
-	"path"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
-func GetInfoRefsHandler(a *api.API, cfg *config.Config) http.Handler {
-	return repoPreAuthorizeHandler(a, func(rw http.ResponseWriter, r *http.Request, apiResponse *api.Response) {
-		if apiResponse.GitalySocketPath == "" {
-			handleGetInfoRefs(rw, r, apiResponse)
-		} else {
-			handleGetInfoRefsWithGitaly(rw, r, apiResponse, gitaly.NewClient(apiResponse.GitalySocketPath, cfg))
-		}
-	})
-}
-
-func handleGetInfoRefsWithGitaly(rw http.ResponseWriter, r *http.Request, a *api.Response, gitalyClient *gitaly.Client) {
-	req := *r // Make a copy of r
-	req.Header = helper.HeaderClone(r.Header)
-	req.Header.Add("Gitaly-Repo-Path", a.RepoPath)
-	req.Header.Add("Gitaly-GL-Id", a.GL_ID)
-	req.URL.Path = path.Join(a.GitalyResourcePath, subCommand(getService(r)))
-	req.URL.RawQuery = ""
-
-	gitalyClient.Proxy.ServeHTTP(rw, &req)
+func GetInfoRefsHandler(a *api.API) http.Handler {
+	return repoPreAuthorizeHandler(a, handleGetInfoRefs)
 }
 
 func handleGetInfoRefs(rw http.ResponseWriter, r *http.Request, a *api.Response) {
@@ -47,12 +28,19 @@ func handleGetInfoRefs(rw http.ResponseWriter, r *http.Request, a *api.Response)
 	w.Header().Set("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
 	w.Header().Set("Cache-Control", "no-cache")
 
-	if err := writeBody(w, a, rpc); err != nil {
+	var err error
+	if a.GitalySocketPath == "" {
+		err = handleGetInfoRefsLocally(w, a, rpc)
+	} else {
+		err = handleGetInfoRefsWithGitaly(w, a, rpc)
+	}
+
+	if err != nil {
 		helper.LogError(r, fmt.Errorf("handleGetInfoRefs: %v", err))
 	}
 }
 
-func writeBody(w http.ResponseWriter, a *api.Response, rpc string) error {
+func handleGetInfoRefsLocally(w http.ResponseWriter, a *api.Response, rpc string) error {
 	if err := pktLine(w, fmt.Sprintf("# service=%s\n", rpc)); err != nil {
 		return fmt.Errorf("pktLine: %v", err)
 	}
@@ -68,6 +56,24 @@ func writeBody(w http.ResponseWriter, a *api.Response, rpc string) error {
 
 	if err := cmd.Wait(); err != nil {
 		return fmt.Errorf("wait for %v: %v", cmd.Args, err)
+	}
+
+	return nil
+}
+
+func handleGetInfoRefsWithGitaly(w http.ResponseWriter, a *api.Response, rpc string) error {
+	smarthttp, err := gitaly.NewSmartHTTPClient(a.GitalySocketPath)
+	if err != nil {
+		return fmt.Errorf("GetInfoRefsHandler: %v", err)
+	}
+
+	infoRefsResponseWriter, err := smarthttp.InfoRefsResponseWriterTo(a.RepoPath, rpc)
+	if err != nil {
+		return fmt.Errorf("GetInfoRefsHandler: %v", err)
+	}
+
+	if _, err = infoRefsResponseWriter.WriteTo(w); err != nil {
+		return fmt.Errorf("handleGetInfoRefsWithGitaly: Error receiving response from server: %v", err)
 	}
 
 	return nil
