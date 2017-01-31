@@ -19,6 +19,7 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/staticpages"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/terminal"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upload"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/webpack"
 )
 
 type matcherFunc func(*http.Request) bool
@@ -138,6 +139,18 @@ func (u *Upstream) configureRoutes() {
 		// Explicitly proxy API requests
 		route("", apiPattern, proxy),
 		route("", ciAPIPattern, proxy),
+
+		// In development mode, proxy /assets/webpack requests to webpack
+		// dev-server, otherwise serve static files from disk.
+		route(
+			"", `^/assets/webpack/`,
+			webpack.DevServer(u.DevelopmentMode, u.WebpackAddr,
+				static.ServeExisting(
+					u.URLPrefix,
+					staticpages.CacheExpireMax,
+					nil,
+				)),
+		),
 
 		// Serve assets
 		route(
