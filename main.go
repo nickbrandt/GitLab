@@ -51,6 +51,7 @@ var apiQueueLimit = flag.Uint("apiQueueLimit", 0, "Number of API requests allowe
 var apiQueueTimeout = flag.Duration("apiQueueDuration", queueing.DefaultTimeout, "Maximum queueing duration of requests")
 var logFile = flag.String("logFile", "", "Log file to be used")
 var prometheusListenAddr = flag.String("prometheusListenAddr", "", "Prometheus listening address, e.g. ':9100'")
+var webpackAddr = flag.String("webpackAddr", "", "(development mode only) Network address of Webpack dev server, e.g. 'tcp://localhost:5000'")
 
 func main() {
 	flag.Usage = func() {
@@ -115,6 +116,7 @@ func main() {
 		Version:             Version,
 		DocumentRoot:        *documentRoot,
 		DevelopmentMode:     *developmentMode,
+		WebpackAddr:         *webpackAddr,
 		ProxyHeadersTimeout: *proxyHeadersTimeout,
 		APILimit:            *apiLimit,
 		APIQueueLimit:       *apiQueueLimit,
