@@ -10,7 +10,6 @@ type Config struct {
 	Version             string
 	DocumentRoot        string
 	DevelopmentMode     bool
-	WebpackAddr         string
 	Socket              string
 	ProxyHeadersTimeout time.Duration
 	APILimit            uint
