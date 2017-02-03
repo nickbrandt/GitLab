@@ -3,6 +3,7 @@ require 'securerandom'
 require 'forwardable'
 
 class Repository
+  include GitlabMarkdownHelper
   include Gitlab::ShellAdapter
   include Elastic::RepositoriesSearch
 
@@ -19,9 +20,9 @@ class Repository
   # same name. The cache key used by those methods must also match method's
   # name.
   #
-  # For example, for entry `:readme` there's a method called `readme` which
-  # stores its data in the `readme` cache key.
-  CACHED_METHODS = %i(size commit_count readme version contribution_guide
+  # For example, for entry `:commit_count` there's a method called `commit_count` which
+  # stores its data in the `commit_count` cache key.
+  CACHED_METHODS = %i(size commit_count rendered_readme version contribution_guide
                       changelog license_blob license_key gitignore koding_yml
                       gitlab_ci_yml branch_names tag_names branch_count
                       tag_count avatar exists? empty? root_ref)
@@ -30,7 +31,7 @@ class Repository
   # changed. This Hash maps file types (as returned by Gitlab::FileDetector) to
   # the corresponding methods to call for refreshing caches.
   METHOD_CACHES_FOR_FILE_TYPES = {
-    readme: :readme,
+    readme: :rendered_readme,
     changelog: :changelog,
     license: %i(license_blob license_key),
     contributing: :contribution_guide,
@@ -585,7 +586,11 @@ class Repository
       head.readme
     end
   end
-  cache_method :readme
+
+  def rendered_readme
+    render_markup(readme.name, readme.data) if readme
+  end
+  cache_method :rendered_readme
 
   def version
     file_on_head(:version)

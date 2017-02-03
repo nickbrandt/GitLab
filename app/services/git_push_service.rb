@@ -81,7 +81,8 @@ class GitPushService < BaseService
       types = []
     end
 
-    ProjectCacheWorker.perform_async(@project.id, types, [:commit_count, :repository_size])
+    # TODO only if readme was touched
+    ProjectCacheWorker.perform_async(@project.id, types, [:commit_count, :repository_size, :readme])
   end
 
   # Schedules processing of commit messages.
