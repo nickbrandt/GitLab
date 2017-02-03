@@ -34,6 +34,16 @@ var (
 		Help: "How many requests are now queued",
 	})
 
+	queueingWaitingTime = prometheus.NewSummary(prometheus.SummaryOpts{
+		Name: "gitlab_workhorse_queueing_waiting_time",
+		Help: "How many time a request spent in queue (0.5 and 0.95 percentile)",
+		Objectives: map[float64]float64{
+			0.50: 0.05,
+			0.95: 0.005,
+			0.99: 0.001,
+		},
+	})
+
 	queueingErrors = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "gitlab_workhorse_queueing_errors",
@@ -45,7 +55,7 @@ var (
 
 type Queue struct {
 	busyCh    chan struct{}
-	waitingCh chan struct{}
+	waitingCh chan time.Time
 }
 
 func init() {
@@ -53,6 +63,7 @@ func init() {
 	prometheus.MustRegister(queueingLimit)
 	prometheus.MustRegister(queueingBusy)
 	prometheus.MustRegister(queueingWaiting)
+	prometheus.MustRegister(queueingWaitingTime)
 	prometheus.MustRegister(queueingQueueLimit)
 }
 
@@ -66,7 +77,7 @@ func NewQueue(limit, queueLimit uint) *Queue {
 
 	return &Queue{
 		busyCh:    make(chan struct{}, limit),
-		waitingCh: make(chan struct{}, limit+queueLimit),
+		waitingCh: make(chan time.Time, limit+queueLimit),
 	}
 }
 
@@ -77,7 +88,7 @@ func NewQueue(limit, queueLimit uint) *Queue {
 func (s *Queue) Acquire(timeout time.Duration) (err error) {
 	// push item to a queue to claim your own slot (non-blocking)
 	select {
-	case s.waitingCh <- struct{}{}:
+	case s.waitingCh <- time.Now():
 		queueingWaiting.Inc()
 		break
 	default:
@@ -87,8 +98,9 @@ func (s *Queue) Acquire(timeout time.Duration) (err error) {
 
 	defer func() {
 		if err != nil {
-			<-s.waitingCh
+			waitStarted := <-s.waitingCh
 			queueingWaiting.Dec()
+			queueingWaitingTime.Observe(float64(time.Since(waitStarted)))
 		}
 	}()
 
@@ -120,8 +132,10 @@ func (s *Queue) Acquire(timeout time.Duration) (err error) {
 // It triggers next request to be processed if it's in queue
 func (s *Queue) Release() {
 	// dequeue from queue to allow next request to be processed
-	<-s.waitingCh
+	waitStarted := <-s.waitingCh
 	queueingWaiting.Dec()
+	queueingWaitingTime.Observe(float64(time.Since(waitStarted)))
+
 	<-s.busyCh
 	queueingBusy.Dec()
 }
