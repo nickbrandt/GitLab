@@ -14,6 +14,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
@@ -27,19 +28,18 @@ func UploadPack(a *api.API) http.Handler {
 	return postRPCHandler(a, "handleUploadPack", handleUploadPack)
 }
 
-func postRPCHandler(a *api.API, name string, handler func(*GitHttpResponseWriter, *http.Request, *api.Response) (int64, error)) http.Handler {
+func postRPCHandler(a *api.API, name string, handler func(*GitHttpResponseWriter, *http.Request, *api.Response) error) http.Handler {
 	return repoPreAuthorizeHandler(a, func(rw http.ResponseWriter, r *http.Request, ar *api.Response) {
-		var writtenIn int64
-		var err error
+		cr := &countReadCloser{ReadCloser: r.Body}
+		r.Body = cr
 
 		w := NewGitHttpResponseWriter(rw)
 		defer func() {
-			w.Log(r, writtenIn)
+			w.Log(r, cr.Count())
 		}()
 
-		writtenIn, err = handler(w, r, ar)
-		if err != nil {
-			helper.LogError(r, fmt.Errorf("%s: %v", name, err))
+		if err := handler(w, r, ar); err != nil {
+			helper.Fail500(w, r, fmt.Errorf("%s: %v", name, err))
 		}
 	})
 }
@@ -70,46 +70,25 @@ func repoPreAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.Han
 	}, "")
 }
 
-func setupGitCommand(action string, a *api.Response, options ...string) (cmd *exec.Cmd, stdin io.WriteCloser, stdout io.ReadCloser, err error) {
-	// Don't leak pipes when we return early after an error
-	defer func() {
-		if err == nil {
-			return
-		}
-		if stdin != nil {
-			stdin.Close()
-		}
-		if stdout != nil {
-			stdout.Close()
-		}
-	}()
-
+func startGitCommand(a *api.Response, stdin io.Reader, stdout io.Writer, action string, options ...string) (cmd *exec.Cmd, err error) {
 	// Prepare our Git subprocess
 	args := []string{subCommand(action), "--stateless-rpc"}
 	args = append(args, options...)
 	args = append(args, a.RepoPath)
 	cmd = gitCommand(a.GL_ID, "git", args...)
-	stdout, err = cmd.StdoutPipe()
-	if err != nil {
-		return nil, nil, nil, fmt.Errorf("stdout pipe: %v", err)
-	}
-
-	stdin, err = cmd.StdinPipe()
-	if err != nil {
-		return nil, nil, nil, fmt.Errorf("stdin pipe: %v", err)
-	}
+	cmd.Stdin = stdin
+	cmd.Stdout = stdout
 
 	if err = cmd.Start(); err != nil {
-		return nil, nil, nil, fmt.Errorf("start %v: %v", cmd.Args, err)
+		return nil, fmt.Errorf("start %v: %v", cmd.Args, err)
 	}
 
-	return cmd, stdin, stdout, nil
+	return cmd, nil
 }
 
 func writePostRPCHeader(w http.ResponseWriter, action string) {
 	w.Header().Set("Content-Type", fmt.Sprintf("application/x-%s-result", action))
 	w.Header().Set("Cache-Control", "no-cache")
-	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
 }
 
 func getService(r *http.Request) string {
@@ -126,4 +105,26 @@ func isExitError(err error) bool {
 
 func subCommand(rpc string) string {
 	return strings.TrimPrefix(rpc, "git-")
+}
+
+type countReadCloser struct {
+	n int64
+	io.ReadCloser
+	sync.Mutex
+}
+
+func (c *countReadCloser) Read(p []byte) (n int, err error) {
+	n, err = c.ReadCloser.Read(p)
+
+	c.Lock()
+	defer c.Unlock()
+	c.n += int64(n)
+
+	return n, err
+}
+
+func (c *countReadCloser) Count() int64 {
+	c.Lock()
+	defer c.Unlock()
+	return c.n
 }

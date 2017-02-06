@@ -39,7 +39,7 @@ func TestHandleReceivePack(t *testing.T) {
 	testHandlePostRpc(t, "git-receive-pack", handleReceivePack)
 }
 
-func testHandlePostRpc(t *testing.T, action string, handler func(*GitHttpResponseWriter, *http.Request, *api.Response) (int64, error)) {
+func testHandlePostRpc(t *testing.T, action string, handler func(*GitHttpResponseWriter, *http.Request, *api.Response) error) {
 	execCommand = fakeExecCommand
 	defer func() { execCommand = exec.Command }()
 
