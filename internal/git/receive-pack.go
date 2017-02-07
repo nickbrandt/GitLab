@@ -14,7 +14,9 @@ func handleReceivePack(w *GitHttpResponseWriter, r *http.Request, a *api.Respons
 	action := getService(r)
 	writePostRPCHeader(w, action)
 
-	cmd, err := startGitCommand(a, r.Body, w, action)
+	cr, cw := helper.NewWriteAfterReader(r.Body, w)
+	defer cw.Flush()
+	cmd, err := startGitCommand(a, cr, cw, action)
 	if err != nil {
 		return fmt.Errorf("startGitCommand: %v", err)
 	}
