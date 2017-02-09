@@ -45,6 +45,8 @@ module API
           optional :labels, type: String, desc: 'Comma-separated list of label names'
           optional :due_date, type: String, desc: 'Date time string in the format YEAR-MONTH-DAY'
           optional :confidential, type: Boolean, desc: 'Boolean parameter if the issue should be confidential'
+          # Gitlab-EE specific
+          optional :weight, type: Integer, values: 0..9, desc: 'The weight of the issue'
         end
       end
 

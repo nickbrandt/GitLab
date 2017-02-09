@@ -717,13 +717,14 @@ describe API::V3::Issues, api: true  do
   describe "POST /projects/:id/issues" do
     it 'creates a new project issue' do
       post v3_api("/projects/#{project.id}/issues", user),
-        title: 'new issue', labels: 'label, label2'
+        title: 'new issue', labels: 'label, label2', weight: 3
 
       expect(response).to have_http_status(201)
       expect(json_response['title']).to eq('new issue')
       expect(json_response['description']).to be_nil
       expect(json_response['labels']).to eq(['label', 'label2'])
       expect(json_response['confidential']).to be_falsy
+      expect(json_response['weight']).to eq(3)
     end
 
     it 'creates a new confidential project issue' do
