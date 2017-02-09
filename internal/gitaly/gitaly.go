@@ -1,51 +1,72 @@
 package gitaly
 
 import (
+	"net"
 	"sync"
+	"time"
+
+	pb "gitlab.com/gitlab-org/gitaly/protos/go"
+	"google.golang.org/grpc"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
 )
 
-type Client struct {
-	Proxy *proxy.Proxy
-}
-
-type clientCache struct {
+type connectionsCache struct {
 	sync.RWMutex
-	clients map[string]*Client
+	connections map[string]*grpc.ClientConn
 }
 
-var cache = clientCache{
-	clients: make(map[string]*Client),
+var cache = connectionsCache{
+	connections: make(map[string]*grpc.ClientConn),
 }
 
-func NewClient(socketPath string, cfg *config.Config) *Client {
-	if client := getClient(socketPath); client != nil {
-		return client
+func NewSmartHTTPClient(socketPath string) (*SmartHTTPClient, error) {
+	conn, err := getOrCreateConnection(socketPath)
+	if err != nil {
+		return nil, err
 	}
+	grpcClient := pb.NewSmartHTTPClient(conn)
+	return &SmartHTTPClient{grpcClient}, nil
+}
 
+func getOrCreateConnection(socketPath string) (*grpc.ClientConn, error) {
 	cache.Lock()
 	defer cache.Unlock()
 
-	if client := cache.clients[socketPath]; client != nil {
-		return client
+	if conn := cache.connections[socketPath]; conn != nil {
+		return conn, nil
 	}
 
-	client := &Client{}
-	roundTripper := badgateway.NewRoundTripper(nil, socketPath, cfg.ProxyHeadersTimeout, cfg.DevelopmentMode)
-	client.Proxy = proxy.NewProxy(nil, cfg.Version, roundTripper)
-	client.Proxy.AllowResponseBuffering = false
+	conn, err := newConnection(socketPath)
+	if err != nil {
+		return nil, err
+	}
 
-	cache.clients[socketPath] = client
+	cache.connections[socketPath] = conn
 
-	return client
+	return conn, nil
 }
 
-func getClient(socketPath string) *Client {
-	cache.RLock()
-	defer cache.RUnlock()
+func CloseConnections() {
+	cache.Lock()
+	defer cache.Unlock()
 
-	return cache.clients[socketPath]
+	for _, conn := range cache.connections {
+		conn.Close()
+	}
+}
+
+func newConnection(socketPath string) (*grpc.ClientConn, error) {
+	connOpts := []grpc.DialOption{
+		grpc.WithInsecure(), // Since we're connecting to Gitaly over UNIX, we don't need to use TLS credentials.
+		grpc.WithDialer(func(addr string, _ time.Duration) (net.Conn, error) {
+			return badgateway.DefaultDialer.Dial("unix", addr)
+		}),
+	}
+	conn, err := grpc.Dial(socketPath, connOpts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return conn, nil
 }
