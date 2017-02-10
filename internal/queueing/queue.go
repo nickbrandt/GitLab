@@ -34,14 +34,10 @@ var (
 		Help: "How many requests are now queued",
 	})
 
-	queueingWaitingTime = prometheus.NewSummary(prometheus.SummaryOpts{
-		Name: "gitlab_workhorse_queueing_waiting_time",
-		Help: "How many time a request spent in queue (0.5 and 0.95 percentile)",
-		Objectives: map[float64]float64{
-			0.50: 0.05,
-			0.95: 0.005,
-			0.99: 0.001,
-		},
+	queueingWaitingTime = prometheus.NewHistogram(prometheus.HistogramOpts{
+		Name:    "gitlab_workhorse_queueing_waiting_time",
+		Help:    "How many time a request spent in queue",
+		Buckets: []float64{0.01, 0.02, 0.05, 0.10, 0.20, 0.50, 1.00, 2.00, 5.00, 10.00, 30.00, 60.00},
 	})
 
 	queueingErrors = prometheus.NewCounterVec(
@@ -100,7 +96,7 @@ func (s *Queue) Acquire(timeout time.Duration) (err error) {
 		if err != nil {
 			waitStarted := <-s.waitingCh
 			queueingWaiting.Dec()
-			queueingWaitingTime.Observe(float64(time.Since(waitStarted)))
+			queueingWaitingTime.Observe(float64(time.Since(waitStarted).Seconds()))
 		}
 	}()
 
@@ -134,7 +130,7 @@ func (s *Queue) Release() {
 	// dequeue from queue to allow next request to be processed
 	waitStarted := <-s.waitingCh
 	queueingWaiting.Dec()
-	queueingWaitingTime.Observe(float64(time.Since(waitStarted)))
+	queueingWaitingTime.Observe(float64(time.Since(waitStarted).Seconds()))
 
 	<-s.busyCh
 	queueingBusy.Dec()
