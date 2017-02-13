@@ -1421,7 +1421,6 @@ ActiveRecord::Schema.define(version: 20170211073944) do
     t.string "linkedin", default: "", null: false
     t.string "twitter", default: "", null: false
     t.string "authentication_token"
-    t.integer "theme_id", default: 1, null: false
     t.string "bio"
     t.integer "failed_attempts", default: 0
     t.datetime "locked_at"
