@@ -209,9 +209,10 @@ class Issue < ActiveRecord::Base
     due_date.try(:past?) || false
   end
 
-  # Only issues on public projects should be checked for spam
+  # Check every issue since private projects can easily become
+  # public projects full of spam issues.
   def check_for_spam?
-    project.public?
+    true
   end
 
   def as_json(options = {})
