@@ -22,7 +22,7 @@ require('../vue_shared/components/pipelines_table');
         apiScope: 'all',
         pageInfo: {},
         pagenum: 1,
-        count: { all: 0, running_or_pending: 0 },
+        count: {},
         pageRequest: false,
       };
     },
