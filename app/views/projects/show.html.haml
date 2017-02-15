@@ -12,7 +12,8 @@
     - if @project.above_size_limit?
       = render 'above_size_limit_warning'
 
-= render 'projects/last_push'
+= render "projects/head"
+= render "projects/last_push"
 = render "home_panel"
 
 - if current_user && can?(current_user, :download_code, @project)
