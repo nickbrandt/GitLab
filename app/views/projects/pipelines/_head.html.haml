@@ -20,3 +20,9 @@
             = link_to project_environments_path(@project), title: 'Environments', class: 'shortcuts-environments' do
               %span
                 Environments
+
+        - if @project.feature_available?(:builds, current_user) && !@project.empty_repo?
+          = nav_link(path: 'graphs#ci', controller: :graphs, action: :ci) do
+            = link_to ci_namespace_project_graph_path(id: @project.default_branch) do
+              %span
+                Continuous Integration
