@@ -13,10 +13,11 @@
             %span
               Activity
 
-        = nav_link(path: 'graphs#show') do
-          = link_to namespace_project_graph_path(@project.namespace, @project, current_ref), title: 'Contributors',  class: 'shortcuts-project-contributors' do
-            %span
-              Contributors
+        - if !@project.empty_repo?
+          = nav_link(path: 'graphs#show') do
+            = link_to namespace_project_graph_path(@project.namespace, @project, current_ref), title: 'Contributors',  class: 'shortcuts-project-contributors' do
+              %span
+                Contributors
 
         = nav_link(path: 'projects#time-tracking') do
           = link_to project_path(@project), title: 'Time Tracking', class: 'shortcuts-project-time-tracking' do
