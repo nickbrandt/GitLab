@@ -43,7 +43,8 @@ require('../vue_shared/components/pipelines_table');
        * @param  {Number} pagenum
        * @param  {String} apiScope = 'all'
        */
-      change(pagenum, apiScope = 'all') {
+      change(pagenum, apiScope) {
+        if (!apiScope) apiScope = 'all';
         gl.utils.visitUrl(`?scope=${apiScope}&page=${pagenum}`);
       },
     },
