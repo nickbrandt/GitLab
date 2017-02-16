@@ -3,6 +3,8 @@
 - content_for :page_specific_javascripts do
   = page_specific_javascript_bundle_tag('lib_chart')
 
+= render "groups/head"
+
 .sub-header-block
   .pull-right
     .dropdown.inline
