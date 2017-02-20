@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -35,6 +36,9 @@ func (r *busyReader) Read(p []byte) (int, error) {
 
 	n, err := r.Reader.Read(p)
 	if err != nil {
+		if err != io.EOF {
+			err = fmt.Errorf("busyReader: %v", err)
+		}
 		r.setError(err)
 	}
 	return n, err
