@@ -69,15 +69,26 @@ type coupledWriter struct {
 
 	tempfile      *os.File
 	tempfileMutex sync.Mutex
+
+	writeError error
 }
 
 func (w *coupledWriter) Write(data []byte) (int, error) {
+	if w.writeError != nil {
+		return 0, w.writeError
+	}
+
 	if w.busyReader.IsBusy() {
-		return w.tempfileWrite(data)
+		n, err := w.tempfileWrite(data)
+		if err != nil {
+			w.writeError = fmt.Errorf("coupledWriter: %v", err)
+		}
+		return n, w.writeError
 	}
 
 	if err := w.Flush(); err != nil {
-		return 0, err
+		w.writeError = fmt.Errorf("coupledWriter: %v", err)
+		return 0, w.writeError
 	}
 
 	return w.Writer.Write(data)
