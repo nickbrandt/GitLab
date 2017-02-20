@@ -58,6 +58,7 @@ constraints(ProjectUrlConstrainer.new) do
 
         resources :graphs, only: [:show], constraints: { id: Gitlab::Regex.git_reference_regex } do
           member do
+            get :charts
             get :commits
             get :ci
             get :languages

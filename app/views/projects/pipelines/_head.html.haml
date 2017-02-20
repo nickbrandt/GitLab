@@ -23,6 +23,6 @@
 
         - if @project.feature_available?(:builds, current_user) && !@project.empty_repo?
           = nav_link(controller: :graphs, action: :ci) do
-            = link_to ci_namespace_project_graph_path(id: @project.default_branch) do
+            = link_to ci_namespace_project_graph_path(@project.namespace, @project, @project.default_branch) do
               %span
                 Charts
