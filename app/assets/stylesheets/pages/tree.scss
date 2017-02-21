@@ -178,3 +178,15 @@
     margin-left: $btn-side-margin;
   }
 }
+
+.repo-charts {
+  .sub-header {
+    margin: 20px 0;
+  }
+
+  .sub-header-block.border-top {
+    margin-top: 20px;
+    border-top: 1px solid $white-dark;
+    border-bottom: none;
+  }
+}
