@@ -1,10 +1,8 @@
 - @no_container = true
 - page_title "Languages", "Graphs"
-
 - content_for :page_specific_javascripts do
   = page_specific_javascript_bundle_tag('lib_chart')
   = page_specific_javascript_bundle_tag('graphs')
-
 = render "projects/commits/head"
 
 %div{ class: container_class }
