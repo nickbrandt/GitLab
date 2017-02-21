@@ -5,14 +5,11 @@
   = page_specific_javascript_bundle_tag('graphs')
 = render "projects/commits/head"
 
-%div{ class: container_class }
-  .sub-header-block
-    .oneline
-      Programming languages used in this repository
+%div.repo-charts{ class: container_class }
+  %h4.sub-header
+    Programming languages used in this repository
 
   .row
-    .col-md-8
-      %canvas#languages-chart{ height: 400 }
     .col-md-4
       %ul.bordered-list
         - @languages.each do |language|
@@ -24,9 +21,11 @@
             .pull-right
               = language[:value]
               \%
+    .col-md-8
+      %canvas#languages-chart{ height: 400 }
 
-%div{ class: container_class }
-  .sub-header-block
+%div.repo-charts{ class: container_class }
+  .sub-header-block.border-top
     .tree-ref-holder
       = render 'shared/ref_switcher', destination: 'graphs_commits'
     %ul.breadcrumb.repo-breadcrumb
@@ -63,15 +62,18 @@
         %canvas#month-chart
   .row
     .col-md-6
-      %div
-        %p.slead
-          Commits per day hour (UTC)
-        %canvas#hour-chart
     .col-md-6
       %div
         %p.slead
           Commits per weekday
         %canvas#weekday-chart
+  .row
+    .col-md-6
+    .col-md-6
+      %div
+        %p.slead
+          Commits per day hour (UTC)
+        %canvas#hour-chart
 
 :javascript
   var responsiveChart = function (selector, data) {
