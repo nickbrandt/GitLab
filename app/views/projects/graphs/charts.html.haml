@@ -5,7 +5,7 @@
   = page_specific_javascript_bundle_tag('graphs')
 = render "projects/commits/head"
 
-%div.repo-charts{ class: container_class }
+.repo-charts{ class: container_class }
   %h4.sub-header
     Programming languages used in this repository
 
@@ -24,7 +24,7 @@
     .col-md-8
       %canvas#languages-chart{ height: 400 }
 
-%div.repo-charts{ class: container_class }
+.repo-charts{ class: container_class }
   .sub-header-block.border-top
     .tree-ref-holder
       = render 'shared/ref_switcher', destination: 'graphs_commits'
