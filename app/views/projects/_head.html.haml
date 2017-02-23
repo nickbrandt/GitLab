@@ -19,11 +19,6 @@
               %span
                 Contributors
 
-        = nav_link(path: 'projects#time-tracking') do
-          = link_to project_path(@project), title: 'Time Tracking', class: 'shortcuts-project-time-tracking' do
-            %span
-              Time Tracking
-
         - if can?(current_user, :read_cycle_analytics, @project)
           = nav_link(path: 'cycle_analytics#show') do
             = link_to project_cycle_analytics_path(@project), title: 'Cycle Analytics', class: 'shortcuts-project-cycle-analytics' do
