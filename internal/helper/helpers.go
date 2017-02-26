@@ -28,18 +28,6 @@ func LogError(r *http.Request, err error) {
 	printError(r, err)
 }
 
-func ServiceUnavailable(w http.ResponseWriter, r *http.Request, err error) {
-	http.Error(w, "Service Unavailable", http.StatusServiceUnavailable)
-	captureRavenError(r, err)
-	printError(r, err)
-}
-
-func TooManyRequests(w http.ResponseWriter, r *http.Request, err error) {
-	http.Error(w, "Too Many Requests", 429) // http.StatusTooManyRequests was added in go1.6
-	captureRavenError(r, err)
-	printError(r, err)
-}
-
 func RequestEntityTooLarge(w http.ResponseWriter, r *http.Request, err error) {
 	http.Error(w, "Request Entity Too Large", http.StatusRequestEntityTooLarge)
 	captureRavenError(r, err)
