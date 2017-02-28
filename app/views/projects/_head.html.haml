@@ -13,12 +13,6 @@
             %span
               Activity
 
-        - if !@project.empty_repo?
-          = nav_link(path: 'graphs#show') do
-            = link_to namespace_project_graph_path(@project.namespace, @project, current_ref), title: 'Contributors',  class: 'shortcuts-project-contributors' do
-              %span
-                Contributors
-
         - if can?(current_user, :read_cycle_analytics, @project)
           = nav_link(path: 'cycle_analytics#show') do
             = link_to project_cycle_analytics_path(@project), title: 'Cycle Analytics', class: 'shortcuts-project-cycle-analytics' do
