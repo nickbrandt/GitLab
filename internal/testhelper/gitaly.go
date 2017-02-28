@@ -1,7 +1,7 @@
 package testhelper
 
 import (
-	pb "gitlab.com/gitlab-org/gitaly/protos/go"
+	pb "gitlab.com/gitlab-org/gitaly-proto/go"
 )
 
 type GitalyTestServer struct{}

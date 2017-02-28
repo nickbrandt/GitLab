@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	pb "gitlab.com/gitlab-org/gitaly/protos/go"
+	pb "gitlab.com/gitlab-org/gitaly-proto/go"
 	"google.golang.org/grpc"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
