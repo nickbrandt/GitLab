@@ -41,8 +41,6 @@ func newQueueMetrics(name string, timeout time.Duration) *queueMetrics {
 		timeout.Seconds() * 0.95,
 		timeout.Seconds() * 0.99,
 		timeout.Seconds(),
-		timeout.Seconds() * 1.5,
-		timeout.Seconds() * 2,
 	}
 
 	metrics := &queueMetrics{
