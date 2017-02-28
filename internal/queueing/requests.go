@@ -9,7 +9,7 @@ import (
 
 const DefaultTimeout = 30 * time.Second
 
-func QueueRequests(h http.Handler, limit, queueLimit uint, queueTimeout time.Duration) http.Handler {
+func QueueRequests(name string, h http.Handler, limit, queueLimit uint, queueTimeout time.Duration) http.Handler {
 	if limit == 0 {
 		return h
 	}
@@ -17,7 +17,7 @@ func QueueRequests(h http.Handler, limit, queueLimit uint, queueTimeout time.Dur
 		queueTimeout = DefaultTimeout
 	}
 
-	queue := NewQueue(limit, queueLimit, queueTimeout)
+	queue := NewQueue(name, limit, queueLimit, queueTimeout)
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		err := queue.Acquire()
