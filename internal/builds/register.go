@@ -49,7 +49,7 @@ func RegisterHandler(h http.Handler, pollingDuration time.Duration) http.Handler
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		lastUpdate := r.Header.Get("X-GitLab-Last-Update")
-		if lastUpdate != "" {
+		if lastUpdate == "" {
 			// We could have a fail-over implementation here, for old runners, that:
 			// Proxies the requests, if this is 204, we delay the response to client,
 			// By checking the response from handler, and reading `X-GitLab-Last-Update`,
