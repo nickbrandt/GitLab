@@ -38,6 +38,7 @@ type Config struct {
 	APILimit            uint          `toml:"-"`
 	APIQueueLimit       uint          `toml:"-"`
 	APIQueueTimeout     time.Duration `toml:"-"`
+	APICILongPolling    time.Duration `toml:"-"`
 }
 
 // LoadConfig from a file

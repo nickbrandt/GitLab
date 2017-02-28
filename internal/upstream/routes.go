@@ -9,6 +9,7 @@ import (
 
 	apipkg "gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/artifacts"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/builds"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/git"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/lfs"
@@ -118,6 +119,7 @@ func (u *Upstream) configureRoutes() {
 
 	uploadAccelerateProxy := upload.Accelerate(path.Join(u.DocumentRoot, "uploads/tmp"), proxy)
 	ciAPIProxyQueue := queueing.QueueRequests(uploadAccelerateProxy, u.APILimit, u.APIQueueLimit, u.APIQueueTimeout)
+	ciAPILongPolling := builds.RegisterHandler(ciAPIProxyQueue, u.APICILongPolling)
 
 	u.Routes = []routeEntry{
 		// Git Clone
@@ -132,8 +134,8 @@ func (u *Upstream) configureRoutes() {
 		// Terminal websocket
 		wsRoute(projectPattern+`environments/[0-9]+/terminal.ws\z`, terminal.Handler(api)),
 
-		// Limit capacity given to builds/register.json
-		route("", ciAPIPattern+`v1/builds/register.json\z`, ciAPIProxyQueue),
+		// Long poll and limit capacity given to builds/register.json
+		route("", ciAPIPattern+`v1/builds/register.json\z`, ciAPILongPolling),
 
 		// Explicitly proxy API requests
 		route("", apiPattern, proxy),
