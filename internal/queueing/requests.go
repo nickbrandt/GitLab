@@ -17,10 +17,10 @@ func QueueRequests(h http.Handler, limit, queueLimit uint, queueTimeout time.Dur
 		queueTimeout = DefaultTimeout
 	}
 
-	queue := NewQueue(limit, queueLimit)
+	queue := NewQueue(limit, queueLimit, queueTimeout)
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := queue.Acquire(queueTimeout)
+		err := queue.Acquire()
 
 		switch err {
 		case nil:
