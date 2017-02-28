@@ -5,6 +5,7 @@ export GOPATH=${BUILD_DIR}/_build
 export GO15VENDOREXPERIMENT=1
 GOBUILD=go build -ldflags "-X main.Version=${VERSION}"
 PKG=gitlab.com/gitlab-org/gitlab-workhorse
+PKG_ALL = $(shell GOPATH=${GOPATH} go list ${PKG}/... | grep -v /vendor/)
 
 all: clean-build gitlab-zip-cat gitlab-zip-metadata gitlab-workhorse
 
@@ -28,8 +29,8 @@ ${BUILD_DIR}/_build:
 
 .PHONY: test
 test:	clean-build clean-workhorse all
-	go fmt ${PKG}/... | awk '{ print } END { if (NR > 0) { print "Please run go fmt"; exit 1 } }'
-	go test ${PKG}/...
+	go fmt ${PKG_ALL} | awk '{ print } END { if (NR > 0) { print "Please run go fmt"; exit 1 } }'
+	go test ${PKG_ALL}
 	@echo SUCCESS
 
 coverage:
@@ -38,7 +39,7 @@ coverage:
 	rm -f test.coverage
 
 fmt:
-	go fmt ./...
+	go fmt ${PKG_ALL}
 
 .PHONY: clean
 clean:	clean-workhorse clean-build
