@@ -3,7 +3,7 @@
 - content_for :page_specific_javascripts do
   = page_specific_javascript_bundle_tag('lib_chart')
   = page_specific_javascript_bundle_tag('graphs')
-= render 'projects/pipelines/head'
+= render 'head'
 
 %div{ class: container_class }
   .sub-header-block
@@ -13,9 +13,9 @@
   #charts.ci-charts
     .row
       .col-md-6
-        = render 'projects/graphs/ci/overall'
+        = render 'projects/pipelines/ci/overall'
       .col-md-6
-        = render 'projects/graphs/ci/build_times'
+        = render 'projects/pipelines/ci/build_times'
 
     %hr
-    = render 'projects/graphs/ci/builds'
+    = render 'projects/pipelines/ci/builds'
