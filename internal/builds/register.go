@@ -58,7 +58,7 @@ func readRunnerBody(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 func readRunnerRequest(r *http.Request, body []byte) (runnerRequest, error) {
 	var runnerRequest runnerRequest
 
-	if r.Header.Get("Content-Type") != "application/json" {
+	if !helper.IsApplicationJson(r) {
 		return runnerRequest, errors.New("invalid content-type received")
 	}
 

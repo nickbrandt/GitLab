@@ -101,3 +101,22 @@ func TestCloneRequestWithBody(t *testing.T) {
 		t.Fatal("Expected the readed body to be the same as passed to function")
 	}
 }
+
+func TestApplicationJson(t *testing.T) {
+	req := httptest.NewRequest("POST", "/test", nil)
+	req.Header.Set("Content-Type", "application/json")
+
+	if !IsApplicationJson(req) {
+		t.Fatalf("Expected to match 'application/json' as 'application/json'")
+	}
+
+	req.Header.Set("Content-Type", "application/json; charset=utf-8")
+	if !IsApplicationJson(req) {
+		t.Fatalf("Expected to match 'application/json; charset=utf-8' as 'application/json'")
+	}
+
+	req.Header.Set("Content-Type", "text/plain")
+	if IsApplicationJson(req) {
+		t.Fatalf("Expected not to match 'text/plain' as 'application/json'")
+	}
+}

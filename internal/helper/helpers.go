@@ -170,6 +170,11 @@ func IsContentType(expected, actual string) bool {
 	return err == nil && parsed == expected
 }
 
+func IsApplicationJson(r *http.Request) bool {
+	contentType := r.Header.Get("Content-Type")
+	return IsContentType("application/json", contentType)
+}
+
 func ReadRequestBody(w http.ResponseWriter, r *http.Request, maxBodySize int64) ([]byte, error) {
 	limitedBody := http.MaxBytesReader(w, r.Body, maxBodySize)
 	defer limitedBody.Close()
