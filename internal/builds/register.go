@@ -33,6 +33,23 @@ var (
 	)
 )
 
+var (
+	registerHandlerOpenAtReading  = registerHandlerOpen.WithLabelValues("reading")
+	registerHandlerOpenAtProxying = registerHandlerOpen.WithLabelValues("proxying")
+	registerHandlerOpenAtWatching = registerHandlerOpen.WithLabelValues("watching")
+)
+
+var (
+	registerHandlerBodyReadErrors     = registerHandlerHits.WithLabelValues("body-read-error")
+	registerHandlerBodyParseErrors    = registerHandlerHits.WithLabelValues("body-parse-error")
+	registerHandlerMissingValues      = registerHandlerHits.WithLabelValues("missing-values")
+	registerHandlerWatchErrors        = registerHandlerHits.WithLabelValues("watch-error")
+	registerHandlerAlreadyChangedHits = registerHandlerHits.WithLabelValues("already-changed")
+	registerHandlerSeenChangeHits     = registerHandlerHits.WithLabelValues("seen-change")
+	registerHandlerTimeoutHits        = registerHandlerHits.WithLabelValues("timeout")
+	registerHandlerNoChangeHits       = registerHandlerHits.WithLabelValues("no-change")
+)
+
 type largeBodyError struct{ error }
 type watchError struct{ error }
 
@@ -51,8 +68,8 @@ type runnerRequest struct {
 }
 
 func readRunnerBody(w http.ResponseWriter, r *http.Request) ([]byte, error) {
-	registerHandlerOpen.WithLabelValues("reading").Inc()
-	defer registerHandlerOpen.WithLabelValues("reading").Dec()
+	registerHandlerOpenAtReading.Inc()
+	defer registerHandlerOpenAtReading.Dec()
 
 	return helper.ReadRequestBody(w, r, maxRegisterBodySize)
 }
@@ -73,15 +90,15 @@ func readRunnerRequest(r *http.Request, body []byte) (runnerRequest, error) {
 }
 
 func proxyRegisterRequest(h http.Handler, w http.ResponseWriter, r *http.Request) {
-	registerHandlerOpen.WithLabelValues("proxying").Inc()
-	defer registerHandlerOpen.WithLabelValues("proxying").Dec()
+	registerHandlerOpenAtProxying.Inc()
+	defer registerHandlerOpenAtProxying.Dec()
 
 	h.ServeHTTP(w, r)
 }
 
 func watchForRunnerChange(watchHandler WatchKeyHandler, token, lastUpdate string, duration time.Duration) (redis.WatchKeyStatus, error) {
-	registerHandlerOpen.WithLabelValues("watching").Inc()
-	defer registerHandlerOpen.WithLabelValues("watching").Dec()
+	registerHandlerOpenAtWatching.Inc()
+	defer registerHandlerOpenAtWatching.Dec()
 
 	return watchHandler(runnerBuildQueue+token, lastUpdate, duration)
 }
@@ -94,7 +111,7 @@ func RegisterHandler(h http.Handler, watchHandler WatchKeyHandler, pollingDurati
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requestBody, err := readRunnerBody(w, r)
 		if err != nil {
-			registerHandlerHits.WithLabelValues("body-read-error").Inc()
+			registerHandlerBodyReadErrors.Inc()
 			helper.RequestEntityTooLarge(w, r, &largeBodyError{err})
 			return
 		}
@@ -103,13 +120,13 @@ func RegisterHandler(h http.Handler, watchHandler WatchKeyHandler, pollingDurati
 
 		runnerRequest, err := readRunnerRequest(r, requestBody)
 		if err != nil {
-			registerHandlerHits.WithLabelValues("body-parse-error").Inc()
+			registerHandlerBodyParseErrors.Inc()
 			proxyRegisterRequest(h, w, newRequest)
 			return
 		}
 
 		if runnerRequest.Token == "" || runnerRequest.LastUpdate == "" {
-			registerHandlerHits.WithLabelValues("missing-values").Inc()
+			registerHandlerMissingValues.Inc()
 			proxyRegisterRequest(h, w, newRequest)
 			return
 		}
@@ -117,7 +134,7 @@ func RegisterHandler(h http.Handler, watchHandler WatchKeyHandler, pollingDurati
 		result, err := watchForRunnerChange(watchHandler, runnerRequest.Token,
 			runnerRequest.LastUpdate, pollingDuration)
 		if err != nil {
-			registerHandlerHits.WithLabelValues("watch-error").Inc()
+			registerHandlerWatchErrors.Inc()
 			proxyRegisterRequest(h, w, newRequest)
 			return
 		}
@@ -126,7 +143,7 @@ func RegisterHandler(h http.Handler, watchHandler WatchKeyHandler, pollingDurati
 		// It means that we detected a change before starting watching on change,
 		// We proxy request to Rails, to see whether we can receive the build
 		case redis.WatchKeyStatusAlreadyChanged:
-			registerHandlerHits.WithLabelValues("already-changed").Inc()
+			registerHandlerAlreadyChangedHits.Inc()
 			proxyRegisterRequest(h, w, newRequest)
 
 		// It means that we detected a change after watching.
@@ -135,18 +152,18 @@ func RegisterHandler(h http.Handler, watchHandler WatchKeyHandler, pollingDurati
 		// as don't really know whether ResponseWriter is still in a sane state,
 		// whether the connection is not dead
 		case redis.WatchKeyStatusSeenChange:
-			registerHandlerHits.WithLabelValues("seen-change").Inc()
+			registerHandlerSeenChangeHits.Inc()
 			w.WriteHeader(http.StatusNoContent)
 
 		// When we receive one of these statuses, it means that we detected no change,
 		// so we return to runner 204, which means nothing got changed,
 		// and there's no new builds to process
 		case redis.WatchKeyStatusTimeout:
-			registerHandlerHits.WithLabelValues("timeout").Inc()
+			registerHandlerTimeoutHits.Inc()
 			w.WriteHeader(http.StatusNoContent)
 
 		case redis.WatchKeyStatusNoChange:
-			registerHandlerHits.WithLabelValues("no-change").Inc()
+			registerHandlerNoChangeHits.Inc()
 			w.WriteHeader(http.StatusNoContent)
 		}
 	})
