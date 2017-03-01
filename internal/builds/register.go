@@ -95,7 +95,7 @@ func RegisterHandler(h http.Handler, watchHandler WatchKeyHandler, pollingDurati
 		requestBody, err := readRunnerBody(w, r)
 		if err != nil {
 			registerHandlerHits.WithLabelValues("body-read-error").Inc()
-			helper.Fail500(w, r, &largeBodyError{err})
+			helper.RequestEntityTooLarge(w, r, &largeBodyError{err})
 			return
 		}
 
@@ -118,7 +118,7 @@ func RegisterHandler(h http.Handler, watchHandler WatchKeyHandler, pollingDurati
 			runnerRequest.LastUpdate, pollingDuration)
 		if err != nil {
 			registerHandlerHits.WithLabelValues("watch-error").Inc()
-			helper.Fail500(w, newRequest, &watchError{err})
+			proxyRegisterRequest(h, w, newRequest)
 			return
 		}
 

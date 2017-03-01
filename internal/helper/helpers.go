@@ -41,6 +41,12 @@ func TooManyRequests(w http.ResponseWriter, r *http.Request, err error) {
 	printError(r, err)
 }
 
+func RequestEntityTooLarge(w http.ResponseWriter, r *http.Request, err error) {
+	http.Error(w, "Request Entity Too Large", http.StatusRequestEntityTooLarge)
+	captureRavenError(r, err)
+	printError(r, err)
+}
+
 func printError(r *http.Request, err error) {
 	if r != nil {
 		log.Printf("error: %s %q: %v", r.Method, r.RequestURI, err)
