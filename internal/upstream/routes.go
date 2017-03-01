@@ -15,6 +15,7 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/lfs"
 	proxypkg "gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/queueing"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/redis"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/sendfile"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/staticpages"
@@ -119,7 +120,7 @@ func (u *Upstream) configureRoutes() {
 
 	uploadAccelerateProxy := upload.Accelerate(path.Join(u.DocumentRoot, "uploads/tmp"), proxy)
 	ciAPIProxyQueue := queueing.QueueRequests(uploadAccelerateProxy, u.APILimit, u.APIQueueLimit, u.APIQueueTimeout)
-	ciAPILongPolling := builds.RegisterHandler(ciAPIProxyQueue, u.APICILongPolling)
+	ciAPILongPolling := builds.RegisterHandler(ciAPIProxyQueue, redis.WatchKey, u.APICILongPolling)
 
 	u.Routes = []routeEntry{
 		// Git Clone
