@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSetForwardedForGeneratesHeader(t *testing.T) {
@@ -57,12 +59,8 @@ func TestReadRequestBody(t *testing.T) {
 	req := httptest.NewRequest("POST", "/test", bytes.NewBuffer(data))
 
 	result, err := ReadRequestBody(rw, req, 1000)
-	if !bytes.Equal(result, data) {
-		t.Fatalf("Expected to receive the same result, got %v", result)
-	}
-	if err != nil {
-		t.Fatalf("Expected to not receive error from reading")
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, data, result)
 }
 
 func TestReadRequestBodyLimit(t *testing.T) {
@@ -71,12 +69,8 @@ func TestReadRequestBodyLimit(t *testing.T) {
 	req := httptest.NewRequest("POST", "/test", bytes.NewBuffer(data))
 
 	result, err := ReadRequestBody(rw, req, 2)
-	if len(result) != 0 {
-		t.Fatalf("Expected empty result, got %v", result)
-	}
-	if err == nil {
-		t.Fatalf("Expected to receive error from reading")
-	}
+	assert.Error(t, err)
+	assert.Empty(t, result)
 }
 
 func TestCloneRequestWithBody(t *testing.T) {
@@ -85,38 +79,24 @@ func TestCloneRequestWithBody(t *testing.T) {
 	req := httptest.NewRequest("POST", "/test", bytes.NewBuffer(input))
 	newReq := CloneRequestWithNewBody(req, newInput)
 
-	if req == newReq {
-		t.Fatalf("Expected a new request to be different from old one")
-	}
-	if req.Body == newReq.Body {
-		t.Fatalf("Expected the body object to be different")
-	}
-	if newReq.ContentLength != int64(len(newInput)) {
-		t.Fatalf("Expected the Content-Length to be updated")
-	}
+	assert.NotEqual(t, req, newReq)
+	assert.NotEqual(t, req.Body, newReq.Body)
+	assert.NotEqual(t, len(newInput), newReq.ContentLength)
 
 	var buffer bytes.Buffer
 	io.Copy(&buffer, newReq.Body)
-	if !bytes.Equal(buffer.Bytes(), newInput) {
-		t.Fatal("Expected the readed body to be the same as passed to function")
-	}
+	assert.Equal(t, newInput, buffer.Bytes())
 }
 
 func TestApplicationJson(t *testing.T) {
 	req := httptest.NewRequest("POST", "/test", nil)
 	req.Header.Set("Content-Type", "application/json")
 
-	if !IsApplicationJson(req) {
-		t.Fatalf("Expected to match 'application/json' as 'application/json'")
-	}
+	assert.True(t, IsApplicationJson(req), "expected to match 'application/json' as 'application/json'")
 
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
-	if !IsApplicationJson(req) {
-		t.Fatalf("Expected to match 'application/json; charset=utf-8' as 'application/json'")
-	}
+	assert.True(t, IsApplicationJson(req), "expected to match 'application/json; charset=utf-8' as 'application/json'")
 
 	req.Header.Set("Content-Type", "text/plain")
-	if IsApplicationJson(req) {
-		t.Fatalf("Expected not to match 'text/plain' as 'application/json'")
-	}
+	assert.False(t, IsApplicationJson(req), "expected not to match 'text/plain' as 'application/json'")
 }
