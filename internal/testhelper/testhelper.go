@@ -65,6 +65,12 @@ func AssertResponseBody(t *testing.T, response *httptest.ResponseRecorder, expec
 	}
 }
 
+func AssertResponseBodyRegexp(t *testing.T, response *httptest.ResponseRecorder, expectedBody *regexp.Regexp) {
+	if !expectedBody.MatchString(response.Body.String()) {
+		t.Fatalf("for HTTP request expected to receive body matching %q, got %q instead", expectedBody.String(), response.Body.String())
+	}
+}
+
 func AssertResponseHeader(t *testing.T, w http.ResponseWriter, header string, expected ...string) {
 	actual := w.Header()[http.CanonicalHeaderKey(header)]
 

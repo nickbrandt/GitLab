@@ -83,7 +83,7 @@ func TestProxyError(t *testing.T) {
 	w := httptest.NewRecorder()
 	newProxy("http://localhost:655575/", nil).ServeHTTP(w, httpRequest)
 	testhelper.AssertResponseCode(t, w, 502)
-	testhelper.AssertResponseBody(t, w, "dial tcp: invalid port 655575")
+	testhelper.AssertResponseBodyRegexp(t, w, regexp.MustCompile("dial tcp:.*invalid port.*"))
 }
 
 func TestProxyReadTimeout(t *testing.T) {
