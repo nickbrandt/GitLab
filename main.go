@@ -26,6 +26,7 @@ import (
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/queueing"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/redis"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream"
 
@@ -36,6 +37,7 @@ import (
 var Version = "(unknown version)" // Set at build time in the Makefile
 
 var printVersion = flag.Bool("version", false, "Print version and exit")
+var configFile = flag.String("config", "", "TOML file to load config from")
 var listenAddr = flag.String("listenAddr", "localhost:8181", "Listen address for HTTP server")
 var listenNetwork = flag.String("listenNetwork", "tcp", "Listen 'network' (tcp, tcp4, tcp6, unix)")
 var listenUmask = flag.Int("listenUmask", 0, "Umask for Unix socket")
@@ -119,6 +121,18 @@ func main() {
 		APILimit:            *apiLimit,
 		APIQueueLimit:       *apiQueueLimit,
 		APIQueueTimeout:     *apiQueueTimeout,
+	}
+
+	if *configFile != "" {
+		cfgFromFile, err := config.LoadConfig(*configFile)
+		if err != nil {
+			log.Fatalf("Can not load config file %q: %v", *configFile, err)
+		}
+
+		cfg.Redis = cfgFromFile.Redis
+
+		redis.Configure(cfg.Redis, redis.DefaultDialFunc(cfg.Redis))
+		go redis.Process(true)
 	}
 
 	up := wrapRaven(upstream.NewUpstream(cfg))
