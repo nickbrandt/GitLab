@@ -19,10 +19,17 @@ const (
 var (
 	registerHandlerHits = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "gitlab_workhorse_builds_register_handler",
-			Help: "How many connections gitlab-workhorse has opened in total. Can be used to track Redis connection rate for this process",
+			Name: "gitlab_workhorse_builds_register_handler_hits",
+			Help: "Describes how many requests in different states hit a register handler",
 		},
 		[]string{"status"},
+	)
+	registerHandlerOpen = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "gitlab_workhorse_builds_register_handler_open",
+			Help: "Describes how many requests is currently open in given state",
+		},
+		[]string{"state"},
 	)
 )
 
@@ -32,6 +39,7 @@ type watchError struct{ error }
 func init() {
 	prometheus.MustRegister(
 		registerHandlerHits,
+		registerHandlerOpen,
 	)
 }
 
@@ -45,6 +53,27 @@ func readRunnerToken(r *http.Request) (string, error) {
 	return token, nil
 }
 
+func readRunnerBody(w http.ResponseWriter, r *http.Request) ([]byte, error) {
+	registerHandlerOpen.WithLabelValues("reading").Inc()
+	defer registerHandlerOpen.WithLabelValues("reading").Dec()
+
+	return helper.ReadRequestBody(w, r, maxRegisterBodySize)
+}
+
+func proxyRegisterRequest(h http.Handler, w http.ResponseWriter, r *http.Request) {
+	registerHandlerOpen.WithLabelValues("proxying").Inc()
+	defer registerHandlerOpen.WithLabelValues("proxying").Dec()
+
+	h.ServeHTTP(w, r)
+}
+
+func watchForRunnerChange(token, lastUpdate string, duration time.Duration) (redis.WatchKeyStatus, error) {
+	registerHandlerOpen.WithLabelValues("watching").Inc()
+	defer registerHandlerOpen.WithLabelValues("watching").Dec()
+
+	return redis.WatchKey(runnerBuildQueue+token, lastUpdate, duration)
+}
+
 func RegisterHandler(h http.Handler, pollingDuration time.Duration) http.Handler {
 	if pollingDuration == 0 {
 		return h
@@ -53,13 +82,12 @@ func RegisterHandler(h http.Handler, pollingDuration time.Duration) http.Handler
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		lastUpdate := r.Header.Get(runnerBuildQueueValue)
 		if lastUpdate == "" {
-			// The client doesn't have update, fail
 			registerHandlerHits.WithLabelValues("missing-value").Inc()
-			h.ServeHTTP(w, r)
+			proxyRegisterRequest(h, w, r)
 			return
 		}
 
-		requestBody, err := helper.ReadRequestBody(w, r, maxRegisterBodySize)
+		requestBody, err := readRunnerBody(w, r)
 		if err != nil {
 			registerHandlerHits.WithLabelValues("body-read-error").Inc()
 			helper.Fail500(w, r, &largeBodyError{err})
@@ -69,11 +97,11 @@ func RegisterHandler(h http.Handler, pollingDuration time.Duration) http.Handler
 		runnerToken, err := readRunnerToken(helper.CloneRequestWithNewBody(r, requestBody))
 		if runnerToken == "" || err != nil {
 			registerHandlerHits.WithLabelValues("body-parse-error").Inc()
-			h.ServeHTTP(w, r)
+			proxyRegisterRequest(h, w, r)
 			return
 		}
 
-		result, err := redis.WatchKey(runnerBuildQueue+runnerToken, lastUpdate, pollingDuration)
+		result, err := watchForRunnerChange(runnerToken, lastUpdate, pollingDuration)
 		if err != nil {
 			registerHandlerHits.WithLabelValues("watch-error").Inc()
 			helper.Fail500(w, r, &watchError{err})
@@ -85,7 +113,7 @@ func RegisterHandler(h http.Handler, pollingDuration time.Duration) http.Handler
 		// We proxy request to Rails, to see whether we can receive the build
 		case redis.WatchKeyStatusAlreadyChanged:
 			registerHandlerHits.WithLabelValues("already-changed").Inc()
-			h.ServeHTTP(w, helper.CloneRequestWithNewBody(r, requestBody))
+			proxyRegisterRequest(h, w, helper.CloneRequestWithNewBody(r, requestBody))
 
 		// It means that we detected a change after watching.
 		// We could potentially proxy request to Rails, but...
