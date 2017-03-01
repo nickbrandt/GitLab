@@ -135,10 +135,6 @@ func Configure(cfg *config.RedisConfig, dialFunc func() (redis.Conn, error)) {
 	}
 }
 
-func Unconfigure() {
-	pool = nil
-}
-
 // Get a connection for the Redis-pool
 func Get() redis.Conn {
 	if pool != nil {
