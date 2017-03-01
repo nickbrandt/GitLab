@@ -1,6 +1,8 @@
 package builds
 
 import (
+	"encoding/json"
+	"errors"
 	"net/http"
 	"time"
 
@@ -10,10 +12,8 @@ import (
 )
 
 const (
-	maxRegisterBodySize   = 4 * 1024
-	runnerBuildQueue      = "runner:build_queue:"
-	runnerBuildQueueKey   = "token"
-	runnerBuildQueueValue = "X-GitLab-Last-Update"
+	maxRegisterBodySize = 4 * 1024
+	runnerBuildQueue    = "runner:build_queue:"
 )
 
 var (
@@ -43,14 +43,9 @@ func init() {
 	)
 }
 
-func readRunnerToken(r *http.Request) (string, error) {
-	err := r.ParseForm()
-	if err != nil {
-		return "", err
-	}
-
-	token := r.FormValue(runnerBuildQueueKey)
-	return token, nil
+type runnerRequest struct {
+	Token      string `json:"token,omitempty"`
+	LastUpdate string `json:"last_update,omitempty"`
 }
 
 func readRunnerBody(w http.ResponseWriter, r *http.Request) ([]byte, error) {
@@ -58,6 +53,21 @@ func readRunnerBody(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	defer registerHandlerOpen.WithLabelValues("reading").Dec()
 
 	return helper.ReadRequestBody(w, r, maxRegisterBodySize)
+}
+
+func readRunnerRequest(r *http.Request, body []byte) (runnerRequest, error) {
+	var runnerRequest runnerRequest
+
+	if r.Header.Get("Content-Type") != "application/json" {
+		return runnerRequest, errors.New("invalid content-type received")
+	}
+
+	err := json.Unmarshal(body, &runnerRequest)
+	if err != nil {
+		return runnerRequest, err
+	}
+
+	return runnerRequest, nil
 }
 
 func proxyRegisterRequest(h http.Handler, w http.ResponseWriter, r *http.Request) {
@@ -80,13 +90,6 @@ func RegisterHandler(h http.Handler, pollingDuration time.Duration) http.Handler
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		lastUpdate := r.Header.Get(runnerBuildQueueValue)
-		if lastUpdate == "" {
-			registerHandlerHits.WithLabelValues("missing-value").Inc()
-			proxyRegisterRequest(h, w, r)
-			return
-		}
-
 		requestBody, err := readRunnerBody(w, r)
 		if err != nil {
 			registerHandlerHits.WithLabelValues("body-read-error").Inc()
@@ -94,14 +97,20 @@ func RegisterHandler(h http.Handler, pollingDuration time.Duration) http.Handler
 			return
 		}
 
-		runnerToken, err := readRunnerToken(helper.CloneRequestWithNewBody(r, requestBody))
-		if runnerToken == "" || err != nil {
+		runnerRequest, err := readRunnerRequest(r, requestBody)
+		if err != nil {
 			registerHandlerHits.WithLabelValues("body-parse-error").Inc()
 			proxyRegisterRequest(h, w, r)
 			return
 		}
 
-		result, err := watchForRunnerChange(runnerToken, lastUpdate, pollingDuration)
+		if runnerRequest.Token == "" || runnerRequest.LastUpdate == "" {
+			registerHandlerHits.WithLabelValues("missing-values").Inc()
+			proxyRegisterRequest(h, w, r)
+			return
+		}
+
+		result, err := watchForRunnerChange(runnerRequest.Token, runnerRequest.LastUpdate, pollingDuration)
 		if err != nil {
 			registerHandlerHits.WithLabelValues("watch-error").Inc()
 			helper.Fail500(w, r, &watchError{err})
@@ -122,18 +131,18 @@ func RegisterHandler(h http.Handler, pollingDuration time.Duration) http.Handler
 		// whether the connection is not dead
 		case redis.WatchKeyStatusSeenChange:
 			registerHandlerHits.WithLabelValues("seen-change").Inc()
-			w.WriteHeader(204)
+			w.WriteHeader(http.StatusNoContent)
 
 		// When we receive one of these statuses, it means that we detected no change,
 		// so we return to runner 204, which means nothing got changed,
 		// and there's no new builds to process
 		case redis.WatchKeyStatusTimeout:
 			registerHandlerHits.WithLabelValues("timeout").Inc()
-			w.WriteHeader(204)
+			w.WriteHeader(http.StatusNoContent)
 
 		case redis.WatchKeyStatusNoChange:
 			registerHandlerHits.WithLabelValues("no-change").Inc()
-			w.WriteHeader(204)
+			w.WriteHeader(http.StatusNoContent)
 		}
 	})
 }
