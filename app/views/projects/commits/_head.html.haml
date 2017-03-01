@@ -19,7 +19,7 @@
           = link_to namespace_project_tags_path(@project.namespace, @project) do
             Tags
 
-        - if !@project.empty_repo?
+        - unless @project.empty_repo?
           = nav_link(path: 'graphs#show') do
             = link_to namespace_project_graph_path(@project.namespace, @project, current_ref), title: 'Contributors',  class: 'shortcuts-project-contributors' do
               %span

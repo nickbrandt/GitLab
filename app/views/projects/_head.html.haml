@@ -2,7 +2,7 @@
   .scrolling-tabs-container.sub-nav-scroll
     = render 'shared/nav_scroll'
     .nav-links.sub-nav.scrolling-tabs
-      %ul{ class: (container_class) }
+      %ul{ class: container_class }
         = nav_link(path: 'projects#show') do
           = link_to project_path(@project), title: 'Project Home', class: 'shortcuts-project' do
             %span
