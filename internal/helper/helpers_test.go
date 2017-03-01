@@ -1,7 +1,10 @@
 package helper
 
 import (
+	"bytes"
+	"io"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 )
 
@@ -45,5 +48,56 @@ func TestSetForwardedForGeneratesHeader(t *testing.T) {
 		if result != tc.expected {
 			t.Fatalf("Expected %v, got %v", tc.expected, result)
 		}
+	}
+}
+
+func TestReadRequestBody(t *testing.T) {
+	data := []byte("123456")
+	rw := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", "/test", bytes.NewBuffer(data))
+
+	result, err := ReadRequestBody(rw, req, 1000)
+	if !bytes.Equal(result, data) {
+		t.Fatalf("Expected to receive the same result, got %v", result)
+	}
+	if err != nil {
+		t.Fatalf("Expected to not receive error from reading")
+	}
+}
+
+func TestReadRequestBodyLimit(t *testing.T) {
+	data := []byte("123456")
+	rw := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", "/test", bytes.NewBuffer(data))
+
+	result, err := ReadRequestBody(rw, req, 2)
+	if len(result) != 0 {
+		t.Fatalf("Expected empty result, got %v", result)
+	}
+	if err == nil {
+		t.Fatalf("Expected to receive error from reading")
+	}
+}
+
+func TestCloneRequestWithBody(t *testing.T) {
+	input := []byte("test")
+	newInput := []byte("new body")
+	req := httptest.NewRequest("POST", "/test", bytes.NewBuffer(input))
+	newReq := CloneRequestWithNewBody(req, newInput)
+
+	if req == newReq {
+		t.Fatalf("Expected a new request to be different from old one")
+	}
+	if req.Body == newReq.Body {
+		t.Fatalf("Expected the body object to be different")
+	}
+	if newReq.ContentLength != int64(len(newInput)) {
+		t.Fatalf("Expected the Content-Length to be updated")
+	}
+
+	var buffer bytes.Buffer
+	io.Copy(&buffer, newReq.Body)
+	if !bytes.Equal(buffer.Bytes(), newInput) {
+		t.Fatal("Expected the readed body to be the same as passed to function")
 	}
 }

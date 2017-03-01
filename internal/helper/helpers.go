@@ -186,5 +186,6 @@ func ReadRequestBody(w http.ResponseWriter, r *http.Request, maxBodySize int64) 
 func CloneRequestWithNewBody(r *http.Request, body []byte) *http.Request {
 	newReq := *r
 	newReq.Body = ioutil.NopCloser(bytes.NewReader(body))
+	newReq.ContentLength = int64(len(body))
 	return &newReq
 }
