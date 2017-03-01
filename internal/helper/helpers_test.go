@@ -56,7 +56,7 @@ func TestSetForwardedForGeneratesHeader(t *testing.T) {
 func TestReadRequestBody(t *testing.T) {
 	data := []byte("123456")
 	rw := httptest.NewRecorder()
-	req := httptest.NewRequest("POST", "/test", bytes.NewBuffer(data))
+	req, _ := http.NewRequest("POST", "/test", bytes.NewBuffer(data))
 
 	result, err := ReadRequestBody(rw, req, 1000)
 	assert.NoError(t, err)
@@ -66,7 +66,7 @@ func TestReadRequestBody(t *testing.T) {
 func TestReadRequestBodyLimit(t *testing.T) {
 	data := []byte("123456")
 	rw := httptest.NewRecorder()
-	req := httptest.NewRequest("POST", "/test", bytes.NewBuffer(data))
+	req, _ := http.NewRequest("POST", "/test", bytes.NewBuffer(data))
 
 	result, err := ReadRequestBody(rw, req, 2)
 	assert.Error(t, err)
@@ -76,7 +76,7 @@ func TestReadRequestBodyLimit(t *testing.T) {
 func TestCloneRequestWithBody(t *testing.T) {
 	input := []byte("test")
 	newInput := []byte("new body")
-	req := httptest.NewRequest("POST", "/test", bytes.NewBuffer(input))
+	req, _ := http.NewRequest("POST", "/test", bytes.NewBuffer(input))
 	newReq := CloneRequestWithNewBody(req, newInput)
 
 	assert.NotEqual(t, req, newReq)
@@ -89,7 +89,7 @@ func TestCloneRequestWithBody(t *testing.T) {
 }
 
 func TestApplicationJson(t *testing.T) {
-	req := httptest.NewRequest("POST", "/test", nil)
+	req, _ := http.NewRequest("POST", "/test", nil)
 	req.Header.Set("Content-Type", "application/json")
 
 	assert.True(t, IsApplicationJson(req), "expected to match 'application/json' as 'application/json'")

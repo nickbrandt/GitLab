@@ -26,7 +26,7 @@ func expectHandlerWithWatcher(t *testing.T, watchHandler WatchKeyHandler, data s
 	h := RegisterHandler(echoRequestFunc, watchHandler, time.Second)
 
 	rw := httptest.NewRecorder()
-	req := httptest.NewRequest("POST", "/", bytes.NewBufferString(data))
+	req, _ := http.NewRequest("POST", "/", bytes.NewBufferString(data))
 	req.Header.Set("Content-Type", contentType)
 
 	h.ServeHTTP(rw, req)
