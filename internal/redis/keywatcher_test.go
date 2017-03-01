@@ -36,153 +36,128 @@ func createUnsubscribeMessage(key string) []interface{} {
 	}
 }
 
+func countWatchers(key string) int {
+	keyWatcherMutex.Lock()
+	defer keyWatcherMutex.Unlock()
+	return len(keyWatcher[key])
+}
+
+func deleteWatchers(key string) {
+	keyWatcherMutex.Lock()
+	defer keyWatcherMutex.Unlock()
+	delete(keyWatcher, key)
+}
+
+// Forces a run of the `Process` loop against a mock PubSubConn.
+func processMessages(numWatchers int, value string) {
+	psc := redigomock.NewConn()
+
+	// Setup the initial subscription message
+	psc.Command("SUBSCRIBE", keySubChannel).Expect(createSubscribeMessage(keySubChannel))
+	psc.Command("UNSUBSCRIBE", keySubChannel).Expect(createUnsubscribeMessage(keySubChannel))
+	psc.AddSubscriptionMessage(createSubscriptionMessage(keySubChannel, runnerKey+"="+value))
+
+	// Wait for all the `WatchKey` calls to be registered
+	for countWatchers(runnerKey) != numWatchers {
+		time.Sleep(time.Millisecond)
+	}
+
+	processInner(psc)
+}
+
 func TestWatchKeySeenChange(t *testing.T) {
-	mconn, td := setupMockPool()
+	conn, td := setupMockPool()
 	defer td()
 
-	go Process(false)
-	// Setup the initial subscription message
-	mconn.Command("SUBSCRIBE", keySubChannel).
-		Expect(createSubscribeMessage(keySubChannel))
-	mconn.Command("UNSUBSCRIBE", keySubChannel).
-		Expect(createUnsubscribeMessage(keySubChannel))
-	mconn.Command("GET", runnerKey).
-		Expect("something").
-		Expect("somethingelse")
-	mconn.ReceiveWait = true
+	conn.Command("GET", runnerKey).Expect("something")
 
-	mconn.AddSubscriptionMessage(createSubscriptionMessage(keySubChannel, runnerKey+"=somethingelse"))
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
 
-	// ACTUALLY Fill the buffers
-	go func(mconn *redigomock.Conn) {
-		mconn.ReceiveNow <- true
-		mconn.ReceiveNow <- true
-		mconn.ReceiveNow <- true
-	}(mconn)
+	go func() {
+		val, err := WatchKey(runnerKey, "something", time.Second)
+		assert.NoError(t, err, "Expected no error")
+		assert.Equal(t, WatchKeyStatusSeenChange, val, "Expected value to change")
+		wg.Done()
+	}()
 
-	val, err := WatchKey(runnerKey, "something", time.Duration(1*time.Second))
-	assert.NoError(t, err, "Expected no error")
-	assert.Equal(t, WatchKeyStatusSeenChange, val, "Expected value to change")
+	processMessages(1, "somethingelse")
+	wg.Wait()
 }
 
 func TestWatchKeyNoChange(t *testing.T) {
-	mconn, td := setupMockPool()
+	conn, td := setupMockPool()
 	defer td()
 
-	go Process(false)
-	// Setup the initial subscription message
-	mconn.Command("SUBSCRIBE", keySubChannel).
-		Expect(createSubscribeMessage(keySubChannel))
-	mconn.Command("UNSUBSCRIBE", keySubChannel).
-		Expect(createUnsubscribeMessage(keySubChannel))
-	mconn.Command("GET", runnerKey).
-		Expect("something").
-		Expect("something")
-	mconn.ReceiveWait = true
+	conn.Command("GET", runnerKey).Expect("something")
 
-	mconn.AddSubscriptionMessage(createSubscriptionMessage(keySubChannel, runnerKey+"=something"))
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
 
-	// ACTUALLY Fill the buffers
-	go func(mconn *redigomock.Conn) {
-		mconn.ReceiveNow <- true
-		mconn.ReceiveNow <- true
-		mconn.ReceiveNow <- true
-	}(mconn)
+	go func() {
+		val, err := WatchKey(runnerKey, "something", time.Second)
+		assert.NoError(t, err, "Expected no error")
+		assert.Equal(t, WatchKeyStatusNoChange, val, "Expected notification without change to value")
+		wg.Done()
+	}()
 
-	val, err := WatchKey(runnerKey, "something", time.Duration(1*time.Second))
-	assert.NoError(t, err, "Expected no error")
-	assert.Equal(t, WatchKeyStatusNoChange, val, "Expected notification without change to value")
+	processMessages(1, "something")
+	wg.Wait()
+
 }
 
 func TestWatchKeyTimeout(t *testing.T) {
-	mconn, td := setupMockPool()
+	conn, td := setupMockPool()
 	defer td()
 
-	go Process(false)
-	// Setup the initial subscription message
-	mconn.Command("SUBSCRIBE", keySubChannel).
-		Expect(createSubscribeMessage(keySubChannel))
-	mconn.Command("UNSUBSCRIBE", keySubChannel).
-		Expect(createUnsubscribeMessage(keySubChannel))
-	mconn.Command("GET", runnerKey).
-		Expect("something").
-		Expect("something")
-	mconn.ReceiveWait = true
+	conn.Command("GET", runnerKey).Expect("something")
 
-	// ACTUALLY Fill the buffers
-	go func(mconn *redigomock.Conn) {
-		mconn.ReceiveNow <- true
-		mconn.ReceiveNow <- true
-		mconn.ReceiveNow <- true
-	}(mconn)
-
-	val, err := WatchKey(runnerKey, "something", time.Duration(1*time.Second))
+	val, err := WatchKey(runnerKey, "something", time.Millisecond)
 	assert.NoError(t, err, "Expected no error")
 	assert.Equal(t, WatchKeyStatusTimeout, val, "Expected value to not change")
+
+	// Clean up watchers since Process isn't doing that for us (not running)
+	deleteWatchers(runnerKey)
 }
 
 func TestWatchKeyAlreadyChanged(t *testing.T) {
-	mconn, td := setupMockPool()
+	conn, td := setupMockPool()
 	defer td()
 
-	go Process(false)
-	// Setup the initial subscription message
-	mconn.Command("SUBSCRIBE", keySubChannel).
-		Expect(createSubscribeMessage(keySubChannel))
-	mconn.Command("UNSUBSCRIBE", keySubChannel).
-		Expect(createUnsubscribeMessage(keySubChannel))
-	mconn.Command("GET", runnerKey).
-		Expect("somethingelse").
-		Expect("somethingelse")
-	mconn.ReceiveWait = true
+	conn.Command("GET", runnerKey).Expect("somethingelse")
 
-	// ACTUALLY Fill the buffers
-	go func(mconn *redigomock.Conn) {
-		mconn.ReceiveNow <- true
-		mconn.ReceiveNow <- true
-		mconn.ReceiveNow <- true
-	}(mconn)
-
-	val, err := WatchKey(runnerKey, "something", time.Duration(1*time.Second))
+	val, err := WatchKey(runnerKey, "something", time.Second)
 	assert.NoError(t, err, "Expected no error")
 	assert.Equal(t, WatchKeyStatusAlreadyChanged, val, "Expected value to have already changed")
+
+	// Clean up watchers since Process isn't doing that for us (not running)
+	deleteWatchers(runnerKey)
 }
 
-func TestWatchKeyMassiveParallel(t *testing.T) {
-	mconn, td := setupMockPool()
+func TestWatchKeyMassivelyParallel(t *testing.T) {
+	runTimes := 100 // 100 parallel watchers
+
+	conn, td := setupMockPool()
 	defer td()
 
-	go Process(false)
-	// Setup the initial subscription message
-	mconn.Command("SUBSCRIBE", keySubChannel).
-		Expect(createSubscribeMessage(keySubChannel))
-	mconn.Command("UNSUBSCRIBE", keySubChannel).
-		Expect(createUnsubscribeMessage(keySubChannel))
-	getCmd := mconn.Command("GET", runnerKey)
-	mconn.ReceiveWait = true
+	wg := &sync.WaitGroup{}
+	wg.Add(runTimes)
 
-	const runTimes = 100
+	getCmd := conn.Command("GET", runnerKey)
+
 	for i := 0; i < runTimes; i++ {
-		mconn.AddSubscriptionMessage(createSubscriptionMessage(keySubChannel, runnerKey+"=somethingelse"))
 		getCmd = getCmd.Expect("something")
 	}
 
-	wg := &sync.WaitGroup{}
-	// Race-conditions /o/ \o\
 	for i := 0; i < runTimes; i++ {
-		wg.Add(1)
-		go func(mconn *redigomock.Conn) {
-			defer wg.Done()
-			// ACTUALLY Fill the buffers
-			go func(mconn *redigomock.Conn) {
-				mconn.ReceiveNow <- true
-			}(mconn)
-
-			val, err := WatchKey(runnerKey, "something", time.Duration(1*time.Second))
+		go func() {
+			val, err := WatchKey(runnerKey, "something", time.Second)
 			assert.NoError(t, err, "Expected no error")
 			assert.Equal(t, WatchKeyStatusSeenChange, val, "Expected value to change")
-		}(mconn)
+			wg.Done()
+		}()
 	}
-	wg.Wait()
 
+	processMessages(runTimes, "somethingelse")
+	wg.Wait()
 }
