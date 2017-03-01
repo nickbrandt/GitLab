@@ -81,6 +81,18 @@ func TestPreAuthorizeContentTypeFailure(t *testing.T) {
 		200, 200)
 }
 
+func TestPreAuthorizeRedirect(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/", 301)
+	}))
+	defer ts.Close()
+
+	runPreAuthorizeHandler(t, ts, "/willredirect",
+		regexp.MustCompile(`/willredirect\z`),
+		"",
+		301, 301)
+}
+
 func TestPreAuthorizeJWT(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token, err := jwt.Parse(r.Header.Get(api.RequestHeader), func(token *jwt.Token) (interface{}, error) {
