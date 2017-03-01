@@ -1,45 +1,48 @@
 package builds
 
 import (
-	"bytes"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/redis"
-	"io"
-	"io/ioutil"
 	"net/http"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/redis"
 )
 
-const MaxRegisterBodySize = 4 * 1024
+const (
+	maxRegisterBodySize   = 4 * 1024
+	runnerBuildQueue      = "runner:build_queue:"
+	runnerBuildQueueKey   = "token"
+	runnerBuildQueueValue = "X-GitLab-Last-Update"
+)
 
-func readRunnerQueueKey(w http.ResponseWriter, r *http.Request) (string, error) {
-	limitedBody := http.MaxBytesReader(w, r.Body, MaxRegisterBodySize)
-	defer limitedBody.Close()
+var (
+	registerHandlerHits = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "gitlab_workhorse_builds_register_handler",
+			Help: "How many connections gitlab-workhorse has opened in total. Can be used to track Redis connection rate for this process",
+		},
+		[]string{"status"},
+	)
+)
 
-	// Read body
-	var body bytes.Buffer
-	_, err := io.Copy(&body, limitedBody)
+type largeBodyError struct{ error }
+type watchError struct{ error }
+
+func init() {
+	prometheus.MustRegister(
+		registerHandlerHits,
+	)
+}
+
+func readRunnerToken(r *http.Request) (string, error) {
+	err := r.ParseForm()
 	if err != nil {
 		return "", err
 	}
 
-	r.Body = ioutil.NopCloser(&body)
-
-	tmpReq := *r
-	tmpReq.Body = ioutil.NopCloser(bytes.NewReader(body.Bytes()))
-
-	err = tmpReq.ParseForm()
-	if err != nil {
-		return "", err
-	}
-
-	token := tmpReq.FormValue("token")
-	if token == "" {
-		return "", nil
-	}
-
-	key := "runner:build_queue:" + token
-	return key, nil
+	token := r.FormValue(runnerBuildQueueKey)
+	return token, nil
 }
 
 func RegisterHandler(h http.Handler, pollingDuration time.Duration) http.Handler {
@@ -48,25 +51,32 @@ func RegisterHandler(h http.Handler, pollingDuration time.Duration) http.Handler
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		lastUpdate := r.Header.Get("X-GitLab-Last-Update")
+		lastUpdate := r.Header.Get(runnerBuildQueueValue)
 		if lastUpdate == "" {
-			// We could have a fail-over implementation here, for old runners, that:
-			// Proxies the requests, if this is 204, we delay the response to client,
-			// By checking the response from handler, and reading `X-GitLab-Last-Update`,
-			// and then watching on a key
+			// The client doesn't have update, fail
+			registerHandlerHits.WithLabelValues("missing-value").Inc()
 			h.ServeHTTP(w, r)
 			return
 		}
 
-		queueKey, err := readRunnerQueueKey(w, r)
+		requestBody, err := helper.ReadRequestBody(w, r, maxRegisterBodySize)
 		if err != nil {
-			helper.Fail500(w, r, err)
+			registerHandlerHits.WithLabelValues("body-read-error").Inc()
+			helper.Fail500(w, r, &largeBodyError{err})
 			return
 		}
 
-		result, err := redis.WatchKey(queueKey, lastUpdate, pollingDuration)
+		runnerToken, err := readRunnerToken(helper.CloneRequestWithNewBody(r, requestBody))
+		if runnerToken == "" || err != nil {
+			registerHandlerHits.WithLabelValues("body-parse-error").Inc()
+			h.ServeHTTP(w, r)
+			return
+		}
+
+		result, err := redis.WatchKey(runnerBuildQueue+runnerToken, lastUpdate, pollingDuration)
 		if err != nil {
-			helper.Fail500(w, r, err)
+			registerHandlerHits.WithLabelValues("watch-error").Inc()
+			helper.Fail500(w, r, &watchError{err})
 			return
 		}
 
@@ -74,7 +84,8 @@ func RegisterHandler(h http.Handler, pollingDuration time.Duration) http.Handler
 		// It means that we detected a change before starting watching on change,
 		// We proxy request to Rails, to see whether we can receive the build
 		case redis.WatchKeyStatusAlreadyChanged:
-			h.ServeHTTP(w, r)
+			registerHandlerHits.WithLabelValues("already-changed").Inc()
+			h.ServeHTTP(w, helper.CloneRequestWithNewBody(r, requestBody))
 
 		// It means that we detected a change after watching.
 		// We could potentially proxy request to Rails, but...
@@ -82,12 +93,18 @@ func RegisterHandler(h http.Handler, pollingDuration time.Duration) http.Handler
 		// as don't really know whether ResponseWriter is still in a sane state,
 		// whether the connection is not dead
 		case redis.WatchKeyStatusSeenChange:
+			registerHandlerHits.WithLabelValues("seen-change").Inc()
 			w.WriteHeader(204)
 
 		// When we receive one of these statuses, it means that we detected no change,
 		// so we return to runner 204, which means nothing got changed,
 		// and there's no new builds to process
-		case redis.WatchKeyStatusTimeout, redis.WatchKeyStatusNoChange:
+		case redis.WatchKeyStatusTimeout:
+			registerHandlerHits.WithLabelValues("timeout").Inc()
+			w.WriteHeader(204)
+
+		case redis.WatchKeyStatusNoChange:
+			registerHandlerHits.WithLabelValues("no-change").Inc()
 			w.WriteHeader(204)
 		}
 	})

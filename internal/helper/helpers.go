@@ -1,7 +1,10 @@
 package helper
 
 import (
+	"bytes"
 	"errors"
+	"io"
+	"io/ioutil"
 	"log"
 	"mime"
 	"net"
@@ -165,4 +168,23 @@ func SetForwardedFor(newHeaders *http.Header, originalRequest *http.Request) {
 func IsContentType(expected, actual string) bool {
 	parsed, _, err := mime.ParseMediaType(actual)
 	return err == nil && parsed == expected
+}
+
+func ReadRequestBody(w http.ResponseWriter, r *http.Request, maxBodySize int64) ([]byte, error) {
+	limitedBody := http.MaxBytesReader(w, r.Body, maxBodySize)
+	defer limitedBody.Close()
+
+	var body bytes.Buffer
+	_, err := io.Copy(&body, limitedBody)
+	if err != nil {
+		return nil, err
+	}
+
+	return body.Bytes(), nil
+}
+
+func CloneRequestWithNewBody(r *http.Request, body []byte) *http.Request {
+	newReq := *r
+	newReq.Body = ioutil.NopCloser(bytes.NewReader(body))
+	return &newReq
 }
