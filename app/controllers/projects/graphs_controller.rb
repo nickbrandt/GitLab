@@ -30,11 +30,7 @@ class Projects::GraphsController < Projects::ApplicationController
   end
 
   def ci
-    @charts = {}
-    @charts[:week] = Ci::Charts::WeekChart.new(project)
-    @charts[:month] = Ci::Charts::MonthChart.new(project)
-    @charts[:year] = Ci::Charts::YearChart.new(project)
-    @charts[:build_times] = Ci::Charts::BuildTime.new(project)
+    redirect_to ci_namespace_project_pipelines_path(@project.namespace, @project)
   end
 
   private
