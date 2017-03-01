@@ -2,13 +2,14 @@ package builds
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
-	"errors"
 	"github.com/stretchr/testify/assert"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/redis"
 )
@@ -19,171 +20,84 @@ func echoRequest(rw http.ResponseWriter, req *http.Request) {
 
 var echoRequestFunc = http.HandlerFunc(echoRequest)
 
-func TestRegisterHandlerLargeBody(t *testing.T) {
-	h := RegisterHandler(echoRequestFunc, nil, time.Second)
+const applicationJson = "application/json"
 
-	data := make([]byte, maxRegisterBodySize+5)
+func expectHandlerWithWatcher(t *testing.T, watchHandler WatchKeyHandler, data string, contentType string, expectedHttpStatus int, msgAndArgs ...interface{}) {
+	h := RegisterHandler(echoRequestFunc, watchHandler, time.Second)
 
 	rw := httptest.NewRecorder()
-	req := httptest.NewRequest("POST", "/", bytes.NewBuffer(data))
+	req := httptest.NewRequest("POST", "/", bytes.NewBufferString(data))
+	req.Header.Set("Content-Type", contentType)
 
 	h.ServeHTTP(rw, req)
 
-	assert.Equal(t, http.StatusInternalServerError, rw.Code)
+	assert.Equal(t, expectedHttpStatus, rw.Code, msgAndArgs...)
+}
+
+func expectHandler(t *testing.T, data string, contentType string, expectedHttpStatus int, msgAndArgs ...interface{}) {
+	expectHandlerWithWatcher(t, nil, data, contentType, expectedHttpStatus, msgAndArgs...)
+}
+
+func TestRegisterHandlerLargeBody(t *testing.T) {
+	data := strings.Repeat(".", maxRegisterBodySize+5)
+	expectHandler(t, data, applicationJson, http.StatusRequestEntityTooLarge,
+		"rejects body with entity too large")
 }
 
 func TestRegisterHandlerInvalidRunnerRequest(t *testing.T) {
-	h := RegisterHandler(echoRequestFunc, nil, time.Second)
-
-	rw := httptest.NewRecorder()
-	req := httptest.NewRequest("POST", "/", bytes.NewBufferString("invalid"))
-
-	h.ServeHTTP(rw, req)
-
-	assert.Equal(t, http.StatusOK, rw.Code)
-	assert.Equal(t, "invalid", rw.Body.String())
+	expectHandler(t, "invalid content", "text/plain", http.StatusOK,
+		"proxies request to upstream")
 }
 
 func TestRegisterHandlerInvalidJsonPayload(t *testing.T) {
-	h := RegisterHandler(echoRequestFunc, nil, time.Second)
-
-	rw := httptest.NewRecorder()
-	req := httptest.NewRequest("POST", "/", bytes.NewBufferString("{["))
-	req.Header.Set("Content-Type", "application/json")
-
-	h.ServeHTTP(rw, req)
-
-	assert.Equal(t, http.StatusOK, rw.Code)
-	assert.Equal(t, "{[", rw.Body.String())
+	expectHandler(t, "{[", applicationJson, http.StatusOK,
+		"fails on parsing body and proxies request to upstream")
 }
 
 func TestRegisterHandlerMissingData(t *testing.T) {
-	datas := []string{"{\"token\":\"token\"}", "{\"last_update\":\"data\"}"}
+	dataList := []string{"{\"token\":\"token\"}", "{\"last_update\":\"data\"}"}
 
-	for _, data := range datas {
-		h := RegisterHandler(echoRequestFunc, nil, time.Second)
-
-		rw := httptest.NewRecorder()
-		req := httptest.NewRequest("POST", "/", bytes.NewBufferString(data))
-		req.Header.Set("Content-Type", "application/json")
-
-		h.ServeHTTP(rw, req)
-
-		assert.Equal(t, http.StatusOK, rw.Code)
-		assert.Equal(t, data, rw.Body.String())
+	for _, data := range dataList {
+		expectHandler(t, data, applicationJson, http.StatusOK,
+			"fails on argument validation and proxies request to upstream")
 	}
+}
+
+func exceptWatcherToBeExecuted(t *testing.T, watchKeyStatus redis.WatchKeyStatus, watchKeyError error,
+	httpStatus int, msgAndArgs ...interface{}) {
+	executed := false
+	watchKeyHandler := func(key, value string, timeout time.Duration) (redis.WatchKeyStatus, error) {
+		executed = true
+		return watchKeyStatus, watchKeyError
+	}
+
+	parsableData := "{\"token\":\"token\",\"last_update\":\"last_update\"}"
+
+	expectHandlerWithWatcher(t, watchKeyHandler, parsableData, applicationJson, httpStatus, msgAndArgs...)
+	assert.True(t, executed, msgAndArgs...)
 }
 
 func TestRegisterHandlerWatcherError(t *testing.T) {
-	data := "{\"token\":\"token\",\"last_update\":\"last_update\"}"
-
-	executed := false
-	watchKeyHandler := func(key, value string, timeout time.Duration) (redis.WatchKeyStatus, error) {
-		executed = true
-		return redis.WatchKeyStatusNoChange, errors.New("redis connection")
-	}
-
-	h := RegisterHandler(echoRequestFunc, watchKeyHandler, time.Second)
-
-	rw := httptest.NewRecorder()
-	req := httptest.NewRequest("POST", "/", bytes.NewBufferString(data))
-	req.Header.Set("Content-Type", "application/json")
-
-	h.ServeHTTP(rw, req)
-
-	assert.Equal(t, http.StatusInternalServerError, rw.Code)
-	assert.True(t, executed)
+	exceptWatcherToBeExecuted(t, redis.WatchKeyStatusNoChange, errors.New("redis connection"),
+		http.StatusOK, "proxies data to upstream")
 }
 
 func TestRegisterHandlerWatcherAlreadyChanged(t *testing.T) {
-	data := "{\"token\":\"token\",\"last_update\":\"last_update\"}"
-
-	executed := false
-	watchKeyHandler := func(key, value string, timeout time.Duration) (redis.WatchKeyStatus, error) {
-		assert.Equal(t, "runner:build_queue:token", key)
-		assert.Equal(t, "last_update", value)
-		executed = true
-		return redis.WatchKeyStatusAlreadyChanged, nil
-	}
-
-	h := RegisterHandler(echoRequestFunc, watchKeyHandler, time.Second)
-
-	rw := httptest.NewRecorder()
-	req := httptest.NewRequest("POST", "/", bytes.NewBufferString(data))
-	req.Header.Set("Content-Type", "application/json")
-
-	h.ServeHTTP(rw, req)
-
-	assert.Equal(t, http.StatusOK, rw.Code)
-	assert.Equal(t, data, rw.Body.String())
-	assert.True(t, executed)
+	exceptWatcherToBeExecuted(t, redis.WatchKeyStatusAlreadyChanged, nil,
+		http.StatusOK, "proxies data to upstream")
 }
 
 func TestRegisterHandlerWatcherSeenChange(t *testing.T) {
-	data := "{\"token\":\"token\",\"last_update\":\"last_update\"}"
-
-	executed := false
-	watchKeyHandler := func(key, value string, timeout time.Duration) (redis.WatchKeyStatus, error) {
-		assert.Equal(t, "runner:build_queue:token", key)
-		assert.Equal(t, "last_update", value)
-		executed = true
-		return redis.WatchKeyStatusSeenChange, nil
-	}
-
-	h := RegisterHandler(echoRequestFunc, watchKeyHandler, time.Second)
-
-	rw := httptest.NewRecorder()
-	req := httptest.NewRequest("POST", "/", bytes.NewBufferString(data))
-	req.Header.Set("Content-Type", "application/json")
-
-	h.ServeHTTP(rw, req)
-
-	assert.Equal(t, http.StatusNoContent, rw.Code)
-	assert.True(t, executed)
+	exceptWatcherToBeExecuted(t, redis.WatchKeyStatusSeenChange, nil,
+		http.StatusNoContent)
 }
 
 func TestRegisterHandlerWatcherTimeout(t *testing.T) {
-	data := "{\"token\":\"token\",\"last_update\":\"last_update\"}"
-
-	executed := false
-	watchKeyHandler := func(key, value string, timeout time.Duration) (redis.WatchKeyStatus, error) {
-		assert.Equal(t, "runner:build_queue:token", key)
-		assert.Equal(t, "last_update", value)
-		executed = true
-		return redis.WatchKeyStatusTimeout, nil
-	}
-
-	h := RegisterHandler(echoRequestFunc, watchKeyHandler, time.Second)
-
-	rw := httptest.NewRecorder()
-	req := httptest.NewRequest("POST", "/", bytes.NewBufferString(data))
-	req.Header.Set("Content-Type", "application/json")
-
-	h.ServeHTTP(rw, req)
-
-	assert.Equal(t, http.StatusNoContent, rw.Code)
-	assert.True(t, executed)
+	exceptWatcherToBeExecuted(t, redis.WatchKeyStatusTimeout, nil,
+		http.StatusNoContent)
 }
 
 func TestRegisterHandlerWatcherNoChange(t *testing.T) {
-	data := "{\"token\":\"token\",\"last_update\":\"last_update\"}"
-
-	executed := false
-	watchKeyHandler := func(key, value string, timeout time.Duration) (redis.WatchKeyStatus, error) {
-		assert.Equal(t, "runner:build_queue:token", key)
-		assert.Equal(t, "last_update", value)
-		executed = true
-		return redis.WatchKeyStatusNoChange, nil
-	}
-
-	h := RegisterHandler(echoRequestFunc, watchKeyHandler, time.Second)
-
-	rw := httptest.NewRecorder()
-	req := httptest.NewRequest("POST", "/", bytes.NewBufferString(data))
-	req.Header.Set("Content-Type", "application/json")
-
-	h.ServeHTTP(rw, req)
-
-	assert.Equal(t, http.StatusNoContent, rw.Code)
-	assert.True(t, executed)
+	exceptWatcherToBeExecuted(t, redis.WatchKeyStatusNoChange, nil,
+		http.StatusNoContent)
 }
