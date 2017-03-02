@@ -68,7 +68,7 @@ func TestReadRequestBodyLimit(t *testing.T) {
 	rw := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/test", bytes.NewBuffer(data))
 
-	result, err := ReadRequestBody(rw, req, 2)
+	_, err := ReadRequestBody(rw, req, 2)
 	assert.Error(t, err)
 }
 

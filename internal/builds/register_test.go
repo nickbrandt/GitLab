@@ -53,10 +53,13 @@ func TestRegisterHandlerInvalidJsonPayload(t *testing.T) {
 }
 
 func TestRegisterHandlerMissingData(t *testing.T) {
-	dataList := []string{`{"token":"token"}`, `{"last_update":"data"}`}
+	testCases := []string{
+		`{"token":"token"}`,
+		`{"last_update":"data"}`,
+	}
 
-	for _, data := range dataList {
-		expectHandler(t, data, "application/json", http.StatusOK,
+	for _, testCase := range testCases {
+		expectHandler(t, testCase, "application/json", http.StatusOK,
 			"fails on argument validation and proxies request to upstream")
 	}
 }
