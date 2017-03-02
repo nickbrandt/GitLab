@@ -70,7 +70,6 @@ func TestReadRequestBodyLimit(t *testing.T) {
 
 	result, err := ReadRequestBody(rw, req, 2)
 	assert.Error(t, err)
-	assert.Empty(t, result)
 }
 
 func TestCloneRequestWithBody(t *testing.T) {
