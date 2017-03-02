@@ -1,7 +1,7 @@
-gitlab-workhorse
 testdata/data
 testdata/scratch
 testdata/public
-gitlab-zip-cat
-gitlab-zip-metadata
-_build
+/gitlab-workhorse
+/gitlab-zip-cat
+/gitlab-zip-metadata
+/_build

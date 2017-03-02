@@ -1,20 +1,24 @@
 .test_template: &test_definition
   script:
-  - apt-get update -qq && apt-get install -y unzip bzip2
+  - apt update -qq && apt install -y unzip bzip2
   - go version
   - make test
 
-test:go1.5.4:
+test using go 1.5:
   <<: *test_definition
-  image: golang:1.5.4
+  image: golang:1.5
 
-test:go1.6.3:
+test using go 1.6:
   <<: *test_definition
-  image: golang:1.6.3
+  image: golang:1.6
 
-test:go1.7.1:
+test using go 1.7:
   <<: *test_definition
-  image: golang:1.7.1
+  image: golang:1.7
+
+test using go 1.8:
+  <<: *test_definition
+  image: golang:1.8
 
 test:release:
   only:
