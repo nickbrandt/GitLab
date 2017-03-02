@@ -31,15 +31,11 @@ var (
 		},
 		[]string{"state"},
 	)
-)
 
-var (
 	registerHandlerOpenAtReading  = registerHandlerOpen.WithLabelValues("reading")
 	registerHandlerOpenAtProxying = registerHandlerOpen.WithLabelValues("proxying")
 	registerHandlerOpenAtWatching = registerHandlerOpen.WithLabelValues("watching")
-)
 
-var (
 	registerHandlerBodyReadErrors     = registerHandlerHits.WithLabelValues("body-read-error")
 	registerHandlerBodyParseErrors    = registerHandlerHits.WithLabelValues("body-parse-error")
 	registerHandlerMissingValues      = registerHandlerHits.WithLabelValues("missing-values")
@@ -74,19 +70,18 @@ func readRunnerBody(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	return helper.ReadRequestBody(w, r, maxRegisterBodySize)
 }
 
-func readRunnerRequest(r *http.Request, body []byte) (runnerRequest, error) {
-	var runnerRequest runnerRequest
-
+func readRunnerRequest(r *http.Request, body []byte) (*runnerRequest, error) {
 	if !helper.IsApplicationJson(r) {
-		return runnerRequest, errors.New("invalid content-type received")
+		return nil, errors.New("invalid content-type received")
 	}
 
+	var runnerRequest runnerRequest
 	err := json.Unmarshal(body, &runnerRequest)
 	if err != nil {
-		return runnerRequest, err
+		return nil, err
 	}
 
-	return runnerRequest, nil
+	return &runnerRequest, nil
 }
 
 func proxyRegisterRequest(h http.Handler, w http.ResponseWriter, r *http.Request) {
@@ -141,7 +136,7 @@ func RegisterHandler(h http.Handler, watchHandler WatchKeyHandler, pollingDurati
 
 		switch result {
 		// It means that we detected a change before starting watching on change,
-		// We proxy request to Rails, to see whether we can receive the build
+		// We proxy request to Rails, to see whether we have a build to receive
 		case redis.WatchKeyStatusAlreadyChanged:
 			registerHandlerAlreadyChangedHits.Inc()
 			proxyRegisterRequest(h, w, newRequest)
@@ -150,7 +145,7 @@ func RegisterHandler(h http.Handler, watchHandler WatchKeyHandler, pollingDurati
 		// We could potentially proxy request to Rails, but...
 		// We can end-up with unreliable responses,
 		// as don't really know whether ResponseWriter is still in a sane state,
-		// whether the connection is not dead
+		// for example the connection is dead
 		case redis.WatchKeyStatusSeenChange:
 			registerHandlerSeenChangeHits.Inc()
 			w.WriteHeader(http.StatusNoContent)

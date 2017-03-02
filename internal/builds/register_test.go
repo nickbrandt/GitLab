@@ -20,8 +20,6 @@ func echoRequest(rw http.ResponseWriter, req *http.Request) {
 
 var echoRequestFunc = http.HandlerFunc(echoRequest)
 
-const applicationJson = "application/json"
-
 func expectHandlerWithWatcher(t *testing.T, watchHandler WatchKeyHandler, data string, contentType string, expectedHttpStatus int, msgAndArgs ...interface{}) {
 	h := RegisterHandler(echoRequestFunc, watchHandler, time.Second)
 
@@ -40,7 +38,7 @@ func expectHandler(t *testing.T, data string, contentType string, expectedHttpSt
 
 func TestRegisterHandlerLargeBody(t *testing.T) {
 	data := strings.Repeat(".", maxRegisterBodySize+5)
-	expectHandler(t, data, applicationJson, http.StatusRequestEntityTooLarge,
+	expectHandler(t, data, "application/json", http.StatusRequestEntityTooLarge,
 		"rejects body with entity too large")
 }
 
@@ -50,20 +48,20 @@ func TestRegisterHandlerInvalidRunnerRequest(t *testing.T) {
 }
 
 func TestRegisterHandlerInvalidJsonPayload(t *testing.T) {
-	expectHandler(t, "{[", applicationJson, http.StatusOK,
+	expectHandler(t, `{[`, "application/json", http.StatusOK,
 		"fails on parsing body and proxies request to upstream")
 }
 
 func TestRegisterHandlerMissingData(t *testing.T) {
-	dataList := []string{"{\"token\":\"token\"}", "{\"last_update\":\"data\"}"}
+	dataList := []string{`{"token":"token"}`, `{"last_update":"data"}`}
 
 	for _, data := range dataList {
-		expectHandler(t, data, applicationJson, http.StatusOK,
+		expectHandler(t, data, "application/json", http.StatusOK,
 			"fails on argument validation and proxies request to upstream")
 	}
 }
 
-func exceptWatcherToBeExecuted(t *testing.T, watchKeyStatus redis.WatchKeyStatus, watchKeyError error,
+func expectWatcherToBeExecuted(t *testing.T, watchKeyStatus redis.WatchKeyStatus, watchKeyError error,
 	httpStatus int, msgAndArgs ...interface{}) {
 	executed := false
 	watchKeyHandler := func(key, value string, timeout time.Duration) (redis.WatchKeyStatus, error) {
@@ -71,33 +69,33 @@ func exceptWatcherToBeExecuted(t *testing.T, watchKeyStatus redis.WatchKeyStatus
 		return watchKeyStatus, watchKeyError
 	}
 
-	parsableData := "{\"token\":\"token\",\"last_update\":\"last_update\"}"
+	parsableData := `{"token":"token","last_update":"last_update"}`
 
-	expectHandlerWithWatcher(t, watchKeyHandler, parsableData, applicationJson, httpStatus, msgAndArgs...)
+	expectHandlerWithWatcher(t, watchKeyHandler, parsableData, "application/json", httpStatus, msgAndArgs...)
 	assert.True(t, executed, msgAndArgs...)
 }
 
 func TestRegisterHandlerWatcherError(t *testing.T) {
-	exceptWatcherToBeExecuted(t, redis.WatchKeyStatusNoChange, errors.New("redis connection"),
+	expectWatcherToBeExecuted(t, redis.WatchKeyStatusNoChange, errors.New("redis connection"),
 		http.StatusOK, "proxies data to upstream")
 }
 
 func TestRegisterHandlerWatcherAlreadyChanged(t *testing.T) {
-	exceptWatcherToBeExecuted(t, redis.WatchKeyStatusAlreadyChanged, nil,
+	expectWatcherToBeExecuted(t, redis.WatchKeyStatusAlreadyChanged, nil,
 		http.StatusOK, "proxies data to upstream")
 }
 
 func TestRegisterHandlerWatcherSeenChange(t *testing.T) {
-	exceptWatcherToBeExecuted(t, redis.WatchKeyStatusSeenChange, nil,
+	expectWatcherToBeExecuted(t, redis.WatchKeyStatusSeenChange, nil,
 		http.StatusNoContent)
 }
 
 func TestRegisterHandlerWatcherTimeout(t *testing.T) {
-	exceptWatcherToBeExecuted(t, redis.WatchKeyStatusTimeout, nil,
+	expectWatcherToBeExecuted(t, redis.WatchKeyStatusTimeout, nil,
 		http.StatusNoContent)
 }
 
 func TestRegisterHandlerWatcherNoChange(t *testing.T) {
-	exceptWatcherToBeExecuted(t, redis.WatchKeyStatusNoChange, nil,
+	expectWatcherToBeExecuted(t, redis.WatchKeyStatusNoChange, nil,
 		http.StatusNoContent)
 }
