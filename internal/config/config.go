@@ -28,17 +28,17 @@ type RedisConfig struct {
 }
 
 type Config struct {
-	Redis               *RedisConfig  `toml:"redis"`
-	Backend             *url.URL      `toml:"-"`
-	Version             string        `toml:"-"`
-	DocumentRoot        string        `toml:"-"`
-	DevelopmentMode     bool          `toml:"-"`
-	Socket              string        `toml:"-"`
-	ProxyHeadersTimeout time.Duration `toml:"-"`
-	APILimit            uint          `toml:"-"`
-	APIQueueLimit       uint          `toml:"-"`
-	APIQueueTimeout     time.Duration `toml:"-"`
-	APICILongPolling    time.Duration `toml:"-"`
+	Redis                    *RedisConfig  `toml:"redis"`
+	Backend                  *url.URL      `toml:"-"`
+	Version                  string        `toml:"-"`
+	DocumentRoot             string        `toml:"-"`
+	DevelopmentMode          bool          `toml:"-"`
+	Socket                   string        `toml:"-"`
+	ProxyHeadersTimeout      time.Duration `toml:"-"`
+	APILimit                 uint          `toml:"-"`
+	APIQueueLimit            uint          `toml:"-"`
+	APIQueueTimeout          time.Duration `toml:"-"`
+	APICILongPollingDuration time.Duration `toml:"-"`
 }
 
 // LoadConfig from a file

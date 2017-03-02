@@ -36,7 +36,7 @@ gitlab-workhorse'][brief-history-blog].
   gitlab-workhorse [OPTIONS]
 
 Options:
-  -apiCiLongPolling duration
+  -apiCiLongPollingDuration duration
         Long polling duration for job requesting for runners (default 0s - disabled)
   -apiLimit uint
         Number of API requests allowed at single time

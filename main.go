@@ -51,7 +51,7 @@ var secretPath = flag.String("secretPath", "./.gitlab_workhorse_secret", "File w
 var apiLimit = flag.Uint("apiLimit", 0, "Number of API requests allowed at single time")
 var apiQueueLimit = flag.Uint("apiQueueLimit", 0, "Number of API requests allowed to be queued")
 var apiQueueTimeout = flag.Duration("apiQueueDuration", queueing.DefaultTimeout, "Maximum queueing duration of requests")
-var apiCiLongPolling = flag.Duration("apiCiLongPolling", 0, "Long polling duration for job requesting for runners (default 0s - disabled)")
+var apiCiLongPollingDuration = flag.Duration("apiCiLongPollingDuration", 0, "Long polling duration for job requesting for runners (default 0s - disabled)")
 var logFile = flag.String("logFile", "", "Log file to be used")
 var prometheusListenAddr = flag.String("prometheusListenAddr", "", "Prometheus listening address, e.g. ':9100'")
 
@@ -113,16 +113,16 @@ func main() {
 
 	secret.SetPath(*secretPath)
 	cfg := config.Config{
-		Backend:             backendURL,
-		Socket:              *authSocket,
-		Version:             Version,
-		DocumentRoot:        *documentRoot,
-		DevelopmentMode:     *developmentMode,
-		ProxyHeadersTimeout: *proxyHeadersTimeout,
-		APILimit:            *apiLimit,
-		APIQueueLimit:       *apiQueueLimit,
-		APIQueueTimeout:     *apiQueueTimeout,
-		APICILongPolling:    *apiCiLongPolling,
+		Backend:                  backendURL,
+		Socket:                   *authSocket,
+		Version:                  Version,
+		DocumentRoot:             *documentRoot,
+		DevelopmentMode:          *developmentMode,
+		ProxyHeadersTimeout:      *proxyHeadersTimeout,
+		APILimit:                 *apiLimit,
+		APIQueueLimit:            *apiQueueLimit,
+		APIQueueTimeout:          *apiQueueTimeout,
+		APICILongPollingDuration: *apiCiLongPollingDuration,
 	}
 
 	if *configFile != "" {
