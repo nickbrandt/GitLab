@@ -1,10 +1,10 @@
 class Projects::PipelinesController < Projects::ApplicationController
-  before_action :pipeline, except: [:index, :new, :create, :ci]
+  before_action :pipeline, except: [:index, :new, :create, :charts]
   before_action :commit, only: [:show, :builds]
   before_action :authorize_read_pipeline!
   before_action :authorize_create_pipeline!, only: [:new, :create]
   before_action :authorize_update_pipeline!, only: [:retry, :cancel]
-  before_action :builds_enabled, only: :ci
+  before_action :builds_enabled, only: :charts
 
   def index
     @scope = params[:scope]
@@ -93,7 +93,7 @@ class Projects::PipelinesController < Projects::ApplicationController
     redirect_back_or_default default: namespace_project_pipelines_path(project.namespace, project)
   end
 
-  def ci
+  def charts
     @charts = {}
     @charts[:week] = Ci::Charts::WeekChart.new(project)
     @charts[:month] = Ci::Charts::MonthChart.new(project)

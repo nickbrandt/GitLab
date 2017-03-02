@@ -175,10 +175,10 @@ constraints(ProjectUrlConstrainer.new) do
       resources :push_rules, constraints: { id: /\d+/ }
       ## EE-specific
 
-      resources :pipelines, only: [:index, :new, :create, :show, :ci] do
+      resources :pipelines, only: [:index, :new, :create, :show] do
         collection do
           resource :pipelines_settings, path: 'settings', only: [:show, :update]
-          get :ci
+          get :charts
         end
 
         member do
