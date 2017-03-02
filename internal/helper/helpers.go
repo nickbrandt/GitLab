@@ -3,7 +3,6 @@ package helper
 import (
 	"bytes"
 	"errors"
-	"io"
 	"io/ioutil"
 	"log"
 	"mime"
@@ -185,13 +184,7 @@ func ReadRequestBody(w http.ResponseWriter, r *http.Request, maxBodySize int64) 
 	limitedBody := http.MaxBytesReader(w, r.Body, maxBodySize)
 	defer limitedBody.Close()
 
-	var body bytes.Buffer
-	_, err := io.Copy(&body, limitedBody)
-	if err != nil {
-		return nil, err
-	}
-
-	return body.Bytes(), nil
+	return ioutil.ReadAll(limitedBody)
 }
 
 func CloneRequestWithNewBody(r *http.Request, body []byte) *http.Request {
