@@ -21,7 +21,7 @@
   .fade-right
     = icon('angle-right')
   %ul.nav-links.scrolling-tabs
-    = nav_link(path: ['projects#show', 'projects#activity', 'cycle_analytics#show'], html_options: {class: 'home'}) do
+    = nav_link(path: ['projects#show', 'projects#activity', 'cycle_analytics#show'], html_options: { class: 'home' }) do
       = link_to project_path(@project), title: 'Project', class: 'shortcuts-project' do
         %span
           Project
