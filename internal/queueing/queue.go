@@ -23,7 +23,13 @@ type queueMetrics struct {
 	queueingErrors       *prometheus.CounterVec
 }
 
-func NewQueueMetrics(name string, timeout time.Duration) *queueMetrics {
+// newQueueMetrics prepares Prometheus metrics for queueing mechanism
+// name specifies name of the queue, used to label metrics with ConstLabel `queue_name`
+//      Don't call newQueueMetrics twice with the same name argument!
+// timeout specifies the timeout of storing a request in queue - queueMetrics
+//         uses it to calculate histogram buckets for gitlab_workhorse_queueing_waiting_time
+//         metric
+func newQueueMetrics(name string, timeout time.Duration) *queueMetrics {
 	waitingTimeBuckets := []float64{
 		timeout.Seconds() * 0.01,
 		timeout.Seconds() * 0.05,
@@ -121,12 +127,14 @@ type Queue struct {
 	timeout   time.Duration
 }
 
-// NewQueue creates a new queue
+// newQueue creates a new queue
+// name specifies name used to label queue metrics.
+//      Don't call newQueue twice with the same name argument!
 // limit specifies number of requests run concurrently
 // queueLimit specifies maximum number of requests that can be queued
 // timeout specifies the time limit of storing the request in the queue
 // if the number of requests is above the limit
-func NewQueue(name string, limit, queueLimit uint, timeout time.Duration) *Queue {
+func newQueue(name string, limit, queueLimit uint, timeout time.Duration) *Queue {
 	queue := &Queue{
 		name:      name,
 		busyCh:    make(chan struct{}, limit),
@@ -134,7 +142,7 @@ func NewQueue(name string, limit, queueLimit uint, timeout time.Duration) *Queue
 		timeout:   timeout,
 	}
 
-	queue.queueMetrics = NewQueueMetrics(name, timeout)
+	queue.queueMetrics = newQueueMetrics(name, timeout)
 	queue.queueingLimit.Set(float64(limit))
 	queue.queueingQueueLimit.Set(float64(queueLimit))
 	queue.queueingQueueTimeout.Set(timeout.Seconds())
