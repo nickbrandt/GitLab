@@ -7,9 +7,8 @@ Feature: Project Active Tab
 
   Scenario: On Project Home
     Given I visit my project's home page
-    And I click the "Home" tab
-    Then the active sub nav should be Home
-    And no other sub navs should be active
+    Then the active sub tab should be Home
+    And no other sub tabs should be active
     And the active main tab should be Project
 
   Scenario: On Project Repository
@@ -36,14 +35,16 @@ Feature: Project Active Tab
 
   Scenario: On Project Home/Show
     Given I visit my project's home page
-    Then the active main tab should be Project
+    Then the active sub tab should be Home
+    And no other sub tabs should be active
+    And the active main tab should be Project
     And no other main tabs should be active
 
   Scenario: On Project Home/Activity
     Given I visit my project's home page
     And I click the "Activity" tab
-    Then the active sub nav should be Activity
-    And no other sub navs should be active
+    Then the active sub tab should be Activity
+    And no other sub tabs should be active
     And the active main tab should be Project
 
   # Sub Tabs: Settings
