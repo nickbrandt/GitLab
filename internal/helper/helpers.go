@@ -1,7 +1,9 @@
 package helper
 
 import (
+	"bytes"
 	"errors"
+	"io/ioutil"
 	"log"
 	"mime"
 	"net"
@@ -34,6 +36,12 @@ func ServiceUnavailable(w http.ResponseWriter, r *http.Request, err error) {
 
 func TooManyRequests(w http.ResponseWriter, r *http.Request, err error) {
 	http.Error(w, "Too Many Requests", 429) // http.StatusTooManyRequests was added in go1.6
+	captureRavenError(r, err)
+	printError(r, err)
+}
+
+func RequestEntityTooLarge(w http.ResponseWriter, r *http.Request, err error) {
+	http.Error(w, "Request Entity Too Large", http.StatusRequestEntityTooLarge)
 	captureRavenError(r, err)
 	printError(r, err)
 }
@@ -165,4 +173,24 @@ func SetForwardedFor(newHeaders *http.Header, originalRequest *http.Request) {
 func IsContentType(expected, actual string) bool {
 	parsed, _, err := mime.ParseMediaType(actual)
 	return err == nil && parsed == expected
+}
+
+func IsApplicationJson(r *http.Request) bool {
+	contentType := r.Header.Get("Content-Type")
+	return IsContentType("application/json", contentType)
+}
+
+func ReadRequestBody(w http.ResponseWriter, r *http.Request, maxBodySize int64) ([]byte, error) {
+	limitedBody := http.MaxBytesReader(w, r.Body, maxBodySize)
+	defer limitedBody.Close()
+
+	return ioutil.ReadAll(limitedBody)
+}
+
+func CloneRequestWithNewBody(r *http.Request, body []byte) *http.Request {
+	newReq := *r
+	newReq.Body = ioutil.NopCloser(bytes.NewReader(body))
+	newReq.Header = HeaderClone(r.Header)
+	newReq.ContentLength = int64(len(body))
+	return &newReq
 }
