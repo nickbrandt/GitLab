@@ -12,8 +12,10 @@ import (
 )
 
 const (
-	maxRegisterBodySize = 32 * 1024
-	runnerBuildQueue    = "runner:build_queue:"
+	maxRegisterBodySize         = 32 * 1024
+	runnerBuildQueue            = "runner:build_queue:"
+	runnerBuildQueueHeaderKey   = "Gitlab-Ci-Builds-Polling"
+	runnerBuildQueueHeaderValue = "yes"
 )
 
 var (
@@ -104,6 +106,8 @@ func RegisterHandler(h http.Handler, watchHandler WatchKeyHandler, pollingDurati
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set(runnerBuildQueueHeaderKey, runnerBuildQueueHeaderValue)
+
 		requestBody, err := readRunnerBody(w, r)
 		if err != nil {
 			registerHandlerBodyReadErrors.Inc()
