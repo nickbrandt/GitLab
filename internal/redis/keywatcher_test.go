@@ -103,7 +103,6 @@ func TestWatchKeyNoChange(t *testing.T) {
 
 	processMessages(1, "something")
 	wg.Wait()
-
 }
 
 func TestWatchKeyTimeout(t *testing.T) {

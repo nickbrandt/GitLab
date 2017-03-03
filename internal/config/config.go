@@ -17,14 +17,27 @@ func (u *TomlURL) UnmarshalText(text []byte) error {
 	return err
 }
 
+type TomlDuration struct {
+	time.Duration
+}
+
+func (d *TomlDuration) UnmarshalTest(text []byte) error {
+	temp, err := time.ParseDuration(string(text))
+	d.Duration = temp
+	return err
+}
+
 type RedisConfig struct {
-	URL            TomlURL
-	Sentinel       []TomlURL
-	SentinelMaster string
-	Password       string
-	ReadTimeout    *int
-	MaxIdle        *int
-	MaxActive      *int
+	URL             TomlURL
+	Sentinel        []TomlURL
+	SentinelMaster  string
+	Password        string
+	DB              *int
+	ReadTimeout     *TomlDuration
+	WriteTimeout    *TomlDuration
+	KeepAlivePeriod *TomlDuration
+	MaxIdle         *int
+	MaxActive       *int
 }
 
 type Config struct {

@@ -1,7 +1,6 @@
 package redis
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -34,7 +33,7 @@ var (
 	totalMessages = prometheus.NewCounter(
 		prometheus.CounterOpts{
 			Name: "gitlab_workhorse_keywather_total_messages",
-			Help: "How many messages gitlab-workhorse has recieved in total on pubsub.",
+			Help: "How many messages gitlab-workhorse has received in total on pubsub.",
 		},
 	)
 )
@@ -58,13 +57,11 @@ type KeyChan struct {
 	Chan chan string
 }
 
-func processInner(conn redis.Conn) {
-	redisReconnectTimeout.Reset()
-
+func processInner(conn redis.Conn) error {
 	defer conn.Close()
 	psc := redis.PubSubConn{Conn: conn}
 	if err := psc.Subscribe(keySubChannel); err != nil {
-		return
+		return err
 	}
 	defer psc.Unsubscribe(keySubChannel)
 
@@ -72,18 +69,36 @@ func processInner(conn redis.Conn) {
 		switch v := psc.Receive().(type) {
 		case redis.Message:
 			totalMessages.Inc()
-			msg := strings.SplitN(string(v.Data), "=", 2)
+			dataStr := string(v.Data)
+			msg := strings.SplitN(dataStr, "=", 2)
 			if len(msg) != 2 {
-				helper.LogError(nil, errors.New("Redis subscribe error: got an invalid notification"))
+				helper.LogError(nil, fmt.Errorf("Redis receive error: got an invalid notification: %q", dataStr))
 				continue
 			}
 			key, value := msg[0], msg[1]
 			notifyChanWatchers(key, value)
 		case error:
-			helper.LogError(nil, fmt.Errorf("Redis subscribe error: %s", v))
-			return
+			helper.LogError(nil, fmt.Errorf("Redis receive error: %s", v))
+			// Intermittent error, return nil so that it doesn't wait before reconnect
+			return nil
 		}
 	}
+}
+
+func dialPubSub(dialer redisDialerFunc) (redis.Conn, error) {
+	conn, err := dialer()
+	if err != nil {
+		return nil, err
+	}
+
+	// Make sure Redis is actually connected
+	conn.Do("PING")
+	if err := conn.Err(); err != nil {
+		conn.Close()
+		return nil, err
+	}
+
+	return conn, nil
 }
 
 // Process redis subscriptions
@@ -97,13 +112,19 @@ func Process(reconnect bool) {
 	for loop {
 		loop = reconnect
 		log.Println("Connecting to redis")
-		conn, err := redisDialFunc()
+
+		conn, err := dialPubSub(workerDialFunc)
 		if err != nil {
 			helper.LogError(nil, fmt.Errorf("Failed to connect to redis: %s", err))
 			time.Sleep(redisReconnectTimeout.Duration())
 			continue
 		}
-		processInner(conn)
+		redisReconnectTimeout.Reset()
+
+		if err = processInner(conn); err != nil {
+			helper.LogError(nil, fmt.Errorf("Failed to process redis-queue: %s", err))
+			continue
+		}
 	}
 }
 

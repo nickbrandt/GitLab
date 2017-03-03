@@ -133,7 +133,7 @@ func main() {
 
 		cfg.Redis = cfgFromFile.Redis
 
-		redis.Configure(cfg.Redis, redis.DefaultDialFunc(cfg.Redis))
+		redis.Configure(cfg.Redis, redis.DefaultDialFunc)
 		go redis.Process(true)
 	}
 

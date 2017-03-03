@@ -3,6 +3,8 @@ package redis
 import (
 	"errors"
 	"fmt"
+	"net"
+	"net/url"
 	"time"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
@@ -18,10 +20,26 @@ var (
 )
 
 const (
-	defaultMaxIdle     = 1
-	defaultMaxActive   = 1
+	// Max Idle Connections in the pool.
+	defaultMaxIdle = 1
+	// Max Active Connections in the pool.
+	defaultMaxActive = 1
+	// Timeout for Read operations on the pool. 1 second is technically overkill,
+	//  it's just for sanity.
 	defaultReadTimeout = 1 * time.Second
+	// Timeout for Write operations on the pool. 1 second is technically overkill,
+	//  it's just for sanity.
+	defaultWriteTimeout = 1 * time.Second
+	// Timeout before killing Idle connections in the pool. 3 minutes seemed good.
+	//  If you _actually_ hit this timeout often, you should consider turning of
+	//  redis-support since it's not necessary at that point...
 	defaultIdleTimeout = 3 * time.Minute
+	// KeepAlivePeriod is to keep a TCP connection open for an extended period of
+	//  time without being killed. This is used both in the pool, and in the
+	//  worker-connection.
+	//  See https://en.wikipedia.org/wiki/Keepalive#TCP_keepalive for more
+	//  information.
+	defaultKeepAlivePeriod = 5 * time.Minute
 )
 
 var (
@@ -65,37 +83,91 @@ func sentinelConn(master string, urls []config.TomlURL) *sentinel.Sentinel {
 	}
 }
 
-var redisDialFunc func() (redis.Conn, error)
+var poolDialFunc func() (redis.Conn, error)
+var workerDialFunc func() (redis.Conn, error)
 
-func dialOptionsBuilder(cfg *config.RedisConfig) []redis.DialOption {
+func timeoutDialOptions(cfg *config.RedisConfig) []redis.DialOption {
 	readTimeout := defaultReadTimeout
-	if cfg.ReadTimeout != nil {
-		readTimeout = time.Millisecond * time.Duration(*cfg.ReadTimeout)
+	writeTimeout := defaultWriteTimeout
+
+	if cfg != nil {
+		if cfg.ReadTimeout != nil {
+			readTimeout = cfg.ReadTimeout.Duration
+		}
+
+		if cfg.WriteTimeout != nil {
+			writeTimeout = cfg.WriteTimeout.Duration
+		}
 	}
-	dopts := []redis.DialOption{redis.DialReadTimeout(readTimeout)}
+	return []redis.DialOption{
+		redis.DialReadTimeout(readTimeout),
+		redis.DialWriteTimeout(writeTimeout),
+	}
+}
+
+func dialOptionsBuilder(cfg *config.RedisConfig, setTimeouts bool) []redis.DialOption {
+	var dopts []redis.DialOption
+	if setTimeouts {
+		dopts = timeoutDialOptions(cfg)
+	}
+	if cfg == nil {
+		return dopts
+	}
 	if cfg.Password != "" {
 		dopts = append(dopts, redis.DialPassword(cfg.Password))
+	}
+	if cfg.DB != nil {
+		dopts = append(dopts, redis.DialDatabase(*cfg.DB))
 	}
 	return dopts
 }
 
-// DefaultDialFunc should always used. Only exception is for unit-tests.
-func DefaultDialFunc(cfg *config.RedisConfig) func() (redis.Conn, error) {
-	dopts := dialOptionsBuilder(cfg)
-	innerDial := func() (redis.Conn, error) {
-		return redis.Dial(cfg.URL.Scheme, cfg.URL.Host, dopts...)
-	}
-	if sntnl != nil {
-		innerDial = func() (redis.Conn, error) {
-			address, err := sntnl.MasterAddr()
-			if err != nil {
-				return nil, err
-			}
-			return redis.Dial("tcp", address, dopts...)
+func keepAliveDialer(timeout time.Duration) func(string, string) (net.Conn, error) {
+	return func(network, address string) (net.Conn, error) {
+		addr, err := net.ResolveTCPAddr(network, address)
+		if err != nil {
+			return nil, err
 		}
+		tc, err := net.DialTCP(network, nil, addr)
+		if err != nil {
+			return nil, err
+		}
+		if err := tc.SetKeepAlive(true); err != nil {
+			return nil, err
+		}
+		if err := tc.SetKeepAlivePeriod(timeout); err != nil {
+			return nil, err
+		}
+		return tc, nil
 	}
+}
+
+type redisDialerFunc func() (redis.Conn, error)
+
+func sentinelDialer(dopts []redis.DialOption, keepAlivePeriod time.Duration) redisDialerFunc {
 	return func() (redis.Conn, error) {
-		c, err := innerDial()
+		address, err := sntnl.MasterAddr()
+		if err != nil {
+			return nil, err
+		}
+		dopts = append(dopts, redis.DialNetDial(keepAliveDialer(keepAlivePeriod)))
+		return redis.Dial("tcp", address, dopts...)
+	}
+}
+
+func defaultDialer(dopts []redis.DialOption, keepAlivePeriod time.Duration, url url.URL) redisDialerFunc {
+	return func() (redis.Conn, error) {
+		if url.Scheme == "unix" {
+			return redis.Dial(url.Scheme, url.Path, dopts...)
+		}
+		dopts = append(dopts, redis.DialNetDial(keepAliveDialer(keepAlivePeriod)))
+		return redis.Dial(url.Scheme, url.Host, dopts...)
+	}
+}
+
+func countDialer(dialer redisDialerFunc) redisDialerFunc {
+	return func() (redis.Conn, error) {
+		c, err := dialer()
 		if err == nil {
 			totalConnections.Inc()
 		}
@@ -103,8 +175,21 @@ func DefaultDialFunc(cfg *config.RedisConfig) func() (redis.Conn, error) {
 	}
 }
 
+// DefaultDialFunc should always used. Only exception is for unit-tests.
+func DefaultDialFunc(cfg *config.RedisConfig, setReadTimeout bool) func() (redis.Conn, error) {
+	keepAlivePeriod := defaultKeepAlivePeriod
+	if cfg.KeepAlivePeriod != nil {
+		keepAlivePeriod = cfg.KeepAlivePeriod.Duration
+	}
+	dopts := dialOptionsBuilder(cfg, setReadTimeout)
+	if sntnl != nil {
+		return countDialer(sentinelDialer(dopts, keepAlivePeriod))
+	}
+	return countDialer(defaultDialer(dopts, keepAlivePeriod, cfg.URL.URL))
+}
+
 // Configure redis-connection
-func Configure(cfg *config.RedisConfig, dialFunc func() (redis.Conn, error)) {
+func Configure(cfg *config.RedisConfig, dialFunc func(*config.RedisConfig, bool) func() (redis.Conn, error)) {
 	if cfg == nil {
 		return
 	}
@@ -117,12 +202,13 @@ func Configure(cfg *config.RedisConfig, dialFunc func() (redis.Conn, error)) {
 		maxActive = *cfg.MaxActive
 	}
 	sntnl = sentinelConn(cfg.SentinelMaster, cfg.Sentinel)
-	redisDialFunc = dialFunc
+	workerDialFunc = dialFunc(cfg, false)
+	poolDialFunc = dialFunc(cfg, true)
 	pool = &redis.Pool{
 		MaxIdle:     maxIdle,            // Keep at most X hot connections
 		MaxActive:   maxActive,          // Keep at most X live connections, 0 means unlimited
 		IdleTimeout: defaultIdleTimeout, // X time until an unused connection is closed
-		Dial:        redisDialFunc,
+		Dial:        poolDialFunc,
 		Wait:        true,
 	}
 	if sntnl != nil {
