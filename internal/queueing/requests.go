@@ -9,7 +9,14 @@ import (
 
 const DefaultTimeout = 30 * time.Second
 
-func QueueRequests(h http.Handler, limit, queueLimit uint, queueTimeout time.Duration) http.Handler {
+// QueueRequests creates a new request queue
+// name specifies the name of queue, used to label Prometheus metrics
+//      Don't call QueueRequests twice with the same name argument!
+// h specifies a http.Handler which will handle the queue requests
+// limit specifies number of requests run concurrently
+// queueLimit specifies maximum number of requests that can be queued
+// queueTimeout specifies the time limit of storing the request in the queue
+func QueueRequests(name string, h http.Handler, limit, queueLimit uint, queueTimeout time.Duration) http.Handler {
 	if limit == 0 {
 		return h
 	}
@@ -17,10 +24,10 @@ func QueueRequests(h http.Handler, limit, queueLimit uint, queueTimeout time.Dur
 		queueTimeout = DefaultTimeout
 	}
 
-	queue := NewQueue(limit, queueLimit)
+	queue := newQueue(name, limit, queueLimit, queueTimeout)
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := queue.Acquire(queueTimeout)
+		err := queue.Acquire()
 
 		switch err {
 		case nil:

@@ -21,7 +21,7 @@ func pausedHttpHandler(pauseCh chan struct{}) http.Handler {
 
 func TestNormalRequestProcessing(t *testing.T) {
 	w := httptest.NewRecorder()
-	h := QueueRequests(httpHandler, 1, 1, time.Second)
+	h := QueueRequests("Normal request processing", httpHandler, 1, 1, time.Second)
 	h.ServeHTTP(w, nil)
 	if w.Code != 200 {
 		t.Fatal("QueueRequests should process request")
@@ -32,11 +32,11 @@ func TestNormalRequestProcessing(t *testing.T) {
 // then it runs a number of requests that are going through queue,
 // we return the response of first finished request,
 // where status of request can be 200, 429 or 503
-func testSlowRequestProcessing(count int, limit, queueLimit uint, queueTimeout time.Duration) *httptest.ResponseRecorder {
+func testSlowRequestProcessing(name string, count int, limit, queueLimit uint, queueTimeout time.Duration) *httptest.ResponseRecorder {
 	pauseCh := make(chan struct{})
 	defer close(pauseCh)
 
-	handler := QueueRequests(pausedHttpHandler(pauseCh), limit, queueLimit, queueTimeout)
+	handler := QueueRequests("Slow request processing: "+name, pausedHttpHandler(pauseCh), limit, queueLimit, queueTimeout)
 
 	respCh := make(chan *httptest.ResponseRecorder, count)
 
@@ -57,7 +57,7 @@ func testSlowRequestProcessing(count int, limit, queueLimit uint, queueTimeout t
 // the queue limit and length is 1,
 // the second request gets timed-out
 func TestQueueingTimeout(t *testing.T) {
-	w := testSlowRequestProcessing(2, 1, 1, time.Microsecond)
+	w := testSlowRequestProcessing("timeout", 2, 1, 1, time.Microsecond)
 
 	if w.Code != 503 {
 		t.Fatal("QueueRequests should timeout queued request")
@@ -68,7 +68,7 @@ func TestQueueingTimeout(t *testing.T) {
 // the queue limit and length is 1,
 // so the third request has to be rejected with 429
 func TestQueueingTooManyRequests(t *testing.T) {
-	w := testSlowRequestProcessing(3, 1, 1, time.Minute)
+	w := testSlowRequestProcessing("too many requests", 3, 1, 1, time.Minute)
 
 	if w.Code != 429 {
 		t.Fatal("QueueRequests should return immediately and return too many requests")
