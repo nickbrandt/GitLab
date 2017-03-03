@@ -25,9 +25,10 @@ Feature: Project Shortcuts
     And the active main tab should be Repository
 
   @javascript
-  Scenario: Navigate to graphs tab
+  Scenario: Navigate to repository charts tab
     Given I press "g" and "g"
-    Then the active main tab should be Graphs
+    Then the active sub tab should be Charts
+    And the active main tab should be Repository
 
   @javascript
   Scenario: Navigate to issues tab
@@ -52,9 +53,19 @@ Feature: Project Shortcuts
   @javascript
   Scenario: Navigate to project home
     Given I press "g" and "p"
+<<<<<<< HEAD
     Then the active main tab should be Home
+=======
+    Then the active sub tab should be Home
+    And the active main tab should be Project
+>>>>>>> 6506645... Update tests for shortcuts and layout
 
   @javascript
   Scenario: Navigate to project feed
     Given I press "g" and "e"
+<<<<<<< HEAD
     Then the active main tab should be Activity
+=======
+    Then the active sub tab should be Activity
+    And the active main tab should be Project
+>>>>>>> 6506645... Update tests for shortcuts and layout
