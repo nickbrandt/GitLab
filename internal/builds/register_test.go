@@ -14,7 +14,10 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/redis"
 )
 
+const upstreamResponseCode = 999
+
 func echoRequest(rw http.ResponseWriter, req *http.Request) {
+	rw.WriteHeader(upstreamResponseCode)
 	io.Copy(rw, req.Body)
 }
 
@@ -43,12 +46,12 @@ func TestRegisterHandlerLargeBody(t *testing.T) {
 }
 
 func TestRegisterHandlerInvalidRunnerRequest(t *testing.T) {
-	expectHandler(t, "invalid content", "text/plain", http.StatusOK,
+	expectHandler(t, "invalid content", "text/plain", upstreamResponseCode,
 		"proxies request to upstream")
 }
 
 func TestRegisterHandlerInvalidJsonPayload(t *testing.T) {
-	expectHandler(t, `{[`, "application/json", http.StatusOK,
+	expectHandler(t, `{[`, "application/json", upstreamResponseCode,
 		"fails on parsing body and proxies request to upstream")
 }
 
@@ -59,7 +62,7 @@ func TestRegisterHandlerMissingData(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		expectHandler(t, testCase, "application/json", http.StatusOK,
+		expectHandler(t, testCase, "application/json", upstreamResponseCode,
 			"fails on argument validation and proxies request to upstream")
 	}
 }
@@ -80,12 +83,12 @@ func expectWatcherToBeExecuted(t *testing.T, watchKeyStatus redis.WatchKeyStatus
 
 func TestRegisterHandlerWatcherError(t *testing.T) {
 	expectWatcherToBeExecuted(t, redis.WatchKeyStatusNoChange, errors.New("redis connection"),
-		http.StatusOK, "proxies data to upstream")
+		upstreamResponseCode, "proxies data to upstream")
 }
 
 func TestRegisterHandlerWatcherAlreadyChanged(t *testing.T) {
 	expectWatcherToBeExecuted(t, redis.WatchKeyStatusAlreadyChanged, nil,
-		http.StatusOK, "proxies data to upstream")
+		upstreamResponseCode, "proxies data to upstream")
 }
 
 func TestRegisterHandlerWatcherSeenChange(t *testing.T) {
