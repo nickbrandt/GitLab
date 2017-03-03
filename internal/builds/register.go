@@ -17,9 +17,9 @@ const (
 )
 
 var (
-	registerHandlerHits = prometheus.NewCounterVec(
+	registerHandlerRequests = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "gitlab_workhorse_builds_register_handler_hits",
+			Name: "gitlab_workhorse_builds_register_handler_requests",
 			Help: "Describes how many requests in different states hit a register handler",
 		},
 		[]string{"status"},
@@ -36,14 +36,14 @@ var (
 	registerHandlerOpenAtProxying = registerHandlerOpen.WithLabelValues("proxying")
 	registerHandlerOpenAtWatching = registerHandlerOpen.WithLabelValues("watching")
 
-	registerHandlerBodyReadErrors     = registerHandlerHits.WithLabelValues("body-read-error")
-	registerHandlerBodyParseErrors    = registerHandlerHits.WithLabelValues("body-parse-error")
-	registerHandlerMissingValues      = registerHandlerHits.WithLabelValues("missing-values")
-	registerHandlerWatchErrors        = registerHandlerHits.WithLabelValues("watch-error")
-	registerHandlerAlreadyChangedHits = registerHandlerHits.WithLabelValues("already-changed")
-	registerHandlerSeenChangeHits     = registerHandlerHits.WithLabelValues("seen-change")
-	registerHandlerTimeoutHits        = registerHandlerHits.WithLabelValues("timeout")
-	registerHandlerNoChangeHits       = registerHandlerHits.WithLabelValues("no-change")
+	registerHandlerBodyReadErrors         = registerHandlerRequests.WithLabelValues("body-read-error")
+	registerHandlerBodyParseErrors        = registerHandlerRequests.WithLabelValues("body-parse-error")
+	registerHandlerMissingValues          = registerHandlerRequests.WithLabelValues("missing-values")
+	registerHandlerWatchErrors            = registerHandlerRequests.WithLabelValues("watch-error")
+	registerHandlerAlreadyChangedRequests = registerHandlerRequests.WithLabelValues("already-changed")
+	registerHandlerSeenChangeRequests     = registerHandlerRequests.WithLabelValues("seen-change")
+	registerHandlerTimeoutRequests        = registerHandlerRequests.WithLabelValues("timeout")
+	registerHandlerNoChangeRequests       = registerHandlerRequests.WithLabelValues("no-change")
 )
 
 type largeBodyError struct{ error }
@@ -53,7 +53,7 @@ type WatchKeyHandler func(key, value string, timeout time.Duration) (redis.Watch
 
 func init() {
 	prometheus.MustRegister(
-		registerHandlerHits,
+		registerHandlerRequests,
 		registerHandlerOpen,
 	)
 }
@@ -138,7 +138,7 @@ func RegisterHandler(h http.Handler, watchHandler WatchKeyHandler, pollingDurati
 		// It means that we detected a change before starting watching on change,
 		// We proxy request to Rails, to see whether we have a build to receive
 		case redis.WatchKeyStatusAlreadyChanged:
-			registerHandlerAlreadyChangedHits.Inc()
+			registerHandlerAlreadyChangedRequests.Inc()
 			proxyRegisterRequest(h, w, newRequest)
 
 		// It means that we detected a change after watching.
@@ -147,18 +147,18 @@ func RegisterHandler(h http.Handler, watchHandler WatchKeyHandler, pollingDurati
 		// as don't really know whether ResponseWriter is still in a sane state,
 		// for example the connection is dead
 		case redis.WatchKeyStatusSeenChange:
-			registerHandlerSeenChangeHits.Inc()
+			registerHandlerSeenChangeRequests.Inc()
 			w.WriteHeader(http.StatusNoContent)
 
 		// When we receive one of these statuses, it means that we detected no change,
 		// so we return to runner 204, which means nothing got changed,
 		// and there's no new builds to process
 		case redis.WatchKeyStatusTimeout:
-			registerHandlerTimeoutHits.Inc()
+			registerHandlerTimeoutRequests.Inc()
 			w.WriteHeader(http.StatusNoContent)
 
 		case redis.WatchKeyStatusNoChange:
-			registerHandlerNoChangeHits.Inc()
+			registerHandlerNoChangeRequests.Inc()
 			w.WriteHeader(http.StatusNoContent)
 		}
 	})
