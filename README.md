@@ -83,6 +83,11 @@ for runners). This requires you to pass a valid TOML config file via
 `-config` flag.  
 For regular setups it only requires the following (replacing the string 
 with the actual socket)
+
+### Redis
+
+Redis integration is currently EXPERIMENTAL.
+
 ```
 [redis]
 URL = "unix:///var/run/gitlab/redis.sock"
