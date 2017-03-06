@@ -2,6 +2,16 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v1.4.0
+
+- Integrate with Gitaly via gRPC !119
+- Buffer git receive-pack responses in tempfiles !123
+- Use stdlib to copy stdin/stdout of git subprocesses !118
+- Terminal session timeouts !107
+- Redis integration EXPERIMENTAL !112
+- CI notifications via Redis EXPERIMENTAL !128
+- More CI queue metrics !122
+
 v1.3.0
 
 - Fix stalled HTTP fetches with large payloads. !110
