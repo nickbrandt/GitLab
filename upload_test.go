@@ -17,28 +17,44 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upload"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func TestArtifactsUpload(t *testing.T) {
+type uploadArtifactsFunction func(url, contentType string, body io.Reader) (*http.Response, error, string)
+
+func uploadArtifactsV1(url, contentType string, body io.Reader) (*http.Response, error, string) {
+	resource := `/ci/api/v1/builds/123/artifacts`
+	resp, err := http.Post(url+resource, contentType, body)
+	return resp, err, resource
+}
+
+func uploadArtifactsV4(url, contentType string, body io.Reader) (*http.Response, error, string) {
+	resource := `/api/v4/jobs/123/artifacts`
+	resp, err := http.Post(url+resource, contentType, body)
+	return resp, err, resource
+}
+
+func testArtifactsUpload(t *testing.T, uploadArtifacts uploadArtifactsFunction) {
 	reqBody, contentType, err := multipartBodyWithFile()
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	ts := uploadTestServer(t, nil)
 	defer ts.Close()
+
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
 
-	resource := `/ci/api/v1/builds/123/artifacts`
-	resp, err := http.Post(ws.URL+resource, contentType, reqBody)
-	if err != nil {
-		t.Error(err)
-	}
+	resp, err, resource := uploadArtifacts(ws.URL, contentType, reqBody)
+	assert.NoError(t, err)
 	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
-	}
+
+	assert.Equal(t, 200, resp.StatusCode, "GET %q: expected 200, got %d", resource, resp.StatusCode)
+}
+
+func TestArtifactsUpload(t *testing.T) {
+	testArtifactsUpload(t, uploadArtifactsV1)
+	testArtifactsUpload(t, uploadArtifactsV4)
 }
 
 func uploadTestServer(t *testing.T, extraTests func(r *http.Request)) *httptest.Server {

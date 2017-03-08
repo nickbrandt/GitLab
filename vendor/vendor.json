@@ -116,6 +116,12 @@
 			"revisionTime": "2016-11-17T07:43:51Z"
 		},
 		{
+			"checksumSHA1": "omdvCNu8sJIc9FbOfObC484M7Dg=",
+			"path": "github.com/stretchr/testify/require",
+			"revision": "18a02ba4a312f95da08ff4cfc0055750ce50ae9e",
+			"revisionTime": "2016-11-17T07:43:51Z"
+		},
+		{
 			"checksumSHA1": "HWuFvDMQ5zp554X4QpVjBUgW5wk=",
 			"path": "gitlab.com/gitlab-org/gitaly-proto/go",
 			"revision": "84b3ffd032eea7af8df96fb9d7bdc100dac2c569",
