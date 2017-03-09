@@ -132,7 +132,6 @@ func (api *API) newRequest(r *http.Request, body io.Reader, suffix string) (*htt
 	if body != nil {
 		authReq.Body = ioutil.NopCloser(body)
 	}
-
 	// Clean some headers when issuing a new request without body
 	if body == nil {
 		authReq.Header.Del("Content-Type")
@@ -186,7 +185,7 @@ func (api *API) PreAuthorize(suffix string, r *http.Request) (httpResponse *http
 		return nil, nil, fmt.Errorf("preAuthorizeHandler newUpstreamRequest: %v", err)
 	}
 
-	httpResponse, err = api.Client.Do(authReq)
+	httpResponse, err = api.doRequestWithoutRedirects(authReq)
 	if err != nil {
 		return nil, nil, fmt.Errorf("preAuthorizeHandler: do request: %v", err)
 	}
@@ -230,46 +229,58 @@ func (api *API) PreAuthorizeHandler(next HandleFunc, suffix string) http.Handler
 		// The response couldn't be interpreted as a valid auth response, so
 		// pass it back (mostly) unmodified
 		if httpResponse != nil && authResponse == nil {
-			// NGINX response buffering is disabled on this path (with
-			// X-Accel-Buffering: no) but we still want to free up the Unicorn worker
-			// that generated httpResponse as fast as possible. To do this we buffer
-			// the entire response body in memory before sending it on.
-			responseBody, err := bufferResponse(httpResponse.Body)
-			if err != nil {
-				helper.Fail500(w, r, err)
-			}
-			httpResponse.Body.Close() // Free up the Unicorn worker
-			bytesTotal.Add(float64(responseBody.Len()))
-
-			for k, v := range httpResponse.Header {
-				// Accomodate broken clients that do case-sensitive header lookup
-				if k == "Www-Authenticate" {
-					w.Header()["WWW-Authenticate"] = v
-				} else {
-					w.Header()[k] = v
-				}
-			}
-			w.WriteHeader(httpResponse.StatusCode)
-			if _, err := io.Copy(w, responseBody); err != nil {
-				helper.LogError(r, err)
-			}
-
+			passResponseBack(httpResponse, w, r)
 			return
 		}
 
 		httpResponse.Body.Close() // Free up the Unicorn worker
 
-		// Negotiate authentication (Kerberos) may need to return a WWW-Authenticate
-		// header to the client even in case of success as per RFC4559.
-		for k, v := range httpResponse.Header {
-			// Case-insensitive comparison as per RFC7230
-			if strings.EqualFold(k, "WWW-Authenticate") {
-				w.Header()[k] = v
-			}
-		}
+		copyAuthHeader(httpResponse, w)
 
 		next(w, r, authResponse)
 	})
+}
+
+func (api *API) doRequestWithoutRedirects(authReq *http.Request) (*http.Response, error) {
+	return api.Client.Transport.RoundTrip(authReq)
+}
+
+func copyAuthHeader(httpResponse *http.Response, w http.ResponseWriter) {
+	// Negotiate authentication (Kerberos) may need to return a WWW-Authenticate
+	// header to the client even in case of success as per RFC4559.
+	for k, v := range httpResponse.Header {
+		// Case-insensitive comparison as per RFC7230
+		if strings.EqualFold(k, "WWW-Authenticate") {
+			w.Header()[k] = v
+		}
+	}
+}
+
+func passResponseBack(httpResponse *http.Response, w http.ResponseWriter, r *http.Request) {
+	// NGINX response buffering is disabled on this path (with
+	// X-Accel-Buffering: no) but we still want to free up the Unicorn worker
+	// that generated httpResponse as fast as possible. To do this we buffer
+	// the entire response body in memory before sending it on.
+	responseBody, err := bufferResponse(httpResponse.Body)
+	if err != nil {
+		helper.Fail500(w, r, err)
+		return
+	}
+	httpResponse.Body.Close() // Free up the Unicorn worker
+	bytesTotal.Add(float64(responseBody.Len()))
+
+	for k, v := range httpResponse.Header {
+		// Accomodate broken clients that do case-sensitive header lookup
+		if k == "Www-Authenticate" {
+			w.Header()["WWW-Authenticate"] = v
+		} else {
+			w.Header()[k] = v
+		}
+	}
+	w.WriteHeader(httpResponse.StatusCode)
+	if _, err := io.Copy(w, responseBody); err != nil {
+		helper.LogError(r, err)
+	}
 }
 
 func bufferResponse(r io.Reader) (*bytes.Buffer, error) {
