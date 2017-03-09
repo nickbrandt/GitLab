@@ -7,7 +7,10 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
-const DefaultTimeout = 30 * time.Second
+const (
+	DefaultTimeout            = 30 * time.Second
+	httpStatusTooManyRequests = 429
+)
 
 // QueueRequests creates a new request queue
 // name specifies the name of queue, used to label Prometheus metrics
@@ -35,10 +38,10 @@ func QueueRequests(name string, h http.Handler, limit, queueLimit uint, queueTim
 			h.ServeHTTP(w, r)
 
 		case ErrTooManyRequests:
-			helper.TooManyRequests(w, r, err)
+			http.Error(w, "Too Many Requests", httpStatusTooManyRequests)
 
 		case ErrQueueingTimedout:
-			helper.ServiceUnavailable(w, r, err)
+			http.Error(w, "Service Unavailable", http.StatusServiceUnavailable)
 
 		default:
 			helper.Fail500(w, r, err)
