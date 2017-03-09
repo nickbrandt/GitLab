@@ -185,8 +185,7 @@ func (api *API) PreAuthorize(suffix string, r *http.Request) (httpResponse *http
 		return nil, nil, fmt.Errorf("preAuthorizeHandler newUpstreamRequest: %v", err)
 	}
 
-	httpResponse, err = api.clientDoNotFollowRedirects(authReq)
-
+	httpResponse, err = api.doRequestWithoutRedirects(authReq)
 	if err != nil {
 		return nil, nil, fmt.Errorf("preAuthorizeHandler: do request: %v", err)
 	}
@@ -242,13 +241,11 @@ func (api *API) PreAuthorizeHandler(next HandleFunc, suffix string) http.Handler
 	})
 }
 
-// go < 1.7 compatibility
-func (api *API) clientDoNotFollowRedirects(authReq *http.Request) (*http.Response, error) {
+func (api *API) doRequestWithoutRedirects(authReq *http.Request) (*http.Response, error) {
 	return api.Client.Transport.RoundTrip(authReq)
 }
 
 func copyAuthHeader(httpResponse *http.Response, w http.ResponseWriter) {
-
 	// Negotiate authentication (Kerberos) may need to return a WWW-Authenticate
 	// header to the client even in case of success as per RFC4559.
 	for k, v := range httpResponse.Header {
