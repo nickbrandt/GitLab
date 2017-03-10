@@ -149,8 +149,7 @@ func GetString(key string) (string, error) {
 	if conn == nil {
 		return "", fmt.Errorf("Not connected to redis")
 	}
-	defer func() {
-		conn.Close()
-	}()
+	defer conn.Close()
+
 	return redis.String(conn.Do("GET", key))
 }
