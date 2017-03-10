@@ -104,13 +104,10 @@ func dialPubSub(dialer redisDialerFunc) (redis.Conn, error) {
 // Process redis subscriptions
 //
 // NOTE: There Can Only Be One!
-// Reconnects is reconnect = true
-func Process(reconnect bool) {
+func Process() {
 	log.Print("Processing redis queue")
 
-	loop := true
-	for loop {
-		loop = reconnect
+	for {
 		log.Println("Connecting to redis")
 
 		conn, err := dialPubSub(workerDialFunc)
@@ -123,7 +120,6 @@ func Process(reconnect bool) {
 
 		if err = processInner(conn); err != nil {
 			helper.LogError(nil, fmt.Errorf("Failed to process redis-queue: %s", err))
-			continue
 		}
 	}
 }
