@@ -2,6 +2,7 @@ PREFIX=/usr/local
 VERSION=$(shell git describe)-$(shell date -u +%Y%m%d.%H%M%S)
 BUILD_DIR = $(shell pwd)
 export GOPATH=${BUILD_DIR}/_build
+export PATH:=${GOPATH}/bin:${PATH}
 export GO15VENDOREXPERIMENT=1
 GOBUILD=go build -ldflags "-X main.Version=${VERSION}"
 PKG=gitlab.com/gitlab-org/gitlab-workhorse
@@ -28,10 +29,15 @@ ${BUILD_DIR}/_build:
 	touch $@
 
 .PHONY: test
-test:	clean-build clean-workhorse all
+test:	clean-build clean-workhorse all govendor
 	go fmt ${PKG_ALL} | awk '{ print } END { if (NR > 0) { print "Please run go fmt"; exit 1 } }'
+	cd ${GOPATH}/src/${PKG} && govendor sync
 	go test ${PKG_ALL}
 	@echo SUCCESS
+
+.PHONY:	govendor
+govendor:
+	command -v govendor || go get github.com/kardianos/govendor
 
 coverage:
 	go test -cover -coverprofile=test.coverage

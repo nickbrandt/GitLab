@@ -3,6 +3,7 @@ package redis
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net"
 	"net/url"
 	"time"
@@ -63,7 +64,9 @@ func sentinelConn(master string, urls []config.TomlURL) *sentinel.Sentinel {
 	}
 	var addrs []string
 	for _, url := range urls {
-		addrs = append(addrs, url.URL.String())
+		h := url.URL.Host
+		log.Printf("redis: using sentinel %q", h)
+		addrs = append(addrs, h)
 	}
 	return &sentinel.Sentinel{
 		Addrs:      addrs,
@@ -151,18 +154,23 @@ func sentinelDialer(dopts []redis.DialOption, keepAlivePeriod time.Duration) red
 			return nil, err
 		}
 		dopts = append(dopts, redis.DialNetDial(keepAliveDialer(keepAlivePeriod)))
-		return redis.Dial("tcp", address, dopts...)
+		return redisDial("tcp", address, dopts...)
 	}
 }
 
 func defaultDialer(dopts []redis.DialOption, keepAlivePeriod time.Duration, url url.URL) redisDialerFunc {
 	return func() (redis.Conn, error) {
 		if url.Scheme == "unix" {
-			return redis.Dial(url.Scheme, url.Path, dopts...)
+			return redisDial(url.Scheme, url.Path, dopts...)
 		}
 		dopts = append(dopts, redis.DialNetDial(keepAliveDialer(keepAlivePeriod)))
-		return redis.Dial(url.Scheme, url.Host, dopts...)
+		return redisDial(url.Scheme, url.Host, dopts...)
 	}
+}
+
+func redisDial(network, address string, options ...redis.DialOption) (redis.Conn, error) {
+	log.Printf("redis: dialing %q, %q", network, address)
+	return redis.Dial(network, address, options...)
 }
 
 func countDialer(dialer redisDialerFunc) redisDialerFunc {
@@ -233,7 +241,7 @@ func Get() redis.Conn {
 func GetString(key string) (string, error) {
 	conn := Get()
 	if conn == nil {
-		return "", fmt.Errorf("Not connected to redis")
+		return "", fmt.Errorf("redis: could not get connection from pool")
 	}
 	defer conn.Close()
 

@@ -72,13 +72,13 @@ func processInner(conn redis.Conn) error {
 			dataStr := string(v.Data)
 			msg := strings.SplitN(dataStr, "=", 2)
 			if len(msg) != 2 {
-				helper.LogError(nil, fmt.Errorf("Redis receive error: got an invalid notification: %q", dataStr))
+				helper.LogError(nil, fmt.Errorf("keywatcher: invalid notification: %q", dataStr))
 				continue
 			}
 			key, value := msg[0], msg[1]
 			notifyChanWatchers(key, value)
 		case error:
-			helper.LogError(nil, fmt.Errorf("Redis receive error: %s", v))
+			helper.LogError(nil, fmt.Errorf("keywatcher: pubsub receive: %v", v))
 			// Intermittent error, return nil so that it doesn't wait before reconnect
 			return nil
 		}
@@ -105,21 +105,18 @@ func dialPubSub(dialer redisDialerFunc) (redis.Conn, error) {
 //
 // NOTE: There Can Only Be One!
 func Process() {
-	log.Print("Processing redis queue")
-
+	log.Print("keywatcher: starting process loop")
 	for {
-		log.Println("Connecting to redis")
-
 		conn, err := dialPubSub(workerDialFunc)
 		if err != nil {
-			helper.LogError(nil, fmt.Errorf("Failed to connect to redis: %s", err))
+			helper.LogError(nil, fmt.Errorf("keywatcher: %v", err))
 			time.Sleep(redisReconnectTimeout.Duration())
 			continue
 		}
 		redisReconnectTimeout.Reset()
 
 		if err = processInner(conn); err != nil {
-			helper.LogError(nil, fmt.Errorf("Failed to process redis-queue: %s", err))
+			helper.LogError(nil, fmt.Errorf("keywatcher: process loop: %v", err))
 		}
 	}
 }
@@ -187,7 +184,7 @@ func WatchKey(key, value string, timeout time.Duration) (WatchKeyStatus, error) 
 
 	currentValue, err := GetString(key)
 	if err != nil {
-		return WatchKeyStatusNoChange, fmt.Errorf("Failed to get value from Redis: %#v", err)
+		return WatchKeyStatusNoChange, fmt.Errorf("keywatcher: redis GET: %v", err)
 	}
 	if currentValue != value {
 		return WatchKeyStatusAlreadyChanged, nil
@@ -196,7 +193,7 @@ func WatchKey(key, value string, timeout time.Duration) (WatchKeyStatus, error) 
 	select {
 	case currentValue := <-kw.Chan:
 		if currentValue == "" {
-			return WatchKeyStatusNoChange, fmt.Errorf("Failed to get value from Redis")
+			return WatchKeyStatusNoChange, fmt.Errorf("keywatcher: redis GET failed")
 		}
 		if currentValue == value {
 			return WatchKeyStatusNoChange, nil
