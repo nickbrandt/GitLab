@@ -133,8 +133,8 @@ func main() {
 
 		cfg.Redis = cfgFromFile.Redis
 
-		redis.Configure(cfg.Redis, redis.DefaultDialFunc(cfg.Redis))
-		go redis.Process(true)
+		redis.Configure(cfg.Redis, redis.DefaultDialFunc)
+		go redis.Process()
 	}
 
 	up := wrapRaven(upstream.NewUpstream(cfg))
