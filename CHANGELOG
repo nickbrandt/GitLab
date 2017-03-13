@@ -2,6 +2,14 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v1.4.1
+
+- Fix several Redis integration bugs !137, !140
+- Fix race conditions in Redis tests !136
+- Don't follow HTTP redirects on internal API !134
+- Support /api/v4 for CI !133
+- Don't spam logs with CI queueing messages (Marcin Biegała) !127
+
 v1.4.0
 
 - Integrate with Gitaly via gRPC !119
