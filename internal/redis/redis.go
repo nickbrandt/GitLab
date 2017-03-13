@@ -3,6 +3,7 @@ package redis
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net"
 	"net/url"
 	"time"
@@ -63,7 +64,9 @@ func sentinelConn(master string, urls []config.TomlURL) *sentinel.Sentinel {
 	}
 	var addrs []string
 	for _, url := range urls {
-		addrs = append(addrs, url.URL.String())
+		h := url.URL.Host
+		log.Printf("redis: using sentinel %q", h)
+		addrs = append(addrs, h)
 	}
 	return &sentinel.Sentinel{
 		Addrs:      addrs,
