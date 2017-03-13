@@ -20,7 +20,7 @@ push/pull and Git archive downloads.
     a modified request containing the tempfile path to Rails.
 -   Workhorse can manage long-lived WebSocket connections for Rails.
     Example: handling the terminal websocket for environments.
--   Workhorse does not connect to Redis or Postgres, only to Rails.
+-   Workhorse does not connect to Postgres, only to Rails and (optionally) Redis.
 -   We assume that all requests that reach Workhorse pass through an
     upstream proxy such as NGINX or Apache first.
 -   Workhorse does not accept HTTPS connections.
@@ -86,7 +86,20 @@ with the actual socket)
 
 ### Redis
 
-Redis integration is currently EXPERIMENTAL.
+Gitlab-workhorse integrates with Redis to do long polling for CI build
+requests. This is configured via two things:
+
+-   Redis settings in the TOML config file
+-   The `-apiCiLongPollingDuration` command line flag to control polling
+    behavior for CI build requests
+
+It is OK to enable Redis in the config file but to leave CI polling
+disabled; this just results in an idle Redis pubsub connection. The
+opposite is not possible: CI long polling requires a correct Redis
+configuration.
+
+Below we discuss the options for the `[redis]` section in the config
+file.
 
 ```
 [redis]
