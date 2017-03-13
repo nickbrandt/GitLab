@@ -100,19 +100,19 @@ func TestSentinelConnNoSentinel(t *testing.T) {
 }
 
 func TestSentinelConnTwoURLs(t *testing.T) {
-	urls := []string{"tcp://10.0.0.1:12345", "tcp://10.0.0.2:12345"}
+	addrs := []string{"10.0.0.1:12345", "10.0.0.2:12345"}
 	var sentinelUrls []config.TomlURL
 
-	for _, url := range urls {
-		parsedURL := helper.URLMustParse(url)
+	for _, a := range addrs {
+		parsedURL := helper.URLMustParse(`tcp://` + a)
 		sentinelUrls = append(sentinelUrls, config.TomlURL{URL: *parsedURL})
 	}
 
 	s := sentinelConn("foobar", sentinelUrls)
-	assert.Equal(t, len(urls), len(s.Addrs))
+	assert.Equal(t, len(addrs), len(s.Addrs))
 
-	for i := range urls {
-		assert.Equal(t, urls[i], s.Addrs[i])
+	for i := range addrs {
+		assert.Equal(t, addrs[i], s.Addrs[i])
 	}
 }
 
