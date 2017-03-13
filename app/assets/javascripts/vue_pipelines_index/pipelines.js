@@ -1,4 +1,4 @@
-/* global Flash */
+  /* global Flash */
 /* eslint-disable no-new */
 import '~/flash';
 import Vue from 'vue';
