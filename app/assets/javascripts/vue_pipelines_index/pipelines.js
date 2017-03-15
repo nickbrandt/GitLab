@@ -23,6 +23,7 @@ export default {
   data() {
     const pipelinesData = document.querySelector('#pipelines-list-vue').dataset;
 
+<<<<<<< HEAD
     return {
       ...pipelinesData,
       pipelines: [],
@@ -50,7 +51,6 @@ export default {
       return this.hasError && !this.pageRequest;
     },
 
-
     /**
      * The empty state should only be rendered when the request is made to fetch all pipelines
      * and none is returned.
@@ -68,178 +68,104 @@ export default {
       return !this.hasError &&
         !this.pageRequest && this.pipelines.length;
     },
+    template: `
+      <div :class="cssClass">
+        <div class="top-area" v-if="!shouldRenderEmptyState">
+          <ul
+            class="nav-links">
 
-    /**
-     * Header tabs should only be rendered when we receive an error or a successfull response with
-     * pipelines.
-     *
-     * @return {Boolean}
-     */
-    shouldRenderTabs() {
-      return !this.pageRequest && !this.hasError && this.pipelines.length;
-    },
-
-    /**
-     * Pagination should only be rendered when there is more than one page.
-     *
-     * @return {Boolean}
-     */
-    shouldRenderPagination() {
-      return !this.pageRequest &&
-        this.pipelines.length &&
-        this.pageInfo.total > this.pageInfo.perPage;
-    },
-  },
-
-  created() {
-    this.service = new PipelinesService(this.endpoint);
-
-    this.fetchPipelines();
-
-    eventHub.$on('refreshPipelines', this.fetchPipelines);
-  },
-
-  beforeUpdate() {
-    if (this.state.pipelines.length && this.$children) {
-      this.store.startTimeAgoLoops.call(this, Vue);
-    }
-  },
-
-  beforeDestroyed() {
-    eventHub.$off('refreshPipelines');
-  },
-
-  methods: {
-    /**
-     * Will change the page number and update the URL.
-     *
-     * @param  {Number} pageNumber desired page to go to.
-     */
-    change(pageNumber) {
-      const param = gl.utils.setParamInURL('page', pageNumber);
-
-      gl.utils.visitUrl(param);
-      return param;
-    },
-
-    fetchPipelines() {
-      const pageNumber = gl.utils.getParameterByName('page') || this.pagenum;
-      const scope = gl.utils.getParameterByName('scope') || this.apiScope;
-
-      this.pageRequest = true;
-      return this.service.getPipelines(scope, pageNumber)
-        .then(resp => ({
-          headers: resp.headers,
-          body: resp.json(),
-        }))
-        .then((response) => {
-          this.store.storeCount(response.body.count);
-          this.store.storePipelines(response.body.pipelines);
-          this.store.storePagination(response.headers);
-        })
-        .then(() => {
-          this.pageRequest = false;
-        })
-        .catch(() => {
-          this.pageRequest = false;
-          new Flash('An error occurred while fetching the pipelines, please reload the page again.');
-        });
-    },
-  },
-  template: `
-    <div :class="cssClass">
-      <div class="top-area" v-if="!shouldRenderEmptyState">
-        <ul
-          class="nav-links">
-
-          <li :class="{ 'active': scope === null || scope === 'all'}">
-            <a :href="allPath">
-              All
-            </a>
-            <span class="badge js-totalbuilds-count">
-            </span>
-          </li>
-          <li
-            class="js-pipelines-tab-pending"
-            :class="{ 'active': scope === 'pending'}">
-            <a :href="pendingPath">
-              Pending
-            </a>
-            <span class="badge"></span>
-          </li>
-          <li
-            class="js-pipelines-tab-running"
-            :class="{ 'active': scope === 'running'}">
-            <a :href="runningPath">Running</a>
-            <span class="badge"></span>
-          </li>
-          <li
-            class="js-pipelines-tab-finished"
-            :class="{ 'active': scope === 'finished'}">
-            <a :href="finishedPath">Finished</a>
-            <span class="badge"></span>
-          </li>
-          <li
-          class="js-pipelines-tab-branches"
-          :class="{ 'active': scope === 'branches'}">
-            <a :href="branchesPath">Branches</a>
-          </li>
-          <li
-            class="js-pipelines-tab-tags"
-            :class="{ 'active': scope === 'tags'}">
-            <a :href="tagsPath">Tags</a>
-          </li>
-        </ul>
-
-        <div class="nav-controls">
-          <a
-            v-if="canCreatePipelineParsed"
-            :href="newPipelinePath"
-            class="btn btn-create">
-            Run Pipeline
-          </a>
-
-          <a
-            v-if="!hasCi"
-            :href="helpPagePath"
-            class="btn btn-info">
-            Get started with Pipelines
-          </a>
-
-          <a
-            :href="ciLintPath"
-            class="btn btn-default">
-            CI Lint
-          </a>
-        </div>
-      </div>
-
-      <div class="pipelines realtime-loading"
-        v-if="pageRequest">
-        <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
-      </div>
-
-      <div v-if="shouldRenderEmptyState"
-        class="row empty-state">
-        <div class="col-xs-12 pull-right">
-          <div class="svg-content">
-            ${pipelinesEmptyStateSVG}
-          </div>
-        </div>
-
-        <div class="col-xs-12 center">
-          <div class="text-content">
-            <h4>Build with confidence</h4>
-            <p>
-              Continous Integration can help catch bugs by running your tests automatically,
-              while Continuous Deployment can help you deliver code to your product environment.
-              <a :href="helpPagePath" class="btn btn-info">
-                Get started with Pipelines
+            <li :class="{ 'active': scope === null || scope === 'all'}">
+              <a :href="allPath">
+                All
               </a>
-            </p>
+              <span class="badge js-totalbuilds-count">
+                {{count.all}}
+              </span>
+            </li>
+            <li
+              class="js-pipelines-tab-pending"
+              :class="{ 'active': scope === 'pending'}">
+              <a :href="pendingPath">
+                Pending
+              </a>
+
+              <span class="badge">
+                {{count.pending}}
+              </span>
+            </li>
+            <li
+              class="js-pipelines-tab-running"
+              :class="{ 'active': scope === 'running'}">
+
+              <a :href="runningPath">
+                Running
+              </a>
+
+              <span class="badge">
+                {{count.running}}
+              </span>
+            </li>
+
+            <li
+              class="js-pipelines-tab-finished"
+              :class="{ 'active': scope === 'finished'}">
+
+              <a :href="finishedPath">
+                Finished
+              </a>
+              <span class="badge">
+                {{count.finished}}
+              </span>
+            </li>
+
+            <li
+            class="js-pipelines-tab-branches"
+            :class="{ 'active': scope === 'branches'}">
+              <a :href="branchesPath">Branches</a>
+            </li>
+
+            <li
+              class="js-pipelines-tab-tags"
+              :class="{ 'active': scope === 'tags'}">
+              <a :href="tagsPath">Tags</a>
+            </li>
+          </ul>
+
+          <div class="nav-controls">
+            <a
+              v-if="canCreatePipelineParsed"
+              :href="newPipelinePath"
+              class="btn btn-create">
+              Run Pipeline
+            </a>
+          </div>
+
+        <div class="pipelines realtime-loading"
+          v-if="pageRequest">
+          <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+        </div>
+
+        <div v-if="shouldRenderEmptyState"
+          class="row empty-state">
+          <div class="col-xs-12 pull-right">
+            <div class="svg-content">
+              ${pipelinesEmptyStateSVG}
+            </div>
+          </div>
+
+          <div class="col-xs-12 center">
+            <div class="text-content">
+              <h4>Build with confidence</h4>
+              <p>
+                Continous Integration can help catch bugs by running your tests automatically,
+                while Continuous Deployment can help you deliver code to your product environment.
+                <a :href="helpPagePath" class="btn btn-info">
+                  Get started with Pipelines
+                </a>
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
       <div v-if="shouldRenderErrorState"
         class="row empty-state">
@@ -267,6 +193,6 @@ export default {
         :change="change"
         :count="count.all"
         :pageInfo="pageInfo"/>
-  </div>
+    </div>
   `,
 };
