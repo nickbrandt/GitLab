@@ -28,6 +28,8 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream"
 
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 )
 
@@ -645,6 +647,80 @@ func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 	}
 }
 
+func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
+	apiResponse := gitOkBody(t)
+
+	gitalyServer, socketPath := startGitalyServer(t)
+	defer gitalyServer.Stop()
+
+	apiResponse.GitalySocketPath = socketPath
+	ts := testAuthServer(nil, 200, apiResponse)
+	defer ts.Close()
+
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	resource := "/gitlab-org/gitlab-test.git/git-receive-pack"
+	resp, err := http.Post(
+		ws.URL+resource,
+		"application/x-git-receive-pack-request",
+		bytes.NewReader(testhelper.GitalyReceivePackResponseMock),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	responseBody, err := ioutil.ReadAll(resp.Body)
+
+	assert.NoError(t, err)
+	testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-receive-pack-result")
+
+	if resp.StatusCode != 200 {
+		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
+	}
+
+	if string(responseBody) != apiResponse.RepoPath+apiResponse.GL_ID+string(testhelper.GitalyReceivePackResponseMock) {
+		t.Errorf("GET %q: Unexpected response", resource)
+	}
+}
+
+func TestPostUploadPackProxiedToGitalySuccessfully(t *testing.T) {
+	apiResponse := gitOkBody(t)
+
+	gitalyServer, socketPath := startGitalyServer(t)
+	defer gitalyServer.Stop()
+
+	apiResponse.GitalySocketPath = socketPath
+	ts := testAuthServer(nil, 200, apiResponse)
+	defer ts.Close()
+
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	resource := "/gitlab-org/gitlab-test.git/git-upload-pack"
+	resp, err := http.Post(
+		ws.URL+resource,
+		"application/x-git-upload-pack-request",
+		bytes.NewReader(testhelper.GitalyUploadPackResponseMock),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	responseBody, err := ioutil.ReadAll(resp.Body)
+
+	assert.NoError(t, err)
+	testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-upload-pack-result")
+
+	if resp.StatusCode != 200 {
+		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
+	}
+
+	if string(responseBody) != apiResponse.RepoPath+string(testhelper.GitalyUploadPackResponseMock) {
+		t.Errorf("GET %q: Unexpected response", resource)
+	}
+}
+
 func TestGetInfoRefsHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 	gitalyServer, _ := startGitalyServer(t)
 	defer gitalyServer.Stop()
@@ -674,6 +750,68 @@ func TestGetInfoRefsHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 
 	expectedContent := testhelper.GitalyInfoRefsResponseMock
 	if bytes.Contains(responseBody, []byte(expectedContent)) {
+		t.Errorf("GET %q: request should not have been proxied to Gitaly", resource)
+	}
+}
+
+func TestPostReceivePackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
+	gitalyServer, _ := startGitalyServer(t)
+	defer gitalyServer.Stop()
+
+	apiResponse := gitOkBody(t)
+	apiResponse.GitalySocketPath = ""
+	ts := testAuthServer(nil, 200, apiResponse)
+	defer ts.Close()
+
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	resource := "/gitlab-org/gitlab-test.git/git-receive-pack"
+	payload := []byte("This payload should not reach Gitaly")
+	resp, err := http.Post(ws.URL+resource, "application/x-git-receive-pack-request", bytes.NewReader(payload))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	responseBody, err := ioutil.ReadAll(resp.Body)
+	assert.NoError(t, err)
+
+	if resp.StatusCode != 200 {
+		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
+	}
+
+	if bytes.Contains(responseBody, payload) {
+		t.Errorf("GET %q: request should not have been proxied to Gitaly", resource)
+	}
+}
+
+func TestPostUploadPackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
+	gitalyServer, _ := startGitalyServer(t)
+	defer gitalyServer.Stop()
+
+	apiResponse := gitOkBody(t)
+	apiResponse.GitalySocketPath = ""
+	ts := testAuthServer(nil, 200, apiResponse)
+	defer ts.Close()
+
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	resource := "/gitlab-org/gitlab-test.git/git-upload-pack"
+	payload := []byte("This payload should not reach Gitaly")
+	resp, err := http.Post(ws.URL+resource, "application/x-git-upload-pack-request", bytes.NewReader(payload))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	responseBody, err := ioutil.ReadAll(resp.Body)
+	assert.NoError(t, err)
+
+	if resp.StatusCode != 200 {
+		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
+	}
+
+	if bytes.Contains(responseBody, payload) {
 		t.Errorf("GET %q: request should not have been proxied to Gitaly", resource)
 	}
 }
