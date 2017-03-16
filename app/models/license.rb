@@ -96,7 +96,7 @@ class License < ActiveRecord::Base
   end
 
   def previous_user_count
-    restricted_attr(:previous_user_count)
+    restricted_attr(:previous_users_count)
   end
 
   def validate_with_trueup?

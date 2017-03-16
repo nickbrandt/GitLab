@@ -93,7 +93,7 @@ describe License do
         def set_restrictions(opts)
           gl_license.restrictions = {
             active_user_count: opts[:restricted_user_count],
-            previous_user_count: opts[:previous_user_count],
+            previous_users_count: opts[:previous_users_count],
             trueup_quantity: opts[:trueup_quantity],
             trueup_from: (Date.today - 1.year).to_s,
             trueup_to: Date.today.to_s
@@ -148,7 +148,7 @@ describe License do
 
         context 'when previous user count is present' do
           before do
-            set_restrictions(restricted_user_count: 5, trueup_quantity: 6, previous_user_count: 4)
+            set_restrictions(restricted_user_count: 5, trueup_quantity: 6, previous_users_count: 4)
           end
 
           it 'uses it to calculate the expected true-up' do
