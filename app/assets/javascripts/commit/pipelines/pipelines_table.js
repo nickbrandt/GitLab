@@ -5,6 +5,7 @@ import PipelinesTableComponent from '../../vue_shared/components/pipelines_table
 import PipelinesService from '../../vue_pipelines_index/services/pipelines_service';
 import PipelineStore from '../../vue_pipelines_index/stores/pipelines_store';
 import eventHub from '../../vue_pipelines_index/event_hub';
+import ErrorState from '../../vue_pipelines_index/components/error_state';
 import '../../lib/utils/common_utils';
 import '../../vue_shared/vue_resource_interceptor';
 
@@ -22,6 +23,7 @@ import '../../vue_shared/vue_resource_interceptor';
 export default Vue.component('pipelines-table', {
   components: {
     'pipelines-table-component': PipelinesTableComponent,
+    'error-state': ErrorState,
   },
 
   /**
@@ -39,7 +41,14 @@ export default Vue.component('pipelines-table', {
       store,
       state: store.state,
       isLoading: false,
+      hasError: false,
     };
+  },
+
+  computed: {
+    shouldRenderErrorState() {
+      return this.hasError && !this.pageRequest;
+    },
   },
 
   /**
@@ -53,37 +62,26 @@ export default Vue.component('pipelines-table', {
   beforeMount() {
     this.service = new PipelinesService(this.endpoint);
 
-    this.fetchPipelines();
-
-    eventHub.$on('refreshPipelines', this.fetchPipelines);
+    this.isLoading = true;
+    return this.service.all()
+      .then(response => response.json())
+      .then((json) => {
+        // depending of the endpoint the response can either bring a `pipelines` key or not.
+        const pipelines = json.pipelines || json;
+        this.store.storePipelines(pipelines);
+        this.isLoading = false;
+      })
+      .catch(() => {
+        this.hasError = true;
+        this.isLoading = false;
+        new Flash('An error occurred while fetching the pipelines, please reload the page again.', 'alert');
+      });
   },
 
   beforeUpdate() {
     if (this.state.pipelines.length && this.$children) {
-      this.store.startTimeAgoLoops.call(this, Vue);
+      PipelineStore.startTimeAgoLoops.call(this, Vue);
     }
-  },
-
-  beforeDestroyed() {
-    eventHub.$off('refreshPipelines');
-  },
-
-  methods: {
-    fetchPipelines() {
-      this.isLoading = true;
-      return this.service.getPipelines()
-        .then(response => response.json())
-        .then((json) => {
-          // depending of the endpoint the response can either bring a `pipelines` key or not.
-          const pipelines = json.pipelines || json;
-          this.store.storePipelines(pipelines);
-          this.isLoading = false;
-        })
-        .catch(() => {
-          this.isLoading = false;
-          new Flash('An error occurred while fetching the pipelines, please reload the page again.');
-        });
-    },
   },
 
   template: `
@@ -99,11 +97,11 @@ export default Vue.component('pipelines-table', {
         </h2>
       </div>
 
+      <error-state v-if="shouldRenderErrorState" />
+
       <div class="table-holder pipelines"
         v-if="!isLoading && state.pipelines.length > 0">
-        <pipelines-table-component
-          :pipelines="state.pipelines"
-          :service="service" />
+        <pipelines-table-component :pipelines="state.pipelines"/>
       </div>
     </div>
   `,
