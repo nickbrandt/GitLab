@@ -17,6 +17,6 @@ $(() => new Vue({
     'vue-pipelines': PipelinesComponent,
   },
   template: `
-    <vue-pipelines :store="store"/>
+    <vue-pipelines :store="store" />
   `,
 }));
