@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -38,7 +39,6 @@ const testProject = "group/test"
 
 var checkoutDir = path.Join(scratchDir, "test")
 var cacheDir = path.Join(scratchDir, "cache")
-var gitalySocketPath = path.Join(scratchDir, "gitaly.sock")
 
 func TestMain(m *testing.M) {
 	source := "https://gitlab.com/gitlab-org/gitlab-test.git"
@@ -59,6 +59,8 @@ func TestMain(m *testing.M) {
 		log.Printf("Test setup: failed to build executables: %v", err)
 		os.Exit(1)
 	}
+
+	defer gitaly.CloseConnections()
 
 	os.Exit(func() int {
 		defer cleanup()
@@ -594,14 +596,18 @@ func TestApiContentTypeBlock(t *testing.T) {
 }
 
 func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
-	gitalyServer := startGitalyServer(t)
-	defer func() {
-		gitalyServer.Stop()
-		gitaly.CloseConnections()
-	}()
-
 	apiResponse := gitOkBody(t)
 	repoPath := apiResponse.RepoPath
+
+	gitalyServer, socketPath := startGitalyServer(t)
+	defer gitalyServer.Stop()
+
+	apiResponse.GitalySocketPath = socketPath
+	ts := testAuthServer(nil, 200, apiResponse)
+	defer ts.Close()
+
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
 
 	for _, testCase := range []struct {
 		repoPath   string
@@ -613,7 +619,7 @@ func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 		func() {
 			apiResponse.RepoPath = testCase.repoPath
 			apiResponse.Repository = testCase.repository
-			apiResponse.GitalySocketPath = gitalySocketPath
+			apiResponse.GitalySocketPath = socketPath
 			ts := testAuthServer(nil, 200, apiResponse)
 			defer ts.Close()
 
@@ -640,11 +646,8 @@ func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 }
 
 func TestGetInfoRefsHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
-	gitalyServer := startGitalyServer(t)
-	defer func() {
-		gitalyServer.Stop()
-		gitaly.CloseConnections()
-	}()
+	gitalyServer, _ := startGitalyServer(t)
+	defer gitalyServer.Stop()
 
 	apiResponse := gitOkBody(t)
 	apiResponse.GitalySocketPath = ""
@@ -848,9 +851,10 @@ func startWorkhorseServerWithConfig(cfg *config.Config) *httptest.Server {
 	return httptest.NewServer(u)
 }
 
-func startGitalyServer(t *testing.T) *grpc.Server {
+func startGitalyServer(t *testing.T) (*grpc.Server, string) {
+	socketPath := path.Join(scratchDir, fmt.Sprintf("gitaly-%d.sock", rand.Int()))
 	server := grpc.NewServer()
-	listener, err := net.Listen("unix", gitalySocketPath)
+	listener, err := net.Listen("unix", socketPath)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -859,7 +863,7 @@ func startGitalyServer(t *testing.T) *grpc.Server {
 
 	go server.Serve(listener)
 
-	return server
+	return server, socketPath
 }
 
 func runOrFail(t *testing.T, cmd *exec.Cmd) {
