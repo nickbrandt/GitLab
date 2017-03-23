@@ -36,7 +36,7 @@ func handleGetInfoRefs(rw http.ResponseWriter, r *http.Request, a *api.Response)
 	}
 
 	if err != nil {
-		helper.LogError(r, fmt.Errorf("handleGetInfoRefs: %v", err))
+		helper.Fail500(w, r, fmt.Errorf("handleGetInfoRefs: %v", err))
 	}
 }
 
