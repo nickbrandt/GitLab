@@ -131,6 +131,34 @@ func TestDeniedClone(t *testing.T) {
 	}
 }
 
+func TestFailedCloneNoGitaly(t *testing.T) {
+	// Prepare clone directory
+	if err := os.RemoveAll(scratchDir); err != nil {
+		t.Fatal(err)
+	}
+
+	authBody := &api.Response{
+		GL_ID:    "user-123",
+		RepoPath: repoPath(t),
+		// This will create a failure to connect to Gitaly
+		GitalySocketPath: "/nonexistent",
+	}
+
+	// Prepare test server and backend
+	ts := testAuthServer(nil, 200, authBody)
+	defer ts.Close()
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	// Do the git clone
+	cloneCmd := exec.Command("git", "clone", fmt.Sprintf("%s/%s", ws.URL, testRepo), checkoutDir)
+	out, err := cloneCmd.CombinedOutput()
+	t.Logf("%s", out)
+	if err == nil {
+		t.Fatal("git clone should have failed")
+	}
+}
+
 func TestAllowedPush(t *testing.T) {
 	preparePushRepo(t)
 
