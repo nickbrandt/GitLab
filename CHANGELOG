@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v1.4.2
+
+- Return 500 from GET /info/refs if possible !145
+
 v1.4.1
 
 - Fix several Redis integration bugs !137, !140
