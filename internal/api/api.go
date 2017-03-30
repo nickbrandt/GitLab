@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
+	pb "gitlab.com/gitlab-org/gitaly-proto/go"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
@@ -90,6 +91,9 @@ type Response struct {
 	Terminal *TerminalSettings
 	// Path to Gitaly Socket
 	GitalySocketPath string
+	// Repository object for making gRPC requests to Gitaly. This will
+	// eventually replace the RepoPath field.
+	Repository pb.Repository
 }
 
 // singleJoiningSlash is taken from reverseproxy.go:NewSingleHostReverseProxy
@@ -207,6 +211,14 @@ func (api *API) PreAuthorize(suffix string, r *http.Request) (httpResponse *http
 	// response body.
 	if err := json.NewDecoder(httpResponse.Body).Decode(authResponse); err != nil {
 		return httpResponse, nil, fmt.Errorf("preAuthorizeHandler: decode authorization response: %v", err)
+	}
+
+	// This is for backwards compatiblity, can be depracated when Rails
+	// always sends a 'Repository' message. For the time being we cannot
+	// count on this, so we put some minimal data in the Repository struct.
+
+	if authResponse.Repository.Path == "" {
+		authResponse.Repository.Path = authResponse.RepoPath
 	}
 
 	return httpResponse, authResponse, nil
