@@ -595,7 +595,6 @@ func TestApiContentTypeBlock(t *testing.T) {
 
 func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 	apiResponse := gitOkBody(t)
-	apiResponse.GitalyResourcePath = "/projects/1/git-http/info-refs"
 
 	gitalyServer := startGitalyServer(t)
 	defer func() {
