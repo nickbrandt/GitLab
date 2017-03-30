@@ -42,6 +42,12 @@
 			"revision": "8ee79997227bf9b34611aee7946ae64735e6fd93"
 		},
 		{
+			"checksumSHA1": "sfoot+dHmmOgWZS6GJ5X79ClZM0=",
+			"path": "github.com/golang/protobuf/ptypes/timestamp",
+			"revision": "c9c7427a2a70d2eb3bafa0ab2dc163e45f143317",
+			"revisionTime": "2017-03-07T00:15:33Z"
+		},
+		{
 			"checksumSHA1": "SmBqqqR0T+1Ksx5zwCl295Vey0s=",
 			"comment": "v1.0.0-39-ge8f0f8a",
 			"path": "github.com/gorilla/websocket",
@@ -122,20 +128,20 @@
 			"revisionTime": "2016-11-17T07:43:51Z"
 		},
 		{
-			"checksumSHA1": "HWuFvDMQ5zp554X4QpVjBUgW5wk=",
+			"checksumSHA1": "qnITGZYkVMWqbOeVVt6jMKJ544M=",
 			"path": "gitlab.com/gitlab-org/gitaly-proto/go",
-			"revision": "84b3ffd032eea7af8df96fb9d7bdc100dac2c569",
-			"revisionTime": "2017-02-27T16:43:55Z",
-			"version": "v0.3.0",
-			"versionExact": "v0.3.0"
+			"revision": "52f77b23166e640a932e50223472d761404afb42",
+			"revisionTime": "2017-03-29T16:52:58Z",
+			"version": "v0.5.0",
+			"versionExact": "v0.5.0"
 		},
 		{
 			"checksumSHA1": "2E36lBoyaVky2EJP1E5ub6Rg+uI=",
 			"path": "gitlab.com/gitlab-org/gitaly-proto/go/helper",
-			"revision": "84b3ffd032eea7af8df96fb9d7bdc100dac2c569",
-			"revisionTime": "2017-02-27T16:43:55Z",
-			"version": "v0.3.0",
-			"versionExact": "v0.3.0"
+			"revision": "52f77b23166e640a932e50223472d761404afb42",
+			"revisionTime": "2017-03-29T16:52:58Z",
+			"version": "v0.5.0",
+			"versionExact": "v0.5.0"
 		},
 		{
 			"checksumSHA1": "9jjO5GjLa0XF/nfWihF02RoH4qc=",

@@ -67,7 +67,7 @@ func handleGetInfoRefsWithGitaly(w http.ResponseWriter, a *api.Response, rpc str
 		return fmt.Errorf("GetInfoRefsHandler: %v", err)
 	}
 
-	infoRefsResponseWriter, err := smarthttp.InfoRefsResponseWriterTo(a.RepoPath, rpc)
+	infoRefsResponseWriter, err := smarthttp.InfoRefsResponseWriterTo(&a.Repository, rpc)
 	if err != nil {
 		return fmt.Errorf("GetInfoRefsHandler: %v", err)
 	}

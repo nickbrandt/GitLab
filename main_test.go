@@ -594,36 +594,48 @@ func TestApiContentTypeBlock(t *testing.T) {
 }
 
 func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
-	apiResponse := gitOkBody(t)
-	apiResponse.GitalyResourcePath = "/projects/1/git-http/info-refs"
-
 	gitalyServer := startGitalyServer(t)
 	defer func() {
 		gitalyServer.Stop()
 		gitaly.CloseConnections()
 	}()
 
-	apiResponse.GitalySocketPath = gitalySocketPath
-	ts := testAuthServer(nil, 200, apiResponse)
-	defer ts.Close()
+	apiResponse := gitOkBody(t)
+	repoPath := apiResponse.RepoPath
 
-	ws := startWorkhorseServer(ts.URL)
-	defer ws.Close()
+	for _, testCase := range []struct {
+		repoPath   string
+		repository pb.Repository
+	}{
+		{repoPath: repoPath},
+		{repoPath: repoPath, repository: pb.Repository{Path: repoPath, StorageName: "foobar", RelativePath: "baz.git"}},
+	} {
+		func() {
+			apiResponse.RepoPath = testCase.repoPath
+			apiResponse.Repository = testCase.repository
+			apiResponse.GitalySocketPath = gitalySocketPath
+			ts := testAuthServer(nil, 200, apiResponse)
+			defer ts.Close()
 
-	resource := "/gitlab-org/gitlab-test.git/info/refs?service=git-upload-pack"
-	resp, err := http.Get(ws.URL + resource)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer resp.Body.Close()
-	responseBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Error(err)
-	}
+			ws := startWorkhorseServer(ts.URL)
+			defer ws.Close()
 
-	expectedContent := testhelper.GitalyInfoRefsResponseMock
-	if !bytes.Equal(responseBody, []byte(expectedContent)) {
-		t.Errorf("GET %q: Expected %q, got %q", resource, expectedContent, responseBody)
+			resource := "/gitlab-org/gitlab-test.git/info/refs?service=git-upload-pack"
+			resp, err := http.Get(ws.URL + resource)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer resp.Body.Close()
+			responseBody, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				t.Error(err)
+			}
+
+			expectedContent := testhelper.GitalyInfoRefsResponseMock
+			if !bytes.Equal(responseBody, []byte(expectedContent)) {
+				t.Errorf("GET %q: Expected %q, got %q", resource, expectedContent, responseBody)
+			}
+		}()
 	}
 }
 
