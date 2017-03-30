@@ -25,3 +25,7 @@ func (s *GitalyTestServer) InfoRefsReceivePack(in *pb.InfoRefsRequest, stream pb
 	}
 	return stream.Send(response)
 }
+
+// TODO replace these empty implementations
+func (*GitalyTestServer) PostUploadPack(pb.SmartHTTP_PostUploadPackServer) error   { return nil }
+func (*GitalyTestServer) PostReceivePack(pb.SmartHTTP_PostReceivePackServer) error { return nil }
