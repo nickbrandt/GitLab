@@ -13,8 +13,8 @@ type SmartHTTPClient struct {
 	pb.SmartHTTPClient
 }
 
-func (client *SmartHTTPClient) InfoRefsResponseWriterTo(repo pb.Repository, rpc string) (io.WriterTo, error) {
-	rpcRequest := &pb.InfoRefsRequest{Repository: &repo}
+func (client *SmartHTTPClient) InfoRefsResponseWriterTo(repo *pb.Repository, rpc string) (io.WriterTo, error) {
+	rpcRequest := &pb.InfoRefsRequest{Repository: repo}
 	var c pbhelper.InfoRefsClient
 	var err error
 
