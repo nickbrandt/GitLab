@@ -20,7 +20,7 @@ func handleReceivePack(w *GitHttpResponseWriter, r *http.Request, a *api.Respons
 	defer cw.Flush()
 
 	var err error
-	if a.GitalySocketPath == "" {
+	if a.GitalyAddress == "" {
 		err = handleReceivePackLocally(a, r, cr, cw, action)
 	} else {
 		err = handleReceivePackWithGitaly(a, cr, cw)
@@ -46,7 +46,7 @@ func handleReceivePackLocally(a *api.Response, r *http.Request, stdin io.Reader,
 }
 
 func handleReceivePackWithGitaly(a *api.Response, clientRequest io.Reader, clientResponse io.Writer) error {
-	smarthttp, err := gitaly.NewSmartHTTPClient(a.GitalySocketPath)
+	smarthttp, err := gitaly.NewSmartHTTPClient(a.GitalyAddress)
 	if err != nil {
 		return fmt.Errorf("smarthttp.ReceivePack: %v", err)
 	}
