@@ -110,13 +110,13 @@ func testServingThePregzippedFile(t *testing.T, enableGzip bool) {
 	st.ServeExisting("/", CacheDisabled, nil).ServeHTTP(w, httpRequest)
 	testhelper.AssertResponseCode(t, w, 200)
 	if enableGzip {
-		testhelper.AssertResponseHeader(t, w, "Content-Encoding", "gzip")
+		testhelper.AssertResponseWriterHeader(t, w, "Content-Encoding", "gzip")
 		if bytes.Compare(w.Body.Bytes(), fileGzipContent.Bytes()) != 0 {
 			t.Error("We should serve the pregzipped file")
 		}
 	} else {
 		testhelper.AssertResponseCode(t, w, 200)
-		testhelper.AssertResponseHeader(t, w, "Content-Encoding")
+		testhelper.AssertResponseWriterHeader(t, w, "Content-Encoding")
 		if w.Body.String() != fileContent {
 			t.Error("We should serve the file: ", w.Body.String())
 		}

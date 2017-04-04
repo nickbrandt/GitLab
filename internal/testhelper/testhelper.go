@@ -71,9 +71,19 @@ func AssertResponseBodyRegexp(t *testing.T, response *httptest.ResponseRecorder,
 	}
 }
 
-func AssertResponseHeader(t *testing.T, w http.ResponseWriter, header string, expected ...string) {
+func AssertResponseWriterHeader(t *testing.T, w http.ResponseWriter, header string, expected ...string) {
 	actual := w.Header()[http.CanonicalHeaderKey(header)]
 
+	assertHeaderExists(t, header, actual, expected)
+}
+
+func AssertResponseHeader(t *testing.T, w *http.Response, header string, expected ...string) {
+	actual := w.Header[http.CanonicalHeaderKey(header)]
+
+	assertHeaderExists(t, header, actual, expected)
+}
+
+func assertHeaderExists(t *testing.T, header string, actual, expected []string) {
 	if len(expected) != len(actual) {
 		t.Fatalf("for HTTP request expected to receive the header %q with %+v, got %+v", header, expected, actual)
 	}

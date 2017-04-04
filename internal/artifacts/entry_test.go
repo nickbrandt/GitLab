@@ -57,10 +57,10 @@ func TestDownloadingFromValidArchive(t *testing.T) {
 
 	testhelper.AssertResponseCode(t, response, 200)
 
-	testhelper.AssertResponseHeader(t, response,
+	testhelper.AssertResponseWriterHeader(t, response,
 		"Content-Type",
 		"text/plain; charset=utf-8")
-	testhelper.AssertResponseHeader(t, response,
+	testhelper.AssertResponseWriterHeader(t, response,
 		"Content-Disposition",
 		"attachment; filename=\"test.txt\"")
 

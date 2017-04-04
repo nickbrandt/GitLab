@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
@@ -22,15 +24,25 @@ func handleUploadPack(w *GitHttpResponseWriter, r *http.Request, a *api.Response
 	defer buffer.Close()
 	r.Body.Close()
 
-	isShallowClone := scanDeepen(buffer)
-	if _, err := buffer.Seek(0, 0); err != nil {
-		return fmt.Errorf("seek tempfile: %v", err)
-	}
-
 	action := getService(r)
 	writePostRPCHeader(w, action)
 
-	cmd, err := startGitCommand(a, buffer, w, action)
+	if a.GitalySocketPath == "" {
+		err = handleUploadPackLocally(a, r, buffer, w, action)
+	} else {
+		err = handleUploadPackWithGitaly(a, buffer, w)
+	}
+
+	return err
+}
+
+func handleUploadPackLocally(a *api.Response, r *http.Request, stdin *os.File, stdout io.Writer, action string) error {
+	isShallowClone := scanDeepen(stdin)
+	if _, err := stdin.Seek(0, 0); err != nil {
+		return fmt.Errorf("seek tempfile: %v", err)
+	}
+
+	cmd, err := startGitCommand(a, stdin, stdout, action)
 	if err != nil {
 		return fmt.Errorf("startGitCommand: %v", err)
 	}
@@ -40,6 +52,19 @@ func handleUploadPack(w *GitHttpResponseWriter, r *http.Request, a *api.Response
 		helper.LogError(r, fmt.Errorf("wait for %v: %v", cmd.Args, err))
 		// Return nil because the response body has been written to already.
 		return nil
+	}
+
+	return nil
+}
+
+func handleUploadPackWithGitaly(a *api.Response, clientRequest io.Reader, clientResponse io.Writer) error {
+	smarthttp, err := gitaly.NewSmartHTTPClient(a.GitalySocketPath)
+	if err != nil {
+		return fmt.Errorf("smarthttp.UploadPack: %v", err)
+	}
+
+	if err := smarthttp.UploadPack(a, clientRequest, clientResponse); err != nil {
+		return fmt.Errorf("smarthttp.UploadPack: %v", err)
 	}
 
 	return nil
