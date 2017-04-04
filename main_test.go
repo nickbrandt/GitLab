@@ -604,46 +604,60 @@ func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 	gitalyServer, socketPath := startGitalyServer(t)
 	defer gitalyServer.Stop()
 
-	apiResponse.GitalySocketPath = socketPath
-	ts := testAuthServer(nil, 200, apiResponse)
-	defer ts.Close()
+	gitalyAddress := "unix://" + socketPath
 
-	ws := startWorkhorseServer(ts.URL)
-	defer ws.Close()
+	addressCases := []struct {
+		socketPath string
+		address    string
+	}{
+		{socketPath: "/nonexistent,/should/be/ignored", address: gitalyAddress},
+		{socketPath: socketPath},
+	}
 
-	for _, testCase := range []struct {
+	repoCases := []struct {
 		repoPath   string
 		repository pb.Repository
 	}{
-		{repoPath: repoPath},
-		{repoPath: repoPath, repository: pb.Repository{Path: repoPath, StorageName: "foobar", RelativePath: "baz.git"}},
-	} {
-		func() {
-			apiResponse.RepoPath = testCase.repoPath
-			apiResponse.Repository = testCase.repository
-			apiResponse.GitalySocketPath = socketPath
-			ts := testAuthServer(nil, 200, apiResponse)
-			defer ts.Close()
+		{
+			repoPath: repoPath,
+		},
+		{
+			repoPath:   repoPath,
+			repository: pb.Repository{Path: repoPath, StorageName: "foobar", RelativePath: "baz.git"},
+		},
+	}
 
-			ws := startWorkhorseServer(ts.URL)
-			defer ws.Close()
+	for _, ac := range addressCases {
+		for _, rc := range repoCases {
+			func() {
+				apiResponse.RepoPath = rc.repoPath
+				apiResponse.Repository = rc.repository
+				apiResponse.GitalySocketPath = ac.socketPath
+				apiResponse.GitalyAddress = ac.address
 
-			resource := "/gitlab-org/gitlab-test.git/info/refs?service=git-upload-pack"
-			resp, err := http.Get(ws.URL + resource)
-			if err != nil {
-				t.Fatal(err)
-			}
-			defer resp.Body.Close()
-			responseBody, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				t.Error(err)
-			}
+				ts := testAuthServer(nil, 200, apiResponse)
+				defer ts.Close()
 
-			expectedContent := testhelper.GitalyInfoRefsResponseMock
-			if !bytes.Equal(responseBody, []byte(expectedContent)) {
-				t.Errorf("GET %q: Expected %q, got %q", resource, expectedContent, responseBody)
-			}
-		}()
+				ws := startWorkhorseServer(ts.URL)
+				defer ws.Close()
+
+				resource := "/gitlab-org/gitlab-test.git/info/refs?service=git-upload-pack"
+				resp, err := http.Get(ws.URL + resource)
+				if err != nil {
+					t.Fatal(err)
+				}
+				defer resp.Body.Close()
+				responseBody, err := ioutil.ReadAll(resp.Body)
+				if err != nil {
+					t.Error(err)
+				}
+
+				expectedContent := testhelper.GitalyInfoRefsResponseMock
+				if !bytes.Equal(responseBody, []byte(expectedContent)) {
+					t.Errorf("GET %q: Expected %q, got %q", resource, expectedContent, responseBody)
+				}
+			}()
+		}
 	}
 }
 
@@ -653,7 +667,7 @@ func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
 	gitalyServer, socketPath := startGitalyServer(t)
 	defer gitalyServer.Stop()
 
-	apiResponse.GitalySocketPath = socketPath
+	apiResponse.GitalyAddress = "unix://" + socketPath
 	ts := testAuthServer(nil, 200, apiResponse)
 	defer ts.Close()
 
@@ -690,7 +704,7 @@ func TestPostUploadPackProxiedToGitalySuccessfully(t *testing.T) {
 	gitalyServer, socketPath := startGitalyServer(t)
 	defer gitalyServer.Stop()
 
-	apiResponse.GitalySocketPath = socketPath
+	apiResponse.GitalyAddress = "unix://" + socketPath
 	ts := testAuthServer(nil, 200, apiResponse)
 	defer ts.Close()
 

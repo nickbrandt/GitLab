@@ -29,7 +29,7 @@ func handleGetInfoRefs(rw http.ResponseWriter, r *http.Request, a *api.Response)
 	w.Header().Set("Cache-Control", "no-cache")
 
 	var err error
-	if a.GitalySocketPath == "" {
+	if a.GitalyAddress == "" {
 		err = handleGetInfoRefsLocally(w, a, rpc)
 	} else {
 		err = handleGetInfoRefsWithGitaly(w, a, rpc)
@@ -62,7 +62,7 @@ func handleGetInfoRefsLocally(w http.ResponseWriter, a *api.Response, rpc string
 }
 
 func handleGetInfoRefsWithGitaly(w http.ResponseWriter, a *api.Response, rpc string) error {
-	smarthttp, err := gitaly.NewSmartHTTPClient(a.GitalySocketPath)
+	smarthttp, err := gitaly.NewSmartHTTPClient(a.GitalyAddress)
 	if err != nil {
 		return fmt.Errorf("GetInfoRefsHandler: %v", err)
 	}
