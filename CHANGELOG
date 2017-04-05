@@ -2,6 +2,12 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v1.4.3
+
+- Support forwarding Git HTTP POST data to Gitaly !143
+- Pass more Gitaly 'Repository' fields on from gitlab-rails !147
+- Support insecure TCP connections to Gitaly !150
+
 v1.4.2
 
 - Return 500 from GET /info/refs if possible !145
