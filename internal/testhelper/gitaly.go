@@ -1,10 +1,12 @@
 package testhelper
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"path"
+	"strings"
 
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
 )
@@ -31,6 +33,10 @@ func NewGitalyServer() *GitalyTestServer {
 }
 
 func (s *GitalyTestServer) InfoRefsUploadPack(in *pb.InfoRefsRequest, stream pb.SmartHTTP_InfoRefsUploadPackServer) error {
+	if err := validateRepository(in.GetRepository()); err != nil {
+		return err
+	}
+
 	response := &pb.InfoRefsResponse{
 		Data: []byte(GitalyInfoRefsResponseMock),
 	}
@@ -38,6 +44,10 @@ func (s *GitalyTestServer) InfoRefsUploadPack(in *pb.InfoRefsRequest, stream pb.
 }
 
 func (s *GitalyTestServer) InfoRefsReceivePack(in *pb.InfoRefsRequest, stream pb.SmartHTTP_InfoRefsReceivePackServer) error {
+	if err := validateRepository(in.GetRepository()); err != nil {
+		return err
+	}
+
 	response := &pb.InfoRefsResponse{
 		Data: []byte(GitalyInfoRefsResponseMock),
 	}
@@ -50,8 +60,17 @@ func (s *GitalyTestServer) PostReceivePack(stream pb.SmartHTTP_PostReceivePackSe
 		return err
 	}
 
+	repo := req.GetRepository()
+	if err := validateRepository(req.GetRepository()); err != nil {
+		return err
+	}
 	response := &pb.PostReceivePackResponse{
-		Data: []byte(req.Repository.GetPath() + req.GlId),
+		Data: []byte(strings.Join([]string{
+			repo.GetPath(),
+			repo.GetStorageName(),
+			repo.GetRelativePath(),
+			req.GlId,
+		}, "\000") + "\000"),
 	}
 	if err := stream.Send(response); err != nil {
 		return err
@@ -84,8 +103,16 @@ func (s *GitalyTestServer) PostUploadPack(stream pb.SmartHTTP_PostUploadPackServ
 		return err
 	}
 
+	repo := req.GetRepository()
+	if err := validateRepository(req.GetRepository()); err != nil {
+		return err
+	}
 	response := &pb.PostUploadPackResponse{
-		Data: []byte(req.Repository.GetPath()),
+		Data: []byte(strings.Join([]string{
+			repo.GetPath(),
+			repo.GetStorageName(),
+			repo.GetRelativePath(),
+		}, "\000") + "\000"),
 	}
 	if err := stream.Send(response); err != nil {
 		return err
@@ -109,5 +136,18 @@ func (s *GitalyTestServer) PostUploadPack(stream pb.SmartHTTP_PostUploadPackServ
 		}
 	}
 
+	return nil
+}
+
+func validateRepository(repo *pb.Repository) error {
+	if len(repo.GetPath()) == 0 {
+		return fmt.Errorf("missing path: %v", repo)
+	}
+	if len(repo.GetStorageName()) == 0 {
+		return fmt.Errorf("missing storage_name: %v", repo)
+	}
+	if len(repo.GetRelativePath()) == 0 {
+		return fmt.Errorf("missing relative_path: %v", repo)
+	}
 	return nil
 }

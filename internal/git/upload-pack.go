@@ -63,7 +63,7 @@ func handleUploadPackWithGitaly(a *api.Response, clientRequest io.Reader, client
 		return fmt.Errorf("smarthttp.UploadPack: %v", err)
 	}
 
-	if err := smarthttp.UploadPack(a, clientRequest, clientResponse); err != nil {
+	if err := smarthttp.UploadPack(&a.Repository, clientRequest, clientResponse); err != nil {
 		return fmt.Errorf("smarthttp.UploadPack: %v", err)
 	}
 
