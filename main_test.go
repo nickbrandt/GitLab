@@ -145,7 +145,7 @@ func TestFailedCloneNoGitaly(t *testing.T) {
 		GL_ID:    "user-123",
 		RepoPath: repoPath(t),
 		// This will create a failure to connect to Gitaly
-		GitalySocketPath: "/nonexistent",
+		GitalyAddress: "unix:/nonexistent",
 	}
 
 	// Prepare test server and backend
@@ -603,43 +603,30 @@ func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 	defer gitalyServer.Stop()
 
 	gitalyAddress := "unix://" + socketPath
+	apiResponse.GitalyAddress = gitalyAddress
 
-	addressCases := []struct {
-		socketPath string
-		address    string
-	}{
-		{socketPath: "/nonexistent,/should/be/ignored", address: gitalyAddress},
-		{socketPath: socketPath},
+	ts := testAuthServer(nil, 200, apiResponse)
+	defer ts.Close()
+
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	resource := "/gitlab-org/gitlab-test.git/info/refs?service=git-upload-pack"
+	resp, err := http.Get(ws.URL + resource)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	responseBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Error(err)
 	}
 
-	for _, ac := range addressCases {
-		func() {
-			apiResponse.GitalySocketPath = ac.socketPath
-			apiResponse.GitalyAddress = ac.address
-
-			ts := testAuthServer(nil, 200, apiResponse)
-			defer ts.Close()
-
-			ws := startWorkhorseServer(ts.URL)
-			defer ws.Close()
-
-			resource := "/gitlab-org/gitlab-test.git/info/refs?service=git-upload-pack"
-			resp, err := http.Get(ws.URL + resource)
-			if err != nil {
-				t.Fatal(err)
-			}
-			defer resp.Body.Close()
-			responseBody, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				t.Error(err)
-			}
-
-			expectedContent := testhelper.GitalyInfoRefsResponseMock
-			if !bytes.Equal(responseBody, []byte(expectedContent)) {
-				t.Errorf("GET %q: Expected %q, got %q", resource, expectedContent, responseBody)
-			}
-		}()
+	expectedContent := testhelper.GitalyInfoRefsResponseMock
+	if !bytes.Equal(responseBody, []byte(expectedContent)) {
+		t.Errorf("GET %q: Expected %q, got %q", resource, expectedContent, responseBody)
 	}
+
 }
 
 func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
@@ -733,7 +720,7 @@ func TestGetInfoRefsHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 	defer gitalyServer.Stop()
 
 	apiResponse := gitOkBody(t)
-	apiResponse.GitalySocketPath = ""
+	apiResponse.GitalyAddress = ""
 	ts := testAuthServer(nil, 200, apiResponse)
 	defer ts.Close()
 
@@ -766,7 +753,7 @@ func TestPostReceivePackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 	defer gitalyServer.Stop()
 
 	apiResponse := gitOkBody(t)
-	apiResponse.GitalySocketPath = ""
+	apiResponse.GitalyAddress = ""
 	ts := testAuthServer(nil, 200, apiResponse)
 	defer ts.Close()
 
@@ -797,7 +784,7 @@ func TestPostUploadPackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 	defer gitalyServer.Stop()
 
 	apiResponse := gitOkBody(t)
-	apiResponse.GitalySocketPath = ""
+	apiResponse.GitalyAddress = ""
 	ts := testAuthServer(nil, 200, apiResponse)
 	defer ts.Close()
 
