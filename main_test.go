@@ -145,7 +145,7 @@ func TestFailedCloneNoGitaly(t *testing.T) {
 		GL_ID:    "user-123",
 		RepoPath: repoPath(t),
 		// This will create a failure to connect to Gitaly
-		GitalySocketPath: "/nonexistent",
+		GitalyAddress: "unix:/nonexistent",
 	}
 
 	// Prepare test server and backend
@@ -599,66 +599,34 @@ func TestApiContentTypeBlock(t *testing.T) {
 
 func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 	apiResponse := gitOkBody(t)
-	repoPath := apiResponse.RepoPath
-
 	gitalyServer, socketPath := startGitalyServer(t)
 	defer gitalyServer.Stop()
 
 	gitalyAddress := "unix://" + socketPath
+	apiResponse.GitalyAddress = gitalyAddress
 
-	addressCases := []struct {
-		socketPath string
-		address    string
-	}{
-		{socketPath: "/nonexistent,/should/be/ignored", address: gitalyAddress},
-		{socketPath: socketPath},
+	ts := testAuthServer(nil, 200, apiResponse)
+	defer ts.Close()
+
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	resource := "/gitlab-org/gitlab-test.git/info/refs?service=git-upload-pack"
+	resp, err := http.Get(ws.URL + resource)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	responseBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Error(err)
 	}
 
-	repoCases := []struct {
-		repoPath   string
-		repository pb.Repository
-	}{
-		{
-			repoPath: repoPath,
-		},
-		{
-			repoPath:   repoPath,
-			repository: pb.Repository{Path: repoPath, StorageName: "foobar", RelativePath: "baz.git"},
-		},
+	expectedContent := testhelper.GitalyInfoRefsResponseMock
+	if !bytes.Equal(responseBody, []byte(expectedContent)) {
+		t.Errorf("GET %q: Expected %q, got %q", resource, expectedContent, responseBody)
 	}
 
-	for _, ac := range addressCases {
-		for _, rc := range repoCases {
-			func() {
-				apiResponse.RepoPath = rc.repoPath
-				apiResponse.Repository = rc.repository
-				apiResponse.GitalySocketPath = ac.socketPath
-				apiResponse.GitalyAddress = ac.address
-
-				ts := testAuthServer(nil, 200, apiResponse)
-				defer ts.Close()
-
-				ws := startWorkhorseServer(ts.URL)
-				defer ws.Close()
-
-				resource := "/gitlab-org/gitlab-test.git/info/refs?service=git-upload-pack"
-				resp, err := http.Get(ws.URL + resource)
-				if err != nil {
-					t.Fatal(err)
-				}
-				defer resp.Body.Close()
-				responseBody, err := ioutil.ReadAll(resp.Body)
-				if err != nil {
-					t.Error(err)
-				}
-
-				expectedContent := testhelper.GitalyInfoRefsResponseMock
-				if !bytes.Equal(responseBody, []byte(expectedContent)) {
-					t.Errorf("GET %q: Expected %q, got %q", resource, expectedContent, responseBody)
-				}
-			}()
-		}
-	}
 }
 
 func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
@@ -692,9 +660,15 @@ func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
 	if resp.StatusCode != 200 {
 		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
 	}
-
-	if string(responseBody) != apiResponse.RepoPath+apiResponse.GL_ID+string(testhelper.GitalyReceivePackResponseMock) {
-		t.Errorf("GET %q: Unexpected response", resource)
+	expectedResponse := strings.Join([]string{
+		apiResponse.RepoPath,
+		apiResponse.Repository.StorageName,
+		apiResponse.Repository.RelativePath,
+		apiResponse.GL_ID,
+		string(testhelper.GitalyReceivePackResponseMock),
+	}, "\000")
+	if string(responseBody) != expectedResponse {
+		t.Errorf("GET %q: Unexpected response %.100q", resource, responseBody)
 	}
 }
 
@@ -730,8 +704,14 @@ func TestPostUploadPackProxiedToGitalySuccessfully(t *testing.T) {
 		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
 	}
 
-	if string(responseBody) != apiResponse.RepoPath+string(testhelper.GitalyUploadPackResponseMock) {
-		t.Errorf("GET %q: Unexpected response", resource)
+	expected := strings.Join([]string{
+		apiResponse.RepoPath,
+		apiResponse.Repository.StorageName,
+		apiResponse.Repository.RelativePath,
+		string(testhelper.GitalyUploadPackResponseMock),
+	}, "\000")
+	if string(responseBody) != expected {
+		t.Errorf("GET %q: Unexpected response: %.100q", resource, responseBody)
 	}
 }
 
@@ -740,7 +720,7 @@ func TestGetInfoRefsHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 	defer gitalyServer.Stop()
 
 	apiResponse := gitOkBody(t)
-	apiResponse.GitalySocketPath = ""
+	apiResponse.GitalyAddress = ""
 	ts := testAuthServer(nil, 200, apiResponse)
 	defer ts.Close()
 
@@ -773,7 +753,7 @@ func TestPostReceivePackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 	defer gitalyServer.Stop()
 
 	apiResponse := gitOkBody(t)
-	apiResponse.GitalySocketPath = ""
+	apiResponse.GitalyAddress = ""
 	ts := testAuthServer(nil, 200, apiResponse)
 	defer ts.Close()
 
@@ -804,7 +784,7 @@ func TestPostUploadPackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 	defer gitalyServer.Stop()
 
 	apiResponse := gitOkBody(t)
-	apiResponse.GitalySocketPath = ""
+	apiResponse.GitalyAddress = ""
 	ts := testAuthServer(nil, 200, apiResponse)
 	defer ts.Close()
 
@@ -1027,9 +1007,15 @@ func runOrFail(t *testing.T, cmd *exec.Cmd) {
 }
 
 func gitOkBody(t *testing.T) *api.Response {
+	repoPath := repoPath(t)
 	return &api.Response{
 		GL_ID:    "user-123",
-		RepoPath: repoPath(t),
+		RepoPath: repoPath,
+		Repository: pb.Repository{
+			Path:         repoPath,
+			StorageName:  "default",
+			RelativePath: "foo/bar.git",
+		},
 	}
 }
 

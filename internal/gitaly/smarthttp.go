@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"io"
 
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
-
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
 	pbhelper "gitlab.com/gitlab-org/gitaly-proto/go/helper"
 
@@ -48,8 +46,7 @@ func (client *SmartHTTPClient) InfoRefsResponseWriterTo(repo *pb.Repository, rpc
 	return &pbhelper.InfoRefsClientWriterTo{c}, nil
 }
 
-func (client *SmartHTTPClient) ReceivePack(a *api.Response, clientRequest io.Reader, clientResponse io.Writer) error {
-	repo := &pb.Repository{Path: a.RepoPath}
+func (client *SmartHTTPClient) ReceivePack(repo *pb.Repository, GlId string, clientRequest io.Reader, clientResponse io.Writer) error {
 	stream, err := client.PostReceivePack(context.Background())
 	if err != nil {
 		return err
@@ -57,7 +54,7 @@ func (client *SmartHTTPClient) ReceivePack(a *api.Response, clientRequest io.Rea
 
 	rpcRequest := &pb.PostReceivePackRequest{
 		Repository: repo,
-		GlId:       a.GL_ID,
+		GlId:       GlId,
 	}
 
 	if err := stream.Send(rpcRequest); err != nil {
@@ -84,8 +81,7 @@ func (client *SmartHTTPClient) ReceivePack(a *api.Response, clientRequest io.Rea
 	return nil
 }
 
-func (client *SmartHTTPClient) UploadPack(a *api.Response, clientRequest io.Reader, clientResponse io.Writer) error {
-	repo := &pb.Repository{Path: a.RepoPath}
+func (client *SmartHTTPClient) UploadPack(repo *pb.Repository, clientRequest io.Reader, clientResponse io.Writer) error {
 	stream, err := client.PostUploadPack(context.Background())
 	if err != nil {
 		return err

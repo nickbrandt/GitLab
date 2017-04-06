@@ -89,8 +89,6 @@ type Response struct {
 	Entry string `json:"entry"`
 	// Used to communicate terminal session details
 	Terminal *TerminalSettings
-	// Path to Gitaly Socket (deprecated in favor of GitalyAddress)
-	GitalySocketPath string
 	// GitalyAddress is a unix:// or tcp:// address to reach a Gitaly service on
 	GitalyAddress string
 	// Repository object for making gRPC requests to Gitaly. This will
@@ -220,12 +218,6 @@ func (api *API) PreAuthorize(suffix string, r *http.Request) (httpResponse *http
 	// count on this, so we put some minimal data in the Repository struct.
 	if authResponse.Repository.Path == "" {
 		authResponse.Repository.Path = authResponse.RepoPath
-	}
-
-	if socketPath := authResponse.GitalySocketPath; socketPath != "" && authResponse.GitalyAddress == "" {
-		// We are transitioning away from the GitalySocketPath response field.
-		// Until all the new code is in place, keep backwards compatibility.
-		authResponse.GitalyAddress = "unix://" + socketPath
 	}
 
 	return httpResponse, authResponse, nil
