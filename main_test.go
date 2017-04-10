@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -16,6 +15,7 @@ import (
 	"os/exec"
 	"path"
 	"regexp"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -30,6 +30,7 @@ import (
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 )
 
@@ -72,9 +73,7 @@ func TestMain(m *testing.M) {
 
 func TestAllowedClone(t *testing.T) {
 	// Prepare clone directory
-	if err := os.RemoveAll(scratchDir); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, os.RemoveAll(scratchDir))
 
 	// Prepare test server and backend
 	ts := testAuthServer(nil, 200, gitOkBody(t))
@@ -94,9 +93,7 @@ func TestAllowedClone(t *testing.T) {
 
 func TestAllowedShallowClone(t *testing.T) {
 	// Prepare clone directory
-	if err := os.RemoveAll(scratchDir); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, os.RemoveAll(scratchDir))
 
 	// Prepare test server and backend
 	ts := testAuthServer(nil, 200, gitOkBody(t))
@@ -116,9 +113,7 @@ func TestAllowedShallowClone(t *testing.T) {
 
 func TestDeniedClone(t *testing.T) {
 	// Prepare clone directory
-	if err := os.RemoveAll(scratchDir); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, os.RemoveAll(scratchDir))
 
 	// Prepare test server and backend
 	ts := testAuthServer(nil, 403, "Access denied")
@@ -129,17 +124,13 @@ func TestDeniedClone(t *testing.T) {
 	// Do the git clone
 	cloneCmd := exec.Command("git", "clone", fmt.Sprintf("%s/%s", ws.URL, testRepo), checkoutDir)
 	out, err := cloneCmd.CombinedOutput()
-	t.Logf("%s", out)
-	if err == nil {
-		t.Fatal("git clone should have failed")
-	}
+	t.Log(string(out))
+	assert.Error(t, err, "git clone should have failed")
 }
 
 func TestFailedCloneNoGitaly(t *testing.T) {
 	// Prepare clone directory
-	if err := os.RemoveAll(scratchDir); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, os.RemoveAll(scratchDir))
 
 	authBody := &api.Response{
 		GL_ID:    "user-123",
@@ -157,10 +148,8 @@ func TestFailedCloneNoGitaly(t *testing.T) {
 	// Do the git clone
 	cloneCmd := exec.Command("git", "clone", fmt.Sprintf("%s/%s", ws.URL, testRepo), checkoutDir)
 	out, err := cloneCmd.CombinedOutput()
-	t.Logf("%s", out)
-	if err == nil {
-		t.Fatal("git clone should have failed")
-	}
+	t.Log(string(out))
+	assert.Error(t, err, "git clone should have failed")
 }
 
 func TestAllowedPush(t *testing.T) {
@@ -191,19 +180,16 @@ func TestDeniedPush(t *testing.T) {
 	pushCmd := exec.Command("git", "push", "-v", fmt.Sprintf("%s/%s", ws.URL, testRepo), fmt.Sprintf("master:%s", newBranch()))
 	pushCmd.Dir = checkoutDir
 	out, err := pushCmd.CombinedOutput()
-	t.Logf("%s", out)
-	if err == nil {
-		t.Fatal("git push should have failed")
-	}
+	t.Log(string(out))
+	assert.Error(t, err, "git push should have failed")
 }
 
 func TestRegularProjectsAPI(t *testing.T) {
 	apiResponse := "API RESPONSE"
 
 	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, _ *http.Request) {
-		if _, err := w.Write([]byte(apiResponse)); err != nil {
-			t.Fatalf("write upstream response: %v", err)
-		}
+		_, err := w.Write([]byte(apiResponse))
+		require.NoError(t, err)
 	})
 	defer ts.Close()
 
@@ -218,24 +204,11 @@ func TestRegularProjectsAPI(t *testing.T) {
 		"/api/v3/projects/foo%2Fbar%2Fbaz/repository/not/special",
 		"/api/v3/projects/foo%2Fbar%2Fbaz%2Fqux/repository/not/special",
 	} {
-		resp, err := http.Get(ws.URL + resource)
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer resp.Body.Close()
-		buf := &bytes.Buffer{}
-		if _, err := io.Copy(buf, resp.Body); err != nil {
-			t.Error(err)
-		}
-		if buf.String() != apiResponse {
-			t.Errorf("GET %q: Expected %q, got %q", resource, apiResponse, buf.String())
-		}
-		if resp.StatusCode != 200 {
-			t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
-		}
-		if h := resp.Header.Get(helper.NginxResponseBufferHeader); h != "" {
-			t.Errorf("GET %q: Expected %s not to be present, got %q", resource, helper.NginxResponseBufferHeader, h)
-		}
+		resp, body := httpGet(t, ws.URL+resource)
+
+		assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
+		assert.Equal(t, apiResponse, body, "GET %q: response body", resource)
+		assertNginxResponseBuffering(t, "", resp, "GET %q: nginx response buffering", resource)
 	}
 }
 
@@ -255,9 +228,7 @@ func TestDeniedXSendfileDownload(t *testing.T) {
 
 func TestAllowedStaticFile(t *testing.T) {
 	content := "PUBLIC"
-	if err := setupStaticFile("static file.txt", content); err != nil {
-		t.Fatalf("create public/static file.txt: %v", err)
-	}
+	require.NoError(t, setupStaticFile("static file.txt", content))
 
 	proxied := false
 	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
@@ -272,35 +243,18 @@ func TestAllowedStaticFile(t *testing.T) {
 		"/static%20file.txt",
 		"/static file.txt",
 	} {
-		resp, err := http.Get(ws.URL + resource)
-		if err != nil {
-			t.Error(err)
-		}
-		defer resp.Body.Close()
-		buf := &bytes.Buffer{}
-		if _, err := io.Copy(buf, resp.Body); err != nil {
-			t.Error(err)
-		}
-		if buf.String() != content {
-			t.Errorf("GET %q: Expected %q, got %q", resource, content, buf.String())
-		}
-		if resp.StatusCode != 200 {
-			t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
-		}
-		if proxied {
-			t.Errorf("GET %q: should not have made it to backend", resource)
-		}
-		if h := resp.Header.Get(helper.NginxResponseBufferHeader); h != "no" {
-			t.Errorf("GET %q: Expected %s to equal %q, got %q", resource, helper.NginxResponseBufferHeader, "no", h)
-		}
+		resp, body := httpGet(t, ws.URL+resource)
+
+		assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
+		assert.Equal(t, content, body, "GET %q: response body", resource)
+		assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resource)
+		assert.False(t, proxied, "GET %q: should not have made it to backend", resource)
 	}
 }
 
 func TestStaticFileRelativeURL(t *testing.T) {
 	content := "PUBLIC"
-	if err := setupStaticFile("static.txt", content); err != nil {
-		t.Fatalf("create public/static.txt: %v", err)
-	}
+	require.NoError(t, setupStaticFile("static.txt", content), "create public/static.txt")
 
 	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), http.HandlerFunc(http.NotFound))
 	defer ts.Close()
@@ -310,28 +264,15 @@ func TestStaticFileRelativeURL(t *testing.T) {
 	defer ws.Close()
 
 	resource := "/my-relative-url/static.txt"
-	resp, err := http.Get(ws.URL + resource)
-	if err != nil {
-		t.Error(err)
-	}
-	defer resp.Body.Close()
-	buf := &bytes.Buffer{}
-	if _, err := io.Copy(buf, resp.Body); err != nil {
-		t.Error(err)
-	}
-	if buf.String() != content {
-		t.Errorf("GET %q: Expected %q, got %q", resource, content, buf.String())
-	}
-	if resp.StatusCode != 200 {
-		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
-	}
+	resp, body := httpGet(t, ws.URL+resource)
+
+	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
+	assert.Equal(t, content, body, "GET %q: response body", resource)
 }
 
 func TestAllowedPublicUploadsFile(t *testing.T) {
 	content := "PRIVATE but allowed"
-	if err := setupStaticFile("uploads/static file.txt", content); err != nil {
-		t.Fatalf("create public/uploads/static file.txt: %v", err)
-	}
+	require.NoError(t, setupStaticFile("uploads/static file.txt", content), "create public/uploads/static file.txt")
 
 	proxied := false
 	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
@@ -347,35 +288,17 @@ func TestAllowedPublicUploadsFile(t *testing.T) {
 		"/uploads/static%20file.txt",
 		"/uploads/static file.txt",
 	} {
-		resp, err := http.Get(ws.URL + resource)
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer resp.Body.Close()
-		buf := &bytes.Buffer{}
-		if _, err := io.Copy(buf, resp.Body); err != nil {
-			t.Fatal(err)
-		}
-		if buf.String() != content {
-			t.Fatalf("GET %q: Expected %q, got %q", resource, content, buf.String())
-		}
-		if resp.StatusCode != 200 {
-			t.Fatalf("GET %q: expected 200, got %d", resource, resp.StatusCode)
-		}
-		if !proxied {
-			t.Fatalf("GET %q: never made it to backend", resource)
-		}
-		if h := resp.Header.Get(helper.NginxResponseBufferHeader); h != "no" {
-			t.Errorf("GET %q: Expected %s to equal %q, got %q", resource, helper.NginxResponseBufferHeader, "no", h)
-		}
+		resp, body := httpGet(t, ws.URL+resource)
+
+		assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
+		assert.Equal(t, content, body, "GET %q: response body", resource)
+		assert.True(t, proxied, "GET %q: never made it to backend", resource)
 	}
 }
 
 func TestDeniedPublicUploadsFile(t *testing.T) {
 	content := "PRIVATE"
-	if err := setupStaticFile("uploads/static.txt", content); err != nil {
-		t.Fatalf("create public/uploads/static.txt: %v", err)
-	}
+	require.NoError(t, setupStaticFile("uploads/static.txt", content), "create public/uploads/static.txt")
 
 	proxied := false
 	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, _ *http.Request) {
@@ -390,24 +313,11 @@ func TestDeniedPublicUploadsFile(t *testing.T) {
 		"/uploads/static.txt",
 		"/uploads%2Fstatic.txt",
 	} {
-		resp, err := http.Get(ws.URL + resource)
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer resp.Body.Close()
-		buf := &bytes.Buffer{}
-		if _, err := io.Copy(buf, resp.Body); err != nil {
-			t.Fatal(err)
-		}
-		if buf.String() == content {
-			t.Fatalf("GET %q: Got private file contents which should have been blocked by upstream", resource)
-		}
-		if resp.StatusCode != 404 {
-			t.Fatalf("GET %q: expected 404, got %d", resource, resp.StatusCode)
-		}
-		if !proxied {
-			t.Fatalf("GET %q: never made it to backend", resource)
-		}
+		resp, body := httpGet(t, ws.URL+resource)
+
+		assert.Equal(t, 404, resp.StatusCode, "GET %q: status code", resource)
+		assert.Equal(t, "", body, "GET %q: response body", resource)
+		assert.True(t, proxied, "GET %q: never made it to backend", resource)
 	}
 }
 
@@ -465,80 +375,42 @@ func TestArtifactsGetSingleFile(t *testing.T) {
 	jsonParams := fmt.Sprintf(`{"Archive":"%s","Entry":"%s"}`, archivePath, encodedFilename)
 
 	resp, body, err := doSendDataRequest(resourcePath, "artifacts-entry", jsonParams)
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 
-	if resp.StatusCode != http.StatusOK {
-		t.Errorf("GET %q: expected HTTP 200, got %d", resp.Request.URL, resp.StatusCode)
-	}
-
-	if string(body) != fileContents {
-		t.Fatalf("Expected file contents %q, got %q", fileContents, body)
-	}
-
-	if h := resp.Header.Get(helper.NginxResponseBufferHeader); h != "no" {
-		t.Errorf("GET %q: Expected %s to equal %q, got %q", resourcePath, helper.NginxResponseBufferHeader, "no", h)
-	}
+	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resourcePath)
+	assert.Equal(t, fileContents, string(body), "GET %q: response body", resourcePath)
+	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resourcePath)
 }
 
 func TestGetGitBlob(t *testing.T) {
 	blobId := "50b27c6518be44c42c4d87966ae2481ce895624c" // the LICENSE file in the test repository
 	blobLength := 1075
 	jsonParams := fmt.Sprintf(`{"RepoPath":"%s","BlobId":"%s"}`, path.Join(testRepoRoot, testRepo), blobId)
+	expectedBody := "The MIT License (MIT)"
 
 	resp, body, err := doSendDataRequest("/something", "git-blob", jsonParams)
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 
-	if resp.StatusCode != http.StatusOK {
-		t.Errorf("GET %q: expected HTTP 200, got %d", resp.Request.URL, resp.StatusCode)
-	}
-
-	if len(body) != blobLength {
-		t.Fatalf("Expected body of %d bytes, got %d", blobLength, len(body))
-	}
-
-	if cl := resp.Header.Get("Content-Length"); cl != fmt.Sprintf("%d", blobLength) {
-		t.Fatalf("Expected Content-Length %v, got %q", blobLength, cl)
-	}
-
-	if !strings.HasPrefix(string(body), "The MIT License (MIT)") {
-		t.Fatalf("Expected MIT license, got %q", body)
-	}
-
-	if h := resp.Header.Get(helper.NginxResponseBufferHeader); h != "no" {
-		t.Errorf("Expected %s to equal %q, got %q", helper.NginxResponseBufferHeader, "no", h)
-	}
+	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	assert.Equal(t, expectedBody, string(body[:len(expectedBody)]), "GET %q: response body", resp.Request.URL)
+	assert.Equal(t, blobLength, len(body), "GET %q: body size", resp.Request.URL)
+	testhelper.AssertResponseHeader(t, resp, "Content-Length", strconv.Itoa(blobLength))
+	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
 }
 
 func TestGetGitDiff(t *testing.T) {
 	fromSha := "be93687618e4b132087f430a4d8fc3a609c9b77c"
 	toSha := "54fcc214b94e78d7a41a9a8fe6d87a5e59500e51"
 	jsonParams := fmt.Sprintf(`{"RepoPath":"%s","ShaFrom":"%s","ShaTo":"%s"}`, path.Join(testRepoRoot, testRepo), fromSha, toSha)
+	expectedBody := "diff --git a/README b/README"
 
 	resp, body, err := doSendDataRequest("/something", "git-diff", jsonParams)
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 
-	if resp.StatusCode != http.StatusOK {
-		t.Errorf("GET %q: expected HTTP 200, got %d", resp.Request.URL, resp.StatusCode)
-	}
-
-	if !strings.HasPrefix(string(body), "diff --git a/README b/README") {
-		t.Fatalf("diff --git a/README b/README, got %q", body)
-	}
-
-	bodyLengthBytes := len(body)
-	if bodyLengthBytes != 155 {
-		t.Fatal("Expected the body to consist of 155 bytes, got %v", bodyLengthBytes)
-	}
-
-	if h := resp.Header.Get(helper.NginxResponseBufferHeader); h != "no" {
-		t.Errorf("Expected %s to equal %q, got %q", helper.NginxResponseBufferHeader, "no", h)
-	}
+	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	assert.Equal(t, expectedBody, string(body[:len(expectedBody)]), "GET %q: response body", resp.Request.URL)
+	assert.Equal(t, 155, len(body), "GET %q: body size", resp.Request.URL)
+	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
 }
 
 func TestGetGitPatch(t *testing.T) {
@@ -548,29 +420,21 @@ func TestGetGitPatch(t *testing.T) {
 	jsonParams := fmt.Sprintf(`{"RepoPath":"%s","ShaFrom":"%s","ShaTo":"%s"}`, path.Join(testRepoRoot, testRepo), fromSha, toSha)
 
 	resp, body, err := doSendDataRequest("/something", "git-format-patch", jsonParams)
-	if err != nil {
-		t.Error(err)
-	}
+	require.NoError(t, err)
 
-	if resp.StatusCode != http.StatusOK {
-		t.Errorf("GET %q: expected HTTP 200, got %d", resp.Request.URL, resp.StatusCode)
-	}
+	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
 
 	// Only the two commits on the fix branch should be included
 	testhelper.AssertPatchSeries(t, body, "12d65c8dd2b2676fa3ac47d955accc085a37a9c1", toSha)
-
-	if h := resp.Header.Get(helper.NginxResponseBufferHeader); h != "no" {
-		t.Errorf("Expected %s to equal %q, got %q", helper.NginxResponseBufferHeader, "no", h)
-	}
 }
 
 func TestApiContentTypeBlock(t *testing.T) {
 	wrongResponse := `{"hello":"world"}`
 	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", api.ResponseContentType)
-		if _, err := w.Write([]byte(wrongResponse)); err != nil {
-			t.Fatalf("write upstream response: %v", err)
-		}
+		_, err := w.Write([]byte(wrongResponse))
+		require.NoError(t, err, "write upstream response")
 	})
 	defer ts.Close()
 
@@ -578,23 +442,10 @@ func TestApiContentTypeBlock(t *testing.T) {
 	defer ws.Close()
 
 	resourcePath := "/something"
-	resp, err := http.Get(ws.URL + resourcePath)
-	if err != nil {
-		t.Error(err)
-	}
-	defer resp.Body.Close()
+	resp, body := httpGet(t, ws.URL+resourcePath)
 
-	if resp.StatusCode != 500 {
-		t.Errorf("GET %q: expected 500, got %d", resourcePath, resp.StatusCode)
-	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if strings.Contains(string(body), "world") {
-		t.Errorf("unexpected response body: %q", body)
-	}
+	assert.Equal(t, 500, resp.StatusCode, "GET %q: status code", resourcePath)
+	assert.NotContains(t, wrongResponse, body, "GET %q: response body", resourcePath)
 }
 
 func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
@@ -612,21 +463,10 @@ func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 	defer ws.Close()
 
 	resource := "/gitlab-org/gitlab-test.git/info/refs?service=git-upload-pack"
-	resp, err := http.Get(ws.URL + resource)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer resp.Body.Close()
-	responseBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Error(err)
-	}
+	_, body := httpGet(t, ws.URL+resource)
 
-	expectedContent := testhelper.GitalyInfoRefsResponseMock
-	if !bytes.Equal(responseBody, []byte(expectedContent)) {
-		t.Errorf("GET %q: Expected %q, got %q", resource, expectedContent, responseBody)
-	}
-
+	expectedContent := string(testhelper.GitalyInfoRefsResponseMock)
+	assert.Equal(t, expectedContent, body, "GET %q: response body")
 }
 
 func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
@@ -643,33 +483,24 @@ func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
 	defer ws.Close()
 
 	resource := "/gitlab-org/gitlab-test.git/git-receive-pack"
-	resp, err := http.Post(
+	resp, body := httpPost(
+		t,
 		ws.URL+resource,
 		"application/x-git-receive-pack-request",
-		bytes.NewReader(testhelper.GitalyReceivePackResponseMock),
+		testhelper.GitalyReceivePackResponseMock,
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer resp.Body.Close()
-	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	assert.NoError(t, err)
-	testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-receive-pack-result")
-
-	if resp.StatusCode != 200 {
-		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
-	}
-	expectedResponse := strings.Join([]string{
+	expectedBody := strings.Join([]string{
 		apiResponse.RepoPath,
 		apiResponse.Repository.StorageName,
 		apiResponse.Repository.RelativePath,
 		apiResponse.GL_ID,
 		string(testhelper.GitalyReceivePackResponseMock),
 	}, "\000")
-	if string(responseBody) != expectedResponse {
-		t.Errorf("GET %q: Unexpected response %.100q", resource, responseBody)
-	}
+
+	assert.Equal(t, 200, resp.StatusCode, "POST %q", resource)
+	assert.Equal(t, expectedBody, body, "POST %q: response body", resource)
+	testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-receive-pack-result")
 }
 
 func TestPostUploadPackProxiedToGitalySuccessfully(t *testing.T) {
@@ -686,33 +517,23 @@ func TestPostUploadPackProxiedToGitalySuccessfully(t *testing.T) {
 	defer ws.Close()
 
 	resource := "/gitlab-org/gitlab-test.git/git-upload-pack"
-	resp, err := http.Post(
+	resp, body := httpPost(
+		t,
 		ws.URL+resource,
 		"application/x-git-upload-pack-request",
-		bytes.NewReader(testhelper.GitalyUploadPackResponseMock),
+		testhelper.GitalyUploadPackResponseMock,
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer resp.Body.Close()
-	responseBody, err := ioutil.ReadAll(resp.Body)
 
-	assert.NoError(t, err)
-	testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-upload-pack-result")
-
-	if resp.StatusCode != 200 {
-		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
-	}
-
-	expected := strings.Join([]string{
+	expectedBody := strings.Join([]string{
 		apiResponse.RepoPath,
 		apiResponse.Repository.StorageName,
 		apiResponse.Repository.RelativePath,
 		string(testhelper.GitalyUploadPackResponseMock),
 	}, "\000")
-	if string(responseBody) != expected {
-		t.Errorf("GET %q: Unexpected response: %.100q", resource, responseBody)
-	}
+
+	assert.Equal(t, 200, resp.StatusCode, "POST %q", resource)
+	assert.Equal(t, expectedBody, body, "POST %q: response body", resource)
+	testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-upload-pack-result")
 }
 
 func TestGetInfoRefsHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
@@ -728,24 +549,11 @@ func TestGetInfoRefsHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 	defer ws.Close()
 
 	resource := "/gitlab-org/gitlab-test.git/info/refs?service=git-upload-pack"
-	resp, err := http.Get(ws.URL + resource)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer resp.Body.Close()
-	responseBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Error(err)
-	}
+	resp, body := httpGet(t, ws.URL+resource)
 
-	if resp.StatusCode != 200 {
-		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
-	}
-
-	expectedContent := testhelper.GitalyInfoRefsResponseMock
-	if bytes.Contains(responseBody, []byte(expectedContent)) {
-		t.Errorf("GET %q: request should not have been proxied to Gitaly", resource)
-	}
+	assert.Equal(t, 200, resp.StatusCode, "GET %q", resource)
+	assert.NotContains(t, string(testhelper.GitalyInfoRefsResponseMock), body, "GET %q: should not have been proxied to Gitaly", resource)
+	testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-upload-pack-advertisement")
 }
 
 func TestPostReceivePackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
@@ -762,21 +570,11 @@ func TestPostReceivePackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 
 	resource := "/gitlab-org/gitlab-test.git/git-receive-pack"
 	payload := []byte("This payload should not reach Gitaly")
-	resp, err := http.Post(ws.URL+resource, "application/x-git-receive-pack-request", bytes.NewReader(payload))
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer resp.Body.Close()
-	responseBody, err := ioutil.ReadAll(resp.Body)
-	assert.NoError(t, err)
+	resp, body := httpPost(t, ws.URL+resource, "application/x-git-receive-pack-request", payload)
 
-	if resp.StatusCode != 200 {
-		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
-	}
-
-	if bytes.Contains(responseBody, payload) {
-		t.Errorf("GET %q: request should not have been proxied to Gitaly", resource)
-	}
+	assert.Equal(t, 200, resp.StatusCode, "POST %q: status code", resource)
+	assert.NotContains(t, payload, body, "POST %q: request should not have been proxied to Gitaly", resource)
+	testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-receive-pack-result")
 }
 
 func TestPostUploadPackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
@@ -793,21 +591,11 @@ func TestPostUploadPackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 
 	resource := "/gitlab-org/gitlab-test.git/git-upload-pack"
 	payload := []byte("This payload should not reach Gitaly")
-	resp, err := http.Post(ws.URL+resource, "application/x-git-upload-pack-request", bytes.NewReader(payload))
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer resp.Body.Close()
-	responseBody, err := ioutil.ReadAll(resp.Body)
-	assert.NoError(t, err)
+	resp, body := httpPost(t, ws.URL+resource, "application/x-git-upload-pack-request", payload)
 
-	if resp.StatusCode != 200 {
-		t.Errorf("GET %q: expected 200, got %d", resource, resp.StatusCode)
-	}
-
-	if bytes.Contains(responseBody, payload) {
-		t.Errorf("GET %q: request should not have been proxied to Gitaly", resource)
-	}
+	assert.Equal(t, 200, resp.StatusCode, "POST %q: status code", resource)
+	assert.NotContains(t, payload, body, "POST %q: request should not have been proxied to Gitaly", resource)
+	testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-upload-pack-result")
 }
 
 func TestAPIFalsePositivesAreProxied(t *testing.T) {
@@ -818,9 +606,8 @@ func TestAPIFalsePositivesAreProxied(t *testing.T) {
 			w.Write([]byte("non-GET request went through PreAuthorize handler"))
 		} else {
 			w.Header().Set("Content-Type", "text/html")
-			if _, err := w.Write(goodResponse); err != nil {
-				t.Fatalf("write upstream response: %v", err)
-			}
+			_, err := w.Write(goodResponse)
+			require.NoError(t, err)
 		}
 	})
 	defer ts.Close()
@@ -841,39 +628,21 @@ func TestAPIFalsePositivesAreProxied(t *testing.T) {
 		{"GET", "/nested/group/project/blob/master/environments/1/terminal.ws"},
 	} {
 		req, err := http.NewRequest(tc.method, ws.URL+tc.path, nil)
-		if err != nil {
-			t.Logf("Creating response for %+v failed: %v", tc, err)
-			t.Fail()
+		if !assert.NoError(t, err, "Constructing %s %q", tc.method, tc.path) {
 			continue
 		}
 		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			t.Logf("Reading response from workhorse for %+v failed: %s", tc, err)
-			t.Fail()
+		if !assert.NoError(t, err, "%s %q", tc.method, tc.path) {
 			continue
 		}
 		defer resp.Body.Close()
 
 		respBody, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			t.Logf("Reading response from workhorse for %+v failed: %s", tc, err)
-			t.Fail()
-		}
+		assert.NoError(t, err, "%s %q: reading body", tc.method, tc.path)
 
-		if resp.StatusCode != http.StatusOK {
-			t.Logf("Expected HTTP 200 response for %+v, got %d. Body: %s", tc, resp.StatusCode, string(respBody))
-			t.Fail()
-		}
-
-		if resp.Header.Get("Content-Type") != "text/html" {
-			t.Logf("Unexpected response content type for %+v: %s", tc, resp.Header.Get("Content-Type"))
-			t.Fail()
-		}
-
-		if bytes.Compare(respBody, goodResponse) != 0 {
-			t.Logf("Unexpected response body for %+v: %s", tc, string(respBody))
-			t.Fail()
-		}
+		assert.Equal(t, 200, resp.StatusCode, "%s %q: status code", tc.method, tc.path)
+		testhelper.AssertResponseHeader(t, resp, "Content-Type", "text/html")
+		assert.Equal(t, string(goodResponse), string(respBody), "%s %q: response body", tc.method, tc.path)
 	}
 }
 
@@ -894,18 +663,12 @@ func setupStaticFile(fpath, content string) error {
 }
 
 func prepareDownloadDir(t *testing.T) {
-	if err := os.RemoveAll(scratchDir); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.MkdirAll(scratchDir, 0755); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, os.RemoveAll(scratchDir))
+	require.NoError(t, os.MkdirAll(scratchDir, 0755))
 }
 
 func preparePushRepo(t *testing.T) {
-	if err := os.RemoveAll(scratchDir); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, os.RemoveAll(scratchDir))
 	cloneCmd := exec.Command("git", "clone", path.Join(testRepoRoot, testRepo), checkoutDir)
 	runOrFail(t, cloneCmd)
 }
@@ -944,9 +707,8 @@ func testAuthServer(url *regexp.Regexp, code int, body interface{}) *httptest.Se
 func archiveOKServer(t *testing.T, archiveName string) *httptest.Server {
 	return testhelper.TestServerWithHandler(regexp.MustCompile("."), func(w http.ResponseWriter, r *http.Request) {
 		cwd, err := os.Getwd()
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
+
 		archivePath := path.Join(cwd, cacheDir, archiveName)
 
 		params := struct{ RepoPath, ArchivePath, CommitId, ArchivePrefix string }{
@@ -956,9 +718,8 @@ func archiveOKServer(t *testing.T, archiveName string) *httptest.Server {
 			"foobar123",
 		}
 		jsonData, err := json.Marshal(params)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
+
 		encodedJSON := base64.URLEncoding.EncodeToString(jsonData)
 		w.Header().Set("Gitlab-Workhorse-Send-Data", "git-archive:"+encodedJSON)
 	})
@@ -987,9 +748,7 @@ func startGitalyServer(t *testing.T) (*grpc.Server, string) {
 	socketPath := path.Join(scratchDir, fmt.Sprintf("gitaly-%d.sock", rand.Int()))
 	server := grpc.NewServer()
 	listener, err := net.Listen("unix", socketPath)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	pb.RegisterSmartHTTPServer(server, testhelper.NewGitalyServer())
 
@@ -1001,9 +760,7 @@ func startGitalyServer(t *testing.T) (*grpc.Server, string) {
 func runOrFail(t *testing.T, cmd *exec.Cmd) {
 	out, err := cmd.CombinedOutput()
 	t.Logf("%s", out)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 }
 
 func gitOkBody(t *testing.T) *api.Response {
@@ -1021,8 +778,34 @@ func gitOkBody(t *testing.T) *api.Response {
 
 func repoPath(t *testing.T) string {
 	cwd, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	return path.Join(cwd, testRepoRoot, testRepo)
+}
+
+func httpGet(t *testing.T, url string) (*http.Response, string) {
+	resp, err := http.Get(url)
+	require.NoError(t, err)
+	defer resp.Body.Close()
+
+	b, err := ioutil.ReadAll(resp.Body)
+	require.NoError(t, err)
+
+	return resp, string(b)
+}
+
+func httpPost(t *testing.T, url, contentType string, reqBody []byte) (*http.Response, string) {
+	resp, err := http.Post(url, contentType, bytes.NewReader(reqBody))
+	require.NoError(t, err)
+	defer resp.Body.Close()
+
+	b, err := ioutil.ReadAll(resp.Body)
+	require.NoError(t, err)
+
+	return resp, string(b)
+}
+
+func assertNginxResponseBuffering(t *testing.T, expected string, resp *http.Response, msgAndArgs ...interface{}) {
+	actual := resp.Header.Get(helper.NginxResponseBufferHeader)
+	assert.Equal(t, expected, actual, msgAndArgs...)
 }
