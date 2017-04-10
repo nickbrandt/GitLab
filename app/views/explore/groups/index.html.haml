@@ -1,6 +1,15 @@
 - page_title    "Groups"
 - header_title  "Groups", dashboard_groups_path
 
+.bordered-box.explore-groups.landing.content-block.js-explore-groups-landing.hidden
+  = icon('times', class: 'dismiss-icon')
+  .row
+    .col-sm-2.col-xs-12.svg-container
+      = custom_icon('icon_explore_groups_splash')
+    .col-sm-10.col-xs-12.inner-content
+      %p Below you will find all the groups that are public.
+      %p You can easily contribute to them by requesting to join these groups.
+
 - if current_user
   = render 'dashboard/groups_head'
 - else

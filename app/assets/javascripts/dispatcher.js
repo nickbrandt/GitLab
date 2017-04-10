@@ -44,6 +44,7 @@ import GroupName from './group_name';
 import GroupsList from './groups_list';
 import ProjectsList from './projects_list';
 import MiniPipelineGraph from './mini_pipeline_graph_dropdown';
+import Landing from './landing';
 import BlobLinePermalinkUpdater from './blob/blob_line_permalink_updater';
 import BlobForkSuggestion from './blob/blob_fork_suggestion';
 import UserCallout from './user_callout';
@@ -147,8 +148,17 @@ const ShortcutsBlob = require('./shortcuts_blob');
           new ProjectsList();
           break;
         case 'dashboard:groups:index':
+          new GroupsList();
+          return;
         case 'explore:groups:index':
           new GroupsList();
+
+          const exploreGroupsLanding = new Landing(
+            document.querySelector('.js-explore-groups-landing'),
+            'explore_groups_landing_dismissed',
+          );
+
+          exploreGroupsLanding.toggle();
           break;
         case 'projects:milestones:new':
         case 'projects:milestones:edit':

@@ -297,6 +297,9 @@ table.u2f-registrations {
       float: right;
       cursor: pointer;
       color: $cycle-analytics-dismiss-icon-color;
+      position: relative;
+      right: 0;
+      padding: 0;
     }
 
     .svg-container {

@@ -255,6 +255,49 @@
   padding: 10px 0;
 }
 
+.landing {
+  margin-bottom: $gl-padding;
+  overflow: hidden;
+  position: relative;
+
+  &> .row {
+    @media (min-width: $screen-sm-min) {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .dismiss-icon {
+    position: absolute;
+    right: $cycle-analytics-box-padding;
+    cursor: pointer;
+    color: $gray-darkest;
+    z-index: 1;
+    padding-right: 5px;
+  }
+
+  .svg-container {
+    text-align: center;
+  }
+
+  .inner-content {
+    @media (max-width: $screen-sm-min) {
+      padding: 0 28px;
+      text-align: center;
+    }
+
+    h4 {
+      color: $gl-text-color;
+      font-size: 17px;
+    }
+
+    p {
+      color: $cycle-analytics-box-text-color;
+      margin-bottom: $gl-padding;
+    }
+  }
+}
+
 .empty-state {
   margin: 100px 0 0;
 
