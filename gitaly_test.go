@@ -18,6 +18,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 )
 
 func TestFailedCloneNoGitaly(t *testing.T) {
@@ -46,7 +47,7 @@ func TestFailedCloneNoGitaly(t *testing.T) {
 
 func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 	apiResponse := gitOkBody(t)
-	gitalyServer, socketPath := startGitalyServer(t)
+	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
 	defer gitalyServer.Stop()
 
 	gitalyAddress := "unix://" + socketPath
@@ -68,7 +69,7 @@ func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
 	apiResponse := gitOkBody(t)
 
-	gitalyServer, socketPath := startGitalyServer(t)
+	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
 	defer gitalyServer.Stop()
 
 	apiResponse.GitalyAddress = "unix://" + socketPath
@@ -102,38 +103,42 @@ func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
 func TestPostUploadPackProxiedToGitalySuccessfully(t *testing.T) {
 	apiResponse := gitOkBody(t)
 
-	gitalyServer, socketPath := startGitalyServer(t)
-	defer gitalyServer.Stop()
+	for _, code := range []codes.Code{codes.OK, codes.Unavailable} {
+		func() {
+			gitalyServer, socketPath := startGitalyServer(t, code)
+			defer gitalyServer.Stop()
 
-	apiResponse.GitalyAddress = "unix://" + socketPath
-	ts := testAuthServer(nil, 200, apiResponse)
-	defer ts.Close()
+			apiResponse.GitalyAddress = "unix://" + socketPath
+			ts := testAuthServer(nil, 200, apiResponse)
+			defer ts.Close()
 
-	ws := startWorkhorseServer(ts.URL)
-	defer ws.Close()
+			ws := startWorkhorseServer(ts.URL)
+			defer ws.Close()
 
-	resource := "/gitlab-org/gitlab-test.git/git-upload-pack"
-	resp, body := httpPost(
-		t,
-		ws.URL+resource,
-		"application/x-git-upload-pack-request",
-		testhelper.GitalyUploadPackResponseMock,
-	)
+			resource := "/gitlab-org/gitlab-test.git/git-upload-pack"
+			resp, body := httpPost(
+				t,
+				ws.URL+resource,
+				"application/x-git-upload-pack-request",
+				testhelper.GitalyUploadPackResponseMock,
+			)
 
-	expectedBody := strings.Join([]string{
-		apiResponse.RepoPath,
-		apiResponse.Repository.StorageName,
-		apiResponse.Repository.RelativePath,
-		string(testhelper.GitalyUploadPackResponseMock),
-	}, "\000")
+			expectedBody := strings.Join([]string{
+				apiResponse.RepoPath,
+				apiResponse.Repository.StorageName,
+				apiResponse.Repository.RelativePath,
+				string(testhelper.GitalyUploadPackResponseMock),
+			}, "\000")
 
-	assert.Equal(t, 200, resp.StatusCode, "POST %q", resource)
-	assert.Equal(t, expectedBody, body, "POST %q: response body", resource)
-	testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-upload-pack-result")
+			assert.Equal(t, 200, resp.StatusCode, "POST %q", resource)
+			assert.Equal(t, expectedBody, body, "POST %q: response body", resource)
+			testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-upload-pack-result")
+		}()
+	}
 }
 
 func TestGetInfoRefsHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
-	gitalyServer, _ := startGitalyServer(t)
+	gitalyServer, _ := startGitalyServer(t, codes.OK)
 	defer gitalyServer.Stop()
 
 	apiResponse := gitOkBody(t)
@@ -153,7 +158,7 @@ func TestGetInfoRefsHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 }
 
 func TestPostReceivePackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
-	gitalyServer, _ := startGitalyServer(t)
+	gitalyServer, _ := startGitalyServer(t, codes.OK)
 	defer gitalyServer.Stop()
 
 	apiResponse := gitOkBody(t)
@@ -174,7 +179,7 @@ func TestPostReceivePackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 }
 
 func TestPostUploadPackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
-	gitalyServer, _ := startGitalyServer(t)
+	gitalyServer, _ := startGitalyServer(t, codes.OK)
 	defer gitalyServer.Stop()
 
 	apiResponse := gitOkBody(t)
@@ -194,13 +199,13 @@ func TestPostUploadPackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 	testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-upload-pack-result")
 }
 
-func startGitalyServer(t *testing.T) (*grpc.Server, string) {
+func startGitalyServer(t *testing.T, code codes.Code) (*grpc.Server, string) {
 	socketPath := path.Join(scratchDir, fmt.Sprintf("gitaly-%d.sock", rand.Int()))
 	server := grpc.NewServer()
 	listener, err := net.Listen("unix", socketPath)
 	require.NoError(t, err)
 
-	pb.RegisterSmartHTTPServer(server, testhelper.NewGitalyServer())
+	pb.RegisterSmartHTTPServer(server, testhelper.NewGitalyServer(code))
 
 	go server.Serve(listener)
 

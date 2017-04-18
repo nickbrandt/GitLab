@@ -9,9 +9,14 @@ import (
 	"strings"
 
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 )
 
-type GitalyTestServer struct{}
+type GitalyTestServer struct {
+	code codes.Code
+}
 
 const GitalyInfoRefsResponseMock = "Mock Gitaly InfoRefsResponse data"
 
@@ -28,8 +33,8 @@ func init() {
 	}
 }
 
-func NewGitalyServer() *GitalyTestServer {
-	return &GitalyTestServer{}
+func NewGitalyServer(code codes.Code) *GitalyTestServer {
+	return &GitalyTestServer{code: code}
 }
 
 func (s *GitalyTestServer) InfoRefsUploadPack(in *pb.InfoRefsRequest, stream pb.SmartHTTP_InfoRefsUploadPackServer) error {
@@ -134,6 +139,10 @@ func (s *GitalyTestServer) PostUploadPack(stream pb.SmartHTTP_PostUploadPackServ
 		if err := stream.Send(response); err != nil {
 			return err
 		}
+	}
+
+	if s.code != codes.OK {
+		return grpc.Errorf(s.code, "error as specified by test")
 	}
 
 	return nil
