@@ -99,3 +99,14 @@ func TestApplicationJson(t *testing.T) {
 	req.Header.Set("Content-Type", "text/plain")
 	assert.False(t, IsApplicationJson(req), "expected not to match 'text/plain' as 'application/json'")
 }
+
+func TestFail500WorksWithNils(t *testing.T) {
+	body := bytes.NewBuffer(nil)
+	w := httptest.NewRecorder()
+	w.Body = body
+
+	Fail500(w, nil, nil)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	assert.Equal(t, "Internal server error\n", body.String())
+}

@@ -19,12 +19,18 @@ const NginxResponseBufferHeader = "X-Accel-Buffering"
 
 func Fail500(w http.ResponseWriter, r *http.Request, err error) {
 	http.Error(w, "Internal server error", 500)
-	captureRavenError(r, err)
+	if err != nil {
+		captureRavenError(r, err)
+	}
+
 	printError(r, err)
 }
 
 func LogError(r *http.Request, err error) {
-	captureRavenError(r, err)
+	if err != nil {
+		captureRavenError(r, err)
+	}
+
 	printError(r, err)
 }
 
