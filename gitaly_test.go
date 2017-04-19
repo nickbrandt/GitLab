@@ -199,13 +199,13 @@ func TestPostUploadPackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 	testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-upload-pack-result")
 }
 
-func startGitalyServer(t *testing.T, code codes.Code) (*grpc.Server, string) {
+func startGitalyServer(t *testing.T, finalMessageCode codes.Code) (*grpc.Server, string) {
 	socketPath := path.Join(scratchDir, fmt.Sprintf("gitaly-%d.sock", rand.Int()))
 	server := grpc.NewServer()
 	listener, err := net.Listen("unix", socketPath)
 	require.NoError(t, err)
 
-	pb.RegisterSmartHTTPServer(server, testhelper.NewGitalyServer(code))
+	pb.RegisterSmartHTTPServer(server, testhelper.NewGitalyServer(finalMessageCode))
 
 	go server.Serve(listener)
 

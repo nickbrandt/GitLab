@@ -15,7 +15,7 @@ import (
 )
 
 type GitalyTestServer struct {
-	code codes.Code
+	finalMessageCode codes.Code
 }
 
 const GitalyInfoRefsResponseMock = "Mock Gitaly InfoRefsResponse data"
@@ -33,8 +33,8 @@ func init() {
 	}
 }
 
-func NewGitalyServer(code codes.Code) *GitalyTestServer {
-	return &GitalyTestServer{code: code}
+func NewGitalyServer(finalMessageCode codes.Code) *GitalyTestServer {
+	return &GitalyTestServer{finalMessageCode: finalMessageCode}
 }
 
 func (s *GitalyTestServer) InfoRefsUploadPack(in *pb.InfoRefsRequest, stream pb.SmartHTTP_InfoRefsUploadPackServer) error {
@@ -45,7 +45,11 @@ func (s *GitalyTestServer) InfoRefsUploadPack(in *pb.InfoRefsRequest, stream pb.
 	response := &pb.InfoRefsResponse{
 		Data: []byte(GitalyInfoRefsResponseMock),
 	}
-	return stream.Send(response)
+	if err := stream.Send(response); err != nil {
+		return err
+	}
+
+	return s.finalError()
 }
 
 func (s *GitalyTestServer) InfoRefsReceivePack(in *pb.InfoRefsRequest, stream pb.SmartHTTP_InfoRefsReceivePackServer) error {
@@ -56,7 +60,11 @@ func (s *GitalyTestServer) InfoRefsReceivePack(in *pb.InfoRefsRequest, stream pb
 	response := &pb.InfoRefsResponse{
 		Data: []byte(GitalyInfoRefsResponseMock),
 	}
-	return stream.Send(response)
+	if err := stream.Send(response); err != nil {
+		return err
+	}
+
+	return s.finalError()
 }
 
 func (s *GitalyTestServer) PostReceivePack(stream pb.SmartHTTP_PostReceivePackServer) error {
@@ -99,7 +107,7 @@ func (s *GitalyTestServer) PostReceivePack(stream pb.SmartHTTP_PostReceivePackSe
 		}
 	}
 
-	return nil
+	return s.finalError()
 }
 
 func (s *GitalyTestServer) PostUploadPack(stream pb.SmartHTTP_PostUploadPackServer) error {
@@ -141,8 +149,12 @@ func (s *GitalyTestServer) PostUploadPack(stream pb.SmartHTTP_PostUploadPackServ
 		}
 	}
 
-	if s.code != codes.OK {
-		return grpc.Errorf(s.code, "error as specified by test")
+	return s.finalError()
+}
+
+func (s *GitalyTestServer) finalError() error {
+	if code := s.finalMessageCode; code != codes.OK {
+		return grpc.Errorf(code, "error as specified by test")
 	}
 
 	return nil
