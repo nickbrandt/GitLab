@@ -63,7 +63,7 @@ func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 	_, body := httpGet(t, ws.URL+resource)
 
 	expectedContent := string(testhelper.GitalyInfoRefsResponseMock)
-	assert.Equal(t, expectedContent, body, "GET %q: response body")
+	assert.Equal(t, expectedContent, body, "GET %q: response body", resource)
 }
 
 func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
