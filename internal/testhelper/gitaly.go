@@ -9,9 +9,14 @@ import (
 	"strings"
 
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 )
 
-type GitalyTestServer struct{}
+type GitalyTestServer struct {
+	finalMessageCode codes.Code
+}
 
 const GitalyInfoRefsResponseMock = "Mock Gitaly InfoRefsResponse data"
 
@@ -28,8 +33,8 @@ func init() {
 	}
 }
 
-func NewGitalyServer() *GitalyTestServer {
-	return &GitalyTestServer{}
+func NewGitalyServer(finalMessageCode codes.Code) *GitalyTestServer {
+	return &GitalyTestServer{finalMessageCode: finalMessageCode}
 }
 
 func (s *GitalyTestServer) InfoRefsUploadPack(in *pb.InfoRefsRequest, stream pb.SmartHTTP_InfoRefsUploadPackServer) error {
@@ -40,7 +45,11 @@ func (s *GitalyTestServer) InfoRefsUploadPack(in *pb.InfoRefsRequest, stream pb.
 	response := &pb.InfoRefsResponse{
 		Data: []byte(GitalyInfoRefsResponseMock),
 	}
-	return stream.Send(response)
+	if err := stream.Send(response); err != nil {
+		return err
+	}
+
+	return s.finalError()
 }
 
 func (s *GitalyTestServer) InfoRefsReceivePack(in *pb.InfoRefsRequest, stream pb.SmartHTTP_InfoRefsReceivePackServer) error {
@@ -51,7 +60,11 @@ func (s *GitalyTestServer) InfoRefsReceivePack(in *pb.InfoRefsRequest, stream pb
 	response := &pb.InfoRefsResponse{
 		Data: []byte(GitalyInfoRefsResponseMock),
 	}
-	return stream.Send(response)
+	if err := stream.Send(response); err != nil {
+		return err
+	}
+
+	return s.finalError()
 }
 
 func (s *GitalyTestServer) PostReceivePack(stream pb.SmartHTTP_PostReceivePackServer) error {
@@ -94,7 +107,7 @@ func (s *GitalyTestServer) PostReceivePack(stream pb.SmartHTTP_PostReceivePackSe
 		}
 	}
 
-	return nil
+	return s.finalError()
 }
 
 func (s *GitalyTestServer) PostUploadPack(stream pb.SmartHTTP_PostUploadPackServer) error {
@@ -134,6 +147,14 @@ func (s *GitalyTestServer) PostUploadPack(stream pb.SmartHTTP_PostUploadPackServ
 		if err := stream.Send(response); err != nil {
 			return err
 		}
+	}
+
+	return s.finalError()
+}
+
+func (s *GitalyTestServer) finalError() error {
+	if code := s.finalMessageCode; code != codes.OK {
+		return grpc.Errorf(code, "error as specified by test")
 	}
 
 	return nil

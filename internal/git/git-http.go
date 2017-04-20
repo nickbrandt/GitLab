@@ -39,7 +39,11 @@ func postRPCHandler(a *api.API, name string, handler func(*GitHttpResponseWriter
 		}()
 
 		if err := handler(w, r, ar); err != nil {
-			helper.Fail500(w, r, fmt.Errorf("%s: %v", name, err))
+			// If the handler already wrote a response this WriteHeader call is a
+			// no-op. It never reaches net/http because GitHttpResponseWriter calls
+			// WriteHeader on its underlying ResponseWriter at most once.
+			w.WriteHeader(500)
+			helper.LogError(r, fmt.Errorf("%s: %v", name, err))
 		}
 	})
 }
