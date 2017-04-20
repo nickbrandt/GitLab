@@ -579,11 +579,29 @@
     list-style: none;
     display: flex;
     width: 100%;
+    border: 1px solid $border-color;
+    border-radius: 3px;
+
+    &:focus,
+    &:hover {
+      border-color: $dropdown-input-focus-border;
+      box-shadow: 0 0 4px $dropdown-input-focus-shadow;
+    }
   }
 
   .input-token {
     flex-grow: 1;
     min-width: 500px;
+
+    input {
+      border-color: transparent;
+
+      &:focus,
+      &:hover {
+        border-color: transparent;
+        box-shadow: none;
+      }
+    }
   }
 
   .scroll-container {
@@ -603,6 +621,8 @@
     padding: 1px 5px;
     margin: 4px;
     border-radius: 3px;
+    display: flex;
+    align-items: center;
   }
 
   .remove-token {
