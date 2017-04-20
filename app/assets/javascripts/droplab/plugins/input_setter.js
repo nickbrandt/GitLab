@@ -33,7 +33,7 @@ const InputSetter = {
   setInput(config, selectedItem) {
     const newValue = selectedItem.getAttribute(config.valueAttribute);
     const inputAttribute = config.inputAttribute;
-    const input = typeof config.input === 'function' ? config.input(selectedItem, newValue) : config.input;
+    const input = typeof config.input === 'function' ? config.input(selectedItem) : config.input;
 
     if (!input) return;
 

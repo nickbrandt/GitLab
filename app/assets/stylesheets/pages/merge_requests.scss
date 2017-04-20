@@ -675,7 +675,13 @@
   }
 }
 
-.token-dropdown .add-approvers {
-  height: 35px;
-  margin-left: 10px;
+.token-dropdown {
+  .add-approvers {
+    height: 35px;
+    margin-left: 10px;
+  }
+
+  .remove-approver {
+    padding: 6px 11px;
+  }
 }

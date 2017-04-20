@@ -546,7 +546,7 @@ class Projects::MergeRequestsController < Projects::ApplicationController
     respond_to do |format|
       format.json do
         # render json: { groups: [{ name: 'frontend' }, { name: 'backend' }, { name: 'ux' }], users: [{ name: 'jacob' }, { name: 'clement' }, { name: 'bryce' }]}
-        render json: [{ id: 1234, name: 'test', type: 'user' }, { id: 4321, name: 'testing', type: 'group' }]
+        render json: [{ id: 1234, name: 'test', type: 'user' }, { id: 4321, name: 'testing', user_count: 3, type: 'group' }, { id: 43212, name: 'testing2', user_count: 3, type: 'group' }, { id: 43213, name: 'testing3', user_count: 3, type: 'group' }]
       end
     end
   end

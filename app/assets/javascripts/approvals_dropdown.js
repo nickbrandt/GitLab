@@ -55,10 +55,12 @@ class ApprovalsDropdown {
     return ApprovalsDropdown.isUser(selectedItem) ? this.usersInput : this.groupsInput;
   }
 
-  createToken(selectedItem, newValue) {
-    if (this.getInput(selectedItem).value.includes(selectedItem.dataset.id)) return;
+  createToken(selectedItem) {
+    const currentValues = this.getInput(selectedItem).value.split(',');
+    if (currentValues.includes(selectedItem.dataset.id)) return;
 
     const token = document.createElement('li');
+    token.innerHTML = '<a href="#"><i class="fa fa-close remove-token"></i></a>';
     token.classList.add('token');
     this.tokenContainer.insertBefore(token, this.inputToken);
 
@@ -67,6 +69,12 @@ class ApprovalsDropdown {
 
   static isUser(element) {
     return element.dataset.type === 'user';
+  }
+
+  static setToken(input, newValue) {
+    const text = document.createElement('span');
+    text.innerText = newValue;
+    input.appendChild(text);
   }
 
   static setInput(input, newValue) {

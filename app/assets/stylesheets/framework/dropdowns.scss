@@ -595,4 +595,18 @@
   .token-dropdown-bar {
     display: flex;
   }
+
+  .token {
+    background-color: $gray-normal;
+    border: 1px solid $gray-dark;
+    color: $gl-gray-dark;
+    padding: 1px 5px;
+    margin: 4px;
+    border-radius: 3px;
+  }
+
+  .remove-token {
+    margin-right: 4px;
+    color: $gl-gray-dark;
+  }
 }

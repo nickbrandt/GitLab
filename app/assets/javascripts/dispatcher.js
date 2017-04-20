@@ -199,8 +199,8 @@ const ShortcutsBlob = require('./shortcuts_blob');
 
           const input = document.getElementById('approvers-input');
           const menu = document.getElementById('approvers-list');
-          const usersInput = document.getElementById('merge_request_approver_ids');
-          const groupsInput = document.getElementById('merge_request_approver_group_ids');
+          const usersInput = document.getElementById('approver_token_ids');
+          const groupsInput = document.getElementById('approver_group_token_ids');
           const tokenContainer = document.getElementById('token-container');
           const inputToken = document.getElementById('input-token');
 
