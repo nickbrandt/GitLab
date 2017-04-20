@@ -4,6 +4,10 @@
 - return unless issuable.is_a?(MergeRequest)
 - return unless issuable.requires_approve?
 
+- author = issuable.author || current_user
+- skip_users = issuable.all_approvers_including_groups + [author]
+- skip_groups = issuable.overall_approver_groups.pluck(:group_id)
+
 .form-group
   = form.label :approvals_before_merge, class: 'control-label' do
     Approvals required
@@ -16,16 +20,24 @@
 .form-group
   = form.label :approver_ids, class: 'control-label' do
     Approvers
-  .col-sm-10
-    - author = issuable.author || current_user
-    - skip_users = issuable.all_approvers_including_groups + [author]
-    = users_select_tag("merge_request[approver_ids]", multiple: true, class: 'input-large', scope: :all, email_user: true, skip_users: skip_users)
-    .help-block
-      This merge request must be approved by these users.
-      You can override the project settings by setting your own list of approvers.
-
-    - skip_groups = issuable.overall_approver_groups.pluck(:group_id)
-    = groups_select_tag('merge_request[approver_group_ids]', multiple: true, data: { skip_groups: skip_groups, all_available: true }, class: 'input-large')
+  .col-sm-10.token-dropdown
+    .token-dropdown-bar
+      .scroll-container
+        %ul#token-container.token-container
+          %li#input-token.input-token
+            = hidden_field :merge_request, :approver_ids
+            = hidden_field :merge_request, :approver_group_ids
+            = text_field_tag 'approvers-input', nil, placeholder: 'Search for users or groups', class: 'form-control dropdown-toggle', data: { 'dropdown-trigger' => '#approvers-list', 'skip-users' => skip_users, 'skip-groups' => skip_groups, 'email-user' => true, 'endpoint': approvers_namespace_project_merge_request_path(@project.namespace, @project, @merge_request) }
+      = button_tag 'Add', class: 'btn btn-success add-approvers'
+    %ul#approvers-list.dropdown-menu{ data: { dropdown: true, dynamic: true } }
+      %li.droplab-ignore-item Users
+      %li{ data: { id: '{{id}}', name: '{{name}}', type: '{{type}}'} }
+        %a {{name}}
+      -# %ul
+      -#   %li.droplab-ignore-item Groups
+      -#   %li {{ name }}
+      -#   %li {{ name }}
+      -#   %li {{ name }}
     .help-block
       This merge request must be approved by members of these groups.
       You can override the project settings by setting your own list of approvers.

@@ -564,3 +564,35 @@
     color: $gl-text-color-secondary;
   }
 }
+
+.token-dropdown {
+  position: relative;
+
+  .dropdown-menu {
+    top: 37px;
+    left: 15px;
+  }
+
+  .token-container {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    width: 100%;
+  }
+
+  .input-token {
+    flex-grow: 1;
+    min-width: 500px;
+  }
+
+  .scroll-container {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .token-dropdown-bar {
+    display: flex;
+  }
+}

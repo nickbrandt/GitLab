@@ -31,10 +31,13 @@ const InputSetter = {
   },
 
   setInput(config, selectedItem) {
-    const input = config.input || this.hook.trigger;
     const newValue = selectedItem.getAttribute(config.valueAttribute);
     const inputAttribute = config.inputAttribute;
+    const input = typeof config.input === 'function' ? config.input(selectedItem, newValue) : config.input;
 
+    if (!input) return;
+
+    if (config.setValue) return config.setValue(input, newValue);
     if (input.hasAttribute(inputAttribute)) return input.setAttribute(inputAttribute, newValue);
     if (input.tagName === 'INPUT') return input.value = newValue;
     return input.textContent = newValue;

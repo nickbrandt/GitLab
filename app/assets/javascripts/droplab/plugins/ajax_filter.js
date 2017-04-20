@@ -33,7 +33,7 @@ const AjaxFilter = {
 
   trigger: function trigger(getEntireList) {
     var config = this.hook.config.AjaxFilter;
-    var searchValue = this.trigger.value;
+    var searchValue = this.hook.trigger.value;
     if (!config || !config.endpoint || !config.searchKey) {
       return;
     }
@@ -41,8 +41,10 @@ const AjaxFilter = {
       searchValue = config.searchValueFunction();
     }
     if (config.loadingTemplate && this.hook.list.data === undefined ||
-      this.hook.list.data.length === 0) {
-      var dynamicList = this.hook.list.list.querySelector('[data-dynamic]');
+      this.hook.list.data && this.hook.list.data.length === 0) {
+      const listElement = this.hook.list.list;
+
+      var dynamicList = listElement.matches('[data-dynamic]') ? listElement : listElement.querySelector('[data-dynamic]');
       var loadingTemplate = document.createElement('div');
       loadingTemplate.innerHTML = config.loadingTemplate;
       loadingTemplate.setAttribute('data-loading-template', true);
@@ -95,7 +97,7 @@ const AjaxFilter = {
   _loadData: function _loadData(data, config, self) {
     const list = self.hook.list;
     if (config.loadingTemplate && list.data === undefined ||
-      list.data.length === 0) {
+      list.data && list.data.length === 0) {
       const dataLoadingTemplate = list.list.querySelector('[data-loading-template]');
       if (dataLoadingTemplate) {
         dataLoadingTemplate.outerHTML = self.listTemplate;

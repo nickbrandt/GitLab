@@ -111,6 +111,8 @@ constraints(ProjectUrlConstrainer.new) do
           post :approvals, action: :approve
           delete :approvals, action: :unapprove
 
+          get :approvers # TEMPORARY
+
           post :rebase
           ## EE-specific
 

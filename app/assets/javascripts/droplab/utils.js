@@ -10,7 +10,7 @@ const utils = {
   t(s, d) {
     for (const p in d) {
       if (Object.prototype.hasOwnProperty.call(d, p)) {
-        s = s.replace(new RegExp(`{{${p}}}`, 'g'), d[p]);
+        s = s.replace(new RegExp(`{{ ?${p} ?}}`, 'g'), d[p]);
       }
     }
     return s;

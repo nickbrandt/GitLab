@@ -52,6 +52,7 @@ import { ProtectedTagCreate, ProtectedTagEditList } from './protected_tags';
 
 import GeoNodes from './geo_nodes';
 import ServiceDeskRoot from './projects/settings_service_desk/service_desk_root';
+import ApprovalsDropdown from './approvals_dropdown';
 
 const ShortcutsBlob = require('./shortcuts_blob');
 
@@ -177,8 +178,16 @@ const ShortcutsBlob = require('./shortcuts_blob');
           new WeightSelect();
           new gl.IssuableTemplateSelectors();
           break;
-        case 'projects:merge_requests:new':
         case 'projects:merge_requests:new_diffs':
+          new gl.Diff();
+          shortcut_handler = new ShortcutsNavigation();
+          new gl.GLForm($('.merge-request-form'));
+          new IssuableForm($('.merge-request-form'));
+          new LabelsSelect();
+          new MilestoneSelect();
+          new gl.IssuableTemplateSelectors();
+          break;
+        case 'projects:merge_requests:new':
         case 'projects:merge_requests:edit':
           new gl.Diff();
           shortcut_handler = new ShortcutsNavigation();
@@ -187,6 +196,16 @@ const ShortcutsBlob = require('./shortcuts_blob');
           new LabelsSelect();
           new MilestoneSelect();
           new gl.IssuableTemplateSelectors();
+
+          const input = document.getElementById('approvers-input');
+          const menu = document.getElementById('approvers-list');
+          const usersInput = document.getElementById('merge_request_approver_ids');
+          const groupsInput = document.getElementById('merge_request_approver_group_ids');
+          const tokenContainer = document.getElementById('token-container');
+          const inputToken = document.getElementById('input-token');
+
+          const approvalsDropdown = new ApprovalsDropdown(input, menu, usersInput, groupsInput, tokenContainer, inputToken);
+          approvalsDropdown.initDropLab();
           break;
         case 'projects:tags:new':
           new ZenMode();

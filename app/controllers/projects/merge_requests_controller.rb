@@ -541,6 +541,16 @@ class Projects::MergeRequestsController < Projects::ApplicationController
     render_approvals_json
   end
 
+  # TEMPORARY
+  def approvers
+    respond_to do |format|
+      format.json do
+        # render json: { groups: [{ name: 'frontend' }, { name: 'backend' }, { name: 'ux' }], users: [{ name: 'jacob' }, { name: 'clement' }, { name: 'bryce' }]}
+        render json: [{ id: 1234, name: 'test', type: 'user' }, { id: 4321, name: 'testing', type: 'group' }]
+      end
+    end
+  end
+
   protected
 
   def render_approvals_json
