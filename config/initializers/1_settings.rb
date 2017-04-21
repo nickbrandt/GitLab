@@ -1,4 +1,5 @@
 require_dependency Rails.root.join('lib/gitlab') # Load Gitlab as soon as possible
+require_dependency Rails.root.join('lib/ee') # Load EE as soon as possible
 
 class Settings < Settingslogic
   source ENV.fetch('GITLAB_CONFIG') { "#{Rails.root}/config/gitlab.yml" }
@@ -56,6 +57,31 @@ class Settings < Settingslogic
       (base_url(gitlab) + [gitlab.relative_url_root]).join('')
     end
 
+    def kerberos_protocol
+      kerberos.https ? "https" : "http"
+    end
+
+    def kerberos_port
+      kerberos.use_dedicated_port ? kerberos.port : gitlab.port
+    end
+
+    # Curl expects username/password for authentication. However when using GSS-Negotiate not credentials should be needed.
+    # By inserting in the Kerberos dedicated URL ":@", we give to curl an empty username and password and GSS auth goes ahead
+    # Known bug reported in http://sourceforge.net/p/curl/bugs/440/ and http://curl.haxx.se/docs/knownbugs.html
+    def build_gitlab_kerberos_url
+      [
+        kerberos_protocol,
+        "://:@",
+        gitlab.host,
+        ":#{kerberos_port}",
+        gitlab.relative_url_root
+      ].join('')
+    end
+
+    def alternative_gitlab_kerberos_url?
+      kerberos.enabled && (build_gitlab_kerberos_url != build_gitlab_url)
+    end
+
     # check that values in `current` (string or integer) is a contant in `modul`.
     def verify_constant_array(modul, current, default)
       values = default || []
@@ -110,12 +136,24 @@ class Settings < Settingslogic
 
       URI.parse(url_without_path).host
     end
+
+    # Random cron time every Sunday to load balance usage pings
+    def cron_random_weekly_time
+      hour = rand(24)
+      minute = rand(60)
+
+      "#{minute} #{hour} * * 0"
+    end
   end
 end
 
 # Default settings
 Settings['ldap'] ||= Settingslogic.new({})
 Settings.ldap['enabled'] = false if Settings.ldap['enabled'].nil?
+Settings.ldap['sync_time'] = 3600 if Settings.ldap['sync_time'].nil?
+Settings.ldap['schedule_sync_daily'] = 1 if Settings.ldap['schedule_sync_daily'].nil?
+Settings.ldap['schedule_sync_hour'] = 1 if Settings.ldap['schedule_sync_hour'].nil?
+Settings.ldap['schedule_sync_minute'] = 30  if Settings.ldap['schedule_sync_minute'].nil?
 
 # backwards compatibility, we only have one host
 if Settings.ldap['enabled'] || Rails.env.test?
@@ -129,6 +167,7 @@ if Settings.ldap['enabled'] || Rails.env.test?
   end
 
   Settings.ldap['servers'].each do |key, server|
+    server = Settingslogic.new(server)
     server['label'] ||= 'LDAP'
     server['timeout'] ||= 10.seconds
     server['block_auto_created_users'] = false if server['block_auto_created_users'].nil?
@@ -137,6 +176,9 @@ if Settings.ldap['enabled'] || Rails.env.test?
     server['attributes'] = {} if server['attributes'].nil?
     server['provider_name'] ||= "ldap#{key}".downcase
     server['provider_class'] = OmniAuth::Utils.camelize(server['provider_name'])
+    server['external_groups'] = [] if server['external_groups'].nil?
+    server['sync_ssh_keys'] = 'sshPublicKey' if server['sync_ssh_keys'].to_s == 'true'
+    Settings.ldap['servers'][key] = server
   end
 end
 
@@ -204,8 +246,8 @@ Settings.gitlab['email_from'] ||= ENV['GITLAB_EMAIL_FROM'] || "gitlab@#{Settings
 Settings.gitlab['email_display_name'] ||= ENV['GITLAB_EMAIL_DISPLAY_NAME'] || 'GitLab'
 Settings.gitlab['email_reply_to'] ||= ENV['GITLAB_EMAIL_REPLY_TO'] || "noreply@#{Settings.gitlab.host}"
 Settings.gitlab['email_subject_suffix'] ||= ENV['GITLAB_EMAIL_SUBJECT_SUFFIX'] || ""
-Settings.gitlab['base_url']   ||= Settings.send(:build_base_gitlab_url)
-Settings.gitlab['url']        ||= Settings.send(:build_gitlab_url)
+Settings.gitlab['base_url']   ||= Settings.__send__(:build_base_gitlab_url)
+Settings.gitlab['url']        ||= Settings.__send__(:build_gitlab_url)
 Settings.gitlab['user']       ||= 'git'
 Settings.gitlab['user_home']  ||= begin
   Etc.getpwnam(Settings.gitlab['user']).dir
@@ -215,7 +257,7 @@ end
 Settings.gitlab['time_zone'] ||= nil
 Settings.gitlab['signup_enabled'] ||= true if Settings.gitlab['signup_enabled'].nil?
 Settings.gitlab['signin_enabled'] ||= true if Settings.gitlab['signin_enabled'].nil?
-Settings.gitlab['restricted_visibility_levels'] = Settings.send(:verify_constant_array, Gitlab::VisibilityLevel, Settings.gitlab['restricted_visibility_levels'], [])
+Settings.gitlab['restricted_visibility_levels'] = Settings.__send__(:verify_constant_array, Gitlab::VisibilityLevel, Settings.gitlab['restricted_visibility_levels'], [])
 Settings.gitlab['username_changing_enabled'] = true if Settings.gitlab['username_changing_enabled'].nil?
 Settings.gitlab['issue_closing_pattern'] = '((?:[Cc]los(?:e[sd]?|ing)|[Ff]ix(?:e[sd]|ing)?|[Rr]esolv(?:e[sd]?|ing))(:?) +(?:(?:issues? +)?%{issue_ref}(?:(?:, *| +and +)?)|([A-Z][A-Z0-9_]+-\d+))+)' if Settings.gitlab['issue_closing_pattern'].nil?
 Settings.gitlab['default_projects_features'] ||= {}
@@ -228,11 +270,18 @@ Settings.gitlab.default_projects_features['wiki']               = true if Settin
 Settings.gitlab.default_projects_features['snippets']           = true if Settings.gitlab.default_projects_features['snippets'].nil?
 Settings.gitlab.default_projects_features['builds']             = true if Settings.gitlab.default_projects_features['builds'].nil?
 Settings.gitlab.default_projects_features['container_registry'] = true if Settings.gitlab.default_projects_features['container_registry'].nil?
-Settings.gitlab.default_projects_features['visibility_level']   = Settings.send(:verify_constant, Gitlab::VisibilityLevel, Settings.gitlab.default_projects_features['visibility_level'], Gitlab::VisibilityLevel::PRIVATE)
+Settings.gitlab.default_projects_features['visibility_level']   = Settings.__send__(:verify_constant, Gitlab::VisibilityLevel, Settings.gitlab.default_projects_features['visibility_level'], Gitlab::VisibilityLevel::PRIVATE)
 Settings.gitlab['domain_whitelist'] ||= []
 Settings.gitlab['import_sources'] ||= %w[github bitbucket gitlab google_code fogbugz git gitlab_project gitea]
 Settings.gitlab['trusted_proxies'] ||= []
 Settings.gitlab['no_todos_messages'] ||= YAML.load_file(Rails.root.join('config', 'no_todos_messages.yml'))
+
+#
+# Elasticseacrh
+#
+Settings['elasticsearch'] ||= Settingslogic.new({})
+Settings.elasticsearch['enabled'] = false if Settings.elasticsearch['enabled'].nil?
+Settings.elasticsearch['url'] = ENV['ELASTIC_URL'] || "http://localhost:9200"
 
 #
 # CI
@@ -242,7 +291,7 @@ Settings.gitlab_ci['shared_runners_enabled'] = true if Settings.gitlab_ci['share
 Settings.gitlab_ci['all_broken_builds']     = true if Settings.gitlab_ci['all_broken_builds'].nil?
 Settings.gitlab_ci['add_pusher']            = false if Settings.gitlab_ci['add_pusher'].nil?
 Settings.gitlab_ci['builds_path']           = Settings.absolute(Settings.gitlab_ci['builds_path'] || "builds/")
-Settings.gitlab_ci['url']                 ||= Settings.send(:build_gitlab_ci_url)
+Settings.gitlab_ci['url']                 ||= Settings.__send__(:build_gitlab_ci_url)
 
 #
 # Reply by email
@@ -281,9 +330,14 @@ Settings.pages['https']           = false if Settings.pages['https'].nil?
 Settings.pages['host']            ||= "example.com"
 Settings.pages['port']            ||= Settings.pages.https ? 443 : 80
 Settings.pages['protocol']        ||= Settings.pages.https ? "https" : "http"
-Settings.pages['url']             ||= Settings.send(:build_pages_url)
+Settings.pages['url']             ||= Settings.__send__(:build_pages_url)
 Settings.pages['external_http']   ||= false unless Settings.pages['external_http'].present?
 Settings.pages['external_https']  ||= false unless Settings.pages['external_https'].present?
+
+#
+# Geo
+#
+Settings.gitlab['geo_status_timeout'] ||= 10
 
 #
 # Git LFS
@@ -315,6 +369,9 @@ Settings['cron_jobs'] ||= Settingslogic.new({})
 Settings.cron_jobs['stuck_ci_jobs_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['stuck_ci_jobs_worker']['cron'] ||= '0 * * * *'
 Settings.cron_jobs['stuck_ci_jobs_worker']['job_class'] = 'StuckCiJobsWorker'
+Settings.cron_jobs['trigger_schedule_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['trigger_schedule_worker']['cron'] ||= '0 */12 * * *'
+Settings.cron_jobs['trigger_schedule_worker']['job_class'] = 'TriggerScheduleWorker'
 Settings.cron_jobs['expire_build_artifacts_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['expire_build_artifacts_worker']['cron'] ||= '50 * * * *'
 Settings.cron_jobs['expire_build_artifacts_worker']['job_class'] = 'ExpireBuildArtifactsWorker'
@@ -327,6 +384,27 @@ Settings.cron_jobs['admin_email_worker']['job_class'] = 'AdminEmailWorker'
 Settings.cron_jobs['repository_archive_cache_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['repository_archive_cache_worker']['cron'] ||= '0 * * * *'
 Settings.cron_jobs['repository_archive_cache_worker']['job_class'] = 'RepositoryArchiveCacheWorker'
+Settings.cron_jobs['historical_data_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['historical_data_worker']['cron'] ||= '0 12 * * *'
+Settings.cron_jobs['historical_data_worker']['job_class'] = 'HistoricalDataWorker'
+Settings.cron_jobs['ldap_sync_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['ldap_sync_worker']['cron'] ||= '30 1 * * *'
+Settings.cron_jobs['ldap_sync_worker']['job_class'] = 'LdapSyncWorker'
+Settings.cron_jobs['ldap_group_sync_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['ldap_group_sync_worker']['cron'] ||= '0 * * * *'
+Settings.cron_jobs['ldap_group_sync_worker']['job_class'] = 'LdapGroupSyncWorker'
+Settings.cron_jobs['geo_bulk_notify_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['geo_bulk_notify_worker']['cron'] ||= '*/10 * * * * *'
+Settings.cron_jobs['geo_bulk_notify_worker']['job_class'] ||= 'GeoBulkNotifyWorker'
+Settings.cron_jobs['geo_backfill_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['geo_backfill_worker']['cron'] ||= '*/5 * * * *'
+Settings.cron_jobs['geo_backfill_worker']['job_class'] ||= 'GeoBackfillWorker'
+Settings.cron_jobs['geo_download_dispatch_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['geo_download_dispatch_worker']['cron'] ||= '5 * * * *'
+Settings.cron_jobs['geo_download_dispatch_worker']['job_class'] ||= 'GeoFileDownloadDispatchWorker'
+Settings.cron_jobs['gitlab_usage_ping_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['gitlab_usage_ping_worker']['cron'] ||= Settings.send(:cron_random_weekly_time)
+Settings.cron_jobs['gitlab_usage_ping_worker']['job_class'] = 'GitlabUsagePingWorker'
 Settings.cron_jobs['import_export_project_cleanup_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['import_export_project_cleanup_worker']['cron'] ||= '0 * * * *'
 Settings.cron_jobs['import_export_project_cleanup_worker']['job_class'] = 'ImportExportProjectCleanupWorker'
@@ -349,6 +427,26 @@ Settings.cron_jobs['trending_projects_worker']['job_class'] = 'TrendingProjectsW
 Settings.cron_jobs['remove_unreferenced_lfs_objects_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['remove_unreferenced_lfs_objects_worker']['cron'] ||= '20 0 * * *'
 Settings.cron_jobs['remove_unreferenced_lfs_objects_worker']['job_class'] = 'RemoveUnreferencedLfsObjectsWorker'
+Settings.cron_jobs['stuck_import_jobs_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['stuck_import_jobs_worker']['cron'] ||= '15 * * * *'
+Settings.cron_jobs['stuck_import_jobs_worker']['job_class'] = 'StuckImportJobsWorker'
+Settings.cron_jobs['gitlab_usage_ping_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['gitlab_usage_ping_worker']['cron'] ||= Settings.__send__(:cron_random_weekly_time)
+Settings.cron_jobs['gitlab_usage_ping_worker']['job_class'] = 'GitlabUsagePingWorker'
+
+# Every day at 00:30
+Settings.cron_jobs['schedule_update_user_activity_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['schedule_update_user_activity_worker']['cron'] ||= '30 0 * * *'
+Settings.cron_jobs['schedule_update_user_activity_worker']['job_class'] = 'ScheduleUpdateUserActivityWorker'
+
+Settings.cron_jobs['clear_shared_runners_minutes_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['clear_shared_runners_minutes_worker']['cron'] ||= '0 0 1 * *'
+Settings.cron_jobs['clear_shared_runners_minutes_worker']['job_class'] = 'ClearSharedRunnersMinutesWorker'
+
+# Every day at 00:30
+Settings.cron_jobs['schedule_update_user_activity_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['schedule_update_user_activity_worker']['cron'] ||= '30 0 * * *'
+Settings.cron_jobs['schedule_update_user_activity_worker']['job_class'] = 'ScheduleUpdateUserActivityWorker'
 
 #
 # GitLab Shell
@@ -363,7 +461,7 @@ Settings.gitlab_shell['ssh_host']     ||= Settings.gitlab.ssh_host
 Settings.gitlab_shell['ssh_port']     ||= 22
 Settings.gitlab_shell['ssh_user']     ||= Settings.gitlab.user
 Settings.gitlab_shell['owner_group']  ||= Settings.gitlab.user
-Settings.gitlab_shell['ssh_path_prefix'] ||= Settings.send(:build_gitlab_shell_ssh_path_prefix)
+Settings.gitlab_shell['ssh_path_prefix'] ||= Settings.__send__(:build_gitlab_shell_ssh_path_prefix)
 
 #
 # Repositories
@@ -428,6 +526,21 @@ Settings.git['timeout']   ||= 10
 # db/migrate/20151023144219_remove_satellites.rb
 Settings['satellites'] ||= Settingslogic.new({})
 Settings.satellites['path'] = Settings.absolute(Settings.satellites['path'] || "tmp/repo_satellites/")
+
+#
+# Kerberos
+#
+Settings['kerberos'] ||= Settingslogic.new({})
+Settings.kerberos['enabled'] = false if Settings.kerberos['enabled'].nil?
+Settings.kerberos['keytab'] = nil if Settings.kerberos['keytab'].blank? # nil means use default keytab
+Settings.kerberos['service_principal_name'] = nil if Settings.kerberos['service_principal_name'].blank? # nil means any SPN in keytab
+Settings.kerberos['use_dedicated_port'] = false if Settings.kerberos['use_dedicated_port'].nil?
+Settings.kerberos['https'] = Settings.gitlab.https if Settings.kerberos['https'].nil?
+Settings.kerberos['port'] ||= Settings.kerberos.https ? 8443 : 8088
+
+if Settings.kerberos['enabled'] && !Settings.omniauth.providers.map(&:name).include?('kerberos_spnego')
+  Settings.omniauth.providers << Settingslogic.new({ 'name' => 'kerberos_spnego' })
+end
 
 #
 # Extra customization

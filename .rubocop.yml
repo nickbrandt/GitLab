@@ -20,6 +20,7 @@ AllCops:
     - 'node_modules/**/*'
     - 'db/*'
     - 'db/fixtures/**/*'
+    - 'db/geo/*'
     - 'tmp/**/*'
     - 'bin/**/*'
     - 'generator_templates/**/*'
@@ -349,6 +350,7 @@ Style/MutableConstant:
   Exclude:
     - 'db/migrate/**/*'
     - 'db/post_migrate/**/*'
+    - 'db/geo/migrate/**/*'
 
 # Favor unless over if for negative conditions (or control flow or).
 Style/NegatedIf:
@@ -953,6 +955,10 @@ RSpec/DescribeClass:
 # Use `described_class` for tested class / module.
 RSpec/DescribeMethod:
   Enabled: false
+
+# Avoid describing symbols.
+RSpec/DescribeSymbol:
+  Enabled: true
 
 # Checks that the second argument to top level describe is the tested method
 # name.

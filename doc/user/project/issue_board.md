@@ -165,6 +165,47 @@ to another list the label changes and a system not is recorded.
 
 ![Issue Board system notes](img/issue_board_system_notes.png)
 
+## Multiple issue boards
+
+> Introduced in [GitLab Enterprise Edition][ee] 8.13.
+
+Multiple issue boards, as the name suggests, allow for more than one issue board
+for a given project. This is great for large projects with more than one team
+or in situations where a repository is used to host the code of multiple
+products.
+
+Clicking on the current board name in the upper left corner will reveal a
+menu from where you can create another issue board and rename or delete the
+existing one.
+
+![Multiple issue boards](img/issue_boards_multiple.png)
+
+### Board with a milestone
+
+> Introduced in [GitLab Enterprise Edition][ee] 9.0.
+
+An issue board can be associated with a milestone which will automatically filter
+the issue to that milestone. This allows you to create unique boards for
+individual milestones.
+
+You can assign a milestone to a board when creating a new issue board or you
+can update current issue boards to also have a milestone. Once a specific
+milestone is assigned to an issue board, you will no longer be able to filter
+through any other milestone. In order to do that, you need to remove the
+defined milestone from the issue board.
+
+There are also two pre-defined milestones, **Any milestone** which will filter
+the issues with any milestone, and **Upcoming** which will filter issues to the
+milestone with the due date that is next.
+
+![Update boards milestone](img/issue_board_multiple_milestone.png)
+
+## Focus mode
+
+Click the button at the top right to toggle focus mode on and off. In focus mode, the navigation UI is hidden, allowing you to focus on issues in the board.
+
+![Board focus mode](img/issue_board_focus_mode.gif)
+
 ## Permissions
 
 [Developers and up](../permissions.md) can use all the functionality of the
@@ -189,6 +230,7 @@ A few things to remember:
   20 will appear.
 
 [ce-5554]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/5554
+[ee]: https://about.gitlab.com/gitlab-ee/
 [labels]: ./labels.md
 [scrum]: https://en.wikipedia.org/wiki/Scrum_(software_development)
 [kanban]: https://en.wikipedia.org/wiki/Kanban_(development)

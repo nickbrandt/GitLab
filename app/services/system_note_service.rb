@@ -228,12 +228,10 @@ module SystemNoteService
 
   def discussion_continued_in_issue(discussion, project, author, issue)
     body = "created #{issue.to_reference} to continue this discussion"
+    note_attributes = discussion.reply_attributes.merge(project: project, author: author, note: body)
 
-    note_params = discussion.reply_attributes.merge(project: project, author: author, note: body)
-    note_params[:type] = note_params.delete(:note_type)
-
-    note = Note.create(note_params.merge(system: true))
-    note.system_note_metadata = SystemNoteMetadata.new({ action: 'discussion' })
+    note = Note.create(note_attributes.merge(system: true))
+    note.system_note_metadata = SystemNoteMetadata.new(action: 'discussion')
 
     note
   end
@@ -475,6 +473,28 @@ module SystemNoteService
     body = "moved #{direction} #{cross_reference}"
 
     create_note(NoteSummary.new(noteable, project, author, body, action: 'moved'))
+  end
+
+  # Called when the merge request is approved by user
+  #
+  # noteable - Noteable object
+  # user     - User performing approve
+  #
+  # Example Note text:
+  #
+  #   "approved this merge request"
+  #
+  # Returns the created Note object
+  def approve_mr(noteable, user)
+    body = "approved this merge request"
+
+    create_note(NoteSummary.new(noteable, noteable.project, user, body, action: 'approved'))
+  end
+
+  def unapprove_mr(noteable, user)
+    body = "unapproved this merge request"
+
+    create_note(NoteSummary.new(noteable, noteable.project, user, body, action: 'unapproved'))
   end
 
   private

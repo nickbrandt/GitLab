@@ -147,10 +147,95 @@ describe API::Internal, api: true  do
     end
   end
 
-  describe "POST /internal/allowed" do
+  describe "GET /internal/authorized_keys" do
+    context "unsing an existing key's fingerprint" do
+      it "finds the key" do
+        get(api('/internal/authorized_keys'), fingerprint: key.fingerprint, secret_token: secret_token)
+
+        expect(response.status).to eq(200)
+        expect(json_response["key"]).to eq(key.key)
+      end
+    end
+
+    context "non existing key's fingerprint" do
+      it "returns 404" do
+        get(api('/internal/authorized_keys'), fingerprint: "no:t-:va:li:d0", secret_token: secret_token)
+
+        expect(response.status).to eq(404)
+      end
+    end
+
+    context "using a partial fingerprint" do
+      it "returns 404" do
+        get(api('/internal/authorized_keys'), fingerprint: "#{key.fingerprint[0..5]}%", secret_token: secret_token)
+
+        expect(response.status).to eq(404)
+      end
+    end
+
+    context "sending the key" do
+      it "finds the key" do
+        get(api('/internal/authorized_keys'), key: key.key.split[1], secret_token: secret_token)
+
+        expect(response.status).to eq(200)
+        expect(json_response["key"]).to eq(key.key)
+      end
+
+      it "returns 404 with a partial key" do
+        get(api('/internal/authorized_keys'), key: key.key.split[1][0...-3], secret_token: secret_token)
+
+        expect(response.status).to eq(404)
+      end
+
+      it "returns 404 with an not valid base64 string" do
+        get(api('/internal/authorized_keys'), key: "whatever!", secret_token: secret_token)
+
+        expect(response.status).to eq(404)
+      end
+    end
+  end
+
+  describe "POST /internal/allowed", :redis do
     context "access granted" do
       before do
         project.team << [user, :developer]
+        Timecop.freeze
+      end
+
+      after do
+        Timecop.return
+      end
+
+      context 'with env passed as a JSON' do
+        it 'sets env in RequestStore' do
+          expect(Gitlab::Git::Env).to receive(:set).with({
+            'GIT_OBJECT_DIRECTORY' => 'foo',
+            'GIT_ALTERNATE_OBJECT_DIRECTORIES' => 'bar'
+          })
+
+          push(key, project.wiki, env: {
+            GIT_OBJECT_DIRECTORY: 'foo',
+            GIT_ALTERNATE_OBJECT_DIRECTORIES: 'bar'
+          }.to_json)
+
+          expect(response).to have_http_status(200)
+        end
+      end
+
+      context 'with env passed as a JSON' do
+        it 'sets env in RequestStore' do
+          expect(Gitlab::Git::Env).to receive(:set).with({
+            'GIT_OBJECT_DIRECTORY' => 'foo',
+            'GIT_ALTERNATE_OBJECT_DIRECTORIES' => 'bar'
+          })
+
+          push(key, project.wiki, env: {
+            GIT_OBJECT_DIRECTORY: 'foo',
+            GIT_ALTERNATE_OBJECT_DIRECTORIES: 'bar'
+          }.to_json)
+
+          expect(response).to have_http_status(200)
+        end
       end
 
       context "git push with project.wiki" do
@@ -160,6 +245,7 @@ describe API::Internal, api: true  do
           expect(response).to have_http_status(200)
           expect(json_response["status"]).to be_truthy
           expect(json_response["repository_path"]).to eq(project.wiki.repository.path_to_repo)
+          expect(user).not_to have_an_activity_record
         end
       end
 
@@ -170,6 +256,7 @@ describe API::Internal, api: true  do
           expect(response).to have_http_status(200)
           expect(json_response["status"]).to be_truthy
           expect(json_response["repository_path"]).to eq(project.wiki.repository.path_to_repo)
+          expect(user).to have_an_activity_record
         end
       end
 
@@ -180,6 +267,7 @@ describe API::Internal, api: true  do
           expect(response).to have_http_status(200)
           expect(json_response["status"]).to be_truthy
           expect(json_response["repository_path"]).to eq(project.repository.path_to_repo)
+          expect(user).to have_an_activity_record
         end
       end
 
@@ -190,6 +278,7 @@ describe API::Internal, api: true  do
           expect(response).to have_http_status(200)
           expect(json_response["status"]).to be_truthy
           expect(json_response["repository_path"]).to eq(project.repository.path_to_repo)
+          expect(user).not_to have_an_activity_record
         end
 
         context 'project as /namespace/project' do
@@ -225,6 +314,7 @@ describe API::Internal, api: true  do
 
           expect(response).to have_http_status(200)
           expect(json_response["status"]).to be_falsey
+          expect(user).not_to have_an_activity_record
         end
       end
 
@@ -234,6 +324,7 @@ describe API::Internal, api: true  do
 
           expect(response).to have_http_status(200)
           expect(json_response["status"]).to be_falsey
+          expect(user).not_to have_an_activity_record
         end
       end
     end
@@ -251,6 +342,7 @@ describe API::Internal, api: true  do
 
           expect(response).to have_http_status(200)
           expect(json_response["status"]).to be_falsey
+          expect(user).not_to have_an_activity_record
         end
       end
 
@@ -260,6 +352,7 @@ describe API::Internal, api: true  do
 
           expect(response).to have_http_status(200)
           expect(json_response["status"]).to be_falsey
+          expect(user).not_to have_an_activity_record
         end
       end
     end
@@ -463,7 +556,7 @@ describe API::Internal, api: true  do
     )
   end
 
-  def push(key, project, protocol = 'ssh')
+  def push(key, project, protocol = 'ssh', env: nil)
     post(
       api("/internal/allowed"),
       changes: 'd14d6c0abdd253381df51a723d58691b2ee1ab08 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/heads/master',
@@ -471,7 +564,8 @@ describe API::Internal, api: true  do
       project: project.repository.path_to_repo,
       action: 'git-receive-pack',
       secret_token: secret_token,
-      protocol: protocol
+      protocol: protocol,
+      env: env
     )
   end
 

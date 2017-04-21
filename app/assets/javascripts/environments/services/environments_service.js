@@ -14,6 +14,10 @@ export default class EnvironmentsService {
     return this.environments.get({ scope, page });
   }
 
+  getDeployBoard(endpoint) {
+    return Vue.http.get(endpoint);
+  }
+
   postAction(endpoint) {
     return Vue.http.post(endpoint, {}, { emulateJSON: true });
   }

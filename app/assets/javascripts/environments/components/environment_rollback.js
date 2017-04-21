@@ -23,6 +23,7 @@ export default {
     service: {
       type: Object,
       required: true,
+      default: () => ({}),
     },
   },
 
@@ -35,6 +36,8 @@ export default {
   methods: {
     onClick() {
       this.isLoading = true;
+
+      $(this.$el).tooltip('destroy');
 
       this.service.postAction(this.retryUrl)
       .then(() => {

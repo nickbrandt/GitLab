@@ -49,7 +49,7 @@ describe('Environment', () => {
       });
     });
 
-    describe('with paginated environments', () => {
+    describe('with environments', () => {
       const environmentsResponseInterceptor = (request, next) => {
         next(request.respondWith(JSON.stringify({
           environments: [environment],
@@ -83,9 +83,10 @@ describe('Environment', () => {
 
       it('should render a table with environments', (done) => {
         setTimeout(() => {
+          expect(component.$el.querySelectorAll('table')).toBeDefined();
           expect(
-            component.$el.querySelectorAll('table tbody tr').length,
-          ).toEqual(1);
+            component.$el.querySelector('.environment-name').textContent.trim(),
+          ).toEqual(environment.name);
           done();
         }, 0);
       });
@@ -142,6 +143,17 @@ describe('Environment', () => {
           setTimeout(() => {
             component.$el.querySelector('.gl-pagination li:nth-child(5) a').click();
             expect(gl.utils.visitUrl).toHaveBeenCalledWith('?page=2&scope=all');
+            done();
+          }, 0);
+        });
+      });
+
+      describe('deploy boards', () => {
+        it('should render arrow to open deploy boards', (done) => {
+          setTimeout(() => {
+            expect(
+              component.$el.querySelector('.deploy-board-icon i.fa-caret-right'),
+            ).toBeDefined();
             done();
           }, 0);
         });

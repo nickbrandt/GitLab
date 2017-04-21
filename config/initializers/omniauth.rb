@@ -1,13 +1,16 @@
 if Gitlab::LDAP::Config.enabled?
   module OmniAuth::Strategies
-    server = Gitlab.config.ldap.servers.values.first
-    klass = server['provider_class']
-    const_set(klass, Class.new(LDAP)) unless klass == 'LDAP'
+    Gitlab::LDAP::Config.servers.each do |server|
+      # do not redeclare LDAP
+      next if server['provider_name'] == 'ldap'
+      const_set(server['provider_class'], Class.new(LDAP))
+    end
   end
 
   OmniauthCallbacksController.class_eval do
-    server = Gitlab.config.ldap.servers.values.first
-    alias_method server['provider_name'], :ldap
+    Gitlab::LDAP::Config.servers.each do |server|
+      alias_method server['provider_name'], :ldap
+    end
   end
 end
 
@@ -22,6 +25,7 @@ end
 if Gitlab.config.omniauth.enabled
   provider_names = Gitlab.config.omniauth.providers.map(&:name)
   require 'omniauth-kerberos' if provider_names.include?('kerberos')
+  require_dependency 'omni_auth/strategies/kerberos_spnego' if provider_names.include?('kerberos_spnego')
 end
 
 module OmniAuth

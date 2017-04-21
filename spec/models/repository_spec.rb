@@ -171,6 +171,27 @@ describe Repository, models: true do
     end
   end
 
+  describe '#commits' do
+    it 'sets follow when path is a single path' do
+      expect(Gitlab::Git::Commit).to receive(:where).with(a_hash_including(follow: true)).and_call_original.twice
+
+      repository.commits('master', path: 'README.md')
+      repository.commits('master', path: ['README.md'])
+    end
+
+    it 'does not set follow when path is multiple paths' do
+      expect(Gitlab::Git::Commit).to receive(:where).with(a_hash_including(follow: false)).and_call_original
+
+      repository.commits('master', path: ['README.md', 'CHANGELOG'])
+    end
+
+    it 'does not set follow when there are no paths' do
+      expect(Gitlab::Git::Commit).to receive(:where).with(a_hash_including(follow: false)).and_call_original
+
+      repository.commits('master')
+    end
+  end
+
   describe '#find_commits_by_message' do
     it 'returns commits with messages containing a given string' do
       commit_ids = repository.find_commits_by_message('submodule').map(&:id)
@@ -1094,6 +1115,32 @@ describe Repository, models: true do
     end
   end
 
+  describe '#ff_merge' do
+    before { repository.add_branch(user, 'ff-target', 'feature~5') }
+
+    it 'merges the code and return the commit id' do
+      merge_request = create(:merge_request, source_branch: 'feature', target_branch: 'ff-target', source_project: project)
+      merge_commit_id = repository.ff_merge(user,
+                                            merge_request.diff_head_sha,
+                                            merge_request.target_branch,
+                                            merge_request: merge_request)
+      merge_commit = repository.commit(merge_commit_id)
+
+      expect(merge_commit).to be_present
+      expect(repository.blob_at(merge_commit.id, 'files/ruby/feature.rb')).to be_present
+    end
+
+    it 'sets the `in_progress_merge_commit_sha` flag for the given merge request' do
+      merge_request = create(:merge_request, source_branch: 'feature', target_branch: 'ff-target', source_project: project)
+      merge_commit_id = repository.ff_merge(user,
+                                            merge_request.diff_head_sha,
+                                            merge_request.target_branch,
+                                            merge_request: merge_request)
+
+      expect(merge_request.in_progress_merge_commit_sha).to eq(merge_commit_id)
+    end
+  end
+
   describe '#revert' do
     let(:new_image_commit) { repository.commit('33f3729a45c02fc67d00adb1b8bca394b0e761d9') }
     let(:update_image_commit) { repository.commit('2f63565e7aac07bcdadb654e253078b727143ec4') }
@@ -1259,7 +1306,6 @@ describe Repository, models: true do
         :changelog,
         :license,
         :contributing,
-        :version,
         :gitignore,
         :koding,
         :gitlab_ci,
@@ -1283,8 +1329,6 @@ describe Repository, models: true do
   describe '#after_import' do
     it 'flushes and builds the cache' do
       expect(repository).to receive(:expire_content_cache)
-      expect(repository).to receive(:expire_tags_cache)
-      expect(repository).to receive(:expire_branches_cache)
 
       repository.after_import
     end
@@ -1316,6 +1360,48 @@ describe Repository, models: true do
       expect(repository).to receive(:expire_branches_cache)
 
       repository.after_remove_branch
+    end
+  end
+
+  describe "Elastic search", elastic: true do
+    before do
+      stub_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
+      Gitlab::Elastic::Helper.create_empty_index
+    end
+
+    after do
+      Gitlab::Elastic::Helper.delete_index
+      stub_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
+    end
+
+    describe "class method find_commits_by_message_with_elastic" do
+      it "returns commits" do
+        project = create :project
+        project1 = create :project
+
+        project.repository.index_commits
+        project1.repository.index_commits
+
+        Gitlab::Elastic::Helper.refresh_index
+
+        expect(described_class.find_commits_by_message_with_elastic('initial').first).to be_a(Commit)
+        expect(described_class.find_commits_by_message_with_elastic('initial').count).to eq(2)
+        expect(described_class.find_commits_by_message_with_elastic('initial').total_count).to eq(2)
+      end
+    end
+
+    describe "find_commits_by_message_with_elastic" do
+      it "returns commits" do
+        project = create :project
+
+        project.repository.index_commits
+
+        Gitlab::Elastic::Helper.refresh_index
+
+        expect(project.repository.find_commits_by_message_with_elastic('initial').first).to be_a(Commit)
+        expect(project.repository.find_commits_by_message_with_elastic('initial').count).to eq(1)
+        expect(project.repository.find_commits_by_message_with_elastic('initial').total_count).to eq(1)
+      end
     end
   end
 
@@ -1705,6 +1791,81 @@ describe Repository, models: true do
     end
   end
 
+  describe '#push_remote_branches' do
+    it 'push branches to the remote repo' do
+      expect_any_instance_of(Gitlab::Shell).to receive(:push_remote_branches)
+        .with(repository.storage_path, repository.path_with_namespace, 'remote_name', ['branch'])
+
+      repository.push_remote_branches('remote_name', ['branch'])
+    end
+  end
+
+  describe '#delete_remote_branches' do
+    it 'delete branches to the remote repo' do
+      expect_any_instance_of(Gitlab::Shell).to receive(:delete_remote_branches)
+        .with(repository.storage_path, repository.path_with_namespace, 'remote_name', ['branch'])
+
+      repository.delete_remote_branches('remote_name', ['branch'])
+    end
+  end
+
+  describe '#remove_remote' do
+    it 'remove a remote reference' do
+      repository.add_remote('upstream', 'http://repo.test')
+
+      expect(repository.remove_remote('upstream')).to eq(true)
+    end
+  end
+
+  describe '#remote_tags' do
+    it 'gets the remote tags' do
+      masterrev = repository.find_branch('master').dereferenced_target.id
+
+      expect_any_instance_of(Gitlab::Shell).to receive(:list_remote_tags)
+        .with(repository.storage_path, repository.path_with_namespace, 'upstream')
+        .and_return({ 'v0.0.1' => masterrev })
+
+      tags = repository.remote_tags('upstream')
+
+      expect(tags.first).to be_an_instance_of(Gitlab::Git::Tag)
+      expect(tags.first.name).to eq('v0.0.1')
+      expect(tags.first.dereferenced_target.id).to eq(masterrev)
+    end
+  end
+
+  describe '#local_branches' do
+    it 'returns the local branches' do
+      masterrev = repository.find_branch('master').dereferenced_target
+      create_remote_branch('joe', 'remote_branch', masterrev)
+      repository.add_branch(user, 'local_branch', masterrev)
+
+      expect(repository.local_branches.any? { |branch| branch.name == 'remote_branch' }).to eq(false)
+      expect(repository.local_branches.any? { |branch| branch.name == 'local_branch' }).to eq(true)
+    end
+  end
+
+  describe '#remote_branches' do
+    it 'returns the remote branches' do
+      masterrev = repository.find_branch('master').dereferenced_target
+      create_remote_branch('joe', 'remote_branch', masterrev)
+      repository.add_branch(user, 'local_branch', masterrev)
+
+      expect(repository.remote_branches('joe').any? { |branch| branch.name == 'local_branch' }).to eq(false)
+      expect(repository.remote_branches('joe').any? { |branch| branch.name == 'remote_branch' }).to eq(true)
+    end
+  end
+
+  describe '#upstream_branches' do
+    it 'returns branches from the upstream remote' do
+      masterrev = repository.find_branch('master').dereferenced_target
+      create_remote_branch('upstream', 'upstream_branch', masterrev)
+
+      expect(repository.upstream_branches.size).to eq(1)
+      expect(repository.upstream_branches.first).to be_an_instance_of(Gitlab::Git::Branch)
+      expect(repository.upstream_branches.first.name).to eq('upstream_branch')
+    end
+  end
+
   describe '#commit_count' do
     context 'with a non-existing repository' do
       it 'returns 0' do
@@ -1831,16 +1992,32 @@ describe Repository, models: true do
     end
   end
 
-  describe '#is_ancestor?' do
-    context 'Gitaly is_ancestor feature enabled' do
-      it 'asks Gitaly server if it\'s an ancestor' do
-        commit = repository.commit
-        allow(Gitlab::GitalyClient).to receive(:feature_enabled?).with(:is_ancestor).and_return(true)
-        expect(Gitlab::GitalyClient::Commit).to receive(:is_ancestor).
-          with(repository.raw_repository, commit.id, commit.id).and_return(true)
+  describe '#after_sync' do
+    it 'expires repository cache' do
+      expect(repository).to receive(:expire_all_method_caches)
+      expect(repository).to receive(:expire_branch_cache)
+      expect(repository).to receive(:expire_content_cache)
 
-        expect(repository.is_ancestor?(commit.id, commit.id)).to be true
-      end
+      repository.after_sync
     end
   end
+
+  def create_remote_branch(remote_name, branch_name, target)
+    rugged = repository.rugged
+    rugged.references.create("refs/remotes/#{remote_name}/#{branch_name}", target.id)
+  end
+
+  # TODO: Uncomment when feature is reenabled
+  # describe '#is_ancestor?' do
+  #   context 'Gitaly is_ancestor feature enabled' do
+  #     it 'asks Gitaly server if it\'s an ancestor' do
+  #       commit = repository.commit
+  #       allow(Gitlab::GitalyClient).to receive(:feature_enabled?).with(:is_ancestor).and_return(true)
+  #       expect(Gitlab::GitalyClient::Commit).to receive(:is_ancestor).
+  #         with(repository.raw_repository, commit.id, commit.id).and_return(true)
+  #
+  #       expect(repository.is_ancestor?(commit.id, commit.id)).to be true
+  #     end
+  #   end
+  # end
 end

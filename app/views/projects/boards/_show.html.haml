@@ -1,5 +1,6 @@
+- board = local_assigns.fetch(:board, nil)
 - @no_container = true
-- @content_class = "issue-boards-content"
+- @content_class = "issue-boards-content js-focus-mode-board"
 - page_title "Boards"
 
 - content_for :page_specific_javascripts do
@@ -13,7 +14,7 @@
 = render "projects/issues/head"
 
 .hidden-xs.hidden-sm
-  = render 'shared/issuable/search_bar', type: :boards
+  = render 'shared/issuable/search_bar', type: :boards, board: board
 
 #board-app.boards-app{ "v-cloak" => true, data: board_data }
   .boards-list{ ":class" => "{ 'is-compact': detailIssueVisible }" }

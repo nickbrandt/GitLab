@@ -23,6 +23,7 @@ export default Vue.component('environment-folder-view', {
 
     return {
       store,
+      service: {},
       folderName,
       endpoint,
       state: store.state,
@@ -31,12 +32,6 @@ export default Vue.component('environment-folder-view', {
       cssContainerClass: environmentsData.cssClass,
       canCreateDeployment: environmentsData.canCreateDeployment,
       canReadEnvironment: environmentsData.canReadEnvironment,
-
-      // svgs
-      commitIconSvg: environmentsData.commitIconSvg,
-      playIconSvg: environmentsData.playIconSvg,
-      terminalIconSvg: environmentsData.terminalIconSvg,
-
       // Pagination Properties,
       paginationInformation: {},
       pageNumber: 1,
@@ -110,6 +105,17 @@ export default Vue.component('environment-folder-view', {
   },
 
   methods: {
+
+    /**
+     * Toggles the visibility of the deploy boards of the clicked environment.
+     *
+     * @param  {Object} model
+     * @return {Object}
+     */
+    toggleDeployBoard(model) {
+      return this.store.toggleDeployBoard(model.id);
+    },
+
     /**
      * Will change the page number and update the URL.
      *
@@ -163,9 +169,8 @@ export default Vue.component('environment-folder-view', {
             :environments="state.environments"
             :can-create-deployment="canCreateDeploymentParsed"
             :can-read-environment="canReadEnvironmentParsed"
-            :play-icon-svg="playIconSvg"
-            :terminal-icon-svg="terminalIconSvg"
-            :commit-icon-svg="commitIconSvg"
+            :toggleDeployBoard="toggleDeployBoard"
+            :store="store"
             :service="service"/>
 
           <table-pagination v-if="state.paginationInformation && state.paginationInformation.totalPages > 1"

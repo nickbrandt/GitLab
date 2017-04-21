@@ -22,12 +22,21 @@ Rails.application.routes.draw do
                 authorizations: 'oauth/authorizations'
   end
 
+  namespace :oauth do
+    scope path: 'geo', controller: :geo_auth, as: :geo do
+      get 'auth'
+      get 'callback'
+      get 'logout'
+    end
+  end
+
   use_doorkeeper_openid_connect
 
   # Autocomplete
   get '/autocomplete/users' => 'autocomplete#users'
   get '/autocomplete/users/:id' => 'autocomplete#user'
   get '/autocomplete/projects' => 'autocomplete#projects'
+  get '/autocomplete/project_groups' => 'autocomplete#project_groups'
 
   # Search
   get 'search' => 'search#show'
@@ -38,6 +47,12 @@ Rails.application.routes.draw do
 
   # Health check
   get 'health_check(/:checks)' => 'health_check#index', as: :health_check
+
+  scope path: '-', controller: 'health' do
+    get :liveness
+    get :readiness
+    get :metrics
+  end
 
   # Koding route
   get 'koding' => 'koding#index'

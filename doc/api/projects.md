@@ -18,6 +18,7 @@ Constants for project visibility levels are next:
   The project can be cloned without any authentication.
 
 
+
 ## List projects
 
 Get a list of visible projects for authenticated user. When being accessed without authentication, all public projects are returned.
@@ -90,7 +91,8 @@ Parameters:
     "shared_with_groups": [],
     "only_allow_merge_if_pipeline_succeeds": false,
     "only_allow_merge_if_all_discussions_are_resolved": false,
-    "request_access_enabled": false
+    "request_access_enabled": false,
+    "approvals_before_merge": 0
   },
   {
     "id": 6,
@@ -150,15 +152,15 @@ Parameters:
     "shared_with_groups": [],
     "only_allow_merge_if_pipeline_succeeds": false,
     "only_allow_merge_if_all_discussions_are_resolved": false,
-    "request_access_enabled": false
+    "request_access_enabled": false,
+    "approvals_before_merge": 0
   }
 ]
 ```
 
 ### Get single project
 
-Get a specific project, identified by project ID or NAMESPACE/PROJECT_NAME, which is owned by the authenticated user.
-If using namespaced projects call make sure that the NAMESPACE/PROJECT_NAME is URL-encoded, eg. `/api/v3/projects/diaspora%2Fdiaspora` (where `/` is represented by `%2F`). This endpoint can be accessed without authentication if
+Get a specific project. This endpoint can be accessed without authentication if
 the project is publicly accessible.
 
 ```
@@ -169,7 +171,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID or NAMESPACE/PROJECT_NAME of the project |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
 ```json
 {
@@ -239,9 +241,11 @@ Parameters:
       "group_access_level": 10
     }
   ],
+  "repository_storage": "default",
   "only_allow_merge_if_pipeline_succeeds": false,
   "only_allow_merge_if_all_discussions_are_resolved": false,
-  "request_access_enabled": false
+  "request_access_enabled": false,
+  "approvals_before_merge": 0
 }
 ```
 
@@ -295,7 +299,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID or NAMESPACE/PROJECT_NAME of the project |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
 ```json
 [
@@ -436,6 +440,7 @@ Parameters:
 | `name` | string | yes if path is not provided | The name of the new project. Equals path if not provided. |
 | `path` | string | yes if name is not provided | Repository name for new project. Generated based on name if not provided (generated lowercased with dashes). |
 | `namespace_id` | integer | no | Namespace for the new project (defaults to the current user's namespace) |
+| `default_branch` | string | no | `master` by default |
 | `description` | string | no | Short project description |
 | `issues_enabled` | boolean | no | Enable issues for this project |
 | `merge_requests_enabled` | boolean | no | Enable merge requests for this project |
@@ -451,6 +456,8 @@ Parameters:
 | `only_allow_merge_if_all_discussions_are_resolved` | boolean | no | Set whether merge requests can only be merged when all the discussions are resolved |
 | `lfs_enabled` | boolean | no | Enable LFS |
 | `request_access_enabled` | boolean | no | Allow users to request member access |
+| `repository_storage` | string | no | Which storage shard the repository is on. Available only to admins |
+| `approvals_before_merge` | integer | no | How many approvers should approve merge request by default |
 
 ### Create project for user
 
@@ -467,7 +474,6 @@ Parameters:
 | `user_id` | integer | yes | The user ID of the project owner |
 | `name` | string | yes | The name of the new project |
 | `path` | string | no | Custom repository name for new project. By default generated based on name |
-| `default_branch` | string | no | `master` by default |
 | `namespace_id` | integer | no | Namespace for the new project (defaults to the current user's namespace) |
 | `description` | string | no | Short project description |
 | `issues_enabled` | boolean | no | Enable issues for this project |
@@ -484,6 +490,8 @@ Parameters:
 | `only_allow_merge_if_all_discussions_are_resolved` | boolean | no | Set whether merge requests can only be merged when all the discussions are resolved |
 | `lfs_enabled` | boolean | no | Enable LFS |
 | `request_access_enabled` | boolean | no | Allow users to request member access |
+| `repository_storage` | string | no | Which storage shard the repository is on. Available only to admins |
+| `approvals_before_merge` | integer | no | How many approvers should approve merge request by default |
 
 ### Edit project
 
@@ -497,7 +505,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID or NAMESPACE/PROJECT_NAME of the project |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `name` | string | yes | The name of the project |
 | `path` | string | no | Custom repository name for the project. By default generated based on name |
 | `default_branch` | string | no | `master` by default |
@@ -516,6 +524,8 @@ Parameters:
 | `only_allow_merge_if_all_discussions_are_resolved` | boolean | no | Set whether merge requests can only be merged when all the discussions are resolved |
 | `lfs_enabled` | boolean | no | Enable LFS |
 | `request_access_enabled` | boolean | no | Allow users to request member access |
+| `repository_storage` | string | no | Which storage shard the repository is on. Available only to admins |
+| `approvals_before_merge` | integer | no | How many approvers should approve merge request by default |
 
 ### Fork project
 
@@ -529,7 +539,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID or NAMESPACE/PROJECT_NAME of the project |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `namespace` | integer/string | yes | The ID or path of the namespace that the project will be forked to |
 
 ### Star a project
@@ -544,7 +554,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID or NAMESPACE/PROJECT_NAME of the project |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
 ```bash
 curl --request POST --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/projects/5/star"
@@ -609,7 +619,7 @@ POST /projects/:id/unstar
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
 ```bash
 curl --request POST --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/projects/5/unstar"
@@ -675,7 +685,7 @@ POST /projects/:id/archive
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
 ```bash
 curl --request POST --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/projects/5/archive"
@@ -757,7 +767,7 @@ POST /projects/:id/unarchive
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
 ```bash
 curl --request POST --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/projects/5/unarchive"
@@ -840,7 +850,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
 ## Uploads
 
@@ -856,7 +866,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `file` | string | yes | The file to be uploaded |
 
 ```json
@@ -887,7 +897,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `group_id` | integer | yes | The ID of the group to share with |
 | `group_access` | integer | yes | The permissions level to grant the group |
 | `expires_at` | string | no | Share expiration date in ISO 8601 format: 2016-09-26 |
@@ -904,7 +914,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `group_id` | integer | yes | The ID of the group |
 
 ```bash
@@ -928,7 +938,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
 ### Get project hook
 
@@ -942,7 +952,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `hook_id` | integer | yes | The ID of a project hook |
 
 ```json
@@ -975,7 +985,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `url` | string | yes | The hook URL |
 | `push_events` | boolean | no | Trigger hook on push events |
 | `issues_events` | boolean | no | Trigger hook on issues events |
@@ -1000,7 +1010,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `hook_id` | integer | yes | The ID of the project hook |
 | `url` | string | yes | The hook URL |
 | `push_events` | boolean | no | Trigger hook on push events |
@@ -1027,7 +1037,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `hook_id` | integer | yes | The ID of the project hook |
 
 Note the JSON response differs if the hook is available or not. If the project hook
@@ -1049,7 +1059,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
 ```json
 [
@@ -1106,7 +1116,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `branch` | string | yes | The name of the branch |
 | `developers_can_push` | boolean | no | Flag if developers can push to the branch |
 | `developers_can_merge` | boolean | no | Flag if developers can merge to the branch |
@@ -1123,7 +1133,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `branch` | string | yes | The name of the branch |
 
 ### Unprotect single branch
@@ -1138,7 +1148,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `branch` | string | yes | The name of the branch |
 
 ## Admin fork relation
@@ -1155,7 +1165,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 | `forked_from_id` | ID | yes | The ID of the project that was forked from |
 
 ### Delete an existing forked from relationship
@@ -1168,7 +1178,7 @@ Parameter:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
 ## Search for projects by name
 
@@ -1201,3 +1211,88 @@ Parameters:
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
 | `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+
+## Push Rules (EE only)
+
+### Show project push rules
+
+Get a project push rule.
+
+```
+GET /projects/:id/push_rule
+```
+
+Parameters:
+
+- `id` (required) - The ID of a project
+
+
+```json
+{
+  "id": 1,
+  "project_id": 3,
+  "commit_message_regex": "Fixes \d +\",
+  "deny_delete_tag": false,
+  "created_at": "2012-10-12T17:04:47Z",
+  "member_check": false,
+  "prevent_secrets": false,
+  "author_email_regex": "",
+  "file_name_regex": "",
+  "max_file_size": 5
+}
+```
+
+### Add project push rule
+
+Adds a push rule to a specified project.
+
+```
+POST /projects/:id/push_rule
+```
+
+Parameters:
+
+| Attribute | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `deny_delete_tag` | boolean | no | Deny deleting a tag |
+| `member_check` | boolean | no | Restrict commits by author (email) to existing GitLab users |
+| `prevent_secrets` | boolean | no | GitLab will reject any files that are likely to contain secrets |
+| `commit_message_regex` | string | no | All commit messages must match this, e.g. `Fixed \d+\..*` |
+| `author_email_regex` | string | no | All commit author emails must match this, e.g. `@my-company.com$` |
+| `file_name_regex` | string | no | All commited filenames must **not** match this, e.g. `(jar|exe)$` |
+| `max_file_size` | integer | no | Maximum file size (MB) |
+
+### Edit project push rule
+
+Edits a push rule for a specified project.
+
+```
+PUT /projects/:id/push_rule
+```
+
+Parameters:
+
+| Attribute | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id` | integer/string | yes | The ID of the project or NAMESPACE/PROJECT_NAME |
+| `deny_delete_tag` | boolean | no | Deny deleting a tag |
+| `member_check` | boolean | no | Restrict commits by author (email) to existing GitLab users |
+| `prevent_secrets` | boolean | no | GitLab will reject any files that are likely to contain secrets |
+| `commit_message_regex` | string | no | All commit messages must match this, e.g. `Fixed \d+\..*` |
+| `author_email_regex` | string | no | All commit author emails must match this, e.g. `@my-company.com$` |
+| `file_name_regex` | string | no | All commited filenames must **not** match this, e.g. `(jar|exe)$` |
+| `max_file_size` | integer | no | Maximum file size (MB) |
+
+### Delete project push rule
+
+Removes a push rule from a project. This is an idempotent method and can be called multiple times.
+Either the push rule is available or not.
+
+```
+DELETE /projects/:id/push_rule
+```
+
+Parameters:
+
+- `id` (required) - The ID of a project

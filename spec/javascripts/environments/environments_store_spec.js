@@ -1,5 +1,5 @@
 import Store from '~/environments/stores/environments_store';
-import { environmentsList, serverData } from './mock_data';
+import { serverData, deployBoardMockData } from './mock_data';
 
 describe('Store', () => {
   let store;
@@ -16,9 +16,28 @@ describe('Store', () => {
   });
 
   it('should store environments', () => {
+    const expectedResult = {
+      name: 'DEV',
+      size: 1,
+      id: 7,
+      state: 'available',
+      external_url: null,
+      environment_type: null,
+      last_deployment: null,
+      'stop_action?': false,
+      environment_path: '/root/review-app/environments/7',
+      stop_path: '/root/review-app/environments/7/stop',
+      created_at: '2017-01-31T10:53:46.894Z',
+      updated_at: '2017-01-31T10:53:46.894Z',
+      rollout_status_path: '/path',
+      hasDeployBoard: true,
+      isDeployBoardVisible: true,
+      deployBoardData: {},
+    };
+
     store.storeEnvironments(serverData);
     expect(store.state.environments.length).toEqual(serverData.length);
-    expect(store.state.environments[0]).toEqual(environmentsList[0]);
+    expect(store.state.environments[0]).toEqual(expectedResult);
   });
 
   it('should store available count', () => {
@@ -35,6 +54,20 @@ describe('Store', () => {
     it('should store environments', () => {
       store.storeEnvironments(serverData);
       expect(store.state.environments.length).toEqual(serverData.length);
+    });
+
+    it('should store a non folder environment with deploy board if rollout_status_path key is provided', () => {
+      const environment = {
+        name: 'foo',
+        size: 1,
+        id: 1,
+        rollout_status_path: 'url',
+      };
+
+      store.storeEnvironments([environment]);
+      expect(store.state.environments[0].hasDeployBoard).toEqual(true);
+      expect(store.state.environments[0].isDeployBoardVisible).toEqual(true);
+      expect(store.state.environments[0].deployBoardData).toEqual({});
     });
 
     it('should add folder keys when environment is a folder', () => {
@@ -67,7 +100,7 @@ describe('Store', () => {
 
     it('should store latest.name when the environment is not a folder', () => {
       store.storeEnvironments(serverData);
-      expect(store.state.environments[0].name).toEqual(serverData[0].latest.name);
+      expect(store.state.environments[2].name).toEqual(serverData[2].latest.name);
     });
 
     it('should store root level name when environment is a folder', () => {
@@ -121,6 +154,28 @@ describe('Store', () => {
 
       store.setPagination(pagination);
       expect(store.state.paginationInformation).toEqual(expectedResult);
+    });
+  });
+
+  describe('deploy boards', () => {
+    beforeEach(() => {
+      const environment = {
+        name: 'foo',
+        size: 1,
+        id: 1,
+      };
+
+      store.storeEnvironments([environment]);
+    });
+
+    it('should toggle deploy board property for given environment id', () => {
+      store.toggleDeployBoard(1);
+      expect(store.state.environments[0].isDeployBoardVisible).toEqual(true);
+    });
+
+    it('should store deploy board data for given environment id', () => {
+      store.storeDeployBoard(1, deployBoardMockData);
+      expect(store.state.environments[0].deployBoardData).toEqual(deployBoardMockData);
     });
   });
 });

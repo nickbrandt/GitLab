@@ -1,13 +1,22 @@
+# coding: utf-8
 require 'securerandom'
+require 'forwardable'
 
 class Repository
   include Gitlab::ShellAdapter
+  include Elastic::RepositoriesSearch
   include RepositoryMirroring
+  prepend EE::Repository
 
   attr_accessor :path_with_namespace, :project
 
+  delegate :ref_name_for_sha, to: :raw_repository
+
   CommitError = Class.new(StandardError)
   CreateTreeError = Class.new(StandardError)
+
+  MIRROR_REMOTE = "upstream".freeze
+  MIRROR_GEO = "geo".freeze
 
   # Methods that cache data from the Git repository.
   #
@@ -17,7 +26,7 @@ class Repository
   #
   # For example, for entry `:readme` there's a method called `readme` which
   # stores its data in the `readme` cache key.
-  CACHED_METHODS = %i(size commit_count readme version contribution_guide
+  CACHED_METHODS = %i(size commit_count readme contribution_guide
                       changelog license_blob license_key gitignore koding_yml
                       gitlab_ci_yml branch_names tag_names branch_count
                       tag_count avatar exists? empty? root_ref).freeze
@@ -30,7 +39,6 @@ class Repository
     changelog: :changelog,
     license: %i(license_blob license_key),
     contributing: :contribution_guide,
-    version: :version,
     gitignore: :gitignore,
     koding: :koding_yml,
     gitlab_ci: :gitlab_ci_yml,
@@ -59,7 +67,7 @@ class Repository
   def raw_repository
     return nil unless path_with_namespace
 
-    @raw_repository ||= Gitlab::Git::Repository.new(path_to_repo)
+    @raw_repository ||= initialize_raw_repository
   end
 
   # Return absolute path to repository
@@ -107,7 +115,7 @@ class Repository
       offset: offset,
       after: after,
       before: before,
-      follow: path.present?,
+      follow: Array(path).length == 1,
       skip_merges: skip_merges
     }
 
@@ -146,12 +154,7 @@ class Repository
     # may cause the branch to "disappear" erroneously or have the wrong SHA.
     #
     # See: https://github.com/libgit2/libgit2/issues/1534 and https://gitlab.com/gitlab-org/gitlab-ce/issues/15392
-    raw_repo =
-      if fresh_repo
-        Gitlab::Git::Repository.new(path_to_repo)
-      else
-        raw_repository
-      end
+    raw_repo = fresh_repo ? initialize_raw_repository : raw_repository
 
     raw_repo.find_branch(name)
   end
@@ -410,8 +413,6 @@ class Repository
   # Runs code after a repository has been forked/imported.
   def after_import
     expire_content_cache
-    expire_tags_cache
-    expire_branches_cache
   end
 
   # Runs code after a new commit has been pushed.
@@ -505,9 +506,7 @@ class Repository
     end
   end
 
-  def branch_names
-    branches.map(&:name)
-  end
+  delegate :branch_names, to: :raw_repository
   cache_method :branch_names, fallback: []
 
   delegate :tag_names, to: :raw_repository
@@ -536,11 +535,6 @@ class Repository
     end
   end
   cache_method :readme
-
-  def version
-    file_on_head(:version)
-  end
-  cache_method :version
 
   def contribution_guide
     file_on_head(:contributing)
@@ -707,14 +701,6 @@ class Repository
     end
   end
 
-  def ref_name_for_sha(ref_path, sha)
-    args = %W(#{Gitlab.config.git.bin_path} for-each-ref --count=1 #{ref_path} --contains #{sha})
-
-    # Not found -> ["", 0]
-    # Found -> ["b8d95eb4969eefacb0a58f6a28f6803f8070e7b9 commit\trefs/environments/production/77\n", 0]
-    Gitlab::Popen.popen(args, path_to_repo).first.split.last
-  end
-
   def refs_contains_sha(ref_type, sha)
     args = %W(#{Gitlab.config.git.bin_path} #{ref_type} --contains #{sha})
     names = Gitlab::Popen.popen(args, path_to_repo).first
@@ -839,6 +825,25 @@ class Repository
       !rugged.merge_commits(our_commit, their_commit).conflicts?
     else
       false
+    end
+  end
+
+  def ff_merge(user, source, target_branch, merge_request: nil)
+    our_commit = rugged.branches[target_branch].target
+    their_commit =
+      if source.is_a?(Gitlab::Git::Commit)
+        source.raw_commit
+      else
+        rugged.lookup(source)
+      end
+
+    raise 'Invalid merge target' if our_commit.nil?
+    raise 'Invalid merge source' if their_commit.nil?
+
+    GitOperationService.new(user, self).with_branch(target_branch) do |start_commit|
+      merge_request&.update(in_progress_merge_commit_sha: their_commit.oid)
+
+      their_commit.oid
     end
   end
 
@@ -969,6 +974,54 @@ class Repository
     end
   end
 
+  def fetch_upstream(url)
+    add_remote(Repository::MIRROR_REMOTE, url)
+    fetch_remote(Repository::MIRROR_REMOTE)
+  end
+
+  def fetch_geo_mirror(url)
+    add_remote(Repository::MIRROR_GEO, url)
+    set_remote_as_mirror(Repository::MIRROR_GEO)
+    fetch_remote(Repository::MIRROR_GEO, forced: true)
+  end
+
+  def upstream_branches
+    @upstream_branches ||= remote_branches(Repository::MIRROR_REMOTE)
+  end
+
+  def diverged_from_upstream?(branch_name)
+    branch_commit = commit("refs/heads/#{branch_name}")
+    upstream_commit = commit("refs/remotes/#{MIRROR_REMOTE}/#{branch_name}")
+
+    if upstream_commit
+      !is_ancestor?(branch_commit.id, upstream_commit.id)
+    else
+      false
+    end
+  end
+
+  def upstream_has_diverged?(branch_name, remote_ref)
+    branch_commit = commit("refs/heads/#{branch_name}")
+    upstream_commit = commit("refs/remotes/#{remote_ref}/#{branch_name}")
+
+    if upstream_commit
+      !is_ancestor?(upstream_commit.id, branch_commit.id)
+    else
+      false
+    end
+  end
+
+  def up_to_date_with_upstream?(branch_name)
+    branch_commit = commit("refs/heads/#{branch_name}")
+    upstream_commit = commit("refs/remotes/#{MIRROR_REMOTE}/#{branch_name}")
+
+    if upstream_commit
+      is_ancestor?(branch_commit.id, upstream_commit.id)
+    else
+      false
+    end
+  end
+
   def merge_base(first_commit_id, second_commit_id)
     first_commit_id = commit(first_commit_id).try(:id) || first_commit_id
     second_commit_id = commit(second_commit_id).try(:id) || second_commit_id
@@ -978,13 +1031,15 @@ class Repository
   end
 
   def is_ancestor?(ancestor_id, descendant_id)
-    Gitlab::GitalyClient.migrate(:is_ancestor) do |is_enabled|
-      if is_enabled
-        raw_repository.is_ancestor?(ancestor_id, descendant_id)
-      else
-        merge_base_commit(ancestor_id, descendant_id) == ancestor_id
-      end
-    end
+    # NOTE: This feature is intentionally disabled until
+    # https://gitlab.com/gitlab-org/gitlab-ce/issues/30586 is resolved
+    # Gitlab::GitalyClient.migrate(:is_ancestor) do |is_enabled|
+    #   if is_enabled
+    #     raw_repository.is_ancestor?(ancestor_id, descendant_id)
+    #   else
+    merge_base_commit(ancestor_id, descendant_id) == ancestor_id
+    #   end
+    # end
   end
 
   def empty_repo?
@@ -1073,6 +1128,12 @@ class Repository
     rescue Gitlab::Git::Repository::InvalidRef
       false
     end
+  end
+
+  def main_language
+    return unless exists?
+
+    Linguist::Repository.new(rugged, rugged.head.target_id).language
   end
 
   # Caches the supplied block both in a cache and in an instance variable.
@@ -1167,5 +1228,11 @@ class Repository
 
   def repository_storage_path
     @project.repository_storage_path
+  end
+
+  delegate :gitaly_channel, :gitaly_repository, to: :raw_repository
+
+  def initialize_raw_repository
+    Gitlab::Git::Repository.new(project.repository_storage, path_with_namespace + '.git')
   end
 end

@@ -1,6 +1,7 @@
 class Namespace < ActiveRecord::Base
   acts_as_paranoid
 
+  prepend EE::Namespace
   include CacheMarkdownField
   include Sortable
   include Gitlab::ShellAdapter
@@ -150,7 +151,7 @@ class Namespace < ActiveRecord::Base
   end
 
   def any_project_has_container_registry_tags?
-    projects.any?(&:has_container_registry_tags?)
+    all_projects.any?(&:has_container_registry_tags?)
   end
 
   def send_update_instructions
@@ -170,6 +171,10 @@ class Namespace < ActiveRecord::Base
   def lfs_enabled?
     # User namespace will always default to the global setting
     Gitlab.config.lfs.enabled
+  end
+
+  def actual_size_limit
+    current_application_settings.repository_size_limit
   end
 
   def shared_runners_enabled?
@@ -214,6 +219,12 @@ class Namespace < ActiveRecord::Base
     @old_repository_storage_paths ||= repository_storage_paths
   end
 
+  # Includes projects from this namespace and projects from all subgroups
+  # that belongs to this namespace
+  def all_projects
+    Project.inside_path(full_path)
+  end
+
   private
 
   def repository_storage_paths
@@ -221,7 +232,7 @@ class Namespace < ActiveRecord::Base
     # pending delete. Unscoping also get rids of the default order, which causes
     # problems with SELECT DISTINCT.
     Project.unscoped do
-      projects.select('distinct(repository_storage)').to_a.map(&:repository_storage_path)
+      all_projects.select('distinct(repository_storage)').to_a.map(&:repository_storage_path)
     end
   end
 

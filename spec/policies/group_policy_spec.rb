@@ -6,6 +6,7 @@ describe GroupPolicy, models: true do
   let(:developer) { create(:user) }
   let(:master) { create(:user) }
   let(:owner) { create(:user) }
+  let(:auditor) { create(:user, :auditor) }
   let(:admin) { create(:admin) }
   let(:group) { create(:group) }
 
@@ -22,7 +23,8 @@ describe GroupPolicy, models: true do
       :admin_group,
       :admin_namespace,
       :admin_group_member,
-      :change_visibility_level
+      :change_visibility_level,
+      :create_subgroup
     ]
   end
 
@@ -168,6 +170,17 @@ describe GroupPolicy, models: true do
         is_expected.to include(:read_group)
         is_expected.to include(*master_permissions)
         is_expected.to include(*owner_permissions)
+      end
+    end
+
+    context 'auditor' do
+      let(:current_user) { auditor }
+
+      it do
+        is_expected.to include(:read_group)
+        is_expected.to all(start_with("read"))
+        is_expected.not_to include(*master_permissions)
+        is_expected.not_to include(*owner_permissions)
       end
     end
   end

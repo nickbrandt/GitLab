@@ -2,7 +2,7 @@ module Ci
   class CreatePipelineService < BaseService
     attr_reader :pipeline
 
-    def execute(ignore_skip_ci: false, save_on_errors: true, trigger_request: nil)
+    def execute(ignore_skip_ci: false, save_on_errors: true, trigger_request: nil, mirror_update: false)
       @pipeline = Ci::Pipeline.new(
         project: project,
         ref: ref,
@@ -15,6 +15,10 @@ module Ci
 
       unless project.builds_enabled?
         return error('Pipeline is disabled')
+      end
+
+      unless project.mirror_trigger_builds?
+        return error('Pipeline is disabled for mirror updates') if mirror_update
       end
 
       unless trigger_request || can?(current_user, :create_pipeline, project)
@@ -53,6 +57,8 @@ module Ci
           .execute(pipeline)
       end
 
+      cancel_pending_pipelines if project.auto_cancel_pending_pipelines?
+
       pipeline.tap(&:process!)
     end
 
@@ -61,6 +67,22 @@ module Ci
     def skip_ci?
       return false unless pipeline.git_commit_message
       pipeline.git_commit_message =~ /\[(ci[ _-]skip|skip[ _-]ci)\]/i
+    end
+
+    def cancel_pending_pipelines
+      Gitlab::OptimisticLocking.retry_lock(auto_cancelable_pipelines) do |cancelables|
+        cancelables.find_each do |cancelable|
+          cancelable.auto_cancel_running(pipeline)
+        end
+      end
+    end
+
+    def auto_cancelable_pipelines
+      project.pipelines
+        .where(ref: pipeline.ref)
+        .where.not(id: pipeline.id)
+        .where.not(sha: project.repository.sha_from_ref(pipeline.ref))
+        .created_or_pending
     end
 
     def commit

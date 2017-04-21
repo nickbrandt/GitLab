@@ -14,8 +14,14 @@ module API
 
     class User < UserBasic
       expose :created_at
-      expose :is_admin?, as: :is_admin
+      expose :admin?, as: :is_admin
       expose :bio, :location, :skype, :linkedin, :twitter, :website_url, :organization
+    end
+
+    class UserActivity < Grape::Entity
+      expose :username
+      expose :last_activity_on
+      expose :last_activity_on, as: :last_activity_at # Back-compat
     end
 
     class Identity < Grape::Entity
@@ -25,6 +31,7 @@ module API
     class UserPublic < User
       expose :last_sign_in_at
       expose :confirmed_at
+      expose :last_activity_on
       expose :email
       expose :color_scheme_id, :projects_limit, :current_sign_in_at
       expose :identities, using: Entities::Identity
@@ -51,6 +58,13 @@ module API
       expose :project_id, :issues_events, :merge_requests_events
       expose :note_events, :pipeline_events, :wiki_page_events
       expose :build_events, as: :job_events
+    end
+
+    class ProjectPushRule < Grape::Entity
+      expose :id, :project_id, :created_at
+      expose :commit_message_regex, :deny_delete_tag
+      expose :member_check, :prevent_secrets, :author_email_regex
+      expose :file_name_regex, :max_file_size
     end
 
     class BasicProjectDetails < Grape::Entity
@@ -99,8 +113,10 @@ module API
         SharedGroup.represent(project.project_group_links.all, options)
       end
       expose :only_allow_merge_if_pipeline_succeeds
+      expose :repository_storage, if: lambda { |_project, options| options[:current_user].try(:admin?) }
       expose :request_access_enabled
       expose :only_allow_merge_if_all_discussions_are_resolved
+      expose :approvals_before_merge
 
       expose :statistics, using: 'API::Entities::ProjectStatistics', if: :statistics
     end
@@ -131,8 +147,20 @@ module API
       end
     end
 
+    class LdapGroupLink < Grape::Entity
+      expose :cn, :group_access, :provider
+    end
+
     class Group < Grape::Entity
       expose :id, :name, :path, :description, :visibility
+
+      ## EE-only
+      expose :ldap_cn, :ldap_access
+      expose :ldap_group_links,
+        using: Entities::LdapGroupLink,
+        if: lambda { |group, options| group.ldap_group_links.any? }
+      ## EE-only
+
       expose :lfs_enabled?, as: :lfs_enabled
       expose :avatar_url
       expose :web_url
@@ -184,19 +212,15 @@ module API
       end
 
       expose :protected do |repo_branch, options|
-        options[:project].protected_branch?(repo_branch.name)
+        ProtectedBranch.protected?(options[:project], repo_branch.name)
       end
 
       expose :developers_can_push do |repo_branch, options|
-        project = options[:project]
-        access_levels = project.protected_branches.matching(repo_branch.name).map(&:push_access_levels).flatten
-        access_levels.any? { |access_level| access_level.access_level == Gitlab::Access::DEVELOPER }
+        options[:project].protected_branches.developers_can?(:push, repo_branch.name)
       end
 
       expose :developers_can_merge do |repo_branch, options|
-        project = options[:project]
-        access_levels = project.protected_branches.matching(repo_branch.name).map(&:merge_access_levels).flatten
-        access_levels.any? { |access_level| access_level.access_level == Gitlab::Access::DEVELOPER }
+        options[:project].protected_branches.developers_can?(:merge, repo_branch.name)
       end
     end
 
@@ -259,6 +283,7 @@ module API
       expose :upvotes, :downvotes
       expose :due_date
       expose :confidential
+      expose :weight
 
       expose :web_url do |issue, options|
         Gitlab::UrlBuilder.build(issue)
@@ -296,8 +321,10 @@ module API
       expose :diff_head_sha, as: :sha
       expose :merge_commit_sha
       expose :user_notes_count
+      expose :approvals_before_merge
       expose :should_remove_source_branch?, as: :should_remove_source_branch
       expose :force_remove_source_branch?, as: :force_remove_source_branch
+      expose :squash
 
       expose :web_url do |merge_request, options|
         Gitlab::UrlBuilder.build(merge_request)
@@ -313,6 +340,26 @@ module API
     class MergeRequestChanges < MergeRequest
       expose :diffs, as: :changes, using: Entities::RepoDiff do |compare, _|
         compare.raw_diffs(all_diffs: true).to_a
+      end
+    end
+
+    class Approvals < Grape::Entity
+      expose :user, using: Entities::UserBasic
+    end
+
+    class MergeRequestApprovals < ProjectEntity
+      expose :merge_status
+      expose :approvals_required
+      expose :approvals_left
+      expose :approvals, as: :approved_by, using: Entities::Approvals
+      expose :approvers_left, as: :suggested_approvers, using: Entities::UserBasic
+
+      expose :user_has_approved do |merge_request, options|
+        merge_request.has_approved?(options[:current_user])
+      end
+
+      expose :user_can_approve do |merge_request, options|
+        merge_request.can_approve?(options[:current_user])
       end
     end
 
@@ -386,6 +433,10 @@ module API
       expose :author_username do |event, options|
         event.author&.username
       end
+    end
+
+    class LdapGroup < Grape::Entity
+      expose :cn
     end
 
     class ProjectGroupLink < Grape::Entity
@@ -514,6 +565,9 @@ module API
 
     class Board < Grape::Entity
       expose :id
+      expose :name
+      expose :project, using: Entities::BasicProjectDetails
+      expose :milestone
       expose :lists, using: Entities::List do |board|
         board.lists.destroyable
       end
@@ -574,7 +628,6 @@ module API
       expose :user_oauth_applications
       expose :after_sign_out_path
       expose :container_registry_token_expire_delay
-      expose :repository_storage
       expose :repository_storages
       expose :koding_enabled
       expose :koding_url
@@ -601,6 +654,22 @@ module API
       end
     end
 
+    class License < Grape::Entity
+      expose :starts_at, :expires_at, :licensee, :add_ons
+
+      expose :user_limit do |license, options|
+        license.restricted?(:active_user_count) ? license.restrictions[:active_user_count] : 0
+      end
+
+      expose :active_users do |license, options|
+        ::User.active.count
+      end
+    end
+
+    class TriggerRequest < Grape::Entity
+      expose :id, :variables
+    end
+
     class Runner < Grape::Entity
       expose :id
       expose :description
@@ -615,9 +684,9 @@ module API
       expose :locked
       expose :version, :revision, :platform, :architecture
       expose :contacted_at
-      expose :token, if: lambda { |runner, options| options[:current_user].is_admin? || !runner.is_shared? }
+      expose :token, if: lambda { |runner, options| options[:current_user].admin? || !runner.is_shared? }
       expose :projects, with: Entities::BasicProjectDetails do |runner, options|
-        if options[:current_user].is_admin?
+        if options[:current_user].admin?
           runner.projects
         else
           options[:current_user].authorized_projects.where(id: runner.projects)
@@ -705,6 +774,19 @@ module API
     class BroadcastMessage < Grape::Entity
       expose :id, :message, :starts_at, :ends_at, :color, :font
       expose :active?, as: :active
+    end
+
+    class GeoNodeStatus < Grape::Entity
+      expose :id
+      expose :health
+      expose :healthy?, as: :healthy
+      expose :repositories_count
+      expose :repositories_synced_count
+      expose :repositories_failed_count
+      expose :lfs_objects_count
+      expose :lfs_objects_synced_count
+      expose :attachments_count
+      expose :attachments_synced_count
     end
 
     class PersonalAccessToken < Grape::Entity

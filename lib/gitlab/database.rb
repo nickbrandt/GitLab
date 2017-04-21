@@ -57,16 +57,20 @@ module Gitlab
       postgresql? ? "RANDOM()" : "RAND()"
     end
 
-    def true_value
-      if Gitlab::Database.postgresql?
+    def self.minute_interval(value)
+      postgresql? ? "#{value} * '1 minute'::interval" : "INTERVAL #{value} MINUTE"
+    end
+
+    def self.true_value
+      if postgresql?
         "'t'"
       else
         1
       end
     end
 
-    def false_value
-      if Gitlab::Database.postgresql?
+    def self.false_value
+      if postgresql?
         "'f'"
       else
         0
@@ -101,6 +105,14 @@ module Gitlab
           ConnectionSpecification::Resolver.new(config).spec(env.to_sym)
 
       ActiveRecord::ConnectionAdapters::ConnectionPool.new(spec)
+    end
+
+    # Disables prepared statements for the current database connection.
+    def self.disable_prepared_statements
+      config = ActiveRecord::Base.configurations[Rails.env]
+      config['prepared_statements'] = false
+
+      ActiveRecord::Base.establish_connection(config)
     end
 
     def self.connection

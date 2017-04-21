@@ -100,13 +100,28 @@ describe Environment, models: true do
     let(:head_commit)   { project.commit }
     let(:commit)        { project.commit.parent }
 
-    it 'returns deployment id for the environment' do
-      expect(environment.first_deployment_for(commit)).to eq deployment1
+    context 'Gitaly find_ref_name feature disabled' do
+      it 'returns deployment id for the environment' do
+        expect(environment.first_deployment_for(commit)).to eq deployment1
+      end
+
+      it 'return nil when no deployment is found' do
+        expect(environment.first_deployment_for(head_commit)).to eq nil
+      end
     end
 
-    it 'return nil when no deployment is found' do
-      expect(environment.first_deployment_for(head_commit)).to eq nil
-    end
+    # TODO: Uncomment when feature is reenabled
+    # context 'Gitaly find_ref_name feature enabled' do
+    #   before do
+    #     allow(Gitlab::GitalyClient).to receive(:feature_enabled?).with(:find_ref_name).and_return(true)
+    #   end
+    #
+    #   it 'calls GitalyClient' do
+    #     expect_any_instance_of(Gitlab::GitalyClient::Ref).to receive(:find_ref_name)
+    #
+    #     environment.first_deployment_for(commit)
+    #   end
+    # end
   end
 
   describe '#environment_type' do
@@ -247,8 +262,8 @@ describe Environment, models: true do
     end
   end
 
-  describe '#has_terminals?' do
-    subject { environment.has_terminals? }
+  describe '#deployment_service_ready?' do
+    subject { environment.deployment_service_ready? }
 
     context 'when the enviroment is available' do
       context 'with a deployment service' do
@@ -286,7 +301,7 @@ describe Environment, models: true do
 
     context 'when the environment has terminals' do
       before do
-        allow(environment).to receive(:has_terminals?).and_return(true)
+        allow(environment).to receive(:deployment_service_ready?).and_return(true)
       end
 
       it 'returns the terminals from the deployment service' do
@@ -300,7 +315,89 @@ describe Environment, models: true do
 
     context 'when the environment does not have terminals' do
       before do
-        allow(environment).to receive(:has_terminals?).and_return(false)
+        allow(environment).to receive(:deployment_service_ready?).and_return(false)
+      end
+
+      it { is_expected.to be_nil }
+    end
+  end
+
+  describe '#rollout_status' do
+    let(:project) { create(:kubernetes_project) }
+    subject { environment.rollout_status }
+
+    context 'when the environment has rollout status' do
+      before { allow(environment).to receive(:deployment_service_ready?).and_return(true) }
+
+      it 'returns the rollout status from the deployment service' do
+        expect(project.deployment_service).
+          to receive(:rollout_status).with(environment).
+          and_return(:fake_rollout_status)
+
+        is_expected.to eq(:fake_rollout_status)
+      end
+    end
+
+    context 'when the environment does not have rollout status' do
+      before { allow(environment).to receive(:deployment_service_ready?).and_return(false) }
+      it { is_expected.to eq(nil) }
+    end
+  end
+
+  describe '#has_metrics?' do
+    subject { environment.has_metrics? }
+
+    context 'when the enviroment is available' do
+      context 'with a deployment service' do
+        let(:project) { create(:prometheus_project) }
+
+        context 'and a deployment' do
+          let!(:deployment) { create(:deployment, environment: environment) }
+          it { is_expected.to be_truthy }
+        end
+
+        context 'but no deployments' do
+          it { is_expected.to be_falsy }
+        end
+      end
+
+      context 'without a monitoring service' do
+        it { is_expected.to be_falsy }
+      end
+    end
+
+    context 'when the environment is unavailable' do
+      let(:project) { create(:prometheus_project) }
+
+      before do
+        environment.stop
+      end
+
+      it { is_expected.to be_falsy }
+    end
+  end
+
+  describe '#metrics' do
+    let(:project) { create(:prometheus_project) }
+    subject { environment.metrics }
+
+    context 'when the environment has metrics' do
+      before do
+        allow(environment).to receive(:has_metrics?).and_return(true)
+      end
+
+      it 'returns the metrics from the deployment service' do
+        expect(project.monitoring_service)
+          .to receive(:metrics).with(environment)
+          .and_return(:fake_metrics)
+
+        is_expected.to eq(:fake_metrics)
+      end
+    end
+
+    context 'when the environment does not have metrics' do
+      before do
+        allow(environment).to receive(:has_metrics?).and_return(false)
       end
 
       it { is_expected.to be_nil }

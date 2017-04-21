@@ -1,11 +1,15 @@
 require 'carrierwave/orm/activerecord'
 
+# Contains methods common to both GitLab CE and EE.
+# All EE methods should be in `EE::Group` only.
 class Group < Namespace
+  include EE::Group
   include Gitlab::ConfigHelper
   include Gitlab::VisibilityLevel
   include AccessRequestable
   include Referable
   include SelectForProjectAuthorization
+  prepend EE::GeoAwareAvatar
 
   has_many :group_members, -> { where(requested_at: nil) }, dependent: :destroy, as: :source
   alias_method :members, :group_members
@@ -19,6 +23,11 @@ class Group < Namespace
 
   has_many :project_group_links, dependent: :destroy
   has_many :shared_projects, through: :project_group_links, source: :project
+  has_many :ldap_group_links, foreign_key: 'group_id', dependent: :destroy
+  has_many :hooks, dependent: :destroy, class_name: 'GroupHook'
+  # We cannot simply set `has_many :audit_events, as: :entity, dependent: :destroy`
+  # here since Group inherits from Namespace, the entity_type would be set to `Namespace`.
+  has_many :audit_events, -> { where(entity_type: Group) }, dependent: :destroy, foreign_key: 'entity_id'
   has_many :notification_settings, dependent: :destroy, as: :source
   has_many :labels, class_name: 'GroupLabel'
 
@@ -27,11 +36,21 @@ class Group < Namespace
 
   validates :avatar, file_size: { maximum: 200.kilobytes.to_i }
 
+  validates :two_factor_grace_period, presence: true, numericality: { greater_than_or_equal_to: 0 }
+
+  validates :repository_size_limit,
+            numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
+
   mount_uploader :avatar, AvatarUploader
   has_many :uploads, as: :model, dependent: :destroy
 
   after_create :post_create_hook
   after_destroy :post_destroy_hook
+  after_save :update_two_factor_requirement
+
+  scope :where_group_links_with_provider, ->(provider) do
+    joins(:ldap_group_links).where(ldap_group_links: { provider: provider })
+  end
 
   class << self
     # Searches for groups matching the given query.
@@ -108,7 +127,7 @@ class Group < Namespace
     allowed_by_projects
   end
 
-  def avatar_url(size = nil)
+  def avatar_url(size = nil, scale = nil)
     if self[:avatar].present?
       [gitlab_config.url, avatar.url].join
     end
@@ -131,13 +150,14 @@ class Group < Namespace
     )
   end
 
-  def add_user(user, access_level, current_user: nil, expires_at: nil)
+  def add_user(user, access_level, current_user: nil, expires_at: nil, ldap: false)
     GroupMember.add_user(
       self,
       user,
       access_level,
       current_user: current_user,
-      expires_at: expires_at
+      expires_at: expires_at,
+      ldap: ldap
     )
   end
 
@@ -181,6 +201,23 @@ class Group < Namespace
     end
   end
 
+  def human_ldap_access
+    Gitlab::Access.options_with_owner.key ldap_access
+  end
+
+  # NOTE: Backwards compatibility with old ldap situation
+  def ldap_cn
+    ldap_group_links.first.try(:cn)
+  end
+
+  def ldap_access
+    ldap_group_links.first.try(:group_access)
+  end
+
+  def ldap_synced?
+    Gitlab.config.ldap.enabled && ldap_cn.present?
+  end
+
   def post_create_hook
     Gitlab::AppLogger.info("Group \"#{name}\" was created")
 
@@ -193,8 +230,18 @@ class Group < Namespace
     system_hook_service.execute_hooks_for(self, :destroy)
   end
 
+  def actual_size_limit
+    return current_application_settings.repository_size_limit if repository_size_limit.nil?
+
+    repository_size_limit
+  end
+
   def system_hook_service
     SystemHooksService.new
+  end
+
+  def first_non_empty_project
+    projects.detect{ |project| !project.empty_repo? }
   end
 
   def refresh_members_authorized_projects
@@ -222,5 +269,13 @@ class Group < Namespace
       display_name: name[0..max_length],
       type: public? ? 'O' : 'I' # Open vs Invite-only
     }
+  end
+
+  protected
+
+  def update_two_factor_requirement
+    return unless require_two_factor_authentication_changed? || two_factor_grace_period_changed?
+
+    users.find_each(&:update_two_factor_requirement)
   end
 end

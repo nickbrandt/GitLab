@@ -24,7 +24,7 @@ module ProjectsHelper
 
     return "(deleted)" unless author
 
-    author_html =  ""
+    author_html = ""
 
     # Build avatar image tag
     author_html << image_tag(avatar_icon(author, opts[:size]), width: opts[:size], class: "avatar avatar-inline #{"s#{opts[:size]}" if opts[:size]} #{opts[:avatar_class] if opts[:avatar_class]}", alt: '') if opts[:avatar]
@@ -45,7 +45,7 @@ module ProjectsHelper
       link_to(author_html, user_path(author), class: "author_link #{"#{opts[:extra_class]}" if opts[:extra_class]} #{"#{opts[:mobile_classes]}" if opts[:mobile_classes]}").html_safe
     else
       title = opts[:title].sub(":name", sanitize(author.name))
-      link_to(author_html, user_path(author), class: "author_link has-tooltip", title: title, data: { container: 'body' } ).html_safe
+      link_to(author_html, user_path(author), class: "author_link has-tooltip", title: title, data: { container: 'body' }).html_safe
     end
   end
 
@@ -227,6 +227,16 @@ module ProjectsHelper
     end
   end
 
+  def size_limit_message(project)
+    show_lfs = project.lfs_enabled? ? 'including files in LFS' : ''
+
+    "The total size of this project's repository #{show_lfs} will be limited to this size. 0 for unlimited. Leave empty to inherit the group/global value."
+  end
+
+  def project_above_size_limit_message
+    Gitlab::RepositorySizeError.new(@project).above_size_limit_message
+  end
+
   def git_user_name
     if current_user
       current_user.name
@@ -245,6 +255,8 @@ module ProjectsHelper
 
   def default_url_to_repo(project = @project)
     case default_clone_protocol
+    when 'krb5'
+      project.kerberos_url_to_repo
     when 'ssh'
       project.ssh_url_to_repo
     else
@@ -255,6 +267,8 @@ module ProjectsHelper
   def default_clone_protocol
     if allowed_protocols_present?
       enabled_protocol
+    elsif alternative_kerberos_url? && current_user
+      "krb5"
     else
       if !current_user || current_user.require_ssh_key?
         gitlab_config.protocol
@@ -262,6 +276,11 @@ module ProjectsHelper
         'ssh'
       end
     end
+  end
+
+  # Given the current GitLab configuration, check whether the GitLab URL for Kerberos is going to be different than the HTTP URL
+  def alternative_kerberos_url?
+    Gitlab.config.alternative_gitlab_kerberos_url?
   end
 
   def project_last_activity(project)
@@ -272,14 +291,14 @@ module ProjectsHelper
     end
   end
 
-  def add_special_file_path(project, file_name:, commit_message: nil, target_branch: nil, context: nil)
+  def add_special_file_path(project, file_name:, commit_message: nil, branch_name: nil, context: nil)
     namespace_project_new_blob_path(
       project.namespace,
       project,
       project.default_branch || 'master',
       file_name:      file_name,
       commit_message: commit_message || "Add #{file_name.downcase}",
-      target_branch: target_branch,
+      branch_name: branch_name,
       context: context
     )
   end
@@ -385,6 +404,14 @@ module ProjectsHelper
     end
   end
 
+  def membership_locked?
+    if @project.group && @project.group.membership_lock
+      true
+    else
+      false
+    end
+  end
+
   def readme_cache_key
     sha = @project.commit.try(:sha) || 'nil'
     [@project.path_with_namespace, sha, "readme"].join('-')
@@ -407,7 +434,10 @@ module ProjectsHelper
   def sanitize_repo_path(project, message)
     return '' unless message.present?
 
-    message.strip.gsub(project.repository_storage_path.chomp('/'), "[REPOS PATH]")
+    exports_path = File.join(Settings.shared['path'], 'tmp/project_exports')
+    filtered_message = message.strip.gsub(exports_path, "[REPO EXPORT PATH]")
+
+    filtered_message.gsub(project.repository_storage_path.chomp('/'), "[REPOS PATH]")
   end
 
   def project_feature_options
@@ -427,13 +457,22 @@ module ProjectsHelper
   end
 
   def visibility_select_options(project, selected_level)
-    levels_options_array = Gitlab::VisibilityLevel.values.map do |level|
-      [
+    level_options = Gitlab::VisibilityLevel.values.each_with_object([]) do |level, level_options|
+      next if restricted_levels.include?(level)
+
+      level_options << [
         visibility_level_label(level),
         { data: { description: visibility_level_description(level, project) } },
         level
       ]
     end
-    options_for_select(levels_options_array, selected_level)
+
+    options_for_select(level_options, selected_level)
+  end
+
+  def restricted_levels
+    return [] if current_user.admin?
+
+    current_application_settings.restricted_visibility_levels || []
   end
 end

@@ -4,11 +4,11 @@ describe API::Boards, api: true  do
   include ApiHelpers
 
   let(:user)        { create(:user) }
-  let(:user2)       { create(:user) }
   let(:non_member)  { create(:user) }
   let(:guest)       { create(:user) }
   let(:admin)       { create(:user, :admin) }
   let!(:project)    { create(:empty_project, :public, creator_id: user.id, namespace: user.namespace ) }
+  let(:milestone)   { create(:milestone, project: project) }
 
   let!(:dev_label) do
     create(:label, title: 'Development', color: '#FFAABB', project: project)
@@ -31,7 +31,7 @@ describe API::Boards, api: true  do
   end
 
   let!(:board) do
-    create(:board, project: project, lists: [dev_list, test_list])
+    create(:board, project: project, milestone: milestone, lists: [dev_list, test_list])
   end
 
   before do
@@ -51,17 +51,12 @@ describe API::Boards, api: true  do
     end
 
     context "when authenticated" do
-      it "returns the project issue board" do
+      it "returns the project issue boards" do
         get api(base_url, user)
 
         expect(response).to have_http_status(200)
         expect(response).to include_pagination_headers
-        expect(json_response).to be_an Array
-        expect(json_response.length).to eq(1)
-        expect(json_response.first['id']).to eq(board.id)
-        expect(json_response.first['lists']).to be_an Array
-        expect(json_response.first['lists'].length).to eq(2)
-        expect(json_response.first['lists'].last).to have_key('position')
+        expect(response).to match_response_schema('public_api/v4/boards')
       end
     end
   end

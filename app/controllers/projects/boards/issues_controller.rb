@@ -8,7 +8,7 @@ module Projects
       def index
         issues = ::Boards::Issues::ListService.new(project, current_user, filter_params).execute
         issues = issues.page(params[:page]).per(params[:per] || 20)
-        make_sure_position_is_set(issues)
+        make_sure_position_is_set(issues) unless Gitlab::Geo.secondary?
 
         render json: {
           issues: serialize_as_json(issues),
@@ -74,7 +74,7 @@ module Projects
       end
 
       def issue_params
-        params.require(:issue).permit(:title).merge(board_id: params[:board_id], list_id: params[:list_id], request: request)
+        params.require(:issue).permit(:title, :milestone_id).merge(board_id: params[:board_id], list_id: params[:list_id], request: request)
       end
 
       def serialize_as_json(resource)

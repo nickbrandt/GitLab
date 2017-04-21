@@ -21,6 +21,10 @@ namespace :admin do
     end
   end
 
+  ## EE-specific
+  resource :push_rule, only: [:show, :update]
+  ## EE-specific
+
   resource :impersonation, only: :destroy
 
   resources :abuse_reports, only: [:index, :destroy]
@@ -61,6 +65,11 @@ namespace :admin do
   resource :logs, only: [:show]
   resource :health_check, controller: 'health_check', only: [:show]
   resource :background_jobs, controller: 'background_jobs', only: [:show]
+
+  ## EE-specific
+  resource :email, only: [:show, :create]
+  ## EE-specific
+
   resource :system_info, controller: 'system_info', only: [:show]
   resources :requests_profiles, only: [:index, :show], param: :name, constraints: { name: /.+\.html/ }
 
@@ -91,10 +100,26 @@ namespace :admin do
 
   resource :application_settings, only: [:show, :update] do
     resources :services, only: [:index, :edit, :update]
+
+    get :usage_data
     put :reset_runners_token
     put :reset_health_check_token
     put :clear_repository_check_states
   end
+
+  ## EE-specific
+  resource :license, only: [:show, :new, :create, :destroy] do
+    get :download, on: :member
+  end
+
+  resources :geo_nodes, only: [:index, :create, :destroy] do
+    member do
+      post :repair
+      post :toggle
+      get  :status
+    end
+  end
+  ## EE-specific
 
   resources :labels
 
@@ -104,6 +129,8 @@ namespace :admin do
       get :pause
     end
   end
+
+  resources :cohorts, only: :index
 
   resources :builds, only: :index do
     collection do

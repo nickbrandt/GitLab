@@ -40,13 +40,27 @@ FactoryGirl.define do
       state :closed
     end
 
+    trait :opened do
+      state :opened
+    end
+
     trait :reopened do
       state :reopened
+    end
+
+    trait :locked do
+      state :locked
     end
 
     trait :simple do
       source_branch "feature"
       target_branch "master"
+    end
+
+    trait :with_approver do
+      after :create do |merge_request|
+        create :approver, target: merge_request
+      end
     end
 
     trait :rebased do
@@ -68,6 +82,7 @@ FactoryGirl.define do
     factory :closed_merge_request, traits: [:closed]
     factory :reopened_merge_request, traits: [:reopened]
     factory :merge_request_with_diffs, traits: [:with_diffs]
+    factory :merge_request_with_approver, traits: [:with_approver]
     factory :merge_request_with_diff_notes do
       after(:create) do |mr|
         create(:diff_note_on_merge_request, noteable: mr, project: mr.source_project)

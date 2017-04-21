@@ -11,13 +11,15 @@ module API
       # Params:
       #   key_id - ssh key id for Git over SSH
       #   user_id - user id for Git over HTTP
+      #   protocol - Git access protocol being used, e.g. HTTP or SSH
       #   project - project path with namespace
       #   action - git action (git-upload-pack or git-receive-pack)
-      #   ref - branch name
-      #   forced_push - forced_push
-      #   protocol - Git access protocol being used, e.g. HTTP or SSH
+      #   changes - changes as "oldrev newrev ref", see Gitlab::ChangesList
       post "/allowed" do
         status 200
+
+        # Stores some Git-specific env thread-safely
+        Gitlab::Git::Env.set(parse_env)
 
         actor =
           if params[:key_id]
@@ -30,22 +32,16 @@ module API
 
         actor.update_last_used_at if actor.is_a?(Key)
 
-        access =
-          if wiki?
-            Gitlab::GitAccessWiki.new(actor, project, protocol, authentication_abilities: ssh_authentication_abilities)
-          else
-            Gitlab::GitAccess.new(actor,
-                                  project,
-                                  protocol,
-                                  authentication_abilities: ssh_authentication_abilities,
-                                  env: parse_allowed_environment_variables)
-          end
-
-        access_status = access.check(params[:action], params[:changes])
+        access_checker = wiki? ? Gitlab::GitAccessWiki : Gitlab::GitAccess
+        access_status = access_checker
+          .new(actor, project, protocol, authentication_abilities: ssh_authentication_abilities)
+          .check(params[:action], params[:changes])
 
         response = { status: access_status.status, message: access_status.message }
 
         if access_status.status
+          log_user_activity(actor)
+
           # Return the repository full path so that gitlab-shell has it when
           # handling ssh commands
           response[:repository_path] =
@@ -76,6 +72,18 @@ module API
 
       get "/merge_request_urls" do
         ::MergeRequests::GetUrlsService.new(project).execute(params[:changes])
+      end
+
+      #
+      # Get a ssh key using the fingerprint
+      #
+      get "/authorized_keys" do
+        fingerprint = params.fetch(:fingerprint) do
+          Gitlab::InsecureKeyFingerprint.new(params.fetch(:key)).fingerprint
+        end
+        key = Key.find_by(fingerprint: fingerprint)
+        not_found!("Key") if key.nil?
+        present key, with: Entities::SSHKey
       end
 
       #
@@ -138,8 +146,11 @@ module API
 
         return unless Gitlab::GitalyClient.enabled?
 
+        relative_path = Gitlab::RepoPath.strip_storage_path(params[:repo_path])
+        project = Project.find_by_full_path(relative_path.sub(/\.(git|wiki)\z/, ''))
+
         begin
-          Gitlab::GitalyClient::Notifications.new(params[:repo_path]).post_receive
+          Gitlab::GitalyClient::Notifications.new(project.repository).post_receive
         rescue GRPC::Unavailable => e
           render_api_error(e, 500)
         end

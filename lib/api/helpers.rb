@@ -1,5 +1,7 @@
 module API
   module Helpers
+    prepend EE::API::Helpers
+
     include Gitlab::Utils
     include Helpers::Pagination
 
@@ -116,9 +118,16 @@ module API
       end
     end
 
+    def authenticate_by_gitlab_geo_token!
+      token = headers['X-Gitlab-Token'].try(:chomp)
+      unless token && Devise.secure_compare(geo_token, token)
+        unauthorized!
+      end
+    end
+
     def authenticated_as_admin!
       authenticate!
-      forbidden! unless current_user.is_admin?
+      forbidden! unless current_user.admin?
     end
 
     def authorize!(action, subject = :global)
@@ -358,7 +367,7 @@ module API
       return unless sudo_identifier
       return unless initial_current_user
 
-      unless initial_current_user.is_admin?
+      unless initial_current_user.admin?
         forbidden!('Must be admin to use sudo')
       end
 
@@ -382,6 +391,10 @@ module API
 
     def secret_token
       Gitlab::Shell.secret_token
+    end
+
+    def geo_token
+      Gitlab::Geo.current_node.system_hook.token
     end
 
     def send_git_blob(repository, blob)

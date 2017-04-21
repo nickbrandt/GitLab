@@ -28,17 +28,25 @@ The API URL is the URL that GitLab uses to access the Kubernetes API. Kubernetes
 exposes several APIs - we want the "base" URL that is common to all of them,
 e.g., `https://kubernetes.example.com` rather than `https://kubernetes.example.com/api/v1`.
 
+A [namespace] is just a logical grouping of resources. This is mostly for ease of
+management, so you can group things together. For example, if you have 50
+projects using the same cluster, providing a simple list of all pods would be
+really difficult to work with. In that case, you can provide a separate
+namespace to group things, as well as reduce name collision issues.
+
 GitLab authenticates against Kubernetes using service tokens, which are
 scoped to a particular `namespace`. If you don't have a service token yet,
 you can follow the
 [Kubernetes documentation](http://kubernetes.io/docs/user-guide/service-accounts/)
 to create one. You can also view or create service tokens in the
 [Kubernetes dashboard](http://kubernetes.io/docs/user-guide/ui/) - visit
-`Config -> Secrets`.
+**Config ➔ Secrets**.
 
 Fill in the service token and namespace according to the values you just got.
 If the API is using a self-signed TLS certificate, you'll also need to include
 the `ca.crt` contents as the `Custom CA bundle`.
+
+[namespace]: https://kubernetes.io/docs/user-guide/namespaces/
 
 ## Deployment variables
 
@@ -60,7 +68,7 @@ to use terminals. Support is currently limited to the first container in the
 first pod of your environment.
 
 When enabled, the Kubernetes service adds [web terminal](../../../ci/environments.md#web-terminals)
-support to your environments. This is based on the `exec` functionality found in
+support to your [environments](../../../ci/environments.md). This is based on the `exec` functionality found in
 Docker and Kubernetes, so you get a new shell session within your existing
 containers. To use this integration, you should deploy to Kubernetes using
 the deployment variables above, ensuring any pods you create are labelled with

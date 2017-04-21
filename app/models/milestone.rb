@@ -12,12 +12,14 @@ class Milestone < ActiveRecord::Base
   include Sortable
   include Referable
   include StripAttribute
+  include Elastic::MilestonesSearch
   include Milestoneish
 
   cache_markdown_field :title, pipeline: :single_line
   cache_markdown_field :description
 
   belongs_to :project
+  has_many :boards
   has_many :issues
   has_many :labels, -> { distinct.reorder('labels.title') },  through: :issues
   has_many :merge_requests
@@ -151,10 +153,6 @@ class Milestone < ActiveRecord::Base
 
   def can_be_closed?
     active? && issues.opened.count.zero?
-  end
-
-  def is_empty?(user = nil)
-    total_items_count(user).zero?
   end
 
   def author_id

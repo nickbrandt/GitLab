@@ -63,14 +63,15 @@
       "due_date": { "type": ["date", "null"] },
       "confidential": { "type": "boolean" },
       "web_url": { "type": "uri" },
-      "subscribed": { "type": ["boolean"] }
+      "subscribed": { "type": ["boolean"] },
+      "weight": { "type": ["integer", "null"] }
     },
     "required": [
       "id", "iid", "project_id", "title", "description",
       "state", "created_at", "updated_at", "labels",
       "milestone", "assignee", "author", "user_notes_count",
       "upvotes", "downvotes", "due_date", "confidential",
-      "web_url", "subscribed"
+      "web_url", "subscribed", "weight"
     ],
     "additionalProperties": false
   }

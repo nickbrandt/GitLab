@@ -1,10 +1,13 @@
 /* eslint-disable one-var, quote-props, comma-dangle, space-before-function-paren */
 /* global BoardService */
+/* global Flash */
 
 import Vue from 'vue';
 import VueResource from 'vue-resource';
 import FilteredSearchBoards from './filtered_search_boards';
 import eventHub from './eventhub';
+import collapseIcon from './icons/fullscreen_collapse.svg';
+import expandIcon from './icons/fullscreen_expand.svg';
 
 require('./models/issue');
 require('./models/label');
@@ -18,6 +21,7 @@ require('./mixins/modal_mixins');
 require('./mixins/sortable_default_options');
 require('./filters/due_date_filters');
 require('./components/board');
+require('./components/boards_selector');
 require('./components/board_sidebar');
 require('./components/new_list_dropdown');
 require('./components/modal/index');
@@ -29,6 +33,7 @@ $(() => {
   const $boardApp = document.getElementById('board-app');
   const Store = gl.issueBoards.BoardsStore;
   const ModalStore = gl.issueBoards.ModalStore;
+  const issueBoardsContent = document.querySelector('.js-focus-mode-board');
 
   window.gl = window.gl || {};
 
@@ -37,6 +42,10 @@ $(() => {
   }
 
   Store.create();
+
+  // hack to allow sidebar scripts like milestone_select manipulate the BoardsStore
+  gl.issueBoards.boardStoreIssueSet = (...args) => Vue.set(Store.detail.issue, ...args);
+  gl.issueBoards.boardStoreIssueDelete = (...args) => Vue.delete(Store.detail.issue, ...args);
 
   gl.IssueBoardsApp = new Vue({
     el: $boardApp,
@@ -54,7 +63,8 @@ $(() => {
       issueLinkBase: $boardApp.dataset.issueLinkBase,
       rootPath: $boardApp.dataset.rootPath,
       bulkUpdatePath: $boardApp.dataset.bulkUpdatePath,
-      detailIssue: Store.detail
+      detailIssue: Store.detail,
+      milestoneTitle: $boardApp.dataset.boardMilestoneTitle,
     },
     computed: {
       detailIssueVisible () {
@@ -62,9 +72,20 @@ $(() => {
       },
     },
     created () {
-      gl.boardService = new BoardService(this.endpoint, this.bulkUpdatePath, this.boardId);
+      if (this.milestoneTitle) {
+        const milestoneTitleParam = `milestone_title=${this.milestoneTitle}`;
 
-      this.filterManager = new FilteredSearchBoards(Store.filter, true);
+        Store.filter.path = [milestoneTitleParam].concat(
+          Store.filter.path.split('&').filter(param => param.match(/^milestone_title=(.*)$/g) === null)
+        ).join('&');
+
+        Store.updateFiltersUrl(true);
+      }
+
+      gl.boardService = new BoardService(this.endpoint, this.bulkUpdatePath, this.boardId);
+      Store.rootPath = this.endpoint;
+
+      this.filterManager = new FilteredSearchBoards(Store.filter, true, [(this.milestoneTitle ? 'milestone' : null)]);
 
       // Listen for updateTokens event
       eventHub.$on('updateTokens', this.updateTokens);
@@ -81,6 +102,7 @@ $(() => {
 
             if (list.type === 'closed') {
               list.position = Infinity;
+              list.label = { description: 'Shows all closed issues. Moving an issue to this list closes it' };
             }
           });
 
@@ -88,7 +110,7 @@ $(() => {
 
           Store.addBlankState();
           this.loading = false;
-        });
+        }).catch(() => new Flash('An error occurred. Please try again.'));
     },
     methods: {
       updateTokens() {
@@ -100,11 +122,12 @@ $(() => {
   gl.IssueBoardsSearch = new Vue({
     el: document.getElementById('js-add-list'),
     data: {
-      filters: Store.state.filters
+      filters: Store.state.filters,
+      milestoneTitle: $boardApp.dataset.boardMilestoneTitle,
     },
     mounted () {
       gl.issueBoards.newListDropdownInit();
-    }
+    },
   });
 
   gl.IssueBoardsModalAddBtn = new Vue({
@@ -113,6 +136,7 @@ $(() => {
     data: {
       modal: ModalStore.store,
       store: Store.state,
+      isFullscreen: false,
     },
     watch: {
       disabled() {
@@ -133,7 +157,7 @@ $(() => {
     },
     methods: {
       updateTooltip() {
-        const $tooltip = $(this.$el);
+        const $tooltip = $(this.$refs.addIssuesButton);
 
         this.$nextTick(() => {
           if (this.disabled) {
@@ -148,21 +172,52 @@ $(() => {
           this.toggleModal(true);
         }
       },
+      toggleFocusMode() {
+        $(this.$refs.toggleFocusModeButton).tooltip('hide');
+        issueBoardsContent.classList.toggle('is-focused');
+
+        this.isFullscreen = !this.isFullscreen;
+      },
     },
     mounted() {
       this.updateTooltip();
     },
     template: `
-      <button
-        class="btn btn-create pull-right prepend-left-10"
-        type="button"
-        data-placement="bottom"
-        :class="{ 'disabled': disabled }"
-        :title="tooltipTitle"
-        :aria-disabled="disabled"
-        @click="openModal">
-        Add issues
-      </button>
+      <div class="board-extra-actions">
+        <button
+          class="btn btn-create prepend-left-10"
+          type="button"
+          data-placement="bottom"
+          ref="addIssuesButton"
+          :class="{ 'disabled': disabled }"
+          :title="tooltipTitle"
+          :aria-disabled="disabled"
+          @click="openModal">
+          Add issues
+        </button>
+        <a
+          href="#"
+          class="btn btn-default has-tooltip prepend-left-10"
+          role="button"
+          aria-label="Toggle focus mode"
+          title="Toggle focus mode"
+          ref="toggleFocusModeButton"
+          @click="toggleFocusMode">
+          <span v-show="isFullscreen">
+            ${collapseIcon}
+          </span>
+          <span v-show="!isFullscreen">
+            ${expandIcon}
+          </span>
+        </a>
+      </div>
     `,
+  });
+
+  gl.IssueboardsSwitcher = new Vue({
+    el: '#js-multiple-boards-switcher',
+    components: {
+      'boards-selector': gl.issueBoards.BoardsSelector,
+    }
   });
 });

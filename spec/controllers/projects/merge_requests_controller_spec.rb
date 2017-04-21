@@ -61,6 +61,169 @@ describe Projects::MergeRequestsController do
     end
   end
 
+  describe 'POST #create' do
+    def create_merge_request(overrides = {})
+      params = {
+        namespace_id: project.namespace.to_param,
+        project_id: project.to_param,
+        merge_request: {
+          title: 'Test',
+          source_branch: 'feature_conflict',
+          target_branch: 'master',
+          author: user
+        }.merge(overrides)
+      }
+
+      post :create, params
+    end
+
+    context 'the approvals_before_merge param' do
+      before { project.update_attributes(approvals_before_merge: 2) }
+      let(:created_merge_request) { assigns(:merge_request) }
+
+      context 'when it is less than the one in the target project' do
+        before { create_merge_request(approvals_before_merge: 1) }
+
+        it 'sets the param to nil' do
+          expect(created_merge_request.approvals_before_merge).to eq(nil)
+        end
+
+        it 'creates the merge request' do
+          expect(created_merge_request).to be_valid
+          expect(response).to redirect_to(namespace_project_merge_request_path(id: created_merge_request.iid, project_id: project.to_param))
+        end
+      end
+
+      context 'when it is equal to the one in the target project' do
+        before { create_merge_request(approvals_before_merge: 2) }
+
+        it 'sets the param to nil' do
+          expect(created_merge_request.approvals_before_merge).to eq(nil)
+        end
+
+        it 'creates the merge request' do
+          expect(created_merge_request).to be_valid
+          expect(response).to redirect_to(namespace_project_merge_request_path(id: created_merge_request.iid, project_id: project.to_param))
+        end
+      end
+
+      context 'when it is greater than the one in the target project' do
+        before { create_merge_request(approvals_before_merge: 3) }
+
+        it 'saves the param in the merge request' do
+          expect(created_merge_request.approvals_before_merge).to eq(3)
+        end
+
+        it 'creates the merge request' do
+          expect(created_merge_request).to be_valid
+          expect(response).to redirect_to(namespace_project_merge_request_path(id: created_merge_request.iid, project_id: project.to_param))
+        end
+      end
+
+      context 'when the target project is a fork of a deleted project' do
+        before do
+          original_project = create(:empty_project)
+          project.update_attributes(forked_from_project: original_project, approvals_before_merge: 4)
+          original_project.update_attributes(pending_delete: true)
+
+          create_merge_request(approvals_before_merge: 3)
+        end
+
+        it 'uses the default from the target project' do
+          expect(created_merge_request.approvals_before_merge).to eq(nil)
+        end
+
+        it 'creates the merge request' do
+          expect(created_merge_request).to be_valid
+          expect(response).to redirect_to(namespace_project_merge_request_path(id: created_merge_request.iid, project_id: project.to_param))
+        end
+      end
+    end
+
+    context 'when the merge request is invalid' do
+      it 'shows the #new form' do
+        expect(create_merge_request(title: nil)).to render_template(:new)
+      end
+    end
+  end
+
+  context 'approvals' do
+    def json_response
+      JSON.parse(response.body)
+    end
+
+    let(:approver) { create(:user) }
+
+    before do
+      merge_request.update_attribute :approvals_before_merge, 2
+      project.team << [approver, :developer]
+      project.approver_ids = [user, approver].map(&:id).join(',')
+    end
+
+    describe 'approve' do
+      before do
+        post :approve,
+          namespace_id: project.namespace.to_param,
+          project_id: project.to_param,
+          id: merge_request.iid,
+          format: :json
+      end
+
+      it 'approves the merge request' do
+        expect(response).to be_success
+        expect(json_response['approvals_left']).to eq 1
+        expect(json_response['approved_by'].size).to eq 1
+        expect(json_response['approved_by'][0]['user']['username']).to eq user.username
+        expect(json_response['user_has_approved']).to be true
+        expect(json_response['user_can_approve']).to be false
+        expect(json_response['suggested_approvers'].size).to eq 1
+        expect(json_response['suggested_approvers'][0]['username']).to eq approver.username
+      end
+    end
+
+    describe 'approvals' do
+      before do
+        merge_request.approvals.create(user: approver)
+        get :approvals,
+          namespace_id: project.namespace.to_param,
+          project_id: project.to_param,
+          id: merge_request.iid,
+          format: :json
+      end
+
+      it 'shows approval information' do
+        expect(response).to be_success
+        expect(json_response['approvals_left']).to eq 1
+        expect(json_response['approved_by'].size).to eq 1
+        expect(json_response['approved_by'][0]['user']['username']).to eq approver.username
+        expect(json_response['user_has_approved']).to be false
+        expect(json_response['user_can_approve']).to be true
+        expect(json_response['suggested_approvers'].size).to eq 1
+        expect(json_response['suggested_approvers'][0]['username']).to eq user.username
+      end
+    end
+
+    describe 'unapprove' do
+      before do
+        merge_request.approvals.create(user: user)
+        delete :unapprove,
+          namespace_id: project.namespace.to_param,
+          project_id: project.to_param,
+          id: merge_request.iid,
+          format: :json
+      end
+
+      it 'unapproves the merge request' do
+        expect(response).to be_success
+        expect(json_response['approvals_left']).to eq 2
+        expect(json_response['approved_by']).to be_empty
+        expect(json_response['user_has_approved']).to be false
+        expect(json_response['user_can_approve']).to be true
+        expect(json_response['suggested_approvers'].size).to eq 2
+      end
+    end
+  end
+
   shared_examples "loads labels" do |action|
     it "loads labels into the @labels variable" do
       get action,
@@ -176,6 +339,18 @@ describe Projects::MergeRequestsController do
         expect(assigns(:merge_requests).current_page).to eq(last_page)
         expect(response).to have_http_status(200)
       end
+
+      it 'does not redirect to external sites when provided a host field' do
+        external_host = "www.example.com"
+        get :index,
+          namespace_id: project.namespace.to_param,
+          project_id: project,
+          state: 'opened',
+          page: (last_page + 1).to_param,
+          host: external_host
+
+        expect(response).to redirect_to(namespace_project_merge_requests_path(page: last_page, state: controller.params[:state], scope: controller.params[:scope]))
+      end
     end
 
     context 'when filtering by opened state' do
@@ -203,6 +378,14 @@ describe Projects::MergeRequestsController do
   end
 
   describe 'PUT update' do
+    def update_merge_request(params = {})
+      post :update,
+           namespace_id: project.namespace.to_param,
+           project_id: project.to_param,
+           id: merge_request.iid,
+           merge_request: params
+    end
+
     context 'changing the assignee' do
       it 'limits the attributes exposed on the assignee' do
         assignee = create(:user)
@@ -234,13 +417,7 @@ describe Projects::MergeRequestsController do
       end
 
       it 'closes MR without errors' do
-        post :update,
-            namespace_id: project.namespace,
-            project_id: project,
-            id: merge_request.iid,
-            merge_request: {
-              state_event: 'close'
-            }
+        update_merge_request(state_event: 'close')
 
         expect(response).to redirect_to([merge_request.target_project.namespace.becomes(Namespace), merge_request.target_project, merge_request])
         expect(merge_request.reload.closed?).to be_truthy
@@ -277,6 +454,111 @@ describe Projects::MergeRequestsController do
 
       it_behaves_like 'update invalid issuable', MergeRequest
     end
+
+    context 'the approvals_before_merge param' do
+      before { project.update_attributes(approvals_before_merge: 2) }
+
+      context 'approvals_before_merge not set for the existing MR' do
+        context 'when it is less than the one in the target project' do
+          before { update_merge_request(approvals_before_merge: 1) }
+
+          it 'sets the param to nil' do
+            expect(merge_request.reload.approvals_before_merge).to eq(nil)
+          end
+
+          it 'updates the merge request' do
+            expect(merge_request.reload).to be_valid
+            expect(response).to redirect_to(namespace_project_merge_request_path(id: merge_request.iid, project_id: project.to_param))
+          end
+        end
+
+        context 'when it is equal to the one in the target project' do
+          before { update_merge_request(approvals_before_merge: 2) }
+
+          it 'sets the param to nil' do
+            expect(merge_request.reload.approvals_before_merge).to eq(nil)
+          end
+
+          it 'updates the merge request' do
+            expect(merge_request.reload).to be_valid
+            expect(response).to redirect_to(namespace_project_merge_request_path(id: merge_request.iid, project_id: project.to_param))
+          end
+        end
+
+        context 'when it is greater than the one in the target project' do
+          before { update_merge_request(approvals_before_merge: 3) }
+
+          it 'saves the param in the merge request' do
+            expect(merge_request.reload.approvals_before_merge).to eq(3)
+          end
+
+          it 'updates the merge request' do
+            expect(merge_request.reload).to be_valid
+            expect(response).to redirect_to(namespace_project_merge_request_path(id: merge_request.iid, project_id: project.to_param))
+          end
+        end
+      end
+
+      context 'approvals_before_merge set for the existing MR' do
+        before do
+          merge_request.update_attribute(:approvals_before_merge, 4)
+        end
+
+        context 'when it is not set' do
+          before do
+            update_merge_request(title: 'New title')
+          end
+
+          it 'does not change the merge request' do
+            expect(merge_request.reload.approvals_before_merge).to eq(4)
+          end
+
+          it 'updates the merge request' do
+            expect(merge_request.reload).to be_valid
+            expect(response).to redirect_to(namespace_project_merge_request_path(id: merge_request.iid, project_id: project.to_param))
+          end
+        end
+
+        context 'when it is less than the one in the target project' do
+          before { update_merge_request(approvals_before_merge: 1) }
+
+          it 'sets the param to nil' do
+            expect(merge_request.reload.approvals_before_merge).to eq(nil)
+          end
+
+          it 'updates the merge request' do
+            expect(merge_request.reload).to be_valid
+            expect(response).to redirect_to(namespace_project_merge_request_path(id: merge_request.iid, project_id: project.to_param))
+          end
+        end
+
+        context 'when it is equal to the one in the target project' do
+          before { update_merge_request(approvals_before_merge: 2) }
+
+          it 'sets the param to nil' do
+            expect(merge_request.reload.approvals_before_merge).to eq(nil)
+          end
+
+          it 'updates the merge request' do
+            expect(merge_request.reload).to be_valid
+            expect(response).to redirect_to(namespace_project_merge_request_path(id: merge_request.iid, project_id: project.to_param))
+          end
+        end
+
+        context 'when it is greater than the one in the target project' do
+          before { update_merge_request(approvals_before_merge: 3) }
+
+          it 'saves the param in the merge request' do
+            expect(merge_request.reload.approvals_before_merge).to eq(3)
+          end
+
+          it 'updates the merge request' do
+            expect(merge_request.reload).to be_valid
+            expect(response).to redirect_to(namespace_project_merge_request_path(id: merge_request.iid, project_id: project.to_param))
+          end
+        end
+      end
+    end
   end
 
   describe 'POST merge' do
@@ -285,6 +567,7 @@ describe Projects::MergeRequestsController do
         namespace_id: project.namespace,
         project_id: project,
         id: merge_request.iid,
+        squash: false,
         format: 'raw'
       }
     end
@@ -322,8 +605,26 @@ describe Projects::MergeRequestsController do
     end
 
     context 'when the sha parameter matches the source SHA' do
-      def merge_with_sha
-        post :merge, base_params.merge(sha: merge_request.diff_head_sha)
+      def merge_with_sha(params = {})
+        post :merge, base_params.merge(sha: merge_request.diff_head_sha).merge(params)
+      end
+
+      context 'when squash is passed as 1' do
+        it 'updates the squash attribute on the MR to true' do
+          merge_request.update(squash: false)
+          merge_with_sha(squash: '1')
+
+          expect(merge_request.reload.squash).to be_truthy
+        end
+      end
+
+      context 'when squash is passed as 1' do
+        it 'updates the squash attribute on the MR to false' do
+          merge_request.update(squash: true)
+          merge_with_sha(squash: '0')
+
+          expect(merge_request.reload.squash).to be_falsey
+        end
       end
 
       it 'returns :success' do
@@ -574,8 +875,8 @@ describe Projects::MergeRequestsController do
               diff_for_path(id: merge_request.iid, old_path: existing_path, new_path: existing_path)
 
               expect(assigns(:diff_notes_disabled)).to be_falsey
-              expect(assigns(:comments_target)).to eq(noteable_type: 'MergeRequest',
-                                                      noteable_id: merge_request.id)
+              expect(assigns(:new_diff_note_attrs)).to eq(noteable_type: 'MergeRequest',
+                                                          noteable_id: merge_request.id)
             end
 
             it 'only renders the diffs for the path given' do
@@ -1196,7 +1497,7 @@ describe Projects::MergeRequestsController do
         expect(json_response['text']).to eq status.text
         expect(json_response['label']).to eq status.label
         expect(json_response['icon']).to eq status.icon
-        expect(json_response['favicon']).to eq status.favicon
+        expect(json_response['favicon']).to eq "/assets/ci_favicons/#{status.favicon}.ico"
       end
     end
 

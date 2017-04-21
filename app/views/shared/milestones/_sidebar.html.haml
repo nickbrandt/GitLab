@@ -85,6 +85,23 @@
               Closed:
               = milestone.issues_visible_to_user(current_user).closed.count
 
+    - total_weight = milestone.issues_visible_to_user(current_user).sum(:weight)
+    .block.weight
+      .sidebar-collapsed-icon
+        = icon('balance-scale')
+        %span
+          - unless total_weight.zero?
+            = total_weight
+          - else
+            None
+      .title.hide-collapsed
+        Total issue weight
+      .value.hide-collapsed
+        - unless total_weight.zero?
+          %strong.bold= total_weight
+        - else
+          .no-value None
+
     .block
       .sidebar-collapsed-icon
         %strong
@@ -122,10 +139,10 @@
     - if milestone_ref.present?
       .block.reference
         .sidebar-collapsed-icon.dont-change-state
-          = clipboard_button(clipboard_text: milestone_ref, title: "Copy reference to clipboard", placement: "left")
+          = clipboard_button(text: milestone_ref, title: "Copy reference to clipboard", placement: "left")
         .cross-project-reference.hide-collapsed
           %span
             Reference:
             %cite{ title: milestone_ref }
               = milestone_ref
-          = clipboard_button(clipboard_text: milestone_ref, title: "Copy reference to clipboard", placement: "left")
+          = clipboard_button(text: milestone_ref, title: "Copy reference to clipboard", placement: "left")

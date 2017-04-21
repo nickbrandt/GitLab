@@ -28,15 +28,43 @@ describe User, models: true do
     it { is_expected.to have_many(:merge_requests).dependent(:destroy) }
     it { is_expected.to have_many(:assigned_merge_requests).dependent(:nullify) }
     it { is_expected.to have_many(:identities).dependent(:destroy) }
-    it { is_expected.to have_one(:abuse_report) }
     it { is_expected.to have_many(:spam_logs).dependent(:destroy) }
     it { is_expected.to have_many(:todos).dependent(:destroy) }
     it { is_expected.to have_many(:award_emoji).dependent(:destroy) }
+    it { is_expected.to have_many(:path_locks).dependent(:destroy) }
     it { is_expected.to have_many(:triggers).dependent(:destroy) }
     it { is_expected.to have_many(:builds).dependent(:nullify) }
     it { is_expected.to have_many(:pipelines).dependent(:nullify) }
     it { is_expected.to have_many(:chat_names).dependent(:destroy) }
     it { is_expected.to have_many(:uploads).dependent(:destroy) }
+    it { is_expected.to have_many(:reported_abuse_reports).dependent(:destroy).class_name('AbuseReport') }
+
+    describe "#abuse_report" do
+      let(:current_user) { create(:user) }
+      let(:other_user) { create(:user) }
+
+      it { is_expected.to have_one(:abuse_report) }
+
+      it "refers to the abuse report whose user_id is the current user" do
+        abuse_report = create(:abuse_report, reporter: other_user, user: current_user)
+
+        expect(current_user.abuse_report).to eq(abuse_report)
+      end
+
+      it "does not refer to the abuse report whose reporter_id is the current user" do
+        create(:abuse_report, reporter: current_user, user: other_user)
+
+        expect(current_user.abuse_report).to be_nil
+      end
+
+      it "does not update the user_id of an abuse report when the user is updated" do
+        abuse_report = create(:abuse_report, reporter: current_user, user: other_user)
+
+        current_user.block
+
+        expect(abuse_report.reload.user).to eq(other_user)
+      end
+    end
 
     describe '#group_members' do
       it 'does not include group memberships for which user is a requester' do
@@ -57,6 +85,10 @@ describe User, models: true do
         expect(user.project_members).to be_empty
       end
     end
+  end
+
+  describe 'nested attributes' do
+    it { is_expected.to respond_to(:namespace_attributes=) }
   end
 
   describe 'validations' do
@@ -211,6 +243,25 @@ describe User, models: true do
         end
       end
     end
+
+    it 'does not allow a user to be both an auditor and an admin' do
+      user = build(:user, :admin, :auditor)
+
+      expect(user).to be_invalid
+    end
+  end
+
+  describe "non_ldap" do
+    it "retuns non-ldap user" do
+      User.delete_all
+      create :user
+      ldap_user = create :omniauth_user, provider: "ldapmain"
+      create :omniauth_user, provider: "gitlub"
+
+      users = User.non_ldap
+      expect(users.count).to eq 2
+      expect(users.detect { |user| user.username == ldap_user.username }).to be_nil
+    end
   end
 
   describe "scopes" do
@@ -288,7 +339,7 @@ describe User, models: true do
   end
 
   describe "Respond to" do
-    it { is_expected.to respond_to(:is_admin?) }
+    it { is_expected.to respond_to(:admin?) }
     it { is_expected.to respond_to(:name) }
     it { is_expected.to respond_to(:private_token) }
     it { is_expected.to respond_to(:external?) }
@@ -559,7 +610,7 @@ describe User, models: true do
     describe 'normal user' do
       let(:user) { create(:user, name: 'John Smith') }
 
-      it { expect(user.is_admin?).to be_falsey }
+      it { expect(user.admin?).to be_falsey }
       it { expect(user.require_ssh_key?).to be_truthy }
       it { expect(user.can_create_group?).to be_truthy }
       it { expect(user.can_create_project?).to be_truthy }
@@ -837,6 +888,35 @@ describe User, models: true do
     end
   end
 
+  describe '#avatar_url' do
+    let(:user) { create(:user) }
+    subject { user.avatar_url }
+
+    context 'when avatar file is uploaded' do
+      before do
+        user.update_columns(avatar: 'uploads/avatar.png')
+        allow(user.avatar).to receive(:present?) { true }
+      end
+
+      let(:avatar_path) do
+        "/uploads/user/avatar/#{user.id}/uploads/avatar.png"
+      end
+
+      it { should eq "http://#{Gitlab.config.gitlab.host}#{avatar_path}" }
+
+      context 'when in a geo secondary node' do
+        let(:geo_url) { 'http://geo.example.com' }
+
+        before do
+          allow(Gitlab::Geo).to receive(:secondary?) { true }
+          allow(Gitlab::Geo).to receive_message_chain(:primary_node, :url) { geo_url }
+        end
+
+        it { should eq "#{geo_url}#{avatar_path}" }
+      end
+    end
+  end
+
   describe '#requires_ldap_check?' do
     let(:user) { User.new }
 
@@ -992,6 +1072,27 @@ describe User, models: true do
       expect(user.starred?(project)).to be_truthy
       user.toggle_star(project)
       expect(user.starred?(project)).to be_falsey
+    end
+  end
+
+  describe "#existing_member?" do
+    it "returns true for exisitng user" do
+      create :user, email: "bruno@example.com"
+
+      expect(User.existing_member?("bruno@example.com")).to be_truthy
+    end
+
+    it "returns false for unknown exisitng user" do
+      create :user, email: "bruno@example.com"
+
+      expect(User.existing_member?("rendom@example.com")).to be_falsey
+    end
+
+    it "returns true if additional email exists" do
+      user = create :user
+      user.emails.create(email: "bruno@example.com")
+
+      expect(User.existing_member?("bruno@example.com")).to be_truthy
     end
   end
 
@@ -1407,6 +1508,17 @@ describe User, models: true do
     it { expect(user.nested_groups).to eq([nested_group]) }
   end
 
+  describe '#all_expanded_groups' do
+    let!(:user) { create(:user) }
+    let!(:group) { create(:group) }
+    let!(:nested_group_1) { create(:group, parent: group) }
+    let!(:nested_group_2) { create(:group, parent: group) }
+
+    before { nested_group_1.add_owner(user) }
+
+    it { expect(user.all_expanded_groups).to match_array [group, nested_group_1] }
+  end
+
   describe '#nested_groups_projects' do
     let!(:user) { create(:user) }
     let!(:group) { create(:group) }
@@ -1455,11 +1567,18 @@ describe User, models: true do
   describe '#access_level=' do
     let(:user) { build(:user) }
 
+    before do
+      # `auditor?` returns true only when the user is an auditor _and_ the auditor license
+      # add-on is present. We aren't testing this here, so we can assume that the add-on exists.
+      allow_any_instance_of(License).to receive(:add_on?).with('GitLab_Auditor_User') { true }
+    end
+
     it 'does nothing for an invalid access level' do
       user.access_level = :invalid_access_level
 
       expect(user.access_level).to eq(:regular)
       expect(user.admin).to be false
+      expect(user.auditor).to be false
     end
 
     it "assigns the 'admin' access level" do
@@ -1467,6 +1586,41 @@ describe User, models: true do
 
       expect(user.access_level).to eq(:admin)
       expect(user.admin).to be true
+      expect(user.auditor).to be false
+    end
+
+    it "assigns the 'auditor' access level" do
+      user.access_level = :auditor
+
+      expect(user.access_level).to eq(:auditor)
+      expect(user.admin).to be false
+      expect(user.auditor).to be true
+    end
+
+    it "assigns the 'auditor' access level" do
+      user.access_level = :regular
+
+      expect(user.access_level).to eq(:regular)
+      expect(user.admin).to be false
+      expect(user.auditor).to be false
+    end
+
+    it "clears the 'admin' access level when a user is made an auditor" do
+      user.access_level = :admin
+      user.access_level = :auditor
+
+      expect(user.access_level).to eq(:auditor)
+      expect(user.admin).to be false
+      expect(user.auditor).to be true
+    end
+
+    it "clears the 'auditor' access level when a user is made an admin" do
+      user.access_level = :auditor
+      user.access_level = :admin
+
+      expect(user.access_level).to eq(:admin)
+      expect(user.admin).to be true
+      expect(user.auditor).to be false
     end
 
     it "doesn't clear existing access levels when an invalid access level is passed in" do
@@ -1475,6 +1629,7 @@ describe User, models: true do
 
       expect(user.access_level).to eq(:admin)
       expect(user.admin).to be true
+      expect(user.auditor).to be false
     end
 
     it "accepts string values in addition to symbols" do
@@ -1482,6 +1637,67 @@ describe User, models: true do
 
       expect(user.access_level).to eq(:admin)
       expect(user.admin).to be true
+      expect(user.auditor).to be false
+    end
+  end
+
+  describe 'the GitLab_Auditor_User add-on' do
+    let(:license) { build(:license) }
+
+    before do
+      allow(::License).to receive(:current).and_return(license)
+    end
+
+    context 'creating an auditor user' do
+      it "does not allow creating an auditor user if the addon isn't enabled" do
+        allow_any_instance_of(License).to receive(:add_on?).with('GitLab_Auditor_User') { false }
+
+        expect(build(:user, :auditor)).to be_invalid
+      end
+
+      it "does not allow creating an auditor user if no license is present" do
+        allow(License).to receive(:current).and_return nil
+
+        expect(build(:user, :auditor)).to be_invalid
+      end
+
+      it "allows creating an auditor user if the addon is enabled" do
+        allow_any_instance_of(License).to receive(:add_on?).with('GitLab_Auditor_User') { true }
+
+        expect(build(:user, :auditor)).to be_valid
+      end
+
+      it "allows creating a regular user if the addon isn't enabled" do
+        allow_any_instance_of(License).to receive(:add_on?).with('GitLab_Auditor_User') { false }
+
+        expect(build(:user)).to be_valid
+      end
+    end
+
+    context '#auditor?' do
+      it "returns true for an auditor user if the addon is enabled" do
+        allow_any_instance_of(License).to receive(:add_on?).with('GitLab_Auditor_User') { true }
+
+        expect(build(:user, :auditor)).to be_auditor
+      end
+
+      it "returns false for an auditor user if the addon is not enabled" do
+        allow_any_instance_of(License).to receive(:add_on?).with('GitLab_Auditor_User') { false }
+
+        expect(build(:user, :auditor)).not_to be_auditor
+      end
+
+      it "returns false for an auditor user if a license is not present" do
+        allow_any_instance_of(License).to receive(:add_on?).with('GitLab_Auditor_User') { false }
+
+        expect(build(:user, :auditor)).not_to be_auditor
+      end
+
+      it "returns false for a non-auditor user even if the addon is present" do
+        allow_any_instance_of(License).to receive(:add_on?).with('GitLab_Auditor_User') { true }
+
+        expect(build(:user)).not_to be_auditor
+      end
     end
   end
 
@@ -1519,6 +1735,127 @@ describe User, models: true do
         expect(ghost).to be_persisted
         expect(ghost.email).to eq('ghost1@example.com')
       end
+    end
+  end
+
+  describe '.ghost' do
+    it "creates a ghost user if one isn't already present" do
+      ghost = User.ghost
+
+      expect(ghost).to be_ghost
+      expect(ghost).to be_persisted
+    end
+
+    it "does not create a second ghost user if one is already present" do
+      expect do
+        User.ghost
+        User.ghost
+      end.to change { User.count }.by(1)
+      expect(User.ghost).to eq(User.ghost)
+    end
+
+    context "when a regular user exists with the username 'ghost'" do
+      it "creates a ghost user with a non-conflicting username" do
+        create(:user, username: 'ghost')
+        ghost = User.ghost
+
+        expect(ghost).to be_persisted
+        expect(ghost.username).to eq('ghost1')
+      end
+    end
+
+    context "when a regular user exists with the email 'ghost@example.com'" do
+      it "creates a ghost user with a non-conflicting email" do
+        create(:user, email: 'ghost@example.com')
+        ghost = User.ghost
+
+        expect(ghost).to be_persisted
+        expect(ghost.email).to eq('ghost1@example.com')
+      end
+    end
+  end
+
+  describe '#update_two_factor_requirement' do
+    let(:user) { create :user }
+
+    context 'with 2FA requirement on groups' do
+      let(:group1) { create :group, require_two_factor_authentication: true, two_factor_grace_period: 23 }
+      let(:group2) { create :group, require_two_factor_authentication: true, two_factor_grace_period: 32 }
+
+      before do
+        group1.add_user(user, GroupMember::OWNER)
+        group2.add_user(user, GroupMember::OWNER)
+
+        user.update_two_factor_requirement
+      end
+
+      it 'requires 2FA' do
+        expect(user.require_two_factor_authentication_from_group).to be true
+      end
+
+      it 'uses the shortest grace period' do
+        expect(user.two_factor_grace_period).to be 23
+      end
+    end
+
+    context 'with 2FA requirement on nested parent group' do
+      let!(:group1) { create :group, require_two_factor_authentication: true }
+      let!(:group1a) { create :group, require_two_factor_authentication: false, parent: group1 }
+
+      before do
+        group1a.add_user(user, GroupMember::OWNER)
+
+        user.update_two_factor_requirement
+      end
+
+      it 'requires 2FA' do
+        expect(user.require_two_factor_authentication_from_group).to be true
+      end
+    end
+
+    context 'with 2FA requirement on nested child group' do
+      let!(:group1) { create :group, require_two_factor_authentication: false }
+      let!(:group1a) { create :group, require_two_factor_authentication: true, parent: group1 }
+
+      before do
+        group1.add_user(user, GroupMember::OWNER)
+
+        user.update_two_factor_requirement
+      end
+
+      it 'requires 2FA' do
+        expect(user.require_two_factor_authentication_from_group).to be true
+      end
+    end
+
+    context 'without 2FA requirement on groups' do
+      let(:group) { create :group }
+
+      before do
+        group.add_user(user, GroupMember::OWNER)
+
+        user.update_two_factor_requirement
+      end
+
+      it 'does not require 2FA' do
+        expect(user.require_two_factor_authentication_from_group).to be false
+      end
+
+      it 'falls back to the default grace period' do
+        expect(user.two_factor_grace_period).to be 48
+      end
+    end
+  end
+
+  context '.active' do
+    before do
+      User.ghost
+      create(:user, name: 'user', state: 'active')
+      create(:user, name: 'user', state: 'blocked')
+    end
+
+    it 'only counts active and non internal users' do
+      expect(User.active.count).to eq(1)
     end
   end
 end

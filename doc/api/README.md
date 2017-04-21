@@ -25,12 +25,13 @@ following locations:
 - [Jobs](jobs.md)
 - [Keys](keys.md)
 - [Labels](labels.md)
+- [License](license.md)
 - [Merge Requests](merge_requests.md)
 - [Milestones](milestones.md)
-- [Open source license templates](templates/licenses.md)
 - [Namespaces](namespaces.md)
 - [Notes](notes.md) (comments)
 - [Notification settings](notification_settings.md)
+- [Open source license templates](templates/licenses.md)
 - [Pipelines](pipelines.md)
 - [Pipeline Triggers](pipeline_triggers.md)
 - [Projects](projects.md) including setting Webhooks
@@ -303,6 +304,17 @@ Additional pagination headers are also sent back.
 | `X-Next-Page`   | The index of the next page |
 | `X-Prev-Page`   | The index of the previous page |
 
+## Namespaced path encoding
+
+If using namespaced API calls, make sure that the `NAMESPACE/PROJECT_NAME` is
+URL-encoded.
+
+For example, `/` is represented by `%2F`:
+
+```
+/api/v4/projects/diaspora%2Fdiaspora
+```
+
 ## `id` vs `iid`
 
 When you work with the API, you may notice two similar fields in API entities:
@@ -397,7 +409,6 @@ Content-Type: application/json
     "error": "404 Not Found"
 }
 ```
-
 
 ## Clients
 

@@ -120,6 +120,20 @@ feature 'Issue Sidebar', feature: true do
     end
   end
 
+  context 'as a allowed mobile user', js: true do
+    before do
+      project.team << [user, :developer]
+      resize_screen_xs
+      visit_issue(project, issue)
+    end
+
+    context 'mobile sidebar' do
+      it 'collapses the sidebar for small screens' do
+        expect(page).not_to have_css('aside.right-sidebar.right-sidebar-collapsed')
+      end
+    end
+  end
+
   context 'as a guest' do
     before do
       project.team << [user, :guest]
@@ -128,6 +142,35 @@ feature 'Issue Sidebar', feature: true do
 
     it 'does not have a option to edit labels' do
       expect(page).not_to have_selector('.block.labels .edit-link')
+    end
+  end
+
+  context 'updating weight', js: true do
+    before do
+      project.team << [user, :master]
+      visit_issue(project, issue)
+    end
+
+    it 'updates weight in sidebar to 1' do
+      page.within '.weight' do
+        click_link 'Edit'
+        click_link '1'
+
+        page.within '.value' do
+          expect(page).to have_content '1'
+        end
+      end
+    end
+
+    it 'updates weight in sidebar to no weight' do
+      page.within '.weight' do
+        click_link 'Edit'
+        click_link 'No Weight'
+
+        page.within '.value' do
+          expect(page).to have_content 'None'
+        end
+      end
     end
   end
 

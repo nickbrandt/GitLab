@@ -30,6 +30,17 @@ class BoardService {
     });
   }
 
+  allBoards () {
+    return this.boards.get();
+  }
+
+  createBoard (board) {
+    if (board.id) {
+      return this.boards.update({ id: board.id }, board);
+    }
+    return this.boards.save({}, board);
+  }
+
   all () {
     return this.lists.get();
   }
@@ -92,6 +103,16 @@ class BoardService {
     };
 
     return this.issues.bulkUpdate(data);
+  }
+
+  static loadMilestones(path) {
+    this.loading = true;
+
+    return this.$http.get(this.milestonePath)
+      .then((res) => {
+        this.milestones = res.json();
+        this.loading = false;
+      });
   }
 }
 

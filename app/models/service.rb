@@ -225,6 +225,8 @@ class Service < ActiveRecord::Base
       gemnasium
       hipchat
       irker
+      jenkins
+      jenkins_deprecated
       jira
       kubernetes
       mattermost_slash_commands
@@ -237,6 +239,7 @@ class Service < ActiveRecord::Base
       slack_slash_commands
       slack
       teamcity
+      microsoft_teams
     ]
     if Rails.env.development?
       service_names += %w[mock_ci mock_deployment mock_monitoring]

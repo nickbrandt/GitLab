@@ -13,7 +13,7 @@
     = button_to reset_health_check_token_admin_application_settings_path,
       method: :put, class: 'btn btn-default',
       data: { confirm: 'Are you sure you want to reset the health check token?' } do
-      = icon('refresh')
+      = icon('spinner')
       Reset health check access token
   %p.light
     Health information can be retrieved as plain text, JSON, or XML using:
@@ -34,6 +34,9 @@
         %code= health_check_url(token: current_application_settings.health_check_access_token, checks: :database)
       %li
         %code= health_check_url(token: current_application_settings.health_check_access_token, checks: :migrations)
+      - if Gitlab::Geo.secondary?
+        %li
+          %code= health_check_url(token: current_application_settings.health_check_access_token, checks: :geo)
 
   %hr
   .panel.panel-default

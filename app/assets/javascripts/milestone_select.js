@@ -2,8 +2,6 @@
 /* global Issuable */
 /* global ListMilestone */
 
-import Vue from 'vue';
-
 (function() {
   this.MilestoneSelect = (function() {
     function MilestoneSelect(currentProject, els) {
@@ -96,6 +94,11 @@ import Vue from 'vue';
           },
           selectable: true,
           toggleLabel: function(selected, el, e) {
+            if ($('html').hasClass('issue-boards-page') && !$dropdown.hasClass('js-issue-board-sidebar') &&
+              !$dropdown.closest('.add-issues-modal').length && !selected) {
+              return gl.issueBoards.BoardsStore.state.currentBoard.milestone.title;
+            }
+
             if (selected && 'id' in selected && $(el).hasClass('is-active')) {
               return selected.title;
             } else {
@@ -123,8 +126,25 @@ import Vue from 'vue';
             return $value.css('display', '');
           },
           vue: $dropdown.hasClass('js-issue-board-sidebar'),
+          hideRow: function(milestone) {
+            if ($('html').hasClass('issue-boards-page') && !$dropdown.hasClass('js-issue-board-sidebar') &&
+              !$dropdown.closest('.add-issues-modal').length && gl.issueBoards.BoardsStore.state.currentBoard.milestone) {
+              return milestone !== gl.issueBoards.BoardsStore.state.currentBoard.milestone.title;
+            }
+
+            return false;
+          },
+          isSelectable: function() {
+            if ($('html').hasClass('issue-boards-page') && !$dropdown.hasClass('js-issue-board-sidebar') &&
+              !$dropdown.closest('.add-issues-modal').length && gl.issueBoards.BoardsStore.state.currentBoard.milestone_id) {
+              return false;
+            }
+
+            return true;
+          },
           clicked: function(selected, $el, e) {
             var data, isIssueIndex, isMRIndex, page, boardsStore;
+            if (!selected) return;
             page = $('body').data('page');
             isIssueIndex = page === 'projects:issues:index';
             isMRIndex = (page === page && page === 'projects:merge_requests:index');
@@ -151,12 +171,12 @@ import Vue from 'vue';
               return $dropdown.closest('form').submit();
             } else if ($dropdown.hasClass('js-issue-board-sidebar')) {
               if (selected.id !== -1) {
-                Vue.set(gl.issueBoards.BoardsStore.detail.issue, 'milestone', new ListMilestone({
+                gl.issueBoards.boardStoreIssueSet('milestone', new ListMilestone({
                   id: selected.id,
                   title: selected.name
                 }));
               } else {
-                Vue.delete(gl.issueBoards.BoardsStore.detail.issue, 'milestone');
+                gl.issueBoards.boardStoreIssueDelete('milestone');
               }
 
               $dropdown.trigger('loading.gl.dropdown');
@@ -165,6 +185,9 @@ import Vue from 'vue';
               gl.issueBoards.BoardsStore.detail.issue.update($dropdown.attr('data-issue-update'))
                 .then(function () {
                   $dropdown.trigger('loaded.gl.dropdown');
+                  $loading.fadeOut();
+                })
+                .catch(() => {
                   $loading.fadeOut();
                 });
             } else {

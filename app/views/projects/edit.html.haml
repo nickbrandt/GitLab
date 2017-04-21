@@ -1,4 +1,5 @@
 = render "projects/settings/head"
+
 .project-edit-container
   .row.prepend-top-default
     .col-lg-3.profile-settings-sidebar
@@ -29,6 +30,15 @@
             .form-group
               = f.label :default_branch, "Default Branch", class: 'label-light'
               = f.select(:default_branch, @project.repository.branch_names, {}, {class: 'select2 select-wide'})
+
+        - if current_user.admin?
+          .form-group
+            = f.label :repository_size_limit, class: 'label-light' do
+              Repository size limit (MB)
+            = f.number_field :repository_size_limit, value: f.object.repository_size_limit.try(:to_mb), class: 'form-control', min: 0
+            %span.help-block#repository_size_limit_help_block
+              = size_limit_message(@project)
+
         .form-group
           = f.label :tag_list, "Tags", class: 'label-light'
           = f.text_field :tag_list, value: @project.tag_list.sort.join(', '), maxlength: 2000, class: "form-control"
@@ -42,7 +52,7 @@
               .col-md-9
                 %label.label-light
                   = label_tag :project_visibility, 'Project Visibility', class: 'label-light'
-                  = link_to "(?)", help_page_path("public_access/public_access")
+                  = link_to icon('question-circle'), help_page_path("public_access/public_access")
                 %span.help-block
               .col-md-3.visibility-select-container
                 = render('projects/visibility_select', model_method: :visibility_level, form: f, selected_level: @project.visibility_level)
@@ -112,7 +122,19 @@
                 %span.descr Enable Container Registry for this project
                 = link_to icon('question-circle'), help_page_path('user/project/container_registry'), target: '_blank'
 
+        = render 'issues_settings', f: f
+
         = render 'merge_request_settings', form: f
+
+        - if EE::Gitlab::ServiceDesk.enabled?
+          %hr
+          %fieldset.js-service-desk-setting-wrapper.features.append-bottom-default
+            %h5.prepend-top-0
+              Service Desk
+              = link_to icon('question-circle'), help_page_path('user/project/service_desk')
+            .js-service-desk-setting-root{ data: { endpoint: namespace_project_service_desk_path(@project.namespace, @project),
+              enabled: @project.service_desk_enabled,
+              incoming_email: (@project.service_desk_address if @project.service_desk_enabled) } }
 
         %hr
         %fieldset.features.append-bottom-default

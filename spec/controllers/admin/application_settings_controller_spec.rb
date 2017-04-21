@@ -3,10 +3,47 @@ require 'spec_helper'
 describe Admin::ApplicationSettingsController do
   include StubENV
 
+  let(:group) { create(:group) }
+  let(:project) { create(:project, namespace: group) }
   let(:admin) { create(:admin) }
+  let(:user) { create(:user)}
 
   before do
     stub_env('IN_MEMORY_APPLICATION_SETTINGS', 'false')
+  end
+
+  describe 'GET #usage_data with no access' do
+    before do
+      sign_in(user)
+    end
+
+    it 'returns 404' do
+      get :usage_data, format: :html
+
+      expect(response.status).to eq(404)
+    end
+  end
+
+  describe 'GET #usage_data' do
+    before do
+      sign_in(admin)
+    end
+
+    it 'returns HTML data' do
+      get :usage_data, format: :html
+
+      expect(response.body).to start_with('<span')
+      expect(response.status).to eq(200)
+    end
+
+    it 'returns JSON data' do
+      get :usage_data, format: :json
+
+      body = JSON.parse(response.body)
+      expect(body["version"]).to eq(Gitlab::VERSION)
+      expect(body).to include('counts')
+      expect(response.status).to eq(200)
+    end
   end
 
   describe 'PUT #update' do
@@ -34,6 +71,68 @@ describe Admin::ApplicationSettingsController do
       expect(response).to redirect_to(admin_application_settings_path)
       expect(ApplicationSetting.current.default_project_visibility).to eq(Gitlab::VisibilityLevel::PRIVATE)
       expect(ApplicationSetting.current.restricted_visibility_levels).to be_empty
+    end
+
+    it 'updates repository_size_limit' do
+      put :update, application_setting: { repository_size_limit: '100' }
+
+      expect(response).to redirect_to(admin_application_settings_path)
+      expect(response).to set_flash[:notice].to('Application settings saved successfully')
+    end
+
+    it 'does not accept negative repository_size_limit' do
+      put :update, application_setting: { repository_size_limit: '-100' }
+
+      expect(response).to render_template(:show)
+      expect(assigns(:application_setting).errors[:repository_size_limit]).to be_present
+    end
+
+    it 'does not accept invalid repository_size_limit' do
+      put :update, application_setting: { repository_size_limit: 'one thousand' }
+
+      expect(response).to render_template(:show)
+      expect(assigns(:application_setting).errors[:repository_size_limit]).to be_present
+    end
+
+    it 'does not accept empty repository_size_limit' do
+      put :update, application_setting: { repository_size_limit: '' }
+
+      expect(response).to render_template(:show)
+      expect(assigns(:application_setting).errors[:repository_size_limit]).to be_present
+    end
+  end
+
+  describe 'GET #usage_data with no access' do
+    before do
+      sign_in(user)
+    end
+
+    it 'returns 404' do
+      get :usage_data, format: :html
+
+      expect(response.status).to eq(404)
+    end
+  end
+
+  describe 'GET #usage_data' do
+    before do
+      sign_in(admin)
+    end
+
+    it 'returns HTML data' do
+      get :usage_data, format: :html
+
+      expect(response.body).to start_with('<span')
+      expect(response.status).to eq(200)
+    end
+
+    it 'returns JSON data' do
+      get :usage_data, format: :json
+
+      body = JSON.parse(response.body)
+      expect(body["version"]).to eq(Gitlab::VERSION)
+      expect(body).to include('counts')
+      expect(response.status).to eq(200)
     end
   end
 end

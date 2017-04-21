@@ -1,11 +1,16 @@
 /**
  * Render environments table.
+ *
+ * Dumb component used to render top level environments and
+ * the folder view.
  */
 import EnvironmentTableRowComponent from './environment_item';
+import DeployBoard from './deploy_board_component';
 
 export default {
   components: {
     'environment-item': EnvironmentTableRowComponent,
+    DeployBoard,
   },
 
   props: {
@@ -27,9 +32,22 @@ export default {
       default: false,
     },
 
+    toggleDeployBoard: {
+      type: Function,
+      required: false,
+      default: () => {},
+    },
+
+    store: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
+
     service: {
       type: Object,
       required: true,
+      default: () => ({}),
     },
 
     isLoadingFolderContent: {
@@ -60,11 +78,25 @@ export default {
       <tbody>
         <template v-for="model in environments"
           v-bind:model="model">
+
           <tr is="environment-item"
             :model="model"
             :can-create-deployment="canCreateDeployment"
             :can-read-environment="canReadEnvironment"
+            :toggleDeployBoard="toggleDeployBoard"
             :service="service"></tr>
+
+          <tr v-if="model.hasDeployBoard && model.isDeployBoardVisible" class="js-deploy-board-row">
+            <td colspan="6" class="deploy-board-container">
+              <deploy-board
+                :store="store"
+                :service="service"
+                :environmentID="model.id"
+                :deployBoardData="model.deployBoardData"
+                :endpoint="model.rollout_status_path">
+              </deploy-board>
+            </td>
+          </tr>
 
           <template v-if="model.isFolder && model.isOpen && model.children && model.children.length > 0">
             <tr v-if="isLoadingFolderContent">

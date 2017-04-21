@@ -1,13 +1,22 @@
 require 'carrierwave/orm/activerecord'
 
 class Issue < ActiveRecord::Base
+  prepend EE::Issue
+
   include InternalId
   include Issuable
+  include Noteable
   include Referable
   include Sortable
   include Spammable
+  include Elastic::IssuesSearch
   include FasterCacheKeys
   include RelativePositioning
+
+  WEIGHT_RANGE = 1..9
+  WEIGHT_ALL = 'Everything'.freeze
+  WEIGHT_ANY = 'Any Weight'.freeze
+  WEIGHT_NONE = 'No Weight'.freeze
 
   DueDateStruct = Struct.new(:title, :name).freeze
   NoDueDate     = DueDateStruct.new('No Due Date', '0').freeze
@@ -25,8 +34,6 @@ class Issue < ActiveRecord::Base
 
   validates :project, presence: true
 
-  scope :cared, ->(user) { where(assignee_id: user) }
-  scope :open_for, ->(user) { opened.assigned_to(user) }
   scope :in_projects, ->(project_ids) { where(project_id: project_ids) }
 
   scope :without_due_date, -> { where(due_date: nil) }
@@ -35,10 +42,14 @@ class Issue < ActiveRecord::Base
 
   scope :order_due_date_asc, -> { reorder('issues.due_date IS NULL, issues.due_date ASC') }
   scope :order_due_date_desc, -> { reorder('issues.due_date IS NULL, issues.due_date DESC') }
+  scope :order_weight_desc, -> { reorder('weight IS NOT NULL, weight DESC') }
+  scope :order_weight_asc, -> { reorder('weight ASC') }
 
   scope :created_after, -> (datetime) { where("created_at >= ?", datetime) }
 
   scope :include_associations, -> { includes(:assignee, :labels, project: :namespace) }
+
+  after_save :expire_etag_cache
 
   attr_spammable :title, spam_title: true
   attr_spammable :description, spam_description: true
@@ -101,6 +112,8 @@ class Issue < ActiveRecord::Base
     case method.to_s
     when 'due_date_asc' then order_due_date_asc
     when 'due_date_desc' then order_due_date_desc
+    when 'weight_desc' then order_weight_desc
+    when 'weight_asc' then order_weight_asc
     else
       super
     end
@@ -165,6 +178,14 @@ class Issue < ActiveRecord::Base
     else
       []
     end
+  end
+
+  def self.weight_filter_options
+    WEIGHT_RANGE.to_a
+  end
+
+  def self.weight_options
+    [WEIGHT_NONE] + WEIGHT_RANGE.to_a
   end
 
   def moved?
@@ -251,5 +272,14 @@ class Issue < ActiveRecord::Base
   # Returns `true` if this Issue is visible to everybody.
   def publicly_visible?
     project.public? && !confidential?
+  end
+
+  def expire_etag_cache
+    key = Gitlab::Routing.url_helpers.rendered_title_namespace_project_issue_path(
+      project.namespace,
+      project,
+      self
+    )
+    Gitlab::EtagCaching::Store.new.touch(key)
   end
 end

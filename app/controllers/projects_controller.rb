@@ -6,7 +6,7 @@ class ProjectsController < Projects::ApplicationController
   before_action :project, except: [:index, :new, :create]
   before_action :repository, except: [:index, :new, :create]
   before_action :assign_ref_vars, only: [:show], if: :repo_exists?
-  before_action :tree, only: [:show], if: [:repo_exists?, :project_view_files?]
+  before_action :assign_tree_vars, only: [:show], if: [:repo_exists?, :project_view_files?]
 
   # Authorize
   before_action :authorize_admin_project!, only: [:edit, :update, :housekeeping, :download_export, :export, :remove_export, :generate_new_export]
@@ -91,7 +91,8 @@ class ProjectsController < Projects::ApplicationController
   end
 
   def show
-    if @project.import_in_progress?
+    # If we're importing while we do have a repository, we're simply updating the mirror.
+    if @project.import_in_progress? && !@project.updating_mirror?
       redirect_to namespace_project_import_path(@project.namespace, @project)
       return
     end
@@ -295,7 +296,7 @@ class ProjectsController < Projects::ApplicationController
 
   def project_params
     params.require(:project)
-      .permit(project_params_ce)
+      .permit(project_params_ce << project_params_ee)
   end
 
   def project_params_ce
@@ -335,6 +336,23 @@ class ProjectsController < Projects::ApplicationController
     ]
   end
 
+  def project_params_ee
+    %i[
+      approvals_before_merge
+      approver_group_ids
+      approver_ids
+      issues_template
+      merge_method
+      merge_requests_template
+      mirror
+      mirror_trigger_builds
+      mirror_user_id
+      repository_size_limit
+      reset_approvals_on_push
+      service_desk_enabled
+    ]
+  end
+
   def repo_exists?
     project.repository_exists? && !project.empty_repo? && project.repo
 
@@ -345,7 +363,11 @@ class ProjectsController < Projects::ApplicationController
   end
 
   def project_view_files?
-    current_user && current_user.project_view == 'files'
+    if current_user
+      current_user.project_view == 'files'
+    else
+      project_view_files_allowed?
+    end
   end
 
   # Override extract_ref from ExtractsPath, which returns the branch and file path
@@ -358,5 +380,16 @@ class ProjectsController < Projects::ApplicationController
   # Override get_id from ExtractsPath in this case is just the root of the default branch.
   def get_id
     project.repository.root_ref
+  end
+
+  # ExtractsPath will set @id = project.path on the show route, but it has to be the
+  # branch name for the tree view to work correctly.
+  def assign_tree_vars
+    @id = get_id
+    tree
+  end
+
+  def project_view_files_allowed?
+    !project.empty_repo? && can?(current_user, :download_code, project)
   end
 end

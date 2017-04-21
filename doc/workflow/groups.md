@@ -1,6 +1,6 @@
 # GitLab Groups
 
-GitLab groups allow you to group projects into directories and give users to several projects at once.
+GitLab groups allow you to group projects into directories and give users access to several projects at once.
 
 When you create a new project in GitLab, the default namespace for the project is the personal namespace associated with your GitLab user.
 In this document we will see how to create groups, put projects in groups and manage who can access the projects in a group.
@@ -11,9 +11,9 @@ You can create a group by going to the 'Groups' tab of the GitLab dashboard and 
 
 ![Click the 'New group' button in the 'Groups' tab](groups/new_group_button.png)
 
-Next, enter the name (required) and the optional description and group avatar.
+Next, enter the path and name (required) and the optional description and group avatar.
 
-![Fill in the name for your new group](groups/new_group_form.png)
+![Fill in the path for your new group](groups/new_group_form.png)
 
 When your group has been created you are presented with the group dashboard feed, which will be empty.
 
@@ -94,3 +94,29 @@ gitlab_rails['gitlab_default_can_create_group'] = false
 # For installations from source, uncomment the 'default_can_create_group'
 # line in /home/git/gitlab/config/gitlab.yml
 ```
+
+## Lock project membership to members of this group
+
+In GitLab Enterprise Edition it is possible to lock membership in project to the
+level of members in group.
+
+This allows group owner to lock down any new project membership to any of the
+projects within the group allowing tighter control over project membership.
+
+To enable this feature, navigate to group settings page, select `Member lock`
+and `Save group`.
+
+![Checkbox for membership lock](groups/membership_lock.png)
+
+This will disable the option for all users who previously had permissions to
+operate project memberships so no new users can be added. Furthermore, any
+request to add new user to project through API will not be possible.
+
+## Prevent projects in this group from sharing a project with another group
+
+In GitLab Enterprise it is possible to prevent projects in a group from sharing
+a project with another group. This allows for tighter control over project
+access.
+
+To enable this feature, navigate to the group settings page. Select `Share with
+group lock` and save the group.

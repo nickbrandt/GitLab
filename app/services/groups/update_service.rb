@@ -14,6 +14,10 @@ module Groups
         end
       end
 
+      # Repository size limit comes as MB from the view
+      limit = @params.delete(:repository_size_limit)
+      group.repository_size_limit = Gitlab::Utils.try_megabytes_to_bytes(limit) if limit
+
       group.assign_attributes(params)
 
       begin

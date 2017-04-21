@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "required" : [
+    "id",
+    "healthy",
+    "health",
+    "attachments_count",
+    "attachments_synced_count",
+    "lfs_objects_count",
+    "lfs_objects_synced_count",
+    "repositories_count",
+    "repositories_failed_count",
+    "repositories_synced_count"
+  ],
+  "properties" : {
+    "id": { "type": "integer" },
+    "healthy": { "type": "boolean" },
+    "health": { "type": "string" },
+    "attachments_count": { "type": "integer" },
+    "attachments_synced_count": { "type": "integer" },
+    "attachments_synced_in_percentage": { "type": "string" },
+    "lfs_objects_count": { "type": "integer" },
+    "lfs_objects_synced_count": { "type": "integer" },
+    "lfs_objects_synced_in_percentage": { "type": "string" },
+    "repositories_count": { "type": "integer" },
+    "repositories_failed_count": { "type": "integer" },
+    "repositories_synced_count": { "type": "integer" },
+    "repositories_synced_in_percentage": { "type": "string" }
+  },
+  "additionalProperties": false
+}

@@ -94,6 +94,30 @@ describe Projects::CreateService, '#execute', services: true do
     end
   end
 
+  context 'repository_size_limit assignment as Bytes' do
+    let(:admin_user) { create(:user, admin: true) }
+
+    context 'when param present' do
+      let(:opts) { { repository_size_limit: '100' } }
+
+      it 'assign repository_size_limit as Bytes' do
+        project = create_project(admin_user, opts)
+
+        expect(project.repository_size_limit).to eql(100 * 1024 * 1024)
+      end
+    end
+
+    context 'when param not present' do
+      let(:opts) { { repository_size_limit: '' } }
+
+      it 'assign nil value' do
+        project = create_project(admin_user, opts)
+
+        expect(project.repository_size_limit).to be_nil
+      end
+    end
+  end
+
   context 'restricted visibility level' do
     before do
       stub_application_setting(restricted_visibility_levels: [Gitlab::VisibilityLevel::PUBLIC])
@@ -121,6 +145,18 @@ describe Projects::CreateService, '#execute', services: true do
     end
   end
 
+  context 'git hook sample' do
+    it 'creates git hook from sample' do
+      push_rule_sample = create(:push_rule_sample)
+
+      push_rule = create_project(user, opts).push_rule
+
+      [:force_push_regex, :deny_delete_tag, :delete_branch_regex, :commit_message_regex].each do |attr_name|
+        expect(push_rule.send(attr_name)).to eq push_rule_sample.send(attr_name)
+      end
+    end
+  end
+
   context 'repository creation' do
     it 'synchronously creates the repository' do
       expect_any_instance_of(Project).to receive(:create_repository)
@@ -141,6 +177,20 @@ describe Projects::CreateService, '#execute', services: true do
       project = create_project(user, opts)
 
       expect(project.services.count).to eq 1
+    end
+  end
+
+  context 'when a bad service template is created' do
+    before do
+      create(:service, type: 'DroneCiService', project: nil, template: true, active: true)
+    end
+
+    it 'reports an error in the imported project' do
+      opts[:import_url] = 'http://www.gitlab.com/gitlab-org/gitlab-ce'
+      project = create_project(user, opts)
+
+      expect(project.errors.full_messages_for(:base).first).to match /Unable to save project. Error: Unable to save DroneCiService/
+      expect(project.services.count).to eq 0
     end
   end
 

@@ -2,6 +2,8 @@
 # class return an instance of `GitlabAccessStatus`
 module Gitlab
   class GitAccess
+    include ActionView::Helpers::SanitizeHelper
+    include PathLocksHelper
     UnauthorizedError = Class.new(StandardError)
 
     ERROR_MESSAGES = {
@@ -18,13 +20,12 @@ module Gitlab
 
     attr_reader :actor, :project, :protocol, :user_access, :authentication_abilities
 
-    def initialize(actor, project, protocol, authentication_abilities:, env: {})
+    def initialize(actor, project, protocol, authentication_abilities:)
       @actor    = actor
       @project  = project
       @protocol = protocol
       @authentication_abilities = authentication_abilities
       @user_access = UserAccess.new(user, project: project)
-      @env = env
     end
 
     def check(cmd, changes)
@@ -33,6 +34,8 @@ module Gitlab
       check_project_accessibility!
       check_command_existence!(cmd)
       check_repository_existence!
+
+      check_geo_license!
 
       case cmd
       when *DOWNLOAD_COMMANDS
@@ -71,7 +74,7 @@ module Gitlab
     end
 
     def check_active_user!
-      return if deploy_key?
+      return if deploy_key? || geo_node_key?
 
       if user && !user_access.allowed?
         raise UnauthorizedError, "Your account has been blocked."
@@ -90,6 +93,12 @@ module Gitlab
       end
     end
 
+    def check_geo_license!
+      if Gitlab::Geo.secondary? && !Gitlab::Geo.license_allows?
+        raise UnauthorizedError, 'Your current license does not have GitLab Geo add-on enabled.'
+      end
+    end
+
     def check_repository_existence!
       unless project.repository.exists?
         raise UnauthorizedError, ERROR_MESSAGES[:no_repo]
@@ -97,7 +106,7 @@ module Gitlab
     end
 
     def check_download_access!
-      return if deploy_key?
+      return if deploy_key? || geo_node_key?
 
       passed = user_can_download_code? ||
         build_can_download_code? ||
@@ -108,7 +117,16 @@ module Gitlab
       end
     end
 
+    # TODO: please clean this up
     def check_push_access!(changes)
+      if project.repository_read_only?
+        raise UnauthorizedError, 'The repository is temporarily read-only. Please try again later.'
+      end
+
+      if Gitlab::Geo.secondary?
+        raise UnauthorizedError, "You can't push code on a secondary GitLab Geo node."
+      end
+
       if deploy_key
         check_deploy_key_push_access!
       elsif user
@@ -118,6 +136,15 @@ module Gitlab
       end
 
       return if changes.blank? # Allow access.
+
+      if project.above_size_limit?
+        raise UnauthorizedError, Gitlab::RepositorySizeError.new(project).push_error
+      end
+
+      if ::License.block_changes?
+        message = ::LicenseHelper.license_message(signed_in: true, is_admin: (user && user.admin?))
+        raise UnauthorizedError, strip_tags(message)
+      end
 
       check_change_access!(changes)
     end
@@ -137,13 +164,24 @@ module Gitlab
     def check_change_access!(changes)
       changes_list = Gitlab::ChangesList.new(changes)
 
+      push_size_in_bytes = 0
+
       # Iterate over all changes to find if user allowed all of them to be applied
       changes_list.each do |change|
         status = check_single_change_access(change)
+
         unless status.allowed?
           # If user does not have access to make at least one change - cancel all push
           raise UnauthorizedError, status.message
         end
+
+        if project.size_limit_enabled?
+          push_size_in_bytes += EE::Gitlab::Deltas.delta_size_check(change, project.repository)
+        end
+      end
+
+      if project.changes_will_exceed_size_limit?(push_size_in_bytes)
+        raise UnauthorizedError, Gitlab::RepositorySizeError.new(project).new_changes_error
       end
     end
 
@@ -152,14 +190,9 @@ module Gitlab
         change,
         user_access: user_access,
         project: project,
-        env: @env,
         skip_authorization: deploy_key?,
         protocol: protocol
       ).exec
-    end
-
-    def matching_merge_request?(newrev, branch_name)
-      Checks::MatchingMergeRequest.new(newrev, branch_name, project).match?
     end
 
     def deploy_key
@@ -170,9 +203,19 @@ module Gitlab
       actor.is_a?(DeployKey)
     end
 
+    def geo_node_key
+      actor if geo_node_key?
+    end
+
+    def geo_node_key?
+      actor.is_a?(GeoNodeKey)
+    end
+
     def can_read_project?
-      if deploy_key
+      if deploy_key?
         deploy_key.has_access_to?(project)
+      elsif geo_node_key?
+        true
       elsif user
         user.can?(:read_project, project)
       end || Guest.can?(:read_project, project)
@@ -188,6 +231,8 @@ module Gitlab
         when User
           actor
         when DeployKey
+          nil
+        when GeoNodeKey
           nil
         when Key
           actor.user

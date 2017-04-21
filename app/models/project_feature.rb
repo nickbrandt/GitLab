@@ -43,6 +43,12 @@ class ProjectFeature < ActiveRecord::Base
   default_value_for :wiki_access_level,           value: ENABLED, allows_nil: false
   default_value_for :repository_access_level,     value: ENABLED, allows_nil: false
 
+  after_commit on: :update do
+    if current_application_settings.elasticsearch_indexing?
+      ElasticIndexerWorker.perform_async(:update, 'Project', project_id)
+    end
+  end
+
   def feature_available?(feature, user)
     access_level = public_send(ProjectFeature.access_level_attribute(feature))
     get_permission(user, access_level)
@@ -83,7 +89,7 @@ class ProjectFeature < ActiveRecord::Base
     when DISABLED
       false
     when PRIVATE
-      user && (project.team.member?(user) || user.admin?)
+      user && (project.team.member?(user) || user.admin_or_auditor?)
     when ENABLED
       true
     else

@@ -2,9 +2,11 @@ class Snippet < ActiveRecord::Base
   include Gitlab::VisibilityLevel
   include Linguist::BlobHelper
   include CacheMarkdownField
+  include Noteable
   include Participable
   include Referable
   include Sortable
+  include Elastic::SnippetsSearch
   include Awardable
   include Mentionable
   include Spammable

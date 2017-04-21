@@ -47,9 +47,10 @@ describe('Environments Folder View', () => {
 
     it('should render a table with environments', (done) => {
       setTimeout(() => {
+        expect(component.$el.querySelectorAll('table')).toBeDefined();
         expect(
-          component.$el.querySelectorAll('table tbody tr').length,
-        ).toEqual(2);
+          component.$el.querySelector('.environment-name').textContent.trim(),
+        ).toEqual(environmentsList[0].name);
         done();
       }, 0);
     });
@@ -137,6 +138,17 @@ describe('Environments Folder View', () => {
         setTimeout(() => {
           component.$el.querySelector('.gl-pagination li:nth-child(5) a').click();
           expect(gl.utils.visitUrl).toHaveBeenCalledWith('?page=2&scope=all');
+          done();
+        }, 0);
+      });
+    });
+
+    describe('deploy boards', () => {
+      it('should render arrow to open deploy boards', (done) => {
+        setTimeout(() => {
+          expect(
+            component.$el.querySelector('.deploy-board-icon i').classList.contains('fa-caret-right'),
+          ).toEqual(true);
           done();
         }, 0);
       });

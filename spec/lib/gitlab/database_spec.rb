@@ -150,13 +150,13 @@ describe Gitlab::Database, lib: true do
     it 'returns correct value for PostgreSQL' do
       expect(described_class).to receive(:postgresql?).and_return(true)
 
-      expect(MigrationTest.new.true_value).to eq "'t'"
+      expect(described_class.true_value).to eq "'t'"
     end
 
     it 'returns correct value for MySQL' do
       expect(described_class).to receive(:postgresql?).and_return(false)
 
-      expect(MigrationTest.new.true_value).to eq 1
+      expect(described_class.true_value).to eq 1
     end
   end
 
@@ -164,13 +164,30 @@ describe Gitlab::Database, lib: true do
     it 'returns correct value for PostgreSQL' do
       expect(described_class).to receive(:postgresql?).and_return(true)
 
-      expect(MigrationTest.new.false_value).to eq "'f'"
+      expect(described_class.false_value).to eq "'f'"
     end
 
     it 'returns correct value for MySQL' do
       expect(described_class).to receive(:postgresql?).and_return(false)
 
-      expect(MigrationTest.new.false_value).to eq 0
+      expect(described_class.false_value).to eq 0
+    end
+  end
+
+  describe '#disable_prepared_statements' do
+    it 'disables prepared statements' do
+      config = {}
+
+      expect(ActiveRecord::Base.configurations).to receive(:[]).
+        with(Rails.env).
+        and_return(config)
+
+      expect(ActiveRecord::Base).to receive(:establish_connection).
+        with({ 'prepared_statements' => false })
+
+      described_class.disable_prepared_statements
+
+      expect(config['prepared_statements']).to eq(false)
     end
   end
 end

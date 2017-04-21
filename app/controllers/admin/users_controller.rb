@@ -173,7 +173,7 @@ class Admin::UsersController < Admin::ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(user_params_ce)
+    params.require(:user).permit(user_params_ce << user_params_ee)
   end
 
   def user_params_ce
@@ -200,6 +200,13 @@ class Admin::UsersController < Admin::ApplicationController
       :twitter,
       :username,
       :website_url
+    ]
+  end
+
+  def user_params_ee
+    [
+      :note,
+      namespace_attributes: [:id, :shared_runners_minutes_limit]
     ]
   end
 end

@@ -17,6 +17,18 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
     end
   end
 
+  def usage_data
+    respond_to do |format|
+      format.html do
+        usage_data = Gitlab::UsageData.data
+        usage_data_json = params[:pretty] ? JSON.pretty_generate(usage_data) : usage_data.to_json
+
+        render html: Gitlab::Highlight.highlight('payload.json', usage_data_json)
+      end
+      format.json { render json: Gitlab::UsageData.to_json }
+    end
+  end
+
   def reset_runners_token
     @application_setting.reset_runners_registration_token!
     flash[:notice] = 'New runners registration token has been generated!'
@@ -46,6 +58,7 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
 
   def application_setting_params
     import_sources = params[:application_setting][:import_sources]
+
     if import_sources.nil?
       params[:application_setting][:import_sources] = []
     else
@@ -62,7 +75,7 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
     params.delete(:domain_blacklist_raw) if params[:domain_blacklist_file]
 
     params.require(:application_setting).permit(
-      application_setting_params_ce
+      application_setting_params_ce << application_setting_params_ee
     )
   end
 
@@ -135,12 +148,31 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
       :version_check_enabled,
       :terminal_max_session_time,
       :polling_interval_multiplier,
+      :usage_ping_enabled,
 
       disabled_oauth_sign_in_sources: [],
       import_sources: [],
       repository_storages: [],
       restricted_visibility_levels: [],
       sidekiq_throttling_queues: []
+    ]
+  end
+
+  def application_setting_params_ee
+    [
+      :help_text,
+      :elasticsearch_url,
+      :elasticsearch_indexing,
+      :elasticsearch_aws,
+      :elasticsearch_aws_access_key,
+      :elasticsearch_aws_secret_access_key,
+      :elasticsearch_aws_region,
+      :elasticsearch_search,
+      :repository_size_limit,
+      :shared_runners_minutes,
+      :minimum_mirror_sync_time,
+      :geo_status_timeout,
+      :elasticsearch_experimental_indexer,
     ]
   end
 end

@@ -2,6 +2,32 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+## 9.0.6 (2017-04-21)
+
+- Bugfix: POST /projects/:id/hooks and PUT /projects/:id/hook/:hook_id no longer ignore the the job_events param in the V4 API. !10586
+- Fix MR widget bug that merged a MR when Merge when pipeline succeeds was clicked via the dropdown. !10611
+- Fix PlantUML integration in GFM. !10651
+- Show sub-nav under Merge Requests when issue tracker is non-default. !10658
+- Fix restricted project visibility setting available to users.
+- Removed orphaned notification settings without a namespace.
+- Fix issue's note cache expiration after delete. (mhasbini)
+- Display custom hook error messages when automatic merge is enabled.
+- Fix filtered search input width for IE.
+
+## 9.0.5 (2017-04-10)
+
+- Add shortcuts and counters to MRs and issues in navbar.
+- Disable invalid service templates.
+- Handle SSH keys that have multiple spaces between each marker.
+
+## 9.0.4 (2017-04-05)
+
+- Don’t show source project name when user does not have access.
+- Remove the class attribute from the whitelist for HTML generated from Markdown.
+- Fix path disclosure in project import/export.
+- Fix for open redirect vulnerability using continue[to] in URL when requesting project import status.
+- Fix for open redirect vulnerabilities in todos, issues, and MR controllers.
+
 ## 9.0.3 (2017-04-05)
 
 - Fix name colision when importing GitHub pull requests from forked repositories. !9719
@@ -320,6 +346,14 @@ entry.
 - Change development tanuki favicon colors to match logo color order.
 - API issues - support filtering by iids.
 
+## 8.17.5 (2017-04-05)
+
+- Don’t show source project name when user does not have access.
+- Remove the class attribute from the whitelist for HTML generated from Markdown.
+- Fix path disclosure in project import/export.
+- Fix for open redirect vulnerability using continue[to] in URL when requesting project import status.
+- Fix for open redirect vulnerabilities in todos, issues, and MR controllers.
+
 ## 8.17.4 (2017-03-19)
 
 - Only show public emails in atom feeds.
@@ -356,6 +390,7 @@ entry.
 ## 8.17.0 (2017-02-22)
 
 - API: Fix file downloading. !0 (8267)
+- Read true-up info from license and validate it. !1159
 - Changed composer installer script in the CI PHP example doc. !4342 (Jeffrey Cafferata)
 - Display fullscreen button on small screens. !5302 (winniehell)
 - Add system hook for when a project is updated (other than rename/transfer). !5711 (Tommy Beadle)
@@ -533,6 +568,14 @@ entry.
 - Remove deprecated GitlabCiService.
 - Requeue pending deletion projects.
 
+## 8.16.9 (2017-04-05)
+
+- Don’t show source project name when user does not have access.
+- Remove the class attribute from the whitelist for HTML generated from Markdown.
+- Fix path disclosure in project import/export.
+- Fix for open redirect vulnerability using continue[to] in URL when requesting project import status.
+- Fix for open redirect vulnerabilities in todos, issues, and MR controllers.
+
 ## 8.16.8 (2017-03-19)
 
 - Only show public emails in atom feeds.
@@ -540,8 +583,6 @@ entry.
 
 ## 8.16.7 (2017-02-27)
 
-- No changes.
-- No changes.
 - Fix MR changes tab size count when there are over 100 files in the diff.
 
 ## 8.16.6 (2017-02-17)
@@ -741,6 +782,7 @@ entry.
 
 ## 8.15.8 (2017-03-19)
 
+- Read true-up info from license and validate it. !1159
 - Only show public emails in atom feeds.
 - To protect against Server-side Request Forgery project import URLs are now prohibited against localhost or the server IP except for the assigned instance URL and port. Imports are also prohibited from ports below 1024 with the exception of ports 22, 80, and 443.
 
@@ -754,6 +796,14 @@ entry.
 - Fix XSS vulnerability in SVG attachments.
 - Prevent the GitHub importer from assigning labels and comments to merge requests or issues belonging to other projects.
 - Patch XSS vulnerability in RDOC support.
+
+## 8.15.5 (2017-01-20)
+
+- Ensure export files are removed after a namespace is deleted.
+- Don't allow project guests to subscribe to merge requests through the API. (Robert Schilling)
+- Prevent users from creating notes on resources they can't access.
+- Prevent users from deleting system deploy keys via the project deploy key API.
+- Upgrade omniauth gem to 1.3.2.
 
 ## 8.15.4 (2017-01-09)
 
@@ -1037,6 +1087,14 @@ entry.
 - Speed up group milestone index by passing group_id to IssuesFinder. !8363
 - Ensure issuable state changes only fire webhooks once.
 
+## 8.14.7 (2017-01-21)
+
+- Ensure export files are removed after a namespace is deleted.
+- Don't allow project guests to subscribe to merge requests through the API. (Robert Schilling)
+- Prevent users from creating notes on resources they can't access.
+- Prevent users from deleting system deploy keys via the project deploy key API.
+- Upgrade omniauth gem to 1.3.2.
+
 ## 8.14.6 (2017-01-10)
 
 - Update the gitlab-markup gem to the version 1.5.1. !8509
@@ -1318,6 +1376,14 @@ entry.
 - Updated commit SHA styling on the branches page.
 - Fix "Without projects" filter. !6611 (Ben Bodenmiller)
 - Fix 404 when visit /projects page
+
+## 8.13.12 (2017-01-21)
+
+- Ensure export files are removed after a namespace is deleted.
+- Don't allow project guests to subscribe to merge requests through the API. (Robert Schilling)
+- Prevent users from creating notes on resources they can't access.
+- Prevent users from deleting system deploy keys via the project deploy key API.
+- Upgrade omniauth gem to 1.3.2.
 
 ## 8.13.11 (2017-01-10)
 

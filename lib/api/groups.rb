@@ -5,11 +5,24 @@ module API
     before { authenticate! }
 
     helpers do
-      params :optional_params do
+      params :optional_params_ce do
         optional :description, type: String, desc: 'The description of the group'
         optional :visibility, type: String, values: Gitlab::VisibilityLevel.string_values, desc: 'The visibility of the group'
         optional :lfs_enabled, type: Boolean, desc: 'Enable/disable LFS for the projects in this group'
         optional :request_access_enabled, type: Boolean, desc: 'Allow users to request member access'
+        optional :share_with_group_lock, type: Boolean, desc: 'Prevent sharing a project with another group within this group'
+      end
+
+      params :optional_params_ee do
+        optional :membership_lock, type: Boolean, desc: 'Prevent adding new members to project membership within this group'
+        optional :ldap_cn, type: String, desc: 'LDAP Common Name'
+        optional :ldap_access, type: Integer, desc: 'A valid access level'
+        all_or_none_of :ldap_cn, :ldap_access
+      end
+
+      params :optional_params do
+        use :optional_params_ce
+        use :optional_params_ee
       end
 
       params :statistics_params do
@@ -56,7 +69,7 @@ module API
         groups = groups.where.not(id: params[:skip_groups]) if params[:skip_groups].present?
         groups = groups.reorder(params[:order_by] => params[:sort])
 
-        present_groups groups, statistics: params[:statistics] && current_user.is_admin?
+        present_groups groups, statistics: params[:statistics] && current_user.admin?
       end
 
       desc 'Create a group. Available only for users who can create groups.' do
@@ -71,9 +84,22 @@ module API
       post do
         authorize! :create_group
 
+        ldap_link_attrs = {
+          cn: params.delete(:ldap_cn),
+          group_access: params.delete(:ldap_access)
+        }
+
         group = ::Groups::CreateService.new(current_user, declared_params(include_missing: false)).execute
 
         if group.persisted?
+          # NOTE: add backwards compatibility for single ldap link
+          if ldap_link_attrs[:cn].present?
+            group.ldap_group_links.create(
+              cn: ldap_link_attrs[:cn],
+              group_access: ldap_link_attrs[:group_access]
+            )
+          end
+
           present group, with: Entities::Group, current_user: current_user
         else
           render_api_error!("Failed to save group #{group.errors.messages}", 400)
@@ -142,7 +168,7 @@ module API
       end
       get ":id/projects" do
         group = find_group!(params[:id])
-        projects = GroupProjectsFinder.new(group).execute(current_user)
+        projects = GroupProjectsFinder.new(group: group, current_user: current_user).execute
         projects = filter_projects(projects)
         entity = params[:simple] ? Entities::BasicProjectDetails : Entities::Project
         present paginate(projects), with: entity, current_user: current_user

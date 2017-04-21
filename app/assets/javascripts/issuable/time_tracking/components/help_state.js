@@ -3,7 +3,12 @@ import Vue from 'vue';
 (() => {
   Vue.component('time-tracking-help-state', {
     name: 'time-tracking-help-state',
-    props: ['docsUrl'],
+    props: {
+      docsUrl: {
+        type: String,
+        required: true,
+      },
+    },
     template: `
       <div class='time-tracking-help-state'>
         <div class='time-tracking-info'>

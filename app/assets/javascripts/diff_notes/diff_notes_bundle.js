@@ -1,5 +1,6 @@
 /* eslint-disable func-names, comma-dangle, new-cap, no-new, max-len */
 /* global ResolveCount */
+/* global ResolveServiceClass */
 
 import Vue from 'vue';
 
@@ -63,6 +64,6 @@ $(() => {
     el: '#resolve-count-app',
     components: {
       'resolve-count': ResolveCount
-    }
+    },
   });
 });

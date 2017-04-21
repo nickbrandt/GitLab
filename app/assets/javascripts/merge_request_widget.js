@@ -38,11 +38,13 @@ import MiniPipelineGraph from './mini_pipeline_graph_dropdown';
     function MergeRequestWidget(opts) {
       // Initialize MergeRequestWidget behavior
       //
-      //   check_enable           - Boolean, whether to check automerge status
-      //   merge_check_url - String, URL to use to check automerge status
+      //   check_enable         - Boolean, whether to check automerge status
+      //   merge_check_url      - String, URL to use to check automerge status
       //   ci_status_url        - String, URL to use to check CI status
+      //   pipeline_status_url  - String, URL to use to get CI status for Favicon
       //
       this.opts = opts;
+      this.opts.pipeline_status_url = `${this.opts.pipeline_status_url}.json`;
       this.$widgetBody = $('.mr-widget-body');
       $('#modal_merge_info').modal({
         show: false
@@ -124,6 +126,23 @@ import MiniPipelineGraph from './mini_pipeline_graph_dropdown';
       });
     };
 
+    MergeRequestWidget.prototype.rebaseInProgress = function() {
+      return $.ajax({
+        type: 'GET',
+        url: $('.merge-request').data('url'),
+        success: (function(_this) {
+          return function(data) {
+            if (data["rebase_in_progress?"]) {
+              return setTimeout(merge_request_widget.rebaseInProgress, 1000);
+            } else {
+              return location.reload();
+            }
+          };
+        })(this),
+        dataType: 'json'
+      });
+    };
+
     MergeRequestWidget.prototype.cancelPolling = function () {
       this.ciStatusInterval.cancel();
       this.ciEnvironmentStatusInterval.cancel();
@@ -134,7 +153,12 @@ import MiniPipelineGraph from './mini_pipeline_graph_dropdown';
         var $html = $(data);
         this.updateMergeButton(this.status, this.hasCi, $html);
         $('.mr-widget-body').replaceWith($html.find('.mr-widget-body'));
-        $('.mr-widget-footer').replaceWith($html.find('.mr-widget-footer'));
+        $('.mr-widget-footer:not(.mr-approvals-footer)').replaceWith($html.find('.mr-widget-footer:not(.mr-approvals-footer)'));
+        $('.approvals-components').replaceWith($html.find('.approvals-components'));
+
+        if (gl.compileApprovalsWidget) {
+          gl.compileApprovalsWidget();
+        }
       });
     };
 
@@ -155,10 +179,11 @@ import MiniPipelineGraph from './mini_pipeline_graph_dropdown';
       $('.ci-widget-fetching').show();
       return $.getJSON(this.opts.ci_status_url, (function(_this) {
         return function(data) {
-          var message, status, title;
+          var message, status, title, callback;
           _this.status = data.status;
           _this.hasCi = data.has_ci;
           _this.updateMergeButton(_this.status, _this.hasCi);
+          gl.utils.setCiStatusFavicon(_this.opts.pipeline_status_url);
           if (data.environments && data.environments.length) _this.renderEnvironments(data.environments);
           if (data.status !== _this.opts.ci_status ||
               data.sha !== _this.opts.ci_sha ||
@@ -175,6 +200,12 @@ import MiniPipelineGraph from './mini_pipeline_graph_dropdown';
             if (data.sha) {
               _this.opts.ci_sha = data.sha;
               _this.updateCommitUrls(data.sha);
+            }
+            if (data.status === "success" || data.status === "failed") {
+              callback = function() {
+                return _this.getMergeStatus();
+              };
+              return setTimeout(callback, 2000);
             }
             if (showNotification && data.status) {
               status = _this.ciLabelForStatus(data.status);
@@ -224,7 +255,7 @@ import MiniPipelineGraph from './mini_pipeline_graph_dropdown';
         environment.ci_success_icon = this.$ciSuccessIcon;
         const templateString = _.unescape($template[0].outerHTML);
         const template = _.template(templateString)(environment);
-        this.$widgetBody.before(template);
+        $('.mr-widget-body').before(template);
       }
     };
 

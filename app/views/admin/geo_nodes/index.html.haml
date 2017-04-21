@@ -1,0 +1,57 @@
+- page_title 'Geo nodes'
+%h3.page-title
+  Geo Nodes
+
+%p.light
+  With #{link_to 'GitLab Geo', help_page_path('gitlab-geo/README'), class: 'vlink'} you can install a special
+  read-only and replicated instance anywhere.
+
+%hr
+
+= render partial: 'form', locals: {geo_node: @node} if Gitlab::Geo.license_allows?
+
+- if @nodes.any?
+  .panel.panel-default
+    .panel-heading
+      Geo nodes (#{@nodes.count})
+    %ul.well-list.geo-nodes
+      - @nodes.each do |node|
+        %li{ id: dom_id(node), class: ('js-geo-secondary-node' if node.secondary?), data: { status_url: status_admin_geo_node_path(node) } }
+          .list-item-name
+            %span
+              = node_status_icon(node)
+            %strong= node.url
+            - if node.primary?
+              %span.help-block Primary node
+            - else
+              .js-geo-node-status{ style: 'display: none' }
+                %p
+                  %span.help-block
+                    Repositories synced:
+                    %span.js-repositories-synced
+                %p
+                  %span.help-block
+                    Repositories failed:
+                    %span.js-repositories-failed
+                %p
+                  %span.help-block
+                    LFS objects synced:
+                    %span.js-lfs-objects-synced
+                %p
+                  %span.help-block
+                    Attachments synced:
+                    %span.js-attachments-synced
+                %p
+                  %span.help-block.js-health
+
+          .pull-right
+            - if Gitlab::Geo.license_allows?
+              - if node.missing_oauth_application?
+                = link_to repair_admin_geo_node_path(node), method: :post, title: 'OAuth application is missing', class: 'btn btn-default btn-sm prepend-left-10' do
+                  = icon('exclamation-triangle fw')
+                  Repair authentication
+              - if node.secondary?
+                = toggle_node_button(node)
+            = link_to admin_geo_node_path(node), data: { confirm: 'Are you sure?' }, method: :delete, class: 'btn btn-remove btn-sm prepend-left-10' do
+              = icon 'trash'
+              Remove

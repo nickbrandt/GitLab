@@ -192,6 +192,40 @@ describe "Admin::Users", feature: true do
         end
       end
     end
+
+    describe 'Shared runners quota status' do
+      before do
+        user.namespace.update(shared_runners_minutes_limit: 500)
+      end
+
+      context 'with projects with shared runners enabled' do
+        before do
+          create(:empty_project, namespace: user.namespace, shared_runners_enabled: true)
+        end
+
+        it 'shows quota' do
+          visit admin_users_path
+
+          click_link user.name
+
+          expect(page).to have_content('Pipeline minutes quota: 0 / 500')
+        end
+      end
+
+      context 'without projects with shared runners enabled' do
+        before do
+          create(:empty_project, namespace: user.namespace, shared_runners_enabled: false)
+        end
+
+        it 'does not show quota' do
+          visit admin_users_path
+
+          click_link user.name
+
+          expect(page).not_to have_content('Pipeline minutes quota:')
+        end
+      end
+    end
   end
 
   describe "GET /admin/users/:id/edit" do
@@ -223,8 +257,23 @@ describe "Admin::Users", feature: true do
       it "changes user entry" do
         user.reload
         expect(user.name).to eq('Big Bang')
-        expect(user.is_admin?).to be_truthy
+        expect(user.admin?).to be_truthy
         expect(user.password_expires_at).to be <= Time.now
+      end
+    end
+
+    describe "Update user account type" do
+      before do
+        allow_any_instance_of(AuditorUserHelper).to receive(:license_allows_auditor_user?).and_return(true)
+        choose "user_access_level_auditor"
+        click_button "Save changes"
+      end
+
+      it "changes account type to be auditor" do
+        user.reload
+
+        expect(user).not_to be_admin
+        expect(user).to be_auditor
       end
     end
 
@@ -238,6 +287,19 @@ describe "Admin::Users", feature: true do
         end
 
         expect(page).to have_selector(%(form[action="/admin/users/#{user.username}"]))
+      end
+    end
+
+    describe 'Update shared runners quota' do
+      let!(:project) { create(:empty_project, namespace: user.namespace, shared_runners_enabled: true) }
+
+      before do
+        fill_in "user_namespace_attributes_shared_runners_minutes_limit", with: "500"
+        click_button "Save changes"
+      end
+
+      it "shows page with new data" do
+        expect(page).to have_content('Pipeline minutes quota: 0 / 500')
       end
     end
   end

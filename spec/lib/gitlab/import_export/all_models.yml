@@ -48,6 +48,7 @@ milestone:
 - merge_requests
 - participants
 - events
+- boards
 snippets:
 - author
 - project
@@ -80,6 +81,9 @@ merge_requests:
 - events
 - merge_requests_closing_issues
 - metrics
+- approvals
+- approvers
+- approver_groups
 - timelogs
 merge_request_diff:
 - merge_request
@@ -89,16 +93,28 @@ pipelines:
 - statuses
 - builds
 - trigger_requests
+- auto_canceled_by
+- auto_canceled_pipelines
+- auto_canceled_jobs
+- pending_builds
+- retryable_builds
+- cancelable_statuses
+- manual_actions
+- artifacts
 statuses:
 - project
 - pipeline
 - user
+- auto_canceled_by
 variables:
 - project
 triggers:
 - project
 - trigger_requests
 - owner
+- trigger_schedule
+trigger_schedule:
+- trigger
 deploy_keys:
 - user
 - deploy_keys_projects
@@ -112,10 +128,22 @@ protected_branches:
 - project
 - merge_access_levels
 - push_access_levels
+protected_tags:
+- project
+- create_access_levels
 merge_access_levels:
+- user
 - protected_branch
+- group
 push_access_levels:
+- user
 - protected_branch
+- group
+create_access_levels:
+- protected_tag
+container_repositories:
+- project
+- name
 project:
 - taggings
 - base_tags
@@ -143,6 +171,7 @@ project:
 - asana_service
 - gemnasium_service
 - slack_service
+- microsoft_teams_service
 - mattermost_service
 - buildkite_service
 - bamboo_service
@@ -172,6 +201,7 @@ project:
 - snippets
 - hooks
 - protected_branches
+- protected_tags
 - project_members
 - users
 - requesters
@@ -192,16 +222,30 @@ project:
 - builds
 - runner_projects
 - runners
+- active_runners
 - variables
 - triggers
+- trigger_schedules
 - environments
 - deployments
 - project_feature
 - pages_domains
 - authorized_users
 - project_authorizations
+- mirror_user
+- push_rule
+- jenkins_service
+- jenkins_deprecated_service
+- index_status
+- approvers
+- pages_domains
+- audit_events
+- remote_mirrors
+- path_locks
+- approver_groups
 - route
 - statistics
+- container_repositories
 - uploads
 award_emoji:
 - awardable

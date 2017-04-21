@@ -3,6 +3,7 @@ require "spec_helper"
 describe 'Git HTTP requests', lib: true do
   include GitHttpHelpers
   include WorkhorseHelpers
+  include UserActivitiesHelpers
 
   it "gives WWW-Authenticate hints" do
     clone_get('doesnt/exist.git')
@@ -171,6 +172,134 @@ describe 'Git HTTP requests', lib: true do
         end
       end
 
+      context "when Kerberos token is provided" do
+        let(:env) { { spnego_request_token: 'opaque_request_token' } }
+
+        before do
+          allow_any_instance_of(Projects::GitHttpController).to receive(:allow_kerberos_spnego_auth?).and_return(true)
+        end
+
+        context "when authentication fails because of invalid Kerberos token" do
+          before do
+            allow_any_instance_of(Projects::GitHttpController).to receive(:spnego_credentials!).and_return(nil)
+          end
+
+          it "responds with status 401" do
+            download(path, env) do |response|
+              expect(response.status).to eq(401)
+            end
+          end
+        end
+
+        context "when authentication fails because of unknown Kerberos identity" do
+          before do
+            allow_any_instance_of(Projects::GitHttpController).to receive(:spnego_credentials!).and_return("mylogin@FOO.COM")
+          end
+
+          it "responds with status 401" do
+            download(path, env) do |response|
+              expect(response.status).to eq(401)
+            end
+          end
+        end
+
+        context "when authentication succeeds" do
+          before do
+            allow_any_instance_of(Projects::GitHttpController).to receive(:spnego_credentials!).and_return("mylogin@FOO.COM")
+            user.identities.create!(provider: "kerberos", extern_uid: "mylogin@FOO.COM")
+          end
+
+          context "when the user has access to the project" do
+            before do
+              project.team << [user, :master]
+            end
+
+            context "when the user is blocked" do
+              before do
+                user.block
+                project.team << [user, :master]
+              end
+
+              it "responds with status 404" do
+                download(path, env) do |response|
+                  expect(response.status).to eq(404)
+                end
+              end
+            end
+
+            context "when the user isn't blocked", :redis do
+              it "responds with status 200" do
+                download(path, env) do |response|
+                  expect(response.status).to eq(200)
+                end
+              end
+
+              it 'updates the user last activity' do
+                download(path, env) do |_response|
+                  expect(user).to have_an_activity_record
+                end
+              end
+            end
+
+            it "complies with RFC4559" do
+              allow_any_instance_of(Projects::GitHttpController).to receive(:spnego_response_token).and_return("opaque_response_token")
+              download(path, env) do |response|
+                expect(response.headers['WWW-Authenticate'].split("\n")).to include("Negotiate #{::Base64.strict_encode64('opaque_response_token')}")
+              end
+            end
+          end
+
+          context "when the user doesn't have access to the project" do
+            it "responds with status 404" do
+              download(path, env) do |response|
+                expect(response.status).to eq(404)
+              end
+            end
+
+            it "complies with RFC4559" do
+              allow_any_instance_of(Projects::GitHttpController).to receive(:spnego_response_token).and_return("opaque_response_token")
+              download(path, env) do |response|
+                expect(response.headers['WWW-Authenticate'].split("\n")).to include("Negotiate #{::Base64.strict_encode64('opaque_response_token')}")
+              end
+            end
+          end
+        end
+      end
+
+      context "when repository is above size limit" do
+        let(:env) { { user: user.username, password: user.password } }
+
+        before do
+          project.team << [user, :master]
+        end
+
+        it 'responds with status 403' do
+          allow_any_instance_of(Project).to receive(:above_size_limit?).and_return(true)
+
+          upload(path, env) do |response|
+            expect(response).to have_http_status(403)
+          end
+        end
+      end
+
+      context 'when license is not provided' do
+        let(:env) { { user: user.username, password: user.password } }
+
+        before do
+          project.team << [user, :master]
+        end
+
+        it 'responds with status 403' do
+          msg = 'No GitLab Enterprise Edition license has been provided yet. Pushing code and creation of issues and merge requests has been disabled. Ask an admin to upload a license to activate this functionality.'
+          allow(License).to receive(:current).and_return(nil)
+
+          upload(path, env) do |response|
+            expect(response).to have_http_status(403)
+            expect(response.body).to eq(msg)
+          end
+        end
+      end
+
       context "when the project is private" do
         before do
           project.update_attribute(:visibility_level, Project::PRIVATE)
@@ -253,6 +382,14 @@ describe 'Git HTTP requests', lib: true do
                   upload(path, env) do |response|
                     expect(response).to have_http_status(200)
                     expect(response.content_type.to_s).to eq(Gitlab::Workhorse::INTERNAL_API_CONTENT_TYPE)
+                  end
+                end
+
+                it 'updates the user last activity', :redis do
+                  expect(user_activity(user)).to be_nil
+
+                  download(path, env) do |response|
+                    expect(user_activity(user)).to be_present
                   end
                 end
               end

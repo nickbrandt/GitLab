@@ -47,6 +47,62 @@ describe Gitlab::Shell, lib: true do
     end
   end
 
+  describe 'projects commands' do
+    let(:projects_path) { 'tmp/tests/shell-projects-test/bin/gitlab-projects' }
+
+    before do
+      allow(Gitlab.config.gitlab_shell).to receive(:path).and_return('tmp/tests/shell-projects-test')
+    end
+
+    describe '#mv_repository' do
+      it 'executes the command' do
+        expect(Gitlab::Utils).to receive(:system_silent)
+          .with([projects_path, 'mv-project', 'storage/path', 'project/path.git', 'new/path.git'])
+        gitlab_shell.mv_repository('storage/path', 'project/path', 'new/path')
+      end
+    end
+
+    describe '#mv_storage' do
+      it 'executes the command' do
+        expect(Gitlab::Utils).to receive(:system_silent)
+          .with([projects_path, 'mv-storage', 'current/storage', 'project/path.git', 'new/storage'])
+        gitlab_shell.mv_storage('current/storage', 'project/path', 'new/storage')
+      end
+    end
+
+    describe '#fetch_remote' do
+      it 'executes the command' do
+        expect(Gitlab::Popen).to receive(:popen)
+          .with([projects_path, 'fetch-remote', 'current/storage', 'project/path.git', 'new/storage', '800']).and_return([nil, 0])
+
+        expect(gitlab_shell.fetch_remote('current/storage', 'project/path', 'new/storage')).to be true
+      end
+
+      it 'fails to execute the command' do
+        expect(Gitlab::Popen).to receive(:popen)
+        .with([projects_path, 'fetch-remote', 'current/storage', 'project/path.git', 'new/storage', '800']).and_return(["error", 1])
+
+        expect { gitlab_shell.fetch_remote('current/storage', 'project/path', 'new/storage') }.to raise_error(Gitlab::Shell::Error, "error")
+      end
+    end
+
+    describe '#push_remote_branches' do
+      it 'executes the command' do
+        expect(Gitlab::Popen).to receive(:popen)
+        .with([projects_path, 'push-branches', 'current/storage', 'project/path.git', 'new/storage', '600', 'master']).and_return([nil, 0])
+
+        expect(gitlab_shell.push_remote_branches('current/storage', 'project/path', 'new/storage', ['master'])).to be true
+      end
+
+      it 'fails to execute the command' do
+        expect(Gitlab::Popen).to receive(:popen)
+        .with([projects_path, 'push-branches', 'current/storage', 'project/path.git', 'new/storage', '600', 'master']).and_return(["error", 1])
+
+        expect { gitlab_shell.push_remote_branches('current/storage', 'project/path', 'new/storage', ['master']) }.to raise_error(Gitlab::Shell::Error, "error")
+      end
+    end
+  end
+
   describe '#add_key' do
     it 'removes trailing garbage' do
       allow(gitlab_shell).to receive(:gitlab_shell_keys_path).and_return(:gitlab_shell_keys_path)

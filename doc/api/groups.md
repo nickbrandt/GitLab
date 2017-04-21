@@ -53,7 +53,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID or path of a group |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user |
 | `archived` | boolean | no | Limit by archived status |
 | `visibility` | string | no | Limit by visibility `public`, `internal`, or `private` |
 | `order_by` | string | no | Return projects ordered by `id`, `name`, `path`, `created_at`, `updated_at`, or `last_activity_at` fields. Default is `created_at` |
@@ -119,7 +119,7 @@ Parameters:
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id` | integer/string | yes | The ID or path of a group |
+| `id` | integer/string | yes | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user |
 
 ```bash
 curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/groups/4
@@ -284,6 +284,8 @@ Parameters:
 - `name` (required) - The name of the group
 - `path` (required) - The path of the group
 - `description` (optional) - The group's description
+- `membership_lock` (optional, boolean) - Prevent adding new members to project membership within this group
+- `share_with_group_lock` (optional, boolean) - Prevent sharing a project with another group within this group
 - `visibility` (optional) - The group's visibility. Can be `private`, `internal`, or `public`.
 - `lfs_enabled` (optional)      - Enable/disable Large File Storage (LFS) for the projects in this group
 - `request_access_enabled` (optional) - Allow users to request member access.
@@ -299,7 +301,7 @@ POST  /groups/:id/projects/:project_id
 
 Parameters:
 
-- `id` (required) - The ID or path of a group
+- `id` (required) - The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user
 - `project_id` (required) - The ID or path of a project
 
 ## Update group
@@ -316,6 +318,8 @@ PUT /groups/:id
 | `name` | string | no | The name of the group |
 | `path` | string | no | The path of the group |
 | `description` | string | no | The description of the group |
+| `membership_lock` | boolean | no | Prevent adding new members to project membership within this group |
+| `share_with_group_lock` | boolean | no | Prevent sharing a project with another group within this group |
 | `visibility` | string | no | The visibility level of the group. Can be `private`, `internal`, or `public`. |
 | `lfs_enabled` (optional) | boolean | no | Enable/disable Large File Storage (LFS) for the projects in this group |
 | `request_access_enabled` | boolean | no | Allow users to request member access. |
@@ -417,6 +421,46 @@ GET /groups?search=foobar
 ## Group members
 
 Please consult the [Group Members](members.md) documentation.
+
+### Add LDAP group link
+
+Adds LDAP group link
+
+```
+POST /groups/:id/ldap_group_links
+```
+
+Parameters:
+
+- `id` (required) - The ID of a group
+- `cn` (required) - The CN of a LDAP group
+- `group_access` (required) - Minimum access level for members of the LDAP group
+- `provider` (required) - LDAP provider for the LDAP group (when using several providers)
+
+### Delete LDAP group link
+
+Deletes a LDAP group link
+
+```
+DELETE /groups/:id/ldap_group_links/:cn
+```
+
+Parameters:
+
+- `id` (required) - The ID of a group
+- `cn` (required) - The CN of a LDAP group
+
+Deletes a LDAP group link for a specific LDAP provider
+
+```
+DELETE /groups/:id/ldap_group_links/:provider/:cn
+```
+
+Parameters:
+
+- `id` (required) - The ID of a group
+- `cn` (required) - The CN of a LDAP group
+- `provider` (required) - Name of a LDAP provider
 
 ## Namespaces in groups
 

@@ -28,6 +28,7 @@ namespace :gitlab do
       check_ruby_version
       check_git_version
       check_active_users
+      check_elasticsearch if current_application_settings.elasticsearch_indexing?
 
       finished_checking "GitLab"
     end
@@ -431,8 +432,7 @@ namespace :gitlab do
 
     def check_repo_base_user_and_group
       gitlab_shell_ssh_user = Gitlab.config.gitlab_shell.ssh_user
-      gitlab_shell_owner_group = Gitlab.config.gitlab_shell.owner_group
-      puts "Repo paths owned by #{gitlab_shell_ssh_user}:#{gitlab_shell_owner_group}?"
+      puts "Repo paths owned by #{gitlab_shell_ssh_user}:root, or #{gitlab_shell_ssh_user}:#{Gitlab.config.gitlab_shell.owner_group}?"
 
       Gitlab.config.repositories.storages.each do |name, repository_storage|
         repo_base_path = repository_storage['path']
@@ -443,15 +443,16 @@ namespace :gitlab do
           break
         end
 
-        uid = uid_for(gitlab_shell_ssh_user)
-        gid = gid_for(gitlab_shell_owner_group)
-        if File.stat(repo_base_path).uid == uid && File.stat(repo_base_path).gid == gid
+        user_id = uid_for(gitlab_shell_ssh_user)
+        root_group_id = gid_for('root')
+        group_ids = [root_group_id, gid_for(Gitlab.config.gitlab_shell.owner_group)]
+        if File.stat(repo_base_path).uid == user_id && group_ids.include?(File.stat(repo_base_path).gid)
           puts "yes".color(:green)
         else
           puts "no".color(:red)
-          puts "  User id for #{gitlab_shell_ssh_user}: #{uid}. Groupd id for #{gitlab_shell_owner_group}: #{gid}".color(:blue)
+          puts "  User id for #{gitlab_shell_ssh_user}: #{user_id}. Groupd id for root: #{root_group_id}".color(:blue)
           try_fixing_it(
-            "sudo chown -R #{gitlab_shell_ssh_user}:#{gitlab_shell_owner_group} #{repo_base_path}"
+            "sudo chown -R #{gitlab_shell_ssh_user}:root #{repo_base_path}"
           )
           for_more_information(
             see_installation_guide_section "GitLab Shell"
@@ -845,6 +846,69 @@ namespace :gitlab do
     end
   end
 
+  namespace :geo do
+    desc 'GitLab | Check Geo configuration and dependencies'
+    task check: :environment do
+      warn_user_is_not_gitlab
+      start_checking 'Geo'
+
+      check_geo_license
+      check_geo_enabled
+      check_nodes_http_connection
+
+      finished_checking 'Geo'
+    end
+
+    # Checks
+    ########################
+
+    def check_geo_license
+      print 'GitLab Geo is available ... '
+      if Gitlab::Geo.license_allows?
+        puts 'yes'.color(:green)
+      else
+        puts 'no'.color(:red)
+
+        try_fixing_it(
+          'Upload a new license that includes GitLab Geo feature'
+        )
+
+        for_more_information(see_geo_features_page)
+      end
+    end
+
+    def check_geo_enabled
+      print 'GitLab Geo is enabled ... '
+      if Gitlab::Geo.enabled?
+        puts 'yes'.color(:green)
+      else
+        puts 'no'.color(:red)
+
+        try_fixing_it(
+          'Follow Geo Setup instructions to configure primary and secondary nodes'
+        )
+
+        for_more_information(see_geo_docs)
+      end
+    end
+
+    def check_nodes_http_connection
+      return unless Gitlab::Geo.enabled?
+
+      if Gitlab::Geo.primary?
+        Gitlab::Geo.secondary_nodes.each do |node|
+          print "Can connect to secondary node: '#{node.url}' ... "
+          check_gitlab_geo_node(node)
+        end
+      end
+
+      if Gitlab::Geo.secondary?
+        print 'Can connect to the primary node ... '
+        check_gitlab_geo_node(Gitlab::Geo.primary_node)
+      end
+    end
+  end
+
   # Helper methods
   ##########################
 
@@ -873,6 +937,18 @@ namespace :gitlab do
 
   def see_installation_guide_section(section)
     "doc/install/installation.md in section \"#{section}\""
+  end
+
+  def see_geo_features_page
+    'https://about.gitlab.com/features/gitlab-geo/'
+  end
+
+  def see_geo_docs
+    'doc/gitlab-geo/README.md'
+  end
+
+  def see_custom_certificate_doc
+    'https://docs.gitlab.com/omnibus/common_installation_problems/README.html#using-self-signed-certificate-or-custom-certificate-authorities'
   end
 
   def sudo_gitlab(command)
@@ -996,6 +1072,71 @@ namespace :gitlab do
       end
     else
       puts "No ref lock files exist".color(:green)
+    end
+  end
+
+  def check_elasticsearch
+    client = Gitlab::Elastic::Client.build(current_application_settings.elasticsearch_config)
+
+    print "Elasticsearch version 5.1.x? ... "
+
+    version = Gitlab::VersionInfo.parse(client.info["version"]["number"])
+
+    if version.major == 5 && version.minor == 1
+      puts "yes (#{version})".color(:green)
+    else
+      puts "no, you have #{version}".color(:red)
+    end
+  end
+
+  def check_gitlab_geo_node(node)
+    display_error = proc do |e|
+      puts 'no'.color(:red)
+      puts '  Reason:'.color(:blue)
+      puts "  #{e.message}"
+    end
+
+    begin
+      response = Net::HTTP.start(node.uri.host, node.uri.port, use_ssl: (node.uri.scheme == 'https')) do |http|
+        http.request(Net::HTTP::Get.new(node.uri))
+      end
+
+      if response.code_type == Net::HTTPFound
+        puts 'yes'.color(:green)
+      else
+        puts 'no'.color(:red)
+      end
+    rescue Errno::ECONNREFUSED => e
+      display_error.call(e)
+
+      try_fixing_it(
+        'Check if the machine is online and GitLab is running',
+        'Check your firewall rules and make sure this machine can reach the target machine',
+        "Make sure port and protocol are correct: '#{node.url}', or change it in Admin > Geo Nodes"
+      )
+    rescue SocketError => e
+      display_error.call(e)
+
+      if e.cause && e.cause.message.starts_with?('getaddrinfo')
+        try_fixing_it(
+          'Check if your machine can connect to a DNS server',
+          "Check if your machine can resolve DNS for: '#{node.uri.host}'",
+          'If machine host is incorrect, change it in Admin > Geo Nodes'
+        )
+      end
+    rescue OpenSSL::SSL::SSLError => e
+      display_error.call(e)
+
+      try_fixing_it(
+        'If you have a self-signed CA or certificate you need to whitelist it in Omnibus',
+      )
+      for_more_information(see_custom_certificate_doc)
+
+      try_fixing_it(
+        'If you have a valid certificate make sure you have the full certificate chain in the pem file'
+      )
+    rescue Exception => e # rubocop:disable Lint/RescueException
+      display_error.call(e)
     end
   end
 end

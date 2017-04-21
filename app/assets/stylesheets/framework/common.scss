@@ -40,6 +40,10 @@
   line-height: 24px;
 }
 
+.bold {
+  font-weight: 600;
+}
+
 .tab-content {
   overflow: visible;
 }
@@ -287,6 +291,10 @@ img.emoji {
   @extend .light-well;
   @extend .light;
   margin-bottom: 10px;
+}
+
+.available-groups form {
+  margin: 5px 0;
 }
 
 table {

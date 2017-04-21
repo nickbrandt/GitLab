@@ -7,6 +7,7 @@ describe Groups::DestroyService, services: true do
   let!(:group)        { create(:group) }
   let!(:nested_group) { create(:group, parent: group) }
   let!(:project)      { create(:empty_project, namespace: group) }
+  let!(:notification_setting) { create(:notification_setting, source: group)}
   let!(:gitlab_shell) { Gitlab::Shell.new }
   let!(:remove_path)  { group.path + "+#{group.id}+deleted" }
 
@@ -23,6 +24,7 @@ describe Groups::DestroyService, services: true do
       it { expect(Group.unscoped.all).not_to include(group) }
       it { expect(Group.unscoped.all).not_to include(nested_group) }
       it { expect(Project.unscoped.all).not_to include(project) }
+      it { expect(NotificationSetting.unscoped.all).not_to include(notification_setting) }
     end
 
     context 'file system' do
@@ -61,6 +63,16 @@ describe Groups::DestroyService, services: true do
 
     context 'potential race conditions' do
       context "when the `GroupDestroyWorker` task runs immediately" do
+        around(:each) do |example|
+          old_strategy = DatabaseCleaner[:active_record, { connection: ActiveRecord::Base }].strategy
+          DatabaseCleaner[:active_record, { connection: ActiveRecord::Base }].strategy = :deletion
+          begin
+            example.run
+          ensure
+            DatabaseCleaner[:active_record, { connection: ActiveRecord::Base }].strategy = old_strategy
+          end
+        end
+
         it "deletes the group" do
           # Commit the contents of this spec's transaction so far
           # so subsequent db connections can see it.

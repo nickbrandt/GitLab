@@ -39,6 +39,31 @@ describe Groups::CreateService, '#execute', services: true do
     end
   end
 
+  context 'repository_size_limit assignment as Bytes' do
+    let(:admin_user) { create(:user, admin: true) }
+    let(:service) { described_class.new(admin_user, group_params.merge(opts)) }
+
+    context 'when param present' do
+      let(:opts) { { repository_size_limit: '100' } }
+
+      it 'assign repository_size_limit as Bytes' do
+        group = service.execute
+
+        expect(group.repository_size_limit).to eql(100 * 1024 * 1024)
+      end
+    end
+
+    context 'when param not present' do
+      let(:opts) { { repository_size_limit: '' } }
+
+      it 'assign nil value' do
+        group = service.execute
+
+        expect(group.repository_size_limit).to be_nil
+      end
+    end
+  end
+
   describe 'creating a mattermost team' do
     let!(:params) { group_params.merge(create_chat_team: "true") }
     let!(:service) { described_class.new(user, params) }

@@ -1,13 +1,19 @@
 class MergeRequest < ActiveRecord::Base
   include InternalId
   include Issuable
+  include Noteable
   include Referable
   include Sortable
+  include Elastic::MergeRequestsSearch
+  include Approvable
 
   belongs_to :target_project, class_name: "Project"
   belongs_to :source_project, class_name: "Project"
   belongs_to :merge_user, class_name: "User"
 
+  has_many :approvals, dependent: :destroy
+  has_many :approvers, as: :target, dependent: :destroy
+  has_many :approver_groups, as: :target, dependent: :destroy
   has_many :merge_request_diffs, dependent: :destroy
   has_one :merge_request_diff,
     -> { order('merge_request_diffs.id DESC') }
@@ -99,20 +105,21 @@ class MergeRequest < ActiveRecord::Base
   validates :merge_user, presence: true, if: :merge_when_pipeline_succeeds?, unless: :importing?
   validate :validate_branches, unless: [:allow_broken, :importing?, :closed_without_fork?]
   validate :validate_fork, unless: :closed_without_fork?
+  validate :validate_approvals_before_merge
 
   scope :by_source_or_target_branch, ->(branch_name) do
     where("source_branch = :branch OR target_branch = :branch", branch: branch_name)
   end
-  scope :cared, ->(user) { where('assignee_id = :user OR author_id = :user', user: user.id) }
   scope :by_milestone, ->(milestone) { where(milestone_id: milestone) }
   scope :of_projects, ->(ids) { where(target_project_id: ids) }
   scope :from_project, ->(project) { where(source_project_id: project.id) }
   scope :merged, -> { with_state(:merged) }
   scope :closed_and_merged, -> { with_states(:closed, :merged) }
   scope :from_source_branches, ->(branches) { where(source_branch: branches) }
-
   scope :join_project, -> { joins(:target_project) }
   scope :references_project, -> { references(:target_project) }
+
+  participant :approvers_left
 
   after_save :keep_around_commit
 
@@ -349,6 +356,22 @@ class MergeRequest < ActiveRecord::Base
     !source_project.forked_from?(target_project)
   end
 
+  def validate_approvals_before_merge
+    return true unless approvals_before_merge
+    return true unless target_project
+
+    # Approvals disabled
+    if target_project.approvals_before_merge == 0
+      errors.add :validate_approvals_before_merge,
+                 'Approvals disabled for target project'
+    elsif approvals_before_merge > target_project.approvals_before_merge
+      true
+    else
+      errors.add :validate_approvals_before_merge,
+                 'Number of approvals must be greater than those on target project'
+    end
+  end
+
   def reopenable?
     closed? && !source_project_missing? && source_branch_exists?
   end
@@ -364,6 +387,14 @@ class MergeRequest < ActiveRecord::Base
 
   def reload_merge_request_diff
     merge_request_diff(true)
+  end
+
+  def merge_request_diff_for(diff_refs)
+    @merge_request_diffs_by_diff_refs ||= Hash.new do |h, diff_refs|
+      h[diff_refs] = merge_request_diffs.viewable.select_without_diff.find_by_diff_refs(diff_refs)
+    end
+
+    @merge_request_diffs_by_diff_refs[diff_refs]
   end
 
   def reload_diff_if_branch_changed
@@ -387,7 +418,7 @@ class MergeRequest < ActiveRecord::Base
   end
 
   def check_if_can_be_merged
-    return unless unchecked?
+    return unless unchecked? && !Gitlab::Geo.secondary?
 
     can_be_merged =
       !broken? && project.repository.can_be_merged?(diff_head_sha, target_branch)
@@ -424,7 +455,7 @@ class MergeRequest < ActiveRecord::Base
 
     check_if_can_be_merged
 
-    can_be_merged?
+    can_be_merged? && !should_be_rebased?
   end
 
   def mergeable_state?(skip_ci_check: false)
@@ -442,7 +473,7 @@ class MergeRequest < ActiveRecord::Base
   end
 
   def can_remove_source_branch?(current_user)
-    !source_project.protected_branch?(source_branch) &&
+    !ProtectedBranch.protected?(source_project, source_branch) &&
       !source_project.root_ref?(source_branch) &&
       Ability.allowed?(current_user, :push_code, source_project) &&
       diff_head_commit == source_branch_head
@@ -475,43 +506,7 @@ class MergeRequest < ActiveRecord::Base
     )
   end
 
-  def discussions
-    @discussions ||= self.related_notes.
-      inc_relations_for_view.
-      fresh.
-      discussions
-  end
-
-  def diff_discussions
-    @diff_discussions ||= self.notes.diff_notes.discussions
-  end
-
-  def resolvable_discussions
-    @resolvable_discussions ||= diff_discussions.select(&:to_be_resolved?)
-  end
-
-  def discussions_can_be_resolved_by?(user)
-    resolvable_discussions.all? { |discussion| discussion.can_resolve?(user) }
-  end
-
-  def find_diff_discussion(discussion_id)
-    notes = self.notes.diff_notes.where(discussion_id: discussion_id).fresh.to_a
-    return if notes.empty?
-
-    Discussion.new(notes)
-  end
-
-  def discussions_resolvable?
-    diff_discussions.any?(&:resolvable?)
-  end
-
-  def discussions_resolved?
-    discussions_resolvable? && diff_discussions.none?(&:to_be_resolved?)
-  end
-
-  def discussions_to_be_resolved?
-    discussions_resolvable? && !discussions_resolved?
-  end
+  alias_method :discussion_notes, :related_notes
 
   def mergeable_discussions_state?
     return true unless project.only_allow_merge_if_all_discussions_are_resolved?
@@ -785,6 +780,50 @@ class MergeRequest < ActiveRecord::Base
     end
   end
 
+  def ff_merge_possible?
+    project.repository.is_ancestor?(target_branch_sha, diff_head_sha)
+  end
+
+  def should_be_rebased?
+    self.project.ff_merge_must_be_possible? && !ff_merge_possible?
+  end
+
+  def rebase_dir_path
+    File.join(Gitlab.config.shared.path, 'tmp/rebase', source_project.id.to_s, id.to_s).to_s
+  end
+
+  def squash_dir_path
+    File.join(Gitlab.config.shared.path, 'tmp/squash', source_project.id.to_s, id.to_s).to_s
+  end
+
+  def rebase_in_progress?
+    # The source project can be deleted
+    return false unless source_project
+
+    File.exist?(rebase_dir_path) && !clean_stuck_rebase
+  end
+
+  def clean_stuck_rebase
+    if File.mtime(rebase_dir_path) < 15.minutes.ago
+      FileUtils.rm_rf(rebase_dir_path)
+      true
+    end
+  end
+
+  def squash_in_progress?
+    # The source project can be deleted
+    return false unless source_project
+
+    File.exist?(squash_dir_path) && !clean_stuck_squash
+  end
+
+  def clean_stuck_squash
+    if File.mtime(squash_dir_path) < 15.minutes.ago
+      FileUtils.rm_rf(squash_dir_path)
+      true
+    end
+  end
+
   def diverged_commits_count
     cache = Rails.cache.read(:"merge_request_#{id}_diverged_commits")
 
@@ -857,8 +896,8 @@ class MergeRequest < ActiveRecord::Base
     return unless has_complete_diff_refs?
     return if new_diff_refs == old_diff_refs
 
-    active_diff_notes = self.notes.diff_notes.select do |note|
-      note.new_diff_note? && note.active?(old_diff_refs)
+    active_diff_notes = self.notes.new_diff_notes.select do |note|
+      note.active?(old_diff_refs)
     end
 
     return if active_diff_notes.empty?

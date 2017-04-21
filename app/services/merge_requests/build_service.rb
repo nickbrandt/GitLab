@@ -21,7 +21,9 @@ module MergeRequests
     delegate :target_branch, :source_branch, :source_project, :target_project, :compare_commits, :wip_title, :description, :errors, to: :merge_request
 
     def find_source_project
-      source_project || project
+      return source_project if source_project.present? && can?(current_user, :read_project, source_project)
+
+      project
     end
 
     def find_target_project
@@ -121,6 +123,11 @@ module MergeRequests
         end
       else
         merge_request.title = source_branch.titleize.humanize
+      end
+
+      # Set MR description based on project template
+      if merge_request.target_project.merge_requests_template.present?
+        merge_request.description = merge_request.target_project.merge_requests_template
       end
 
       if iid

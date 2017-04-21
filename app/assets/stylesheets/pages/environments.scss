@@ -155,6 +155,156 @@
   }
 }
 
+/**
+ * Deploy boards
+ */
+
+.deploy-board > div {
+  display: flex;
+  justify-content: space-between;
+
+  .deploy-board-information {
+    order: 1;
+    display: flex;
+    width: 70px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 20px 0 20px 5px;
+
+    > span {
+      text-align: center;
+    }
+
+    .percentage {
+      color: $gl-text-color;
+    }
+
+    .text {
+      color: $gl-text-color-secondary;
+    }
+  }
+
+  .deploy-board-instances {
+    order: 2;
+    margin-left: 20px;
+    width: 100%;
+
+    .text {
+      color: $gl-text-color-secondary;
+      font-size: 12px;
+    }
+
+    .deploy-board-instances-container {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: row;
+      margin-top: -8px;
+    }
+  }
+
+  .deploy-board-actions {
+    order: 3;
+    align-self: center;
+    min-width: 150px;
+    margin-left: 10px;
+  }
+
+  &.deploy-board-error-message {
+    justify-content: center;
+  }
+
+  .deploy-board-empty-state-svg {
+    order: 1;
+    width: 90px;
+    margin: auto 0 auto 20px;
+  }
+
+  .deploy-board-empty-state-text {
+    order: 2;
+    flex-wrap: wrap;
+    margin: auto auto 15px 0;
+
+    .title {
+      order: 1;
+      display: flex;
+      font-size: 17px;
+      line-height: 40px;
+    }
+  }
+}
+
+.deploy-board-instance {
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+  border-width: 1px;
+  border-style: solid;
+  margin: 1px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &-finished {
+    background-color: $green-100;
+    border-color: $green-400;
+  }
+
+  &-deploying {
+    background-color: $green-50;
+    border-color: $green-400;
+  }
+
+  &-failed {
+    background-color: $red-200;
+    border-color: $red-500;
+  }
+
+  &-ready {
+    background-color: lighten($border-color, 1%);
+    border-color: $border-color;
+  }
+
+  &-preparing {
+    background-color: lighten($border-color, 5%);
+    border-color: $border-color;
+  }
+
+  &-waiting {
+    background-color: $white-light;
+    border-color: $border-color;
+  }
+
+  &.deploy-board-instance-canary {
+    &::after {
+      width: 7px;
+      height: 7px;
+      border: 1px solid $white-light;
+      background-color: $orange-300;
+      border-radius: 50%;
+      content: "";
+    }
+  }
+}
+
+.deploy-board-icon i {
+  cursor: pointer;
+  color: $layout-link-gray;
+  padding-right: 10px;
+}
+
+.deploy-board {
+  padding: 10px;
+  background-color: $gray-light;
+  min-height: 20px;
+
+  .fa-spinner {
+    margin: 0 auto;
+    width: 20px;
+    display: block;
+    font-size: 20px;
+  }
+}
+
 .prometheus-graph {
   text {
     fill: $stat-graph-axis-fill;
@@ -231,6 +381,15 @@
 .selected-metric-line {
   stroke: $black;
   stroke-width: 1;
+}
+
+.prometheus-state {
+  margin-top: 10px;
+  display: none;
+
+  .state-button-section {
+    margin-top: 10px;
+  }
 }
 
 .environments-actions {

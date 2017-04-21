@@ -21,6 +21,7 @@ export default Vue.component('environment-component', {
 
     return {
       store,
+      service: {},
       state: store.state,
       visibility: 'available',
       isLoading: false,
@@ -57,6 +58,16 @@ export default Vue.component('environment-component', {
     canCreateEnvironmentParsed() {
       return gl.utils.convertPermissionToBoolean(this.canCreateEnvironment);
     },
+
+    /**
+     * Pagination should only be rendered when we have information about it and when the
+     * number of total pages is bigger than 1.
+     *
+     * @return {Boolean}
+     */
+    shouldRenderPagination() {
+      return this.state.paginationInformation && this.state.paginationInformation.totalPages > 1;
+    },
   },
 
   /**
@@ -78,6 +89,17 @@ export default Vue.component('environment-component', {
   },
 
   methods: {
+
+    /**
+     * Toggles the visibility of the deploy boards of the clicked environment.
+     *
+     * @param  {Object} model
+     * @return {Object}
+     */
+    toggleDeployBoard(model) {
+      return this.store.toggleDeployBoard(model.id);
+    },
+
     toggleFolder(folder, folderUrl) {
       this.store.toggleFolder(folder);
 
@@ -201,6 +223,8 @@ export default Vue.component('environment-component', {
             :environments="state.environments"
             :can-create-deployment="canCreateDeploymentParsed"
             :can-read-environment="canReadEnvironmentParsed"
+            :toggleDeployBoard="toggleDeployBoard"
+            :store="store"
             :service="service"
             :is-loading-folder-content="isLoadingFolderContent" />
         </div>

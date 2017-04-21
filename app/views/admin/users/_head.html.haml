@@ -6,6 +6,8 @@
     %span.cred (Internal)
   - if @user.admin
     %span.cred (Admin)
+  - if @user.auditor
+    %span.cred (Auditor)
 
   .pull-right
     - if @user != current_user && @user.can?(:log_in)

@@ -21,6 +21,10 @@
 class IssuableFinder
   NONE = '0'.freeze
 
+  SCALAR_PARAMS = %i(scope state group_id project_id milestone_title assignee_id search label_name sort assignee_username author_id author_username authorized_only due_date iids non_archived weight).freeze
+  ARRAY_PARAMS = { label_name: [], iids: [] }.freeze
+  VALID_PARAMS = (SCALAR_PARAMS + [ARRAY_PARAMS]).freeze
+
   attr_accessor :current_user, :params
 
   def initialize(current_user, params = {})
@@ -36,6 +40,7 @@ class IssuableFinder
     items = by_search(items)
     items = by_assignee(items)
     items = by_author(items)
+    items = by_weight(items)
     items = by_due_date(items)
     items = by_non_archived(items)
     items = by_iids(items)
@@ -78,7 +83,7 @@ class IssuableFinder
     counts[:all] = counts.values.sum
     counts[:opened] += counts[:reopened]
 
-    counts
+    counts.with_indifferent_access
   end
 
   def find_by!(*params)
@@ -116,9 +121,9 @@ class IssuableFinder
       if current_user && params[:authorized_only].presence && !current_user_related?
         current_user.authorized_projects
       elsif group
-        GroupProjectsFinder.new(group).execute(current_user)
+        GroupProjectsFinder.new(group: group, current_user: current_user).execute
       else
-        projects_finder.execute(current_user, item_project_ids(items))
+        ProjectsFinder.new(current_user: current_user, project_ids_relation: item_project_ids(items)).execute
       end
 
     @projects = projects.with_feature_available_for_user(klass, current_user).reorder(nil)
@@ -354,6 +359,31 @@ class IssuableFinder
     items
   end
 
+  def by_weight(items)
+    return items unless weights?
+
+    if filter_by_no_weight?
+      items.where(weight: [-1, nil])
+    elsif filter_by_any_weight?
+      items.where.not(weight: [-1, nil])
+    else
+      items.where(weight: params[:weight])
+    end
+  end
+
+  def weights?
+    params[:weight].present? && params[:weight] != Issue::WEIGHT_ALL &&
+      klass.column_names.include?('weight')
+  end
+
+  def filter_by_no_weight?
+    params[:weight] == Issue::WEIGHT_NONE
+  end
+
+  def filter_by_any_weight?
+    params[:weight] == Issue::WEIGHT_ANY
+  end
+
   def by_due_date(items)
     if due_date?
       if filter_by_no_due_date?
@@ -404,9 +434,5 @@ class IssuableFinder
 
   def current_user_related?
     params[:scope] == 'created-by-me' || params[:scope] == 'authored' || params[:scope] == 'assigned-to-me'
-  end
-
-  def projects_finder
-    @projects_finder ||= ProjectsFinder.new
   end
 end

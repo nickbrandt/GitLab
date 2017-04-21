@@ -61,7 +61,7 @@ class Admin::GroupsController < Admin::ApplicationController
   end
 
   def group_params
-    params.require(:group).permit(group_params_ce)
+    params.require(:group).permit(group_params_ce << group_params_ee)
   end
 
   def group_params_ce
@@ -72,7 +72,16 @@ class Admin::GroupsController < Admin::ApplicationController
       :name,
       :path,
       :request_access_enabled,
-      :visibility_level
+      :visibility_level,
+      :require_two_factor_authentication,
+      :two_factor_grace_period
+    ]
+  end
+
+  def group_params_ee
+    [
+      :repository_size_limit,
+      :shared_runners_minutes_limit
     ]
   end
 end

@@ -52,6 +52,10 @@ class GitPushService < BaseService
       update_gitattributes if is_default_branch?
     end
 
+    if current_application_settings.elasticsearch_indexing? && is_default_branch?
+      ElasticCommitIndexerWorker.perform_async(@project.id, params[:oldrev], params[:newrev])
+    end
+
     execute_related_hooks
     perform_housekeeping
 
@@ -99,12 +103,13 @@ class GitPushService < BaseService
     UpdateMergeRequestsWorker
       .perform_async(@project.id, current_user.id, params[:oldrev], params[:newrev], params[:ref])
 
+    mirror_update = @project.mirror? && @project.repository.up_to_date_with_upstream?(branch_name)
     SystemHookPushWorker.perform_async(build_push_data.dup, :push_hooks)
 
     EventCreateService.new.push(@project, current_user, build_push_data)
     @project.execute_hooks(build_push_data.dup, :push_hooks)
     @project.execute_services(build_push_data.dup, :push_hooks)
-    Ci::CreatePipelineService.new(@project, current_user, build_push_data).execute
+    Ci::CreatePipelineService.new(@project, current_user, build_push_data).execute(mirror_update: mirror_update)
 
     if push_remove_branch?
       AfterBranchDeleteService
@@ -127,7 +132,7 @@ class GitPushService < BaseService
     project.change_head(branch_name)
 
     # Set protection on the default branch if configured
-    if current_application_settings.default_branch_protection != PROTECTION_NONE && !@project.protected_branch?(@project.default_branch)
+    if current_application_settings.default_branch_protection != PROTECTION_NONE && !ProtectedBranch.protected?(@project, @project.default_branch)
 
       params = {
         name: @project.default_branch,

@@ -21,6 +21,7 @@ eslint-report.html
 /backups/*
 /config/aws.yml
 /config/database.yml
+/config/database_geo.yml
 /config/gitlab.yml
 /config/gitlab_ci.yml
 /config/initializers/rack_attack.rb
@@ -30,6 +31,7 @@ eslint-report.html
 /config/unicorn.rb
 /config/secrets.yml
 /config/sidekiq.yml
+/config/registry.key
 /coverage/*
 /coverage-javascript/
 /db/*.sqlite3

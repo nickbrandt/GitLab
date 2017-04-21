@@ -12,6 +12,10 @@ FactoryGirl.define do
       admin true
     end
 
+    trait :auditor do
+      auditor true
+    end
+
     trait :blocked do
       after(:build) { |user, _| user.block! }
     end
@@ -62,5 +66,7 @@ FactoryGirl.define do
     end
 
     factory :admin, traits: [:admin]
+    factory :auditor, traits: [:auditor]
+    factory :external_user, traits: [:external]
   end
 end

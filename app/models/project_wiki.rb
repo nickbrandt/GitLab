@@ -1,5 +1,7 @@
 class ProjectWiki
   include Gitlab::ShellAdapter
+  include Elastic::WikiRepositoriesSearch
+  include Gitlab::CurrentSettings
 
   MARKUPS = {
     'Markdown' => :markdown,
@@ -47,6 +49,11 @@ class ProjectWiki
     credentials = Gitlab::UrlSanitizer.http_credentials_for_user(user)
 
     Gitlab::UrlSanitizer.new(url, credentials: credentials).full_url
+  end
+
+  # No need to have a Kerberos Web url. Kerberos URL will be used only to clone
+  def kerberos_url_to_repo
+    [Gitlab.config.build_gitlab_kerberos_url, "/", path_with_namespace, ".git"].join('')
   end
 
   def wiki_base_path
@@ -102,6 +109,8 @@ class ProjectWiki
 
     wiki.write_page(title, format.to_sym, content, commit)
 
+    update_elastic_index
+
     update_project_activity
   rescue Gollum::DuplicatePageError => e
     @error_message = "Duplicate page: #{e.message}"
@@ -113,11 +122,15 @@ class ProjectWiki
 
     wiki.update_page(page, page.name, format.to_sym, content, commit)
 
+    update_elastic_index
+
     update_project_activity
   end
 
   def delete_page(page, message = nil)
     wiki.delete_page(page, commit_details(:deleted, message, page.title))
+
+    update_elastic_index
 
     update_project_activity
   end
@@ -184,5 +197,9 @@ class ProjectWiki
 
   def update_project_activity
     @project.touch(:last_activity_at)
+  end
+
+  def update_elastic_index
+    index_blobs if current_application_settings.elasticsearch_indexing?
   end
 end

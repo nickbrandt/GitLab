@@ -22,6 +22,9 @@ module Projects
         return @project
       end
 
+      # Repository size limit comes as MB from the view
+      set_repository_size_limit_as_bytes
+
       set_project_name_from_path
 
       # get namespace id
@@ -58,6 +61,9 @@ module Projects
         fail(error: @project.errors.full_messages.join(', '))
       end
       @project
+    rescue ActiveRecord::RecordInvalid => e
+      message = "Unable to save #{e.record.type}: #{e.record.errors.full_messages.join(", ")} "
+      fail(error: message)
     rescue => e
       fail(error: e.message)
     end
@@ -97,6 +103,13 @@ module Projects
         @project.team << [current_user, :master, current_user]
       end
 
+      predefined_push_rule = PushRule.find_by(is_sample: true)
+
+      if predefined_push_rule
+        push_rule = predefined_push_rule.dup.tap{ |gh| gh.is_sample = false }
+        project.push_rule = push_rule
+      end
+
       @project.group&.refresh_members_authorized_projects
     end
 
@@ -133,6 +146,11 @@ module Projects
         service = Service.build_from_template(project.id, template)
         service.save!
       end
+    end
+
+    def set_repository_size_limit_as_bytes
+      limit = params.delete(:repository_size_limit)
+      @project.repository_size_limit = Gitlab::Utils.try_megabytes_to_bytes(limit) if limit
     end
 
     def set_project_name_from_path
