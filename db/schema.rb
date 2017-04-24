@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170421113144) do
+ActiveRecord::Schema.define(version: 20170424131911) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -1201,6 +1201,15 @@ ActiveRecord::Schema.define(version: 20170421113144) do
   end
 
   add_index "push_rules", ["project_id"], name: "index_push_rules_on_project_id", using: :btree
+
+  create_table "related_issues", force: :cascade do |t|
+    t.integer "issue_id", null: false
+    t.integer "related_issue_id", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "related_issues", ["issue_id", "related_issue_id"], name: "index_related_issues_on_issue_id_and_related_issue_id", unique: true, using: :btree
 
   create_table "releases", force: :cascade do |t|
     t.string "tag"
