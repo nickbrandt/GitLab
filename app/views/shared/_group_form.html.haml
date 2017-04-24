@@ -1,3 +1,5 @@
+- content_for :page_specific_javascripts do
+  = page_specific_javascript_bundle_tag('group')
 - parent = GroupFinder.new(current_user).execute(id: params[:parent_id] || @group.parent_id)
 - group_path = root_url
 - group_path << parent.full_path + '/' if parent
@@ -33,6 +35,13 @@
     = f.text_field :name, placeholder: 'Group name', class: 'form-control',
       required: true,
       title: 'You can choose a descriptive name different from the path.'
+
+.form-group.group-name-holder
+  = f.label :name, class: 'label-light' do
+    Group name
+  = f.text_field :name, class: 'form-control',
+    required: true,
+    title: 'You can choose a descriptive name different from the path.'
 
 .form-group.group-description-holder.col-xs-12
   = f.label :description, class: 'label-light' do
