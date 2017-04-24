@@ -2,7 +2,7 @@
 /* global Flash */
 import Vue from 'vue';
 import EnvironmentsService from '../services/environments_service';
-import EnvironmentTable from '../components/environments_table';
+import EnvironmentTable from '../components/environments_table.vue';
 import EnvironmentsStore from '../stores/environments_store';
 import TablePaginationComponent from '../../vue_shared/components/table_pagination';
 import '../../lib/utils/common_utils';
@@ -32,12 +32,6 @@ export default Vue.component('environment-folder-view', {
       cssContainerClass: environmentsData.cssClass,
       canCreateDeployment: environmentsData.canCreateDeployment,
       canReadEnvironment: environmentsData.canReadEnvironment,
-
-      // svgs
-      commitIconSvg: environmentsData.commitIconSvg,
-      playIconSvg: environmentsData.playIconSvg,
-      terminalIconSvg: environmentsData.terminalIconSvg,
-
       // Pagination Properties,
       paginationInformation: {},
       pageNumber: 1,
@@ -175,9 +169,6 @@ export default Vue.component('environment-folder-view', {
             :environments="state.environments"
             :can-create-deployment="canCreateDeploymentParsed"
             :can-read-environment="canReadEnvironmentParsed"
-            :play-icon-svg="playIconSvg"
-            :terminal-icon-svg="terminalIconSvg"
-            :commit-icon-svg="commitIconSvg"
             :toggleDeployBoard="toggleDeployBoard"
             :store="store"
             :service="service"/>

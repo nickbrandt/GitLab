@@ -24,7 +24,6 @@
 /* global Search */
 /* global Admin */
 /* global NamespaceSelects */
-/* global ShortcutsDashboardNavigation */
 /* global Project */
 /* global ProjectAvatar */
 /* global CompareAutocomplete */
@@ -36,19 +35,23 @@
 /* global Sidebar */
 /* global WeightSelect */
 /* global AdminEmailSelect */
+/* global ShortcutsWiki */
 
 import Issue from './issue';
 
 import BindInOut from './behaviors/bind_in_out';
+import Group from './group';
 import GroupName from './group_name';
 import GroupsList from './groups_list';
 import ProjectsList from './projects_list';
+import ApproversSelect from './approvers_select';
 import MiniPipelineGraph from './mini_pipeline_graph_dropdown';
 import Landing from './landing';
 import BlobLinePermalinkUpdater from './blob/blob_line_permalink_updater';
 import BlobForkSuggestion from './blob/blob_fork_suggestion';
 import UserCallout from './user_callout';
 import { ProtectedTagCreate, ProtectedTagEditList } from './protected_tags';
+import ShortcutsWiki from './shortcuts_wiki';
 
 import GeoNodes from './geo_nodes';
 import ServiceDeskRoot from './projects/settings_service_desk/service_desk_root';
@@ -163,12 +166,12 @@ const ShortcutsBlob = require('./shortcuts_blob');
         case 'projects:milestones:new':
         case 'projects:milestones:edit':
         case 'projects:milestones:update':
+        case 'groups:milestones:new':
+        case 'groups:milestones:edit':
+        case 'groups:milestones:update':
           new ZenMode();
           new gl.DueDateSelectors();
           new gl.GLForm($('.milestone-form'));
-          break;
-        case 'groups:milestones:new':
-          new ZenMode();
           break;
         case 'projects:compare:show':
           new gl.Diff();
@@ -295,8 +298,9 @@ const ShortcutsBlob = require('./shortcuts_blob');
         case 'groups:create':
         case 'admin:groups:create':
           BindInOut.initAll();
-        case 'groups:new':
-        case 'admin:groups:new':
+          new Group();
+          new GroupAvatar();
+          break;
         case 'groups:edit':
         case 'admin:groups:edit':
           new GroupAvatar();
@@ -395,9 +399,8 @@ const ShortcutsBlob = require('./shortcuts_blob');
         case 'admin':
           new Admin();
           switch (path[1]) {
-            case 'application_settings':
             case 'cohorts':
-              new gl.ApplicationSettings();
+              new gl.UsagePing();
               break;
             case 'groups':
               new UsersSelect();
@@ -421,7 +424,6 @@ const ShortcutsBlob = require('./shortcuts_blob');
           break;
         case 'dashboard':
         case 'root':
-          shortcut_handler = new ShortcutsDashboardNavigation();
           new UserCallout();
           break;
         case 'groups':
@@ -442,6 +444,7 @@ const ShortcutsBlob = require('./shortcuts_blob');
             case 'edit':
               shortcut_handler = new ShortcutsNavigation();
               new ProjectNew();
+              new ApproversSelect();
               break;
             case 'new':
               new ProjectNew();
@@ -454,7 +457,7 @@ const ShortcutsBlob = require('./shortcuts_blob');
               break;
             case 'wikis':
               new gl.Wikis();
-              shortcut_handler = new ShortcutsNavigation();
+              shortcut_handler = new ShortcutsWiki();
               new ZenMode();
               new gl.GLForm($('.wiki-form'));
               break;
