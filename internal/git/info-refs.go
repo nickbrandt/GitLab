@@ -7,6 +7,8 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+
+	"golang.org/x/net/context"
 )
 
 func GetInfoRefsHandler(a *api.API) http.Handler {
@@ -67,7 +69,9 @@ func handleGetInfoRefsWithGitaly(w http.ResponseWriter, a *api.Response, rpc str
 		return fmt.Errorf("GetInfoRefsHandler: %v", err)
 	}
 
-	infoRefsResponseWriter, err := smarthttp.InfoRefsResponseWriterTo(&a.Repository, rpc)
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	defer cancelFunc()
+	infoRefsResponseWriter, err := smarthttp.InfoRefsResponseWriterTo(ctx, &a.Repository, rpc)
 	if err != nil {
 		return fmt.Errorf("GetInfoRefsHandler: %v", err)
 	}

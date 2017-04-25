@@ -25,16 +25,16 @@ type receivePackWriter struct {
 
 const sendChunkSize = 16384
 
-func (client *SmartHTTPClient) InfoRefsResponseWriterTo(repo *pb.Repository, rpc string) (io.WriterTo, error) {
+func (client *SmartHTTPClient) InfoRefsResponseWriterTo(ctx context.Context, repo *pb.Repository, rpc string) (io.WriterTo, error) {
 	rpcRequest := &pb.InfoRefsRequest{Repository: repo}
 	var c pbhelper.InfoRefsClient
 	var err error
 
 	switch rpc {
 	case "git-upload-pack":
-		c, err = client.InfoRefsUploadPack(context.Background(), rpcRequest)
+		c, err = client.InfoRefsUploadPack(ctx, rpcRequest)
 	case "git-receive-pack":
-		c, err = client.InfoRefsReceivePack(context.Background(), rpcRequest)
+		c, err = client.InfoRefsReceivePack(ctx, rpcRequest)
 	default:
 		return nil, fmt.Errorf("InfoRefsResponseWriterTo: Unsupported RPC: %q", rpc)
 	}
@@ -47,7 +47,10 @@ func (client *SmartHTTPClient) InfoRefsResponseWriterTo(repo *pb.Repository, rpc
 }
 
 func (client *SmartHTTPClient) ReceivePack(repo *pb.Repository, GlId string, clientRequest io.Reader, clientResponse io.Writer) error {
-	stream, err := client.PostReceivePack(context.Background())
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	defer cancelFunc()
+
+	stream, err := client.PostReceivePack(ctx)
 	if err != nil {
 		return err
 	}
@@ -82,7 +85,10 @@ func (client *SmartHTTPClient) ReceivePack(repo *pb.Repository, GlId string, cli
 }
 
 func (client *SmartHTTPClient) UploadPack(repo *pb.Repository, clientRequest io.Reader, clientResponse io.Writer) error {
-	stream, err := client.PostUploadPack(context.Background())
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	defer cancelFunc()
+
+	stream, err := client.PostUploadPack(ctx)
 	if err != nil {
 		return err
 	}
