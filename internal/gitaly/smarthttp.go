@@ -8,22 +8,11 @@ import (
 	pbhelper "gitlab.com/gitlab-org/gitaly-proto/go/helper"
 
 	"golang.org/x/net/context"
-	"google.golang.org/grpc"
 )
 
 type SmartHTTPClient struct {
 	pb.SmartHTTPClient
 }
-
-type uploadPackWriter struct {
-	pb.SmartHTTP_PostUploadPackClient
-}
-
-type receivePackWriter struct {
-	pb.SmartHTTP_PostReceivePackClient
-}
-
-const sendChunkSize = 16384
 
 func (client *SmartHTTPClient) InfoRefsResponseWriterTo(ctx context.Context, repo *pb.Repository, rpc string) (io.WriterTo, error) {
 	rpcRequest := &pb.InfoRefsRequest{Repository: repo}
@@ -64,21 +53,31 @@ func (client *SmartHTTPClient) ReceivePack(repo *pb.Repository, GlId string, cli
 		return fmt.Errorf("initial request: %v", err)
 	}
 
-	waitc := make(chan error, 1)
+	numStreams := 2
+	errC := make(chan error, numStreams)
 
-	go receiveGitalyResponse(stream, waitc, clientResponse, func() ([]byte, error) {
-		response, err := stream.Recv()
-		return response.GetData(), err
-	})
+	go func() {
+		rr := pbhelper.NewReceiveReader(func() ([]byte, error) {
+			response, err := stream.Recv()
+			return response.GetData(), err
+		})
+		_, err := io.Copy(clientResponse, rr)
+		errC <- err
+	}()
 
-	_, sendErr := io.Copy(receivePackWriter{stream}, clientRequest)
-	stream.CloseSend()
+	go func() {
+		sw := pbhelper.NewSendWriter(func(data []byte) error {
+			return stream.Send(&pb.PostReceivePackRequest{Data: data})
+		})
+		_, err := io.Copy(sw, clientRequest)
+		stream.CloseSend()
+		errC <- err
+	}()
 
-	if recvErr := <-waitc; recvErr != nil {
-		return recvErr
-	}
-	if sendErr != nil {
-		return fmt.Errorf("send: %v", sendErr)
+	for i := 0; i < numStreams; i++ {
+		if err := <-errC; err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -101,60 +100,32 @@ func (client *SmartHTTPClient) UploadPack(repo *pb.Repository, clientRequest io.
 		return fmt.Errorf("initial request: %v", err)
 	}
 
-	waitc := make(chan error, 1)
+	numStreams := 2
+	errC := make(chan error, numStreams)
 
-	go receiveGitalyResponse(stream, waitc, clientResponse, func() ([]byte, error) {
-		response, err := stream.Recv()
-		return response.GetData(), err
-	})
+	go func() {
+		rr := pbhelper.NewReceiveReader(func() ([]byte, error) {
+			response, err := stream.Recv()
+			return response.GetData(), err
+		})
+		_, err := io.Copy(clientResponse, rr)
+		errC <- err
+	}()
 
-	_, sendErr := io.Copy(uploadPackWriter{stream}, clientRequest)
-	stream.CloseSend()
+	go func() {
+		sw := pbhelper.NewSendWriter(func(data []byte) error {
+			return stream.Send(&pb.PostUploadPackRequest{Data: data})
+		})
+		_, err := io.Copy(sw, clientRequest)
+		stream.CloseSend()
+		errC <- err
+	}()
 
-	if recvErr := <-waitc; recvErr != nil {
-		return recvErr
-	}
-	if sendErr != nil {
-		return fmt.Errorf("send: %v", sendErr)
+	for i := 0; i < numStreams; i++ {
+		if err := <-errC; err != nil {
+			return err
+		}
 	}
 
 	return nil
-}
-
-func receiveGitalyResponse(cs grpc.ClientStream, waitc chan error, clientResponse io.Writer, receiver func() ([]byte, error)) {
-	defer func() {
-		close(waitc)
-		cs.CloseSend()
-	}()
-
-	for {
-		data, err := receiver()
-		if err != nil {
-			if err != io.EOF {
-				waitc <- fmt.Errorf("receive: %v", err)
-			}
-			return
-		}
-
-		if _, err := clientResponse.Write(data); err != nil {
-			waitc <- fmt.Errorf("write: %v", err)
-			return
-		}
-	}
-}
-
-func (rw uploadPackWriter) Write(p []byte) (int, error) {
-	resp := &pb.PostUploadPackRequest{Data: p}
-	if err := rw.Send(resp); err != nil {
-		return 0, err
-	}
-	return len(p), nil
-}
-
-func (rw receivePackWriter) Write(p []byte) (int, error) {
-	resp := &pb.PostReceivePackRequest{Data: p}
-	if err := rw.Send(resp); err != nil {
-		return 0, err
-	}
-	return len(p), nil
 }
