@@ -171,3 +171,155 @@ ul.related-merge-requests > li {
 .recaptcha {
   margin-bottom: 30px;
 }
+
+
+
+.issue-count-holder {
+  display: inline-flex;
+  align-items: stretch;
+  height: 24px;
+}
+
+.issue-count-holder-count {
+  display: flex;
+  align-items: center;
+  padding-right: 10px;
+  padding-left: 10px;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-base;
+  line-height: 1;
+
+  &.has-btn {
+    border-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
+.issue-count-holder-add-button {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid $border-color;
+  border-left: 1px solid $border-color;
+  border-bottom: 1px solid $border-color;
+  border-right: 1px solid $border-color;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: $border-radius-base;
+  border-bottom-right-radius: $border-radius-base;
+  line-height: 1;
+}
+
+.issue-token {
+  display: inline-flex;
+  line-height: 1.5;
+}
+
+.issue-token-reference {
+  display: flex;
+  align-items: baseline;
+  margin-right: 1px;
+  padding: 0 .5em;
+  background-color: $gray-lighter;
+
+  transition: background 0.2s ease, color 0.2s ease;
+
+  &:hover,
+  &:focus,
+  .issue-token:hover > &,
+  .issue-token:focus > & {
+    background-color: $gray-normal;
+    color: $gl-link-hover-color;
+    text-decoration: none;
+  }
+}
+
+@mixin issue-token-state-icon {
+  margin-right: 0.35em;
+  font-size: 0.9em;
+}
+
+.issue-token-state-icon-open {
+  @include issue-token-state-icon;
+  color: $green-600;
+}
+
+.issue-token-state-icon-closed {
+  @include issue-token-state-icon;
+  color: $red-600;
+}
+
+.issue-token-title {
+  display: flex;
+  align-items: baseline;
+  padding: 0 .5em;
+  background-color: $gray-normal;
+  color: $gl-text-color-secondary;
+
+  transition: background 0.2s ease, color 0.2s ease;
+
+  &:hover,
+  &:focus,
+  .issue-token:hover > &,
+  .issue-token:focus > & {
+    background-color: darken($gray-normal, 2%);
+    color: $gl-text-color-secondary;
+  }
+}
+
+.issue-token-title-link {
+  color: inherit;
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    color: inherit;
+  }
+}
+
+.issue-token-remove-button {
+  background-color: transparent;
+  border: 0;
+  color: inherit;
+  font-size: 0.9em;
+}
+
+
+.add-issuable-form-input-wrapper {
+  display: flex;
+  align-items: stretch;
+}
+
+.add-issuable-form-input-token-list {
+  display: flex;
+  list-style: none;
+  margin-bottom: 0;
+  padding-left: 0;
+}
+
+.add-issuable-form-input {
+  flex: 1;
+  border: 0;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+
+.related-issues-add-related-issues-form {
+  border-bottom: 1px solid $border-color;
+}
+
+.related-issues-token-body {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.related-issues-token-list-item {
+  margin-bottom: 0.5em;
+  margin-right: 1em;
+}
