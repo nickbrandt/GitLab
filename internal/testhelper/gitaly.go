@@ -7,6 +7,7 @@ import (
 	"log"
 	"path"
 	"strings"
+	"sync"
 
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
 
@@ -16,12 +17,14 @@ import (
 
 type GitalyTestServer struct {
 	finalMessageCode codes.Code
+	sync.WaitGroup
 }
 
-const GitalyInfoRefsResponseMock = "Mock Gitaly InfoRefsResponse data"
-
-var GitalyReceivePackResponseMock []byte
-var GitalyUploadPackResponseMock []byte
+var (
+	GitalyInfoRefsResponseMock    = strings.Repeat("Mock Gitaly InfoRefsResponse data", 100000)
+	GitalyReceivePackResponseMock []byte
+	GitalyUploadPackResponseMock  []byte
+)
 
 func init() {
 	var err error
@@ -38,21 +41,30 @@ func NewGitalyServer(finalMessageCode codes.Code) *GitalyTestServer {
 }
 
 func (s *GitalyTestServer) InfoRefsUploadPack(in *pb.InfoRefsRequest, stream pb.SmartHTTP_InfoRefsUploadPackServer) error {
+	s.WaitGroup.Add(1)
+	defer s.WaitGroup.Done()
+
 	if err := validateRepository(in.GetRepository()); err != nil {
 		return err
 	}
 
-	response := &pb.InfoRefsResponse{
-		Data: []byte(GitalyInfoRefsResponseMock),
-	}
-	if err := stream.Send(response); err != nil {
+	nSends, err := sendBytes([]byte(GitalyInfoRefsResponseMock), 100, func(p []byte) error {
+		return stream.Send(&pb.InfoRefsResponse{Data: p})
+	})
+	if err != nil {
 		return err
+	}
+	if nSends <= 1 {
+		panic("should have sent more than one message")
 	}
 
 	return s.finalError()
 }
 
 func (s *GitalyTestServer) InfoRefsReceivePack(in *pb.InfoRefsRequest, stream pb.SmartHTTP_InfoRefsReceivePackServer) error {
+	s.WaitGroup.Add(1)
+	defer s.WaitGroup.Done()
+
 	if err := validateRepository(in.GetRepository()); err != nil {
 		return err
 	}
@@ -68,6 +80,9 @@ func (s *GitalyTestServer) InfoRefsReceivePack(in *pb.InfoRefsRequest, stream pb
 }
 
 func (s *GitalyTestServer) PostReceivePack(stream pb.SmartHTTP_PostReceivePackServer) error {
+	s.WaitGroup.Add(1)
+	defer s.WaitGroup.Done()
+
 	req, err := stream.Recv()
 	if err != nil {
 		return err
@@ -77,17 +92,13 @@ func (s *GitalyTestServer) PostReceivePack(stream pb.SmartHTTP_PostReceivePackSe
 	if err := validateRepository(req.GetRepository()); err != nil {
 		return err
 	}
-	response := &pb.PostReceivePackResponse{
-		Data: []byte(strings.Join([]string{
-			repo.GetPath(),
-			repo.GetStorageName(),
-			repo.GetRelativePath(),
-			req.GlId,
-		}, "\000") + "\000"),
-	}
-	if err := stream.Send(response); err != nil {
-		return err
-	}
+
+	data := []byte(strings.Join([]string{
+		repo.GetPath(),
+		repo.GetStorageName(),
+		repo.GetRelativePath(),
+		req.GlId,
+	}, "\000") + "\000")
 
 	// The body of the request starts in the second message
 	for {
@@ -99,18 +110,25 @@ func (s *GitalyTestServer) PostReceivePack(stream pb.SmartHTTP_PostReceivePackSe
 			break
 		}
 
-		response := &pb.PostReceivePackResponse{
-			Data: req.GetData(),
-		}
-		if err := stream.Send(response); err != nil {
-			return err
-		}
+		// We want to echo the request data back
+		data = append(data, req.GetData()...)
+	}
+
+	nSends, err := sendBytes(data, 100, func(p []byte) error {
+		return stream.Send(&pb.PostReceivePackResponse{Data: p})
+	})
+
+	if nSends <= 1 {
+		panic("should have sent more than one message")
 	}
 
 	return s.finalError()
 }
 
 func (s *GitalyTestServer) PostUploadPack(stream pb.SmartHTTP_PostUploadPackServer) error {
+	s.WaitGroup.Add(1)
+	defer s.WaitGroup.Done()
+
 	req, err := stream.Recv()
 	if err != nil {
 		return err
@@ -120,16 +138,12 @@ func (s *GitalyTestServer) PostUploadPack(stream pb.SmartHTTP_PostUploadPackServ
 	if err := validateRepository(req.GetRepository()); err != nil {
 		return err
 	}
-	response := &pb.PostUploadPackResponse{
-		Data: []byte(strings.Join([]string{
-			repo.GetPath(),
-			repo.GetStorageName(),
-			repo.GetRelativePath(),
-		}, "\000") + "\000"),
-	}
-	if err := stream.Send(response); err != nil {
-		return err
-	}
+
+	data := []byte(strings.Join([]string{
+		repo.GetPath(),
+		repo.GetStorageName(),
+		repo.GetRelativePath(),
+	}, "\000") + "\000")
 
 	// The body of the request starts in the second message
 	for {
@@ -141,15 +155,36 @@ func (s *GitalyTestServer) PostUploadPack(stream pb.SmartHTTP_PostUploadPackServ
 			break
 		}
 
-		response := &pb.PostUploadPackResponse{
-			Data: req.GetData(),
-		}
-		if err := stream.Send(response); err != nil {
-			return err
-		}
+		data = append(data, req.GetData()...)
+	}
+
+	nSends, err := sendBytes(data, 100, func(p []byte) error {
+		return stream.Send(&pb.PostUploadPackResponse{Data: p})
+	})
+
+	if nSends <= 1 {
+		panic("should have sent more than one message")
 	}
 
 	return s.finalError()
+}
+
+// sendBytes returns the number of times the 'sender' function was called and an error.
+func sendBytes(data []byte, chunkSize int, sender func([]byte) error) (int, error) {
+	i := 0
+	for ; len(data) > 0; i++ {
+		n := chunkSize
+		if n > len(data) {
+			n = len(data)
+		}
+
+		if err := sender(data[:n]); err != nil {
+			return i, err
+		}
+		data = data[n:]
+	}
+
+	return i, nil
 }
 
 func (s *GitalyTestServer) finalError() error {

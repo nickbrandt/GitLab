@@ -1,14 +1,17 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"math/rand"
 	"net"
+	"net/http"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
 	"testing"
+	"time"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
@@ -66,6 +69,41 @@ func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 	assert.Equal(t, expectedContent, body, "GET %q: response body", resource)
 }
 
+func TestGetInfoRefsProxiedToGitalyInterruptedStream(t *testing.T) {
+	apiResponse := gitOkBody(t)
+	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
+	defer gitalyServer.Stop()
+
+	gitalyAddress := "unix://" + socketPath
+	apiResponse.GitalyAddress = gitalyAddress
+
+	ts := testAuthServer(nil, 200, apiResponse)
+	defer ts.Close()
+
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	resource := "/gitlab-org/gitlab-test.git/info/refs?service=git-upload-pack"
+	resp, err := http.Get(ws.URL + resource)
+	require.NoError(t, err)
+
+	// This causes the server stream to be interrupted instead of consumed entirely.
+	resp.Body.Close()
+
+	done := make(chan struct{})
+	go func() {
+		gitalyServer.WaitGroup.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		return
+	case <-time.After(10 * time.Second):
+		t.Fatal("time out waiting for gitaly handler to return")
+	}
+}
+
 func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
 	apiResponse := gitOkBody(t)
 
@@ -98,6 +136,45 @@ func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
 	assert.Equal(t, 200, resp.StatusCode, "POST %q", resource)
 	assert.Equal(t, expectedBody, body, "POST %q: response body", resource)
 	testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-receive-pack-result")
+}
+
+func TestPostReceivePackProxiedToGitalyInterrupted(t *testing.T) {
+	apiResponse := gitOkBody(t)
+
+	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
+	defer gitalyServer.Stop()
+
+	apiResponse.GitalyAddress = "unix://" + socketPath
+	ts := testAuthServer(nil, 200, apiResponse)
+	defer ts.Close()
+
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	resource := "/gitlab-org/gitlab-test.git/git-receive-pack"
+	resp, err := http.Post(
+		ws.URL+resource,
+		"application/x-git-receive-pack-request",
+		bytes.NewReader(testhelper.GitalyReceivePackResponseMock),
+	)
+	require.NoError(t, err)
+	assert.Equal(t, 200, resp.StatusCode, "POST %q", resource)
+
+	// This causes the server stream to be interrupted instead of consumed entirely.
+	resp.Body.Close()
+
+	done := make(chan struct{})
+	go func() {
+		gitalyServer.WaitGroup.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		return
+	case <-time.After(10 * time.Second):
+		t.Fatal("time out waiting for gitaly handler to return")
+	}
 }
 
 func TestPostUploadPackProxiedToGitalySuccessfully(t *testing.T) {
@@ -134,6 +211,45 @@ func TestPostUploadPackProxiedToGitalySuccessfully(t *testing.T) {
 			assert.Equal(t, expectedBody, body, "POST %q: response body", resource)
 			testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-upload-pack-result")
 		}()
+	}
+}
+
+func TestPostUploadPackProxiedToGitalyInterrupted(t *testing.T) {
+	apiResponse := gitOkBody(t)
+
+	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
+	defer gitalyServer.Stop()
+
+	apiResponse.GitalyAddress = "unix://" + socketPath
+	ts := testAuthServer(nil, 200, apiResponse)
+	defer ts.Close()
+
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	resource := "/gitlab-org/gitlab-test.git/git-upload-pack"
+	resp, err := http.Post(
+		ws.URL+resource,
+		"application/x-git-upload-pack-request",
+		bytes.NewReader(testhelper.GitalyUploadPackResponseMock),
+	)
+	require.NoError(t, err)
+	assert.Equal(t, 200, resp.StatusCode, "POST %q", resource)
+
+	// This causes the server stream to be interrupted instead of consumed entirely.
+	resp.Body.Close()
+
+	done := make(chan struct{})
+	go func() {
+		gitalyServer.WaitGroup.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		return
+	case <-time.After(10 * time.Second):
+		t.Fatal("time out waiting for gitaly handler to return")
 	}
 }
 
@@ -199,15 +315,24 @@ func TestPostUploadPackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 	testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-upload-pack-result")
 }
 
-func startGitalyServer(t *testing.T, finalMessageCode codes.Code) (*grpc.Server, string) {
+type combinedServer struct {
+	*grpc.Server
+	*testhelper.GitalyTestServer
+}
+
+func startGitalyServer(t *testing.T, finalMessageCode codes.Code) (*combinedServer, string) {
 	socketPath := path.Join(scratchDir, fmt.Sprintf("gitaly-%d.sock", rand.Int()))
+	if err := os.Remove(socketPath); err != nil && !os.IsNotExist(err) {
+		t.Fatal(err)
+	}
 	server := grpc.NewServer()
 	listener, err := net.Listen("unix", socketPath)
 	require.NoError(t, err)
 
-	pb.RegisterSmartHTTPServer(server, testhelper.NewGitalyServer(finalMessageCode))
+	gitalyServer := testhelper.NewGitalyServer(finalMessageCode)
+	pb.RegisterSmartHTTPServer(server, gitalyServer)
 
 	go server.Serve(listener)
 
-	return server, socketPath
+	return &combinedServer{Server: server, GitalyTestServer: gitalyServer}, socketPath
 }
