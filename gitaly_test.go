@@ -201,6 +201,9 @@ func TestPostUploadPackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 
 func startGitalyServer(t *testing.T, finalMessageCode codes.Code) (*grpc.Server, string) {
 	socketPath := path.Join(scratchDir, fmt.Sprintf("gitaly-%d.sock", rand.Int()))
+	if err := os.Remove(socketPath); err != nil && !os.IsNotExist(err) {
+		t.Fatal(err)
+	}
 	server := grpc.NewServer()
 	listener, err := net.Listen("unix", socketPath)
 	require.NoError(t, err)
