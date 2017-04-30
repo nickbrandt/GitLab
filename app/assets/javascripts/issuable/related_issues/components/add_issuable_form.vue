@@ -1,15 +1,39 @@
 <script>
+import eventHub from '../event_hub';
+import IssueToken from './issue_token.vue';
+
 export default {
   name: 'AddIssuableForm',
 
   props: {
+    inputValue: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    pendingIssuables: {
+      type: Array,
+      required: false,
+      default: [],
+    },
     addButtonLabel: {
       type: String,
       required: true,
     },
   },
 
+  components: {
+    issueToken: IssueToken,
+  },
+
   methods: {
+    onInput(e) {
+      const value = e.target.value;
+      eventHub.$emit('addIssuableFormInput', value);
+    },
+    addIssuableFormCancel() {
+      eventHub.$emit('addIssuableFormCancel');
+    },
   },
 };
 </script>
@@ -18,12 +42,18 @@ export default {
   <div>
     <div class="add-issuable-form-input-wrapper form-control">
       <ul class="add-issuable-form-input-token-list">
-        <li>some token</li>
+        <li v-for="issuable in pendingIssuables">
+          <issueToken
+            :reference="issuable.reference"
+            :title="issuable.title"
+            :path="issuable.path"
+            :state="issuable.state" />
+        </li>
       </ul>
       <input
         type="text"
         class="add-issuable-form-input"
-        value="asdf"
+        :value="inputValue"
         placeholder="Search issues..."
         @input="onInput" />
     </div>
@@ -31,7 +61,9 @@ export default {
       <button class="btn btn-new pull-left">
         {{ addButtonLabel }}
       </button>
-      <button class="btn btn-default pull-right">
+      <button
+        class="btn btn-default pull-right"
+        @click="addIssuableFormCancel">
         Cancel
       </button>
     </div>

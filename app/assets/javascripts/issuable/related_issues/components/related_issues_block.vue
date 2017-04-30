@@ -22,6 +22,16 @@ export default {
       required: false,
       default: false,
     },
+    pendingRelatedIssues: {
+      type: Array,
+      required: false,
+      default: [],
+    },
+    addRelatedIssuesFormInputValue: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
 
   components: {
@@ -74,6 +84,8 @@ export default {
       v-if="isAddRelatedIssuesFormVisible"
       class="related-issues-add-related-issues-form panel-body">
       <addIssuableForm
+        :input-value="addRelatedIssuesFormInputValue"
+        :pending-issuables="pendingRelatedIssues"
         add-button-label="Add related issues" />
     </div>
     <div class="panel-body">

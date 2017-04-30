@@ -9,11 +9,11 @@ export default {
     },
     title: {
       type: String,
-      required: true,
+      default: '',
     },
     path: {
       type: String,
-      required: true,
+      default: null,
     },
     state: {
       type: String,

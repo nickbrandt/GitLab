@@ -1,8 +1,6 @@
 /* eslint-disable func-names, space-before-function-paren, no-var, prefer-rest-params, wrap-iife, one-var, no-underscore-dangle, one-var-declaration-per-line, object-shorthand, no-unused-vars, no-new, comma-dangle, consistent-return, quotes, dot-notation, quote-props, prefer-arrow-callback, max-len */
 /* global Flash */
 
-import RelatedIssuesRoot from './issuable/related_issues/related_issues_root';
-
 require('./flash');
 require('~/lib/utils/text_utility');
 require('vendor/jquery.waitforimages');
@@ -25,7 +23,6 @@ class Issue {
 
     Issue.$btnNewBranch = $('#new-branch');
 
-    Issue.initRelatedIssues();
     Issue.initMergeRequests();
     Issue.initRelatedBranches();
     Issue.initCanCreateBranch();
@@ -87,12 +84,6 @@ class Issue {
     if (noteText.trim().length > 0) {
       return form.submit();
     }
-  }
-
-  static initRelatedIssues() {
-    console.log('initRelatedIssues');
-    new RelatedIssuesRoot(document.querySelector('.js-related-issues-root'))
-      .init();
   }
 
   static initMergeRequests() {

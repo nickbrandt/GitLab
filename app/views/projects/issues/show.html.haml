@@ -64,7 +64,9 @@
           = @issue.description
     = edited_time_ago_with_tooltip(@issue, placement: 'bottom', html_class: 'issue_edited_ago')
 
-    .js-related-issues-root{ data: { endpoint: namespace_project_issue_related_issues_path(@project.namespace, @project, @issue) } }
+    .js-related-issues-root{ data: { endpoint: namespace_project_issue_related_issues_path(@project.namespace, @project, @issue),
+      namespace: @project.namespace.path,
+      project: @project.path } }
 
     #merge-requests{ data: { url: referenced_merge_requests_namespace_project_issue_url(@project.namespace, @project, @issue) } }
       // This element is filled in using JavaScript.
