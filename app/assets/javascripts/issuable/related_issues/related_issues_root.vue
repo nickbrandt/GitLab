@@ -52,14 +52,34 @@ export default {
 
   methods: {
     bindEvents() {
+      eventHub.$on('relatedIssueRemoveRequest', this.onRelatedIssueRemoveRequest);
       eventHub.$on('showAddRelatedIssuesForm', this.onShowAddRelatedIssuesForm);
       eventHub.$on('addIssuableFormInput', this.onAddIssuableFormInput);
+      eventHub.$on('addIssuableFormIssuableRemoveRequest', this.onAddIssuableFormIssuableRemoveRequest);
+      eventHub.$on('addIssuableFormSubmit', this.onAddIssuableFormSubmit);
       eventHub.$on('addIssuableFormCancel', this.onAddIssuableFormCancel);
     },
     unbindEvents() {
+      eventHub.$off('relatedIssueRemoveRequest', this.onRelatedIssueRemoveRequest);
       eventHub.$off('showAddRelatedIssuesForm', this.onShowAddRelatedIssuesForm);
-      eventHub.$on('addIssuableFormInput', this.onAddIssuableFormInput);
+      eventHub.$off('addIssuableFormInput', this.onAddIssuableFormInput);
+      eventHub.$off('addIssuableFormIssuableRemoveRequest', this.onAddIssuableFormIssuableRemoveRequest);
+      eventHub.$off('addIssuableFormSubmit', this.onAddIssuableFormSubmit);
       eventHub.$off('addIssuableFormCancel', this.onAddIssuableFormCancel);
+    },
+    onRelatedIssueRemoveRequest(reference) {
+      const fullReference = assembleFullIssuableReference(
+        reference,
+        this.currentNamespacePath,
+        this.currentProjectPath,
+      );
+      this.store.setRelatedIssues(this.relatedIssues.filter(ref => ref !== fullReference));
+      RelatedIssuesService.removeRelatedIssue(this.issueMap[fullReference].destroy_relation_path)
+        .catch((err) => {
+          // Restore issue we were unable to delete
+          this.store.setRelatedIssues(this.relatedIssues.concat(fullReference));
+          // TODO: Show error, err
+        });
     },
     onShowAddRelatedIssuesForm() {
       this.store.setIsAddRelatedIssuesFormVisible(true);
@@ -93,11 +113,38 @@ export default {
           });
         }
       });
-      this.store.addPendingRelatedIssues(fullReferences);
+      this.store.setPendingRelatedIssues(this.pendingRelatedIssues.concat(fullReferences));
       this.store.setAddRelatedIssuesFormInputValue(`${unprocessableReferences.join(' ')} ${references.slice(-1)[0]}`);
+    },
+    onAddIssuableFormIssuableRemoveRequest(reference) {
+      const fullReference = assembleFullIssuableReference(
+        reference,
+        this.currentNamespacePath,
+        this.currentProjectPath,
+      );
+      this.store.setPendingRelatedIssues(
+        this.pendingRelatedIssues.filter(ref => ref !== fullReference),
+      );
+    },
+    onAddIssuableFormSubmit() {
+      const currentPendingIssues = this.pendingRelatedIssues;
+      this.service.addRelatedIssues(currentPendingIssues)
+        .then(() => {
+          this.store.setRelatedIssues(this.relatedIssues.concat(currentPendingIssues));
+        })
+        .catch((err) => {
+          // Restore issues we were unable to submit
+          this.store.setPendingRelatedIssues(
+            _.uniq(this.pendingRelatedIssues.concat(currentPendingIssues)),
+          );
+          // TODO: Show error, err
+        });
+      this.store.setPendingRelatedIssues([]);
     },
     onAddIssuableFormCancel() {
       this.store.setIsAddRelatedIssuesFormVisible(false);
+      this.store.setPendingRelatedIssues([]);
+      this.store.setAddRelatedIssuesFormInputValue('');
     },
     fetchRelatedIssues() {
       this.service.fetchRelatedIssues()

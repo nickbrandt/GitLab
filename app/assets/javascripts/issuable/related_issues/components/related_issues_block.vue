@@ -53,6 +53,9 @@ export default {
     showAddRelatedIssuesForm() {
       eventHub.$emit('showAddRelatedIssuesForm');
     },
+    onRelatedIssueRemoveRequest(reference) {
+      eventHub.$emit('relatedIssueRemoveRequest', reference);
+    },
   },
 };
 </script>
@@ -103,7 +106,9 @@ export default {
             :reference="issue.reference"
             :title="issue.title"
             :path="issue.path"
-            :state="issue.state" />
+            :state="issue.state"
+            :canRemove="issue.canRemove"
+            @onRemoveRequest="onRelatedIssueRemoveRequest(issue.reference)" />
         </li>
       </ul>
       <template v-else>

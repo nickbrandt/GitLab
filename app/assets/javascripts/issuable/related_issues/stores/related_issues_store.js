@@ -24,9 +24,14 @@ class RelatedIssuesStore {
         namespacePath,
         projectPath,
       );
+      const issueEntry = this.state.issueMap[referenceKey];
+
       return {
-        ...this.state.issueMap[referenceKey],
+        path: issueEntry.path,
         reference: displayReference,
+        title: issueEntry.title,
+        state: issueEntry.state,
+        canRemove: !!issueEntry.destroy_relation_path,
       };
     });
   }
@@ -39,8 +44,8 @@ class RelatedIssuesStore {
     this.state.relatedIssues = value;
   }
 
-  addPendingRelatedIssues(issues) {
-    this.state.pendingRelatedIssues = this.state.pendingRelatedIssues.concat(issues);
+  setPendingRelatedIssues(issues) {
+    this.state.pendingRelatedIssues = issues;
   }
 
   setFetchError(value) {

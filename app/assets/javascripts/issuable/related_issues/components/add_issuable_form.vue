@@ -32,6 +32,12 @@ export default {
       const value = this.$refs.input.value;
       eventHub.$emit('addIssuableFormInput', value);
     },
+    onPendingIssuableRemoveRequest(reference) {
+      eventHub.$emit('addIssuableFormIssuableRemoveRequest', reference);
+    },
+    onIssuableSubmit() {
+      eventHub.$emit('addIssuableFormSubmit');
+    },
     addIssuableFormCancel() {
       eventHub.$emit('addIssuableFormCancel');
     },
@@ -58,7 +64,9 @@ export default {
             :reference="issuable.reference"
             :title="issuable.title"
             :path="issuable.path"
-            :state="issuable.state" />
+            :state="issuable.state"
+            canRemove
+            @onRemoveRequest="onPendingIssuableRemoveRequest(issuable.reference)" />
         </li>
       </ul>
       <input
@@ -70,7 +78,9 @@ export default {
         @input="onInput" />
     </div>
     <div class="clearfix prepend-top-10">
-      <button class="btn btn-new pull-left">
+      <button
+        class="btn btn-new pull-left"
+        @click="onIssuableSubmit">
         {{ addButtonLabel }}
       </button>
       <button

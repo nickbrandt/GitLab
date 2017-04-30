@@ -20,6 +20,11 @@ export default {
       required: false,
       default: null,
     },
+    canRemove: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
 
   computed: {
@@ -42,6 +47,9 @@ export default {
   },
 
   methods: {
+    onRemoveRequest() {
+      this.$emit('onRemoveRequest');
+    },
   },
 };
 </script>
@@ -66,8 +74,10 @@ export default {
         {{ title }}
       </a>
       <button
+        v-if="canRemove"
         class="issue-token-remove-button has-tooltip"
-        :title="removeButtonLabel">
+        :title="removeButtonLabel"
+        @click="onRemoveRequest">
         <i class="fa fa-times" aria-hidden="true" />
       </button>
     </div>
