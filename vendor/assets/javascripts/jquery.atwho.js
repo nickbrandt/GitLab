@@ -428,6 +428,8 @@ Controller = (function() {
     data.push(this);
     alias = this.getOpt('alias');
     eventName = alias ? name + "-" + alias + ".atwho" : name + ".atwho";
+    //console.log(eventName, this.$inputor);
+
     return this.$inputor.trigger(eventName, data);
   };
 

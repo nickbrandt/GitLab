@@ -1,6 +1,7 @@
 <script>
 import eventHub from '../event_hub';
 import IssueToken from './issue_token.vue';
+import GfmAutoComplete from '../../../gfm_auto_complete';
 
 export default {
   name: 'AddIssuableForm',
@@ -27,13 +28,23 @@ export default {
   },
 
   methods: {
-    onInput(e) {
-      const value = e.target.value;
+    onInput() {
+      const value = this.$refs.input.value;
       eventHub.$emit('addIssuableFormInput', value);
     },
     addIssuableFormCancel() {
       eventHub.$emit('addIssuableFormCancel');
     },
+  },
+
+  mounted() {
+    const $input = $(this.$refs.input);
+    new GfmAutoComplete(gl.GfmAutoComplete && gl.GfmAutoComplete.dataSources).setup($input, {
+      issues: true,
+    });
+    $input.on('inserted-issues.atwho', () => {
+      this.onInput();
+    });
   },
 };
 </script>
@@ -51,6 +62,7 @@ export default {
         </li>
       </ul>
       <input
+        ref="input"
         type="text"
         class="add-issuable-form-input"
         :value="inputValue"

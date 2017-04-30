@@ -7,6 +7,8 @@
 /* global dateFormat */
 /* global Pikaday */
 
+import GfmAutoComplete from './gfm_auto_complete';
+
 (function() {
   var bind = function(fn, me) { return function() { return fn.apply(me, arguments); }; };
 
@@ -22,7 +24,7 @@
       this.renderWipExplanation = bind(this.renderWipExplanation, this);
       this.resetAutosave = bind(this.resetAutosave, this);
       this.handleSubmit = bind(this.handleSubmit, this);
-      gl.GfmAutoComplete.setup();
+      new GfmAutoComplete(gl.GfmAutoComplete && gl.GfmAutoComplete.dataSources).setup();
       new UsersSelect();
       new GroupsSelect();
       new ZenMode();
