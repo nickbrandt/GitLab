@@ -108,7 +108,7 @@ export default {
             :path="issue.path"
             :state="issue.state"
             :canRemove="issue.canRemove"
-            @onRemoveRequest="onRelatedIssueRemoveRequest(issue.reference)" />
+            @removeRequest="onRelatedIssueRemoveRequest(issue.reference)" />
         </li>
       </ul>
       <template v-else>

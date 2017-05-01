@@ -143,9 +143,9 @@ class GfmAutoComplete {
     // Team Members
     $input.atwho({
       at: '@',
-      displayTpl: function(value) {
+      displayTpl(value) {
         return value.username != null ? GfmAutoComplete.Members.template : GfmAutoComplete.Loading.template;
-      }.bind(this),
+      },
       insertTpl: '${atwho-at}${username}',
       searchKey: 'search',
       alwaysHighlightFirst: true,

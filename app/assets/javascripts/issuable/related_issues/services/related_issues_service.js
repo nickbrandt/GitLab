@@ -8,6 +8,19 @@ class RelatedIssuesService {
     this.relatedIssuesResource = Vue.resource(endpoint);
   }
 
+  static fetchIssueInfo(endpoint) {
+    const issueResource = Vue.resource(endpoint);
+    return issueResource.get()
+      .then((res) => {
+        const issue = res.data;
+        if (!issue) {
+          throw new Error('Response didn\'t return any issue data');
+        }
+
+        return issue;
+      });
+  }
+
   fetchRelatedIssues() {
     return this.relatedIssuesResource.get()
       .then((res) => {

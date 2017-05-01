@@ -3,7 +3,11 @@ import eventHub from './event_hub';
 import RelatedIssuesBlock from './components/related_issues_block.vue';
 import RelatedIssuesStore from './stores/related_issues_store';
 import RelatedIssuesService from './services/related_issues_service';
-import { ISSUABLE_REFERENCE_RE, assembleFullIssuableReference } from '../../lib/utils/issuable_reference_utils';
+import {
+  ISSUABLE_REFERENCE_RE,
+  getReferencePieces,
+  assembleFullIssuableReference,
+} from '../../lib/utils/issuable_reference_utils';
 
 export default {
   name: 'RelatedIssuesRoot',
@@ -111,6 +115,21 @@ export default {
             reference,
             fetchStatus: RelatedIssuesService.FETCHING_STATUS,
           });
+
+          const referencePieces = getReferencePieces(reference);
+          const baseIssueEndpoint = `/${referencePieces.namespace}/${referencePieces.project}/issues/${referencePieces.issue}`;
+          RelatedIssuesService.fetchIssueInfo(`${baseIssueEndpoint}.json`)
+            .then((issue) => {
+              this.store.addToIssueMap(reference, {
+                path: baseIssueEndpoint,
+                reference,
+                state: issue.state,
+                title: issue.title,
+              });
+            })
+            .catch((err) => {
+              // TODO: Show error, err
+            });
         }
       });
       this.store.setPendingRelatedIssues(this.pendingRelatedIssues.concat(fullReferences));

@@ -48,7 +48,7 @@ export default {
 
   methods: {
     onRemoveRequest() {
-      this.$emit('onRemoveRequest');
+      this.$emit('removeRequest');
     },
   },
 };

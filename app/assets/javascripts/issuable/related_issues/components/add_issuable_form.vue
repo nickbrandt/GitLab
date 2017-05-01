@@ -66,7 +66,7 @@ export default {
             :path="issuable.path"
             :state="issuable.state"
             canRemove
-            @onRemoveRequest="onPendingIssuableRemoveRequest(issuable.reference)" />
+            @removeRequest="onPendingIssuableRemoveRequest(issuable.reference)" />
         </li>
       </ul>
       <input

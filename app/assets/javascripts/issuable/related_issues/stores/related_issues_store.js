@@ -37,7 +37,10 @@ class RelatedIssuesStore {
   }
 
   addToIssueMap(reference, issue) {
-    this.state.issueMap[reference] = issue;
+    this.state.issueMap = {
+      ...this.state.issueMap,
+      [reference]: issue,
+    };
   }
 
   setRelatedIssues(value) {
