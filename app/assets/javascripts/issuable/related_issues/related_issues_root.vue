@@ -59,6 +59,7 @@ export default {
       eventHub.$on('relatedIssueRemoveRequest', this.onRelatedIssueRemoveRequest);
       eventHub.$on('showAddRelatedIssuesForm', this.onShowAddRelatedIssuesForm);
       eventHub.$on('addIssuableFormInput', this.onAddIssuableFormInput);
+      eventHub.$on('addIssuableFormBlur', this.onAddIssuableFormBlur);
       eventHub.$on('addIssuableFormIssuableRemoveRequest', this.onAddIssuableFormIssuableRemoveRequest);
       eventHub.$on('addIssuableFormSubmit', this.onAddIssuableFormSubmit);
       eventHub.$on('addIssuableFormCancel', this.onAddIssuableFormCancel);
@@ -67,6 +68,7 @@ export default {
       eventHub.$off('relatedIssueRemoveRequest', this.onRelatedIssueRemoveRequest);
       eventHub.$off('showAddRelatedIssuesForm', this.onShowAddRelatedIssuesForm);
       eventHub.$off('addIssuableFormInput', this.onAddIssuableFormInput);
+      eventHub.$off('addIssuableFormBlur', this.onAddIssuableFormBlur);
       eventHub.$off('addIssuableFormIssuableRemoveRequest', this.onAddIssuableFormIssuableRemoveRequest);
       eventHub.$off('addIssuableFormSubmit', this.onAddIssuableFormSubmit);
       eventHub.$off('addIssuableFormCancel', this.onAddIssuableFormCancel);
@@ -88,52 +90,32 @@ export default {
     onShowAddRelatedIssuesForm() {
       this.store.setIsAddRelatedIssuesFormVisible(true);
     },
-    onAddIssuableFormInput(newValue) {
-      const references = newValue.split(/\s+/);
-      const unprocessableReferences = [];
-      const fullReferences = newValue.split(/\s+/)
-        .slice(0, -1)
-        .filter((reference) => {
-          const isValidReference = ISSUABLE_REFERENCE_RE.test(reference);
-          if (!isValidReference) {
-            unprocessableReferences.push(reference);
-          }
+    onAddIssuableFormInput(newValue, caretPos) {
+      const rawReferences = newValue.split(/\s/);
 
-          return isValidReference;
-        })
-        .map(reference => assembleFullIssuableReference(
-          reference,
-          this.currentNamespacePath,
-          this.currentProjectPath,
-        ));
-
-      // Add some temporary placeholders to lookup
-      // TODO: We could fetch these issues and add some extra info
-      fullReferences.forEach((reference) => {
-        if (!this.issueMap[reference]) {
-          this.store.addToIssueMap(reference, {
-            reference,
-            fetchStatus: RelatedIssuesService.FETCHING_STATUS,
-          });
-
-          const referencePieces = getReferencePieces(reference);
-          const baseIssueEndpoint = `/${referencePieces.namespace}/${referencePieces.project}/issues/${referencePieces.issue}`;
-          RelatedIssuesService.fetchIssueInfo(`${baseIssueEndpoint}.json`)
-            .then((issue) => {
-              this.store.addToIssueMap(reference, {
-                path: baseIssueEndpoint,
-                reference,
-                state: issue.state,
-                title: issue.title,
-              });
-            })
-            .catch((err) => {
-              // TODO: Show error, err
-            });
+      /* * /
+      let iteratingPos = 0;
+      const asdf = rawReferences.filter((reference) => {
+        const newIteratingPos = iteratingPos + reference.length + 1;
+        if (caretPos >= iteratingPos && caretPos >= newIteratingPos) {
+          return false;
         }
+        return true;
       });
-      this.store.setPendingRelatedIssues(this.pendingRelatedIssues.concat(fullReferences));
-      this.store.setAddRelatedIssuesFormInputValue(`${unprocessableReferences.join(' ')} ${references.slice(-1)[0]}`);
+      /* */
+
+      const results = this.processIssuableReferences(rawReferences.slice(0, -1));
+      this.store.setPendingRelatedIssues(this.pendingRelatedIssues.concat(results.fullReferences));
+      const leftoverReference = rawReferences.slice(-1)[0];
+      console.log('rawReferences', rawReferences);
+      console.log('->', results.unprocessableReferences, leftoverReference);
+      this.store.setAddRelatedIssuesFormInputValue(`${results.unprocessableReferences.map(ref => `${ref} `).join('')}${leftoverReference}`);
+    },
+    onAddIssuableFormBlur(newValue) {
+      const rawReferences = newValue.split(/\s+/);
+      const results = this.processIssuableReferences(rawReferences);
+      this.store.setPendingRelatedIssues(this.pendingRelatedIssues.concat(results.fullReferences));
+      this.store.setAddRelatedIssuesFormInputValue(`${results.unprocessableReferences.join(' ')}`);
     },
     onAddIssuableFormIssuableRemoveRequest(reference) {
       const fullReference = assembleFullIssuableReference(
@@ -184,6 +166,53 @@ export default {
         .catch((err) => {
           this.store.setFetchError(err);
         });
+    },
+    processIssuableReferences(rawReferences) {
+      const unprocessableReferences = [];
+      const fullReferences = rawReferences
+        .filter((reference) => {
+          const isValidReference = ISSUABLE_REFERENCE_RE.test(reference);
+          if (!isValidReference) {
+            unprocessableReferences.push(reference);
+          }
+
+          return isValidReference;
+        })
+        .map(reference => assembleFullIssuableReference(
+          reference,
+          this.currentNamespacePath,
+          this.currentProjectPath,
+        ));
+
+      // Add some temporary placeholders to lookup
+      fullReferences.forEach((reference) => {
+        if (!this.issueMap[reference]) {
+          this.store.addToIssueMap(reference, {
+            reference,
+            fetchStatus: RelatedIssuesService.FETCHING_STATUS,
+          });
+
+          const referencePieces = getReferencePieces(reference);
+          const baseIssueEndpoint = `/${referencePieces.namespace}/${referencePieces.project}/issues/${referencePieces.issue}`;
+          RelatedIssuesService.fetchIssueInfo(`${baseIssueEndpoint}.json`)
+            .then((issue) => {
+              this.store.addToIssueMap(reference, {
+                path: baseIssueEndpoint,
+                reference,
+                state: issue.state,
+                title: issue.title,
+              });
+            })
+            .catch((err) => {
+              // TODO: Show error, err
+            });
+        }
+      });
+
+      return {
+        unprocessableReferences,
+        fullReferences,
+      };
     },
   },
 

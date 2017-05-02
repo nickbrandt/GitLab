@@ -9,17 +9,16 @@ export default {
   props: {
     inputValue: {
       type: String,
-      required: false,
-      default: '',
-    },
-    pendingIssuables: {
-      type: Array,
-      required: false,
-      default: [],
+      required: true,
     },
     addButtonLabel: {
       type: String,
       required: true,
+    },
+    pendingIssuables: {
+      type: Array,
+      required: false,
+      default: () => [],
     },
   },
 
@@ -30,7 +29,14 @@ export default {
   methods: {
     onInput() {
       const value = this.$refs.input.value;
-      eventHub.$emit('addIssuableFormInput', value);
+      eventHub.$emit('addIssuableFormInput', value, $(this.$refs.input).caret('pos'));
+    },
+    onBlur() {
+      const value = this.$refs.input.value;
+      eventHub.$emit('addIssuableFormBlur', value);
+    },
+    onInputWrapperClick() {
+      this.$refs.input.focus();
     },
     onPendingIssuableRemoveRequest(reference) {
       eventHub.$emit('addIssuableFormIssuableRemoveRequest', reference);
@@ -57,9 +63,13 @@ export default {
 
 <template>
   <div>
-    <div class="add-issuable-form-input-wrapper form-control">
+    <div
+      class="add-issuable-form-input-wrapper form-control"
+      @click="onInputWrapperClick">
       <ul class="add-issuable-form-input-token-list">
-        <li v-for="issuable in pendingIssuables">
+        <li
+          v-for="issuable in pendingIssuables"
+          class="add-issuable-form-input-token-list-item">
           <issueToken
             :reference="issuable.reference"
             :title="issuable.title"
@@ -68,14 +78,17 @@ export default {
             canRemove
             @removeRequest="onPendingIssuableRemoveRequest(issuable.reference)" />
         </li>
+        <li class="add-issuable-form-input-token-list-input-item">
+          <input
+            ref="input"
+            type="text"
+            class="add-issuable-form-input"
+            :value="inputValue"
+            placeholder="Search issues..."
+            @input="onInput"
+            @blur="onBlur" />
+        </li>
       </ul>
-      <input
-        ref="input"
-        type="text"
-        class="add-issuable-form-input"
-        :value="inputValue"
-        placeholder="Search issues..."
-        @input="onInput" />
     </div>
     <div class="clearfix prepend-top-10">
       <button

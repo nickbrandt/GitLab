@@ -9,10 +9,12 @@ export default {
     },
     title: {
       type: String,
+      required: false,
       default: '',
     },
     path: {
       type: String,
+      required: false,
       default: null,
     },
     state: {
@@ -58,15 +60,17 @@ export default {
   <div class="issue-token">
     <a
       class="issue-token-reference"
-      :href="path">
+      :href="path"
+      :aria-label="accessibleLabel">
       <i
         v-if="stateIconClass"
         :class="stateIconClass"
-        :aria-label="accessibleLabel" />
+        aria-hidden="true" />
       {{ reference }}
     </a>
     <div class="issue-token-title">
       <a
+        v-if="title"
         class="issue-token-title-link"
         :href="path"
         aria-hidden="true"
