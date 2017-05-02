@@ -101,7 +101,6 @@ class Project < ActiveRecord::Base
   has_one :mattermost_service, dependent: :destroy
   has_one :slack_service, dependent: :destroy
   has_one :jenkins_service, dependent: :destroy
-  has_one :jenkins_deprecated_service, dependent: :destroy
   has_one :slack_slash_commands_service, dependent: :destroy
   has_one :buildkite_service, dependent: :destroy
   has_one :bamboo_service, dependent: :destroy
