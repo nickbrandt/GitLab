@@ -2,6 +2,12 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v2.0.0
+
+- Fix gRPC stream resource leak !158, !160
+- Don't append error messages to Git HTTP responses !157
+- Drop support for old Gitaly fields in Git API response !152
+
 v1.4.3
 
 - Support forwarding Git HTTP POST data to Gitaly !143
