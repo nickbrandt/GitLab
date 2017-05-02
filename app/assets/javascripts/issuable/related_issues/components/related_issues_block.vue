@@ -10,12 +10,17 @@ export default {
     relatedIssues: {
       type: Array,
       required: false,
-      default: [],
+      default: () => [],
     },
     fetchError: {
       type: Error,
       required: false,
       default: null,
+    },
+    canAddRelatedIssues: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
     isAddRelatedIssuesFormVisible: {
       type: Boolean,
@@ -25,7 +30,7 @@ export default {
     pendingRelatedIssues: {
       type: Array,
       required: false,
-      default: [],
+      default: () => [],
     },
     addRelatedIssuesFormInputValue: {
       type: String,
@@ -43,9 +48,8 @@ export default {
     relatedIssueCount() {
       return this.relatedIssues.length;
     },
-    canAddRelatedIssues() {
-      // TODO:
-      return true;
+    issueCountHolderCountClass() {
+      return `issue-count-holder-count ${this.canAddRelatedIssues ? 'has-btn' : ''}`;
     },
   },
 
@@ -67,10 +71,11 @@ export default {
       <h3 class="panel-title">
         Related issues
         <div class="issue-count-holder">
-          <span class="issue-count-holder-count has-btn">
+          <span :class="issueCountHolderCountClass">
             {{ relatedIssueCount }}
           </span>
           <button
+            ref="issue-count-holder-add-button"
             v-if="canAddRelatedIssues"
             class="issue-count-holder-add-button btn btn-small btn-default has-tooltip"
             type="button"
@@ -84,6 +89,7 @@ export default {
       </h3>
     </div>
     <div
+      ref="related-issues-add-related-issues-form"
       v-if="isAddRelatedIssuesFormVisible"
       class="related-issues-add-related-issues-form panel-body">
       <addIssuableForm

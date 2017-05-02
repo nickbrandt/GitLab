@@ -41,10 +41,10 @@ export default {
     onPendingIssuableRemoveRequest(reference) {
       eventHub.$emit('addIssuableFormIssuableRemoveRequest', reference);
     },
-    onIssuableSubmit() {
+    onFormSubmit() {
       eventHub.$emit('addIssuableFormSubmit');
     },
-    addIssuableFormCancel() {
+    onFormCancel() {
       eventHub.$emit('addIssuableFormCancel');
     },
   },
@@ -64,6 +64,7 @@ export default {
 <template>
   <div>
     <div
+      ref="issuable-form-wrapper"
       class="add-issuable-form-input-wrapper form-control"
       @click="onInputWrapperClick">
       <ul class="add-issuable-form-input-token-list">
@@ -93,12 +94,12 @@ export default {
     <div class="clearfix prepend-top-10">
       <button
         class="btn btn-new pull-left"
-        @click="onIssuableSubmit">
+        @click="onFormSubmit">
         {{ addButtonLabel }}
       </button>
       <button
         class="btn btn-default pull-right"
-        @click="addIssuableFormCancel">
+        @click="onFormCancel">
         Cancel
       </button>
     </div>

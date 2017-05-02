@@ -1,13 +1,13 @@
 <script>
-import eventHub from './event_hub';
-import RelatedIssuesBlock from './components/related_issues_block.vue';
-import RelatedIssuesStore from './stores/related_issues_store';
-import RelatedIssuesService from './services/related_issues_service';
+import eventHub from '../event_hub';
+import RelatedIssuesBlock from './related_issues_block.vue';
+import RelatedIssuesStore from '../stores/related_issues_store';
+import RelatedIssuesService from '../services/related_issues_service';
 import {
   ISSUABLE_REFERENCE_RE,
   getReferencePieces,
   assembleFullIssuableReference,
-} from '../../lib/utils/issuable_reference_utils';
+} from '../../../lib/utils/issuable_reference_utils';
 
 export default {
   name: 'RelatedIssuesRoot',
@@ -24,6 +24,11 @@ export default {
     currentProjectPath: {
       type: String,
       required: true,
+    },
+    canAddRelatedIssues: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
 
@@ -93,23 +98,26 @@ export default {
     onAddIssuableFormInput(newValue, caretPos) {
       const rawReferences = newValue.split(/\s/);
 
-      /* * /
+      let touchedReference;
       let iteratingPos = 0;
-      const asdf = rawReferences.filter((reference) => {
-        const newIteratingPos = iteratingPos + reference.length + 1;
-        if (caretPos >= iteratingPos && caretPos >= newIteratingPos) {
-          return false;
+      const untouchedReferences = rawReferences.filter((reference) => {
+        let isTouched = false;
+        if (caretPos >= iteratingPos && caretPos <= (iteratingPos + reference.length)) {
+          touchedReference = reference;
+          isTouched = true;
         }
-        return true;
-      });
-      /* */
 
-      const results = this.processIssuableReferences(rawReferences.slice(0, -1));
-      this.store.setPendingRelatedIssues(this.pendingRelatedIssues.concat(results.fullReferences));
-      const leftoverReference = rawReferences.slice(-1)[0];
-      console.log('rawReferences', rawReferences);
-      console.log('->', results.unprocessableReferences, leftoverReference);
-      this.store.setAddRelatedIssuesFormInputValue(`${results.unprocessableReferences.map(ref => `${ref} `).join('')}${leftoverReference}`);
+        iteratingPos = iteratingPos + reference.length + 1;
+        return !isTouched;
+      });
+
+      const results = this.processIssuableReferences(untouchedReferences);
+      if (results.fullReferences.length > 0) {
+        this.store.setPendingRelatedIssues(
+          this.pendingRelatedIssues.concat(results.fullReferences),
+        );
+        this.store.setAddRelatedIssuesFormInputValue(`${results.unprocessableReferences.map(ref => `${ref} `).join('')}${touchedReference}`);
+      }
     },
     onAddIssuableFormBlur(newValue) {
       const rawReferences = newValue.split(/\s+/);
@@ -233,6 +241,7 @@ export default {
   <relatedIssuesBlock
     :related-issues="computedRelatedIssues"
     :fetch-error="fetchError"
+    :canAddRelatedIssues="canAddRelatedIssues"
     :is-add-related-issues-form-visible="isAddRelatedIssuesFormVisible"
     :pending-related-issues="computedPendingRelatedIssues"
     :add-related-issues-form-input-value="addRelatedIssuesFormInputValue" />
