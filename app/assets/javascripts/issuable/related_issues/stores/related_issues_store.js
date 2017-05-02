@@ -6,7 +6,7 @@ class RelatedIssuesStore {
       issueMap: {},
       relatedIssues: [],
       pendingRelatedIssues: [],
-      fetchError: null,
+      requestError: null,
       isAddRelatedIssuesFormVisible: false,
       addRelatedIssuesFormInputValue: '',
     }, initialState);
@@ -51,8 +51,8 @@ class RelatedIssuesStore {
     this.state.pendingRelatedIssues = issues;
   }
 
-  setFetchError(value) {
-    this.state.fetchError = value;
+  setRequestError(value) {
+    this.state.requestError = value;
   }
 
   setIsAddRelatedIssuesFormVisible(value) {

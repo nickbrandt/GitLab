@@ -323,6 +323,15 @@ ul.related-merge-requests > li {
 }
 
 
+.related-issues-header-help-icon {
+  margin-left: 0.25em;
+  color: $gl-text-color-secondary;
+}
+
+.related-issues-header-issue-count {
+  margin-left: 0.5em;
+}
+
 .related-issues-add-related-issues-form {
   border-bottom: 1px solid $border-color;
 }

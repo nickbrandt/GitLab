@@ -172,7 +172,7 @@ export default {
           this.store.setRelatedIssues(relatedIssueReferences);
         })
         .catch((err) => {
-          this.store.setFetchError(err);
+          this.store.setRequestError(err);
         });
     },
     processIssuableReferences(rawReferences) {
@@ -240,7 +240,7 @@ export default {
 <template>
   <relatedIssuesBlock
     :related-issues="computedRelatedIssues"
-    :fetch-error="fetchError"
+    :request-error="requestError"
     :canAddRelatedIssues="canAddRelatedIssues"
     :is-add-related-issues-form-visible="isAddRelatedIssuesFormVisible"
     :pending-related-issues="computedPendingRelatedIssues"
