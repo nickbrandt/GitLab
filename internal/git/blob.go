@@ -25,13 +25,13 @@ func (b *blob) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
 
 	log.Printf("SendBlob: sending %q for %q", params.BlobId, r.URL.Path)
 
-	sizeOutput, err := gitCommand("", "git", "--git-dir="+params.RepoPath, "cat-file", "-s", params.BlobId).Output()
+	sizeOutput, err := gitCommand("", "", "git", "--git-dir="+params.RepoPath, "cat-file", "-s", params.BlobId).Output()
 	if err != nil {
 		helper.Fail500(w, r, fmt.Errorf("SendBlob: get blob size: %v", err))
 		return
 	}
 
-	gitShowCmd := gitCommand("", "git", "--git-dir="+params.RepoPath, "cat-file", "blob", params.BlobId)
+	gitShowCmd := gitCommand("", "", "git", "--git-dir="+params.RepoPath, "cat-file", "blob", params.BlobId)
 	stdout, err := gitShowCmd.StdoutPipe()
 	if err != nil {
 		helper.Fail500(w, r, fmt.Errorf("SendBlob: git cat-file stdout: %v", err))

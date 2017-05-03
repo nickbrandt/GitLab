@@ -35,7 +35,7 @@ func (client *SmartHTTPClient) InfoRefsResponseWriterTo(ctx context.Context, rep
 	return &pbhelper.InfoRefsClientWriterTo{c}, nil
 }
 
-func (client *SmartHTTPClient) ReceivePack(repo *pb.Repository, GlId string, clientRequest io.Reader, clientResponse io.Writer) error {
+func (client *SmartHTTPClient) ReceivePack(repo *pb.Repository, glId string, glRepository string, clientRequest io.Reader, clientResponse io.Writer) error {
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	defer cancelFunc()
 
@@ -45,8 +45,9 @@ func (client *SmartHTTPClient) ReceivePack(repo *pb.Repository, GlId string, cli
 	}
 
 	rpcRequest := &pb.PostReceivePackRequest{
-		Repository: repo,
-		GlId:       GlId,
+		Repository:   repo,
+		GlId:         glId,
+		GlRepository: glRepository,
 	}
 
 	if err := stream.Send(rpcRequest); err != nil {

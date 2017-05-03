@@ -73,7 +73,7 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 
 	compressCmd, archiveFormat := parseArchiveFormat(format)
 
-	archiveCmd := gitCommand("", "git", "--git-dir="+params.RepoPath, "archive", "--format="+archiveFormat, "--prefix="+params.ArchivePrefix+"/", params.CommitId)
+	archiveCmd := gitCommand("", "", "git", "--git-dir="+params.RepoPath, "archive", "--format="+archiveFormat, "--prefix="+params.ArchivePrefix+"/", params.CommitId)
 	archiveStdout, err := archiveCmd.StdoutPipe()
 	if err != nil {
 		helper.Fail500(w, r, fmt.Errorf("SendArchive: archive stdout: %v", err))

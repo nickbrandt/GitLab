@@ -2,6 +2,9 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v2.0.1
+- Support GL_REPOSITORY from API and pass it to Gitaly on ReceivePack
+
 v2.0.0
 
 - Fix gRPC stream resource leak !158, !160
