@@ -89,7 +89,9 @@ export default {
         .catch((err) => {
           // Restore issue we were unable to delete
           this.store.setRelatedIssues(this.relatedIssues.concat(fullReference));
-          // TODO: Show error, err
+
+          this.store.setRequestError('Error occurred while removing related issues.');
+          throw err;
         });
     },
     onShowAddRelatedIssuesForm() {
@@ -114,7 +116,7 @@ export default {
       const results = this.processIssuableReferences(untouchedReferences);
       if (results.fullReferences.length > 0) {
         this.store.setPendingRelatedIssues(
-          this.pendingRelatedIssues.concat(results.fullReferences),
+          _.uniq(this.pendingRelatedIssues.concat(results.fullReferences)),
         );
         this.store.setAddRelatedIssuesFormInputValue(`${results.unprocessableReferences.map(ref => `${ref} `).join('')}${touchedReference}`);
       }
@@ -122,7 +124,9 @@ export default {
     onAddIssuableFormBlur(newValue) {
       const rawReferences = newValue.split(/\s+/);
       const results = this.processIssuableReferences(rawReferences);
-      this.store.setPendingRelatedIssues(this.pendingRelatedIssues.concat(results.fullReferences));
+      this.store.setPendingRelatedIssues(
+        _.uniq(this.pendingRelatedIssues.concat(results.fullReferences)),
+      );
       this.store.setAddRelatedIssuesFormInputValue(`${results.unprocessableReferences.join(' ')}`);
     },
     onAddIssuableFormIssuableRemoveRequest(reference) {
@@ -146,7 +150,9 @@ export default {
           this.store.setPendingRelatedIssues(
             _.uniq(this.pendingRelatedIssues.concat(currentPendingIssues)),
           );
-          // TODO: Show error, err
+
+          this.store.setRequestError('Error occurred while submitting related issues.');
+          throw err;
         });
       this.store.setPendingRelatedIssues([]);
     },
@@ -172,7 +178,8 @@ export default {
           this.store.setRelatedIssues(relatedIssueReferences);
         })
         .catch((err) => {
-          this.store.setRequestError(err);
+          this.store.setRequestError('Error occurred while fetching related issues.');
+          throw err;
         });
     },
     processIssuableReferences(rawReferences) {
@@ -212,7 +219,8 @@ export default {
               });
             })
             .catch((err) => {
-              // TODO: Show error, err
+              this.store.setRequestError('Error occurred while fetching issue info.');
+              throw err;
             });
         }
       });

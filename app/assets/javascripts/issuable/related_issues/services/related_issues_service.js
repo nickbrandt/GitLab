@@ -12,7 +12,7 @@ class RelatedIssuesService {
     const issueResource = Vue.resource(endpoint);
     return issueResource.get()
       .then((res) => {
-        const issue = res.data;
+        const issue = res.json();
         if (!issue) {
           throw new Error('Response didn\'t return any issue data');
         }
@@ -24,7 +24,7 @@ class RelatedIssuesService {
   fetchRelatedIssues() {
     return this.relatedIssuesResource.get()
       .then((res) => {
-        const issues = res.data;
+        const issues = res.json();
         if (!issues) {
           throw new Error('Response didn\'t return any issues data');
         }
@@ -36,19 +36,27 @@ class RelatedIssuesService {
   addRelatedIssues(newIssueReferences) {
     return this.relatedIssuesResource.save({}, {
       issue_references: newIssueReferences,
-    });
+    })
+      .then((res) => {
+        const resData = res.json();
+        if (!resData) {
+          throw new Error('Response didn\'t return any data');
+        }
+
+        return resData;
+      });
   }
 
   static removeRelatedIssue(endpoint) {
     const relatedIssueResource = Vue.resource(endpoint);
     return relatedIssueResource.remove()
       .then((res) => {
-        const issues = res.data;
-        if (!issues) {
-          throw new Error('Response didn\'t return any issues data');
+        const resData = res.json();
+        if (!resData) {
+          throw new Error('Response didn\'t return any data');
         }
 
-        return issues;
+        return resData;
       });
   }
 }

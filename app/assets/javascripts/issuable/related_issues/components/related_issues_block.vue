@@ -13,7 +13,7 @@ export default {
       default: () => [],
     },
     requestError: {
-      type: Error,
+      type: String,
       required: false,
       default: null,
     },
@@ -71,11 +71,13 @@ export default {
 </script>
 
 <template>
-  <div>
-    <template v-if="requestError">
+  <div class="related-issues-block">
+    <div
+      v-if="requestError"
+      class="alert alert-danger">
       <i class="fa fa-exclamation-circle" aria-hidden="true" />
       An error occurred while requesting the related issues
-    </template>
+    </div>
     <div
       class="panel-slim panel-default">
       <div :class="panelHeadingClass">

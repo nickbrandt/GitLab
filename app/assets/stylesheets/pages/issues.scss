@@ -323,6 +323,10 @@ ul.related-merge-requests > li {
 }
 
 
+.related-issues-block {
+  margin-top: $gl-vert-padding;
+}
+
 .related-issues-header-help-icon {
   margin-left: 0.25em;
   color: $gl-text-color-secondary;
