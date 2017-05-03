@@ -32,7 +32,7 @@ const issuable2 = {
   destroy_relation_path: '/foo/bar/issues/124/related_issues/2',
 };
 
-fdescribe('RelatedIssuesRoot', () => {
+describe('RelatedIssuesRoot', () => {
   let vm;
   afterEach(() => {
     if (vm) {
@@ -80,6 +80,7 @@ fdescribe('RelatedIssuesRoot', () => {
         setTimeout(() => {
           expect(vm.computedRelatedIssues.length).toEqual(1);
           expect(vm.computedRelatedIssues[0].reference).toEqual('#123');
+          expect(vm.requestError).toBeDefined();
 
           Vue.http.interceptors = _.without(Vue.http.interceptors, interceptor);
 
@@ -264,6 +265,7 @@ fdescribe('RelatedIssuesRoot', () => {
             expect(vm.computedPendingRelatedIssues.length).toEqual(1);
             expect(vm.computedPendingRelatedIssues[0].reference).toEqual('#123');
             expect(vm.computedRelatedIssues.length).toEqual(0);
+            expect(vm.requestError).toBeDefined();
 
             done();
           });

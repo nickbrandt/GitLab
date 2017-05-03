@@ -76,7 +76,7 @@ export default {
       v-if="requestError"
       class="alert alert-danger">
       <i class="fa fa-exclamation-circle" aria-hidden="true" />
-      An error occurred while requesting the related issues
+      {{ requestError }}
     </div>
     <div
       class="panel-slim panel-default">

@@ -85,12 +85,16 @@ export default {
         this.currentProjectPath,
       );
       this.store.setRelatedIssues(this.relatedIssues.filter(ref => ref !== fullReference));
+
+      // Reset request error
+      this.store.setRequestError(null);
+
       RelatedIssuesService.removeRelatedIssue(this.issueMap[fullReference].destroy_relation_path)
         .catch((err) => {
           // Restore issue we were unable to delete
           this.store.setRelatedIssues(this.relatedIssues.concat(fullReference));
 
-          this.store.setRequestError('Error occurred while removing related issues.');
+          this.store.setRequestError('An error occurred while removing related issues.');
           throw err;
         });
     },
@@ -140,6 +144,9 @@ export default {
       );
     },
     onAddIssuableFormSubmit() {
+      // Reset request error
+      this.store.setRequestError(null);
+
       const currentPendingIssues = this.pendingRelatedIssues;
       this.service.addRelatedIssues(currentPendingIssues)
         .then(() => {
@@ -151,7 +158,7 @@ export default {
             _.uniq(this.pendingRelatedIssues.concat(currentPendingIssues)),
           );
 
-          this.store.setRequestError('Error occurred while submitting related issues.');
+          this.store.setRequestError('An error occurred while submitting related issues.');
           throw err;
         });
       this.store.setPendingRelatedIssues([]);
@@ -162,6 +169,9 @@ export default {
       this.store.setAddRelatedIssuesFormInputValue('');
     },
     fetchRelatedIssues() {
+      // Reset request error
+      this.store.setRequestError(null);
+
       this.service.fetchRelatedIssues()
         .then((issues) => {
           const relatedIssueReferences = issues.map((issue) => {
@@ -178,7 +188,7 @@ export default {
           this.store.setRelatedIssues(relatedIssueReferences);
         })
         .catch((err) => {
-          this.store.setRequestError('Error occurred while fetching related issues.');
+          this.store.setRequestError('An error occurred while fetching related issues.');
           throw err;
         });
     },
@@ -207,6 +217,9 @@ export default {
             fetchStatus: RelatedIssuesService.FETCHING_STATUS,
           });
 
+          // Reset request error
+          this.store.setRequestError(null);
+
           const referencePieces = getReferencePieces(reference);
           const baseIssueEndpoint = `/${referencePieces.namespace}/${referencePieces.project}/issues/${referencePieces.issue}`;
           RelatedIssuesService.fetchIssueInfo(`${baseIssueEndpoint}.json`)
@@ -219,7 +232,7 @@ export default {
               });
             })
             .catch((err) => {
-              this.store.setRequestError('Error occurred while fetching issue info.');
+              this.store.setRequestError('An error occurred while fetching issue info.');
               throw err;
             });
         }
