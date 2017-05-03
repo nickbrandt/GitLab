@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import RelatedIssuesRoot from '../issuable/related_issues/components/related_issues_root.vue';
+import RelatedIssuesRoot from './related_issues/components/related_issues_root.vue';
 import './time_tracking/time_tracking_bundle';
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -60,24 +60,6 @@ export default {
   },
 
   methods: {
-    bindEvents() {
-      eventHub.$on('relatedIssueRemoveRequest', this.onRelatedIssueRemoveRequest);
-      eventHub.$on('showAddRelatedIssuesForm', this.onShowAddRelatedIssuesForm);
-      eventHub.$on('addIssuableFormInput', this.onAddIssuableFormInput);
-      eventHub.$on('addIssuableFormBlur', this.onAddIssuableFormBlur);
-      eventHub.$on('addIssuableFormIssuableRemoveRequest', this.onAddIssuableFormIssuableRemoveRequest);
-      eventHub.$on('addIssuableFormSubmit', this.onAddIssuableFormSubmit);
-      eventHub.$on('addIssuableFormCancel', this.onAddIssuableFormCancel);
-    },
-    unbindEvents() {
-      eventHub.$off('relatedIssueRemoveRequest', this.onRelatedIssueRemoveRequest);
-      eventHub.$off('showAddRelatedIssuesForm', this.onShowAddRelatedIssuesForm);
-      eventHub.$off('addIssuableFormInput', this.onAddIssuableFormInput);
-      eventHub.$off('addIssuableFormBlur', this.onAddIssuableFormBlur);
-      eventHub.$off('addIssuableFormIssuableRemoveRequest', this.onAddIssuableFormIssuableRemoveRequest);
-      eventHub.$off('addIssuableFormSubmit', this.onAddIssuableFormSubmit);
-      eventHub.$off('addIssuableFormCancel', this.onAddIssuableFormCancel);
-    },
     onRelatedIssueRemoveRequest(reference) {
       const fullReference = assembleFullIssuableReference(
         reference,
@@ -246,20 +228,32 @@ export default {
   },
 
   created() {
-    this.service = new RelatedIssuesService(this.endpoint);
-    this.bindEvents();
+    eventHub.$on('relatedIssueRemoveRequest', this.onRelatedIssueRemoveRequest);
+    eventHub.$on('showAddRelatedIssuesForm', this.onShowAddRelatedIssuesForm);
+    eventHub.$on('addIssuableFormInput', this.onAddIssuableFormInput);
+    eventHub.$on('addIssuableFormBlur', this.onAddIssuableFormBlur);
+    eventHub.$on('addIssuableFormIssuableRemoveRequest', this.onAddIssuableFormIssuableRemoveRequest);
+    eventHub.$on('addIssuableFormSubmit', this.onAddIssuableFormSubmit);
+    eventHub.$on('addIssuableFormCancel', this.onAddIssuableFormCancel);
 
+    this.service = new RelatedIssuesService(this.endpoint);
     this.fetchRelatedIssues();
   },
 
   beforeDestroy() {
-    this.unbindEvents();
+    eventHub.$off('relatedIssueRemoveRequest', this.onRelatedIssueRemoveRequest);
+    eventHub.$off('showAddRelatedIssuesForm', this.onShowAddRelatedIssuesForm);
+    eventHub.$off('addIssuableFormInput', this.onAddIssuableFormInput);
+    eventHub.$off('addIssuableFormBlur', this.onAddIssuableFormBlur);
+    eventHub.$off('addIssuableFormIssuableRemoveRequest', this.onAddIssuableFormIssuableRemoveRequest);
+    eventHub.$off('addIssuableFormSubmit', this.onAddIssuableFormSubmit);
+    eventHub.$off('addIssuableFormCancel', this.onAddIssuableFormCancel);
   },
 };
 </script>
 
 <template>
-  <relatedIssuesBlock
+  <related-issues-block
     :related-issues="computedRelatedIssues"
     :request-error="requestError"
     :canAddRelatedIssues="canAddRelatedIssues"

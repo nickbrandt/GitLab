@@ -79,6 +79,7 @@ export default {
       </a>
       <button
         v-if="canRemove"
+        type="button"
         class="issue-token-remove-button has-tooltip"
         :title="removeButtonLabel"
         @click="onRemoveRequest">

@@ -13,10 +13,6 @@ class RelatedIssuesService {
     return issueResource.get()
       .then((res) => {
         const issue = res.json();
-        if (!issue) {
-          throw new Error('Response didn\'t return any issue data');
-        }
-
         return issue;
       });
   }
@@ -25,10 +21,6 @@ class RelatedIssuesService {
     return this.relatedIssuesResource.get()
       .then((res) => {
         const issues = res.json();
-        if (!issues) {
-          throw new Error('Response didn\'t return any issues data');
-        }
-
         return issues;
       });
   }
@@ -39,10 +31,6 @@ class RelatedIssuesService {
     })
       .then((res) => {
         const resData = res.json();
-        if (!resData) {
-          throw new Error('Response didn\'t return any data');
-        }
-
         return resData;
       });
   }
@@ -52,10 +40,6 @@ class RelatedIssuesService {
     return relatedIssueResource.remove()
       .then((res) => {
         const resData = res.json();
-        if (!resData) {
-          throw new Error('Response didn\'t return any data');
-        }
-
         return resData;
       });
   }

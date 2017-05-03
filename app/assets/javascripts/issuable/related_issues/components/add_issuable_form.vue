@@ -54,9 +54,12 @@ export default {
     new GfmAutoComplete(gl.GfmAutoComplete && gl.GfmAutoComplete.dataSources).setup($input, {
       issues: true,
     });
-    $input.on('inserted-issues.atwho', () => {
-      this.onInput();
-    });
+    $input.on('inserted-issues.atwho', this.onInput);
+  },
+
+  beforeDestroy() {
+    const $input = $(this.$refs.input);
+    $input.off('inserted-issues.atwho', this.onInput);
   },
 };
 </script>
@@ -69,14 +72,15 @@ export default {
       @click="onInputWrapperClick">
       <ul class="add-issuable-form-input-token-list">
         <li
+          :key="issuable.reference"
           v-for="issuable in pendingIssuables"
           class="add-issuable-form-input-token-list-item">
-          <issueToken
+          <issue-token
             :reference="issuable.reference"
             :title="issuable.title"
             :path="issuable.path"
             :state="issuable.state"
-            canRemove
+            :can-remove="true"
             @removeRequest="onPendingIssuableRemoveRequest(issuable.reference)" />
         </li>
         <li class="add-issuable-form-input-token-list-input-item">
@@ -93,11 +97,13 @@ export default {
     </div>
     <div class="clearfix prepend-top-10">
       <button
+        type="button"
         class="btn btn-new pull-left"
         @click="onFormSubmit">
         {{ addButtonLabel }}
       </button>
       <button
+        type="button"
         class="btn btn-default pull-right"
         @click="onFormCancel">
         Cancel

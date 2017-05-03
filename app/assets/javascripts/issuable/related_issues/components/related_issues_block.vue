@@ -97,8 +97,8 @@ export default {
             <button
               ref="issue-count-holder-add-button"
               v-if="canAddRelatedIssues"
-              class="issue-count-holder-add-button btn btn-small btn-default has-tooltip"
               type="button"
+              class="issue-count-holder-add-button btn btn-small btn-default has-tooltip"
               aria-label="Add an issue"
               title="Add an issue"
               data-placement="top"
@@ -112,7 +112,7 @@ export default {
         ref="related-issues-add-related-issues-form"
         v-if="isAddRelatedIssuesFormVisible"
         class="related-issues-add-related-issues-form panel-body">
-        <addIssuableForm
+        <add-issuable-form
           :input-value="addRelatedIssuesFormInputValue"
           :pending-issuables="pendingRelatedIssues"
           add-button-label="Add related issues" />
@@ -123,14 +123,15 @@ export default {
         <ul
           class="related-issues-token-body">
           <li
+            :key="issue.reference"
             v-for="issue in relatedIssues"
             class="related-issues-token-list-item">
-            <issueToken
+            <issue-token
               :reference="issue.reference"
               :title="issue.title"
               :path="issue.path"
               :state="issue.state"
-              :canRemove="issue.canRemove"
+              :can-remove="issue.canRemove"
               @removeRequest="onRelatedIssueRemoveRequest(issue.reference)" />
           </li>
         </ul>
