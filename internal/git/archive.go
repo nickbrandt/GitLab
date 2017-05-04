@@ -19,6 +19,8 @@ import (
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type archive struct{ senddata.Prefix }
@@ -29,7 +31,20 @@ type archiveParams struct {
 	CommitId      string
 }
 
-var SendArchive = &archive{"git-archive:"}
+var (
+	SendArchive     = &archive{"git-archive:"}
+	gitArchiveCache = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "gitlab_workhorse_git_archive_cache",
+			Help: "Cache hits and misses for 'git archive' streaming",
+		},
+		[]string{"result"},
+	)
+)
+
+func init() {
+	prometheus.MustRegister(gitArchiveCache)
+}
 
 func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
 	var params archiveParams
@@ -50,6 +65,7 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 
 	if cachedArchive, err := os.Open(params.ArchivePath); err == nil {
 		defer cachedArchive.Close()
+		gitArchiveCache.WithLabelValues("hit").Inc()
 		log.Printf("Serving cached file %q", params.ArchivePath)
 		setArchiveHeaders(w, format, archiveFilename)
 		// Even if somebody deleted the cachedArchive from disk since we opened
@@ -58,6 +74,8 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 		http.ServeContent(w, r, "", time.Unix(0, 0), cachedArchive)
 		return
 	}
+
+	gitArchiveCache.WithLabelValues("miss").Inc()
 
 	// We assume the tempFile has a unique name so that concurrent requests are
 	// safe. We create the tempfile in the same directory as the final cached
