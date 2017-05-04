@@ -2,6 +2,7 @@ package artifacts
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
@@ -17,7 +18,30 @@ import (
 
 type artifactsUploadProcessor struct {
 	TempPath     string
+	ObjectStore  api.RemoteObjectStore
 	metadataFile string
+	stored       bool
+}
+
+func (a *artifactsUploadProcessor) generateMetadataFromZip(fileName string, metadataFile io.Writer) (bool, error) {
+	// Generate metadata and save to file
+	zipMd := exec.Command("gitlab-zip-metadata", fileName)
+	zipMd.Stderr = os.Stderr
+	zipMd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	zipMd.Stdout = metadataFile
+
+	if err := zipMd.Start(); err != nil {
+		return false, err
+	}
+	defer helper.CleanUpProcessGroup(zipMd)
+	if err := zipMd.Wait(); err != nil {
+		if st, ok := helper.ExitStatus(err); ok && st == zipartifacts.StatusNotZip {
+			return false, nil
+		}
+		return false, err
+	}
+
+	return true, nil
 }
 
 func (a *artifactsUploadProcessor) ProcessFile(formName, fileName string, writer *multipart.Writer) error {
@@ -36,28 +60,23 @@ func (a *artifactsUploadProcessor) ProcessFile(formName, fileName string, writer
 		return err
 	}
 	defer tempFile.Close()
+
 	a.metadataFile = tempFile.Name()
 
-	// Generate metadata and save to file
-	zipMd := exec.Command("gitlab-zip-metadata", fileName)
-	zipMd.Stderr = os.Stderr
-	zipMd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	zipMd.Stdout = tempFile
-
-	if err := zipMd.Start(); err != nil {
-		return err
-	}
-	defer helper.CleanUpProcessGroup(zipMd)
-	if err := zipMd.Wait(); err != nil {
-		if st, ok := helper.ExitStatus(err); ok && st == zipartifacts.StatusNotZip {
-			return nil
-		}
-		return err
+	generatedMetadata, err := a.generateMetadataFromZip(fileName, tempFile)
+	if err != nil {
+		return fmt.Errorf("generateMetadataFromZip: %v", err)
 	}
 
-	// Pass metadata file path to Rails
-	writer.WriteField("metadata.path", a.metadataFile)
-	writer.WriteField("metadata.name", "metadata.gz")
+	if generatedMetadata {
+		// Pass metadata file path to Rails
+		writer.WriteField("metadata.path", a.metadataFile)
+		writer.WriteField("metadata.name", "metadata.gz")
+	}
+
+	if err := a.storeFile(formName, fileName, writer); err != nil {
+		return fmt.Errorf("storeFile: %v", err)
+	}
 	return nil
 }
 
@@ -86,7 +105,10 @@ func UploadArtifacts(myAPI *api.API, h http.Handler) http.Handler {
 			return
 		}
 
-		mg := &artifactsUploadProcessor{TempPath: a.TempPath}
+		mg := &artifactsUploadProcessor{
+			TempPath:    a.TempPath,
+			ObjectStore: a.ObjectStore,
+		}
 		defer mg.Cleanup()
 
 		upload.HandleFileUploads(w, r, h, a.TempPath, mg)
