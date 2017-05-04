@@ -16,10 +16,18 @@ var (
 		},
 		[]string{"name"},
 	)
+	sendDataResponseBytes = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "gitlab_workhorse_senddata_response_bytes",
+			Help: "How many bytes have been written by workhorse senddata response hijackers",
+		},
+		[]string{"name"},
+	)
 )
 
 func init() {
 	prometheus.MustRegister(sendDataResponses)
+	prometheus.MustRegister(sendDataResponseBytes)
 }
 
 type sendDataResponseWriter struct {
@@ -82,7 +90,9 @@ func (s *sendDataResponseWriter) tryInject() bool {
 			s.hijacked = true
 			sendDataResponses.WithLabelValues(injecter.Name()).Inc()
 			helper.DisableResponseBuffering(s.rw)
-			injecter.Inject(s.rw, s.req, header)
+			crw := helper.NewCountingResponseWriter(s.rw)
+			injecter.Inject(crw, s.req, header)
+			sendDataResponseBytes.WithLabelValues(injecter.Name()).Add(float64(crw.Count()))
 			return true
 		}
 	}
