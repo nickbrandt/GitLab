@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -42,39 +44,14 @@ func init() {
 }
 
 type GitHttpResponseWriter struct {
-	rw      http.ResponseWriter
-	status  int
-	written int64
+	helper.CountingResponseWriter
 }
 
 func NewGitHttpResponseWriter(rw http.ResponseWriter) *GitHttpResponseWriter {
 	gitHTTPSessionsActive.Inc()
 	return &GitHttpResponseWriter{
-		rw: rw,
+		CountingResponseWriter: helper.NewCountingResponseWriter(rw),
 	}
-}
-
-func (w *GitHttpResponseWriter) Header() http.Header {
-	return w.rw.Header()
-}
-
-func (w *GitHttpResponseWriter) Write(data []byte) (n int, err error) {
-	if w.status == 0 {
-		w.WriteHeader(http.StatusOK)
-	}
-
-	n, err = w.rw.Write(data)
-	w.written += int64(n)
-	return n, err
-}
-
-func (w *GitHttpResponseWriter) WriteHeader(status int) {
-	if w.status != 0 {
-		return
-	}
-
-	w.status = status
-	w.rw.WriteHeader(status)
 }
 
 func (w *GitHttpResponseWriter) Log(r *http.Request, writtenIn int64) {
@@ -82,11 +59,11 @@ func (w *GitHttpResponseWriter) Log(r *http.Request, writtenIn int64) {
 	agent := getRequestAgent(r)
 
 	gitHTTPSessionsActive.Dec()
-	gitHTTPRequests.WithLabelValues(r.Method, strconv.Itoa(w.status), service, agent).Inc()
-	gitHTTPBytes.WithLabelValues(r.Method, strconv.Itoa(w.status), service, agent, directionIn).
+	gitHTTPRequests.WithLabelValues(r.Method, strconv.Itoa(w.Status()), service, agent).Inc()
+	gitHTTPBytes.WithLabelValues(r.Method, strconv.Itoa(w.Status()), service, agent, directionIn).
 		Add(float64(writtenIn))
-	gitHTTPBytes.WithLabelValues(r.Method, strconv.Itoa(w.status), service, agent, directionOut).
-		Add(float64(w.written))
+	gitHTTPBytes.WithLabelValues(r.Method, strconv.Itoa(w.Status()), service, agent, directionOut).
+		Add(float64(w.Count()))
 }
 
 func getRequestAgent(r *http.Request) string {

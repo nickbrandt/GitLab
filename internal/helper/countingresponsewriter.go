@@ -7,6 +7,7 @@ import (
 type CountingResponseWriter interface {
 	http.ResponseWriter
 	Count() int64
+	Status() int
 }
 
 type countingResponseWriter struct {
@@ -42,6 +43,14 @@ func (c *countingResponseWriter) WriteHeader(status int) {
 	c.rw.WriteHeader(status)
 }
 
+// Count returns the number of bytes written to the ResponseWriter. This
+// function is not thread-safe.
 func (c *countingResponseWriter) Count() int64 {
 	return c.count
+}
+
+// Status returns the first HTTP status value that was written to the
+// ResponseWriter. This function is not thread-safe.
+func (c *countingResponseWriter) Status() int {
+	return c.status
 }
