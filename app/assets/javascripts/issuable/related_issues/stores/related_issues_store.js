@@ -7,7 +7,6 @@ class RelatedIssuesStore {
       relatedIssues: [],
       pendingRelatedIssues: [],
       requestError: null,
-      isAddRelatedIssuesFormVisible: false,
       addRelatedIssuesFormInputValue: '',
     }, initialState);
   }
@@ -53,10 +52,6 @@ class RelatedIssuesStore {
 
   setRequestError(value) {
     this.state.requestError = value;
-  }
-
-  setIsAddRelatedIssuesFormVisible(value) {
-    this.state.isAddRelatedIssuesFormVisible = value;
   }
 
   setAddRelatedIssuesFormInputValue(value) {

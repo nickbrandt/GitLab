@@ -35,7 +35,10 @@ export default {
   data() {
     this.store = new RelatedIssuesStore();
 
-    return this.store.state;
+    return {
+      state: this.store.state,
+      isAddRelatedIssuesFormVisible: false,
+    };
   },
 
   components: {
@@ -45,14 +48,14 @@ export default {
   computed: {
     computedRelatedIssues() {
       return this.store.getIssuesFromReferences(
-        this.relatedIssues,
+        this.state.relatedIssues,
         this.currentNamespacePath,
         this.currentProjectPath,
       );
     },
     computedPendingRelatedIssues() {
       return this.store.getIssuesFromReferences(
-        this.pendingRelatedIssues,
+        this.state.pendingRelatedIssues,
         this.currentNamespacePath,
         this.currentProjectPath,
       );
@@ -66,22 +69,24 @@ export default {
         this.currentNamespacePath,
         this.currentProjectPath,
       );
-      this.store.setRelatedIssues(this.relatedIssues.filter(ref => ref !== fullReference));
+      this.store.setRelatedIssues(this.state.relatedIssues.filter(ref => ref !== fullReference));
 
       // Reset request error
       this.store.setRequestError(null);
 
-      RelatedIssuesService.removeRelatedIssue(this.issueMap[fullReference].destroy_relation_path)
+      RelatedIssuesService.removeRelatedIssue(
+        this.state.issueMap[fullReference].destroy_relation_path,
+      )
         .catch((err) => {
           // Restore issue we were unable to delete
-          this.store.setRelatedIssues(this.relatedIssues.concat(fullReference));
+          this.store.setRelatedIssues(this.state.relatedIssues.concat(fullReference));
 
           this.store.setRequestError('An error occurred while removing related issues.');
           throw err;
         });
     },
     onShowAddRelatedIssuesForm() {
-      this.store.setIsAddRelatedIssuesFormVisible(true);
+      this.isAddRelatedIssuesFormVisible = true;
     },
     onAddIssuableFormInput(newValue, caretPos) {
       const rawReferences = newValue.split(/\s/);
@@ -102,7 +107,7 @@ export default {
       const results = this.processIssuableReferences(untouchedReferences);
       if (results.fullReferences.length > 0) {
         this.store.setPendingRelatedIssues(
-          _.uniq(this.pendingRelatedIssues.concat(results.fullReferences)),
+          _.uniq(this.state.pendingRelatedIssues.concat(results.fullReferences)),
         );
         this.store.setAddRelatedIssuesFormInputValue(`${results.unprocessableReferences.map(ref => `${ref} `).join('')}${touchedReference}`);
       }
@@ -111,7 +116,7 @@ export default {
       const rawReferences = newValue.split(/\s+/);
       const results = this.processIssuableReferences(rawReferences);
       this.store.setPendingRelatedIssues(
-        _.uniq(this.pendingRelatedIssues.concat(results.fullReferences)),
+        _.uniq(this.state.pendingRelatedIssues.concat(results.fullReferences)),
       );
       this.store.setAddRelatedIssuesFormInputValue(`${results.unprocessableReferences.join(' ')}`);
     },
@@ -122,22 +127,22 @@ export default {
         this.currentProjectPath,
       );
       this.store.setPendingRelatedIssues(
-        this.pendingRelatedIssues.filter(ref => ref !== fullReference),
+        this.state.pendingRelatedIssues.filter(ref => ref !== fullReference),
       );
     },
     onAddIssuableFormSubmit() {
       // Reset request error
       this.store.setRequestError(null);
 
-      const currentPendingIssues = this.pendingRelatedIssues;
+      const currentPendingIssues = this.state.pendingRelatedIssues;
       this.service.addRelatedIssues(currentPendingIssues)
         .then(() => {
-          this.store.setRelatedIssues(this.relatedIssues.concat(currentPendingIssues));
+          this.store.setRelatedIssues(this.state.relatedIssues.concat(currentPendingIssues));
         })
         .catch((err) => {
           // Restore issues we were unable to submit
           this.store.setPendingRelatedIssues(
-            _.uniq(this.pendingRelatedIssues.concat(currentPendingIssues)),
+            _.uniq(this.state.pendingRelatedIssues.concat(currentPendingIssues)),
           );
 
           this.store.setRequestError('An error occurred while submitting related issues.');
@@ -146,7 +151,7 @@ export default {
       this.store.setPendingRelatedIssues([]);
     },
     onAddIssuableFormCancel() {
-      this.store.setIsAddRelatedIssuesFormVisible(false);
+      this.isAddRelatedIssuesFormVisible = false;
       this.store.setPendingRelatedIssues([]);
       this.store.setAddRelatedIssuesFormInputValue('');
     },
@@ -193,7 +198,7 @@ export default {
 
       // Add some temporary placeholders to lookup
       fullReferences.forEach((reference) => {
-        if (!this.issueMap[reference]) {
+        if (!this.state.issueMap[reference]) {
           this.store.addToIssueMap(reference, {
             reference,
             fetchStatus: RelatedIssuesService.FETCHING_STATUS,
@@ -255,9 +260,9 @@ export default {
 <template>
   <related-issues-block
     :related-issues="computedRelatedIssues"
-    :request-error="requestError"
+    :request-error="state.requestError"
     :canAddRelatedIssues="canAddRelatedIssues"
     :is-add-related-issues-form-visible="isAddRelatedIssuesFormVisible"
     :pending-related-issues="computedPendingRelatedIssues"
-    :add-related-issues-form-input-value="addRelatedIssuesFormInputValue" />
+    :add-related-issues-form-input-value="state.addRelatedIssuesFormInputValue" />
 </template>
