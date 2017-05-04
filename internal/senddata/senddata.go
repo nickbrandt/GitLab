@@ -4,7 +4,23 @@ import (
 	"net/http"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
+
+var (
+	sendDataResponses = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "gitlab_workhorse_senddata_responses",
+			Help: "How many HTTP responses have been hijacked by a workhorse senddata injecter",
+		},
+		[]string{"name"},
+	)
+)
+
+func init() {
+	prometheus.MustRegister(sendDataResponses)
+}
 
 type sendDataResponseWriter struct {
 	rw        http.ResponseWriter
@@ -64,6 +80,7 @@ func (s *sendDataResponseWriter) tryInject() bool {
 	for _, injecter := range s.injecters {
 		if injecter.Match(header) {
 			s.hijacked = true
+			sendDataResponses.WithLabelValues(injecter.Name()).Inc()
 			helper.DisableResponseBuffering(s.rw)
 			injecter.Inject(s.rw, s.req, header)
 			return true

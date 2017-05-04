@@ -10,6 +10,7 @@ import (
 type Injecter interface {
 	Match(string) bool
 	Inject(http.ResponseWriter, *http.Request, string)
+	Name() string
 }
 
 type Prefix string
@@ -29,4 +30,8 @@ func (p Prefix) Unpack(result interface{}, sendData string) error {
 		return err
 	}
 	return nil
+}
+
+func (p Prefix) Name() string {
+	return strings.TrimSuffix(string(p), ":")
 }
