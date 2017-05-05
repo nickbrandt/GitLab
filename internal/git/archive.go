@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -66,7 +65,6 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 	if cachedArchive, err := os.Open(params.ArchivePath); err == nil {
 		defer cachedArchive.Close()
 		gitArchiveCache.WithLabelValues("hit").Inc()
-		log.Printf("Serving cached file %q", params.ArchivePath)
 		setArchiveHeaders(w, format, archiveFilename)
 		// Even if somebody deleted the cachedArchive from disk since we opened
 		// the file, Unix file semantics guarantee we can still read from the
