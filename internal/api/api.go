@@ -79,6 +79,9 @@ type Response struct {
 	// GL_ID is an environment variable used by gitlab-shell hooks during 'git
 	// push' and 'git pull'
 	GL_ID string
+	// GL_REPOSITORY is an environment variable used by gitlab-shell hooks during
+	// 'git push' and 'git pull'
+	GL_REPOSITORY string
 	// RepoPath is the full path on disk to the Git repository the request is
 	// about
 	RepoPath string
