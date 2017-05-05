@@ -14,14 +14,14 @@ var (
 			Name: "gitlab_workhorse_senddata_responses",
 			Help: "How many HTTP responses have been hijacked by a workhorse senddata injecter",
 		},
-		[]string{"name"},
+		[]string{"injecter"},
 	)
 	sendDataResponseBytes = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "gitlab_workhorse_senddata_response_bytes",
-			Help: "How many bytes have been written by workhorse senddata response hijackers",
+			Help: "How many bytes have been written by workhorse senddata response injecters",
 		},
-		[]string{"name"},
+		[]string{"injecter"},
 	)
 )
 
