@@ -88,10 +88,10 @@ func (s *sendDataResponseWriter) tryInject() bool {
 	for _, injecter := range s.injecters {
 		if injecter.Match(header) {
 			s.hijacked = true
-			sendDataResponses.WithLabelValues(injecter.Name()).Inc()
 			helper.DisableResponseBuffering(s.rw)
 			crw := helper.NewCountingResponseWriter(s.rw)
 			injecter.Inject(crw, s.req, header)
+			sendDataResponses.WithLabelValues(injecter.Name()).Inc()
 			sendDataResponseBytes.WithLabelValues(injecter.Name()).Add(float64(crw.Count()))
 			return true
 		}
