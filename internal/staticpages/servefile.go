@@ -70,7 +70,7 @@ func (s *Static) ServeExisting(prefix urlprefix.Prefix, cache CacheMode, notFoun
 			w.Header().Set("Expires", cacheUntil)
 		}
 
-		log.Printf("Send static file %q (%q) for %s %q", file, w.Header().Get("Content-Encoding"), r.Method, r.RequestURI)
+		log.Printf("Send static file %q (%q) for %s %q", file, w.Header().Get("Content-Encoding"), r.Method, helper.ScrubURLParams(r.RequestURI))
 		http.ServeContent(w, r, filepath.Base(file), fi.ModTime(), content)
 	})
 }
