@@ -109,8 +109,8 @@ func (l *loggingResponseWriter) Log(r *http.Request) {
 	duration := time.Since(l.started)
 	responseLogger.Printf("%s %s - - [%s] %q %d %d %q %q %f\n",
 		r.Host, r.RemoteAddr, l.started,
-		fmt.Sprintf("%s %s %s", r.Method, r.RequestURI, r.Proto),
-		l.status, l.written, r.Referer(), r.UserAgent(), duration.Seconds(),
+		fmt.Sprintf("%s %s %s", r.Method, ScrubURLParams(r.RequestURI), r.Proto),
+		l.status, l.written, ScrubURLParams(r.Referer()), r.UserAgent(), duration.Seconds(),
 	)
 
 	sessionsActive.Dec()

@@ -11,11 +11,14 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 	"syscall"
 )
 
 const NginxResponseBufferHeader = "X-Accel-Buffering"
+
+var scrubRegexp = regexp.MustCompile(`([\?&](?:private|authenticity|rss)[\-_]token)=[^&]*`)
 
 func Fail500(w http.ResponseWriter, r *http.Request, err error) {
 	http.Error(w, "Internal server error", 500)
@@ -42,7 +45,7 @@ func RequestEntityTooLarge(w http.ResponseWriter, r *http.Request, err error) {
 
 func printError(r *http.Request, err error) {
 	if r != nil {
-		log.Printf("error: %s %q: %v", r.Method, r.RequestURI, err)
+		log.Printf("error: %s %q: %v", r.Method, ScrubURLParams(r.RequestURI), err)
 	} else {
 		log.Printf("error: %v", err)
 	}
@@ -187,4 +190,10 @@ func CloneRequestWithNewBody(r *http.Request, body []byte) *http.Request {
 	newReq.Header = HeaderClone(r.Header)
 	newReq.ContentLength = int64(len(body))
 	return &newReq
+}
+
+// ScrubURLParams replaces the content of any sensitive query string parameters
+// in an URL with `[FILTERED]`
+func ScrubURLParams(url string) string {
+	return scrubRegexp.ReplaceAllString(url, "$1=[FILTERED]")
 }

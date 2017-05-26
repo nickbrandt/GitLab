@@ -110,3 +110,25 @@ func TestFail500WorksWithNils(t *testing.T) {
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
 	assert.Equal(t, "Internal server error\n", body.String())
 }
+
+func TestScrubURLParams(t *testing.T) {
+	for before, expected := range map[string]string{
+		"http://example.com":                                                "http://example.com",
+		"http://example.com?foo=1":                                          "http://example.com?foo=1",
+		"http://example.com?authenticity_token=1":                           "http://example.com?authenticity_token=[FILTERED]",
+		"http://example.com?private_token=1":                                "http://example.com?private_token=[FILTERED]",
+		"http://example.com?rss_token=1":                                    "http://example.com?rss_token=[FILTERED]",
+		"http://example.com?foo&authenticity_token=blahblah&bar":            "http://example.com?foo&authenticity_token=[FILTERED]&bar",
+		"http://example.com?private-token=1":                                "http://example.com?private-token=[FILTERED]",
+		"http://example.com?foo&private-token=blahblah&bar":                 "http://example.com?foo&private-token=[FILTERED]&bar",
+		"http://example.com?private-token=foo&authenticity_token=bar":       "http://example.com?private-token=[FILTERED]&authenticity_token=[FILTERED]",
+		"https://example.com:8080?private-token=foo&authenticity_token=bar": "https://example.com:8080?private-token=[FILTERED]&authenticity_token=[FILTERED]",
+		"/?private-token=foo&authenticity_token=bar":                        "/?private-token=[FILTERED]&authenticity_token=[FILTERED]",
+		"?private-token=&authenticity_token=&bar":                           "?private-token=[FILTERED]&authenticity_token=[FILTERED]&bar",
+		"?private-token=foo&authenticity_token=bar":                         "?private-token=[FILTERED]&authenticity_token=[FILTERED]",
+		"?private_token=foo&authenticity-token=bar":                         "?private_token=[FILTERED]&authenticity-token=[FILTERED]",
+	} {
+		after := ScrubURLParams(before)
+		assert.Equal(t, expected, after, "Scrubbing %q", before)
+	}
+}

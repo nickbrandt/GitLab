@@ -104,7 +104,7 @@ func (s *sendFileResponseWriter) WriteHeader(status int) {
 }
 
 func sendFileFromDisk(w http.ResponseWriter, r *http.Request, file string) {
-	log.Printf("Send file %q for %s %q", file, r.Method, r.RequestURI)
+	log.Printf("Send file %q for %s %q", file, r.Method, helper.ScrubURLParams(r.RequestURI))
 	content, fi, err := helper.OpenFile(file)
 	if err != nil {
 		http.NotFound(w, r)
