@@ -56,7 +56,7 @@ section.settings {
     &.expanded {
       max-height: none;
       overflow-y: hidden;
-      animation: expandMaxHeight 300ms ease-out;
+      animation: expandMaxHeight 300ms ease-in;
     }
 
     &.no-animate {
