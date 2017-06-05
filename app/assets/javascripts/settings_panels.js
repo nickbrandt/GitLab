@@ -1,6 +1,6 @@
 function expandSection($section) {
   $section.find('.js-settings-toggle').text('Close');
-  $section.find('.settings-content').removeClass('no-animate').addClass('expanded').off('scroll');
+  $section.find('.settings-content').addClass('expanded').off('scroll');
 }
 
 function closeSection($section) {
@@ -9,7 +9,9 @@ function closeSection($section) {
 }
 
 function toggleSection($section) {
-  if ($section.find('.settings-content').hasClass('expanded')) {
+  const $content = $section.find('.settings-content');
+  $content.removeClass('no-animate');
+  if ($content.hasClass('expanded')) {
     closeSection($section);
   } else {
     expandSection($section);
@@ -20,6 +22,6 @@ export default function initSettingsPanels() {
   $('.settings').each((i, elm) => {
     const $section = $(elm);
     $section.on('click', '.js-settings-toggle', () => toggleSection($section));
-    closeSection($section);
+    $section.find('.settings-content').on('scroll', () => expandSection($section));
   });
 }
