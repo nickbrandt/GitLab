@@ -1,12 +1,13 @@
+- expanded = Rails.env.test?
 %section.settings
   .settings-header
     %h4
       Push Rules
     %button.btn.js-settings-toggle
-      Expand
+      = expanded ? 'Close' : 'Expand'
     %p
       Push Rules outline what is accepted for this project.
-  .settings-content.no-animate
+  .settings-content.no-animate{ class: ('expanded' if expanded) }
     %h5
       Add new push rule
     = form_for [@project.namespace.becomes(Namespace), @project, @push_rule] do |f|
