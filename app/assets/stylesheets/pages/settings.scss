@@ -61,7 +61,7 @@
   }
 
   &.no-animate {
-    animation: none !important;
+    animation: none;
   }
 
   @media(max-width: $screen-sm-max) {
