@@ -1,6 +1,6 @@
 function expandSection($section) {
   $section.find('.js-settings-toggle').text('Close');
-  $section.find('.settings-content').addClass('expanded').off('scroll');
+  $section.find('.settings-content').addClass('expanded').off('scroll').scrollTop(0);
 }
 
 function closeSection($section) {

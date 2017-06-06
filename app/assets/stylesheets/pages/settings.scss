@@ -67,6 +67,22 @@
   @media(max-width: $screen-sm-max) {
     padding-right: 20px;
   }
+
+  &::before {
+    content: ' ';
+    display: block;
+    height: 1px;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+
+  &::after {
+    content: ' ';
+    display: block;
+    height: 1px;
+    overflow: hidden;
+    margin-top: 20px;
+  }
 }
 
 .settings-list-icon {
