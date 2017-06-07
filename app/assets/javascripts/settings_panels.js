@@ -22,6 +22,6 @@ export default function initSettingsPanels() {
   $('.settings').each((i, elm) => {
     const $section = $(elm);
     $section.on('click', '.js-settings-toggle', () => toggleSection($section));
-    $section.find('.settings-content').on('scroll', () => expandSection($section));
+    $section.find('.settings-content:not(.expanded)').on('scroll', () => expandSection($section));
   });
 }
