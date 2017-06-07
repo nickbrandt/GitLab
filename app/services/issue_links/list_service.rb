@@ -10,11 +10,9 @@ module IssueLinks
       issues.map do |referenced_issue|
         {
           id: referenced_issue.id,
-          iid: referenced_issue.iid,
           title: referenced_issue.title,
           state: referenced_issue.state,
-          project_path: referenced_issue.project.path,
-          namespace_full_path: referenced_issue.project.namespace.full_path,
+          reference: referenced_issue.to_reference(@project),
           path: namespace_project_issue_path(referenced_issue.project.namespace, referenced_issue.project, referenced_issue.iid),
           destroy_relation_path: destroy_relation_path(referenced_issue)
         }
