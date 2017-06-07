@@ -2,7 +2,7 @@
 - content_for :page_specific_javascripts do
   = page_specific_javascript_bundle_tag('protected_tags')
 
-%section.settings
+%section.settings.js-protected-tags-container{ data: { "groups-autocomplete" => "#{autocomplete_project_groups_path(format: :json)}", "users-autocomplete" => "#{autocomplete_users_path(format: :json)}" } }
   .settings-header
     %h4
       Protected Tags
@@ -18,7 +18,7 @@
         %li Prevent <strong>anyone</strong> from updating the tag
         %li Prevent <strong>anyone</strong> from deleting the tag
 
-    %p.append-bottom-0 Read more about #{link_to "protected tags", help_page_path("user/project/protected_tags"), class: "underlined-link"}.
+    %p Read more about #{link_to "protected tags", help_page_path("user/project/protected_tags"), class: "underlined-link"}.
 
     - if can? current_user, :admin_project, @project
       = render 'projects/protected_tags/create_protected_tag'
