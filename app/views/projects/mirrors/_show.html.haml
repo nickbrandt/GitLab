@@ -47,7 +47,6 @@
       - if @project.builds_enabled?
         = render "shared/mirror_trigger_builds_setting", f: f
       = f.submit 'Save changes', class: 'btn btn-create', name: 'update_remote_mirror'
-    &nbsp;
 
 %section.settings
   .settings-header
@@ -86,4 +85,3 @@
           = rm_form.text_field :url, class: "form-control", placeholder: 'https://username:password@gitlab.company.com/group/project.git'
           = render "projects/mirrors/instructions"
         = f.submit 'Save changes', class: 'btn btn-create', name: 'update_remote_mirror'
-      %div &nbsp;
