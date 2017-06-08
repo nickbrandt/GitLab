@@ -3,7 +3,6 @@ package staticpages
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"path/filepath"
 
@@ -45,7 +44,6 @@ func (s *errorPageResponseWriter) WriteHeader(status int) {
 		if data, err := ioutil.ReadFile(errorPageFile); err == nil {
 			s.hijacked = true
 
-			log.Printf("ErrorPage: serving predefined error page: %d", s.status)
 			helper.SetNoCacheHeaders(s.rw.Header())
 			s.rw.Header().Set("Content-Type", "text/html; charset=utf-8")
 			s.rw.WriteHeader(s.status)
