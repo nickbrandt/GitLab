@@ -46,6 +46,8 @@ func (s *errorPageResponseWriter) WriteHeader(status int) {
 
 			helper.SetNoCacheHeaders(s.rw.Header())
 			s.rw.Header().Set("Content-Type", "text/html; charset=utf-8")
+			s.rw.Header().Set("Content-Length", fmt.Sprintf("%d", len(data)))
+			s.rw.Header().Del("Transfer-Encoding")
 			s.rw.WriteHeader(s.status)
 			s.rw.Write(data)
 			return
