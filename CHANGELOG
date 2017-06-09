@@ -2,6 +2,9 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v2.1.1
+- Bug fix and counters for static error pages
+
 v2.1.0
 - Remove chatty ErrorPage log message
 - Filter query-string secrets out of logged URLs
