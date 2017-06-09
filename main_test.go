@@ -293,6 +293,35 @@ func TestDeniedPublicUploadsFile(t *testing.T) {
 	}
 }
 
+func TestStaticErrorPage(t *testing.T) {
+	errorPageBody := `<html>
+<body>
+This is a static error page for code 499
+</body>
+</html>
+`
+	require.NoError(t, setupStaticFile("499.html", errorPageBody))
+	ts := testhelper.TestServerWithHandler(nil, func(w http.ResponseWriter, _ *http.Request) {
+		upstreamError := "499"
+		// This is the point of the test: the size of the upstream response body
+		// should be overridden.
+		require.NotEqual(t, len(upstreamError), len(errorPageBody))
+		w.WriteHeader(499)
+		_, err := w.Write([]byte(upstreamError))
+		require.NoError(t, err)
+	})
+	defer ts.Close()
+
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	resourcePath := "/error-499"
+	resp, body := httpGet(t, ws.URL+resourcePath)
+
+	assert.Equal(t, 499, resp.StatusCode, "GET %q: status code", resourcePath)
+	assert.Equal(t, string(errorPageBody), body, "GET %q: response body", resourcePath)
+}
+
 var sendDataHeader = "Gitlab-Workhorse-Send-Data"
 
 func sendDataResponder(command string, literalJSON string) *httptest.Server {

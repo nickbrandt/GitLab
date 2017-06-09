@@ -7,7 +7,23 @@ import (
 	"path/filepath"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
+
+var (
+	staticErrorResponses = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "gitlab_workhorse_static_error_responses",
+			Help: "How many HTTP responses have been changed to a static error page, by HTTP status code.",
+		},
+		[]string{"code"},
+	)
+)
+
+func init() {
+	prometheus.MustRegister(staticErrorResponses)
+}
 
 type errorPageResponseWriter struct {
 	rw       http.ResponseWriter
@@ -43,9 +59,12 @@ func (s *errorPageResponseWriter) WriteHeader(status int) {
 		// check if custom error page exists, serve this page instead
 		if data, err := ioutil.ReadFile(errorPageFile); err == nil {
 			s.hijacked = true
+			staticErrorResponses.WithLabelValues(fmt.Sprintf("%d", s.status)).Inc()
 
 			helper.SetNoCacheHeaders(s.rw.Header())
 			s.rw.Header().Set("Content-Type", "text/html; charset=utf-8")
+			s.rw.Header().Set("Content-Length", fmt.Sprintf("%d", len(data)))
+			s.rw.Header().Del("Transfer-Encoding")
 			s.rw.WriteHeader(s.status)
 			s.rw.Write(data)
 			return
