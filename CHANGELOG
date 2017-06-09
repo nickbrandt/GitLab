@@ -2,6 +2,13 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v2.1.0
+- Remove chatty ErrorPage log message
+- Filter query-string secrets out of logged URLs
+- Suggest better default for prometheus port
+- Add internal upload to external storage
+- Prometheus metrics for senddata and git archive cache
+
 v2.0.1
 - Support GL_REPOSITORY from API and pass it to Gitaly on ReceivePack
 
