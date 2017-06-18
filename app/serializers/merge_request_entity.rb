@@ -214,6 +214,11 @@ class MergeRequestEntity < IssuableEntity
     end
   end
 
+  # EE-specific
+  expose :approvals do |merge_request, options|
+    MergeRequestApprovalsEntity.represent merge_request, options
+  end
+
   private
 
   delegate :current_user, to: :request

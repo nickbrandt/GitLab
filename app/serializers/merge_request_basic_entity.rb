@@ -9,4 +9,9 @@ class MergeRequestBasicEntity < Grape::Entity
   expose :human_time_estimate
   expose :human_total_time_spent
   expose :rebase_in_progress?, as: :rebase_in_progress
+
+  # EE-specific
+  expose :approvals do |merge_request, options|
+    MergeRequestApprovalsEntity.represent merge_request, options
+  end
 end

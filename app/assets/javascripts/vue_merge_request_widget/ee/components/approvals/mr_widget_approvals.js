@@ -15,39 +15,15 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      fetchingApprovals: true,
-    };
-  },
   components: {
     'approvals-body': ApprovalsBody,
     'approvals-footer': ApprovalsFooter,
-  },
-  created() {
-    const flashErrorMessage = 'An error occured while retrieving approval data for this merge request.';
-
-    this.service.fetchApprovals()
-      .then((data) => {
-        this.mr.setApprovals(data);
-        this.fetchingApprovals = false;
-      })
-      .catch(() => new Flash(flashErrorMessage));
   },
   template: `
     <div
       v-if="mr.approvalsRequired"
       class="mr-widget-approvals-container mr-widget-body">
       <div
-        v-show="fetchingApprovals"
-        class="mr-approvals-loading-state">
-        <span class="approvals-loading-text bold">
-          Checking approval status for this merge request.
-        </span>
-        <i class="fa fa-spinner fa-spin" />
-      </div>
-      <div
-        v-if="!fetchingApprovals"
         class="approvals-components">
         <approvals-body
           :mr="mr"
@@ -68,4 +44,3 @@ export default {
     </div>
     `,
 };
-
