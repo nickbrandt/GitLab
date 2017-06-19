@@ -144,6 +144,14 @@
 			"versionExact": "v0.9.0"
 		},
 		{
+			"checksumSHA1": "dUHJbKas746n5fLzlwxHb6FOCxs=",
+			"path": "gitlab.com/gitlab-org/gitaly/auth",
+			"revision": "b933e5ce4843ec6c332a0184afb8e69820cc9050",
+			"revisionTime": "2017-06-22T09:36:09Z",
+			"version": "v0.13.0",
+			"versionExact": "v0.13.0"
+		},
+		{
 			"checksumSHA1": "9jjO5GjLa0XF/nfWihF02RoH4qc=",
 			"path": "golang.org/x/net/context",
 			"revision": "f2499483f923065a842d38eb4c7f1927e6fc6e6d"

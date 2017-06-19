@@ -9,6 +9,7 @@ import (
 	"time"
 
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+	"gitlab.com/gitlab-org/gitaly/auth"
 	"google.golang.org/grpc"
 )
 
@@ -19,15 +20,15 @@ type Server struct {
 
 type connectionsCache struct {
 	sync.RWMutex
-	connections map[string]*grpc.ClientConn
+	connections map[Server]*grpc.ClientConn
 }
 
 var cache = connectionsCache{
-	connections: make(map[string]*grpc.ClientConn),
+	connections: make(map[Server]*grpc.ClientConn),
 }
 
 func NewSmartHTTPClient(server Server) (*SmartHTTPClient, error) {
-	conn, err := getOrCreateConnection(server.Address)
+	conn, err := getOrCreateConnection(server)
 	if err != nil {
 		return nil, err
 	}
@@ -35,20 +36,20 @@ func NewSmartHTTPClient(server Server) (*SmartHTTPClient, error) {
 	return &SmartHTTPClient{grpcClient}, nil
 }
 
-func getOrCreateConnection(address string) (*grpc.ClientConn, error) {
+func getOrCreateConnection(server Server) (*grpc.ClientConn, error) {
 	cache.Lock()
 	defer cache.Unlock()
 
-	if conn := cache.connections[address]; conn != nil {
+	if conn := cache.connections[server]; conn != nil {
 		return conn, nil
 	}
 
-	conn, err := newConnection(address)
+	conn, err := newConnection(server)
 	if err != nil {
 		return nil, err
 	}
 
-	cache.connections[address] = conn
+	cache.connections[server] = conn
 
 	return conn, nil
 }
@@ -62,8 +63,8 @@ func CloseConnections() {
 	}
 }
 
-func newConnection(rawAddress string) (*grpc.ClientConn, error) {
-	network, addr, err := parseAddress(rawAddress)
+func newConnection(server Server) (*grpc.ClientConn, error) {
+	network, addr, err := parseAddress(server.Address)
 	if err != nil {
 		return nil, err
 	}
@@ -73,6 +74,7 @@ func newConnection(rawAddress string) (*grpc.ClientConn, error) {
 		grpc.WithDialer(func(a string, _ time.Duration) (net.Conn, error) {
 			return net.Dial(network, a)
 		}),
+		grpc.WithPerRPCCredentials(gitalyauth.RPCCredentials(server.Token)),
 	}
 	conn, err := grpc.Dial(addr, connOpts...)
 	if err != nil {
