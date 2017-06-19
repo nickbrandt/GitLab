@@ -108,7 +108,7 @@ type Response struct {
 	// DEPRECATED. GitalyAddress is a unix:// or tcp:// address to reach a Gitaly service on
 	GitalyAddress string
 	// GitalyServer specifies an address and authentication token for a gitaly server we should connect to.
-	GitalyServer gitaly.Server `json:"gitaly_server"`
+	GitalyServer gitaly.Server
 	// Repository object for making gRPC requests to Gitaly. This will
 	// eventually replace the RepoPath field.
 	Repository pb.Repository
