@@ -12,6 +12,11 @@ import (
 	"google.golang.org/grpc"
 )
 
+type Server struct {
+	Address string `json:"address"`
+	Token   string `json:"token"`
+}
+
 type connectionsCache struct {
 	sync.RWMutex
 	connections map[string]*grpc.ClientConn
@@ -21,8 +26,8 @@ var cache = connectionsCache{
 	connections: make(map[string]*grpc.ClientConn),
 }
 
-func NewSmartHTTPClient(address string) (*SmartHTTPClient, error) {
-	conn, err := getOrCreateConnection(address)
+func NewSmartHTTPClient(server Server) (*SmartHTTPClient, error) {
+	conn, err := getOrCreateConnection(server.Address)
 	if err != nil {
 		return nil, err
 	}
