@@ -11,6 +11,7 @@ import (
 
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
 
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 )
@@ -22,6 +23,7 @@ type GitalyTestServer struct {
 
 var (
 	GitalyInfoRefsResponseMock    = strings.Repeat("Mock Gitaly InfoRefsResponse data", 100000)
+	GitalyTreeEntryResponseMock   = strings.Repeat("Mock Gitaly TreeEntryResponse data", 100000)
 	GitalyReceivePackResponseMock []byte
 	GitalyUploadPackResponseMock  []byte
 )
@@ -160,6 +162,46 @@ func (s *GitalyTestServer) PostUploadPack(stream pb.SmartHTTP_PostUploadPackServ
 		return stream.Send(&pb.PostUploadPackResponse{Data: p})
 	})
 
+	if nSends <= 1 {
+		panic("should have sent more than one message")
+	}
+
+	return s.finalError()
+}
+
+func (s *GitalyTestServer) CommitIsAncestor(ctx context.Context, in *pb.CommitIsAncestorRequest) (*pb.CommitIsAncestorResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) TreeEntry(in *pb.TreeEntryRequest, stream pb.Commit_TreeEntryServer) error {
+	s.WaitGroup.Add(1)
+	defer s.WaitGroup.Done()
+
+	if err := validateRepository(in.GetRepository()); err != nil {
+		return err
+	}
+
+	response := &pb.TreeEntryResponse{
+		Type: pb.TreeEntryResponse_BLOB,
+		Oid:  "deadfacedeadfacedeadfacedeadfacedeadface",
+		Size: int64(len(GitalyTreeEntryResponseMock)),
+		Mode: 0100644,
+	}
+	nSends, err := sendBytes([]byte(GitalyTreeEntryResponseMock), 100, func(p []byte) error {
+		response.Data = p
+
+		if err := stream.Send(response); err != nil {
+			return err
+		}
+
+		// Use a new response so we don't send other fields (Size, ...) over and over
+		response = &pb.TreeEntryResponse{}
+
+		return nil
+	})
+	if err != nil {
+		return err
+	}
 	if nSends <= 1 {
 		panic("should have sent more than one message")
 	}
