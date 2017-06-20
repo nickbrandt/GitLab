@@ -668,7 +668,6 @@ func gitOkBody(t *testing.T) *api.Response {
 		GL_ID:    "user-123",
 		RepoPath: repoPath,
 		Repository: pb.Repository{
-			Path:         repoPath,
 			StorageName:  "default",
 			RelativePath: "foo/bar.git",
 		},

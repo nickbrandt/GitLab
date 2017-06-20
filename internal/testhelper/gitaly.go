@@ -94,7 +94,6 @@ func (s *GitalyTestServer) PostReceivePack(stream pb.SmartHTTP_PostReceivePackSe
 	}
 
 	data := []byte(strings.Join([]string{
-		repo.GetPath(),
 		repo.GetStorageName(),
 		repo.GetRelativePath(),
 		req.GlId,
@@ -140,7 +139,6 @@ func (s *GitalyTestServer) PostUploadPack(stream pb.SmartHTTP_PostUploadPackServ
 	}
 
 	data := []byte(strings.Join([]string{
-		repo.GetPath(),
 		repo.GetStorageName(),
 		repo.GetRelativePath(),
 	}, "\000") + "\000")
@@ -196,9 +194,6 @@ func (s *GitalyTestServer) finalError() error {
 }
 
 func validateRepository(repo *pb.Repository) error {
-	if len(repo.GetPath()) == 0 {
-		return fmt.Errorf("missing path: %v", repo)
-	}
 	if len(repo.GetStorageName()) == 0 {
 		return fmt.Errorf("missing storage_name: %v", repo)
 	}

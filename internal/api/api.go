@@ -228,13 +228,6 @@ func (api *API) PreAuthorize(suffix string, r *http.Request) (httpResponse *http
 		return httpResponse, nil, fmt.Errorf("preAuthorizeHandler: decode authorization response: %v", err)
 	}
 
-	// This is for backwards compatiblity, can be depracated when Rails
-	// always sends a 'Repository' message. For the time being we cannot
-	// count on this, so we put some minimal data in the Repository struct.
-	if authResponse.Repository.Path == "" {
-		authResponse.Repository.Path = authResponse.RepoPath
-	}
-
 	return httpResponse, authResponse, nil
 }
 
