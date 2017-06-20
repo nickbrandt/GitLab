@@ -126,7 +126,6 @@ func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
 	)
 
 	expectedBody := strings.Join([]string{
-		apiResponse.RepoPath,
 		apiResponse.Repository.StorageName,
 		apiResponse.Repository.RelativePath,
 		apiResponse.GL_ID,
@@ -201,7 +200,6 @@ func TestPostUploadPackProxiedToGitalySuccessfully(t *testing.T) {
 			)
 
 			expectedBody := strings.Join([]string{
-				apiResponse.RepoPath,
 				apiResponse.Repository.StorageName,
 				apiResponse.Repository.RelativePath,
 				string(testhelper.GitalyUploadPackResponseMock),
