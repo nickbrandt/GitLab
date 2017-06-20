@@ -1,37 +1,27 @@
 require 'spec_helper'
 
 describe MergeRequestApprovalsEntity do
-  let(:project)  { create :empty_project }
-  let(:resource) { create(:merge_request, source_project: project, target_project: project) }
+  let(:project)  { create(:empty_project, approvals_before_merge: 2) }
   let(:user)     { create(:user) }
-
+  let(:other_user)     { create(:user) }
+  let(:resource) { create(:merge_request, source_project: project) }
   let(:request) { double('request', current_user: user) }
 
-  subject do
-    described_class.new(resource, request: request).as_json
+  subject(:entity) { described_class.new(resource, request: request).as_json }
+
+  before do
+    project.add_master(user)
+
+    resource.approvals.create(user: user)
+    resource.approvers.create(user: other_user)
   end
 
-  it 'exposes approvals_required' do
-    expect(subject[:approvals_required]).to be_a(Numeric)
-  end
-
-  it 'exposes approvals_left' do
-    expect(subject[:approvals_left]).to be_a(Numeric)
-  end
-
-  it 'exposes approved_by' do
-    expect(subject[:approved_by]).to be_a(Array)
-  end
-
-  it 'exposes suggested_approvers' do
-    expect(subject[:suggested_approvers]).to be_a(Array)
-  end
-
-  it 'exposes user_can_approve' do
-    expect(subject[:user_can_approve]).to be(resource.can_approve?(user))
-  end
-
-  it 'exposes user_has_approved' do
-    expect(subject[:user_has_approved]).to be(resource.has_approved?(user))
+  it 'exposes approvals properties' do
+    expect(entity[:approvals_required]).to eq(2)
+    expect(entity[:approvals_left]).to eq(1)
+    expect(entity[:approved_by].to_json).to eq([user: UserEntity.represent(user)].to_json)
+    expect(entity[:suggested_approvers].to_json).to eq([UserEntity.represent(other_user)].to_json)
+    expect(entity[:user_can_approve]).to eq(resource.can_approve?(user))
+    expect(entity[:user_has_approved]).to eq(resource.has_approved?(user))
   end
 end
