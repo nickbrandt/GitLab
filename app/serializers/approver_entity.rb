@@ -1,3 +1,3 @@
-class ApproversEntity < Grape::Entity
+class ApproverEntity < Grape::Entity
   expose :user, using: UserEntity
 end

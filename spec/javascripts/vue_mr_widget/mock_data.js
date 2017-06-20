@@ -275,3 +275,42 @@ export const baseIssues = [
     "fingerprint": "ca2354534dee94ae60ba2f54e3857c50e5",
   }
 ]
+
+export const approvalsData = {
+  current_user: {},
+  approvals_path: '/approvals',
+  approvals: {
+    approvals_required: 2,
+    approvals_left: 0,
+    approved_by: [
+      {
+        user: {
+          id: 1,
+          avatar_url: '/approver_avatar_url',
+          name: 'one',
+          web_url: '/approver_web_url',
+        },
+      },
+      {
+        user: {
+          id: 2,
+          avatar_url: '/approver_avatar_url',
+          name: 'two',
+          web_url: '/approver_web_url',
+        },
+      },
+    ],
+    suggested_approvers: [
+      {
+        id: 1,
+        avatar_url: '/suggested_avatar_url',
+      },
+      {
+        id: 2,
+        avatar_url: '/suggested_avatar_url',
+      },
+    ],
+    user_can_approve: true,
+    user_has_approved: true,
+  },
+};

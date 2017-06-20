@@ -3,7 +3,7 @@ class MergeRequestApprovalsEntity < Grape::Entity
 
   expose :approvals_required
   expose :approvals_left
-  expose :approvals, as: :approved_by, using: ApproversEntity
+  expose :approvals, as: :approved_by, using: ApproverEntity
   expose :approvers_left, as: :suggested_approvers, using: UserEntity
 
   expose :user_can_approve do |merge_request, options|

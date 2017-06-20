@@ -13,7 +13,7 @@ class Projects::MergeRequestsController < Projects::ApplicationController
     :pipeline_status, :ci_environments_status, :toggle_subscription, :cancel_merge_when_pipeline_succeeds,
     :remove_wip, :resolve_conflicts, :assign_related_issues, :commit_change_content,
     # EE
-    :approve, :approvals, :unapprove, :rebase
+    :approve, :unapprove, :rebase
   ]
   before_action :validates_merge_request, only: [:show, :diffs, :commits, :pipelines]
   before_action :define_show_vars, only: [:diffs, :commits, :conflicts, :conflict_for_path, :builds, :pipelines]
@@ -463,10 +463,6 @@ class Projects::MergeRequestsController < Projects::ApplicationController
       .new(project, current_user)
       .execute(@merge_request)
 
-    render_approvals_json
-  end
-
-  def approvals
     render_approvals_json
   end
 

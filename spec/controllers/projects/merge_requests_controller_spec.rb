@@ -190,28 +190,6 @@ describe Projects::MergeRequestsController do
       end
     end
 
-    describe 'approvals' do
-      before do
-        merge_request.approvals.create(user: approver)
-        get :approvals,
-          namespace_id: project.namespace.to_param,
-          project_id: project.to_param,
-          id: merge_request.iid,
-          format: :json
-      end
-
-      it 'shows approval information' do
-        expect(response).to be_success
-        expect(json_response['approvals_left']).to eq 1
-        expect(json_response['approved_by'].size).to eq 1
-        expect(json_response['approved_by'][0]['user']['username']).to eq approver.username
-        expect(json_response['user_has_approved']).to be false
-        expect(json_response['user_can_approve']).to be true
-        expect(json_response['suggested_approvers'].size).to eq 1
-        expect(json_response['suggested_approvers'][0]['username']).to eq user.username
-      end
-    end
-
     describe 'unapprove' do
       before do
         merge_request.approvals.create(user: user)

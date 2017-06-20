@@ -162,4 +162,12 @@ describe MergeRequestEntity do
       expect(entity[:rebase_path]).to be_nil
     end
   end
+
+  it 'exposes approvals' do
+    approvals = MergeRequestApprovalsEntity
+      .represent(resource, request: request)
+      .as_json
+
+    expect(subject[:approvals]).to eq(approvals)
+  end
 end

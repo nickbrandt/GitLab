@@ -10,11 +10,6 @@ export default class MRWidgetService extends CEWidgetService {
     this.rebaseResource = Vue.resource(mr.rebasePath);
   }
 
-  fetchApprovals() {
-    return this.approvalsResource.get()
-      .then(res => res.json());
-  }
-
   approveMergeRequest() {
     return this.approvalsResource.save()
       .then(res => res.json());
