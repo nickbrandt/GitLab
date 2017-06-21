@@ -196,7 +196,10 @@ class License < ActiveRecord::Base
     end
 
     def block_changes?
-      !current || current.block_changes?
+      return false if current.nil?
+      return false if License&.current&.trial?
+
+      current.block_changes?
     end
 
     def load_license
