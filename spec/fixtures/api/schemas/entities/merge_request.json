@@ -108,7 +108,8 @@
     "codeclimate": {
       "head_path": { "type": "string" },
       "base_path": { "type": "string" }
-    }
+    },
+    "approvals": { "type": "hash" }
   },
   "additionalProperties": false
 }
