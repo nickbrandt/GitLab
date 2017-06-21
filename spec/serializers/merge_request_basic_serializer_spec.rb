@@ -4,9 +4,7 @@ describe MergeRequestBasicSerializer do
   let(:resource) { create(:merge_request) }
   let(:user)     { create(:user) }
 
-  subject { described_class.new.represent(resource) }
+  subject(:entity) { described_class.new(current_user: user).represent(resource) }
 
-  it 'has important MergeRequest attributes' do
-    expect(subject).to include(:merge_status)
-  end
+  it { is_expected.to include(:merge_status) }
 end
