@@ -276,6 +276,7 @@ export const baseIssues = [
   }
 ]
 
+// EE-specific
 export const approvalsData = {
   current_user: {},
   approvals_path: '/approvals',

@@ -163,6 +163,7 @@ describe MergeRequestEntity do
     end
   end
 
+  # EE-specific
   it 'exposes approvals' do
     approvals = MergeRequestApprovalsEntity
       .represent(resource, request: request)
