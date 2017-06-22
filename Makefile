@@ -3,7 +3,6 @@ VERSION=$(shell git describe)-$(shell date -u +%Y%m%d.%H%M%S)
 BUILD_DIR = $(shell pwd)
 export GOPATH=${BUILD_DIR}/_build
 export PATH:=${GOPATH}/bin:${PATH}
-export GO15VENDOREXPERIMENT=1
 GOBUILD=go build -ldflags "-X main.Version=${VERSION}"
 PKG=gitlab.com/gitlab-org/gitlab-workhorse
 PKG_ALL = $(shell GOPATH=${GOPATH} go list ${PKG}/... | grep -v /vendor/)
