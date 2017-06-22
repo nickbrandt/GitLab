@@ -27,7 +27,7 @@ func handleUploadPack(w *GitHttpResponseWriter, r *http.Request, a *api.Response
 	action := getService(r)
 	writePostRPCHeader(w, action)
 
-	if a.GitalyAddress == "" {
+	if a.GitalyServer.Address == "" {
 		err = handleUploadPackLocally(a, r, buffer, w, action)
 	} else {
 		err = handleUploadPackWithGitaly(a, buffer, w)
@@ -58,7 +58,7 @@ func handleUploadPackLocally(a *api.Response, r *http.Request, stdin *os.File, s
 }
 
 func handleUploadPackWithGitaly(a *api.Response, clientRequest io.Reader, clientResponse io.Writer) error {
-	smarthttp, err := gitaly.NewSmartHTTPClient(a.GitalyAddress)
+	smarthttp, err := gitaly.NewSmartHTTPClient(a.GitalyServer)
 	if err != nil {
 		return fmt.Errorf("smarthttp.UploadPack: %v", err)
 	}

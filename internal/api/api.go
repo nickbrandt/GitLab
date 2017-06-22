@@ -15,6 +15,7 @@ import (
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
 )
@@ -104,8 +105,10 @@ type Response struct {
 	Entry string `json:"entry"`
 	// Used to communicate terminal session details
 	Terminal *TerminalSettings
-	// GitalyAddress is a unix:// or tcp:// address to reach a Gitaly service on
+	// DEPRECATED. GitalyAddress is a unix:// or tcp:// address to reach a Gitaly service on
 	GitalyAddress string
+	// GitalyServer specifies an address and authentication token for a gitaly server we should connect to.
+	GitalyServer gitaly.Server
 	// Repository object for making gRPC requests to Gitaly. This will
 	// eventually replace the RepoPath field.
 	Repository pb.Repository
@@ -227,6 +230,11 @@ func (api *API) PreAuthorize(suffix string, r *http.Request) (httpResponse *http
 	if err := json.NewDecoder(httpResponse.Body).Decode(authResponse); err != nil {
 		return httpResponse, nil, fmt.Errorf("preAuthorizeHandler: decode authorization response: %v", err)
 	}
+
+	if authResponse.GitalyServer.Address == "" {
+		authResponse.GitalyServer.Address = authResponse.GitalyAddress
+	}
+	authResponse.GitalyAddress = ""
 
 	return httpResponse, authResponse, nil
 }
