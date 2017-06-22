@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v2.2.0
+- Add support for token authentication on Gitaly requests
+- Update gitaly-proto library to 0.9.0
+
 v2.1.1
 - Bug fix and counters for static error pages
 
