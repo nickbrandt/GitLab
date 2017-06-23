@@ -77,7 +77,7 @@ func handleGetInfoRefsWithGitaly(w http.ResponseWriter, a *api.Response, rpc str
 	}
 
 	if _, err = infoRefsResponseWriter.WriteTo(w); err != nil {
-		return fmt.Errorf("handleGetInfoRefsWithGitaly: Error receiving response from server: %v", err)
+		return fmt.Errorf("GetInfoRefsHandler: copy Gitaly response: %v", err)
 	}
 
 	return nil
