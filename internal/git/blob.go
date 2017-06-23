@@ -7,12 +7,20 @@ import (
 	"net/http"
 	"strings"
 
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
+
+	pb "gitlab.com/gitlab-org/gitaly-proto/go"
 )
 
 type blob struct{ senddata.Prefix }
-type blobParams struct{ RepoPath, BlobId string }
+type blobParams struct {
+	RepoPath         string
+	BlobId           string
+	GitalyServer     gitaly.Server
+	TreeEntryRequest pb.TreeEntryRequest
+}
 
 var SendBlob = &blob{"git-blob:"}
 
@@ -23,6 +31,25 @@ func (b *blob) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
 		return
 	}
 
+	if params.GitalyServer.Address != "" {
+		handleSendBlobWithGitaly(w, r, &params)
+	} else {
+		handleSendBlobLocally(w, r, &params)
+	}
+}
+
+func handleSendBlobWithGitaly(w http.ResponseWriter, r *http.Request, params *blobParams) {
+	commitClient, err := gitaly.NewCommitClient(params.GitalyServer)
+	if err != nil {
+		helper.Fail500(w, r, fmt.Errorf("commit.GetBlob: %v", err))
+	}
+
+	if err := commitClient.SendBlob(w, &params.TreeEntryRequest); err != nil {
+		helper.Fail500(w, r, fmt.Errorf("commit.GetBlob: %v", err))
+	}
+}
+
+func handleSendBlobLocally(w http.ResponseWriter, r *http.Request, params *blobParams) {
 	log.Printf("SendBlob: sending %q for %q", params.BlobId, r.URL.Path)
 
 	sizeOutput, err := gitCommand("", "", "git", "--git-dir="+params.RepoPath, "cat-file", "-s", params.BlobId).Output()

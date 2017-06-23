@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
 	"math/rand"
 	"net"
@@ -9,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -324,6 +326,61 @@ func TestPostUploadPackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 	testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-upload-pack-result")
 }
 
+func TestGetBlobProxiedToGitalySuccessfully(t *testing.T) {
+	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
+	defer gitalyServer.Stop()
+
+	gitalyAddress := "unix://" + socketPath
+	pathEncoded := base64.StdEncoding.EncodeToString([]byte("LICENSE"))
+	repoStorage := "default"
+	revisionEncoded := base64.StdEncoding.EncodeToString([]byte("54fcc214b94e78d7a41a9a8fe6d87a5e59500e51"))
+	repoRelativePath := "foo/bar.git"
+	jsonParams := fmt.Sprintf(`{"GitalyServer":{"Address":"%s","Token":""},"TreeEntryRequest":{"repository":{"storage_name":"%s","relative_path":"%s"},"revision":"%s","path":"%s"}}`,
+		gitalyAddress, repoStorage, repoRelativePath, revisionEncoded, pathEncoded)
+	expectedBody := testhelper.GitalyTreeEntryResponseMock
+	blobLength := len(expectedBody)
+
+	resp, body, err := doSendDataRequest("/something", "git-blob", jsonParams)
+	require.NoError(t, err)
+
+	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	assert.Equal(t, expectedBody, string(body), "GET %q: response body", resp.Request.URL)
+	assert.Equal(t, blobLength, len(body), "GET %q: body size", resp.Request.URL)
+	testhelper.AssertResponseHeader(t, resp, "Content-Length", strconv.Itoa(blobLength))
+}
+
+func TestGetBlobProxiedToGitalyInterruptedStream(t *testing.T) {
+	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
+	defer gitalyServer.Stop()
+
+	gitalyAddress := "unix://" + socketPath
+	pathEncoded := base64.StdEncoding.EncodeToString([]byte("LICENSE"))
+	repoStorage := "default"
+	revisionEncoded := base64.StdEncoding.EncodeToString([]byte("54fcc214b94e78d7a41a9a8fe6d87a5e59500e51"))
+	repoRelativePath := "foo/bar.git"
+	jsonParams := fmt.Sprintf(`{"GitalyServer":{"Address":"%s","Token":""},"TreeEntryRequest":{"repository":{"storage_name":"%s","relative_path":"%s"},"revision":"%s","path":"%s"}}`,
+		gitalyAddress, repoStorage, repoRelativePath, revisionEncoded, pathEncoded)
+
+	resp, _, err := doSendDataRequest("/something", "git-blob", jsonParams)
+	require.NoError(t, err)
+
+	// This causes the server stream to be interrupted instead of consumed entirely.
+	resp.Body.Close()
+
+	done := make(chan struct{})
+	go func() {
+		gitalyServer.WaitGroup.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		return
+	case <-time.After(10 * time.Second):
+		t.Fatal("time out waiting for gitaly handler to return")
+	}
+}
+
 type combinedServer struct {
 	*grpc.Server
 	*testhelper.GitalyTestServer
@@ -340,6 +397,7 @@ func startGitalyServer(t *testing.T, finalMessageCode codes.Code) (*combinedServ
 
 	gitalyServer := testhelper.NewGitalyServer(finalMessageCode)
 	pb.RegisterSmartHTTPServer(server, gitalyServer)
+	pb.RegisterCommitServer(server, gitalyServer)
 
 	go server.Serve(listener)
 
