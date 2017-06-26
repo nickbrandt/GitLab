@@ -4,18 +4,6 @@
   - go version
   - make test
 
-test using go 1.5:
-  <<: *test_definition
-  image: golang:1.5
-
-test using go 1.6:
-  <<: *test_definition
-  image: golang:1.6
-
-test using go 1.7:
-  <<: *test_definition
-  image: golang:1.7
-
 test using go 1.8:
   <<: *test_definition
   image: golang:1.8
