@@ -1,6 +1,7 @@
 <script>
 import ciStatus from '../../../vue_shared/components/ci_icon.vue';
 import tooltip from '../../../vue_shared/directives/tooltip';
+import eventHub from '../../event_hub';
 
 export default {
   props: {
@@ -20,6 +21,10 @@ export default {
       type: String,
       required: true,
     },
+    type: {
+      type: String,
+      required: true,
+    },
   },
   directives: {
     tooltip,
@@ -32,6 +37,15 @@ export default {
       return `${this.projectName} - ${this.pipelineStatus.label}`;
     },
   },
+
+  methods: {
+    expand() {
+      eventHub.$emit('expandNode', { 
+        type: this.type,
+        id: this.pipelineId,
+      });
+    }
+  }
 };
 </script>
 
@@ -39,6 +53,9 @@ export default {
   <li class="linked-pipeline build">
     <div class="curve"></div>
     <div>
+      <div 
+        style="background: blue; width: 10px; height: 40px;"
+        @click="expand"></div>
       <a
         v-tooltip
         class="linked-pipeline-content"

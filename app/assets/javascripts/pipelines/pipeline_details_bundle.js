@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return createElement('pipeline-graph', {
         props: {
           isLoading: this.mediator.state.isLoading,
-          pipeline: this.mediator.store.state.pipeline,
+          pipeline: this.mediator.store.state,
         },
       });
     },
@@ -47,9 +47,11 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     created() {
       eventHub.$on('headerPostAction', this.postAction);
+      eventHub.$on('expandNode', this.mediator.store.expandPipeline);
     },
     beforeDestroy() {
       eventHub.$off('headerPostAction', this.postAction);
+      eventHub.$ff('expandNode', this.mediator.store.expandPipeline);
     },
     methods: {
       postAction(action) {

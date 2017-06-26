@@ -2,6 +2,7 @@
   import linkedPipelinesColumn from './linked_pipelines_column.vue';
   import stageColumnComponent from './stage_column_component.vue';
   import loadingIcon from '../../../vue_shared/components/loading_icon.vue';
+  import { UPSTREAM, DOWNSTREAM } from '../../constants';
 
   export default {
     props: {
@@ -14,23 +15,27 @@
         required: true,
       },
     },
-
     components: {
       linkedPipelinesColumn,
       stageColumnComponent,
       loadingIcon,
     },
+    data() {
+      return {
+        UPSTREAM,
+        DOWNSTREAM,
+      };
+    },
+    created() {
+      console.log(this.pipeline);
+    },
 
     computed: {
-      graph() {
-        return this.pipeline.details && this.pipeline.details.stages;
-      },
       triggered() {
-        return this.pipeline.triggered || [];
+        return this.pipeline.downstreams || [];
       },
       triggeredBy() {
-        const response = this.pipeline.triggered_by;
-        return response ? [response] : [];
+        return this.pipeline.upstreams;
       },
       hasTriggered() {
         return !!this.triggered.length;
@@ -79,7 +84,7 @@
         v-if="hasTriggeredBy"
         :linked-pipelines="triggeredBy"
         column-title="Upstream"
-        graph-position="left"
+        :type="UPSTREAM"
       />
 
       <ul
@@ -90,10 +95,10 @@
         }"
         >
         <stage-column-component
-          v-for="(stage, index) in graph"
+          v-for="(stage, index) in pipeline.graph"
           :class="{
             'has-upstream': index === 0 && hasTriggeredBy,
-            'has-downstream': index === graph.length - 1 && hasTriggered,
+            'has-downstream': index === pipeline.graph.length - 1 && hasTriggered,
             'has-only-one-job': stage.groups.length === 1
           }"
           :title="capitalizeStageName(stage.name)"
@@ -109,7 +114,7 @@
         v-if="hasTriggered"
         :linked-pipelines="triggered"
         column-title="Downstream"
-        graph-position="right"
+        :type="DOWNSTREAM"
       />
     </div>
   </div>

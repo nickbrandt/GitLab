@@ -1,30 +1,46 @@
 <script>
-import linkedPipeline from './linked_pipeline.vue';
+  import linkedPipeline from './linked_pipeline.vue';
+  import { UPSTREAM, DOWNSTREAM } from '../../constants';
 
-export default {
-  props: {
-    columnTitle: {
-      type: String,
-      required: true,
+  export default {
+    props: {
+      columnTitle: {
+        type: String,
+        required: true,
+      },
+      linkedPipelines: {
+        type: Array,
+        required: true,
+      },
+      type: {
+        type: String,
+        required: true,
+      },
     },
-    linkedPipelines: {
-      type: Array,
-      required: true,
+    components: {
+      linkedPipeline,
     },
-    graphPosition: {
-      type: String,
-      required: true,
+    data() {
+      return {
+        UPSTREAM,
+        DOWNSTREAM,
+      };
     },
-  },
-  components: {
-    linkedPipeline,
-  },
-  computed: {
-    columnClass() {
-      return `graph-position-${this.graphPosition}`;
+    computed: {
+      graphPosition() {
+        if (this.type === UPSTREAM) {
+          return 'left';
+        }
+
+        if (this.type === DOWNSTREAM) {
+          return 'right';
+        }
+      },
+      columnClass() {
+        return `graph-position-${this.graphPosition}`;
+      },
     },
-  },
-};
+  };
 </script>
 
 <template>
@@ -45,6 +61,7 @@ export default {
         :project-name="pipeline.project.name"
         :pipeline-status="pipeline.details.status"
         :pipeline-path="pipeline.path"
+        :type="type"
       />
     </ul>
   </div>
