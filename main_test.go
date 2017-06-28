@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"compress/gzip"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -320,6 +321,59 @@ This is a static error page for code 499
 
 	assert.Equal(t, 499, resp.StatusCode, "GET %q: status code", resourcePath)
 	assert.Equal(t, string(errorPageBody), body, "GET %q: response body", resourcePath)
+}
+
+func TestGzipAssets(t *testing.T) {
+	path := "/assets/static.txt"
+	content := "asset"
+	require.NoError(t, setupStaticFile(path, content))
+
+	buf := &bytes.Buffer{}
+	gzipWriter := gzip.NewWriter(buf)
+	_, err := gzipWriter.Write([]byte(content))
+	require.NoError(t, err)
+	require.NoError(t, gzipWriter.Close())
+	contentGzip := buf.String()
+	require.NoError(t, setupStaticFile(path+".gz", contentGzip))
+
+	proxied := false
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
+		proxied = true
+		w.WriteHeader(404)
+	})
+	defer ts.Close()
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	testCases := []struct {
+		content         string
+		path            string
+		acceptEncoding  string
+		contentEncoding string
+	}{
+		{content: content, path: path},
+		{content: contentGzip, path: path, acceptEncoding: "gzip", contentEncoding: "gzip"},
+		{content: contentGzip, path: path, acceptEncoding: "gzip, compress, br", contentEncoding: "gzip"},
+		{content: contentGzip, path: path, acceptEncoding: "br;q=1.0, gzip;q=0.8, *;q=0.1", contentEncoding: "gzip"},
+	}
+
+	for _, tc := range testCases {
+		desc := fmt.Sprintf("accept-encoding: %q", tc.acceptEncoding)
+		req, err := http.NewRequest("GET", ws.URL+tc.path, nil)
+		require.NoError(t, err, desc)
+		req.Header.Set("Accept-Encoding", tc.acceptEncoding)
+
+		resp, err := http.DefaultTransport.RoundTrip(req)
+		require.NoError(t, err, desc)
+		defer resp.Body.Close()
+		b, err := ioutil.ReadAll(resp.Body)
+		require.NoError(t, err, desc)
+
+		assert.Equal(t, 200, resp.StatusCode, "%s: status code", desc)
+		assert.Equal(t, tc.content, string(b), "%s: response body", desc)
+		assert.Equal(t, tc.contentEncoding, resp.Header.Get("Content-Encoding"), "%s: response body", desc)
+		assert.False(t, proxied, "%s: should not have made it to backend", desc)
+	}
 }
 
 var sendDataHeader = "Gitlab-Workhorse-Send-Data"
