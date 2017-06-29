@@ -1,7 +1,32 @@
 .blank-state-parent-container {
+<<<<<<< HEAD
   .section-container {
     padding: 10px;
   }
+=======
+  display: flex;
+
+  .col-md-6 {
+    display: flex;
+    flex: 1;
+    padding: 10px;
+  }
+
+  .section-body {
+    width: 100%;
+    height: 100%;
+    border: 1px solid $border-color;
+    border-radius: 5px;
+
+    &.section-ee-trial {
+      display: table;
+    }
+  }
+}
+
+.blank-state-welcome {
+  text-align: center;
+>>>>>>> Styles for welcome page
 
   .section-body {
     width: 100%;
@@ -15,7 +40,13 @@
 .blank-state {
   padding-top: 20px;
   padding-bottom: 20px;
+}
+
+.blank-state.ee-trial {
+  display: table-cell;
+  padding: 20px;
   text-align: center;
+<<<<<<< HEAD
 
   &.blank-state-welcome {
     .blank-state-welcome-title {
@@ -25,10 +56,35 @@
     .blank-state-text {
       margin-bottom: 0;
     }
+=======
+  vertical-align: middle;
+}
+
+.blank-state-no-icon {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.blank-state-icon {
+  padding-bottom: 20px;
+  font-size: 56px;
+
+  svg {
+    display: block;
+    margin: auto;
+>>>>>>> Styles for welcome page
   }
 
+<<<<<<< HEAD
   .blank-state-icon {
     padding-bottom: 20px;
+=======
+.blank-state-title {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+>>>>>>> Styles for welcome page
 
     svg {
       display: block;
@@ -46,5 +102,26 @@
     max-width: $container-text-max-width;
     margin: 0 auto $gl-padding;
     font-size: 14px;
+  }
+}
+
+@media (max-width: $screen-md-min) {
+  .blank-state-parent-container {
+    &,
+    .col-md-6 {
+      display: block;
+    }
+  }
+
+  .blank-state {
+    text-align: center;
+  }
+
+  .blank-state-icon {
+    padding-bottom: 0;
+  }
+
+  .blank-state-body {
+    margin-top: 15px;
   }
 }
