@@ -1,4 +1,5 @@
 .row.blank-state-parent-container
+<<<<<<< HEAD
   .section-container.section-welcome{ class: "#{ 'section-admin-welcome' if current_user.admin? }" }
     .container.section-body
       .blank-state.blank-state-welcome
@@ -10,3 +11,11 @@
         = render "blank_state_admin_welcome"
       - else
         = render "blank_state_welcome"
+=======
+  .col-md-6
+    .section-body.section-welcome
+      = render "blank_state_welcome"
+  .col-md-6
+    .section-body.section-ee-trial
+      = render "blank_state_ee_trial"
+>>>>>>> Move content to individual partials
