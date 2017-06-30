@@ -287,12 +287,17 @@ table.u2f-registrations {
 
 .user-callout {
 <<<<<<< HEAD
+<<<<<<< HEAD
   margin: 20px -5px 0;
 =======
   margin: 0 auto;
   margin-top: 20px;
   max-width: $screen-lg-min;
 >>>>>>> Fix user callout margin
+=======
+  margin: 20px -5px auto -5px;
+  margin-top: 20px;
+>>>>>>> Adjust user callout width to cover container size
 
   .bordered-box {
     border: 1px solid $blue-300;
