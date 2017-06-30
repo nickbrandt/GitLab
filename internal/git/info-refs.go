@@ -2,6 +2,7 @@ package git
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
@@ -71,12 +72,12 @@ func handleGetInfoRefsWithGitaly(w http.ResponseWriter, a *api.Response, rpc str
 
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	defer cancelFunc()
-	infoRefsResponseWriter, err := smarthttp.InfoRefsResponseWriterTo(ctx, &a.Repository, rpc)
+	infoRefsResponseReader, err := smarthttp.InfoRefsResponseReader(ctx, &a.Repository, rpc)
 	if err != nil {
 		return fmt.Errorf("GetInfoRefsHandler: %v", err)
 	}
 
-	if _, err = infoRefsResponseWriter.WriteTo(w); err != nil {
+	if _, err = io.Copy(w, infoRefsResponseReader); err != nil {
 		return fmt.Errorf("GetInfoRefsHandler: copy Gitaly response: %v", err)
 	}
 

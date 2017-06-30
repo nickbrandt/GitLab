@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
-	pbhelper "gitlab.com/gitlab-org/gitaly-proto/go/helper"
+	"gitlab.com/gitlab-org/gitaly/streamio"
 
 	"golang.org/x/net/context"
 )
@@ -26,7 +26,7 @@ func (client *CommitClient) SendBlob(w http.ResponseWriter, request *pb.TreeEntr
 	}
 
 	firstResponseReceived := false
-	rr := pbhelper.NewReceiveReader(func() ([]byte, error) {
+	rr := streamio.NewReader(func() ([]byte, error) {
 		resp, err := c.Recv()
 
 		if !firstResponseReceived && err == nil {
