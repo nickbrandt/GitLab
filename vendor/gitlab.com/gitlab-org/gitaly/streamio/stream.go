@@ -1,13 +1,13 @@
-package helper
+package streamio
 
 import (
 	"io"
 )
 
-// NewReceiveReader turns receiver into an io.Reader. Errors from the
-// receiver function are passed on unmodified. This means receiver should
-// emit io.EOF when done.
-func NewReceiveReader(receiver func() ([]byte, error)) io.Reader {
+// NewReader turns receiver into an io.Reader. Errors from the receiver
+// function are passed on unmodified. This means receiver should emit
+// io.EOF when done.
+func NewReader(receiver func() ([]byte, error)) io.Reader {
 	return &receiveReader{receiver: receiver}
 }
 
@@ -29,9 +29,9 @@ func (rr *receiveReader) Read(p []byte) (int, error) {
 	return n, nil
 }
 
-// NewSendWriter turns sender into an io.Writer. The number of 'bytes
+// NewWriter turns sender into an io.Writer. The number of 'bytes
 // written' reported back is always len(p).
-func NewSendWriter(sender func(p []byte) error) io.Writer {
+func NewWriter(sender func(p []byte) error) io.Writer {
 	return &sendWriter{sender: sender}
 }
 

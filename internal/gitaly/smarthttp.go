@@ -5,7 +5,7 @@ import (
 	"io"
 
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
-	pbhelper "gitlab.com/gitlab-org/gitaly-proto/go/helper"
+	"gitlab.com/gitlab-org/gitaly/streamio"
 
 	"golang.org/x/net/context"
 )
@@ -14,25 +14,30 @@ type SmartHTTPClient struct {
 	pb.SmartHTTPClient
 }
 
-func (client *SmartHTTPClient) InfoRefsResponseWriterTo(ctx context.Context, repo *pb.Repository, rpc string) (io.WriterTo, error) {
+func (client *SmartHTTPClient) InfoRefsResponseReader(ctx context.Context, repo *pb.Repository, rpc string) (io.Reader, error) {
 	rpcRequest := &pb.InfoRefsRequest{Repository: repo}
-	var c pbhelper.InfoRefsClient
-	var err error
 
 	switch rpc {
 	case "git-upload-pack":
-		c, err = client.InfoRefsUploadPack(ctx, rpcRequest)
+		stream, err := client.InfoRefsUploadPack(ctx, rpcRequest)
+		return infoRefsReader(stream), err
 	case "git-receive-pack":
-		c, err = client.InfoRefsReceivePack(ctx, rpcRequest)
+		stream, err := client.InfoRefsReceivePack(ctx, rpcRequest)
+		return infoRefsReader(stream), err
 	default:
 		return nil, fmt.Errorf("InfoRefsResponseWriterTo: Unsupported RPC: %q", rpc)
 	}
+}
 
-	if err != nil {
-		return nil, fmt.Errorf("InfoRefsResponseWriterTo: RPC call failed: %v", err)
-	}
+type infoRefsClient interface {
+	Recv() (*pb.InfoRefsResponse, error)
+}
 
-	return &pbhelper.InfoRefsClientWriterTo{c}, nil
+func infoRefsReader(stream infoRefsClient) io.Reader {
+	return streamio.NewReader(func() ([]byte, error) {
+		resp, err := stream.Recv()
+		return resp.GetData(), err
+	})
 }
 
 func (client *SmartHTTPClient) ReceivePack(repo *pb.Repository, glId string, glRepository string, clientRequest io.Reader, clientResponse io.Writer) error {
@@ -58,7 +63,7 @@ func (client *SmartHTTPClient) ReceivePack(repo *pb.Repository, glId string, glR
 	errC := make(chan error, numStreams)
 
 	go func() {
-		rr := pbhelper.NewReceiveReader(func() ([]byte, error) {
+		rr := streamio.NewReader(func() ([]byte, error) {
 			response, err := stream.Recv()
 			return response.GetData(), err
 		})
@@ -67,7 +72,7 @@ func (client *SmartHTTPClient) ReceivePack(repo *pb.Repository, glId string, glR
 	}()
 
 	go func() {
-		sw := pbhelper.NewSendWriter(func(data []byte) error {
+		sw := streamio.NewWriter(func(data []byte) error {
 			return stream.Send(&pb.PostReceivePackRequest{Data: data})
 		})
 		_, err := io.Copy(sw, clientRequest)
@@ -105,7 +110,7 @@ func (client *SmartHTTPClient) UploadPack(repo *pb.Repository, clientRequest io.
 	errC := make(chan error, numStreams)
 
 	go func() {
-		rr := pbhelper.NewReceiveReader(func() ([]byte, error) {
+		rr := streamio.NewReader(func() ([]byte, error) {
 			response, err := stream.Recv()
 			return response.GetData(), err
 		})
@@ -114,7 +119,7 @@ func (client *SmartHTTPClient) UploadPack(repo *pb.Repository, clientRequest io.
 	}()
 
 	go func() {
-		sw := pbhelper.NewSendWriter(func(data []byte) error {
+		sw := streamio.NewWriter(func(data []byte) error {
 			return stream.Send(&pb.PostUploadPackRequest{Data: data})
 		})
 		_, err := io.Copy(sw, clientRequest)
