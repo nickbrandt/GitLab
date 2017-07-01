@@ -35,7 +35,6 @@
           = link_to charts_project_graph_path(@project, current_ref) do
             #{ _('Charts') }
 
-        - if @project.feature_available?(:file_locks)
-          = nav_link(controller: [:path_locks]) do
-            = link_to project_path_locks_path(@project) do
-              Locked Files
+        = nav_link(controller: [:path_locks]) do
+          = link_to_protected_feature namespace_project_path_locks_path(@project.namespace, @project), feature: :file_lock do
+            Locked Files
