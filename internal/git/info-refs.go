@@ -1,6 +1,7 @@
 package git
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -8,8 +9,6 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
-
-	"golang.org/x/net/context"
 )
 
 func GetInfoRefsHandler(a *api.API) http.Handler {
@@ -35,7 +34,7 @@ func handleGetInfoRefs(rw http.ResponseWriter, r *http.Request, a *api.Response)
 	if a.GitalyServer.Address == "" {
 		err = handleGetInfoRefsLocally(w, a, rpc)
 	} else {
-		err = handleGetInfoRefsWithGitaly(w, a, rpc)
+		err = handleGetInfoRefsWithGitaly(r.Context(), w, a, rpc)
 	}
 
 	if err != nil {
@@ -64,14 +63,12 @@ func handleGetInfoRefsLocally(w http.ResponseWriter, a *api.Response, rpc string
 	return nil
 }
 
-func handleGetInfoRefsWithGitaly(w http.ResponseWriter, a *api.Response, rpc string) error {
+func handleGetInfoRefsWithGitaly(ctx context.Context, w http.ResponseWriter, a *api.Response, rpc string) error {
 	smarthttp, err := gitaly.NewSmartHTTPClient(a.GitalyServer)
 	if err != nil {
 		return fmt.Errorf("GetInfoRefsHandler: %v", err)
 	}
 
-	ctx, cancelFunc := context.WithCancel(context.Background())
-	defer cancelFunc()
 	infoRefsResponseReader, err := smarthttp.InfoRefsResponseReader(ctx, &a.Repository, rpc)
 	if err != nil {
 		return fmt.Errorf("GetInfoRefsHandler: %v", err)

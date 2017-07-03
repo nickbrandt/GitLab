@@ -1,13 +1,12 @@
 package gitaly
 
 import (
+	"context"
 	"fmt"
 	"io"
 
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
 	"gitlab.com/gitlab-org/gitaly/streamio"
-
-	"golang.org/x/net/context"
 )
 
 type SmartHTTPClient struct {
@@ -40,10 +39,7 @@ func infoRefsReader(stream infoRefsClient) io.Reader {
 	})
 }
 
-func (client *SmartHTTPClient) ReceivePack(repo *pb.Repository, glId string, glRepository string, clientRequest io.Reader, clientResponse io.Writer) error {
-	ctx, cancelFunc := context.WithCancel(context.Background())
-	defer cancelFunc()
-
+func (client *SmartHTTPClient) ReceivePack(ctx context.Context, repo *pb.Repository, glId string, glRepository string, clientRequest io.Reader, clientResponse io.Writer) error {
 	stream, err := client.PostReceivePack(ctx)
 	if err != nil {
 		return err
@@ -89,10 +85,7 @@ func (client *SmartHTTPClient) ReceivePack(repo *pb.Repository, glId string, glR
 	return nil
 }
 
-func (client *SmartHTTPClient) UploadPack(repo *pb.Repository, clientRequest io.Reader, clientResponse io.Writer) error {
-	ctx, cancelFunc := context.WithCancel(context.Background())
-	defer cancelFunc()
-
+func (client *SmartHTTPClient) UploadPack(ctx context.Context, repo *pb.Repository, clientRequest io.Reader, clientResponse io.Writer) error {
 	stream, err := client.PostUploadPack(ctx)
 	if err != nil {
 		return err

@@ -44,7 +44,7 @@ func handleSendBlobWithGitaly(w http.ResponseWriter, r *http.Request, params *bl
 		helper.Fail500(w, r, fmt.Errorf("commit.GetBlob: %v", err))
 	}
 
-	if err := commitClient.SendBlob(w, &params.TreeEntryRequest); err != nil {
+	if err := commitClient.SendBlob(r.Context(), w, &params.TreeEntryRequest); err != nil {
 		helper.Fail500(w, r, fmt.Errorf("commit.GetBlob: %v", err))
 	}
 }
