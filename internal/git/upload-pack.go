@@ -1,6 +1,7 @@
 package git
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -30,7 +31,7 @@ func handleUploadPack(w *GitHttpResponseWriter, r *http.Request, a *api.Response
 	if a.GitalyServer.Address == "" {
 		err = handleUploadPackLocally(a, r, buffer, w, action)
 	} else {
-		err = handleUploadPackWithGitaly(a, buffer, w)
+		err = handleUploadPackWithGitaly(r.Context(), a, buffer, w)
 	}
 
 	return err
@@ -57,13 +58,13 @@ func handleUploadPackLocally(a *api.Response, r *http.Request, stdin *os.File, s
 	return nil
 }
 
-func handleUploadPackWithGitaly(a *api.Response, clientRequest io.Reader, clientResponse io.Writer) error {
+func handleUploadPackWithGitaly(ctx context.Context, a *api.Response, clientRequest io.Reader, clientResponse io.Writer) error {
 	smarthttp, err := gitaly.NewSmartHTTPClient(a.GitalyServer)
 	if err != nil {
 		return fmt.Errorf("smarthttp.UploadPack: %v", err)
 	}
 
-	if err := smarthttp.UploadPack(&a.Repository, clientRequest, clientResponse); err != nil {
+	if err := smarthttp.UploadPack(ctx, &a.Repository, clientRequest, clientResponse); err != nil {
 		return fmt.Errorf("smarthttp.UploadPack: %v", err)
 	}
 

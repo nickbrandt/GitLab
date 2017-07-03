@@ -1,6 +1,7 @@
 package git
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -23,7 +24,7 @@ func handleReceivePack(w *GitHttpResponseWriter, r *http.Request, a *api.Respons
 	if a.GitalyServer.Address == "" {
 		err = handleReceivePackLocally(a, r, cr, cw, action)
 	} else {
-		err = handleReceivePackWithGitaly(a, cr, cw)
+		err = handleReceivePackWithGitaly(r.Context(), a, cr, cw)
 	}
 
 	return err
@@ -45,13 +46,13 @@ func handleReceivePackLocally(a *api.Response, r *http.Request, stdin io.Reader,
 	return nil
 }
 
-func handleReceivePackWithGitaly(a *api.Response, clientRequest io.Reader, clientResponse io.Writer) error {
+func handleReceivePackWithGitaly(ctx context.Context, a *api.Response, clientRequest io.Reader, clientResponse io.Writer) error {
 	smarthttp, err := gitaly.NewSmartHTTPClient(a.GitalyServer)
 	if err != nil {
 		return fmt.Errorf("smarthttp.ReceivePack: %v", err)
 	}
 
-	if err := smarthttp.ReceivePack(&a.Repository, a.GL_ID, a.GL_REPOSITORY, clientRequest, clientResponse); err != nil {
+	if err := smarthttp.ReceivePack(ctx, &a.Repository, a.GL_ID, a.GL_REPOSITORY, clientRequest, clientResponse); err != nil {
 		return fmt.Errorf("smarthttp.ReceivePack: %v", err)
 	}
 

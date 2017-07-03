@@ -1,6 +1,7 @@
 package gitaly
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -8,18 +9,13 @@ import (
 
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
 	"gitlab.com/gitlab-org/gitaly/streamio"
-
-	"golang.org/x/net/context"
 )
 
 type CommitClient struct {
 	pb.CommitClient
 }
 
-func (client *CommitClient) SendBlob(w http.ResponseWriter, request *pb.TreeEntryRequest) error {
-	ctx, cancelFunc := context.WithCancel(context.Background())
-	defer cancelFunc()
-
+func (client *CommitClient) SendBlob(ctx context.Context, w http.ResponseWriter, request *pb.TreeEntryRequest) error {
 	c, err := client.TreeEntry(ctx, request)
 	if err != nil {
 		return fmt.Errorf("rpc failed: %v", err)
