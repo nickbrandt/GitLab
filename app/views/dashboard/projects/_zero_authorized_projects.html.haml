@@ -1,5 +1,6 @@
 .row.blank-state-parent-container
 <<<<<<< HEAD
+<<<<<<< HEAD
   .section-container.section-welcome{ class: "#{ 'section-admin-welcome' if current_user.admin? }" }
     .container.section-body
       .blank-state.blank-state-welcome
@@ -19,3 +20,13 @@
     .section-body.section-ee-trial
       = render "blank_state_ee_trial"
 >>>>>>> Move content to individual partials
+=======
+  - if current_user.admin?
+    .col-md-6.section-container
+      .section-body.section-welcome
+        = render "blank_state_welcome"
+  - unless current_license&.trial?
+    .col-md-6.section-container
+      .section-body.section-ee-trial
+        = render "blank_state_ee_trial"
+>>>>>>> Use flags to hide/show contents
