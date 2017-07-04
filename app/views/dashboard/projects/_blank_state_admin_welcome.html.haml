@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 - public_project_count = ProjectsFinder.new(current_user: current_user).execute.count
 
 - if current_user.can_create_group?
@@ -49,12 +50,9 @@
         Browse projects
 =======
 - publicish_project_count = ProjectsFinder.new(current_user: current_user).execute.count
+=======
+>>>>>>> Move common chunk to parent view
 - state_body_class = current_license&.trial? ? 'col-md-3' : 'col-md-9'
-.blank-state.blank-state-welcome
-  %h2.blank-state-welcome-title
-    Welcome to GitLab
-  %p.blank-state-text
-    Code, test, and deploy together
 
 .blank-state.clearfix
   - if current_license&.trial?
