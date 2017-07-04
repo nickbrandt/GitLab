@@ -1,14 +1,20 @@
 .row.blank-state-parent-container
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   .section-container.section-welcome{ class: "#{ 'section-admin-welcome' if current_user.admin? }" }
     .container.section-body
+=======
+  .col-md-6.section-container
+    .section-body.section-welcome
+>>>>>>> Add standard user welcome page
       .blank-state.blank-state-welcome
         %h2.blank-state-welcome-title
           Welcome to GitLab
         %p.blank-state-text
           Code, test, and deploy together
       - if current_user.admin?
+<<<<<<< HEAD
         = render "blank_state_admin_welcome"
       - else
         = render "blank_state_welcome"
@@ -24,8 +30,12 @@
   - if current_user.admin?
     .col-md-6.section-container
       .section-body.section-welcome
+=======
+>>>>>>> Add standard user welcome page
         = render "blank_state_admin_welcome"
-  - unless current_license&.trial?
+      - else
+        = render "blank_state_welcome"
+  - if !current_license&.trial? && current_user.admin?
     .col-md-6.section-container
       .section-body.section-ee-trial
         = render "blank_state_ee_trial"
