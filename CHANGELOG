@@ -2,6 +2,15 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v2.3.0
+- Improve gitaly info refs error message !172
+- Migrate GetBlob to Gitaly !174
+- Drop support for Go <1.8 !176
+- Add some tests for gzipped assets !177
+- Use reader/writer from gitaly streamio !178
+- Use http.Request contexts for Gitaly calls !179
+- Allow to access remote archive !180
+
 v2.2.0
 - Add support for token authentication on Gitaly requests
 - Update gitaly-proto library to 0.9.0
