@@ -127,6 +127,9 @@ func TestScrubURLParams(t *testing.T) {
 		"?private-token=&authenticity_token=&bar":                           "?private-token=[FILTERED]&authenticity_token=[FILTERED]&bar",
 		"?private-token=foo&authenticity_token=bar":                         "?private-token=[FILTERED]&authenticity_token=[FILTERED]",
 		"?private_token=foo&authenticity-token=bar":                         "?private_token=[FILTERED]&authenticity-token=[FILTERED]",
+		"?X-AMZ-Signature=foo":                                              "?X-AMZ-Signature=[FILTERED]",
+		"&X-AMZ-Signature=foo":                                              "&X-AMZ-Signature=[FILTERED]",
+		"?x-amz-signature=foo":                                              "?x-amz-signature=[FILTERED]",
 	} {
 		after := ScrubURLParams(before)
 		assert.Equal(t, expected, after, "Scrubbing %q", before)
