@@ -55,13 +55,17 @@ func detectFileContentType(fileName string) string {
 	return contentType
 }
 
-func unpackFileFromZip(archiveFileName, encodedFilename string, headers http.Header, output io.Writer) error {
+func unpackFileFromZip(archivePath, encodedFilename string, headers http.Header, output io.Writer) error {
 	fileName, err := zipartifacts.DecodeFileEntry(encodedFilename)
 	if err != nil {
 		return err
 	}
 
-	catFile := exec.Command("gitlab-zip-cat", archiveFileName, encodedFilename)
+	catFile := exec.Command("gitlab-zip-cat")
+	catFile.Env = []string{
+		"ARCHIVE_PATH=" + archivePath,
+		"ENCODED_FILE_NAME=" + encodedFilename,
+	}
 	catFile.Stderr = os.Stderr
 	catFile.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	stdout, err := catFile.StdoutPipe()

@@ -8,7 +8,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
@@ -16,9 +19,7 @@ import (
 func testEntryServer(t *testing.T, archive string, entry string) *httptest.ResponseRecorder {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/url/path", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "GET" {
-			t.Fatal("Expected GET request")
-		}
+		require.Equal(t, "GET", r.Method)
 
 		encodedEntry := base64.StdEncoding.EncodeToString([]byte(entry))
 		jsonParams := fmt.Sprintf(`{"Archive":"%s","Entry":"%s"}`, archive, encodedEntry)
@@ -28,9 +29,7 @@ func testEntryServer(t *testing.T, archive string, entry string) *httptest.Respo
 	})
 
 	httpRequest, err := http.NewRequest("GET", "/url/path", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	response := httptest.NewRecorder()
 	mux.ServeHTTP(response, httpRequest)
 	return response
@@ -38,18 +37,14 @@ func testEntryServer(t *testing.T, archive string, entry string) *httptest.Respo
 
 func TestDownloadingFromValidArchive(t *testing.T) {
 	tempFile, err := ioutil.TempFile("", "uploads")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer tempFile.Close()
 	defer os.Remove(tempFile.Name())
 
 	archive := zip.NewWriter(tempFile)
 	defer archive.Close()
 	fileInArchive, err := archive.Create("test.txt")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	fmt.Fprint(fileInArchive, "testtest")
 	archive.Close()
 
@@ -67,11 +62,43 @@ func TestDownloadingFromValidArchive(t *testing.T) {
 	testhelper.AssertResponseBody(t, response, "testtest")
 }
 
+func TestDownloadingFromValidHTTPArchive(t *testing.T) {
+	tempDir, err := ioutil.TempDir("", "uploads")
+	require.NoError(t, err)
+	defer os.RemoveAll(tempDir)
+
+	f, err := os.Create(filepath.Join(tempDir, "archive.zip"))
+	require.NoError(t, err)
+	defer f.Close()
+
+	archive := zip.NewWriter(f)
+	defer archive.Close()
+	fileInArchive, err := archive.Create("test.txt")
+	require.NoError(t, err)
+	fmt.Fprint(fileInArchive, "testtest")
+	archive.Close()
+	f.Close()
+
+	fileServer := httptest.NewServer(http.FileServer(http.Dir(tempDir)))
+	defer fileServer.Close()
+
+	response := testEntryServer(t, fileServer.URL+"/archive.zip", "test.txt")
+
+	testhelper.AssertResponseCode(t, response, 200)
+
+	testhelper.AssertResponseWriterHeader(t, response,
+		"Content-Type",
+		"text/plain; charset=utf-8")
+	testhelper.AssertResponseWriterHeader(t, response,
+		"Content-Disposition",
+		"attachment; filename=\"test.txt\"")
+
+	testhelper.AssertResponseBody(t, response, "testtest")
+}
+
 func TestDownloadingNonExistingFile(t *testing.T) {
 	tempFile, err := ioutil.TempFile("", "uploads")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer tempFile.Close()
 	defer os.Remove(tempFile.Name())
 
@@ -91,4 +118,17 @@ func TestDownloadingFromInvalidArchive(t *testing.T) {
 func TestIncompleteApiResponse(t *testing.T) {
 	response := testEntryServer(t, "", "")
 	testhelper.AssertResponseCode(t, response, 500)
+}
+
+func TestDownloadingFromNonExistingHTTPArchive(t *testing.T) {
+	tempDir, err := ioutil.TempDir("", "uploads")
+	require.NoError(t, err)
+	defer os.RemoveAll(tempDir)
+
+	fileServer := httptest.NewServer(http.FileServer(http.Dir(tempDir)))
+	defer fileServer.Close()
+
+	response := testEntryServer(t, fileServer.URL+"/not-existing-archive-file.zip", "test.txt")
+
+	testhelper.AssertResponseCode(t, response, 404)
 }

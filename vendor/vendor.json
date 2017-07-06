@@ -54,6 +54,12 @@
 			"revision": "e8f0f8aaa98dfb6586cbdf2978d511e3199a960a"
 		},
 		{
+			"checksumSHA1": "g46WnPAlsmkyNDUFdObDgP6DP+s=",
+			"path": "github.com/jfbus/httprs",
+			"revision": "e879ae6bf984ca6c009eb44696e9f400ec3ed2d9",
+			"revisionTime": "2017-07-03T13:54:35Z"
+		},
+		{
 			"checksumSHA1": "oIkoHb8+rM5Etur5HhZVY/sDQKQ=",
 			"path": "github.com/jpillora/backoff",
 			"revision": "06c7a16c845dc8e0bf575fafeeca0f5462f5eb4d",
@@ -64,6 +70,18 @@
 			"comment": "v1.0.0-2-gc12348c",
 			"path": "github.com/matttproud/golang_protobuf_extensions/pbutil",
 			"revision": "c12348ce28de40eed0136aa2b644d0ee0650e56c"
+		},
+		{
+			"checksumSHA1": "kSmDazz+cokgcHQT7q56Na+IBe0=",
+			"path": "github.com/mitchellh/copystructure",
+			"revision": "f81071c9d77b7931f78c90b416a074ecdc50e959",
+			"revisionTime": "2017-01-16T00:44:49Z"
+		},
+		{
+			"checksumSHA1": "KqsMqI+Y+3EFYPhyzafpIneaVCM=",
+			"path": "github.com/mitchellh/reflectwalk",
+			"revision": "8d802ff4ae93611b807597f639c19f76074df5c6",
+			"revisionTime": "2017-05-08T17:38:06Z"
 		},
 		{
 			"checksumSHA1": "LuFv4/jlrmFNnDb/5SCSEPAM9vU=",
