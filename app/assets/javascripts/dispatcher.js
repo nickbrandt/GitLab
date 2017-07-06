@@ -234,6 +234,7 @@ import AuditLogs from './audit_logs';
           new MilestoneSelect();
           new gl.IssuableTemplateSelectors();
           new AutoWidthDropdownSelect($('.js-target-branch-select')).init();
+          new ApproversSelect();
           break;
         case 'projects:tags:new':
           new ZenMode();
