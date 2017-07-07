@@ -7,11 +7,15 @@
 =======
   .col-md-6.section-container
 <<<<<<< HEAD
+<<<<<<< HEAD
     .section-body.section-welcome
 >>>>>>> Add standard user welcome page
 =======
     .section-body.section-welcome{ class: "#{ 'section-admin-welcome' if current_user.admin? }" }
 >>>>>>> Make admin welcome page have extra offset margin
+=======
+    .container.section-body.section-welcome{ class: "#{ 'section-admin-welcome' if current_user.admin? }" }
+>>>>>>> Add missing `container` class
       .blank-state.blank-state-welcome
         %h2.blank-state-welcome-title
           Welcome to GitLab
@@ -41,7 +45,7 @@
         = render "blank_state_welcome"
   - if !current_license&.trial? && current_user.admin?
     .col-md-6.section-container
-      .section-body.section-ee-trial
+      .container.section-body.section-ee-trial
         = render "blank_state_ee_trial"
 <<<<<<< HEAD
 >>>>>>> Use flags to hide/show contents
