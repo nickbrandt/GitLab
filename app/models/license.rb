@@ -182,7 +182,7 @@ class License < ActiveRecord::Base
       end
     end
 
-    delegate :feature_available?, to: :current, allow_nil: true
+    delegate :block_changes?, :feature_available?, to: :current, allow_nil: true
 
     def reset_current
       RequestStore.delete(:current_license)
@@ -193,10 +193,6 @@ class License < ActiveRecord::Base
       feature = FEATURE_CODES.fetch(code)
 
       features[feature].to_i > 0
-    end
-
-    def block_changes?
-      current&.block_changes?
     end
 
     def load_license
