@@ -152,6 +152,8 @@ export default class ApproversSelect {
     const $loadWrapper = $('.load-wrapper');
     const $approverSelect = $('.js-select-user-and-group');
 
+    debugger
+
     if (!newValue) {
       return;
     }

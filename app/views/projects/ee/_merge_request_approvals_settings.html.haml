@@ -1,5 +1,6 @@
 - return unless project.feature_available?(:merge_request_approvers)
 - merge_request = local_assigns.fetch(:merge_request, nil)
+- suggested_approvers = local_assigns.fetch(:suggested_approvers, [])
 - model_name = merge_request ? 'merge_request' : 'project'
 - model = merge_request || project
 - can_override_approvers = project.can_override_approvers?
@@ -44,7 +45,7 @@
           %li.approver.settings-flex-row.js-approver{ data: { id: approver.user_id } }
             = link_to approver.user.name, approver.user
             .pull-right
-              %button{ href: project_approver_path(project, approver, merge_request_id: "#{merge_request.iid if merge_request}"), data: { confirm: "Are you sure you want to remove approver #{approver.user.name}"}, class: "btn btn-remove js-approver-remove", title: 'Remove approver' }
+              %button{ href: merge_request_approver_path(project, merge_request, approver), data: { confirm: "Are you sure you want to remove approver #{approver.user.name}"}, class: "btn btn-remove js-approver-remove", title: 'Remove approver' }
                 = icon("trash")
         - model.approver_groups.each do |approver_group|
           %li.approver-group.settings-flex-row.js-approver-group{ data: { id: approver_group.group.id } }
@@ -55,7 +56,7 @@
               %span.badge
                 = approver_group.group.members.count
             .pull-right
-              %button{ href: project_approver_group_path(project, approver_group, merge_request_id: "#{merge_request.iid if merge_request}"), data: { confirm: "Are you sure you want to remove group #{approver_group.group.name}" }, class: "btn btn-remove js-approver-remove", title: 'Remove group' }
+              %button{ href: merge_request_approver_path(project, merge_request, approver_group), data: { confirm: "Are you sure you want to remove group #{approver_group.group.name}" }, class: "btn btn-remove js-approver-remove", title: 'Remove group' }
                 = icon("trash")
         - if model.approvers.empty? && model.approver_groups.empty?
           %li There are no approvers
@@ -83,6 +84,6 @@
 
 - if merge_request
   .help-block.suggested-approvers
-    - if @suggested_approvers.any?
+    - if suggested_approvers.any?
       Suggested approvers:
-      = raw @suggested_approvers.map { |approver| link_to sanitize(approver.name), "#", id: dom_id(approver) }.join(", ")
+      = raw suggested_approvers.map { |approver| link_to sanitize(approver.name), "#", id: dom_id(approver) }.join(", ")

@@ -41,7 +41,8 @@
       title: 'Moving an issue will copy the discussion to a different project and close it here. All participants will be notified of the new location.' }
         = icon('question-circle')
 
-= render 'projects/ee/merge_request_approvals_settings', project: project, merge_request: issuable, form: form if issuable.is_a?(MergeRequest)
+- if issuable.is_a?(MergeRequest)
+  = render 'projects/ee/merge_request_approvals_settings', project: project, merge_request: issuable, form: form, suggested_approvers: @suggested_approvers
 
 = render 'shared/issuable/form/branch_chooser', issuable: issuable, form: form
 
