@@ -23,7 +23,7 @@ type GitalyTestServer struct {
 
 var (
 	GitalyInfoRefsResponseMock    = strings.Repeat("Mock Gitaly InfoRefsResponse data", 100000)
-	GitalyTreeEntryResponseMock   = strings.Repeat("Mock Gitaly TreeEntryResponse data", 100000)
+	GitalyGetBlobResponseMock     = strings.Repeat("Mock Gitaly GetBlobResponse data", 100000)
 	GitalyReceivePackResponseMock []byte
 	GitalyUploadPackResponseMock  []byte
 )
@@ -173,7 +173,7 @@ func (s *GitalyTestServer) CommitIsAncestor(ctx context.Context, in *pb.CommitIs
 	return nil, nil
 }
 
-func (s *GitalyTestServer) TreeEntry(in *pb.TreeEntryRequest, stream pb.Commit_TreeEntryServer) error {
+func (s *GitalyTestServer) GetBlob(in *pb.GetBlobRequest, stream pb.BlobService_GetBlobServer) error {
 	s.WaitGroup.Add(1)
 	defer s.WaitGroup.Done()
 
@@ -181,13 +181,11 @@ func (s *GitalyTestServer) TreeEntry(in *pb.TreeEntryRequest, stream pb.Commit_T
 		return err
 	}
 
-	response := &pb.TreeEntryResponse{
-		Type: pb.TreeEntryResponse_BLOB,
-		Oid:  "deadfacedeadfacedeadfacedeadfacedeadface",
-		Size: int64(len(GitalyTreeEntryResponseMock)),
-		Mode: 0100644,
+	response := &pb.GetBlobResponse{
+		Oid:  in.GetOid(),
+		Size: int64(len(GitalyGetBlobResponseMock)),
 	}
-	nSends, err := sendBytes([]byte(GitalyTreeEntryResponseMock), 100, func(p []byte) error {
+	nSends, err := sendBytes([]byte(GitalyGetBlobResponseMock), 100, func(p []byte) error {
 		response.Data = p
 
 		if err := stream.Send(response); err != nil {
@@ -195,7 +193,7 @@ func (s *GitalyTestServer) TreeEntry(in *pb.TreeEntryRequest, stream pb.Commit_T
 		}
 
 		// Use a new response so we don't send other fields (Size, ...) over and over
-		response = &pb.TreeEntryResponse{}
+		response = &pb.GetBlobResponse{}
 
 		return nil
 	})
