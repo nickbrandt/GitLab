@@ -11,12 +11,12 @@ import (
 	"gitlab.com/gitlab-org/gitaly/streamio"
 )
 
-type CommitClient struct {
-	pb.CommitClient
+type BlobClient struct {
+	pb.BlobServiceClient
 }
 
-func (client *CommitClient) SendBlob(ctx context.Context, w http.ResponseWriter, request *pb.TreeEntryRequest) error {
-	c, err := client.TreeEntry(ctx, request)
+func (client *BlobClient) SendBlob(ctx context.Context, w http.ResponseWriter, request *pb.GetBlobRequest) error {
+	c, err := client.GetBlob(ctx, request)
 	if err != nil {
 		return fmt.Errorf("rpc failed: %v", err)
 	}

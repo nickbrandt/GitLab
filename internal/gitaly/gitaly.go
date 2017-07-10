@@ -36,13 +36,13 @@ func NewSmartHTTPClient(server Server) (*SmartHTTPClient, error) {
 	return &SmartHTTPClient{grpcClient}, nil
 }
 
-func NewCommitClient(server Server) (*CommitClient, error) {
+func NewBlobClient(server Server) (*BlobClient, error) {
 	conn, err := getOrCreateConnection(server)
 	if err != nil {
 		return nil, err
 	}
-	grpcClient := pb.NewCommitClient(conn)
-	return &CommitClient{grpcClient}, nil
+	grpcClient := pb.NewBlobServiceClient(conn)
+	return &BlobClient{grpcClient}, nil
 }
 
 func getOrCreateConnection(server Server) (*grpc.ClientConn, error) {

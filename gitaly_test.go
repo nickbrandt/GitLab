@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"encoding/base64"
 	"fmt"
 	"math/rand"
 	"net"
@@ -331,13 +330,12 @@ func TestGetBlobProxiedToGitalySuccessfully(t *testing.T) {
 	defer gitalyServer.Stop()
 
 	gitalyAddress := "unix://" + socketPath
-	pathEncoded := base64.StdEncoding.EncodeToString([]byte("LICENSE"))
 	repoStorage := "default"
-	revisionEncoded := base64.StdEncoding.EncodeToString([]byte("54fcc214b94e78d7a41a9a8fe6d87a5e59500e51"))
+	oid := "54fcc214b94e78d7a41a9a8fe6d87a5e59500e51"
 	repoRelativePath := "foo/bar.git"
-	jsonParams := fmt.Sprintf(`{"GitalyServer":{"Address":"%s","Token":""},"TreeEntryRequest":{"repository":{"storage_name":"%s","relative_path":"%s"},"revision":"%s","path":"%s"}}`,
-		gitalyAddress, repoStorage, repoRelativePath, revisionEncoded, pathEncoded)
-	expectedBody := testhelper.GitalyTreeEntryResponseMock
+	jsonParams := fmt.Sprintf(`{"GitalyServer":{"Address":"%s","Token":""},"GetBlobRequest":{"repository":{"storage_name":"%s","relative_path":"%s"},"oid":"%s","limit":-1}}`,
+		gitalyAddress, repoStorage, repoRelativePath, oid)
+	expectedBody := testhelper.GitalyGetBlobResponseMock
 	blobLength := len(expectedBody)
 
 	resp, body, err := doSendDataRequest("/something", "git-blob", jsonParams)
@@ -354,12 +352,11 @@ func TestGetBlobProxiedToGitalyInterruptedStream(t *testing.T) {
 	defer gitalyServer.Stop()
 
 	gitalyAddress := "unix://" + socketPath
-	pathEncoded := base64.StdEncoding.EncodeToString([]byte("LICENSE"))
 	repoStorage := "default"
-	revisionEncoded := base64.StdEncoding.EncodeToString([]byte("54fcc214b94e78d7a41a9a8fe6d87a5e59500e51"))
+	oid := "54fcc214b94e78d7a41a9a8fe6d87a5e59500e51"
 	repoRelativePath := "foo/bar.git"
-	jsonParams := fmt.Sprintf(`{"GitalyServer":{"Address":"%s","Token":""},"TreeEntryRequest":{"repository":{"storage_name":"%s","relative_path":"%s"},"revision":"%s","path":"%s"}}`,
-		gitalyAddress, repoStorage, repoRelativePath, revisionEncoded, pathEncoded)
+	jsonParams := fmt.Sprintf(`{"GitalyServer":{"Address":"%s","Token":""},"GetBlobRequest":{"repository":{"storage_name":"%s","relative_path":"%s"},"oid":"%s","limit":-1}}`,
+		gitalyAddress, repoStorage, repoRelativePath, oid)
 
 	resp, _, err := doSendDataRequest("/something", "git-blob", jsonParams)
 	require.NoError(t, err)
@@ -397,7 +394,7 @@ func startGitalyServer(t *testing.T, finalMessageCode codes.Code) (*combinedServ
 
 	gitalyServer := testhelper.NewGitalyServer(finalMessageCode)
 	pb.RegisterSmartHTTPServer(server, gitalyServer)
-	pb.RegisterCommitServer(server, gitalyServer)
+	pb.RegisterBlobServiceServer(server, gitalyServer)
 
 	go server.Serve(listener)
 

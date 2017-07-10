@@ -16,10 +16,10 @@ import (
 
 type blob struct{ senddata.Prefix }
 type blobParams struct {
-	RepoPath         string
-	BlobId           string
-	GitalyServer     gitaly.Server
-	TreeEntryRequest pb.TreeEntryRequest
+	RepoPath       string
+	BlobId         string
+	GitalyServer   gitaly.Server
+	GetBlobRequest pb.GetBlobRequest
 }
 
 var SendBlob = &blob{"git-blob:"}
@@ -39,13 +39,13 @@ func (b *blob) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
 }
 
 func handleSendBlobWithGitaly(w http.ResponseWriter, r *http.Request, params *blobParams) {
-	commitClient, err := gitaly.NewCommitClient(params.GitalyServer)
+	blobClient, err := gitaly.NewBlobClient(params.GitalyServer)
 	if err != nil {
-		helper.Fail500(w, r, fmt.Errorf("commit.GetBlob: %v", err))
+		helper.Fail500(w, r, fmt.Errorf("blob.GetBlob: %v", err))
 	}
 
-	if err := commitClient.SendBlob(r.Context(), w, &params.TreeEntryRequest); err != nil {
-		helper.Fail500(w, r, fmt.Errorf("commit.GetBlob: %v", err))
+	if err := blobClient.SendBlob(r.Context(), w, &params.GetBlobRequest); err != nil {
+		helper.Fail500(w, r, fmt.Errorf("blob.GetBlob: %v", err))
 	}
 }
 
