@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v3.0.0
+
+- Use GetBlob RPC instead of TreeEntry RPC for serving blobs !182
+
 v2.3.0
 - Improve gitaly info refs error message !172
 - Migrate GetBlob to Gitaly !174
