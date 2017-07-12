@@ -1,14 +1,15 @@
 .blank-state-parent-container {
 <<<<<<< HEAD
+<<<<<<< HEAD
   .section-container {
     padding: 10px;
   }
 =======
   display: flex;
 
+=======
+>>>>>>> Port over changes from CE
   .section-container {
-    display: flex;
-    flex: 1;
     padding: 10px;
   }
 
@@ -17,6 +18,7 @@
     height: 100%;
     border: 1px solid $border-color;
     border-radius: $border-radius-default;
+<<<<<<< HEAD
 
     &.section-ee-trial {
       display: flex;
@@ -36,17 +38,16 @@
     padding-bottom: 25px;
     border: 1px solid $border-color;
     border-radius: $border-radius-default;
+=======
+>>>>>>> Port over changes from CE
   }
 }
 
 .blank-state {
   padding-top: 20px;
   padding-bottom: 20px;
-}
-
-.blank-state.ee-trial {
-  padding: 20px;
   text-align: center;
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 
@@ -121,24 +122,57 @@
     font-size: 14px;
   }
 }
+=======
 
-@media (max-width: $screen-md-min) {
-  .blank-state-parent-container {
-    &,
-    .section-container {
-      display: block;
+  &.blank-state-welcome {
+    .blank-state-welcome-title {
+      font-size: 24px;
+    }
+
+    .blank-state-text {
+      margin-bottom: 0;
     }
   }
 
-  .blank-state {
-    text-align: center;
-  }
-
   .blank-state-icon {
-    padding-bottom: 0;
+    padding-bottom: 20px;
+>>>>>>> Port over changes from CE
+
+    svg {
+      display: block;
+      margin: auto;
+    }
   }
 
-  .blank-state-body {
-    margin-top: 15px;
+  .blank-state-title {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 18px;
+  }
+
+  .blank-state-text {
+    max-width: $container-text-max-width;
+    margin: 0 auto $gl-padding;
+    font-size: 14px;
+  }
+}
+
+/* EE-specific Styles */
+@media (min-width: $screen-md-min) {
+  .blank-state-parent-container.has-start-trial-container {
+    display: flex;
+  }
+}
+
+.section-ee-trial {
+  .section-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .blank-state {
+      padding: 20px;
+      text-align: center;
+    }
   }
 }
