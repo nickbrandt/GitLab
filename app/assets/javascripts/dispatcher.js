@@ -234,7 +234,7 @@ import AuditLogs from './audit_logs';
           new MilestoneSelect();
           new gl.IssuableTemplateSelectors();
           new AutoWidthDropdownSelect($('.js-target-branch-select')).init();
-          new ApproversSelect();
+          new ApproversSelect(page);
           break;
         case 'projects:tags:new':
           new ZenMode();
@@ -500,7 +500,7 @@ import AuditLogs from './audit_logs';
             case 'edit':
               shortcut_handler = new ShortcutsNavigation();
               new ProjectNew();
-              new ApproversSelect();
+              new ApproversSelect(page);
               break;
             case 'new':
               new ProjectNew();

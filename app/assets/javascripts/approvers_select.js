@@ -1,11 +1,40 @@
+import { template } from 'underscore';
 import Api from './api';
 
+const approverItemTemplate = template(`
+  <li class="<%- itemClass %> settings-flex-row js-<%- itemClass %>" data-id="<%- id %>">
+    <div class="span">
+      <% if (isGroup) { %>
+        <span class="light">Group:</span>
+      <% } %>
+      <a href="<%- link %>"><%- name %></a>
+      <% if (isGroup) { %>
+        <span class="badge"><%- count %></span>
+      <% } %>
+    </div>
+    <div class="pull-right">
+      <button class="btn btn-remove js-approver-remove" data-confirm="Are you sure you want to remove <%- type %> <%- name %>?" href="<%- removeLink %>" title="Remove <%- type %>">
+        <i aria-hidden="true" data-hidden="true" class="fa fa-trash"></i>
+      </button>
+    </div>
+  </li>
+`);
+
 export default class ApproversSelect {
-  constructor() {
+  constructor(page) {
     this.$approverSelect = $('.js-select-user-and-group');
+    this.$approversListContainer = $('.js-current-approvers');
+    this.$approversList = $('.approver-list', this.$approversListContainer);
+
     const name = this.$approverSelect.data('name');
     this.fieldNames = [`${name}[approver_ids]`, `${name}[approver_group_ids]`];
+
+    this.approversField = $(`input[name="${this.fieldNames[0]}"]`);
+    this.approverGroupsField = $(`input[name="${this.fieldNames[1]}"]`);
     this.$loadWrapper = $('.load-wrapper');
+
+    this.isMR = name === 'merge_request';
+    this.isNewMR = this.isMR && page === 'projects:merge_requests:new';
 
     this.bindEvents();
     this.addEvents();
@@ -20,7 +49,7 @@ export default class ApproversSelect {
 
   addEvents() {
     $(document).on('click', '.js-add-approvers', () => this.addApprover());
-    $(document).on('click', '.js-approver-remove', e => ApproversSelect.removeApprover(e));
+    $(document).on('click', '.js-approver-remove', e => this.removeApprover(e));
   }
 
   static getApprovers(fieldName, approverList) {
@@ -45,14 +74,16 @@ export default class ApproversSelect {
     const options = {
       skip_users: ApproversSelect.getApprovers(this.fieldNames[0], '.js-approver'),
       project_id: $('#project_id').val(),
+      merge_request_id: $('#merge_request_id').val(),
+      approvers: true,
     };
     return Api.approverUsers(term, options);
   }
 
   handleSelectChange(e) {
     const { added, removed } = e;
-    const userInput = $(`[name="${this.fieldNames[0]}"]`);
-    const groupInput = $(`[name="${this.fieldNames[1]}"]`);
+    const userInput = this.approversField;
+    const groupInput = this.approverGroupsField;
 
     if (added) {
       if (added.full_name) {
@@ -88,6 +119,7 @@ export default class ApproversSelect {
       },
       formatResult: ApproversSelect.formatResult,
       formatSelection: ApproversSelect.formatSelection,
+      containerCssClass: 'js-approvers-input-container',
       dropdownCss() {
         const $input = $('.js-select-user-and-group .select2-input');
         const offset = $input.offset();
@@ -106,10 +138,25 @@ export default class ApproversSelect {
       },
     })
     .on('change', this.handleSelectChange);
+
+    this.$approversInputContainer = $('.js-approvers-input-container');
   }
 
-  static formatSelection(group) {
-    return group.full_name || group.name;
+  static formatSelection(approver) {
+    const type = Object.hasOwnProperty.call(approver, 'username') ? 'user' : 'group';
+
+    return `
+      <div
+        class="approver-${type}"
+        data-id="${approver.id}"
+        data-link="/${approver.full_path}"
+        data-name="${approver.full_name || approver.name}"
+        data-count="${approver.user_count}"
+        data-remove-link="${approver.remove_approver_path}"
+      >
+        ${approver.full_name || approver.name}
+      </div>
+    `;
   }
 
   static formatResult({
@@ -143,31 +190,30 @@ export default class ApproversSelect {
   }
 
   addApprover() {
-    this.fieldNames.forEach(ApproversSelect.saveApprovers);
+    this.fieldNames.forEach(this.saveApprovers.bind(this));
   }
 
-  static saveApprovers(fieldName) {
+  saveApprovers(fieldName) {
     const $input = window.$(`[name="${fieldName}"]`);
     const newValue = $input.val();
     const $loadWrapper = $('.load-wrapper');
     const $approverSelect = $('.js-select-user-and-group');
 
-    debugger
+    if (!newValue) return undefined;
 
-    if (!newValue) {
-      return;
-    }
+    if (this.isNewMR) return this.addMergeApprover($input);
 
     const $form = $('.js-add-approvers').closest('form');
     $loadWrapper.removeClass('hidden');
-    window.$.ajax({
+
+    return window.$.ajax({
       url: $form.attr('action'),
       type: 'POST',
       data: {
         _method: 'PATCH',
         [fieldName]: newValue,
       },
-      success: ApproversSelect.updateApproverList,
+      success: this.isMR ? this.addMergeApprover.bind(this, $input) : this.updateProjectList,
       complete() {
         $input.val('');
         $approverSelect.select2('val', '');
@@ -179,18 +225,23 @@ export default class ApproversSelect {
     });
   }
 
-  static removeApprover(e) {
+  removeApprover(e) {
     e.preventDefault();
+
     const target = e.currentTarget;
+
+    if (this.isNewMR) return this.removeMergeApprover(target);
+
     const $loadWrapper = $('.load-wrapper');
     $loadWrapper.removeClass('hidden');
-    $.ajax({
+
+    return $.ajax({
       url: target.getAttribute('href'),
       type: 'POST',
       data: {
         _method: 'DELETE',
       },
-      success: ApproversSelect.updateApproverList,
+      success: this.isMR ? this.removeMergeApprover.bind(this, target) : this.updateProjectList,
       complete: () => $loadWrapper.addClass('hidden'),
       error() {
         window.Flash('Failed to remove Approver', 'alert');
@@ -198,7 +249,45 @@ export default class ApproversSelect {
     });
   }
 
-  static updateApproverList(html) {
-    $('.js-current-approvers').html($(html).find('.js-current-approvers').html());
+  updateProjectList(html) {
+    const newHtml = $('.js-current-approvers', html).html();
+
+    this.$approversListContainer.html(newHtml);
+  }
+
+  addMergeApprover($input) {
+    const ids = $input.val().split(',');
+    const isGroup = $input.attr('name').contains('approver_group');
+    const selector = isGroup ? '.approver-group' : '.approver-user';
+
+    $(selector, this.$approversInputContainer).forEach((approver) => {
+      const approverItem = approverItemTemplate({
+        id: approver.data('id'),
+        link: approver.data('link'),
+        name: approver.data('name'),
+        count: approver.data('count'),
+        removeLink: approver.data('remove-link'),
+        type: isGroup ? 'group' : 'user',
+        itemClass: isGroup ? 'approver-group' : 'approver',
+        isGroup,
+      });
+
+      this.$approversList.append(approverItem);
+    });
+
+    this.$approverSelect.select2('val', '');
+  }
+
+  removeMergeApprover(target) {
+    const approver = $(target).closest('.approver-list li');
+    const approverID = approver.data('id');
+    const field = approver.hasClass('approver') ? this.approversField : this.approverGroupsField;
+
+    const ids = field.val().split(',');
+    const approverIndex = ids.indexOf(approverID);
+
+    if (approverIndex !== -1) ids.splice(approverIndex, 1);
+    field.val(ids.join(','));
+    approver.remove();
   }
 }
