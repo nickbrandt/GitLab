@@ -4,8 +4,10 @@ import (
 	"net/http"
 	"path"
 	"regexp"
+	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/prometheus/client_golang/prometheus"
 
 	apipkg "gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/artifacts"
@@ -39,6 +41,20 @@ const (
 	projectPattern    = `^/([^/]+/){1,}[^/]+/`
 )
 
+var (
+	routeRequestDurations = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		Name:    "gitlab_workhorse_request_duration_seconds",
+		Help:    "A histogram of request times in seconds",
+		Buckets: prometheus.ExponentialBuckets(0.01, 2.5, 10),
+	},
+		[]string{"method", "route"},
+	)
+)
+
+func init() {
+	prometheus.MustRegister(routeRequestDurations)
+}
+
 func compileRegexp(regexpStr string) *regexp.Regexp {
 	if len(regexpStr) == 0 {
 		return nil
@@ -48,10 +64,17 @@ func compileRegexp(regexpStr string) *regexp.Regexp {
 }
 
 func route(method, regexpStr string, handler http.Handler, matchers ...matcherFunc) routeEntry {
+	instr := func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			start := time.Now()
+			h.ServeHTTP(w, r)
+			routeRequestDurations.WithLabelValues(method, regexpStr).Observe(time.Since(start).Seconds())
+		})
+	}
 	return routeEntry{
 		method:   method,
 		regex:    compileRegexp(regexpStr),
-		handler:  denyWebsocket(handler),
+		handler:  instr(denyWebsocket(handler)),
 		matchers: matchers,
 	}
 }
