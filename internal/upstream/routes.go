@@ -63,18 +63,19 @@ func compileRegexp(regexpStr string) *regexp.Regexp {
 	return regexp.MustCompile(regexpStr)
 }
 
+func instrumentDuration(h http.Handler, method string, regexpStr string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		h.ServeHTTP(w, r)
+		routeRequestDurations.WithLabelValues(method, regexpStr).Observe(time.Since(start).Seconds())
+	})
+}
+
 func route(method, regexpStr string, handler http.Handler, matchers ...matcherFunc) routeEntry {
-	instr := func(h http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			start := time.Now()
-			h.ServeHTTP(w, r)
-			routeRequestDurations.WithLabelValues(method, regexpStr).Observe(time.Since(start).Seconds())
-		})
-	}
 	return routeEntry{
 		method:   method,
 		regex:    compileRegexp(regexpStr),
-		handler:  instr(denyWebsocket(handler)),
+		handler:  instrumentDuration(denyWebsocket(handler), method, regexpStr),
 		matchers: matchers,
 	}
 }
@@ -83,7 +84,7 @@ func wsRoute(regexpStr string, handler http.Handler, matchers ...matcherFunc) ro
 	return routeEntry{
 		method:   "GET",
 		regex:    compileRegexp(regexpStr),
-		handler:  handler,
+		handler:  instrumentDuration(handler, "GET", regexpStr),
 		matchers: append(matchers, websocket.IsWebSocketUpgrade),
 	}
 }
