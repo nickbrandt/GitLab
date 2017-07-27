@@ -21,6 +21,7 @@
     .blank-state-welcome-title {
       font-size: 24px;
     }
+<<<<<<< HEAD
 
     .blank-state-text {
       margin-bottom: 0;
@@ -53,9 +54,30 @@
 @media (min-width: $screen-md-min) {
   .blank-state-parent-container.has-start-trial-container {
     display: flex;
-  }
-}
+=======
 
+    .blank-state-text {
+      margin-bottom: 0;
+    }
+  }
+
+  .blank-state-icon {
+    padding-bottom: 20px;
+
+    svg {
+      display: block;
+      margin: auto;
+    }
+  }
+
+  .blank-state-title {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 18px;
+>>>>>>> master
+  }
+
+<<<<<<< HEAD
 .section-ee-trial {
   .section-body {
     display: flex;
@@ -66,5 +88,11 @@
       padding: 20px;
       text-align: center;
     }
+=======
+  .blank-state-text {
+    max-width: $container-text-max-width;
+    margin: 0 auto $gl-padding;
+    font-size: 14px;
+>>>>>>> master
   }
 }
