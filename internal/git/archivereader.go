@@ -74,7 +74,7 @@ func newArchiveReader(ctx context.Context, repoPath string, format ArchiveFormat
 	a = &archiveReader{}
 
 	compressCmd, formatArg := parseArchiveFormat(format)
-	archiveCmd := gitCommand("", "", "git", "--git-dir="+repoPath, "archive", "--format="+formatArg, "--prefix="+archivePrefix+"/", commitId)
+	archiveCmd := gitCommandApi(nil, "git", "--git-dir="+repoPath, "archive", "--format="+formatArg, "--prefix="+archivePrefix+"/", commitId)
 
 	var archiveStdout io.ReadCloser
 	archiveStdout, err = archiveCmd.StdoutPipe()

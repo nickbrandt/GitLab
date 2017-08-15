@@ -79,7 +79,7 @@ func startGitCommand(a *api.Response, stdin io.Reader, stdout io.Writer, action 
 	args := []string{subCommand(action), "--stateless-rpc"}
 	args = append(args, options...)
 	args = append(args, a.RepoPath)
-	cmd = gitCommand(a.GL_ID, a.GL_REPOSITORY, "git", args...)
+	cmd = gitCommandApi(a, "git", args...)
 	cmd.Stdin = stdin
 	cmd.Stdout = stdout
 
