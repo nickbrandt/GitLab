@@ -20,6 +20,7 @@ import (
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/git"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
@@ -41,6 +42,8 @@ var checkoutDir = path.Join(scratchDir, "test")
 var cacheDir = path.Join(scratchDir, "cache")
 
 func TestMain(m *testing.M) {
+	git.Testing = true
+
 	source := "https://gitlab.com/gitlab-org/gitlab-test.git"
 	clonePath := path.Join(testRepoRoot, testRepo)
 	if _, err := os.Stat(clonePath); err != nil {

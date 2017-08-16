@@ -56,26 +56,20 @@ func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 
 	gitalyAddress := "unix://" + socketPath
 
-	apiResponseOld := gitOkBody(t)
-	apiResponseOld.GitalyServer = gitaly.Server{}
-	apiResponseOld.GitalyAddress = gitalyAddress
-
 	apiResponse := gitOkBody(t)
 	apiResponse.GitalyServer.Address = gitalyAddress
 
-	for _, a := range []*api.Response{apiResponseOld, apiResponse} {
-		ts := testAuthServer(nil, 200, a)
-		defer ts.Close()
+	ts := testAuthServer(nil, 200, apiResponse)
+	defer ts.Close()
 
-		ws := startWorkhorseServer(ts.URL)
-		defer ws.Close()
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
 
-		resource := "/gitlab-org/gitlab-test.git/info/refs?service=git-upload-pack"
-		_, body := httpGet(t, ws.URL+resource)
+	resource := "/gitlab-org/gitlab-test.git/info/refs?service=git-upload-pack"
+	_, body := httpGet(t, ws.URL+resource)
 
-		expectedContent := string(testhelper.GitalyInfoRefsResponseMock)
-		assert.Equal(t, expectedContent, body, "GET %q: response body", resource)
-	}
+	expectedContent := string(testhelper.GitalyInfoRefsResponseMock)
+	assert.Equal(t, expectedContent, body, "GET %q: response body", resource)
 }
 
 func TestGetInfoRefsProxiedToGitalyInterruptedStream(t *testing.T) {
@@ -265,7 +259,6 @@ func TestGetInfoRefsHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 	defer gitalyServer.Stop()
 
 	apiResponse := gitOkBody(t)
-	apiResponse.GitalyAddress = ""
 	apiResponse.GitalyServer.Address = ""
 	ts := testAuthServer(nil, 200, apiResponse)
 	defer ts.Close()
@@ -286,7 +279,6 @@ func TestPostReceivePackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 	defer gitalyServer.Stop()
 
 	apiResponse := gitOkBody(t)
-	apiResponse.GitalyAddress = ""
 	apiResponse.GitalyServer.Address = ""
 	ts := testAuthServer(nil, 200, apiResponse)
 	defer ts.Close()
@@ -308,7 +300,6 @@ func TestPostUploadPackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 	defer gitalyServer.Stop()
 
 	apiResponse := gitOkBody(t)
-	apiResponse.GitalyAddress = ""
 	apiResponse.GitalyServer.Address = ""
 	ts := testAuthServer(nil, 200, apiResponse)
 	defer ts.Close()
