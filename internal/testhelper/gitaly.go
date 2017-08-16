@@ -42,7 +42,7 @@ func NewGitalyServer(finalMessageCode codes.Code) *GitalyTestServer {
 	return &GitalyTestServer{finalMessageCode: finalMessageCode}
 }
 
-func (s *GitalyTestServer) InfoRefsUploadPack(in *pb.InfoRefsRequest, stream pb.SmartHTTP_InfoRefsUploadPackServer) error {
+func (s *GitalyTestServer) InfoRefsUploadPack(in *pb.InfoRefsRequest, stream pb.SmartHTTPService_InfoRefsUploadPackServer) error {
 	s.WaitGroup.Add(1)
 	defer s.WaitGroup.Done()
 
@@ -63,7 +63,7 @@ func (s *GitalyTestServer) InfoRefsUploadPack(in *pb.InfoRefsRequest, stream pb.
 	return s.finalError()
 }
 
-func (s *GitalyTestServer) InfoRefsReceivePack(in *pb.InfoRefsRequest, stream pb.SmartHTTP_InfoRefsReceivePackServer) error {
+func (s *GitalyTestServer) InfoRefsReceivePack(in *pb.InfoRefsRequest, stream pb.SmartHTTPService_InfoRefsReceivePackServer) error {
 	s.WaitGroup.Add(1)
 	defer s.WaitGroup.Done()
 
@@ -81,7 +81,7 @@ func (s *GitalyTestServer) InfoRefsReceivePack(in *pb.InfoRefsRequest, stream pb
 	return s.finalError()
 }
 
-func (s *GitalyTestServer) PostReceivePack(stream pb.SmartHTTP_PostReceivePackServer) error {
+func (s *GitalyTestServer) PostReceivePack(stream pb.SmartHTTPService_PostReceivePackServer) error {
 	s.WaitGroup.Add(1)
 	defer s.WaitGroup.Done()
 
@@ -126,7 +126,7 @@ func (s *GitalyTestServer) PostReceivePack(stream pb.SmartHTTP_PostReceivePackSe
 	return s.finalError()
 }
 
-func (s *GitalyTestServer) PostUploadPack(stream pb.SmartHTTP_PostUploadPackServer) error {
+func (s *GitalyTestServer) PostUploadPack(stream pb.SmartHTTPService_PostUploadPackServer) error {
 	s.WaitGroup.Add(1)
 	defer s.WaitGroup.Done()
 
