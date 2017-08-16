@@ -32,7 +32,7 @@ func NewSmartHTTPClient(server Server) (*SmartHTTPClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	grpcClient := pb.NewSmartHTTPClient(conn)
+	grpcClient := pb.NewSmartHTTPServiceClient(conn)
 	return &SmartHTTPClient{grpcClient}, nil
 }
 

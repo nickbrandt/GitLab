@@ -49,9 +49,246 @@ func (m *RepositoryExistsResponse) GetExists() bool {
 	return false
 }
 
+type RepackIncrementalRequest struct {
+	Repository *Repository `protobuf:"bytes,1,opt,name=repository" json:"repository,omitempty"`
+}
+
+func (m *RepackIncrementalRequest) Reset()                    { *m = RepackIncrementalRequest{} }
+func (m *RepackIncrementalRequest) String() string            { return proto.CompactTextString(m) }
+func (*RepackIncrementalRequest) ProtoMessage()               {}
+func (*RepackIncrementalRequest) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{2} }
+
+func (m *RepackIncrementalRequest) GetRepository() *Repository {
+	if m != nil {
+		return m.Repository
+	}
+	return nil
+}
+
+type RepackIncrementalResponse struct {
+}
+
+func (m *RepackIncrementalResponse) Reset()                    { *m = RepackIncrementalResponse{} }
+func (m *RepackIncrementalResponse) String() string            { return proto.CompactTextString(m) }
+func (*RepackIncrementalResponse) ProtoMessage()               {}
+func (*RepackIncrementalResponse) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{3} }
+
+type RepackFullRequest struct {
+	Repository   *Repository `protobuf:"bytes,1,opt,name=repository" json:"repository,omitempty"`
+	CreateBitmap bool        `protobuf:"varint,2,opt,name=create_bitmap,json=createBitmap" json:"create_bitmap,omitempty"`
+}
+
+func (m *RepackFullRequest) Reset()                    { *m = RepackFullRequest{} }
+func (m *RepackFullRequest) String() string            { return proto.CompactTextString(m) }
+func (*RepackFullRequest) ProtoMessage()               {}
+func (*RepackFullRequest) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{4} }
+
+func (m *RepackFullRequest) GetRepository() *Repository {
+	if m != nil {
+		return m.Repository
+	}
+	return nil
+}
+
+func (m *RepackFullRequest) GetCreateBitmap() bool {
+	if m != nil {
+		return m.CreateBitmap
+	}
+	return false
+}
+
+type RepackFullResponse struct {
+}
+
+func (m *RepackFullResponse) Reset()                    { *m = RepackFullResponse{} }
+func (m *RepackFullResponse) String() string            { return proto.CompactTextString(m) }
+func (*RepackFullResponse) ProtoMessage()               {}
+func (*RepackFullResponse) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{5} }
+
+type GarbageCollectRequest struct {
+	Repository   *Repository `protobuf:"bytes,1,opt,name=repository" json:"repository,omitempty"`
+	CreateBitmap bool        `protobuf:"varint,2,opt,name=create_bitmap,json=createBitmap" json:"create_bitmap,omitempty"`
+}
+
+func (m *GarbageCollectRequest) Reset()                    { *m = GarbageCollectRequest{} }
+func (m *GarbageCollectRequest) String() string            { return proto.CompactTextString(m) }
+func (*GarbageCollectRequest) ProtoMessage()               {}
+func (*GarbageCollectRequest) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{6} }
+
+func (m *GarbageCollectRequest) GetRepository() *Repository {
+	if m != nil {
+		return m.Repository
+	}
+	return nil
+}
+
+func (m *GarbageCollectRequest) GetCreateBitmap() bool {
+	if m != nil {
+		return m.CreateBitmap
+	}
+	return false
+}
+
+type GarbageCollectResponse struct {
+}
+
+func (m *GarbageCollectResponse) Reset()                    { *m = GarbageCollectResponse{} }
+func (m *GarbageCollectResponse) String() string            { return proto.CompactTextString(m) }
+func (*GarbageCollectResponse) ProtoMessage()               {}
+func (*GarbageCollectResponse) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{7} }
+
+type RepositorySizeRequest struct {
+	Repository *Repository `protobuf:"bytes,1,opt,name=repository" json:"repository,omitempty"`
+}
+
+func (m *RepositorySizeRequest) Reset()                    { *m = RepositorySizeRequest{} }
+func (m *RepositorySizeRequest) String() string            { return proto.CompactTextString(m) }
+func (*RepositorySizeRequest) ProtoMessage()               {}
+func (*RepositorySizeRequest) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{8} }
+
+func (m *RepositorySizeRequest) GetRepository() *Repository {
+	if m != nil {
+		return m.Repository
+	}
+	return nil
+}
+
+type RepositorySizeResponse struct {
+	// Repository size in kilobytes
+	Size int64 `protobuf:"varint,1,opt,name=size" json:"size,omitempty"`
+}
+
+func (m *RepositorySizeResponse) Reset()                    { *m = RepositorySizeResponse{} }
+func (m *RepositorySizeResponse) String() string            { return proto.CompactTextString(m) }
+func (*RepositorySizeResponse) ProtoMessage()               {}
+func (*RepositorySizeResponse) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{9} }
+
+func (m *RepositorySizeResponse) GetSize() int64 {
+	if m != nil {
+		return m.Size
+	}
+	return 0
+}
+
+type ApplyGitattributesRequest struct {
+	Repository *Repository `protobuf:"bytes,1,opt,name=repository" json:"repository,omitempty"`
+	Revision   []byte      `protobuf:"bytes,2,opt,name=revision,proto3" json:"revision,omitempty"`
+}
+
+func (m *ApplyGitattributesRequest) Reset()                    { *m = ApplyGitattributesRequest{} }
+func (m *ApplyGitattributesRequest) String() string            { return proto.CompactTextString(m) }
+func (*ApplyGitattributesRequest) ProtoMessage()               {}
+func (*ApplyGitattributesRequest) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{10} }
+
+func (m *ApplyGitattributesRequest) GetRepository() *Repository {
+	if m != nil {
+		return m.Repository
+	}
+	return nil
+}
+
+func (m *ApplyGitattributesRequest) GetRevision() []byte {
+	if m != nil {
+		return m.Revision
+	}
+	return nil
+}
+
+type ApplyGitattributesResponse struct {
+}
+
+func (m *ApplyGitattributesResponse) Reset()                    { *m = ApplyGitattributesResponse{} }
+func (m *ApplyGitattributesResponse) String() string            { return proto.CompactTextString(m) }
+func (*ApplyGitattributesResponse) ProtoMessage()               {}
+func (*ApplyGitattributesResponse) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{11} }
+
+type FetchRemoteRequest struct {
+	Repository *Repository `protobuf:"bytes,1,opt,name=repository" json:"repository,omitempty"`
+	Remote     string      `protobuf:"bytes,2,opt,name=remote" json:"remote,omitempty"`
+	Force      bool        `protobuf:"varint,3,opt,name=force" json:"force,omitempty"`
+	NoTags     bool        `protobuf:"varint,4,opt,name=no_tags,json=noTags" json:"no_tags,omitempty"`
+	Timeout    int32       `protobuf:"varint,5,opt,name=timeout" json:"timeout,omitempty"`
+	SshKey     string      `protobuf:"bytes,6,opt,name=ssh_key,json=sshKey" json:"ssh_key,omitempty"`
+	KnownHosts string      `protobuf:"bytes,7,opt,name=known_hosts,json=knownHosts" json:"known_hosts,omitempty"`
+}
+
+func (m *FetchRemoteRequest) Reset()                    { *m = FetchRemoteRequest{} }
+func (m *FetchRemoteRequest) String() string            { return proto.CompactTextString(m) }
+func (*FetchRemoteRequest) ProtoMessage()               {}
+func (*FetchRemoteRequest) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{12} }
+
+func (m *FetchRemoteRequest) GetRepository() *Repository {
+	if m != nil {
+		return m.Repository
+	}
+	return nil
+}
+
+func (m *FetchRemoteRequest) GetRemote() string {
+	if m != nil {
+		return m.Remote
+	}
+	return ""
+}
+
+func (m *FetchRemoteRequest) GetForce() bool {
+	if m != nil {
+		return m.Force
+	}
+	return false
+}
+
+func (m *FetchRemoteRequest) GetNoTags() bool {
+	if m != nil {
+		return m.NoTags
+	}
+	return false
+}
+
+func (m *FetchRemoteRequest) GetTimeout() int32 {
+	if m != nil {
+		return m.Timeout
+	}
+	return 0
+}
+
+func (m *FetchRemoteRequest) GetSshKey() string {
+	if m != nil {
+		return m.SshKey
+	}
+	return ""
+}
+
+func (m *FetchRemoteRequest) GetKnownHosts() string {
+	if m != nil {
+		return m.KnownHosts
+	}
+	return ""
+}
+
+type FetchRemoteResponse struct {
+}
+
+func (m *FetchRemoteResponse) Reset()                    { *m = FetchRemoteResponse{} }
+func (m *FetchRemoteResponse) String() string            { return proto.CompactTextString(m) }
+func (*FetchRemoteResponse) ProtoMessage()               {}
+func (*FetchRemoteResponse) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{13} }
+
 func init() {
 	proto.RegisterType((*RepositoryExistsRequest)(nil), "gitaly.RepositoryExistsRequest")
 	proto.RegisterType((*RepositoryExistsResponse)(nil), "gitaly.RepositoryExistsResponse")
+	proto.RegisterType((*RepackIncrementalRequest)(nil), "gitaly.RepackIncrementalRequest")
+	proto.RegisterType((*RepackIncrementalResponse)(nil), "gitaly.RepackIncrementalResponse")
+	proto.RegisterType((*RepackFullRequest)(nil), "gitaly.RepackFullRequest")
+	proto.RegisterType((*RepackFullResponse)(nil), "gitaly.RepackFullResponse")
+	proto.RegisterType((*GarbageCollectRequest)(nil), "gitaly.GarbageCollectRequest")
+	proto.RegisterType((*GarbageCollectResponse)(nil), "gitaly.GarbageCollectResponse")
+	proto.RegisterType((*RepositorySizeRequest)(nil), "gitaly.RepositorySizeRequest")
+	proto.RegisterType((*RepositorySizeResponse)(nil), "gitaly.RepositorySizeResponse")
+	proto.RegisterType((*ApplyGitattributesRequest)(nil), "gitaly.ApplyGitattributesRequest")
+	proto.RegisterType((*ApplyGitattributesResponse)(nil), "gitaly.ApplyGitattributesResponse")
+	proto.RegisterType((*FetchRemoteRequest)(nil), "gitaly.FetchRemoteRequest")
+	proto.RegisterType((*FetchRemoteResponse)(nil), "gitaly.FetchRemoteResponse")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -65,6 +302,14 @@ const _ = grpc.SupportPackageIsVersion4
 // Client API for RepositoryService service
 
 type RepositoryServiceClient interface {
+	RepositoryExists(ctx context.Context, in *RepositoryExistsRequest, opts ...grpc.CallOption) (*RepositoryExistsResponse, error)
+	RepackIncremental(ctx context.Context, in *RepackIncrementalRequest, opts ...grpc.CallOption) (*RepackIncrementalResponse, error)
+	RepackFull(ctx context.Context, in *RepackFullRequest, opts ...grpc.CallOption) (*RepackFullResponse, error)
+	GarbageCollect(ctx context.Context, in *GarbageCollectRequest, opts ...grpc.CallOption) (*GarbageCollectResponse, error)
+	RepositorySize(ctx context.Context, in *RepositorySizeRequest, opts ...grpc.CallOption) (*RepositorySizeResponse, error)
+	ApplyGitattributes(ctx context.Context, in *ApplyGitattributesRequest, opts ...grpc.CallOption) (*ApplyGitattributesResponse, error)
+	FetchRemote(ctx context.Context, in *FetchRemoteRequest, opts ...grpc.CallOption) (*FetchRemoteResponse, error)
+	// Deprecated, use the RepositoryExists RPC instead.
 	Exists(ctx context.Context, in *RepositoryExistsRequest, opts ...grpc.CallOption) (*RepositoryExistsResponse, error)
 }
 
@@ -74,6 +319,69 @@ type repositoryServiceClient struct {
 
 func NewRepositoryServiceClient(cc *grpc.ClientConn) RepositoryServiceClient {
 	return &repositoryServiceClient{cc}
+}
+
+func (c *repositoryServiceClient) RepositoryExists(ctx context.Context, in *RepositoryExistsRequest, opts ...grpc.CallOption) (*RepositoryExistsResponse, error) {
+	out := new(RepositoryExistsResponse)
+	err := grpc.Invoke(ctx, "/gitaly.RepositoryService/RepositoryExists", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *repositoryServiceClient) RepackIncremental(ctx context.Context, in *RepackIncrementalRequest, opts ...grpc.CallOption) (*RepackIncrementalResponse, error) {
+	out := new(RepackIncrementalResponse)
+	err := grpc.Invoke(ctx, "/gitaly.RepositoryService/RepackIncremental", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *repositoryServiceClient) RepackFull(ctx context.Context, in *RepackFullRequest, opts ...grpc.CallOption) (*RepackFullResponse, error) {
+	out := new(RepackFullResponse)
+	err := grpc.Invoke(ctx, "/gitaly.RepositoryService/RepackFull", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *repositoryServiceClient) GarbageCollect(ctx context.Context, in *GarbageCollectRequest, opts ...grpc.CallOption) (*GarbageCollectResponse, error) {
+	out := new(GarbageCollectResponse)
+	err := grpc.Invoke(ctx, "/gitaly.RepositoryService/GarbageCollect", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *repositoryServiceClient) RepositorySize(ctx context.Context, in *RepositorySizeRequest, opts ...grpc.CallOption) (*RepositorySizeResponse, error) {
+	out := new(RepositorySizeResponse)
+	err := grpc.Invoke(ctx, "/gitaly.RepositoryService/RepositorySize", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *repositoryServiceClient) ApplyGitattributes(ctx context.Context, in *ApplyGitattributesRequest, opts ...grpc.CallOption) (*ApplyGitattributesResponse, error) {
+	out := new(ApplyGitattributesResponse)
+	err := grpc.Invoke(ctx, "/gitaly.RepositoryService/ApplyGitattributes", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *repositoryServiceClient) FetchRemote(ctx context.Context, in *FetchRemoteRequest, opts ...grpc.CallOption) (*FetchRemoteResponse, error) {
+	out := new(FetchRemoteResponse)
+	err := grpc.Invoke(ctx, "/gitaly.RepositoryService/FetchRemote", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *repositoryServiceClient) Exists(ctx context.Context, in *RepositoryExistsRequest, opts ...grpc.CallOption) (*RepositoryExistsResponse, error) {
@@ -88,11 +396,145 @@ func (c *repositoryServiceClient) Exists(ctx context.Context, in *RepositoryExis
 // Server API for RepositoryService service
 
 type RepositoryServiceServer interface {
+	RepositoryExists(context.Context, *RepositoryExistsRequest) (*RepositoryExistsResponse, error)
+	RepackIncremental(context.Context, *RepackIncrementalRequest) (*RepackIncrementalResponse, error)
+	RepackFull(context.Context, *RepackFullRequest) (*RepackFullResponse, error)
+	GarbageCollect(context.Context, *GarbageCollectRequest) (*GarbageCollectResponse, error)
+	RepositorySize(context.Context, *RepositorySizeRequest) (*RepositorySizeResponse, error)
+	ApplyGitattributes(context.Context, *ApplyGitattributesRequest) (*ApplyGitattributesResponse, error)
+	FetchRemote(context.Context, *FetchRemoteRequest) (*FetchRemoteResponse, error)
+	// Deprecated, use the RepositoryExists RPC instead.
 	Exists(context.Context, *RepositoryExistsRequest) (*RepositoryExistsResponse, error)
 }
 
 func RegisterRepositoryServiceServer(s *grpc.Server, srv RepositoryServiceServer) {
 	s.RegisterService(&_RepositoryService_serviceDesc, srv)
+}
+
+func _RepositoryService_RepositoryExists_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RepositoryExistsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RepositoryServiceServer).RepositoryExists(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gitaly.RepositoryService/RepositoryExists",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RepositoryServiceServer).RepositoryExists(ctx, req.(*RepositoryExistsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RepositoryService_RepackIncremental_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RepackIncrementalRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RepositoryServiceServer).RepackIncremental(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gitaly.RepositoryService/RepackIncremental",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RepositoryServiceServer).RepackIncremental(ctx, req.(*RepackIncrementalRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RepositoryService_RepackFull_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RepackFullRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RepositoryServiceServer).RepackFull(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gitaly.RepositoryService/RepackFull",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RepositoryServiceServer).RepackFull(ctx, req.(*RepackFullRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RepositoryService_GarbageCollect_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GarbageCollectRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RepositoryServiceServer).GarbageCollect(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gitaly.RepositoryService/GarbageCollect",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RepositoryServiceServer).GarbageCollect(ctx, req.(*GarbageCollectRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RepositoryService_RepositorySize_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RepositorySizeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RepositoryServiceServer).RepositorySize(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gitaly.RepositoryService/RepositorySize",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RepositoryServiceServer).RepositorySize(ctx, req.(*RepositorySizeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RepositoryService_ApplyGitattributes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplyGitattributesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RepositoryServiceServer).ApplyGitattributes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gitaly.RepositoryService/ApplyGitattributes",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RepositoryServiceServer).ApplyGitattributes(ctx, req.(*ApplyGitattributesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RepositoryService_FetchRemote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FetchRemoteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RepositoryServiceServer).FetchRemote(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gitaly.RepositoryService/FetchRemote",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RepositoryServiceServer).FetchRemote(ctx, req.(*FetchRemoteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _RepositoryService_Exists_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -118,6 +560,34 @@ var _RepositoryService_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*RepositoryServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "RepositoryExists",
+			Handler:    _RepositoryService_RepositoryExists_Handler,
+		},
+		{
+			MethodName: "RepackIncremental",
+			Handler:    _RepositoryService_RepackIncremental_Handler,
+		},
+		{
+			MethodName: "RepackFull",
+			Handler:    _RepositoryService_RepackFull_Handler,
+		},
+		{
+			MethodName: "GarbageCollect",
+			Handler:    _RepositoryService_GarbageCollect_Handler,
+		},
+		{
+			MethodName: "RepositorySize",
+			Handler:    _RepositoryService_RepositorySize_Handler,
+		},
+		{
+			MethodName: "ApplyGitattributes",
+			Handler:    _RepositoryService_ApplyGitattributes_Handler,
+		},
+		{
+			MethodName: "FetchRemote",
+			Handler:    _RepositoryService_FetchRemote_Handler,
+		},
+		{
 			MethodName: "Exists",
 			Handler:    _RepositoryService_Exists_Handler,
 		},
@@ -129,16 +599,40 @@ var _RepositoryService_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("repository-service.proto", fileDescriptor6) }
 
 var fileDescriptor6 = []byte{
-	// 172 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x28, 0x4a, 0x2d, 0xc8,
-	0x2f, 0xce, 0x2c, 0xc9, 0x2f, 0xaa, 0xd4, 0x2d, 0x4e, 0x2d, 0x2a, 0xcb, 0x4c, 0x4e, 0xd5, 0x2b,
-	0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x4b, 0xcf, 0x2c, 0x49, 0xcc, 0xa9, 0x94, 0xe2, 0x29, 0xce,
-	0x48, 0x2c, 0x4a, 0x4d, 0x81, 0x88, 0x2a, 0xf9, 0x72, 0x89, 0x07, 0xc1, 0x75, 0xb8, 0x56, 0x64,
-	0x16, 0x97, 0x14, 0x07, 0xa5, 0x16, 0x96, 0xa6, 0x16, 0x97, 0x08, 0x19, 0x71, 0x71, 0x21, 0x0c,
-	0x93, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x36, 0x12, 0xd2, 0x83, 0x98, 0xa2, 0x87, 0xd0, 0x14, 0x84,
-	0xa4, 0x4a, 0xc9, 0x88, 0x4b, 0x02, 0xd3, 0xb8, 0xe2, 0x82, 0xfc, 0xbc, 0xe2, 0x54, 0x21, 0x31,
-	0x2e, 0xb6, 0x54, 0xb0, 0x08, 0xd8, 0x2c, 0x8e, 0x20, 0x28, 0xcf, 0x28, 0x89, 0x4b, 0x10, 0xa1,
-	0x27, 0x18, 0xe2, 0x66, 0x21, 0x5f, 0x2e, 0x36, 0x88, 0x76, 0x21, 0x79, 0x4c, 0x2b, 0x51, 0xdc,
-	0x29, 0xa5, 0x80, 0x5b, 0x01, 0xc4, 0x66, 0x25, 0x86, 0x24, 0x36, 0xb0, 0x6f, 0x8d, 0x01, 0x01,
-	0x00, 0x00, 0xff, 0xff, 0x7e, 0xc1, 0x7d, 0x44, 0x1f, 0x01, 0x00, 0x00,
+	// 558 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x55, 0xcd, 0x6e, 0xd3, 0x40,
+	0x10, 0x6e, 0x68, 0x93, 0x94, 0x49, 0x40, 0x30, 0x34, 0xa9, 0xe3, 0x02, 0x0d, 0xe6, 0xd2, 0x03,
+	0xe4, 0x10, 0x9e, 0x00, 0x50, 0x7f, 0x50, 0x55, 0x24, 0x0c, 0x12, 0x12, 0x12, 0x8a, 0x36, 0x66,
+	0x48, 0x56, 0x71, 0xbc, 0x66, 0x77, 0x53, 0x48, 0xdf, 0x89, 0xa7, 0xe2, 0x45, 0x50, 0x76, 0x1d,
+	0xdb, 0x49, 0x9c, 0x5e, 0x0c, 0x37, 0xcf, 0xdf, 0x37, 0xb3, 0xdf, 0xce, 0xb7, 0x06, 0x47, 0x52,
+	0x2c, 0x14, 0xd7, 0x42, 0xce, 0x5f, 0x2a, 0x92, 0xd7, 0x3c, 0xa0, 0x5e, 0x2c, 0x85, 0x16, 0x58,
+	0x1b, 0x71, 0xcd, 0xc2, 0xb9, 0xdb, 0x54, 0x63, 0x26, 0xe9, 0x9b, 0xf5, 0x7a, 0x57, 0x70, 0xe8,
+	0xa7, 0x15, 0xa7, 0xbf, 0xb8, 0xd2, 0xca, 0xa7, 0x1f, 0x33, 0x52, 0x1a, 0xfb, 0x00, 0x19, 0x98,
+	0x53, 0xe9, 0x56, 0x4e, 0x1a, 0x7d, 0xec, 0x59, 0x94, 0x5e, 0x56, 0xe4, 0xe7, 0xb2, 0xbc, 0x3e,
+	0x38, 0x9b, 0x70, 0x2a, 0x16, 0x91, 0x22, 0x6c, 0x43, 0x8d, 0x8c, 0xc7, 0x60, 0xed, 0xfb, 0x89,
+	0xe5, 0xbd, 0x37, 0x35, 0x2c, 0x98, 0xbc, 0x8b, 0x02, 0x49, 0x53, 0x8a, 0x34, 0x0b, 0xcb, 0xcc,
+	0x70, 0x04, 0x9d, 0x02, 0x3c, 0x3b, 0x84, 0x17, 0xc2, 0x43, 0x1b, 0x3c, 0x9b, 0x85, 0x65, 0xba,
+	0xe0, 0x73, 0xb8, 0x17, 0x48, 0x62, 0x9a, 0x06, 0x43, 0xae, 0xa7, 0x2c, 0x76, 0xee, 0x98, 0x43,
+	0x35, 0xad, 0xf3, 0x8d, 0xf1, 0x79, 0x07, 0x80, 0xf9, 0x6e, 0xc9, 0x0c, 0x31, 0xb4, 0xce, 0x99,
+	0x1c, 0xb2, 0x11, 0xbd, 0x15, 0x61, 0x48, 0x81, 0xfe, 0xef, 0x73, 0x38, 0xd0, 0x5e, 0xef, 0x98,
+	0xcc, 0x72, 0x09, 0xad, 0x0c, 0xf8, 0x23, 0xbf, 0xa1, 0x32, 0xcc, 0xbf, 0x80, 0xf6, 0x3a, 0x58,
+	0x72, 0xf7, 0x08, 0x7b, 0x8a, 0xdf, 0x90, 0xc1, 0xd9, 0xf5, 0xcd, 0xb7, 0x37, 0x81, 0xce, 0xeb,
+	0x38, 0x0e, 0xe7, 0xe7, 0x5c, 0x33, 0xad, 0x25, 0x1f, 0xce, 0x34, 0x95, 0x59, 0x3e, 0x74, 0x61,
+	0x5f, 0xd2, 0x35, 0x57, 0x5c, 0x44, 0x86, 0x85, 0xa6, 0x9f, 0xda, 0xde, 0x63, 0x70, 0x8b, 0x9a,
+	0x25, 0x2c, 0xfc, 0xa9, 0x00, 0x9e, 0x91, 0x0e, 0xc6, 0x3e, 0x4d, 0x85, 0x2e, 0xc3, 0xc1, 0x62,
+	0xcb, 0xa5, 0x01, 0x31, 0x23, 0xdc, 0xf5, 0x13, 0x0b, 0x0f, 0xa0, 0xfa, 0x5d, 0xc8, 0x80, 0x9c,
+	0x5d, 0x73, 0x3f, 0xd6, 0xc0, 0x43, 0xa8, 0x47, 0x62, 0xa0, 0xd9, 0x48, 0x39, 0x7b, 0x56, 0x14,
+	0x91, 0xf8, 0xc4, 0x46, 0x0a, 0x1d, 0xa8, 0x6b, 0x3e, 0x25, 0x31, 0xd3, 0x4e, 0xb5, 0x5b, 0x39,
+	0xa9, 0xfa, 0x4b, 0x73, 0x51, 0xa2, 0xd4, 0x78, 0x30, 0xa1, 0xb9, 0x53, 0xb3, 0x1d, 0x94, 0x1a,
+	0x5f, 0xd2, 0x1c, 0x8f, 0xa1, 0x31, 0x89, 0xc4, 0xcf, 0x68, 0x30, 0x16, 0x0b, 0x91, 0xd5, 0x4d,
+	0x10, 0x8c, 0xeb, 0x62, 0xe1, 0xf1, 0x5a, 0xf0, 0x68, 0xe5, 0x90, 0xf6, 0xf0, 0xfd, 0xdf, 0x55,
+	0xa3, 0x89, 0xe5, 0xb5, 0xd9, 0x47, 0x03, 0x3f, 0xc3, 0x83, 0x75, 0x25, 0xe3, 0xf1, 0xe6, 0xd9,
+	0x57, 0x9e, 0x0c, 0xb7, 0xbb, 0x3d, 0x21, 0x61, 0x7a, 0x07, 0xbf, 0x2c, 0x15, 0x98, 0x93, 0x27,
+	0xe6, 0x0b, 0x0b, 0x5f, 0x02, 0xf7, 0xd9, 0x2d, 0x19, 0x29, 0xf6, 0x29, 0x40, 0xa6, 0x37, 0xec,
+	0xac, 0x96, 0xe4, 0x14, 0xef, 0xba, 0x45, 0xa1, 0x14, 0xe6, 0x03, 0xdc, 0x5f, 0x95, 0x0b, 0x3e,
+	0x59, 0xe6, 0x17, 0x0a, 0xd7, 0x7d, 0xba, 0x2d, 0x9c, 0x87, 0x5c, 0x95, 0x46, 0x06, 0x59, 0xa8,
+	0xbf, 0x0c, 0xb2, 0x58, 0x51, 0xde, 0x0e, 0x7e, 0x05, 0xdc, 0x5c, 0x69, 0x4c, 0x79, 0xda, 0xaa,
+	0x2d, 0xd7, 0xbb, 0x2d, 0x25, 0x85, 0xbf, 0x80, 0x46, 0x6e, 0x5b, 0x30, 0x65, 0x6c, 0x53, 0x27,
+	0xee, 0x51, 0x61, 0x2c, 0x45, 0xba, 0x82, 0xda, 0x3f, 0x5c, 0xa0, 0x61, 0xcd, 0xfc, 0xb9, 0x5e,
+	0xfd, 0x0d, 0x00, 0x00, 0xff, 0xff, 0x33, 0x2f, 0xf5, 0x96, 0xeb, 0x06, 0x00, 0x00,
 }

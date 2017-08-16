@@ -384,7 +384,7 @@ func startGitalyServer(t *testing.T, finalMessageCode codes.Code) (*combinedServ
 	require.NoError(t, err)
 
 	gitalyServer := testhelper.NewGitalyServer(finalMessageCode)
-	pb.RegisterSmartHTTPServer(server, gitalyServer)
+	pb.RegisterSmartHTTPServiceServer(server, gitalyServer)
 	pb.RegisterBlobServiceServer(server, gitalyServer)
 
 	go server.Serve(listener)

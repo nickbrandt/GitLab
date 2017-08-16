@@ -10,7 +10,7 @@ import (
 )
 
 type SmartHTTPClient struct {
-	pb.SmartHTTPClient
+	pb.SmartHTTPServiceClient
 }
 
 func (client *SmartHTTPClient) InfoRefsResponseReader(ctx context.Context, repo *pb.Repository, rpc string) (io.Reader, error) {
