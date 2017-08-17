@@ -30,9 +30,14 @@ module Geo
     end
 
     def setup_sample_repositories!
+      puts "\n==> Setting up sample repositories..."
+      start = Time.now
+
       REPOSITORIES_URLS.each do |project_url|
         clone_repository(project_url)
       end
+
+      puts "    Repositories setup in #{Time.now - start} seconds...\n"
     end
 
     def clone_repository(clone_url)
@@ -50,11 +55,16 @@ module Geo
     end
 
     def copy_repositories_to_projects!
+      puts "\n==> Copying repositories..."
+      start = Time.now
+
       Project.find_in_batches(batch_size: BATCH_SIZE) do |batch|
         batch.each do |project|
           copy_repository(project, REPOSITORIES_URLS.sample)
         end
       end
+
+      puts "    Repositories copied in #{Time.now - start} seconds...\n"
     end
 
     def copy_repository(project, clone_url)
@@ -78,24 +88,28 @@ module Geo
       { 'GIT_TEMPLATE_DIR' => '' }
     end
 
-    def create_mass_projects!
-      # TODO: Create forked projects
-      # TODO: Create wiki repositories
+    # TODO: Create forked projects
+    # TODO: Create wiki repositories
+    def create_mass_projects!(count = 750)
+      puts "\n==> Creating #{count} projects..."
+      start = Time.now
 
       # Disable database insertion logs so speed isn't limited by ability to print to console
       old_logger = ActiveRecord::Base.logger
       ActiveRecord::Base.logger = nil
 
       Sidekiq::Testing.inline! do
-        create_projects_by_visibility!(250, :private)
-        create_projects_by_visibility!(250, :internal)
-        create_projects_by_visibility!(250, :public)
+        create_projects_by_visibility!(count / 3, :private)
+        create_projects_by_visibility!(count / 3, :internal)
+        create_projects_by_visibility!(count / 3, :public)
         create_missing_project_features!
         create_missing_project_statistics!
       end
 
       # Reset logging
       ActiveRecord::Base.logger = old_logger
+
+      puts "    #{count} projects created in #{Time.now - start} seconds...\n"
     end
 
     def create_projects_by_visibility!(count, visibility)
@@ -144,9 +158,8 @@ module Geo
       SQL
     end
 
+    # TODO: ProjectStatistics#update_storage_size
     def create_missing_project_statistics!
-      # TODO: ProjectStatistics#update_storage_size
-
       ActiveRecord::Base.connection.execute <<-SQL
         INSERT INTO project_statistics (
           project_id,
