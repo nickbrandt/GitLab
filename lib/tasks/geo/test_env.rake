@@ -3,7 +3,7 @@ require 'sidekiq/testing/inline'
 module Geo
   class TestEnv
     BATCH_SIZE = 250
-
+    MASS_PROJECTS_COUNT = 30_000
     TMP_TEST_PATH = Rails.root.join('tmp', 'tests', 'geo')
 
     REPOSITORIES_URLS = [
@@ -37,7 +37,7 @@ module Geo
         clone_repository(project_url)
       end
 
-      puts "    Repositories setup in #{Time.now - start} seconds...\n"
+      puts "    Repositories setup in #{pretty_duration(Time.now - start)}...\n"
     end
 
     def clone_repository(clone_url)
@@ -64,7 +64,7 @@ module Geo
         end
       end
 
-      puts "    Repositories copied in #{Time.now - start} seconds...\n"
+      puts "    #{MASS_PROJECTS_COUNT} repositories copied in #{pretty_duration(Time.now - start)}...\n"
     end
 
     def copy_repository(project, clone_url)
@@ -90,8 +90,8 @@ module Geo
 
     # TODO: Create forked projects
     # TODO: Create wiki repositories
-    def create_mass_projects!(count = 750)
-      puts "\n==> Creating #{count} projects..."
+    def create_mass_projects!
+      puts "\n==> Creating #{MASS_PROJECTS_COUNT} projects..."
       start = Time.now
 
       # Disable database insertion logs so speed isn't limited by ability to print to console
@@ -99,9 +99,9 @@ module Geo
       ActiveRecord::Base.logger = nil
 
       Sidekiq::Testing.inline! do
-        create_projects_by_visibility!(count / 3, :private)
-        create_projects_by_visibility!(count / 3, :internal)
-        create_projects_by_visibility!(count / 3, :public)
+        create_projects_by_visibility!(MASS_PROJECTS_COUNT / 3, :private)
+        create_projects_by_visibility!(MASS_PROJECTS_COUNT / 3, :internal)
+        create_projects_by_visibility!(MASS_PROJECTS_COUNT / 3, :public)
         create_missing_project_features!
         create_missing_project_statistics!
       end
@@ -109,7 +109,7 @@ module Geo
       # Reset logging
       ActiveRecord::Base.logger = old_logger
 
-      puts "    #{count} projects created in #{Time.now - start} seconds...\n"
+      puts "    #{MASS_PROJECTS_COUNT} projects created in #{pretty_duration(Time.now - start)}...\n"
     end
 
     def create_projects_by_visibility!(count, visibility)
@@ -174,6 +174,10 @@ module Geo
 
     def take_chance(prob)
       1 + rand(prob) === 1
+    end
+
+    def pretty_duration(duration)
+       Time.at(duration).utc.strftime('%Hh %Mm %Ss')
     end
   end
 end
