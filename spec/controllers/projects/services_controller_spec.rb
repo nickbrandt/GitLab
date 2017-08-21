@@ -60,6 +60,25 @@ describe Projects::ServicesController do
       end
     end
 
+    context 'when Service is new' do
+      before do
+        controller.instance_variable_set(:@service, nil)
+        allow_any_instance_of(ServiceHook).to receive(:execute).and_return(true)
+      end
+
+      it 'creates the service' do
+        put :test, namespace_id: project.namespace.id,
+                   project_id: project.id,
+                   id: 'jenkins',
+                   service: { 'active' => '1', 'push_events' => '1', 'project_name' => 'gitlab',
+                              'jenkins_url' => 'http://jenkins.test.com', 'username' => 'john', 'password' => '1234' }
+
+        jenkins_service = JenkinsService.last
+        expect(jenkins_service).to be_present
+        expect(jenkins_service.jenkins_url).to eq('http://jenkins.test.com')
+      end
+    end
+
     context 'failure' do
       it 'returns success status code and the error message' do
         expect(HipChat::Client).to receive(:new).with('hipchat_token_p', anything).and_raise('Bad test')

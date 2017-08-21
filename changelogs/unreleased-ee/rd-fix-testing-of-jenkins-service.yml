@@ -1,0 +1,5 @@
+---
+title: Testing of Jenkins integration was broken due to missing ServiceHook record.
+merge_request:
+author:
+type: fixed
