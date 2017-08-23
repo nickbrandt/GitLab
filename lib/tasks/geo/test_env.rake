@@ -8,7 +8,7 @@ module Geo
 
     REPOSITORIES_URLS = [
       'https://gitlab.com/gitlab-org/gitlab-test.git'
-    ]
+    ].freeze
 
     attr_reader :opts
 
@@ -177,7 +177,7 @@ module Geo
     end
 
     def pretty_duration(duration)
-       Time.at(duration).utc.strftime('%Hh %Mm %Ss')
+      Time.at(duration).utc.strftime('%Hh %Mm %Ss')
     end
   end
 end
