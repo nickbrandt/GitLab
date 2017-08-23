@@ -69,6 +69,8 @@ module Geo
 
     def copy_repository(project, clone_url)
       target_repo_path = File.expand_path(File.join(project.repository_storage_path, "#{project.full_path}.git"))
+      return if File.exists?(target_repo_path)
+
       FileUtils.mkdir_p(target_repo_path)
 
       if take_chance(12)
