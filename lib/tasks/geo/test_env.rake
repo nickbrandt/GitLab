@@ -33,16 +33,18 @@ module Geo
       puts "\n==> Setting up sample repositories..."
       start = Time.now
 
-      REPOSITORIES_URLS.each do |project_url|
-        clone_repository(project_url)
+      REPOSITORIES_URLS.each do |clone_url|
+        repo_name = clone_url[/.+\/(?<name>.+).git/, 1]
+        repo_path = File.join(TMP_TEST_PATH, repo_name)
+
+        clone_repository(repo_path, clone_url)
+        create_bare_repository("#{repo_path}.wiki")
       end
 
-      puts "    Repositories setup in #{pretty_duration(Time.now - start)}...\n"
+      puts "    Sample repositories setup in #{pretty_duration(Time.now - start)}...\n"
     end
 
-    def clone_repository(clone_url)
-      repo_name = clone_url[/.+\/(?<name>.+).git/, 1]
-      repo_path = File.join(TMP_TEST_PATH, repo_name)
+    def clone_repository(repo_path, clone_url)
       repo_path_bare = "#{repo_path}_bare"
 
       unless File.directory?(repo_path)
@@ -52,6 +54,10 @@ module Geo
       unless File.directory?(repo_path_bare)
         system(git_env, *%W(#{Gitlab.config.git.bin_path} clone -q --bare #{repo_path} #{repo_path_bare}))
       end
+    end
+
+    def create_bare_repository(repo_path)
+      system(git_env, *%W(#{Gitlab.config.git.bin_path} init -q --bare #{repo_path}))
     end
 
     def copy_repositories_to_projects!
@@ -69,20 +75,25 @@ module Geo
 
     def copy_repository(project, clone_url)
       target_repo_path = File.expand_path(File.join(project.repository_storage_path, "#{project.full_path}.git"))
+      target_wiki_path = File.expand_path(File.join(project.repository_storage_path, "#{project.full_path}.wiki.git"))
       return if File.exists?(target_repo_path)
 
       FileUtils.mkdir_p(target_repo_path)
+      FileUtils.mkdir_p(target_wiki_path)
 
       if take_chance(12)
-        system(git_env, *%W(#{Gitlab.config.git.bin_path} init -q --bare #{target_repo_path}))
+        create_bare_repository(target_repo_path)
+        create_bare_repository(target_wiki_path)
       else
         repo_name = clone_url[/.+\/(?<name>.+).git/, 1]
-        source_repo_path = File.expand_path(File.join(TMP_TEST_PATH, "#{repo_name}_bare"))
+        source_repo_path = File.expand_path(File.join(TMP_TEST_PATH, repo_name))
 
-        FileUtils.cp_r("#{source_repo_path}/.", target_repo_path)
+        FileUtils.cp_r("#{source_repo_path}_bare/.", target_repo_path)
+        FileUtils.cp_r("#{source_repo_path}.wiki/.", target_wiki_path)
       end
 
       FileUtils.chmod_R 0755, target_repo_path
+      FileUtils.chmod_R 0755, target_wiki_path
     end
 
     # Prevent developer git configurations from being persisted to test repositories
