@@ -195,6 +195,144 @@ module Geo
   end
 end
 
+module Geo
+  class RandomCommitGenerator
+    TMP_TEST_PATH = Rails.root.join('tmp', 'tests', 'geo')
+
+    EXTENSIONS = %w(css js html rb txt png).freeze
+
+    def generate(project)
+      puts "\n==> Generating random changes for project #{project.full_path}..."
+      repo_path = File.join(TMP_TEST_PATH, project.path)
+      clone_url = project.ssh_url_to_repo
+      clone_repository(repo_path, clone_url)
+
+      directories, files = traverse_root_path(repo_path)
+      remove_random_files(directories, files)
+      create_random_files(repo_path)
+      commit_changes(repo_path)
+    end
+
+    private
+
+    def clone_repository(repo_path, clone_url)
+      unless File.directory?(repo_path)
+        puts "    Cloning project in #{repo_path}"
+        system(*%W(#{Gitlab.config.git.bin_path} clone -q #{clone_url} #{repo_path}))
+      end
+    end
+
+    def traverse_root_path(path)
+      directories, files = [], []
+
+      Dir.foreach(path) do |file|
+        next if file.start_with?('.')
+
+        fullpath = File.join(path, file)
+
+        if File.directory?(fullpath)
+          directories << fullpath
+        else
+          files << fullpath
+        end
+      end
+
+      # Shuffle directories and files so that they're explored in a different order each time
+      [directories.shuffle, files.shuffle!]
+    end
+
+    def remove_random_files(directories, files)
+      # Remove some directories
+      directories.delete_if do |directory|
+        if rand > 0.999
+          FileUtils.rm_rf(directory)
+          puts "    Removed directory: #{directory}\n"
+          true
+        else
+          false
+        end
+      end
+
+      max_removals  = random(2)
+      removals = 0
+
+      files.delete_if do |file|
+        if random > 0.8 && removals < max_removals
+          FileUtils.rm_rf(file)
+          removals += 1
+          puts "    Removed file: #{file}\n"
+          true
+        else
+          false
+        end
+      end
+    end
+
+    def create_random_files(repo_path)
+      max_new_dirs  = random(3)
+      max_new_files = random(10)
+
+      max_new_files.times do
+        file = make_random_file(repo_path)
+        puts "    Created file: #{file}\n"
+      end
+
+      max_new_dirs.times do
+        directory = make_random_directory(repo_path)
+        file = make_random_file(directory)
+        puts "    Created file: #{file}\n"
+      end
+    end
+
+    def make_random_directory(path)
+      make_directory(path, make_random_name)
+    end
+
+    def make_random_file(path)
+      make_empty_file(path, "#{make_random_name}.#{make_random_extension}")
+    end
+
+    def make_empty_file(path, name)
+      fullpath = File.join(path, name)
+      File.open(fullpath, 'a') {}
+      fullpath
+    end
+
+    def make_directory(path, name)
+      fullpath = File.join(path, name)
+
+      unless File.exists?(fullpath)
+        FileUtils.mkdir_p(fullpath)
+      end
+
+      fullpath
+    end
+
+    def make_random_name(length = 8)
+      SecureRandom.hex(length / 2)
+    end
+
+    def make_random_extension
+      EXTENSIONS.sample
+    end
+
+    def commit_changes(repo_path)
+      puts "\n==> Committing changes..."
+      system(*%W(#{Gitlab.config.git.bin_path} -C #{repo_path} add .))
+      system(*%W(#{Gitlab.config.git.bin_path} -C #{repo_path} commit -m Commit-#{Time.now.strftime('%Y-%m-%d-%H-%M')}))
+      system(*%W(#{Gitlab.config.git.bin_path} -C #{repo_path} push origin master))
+    end
+
+    def random(max = nil)
+      if max
+        1 + rand(max)
+      else
+        rand
+      end
+    end
+  end
+end
+
 namespace :geo do
   namespace :test_env do |ns|
     task seed: :environment do
@@ -202,6 +340,11 @@ namespace :geo do
         projects = Geo::TestEnv.new
         projects.seed!
       end
+    end
+
+    task commits: :environment do
+      generator = Geo::RandomCommitGenerator.new
+      generator.generate(Project.first)
     end
   end
 end
