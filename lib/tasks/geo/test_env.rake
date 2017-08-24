@@ -94,6 +94,18 @@ module Geo
 
       FileUtils.chmod_R 0755, target_repo_path
       FileUtils.chmod_R 0755, target_wiki_path
+
+      create_hooks(target_repo_path)
+      create_hooks(target_wiki_path)
+    end
+
+    def create_hooks(repo_path)
+      local_hooks_directory = File.join(repo_path, 'hooks')
+      FileUtils.ln_sf(gitlab_shell_hooks_path, local_hooks_directory)
+    end
+
+    def gitlab_shell_hooks_path
+      File.expand_path(Gitlab.config.gitlab_shell.hooks_path)
     end
 
     # Prevent developer git configurations from being persisted to test repositories
