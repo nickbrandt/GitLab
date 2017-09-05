@@ -32,7 +32,7 @@
   - if no_issuable_templates && can?(current_user, :push_code, issuable.project)
     - if show_promotions?
       = render 'shared/promotions/promote_issue_templates'
-    - else 
+    - else
       %p.help-block
         Add
         = link_to 'description templates', help_page_path('user/project/description_templates'), tabindex: -1
