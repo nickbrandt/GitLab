@@ -276,14 +276,6 @@ import initGroupAnalytics from './init_group_analytics';
           new MilestoneSelect();
           new WeightSelect();
           new gl.IssuableTemplateSelectors();
-
-          $('#promotion-issue-template-link').on('click', () => {
-            $('.promotion-issue-template').toggleClass('open');
-          });
-          $('.promotion-issue-template .dropdown-title-button').on('click', () => {
-            $('.promotion-issue-template').removeClass('open');
-          });
-
           break;
         case 'projects:merge_requests:creations:new':
           const mrNewCompareNode = document.querySelector('.js-merge-request-new-compare');

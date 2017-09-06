@@ -130,7 +130,7 @@
 
 
 .promotion-issue-template-message {
-  padding: 15px 30px 20px 15px;
+  padding: $gl-padding 30px 20px $gl-padding;
 
   p {
     margin-right: 20px;
@@ -150,7 +150,7 @@
   }
 
   .btn-link {
-    display: inline-block;
+    display: inline;
     color: $gl-link-color;
     padding: 0;
 
