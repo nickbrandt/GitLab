@@ -130,8 +130,11 @@
 
 
 .promotion-issue-template-message {
-  line-height: 1.5;
-  padding: 15px 20px 20px 15px;
+  padding: 15px 30px 20px 15px;
+
+  p {
+    margin-right: 20px;
+  }
 
   .dropdown-title {
     margin: 0 -10px -5px;
@@ -140,15 +143,16 @@
   }
 
   .btn {
-    padding: 6px 8px;
+    padding: $gl-vert-padding $gl-btn-padding;
     border-radius: $border-radius-default;
     display: inline-block;
+    line-height: $line-height-base;
   }
 
   .btn-link {
-    display: inline;
+    display: inline-block;
     color: $gl-link-color;
-    padding: 0 5px;
+    padding: 0;
 
     &:hover {
       background-color: transparent;
