@@ -9,16 +9,19 @@ import (
 )
 
 func TestParseBasename(t *testing.T) {
-	for _, testCase := range []struct{ in, out string }{
-		{"", "tar.gz"},
-		{".tar.gz", "tar.gz"},
-		{".tgz", "tar.gz"},
-		{".gz", "tar.gz"},
-		{".tar.bz2", "tar.bz2"},
-		{".tbz", "tar.bz2"},
-		{".tbz2", "tar.bz2"},
-		{".tb2", "tar.bz2"},
-		{".bz2", "tar.bz2"},
+	for _, testCase := range []struct {
+		in  string
+		out ArchiveFormat
+	}{
+		{"", TarGzFormat},
+		{".tar.gz", TarGzFormat},
+		{".tgz", TarGzFormat},
+		{".gz", TarGzFormat},
+		{".tar.bz2", TarBz2Format},
+		{".tbz", TarBz2Format},
+		{".tbz2", TarBz2Format},
+		{".tb2", TarBz2Format},
+		{".bz2", TarBz2Format},
 	} {
 		basename := "archive" + testCase.in
 		out, ok := parseBasename(basename)
@@ -47,11 +50,13 @@ func TestFinalizeArchive(t *testing.T) {
 }
 
 func TestSetArchiveHeaders(t *testing.T) {
-	for _, testCase := range []struct{ in, out string }{
-		{"zip", "application/zip"},
-		{"zippy", "application/octet-stream"},
-		{"rezip", "application/octet-stream"},
-		{"_anything_", "application/octet-stream"},
+	for _, testCase := range []struct {
+		in  ArchiveFormat
+		out string
+	}{
+		{ZipFormat, "application/zip"},
+		{TarFormat, "application/octet-stream"},
+		{InvalidFormat, "application/octet-stream"},
 	} {
 		w := httptest.NewRecorder()
 
