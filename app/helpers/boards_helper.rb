@@ -1,6 +1,9 @@
 module BoardsHelper
+<<<<<<< HEAD
   prepend EE::BoardsHelper
 
+=======
+>>>>>>> ce/10-0-stable
   def board
     @board ||= @board || @boards.first
   end

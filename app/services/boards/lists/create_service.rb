@@ -1,8 +1,11 @@
 module Boards
   module Lists
     class CreateService < Boards::BaseService
+<<<<<<< HEAD
       prepend EE::Boards::Lists::CreateService
 
+=======
+>>>>>>> ce/10-0-stable
       def execute(board)
         List.transaction do
           label    = available_labels_for(board).find(params[:label_id])

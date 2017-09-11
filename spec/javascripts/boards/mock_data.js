@@ -43,11 +43,15 @@ const BoardsMockData = {
         labels: [],
         assignees: [],
       }],
+<<<<<<< HEAD
     },
     '/test/issue-boards/milestones.json': [{
       id: 1,
       title: 'test',
     }],
+=======
+    }
+>>>>>>> ce/10-0-stable
   },
   'POST': {
     '/test/boards/1{/id}': listObj
@@ -82,7 +86,10 @@ const mockBoardService = (opts = {}) => {
   });
 };
 
+<<<<<<< HEAD
 window.boardObj = boardObj;
+=======
+>>>>>>> ce/10-0-stable
 window.listObj = listObj;
 window.listObjDuplicate = listObjDuplicate;
 window.BoardsMockData = BoardsMockData;

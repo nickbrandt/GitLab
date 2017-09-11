@@ -1,7 +1,10 @@
 module Boards
   class CreateService < Boards::BaseService
+<<<<<<< HEAD
     prepend EE::Boards::CreateService
 
+=======
+>>>>>>> ce/10-0-stable
     def execute
       create_board! if can_create_board?
     end

@@ -655,6 +655,10 @@ GitLabDropdown = (function() {
         fieldName = this.options.fieldName;
 
         if (value) {
+<<<<<<< HEAD
+=======
+          value = value.toString().replace(/'/g, '\\\'');
+>>>>>>> ce/10-0-stable
           field = this.dropdown.parent().find(`input[name='${fieldName}'][value='${value}']`);
           if (field.length) {
             selected = true;

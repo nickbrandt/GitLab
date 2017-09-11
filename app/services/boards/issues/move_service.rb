@@ -1,8 +1,11 @@
 module Boards
   module Issues
     class MoveService < Boards::BaseService
+<<<<<<< HEAD
       prepend EE::Boards::Issues::MoveService
 
+=======
+>>>>>>> ce/10-0-stable
       def execute(issue)
         return false unless can?(current_user, :update_issue, issue)
         return false if issue_params.empty?
