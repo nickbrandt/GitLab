@@ -82,11 +82,7 @@ export default {
       this.showIssueForm = !this.showIssueForm;
     },
     onScroll() {
-<<<<<<< HEAD
       if (!this.list.loadingMore && (this.scrollTop() > this.scrollHeight() - this.scrollOffset)) {
-=======
-      if (!this.loadingMore && (this.scrollTop() > this.scrollHeight() - this.scrollOffset)) {
->>>>>>> ce/10-0-stable
         this.loadNextPage();
       }
     },
@@ -176,11 +172,8 @@ export default {
         <loading-icon />
       </div>
       <board-new-issue
-<<<<<<< HEAD
         key="newIssue"
         :group-id="groupId"
-=======
->>>>>>> ce/10-0-stable
         :list="list"
         v-if="list.type !== 'closed' && showIssueForm"/>
       <ul

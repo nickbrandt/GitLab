@@ -7,14 +7,11 @@ const Store = gl.issueBoards.BoardsStore;
 export default {
   name: 'BoardNewIssue',
   props: {
-<<<<<<< HEAD
     groupId: {
       type: Number,
       required: false,
       default: 0,
     },
-=======
->>>>>>> ce/10-0-stable
     list: {
       type: Object,
       required: true,

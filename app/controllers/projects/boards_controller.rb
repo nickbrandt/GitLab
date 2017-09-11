@@ -1,9 +1,6 @@
 class Projects::BoardsController < Projects::ApplicationController
-<<<<<<< HEAD
   prepend EE::Boards::BoardsController
   prepend EE::BoardsResponses
-=======
->>>>>>> ce/10-0-stable
   include BoardsResponses
   include IssuableCollections
 
