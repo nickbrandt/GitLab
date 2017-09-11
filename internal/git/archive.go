@@ -10,10 +10,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
-	"syscall"
 	"time"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
@@ -52,7 +50,6 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 		return
 	}
 
-	var format string
 	urlPath := r.URL.Path
 	format, ok := parseBasename(filepath.Base(urlPath))
 	if !ok {
@@ -87,63 +84,20 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 	defer tempFile.Close()
 	defer os.Remove(tempFile.Name())
 
-	compressCmd, archiveFormat := parseArchiveFormat(format)
-
-	archiveCmd := gitCommand("", "", "git", "--git-dir="+params.RepoPath, "archive", "--format="+archiveFormat, "--prefix="+params.ArchivePrefix+"/", params.CommitId)
-	archiveStdout, err := archiveCmd.StdoutPipe()
+	archiveReader, err := newArchiveReader(r.Context(), params.RepoPath, format, params.ArchivePrefix, params.CommitId)
 	if err != nil {
-		helper.Fail500(w, r, fmt.Errorf("SendArchive: archive stdout: %v", err))
+		helper.Fail500(w, r, err)
 		return
 	}
-	defer archiveStdout.Close()
-	if err := archiveCmd.Start(); err != nil {
-		helper.Fail500(w, r, fmt.Errorf("SendArchive: start %v: %v", archiveCmd.Args, err))
-		return
-	}
-	defer helper.CleanUpProcessGroup(archiveCmd) // Ensure brute force subprocess clean-up
 
-	var stdout io.ReadCloser
-	if compressCmd == nil {
-		stdout = archiveStdout
-	} else {
-		compressCmd.Stdin = archiveStdout
-		compressCmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-
-		stdout, err = compressCmd.StdoutPipe()
-		if err != nil {
-			helper.Fail500(w, r, fmt.Errorf("SendArchive: compress stdout: %v", err))
-			return
-		}
-		defer stdout.Close()
-
-		if err := compressCmd.Start(); err != nil {
-			helper.Fail500(w, r, fmt.Errorf("SendArchive: start %v: %v", compressCmd.Args, err))
-			return
-		}
-		defer helper.CleanUpProcessGroup(compressCmd)
-
-		archiveStdout.Close()
-	}
-	// Every Read() from stdout will be synchronously written to tempFile
-	// before it comes out the TeeReader.
-	archiveReader := io.TeeReader(stdout, tempFile)
+	reader := io.TeeReader(archiveReader, tempFile)
 
 	// Start writing the response
 	setArchiveHeaders(w, format, archiveFilename)
 	w.WriteHeader(200) // Don't bother with HTTP 500 from this point on, just return
-	if _, err := io.Copy(w, archiveReader); err != nil {
+	if _, err := io.Copy(w, reader); err != nil {
 		helper.LogError(r, &copyError{fmt.Errorf("SendArchive: copy 'git archive' output: %v", err)})
 		return
-	}
-	if err := archiveCmd.Wait(); err != nil {
-		helper.LogError(r, fmt.Errorf("SendArchive: archiveCmd: %v", err))
-		return
-	}
-	if compressCmd != nil {
-		if err := compressCmd.Wait(); err != nil {
-			helper.LogError(r, fmt.Errorf("SendArchive: compressCmd: %v", err))
-			return
-		}
 	}
 
 	if err := finalizeCachedArchive(tempFile, params.ArchivePath); err != nil {
@@ -152,30 +106,16 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 	}
 }
 
-func setArchiveHeaders(w http.ResponseWriter, format string, archiveFilename string) {
+func setArchiveHeaders(w http.ResponseWriter, format ArchiveFormat, archiveFilename string) {
 	w.Header().Del("Content-Length")
 	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, archiveFilename))
-	if format == "zip" {
+	if format == ZipFormat {
 		w.Header().Set("Content-Type", "application/zip")
 	} else {
 		w.Header().Set("Content-Type", "application/octet-stream")
 	}
 	w.Header().Set("Content-Transfer-Encoding", "binary")
 	w.Header().Set("Cache-Control", "private")
-}
-
-func parseArchiveFormat(format string) (*exec.Cmd, string) {
-	switch format {
-	case "tar":
-		return nil, "tar"
-	case "tar.gz":
-		return exec.Command("gzip", "-c", "-n"), "tar"
-	case "tar.bz2":
-		return exec.Command("bzip2", "-c"), "tar"
-	case "zip":
-		return nil, "zip"
-	}
-	return nil, "unknown"
 }
 
 func prepareArchiveTempfile(dir string, prefix string) (*os.File, error) {
@@ -196,20 +136,20 @@ func finalizeCachedArchive(tempFile *os.File, archivePath string) error {
 	return nil
 }
 
-func parseBasename(basename string) (string, bool) {
-	var format string
+func parseBasename(basename string) (ArchiveFormat, bool) {
+	var format ArchiveFormat
 
 	switch basename {
 	case "archive.zip":
-		format = "zip"
+		format = ZipFormat
 	case "archive.tar":
-		format = "tar"
+		format = TarFormat
 	case "archive", "archive.tar.gz", "archive.tgz", "archive.gz":
-		format = "tar.gz"
+		format = TarGzFormat
 	case "archive.tar.bz2", "archive.tbz", "archive.tbz2", "archive.tb2", "archive.bz2":
-		format = "tar.bz2"
+		format = TarBz2Format
 	default:
-		return "", false
+		return InvalidFormat, false
 	}
 
 	return format, true
