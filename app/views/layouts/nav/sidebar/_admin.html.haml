@@ -52,7 +52,7 @@
               %span
                 ConvDev Index
 
-      = nav_link(controller: %w(system_info background_jobs logs health_check requests_profiles)) do
+      = nav_link(controller: %w(system_info background_jobs logs health_check requests_profiles audit_logs)) do
         = sidebar_link admin_system_info_path, title: _('Monitoring') do
           .nav-icon-container
             = custom_icon('monitoring')
