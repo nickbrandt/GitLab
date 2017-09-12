@@ -4,7 +4,7 @@ class GeoNode < ActiveRecord::Base
 
   ignore_column :system_hook_id
 
-  belongs_to :geo_node_key, dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
+  belongs_to :geo_node_key, inverse_of: :geo_node, dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
   belongs_to :oauth_application, class_name: 'Doorkeeper::Application', dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
 
   has_many :geo_node_namespace_links
@@ -24,6 +24,8 @@ class GeoNode < ActiveRecord::Base
   validates :relative_url_root, length: { minimum: 0, allow_nil: false }
   validates :access_key, presence: true
   validates :encrypted_secret_access_key, presence: true
+
+  validates :geo_node_key, presence: true, if: :secondary?
 
   after_initialize :build_dependents
   after_save :expire_cache!
@@ -196,13 +198,15 @@ class GeoNode < ActiveRecord::Base
   end
 
   def build_dependents
-    unless persisted?
-      self.build_geo_node_key unless geo_node_key.present?
-    end
+    build_geo_node_key if new_record? && secondary? && geo_node_key.nil?
   end
 
   def update_dependents_attributes
-    self.geo_node_key&.title = "Geo node: #{self.url}"
+    if primary?
+      self.geo_node_key = nil
+    else
+      self.geo_node_key&.title = "Geo node: #{self.url}"
+    end
 
     if self.primary?
       self.oauth_application = nil
