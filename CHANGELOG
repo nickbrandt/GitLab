@@ -2,6 +2,13 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v3.1.0
+
+- Add histograms to routes !184
+- Gitaly deprecations and replacements !186, !187, !189
+- Enable CI long polling by default !188
+- Refactor Git archive creation !190
+
 v3.0.0
 
 - Use GetBlob RPC instead of TreeEntry RPC for serving blobs !182
