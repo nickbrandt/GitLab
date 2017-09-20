@@ -33,3 +33,7 @@ func gitCommandApi(a *api.Response, name string, args ...string) *exec.Cmd {
 	cmd.Stderr = os.Stderr
 	return cmd
 }
+
+func gitCommand(name string, args ...string) *exec.Cmd {
+	return gitCommandApi(nil, name, args...)
+}
