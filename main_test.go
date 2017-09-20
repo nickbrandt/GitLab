@@ -722,8 +722,9 @@ func runOrFail(t *testing.T, cmd *exec.Cmd) {
 func gitOkBody(t *testing.T) *api.Response {
 	repoPath := repoPath(t)
 	return &api.Response{
-		GL_ID:    "user-123",
-		RepoPath: repoPath,
+		GL_ID:       "user-123",
+		GL_USERNAME: "username",
+		RepoPath:    repoPath,
 		Repository: pb.Repository{
 			StorageName:  "default",
 			RelativePath: "foo/bar.git",

@@ -31,8 +31,9 @@ func TestFailedCloneNoGitaly(t *testing.T) {
 	require.NoError(t, os.RemoveAll(scratchDir))
 
 	authBody := &api.Response{
-		GL_ID:    "user-123",
-		RepoPath: repoPath(t),
+		GL_ID:       "user-123",
+		GL_USERNAME: "username",
+		RepoPath:    repoPath(t),
 		// This will create a failure to connect to Gitaly
 		GitalyServer: gitaly.Server{Address: "unix:/nonexistent"},
 	}
@@ -132,6 +133,7 @@ func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
 		apiResponse.Repository.StorageName,
 		apiResponse.Repository.RelativePath,
 		apiResponse.GL_ID,
+		apiResponse.GL_USERNAME,
 		string(testhelper.GitalyReceivePackResponseMock),
 	}, "\000")
 

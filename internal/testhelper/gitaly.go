@@ -99,6 +99,7 @@ func (s *GitalyTestServer) PostReceivePack(stream pb.SmartHTTPService_PostReceiv
 		repo.GetStorageName(),
 		repo.GetRelativePath(),
 		req.GlId,
+		req.GlUsername,
 	}, "\000") + "\000")
 
 	// The body of the request starts in the second message

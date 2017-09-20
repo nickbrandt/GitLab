@@ -39,7 +39,7 @@ func infoRefsReader(stream infoRefsClient) io.Reader {
 	})
 }
 
-func (client *SmartHTTPClient) ReceivePack(ctx context.Context, repo *pb.Repository, glId string, glRepository string, clientRequest io.Reader, clientResponse io.Writer) error {
+func (client *SmartHTTPClient) ReceivePack(ctx context.Context, repo *pb.Repository, glId string, glUsername string, glRepository string, clientRequest io.Reader, clientResponse io.Writer) error {
 	stream, err := client.PostReceivePack(ctx)
 	if err != nil {
 		return err
@@ -48,6 +48,7 @@ func (client *SmartHTTPClient) ReceivePack(ctx context.Context, repo *pb.Reposit
 	rpcRequest := &pb.PostReceivePackRequest{
 		Repository:   repo,
 		GlId:         glId,
+		GlUsername:   glUsername,
 		GlRepository: glRepository,
 	}
 
