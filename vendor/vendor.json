@@ -162,6 +162,12 @@
 			"versionExact": "v0.14.0"
 		},
 		{
+			"checksumSHA1": "qlzYmQ21XX/voiKWHDWUZ3lybGQ=",
+			"path": "gitlab.com/gitlab-org/gitaly/client",
+			"revision": "871c07b758cf13892972089e1357c5a28bfc40d9",
+			"revisionTime": "2017-09-22T12:56:31Z"
+		},
+		{
 			"checksumSHA1": "sdUF3j5MaQ9Tjc2dGHqc/toQxyk=",
 			"path": "gitlab.com/gitlab-org/gitaly/streamio",
 			"revision": "e4f8d3d14cc3fe673cb511fb4d0189b68a158ccd",
