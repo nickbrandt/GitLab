@@ -9,7 +9,9 @@ It is generated from these files:
 	commit.proto
 	deprecated-services.proto
 	diff.proto
+	namespace.proto
 	notifications.proto
+	operations.proto
 	ref.proto
 	repository-service.proto
 	shared.proto
@@ -53,8 +55,22 @@ It has these top-level messages:
 	CommitDeltaRequest
 	CommitDelta
 	CommitDeltaResponse
+	CommitPatchRequest
+	CommitPatchResponse
+	AddNamespaceRequest
+	RemoveNamespaceRequest
+	RenameNamespaceRequest
+	NamespaceExistsRequest
+	NamespaceExistsResponse
+	AddNamespaceResponse
+	RemoveNamespaceResponse
+	RenameNamespaceResponse
 	PostReceiveRequest
 	PostReceiveResponse
+	UserCreateBranchRequest
+	UserCreateBranchResponse
+	UserDeleteTagRequest
+	UserDeleteTagResponse
 	FindDefaultBranchNameRequest
 	FindDefaultBranchNameResponse
 	FindAllBranchNamesRequest
@@ -73,6 +89,12 @@ It has these top-level messages:
 	FindAllTagsResponse
 	RefExistsRequest
 	RefExistsResponse
+	CreateBranchRequest
+	CreateBranchResponse
+	DeleteBranchRequest
+	DeleteBranchResponse
+	FindBranchRequest
+	FindBranchResponse
 	RepositoryExistsRequest
 	RepositoryExistsResponse
 	RepackIncrementalRequest
@@ -87,10 +109,14 @@ It has these top-level messages:
 	ApplyGitattributesResponse
 	FetchRemoteRequest
 	FetchRemoteResponse
+	CreateRepositoryRequest
+	CreateRepositoryResponse
 	Repository
 	GitCommit
 	CommitAuthor
 	ExitStatus
+	Branch
+	User
 	InfoRefsRequest
 	InfoRefsResponse
 	PostUploadPackRequest
