@@ -28,7 +28,7 @@ func (d *diff) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
 
 	log.Printf("SendDiff: sending diff between %q and %q for %q", params.ShaFrom, params.ShaTo, r.URL.Path)
 
-	gitDiffCmd := gitCommand("", "", "git", "--git-dir="+params.RepoPath, "diff", params.ShaFrom, params.ShaTo)
+	gitDiffCmd := gitCommand("git", "--git-dir="+params.RepoPath, "diff", params.ShaFrom, params.ShaTo)
 	stdout, err := gitDiffCmd.StdoutPipe()
 	if err != nil {
 		helper.Fail500(w, r, fmt.Errorf("SendDiff: create stdout pipe: %v", err))
