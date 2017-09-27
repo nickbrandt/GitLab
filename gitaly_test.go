@@ -371,6 +371,62 @@ func TestGetBlobProxiedToGitalyInterruptedStream(t *testing.T) {
 	}
 }
 
+func TestGetArchiveProxiedToGitalySuccessfully(t *testing.T) {
+	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
+	defer gitalyServer.Stop()
+
+	gitalyAddress := "unix://" + socketPath
+	repoStorage := "default"
+	oid := "54fcc214b94e78d7a41a9a8fe6d87a5e59500e51"
+	repoRelativePath := "foo/bar.git"
+	archivePath := "my/path"
+	archivePrefix := "repo-1"
+	jsonParams := fmt.Sprintf(`{"GitalyServer":{"Address":"%s","Token":""},"GitalyRepository":{"storage_name":"%s","relative_path":"%s"},"ArchivePath":"%s","ArchivePrefix":"%s","CommitId":"%s"}`,
+		gitalyAddress, repoStorage, repoRelativePath, archivePath, archivePrefix, oid)
+	expectedBody := testhelper.GitalyGetArchiveResponseMock
+	archiveLength := len(expectedBody)
+
+	resp, body, err := doSendDataRequest("/archive.tar.gz", "git-archive", jsonParams)
+	require.NoError(t, err)
+
+	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	assert.Equal(t, expectedBody, string(body), "GET %q: response body", resp.Request.URL)
+	assert.Equal(t, archiveLength, len(body), "GET %q: body size", resp.Request.URL)
+}
+
+func TestGetArchiveProxiedToGitalyInterruptedStream(t *testing.T) {
+	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
+	defer gitalyServer.Stop()
+
+	gitalyAddress := "unix://" + socketPath
+	repoStorage := "default"
+	oid := "54fcc214b94e78d7a41a9a8fe6d87a5e59500e51"
+	repoRelativePath := "foo/bar.git"
+	archivePath := "my/path"
+	archivePrefix := "repo-1"
+	jsonParams := fmt.Sprintf(`{"GitalyServer":{"Address":"%s","Token":""},"GitalyRepository":{"storage_name":"%s","relative_path":"%s"},"ArchivePath":"%s","ArchivePrefix":"%s","CommitId":"%s"}`,
+		gitalyAddress, repoStorage, repoRelativePath, archivePath, archivePrefix, oid)
+
+	resp, _, err := doSendDataRequest("/archive.tar.gz", "git-archive", jsonParams)
+	require.NoError(t, err)
+
+	// This causes the server stream to be interrupted instead of consumed entirely.
+	resp.Body.Close()
+
+	done := make(chan struct{})
+	go func() {
+		gitalyServer.WaitGroup.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		return
+	case <-time.After(10 * time.Second):
+		t.Fatal("time out waiting for gitaly handler to return")
+	}
+}
+
 type combinedServer struct {
 	*grpc.Server
 	*testhelper.GitalyTestServer
@@ -388,6 +444,7 @@ func startGitalyServer(t *testing.T, finalMessageCode codes.Code) (*combinedServ
 	gitalyServer := testhelper.NewGitalyServer(finalMessageCode)
 	pb.RegisterSmartHTTPServiceServer(server, gitalyServer)
 	pb.RegisterBlobServiceServer(server, gitalyServer)
+	pb.RegisterRepositoryServiceServer(server, gitalyServer)
 
 	go server.Serve(listener)
 

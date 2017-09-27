@@ -7,28 +7,19 @@ import (
 	"os/exec"
 	"syscall"
 
+	pb "gitlab.com/gitlab-org/gitaly-proto/go"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
-type ArchiveFormat int
-
-const (
-	InvalidFormat ArchiveFormat = iota
-	ZipFormat
-	TarFormat
-	TarGzFormat
-	TarBz2Format
-)
-
-func parseArchiveFormat(format ArchiveFormat) (*exec.Cmd, string) {
+func parseArchiveFormat(format pb.GetArchiveRequest_Format) (*exec.Cmd, string) {
 	switch format {
-	case TarFormat:
+	case pb.GetArchiveRequest_TAR:
 		return nil, "tar"
-	case TarGzFormat:
+	case pb.GetArchiveRequest_TAR_GZ:
 		return exec.Command("gzip", "-c", "-n"), "tar"
-	case TarBz2Format:
+	case pb.GetArchiveRequest_TAR_BZ2:
 		return exec.Command("bzip2", "-c"), "tar"
-	case ZipFormat:
+	case pb.GetArchiveRequest_ZIP:
 		return nil, "zip"
 	default:
 		return nil, "invalid format"
@@ -70,7 +61,7 @@ func (a *archiveReader) wait() error {
 	return nil
 }
 
-func newArchiveReader(ctx context.Context, repoPath string, format ArchiveFormat, archivePrefix string, commitId string) (a *archiveReader, err error) {
+func newArchiveReader(ctx context.Context, repoPath string, format pb.GetArchiveRequest_Format, archivePrefix string, commitId string) (a *archiveReader, err error) {
 	a = &archiveReader{}
 
 	compressCmd, formatArg := parseArchiveFormat(format)
