@@ -951,12 +951,12 @@ describe Projects::IssuesController do
           it_behaves_like 'user can see confidential issue', access
         end
 
-        it_behaves_like 'user cannot see confidential issue', :guest
       end
 
       context 'when unauthenticated' do
         let(:project) { create(:project, :public) }
 
+        it_behaves_like 'user cannot see confidential issue', :guest
         it_behaves_like 'user cannot see confidential issue', Gitlab::Access::NO_ACCESS
       end
     end
@@ -967,12 +967,6 @@ describe Projects::IssuesController do
 
       before do
         create(:discussion_note_on_issue, :system, noteable: issue, project: issue.project, note: cross_reference)
-      end
-
-      it 'filters notes that the user should not see' do
-        get :discussions, namespace_id: project.namespace, project_id: project, id: issue.iid
-
-        expect(JSON.parse(response.body).count).to eq(1)
       end
 
       it 'does not result in N+1 queries' do
