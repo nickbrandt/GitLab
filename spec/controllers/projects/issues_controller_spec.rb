@@ -950,7 +950,7 @@ describe Projects::IssuesController do
         %i(reporter developer master).each do |access|
           it_behaves_like 'user can see confidential issue', access
         end
-        
+
         it_behaves_like 'user cannot see confidential issue', :guest
       end
 
