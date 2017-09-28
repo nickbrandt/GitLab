@@ -950,13 +950,13 @@ describe Projects::IssuesController do
         %i(reporter developer master).each do |access|
           it_behaves_like 'user can see confidential issue', access
         end
-
+        
+        it_behaves_like 'user cannot see confidential issue', :guest
       end
 
       context 'when unauthenticated' do
         let(:project) { create(:project, :public) }
 
-        it_behaves_like 'user cannot see confidential issue', :guest
         it_behaves_like 'user cannot see confidential issue', Gitlab::Access::NO_ACCESS
       end
     end
