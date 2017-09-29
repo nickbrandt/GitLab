@@ -226,7 +226,7 @@ describe Projects::IssuesController do
           id: issue.iid,
           issue: { assignee_ids: [assignee.id] },
           format: :json
-        body = JSON.parse(response.body)
+        body = json_response
 
         expect(body['assignees'].first.keys)
           .to match_array(%w(id name username avatar_url state web_url))
@@ -889,16 +889,76 @@ describe Projects::IssuesController do
 
   describe 'GET #discussions' do
     let!(:discussion) { create(:discussion_note_on_issue, noteable: issue, project: issue.project) }
+    context 'when authenticated' do
+      before do
+        project.add_developer(user)
+        sign_in(user)
+      end
 
-    before do
-      project.add_developer(user)
-      sign_in(user)
+      it 'returns discussion json' do
+        get :discussions, namespace_id: project.namespace, project_id: project, id: issue.iid
+
+        expect(json_response.first.keys).to match_array(%w[id reply_id expanded notes individual_note])
+      end
     end
 
-    it 'returns discussion json' do
-      get :discussions, namespace_id: project.namespace, project_id: project, id: issue.iid
+    context 'with a related system note' do
+      let(:confidential_issue) { create(:issue, :confidential, project: project) }
+      let!(:system_note) { SystemNoteService.relate_issue(issue, confidential_issue, user) }
 
-      expect(JSON.parse(response.body).first.keys).to match_array(%w[id reply_id expanded notes individual_note])
+      shared_examples 'user can see confidential issue' do |access_level|
+        context "when a user is a #{access_level}" do
+          before do
+            project.add_user(user, access_level)
+          end
+
+          it 'displays related notes' do
+            get :discussions, namespace_id: project.namespace, project_id: project, id: issue.iid
+
+            discussions = json_response
+            notes = discussions.flat_map {|d| d['notes']}
+
+            expect(discussions.count).to equal(2)
+            expect(notes).to include(a_hash_including('id' => system_note.id))
+          end
+        end
+      end
+
+      shared_examples 'user cannot see confidential issue' do |access_level|
+        context "when a user is a #{access_level}" do
+          before do
+            project.add_user(user, access_level)
+          end
+
+          it 'redacts note related to a confidential issue' do
+            get :discussions, namespace_id: project.namespace, project_id: project, id: issue.iid
+
+            discussions = json_response
+            notes = discussions.flat_map {|d| d['notes']}
+
+            expect(discussions.count).to equal(1)
+            expect(notes).not_to include(a_hash_including('id' => system_note.id))
+          end
+        end
+      end
+
+      context 'when authenticated' do
+        before do
+          sign_in(user)
+        end
+
+        %i(reporter developer master).each do |access|
+          it_behaves_like 'user can see confidential issue', access
+        end
+
+        it_behaves_like 'user cannot see confidential issue', :guest
+      end
+
+      context 'when unauthenticated' do
+        let(:project) { create(:project, :public) }
+
+        it_behaves_like 'user cannot see confidential issue', Gitlab::Access::NO_ACCESS
+      end
     end
 
     context 'with cross-reference system note', :request_store do
@@ -907,12 +967,6 @@ describe Projects::IssuesController do
 
       before do
         create(:discussion_note_on_issue, :system, noteable: issue, project: issue.project, note: cross_reference)
-      end
-
-      it 'filters notes that the user should not see' do
-        get :discussions, namespace_id: project.namespace, project_id: project, id: issue.iid
-
-        expect(JSON.parse(response.body).count).to eq(1)
       end
 
       it 'does not result in N+1 queries' do
