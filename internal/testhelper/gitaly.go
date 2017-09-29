@@ -25,6 +25,8 @@ var (
 	GitalyInfoRefsResponseMock    = strings.Repeat("Mock Gitaly InfoRefsResponse data", 100000)
 	GitalyGetBlobResponseMock     = strings.Repeat("Mock Gitaly GetBlobResponse data", 100000)
 	GitalyGetArchiveResponseMock  = strings.Repeat("Mock Gitaly GetArchiveResponse data", 100000)
+	GitalyGetDiffResponseMock     = strings.Repeat("Mock Gitaly GetDiffResponse data", 100000)
+	GitalyGetPatchResponseMock    = strings.Repeat("Mock Gitaly GetPatchResponse data", 100000)
 	GitalyReceivePackResponseMock []byte
 	GitalyUploadPackResponseMock  []byte
 )
@@ -230,6 +232,45 @@ func (s *GitalyTestServer) GetArchive(in *pb.GetArchiveRequest, stream pb.Reposi
 	return s.finalError()
 }
 
+func (s *GitalyTestServer) RawDiff(in *pb.RawDiffRequest, stream pb.DiffService_RawDiffServer) error {
+	nSends, err := sendBytes([]byte(GitalyGetDiffResponseMock), 100, func(p []byte) error {
+		return stream.Send(&pb.RawDiffResponse{
+			Data: p,
+		})
+	})
+	if err != nil {
+		return err
+	}
+	if nSends <= 1 {
+		panic("should have sent more than one message")
+	}
+
+	return s.finalError()
+}
+
+func (s *GitalyTestServer) RawPatch(in *pb.RawPatchRequest, stream pb.DiffService_RawPatchServer) error {
+	s.WaitGroup.Add(1)
+	defer s.WaitGroup.Done()
+
+	if err := validateRepository(in.GetRepository()); err != nil {
+		return err
+	}
+
+	nSends, err := sendBytes([]byte(GitalyGetPatchResponseMock), 100, func(p []byte) error {
+		return stream.Send(&pb.RawPatchResponse{
+			Data: p,
+		})
+	})
+	if err != nil {
+		return err
+	}
+	if nSends <= 1 {
+		panic("should have sent more than one message")
+	}
+
+	return s.finalError()
+}
+
 func (s *GitalyTestServer) RepositoryExists(context.Context, *pb.RepositoryExistsRequest) (*pb.RepositoryExistsResponse, error) {
 	return nil, nil
 }
@@ -264,6 +305,18 @@ func (s *GitalyTestServer) CreateRepository(context.Context, *pb.CreateRepositor
 
 func (s *GitalyTestServer) Exists(context.Context, *pb.RepositoryExistsRequest) (*pb.RepositoryExistsResponse, error) {
 	return nil, nil
+}
+
+func (s *GitalyTestServer) CommitDelta(in *pb.CommitDeltaRequest, stream pb.DiffService_CommitDeltaServer) error {
+	return nil
+}
+
+func (s *GitalyTestServer) CommitDiff(in *pb.CommitDiffRequest, stream pb.DiffService_CommitDiffServer) error {
+	return nil
+}
+
+func (s *GitalyTestServer) CommitPatch(in *pb.CommitPatchRequest, stream pb.DiffService_CommitPatchServer) error {
+	return nil
 }
 
 // sendBytes returns the number of times the 'sender' function was called and an error.
