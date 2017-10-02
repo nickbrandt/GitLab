@@ -1281,6 +1281,7 @@ describe Repository, models: true do
       allow(repository).to receive(:empty?).and_return(true)
 
       expect(cache).to receive(:expire).with(:empty?)
+      expect(cache).to receive(:expire).with(:has_visible_content?)
 
       repository.expire_emptiness_caches
     end
@@ -1289,6 +1290,7 @@ describe Repository, models: true do
       allow(repository).to receive(:empty?).and_return(false)
 
       expect(cache).not_to receive(:expire).with(:empty?)
+      expect(cache).not_to receive(:expire).with(:has_visible_content?)
 
       repository.expire_emptiness_caches
     end
@@ -1689,7 +1691,7 @@ describe Repository, models: true do
   describe '#expire_branches_cache' do
     it 'expires the cache' do
       expect(repository).to receive(:expire_method_caches)
-        .with(%i(branch_names branch_count))
+        .with(%i(branch_names branch_count has_visible_content?))
         .and_call_original
 
       repository.expire_branches_cache
@@ -1949,6 +1951,15 @@ describe Repository, models: true do
         .with(Repository::CACHED_METHODS)
 
       repository.expire_all_method_caches
+    end
+
+    it 'all cache_method definitions are in the lists of method caches' do
+      methods = repository.methods.map do |method|
+        match = /^_uncached_(.*)/.match(method)
+        match[1].to_sym if match
+      end.compact
+
+      expect(methods).to match_array(Repository::CACHED_METHODS + Repository::MEMOIZED_CACHED_METHODS)
     end
   end
 
