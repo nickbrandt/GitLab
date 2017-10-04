@@ -340,6 +340,46 @@ func TestGetBlobProxiedToGitalySuccessfully(t *testing.T) {
 	testhelper.AssertResponseHeader(t, resp, "Content-Length", strconv.Itoa(blobLength))
 }
 
+func TestGetDiffProxiedToGitalySuccessfully(t *testing.T) {
+	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
+	defer gitalyServer.Stop()
+
+	gitalyAddress := "unix://" + socketPath
+	repoStorage := "default"
+	rightCommit := "e395f646b1499e8e0279445fc99a0596a65fab7e"
+	leftCommit := "8a0f2ee90d940bfb0ba1e14e8214b0649056e4ab"
+	repoRelativePath := "foo/bar.git"
+	jsonParams := fmt.Sprintf(`{"GitalyServer":{"Address":"%s","Token":""},"RawDiffRequest":"{\"repository\":{\"storageName\":\"%s\",\"relativePath\":\"%s\"},\"rightCommitId\":\"%s\",\"leftCommitId\":\"%s\"}"}`,
+		gitalyAddress, repoStorage, repoRelativePath, leftCommit, rightCommit)
+	expectedBody := testhelper.GitalyGetDiffResponseMock
+
+	resp, body, err := doSendDataRequest("/something", "git-diff", jsonParams)
+	require.NoError(t, err)
+
+	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	assert.Equal(t, expectedBody, string(body), "GET %q: response body", resp.Request.URL)
+}
+
+func TestGetPatchProxiedToGitalySuccessfully(t *testing.T) {
+	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
+	defer gitalyServer.Stop()
+
+	gitalyAddress := "unix://" + socketPath
+	repoStorage := "default"
+	rightCommit := "e395f646b1499e8e0279445fc99a0596a65fab7e"
+	leftCommit := "8a0f2ee90d940bfb0ba1e14e8214b0649056e4ab"
+	repoRelativePath := "foo/bar.git"
+	jsonParams := fmt.Sprintf(`{"GitalyServer":{"Address":"%s","Token":""},"RawPatchRequest":"{\"repository\":{\"storageName\":\"%s\",\"relativePath\":\"%s\"},\"rightCommitId\":\"%s\",\"leftCommitId\":\"%s\"}"}`,
+		gitalyAddress, repoStorage, repoRelativePath, leftCommit, rightCommit)
+	expectedBody := testhelper.GitalyGetPatchResponseMock
+
+	resp, body, err := doSendDataRequest("/something", "git-format-patch", jsonParams)
+	require.NoError(t, err)
+
+	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	assert.Equal(t, expectedBody, string(body), "GET %q: response body", resp.Request.URL)
+}
+
 func TestGetBlobProxiedToGitalyInterruptedStream(t *testing.T) {
 	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
 	defer gitalyServer.Stop()
@@ -427,6 +467,70 @@ func TestGetArchiveProxiedToGitalyInterruptedStream(t *testing.T) {
 	}
 }
 
+func TestGetDiffProxiedToGitalyInterruptedStream(t *testing.T) {
+	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
+	defer gitalyServer.Stop()
+
+	gitalyAddress := "unix://" + socketPath
+	repoStorage := "default"
+	rightCommit := "e395f646b1499e8e0279445fc99a0596a65fab7e"
+	leftCommit := "8a0f2ee90d940bfb0ba1e14e8214b0649056e4ab"
+	repoRelativePath := "foo/bar.git"
+	jsonParams := fmt.Sprintf(`{"GitalyServer":{"Address":"%s","Token":""},"RawDiffRequest":"{\"repository\":{\"storageName\":\"%s\",\"relativePath\":\"%s\"},\"rightCommitId\":\"%s\",\"leftCommitId\":\"%s\"}"}`,
+		gitalyAddress, repoStorage, repoRelativePath, leftCommit, rightCommit)
+
+	resp, _, err := doSendDataRequest("/something", "git-diff", jsonParams)
+	require.NoError(t, err)
+
+	// This causes the server stream to be interrupted instead of consumed entirely.
+	resp.Body.Close()
+
+	done := make(chan struct{})
+	go func() {
+		gitalyServer.WaitGroup.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		return
+	case <-time.After(10 * time.Second):
+		t.Fatal("time out waiting for gitaly handler to return")
+	}
+}
+
+func TestGetPatchProxiedToGitalyInterruptedStream(t *testing.T) {
+	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
+	defer gitalyServer.Stop()
+
+	gitalyAddress := "unix://" + socketPath
+	repoStorage := "default"
+	rightCommit := "e395f646b1499e8e0279445fc99a0596a65fab7e"
+	leftCommit := "8a0f2ee90d940bfb0ba1e14e8214b0649056e4ab"
+	repoRelativePath := "foo/bar.git"
+	jsonParams := fmt.Sprintf(`{"GitalyServer":{"Address":"%s","Token":""},"RawPatchRequest":"{\"repository\":{\"storageName\":\"%s\",\"relativePath\":\"%s\"},\"rightCommitId\":\"%s\",\"leftCommitId\":\"%s\"}"}`,
+		gitalyAddress, repoStorage, repoRelativePath, leftCommit, rightCommit)
+
+	resp, _, err := doSendDataRequest("/something", "git-format-patch", jsonParams)
+	require.NoError(t, err)
+
+	// This causes the server stream to be interrupted instead of consumed entirely.
+	resp.Body.Close()
+
+	done := make(chan struct{})
+	go func() {
+		gitalyServer.WaitGroup.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		return
+	case <-time.After(10 * time.Second):
+		t.Fatal("time out waiting for gitaly handler to return")
+	}
+}
+
 type combinedServer struct {
 	*grpc.Server
 	*testhelper.GitalyTestServer
@@ -445,6 +549,7 @@ func startGitalyServer(t *testing.T, finalMessageCode codes.Code) (*combinedServ
 	pb.RegisterSmartHTTPServiceServer(server, gitalyServer)
 	pb.RegisterBlobServiceServer(server, gitalyServer)
 	pb.RegisterRepositoryServiceServer(server, gitalyServer)
+	pb.RegisterDiffServiceServer(server, gitalyServer)
 
 	go server.Serve(listener)
 

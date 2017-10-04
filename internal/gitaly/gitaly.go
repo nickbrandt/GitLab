@@ -50,6 +50,15 @@ func NewRepositoryClient(server Server) (*RepositoryClient, error) {
 	return &RepositoryClient{grpcClient}, nil
 }
 
+func NewDiffClient(server Server) (*DiffClient, error) {
+	conn, err := getOrCreateConnection(server)
+	if err != nil {
+		return nil, err
+	}
+	grpcClient := pb.NewDiffServiceClient(conn)
+	return &DiffClient{grpcClient}, nil
+}
+
 func getOrCreateConnection(server Server) (*grpc.ClientConn, error) {
 	cache.RLock()
 	conn := cache.connections[server]
