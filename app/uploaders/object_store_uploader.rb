@@ -159,7 +159,7 @@ class ObjectStoreUploader < CarrierWave::Uploader::Base
   end
 
   def exists?
-    file.try(:exists?)
+    file.present?
   end
 
   def cache_dir
