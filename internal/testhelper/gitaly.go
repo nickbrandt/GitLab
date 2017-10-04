@@ -24,6 +24,7 @@ type GitalyTestServer struct {
 var (
 	GitalyInfoRefsResponseMock    = strings.Repeat("Mock Gitaly InfoRefsResponse data", 100000)
 	GitalyGetBlobResponseMock     = strings.Repeat("Mock Gitaly GetBlobResponse data", 100000)
+	GitalyGetArchiveResponseMock  = strings.Repeat("Mock Gitaly GetArchiveResponse data", 100000)
 	GitalyReceivePackResponseMock []byte
 	GitalyUploadPackResponseMock  []byte
 )
@@ -206,6 +207,63 @@ func (s *GitalyTestServer) GetBlob(in *pb.GetBlobRequest, stream pb.BlobService_
 	}
 
 	return s.finalError()
+}
+
+func (s *GitalyTestServer) GetArchive(in *pb.GetArchiveRequest, stream pb.RepositoryService_GetArchiveServer) error {
+	s.WaitGroup.Add(1)
+	defer s.WaitGroup.Done()
+
+	if err := validateRepository(in.GetRepository()); err != nil {
+		return err
+	}
+
+	nSends, err := sendBytes([]byte(GitalyGetArchiveResponseMock), 100, func(p []byte) error {
+		return stream.Send(&pb.GetArchiveResponse{Data: p})
+	})
+	if err != nil {
+		return err
+	}
+	if nSends <= 1 {
+		panic("should have sent more than one message")
+	}
+
+	return s.finalError()
+}
+
+func (s *GitalyTestServer) RepositoryExists(context.Context, *pb.RepositoryExistsRequest) (*pb.RepositoryExistsResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) RepackIncremental(context.Context, *pb.RepackIncrementalRequest) (*pb.RepackIncrementalResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) RepackFull(context.Context, *pb.RepackFullRequest) (*pb.RepackFullResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) GarbageCollect(context.Context, *pb.GarbageCollectRequest) (*pb.GarbageCollectResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) RepositorySize(context.Context, *pb.RepositorySizeRequest) (*pb.RepositorySizeResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) ApplyGitattributes(context.Context, *pb.ApplyGitattributesRequest) (*pb.ApplyGitattributesResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) FetchRemote(context.Context, *pb.FetchRemoteRequest) (*pb.FetchRemoteResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) CreateRepository(context.Context, *pb.CreateRepositoryRequest) (*pb.CreateRepositoryResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) Exists(context.Context, *pb.RepositoryExistsRequest) (*pb.RepositoryExistsResponse, error) {
+	return nil, nil
 }
 
 // sendBytes returns the number of times the 'sender' function was called and an error.

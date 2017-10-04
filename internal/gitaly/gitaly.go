@@ -41,6 +41,15 @@ func NewBlobClient(server Server) (*BlobClient, error) {
 	return &BlobClient{grpcClient}, nil
 }
 
+func NewRepositoryClient(server Server) (*RepositoryClient, error) {
+	conn, err := getOrCreateConnection(server)
+	if err != nil {
+		return nil, err
+	}
+	grpcClient := pb.NewRepositoryServiceClient(conn)
+	return &RepositoryClient{grpcClient}, nil
+}
+
 func getOrCreateConnection(server Server) (*grpc.ClientConn, error) {
 	cache.RLock()
 	conn := cache.connections[server]

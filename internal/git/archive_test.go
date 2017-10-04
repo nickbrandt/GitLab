@@ -5,23 +5,24 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	pb "gitlab.com/gitlab-org/gitaly-proto/go"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
 
 func TestParseBasename(t *testing.T) {
 	for _, testCase := range []struct {
 		in  string
-		out ArchiveFormat
+		out pb.GetArchiveRequest_Format
 	}{
-		{"", TarGzFormat},
-		{".tar.gz", TarGzFormat},
-		{".tgz", TarGzFormat},
-		{".gz", TarGzFormat},
-		{".tar.bz2", TarBz2Format},
-		{".tbz", TarBz2Format},
-		{".tbz2", TarBz2Format},
-		{".tb2", TarBz2Format},
-		{".bz2", TarBz2Format},
+		{"", pb.GetArchiveRequest_TAR_GZ},
+		{".tar.gz", pb.GetArchiveRequest_TAR_GZ},
+		{".tgz", pb.GetArchiveRequest_TAR_GZ},
+		{".gz", pb.GetArchiveRequest_TAR_GZ},
+		{".tar.bz2", pb.GetArchiveRequest_TAR_BZ2},
+		{".tbz", pb.GetArchiveRequest_TAR_BZ2},
+		{".tbz2", pb.GetArchiveRequest_TAR_BZ2},
+		{".tb2", pb.GetArchiveRequest_TAR_BZ2},
+		{".bz2", pb.GetArchiveRequest_TAR_BZ2},
 	} {
 		basename := "archive" + testCase.in
 		out, ok := parseBasename(basename)
@@ -51,12 +52,13 @@ func TestFinalizeArchive(t *testing.T) {
 
 func TestSetArchiveHeaders(t *testing.T) {
 	for _, testCase := range []struct {
-		in  ArchiveFormat
+		in  pb.GetArchiveRequest_Format
 		out string
 	}{
-		{ZipFormat, "application/zip"},
-		{TarFormat, "application/octet-stream"},
-		{InvalidFormat, "application/octet-stream"},
+		{pb.GetArchiveRequest_ZIP, "application/zip"},
+		{pb.GetArchiveRequest_TAR, "application/octet-stream"},
+		{pb.GetArchiveRequest_TAR_GZ, "application/octet-stream"},
+		{pb.GetArchiveRequest_TAR_BZ2, "application/octet-stream"},
 	} {
 		w := httptest.NewRecorder()
 

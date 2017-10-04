@@ -14,6 +14,8 @@ import (
 	"path/filepath"
 	"time"
 
+	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 
@@ -22,10 +24,12 @@ import (
 
 type archive struct{ senddata.Prefix }
 type archiveParams struct {
-	RepoPath      string
-	ArchivePath   string
-	ArchivePrefix string
-	CommitId      string
+	RepoPath         string
+	ArchivePath      string
+	ArchivePrefix    string
+	CommitId         string
+	GitalyServer     gitaly.Server
+	GitalyRepository pb.Repository
 }
 
 var (
@@ -84,7 +88,16 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 	defer tempFile.Close()
 	defer os.Remove(tempFile.Name())
 
-	archiveReader, err := newArchiveReader(r.Context(), params.RepoPath, format, params.ArchivePrefix, params.CommitId)
+	var archiveReader io.Reader
+	if params.GitalyServer.Address != "" {
+		archiveReader, err = handleArchiveWithGitaly(r, params, format)
+
+		if err != nil {
+			err = fmt.Errorf("operations.GetArchive: %v", err)
+		}
+	} else {
+		archiveReader, err = newArchiveReader(r.Context(), params.RepoPath, format, params.ArchivePrefix, params.CommitId)
+	}
 	if err != nil {
 		helper.Fail500(w, r, err)
 		return
@@ -106,10 +119,26 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 	}
 }
 
-func setArchiveHeaders(w http.ResponseWriter, format ArchiveFormat, archiveFilename string) {
+func handleArchiveWithGitaly(r *http.Request, params archiveParams, format pb.GetArchiveRequest_Format) (io.Reader, error) {
+	c, err := gitaly.NewRepositoryClient(params.GitalyServer)
+	if err != nil {
+		return nil, err
+	}
+
+	request := &pb.GetArchiveRequest{
+		Repository: &params.GitalyRepository,
+		CommitId:   params.CommitId,
+		Prefix:     params.ArchivePrefix,
+		Format:     format,
+	}
+
+	return c.ArchiveReader(r.Context(), request)
+}
+
+func setArchiveHeaders(w http.ResponseWriter, format pb.GetArchiveRequest_Format, archiveFilename string) {
 	w.Header().Del("Content-Length")
 	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, archiveFilename))
-	if format == ZipFormat {
+	if format == pb.GetArchiveRequest_ZIP {
 		w.Header().Set("Content-Type", "application/zip")
 	} else {
 		w.Header().Set("Content-Type", "application/octet-stream")
@@ -136,20 +165,20 @@ func finalizeCachedArchive(tempFile *os.File, archivePath string) error {
 	return nil
 }
 
-func parseBasename(basename string) (ArchiveFormat, bool) {
-	var format ArchiveFormat
+func parseBasename(basename string) (pb.GetArchiveRequest_Format, bool) {
+	var format pb.GetArchiveRequest_Format
 
 	switch basename {
 	case "archive.zip":
-		format = ZipFormat
+		format = pb.GetArchiveRequest_ZIP
 	case "archive.tar":
-		format = TarFormat
+		format = pb.GetArchiveRequest_TAR
 	case "archive", "archive.tar.gz", "archive.tgz", "archive.gz":
-		format = TarGzFormat
+		format = pb.GetArchiveRequest_TAR_GZ
 	case "archive.tar.bz2", "archive.tbz", "archive.tbz2", "archive.tb2", "archive.bz2":
-		format = TarBz2Format
+		format = pb.GetArchiveRequest_TAR_BZ2
 	default:
-		return InvalidFormat, false
+		return format, false
 	}
 
 	return format, true
