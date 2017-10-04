@@ -2,9 +2,14 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
-UNRELEASED
+v3.2.0
 
 - Implement Gitaly call for archive requests !199
+- Re-use client.Dial from gitaly !194
+- Respect GL_USERNAME !192
+- Update BurntSushi/toml !195
+- Add Redis error counters !197
+- Migrate Send{Diff,Patch} to Gitaly !200
 
 v3.1.0
 
