@@ -1712,6 +1712,7 @@ ActiveRecord::Schema.define(version: 20171017130239) do
     t.boolean "prevent_secrets", default: false, null: false
     t.string "branch_name_regex"
     t.boolean "reject_unsigned_commits"
+    t.boolean "commit_author_check"
   end
 
   add_index "push_rules", ["is_sample"], name: "index_push_rules_on_is_sample", where: "is_sample", using: :btree
