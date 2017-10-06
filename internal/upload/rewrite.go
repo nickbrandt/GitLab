@@ -1,6 +1,7 @@
 package upload
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -101,10 +102,10 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 
 		// Copy form field
 		if p.FileName() != "" {
-			err = rew.handleFilePart(name, p)
+			err = rew.handleFilePart(r.Context(), name, p)
 
 		} else {
-			err = rew.copyPart(name, p)
+			err = rew.copyPart(r.Context(), name, p)
 		}
 
 		if err != nil {
@@ -115,7 +116,7 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 	return cleanup, nil
 }
 
-func (rew *rewriter) handleFilePart(name string, p *multipart.Part) error {
+func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipart.Part) error {
 	multipartFiles.WithLabelValues(rew.filter.Name()).Inc()
 
 	filename := p.FileName()
@@ -153,14 +154,14 @@ func (rew *rewriter) handleFilePart(name string, p *multipart.Part) error {
 
 	file.Close()
 
-	if err := rew.filter.ProcessFile(name, file.Name(), rew.writer); err != nil {
+	if err := rew.filter.ProcessFile(ctx, name, file.Name(), rew.writer); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (rew *rewriter) copyPart(name string, p *multipart.Part) error {
+func (rew *rewriter) copyPart(ctx context.Context, name string, p *multipart.Part) error {
 	np, err := rew.writer.CreatePart(p.Header)
 	if err != nil {
 		return fmt.Errorf("create multipart field: %v", err)
@@ -170,7 +171,7 @@ func (rew *rewriter) copyPart(name string, p *multipart.Part) error {
 		return fmt.Errorf("duplicate multipart field: %v", err)
 	}
 
-	if err := rew.filter.ProcessField(name, rew.writer); err != nil {
+	if err := rew.filter.ProcessField(ctx, name, rew.writer); err != nil {
 		return fmt.Errorf("process multipart field: %v", err)
 	}
 

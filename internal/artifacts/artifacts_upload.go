@@ -1,6 +1,7 @@
 package artifacts
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -44,7 +45,7 @@ func (a *artifactsUploadProcessor) generateMetadataFromZip(fileName string, meta
 	return true, nil
 }
 
-func (a *artifactsUploadProcessor) ProcessFile(formName, fileName string, writer *multipart.Writer) error {
+func (a *artifactsUploadProcessor) ProcessFile(ctx context.Context, formName, fileName string, writer *multipart.Writer) error {
 	//  ProcessFile for artifacts requires file form-data field name to eq `file`
 
 	if formName != "file" {
@@ -74,17 +75,17 @@ func (a *artifactsUploadProcessor) ProcessFile(formName, fileName string, writer
 		writer.WriteField("metadata.name", "metadata.gz")
 	}
 
-	if err := a.storeFile(formName, fileName, writer); err != nil {
+	if err := a.storeFile(ctx, formName, fileName, writer); err != nil {
 		return fmt.Errorf("storeFile: %v", err)
 	}
 	return nil
 }
 
-func (a *artifactsUploadProcessor) ProcessField(formName string, writer *multipart.Writer) error {
+func (a *artifactsUploadProcessor) ProcessField(ctx context.Context, formName string, writer *multipart.Writer) error {
 	return nil
 }
 
-func (a *artifactsUploadProcessor) Finalize() error {
+func (a *artifactsUploadProcessor) Finalize(ctx context.Context) error {
 	return nil
 }
 

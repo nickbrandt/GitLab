@@ -1,14 +1,12 @@
 package artifacts
 
 import (
+	"context"
 	"fmt"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"time"
-
-	"golang.org/x/net/context"
-	"golang.org/x/net/context/ctxhttp"
 
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -60,7 +58,7 @@ func init() {
 		objectStorageUploadBytes)
 }
 
-func (a *artifactsUploadProcessor) storeFile(formName, fileName string, writer *multipart.Writer) error {
+func (a *artifactsUploadProcessor) storeFile(ctx context.Context, formName, fileName string, writer *multipart.Writer) error {
 	if a.ObjectStore.StoreURL == "" {
 		return nil
 	}
@@ -104,10 +102,11 @@ func (a *artifactsUploadProcessor) storeFile(formName, fileName string, writer *
 		timeout = a.ObjectStore.Timeout
 	}
 
-	ctx, cancelFn := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+	ctx2, cancelFn := context.WithTimeout(ctx, time.Duration(timeout)*time.Second)
 	defer cancelFn()
+	req = req.WithContext(ctx2)
 
-	resp, err := ctxhttp.Do(ctx, http.DefaultClient, req)
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		objectStorageUploadRequestsRequestFailed.Inc()
 		return fmt.Errorf("PUT request %q: %v", a.ObjectStore.StoreURL, err)

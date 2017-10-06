@@ -2,6 +2,7 @@ package upload
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -24,21 +25,21 @@ var nilHandler = http.HandlerFunc(func(http.ResponseWriter, *http.Request) {})
 
 type testFormProcessor struct{}
 
-func (a *testFormProcessor) ProcessFile(formName, fileName string, writer *multipart.Writer) error {
+func (a *testFormProcessor) ProcessFile(ctx context.Context, formName, fileName string, writer *multipart.Writer) error {
 	if formName != "file" && fileName != "my.file" {
 		return errors.New("illegal file")
 	}
 	return nil
 }
 
-func (a *testFormProcessor) ProcessField(formName string, writer *multipart.Writer) error {
+func (a *testFormProcessor) ProcessField(ctx context.Context, formName string, writer *multipart.Writer) error {
 	if formName != "token" {
 		return errors.New("illegal field")
 	}
 	return nil
 }
 
-func (a *testFormProcessor) Finalize() error {
+func (a *testFormProcessor) Finalize(ctx context.Context) error {
 	return nil
 }
 
