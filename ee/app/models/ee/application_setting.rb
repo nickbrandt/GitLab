@@ -40,9 +40,42 @@ module EE
           mirror_max_delay: Settings.gitlab['mirror_max_delay'],
           mirror_max_capacity: Settings.gitlab['mirror_max_capacity'],
           mirror_capacity_threshold: Settings.gitlab['mirror_capacity_threshold'],
-          allow_group_owners_to_manage_ldap: true
+          allow_group_owners_to_manage_ldap: true,
+          push_mirror_allowed_group_id: nil
         )
       end
+    end
+
+    def push_mirror_allowed_group_id=(group_full_path)
+      group_full_path = nil if group_full_path.blank?
+
+      if group_full_path.nil?
+        super(group_full_path) unless push_mirror_allowed_group_id.nil?
+
+        return
+      end
+
+      group = ::Group.find_by_full_path(group_full_path)
+
+      if group
+        super(group.id) if group.id != push_mirror_allowed_group_id
+      else
+        super(nil)
+      end
+    end
+
+    def push_mirror_allowed_group
+      ::Group.find_by_id(push_mirror_allowed_group_id)
+    end
+
+    def push_mirror_restriction_enabled
+      push_mirror_allowed_group_id.present?
+    end
+
+    def push_mirror_restriction_enabled=(enable)
+      return if enable
+
+      self.push_mirror_allowed_group_id = nil
     end
 
     def should_check_namespace_plan?

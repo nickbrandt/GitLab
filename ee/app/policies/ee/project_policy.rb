@@ -20,6 +20,13 @@ module EE
         !PushRule.global&.reject_unsigned_commits
       end
 
+      desc "User belongs to the group allowed to setup push mirrors"
+      condition(:user_in_push_mirror_allowed_group) do
+        group = Gitlab::CurrentSettings.current_application_settings.push_mirror_allowed_group
+
+        group.users.include?(user)
+      end
+
       rule { admin }.enable :change_repository_storage
 
       rule { support_bot }.enable :guest_access
@@ -75,6 +82,8 @@ module EE
       end
 
       rule { ~can?(:push_code) }.prevent :push_code_to_protected_branches
+
+      rule { admin | user_in_push_mirror_allowed_group }.enable :setup_push_mirror
 
       rule { admin | (reject_unsigned_commits_disabled_globally & can?(:master_access)) }.enable :change_reject_unsigned_commits
     end

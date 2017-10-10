@@ -3,4 +3,5 @@
 
 - if @project.feature_available?(:repository_mirrors)
   = render 'projects/mirrors/pull'
-  = render 'projects/mirrors/push'
+  - if setup_push_mirror?
+    = render 'projects/mirrors/push'

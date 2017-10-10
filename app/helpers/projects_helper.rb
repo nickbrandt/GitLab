@@ -112,6 +112,12 @@ module ProjectsHelper
     abilities.any? { |ability| can?(current_user, ability, @project) }
   end
 
+  def setup_push_mirror?
+    return true unless current_application_settings.push_mirror_restriction_enabled
+
+    can?(current_user, :setup_push_mirror, @project)
+  end
+
   def project_nav_tab?(name)
     project_nav_tabs.include? name
   end

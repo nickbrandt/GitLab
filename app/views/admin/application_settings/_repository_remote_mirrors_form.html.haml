@@ -1,0 +1,14 @@
+%fieldset
+  %legend Repository push mirror settings
+  %p
+    Enable push mirroring for a given group.
+  .form-group
+    .col-sm-offset-2.col-sm-10
+      .checkbox
+        = f.label :push_mirror_restriction_enabled do
+          = f.check_box :push_mirror_restriction_enabled
+          Enable the Push Mirror restriction
+  .form-group
+    = f.label :push_mirror_allowed_group_id, 'Allowed group', class: 'control-label col-sm-2'
+    .col-sm-10
+      = f.text_field :push_mirror_allowed_group_id, class: 'form-control', placeholder: 'my-org/my-group', value: @application_setting.push_mirror_allowed_group&.full_path
