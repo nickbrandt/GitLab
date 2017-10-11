@@ -113,6 +113,11 @@ Example response:
          "human_time_estimate": null,
          "human_total_time_spent": null
       },
+<<<<<<< HEAD
+=======
+      "confidential": false,
+      "discussion_locked": false
+>>>>>>> 10-1-stable
    }
 ]
 ```
@@ -221,6 +226,11 @@ Example response:
          "human_time_estimate": null,
          "human_total_time_spent": null
       },
+<<<<<<< HEAD
+=======
+      "confidential": false,
+      "discussion_locked": false
+>>>>>>> 10-1-stable
    }
 ]
 ```
@@ -330,6 +340,11 @@ Example response:
          "human_time_estimate": null,
          "human_total_time_spent": null
       },
+<<<<<<< HEAD
+=======
+      "confidential": false,
+      "discussion_locked": false
+>>>>>>> 10-1-stable
    }
 ]
 ```
@@ -413,7 +428,10 @@ Example response:
       "human_total_time_spent": null
    },
    "confidential": false,
+<<<<<<< HEAD
    "weight": null,
+=======
+>>>>>>> 10-1-stable
    "discussion_locked": false,
    "_links": {
       "self": "http://example.com/api/v4/projects/1/issues/2",
@@ -491,7 +509,10 @@ Example response:
       "human_total_time_spent": null
    },
    "confidential": false,
+<<<<<<< HEAD
    "weight": null,
+=======
+>>>>>>> 10-1-stable
    "discussion_locked": false,
    "_links": {
       "self": "http://example.com/api/v4/projects/1/issues/2",
@@ -526,8 +547,13 @@ PUT /projects/:id/issues/:issue_iid
 | `state_event`  | string  | no       | The state event of an issue. Set `close` to close the issue and `reopen` to reopen it                      |
 | `updated_at`   | string  | no       | Date time string, ISO 8601 formatted, e.g. `2016-03-11T03:45:40Z` (requires admin or project owner rights) |
 | `due_date`     | string  | no       | Date time string in the format YEAR-MONTH-DAY, e.g. `2016-03-11`                                           |
+<<<<<<< HEAD
 | `weight`       | integer | no       | The weight of the issue in range 0 to 9                                                                    |
 | `discussion_locked` | boolean | no  | Flag indicating if the issue's discussion is locked. If the discussion is locked only project members can add or edit comments. |
+=======
+| `discussion_locked` | boolean | no  | Flag indicating if the issue's discussion is locked. If the discussion is locked only project members can add or edit comments. |
+
+>>>>>>> 10-1-stable
 
 ```bash
 curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/4/issues/85?state_event=close
@@ -571,7 +597,10 @@ Example response:
       "human_total_time_spent": null
    },
    "confidential": false,
+<<<<<<< HEAD
    "weight": null,
+=======
+>>>>>>> 10-1-stable
    "discussion_locked": false,
    "_links": {
       "self": "http://example.com/api/v4/projects/1/issues/2",
@@ -672,7 +701,10 @@ Example response:
     "human_total_time_spent": null
   },
   "confidential": false,
+<<<<<<< HEAD
   "weight": null,
+=======
+>>>>>>> 10-1-stable
   "discussion_locked": false,
   "_links": {
     "self": "http://example.com/api/v4/projects/1/issues/2",
@@ -752,7 +784,10 @@ Example response:
     "human_total_time_spent": null
   },
   "confidential": false,
+<<<<<<< HEAD
   "weight": null,
+=======
+>>>>>>> 10-1-stable
   "discussion_locked": false,
   "_links": {
     "self": "http://example.com/api/v4/projects/1/issues/2",
@@ -915,7 +950,10 @@ Example response:
     "due_date": null,
     "web_url": "http://example.com/example/example/issues/110",
     "confidential": false,
+<<<<<<< HEAD
     "weight": null,
+=======
+>>>>>>> 10-1-stable
     "discussion_locked": false
   },
   "target_url": "https://gitlab.example.com/gitlab-org/gitlab-ci/issues/10",

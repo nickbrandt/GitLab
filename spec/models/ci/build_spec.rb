@@ -18,7 +18,10 @@ describe Ci::Build do
   it { is_expected.to belong_to(:trigger_request) }
   it { is_expected.to belong_to(:erased_by) }
   it { is_expected.to have_many(:deployments) }
+<<<<<<< HEAD
   it { is_expected.to have_many(:sourced_pipelines) }
+=======
+>>>>>>> 10-1-stable
   it { is_expected.to have_many(:trace_sections)}
   it { is_expected.to validate_presence_of(:ref) }
   it { is_expected.to respond_to(:has_trace?) }

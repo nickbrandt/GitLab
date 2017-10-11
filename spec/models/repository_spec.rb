@@ -259,6 +259,7 @@ describe Repository do
       it_behaves_like 'finding commits by message'
     end
 
+<<<<<<< HEAD
     describe 'when storage is broken', :broken_storage do
       it 'should raise a storage error' do
         expect_to_raise_storage_error { broken_repository.find_commits_by_message('s') }
@@ -266,6 +267,9 @@ describe Repository do
     end
 
     describe 'when storage is broken', :broken_storage do
+=======
+    describe 'when storage is broken', :broken_storage  do
+>>>>>>> 10-1-stable
       it 'should raise a storage error' do
         expect_to_raise_storage_error { broken_repository.find_commits_by_message('s') }
       end
