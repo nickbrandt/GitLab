@@ -13,8 +13,8 @@ type SmartHTTPClient struct {
 	pb.SmartHTTPServiceClient
 }
 
-func (client *SmartHTTPClient) InfoRefsResponseReader(ctx context.Context, repo *pb.Repository, rpc string) (io.Reader, error) {
-	rpcRequest := &pb.InfoRefsRequest{Repository: repo}
+func (client *SmartHTTPClient) InfoRefsResponseReader(ctx context.Context, repo *pb.Repository, rpc string, gitConfigOptions []string) (io.Reader, error) {
+	rpcRequest := &pb.InfoRefsRequest{Repository: repo, GitConfigOptions: gitConfigOptions}
 
 	switch rpc {
 	case "git-upload-pack":
@@ -86,14 +86,15 @@ func (client *SmartHTTPClient) ReceivePack(ctx context.Context, repo *pb.Reposit
 	return nil
 }
 
-func (client *SmartHTTPClient) UploadPack(ctx context.Context, repo *pb.Repository, clientRequest io.Reader, clientResponse io.Writer) error {
+func (client *SmartHTTPClient) UploadPack(ctx context.Context, repo *pb.Repository, clientRequest io.Reader, clientResponse io.Writer, gitConfigOptions []string) error {
 	stream, err := client.PostUploadPack(ctx)
 	if err != nil {
 		return err
 	}
 
 	rpcRequest := &pb.PostUploadPackRequest{
-		Repository: repo,
+		Repository:       repo,
+		GitConfigOptions: gitConfigOptions,
 	}
 
 	if err := stream.Send(rpcRequest); err != nil {

@@ -53,7 +53,14 @@ func (s *GitalyTestServer) InfoRefsUploadPack(in *pb.InfoRefsRequest, stream pb.
 		return err
 	}
 
-	nSends, err := sendBytes([]byte(GitalyInfoRefsResponseMock), 100, func(p []byte) error {
+	fmt.Printf("Result: %+v", in)
+
+	data := []byte(strings.Join([]string{
+		strings.Join(in.GitConfigOptions, "\n") + "\n",
+		GitalyInfoRefsResponseMock,
+	}, "\000") + "\000")
+
+	nSends, err := sendBytes(data, 100, func(p []byte) error {
 		return stream.Send(&pb.InfoRefsResponse{Data: p})
 	})
 	if err != nil {
@@ -147,6 +154,7 @@ func (s *GitalyTestServer) PostUploadPack(stream pb.SmartHTTPService_PostUploadP
 	data := []byte(strings.Join([]string{
 		repo.GetStorageName(),
 		repo.GetRelativePath(),
+		strings.Join(req.GitConfigOptions, "\n") + "\n",
 	}, "\000") + "\000")
 
 	// The body of the request starts in the second message
@@ -307,6 +315,10 @@ func (s *GitalyTestServer) Exists(context.Context, *pb.RepositoryExistsRequest) 
 	return nil, nil
 }
 
+func (s *GitalyTestServer) HasLocalBranches(ctx context.Context, in *pb.HasLocalBranchesRequest) (*pb.HasLocalBranchesResponse, error) {
+	return nil, nil
+}
+
 func (s *GitalyTestServer) CommitDelta(in *pb.CommitDeltaRequest, stream pb.DiffService_CommitDeltaServer) error {
 	return nil
 }
@@ -316,6 +328,10 @@ func (s *GitalyTestServer) CommitDiff(in *pb.CommitDiffRequest, stream pb.DiffSe
 }
 
 func (s *GitalyTestServer) CommitPatch(in *pb.CommitPatchRequest, stream pb.DiffService_CommitPatchServer) error {
+	return nil
+}
+
+func (s *GitalyTestServer) GetBlobs(in *pb.GetBlobsRequest, stream pb.BlobService_GetBlobsServer) error {
 	return nil
 }
 
