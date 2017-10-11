@@ -65,20 +65,8 @@
 - [Hash Indexes](hash_indexes.md)
 - [Swapping Tables](swapping_tables.md)
 
-<<<<<<< HEAD
-## Documentation guides
-
-- [Documentation styleguide](doc_styleguide.md): Use this styleguide if you are
-  contributing to the documentation.
-- [Writing documentation](writing_documentation.md)
-  - [Distinction between general documentation and technical articles](writing_documentation.md#distinction-between-general-documentation-and-technical-articles)
-
 ## Internationalization (i18n) guides
 
-=======
-## Internationalization (i18n)
-
->>>>>>> 10-1-stable
 - [Introduction](i18n/index.md)
 - [Externalization](i18n/externalization.md)
 - [Translation](i18n/translation.md)
