@@ -1,6 +1,4 @@
 class ProjectMirrorData < ActiveRecord::Base
-  include Gitlab::CurrentSettings
-
   BACKOFF_PERIOD = 24.seconds
   JITTER = 6.seconds
 
@@ -12,6 +10,8 @@ class ProjectMirrorData < ActiveRecord::Base
   before_validation on: :create do
     self.next_execution_timestamp = Time.now
   end
+
+  after_save :hard_fail_mirror, if: :retry_count_limit_reached?
 
   def reset_retry_count!
     self.retry_count = 0
@@ -42,5 +42,14 @@ class ProjectMirrorData < ActiveRecord::Base
     duration = timestamp - self.last_update_started_at
 
     (BACKOFF_PERIOD + rand(JITTER)) * duration.seconds
+  end
+
+  def retry_count_limit_reached?
+    retry_count_changed? &&
+      Gitlab::CurrentSettings.current_application_settings.mirror_max_retry_count < retry_count
+  end
+
+  def hard_fail_mirror
+    project.import_hard_fail
   end
 end

@@ -1,6 +1,7 @@
 class UpdateAllMirrorsWorker
   include Sidekiq::Worker
   include CronjobQueue
+  include Gitlab::CurrentSettings
 
   LEASE_TIMEOUT = 5.minutes
   LEASE_KEY = 'update_all_mirrors'.freeze

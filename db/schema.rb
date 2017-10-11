@@ -162,6 +162,7 @@ ActiveRecord::Schema.define(version: 20171017130239) do
     t.integer "circuitbreaker_failure_reset_time", default: 1800
     t.integer "circuitbreaker_storage_timeout", default: 30
     t.boolean "remote_mirror_available", default: true, null: false
+    t.integer "mirror_max_retry_count", default: 10, null: false
   end
 
   create_table "approvals", force: :cascade do |t|
