@@ -20,7 +20,9 @@ class GeoNodeStatus {
     this.$repositoriesSynced = $('.js-repositories-synced', this.$status);
     this.$repositoriesFailed = $('.js-repositories-failed', this.$status);
     this.$lfsObjectsSynced = $('.js-lfs-objects-synced', this.$status);
+    this.$lfsObjectsFailed = $('.js-lfs-objects-failed', this.$status);
     this.$attachmentsSynced = $('.js-attachments-synced', this.$status);
+    this.$attachmentsFailed = $('.js-attachments-failed', this.$status);
     this.$lastEventSeen = $('.js-last-event-seen', this.$status);
     this.$lastCursorEvent = $('.js-last-cursor-event', this.$status);
     this.$health = $('.js-health', this.$status);
@@ -65,7 +67,10 @@ class GeoNodeStatus {
       this.$repositoriesSynced.text(`${status.repositories_synced_count}/${status.repositories_count} (${status.repositories_synced_in_percentage})`);
       this.$repositoriesFailed.text(status.repositories_failed_count);
       this.$lfsObjectsSynced.text(`${status.lfs_objects_synced_count}/${status.lfs_objects_count} (${status.lfs_objects_synced_in_percentage})`);
+      this.$lfsObjectsFailed.text(status.lfs_objects_failed_count);
       this.$attachmentsSynced.text(`${status.attachments_synced_count}/${status.attachments_count} (${status.attachments_synced_in_percentage})`);
+      this.$attachmentsFailed.text(status.attachments_failed_count);
+
       const eventDate = gl.utils.formatDate(new Date(status.last_event_date));
       const cursorDate = gl.utils.formatDate(new Date(status.cursor_last_event_date));
       this.$lastEventSeen.text(`${status.last_event_id} (${eventDate})`);
