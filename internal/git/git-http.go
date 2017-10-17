@@ -20,12 +20,28 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
+const (
+	// We have to use a negative transfer.hideRefs since this is the only way
+	// to undo an already set parameter: https://www.spinics.net/lists/git/msg256772.html
+	GitConfigShowAllRefs = "transfer.hideRefs=!refs"
+)
+
 func ReceivePack(a *api.API) http.Handler {
 	return postRPCHandler(a, "handleReceivePack", handleReceivePack)
 }
 
 func UploadPack(a *api.API) http.Handler {
 	return postRPCHandler(a, "handleUploadPack", handleUploadPack)
+}
+
+func gitConfigOptions(a *api.Response) []string {
+	var out []string
+
+	if a.ShowAllRefs {
+		out = append(out, GitConfigShowAllRefs)
+	}
+
+	return out
 }
 
 func postRPCHandler(a *api.API, name string, handler func(*GitHttpResponseWriter, *http.Request, *api.Response) error) http.Handler {

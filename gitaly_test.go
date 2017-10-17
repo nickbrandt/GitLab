@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/git"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 
@@ -60,17 +61,29 @@ func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 	apiResponse := gitOkBody(t)
 	apiResponse.GitalyServer.Address = gitalyAddress
 
-	ts := testAuthServer(nil, 200, apiResponse)
-	defer ts.Close()
+	for _, showAllRefs := range []bool{true, false} {
+		t.Run(fmt.Sprintf("ShowAllRefs=%v", showAllRefs), func(t *testing.T) {
+			apiResponse.ShowAllRefs = showAllRefs
 
-	ws := startWorkhorseServer(ts.URL)
-	defer ws.Close()
+			ts := testAuthServer(nil, 200, apiResponse)
+			defer ts.Close()
 
-	resource := "/gitlab-org/gitlab-test.git/info/refs?service=git-upload-pack"
-	_, body := httpGet(t, ws.URL+resource)
+			ws := startWorkhorseServer(ts.URL)
+			defer ws.Close()
 
-	expectedContent := string(testhelper.GitalyInfoRefsResponseMock)
-	assert.Equal(t, expectedContent, body, "GET %q: response body", resource)
+			resource := "/gitlab-org/gitlab-test.git/info/refs?service=git-upload-pack"
+			_, body := httpGet(t, ws.URL+resource)
+
+			expectedContent := "\n\000" + string(testhelper.GitalyInfoRefsResponseMock) + "\000"
+			if showAllRefs {
+				expectedContent = git.GitConfigShowAllRefs + expectedContent
+			}
+
+			assert.Equal(t, expectedContent, body, "GET %q: response body", resource)
+
+		})
+	}
+
 }
 
 func TestGetInfoRefsProxiedToGitalyInterruptedStream(t *testing.T) {
@@ -182,11 +195,20 @@ func TestPostReceivePackProxiedToGitalyInterrupted(t *testing.T) {
 }
 
 func TestPostUploadPackProxiedToGitalySuccessfully(t *testing.T) {
-	apiResponse := gitOkBody(t)
+	for i, tc := range []struct {
+		showAllRefs bool
+		code        codes.Code
+	}{
+		{true, codes.OK},
+		{true, codes.Unavailable},
+		{false, codes.OK},
+		{false, codes.Unavailable},
+	} {
+		t.Run(fmt.Sprintf("Case %d", i), func(t *testing.T) {
+			apiResponse := gitOkBody(t)
+			apiResponse.ShowAllRefs = tc.showAllRefs
 
-	for _, code := range []codes.Code{codes.OK, codes.Unavailable} {
-		func() {
-			gitalyServer, socketPath := startGitalyServer(t, code)
+			gitalyServer, socketPath := startGitalyServer(t, tc.code)
 			defer gitalyServer.Stop()
 
 			apiResponse.GitalyServer.Address = "unix://" + socketPath
@@ -204,16 +226,23 @@ func TestPostUploadPackProxiedToGitalySuccessfully(t *testing.T) {
 				testhelper.GitalyUploadPackResponseMock,
 			)
 
-			expectedBody := strings.Join([]string{
+			expectedBodyParts := []string{
 				apiResponse.Repository.StorageName,
 				apiResponse.Repository.RelativePath,
-				string(testhelper.GitalyUploadPackResponseMock),
-			}, "\000")
+			}
+			if tc.showAllRefs {
+				expectedBodyParts = append(expectedBodyParts, git.GitConfigShowAllRefs+"\n")
+			} else {
+				expectedBodyParts = append(expectedBodyParts, "\n")
+			}
+
+			expectedBodyParts = append(expectedBodyParts, string(testhelper.GitalyUploadPackResponseMock))
+			expectedBody := strings.Join(expectedBodyParts, "\000")
 
 			assert.Equal(t, 200, resp.StatusCode, "POST %q", resource)
 			assert.Equal(t, expectedBody, body, "POST %q: response body", resource)
 			testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-upload-pack-result")
-		}()
+		})
 	}
 }
 

@@ -114,6 +114,8 @@ type Response struct {
 	// Repository object for making gRPC requests to Gitaly. This will
 	// eventually replace the RepoPath field.
 	Repository pb.Repository
+	// For git-http, does the requestor have the right to view all refs?
+	ShowAllRefs bool
 }
 
 // singleJoiningSlash is taken from reverseproxy.go:NewSingleHostReverseProxy
