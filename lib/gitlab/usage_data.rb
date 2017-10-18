@@ -63,6 +63,8 @@ module Gitlab
             deployments: Deployment.count,
             environments: ::Environment.count,
             gcp_clusters: ::Gcp::Cluster.count,
+            gcp_clusters_enabled: ::Gcp::Cluster.enabled.count,
+            gcp_clusters_disabled: ::Gcp::Cluster.disabled.count,
             geo_nodes: GeoNode.count,
             in_review_folder: ::Environment.in_review_folder.count,
             groups: Group.count,
