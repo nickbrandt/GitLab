@@ -26,7 +26,6 @@ module Gitlab
       apple-touch-icon.png
       assets
       autocomplete
-      boards
       ci
       dashboard
       deploy.html
@@ -119,7 +118,6 @@ module Gitlab
       analytics
       audit_events
       avatar
-      boards
       edit
       group_members
       hooks
