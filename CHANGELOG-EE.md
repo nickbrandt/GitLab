@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 10.0.6 (2017-11-08)
+
+- No changes.
+
 ## 10.0.5 (2017-11-03)
 
 - [FIXED] Find stuck scheduled import jobs and also mark them as failed. !3055
