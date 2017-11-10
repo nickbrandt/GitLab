@@ -112,7 +112,6 @@ describe('MRWidgetPipeline', () => {
           vm.$el.querySelector('.media-body').textContent,
         ).toContain(`Coverage ${mockData.pipeline.coverage}`);
       });
-    });
 
     describe('without coverage', () => {
       it('should not render a coverage', () => {
