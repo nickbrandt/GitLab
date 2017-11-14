@@ -91,10 +91,10 @@
 			"revision": "e8f0f8aaa98dfb6586cbdf2978d511e3199a960a"
 		},
 		{
-			"checksumSHA1": "g46WnPAlsmkyNDUFdObDgP6DP+s=",
+			"checksumSHA1": "6TbprMZzwDk+SaW+JxdxvnauyDk=",
 			"path": "github.com/jfbus/httprs",
-			"revision": "e879ae6bf984ca6c009eb44696e9f400ec3ed2d9",
-			"revisionTime": "2017-07-03T13:54:35Z"
+			"revision": "32cf48c14a79f94eb3d8100efc00e773c5c8b160",
+			"revisionTime": "2017-11-08T13:45:55Z"
 		},
 		{
 			"checksumSHA1": "oIkoHb8+rM5Etur5HhZVY/sDQKQ=",
