@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 3.3.1
+
+- Fix "net/http: request canceled" errors in gitlab-zip-cat !208
+
 v 3.3.0
 
 - Ban context.Background !201
