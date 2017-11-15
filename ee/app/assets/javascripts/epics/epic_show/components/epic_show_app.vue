@@ -1,7 +1,6 @@
 <script>
   import issuableApp from '~/issue_show/components/app.vue';
   import relatedIssuesRoot from '~/issuable/related_issues/components/related_issues_root.vue';
-  import issuableAppEventHub from '~/issue_show/event_hub';
   import epicHeader from './epic_header.vue';
   import epicSidebar from '../../sidebar/components/sidebar_app.vue';
 
