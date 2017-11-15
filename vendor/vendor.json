@@ -91,6 +91,12 @@
 			"revision": "e8f0f8aaa98dfb6586cbdf2978d511e3199a960a"
 		},
 		{
+			"checksumSHA1": "s7J8PdKJFnoBFg6MowXLTvix7ug=",
+			"path": "github.com/grpc-ecosystem/go-grpc-prometheus",
+			"revision": "0dafe0d496ea71181bf2dd039e7e3f44b6bd11a7",
+			"revisionTime": "2017-08-26T09:06:48Z"
+		},
+		{
 			"checksumSHA1": "6TbprMZzwDk+SaW+JxdxvnauyDk=",
 			"path": "github.com/jfbus/httprs",
 			"revision": "32cf48c14a79f94eb3d8100efc00e773c5c8b160",
