@@ -1,5 +1,6 @@
 <script>
   import issuableApp from '~/issue_show/components/app.vue';
+  import relatedIssuesRoot from '~/issuable/related_issues/components/related_issues_root.vue';
   import epicHeader from './epic_header.vue';
   import epicSidebar from '../../sidebar/components/sidebar_app.vue';
 
@@ -15,6 +16,10 @@
         type: Boolean,
       },
       canDestroy: {
+        required: true,
+        type: Boolean,
+      },
+      canAdmin: {
         required: true,
         type: Boolean,
       },
@@ -56,6 +61,10 @@
         type: Object,
         required: true,
       },
+      issueLinksEndpoint: {
+        type: String,
+        required: true,
+      },
       startDate: {
         type: String,
         required: false,
@@ -69,6 +78,7 @@
       epicHeader,
       epicSidebar,
       issuableApp,
+      relatedIssuesRoot,
     },
     created() {
       // Epics specific configuration
@@ -108,6 +118,12 @@
         :editable="canUpdate"
         :initialStartDate="startDate"
         :initialEndDate="endDate"
+      />
+      <related-issues-root
+        :endpoint="issueLinksEndpoint"
+        :can-admin="canAdmin"
+        :allow-auto-complete="false"
+        title="Issues"
       />
     </div>
   </div>
