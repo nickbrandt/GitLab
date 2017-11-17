@@ -169,13 +169,13 @@ describe Gitlab::Checks::ChangeAccess do
       it 'fails if any LFS blobs are missing' do
         allow_any_instance_of(Gitlab::Checks::LfsIntegrity).to receive(:objects_missing?).and_return(true)
 
-        expect { subject.exec }.to raise_error(Gitlab::GitAccess::UnauthorizedError, /LFS objects are missing/)
+        expect { subject }.to raise_error(Gitlab::GitAccess::UnauthorizedError, /LFS objects are missing/)
       end
 
       it 'succeeds if LFS objects have already been uploaded' do
         allow_any_instance_of(Gitlab::Checks::LfsIntegrity).to receive(:objects_missing?).and_return(false)
 
-        expect { subject.exec }.not_to raise_error
+        expect { subject }.not_to raise_error
       end
     end
 
