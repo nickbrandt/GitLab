@@ -169,42 +169,13 @@ describe Gitlab::Checks::ChangeAccess do
       it 'fails if any LFS blobs are missing' do
         allow_any_instance_of(Gitlab::Checks::LfsIntegrity).to receive(:objects_missing?).and_return(true)
 
-<<<<<<< HEAD
-      before do
-        allow_any_instance_of(Gitlab::Git::RevList).to receive(:new_objects) do |&lazy_block|
-          lazy_block.call([blob_object.id])
-        end
-      end
-
-      context 'with LFS not enabled' do
-        it 'skips integrity check' do
-          expect_any_instance_of(Gitlab::Git::RevList).not_to receive(:new_objects)
-
-          subject
-        end
-=======
         expect { subject.exec }.to raise_error(Gitlab::GitAccess::UnauthorizedError, /LFS objects are missing/)
->>>>>>> local-ce/10-2-stable-prepare-rc3
       end
 
       it 'succeeds if LFS objects have already been uploaded' do
         allow_any_instance_of(Gitlab::Checks::LfsIntegrity).to receive(:objects_missing?).and_return(false)
 
-<<<<<<< HEAD
-            subject
-          end
-        end
-
-        it 'fails if any LFS blobs are missing' do
-          expect { subject }.to raise_error(Gitlab::GitAccess::UnauthorizedError, /LFS objects are missing/)
-        end
-
-        it 'succeeds if LFS objects have already been uploaded' do
-          lfs_object = create(:lfs_object, oid: blob_object.lfs_oid)
-          create(:lfs_objects_project, project: project, lfs_object: lfs_object)
-
-          expect { subject }.not_to raise_error
-        end
+        expect { subject.exec }.not_to raise_error
       end
     end
 
@@ -581,9 +552,6 @@ describe Gitlab::Checks::ChangeAccess do
                                      .and_call_original
           expect { subject }.not_to raise_error
         end
-=======
-        expect { subject.exec }.not_to raise_error
->>>>>>> local-ce/10-2-stable-prepare-rc3
       end
     end
   end
