@@ -7,7 +7,7 @@ module QA
       include Scenario::Actable
 
       def refresh
-        visit current_path
+        visit current_url
       end
 
       def scroll_to(selector, text: nil)
