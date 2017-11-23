@@ -107,11 +107,6 @@ export default {
       required: false,
       default: 'issue',
     },
-    canAttachFile: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
   },
   data() {
     const store = new Store({
