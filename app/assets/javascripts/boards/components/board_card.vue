@@ -66,10 +66,7 @@ export default {
       :list="list"
       :issue="issue"
       :issue-link-base="issueLinkBase"
-<<<<<<< HEAD:app/assets/javascripts/boards/components/board_card.vue
       :group-id="groupId"
-=======
->>>>>>> local-ce/10-2-stable-patch-2:app/assets/javascripts/boards/components/board_card.vue
       :root-path="rootPath"
       :update-filters="true" />
   </li>
