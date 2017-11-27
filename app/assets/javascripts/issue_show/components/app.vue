@@ -34,7 +34,11 @@ export default {
       required: false,
       default: true,
     },
+<<<<<<< HEAD
     canAttachFile: {
+=======
+    enableAutocomplete: {
+>>>>>>> c97b60cb69... Merge branch 'disable-autocomplete' into 'master'
       type: Boolean,
       required: false,
       default: true,
@@ -240,6 +244,7 @@ export default {
       :project-namespace="projectNamespace"
       :show-delete-button="showDeleteButton"
       :can-attach-file="canAttachFile"
+      :enable-autocomplete="enableAutocomplete"
     />
     <div v-else>
       <title-component
