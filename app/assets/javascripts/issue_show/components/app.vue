@@ -34,11 +34,7 @@ export default {
       required: false,
       default: true,
     },
-<<<<<<< HEAD
-    canAttachFile: {
-=======
     enableAutocomplete: {
->>>>>>> c97b60cb69... Merge branch 'disable-autocomplete' into 'master'
       type: Boolean,
       required: false,
       default: true,
@@ -110,6 +106,11 @@ export default {
       type: String,
       required: false,
       default: 'issue',
+    },
+    canAttachFile: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
   data() {
