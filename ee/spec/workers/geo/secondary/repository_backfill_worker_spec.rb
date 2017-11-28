@@ -15,8 +15,9 @@ RSpec.describe Geo::Secondary::RepositoryBackfillWorker, :geo, :geo_fdw, :clean_
   end
 
   it 'disables Sidekiq retries' do
-    expect(subject.sidekiq_options_hash).to eq(
+    expect(subject.sidekiq_options_hash).to match(
       'retry' => false,
+      'version' => an_instance_of(Integer),
       'queue' => 'geo:geo_secondary_repository_backfill',
       'queue_namespace' => :geo
     )
