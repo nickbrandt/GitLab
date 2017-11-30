@@ -24,10 +24,6 @@ export function highCountTrim(count) {
   return count > 99 ? '99+' : count;
 }
 
-export function capitalizeFirstCharacter(text) {
-  return `${text[0].toUpperCase()}${text.slice(1)}`;
-}
-
 gl.text.randomString = function() {
   return Math.random().toString(36).substring(7);
 };
@@ -199,3 +195,12 @@ gl.text.dasherize = function(str) {
 gl.text.slugify = function(str) {
   return str.trim().toLowerCase().latinise();
 };
+/**
+ * Capitalizes first character
+ *
+ * @param {String} text
+ * @return {String}
+ */
+export function capitalizeFirstCharacter(text) {
+  return `${text[0].toUpperCase()}${text.slice(1)}`;
+}

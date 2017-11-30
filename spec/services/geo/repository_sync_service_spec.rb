@@ -91,7 +91,7 @@ describe Geo::RepositorySyncService do
     end
 
     it 'increases retry count when Gitlab::Git::Repository::NoRepository is raised' do
-      allow(repository).to receive(:fetch_as_mirror).with(url_to_repo, forced: true) { raise Gitlab::Git::Repository::NoRepository }
+      allow(repository).to receive(:fetch_geo_mirror).with(url_to_repo) { raise Gitlab::Git::Repository::NoRepository }
 
       subject.execute
 
