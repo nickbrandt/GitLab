@@ -6,5 +6,9 @@ module Geo
 
     validates :upload, :path, :checksum, :model_id, :model_type,
               :uploader, presence: true
+
+    def upload_type
+      uploader&.sub(/Uploader\z/, '')&.underscore
+    end
   end
 end

@@ -31,6 +31,10 @@ FactoryBot.define do
     trait :job_artifact_deleted_event do
       job_artifact_deleted_event factory: :geo_job_artifact_deleted_event
     end
+
+    trait :upload_deleted_event do
+      upload_deleted_event factory: :geo_upload_deleted_event
+    end
   end
 
   factory :geo_repository_created_event, class: Geo::RepositoryCreatedEvent do
