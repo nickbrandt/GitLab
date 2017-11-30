@@ -4,6 +4,7 @@ module Geo
 
     belongs_to :upload
 
-    validates :upload, :path, :checksum, :model_id, :model_type, presence: true
+    validates :upload, :path, :checksum, :model_id, :model_type,
+              :uploader, presence: true
   end
 end

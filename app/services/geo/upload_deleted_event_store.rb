@@ -16,7 +16,8 @@ module Geo
         path: upload.path,
         checksum: upload.checksum,
         model_id: upload.model_id,
-        model_type: upload.model_type
+        model_type: upload.model_type,
+        uploader: upload.uploader
       )
     end
 
@@ -30,6 +31,7 @@ module Geo
         path: upload.path,
         model_id: upload.model_id,
         model_type: upload.model_type,
+        uploader: upload.uploader,
         message: message
       }
     end

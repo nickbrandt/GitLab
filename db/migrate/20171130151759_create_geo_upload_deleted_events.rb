@@ -9,6 +9,7 @@ class CreateGeoUploadDeletedEvents < ActiveRecord::Migration
       t.string :checksum, null: false, limit: 64
       t.integer :model_id, null: false
       t.string :model_type, null: false
+      t.string :uploader, null: false
     end
 
     add_column :geo_event_log, :upload_deleted_event_id, :integer, limit: 8

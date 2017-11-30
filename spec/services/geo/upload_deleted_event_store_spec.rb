@@ -38,7 +38,8 @@ describe Geo::UploadDeletedEventStore do
           path: upload.path,
           checksum: upload.checksum,
           model_id: upload.model_id,
-          model_type: upload.model_type
+          model_type: upload.model_type,
+          uploader: upload.uploader
         )
       end
 
@@ -54,6 +55,7 @@ describe Geo::UploadDeletedEventStore do
           path: invalid_upload.path,
           model_id: invalid_upload.model_id,
           model_type: invalid_upload.model_type,
+          uploader: invalid_upload.uploader,
           message: "Upload deleted event could not be created",
           error: "Validation failed: Checksum can't be blank"
         }
