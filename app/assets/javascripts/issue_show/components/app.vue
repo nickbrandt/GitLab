@@ -16,6 +16,10 @@ export default {
       required: true,
       type: String,
     },
+    updateEndpoint: {
+      required: true,
+      type: String,
+    },
     canUpdate: {
       required: true,
       type: Boolean,
@@ -34,7 +38,7 @@ export default {
       required: false,
       default: true,
     },
-    canAttachFile: {
+    enableAutocomplete: {
       type: Boolean,
       required: false,
       default: true,
@@ -106,6 +110,11 @@ export default {
       type: String,
       required: false,
       default: 'issue',
+    },
+    canAttachFile: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
   },
   data() {
@@ -240,6 +249,7 @@ export default {
       :project-namespace="projectNamespace"
       :show-delete-button="showDeleteButton"
       :can-attach-file="canAttachFile"
+      :enable-autocomplete="enableAutocomplete"
     />
     <div v-else>
       <title-component
@@ -256,6 +266,8 @@ export default {
         :description-text="state.descriptionText"
         :updated-at="state.updatedAt"
         :task-status="state.taskStatus"
+        :issuable-type="issuableType"
+        :update-url="updateEndpoint"
       />
       <edited-component
         v-if="hasUpdated"

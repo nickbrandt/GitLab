@@ -3,7 +3,16 @@ require 'spec_helper'
 feature 'Update Epic', :js do
   let(:user) { create(:user) }
   let(:group) { create(:group, :public) }
-  let(:epic) { create(:epic, group: group) }
+
+  let(:markdown) do
+    <<-MARKDOWN.strip_heredoc
+    This is a task list:
+
+    - [ ] Incomplete entry 1
+    MARKDOWN
+  end
+
+  let(:epic) { create(:epic, group: group, description: markdown) }
 
   before do
     stub_licensed_features(epics: true)
@@ -37,11 +46,38 @@ feature 'Update Epic', :js do
       expect(find('.issuable-details .description')).to have_content('New epic description')
     end
 
+    it 'edits full screen' do
+      find('.btn-edit').click
+      find('.js-zen-enter').click
+
+      expect(page).to have_selector('.div-dropzone-wrapper.fullscreen')
+    end
+
     # File attachment feature is not implemented yet for epics
     it 'cannot attach files' do
       find('.btn-edit').click
 
       expect(page).not_to have_selector('.uploading-container .button-attach-file')
+    end
+
+    it 'updates the tasklist' do
+      expect(page).to have_selector('ul.task-list',      count: 1)
+      expect(page).to have_selector('li.task-list-item', count: 1)
+      expect(page).to have_selector('ul input[checked]', count: 0)
+
+      find('.task-list .task-list-item', text: 'Incomplete entry 1').find('input').click
+
+      expect(page).to have_selector('ul input[checked]', count: 1)
+    end
+
+    # Autocomplete is disabled for epics until #4084 is resolved
+    describe 'autocomplete disabled' do
+      it 'does not open atwho container' do
+        find('.btn-edit').click
+
+        find('#issue-description').native.send_keys('@')
+        expect(page).not_to have_selector('.atwho-container')
+      end
     end
   end
 
