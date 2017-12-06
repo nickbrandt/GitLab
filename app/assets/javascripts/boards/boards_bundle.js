@@ -25,11 +25,11 @@ import './components/board_sidebar';
 import './components/new_list_dropdown';
 import './components/modal/index';
 import '../vue_shared/vue_resource_interceptor';
-import { convertPermissionToBoolean } from '../lib/utils/common_utils';
 
 import './components/boards_selector';
 import collapseIcon from './icons/fullscreen_collapse.svg';
 import expandIcon from './icons/fullscreen_expand.svg';
+import tooltip from '../vue_shared/directives/tooltip';
 
 Vue.use(VueResource);
 
@@ -188,10 +188,13 @@ $(() => {
       el: configEl,
       data() {
         return {
-          canAdminList: convertPermissionToBoolean(
-            this.$options.el.dataset.canAdminList,
-          ),
+          canAdminList: this.$options.el.hasAttribute('data-can-admin-list'),
+          hasScope: this.$options.el.hasAttribute('data-has-scope'),
+          state: Store.state,
         };
+      },
+      directives: {
+        tooltip,
       },
       methods: {
         showPage: page => gl.issueBoards.BoardsStore.showPage(page),
@@ -200,11 +203,17 @@ $(() => {
         buttonText() {
           return this.canAdminList ? 'Edit board' : 'View scope';
         },
+        tooltipTitle() {
+          return this.hasScope ? __('This board\'s scope is reduced') : '';
+        }
       },
       template: `
         <div class="prepend-left-10">
           <button
+            v-tooltip
+            :title="tooltipTitle"
             class="btn btn-inverted"
+            :class="{ 'dot-highlight': hasScope }"
             type="button"
             @click.prevent="showPage('edit')"
           >
@@ -223,12 +232,8 @@ $(() => {
         modal: ModalStore.store,
         store: Store.state,
         isFullscreen: false,
-        focusModeAvailable: convertPermissionToBoolean(
-          $boardApp.dataset.focusModeAvailable,
-        ),
-        canAdminList: this.$options.el && convertPermissionToBoolean(
-          this.$options.el.dataset.canAdminList,
-        ),
+        focusModeAvailable: $boardApp.hasAttribute('data-focus-mode-available'),
+        canAdminList: this.$options.el.hasAttribute('data-can-admin-list'),
       };
     },
     watch: {
@@ -296,7 +301,7 @@ $(() => {
       modal: ModalStore.store,
       store: Store.state,
       isFullscreen: false,
-      focusModeAvailable: convertPermissionToBoolean($boardApp.dataset.focusModeAvailable),
+      focusModeAvailable: $boardApp.hasAttribute('data-focus-mode-available'),
     },
     methods: {
       toggleFocusMode() {
