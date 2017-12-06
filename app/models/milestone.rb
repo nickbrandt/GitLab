@@ -90,6 +90,13 @@ class Milestone < ActiveRecord::Base
       else milestones.active
       end
     end
+
+    def predefined?(milestone)
+      milestone == Any ||
+        milestone == None ||
+        milestone == Upcoming ||
+        milestone == Started
+    end
   end
 
   def self.reference_prefix
