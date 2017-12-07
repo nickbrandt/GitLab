@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 10.0.7 (2017-12-07)
+
+- No changes.
+
 ## 10.0.6 (2017-11-08)
 
 - [SECURITY] Geo JSON web tokens now expire after two minutes to reduce risk of compromise.
