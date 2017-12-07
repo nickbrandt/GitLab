@@ -242,11 +242,29 @@ module API
     end
 
     class GroupDetail < Group
+<<<<<<< HEAD
       expose :projects, using: Entities::Project
       expose :shared_projects, using: Entities::Project
 
       # EE-only
       expose :shared_runners_minutes_limit
+=======
+      expose :projects, using: Entities::Project do |group, options|
+        GroupProjectsFinder.new(
+          group: group,
+          current_user: options[:current_user],
+          options: { only_owned: true }
+        ).execute
+      end
+
+      expose :shared_projects, using: Entities::Project do |group, options|
+        GroupProjectsFinder.new(
+          group: group,
+          current_user: options[:current_user],
+          options: { only_shared: true }
+        ).execute
+      end
+>>>>>>> local-ce/10-1-stable
     end
 
     class Commit < Grape::Entity
