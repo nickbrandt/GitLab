@@ -27,7 +27,15 @@ With GitLab merge requests, you can:
 - [Resolve merge conflicts from the UI](#resolve-conflicts)
 - Enable [fast-forward merge requests](#fast-forward-merge-requests)
 - Enable [semi-linear history merge requests](#semi-linear-history-merge-requests) as another security layer to guarantee the pipeline is passing in the target branch
+<<<<<<< HEAD
 
+||||||| merged common ancestors
+
+
+=======
+- [Create new merge requests by email](#create_by_email)
+
+>>>>>>> ce/10-3-stable
 With **[GitLab Enterprise Edition][ee]**, you can also:
 
 - View the deployment process across projects with [Multi-Project Pipeline Graphs](../../../ci/multi_project_pipeline_graphs.md) (available only in GitLab Enterprise Edition Premium)
@@ -137,6 +145,14 @@ When a merge request has conflicts, GitLab may provide the option to resolve
 those conflicts in the GitLab UI.
 
 [Learn more about resolving merge conflicts in the UI.](resolve_conflicts.md)
+
+## Create new merge requests by email
+
+You can create a new merge request by sending an email to a user-specific email
+address. The address can be obtained on the merge requests page by clicking on
+a **Email a new merge request to this project** button.  The subject will be
+used as the source branch name for the new merge request and the target branch
+will be the default branch for the project.
 
 ## Revert changes
 

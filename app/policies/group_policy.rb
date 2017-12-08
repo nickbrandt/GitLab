@@ -36,6 +36,7 @@ class GroupPolicy < BasePolicy
   end
 
   rule { logged_in_viewable }.enable :read_group
+<<<<<<< HEAD
 
   rule { guest }.policy do
     enable :read_group
@@ -43,6 +44,16 @@ class GroupPolicy < BasePolicy
     enable :upload_file
   end
 
+||||||| merged common ancestors
+  rule { guest }             .enable :read_group
+=======
+
+  rule { guest }.policy do
+    enable :read_group
+    enable :upload_file
+  end
+
+>>>>>>> ce/10-3-stable
   rule { admin }             .enable :read_group
   rule { has_projects }      .enable :read_group
 

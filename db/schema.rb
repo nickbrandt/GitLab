@@ -158,12 +158,10 @@ ActiveRecord::Schema.define(version: 20171205190711) do
     t.boolean "hashed_storage_enabled", default: false, null: false
     t.boolean "project_export_enabled", default: true, null: false
     t.boolean "auto_devops_enabled", default: false, null: false
-    t.integer "circuitbreaker_failure_count_threshold", default: 160
-    t.integer "circuitbreaker_failure_wait_time", default: 30
+    t.integer "circuitbreaker_failure_count_threshold", default: 3
     t.integer "circuitbreaker_failure_reset_time", default: 1800
-    t.integer "circuitbreaker_storage_timeout", default: 30
+    t.integer "circuitbreaker_storage_timeout", default: 15
     t.integer "circuitbreaker_access_retries", default: 3
-    t.integer "circuitbreaker_backoff_threshold", default: 80
     t.boolean "throttle_unauthenticated_enabled", default: false, null: false
     t.integer "throttle_unauthenticated_requests_per_period", default: 3600, null: false
     t.integer "throttle_unauthenticated_period_in_seconds", default: 3600, null: false
@@ -173,6 +171,7 @@ ActiveRecord::Schema.define(version: 20171205190711) do
     t.boolean "throttle_authenticated_web_enabled", default: false, null: false
     t.integer "throttle_authenticated_web_requests_per_period", default: 7200, null: false
     t.integer "throttle_authenticated_web_period_in_seconds", default: 3600, null: false
+    t.integer "circuitbreaker_check_interval", default: 1, null: false
     t.boolean "password_authentication_enabled_for_web"
     t.boolean "password_authentication_enabled_for_git", default: true
     t.integer "gitaly_timeout_default", default: 55, null: false
@@ -403,6 +402,20 @@ ActiveRecord::Schema.define(version: 20171205190711) do
     t.integer "job_id", null: false
     t.integer "file_type", null: false
     t.integer "file_store"
+    t.integer "size", limit: 8
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.datetime_with_timezone "expire_at"
+    t.string "file"
+  end
+
+  add_index "ci_job_artifacts", ["job_id", "file_type"], name: "index_ci_job_artifacts_on_job_id_and_file_type", unique: true, using: :btree
+  add_index "ci_job_artifacts", ["project_id"], name: "index_ci_job_artifacts_on_project_id", using: :btree
+
+  create_table "ci_job_artifacts", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.integer "job_id", null: false
+    t.integer "file_type", null: false
     t.integer "size", limit: 8
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false

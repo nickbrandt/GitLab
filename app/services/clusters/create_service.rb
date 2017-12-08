@@ -27,11 +27,19 @@ module Clusters
 
       @cluster_params = params.merge(user: current_user, projects: [project])
     end
+<<<<<<< HEAD
 
     def can_create_cluster?
       return true if project.clusters.empty?
 
       project.feature_available?(:multiple_clusters)
     end
+||||||| merged common ancestors
+=======
+
+    def can_create_cluster?
+      project.clusters.empty?
+    end
+>>>>>>> ce/10-3-stable
   end
 end

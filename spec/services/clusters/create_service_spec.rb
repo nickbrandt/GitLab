@@ -36,6 +36,7 @@ describe Clusters::CreateService do
           }
         }
       end
+<<<<<<< HEAD
     end
 
     shared_examples 'create cluster' do
@@ -57,10 +58,40 @@ describe Clusters::CreateService do
         expect(subject.platform).to be_nil
       end
     end
+||||||| merged common ancestors
+=======
+    end
+
+    shared_examples 'create cluster' do
+      it 'creates a cluster object and performs a worker' do
+        expect(ClusterProvisionWorker).to receive(:perform_async)
+
+        expect { subject }
+          .to change { Clusters::Cluster.count }.by(1)
+          .and change { Clusters::Providers::Gcp.count }.by(1)
+>>>>>>> ce/10-3-stable
+
+<<<<<<< HEAD
+    shared_examples 'error' do
+||||||| merged common ancestors
+=======
+        expect(subject.name).to eq('test-cluster')
+        expect(subject.user).to eq(user)
+        expect(subject.project).to eq(project)
+        expect(subject.provider.gcp_project_id).to eq('gcp-project')
+        expect(subject.provider.zone).to eq('us-central1-a')
+        expect(subject.provider.num_nodes).to eq(1)
+        expect(subject.provider.machine_type).to eq('machine_type-a')
+        expect(subject.provider.access_token).to eq(access_token)
+        expect(subject.platform).to be_nil
+      end
+    end
 
     shared_examples 'error' do
+>>>>>>> ce/10-3-stable
       it 'returns an error' do
         expect(ClusterProvisionWorker).not_to receive(:perform_async)
+<<<<<<< HEAD
         expect { subject }.to change { Clusters::Cluster.count }.by(0)
         expect(subject.errors[:"provider_gcp.gcp_project_id"]).to be_present
       end
@@ -116,6 +147,37 @@ describe Clusters::CreateService do
           expect(ClusterProvisionWorker).not_to receive(:perform_async)
           expect { subject }.to raise_error(ArgumentError).and change { Clusters::Cluster.count }.by(0)
         end
+||||||| merged common ancestors
+        expect { result }.to change { Clusters::Cluster.count }.by(0)
+        expect(result.errors[:"provider_gcp.gcp_project_id"]).to be_present
+=======
+        expect { subject }.to change { Clusters::Cluster.count }.by(0)
+        expect(subject.errors[:"provider_gcp.gcp_project_id"]).to be_present
+      end
+    end
+
+    context 'when project has no clusters' do
+      context 'when correct params' do
+        include_context 'valid params'
+
+        include_examples 'create cluster'
+      end
+
+      context 'when invalid params' do
+        include_context 'invalid params'
+
+        include_examples 'error'
+      end
+    end
+
+    context 'when project has a cluster' do
+      include_context 'valid params'
+      let!(:cluster) { create(:cluster, :provided_by_gcp, projects: [project]) }
+
+      it 'does not create a cluster' do
+        expect(ClusterProvisionWorker).not_to receive(:perform_async)
+        expect { subject }.to raise_error(ArgumentError).and change { Clusters::Cluster.count }.by(0)
+>>>>>>> ce/10-3-stable
       end
     end
   end

@@ -1,7 +1,9 @@
 require 'spec_helper'
 
 describe MergeRequestsHelper do
+  include ActionView::Helpers::UrlHelper
   include ProjectForksHelper
+
   describe 'ci_build_details_path' do
     let(:project) { create(:project) }
     let(:merge_request) { MergeRequest.new }
@@ -41,6 +43,7 @@ describe MergeRequestsHelper do
       it { is_expected.to eq([source_title, target_title]) }
     end
   end
+<<<<<<< HEAD
 
   describe '#render_items_list' do
     it "returns one item in the list" do
@@ -55,4 +58,22 @@ describe MergeRequestsHelper do
       expect(render_items_list(%w(user user1 user2))).to eq("user, user1 and user2")
     end
   end
+||||||| merged common ancestors
+=======
+
+  describe '#tab_link_for' do
+    let(:merge_request) { create(:merge_request, :simple) }
+    let(:options) { Hash.new }
+
+    subject { tab_link_for(merge_request, :show, options) { 'Discussion' } }
+
+    describe 'supports the :force_link option' do
+      let(:options) { { force_link: true } }
+
+      it 'removes the data-toggle attributes' do
+        is_expected.not_to match(/data-toggle="tab"/)
+      end
+    end
+  end
+>>>>>>> ce/10-3-stable
 end

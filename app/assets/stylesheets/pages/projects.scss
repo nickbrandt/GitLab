@@ -1181,6 +1181,7 @@ a.allowed-to-push {
     border-color: $border-color;
   }
 }
+<<<<<<< HEAD
 
 /* EE-specific styles */
 .project-mirror-settings {
@@ -1254,3 +1255,11 @@ a.allowed-to-push {
     justify-content: center;
   }
 }
+||||||| merged common ancestors
+=======
+
+.issuable-footer {
+  padding-top: $gl-padding;
+  padding-bottom: 37px;
+}
+>>>>>>> ce/10-3-stable

@@ -28,6 +28,7 @@ module Banzai
       end
 
       def build_url(uri)
+<<<<<<< HEAD
         base_path = if Gitlab::Geo.secondary?
                       Gitlab::Geo.primary_node.url
                     else
@@ -43,6 +44,21 @@ module Banzai
         else
           File.join(base_path, project.full_path, uri)
         end
+||||||| merged common ancestors
+        File.join(Gitlab.config.gitlab.url, project.full_path, uri)
+=======
+        base_path = Gitlab.config.gitlab.url
+
+        if group
+          urls = Gitlab::Routing.url_helpers
+          # we need to get last 2 parts of the uri which are secret and filename
+          uri_parts = uri.split(File::SEPARATOR)
+          file_path = urls.show_group_uploads_path(group, uri_parts[-2], uri_parts[-1])
+          File.join(base_path, file_path)
+        else
+          File.join(base_path, project.full_path, uri)
+        end
+>>>>>>> ce/10-3-stable
       end
 
       def project

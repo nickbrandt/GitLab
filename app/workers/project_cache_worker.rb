@@ -1,7 +1,14 @@
 # Worker for updating any project specific caches.
 class ProjectCacheWorker
+<<<<<<< HEAD
   include ApplicationWorker
   prepend EE::Workers::ProjectCacheWorker
+||||||| merged common ancestors
+  include Sidekiq::Worker
+  include DedicatedSidekiqQueue
+=======
+  include ApplicationWorker
+>>>>>>> ce/10-3-stable
 
   LEASE_TIMEOUT = 15.minutes.to_i
 
