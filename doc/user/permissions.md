@@ -43,12 +43,7 @@ The following table depicts the various user permission levels in a project.
 | See environments                      |         | ✓          | ✓           | ✓        | ✓      |
 | See a list of merge requests          |         | ✓          | ✓           | ✓        | ✓      |
 | Create new environments               |         |            | ✓           | ✓        | ✓      |
-<<<<<<< HEAD
 | Manage related issues                 |         | ✓          | ✓           | ✓        | ✓      |
-||||||| merged common ancestors
-| Use environment terminals             |         |            |             | ✓        | ✓      |
-=======
->>>>>>> ce/10-3-stable
 | Stop environments                     |         |            | ✓           | ✓        | ✓      |
 | Manage/Accept merge requests          |         |            | ✓           | ✓        | ✓      |
 | Create new merge request              |         |            | ✓           | ✓        | ✓      |
