@@ -31,16 +31,10 @@ import projectImport from './project_import';
 import Labels from './labels';
 import LabelManager from './label_manager';
 /* global Sidebar */
-<<<<<<< HEAD
 /* global WeightSelect */
 /* global AdminEmailSelect */
 
 import IssuableTemplateSelectors from './templates/issuable_template_selectors';
-||||||| merged common ancestors
-
-=======
-import IssuableTemplateSelectors from './templates/issuable_template_selectors';
->>>>>>> ce/10-3-stable
 import Flash from './flash';
 import CommitsList from './commits';
 import Issue from './issue';
@@ -300,14 +294,8 @@ import initGroupAnalytics from './init_group_analytics';
           new IssuableForm($('.issue-form'));
           new LabelsSelect();
           new MilestoneSelect();
-<<<<<<< HEAD
           new WeightSelect();
           new IssuableTemplateSelectors();
-||||||| merged common ancestors
-          new gl.IssuableTemplateSelectors();
-=======
-          new IssuableTemplateSelectors();
->>>>>>> ce/10-3-stable
           break;
         case 'projects:merge_requests:creations:new':
           const mrNewCompareNode = document.querySelector('.js-merge-request-new-compare');
@@ -630,11 +618,6 @@ import initGroupAnalytics from './init_group_analytics';
           import(/* webpackChunkName: "clusters" */ './clusters/clusters_bundle')
             .then(cluster => new cluster.default()) // eslint-disable-line new-cap
             .catch((err) => {
-<<<<<<< HEAD
-              Flash(s__('ClusterIntegration|Problem setting up the cluster'));
-||||||| merged common ancestors
-              Flash(s__('ClusterIntegration|Problem setting up the cluster JavaScript'));
-=======
               Flash(s__('ClusterIntegration|Problem setting up the cluster'));
               throw err;
             });
@@ -644,7 +627,6 @@ import initGroupAnalytics from './init_group_analytics';
             .then(clusterIndex => clusterIndex.default())
             .catch((err) => {
               Flash(s__('ClusterIntegration|Problem setting up the clusters list'));
->>>>>>> ce/10-3-stable
               throw err;
             });
           break;
