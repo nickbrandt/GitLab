@@ -17,15 +17,10 @@ class User < ActiveRecord::Base
   include FeatureGate
   include CreatedAtFilterable
   include IgnorableColumn
-<<<<<<< HEAD
   include BulkMemberAccessLoad
 
   prepend EE::GeoAwareAvatar
   prepend EE::User
-||||||| merged common ancestors
-=======
-  include BulkMemberAccessLoad
->>>>>>> ce/10-3-stable
 
   DEFAULT_NOTIFICATION_LEVEL = :participating
 
