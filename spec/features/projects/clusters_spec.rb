@@ -14,7 +14,6 @@ feature 'Clusters', :js do
   context 'when user does not have a cluster and visits cluster index page' do
     before do
       visit project_clusters_path(project)
-<<<<<<< HEAD
     end
 
     it 'sees empty state' do
@@ -30,22 +29,10 @@ feature 'Clusters', :js do
     before do
       visit project_clusters_path(project)
     end
-||||||| merged common ancestors
-=======
-    end
->>>>>>> ce/10-3-stable
 
-<<<<<<< HEAD
     it 'user sees a table with one cluster' do
       # One is the header row, the other the cluster row
       expect(page).to have_selector('.gl-responsive-table-row', count: 2)
-||||||| merged common ancestors
-      click_link 'Create on GKE'
-=======
-    it 'sees empty state' do
-      expect(page).to have_link('Add cluster')
-      expect(page).to have_selector('.empty-state')
->>>>>>> ce/10-3-stable
     end
   end
 

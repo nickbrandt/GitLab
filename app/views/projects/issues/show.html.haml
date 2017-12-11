@@ -77,7 +77,6 @@
 
       = edited_time_ago_with_tooltip(@issue, placement: 'bottom', html_class: 'issue-edited-ago js-issue-edited-ago')
 
-<<<<<<< HEAD
     - if can?(current_user, :read_issue_link, @project)
       .js-related-issues-root{ data: { endpoint: project_issue_links_path(@project, @issue),
         can_add_related_issues: "#{can?(current_user, :admin_issue_link, @issue)}",
@@ -90,11 +89,6 @@
 
 
     #merge-requests{ data: { url: referenced_merge_requests_project_issue_path(@project, @issue) } }
-||||||| merged common ancestors
-    #merge-requests{ data: { url: referenced_merge_requests_project_issue_url(@project, @issue) } }
-=======
-    #merge-requests{ data: { url: referenced_merge_requests_project_issue_path(@project, @issue) } }
->>>>>>> ce/10-3-stable
       // This element is filled in using JavaScript.
 
     #related-branches{ data: { url: related_branches_project_issue_path(@project, @issue) } }

@@ -77,7 +77,6 @@ module MergeRequests
         end
 
         merge_request.mark_as_unchecked
-<<<<<<< HEAD
         UpdateHeadPipelineForMergeRequestWorker.perform_async(merge_request.id)
       end
     end
@@ -95,10 +94,6 @@ module MergeRequests
 
           merge_request.approvals.delete_all
         end
-||||||| merged common ancestors
-=======
-        UpdateHeadPipelineForMergeRequestWorker.perform_async(merge_request.id)
->>>>>>> ce/10-3-stable
       end
     end
 

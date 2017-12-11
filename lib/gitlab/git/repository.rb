@@ -1125,7 +1125,6 @@ module Gitlab
         Gitlab::Git::Commit.find(self, ref)
       end
 
-<<<<<<< HEAD
       def empty?
         !has_visible_content?
       end
@@ -1143,31 +1142,6 @@ module Gitlab
             [repository.path, nil]
           end
         end
-||||||| merged common ancestors
-      # Refactoring aid; allows us to copy code from app/models/repository.rb
-      def empty_repo?
-        !exists? || !has_visible_content?
-      end
-
-      #
-      # Git repository can contains some hidden refs like:
-      #   /refs/notes/*
-      #   /refs/git-as-svn/*
-      #   /refs/pulls/*
-      # This refs by default not visible in project page and not cloned to client side.
-      #
-      # This method return true if repository contains some content visible in project page.
-      #
-      def has_visible_content?
-        return @has_visible_content if defined?(@has_visible_content)
-
-        @has_visible_content = has_local_branches?
-      end
-=======
-      def empty?
-        !has_visible_content?
-      end
->>>>>>> ce/10-3-stable
 
         add_remote(remote_name, url)
         set_remote_as_mirror(remote_name)

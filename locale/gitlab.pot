@@ -368,28 +368,12 @@ msgstr ""
 msgid "Chat"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Checking %{text} availability…"
 msgstr ""
 
 msgid "Checking branch availability..."
 msgstr ""
 
-msgid "Cherry-pick this commit"
-msgstr ""
-
-msgid "Checking branch availability..."
-msgstr ""
-
-||||||| merged common ancestors
-=======
-msgid "Checking %{text} availability…"
-msgstr ""
-
-msgid "Checking branch availability..."
-msgstr ""
-
->>>>>>> ce/10-3-stable
 msgid "Cherry-pick this commit"
 msgstr ""
 
