@@ -1176,7 +1176,7 @@ describe MergeRequest do
       end
 
       shared_examples 'returning all SHA' do
-        it 'returns all SHA from all merge_request_diffs' do
+        it 'returns all SHAs from all merge_request_diffs' do
           expect(subject.merge_request_diffs.size).to eq(2)
           expect(subject.all_commit_shas).to match_array(all_commit_shas)
         end
@@ -2293,5 +2293,9 @@ describe MergeRequest do
       expect { subject.destroy }
         .to change { project.open_merge_requests_count }.from(1).to(0)
     end
+  end
+
+  it_behaves_like 'throttled touch' do
+    subject { create(:merge_request, updated_at: 1.hour.ago) }
   end
 end

@@ -1,6 +1,16 @@
 module AppearancesHelper
   def brand_title
+<<<<<<< HEAD
     brand_item&.title.presence || 'GitLab Enterprise Edition'
+||||||| merged common ancestors
+    if brand_item && brand_item.title
+      brand_item.title
+    else
+      'GitLab Community Edition'
+    end
+=======
+    brand_item&.title.presence || 'GitLab Community Edition'
+>>>>>>> ce/10-3-stable
   end
 
   def brand_image

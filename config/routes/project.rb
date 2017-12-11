@@ -490,6 +490,7 @@ constraints(ProjectUrlConstrainer.new) do
         get :download_export
         get :activity
         get :refs
+<<<<<<< HEAD
         put :new_issuable_address
       end
     end
@@ -504,6 +505,11 @@ constraints(ProjectUrlConstrainer.new) do
         resources :commit, only: :show, constraints: { id: /\h{7,40}/ }
 
         get 'tree/*id', to: 'tree#show', as: nil
+||||||| merged common ancestors
+        put :new_issue_address
+=======
+        put :new_issuable_address
+>>>>>>> ce/10-3-stable
       end
     end
   end

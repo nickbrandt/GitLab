@@ -133,24 +133,63 @@ describe Ci::Build do
   end
 
   describe '#artifacts?' do
-    subject { build.artifacts? }
+    context 'when new artifacts are used' do
+      let(:build) { create(:ci_build, :artifacts) }
 
+<<<<<<< HEAD
     context 'when new artifacts are used' do
       context 'artifacts archive does not exist' do
         let(:build) { create(:ci_build) }
 
         it { is_expected.to be_falsy }
+||||||| merged common ancestors
+    context 'artifacts archive does not exist' do
+      before do
+        build.update_attributes(artifacts_file: nil)
+=======
+      subject { build.artifacts? }
+
+      context 'artifacts archive does not exist' do
+        let(:build) { create(:ci_build) }
+
+        it { is_expected.to be_falsy }
+>>>>>>> ce/10-3-stable
       end
 
+<<<<<<< HEAD
       context 'artifacts archive exists' do
         let(:build) { create(:ci_build, :artifacts) }
-
+||||||| merged common ancestors
+      it { is_expected.to be_falsy }
+    end
+=======
+      context 'artifacts archive exists' do
         it { is_expected.to be_truthy }
+>>>>>>> ce/10-3-stable
 
+<<<<<<< HEAD
+        it { is_expected.to be_truthy }
+||||||| merged common ancestors
+    context 'artifacts archive exists' do
+      let(:build) { create(:ci_build, :artifacts) }
+      it { is_expected.to be_truthy }
+=======
+        context 'is expired' do
+          let!(:build) { create(:ci_build, :artifacts, :expired) }
+>>>>>>> ce/10-3-stable
+
+<<<<<<< HEAD
         context 'is expired' do
           let(:build) { create(:ci_build, :artifacts, :expired) }
 
           it { is_expected.to be_falsy }
+||||||| merged common ancestors
+      context 'is expired' do
+        before do
+          build.update(artifacts_expire_at: Time.now - 7.days)
+=======
+          it { is_expected.to be_falsy }
+>>>>>>> ce/10-3-stable
         end
       end
     end
@@ -159,12 +198,43 @@ describe Ci::Build do
       context 'artifacts archive does not exist' do
         let(:build) { create(:ci_build) }
 
+        context 'is not expired' do
+          it { is_expected.to be_truthy }
+        end
+      end
+    end
+
+    context 'when legacy artifacts are used' do
+      let(:build) { create(:ci_build, :legacy_artifacts) }
+
+      subject { build.artifacts? }
+
+      context 'artifacts archive does not exist' do
+        let(:build) { create(:ci_build) }
+
         it { is_expected.to be_falsy }
       end
 
+<<<<<<< HEAD
       context 'artifacts archive exists' do
         let(:build) { create(:ci_build, :legacy_artifacts) }
+||||||| merged common ancestors
+      context 'is not expired' do
+        before do
+          build.update(artifacts_expire_at: Time.now + 7.days)
+        end
+=======
+      context 'artifacts archive exists' do
+        it { is_expected.to be_truthy }
 
+        context 'is expired' do
+          let!(:build) { create(:ci_build, :legacy_artifacts, :expired) }
+
+          it { is_expected.to be_falsy }
+        end
+>>>>>>> ce/10-3-stable
+
+<<<<<<< HEAD
         it { is_expected.to be_truthy }
 
         context 'is expired' do
@@ -172,6 +242,13 @@ describe Ci::Build do
 
           it { is_expected.to be_falsy }
         end
+||||||| merged common ancestors
+        it { is_expected.to be_truthy }
+=======
+        context 'is not expired' do
+          it { is_expected.to be_truthy }
+        end
+>>>>>>> ce/10-3-stable
       end
     end
   end
@@ -1874,6 +1951,94 @@ describe Ci::Build do
       expect(BuildQueueWorker).to receive(:perform_async).with(build.id)
 
       build.enqueue
+    end
+  end
+
+  describe 'state transition: any => [:running]' do
+    shared_examples 'validation is active' do
+      context 'when depended job has not been completed yet' do
+        let!(:pre_stage_job) { create(:ci_build, :running, pipeline: pipeline, name: 'test', stage_idx: 0) }
+
+        it { expect { job.run! }.to raise_error(Ci::Build::MissingDependenciesError) }
+      end
+
+      context 'when artifacts of depended job has been expired' do
+        let!(:pre_stage_job) { create(:ci_build, :success, :expired, pipeline: pipeline, name: 'test', stage_idx: 0) }
+
+        it { expect { job.run! }.to raise_error(Ci::Build::MissingDependenciesError) }
+      end
+
+      context 'when artifacts of depended job has been erased' do
+        let!(:pre_stage_job) { create(:ci_build, :success, pipeline: pipeline, name: 'test', stage_idx: 0, erased_at: 1.minute.ago) }
+
+        before do
+          pre_stage_job.erase
+        end
+
+        it { expect { job.run! }.to raise_error(Ci::Build::MissingDependenciesError) }
+      end
+    end
+
+    shared_examples 'validation is not active' do
+      context 'when depended job has not been completed yet' do
+        let!(:pre_stage_job) { create(:ci_build, :running, pipeline: pipeline, name: 'test', stage_idx: 0) }
+
+        it { expect { job.run! }.not_to raise_error }
+      end
+
+      context 'when artifacts of depended job has been expired' do
+        let!(:pre_stage_job) { create(:ci_build, :success, :expired, pipeline: pipeline, name: 'test', stage_idx: 0) }
+
+        it { expect { job.run! }.not_to raise_error }
+      end
+
+      context 'when artifacts of depended job has been erased' do
+        let!(:pre_stage_job) { create(:ci_build, :success, pipeline: pipeline, name: 'test', stage_idx: 0, erased_at: 1.minute.ago) }
+
+        before do
+          pre_stage_job.erase
+        end
+
+        it { expect { job.run! }.not_to raise_error }
+      end
+    end
+
+    let!(:job) { create(:ci_build, :pending, pipeline: pipeline, stage_idx: 1, options: options) }
+
+    context 'when validates for dependencies is enabled' do
+      before do
+        stub_feature_flags(ci_disable_validates_dependencies: false)
+      end
+
+      let!(:pre_stage_job) { create(:ci_build, :success, pipeline: pipeline, name: 'test', stage_idx: 0) }
+
+      context 'when "dependencies" keyword is not defined' do
+        let(:options) { {} }
+
+        it { expect { job.run! }.not_to raise_error }
+      end
+
+      context 'when "dependencies" keyword is empty' do
+        let(:options) { { dependencies: [] } }
+
+        it { expect { job.run! }.not_to raise_error }
+      end
+
+      context 'when "dependencies" keyword is specified' do
+        let(:options) { { dependencies: ['test'] } }
+
+        it_behaves_like 'validation is active'
+      end
+    end
+
+    context 'when validates for dependencies is disabled' do
+      let(:options) { { dependencies: ['test'] } }
+
+      before do
+        stub_feature_flags(ci_disable_validates_dependencies: true)
+      end
+
+      it_behaves_like 'validation is not active'
     end
   end
 

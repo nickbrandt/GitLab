@@ -13,6 +13,7 @@ class Issue < ActiveRecord::Base
   include FasterCacheKeys
   include RelativePositioning
   include TimeTrackable
+  include ThrottledTouch
 
   WEIGHT_RANGE = 1..9
   WEIGHT_ALL = 'Everything'.freeze

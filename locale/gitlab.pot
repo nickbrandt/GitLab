@@ -368,6 +368,7 @@ msgstr ""
 msgid "Chat"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Checking %{text} availability…"
 msgstr ""
 
@@ -380,6 +381,15 @@ msgstr ""
 msgid "Checking branch availability..."
 msgstr ""
 
+||||||| merged common ancestors
+=======
+msgid "Checking %{text} availability…"
+msgstr ""
+
+msgid "Checking branch availability..."
+msgstr ""
+
+>>>>>>> ce/10-3-stable
 msgid "Cherry-pick this commit"
 msgstr ""
 
@@ -449,6 +459,7 @@ msgstr ""
 msgid "Cluster"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "ClusterIntegration|%{appList} was successfully installed on your cluster"
 msgstr ""
 
@@ -486,6 +497,44 @@ msgid "ClusterIntegration|Choose how to set up cluster integration"
 msgstr ""
 
 msgid "ClusterIntegration|Cluster"
+||||||| merged common ancestors
+msgid "ClusterIntegration|This account must have permissions to create a cluster in the %{link_to_container_project} specified below"
+=======
+msgid "ClusterIntegration|%{appList} was successfully installed on your cluster"
+msgstr ""
+
+msgid "ClusterIntegration|%{boldNotice} This will add some extra resources like a load balancer, which incur additional costs. See %{pricingLink}"
+msgstr ""
+
+msgid "ClusterIntegration|API URL"
+msgstr ""
+
+msgid "ClusterIntegration|Active"
+msgstr ""
+
+msgid "ClusterIntegration|Add an existing cluster"
+msgstr ""
+
+msgid "ClusterIntegration|Add cluster"
+msgstr ""
+
+msgid "ClusterIntegration|All"
+msgstr ""
+
+msgid "ClusterIntegration|Applications"
+msgstr ""
+
+msgid "ClusterIntegration|CA Certificate"
+msgstr ""
+
+msgid "ClusterIntegration|Certificate Authority bundle (PEM format)"
+msgstr ""
+
+msgid "ClusterIntegration|Choose how to set up cluster integration"
+msgstr ""
+
+msgid "ClusterIntegration|Cluster"
+>>>>>>> ce/10-3-stable
 msgstr ""
 
 msgid "ClusterIntegration|Cluster details"
@@ -503,12 +552,13 @@ msgstr ""
 msgid "ClusterIntegration|Cluster integration is enabled for this project. Disabling this integration will not affect your cluster, it will only temporarily turn off GitLab's connection to it."
 msgstr ""
 
-msgid "ClusterIntegration|Cluster is being created on Google Container Engine..."
+msgid "ClusterIntegration|Cluster is being created on Google Kubernetes Engine..."
 msgstr ""
 
 msgid "ClusterIntegration|Cluster name"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "ClusterIntegration|Cluster was successfully created on Google Container Engine. Refresh the page to see cluster's details"
 msgstr ""
 
@@ -522,6 +572,23 @@ msgid "ClusterIntegration|Copy CA Certificate"
 msgstr ""
 
 msgid "ClusterIntegration|Copy Token"
+||||||| merged common ancestors
+msgid "ClusterIntegration|Cluster was successfully created on Google Container Engine"
+=======
+msgid "ClusterIntegration|Cluster was successfully created on Google Kubernetes Engine. Refresh the page to see cluster's details"
+msgstr ""
+
+msgid "ClusterIntegration|Clusters allow you to use review apps, deploy your applications, run your pipelines, and much more in an easy way. %{link_to_help_page}"
+msgstr ""
+
+msgid "ClusterIntegration|Copy API URL"
+msgstr ""
+
+msgid "ClusterIntegration|Copy CA Certificate"
+msgstr ""
+
+msgid "ClusterIntegration|Copy Token"
+>>>>>>> ce/10-3-stable
 msgstr ""
 
 msgid "ClusterIntegration|Copy cluster name"
@@ -533,10 +600,19 @@ msgstr ""
 msgid "ClusterIntegration|Create cluster"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "ClusterIntegration|Create cluster on Google Container Engine"
 msgstr ""
 
 msgid "ClusterIntegration|Create on GKE"
+||||||| merged common ancestors
+msgid "ClusterIntegration|Create new cluster on Google Container Engine"
+=======
+msgid "ClusterIntegration|Create cluster on Google Kubernetes Engine"
+msgstr ""
+
+msgid "ClusterIntegration|Create on GKE"
+>>>>>>> ce/10-3-stable
 msgstr ""
 
 msgid "ClusterIntegration|Enable cluster integration"
@@ -560,10 +636,34 @@ msgstr ""
 msgid "ClusterIntegration|Google Cloud Platform project ID"
 msgstr ""
 
-msgid "ClusterIntegration|Google Container Engine"
+msgid "ClusterIntegration|Google Kubernetes Engine"
 msgstr ""
 
-msgid "ClusterIntegration|Google Container Engine project"
+msgid "ClusterIntegration|Google Kubernetes Engine project"
+msgstr ""
+
+msgid "ClusterIntegration|Helm Tiller"
+msgstr ""
+
+msgid "ClusterIntegration|Inactive"
+msgstr ""
+
+msgid "ClusterIntegration|Ingress"
+msgstr ""
+
+msgid "ClusterIntegration|Install"
+msgstr ""
+
+msgid "ClusterIntegration|Install applications on your cluster. Read more about %{helpLink}"
+msgstr ""
+
+msgid "ClusterIntegration|Installed"
+msgstr ""
+
+msgid "ClusterIntegration|Installing"
+msgstr ""
+
+msgid "ClusterIntegration|Integrate cluster automation"
 msgstr ""
 
 msgid "ClusterIntegration|Helm Tiller"
@@ -647,7 +747,13 @@ msgstr ""
 msgid "ClusterIntegration|Remove integration"
 msgstr ""
 
-msgid "ClusterIntegration|Removing cluster integration will remove the cluster configuration you have added to this project. It will not delete your cluster on Google Container Engine."
+msgid "ClusterIntegration|Removing cluster integration will remove the cluster configuration you have added to this project. It will not delete your cluster on Google Kubernetes Engine."
+msgstr ""
+
+msgid "ClusterIntegration|Request to begin installing failed"
+msgstr ""
+
+msgid "ClusterIntegration|Save changes"
 msgstr ""
 
 msgid "ClusterIntegration|Request to begin installing failed"
@@ -677,7 +783,16 @@ msgstr ""
 msgid "ClusterIntegration|Something went wrong on our end."
 msgstr ""
 
-msgid "ClusterIntegration|Something went wrong while creating your cluster on Google Container Engine"
+msgid "ClusterIntegration|Something went wrong while creating your cluster on Google Kubernetes Engine"
+msgstr ""
+
+msgid "ClusterIntegration|Something went wrong while installing %{title}"
+msgstr ""
+
+msgid "ClusterIntegration|There are no clusters to show"
+msgstr ""
+
+msgid "ClusterIntegration|This account must have permissions to create a cluster in the %{link_to_container_project} specified below"
 msgstr ""
 
 msgid "ClusterIntegration|Something went wrong while installing %{title}"
@@ -698,13 +813,13 @@ msgstr ""
 msgid "ClusterIntegration|With a cluster associated to this project, you can use review apps, deploy your applications, run your pipelines, and much more in an easy way."
 msgstr ""
 
-msgid "ClusterIntegration|Your account must have %{link_to_container_engine}"
+msgid "ClusterIntegration|Your account must have %{link_to_kubernetes_engine}"
 msgstr ""
 
 msgid "ClusterIntegration|Zone"
 msgstr ""
 
-msgid "ClusterIntegration|access to Google Container Engine"
+msgid "ClusterIntegration|access to Google Kubernetes Engine"
 msgstr ""
 
 msgid "ClusterIntegration|cluster"
@@ -814,6 +929,7 @@ msgstr ""
 msgid "Contributors"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "ContributorsPage|Building repository graph."
 msgstr ""
 
@@ -832,6 +948,18 @@ msgstr ""
 msgid "ContributorsPage|Please wait a moment, this page will automatically refresh when ready."
 msgstr ""
 
+||||||| merged common ancestors
+=======
+msgid "ContributorsPage|Building repository graph."
+msgstr ""
+
+msgid "ContributorsPage|Commits to %{branch_name}, excluding merge commits. Limited to 6,000 commits."
+msgstr ""
+
+msgid "ContributorsPage|Please wait a moment, this page will automatically refresh when ready."
+msgstr ""
+
+>>>>>>> ce/10-3-stable
 msgid "Copy URL to clipboard"
 msgstr ""
 
@@ -1274,6 +1402,7 @@ msgstr ""
 msgid "Issues"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Jan"
 msgstr ""
 
@@ -1310,6 +1439,27 @@ msgstr ""
 msgid "June"
 msgstr ""
 
+||||||| merged common ancestors
+=======
+msgid "Jan"
+msgstr ""
+
+msgid "January"
+msgstr ""
+
+msgid "Jul"
+msgstr ""
+
+msgid "July"
+msgstr ""
+
+msgid "Jun"
+msgstr ""
+
+msgid "June"
+msgstr ""
+
+>>>>>>> ce/10-3-stable
 msgid "LFSStatus|Disabled"
 msgstr ""
 
@@ -1377,6 +1527,7 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Mar"
 msgstr ""
 
@@ -1389,6 +1540,15 @@ msgstr ""
 msgid "March"
 msgstr ""
 
+||||||| merged common ancestors
+=======
+msgid "Mar"
+msgstr ""
+
+msgid "March"
+msgstr ""
+
+>>>>>>> ce/10-3-stable
 msgid "Maximum git storage failures"
 msgstr ""
 
@@ -1802,6 +1962,7 @@ msgstr ""
 msgid "ProjectNetworkGraph|Graph"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "ProjectSettings|Immediately run a pipeline on the default branch"
 msgstr ""
 
@@ -1814,6 +1975,15 @@ msgstr ""
 msgid "ProjectSettings|Problem setting up the CI/CD settings JavaScript"
 msgstr ""
 
+||||||| merged common ancestors
+=======
+msgid "ProjectSettings|Immediately run a pipeline on the default branch"
+msgstr ""
+
+msgid "ProjectSettings|Problem setting up the CI/CD settings JavaScript"
+msgstr ""
+
+>>>>>>> ce/10-3-stable
 msgid "Projects"
 msgstr ""
 
@@ -1838,6 +2008,7 @@ msgstr ""
 msgid "ProjectsDropdown|This feature requires browser localStorage support"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "PrometheusService|By default, Prometheus listens on ‘http://localhost:9090’. It’s not recommended to change the default address and port as this might affect or conflict with other services running on the GitLab server."
 msgstr ""
 
@@ -1904,6 +2075,42 @@ msgstr ""
 msgid "PrometheusService|View environments"
 msgstr ""
 
+||||||| merged common ancestors
+=======
+msgid "PrometheusService|By default, Prometheus listens on ‘http://localhost:9090’. It’s not recommended to change the default address and port as this might affect or conflict with other services running on the GitLab server."
+msgstr ""
+
+msgid "PrometheusService|Finding and configuring metrics..."
+msgstr ""
+
+msgid "PrometheusService|Metrics"
+msgstr ""
+
+msgid "PrometheusService|Metrics are automatically configured and monitored based on a library of metrics from popular exporters."
+msgstr ""
+
+msgid "PrometheusService|Missing environment variable"
+msgstr ""
+
+msgid "PrometheusService|Monitored"
+msgstr ""
+
+msgid "PrometheusService|More information"
+msgstr ""
+
+msgid "PrometheusService|No metrics are being monitored. To start monitoring, deploy to an environment."
+msgstr ""
+
+msgid "PrometheusService|Prometheus API Base URL, like http://prometheus.example.com/"
+msgstr ""
+
+msgid "PrometheusService|Prometheus monitoring"
+msgstr ""
+
+msgid "PrometheusService|View environments"
+msgstr ""
+
+>>>>>>> ce/10-3-stable
 msgid "Public - The group and any public projects can be viewed without any authentication."
 msgstr ""
 
@@ -2205,6 +2412,7 @@ msgstr[1] ""
 msgid "Tags"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "TagsPage|Browse commits"
 msgstr ""
 
@@ -2343,6 +2551,78 @@ msgstr ""
 msgid "TagsPage|protected"
 msgstr ""
 
+||||||| merged common ancestors
+=======
+msgid "TagsPage|Browse commits"
+msgstr ""
+
+msgid "TagsPage|Browse files"
+msgstr ""
+
+msgid "TagsPage|Can't find HEAD commit for this tag"
+msgstr ""
+
+msgid "TagsPage|Cancel"
+msgstr ""
+
+msgid "TagsPage|Create tag"
+msgstr ""
+
+msgid "TagsPage|Delete tag"
+msgstr ""
+
+msgid "TagsPage|Deleting the %{tag_name} tag cannot be undone. Are you sure?"
+msgstr ""
+
+msgid "TagsPage|Edit release notes"
+msgstr ""
+
+msgid "TagsPage|Existing branch name, tag, or commit SHA"
+msgstr ""
+
+msgid "TagsPage|Filter by tag name"
+msgstr ""
+
+msgid "TagsPage|New Tag"
+msgstr ""
+
+msgid "TagsPage|New tag"
+msgstr ""
+
+msgid "TagsPage|Optionally, add a message to the tag."
+msgstr ""
+
+msgid "TagsPage|Optionally, add release notes to the tag. They will be stored in the GitLab database and displayed on the tags page."
+msgstr ""
+
+msgid "TagsPage|Release notes"
+msgstr ""
+
+msgid "TagsPage|Repository has no tags yet."
+msgstr ""
+
+msgid "TagsPage|Sort by"
+msgstr ""
+
+msgid "TagsPage|Tags"
+msgstr ""
+
+msgid "TagsPage|Tags give the ability to mark specific points in history as being important"
+msgstr ""
+
+msgid "TagsPage|This tag has no release notes."
+msgstr ""
+
+msgid "TagsPage|Use git tag command to add a new one:"
+msgstr ""
+
+msgid "TagsPage|Write your release notes or drag files here..."
+msgstr ""
+
+msgid "TagsPage|protected"
+msgstr ""
+
+>>>>>>> ce/10-3-stable
 msgid "Target Branch"
 msgstr ""
 
@@ -2590,12 +2870,19 @@ msgstr ""
 msgid "Total Time"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Total issue time spent"
 msgstr ""
 
 msgid "Total test time for all commits/merges"
 msgstr ""
 
+||||||| merged common ancestors
+=======
+msgid "Total issue time spent"
+msgstr ""
+
+>>>>>>> ce/10-3-stable
 msgid "Total test time for all commits/merges"
 msgstr ""
 
@@ -2827,12 +3114,19 @@ msgstr ""
 msgid "Your projects"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "branch name"
 msgstr ""
 
 msgid "branch name"
 msgstr ""
 
+||||||| merged common ancestors
+=======
+msgid "branch name"
+msgstr ""
+
+>>>>>>> ce/10-3-stable
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
@@ -2855,11 +3149,18 @@ msgstr ""
 msgid "personal access token"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "source"
 msgstr ""
 
 msgid "source"
 msgstr ""
 
+||||||| merged common ancestors
+=======
+msgid "source"
+msgstr ""
+
+>>>>>>> ce/10-3-stable
 msgid "username"
 msgstr ""

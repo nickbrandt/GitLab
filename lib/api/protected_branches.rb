@@ -62,6 +62,7 @@ module API
           conflict!("Protected branch '#{params[:name]}' already exists")
         end
 
+<<<<<<< HEAD
         # Replace with `declared(params)` after updating to grape v1.0.2
         # See https://github.com/ruby-grape/grape/pull/1710
         # and https://gitlab.com/gitlab-org/gitlab-ce/issues/40843
@@ -69,6 +70,25 @@ module API
 
         api_service = ::ProtectedBranches::ApiService.new(user_project, current_user, declared_params)
         protected_branch = api_service.create
+||||||| merged common ancestors
+        protected_branch_params = {
+          name: params[:name],
+          push_access_levels_attributes: [{ access_level: params[:push_access_level] }],
+          merge_access_levels_attributes: [{ access_level: params[:merge_access_level] }]
+        }
+
+        service_args = [user_project, current_user, protected_branch_params]
+
+        protected_branch = ::ProtectedBranches::CreateService.new(*service_args).execute
+=======
+        # Replace with `declared(params)` after updating to grape v1.0.2
+        # See https://github.com/ruby-grape/grape/pull/1710
+        # and https://gitlab.com/gitlab-org/gitlab-ce/issues/40843
+        declared_params = params.slice("name", "push_access_level", "merge_access_level", "allowed_to_push", "allowed_to_merge")
+
+        api_service = ::ProtectedBranches::ApiService.new(user_project, current_user, declared_params)
+        protected_branch = api_service.create
+>>>>>>> ce/10-3-stable
 
         if protected_branch.persisted?
           present protected_branch, with: Entities::ProtectedBranch, project: user_project

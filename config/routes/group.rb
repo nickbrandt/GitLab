@@ -51,6 +51,7 @@ constraints(GroupUrlConstrainer.new) do
       delete :leave, on: :collection
       patch :override, on: :member ## EE-specific
     end
+<<<<<<< HEAD
 
     resources :uploads, only: [:create] do
       collection do
@@ -96,6 +97,15 @@ constraints(GroupUrlConstrainer.new) do
     end
     get 'boards(/*extra_params)', as: :legacy_ee_group_boards_redirect, to: legacy_ee_group_boards_redirect
     ## EE-specific
+||||||| merged common ancestors
+=======
+
+    resources :uploads, only: [:create] do
+      collection do
+        get ":secret/:filename", action: :show, as: :show, constraints: { filename: /[^\/]+/ }
+      end
+    end
+>>>>>>> ce/10-3-stable
   end
 
   scope(path: '*id',

@@ -1181,6 +1181,7 @@ a.allowed-to-push {
     border-color: $border-color;
   }
 }
+<<<<<<< HEAD
 
 .issuable-footer {
   padding-top: $gl-padding;
@@ -1259,3 +1260,11 @@ a.allowed-to-push {
     justify-content: center;
   }
 }
+||||||| merged common ancestors
+=======
+
+.issuable-footer {
+  padding-top: $gl-padding;
+  padding-bottom: 37px;
+}
+>>>>>>> ce/10-3-stable

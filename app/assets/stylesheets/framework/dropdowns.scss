@@ -1030,6 +1030,7 @@ header.header-content .dropdown-menu.projects-dropdown-menu {
     }
   }
 }
+<<<<<<< HEAD
 
 .new-epic-dropdown {
   .dropdown-menu {
@@ -1084,3 +1085,31 @@ header.header-content .dropdown-menu.projects-dropdown-menu {
     opacity: 0;
   }
 }
+||||||| merged common ancestors
+=======
+
+.dropdown-content-faded-mask {
+  position: relative;
+
+  .dropdown-list {
+    max-height: $dropdown-max-height;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  &::after {
+    height: $dropdown-fade-mask-height;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    background: linear-gradient(to top, $white-light 0, rgba($white-light, 0));
+    transition: opacity $fade-mask-transition-duration $fade-mask-transition-curve;
+    content: '';
+    pointer-events: none;
+  }
+
+  &.fade-out::after {
+    opacity: 0;
+  }
+}
+>>>>>>> ce/10-3-stable

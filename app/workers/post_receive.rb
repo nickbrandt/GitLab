@@ -1,6 +1,13 @@
 class PostReceive
+<<<<<<< HEAD
   include ApplicationWorker
   prepend EE::PostReceive
+||||||| merged common ancestors
+  include Sidekiq::Worker
+  include DedicatedSidekiqQueue
+=======
+  include ApplicationWorker
+>>>>>>> ce/10-3-stable
 
   def perform(gl_repository, identifier, changes)
     project, is_wiki = Gitlab::GlRepository.parse(gl_repository)

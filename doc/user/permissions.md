@@ -40,8 +40,13 @@ The following table depicts the various user permission levels in a project.
 | See a commit status                   |         | ✓          | ✓           | ✓        | ✓      |
 | See a container registry              |         | ✓          | ✓           | ✓        | ✓      |
 | See environments                      |         | ✓          | ✓           | ✓        | ✓      |
+<<<<<<< HEAD
 | See a list of merge requests          |         | ✓          | ✓           | ✓        | ✓      |
 | Manage related issues                 |         | ✓          | ✓           | ✓        | ✓      |
+||||||| merged common ancestors
+=======
+| See a list of merge requests          |         | ✓          | ✓           | ✓        | ✓      |
+>>>>>>> ce/10-3-stable
 | Create new environments               |         |            | ✓           | ✓        | ✓      |
 | Stop environments                     |         |            | ✓           | ✓        | ✓      |
 | Manage/Accept merge requests          |         |            | ✓           | ✓        | ✓      |
@@ -57,8 +62,13 @@ The following table depicts the various user permission levels in a project.
 | Update a container registry           |         |            | ✓           | ✓        | ✓      |
 | Remove a container registry image     |         |            | ✓           | ✓        | ✓      |
 | Create/edit/delete project milestones |         |            | ✓           | ✓        | ✓      |
+<<<<<<< HEAD
 | Lock discussions (issues and merge requests) |  |            |             | ✓        | ✓      |
 | Use environment terminals             |         |            |             | ✓        | ✓      |
+||||||| merged common ancestors
+=======
+| Use environment terminals             |         |            |             | ✓        | ✓      |
+>>>>>>> ce/10-3-stable
 | Add new team members                  |         |            |             | ✓        | ✓      |
 | Push to protected branches            |         |            |             | ✓        | ✓      |
 | Enable/disable branch protection      |         |            |             | ✓        | ✓      |

@@ -379,14 +379,37 @@ module API
       post ":id/fork/:forked_from_id" do
         authenticated_as_admin!
 
+<<<<<<< HEAD
         fork_from_project = find_project!(params[:forked_from_id])
 
         not_found!("Source Project") unless fork_from_project
+||||||| merged common ancestors
+        forked_from_project = find_project!(params[:forked_from_id])
+        not_found!("Source Project") unless forked_from_project
+=======
+        fork_from_project = find_project!(params[:forked_from_id])
+>>>>>>> ce/10-3-stable
 
+<<<<<<< HEAD
+        result = ::Projects::ForkService.new(fork_from_project, current_user).execute(user_project)
+||||||| merged common ancestors
+        if user_project.forked_from_project.nil?
+          user_project.create_forked_project_link(forked_to_project_id: user_project.id, forked_from_project_id: forked_from_project.id)
+=======
+        not_found!("Source Project") unless fork_from_project
+>>>>>>> ce/10-3-stable
+
+<<<<<<< HEAD
+        if result
+          present user_project.reload, with: Entities::Project
+||||||| merged common ancestors
+          ::Projects::ForksCountService.new(forked_from_project).refresh_cache
+=======
         result = ::Projects::ForkService.new(fork_from_project, current_user).execute(user_project)
 
         if result
           present user_project.reload, with: Entities::Project
+>>>>>>> ce/10-3-stable
         else
           render_api_error!("Project already forked", 409) if user_project.forked?
         end
