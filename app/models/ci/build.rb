@@ -364,22 +364,10 @@ module Ci
       project.running_or_pending_build_count(force: true)
     end
 
-<<<<<<< HEAD
     def browsable_artifacts?
       artifacts_metadata?
     end
 
-||||||| merged common ancestors
-    def artifacts?
-      !artifacts_expired? && artifacts_file.exists?
-    end
-
-    def artifacts_metadata?
-      artifacts? && artifacts_metadata.exists?
-    end
-
-=======
->>>>>>> ce/10-3-stable
     def artifacts_metadata_entry(path, **options)
       artifacts_metadata.use_file do |metadata_path|
         metadata = Gitlab::Ci::Build::Artifacts::Metadata.new(
