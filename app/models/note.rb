@@ -236,16 +236,18 @@ class Note < ActiveRecord::Base
     for_personal_snippet?
   end
 
+  def commit
+    @commit ||= project.commit(commit_id) if commit_id.present?
+  end
+
   # override to return commits, which are not active record
   def noteable
-    if for_commit?
-      @commit ||= project.commit(commit_id)
-    else
-      super
-    end
-  # Temp fix to prevent app crash
-  # if note commit id doesn't exist
+    return commit if for_commit?
+
+    super
   rescue
+    # Temp fix to prevent app crash
+    # if note commit id doesn't exist
     nil
   end
 
@@ -373,6 +375,10 @@ class Note < ActiveRecord::Base
       target_id: noteable_id
     )
     Gitlab::EtagCaching::Store.new.touch(key)
+  end
+
+  def banzai_render_context(field)
+    super.merge(noteable: noteable)
   end
 
   private

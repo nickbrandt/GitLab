@@ -156,6 +156,10 @@ describe Ci::Build do
     end
 
     context 'when legacy artifacts are used' do
+      let(:build) { create(:ci_build, :legacy_artifacts) }
+
+      subject { build.artifacts? }
+
       context 'artifacts archive does not exist' do
         let(:build) { create(:ci_build) }
 
@@ -438,16 +442,6 @@ describe Ci::Build do
 
       before do
         build.project.update(runners_token: 'token')
-      end
-
-      it { is_expected.to eq('new xxxxx data') }
-    end
-
-    context 'hide build token' do
-      let(:data) { 'new token data'}
-
-      before do
-        build.update(token: 'token')
       end
 
       it { is_expected.to eq('new xxxxx data') }
@@ -1874,6 +1868,94 @@ describe Ci::Build do
       expect(BuildQueueWorker).to receive(:perform_async).with(build.id)
 
       build.enqueue
+    end
+  end
+
+  describe 'state transition: any => [:running]' do
+    shared_examples 'validation is active' do
+      context 'when depended job has not been completed yet' do
+        let!(:pre_stage_job) { create(:ci_build, :running, pipeline: pipeline, name: 'test', stage_idx: 0) }
+
+        it { expect { job.run! }.to raise_error(Ci::Build::MissingDependenciesError) }
+      end
+
+      context 'when artifacts of depended job has been expired' do
+        let!(:pre_stage_job) { create(:ci_build, :success, :expired, pipeline: pipeline, name: 'test', stage_idx: 0) }
+
+        it { expect { job.run! }.to raise_error(Ci::Build::MissingDependenciesError) }
+      end
+
+      context 'when artifacts of depended job has been erased' do
+        let!(:pre_stage_job) { create(:ci_build, :success, pipeline: pipeline, name: 'test', stage_idx: 0, erased_at: 1.minute.ago) }
+
+        before do
+          pre_stage_job.erase
+        end
+
+        it { expect { job.run! }.to raise_error(Ci::Build::MissingDependenciesError) }
+      end
+    end
+
+    shared_examples 'validation is not active' do
+      context 'when depended job has not been completed yet' do
+        let!(:pre_stage_job) { create(:ci_build, :running, pipeline: pipeline, name: 'test', stage_idx: 0) }
+
+        it { expect { job.run! }.not_to raise_error }
+      end
+
+      context 'when artifacts of depended job has been expired' do
+        let!(:pre_stage_job) { create(:ci_build, :success, :expired, pipeline: pipeline, name: 'test', stage_idx: 0) }
+
+        it { expect { job.run! }.not_to raise_error }
+      end
+
+      context 'when artifacts of depended job has been erased' do
+        let!(:pre_stage_job) { create(:ci_build, :success, pipeline: pipeline, name: 'test', stage_idx: 0, erased_at: 1.minute.ago) }
+
+        before do
+          pre_stage_job.erase
+        end
+
+        it { expect { job.run! }.not_to raise_error }
+      end
+    end
+
+    let!(:job) { create(:ci_build, :pending, pipeline: pipeline, stage_idx: 1, options: options) }
+
+    context 'when validates for dependencies is enabled' do
+      before do
+        stub_feature_flags(ci_disable_validates_dependencies: false)
+      end
+
+      let!(:pre_stage_job) { create(:ci_build, :success, pipeline: pipeline, name: 'test', stage_idx: 0) }
+
+      context 'when "dependencies" keyword is not defined' do
+        let(:options) { {} }
+
+        it { expect { job.run! }.not_to raise_error }
+      end
+
+      context 'when "dependencies" keyword is empty' do
+        let(:options) { { dependencies: [] } }
+
+        it { expect { job.run! }.not_to raise_error }
+      end
+
+      context 'when "dependencies" keyword is specified' do
+        let(:options) { { dependencies: ['test'] } }
+
+        it_behaves_like 'validation is active'
+      end
+    end
+
+    context 'when validates for dependencies is disabled' do
+      let(:options) { { dependencies: ['test'] } }
+
+      before do
+        stub_feature_flags(ci_disable_validates_dependencies: true)
+      end
+
+      it_behaves_like 'validation is not active'
     end
   end
 

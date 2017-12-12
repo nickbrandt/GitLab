@@ -33,7 +33,6 @@ import LabelManager from './label_manager';
 /* global Sidebar */
 /* global WeightSelect */
 /* global AdminEmailSelect */
-
 import IssuableTemplateSelectors from './templates/issuable_template_selectors';
 import Flash from './flash';
 import CommitsList from './commits';
@@ -588,13 +587,6 @@ import initGroupAnalytics from './init_group_analytics';
         case 'projects:settings:ci_cd:show':
           // Initialize expandable settings panels
           initSettingsPanels();
-
-          import(/* webpackChunkName: "ci-cd-settings" */ './projects/ci_cd_settings_bundle')
-            .then(ciCdSettings => ciCdSettings.default())
-            .catch((err) => {
-              Flash(s__('ProjectSettings|Problem setting up the CI/CD settings JavaScript'));
-              throw err;
-            });
         case 'groups:settings:ci_cd:show':
           new ProjectVariables();
           break;
@@ -626,6 +618,14 @@ import initGroupAnalytics from './init_group_analytics';
             .then(cluster => new cluster.default()) // eslint-disable-line new-cap
             .catch((err) => {
               Flash(s__('ClusterIntegration|Problem setting up the cluster'));
+              throw err;
+            });
+          break;
+        case 'projects:clusters:index':
+          import(/* webpackChunkName: "clusters_index" */ './clusters/clusters_index')
+            .then(clusterIndex => clusterIndex.default())
+            .catch((err) => {
+              Flash(s__('ClusterIntegration|Problem setting up the clusters list'));
               throw err;
             });
           break;

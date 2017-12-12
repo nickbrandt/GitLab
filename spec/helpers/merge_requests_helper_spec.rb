@@ -1,7 +1,9 @@
 require 'spec_helper'
 
 describe MergeRequestsHelper do
+  include ActionView::Helpers::UrlHelper
   include ProjectForksHelper
+
   describe 'ci_build_details_path' do
     let(:project) { create(:project) }
     let(:merge_request) { MergeRequest.new }
