@@ -841,7 +841,6 @@ msgstr ""
 msgid "Contributors"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "ContributorsPage|Building repository graph."
 msgstr ""
 
@@ -860,8 +859,6 @@ msgstr ""
 msgid "ContributorsPage|Please wait a moment, this page will automatically refresh when ready."
 msgstr ""
 
-||||||| merged common ancestors
-=======
 msgid "ContributorsPage|Building repository graph."
 msgstr ""
 
