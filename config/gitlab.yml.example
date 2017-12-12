@@ -787,8 +787,6 @@ test:
     # user: YOUR_USERNAME
   pages:
     path: tmp/tests/pages
-  artifacts:
-    path: tmp/tests/artifacts
   repositories:
     storages:
       default:
