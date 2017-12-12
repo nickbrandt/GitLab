@@ -96,7 +96,6 @@ feature 'Clusters', :js do
         click_link cluster.name
       end
 
-<<<<<<< HEAD
     context 'when license has multiple clusters feature' do
       before do
         allow_any_instance_of(EE::Project).to receive(:feature_available?).with(:multiple_clusters).and_return(true)
@@ -168,15 +167,6 @@ feature 'Clusters', :js do
         expect(page).to have_button('Save')
         expect(page.find(:css, '.cluster-name').value).to eq(cluster.name)
       end
-||||||| merged common ancestors
-    it 'user sees a new page' do
-      expect(page).to have_button('Create cluster')
-=======
-      it 'user sees a cluster details page' do
-        expect(page).to have_button('Save')
-        expect(page.find(:css, '.cluster-name').value).to eq(cluster.name)
-      end
->>>>>>> ce/10-3-stable
     end
   end
 end
