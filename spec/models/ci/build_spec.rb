@@ -133,8 +133,7 @@ describe Ci::Build do
   end
 
   describe '#artifacts?' do
-    context 'when new artifacts are used' do
-      let(:build) { create(:ci_build, :artifacts) }
+    subject { build.artifacts? }
 
     context 'when new artifacts are used' do
       context 'artifacts archive does not exist' do
@@ -152,16 +151,6 @@ describe Ci::Build do
           let(:build) { create(:ci_build, :artifacts, :expired) }
 
           it { is_expected.to be_falsy }
-        end
-      end
-    end
-
-    context 'when legacy artifacts are used' do
-      context 'artifacts archive does not exist' do
-        let(:build) { create(:ci_build) }
-
-        context 'is not expired' do
-          it { is_expected.to be_truthy }
         end
       end
     end
@@ -453,16 +442,6 @@ describe Ci::Build do
 
       before do
         build.project.update(runners_token: 'token')
-      end
-
-      it { is_expected.to eq('new xxxxx data') }
-    end
-
-    context 'hide build token' do
-      let(:data) { 'new token data'}
-
-      before do
-        build.update(token: 'token')
       end
 
       it { is_expected.to eq('new xxxxx data') }
