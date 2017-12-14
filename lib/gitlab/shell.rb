@@ -145,7 +145,6 @@ module Gitlab
                                  storage, "#{path}.git", "#{new_path}.git"])
     end
 
-<<<<<<< HEAD
     # Move repository storage
     #
     # current_storage - project's current storage path
@@ -160,10 +159,7 @@ module Gitlab
                                    current_storage, "#{path}.git", new_storage])
     end
 
-    # Fork repository to new namespace
-=======
     # Fork repository to new path
->>>>>>> ce/10-2-stable-patch-5
     # forked_from_storage - forked-from project's storage path
     # forked_from_disk_path - project disk path
     # forked_to_storage - forked-to project's storage path
