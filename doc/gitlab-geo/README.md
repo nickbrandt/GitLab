@@ -181,6 +181,10 @@ Read through the [GitLab Geo configuration](configuration.md) documentation.
 
 Read how to [update your Geo nodes to the latest GitLab version](updating_the_geo_nodes.md).
 
+## Configuring GitLab Geo HA
+
+Read through the [Geo High Availability documentation](ha.md).
+
 ## Current limitations
 
 - You cannot push code to secondary nodes
@@ -211,6 +215,10 @@ example:
 ```
 
 This message shows that Geo detected that a repository update was needed for project 1.
+
+## Tuning Geo
+
+Read the [GitLab Geo tuning](tuning.md) documentation.
 
 ## Troubleshooting
 
