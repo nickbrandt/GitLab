@@ -15,8 +15,8 @@
   = webpack_bundle_tag('common_vue')
   = webpack_bundle_tag('issuable')
 
-.clearfix.detail-page-header
-  .issuable-header
+.detail-page-header
+  .detail-page-header-body
     .issuable-status-box.status-box.status-box-closed{ class: issue_button_visibility(@issue, false) }
       = icon('check', class: "hidden-sm hidden-md hidden-lg")
       %span.hidden-xs
@@ -25,9 +25,6 @@
       = icon('circle-o', class: "hidden-sm hidden-md hidden-lg")
       %span.hidden-xs Open
 
-    %a.btn.btn-default.pull-right.visible-xs-block.gutter-toggle.issuable-gutter-toggle.js-sidebar-toggle{ href: "#" }
-      = icon('angle-double-left')
-
     .issuable-meta
       - if @issue.confidential
         = icon('eye-slash', class: 'issuable-warning-icon')
@@ -35,7 +32,10 @@
         = icon('lock', class: 'issuable-warning-icon')
       = issuable_meta(@issue, @project, "Issue")
 
-  .issuable-actions.js-issuable-actions
+    %a.btn.btn-default.pull-right.visible-xs-block.gutter-toggle.issuable-gutter-toggle.js-sidebar-toggle{ href: "#" }
+      = icon('angle-double-left')
+
+  .detail-page-header-actions.js-issuable-actions
     .clearfix.issue-btn-group.dropdown
       %button.btn.btn-default.pull-left.hidden-md.hidden-lg{ type: "button", data: { toggle: "dropdown" } }
         Options
@@ -77,6 +77,7 @@
 
       = edited_time_ago_with_tooltip(@issue, placement: 'bottom', html_class: 'issue-edited-ago js-issue-edited-ago')
 
+<<<<<<< HEAD
     - if can?(current_user, :read_issue_link, @project)
       .js-related-issues-root{ data: { endpoint: project_issue_links_path(@project, @issue),
         can_add_related_issues: "#{can?(current_user, :admin_issue_link, @issue)}",
@@ -88,6 +89,8 @@
                 Related issues
 
 
+=======
+>>>>>>> ce/10-2-stable-patch-5
     #merge-requests{ data: { url: referenced_merge_requests_project_issue_path(@project, @issue) } }
       // This element is filled in using JavaScript.
 
