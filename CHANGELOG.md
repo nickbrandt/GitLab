@@ -4,11 +4,13 @@ entry.
 
 ## 10.0.7 (2017-12-07)
 
-### Security (3 changes)
+### Security (5 changes)
 
-- Don't match partial email adresses. !2227
-- Prevent creating issues through API when user does not have permissions.
-- Prevent an information disclosure in the Groups API.
+- Fix e-mail address disclosure through member search fields
+- Prevent creating issues through API when user does not have permissions
+- Prevent an information disclosure in the Groups API
+- Fix user without access to private Wiki being able to see it on the project page
+- Fix Cross-Site Scripting (XSS) vulnerability while editing a comment
 
 
 ## 10.0.6 (2017-11-08)
