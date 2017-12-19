@@ -10,6 +10,7 @@ class MergeRequest < ActiveRecord::Base
   include EachBatch
   include Gitlab::Utils::StrongMemoize
   include ThrottledTouch
+  include Gitlab::Utils::StrongMemoize
 
   ignore_column :locked_at,
                 :ref_fetched

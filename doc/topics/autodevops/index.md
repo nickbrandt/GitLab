@@ -227,6 +227,18 @@ check out.
 
 Any security warnings are also [shown in the merge request widget](https://docs.gitlab.com/ee/user/project/merge_requests/sast.html).
 
+### Auto SAST
+
+> Introduced in [GitLab Enterprise Edition Ultimate][ee] 10.3.
+
+Static Application Security Testing (SAST) uses the
+[gl-sast Docker image](https://gitlab.com/gitlab-org/gl-sast) to run static
+analysis on the current code and checks for potential security issues. Once the
+report is created, it's uploaded as an artifact which you can later download and
+check out.
+
+Any security warnings are also [shown in the merge request widget](https://docs.gitlab.com/ee/user/project/merge_requests/sast.html).
+
 ### Auto Review Apps
 
 NOTE: **Note:**
