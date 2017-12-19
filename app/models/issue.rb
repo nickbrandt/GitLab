@@ -13,6 +13,7 @@ class Issue < ActiveRecord::Base
   include FasterCacheKeys
   include RelativePositioning
   include TimeTrackable
+  include ThrottledTouch
   include IgnorableColumn
 
   ignore_column :branch_name
