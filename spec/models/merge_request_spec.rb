@@ -601,7 +601,6 @@ describe MergeRequest do
     end
   end
 
-<<<<<<< HEAD
   describe "#approvers_left" do
     let(:merge_request) {create :merge_request}
 
