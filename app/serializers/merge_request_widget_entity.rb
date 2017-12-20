@@ -1,4 +1,6 @@
 class MergeRequestWidgetEntity < IssuableEntity
+  prepend ::EE::MergeRequestWidgetEntity
+
   expose :state
   expose :in_progress_merge_commit_sha
   expose :merge_commit_sha

@@ -12,6 +12,16 @@ module StubConfiguration
     allow_any_instance_of(ApplicationSetting).to receive(:cached_html_up_to_date?).and_return(false)
   end
 
+  def stub_application_setting_on_object(object, messages)
+    add_predicates(messages)
+
+    allow(Gitlab::CurrentSettings.current_application_settings)
+      .to receive_messages(messages)
+    messages.each do |setting, value|
+      allow(object).to receive_message_chain(:current_application_settings, setting) { value }
+    end
+  end
+
   def stub_not_protect_default_branch
     stub_application_setting(
       default_branch_protection: Gitlab::Access::PROTECTION_NONE)
