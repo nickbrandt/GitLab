@@ -221,19 +221,8 @@ On each Consul node perform the following:
 
     ```ruby
     # Disable all components except Consul
-    bootstrap['enable'] = false
-    gitlab_rails['auto_migrate'] = false
-    gitaly['enable'] = false
-    gitlab_workhorse['enable'] = false
-    mailroom['enable'] = false
-    nginx['enable'] = false
-    postgresql['enable'] = false
-    redis['enable'] = false
-    sidekiq['enable'] = false
-    prometheus['enable'] = false
-    unicorn['enable'] = false
+    roles ['consul_role']
 
-    consul['enable'] = true
     # START user configuration
     # Replace placeholders:
     #
@@ -246,6 +235,8 @@ On each Consul node perform the following:
     #
     # END user configuration
     ```
+
+    > `consul_role` was introduced with GitLab 10.3
 
 1. [Reconfigure GitLab] for the changes to take effect.
 
@@ -261,19 +252,7 @@ On each database node perform the following:
 
     ```ruby
     # Disable all components except PostgreSQL and Repmgr and Consul
-    bootstrap['enable'] = false
-    gitaly['enable'] = false
-    mailroom['enable'] = false
-    nginx['enable'] = false
-    unicorn['enable'] = false
-    sidekiq['enable'] = false
-    redis['enable'] = false
-    gitlab_workhorse['enable'] = false
-    prometheus_monitoring['enable'] = false
-
-    repmgr['enable'] = true
-    postgresql['enable'] = true
-    consul['enable'] = true
+    roles ['postgres_role']
 
     # PostgreSQL configuration
     postgresql['listen_address'] = '0.0.0.0'
@@ -311,6 +290,8 @@ On each database node perform the following:
     #
     # END user configuration
     ```
+
+    > `postgres_role` was introduced with GitLab 10.3
 
 1. [Reconfigure GitLab] for the changes to take effect.
 
@@ -499,10 +480,80 @@ Select one node as a primary node.
 
 Repeat the above steps on all secondary nodes.
 
+<<<<<<< HEAD
 #### Pgbouncer node post-configuration
 
 1. Create a `.pgpass` file user for the `CONSUL_USER` account to be able to
    reload pgbouncer. Confirm `PGBOUNCER_PASSWORD` twice when asked:
+=======
+#### Database checkpoint
+
+Before moving on, make sure the databases are configured correctly. Run the
+following command on the **primary** node to verify that replication is working
+properly:
+
+```
+gitlab-ctl repmgr cluster show
+```
+
+The output should be similar to:
+
+```
+Role      | Name         | Upstream     | Connection String
+----------+--------------|--------------|--------------------------------------------------------------------
+* master  | MASTER  |        | host=MASTER port=5432 user=gitlab_repmgr dbname=gitlab_repmgr
+  standby | STANDBY | MASTER | host=STANDBY port=5432 user=gitlab_repmgr dbname=gitlab_repmgr
+```
+
+If the 'Role' column for any node says "FAILED", check the
+[Troubleshooting section](#troubleshooting) before proceeding.
+
+### Configuring the Pgbouncer node
+
+1. Make sure you collect [`CONSUL_SERVER_NODES`](#consul_information), [`CONSUL_PASSWORD_HASH`](#consul_information), and [`PGBOUNCER_PASSWORD_HASH`](#pgbouncer_information) before executing the next step.
+
+1. Edit `/etc/gitlab/gitlab.rb` replacing values noted in the `# START user configuration` section:
+
+    ```ruby
+    # Disable all components except Pgbouncer and Consul agent
+    roles ['pgbouncer_role']
+
+    # Configure Pgbouncer
+    pgbouncer['admin_users'] = %w(pgbouncer gitlab-consul)
+
+    # Configure Consul agent
+    consul['watchers'] = %w(postgresql)
+
+    # START user configuration
+    # Please set the real values as explained in Required Information section
+    # Replace CONSUL_PASSWORD_HASH with with a generated md5 value
+    # Replace PGBOUNCER_PASSWORD_HASH with with a generated md5 value
+    pgbouncer['users'] = {
+      'gitlab-consul': {
+        password: 'CONSUL_PASSWORD_HASH'
+      },
+      'pgbouncer': {
+        password: 'PGBOUNCER_PASSWORD_HASH'
+      }
+    }
+    # Replace placeholders:
+    #
+    # Y.Y.Y.Y consul1.gitlab.example.com Z.Z.Z.Z
+    # with the addresses gathered for CONSUL_SERVER_NODES
+    consul['configuration'] = {
+      retry_join: %w(Y.Y.Y.Y consul1.gitlab.example.com Z.Z.Z.Z)
+    }
+    #
+    # END user configuration
+    ```
+
+    > `pgbouncer_role` was introduced with GitLab 10.3
+
+1. [Reconfigure GitLab] for the changes to take effect.
+
+1. Create a `.pgpass` file so Consule is able to
+   reload pgbouncer. Enter the `PGBOUNCER_PASSWORD` twice when asked:
+>>>>>>> 41313ee9e6... Merge branch 'docs/use-roles-for-postgres-ha' into 'master'
 
      ```sh
      gitlab-ctl write-pgpass --host 127.0.0.1 --database pgbouncer --user pgbouncer --hostuser gitlab-consul
@@ -582,19 +633,8 @@ On each server edit `/etc/gitlab/gitlab.rb`:
 
 ```ruby
 # Disable all components except Consul
-bootstrap['enable'] = false
-gitlab_rails['auto_migrate'] = false
-gitaly['enable'] = false
-gitlab_workhorse['enable'] = false
-mailroom['enable'] = false
-nginx['enable'] = false
-postgresql['enable'] = false
-redis['enable'] = false
-sidekiq['enable'] = false
-prometheus['enable'] = false
-unicorn['enable'] = false
+roles ['consul_role']
 
-consul['enable'] = true
 consul['configuration'] = {
   server: true,
   retry_join: %w(10.6.0.11 10.6.0.12 10.6.0.13)
@@ -609,19 +649,7 @@ On each server edit `/etc/gitlab/gitlab.rb`:
 
 ```ruby
 # Disable all components except PostgreSQL and Repmgr and Consul
-bootstrap['enable'] = false
-gitaly['enable'] = false
-mailroom['enable'] = false
-nginx['enable'] = false
-unicorn['enable'] = false
-sidekiq['enable'] = false
-redis['enable'] = false
-gitlab_workhorse['enable'] = false
-prometheus_monitoring['enable'] = false
-
-repmgr['enable'] = true
-postgresql['enable'] = true
-consul['enable'] = true
+roles ['postgres_role']
 
 # PostgreSQL configuration
 postgresql['listen_address'] = '0.0.0.0'
@@ -761,19 +789,7 @@ On each server edit `/etc/gitlab/gitlab.rb`:
 
 ```ruby
 # Disable all components except PostgreSQL, Repmgr, and Consul
-bootstrap['enable'] = false
-gitaly['enable'] = false
-mailroom['enable'] = false
-nginx['enable'] = false
-unicorn['enable'] = false
-sidekiq['enable'] = false
-redis['enable'] = false
-gitlab_workhorse['enable'] = false
-prometheus_monitoring['enable'] = false
-
-repmgr['enable'] = true
-postgresql['enable'] = true
-consul['enable'] = true
+roles ['postgres_role']
 
 # PostgreSQL configuration
 postgresql['listen_address'] = '0.0.0.0'
