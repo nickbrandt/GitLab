@@ -1,9 +1,5 @@
 module DeploymentPlatform
-<<<<<<< HEAD
   def deployment_platform(environment: nil)
-=======
-  def deployment_platform
->>>>>>> ce/10-4-stable
     @deployment_platform ||=
       find_cluster_platform_kubernetes ||
       find_kubernetes_service_integration ||
