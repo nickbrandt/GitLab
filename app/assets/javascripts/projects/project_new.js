@@ -98,12 +98,15 @@ const bindEvents = () => {
   });
 
   $projectImportUrl.keyup(() => deriveProjectPathFromUrl($projectImportUrl));
+<<<<<<< HEAD
 
   $('.import_git').on('click', () => {
     const $projectMirror = $('#project_mirror');
 
     $projectMirror.attr('disabled', !$projectMirror.attr('disabled'));
   });
+=======
+>>>>>>> ce/10-4-stable
 };
 
 document.addEventListener('DOMContentLoaded', bindEvents);

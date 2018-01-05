@@ -81,7 +81,10 @@ export default {
         statusPath: store.statusPath,
         mergeActionsContentPath: store.mergeActionsContentPath,
         rebasePath: store.rebasePath,
+<<<<<<< HEAD
         approvalsPath: store.approvalsPath,
+=======
+>>>>>>> ce/10-4-stable
       };
       return new MRWidgetService(endpoints);
     },

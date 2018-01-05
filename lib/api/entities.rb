@@ -891,6 +891,7 @@ module API
       expose :id
       expose :project, using: Entities::BasicProjectDetails
 
+<<<<<<< HEAD
       # EE-specific
       # Default filtering configuration
       expose :name
@@ -900,6 +901,8 @@ module API
       expose :labels, using: Entities::LabelBasic, if: -> (board, _) { scoped_issue_available?(board) }
       expose :weight, if: -> (board, _) { scoped_issue_available?(board) }
 
+=======
+>>>>>>> ce/10-4-stable
       expose :lists, using: Entities::List do |board|
         board.lists.destroyable
       end
@@ -994,6 +997,8 @@ module API
       expose :active
       expose :is_shared
       expose :name
+      expose :online?, as: :online
+      expose :status
     end
 
     class RunnerDetails < Runner
@@ -1287,6 +1292,7 @@ module API
     class PagesDomainBasic < Grape::Entity
       expose :domain
       expose :url
+      expose :project_id
       expose :certificate,
         as: :certificate_expiration,
         if: ->(pages_domain, _) { pages_domain.certificate? },
