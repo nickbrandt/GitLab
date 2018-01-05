@@ -7,11 +7,8 @@ package git
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
-	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -64,25 +61,10 @@ func postRPCHandler(a *api.API, name string, handler func(*GitHttpResponseWriter
 	})
 }
 
-func looksLikeRepo(p string) bool {
-	// If /path/to/foo.git/objects exists then let's assume it is a valid Git
-	// repository.
-	if _, err := os.Stat(path.Join(p, "objects")); err != nil {
-		log.Print(err)
-		return false
-	}
-	return true
-}
-
 func repoPreAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.Handler {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		if a.RepoPath == "" {
 			helper.Fail500(w, r, fmt.Errorf("repoPreAuthorizeHandler: RepoPath empty"))
-			return
-		}
-
-		if !looksLikeRepo(a.RepoPath) {
-			http.Error(w, "Not Found", 404)
 			return
 		}
 
