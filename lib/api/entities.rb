@@ -891,7 +891,6 @@ module API
       expose :id
       expose :project, using: Entities::BasicProjectDetails
 
-<<<<<<< HEAD
       # EE-specific
       # Default filtering configuration
       expose :name
@@ -901,8 +900,6 @@ module API
       expose :labels, using: Entities::LabelBasic, if: -> (board, _) { scoped_issue_available?(board) }
       expose :weight, if: -> (board, _) { scoped_issue_available?(board) }
 
-=======
->>>>>>> ce/10-4-stable
       expose :lists, using: Entities::List do |board|
         board.lists.destroyable
       end
