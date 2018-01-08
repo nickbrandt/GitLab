@@ -2,11 +2,17 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
-v 3.3.1
+v3.4.0
+
+- Track Gitaly Connections in Prometheus !211
+- Run test suite on Go 1.9 !213
+- Remove repo disk check !218
+
+v3.3.1
 
 - Fix "net/http: request canceled" errors in gitlab-zip-cat !208
 
-v 3.3.0
+v3.3.0
 
 - Ban context.Background !201
 - Respect the ShowAllRefs flag in git upload-pack and info-refs !203
