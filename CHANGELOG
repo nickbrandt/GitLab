@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v3.5.0
+
+- Add option to disable Git archive caching !222
+
 v3.4.0
 
 - Track Gitaly Connections in Prometheus !211
