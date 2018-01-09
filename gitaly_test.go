@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"net"
 	"net/http"
@@ -448,19 +449,37 @@ func TestGetArchiveProxiedToGitalySuccessfully(t *testing.T) {
 	repoStorage := "default"
 	oid := "54fcc214b94e78d7a41a9a8fe6d87a5e59500e51"
 	repoRelativePath := "foo/bar.git"
-	archivePath := "my/path"
 	archivePrefix := "repo-1"
-	jsonParams := fmt.Sprintf(`{"GitalyServer":{"Address":"%s","Token":""},"GitalyRepository":{"storage_name":"%s","relative_path":"%s"},"ArchivePath":"%s","ArchivePrefix":"%s","CommitId":"%s"}`,
-		gitalyAddress, repoStorage, repoRelativePath, archivePath, archivePrefix, oid)
 	expectedBody := testhelper.GitalyGetArchiveResponseMock
 	archiveLength := len(expectedBody)
 
-	resp, body, err := doSendDataRequest("/archive.tar.gz", "git-archive", jsonParams)
-	require.NoError(t, err)
+	testCases := []struct {
+		archivePath   string
+		cacheDisabled bool
+	}{
+		{archivePath: path.Join(scratchDir, "my/path"), cacheDisabled: false},
+		{archivePath: "/var/empty/my/path", cacheDisabled: true},
+	}
 
-	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
-	assert.Equal(t, expectedBody, string(body), "GET %q: response body", resp.Request.URL)
-	assert.Equal(t, archiveLength, len(body), "GET %q: body size", resp.Request.URL)
+	for _, tc := range testCases {
+		jsonParams := fmt.Sprintf(`{"GitalyServer":{"Address":"%s","Token":""},"GitalyRepository":{"storage_name":"%s","relative_path":"%s"},"ArchivePath":"%s","ArchivePrefix":"%s","CommitId":"%s","DisableCache":%v}`,
+			gitalyAddress, repoStorage, repoRelativePath, tc.archivePath, archivePrefix, oid, tc.cacheDisabled)
+		resp, body, err := doSendDataRequest("/archive.tar.gz", "git-archive", jsonParams)
+		require.NoError(t, err)
+
+		assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+		assert.Equal(t, expectedBody, string(body), "GET %q: response body", resp.Request.URL)
+		assert.Equal(t, archiveLength, len(body), "GET %q: body size", resp.Request.URL)
+
+		if tc.cacheDisabled {
+			_, err := os.Stat(tc.archivePath)
+			require.True(t, os.IsNotExist(err), "expected 'does not exist', got: %v", err)
+		} else {
+			cachedArchive, err := ioutil.ReadFile(tc.archivePath)
+			require.NoError(t, err)
+			require.Equal(t, expectedBody, string(cachedArchive))
+		}
+	}
 }
 
 func TestGetArchiveProxiedToGitalyInterruptedStream(t *testing.T) {
