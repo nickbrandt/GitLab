@@ -30,6 +30,7 @@ type archiveParams struct {
 	CommitId         string
 	GitalyServer     gitaly.Server
 	GitalyRepository pb.Repository
+	DisableCache     bool
 }
 
 var (
@@ -61,32 +62,41 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 		return
 	}
 
+	cacheEnabled := !params.DisableCache
 	archiveFilename := path.Base(params.ArchivePath)
 
-	if cachedArchive, err := os.Open(params.ArchivePath); err == nil {
-		defer cachedArchive.Close()
-		gitArchiveCache.WithLabelValues("hit").Inc()
-		setArchiveHeaders(w, format, archiveFilename)
-		// Even if somebody deleted the cachedArchive from disk since we opened
-		// the file, Unix file semantics guarantee we can still read from the
-		// open file in this process.
-		http.ServeContent(w, r, "", time.Unix(0, 0), cachedArchive)
-		return
+	if cacheEnabled {
+		cachedArchive, err := os.Open(params.ArchivePath)
+		if err == nil {
+			defer cachedArchive.Close()
+			gitArchiveCache.WithLabelValues("hit").Inc()
+			setArchiveHeaders(w, format, archiveFilename)
+			// Even if somebody deleted the cachedArchive from disk since we opened
+			// the file, Unix file semantics guarantee we can still read from the
+			// open file in this process.
+			http.ServeContent(w, r, "", time.Unix(0, 0), cachedArchive)
+			return
+		}
 	}
 
 	gitArchiveCache.WithLabelValues("miss").Inc()
 
-	// We assume the tempFile has a unique name so that concurrent requests are
-	// safe. We create the tempfile in the same directory as the final cached
-	// archive we want to create so that we can use an atomic link(2) operation
-	// to finalize the cached archive.
-	tempFile, err := prepareArchiveTempfile(path.Dir(params.ArchivePath), archiveFilename)
-	if err != nil {
-		helper.Fail500(w, r, fmt.Errorf("SendArchive: create tempfile: %v", err))
-		return
+	var tempFile *os.File
+	var err error
+
+	if cacheEnabled {
+		// We assume the tempFile has a unique name so that concurrent requests are
+		// safe. We create the tempfile in the same directory as the final cached
+		// archive we want to create so that we can use an atomic link(2) operation
+		// to finalize the cached archive.
+		tempFile, err = prepareArchiveTempfile(path.Dir(params.ArchivePath), archiveFilename)
+		if err != nil {
+			helper.Fail500(w, r, fmt.Errorf("SendArchive: create tempfile: %v", err))
+			return
+		}
+		defer tempFile.Close()
+		defer os.Remove(tempFile.Name())
 	}
-	defer tempFile.Close()
-	defer os.Remove(tempFile.Name())
 
 	var archiveReader io.Reader
 	if params.GitalyServer.Address != "" {
@@ -103,7 +113,10 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 		return
 	}
 
-	reader := io.TeeReader(archiveReader, tempFile)
+	reader := archiveReader
+	if cacheEnabled {
+		reader = io.TeeReader(archiveReader, tempFile)
+	}
 
 	// Start writing the response
 	setArchiveHeaders(w, format, archiveFilename)
@@ -113,9 +126,12 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 		return
 	}
 
-	if err := finalizeCachedArchive(tempFile, params.ArchivePath); err != nil {
-		helper.LogError(r, fmt.Errorf("SendArchive: finalize cached archive: %v", err))
-		return
+	if cacheEnabled {
+		err := finalizeCachedArchive(tempFile, params.ArchivePath)
+		if err != nil {
+			helper.LogError(r, fmt.Errorf("SendArchive: finalize cached archive: %v", err))
+			return
+		}
 	}
 }
 
