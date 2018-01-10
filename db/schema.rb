@@ -774,6 +774,7 @@ ActiveRecord::Schema.define(version: 20171230123729) do
   create_table "epic_issues", force: :cascade do |t|
     t.integer "epic_id", null: false
     t.integer "issue_id", null: false
+    t.integer "relative_position", default: 1073741823, null: false
   end
 
   add_index "epic_issues", ["epic_id"], name: "index_epic_issues_on_epic_id", using: :btree
@@ -1872,6 +1873,7 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.boolean "remote_mirror_available_overridden"
     t.boolean "only_mirror_protected_branches"
     t.boolean "pull_mirror_available_overridden"
+    t.integer "jobs_cache_index"
   end
 
   add_index "projects", ["ci_id"], name: "index_projects_on_ci_id", using: :btree
