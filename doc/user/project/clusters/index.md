@@ -2,6 +2,10 @@
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/35954) in GitLab 10.1.
 
+NOTE: **Note:**
+The Cluster integration will eventually supersede the
+[Kubernetes integration](../integrations/kubernetes.md).
+
 With a cluster associated to your project, you can use Review Apps, deploy your
 applications, run your pipelines, and much more, in an easy way.
 
