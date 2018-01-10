@@ -118,8 +118,58 @@ export default {
 <<<<<<< HEAD
     cursorLastEventStatus() {
       return {
+<<<<<<< HEAD
         eventId: this.nodeDetails.cursorLastEvent.id,
         eventTimeStamp: this.nodeDetails.cursorLastEvent.timeStamp,
+=======
+        showAdvanceItems: false,
+        errorMessage: '',
+        nodeDetailItems: [
+          {
+            itemTitle: s__('GeoNodes|Storage config:'),
+            itemValue: this.storageShardsStatus(),
+            itemValueType: VALUE_TYPE.PLAIN,
+            cssClass: this.plainValueCssClass(!this.nodeDetails.storageShardsMatch),
+          },
+          {
+            itemTitle: s__('GeoNodes|Health status:'),
+            itemValue: this.nodeHealthStatus(),
+            itemValueType: VALUE_TYPE.CUSTOM,
+            customType: CUSTOM_TYPE.STATUS,
+          },
+          {
+            itemTitle: s__('GeoNodes|Repositories:'),
+            itemValue: this.nodeDetails.repositories,
+            itemValueType: VALUE_TYPE.GRAPH,
+          },
+          {
+            itemTitle: s__('GeoNodes|Wikis:'),
+            itemValue: this.nodeDetails.wikis,
+            itemValueType: VALUE_TYPE.GRAPH,
+          },
+          {
+            itemTitle: s__('GeoNodes|Local LFS objects:'),
+            itemValue: this.nodeDetails.lfs,
+            itemValueType: VALUE_TYPE.GRAPH,
+          },
+          {
+            itemTitle: s__('GeoNodes|Local job artifacts:'),
+            itemValue: this.nodeDetails.jobArtifacts,
+            itemValueType: VALUE_TYPE.GRAPH,
+          },
+          {
+            itemTitle: s__('GeoNodes|Local Attachments:'),
+            itemValue: this.nodeDetails.attachments,
+            itemValueType: VALUE_TYPE.GRAPH,
+          },
+          {
+            itemTitle: s__('GeoNodes|Sync settings:'),
+            itemValue: this.syncSettings(),
+            itemValueType: VALUE_TYPE.CUSTOM,
+            customType: CUSTOM_TYPE.SYNC,
+          },
+        ],
+>>>>>>> b84ab70a63... Merge branch 'mk-add-geo-support-for-artifacts' into 'master'
       };
     },
     valueType() {

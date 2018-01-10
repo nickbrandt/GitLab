@@ -61,6 +61,7 @@ export default class GeoNodesStore {
       lfs: {
 <<<<<<< HEAD
         totalCount: rawNodeDetails.lfs_objects_count,
+<<<<<<< HEAD
         successCount: rawNodeDetails.lfs_objects_failed_count,
         failureCount: rawNodeDetails.lfs_objects_synced_count,
 =======
@@ -73,6 +74,15 @@ export default class GeoNodesStore {
         successCount: rawNodeDetails.job_artifacts_synced_count || 0,
         failureCount: rawNodeDetails.job_artifacts_failed_count || 0,
 >>>>>>> 2865c0ba5a... Merge branch '4511-handle-node-error-gracefully' into 'master'
+=======
+        successCount: rawNodeDetails.lfs_objects_synced_count,
+        failureCount: rawNodeDetails.lfs_objects_failed_count,
+      },
+      jobArtifacts: {
+        totalCount: rawNodeDetails.job_artifacts_count,
+        successCount: rawNodeDetails.job_artifacts_synced_count,
+        failureCount: rawNodeDetails.job_artifacts_failed_count,
+>>>>>>> b84ab70a63... Merge branch 'mk-add-geo-support-for-artifacts' into 'master'
       },
       attachments: {
         totalCount: rawNodeDetails.attachments_count || 0,

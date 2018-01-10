@@ -12,6 +12,9 @@
     "lfs_objects_count",
     "lfs_objects_failed_count",
     "lfs_objects_synced_count",
+    "job_artifacts_count",
+    "job_artifacts_failed_count",
+    "job_artifacts_synced_count",
     "db_replication_lag_seconds",
     "repositories_count",
     "repositories_failed_count",
@@ -47,12 +50,19 @@
     "lfs_objects_synced_count": { "type": ["integer", "null"] },
     "lfs_objects_synced_in_percentage": { "type": "string" },
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     "job_artifacts_count": { "type": "integer" },
     "job_artifacts_failed_count": { "type": ["integer", "null"] },
     "job_artifacts_synced_count": { "type": ["integer", "null"] },
     "job_artifacts_synced_in_percentage": { "type": "string" },
 >>>>>>> a9521a838d... Merge branch 'mk-fix-api-geo-spec' into 'master'
+=======
+    "job_artifacts_count": { "type": "integer" },
+    "job_artifacts_failed_count": { "type": "integer" },
+    "job_artifacts_synced_count": { "type": "integer" },
+    "job_artifacts_synced_in_percentage": { "type": "string" },
+>>>>>>> b84ab70a63... Merge branch 'mk-add-geo-support-for-artifacts' into 'master'
     "repositories_count": { "type": "integer" },
     "repositories_failed_count": { "type": ["integer", "null"] },
     "repositories_synced_count": { "type": ["integer", "null"] },

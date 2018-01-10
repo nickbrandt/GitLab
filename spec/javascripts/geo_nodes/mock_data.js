@@ -43,6 +43,10 @@ export const rawMockNodeDetails = {
   lfs_objects_synced_count: 0,
   lfs_objects_failed_count: 0,
   lfs_objects_synced_in_percentage: '0.00%',
+  job_artifacts_count: 0,
+  job_artifacts_synced_count: 0,
+  job_artifacts_failed_count: 0,
+  job_artifacts_synced_in_percentage: '0.00%',
   repositories_count: 12,
   repositories_failed_count: 0,
   repositories_synced_count: 12,
@@ -130,13 +134,20 @@ export const mockNodeDetails = {
     failureCount: 0,
   },
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   jobArtifacts: {
+=======
+  job_artifacts: {
+>>>>>>> b84ab70a63... Merge branch 'mk-add-geo-support-for-artifacts' into 'master'
     totalCount: 0,
     successCount: 0,
     failureCount: 0,
   },
+<<<<<<< HEAD
 >>>>>>> 2865c0ba5a... Merge branch '4511-handle-node-error-gracefully' into 'master'
+=======
+>>>>>>> b84ab70a63... Merge branch 'mk-add-geo-support-for-artifacts' into 'master'
   attachments: {
     totalCount: 0,
     successCount: 0,
