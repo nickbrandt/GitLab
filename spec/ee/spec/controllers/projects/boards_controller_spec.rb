@@ -36,14 +36,23 @@ describe Projects::BoardsController do
       end
 
       context 'with valid params' do
+        let(:user) { create(:user) }
+        let(:milestone) { create(:milestone, project: project) }
+        let(:label) { create(:label) }
+
+        let(:create_params) do
+          { name: 'Backend',
+            milestone_id: milestone.id }
+        end
+
         it 'returns a successful 200 response' do
-          create_board name: 'Backend'
+          create_board create_params
 
           expect(response).to have_http_status(200)
         end
 
         it 'returns the created board' do
-          create_board name: 'Backend'
+          create_board create_params
 
           expect(response).to match_response_schema('board')
         end
@@ -80,26 +89,34 @@ describe Projects::BoardsController do
       expect(response).to have_http_status(404)
     end
 
-    def create_board(name:)
+    def create_board(board_params)
       post :create, namespace_id: project.namespace.to_param,
                     project_id: project.to_param,
-                    board: { name: name },
+                    board: board_params,
                     format: :json
     end
   end
 
   describe 'PATCH update' do
     let(:board) { create(:board, project: project, name: 'Backend') }
+    let(:user) { create(:user) }
+    let(:milestone) { create(:milestone, project: project) }
+    let(:label) { create(:label) }
+
+    let(:update_params) do
+      { name: 'Frontend',
+        milestone_id: milestone.id }
+    end
 
     context 'with valid params' do
       it 'returns a successful 200 response' do
-        update_board board: board, name: 'Frontend'
+        update_board board, update_params
 
         expect(response).to have_http_status(200)
       end
 
       it 'returns the updated board' do
-        update_board board: board, name: 'Frontend'
+        update_board board, update_params
 
         expect(response).to match_response_schema('board')
       end
@@ -107,7 +124,7 @@ describe Projects::BoardsController do
 
     context 'with invalid params' do
       it 'returns an unprocessable entity 422 response' do
-        update_board board: board, name: nil
+        update_board board, name: nil
 
         expect(response).to have_http_status(422)
       end
@@ -115,7 +132,7 @@ describe Projects::BoardsController do
 
     context 'with invalid board id' do
       it 'returns a not found 404 response' do
-        update_board board: 999, name: 'Frontend'
+        update_board 999, name: 'Backend'
 
         expect(response).to have_http_status(404)
       end
@@ -128,18 +145,18 @@ describe Projects::BoardsController do
       end
 
       it 'returns a not found 404 response' do
-        update_board board: board, name: 'Backend'
+        update_board board, update_params
 
         expect(response.content_type).to eq 'application/json'
         expect(response).to have_http_status(404)
       end
     end
 
-    def update_board(board:, name:)
+    def update_board(board, update_params)
       patch :update, namespace_id: project.namespace.to_param,
                      project_id: project.to_param,
                      id: board.to_param,
-                     board: { name: name },
+                     board: update_params,
                      format: :json
     end
   end
