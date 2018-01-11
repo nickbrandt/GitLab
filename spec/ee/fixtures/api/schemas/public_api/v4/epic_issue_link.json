@@ -2,6 +2,7 @@
   "type": "object",
   "properties" : {
     "id": { "type": "integer" },
+    "relative_position": { "type": "integer" },
     "issue": { "type": "object" },
     "epic": {
       "type": "object",
@@ -14,6 +15,7 @@
         "id": { "type": "integer" },
         "iid": { "type": "integer" },
         "title": { "type": "string" },
+        "group_id": { "type": "integer" },
         "description": { "type": ["string", "null"] },
         "author": { "type": ["object", "null"] },
         "start_date": { "type": ["string", "null"] },
@@ -32,6 +34,6 @@
         ]
      }
   },
-  "required" : [ "id", "epic", "issue" ],
+  "required" : [ "id", "epic", "issue", "relative_position" ],
   "additionalProperties": false
 }

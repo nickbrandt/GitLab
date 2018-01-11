@@ -494,6 +494,7 @@ module API
     class Epic < Grape::Entity
       expose :id
       expose :iid
+      expose :group_id
       expose :title
       expose :description
       expose :author, using: Entities::UserBasic
@@ -503,10 +504,12 @@ module API
 
     class EpicIssue < Issue
       expose :epic_issue_id
+      expose :relative_position
     end
 
     class EpicIssueLink < Grape::Entity
       expose :id
+      expose :relative_position
       expose :epic, using: Entities::Epic
       expose :issue, using: Entities::IssueBasic
     end
@@ -904,9 +907,19 @@ module API
         board.lists.destroyable
       end
 
+      # EE-specific START
       def scoped_issue_available?(board)
         board.parent.feature_available?(:scoped_issue_board)
       end
+
+      # Default filtering configuration
+      expose :name
+      expose :group
+      expose :milestone, using: Entities::Milestone, if: -> (board, _) { scoped_issue_available?(board) }
+      expose :assignee, using: Entities::UserBasic, if: -> (board, _) { scoped_issue_available?(board) }
+      expose :labels, using: Entities::LabelBasic, if: -> (board, _) { scoped_issue_available?(board) }
+      expose :weight, if: -> (board, _) { scoped_issue_available?(board) }
+      # EE-specific END
     end
 
     class Compare < Grape::Entity
