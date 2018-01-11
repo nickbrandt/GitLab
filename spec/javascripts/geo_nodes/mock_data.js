@@ -129,6 +129,14 @@ export const mockNodeDetails = {
     successCount: 0,
     failureCount: 0,
   },
+<<<<<<< HEAD
+=======
+  jobArtifacts: {
+    totalCount: 0,
+    successCount: 0,
+    failureCount: 0,
+  },
+>>>>>>> 2865c0ba5a... Merge branch '4511-handle-node-error-gracefully' into 'master'
   attachments: {
     totalCount: 0,
     successCount: 0,

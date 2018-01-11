@@ -64,12 +64,40 @@ export default {
             primaryVersion: primaryNodeVersion.version,
             primaryRevision: primaryNodeVersion.revision,
           });
+<<<<<<< HEAD
           this.store.setNodeDetails(nodeId, updatedNodeDetails);
           eventHub.$emit('nodeDetailsLoaded', this.store.getNodeDetails(nodeId));
         })
         .catch((err) => {
           this.hasError = true;
           this.errorMessage = err;
+=======
+      },
+      fetchNodeDetails(nodeId) {
+        return this.service.getGeoNodeDetails(nodeId)
+          .then(res => res.data)
+          .then((nodeDetails) => {
+            const primaryNodeVersion = this.store.getPrimaryNodeVersion();
+            const updatedNodeDetails = Object.assign(nodeDetails, {
+              primaryVersion: primaryNodeVersion.version,
+              primaryRevision: primaryNodeVersion.revision,
+            });
+            this.store.setNodeDetails(nodeId, updatedNodeDetails);
+            eventHub.$emit('nodeDetailsLoaded', this.store.getNodeDetails(nodeId));
+          })
+          .catch((err) => {
+            eventHub.$emit('nodeDetailsLoadFailed', nodeId, err);
+          });
+      },
+      initNodeDetailsPolling(nodeId) {
+        this.nodePollingInterval = new SmartInterval({
+          callback: this.fetchNodeDetails.bind(this, nodeId),
+          startingInterval: 30000,
+          maxInterval: 120000,
+          hiddenInterval: 240000,
+          incrementByFactorOf: 15000,
+          immediateExecution: true,
+>>>>>>> 2865c0ba5a... Merge branch '4511-handle-node-error-gracefully' into 'master'
         });
     },
     initNodeDetailsPolling(nodeId) {
