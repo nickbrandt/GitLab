@@ -115,6 +115,7 @@ export default {
         eventTimeStamp: this.nodeDetails.lastEvent.timeStamp,
       };
     },
+<<<<<<< HEAD
     cursorLastEventStatus() {
       return {
         eventId: this.nodeDetails.cursorLastEvent.id,
@@ -154,6 +155,93 @@ export default {
     },
   },
 };
+=======
+    computed: {
+      hasError() {
+        if (!this.nodeDetails.healthy) {
+          this.errorMessage = this.nodeDetails.health;
+        }
+        return !this.nodeDetails.healthy;
+      },
+      hasVersionMismatch() {
+        if (this.nodeDetails.version !== this.nodeDetails.primaryVersion ||
+            this.nodeDetails.revision !== this.nodeDetails.primaryRevision) {
+          this.errorMessage = s__('GeoNodes|GitLab version does not match the primary node version');
+          return true;
+        }
+        return false;
+      },
+      versionCssClass() {
+        return this.plainValueCssClass(this.hasVersionMismatch);
+      },
+      advanceButtonIcon() {
+        return this.showAdvanceItems ? 'angle-up' : 'angle-down';
+      },
+      nodeVersion() {
+        return `${this.nodeDetails.version} (${this.nodeDetails.revision})`;
+      },
+      replicationSlotWAL() {
+        return `${bytesToMiB(this.nodeDetails.replicationSlotWAL)} MB`;
+      },
+      dbReplicationLag() {
+        // Replication lag can be nil if the secondary isn't actually streaming
+        if (this.nodeDetails.dbReplicationLag !== null &&
+            this.nodeDetails.dbReplicationLag >= 0) {
+          const parsedTime = parseSeconds(this.nodeDetails.dbReplicationLag, {
+            hoursPerDay: 24,
+            daysPerWeek: 7,
+          });
+
+          return stringifyTime(parsedTime);
+        }
+        return 'Unknown';
+      },
+      lastEventStatus() {
+        return {
+          eventId: this.nodeDetails.lastEvent.id,
+          eventTimeStamp: this.nodeDetails.lastEvent.timeStamp,
+        };
+      },
+      cursorLastEventStatus() {
+        return {
+          eventId: this.nodeDetails.cursorLastEvent.id,
+          eventTimeStamp: this.nodeDetails.cursorLastEvent.timeStamp,
+        };
+      },
+      valueType() {
+        return VALUE_TYPE;
+      },
+      customType() {
+        return CUSTOM_TYPE;
+      },
+    },
+    methods: {
+      nodeHealthStatus() {
+        return this.nodeDetails.healthy ? this.nodeDetails.health : this.nodeDetails.healthStatus;
+      },
+      storageShardsStatus() {
+        if (this.nodeDetails.storageShardsMatch == null) {
+          return __('Unknown');
+        }
+        return this.nodeDetails.storageShardsMatch ? __('OK') : s__('GeoNodes|Does not match the primary storage configuration');
+      },
+      plainValueCssClass(value) {
+        const cssClass = 'node-detail-value-bold';
+        return value ? `${cssClass} node-detail-value-error` : cssClass;
+      },
+      syncSettings() {
+        return {
+          namespaces: this.nodeDetails.namespaces,
+          lastEvent: this.nodeDetails.lastEvent,
+          cursorLastEvent: this.nodeDetails.cursorLastEvent,
+        };
+      },
+      onClickShowAdvance() {
+        this.showAdvanceItems = !this.showAdvanceItems;
+      },
+    },
+  };
+>>>>>>> 0c45381168... Merge branch '4586-fix-shard-storage-null-check' into 'master'
 </script>
 
 <template>
