@@ -56,7 +56,7 @@ Apart from those, here is an collection of tutorials and guides on setting up yo
 
 ### Static Application Security Testing (SAST)
 
-- [Scan your code for vulnerabilities](sast.md)
+- **(EEU)** [Scan your code for vulnerabilities](sast.md)
 - [Scan your Docker images for vulnerabilities](sast_docker.md)
 
 ### Dynamic Application Security Testing (DAST)
