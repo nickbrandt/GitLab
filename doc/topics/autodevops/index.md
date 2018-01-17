@@ -212,11 +212,7 @@ report is created, it's uploaded as an artifact which you can later download and
 check out.
 
 In GitLab Enterprise Edition Ultimate, any security warnings are also
-<<<<<<< HEAD
-[shown in the merge request widget](../../user/project/merge_requests/sast.md).
-=======
 [shown in the merge request widget](https://docs.gitlab.com/ee/user/project/merge_requests/sast.html).
->>>>>>> ce/10-4-stable-prepare-rc7
 
 ### Auto SAST for Docker images
 
@@ -229,11 +225,7 @@ created, it's uploaded as an artifact which you can later download and
 check out.
 
 In GitLab Enterprise Edition Ultimate, any security warnings are also
-<<<<<<< HEAD
-[shown in the merge request widget](../../user/project/merge_requests/sast_docker.md).
-=======
 [shown in the merge request widget](https://docs.gitlab.com/ee/user/project/merge_requests/sast_docker.html).
->>>>>>> ce/10-4-stable-prepare-rc7
 
 ### Auto DAST
 
@@ -246,11 +238,7 @@ issues. Once the report is created, it's uploaded as an artifact which you can
 later download and check out.
 
 In GitLab Enterprise Edition Ultimate, any security warnings are also
-<<<<<<< HEAD
-[shown in the merge request widget](../../user/project/merge_requests/dast.md).
-=======
 [shown in the merge request widget](https://docs.gitlab.com/ee/user/project/merge_requests/dast.html).
->>>>>>> ce/10-4-stable-prepare-rc7
 
 ### Auto Browser Performance Testing
 
