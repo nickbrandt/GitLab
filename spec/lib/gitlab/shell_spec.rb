@@ -402,17 +402,6 @@ describe Gitlab::Shell do
       allow(Gitlab.config.gitlab_shell).to receive(:git_timeout).and_return(800)
     end
 
-    describe '#add_key' do
-      it 'removes trailing garbage' do
-        allow(gitlab_shell).to receive(:gitlab_shell_keys_path).and_return(:gitlab_shell_keys_path)
-        expect(gitlab_shell).to receive(:gitlab_shell_fast_execute).with(
-          [:gitlab_shell_keys_path, 'add-key', 'key-123', 'ssh-rsa foobar']
-        )
-
-        gitlab_shell.add_key('key-123', 'ssh-rsa foobar trailing garbage')
-      end
-    end
-
     describe '#add_repository' do
       shared_examples '#add_repository' do
         let(:repository_storage) { 'default' }
