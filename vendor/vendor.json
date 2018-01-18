@@ -199,24 +199,26 @@
 		{
 			"checksumSHA1": "dUHJbKas746n5fLzlwxHb6FOCxs=",
 			"path": "gitlab.com/gitlab-org/gitaly/auth",
-			"revision": "e4f8d3d14cc3fe673cb511fb4d0189b68a158ccd",
-			"revisionTime": "2017-06-30T12:58:40Z",
-			"version": "v0.14.0",
-			"versionExact": "v0.14.0"
+			"revision": "95a198aef54c42fd8e84c62acc63f0cd620864b3",
+			"revisionTime": "2018-01-18T11:33:00Z",
+			"version": "v0.71.0",
+			"versionExact": "v0.71.0"
 		},
 		{
-			"checksumSHA1": "qlzYmQ21XX/voiKWHDWUZ3lybGQ=",
+			"checksumSHA1": "s53Qjro9ZHX0DV2tCYQXLO2FHqI=",
 			"path": "gitlab.com/gitlab-org/gitaly/client",
-			"revision": "871c07b758cf13892972089e1357c5a28bfc40d9",
-			"revisionTime": "2017-09-22T12:56:31Z"
+			"revision": "95a198aef54c42fd8e84c62acc63f0cd620864b3",
+			"revisionTime": "2018-01-18T11:33:00Z",
+			"version": "v0.71.0",
+			"versionExact": "v0.71.0"
 		},
 		{
-			"checksumSHA1": "sdUF3j5MaQ9Tjc2dGHqc/toQxyk=",
+			"checksumSHA1": "mifcYH0qXpoPkX5KzXoM3mterWQ=",
 			"path": "gitlab.com/gitlab-org/gitaly/streamio",
-			"revision": "e4f8d3d14cc3fe673cb511fb4d0189b68a158ccd",
-			"revisionTime": "2017-06-30T12:58:40Z",
-			"version": "v0.14.0",
-			"versionExact": "v0.14.0"
+			"revision": "95a198aef54c42fd8e84c62acc63f0cd620864b3",
+			"revisionTime": "2018-01-18T11:33:00Z",
+			"version": "v0.71.0",
+			"versionExact": "v0.71.0"
 		},
 		{
 			"checksumSHA1": "9jjO5GjLa0XF/nfWihF02RoH4qc=",
