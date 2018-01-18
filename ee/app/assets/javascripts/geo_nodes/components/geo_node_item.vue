@@ -1,8 +1,5 @@
 <script>
-<<<<<<< HEAD
-=======
 import { s__ } from '~/locale';
->>>>>>> 2865c0ba5a... Merge branch '4511-handle-node-error-gracefully' into 'master'
 import icon from '~/vue_shared/components/icon.vue';
 import loadingIcon from '~/vue_shared/components/loading_icon.vue';
 import tooltip from '~/vue_shared/directives/tooltip';
@@ -13,8 +10,6 @@ import geoNodeActions from './geo_node_actions.vue';
 import geoNodeDetails from './geo_node_details.vue';
 
 export default {
-<<<<<<< HEAD
-=======
   components: {
     icon,
     loadingIcon,
@@ -24,7 +19,6 @@ export default {
   directives: {
     tooltip,
   },
->>>>>>> 2865c0ba5a... Merge branch '4511-handle-node-error-gracefully' into 'master'
   props: {
     node: {
       type: Object,
@@ -43,52 +37,16 @@ export default {
       required: true,
     },
   },
-<<<<<<< HEAD
-  components: {
-    icon,
-    loadingIcon,
-    geoNodeActions,
-    geoNodeDetails,
-  },
-  directives: {
-    tooltip,
-  },
-  data() {
-    return {
-      isNodeDetailsLoading: true,
-      nodeHealthStatus: '',
-=======
   data() {
     return {
       isNodeDetailsLoading: true,
       isNodeDetailsFailed: false,
       nodeHealthStatus: '',
       errorMessage: '',
->>>>>>> 2865c0ba5a... Merge branch '4511-handle-node-error-gracefully' into 'master'
       nodeDetails: {},
     };
   },
   computed: {
-<<<<<<< HEAD
-    showInsecureUrlWarning() {
-      return this.node.url.startsWith('http://');
-    },
-  },
-  methods: {
-    handleNodeDetails(nodeDetails) {
-      if (this.node.id === nodeDetails.id) {
-        this.isNodeDetailsLoading = false;
-        this.nodeDetails = nodeDetails;
-        this.nodeHealthStatus = nodeDetails.health;
-      }
-    },
-    handleMounted() {
-      eventHub.$emit('pollNodeDetails', this.node.id);
-    },
-  },
-  created() {
-    eventHub.$on('nodeDetailsLoaded', this.handleNodeDetails);
-=======
     isNodeNonHTTPS() {
       return this.node.url.startsWith('http://');
     },
@@ -128,15 +86,12 @@ export default {
   created() {
     eventHub.$on('nodeDetailsLoaded', this.handleNodeDetails);
     eventHub.$on('nodeDetailsLoadFailed', this.handleNodeDetailsFailure);
->>>>>>> 2865c0ba5a... Merge branch '4511-handle-node-error-gracefully' into 'master'
   },
   mounted() {
     this.handleMounted();
   },
   beforeDestroy() {
     eventHub.$off('nodeDetailsLoaded', this.handleNodeDetails);
-<<<<<<< HEAD
-=======
     eventHub.$off('nodeDetailsLoadFailed', this.handleNodeDetailsFailure);
   },
   methods: {
@@ -159,7 +114,6 @@ export default {
     handleMounted() {
       eventHub.$emit('pollNodeDetails', this.node.id);
     },
->>>>>>> 2865c0ba5a... Merge branch '4511-handle-node-error-gracefully' into 'master'
   },
 };
 </script>
@@ -171,23 +125,19 @@ export default {
         <div class="row">
           <div class="col-md-8 clearfix">
             <strong class="node-url inline pull-left">
-              {{node.url}}
+              {{ node.url }}
             </strong>
             <loading-icon
               v-if="isNodeDetailsLoading"
               class="node-details-loading prepend-left-10 pull-left inline"
-              size=1
+              size="1"
             />
             <icon
               v-tooltip
               v-if="showNodeStatusIcon"
               data-container="body"
               data-placement="bottom"
-<<<<<<< HEAD
-              :title="s__('GeoNodes|You have configured Geo nodes using an insecure HTTP connection. We recommend the use of HTTPS.')"
-=======
               :name="nodeStatusIconName"
->>>>>>> 2865c0ba5a... Merge branch '4511-handle-node-error-gracefully' into 'master'
               :size="18"
               :css-classes="nodeStatusIconClass"
               :title="nodeStatusIconTooltip"
@@ -197,13 +147,13 @@ export default {
                 class="node-badge current-node"
                 v-if="node.current"
               >
-                {{s__('Current node')}}
+                {{ s__('Current node') }}
               </span>
               <span
                 class="node-badge primary-node"
                 v-if="node.primary"
               >
-                {{s__('Primary')}}
+                {{ s__('Primary') }}
               </span>
             </span>
           </div>
