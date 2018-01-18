@@ -19,7 +19,6 @@ instructions will break installations using older versions of OpenSSH, such as
 those included with CentOS 6 as of September 2017. If you want to use this
 feature for CentOS 6, follow [the instructions on how to build and install a custom OpenSSH package](#compiling-a-custom-version-of-openssh-for-centos-6) before continuing.
 
-
 ## Fast lookup is required for GitLab Geo
 
 By default, GitLab manages an `authorized_keys` file, which contains all the
