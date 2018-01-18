@@ -480,12 +480,6 @@ Select one node as a primary node.
 
 Repeat the above steps on all secondary nodes.
 
-<<<<<<< HEAD
-#### Pgbouncer node post-configuration
-
-1. Create a `.pgpass` file user for the `CONSUL_USER` account to be able to
-   reload pgbouncer. Confirm `PGBOUNCER_PASSWORD` twice when asked:
-=======
 #### Database checkpoint
 
 Before moving on, make sure the databases are configured correctly. Run the
@@ -551,9 +545,8 @@ If the 'Role' column for any node says "FAILED", check the
 
 1. [Reconfigure GitLab] for the changes to take effect.
 
-1. Create a `.pgpass` file so Consule is able to
+1. Create a `.pgpass` file so Consul is able to
    reload pgbouncer. Enter the `PGBOUNCER_PASSWORD` twice when asked:
->>>>>>> 41313ee9e6... Merge branch 'docs/use-roles-for-postgres-ha' into 'master'
 
      ```sh
      gitlab-ctl write-pgpass --host 127.0.0.1 --database pgbouncer --user pgbouncer --hostuser gitlab-consul
