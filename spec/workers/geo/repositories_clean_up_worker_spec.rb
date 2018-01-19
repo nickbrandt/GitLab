@@ -41,6 +41,10 @@ describe Geo::RepositoriesCleanUpWorker do
           hash = Digest::SHA2.hexdigest(unsynced_project.id.to_s)
           disk_path = "@hashed/#{hash[0..1]}/#{hash[2..3]}/#{hash}"
 
+          allow_any_instance_of(Gitlab::Shell).to receive(:exists?)
+            .with(unsynced_project.repository_storage_path, "#{disk_path}.git")
+            .and_return(true)
+
           expect(GeoRepositoryDestroyWorker).to receive(:perform_async)
             .with(unsynced_project.id, unsynced_project.name, disk_path, unsynced_project.repository.storage)
             .once.and_return(1)
