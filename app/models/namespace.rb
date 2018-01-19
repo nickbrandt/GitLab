@@ -1,8 +1,5 @@
 class Namespace < ActiveRecord::Base
-<<<<<<< HEAD
   prepend EE::Namespace
-=======
->>>>>>> ce/10-4-stable
   include CacheMarkdownField
   include Sortable
   include Gitlab::ShellAdapter
