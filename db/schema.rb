@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171230123729) do
+ActiveRecord::Schema.define(version: 20180105233807) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -434,7 +434,6 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.integer "project_id"
     t.integer "owner_id"
     t.boolean "active", default: true
-    t.datetime "deleted_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -558,7 +557,6 @@ ActiveRecord::Schema.define(version: 20171230123729) do
 
   create_table "ci_triggers", force: :cascade do |t|
     t.string "token"
-    t.datetime "deleted_at"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "project_id"
@@ -913,6 +911,7 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.integer "hashed_storage_migrated_event_id", limit: 8
     t.integer "lfs_object_deleted_event_id", limit: 8
     t.integer "hashed_storage_attachments_event_id", limit: 8
+    t.integer "job_artifact_deleted_event_id", limit: 8
   end
 
   add_index "geo_event_log", ["repositories_changed_event_id"], name: "index_geo_event_log_on_repositories_changed_event_id", using: :btree
@@ -942,6 +941,13 @@ ActiveRecord::Schema.define(version: 20171230123729) do
   end
 
   add_index "geo_hashed_storage_migrated_events", ["project_id"], name: "index_geo_hashed_storage_migrated_events_on_project_id", using: :btree
+
+  create_table "geo_job_artifact_deleted_events", id: :bigserial, force: :cascade do |t|
+    t.integer "job_artifact_id", null: false
+    t.string "file_path", null: false
+  end
+
+  add_index "geo_job_artifact_deleted_events", ["job_artifact_id"], name: "index_geo_job_artifact_deleted_events_on_job_artifact_id", using: :btree
 
   create_table "geo_lfs_object_deleted_events", id: :bigserial, force: :cascade do |t|
     t.integer "lfs_object_id", null: false
@@ -987,6 +993,9 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.integer "wikis_count"
     t.integer "wikis_synced_count"
     t.integer "wikis_failed_count"
+    t.integer "job_artifacts_count"
+    t.integer "job_artifacts_synced_count"
+    t.integer "job_artifacts_failed_count"
   end
 
   add_index "geo_node_statuses", ["geo_node_id"], name: "index_geo_node_statuses_on_geo_node_id", unique: true, using: :btree
@@ -1188,7 +1197,6 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.integer "updated_by_id"
     t.integer "weight"
     t.boolean "confidential", default: false, null: false
-    t.datetime "deleted_at"
     t.date "due_date"
     t.integer "moved_to_id"
     t.integer "lock_version"
@@ -1206,7 +1214,6 @@ ActiveRecord::Schema.define(version: 20171230123729) do
 
   add_index "issues", ["author_id"], name: "index_issues_on_author_id", using: :btree
   add_index "issues", ["confidential"], name: "index_issues_on_confidential", using: :btree
-  add_index "issues", ["deleted_at"], name: "index_issues_on_deleted_at", using: :btree
   add_index "issues", ["description"], name: "index_issues_on_description_trigram", using: :gin, opclasses: {"description"=>"gin_trgm_ops"}
   add_index "issues", ["milestone_id"], name: "index_issues_on_milestone_id", using: :btree
   add_index "issues", ["moved_to_id"], name: "index_issues_on_moved_to_id", where: "(moved_to_id IS NOT NULL)", using: :btree
@@ -1433,7 +1440,6 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.boolean "merge_when_pipeline_succeeds", default: false, null: false
     t.integer "merge_user_id"
     t.string "merge_commit_sha"
-    t.datetime "deleted_at"
     t.integer "approvals_before_merge"
     t.string "rebase_commit_sha"
     t.string "in_progress_merge_commit_sha"
@@ -1454,7 +1460,6 @@ ActiveRecord::Schema.define(version: 20171230123729) do
   add_index "merge_requests", ["assignee_id"], name: "index_merge_requests_on_assignee_id", using: :btree
   add_index "merge_requests", ["author_id"], name: "index_merge_requests_on_author_id", using: :btree
   add_index "merge_requests", ["created_at"], name: "index_merge_requests_on_created_at", using: :btree
-  add_index "merge_requests", ["deleted_at"], name: "index_merge_requests_on_deleted_at", using: :btree
   add_index "merge_requests", ["description"], name: "index_merge_requests_on_description_trigram", using: :gin, opclasses: {"description"=>"gin_trgm_ops"}
   add_index "merge_requests", ["head_pipeline_id"], name: "index_merge_requests_on_head_pipeline_id", using: :btree
   add_index "merge_requests", ["latest_merge_request_diff_id"], name: "index_merge_requests_on_latest_merge_request_diff_id", using: :btree
@@ -1528,7 +1533,6 @@ ActiveRecord::Schema.define(version: 20171230123729) do
     t.datetime "ldap_sync_last_update_at"
     t.datetime "ldap_sync_last_successful_update_at"
     t.datetime "ldap_sync_last_sync_at"
-    t.datetime "deleted_at"
     t.text "description_html"
     t.boolean "lfs_enabled"
     t.integer "parent_id"
@@ -1541,7 +1545,6 @@ ActiveRecord::Schema.define(version: 20171230123729) do
   end
 
   add_index "namespaces", ["created_at"], name: "index_namespaces_on_created_at", using: :btree
-  add_index "namespaces", ["deleted_at"], name: "index_namespaces_on_deleted_at", using: :btree
   add_index "namespaces", ["ldap_sync_last_successful_update_at"], name: "index_namespaces_on_ldap_sync_last_successful_update_at", using: :btree
   add_index "namespaces", ["ldap_sync_last_update_at"], name: "index_namespaces_on_ldap_sync_last_update_at", using: :btree
   add_index "namespaces", ["name", "parent_id"], name: "index_namespaces_on_name_and_parent_id", unique: true, using: :btree
@@ -2489,6 +2492,7 @@ ActiveRecord::Schema.define(version: 20171230123729) do
   add_foreign_key "gcp_clusters", "services", on_delete: :nullify
   add_foreign_key "gcp_clusters", "users", on_delete: :nullify
   add_foreign_key "geo_event_log", "geo_hashed_storage_migrated_events", column: "hashed_storage_migrated_event_id", name: "fk_27548c6db3", on_delete: :cascade
+  add_foreign_key "geo_event_log", "geo_job_artifact_deleted_events", column: "job_artifact_deleted_event_id", name: "fk_176d3fbb5d", on_delete: :cascade
   add_foreign_key "geo_event_log", "geo_lfs_object_deleted_events", column: "lfs_object_deleted_event_id", name: "fk_d5af95fcd9", on_delete: :cascade
   add_foreign_key "geo_event_log", "geo_repositories_changed_events", column: "repositories_changed_event_id", name: "fk_4a99ebfd60", on_delete: :cascade
   add_foreign_key "geo_event_log", "geo_repository_created_events", column: "repository_created_event_id", name: "fk_9b9afb1916", on_delete: :cascade
