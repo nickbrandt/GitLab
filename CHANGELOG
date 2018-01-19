@@ -2,6 +2,11 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v3.5.1
+
+- Use grpc-go 1.9.1 (!225)
+- Update gitaly stream and dial library functions (!224)
+
 v3.5.0
 
 - Add option to disable Git archive caching !222
