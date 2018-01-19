@@ -67,13 +67,8 @@ The following guide assumes that:
     ```
 
     This command will use your defined `external_url` in `/etc/gitlab/gitlab.rb`.
-<<<<<<< HEAD
-    
-1. GitLab 10.4 and up only: Make sure your the `gitlab` database user has a password defined
-=======
 
 1. GitLab 10.4 and up only: Do the following to make sure the `gitlab` database user has a password defined
->>>>>>> 9fbbbd7f73... Merge branch 'tc-geo-fdw-configurable' into 'master'
 
     Generate a MD5 hash of the desired password:
 
@@ -316,22 +311,6 @@ because we have not yet configured the secondary server. This is the next step.
     We need to enable this, to enable FDW support, even if using a single node.
 
     Edit `/etc/gitlab/gitlab.rb` and add the following, replacing the IP
-<<<<<<< HEAD
-        addresses with addresses appropriate to your network configuration:
-    
-        ```ruby
-        geo_primary_role['enable'] = true
-    
-        # Secondary addresses
-        # - replace '5.6.7.8' with the secondary public address
-        postgresql['listen_address'] = '5.6.7.8'
-        postgresql['trust_auth_cidr_addresses'] = ['127.0.0.1/32','5.6.7.8/32']
-        postgresql['md5_auth_cidr_addresses'] = ['5.6.7.8/32']
-        
-        # gitlab database user's password (defined previously)
-        gitlab_rails['db_password'] = 'mypassword'
-        ```
-=======
     addresses with addresses appropriate to your network configuration:
 
     ```ruby
@@ -346,7 +325,6 @@ because we have not yet configured the secondary server. This is the next step.
     # enable fdw for the geo tracking database
     geo_secondary['db_fdw'] = true
     ```
->>>>>>> 9fbbbd7f73... Merge branch 'tc-geo-fdw-configurable' into 'master'
 
 1. Test that the `gitlab-psql` user can connect to the primary's database:
 
