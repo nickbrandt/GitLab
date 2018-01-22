@@ -35,6 +35,6 @@ Starting with [GitLab Enterprise Edition Ultimate][ee] 10.4, this information wi
 be automatically extracted and shown right in the merge request widget. To do
 so, the CI job must be named `dast` and the artifact path must be
 `gl-dast-report.json`.
-[Learn more on dynamic application security testing results shown in merge requests](https://docs.gitlab.com/ee/user/project/merge_requests/dast.html).
+[Learn more about DAST results shown in merge requests](https://docs.gitlab.com/ee/user/project/merge_requests/dast.html).
 
 [ee]: https://about.gitlab.com/gitlab-ee/

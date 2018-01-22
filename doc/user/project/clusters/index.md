@@ -259,7 +259,7 @@ displaying the status of the pods in the deployment. Developers and other
 teammates can view the progress and status of a rollout, pod by pod, in the
 workflow they already use without any need to access Kubernetes.
 
-[> Read more about Deploy Boards](../deploy_boards.md)
+[> Read more about Deploy Boards](https://docs.gitlab.com/ee/user/project/deploy_boards.html)
 
 ### Canary Deployments (EEP)
 
@@ -269,7 +269,7 @@ Leverage [Kubernetes' Canary deployments](https://kubernetes.io/docs/concepts/cl
 and visualize your canary deployments right inside the Deploy Board, without
 the need to leave GitLab.
 
-[> Read more about Canary Deployments](../canary_deployments.md)
+[> Read more about Canary Deployments](https://docs.gitlab.com/ee/user/project/canary_deployments.html)
 
 ### Kubernetes monitoring
 
