@@ -33,7 +33,9 @@
 <template>
   <component
     :is="this.rootElementType"
-    class="text-center">
+    class="text-center"
+    :is="rootElementType"
+    class="loading-container text-center">
     <i
       class="fa fa-spin fa-spinner"
       :class="cssClass"
