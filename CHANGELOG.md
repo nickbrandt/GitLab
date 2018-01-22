@@ -7,15 +7,15 @@ entry.
 ### Security (8 changes, 1 of them is from the community)
 
 - Upgrade Ruby to 2.3.6 to include security patches. !16016
-- Filter out sensitive fields from the project services API. (Robert Schilling)
-- Fix RCE via project import mechanism.
-- Prevent OAuth login POST requests when a provider has been disabled.
 - Prevent a SQL injection in the MilestonesFinder.
 - Check user authorization for source and target projects when creating a merge request.
 - Fix path traversal in gitlab-ci.yml cache:key.
 - Fix writable shared deploy keys.
+- Filter out sensitive fields from the project services API. (Robert Schilling)
+- Fix RCE via project import mechanism.
+- Prevent OAuth login POST requests when a provider has been disabled.
 
-### Fixed (69 changes, 24 of them are from the community)
+### Fixed (68 changes, 24 of them are from the community)
 
 - Update comment on image cursor and icons. !15760
 - Fixes the wording of headers in system info page. !15802 (Gilbert Roulot)
@@ -60,24 +60,6 @@ entry.
 - Prevent RevList failing on non utf8 paths. !16440
 - Fix giant fork icons on forks page. !16474
 - Fix links to uploaded files on wiki pages. !16499
-- Fix GitHub importer using removed interface.
-- Fix when branch creation fails don't post system note. (Mateusz Bajorski)
-- Show authored date rather than committed date on the commit list.
-- Fix ANSI 256 bold colors in pipelines job output.
-- Add optional search param for Merge Requests API.
-- fix button alignment on MWPS component.
-- Clears visual token on second backspace. (Martin Wortschack)
-- Fix viewing merge request diffs where the underlying blobs are unavailable.
-- Fix 500 error when visiting a commit where the blobs do not exist.
-- Set target_branch to the ref branch when creating MR from issue.
-- Fix closed text for issues on Todos page.
-- [API] Fix creating issue when assignee_id is empty.
-- Fix false positive issue references in merge requests caused by header anchor links.
-- Fixed chanages dropdown ellipsis positioning.
-- Fix shortcut links on help page.
-- Fix onion-skin re-entering state.
-- Normalizing Identity extern_uid when saving the record.
-- Fixed typo for issue description field declaration. (Marcus Amargi)
 - Modify `LDAP::Person` to return username value based on attributes.
 - Fixed merge request status badge not updating after merging.
 - Remove related links in MR widget when empty state.
@@ -86,6 +68,23 @@ entry.
 - Fix Mermaid drawings not loading on some browsers.
 - Humanize the units of "Showing last X KiB of log" in job trace.
 - Avoid leaving a push event empty if payload cannot be created.
+- Show authored date rather than committed date on the commit list.
+- Fix when branch creation fails don't post system note. (Mateusz Bajorski)
+- Fix viewing merge request diffs where the underlying blobs are unavailable.
+- Fix 500 error when visiting a commit where the blobs do not exist.
+- Set target_branch to the ref branch when creating MR from issue.
+- Fix closed text for issues on Todos page.
+- [API] Fix creating issue when assignee_id is empty.
+- Fix false positive issue references in merge requests caused by header anchor links.
+- Fixed chanages dropdown ellipsis positioning.
+- Fix shortcut links on help page.
+- Clears visual token on second backspace. (Martin Wortschack)
+- Fix onion-skin re-entering state.
+- fix button alignment on MWPS component.
+- Add optional search param for Merge Requests API.
+- Normalizing Identity extern_uid when saving the record.
+- Fixed typo for issue description field declaration. (Marcus Amargi)
+- Fix ANSI 256 bold colors in pipelines job output.
 
 ### Changed (18 changes, 3 of them are from the community)
 
@@ -102,25 +101,25 @@ entry.
 - Allow forking a public project to a private group. !16050
 - Expose project_id on /api/v4/pages/domains. !16200 (Luc Didry)
 - Display graph values on hover within monitoring page. !16261
-- Hide markdown toolbar in preview mode.
-- Run background migrations with a minimum interval.
-- Provide additional cookies to JIRA service requests to allow Oracle WebGates Basic Auth. (Stanislaw Wozniak)
 - removed tabindexes from tag form. (Marcus Amargi)
 - Move edit button to second row on issue page (and change it to a pencil icon).
+- Run background migrations with a minimum interval.
+- Provide additional cookies to JIRA service requests to allow Oracle WebGates Basic Auth. (Stanislaw Wozniak)
+- Hide markdown toolbar in preview mode.
 
 ### Performance (11 changes)
 
 - Improve the performance for counting diverging commits. Show 999+ if it is more than 1000 commits. !15963
-- Improve search query for merge requests.
+- Treat empty markdown and html strings as valid cached text, not missing cache that needs to be updated.
+- Cache merged and closed events data in merge_request_metrics table.
+- Speed up generation of commit stats by using Rugged native methods.
 - Improve search query for issues.
+- Improve search query for merge requests.
 - Eager load event target authors whenever possible.
 - Use simple Next/Prev paging for jobs to avoid large count queries on arbitrarily large sets of historical jobs.
 - Improve performance of MR discussions on large diffs.
 - Add index on namespaces lower(name) for UsersController#exists.
 - Fix timeout when filtering issues by label.
-- Treat empty markdown and html strings as valid cached text, not missing cache that needs to be updated.
-- Cache merged and closed events data in merge_request_metrics table.
-- Speed up generation of commit stats by using Rugged native methods.
 
 ### Added (26 changes, 8 of them are from the community)
 
@@ -144,12 +143,12 @@ entry.
 - API: get participants from merge_requests & issues. !16187 (Brent Greeff)
 - Added option to disable commits stats in the commit endpoint. !16309
 - Disable creation of new Kubernetes Integrations unless they're active or created from template. !41054
+- Added badge to tree & blob views to indicate LFS tracked files.
 - Enable ordering of groups and their children by name.
-- Hide runner token in CI/CD settings page.
+- Add button to run scheduled pipeline immediately.
 - Allow user to rebase merge requests.
 - Handle GitLab hashed storage repositories using the repo import task.
-- Added badge to tree & blob views to indicate LFS tracked files.
-- Add button to run scheduled pipeline immediately.
+- Hide runner token in CI/CD settings page.
 
 ### Other (12 changes, 3 of them are from the community)
 
@@ -160,11 +159,11 @@ entry.
 - Add id to modal.vue to support data-toggle="modal". !16189
 - Update scss-lint to 0.56.0. !16278 (Takuya Noguchi)
 - Fix web ide user preferences copy and buttons. !41789
-- Update Browse file to Choose file in all occurences.
+- Update redis-rack to 2.0.4.
 - Import some code and functionality from gitlab-shell to improve subprocess handling.
+- Update Browse file to Choose file in all occurences.
 - Bump mysql2 gem version from 0.4.5 to 0.4.10. (asaparov)
 - Use a background migration for issues.closed_at.
-- Update redis-rack to 2.0.4.
 
 
 ## 10.3.3 (2018-01-02)
@@ -776,7 +775,7 @@ entry.
 - [CHANGED] Added defaults for protected branches dropdowns on the repository settings. !14278
 - [CHANGED] Show confirmation modal before deleting account. !14360
 - [CHANGED] Allow creating merge requests across a fork network. !14422
-- [CHANGED] Re-arrange <script> tags before <template> tags in .vue files. !14671
+- [CHANGED] Re-arrange script HTML tags before template HTML tags in .vue files. !14671
 - [CHANGED] Create idea of read-only database. !14688
 - [CHANGED] Add active states to nav bar counters.
 - [CHANGED] Add view replaced file link for image diffs.
