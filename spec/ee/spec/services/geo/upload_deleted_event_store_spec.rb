@@ -35,7 +35,7 @@ describe Geo::UploadDeletedEventStore do
 
         expect(event).to have_attributes(
           upload_id: upload.id,
-          path: upload.path,
+          file_path: upload.path,
           checksum: upload.checksum,
           model_id: upload.model_id,
           model_type: upload.model_type,
@@ -52,7 +52,7 @@ describe Geo::UploadDeletedEventStore do
         expected_message = {
           class: "Geo::UploadDeletedEventStore",
           upload_id: invalid_upload.id,
-          path: invalid_upload.path,
+          file_path: invalid_upload.path,
           model_id: invalid_upload.model_id,
           model_type: invalid_upload.model_type,
           uploader: invalid_upload.uploader,

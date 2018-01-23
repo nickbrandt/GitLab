@@ -13,7 +13,7 @@ module Geo
     def build_event
       Geo::UploadDeletedEvent.new(
         upload: upload,
-        path: upload.path,
+        file_path: upload.path,
         checksum: upload.checksum,
         model_id: upload.model_id,
         model_type: upload.model_type,
@@ -28,7 +28,7 @@ module Geo
       {
         class: self.class.name,
         upload_id: upload.id,
-        path: upload.path,
+        file_path: upload.path,
         model_id: upload.model_id,
         model_type: upload.model_type,
         uploader: upload.uploader,

@@ -7,7 +7,7 @@ RSpec.describe Geo::UploadDeletedEvent, type: :model do
 
   describe 'validations' do
     it { is_expected.to validate_presence_of(:upload) }
-    it { is_expected.to validate_presence_of(:path) }
+    it { is_expected.to validate_presence_of(:file_path) }
     it { is_expected.to validate_presence_of(:checksum) }
     it { is_expected.to validate_presence_of(:model_id) }
     it { is_expected.to validate_presence_of(:model_type) }

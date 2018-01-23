@@ -5,7 +5,7 @@ class CreateGeoUploadDeletedEvents < ActiveRecord::Migration
     create_table :geo_upload_deleted_events, id: :bigserial do |t|
       # If a upload is deleted, we need to retain this entry
       t.references :upload, index: true, foreign_key: false, null: false
-      t.string :path, null: false
+      t.string :file_path, null: false
       t.string :checksum, null: false, limit: 64
       t.integer :model_id, null: false
       t.string :model_type, null: false

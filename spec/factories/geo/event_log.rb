@@ -125,7 +125,7 @@ FactoryBot.define do
 
   factory :geo_upload_deleted_event, class: Geo::UploadDeletedEvent do
     upload { create(:upload) }
-    path { upload.path }
+    file_path { upload.path }
     checksum { '8710d2c16809c79fee211a9693b64038a8aae99561bc86ce98a9b46b45677fe4' }
     model_id { upload.model_id }
     model_type { upload.model_type }
