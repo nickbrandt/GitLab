@@ -1,5 +1,5 @@
 import CEMergeRequestStore from '~/vue_merge_request_widget/stores/mr_widget_store';
-import { stripeHtml } from '~/lib/utils/text_utility';
+import { stripHtml } from '~/lib/utils/text_utility';
 
 export default class MergeRequestStore extends CEMergeRequestStore {
   constructor(data) {
@@ -112,7 +112,7 @@ export default class MergeRequestStore extends CEMergeRequestStore {
   setDastReport(data) {
     this.dastReport = data.site.alerts.map(alert => ({
       name: alert.name,
-      parsedDescription: stripeHtml(alert.desc, ' '),
+      parsedDescription: stripHtml(alert.desc, ' '),
       priority: alert.riskdesc,
       ...alert,
     }));
