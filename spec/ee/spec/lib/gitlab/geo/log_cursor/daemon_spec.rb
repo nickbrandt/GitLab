@@ -307,19 +307,81 @@ describe Gitlab::Geo::LogCursor::Daemon, :postgresql, :clean_gitlab_redis_shared
     end
 
     context 'when replaying a upload deleted event' do
-      let(:event_log) { create(:geo_event_log, :upload_deleted_event) }
-      let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
-      let(:upload_deleted_event) { event_log.upload_deleted_event }
-      let(:upload) { upload_deleted_event.upload }
+      context 'with default handling' do
+        let(:event_log) { create(:geo_event_log, :upload_deleted_event) }
+        let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
+        let(:upload_deleted_event) { event_log.upload_deleted_event }
+        let(:upload) { upload_deleted_event.upload }
 
-      it 'does not create a tracking database entry' do
-        expect { daemon.run_once! }.not_to change(Geo::FileRegistry, :count)
+        it 'does not create a tracking database entry' do
+          expect { daemon.run_once! }.not_to change(Geo::FileRegistry, :count)
+        end
+
+        it 'removes the tracking database entry if exist' do
+          create(:geo_file_registry, :avatar, file_id: upload.id)
+
+          expect { daemon.run_once! }.to change(Geo::FileRegistry.attachments, :count).by(-1)
+        end
       end
 
-      it 'removes the tracking database entry if exist' do
-        create(:geo_file_registry, :avatar, file_id: upload.id)
+      context 'with a AvatarUploader' do
+        let(:upload_deleted_event) { create(:geo_upload_deleted_event) }
+        let(:event_log) { create(:geo_event_log, upload_deleted_event: upload_deleted_event) }
+        let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
+        let(:upload) { upload_deleted_event.upload }
 
-        expect { daemon.run_once! }.to change(Geo::FileRegistry.attachments, :count).by(-1)
+        it 'does not delete an avatar file' do
+          file_path = File.join(::CarrierWave.root, upload_deleted_event.file_path)
+
+          expect(::Geo::FileRemovalWorker).not_to receive(:perform_async).with(file_path)
+
+          daemon.run_once!
+        end
+      end
+
+      context 'with a FileUploader' do
+        let(:upload_deleted_event) { create(:geo_upload_deleted_event, :issuable_upload) }
+        let(:event_log) { create(:geo_event_log, upload_deleted_event: upload_deleted_event) }
+        let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
+        let(:upload) { upload_deleted_event.upload }
+
+        it 'deletes the file' do
+          file_path = File.join(::CarrierWave.root, upload_deleted_event.file_path)
+
+          expect(::Geo::FileRemovalWorker).to receive(:perform_async).with(file_path)
+
+          daemon.run_once!
+        end
+      end
+
+      context 'with a PersonalFileUploader' do
+        let(:upload_deleted_event) { create(:geo_upload_deleted_event, :personal_snippet) }
+        let(:event_log) { create(:geo_event_log, upload_deleted_event: upload_deleted_event) }
+        let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
+        let(:upload) { upload_deleted_event.upload }
+
+        it 'deletes the file' do
+          file_path = File.join(::CarrierWave.root, upload_deleted_event.file_path)
+
+          expect(::Geo::FileRemovalWorker).to receive(:perform_async).with(file_path)
+
+          daemon.run_once!
+        end
+      end
+
+      context 'with a NamespaceFileUploader' do
+        let(:upload_deleted_event) { create(:geo_upload_deleted_event, :namespace_upload) }
+        let(:event_log) { create(:geo_event_log, upload_deleted_event: upload_deleted_event) }
+        let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
+        let(:upload) { upload_deleted_event.upload }
+
+        it 'deletes the file' do
+          file_path = File.join(::CarrierWave.root, upload_deleted_event.file_path)
+
+          expect(::Geo::FileRemovalWorker).to receive(:perform_async).with(file_path)
+
+          daemon.run_once!
+        end
       end
     end
 

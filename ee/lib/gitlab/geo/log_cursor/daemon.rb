@@ -237,14 +237,27 @@ module Gitlab
         end
 
         def handle_upload_deleted_event(event, created_at)
+          uploader_class = event.uploader.classify.constantize
+
+          if uploader_class.file_storage?
+            # when an avatar is replaced, the upload record gets deleted/created and the
+            # file is simply replaced.  So don't delete it
+            if event.upload_type != 'avatar'
+              file_path = File.join(::CarrierWave.root, event.file_path)
+
+              job_id = ::Geo::FileRemovalWorker.perform_async(file_path)
+            end
+          end
+
           logger.event_info(
             created_at,
             message: 'Deleted upload file',
             upload_id: event.upload_id,
             upload_type: event.upload_type,
-            path: event.path,
+            file_path: event.file_path,
             model_id: event.model_id,
-            model_type: event.model_type)
+            model_type: event.model_type,
+            job_id: job_id)
 
           ::Geo::FileRegistry.where(file_id: event.upload_id, file_type: event.upload_type).delete_all
         end

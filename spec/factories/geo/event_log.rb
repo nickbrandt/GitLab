@@ -130,5 +130,17 @@ FactoryBot.define do
     model_id { upload.model_id }
     model_type { upload.model_type }
     uploader { upload.uploader }
+
+    trait :issuable_upload do
+      upload { create(:upload, :issuable_upload) }
+    end
+
+    trait :personal_snippet do
+      upload { create(:upload, :personal_snippet) }
+    end
+
+    trait :namespace_upload do
+      upload { create(:upload, :namespace_upload) }
+    end
   end
 end
