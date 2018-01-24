@@ -40,6 +40,14 @@ describe Gitlab::LDAP::User do
           it "sets the user's external flag to true" do
             expect(gl_user.external).to be_truthy
           end
+
+          context 'when user already exists' do
+            it 'does not mark user as external' do
+              create(:omniauth_user, extern_uid: 'uid=john,ou=people,dc=example,dc=com', provider: 'ldapmain')
+
+              expect(gl_user.external).to be_falsey
+            end
+          end
         end
 
         context 'when the user is not in the external group' do
@@ -82,6 +90,14 @@ describe Gitlab::LDAP::User do
 
         it "sets the user's external flag to true" do
           expect(gl_user.external).to be_truthy
+        end
+
+        context 'when user already exists' do
+          it "doesn't set the user's external flag to true" do
+            create(:omniauth_user, extern_uid: 'uid=john,ou=people,dc=example,dc=com', provider: 'ldapmain')
+
+            expect(gl_user.external).to be_falsey
+          end
         end
       end
 
