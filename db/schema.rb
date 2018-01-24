@@ -1080,7 +1080,7 @@ ActiveRecord::Schema.define(version: 20180201145907) do
 
   create_table "geo_upload_deleted_events", id: :bigserial, force: :cascade do |t|
     t.integer "upload_id", null: false
-    t.string "path", null: false
+    t.string "file_path", null: false
     t.string "checksum", limit: 64, null: false
     t.integer "model_id", null: false
     t.string "model_type", null: false
