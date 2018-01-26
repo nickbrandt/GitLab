@@ -86,6 +86,9 @@ export default {
     isEditForm() {
       return this.currentPage === 'edit';
     },
+    isVisible() {
+      return this.currentPage !== '';
+    },
     buttonText() {
       if (this.isNewForm) {
         return 'Create board';
@@ -180,14 +183,14 @@ export default {
 
 <template>
   <modal
-    v-show="currentPage"
+    v-show="isVisible"
     modal-dialog-class="board-config-modal"
     :hide-footer="readonly"
     :title="title"
     :primary-button-label="buttonText"
     :kind="buttonKind"
     :submit-disabled="submitDisabled"
-    @toggle="cancel"
+    @cancel="cancel"
     @submit="submit"
   >
     <template slot="body">
