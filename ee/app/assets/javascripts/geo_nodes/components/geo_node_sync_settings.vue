@@ -20,6 +20,7 @@ export default {
       type: Object,
       required: true,
     },
+<<<<<<< HEAD
   },
   directives: {
     tooltip,
@@ -43,6 +44,54 @@ export default {
         this.cursorLastEvent.id,
         this.syncLagInSeconds,
       );
+||||||| parent of c3efd8e0d8... Merge branch 'kp-fix-geo-admin-bugs' into 'master'
+
+    computed: {
+      syncType() {
+        return this.namespaces.length > 0 ? s__('GeoNodes|Selective') : s__('GeoNodes|Full');
+      },
+      syncLagInSeconds() {
+        return this.lagInSeconds(this.lastEvent.timeStamp, this.cursorLastEvent.timeStamp);
+      },
+      syncStatusIcon() {
+        return this.statusIcon(this.syncLagInSeconds);
+      },
+      syncStatusEventInfo() {
+        return this.statusEventInfo(
+          this.lastEvent.id,
+          this.cursorLastEvent.id,
+          this.syncLagInSeconds,
+        );
+      },
+      syncStatusTooltip() {
+        return this.statusTooltip(this.syncLagInSeconds);
+      },
+=======
+
+    computed: {
+      syncType() {
+        return this.namespaces.length > 0 ? s__('GeoNodes|Selective') : s__('GeoNodes|Full');
+      },
+      eventTimestampEmpty() {
+        return this.lastEvent.timeStamp === 0 || this.cursorLastEvent.timeStamp === 0;
+      },
+      syncLagInSeconds() {
+        return this.lagInSeconds(this.lastEvent.timeStamp, this.cursorLastEvent.timeStamp);
+      },
+      syncStatusIcon() {
+        return this.statusIcon(this.syncLagInSeconds);
+      },
+      syncStatusEventInfo() {
+        return this.statusEventInfo(
+          this.lastEvent.id,
+          this.cursorLastEvent.id,
+          this.syncLagInSeconds,
+        );
+      },
+      syncStatusTooltip() {
+        return this.statusTooltip(this.syncLagInSeconds);
+      },
+>>>>>>> c3efd8e0d8... Merge branch 'kp-fix-geo-admin-bugs' into 'master'
     },
     syncStatusTooltip() {
       return this.statusTooltip(this.syncLagInSeconds);
@@ -61,6 +110,7 @@ export default {
         cursorDateTime = new Date(cursorLastEventTimeStamp * 1000);
       }
 
+<<<<<<< HEAD
       return (cursorDateTime - eventDateTime) / 1000;
     },
     statusIcon(syncLag) {
@@ -85,6 +135,60 @@ export default {
         return s__('GeoNodeSyncStatus|Node is slow, overloaded, or it just recovered after an outage.');
       }
       return s__('GeoNodeSyncStatus|Node is failing or broken.');
+||||||| parent of c3efd8e0d8... Merge branch 'kp-fix-geo-admin-bugs' into 'master'
+        return (cursorDateTime - eventDateTime) / 1000;
+      },
+      statusIcon(syncLag) {
+        if (syncLag <= TIME_DIFF.FIVE_MINS) {
+          return 'retry';
+        } else if (syncLag > TIME_DIFF.FIVE_MINS &&
+                  syncLag <= TIME_DIFF.HOUR) {
+          return 'warning';
+        }
+        return 'status_failed';
+      },
+      statusEventInfo(lastEventId, cursorLastEventId, lagInSeconds) {
+        const timeAgoStr = timeIntervalInWords(lagInSeconds);
+        const pendingEvents = lastEventId - cursorLastEventId;
+        return `${timeAgoStr} (${pendingEvents} events)`;
+      },
+      statusTooltip(lagInSeconds) {
+        if (lagInSeconds <= TIME_DIFF.FIVE_MINS) {
+          return '';
+        } else if (lagInSeconds > TIME_DIFF.FIVE_MINS &&
+                  lagInSeconds <= TIME_DIFF.HOUR) {
+          return s__('GeoNodeSyncStatus|Node is slow, overloaded, or it just recovered after an outage.');
+        }
+        return s__('GeoNodeSyncStatus|Node is failing or broken.');
+      },
+=======
+        return (cursorDateTime - eventDateTime) / 1000;
+      },
+      statusIcon(syncLag) {
+        if (syncLag <= TIME_DIFF.FIVE_MINS) {
+          return 'retry';
+        } else if (syncLag > TIME_DIFF.FIVE_MINS &&
+                  syncLag <= TIME_DIFF.HOUR) {
+          return 'warning';
+        }
+        return 'status_failed';
+      },
+      statusEventInfo(lastEventId, cursorLastEventId, lagInSeconds) {
+        const timeAgoStr = timeIntervalInWords(lagInSeconds);
+        const pendingEvents = lastEventId - cursorLastEventId;
+        return `${timeAgoStr} (${pendingEvents} events)`;
+      },
+      statusTooltip(lagInSeconds) {
+        if (this.eventTimestampEmpty ||
+            lagInSeconds <= TIME_DIFF.FIVE_MINS) {
+          return '';
+        } else if (lagInSeconds > TIME_DIFF.FIVE_MINS &&
+                  lagInSeconds <= TIME_DIFF.HOUR) {
+          return s__('GeoNodeSyncStatus|Node is slow, overloaded, or it just recovered after an outage.');
+        }
+        return s__('GeoNodeSyncStatus|Node is failing or broken.');
+      },
+>>>>>>> c3efd8e0d8... Merge branch 'kp-fix-geo-admin-bugs' into 'master'
     },
   },
 };
@@ -106,6 +210,7 @@ export default {
         css-classes="sync-status-icon prepend-left-5"
       />
       <span
+        v-if="!eventTimestampEmpty"
         class="sync-status-event-info prepend-left-5"
       >
         {{syncStatusEventInfo}}
