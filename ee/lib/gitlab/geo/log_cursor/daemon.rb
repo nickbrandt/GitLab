@@ -240,11 +240,14 @@ module Gitlab
           uploader_class = event.uploader.classify.constantize
 
           if uploader_class.file_storage?
-            # when an avatar is replaced, the upload record gets deleted/created and the
-            # file is simply replaced.  So don't delete it
-            if event.upload_type != 'avatar'
-              file_path = File.join(::CarrierWave.root, event.file_path)
+            # only certain files should be deleted
+            delete_file =
+              (event.upload_type == 'attachment' && event.model_type == 'Appearance') ||
+              (event.upload_type == 'avatar' && event.model_type == 'Project') ||
+              (event.upload_type == 'avatar' && event.model_type == 'Namespace')
 
+            if delete_file
+              file_path = File.join(::CarrierWave.root, event.file_path)
               job_id = ::Geo::FileRemovalWorker.perform_async(file_path)
             end
           end

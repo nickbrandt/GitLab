@@ -324,63 +324,50 @@ describe Gitlab::Geo::LogCursor::Daemon, :postgresql, :clean_gitlab_redis_shared
         end
       end
 
-      context 'with a AvatarUploader' do
-        let(:upload_deleted_event) { create(:geo_upload_deleted_event) }
+      describe 'files should be deleted' do
         let(:event_log) { create(:geo_event_log, upload_deleted_event: upload_deleted_event) }
         let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
         let(:upload) { upload_deleted_event.upload }
+        let(:file_path) { File.join(::CarrierWave.root, upload_deleted_event.file_path) }
 
-        it 'does not delete an avatar file' do
-          file_path = File.join(::CarrierWave.root, upload_deleted_event.file_path)
+        context 'with a User avatar' do
+          let(:upload_deleted_event) { create(:geo_upload_deleted_event, model_type: 'User') }
 
-          expect(::Geo::FileRemovalWorker).not_to receive(:perform_async).with(file_path)
+          it 'does not delete the file' do
+            expect(::Geo::FileRemovalWorker).not_to receive(:perform_async).with(file_path)
 
-          daemon.run_once!
+            daemon.run_once!
+          end
         end
-      end
 
-      context 'with a FileUploader' do
-        let(:upload_deleted_event) { create(:geo_upload_deleted_event, :issuable_upload) }
-        let(:event_log) { create(:geo_event_log, upload_deleted_event: upload_deleted_event) }
-        let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
-        let(:upload) { upload_deleted_event.upload }
+        context 'with a Project avatar' do
+          let(:upload_deleted_event) { create(:geo_upload_deleted_event) }
 
-        it 'deletes the file' do
-          file_path = File.join(::CarrierWave.root, upload_deleted_event.file_path)
+          it 'deletes the file' do
+            expect(::Geo::FileRemovalWorker).to receive(:perform_async).with(file_path)
 
-          expect(::Geo::FileRemovalWorker).to receive(:perform_async).with(file_path)
-
-          daemon.run_once!
+            daemon.run_once!
+          end
         end
-      end
 
-      context 'with a PersonalFileUploader' do
-        let(:upload_deleted_event) { create(:geo_upload_deleted_event, :personal_snippet) }
-        let(:event_log) { create(:geo_event_log, upload_deleted_event: upload_deleted_event) }
-        let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
-        let(:upload) { upload_deleted_event.upload }
+        context 'with a Project FileUploader' do
+          let(:upload_deleted_event) { create(:geo_upload_deleted_event, :issuable_upload) }
 
-        it 'deletes the file' do
-          file_path = File.join(::CarrierWave.root, upload_deleted_event.file_path)
+          it 'does not delete the file' do
+            expect(::Geo::FileRemovalWorker).not_to receive(:perform_async).with(file_path)
 
-          expect(::Geo::FileRemovalWorker).to receive(:perform_async).with(file_path)
-
-          daemon.run_once!
+            daemon.run_once!
+          end
         end
-      end
 
-      context 'with a NamespaceFileUploader' do
-        let(:upload_deleted_event) { create(:geo_upload_deleted_event, :namespace_upload) }
-        let(:event_log) { create(:geo_event_log, upload_deleted_event: upload_deleted_event) }
-        let!(:event_log_state) { create(:geo_event_log_state, event_id: event_log.id - 1) }
-        let(:upload) { upload_deleted_event.upload }
+        context 'with a Namespace avatar' do
+          let(:upload_deleted_event) { create(:geo_upload_deleted_event, model_type: 'Namespace') }
 
-        it 'deletes the file' do
-          file_path = File.join(::CarrierWave.root, upload_deleted_event.file_path)
+          it 'deletes the file' do
+            expect(::Geo::FileRemovalWorker).to receive(:perform_async).with(file_path)
 
-          expect(::Geo::FileRemovalWorker).to receive(:perform_async).with(file_path)
-
-          daemon.run_once!
+            daemon.run_once!
+          end
         end
       end
     end

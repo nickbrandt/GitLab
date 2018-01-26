@@ -30,7 +30,6 @@ describe Geo::UploadDeletedEventStore do
 
       it 'tracks upload attributes' do
         event_store.create
-
         event = Geo::UploadDeletedEvent.last
 
         expect(event).to have_attributes(
@@ -64,6 +63,24 @@ describe Geo::UploadDeletedEventStore do
           .with(expected_message).and_call_original
 
         event_store.create
+      end
+
+      it 'generates the correct file path for an AvatarUploader' do
+        avatar_upload = create(:upload, checksum: '8710d2c16809c79')
+        event_store = described_class.new(avatar_upload)
+        event_store.create
+        event = Geo::UploadDeletedEvent.last
+
+        expect(File.join(CarrierWave.root, event.file_path)).to eq avatar_upload.absolute_path
+      end
+
+      it 'generates the correct file path for a FileUploader' do
+        issue_upload = create(:upload, :issuable_upload, checksum: '8710d2c16809c79')
+        event_store = described_class.new(issue_upload)
+        event_store.create
+        event = Geo::UploadDeletedEvent.last
+
+        expect(File.join(CarrierWave.root, event.file_path)).to eq issue_upload.absolute_path
       end
     end
   end
