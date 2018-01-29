@@ -41,7 +41,9 @@ module Geo
     # model that created it, so grab that now because the model is most likely being
     # deleted as well
     def relative_upload_path
-      upload.absolute_path.sub("#{CarrierWave.root}/", '')
+      Pathname.new(upload.absolute_path)
+        .relative_path_from(Pathname.new(CarrierWave.root))
+        .to_s
     end
   end
 end
