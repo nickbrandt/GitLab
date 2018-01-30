@@ -17,8 +17,6 @@ class RemoteMirror < ActiveRecord::Base
   belongs_to :project, inverse_of: :remote_mirrors
 
   validates :url, presence: true, url: { protocols: %w(ssh git http https), allow_blank: true }
-
-  validate  :url_availability, if: -> (mirror) { mirror.url_changed? || mirror.enabled? }
   validates :url, addressable_url: true, if: :url_changed?
 
   after_save :set_override_remote_mirror_available, unless: -> { Gitlab::CurrentSettings.current_application_settings.mirror_available }
@@ -163,14 +161,6 @@ class RemoteMirror < ActiveRecord::Base
       PROTECTED_BACKOFF_DELAY
     else
       UNPROTECTED_BACKOFF_DELAY
-    end
-  end
-
-  def url_availability
-    return unless project
-
-    if project.import_url == url && project.mirror?
-      errors.add(:url, 'is already in use')
     end
   end
 
