@@ -2,45 +2,7 @@ import Vue from 'vue';
 import eventHub from '~/issuable/related_issues/event_hub';
 import relatedIssuesBlock from '~/issuable/related_issues/components/related_issues_block.vue';
 
-const issuable1 = {
-  id: 200,
-  epic_issue_id: 1,
-  reference: 'foo/bar#123',
-  displayReference: '#123',
-  title: 'some title',
-  path: '/foo/bar/issues/123',
-  state: 'opened',
-};
-
-const issuable2 = {
-  id: 201,
-  epic_issue_id: 2,
-  reference: 'foo/bar#124',
-  displayReference: '#124',
-  title: 'some other thing',
-  path: '/foo/bar/issues/124',
-  state: 'opened',
-};
-
-const issuable3 = {
-  id: 202,
-  epic_issue_id: 3,
-  reference: 'foo/bar#125',
-  displayReference: '#125',
-  title: 'some other other thing',
-  path: '/foo/bar/issues/125',
-  state: 'opened',
-};
-
-const issuable4 = {
-  id: 203,
-  epic_issue_id: 4,
-  reference: 'foo/bar#126',
-  displayReference: '#126',
-  title: 'some other other other thing',
-  path: '/foo/bar/issues/126',
-  state: 'opened',
-};
+import { issuable1, issuable2, issuable3, issuable4, issuable5 } from '../mock_data';
 
 describe('RelatedIssuesBlock', () => {
   let RelatedIssuesBlock;
@@ -148,6 +110,7 @@ describe('RelatedIssuesBlock', () => {
             issuable2,
             issuable3,
             issuable4,
+            issuable5,
           ],
         },
       }).$mount();
@@ -160,21 +123,27 @@ describe('RelatedIssuesBlock', () => {
     });
 
     it('reorder item correctly when an item is moved to the top', () => {
-      const beforeAfterIds = vm.getBeforeAfterId(0, 3);
+      const beforeAfterIds = vm.getBeforeAfterId(vm.$el.querySelector('ul li:first-child'));
       expect(beforeAfterIds.beforeId).toBeNull();
-      expect(beforeAfterIds.afterId).toBe(1);
+      expect(beforeAfterIds.afterId).toBe(2);
     });
 
     it('reorder item correctly when an item is moved to the bottom', () => {
-      const beforeAfterIds = vm.getBeforeAfterId(3, 3);
+      const beforeAfterIds = vm.getBeforeAfterId(vm.$el.querySelector('ul li:last-child'));
       expect(beforeAfterIds.beforeId).toBe(4);
       expect(beforeAfterIds.afterId).toBeNull();
     });
 
-    it('reorder item correctly when an item is moved somewhere in the middle', () => {
-      const beforeAfterIds = vm.getBeforeAfterId(2, 3);
+    it('reorder item correctly when an item is swapped with adjecent item', () => {
+      const beforeAfterIds = vm.getBeforeAfterId(vm.$el.querySelector('ul li:nth-child(3)'));
       expect(beforeAfterIds.beforeId).toBe(2);
-      expect(beforeAfterIds.afterId).toBe(3);
+      expect(beforeAfterIds.afterId).toBe(4);
+    });
+
+    it('reorder item correctly when an item is moved somewhere in the middle', () => {
+      const beforeAfterIds = vm.getBeforeAfterId(vm.$el.querySelector('ul li:nth-child(4)'));
+      expect(beforeAfterIds.beforeId).toBe(3);
+      expect(beforeAfterIds.afterId).toBe(5);
     });
 
     it('when expanding add related issue form', () => {
