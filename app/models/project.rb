@@ -1598,8 +1598,11 @@ class Project < ActiveRecord::Base
   end
 
   def protected_for?(ref)
-    ProtectedBranch.protected?(self, ref) ||
+    if repository.branch_exists?(ref)
+      ProtectedBranch.protected?(self, ref)
+    elsif repository.tag_exists?(ref)
       ProtectedTag.protected?(self, ref)
+    end
   end
 
   def deployment_variables(environment: nil)
