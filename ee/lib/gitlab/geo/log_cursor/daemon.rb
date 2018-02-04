@@ -237,21 +237,6 @@ module Gitlab
         end
 
         def handle_upload_deleted_event(event, created_at)
-          uploader_class = event.uploader.classify.constantize
-
-          if uploader_class.file_storage?
-            # only certain files should be deleted
-            delete_file =
-              (event.upload_type == 'attachment' && event.model_type == 'Appearance') ||
-              (event.upload_type == 'avatar' && event.model_type == 'Project') ||
-              (event.upload_type == 'avatar' && event.model_type == 'Namespace')
-
-            if delete_file
-              file_path = File.join(::CarrierWave.root, event.file_path)
-              job_id = ::Geo::FileRemovalWorker.perform_async(file_path)
-            end
-          end
-
           logger.event_info(
             created_at,
             message: 'Deleted upload file',
@@ -259,8 +244,7 @@ module Gitlab
             upload_type: event.upload_type,
             file_path: event.file_path,
             model_id: event.model_id,
-            model_type: event.model_type,
-            job_id: job_id)
+            model_type: event.model_type)
 
           ::Geo::FileRegistry.where(file_id: event.upload_id, file_type: event.upload_type).delete_all
         end
