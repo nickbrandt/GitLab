@@ -13,7 +13,7 @@ module Geo
     def build_event
       Geo::UploadDeletedEvent.new(
         upload: upload,
-        file_path: upload.path,
+        file_path: relative_upload_path,
         checksum: upload.checksum,
         model_id: upload.model_id,
         model_type: upload.model_type,
@@ -28,12 +28,22 @@ module Geo
       {
         class: self.class.name,
         upload_id: upload.id,
-        file_path: upload.path,
+        file_path: relative_upload_path,
         model_id: upload.model_id,
         model_type: upload.model_type,
         uploader: upload.uploader,
         message: message
       }
+    end
+
+    # store the actual relative path to the file, so we have a chance of locating
+    # the file on the secondary if we want.  upload path is determined by the
+    # model that created it, so grab that now because the model is most likely being
+    # deleted as well
+    def relative_upload_path
+      Pathname.new(upload.absolute_path)
+        .relative_path_from(Pathname.new(CarrierWave.root))
+        .to_s
     end
   end
 end
