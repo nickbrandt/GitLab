@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v3.6.0
+
+- Introduce a `send-url:` method that allows to serve remote HTTP/GET file, like S3-based file !228
+
 v3.5.1
 
 - Use grpc-go 1.9.1 (!225)
