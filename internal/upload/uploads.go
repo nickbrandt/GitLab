@@ -30,7 +30,7 @@ func HandleFileUploads(w http.ResponseWriter, r *http.Request, h http.Handler, t
 	defer writer.Close()
 
 	// Rewrite multipart form data
-	cleanup, err := rewriteFormFilesFromMultipart(r, writer, tempPath, filter)
+	err := rewriteFormFilesFromMultipart(r, writer, tempPath, filter)
 	if err != nil {
 		if err == http.ErrNotMultipart {
 			h.ServeHTTP(w, r)
@@ -38,10 +38,6 @@ func HandleFileUploads(w http.ResponseWriter, r *http.Request, h http.Handler, t
 			helper.Fail500(w, r, fmt.Errorf("handleFileUploads: extract files from multipart: %v", err))
 		}
 		return
-	}
-
-	if cleanup != nil {
-		defer cleanup()
 	}
 
 	// Close writer
