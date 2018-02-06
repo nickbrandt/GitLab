@@ -493,7 +493,7 @@ func TestGetArchiveProxiedToGitalyInterruptedStream(t *testing.T) {
 	archivePath := "my/path"
 	archivePrefix := "repo-1"
 	jsonParams := fmt.Sprintf(`{"GitalyServer":{"Address":"%s","Token":""},"GitalyRepository":{"storage_name":"%s","relative_path":"%s"},"ArchivePath":"%s","ArchivePrefix":"%s","CommitId":"%s"}`,
-		gitalyAddress, repoStorage, repoRelativePath, archivePath, archivePrefix, oid)
+		gitalyAddress, repoStorage, repoRelativePath, path.Join(scratchDir, archivePath), archivePrefix, oid)
 
 	resp, _, err := doSendDataRequest("/archive.tar.gz", "git-archive", jsonParams)
 	require.NoError(t, err)
