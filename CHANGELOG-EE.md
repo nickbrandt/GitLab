@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 10.2.8 (2018-02-07)
+
+### Security (1 change)
+
+- Restrict LDAP API to admins only.
+
+
 ## 10.2.7 (2018-01-18)
 
 - No changes.
