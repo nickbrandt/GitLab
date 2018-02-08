@@ -171,6 +171,13 @@ class Repository
     commits
   end
 
+  # Returns a list of commits that are not present in any reference
+  def new_commits(newrev)
+    refs = ::Gitlab::Git::RevList.new(raw, newrev: newrev).new_refs
+
+    refs.map { |sha| commit(sha.strip) }
+  end
+
   # Gitaly migration: https://gitlab.com/gitlab-org/gitaly/issues/384
   def find_commits_by_message(query, ref = nil, path = nil, limit = 1000, offset = 0)
     unless exists? && has_visible_content? && query.present?
@@ -1054,6 +1061,14 @@ class Repository
                                        remote_branch: merge_request.target_branch)
   end
 
+  def blob_data_at(sha, path)
+    blob = blob_at(sha, path)
+    return unless blob
+
+    blob.load_all_data!
+    blob.data
+  end
+
   private
 
   # TODO Generice finder, later split this on finders by Ref or Oid
@@ -1066,14 +1081,6 @@ class Repository
              end
 
     ::Commit.new(commit, @project) if commit
-  end
-
-  def blob_data_at(sha, path)
-    blob = blob_at(sha, path)
-    return unless blob
-
-    blob.load_all_data!
-    blob.data
   end
 
   def cache

@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 10.4.3 (2018-02-05)
+
+### Security (1 change)
+
+- Restrict LDAP API to admins only.
+
+
 ## 10.4.2 (2018-01-30)
 
 ### Fixed (7 changes)
@@ -82,6 +89,17 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Remove unnecessary NTP checks now included in gitlab:geo:check. !3940
 - Move geo status check after db replication to avoid anticipated failures. !3941
 - Make scoped issue board specs more reliable.
+
+
+## 10.3.7 (2018-02-05)
+
+### Security (1 change)
+
+- Restrict LDAP API to admins only.
+
+### Fixed (1 change)
+
+- Fix JavaScript bundle running on Cluster update/destroy pages.
 
 
 ## 10.3.6 (2018-01-22)
@@ -183,6 +201,13 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Add fade mask to the bottom of the boards selector dropdown list if it can be scrolled down. !3384
 - Document how to set up GitLab Geo for HA. !3468
 - Add border for epic edit button.
+
+
+## 10.2.8 (2018-02-07)
+
+### Security (1 change)
+
+- Restrict LDAP API to admins only.
 
 
 ## 10.2.7 (2018-01-18)

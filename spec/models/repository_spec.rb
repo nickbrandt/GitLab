@@ -262,6 +262,28 @@ describe Repository do
     end
   end
 
+  describe '#new_commits' do
+    let(:new_refs) do
+      double(:git_rev_list, new_refs: %w[
+        c1acaa58bbcbc3eafe538cb8274ba387047b69f8
+        5937ac0a7beb003549fc5fd26fc247adbce4a52e
+      ])
+    end
+
+    it 'delegates to Gitlab::Git::RevList' do
+      expect(Gitlab::Git::RevList).to receive(:new).with(
+        repository.raw,
+        newrev: 'aaaabbbbccccddddeeeeffffgggghhhhiiiijjjj').and_return(new_refs)
+
+      commits = repository.new_commits('aaaabbbbccccddddeeeeffffgggghhhhiiiijjjj')
+
+      expect(commits).to eq([
+        repository.commit('c1acaa58bbcbc3eafe538cb8274ba387047b69f8'),
+        repository.commit('5937ac0a7beb003549fc5fd26fc247adbce4a52e')
+      ])
+    end
+  end
+
   describe '#commits_by' do
     set(:project) { create(:project, :repository) }
 
@@ -1755,13 +1777,13 @@ describe Repository do
 
   describe "Elastic search", :elastic do
     before do
-      stub_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
+      stub_ee_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
       Gitlab::Elastic::Helper.create_empty_index
     end
 
     after do
       Gitlab::Elastic::Helper.delete_index
-      stub_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
+      stub_ee_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
     end
 
     describe "class method find_commits_by_message_with_elastic" do

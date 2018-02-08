@@ -81,6 +81,7 @@ describe Project do
     it { is_expected.to have_many(:members_and_requesters) }
     it { is_expected.to have_many(:clusters) }
     it { is_expected.to have_many(:custom_attributes).class_name('ProjectCustomAttribute') }
+    it { is_expected.to have_many(:lfs_file_locks) }
 
     context 'after initialized' do
       it "has a project_feature" do
@@ -133,7 +134,6 @@ describe Project do
     it { is_expected.to validate_length_of(:name).is_at_most(255) }
 
     it { is_expected.to validate_presence_of(:path) }
-    it { is_expected.to validate_uniqueness_of(:path).scoped_to(:namespace_id) }
     it { is_expected.to validate_length_of(:path).is_at_most(255) }
 
     it { is_expected.to validate_length_of(:description).is_at_most(2000) }
@@ -1824,7 +1824,7 @@ describe Project do
 
       context 'elasticsearch indexing disabled' do
         before do
-          stub_application_setting(elasticsearch_indexing: false)
+          stub_ee_application_setting(elasticsearch_indexing: false)
         end
 
         it 'does not index the repository' do
@@ -1840,7 +1840,7 @@ describe Project do
         let(:project) { create(:project, :import_started, import_type: :github) }
 
         before do
-          stub_application_setting(elasticsearch_indexing: true)
+          stub_ee_application_setting(elasticsearch_indexing: true)
         end
 
         context 'no index status' do
@@ -2471,7 +2471,7 @@ describe Project do
       create(:ci_variable, :protected, value: 'protected', project: project)
     end
 
-    subject { project.secret_variables_for(ref: 'ref') }
+    subject { project.reload.secret_variables_for(ref: 'ref') }
 
     before do
       stub_application_setting(
@@ -3420,18 +3420,40 @@ describe Project do
 
     subject { project.auto_devops_variables }
 
-    context 'when enabled in settings' do
+    context 'when enabled in instance settings' do
       before do
         stub_application_setting(auto_devops_enabled: true)
       end
 
       context 'when domain is empty' do
         before do
+          stub_application_setting(auto_devops_domain: nil)
+        end
+
+        it 'variables does not include AUTO_DEVOPS_DOMAIN' do
+          is_expected.not_to include(domain_variable)
+        end
+      end
+
+      context 'when domain is configured' do
+        before do
+          stub_application_setting(auto_devops_domain: 'example.com')
+        end
+
+        it 'variables includes AUTO_DEVOPS_DOMAIN' do
+          is_expected.to include(domain_variable)
+        end
+      end
+    end
+
+    context 'when explicitely enabled' do
+      context 'when domain is empty' do
+        before do
           create(:project_auto_devops, project: project, domain: nil)
         end
 
-        it 'variables are empty' do
-          is_expected.to be_empty
+        it 'variables does not include AUTO_DEVOPS_DOMAIN' do
+          is_expected.not_to include(domain_variable)
         end
       end
 
@@ -3440,10 +3462,14 @@ describe Project do
           create(:project_auto_devops, project: project, domain: 'example.com')
         end
 
-        it "variables are not empty" do
-          is_expected.not_to be_empty
+        it 'variables includes AUTO_DEVOPS_DOMAIN' do
+          is_expected.to include(domain_variable)
         end
       end
+    end
+
+    def domain_variable
+      { key: 'AUTO_DEVOPS_DOMAIN', value: 'example.com', public: true }
     end
   end
 
