@@ -111,14 +111,13 @@ describe Groups::AnalyticsController do
     render_views
 
     it 'avoids a N+1 query in #show' do
-      control_count = ActiveRecord::QueryRecorder.new { get :show, params: { group_id: group.path } }.count
+      # Warm the cache
+      get :show, params: { group_id: group.path }
 
-      # Clear out controller state to force a refresh of the group
-      controller.instance_variable_set(:@group, nil)
-      user4 = create(:user)
-      group.add_user(user4, GroupMember::DEVELOPER)
+      control_queries = ActiveRecord::QueryRecorder.new { get :show, params: { group_id: group.path } }
+      create_push_event(user, project)
 
-      expect { get :show, params: { group_id: group.path } }.not_to exceed_query_limit(control_count)
+      expect { get :show, params: { group_id: group.path } }.not_to exceed_query_limit(control_queries)
     end
   end
 

@@ -22,3 +22,5 @@ class PushEventPayload < ActiveRecord::Base
     tag: 1
   }
 end
+
+PushEventPayload.prepend(EE::PushEventPayload)
