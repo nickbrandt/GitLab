@@ -32,10 +32,11 @@ describe 'User approves a merge request', :js do
     before do
       project.add_developer(user2)
       project.add_developer(user3)
-      visit(merge_request_path(merge_request))
     end
 
     it 'shows multiple approvers beyond the needed count' do
+      visit(merge_request_path(merge_request))
+
       click_button('Approve')
       wait_for_requests
 
