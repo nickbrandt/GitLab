@@ -12,6 +12,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"time"
 
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
@@ -181,17 +182,26 @@ func finalizeCachedArchive(tempFile *os.File, archivePath string) error {
 	return nil
 }
 
+var (
+	patternZip    = regexp.MustCompile(`\.zip$`)
+	patternTar    = regexp.MustCompile(`\.tar$`)
+	patternTarGz  = regexp.MustCompile(`\.(tar\.gz|tgz|gz)$`)
+	patternTarBz2 = regexp.MustCompile(`\.(tar\.bz2|tbz|tbz2|tb2|bz2)$`)
+)
+
 func parseBasename(basename string) (pb.GetArchiveRequest_Format, bool) {
 	var format pb.GetArchiveRequest_Format
 
-	switch basename {
-	case "archive.zip":
-		format = pb.GetArchiveRequest_ZIP
-	case "archive.tar":
-		format = pb.GetArchiveRequest_TAR
-	case "archive", "archive.tar.gz", "archive.tgz", "archive.gz":
+	switch {
+	case (basename == "archive"):
 		format = pb.GetArchiveRequest_TAR_GZ
-	case "archive.tar.bz2", "archive.tbz", "archive.tbz2", "archive.tb2", "archive.bz2":
+	case patternZip.MatchString(basename):
+		format = pb.GetArchiveRequest_ZIP
+	case patternTar.MatchString(basename):
+		format = pb.GetArchiveRequest_TAR
+	case patternTarGz.MatchString(basename):
+		format = pb.GetArchiveRequest_TAR_GZ
+	case patternTarBz2.MatchString(basename):
 		format = pb.GetArchiveRequest_TAR_BZ2
 	default:
 		return format, false
