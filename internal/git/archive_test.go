@@ -14,17 +14,17 @@ func TestParseBasename(t *testing.T) {
 		in  string
 		out pb.GetArchiveRequest_Format
 	}{
-		{"", pb.GetArchiveRequest_TAR_GZ},
-		{".tar.gz", pb.GetArchiveRequest_TAR_GZ},
-		{".tgz", pb.GetArchiveRequest_TAR_GZ},
-		{".gz", pb.GetArchiveRequest_TAR_GZ},
-		{".tar.bz2", pb.GetArchiveRequest_TAR_BZ2},
-		{".tbz", pb.GetArchiveRequest_TAR_BZ2},
-		{".tbz2", pb.GetArchiveRequest_TAR_BZ2},
-		{".tb2", pb.GetArchiveRequest_TAR_BZ2},
-		{".bz2", pb.GetArchiveRequest_TAR_BZ2},
+		{"archive", pb.GetArchiveRequest_TAR_GZ},
+		{"master.tar.gz", pb.GetArchiveRequest_TAR_GZ},
+		{"foo-master.tgz", pb.GetArchiveRequest_TAR_GZ},
+		{"foo-v1.2.1.gz", pb.GetArchiveRequest_TAR_GZ},
+		{"foo.tar.bz2", pb.GetArchiveRequest_TAR_BZ2},
+		{"archive.tbz", pb.GetArchiveRequest_TAR_BZ2},
+		{"archive.tbz2", pb.GetArchiveRequest_TAR_BZ2},
+		{"archive.tb2", pb.GetArchiveRequest_TAR_BZ2},
+		{"archive.bz2", pb.GetArchiveRequest_TAR_BZ2},
 	} {
-		basename := "archive" + testCase.in
+		basename := testCase.in
 		out, ok := parseBasename(basename)
 		if !ok {
 			t.Fatalf("parseBasename did not recognize %q", basename)
