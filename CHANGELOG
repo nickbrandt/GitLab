@@ -2,6 +2,11 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v3.7.0
+
+- Allow sending Git archives with file names other than 'archive' !232
+- Unify uploads handling under filestore package !230
+
 v3.6.0
 
 - Introduce a `send-url:` method that allows to serve remote HTTP/GET file, like S3-based file !228
