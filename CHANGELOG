@@ -4,6 +4,7 @@ Formerly known as 'gitlab-git-http-server'.
 
 v3.7.0
 
+- Add option to send file uploads straight to object storage !227
 - Allow sending Git archives with file names other than 'archive' !232
 - Unify uploads handling under filestore package !230
 
