@@ -23,10 +23,14 @@ func PutStore(a *api.API, h http.Handler) http.Handler {
 
 func handleStoreLFSObject(myAPI *api.API, h http.Handler) http.Handler {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
-		opts := &filestore.SaveFileOpts{
-			LocalTempPath:  a.StoreLFSPath,
-			TempFilePrefix: a.LfsOid,
+		opts := filestore.GetOpts(a)
+		opts.TempFilePrefix = a.LfsOid
+
+		// backward compatible api check - to be removed on next release
+		if a.StoreLFSPath != "" {
+			opts.LocalTempPath = a.StoreLFSPath
 		}
+		// end of backward compatible api check
 
 		fh, err := filestore.SaveFileFromReader(r.Context(), r.Body, r.ContentLength, opts)
 		if err != nil {
@@ -54,7 +58,11 @@ func handleStoreLFSObject(myAPI *api.API, h http.Handler) http.Handler {
 		r.Body = ioutil.NopCloser(strings.NewReader(body))
 		r.ContentLength = int64(len(body))
 		r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-		r.Header.Set("X-GitLab-Lfs-Tmp", filepath.Base(fh.LocalPath))
+		// backward compatible API header - to be removed on next release
+		if opts.IsLocal() {
+			r.Header.Set("X-GitLab-Lfs-Tmp", filepath.Base(fh.LocalPath))
+		}
+		// end of backward compatible API header
 
 		// And proxy the request
 		h.ServeHTTP(w, r)
