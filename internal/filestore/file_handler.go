@@ -8,14 +8,23 @@ import (
 	"io/ioutil"
 	"os"
 	"strconv"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/objectstore"
 )
+
+type MD5Error error
+type SizeError error
 
 // FileHandler represent a file that has been processed for upload
 // it may be either uploaded to an ObjectStore and/or saved on local path.
-// Remote upload is not yet implemented
 type FileHandler struct {
 	// LocalPath is the path on the disk where file has been stored
 	LocalPath string
+
+	// RemoteID is the objectID provided by GitLab Rails
+	RemoteID string
+	// RemoteURL is ObjectStore URL provided by GitLab Rails
+	RemoteURL string
 
 	// Size is the persisted file size
 	Size int64
@@ -55,6 +64,12 @@ func (fh *FileHandler) GitLabFinalizeFields(prefix string) map[string]string {
 	if fh.LocalPath != "" {
 		data[key("path")] = fh.LocalPath
 	}
+	if fh.RemoteURL != "" {
+		data[key("store_url")] = fh.RemoteURL
+	}
+	if fh.RemoteID != "" {
+		data[key("object_id")] = fh.RemoteID
+	}
 	data[key("size")] = strconv.FormatInt(fh.Size, 10)
 	for hashName, hash := range fh.hashes {
 		data[key(hashName)] = hash
@@ -66,7 +81,12 @@ func (fh *FileHandler) GitLabFinalizeFields(prefix string) map[string]string {
 // SaveFileFromReader persists the provided reader content to all the location specified in opts. A cleanup will be performed once ctx is Done
 // Make sure the provided context will not expire before finalizing upload with GitLab Rails.
 func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts *SaveFileOpts) (fh *FileHandler, err error) {
-	fh = &FileHandler{Name: opts.TempFilePrefix}
+	var object *objectstore.Object
+	fh = &FileHandler{
+		Name:      opts.TempFilePrefix,
+		RemoteID:  opts.RemoteID,
+		RemoteURL: opts.RemoteURL,
+	}
 	hashes := newMultiHash()
 	writers := []io.Writer{hashes.Writer}
 	defer func() {
@@ -76,6 +96,21 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 			}
 		}
 	}()
+
+	if opts.IsRemote() {
+		// Unknown ContentLength must be implemented in order to achieve Artifact Uploading
+		if size == -1 && !opts.isGoogleCloudStorage() {
+			// TODO add support for artifact upload to S3-compatible object storage
+			return nil, errors.New("Not implemented")
+		}
+
+		object, err = objectstore.NewObject(ctx, opts.PresignedPut, opts.PresignedDelete, opts.Timeout, size)
+		if err != nil {
+			return nil, err
+		}
+
+		writers = append(writers, object)
+	}
 
 	if opts.IsLocal() {
 		fileWriter, err := fh.uploadLocalFile(ctx, opts)
@@ -97,10 +132,22 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 	}
 
 	if size != -1 && size != fh.Size {
-		return nil, fmt.Errorf("Expected %d bytes but got only %d", size, fh.Size)
+		return nil, SizeError(fmt.Errorf("Expected %d bytes but got only %d", size, fh.Size))
 	}
 
 	fh.hashes = hashes.finish()
+
+	if opts.IsRemote() {
+		// we need to close the writer in order to get ETag header
+		err = object.Close()
+		if err != nil {
+			return nil, err
+		}
+
+		if fh.MD5() != object.MD5() {
+			return nil, MD5Error(fmt.Errorf("expected md5 %s, got %s", fh.MD5(), object.MD5()))
+		}
+	}
 
 	return fh, err
 }
@@ -124,4 +171,20 @@ func (fh *FileHandler) uploadLocalFile(ctx context.Context, opts *SaveFileOpts) 
 
 	fh.LocalPath = file.Name()
 	return file, nil
+}
+
+// SaveFileFromDisk open the local file fileName and calls SaveFileFromReader
+func SaveFileFromDisk(ctx context.Context, fileName string, opts *SaveFileOpts) (fh *FileHandler, err error) {
+	file, err := os.Open(fileName)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	fi, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	return SaveFileFromReader(ctx, file, fi.Size(), opts)
 }
