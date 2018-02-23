@@ -109,19 +109,10 @@ From [project issue boards](../issue_board.md), you can filter by both group mil
 ### Special milestone filters
 
 When filtering by milestone, in addition to choosing a specific project milestone or group milestone, you can choose a special milestone filter.
->>>>>>> ce/10-5-stable-patch-2
 
-<<<<<<< HEAD
-The milestone view shows the title and description.
-||||||| merged common ancestors
-You can create a milestone for a group that will be shared across group projects.
-On the group's **Issues ➔ Milestones** page, you will be able to see the state
-of that milestone and the issues/merge requests count that it shares across the group projects. To create a new milestone click the **New milestone** button. The form is the same as when creating a milestone for a specific project which you can find in the previous item.
-=======
 - **No Milestone**: Show issues or merge requests with no assigned milestone.
 - **Upcoming**: Show issues or merge requests that have been assigned the open milestone that has the next upcoming due date (i.e. nearest due date in the future).
 - **Started**: Show issues or merge requests that have an assigned milestone with a start date that is before today.
->>>>>>> ce/10-5-stable-patch-2
 
 ### Project milestone features
 
