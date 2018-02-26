@@ -93,7 +93,8 @@
       hasIssues() {
         return this.unresolvedIssues.length ||
           this.resolvedIssues.length ||
-          this.allIssues.length;
+          this.allIssues.length ||
+          this.neutralIssues.length;
       },
     },
 
@@ -148,7 +149,7 @@
 
         <button
           type="button"
-          class="btn pull-right btn-sm"
+          class="js-collapse-btn btn pull-right btn-sm"
           v-if="hasIssues"
           @click="toggleCollapsed"
         >
