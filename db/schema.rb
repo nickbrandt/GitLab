@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171215121259) do
+ActiveRecord::Schema.define(version: 20171222151344) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -1960,6 +1960,7 @@ ActiveRecord::Schema.define(version: 20171215121259) do
     t.string "branch_name_regex"
     t.boolean "reject_unsigned_commits"
     t.boolean "commit_committer_check"
+    t.boolean "regexp_uses_re2", default: true
   end
 
   add_index "push_rules", ["is_sample"], name: "index_push_rules_on_is_sample", where: "is_sample", using: :btree
