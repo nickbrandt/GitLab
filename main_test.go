@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -17,6 +16,8 @@ import (
 	"strconv"
 	"testing"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
@@ -52,14 +53,14 @@ func TestMain(m *testing.M) {
 		testCmd.Stderr = os.Stderr
 
 		if err := testCmd.Run(); err != nil {
-			log.Printf("Test setup: failed to run %v", testCmd)
+			log.WithField("testCmd", testCmd).Print("Test setup: failed to run")
 			os.Exit(-1)
 		}
 	}
 
 	cleanup, err := testhelper.BuildExecutables()
 	if err != nil {
-		log.Printf("Test setup: failed to build executables: %v", err)
+		log.WithError(err).Print("Test setup: failed to build executables")
 		os.Exit(1)
 	}
 
@@ -569,67 +570,6 @@ func TestAPIFalsePositivesAreProxied(t *testing.T) {
 		assert.Equal(t, 200, resp.StatusCode, "%s %q: status code", tc.method, tc.path)
 		testhelper.AssertResponseHeader(t, resp, "Content-Type", "text/html")
 		assert.Equal(t, string(goodResponse), string(respBody), "%s %q: response body", tc.method, tc.path)
-	}
-}
-
-func TestQueryStringLogFiltering(t *testing.T) {
-	// capture the log output
-	buf := bytes.NewBuffer(nil)
-	log.SetOutput(buf)
-	helper.SetCustomResponseLogger(buf)
-
-	defer log.SetOutput(os.Stderr)
-	defer helper.SetCustomResponseLogger(os.Stderr)
-
-	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, _ *http.Request) {
-		w.WriteHeader(200)
-	})
-	defer ts.Close()
-
-	ws := startWorkhorseServer(ts.URL)
-	defer ws.Close()
-
-	for _, path := range []string{
-		"",
-		"/",
-	} {
-		for _, queryString := range []string{
-			"private-token=should_be_filtered",
-			"authenticity-token=should_be_filtered",
-			"rss-token=should_be_filtered",
-			"private_token=should_be_filtered",
-			"authenticity_token=should_be_filtered",
-			"rss-token=should_be_filtered",
-			"private-token=should_be_filtered&authenticity-token=should_be_filtered",
-			"private_token=should_be_filtered&authenticity_token=should_be_filtered",
-		} {
-			resource := path + "?" + queryString
-
-			// Ensure the Referer is scrubbed too
-			req, err := http.NewRequest("GET", ws.URL+resource, nil)
-			if !assert.NoError(t, err, "GET %q: %v", resource, err) {
-				continue
-			}
-
-			req.Header.Set("Referer", "http://referer.example.com"+resource)
-
-			resp, err := http.DefaultClient.Do(req)
-			if !assert.NoError(t, err, "GET %q: %v", resource, err) {
-				continue
-			}
-
-			resp.Body.Close()
-
-			assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
-
-			logged := buf.String()
-			buf.Reset()
-
-			assert.NotEqual(t, 0, len(logged), "GET %q: log is empty", resource)
-			assert.Contains(t, logged, path, "GET %q: path not logged", resource)
-			assert.Contains(t, logged, "referer", "GET %q: referer not logged", resource)
-			assert.NotContains(t, logged, "should_be_filtered", "GET %q: log not filtered correctly", resource)
-		}
 	}
 }
 
