@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v3.8.0
+
+- Add structured logging !236
+
 v3.7.0
 
 - Add option to send file uploads straight to object storage !227
