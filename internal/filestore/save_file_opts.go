@@ -51,17 +51,17 @@ func (s *SaveFileOpts) isGoogleCloudStorage() bool {
 
 // GetOpts converts GitLab api.Response to a proper SaveFileOpts
 func GetOpts(apiResponse *api.Response) *SaveFileOpts {
-	timeout := time.Duration(apiResponse.ObjectStore.Timeout) * time.Second
+	timeout := time.Duration(apiResponse.RemoteObject.Timeout) * time.Second
 	if timeout == 0 {
 		timeout = objectstore.DefaultObjectStoreTimeout
 	}
 
 	return &SaveFileOpts{
 		LocalTempPath:   apiResponse.TempPath,
-		RemoteID:        apiResponse.ObjectStore.ObjectID,
-		RemoteURL:       apiResponse.ObjectStore.GetURL,
-		PresignedPut:    apiResponse.ObjectStore.StoreURL,
-		PresignedDelete: apiResponse.ObjectStore.DeleteURL,
+		RemoteID:        apiResponse.RemoteObject.ID,
+		RemoteURL:       apiResponse.RemoteObject.GetURL,
+		PresignedPut:    apiResponse.RemoteObject.StoreURL,
+		PresignedDelete: apiResponse.RemoteObject.DeleteURL,
 		Timeout:         timeout,
 	}
 }

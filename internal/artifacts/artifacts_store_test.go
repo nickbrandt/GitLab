@@ -74,8 +74,8 @@ func TestUploadHandlerSendingToExternalStorage(t *testing.T) {
 
 	responseProcessorCalled := 0
 	responseProcessor := func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "store-id", r.FormValue("file.object_id"))
-		assert.NotEmpty(t, r.FormValue("file.store_url"))
+		assert.Equal(t, "store-id", r.FormValue("file.remote_id"))
+		assert.NotEmpty(t, r.FormValue("file.remote_url"))
 		w.WriteHeader(200)
 		responseProcessorCalled++
 	}
@@ -85,9 +85,9 @@ func TestUploadHandlerSendingToExternalStorage(t *testing.T) {
 
 	authResponse := api.Response{
 		TempPath: tempPath,
-		ObjectStore: api.RemoteObjectStore{
+		RemoteObject: api.RemoteObject{
 			StoreURL: storeServer.URL + "/url/put",
-			ObjectID: "store-id",
+			ID:       "store-id",
 			GetURL:   storeServer.URL + "/store-id",
 		},
 	}
@@ -114,9 +114,9 @@ func TestUploadHandlerSendingToExternalStorageAndStorageServerUnreachable(t *tes
 
 	authResponse := api.Response{
 		TempPath: tempPath,
-		ObjectStore: api.RemoteObjectStore{
+		RemoteObject: api.RemoteObject{
 			StoreURL: "http://localhost:12323/invalid/url",
-			ObjectID: "store-id",
+			ID:       "store-id",
 		},
 	}
 
@@ -143,9 +143,9 @@ func TestUploadHandlerSendingToExternalStorageAndInvalidURLIsUsed(t *testing.T) 
 
 	authResponse := api.Response{
 		TempPath: tempPath,
-		ObjectStore: api.RemoteObjectStore{
+		RemoteObject: api.RemoteObject{
 			StoreURL: "htt:////invalid-url",
-			ObjectID: "store-id",
+			ID:       "store-id",
 		},
 	}
 
@@ -184,9 +184,9 @@ func TestUploadHandlerSendingToExternalStorageAndItReturnsAnError(t *testing.T) 
 
 	authResponse := api.Response{
 		TempPath: tempPath,
-		ObjectStore: api.RemoteObjectStore{
+		RemoteObject: api.RemoteObject{
 			StoreURL: storeServer.URL + "/url/put",
-			ObjectID: "store-id",
+			ID:       "store-id",
 		},
 	}
 
@@ -227,9 +227,9 @@ func TestUploadHandlerSendingToExternalStorageAndSupportRequestTimeout(t *testin
 
 	authResponse := api.Response{
 		TempPath: tempPath,
-		ObjectStore: api.RemoteObjectStore{
+		RemoteObject: api.RemoteObject{
 			StoreURL: storeServer.URL + "/url/put",
-			ObjectID: "store-id",
+			ID:       "store-id",
 			Timeout:  1,
 		},
 	}

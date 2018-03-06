@@ -62,9 +62,9 @@ func TestGetOpts(t *testing.T) {
 	assert := assert.New(t)
 	apiResponse := &api.Response{
 		TempPath: "/tmp",
-		ObjectStore: api.RemoteObjectStore{
+		RemoteObject: api.RemoteObject{
 			Timeout:   10,
-			ObjectID:  "id",
+			ID:        "id",
 			GetURL:    "http://get",
 			StoreURL:  "http://store",
 			DeleteURL: "http://delete",
@@ -74,11 +74,11 @@ func TestGetOpts(t *testing.T) {
 	opts := filestore.GetOpts(apiResponse)
 
 	assert.Equal(apiResponse.TempPath, opts.LocalTempPath)
-	assert.Equal(time.Duration(apiResponse.ObjectStore.Timeout)*time.Second, opts.Timeout)
-	assert.Equal(apiResponse.ObjectStore.ObjectID, opts.RemoteID)
-	assert.Equal(apiResponse.ObjectStore.GetURL, opts.RemoteURL)
-	assert.Equal(apiResponse.ObjectStore.StoreURL, opts.PresignedPut)
-	assert.Equal(apiResponse.ObjectStore.DeleteURL, opts.PresignedDelete)
+	assert.Equal(time.Duration(apiResponse.RemoteObject.Timeout)*time.Second, opts.Timeout)
+	assert.Equal(apiResponse.RemoteObject.ID, opts.RemoteID)
+	assert.Equal(apiResponse.RemoteObject.GetURL, opts.RemoteURL)
+	assert.Equal(apiResponse.RemoteObject.StoreURL, opts.PresignedPut)
+	assert.Equal(apiResponse.RemoteObject.DeleteURL, opts.PresignedDelete)
 }
 
 func TestGetOptsDefaultTimeout(t *testing.T) {

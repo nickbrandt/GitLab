@@ -213,8 +213,8 @@ func TestSaveFile(t *testing.T) {
 
 			assert.Equal(fh.Name, fields["file.name"])
 			assert.Equal(fh.LocalPath, fields["file.path"])
-			assert.Equal(fh.RemoteURL, fields["file.store_url"])
-			assert.Equal(fh.RemoteID, fields["file.object_id"])
+			assert.Equal(fh.RemoteURL, fields["file.remote_url"])
+			assert.Equal(fh.RemoteID, fields["file.remote_id"])
 			assert.Equal(strconv.FormatInt(test.ObjectSize, 10), fields["file.size"])
 			assert.Equal(test.ObjectMD5, fields["file.md5"])
 			assert.Equal(test.ObjectSHA1, fields["file.sha1"])
