@@ -67,16 +67,15 @@ func NewAPI(myURL *url.URL, version string, roundTripper *badgateway.RoundTrippe
 
 type HandleFunc func(http.ResponseWriter, *http.Request, *Response)
 
-type RemoteObjectStore struct {
-	// GetURL is not used in gitlab-workhorse. We pass it back to gitlab-rails
-	// later for symmetry with the 'store upload in tempfile' approach.
+type RemoteObject struct {
+	// GetURL is an S3 GetObject URL
 	GetURL string
 	// DeleteURL is a presigned S3 RemoveObject URL
 	DeleteURL string
 	// StoreURL is the temporary presigned S3 PutObject URL to which upload the first found file
 	StoreURL string
-	// ObjectID is a unique identifier of object storage upload
-	ObjectID string
+	// ID is a unique identifier of object storage upload
+	ID string
 	// Timeout is a number that represents timeout in seconds for sending data to StoreURL
 	Timeout int
 }
@@ -105,9 +104,9 @@ type Response struct {
 	// TmpPath is the path where we should store temporary files
 	// This is set by authorization middleware
 	TempPath string
-	// ObjectStore is provided by the GitLab Rails application
+	// RemoteObject is provided by the GitLab Rails application
 	// and defines a way to store object on remote storage
-	ObjectStore RemoteObjectStore
+	RemoteObject RemoteObject
 	// Archive is the path where the artifacts archive is stored
 	Archive string `json:"archive"`
 	// Entry is a filename inside the archive point to file that needs to be extracted
