@@ -98,12 +98,6 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 	}()
 
 	if opts.IsRemote() {
-		// Unknown ContentLength must be implemented in order to achieve Artifact Uploading
-		if size == -1 && !opts.isGoogleCloudStorage() {
-			// TODO add support for artifact upload to S3-compatible object storage
-			return nil, errors.New("Not implemented")
-		}
-
 		object, err = objectstore.NewObject(ctx, opts.PresignedPut, opts.PresignedDelete, opts.Timeout, size)
 		if err != nil {
 			return nil, err

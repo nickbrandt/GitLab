@@ -48,6 +48,13 @@ func createTestMultipartForm(t *testing.T, data []byte) (bytes.Buffer, string) {
 	return buffer, writer.FormDataContentType()
 }
 
+func testUploadArtifactsFromTestZip(t *testing.T, ts *httptest.Server) *httptest.ResponseRecorder {
+	archiveData, _ := createTestZipArchive(t)
+	contentBuffer, contentType := createTestMultipartForm(t, archiveData)
+
+	return testUploadArtifacts(contentType, &contentBuffer, t, ts)
+}
+
 func TestUploadHandlerSendingToExternalStorage(t *testing.T) {
 	tempPath, err := ioutil.TempDir("", "uploads")
 	if err != nil {
@@ -123,10 +130,7 @@ func TestUploadHandlerSendingToExternalStorageAndStorageServerUnreachable(t *tes
 	ts := testArtifactsUploadServer(t, authResponse, responseProcessor)
 	defer ts.Close()
 
-	archiveData, _ := createTestZipArchive(t)
-	contentBuffer, contentType := createTestMultipartForm(t, archiveData)
-
-	response := testUploadArtifacts(contentType, &contentBuffer, t, ts)
+	response := testUploadArtifactsFromTestZip(t, ts)
 	testhelper.AssertResponseCode(t, response, 500)
 }
 
@@ -152,10 +156,7 @@ func TestUploadHandlerSendingToExternalStorageAndInvalidURLIsUsed(t *testing.T) 
 	ts := testArtifactsUploadServer(t, authResponse, responseProcessor)
 	defer ts.Close()
 
-	archiveData, _ := createTestZipArchive(t)
-	contentBuffer, contentType := createTestMultipartForm(t, archiveData)
-
-	response := testUploadArtifacts(contentType, &contentBuffer, t, ts)
+	response := testUploadArtifactsFromTestZip(t, ts)
 	testhelper.AssertResponseCode(t, response, 500)
 }
 
@@ -193,10 +194,7 @@ func TestUploadHandlerSendingToExternalStorageAndItReturnsAnError(t *testing.T) 
 	ts := testArtifactsUploadServer(t, authResponse, responseProcessor)
 	defer ts.Close()
 
-	archiveData, _ := createTestZipArchive(t)
-	contentBuffer, contentType := createTestMultipartForm(t, archiveData)
-
-	response := testUploadArtifacts(contentType, &contentBuffer, t, ts)
+	response := testUploadArtifactsFromTestZip(t, ts)
 	testhelper.AssertResponseCode(t, response, 500)
 	assert.Equal(t, 1, putCalledTimes, "upload should be called only once")
 }
@@ -237,10 +235,7 @@ func TestUploadHandlerSendingToExternalStorageAndSupportRequestTimeout(t *testin
 	ts := testArtifactsUploadServer(t, authResponse, responseProcessor)
 	defer ts.Close()
 
-	archiveData, _ := createTestZipArchive(t)
-	contentBuffer, contentType := createTestMultipartForm(t, archiveData)
-
-	response := testUploadArtifacts(contentType, &contentBuffer, t, ts)
+	response := testUploadArtifactsFromTestZip(t, ts)
 	testhelper.AssertResponseCode(t, response, 500)
 	assert.Equal(t, 1, putCalledTimes, "upload should be called only once")
 }

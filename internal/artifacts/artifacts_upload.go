@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -24,28 +23,55 @@ type artifactsUploadProcessor struct {
 	stored       bool
 }
 
-func (a *artifactsUploadProcessor) generateMetadataFromZip(fileName string, metadataFile io.Writer) (bool, error) {
-	// Generate metadata and save to file
-	zipMd := exec.Command("gitlab-zip-metadata", fileName)
+func (a *artifactsUploadProcessor) generateMetadataFromZip(ctx context.Context, file *filestore.FileHandler) (*filestore.FileHandler, error) {
+	metaReader, metaWriter := io.Pipe()
+	defer metaWriter.Close()
+
+	metaOpts := &filestore.SaveFileOpts{
+		LocalTempPath:  a.opts.LocalTempPath,
+		TempFilePrefix: "metadata.gz",
+	}
+
+	fileName := file.LocalPath
+	if fileName == "" {
+		fileName = file.RemoteURL
+	}
+
+	zipMd := exec.CommandContext(ctx, "gitlab-zip-metadata", fileName)
 	zipMd.Stderr = os.Stderr
 	zipMd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	zipMd.Stdout = metadataFile
+	zipMd.Stdout = metaWriter
 
 	if err := zipMd.Start(); err != nil {
-		return false, err
+		return nil, err
 	}
 	defer helper.CleanUpProcessGroup(zipMd)
+
+	type saveResult struct {
+		error
+		*filestore.FileHandler
+	}
+	done := make(chan saveResult)
+	go func() {
+		var result saveResult
+		result.FileHandler, result.error = filestore.SaveFileFromReader(ctx, metaReader, -1, metaOpts)
+
+		done <- result
+	}()
+
 	if err := zipMd.Wait(); err != nil {
 		if st, ok := helper.ExitStatus(err); ok && st == zipartifacts.StatusNotZip {
-			return false, nil
+			return nil, nil
 		}
-		return false, err
+		return nil, err
 	}
 
-	return true, nil
+	metaWriter.Close()
+	result := <-done
+	return result.FileHandler, result.error
 }
 
-func (a *artifactsUploadProcessor) ProcessFile(ctx context.Context, formName, fileName string, writer *multipart.Writer) error {
+func (a *artifactsUploadProcessor) ProcessFile(ctx context.Context, formName string, file *filestore.FileHandler, writer *multipart.Writer) error {
 	//  ProcessFile for artifacts requires file form-data field name to eq `file`
 
 	if formName != "file" {
@@ -55,28 +81,22 @@ func (a *artifactsUploadProcessor) ProcessFile(ctx context.Context, formName, fi
 		return fmt.Errorf("Artifacts request contains more than one file!")
 	}
 
-	// Create temporary file for metadata and store it's path
-	tempFile, err := ioutil.TempFile(a.opts.LocalTempPath, "metadata_")
-	if err != nil {
-		return err
-	}
-	defer tempFile.Close()
+	select {
+	case <-ctx.Done():
+		return fmt.Errorf("ProcessFile: context done")
 
-	a.metadataFile = tempFile.Name()
+	default:
+		// TODO: can we rely on disk for shipping metadata? Not if we split workhorse and rails in 2 different PODs
+		metadata, err := a.generateMetadataFromZip(ctx, file)
+		if err != nil {
+			return fmt.Errorf("generateMetadataFromZip: %v", err)
+		}
 
-	generatedMetadata, err := a.generateMetadataFromZip(fileName, tempFile)
-	if err != nil {
-		return fmt.Errorf("generateMetadataFromZip: %v", err)
-	}
-
-	if generatedMetadata {
-		// Pass metadata file path to Rails
-		writer.WriteField("metadata.path", a.metadataFile)
-		writer.WriteField("metadata.name", "metadata.gz")
-	}
-
-	if err := a.storeFile(ctx, formName, fileName, writer); err != nil {
-		return fmt.Errorf("storeFile: %v", err)
+		if metadata != nil {
+			for k, v := range metadata.GitLabFinalizeFields("metadata") {
+				writer.WriteField(k, v)
+			}
+		}
 	}
 	return nil
 }
@@ -93,12 +113,6 @@ func (a *artifactsUploadProcessor) Name() string {
 	return "artifacts"
 }
 
-func (a *artifactsUploadProcessor) Cleanup() {
-	if a.metadataFile != "" {
-		os.Remove(a.metadataFile)
-	}
-}
-
 func UploadArtifacts(myAPI *api.API, h http.Handler) http.Handler {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		if a.TempPath == "" {
@@ -107,8 +121,7 @@ func UploadArtifacts(myAPI *api.API, h http.Handler) http.Handler {
 		}
 
 		mg := &artifactsUploadProcessor{opts: filestore.GetOpts(a)}
-		defer mg.Cleanup()
 
-		upload.HandleFileUploads(w, r, h, a.TempPath, mg)
+		upload.HandleFileUploads(w, r, h, a, mg)
 	}, "/authorize")
 }

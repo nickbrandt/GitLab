@@ -1,17 +1,24 @@
-package zipartifacts
+package zipartifacts_test
 
 import (
 	"archive/zip"
 	"bytes"
-	"encoding/binary"
+	"compress/gzip"
+	"context"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 )
 
-func TestMissingMetadataEntries(t *testing.T) {
-	var zipBuffer, metaBuffer bytes.Buffer
-
-	archive := zip.NewWriter(&zipBuffer)
+func generateTestArchive(w io.Writer) error {
+	archive := zip.NewWriter(w)
 
 	// non-POSIX paths are here just to test if we never enter infinite loop
 	files := []string{"file1", "some/file/dir/", "some/file/dir/file2", "../../test12/test",
@@ -20,23 +27,78 @@ func TestMissingMetadataEntries(t *testing.T) {
 	for _, file := range files {
 		archiveFile, err := archive.Create(file)
 		if err != nil {
-			t.Fatal(err)
+			return err
 		}
+
 		fmt.Fprint(archiveFile, file)
 	}
 
-	archive.Close()
+	return archive.Close()
+}
 
-	zipReader := bytes.NewReader(zipBuffer.Bytes())
-	zipArchiveReader, _ := zip.NewReader(zipReader, int64(binary.Size(zipBuffer.Bytes())))
-	if err := generateZipMetadata(&metaBuffer, zipArchiveReader); err != nil {
-		t.Fatal("zipartifacts: generateZipMetadata failed", err)
+func validateMetadata(r io.Reader) error {
+	gz, err := gzip.NewReader(r)
+	if err != nil {
+		return err
+	}
+
+	meta, err := ioutil.ReadAll(gz)
+	if err != nil {
+		return err
 	}
 
 	paths := []string{"file1", "some/", "some/file/", "some/file/dir/", "some/file/dir/file2"}
 	for _, path := range paths {
-		if !bytes.Contains(metaBuffer.Bytes(), []byte(path+"\x00")) {
-			t.Fatal("zipartifacts: metadata for path", path, "not found")
+		if !bytes.Contains(meta, []byte(path+"\x00")) {
+			return fmt.Errorf(fmt.Sprintf("zipartifacts: metadata for path %q not found", path))
 		}
 	}
+
+	return nil
+}
+
+func TestGenerateZipMetadataFromFile(t *testing.T) {
+	var metaBuffer bytes.Buffer
+	require := require.New(t)
+
+	f, err := ioutil.TempFile("", "workhorse-metadata.zip-")
+	if f != nil {
+		defer os.Remove(f.Name())
+	}
+	require.NoError(err)
+	defer f.Close()
+
+	err = generateTestArchive(f)
+	require.NoError(err)
+	f.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	archive, err := zipartifacts.OpenArchive(ctx, f.Name())
+	require.NoError(err, "zipartifacts: OpenArchive failed")
+
+	err = zipartifacts.GenerateZipMetadata(&metaBuffer, archive)
+	require.NoError(err, "zipartifacts: GenerateZipMetadata failed")
+
+	err = validateMetadata(&metaBuffer)
+	require.NoError(err)
+}
+
+func TestErrNotAZip(t *testing.T) {
+	f, err := ioutil.TempFile("", "workhorse-metadata.zip-")
+	if f != nil {
+		defer os.Remove(f.Name())
+	}
+	require.NoError(t, err)
+	defer f.Close()
+
+	_, err = fmt.Fprint(f, "Not a zip file")
+	require.NoError(t, err)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	_, err = zipartifacts.OpenArchive(ctx, f.Name())
+	assert.Equal(t, zipartifacts.ErrNotAZip, err, "OpenArchive requires a zip file")
 }

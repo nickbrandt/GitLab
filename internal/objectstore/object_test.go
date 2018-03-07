@@ -97,13 +97,3 @@ func TestObjectUpload404(t *testing.T) {
 	assert.True(isStatusCodeError, "Should fail with StatusCodeError")
 	assert.Contains(err.Error(), "404")
 }
-
-func TestUnknownSizeUpload(t *testing.T) {
-	assert := assert.New(t)
-
-	object, err := objectstore.NewObject(context.Background(), "http://example.com/bucket/object", "", 0, -1)
-	assert.Error(err)
-	_, isMissingContentLengthError := err.(objectstore.MissingContentLengthError)
-	assert.True(isMissingContentLengthError, "Should fail with MissingContentLengthError")
-	assert.Nil(object)
-}

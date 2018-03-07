@@ -6,7 +6,6 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"io"
-	"os"
 	"path"
 	"sort"
 	"strconv"
@@ -60,7 +59,10 @@ func writeZipEntryMetadata(output io.Writer, path string, entry *zip.File) error
 	return nil
 }
 
-func generateZipMetadata(output io.Writer, archive *zip.Reader) error {
+func GenerateZipMetadata(w io.Writer, archive *zip.Reader) error {
+	output := gzip.NewWriter(w)
+	defer output.Close()
+
 	if err := writeString(output, MetadataHeader); err != nil {
 		return err
 	}
@@ -99,20 +101,6 @@ func generateZipMetadata(output io.Writer, archive *zip.Reader) error {
 		}
 	}
 	return nil
-}
-
-func GenerateZipMetadataFromFile(fileName string, w io.Writer) error {
-	archive, err := zip.OpenReader(fileName)
-	if err != nil {
-		// Ignore non-zip archives
-		return os.ErrInvalid
-	}
-	defer archive.Close()
-
-	gz := gzip.NewWriter(w)
-	defer gz.Close()
-
-	return generateZipMetadata(gz, &archive.Reader)
 }
 
 func writeBytes(output io.Writer, data []byte) error {
