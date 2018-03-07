@@ -42,7 +42,6 @@ func IsGoogleCloudStorage(u *url.URL) bool {
 	return strings.ToLower(u.Host) == "storage.googleapis.com"
 }
 
-type MissingContentLengthError error
 type StatusCodeError error
 
 // Object represents an object on a S3 compatible Object Store service.
@@ -79,14 +78,7 @@ func NewObject(ctx context.Context, putURL, deleteURL string, timeout time.Durat
 		objectStorageUploadRequestsRequestFailed.Inc()
 		return nil, fmt.Errorf("PUT %q: %v", helper.ScrubURLParams(o.PutURL), err)
 	}
-	if size == -1 {
-		if !IsGoogleCloudStorage(req.URL) {
-			objectStorageUploadRequestsRequestFailed.Inc()
-			return nil, MissingContentLengthError(fmt.Errorf("Unknown Content-Length not allowed on %s", req.URL.Host))
-		}
-	} else {
-		req.ContentLength = size
-	}
+	req.ContentLength = size
 	req.Header.Set("Content-Type", "application/octet-stream")
 
 	if timeout == 0 {

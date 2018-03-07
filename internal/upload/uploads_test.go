@@ -16,7 +16,9 @@ import (
 	"testing"
 	"time"
 
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
@@ -26,8 +28,8 @@ var nilHandler = http.HandlerFunc(func(http.ResponseWriter, *http.Request) {})
 
 type testFormProcessor struct{}
 
-func (a *testFormProcessor) ProcessFile(ctx context.Context, formName, fileName string, writer *multipart.Writer) error {
-	if formName != "file" && fileName != "my.file" {
+func (a *testFormProcessor) ProcessFile(ctx context.Context, formName string, file *filestore.FileHandler, writer *multipart.Writer) error {
+	if formName != "file" && file.LocalPath != "my.file" {
 		return errors.New("illegal file")
 	}
 	return nil
@@ -54,7 +56,7 @@ func TestUploadTempPathRequirement(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	HandleFileUploads(response, request, nilHandler, "", nil)
+	HandleFileUploads(response, request, nilHandler, &api.Response{}, nil)
 	testhelper.AssertResponseCode(t, response, 500)
 }
 
@@ -89,7 +91,7 @@ func TestUploadHandlerForwardingRawData(t *testing.T) {
 	response := httptest.NewRecorder()
 
 	handler := newProxy(ts.URL)
-	HandleFileUploads(response, httpRequest, handler, tempPath, nil)
+	HandleFileUploads(response, httpRequest, handler, &api.Response{TempPath: tempPath}, nil)
 	testhelper.AssertResponseCode(t, response, 202)
 	if response.Body.String() != "RESPONSE" {
 		t.Fatal("Expected RESPONSE in response body")
@@ -115,30 +117,25 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if len(r.MultipartForm.Value) != 8 {
-			t.Fatal("Expected to receive exactly 8 values")
-		}
-
 		if len(r.MultipartForm.File) != 0 {
-			t.Fatal("Expected to not receive any files")
+			t.Error("Expected to not receive any files")
 		}
 
 		if r.FormValue("token") != "test" {
-			t.Fatal("Expected to receive token")
+			t.Error("Expected to receive token")
 		}
 
 		if r.FormValue("file.name") != "my.file" {
-			t.Fatal("Expected to receive a filename")
+			t.Error("Expected to receive a filename")
 		}
 
 		filePath = r.FormValue("file.path")
-
-		if !strings.HasPrefix(r.FormValue("file.path"), tempPath) {
-			t.Fatal("Expected to the file to be in tempPath")
+		if !strings.HasPrefix(filePath, tempPath) {
+			t.Error("Expected to the file to be in tempPath")
 		}
 
 		if r.FormValue("file.size") != "4" {
-			t.Fatal("Expected to receive the file size")
+			t.Error("Expected to receive the file size")
 		}
 
 		hashes := map[string]string{
@@ -150,8 +147,12 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 
 		for algo, hash := range hashes {
 			if r.FormValue("file."+algo) != hash {
-				t.Fatalf("Expected to receive file %s hash", algo)
+				t.Errorf("Expected to receive file %s hash", algo)
 			}
+		}
+
+		if valueCnt := len(r.MultipartForm.Value); valueCnt != 8 {
+			t.Fatal("Expected to receive exactly 8 values but got", valueCnt)
 		}
 
 		w.WriteHeader(202)
@@ -182,7 +183,7 @@ func TestUploadHandlerRewritingMultiPartData(t *testing.T) {
 	response := httptest.NewRecorder()
 
 	handler := newProxy(ts.URL)
-	HandleFileUploads(response, httpRequest, handler, tempPath, &testFormProcessor{})
+	HandleFileUploads(response, httpRequest, handler, &api.Response{TempPath: tempPath}, &testFormProcessor{})
 	testhelper.AssertResponseCode(t, response, 202)
 
 	cancel() // this will trigger an async cleanup
@@ -221,7 +222,7 @@ func TestUploadProcessingField(t *testing.T) {
 	httpRequest.Header.Set("Content-Type", writer.FormDataContentType())
 
 	response := httptest.NewRecorder()
-	HandleFileUploads(response, httpRequest, nilHandler, tempPath, &testFormProcessor{})
+	HandleFileUploads(response, httpRequest, nilHandler, &api.Response{TempPath: tempPath}, &testFormProcessor{})
 	testhelper.AssertResponseCode(t, response, 500)
 }
 
@@ -249,7 +250,7 @@ func TestUploadProcessingFile(t *testing.T) {
 	httpRequest.Header.Set("Content-Type", writer.FormDataContentType())
 
 	response := httptest.NewRecorder()
-	HandleFileUploads(response, httpRequest, nilHandler, tempPath, &testFormProcessor{})
+	HandleFileUploads(response, httpRequest, nilHandler, &api.Response{TempPath: tempPath}, &testFormProcessor{})
 	testhelper.AssertResponseCode(t, response, 500)
 }
 
@@ -289,7 +290,7 @@ func TestInvalidFileNames(t *testing.T) {
 		httpRequest.Header.Set("Content-Type", writer.FormDataContentType())
 
 		response := httptest.NewRecorder()
-		HandleFileUploads(response, httpRequest, nilHandler, tempPath, &savedFileTracker{request: httpRequest})
+		HandleFileUploads(response, httpRequest, nilHandler, &api.Response{TempPath: tempPath}, &savedFileTracker{request: httpRequest})
 		testhelper.AssertResponseCode(t, response, testCase.code)
 	}
 }

@@ -10,6 +10,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
 )
 
@@ -41,9 +42,9 @@ var (
 )
 
 type rewriter struct {
-	writer   *multipart.Writer
-	tempPath string
-	filter   MultipartFormProcessor
+	writer  *multipart.Writer
+	preauth *api.Response
+	filter  MultipartFormProcessor
 }
 
 func init() {
@@ -52,7 +53,7 @@ func init() {
 	prometheus.MustRegister(multipartFiles)
 }
 
-func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, tempPath string, filter MultipartFormProcessor) error {
+func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, preauth *api.Response, filter MultipartFormProcessor) error {
 	// Create multipart reader
 	reader, err := r.MultipartReader()
 	if err != nil {
@@ -66,9 +67,9 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 	multipartUploadRequests.WithLabelValues(filter.Name()).Inc()
 
 	rew := &rewriter{
-		writer:   writer,
-		tempPath: tempPath,
-		filter:   filter,
+		writer:  writer,
+		preauth: preauth,
+		filter:  filter,
 	}
 
 	for {
@@ -88,7 +89,6 @@ func rewriteFormFilesFromMultipart(r *http.Request, writer *multipart.Writer, te
 		// Copy form field
 		if p.FileName() != "" {
 			err = rew.handleFilePart(r.Context(), name, p)
-
 		} else {
 			err = rew.copyPart(r.Context(), name, p)
 		}
@@ -110,10 +110,8 @@ func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipa
 		return fmt.Errorf("illegal filename: %q", filename)
 	}
 
-	opts := &filestore.SaveFileOpts{
-		LocalTempPath:  rew.tempPath,
-		TempFilePrefix: filename,
-	}
+	opts := filestore.GetOpts(rew.preauth)
+	opts.TempFilePrefix = filename
 
 	fh, err := filestore.SaveFileFromReader(ctx, p, -1, opts)
 	if err != nil {
@@ -126,7 +124,7 @@ func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipa
 
 	multipartFileUploadBytes.WithLabelValues(rew.filter.Name()).Add(float64(fh.Size))
 
-	return rew.filter.ProcessFile(ctx, name, fh.LocalPath, rew.writer)
+	return rew.filter.ProcessFile(ctx, name, fh, rew.writer)
 }
 
 func (rew *rewriter) copyPart(ctx context.Context, name string, p *multipart.Part) error {

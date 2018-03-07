@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -27,11 +28,24 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Usage: %s FILE.ZIP\n", progName)
 		os.Exit(1)
 	}
-	if err := zipartifacts.GenerateZipMetadataFromFile(os.Args[1], os.Stdout); err != nil {
-		fmt.Fprintf(os.Stderr, "%s: %v\n", progName, err)
-		if err == os.ErrInvalid {
-			os.Exit(zipartifacts.StatusNotZip)
-		}
-		os.Exit(1)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	archive, err := zipartifacts.OpenArchive(ctx, os.Args[1])
+	if err != nil {
+		fatalError(err)
 	}
+
+	if err := zipartifacts.GenerateZipMetadata(os.Stdout, archive); err != nil {
+		fatalError(err)
+	}
+}
+
+func fatalError(err error) {
+	fmt.Fprintf(os.Stderr, "%s: %v\n", progName, err)
+	if err == zipartifacts.ErrNotAZip {
+		os.Exit(zipartifacts.StatusNotZip)
+	}
+	os.Exit(1)
 }

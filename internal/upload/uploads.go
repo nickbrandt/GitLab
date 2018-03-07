@@ -8,19 +8,21 @@ import (
 	"mime/multipart"
 	"net/http"
 
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
 // These methods are allowed to have thread-unsafe implementations.
 type MultipartFormProcessor interface {
-	ProcessFile(ctx context.Context, formName, fileName string, writer *multipart.Writer) error
+	ProcessFile(ctx context.Context, formName string, file *filestore.FileHandler, writer *multipart.Writer) error
 	ProcessField(ctx context.Context, formName string, writer *multipart.Writer) error
 	Finalize(ctx context.Context) error
 	Name() string
 }
 
-func HandleFileUploads(w http.ResponseWriter, r *http.Request, h http.Handler, tempPath string, filter MultipartFormProcessor) {
-	if tempPath == "" {
+func HandleFileUploads(w http.ResponseWriter, r *http.Request, h http.Handler, preauth *api.Response, filter MultipartFormProcessor) {
+	if preauth.TempPath == "" {
 		helper.Fail500(w, r, fmt.Errorf("handleFileUploads: tempPath empty"))
 		return
 	}
@@ -30,7 +32,7 @@ func HandleFileUploads(w http.ResponseWriter, r *http.Request, h http.Handler, t
 	defer writer.Close()
 
 	// Rewrite multipart form data
-	err := rewriteFormFilesFromMultipart(r, writer, tempPath, filter)
+	err := rewriteFormFilesFromMultipart(r, writer, preauth, filter)
 	if err != nil {
 		if err == http.ErrNotMultipart {
 			h.ServeHTTP(w, r)

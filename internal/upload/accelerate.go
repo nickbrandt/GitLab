@@ -6,6 +6,8 @@ import (
 	"mime/multipart"
 	"net/http"
 
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -24,17 +26,19 @@ type MultipartClaims struct {
 }
 
 func Accelerate(tempDir string, h http.Handler) http.Handler {
+	// TODO: for Object Store this will need a authorize call
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		localOnlyPreAuth := &api.Response{TempPath: tempDir}
 		s := &savedFileTracker{request: r}
-		HandleFileUploads(w, r, h, tempDir, s)
+		HandleFileUploads(w, r, h, localOnlyPreAuth, s)
 	})
 }
 
-func (s *savedFileTracker) ProcessFile(_ context.Context, fieldName, fileName string, _ *multipart.Writer) error {
+func (s *savedFileTracker) ProcessFile(_ context.Context, fieldName string, file *filestore.FileHandler, _ *multipart.Writer) error {
 	if s.rewrittenFields == nil {
 		s.rewrittenFields = make(map[string]string)
 	}
-	s.rewrittenFields[fieldName] = fileName
+	s.rewrittenFields[fieldName] = file.LocalPath
 	return nil
 }
 
