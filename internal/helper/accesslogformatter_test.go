@@ -43,7 +43,7 @@ func TestAccessLogFormatter_Format(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			f := &accessLogFormatter{clock: &StubClock{time.Unix(1515283200, 0)}}
+			f := &accessLogFormatter{clock: &StubClock{time.Unix(1515283200, 0).UTC()}}
 
 			got, err := f.Format(tt.entry)
 			if err != nil {
