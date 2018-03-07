@@ -2,6 +2,11 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 4.0.0
+
+- Handle Object Store upload in upload.HandleFileUploads !238
+- More consistent API naming. ObjectStore -> RemoteObject !240
+
 v3.8.0
 
 - Add structured logging !236
