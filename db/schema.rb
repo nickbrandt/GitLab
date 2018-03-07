@@ -1955,6 +1955,7 @@ ActiveRecord::Schema.define(version: 20180307012445) do
     t.integer "jobs_cache_index"
     t.boolean "mirror_overwrites_diverged_branches"
     t.string "external_authorization_classification_label"
+    t.string "external_webhook_token"
   end
 
   add_index "projects", ["ci_id"], name: "index_projects_on_ci_id", using: :btree
