@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-05 14:35-0600\n"
-"PO-Revision-Date: 2018-03-05 14:35-0600\n"
+"POT-Creation-Date: 2018-03-08 09:20+0100\n"
+"PO-Revision-Date: 2018-03-08 09:20+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -31,6 +31,11 @@ msgid_plural "%d commits behind"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d exporter"
+msgid_plural "%d exporters"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d issue"
 msgid_plural "%d issues"
 msgstr[0] ""
@@ -43,6 +48,11 @@ msgstr[1] ""
 
 msgid "%d merge request"
 msgid_plural "%d merge requests"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "%d metric"
+msgid_plural "%d metrics"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -61,6 +71,9 @@ msgid "%{count} participant"
 msgid_plural "%{count} participants"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "%{loadingIcon} Started"
+msgstr ""
 
 msgid "%{lock_path} is locked by GitLab User %{lock_user_id}"
 msgstr ""
@@ -106,6 +119,9 @@ msgid "2FA enabled"
 msgstr ""
 
 msgid "A collection of graphs regarding Continuous Integration"
+msgstr ""
+
+msgid "A new branch will be created in your fork and a new merge request will be started."
 msgstr ""
 
 msgid "A project is where you house your files (repository), plan your work (issues), and publish your documentation (wiki), %{among_other_things_link}."
@@ -223,6 +239,9 @@ msgid "All changes are committed"
 msgstr ""
 
 msgid "All features are enabled for blank projects, from templates, or when importing, but you can disable them afterward in the project settings."
+msgstr ""
+
+msgid "Allow edits from maintainers"
 msgstr ""
 
 msgid "Allows you to add and manage Kubernetes clusters."
@@ -509,6 +528,15 @@ msgstr ""
 msgid "Branches"
 msgstr ""
 
+msgid "Branches|Active"
+msgstr ""
+
+msgid "Branches|Active branches"
+msgstr ""
+
+msgid "Branches|All"
+msgstr ""
+
 msgid "Branches|Cant find HEAD commit for this branch"
 msgstr ""
 
@@ -554,10 +582,37 @@ msgstr ""
 msgid "Branches|Only a project master or owner can delete a protected branch"
 msgstr ""
 
-msgid "Branches|Protected branches can be managed in %{project_settings_link}"
+msgid "Branches|Overview"
+msgstr ""
+
+msgid "Branches|Protected branches can be managed in %{project_settings_link}."
+msgstr ""
+
+msgid "Branches|Show active branches"
+msgstr ""
+
+msgid "Branches|Show all branches"
+msgstr ""
+
+msgid "Branches|Show more active branches"
+msgstr ""
+
+msgid "Branches|Show more stale branches"
+msgstr ""
+
+msgid "Branches|Show overview of the branches"
+msgstr ""
+
+msgid "Branches|Show stale branches"
 msgstr ""
 
 msgid "Branches|Sort by"
+msgstr ""
+
+msgid "Branches|Stale"
+msgstr ""
+
+msgid "Branches|Stale branches"
 msgstr ""
 
 msgid "Branches|The branch could not be updated automatically because it has diverged from its upstream counterpart."
@@ -603,6 +658,9 @@ msgid "Browse Files"
 msgstr ""
 
 msgid "Browse files"
+msgstr ""
+
+msgid "Business"
 msgstr ""
 
 msgid "ByAuthor|by"
@@ -896,6 +954,9 @@ msgstr ""
 msgid "ClusterIntegration|Helm Tiller"
 msgstr ""
 
+msgid "ClusterIntegration|In order to show the health of the cluster, we'll need to provision your cluster with Prometheus to collect the required data."
+msgstr ""
+
 msgid "ClusterIntegration|Ingress"
 msgstr ""
 
@@ -903,6 +964,9 @@ msgid "ClusterIntegration|Ingress IP Address"
 msgstr ""
 
 msgid "ClusterIntegration|Install"
+msgstr ""
+
+msgid "ClusterIntegration|Install Prometheus"
 msgstr ""
 
 msgid "ClusterIntegration|Installed"
@@ -921,6 +985,9 @@ msgid "ClusterIntegration|Kubernetes cluster"
 msgstr ""
 
 msgid "ClusterIntegration|Kubernetes cluster details"
+msgstr ""
+
+msgid "ClusterIntegration|Kubernetes cluster health"
 msgstr ""
 
 msgid "ClusterIntegration|Kubernetes cluster integration"
@@ -954,6 +1021,9 @@ msgid "ClusterIntegration|Learn more about %{link_to_documentation}"
 msgstr ""
 
 msgid "ClusterIntegration|Learn more about environments"
+msgstr ""
+
+msgid "ClusterIntegration|Learn more about security configuration"
 msgstr ""
 
 msgid "ClusterIntegration|Machine type"
@@ -1016,6 +1086,9 @@ msgstr ""
 msgid "ClusterIntegration|Save changes"
 msgstr ""
 
+msgid "ClusterIntegration|Security"
+msgstr ""
+
 msgid "ClusterIntegration|See and edit the details for your Kubernetes cluster"
 msgstr ""
 
@@ -1041,6 +1114,9 @@ msgid "ClusterIntegration|Something went wrong while creating your Kubernetes cl
 msgstr ""
 
 msgid "ClusterIntegration|Something went wrong while installing %{title}"
+msgstr ""
+
+msgid "ClusterIntegration|The default cluster configuration grants access to a wide set of functionalities needed to successfully build and deploy a containerised application."
 msgstr ""
 
 msgid "ClusterIntegration|This account must have permissions to create a Kubernetes cluster in the %{link_to_container_project} specified below"
@@ -1243,6 +1319,9 @@ msgid "ContainerRegistry|Use different image names"
 msgstr ""
 
 msgid "ContainerRegistry|With the Docker Container Registry integrated into GitLab, every project can have its own space to store its Docker images."
+msgstr ""
+
+msgid "Contribution"
 msgstr ""
 
 msgid "Contribution guide"
@@ -1703,6 +1782,9 @@ msgstr ""
 msgid "Find file"
 msgstr ""
 
+msgid "Finished"
+msgstr ""
+
 msgid "FirstPushedBy|First"
 msgstr ""
 
@@ -1753,6 +1835,9 @@ msgstr ""
 msgid "GeoNodeSyncStatus|Node is slow, overloaded, or it just recovered after an outage."
 msgstr ""
 
+msgid "GeoNodes|Checksummed"
+msgstr ""
+
 msgid "GeoNodes|Database replication lag:"
 msgstr ""
 
@@ -1798,7 +1883,19 @@ msgstr ""
 msgid "GeoNodes|New node"
 msgstr ""
 
+msgid "GeoNodes|Node Authentication was successfully repaired."
+msgstr ""
+
+msgid "GeoNodes|Node was successfully removed."
+msgstr ""
+
+msgid "GeoNodes|Not checksummed"
+msgstr ""
+
 msgid "GeoNodes|Out of sync"
+msgstr ""
+
+msgid "GeoNodes|Removing a node stops the sync process. Are you sure?"
 msgstr ""
 
 msgid "GeoNodes|Replication slot WAL:"
@@ -1807,10 +1904,25 @@ msgstr ""
 msgid "GeoNodes|Replication slots:"
 msgstr ""
 
+msgid "GeoNodes|Repositories checksummed:"
+msgstr ""
+
 msgid "GeoNodes|Repositories:"
 msgstr ""
 
+msgid "GeoNodes|Repository checksums verified:"
+msgstr ""
+
 msgid "GeoNodes|Selective"
+msgstr ""
+
+msgid "GeoNodes|Something went wrong while changing node status"
+msgstr ""
+
+msgid "GeoNodes|Something went wrong while removing node"
+msgstr ""
+
+msgid "GeoNodes|Something went wrong while repairing node"
 msgstr ""
 
 msgid "GeoNodes|Storage config:"
@@ -1825,7 +1937,19 @@ msgstr ""
 msgid "GeoNodes|Unused slots"
 msgstr ""
 
+msgid "GeoNodes|Unverified"
+msgstr ""
+
 msgid "GeoNodes|Used slots"
+msgstr ""
+
+msgid "GeoNodes|Verified"
+msgstr ""
+
+msgid "GeoNodes|Wiki checksums verified:"
+msgstr ""
+
+msgid "GeoNodes|Wikis checksummed:"
 msgstr ""
 
 msgid "GeoNodes|Wikis:"
@@ -2010,6 +2134,9 @@ msgstr ""
 msgid "Housekeeping successfully started"
 msgstr ""
 
+msgid "If using GitHub, you’ll see pipeline statuses on GitHub for your commits and pull requests. %{more_info_link}"
+msgstr ""
+
 msgid "If you already have files you can push them using the %{link_to_cli} below."
 msgstr ""
 
@@ -2055,6 +2182,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "Instance does not support multiple Kubernetes clusters"
+msgstr ""
+
+msgid "Integrations"
 msgstr ""
 
 msgid "Interested parties can even contribute by pushing commits if they want to."
@@ -2153,7 +2283,16 @@ msgstr ""
 msgid "Labels"
 msgstr ""
 
+msgid "Labels can be applied to %{features}. Group labels are available for any project within the group."
+msgstr ""
+
 msgid "Labels can be applied to issues and merge requests to categorize them."
+msgstr ""
+
+msgid "Labels|Promote Label"
+msgstr ""
+
+msgid "Labels|Promote label %{labelTitle} to Group Label?"
 msgstr ""
 
 msgid "Last %d day"
@@ -2293,6 +2432,75 @@ msgstr ""
 msgid "Messages"
 msgstr ""
 
+msgid "Metrics|Business"
+msgstr ""
+
+msgid "Metrics|Create metric"
+msgstr ""
+
+msgid "Metrics|Edit metric"
+msgstr ""
+
+msgid "Metrics|For grouping similar metrics"
+msgstr ""
+
+msgid "Metrics|Label of the chart's vertical axis. Usually the type of the unit being charted. The horizontal axis (X-axis) always represents time."
+msgstr ""
+
+msgid "Metrics|Legend label (optional)"
+msgstr ""
+
+msgid "Metrics|Must be a valid PromQL query."
+msgstr ""
+
+msgid "Metrics|Name"
+msgstr ""
+
+msgid "Metrics|New metric"
+msgstr ""
+
+msgid "Metrics|Prometheus Query Documentation"
+msgstr ""
+
+msgid "Metrics|Query"
+msgstr ""
+
+msgid "Metrics|Response"
+msgstr ""
+
+msgid "Metrics|System"
+msgstr ""
+
+msgid "Metrics|Type"
+msgstr ""
+
+msgid "Metrics|Unit label"
+msgstr ""
+
+msgid "Metrics|Used as a title for the chart"
+msgstr ""
+
+msgid "Metrics|Used if the query returns a single series. If it returns multiple series, their legend labels will be picked up from the response."
+msgstr ""
+
+msgid "Metrics|Y-axis label"
+msgstr ""
+
+msgid "Metrics|e.g. HTTP requests"
+msgstr ""
+
+msgid "Metrics|e.g. Requests/second"
+msgstr ""
+
+msgid "Metrics|e.g. Throughput"
+msgstr ""
+
+msgid "Metrics|e.g. rate(http_requests_total[5m])"
+msgstr ""
+
+msgid "Metrics|e.g. req/sec"
+msgstr ""
+
 msgid "Milestone"
 msgstr ""
 
@@ -2308,6 +2516,12 @@ msgstr ""
 msgid "Milestones|Milestone %{milestoneTitle} was not found"
 msgstr ""
 
+msgid "Milestones|Promote %{milestoneTitle} to group milestone?"
+msgstr ""
+
+msgid "Milestones|Promote Milestone"
+msgstr ""
+
 msgid "MissingSSHKeyWarningLink|add an SSH key"
 msgstr ""
 
@@ -2318,6 +2532,9 @@ msgid "Modal|Close"
 msgstr ""
 
 msgid "Monitoring"
+msgstr ""
+
+msgid "More info"
 msgstr ""
 
 msgid "More information"
@@ -2394,6 +2611,9 @@ msgstr ""
 msgid "New tag"
 msgstr ""
 
+msgid "No Label"
+msgstr ""
+
 msgid "No assignee"
 msgstr ""
 
@@ -2412,6 +2632,9 @@ msgstr ""
 msgid "No file chosen"
 msgstr ""
 
+msgid "No labels created yet."
+msgstr ""
+
 msgid "No repository"
 msgstr ""
 
@@ -2425,6 +2648,12 @@ msgid "Not allowed to merge"
 msgstr ""
 
 msgid "Not available"
+msgstr ""
+
+msgid "Not available for private projects"
+msgstr ""
+
+msgid "Not available for protected branches"
 msgstr ""
 
 msgid "Not confidential"
@@ -2577,6 +2806,9 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
+msgid "Pending"
+msgstr ""
+
 msgid "Personal Access Token"
 msgstr ""
 
@@ -2661,7 +2893,28 @@ msgstr ""
 msgid "Pipelines|Build with confidence"
 msgstr ""
 
+msgid "Pipelines|CI Lint"
+msgstr ""
+
+msgid "Pipelines|Clear Runner Caches"
+msgstr ""
+
 msgid "Pipelines|Get started with Pipelines"
+msgstr ""
+
+msgid "Pipelines|Loading Pipelines"
+msgstr ""
+
+msgid "Pipelines|Run Pipeline"
+msgstr ""
+
+msgid "Pipelines|There are currently no %{scope} pipelines."
+msgstr ""
+
+msgid "Pipelines|There are currently no pipelines."
+msgstr ""
+
+msgid "Pipelines|This project is not currently set up to run pipelines."
 msgstr ""
 
 msgid "Pipeline|Retry pipeline"
@@ -2886,6 +3139,12 @@ msgstr ""
 msgid "ProjectsDropdown|This feature requires browser localStorage support"
 msgstr ""
 
+msgid "PrometheusService|%{exporters} with %{metrics} were found"
+msgstr ""
+
+msgid "PrometheusService|<p class=\"text-tertiary\">No <a href=\"%{docsUrl}\">common metrics</a> were found</p>"
+msgstr ""
+
 msgid "PrometheusService|Active"
 msgstr ""
 
@@ -2898,7 +3157,19 @@ msgstr ""
 msgid "PrometheusService|By default, Prometheus listens on ‘http://localhost:9090’. It’s not recommended to change the default address and port as this might affect or conflict with other services running on the GitLab server."
 msgstr ""
 
+msgid "PrometheusService|Common metrics"
+msgstr ""
+
+msgid "PrometheusService|Common metrics are automatically monitored based on a library of metrics from popular exporters."
+msgstr ""
+
+msgid "PrometheusService|Custom metrics"
+msgstr ""
+
 msgid "PrometheusService|Finding and configuring metrics..."
+msgstr ""
+
+msgid "PrometheusService|Finding custom metrics..."
 msgstr ""
 
 msgid "PrometheusService|Install Prometheus on clusters"
@@ -2913,25 +3184,22 @@ msgstr ""
 msgid "PrometheusService|Metrics"
 msgstr ""
 
-msgid "PrometheusService|Metrics are automatically configured and monitored based on a library of metrics from popular exporters."
-msgstr ""
-
 msgid "PrometheusService|Missing environment variable"
-msgstr ""
-
-msgid "PrometheusService|Monitored"
 msgstr ""
 
 msgid "PrometheusService|More information"
 msgstr ""
 
-msgid "PrometheusService|No metrics are being monitored. To start monitoring, deploy to an environment."
+msgid "PrometheusService|New metric"
 msgstr ""
 
 msgid "PrometheusService|Prometheus API Base URL, like http://prometheus.example.com/"
 msgstr ""
 
 msgid "PrometheusService|Prometheus is being automatically managed on your clusters"
+msgstr ""
+
+msgid "PrometheusService|These metrics will only be monitored after your first deployment to an environment"
 msgstr ""
 
 msgid "PrometheusService|Time-series monitoring service"
@@ -2943,7 +3211,16 @@ msgstr ""
 msgid "PrometheusService|To enable the installation of Prometheus on your clusters, deactivate the manual configuration below"
 msgstr ""
 
-msgid "PrometheusService|View environments"
+msgid "PrometheusService|Waiting for your first deployment to an environment to find common metrics"
+msgstr ""
+
+msgid "Promote"
+msgstr ""
+
+msgid "Promote to Group Label"
+msgstr ""
+
+msgid "Promote to Group Milestone"
 msgstr ""
 
 msgid "Protip:"
@@ -3051,6 +3328,9 @@ msgstr ""
 msgid "Resolve discussion"
 msgstr ""
 
+msgid "Response"
+msgstr ""
+
 msgid "Reveal value"
 msgid_plural "Reveal values"
 msgstr[0] ""
@@ -3066,6 +3346,9 @@ msgid "Roadmap"
 msgstr ""
 
 msgid "Run CI/CD pipelines for external repositories"
+msgstr ""
+
+msgid "Running"
 msgstr ""
 
 msgid "SSH Keys"
@@ -3400,6 +3683,9 @@ msgstr ""
 msgid "Switch branch/tag"
 msgstr ""
 
+msgid "System"
+msgstr ""
+
 msgid "System Hooks"
 msgstr ""
 
@@ -3655,6 +3941,9 @@ msgid "This project"
 msgstr ""
 
 msgid "This repository"
+msgstr ""
+
+msgid "This will delete the custom metric, Are you sure?"
 msgstr ""
 
 msgid "Those emails automatically become issues (with the comments becoming the email conversation) listed here."
@@ -4120,13 +4409,13 @@ msgstr ""
 msgid "You are going to remove %{group_name}. Removed groups CANNOT be restored! Are you ABSOLUTELY sure?"
 msgstr ""
 
-msgid "You are going to remove %{project_name_with_namespace}. Removed project CANNOT be restored! Are you ABSOLUTELY sure?"
+msgid "You are going to remove %{project_full_name}. Removed project CANNOT be restored! Are you ABSOLUTELY sure?"
 msgstr ""
 
 msgid "You are going to remove the fork relationship to source project %{forked_from_project}. Are you ABSOLUTELY sure?"
 msgstr ""
 
-msgid "You are going to transfer %{project_name_with_namespace} to another owner. Are you ABSOLUTELY sure?"
+msgid "You are going to transfer %{project_full_name} to another owner. Are you ABSOLUTELY sure?"
 msgstr ""
 
 msgid "You can also create a project from the command line."
@@ -4202,6 +4491,9 @@ msgid "You'll need to use different branch names to get a valid comparison."
 msgstr ""
 
 msgid "Your Kubernetes cluster information on this page is still editable, but you are advised to disable and reconfigure"
+msgstr ""
+
+msgid "Your changes can be committed to %{branch_name} because a merge request is open."
 msgstr ""
 
 msgid "Your changes have been committed. Commit %{commitId} %{commitStats}"
@@ -4335,6 +4627,9 @@ msgid "mrWidget| Please restore it or use a different %{missingBranchName} branc
 msgstr ""
 
 msgid "mrWidget|Add approval"
+msgstr ""
+
+msgid "mrWidget|Allows edits from maintainers"
 msgstr ""
 
 msgid "mrWidget|An error occured while removing your approval."
