@@ -32,25 +32,40 @@ describe 'User approves a merge request', :js do
     before do
       project.add_developer(user2)
       project.add_developer(user3)
-      visit(merge_request_path(merge_request))
     end
 
     it 'shows multiple approvers beyond the needed count' do
+      visit(merge_request_path(merge_request))
+
       click_button('Approve')
       wait_for_requests
 
       sign_out(user)
 
-      sign_in_visit_merge_request(user2)
-      sign_in_visit_merge_request(user3)
+      sign_in_visit_merge_request(user2, true)
+      sign_in_visit_merge_request(user3, true)
 
       expect(all('.js-approver-list-member').count).to eq(3)
     end
 
-    def sign_in_visit_merge_request(user)
+    it "doesn't show the add approval when a merge request is closed" do
+      merge_request_closed = create(:merge_request, :closed, source_project: project, target_project: project)
+      create(:approval, merge_request: merge_request_closed, user: user)
+
+      sign_in(user2)
+
+      visit(merge_request_path(merge_request_closed))
+      wait_for_requests
+
+      expect(page).not_to have_button('Approve')
+      expect(page).not_to have_button('Add approval')
+    end
+
+    def sign_in_visit_merge_request(user, additional_approver = false)
       sign_in(user)
       visit(merge_request_path(merge_request))
-      click_button('Approve')
+      button_text = additional_approver ? 'Add approval' : 'Approve'
+      click_button(button_text)
       wait_for_requests
       sign_out(user)
     end

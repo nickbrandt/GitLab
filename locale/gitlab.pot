@@ -3759,6 +3759,27 @@ msgid_plural "merge requests"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "mrWidget| Please restore it or use a different %{missingBranchName} branch"
+msgstr ""
+
+msgid "mrWidget|An error occured while removing your approval."
+msgstr ""
+
+msgid "mrWidget|An error occured while retrieving approval data for this merge request."
+msgstr ""
+
+msgid "mrWidget|An error occured while submitting your approval."
+msgstr ""
+
+msgid "mrWidget|Approve"
+msgstr ""
+
+msgid "mrWidget|Add approval"
+msgstr ""
+
+msgid "mrWidget|Approved by"
+msgstr ""
+
 msgid "mrWidget|Cancel automatic merge"
 msgstr ""
 
