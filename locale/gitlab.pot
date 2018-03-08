@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-05 14:09-0600\n"
-"PO-Revision-Date: 2018-03-05 14:09-0600\n"
+"POT-Creation-Date: 2018-03-08 00:12+0100\n"
+"PO-Revision-Date: 2018-03-08 00:12+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -62,6 +62,9 @@ msgid_plural "%{count} participants"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%{loadingIcon} Started"
+msgstr ""
+
 msgid "%{lock_path} is locked by GitLab User %{lock_user_id}"
 msgstr ""
 
@@ -106,6 +109,9 @@ msgid "2FA enabled"
 msgstr ""
 
 msgid "A collection of graphs regarding Continuous Integration"
+msgstr ""
+
+msgid "A new branch will be created in your fork and a new merge request will be started."
 msgstr ""
 
 msgid "A project is where you house your files (repository), plan your work (issues), and publish your documentation (wiki), %{among_other_things_link}."
@@ -225,7 +231,16 @@ msgstr ""
 msgid "All features are enabled for blank projects, from templates, or when importing, but you can disable them afterward in the project settings."
 msgstr ""
 
+msgid "Allow edits from maintainers"
+msgstr ""
+
 msgid "Allows you to add and manage Kubernetes clusters."
+msgstr ""
+
+msgid "Alternatively, you can use a %{personal_access_token_link}. When you create your Personal Access Token, you will need to select the <code>repo</code> scope, so we can display a list of your public and private repositories which are available to connect."
+msgstr ""
+
+msgid "Alternatively, you can use a %{personal_access_token_link}. When you create your Personal Access Token, you will need to select the <code>repo</code> scope, so we can display a list of your public and private repositories which are available to import."
 msgstr ""
 
 msgid "An error occurred previewing the blob"
@@ -503,6 +518,15 @@ msgstr ""
 msgid "Branches"
 msgstr ""
 
+msgid "Branches|Active"
+msgstr ""
+
+msgid "Branches|Active branches"
+msgstr ""
+
+msgid "Branches|All"
+msgstr ""
+
 msgid "Branches|Cant find HEAD commit for this branch"
 msgstr ""
 
@@ -548,10 +572,37 @@ msgstr ""
 msgid "Branches|Only a project master or owner can delete a protected branch"
 msgstr ""
 
-msgid "Branches|Protected branches can be managed in %{project_settings_link}"
+msgid "Branches|Overview"
+msgstr ""
+
+msgid "Branches|Protected branches can be managed in %{project_settings_link}."
+msgstr ""
+
+msgid "Branches|Show active branches"
+msgstr ""
+
+msgid "Branches|Show all branches"
+msgstr ""
+
+msgid "Branches|Show more active branches"
+msgstr ""
+
+msgid "Branches|Show more stale branches"
+msgstr ""
+
+msgid "Branches|Show overview of the branches"
+msgstr ""
+
+msgid "Branches|Show stale branches"
 msgstr ""
 
 msgid "Branches|Sort by"
+msgstr ""
+
+msgid "Branches|Stale"
+msgstr ""
+
+msgid "Branches|Stale branches"
 msgstr ""
 
 msgid "Branches|The branch could not be updated automatically because it has diverged from its upstream counterpart."
@@ -681,6 +732,12 @@ msgid "Choose file..."
 msgstr ""
 
 msgid "Choose which groups you wish to synchronize to this secondary node."
+msgstr ""
+
+msgid "Choose which repositories you want to connect and run CI/CD pipelines."
+msgstr ""
+
+msgid "Choose which repositories you want to import."
 msgstr ""
 
 msgid "Choose which shards you wish to synchronize to this secondary node."
@@ -884,6 +941,9 @@ msgstr ""
 msgid "ClusterIntegration|Helm Tiller"
 msgstr ""
 
+msgid "ClusterIntegration|In order to show the health of the cluster, we'll need to provision your cluster with Prometheus to collect the required data."
+msgstr ""
+
 msgid "ClusterIntegration|Ingress"
 msgstr ""
 
@@ -891,6 +951,9 @@ msgid "ClusterIntegration|Ingress IP Address"
 msgstr ""
 
 msgid "ClusterIntegration|Install"
+msgstr ""
+
+msgid "ClusterIntegration|Install Prometheus"
 msgstr ""
 
 msgid "ClusterIntegration|Installed"
@@ -909,6 +972,9 @@ msgid "ClusterIntegration|Kubernetes cluster"
 msgstr ""
 
 msgid "ClusterIntegration|Kubernetes cluster details"
+msgstr ""
+
+msgid "ClusterIntegration|Kubernetes cluster health"
 msgstr ""
 
 msgid "ClusterIntegration|Kubernetes cluster integration"
@@ -1173,6 +1239,15 @@ msgstr ""
 msgid "Confidentiality"
 msgstr ""
 
+msgid "Connect"
+msgstr ""
+
+msgid "Connect all repositories"
+msgstr ""
+
+msgid "Connect repositories from GitHub"
+msgstr ""
+
 msgid "Connect your external repositories, and CI/CD pipelines will run for new commits. A GitLab project will be created with only CI/CD features enabled."
 msgstr ""
 
@@ -1222,6 +1297,9 @@ msgid "ContainerRegistry|Use different image names"
 msgstr ""
 
 msgid "ContainerRegistry|With the Docker Container Registry integrated into GitLab, every project can have its own space to store its Docker images."
+msgstr ""
+
+msgid "Contribution"
 msgstr ""
 
 msgid "Contribution guide"
@@ -1439,6 +1517,9 @@ msgstr ""
 msgid "Don't show again"
 msgstr ""
 
+msgid "Done"
+msgstr ""
+
 msgid "Download"
 msgstr ""
 
@@ -1634,6 +1715,9 @@ msgstr ""
 msgid "ExternalAuthorizationService|When no classification label is set the default label `%{default_label}` will be used."
 msgstr ""
 
+msgid "Failed"
+msgstr ""
+
 msgid "Failed Jobs"
 msgstr ""
 
@@ -1676,6 +1760,9 @@ msgstr ""
 msgid "Find file"
 msgstr ""
 
+msgid "Finished"
+msgstr ""
+
 msgid "FirstPushedBy|First"
 msgstr ""
 
@@ -1697,6 +1784,9 @@ msgid "Forking in progress"
 msgstr ""
 
 msgid "Format"
+msgstr ""
+
+msgid "From %{provider_title}"
 msgstr ""
 
 msgid "From issue creation until deploy to production"
@@ -1768,7 +1858,16 @@ msgstr ""
 msgid "GeoNodes|New node"
 msgstr ""
 
+msgid "GeoNodes|Node Authentication was successfully repaired."
+msgstr ""
+
+msgid "GeoNodes|Node was successfully removed."
+msgstr ""
+
 msgid "GeoNodes|Out of sync"
+msgstr ""
+
+msgid "GeoNodes|Removing a node stops the sync process. Are you sure?"
 msgstr ""
 
 msgid "GeoNodes|Replication slot WAL:"
@@ -1781,6 +1880,15 @@ msgid "GeoNodes|Repositories:"
 msgstr ""
 
 msgid "GeoNodes|Selective"
+msgstr ""
+
+msgid "GeoNodes|Something went wrong while changing node status"
+msgstr ""
+
+msgid "GeoNodes|Something went wrong while removing node"
+msgstr ""
+
+msgid "GeoNodes|Something went wrong while repairing node"
 msgstr ""
 
 msgid "GeoNodes|Storage config:"
@@ -1838,6 +1946,9 @@ msgid "Git storage health information has been reset"
 msgstr ""
 
 msgid "Git version"
+msgstr ""
+
+msgid "GitHub import"
 msgstr ""
 
 msgid "GitLab Runner section"
@@ -1977,13 +2088,25 @@ msgstr ""
 msgid "Housekeeping successfully started"
 msgstr ""
 
+msgid "If using GitHub, you’ll see pipeline statuses on GitHub for your commits and pull requests. %{more_info_link}"
+msgstr ""
+
 msgid "If you already have files you can push them using the %{link_to_cli} below."
 msgstr ""
 
 msgid "If your HTTP repository is not publicly accessible, add authentication information to the URL: <code>https://username:password@gitlab.company.com/group/project.git</code>."
 msgstr ""
 
+msgid "Import"
+msgstr ""
+
+msgid "Import all repositories"
+msgstr ""
+
 msgid "Import in progress"
+msgstr ""
+
+msgid "Import repositories from GitHub"
 msgstr ""
 
 msgid "Import repository"
@@ -2111,7 +2234,16 @@ msgstr ""
 msgid "Labels"
 msgstr ""
 
+msgid "Labels can be applied to %{features}. Group labels are available for any project within the group."
+msgstr ""
+
 msgid "Labels can be applied to issues and merge requests to categorize them."
+msgstr ""
+
+msgid "Labels|Promote Label"
+msgstr ""
+
+msgid "Labels|Promote label %{labelTitle} to Group Label?"
 msgstr ""
 
 msgid "Last %d day"
@@ -2171,6 +2303,9 @@ msgid "License"
 msgstr ""
 
 msgid "List"
+msgstr ""
+
+msgid "List your GitHub repositories"
 msgstr ""
 
 msgid "Loading the GitLab IDE..."
@@ -2263,6 +2398,12 @@ msgstr ""
 msgid "Milestones|Milestone %{milestoneTitle} was not found"
 msgstr ""
 
+msgid "Milestones|Promote %{milestoneTitle} to group milestone?"
+msgstr ""
+
+msgid "Milestones|Promote Milestone"
+msgstr ""
+
 msgid "MissingSSHKeyWarningLink|add an SSH key"
 msgstr ""
 
@@ -2273,6 +2414,9 @@ msgid "Modal|Close"
 msgstr ""
 
 msgid "Monitoring"
+msgstr ""
+
+msgid "More info"
 msgstr ""
 
 msgid "More information"
@@ -2349,6 +2493,9 @@ msgstr ""
 msgid "New tag"
 msgstr ""
 
+msgid "No Label"
+msgstr ""
+
 msgid "No assignee"
 msgstr ""
 
@@ -2367,6 +2514,9 @@ msgstr ""
 msgid "No file chosen"
 msgstr ""
 
+msgid "No labels created yet."
+msgstr ""
+
 msgid "No repository"
 msgstr ""
 
@@ -2382,6 +2532,12 @@ msgstr ""
 msgid "Not available"
 msgstr ""
 
+msgid "Not available for private projects"
+msgstr ""
+
+msgid "Not available for protected branches"
+msgstr ""
+
 msgid "Not confidential"
 msgstr ""
 
@@ -2389,6 +2545,18 @@ msgid "Not enough data"
 msgstr ""
 
 msgid "Note that the master branch is automatically protected. %{link_to_protected_branches}"
+msgstr ""
+
+msgid "Note: As an administrator you may like to configure %{github_integration_link}, which will allow login via GitHub and allow connecting repositories without generating a Personal Access Token."
+msgstr ""
+
+msgid "Note: As an administrator you may like to configure %{github_integration_link}, which will allow login via GitHub and allow importing repositories without generating a Personal Access Token."
+msgstr ""
+
+msgid "Note: Consider asking your GitLab administrator to configure %{github_integration_link}, which will allow login via GitHub and allow connecting repositories without generating a Personal Access Token."
+msgstr ""
+
+msgid "Note: Consider asking your GitLab administrator to configure %{github_integration_link}, which will allow login via GitHub and allow importing repositories without generating a Personal Access Token."
 msgstr ""
 
 msgid "Notification events"
@@ -2520,6 +2688,12 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
+msgid "Pending"
+msgstr ""
+
+msgid "Personal Access Token"
+msgstr ""
+
 msgid "Pipeline"
 msgstr ""
 
@@ -2601,7 +2775,28 @@ msgstr ""
 msgid "Pipelines|Build with confidence"
 msgstr ""
 
+msgid "Pipelines|CI Lint"
+msgstr ""
+
+msgid "Pipelines|Clear Runner Caches"
+msgstr ""
+
 msgid "Pipelines|Get started with Pipelines"
+msgstr ""
+
+msgid "Pipelines|Loading Pipelines"
+msgstr ""
+
+msgid "Pipelines|Run Pipeline"
+msgstr ""
+
+msgid "Pipelines|There are currently no %{scope} pipelines."
+msgstr ""
+
+msgid "Pipelines|There are currently no pipelines."
+msgstr ""
+
+msgid "Pipelines|This project is not currently set up to run pipelines."
 msgstr ""
 
 msgid "Pipeline|Retry pipeline"
@@ -2886,6 +3081,15 @@ msgstr ""
 msgid "PrometheusService|View environments"
 msgstr ""
 
+msgid "Promote"
+msgstr ""
+
+msgid "Promote to Group Label"
+msgstr ""
+
+msgid "Promote to Group Milestone"
+msgstr ""
+
 msgid "Protip:"
 msgstr ""
 
@@ -3008,6 +3212,9 @@ msgstr ""
 msgid "Run CI/CD pipelines for external repositories"
 msgstr ""
 
+msgid "Running"
+msgstr ""
+
 msgid "SSH Keys"
 msgstr ""
 
@@ -3021,6 +3228,9 @@ msgid "Save variables"
 msgstr ""
 
 msgid "Schedule a new pipeline"
+msgstr ""
+
+msgid "Scheduled"
 msgstr ""
 
 msgid "Schedules"
@@ -3317,6 +3527,12 @@ msgid "Start a %{new_merge_request} with these changes"
 msgstr ""
 
 msgid "Start the Runner!"
+msgstr ""
+
+msgid "Started"
+msgstr ""
+
+msgid "Status"
 msgstr ""
 
 msgid "Stopped"
@@ -3757,7 +3973,22 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
+msgid "To GitLab"
+msgstr ""
+
+msgid "To connect GitHub repositories, you can use a %{personal_access_token_link}. When you create your Personal Access Token, you will need to select the <code>repo</code> scope, so we can display a list of your public and private repositories which are available to connect."
+msgstr ""
+
+msgid "To connect GitHub repositories, you first need to authorize GitLab to access the list of your GitHub repositories:"
+msgstr ""
+
 msgid "To connect an SVN repository, check out %{svn_link}."
+msgstr ""
+
+msgid "To import GitHub repositories, you can use a %{personal_access_token_link}. When you create your Personal Access Token, you will need to select the <code>repo</code> scope, so we can display a list of your public and private repositories which are available to import."
+msgstr ""
+
+msgid "To import GitHub repositories, you first need to authorize GitLab to access the list of your GitHub repositories:"
 msgstr ""
 
 msgid "To import an SVN repository, check out %{svn_link}."
@@ -4036,13 +4267,13 @@ msgstr ""
 msgid "You are going to remove %{group_name}. Removed groups CANNOT be restored! Are you ABSOLUTELY sure?"
 msgstr ""
 
-msgid "You are going to remove %{project_name_with_namespace}. Removed project CANNOT be restored! Are you ABSOLUTELY sure?"
+msgid "You are going to remove %{project_full_name}. Removed project CANNOT be restored! Are you ABSOLUTELY sure?"
 msgstr ""
 
 msgid "You are going to remove the fork relationship to source project %{forked_from_project}. Are you ABSOLUTELY sure?"
 msgstr ""
 
-msgid "You are going to transfer %{project_name_with_namespace} to another owner. Are you ABSOLUTELY sure?"
+msgid "You are going to transfer %{project_full_name} to another owner. Are you ABSOLUTELY sure?"
 msgstr ""
 
 msgid "You can also create a project from the command line."
@@ -4118,6 +4349,9 @@ msgid "You'll need to use different branch names to get a valid comparison."
 msgstr ""
 
 msgid "Your Kubernetes cluster information on this page is still editable, but you are advised to disable and reconfigure"
+msgstr ""
+
+msgid "Your changes can be committed to %{branch_name} because a merge request is open."
 msgstr ""
 
 msgid "Your changes have been committed. Commit %{commitId} %{commitStats}"
@@ -4216,6 +4450,9 @@ msgstr ""
 msgid "confidentiality|You are going to turn on the confidentiality. This means that only team members with <strong>at least Reporter access</strong> are able to see and leave comments on the issue."
 msgstr ""
 
+msgid "connecting"
+msgstr ""
+
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
@@ -4225,6 +4462,9 @@ msgid "estimateCommand|%{slash_command} will update the estimated time with the 
 msgstr ""
 
 msgid "here"
+msgstr ""
+
+msgid "importing"
 msgstr ""
 
 msgid "is invalid because there is downstream lock"
@@ -4245,6 +4485,9 @@ msgid "mrWidget| Please restore it or use a different %{missingBranchName} branc
 msgstr ""
 
 msgid "mrWidget|Add approval"
+msgstr ""
+
+msgid "mrWidget|Allows edits from maintainers"
 msgstr ""
 
 msgid "mrWidget|An error occured while removing your approval."
