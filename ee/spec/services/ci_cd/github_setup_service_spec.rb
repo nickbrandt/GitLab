@@ -6,9 +6,10 @@ describe CiCd::GithubSetupService do
   let(:import_url) { "https://#{api_token}@github.com/#{repo_full_name}.git" }
   let(:credentials) { { user: api_token } }
   let(:project) do
-    create(:project, import_source: repo_full_name,
+    create(:project,
+           import_source: repo_full_name,
            import_url: import_url,
-           import_data_attributes: { credentials: credentials } )
+           import_data_attributes: { credentials: credentials })
   end
 
   subject do
