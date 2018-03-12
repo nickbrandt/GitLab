@@ -1,19 +1,15 @@
 require 'spec_helper'
 
 describe CiCd::GithubSetupService do
-<<<<<<< HEAD
   let(:repo_full_name) { "MyUser/my-project" }
   let(:api_token) { "abcdefghijk123" }
   let(:import_url) { "https://#{api_token}@github.com/#{repo_full_name}.git" }
   let(:credentials) { { user: api_token } }
   let(:project) do
     create(:project, import_source: repo_full_name,
-                     import_url: import_url,
-                     import_data_attributes: { credentials: credentials } )
+           import_url: import_url,
+           import_data_attributes: { credentials: credentials } )
   end
-=======
-  let(:project) { create(:project) }
->>>>>>> 10-6-stable-ee
 
   subject do
     described_class.new(project)
@@ -25,7 +21,6 @@ describe CiCd::GithubSetupService do
 
       subject.execute
     end
-<<<<<<< HEAD
 
     it 'sets up GithubService project integration' do
       allow(subject).to receive(:create_webhook)
@@ -34,7 +29,5 @@ describe CiCd::GithubSetupService do
 
       expect(project.github_service).to be_active
     end
-=======
->>>>>>> 10-6-stable-ee
   end
 end
