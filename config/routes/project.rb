@@ -69,7 +69,7 @@ constraints(ProjectUrlConstrainer.new) do
         end
       end
 
-      resources :services, constraints: { id: %r{[^/]+} }, only: [:index, :edit, :update] do
+      resources :services, constraints: { id: %r{[^/]+} }, only: [:edit, :update] do
         member do
           put :test
         end
@@ -78,7 +78,8 @@ constraints(ProjectUrlConstrainer.new) do
       resource :mattermost, only: [:new, :create]
 
       namespace :prometheus do
-        resources :metrics, constraints: { id: %r{[^\/]+} }, only: [] do
+        resources :metrics, constraints: { id: %r{[^\/]+} }, only: [:index, :new, :create, :edit, :update, :destroy] do
+          post :validate_query, on: :collection
           get :active_common, on: :collection
         end
       end
@@ -244,6 +245,7 @@ constraints(ProjectUrlConstrainer.new) do
 
         member do
           get :status, format: :json
+          get :metrics, format: :json
 
           scope :applications do
             post '/:application', to: 'clusters/applications#create', as: :install_applications

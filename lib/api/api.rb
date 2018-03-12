@@ -144,14 +144,17 @@ module API
     mount ::API::Labels
     mount ::API::Lint
     mount ::API::Members
+    mount ::API::MergeRequestApprovals
     mount ::API::MergeRequestDiffs
     mount ::API::MergeRequests
     mount ::API::Namespaces
     mount ::API::Notes
+    mount ::API::Discussions
     mount ::API::NotificationSettings
     mount ::API::PagesDomains
     mount ::API::Pipelines
     mount ::API::PipelineSchedules
+    mount ::API::ProjectApprovals
     mount ::API::ProjectExport
     mount ::API::ProjectImport
     mount ::API::ProjectHooks
