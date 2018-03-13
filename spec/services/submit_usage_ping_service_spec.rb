@@ -7,7 +7,7 @@ describe SubmitUsagePingService do
     end
 
     it 'does not run' do
-      expect(HTTParty).not_to receive(:post)
+      expect(Gitlab::HTTP).not_to receive(:post)
 
       result = subject.execute
 
