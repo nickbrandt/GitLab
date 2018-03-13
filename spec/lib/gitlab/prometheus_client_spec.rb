@@ -69,8 +69,8 @@ describe Gitlab::PrometheusClient do
         expect(req_stub).to have_been_requested
       end
 
-      it 'raises a Gitlab::PrometheusError error when a HTTParty::Error is rescued' do
-        req_stub = stub_prometheus_request_with_exception(prometheus_url, HTTParty::Error)
+      it 'raises a Gitlab::PrometheusError error when a Gitlab::HTTP::Error is rescued' do
+        req_stub = stub_prometheus_request_with_exception(prometheus_url, Gitlab::HTTP::Error)
 
         expect { subject.send(:get, prometheus_url) }
           .to raise_error(Gitlab::PrometheusError, "Network connection error")

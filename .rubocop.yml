@@ -1229,3 +1229,6 @@ GitlabSecurity/SystemCommandInjection:
   Exclude:
     - 'lib/**/*.rake'
     - 'spec/**/*'
+
+Gitlab/HTTParty:
+  Enabled: true
