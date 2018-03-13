@@ -184,6 +184,7 @@ ActiveRecord::Schema.define(version: 20180309160427) do
     t.string "external_authorization_service_url"
     t.string "external_authorization_service_default_label"
     t.boolean "pages_domain_verification_enabled", default: true, null: false
+    t.boolean "allow_local_requests_from_hooks_and_services", default: false, null: false
   end
 
   create_table "approvals", force: :cascade do |t|
