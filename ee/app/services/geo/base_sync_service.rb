@@ -194,7 +194,13 @@ module Geo
       # Remove the deleted path in case it exists, but it may not be there
       gitlab_shell.remove_repository(project.repository_storage_path, deleted_disk_path_temp)
 
-      if project.repository_exists? && !gitlab_shell.mv_repository(project.repository_storage_path, repository.disk_path, deleted_disk_path_temp)
+      # Make sure we have a namespace directory
+      gitlab_shell.add_namespace(project.repository_storage_path, deleted_disk_path_temp)
+
+      # Make sure we have the most current state of exists?
+      repository.expire_exists_cache
+
+      if repository.exists? && !gitlab_shell.mv_repository(project.repository_storage_path, repository.disk_path, deleted_disk_path_temp)
         raise Gitlab::Shell::Error, 'Can not move original repository out of the way'
       end
 
