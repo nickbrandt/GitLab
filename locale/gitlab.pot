@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-08 09:20+0100\n"
-"PO-Revision-Date: 2018-03-08 09:20+0100\n"
+"POT-Creation-Date: 2018-03-12 19:50+0100\n"
+"PO-Revision-Date: 2018-03-12 19:50+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -118,6 +118,9 @@ msgstr ""
 msgid "2FA enabled"
 msgstr ""
 
+msgid "<strong>Removes</strong> source branch"
+msgstr ""
+
 msgid "A collection of graphs regarding Continuous Integration"
 msgstr ""
 
@@ -125,6 +128,9 @@ msgid "A new branch will be created in your fork and a new merge request will be
 msgstr ""
 
 msgid "A project is where you house your files (repository), plan your work (issues), and publish your documentation (wiki), %{among_other_things_link}."
+msgstr ""
+
+msgid "A user with write access to the source branch selected this option"
 msgstr ""
 
 msgid "About auto deploy"
@@ -241,7 +247,7 @@ msgstr ""
 msgid "All features are enabled for blank projects, from templates, or when importing, but you can disable them afterward in the project settings."
 msgstr ""
 
-msgid "Allow edits from maintainers"
+msgid "Allow edits from maintainers."
 msgstr ""
 
 msgid "Allows you to add and manage Kubernetes clusters."
@@ -1426,6 +1432,9 @@ msgstr ""
 msgid "Create new..."
 msgstr ""
 
+msgid "Create project label"
+msgstr ""
+
 msgid "CreateNewFork|Fork"
 msgstr ""
 
@@ -2411,6 +2420,9 @@ msgstr ""
 msgid "Manage labels"
 msgstr ""
 
+msgid "Manage project labels"
+msgstr ""
+
 msgid "Mar"
 msgstr ""
 
@@ -2926,7 +2938,13 @@ msgstr ""
 msgid "Pipelines|Loading Pipelines"
 msgstr ""
 
+msgid "Pipelines|Project cache successfully reset."
+msgstr ""
+
 msgid "Pipelines|Run Pipeline"
+msgstr ""
+
+msgid "Pipelines|Something went wrong while cleaning runners cache."
 msgstr ""
 
 msgid "Pipelines|There are currently no %{scope} pipelines."
@@ -3059,9 +3077,6 @@ msgid "Project avatar"
 msgstr ""
 
 msgid "Project avatar in repository: %{link}"
-msgstr ""
-
-msgid "Project cache successfully reset."
 msgstr ""
 
 msgid "Project details"
@@ -4283,10 +4298,16 @@ msgstr ""
 msgid "View file @ "
 msgstr ""
 
+msgid "View group labels"
+msgstr ""
+
 msgid "View labels"
 msgstr ""
 
 msgid "View open merge request"
+msgstr ""
+
+msgid "View project labels"
 msgstr ""
 
 msgid "View replaced file @ "
