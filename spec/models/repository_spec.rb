@@ -1451,7 +1451,6 @@ describe Repository do
     it 'expires the caches for an empty repository' do
       allow(repository).to receive(:empty?).and_return(true)
 
-      expect(cache).to receive(:expire).with(:empty?)
       expect(cache).to receive(:expire).with(:has_visible_content?)
 
       repository.expire_emptiness_caches
@@ -1460,7 +1459,6 @@ describe Repository do
     it 'does not expire the cache for a non-empty repository' do
       allow(repository).to receive(:empty?).and_return(false)
 
-      expect(cache).not_to receive(:expire).with(:empty?)
       expect(cache).not_to receive(:expire).with(:has_visible_content?)
 
       repository.expire_emptiness_caches
