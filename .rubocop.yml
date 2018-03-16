@@ -1202,6 +1202,9 @@ GitlabSecurity/DeepMunge:
 GitlabSecurity/JsonSerialization:
   Enabled: false
 
+Gitlab/HTTParty:
+  Enabled: true
+
 GitlabSecurity/PublicSend:
   Enabled: true
   Exclude:
