@@ -342,7 +342,8 @@ class ApplicationSetting < ActiveRecord::Base
       slack_app_enabled: false,
       slack_app_id: nil,
       slack_app_secret: nil,
-      slack_app_verification_token: nil
+      slack_app_verification_token: nil,
+      allow_local_requests_from_hooks_and_services: false
     }
   end
 
