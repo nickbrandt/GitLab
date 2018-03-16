@@ -19,8 +19,8 @@ module Gitlab
 
             @content = strong_memoize(:content) do
               begin
-                HTTParty.get(location)
-              rescue HTTParty::Error, Timeout::Error
+                Gitlab::HTTP.get(location)
+              rescue Gitlab::HTTP::Error, Timeout::Error
                 false
               end
             end

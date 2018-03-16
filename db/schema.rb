@@ -181,6 +181,7 @@ ActiveRecord::Schema.define(version: 20180308052825) do
     t.string "auto_devops_domain"
     t.integer "default_project_creation", default: 2, null: false
     t.boolean "pages_domain_verification_enabled", default: true, null: false
+    t.boolean "allow_local_requests_from_hooks_and_services", default: false, null: false
   end
 
   create_table "approvals", force: :cascade do |t|
