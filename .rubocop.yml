@@ -1202,6 +1202,9 @@ GitlabSecurity/DeepMunge:
 GitlabSecurity/JsonSerialization:
   Enabled: false
 
+Gitlab/HTTParty:
+  Enabled: true
+
 GitlabSecurity/PublicSend:
   Enabled: true
   Exclude:
@@ -1229,3 +1232,6 @@ GitlabSecurity/SystemCommandInjection:
   Exclude:
     - 'lib/**/*.rake'
     - 'spec/**/*'
+
+Gitlab/HTTParty:
+  Enabled: true
