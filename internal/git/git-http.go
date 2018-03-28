@@ -63,11 +63,6 @@ func postRPCHandler(a *api.API, name string, handler func(*GitHttpResponseWriter
 
 func repoPreAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.Handler {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
-		if a.RepoPath == "" {
-			helper.Fail500(w, r, fmt.Errorf("repoPreAuthorizeHandler: RepoPath empty"))
-			return
-		}
-
 		handleFunc(w, r, a)
 	}, "")
 }
