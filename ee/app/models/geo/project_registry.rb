@@ -6,6 +6,8 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
   validates :project, presence: true, uniqueness: true
 
   scope :dirty, -> { where(arel_table[:resync_repository].eq(true).or(arel_table[:resync_wiki].eq(true))) }
+  scope :synced_repos, -> { where(resync_repository: false) }
+  scope :synced_wikis, -> { where(resync_wiki: false) }
   scope :failed_repos, -> { where(arel_table[:repository_retry_count].gt(0)) }
   scope :failed_wikis, -> { where(arel_table[:wiki_retry_count].gt(0)) }
   scope :verification_failed_repos, -> { where(arel_table[:last_repository_verification_failed].eq(true)) }
@@ -34,6 +36,7 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     )
   end
 
+<<<<<<< HEAD
   def self.synced_repos
     where.not(last_repository_synced_at: nil, last_repository_successful_sync_at: nil)
         .where(resync_repository: false)
@@ -54,6 +57,8 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
         .where(last_wiki_verification_failed: false)
   end
 
+=======
+>>>>>>> 360fa69f22f... Merge branch 'mk/geo/fix-inconsistent-project-registry-queries' into 'master'
   def repository_sync_due?(scheduled_time)
     never_synced_repository? || repository_sync_needed?(scheduled_time)
   end
