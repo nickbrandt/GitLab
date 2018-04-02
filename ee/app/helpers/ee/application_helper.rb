@@ -60,17 +60,6 @@ module EE
       class_names
     end
 
-    def system_message_class
-      class_names = []
-
-      return class_names unless appearance
-
-      class_names << 'with-system-header' if appearance.show_header?
-      class_names << 'with-system-footer' if appearance.show_footer?
-
-      class_names
-    end
-
     override :autocomplete_data_sources
     def autocomplete_data_sources(object, noteable_type)
       return {} unless object && noteable_type
