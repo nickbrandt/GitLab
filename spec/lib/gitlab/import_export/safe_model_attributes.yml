@@ -393,6 +393,7 @@ Service:
 - default
 - wiki_page_events
 - confidential_issues_events
+- confidential_note_events
 ProjectHook:
 - id
 - url
@@ -413,6 +414,7 @@ ProjectHook:
 - token
 - group_id
 - confidential_issues_events
+- confidential_note_events
 - repository_update_events
 ProtectedBranch:
 - id
