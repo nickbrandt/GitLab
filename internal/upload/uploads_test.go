@@ -243,15 +243,41 @@ func TestUploadProcessingFile(t *testing.T) {
 	fmt.Fprint(file, "test")
 	writer.Close()
 
-	httpRequest, err := http.NewRequest("PUT", "/url/path", &buffer)
-	if err != nil {
-		t.Fatal(err)
+	tests := []struct {
+		name    string
+		preauth api.Response
+	}{
+		{
+			name:    "FileStore Upload",
+			preauth: api.Response{TempPath: tempPath},
+		},
+		{
+			name:    "ObjectStore Upload",
+			preauth: api.Response{RemoteObject: api.RemoteObject{StoreURL: "http://example.com"}},
+		},
+		{
+			name: "ObjectStore and FileStore Upload",
+			preauth: api.Response{
+				TempPath:     tempPath,
+				RemoteObject: api.RemoteObject{StoreURL: "http://example.com"},
+			},
+		},
 	}
-	httpRequest.Header.Set("Content-Type", writer.FormDataContentType())
 
-	response := httptest.NewRecorder()
-	HandleFileUploads(response, httpRequest, nilHandler, &api.Response{TempPath: tempPath}, &testFormProcessor{})
-	testhelper.AssertResponseCode(t, response, 500)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			httpRequest, err := http.NewRequest("PUT", "/url/path", &buffer)
+			if err != nil {
+				t.Fatal(err)
+			}
+			httpRequest.Header.Set("Content-Type", writer.FormDataContentType())
+
+			response := httptest.NewRecorder()
+			HandleFileUploads(response, httpRequest, nilHandler, &test.preauth, &testFormProcessor{})
+			testhelper.AssertResponseCode(t, response, 500)
+		})
+	}
+
 }
 
 func TestInvalidFileNames(t *testing.T) {

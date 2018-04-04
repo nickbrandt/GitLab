@@ -16,6 +16,7 @@ import (
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
@@ -38,21 +39,31 @@ func testArtifactsUploadServer(t *testing.T, authResponse api.Response, bodyProc
 		w.Write(data)
 	})
 	mux.HandleFunc("/url/path", func(w http.ResponseWriter, r *http.Request) {
+		opts := filestore.GetOpts(&authResponse)
+
 		if r.Method != "POST" {
 			t.Fatal("Expected POST request")
 		}
-		if r.FormValue("file.path") == "" {
+		if opts.IsLocal() {
+			if r.FormValue("file.path") == "" {
+				w.WriteHeader(501)
+				return
+			}
+
+			_, err := ioutil.ReadFile(r.FormValue("file.path"))
+			if err != nil {
+				w.WriteHeader(404)
+				return
+			}
+		}
+
+		if opts.IsRemote() && r.FormValue("file.remote_url") == "" {
 			w.WriteHeader(501)
 			return
 		}
+
 		if r.FormValue("metadata.path") == "" {
 			w.WriteHeader(502)
-			return
-		}
-
-		_, err := ioutil.ReadFile(r.FormValue("file.path"))
-		if err != nil {
-			w.WriteHeader(404)
 			return
 		}
 

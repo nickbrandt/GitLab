@@ -31,6 +31,9 @@ func (a *artifactsUploadProcessor) generateMetadataFromZip(ctx context.Context, 
 		LocalTempPath:  a.opts.LocalTempPath,
 		TempFilePrefix: "metadata.gz",
 	}
+	if metaOpts.LocalTempPath == "" {
+		metaOpts.LocalTempPath = os.TempDir()
+	}
 
 	fileName := file.LocalPath
 	if fileName == "" {
@@ -115,11 +118,6 @@ func (a *artifactsUploadProcessor) Name() string {
 
 func UploadArtifacts(myAPI *api.API, h http.Handler) http.Handler {
 	return myAPI.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
-		if a.TempPath == "" {
-			helper.Fail500(w, r, fmt.Errorf("UploadArtifacts: TempPath is empty"))
-			return
-		}
-
 		mg := &artifactsUploadProcessor{opts: filestore.GetOpts(a)}
 
 		upload.HandleFileUploads(w, r, h, a, mg)

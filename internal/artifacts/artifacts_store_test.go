@@ -63,7 +63,12 @@ func TestUploadHandlerSendingToExternalStorage(t *testing.T) {
 	defer os.RemoveAll(tempPath)
 
 	archiveData, md5 := createTestZipArchive(t)
-	contentBuffer, contentType := createTestMultipartForm(t, archiveData)
+	archiveFile, err := ioutil.TempFile("", "artifact.zip")
+	require.NoError(t, err)
+	defer os.Remove(archiveFile.Name())
+	_, err = archiveFile.Write(archiveData)
+	require.NoError(t, err)
+	archiveFile.Close()
 
 	storeServerCalled := 0
 	storeServerMux := http.NewServeMux()
@@ -78,6 +83,9 @@ func TestUploadHandlerSendingToExternalStorage(t *testing.T) {
 		w.Header().Set("ETag", md5)
 		w.WriteHeader(200)
 	})
+	storeServerMux.HandleFunc("/store-id", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, archiveFile.Name())
+	})
 
 	responseProcessorCalled := 0
 	responseProcessor := func(w http.ResponseWriter, r *http.Request) {
@@ -90,22 +98,48 @@ func TestUploadHandlerSendingToExternalStorage(t *testing.T) {
 	storeServer := httptest.NewServer(storeServerMux)
 	defer storeServer.Close()
 
-	authResponse := api.Response{
-		TempPath: tempPath,
-		RemoteObject: api.RemoteObject{
-			StoreURL: storeServer.URL + "/url/put",
-			ID:       "store-id",
-			GetURL:   storeServer.URL + "/store-id",
+	tests := []struct {
+		name    string
+		preauth api.Response
+	}{
+		{
+			name: "ObjectStore Upload",
+			preauth: api.Response{
+				RemoteObject: api.RemoteObject{
+					StoreURL: storeServer.URL + "/url/put",
+					ID:       "store-id",
+					GetURL:   storeServer.URL + "/store-id",
+				},
+			},
+		},
+		{
+			name: "ObjectStore and FileStore Upload",
+			preauth: api.Response{
+				TempPath: tempPath,
+				RemoteObject: api.RemoteObject{
+					StoreURL: storeServer.URL + "/url/put",
+					ID:       "store-id",
+					GetURL:   storeServer.URL + "/store-id",
+				},
+			},
 		},
 	}
 
-	ts := testArtifactsUploadServer(t, authResponse, responseProcessor)
-	defer ts.Close()
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			storeServerCalled = 0
+			responseProcessorCalled = 0
 
-	response := testUploadArtifacts(contentType, &contentBuffer, t, ts)
-	testhelper.AssertResponseCode(t, response, 200)
-	assert.Equal(t, 1, storeServerCalled, "store should be called only once")
-	assert.Equal(t, 1, responseProcessorCalled, "response processor should be called only once")
+			ts := testArtifactsUploadServer(t, test.preauth, responseProcessor)
+			defer ts.Close()
+
+			contentBuffer, contentType := createTestMultipartForm(t, archiveData)
+			response := testUploadArtifacts(contentType, &contentBuffer, t, ts)
+			testhelper.AssertResponseCode(t, response, 200)
+			assert.Equal(t, 1, storeServerCalled, "store should be called only once")
+			assert.Equal(t, 1, responseProcessorCalled, "response processor should be called only once")
+		})
+	}
 }
 
 func TestUploadHandlerSendingToExternalStorageAndStorageServerUnreachable(t *testing.T) {
