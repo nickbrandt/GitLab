@@ -17,6 +17,38 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
+type UserCommitFilesActionHeader_ActionType int32
+
+const (
+	UserCommitFilesActionHeader_CREATE     UserCommitFilesActionHeader_ActionType = 0
+	UserCommitFilesActionHeader_CREATE_DIR UserCommitFilesActionHeader_ActionType = 1
+	UserCommitFilesActionHeader_UPDATE     UserCommitFilesActionHeader_ActionType = 2
+	UserCommitFilesActionHeader_MOVE       UserCommitFilesActionHeader_ActionType = 3
+	UserCommitFilesActionHeader_DELETE     UserCommitFilesActionHeader_ActionType = 4
+)
+
+var UserCommitFilesActionHeader_ActionType_name = map[int32]string{
+	0: "CREATE",
+	1: "CREATE_DIR",
+	2: "UPDATE",
+	3: "MOVE",
+	4: "DELETE",
+}
+var UserCommitFilesActionHeader_ActionType_value = map[string]int32{
+	"CREATE":     0,
+	"CREATE_DIR": 1,
+	"UPDATE":     2,
+	"MOVE":       3,
+	"DELETE":     4,
+}
+
+func (x UserCommitFilesActionHeader_ActionType) String() string {
+	return proto.EnumName(UserCommitFilesActionHeader_ActionType_name, int32(x))
+}
+func (UserCommitFilesActionHeader_ActionType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor7, []int{17, 0}
+}
+
 type UserCreateBranchRequest struct {
 	Repository *Repository `protobuf:"bytes,1,opt,name=repository" json:"repository,omitempty"`
 	BranchName []byte      `protobuf:"bytes,2,opt,name=branch_name,json=branchName,proto3" json:"branch_name,omitempty"`
@@ -27,7 +59,7 @@ type UserCreateBranchRequest struct {
 func (m *UserCreateBranchRequest) Reset()                    { *m = UserCreateBranchRequest{} }
 func (m *UserCreateBranchRequest) String() string            { return proto.CompactTextString(m) }
 func (*UserCreateBranchRequest) ProtoMessage()               {}
-func (*UserCreateBranchRequest) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{0} }
+func (*UserCreateBranchRequest) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{0} }
 
 func (m *UserCreateBranchRequest) GetRepository() *Repository {
 	if m != nil {
@@ -67,7 +99,7 @@ type UserCreateBranchResponse struct {
 func (m *UserCreateBranchResponse) Reset()                    { *m = UserCreateBranchResponse{} }
 func (m *UserCreateBranchResponse) String() string            { return proto.CompactTextString(m) }
 func (*UserCreateBranchResponse) ProtoMessage()               {}
-func (*UserCreateBranchResponse) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{1} }
+func (*UserCreateBranchResponse) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{1} }
 
 func (m *UserCreateBranchResponse) GetBranch() *Branch {
 	if m != nil {
@@ -92,7 +124,7 @@ type UserDeleteBranchRequest struct {
 func (m *UserDeleteBranchRequest) Reset()                    { *m = UserDeleteBranchRequest{} }
 func (m *UserDeleteBranchRequest) String() string            { return proto.CompactTextString(m) }
 func (*UserDeleteBranchRequest) ProtoMessage()               {}
-func (*UserDeleteBranchRequest) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{2} }
+func (*UserDeleteBranchRequest) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{2} }
 
 func (m *UserDeleteBranchRequest) GetRepository() *Repository {
 	if m != nil {
@@ -122,7 +154,7 @@ type UserDeleteBranchResponse struct {
 func (m *UserDeleteBranchResponse) Reset()                    { *m = UserDeleteBranchResponse{} }
 func (m *UserDeleteBranchResponse) String() string            { return proto.CompactTextString(m) }
 func (*UserDeleteBranchResponse) ProtoMessage()               {}
-func (*UserDeleteBranchResponse) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{3} }
+func (*UserDeleteBranchResponse) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{3} }
 
 func (m *UserDeleteBranchResponse) GetPreReceiveError() string {
 	if m != nil {
@@ -140,7 +172,7 @@ type UserDeleteTagRequest struct {
 func (m *UserDeleteTagRequest) Reset()                    { *m = UserDeleteTagRequest{} }
 func (m *UserDeleteTagRequest) String() string            { return proto.CompactTextString(m) }
 func (*UserDeleteTagRequest) ProtoMessage()               {}
-func (*UserDeleteTagRequest) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{4} }
+func (*UserDeleteTagRequest) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{4} }
 
 func (m *UserDeleteTagRequest) GetRepository() *Repository {
 	if m != nil {
@@ -170,7 +202,7 @@ type UserDeleteTagResponse struct {
 func (m *UserDeleteTagResponse) Reset()                    { *m = UserDeleteTagResponse{} }
 func (m *UserDeleteTagResponse) String() string            { return proto.CompactTextString(m) }
 func (*UserDeleteTagResponse) ProtoMessage()               {}
-func (*UserDeleteTagResponse) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{5} }
+func (*UserDeleteTagResponse) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{5} }
 
 func (m *UserDeleteTagResponse) GetPreReceiveError() string {
 	if m != nil {
@@ -190,7 +222,7 @@ type UserCreateTagRequest struct {
 func (m *UserCreateTagRequest) Reset()                    { *m = UserCreateTagRequest{} }
 func (m *UserCreateTagRequest) String() string            { return proto.CompactTextString(m) }
 func (*UserCreateTagRequest) ProtoMessage()               {}
-func (*UserCreateTagRequest) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{6} }
+func (*UserCreateTagRequest) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{6} }
 
 func (m *UserCreateTagRequest) GetRepository() *Repository {
 	if m != nil {
@@ -236,7 +268,7 @@ type UserCreateTagResponse struct {
 func (m *UserCreateTagResponse) Reset()                    { *m = UserCreateTagResponse{} }
 func (m *UserCreateTagResponse) String() string            { return proto.CompactTextString(m) }
 func (*UserCreateTagResponse) ProtoMessage()               {}
-func (*UserCreateTagResponse) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{7} }
+func (*UserCreateTagResponse) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{7} }
 
 func (m *UserCreateTagResponse) GetTag() *Tag {
 	if m != nil {
@@ -274,7 +306,7 @@ type UserMergeBranchRequest struct {
 func (m *UserMergeBranchRequest) Reset()                    { *m = UserMergeBranchRequest{} }
 func (m *UserMergeBranchRequest) String() string            { return proto.CompactTextString(m) }
 func (*UserMergeBranchRequest) ProtoMessage()               {}
-func (*UserMergeBranchRequest) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{8} }
+func (*UserMergeBranchRequest) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{8} }
 
 func (m *UserMergeBranchRequest) GetRepository() *Repository {
 	if m != nil {
@@ -324,13 +356,14 @@ type UserMergeBranchResponse struct {
 	CommitId string `protobuf:"bytes,1,opt,name=commit_id,json=commitId" json:"commit_id,omitempty"`
 	// Second message
 	// If set, the merge has been applied to the branch.
-	BranchUpdate *OperationBranchUpdate `protobuf:"bytes,3,opt,name=branch_update,json=branchUpdate" json:"branch_update,omitempty"`
+	BranchUpdate    *OperationBranchUpdate `protobuf:"bytes,3,opt,name=branch_update,json=branchUpdate" json:"branch_update,omitempty"`
+	PreReceiveError string                 `protobuf:"bytes,4,opt,name=pre_receive_error,json=preReceiveError" json:"pre_receive_error,omitempty"`
 }
 
 func (m *UserMergeBranchResponse) Reset()                    { *m = UserMergeBranchResponse{} }
 func (m *UserMergeBranchResponse) String() string            { return proto.CompactTextString(m) }
 func (*UserMergeBranchResponse) ProtoMessage()               {}
-func (*UserMergeBranchResponse) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{9} }
+func (*UserMergeBranchResponse) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{9} }
 
 func (m *UserMergeBranchResponse) GetCommitId() string {
 	if m != nil {
@@ -346,6 +379,13 @@ func (m *UserMergeBranchResponse) GetBranchUpdate() *OperationBranchUpdate {
 	return nil
 }
 
+func (m *UserMergeBranchResponse) GetPreReceiveError() string {
+	if m != nil {
+		return m.PreReceiveError
+	}
+	return ""
+}
+
 type OperationBranchUpdate struct {
 	// If this string is non-empty the branch has been updated.
 	CommitId string `protobuf:"bytes,1,opt,name=commit_id,json=commitId" json:"commit_id,omitempty"`
@@ -358,7 +398,7 @@ type OperationBranchUpdate struct {
 func (m *OperationBranchUpdate) Reset()                    { *m = OperationBranchUpdate{} }
 func (m *OperationBranchUpdate) String() string            { return proto.CompactTextString(m) }
 func (*OperationBranchUpdate) ProtoMessage()               {}
-func (*OperationBranchUpdate) Descriptor() ([]byte, []int) { return fileDescriptor6, []int{10} }
+func (*OperationBranchUpdate) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{10} }
 
 func (m *OperationBranchUpdate) GetCommitId() string {
 	if m != nil {
@@ -381,6 +421,852 @@ func (m *OperationBranchUpdate) GetBranchCreated() bool {
 	return false
 }
 
+type UserFFBranchRequest struct {
+	Repository *Repository `protobuf:"bytes,1,opt,name=repository" json:"repository,omitempty"`
+	User       *User       `protobuf:"bytes,2,opt,name=user" json:"user,omitempty"`
+	CommitId   string      `protobuf:"bytes,3,opt,name=commit_id,json=commitId" json:"commit_id,omitempty"`
+	Branch     []byte      `protobuf:"bytes,4,opt,name=branch,proto3" json:"branch,omitempty"`
+}
+
+func (m *UserFFBranchRequest) Reset()                    { *m = UserFFBranchRequest{} }
+func (m *UserFFBranchRequest) String() string            { return proto.CompactTextString(m) }
+func (*UserFFBranchRequest) ProtoMessage()               {}
+func (*UserFFBranchRequest) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{11} }
+
+func (m *UserFFBranchRequest) GetRepository() *Repository {
+	if m != nil {
+		return m.Repository
+	}
+	return nil
+}
+
+func (m *UserFFBranchRequest) GetUser() *User {
+	if m != nil {
+		return m.User
+	}
+	return nil
+}
+
+func (m *UserFFBranchRequest) GetCommitId() string {
+	if m != nil {
+		return m.CommitId
+	}
+	return ""
+}
+
+func (m *UserFFBranchRequest) GetBranch() []byte {
+	if m != nil {
+		return m.Branch
+	}
+	return nil
+}
+
+type UserFFBranchResponse struct {
+	BranchUpdate    *OperationBranchUpdate `protobuf:"bytes,1,opt,name=branch_update,json=branchUpdate" json:"branch_update,omitempty"`
+	PreReceiveError string                 `protobuf:"bytes,2,opt,name=pre_receive_error,json=preReceiveError" json:"pre_receive_error,omitempty"`
+}
+
+func (m *UserFFBranchResponse) Reset()                    { *m = UserFFBranchResponse{} }
+func (m *UserFFBranchResponse) String() string            { return proto.CompactTextString(m) }
+func (*UserFFBranchResponse) ProtoMessage()               {}
+func (*UserFFBranchResponse) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{12} }
+
+func (m *UserFFBranchResponse) GetBranchUpdate() *OperationBranchUpdate {
+	if m != nil {
+		return m.BranchUpdate
+	}
+	return nil
+}
+
+func (m *UserFFBranchResponse) GetPreReceiveError() string {
+	if m != nil {
+		return m.PreReceiveError
+	}
+	return ""
+}
+
+type UserCherryPickRequest struct {
+	Repository      *Repository `protobuf:"bytes,1,opt,name=repository" json:"repository,omitempty"`
+	User            *User       `protobuf:"bytes,2,opt,name=user" json:"user,omitempty"`
+	Commit          *GitCommit  `protobuf:"bytes,3,opt,name=commit" json:"commit,omitempty"`
+	BranchName      []byte      `protobuf:"bytes,4,opt,name=branch_name,json=branchName,proto3" json:"branch_name,omitempty"`
+	Message         []byte      `protobuf:"bytes,5,opt,name=message,proto3" json:"message,omitempty"`
+	StartBranchName []byte      `protobuf:"bytes,6,opt,name=start_branch_name,json=startBranchName,proto3" json:"start_branch_name,omitempty"`
+	StartRepository *Repository `protobuf:"bytes,7,opt,name=start_repository,json=startRepository" json:"start_repository,omitempty"`
+}
+
+func (m *UserCherryPickRequest) Reset()                    { *m = UserCherryPickRequest{} }
+func (m *UserCherryPickRequest) String() string            { return proto.CompactTextString(m) }
+func (*UserCherryPickRequest) ProtoMessage()               {}
+func (*UserCherryPickRequest) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{13} }
+
+func (m *UserCherryPickRequest) GetRepository() *Repository {
+	if m != nil {
+		return m.Repository
+	}
+	return nil
+}
+
+func (m *UserCherryPickRequest) GetUser() *User {
+	if m != nil {
+		return m.User
+	}
+	return nil
+}
+
+func (m *UserCherryPickRequest) GetCommit() *GitCommit {
+	if m != nil {
+		return m.Commit
+	}
+	return nil
+}
+
+func (m *UserCherryPickRequest) GetBranchName() []byte {
+	if m != nil {
+		return m.BranchName
+	}
+	return nil
+}
+
+func (m *UserCherryPickRequest) GetMessage() []byte {
+	if m != nil {
+		return m.Message
+	}
+	return nil
+}
+
+func (m *UserCherryPickRequest) GetStartBranchName() []byte {
+	if m != nil {
+		return m.StartBranchName
+	}
+	return nil
+}
+
+func (m *UserCherryPickRequest) GetStartRepository() *Repository {
+	if m != nil {
+		return m.StartRepository
+	}
+	return nil
+}
+
+type UserCherryPickResponse struct {
+	BranchUpdate    *OperationBranchUpdate `protobuf:"bytes,1,opt,name=branch_update,json=branchUpdate" json:"branch_update,omitempty"`
+	CreateTreeError string                 `protobuf:"bytes,2,opt,name=create_tree_error,json=createTreeError" json:"create_tree_error,omitempty"`
+	CommitError     string                 `protobuf:"bytes,3,opt,name=commit_error,json=commitError" json:"commit_error,omitempty"`
+	PreReceiveError string                 `protobuf:"bytes,4,opt,name=pre_receive_error,json=preReceiveError" json:"pre_receive_error,omitempty"`
+}
+
+func (m *UserCherryPickResponse) Reset()                    { *m = UserCherryPickResponse{} }
+func (m *UserCherryPickResponse) String() string            { return proto.CompactTextString(m) }
+func (*UserCherryPickResponse) ProtoMessage()               {}
+func (*UserCherryPickResponse) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{14} }
+
+func (m *UserCherryPickResponse) GetBranchUpdate() *OperationBranchUpdate {
+	if m != nil {
+		return m.BranchUpdate
+	}
+	return nil
+}
+
+func (m *UserCherryPickResponse) GetCreateTreeError() string {
+	if m != nil {
+		return m.CreateTreeError
+	}
+	return ""
+}
+
+func (m *UserCherryPickResponse) GetCommitError() string {
+	if m != nil {
+		return m.CommitError
+	}
+	return ""
+}
+
+func (m *UserCherryPickResponse) GetPreReceiveError() string {
+	if m != nil {
+		return m.PreReceiveError
+	}
+	return ""
+}
+
+type UserRevertRequest struct {
+	Repository      *Repository `protobuf:"bytes,1,opt,name=repository" json:"repository,omitempty"`
+	User            *User       `protobuf:"bytes,2,opt,name=user" json:"user,omitempty"`
+	Commit          *GitCommit  `protobuf:"bytes,3,opt,name=commit" json:"commit,omitempty"`
+	BranchName      []byte      `protobuf:"bytes,4,opt,name=branch_name,json=branchName,proto3" json:"branch_name,omitempty"`
+	Message         []byte      `protobuf:"bytes,5,opt,name=message,proto3" json:"message,omitempty"`
+	StartBranchName []byte      `protobuf:"bytes,6,opt,name=start_branch_name,json=startBranchName,proto3" json:"start_branch_name,omitempty"`
+	StartRepository *Repository `protobuf:"bytes,7,opt,name=start_repository,json=startRepository" json:"start_repository,omitempty"`
+}
+
+func (m *UserRevertRequest) Reset()                    { *m = UserRevertRequest{} }
+func (m *UserRevertRequest) String() string            { return proto.CompactTextString(m) }
+func (*UserRevertRequest) ProtoMessage()               {}
+func (*UserRevertRequest) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{15} }
+
+func (m *UserRevertRequest) GetRepository() *Repository {
+	if m != nil {
+		return m.Repository
+	}
+	return nil
+}
+
+func (m *UserRevertRequest) GetUser() *User {
+	if m != nil {
+		return m.User
+	}
+	return nil
+}
+
+func (m *UserRevertRequest) GetCommit() *GitCommit {
+	if m != nil {
+		return m.Commit
+	}
+	return nil
+}
+
+func (m *UserRevertRequest) GetBranchName() []byte {
+	if m != nil {
+		return m.BranchName
+	}
+	return nil
+}
+
+func (m *UserRevertRequest) GetMessage() []byte {
+	if m != nil {
+		return m.Message
+	}
+	return nil
+}
+
+func (m *UserRevertRequest) GetStartBranchName() []byte {
+	if m != nil {
+		return m.StartBranchName
+	}
+	return nil
+}
+
+func (m *UserRevertRequest) GetStartRepository() *Repository {
+	if m != nil {
+		return m.StartRepository
+	}
+	return nil
+}
+
+type UserRevertResponse struct {
+	BranchUpdate    *OperationBranchUpdate `protobuf:"bytes,1,opt,name=branch_update,json=branchUpdate" json:"branch_update,omitempty"`
+	CreateTreeError string                 `protobuf:"bytes,2,opt,name=create_tree_error,json=createTreeError" json:"create_tree_error,omitempty"`
+	CommitError     string                 `protobuf:"bytes,3,opt,name=commit_error,json=commitError" json:"commit_error,omitempty"`
+	PreReceiveError string                 `protobuf:"bytes,4,opt,name=pre_receive_error,json=preReceiveError" json:"pre_receive_error,omitempty"`
+}
+
+func (m *UserRevertResponse) Reset()                    { *m = UserRevertResponse{} }
+func (m *UserRevertResponse) String() string            { return proto.CompactTextString(m) }
+func (*UserRevertResponse) ProtoMessage()               {}
+func (*UserRevertResponse) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{16} }
+
+func (m *UserRevertResponse) GetBranchUpdate() *OperationBranchUpdate {
+	if m != nil {
+		return m.BranchUpdate
+	}
+	return nil
+}
+
+func (m *UserRevertResponse) GetCreateTreeError() string {
+	if m != nil {
+		return m.CreateTreeError
+	}
+	return ""
+}
+
+func (m *UserRevertResponse) GetCommitError() string {
+	if m != nil {
+		return m.CommitError
+	}
+	return ""
+}
+
+func (m *UserRevertResponse) GetPreReceiveError() string {
+	if m != nil {
+		return m.PreReceiveError
+	}
+	return ""
+}
+
+type UserCommitFilesActionHeader struct {
+	Action        UserCommitFilesActionHeader_ActionType `protobuf:"varint,1,opt,name=action,enum=gitaly.UserCommitFilesActionHeader_ActionType" json:"action,omitempty"`
+	FilePath      []byte                                 `protobuf:"bytes,2,opt,name=file_path,json=filePath,proto3" json:"file_path,omitempty"`
+	PreviousPath  []byte                                 `protobuf:"bytes,3,opt,name=previous_path,json=previousPath,proto3" json:"previous_path,omitempty"`
+	Base64Content bool                                   `protobuf:"varint,4,opt,name=base64_content,json=base64Content" json:"base64_content,omitempty"`
+}
+
+func (m *UserCommitFilesActionHeader) Reset()                    { *m = UserCommitFilesActionHeader{} }
+func (m *UserCommitFilesActionHeader) String() string            { return proto.CompactTextString(m) }
+func (*UserCommitFilesActionHeader) ProtoMessage()               {}
+func (*UserCommitFilesActionHeader) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{17} }
+
+func (m *UserCommitFilesActionHeader) GetAction() UserCommitFilesActionHeader_ActionType {
+	if m != nil {
+		return m.Action
+	}
+	return UserCommitFilesActionHeader_CREATE
+}
+
+func (m *UserCommitFilesActionHeader) GetFilePath() []byte {
+	if m != nil {
+		return m.FilePath
+	}
+	return nil
+}
+
+func (m *UserCommitFilesActionHeader) GetPreviousPath() []byte {
+	if m != nil {
+		return m.PreviousPath
+	}
+	return nil
+}
+
+func (m *UserCommitFilesActionHeader) GetBase64Content() bool {
+	if m != nil {
+		return m.Base64Content
+	}
+	return false
+}
+
+type UserCommitFilesAction struct {
+	// Types that are valid to be assigned to UserCommitFilesActionPayload:
+	//	*UserCommitFilesAction_Header
+	//	*UserCommitFilesAction_Content
+	UserCommitFilesActionPayload isUserCommitFilesAction_UserCommitFilesActionPayload `protobuf_oneof:"user_commit_files_action_payload"`
+}
+
+func (m *UserCommitFilesAction) Reset()                    { *m = UserCommitFilesAction{} }
+func (m *UserCommitFilesAction) String() string            { return proto.CompactTextString(m) }
+func (*UserCommitFilesAction) ProtoMessage()               {}
+func (*UserCommitFilesAction) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{18} }
+
+type isUserCommitFilesAction_UserCommitFilesActionPayload interface {
+	isUserCommitFilesAction_UserCommitFilesActionPayload()
+}
+
+type UserCommitFilesAction_Header struct {
+	Header *UserCommitFilesActionHeader `protobuf:"bytes,1,opt,name=header,oneof"`
+}
+type UserCommitFilesAction_Content struct {
+	Content []byte `protobuf:"bytes,2,opt,name=content,proto3,oneof"`
+}
+
+func (*UserCommitFilesAction_Header) isUserCommitFilesAction_UserCommitFilesActionPayload()  {}
+func (*UserCommitFilesAction_Content) isUserCommitFilesAction_UserCommitFilesActionPayload() {}
+
+func (m *UserCommitFilesAction) GetUserCommitFilesActionPayload() isUserCommitFilesAction_UserCommitFilesActionPayload {
+	if m != nil {
+		return m.UserCommitFilesActionPayload
+	}
+	return nil
+}
+
+func (m *UserCommitFilesAction) GetHeader() *UserCommitFilesActionHeader {
+	if x, ok := m.GetUserCommitFilesActionPayload().(*UserCommitFilesAction_Header); ok {
+		return x.Header
+	}
+	return nil
+}
+
+func (m *UserCommitFilesAction) GetContent() []byte {
+	if x, ok := m.GetUserCommitFilesActionPayload().(*UserCommitFilesAction_Content); ok {
+		return x.Content
+	}
+	return nil
+}
+
+// XXX_OneofFuncs is for the internal use of the proto package.
+func (*UserCommitFilesAction) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _UserCommitFilesAction_OneofMarshaler, _UserCommitFilesAction_OneofUnmarshaler, _UserCommitFilesAction_OneofSizer, []interface{}{
+		(*UserCommitFilesAction_Header)(nil),
+		(*UserCommitFilesAction_Content)(nil),
+	}
+}
+
+func _UserCommitFilesAction_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
+	m := msg.(*UserCommitFilesAction)
+	// user_commit_files_action_payload
+	switch x := m.UserCommitFilesActionPayload.(type) {
+	case *UserCommitFilesAction_Header:
+		b.EncodeVarint(1<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Header); err != nil {
+			return err
+		}
+	case *UserCommitFilesAction_Content:
+		b.EncodeVarint(2<<3 | proto.WireBytes)
+		b.EncodeRawBytes(x.Content)
+	case nil:
+	default:
+		return fmt.Errorf("UserCommitFilesAction.UserCommitFilesActionPayload has unexpected type %T", x)
+	}
+	return nil
+}
+
+func _UserCommitFilesAction_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
+	m := msg.(*UserCommitFilesAction)
+	switch tag {
+	case 1: // user_commit_files_action_payload.header
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(UserCommitFilesActionHeader)
+		err := b.DecodeMessage(msg)
+		m.UserCommitFilesActionPayload = &UserCommitFilesAction_Header{msg}
+		return true, err
+	case 2: // user_commit_files_action_payload.content
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		x, err := b.DecodeRawBytes(true)
+		m.UserCommitFilesActionPayload = &UserCommitFilesAction_Content{x}
+		return true, err
+	default:
+		return false, nil
+	}
+}
+
+func _UserCommitFilesAction_OneofSizer(msg proto.Message) (n int) {
+	m := msg.(*UserCommitFilesAction)
+	// user_commit_files_action_payload
+	switch x := m.UserCommitFilesActionPayload.(type) {
+	case *UserCommitFilesAction_Header:
+		s := proto.Size(x.Header)
+		n += proto.SizeVarint(1<<3 | proto.WireBytes)
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *UserCommitFilesAction_Content:
+		n += proto.SizeVarint(2<<3 | proto.WireBytes)
+		n += proto.SizeVarint(uint64(len(x.Content)))
+		n += len(x.Content)
+	case nil:
+	default:
+		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
+	}
+	return n
+}
+
+type UserCommitFilesRequestHeader struct {
+	Repository        *Repository `protobuf:"bytes,1,opt,name=repository" json:"repository,omitempty"`
+	User              *User       `protobuf:"bytes,2,opt,name=user" json:"user,omitempty"`
+	BranchName        []byte      `protobuf:"bytes,3,opt,name=branch_name,json=branchName,proto3" json:"branch_name,omitempty"`
+	CommitMessage     []byte      `protobuf:"bytes,4,opt,name=commit_message,json=commitMessage,proto3" json:"commit_message,omitempty"`
+	CommitAuthorName  []byte      `protobuf:"bytes,5,opt,name=commit_author_name,json=commitAuthorName,proto3" json:"commit_author_name,omitempty"`
+	CommitAuthorEmail []byte      `protobuf:"bytes,6,opt,name=commit_author_email,json=commitAuthorEmail,proto3" json:"commit_author_email,omitempty"`
+	StartBranchName   []byte      `protobuf:"bytes,7,opt,name=start_branch_name,json=startBranchName,proto3" json:"start_branch_name,omitempty"`
+	StartRepository   *Repository `protobuf:"bytes,8,opt,name=start_repository,json=startRepository" json:"start_repository,omitempty"`
+}
+
+func (m *UserCommitFilesRequestHeader) Reset()                    { *m = UserCommitFilesRequestHeader{} }
+func (m *UserCommitFilesRequestHeader) String() string            { return proto.CompactTextString(m) }
+func (*UserCommitFilesRequestHeader) ProtoMessage()               {}
+func (*UserCommitFilesRequestHeader) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{19} }
+
+func (m *UserCommitFilesRequestHeader) GetRepository() *Repository {
+	if m != nil {
+		return m.Repository
+	}
+	return nil
+}
+
+func (m *UserCommitFilesRequestHeader) GetUser() *User {
+	if m != nil {
+		return m.User
+	}
+	return nil
+}
+
+func (m *UserCommitFilesRequestHeader) GetBranchName() []byte {
+	if m != nil {
+		return m.BranchName
+	}
+	return nil
+}
+
+func (m *UserCommitFilesRequestHeader) GetCommitMessage() []byte {
+	if m != nil {
+		return m.CommitMessage
+	}
+	return nil
+}
+
+func (m *UserCommitFilesRequestHeader) GetCommitAuthorName() []byte {
+	if m != nil {
+		return m.CommitAuthorName
+	}
+	return nil
+}
+
+func (m *UserCommitFilesRequestHeader) GetCommitAuthorEmail() []byte {
+	if m != nil {
+		return m.CommitAuthorEmail
+	}
+	return nil
+}
+
+func (m *UserCommitFilesRequestHeader) GetStartBranchName() []byte {
+	if m != nil {
+		return m.StartBranchName
+	}
+	return nil
+}
+
+func (m *UserCommitFilesRequestHeader) GetStartRepository() *Repository {
+	if m != nil {
+		return m.StartRepository
+	}
+	return nil
+}
+
+type UserCommitFilesRequest struct {
+	// Types that are valid to be assigned to UserCommitFilesRequestPayload:
+	//	*UserCommitFilesRequest_Header
+	//	*UserCommitFilesRequest_Action
+	UserCommitFilesRequestPayload isUserCommitFilesRequest_UserCommitFilesRequestPayload `protobuf_oneof:"user_commit_files_request_payload"`
+}
+
+func (m *UserCommitFilesRequest) Reset()                    { *m = UserCommitFilesRequest{} }
+func (m *UserCommitFilesRequest) String() string            { return proto.CompactTextString(m) }
+func (*UserCommitFilesRequest) ProtoMessage()               {}
+func (*UserCommitFilesRequest) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{20} }
+
+type isUserCommitFilesRequest_UserCommitFilesRequestPayload interface {
+	isUserCommitFilesRequest_UserCommitFilesRequestPayload()
+}
+
+type UserCommitFilesRequest_Header struct {
+	Header *UserCommitFilesRequestHeader `protobuf:"bytes,1,opt,name=header,oneof"`
+}
+type UserCommitFilesRequest_Action struct {
+	Action *UserCommitFilesAction `protobuf:"bytes,2,opt,name=action,oneof"`
+}
+
+func (*UserCommitFilesRequest_Header) isUserCommitFilesRequest_UserCommitFilesRequestPayload() {}
+func (*UserCommitFilesRequest_Action) isUserCommitFilesRequest_UserCommitFilesRequestPayload() {}
+
+func (m *UserCommitFilesRequest) GetUserCommitFilesRequestPayload() isUserCommitFilesRequest_UserCommitFilesRequestPayload {
+	if m != nil {
+		return m.UserCommitFilesRequestPayload
+	}
+	return nil
+}
+
+func (m *UserCommitFilesRequest) GetHeader() *UserCommitFilesRequestHeader {
+	if x, ok := m.GetUserCommitFilesRequestPayload().(*UserCommitFilesRequest_Header); ok {
+		return x.Header
+	}
+	return nil
+}
+
+func (m *UserCommitFilesRequest) GetAction() *UserCommitFilesAction {
+	if x, ok := m.GetUserCommitFilesRequestPayload().(*UserCommitFilesRequest_Action); ok {
+		return x.Action
+	}
+	return nil
+}
+
+// XXX_OneofFuncs is for the internal use of the proto package.
+func (*UserCommitFilesRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _UserCommitFilesRequest_OneofMarshaler, _UserCommitFilesRequest_OneofUnmarshaler, _UserCommitFilesRequest_OneofSizer, []interface{}{
+		(*UserCommitFilesRequest_Header)(nil),
+		(*UserCommitFilesRequest_Action)(nil),
+	}
+}
+
+func _UserCommitFilesRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
+	m := msg.(*UserCommitFilesRequest)
+	// user_commit_files_request_payload
+	switch x := m.UserCommitFilesRequestPayload.(type) {
+	case *UserCommitFilesRequest_Header:
+		b.EncodeVarint(1<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Header); err != nil {
+			return err
+		}
+	case *UserCommitFilesRequest_Action:
+		b.EncodeVarint(2<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Action); err != nil {
+			return err
+		}
+	case nil:
+	default:
+		return fmt.Errorf("UserCommitFilesRequest.UserCommitFilesRequestPayload has unexpected type %T", x)
+	}
+	return nil
+}
+
+func _UserCommitFilesRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
+	m := msg.(*UserCommitFilesRequest)
+	switch tag {
+	case 1: // user_commit_files_request_payload.header
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(UserCommitFilesRequestHeader)
+		err := b.DecodeMessage(msg)
+		m.UserCommitFilesRequestPayload = &UserCommitFilesRequest_Header{msg}
+		return true, err
+	case 2: // user_commit_files_request_payload.action
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(UserCommitFilesAction)
+		err := b.DecodeMessage(msg)
+		m.UserCommitFilesRequestPayload = &UserCommitFilesRequest_Action{msg}
+		return true, err
+	default:
+		return false, nil
+	}
+}
+
+func _UserCommitFilesRequest_OneofSizer(msg proto.Message) (n int) {
+	m := msg.(*UserCommitFilesRequest)
+	// user_commit_files_request_payload
+	switch x := m.UserCommitFilesRequestPayload.(type) {
+	case *UserCommitFilesRequest_Header:
+		s := proto.Size(x.Header)
+		n += proto.SizeVarint(1<<3 | proto.WireBytes)
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *UserCommitFilesRequest_Action:
+		s := proto.Size(x.Action)
+		n += proto.SizeVarint(2<<3 | proto.WireBytes)
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case nil:
+	default:
+		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
+	}
+	return n
+}
+
+type UserCommitFilesResponse struct {
+	BranchUpdate    *OperationBranchUpdate `protobuf:"bytes,1,opt,name=branch_update,json=branchUpdate" json:"branch_update,omitempty"`
+	IndexError      string                 `protobuf:"bytes,2,opt,name=index_error,json=indexError" json:"index_error,omitempty"`
+	PreReceiveError string                 `protobuf:"bytes,3,opt,name=pre_receive_error,json=preReceiveError" json:"pre_receive_error,omitempty"`
+}
+
+func (m *UserCommitFilesResponse) Reset()                    { *m = UserCommitFilesResponse{} }
+func (m *UserCommitFilesResponse) String() string            { return proto.CompactTextString(m) }
+func (*UserCommitFilesResponse) ProtoMessage()               {}
+func (*UserCommitFilesResponse) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{21} }
+
+func (m *UserCommitFilesResponse) GetBranchUpdate() *OperationBranchUpdate {
+	if m != nil {
+		return m.BranchUpdate
+	}
+	return nil
+}
+
+func (m *UserCommitFilesResponse) GetIndexError() string {
+	if m != nil {
+		return m.IndexError
+	}
+	return ""
+}
+
+func (m *UserCommitFilesResponse) GetPreReceiveError() string {
+	if m != nil {
+		return m.PreReceiveError
+	}
+	return ""
+}
+
+type UserRebaseRequest struct {
+	Repository       *Repository `protobuf:"bytes,1,opt,name=repository" json:"repository,omitempty"`
+	User             *User       `protobuf:"bytes,2,opt,name=user" json:"user,omitempty"`
+	RebaseId         string      `protobuf:"bytes,3,opt,name=rebase_id,json=rebaseId" json:"rebase_id,omitempty"`
+	Branch           []byte      `protobuf:"bytes,4,opt,name=branch,proto3" json:"branch,omitempty"`
+	BranchSha        string      `protobuf:"bytes,5,opt,name=branch_sha,json=branchSha" json:"branch_sha,omitempty"`
+	RemoteRepository *Repository `protobuf:"bytes,6,opt,name=remote_repository,json=remoteRepository" json:"remote_repository,omitempty"`
+	RemoteBranch     []byte      `protobuf:"bytes,7,opt,name=remote_branch,json=remoteBranch,proto3" json:"remote_branch,omitempty"`
+}
+
+func (m *UserRebaseRequest) Reset()                    { *m = UserRebaseRequest{} }
+func (m *UserRebaseRequest) String() string            { return proto.CompactTextString(m) }
+func (*UserRebaseRequest) ProtoMessage()               {}
+func (*UserRebaseRequest) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{22} }
+
+func (m *UserRebaseRequest) GetRepository() *Repository {
+	if m != nil {
+		return m.Repository
+	}
+	return nil
+}
+
+func (m *UserRebaseRequest) GetUser() *User {
+	if m != nil {
+		return m.User
+	}
+	return nil
+}
+
+func (m *UserRebaseRequest) GetRebaseId() string {
+	if m != nil {
+		return m.RebaseId
+	}
+	return ""
+}
+
+func (m *UserRebaseRequest) GetBranch() []byte {
+	if m != nil {
+		return m.Branch
+	}
+	return nil
+}
+
+func (m *UserRebaseRequest) GetBranchSha() string {
+	if m != nil {
+		return m.BranchSha
+	}
+	return ""
+}
+
+func (m *UserRebaseRequest) GetRemoteRepository() *Repository {
+	if m != nil {
+		return m.RemoteRepository
+	}
+	return nil
+}
+
+func (m *UserRebaseRequest) GetRemoteBranch() []byte {
+	if m != nil {
+		return m.RemoteBranch
+	}
+	return nil
+}
+
+type UserRebaseResponse struct {
+	RebaseSha       string `protobuf:"bytes,1,opt,name=rebase_sha,json=rebaseSha" json:"rebase_sha,omitempty"`
+	PreReceiveError string `protobuf:"bytes,2,opt,name=pre_receive_error,json=preReceiveError" json:"pre_receive_error,omitempty"`
+	GitError        string `protobuf:"bytes,3,opt,name=git_error,json=gitError" json:"git_error,omitempty"`
+}
+
+func (m *UserRebaseResponse) Reset()                    { *m = UserRebaseResponse{} }
+func (m *UserRebaseResponse) String() string            { return proto.CompactTextString(m) }
+func (*UserRebaseResponse) ProtoMessage()               {}
+func (*UserRebaseResponse) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{23} }
+
+func (m *UserRebaseResponse) GetRebaseSha() string {
+	if m != nil {
+		return m.RebaseSha
+	}
+	return ""
+}
+
+func (m *UserRebaseResponse) GetPreReceiveError() string {
+	if m != nil {
+		return m.PreReceiveError
+	}
+	return ""
+}
+
+func (m *UserRebaseResponse) GetGitError() string {
+	if m != nil {
+		return m.GitError
+	}
+	return ""
+}
+
+type UserSquashRequest struct {
+	Repository    *Repository `protobuf:"bytes,1,opt,name=repository" json:"repository,omitempty"`
+	User          *User       `protobuf:"bytes,2,opt,name=user" json:"user,omitempty"`
+	SquashId      string      `protobuf:"bytes,3,opt,name=squash_id,json=squashId" json:"squash_id,omitempty"`
+	Branch        []byte      `protobuf:"bytes,4,opt,name=branch,proto3" json:"branch,omitempty"`
+	StartSha      string      `protobuf:"bytes,5,opt,name=start_sha,json=startSha" json:"start_sha,omitempty"`
+	EndSha        string      `protobuf:"bytes,6,opt,name=end_sha,json=endSha" json:"end_sha,omitempty"`
+	Author        *User       `protobuf:"bytes,7,opt,name=author" json:"author,omitempty"`
+	CommitMessage []byte      `protobuf:"bytes,8,opt,name=commit_message,json=commitMessage,proto3" json:"commit_message,omitempty"`
+}
+
+func (m *UserSquashRequest) Reset()                    { *m = UserSquashRequest{} }
+func (m *UserSquashRequest) String() string            { return proto.CompactTextString(m) }
+func (*UserSquashRequest) ProtoMessage()               {}
+func (*UserSquashRequest) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{24} }
+
+func (m *UserSquashRequest) GetRepository() *Repository {
+	if m != nil {
+		return m.Repository
+	}
+	return nil
+}
+
+func (m *UserSquashRequest) GetUser() *User {
+	if m != nil {
+		return m.User
+	}
+	return nil
+}
+
+func (m *UserSquashRequest) GetSquashId() string {
+	if m != nil {
+		return m.SquashId
+	}
+	return ""
+}
+
+func (m *UserSquashRequest) GetBranch() []byte {
+	if m != nil {
+		return m.Branch
+	}
+	return nil
+}
+
+func (m *UserSquashRequest) GetStartSha() string {
+	if m != nil {
+		return m.StartSha
+	}
+	return ""
+}
+
+func (m *UserSquashRequest) GetEndSha() string {
+	if m != nil {
+		return m.EndSha
+	}
+	return ""
+}
+
+func (m *UserSquashRequest) GetAuthor() *User {
+	if m != nil {
+		return m.Author
+	}
+	return nil
+}
+
+func (m *UserSquashRequest) GetCommitMessage() []byte {
+	if m != nil {
+		return m.CommitMessage
+	}
+	return nil
+}
+
+type UserSquashResponse struct {
+	SquashSha string `protobuf:"bytes,1,opt,name=squash_sha,json=squashSha" json:"squash_sha,omitempty"`
+	GitError  string `protobuf:"bytes,3,opt,name=git_error,json=gitError" json:"git_error,omitempty"`
+}
+
+func (m *UserSquashResponse) Reset()                    { *m = UserSquashResponse{} }
+func (m *UserSquashResponse) String() string            { return proto.CompactTextString(m) }
+func (*UserSquashResponse) ProtoMessage()               {}
+func (*UserSquashResponse) Descriptor() ([]byte, []int) { return fileDescriptor7, []int{25} }
+
+func (m *UserSquashResponse) GetSquashSha() string {
+	if m != nil {
+		return m.SquashSha
+	}
+	return ""
+}
+
+func (m *UserSquashResponse) GetGitError() string {
+	if m != nil {
+		return m.GitError
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*UserCreateBranchRequest)(nil), "gitaly.UserCreateBranchRequest")
 	proto.RegisterType((*UserCreateBranchResponse)(nil), "gitaly.UserCreateBranchResponse")
@@ -393,6 +1279,22 @@ func init() {
 	proto.RegisterType((*UserMergeBranchRequest)(nil), "gitaly.UserMergeBranchRequest")
 	proto.RegisterType((*UserMergeBranchResponse)(nil), "gitaly.UserMergeBranchResponse")
 	proto.RegisterType((*OperationBranchUpdate)(nil), "gitaly.OperationBranchUpdate")
+	proto.RegisterType((*UserFFBranchRequest)(nil), "gitaly.UserFFBranchRequest")
+	proto.RegisterType((*UserFFBranchResponse)(nil), "gitaly.UserFFBranchResponse")
+	proto.RegisterType((*UserCherryPickRequest)(nil), "gitaly.UserCherryPickRequest")
+	proto.RegisterType((*UserCherryPickResponse)(nil), "gitaly.UserCherryPickResponse")
+	proto.RegisterType((*UserRevertRequest)(nil), "gitaly.UserRevertRequest")
+	proto.RegisterType((*UserRevertResponse)(nil), "gitaly.UserRevertResponse")
+	proto.RegisterType((*UserCommitFilesActionHeader)(nil), "gitaly.UserCommitFilesActionHeader")
+	proto.RegisterType((*UserCommitFilesAction)(nil), "gitaly.UserCommitFilesAction")
+	proto.RegisterType((*UserCommitFilesRequestHeader)(nil), "gitaly.UserCommitFilesRequestHeader")
+	proto.RegisterType((*UserCommitFilesRequest)(nil), "gitaly.UserCommitFilesRequest")
+	proto.RegisterType((*UserCommitFilesResponse)(nil), "gitaly.UserCommitFilesResponse")
+	proto.RegisterType((*UserRebaseRequest)(nil), "gitaly.UserRebaseRequest")
+	proto.RegisterType((*UserRebaseResponse)(nil), "gitaly.UserRebaseResponse")
+	proto.RegisterType((*UserSquashRequest)(nil), "gitaly.UserSquashRequest")
+	proto.RegisterType((*UserSquashResponse)(nil), "gitaly.UserSquashResponse")
+	proto.RegisterEnum("gitaly.UserCommitFilesActionHeader_ActionType", UserCommitFilesActionHeader_ActionType_name, UserCommitFilesActionHeader_ActionType_value)
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -411,6 +1313,12 @@ type OperationServiceClient interface {
 	UserCreateTag(ctx context.Context, in *UserCreateTagRequest, opts ...grpc.CallOption) (*UserCreateTagResponse, error)
 	UserDeleteTag(ctx context.Context, in *UserDeleteTagRequest, opts ...grpc.CallOption) (*UserDeleteTagResponse, error)
 	UserMergeBranch(ctx context.Context, opts ...grpc.CallOption) (OperationService_UserMergeBranchClient, error)
+	UserFFBranch(ctx context.Context, in *UserFFBranchRequest, opts ...grpc.CallOption) (*UserFFBranchResponse, error)
+	UserCherryPick(ctx context.Context, in *UserCherryPickRequest, opts ...grpc.CallOption) (*UserCherryPickResponse, error)
+	UserRevert(ctx context.Context, in *UserRevertRequest, opts ...grpc.CallOption) (*UserRevertResponse, error)
+	UserCommitFiles(ctx context.Context, opts ...grpc.CallOption) (OperationService_UserCommitFilesClient, error)
+	UserRebase(ctx context.Context, in *UserRebaseRequest, opts ...grpc.CallOption) (*UserRebaseResponse, error)
+	UserSquash(ctx context.Context, in *UserSquashRequest, opts ...grpc.CallOption) (*UserSquashResponse, error)
 }
 
 type operationServiceClient struct {
@@ -488,6 +1396,85 @@ func (x *operationServiceUserMergeBranchClient) Recv() (*UserMergeBranchResponse
 	return m, nil
 }
 
+func (c *operationServiceClient) UserFFBranch(ctx context.Context, in *UserFFBranchRequest, opts ...grpc.CallOption) (*UserFFBranchResponse, error) {
+	out := new(UserFFBranchResponse)
+	err := grpc.Invoke(ctx, "/gitaly.OperationService/UserFFBranch", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *operationServiceClient) UserCherryPick(ctx context.Context, in *UserCherryPickRequest, opts ...grpc.CallOption) (*UserCherryPickResponse, error) {
+	out := new(UserCherryPickResponse)
+	err := grpc.Invoke(ctx, "/gitaly.OperationService/UserCherryPick", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *operationServiceClient) UserRevert(ctx context.Context, in *UserRevertRequest, opts ...grpc.CallOption) (*UserRevertResponse, error) {
+	out := new(UserRevertResponse)
+	err := grpc.Invoke(ctx, "/gitaly.OperationService/UserRevert", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *operationServiceClient) UserCommitFiles(ctx context.Context, opts ...grpc.CallOption) (OperationService_UserCommitFilesClient, error) {
+	stream, err := grpc.NewClientStream(ctx, &_OperationService_serviceDesc.Streams[1], c.cc, "/gitaly.OperationService/UserCommitFiles", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &operationServiceUserCommitFilesClient{stream}
+	return x, nil
+}
+
+type OperationService_UserCommitFilesClient interface {
+	Send(*UserCommitFilesRequest) error
+	CloseAndRecv() (*UserCommitFilesResponse, error)
+	grpc.ClientStream
+}
+
+type operationServiceUserCommitFilesClient struct {
+	grpc.ClientStream
+}
+
+func (x *operationServiceUserCommitFilesClient) Send(m *UserCommitFilesRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *operationServiceUserCommitFilesClient) CloseAndRecv() (*UserCommitFilesResponse, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(UserCommitFilesResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *operationServiceClient) UserRebase(ctx context.Context, in *UserRebaseRequest, opts ...grpc.CallOption) (*UserRebaseResponse, error) {
+	out := new(UserRebaseResponse)
+	err := grpc.Invoke(ctx, "/gitaly.OperationService/UserRebase", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *operationServiceClient) UserSquash(ctx context.Context, in *UserSquashRequest, opts ...grpc.CallOption) (*UserSquashResponse, error) {
+	out := new(UserSquashResponse)
+	err := grpc.Invoke(ctx, "/gitaly.OperationService/UserSquash", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for OperationService service
 
 type OperationServiceServer interface {
@@ -496,6 +1483,12 @@ type OperationServiceServer interface {
 	UserCreateTag(context.Context, *UserCreateTagRequest) (*UserCreateTagResponse, error)
 	UserDeleteTag(context.Context, *UserDeleteTagRequest) (*UserDeleteTagResponse, error)
 	UserMergeBranch(OperationService_UserMergeBranchServer) error
+	UserFFBranch(context.Context, *UserFFBranchRequest) (*UserFFBranchResponse, error)
+	UserCherryPick(context.Context, *UserCherryPickRequest) (*UserCherryPickResponse, error)
+	UserRevert(context.Context, *UserRevertRequest) (*UserRevertResponse, error)
+	UserCommitFiles(OperationService_UserCommitFilesServer) error
+	UserRebase(context.Context, *UserRebaseRequest) (*UserRebaseResponse, error)
+	UserSquash(context.Context, *UserSquashRequest) (*UserSquashResponse, error)
 }
 
 func RegisterOperationServiceServer(s *grpc.Server, srv OperationServiceServer) {
@@ -600,6 +1593,122 @@ func (x *operationServiceUserMergeBranchServer) Recv() (*UserMergeBranchRequest,
 	return m, nil
 }
 
+func _OperationService_UserFFBranch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserFFBranchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OperationServiceServer).UserFFBranch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gitaly.OperationService/UserFFBranch",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OperationServiceServer).UserFFBranch(ctx, req.(*UserFFBranchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _OperationService_UserCherryPick_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserCherryPickRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OperationServiceServer).UserCherryPick(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gitaly.OperationService/UserCherryPick",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OperationServiceServer).UserCherryPick(ctx, req.(*UserCherryPickRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _OperationService_UserRevert_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserRevertRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OperationServiceServer).UserRevert(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gitaly.OperationService/UserRevert",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OperationServiceServer).UserRevert(ctx, req.(*UserRevertRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _OperationService_UserCommitFiles_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(OperationServiceServer).UserCommitFiles(&operationServiceUserCommitFilesServer{stream})
+}
+
+type OperationService_UserCommitFilesServer interface {
+	SendAndClose(*UserCommitFilesResponse) error
+	Recv() (*UserCommitFilesRequest, error)
+	grpc.ServerStream
+}
+
+type operationServiceUserCommitFilesServer struct {
+	grpc.ServerStream
+}
+
+func (x *operationServiceUserCommitFilesServer) SendAndClose(m *UserCommitFilesResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *operationServiceUserCommitFilesServer) Recv() (*UserCommitFilesRequest, error) {
+	m := new(UserCommitFilesRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func _OperationService_UserRebase_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserRebaseRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OperationServiceServer).UserRebase(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gitaly.OperationService/UserRebase",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OperationServiceServer).UserRebase(ctx, req.(*UserRebaseRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _OperationService_UserSquash_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserSquashRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OperationServiceServer).UserSquash(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gitaly.OperationService/UserSquash",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OperationServiceServer).UserSquash(ctx, req.(*UserSquashRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _OperationService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "gitaly.OperationService",
 	HandlerType: (*OperationServiceServer)(nil),
@@ -620,6 +1729,26 @@ var _OperationService_serviceDesc = grpc.ServiceDesc{
 			MethodName: "UserDeleteTag",
 			Handler:    _OperationService_UserDeleteTag_Handler,
 		},
+		{
+			MethodName: "UserFFBranch",
+			Handler:    _OperationService_UserFFBranch_Handler,
+		},
+		{
+			MethodName: "UserCherryPick",
+			Handler:    _OperationService_UserCherryPick_Handler,
+		},
+		{
+			MethodName: "UserRevert",
+			Handler:    _OperationService_UserRevert_Handler,
+		},
+		{
+			MethodName: "UserRebase",
+			Handler:    _OperationService_UserRebase_Handler,
+		},
+		{
+			MethodName: "UserSquash",
+			Handler:    _OperationService_UserSquash_Handler,
+		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
@@ -628,52 +1757,109 @@ var _OperationService_serviceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 			ClientStreams: true,
 		},
+		{
+			StreamName:    "UserCommitFiles",
+			Handler:       _OperationService_UserCommitFiles_Handler,
+			ClientStreams: true,
+		},
 	},
 	Metadata: "operations.proto",
 }
 
-func init() { proto.RegisterFile("operations.proto", fileDescriptor6) }
+func init() { proto.RegisterFile("operations.proto", fileDescriptor7) }
 
-var fileDescriptor6 = []byte{
-	// 637 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x55, 0xc1, 0x6e, 0xd3, 0x40,
-	0x10, 0xad, 0xe3, 0x34, 0x4d, 0x27, 0x69, 0x12, 0x56, 0x6d, 0x31, 0x81, 0x90, 0x60, 0x09, 0x88,
-	0x38, 0x44, 0x28, 0xfc, 0x41, 0x0b, 0x48, 0x20, 0x51, 0x90, 0xa1, 0x82, 0x9b, 0xb5, 0x89, 0x47,
-	0xae, 0xa5, 0xc4, 0x36, 0xbb, 0x9b, 0x88, 0x70, 0x40, 0xdc, 0xb8, 0xf2, 0x2b, 0xfc, 0x00, 0x1f,
-	0xc0, 0x95, 0x1f, 0x42, 0xde, 0x5d, 0xa7, 0xb6, 0xe3, 0x20, 0x04, 0x48, 0x70, 0xdc, 0xd9, 0xf1,
-	0x9b, 0xf7, 0xde, 0xce, 0x8c, 0xa1, 0x13, 0xc5, 0xc8, 0xa8, 0x08, 0xa2, 0x90, 0x8f, 0x62, 0x16,
-	0x89, 0x88, 0xd4, 0xfc, 0x40, 0xd0, 0xd9, 0xaa, 0xdb, 0xe4, 0x17, 0x94, 0xa1, 0xa7, 0xa2, 0xf6,
-	0x17, 0x03, 0xae, 0x9e, 0x73, 0x64, 0xa7, 0x0c, 0xa9, 0xc0, 0x13, 0x46, 0xc3, 0xe9, 0x85, 0x83,
-	0x6f, 0x17, 0xc8, 0x05, 0x19, 0x03, 0x30, 0x8c, 0x23, 0x1e, 0x88, 0x88, 0xad, 0x2c, 0x63, 0x60,
-	0x0c, 0x1b, 0x63, 0x32, 0x52, 0x30, 0x23, 0x67, 0x7d, 0xe3, 0x64, 0xb2, 0x48, 0x1f, 0x1a, 0x13,
-	0x09, 0xe2, 0x86, 0x74, 0x8e, 0x56, 0x65, 0x60, 0x0c, 0x9b, 0x0e, 0xa8, 0xd0, 0x19, 0x9d, 0x23,
-	0x19, 0x40, 0x75, 0xc1, 0x91, 0x59, 0xa6, 0x84, 0x6b, 0xa6, 0x70, 0x09, 0x07, 0x47, 0xde, 0x24,
-	0x10, 0x5c, 0x50, 0x26, 0xdc, 0x38, 0x0a, 0x42, 0x61, 0x55, 0x15, 0x84, 0x0c, 0xbd, 0x48, 0x22,
-	0x76, 0x08, 0xd6, 0x26, 0x65, 0x1e, 0x47, 0x21, 0x47, 0x72, 0x07, 0x6a, 0xaa, 0x98, 0xe6, 0xdb,
-	0x4a, 0x0b, 0xe8, 0x3c, 0x7d, 0x4b, 0xee, 0xc1, 0x95, 0x98, 0xa1, 0xcb, 0x70, 0x8a, 0xc1, 0x12,
-	0x5d, 0x64, 0x2c, 0x62, 0x92, 0xed, 0xbe, 0xd3, 0x8e, 0x19, 0x3a, 0x2a, 0xfe, 0x28, 0x09, 0xdb,
-	0x9f, 0xb5, 0x47, 0x0f, 0x71, 0x86, 0xff, 0x87, 0x47, 0xf6, 0x63, 0x65, 0x41, 0x9e, 0x91, 0xb6,
-	0xa0, 0x54, 0x9a, 0x51, 0x2e, 0xed, 0x93, 0x01, 0x87, 0x97, 0x40, 0xaf, 0xa8, 0xff, 0x27, 0xba,
-	0xae, 0x41, 0x5d, 0x50, 0x3f, 0x2b, 0x6a, 0x4f, 0x50, 0xff, 0x17, 0x15, 0x9d, 0xc2, 0x51, 0x81,
-	0xc8, 0x6f, 0xc8, 0xf9, 0xa6, 0xe5, 0xa8, 0xd6, 0xf8, 0x87, 0x72, 0xc8, 0x5d, 0x68, 0x0b, 0xca,
-	0x7c, 0x14, 0x2e, 0xc3, 0x65, 0xc0, 0x83, 0x28, 0xd4, 0x8d, 0xdc, 0x52, 0x61, 0x47, 0x47, 0x89,
-	0x05, 0x7b, 0x73, 0xe4, 0x9c, 0xfa, 0x68, 0xed, 0xaa, 0x22, 0xfa, 0x68, 0xbf, 0x57, 0x8e, 0x64,
-	0xb4, 0x68, 0x47, 0x7a, 0x60, 0x0a, 0xea, 0x6b, 0x15, 0x8d, 0xb4, 0x78, 0x92, 0x91, 0xc4, 0xc9,
-	0x31, 0xd4, 0xf0, 0x5d, 0xc0, 0x05, 0x97, 0xac, 0xeb, 0x8e, 0x3e, 0x95, 0x1b, 0x69, 0x96, 0x1b,
-	0xf9, 0xdd, 0x80, 0xe3, 0xa4, 0xf8, 0x33, 0x64, 0xfe, 0x5f, 0xe8, 0xf8, 0xd4, 0xaf, 0xca, 0x56,
-	0xbf, 0xae, 0xc3, 0xfe, 0x34, 0x9a, 0xcf, 0x03, 0xe1, 0x06, 0x9e, 0x26, 0x55, 0x57, 0x81, 0x27,
-	0x5e, 0xa2, 0x48, 0x0f, 0xb5, 0xf2, 0x30, 0x1d, 0xe2, 0xad, 0xde, 0x91, 0x43, 0xd8, 0xa5, 0x71,
-	0x3c, 0x5b, 0x59, 0x35, 0x69, 0x81, 0x3a, 0xd8, 0x1f, 0xf5, 0x20, 0xe7, 0x54, 0x69, 0x53, 0x73,
-	0x04, 0x8c, 0x02, 0x81, 0x13, 0x38, 0xd0, 0x13, 0xbb, 0x88, 0x3d, 0x2a, 0x50, 0x3f, 0x7c, 0x2f,
-	0x15, 0xf2, 0x3c, 0x5d, 0xb6, 0x0a, 0xf4, 0x5c, 0x26, 0x39, 0xcd, 0x49, 0xe6, 0xf4, 0xb4, 0x5a,
-	0xaf, 0x74, 0x4c, 0xfb, 0x03, 0x1c, 0x95, 0x26, 0xff, 0xbc, 0xfe, 0x2d, 0x68, 0x26, 0x6e, 0xba,
-	0x53, 0xd9, 0x0b, 0x9e, 0x7e, 0xd8, 0x46, 0x12, 0x53, 0xed, 0xe1, 0x91, 0xdb, 0xd0, 0xd2, 0x14,
-	0xd3, 0x24, 0x53, 0x26, 0x69, 0xe2, 0x3a, 0x6d, 0xfc, 0xd5, 0x84, 0xce, 0x9a, 0xc0, 0x4b, 0x64,
-	0xcb, 0x60, 0x8a, 0xe4, 0x35, 0x74, 0x8a, 0x0b, 0x95, 0xf4, 0xb3, 0x8f, 0x54, 0xf2, 0x77, 0xe8,
-	0x0e, 0xb6, 0x27, 0x28, 0x4b, 0xed, 0x9d, 0x14, 0x38, 0xbb, 0xa6, 0xf2, 0xc0, 0x25, 0x2b, 0x35,
-	0x0f, 0x5c, 0xb6, 0xe1, 0xec, 0x1d, 0x72, 0x06, 0x07, 0xb9, 0xd9, 0x20, 0x37, 0x36, 0xd9, 0x5c,
-	0x8e, 0x7f, 0xb7, 0xb7, 0xe5, 0xb6, 0x88, 0xb7, 0xde, 0x3e, 0x79, 0xbc, 0xe2, 0x76, 0xcc, 0xe3,
-	0x6d, 0xac, 0x2c, 0x7b, 0x87, 0xbc, 0x81, 0x76, 0xa1, 0xd1, 0xc8, 0xcd, 0xec, 0x37, 0x9b, 0x73,
-	0xd5, 0xed, 0x6f, 0xbd, 0x4f, 0x51, 0x87, 0xc6, 0x7d, 0x63, 0x52, 0x93, 0xff, 0xed, 0x07, 0x3f,
-	0x02, 0x00, 0x00, 0xff, 0xff, 0xd1, 0x35, 0x6e, 0x0e, 0xe1, 0x07, 0x00, 0x00,
+var fileDescriptor7 = []byte{
+	// 1459 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x58, 0x4f, 0x73, 0xdb, 0x44,
+	0x14, 0xb7, 0x6c, 0x57, 0x76, 0x5e, 0x1c, 0xc7, 0xd9, 0xfe, 0x73, 0xdd, 0xa6, 0x49, 0xd5, 0x16,
+	0x4a, 0x87, 0xc9, 0x30, 0x81, 0x81, 0x53, 0x61, 0x9a, 0xc4, 0xa1, 0x2d, 0xb4, 0x0d, 0x6a, 0x5a,
+	0xb8, 0x69, 0xb6, 0xf6, 0x62, 0x6b, 0xb0, 0x2d, 0x75, 0xa5, 0x64, 0x6a, 0x86, 0xe1, 0x06, 0x1c,
+	0xb8, 0x70, 0xe2, 0xc0, 0x09, 0x86, 0x1b, 0xc3, 0x85, 0x0b, 0x07, 0x0e, 0x7c, 0x00, 0xae, 0x3d,
+	0xf0, 0x75, 0x98, 0xdd, 0xf7, 0x64, 0x4b, 0xb2, 0x94, 0x49, 0x21, 0x19, 0x3a, 0x0c, 0x37, 0xe9,
+	0xbd, 0xb7, 0x6f, 0xdf, 0xfb, 0xbd, 0x7f, 0xbb, 0x0b, 0x0d, 0xcf, 0x17, 0x92, 0x87, 0xae, 0x37,
+	0x0a, 0xd6, 0x7c, 0xe9, 0x85, 0x1e, 0x33, 0x7b, 0x6e, 0xc8, 0x07, 0xe3, 0x56, 0x2d, 0xe8, 0x73,
+	0x29, 0xba, 0x48, 0xb5, 0x7e, 0x31, 0xe0, 0xec, 0xc3, 0x40, 0xc8, 0x4d, 0x29, 0x78, 0x28, 0x36,
+	0x24, 0x1f, 0x75, 0xfa, 0xb6, 0x78, 0xb2, 0x27, 0x82, 0x90, 0xad, 0x03, 0x48, 0xe1, 0x7b, 0x81,
+	0x1b, 0x7a, 0x72, 0xdc, 0x34, 0x56, 0x8d, 0x6b, 0xf3, 0xeb, 0x6c, 0x0d, 0xd5, 0xac, 0xd9, 0x13,
+	0x8e, 0x1d, 0x93, 0x62, 0x2b, 0x30, 0xff, 0x58, 0x2b, 0x71, 0x46, 0x7c, 0x28, 0x9a, 0xc5, 0x55,
+	0xe3, 0x5a, 0xcd, 0x06, 0x24, 0xdd, 0xe3, 0x43, 0xc1, 0x56, 0xa1, 0xbc, 0x17, 0x08, 0xd9, 0x2c,
+	0x69, 0x75, 0xb5, 0x48, 0x9d, 0xb2, 0xc1, 0xd6, 0x1c, 0xa5, 0x22, 0x08, 0xb9, 0x0c, 0x1d, 0xdf,
+	0x73, 0x47, 0x61, 0xb3, 0x8c, 0x2a, 0x34, 0x69, 0x47, 0x51, 0xac, 0x11, 0x34, 0x67, 0x4d, 0x0e,
+	0x7c, 0x6f, 0x14, 0x08, 0xf6, 0x12, 0x98, 0xb8, 0x19, 0xd9, 0x5b, 0x8f, 0x36, 0x20, 0x39, 0xe2,
+	0xb2, 0xeb, 0xb0, 0xe4, 0x4b, 0xe1, 0x48, 0xd1, 0x11, 0xee, 0xbe, 0x70, 0x84, 0x94, 0x9e, 0xd4,
+	0xd6, 0xce, 0xd9, 0x8b, 0xbe, 0x14, 0x36, 0xd2, 0xdb, 0x8a, 0x6c, 0x7d, 0x43, 0x18, 0x6d, 0x89,
+	0x81, 0x78, 0x31, 0x30, 0xb2, 0xb6, 0x11, 0x82, 0xa4, 0x45, 0x04, 0x41, 0xa6, 0x6b, 0x46, 0xb6,
+	0x6b, 0x5f, 0x19, 0x70, 0x6a, 0xaa, 0x68, 0x97, 0xf7, 0xfe, 0x89, 0x5f, 0xe7, 0xa0, 0x1a, 0xf2,
+	0x5e, 0xdc, 0xa9, 0x4a, 0xc8, 0x7b, 0x87, 0xf4, 0x68, 0x13, 0x4e, 0xa7, 0x0c, 0xf9, 0x1b, 0xee,
+	0xfc, 0x41, 0xee, 0x60, 0x6a, 0xfc, 0x8b, 0xee, 0xb0, 0x97, 0x61, 0x31, 0xe4, 0xb2, 0x27, 0x42,
+	0x47, 0x8a, 0x7d, 0x37, 0x70, 0xbd, 0x11, 0x25, 0x72, 0x1d, 0xc9, 0x36, 0x51, 0x59, 0x13, 0x2a,
+	0x43, 0x11, 0x04, 0xbc, 0x27, 0x9a, 0x27, 0x70, 0x13, 0xfa, 0xb5, 0x3e, 0x45, 0x44, 0x62, 0xbe,
+	0x10, 0x22, 0xcb, 0x50, 0x0a, 0x79, 0x8f, 0xbc, 0x98, 0x8f, 0x36, 0x57, 0x12, 0x8a, 0xce, 0xce,
+	0x80, 0x29, 0x9e, 0xba, 0x41, 0x18, 0x68, 0xab, 0xab, 0x36, 0xfd, 0x65, 0x03, 0x59, 0xca, 0x06,
+	0xf2, 0x99, 0x01, 0x67, 0xd4, 0xe6, 0x77, 0x85, 0xec, 0x1d, 0x41, 0xc6, 0x47, 0x78, 0x15, 0x73,
+	0xf1, 0x3a, 0x0f, 0x73, 0x1d, 0x6f, 0x38, 0x74, 0x43, 0xc7, 0xed, 0x92, 0x51, 0x55, 0x24, 0xdc,
+	0xee, 0x2a, 0x8f, 0xa8, 0xa8, 0x11, 0xc3, 0xa8, 0x88, 0x73, 0xb1, 0x63, 0xa7, 0xe0, 0x04, 0xf7,
+	0xfd, 0xc1, 0xb8, 0x69, 0x6a, 0x08, 0xf0, 0xc7, 0xfa, 0x99, 0x0a, 0x39, 0xe1, 0x15, 0x81, 0x9a,
+	0x30, 0xc0, 0x48, 0x19, 0xb0, 0x01, 0x0b, 0x54, 0xb1, 0x7b, 0x7e, 0x97, 0x87, 0x82, 0x02, 0xbf,
+	0x1c, 0x39, 0x72, 0x3f, 0x6a, 0xb6, 0xa8, 0xf4, 0xa1, 0x16, 0xb2, 0x6b, 0x8f, 0x63, 0x7f, 0xd9,
+	0xf0, 0x97, 0x33, 0xe1, 0xbf, 0x53, 0xae, 0x16, 0x1b, 0x25, 0xeb, 0x73, 0x38, 0x9d, 0xa9, 0xf8,
+	0x60, 0x5b, 0x2f, 0x41, 0x4d, 0x21, 0xef, 0x74, 0x74, 0xde, 0x74, 0x29, 0x09, 0xe6, 0x15, 0x0d,
+	0x53, 0xa9, 0xcb, 0xae, 0x42, 0x9d, 0xdc, 0x89, 0x84, 0x4a, 0x5a, 0x88, 0x9c, 0x24, 0x31, 0xeb,
+	0x7b, 0x03, 0x4e, 0x2a, 0xb8, 0xb6, 0xb7, 0x5f, 0xd4, 0x0c, 0xb0, 0xbe, 0xa4, 0x82, 0x9f, 0x9a,
+	0x48, 0xe1, 0x9c, 0x89, 0x98, 0x71, 0x44, 0x11, 0xcb, 0x99, 0x11, 0xbf, 0x17, 0xa9, 0x5a, 0xfb,
+	0x42, 0xca, 0xf1, 0x8e, 0xdb, 0xf9, 0xe4, 0x78, 0xd1, 0x7a, 0x05, 0x4c, 0x04, 0x87, 0x52, 0x71,
+	0x29, 0x92, 0x79, 0xd7, 0x0d, 0x37, 0x35, 0xc3, 0x26, 0x81, 0xf4, 0xb8, 0x29, 0xcf, 0x8c, 0x9b,
+	0xfc, 0x32, 0xba, 0x0e, 0x4b, 0x38, 0x8a, 0xe3, 0x0a, 0x4c, 0x2d, 0xb3, 0xa8, 0x19, 0x1b, 0x53,
+	0x2d, 0x37, 0xa0, 0x81, 0xb2, 0x31, 0x6f, 0x2b, 0xb9, 0xde, 0xe2, 0xf2, 0x29, 0xc1, 0xfa, 0x93,
+	0x3a, 0x4e, 0x1c, 0xc0, 0xa3, 0x8d, 0x25, 0xe6, 0xba, 0x13, 0x4a, 0x91, 0x8a, 0x25, 0x32, 0x76,
+	0xa5, 0xc0, 0x58, 0xaa, 0x0a, 0xa2, 0x4c, 0x8c, 0xf7, 0xc8, 0x79, 0xa4, 0xa1, 0xc8, 0x73, 0x14,
+	0xb3, 0xf5, 0x5b, 0x11, 0x96, 0x74, 0xe4, 0xc4, 0xbe, 0x50, 0x2e, 0xff, 0x9f, 0x16, 0xcf, 0x91,
+	0x16, 0xcf, 0x0c, 0x60, 0x71, 0xf0, 0xfe, 0x1b, 0x29, 0xf1, 0x5d, 0x11, 0xce, 0xeb, 0x64, 0xd7,
+	0xeb, 0xb7, 0xdd, 0x81, 0x08, 0x6e, 0x76, 0x94, 0xb9, 0xb7, 0x04, 0xef, 0x0a, 0xc9, 0xb6, 0xc1,
+	0xe4, 0xfa, 0x5f, 0xfb, 0x55, 0x5f, 0x5f, 0x8b, 0x87, 0x3a, 0x67, 0xd1, 0x1a, 0xfe, 0xec, 0x8e,
+	0x7d, 0x61, 0xd3, 0x6a, 0xd5, 0x53, 0x3f, 0x76, 0x07, 0xc2, 0xf1, 0x79, 0xd8, 0xa7, 0x33, 0x4c,
+	0x55, 0x11, 0x76, 0x78, 0xd8, 0x67, 0x97, 0x61, 0xc1, 0x57, 0x87, 0x13, 0x6f, 0x2f, 0x40, 0x81,
+	0x92, 0x16, 0xa8, 0x45, 0x44, 0x2d, 0xa4, 0x46, 0x05, 0x0f, 0xc4, 0x9b, 0x6f, 0x38, 0x1d, 0x6f,
+	0x14, 0x0a, 0x3a, 0x8f, 0xab, 0x51, 0xa1, 0xa9, 0x9b, 0x48, 0xb4, 0xee, 0x00, 0x4c, 0xb7, 0x67,
+	0x00, 0xe6, 0xa6, 0xdd, 0xbe, 0xb9, 0xdb, 0x6e, 0x14, 0x58, 0x1d, 0x00, 0xbf, 0x9d, 0xad, 0xdb,
+	0x76, 0xc3, 0x50, 0xbc, 0x87, 0x3b, 0x5b, 0x8a, 0x57, 0x64, 0x55, 0x28, 0xdf, 0xbd, 0xff, 0xa8,
+	0xdd, 0x28, 0x29, 0xea, 0x56, 0xfb, 0xfd, 0xf6, 0x6e, 0xbb, 0x51, 0xb6, 0xbe, 0x35, 0xa8, 0x95,
+	0xa6, 0xfd, 0x64, 0x37, 0xc0, 0xec, 0x6b, 0x5f, 0x29, 0xdc, 0x97, 0x0f, 0x01, 0xcb, 0xad, 0x82,
+	0x4d, 0x8b, 0x58, 0x0b, 0x2a, 0x91, 0x13, 0x1a, 0x8b, 0x5b, 0x05, 0x3b, 0x22, 0x6c, 0x58, 0xb0,
+	0xaa, 0x0a, 0xc8, 0xa1, 0x28, 0x2b, 0x90, 0x02, 0x07, 0x51, 0x74, 0x7c, 0x3e, 0x1e, 0x78, 0xbc,
+	0x6b, 0x7d, 0x51, 0x82, 0x0b, 0xa9, 0x9d, 0xa8, 0x9a, 0x29, 0x6c, 0xc7, 0x53, 0xd3, 0xa9, 0x42,
+	0x2d, 0xcd, 0x14, 0xea, 0x55, 0xa8, 0x93, 0xd9, 0x51, 0xbd, 0x62, 0x31, 0x2f, 0x20, 0xf5, 0x2e,
+	0x55, 0xed, 0xab, 0xc0, 0x48, 0x8c, 0xef, 0x85, 0x7d, 0x4f, 0xa2, 0x3a, 0x2c, 0xed, 0x06, 0x72,
+	0x6e, 0x6a, 0x86, 0x56, 0xba, 0x06, 0x27, 0x93, 0xd2, 0x62, 0xc8, 0xdd, 0x01, 0x55, 0xf9, 0x52,
+	0x5c, 0xbc, 0xad, 0x18, 0xd9, 0x3d, 0xa1, 0x72, 0xf8, 0x9e, 0x50, 0x3d, 0x7c, 0x4f, 0xf8, 0x35,
+	0x1a, 0x15, 0x33, 0x71, 0x60, 0x6f, 0xa7, 0x32, 0xe4, 0x4a, 0x4e, 0x86, 0x24, 0xe2, 0x16, 0x4b,
+	0x91, 0xb7, 0x26, 0x85, 0x57, 0x4c, 0x36, 0x94, 0xec, 0x0c, 0x2b, 0x44, 0x95, 0xb6, 0x71, 0x19,
+	0x2e, 0xcd, 0xe6, 0x8f, 0xc4, 0x5d, 0x26, 0x09, 0xf4, 0x53, 0x74, 0xd9, 0x8e, 0x1b, 0x72, 0x84,
+	0x1d, 0x6d, 0x05, 0xe6, 0xdd, 0x51, 0x57, 0x3c, 0x4d, 0xf4, 0x32, 0xd0, 0xa4, 0x03, 0x7a, 0x54,
+	0xce, 0x15, 0xe0, 0xc7, 0xc9, 0xd8, 0x52, 0xa5, 0x7e, 0xec, 0x67, 0x3f, 0xa9, 0xb7, 0x89, 0x9d,
+	0xfd, 0x90, 0x70, 0xc0, 0xe9, 0x7f, 0x19, 0xa8, 0x08, 0x9c, 0xa0, 0xcf, 0x75, 0x1e, 0xcf, 0xd9,
+	0x73, 0x48, 0x79, 0xd0, 0xe7, 0xec, 0x1d, 0x58, 0x92, 0x62, 0xe8, 0x85, 0x22, 0x9e, 0x65, 0x66,
+	0xae, 0xc1, 0x0d, 0x14, 0x9e, 0x52, 0x54, 0x7f, 0x24, 0x05, 0xb4, 0x3d, 0x66, 0x73, 0x0d, 0x89,
+	0x18, 0x06, 0xeb, 0xb3, 0x68, 0x3c, 0x21, 0x48, 0x93, 0x1b, 0x1a, 0x90, 0x3f, 0xca, 0x34, 0x3c,
+	0xa1, 0x93, 0x87, 0xca, 0xb4, 0xe7, 0x38, 0x58, 0x2a, 0x68, 0x7a, 0xa9, 0xb1, 0x53, 0xed, 0xd1,
+	0xcc, 0xb1, 0x7e, 0xa0, 0x18, 0x3d, 0x78, 0xb2, 0xc7, 0x83, 0xe3, 0x3f, 0x9f, 0x07, 0x7a, 0x9b,
+	0x58, 0x8c, 0x90, 0x70, 0x40, 0x8c, 0xd4, 0x22, 0x5d, 0xe9, 0xd3, 0x10, 0x55, 0x35, 0x41, 0xc1,
+	0x70, 0x16, 0x2a, 0x62, 0xd4, 0xd5, 0x2c, 0x53, 0xb3, 0x4c, 0x31, 0xea, 0x2a, 0xc6, 0x15, 0x30,
+	0xb1, 0xe9, 0xd0, 0x49, 0x21, 0x69, 0x0e, 0xf1, 0x32, 0xda, 0x5e, 0x35, 0xa3, 0xed, 0x59, 0x2e,
+	0x46, 0x28, 0x82, 0x68, 0x1a, 0x21, 0xf2, 0x26, 0x16, 0x21, 0xa4, 0x28, 0x0b, 0x0e, 0x42, 0x1d,
+	0x6f, 0x67, 0xf6, 0x6c, 0x08, 0xd7, 0xbf, 0xae, 0x40, 0x63, 0x52, 0xa7, 0x0f, 0x84, 0xdc, 0x77,
+	0x3b, 0x82, 0x7d, 0x08, 0x8d, 0xf4, 0x6b, 0x15, 0x5b, 0x49, 0xb4, 0x95, 0xd9, 0xa7, 0xb7, 0xd6,
+	0x6a, 0xbe, 0x00, 0x3a, 0x60, 0x15, 0x22, 0xc5, 0xf1, 0x37, 0xa0, 0xa4, 0xe2, 0x8c, 0xf7, 0xaa,
+	0xa4, 0xe2, 0xac, 0xe7, 0x23, 0xab, 0xc0, 0xee, 0xc1, 0x42, 0xe2, 0xe1, 0x81, 0x5d, 0x98, 0xb5,
+	0x66, 0xfa, 0xb6, 0xd2, 0x5a, 0xce, 0xe1, 0xa6, 0xf5, 0x4d, 0x9e, 0x76, 0x92, 0xfa, 0xd2, 0x4f,
+	0x4f, 0x49, 0x7d, 0x33, 0xef, 0x41, 0x56, 0x81, 0x7d, 0x04, 0x8b, 0xa9, 0x5b, 0x3c, 0xbb, 0x18,
+	0x5f, 0x33, 0xfb, 0x68, 0xd1, 0x5a, 0xc9, 0xe5, 0x47, 0x5a, 0xaf, 0x19, 0xaf, 0x19, 0xec, 0x3d,
+	0xa8, 0xc5, 0x6f, 0x93, 0xec, 0x7c, 0x7c, 0x59, 0xea, 0x1a, 0xdc, 0xba, 0x90, 0xcd, 0x9c, 0x98,
+	0xf9, 0x01, 0xd4, 0x93, 0x17, 0x1a, 0x96, 0x44, 0x2a, 0x7d, 0x53, 0x6c, 0x5d, 0xcc, 0x63, 0x4f,
+	0x54, 0xb6, 0x01, 0xa6, 0x87, 0x61, 0x76, 0x2e, 0x51, 0x16, 0xf1, 0xdb, 0x45, 0xab, 0x95, 0xc5,
+	0x9a, 0xa8, 0x79, 0x84, 0x00, 0xc6, 0xc6, 0x50, 0x12, 0xc0, 0xd9, 0x41, 0x99, 0x04, 0x30, 0x63,
+	0x7e, 0x29, 0x00, 0xa7, 0xe6, 0xa9, 0x46, 0x97, 0x36, 0x2f, 0x36, 0x45, 0xd2, 0xe6, 0xc5, 0x7b,
+	0xe7, 0xd4, 0x4b, 0xac, 0xd8, 0xa4, 0x9a, 0x44, 0xa3, 0x4b, 0xaa, 0x49, 0x16, 0xb8, 0x55, 0x78,
+	0x6c, 0xea, 0x17, 0xee, 0xd7, 0xff, 0x0a, 0x00, 0x00, 0xff, 0xff, 0x36, 0x90, 0x2b, 0x73, 0x0b,
+	0x17, 0x00, 0x00,
 }

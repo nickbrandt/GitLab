@@ -308,6 +308,10 @@ func (s *GitalyTestServer) FetchRemote(context.Context, *pb.FetchRemoteRequest) 
 	return nil, nil
 }
 
+func (s *GitalyTestServer) FetchSourceBranch(context.Context, *pb.FetchSourceBranchRequest) (*pb.FetchSourceBranchResponse, error) {
+	return nil, nil
+}
+
 func (s *GitalyTestServer) CreateRepository(context.Context, *pb.CreateRepositoryRequest) (*pb.CreateRepositoryResponse, error) {
 	return nil, nil
 }
@@ -334,6 +338,74 @@ func (s *GitalyTestServer) CommitPatch(in *pb.CommitPatchRequest, stream pb.Diff
 
 func (s *GitalyTestServer) GetBlobs(in *pb.GetBlobsRequest, stream pb.BlobService_GetBlobsServer) error {
 	return nil
+}
+
+func (s *GitalyTestServer) GetAllLFSPointers(*pb.GetAllLFSPointersRequest, pb.BlobService_GetAllLFSPointersServer) error {
+	return nil
+}
+
+func (s *GitalyTestServer) GetLFSPointers(*pb.GetLFSPointersRequest, pb.BlobService_GetLFSPointersServer) error {
+	return nil
+}
+
+func (s *GitalyTestServer) GetNewLFSPointers(*pb.GetNewLFSPointersRequest, pb.BlobService_GetNewLFSPointersServer) error {
+	return nil
+}
+
+func (s *GitalyTestServer) CreateFork(context.Context, *pb.CreateForkRequest) (*pb.CreateForkResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) CalculateChecksum(context.Context, *pb.CalculateChecksumRequest) (*pb.CalculateChecksumResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) CreateBundle(*pb.CreateBundleRequest, pb.RepositoryService_CreateBundleServer) error {
+	return nil
+}
+
+func (s *GitalyTestServer) CreateRepositoryFromBundle(pb.RepositoryService_CreateRepositoryFromBundleServer) error {
+	return nil
+}
+
+func (s *GitalyTestServer) CreateRepositoryFromURL(context.Context, *pb.CreateRepositoryFromURLRequest) (*pb.CreateRepositoryFromURLResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) FindLicense(context.Context, *pb.FindLicenseRequest) (*pb.FindLicenseResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) FindMergeBase(context.Context, *pb.FindMergeBaseRequest) (*pb.FindMergeBaseResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) Fsck(context.Context, *pb.FsckRequest) (*pb.FsckResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) GetInfoAttributes(*pb.GetInfoAttributesRequest, pb.RepositoryService_GetInfoAttributesServer) error {
+	return nil
+}
+
+func (s *GitalyTestServer) IsRebaseInProgress(context.Context, *pb.IsRebaseInProgressRequest) (*pb.IsRebaseInProgressResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) IsSquashInProgress(context.Context, *pb.IsSquashInProgressRequest) (*pb.IsSquashInProgressResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) WriteConfig(context.Context, *pb.WriteConfigRequest) (*pb.WriteConfigResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) WriteRef(context.Context, *pb.WriteRefRequest) (*pb.WriteRefResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) Cleanup(context.Context, *pb.CleanupRequest) (*pb.CleanupResponse, error) {
+	return nil, nil
 }
 
 // sendBytes returns the number of times the 'sender' function was called and an error.
