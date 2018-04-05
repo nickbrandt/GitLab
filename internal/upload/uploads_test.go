@@ -20,6 +20,7 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/objectstore/test"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
@@ -29,9 +30,6 @@ var nilHandler = http.HandlerFunc(func(http.ResponseWriter, *http.Request) {})
 type testFormProcessor struct{}
 
 func (a *testFormProcessor) ProcessFile(ctx context.Context, formName string, file *filestore.FileHandler, writer *multipart.Writer) error {
-	if formName != "file" && file.LocalPath != "my.file" {
-		return errors.New("illegal file")
-	}
 	return nil
 }
 
@@ -233,15 +231,10 @@ func TestUploadProcessingFile(t *testing.T) {
 	}
 	defer os.RemoveAll(tempPath)
 
-	var buffer bytes.Buffer
+	_, testServer := test.StartObjectStore()
+	defer testServer.Close()
 
-	writer := multipart.NewWriter(&buffer)
-	file, err := writer.CreateFormFile("file2", "my.file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Fprint(file, "test")
-	writer.Close()
+	storeUrl := testServer.URL + test.ObjectPath
 
 	tests := []struct {
 		name    string
@@ -253,19 +246,28 @@ func TestUploadProcessingFile(t *testing.T) {
 		},
 		{
 			name:    "ObjectStore Upload",
-			preauth: api.Response{RemoteObject: api.RemoteObject{StoreURL: "http://example.com"}},
+			preauth: api.Response{RemoteObject: api.RemoteObject{StoreURL: storeUrl}},
 		},
 		{
 			name: "ObjectStore and FileStore Upload",
 			preauth: api.Response{
 				TempPath:     tempPath,
-				RemoteObject: api.RemoteObject{StoreURL: "http://example.com"},
+				RemoteObject: api.RemoteObject{StoreURL: storeUrl},
 			},
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			var buffer bytes.Buffer
+			writer := multipart.NewWriter(&buffer)
+			file, err := writer.CreateFormFile("file", "my.file")
+			if err != nil {
+				t.Fatal(err)
+			}
+			fmt.Fprint(file, "test")
+			writer.Close()
+
 			httpRequest, err := http.NewRequest("PUT", "/url/path", &buffer)
 			if err != nil {
 				t.Fatal(err)
@@ -274,7 +276,7 @@ func TestUploadProcessingFile(t *testing.T) {
 
 			response := httptest.NewRecorder()
 			HandleFileUploads(response, httpRequest, nilHandler, &test.preauth, &testFormProcessor{})
-			testhelper.AssertResponseCode(t, response, 500)
+			testhelper.AssertResponseCode(t, response, 200)
 		})
 	}
 
