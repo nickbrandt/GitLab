@@ -13,6 +13,10 @@ test using go 1.9:
   image: golang:1.9
   <<: *test_definition
 
+test using go 1.10:
+  image: golang:1.10
+  <<: *test_definition
+
 test:release:
   only:
     - tags

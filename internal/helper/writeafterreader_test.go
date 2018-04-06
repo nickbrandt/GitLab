@@ -85,7 +85,7 @@ func TestComplainingWriterSanity(t *testing.T) {
 
 	w.CheerUp()
 	if _, err := io.Copy(w, testReader(testData)); err != nil {
-		t.Error("copy after CheerUp: %v", err)
+		t.Errorf("copy after CheerUp: %v", err)
 	}
 
 	if result := recorder.String(); result != testData {
