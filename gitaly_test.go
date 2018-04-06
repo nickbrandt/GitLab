@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
@@ -22,6 +23,8 @@ import (
 
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
 
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
@@ -577,6 +580,106 @@ func TestGetPatchProxiedToGitalyInterruptedStream(t *testing.T) {
 	case <-time.After(10 * time.Second):
 		t.Fatal("time out waiting for gitaly handler to return")
 	}
+}
+
+func TestGetSnapshotProxiedToGitalySuccessfully(t *testing.T) {
+	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
+	defer gitalyServer.Stop()
+
+	gitalyAddress := "unix://" + socketPath
+	expectedBody := testhelper.GitalyGetSnapshotResponseMock
+	archiveLength := len(expectedBody)
+
+	params := buildGetSnapshotParams(gitalyAddress, buildPbRepo("default", "foo/bar.git"))
+	resp, body, err := doSendDataRequest("/api/v4/projects/:id/snapshot", "git-snapshot", params)
+	require.NoError(t, err)
+
+	assert.Equal(t, http.StatusOK, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	assert.Equal(t, expectedBody, string(body), "GET %q: body", resp.Request.URL)
+	assert.Equal(t, archiveLength, len(body), "GET %q: body size", resp.Request.URL)
+
+	testhelper.AssertResponseHeader(t, resp, "Content-Disposition", `attachment; filename="snapshot.tar"`)
+	testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-tar")
+	testhelper.AssertResponseHeader(t, resp, "Content-Transfer-Encoding", "binary")
+	testhelper.AssertResponseHeader(t, resp, "Cache-Control", "private")
+}
+
+func TestGetSnapshotProxiedToGitalyInterruptedStream(t *testing.T) {
+	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
+	defer gitalyServer.Stop()
+
+	gitalyAddress := "unix://" + socketPath
+
+	params := buildGetSnapshotParams(gitalyAddress, buildPbRepo("default", "foo/bar.git"))
+	resp, _, err := doSendDataRequest("/api/v4/projects/:id/snapshot", "git-snapshot", params)
+	require.NoError(t, err)
+
+	// This causes the server stream to be interrupted instead of consumed entirely.
+	resp.Body.Close()
+
+	done := make(chan struct{})
+	go func() {
+		gitalyServer.WaitGroup.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		return
+	case <-time.After(10 * time.Second):
+		t.Fatal("time out waiting for gitaly handler to return")
+	}
+}
+
+func buildGetSnapshotParams(gitalyAddress string, repo *pb.Repository) string {
+	msg := serializedMessage("GetSnapshotRequest", &pb.GetSnapshotRequest{Repository: repo})
+	return buildGitalyRpcParams(gitalyAddress, msg)
+}
+
+type rpcArg struct {
+	k string
+	v interface{}
+}
+
+// Gitlab asks workhorse to perform some long-running RPCs for it by sending
+// the RPC arguments (which are protobuf messages) in HTTP response headers.
+// The messages are encoded to JSON objects using pbjson, The strings are then
+// re-encoded to JSON strings using json. We must replicate this behaviour here
+func buildGitalyRpcParams(gitalyAddress string, rpcArgs ...rpcArg) string {
+	built := map[string]interface{}{
+		"GitalyServer": map[string]string{
+			"Address": gitalyAddress,
+			"Token":   "",
+		},
+	}
+
+	for _, arg := range rpcArgs {
+		built[arg.k] = arg.v
+	}
+
+	b, err := json.Marshal(interface{}(built))
+	if err != nil {
+		panic(err)
+	}
+
+	return string(b)
+}
+
+func buildPbRepo(storageName, relativePath string) *pb.Repository {
+	return &pb.Repository{
+		StorageName:  storageName,
+		RelativePath: relativePath,
+	}
+}
+
+func serializedMessage(name string, arg proto.Message) rpcArg {
+	m := &jsonpb.Marshaler{}
+	str, err := m.MarshalToString(arg)
+	if err != nil {
+		panic(err)
+	}
+
+	return rpcArg{name, str}
 }
 
 type combinedServer struct {
