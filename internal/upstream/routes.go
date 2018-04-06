@@ -161,6 +161,7 @@ func (u *Upstream) configureRoutes() {
 
 		// Terminal websocket
 		wsRoute(projectPattern+`environments/[0-9]+/terminal.ws\z`, terminal.Handler(api)),
+		wsRoute(projectPattern+`-/jobs/[0-9]+/terminal.ws\z`, terminal.Handler(api)),
 
 		// Long poll and limit capacity given to jobs/request and builds/register.json
 		route("", apiPattern+`v4/jobs/request\z`, ciAPILongPolling),

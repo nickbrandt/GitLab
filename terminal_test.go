@@ -20,7 +20,10 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 )
 
-var terminalPath = fmt.Sprintf("%s/environments/1/terminal.ws", testProject)
+var (
+	envTerminalPath = fmt.Sprintf("%s/environments/1/terminal.ws", testProject)
+	jobTerminalPath = fmt.Sprintf("%s/-/jobs/1/terminal.ws", testProject)
+)
 
 type connWithReq struct {
 	conn *websocket.Conn
@@ -28,39 +31,50 @@ type connWithReq struct {
 }
 
 func TestTerminalHappyPath(t *testing.T) {
-	serverConns, clientURL, close := wireupTerminal(nil, "channel.k8s.io")
-	defer close()
-
-	client, _, err := dialWebsocket(clientURL, nil, "terminal.gitlab.com")
-	if err != nil {
-		t.Fatal(err)
+	tests := []struct {
+		name         string
+		terminalPath string
+	}{
+		{"environments", envTerminalPath},
+		{"jobs", jobTerminalPath},
 	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			serverConns, clientURL, close := wireupTerminal(test.terminalPath, nil, "channel.k8s.io")
+			defer close()
 
-	server := (<-serverConns).conn
-	defer server.Close()
+			client, _, err := dialWebsocket(clientURL, nil, "terminal.gitlab.com")
+			if err != nil {
+				t.Fatal(err)
+			}
 
-	message := "test message"
+			server := (<-serverConns).conn
+			defer server.Close()
 
-	// channel.k8s.io: server writes to channel 1, STDOUT
-	if err := say(server, "\x01"+message); err != nil {
-		t.Fatal(err)
+			message := "test message"
+
+			// channel.k8s.io: server writes to channel 1, STDOUT
+			if err := say(server, "\x01"+message); err != nil {
+				t.Fatal(err)
+			}
+			assertReadMessage(t, client, websocket.BinaryMessage, message)
+
+			if err := say(client, message); err != nil {
+				t.Fatal(err)
+			}
+
+			// channel.k8s.io: client writes get put on channel 0, STDIN
+			assertReadMessage(t, server, websocket.BinaryMessage, "\x00"+message)
+
+			// Closing the client should send an EOT signal to the server's STDIN
+			client.Close()
+			assertReadMessage(t, server, websocket.BinaryMessage, "\x00\x04")
+		})
 	}
-	assertReadMessage(t, client, websocket.BinaryMessage, message)
-
-	if err := say(client, message); err != nil {
-		t.Fatal(err)
-	}
-
-	// channel.k8s.io: client writes get put on channel 0, STDIN
-	assertReadMessage(t, server, websocket.BinaryMessage, "\x00"+message)
-
-	// Closing the client should send an EOT signal to the server's STDIN
-	client.Close()
-	assertReadMessage(t, server, websocket.BinaryMessage, "\x00\x04")
 }
 
 func TestTerminalBadTLS(t *testing.T) {
-	_, clientURL, close := wireupTerminal(badCA, "channel.k8s.io")
+	_, clientURL, close := wireupTerminal(envTerminalPath, badCA, "channel.k8s.io")
 	defer close()
 
 	client, _, err := dialWebsocket(clientURL, nil, "terminal.gitlab.com")
@@ -74,7 +88,7 @@ func TestTerminalBadTLS(t *testing.T) {
 }
 
 func TestTerminalSessionTimeout(t *testing.T) {
-	serverConns, clientURL, close := wireupTerminal(timeout, "channel.k8s.io")
+	serverConns, clientURL, close := wireupTerminal(envTerminalPath, timeout, "channel.k8s.io")
 	defer close()
 
 	client, _, err := dialWebsocket(clientURL, nil, "terminal.gitlab.com")
@@ -96,7 +110,7 @@ func TestTerminalSessionTimeout(t *testing.T) {
 func TestTerminalProxyForwardsHeadersFromUpstream(t *testing.T) {
 	hdr := make(http.Header)
 	hdr.Set("Random-Header", "Value")
-	serverConns, clientURL, close := wireupTerminal(setHeader(hdr), "channel.k8s.io")
+	serverConns, clientURL, close := wireupTerminal(envTerminalPath, setHeader(hdr), "channel.k8s.io")
 	defer close()
 
 	client, _, err := dialWebsocket(clientURL, nil, "terminal.gitlab.com")
@@ -113,7 +127,7 @@ func TestTerminalProxyForwardsHeadersFromUpstream(t *testing.T) {
 }
 
 func TestTerminalProxyForwardsXForwardedForFromClient(t *testing.T) {
-	serverConns, clientURL, close := wireupTerminal(nil, "channel.k8s.io")
+	serverConns, clientURL, close := wireupTerminal(envTerminalPath, nil, "channel.k8s.io")
 	defer close()
 
 	hdr := make(http.Header)
@@ -136,7 +150,7 @@ func TestTerminalProxyForwardsXForwardedForFromClient(t *testing.T) {
 	}
 }
 
-func wireupTerminal(modifier func(*api.Response), subprotocols ...string) (chan connWithReq, string, func()) {
+func wireupTerminal(terminalPath string, modifier func(*api.Response), subprotocols ...string) (chan connWithReq, string, func()) {
 	serverConns, remote := startWebsocketServer(subprotocols...)
 	authResponse := terminalOkBody(remote, nil, subprotocols...)
 	if modifier != nil {
