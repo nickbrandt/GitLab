@@ -23,11 +23,14 @@ type GitalyTestServer struct {
 }
 
 var (
-	GitalyInfoRefsResponseMock    = strings.Repeat("Mock Gitaly InfoRefsResponse data", 100000)
-	GitalyGetBlobResponseMock     = strings.Repeat("Mock Gitaly GetBlobResponse data", 100000)
-	GitalyGetArchiveResponseMock  = strings.Repeat("Mock Gitaly GetArchiveResponse data", 100000)
-	GitalyGetDiffResponseMock     = strings.Repeat("Mock Gitaly GetDiffResponse data", 100000)
-	GitalyGetPatchResponseMock    = strings.Repeat("Mock Gitaly GetPatchResponse data", 100000)
+	GitalyInfoRefsResponseMock   = strings.Repeat("Mock Gitaly InfoRefsResponse data", 100000)
+	GitalyGetBlobResponseMock    = strings.Repeat("Mock Gitaly GetBlobResponse data", 100000)
+	GitalyGetArchiveResponseMock = strings.Repeat("Mock Gitaly GetArchiveResponse data", 100000)
+	GitalyGetDiffResponseMock    = strings.Repeat("Mock Gitaly GetDiffResponse data", 100000)
+	GitalyGetPatchResponseMock   = strings.Repeat("Mock Gitaly GetPatchResponse data", 100000)
+
+	GitalyGetSnapshotResponseMock = strings.Repeat("Mock Gitaly GetSnapshotResponse data", 100000)
+
 	GitalyReceivePackResponseMock []byte
 	GitalyUploadPackResponseMock  []byte
 )
@@ -280,6 +283,27 @@ func (s *GitalyTestServer) RawPatch(in *pb.RawPatchRequest, stream pb.DiffServic
 	return s.finalError()
 }
 
+func (s *GitalyTestServer) GetSnapshot(in *pb.GetSnapshotRequest, stream pb.RepositoryService_GetSnapshotServer) error {
+	s.WaitGroup.Add(1)
+	defer s.WaitGroup.Done()
+
+	if err := validateRepository(in.GetRepository()); err != nil {
+		return err
+	}
+
+	nSends, err := sendBytes([]byte(GitalyGetSnapshotResponseMock), 100, func(p []byte) error {
+		return stream.Send(&pb.GetSnapshotResponse{Data: p})
+	})
+	if err != nil {
+		return err
+	}
+	if nSends <= 1 {
+		panic("should have sent more than one message")
+	}
+
+	return s.finalError()
+}
+
 func (s *GitalyTestServer) RepositoryExists(context.Context, *pb.RepositoryExistsRequest) (*pb.RepositoryExistsResponse, error) {
 	return nil, nil
 }
@@ -405,6 +429,10 @@ func (s *GitalyTestServer) WriteRef(context.Context, *pb.WriteRefRequest) (*pb.W
 }
 
 func (s *GitalyTestServer) Cleanup(context.Context, *pb.CleanupRequest) (*pb.CleanupResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) CreateRepositoryFromSnapshot(context.Context, *pb.CreateRepositoryFromSnapshotRequest) (*pb.CreateRepositoryFromSnapshotResponse, error) {
 	return nil, nil
 }
 

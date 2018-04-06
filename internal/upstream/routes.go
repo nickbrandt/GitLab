@@ -140,6 +140,7 @@ func (u *Upstream) configureRoutes() {
 		git.SendBlob,
 		git.SendDiff,
 		git.SendPatch,
+		git.SendSnapshot,
 		artifacts.SendEntry,
 		sendurl.SendURL,
 	)
