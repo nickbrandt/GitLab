@@ -36,17 +36,6 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     )
   end
 
-<<<<<<< HEAD
-  def self.synced_repos
-    where.not(last_repository_synced_at: nil, last_repository_successful_sync_at: nil)
-        .where(resync_repository: false)
-  end
-
-  def self.synced_wikis
-    where.not(last_wiki_synced_at: nil, last_wiki_successful_sync_at: nil)
-        .where(resync_wiki: false)
-  end
-
   def self.verified_repos
     where.not(last_repository_verification_at: nil, repository_verification_checksum: nil)
         .where(last_repository_verification_failed: false)
@@ -57,8 +46,6 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
         .where(last_wiki_verification_failed: false)
   end
 
-=======
->>>>>>> 360fa69f22f... Merge branch 'mk/geo/fix-inconsistent-project-registry-queries' into 'master'
   def repository_sync_due?(scheduled_time)
     never_synced_repository? || repository_sync_needed?(scheduled_time)
   end
