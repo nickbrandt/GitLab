@@ -21,18 +21,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type uploadArtifactsFunction func(url, contentType string, body io.Reader) (*http.Response, error, string)
+type uploadArtifactsFunction func(url, contentType string, body io.Reader) (*http.Response, string, error)
 
-func uploadArtifactsV1(url, contentType string, body io.Reader) (*http.Response, error, string) {
+func uploadArtifactsV1(url, contentType string, body io.Reader) (*http.Response, string, error) {
 	resource := `/ci/api/v1/builds/123/artifacts`
 	resp, err := http.Post(url+resource, contentType, body)
-	return resp, err, resource
+	return resp, resource, err
 }
 
-func uploadArtifactsV4(url, contentType string, body io.Reader) (*http.Response, error, string) {
+func uploadArtifactsV4(url, contentType string, body io.Reader) (*http.Response, string, error) {
 	resource := `/api/v4/jobs/123/artifacts`
 	resp, err := http.Post(url+resource, contentType, body)
-	return resp, err, resource
+	return resp, resource, err
 }
 
 func testArtifactsUpload(t *testing.T, uploadArtifacts uploadArtifactsFunction) {
@@ -45,7 +45,7 @@ func testArtifactsUpload(t *testing.T, uploadArtifacts uploadArtifactsFunction) 
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
 
-	resp, err, resource := uploadArtifacts(ws.URL, contentType, reqBody)
+	resp, resource, err := uploadArtifacts(ws.URL, contentType, reqBody)
 	assert.NoError(t, err)
 	defer resp.Body.Close()
 

@@ -14,7 +14,7 @@ import (
 )
 
 func reopenLogWriter(l reopen.WriteCloser, sighup chan os.Signal) {
-	for _ = range sighup {
+	for range sighup {
 		log.Print("Reopening log file")
 		l.Reopen()
 	}

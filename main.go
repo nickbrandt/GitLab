@@ -34,7 +34,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-// Current version of GitLab Workhorse
+// Version is the current version of GitLab Workhorse
 var Version = "(unknown version)" // Set at build time in the Makefile
 
 var printVersion = flag.Bool("version", false, "Print version and exit")

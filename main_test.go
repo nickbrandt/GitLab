@@ -460,9 +460,9 @@ func TestSendURLForArtifacts(t *testing.T) {
 }
 
 func TestGetGitBlob(t *testing.T) {
-	blobId := "50b27c6518be44c42c4d87966ae2481ce895624c" // the LICENSE file in the test repository
+	blobID := "50b27c6518be44c42c4d87966ae2481ce895624c" // the LICENSE file in the test repository
 	blobLength := 1075
-	jsonParams := fmt.Sprintf(`{"RepoPath":"%s","BlobId":"%s"}`, path.Join(testRepoRoot, testRepo), blobId)
+	jsonParams := fmt.Sprintf(`{"RepoPath":"%s","BlobId":"%s"}`, path.Join(testRepoRoot, testRepo), blobID)
 	expectedBody := "The MIT License (MIT)"
 
 	resp, body, err := doSendDataRequest("/something", "git-blob", jsonParams)
@@ -582,8 +582,8 @@ func setupStaticFile(fpath, content string) error {
 	if err := os.MkdirAll(path.Join(*documentRoot, path.Dir(fpath)), 0755); err != nil {
 		return err
 	}
-	static_file := path.Join(*documentRoot, fpath)
-	if err := ioutil.WriteFile(static_file, []byte(content), 0666); err != nil {
+	staticFile := path.Join(*documentRoot, fpath)
+	if err := ioutil.WriteFile(staticFile, []byte(content), 0666); err != nil {
 		return err
 	}
 	return nil
@@ -638,7 +638,7 @@ func archiveOKServer(t *testing.T, archiveName string) *httptest.Server {
 
 		archivePath := path.Join(cwd, cacheDir, archiveName)
 
-		params := struct{ RepoPath, ArchivePath, CommitId, ArchivePrefix string }{
+		params := struct{ RepoPath, ArchivePath, CommitID, ArchivePrefix string }{
 			repoPath(t),
 			archivePath,
 			"c7fbe50c7c7419d9701eebe64b1fdacc3df5b9dd",
