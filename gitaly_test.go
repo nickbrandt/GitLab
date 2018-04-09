@@ -633,7 +633,7 @@ func TestGetSnapshotProxiedToGitalyInterruptedStream(t *testing.T) {
 
 func buildGetSnapshotParams(gitalyAddress string, repo *pb.Repository) string {
 	msg := serializedMessage("GetSnapshotRequest", &pb.GetSnapshotRequest{Repository: repo})
-	return buildGitalyRpcParams(gitalyAddress, msg)
+	return buildGitalyRPCParams(gitalyAddress, msg)
 }
 
 type rpcArg struct {
@@ -645,7 +645,7 @@ type rpcArg struct {
 // the RPC arguments (which are protobuf messages) in HTTP response headers.
 // The messages are encoded to JSON objects using pbjson, The strings are then
 // re-encoded to JSON strings using json. We must replicate this behaviour here
-func buildGitalyRpcParams(gitalyAddress string, rpcArgs ...rpcArg) string {
+func buildGitalyRPCParams(gitalyAddress string, rpcArgs ...rpcArg) string {
 	built := map[string]interface{}{
 		"GitalyServer": map[string]string{
 			"Address": gitalyAddress,
