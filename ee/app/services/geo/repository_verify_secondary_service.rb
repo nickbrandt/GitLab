@@ -36,18 +36,18 @@ module Geo
     end
 
     def secondary_checksum
-      registry.public_send("#{type}_verification_checksum") # rubocop:disable GitlabSecurity/PublicSend
+      registry.public_send("#{type}_verification_checksum_sha") # rubocop:disable GitlabSecurity/PublicSend
     end
 
     def verify_checksum
-      checksum = calculate_checksum(project.repository_storage, repository_path)
+      checksum = project.repository.checksum
 
       if mismatch?(checksum)
         update_registry!(failure: "#{type.to_s.capitalize} checksum mismatch: #{repository_path}")
       else
         update_registry!(checksum: checksum)
       end
-    rescue ::Gitlab::Git::Repository::NoRepository, ::Gitlab::Git::Checksum::Failure, Timeout::Error => e
+    rescue ::Gitlab::Git::Repository::NoRepository, ::Gitlab::Git::Repository::ChecksumError, Timeout::Error => e
       update_registry!(failure: "Error verifying #{type.to_s.capitalize} checksum: #{repository_path}", exception: e)
     end
 
@@ -55,13 +55,9 @@ module Geo
       primary_checksum != checksum
     end
 
-    def calculate_checksum(storage, relative_path)
-      Gitlab::Git::Checksum.new(storage, relative_path).calculate
-    end
-
     def update_registry!(checksum: nil, failure: nil, exception: nil, details: {})
       attrs = {
-        "#{type}_verification_checksum"     => checksum,
+        "#{type}_verification_checksum_sha" => checksum,
         "last_#{type}_verification_failure" => failure
       }
 
