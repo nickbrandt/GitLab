@@ -473,7 +473,9 @@ also be customized, and you can easily use a [custom buildpack](#custom-buildpac
 | ------------ | --------------- |
 | `AUTO_DEVOPS_DOMAIN`        | The [Auto DevOps domain](#auto-devops-domain); by default set automatically by the [Auto DevOps setting](#enabling-auto-devops). |
 | `AUTO_DEVOPS_CHART`         | The Helm Chart used to deploy your apps; defaults to the one [provided by GitLab](https://gitlab.com/charts/charts.gitlab.io/tree/master/charts/auto-deploy-app). |
+| `REPLICAS`                   | The number of replicas to deploy; defaults to 1. For GitLab Premium/Ultimate, you can define the same secret variable name under [multiple environments]](../../ci/variables/README.md#limiting-environment-scopes-of-secret-variables).                                                                                                                                                                              |
 | `PRODUCTION_REPLICAS`       | The number of replicas to deploy in the production environment; defaults to 1. |
+| `CANARY_REPLICAS`            | The number of canary replicas to deploy for [Canary Deployments](https://docs.gitlab.com/ee/user/project/canary_deployments.html); defaults to 1. For GitLab Premium/Ultimate, you can define the same secret variable name under [multiple environments]](../../ci/variables/README.md#limiting-environment-scopes-of-secret-variables)                                                                             |
 | `CANARY_PRODUCTION_REPLICAS`| The number of canary replicas to deploy for [Canary Deployments](../../user/project/canary_deployments.md) in the production environment. |
 | `POSTGRES_ENABLED`  | Whether PostgreSQL is enabled; defaults to `"true"`. Set to `false` to disable the automatic deployment of PostgreSQL. |
 | `POSTGRES_USER`     | The PostgreSQL user; defaults to `user`. Set it to use a custom username. |
