@@ -2,6 +2,14 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 4.1.0
+
+- Add websocket route for web terminal access to CI jobs !234
+- Remove RepoPath check on Git HTTP !244
+- Artifacts and Uploads must allow Objects Storage only requests !247
+- Bridge between Gitaly and GitLab for a new repository snapshot endpoint !248
+- Update gitaly proto !249
+
 v 4.0.0
 
 - Handle Object Store upload in upload.HandleFileUploads !238
