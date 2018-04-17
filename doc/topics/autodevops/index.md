@@ -512,8 +512,9 @@ The general rule is: `TRACK_ENV_REPLICAS`. Where:
 That way, you can define your own `TRACK_ENV_REPLICAS` variables with which
 you will be able to scale the pod's replicas easily.
 
-In the example below, the environment's name is `qa` which would result in
-looking for the `QA_REPLICAS` environment variable:
+In the example below, the environment's name is `qa` and it deploys the track
+`foo` which would result in looking for the `FOO_QA_REPLICAS` environment
+variable:
 
 ```yaml
 QA testing:
@@ -521,11 +522,11 @@ QA testing:
   environment:
     name: qa
   script:
-  - deploy qa
+  - deploy foo
 ```
 
-If, in addition, there was also a `track: foo` defined in the application's Helm
-chart, like:
+The track `foo` being referenced would also need to be defined in the
+application's Helm chart, like:
 
 ```yaml
 replicaCount: 1
@@ -546,8 +547,6 @@ service:
   externalPort: 5000
   internalPort: 5000
 ```
-
-then the environment variable would be `FOO_QA_REPLICAS`.
 
 ## Currently supported languages
 
