@@ -1,8 +1,11 @@
 module API
   module Helpers
     module ProjectSnapshotsHelpers
+<<<<<<< HEAD
       prepend ::EE::API::Helpers::ProjectSnapshotsHelpers
 
+=======
+>>>>>>> 64be2046a655cced89ff7c7f5b289a68e105fad9
       def authorize_read_git_snapshot!
         authenticated_with_full_private_access!
       end
