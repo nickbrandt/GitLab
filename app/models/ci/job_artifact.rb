@@ -15,10 +15,7 @@ module Ci
     after_save :update_file_store
 
     scope :with_files_stored_locally, -> { where(file_store: [nil, ::JobArtifactUploader::Store::LOCAL]) }
-<<<<<<< HEAD
     scope :with_files_stored_remotely, -> { where(file_store: ::JobArtifactUploader::Store::REMOTE) }
-=======
->>>>>>> 64be2046a655cced89ff7c7f5b289a68e105fad9
 
     delegate :exists?, :open, to: :file
 
