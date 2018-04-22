@@ -26,3 +26,5 @@
 
     .form-actions
       = f.submit _("Save changes"), class: 'btn btn-success qa-save-changes-button'
+      .pull-right
+        = render 'test_button', saml_provider: @saml_provider
