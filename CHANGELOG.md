@@ -12,17 +12,18 @@ entry.
 - Fix specifying a non-default ref when requesting an archive using the legacy URL. !18468
 - Respect visibility options and description when importing project from template. !18473
 - Removes 'No Job log' message from build trace. !18523
+- Align action icons in pipeline graph.
 - Fix direct_upload when records with null file_store are used.
 - Removed alert box in IDE when redirecting to new merge request.
 - Fixed IDE not loading for sub groups.
 - Fixed IDE not showing loading state when tree is loading.
-- Align action icons in pipeline graph.
 
-### Performance (3 changes)
+### Performance (4 changes)
 
 - Validate project path prior to hitting the database. !18322
 - Add index to file_store on ci_job_artifacts. !18444
 - Fix N+1 queries when loading participants for a commit note.
+- Support Markdown rendering using multiple projects.
 
 ### Added (1 change)
 
@@ -40,8 +41,9 @@ entry.
 - Fix XSS on diff view stored on filenames.
 - Fix GitLab Auth0 integration signing in the wrong user.
 
-### Fixed (63 changes, 20 of them are from the community)
+### Fixed (65 changes, 20 of them are from the community)
 
+- File uploads in remote storage now support project renaming. !4597
 - Fixed bug in dropdown selector when selecting the same selection again. !14631 (bitsapien)
 - Fixed group deletion linked to Mattermost. !16209 (Julien Millau)
 - Create commit API and Web IDE obey LFS filters. !16718
@@ -82,9 +84,9 @@ entry.
 - Work around Prometheus Helm chart name changes to fix integration. !18206 (joshlambert)
 - Prioritize weight over title when sorting charts. !18233
 - Verify that deploy token has valid access when pulling container registry image. !18260
-- Ensure hooks run when a deploy key without a user pushes.
 - Stop redirecting the page in pipeline main actions.
 - Fixed IDE button opening the wrong URL in tree list.
+- Ensure hooks run when a deploy key without a user pushes.
 - Fix 404 in group boards when moving issue between lists.
 - Display state indicator for issuable references in non-project scope (e.g. when referencing issuables from group scope).
 - Add missing port to artifact links.
@@ -93,12 +95,13 @@ entry.
 - Don't show Jump to Discussion button on Issues.
 - Fix bug rendering group icons when forking.
 - Automatically cleanup stale worktrees and lock files upon a push.
+- Use the GitLab version as part of the appearances cache key.
 - Fix Firefox stealing formatting characters on issue notes.
 - Include matching branches and tags in protected branches / tags count. (Jan Beckmann)
-- Fix relative uri when "#" is in branch name. (Jan)
-- Test if remote repository exists when importing wikis.
 - Fix 500 error when a merge request from a fork has conflicts and has not yet been updated.
+- Test if remote repository exists when importing wikis.
 - Hide emoji popup after multiple spaces. (Jan Beckmann)
+- Fix relative uri when "#" is in branch name. (Jan)
 - Escape Markdown characters properly when using autocomplete.
 - Ignore project internal references in group context.
 - Fix finding wiki file when Gitaly is enabled.
@@ -163,7 +166,7 @@ entry.
 - Bulk deleting refs is handled by Gitaly by default.
 - ListCommitsByOid is executed by Gitaly by default.
 
-### Added (37 changes, 7 of them are from the community)
+### Added (38 changes, 7 of them are from the community)
 
 - Add HTTPS-only pages. !16273 (rfwatson)
 - adds closed by informations in issue api. !17042 (haseebeqx)
@@ -171,6 +174,7 @@ entry.
 - Add per-runner configured job timeout. !17221
 - Add alternate archive route for simplified packaging. !17225
 - Add support for pipeline variables expressions in only/except. !17316
+- Add object storage support for LFS objects, CI artifacts, and uploads. !17358
 - Added confirmation modal for changing username. !17405
 - Implement foreground verification of CI artifacts. !17578
 - Extend API for exporting a project with direct upload URL. !17686
@@ -191,9 +195,9 @@ entry.
 - Support LFS objects when importing/exporting GitLab project archives. !18115
 - Store sha256 checksum of artifact metadata. !18149
 - Limit the number of failed logins when using LDAP for authentication. !43525
-- Allow to store uploads by default on Object Storage.
 - Allow assigning and filtering issuables by ancestor group labels.
 - Include subgroup issues when searching for group issues using the API.
+- Allow to store uploads by default on Object Storage.
 - Add slash command for moving issues. (Adam Pahlevi)
 - Render MR commit SHA instead "diffs" when viable.
 - Send @mention notifications even if a user has explicitly unsubscribed from item.
