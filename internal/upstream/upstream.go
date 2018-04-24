@@ -16,6 +16,8 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upload"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/urlprefix"
+
+	"github.com/sebest/xff"
 )
 
 var (
@@ -54,6 +56,9 @@ func (u *Upstream) configureURLPrefix() {
 }
 
 func (u *Upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
+	// Automatic quasi-intelligent X-Forwarded-For parsing
+	r.RemoteAddr = xff.GetRemoteAddr(r)
+
 	w := helper.NewStatsCollectingResponseWriter(ow)
 	defer w.RequestFinished(r)
 
