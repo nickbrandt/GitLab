@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 4.2.0
+
+- Guess RemoteAddr from X-Forwarded-For !254
+
 v 4.1.0
 
 - Add websocket route for web terminal access to CI jobs !234
