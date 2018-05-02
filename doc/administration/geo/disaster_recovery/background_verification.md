@@ -52,7 +52,7 @@ To check the health of Geo secondary nodes, we use a checksum over the list of
 Git references and theirs values. Right now the checksum only includes `heads`
 and `tags`. We should include all references ([issue #5196][ee-5196]), including
 GitLab-specific references to ensure true consistency. If two nodes have the
-same checksum, then they definitely hold the same data. We compute the checksuym
+same checksum, then they definitely hold the same data. We compute the checksum
 for every node after every update to make sure that they are all in sync.
 
 # Current limitations
@@ -67,6 +67,7 @@ for ensuring the integrity of the data.
 
 [disaster-recovery]: index.md
 [foreground-verification]: ../../raketasks/check.md
+[ee-5064]: https://gitlab.com/gitlab-org/gitlab-ee/issues/5064
 [ee-5699]: https://gitlab.com/gitlab-org/gitlab-ee/issues/5699
 [ee-5195]: https://gitlab.com/gitlab-org/gitlab-ee/issues/5195
 [ee-5196]: https://gitlab.com/gitlab-org/gitlab-ee/issues/5196

@@ -146,7 +146,7 @@ entry.
 - Fixes remove source branch checkbox being visible when user cannot remove the branch.
 - Make /-/ delimiter optional for search endpoints.
 
-### Performance (25 changes, 11 of them are from the community)
+### Performance (24 changes, 11 of them are from the community)
 
 - Move AssigneeTitle vue component. !17397 (George Tsiolis)
 - Move TimeTrackingCollapsedState vue component. !17399 (George Tsiolis)
@@ -166,7 +166,6 @@ entry.
 - Cache personal projects count. !18197
 - Reduce complexity of issuable finder query. !18219
 - Reduce number of queries when viewing a merge request.
-- Support Markdown rendering using multiple projects.
 - Free open file descriptors and libgit2 buffers in UpdatePagesService.
 - Memoize Git::Repository#has_visible_content?.
 - Require at least one filter when listing issues or merge requests on dashboard page.
@@ -268,11 +267,10 @@ entry.
 
 - Bump rails-html-sanitizer to 1.0.4.
 
-### Fixed (3 changes)
+### Fixed (2 changes)
 
 - Prevent auto-retry AccessDenied error from stopping transition to failed. !17862
 - Fix 500 error when trying to resolve non-ASCII conflicts in the editor. !17962
-- Don't capture trailing punctuation when autolinking. !17965
 
 ### Performance (1 change)
 
