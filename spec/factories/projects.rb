@@ -183,7 +183,6 @@ FactoryBot.define do
       end
     end
 
-<<<<<<< HEAD
     trait :remote_mirror do
       transient do
         remote_name "remote_mirror_#{SecureRandom.hex}"
@@ -193,12 +192,13 @@ FactoryBot.define do
 
       after(:create) do |project, evaluator|
         project.remote_mirrors.create!(url: evaluator.url, enabled: evaluator.enabled)
-=======
+      end
+    end
+
     trait :stubbed_repository do
       after(:build) do |project|
         allow(project).to receive(:empty_repo?).and_return(false)
         allow(project.repository).to receive(:empty?).and_return(false)
->>>>>>> ce/10-7-stable-patch-3
       end
     end
 
