@@ -211,7 +211,11 @@ module Geo
     end
 
     def clean_up_temporary_repository
+<<<<<<< HEAD
       exists = gitlab_shell.exists?(project.repository_storage_path, disk_path_temp)
+=======
+      exists = gitlab_shell.exists?(project.repository_storage, disk_path_temp + '.git')
+>>>>>>> 0b286515d5c... Merge branch '5841-geo-basesyncservice-should-prune-the-geo-temporary-directory-before-fetching' into 'master'
 
       if exists && !gitlab_shell.remove_repository(project.repository_storage_path, disk_path_temp)
         raise Gitlab::Shell::Error, "Temporary #{type} can not be removed"
