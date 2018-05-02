@@ -1616,6 +1616,7 @@ describe Project do
     end
   end
 
+<<<<<<< HEAD
   describe 'handling import URL' do
     context 'when project is a mirror' do
       it 'returns the full URL' do
@@ -1684,6 +1685,8 @@ describe Project do
     end
   end
 
+=======
+>>>>>>> ce/10-7-stable-patch-3
   describe '#container_registry_url' do
     let(:project) { create(:project) }
 
