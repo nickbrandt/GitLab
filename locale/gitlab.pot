@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-25 17:57+0200\n"
-"PO-Revision-Date: 2018-04-25 17:57+0200\n"
+"POT-Creation-Date: 2018-05-04 17:37+0200\n"
+"PO-Revision-Date: 2018-05-04 17:37+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -63,6 +63,16 @@ msgstr[1] ""
 
 msgid "%d metric"
 msgid_plural "%d metrics"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "%d staged change"
+msgid_plural "%d staged changes"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "%d unstaged change"
+msgid_plural "%d unstaged changes"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -123,6 +133,9 @@ msgid "%{type} detected %d vulnerability"
 msgid_plural "%{type} detected %d vulnerabilities"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "%{unstaged} unstaged and %{staged} staged changes"
+msgstr ""
 
 msgid "(checkout the %{link} for information on how to install it)."
 msgstr ""
@@ -203,6 +216,9 @@ msgstr ""
 msgid "Abuse reports"
 msgstr ""
 
+msgid "Accept terms"
+msgstr ""
+
 msgid "Accepted MR"
 msgstr ""
 
@@ -219,6 +235,9 @@ msgid "Account and limit settings"
 msgstr ""
 
 msgid "Active"
+msgstr ""
+
+msgid "Active Sessions"
 msgstr ""
 
 msgid "Activity"
@@ -1736,6 +1755,12 @@ msgstr ""
 msgid "Current node"
 msgstr ""
 
+msgid "CurrentUser|Profile"
+msgstr ""
+
+msgid "CurrentUser|Settings"
+msgstr ""
+
 msgid "Custom notification events"
 msgstr ""
 
@@ -1779,6 +1804,9 @@ msgid "Dec"
 msgstr ""
 
 msgid "December"
+msgstr ""
+
+msgid "Decline and sign out"
 msgstr ""
 
 msgid "Default classification label"
@@ -2209,9 +2237,6 @@ msgstr ""
 msgid "Fields on this page are now uneditable, you can configure"
 msgstr ""
 
-msgid "File name"
-msgstr ""
-
 msgid "Files"
 msgstr ""
 
@@ -2496,9 +2521,6 @@ msgstr ""
 msgid "Group ID"
 msgstr ""
 
-msgid "GroupRoadmap|Epics let you manage your portfolio of projects more efficiently and with less effort"
-msgstr ""
-
 msgid "GroupRoadmap|From %{dateWord}"
 msgstr ""
 
@@ -2508,7 +2530,16 @@ msgstr ""
 msgid "GroupRoadmap|Something went wrong while fetching epics"
 msgstr ""
 
+msgid "GroupRoadmap|Sorry, no epics matched your search"
+msgstr ""
+
+msgid "GroupRoadmap|The roadmap shows the progress of your epics along a timeline"
+msgstr ""
+
 msgid "GroupRoadmap|To view the roadmap, add a planned start or finish date to one of your epics in this group or its subgroups. Only epics in the past 3 months and the next 3 months are shown &ndash; from %{startDate} to %{endDate}."
+msgstr ""
+
+msgid "GroupRoadmap|To widen your search, change or remove filters. Only epics in the past 3 months and the next 3 months are shown &ndash; from %{startDate} to %{endDate}."
 msgstr ""
 
 msgid "GroupRoadmap|Until %{dateWord}"
@@ -2661,6 +2692,9 @@ msgid "Improve issues management with Issue weight and GitLab Enterprise Edition
 msgstr ""
 
 msgid "Improve search with Advanced Global Search and GitLab Enterprise Edition."
+msgstr ""
+
+msgid "Include a Terms of Service agreement that all users must accept."
 msgstr ""
 
 msgid "Install Runner on Kubernetes"
@@ -2914,6 +2948,9 @@ msgid "March"
 msgstr ""
 
 msgid "Mark todo as done"
+msgstr ""
+
+msgid "Markdown enabled"
 msgstr ""
 
 msgid "Maximum git storage failures"
@@ -3548,6 +3585,9 @@ msgstr ""
 msgid "Please <a href=%{link_to_billing} target=\"_blank\" rel=\"noopener noreferrer\">enable billing for one of your projects to be able to create a Kubernetes cluster</a>, then try again."
 msgstr ""
 
+msgid "Please accept the Terms of Service before continuing."
+msgstr ""
+
 msgid "Please select at least one filter to see results"
 msgstr ""
 
@@ -3965,6 +4005,9 @@ msgstr ""
 msgid "Request Access"
 msgstr ""
 
+msgid "Require all users to accept Terms of Service when they access GitLab."
+msgstr ""
+
 msgid "Reset git storage health information"
 msgstr ""
 
@@ -4024,6 +4067,12 @@ msgstr ""
 msgid "Running"
 msgstr ""
 
+msgid "SAML SSO"
+msgstr ""
+
+msgid "SAML SSO for %{group_name}"
+msgstr ""
+
 msgid "SAML Single Sign On"
 msgstr ""
 
@@ -4061,6 +4110,9 @@ msgid "Scoped issue boards"
 msgstr ""
 
 msgid "Search"
+msgstr ""
+
+msgid "Search branches"
 msgstr ""
 
 msgid "Search branches and tags"
@@ -4106,6 +4158,9 @@ msgid "Select assignee"
 msgstr ""
 
 msgid "Select branch/tag"
+msgstr ""
+
+msgid "Select source branch"
 msgstr ""
 
 msgid "Select target branch"
@@ -4209,6 +4264,15 @@ msgstr ""
 msgid "Sidebar|Weight"
 msgstr ""
 
+msgid "Sign in to %{group_name}"
+msgstr ""
+
+msgid "Sign in with Single Sign-On"
+msgstr ""
+
+msgid "Sign out"
+msgstr ""
+
 msgid "Sign-in restrictions"
 msgstr ""
 
@@ -4243,6 +4307,9 @@ msgid "Something went wrong while fetching the registry list."
 msgstr ""
 
 msgid "Something went wrong. Please try again."
+msgstr ""
+
+msgid "Sorry, no epics matched your search"
 msgstr ""
 
 msgid "Sort by"
@@ -4520,6 +4587,12 @@ msgstr ""
 msgid "Team"
 msgstr ""
 
+msgid "Terms of Service"
+msgstr ""
+
+msgid "Terms of Service Agreement"
+msgstr ""
+
 msgid "Thanks! Don't show me this again"
 msgstr ""
 
@@ -4650,6 +4723,9 @@ msgid "This board\\'s scope is reduced"
 msgstr ""
 
 msgid "This directory"
+msgstr ""
+
+msgid "This group allows you to sign in with your %{group_name} Single Sign-On account. This will redirect you to an external sign in page."
 msgstr ""
 
 msgid "This is a confidential issue."
@@ -4929,6 +5005,9 @@ msgstr ""
 msgid "To view the roadmap, add a planned start or finish date to one of your epics in this group or its subgroups. Only epics in the past 3 months and the next 3 months are shown."
 msgstr ""
 
+msgid "To widen your search, change or remove filters. If something is missing, create an epic."
+msgstr ""
+
 msgid "Todo"
 msgstr ""
 
@@ -5148,7 +5227,10 @@ msgstr ""
 msgid "Weight %{weight}"
 msgstr ""
 
-msgid "When leaving the URL blank, classification labels can still be specified whitout disabling cross project features or performing external authorization checks."
+msgid "When enabled, users cannot use GitLab until the terms have been accepted."
+msgstr ""
+
+msgid "When leaving the URL blank, classification labels can still be specified without disabling cross project features or performing external authorization checks."
 msgstr ""
 
 msgid "Wiki"

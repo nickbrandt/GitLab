@@ -176,7 +176,6 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
 
           get :diff_for_path
-          get :update_branches
           get :branch_from
           get :branch_to
         end
@@ -201,13 +200,14 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
-      ## EE-specific
       resource :mirror, only: [:show, :update] do
         member do
           get :ssh_host_keys, constraints: { format: :json }
           post :update_now
         end
       end
+
+      ## EE-specific
       resources :push_rules, constraints: { id: /\d+/ }, only: [:update]
       ## EE-specific
 
@@ -453,6 +453,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
         collection do
           post :toggle_shared_runners
+          post :toggle_group_runners
         end
       end
 

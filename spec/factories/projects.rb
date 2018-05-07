@@ -15,14 +15,18 @@ FactoryBot.define do
     namespace
     creator { group ? create(:user) : namespace&.owner }
 
-    # Nest Project Feature attributes
     transient do
+      # Nest Project Feature attributes
       wiki_access_level ProjectFeature::ENABLED
       builds_access_level ProjectFeature::ENABLED
       snippets_access_level ProjectFeature::ENABLED
       issues_access_level ProjectFeature::ENABLED
       merge_requests_access_level ProjectFeature::ENABLED
       repository_access_level ProjectFeature::ENABLED
+
+      # we can't assign the delegated `#ci_cd_settings` attributes directly, as the
+      # `#ci_cd_settings` relation needs to be created first
+      group_runners_enabled nil
     end
 
     after(:create) do |project, evaluator|
@@ -47,6 +51,9 @@ FactoryBot.define do
       end
 
       project.group&.refresh_members_authorized_projects
+
+      # assign the delegated `#ci_cd_settings` attributes after create
+      project.reload.group_runners_enabled = evaluator.group_runners_enabled unless evaluator.group_runners_enabled.nil?
     end
 
     trait :public do
@@ -62,45 +69,85 @@ FactoryBot.define do
     end
 
     trait :import_none do
-      import_status :none
+      transient do
+        status :none
+      end
+
+      before(:create) do |project, evaluator|
+        project.create_import_state(:status, evaluator.status)
+      end
     end
 
     trait :import_scheduled do
-      import_status :scheduled
+      transient do
+        status :scheduled
+        last_update_scheduled_at Time.now
+      end
 
-      after(:create) do |project, _|
-        project.mirror_data&.update_attributes(last_update_scheduled_at: Time.now)
+      before(:create) do |project, evaluator|
+        project.create_import_state(status: evaluator.status,
+                                    last_update_scheduled_at: evaluator.last_update_scheduled_at)
       end
     end
 
     trait :import_started do
-      import_status :started
+      transient do
+        status :started
+        last_update_started_at Time.now
+      end
 
-      after(:create) do |project, _|
-        project.mirror_data&.update_attributes(last_update_started_at: Time.now)
+      before(:create) do |project, evaluator|
+        project.create_import_state(status: evaluator.status,
+                                    last_update_started_at: evaluator.last_update_started_at)
       end
     end
 
     trait :import_finished do
-      timestamp = Time.now
+      transient do
+        timestamp = Time.now
 
-      import_status :finished
-      mirror_last_update_at timestamp
-      mirror_last_successful_update_at timestamp
+        status :finished
+        last_update_at timestamp
+        last_successful_update_at timestamp
+      end
+
+      before(:create) do |project, evaluator|
+        project.create_import_state(status: evaluator.status,
+                                    last_update_at: evaluator.last_update_at,
+                                    last_successful_update_at: evaluator.last_successful_update_at)
+      end
     end
 
     trait :import_failed do
-      import_status :failed
-      mirror_last_update_at { Time.now }
+      transient do
+        status :failed
+        last_update_at { Time.now }
+      end
+
+      before(:create) do |project, evaluator|
+        project.create_import_state(status: evaluator.status,
+                                    last_update_at: evaluator.last_update_at)
+      end
     end
 
     trait :import_hard_failed do
-      import_status :failed
-      mirror_last_update_at { Time.now - 1.minute }
-
-      after(:create) do |project|
-        project.mirror_data&.update_attributes(retry_count: Gitlab::Mirror::MAX_RETRY + 1)
+      transient do
+        status :failed
+        retry_count Gitlab::Mirror::MAX_RETRY + 1
+        last_update_at Time.now - 1.minute
       end
+
+      before(:create) do |project, evaluator|
+        project.create_import_state(status: evaluator.status,
+                                    retry_count: evaluator.retry_count,
+                                    last_update_at: evaluator.last_update_at)
+      end
+    end
+
+    trait :disabled_mirror do
+      mirror false
+      import_url { generate(:url) }
+      mirror_user_id { creator_id }
     end
 
     trait :mirror do
