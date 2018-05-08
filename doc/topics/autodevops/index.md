@@ -43,6 +43,7 @@ project in an easy and automatic way:
 1. [Auto Code Quality](#auto-code-quality)
 1. [Auto SAST (Static Application Security Testing)](#auto-sast)
 1. [Auto Dependency Scanning](#auto-dependency-scanning)
+1. [Auto License Management](#auto-license-management)
 1. [Auto Container Scanning](#auto-container-scanning)
 1. [Auto Review Apps](#auto-review-apps)
 1. [Auto DAST (Dynamic Application Security Testing)](#auto-dast)
@@ -258,6 +259,19 @@ check out.
 In GitLab Ultimate, any security warnings are also
 [shown in the merge request widget](../../user/project/merge_requests/dependency_scanning.md).
 
+### Auto License Management **[ULTIMATE]**
+
+> Introduced in [GitLab Ultimate][ee] 10.8.
+
+License Management uses the
+[License Management Docker image](https://gitlab.com/gitlab-org/security-products/license_management)
+to search the project dependencies for their license. Once the
+report is created, it's uploaded as an artifact which you can later download and
+check out.
+
+In GitLab Ultimate, any license are also
+[shown in the merge request widget](../../user/project/merge_requests/license_management.md).
+
 ### Auto Container Scanning
 
 > Introduced in GitLab 10.4.
@@ -390,7 +404,7 @@ If you have installed GitLab using a different method, you need to:
 1. [Deploy Prometheus](../../user/project/integrations/prometheus.md#configuring-your-own-prometheus-server-within-kubernetes) into your Kubernetes cluster
 1. If you would like response metrics, ensure you are running at least version
    0.9.0 of NGINX Ingress and
-   [enable Prometheus metrics](https://github.com/kubernetes/ingress/blob/master/examples/customization/custom-vts-metrics/nginx/nginx-vts-metrics-conf.yaml).
+   [enable Prometheus metrics](https://github.com/kubernetes/ingress-nginx/blob/master/docs/examples/customization/custom-vts-metrics-prometheus/nginx-vts-metrics-conf.yaml).
 1. Finally, [annotate](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
    the NGINX Ingress deployment to be scraped by Prometheus using
    `prometheus.io/scrape: "true"` and `prometheus.io/port: "10254"`.
@@ -498,6 +512,7 @@ also be customized, and you can easily use a [custom buildpack](#custom-buildpac
 | `BUILDPACK_URL`              | The buildpack's full URL. It can point to either Git repositories or a tarball URL. For Git repositories, it is possible to point to a specific `ref`, for example `https://github.com/heroku/heroku-buildpack-ruby.git#v142` |
 | `SAST_CONFIDENCE_LEVEL`      | The minimum confidence level of security issues you want to be reported; `1` for Low, `2` for Medium, `3` for High; defaults to `3`.|
 | `DEP_SCAN_DISABLE_REMOTE_CHECKS` | Whether remote Dependency Scanning checks are disabled; defaults to `"false"`. Set to `"true"` to disable checks that send data to GitLab central servers. [Read more about remote checks](https://gitlab.com/gitlab-org/security-products/dependency-scanning#remote-checks).|
+| `STAGING_ENABLED`            | From GitLab 10.8, this variable can be used to define a [deploy policy for staging and production environments](#deploy-policy-for-staging-and-production-environments). |
 
 TIP: **Tip:**
 Set up the replica variables using a
@@ -563,6 +578,22 @@ service:
   externalPort: 5000
   internalPort: 5000
 ```
+
+#### Deploy policy for staging and production environments
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ci-yml/merge_requests/160)
+in GitLab 10.8.
+
+The normal behavior of Auto DevOps is to use Continuous Deployment, pushing
+automatically to the `production` environment every time a new pipeline is run
+on the default branch. However, there are cases where you might want to use a
+staging environment and deploy to production manually. For this scenario, the
+`STAGING_ENABLED` environment variable was introduced.
+
+If `STAGING_ENABLED` is defined in your project (e.g., set `STAGING_ENABLED` to
+`1` as a secret variable), then the application will be automatically deployed
+to a `staging` environment, and a  `production_manual` job will be created for
+you when you're ready to manually deploy to production.
 
 ## Currently supported languages
 

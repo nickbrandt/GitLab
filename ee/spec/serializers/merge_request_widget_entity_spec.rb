@@ -60,6 +60,19 @@ describe MergeRequestWidgetEntity do
     expect(subject.as_json[:dependency_scanning]).to include(:base_path)
   end
 
+  it 'has license_management data' do
+    build = create(:ci_build, name: 'license_management', pipeline: pipeline)
+
+    allow(merge_request).to receive(:expose_license_management_data?).and_return(true)
+    allow(merge_request).to receive(:base_has_license_management_data?).and_return(true)
+    allow(merge_request).to receive(:base_license_management_artifact).and_return(build)
+    allow(merge_request).to receive(:head_license_management_artifact).and_return(build)
+
+    expect(subject.as_json).to include(:license_management)
+    expect(subject.as_json[:license_management]).to include(:head_path)
+    expect(subject.as_json[:license_management]).to include(:base_path)
+  end
+
   it 'has sast_container data' do
     build = create(:ci_build, name: 'sast:image', pipeline: pipeline)
 
@@ -84,5 +97,15 @@ describe MergeRequestWidgetEntity do
     expect(subject.as_json).to include(:dast)
     expect(subject.as_json[:dast]).to include(:head_path)
     expect(subject.as_json[:dast]).to include(:base_path)
+  end
+
+  it 'has vulnerability feedbacks path' do
+    expect(subject.as_json).to include(:vulnerability_feedback_path)
+  end
+
+  it 'has pipeline id' do
+    allow(merge_request).to receive(:head_pipeline).and_return(pipeline)
+
+    expect(subject.as_json).to include(:pipeline_id)
   end
 end
