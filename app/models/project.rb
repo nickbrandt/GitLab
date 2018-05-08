@@ -23,12 +23,9 @@ class Project < ActiveRecord::Base
   include ::Gitlab::Utils::StrongMemoize
   include ChronicDurationAttribute
   include FastDestroyAll::Helpers
-<<<<<<< HEAD
 
   # EE specific modules
   prepend EE::Project
-=======
->>>>>>> 632244e7ad4a77dc5bf7ef407812b875d20569bb
 
   extend Gitlab::ConfigHelper
 
