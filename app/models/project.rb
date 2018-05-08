@@ -69,7 +69,10 @@ class Project < ActiveRecord::Base
   default_value_for :only_mirror_protected_branches, true
 
   add_authentication_token_field :runners_token
-  before_validation :mark_remote_mirrors_for_removal
+
+  before_validation :mark_remote_mirrors_for_removal, if: -> { ActiveRecord::Base.connection.table_exists?(:remote_mirrors) }
+
+  before_save :ensure_runners_token
 
   before_save :ensure_runners_token
   after_save :update_project_statistics, if: :namespace_id_changed?
@@ -676,9 +679,15 @@ class Project < ActiveRecord::Base
     return if !force && (self[:import_status] == 'none' || self[:import_status].nil?)
     return unless import_state.nil?
 
-    create_import_state(import_state_args)
+    if persisted?
+      create_import_state(import_state_args)
 
-    update_column(:import_status, 'none')
+      update_column(:import_status, 'none')
+    else
+      build_import_state(import_state_args)
+
+      self[:import_status] = 'none'
+    end
   end
 
   def import_schedule
