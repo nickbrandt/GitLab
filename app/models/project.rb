@@ -69,14 +69,10 @@ class Project < ActiveRecord::Base
   default_value_for :only_mirror_protected_branches, true
 
   add_authentication_token_field :runners_token
-<<<<<<< HEAD
-  before_validation :mark_remote_mirrors_for_removal
-=======
 
   before_validation :mark_remote_mirrors_for_removal, if: -> { ActiveRecord::Base.connection.table_exists?(:remote_mirrors) }
 
   before_save :ensure_runners_token
->>>>>>> 632244e7ad4a77dc5bf7ef407812b875d20569bb
 
   before_save :ensure_runners_token
   after_save :update_project_statistics, if: :namespace_id_changed?
