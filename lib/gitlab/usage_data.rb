@@ -96,10 +96,6 @@ module Gitlab
             protected_branches: ProtectedBranch.count,
             releases: Release.count,
             remote_mirrors: RemoteMirror.count,
-<<<<<<< HEAD
-            services: Service.where(active: true).count,
-=======
->>>>>>> 632244e7ad4a77dc5bf7ef407812b875d20569bb
             snippets: Snippet.count,
             todos: Todo.count,
             uploads: Upload.count,
