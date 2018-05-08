@@ -94,11 +94,14 @@ RSpec.configure do |config|
   config.include LiveDebugger, :js
   config.include MigrationsHelpers, :migration
   config.include RedisHelpers
+<<<<<<< HEAD
 
   # EE only START
   config.include EE::LicenseHelpers
   config.include Rails.application.routes.url_helpers, type: :routing
   # EE only END
+=======
+>>>>>>> 632244e7ad4a77dc5bf7ef407812b875d20569bb
 
   if ENV['CI']
     # This includes the first try, i.e. tests will be run 4 times before failing.
@@ -175,6 +178,7 @@ RSpec.configure do |config|
 
   config.around(:each, :clean_gitlab_redis_shared_state) do |example|
     redis_shared_state_cleanup!
+<<<<<<< HEAD
 
     example.run
 
@@ -186,6 +190,19 @@ RSpec.configure do |config|
 
     example.run
 
+=======
+
+    example.run
+
+    redis_shared_state_cleanup!
+  end
+
+  config.around(:each, :clean_gitlab_redis_queues) do |example|
+    redis_queues_cleanup!
+
+    example.run
+
+>>>>>>> 632244e7ad4a77dc5bf7ef407812b875d20569bb
     redis_queues_cleanup!
   end
 

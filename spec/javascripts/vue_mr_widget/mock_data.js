@@ -216,6 +216,7 @@ export default {
   diverged_commits_count: 0,
   only_allow_merge_if_pipeline_succeeds: false,
   commit_change_content_path: '/root/acets-app/merge_requests/22/commit_change_content',
+<<<<<<< HEAD
   codeclimate: {
     head_path: 'head.json',
     base_path: 'base.json',
@@ -225,6 +226,8 @@ export default {
     head_path: 'blob_path',
   },
   vulnerability_feedback_help_path: '/help/user/project/merge_requests/index#interacting-with-security-reports',
+=======
+>>>>>>> 632244e7ad4a77dc5bf7ef407812b875d20569bb
   merge_commit_path: 'http://localhost:3000/root/acets-app/commit/53027d060246c8f47e4a9310fb332aa52f221775',
 };
 // Codeclimate

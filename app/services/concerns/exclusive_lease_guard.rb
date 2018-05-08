@@ -35,7 +35,11 @@ module ExclusiveLeaseGuard
 
   def lease_timeout
     raise NotImplementedError,
+<<<<<<< HEAD
       "#{self.class.name} does not implement #{__method__}"
+=======
+          "#{self.class.name} does not implement #{__method__}"
+>>>>>>> 632244e7ad4a77dc5bf7ef407812b875d20569bb
   end
 
   def release_lease(uuid)

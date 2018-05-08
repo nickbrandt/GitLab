@@ -2403,6 +2403,7 @@ describe Repository do
     end
   end
 
+<<<<<<< HEAD
   describe '#after_sync' do
     it 'expires repository cache' do
       expect(repository).to receive(:expire_all_method_caches)
@@ -2413,6 +2414,8 @@ describe Repository do
     end
   end
 
+=======
+>>>>>>> 632244e7ad4a77dc5bf7ef407812b875d20569bb
   def create_remote_branch(remote_name, branch_name, target)
     rugged = repository.rugged
     rugged.references.create("refs/remotes/#{remote_name}/#{branch_name}", target.id)

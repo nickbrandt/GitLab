@@ -7,11 +7,15 @@ module Gitlab # rubocop:disable Naming/FileName
           :origin_ref, :checkout_sha, :after_sha, :before_sha,
           :trigger_request, :schedule,
           :ignore_skip_ci, :save_incompleted,
+<<<<<<< HEAD
           :seeds_block, :variables_attributes,
 
           # EE specific
           :allow_mirror_update,
           :chat_data
+=======
+          :seeds_block, :variables_attributes
+>>>>>>> 632244e7ad4a77dc5bf7ef407812b875d20569bb
         ) do
           include Gitlab::Utils::StrongMemoize
 

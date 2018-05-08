@@ -1,6 +1,9 @@
 module Ci
   class PipelinePresenter < Gitlab::View::Presenter::Delegated
+<<<<<<< HEAD
     prepend ::EE::Ci::PipelinePresenter
+=======
+>>>>>>> 632244e7ad4a77dc5bf7ef407812b875d20569bb
     include Gitlab::Utils::StrongMemoize
 
     FAILURE_REASONS = {
