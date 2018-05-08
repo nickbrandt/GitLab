@@ -94,14 +94,11 @@ RSpec.configure do |config|
   config.include LiveDebugger, :js
   config.include MigrationsHelpers, :migration
   config.include RedisHelpers
-<<<<<<< HEAD
 
   # EE only START
   config.include EE::LicenseHelpers
   config.include Rails.application.routes.url_helpers, type: :routing
   # EE only END
-=======
->>>>>>> 632244e7ad4a77dc5bf7ef407812b875d20569bb
 
   if ENV['CI']
     # This includes the first try, i.e. tests will be run 4 times before failing.
