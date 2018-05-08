@@ -37,7 +37,6 @@ function generateEntries() {
 
   pageEntries.forEach(path => generateAutoEntries(path));
 
-<<<<<<< HEAD
   // EE-specific auto entries
   const eePageEntries = glob.sync('pages/**/index.js', {
     cwd: path.join(ROOT_PATH, 'ee/app/assets/javascripts'),
@@ -45,8 +44,6 @@ function generateEntries() {
   eePageEntries.forEach(path => generateAutoEntries(path, 'ee'));
   watchAutoEntries.push(path.join(ROOT_PATH, 'ee/app/assets/javascripts/pages/'));
 
-=======
->>>>>>> 632244e7ad4a77dc5bf7ef407812b875d20569bb
   const autoEntryKeys = Object.keys(autoEntriesMap);
   autoEntriesCount = autoEntryKeys.length;
 
