@@ -11,7 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 20180509091305) do
+=======
+ActiveRecord::Schema.define(version: 20180508102840) do
+>>>>>>> abd24d1c145fce609f9caed27c39ba758571ebd9
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -1982,11 +1986,15 @@ ActiveRecord::Schema.define(version: 20180509091305) do
   add_index "project_import_data", ["project_id"], name: "index_project_import_data_on_project_id", using: :btree
 
   create_table "project_mirror_data", force: :cascade do |t|
+<<<<<<< HEAD
     t.integer "project_id"
     t.integer "retry_count", default: 0, null: false
     t.datetime "last_update_started_at"
     t.datetime "last_update_scheduled_at"
     t.datetime "next_execution_timestamp"
+=======
+    t.integer "project_id", null: false
+>>>>>>> abd24d1c145fce609f9caed27c39ba758571ebd9
     t.string "status"
     t.string "jid"
     t.datetime_with_timezone "last_update_at"
@@ -1995,8 +2003,11 @@ ActiveRecord::Schema.define(version: 20180509091305) do
   end
 
   add_index "project_mirror_data", ["jid"], name: "index_project_mirror_data_on_jid", using: :btree
+<<<<<<< HEAD
   add_index "project_mirror_data", ["last_successful_update_at"], name: "index_project_mirror_data_on_last_successful_update_at", using: :btree
   add_index "project_mirror_data", ["next_execution_timestamp", "retry_count"], name: "index_mirror_data_on_next_execution_and_retry_count", using: :btree
+=======
+>>>>>>> abd24d1c145fce609f9caed27c39ba758571ebd9
   add_index "project_mirror_data", ["project_id"], name: "index_project_mirror_data_on_project_id", unique: true, using: :btree
   add_index "project_mirror_data", ["status"], name: "index_project_mirror_data_on_status", using: :btree
 
