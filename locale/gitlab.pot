@@ -2317,7 +2317,7 @@ msgstr ""
 msgid "GeoNodeSyncStatus|Node is slow, overloaded, or it just recovered after an outage."
 msgstr ""
 
-msgid "GeoNodes|%{eventId} events behind"
+msgid "GeoNodes|%{eventId}"
 msgstr ""
 
 msgid "GeoNodes|Checksummed"
@@ -2345,6 +2345,9 @@ msgid "GeoNodes|GitLab version:"
 msgstr ""
 
 msgid "GeoNodes|Health status:"
+msgstr ""
+
+msgid "GeoNodes|Last event ID processed by cursor"
 msgstr ""
 
 msgid "GeoNodes|Last event ID seen from primary:"
