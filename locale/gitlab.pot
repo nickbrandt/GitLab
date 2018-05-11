@@ -2003,6 +2003,9 @@ msgstr ""
 msgid "GeoNodeSyncStatus|Node is slow, overloaded, or it just recovered after an outage."
 msgstr ""
 
+msgid "GeoNodes|%{eventId}"
+msgstr ""
+
 msgid "GeoNodes|Checksummed"
 msgstr ""
 
@@ -2030,7 +2033,11 @@ msgstr ""
 msgid "GeoNodes|Health status:"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "GeoNodes|Last event ID processed by cursor:"
+=======
+msgid "GeoNodes|Last event ID processed by cursor"
+>>>>>>> efd8cff2f8a... Merge branch 'sh-fix-geo-node-status-lies' into 'master'
 msgstr ""
 
 msgid "GeoNodes|Last event ID seen from primary:"
