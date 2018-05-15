@@ -50,7 +50,6 @@ A. Consider you are a software developer working in a team:
 1. You checkout a new branch, and submit your changes through a merge request
 1. You gather feedback from your team
 1. You work on the implementation optimizing code with [Code Quality reports](code_quality_diff.md) **[STARTER]**
-1. You avoid using dependencies whose license is not compatible with your project with [License Management reports](license_management.md) **[ULTIMATE]**
 1. You build and test your changes with GitLab CI/CD
 1. You request the [approval](#merge-request-approvals) from your manager
 1. Your manager pushes a commit with his final review, [approves the merge request](#merge-request-approvals), and set it to [merge when pipeline succeeds](#merge-when-pipeline-succeeds)
@@ -249,17 +248,6 @@ GitLab runs the [Sitespeed.io container][sitespeed-container] and displays the d
 
 [Read more about Browser Performance Testing.](browser_performance_testing.md)
 
-## License Management **[ULTIMATE]**
-
-> Introduced in [GitLab Ultimate][products] 10.8.
-
-If you are using [GitLab CI/CD][ci], you can search your dependencies for their 
-licenses using License Management.
-Going a step further, GitLab can show the licenses report right in the
-merge request widget area.
-
-[Read more about License Management reports.](license_management.md)
-
 ## Security reports **[ULTIMATE]**
 
 GitLab can scan and report any vulnerabilities found in your project. The
@@ -283,17 +271,20 @@ following security reports are available:
 > Introduced in [GitLab Ultimate][products] 10.8.
 
 CAUTION: **Warning:**
-This feature is currently experimental and while you can start using it,
-it may receive important changes in the future.
+This feature is currently [Alpha](https://about.gitlab.com/handbook/product/#alpha-beta-ga) and while you can start using it, it may receive important changes in the future.
 
-Each security vulnerability in the report is actionable which means that you can:
+Each security vulnerability in the report is actionable. Clicking on an entry,
+a detailed information will pop up with two different possible options:
 
-- **Dismiss it** - Dismissing a vulnerability will place a ~~strikethrough~~
-  styling on it.
-- **Revert your dismissal** - Reverting a dismissal will undo the
-  ~~strikethrough~~ styling.
-- **Create an issue out of it** - The new issue will have the title and
-  description pre-populated with the information of the vulnerability report.
+- **Dismiss vulnerability** - Dismissing a vulnerability will place a
+  ~~strikethrough~~ styling on it.
+- **Create issue** - The new issue will have the title and description
+  pre-populated with the information of the vulnerability report.
+
+![Interacting with security reports](img/interactive_reports.png)
+
+You can also revert your dismissal or see the linked issue after the action has
+been taken.
 
 ## Live preview with Review Apps
 
