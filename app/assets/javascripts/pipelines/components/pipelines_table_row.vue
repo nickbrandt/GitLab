@@ -8,7 +8,7 @@
   import pipelineUrl from './pipeline_url.vue';
   import pipelinesTimeago from './time_ago.vue';
   import commitComponent from '../../vue_shared/components/commit.vue';
-  import { PIPELINES_TABLE } from '../constants'
+  import { PIPELINES_TABLE } from '../constants';
 
   /**
    * Pipeline table row.
