@@ -1163,6 +1163,7 @@ describe Gitlab::GitAccess do
     end
   end
 
+<<<<<<< HEAD
   describe 'Geo system permissions' do
     let(:actor) { :geo }
 
@@ -1170,6 +1171,8 @@ describe Gitlab::GitAccess do
     it { expect { push_access_check }.to raise_unauthorized(Gitlab::GitAccess::ERROR_MESSAGES[:upload]) }
   end
 
+=======
+>>>>>>> 8236be82c7c687a305d16c15fd647b9d5193a1cc
   context 'terms are enforced' do
     before do
       enforce_terms

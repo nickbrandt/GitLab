@@ -2,10 +2,13 @@
 # class return an instance of `GitlabAccessStatus`
 module Gitlab
   class GitAccess
+<<<<<<< HEAD
     prepend ::EE::Gitlab::GitAccess
     include ActionView::Helpers::SanitizeHelper
     include PathLocksHelper
 
+=======
+>>>>>>> 8236be82c7c687a305d16c15fd647b9d5193a1cc
     UnauthorizedError = Class.new(StandardError)
     NotFoundError = Class.new(StandardError)
     ProjectCreationError = Class.new(StandardError)
