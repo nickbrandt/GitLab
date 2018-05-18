@@ -78,6 +78,7 @@ func TestObjectUpload(t *testing.T) {
 
 func TestObjectUpload404(t *testing.T) {
 	assert := assert.New(t)
+	require := require.New(t)
 
 	ts := httptest.NewServer(http.NotFoundHandler())
 	defer ts.Close()
@@ -87,13 +88,56 @@ func TestObjectUpload404(t *testing.T) {
 
 	objectURL := ts.URL + test.ObjectPath
 	object, err := objectstore.NewObject(ctx, objectURL, "", testTimeout, test.ObjectSize)
-	require.NoError(t, err)
+	require.NoError(err)
 	_, err = io.Copy(object, strings.NewReader(test.ObjectContent))
 
 	assert.NoError(err)
 	err = object.Close()
 	assert.Error(err)
 	_, isStatusCodeError := err.(objectstore.StatusCodeError)
-	assert.True(isStatusCodeError, "Should fail with StatusCodeError")
-	assert.Contains(err.Error(), "404")
+	require.True(isStatusCodeError, "Should fail with StatusCodeError")
+	require.Contains(err.Error(), "404")
+}
+
+type endlessReader struct{}
+
+func (e *endlessReader) Read(p []byte) (n int, err error) {
+	for i := 0; i < len(p); i++ {
+		p[i] = '*'
+	}
+
+	return len(p), nil
+}
+
+// TestObjectUploadBrokenConnection purpose is to ensure that errors caused by the upload destination get propagated back correctly.
+// This is important for troubleshooting in production.
+func TestObjectUploadBrokenConnection(t *testing.T) {
+	// This test server closes connection immediately
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		hj, ok := w.(http.Hijacker)
+		if !ok {
+			require.FailNow(t, "webserver doesn't support hijacking")
+		}
+		conn, _, err := hj.Hijack()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		conn.Close()
+	}))
+	defer ts.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	objectURL := ts.URL + test.ObjectPath
+	object, err := objectstore.NewObject(ctx, objectURL, "", testTimeout, -1)
+	require.NoError(t, err)
+
+	_, copyErr := io.Copy(object, &endlessReader{})
+	require.Error(t, copyErr)
+	require.NotEqual(t, io.ErrClosedPipe, copyErr, "We are shadowing the real error")
+
+	closeErr := object.Close()
+	require.Equal(t, copyErr, closeErr)
 }
