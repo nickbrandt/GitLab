@@ -10,11 +10,10 @@ import (
 	"net/http"
 	"regexp"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/prometheus/client_golang/prometheus"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
 )
 
 const sendFileResponseHeader = "X-Sendfile"
@@ -105,7 +104,7 @@ func (s *sendFileResponseWriter) WriteHeader(status int) {
 }
 
 func sendFileFromDisk(w http.ResponseWriter, r *http.Request, file string) {
-	log.WithFields(log.Fields{
+	log.WithFields(r.Context(), log.Fields{
 		"file":   file,
 		"method": r.Method,
 		"uri":    helper.ScrubURLParams(r.RequestURI),

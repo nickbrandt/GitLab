@@ -7,9 +7,8 @@ import (
 	"strings"
 	"time"
 
-	log "github.com/sirupsen/logrus"
-
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/urlprefix"
 )
 
@@ -71,7 +70,7 @@ func (s *Static) ServeExisting(prefix urlprefix.Prefix, cache CacheMode, notFoun
 			w.Header().Set("Expires", cacheUntil)
 		}
 
-		log.WithFields(log.Fields{
+		log.WithFields(r.Context(), log.Fields{
 			"file":     file,
 			"encoding": w.Header().Get("Content-Encoding"),
 			"method":   r.Method,

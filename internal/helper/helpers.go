@@ -14,7 +14,7 @@ import (
 	"strings"
 	"syscall"
 
-	log "github.com/sirupsen/logrus"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
 )
 
 const NginxResponseBufferHeader = "X-Accel-Buffering"
@@ -46,12 +46,12 @@ func RequestEntityTooLarge(w http.ResponseWriter, r *http.Request, err error) {
 
 func printError(r *http.Request, err error) {
 	if r != nil {
-		log.WithFields(log.Fields{
+		log.WithFields(r.Context(), log.Fields{
 			"method": r.Method,
 			"uri":    ScrubURLParams(r.RequestURI),
 		}).WithError(err).Error("error")
 	} else {
-		log.WithError(err).Error("unknown error")
+		log.NoContext().WithError(err).Error("unknown error")
 	}
 }
 
@@ -94,7 +94,7 @@ func OpenFile(path string) (file *os.File, fi os.FileInfo, err error) {
 func URLMustParse(s string) *url.URL {
 	u, err := url.Parse(s)
 	if err != nil {
-		log.WithField("url", s).WithError(err).Fatal("urlMustParse")
+		log.NoContext().WithField("url", s).WithError(err).Fatal("urlMustParse")
 	}
 	return u
 }

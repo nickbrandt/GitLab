@@ -5,10 +5,9 @@ import (
 	"io"
 	"net/http"
 
-	log "github.com/sirupsen/logrus"
-
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
@@ -60,7 +59,7 @@ func handleSendPatchWithGitaly(w http.ResponseWriter, r *http.Request, params *p
 }
 
 func handleSendPatchLocally(w http.ResponseWriter, r *http.Request, params *patchParams) {
-	log.WithFields(log.Fields{
+	log.WithFields(r.Context(), log.Fields{
 		"shaFrom": params.ShaFrom,
 		"shaTo":   params.ShaTo,
 		"path":    r.URL.Path,
