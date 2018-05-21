@@ -112,6 +112,17 @@ module EE
       update_column(:ldap_sync_error, ::Gitlab::UrlSanitizer.sanitize(error_message))
     end
 
+    # This token conveys that the anonymous user is allowed to know of the group
+    # Used to avoid revealing that a group exists on a given path
+    def saml_discovery_token
+      super.presence || begin
+        self.saml_discovery_token = Devise.friendly_token(8)
+
+        save if ::Gitlab::Database.read_write?
+        super
+      end
+    end
+
     def project_creation_level
       super || ::Gitlab::CurrentSettings.default_project_creation
     end
