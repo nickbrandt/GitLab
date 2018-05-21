@@ -22,9 +22,19 @@ module Gitlab
           saml_provider && group.feature_available?(:group_saml)
         end
 
+        def token_discoverable?
+          return unless group_discovery_token.present?
+
+          group_discovery_token == params['token']
+        end
+
         private
 
         attr_reader :env
+
+        def group_discovery_token
+          group&.saml_discovery_token
+        end
 
         def path_from_callback_path
           path = env['PATH_INFO']

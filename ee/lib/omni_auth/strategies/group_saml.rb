@@ -5,7 +5,11 @@ module OmniAuth
       option :callback_path, ->(env) { callback?(env) }
 
       def setup_phase
-        require_saml_provider
+        if on_subpath?(:metadata)
+          require_discovery_token
+        else
+          require_saml_provider
+        end
 
         # Set devise scope for custom callback URL
         env["devise.mapping"] = Devise.mappings[:user]
@@ -16,10 +20,14 @@ module OmniAuth
         super
       end
 
-      # Prevent access to SLO and metadata endpoints
-      # These will need additional work to securely support
+      # Prevent access to SLO endpoints. These make less sense at
+      # group level and would need additional work to securely support
       def other_phase
-        call_app!
+        if on_subpath?(:metadata)
+          super
+        else
+          call_app!
+        end
       end
 
       def self.invalid_group!(path)
@@ -38,6 +46,12 @@ module OmniAuth
 
       def require_saml_provider
         unless group_lookup.group_saml_enabled?
+          self.class.invalid_group!(group_lookup.path)
+        end
+      end
+
+      def require_discovery_token
+        unless group_lookup.token_discoverable?
           self.class.invalid_group!(group_lookup.path)
         end
       end
