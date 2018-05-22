@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 4.2.1
+
+- Fix objectstore error shadowing !259
+
 v 4.2.0
 
 - Guess RemoteAddr from X-Forwarded-For !254
