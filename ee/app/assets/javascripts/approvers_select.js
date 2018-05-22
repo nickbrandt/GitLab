@@ -1,3 +1,4 @@
+import _ from 'underscore';
 import Api from '~/api';
 import { __ } from '~/locale';
 import Flash from '~/flash';
@@ -130,8 +131,8 @@ export default class ApproversSelect {
             <img class="avatar s40" src="${avatar}">
           </div>
           <div class="user-info">
-            <div class="user-name">${name}</div>
-            <div class="user-username">@${username}</div>
+            <div class="user-name">${_.escape(name)}</div>
+            <div class="user-username">@${_.escape(username)}</div>
           </div>
         </div>
       `;
@@ -139,8 +140,8 @@ export default class ApproversSelect {
 
     return `
       <div class="group-result">
-        <div class="group-name">${fullName}</div>
-        <div class="group-path">${fullPath}</div>
+        <div class="group-name">${_.escape(fullName)}</div>
+        <div class="group-path">${_.escape(fullPath)}</div>
       </div>
     `;
   }
