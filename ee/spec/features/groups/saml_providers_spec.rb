@@ -40,6 +40,17 @@ describe 'SAML provider settings' do
       end
     end
 
+    it 'provides metadata XML' do
+      visit group_saml_providers_path(group)
+
+      StrategyHelpers.without_test_mode do
+        click_link('metadata')
+      end
+
+      expect(page.body).to include(callback_path)
+      expect(response_headers['Content-Type']).to have_content("application/xml")
+    end
+
     it 'allows creation of new provider' do
       visit group_saml_providers_path(group)
 
