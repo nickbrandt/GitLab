@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
@@ -73,7 +74,8 @@ func NewObject(ctx context.Context, putURL, deleteURL string, timeout time.Durat
 	pr, pw := io.Pipe()
 	o.writeCloser = pw
 
-	req, err := http.NewRequest(http.MethodPut, o.PutURL, pr)
+	// we should prevent pr.Close() otherwise it may shadow error set with pr.CloseWithError(err)
+	req, err := http.NewRequest(http.MethodPut, o.PutURL, ioutil.NopCloser(pr))
 	if err != nil {
 		objectStorageUploadRequestsRequestFailed.Inc()
 		return nil, fmt.Errorf("PUT %q: %v", helper.ScrubURLParams(o.PutURL), err)
@@ -103,7 +105,10 @@ func NewObject(ctx context.Context, putURL, deleteURL string, timeout time.Durat
 	go func() {
 		defer cancelFn()
 		defer objectStorageUploadsOpen.Dec()
-		defer pr.Close()
+		defer func() {
+			// This will be returned as error to the next write operation on the pipe
+			pr.CloseWithError(o.uploadError)
+		}()
 
 		req = req.WithContext(o.ctx)
 
