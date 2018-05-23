@@ -38,7 +38,6 @@ describe('pipeline graph action component', () => {
     component.$nextTick()
       .then(() => {
         expect(component.$el.getAttribute('data-original-title')).toBe('changed');
-        done();
       })
       .then(done)
       .catch(done.fail);
@@ -54,11 +53,11 @@ describe('pipeline graph action component', () => {
       spyOn(component, '$emit');
       component.$el.click();
       component.$nextTick()
-        .then(() => {
-          expect(component.$emit).toHaveBeenCalledWith('pipelineActionRequestComplete');
-        })
-        .then(done)
-        .catch(done.fail);
+      .then(() => {
+        expect(component.$emit).toHaveBeenCalledWith('pipelineActionRequestComplete');
+      })
+      .then(done)
+      .catch(done.fail);
     });
   });
 });
