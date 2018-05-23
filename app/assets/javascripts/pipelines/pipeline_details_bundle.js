@@ -31,7 +31,6 @@ export default () => {
         mediator,
       };
     },
-
     methods: {
       requestRefreshPipelineGraph() {
         // When an action is clicked
