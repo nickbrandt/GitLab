@@ -9,12 +9,6 @@ module Gitlab
     Settings
   end
 
-<<<<<<< HEAD
-=======
-  def self.migrations_hash
-    @_migrations_hash ||= Digest::MD5.hexdigest(ActiveRecord::Migrator.get_all_versions.to_s)
-  end
-
   def self.revision
     @_revision ||= begin
       if File.exist?(root.join("REVISION"))
@@ -31,7 +25,6 @@ module Gitlab
     end
   end
 
->>>>>>> 5bc22a8b688... Merge branch 'ee-46600-fix-gitlab-revision-when-not-in-git-repo' into 'master'
   COM_URL = 'https://gitlab.com'.freeze
   APP_DIRS_PATTERN = %r{^/?(app|config|ee|lib|spec|\(\w*\))}
   SUBDOMAIN_REGEX = %r{\Ahttps://[a-z0-9]+\.gitlab\.com\z}
