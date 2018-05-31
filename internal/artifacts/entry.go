@@ -67,10 +67,10 @@ func unpackFileFromZip(archivePath, encodedFilename string, headers http.Header,
 	}
 
 	catFile := exec.Command("gitlab-zip-cat")
-	catFile.Env = []string{
-		"ARCHIVE_PATH=" + archivePath,
-		"ENCODED_FILE_NAME=" + encodedFilename,
-	}
+	catFile.Env = append(os.Environ(),
+		"ARCHIVE_PATH="+archivePath,
+		"ENCODED_FILE_NAME="+encodedFilename,
+	)
 	catFile.Stderr = os.Stderr
 	catFile.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	stdout, err := catFile.StdoutPipe()
