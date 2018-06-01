@@ -19,6 +19,10 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/objectstore/test"
 )
 
+func testDeadline() time.Time {
+	return time.Now().Add(filestore.DefaultObjectStoreTimeout)
+}
+
 func assertFileGetsRemovedAsync(t *testing.T, filePath string) {
 	var err error
 
@@ -76,33 +80,6 @@ func TestSaveFromDiskNotExistingFile(t *testing.T) {
 	assert.Nil(fh, "On error FileHandler should be nil")
 }
 
-func TestSaveFileWrongMD5(t *testing.T) {
-	assert := assert.New(t)
-
-	osStub, ts := test.StartObjectStoreWithCustomMD5(map[string]string{test.ObjectPath: "brokenMD5"})
-	defer ts.Close()
-
-	objectURL := ts.URL + test.ObjectPath
-
-	opts := &filestore.SaveFileOpts{
-		RemoteID:        "test-file",
-		RemoteURL:       objectURL,
-		PresignedPut:    objectURL + "?Signature=ASignature",
-		PresignedDelete: objectURL + "?Signature=AnotherSignature",
-	}
-
-	ctx, cancel := context.WithCancel(context.Background())
-	fh, err := filestore.SaveFileFromReader(ctx, strings.NewReader(test.ObjectContent), test.ObjectSize, opts)
-	assert.Nil(fh)
-	assert.Error(err)
-	_, isMD5Error := err.(filestore.MD5Error)
-	assert.True(isMD5Error, "Should fail with MD5Error")
-	assert.Equal(1, osStub.PutsCnt(), "File not uploaded")
-
-	cancel() // this will trigger an async cleanup
-	assertObjectStoreDeletedAsync(t, 1, osStub)
-}
-
 func TestSaveFileFromDiskToLocalPath(t *testing.T) {
 	assert := assert.New(t)
 	require := require.New(t)
@@ -132,6 +109,12 @@ func TestSaveFileFromDiskToLocalPath(t *testing.T) {
 }
 
 func TestSaveFile(t *testing.T) {
+	type remote int
+	const (
+		remoteSingle remote = iota
+		remoteMultipart
+	)
+
 	tmpFolder, err := ioutil.TempDir("", "workhorse-test-tmp")
 	require.NoError(t, err)
 	defer os.RemoveAll(tmpFolder)
@@ -139,11 +122,13 @@ func TestSaveFile(t *testing.T) {
 	tests := []struct {
 		name   string
 		local  bool
-		remote bool
+		remote remote
 	}{
 		{name: "Local only", local: true},
-		{name: "Remote only", remote: true},
-		{name: "Both", local: true, remote: true},
+		{name: "Remote Single only", remote: remoteSingle},
+		{name: "Remote Single and Local", local: true, remote: remoteSingle},
+		{name: "Remote Multipart only", remote: remoteMultipart},
+		{name: "Remote Multipart and Local", local: true, remote: remoteMultipart},
 	}
 
 	for _, spec := range tests {
@@ -156,16 +141,32 @@ func TestSaveFile(t *testing.T) {
 			osStub, ts := test.StartObjectStore()
 			defer ts.Close()
 
-			if spec.remote {
+			switch spec.remote {
+			case remoteSingle:
 				objectURL := ts.URL + test.ObjectPath
 
 				opts.RemoteID = "test-file"
 				opts.RemoteURL = objectURL
 				opts.PresignedPut = objectURL + "?Signature=ASignature"
 				opts.PresignedDelete = objectURL + "?Signature=AnotherSignature"
+				opts.Deadline = testDeadline()
 
 				expectedDeletes = 1
 				expectedPuts = 1
+			case remoteMultipart:
+				objectURL := ts.URL + test.ObjectPath
+
+				opts.RemoteID = "test-file"
+				opts.RemoteURL = objectURL
+				opts.PresignedDelete = objectURL + "?Signature=AnotherSignature"
+				opts.PartSize = int64(len(test.ObjectContent)/2) + 1
+				opts.PresignedParts = []string{objectURL + "?partNumber=1", objectURL + "?partNumber=2"}
+				opts.PresignedCompleteMultipart = objectURL + "?Signature=CompleteSignature"
+				opts.Deadline = testDeadline()
+
+				osStub.InitiateMultipartUpload(test.ObjectPath)
+				expectedDeletes = 1
+				expectedPuts = 2
 			}
 
 			if spec.local {
@@ -222,4 +223,34 @@ func TestSaveFile(t *testing.T) {
 			assert.Equal(test.ObjectSHA512, fields["file.sha512"])
 		})
 	}
+}
+
+func TestSaveMultipartInBodyFailure(t *testing.T) {
+	assert := assert.New(t)
+
+	osStub, ts := test.StartObjectStore()
+	defer ts.Close()
+
+	// this is a broken path because it contains bucket name but no key
+	// this is the only way to get an in-body failure from our ObjectStoreStub
+	objectPath := "/bucket-but-no-object-key"
+	objectURL := ts.URL + objectPath
+	opts := filestore.SaveFileOpts{
+		RemoteID:                   "test-file",
+		RemoteURL:                  objectURL,
+		PartSize:                   test.ObjectSize,
+		PresignedParts:             []string{objectURL + "?partNumber=1", objectURL + "?partNumber=2"},
+		PresignedCompleteMultipart: objectURL + "?Signature=CompleteSignature",
+		Deadline:                   testDeadline(),
+	}
+
+	osStub.InitiateMultipartUpload(objectPath)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	fh, err := filestore.SaveFileFromReader(ctx, strings.NewReader(test.ObjectContent), test.ObjectSize, &opts)
+	assert.Nil(fh)
+	require.Error(t, err)
+	assert.EqualError(err, test.MultipartUploadInternalError().Error())
 }
