@@ -2,6 +2,11 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 4.3.0
+
+- Multipart upload support !257
+- Make external commands extend the environment !261
+
 v 4.2.1
 
 - Fix objectstore error shadowing !259
