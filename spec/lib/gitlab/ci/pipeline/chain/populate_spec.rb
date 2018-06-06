@@ -138,18 +138,12 @@ describe Gitlab::Ci::Pipeline::Chain::Populate do
         prod: { script: 'cap prod', stage: 'deploy', only: ['tags'] } }
     end
 
-<<<<<<< HEAD
-    let(:pipeline) do
-      build(:ci_pipeline, ref: 'master', project: project, config: config)
-    end
-
     it 'populates pipeline according to used policies' do
       step.perform!
-=======
-        expect(pipeline.stages.size).to eq 1
-        expect(pipeline.stages.first.builds.size).to eq 1
-        expect(pipeline.stages.first.builds.first.name).to eq 'rspec'
-      end
+
+      expect(pipeline.stages.size).to eq 1
+      expect(pipeline.stages.first.builds.size).to eq 1
+      expect(pipeline.stages.first.builds.first.name).to eq 'rspec'
     end
 
     context 'when using only/except build policies' do
@@ -170,11 +164,9 @@ describe Gitlab::Ci::Pipeline::Chain::Populate do
             { rspec: { script: 'rspec', only: { variables: ["$CI_PIPELINE_IID == '1'"] } },
               prod: { script: 'cap prod', only: { variables: ["$CI_PIPELINE_IID == '1000'"] } } }
           end
->>>>>>> 7d0145ebd830617412443ced1862ce93e807359e
 
-      expect(pipeline.stages.size).to eq 1
-      expect(pipeline.stages.first.builds.size).to eq 1
-      expect(pipeline.stages.first.builds.first.name).to eq 'rspec'
+        it_behaves_like 'a correct pipeline'
+      end
     end
   end
 end
