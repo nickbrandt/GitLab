@@ -5,10 +5,6 @@ module Projects
     prepend ::EE::Projects::UpdateService
 
     def execute
-      # Repository size limit comes as MB from the view
-      limit = params.delete(:repository_size_limit)
-      project.repository_size_limit = Gitlab::Utils.try_megabytes_to_bytes(limit) if limit
-
       unless valid_visibility_level_change?(project, params[:visibility_level])
         return error('New visibility level not allowed!')
       end
@@ -27,6 +23,11 @@ module Projects
 
       ensure_wiki_exists if enabling_wiki?
 
+      yield if block_given?
+
+      # If the block added errors, don't try to save the project
+      return validation_failed! if project.errors.any?
+
       if project.update_attributes(params.except(:default_branch))
         if project.previous_changes.include?('path')
           project.rename_repo
@@ -38,10 +39,7 @@ module Projects
 
         success
       else
-        model_errors = project.errors.full_messages.to_sentence
-        error_message = model_errors.presence || 'Project could not be updated!'
-
-        error(error_message)
+        validation_failed!
       end
     end
 
@@ -52,6 +50,13 @@ module Projects
     end
 
     private
+
+    def validation_failed!
+      model_errors = project.errors.full_messages.to_sentence
+      error_message = model_errors.presence || 'Project could not be updated!'
+
+      error(error_message)
+    end
 
     def renaming_project_with_container_registry_tags?
       new_path = params[:path]
