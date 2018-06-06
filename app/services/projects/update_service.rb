@@ -27,14 +27,11 @@ module Projects
 
       ensure_wiki_exists if enabling_wiki?
 
-<<<<<<< HEAD
-=======
       yield if block_given?
 
       # If the block added errors, don't try to save the project
       return validation_failed! if project.errors.any?
 
->>>>>>> e14fec7a5c1... Merge branch 'bvl-validate-label-for-project-before-save' into 'master'
       if project.update_attributes(params.except(:default_branch))
         if project.previous_changes.include?('path')
           project.rename_repo
