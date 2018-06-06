@@ -1,5 +1,9 @@
 module ApplicationSettings
   class UpdateService < ApplicationSettings::BaseService
+    prepend EE::ApplicationSettings::UpdateService
+
+    attr_reader :params, :application_setting
+
     def execute
       # Repository size limit comes as MB from the view
       limit = @params.delete(:repository_size_limit)
