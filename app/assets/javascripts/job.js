@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import _ from 'underscore';
-import StickyFill from 'stickyfilljs';
+import { polyfillSticky } from './lib/utils/sticky';
 import axios from './lib/utils/axios_utils';
 import { visitUrl } from './lib/utils/url_utility';
 import bp from './breakpoints';
@@ -70,6 +70,7 @@ export default class Job extends LogOutputBehaviours {
   }
 
   initAffixTopArea() {
+<<<<<<< HEAD
     /**
       If the browser does not support position sticky, it returns the position as static.
       If the browser does support sticky, then we allow the browser to handle it, if not
@@ -78,6 +79,9 @@ export default class Job extends LogOutputBehaviours {
     if (this.$topBar.css('position') !== 'static') return;
 
     StickyFill.add(this.$topBar);
+=======
+    polyfillSticky(this.$topBar);
+>>>>>>> ce/11-0-stable-prepare-rc6
   }
 
   scrollToBottom() {
