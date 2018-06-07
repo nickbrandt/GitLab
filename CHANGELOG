@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 4.3.1
+
+- Objectstorage ETag checking !263
+
 v 4.3.0
 
 - Multipart upload support !257
