@@ -80,6 +80,52 @@ func TestSaveFromDiskNotExistingFile(t *testing.T) {
 	assert.Nil(fh, "On error FileHandler should be nil")
 }
 
+func TestSaveFileWrongETag(t *testing.T) {
+	tests := []struct {
+		name      string
+		multipart bool
+	}{
+		{name: "single part"},
+		{name: "multi part", multipart: true},
+	}
+
+	for _, spec := range tests {
+		t.Run(spec.name, func(t *testing.T) {
+			assert := assert.New(t)
+
+			osStub, ts := test.StartObjectStoreWithCustomMD5(map[string]string{test.ObjectPath: "brokenMD5"})
+			defer ts.Close()
+
+			objectURL := ts.URL + test.ObjectPath
+
+			opts := &filestore.SaveFileOpts{
+				RemoteID:        "test-file",
+				RemoteURL:       objectURL,
+				PresignedPut:    objectURL + "?Signature=ASignature",
+				PresignedDelete: objectURL + "?Signature=AnotherSignature",
+				Deadline:        testDeadline(),
+			}
+			if spec.multipart {
+				opts.PresignedParts = []string{objectURL + "?partNumber=1"}
+				opts.PresignedCompleteMultipart = objectURL + "?Signature=CompleteSig"
+				opts.PresignedAbortMultipart = objectURL + "?Signature=AbortSig"
+				opts.PartSize = test.ObjectSize
+
+				osStub.InitiateMultipartUpload(test.ObjectPath)
+			}
+			ctx, cancel := context.WithCancel(context.Background())
+			fh, err := filestore.SaveFileFromReader(ctx, strings.NewReader(test.ObjectContent), test.ObjectSize, opts)
+			assert.Nil(fh)
+			assert.Error(err)
+			assert.Equal(1, osStub.PutsCnt(), "File not uploaded")
+
+			cancel() // this will trigger an async cleanup
+			assertObjectStoreDeletedAsync(t, 1, osStub)
+			assert.False(spec.multipart && osStub.IsMultipartUpload(test.ObjectPath), "there must be no multipart upload in progress now")
+		})
+	}
+}
+
 func TestSaveFileFromDiskToLocalPath(t *testing.T) {
 	assert := assert.New(t)
 	require := require.New(t)
@@ -111,7 +157,8 @@ func TestSaveFileFromDiskToLocalPath(t *testing.T) {
 func TestSaveFile(t *testing.T) {
 	type remote int
 	const (
-		remoteSingle remote = iota
+		notRemote remote = iota
+		remoteSingle
 		remoteMultipart
 	)
 
@@ -221,6 +268,11 @@ func TestSaveFile(t *testing.T) {
 			assert.Equal(test.ObjectSHA1, fields["file.sha1"])
 			assert.Equal(test.ObjectSHA256, fields["file.sha256"])
 			assert.Equal(test.ObjectSHA512, fields["file.sha512"])
+			if spec.remote == notRemote {
+				assert.NotContains(fields, "file.etag")
+			} else {
+				assert.Contains(fields, "file.etag")
+			}
 		})
 	}
 }

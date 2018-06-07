@@ -106,6 +106,7 @@ func TestObjectStoreCompleteMultipartUpload(t *testing.T) {
 			contentMD5: "920b914bca0a70780b40881b8f376135",
 		},
 	}
+	expectedETag := "2f2f82eceacf5bd0ac5d7c3d3d388849-2"
 
 	stub.InitiateMultipartUpload(ObjectPath)
 
@@ -148,7 +149,7 @@ func TestObjectStoreCompleteMultipartUpload(t *testing.T) {
 
 	assert.Equal(len(parts), stub.PutsCnt())
 	assert.Equal(0, stub.DeletesCnt())
-	assert.NotEmpty(stub.GetObjectMD5(ObjectPath), "MultipartUpload not completed")
+	assert.Equal(expectedETag, stub.GetObjectMD5(ObjectPath))
 	assert.False(stub.IsMultipartUpload(ObjectPath), "MultipartUpload is still in progress")
 }
 

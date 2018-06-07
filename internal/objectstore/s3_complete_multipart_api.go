@@ -1,6 +1,8 @@
 package objectstore
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/xml"
 	"fmt"
 )
@@ -48,4 +50,26 @@ type compoundCompleteMultipartUploadResult struct {
 
 func (c *compoundCompleteMultipartUploadResult) isError() bool {
 	return c.CompleteMultipartUploadError != nil
+}
+
+// BuildMultipartUploadETag creates an S3 compatible ETag for MultipartUpload
+// Given the MD5 hash for each uploaded part of the file, concatenate
+// the hashes into a single binary string and calculate the MD5 hash of that result,
+// the append "-len(etags)"
+// http://permalink.gmane.org/gmane.comp.file-systems.s3.s3tools/583
+func (cmu *CompleteMultipartUpload) BuildMultipartUploadETag() (string, error) {
+	hasher := md5.New()
+	for _, part := range cmu.Part {
+		checksum, err := hex.DecodeString(part.ETag)
+		if err != nil {
+			return "", err
+		}
+		_, err = hasher.Write(checksum)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	multipartChecksum := hasher.Sum(nil)
+	return fmt.Sprintf("%s-%d", hex.EncodeToString(multipartChecksum), len(cmu.Part)), nil
 }

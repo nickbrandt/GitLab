@@ -47,7 +47,7 @@ func testObjectUploadNoErrors(t *testing.T, useDeleteURL bool) {
 	assert.NoError(err)
 
 	// Checking MD5 extraction
-	assert.Equal(osStub.GetObjectMD5(test.ObjectPath), object.MD5())
+	assert.Equal(osStub.GetObjectMD5(test.ObjectPath), object.ETag())
 
 	// Checking cleanup
 	cancel()
