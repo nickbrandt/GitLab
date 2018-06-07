@@ -70,18 +70,7 @@ export default class Job extends LogOutputBehaviours {
   }
 
   initAffixTopArea() {
-<<<<<<< HEAD
-    /**
-      If the browser does not support position sticky, it returns the position as static.
-      If the browser does support sticky, then we allow the browser to handle it, if not
-      then we use a polyfill
-    */
-    if (this.$topBar.css('position') !== 'static') return;
-
-    StickyFill.add(this.$topBar);
-=======
     polyfillSticky(this.$topBar);
->>>>>>> ce/11-0-stable-prepare-rc6
   }
 
   scrollToBottom() {
