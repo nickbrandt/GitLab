@@ -2,6 +2,9 @@ package objectstore
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
+	"hash"
 	"io"
 	"net/http"
 
@@ -10,10 +13,22 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
+// Upload represents an upload to an ObjectStorage provider
+type Upload interface {
+	io.WriteCloser
+	ETag() string
+}
+
 // uploader is an io.WriteCloser that can be used as write end of the uploading pipe.
 type uploader struct {
-	// writeCloser is the writer bound to the request body
-	io.WriteCloser
+	// etag is the object storage provided checksum
+	etag string
+
+	// md5 is an optional hasher for calculating md5 on the fly
+	md5 hash.Hash
+
+	w io.Writer
+	c io.Closer
 
 	// uploadError is the last error occourred during upload
 	uploadError error
@@ -22,13 +37,19 @@ type uploader struct {
 }
 
 func newUploader(ctx context.Context, w io.WriteCloser) uploader {
-	return uploader{WriteCloser: w, ctx: ctx}
+	return uploader{w: w, c: w, ctx: ctx}
+}
+
+func newMD5Uploader(ctx context.Context, w io.WriteCloser) uploader {
+	hasher := md5.New()
+	mw := io.MultiWriter(w, hasher)
+	return uploader{w: mw, c: w, md5: hasher, ctx: ctx}
 }
 
 // Close implements the standard io.Closer interface: it closes the http client request.
 // This method will also wait for the connection to terminate and return any error occurred during the upload
 func (u *uploader) Close() error {
-	if err := u.WriteCloser.Close(); err != nil {
+	if err := u.c.Close(); err != nil {
 		return err
 	}
 
@@ -39,6 +60,10 @@ func (u *uploader) Close() error {
 	}
 
 	return u.uploadError
+}
+
+func (u *uploader) Write(p []byte) (int, error) {
+	return u.w.Write(p)
 }
 
 // syncAndDelete wait for Context to be Done and then performs the requested HTTP call
@@ -62,4 +87,28 @@ func (u *uploader) syncAndDelete(url string) {
 		return
 	}
 	resp.Body.Close()
+}
+
+func (u *uploader) extractETag(rawETag string) {
+	if rawETag != "" && rawETag[0] == '"' {
+		rawETag = rawETag[1 : len(rawETag)-1]
+	}
+	u.etag = rawETag
+}
+
+func (u *uploader) md5Sum() string {
+	if u.md5 == nil {
+		return ""
+	}
+
+	checksum := u.md5.Sum(nil)
+	return hex.EncodeToString(checksum)
+}
+
+// ETag returns the checksum of the uploaded object returned by the ObjectStorage provider via ETag Header.
+// This method will wait until upload context is done before returning.
+func (u *uploader) ETag() string {
+	<-u.ctx.Done()
+
+	return u.etag
 }

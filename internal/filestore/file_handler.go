@@ -83,7 +83,7 @@ func (fh *FileHandler) GitLabFinalizeFields(prefix string) map[string]string {
 // SaveFileFromReader persists the provided reader content to all the location specified in opts. A cleanup will be performed once ctx is Done
 // Make sure the provided context will not expire before finalizing upload with GitLab Rails.
 func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts *SaveFileOpts) (fh *FileHandler, err error) {
-	var remoteWriter io.WriteCloser
+	var remoteWriter objectstore.Upload
 	fh = &FileHandler{
 		Name:      opts.TempFilePrefix,
 		RemoteID:  opts.RemoteID,
@@ -149,6 +149,9 @@ func SaveFileFromReader(ctx context.Context, reader io.Reader, size int64, opts 
 			}
 			return nil, err
 		}
+
+		etag := remoteWriter.ETag()
+		fh.hashes["etag"] = etag
 	}
 
 	return fh, err

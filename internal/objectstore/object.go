@@ -42,8 +42,6 @@ type Object struct {
 	PutURL string
 	// DeleteURL is a presigned URL for RemoveObject
 	DeleteURL string
-	// md5 is the checksum provided by the Object Store
-	md5 string
 
 	uploader
 }
@@ -71,7 +69,7 @@ func newObject(ctx context.Context, putURL, deleteURL string, deadline time.Time
 	o := &Object{
 		PutURL:    putURL,
 		DeleteURL: deleteURL,
-		uploader:  newUploader(uploadCtx, pw),
+		uploader:  newMD5Uploader(uploadCtx, pw),
 	}
 
 	if metrics {
@@ -120,26 +118,14 @@ func newObject(ctx context.Context, putURL, deleteURL string, deadline time.Time
 			return
 		}
 
-		o.extractMD5(resp.Header)
+		o.extractETag(resp.Header.Get("ETag"))
+		if o.etag != o.md5Sum() {
+			o.uploadError = fmt.Errorf("ETag mismatch. expected %q got %q", o.md5Sum(), o.etag)
+			return
+		}
 	}()
 
 	return o, nil
-}
-
-// MD5 returns the md5sum of the uploaded returned by the Object Store provider via ETag Header.
-// This method will wait until upload context is done before returning.
-func (o *Object) MD5() string {
-	<-o.ctx.Done()
-
-	return o.md5
-}
-
-func (o *Object) extractMD5(h http.Header) {
-	etag := h.Get("ETag")
-	if etag != "" && etag[0] == '"' {
-		etag = etag[1 : len(etag)-1]
-	}
-	o.md5 = etag
 }
 
 func (o *Object) delete() {

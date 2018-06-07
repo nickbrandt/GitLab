@@ -204,7 +204,11 @@ func (o *ObjectstoreStub) completeMultipartUpload(w http.ResponseWriter, r *http
 
 	etag, overwritten := o.overwriteMD5[objectPath]
 	if !overwritten {
-		etag = "not an md5 hash"
+		etag, err = msg.BuildMultipartUploadETag()
+		if err != nil {
+			http.Error(w, "cannot compute ETag", 400)
+			return
+		}
 	}
 
 	o.bucket[objectPath] = etag

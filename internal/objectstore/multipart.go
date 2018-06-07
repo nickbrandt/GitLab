@@ -151,6 +151,27 @@ func (m *Multipart) complete(cmu *CompleteMultipartUpload) error {
 		return result
 	}
 
+	if result.CompleteMultipartUploadResult == nil {
+		return fmt.Errorf("Cannot read CompleteMultipartUpload answer")
+	}
+
+	m.extractETag(result.ETag)
+	if err := m.verifyETag(cmu); err != nil {
+		return fmt.Errorf("ETag verification failure: %v", err)
+	}
+
+	return nil
+}
+
+func (m *Multipart) verifyETag(cmu *CompleteMultipartUpload) error {
+	expectedChecksum, err := cmu.BuildMultipartUploadETag()
+	if err != nil {
+		return err
+	}
+	if expectedChecksum != m.etag {
+		return fmt.Errorf("got %q expected %q", m.etag, expectedChecksum)
+	}
+
 	return nil
 }
 
@@ -205,7 +226,7 @@ func (m *Multipart) uploadPart(url string, body io.Reader, size int64) (string, 
 		return "", err
 	}
 
-	return part.MD5(), nil
+	return part.ETag(), nil
 }
 
 func (m *Multipart) delete() {
