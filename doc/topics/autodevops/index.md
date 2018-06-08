@@ -293,11 +293,7 @@ report is created, it's uploaded as an artifact which you can later download and
 check out.
 
 In GitLab Ultimate, any security warnings are also
-<<<<<<< HEAD
 [shown in the merge request widget](../../user/project/merge_requests/sast.md).
-=======
-[shown in the merge request widget](https://docs.gitlab.com/ee//user/project/merge_requests/sast.html).
->>>>>>> 6c276484971edd821ad113153d0afdf28c1871f5
 
 ### Auto Dependency Scanning **[ULTIMATE]**
 
@@ -310,11 +306,7 @@ report is created, it's uploaded as an artifact which you can later download and
 check out.
 
 In GitLab Ultimate, any security warnings are also
-<<<<<<< HEAD
 [shown in the merge request widget](../../user/project/merge_requests/dependency_scanning.md).
-=======
-[shown in the merge request widget](https://docs.gitlab.com/ee//user/project/merge_requests/dependency_scanning.html).
->>>>>>> 6c276484971edd821ad113153d0afdf28c1871f5
 
 ### Auto License Management **[ULTIMATE]**
 
@@ -327,11 +319,7 @@ report is created, it's uploaded as an artifact which you can later download and
 check out.
 
 In GitLab Ultimate, any licenses are also
-<<<<<<< HEAD
 [shown in the merge request widget](../../user/project/merge_requests/license_management.md).
-=======
-[shown in the merge request widget](https://docs.gitlab.com/ee//user/project/merge_requests/license_management.html).
->>>>>>> 6c276484971edd821ad113153d0afdf28c1871f5
 
 ### Auto Container Scanning
 
@@ -344,11 +332,7 @@ created, it's uploaded as an artifact which you can later download and
 check out.
 
 In GitLab Ultimate, any security warnings are also
-<<<<<<< HEAD
 [shown in the merge request widget](../../user/project/merge_requests/container_scanning.md).
-=======
-[shown in the merge request widget](https://docs.gitlab.com/ee//user/project/merge_requests/container_scanning.html).
->>>>>>> 6c276484971edd821ad113153d0afdf28c1871f5
 
 ### Auto Review Apps
 
@@ -387,11 +371,7 @@ issues. Once the report is created, it's uploaded as an artifact which you can
 later download and check out.
 
 In GitLab Ultimate, any security warnings are also
-<<<<<<< HEAD
 [shown in the merge request widget](../../user/project/merge_requests/dast.md).
-=======
-[shown in the merge request widget](https://docs.gitlab.com/ee//user/project/merge_requests/dast.html).
->>>>>>> 6c276484971edd821ad113153d0afdf28c1871f5
 
 ### Auto Browser Performance Testing **[PREMIUM]**
 
@@ -406,11 +386,7 @@ Auto Browser Performance Testing utilizes the [Sitespeed.io container](https://h
 ```
 
 In GitLab Premium, performance differences between the source
-<<<<<<< HEAD
 and target branches are [shown in the merge request widget](../../user/project/merge_requests/browser_performance_testing.md).
-=======
-and target branches are [shown in the merge request widget](https://docs.gitlab.com/ee//user/project/merge_requests/browser_performance_testing.html).
->>>>>>> 6c276484971edd821ad113153d0afdf28c1871f5
 
 ### Auto Deploy
 
