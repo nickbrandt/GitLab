@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-07 18:08+0200\n"
-"PO-Revision-Date: 2018-06-07 18:08+0200\n"
+"POT-Creation-Date: 2018-06-08 18:27+0200\n"
+"PO-Revision-Date: 2018-06-08 18:27+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -106,6 +106,9 @@ msgid "%{loadingIcon} Started"
 msgstr ""
 
 msgid "%{lock_path} is locked by GitLab User %{lock_user_id}"
+msgstr ""
+
+msgid "%{name}'s avatar"
 msgstr ""
 
 msgid "%{nip_domain} can be used as an alternative to a custom domain."
@@ -437,7 +440,7 @@ msgstr ""
 msgid "An error occurred while getting projects"
 msgstr ""
 
-msgid "An error occurred while importing project"
+msgid "An error occurred while importing project: ${details}"
 msgstr ""
 
 msgid "An error occurred while initializing path locks"
@@ -557,7 +560,16 @@ msgstr ""
 msgid "Assigned to :name"
 msgstr ""
 
+msgid "Assigned to me"
+msgstr ""
+
 msgid "Assignee"
+msgstr ""
+
+msgid "Assignee boards not available with your current license"
+msgstr ""
+
+msgid "Assignee lists show all issues assigned to the selected user."
 msgstr ""
 
 msgid "Assignee(s)"
@@ -946,9 +958,6 @@ msgstr ""
 msgid "CI/CD settings"
 msgstr ""
 
-msgid "CICD|A domain is required to use Auto Review Apps and Auto Deploy Stages."
-msgstr ""
-
 msgid "CICD|An explicit %{ci_file} needs to be specified before you can begin using Continuous Integration and Delivery."
 msgstr ""
 
@@ -958,7 +967,22 @@ msgstr ""
 msgid "CICD|Auto DevOps will automatically build, test, and deploy your application based on a predefined Continuous Integration and Delivery configuration."
 msgstr ""
 
+msgid "CICD|Automatic deployment to staging, manual deployment to production"
+msgstr ""
+
+msgid "CICD|Continuous deployment to production"
+msgstr ""
+
+msgid "CICD|Deployment strategy"
+msgstr ""
+
+msgid "CICD|Deployment strategy needs a domain name to work correctly."
+msgstr ""
+
 msgid "CICD|Disable Auto DevOps"
+msgstr ""
+
+msgid "CICD|Do not set up a domain here if you are setting up multiple Kubernetes clusters with Auto DevOps."
 msgstr ""
 
 msgid "CICD|Enable Auto DevOps"
@@ -977,6 +1001,9 @@ msgid "CICD|Learn more about Auto DevOps"
 msgstr ""
 
 msgid "CICD|The Auto DevOps pipeline configuration will be used when there is no %{ci_file} in the project."
+msgstr ""
+
+msgid "CICD|You need to specify a domain if you want to use Auto Review Apps and Auto Deploy stages."
 msgstr ""
 
 msgid "Can run untagged jobs"
@@ -1307,6 +1334,9 @@ msgid "ClusterIntegration|Google Kubernetes Engine project"
 msgstr ""
 
 msgid "ClusterIntegration|Helm Tiller"
+msgstr ""
+
+msgid "ClusterIntegration|If you are setting up multiple clusters and are using Auto DevOps, %{docs_link}."
 msgstr ""
 
 msgid "ClusterIntegration|In order to show the health of the cluster, we'll need to provision your cluster with Prometheus to collect the required data."
@@ -1889,6 +1919,9 @@ msgstr ""
 msgid "Created"
 msgstr ""
 
+msgid "Created by me"
+msgstr ""
+
 msgid "Creating epic"
 msgstr ""
 
@@ -2090,6 +2123,9 @@ msgid "DeployTokens|Your New Deploy Token"
 msgstr ""
 
 msgid "DeployTokens|Your new project deploy token has been created."
+msgstr ""
+
+msgid "Deprioritize label"
 msgstr ""
 
 msgid "Descending"
@@ -2341,6 +2377,9 @@ msgstr ""
 msgid "Error fetching contributors data."
 msgstr ""
 
+msgid "Error fetching job trace"
+msgstr ""
+
 msgid "Error fetching labels."
 msgstr ""
 
@@ -2459,6 +2498,9 @@ msgid "Failed to remove the pipeline schedule"
 msgstr ""
 
 msgid "Failed to update issues, please try again."
+msgstr ""
+
+msgid "Failure"
 msgstr ""
 
 msgid "Feb"
@@ -2824,10 +2866,22 @@ msgstr ""
 msgid "GroupRoadmap|The roadmap shows the progress of your epics along a timeline"
 msgstr ""
 
-msgid "GroupRoadmap|To view the roadmap, add a planned start or finish date to one of your epics in this group or its subgroups. Only epics in the past 3 months and the next 3 months are shown &ndash; from %{startDate} to %{endDate}."
+msgid "GroupRoadmap|To view the roadmap, add a planned start or finish date to one of your epics in this group or its subgroups. In the months view, only epics in the past month, current month, and next 5 months are shown &ndash; from %{startDate} to %{endDate}."
 msgstr ""
 
-msgid "GroupRoadmap|To widen your search, change or remove filters. Only epics in the past 3 months and the next 3 months are shown &ndash; from %{startDate} to %{endDate}."
+msgid "GroupRoadmap|To view the roadmap, add a planned start or finish date to one of your epics in this group or its subgroups. In the quarters view, only epics in the past quarter, current quarter, and next 4 quarters are shown &ndash; from %{startDate} to %{endDate}."
+msgstr ""
+
+msgid "GroupRoadmap|To view the roadmap, add a planned start or finish date to one of your epics in this group or its subgroups. In the weeks view, only epics in the past week, current week, and next 4 weeks are shown &ndash; from %{startDate} to %{endDate}."
+msgstr ""
+
+msgid "GroupRoadmap|To widen your search, change or remove filters. In the months view, only epics in the past month, current month, and next 5 months are shown &ndash; from %{startDate} to %{endDate}."
+msgstr ""
+
+msgid "GroupRoadmap|To widen your search, change or remove filters. In the quarters view, only epics in the past quarter, current quarter, and next 4 quarters are shown &ndash; from %{startDate} to %{endDate}."
+msgstr ""
+
+msgid "GroupRoadmap|To widen your search, change or remove filters. In the weeks view, only epics in the past week, current week, and next 4 weeks are shown &ndash; from %{startDate} to %{endDate}."
 msgstr ""
 
 msgid "GroupRoadmap|Until %{dateWord}"
@@ -2940,6 +2994,12 @@ msgstr ""
 msgid "Housekeeping successfully started"
 msgstr ""
 
+msgid "I accept the %{terms_link}"
+msgstr ""
+
+msgid "I accept the|Terms of Service and Privacy Policy"
+msgstr ""
+
 msgid "IDE|Commit"
 msgstr ""
 
@@ -2965,6 +3025,9 @@ msgid "If using GitHub, you’ll see pipeline statuses on GitHub for your commit
 msgstr ""
 
 msgid "If you already have files you can push them using the %{link_to_cli} below."
+msgstr ""
+
+msgid "If you are setting up multiple clusters and are using Auto DevOps,|read this first"
 msgstr ""
 
 msgid "If your HTTP repository is not publicly accessible, add authentication information to the URL: <code>https://username:password@gitlab.company.com/group/project.git</code>."
@@ -2997,7 +3060,7 @@ msgstr ""
 msgid "Improve search with Advanced Global Search and GitLab Enterprise Edition."
 msgstr ""
 
-msgid "Include a Terms of Service agreement that all users must accept."
+msgid "Include a Terms of Service agreement and Privacy Policy that all users must accept."
 msgstr ""
 
 msgid "Install Runner on Kubernetes"
@@ -3110,6 +3173,12 @@ msgstr ""
 msgid "Label"
 msgstr ""
 
+msgid "Label actions dropdown"
+msgstr ""
+
+msgid "Label lists show all issues with the selected label."
+msgstr ""
+
 msgid "LabelSelect|%{firstLabelName} +%{remainingLabelCount} more"
 msgstr ""
 
@@ -3126,6 +3195,9 @@ msgid "Labels can be applied to %{features}. Group labels are available for any 
 msgstr ""
 
 msgid "Labels can be applied to issues and merge requests to categorize them."
+msgstr ""
+
+msgid "Labels can be applied to issues and merge requests."
 msgstr ""
 
 msgid "Labels|<span>Promote label</span> %{labelTitle} <span>to Group Label?</span>"
@@ -3427,6 +3499,9 @@ msgstr ""
 msgid "Monitoring"
 msgstr ""
 
+msgid "Months"
+msgstr ""
+
 msgid "More info"
 msgstr ""
 
@@ -3546,7 +3621,10 @@ msgstr ""
 msgid "No files found."
 msgstr ""
 
-msgid "No labels created yet."
+msgid "No merge requests found"
+msgstr ""
+
+msgid "No messages were logged"
 msgstr ""
 
 msgid "No repository"
@@ -3709,6 +3787,9 @@ msgid "Operations"
 msgstr ""
 
 msgid "Options"
+msgstr ""
+
+msgid "Other Labels"
 msgstr ""
 
 msgid "Other information"
@@ -3952,6 +4033,18 @@ msgid "Preferences|Navigation theme"
 msgstr ""
 
 msgid "Primary"
+msgstr ""
+
+msgid "Prioritize"
+msgstr ""
+
+msgid "Prioritize label"
+msgstr ""
+
+msgid "Prioritized Labels"
+msgstr ""
+
+msgid "Prioritized label"
 msgstr ""
 
 msgid "Private - Project access must be granted explicitly to each user."
@@ -4230,10 +4323,10 @@ msgstr ""
 msgid "Promote these project milestones into a group milestone."
 msgstr ""
 
-msgid "Promote to Group Label"
+msgid "Promote to Group Milestone"
 msgstr ""
 
-msgid "Promote to Group Milestone"
+msgid "Promote to group label"
 msgstr ""
 
 msgid "Promotions|Don't show me this again"
@@ -4273,6 +4366,9 @@ msgid "PushRule|Committer restriction"
 msgstr ""
 
 msgid "Pushed"
+msgstr ""
+
+msgid "Quarters"
 msgstr ""
 
 msgid "Quick actions can be used in the issues description and comment boxes."
@@ -4341,6 +4437,9 @@ msgstr ""
 msgid "Remove avatar"
 msgstr ""
 
+msgid "Remove priority"
+msgstr ""
+
 msgid "Remove project"
 msgstr ""
 
@@ -4371,7 +4470,7 @@ msgstr ""
 msgid "Request Access"
 msgstr ""
 
-msgid "Require all users to accept Terms of Service when they access GitLab."
+msgid "Require all users to accept Terms of Service and Privacy Policy when they access GitLab."
 msgstr ""
 
 msgid "Reset git storage health information"
@@ -4511,6 +4610,9 @@ msgstr ""
 msgid "Search for projects, issues, etc."
 msgstr ""
 
+msgid "Search merge requests"
+msgstr ""
+
 msgid "Search milestones"
 msgstr ""
 
@@ -4643,6 +4745,9 @@ msgstr ""
 msgid "Show command"
 msgstr ""
 
+msgid "Show complete raw log"
+msgstr ""
+
 msgid "Show parent pages"
 msgstr ""
 
@@ -4657,10 +4762,10 @@ msgstr[1] ""
 msgid "Sidebar|Change weight"
 msgstr ""
 
-msgid "Sidebar|No"
+msgid "Sidebar|None"
 msgstr ""
 
-msgid "Sidebar|None"
+msgid "Sidebar|Only numeral characters allowed"
 msgstr ""
 
 msgid "Sidebar|Weight"
@@ -4697,6 +4802,9 @@ msgid "Something went wrong on our end."
 msgstr ""
 
 msgid "Something went wrong when toggling the button"
+msgstr ""
+
+msgid "Something went wrong while fetching assignees list"
 msgstr ""
 
 msgid "Something went wrong while fetching group member contributions"
@@ -4840,6 +4948,9 @@ msgstr ""
 msgid "Squash commits"
 msgstr ""
 
+msgid "Stage"
+msgstr ""
+
 msgid "Stage all"
 msgstr ""
 
@@ -4850,6 +4961,9 @@ msgid "Staged"
 msgstr ""
 
 msgid "Staged %{type}"
+msgstr ""
+
+msgid "Star a label to make it a priority label. Order the prioritized labels to change their relative priority, by dragging."
 msgstr ""
 
 msgid "StarProject|Star"
@@ -4892,6 +5006,15 @@ msgid "Storage"
 msgstr ""
 
 msgid "Subgroups"
+msgstr ""
+
+msgid "Subscribe"
+msgstr ""
+
+msgid "Subscribe at group level"
+msgstr ""
+
+msgid "Subscribe at project level"
 msgstr ""
 
 msgid "Switch branch/tag"
@@ -4998,10 +5121,10 @@ msgstr ""
 msgid "Team"
 msgstr ""
 
-msgid "Terms of Service"
+msgid "Terms of Service Agreement and Privacy Policy"
 msgstr ""
 
-msgid "Terms of Service Agreement"
+msgid "Terms of Service and Privacy Policy"
 msgstr ""
 
 msgid "Thanks! Don't show me this again"
@@ -5524,6 +5647,15 @@ msgstr ""
 msgid "Unstar"
 msgstr ""
 
+msgid "Unsubscribe"
+msgstr ""
+
+msgid "Unsubscribe at group level"
+msgstr ""
+
+msgid "Unsubscribe at project level"
+msgstr ""
+
 msgid "Unverified"
 msgstr ""
 
@@ -5617,7 +5749,13 @@ msgstr ""
 msgid "View issue"
 msgstr ""
 
+msgid "View jobs"
+msgstr ""
+
 msgid "View labels"
+msgstr ""
+
+msgid "View log"
 msgstr ""
 
 msgid "View open merge request"
@@ -5660,6 +5798,9 @@ msgid "Web terminal"
 msgstr ""
 
 msgid "Webhooks allow you to trigger a URL if, for example, new code is pushed or a new issue is created. You can configure webhooks to listen for specific events like pushes, issues or merge requests. Group webhooks will apply to all projects in a group, allowing you to standardize webhook functionality across your entire group."
+msgstr ""
+
+msgid "Weeks"
 msgstr ""
 
 msgid "Weight"
@@ -5872,13 +6013,22 @@ msgstr ""
 msgid "You cannot write to this read-only GitLab instance."
 msgstr ""
 
+msgid "You do not have any assigned merge requests"
+msgstr ""
+
 msgid "You do not have the correct permissions to override the settings from the LDAP group sync."
 msgstr ""
 
 msgid "You have no permissions"
 msgstr ""
 
+msgid "You have not created any merge requests"
+msgstr ""
+
 msgid "You have reached your project limit"
+msgstr ""
+
+msgid "You must accept our Terms of Service and privacy policy in order to register an account"
 msgstr ""
 
 msgid "You must have maintainer access to force delete a lock"
@@ -6455,6 +6605,9 @@ msgid "remaining"
 msgstr ""
 
 msgid "remove due date"
+msgstr ""
+
+msgid "remove weight"
 msgstr ""
 
 msgid "source"
