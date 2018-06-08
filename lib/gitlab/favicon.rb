@@ -8,11 +8,7 @@ module Gitlab
           if Gitlab::Utils.to_boolean(ENV['CANARY'])
             'favicon-yellow.png'
           elsif Rails.env.development?
-<<<<<<< HEAD
             'favicon-green.png'
-=======
-            'favicon-blue.png'
->>>>>>> 6c276484971edd821ad113153d0afdf28c1871f5
           else
             'favicon.png'
           end
