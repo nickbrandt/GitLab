@@ -144,7 +144,6 @@ class IssuesFinder < IssuableFinder
       items
     end
   end
-<<<<<<< HEAD
 
   def assignees
     return @assignees if defined?(@assignees)
@@ -158,6 +157,4 @@ class IssuesFinder < IssuableFinder
         []
       end
   end
-=======
->>>>>>> 6c276484971edd821ad113153d0afdf28c1871f5
 end
