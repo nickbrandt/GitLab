@@ -169,7 +169,6 @@ class MergeRequest < ActiveRecord::Base
   scope :unassigned, -> { where("assignee_id IS NULL") }
   scope :assigned_to, ->(u) { where(assignee_id: u.id)}
 
-  participant :participant_approvers
   participant :assignee
 
   after_save :keep_around_commit
@@ -299,10 +298,6 @@ class MergeRequest < ActiveRecord::Base
 
   def assignee_or_author?(user)
     author_id == user.id || assignee_id == user.id
-  end
-
-  def participant_approvers
-    requires_approve? ? approvers_left : []
   end
 
   # `from` argument can be a Namespace or Project.
@@ -547,22 +542,6 @@ class MergeRequest < ActiveRecord::Base
     return true unless source_project
 
     !source_project.in_fork_network_of?(target_project)
-  end
-
-  def validate_approvals_before_merge
-    return true unless approvals_before_merge
-    return true unless target_project
-
-    # Approvals disabled
-    if target_project.approvals_before_merge == 0
-      errors.add :validate_approvals_before_merge,
-                 'Approvals disabled for target project'
-    elsif approvals_before_merge > target_project.approvals_before_merge
-      true
-    else
-      errors.add :validate_approvals_before_merge,
-                 'Number of approvals must be greater than those on target project'
-    end
   end
 
   def reopenable?
@@ -1158,8 +1137,11 @@ class MergeRequest < ActiveRecord::Base
     project.merge_requests.merged.where(author_id: author_id).empty?
   end
 
+  # TODO: remove once production database rename completes
+  alias_attribute :allow_collaboration, :allow_maintainer_to_push
+
   def allow_collaboration
-    collaborative_push_possible? && super
+    collaborative_push_possible? && allow_maintainer_to_push
   end
 
   alias_method :allow_collaboration?, :allow_collaboration
