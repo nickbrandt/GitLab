@@ -161,7 +161,6 @@ gl.issueBoards.BoardsStore = {
       return list[key] === val && byType;
     });
     return filteredList[0];
-<<<<<<< HEAD
   },
   updateFiltersUrl (replaceState = false) {
     if (replaceState) {
@@ -169,8 +168,6 @@ gl.issueBoards.BoardsStore = {
     } else {
       history.pushState(null, null, `?${this.filter.path}`);
     }
-=======
->>>>>>> 6c276484971edd821ad113153d0afdf28c1871f5
   },
 };
 

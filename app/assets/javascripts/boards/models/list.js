@@ -55,12 +55,8 @@ class List {
       entityType = 'assignee_id';
     }
 
-<<<<<<< HEAD
     return gl.boardService
       .createList(entity.id, entityType)
-=======
-    return gl.boardService.createList(this.label.id)
->>>>>>> 6c276484971edd821ad113153d0afdf28c1871f5
       .then(res => res.data)
       .then(data => {
         this.id = data.id;
