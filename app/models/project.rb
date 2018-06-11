@@ -1633,6 +1633,7 @@ class Project < ActiveRecord::Base
 
   def after_import
     repository.after_import
+    wiki.repository.after_import
     import_finish
     remove_import_jid
     update_project_counter_caches
