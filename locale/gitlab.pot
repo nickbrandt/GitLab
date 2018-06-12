@@ -2577,6 +2577,13 @@ msgstr ""
 msgid "GeoNodes|Full"
 msgstr ""
 
+
+msgid "Gitaly|Address"
+msgstr ""
+
+msgid "Gitaly Servers"
+msgstr ""
+
 msgid "GeoNodes|GitLab version"
 msgstr ""
 
