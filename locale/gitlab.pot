@@ -8,13 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gitlab 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2018-06-08 18:27+0200\n"
-"PO-Revision-Date: 2018-06-08 18:27+0200\n"
-=======
-"POT-Creation-Date: 2018-06-08 18:19+0200\n"
-"PO-Revision-Date: 2018-06-08 18:19+0200\n"
->>>>>>> 426108e50c1968857d7b6bfd5e5ac73f162cc2bc
+"POT-Creation-Date: 2018-06-13 18:12+0200\n"
+"PO-Revision-Date: 2018-06-13 18:12+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -277,7 +272,7 @@ msgstr ""
 msgid "Account"
 msgstr ""
 
-msgid "Account and limit"
+msgid "Account and limit settings"
 msgstr ""
 
 msgid "Active"
@@ -960,12 +955,9 @@ msgstr ""
 msgid "CI/CD for external repo"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "CI/CD settings"
 msgstr ""
 
-=======
->>>>>>> 426108e50c1968857d7b6bfd5e5ac73f162cc2bc
 msgid "CICD|An explicit %{ci_file} needs to be specified before you can begin using Continuous Integration and Delivery."
 msgstr ""
 
@@ -2511,9 +2503,6 @@ msgstr ""
 msgid "Failure"
 msgstr ""
 
-msgid "Failure"
-msgstr ""
-
 msgid "Feb"
 msgstr ""
 
@@ -2628,13 +2617,6 @@ msgid "GeoNodes|Failed"
 msgstr ""
 
 msgid "GeoNodes|Full"
-msgstr ""
-
-
-msgid "Gitaly|Address"
-msgstr ""
-
-msgid "Gitaly Servers"
 msgstr ""
 
 msgid "GeoNodes|GitLab version"
@@ -2827,6 +2809,9 @@ msgid "Gitaly"
 msgstr ""
 
 msgid "Gitaly Servers"
+msgstr ""
+
+msgid "Gitaly|Address"
 msgstr ""
 
 msgid "Go Back"
@@ -3059,7 +3044,6 @@ msgstr ""
 msgid "Import repository"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "ImportButtons|Connect repositories from"
 msgstr ""
 
@@ -3072,8 +3056,6 @@ msgstr ""
 msgid "Improve search with Advanced Global Search and GitLab Enterprise Edition."
 msgstr ""
 
-=======
->>>>>>> 426108e50c1968857d7b6bfd5e5ac73f162cc2bc
 msgid "Include a Terms of Service agreement and Privacy Policy that all users must accept."
 msgstr ""
 
@@ -4472,7 +4454,7 @@ msgstr ""
 msgid "Repository maintenance"
 msgstr ""
 
-msgid "Repository mirror"
+msgid "Repository mirror settings"
 msgstr ""
 
 msgid "Repository storage"
@@ -4553,6 +4535,9 @@ msgid "Runners API"
 msgstr ""
 
 msgid "Runners can be placed on separate users, servers, and even on your local machine."
+msgstr ""
+
+msgid "Runners settings"
 msgstr ""
 
 msgid "Running"
@@ -4956,21 +4941,12 @@ msgstr ""
 msgid "Specify the following URL during the Runner setup:"
 msgstr ""
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 426108e50c1968857d7b6bfd5e5ac73f162cc2bc
 msgid "Squash commits"
 msgstr ""
 
 msgid "Stage"
 msgstr ""
 
-<<<<<<< HEAD
-=======
->>>>>>> 27045ce58e6... Merge branch 'bvl-terms-on-registration' into 'master'
->>>>>>> 426108e50c1968857d7b6bfd5e5ac73f162cc2bc
 msgid "Stage all"
 msgstr ""
 
@@ -5142,7 +5118,6 @@ msgid "Team"
 msgstr ""
 
 msgid "Terms of Service Agreement and Privacy Policy"
-<<<<<<< HEAD
 msgstr ""
 
 msgid "Terms of Service and Privacy Policy"
@@ -5152,11 +5127,6 @@ msgid "Thanks! Don't show me this again"
 msgstr ""
 
 msgid "The Advanced Global Search in GitLab is a powerful search service that saves you time. Instead of creating duplicate code and wasting time, you can now search for code within other teams that can help your own project."
-=======
-msgstr ""
-
-msgid "Terms of Service and Privacy Policy"
->>>>>>> 426108e50c1968857d7b6bfd5e5ac73f162cc2bc
 msgstr ""
 
 msgid "The Issue Tracker is the place to add things that need to be improved or solved in a project"
