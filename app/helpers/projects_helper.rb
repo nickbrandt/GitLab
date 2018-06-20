@@ -42,7 +42,8 @@ module ProjectsHelper
       name_tag_options[:class] << 'has-tooltip'
     end
 
-    content_tag(:span, sanitize(username), name_tag_options)
+    # NOTE: ActionView::Helpers::TagHelper#content_tag HTML escapes username
+    content_tag(:span, username, name_tag_options)
   end
 
   def link_to_member(project, author, opts = {}, &block)
