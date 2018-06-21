@@ -145,7 +145,8 @@ func (u *Upstream) configureRoutes() {
 		sendurl.SendURL,
 	)
 
-	uploadAccelerateProxy := upload.Accelerate(path.Join(u.DocumentRoot, "uploads/tmp"), proxy)
+	uploadPath := path.Join(u.DocumentRoot, "uploads/tmp")
+	uploadAccelerateProxy := upload.Accelerate(&upload.SkipRailsAuthorizer{TempPath: uploadPath}, proxy)
 	ciAPIProxyQueue := queueing.QueueRequests("ci_api_job_requests", uploadAccelerateProxy, u.APILimit, u.APIQueueLimit, u.APIQueueTimeout)
 	ciAPILongPolling := builds.RegisterHandler(ciAPIProxyQueue, redis.WatchKey, u.APICILongPollingDuration)
 
@@ -181,6 +182,9 @@ func (u *Upstream) configureRoutes() {
 				NotFoundUnless(u.DevelopmentMode, proxy),
 			),
 		),
+
+		// Uploads
+		route("POST", projectPattern+`uploads\z`, upload.Accelerate(api, proxy)),
 
 		// For legacy reasons, user uploads are stored under the document root.
 		// To prevent anybody who knows/guesses the URL of a user-uploaded file
