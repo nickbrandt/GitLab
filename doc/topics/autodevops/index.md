@@ -322,7 +322,7 @@ to run analysis on the project dependencies and checks for potential security is
 report is created, it's uploaded as an artifact which you can later download and
 check out.
 
-In GitLab Ultimate, any security warnings are also
+Any security warnings are also
 [shown in the merge request widget](../../user/project/merge_requests/dependency_scanning.md).
 
 ### Auto License Management **[ULTIMATE]**
@@ -335,7 +335,7 @@ to search the project dependencies for their license. Once the
 report is created, it's uploaded as an artifact which you can later download and
 check out.
 
-In GitLab Ultimate, any licenses are also
+Any licenses are also
 [shown in the merge request widget](../../user/project/merge_requests/license_management.md).
 
 ### Auto Container Scanning
