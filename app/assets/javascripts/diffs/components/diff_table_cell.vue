@@ -28,6 +28,11 @@ export default {
       type: Object,
       required: true,
     },
+    diffViewType: {
+      type: String,
+      required: false,
+      default: INLINE_DIFF_VIEW_TYPE,
+    },
     showCommentButton: {
       type: Boolean,
       required: false,
@@ -60,7 +65,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['isLoggedIn', 'isInlineView']),
+    ...mapGetters(['isLoggedIn']),
     normalizedLine() {
       let normalizedLine;
 
@@ -81,10 +86,10 @@ export default {
       return this.normalizedLine.type === CONTEXT_LINE_TYPE;
     },
     isMetaLine() {
+      const { type } = this.normalizedLine;
+
       return (
-        this.normalizedLine.type === OLD_NO_NEW_LINE_TYPE ||
-        this.normalizedLine.type === NEW_NO_NEW_LINE_TYPE ||
-        this.normalizedLine.type === EMPTY_CELL_TYPE
+        type === OLD_NO_NEW_LINE_TYPE || type === NEW_NO_NEW_LINE_TYPE || type === EMPTY_CELL_TYPE
       );
     },
     classNameMap() {
