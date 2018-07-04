@@ -25,13 +25,15 @@ type MultipartClaims struct {
 	jwt.StandardClaims
 }
 
-func Accelerate(tempDir string, h http.Handler) http.Handler {
-	// TODO: for Object Store this will need a authorize call
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		localOnlyPreAuth := &api.Response{TempPath: tempDir}
+type PreAuthorizer interface {
+	PreAuthorizeHandler(next api.HandleFunc, suffix string) http.Handler
+}
+
+func Accelerate(rails PreAuthorizer, h http.Handler) http.Handler {
+	return rails.PreAuthorizeHandler(func(w http.ResponseWriter, r *http.Request, a *api.Response) {
 		s := &savedFileTracker{request: r}
-		HandleFileUploads(w, r, h, localOnlyPreAuth, s)
-	})
+		HandleFileUploads(w, r, h, a, s)
+	}, "/authorize")
 }
 
 func (s *savedFileTracker) ProcessFile(_ context.Context, fieldName string, file *filestore.FileHandler, _ *multipart.Writer) error {
