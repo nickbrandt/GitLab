@@ -18,9 +18,8 @@ import (
 )
 
 type artifactsUploadProcessor struct {
-	opts         *filestore.SaveFileOpts
-	metadataFile string
-	stored       bool
+	opts   *filestore.SaveFileOpts
+	stored bool
 }
 
 func (a *artifactsUploadProcessor) generateMetadataFromZip(ctx context.Context, file *filestore.FileHandler) (*filestore.FileHandler, error) {
@@ -80,9 +79,10 @@ func (a *artifactsUploadProcessor) ProcessFile(ctx context.Context, formName str
 	if formName != "file" {
 		return fmt.Errorf("Invalid form field: %q", formName)
 	}
-	if a.metadataFile != "" {
-		return fmt.Errorf("Artifacts request contains more than one file!")
+	if a.stored {
+		return fmt.Errorf("Artifacts request contains more than one file")
 	}
+	a.stored = true
 
 	select {
 	case <-ctx.Done():
