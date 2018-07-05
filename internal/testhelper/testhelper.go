@@ -78,8 +78,20 @@ func AssertResponseWriterHeader(t *testing.T, w http.ResponseWriter, header stri
 	assertHeaderExists(t, header, actual, expected)
 }
 
-func AssertResponseHeader(t *testing.T, w *http.Response, header string, expected ...string) {
-	actual := w.Header[http.CanonicalHeaderKey(header)]
+func AssertResponseHeader(t *testing.T, w interface{}, header string, expected ...string) {
+	var actual []string
+
+	header = http.CanonicalHeaderKey(header)
+
+	if resp, ok := w.(*http.Response); ok {
+		actual = resp.Header[header]
+	} else if resp, ok := w.(http.ResponseWriter); ok {
+		actual = resp.Header()[header]
+	} else if resp, ok := w.(*httptest.ResponseRecorder); ok {
+		actual = resp.Header()[header]
+	} else {
+		t.Fatalf("invalid type of w passed AssertResponseHeader")
+	}
 
 	assertHeaderExists(t, header, actual, expected)
 }

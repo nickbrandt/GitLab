@@ -136,7 +136,8 @@ func TestUploadHandlerSendingToExternalStorage(t *testing.T) {
 
 			contentBuffer, contentType := createTestMultipartForm(t, archiveData)
 			response := testUploadArtifacts(contentType, &contentBuffer, t, ts)
-			testhelper.AssertResponseCode(t, response, 200)
+			testhelper.AssertResponseCode(t, response, http.StatusOK)
+			testhelper.AssertResponseHeader(t, response, MetadataHeaderKey, MetadataHeaderPresent)
 			assert.Equal(t, 1, storeServerCalled, "store should be called only once")
 			assert.Equal(t, 1, responseProcessorCalled, "response processor should be called only once")
 		})
@@ -166,7 +167,7 @@ func TestUploadHandlerSendingToExternalStorageAndStorageServerUnreachable(t *tes
 	defer ts.Close()
 
 	response := testUploadArtifactsFromTestZip(t, ts)
-	testhelper.AssertResponseCode(t, response, 500)
+	testhelper.AssertResponseCode(t, response, http.StatusInternalServerError)
 }
 
 func TestUploadHandlerSendingToExternalStorageAndInvalidURLIsUsed(t *testing.T) {
@@ -192,7 +193,7 @@ func TestUploadHandlerSendingToExternalStorageAndInvalidURLIsUsed(t *testing.T) 
 	defer ts.Close()
 
 	response := testUploadArtifactsFromTestZip(t, ts)
-	testhelper.AssertResponseCode(t, response, 500)
+	testhelper.AssertResponseCode(t, response, http.StatusInternalServerError)
 }
 
 func TestUploadHandlerSendingToExternalStorageAndItReturnsAnError(t *testing.T) {
@@ -230,7 +231,7 @@ func TestUploadHandlerSendingToExternalStorageAndItReturnsAnError(t *testing.T) 
 	defer ts.Close()
 
 	response := testUploadArtifactsFromTestZip(t, ts)
-	testhelper.AssertResponseCode(t, response, 500)
+	testhelper.AssertResponseCode(t, response, http.StatusInternalServerError)
 	assert.Equal(t, 1, putCalledTimes, "upload should be called only once")
 }
 
@@ -271,7 +272,7 @@ func TestUploadHandlerSendingToExternalStorageAndSupportRequestTimeout(t *testin
 	defer ts.Close()
 
 	response := testUploadArtifactsFromTestZip(t, ts)
-	testhelper.AssertResponseCode(t, response, 500)
+	testhelper.AssertResponseCode(t, response, http.StatusInternalServerError)
 	assert.Equal(t, 1, putCalledTimes, "upload should be called only once")
 }
 

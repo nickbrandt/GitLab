@@ -23,6 +23,12 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 )
 
+const (
+	MetadataHeaderKey     = "Metadata-Status"
+	MetadataHeaderPresent = "present"
+	MetadataHeaderMissing = "missing"
+)
+
 func testArtifactsUploadServer(t *testing.T, authResponse api.Response, bodyProcessor func(w http.ResponseWriter, r *http.Request)) *httptest.Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/url/path/authorize", func(w http.ResponseWriter, r *http.Request) {
@@ -46,52 +52,54 @@ func testArtifactsUploadServer(t *testing.T, authResponse api.Response, bodyProc
 		}
 		if opts.IsLocal() {
 			if r.FormValue("file.path") == "" {
-				w.WriteHeader(501)
+				t.Fatal("Expected file to be present")
 				return
 			}
 
 			_, err := ioutil.ReadFile(r.FormValue("file.path"))
 			if err != nil {
-				w.WriteHeader(404)
+				t.Fatal("Expected file to be readable")
+				return
+			}
+		} else if opts.IsRemote() {
+			if r.FormValue("file.remote_url") == "" {
+				t.Fatal("Expected file to be remote accessible")
 				return
 			}
 		}
 
-		if opts.IsRemote() && r.FormValue("file.remote_url") == "" {
-			w.WriteHeader(501)
-			return
+		if r.FormValue("metadata.path") != "" {
+			metadata, err := ioutil.ReadFile(r.FormValue("metadata.path"))
+			if err != nil {
+				t.Fatal("Expected metadata to be readable")
+				return
+			}
+			gz, err := gzip.NewReader(bytes.NewReader(metadata))
+			if err != nil {
+				t.Fatal("Expected metadata to be valid gzip")
+				return
+			}
+			defer gz.Close()
+			metadata, err = ioutil.ReadAll(gz)
+			if err != nil {
+				t.Fatal("Expected metadata to be valid")
+				return
+			}
+			if !bytes.HasPrefix(metadata, []byte(zipartifacts.MetadataHeaderPrefix+zipartifacts.MetadataHeader)) {
+				t.Fatal("Expected metadata to be of valid format")
+				return
+			}
+
+			w.Header().Set(MetadataHeaderKey, MetadataHeaderPresent)
+
+		} else {
+			w.Header().Set(MetadataHeaderKey, MetadataHeaderMissing)
 		}
 
-		if r.FormValue("metadata.path") == "" {
-			w.WriteHeader(502)
-			return
-		}
-
-		metadata, err := ioutil.ReadFile(r.FormValue("metadata.path"))
-		if err != nil {
-			w.WriteHeader(404)
-			return
-		}
-		gz, err := gzip.NewReader(bytes.NewReader(metadata))
-		if err != nil {
-			w.WriteHeader(405)
-			return
-		}
-		defer gz.Close()
-		metadata, err = ioutil.ReadAll(gz)
-		if err != nil {
-			w.WriteHeader(404)
-			return
-		}
-		if !bytes.HasPrefix(metadata, []byte(zipartifacts.MetadataHeaderPrefix+zipartifacts.MetadataHeader)) {
-			w.WriteHeader(400)
-			return
-		}
+		w.WriteHeader(http.StatusOK)
 
 		if bodyProcessor != nil {
 			bodyProcessor(w, r)
-		} else {
-			w.WriteHeader(200)
 		}
 	})
 	return testhelper.TestServerWithHandler(nil, mux.ServeHTTP)
@@ -141,7 +149,8 @@ func TestUploadHandlerAddingMetadata(t *testing.T) {
 	writer.Close()
 
 	response := testUploadArtifacts(writer.FormDataContentType(), &buffer, t, ts)
-	testhelper.AssertResponseCode(t, response, 200)
+	testhelper.AssertResponseCode(t, response, http.StatusOK)
+	testhelper.AssertResponseHeader(t, response, MetadataHeaderKey, MetadataHeaderPresent)
 }
 
 func TestUploadHandlerForUnsupportedArchive(t *testing.T) {
@@ -164,8 +173,37 @@ func TestUploadHandlerForUnsupportedArchive(t *testing.T) {
 	writer.Close()
 
 	response := testUploadArtifacts(writer.FormDataContentType(), &buffer, t, ts)
-	// 502 is a custom response code from the mock server in testUploadArtifacts
-	testhelper.AssertResponseCode(t, response, 502)
+	testhelper.AssertResponseCode(t, response, http.StatusOK)
+	testhelper.AssertResponseHeader(t, response, MetadataHeaderKey, MetadataHeaderMissing)
+}
+
+func TestUploadHandlerForMultipleFiles(t *testing.T) {
+	tempPath, err := ioutil.TempDir("", "uploads")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tempPath)
+
+	ts := testArtifactsUploadServer(t, api.Response{TempPath: tempPath}, nil)
+	defer ts.Close()
+
+	var buffer bytes.Buffer
+	writer := multipart.NewWriter(&buffer)
+	file, err := writer.CreateFormFile("file", "my.file")
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Fprint(file, "test")
+
+	file, err = writer.CreateFormFile("file", "my.file")
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Fprint(file, "test")
+	writer.Close()
+
+	response := testUploadArtifacts(writer.FormDataContentType(), &buffer, t, ts)
+	testhelper.AssertResponseCode(t, response, http.StatusInternalServerError)
 }
 
 func TestUploadFormProcessing(t *testing.T) {
@@ -188,5 +226,5 @@ func TestUploadFormProcessing(t *testing.T) {
 	writer.Close()
 
 	response := testUploadArtifacts(writer.FormDataContentType(), &buffer, t, ts)
-	testhelper.AssertResponseCode(t, response, 500)
+	testhelper.AssertResponseCode(t, response, http.StatusInternalServerError)
 }
