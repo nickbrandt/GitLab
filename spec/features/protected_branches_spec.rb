@@ -1,11 +1,8 @@
 require 'spec_helper'
 
 describe 'Protected Branches', :js do
-<<<<<<< HEAD
   include EE::ProtectedBranchHelpers
 
-=======
->>>>>>> 7240d175fc70b4988b351c1733a3b4e33ecb7947
   let(:user) { create(:user) }
   let(:admin) { create(:admin) }
   let(:project) { create(:project, :repository) }
