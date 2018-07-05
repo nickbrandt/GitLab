@@ -7,8 +7,13 @@ describe 'Project > Members > Share with Group', :js do
   let(:master) { create(:user) }
 
   describe 'Share with group lock' do
+<<<<<<< HEAD:spec/features/projects/members/share_with_group_and_members_spec.rb
     shared_examples 'the project cannot be shared with groups' do
       it 'user is only able to share with members' do
+=======
+    shared_examples 'the project can be shared with groups' do
+      it 'the "Share with group" tab exists' do
+>>>>>>> 7240d175fc70b4988b351c1733a3b4e33ecb7947:spec/features/projects/members/share_with_group_spec.rb
         visit project_settings_members_path(project)
 
         expect(page).not_to have_selector('#add-member-tab')
@@ -18,8 +23,13 @@ describe 'Project > Members > Share with Group', :js do
       end
     end
 
+<<<<<<< HEAD:spec/features/projects/members/share_with_group_and_members_spec.rb
     shared_examples 'the project cannot be shared with members' do
       it 'user is only able to share with groups' do
+=======
+    shared_examples 'the project cannot be shared with groups' do
+      it 'the "Share with group" tab does not exist' do
+>>>>>>> 7240d175fc70b4988b351c1733a3b4e33ecb7947:spec/features/projects/members/share_with_group_spec.rb
         visit project_settings_members_path(project)
 
         expect(page).not_to have_selector('#add-member-tab')
