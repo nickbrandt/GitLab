@@ -57,6 +57,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     resources :uploads, only: [:create] do
       collection do
         get ":secret/:filename", action: :show, as: :show, constraints: { filename: %r{[^/]+} }
+        post :authorize
       end
     end
 
@@ -106,6 +107,8 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
         resources :notes, only: [:index, :create, :destroy, :update], concerns: :awardable, constraints: { id: /\d+/ }
       end
     end
+
+    resources :todos, only: [:create]
 
     # On CE only index and show are needed
     resources :boards, only: [:index, :show, :create, :update, :destroy]
