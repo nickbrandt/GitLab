@@ -59,6 +59,7 @@ describe 'Admin updates settings' do
       end
     end
   end
+
   it 'Modify import sources' do
     expect(Gitlab::CurrentSettings.import_sources).not_to be_empty
 
