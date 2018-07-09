@@ -13,6 +13,7 @@ module Gitlab
                     push_access_levels: 'ProtectedBranch::PushAccessLevel',
                     unprotect_access_levels: 'ProtectedBranch::UnprotectAccessLevel',
                     create_access_levels: 'ProtectedTag::CreateAccessLevel',
+                    deploy_access_levels: 'ProtectedEnvironment::DeployAccessLevel',
                     labels: :project_labels,
                     priorities: :label_priorities,
                     auto_devops: :project_auto_devops,
