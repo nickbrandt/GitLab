@@ -277,6 +277,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
         end
       end
 
+      ## EE-specific start
+      resources :protected_environments, constraints: { id: Gitlab::PathRegex.git_reference_regex }
+      ## EE-specific end
+
       resource :cycle_analytics, only: [:show]
 
       namespace :cycle_analytics do

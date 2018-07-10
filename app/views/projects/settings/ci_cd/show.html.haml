@@ -28,6 +28,10 @@
   .settings-content
     = render 'autodevops_form'
 
+-# EE-specific start
+= render_if_exists 'projects/settings/ci_cd/protected_environments', expanded: expanded
+-# EE-specific end
+
 %section.qa-runners-settings.settings.no-animate{ class: ('expanded' if expanded) }
   .settings-header
     %h4
