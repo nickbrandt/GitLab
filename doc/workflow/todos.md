@@ -109,7 +109,6 @@ There are four kinds of filters you can use on your Todos dashboard.
 | Filter  | Description |
 | ------- | ----------- |
 | Project | Filter by project |
-| Group   | Filter by group |
 | Author  | Filter by the author that triggered the Todo |
 | Type    | Filter by issue, merge request or epic |
 | Action  | Filter by the action that triggered the Todo |
