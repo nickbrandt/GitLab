@@ -11,23 +11,21 @@ module EE
         private
 
         def load_gon_index
-          gon.push(current_project_id: project.id) if project
-          gon.push(deploy_access_levels: levels_for_dropdown)
+          gon.push(current_project_id: project.id)
+          gon.push(deploy_access_levels)
           gon.push(protectable_environments_for_dropdown)
         end
 
         def protectable_environments_for_dropdown
-          # For testing purposes (to be implemented soon)
-          hardcoded_output = [{text: 'staging', id: 'staging', title: 'staging'}, {text: 'production', id: 'production', title: 'production'}]
-
-          { open_environments: hardcoded_output }
+          { open_environments: environment_dropdown.env_hash }
         end
 
-        def levels_for_dropdown
-          roles = ::ProtectedRefAccess::HUMAN_ACCESS_LEVELS.map do |id, text|
-            { id: id, text: text, before_divider: true }
-          end
-          { roles: roles }
+        def deploy_access_levels
+          { deploy_access_levels: environment_dropdown.roles_hash }
+        end
+
+        def environment_dropdown
+          @environment_dropdown ||= ProtectedEnvironments::EnvironmentDropdown.new(@project)
         end
       end
     end

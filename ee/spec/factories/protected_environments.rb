@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :protected_environment do
-    name
+    name 'production'
     project
 
     transient do
