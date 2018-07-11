@@ -87,7 +87,7 @@ export default class ProtectedEnvironmentCreate {
         }
       });
 
-      formData.protected_branch[`${accessLevel}_attributes`] = levelAttributes;
+      formData.protected_environment[`${accessLevel}_attributes`] = levelAttributes;
     });
 
     return formData;

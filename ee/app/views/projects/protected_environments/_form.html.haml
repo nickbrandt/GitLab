@@ -1,10 +1,10 @@
-= form_for [@project.namespace.becomes(Namespace), @project, @project.protected_environments.new], html: { class: 'new-protected-environment js-new-protected-environment' } do |f|
+= form_for [@project.namespace.becomes(Namespace), @project, @protected_environment], html: { class: 'new-protected-environment js-new-protected-environment' } do |f|
   .card
     .card-header
       %h3.card-title
         Protect an environment
     .card-body
-      = form_errors(ProtectedEnvironment.new)
+      = form_errors(@protected_environment)
       .form-group.row
         = f.label :name, class: 'col-md-2 text-right' do
           Environment:

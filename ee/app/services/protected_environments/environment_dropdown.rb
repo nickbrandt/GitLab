@@ -1,5 +1,10 @@
 module ProtectedEnvironments
-  class EnvironmentDropdown < ProtectedEnvironments::BaseService
+  class EnvironmentDropdown
+    attr_reader :project
+
+    def initialize(project)
+      @project = project
+    end
 
     def protectable_env_names
       env_names - protected_environment_names
