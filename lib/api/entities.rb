@@ -1420,4 +1420,3 @@ API::Entities.prepend_entity(::API::Entities::Project, with: EE::API::Entities::
 API::Entities.prepend_entity(::API::Entities::ProtectedRefAccess, with: EE::API::Entities::ProtectedRefAccess)
 API::Entities.prepend_entity(::API::Entities::UserPublic, with: EE::API::Entities::UserPublic)
 API::Entities.prepend_entity(::API::Entities::Variable, with: EE::API::Entities::Variable)
-API::Entities.prepend_entity(::API::Entities::Todo, with: EE::API::Entities::Todo)

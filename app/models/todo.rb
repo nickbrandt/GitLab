@@ -1,5 +1,4 @@
 class Todo < ActiveRecord::Base
-  prepend EE::Todo
   include Sortable
 
   ASSIGNED           = 1

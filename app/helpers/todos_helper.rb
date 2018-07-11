@@ -1,6 +1,4 @@
 module TodosHelper
-  prepend EE::NotesHelper
-
   def todos_pending_count
     @todos_pending_count ||= current_user.todos_pending_count
   end
