@@ -6,12 +6,11 @@ import (
 	"net/http"
 	"time"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/gorilla/websocket"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
 )
 
 var (
@@ -47,7 +46,7 @@ func ProxyTerminal(w http.ResponseWriter, r *http.Request, terminal *api.Termina
 	server, err := connectToServer(terminal, r)
 	if err != nil {
 		helper.Fail500(w, r, err)
-		log.WithError(err).Print("Terminal: connecting to server failed")
+		log.WithError(r.Context(), err).Print("Terminal: connecting to server failed")
 		return
 	}
 	defer server.UnderlyingConn().Close()
@@ -55,7 +54,7 @@ func ProxyTerminal(w http.ResponseWriter, r *http.Request, terminal *api.Termina
 
 	client, err := upgradeClient(w, r)
 	if err != nil {
-		log.WithError(err).Print("Terminal: upgrading client to websocket failed")
+		log.WithError(r.Context(), err).Print("Terminal: upgrading client to websocket failed")
 		return
 	}
 
@@ -66,7 +65,7 @@ func ProxyTerminal(w http.ResponseWriter, r *http.Request, terminal *api.Termina
 	defer client.UnderlyingConn().Close()
 	clientAddr := getClientAddr(r) // We can't know the port with confidence
 
-	logEntry := log.WithFields(log.Fields{
+	logEntry := log.WithFields(r.Context(), log.Fields{
 		"clientAddr": clientAddr,
 		"serverAddr": serverAddr,
 	})

@@ -9,6 +9,8 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
+
+	logging "gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
 )
 
 var (
@@ -110,7 +112,8 @@ func (l *statsCollectingResponseWriter) writeAccessLog(r *http.Request) {
 		return
 	}
 
-	accessLogEntry.WithFields(l.accessLogFields(r)).Info("access")
+	logEntry := accessLogEntry.WithFields(l.accessLogFields(r))
+	logging.WrapEntry(r.Context(), logEntry).Info("access")
 }
 
 func (l *statsCollectingResponseWriter) accessLogFields(r *http.Request) log.Fields {

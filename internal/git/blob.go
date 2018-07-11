@@ -6,10 +6,9 @@ import (
 	"net/http"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
-
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
@@ -51,7 +50,7 @@ func handleSendBlobWithGitaly(w http.ResponseWriter, r *http.Request, params *bl
 }
 
 func handleSendBlobLocally(w http.ResponseWriter, r *http.Request, params *blobParams) {
-	log.WithFields(log.Fields{
+	log.WithFields(r.Context(), log.Fields{
 		"blobId": params.BlobId,
 		"path":   r.URL.Path,
 	}).Print("SendBlob: sending")

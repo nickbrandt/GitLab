@@ -23,9 +23,8 @@ import (
 	"syscall"
 	"time"
 
-	log "github.com/sirupsen/logrus"
-
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/queueing"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/redis"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
@@ -78,18 +77,19 @@ func main() {
 	}
 
 	startLogging(logConfig)
+	logger := log.NoContext()
 
 	backendURL, err := parseAuthBackend(*authBackend)
 	if err != nil {
-		log.WithError(err).Fatal("invalid authBackend")
+		logger.WithError(err).Fatal("invalid authBackend")
 	}
 
-	log.WithField("version", version).Print("Starting")
+	logger.WithField("version", version).Print("Starting")
 
 	// Good housekeeping for Unix sockets: unlink before binding
 	if *listenNetwork == "unix" {
 		if err := os.Remove(*listenAddr); err != nil && !os.IsNotExist(err) {
-			log.Fatal(err)
+			logger.Fatal(err)
 		}
 	}
 
@@ -98,7 +98,7 @@ func main() {
 	listener, err := net.Listen(*listenNetwork, *listenAddr)
 	syscall.Umask(oldUmask)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 
 	// The profiler will only be activated by HTTP requests. HTTP
@@ -107,7 +107,7 @@ func main() {
 	// effectively disabled by default.
 	if *pprofListenAddr != "" {
 		go func() {
-			log.Print(http.ListenAndServe(*pprofListenAddr, nil))
+			logger.Print(http.ListenAndServe(*pprofListenAddr, nil))
 		}()
 	}
 
@@ -115,7 +115,7 @@ func main() {
 		promMux := http.NewServeMux()
 		promMux.Handle("/metrics", promhttp.Handler())
 		go func() {
-			log.Print(http.ListenAndServe(*prometheusListenAddr, promMux))
+			logger.Print(http.ListenAndServe(*prometheusListenAddr, promMux))
 		}()
 	}
 
@@ -136,7 +136,7 @@ func main() {
 	if *configFile != "" {
 		cfgFromFile, err := config.LoadConfig(*configFile)
 		if err != nil {
-			log.WithField("configFile", *configFile).WithError(err).Fatal("Can not load config file")
+			logger.WithField("configFile", *configFile).WithError(err).Fatal("Can not load config file")
 		}
 
 		cfg.Redis = cfgFromFile.Redis
@@ -147,7 +147,7 @@ func main() {
 		}
 	}
 
-	up := wrapRaven(upstream.NewUpstream(cfg))
+	up := wrapRaven(log.InjectCorrelationID(upstream.NewUpstream(cfg)))
 
-	log.Fatal(http.Serve(listener, up))
+	logger.Fatal(http.Serve(listener, up))
 }

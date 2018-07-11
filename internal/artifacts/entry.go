@@ -12,9 +12,8 @@ import (
 	"strings"
 	"syscall"
 
-	log "github.com/sirupsen/logrus"
-
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 )
@@ -32,7 +31,7 @@ func (e *entry) Inject(w http.ResponseWriter, r *http.Request, sendData string) 
 		return
 	}
 
-	log.WithFields(log.Fields{
+	log.WithFields(r.Context(), log.Fields{
 		"entry":   params.Entry,
 		"archive": params.Archive,
 		"path":    r.URL.Path,
