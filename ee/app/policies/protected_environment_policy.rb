@@ -1,5 +1,4 @@
 class ProtectedEnvironmentPolicy < BasePolicy
-
   delegate { @subject.project }
 
   rule { can?(:admin_project) }.policy do
@@ -8,4 +7,3 @@ class ProtectedEnvironmentPolicy < BasePolicy
     enable :destroy_protected_environment
   end
 end
-

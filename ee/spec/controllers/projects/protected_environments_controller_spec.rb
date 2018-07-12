@@ -18,10 +18,10 @@ describe Projects::ProtectedEnvironmentsController do
     end
 
     context 'with valid access and params' do
-     let(:params) do
-        attributes_for(:protected_environment, 
+      let(:params) do
+        attributes_for(:protected_environment,
                        deploy_access_levels_attributes: [{ access_level: master_access }])
-      end 
+      end
 
       before do
         project.add_master(current_user)
@@ -29,7 +29,7 @@ describe Projects::ProtectedEnvironmentsController do
 
       it 'should create a new ProtectedEnvironment' do
         expect do
-          subject 
+          subject
         end.to change(ProtectedEnvironment, :count).by(1)
       end
 
@@ -40,7 +40,7 @@ describe Projects::ProtectedEnvironmentsController do
       end
 
       it 'should redirect to CI/CD settings' do
-        subject 
+        subject
 
         expect(response).to redirect_to project_settings_ci_cd_path(project)
       end
@@ -52,11 +52,10 @@ describe Projects::ProtectedEnvironmentsController do
       end
 
       let(:params) do
-        attributes_for(:protected_environment, 
+        attributes_for(:protected_environment,
                        name: '',
                        deploy_access_levels_attributes: [{ access_level: master_access }])
       end
-
 
       it 'should not create a new ProtectedEnvironment' do
         expect do
@@ -73,7 +72,7 @@ describe Projects::ProtectedEnvironmentsController do
 
     context 'with invalid access' do
       let(:params) do
-        attributes_for(:protected_environment, 
+        attributes_for(:protected_environment,
                        deploy_access_levels_attributes: [{ access_level: master_access }])
       end
 

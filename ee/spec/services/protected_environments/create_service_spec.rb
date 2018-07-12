@@ -6,7 +6,7 @@ describe ProtectedEnvironments::CreateService do
   let(:master_access) { Gitlab::Access::MASTER }
 
   let(:params) do
-    attributes_for(:protected_environment, 
+    attributes_for(:protected_environment,
                    deploy_access_levels_attributes: [{ access_level: master_access }])
   end
 
