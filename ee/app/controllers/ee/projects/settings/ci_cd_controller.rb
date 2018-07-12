@@ -10,6 +10,7 @@ module EE
 
         private
 
+        # rubocop:disable Gitlab/ModuleWithInstanceVariables
         def define_variables
           super
 

@@ -5,4 +5,3 @@ class Projects::ProtectedEnvironments::ApplicationController < Projects::Applica
     @protected_environment = @project.protected_environmentes.find(params[:protected_environment_id])
   end
 end
-

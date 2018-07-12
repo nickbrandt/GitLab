@@ -37,7 +37,7 @@ module ProtectedEnvironments
     def protected_environments
       @protected_environments ||= project.protected_environments
     end
-    
+
     def environments
       @environments ||= project.environments
     end
