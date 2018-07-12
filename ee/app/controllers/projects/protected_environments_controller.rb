@@ -1,9 +1,12 @@
 class Projects::ProtectedEnvironmentsController < Projects::ApplicationController
+  before_action :authorize_admin_project!
 
   def create
-    protected_environment = ProtectedEnvironments::CreateService.new(@project, current_user, protected_environment_params).execute
+    protected_environment = ::ProtectedEnvironments::CreateService.new(@project, current_user, protected_environment_params).execute
 
-    unless protected_environment.persisted?
+    if protected_environment.persisted?
+      flash[:notice] = s_('ProtectedEnvironment|Your environment has been protected.')
+    else
       flash[:alert] = protected_environment.errors.full_messages.join(', ').html_safe
     end
 
@@ -13,6 +16,6 @@ class Projects::ProtectedEnvironmentsController < Projects::ApplicationControlle
   private
 
   def protected_environment_params
-    params.require(:protected_environment).permit(:name, deploy_access_levels_attributes: [:deploy_access_levels])
+    params.require(:protected_environment).permit(:name, deploy_access_levels_attributes: [:access_level, :user_id, :group_id])
   end
 end

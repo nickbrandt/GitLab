@@ -8,8 +8,7 @@ module ProtectedEnvironments
     end
 
     def authorized?
-      #can?(current_user, :create_protected_environment, protected_environment)
-      true
+      can?(current_user, :create_protected_environment, protected_environment)
     end
 
     private
