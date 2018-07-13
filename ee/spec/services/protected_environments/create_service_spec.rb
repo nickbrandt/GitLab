@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'spec_helper'
 
 describe ProtectedEnvironments::CreateService do
   let(:project) { create(:project) }

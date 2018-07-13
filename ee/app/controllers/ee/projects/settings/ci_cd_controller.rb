@@ -14,6 +14,12 @@ module EE
         def define_variables
           super
 
+          define_protected_environment_variables
+        end
+
+        def define_protected_environment_variables
+          @protected_environments = @project.protected_environments.order(:name)
+          @protected_environments_count = @protected_environments.count
           @protected_environment = @project.protected_environments.new
         end
 

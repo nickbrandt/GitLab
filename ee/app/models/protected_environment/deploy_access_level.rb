@@ -1,4 +1,6 @@
 class ProtectedEnvironment::DeployAccessLevel < ActiveRecord::Base
+  include ProtectedBranchAccess
+
   belongs_to :protected_environment
   belongs_to :user
   belongs_to :group

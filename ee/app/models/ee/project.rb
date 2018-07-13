@@ -34,12 +34,12 @@ module EE
       has_many :audit_events, as: :entity
       has_many :path_locks
       has_many :vulnerability_feedback
+      has_many :protected_environments, class_name: 'ProtectedEnvironment'
 
       has_many :sourced_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :source_project_id
 
       has_many :source_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :project_id
 
-      has_many :protected_environments, class_name: 'ProtectedEnvironment', inverse_of: :project
 
       scope :with_shared_runners_limit_enabled, -> { with_shared_runners.non_public_only }
 

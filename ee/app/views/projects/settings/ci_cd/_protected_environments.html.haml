@@ -1,4 +1,5 @@
 - expanded = Rails.env.test?
+- can_admin_project = can?(current_user, :admin_project, @project)
 
 %section.protected-environments-settings.settings.no-animate{ class: ('expanded' if expanded) }
   .settings-header
@@ -10,3 +11,7 @@
       = _('Protect Environments in order to restrict who can execute deployments.')
   .settings-content
     = render 'projects/protected_environments/form'
+
+  .settings-content
+    = render partial: 'projects/protected_environments/environments_list', locals: { can_admin_project: can_admin_project }
+      
