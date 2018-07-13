@@ -59,7 +59,7 @@ var logConfig = logConfiguration{}
 
 func init() {
 	flag.StringVar(&logConfig.logFile, "logFile", "", "Log file location")
-	flag.StringVar(&logConfig.logFormat, "logFormat", "text", "Log format to use defaults to text (text, json, none)")
+	flag.StringVar(&logConfig.logFormat, "logFormat", "text", "Log format to use defaults to text (text, json, structured, none)")
 }
 
 func main() {
