@@ -11,7 +11,7 @@ describe ProtectedEnvironments::DestroyService do
 
     context 'when the user is authorized' do
       before do
-        project.add_master(user)
+        project.add_maintainer(user)
       end
 
       it 'should delete the requested ProtectedEnvironment' do

@@ -7,9 +7,9 @@ describe ProtectedEnvironmentPolicy do
 
   subject { described_class.new(current_user, protected_environment) }
 
-  describe 'master access' do
+  describe 'maintainer access' do
     before do
-      project.add_master(current_user)
+      project.add_maintainer(current_user)
     end
 
     it { is_expected.to be_allowed(:create_protected_environment) }

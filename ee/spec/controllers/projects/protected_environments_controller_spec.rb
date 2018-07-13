@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Projects::ProtectedEnvironmentsController do
   let(:project) { create(:project) }
   let(:current_user) { create(:user) }
-  let(:master_access) { Gitlab::Access::MASTER }
+  let(:maintainer_access) { Gitlab::Access::MAINTAINER }
   let(:developer_access) { Gitlab::Access::DEVELOPER }
 
   before do
@@ -21,11 +21,11 @@ describe Projects::ProtectedEnvironmentsController do
     context 'with valid access and params' do
       let(:params) do
         attributes_for(:protected_environment,
-                       deploy_access_levels_attributes: [{ access_level: master_access }])
+                       deploy_access_levels_attributes: [{ access_level: maintainer_access }])
       end
 
       before do
-        project.add_master(current_user)
+        project.add_maintainer(current_user)
       end
 
       it 'should create a new ProtectedEnvironment' do
@@ -49,13 +49,13 @@ describe Projects::ProtectedEnvironmentsController do
 
     context 'with valid access and invalid params' do
       before do
-        project.add_master(current_user)
+        project.add_maintainer(current_user)
       end
 
       let(:params) do
         attributes_for(:protected_environment,
                        name: '',
-                       deploy_access_levels_attributes: [{ access_level: master_access }])
+                       deploy_access_levels_attributes: [{ access_level: maintainer_access }])
       end
 
       it 'should not create a new ProtectedEnvironment' do
@@ -74,7 +74,7 @@ describe Projects::ProtectedEnvironmentsController do
     context 'with invalid access' do
       let(:params) do
         attributes_for(:protected_environment,
-                       deploy_access_levels_attributes: [{ access_level: master_access }])
+                       deploy_access_levels_attributes: [{ access_level: maintainer_access }])
       end
 
       before do
@@ -97,7 +97,7 @@ describe Projects::ProtectedEnvironmentsController do
       {
         deploy_access_levels_attributes: [
           { id: deploy_access_level.id, access_level: developer_access },
-          { access_level: master_access }
+          { access_level: maintainer_access }
         ]
       }
     end
@@ -112,7 +112,7 @@ describe Projects::ProtectedEnvironmentsController do
 
     context 'when the user is authorized' do
       before do
-        project.add_master(current_user)
+        project.add_maintainer(current_user)
 
         subject
       end
@@ -155,7 +155,7 @@ describe Projects::ProtectedEnvironmentsController do
 
     context 'when the user is authorized' do
       before do
-        project.add_master(current_user)
+        project.add_maintainer(current_user)
       end
 
       it 'should find the requested protected environment' do

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe ProtectedEnvironments::UpdateService do
   let(:project) { create(:project) }
   let(:user) { create(:user) }
-  let(:master_access) { Gitlab::Access::MASTER }
+  let(:maintainer_access) { Gitlab::Access::MAINTAINER }
   let(:developer_access) { Gitlab::Access::DEVELOPER }
   let(:protected_environment) { create(:protected_environment, project: project) }
   let(:deploy_access_level) { protected_environment.deploy_access_levels.first }
@@ -12,7 +12,7 @@ describe ProtectedEnvironments::UpdateService do
     {
       deploy_access_levels_attributes: [
         { id: deploy_access_level.id, access_level: developer_access },
-        { access_level: master_access }
+        { access_level: maintainer_access }
       ]
     }
   end
@@ -22,7 +22,7 @@ describe ProtectedEnvironments::UpdateService do
 
     context 'when the user is authorized' do
       before do
-        project.add_master(user)
+        project.add_maintainer(user)
       end
 
       it 'should update the requested ProtectedEnvironment' do

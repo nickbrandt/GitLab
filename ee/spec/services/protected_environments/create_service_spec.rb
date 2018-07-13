@@ -3,11 +3,11 @@ require 'spec_helper'
 describe ProtectedEnvironments::CreateService do
   let(:project) { create(:project) }
   let(:user) { create(:user) }
-  let(:master_access) { Gitlab::Access::MASTER }
+  let(:maintainer_access) { Gitlab::Access::MAINTAINER }
 
   let(:params) do
     attributes_for(:protected_environment,
-                   deploy_access_levels_attributes: [{ access_level: master_access }])
+                   deploy_access_levels_attributes: [{ access_level: maintainer_access }])
   end
 
   describe '#execute' do
@@ -15,7 +15,7 @@ describe ProtectedEnvironments::CreateService do
 
     context 'when the user is authorized' do
       before do
-        project.add_master(user)
+        project.add_maintainer(user)
       end
 
       it 'should create a record on ProtectedEnvironment' do
