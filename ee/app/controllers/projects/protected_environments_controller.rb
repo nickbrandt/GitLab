@@ -30,7 +30,10 @@ class Projects::ProtectedEnvironmentsController < Projects::ApplicationControlle
   def destroy
     ::ProtectedEnvironments::DestroyService.new(@project, current_user).execute(@protected_environment)
 
-    redirect_to project_settings_ci_cd_path(@project)
+    respond_to do |format|
+      format.html { redirect_to project_settings_ci_cd_path(@project), status: :found }
+      format.js { head :ok }
+    end
   end
 
   private
