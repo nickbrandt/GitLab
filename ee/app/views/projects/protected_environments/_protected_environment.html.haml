@@ -4,8 +4,10 @@
   %td
     %span.ref-name= link_to protected_environment.name, '#'
   %td
-    %td
-      = render partial: 'projects/protected_environments/update_deploy_access_level_dropdown', locals: { protected_environment: protected_environment, access_levels: protected_environment.deploy_access_levels, disabled: !can_unprotect }
+    = render partial: 'projects/protected_environments/last_deployment', locals: { environment: protected_environment.environment, last_deployment: protected_environment.last_deployment }
+   
+  %td
+    = render partial: 'projects/protected_environments/update_deploy_access_level_dropdown', locals: { protected_environment: protected_environment, access_levels: protected_environment.deploy_access_levels, disabled: !can_unprotect }
 
   - if can_unprotect
     %td

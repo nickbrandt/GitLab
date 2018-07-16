@@ -24,4 +24,14 @@ class ProtectedEnvironment < ActiveRecord::Base
   def self.protected?(project, environment_name)
     project.protected_environments.exists?(name: environment_name)
   end
+
+  def environment
+    @environment ||= project.environments.find_by(name: name)
+  end
+
+  def last_deployment
+    return unless environment
+
+    environment.last_deployment
+  end
 end
