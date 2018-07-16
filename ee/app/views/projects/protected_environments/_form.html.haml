@@ -13,7 +13,7 @@
 
       .form-group.row
         %label.col-md-2.text-right{ for: 'deploy_access_levels_attributes' }
-          = s_('ProtectedEnvironment|Allowed to deploy:') + ':'
+          = s_('ProtectedEnvironment|Allowed to deploy') + ':'
         .col-md-10
           = render partial: 'projects/protected_environments/deploy_access_levels_dropdown', locals: { f: f }
 

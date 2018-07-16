@@ -12,4 +12,3 @@
   - if can_unprotect
     %td
       = link_to s_('ProtectedEnvironment|Unprotect'), [@project.namespace.becomes(Namespace), @project, protected_environment], disabled: local_assigns[:disabled], data: { confirm: s_('ProtectedEnvironment|%{environment_name} will be writable for developers. Are you sure?') % { environment_name: protected_environment.name } }, method: :delete, class: 'btn btn-warning'
-)
