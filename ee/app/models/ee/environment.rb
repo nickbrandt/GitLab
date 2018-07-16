@@ -11,9 +11,5 @@ module EE
     def protected?
       ProtectedEnvironment.protected?(project, name)
     end
-
-    def protected_deployable_by_user?(user)
-      ProtectedEnvironment.protected_ref_accessible_to?(name, user, project: project, action: :deploy)
-    end
   end
 end

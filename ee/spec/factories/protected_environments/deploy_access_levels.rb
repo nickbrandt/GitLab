@@ -4,5 +4,9 @@ FactoryBot.define do
     group nil
     protected_environment
     access_level { Gitlab::Access::DEVELOPER }
+
+    trait :maintainer_access do
+      access_level { Gitlab::Access::MAINTAINER }
+    end
   end
 end

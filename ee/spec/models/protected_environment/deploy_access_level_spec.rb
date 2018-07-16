@@ -25,14 +25,14 @@ describe ProtectedEnvironment::DeployAccessLevel do
       it { is_expected.to be_truthy }
     end
 
-    context 'when deploy access is directly related to the user' do
+    context 'when specific access has been assigned to a user' do
       let(:deploy_access_level) { create(:protected_environment_deploy_access_level, protected_environment: protected_environment, user: user) }
       let(:user) { create(:user, :admin) }
 
       it { is_expected.to be_truthy }
     end
 
-    context 'when the user belongs to a directly related group' do
+    context 'when specific access has been assigned to a group' do
       let(:group) { create(:group, projects: [project]) }
       let(:user) { create(:user) }
       let(:deploy_access_level) { create(:protected_environment_deploy_access_level, protected_environment: protected_environment, group: group) }
@@ -44,7 +44,7 @@ describe ProtectedEnvironment::DeployAccessLevel do
       it { is_expected.to be_truthy }
     end
 
-    context 'when the user has the right permission' do
+    context 'when user is project member above the permitted access level' do
       let(:user) { create(:user) }
       let(:developer) { Gitlab::Access::DEVELOPER }
       let(:deploy_access_level) { create(:protected_environment_deploy_access_level, protected_environment: protected_environment, access_level: developer) }
@@ -56,14 +56,26 @@ describe ProtectedEnvironment::DeployAccessLevel do
       it { is_expected.to be_truthy }
     end
 
-    context 'when user is not directly related to deploy access level' do
+    context 'when user is in group that is allowed to deploy' do
+      let(:group) { create(:group, projects: [project]) }
+      let(:user) { create(:user) }
+      let(:deploy_access_level) { create(:protected_environment_deploy_access_level, protected_environment: protected_environment, group: group) }
+
+      before do
+        group.add_guest(user)
+      end
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'when no permissions have been given to a user' do
       let(:deploy_access_level) { create(:protected_environment_deploy_access_level, protected_environment: protected_environment) }
       let(:user) { create(:user) }
 
       it { is_expected.to be_falsy }
     end
 
-    context 'when user does not belong to a directly related group' do
+    context 'when no permissions have been given to a group' do
       let(:group) { create(:group, projects: [project]) }
       let(:user) { create(:user) }
       let(:deploy_access_level) { create(:protected_environment_deploy_access_level, protected_environment: protected_environment, group: group) }
@@ -71,13 +83,25 @@ describe ProtectedEnvironment::DeployAccessLevel do
       it { is_expected.to be_falsy }
     end
 
-    context 'when user does not have the right permission' do
+    context 'when user is project member below the permitted access level' do
       let(:user) { create(:user) }
       let(:developer_access) { Gitlab::Access::DEVELOPER }
       let(:deploy_access_level) { create(:protected_environment_deploy_access_level, protected_environment: protected_environment, access_level: developer_access) }
 
       before do
         project.add_reporter(user)
+      end
+
+      it { is_expected.to be_falsy }
+    end
+
+    context 'when user is not in group that is allowed to deploy' do
+      let(:group) { create(:group, projects: [project]) }
+      let(:user) { create(:user) }
+      let(:deploy_access_level) { create(:protected_environment_deploy_access_level, protected_environment: protected_environment) }
+
+      before do
+        group.add_guest(user)
       end
 
       it { is_expected.to be_falsy }
