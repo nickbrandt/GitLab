@@ -2,20 +2,20 @@
   .card
     .card-header
       %h3.card-title
-        Protect an environment
+        = s_('ProtectedEnvironment|Protect an environment')
     .card-body
       = form_errors(@protected_environment)
       .form-group.row
         = f.label :name, class: 'col-md-2 text-right' do
-          Environment:
+          = s_('ProtectedEnvironment|Environment') + ':'
         .col-md-10
           = render partial: 'projects/protected_environments/environments_dropdown', locals: { f: f, project: @project }
 
       .form-group.row
         %label.col-md-2.text-right{ for: 'deploy_access_levels_attributes' }
-          Allowed to deploy:
+          = s_('ProtectedEnvironment|Allowed to deploy:') + ':'
         .col-md-10
           = render partial: 'projects/protected_environments/deploy_access_levels_dropdown', locals: { f: f }
 
     .card-footer
-      = f.submit 'Protect', class: 'btn-create btn', disabled: true
+      = f.submit s_('ProtectedEnvironment|Protect'), class: 'btn-create btn', disabled: true
