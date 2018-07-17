@@ -34,7 +34,7 @@ module EE
       has_many :audit_events, as: :entity
       has_many :path_locks
       has_many :vulnerability_feedback
-      has_many :protected_environments, class_name: 'ProtectedEnvironment'
+      has_many :protected_environments
 
       has_many :sourced_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :source_project_id
 

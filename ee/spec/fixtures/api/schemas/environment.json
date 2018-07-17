@@ -68,6 +68,9 @@
         },
         "can_stop": {
             "type": "boolean"
+        },
+        "deployable_by_user?": {
+            "type": "boolean"
         }
     }
 }

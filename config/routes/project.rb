@@ -278,7 +278,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       end
 
       ## EE-specific
-      resources :protected_environments, constraints: { id: Gitlab::PathRegex.git_reference_regex }
+      resources :protected_environments
       ## EE-specific
 
       resource :cycle_analytics, only: [:show]

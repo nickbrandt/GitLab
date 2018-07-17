@@ -24,12 +24,6 @@ class ProtectedEnvironment::DeployAccessLevel < ActiveRecord::Base
   validates :access_level, uniqueness: { scope: :protected_environment, if: :role?,
                                          conditions: -> { where(user_id: nil, group_id: nil) } }
 
-  scope :by_user, -> (user) { where(user: user ) }
-  scope :by_group, -> (group) { where(group: group ) }
-  scope :for_role, -> { where(user: nil, group: nil) }
-  scope :for_user, -> { where.not(user: nil) }
-  scope :for_group, -> { where.not(group: nil) }
-
   delegate :project, to: :protected_environment
 
   def check_access(user)
@@ -40,10 +34,18 @@ class ProtectedEnvironment::DeployAccessLevel < ActiveRecord::Base
     project.team.max_member_access(user.id) >= access_level
   end
 
+  def user_type?
+    user_id.present?
+  end
+
+  def group_type?
+    group_id.present?
+  end
+
   def type
-    if user.present?
+    if user_type?
       :user
-    elsif group.present?
+    elsif group_type?
       :group
     else
       :role
@@ -55,8 +57,8 @@ class ProtectedEnvironment::DeployAccessLevel < ActiveRecord::Base
   end
 
   def humanize
-    return user.name if user.present?
-    return group.name if group.present?
+    return user.name if user_type?
+    return group.name if group_type?
 
     HUMAN_ACCESS_LEVELS[access_level]
   end

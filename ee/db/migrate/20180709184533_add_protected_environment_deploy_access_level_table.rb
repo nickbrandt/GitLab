@@ -25,7 +25,9 @@ class AddProtectedEnvironmentDeployAccessLevelTable < ActiveRecord::Migration
   end
 
   def down
-    remove_foreign_key :protected_environment_deploy_access_levels, column: :group_id
+    if foreign_keys_for(:protected_environment_deploy_access_levels, :group_id).any?
+      remove_foreign_key :protected_environment_deploy_access_levels, column: :group_id
+    end
 
     drop_table :protected_environment_deploy_access_levels
   end

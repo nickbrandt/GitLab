@@ -5,7 +5,7 @@ module EE
         extend ActiveSupport::Concern
 
         prepended do
-          before_action :load_gon_index, only: :show
+          before_action :assign_variables_to_gon, only: :show
           before_action :define_protected_env_variables, only: :show
         end
 
@@ -18,7 +18,7 @@ module EE
           @protected_environment = @project.protected_environments.new
         end
 
-        def load_gon_index
+        def assign_variables_to_gon
           gon.push(current_project_id: project.id)
           gon.push(deploy_access_levels)
           gon.push(protectable_environments_for_dropdown)
