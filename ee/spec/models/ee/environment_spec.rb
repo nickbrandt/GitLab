@@ -25,31 +25,25 @@ describe Environment do
     end
   end
 
-  describe '#protected?' do
-    let(:environment) { create(:environment, project: project, name: 'production') }
+  describe '#protected_deployable_by_user' do
+    let(:user) { create(:user) }
 
-    subject { environment.protected? }
+    subject { environment.protected_deployable_by_user(user) }
 
-    context 'when there is a matching ProtectedEnvironment for this project' do
+    before do
+      project.add_developer(user)
+    end
+
+    context 'when the environment is protected' do
       before do
-        create(:protected_environment, project: project, name: 'production')
+        create(:protected_environment, :maintainers_can_deploy, name: environment.name, project: project)
       end
 
+      it { is_expected.to be_falsy }
+    end
+
+    context 'when the environment is not protected' do
       it { is_expected.to be_truthy }
-    end
-
-    context 'when there is no matching ProtectedEnvironment for this project' do
-      it { is_expected.to be_falsey }
-    end
-
-    context 'when there is a matching ProtectedEnvironment but for a different project' do
-      let(:different_project) { create(:project, :stubbed_repository) }
-
-      before do
-        create(:protected_environment, project: different_project, name: 'production')
-      end
-
-      it { is_expected.to be_falsey }
     end
   end
 end

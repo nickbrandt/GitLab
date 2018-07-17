@@ -22,7 +22,7 @@ FactoryBot.define do
       end
     end
 
-    trait :masters_can_deploy do
+    trait :maintainers_can_deploy do
       after(:build) do |protected_environment|
         protected_environment.deploy_access_levels.new(access_level: Gitlab::Access::MAINTAINER)
       end

@@ -1,9 +1,9 @@
 - if environment
   %div
     %span.flex-truncate-child
-      - if last_deployment&.user
-        = "##{last_deployment.iid} by"
-        = user_avatar(user: last_deployment.user, size: 20)
+      - if last_deployment
+        = "##{last_deployment.iid}"
+        = "by " + user_avatar(user: last_deployment.user, size: 20) if last_deployment.user
       - else
         = "-"
 - else
