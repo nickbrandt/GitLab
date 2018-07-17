@@ -18,10 +18,6 @@ module EE
           @protected_environment = @project.protected_environments.new
         end
 
-        def define_protected_environment_variables
-          
-        end
-
         def load_gon_index
           gon.push(current_project_id: project.id)
           gon.push(deploy_access_levels)

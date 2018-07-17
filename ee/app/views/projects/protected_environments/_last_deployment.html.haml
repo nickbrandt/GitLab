@@ -1,8 +1,10 @@
 - if environment
-  - if last_deployment&.user
-    %div
-      %span.flex-truncate-child
+  %div
+    %span.flex-truncate-child
+      - if last_deployment&.user
         = "##{last_deployment.iid} by"
         = user_avatar(user: last_deployment.user, size: 20)
+      - else
+        = "-"
 - else
   = s_('ProtectedEnvironment|(environment was deleted from repository)')
