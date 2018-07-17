@@ -2243,7 +2243,7 @@ ActiveRecord::Schema.define(version: 20180709184533) do
     t.datetime_with_timezone "updated_at", null: false
     t.integer "protected_environment_id", null: false
     t.integer "user_id"
-    t.integer "access_level", default: 40, null: false
+    t.integer "access_level", default: 40
     t.integer "group_id"
   end
 

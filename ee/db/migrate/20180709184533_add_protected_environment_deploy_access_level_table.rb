@@ -15,7 +15,7 @@ class AddProtectedEnvironmentDeployAccessLevelTable < ActiveRecord::Migration
       t.timestamps_with_timezone null: false
       t.references :protected_environment, index: { name: 'index_protected_environment_deploy_access' }, foreign_key: { on_delete: :cascade }, null: false
       t.references :user, foreign_key: { on_delete: :cascade }, index: true
-      t.integer :access_level, default: GITLAB_ACCESS_MAINTAINER, null: false
+      t.integer :access_level, default: GITLAB_ACCESS_MAINTAINER, null: true
       t.integer :group_id, index: true
     end
 
