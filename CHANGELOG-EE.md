@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 10.7.7 (2018-07-17)
+
+- No changes.
+
 ## 10.7.6 (2018-06-21)
 
 - No changes.
