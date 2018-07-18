@@ -20,26 +20,14 @@ describe ProtectedEnvironments::UpdateService do
   describe '#execute' do
     subject { described_class.new(project, user, params).execute(protected_environment) }
 
-    context 'when the user is authorized' do
-      before do
-        project.add_maintainer(user)
-      end
-
-      it 'should update the requested ProtectedEnvironment' do
-        subject
-
-        expect(protected_environment.deploy_access_levels.count).to eq(2)
-      end
+    before do
+      project.add_maintainer(user)
     end
 
-    context 'when the user is not authorized' do
-      before do
-        project.add_developer(user)
-      end
+    it 'should update the requested ProtectedEnvironment' do
+      subject
 
-      it 'should raise a Gitlab::AccessDeniedError' do
-        expect { subject }.to raise_error(Gitlab::Access::AccessDeniedError)
-      end
+      expect(protected_environment.deploy_access_levels.count).to eq(2)
     end
   end
 end

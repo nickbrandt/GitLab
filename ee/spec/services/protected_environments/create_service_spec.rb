@@ -13,28 +13,12 @@ describe ProtectedEnvironments::CreateService do
   describe '#execute' do
     subject { described_class.new(project, user, params).execute }
 
-    context 'when the user is authorized' do
-      before do
-        project.add_maintainer(user)
-      end
-
-      it 'should create a record on ProtectedEnvironment' do
-        expect { subject }.to change(ProtectedEnvironment, :count).by(1)
-      end
-
-      it 'should create a record on ProtectedEnvironment record' do
-        expect { subject }.to change(ProtectedEnvironment::DeployAccessLevel, :count).by(1)
-      end
+    it 'should create a record on ProtectedEnvironment' do
+      expect { subject }.to change(ProtectedEnvironment, :count).by(1)
     end
 
-    context 'when the user is not authorized' do
-      before do
-        project.add_developer(user)
-      end
-
-      it 'should raise a Gitlab::AccessDeniedError' do
-        expect { subject }.to raise_error(Gitlab::Access::AccessDeniedError)
-      end
+    it 'should create a record on ProtectedEnvironment record' do
+      expect { subject }.to change(ProtectedEnvironment::DeployAccessLevel, :count).by(1)
     end
   end
 end
