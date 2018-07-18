@@ -504,6 +504,14 @@ module EE
     end
     request_cache(:any_path_locks?) { self.id }
 
+    def protected_environment_accessible_to?(environment_name, user)
+      protected_env = protected_environments.find_by(name: environment_name)
+
+      return unless protected_env
+
+      protected_env.accessible_to?(user)
+    end
+
     private
 
     def set_override_pull_mirror_available

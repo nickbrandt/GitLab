@@ -7,10 +7,6 @@ class ProtectedEnvironment < ActiveRecord::Base
   validates :deploy_access_levels, length: { is: 1 }, if: -> { false }
   validates :name, :project, presence: true
 
-  def self.protected?(project, environment_name)
-    project.protected_environments.exists?(name: environment_name)
-  end
-
   def accessible_to?(user)
     deploy_access_levels
       .any? { |deploy_access_level| deploy_access_level.check_access(user) }

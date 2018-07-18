@@ -1482,4 +1482,33 @@ describe Project do
       expect(project.latest_pipeline_with_security_reports).to eq(pipeline_2)
     end
   end
+
+  describe '#protected_environment_accessible_to?' do
+    let(:project) { create(:project) }
+    let(:user) { create(:user) }
+    let(:environment) { create(:environment, project: project) }
+    let(:protected_environment) { create(:protected_environment, project: project, name: environment.name) }
+
+    subject { project.protected_environment_accessible_to?(environment.name, user) }
+
+    context 'when project does not have protected environments' do
+      it { is_expected.to be_falsy }
+    end
+
+    context 'when project has protected environments and user has the right access' do
+      before do
+        protected_environment.deploy_access_levels.create(user_id: user.id)
+      end
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'when project has protected environments and user does not have the right access' do
+      before do
+        protected_environment.deploy_access_levels.create
+      end
+
+      it { is_expected.to be_falsy }
+    end
+  end
 end

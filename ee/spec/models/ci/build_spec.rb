@@ -190,4 +190,58 @@ describe Ci::Build do
       end
     end
   end
+
+  describe 'status' do
+    context 'when after transitioning from pending' do
+      let(:user) { create(:user) }
+      let(:project) { create(:project, :repository) }
+      let(:job) { create(:ci_build, :created, project: project, user: user) }
+      let(:environment) { create(:environment, project: project) }
+      let(:protected_environment) { create(:protected_environment, name: environment.name, project: project) }
+
+      before do
+        allow(project).to receive(:feature_available?)
+              .with(:protected_environments).and_return(true)
+      end
+
+      context 'when there is no environment related' do
+        it 'should succeed' do
+          job.public_send('enqueue')
+
+          expect(job.pending?).to be_truthy
+        end
+      end
+
+      context 'when there is an environment related and is protected' do
+        let(:job) { create(:ci_build, :created, project: project, environment: environment.name, user: user) }
+
+        context 'when the user has access to it' do
+          before do
+            protected_environment.deploy_access_levels.create(user_id: user.id)
+          end
+
+          it 'should succeed' do
+            job.public_send('enqueue')
+
+            expect(job.pending?).to be_truthy
+            expect(job.protected_environment_failure?).to be_falsy
+          end
+        end
+
+        context 'when the user does not have access to it' do
+          before do
+            job.public_send('enqueue')
+          end
+
+          it 'should failed' do
+            expect(job.failed?).to be_truthy
+          end
+
+          it 'should assign a failure reason' do
+            expect(job.protected_environment_failure?).to be_truthy
+          end
+        end
+      end
+    end
+  end
 end

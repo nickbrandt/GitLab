@@ -7,6 +7,7 @@ module Ci
     include Presentable
     include Importable
     include Gitlab::Utils::StrongMemoize
+    include ProtectedScope
 
     prepend EE::Ci::Build
 
@@ -187,6 +188,12 @@ module Ci
 
       after_transition running: any do |build|
         Ci::BuildRunnerSession.where(build: build).delete_all
+      end
+
+      after_transition any => [:pending] do |build|
+        return unless build.project.feature_available?(:protected_environments)
+
+        build.review_protected_environment_scope
       end
     end
 

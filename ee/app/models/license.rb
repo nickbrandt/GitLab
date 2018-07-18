@@ -60,6 +60,7 @@ class License < ActiveRecord::Base
     external_authorization_service
     ci_cd_projects
     group_burndown_charts
+    protected_environments
   ].freeze
 
   EEU_FEATURES = EEP_FEATURES + %i[

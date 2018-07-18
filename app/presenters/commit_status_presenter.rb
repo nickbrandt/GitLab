@@ -1,11 +1,13 @@
 class CommitStatusPresenter < Gitlab::View::Presenter::Delegated
+  prepend ::EE::CommitStatusPresenter
+
   CALLOUT_FAILURE_MESSAGES = {
       unknown_failure: 'There is an unknown failure, please try again',
       api_failure: 'There has been an API failure, please try again',
       stuck_or_timeout_failure: 'There has been a timeout failure or the job got stuck. Check your timeout limits or try again',
       runner_system_failure: 'There has been a runner system failure, please try again',
       missing_dependency_failure: 'There has been a missing dependency failure'
-  }.freeze
+  }.merge(EE_CALLOUT_FAILURE_MESSAGES).freeze
 
   presents :build
 
