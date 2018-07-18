@@ -2,7 +2,7 @@
 
 %tr.js-protected-environment-edit-form{ data: { url: namespace_project_protected_environment_path(@project.namespace, @project, protected_environment) } }
   %td
-    %span.ref-name= link_to protected_environment.name, '#'
+    %span.ref-name= link_to protected_environment.name, namespace_project_environment_path(@project.namespace, @project, protected_environment.environment)
   %td
     = render partial: 'projects/protected_environments/last_deployment', locals: { environment: protected_environment.environment, last_deployment: protected_environment.last_deployment }
 
