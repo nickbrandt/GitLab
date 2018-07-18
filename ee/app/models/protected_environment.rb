@@ -13,8 +13,7 @@ class ProtectedEnvironment < ActiveRecord::Base
 
   def accessible_to?(user)
     deploy_access_levels
-      .select { |deploy_access_level| deploy_access_level.check_access(user) }
-      .any?
+      .any? { |deploy_access_level| deploy_access_level.check_access(user) }
   end
 
   def environment

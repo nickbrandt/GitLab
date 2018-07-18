@@ -28,8 +28,8 @@ class ProtectedEnvironment::DeployAccessLevel < ActiveRecord::Base
 
   def check_access(user)
     return true if user.admin?
-    return user.id == user_id if self.user.present?
-    return group.users.exists?(user.id) if group.present?
+    return user.id == user_id if user_type?
+    return group.users.exists?(user.id) if group_type?
 
     project.team.max_member_access(user.id) >= access_level
   end
