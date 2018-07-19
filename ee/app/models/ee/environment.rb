@@ -8,6 +8,10 @@ module EE
       end
     end
 
+    def protected?
+      project.protected_environments.exists?(name: name)
+    end
+
     def protected_deployable_by_user(user)
       protected_env = project.protected_environments.find_by(name: name)
 

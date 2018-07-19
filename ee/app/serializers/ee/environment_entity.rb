@@ -10,6 +10,10 @@ module EE
       expose :deployable_by_user? do |environment|
         environment.protected_deployable_by_user(current_user)
       end
+
+      expose :protected? do |environment|
+        environment.protected?
+      end
     end
 
     def can_read_pod_logs?

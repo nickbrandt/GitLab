@@ -25,6 +25,25 @@ describe Environment do
     end
   end
 
+  describe '#protected?' do
+    let(:user) { create(:user) }
+
+    subject { environment.protected? }
+
+
+    context 'when the environment is protected' do
+      before do
+        create(:protected_environment,  name: environment.name, project: project)
+      end
+
+      it { is_expected.to be_truthy }
+    end
+
+    context 'when the environment is not protected' do
+      it { is_expected.to be_falsy }
+    end
+  end
+
   describe '#protected_deployable_by_user' do
     let(:user) { create(:user) }
 
