@@ -5,5 +5,7 @@ import ProtectedEnvironmentEditList from 'ee/protected_environments/protected_en
 document.addEventListener('DOMContentLoaded', () => {
   // eslint-disable-next-line no-new
   new ProtectedEnvironmentCreate();
+
+  // eslint-disable-next-line no-new
   new ProtectedEnvironmentEditList();
 });
