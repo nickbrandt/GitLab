@@ -30,7 +30,6 @@ describe Environment do
 
     subject { environment.protected? }
 
-
     context 'when the environment is protected' do
       before do
         create(:protected_environment,  name: environment.name, project: project)

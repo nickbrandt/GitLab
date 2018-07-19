@@ -191,7 +191,7 @@ module Ci
       end
 
       after_transition any => [:pending] do |build|
-        return unless build.project.feature_available?(:protected_environments)
+        next unless build.project.feature_available?(:protected_environments)
 
         build.review_protected_environment_scope
       end
