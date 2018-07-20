@@ -60,11 +60,10 @@ export default {
     >
       <span>
         <icon name="play" />
-        <i
-          class="fa fa-caret-down"
+        <icon
+          name="angle-down"
           aria-hidden="true"
-        >
-        </i>
+        />
         <gl-loading-icon v-if="isLoading" />
       </span>
     </button>
