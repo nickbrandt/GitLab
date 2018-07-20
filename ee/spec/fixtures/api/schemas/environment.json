@@ -69,6 +69,9 @@
         "can_stop": {
             "type": "boolean"
         },
+        "protected?": {
+            "type": "boolean"
+        },
         "deployable_by_user?": {
             "type": "boolean"
         }
