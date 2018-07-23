@@ -2,14 +2,12 @@ class ProtectedEnvironment::DeployAccessLevel < ActiveRecord::Base
   ALLOWED_ACCESS_LEVELS = [
     Gitlab::Access::MAINTAINER,
     Gitlab::Access::DEVELOPER,
-    Gitlab::Access::NO_ACCESS,
     Gitlab::Access::ADMIN
   ].freeze
 
   HUMAN_ACCESS_LEVELS = {
     Gitlab::Access::MAINTAINER => 'Maintainers'.freeze,
-    Gitlab::Access::DEVELOPER => 'Developers + Maintainers'.freeze,
-    Gitlab::Access::NO_ACCESS => 'No one'.freeze
+    Gitlab::Access::DEVELOPER => 'Developers + Maintainers'.freeze
   }.freeze
 
   belongs_to :user

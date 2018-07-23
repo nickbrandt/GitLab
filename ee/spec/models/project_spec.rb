@@ -1492,23 +1492,25 @@ describe Project do
     subject { project.protected_environment_accessible_to?(environment.name, user) }
 
     context 'when project does not have protected environments' do
-      it { is_expected.to be_falsy }
-    end
-
-    context 'when project has protected environments and user has the right access' do
-      before do
-        protected_environment.deploy_access_levels.create(user_id: user.id)
-      end
-
       it { is_expected.to be_truthy }
     end
 
-    context 'when project has protected environments and user does not have the right access' do
-      before do
-        protected_environment.deploy_access_levels.create
+    context 'when project has protected environments' do
+      context 'when user has the right access' do
+        before do
+          protected_environment.deploy_access_levels.create(user_id: user.id)
+        end
+
+        it { is_expected.to be_truthy }
       end
 
-      it { is_expected.to be_falsy }
+      context 'when user does not have the right access' do
+        before do
+          protected_environment.deploy_access_levels.create
+        end
+
+        it { is_expected.to be_falsy }
+      end
     end
   end
 end

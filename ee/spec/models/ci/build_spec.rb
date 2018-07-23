@@ -230,6 +230,8 @@ describe Ci::Build do
 
         context 'when the user does not have access to it' do
           before do
+            protected_environment
+
             job.public_send('enqueue')
           end
 

@@ -6,8 +6,7 @@ describe ProtectedEnvironments::EnvironmentDropdown do
   let(:roles) do
     [
       { id: 40, text: 'Maintainers', before_divider: true },
-      { id: 30, text: 'Developers + Maintainers', before_divider: true },
-      { id: 0, text: 'No one', before_divider: true }
+      { id: 30, text: 'Developers + Maintainers', before_divider: true }
     ]
   end
 

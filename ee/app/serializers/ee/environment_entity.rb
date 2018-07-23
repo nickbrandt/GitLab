@@ -7,11 +7,11 @@ module EE
         logs_project_environment_path(environment.project, environment)
       end
 
-      expose :deployable_by_user? do |environment|
+      expose :can_deploy do |environment|
         environment.protected_deployable_by_user(current_user)
       end
 
-      expose :protected? do |environment|
+      expose :is_protected do |environment|
         environment.protected?
       end
     end

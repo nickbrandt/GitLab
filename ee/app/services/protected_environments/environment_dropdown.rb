@@ -19,7 +19,7 @@ module ProtectedEnvironments
     end
 
     def roles
-      ::ProtectedRefAccess::HUMAN_ACCESS_LEVELS.map do |id, text|
+      human_access_levels.map do |id, text|
         { id: id, text: text, before_divider: true }
       end
     end
@@ -40,6 +40,10 @@ module ProtectedEnvironments
 
     def environments
       @environments ||= project.environments
+    end
+
+    def human_access_levels
+      ::ProtectedEnvironment::DeployAccessLevel::HUMAN_ACCESS_LEVELS
     end
   end
 end

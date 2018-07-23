@@ -505,6 +505,8 @@ module EE
     request_cache(:any_path_locks?) { self.id }
 
     def protected_environment_accessible_to?(environment_name, user)
+      return true if protected_environments.empty?
+
       protected_env = protected_environments.find_by(name: environment_name)
 
       return unless protected_env

@@ -58,14 +58,6 @@ describe ProtectedEnvironment do
       it { is_expected.to be_truthy }
     end
 
-    context 'when no permissions have been given to a user' do
-      before do
-        create(:protected_environment_deploy_access_level, protected_environment: protected_environment)
-      end
-
-      it { is_expected.to be_falsy }
-    end
-
     context 'when user is a project member below the permitted access level' do
       before do
         create(:protected_environment_deploy_access_level, protected_environment: protected_environment)
@@ -74,6 +66,52 @@ describe ProtectedEnvironment do
       end
 
       it { is_expected.to be_falsy }
+    end
+
+    context 'when no permissions have been given to a user' do
+      before do
+        create(:protected_environment_deploy_access_level, protected_environment: protected_environment)
+      end
+
+      it { is_expected.to be_falsy }
+    end
+
+    context 'when only specific access has been granted to another user' do
+      let(:another_user) { create(:user) }
+
+      before do
+        create(:protected_environment_deploy_access_level, protected_environment: protected_environment, user: another_user)
+      end
+
+      it 'should reject access for developers' do
+        project.add_developer(user)
+
+        expect(subject).to be_falsy
+      end
+
+      it 'should reject access for maintainers' do
+        project.add_maintainer(user)
+
+        expect(subject).to be_falsy
+      end
+    end
+
+    context 'when specific access has been granted to users and roles' do
+      before do
+        create(:protected_environment_deploy_access_level, protected_environment: protected_environment)
+      end
+
+      it 'should allow access fow developers' do
+        project.add_developer(user)
+
+        expect(subject).to be_truthy
+      end
+
+      it 'should allow access for maintainers' do
+        project.add_maintainer(user)
+
+        expect(subject).to be_truthy
+      end
     end
   end
 end
