@@ -132,7 +132,7 @@ describe('graph component', function () {
 
   describe('capitalizeStageName', () => {
     it('capitalizes and escapes stage name', () => {
-      component = mountComponent(GraphComponent, {
+      const component = mountComponent(GraphComponent, {
         isLoading: false,
         pipeline: graphJSON,
       });
