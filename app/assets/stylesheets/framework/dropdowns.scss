@@ -579,9 +579,10 @@
   padding: 0 10px;
 
   .fa,
-  .input-icon {
+  .input-icon,
+  .ic-search {
     position: absolute;
-    top: 10px;
+    top: $gl-padding-8;
     right: 20px;
     color: $dropdown-input-fa-color;
     font-size: 12px;

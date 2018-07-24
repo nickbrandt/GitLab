@@ -52,7 +52,6 @@ export default {
     <icon
       v-if="!searchQuery"
       name="search"
-      size="12"
       class="search-icon"
       aria-hidden="true"
     />
