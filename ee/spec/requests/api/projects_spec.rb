@@ -150,15 +150,6 @@ describe API::Projects do
         )
       end
 
-      it 'updates project without mirror attributes when the project is unable to setup repository mirroring' do
-        stub_licensed_features(repository_mirrors: false)
-
-        put(api("/projects/#{project.id}", user), mirror_params)
-
-        expect(response).to have_gitlab_http_status(200)
-        expect(project.reload.mirror).to be false
-      end
-
       it 'renders an API error when mirror user is invalid' do
         invalid_mirror_user = create(:user)
         project.add_developer(invalid_mirror_user)
@@ -175,6 +166,14 @@ describe API::Projects do
         project.add_developer(developer)
 
         put(api("/projects/#{project.id}", developer), mirror_params)
+
+        expect(response).to have_gitlab_http_status(:forbidden)
+      end
+
+      it 'returns 403 when the project is unable to setup repository mirroring' do
+        stub_licensed_features(repository_mirrors: false)
+
+        put(api("/projects/#{project.id}", user), mirror_params)
 
         expect(response).to have_gitlab_http_status(:forbidden)
       end

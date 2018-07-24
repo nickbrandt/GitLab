@@ -62,9 +62,12 @@ module EE
               .allow_group_owners_to_manage_ldap
       end
 
-      def mirroring_available?
-        ::Gitlab::CurrentSettings.current_application_settings.mirror_available ||
-          current_user&.admin?
+      def mirror_available_for_update?(project, mirror_params)
+        project.feature_available?(:repository_mirrors) && mirror_available?
+      end
+
+      def mirror_available?
+        ::Gitlab::CurrentSettings.current_application_settings.mirror_available || current_user&.admin?
       end
 
       def valid_mirror_user?(mirror_params)
