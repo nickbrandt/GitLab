@@ -34,7 +34,7 @@ module EE
     end
 
     def maintainer_or_admin?
-      maintainer? || current_user.admin? 
+      maintainer? || current_user.admin?
     end
 
     def maintainer?
