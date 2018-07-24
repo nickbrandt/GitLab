@@ -65,6 +65,7 @@ describe('stage column component', () => {
           },
         ],
         title: 'test',
+        hasTriggeredBy: false,
       });
 
       expect(
