@@ -32,7 +32,6 @@ describe('stage column component', () => {
       mockJobs.push(mockedJob);
     }
 
-<<<<<<< HEAD
     component = new StageColumnComponent({
       propsData: {
         title: 'foo',
@@ -40,12 +39,6 @@ describe('stage column component', () => {
         hasTriggeredBy: false,
       },
     }).$mount();
-=======
-    component = mountComponent(StageColumnComponent, {
-      title: 'foo',
-      jobs: mockJobs,
-    });
->>>>>>> DEV-CE/10-8-stable
   });
 
   it('should render provided title', () => {
