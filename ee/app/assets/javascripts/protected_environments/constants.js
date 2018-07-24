@@ -13,5 +13,3 @@ export const LEVEL_ID_PROP = {
   USER: 'user_id',
   GROUP: 'group_id',
 };
-
-export const ACCESS_LEVEL_NONE = 0;

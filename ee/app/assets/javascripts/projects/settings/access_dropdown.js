@@ -22,7 +22,11 @@ export default class AccessDropdown {
     this.setSelectedItems([]);
     this.persistPreselectedItems();
 
-    this.noOneObj = this.accessLevelsData.find(level => level.id === ACCESS_LEVEL_NONE);
+    if (this.accessLevelsData.length === 2) {
+      this.noOneObj = { id: 100, text: 'N/A', before_divider: true };
+    } else {
+      this.noOneObj = this.accessLevelsData.find(level => level.id === ACCESS_LEVEL_NONE);
+    }
 
     this.initDropdown();
   }
