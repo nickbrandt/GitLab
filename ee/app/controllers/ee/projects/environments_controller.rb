@@ -6,6 +6,7 @@ module EE
       prepended do
         before_action :authorize_read_pod_logs!, only: [:logs]
         before_action :environment_ee, only: [:logs]
+        before_action :protected_environment, only: [:terminal]
       end
 
       def logs
@@ -30,6 +31,24 @@ module EE
 
       def pod_logs
         environment.deployment_platform.read_pod_logs(params[:pod_name])
+      end
+
+      def protected_environment
+        return unless environment.protected?
+
+        access_denied! unless can_access_environment?
+      end
+
+      def can_access_environment?
+        environment.protected_deployable_by_user(current_user) && maintainer_or_admin?
+      end
+
+      def maintainer_or_admin?
+        access_level >= ::Gitlab::Access::MAINTAINER || current_user.admin?
+      end
+
+      def access_level
+        project.team.max_member_access(current_user.id)
       end
     end
   end

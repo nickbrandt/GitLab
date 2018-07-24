@@ -6,6 +6,8 @@ module EE
       prepended do
         with_scope :subject
 
+        condition(:guest_or_reporter) { guest_or_reporter? }
+
         condition(:has_environment) { @subject.has_environment? }
 
         condition(:protected_environment_user_allowed) do

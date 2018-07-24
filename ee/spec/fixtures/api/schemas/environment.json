@@ -69,10 +69,10 @@
         "can_stop": {
             "type": "boolean"
         },
-        "protected?": {
+        "is_protected": {
             "type": "boolean"
         },
-        "deployable_by_user?": {
+        "can_deploy": {
             "type": "boolean"
         }
     }

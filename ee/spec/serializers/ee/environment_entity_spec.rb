@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe EnvironmentEntity do
+  using RSpec::Parameterized::TableSyntax
+
   let(:user) { create(:user) }
   let(:project) { create(:project, :repository) }
   let(:environment) { create(:environment, project: project) }
@@ -9,9 +11,7 @@ describe EnvironmentEntity do
     described_class.new(environment, request: double(current_user: user, project: project))
   end
 
-  subject { entity.as_json }
-
-  describe '#is_protected' do
+  describe '#protected?' do
     subject { entity.as_json[:is_protected] }
 
     context 'when environment is protected' do
@@ -27,70 +27,250 @@ describe EnvironmentEntity do
     end
   end
 
-  describe '#can_deploy' do
-    let(:protected_environment) { create(:protected_environment, name: environment.name, project: project) }
-
+  describe '#can_deploy?' do
     subject { entity.as_json[:can_deploy] }
 
-    context 'when access has been granted to a user' do
-      before do
-        protected_environment.deploy_access_levels.create(user: user)
+    context 'for protected environments' do
+      let(:protected_environment) { create(:protected_environment, name: environment.name, project: project) }
+
+      context 'when user does not have access to it' do
+        where(:access_level, :result) do
+          :guest      | false
+          :reporter   | false
+          :developer  | false
+          :maintainer | false
+          :admin      | true
+        end
+
+        with_them do
+          before do
+            if access_level == :admin
+              user.update_attribute(:admin, true)
+            elsif access_level.present?
+              project.add_user(user, access_level)
+            end
+
+            protected_environment
+          end
+
+          it { is_expected.to eq(result) }
+        end
       end
 
-      it { is_expected.to be_truthy }
+      context 'when user has access to it' do
+        where(:access_level, :result) do
+          :guest      | true
+          :reporter   | true
+          :developer  | true
+          :maintainer | true
+          :admin      | true
+        end
+
+        with_them do
+          before do
+            if access_level == :admin
+              user.update_attribute(:admin, true)
+            elsif access_level.present?
+              project.add_user(user, access_level)
+            end
+
+            protected_environment.deploy_access_levels.create(user: user)
+          end
+
+          it { is_expected.to eq(result) }
+        end
+      end
     end
 
-    context 'when no access has been granted to a user' do
-      before do
-        protected_environment
+    context 'for unprotected environments' do
+      where(:access_level, :result) do
+        :guest      | true
+        :reporter   | true
+        :developer  | true
+        :maintainer | true
+        :admin      | true
       end
 
-      it { is_expected.to be_falsy }
-    end
+      with_them do
+        before do
+          if access_level == :admin
+            user.update_attribute(:admin, true)
+          elsif access_level.present?
+            project.add_user(user, access_level)
+          end
+        end
 
-    context 'when the environment is not protected' do
-      it { is_expected.to be_truthy }
+        it { is_expected.to eq(result) }
+      end
     end
   end
 
   describe '#can_stop' do
-    let(:pipeline) { create(:ci_pipeline, project: project) }
-    let(:job) { create(:ci_build, pipeline: pipeline, ref: 'development', environment: environment.name) }
-    let(:deployment) { create(:deployment, environment: environment, project: project, deployable: job, ref: 'development', sha: project.commit.id) }
-    let(:teardown_build) { create(:ci_build, :manual, pipeline: pipeline, name: 'teardown', ref: 'development', environment:environment.name) }
-    let(:environment) { create(:environment, project: project) }
+    let(:environment) { create(:environment, :with_review_app, ref: 'development', project: project) }
     let(:protected_environment) { create(:protected_environment, name: environment.name, project: project) }
 
     before do
       project.repository.add_branch(user, 'development', project.commit.id)
-
-      deployment.update_column(:on_stop, teardown_build.name)
-      environment.update_attribute(:deployments, [deployment])
-      project.add_maintainer(user)
     end
 
     subject { entity.as_json[:can_stop] }
 
-    context 'when environment is protected' do
-      context 'when user has access to the environment' do
-        before do
-          protected_environment.deploy_access_levels.create(user: user)
+    context 'for protected environments' do
+      let(:protected_environment) { create(:protected_environment, name: environment.name, project: project) }
+
+      context 'when user does not have access to it' do
+        where(:access_level, :result) do
+          :guest      | false
+          :reporter   | false
+          :developer  | false
+          :maintainer | false
+          :admin      | true
         end
 
-        it { is_expected.to be_truthy }
+        with_them do
+          before do
+            if access_level == :admin
+              user.update_attribute(:admin, true)
+            elsif access_level.present?
+              project.add_user(user, access_level)
+            end
+
+            protected_environment
+          end
+
+          it { is_expected.to eq(result) }
+        end
       end
 
-      context 'when user does not have access to the environment' do
-        before do
-          protected_environment
+      context 'when user has access to it' do
+        where(:access_level, :result) do
+          :guest      | false
+          :reporter   | false
+          :developer  | false
+          :maintainer | true
+          :admin      | true
         end
 
-        it { is_expected.to be_falsy }
+        with_them do
+          before do
+            if access_level == :admin
+              user.update_attribute(:admin, true)
+            elsif access_level.present?
+              project.add_user(user, access_level)
+            end
+
+            protected_environment.deploy_access_levels.create(user: user)
+          end
+
+          it { is_expected.to eq(result) }
+        end
       end
     end
 
-    context 'when environment is not protected' do
-      it { is_expected.to be_truthy }
+    context 'for unprotected environments' do
+      where(:access_level, :result) do
+        :guest      | false
+        :reporter   | false
+        :developer  | false
+        :maintainer | true
+        :admin      | true
+      end
+
+      with_them do
+        before do
+          if access_level == :admin
+            user.update_attribute(:admin, true)
+          elsif access_level.present?
+            project.add_user(user, access_level)
+          end
+        end
+
+        it { is_expected.to eq(result) }
+      end
+    end
+  end
+
+  describe '#terminal_path' do
+    subject { entity.as_json }
+
+    context 'for protected environments' do
+      let(:protected_environment) { create(:protected_environment, name: environment.name, project: project) }
+
+      context 'when user does not have access to it' do
+        where(:access_level, :result) do
+          :guest      | false
+          :reporter   | false
+          :developer  | false
+          :maintainer | false
+          :admin      | true
+        end
+
+        with_them do
+          before do
+            allow(environment).to receive(:has_terminals?).and_return(true)
+
+            if access_level == :admin
+              user.update_attribute(:admin, true)
+            elsif access_level.present?
+              project.add_user(user, access_level)
+            end
+
+            protected_environment
+          end
+
+          it { expect(subject.include?(:terminal_path)).to eq(result) }
+        end
+      end
+
+      context 'when user has access to it' do
+        where(:access_level, :result) do
+          :guest      | false
+          :reporter   | false
+          :developer  | false
+          :maintainer | true
+          :admin      | true
+        end
+
+        with_them do
+          before do
+            allow(environment).to receive(:has_terminals?).and_return(true)
+
+            if access_level == :admin
+              user.update_attribute(:admin, true)
+            elsif access_level.present?
+              project.add_user(user, access_level)
+            end
+
+            protected_environment.deploy_access_levels.create(user: user)
+          end
+
+          it { expect(subject.include?(:terminal_path)).to eq(result) }
+        end
+      end
+    end
+
+    context 'for unprotected environments' do
+      where(:access_level, :result) do
+        :guest      | false
+        :reporter   | false
+        :developer  | false
+        :maintainer | true
+        :admin      | true
+      end
+
+      with_them do
+        before do
+          allow(environment).to receive(:has_terminals?).and_return(true)
+
+          if access_level == :admin
+            user.update_attribute(:admin, true)
+          elsif access_level.present?
+            project.add_user(user, access_level)
+          end
+        end
+
+        it { expect(subject.include?(:terminal_path)).to eq(result) }
+      end
     end
   end
 end
