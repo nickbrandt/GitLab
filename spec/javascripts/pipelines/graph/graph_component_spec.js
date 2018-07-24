@@ -4,7 +4,6 @@ import graphComponent from '~/pipelines/components/graph/graph_component.vue';
 import graphJSON from './mock_data';
 import linkedPipelineJSON from './linked_pipelines_mock_data';
 
-<<<<<<< HEAD
 const GraphComponent = Vue.extend(graphComponent);
 
 const pipelineJSON = Object.assign(graphJSON, {
@@ -63,6 +62,7 @@ describe('graph component', function () {
       it('should include the left-margin class on the second child', function () {
         const firstStageColumnElement = this.component.$el.querySelector('.stage-column-list .stage-column:last-child');
         expect(firstStageColumnElement.classList.contains('left-margin')).toEqual(true);
+<<<<<<< HEAD
 =======
 describe('graph component', () => {
   const GraphComponent = Vue.extend(graphComponent);
@@ -89,6 +89,8 @@ describe('graph component', () => {
         isLoading: false,
         pipeline: graphJSON,
 >>>>>>> 8b0634f924eecac6423f098801ab37a4817f222a
+=======
+>>>>>>> a8b5e772d36... Fix conflicts in js specs
       });
 
       it('should include the has-linked-pipelines flag', function () {
