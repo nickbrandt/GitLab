@@ -297,7 +297,6 @@ module API
         attrs = declared_params(include_missing: false)
         authorize! :rename_project, user_project if attrs[:name].present?
         authorize! :change_visibility_level, user_project if attrs[:visibility].present?
-
         attrs = translate_params_for_compatibility(attrs)
 
         break render_api_error!("Pull mirroring is not available", 403) if attrs[:mirror].present? && !mirroring_available?
