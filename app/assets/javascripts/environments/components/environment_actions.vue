@@ -61,7 +61,7 @@ export default {
       <span>
         <icon name="play" />
         <icon
-          name="angle-down"
+          name="chevron-down"
           aria-hidden="true"
         />
         <gl-loading-icon v-if="isLoading" />

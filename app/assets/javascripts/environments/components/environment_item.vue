@@ -524,13 +524,13 @@ export default {
 
         <icon
           v-show="model.isOpen"
-          name="angle-down"
+          name="chevron-down"
           class="folder-icon"
           aria-hidden="true"
         />
         <icon
           v-show="!model.isOpen"
-          name="angle-right"
+          name="chevron-right"
           class="folder-icon"
           aria-hidden="true"
         />
