@@ -284,7 +284,7 @@
   .dismiss-button {
     position: absolute;
     right: 6px;
-    top: 12px;
+    top: $gl-btn-horz-padding;
     cursor: pointer;
     color: $blue-300;
     z-index: 1;

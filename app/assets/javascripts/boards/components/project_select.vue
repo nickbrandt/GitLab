@@ -111,7 +111,7 @@ export default {
           />
           <icon
             name="search"
-            class="search-icon"
+            class="dropdown-input-search"
             aria-hidden="true"
             data-hidden="true"
           />

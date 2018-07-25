@@ -450,6 +450,14 @@ export default {
         this.canRetry
       );
     },
+
+    folderIconName() {
+      if (this.model.isOpen) {
+        return 'chevron-down';
+      }
+
+      return 'chevron-right';
+    },
   },
 
   methods: {
@@ -523,14 +531,7 @@ export default {
         @click="onClickFolder">
 
         <icon
-          v-show="model.isOpen"
-          name="chevron-down"
-          class="folder-icon"
-          aria-hidden="true"
-        />
-        <icon
-          v-show="!model.isOpen"
-          name="chevron-right"
+          :name="folderIconName"
           class="folder-icon"
           aria-hidden="true"
         />

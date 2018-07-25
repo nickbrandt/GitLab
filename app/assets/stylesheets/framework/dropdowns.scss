@@ -147,8 +147,8 @@
 
   .ic-angle-down {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: $gl-padding-8;
+    right: $gl-padding-8;
     color: $gray-darkest;
   }
 }
