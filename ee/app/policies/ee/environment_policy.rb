@@ -7,11 +7,9 @@ module EE
 
       condition(:deployable_by_user) { deployable_by_user? }
 
-      condition(:maintainer_or_admin) { maintainer_or_admin? }
+      condition(:developer) { developer? }
 
-      condition(:admin) { admin? }
-
-      rule { (protected_environment & ~deployable_by_user) | ~maintainer_or_admin }.policy do
+      rule { protected_environment & (~deployable_by_user | developer) }.policy do
         prevent :stop_environment
       end
 
@@ -25,16 +23,8 @@ module EE
         @subject.protected?
       end
 
-      def maintainer_or_admin?
-        maintainer? || admin?
-      end
-
-      def maintainer?
-        access_level >= ::Gitlab::Access::MAINTAINER
-      end
-
-      def admin?
-        @user.admin?
+      def developer?
+        access_level == ::Gitlab::Access::DEVELOPER
       end
 
       def access_level

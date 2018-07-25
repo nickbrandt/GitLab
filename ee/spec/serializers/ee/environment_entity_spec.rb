@@ -171,7 +171,7 @@ describe EnvironmentEntity do
       where(:access_level, :result) do
         :guest      | false
         :reporter   | false
-        :developer  | false
+        :developer  | true
         :maintainer | true
         :admin      | true
       end

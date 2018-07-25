@@ -6,7 +6,7 @@ module EE
           module Failed
             EE_REASONS = {
               'protected_environment_failure' => 'protected environment failure'
-            }
+            }.freeze
           end
         end
       end
