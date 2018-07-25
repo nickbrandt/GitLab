@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import graphComponent from '~/pipelines/components/graph/graph_component.vue';
 import graphJSON from './mock_data';
 import linkedPipelineJSON from './linked_pipelines_mock_data';
@@ -126,6 +127,17 @@ describe('graph component', function () {
       it('it returns left-margin when no triggerer and not the first stage', function () {
         expect(this.component.stageConnectorClass(99, { groups: ['job'] })).toBe('left-margin');
       });
+    });
+  });
+
+  describe('capitalizeStageName', () => {
+    it('capitalizes and escapes stage name', () => {
+      const component = mountComponent(GraphComponent, {
+        isLoading: false,
+        pipeline: graphJSON,
+      });
+
+      expect(component.$el.querySelector('.stage-column:nth-child(2) .stage-name').textContent.trim()).toEqual('Deploy &lt;img src=x onerror=alert(document.domain)&gt;');
     });
   });
 });
