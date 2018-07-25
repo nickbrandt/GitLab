@@ -40,15 +40,6 @@ describe('stage column component', () => {
         hasTriggeredBy: false,
       },
     }).$mount();
-<<<<<<< HEAD
-=======
-    component = mountComponent(StageColumnComponent, {
-      title: 'foo',
-      jobs: mockJobs,
-    });
->>>>>>> 8b0634f924eecac6423f098801ab37a4817f222a
-=======
->>>>>>> a8b5e772d36... Fix conflicts in js specs
   });
 
   it('should render provided title', () => {
