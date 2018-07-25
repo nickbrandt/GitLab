@@ -10,8 +10,7 @@ module EE
     private
 
     def protected_environment?
-      project.feature_available?(:protected_environments) &&
-        user &&
+      user &&
         has_environment? &&
         !project.protected_environment_accessible_to?(expanded_environment_name, user)
     end

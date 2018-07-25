@@ -13,6 +13,8 @@ describe JobEntity do
 
   before do
     allow(request).to receive(:current_user).and_return(user)
+    allow(project).to receive(:feature_available?)
+      .with(:protected_environments).and_return(true)
   end
 
   describe '#playable?' do

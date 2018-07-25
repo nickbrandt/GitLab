@@ -10,11 +10,16 @@ describe Ci::BuildPolicy do
   end
 
   describe 'rules for protected environments' do
+    before do
+      allow(project).to receive(:feature_available?)
+              .with(:protected_environments).and_return(true)
+    end
+
     let(:environment) { create(:environment, project: project, name: 'production') }
     let(:build) { create(:ci_build, pipeline: pipeline, environment: 'production', ref: 'development') }
 
     context 'when environment is protected' do
-      let(:protected_environment) { create(:protected_environment, name: 'production', project: project) }
+      let(:protected_environment) { create(:protected_environment, name: environment.name, project: project) }
 
       before do
         project.add_developer(user)

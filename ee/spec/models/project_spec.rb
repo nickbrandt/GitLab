@@ -1491,6 +1491,11 @@ describe Project do
 
     subject { project.protected_environment_accessible_to?(environment.name, user) }
 
+    before do
+      allow(project).to receive(:feature_available?)
+              .with(:protected_environments).and_return(true)
+    end
+
     context 'when project does not have protected environments' do
       it { is_expected.to be_truthy }
     end

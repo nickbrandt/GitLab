@@ -11,6 +11,12 @@ describe EnvironmentEntity do
     described_class.new(environment, request: double(current_user: user, project: project))
   end
 
+  before do
+    allow(project).to receive(:feature_available?).and_call_original
+    allow(project).to receive(:feature_available?)
+      .with(:protected_environments).and_return(true)
+  end
+
   describe '#protected?' do
     subject { entity.as_json[:is_protected] }
 
