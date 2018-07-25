@@ -121,9 +121,14 @@ describe Projects::EnvironmentsController do
   end
 
   describe '#GET terminal' do
-    context 'when environment is protected' do
-      let(:protected_environment) { create(:protected_environment, name: environment.name, project: project) }
+    let(:protected_environment) { create(:protected_environment, name: environment.name, project: project) }
 
+    before do
+      allow(License).to receive(:feature_available?).and_call_original
+      allow(License).to receive(:feature_available?).with(:protected_environments).and_return(true)
+    end
+
+    context 'when environment is protected' do
       context 'when user does not have access to it' do
         before do
           protected_environment

@@ -34,8 +34,6 @@ module EE
       end
 
       def protected_environment
-        return unless environment.protected?
-
         access_denied! unless can_access_environment?
       end
 
