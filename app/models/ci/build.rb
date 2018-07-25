@@ -7,7 +7,7 @@ module Ci
     include Presentable
     include Importable
     include Gitlab::Utils::StrongMemoize
-    include ProtectedScope
+    include ProtectedEnvironmentScope
 
     prepend EE::Ci::Build
 
@@ -191,9 +191,7 @@ module Ci
       end
 
       after_transition any => [:pending] do |build|
-        next unless build.project.feature_available?(:protected_environments)
-
-        build.review_protected_environment_scope
+        build.entitled_to_environment?
       end
     end
 

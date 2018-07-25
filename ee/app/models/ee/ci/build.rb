@@ -6,7 +6,7 @@ module EE
     # and be included in the `Build` model
     module Build
       extend ActiveSupport::Concern
-      include EE::ProtectedScope
+      include EE::ProtectedEnvironmentScope
 
       # CODECLIMATE_FILE is deprecated and replaced with CODE_QUALITY_FILE (#5779)
       CODECLIMATE_FILE = 'codeclimate.json'.freeze

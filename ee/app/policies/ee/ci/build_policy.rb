@@ -6,12 +6,10 @@ module EE
       prepended do
         with_scope :subject
 
-        condition(:guest_or_reporter) { guest_or_reporter? }
-
         condition(:has_environment) { @subject.has_environment? }
 
         condition(:protected_environment_user_allowed) do
-          environment_is_protected?(@subject.expanded_environment_name, @user)
+          protected_environment?(@subject.expanded_environment_name, @user)
         end
 
         rule { has_environment & ~protected_environment_user_allowed }.policy do
@@ -20,7 +18,7 @@ module EE
 
         private
 
-        def environment_is_protected?(environment_name, user)
+        def protected_environment?(environment_name, user)
           @subject.project.protected_environment_accessible_to?(environment_name, user)
         end
       end

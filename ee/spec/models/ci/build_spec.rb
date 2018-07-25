@@ -192,7 +192,7 @@ describe Ci::Build do
   end
 
   describe 'status' do
-    context 'when after transitioning from pending' do
+    context 'after transitioning from pending' do
       let(:user) { create(:user) }
       let(:project) { create(:project, :repository) }
       let(:job) { create(:ci_build, :created, project: project, user: user) }

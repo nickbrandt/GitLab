@@ -1,16 +1,17 @@
 module EE
-  module ProtectedScope
+  module ProtectedEnvironmentScope
     extend ::Gitlab::Utils::Override
 
-    override :review_protected_environment_scope
-    def review_protected_environment_scope
+    override :entitled_to_environment?
+    def entitled_to_environment?
       self.drop(:protected_environment_failure) if protected_environment?
     end
 
     private
 
     def protected_environment?
-      user &&
+      project.feature_available?(:protected_environments) &&
+        user &&
         has_environment? &&
         !project.protected_environment_accessible_to?(expanded_environment_name, user)
     end
