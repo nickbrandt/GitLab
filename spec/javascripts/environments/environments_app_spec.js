@@ -170,10 +170,10 @@ describe('Environment', () => {
 
         Vue.nextTick(() => {
           expect(
-            component.$el.querySelector('.folder-icon.ic-angle-right').getAttribute('style'),
+            component.$el.querySelector('.folder-icon.ic-chevron-right').getAttribute('style'),
           ).toContain('display: none');
           expect(
-            component.$el.querySelector('.folder-icon.ic-angle-down').getAttribute('style'),
+            component.$el.querySelector('.folder-icon.ic-chevron-down').getAttribute('style'),
           ).not.toContain('display: none');
           done();
         });
@@ -191,10 +191,10 @@ describe('Environment', () => {
 
           Vue.nextTick(() => {
             expect(
-              component.$el.querySelector('.folder-icon.ic-angle-down').getAttribute('style'),
+              component.$el.querySelector('.folder-icon.ic-chevron-down').getAttribute('style'),
             ).toContain('display: none');
             expect(
-              component.$el.querySelector('.folder-icon.ic-angle-right').getAttribute('style'),
+              component.$el.querySelector('.folder-icon.ic-chevron-right').getAttribute('style'),
             ).not.toContain('display: none');
             done();
           });
