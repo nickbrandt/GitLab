@@ -1,21 +1,19 @@
-require 'spec_helper'
+require 'rails_helper'
 
-describe Ci::BuildPolicy do
+describe EnvironmentPolicy do
   using RSpec::Parameterized::TableSyntax
 
   let(:project) { create(:project, :repository) }
   let(:user) { create(:user) }
-  let(:pipeline) { create(:ci_empty_pipeline, project: project) }
 
-  let(:policy) do
-    described_class.new(user, build)
-  end
+  describe '#stop_environment' do
+    let(:environment) { create(:environment, :with_review_app, ref: 'development', project: project) }
 
-  describe '#update_build?' do
-    let(:environment) { create(:environment, project: project, name: 'production') }
-    let(:build) { create(:ci_build, pipeline: pipeline, environment: 'production', ref: 'development') }
+    subject { user.can?(:stop_environment, environment) }
 
-    subject { user.can?(:update_build, build) }
+    before do
+      project.repository.add_branch(user, 'development', project.commit.id)
+    end
 
     context 'when protected environment feature is not available' do
       where(:access_level, :result) do
@@ -42,7 +40,7 @@ describe Ci::BuildPolicy do
       end
     end
 
-    context 'when protected environments feature is available' do
+    context 'when protected environment feature is available' do
       before do
         allow(project).to receive(:feature_available?)
           .with(:protected_environments).and_return(true)
@@ -51,18 +49,18 @@ describe Ci::BuildPolicy do
       context 'when environment is protected' do
         let(:protected_environment) { create(:protected_environment, name: environment.name, project: project) }
 
-        context 'when user has access to it' do
+        context 'when user does not have access to the environment' do
           where(:access_level, :result) do
             :guest      | false
             :reporter   | false
-            :developer  | true
-            :maintainer | true
+            :developer  | false
+            :maintainer | false
             :admin      | true
           end
 
           with_them do
             before do
-              protected_environment.deploy_access_levels.create(user: user)
+              protected_environment
 
               if access_level == :admin
                 user.update_attribute(:admin, true)
@@ -75,18 +73,18 @@ describe Ci::BuildPolicy do
           end
         end
 
-        context 'when user does not have access to it' do
+        context 'when user has access to the environment' do
           where(:access_level, :result) do
             :guest      | false
             :reporter   | false
             :developer  | false
-            :maintainer | false
+            :maintainer | true
             :admin      | true
           end
 
           with_them do
             before do
-              protected_environment
+              protected_environment.deploy_access_levels.create(user: user)
 
               if access_level == :admin
                 user.update_attribute(:admin, true)

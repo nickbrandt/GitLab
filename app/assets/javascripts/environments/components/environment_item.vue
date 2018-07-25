@@ -94,7 +94,7 @@ export default {
      */
     isDeployableByUser() {
       return this.model && 'can_deploy' in this.model
-        ? this.model['can_deploy']
+        ? this.model.can_deploy
         : this.canCreateDeployment;
     },
 
@@ -105,7 +105,7 @@ export default {
      * @returns {Boolean}
      */
     isProtected() {
-      return this.model && this.model['is_protected'];
+      return this.model && this.model.is_protected;
     },
 
     /**
