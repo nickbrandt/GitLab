@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Ci
   class BuildPolicy < CommitStatusPolicy
     prepend EE::Ci::BuildPolicy

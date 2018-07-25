@@ -512,6 +512,12 @@ module EE
       env.protected_deployable_by_user(user)
     end
 
+    override :after_import
+    def after_import
+      super
+      log_geo_events
+    end
+
     private
 
     def set_override_pull_mirror_available
@@ -546,6 +552,13 @@ module EE
 
     def validate_board_limit(board)
       # Board limits are disabled in EE, so this method is just a no-op.
+    end
+
+    def log_geo_events
+      return unless ::Gitlab::Geo.primary?
+
+      ::Geo::RepositoryUpdatedService.new(self, source: ::Geo::RepositoryUpdatedEvent::REPOSITORY).execute
+      ::Geo::RepositoryUpdatedService.new(self, source: ::Geo::RepositoryUpdatedEvent::WIKI).execute
     end
   end
 end

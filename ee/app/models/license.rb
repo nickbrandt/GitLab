@@ -13,6 +13,7 @@ class License < ActiveRecord::Base
     elastic_search
     export_issues
     external_files_in_gitlab_ci
+    group_burndown_charts
     group_webhooks
     issuable_default_templates
     issue_board_focus_mode
@@ -59,8 +60,8 @@ class License < ActiveRecord::Base
     commit_committer_check
     external_authorization_service
     ci_cd_projects
-    group_burndown_charts
     protected_environments
+    system_header_footer
   ].freeze
 
   EEU_FEATURES = EEP_FEATURES + %i[
@@ -155,6 +156,7 @@ class License < ActiveRecord::Base
     object_storage
     repository_size_limit
     external_authorization_service
+    system_header_footer
   ].freeze
 
   validate :valid_license
