@@ -436,6 +436,38 @@ func (s *GitalyTestServer) CreateRepositoryFromSnapshot(context.Context, *pb.Cre
 	return nil, nil
 }
 
+func (s *GitalyTestServer) BackupCustomHooks(*pb.BackupCustomHooksRequest, pb.RepositoryService_BackupCustomHooksServer) error {
+	return nil
+}
+
+func (s *GitalyTestServer) DeleteConfig(context.Context, *pb.DeleteConfigRequest) (*pb.DeleteConfigResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) GetRawChanges(*pb.GetRawChangesRequest, pb.RepositoryService_GetRawChangesServer) error {
+	return nil
+}
+
+func (s *GitalyTestServer) RestoreCustomHooks(pb.RepositoryService_RestoreCustomHooksServer) error {
+	return nil
+}
+
+func (s *GitalyTestServer) SearchFilesByContent(*pb.SearchFilesByContentRequest, pb.RepositoryService_SearchFilesByContentServer) error {
+	return nil
+}
+
+func (s *GitalyTestServer) SearchFilesByName(*pb.SearchFilesByNameRequest, pb.RepositoryService_SearchFilesByNameServer) error {
+	return nil
+}
+
+func (s *GitalyTestServer) SetConfig(context.Context, *pb.SetConfigRequest) (*pb.SetConfigResponse, error) {
+	return nil, nil
+}
+
+func (s *GitalyTestServer) DiffStats(*pb.DiffStatsRequest, pb.DiffService_DiffStatsServer) error {
+	return nil
+}
+
 // sendBytes returns the number of times the 'sender' function was called and an error.
 func sendBytes(data []byte, chunkSize int, sender func([]byte) error) (int, error) {
 	i := 0
