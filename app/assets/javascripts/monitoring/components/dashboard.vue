@@ -91,6 +91,11 @@ export default {
       type: String,
       required: true,
     },
+    showEnvironmentDropdown: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   data() {
     return {
@@ -119,9 +124,25 @@ export default {
   },
   mounted() {
     this.resizeThrottled = _.throttle(this.resize, 600);
+    this.servicePromises = [
+      this.service
+        .getGraphsData()
+        .then(data => this.store.storeMetrics(data))
+        .catch(() => Flash(s__('Metrics|There was an error while retrieving metrics'))),
+      this.service
+        .getDeploymentData()
+        .then(data => this.store.storeDeploymentData(data))
+        .catch(() => Flash(s__('Metrics|There was an error getting deployment information.'))),
+    ];
     if (!this.hasMetrics) {
       this.state = 'gettingStarted';
     } else {
+      if (this.showEnvironmentDropdown) {
+        this.servicePromises.push(this.service
+        .getEnvironmentsData()
+        .then((data) => this.store.storeEnvironmentsData(data))
+        .catch(() => Flash(s__('Metrics|There was an error getting environments information.'))));
+      }
       this.getGraphsData();
       window.addEventListener('resize', this.resizeThrottled, false);
     }
@@ -129,17 +150,7 @@ export default {
   methods: {
     getGraphsData() {
       this.state = 'loading';
-      Promise.all([
-        this.service.getGraphsData().then(data => this.store.storeMetrics(data)),
-        this.service
-          .getDeploymentData()
-          .then(data => this.store.storeDeploymentData(data))
-          .catch(() => Flash(s__('Metrics|There was an error getting deployment information.'))),
-        this.service
-          .getEnvironmentsData()
-          .then((data) => this.store.storeEnvironmentsData(data))
-          .catch(() => Flash(s__('Metrics|There was an error getting environments information.'))),
-      ])
+      Promise.all(this.servicePromises)
         .then(() => {
           if (this.store.groups.length < 1) {
             this.state = 'noData';
@@ -173,7 +184,10 @@ export default {
     v-if="!showEmptyState"
     class="prometheus-graphs prepend-top-10"
   >
-    <div class="environments d-flex align-items-center">
+    <div
+      v-if="showEnvironmentDropdown"
+      class="environments d-flex align-items-center"
+    >
       {{ s__('Metrics|Environment') }}
       <div class="dropdown prepend-left-10">
         <button
