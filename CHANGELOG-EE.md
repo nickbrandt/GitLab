@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 10.8.7 (2018-07-26)
+
+### Security (1 change)
+
+- Don't expose project names in EE counters.
+
+
 ## 10.8.6 (2018-07-17)
 
 - No changes.
