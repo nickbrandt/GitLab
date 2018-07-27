@@ -4,10 +4,8 @@ import (
 	"net/http"
 	"path"
 	"regexp"
-	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/prometheus/client_golang/prometheus"
 
 	apipkg "gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/artifacts"
@@ -42,20 +40,6 @@ const (
 	projectPattern    = `^/([^/]+/){1,}[^/]+/`
 )
 
-var (
-	routeRequestDurations = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name:    "gitlab_workhorse_request_duration_seconds",
-		Help:    "A histogram of request times in seconds",
-		Buckets: prometheus.ExponentialBuckets(0.01, 2.5, 10),
-	},
-		[]string{"method", "route"},
-	)
-)
-
-func init() {
-	prometheus.MustRegister(routeRequestDurations)
-}
-
 func compileRegexp(regexpStr string) *regexp.Regexp {
 	if len(regexpStr) == 0 {
 		return nil
@@ -64,19 +48,11 @@ func compileRegexp(regexpStr string) *regexp.Regexp {
 	return regexp.MustCompile(regexpStr)
 }
 
-func instrumentDuration(h http.Handler, method string, regexpStr string) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
-		h.ServeHTTP(w, r)
-		routeRequestDurations.WithLabelValues(method, regexpStr).Observe(time.Since(start).Seconds())
-	})
-}
-
 func route(method, regexpStr string, handler http.Handler, matchers ...matcherFunc) routeEntry {
 	return routeEntry{
 		method:   method,
 		regex:    compileRegexp(regexpStr),
-		handler:  instrumentDuration(denyWebsocket(handler), method, regexpStr),
+		handler:  instrumentRoute(denyWebsocket(handler), method, regexpStr),
 		matchers: matchers,
 	}
 }
@@ -85,7 +61,7 @@ func wsRoute(regexpStr string, handler http.Handler, matchers ...matcherFunc) ro
 	return routeEntry{
 		method:   "GET",
 		regex:    compileRegexp(regexpStr),
-		handler:  instrumentDuration(handler, "GET", regexpStr),
+		handler:  instrumentRoute(handler, "GET", regexpStr),
 		matchers: append(matchers, websocket.IsWebSocketUpgrade),
 	}
 }

@@ -4,10 +4,8 @@ import (
 	"bufio"
 	"net"
 	"net/http"
-	"strconv"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 
 	logging "gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
@@ -15,33 +13,11 @@ import (
 
 var (
 	accessLogEntry *log.Entry
-
-	sessionsActive = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "gitlab_workhorse_http_sessions_active",
-		Help: "Number of HTTP request-response cycles currently being handled by gitlab-workhorse.",
-	})
-
-	requestsTotal = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "gitlab_workhorse_http_requests_total",
-			Help: "How many HTTP requests have been processed by gitlab-workhorse, partitioned by status code and HTTP method.",
-		},
-		[]string{"code", "method"},
-	)
 )
-
-func init() {
-	registerPrometheusMetrics()
-}
 
 // SetAccessLoggerEntry sets the access logger used in the system
 func SetAccessLoggerEntry(logEntry *log.Entry) {
 	accessLogEntry = logEntry
-}
-
-func registerPrometheusMetrics() {
-	prometheus.MustRegister(sessionsActive)
-	prometheus.MustRegister(requestsTotal)
 }
 
 type LoggingResponseWriter interface {
@@ -63,7 +39,6 @@ type hijackingResponseWriter struct {
 }
 
 func NewStatsCollectingResponseWriter(rw http.ResponseWriter) LoggingResponseWriter {
-	sessionsActive.Inc()
 	out := statsCollectingResponseWriter{
 		rw:      rw,
 		started: time.Now(),
@@ -135,7 +110,4 @@ func (l *statsCollectingResponseWriter) accessLogFields(r *http.Request) log.Fie
 
 func (l *statsCollectingResponseWriter) RequestFinished(r *http.Request) {
 	l.writeAccessLog(r)
-
-	sessionsActive.Dec()
-	requestsTotal.WithLabelValues(strconv.Itoa(l.status), r.Method).Inc()
 }
