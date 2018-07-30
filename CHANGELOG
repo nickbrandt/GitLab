@@ -2,6 +2,12 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 5.1.0
+
+- Log using correlation-id bound to the incoming request !258
+- Prevent uploading two files as artifacts in single request !273
+- Prometheus instrumentation !279
+
 v 5.0.0
 
 - Update httprs for broken range implementations !266
