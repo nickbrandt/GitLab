@@ -5,11 +5,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"os/exec"
 	"path"
 	"regexp"
 	"runtime"
@@ -126,35 +124,24 @@ func TestServerWithHandler(url *regexp.Regexp, handler http.HandlerFunc) *httpte
 	}))
 }
 
-func BuildExecutables() (func(), error) {
+var workhorseExecutables = []string{"gitlab-workhorse", "gitlab-zip-cat", "gitlab-zip-metadata"}
+
+func BuildExecutables() error {
 	rootDir := RootDir()
 
-	// This method will be invoked more than once due to Go test
-	// parallelization. We must use a unique temp directory for each
-	// invokation so that they do not trample each other's builds.
-	testDir, err := ioutil.TempDir("", "gitlab-workhorse-test")
-	if err != nil {
-		return nil, errors.New("could not create temp directory")
-	}
-
-	makeCmd := exec.Command("make", "BUILD_DIR="+testDir)
-	makeCmd.Dir = rootDir
-	makeCmd.Stderr = os.Stderr
-	makeCmd.Stdout = os.Stdout
-	if err := makeCmd.Run(); err != nil {
-		return nil, fmt.Errorf("failed to run %v in %v", makeCmd, rootDir)
+	for _, exe := range workhorseExecutables {
+		if _, err := os.Stat(path.Join(rootDir, exe)); os.IsNotExist(err) {
+			return fmt.Errorf("cannot find executable %s. Please run 'make prepare-tests'", exe)
+		}
 	}
 
 	oldPath := os.Getenv("PATH")
-	testPath := fmt.Sprintf("%s:%s", testDir, oldPath)
+	testPath := fmt.Sprintf("%s:%s", rootDir, oldPath)
 	if err := os.Setenv("PATH", testPath); err != nil {
-		return nil, fmt.Errorf("failed to set PATH to %v", testPath)
+		return fmt.Errorf("failed to set PATH to %v", testPath)
 	}
 
-	return func() {
-		os.Setenv("PATH", oldPath)
-		os.RemoveAll(testDir)
-	}, nil
+	return nil
 }
 
 func RootDir() string {

@@ -45,31 +45,17 @@ var cacheDir = path.Join(scratchDir, "cache")
 func TestMain(m *testing.M) {
 	git.Testing = true
 
-	source := "https://gitlab.com/gitlab-org/gitlab-test.git"
-	clonePath := path.Join(testRepoRoot, testRepo)
-	if _, err := os.Stat(clonePath); err != nil {
-		testCmd := exec.Command("git", "clone", "--bare", source, clonePath)
-		testCmd.Stdout = os.Stdout
-		testCmd.Stderr = os.Stderr
-
-		if err := testCmd.Run(); err != nil {
-			log.WithField("testCmd", testCmd).Print("Test setup: failed to run")
-			os.Exit(-1)
-		}
+	if _, err := os.Stat(path.Join(testRepoRoot, testRepo)); os.IsNotExist(err) {
+		log.Fatal("cannot find test repository. Please run 'make prepare-tests'")
 	}
 
-	cleanup, err := testhelper.BuildExecutables()
-	if err != nil {
-		log.WithError(err).Print("Test setup: failed to build executables")
-		os.Exit(1)
+	if err := testhelper.BuildExecutables(); err != nil {
+		log.WithError(err).Fatal()
 	}
 
 	defer gitaly.CloseConnections()
 
-	os.Exit(func() int {
-		defer cleanup()
-		return m.Run()
-	}())
+	os.Exit(m.Run())
 }
 
 func TestAllowedClone(t *testing.T) {
