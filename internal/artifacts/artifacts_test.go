@@ -10,15 +10,10 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	cleanup, err := testhelper.BuildExecutables()
-	if err != nil {
-		log.WithError(err).Print("Test setup: failed to build executables")
-		os.Exit(1)
+	if err := testhelper.BuildExecutables(); err != nil {
+		log.WithError(err).Fatal()
 	}
 
-	os.Exit(func() int {
-		defer cleanup()
-		return m.Run()
-	}())
+	os.Exit(m.Run())
 
 }
