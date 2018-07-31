@@ -167,7 +167,7 @@ func TestRegularProjectsAPI(t *testing.T) {
 		"/api/v3/projects/foo%2Fbar%2Fbaz/repository/not/special",
 		"/api/v3/projects/foo%2Fbar%2Fbaz%2Fqux/repository/not/special",
 	} {
-		resp, body := httpGet(t, ws.URL+resource)
+		resp, body := httpGet(t, ws.URL+resource, nil)
 
 		assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
 		assert.Equal(t, apiResponse, body, "GET %q: response body", resource)
@@ -206,7 +206,7 @@ func TestAllowedStaticFile(t *testing.T) {
 		"/static%20file.txt",
 		"/static file.txt",
 	} {
-		resp, body := httpGet(t, ws.URL+resource)
+		resp, body := httpGet(t, ws.URL+resource, nil)
 
 		assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
 		assert.Equal(t, content, body, "GET %q: response body", resource)
@@ -227,7 +227,7 @@ func TestStaticFileRelativeURL(t *testing.T) {
 	defer ws.Close()
 
 	resource := "/my-relative-url/static.txt"
-	resp, body := httpGet(t, ws.URL+resource)
+	resp, body := httpGet(t, ws.URL+resource, nil)
 
 	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
 	assert.Equal(t, content, body, "GET %q: response body", resource)
@@ -251,7 +251,7 @@ func TestAllowedPublicUploadsFile(t *testing.T) {
 		"/uploads/static%20file.txt",
 		"/uploads/static file.txt",
 	} {
-		resp, body := httpGet(t, ws.URL+resource)
+		resp, body := httpGet(t, ws.URL+resource, nil)
 
 		assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resource)
 		assert.Equal(t, content, body, "GET %q: response body", resource)
@@ -276,7 +276,7 @@ func TestDeniedPublicUploadsFile(t *testing.T) {
 		"/uploads/static.txt",
 		"/uploads%2Fstatic.txt",
 	} {
-		resp, body := httpGet(t, ws.URL+resource)
+		resp, body := httpGet(t, ws.URL+resource, nil)
 
 		assert.Equal(t, 404, resp.StatusCode, "GET %q: status code", resource)
 		assert.Equal(t, "", body, "GET %q: response body", resource)
@@ -307,7 +307,7 @@ This is a static error page for code 499
 	defer ws.Close()
 
 	resourcePath := "/error-499"
-	resp, body := httpGet(t, ws.URL+resourcePath)
+	resp, body := httpGet(t, ws.URL+resourcePath, nil)
 
 	assert.Equal(t, 499, resp.StatusCode, "GET %q: status code", resourcePath)
 	assert.Equal(t, string(errorPageBody), body, "GET %q: response body", resourcePath)
@@ -505,7 +505,7 @@ func TestApiContentTypeBlock(t *testing.T) {
 	defer ws.Close()
 
 	resourcePath := "/something"
-	resp, body := httpGet(t, ws.URL+resourcePath)
+	resp, body := httpGet(t, ws.URL+resourcePath, nil)
 
 	assert.Equal(t, 500, resp.StatusCode, "GET %q: status code", resourcePath)
 	assert.NotContains(t, wrongResponse, body, "GET %q: response body", resourcePath)
@@ -683,8 +683,15 @@ func repoPath(t *testing.T) string {
 	return path.Join(cwd, testRepoRoot, testRepo)
 }
 
-func httpGet(t *testing.T, url string) (*http.Response, string) {
-	resp, err := http.Get(url)
+func httpGet(t *testing.T, url string, headers map[string]string) (*http.Response, string) {
+	req, err := http.NewRequest("GET", url, nil)
+	require.NoError(t, err)
+
+	for k, v := range headers {
+		req.Header.Set(k, v)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
 	require.NoError(t, err)
 	defer resp.Body.Close()
 
@@ -694,8 +701,15 @@ func httpGet(t *testing.T, url string) (*http.Response, string) {
 	return resp, string(b)
 }
 
-func httpPost(t *testing.T, url, contentType string, reqBody []byte) (*http.Response, string) {
-	resp, err := http.Post(url, contentType, bytes.NewReader(reqBody))
+func httpPost(t *testing.T, url string, headers map[string]string, reqBody []byte) (*http.Response, string) {
+	req, err := http.NewRequest("POST", url, bytes.NewReader(reqBody))
+	require.NoError(t, err)
+
+	for k, v := range headers {
+		req.Header.Set(k, v)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
 	require.NoError(t, err)
 	defer resp.Body.Close()
 

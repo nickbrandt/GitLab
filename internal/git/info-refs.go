@@ -35,11 +35,13 @@ func handleGetInfoRefs(rw http.ResponseWriter, r *http.Request, a *api.Response)
 	w.Header().Set("Content-Type", fmt.Sprintf("application/x-%s-advertisement", rpc))
 	w.Header().Set("Cache-Control", "no-cache")
 
+	gitProtocol := r.Header.Get("Git-Protocol")
+
 	var err error
 	if a.GitalyServer.Address == "" && Testing {
 		err = handleGetInfoRefsLocalTesting(w, a, rpc)
 	} else {
-		err = handleGetInfoRefsWithGitaly(r.Context(), w, a, rpc)
+		err = handleGetInfoRefsWithGitaly(r.Context(), w, a, rpc, gitProtocol)
 	}
 
 	if err != nil {
@@ -71,13 +73,13 @@ func handleGetInfoRefsLocalTesting(w http.ResponseWriter, a *api.Response, rpc s
 	return nil
 }
 
-func handleGetInfoRefsWithGitaly(ctx context.Context, w http.ResponseWriter, a *api.Response, rpc string) error {
+func handleGetInfoRefsWithGitaly(ctx context.Context, w http.ResponseWriter, a *api.Response, rpc string, gitProtocol string) error {
 	smarthttp, err := gitaly.NewSmartHTTPClient(a.GitalyServer)
 	if err != nil {
 		return fmt.Errorf("GetInfoRefsHandler: %v", err)
 	}
 
-	infoRefsResponseReader, err := smarthttp.InfoRefsResponseReader(ctx, &a.Repository, rpc, gitConfigOptions(a))
+	infoRefsResponseReader, err := smarthttp.InfoRefsResponseReader(ctx, &a.Repository, rpc, gitConfigOptions(a), gitProtocol)
 	if err != nil {
 		return fmt.Errorf("GetInfoRefsHandler: %v", err)
 	}

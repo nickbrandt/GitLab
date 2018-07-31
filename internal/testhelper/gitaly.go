@@ -57,10 +57,12 @@ func (s *GitalyTestServer) InfoRefsUploadPack(in *pb.InfoRefsRequest, stream pb.
 		return err
 	}
 
-	fmt.Printf("Result: %+v", in)
+	fmt.Printf("Result: %+v\n", in)
 
 	data := []byte(strings.Join([]string{
 		strings.Join(in.GitConfigOptions, "\n") + "\n",
+		in.GitProtocol,
+		"git-upload-pack",
 		GitalyInfoRefsResponseMock,
 	}, "\000") + "\000")
 
@@ -85,11 +87,23 @@ func (s *GitalyTestServer) InfoRefsReceivePack(in *pb.InfoRefsRequest, stream pb
 		return err
 	}
 
-	response := &pb.InfoRefsResponse{
-		Data: []byte(GitalyInfoRefsResponseMock),
-	}
-	if err := stream.Send(response); err != nil {
+	fmt.Printf("Result: %+v\n", in)
+
+	data := []byte(strings.Join([]string{
+		strings.Join(in.GitConfigOptions, "\n") + "\n",
+		in.GitProtocol,
+		"git-receive-pack",
+		GitalyInfoRefsResponseMock,
+	}, "\000") + "\000")
+
+	nSends, err := sendBytes(data, 100, func(p []byte) error {
+		return stream.Send(&pb.InfoRefsResponse{Data: p})
+	})
+	if err != nil {
 		return err
+	}
+	if nSends <= 1 {
+		panic("should have sent more than one message")
 	}
 
 	return s.finalError()
@@ -114,6 +128,7 @@ func (s *GitalyTestServer) PostReceivePack(stream pb.SmartHTTPService_PostReceiv
 		repo.GetRelativePath(),
 		req.GlId,
 		req.GlUsername,
+		req.GitProtocol,
 	}, "\000") + "\000")
 
 	// The body of the request starts in the second message
@@ -158,6 +173,7 @@ func (s *GitalyTestServer) PostUploadPack(stream pb.SmartHTTPService_PostUploadP
 	data := []byte(strings.Join([]string{
 		repo.GetStorageName(),
 		repo.GetRelativePath(),
+		req.GitProtocol,
 		strings.Join(req.GitConfigOptions, "\n") + "\n",
 	}, "\000") + "\000")
 

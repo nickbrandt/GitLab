@@ -13,8 +13,12 @@ type SmartHTTPClient struct {
 	pb.SmartHTTPServiceClient
 }
 
-func (client *SmartHTTPClient) InfoRefsResponseReader(ctx context.Context, repo *pb.Repository, rpc string, gitConfigOptions []string) (io.Reader, error) {
-	rpcRequest := &pb.InfoRefsRequest{Repository: repo, GitConfigOptions: gitConfigOptions}
+func (client *SmartHTTPClient) InfoRefsResponseReader(ctx context.Context, repo *pb.Repository, rpc string, gitConfigOptions []string, gitProtocol string) (io.Reader, error) {
+	rpcRequest := &pb.InfoRefsRequest{
+		Repository:       repo,
+		GitConfigOptions: gitConfigOptions,
+		GitProtocol:      gitProtocol,
+	}
 
 	switch rpc {
 	case "git-upload-pack":
@@ -39,7 +43,7 @@ func infoRefsReader(stream infoRefsClient) io.Reader {
 	})
 }
 
-func (client *SmartHTTPClient) ReceivePack(ctx context.Context, repo *pb.Repository, glId string, glUsername string, glRepository string, clientRequest io.Reader, clientResponse io.Writer) error {
+func (client *SmartHTTPClient) ReceivePack(ctx context.Context, repo *pb.Repository, glId string, glUsername string, glRepository string, clientRequest io.Reader, clientResponse io.Writer, gitProtocol string) error {
 	stream, err := client.PostReceivePack(ctx)
 	if err != nil {
 		return err
@@ -50,6 +54,7 @@ func (client *SmartHTTPClient) ReceivePack(ctx context.Context, repo *pb.Reposit
 		GlId:         glId,
 		GlUsername:   glUsername,
 		GlRepository: glRepository,
+		GitProtocol:  gitProtocol,
 	}
 
 	if err := stream.Send(rpcRequest); err != nil {
@@ -86,7 +91,7 @@ func (client *SmartHTTPClient) ReceivePack(ctx context.Context, repo *pb.Reposit
 	return nil
 }
 
-func (client *SmartHTTPClient) UploadPack(ctx context.Context, repo *pb.Repository, clientRequest io.Reader, clientResponse io.Writer, gitConfigOptions []string) error {
+func (client *SmartHTTPClient) UploadPack(ctx context.Context, repo *pb.Repository, clientRequest io.Reader, clientResponse io.Writer, gitConfigOptions []string, gitProtocol string) error {
 	stream, err := client.PostUploadPack(ctx)
 	if err != nil {
 		return err
@@ -95,6 +100,7 @@ func (client *SmartHTTPClient) UploadPack(ctx context.Context, repo *pb.Reposito
 	rpcRequest := &pb.PostUploadPackRequest{
 		Repository:       repo,
 		GitConfigOptions: gitConfigOptions,
+		GitProtocol:      gitProtocol,
 	}
 
 	if err := stream.Send(rpcRequest); err != nil {
