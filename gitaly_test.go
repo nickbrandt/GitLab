@@ -65,9 +65,19 @@ func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 	apiResponse := gitOkBody(t)
 	apiResponse.GitalyServer.Address = gitalyAddress
 
-	for _, showAllRefs := range []bool{true, false} {
-		t.Run(fmt.Sprintf("ShowAllRefs=%v", showAllRefs), func(t *testing.T) {
-			apiResponse.ShowAllRefs = showAllRefs
+	testCases := []struct {
+		showAllRefs bool
+		gitRpc      string
+	}{
+		{showAllRefs: false, gitRpc: "git-upload-pack"},
+		{showAllRefs: true, gitRpc: "git-upload-pack"},
+		{showAllRefs: false, gitRpc: "git-receive-pack"},
+		{showAllRefs: true, gitRpc: "git-receive-pack"},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("ShowAllRefs=%v,gitRpc=%v", tc.showAllRefs, tc.gitRpc), func(t *testing.T) {
+			apiResponse.ShowAllRefs = tc.showAllRefs
 
 			ts := testAuthServer(nil, 200, apiResponse)
 			defer ts.Close()
@@ -75,19 +85,18 @@ func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 			ws := startWorkhorseServer(ts.URL)
 			defer ws.Close()
 
-			resource := "/gitlab-org/gitlab-test.git/info/refs?service=git-upload-pack"
-			_, body := httpGet(t, ws.URL+resource)
+			gitProtocol := "fake git protocol"
+			resource := "/gitlab-org/gitlab-test.git/info/refs?service=" + tc.gitRpc
+			_, body := httpGet(t, ws.URL+resource, map[string]string{"Git-Protocol": gitProtocol})
 
-			expectedContent := "\n\000" + string(testhelper.GitalyInfoRefsResponseMock) + "\000"
-			if showAllRefs {
+			expectedContent := fmt.Sprintf("\n\000%s\000%s\000%s\000", gitProtocol, tc.gitRpc, testhelper.GitalyInfoRefsResponseMock)
+			if tc.showAllRefs {
 				expectedContent = git.GitConfigShowAllRefs + expectedContent
 			}
 
-			assert.Equal(t, expectedContent, body, "GET %q: response body", resource)
-
+			require.Equal(t, expectedContent, body, "GET %q: response body", resource)
 		})
 	}
-
 }
 
 func TestGetInfoRefsProxiedToGitalyInterruptedStream(t *testing.T) {
@@ -138,11 +147,15 @@ func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
 
+	gitProtocol := "fake Git protocol"
 	resource := "/gitlab-org/gitlab-test.git/git-receive-pack"
 	resp, body := httpPost(
 		t,
 		ws.URL+resource,
-		"application/x-git-receive-pack-request",
+		map[string]string{
+			"Content-Type": "application/x-git-receive-pack-request",
+			"Git-Protocol": "fake Git protocol",
+		},
 		testhelper.GitalyReceivePackResponseMock,
 	)
 
@@ -151,6 +164,7 @@ func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
 		apiResponse.Repository.RelativePath,
 		apiResponse.GL_ID,
 		apiResponse.GL_USERNAME,
+		gitProtocol,
 		string(testhelper.GitalyReceivePackResponseMock),
 	}, "\000")
 
@@ -222,17 +236,22 @@ func TestPostUploadPackProxiedToGitalySuccessfully(t *testing.T) {
 			ws := startWorkhorseServer(ts.URL)
 			defer ws.Close()
 
+			gitProtocol := "fake git protocol"
 			resource := "/gitlab-org/gitlab-test.git/git-upload-pack"
 			resp, body := httpPost(
 				t,
 				ws.URL+resource,
-				"application/x-git-upload-pack-request",
+				map[string]string{
+					"Content-Type": "application/x-git-upload-pack-request",
+					"Git-Protocol": gitProtocol,
+				},
 				testhelper.GitalyUploadPackResponseMock,
 			)
 
 			expectedBodyParts := []string{
 				apiResponse.Repository.StorageName,
 				apiResponse.Repository.RelativePath,
+				gitProtocol,
 			}
 			if tc.showAllRefs {
 				expectedBodyParts = append(expectedBodyParts, git.GitConfigShowAllRefs+"\n")
@@ -302,7 +321,7 @@ func TestGetInfoRefsHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 	defer ws.Close()
 
 	resource := "/gitlab-org/gitlab-test.git/info/refs?service=git-upload-pack"
-	resp, body := httpGet(t, ws.URL+resource)
+	resp, body := httpGet(t, ws.URL+resource, nil)
 
 	assert.Equal(t, 200, resp.StatusCode, "GET %q", resource)
 	assert.NotContains(t, string(testhelper.GitalyInfoRefsResponseMock), body, "GET %q: should not have been proxied to Gitaly", resource)
@@ -323,7 +342,12 @@ func TestPostReceivePackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 
 	resource := "/gitlab-org/gitlab-test.git/git-receive-pack"
 	payload := []byte("This payload should not reach Gitaly")
-	resp, body := httpPost(t, ws.URL+resource, "application/x-git-receive-pack-request", payload)
+	resp, body := httpPost(
+		t,
+		ws.URL+resource,
+		map[string]string{"Content-type": "application/x-git-receive-pack-request"},
+		payload,
+	)
 
 	assert.Equal(t, 200, resp.StatusCode, "POST %q: status code", resource)
 	assert.NotContains(t, payload, body, "POST %q: request should not have been proxied to Gitaly", resource)
@@ -344,7 +368,12 @@ func TestPostUploadPackHandledLocallyDueToEmptyGitalySocketPath(t *testing.T) {
 
 	resource := "/gitlab-org/gitlab-test.git/git-upload-pack"
 	payload := []byte("This payload should not reach Gitaly")
-	resp, body := httpPost(t, ws.URL+resource, "application/x-git-upload-pack-request", payload)
+	resp, body := httpPost(
+		t,
+		ws.URL+resource,
+		map[string]string{"Content-type": "application/x-git-upload-pack-request"},
+		payload,
+	)
 
 	assert.Equal(t, 200, resp.StatusCode, "POST %q: status code", resource)
 	assert.NotContains(t, payload, body, "POST %q: request should not have been proxied to Gitaly", resource)

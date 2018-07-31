@@ -32,7 +32,9 @@ func handleUploadPack(w *GitHttpResponseWriter, r *http.Request, a *api.Response
 		// This code path is no longer reachable in GitLab 10.0
 		err = handleUploadPackLocally(a, r, buffer, w, action)
 	} else {
-		err = handleUploadPackWithGitaly(r.Context(), a, buffer, w)
+		gitProtocol := r.Header.Get("Git-Protocol")
+
+		err = handleUploadPackWithGitaly(r.Context(), a, buffer, w, gitProtocol)
 	}
 
 	return err
@@ -59,13 +61,13 @@ func handleUploadPackLocally(a *api.Response, r *http.Request, stdin *os.File, s
 	return nil
 }
 
-func handleUploadPackWithGitaly(ctx context.Context, a *api.Response, clientRequest io.Reader, clientResponse io.Writer) error {
+func handleUploadPackWithGitaly(ctx context.Context, a *api.Response, clientRequest io.Reader, clientResponse io.Writer, gitProtocol string) error {
 	smarthttp, err := gitaly.NewSmartHTTPClient(a.GitalyServer)
 	if err != nil {
 		return fmt.Errorf("smarthttp.UploadPack: %v", err)
 	}
 
-	if err := smarthttp.UploadPack(ctx, &a.Repository, clientRequest, clientResponse, gitConfigOptions(a)); err != nil {
+	if err := smarthttp.UploadPack(ctx, &a.Repository, clientRequest, clientResponse, gitConfigOptions(a), gitProtocol); err != nil {
 		return fmt.Errorf("smarthttp.UploadPack: %v", err)
 	}
 
