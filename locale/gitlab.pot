@@ -4435,9 +4435,12 @@ msgstr ""
 msgid "Note: Consider asking your GitLab administrator to configure %{github_integration_link}, which will allow login via GitHub and allow connecting repositories without generating a Personal Access Token."
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Note: Consider asking your GitLab administrator to configure %{github_integration_link}, which will allow login via GitHub and allow importing repositories without generating a Personal Access Token."
 msgstr ""
 
+=======
+>>>>>>> 863a7c73cf8b45539da70f94e482b894de407c6f
 msgid "Notification events"
 msgstr ""
 
