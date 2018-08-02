@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/golang/protobuf/jsonpb"
 	log "github.com/sirupsen/logrus"
 
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
@@ -119,17 +120,17 @@ func (s *GitalyTestServer) PostReceivePack(stream pb.SmartHTTPService_PostReceiv
 	}
 
 	repo := req.GetRepository()
-	if err := validateRepository(req.GetRepository()); err != nil {
+	if err := validateRepository(repo); err != nil {
 		return err
 	}
 
-	data := []byte(strings.Join([]string{
-		repo.GetStorageName(),
-		repo.GetRelativePath(),
-		req.GlId,
-		req.GlUsername,
-		req.GitProtocol,
-	}, "\000") + "\000")
+	marshaler := &jsonpb.Marshaler{}
+	jsonString, err := marshaler.MarshalToString(req)
+	if err != nil {
+		return err
+	}
+
+	data := []byte(jsonString + "\000")
 
 	// The body of the request starts in the second message
 	for {
