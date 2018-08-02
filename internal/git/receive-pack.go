@@ -54,7 +54,7 @@ func handleReceivePackWithGitaly(ctx context.Context, a *api.Response, clientReq
 		return fmt.Errorf("smarthttp.ReceivePack: %v", err)
 	}
 
-	if err := smarthttp.ReceivePack(ctx, &a.Repository, a.GL_ID, a.GL_USERNAME, a.GL_REPOSITORY, clientRequest, clientResponse, gitProtocol); err != nil {
+	if err := smarthttp.ReceivePack(ctx, &a.Repository, a.GL_ID, a.GL_USERNAME, a.GL_REPOSITORY, a.GitConfigOptions, clientRequest, clientResponse, gitProtocol); err != nil {
 		return fmt.Errorf("smarthttp.ReceivePack: %v", err)
 	}
 

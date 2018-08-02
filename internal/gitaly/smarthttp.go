@@ -43,18 +43,19 @@ func infoRefsReader(stream infoRefsClient) io.Reader {
 	})
 }
 
-func (client *SmartHTTPClient) ReceivePack(ctx context.Context, repo *pb.Repository, glId string, glUsername string, glRepository string, clientRequest io.Reader, clientResponse io.Writer, gitProtocol string) error {
+func (client *SmartHTTPClient) ReceivePack(ctx context.Context, repo *pb.Repository, glId string, glUsername string, glRepository string, gitConfigOptions []string, clientRequest io.Reader, clientResponse io.Writer, gitProtocol string) error {
 	stream, err := client.PostReceivePack(ctx)
 	if err != nil {
 		return err
 	}
 
 	rpcRequest := &pb.PostReceivePackRequest{
-		Repository:   repo,
-		GlId:         glId,
-		GlUsername:   glUsername,
-		GlRepository: glRepository,
-		GitProtocol:  gitProtocol,
+		Repository:       repo,
+		GlId:             glId,
+		GlUsername:       glUsername,
+		GlRepository:     glRepository,
+		GitConfigOptions: gitConfigOptions,
+		GitProtocol:      gitProtocol,
 	}
 
 	if err := stream.Send(rpcRequest); err != nil {
