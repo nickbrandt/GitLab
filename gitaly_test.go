@@ -87,14 +87,26 @@ func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 
 			gitProtocol := "fake git protocol"
 			resource := "/gitlab-org/gitlab-test.git/info/refs?service=" + tc.gitRpc
-			_, body := httpGet(t, ws.URL+resource, map[string]string{"Git-Protocol": gitProtocol})
+			resp, body := httpGet(t, ws.URL+resource, map[string]string{"Git-Protocol": gitProtocol})
 
-			expectedContent := fmt.Sprintf("\n\000%s\000%s\000%s\000", gitProtocol, tc.gitRpc, testhelper.GitalyInfoRefsResponseMock)
+			require.Equal(t, 200, resp.StatusCode)
+
+			bodySplit := strings.SplitN(body, "\000", 3)
+			require.Len(t, bodySplit, 3)
+
+			gitalyRequest := &pb.InfoRefsRequest{}
+			require.NoError(t, jsonpb.UnmarshalString(bodySplit[0], gitalyRequest))
+
+			require.Equal(t, gitProtocol, gitalyRequest.GitProtocol)
 			if tc.showAllRefs {
-				expectedContent = git.GitConfigShowAllRefs + expectedContent
+				require.Equal(t, []string{git.GitConfigShowAllRefs}, gitalyRequest.GitConfigOptions)
+			} else {
+				require.Empty(t, gitalyRequest.GitConfigOptions)
 			}
 
-			require.Equal(t, expectedContent, body, "GET %q: response body", resource)
+			require.Equal(t, tc.gitRpc, bodySplit[1])
+
+			require.Equal(t, string(testhelper.GitalyInfoRefsResponseMock), bodySplit[2], "GET %q: response body", resource)
 		})
 	}
 }
@@ -248,23 +260,26 @@ func TestPostUploadPackProxiedToGitalySuccessfully(t *testing.T) {
 				testhelper.GitalyUploadPackResponseMock,
 			)
 
-			expectedBodyParts := []string{
-				apiResponse.Repository.StorageName,
-				apiResponse.Repository.RelativePath,
-				gitProtocol,
-			}
-			if tc.showAllRefs {
-				expectedBodyParts = append(expectedBodyParts, git.GitConfigShowAllRefs+"\n")
-			} else {
-				expectedBodyParts = append(expectedBodyParts, "\n")
-			}
-
-			expectedBodyParts = append(expectedBodyParts, string(testhelper.GitalyUploadPackResponseMock))
-			expectedBody := strings.Join(expectedBodyParts, "\000")
-
-			assert.Equal(t, 200, resp.StatusCode, "POST %q", resource)
-			assert.Equal(t, expectedBody, body, "POST %q: response body", resource)
+			require.Equal(t, 200, resp.StatusCode, "POST %q", resource)
 			testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-upload-pack-result")
+
+			bodySplit := strings.SplitN(body, "\000", 2)
+			require.Len(t, bodySplit, 2)
+
+			gitalyRequest := &pb.PostUploadPackRequest{}
+			require.NoError(t, jsonpb.UnmarshalString(bodySplit[0], gitalyRequest))
+
+			require.Equal(t, apiResponse.Repository.StorageName, gitalyRequest.Repository.StorageName)
+			require.Equal(t, apiResponse.Repository.RelativePath, gitalyRequest.Repository.RelativePath)
+			require.Equal(t, gitProtocol, gitalyRequest.GitProtocol)
+
+			if tc.showAllRefs {
+				require.Equal(t, []string{git.GitConfigShowAllRefs}, gitalyRequest.GitConfigOptions)
+			} else {
+				require.Empty(t, gitalyRequest.GitConfigOptions)
+			}
+
+			require.Equal(t, string(testhelper.GitalyUploadPackResponseMock), bodySplit[1], "POST %q: response body", resource)
 		})
 	}
 }

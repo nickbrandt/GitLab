@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/golang/protobuf/jsonpb"
 	log "github.com/sirupsen/logrus"
 
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
@@ -59,12 +60,17 @@ func (s *GitalyTestServer) InfoRefsUploadPack(in *pb.InfoRefsRequest, stream pb.
 
 	fmt.Printf("Result: %+v\n", in)
 
+	marshaler := &jsonpb.Marshaler{}
+	jsonString, err := marshaler.MarshalToString(in)
+	if err != nil {
+		return err
+	}
+
 	data := []byte(strings.Join([]string{
-		strings.Join(in.GitConfigOptions, "\n") + "\n",
-		in.GitProtocol,
+		jsonString,
 		"git-upload-pack",
 		GitalyInfoRefsResponseMock,
-	}, "\000") + "\000")
+	}, "\000"))
 
 	nSends, err := sendBytes(data, 100, func(p []byte) error {
 		return stream.Send(&pb.InfoRefsResponse{Data: p})
@@ -89,12 +95,17 @@ func (s *GitalyTestServer) InfoRefsReceivePack(in *pb.InfoRefsRequest, stream pb
 
 	fmt.Printf("Result: %+v\n", in)
 
+	marshaler := &jsonpb.Marshaler{}
+	jsonString, err := marshaler.MarshalToString(in)
+	if err != nil {
+		return err
+	}
+
 	data := []byte(strings.Join([]string{
-		strings.Join(in.GitConfigOptions, "\n") + "\n",
-		in.GitProtocol,
+		jsonString,
 		"git-receive-pack",
 		GitalyInfoRefsResponseMock,
-	}, "\000") + "\000")
+	}, "\000"))
 
 	nSends, err := sendBytes(data, 100, func(p []byte) error {
 		return stream.Send(&pb.InfoRefsResponse{Data: p})
@@ -165,16 +176,18 @@ func (s *GitalyTestServer) PostUploadPack(stream pb.SmartHTTPService_PostUploadP
 		return err
 	}
 
-	repo := req.GetRepository()
 	if err := validateRepository(req.GetRepository()); err != nil {
 		return err
 	}
 
+	marshaler := &jsonpb.Marshaler{}
+	jsonString, err := marshaler.MarshalToString(req)
+	if err != nil {
+		return err
+	}
+
 	data := []byte(strings.Join([]string{
-		repo.GetStorageName(),
-		repo.GetRelativePath(),
-		req.GitProtocol,
-		strings.Join(req.GitConfigOptions, "\n") + "\n",
+		jsonString,
 	}, "\000") + "\000")
 
 	// The body of the request starts in the second message
