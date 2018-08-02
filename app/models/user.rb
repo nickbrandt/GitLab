@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'carrierwave/orm/activerecord'
 
 class User < ActiveRecord::Base
@@ -142,6 +144,8 @@ class User < ActiveRecord::Base
   has_many :callouts, class_name: 'UserCallout'
   has_many :term_agreements
   belongs_to :accepted_term, class_name: 'ApplicationSetting::Term'
+
+  has_one :status, class_name: 'UserStatus'
 
   #
   # Validations

@@ -208,6 +208,7 @@ ActiveRecord::Schema.define(version: 20180726172057) do
     t.boolean "enforce_terms", default: false
     t.boolean "pseudonymizer_enabled", default: false, null: false
     t.boolean "hide_third_party_offers", default: false, null: false
+    t.boolean "instance_statistics_visibility_private", default: false, null: false
     t.integer "custom_project_templates_group_id"
   end
 
@@ -1957,6 +1958,14 @@ ActiveRecord::Schema.define(version: 20180726172057) do
 
   add_index "plans", ["name"], name: "index_plans_on_name", using: :btree
 
+  create_table "programming_languages", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "color", null: false
+    t.datetime_with_timezone "created_at", null: false
+  end
+
+  add_index "programming_languages", ["name"], name: "index_programming_languages_on_name", unique: true, using: :btree
+
   create_table "project_authorizations", id: false, force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "project_id", null: false
@@ -2359,6 +2368,14 @@ ActiveRecord::Schema.define(version: 20180726172057) do
   add_index "remote_mirrors", ["last_successful_update_at"], name: "index_remote_mirrors_on_last_successful_update_at", using: :btree
   add_index "remote_mirrors", ["project_id"], name: "index_remote_mirrors_on_project_id", using: :btree
 
+  create_table "repository_languages", id: false, force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.integer "programming_language_id", null: false
+    t.float "share", null: false
+  end
+
+  add_index "repository_languages", ["project_id", "programming_language_id"], name: "index_repository_languages_on_project_and_languages_id", unique: true, using: :btree
+
   create_table "resource_label_events", id: :bigserial, force: :cascade do |t|
     t.integer "action", null: false
     t.integer "issue_id"
@@ -2677,6 +2694,13 @@ ActiveRecord::Schema.define(version: 20180726172057) do
 
   add_index "user_interacted_projects", ["project_id", "user_id"], name: "index_user_interacted_projects_on_project_id_and_user_id", unique: true, using: :btree
   add_index "user_interacted_projects", ["user_id"], name: "index_user_interacted_projects_on_user_id", using: :btree
+
+  create_table "user_statuses", primary_key: "user_id", force: :cascade do |t|
+    t.integer "cached_markdown_version"
+    t.string "emoji", default: "speech_balloon", null: false
+    t.string "message", limit: 100
+    t.string "message_html"
+  end
 
   create_table "user_synced_attributes_metadata", force: :cascade do |t|
     t.boolean "name_synced", default: false
@@ -3050,6 +3074,7 @@ ActiveRecord::Schema.define(version: 20180726172057) do
   add_foreign_key "push_rules", "projects", name: "fk_83b29894de", on_delete: :cascade
   add_foreign_key "releases", "projects", name: "fk_47fe2a0596", on_delete: :cascade
   add_foreign_key "remote_mirrors", "projects", name: "fk_43a9aa4ca8", on_delete: :cascade
+  add_foreign_key "repository_languages", "projects", on_delete: :cascade
   add_foreign_key "resource_label_events", "epics", on_delete: :cascade
   add_foreign_key "resource_label_events", "issues", on_delete: :cascade
   add_foreign_key "resource_label_events", "labels", on_delete: :nullify
@@ -3077,6 +3102,7 @@ ActiveRecord::Schema.define(version: 20180726172057) do
   add_foreign_key "user_custom_attributes", "users", on_delete: :cascade
   add_foreign_key "user_interacted_projects", "projects", name: "fk_722ceba4f7", on_delete: :cascade
   add_foreign_key "user_interacted_projects", "users", name: "fk_0894651f08", on_delete: :cascade
+  add_foreign_key "user_statuses", "users", on_delete: :cascade
   add_foreign_key "user_synced_attributes_metadata", "users", on_delete: :cascade
   add_foreign_key "users", "application_setting_terms", column: "accepted_term_id", name: "fk_789cd90b35", on_delete: :cascade
   add_foreign_key "users_star_projects", "projects", name: "fk_22cd27ddfc", on_delete: :cascade

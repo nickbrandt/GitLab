@@ -55,7 +55,8 @@ Example response:
    "ed25519_key_restriction": 0,
    "enforce_terms": true,
    "terms": "Hello world!",
-   "performance_bar_allowed_group_id": 42
+   "performance_bar_allowed_group_id": 42,
+   "instance_statistics_visibility_private": false
 }
 ```
 
@@ -99,7 +100,7 @@ PUT /application/settings
 | `elasticsearch_aws_region`               | string           | no                                            | The AWS region the elasticsearch domain is configured                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `elasticsearch_aws_secret_access_key`    | string           | no                                            | AWS IAM secret access key                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `elasticsearch_aws`                      | boolean          | no                                            | Enable the use of AWS hosted Elasticsearch                                                                                                                                                                                                                                                                                                                                                                                                                |
-| `elasticsearch_experimental_indexer`     | boolean          | no                                            | Use the experimental elasticsearch indexer. More info: https://gitlab.com/gitlab-org/gitlab-elasticsearch-indexer                                                                                                                                                                                                                                                                                                                                         |
+| `elasticsearch_experimental_indexer`     | boolean          | no                                            | Use the beta elasticsearch indexer. More info: https://gitlab.com/gitlab-org/gitlab-elasticsearch-indexer                                                                                                                                                                                                                                                                                                                                         |
 | `elasticsearch_indexing`                 | boolean          | no                                            | Enable Elasticsearch indexing                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `elasticsearch_search`                   | boolean          | no                                            | Enable Elasticsearch search                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `elasticsearch_url`                      | string           | no                                            | The url to use for connecting to Elasticsearch. Use a comma-separated list to support cluster (e.g., "http://localhost:9200, http://localhost:9201")                                                                                                                                                                                                                                                                                                      |
@@ -182,6 +183,7 @@ PUT /application/settings
 | `external_auth_client_key_pass` | string | no | Passphrase to use for the private key when authenticating with the external service this is encrypted when stored |
 | `enforce_terms`                          | boolean          | no                                            | Enforce application ToS to all users                                                                                                                                                                                                                                                                                                                                                                                                         |
 | `terms`                                  | text             | yes (if `enforce_terms` is true)              | Markdown content for the ToS                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `instance_statistics_visibility_private` | boolean          | no                                            | When set to `true` Instance statistics will only be available to admins                                                                                                                                                                                                                                                                                                                                                                      |
 
 ```bash
 curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/application/settings?signup_enabled=false&default_project_visibility=internal
@@ -230,6 +232,7 @@ Example response:
   "ed25519_key_restriction": 0,
   "enforce_terms": true,
   "terms": "Hello world!",
-  "performance_bar_allowed_group_id": 42
+  "performance_bar_allowed_group_id": 42,
+  "instance_statistics_visibility_private": false
 }
 ```
