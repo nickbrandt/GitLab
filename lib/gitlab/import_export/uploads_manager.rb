@@ -91,7 +91,10 @@ module Gitlab
 
         mkdir_p(File.join(uploads_export_path, secret))
 
-        download_or_copy_upload(upload, upload_path)
+        File.open(upload_path, 'w') do |file|
+          # Download (stream) file from the uploader's location
+          IO.copy_stream(URI.parse(upload.file.url).open, file)
+        end
       end
     end
   end
