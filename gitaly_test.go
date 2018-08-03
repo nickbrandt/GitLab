@@ -166,12 +166,12 @@ func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
 	gitalyRequest := &pb.PostReceivePackRequest{}
 	require.NoError(t, jsonpb.UnmarshalString(split[0], gitalyRequest))
 
-	require.Equal(t, apiResponse.Repository.StorageName, gitalyRequest.Repository.StorageName)
-	require.Equal(t, apiResponse.Repository.RelativePath, gitalyRequest.Repository.RelativePath)
-	require.Equal(t, apiResponse.GL_ID, gitalyRequest.GlId)
-	require.Equal(t, apiResponse.GL_USERNAME, gitalyRequest.GlUsername)
-	require.Equal(t, apiResponse.GitConfigOptions, gitalyRequest.GitConfigOptions)
-	require.Equal(t, gitProtocol, gitalyRequest.GitProtocol)
+	assert.Equal(t, apiResponse.Repository.StorageName, gitalyRequest.Repository.StorageName)
+	assert.Equal(t, apiResponse.Repository.RelativePath, gitalyRequest.Repository.RelativePath)
+	assert.Equal(t, apiResponse.GL_ID, gitalyRequest.GlId)
+	assert.Equal(t, apiResponse.GL_USERNAME, gitalyRequest.GlUsername)
+	assert.Equal(t, apiResponse.GitConfigOptions, gitalyRequest.GitConfigOptions)
+	assert.Equal(t, gitProtocol, gitalyRequest.GitProtocol)
 
 	assert.Equal(t, 200, resp.StatusCode, "POST %q", resource)
 	require.Equal(t, string(testhelper.GitalyReceivePackResponseMock), split[1])
