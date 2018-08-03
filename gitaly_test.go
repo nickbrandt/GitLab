@@ -153,6 +153,7 @@ func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
 	defer gitalyServer.Stop()
 
 	apiResponse.GitalyServer.Address = "unix://" + socketPath
+	apiResponse.GitConfigOptions = []string{"git-config-hello=world"}
 	ts := testAuthServer(nil, 200, apiResponse)
 	defer ts.Close()
 
@@ -166,22 +167,26 @@ func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
 		ws.URL+resource,
 		map[string]string{
 			"Content-Type": "application/x-git-receive-pack-request",
-			"Git-Protocol": "fake Git protocol",
+			"Git-Protocol": gitProtocol,
 		},
 		testhelper.GitalyReceivePackResponseMock,
 	)
 
-	expectedBody := strings.Join([]string{
-		apiResponse.Repository.StorageName,
-		apiResponse.Repository.RelativePath,
-		apiResponse.GL_ID,
-		apiResponse.GL_USERNAME,
-		gitProtocol,
-		string(testhelper.GitalyReceivePackResponseMock),
-	}, "\000")
+	split := strings.SplitN(body, "\000", 2)
+	require.Len(t, split, 2)
+
+	gitalyRequest := &pb.PostReceivePackRequest{}
+	require.NoError(t, jsonpb.UnmarshalString(split[0], gitalyRequest))
+
+	assert.Equal(t, apiResponse.Repository.StorageName, gitalyRequest.Repository.StorageName)
+	assert.Equal(t, apiResponse.Repository.RelativePath, gitalyRequest.Repository.RelativePath)
+	assert.Equal(t, apiResponse.GL_ID, gitalyRequest.GlId)
+	assert.Equal(t, apiResponse.GL_USERNAME, gitalyRequest.GlUsername)
+	assert.Equal(t, apiResponse.GitConfigOptions, gitalyRequest.GitConfigOptions)
+	assert.Equal(t, gitProtocol, gitalyRequest.GitProtocol)
 
 	assert.Equal(t, 200, resp.StatusCode, "POST %q", resource)
-	assert.Equal(t, expectedBody, body, "POST %q: response body", resource)
+	require.Equal(t, string(testhelper.GitalyReceivePackResponseMock), split[1])
 	testhelper.AssertResponseHeader(t, resp, "Content-Type", "application/x-git-receive-pack-result")
 }
 

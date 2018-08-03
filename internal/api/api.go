@@ -107,6 +107,8 @@ type Response struct {
 	// RepoPath is the full path on disk to the Git repository the request is
 	// about
 	RepoPath string
+	// GitConfigOptions holds the custom options that we want to pass to the git command
+	GitConfigOptions []string
 	// StoreLFSPath is provided by the GitLab Rails application to mark where the tmp file should be placed.
 	// This field is deprecated. GitLab will use TempPath instead
 	StoreLFSPath string
