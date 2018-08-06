@@ -4935,9 +4935,12 @@ msgstr ""
 msgid "Preview"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Primary"
 msgstr ""
 
+=======
+>>>>>>> ce/11-2-stable-prepare-rc3
 msgid "Prioritize"
 msgstr ""
 
