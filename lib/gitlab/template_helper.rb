@@ -2,8 +2,8 @@ module Gitlab
   module TemplateHelper
     include Gitlab::Utils::StrongMemoize
 
-    def prepare_template_environment(file_path)
-      return unless file_path.present?
+    def prepare_template_environment(file)
+      return unless file
 
       FileUtils.mkdir_p(File.dirname(import_upload_path))
       FileUtils.copy_entry(file_path, import_upload_path)

@@ -49,6 +49,16 @@ msgid_plural "%d exporters"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d failed test result"
+msgid_plural "%d failed test results"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "%d fixed test result"
+msgid_plural "%d fixed test results"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d issue"
 msgid_plural "%d issues"
 msgstr[0] ""
@@ -1147,6 +1157,9 @@ msgstr ""
 msgid "Browse files"
 msgstr ""
 
+msgid "Built-In"
+msgstr ""
+
 msgid "Business metrics (Custom)"
 msgstr ""
 
@@ -1244,6 +1257,9 @@ msgid "Certificate fingerprint"
 msgstr ""
 
 msgid "Change Weight"
+msgstr ""
+
+msgid "Change template"
 msgstr ""
 
 msgid "Change this value to influence how frequently the GitLab UI polls for updates."
@@ -2222,6 +2238,9 @@ msgstr ""
 msgid "CurrentUser|Settings"
 msgstr ""
 
+msgid "Custom"
+msgstr ""
+
 msgid "Custom CI config path"
 msgstr ""
 
@@ -2229,6 +2248,9 @@ msgid "Custom notification events"
 msgstr ""
 
 msgid "Custom notification levels are the same as participating levels. With custom notification levels you will also receive notifications for select events. To find out more, check out %{notification_link}."
+msgstr ""
+
+msgid "Custom project templates"
 msgstr ""
 
 msgid "Customize colors"
@@ -3918,10 +3940,10 @@ msgstr ""
 msgid "LicenseManagement|URL"
 msgstr ""
 
-msgid "LicenseManagement|Unapproved"
+msgid "LicenseManagement|You are about to remove the license, %{name}, from this project."
 msgstr ""
 
-msgid "LicenseManagement|You are about to remove the license, %{name}, from this project."
+msgid "Licenses"
 msgstr ""
 
 msgid "LinkedIn"
@@ -4910,6 +4932,9 @@ msgstr ""
 msgid "Preferences|Navigation theme"
 msgstr ""
 
+msgid "Preview"
+msgstr ""
+
 msgid "Primary"
 msgstr ""
 
@@ -5387,6 +5412,15 @@ msgstr ""
 msgid "Remove project"
 msgstr ""
 
+msgid "Rename"
+msgstr ""
+
+msgid "Rename file"
+msgstr ""
+
+msgid "Rename folder"
+msgstr ""
+
 msgid "Repair authentication"
 msgstr ""
 
@@ -5394,6 +5428,33 @@ msgid "Reply to this email directly or %{view_it_on_gitlab}."
 msgstr ""
 
 msgid "Repo by URL"
+msgstr ""
+
+msgid "Reports|%{failedString} and %{resolvedString}"
+msgstr ""
+
+msgid "Reports|Class"
+msgstr ""
+
+msgid "Reports|Execution time"
+msgstr ""
+
+msgid "Reports|Failure"
+msgstr ""
+
+msgid "Reports|System output"
+msgstr ""
+
+msgid "Reports|Test summary"
+msgstr ""
+
+msgid "Reports|Test summary failed loading results"
+msgstr ""
+
+msgid "Reports|Test summary results are being parsed"
+msgstr ""
+
+msgid "Reports|no changed test results"
 msgstr ""
 
 msgid "Repository"
@@ -5608,10 +5669,10 @@ msgstr ""
 msgid "Secret:"
 msgstr ""
 
-msgid "Security Dashboard"
+msgid "Security"
 msgstr ""
 
-msgid "Security report"
+msgid "Security Dashboard"
 msgstr ""
 
 msgid "SecurityDashboard|Monitor vulnerabilities in your code"
@@ -5657,6 +5718,9 @@ msgid "Select source branch"
 msgstr ""
 
 msgid "Select target branch"
+msgstr ""
+
+msgid "Select the custom project template source group."
 msgstr ""
 
 msgid "Selecting a GitLab user will add a link to the GitLab user in the descriptions of issues and comments (e.g. \"By <a href=\"#\">@johnsmith</a>\"). It will also associate and/or assign these issues and comments with the selected user."
@@ -6171,6 +6235,9 @@ msgid "Target branch"
 msgstr ""
 
 msgid "Team"
+msgstr ""
+
+msgid "Template"
 msgstr ""
 
 msgid "Terms of Service Agreement and Privacy Policy"
@@ -6843,6 +6910,9 @@ msgstr ""
 msgid "Use one line per URI"
 msgstr ""
 
+msgid "Use template"
+msgstr ""
+
 msgid "Use the following registration token during setup:"
 msgstr ""
 
@@ -7433,6 +7503,9 @@ msgstr ""
 msgid "ciReport|Learn more about whitelisting"
 msgstr ""
 
+msgid "ciReport|License management detected no licenses for the source branch only"
+msgstr ""
+
 msgid "ciReport|License management detected no new licenses"
 msgstr ""
 
@@ -7809,6 +7882,11 @@ msgstr ""
 
 msgid "or"
 msgstr ""
+
+msgid "out of %d total test"
+msgid_plural "out of %d total tests"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "parent"
 msgid_plural "parents"

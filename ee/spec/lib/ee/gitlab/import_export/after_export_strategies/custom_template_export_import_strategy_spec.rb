@@ -47,16 +47,16 @@ describe EE::Gitlab::ImportExport::AfterExportStrategies::CustomTemplateExportIm
       subject.execute(user, project_template)
     end
 
-    describe 'export_file_path' do
+    describe 'export_file' do
       before do
         allow(subject).to receive(:project).and_return(project_template)
       end
 
       context 'without object storage' do
         it 'returns the local path' do
-          expect(project_template).to receive(:export_project_path)
+          subject.execute(user, project_template)
 
-          subject.send(:export_file_path)
+          expect(subject.send(:export_file)).not_to be_nil
         end
       end
 
@@ -64,9 +64,9 @@ describe EE::Gitlab::ImportExport::AfterExportStrategies::CustomTemplateExportIm
         let(:project_template) { create(:project, :with_object_export) }
 
         it 'returns the path from object storage' do
-          expect(project_template.import_export_upload.export_file).to receive(:path)
+          subject.execute(user, project_template)
 
-          subject.send(:export_file_path)
+          expect(subject.send(:export_file)).not_to be_nil
         end
       end
     end

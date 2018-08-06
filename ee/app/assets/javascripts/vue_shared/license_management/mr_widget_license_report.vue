@@ -28,6 +28,11 @@ export default {
       required: false,
       default: null,
     },
+    pipelinePath: {
+      type: String,
+      required: false,
+      default: null,
+    },
     apiUrl: {
       type: String,
       required: true,
@@ -35,6 +40,16 @@ export default {
     canManageLicenses: {
       type: Boolean,
       required: true,
+    },
+    reportSectionClass: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    alwaysOpen: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   computed: {
@@ -46,6 +61,14 @@ export default {
     },
     licenseReportStatus() {
       return this.checkReportStatus(this.isLoading, this.loadLicenseReportError);
+    },
+    licensesTab() {
+      return this.pipelinePath ? `${this.pipelinePath}/licenses` : null;
+    },
+  },
+  watch: {
+    licenseReport() {
+      this.$emit('updateBadgeCount', this.licenseReport.length);
     },
   },
   mounted() {
@@ -77,7 +100,21 @@ export default {
       :neutral-issues="licenseReport"
       :has-issues="hasLicenseReportIssues"
       :component="$options.componentNames.LicenseIssueBody"
-      class="license-report-widget mr-widget-border-top"
-    />
+      :class="reportSectionClass"
+      :always-open="alwaysOpen"
+      class="license-report-widget"
+    >
+      <div
+        v-if="licensesTab"
+        slot="actionButtons"
+      >
+        <a
+          :href="licensesTab"
+          class="btn btn-default float-right btn-sm"
+        >
+          {{ s__("ciReport|View full report") }}
+        </a>
+      </div>
+    </report-section>
   </div>
 </template>

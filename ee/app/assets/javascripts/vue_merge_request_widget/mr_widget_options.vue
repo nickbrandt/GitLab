@@ -40,7 +40,7 @@ export default {
     },
     shouldRenderLicenseReport() {
       const { licenseManagement } = this.mr;
-      return licenseManagement && licenseManagement.head_path && licenseManagement.base_path;
+      return licenseManagement && licenseManagement.head_path;
     },
     hasCodequalityIssues() {
       return (
@@ -260,6 +260,7 @@ export default {
     <mr-widget-licenses
       v-if="shouldRenderLicenseReport"
       :api-url="mr.licenseManagement.managed_licenses_path"
+      :pipeline-path="mr.pipeline.path"
       :can-manage-licenses="mr.licenseManagement.can_manage_licenses"
       :base-path="mr.licenseManagement.base_path"
       :head-path="mr.licenseManagement.head_path"
