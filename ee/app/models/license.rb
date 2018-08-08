@@ -38,6 +38,7 @@ class License < ActiveRecord::Base
     admin_audit_log
     auditor_user
     board_assignee_lists
+    board_milestone_lists
     cross_project_pipelines
     email_additional_text
     db_load_balancing
@@ -304,6 +305,19 @@ class License < ActiveRecord::Base
 
   def plan
     restricted_attr(:plan).presence || STARTER_PLAN
+  end
+
+  def edition
+    case restricted_attr(:plan)
+    when 'ultimate'
+      'EEU'
+    when 'premium'
+      'EEP'
+    when 'starter'
+      'EES'
+    else # Older licenses
+      'EE'
+    end
   end
 
   def current_active_users_count

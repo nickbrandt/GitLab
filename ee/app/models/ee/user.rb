@@ -5,7 +5,11 @@ module EE
   # and be prepended in the `User` model
   module User
     extend ActiveSupport::Concern
+    extend ::Gitlab::Utils::Override
+
     include AuditorUserHelper
+
+    DEFAULT_ROADMAP_LAYOUT = 'months'.freeze
 
     included do
       EMAIL_OPT_IN_SOURCE_ID_GITLAB_COM = 1
@@ -29,12 +33,16 @@ module EE
       has_many :approvals,                dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
       has_many :approvers,                dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
 
+      has_many :developer_groups, -> { where(members: { access_level: ::Gitlab::Access::DEVELOPER }) }, through: :group_members, source: :group
+
       # Protected Branch Access
       has_many :protected_branch_merge_access_levels, dependent: :destroy, class_name: ::ProtectedBranch::MergeAccessLevel # rubocop:disable Cop/ActiveRecordDependent
       has_many :protected_branch_push_access_levels, dependent: :destroy, class_name: ::ProtectedBranch::PushAccessLevel # rubocop:disable Cop/ActiveRecordDependent
       has_many :protected_branch_unprotect_access_levels, dependent: :destroy, class_name: ::ProtectedBranch::UnprotectAccessLevel # rubocop:disable Cop/ActiveRecordDependent
 
       scope :excluding_guests, -> { joins(:members).where('members.access_level > ?', ::Gitlab::Access::GUEST).distinct }
+
+      enum roadmap_layout: { weeks: 1, months: 4, quarters: 12 }
     end
 
     module ClassMethods
@@ -101,6 +109,47 @@ module EE
                          project_ids_relation: templates,
                          params: { search: search, sort: 'name_asc' })
                     .execute
+    end
+
+    def roadmap_layout
+      super || DEFAULT_ROADMAP_LAYOUT
+    end
+
+    override :several_namespaces?
+    def several_namespaces?
+      union_sql = ::Gitlab::SQL::Union.new(
+        [owned_groups,
+         maintainers_groups,
+         groups_with_developer_maintainer_project_access]).to_sql
+
+      ::Group.from("(#{union_sql}) #{::Group.table_name}").any?
+    end
+
+    override :manageable_groups
+    def manageable_groups(include_groups_with_developer_maintainer_access: false)
+      owned_and_maintainer_group_hierarchy = super()
+
+      if include_groups_with_developer_maintainer_access
+        union_sql = ::Gitlab::SQL::Union.new(
+          [owned_and_maintainer_group_hierarchy,
+           groups_with_developer_maintainer_project_access]).to_sql
+
+        ::Group.from("(#{union_sql}) #{::Group.table_name}")
+      else
+        owned_and_maintainer_group_hierarchy
+      end
+    end
+
+    def groups_with_developer_maintainer_project_access
+      project_creation_levels = [::EE::Gitlab::Access::DEVELOPER_MAINTAINER_PROJECT_ACCESS]
+
+      if ::Gitlab::CurrentSettings.default_project_creation == ::EE::Gitlab::Access::DEVELOPER_MAINTAINER_PROJECT_ACCESS
+        project_creation_levels << nil
+      end
+
+      developer_groups_hierarchy = ::Gitlab::GroupHierarchy.new(developer_groups).base_and_descendants
+      ::Group.where(id: developer_groups_hierarchy.select(:id),
+                    project_creation_level: project_creation_levels)
     end
   end
 end

@@ -153,7 +153,7 @@ module Issuable
         end
 
       # Break ties with the ID column for pagination
-      sorted.order(id: :desc)
+      sorted.with_order_id_desc
     end
 
     def order_due_date_and_labels_priority(excluded_labels: [])
@@ -251,6 +251,12 @@ module Issuable
 
   def open?
     opened?
+  end
+
+  def overdue?
+    return false unless respond_to?(:due_date)
+
+    due_date.try(:past?) || false
   end
 
   def user_notes_count

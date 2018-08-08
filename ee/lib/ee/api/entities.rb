@@ -100,6 +100,15 @@ module EE
         end
       end
 
+      module List
+        extend ActiveSupport::Concern
+
+        prepended do
+          expose :milestone, using: ::API::Entities::Milestone, if: -> (entity, _) { entity.milestone? }
+          expose :user, as: :assignee, using: ::API::Entities::UserSafe, if: -> (entity, _) { entity.assignee? }
+        end
+      end
+
       module ApplicationSetting
         extend ActiveSupport::Concern
 
@@ -123,6 +132,16 @@ module EE
               variable.project.feature_available?(:variable_environment_scope)
             end
           end
+        end
+      end
+
+      module Todo
+        extend ActiveSupport::Concern
+
+        def todo_target_class(target_type)
+          ::EE::API::Entities.const_get(target_type, false)
+        rescue NameError
+          super
         end
       end
 
