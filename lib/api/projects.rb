@@ -72,6 +72,12 @@ module API
         params[:builds_enabled] = params.delete(:jobs_enabled) if params.key?(:jobs_enabled)
         params
       end
+
+      def verify_storage_attrs!(attrs)
+        unless current_user.admin?
+          attrs.delete(:repository_storage)
+        end
+      end
     end
 
     resource :users, requirements: API::PROJECT_ENDPOINT_REQUIREMENTS do
@@ -283,6 +289,7 @@ module API
         authorize! :change_visibility_level, user_project if attrs[:visibility].present?
 
         attrs = translate_params_for_compatibility(attrs)
+        verify_storage_attrs!(attrs)
 
         result = ::Projects::UpdateService.new(user_project, current_user, attrs).execute
 
