@@ -10,6 +10,7 @@ import (
 	apipkg "gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/artifacts"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/builds"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/git"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/lfs"
@@ -144,6 +145,9 @@ func (u *Upstream) configureRoutes() {
 		// Long poll and limit capacity given to jobs/request and builds/register.json
 		route("", apiPattern+`v4/jobs/request\z`, ciAPILongPolling),
 		route("", ciAPIPattern+`v1/builds/register.json\z`, ciAPILongPolling),
+
+		// Maven Artifact Repository
+		route("PUT", apiPattern+`v4/projects/[0-9]+/packages/maven/`, filestore.BodyUploader(api, proxy, nil)),
 
 		// Explicitly proxy API requests
 		route("", apiPattern, proxy),
