@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 6.0.0
+
+- Accelerate Maven artifact repository uploads !283
+
 v 5.2.0
 
 - Populate Git Protocol !276
