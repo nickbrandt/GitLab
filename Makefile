@@ -1,71 +1,106 @@
 PREFIX=/usr/local
-VERSION=$(shell git describe)-$(shell date -u +%Y%m%d.%H%M%S)
-BUILD_DIR = $(shell pwd)
-export GOPATH=${BUILD_DIR}/_build
-export PATH:=${GOPATH}/bin:${PATH}
-GOBUILD=go build -ldflags "-X main.Version=${VERSION}"
-PKG=gitlab.com/gitlab-org/gitlab-workhorse
-PKG_ALL = $(shell GOPATH=${GOPATH} go list ${PKG}/... | grep -v /vendor/)
-EXE_ALL = gitlab-zip-cat gitlab-zip-metadata gitlab-workhorse
+PKG := gitlab.com/gitlab-org/gitlab-workhorse
+BUILD_DIR := $(CURDIR)
+TARGET_DIR := $(BUILD_DIR)/_build
+TARGET_SETUP := $(TARGET_DIR)/.ok
+BIN_BUILD_DIR := $(TARGET_DIR)/bin
+PKG_BUILD_DIR := $(TARGET_DIR)/src/$(PKG)
+COVERAGE_DIR := $(TARGET_DIR)/cover
+VERSION := $(shell git describe)-$(shell date -u +%Y%m%d.%H%M%S)
+GOBUILD := go build -ldflags "-X main.Version=$(VERSION)"
+EXE_ALL := gitlab-zip-cat gitlab-zip-metadata gitlab-workhorse
 
-all: clean-build $(EXE_ALL)
+# Some users may have these variables set in their environment, but doing so could break
+# their build process, so unset then
+unexport GOROOT
+unexport GOBIN
 
-gitlab-zip-cat:	${BUILD_DIR}/_build/.sync $(shell find cmd/gitlab-zip-cat/ -name '*.go')
-	${GOBUILD} -o ${BUILD_DIR}/$@ ${PKG}/cmd/$@
+export GOPATH := $(TARGET_DIR)
+export PATH := $(GOPATH)/bin:$(PATH)
 
-gitlab-zip-metadata:	${BUILD_DIR}/_build/.sync $(shell find cmd/gitlab-zip-metadata/ -name '*.go')
-	${GOBUILD} -o ${BUILD_DIR}/$@ ${PKG}/cmd/$@
+# Returns a list of all non-vendored (local packages)
+LOCAL_PACKAGES = $(shell cd "$(PKG_BUILD_DIR)" && GOPATH=$(GOPATH) go list ./... | grep -v -e '^$(PKG)/vendor/' -e '^$(PKG)/ruby/')
 
-gitlab-workhorse: ${BUILD_DIR}/_build/.sync $(shell find . -name '*.go' | grep -v '^\./_')
-	${GOBUILD} -o ${BUILD_DIR}/$@ ${PKG}
+.NOTPARALLEL:
 
-install: gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata
-	mkdir -p $(DESTDIR)${PREFIX}/bin/
-	cd ${BUILD_DIR} && install gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata ${DESTDIR}${PREFIX}/bin/
+.PHONY:	all
+all:	clean-build $(EXE_ALL)
 
-${BUILD_DIR}/_build/.sync:
-	mkdir -p ${BUILD_DIR}/_build/src/${PKG}
-	tar -cf - --exclude _build --exclude .git . | (cd ${BUILD_DIR}/_build/src/${PKG} && tar -xf -)
-	touch $@
+$(TARGET_SETUP):
+	@echo "### Setting up $(TARGET_SETUP)"
+	rm -rf $(TARGET_DIR)
+	mkdir -p "$(dir $(PKG_BUILD_DIR))"
+	ln -sf ../../../.. "$(PKG_BUILD_DIR)"
+	mkdir -p "$(BIN_BUILD_DIR)"
+	touch "$(TARGET_SETUP)"
 
-.PHONY: test
-test:	clean-build clean-workhorse govendor prepare-tests 
-	go fmt ${PKG_ALL} | awk '{ print } END { if (NR > 0) { print "Please run go fmt"; exit 1 } }'
+gitlab-zip-cat:	$(TARGET_SETUP) $(shell find cmd/gitlab-zip-cat/ -name '*.go')
+	$(GOBUILD) -o $(BUILD_DIR)/$@ $(PKG)/cmd/$@
+
+gitlab-zip-metadata:	$(TARGET_SETUP) $(shell find cmd/gitlab-zip-metadata/ -name '*.go')
+	$(GOBUILD) -o $(BUILD_DIR)/$@ $(PKG)/cmd/$@
+
+gitlab-workhorse:	$(TARGET_SETUP) $(shell find . -name '*.go' | grep -v '^\./_')
+	$(GOBUILD) -o $(BUILD_DIR)/$@ $(PKG)
+
+.PHONY:	install
+install:	gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata
+	@echo "### install"
+	mkdir -p $(DESTDIR)$(PREFIX)/bin/
+	cd $(BUILD_DIR) && install gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata $(DESTDIR)$(PREFIX)/bin/
+
+.PHONY:	test
+test:	$(TARGET_SETUP) govendor prepare-tests
+	@echo "### verifying formatting with go fmt"
+	@go fmt $(LOCAL_PACKAGES) | awk '{ print } END { if (NR > 0) { print "Please run go fmt"; exit 1 } }'
+
 	_support/detect-context.sh
-	cd ${GOPATH}/src/${PKG} && govendor sync
-	cp $(EXE_ALL) ${GOPATH}/src/${PKG}
-	go test ${PKG_ALL}
+
+	@echo "### running govendor sync"
+	cd $(PKG_BUILD_DIR) && govendor sync
+
+	@echo "### running tests"
+	@go test $(LOCAL_PACKAGES)
 	@echo SUCCESS
 
 .PHONY:	govendor
-govendor:
-	command -v govendor || go get github.com/kardianos/govendor
+govendor: $(TARGET_SETUP)
+	@command -v govendor || go get github.com/kardianos/govendor
 
-coverage:
-	go test -cover -coverprofile=test.coverage
+.PHONY:	coverage
+coverage:	$(TARGET_SETUP) prepare-tests
+	@echo "### coverage"
+	@go test -cover -coverprofile=test.coverage $(LOCAL_PACKAGES)
 	go tool cover -html=test.coverage -o coverage.html
 	rm -f test.coverage
 
+.PHONY:	fmt
 fmt:
-	go fmt ${PKG_ALL}
+	@echo "### fmt"
+	@go fmt $(LOCAL_PACKAGES)
 
-.PHONY: clean
+.PHONY:	clean
 clean:	clean-workhorse clean-build
+	@echo "### clean"
 	rm -rf testdata/data testdata/scratch
 
 .PHONY:	clean-workhorse
 clean-workhorse:
-	cd ${BUILD_DIR} && rm -f gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata
+	@echo "### clean-workhorse"
+	rm -f $(EXE_ALL)
 
+.PHONY:	release
 release:
+	@echo "### release"
 	sh _support/release.sh
 
 .PHONY:	clean-build
 clean-build:
-	rm -rf ${BUILD_DIR}/_build
+	@echo "### clean-build"
+	rm -rf $(TARGET_DIR)
 
-.PHONY: prepare-tests
-prepare-tests: testdata/data/group/test.git $(EXE_ALL)
-	
+.PHONY:	prepare-tests
+prepare-tests:	testdata/data/group/test.git $(EXE_ALL)
+
 testdata/data/group/test.git:
 	git clone --quiet --bare https://gitlab.com/gitlab-org/gitlab-test.git $@
