@@ -47,11 +47,11 @@ type Object struct {
 }
 
 // NewObject opens an HTTP connection to Object Store and returns an Object pointer that can be used for uploading.
-func NewObject(ctx context.Context, putURL, deleteURL string, deadline time.Time, size int64) (*Object, error) {
-	return newObject(ctx, putURL, deleteURL, deadline, size, true)
+func NewObject(ctx context.Context, putURL, deleteURL string, putHeaders map[string]string, deadline time.Time, size int64) (*Object, error) {
+	return newObject(ctx, putURL, deleteURL, putHeaders, deadline, size, true)
 }
 
-func newObject(ctx context.Context, putURL, deleteURL string, deadline time.Time, size int64, metrics bool) (*Object, error) {
+func newObject(ctx context.Context, putURL, deleteURL string, putHeaders map[string]string, deadline time.Time, size int64, metrics bool) (*Object, error) {
 	started := time.Now()
 	pr, pw := io.Pipe()
 	// we should prevent pr.Close() otherwise it may shadow error set with pr.CloseWithError(err)
@@ -63,7 +63,10 @@ func newObject(ctx context.Context, putURL, deleteURL string, deadline time.Time
 		return nil, fmt.Errorf("PUT %q: %v", helper.ScrubURLParams(putURL), err)
 	}
 	req.ContentLength = size
-	req.Header.Set("Content-Type", "application/octet-stream")
+
+	for k, v := range putHeaders {
+		req.Header.Set(k, v)
+	}
 
 	uploadCtx, cancelFn := context.WithDeadline(ctx, deadline)
 	o := &Object{

@@ -85,6 +85,10 @@ type RemoteObject struct {
 	DeleteURL string
 	// StoreURL is the temporary presigned S3 PutObject URL to which upload the first found file
 	StoreURL string
+	// Boolean to indicate whether to use headers included in PutHeaders
+	CustomPutHeaders bool
+	// PutHeaders are HTTP headers (e.g. Content-Type) to be sent with StoreURL
+	PutHeaders map[string]string
 	// ID is a unique identifier of object storage upload
 	ID string
 	// Timeout is a number that represents timeout in seconds for sending data to StoreURL

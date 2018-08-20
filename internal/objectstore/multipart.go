@@ -36,7 +36,7 @@ type Multipart struct {
 // NewMultipart provides Multipart pointer that can be used for uploading. Data written will be split buffered on disk up to size bytes
 // then uploaded with S3 Upload Part. Once Multipart is Closed a final call to CompleteMultipartUpload will be sent.
 // In case of any error a call to AbortMultipartUpload will be made to cleanup all the resources
-func NewMultipart(ctx context.Context, partURLs []string, completeURL, abortURL, deleteURL string, deadline time.Time, partSize int64) (*Multipart, error) {
+func NewMultipart(ctx context.Context, partURLs []string, completeURL, abortURL, deleteURL string, putHeaders map[string]string, deadline time.Time, partSize int64) (*Multipart, error) {
 	pr, pw := io.Pipe()
 	uploadCtx, cancelFn := context.WithDeadline(ctx, deadline)
 	m := &Multipart{
@@ -62,7 +62,7 @@ func NewMultipart(ctx context.Context, partURLs []string, completeURL, abortURL,
 		cmu := &CompleteMultipartUpload{}
 		for i, partURL := range partURLs {
 			src := io.LimitReader(pr, partSize)
-			part, err := m.readAndUploadOnePart(partURL, src, i+1)
+			part, err := m.readAndUploadOnePart(partURL, putHeaders, src, i+1)
 			if err != nil {
 				m.uploadError = err
 				return
@@ -175,7 +175,7 @@ func (m *Multipart) verifyETag(cmu *CompleteMultipartUpload) error {
 	return nil
 }
 
-func (m *Multipart) readAndUploadOnePart(partURL string, src io.Reader, partNumber int) (*completeMultipartUploadPart, error) {
+func (m *Multipart) readAndUploadOnePart(partURL string, putHeaders map[string]string, src io.Reader, partNumber int) (*completeMultipartUploadPart, error) {
 	file, err := ioutil.TempFile("", "part-buffer")
 	if err != nil {
 		return nil, fmt.Errorf("Unable to create a temporary file for buffering: %v", err)
@@ -198,20 +198,20 @@ func (m *Multipart) readAndUploadOnePart(partURL string, src io.Reader, partNumb
 		return nil, fmt.Errorf("Cannot rewind part %d temporary dump : %v", partNumber, err)
 	}
 
-	etag, err := m.uploadPart(partURL, file, n)
+	etag, err := m.uploadPart(partURL, putHeaders, file, n)
 	if err != nil {
 		return nil, fmt.Errorf("Cannot upload part %d: %v", partNumber, err)
 	}
 	return &completeMultipartUploadPart{PartNumber: partNumber, ETag: etag}, nil
 }
 
-func (m *Multipart) uploadPart(url string, body io.Reader, size int64) (string, error) {
+func (m *Multipart) uploadPart(url string, headers map[string]string, body io.Reader, size int64) (string, error) {
 	deadline, ok := m.ctx.Deadline()
 	if !ok {
 		return "", fmt.Errorf("Missing deadline")
 	}
 
-	part, err := newObject(m.ctx, url, "", deadline, size, false)
+	part, err := newObject(m.ctx, url, "", headers, deadline, size, false)
 	if err != nil {
 		return "", err
 	}
