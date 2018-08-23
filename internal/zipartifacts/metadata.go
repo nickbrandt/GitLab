@@ -29,6 +29,7 @@ func newMetadata(file *zip.File) metadata {
 	}
 
 	return metadata{
+		//lint:ignore SA1019 Remove this once the minimum supported version is go 1.10 (go 1.9 and down do not support an alternative)
 		Modified: file.ModTime().Unix(),
 		Mode:     strconv.FormatUint(uint64(file.Mode().Perm()), 8),
 		CRC:      file.CRC32,
@@ -89,7 +90,7 @@ func GenerateZipMetadata(w io.Writer, archive *zip.Reader) error {
 
 	// Sort paths
 	sortedPaths := make([]string, 0, len(zipMap))
-	for path, _ := range zipMap {
+	for path := range zipMap {
 		sortedPaths = append(sortedPaths, path)
 	}
 	sort.Strings(sortedPaths)
