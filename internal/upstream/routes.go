@@ -98,13 +98,13 @@ func (ro *routeEntry) isMatch(cleanedPath string, req *http.Request) bool {
 // We match against URI not containing the relativeUrlRoot:
 // see upstream.ServeHTTP
 
-func (u *Upstream) configureRoutes() {
+func (u *upstream) configureRoutes() {
 	api := apipkg.NewAPI(
 		u.Backend,
 		u.Version,
 		u.RoundTripper,
 	)
-	static := &staticpages.Static{u.DocumentRoot}
+	static := &staticpages.Static{DocumentRoot: u.DocumentRoot}
 	proxy := senddata.SendData(
 		sendfile.SendFile(
 			apipkg.Block(

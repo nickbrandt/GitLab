@@ -1,5 +1,10 @@
 image: golang:1.8
 
+verify:
+  image: golang:1.10
+  script:
+  - make verify
+
 .test_template: &test_definition
   script:
   - apt update -qq && apt install -y unzip bzip2

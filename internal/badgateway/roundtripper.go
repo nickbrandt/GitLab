@@ -2,6 +2,7 @@ package badgateway
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -12,19 +13,14 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
-// Values from http.DefaultTransport
-var DefaultDialer = &net.Dialer{
+// defaultDialer is configured to use the values from http.DefaultTransport
+var defaultDialer = &net.Dialer{
 	Timeout:   30 * time.Second,
 	KeepAlive: 30 * time.Second,
+	DualStack: true,
 }
 
-var DefaultTransport = &http.Transport{
-	Proxy:               http.ProxyFromEnvironment, // from http.DefaultTransport
-	Dial:                DefaultDialer.Dial,        // from http.DefaultTransport
-	TLSHandshakeTimeout: 10 * time.Second,          // from http.DefaultTransport
-}
-
-// Custom error for pretty Sentry 'issues'
+// Error is a custom error for pretty Sentry 'issues'
 type Error struct{ error }
 
 type RoundTripper struct {
@@ -36,24 +32,34 @@ func TestRoundTripper(backend *url.URL) *RoundTripper {
 	return NewRoundTripper(backend, "", 0, true)
 }
 
+// NewRoundTripper returns a new RoundTripper instance using the provided values
 func NewRoundTripper(backend *url.URL, socket string, proxyHeadersTimeout time.Duration, developmentMode bool) *RoundTripper {
-	tr := *DefaultTransport
+	// Copied from the definition of http.DefaultTransport. We can't literally copy http.DefaultTransport because of its hidden internal state.
+	tr := &http.Transport{
+		Proxy:                 http.ProxyFromEnvironment,
+		DialContext:           defaultDialer.DialContext,
+		MaxIdleConns:          100,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+	}
+
 	tr.ResponseHeaderTimeout = proxyHeadersTimeout
 
 	if backend != nil && socket == "" {
 		address := mustParseAddress(backend.Host, backend.Scheme)
-		tr.Dial = func(_, _ string) (net.Conn, error) {
-			return DefaultDialer.Dial("tcp", address)
+		tr.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
+			return defaultDialer.DialContext(ctx, "tcp", address)
 		}
 	} else if socket != "" {
-		tr.Dial = func(_, _ string) (net.Conn, error) {
-			return DefaultDialer.Dial("unix", socket)
+		tr.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
+			return defaultDialer.DialContext(ctx, "unix", socket)
 		}
 	} else {
 		panic("backend is nil and socket is empty")
 	}
 
-	return &RoundTripper{Transport: &tr, developmentMode: developmentMode}
+	return &RoundTripper{Transport: tr, developmentMode: developmentMode}
 }
 
 func mustParseAddress(address, scheme string) string {
