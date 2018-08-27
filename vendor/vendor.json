@@ -131,6 +131,12 @@
 			"revisionTime": "2017-02-22T00:19:28Z"
 		},
 		{
+			"checksumSHA1": "cl9bdp4vvusDqC44P6NOtMK5tIU=",
+			"path": "github.com/konsorten/go-windows-terminal-sequences",
+			"revision": "b729f2633dfe35f4d1d8a32385f6685610ce1cb5",
+			"revisionTime": "2018-04-02T22:36:58Z"
+		},
+		{
 			"checksumSHA1": "bKMZjd2wPw13VwoE7mBeSv5djFA=",
 			"comment": "v1.0.0-2-gc12348c",
 			"path": "github.com/matttproud/golang_protobuf_extensions/pbutil",
@@ -229,12 +235,12 @@
 			"revisionTime": "2016-09-10T04:38:05Z"
 		},
 		{
-			"checksumSHA1": "vRcu8DLpEnhOuaZ/M8iGl2CRG8Y=",
+			"checksumSHA1": "oEqs3JOJUIW+slB4kK+Or1KTvg8=",
 			"path": "github.com/sirupsen/logrus",
-			"revision": "3e01752db0189b9157070a0e1668a620f9a85da2",
-			"revisionTime": "2018-07-21T07:00:01Z",
-			"version": "v1.0.6",
-			"versionExact": "v1.0.6"
+			"revision": "a67f783a3814b8729bd2dac5780b5f78f8dbd64d",
+			"revisionTime": "2018-09-25T19:35:18Z",
+			"version": "v1.1.0",
+			"versionExact": "v1.1.0"
 		},
 		{
 			"checksumSHA1": "hIEmcd7hIDqO/xWSp1rJJHd0TpE=",
