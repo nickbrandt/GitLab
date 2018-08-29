@@ -97,7 +97,7 @@ func CloseConnections() {
 
 func newConnection(server Server) (*grpc.ClientConn, error) {
 	connOpts := append(gitalyclient.DefaultDialOpts,
-		grpc.WithPerRPCCredentials(gitalyauth.RPCCredentials(server.Token)),
+		grpc.WithPerRPCCredentials(gitalyauth.RPCCredentialsV2(server.Token)),
 		grpc.WithStreamInterceptor(grpc_prometheus.StreamClientInterceptor),
 		grpc.WithUnaryInterceptor(grpc_prometheus.UnaryClientInterceptor),
 	)

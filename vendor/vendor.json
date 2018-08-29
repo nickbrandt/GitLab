@@ -91,6 +91,24 @@
 			"revision": "e8f0f8aaa98dfb6586cbdf2978d511e3199a960a"
 		},
 		{
+			"checksumSHA1": "ZRhE1BjkcaROD1NZMZwICtPemTs=",
+			"path": "github.com/grpc-ecosystem/go-grpc-middleware",
+			"revision": "15ea7401d63d2d8c2f17472d22359564615a9f7a",
+			"revisionTime": "2018-08-24T10:49:23Z"
+		},
+		{
+			"checksumSHA1": "tvOR7YKj51rBR+j5C/ZyZj6rvYc=",
+			"path": "github.com/grpc-ecosystem/go-grpc-middleware/auth",
+			"revision": "15ea7401d63d2d8c2f17472d22359564615a9f7a",
+			"revisionTime": "2018-08-24T10:49:23Z"
+		},
+		{
+			"checksumSHA1": "L5z1C445GhhQmDKSisTFv754LdU=",
+			"path": "github.com/grpc-ecosystem/go-grpc-middleware/util/metautils",
+			"revision": "15ea7401d63d2d8c2f17472d22359564615a9f7a",
+			"revisionTime": "2018-08-24T10:49:23Z"
+		},
+		{
 			"checksumSHA1": "3iVD2sJv4uYnA8YgkR8yzZiUF7o=",
 			"path": "github.com/grpc-ecosystem/go-grpc-prometheus",
 			"revision": "c225b8c3b01faf2899099b768856a9e916e5087b",
@@ -239,12 +257,12 @@
 			"versionExact": "v0.111.0"
 		},
 		{
-			"checksumSHA1": "dUHJbKas746n5fLzlwxHb6FOCxs=",
+			"checksumSHA1": "SbYAalNU5azT8lJGerDI4I/Nw84=",
 			"path": "gitlab.com/gitlab-org/gitaly/auth",
-			"revision": "95a198aef54c42fd8e84c62acc63f0cd620864b3",
-			"revisionTime": "2018-01-18T11:33:00Z",
-			"version": "v0.71.0",
-			"versionExact": "v0.71.0"
+			"revision": "8a8daada771e4659baeb6fc08178179ea78010a6",
+			"revisionTime": "2018-09-07T08:03:54Z",
+			"version": "v0.120.0",
+			"versionExact": "v0.120.0"
 		},
 		{
 			"checksumSHA1": "s53Qjro9ZHX0DV2tCYQXLO2FHqI=",
