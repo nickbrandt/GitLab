@@ -468,6 +468,8 @@ ActiveRecord::Schema.define(version: 20181220165848) do
     t.integer "project_id", null: false
     t.integer "timeout"
     t.integer "timeout_source", default: 1, null: false
+    t.jsonb "config_options"
+    t.jsonb "config_variables"
     t.index ["build_id"], name: "index_ci_builds_metadata_on_build_id", unique: true, using: :btree
     t.index ["project_id"], name: "index_ci_builds_metadata_on_project_id", using: :btree
   end
