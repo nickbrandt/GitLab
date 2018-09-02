@@ -340,10 +340,10 @@ class AddOptionsToBuildMetadata < ActiveRecord::Migration[5.0]
 end
 ```
 
-On MySQL the `JSON` and `JSONB` is translated to `TEXT 1MB`, as `JSONB` is PostrgreSQL only feature.
+On MySQL the `JSON` and `JSONB` is translated to `TEXT 1MB`, as `JSONB` is PostgreSQL only feature.
 
-For above reason you have to use serializer to provide translation layer
-to support seamlessly PostgreSQL and MySQL:
+For above reason you have to use a serializer to provide a translation layer
+in order to support PostgreSQL and MySQL seamlessly:
 
 ```ruby
 class BuildMetadata

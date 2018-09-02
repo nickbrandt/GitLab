@@ -924,12 +924,10 @@ module Ci
     # have the old integer only format. This method returns the retry option
     # normalized as a hash in 11.5+ format.
     def normalized_retry
-      value = options&.dig(:retry)
-
-      if value.is_a?(Integer)
-        { max: value }.with_indifferent_access
-      else
-        value || {}
+      strong_memoize(:normalized_retry) do
+        value = options&.dig(:retry)
+        value = value.is_a?(Integer) ? { max: value } : value.to_h
+        value.with_indifferent_access
       end
     end
 
