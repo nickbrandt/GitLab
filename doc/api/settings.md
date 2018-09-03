@@ -167,6 +167,7 @@ are listed in the descriptions of the relevant settings.
 | `dsa_key_restriction`                    | integer          | no                                   | The minimum allowed bit length of an uploaded DSA key. Default is `0` (no restriction). `-1` disables DSA keys. |
 | `ecdsa_key_restriction`                  | integer          | no                                   | The minimum allowed curve size (in bits) of an uploaded ECDSA key. Default is `0` (no restriction). `-1` disables ECDSA keys. |
 | `ed25519_key_restriction`                | integer          | no                                   | The minimum allowed curve size (in bits) of an uploaded ED25519 key. Default is `0` (no restriction). `-1` disables ED25519 keys. |
+<<<<<<< HEAD
 | `elasticsearch_aws`                      | boolean          | no                                   | **(Premium)** Enable the use of AWS hosted Elasticsearch |
 | `elasticsearch_aws_access_key`           | string           | no                                   | **(Premium)** AWS IAM access key |
 | `elasticsearch_aws_region`               | string           | no                                   | **(Premium)** The AWS region the elasticsearch domain is configured |
