@@ -23,6 +23,9 @@ type SaveFileOpts struct {
 	PresignedPut string
 	// PresignedDelete is a presigned S3 DeleteObject compatible URL.
 	PresignedDelete string
+	// HTTP headers to be sent along with PUT request
+	PutHeaders map[string]string
+
 	// Deadline it the S3 operation deadline, the upload will be aborted if not completed in time
 	Deadline time.Time
 
@@ -65,7 +68,15 @@ func GetOpts(apiResponse *api.Response) *SaveFileOpts {
 		RemoteURL:       apiResponse.RemoteObject.GetURL,
 		PresignedPut:    apiResponse.RemoteObject.StoreURL,
 		PresignedDelete: apiResponse.RemoteObject.DeleteURL,
+		PutHeaders:      apiResponse.RemoteObject.PutHeaders,
 		Deadline:        time.Now().Add(timeout),
+	}
+
+	// Backwards compatibility to ensure API servers that do not include the
+	// CustomPutHeaders flag will default to the original content type.
+	if !apiResponse.RemoteObject.CustomPutHeaders {
+		opts.PutHeaders = make(map[string]string)
+		opts.PutHeaders["Content-Type"] = "application/octet-stream"
 	}
 
 	if multiParams := apiResponse.RemoteObject.MultipartUpload; multiParams != nil {

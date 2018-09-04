@@ -27,6 +27,8 @@ type ObjectstoreStub struct {
 	overwriteMD5 map[string]string
 	// multipart is a map of MultipartUploads
 	multipart map[string]partsEtagMap
+	// HTTP header sent along request
+	headers map[string]*http.Header
 
 	puts    int
 	deletes int
@@ -45,6 +47,7 @@ func StartObjectStoreWithCustomMD5(md5Hashes map[string]string) (*ObjectstoreStu
 		bucket:       make(map[string]string),
 		multipart:    make(map[string]partsEtagMap),
 		overwriteMD5: make(map[string]string),
+		headers:      make(map[string]*http.Header),
 	}
 
 	for k, v := range md5Hashes {
@@ -77,6 +80,18 @@ func (o *ObjectstoreStub) GetObjectMD5(path string) string {
 	defer o.m.Unlock()
 
 	return o.bucket[path]
+}
+
+// GetHeader returns a given HTTP header of the object uploaded to the path
+func (o *ObjectstoreStub) GetHeader(path, key string) string {
+	o.m.Lock()
+	defer o.m.Unlock()
+
+	if val, ok := o.headers[path]; ok {
+		return val.Get(key)
+	}
+
+	return ""
 }
 
 // InitiateMultipartUpload prepare the ObjectstoreStob to receive a MultipartUpload on path
@@ -146,6 +161,7 @@ func (o *ObjectstoreStub) putObject(w http.ResponseWriter, r *http.Request) {
 		etag = hex.EncodeToString(checksum)
 	}
 
+	o.headers[objectPath] = &r.Header
 	o.puts++
 	if o.isMultipartUpload(objectPath) {
 		pNumber := r.URL.Query().Get("partNumber")

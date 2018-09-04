@@ -76,8 +76,10 @@ func TestSaveFileOptsLocalAndRemote(t *testing.T) {
 
 func TestGetOpts(t *testing.T) {
 	tests := []struct {
-		name      string
-		multipart *api.MultipartUploadParams
+		name             string
+		multipart        *api.MultipartUploadParams
+		customPutHeaders bool
+		putHeaders       map[string]string
 	}{
 		{
 			name: "Single upload",
@@ -90,6 +92,21 @@ func TestGetOpts(t *testing.T) {
 				PartURLs:    []string{"http://part1", "http://part2"},
 			},
 		},
+		{
+			name:             "Single upload with custom content type",
+			customPutHeaders: true,
+			putHeaders:       map[string]string{"Content-Type": "image/jpeg"},
+		}, {
+			name: "Multipart upload with custom content type",
+			multipart: &api.MultipartUploadParams{
+				PartSize:    10,
+				CompleteURL: "http://complete",
+				AbortURL:    "http://abort",
+				PartURLs:    []string{"http://part1", "http://part2"},
+			},
+			customPutHeaders: true,
+			putHeaders:       map[string]string{"Content-Type": "image/jpeg"},
+		},
 	}
 
 	for _, test := range tests {
@@ -99,12 +116,14 @@ func TestGetOpts(t *testing.T) {
 			apiResponse := &api.Response{
 				TempPath: "/tmp",
 				RemoteObject: api.RemoteObject{
-					Timeout:         10,
-					ID:              "id",
-					GetURL:          "http://get",
-					StoreURL:        "http://store",
-					DeleteURL:       "http://delete",
-					MultipartUpload: test.multipart,
+					Timeout:          10,
+					ID:               "id",
+					GetURL:           "http://get",
+					StoreURL:         "http://store",
+					DeleteURL:        "http://delete",
+					MultipartUpload:  test.multipart,
+					CustomPutHeaders: test.customPutHeaders,
+					PutHeaders:       test.putHeaders,
 				},
 			}
 			deadline := time.Now().Add(time.Duration(apiResponse.RemoteObject.Timeout) * time.Second)
@@ -116,6 +135,12 @@ func TestGetOpts(t *testing.T) {
 			assert.Equal(apiResponse.RemoteObject.GetURL, opts.RemoteURL)
 			assert.Equal(apiResponse.RemoteObject.StoreURL, opts.PresignedPut)
 			assert.Equal(apiResponse.RemoteObject.DeleteURL, opts.PresignedDelete)
+			if test.customPutHeaders {
+				assert.Equal(opts.PutHeaders, apiResponse.RemoteObject.PutHeaders)
+			} else {
+				assert.Equal(opts.PutHeaders, map[string]string{"Content-Type": "application/octet-stream"})
+			}
+
 			if test.multipart == nil {
 				assert.False(opts.IsMultipart())
 				assert.Empty(opts.PresignedCompleteMultipart)

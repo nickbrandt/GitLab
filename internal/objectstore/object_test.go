@@ -18,7 +18,7 @@ import (
 
 const testTimeout = 10 * time.Second
 
-func testObjectUploadNoErrors(t *testing.T, useDeleteURL bool) {
+func testObjectUploadNoErrors(t *testing.T, useDeleteURL bool, contentType string) {
 	assert := assert.New(t)
 
 	osStub, ts := test.StartObjectStore()
@@ -30,11 +30,13 @@ func testObjectUploadNoErrors(t *testing.T, useDeleteURL bool) {
 		deleteURL = objectURL
 	}
 
+	putHeaders := map[string]string{"Content-Type": contentType}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	deadline := time.Now().Add(testTimeout)
-	object, err := objectstore.NewObject(ctx, objectURL, deleteURL, deadline, test.ObjectSize)
+	object, err := objectstore.NewObject(ctx, objectURL, deleteURL, putHeaders, deadline, test.ObjectSize)
 	require.NoError(t, err)
 
 	// copy data
@@ -45,6 +47,8 @@ func testObjectUploadNoErrors(t *testing.T, useDeleteURL bool) {
 	// close HTTP stream
 	err = object.Close()
 	assert.NoError(err)
+
+	assert.Equal(contentType, osStub.GetHeader(test.ObjectPath, "Content-Type"))
 
 	// Checking MD5 extraction
 	assert.Equal(osStub.GetObjectMD5(test.ObjectPath), object.ETag())
@@ -73,8 +77,9 @@ func testObjectUploadNoErrors(t *testing.T, useDeleteURL bool) {
 }
 
 func TestObjectUpload(t *testing.T) {
-	t.Run("with delete URL", func(t *testing.T) { testObjectUploadNoErrors(t, true) })
-	t.Run("without delete URL", func(t *testing.T) { testObjectUploadNoErrors(t, false) })
+	t.Run("with delete URL", func(t *testing.T) { testObjectUploadNoErrors(t, true, "application/octet-stream") })
+	t.Run("without delete URL", func(t *testing.T) { testObjectUploadNoErrors(t, false, "application/octet-stream") })
+	t.Run("with custom content type", func(t *testing.T) { testObjectUploadNoErrors(t, false, "image/jpeg") })
 }
 
 func TestObjectUpload404(t *testing.T) {
@@ -89,7 +94,7 @@ func TestObjectUpload404(t *testing.T) {
 
 	deadline := time.Now().Add(testTimeout)
 	objectURL := ts.URL + test.ObjectPath
-	object, err := objectstore.NewObject(ctx, objectURL, "", deadline, test.ObjectSize)
+	object, err := objectstore.NewObject(ctx, objectURL, "", map[string]string{}, deadline, test.ObjectSize)
 	require.NoError(err)
 	_, err = io.Copy(object, strings.NewReader(test.ObjectContent))
 
@@ -134,7 +139,7 @@ func TestObjectUploadBrokenConnection(t *testing.T) {
 
 	deadline := time.Now().Add(testTimeout)
 	objectURL := ts.URL + test.ObjectPath
-	object, err := objectstore.NewObject(ctx, objectURL, "", deadline, -1)
+	object, err := objectstore.NewObject(ctx, objectURL, "", map[string]string{}, deadline, -1)
 	require.NoError(t, err)
 
 	_, copyErr := io.Copy(object, &endlessReader{})
