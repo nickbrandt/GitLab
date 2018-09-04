@@ -34,7 +34,6 @@
     >
       <icon
         name="close"
-        aria-hidden="true"
       />
     </button>
     <div

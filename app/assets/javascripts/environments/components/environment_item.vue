@@ -533,13 +533,11 @@ export default {
         <icon
           :name="folderIconName"
           class="folder-icon"
-          aria-hidden="true"
         />
 
         <icon
           name="folder"
           class="folder-icon"
-          aria-hidden="true"
         />
 
         <span>

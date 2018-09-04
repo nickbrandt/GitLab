@@ -147,7 +147,6 @@
         <icon
           v-if="issue.confidential"
           name="eye-slash"
-          aria-hidden="true"
           class="confidential-icon"
         />
         <a

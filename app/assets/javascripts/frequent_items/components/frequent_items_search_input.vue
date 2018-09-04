@@ -53,7 +53,6 @@ export default {
       v-if="!searchQuery"
       name="search"
       class="search-icon"
-      aria-hidden="true"
     />
   </div>
 </template>

@@ -84,7 +84,6 @@ export default {
         {{ selectedProjectName }}
         <icon
           name="angle-down"
-          aria-hidden="true"
         />
       </button>
       <div class="dropdown-menu dropdown-menu-selectable dropdown-menu-full-width">
@@ -97,7 +96,6 @@ export default {
           >
             <icon
               name="merge-request-close-m"
-              aria-hidden="true"
               data-hidden="true"
               class="dropdown-menu-close-icon"
             />
@@ -112,7 +110,6 @@ export default {
           <icon
             name="search"
             class="dropdown-input-search"
-            aria-hidden="true"
             data-hidden="true"
           />
         </div>
