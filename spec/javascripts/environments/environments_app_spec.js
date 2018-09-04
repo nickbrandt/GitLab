@@ -169,9 +169,7 @@ describe('Environment', () => {
         component.$el.querySelector('.folder-name').click();
 
         Vue.nextTick(() => {
-          expect(
-            component.$el.querySelector('.folder-icon.ic-chevron-right').getAttribute('style'),
-          ).toContain('display: none');
+          expect(component.$el.querySelector('.folder-icon.ic-chevron-right')).toBe(null);
           done();
         });
       }, 0);
@@ -187,9 +185,7 @@ describe('Environment', () => {
           component.$el.querySelector('.folder-name').click();
 
           Vue.nextTick(() => {
-            expect(
-              component.$el.querySelector('.folder-icon.ic-chevron-down').getAttribute('style'),
-            ).toContain('display: none');
+            expect(component.$el.querySelector('.folder-icon.ic-chevron-down')).toBe(null);
             done();
           });
         });
