@@ -458,6 +458,14 @@ export default {
 
       return 'chevron-right';
     },
+
+    deployIconName() {
+      if (this.model.isDeployBoardVisible) {
+        return 'chevron-down';
+      }
+
+      return 'chevron-right';
+    },
   },
 
   methods: {
@@ -491,23 +499,14 @@ export default {
       >
         {{ s__("Environments|Environment") }}
       </div>
-      <span
+
+      <icon
         v-if="model.hasDeployBoard"
+        :name="deployIconName"
         class="deploy-board-icon"
-        @click="toggleDeployBoard">
+        @click="toggleDeployBoard"
+      />
 
-        <i
-          v-show="!model.isDeployBoardVisible"
-          class="fa fa-caret-right"
-          aria-hidden="true">
-        </i>
-
-        <i
-          v-show="model.isDeployBoardVisible"
-          class="fa fa-caret-down"
-          aria-hidden="true">
-        </i>
-      </span>
       <span
         v-if="!model.isFolder"
         class="environment-name table-mobile-content">
