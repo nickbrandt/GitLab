@@ -114,7 +114,7 @@ export default class ApproversSelect {
   }
 
   static formatSelection(group) {
-    return group.full_name || group.name;
+    return _.escape(group.full_name || group.name);
   }
 
   static formatResult({
