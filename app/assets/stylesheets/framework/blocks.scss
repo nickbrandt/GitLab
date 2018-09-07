@@ -283,13 +283,15 @@
 
   .dismiss-button {
     position: absolute;
-    right: 6px;
-    top: $gl-btn-padding;
+    right: $gl-padding-8;
+    top: $gl-padding-8;
     cursor: pointer;
     color: $blue-300;
     z-index: 1;
     border: 0;
     background-color: transparent;
+    padding: $gl-padding-8;
+    line-height: 0;
 
     &:hover,
     &:focus {
