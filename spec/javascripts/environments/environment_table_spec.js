@@ -54,9 +54,7 @@ describe('Environment table', () => {
     });
 
     expect(vm.$el.querySelector('.js-deploy-board-row')).toBeDefined();
-    expect(
-      vm.$el.querySelector('.deploy-board-icon i').classList.contains('fa-caret-right'),
-    ).toEqual(true);
+    expect(vm.$el.querySelector('.deploy-board-icon.ic-chevron-right')).not.toBeNull();
   });
 
   it('should toggle deploy board visibility when arrow is clicked', () => {
