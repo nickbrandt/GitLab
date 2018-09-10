@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180831152625) do
+ActiveRecord::Schema.define(version: 20180906101639) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -218,6 +218,8 @@ ActiveRecord::Schema.define(version: 20180831152625) do
     t.boolean "web_ide_clientside_preview_enabled", default: false, null: false
     t.boolean "user_show_add_ssh_key_message", default: true, null: false
     t.integer "custom_project_templates_group_id"
+    t.integer "usage_stats_set_by_user_id"
+    t.integer "receive_max_input_size"
   end
 
   create_table "approvals", force: :cascade do |t|
@@ -580,6 +582,7 @@ ActiveRecord::Schema.define(version: 20180831152625) do
   add_index "ci_pipelines", ["project_id", "iid"], name: "index_ci_pipelines_on_project_id_and_iid", unique: true, where: "(iid IS NOT NULL)", using: :btree
   add_index "ci_pipelines", ["project_id", "ref", "status", "id"], name: "index_ci_pipelines_on_project_id_and_ref_and_status_and_id", using: :btree
   add_index "ci_pipelines", ["project_id", "sha"], name: "index_ci_pipelines_on_project_id_and_sha", using: :btree
+  add_index "ci_pipelines", ["project_id", "status", "config_source"], name: "index_ci_pipelines_on_project_id_and_status_and_config_source", using: :btree
   add_index "ci_pipelines", ["project_id"], name: "index_ci_pipelines_on_project_id", using: :btree
   add_index "ci_pipelines", ["status"], name: "index_ci_pipelines_on_status", using: :btree
   add_index "ci_pipelines", ["user_id"], name: "index_ci_pipelines_on_user_id", using: :btree
@@ -2271,10 +2274,11 @@ ActiveRecord::Schema.define(version: 20180831152625) do
   end
 
   add_index "prometheus_alerts", ["environment_id"], name: "index_prometheus_alerts_on_environment_id", using: :btree
-  add_index "prometheus_alerts", ["prometheus_metric_id"], name: "index_prometheus_alerts_on_prometheus_metric_id", unique: true, using: :btree
+  add_index "prometheus_alerts", ["project_id", "prometheus_metric_id"], name: "index_prometheus_alerts_on_project_id_and_prometheus_metric_id", unique: true, using: :btree
+  add_index "prometheus_alerts", ["prometheus_metric_id"], name: "index_prometheus_alerts_on_prometheus_metric_id", using: :btree
 
   create_table "prometheus_metrics", force: :cascade do |t|
-    t.integer "project_id", null: false
+    t.integer "project_id"
     t.string "title", null: false
     t.string "query", null: false
     t.string "y_label"
@@ -2283,9 +2287,13 @@ ActiveRecord::Schema.define(version: 20180831152625) do
     t.integer "group", null: false
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
+    t.boolean "common", default: false, null: false
+    t.string "identifier"
   end
 
+  add_index "prometheus_metrics", ["common"], name: "index_prometheus_metrics_on_common", using: :btree
   add_index "prometheus_metrics", ["group"], name: "index_prometheus_metrics_on_group", using: :btree
+  add_index "prometheus_metrics", ["identifier"], name: "index_prometheus_metrics_on_identifier", unique: true, using: :btree
   add_index "prometheus_metrics", ["project_id"], name: "index_prometheus_metrics_on_project_id", using: :btree
 
   create_table "protected_branch_merge_access_levels", force: :cascade do |t|
@@ -2475,6 +2483,9 @@ ActiveRecord::Schema.define(version: 20180831152625) do
     t.integer "label_id"
     t.integer "user_id"
     t.datetime_with_timezone "created_at", null: false
+    t.integer "cached_markdown_version"
+    t.text "reference"
+    t.text "reference_html"
   end
 
   add_index "resource_label_events", ["epic_id"], name: "index_resource_label_events_on_epic_id", using: :btree
@@ -2881,6 +2892,7 @@ ActiveRecord::Schema.define(version: 20180831152625) do
     t.string "feed_token"
     t.boolean "private_profile"
     t.integer "roadmap_layout", limit: 2
+    t.boolean "include_private_contributions"
   end
 
   add_index "users", ["admin"], name: "index_users_on_admin", using: :btree
@@ -2974,6 +2986,7 @@ ActiveRecord::Schema.define(version: 20180831152625) do
 
   add_foreign_key "application_settings", "namespaces", column: "custom_project_templates_group_id", on_delete: :nullify
   add_foreign_key "application_settings", "projects", column: "file_template_project_id", name: "fk_ec757bd087", on_delete: :nullify
+  add_foreign_key "application_settings", "users", column: "usage_stats_set_by_user_id", name: "fk_964370041d", on_delete: :nullify
   add_foreign_key "approvals", "merge_requests", name: "fk_310d714958", on_delete: :cascade
   add_foreign_key "approver_groups", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "badges", "namespaces", column: "group_id", on_delete: :cascade
@@ -3096,6 +3109,7 @@ ActiveRecord::Schema.define(version: 20180831152625) do
   add_foreign_key "issues", "users", column: "author_id", name: "fk_05f1e72feb", on_delete: :nullify
   add_foreign_key "issues", "users", column: "closed_by_id", name: "fk_c63cbf6c25", on_delete: :nullify
   add_foreign_key "issues", "users", column: "updated_by_id", name: "fk_ffed080f01", on_delete: :nullify
+  add_foreign_key "label_links", "labels", name: "fk_d97dd08678", on_delete: :cascade
   add_foreign_key "label_priorities", "labels", on_delete: :cascade
   add_foreign_key "label_priorities", "projects", on_delete: :cascade
   add_foreign_key "labels", "namespaces", column: "group_id", on_delete: :cascade
