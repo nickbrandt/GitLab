@@ -286,7 +286,7 @@
     right: $gl-padding-8;
     top: $gl-padding-8;
     cursor: pointer;
-    color: $blue-300;
+    color: $blue-500;
     z-index: 1;
     border: 0;
     background-color: transparent;
@@ -296,7 +296,7 @@
     &:hover,
     &:focus {
       border: 0;
-      color: $blue-400;
+      color: $blue-700;
     }
   }
 
