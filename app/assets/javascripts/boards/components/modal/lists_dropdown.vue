@@ -38,7 +38,7 @@ export default {
       </span>
       {{ selected.title }}
       <icon
-        name="angle-down"
+        name="chevron-down"
       />
     </button>
     <div class="dropdown-menu dropdown-menu-selectable dropdown-menu-drop-up">
