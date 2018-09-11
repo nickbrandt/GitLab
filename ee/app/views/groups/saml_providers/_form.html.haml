@@ -26,5 +26,5 @@
 
     .form-actions
       = f.submit _("Save changes"), class: 'btn btn-success qa-save-changes-button'
-      #js-saml-test-button.pull-right
+      #js-saml-test-button.has-tooltip.pull-right
         = render 'test_button', saml_provider: @saml_provider

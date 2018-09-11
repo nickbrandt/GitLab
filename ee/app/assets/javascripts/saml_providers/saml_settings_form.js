@@ -5,7 +5,8 @@ export default class SamlSettingsForm {
   constructor(formSelector) {
     this.form = document.querySelector(formSelector);
     this.enabledToggle = this.form.querySelector('#saml_provider_enabled');
-    this.testButton = this.form.querySelector('#js-saml-test-button a');
+    this.testButtonTooltipWrapper = this.form.querySelector('#js-saml-test-button');
+    this.testButton = this.testButtonTooltipWrapper.querySelector('a');
     this.dirtyFormChecker = new DirtyFormChecker(formSelector, () => this.updateView());
   }
 
@@ -26,11 +27,27 @@ export default class SamlSettingsForm {
     this.enabled = this.enabledToggle.checked;
   }
 
+  testButtonTooltip() {
+    if (!this.enabled) {
+      return 'Group SAML must be enabled to test';
+    }
+
+    if (this.dirtyFormChecker.isDirty) {
+      return 'Save changes before testing';
+    }
+
+    return 'Redirect to SAML provider to test configuration';
+  }
+
   updateView() {
     if (this.enabled && !this.dirtyFormChecker.isDirty) {
       this.testButton.removeAttribute('disabled');
     } else {
       this.testButton.setAttribute('disabled', true);
     }
+
+    // Update tooltip using wrapper so it works when input disabled
+    this.testButtonTooltipWrapper.setAttribute('title', this.testButtonTooltip());
+    $(this.testButtonTooltipWrapper).tooltip('_fixTitle');
   }
 }
