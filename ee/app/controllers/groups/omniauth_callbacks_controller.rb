@@ -28,6 +28,13 @@ class Groups::OmniauthCallbacksController < OmniauthCallbacksController
     redirect_to after_sign_in_path_for(current_user)
   end
 
+  override :redirect_identity_link_failed
+  def redirect_identity_link_failed(error_message)
+    flash[:notice] = "SAML authentication failed: #{error_message}"
+
+    redirect_to after_sign_in_path_for(current_user)
+  end
+
   override :after_sign_in_path_for
   def after_sign_in_path_for(resource)
     saml_redirect_path || super
