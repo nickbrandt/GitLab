@@ -9134,6 +9134,9 @@ msgstr ""
 msgid "to help your contributors communicate effectively!"
 msgstr ""
 
+msgid "toggle collapse"
+msgstr ""
+
 msgid "username"
 msgstr ""
 

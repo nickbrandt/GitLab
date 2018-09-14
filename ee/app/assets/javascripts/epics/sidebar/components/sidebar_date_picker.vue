@@ -8,6 +8,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 import DatePicker from '~/vue_shared/components/pikaday.vue';
 import LoadingIcon from '~/vue_shared/components/loading_icon.vue';
 import CollapsedCalendarIcon from '~/vue_shared/components/sidebar/collapsed_calendar_icon.vue';
+import ToggleSidebar from '~/vue_shared/components/sidebar/toggle_sidebar.vue';
 
 const label = __('Date picker');
 const pickerLabel = __('Fixed date');
@@ -22,6 +23,7 @@ export default {
     DatePicker,
     LoadingIcon,
     CollapsedCalendarIcon,
+    ToggleSidebar,
   },
   props: {
     blockClass: {
@@ -33,6 +35,11 @@ export default {
       type: Boolean,
       required: false,
       default: true,
+    },
+    showToggleSidebar: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
     isLoading: {
       type: Boolean,
@@ -161,6 +168,9 @@ export default {
     toggleDateType(dateTypeFixed) {
       this.$emit('toggleDateType', dateTypeFixed);
     },
+    toggleSidebar() {
+      this.$emit('toggleCollapse');
+    },
   },
 };
 </script>
@@ -195,6 +205,11 @@ export default {
         >
           {{ __('Edit') }}
         </button>
+        <toggle-sidebar
+          v-if="showToggleSidebar"
+          :collapsed="collapsed"
+          @toggle="toggleSidebar"
+        />
       </div>
     </div>
     <div class="value">
