@@ -47,8 +47,10 @@ module Geo
 
     # Update the default branch querying the remote to determine its HEAD
     def update_root_ref
-      root_ref = repository.find_remote_root_ref(GEO_REMOTE_NAME)
-      project.change_head(root_ref) if root_ref.present? && root_ref != project.default_branch
+      # Find the remote root ref, using a JWT header for authentication
+      repository.with_config(jwt_authentication_header) do
+        project.update_root_ref(GEO_REMOTE_NAME)
+      end
     end
 
     def schedule_repack
