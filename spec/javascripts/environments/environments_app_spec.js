@@ -113,7 +113,7 @@ describe('Environment', () => {
       describe('deploy boards', () => {
         it('should render arrow to open deploy boards', (done) => {
           setTimeout(() => {
-            expect(component.$el.querySelector('.deploy-board-icon.ic-chevron-right')).not.toBeNull();
+            expect(component.$el.querySelector('.deploy-board-icon.ic-chevron-right')).toBeDefined();
             done();
           }, 0);
         });
