@@ -87,7 +87,7 @@ describe GithubService::StatusMessage do
       end
 
       specify 'context' do
-        expect(subject.context).to eq "ci/gitlab/#{pipeline.ref}"
+        expect(subject.context).to eq "ci/gitlab"
       end
 
       context 'blocked pipeline' do

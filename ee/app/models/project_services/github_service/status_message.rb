@@ -14,7 +14,7 @@ class GithubService
     end
 
     def context
-      "ci/gitlab/#{@ref_name}".truncate(255)
+      "ci/gitlab"
     end
 
     def description
