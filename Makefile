@@ -9,6 +9,7 @@ COVERAGE_DIR := $(TARGET_DIR)/cover
 VERSION := $(shell git describe)-$(shell date -u +%Y%m%d.%H%M%S)
 GOBUILD := go build -ldflags "-X main.Version=$(VERSION)"
 EXE_ALL := gitlab-zip-cat gitlab-zip-metadata gitlab-workhorse
+INSTALL := install
 
 MINIMUM_SUPPORTED_GO_VERSION := 1.8
 
@@ -57,7 +58,7 @@ gitlab-workhorse:	$(TARGET_SETUP) $(shell find . -name '*.go' | grep -v '^\./_')
 install:	gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata
 	$(call message,$@)
 	mkdir -p $(DESTDIR)$(PREFIX)/bin/
-	cd $(BUILD_DIR) && install gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata $(DESTDIR)$(PREFIX)/bin/
+	cd $(BUILD_DIR) && $(INSTALL) gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata $(DESTDIR)$(PREFIX)/bin/
 
 .PHONY:	test
 test: $(TARGET_SETUP) prepare-tests
