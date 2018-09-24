@@ -7,6 +7,7 @@ class MergeRequest < ActiveRecord::Base
   include Noteable
   include Referable
   include Elastic::MergeRequestsSearch
+  include Presentable
   include IgnorableColumn
   include TimeTrackable
   include ManualInverseAssociation
