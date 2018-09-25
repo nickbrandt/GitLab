@@ -1,4 +1,6 @@
 class ProjectPresenter < Gitlab::View::Presenter::Delegated
+  prepend EE::ProjectPresenter
+
   include ActionView::Helpers::NumberHelper
   include ActionView::Helpers::UrlHelper
   include GitlabRoutingHelper
