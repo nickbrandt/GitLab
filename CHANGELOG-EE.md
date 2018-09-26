@@ -1,5 +1,13 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.2.4 (2018-09-26)
+
+### Security (2 changes)
+
+- Project groups approvers no longer leak private groups info.
+- Protect against CSRF attacks when adding Slack app.
+
+
 ## 11.2.3 (2018-08-28)
 
 - No changes.
