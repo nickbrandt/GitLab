@@ -3,56 +3,67 @@ require 'spec_helper'
 describe TemplateFinder do
   using RSpec::Parameterized::TableSyntax
 
-  files = {
-    'Dockerfile/custom_dockerfile.dockerfile' => 'Custom Dockerfile',
-    'gitignore/custom_gitignore.gitignore'    => 'Custom .gitignore',
-    'gitlab-ci/custom_gitlab_ci.yml'          => 'Custom gitlab-ci.yml'
-  }
+  set(:project) { create(:project) }
 
-  set(:project) { create(:project, :custom_repo, files: files) }
+  let(:params) { {} }
+
+  let(:fake_template_source) { double(::Gitlab::CustomFileTemplates) }
+  let(:custom_template) { OpenStruct.new(key: 'foo', name: 'foo', category: nil, content: 'Template') }
+  let(:custom_templates) { [custom_template] }
+
+  subject(:finder) { described_class.build(type, project, params) }
 
   describe '#execute' do
-    before do
-      stub_licensed_features(custom_file_templates: true)
-      stub_ee_application_setting(file_template_project: project)
-    end
-
-    where(:type, :custom_name, :vendored_name) do
-      :dockerfiles    | 'custom_dockerfile' | 'Binary'
-      :gitignores     | 'custom_gitignore'  | 'Actionscript'
-      :gitlab_ci_ymls | 'custom_gitlab_ci'  | 'Android'
+    where(:type, :expected_template_finder) do
+      :dockerfiles    | ::Gitlab::Template::CustomDockerfileTemplate
+      :gitignores     | ::Gitlab::Template::CustomGitignoreTemplate
+      :gitlab_ci_ymls | ::Gitlab::Template::CustomGitlabCiYmlTemplate
     end
 
     with_them do
-      subject(:result) { described_class.new(type, nil, params).execute }
+      subject(:result) { finder.execute }
 
-      context 'specifying name' do
-        let(:params) { { name: custom_name } }
+      before do
+        expect(Gitlab::CustomFileTemplates)
+          .to receive(:new)
+          .with(expected_template_finder, project)
+          .and_return(fake_template_source)
 
-        it { is_expected.to have_attributes(name: custom_name) }
+        allow(fake_template_source)
+          .to receive(:find)
+          .with(custom_template.key)
+          .and_return(custom_template)
 
-        context 'feature is disabled' do
-          before do
-            stub_licensed_features(custom_file_templates: false)
+        allow(fake_template_source)
+          .to receive(:all)
+          .and_return(custom_templates)
+      end
+
+      context 'custom templates enabled' do
+        before do
+          allow(fake_template_source).to receive(:enabled?).and_return(true)
+        end
+
+        it 'returns custom templates' do
+          is_expected.to include(custom_template)
+        end
+
+        context 'a custom template is specified by name' do
+          let(:params) { { name: custom_template.key } }
+
+          it 'returns the custom template if its name is specified' do
+            is_expected.to eq(custom_template)
           end
-
-          it { is_expected.to be_nil }
         end
       end
 
-      context 'not specifying name' do
-        let(:params) { {} }
+      context 'custom templates disabled' do
+        before do
+          allow(fake_template_source).to receive(:enabled?).and_return(false)
+        end
 
-        it { is_expected.to include(have_attributes(name: custom_name)) }
-        it { is_expected.to include(have_attributes(name: vendored_name)) }
-
-        context 'feature is disabled' do
-          before do
-            stub_licensed_features(custom_file_templates: false)
-          end
-
-          it { is_expected.not_to include(have_attributes(name: custom_name)) }
-          it { is_expected.to include(have_attributes(name: vendored_name)) }
+        it 'does not return any custom templates' do
+          is_expected.not_to include(custom_template)
         end
       end
     end

@@ -569,4 +569,31 @@ describe Namespace do
       end
     end
   end
+
+  describe '#file_template_project_id' do
+    it 'is cleared before validation' do
+      project = create(:project, namespace: namespace)
+
+      namespace.file_template_project_id = project.id
+
+      expect(namespace).to be_valid
+      expect(namespace.file_template_project_id).to be_nil
+    end
+  end
+
+  describe '#checked_file_template_project' do
+    it 'is always nil' do
+      namespace.file_template_project_id = create(:project, namespace: namespace).id
+
+      expect(namespace.checked_file_template_project).to be_nil
+    end
+  end
+
+  describe '#checked_file_template_project_id' do
+    it 'is always nil' do
+      namespace.file_template_project_id = create(:project, namespace: namespace).id
+
+      expect(namespace.checked_file_template_project_id).to be_nil
+    end
+  end
 end

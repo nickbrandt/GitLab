@@ -35,10 +35,16 @@ module EE
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         to: :namespace_statistics, allow_nil: true
 
+      # Opportunistically clear the +file_template_project_id+ if invalid
+      before_validation :clear_file_template_project_id
+
       validate :validate_plan_name
       validate :validate_shared_runner_minutes_support
 
       before_create :sync_membership_lock_with_parent
+
+      # Changing the plan or other details may invalidate this cache
+      before_save :clear_feature_available_cache
     end
 
     class_methods do
@@ -200,6 +206,15 @@ module EE
         actual_plan_name == FREE_PLAN
     end
 
+    # A namespace may not have a file template project
+    def checked_file_template_project
+      nil
+    end
+
+    def checked_file_template_project_id
+      checked_file_template_project&.id
+    end
+
     private
 
     def validate_plan_name
@@ -216,6 +231,10 @@ module EE
       end
     end
 
+    def clear_feature_available_cache
+      clear_memoization(:feature_available)
+    end
+
     def load_feature_available(feature)
       globally_available = License.feature_available?(feature)
 
@@ -224,6 +243,13 @@ module EE
       else
         globally_available
       end
+    end
+
+    def clear_file_template_project_id
+      return unless has_attribute?(:file_template_project_id)
+      return if checked_file_template_project_id.present?
+
+      self.file_template_project_id = nil
     end
   end
 end

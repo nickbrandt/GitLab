@@ -165,17 +165,24 @@ module API
         optional :name, type: String, desc: 'The name of the group'
         optional :path, type: String, desc: 'The path of the group'
         use :optional_params
+
+        # EE
+        optional :file_template_project_id, type: Integer, desc: 'The ID of a project to use for custom templates in this group'
       end
       put ':id' do
         group = find_group!(params[:id])
         authorize! :admin_group, group
 
-        # EE
+        # Begin EE-specific block
         if params[:shared_runners_minutes_limit].present? &&
             group.shared_runners_minutes_limit.to_i !=
                 params[:shared_runners_minutes_limit].to_i
           authenticated_as_admin!
         end
+
+        params.delete(:file_template_project_id) unless
+          group.feature_available?(:custom_file_templates_for_namespace)
+        # End EE-specific block
 
         if ::Groups::UpdateService.new(group, current_user, declared_params(include_missing: false)).execute
           present group, with: Entities::GroupDetail, current_user: current_user
