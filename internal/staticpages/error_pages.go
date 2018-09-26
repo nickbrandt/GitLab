@@ -53,7 +53,9 @@ func (s *errorPageResponseWriter) WriteHeader(status int) {
 
 	s.status = status
 
-	if 400 <= s.status && s.status <= 599 {
+	if 400 <= s.status && s.status <= 599 &&
+		s.rw.Header().Get("X-GitLab-Custom-Error") == "" &&
+		s.rw.Header().Get("Content-Type") != "application/json" {
 		errorPageFile := filepath.Join(s.path, fmt.Sprintf("%d.html", s.status))
 
 		// check if custom error page exists, serve this page instead
