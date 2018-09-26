@@ -83,7 +83,7 @@ describe Gitlab::Auth::LDAP::Access do
           stub_ldap_person_find_by_dn(entry, provider)
         end
 
-        it 'triggers a sync for all groups found in `memberof`' do
+        it 'triggers a sync for all groups found in `memberof` for new users' do
           group_link_1 = create(:ldap_group_link, cn: 'Group1', provider: provider)
           group_link_2 = create(:ldap_group_link, cn: 'Group2', provider: provider)
           group_ids = [group_link_1, group_link_2].map(&:group_id)
@@ -109,6 +109,17 @@ describe Gitlab::Auth::LDAP::Access do
                                      cn: 'Group1',
                                      provider: 'not-this-ldap')
 
+          expect(LdapGroupSyncWorker).not_to receive(:perform_async)
+
+          access.update_user
+        end
+
+        it 'does not performs the membership update for existing users' do
+          user.created_at = Time.now - 10.minutes
+          user.last_credential_check_at = Time.now
+          user.save
+
+          expect(LdapGroupLink).not_to receive(:where)
           expect(LdapGroupSyncWorker).not_to receive(:perform_async)
 
           access.update_user

@@ -120,6 +120,10 @@ module EE
           def update_memberships
             return if ldap_user.nil? || ldap_user.group_cns.empty?
 
+            # Only update membership for new users. After this, regular
+            # LDAP group sync will take care of things.
+            return unless user.created_at > 5.minutes.ago && !user.last_credential_check_at
+
             group_ids = ::LdapGroupLink.where(cn: ldap_user.group_cns, provider: provider)
                           .distinct(:group_id)
                           .pluck(:group_id)
