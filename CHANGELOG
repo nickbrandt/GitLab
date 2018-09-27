@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 6.1.1
+
+- Allow custom error messages to pass through to Rails !300
+
 v 6.1.0
 
 - Support adding PUT headers for object storage from Rails !297
