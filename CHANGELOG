@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 7.0.0
+
+- Use the new Gitaly auth scheme (v2) !298
+
 v 6.1.1
 
 - Allow custom error messages to pass through to Rails !300
