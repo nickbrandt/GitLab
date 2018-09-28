@@ -61,8 +61,6 @@ module QA
       def configure_identity(name, email)
         run(%Q{git config user.name #{name}})
         run(%Q{git config user.email #{email}})
-
-        add_credentials_to_netrc
       end
 
       def commit_file(name, contents, message)
