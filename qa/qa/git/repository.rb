@@ -3,14 +3,22 @@
 require 'cgi'
 require 'uri'
 require 'open3'
+require 'fileutils'
+require 'tmpdir'
 
 module QA
   module Git
     class Repository
       include Scenario::Actable
 
+      attr_writer :password
+      attr_accessor :env_vars
+
       def initialize
-        @ssh_cmd = ""
+        # We set HOME to the current working directory (which is a
+        # temporary directory created in .perform()) so the temporarily dropped
+        # .netrc can be utilised
+        self.env_vars = [%Q{HOME="#{File.dirname(netrc_file_path)}"}]
       end
 
       def self.perform(*args)
@@ -23,14 +31,9 @@ module QA
         @uri = URI(address)
       end
 
-      def username=(name)
-        @username = name
-        uri.user = name
-      end
-
-      def password=(pass)
-        @password = pass
-        uri.password = CGI.escape(pass).gsub('+', '%20')
+      def username=(username)
+        @username = username
+        @uri.user = username
       end
 
       def use_default_credentials
@@ -41,10 +44,12 @@ module QA
           self.username = Runtime::User.username
           self.password = Runtime::User.password
         end
+
+        add_credentials_to_netrc unless ssh_key_set?
       end
 
       def clone(opts = '')
-        run_and_redact_credentials(build_git_command("git clone #{opts} #{uri} ./"))
+        run("git clone #{opts} #{uri} ./")
       end
 
       def checkout(branch_name)
@@ -60,12 +65,10 @@ module QA
       end
 
       def configure_identity(name, email)
-        `git config user.name #{name}`
-        `git config user.email #{email}`
-      end
+        run(%Q{git config user.name #{name}})
+        run(%Q{git config user.email #{email}})
 
-      def configure_ssh_command(command)
-        @ssh_cmd = "GIT_SSH_COMMAND='#{command}'"
+        add_credentials_to_netrc
       end
 
       def commit_file(name, contents, message)
@@ -84,9 +87,7 @@ module QA
       end
 
       def push_changes(branch = 'master')
-        output, _ = run_and_redact_credentials(build_git_command("git push #{uri} #{branch}"))
-
-        output
+        run("git push #{uri} #{branch}")
       end
 
       def commits
@@ -104,28 +105,69 @@ module QA
         keyscan_params << uri.host
         run_and_redact_credentials("ssh-keyscan #{keyscan_params.join(' ')} >> #{known_hosts_file.path}")
 
-        configure_ssh_command("ssh -i #{private_key_file.path} -o UserKnownHostsFile=#{known_hosts_file.path}")
+        self.env_vars << %Q{GIT_SSH_COMMAND="ssh -i #{private_key_file.path} -o UserKnownHostsFile=#{known_hosts_file.path}"}
       end
 
       def delete_ssh_key
-        return unless private_key_file
+        return unless ssh_key_set?
 
         private_key_file.close(true)
         known_hosts_file.close(true)
       end
 
-      def build_git_command(command_str)
-        [ssh_cmd, command_str].compact.join(' ')
-      end
-
       private
 
-      attr_reader :uri, :username, :password, :ssh_cmd, :known_hosts_file, :private_key_file
+      attr_reader :uri, :username, :password, :known_hosts_file, :private_key_file
 
-      # Since the remote URL contains the credentials, and git occasionally
-      # outputs the URL. Note that stderr is redirected to stdout.
-      def run_and_redact_credentials(command)
-        Open3.capture2("#{command} 2>&1 | sed -E 's#://[^@]+@#://****@#g'")
+      def debug?
+        Runtime::Env.respond_to?(:verbose?) && Runtime::Env.verbose?
+      end
+
+      def ssh_key_set?
+        !private_key_file.nil?
+      end
+
+      def run(command_str)
+        command = [env_vars, command_str, '2>&1'].compact.join(' ')
+        warn "DEBUG: command=[#{command}]" if debug?
+
+        output, _ = Open3.capture2(command)
+        output = output.chomp.gsub(/\s+$/, '')
+        warn "DEBUG: output=[#{output}]" if debug?
+
+        output
+      end
+
+      def tmp_netrc_directory
+        @tmp_netrc_directory ||= File.join(Dir.tmpdir, "qa-netrc-credentials", $$.to_s)
+      end
+
+      def netrc_file_path
+        @netrc_file_path ||= File.join(tmp_netrc_directory, '.netrc')
+      end
+
+      def netrc_content
+        "machine #{uri.host} login #{username} password #{password}"
+      end
+
+      def netrc_already_contains_content?
+        File.exist?(netrc_file_path) &&
+          File.readlines(netrc_file_path).grep(/^#{netrc_content}$/).any?
+      end
+
+      def add_credentials_to_netrc
+        # Despite libcurl supporting a custom .netrc location through the
+        # CURLOPT_NETRC_FILE environment variable, git does not support it :(
+        # Info: https://curl.haxx.se/libcurl/c/CURLOPT_NETRC_FILE.html
+        #
+        # This will create a .netrc in the correct working directory, which is
+        # a temporary directory created in .perform()
+        #
+        return if netrc_already_contains_content?
+
+        FileUtils.mkdir_p(tmp_netrc_directory)
+        File.open(netrc_file_path, 'a') { |file| file.puts(netrc_content) }
+        File.chmod(0600, netrc_file_path)
       end
     end
   end
