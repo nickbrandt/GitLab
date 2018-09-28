@@ -23,12 +23,12 @@ module QA
 
       def username=(name)
         @username = name
-        @uri.user = name
+        uri.user = name
       end
 
       def password=(pass)
         @password = pass
-        @uri.password = CGI.escape(pass).gsub('+', '%20')
+        uri.password = CGI.escape(pass).gsub('+', '%20')
       end
 
       def use_default_credentials
@@ -42,7 +42,7 @@ module QA
       end
 
       def clone(opts = '')
-        run_and_redact_credentials(build_git_command("git clone #{opts} #{@uri} ./"))
+        run_and_redact_credentials(build_git_command("git clone #{opts} #{uri} ./"))
       end
 
       def checkout(branch_name)
@@ -82,7 +82,7 @@ module QA
       end
 
       def push_changes(branch = 'master')
-        output, _ = run_and_redact_credentials(build_git_command("git push #{@uri} #{branch}"))
+        output, _ = run_and_redact_credentials(build_git_command("git push #{uri} #{branch}"))
 
         output
       end
@@ -93,30 +93,32 @@ module QA
 
       def use_ssh_key(key)
         @private_key_file = Tempfile.new("id_#{SecureRandom.hex(8)}")
-        File.binwrite(@private_key_file, key.private_key)
-        File.chmod(0700, @private_key_file)
+        File.binwrite(private_key_file, key.private_key)
+        File.chmod(0700, private_key_file)
 
         @known_hosts_file = Tempfile.new("known_hosts_#{SecureRandom.hex(8)}")
         keyscan_params = ['-H']
-        keyscan_params << "-p #{@uri.port}" if @uri.port
-        keyscan_params << @uri.host
-        run_and_redact_credentials("ssh-keyscan #{keyscan_params.join(' ')} >> #{@known_hosts_file.path}")
+        keyscan_params << "-p #{uri.port}" if uri.port
+        keyscan_params << uri.host
+        run_and_redact_credentials("ssh-keyscan #{keyscan_params.join(' ')} >> #{known_hosts_file.path}")
 
-        configure_ssh_command("ssh -i #{@private_key_file.path} -o UserKnownHostsFile=#{@known_hosts_file.path}")
+        configure_ssh_command("ssh -i #{private_key_file.path} -o UserKnownHostsFile=#{known_hosts_file.path}")
       end
 
       def delete_ssh_key
-        return unless @private_key_file
+        return unless private_key_file
 
-        @private_key_file.close(true)
-        @known_hosts_file.close(true)
+        private_key_file.close(true)
+        known_hosts_file.close(true)
       end
 
       def build_git_command(command_str)
-        [@ssh_cmd, command_str].compact.join(' ')
+        [ssh_cmd, command_str].compact.join(' ')
       end
 
       private
+
+      attr_reader :uri, :username, :password, :ssh_cmd, :known_hosts_file, :private_key_file
 
       # Since the remote URL contains the credentials, and git occasionally
       # outputs the URL. Note that stderr is redirected to stdout.
