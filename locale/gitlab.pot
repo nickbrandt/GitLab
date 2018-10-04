@@ -4349,9 +4349,6 @@ msgstr ""
 msgid "Last commit"
 msgstr ""
 
-msgid "Last contact"
-msgstr ""
-
 msgid "Last edited %{date}"
 msgstr ""
 
@@ -9080,9 +9077,6 @@ msgid "mrWidget|into"
 msgstr ""
 
 msgid "mrWidget|to be merged automatically when the pipeline succeeds"
-msgstr ""
-
-msgid "n/a"
 msgstr ""
 
 msgid "new merge request"
