@@ -4,6 +4,7 @@
 class Blob < SimpleDelegator
   prepend EE::Blob
   include Presentable
+  include BlobLanguageFromGitAttributes
 
   CACHE_TIME = 60 # Cache raw blobs referred to by a (mutable) ref for 1 minute
   CACHE_TIME_IMMUTABLE = 3600 # Cache blobs referred to by an immutable reference for 1 hour
@@ -179,13 +180,6 @@ class Blob < SimpleDelegator
     name = File.basename(path)
 
     Gitlab::FileDetector.type_of(path) || Gitlab::FileDetector.type_of(name)
-  end
-
-  def language_from_gitattributes
-    return nil unless project
-
-    repository = project.repository
-    repository.gitattribute(path, 'gitlab-language')
   end
 
   def video?
