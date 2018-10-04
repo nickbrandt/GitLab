@@ -500,12 +500,13 @@ export default {
         {{ s__("Environments|Environment") }}
       </div>
 
-      <icon
+      <span
         v-if="model.hasDeployBoard"
-        :name="deployIconName"
         class="deploy-board-icon"
         @click="toggleDeployBoard"
-      />
+      >
+        <icon :name="deployIconName" />
+      </span>
 
       <span
         v-if="!model.isFolder"
