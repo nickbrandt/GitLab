@@ -84,15 +84,13 @@
 </script>
 
 <template>
-  <div>
-    <div class="center append-right-default">
-      <h1>GitLab for Slack</h1>
-      <p>Track your GitLab projects with GitLab for Slack.</p>
-    </div>
+  <div class="text-center">
+    <h1>GitLab for Slack</h1>
+    <p>Track your GitLab projects with GitLab for Slack.</p>
 
     <div
       v-once
-      class="append-bottom-20 center"
+      class="prepend-top-20 append-bottom-20"
     >
       <img
         :src="gitlabLogoPath"
@@ -111,7 +109,7 @@
 
     <button
       type="button"
-      class="btn btn-red mx-auto js-popup-button"
+      class="btn btn-red mx-auto js-popup-button prepend-top-default"
       @click="togglePopup"
     >
       Add GitLab to Slack
@@ -129,8 +127,7 @@
 
         <select
           v-model="selectedProjectId"
-          class="gitlab-slack-project-select
-js-project-select form-control prepend-top-10 append-bottom-10"
+          class="js-project-select form-control prepend-top-10 append-bottom-10"
         >
           <option
             v-for="project in projects"
@@ -178,9 +175,9 @@ js-project-select form-control prepend-top-10 append-bottom-10"
 
     <div
       v-once
-      class="gitlab-slack-example"
+      class="text-center"
     >
-      <h3 class="center">How it works</h3>
+      <h3>How it works</h3>
 
       <div class="well gitlab-slack-well mx-auto">
         <code
@@ -195,13 +192,16 @@ js-project-select form-control prepend-top-10 append-bottom-10"
           Shows the issue with id
           <strong>&lt;id&gt;</strong>
         </span>
+
+        <div class="prepend-top-default">
+          <a
+            :href="docsPath"
+          >
+            More Slack commands
+          </a>
+        </div>
       </div>
 
-      <div class="center">
-        <a :href="docsPath">
-          More Slack commands
-        </a>
-      </div>
     </div>
   </div>
 </template>
