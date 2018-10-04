@@ -88,6 +88,27 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     where(project: Geo::Fdw::Project.search(query))
   end
 
+  def self.flag_repositories_for_resync!
+    update_all(
+      resync_repository: true,
+      repository_verification_checksum_sha: nil,
+      repository_checksum_mismatch: false,
+      last_repository_verification_failure: nil,
+      repository_verification_retry_count: nil,
+      resync_repository_was_scheduled_at: Time.now,
+      repository_retry_count: nil,
+      repository_retry_at: nil
+    )
+  end
+
+  def self.flag_repositories_for_recheck!
+    update_all(
+      repository_verification_checksum_sha: nil,
+      last_repository_verification_failure: nil,
+      repository_checksum_mismatch: false
+    )
+  end
+
   # Must be run before fetching the repository to avoid a race condition
   #
   # @param [String] type must be one of the values in TYPES
