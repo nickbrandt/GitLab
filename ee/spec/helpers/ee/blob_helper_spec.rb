@@ -4,14 +4,14 @@ describe BlobHelper do
   include TreeHelper
 
   describe '#licenses_for_select' do
-    subject(:result) { helper.licenses_for_select }
-
     let(:categories) { result.keys }
     let(:custom) { result[:Custom] }
     let(:popular) { result[:Popular] }
     let(:other) { result[:Other] }
 
     let(:project) { create(:project) }
+
+    subject(:result) { helper.licenses_for_select(project) }
 
     it 'returns Custom licenses when enabled' do
       stub_licensed_features(custom_file_templates: true)
