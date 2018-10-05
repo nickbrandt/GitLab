@@ -34,18 +34,6 @@ module OmniAuth
       def self.callback?(env)
         env['PATH_INFO'] =~ Gitlab::PathRegex.saml_callback_regex
       end
-
-      def mock_redirect_relay_state
-        setup_phase
-
-        redirect(request.params[relay_state_key])
-      end
-
-      private
-
-      def relay_state_key
-        options[:idp_sso_target_url_runtime_params].key(:RelayState) || 'RelayState'
-      end
     end
   end
 end

@@ -92,18 +92,6 @@ describe 'SAML provider settings' do
 
         expect(current_path).to eq callback_path
       end
-
-      it 'sets RelayState to redirect back to settings page' do
-        visit group_saml_providers_path(group)
-
-        allow_any_instance_of(OmniAuth::Strategies::GroupSaml).to receive(:mock_request_call) do |group_saml_strategy|
-          group_saml_strategy.mock_redirect_relay_state
-        end
-
-        test_sso
-
-        expect(current_path).to eq group_saml_providers_path(group)
-      end
     end
   end
 
