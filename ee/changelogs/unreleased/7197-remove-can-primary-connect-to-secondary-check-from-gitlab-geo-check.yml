@@ -1,0 +1,6 @@
+---
+title: 'Geo: Remove connectivity check from primary to secondary from gitlab:geo:check
+  rake task'
+merge_request: 7821
+author:
+type: fixed
