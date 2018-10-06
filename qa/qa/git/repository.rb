@@ -53,11 +53,11 @@ module QA
       end
 
       def checkout(branch_name)
-        `git checkout "#{branch_name}"`
+        run(%Q{git checkout "#{branch_name}"})
       end
 
       def checkout_new_branch(branch_name)
-        `git checkout -b "#{branch_name}"`
+        run(%Q{git checkout -b "#{branch_name}"})
       end
 
       def shallow_clone
@@ -79,11 +79,11 @@ module QA
       def add_file(name, contents)
         ::File.write(name, contents)
 
-        `git add #{name}`
+        run(%Q{git add #{name}})
       end
 
       def commit(message)
-        `git commit -m "#{message}"`
+        run(%Q{git commit -m "#{message}"})
       end
 
       def push_changes(branch = 'master')
@@ -91,7 +91,7 @@ module QA
       end
 
       def commits
-        `git log --oneline`.split("\n")
+        run('git log --oneline').split("\n")
       end
 
       def use_ssh_key(key)
@@ -103,7 +103,7 @@ module QA
         keyscan_params = ['-H']
         keyscan_params << "-p #{uri.port}" if uri.port
         keyscan_params << uri.host
-        run_and_redact_credentials("ssh-keyscan #{keyscan_params.join(' ')} >> #{known_hosts_file.path}")
+        run("ssh-keyscan #{keyscan_params.join(' ')} >> #{known_hosts_file.path}")
 
         self.env_vars << %Q{GIT_SSH_COMMAND="ssh -i #{private_key_file.path} -o UserKnownHostsFile=#{known_hosts_file.path}"}
       end
