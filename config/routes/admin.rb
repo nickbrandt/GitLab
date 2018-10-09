@@ -76,9 +76,7 @@ namespace :admin do
   end
 
   resource :logs, only: [:show]
-  resource :health_check, controller: 'health_check', only: [:show] do
-    post :reset_storage_health
-  end
+  resource :health_check, controller: 'health_check', only: [:show]
   resource :background_jobs, controller: 'background_jobs', only: [:show]
 
   ## EE-specific
