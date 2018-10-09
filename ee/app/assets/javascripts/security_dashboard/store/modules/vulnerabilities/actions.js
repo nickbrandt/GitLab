@@ -2,6 +2,14 @@ import axios from '~/lib/utils/axios_utils';
 import * as types from './mutation_types';
 import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
 
+export const setVulnerabilitiesEndpoint = ({ commit }, endpoint) => {
+  commit(types.SET_VULNERABILITIES_ENDPOINT, endpoint);
+};
+
+export const setVulnerabilitiesCountEndpoint = ({ commit }, endpoint) => {
+  commit(types.SET_VULNERABILITIES_COUNT_ENDPOINT, endpoint);
+};
+
 export const fetchVulnerabilitiesCount = ({ state, dispatch }) => {
   dispatch('requestVulnerabilitiesCount');
 
