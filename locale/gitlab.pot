@@ -102,11 +102,6 @@ msgid_plural "%d unstaged changes"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "%d vulnerability"
-msgid_plural "%d vulnerabilities"
-msgstr[0] ""
-msgstr[1] ""
-
 msgid "%s additional commit has been omitted to prevent performance issues."
 msgid_plural "%s additional commits have been omitted to prevent performance issues."
 msgstr[0] ""
@@ -9009,25 +9004,16 @@ msgstr ""
 msgid "ciReport|Container scanning"
 msgstr ""
 
-msgid "ciReport|Container scanning detected"
-msgstr ""
-
 msgid "ciReport|Container scanning detects known vulnerabilities in your docker images."
 msgstr ""
 
 msgid "ciReport|DAST"
 msgstr ""
 
-msgid "ciReport|DAST detected"
-msgstr ""
-
 msgid "ciReport|Dependency Scanning detects known vulnerabilities in your source code's dependencies."
 msgstr ""
 
 msgid "ciReport|Dependency scanning"
-msgstr ""
-
-msgid "ciReport|Dependency scanning detected"
 msgstr ""
 
 msgid "ciReport|Description"
@@ -9106,9 +9092,6 @@ msgstr ""
 msgid "ciReport|SAST"
 msgstr ""
 
-msgid "ciReport|SAST detected"
-msgstr ""
-
 msgid "ciReport|Security scanning"
 msgstr ""
 
@@ -9154,9 +9137,6 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "ciReport|View full report"
-msgstr ""
-
-msgid "ciReport|no vulnerabilities"
 msgstr ""
 
 msgid "ciReport|on pipeline"
