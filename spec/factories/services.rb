@@ -57,12 +57,6 @@ FactoryBot.define do
     )
   end
 
-  factory :hipchat_service do
-    project
-    type 'HipchatService'
-    token 'test_token'
-  end
-
   factory :gitlab_slack_application_service do
     project
     active true
