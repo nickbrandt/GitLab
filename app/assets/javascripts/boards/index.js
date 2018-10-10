@@ -16,6 +16,7 @@ import boardsStore from './stores/boards_store';
 import ModalStore from './stores/modal_store';
 import modalMixin from './mixins/modal_mixins';
 import './filters/due_date_filters';
+<<<<<<< HEAD
 import Board from 'ee/boards/components/board';
 import BoardSidebar from 'ee/boards/components/board_sidebar';
 import initNewListDropdown from './components/new_list_dropdown';
@@ -32,11 +33,23 @@ import collapseIcon from 'ee/boards/icons/fullscreen_collapse.svg';
 import expandIcon from 'ee/boards/icons/fullscreen_expand.svg';
 import tooltip from '~/vue_shared/directives/tooltip';
 
+=======
+import Board from './components/board';
+import BoardSidebar from './components/board_sidebar';
+import initNewListDropdown from './components/new_list_dropdown';
+import BoardAddIssuesModal from './components/modal/index.vue';
+import '~/vue_shared/vue_resource_interceptor';
+import { NavigationType } from '~/lib/utils/common_utils';
+
+>>>>>>> upstream/master
 let issueBoardsApp;
 
 export default () => {
   const $boardApp = document.getElementById('board-app');
+<<<<<<< HEAD
   const issueBoardsContent = document.querySelector('.content-wrapper > .js-focus-mode-board');
+=======
+>>>>>>> upstream/master
 
   // check for browser back and trigger a hard reload to circumvent browser caching.
   window.addEventListener('pageshow', (event) => {
@@ -121,7 +134,10 @@ export default () => {
           this.state.lists = _.sortBy(this.state.lists, 'position');
 
           boardsStore.addBlankState();
+<<<<<<< HEAD
           boardsStore.addPromotionState();
+=======
+>>>>>>> upstream/master
           this.loading = false;
         })
         .catch(() => {
@@ -187,7 +203,10 @@ export default () => {
     el: document.getElementById('js-add-list'),
     data: {
       filters: boardsStore.state.filters,
+<<<<<<< HEAD
       milestoneTitle: $boardApp.dataset.boardMilestoneTitle,
+=======
+>>>>>>> upstream/master
     },
     mounted() {
       initNewListDropdown();
@@ -248,8 +267,11 @@ export default () => {
         return {
           modal: ModalStore.store,
           store: boardsStore.state,
+<<<<<<< HEAD
           isFullscreen: false,
           focusModeAvailable: $boardApp.hasAttribute('data-focus-mode-available'),
+=======
+>>>>>>> upstream/master
           canAdminList: this.$options.el.hasAttribute('data-can-admin-list'),
         };
       },
