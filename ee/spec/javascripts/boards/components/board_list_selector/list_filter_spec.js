@@ -1,15 +1,15 @@
 import Vue from 'vue';
 
-import ListFilterComponent from 'ee/boards/components/boards_list_selector/list_filter.vue';
+import ListFilter from 'ee/boards/components/boards_list_selector/list_filter.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 const createComponent = () => {
-  const Component = Vue.extend(ListFilterComponent);
+  const Component = Vue.extend(ListFilter);
 
   return mountComponent(Component);
 };
 
-describe('ListFilterComponent', () => {
+describe('ListFilter', () => {
   let vm;
 
   beforeEach(() => {

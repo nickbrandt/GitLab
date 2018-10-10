@@ -1,19 +1,19 @@
 import Vue from 'vue';
 
-import AssigneesListItemComponent from 'ee/boards/components/boards_list_selector/assignees_list_item.vue';
+import AssigneesListItem from 'ee/boards/components/boards_list_selector/assignees_list_item.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 import { mockAssigneesList } from 'spec/boards/mock_data';
 
 const createComponent = () => {
-  const Component = Vue.extend(AssigneesListItemComponent);
+  const Component = Vue.extend(AssigneesListItem);
 
   return mountComponent(Component, {
     item: mockAssigneesList[0],
   });
 };
 
-describe('AssigneesListItemComponent', () => {
+describe('AssigneesListItem', () => {
   let vm;
 
   beforeEach(() => {
