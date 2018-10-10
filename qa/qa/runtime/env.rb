@@ -11,7 +11,7 @@ module QA
       end
 
       def accept_insecure_certs?
-        (ENV['ACCEPT_INSECURE_CERTS'] =~ /^(false|no|0)$/i) != 0
+        enabled?(ENV['ACCEPT_INSECURE_CERTS'])
       end
 
       def running_in_ci?
