@@ -75,8 +75,8 @@ class Projects::ClustersController < Projects::ApplicationController
 
   def create_gcp
     @gcp_cluster = ::Clusters::CreateService
-      .new(project, current_user,  create_gcp_cluster_params)
-      .execute(token_in_session)
+      .new(current_user, create_gcp_cluster_params)
+      .execute(project: project, access_token: token_in_session)
 
     if @gcp_cluster.persisted?
       redirect_to project_cluster_path(project, @gcp_cluster)
@@ -91,8 +91,8 @@ class Projects::ClustersController < Projects::ApplicationController
 
   def create_user
     @user_cluster = ::Clusters::CreateService
-      .new(project, current_user,  create_user_cluster_params)
-      .execute(token_in_session)
+      .new(current_user, create_user_cluster_params)
+      .execute(project: project, access_token: token_in_session)
 
     if @user_cluster.persisted?
       redirect_to project_cluster_path(project, @user_cluster)
