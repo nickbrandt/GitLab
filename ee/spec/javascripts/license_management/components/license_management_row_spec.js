@@ -110,6 +110,7 @@ describe('LicenseManagementRow', () => {
       linkEl.click();
       expect(actions.setLicenseInModal).toHaveBeenCalled();
     });
+
     it('triggering approveLicense by clicking the first dropdown option', () => {
       const linkEl = vm.$el.querySelector('.dropdown-item:nth-child(1)');
       linkEl.click();
