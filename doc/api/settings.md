@@ -145,10 +145,7 @@ are listed in the descriptions of the relevant settings.
 | `authorized_keys_enabled`                | boolean          | no                                   | By default, we write to the `authorized_keys` file to support Git over SSH without additional configuration. GitLab can be optimized to authenticate SSH keys via the database file. Only disable this if you have configured your OpenSSH server to use the AuthorizedKeysCommand. |
 | `auto_devops_domain`                     | string           | no                                   | Specify a domain to use by default for every project's Auto Review Apps and Auto Deploy stages. |
 | `auto_devops_enabled`                    | boolean          | no                                   | Enable Auto DevOps for projects by default. It will automatically build, test, and deploy applications based on a predefined CI/CD configuration. |
-<<<<<<< HEAD
 | `check_namespace_plan`                   | boolean          | no                                   | **(Premium)** Enabling this will make only licensed EE features available to projects if the project namespace's plan includes the feature or if the project is public. |
-=======
->>>>>>> upstream/master
 | `clientside_sentry_dsn`                  | string           | required by: `clientside_sentry_enabled` | Clientside Sentry Data Source Name. |
 | `clientside_sentry_enabled`              | boolean          | no                                   | (**If enabled, requires:** `clientside_sentry_dsn`) Enable Sentry error reporting for the client side. |
 | `container_registry_token_expire_delay`  | integer          | no                                   | Container Registry token duration in minutes. |

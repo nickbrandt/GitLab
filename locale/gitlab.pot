@@ -142,15 +142,12 @@ msgstr ""
 msgid "%{name}'s avatar"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "%{nip_domain} can be used as an alternative to a custom domain."
 msgstr ""
 
 msgid "%{number_commits_behind} commits behind %{default_branch}, %{number_commits_ahead} commits ahead"
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "%{openOrClose} %{noteable}"
 msgstr ""
 
@@ -352,12 +349,9 @@ msgstr ""
 msgid "Access expiration date"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Access to '%{classification_label}' not allowed"
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "Account"
 msgstr ""
 
@@ -1554,12 +1548,9 @@ msgstr ""
 msgid "CiVariable|Validation failed"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "ClassificationLabelUnavailable|is unavailable: %{reason}"
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "Clear search"
 msgstr ""
 
@@ -2138,12 +2129,9 @@ msgid "Configure push mirrors."
 msgstr ""
 
 msgid "Configure storage path settings."
-<<<<<<< HEAD
 msgstr ""
 
 msgid "Configure the %{link} integration."
-=======
->>>>>>> upstream/master
 msgstr ""
 
 msgid "Configure the way a user creates a new account."
@@ -4808,12 +4796,9 @@ msgstr ""
 msgid "Maven package"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Max access level"
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "Maximum job timeout"
 msgstr ""
 
@@ -5431,12 +5416,9 @@ msgstr ""
 msgid "November"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "OK"
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "Oct"
 msgstr ""
 
@@ -6875,7 +6857,6 @@ msgid "SearchAutocomplete|in this project"
 msgstr ""
 
 msgid "Secret"
-<<<<<<< HEAD
 msgstr ""
 
 msgid "Security"
@@ -6891,8 +6872,6 @@ msgid "SecurityDashboard|Monitor vulnerabilities in your code"
 msgstr ""
 
 msgid "SecurityDashboard|Pipeline %{pipelineLink} triggered"
-=======
->>>>>>> upstream/master
 msgstr ""
 
 msgid "Select"
@@ -7604,12 +7583,9 @@ msgstr ""
 msgid "The maximum file size allowed is 200KB."
 msgstr ""
 
-<<<<<<< HEAD
 msgid "The passphrase required to decrypt the private key. This is optional and the value is encrypted at rest."
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "The path to CI config file. Defaults to <code>.gitlab-ci.yml</code>"
 msgstr ""
 
@@ -7703,15 +7679,12 @@ msgstr ""
 msgid "There are no unstaged changes"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "There was an error adding a todo."
 msgstr ""
 
 msgid "There was an error deleting the todo."
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "There was an error loading users activity calendar."
 msgstr ""
 
