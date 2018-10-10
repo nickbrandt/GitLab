@@ -37,13 +37,7 @@ module QA
       end
 
       def use_default_credentials
-        if ::QA::Runtime::User.ldap_user?
-          self.username = Runtime::User.ldap_username
-          self.password = Runtime::User.ldap_password
-        else
-          self.username = Runtime::User.username
-          self.password = Runtime::User.password
-        end
+        self.username, self.password = default_credentials
 
         add_credentials_to_netrc unless ssh_key_set?
       end
@@ -136,6 +130,14 @@ module QA
         warn "DEBUG: output=[#{output}]" if debug?
 
         output
+      end
+
+      def default_credentials
+        if ::QA::Runtime::User.ldap_user?
+          [Runtime::User.ldap_username, Runtime::User.ldap_password]
+        else
+          [Runtime::User.username, Runtime::User.password]
+        end
       end
 
       def tmp_netrc_directory
