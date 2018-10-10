@@ -1,4 +1,4 @@
-import '~/boards/stores/boards_store';
+import boardsStore from '~/boards/stores/boards_store';
 
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
@@ -21,8 +21,8 @@ describe('BoardListSelectorComponent', () => {
   let vm;
   let mock;
 
-  gl.issueBoards.BoardsStore.create();
-  gl.issueBoards.BoardsStore.state.assignees = [];
+  boardsStore.create();
+  boardsStore.state.assignees = [];
 
   beforeEach(() => {
     mock = new MockAdapter(axios);
@@ -39,7 +39,7 @@ describe('BoardListSelectorComponent', () => {
   describe('data', () => {
     it('returns default data props', () => {
       expect(vm.loading).toBe(true);
-      expect(vm.store).toBe(gl.issueBoards.BoardsStore);
+      expect(vm.store).toBe(boardsStore);
     });
   });
 
@@ -47,7 +47,7 @@ describe('BoardListSelectorComponent', () => {
     describe('loadList', () => {
       it('calls axios.get and sets response to store.state.assignees', done => {
         mock.onGet(dummyEndpoint).reply(200, mockAssigneesList);
-        gl.issueBoards.BoardsStore.state.assignees = [];
+        boardsStore.state.assignees = [];
 
         vm
           .loadList()
@@ -61,7 +61,7 @@ describe('BoardListSelectorComponent', () => {
 
       it('does not call axios.get when store.state.assignees is not empty', done => {
         spyOn(axios, 'get');
-        gl.issueBoards.BoardsStore.state.assignees = mockAssigneesList;
+        boardsStore.state.assignees = mockAssigneesList;
 
         vm
           .loadList()
@@ -74,7 +74,7 @@ describe('BoardListSelectorComponent', () => {
 
       it('calls axios.get and shows Flash error when request fails', done => {
         mock.onGet(dummyEndpoint).replyOnce(500, {});
-        gl.issueBoards.BoardsStore.state.assignees = [];
+        boardsStore.state.assignees = [];
 
         vm
           .loadList()

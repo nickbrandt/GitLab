@@ -3,14 +3,12 @@
 
 import $ from 'jquery';
 import _ from 'underscore';
+import Vue from 'vue';
 import Cookies from 'js-cookie';
-import boardsStoreEE from 'ee/boards/stores/boards_store_ee';
+import BoardsStoreEE from 'ee/boards/stores/boards_store_ee';
 import { getUrlParamsArray } from '~/lib/utils/common_utils';
 
-window.gl = window.gl || {};
-window.gl.issueBoards = window.gl.issueBoards || {};
-
-gl.issueBoards.BoardsStore = {
+const boardsStore = {
   disabled: false,
   filter: {
     path: '',
@@ -186,4 +184,17 @@ gl.issueBoards.BoardsStore = {
   }
 };
 
-boardsStoreEE.initEESpecific(gl.issueBoards.BoardsStore);
+BoardsStoreEE.initEESpecific(boardsStore);
+
+// hacks added in order to allow milestone_select to function properly
+// TODO: remove these
+
+export function boardStoreIssueSet(...args) {
+  Vue.set(boardsStore.detail.issue, ...args);
+}
+
+export function boardStoreIssueDelete(...args) {
+  Vue.delete(boardsStore.detail.issue, ...args);
+}
+
+export default boardsStore;

@@ -1,8 +1,7 @@
 import $ from 'jquery';
 import Vue from 'vue';
-
+import boardsStore from '~/boards/stores/boards_store';
 import boardForm from 'ee/boards/components/board_form.vue';
-
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 describe('board_form.vue', () => {
@@ -15,7 +14,7 @@ describe('board_form.vue', () => {
 
   beforeEach(() => {
     spyOn($, 'ajax');
-    gl.issueBoards.BoardsStore.state.currentPage = 'edit';
+    boardsStore.state.currentPage = 'edit';
     const Component = Vue.extend(boardForm);
     vm = mountComponent(Component, props);
   });
@@ -62,7 +61,7 @@ describe('board_form.vue', () => {
 
         Vue.nextTick()
           .then(() => {
-            expect(gl.issueBoards.BoardsStore.state.currentPage).toBe('');
+            expect(boardsStore.state.currentPage).toBe('');
           })
           .then(done)
           .catch(done.fail);
