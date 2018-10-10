@@ -8,11 +8,8 @@ import { visitUrl } from '~/lib/utils/url_utility';
 import BoardMilestoneSelect from './milestone_select.vue';
 import BoardWeightSelect from './weight_select.vue';
 import AssigneeSelect from './assignee_select.vue';
+import boardsStore from '~/boards/stores/boards_store';
 
-window.gl = window.gl || {};
-window.gl.issueBoards = window.gl.issueBoards || {};
-
-const Store = gl.issueBoards.BoardsStore;
 const boardDefaults = {
   id: false,
   name: '',
@@ -70,8 +67,8 @@ export default {
       board: { ...boardDefaults, ...this.currentBoard },
       expanded: false,
       issue: {},
-      currentBoard: Store.state.currentBoard,
-      currentPage: Store.state.currentPage,
+      currentBoard: boardsStore.state.currentBoard,
+      currentPage: boardsStore.state.currentPage,
       milestones: [],
       milestoneDropdownOpen: false,
       isLoading: false,
@@ -168,7 +165,7 @@ export default {
         gl.boardService
           .deleteBoard(this.currentBoard)
           .then(() => {
-            visitUrl(Store.rootPath);
+            visitUrl(boardsStore.rootPath);
           })
           .catch(() => {
             Flash('Failed to delete board. Please try again.');
@@ -188,7 +185,7 @@ export default {
       }
     },
     cancel() {
-      Store.state.currentPage = '';
+      boardsStore.state.currentPage = '';
     },
     resetFormState() {
       if (this.isNewForm) {

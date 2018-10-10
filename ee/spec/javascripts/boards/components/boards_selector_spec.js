@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import BoardService from 'ee/boards/services/board_service';
-import 'ee/boards/components/boards_selector';
+import BoardsSelector from 'ee/boards/components/boards_selector';
 import setTimeoutPromiseHelper from 'spec/helpers/set_timeout_promise_helper';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
@@ -45,7 +45,7 @@ describe('BoardsSelector', () => {
 
     spyOn(BoardService.prototype, 'allBoards').and.returnValue(boardServiceResponse);
 
-    vm = mountComponent(gl.issueBoards.BoardsSelector, {
+    vm = mountComponent(BoardsSelector, {
       throttleDuration,
       currentBoard: {},
       milestonePath: '',

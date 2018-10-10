@@ -3,7 +3,7 @@ import _ from 'underscore';
 import { __, sprintf } from '~/locale';
 import Flash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
-
+import boardsStore from '~/boards/stores/boards_store';
 import ListContainer from './list_container.vue';
 
 export default Vue.extend({
@@ -23,7 +23,7 @@ export default Vue.extend({
   data() {
     return {
       loading: true,
-      store: gl.issueBoards.BoardsStore,
+      store: boardsStore,
     };
   },
   mounted() {

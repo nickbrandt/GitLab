@@ -15,13 +15,9 @@ import IssuableContext from '../../issuable_context';
 import LabelsSelect from '../../labels_select';
 import Subscriptions from '../../sidebar/components/subscriptions/subscriptions.vue';
 import MilestoneSelect from '../../milestone_select';
+import boardsStore from '../stores/boards_store';
 
-const Store = gl.issueBoards.BoardsStore;
-
-window.gl = window.gl || {};
-window.gl.issueBoards = window.gl.issueBoards || {};
-
-gl.issueBoards.BoardSidebar = Vue.extend({
+export default Vue.extend({
   components: {
     AssigneeTitle,
     Assignees,
@@ -37,7 +33,7 @@ gl.issueBoards.BoardSidebar = Vue.extend({
   },
   data() {
     return {
-      detail: Store.detail,
+      detail: boardsStore.detail,
       issue: {},
       list: {},
       loadingAssignees: false,
@@ -119,18 +115,18 @@ gl.issueBoards.BoardSidebar = Vue.extend({
       this.saveAssignees();
     },
     removeAssignee (a) {
-      gl.issueBoards.BoardsStore.detail.issue.removeAssignee(a);
+      boardsStore.detail.issue.removeAssignee(a);
     },
     addAssignee (a) {
-      gl.issueBoards.BoardsStore.detail.issue.addAssignee(a);
+      boardsStore.detail.issue.addAssignee(a);
     },
     removeAllAssignees () {
-      gl.issueBoards.BoardsStore.detail.issue.removeAllAssignees();
+      boardsStore.detail.issue.removeAllAssignees();
     },
     saveAssignees () {
       this.loadingAssignees = true;
 
-      gl.issueBoards.BoardsStore.detail.issue.update()
+      boardsStore.detail.issue.update()
         .then(() => {
           this.loadingAssignees = false;
         })
