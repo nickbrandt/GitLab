@@ -42,7 +42,7 @@ class Projects::ClustersController < Projects::ApplicationController
 
   def update
     Clusters::UpdateService
-      .new(project, current_user, update_params)
+      .new(current_user, update_params)
       .execute(cluster)
 
     if cluster.valid?
