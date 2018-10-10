@@ -75,6 +75,7 @@ describe('Link To Members Components', () => {
     Object.keys(correctVals).forEach(computedKey => {
       const expectedVal = correctVals[computedKey];
       const actualComputed = vm[computedKey];
+
       expect(actualComputed).toBe(expectedVal);
     });
   });

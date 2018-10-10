@@ -304,6 +304,7 @@ describe('Issue card component', () => {
           expect(
             component.$el.querySelectorAll('.badge').length,
           ).toBe(3);
+
           expect(
             component.$el.textContent,
           ).toContain('Group label');
@@ -326,6 +327,7 @@ describe('Issue card component', () => {
           expect(
             component.$el.querySelectorAll('.badge').length,
           ).toBe(3);
+
           expect(
             component.$el.textContent,
           ).toContain('Project label');

@@ -108,6 +108,7 @@ describe('Kubernetes Logs', () => {
 
     it('escapes the pod name', () => {
       kubernetesLog = new KubernetesLogs(kubernetesLogContainer);
+
       expect(kubernetesLog.podName).toContain('&quot;&gt;&amp;lt;img src=x onerror=alert(document.domain)&amp;gt; production');
     });
   });

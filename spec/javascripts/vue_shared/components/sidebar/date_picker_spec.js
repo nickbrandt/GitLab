@@ -54,6 +54,7 @@ describe('sidebarDatePicker', () => {
       vm.isLoading = false;
       Vue.nextTick(() => {
         vm.$el.querySelector('.title .btn-blank').click();
+
         expect(vm.editing).toEqual(true);
         done();
       });
@@ -84,6 +85,7 @@ describe('sidebarDatePicker', () => {
       vm.$on('saveDate', saveDate);
 
       vm.$el.querySelector('.value-content .btn-blank').click();
+
       expect(saveDate).toHaveBeenCalled();
     });
   });
@@ -103,6 +105,7 @@ describe('sidebarDatePicker', () => {
       vm.$on('toggleCollapse', toggleCollapse);
 
       vm.$el.querySelector('.title .gutter-toggle').click();
+
       expect(toggleCollapse).toHaveBeenCalled();
     });
   });

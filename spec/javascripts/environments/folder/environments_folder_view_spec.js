@@ -107,6 +107,7 @@ describe('Environments Folder View', () => {
         spyOn(component, 'updateContent');
         setTimeout(() => {
           component.$el.querySelector('.gl-pagination .js-last-button a').click();
+
           expect(component.updateContent).toHaveBeenCalledWith({ scope: component.scope, page: '10' });
           done();
         }, 0);
@@ -116,6 +117,7 @@ describe('Environments Folder View', () => {
         setTimeout(() => {
           spyOn(component, 'updateContent');
           component.$el.querySelector('.js-environments-tab-stopped').click();
+
           expect(component.updateContent).toHaveBeenCalledWith({ scope: 'stopped', page: '1' });
           done();
         });

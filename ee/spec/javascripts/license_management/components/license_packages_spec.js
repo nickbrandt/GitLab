@@ -46,6 +46,7 @@ describe('LicensePackages', () => {
       it('sets value of `showAllPackages` prop to true', () => {
         vm.showAllPackages = false;
         vm.handleShowPackages();
+
         expect(vm.showAllPackages).toBe(true);
       });
     });
@@ -54,12 +55,14 @@ describe('LicensePackages', () => {
   describe('template', () => {
     it('renders packages list for a particular license', () => {
       const packagesEl = vm.$el.querySelector('.js-license-dependencies');
+
       expect(packagesEl).not.toBeNull();
       expect(packagesEl.innerText.trim()).toBe('Used by pg, puma, foo, and');
     });
 
     it('renders more packages button element', () => {
       const buttonEl = vm.$el.querySelector('.btn-show-all-packages');
+
       expect(buttonEl).not.toBeNull();
       expect(buttonEl.innerText.trim()).toBe('2 more');
     });

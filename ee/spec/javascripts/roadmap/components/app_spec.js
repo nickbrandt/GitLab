@@ -85,6 +85,7 @@ describe('AppComponent', () => {
         vm.isLoading = false;
         vm.isEpicsListEmpty = false;
         vm.hasError = false;
+
         expect(vm.showRoadmap).toBe(true);
       });
 
@@ -92,14 +93,17 @@ describe('AppComponent', () => {
         vm.isLoading = true;
         vm.isEpicsListEmpty = false;
         vm.hasError = false;
+
         expect(vm.showRoadmap).toBe(false);
         vm.isLoading = false;
         vm.isEpicsListEmpty = true;
         vm.hasError = false;
+
         expect(vm.showRoadmap).toBe(false);
         vm.isLoading = false;
         vm.isEpicsListEmpty = false;
         vm.hasError = true;
+
         expect(vm.showRoadmap).toBe(false);
       });
     });
@@ -124,6 +128,7 @@ describe('AppComponent', () => {
         spyOn(vm.store, 'setEpics');
 
         vm.fetchEpics();
+
         expect(vm.hasError).toBe(false);
         setTimeout(() => {
           expect(vm.isLoading).toBe(false);
@@ -137,6 +142,7 @@ describe('AppComponent', () => {
         spyOn(vm.store, 'setEpics');
 
         vm.fetchEpics();
+
         expect(vm.isEpicsListEmpty).toBe(false);
         setTimeout(() => {
           expect(vm.isEpicsListEmpty).toBe(true);
@@ -149,6 +155,7 @@ describe('AppComponent', () => {
         mock.onGet(vm.service.epicsPath).reply(500, {});
 
         vm.fetchEpics();
+
         expect(vm.hasError).toBe(false);
         setTimeout(() => {
           expect(vm.hasError).toBe(true);

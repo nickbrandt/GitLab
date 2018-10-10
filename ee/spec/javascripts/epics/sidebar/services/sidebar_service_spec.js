@@ -18,6 +18,7 @@ describe('Sidebar Service', () => {
       spyOn(axios, 'put').and.stub();
       const dateValue = '2018-06-21';
       service.updateStartDate({ dateValue, isFixed: true });
+
       expect(axios.put).toHaveBeenCalledWith(service.endpoint, {
         start_date_is_fixed: true,
         start_date_fixed: dateValue,
@@ -30,6 +31,7 @@ describe('Sidebar Service', () => {
       spyOn(axios, 'put').and.stub();
       const dateValue = '2018-06-21';
       service.updateEndDate({ dateValue, isFixed: true });
+
       expect(axios.put).toHaveBeenCalledWith(service.endpoint, {
         due_date_is_fixed: true,
         due_date_fixed: dateValue,
@@ -41,6 +43,7 @@ describe('Sidebar Service', () => {
     it('returns axios instance with POST for `subscriptionEndpoint`', () => {
       spyOn(axios, 'post').and.stub();
       service.toggleSubscribed();
+
       expect(axios.post).toHaveBeenCalled();
     });
   });
@@ -50,6 +53,7 @@ describe('Sidebar Service', () => {
       spyOn(axios, 'post').and.stub();
       const epicId = 1;
       service.addTodo(epicId);
+
       expect(axios.post).toHaveBeenCalledWith(service.todoPath, {
         issuable_id: epicId,
         issuable_type: 'epic',
@@ -61,6 +65,7 @@ describe('Sidebar Service', () => {
     it('returns axios instance with DELETE for provided `todoDeletePath` param', () => {
       spyOn(axios, 'delete').and.stub();
       service.deleteTodo('/foo/bar');
+
       expect(axios.delete).toHaveBeenCalledWith('/foo/bar');
     });
   });

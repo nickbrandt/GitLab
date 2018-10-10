@@ -38,23 +38,27 @@ describe('Store', () => {
     };
 
     store.storeEnvironments(serverData);
+
     expect(store.state.environments.length).toEqual(serverData.length);
     expect(store.state.environments[0]).toEqual(expectedResult);
   });
 
   it('should store available count', () => {
     store.storeAvailableCount(2);
+
     expect(store.state.availableCounter).toEqual(2);
   });
 
   it('should store stopped count', () => {
     store.storeStoppedCount(2);
+
     expect(store.state.stoppedCounter).toEqual(2);
   });
 
   describe('store environments', () => {
     it('should store environments', () => {
       store.storeEnvironments(serverData);
+
       expect(store.state.environments.length).toEqual(serverData.length);
     });
 
@@ -69,6 +73,7 @@ describe('Store', () => {
       };
 
       store.storeEnvironments([environment]);
+
       expect(store.state.environments[0].hasDeployBoard).toEqual(true);
       expect(store.state.environments[0].isDeployBoardVisible).toEqual(true);
       expect(store.state.environments[0].deployBoardData).toEqual(deployBoardMockData);
@@ -84,6 +89,7 @@ describe('Store', () => {
       };
 
       store.storeEnvironments([environment]);
+
       expect(store.state.environments[0].isFolder).toEqual(true);
       expect(store.state.environments[0].folderName).toEqual('bar');
     });
@@ -100,17 +106,20 @@ describe('Store', () => {
       };
 
       store.storeEnvironments([environment]);
+
       expect(store.state.environments[0].last_deployment).toEqual({});
       expect(store.state.environments[0].isStoppable).toEqual(true);
     });
 
     it('should store latest.name when the environment is not a folder', () => {
       store.storeEnvironments(serverData);
+
       expect(store.state.environments[2].name).toEqual(serverData[2].latest.name);
     });
 
     it('should store root level name when environment is a folder', () => {
       store.storeEnvironments(serverData);
+
       expect(store.state.environments[1].folderName).toEqual(serverData[1].name);
     });
   });
@@ -120,9 +129,11 @@ describe('Store', () => {
       store.storeEnvironments(serverData);
 
       store.toggleFolder(store.state.environments[1]);
+
       expect(store.state.environments[1].isOpen).toEqual(true);
 
       store.toggleFolder(store.state.environments[1]);
+
       expect(store.state.environments[1].isOpen).toEqual(false);
     });
 
@@ -130,9 +141,11 @@ describe('Store', () => {
       store.storeEnvironments(serverData);
 
       store.toggleFolder(store.state.environments[1]);
+
       expect(store.state.environments[1].isOpen).toEqual(true);
 
       store.storeEnvironments(serverData);
+
       expect(store.state.environments[1].isOpen).toEqual(true);
     });
   });
@@ -155,6 +168,7 @@ describe('Store', () => {
       expect(store.state.environments[1].children.length).toEqual(serverData.length);
       // poll
       store.storeEnvironments(serverData);
+
       expect(store.state.environments[1].children.length).toEqual(serverData.length);
     });
   });
@@ -180,6 +194,7 @@ describe('Store', () => {
       };
 
       store.setPagination(pagination);
+
       expect(store.state.paginationInformation).toEqual(expectedResult);
     });
   });
@@ -216,6 +231,7 @@ describe('Store', () => {
         rollout_status: deployBoardMockData,
       };
       store.storeEnvironments([environment]);
+
       expect(store.state.environments[0].deployBoardData).toEqual(deployBoardMockData);
     });
   });
@@ -225,6 +241,7 @@ describe('Store', () => {
       store.storeEnvironments(serverData);
 
       store.toggleFolder(store.state.environments[1]);
+
       expect(store.getOpenFolders()[0]).toEqual(store.state.environments[1]);
     });
   });

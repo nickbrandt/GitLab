@@ -234,6 +234,7 @@ describe('Security reports getters', () => {
           newState.dast.paths.head = 'foo';
           newState.dast.paths.base = 'foo';
           newState.dast.resolvedIssues = [{}];
+
           expect(groupedDastText(newState)).toEqual('DAST detected 1 fixed vulnerability');
         });
       });
@@ -272,6 +273,7 @@ describe('Security reports getters', () => {
           newState.dependencyScanning.paths.head = 'foo';
           newState.dependencyScanning.paths.base = 'foo';
           newState.dependencyScanning.newIssues = [{}];
+
           expect(groupedDependencyText(newState)).toEqual(
             'Dependency scanning detected 1 new vulnerability',
           );
@@ -299,6 +301,7 @@ describe('Security reports getters', () => {
           newState.dependencyScanning.paths.base = 'foo';
 
           newState.dependencyScanning.resolvedIssues = [{}];
+
           expect(groupedDependencyText(newState)).toEqual(
             'Dependency scanning detected 1 fixed vulnerability',
           );
@@ -445,12 +448,14 @@ describe('Security reports getters', () => {
     it('returns warning with new issues', () => {
       const newState = state();
       newState.sast.newIssues = [{}];
+
       expect(sastStatusIcon(newState)).toEqual('warning');
     });
 
     it('returns warning with failed report', () => {
       const newState = state();
       newState.sast.hasError = true;
+
       expect(sastStatusIcon(newState)).toEqual('warning');
     });
 
@@ -463,12 +468,14 @@ describe('Security reports getters', () => {
     it('returns warning with new issues', () => {
       const newState = state();
       newState.dast.newIssues = [{}];
+
       expect(dastStatusIcon(newState)).toEqual('warning');
     });
 
     it('returns warning with failed report', () => {
       const newState = state();
       newState.dast.hasError = true;
+
       expect(dastStatusIcon(newState)).toEqual('warning');
     });
 
@@ -481,12 +488,14 @@ describe('Security reports getters', () => {
     it('returns warning with new issues', () => {
       const newState = state();
       newState.sastContainer.newIssues = [{}];
+
       expect(sastContainerStatusIcon(newState)).toEqual('warning');
     });
 
     it('returns warning with failed report', () => {
       const newState = state();
       newState.sastContainer.hasError = true;
+
       expect(sastContainerStatusIcon(newState)).toEqual('warning');
     });
 
@@ -499,12 +508,14 @@ describe('Security reports getters', () => {
     it('returns warning with new issues', () => {
       const newState = state();
       newState.dependencyScanning.newIssues = [{}];
+
       expect(dependencyScanningStatusIcon(newState)).toEqual('warning');
     });
 
     it('returns warning with failed report', () => {
       const newState = state();
       newState.dependencyScanning.hasError = true;
+
       expect(dependencyScanningStatusIcon(newState)).toEqual('warning');
     });
 
@@ -517,6 +528,7 @@ describe('Security reports getters', () => {
     it('returns true when any report is loading', () => {
       const newState = state();
       newState.sast.isLoading = true;
+
       expect(areReportsLoading(newState)).toEqual(true);
     });
 
@@ -572,6 +584,7 @@ describe('Security reports getters', () => {
     it('returns false when any of the reports has base', () => {
       const newState = state();
       newState.sast.paths.base = 'foo';
+
       expect(noBaseInAllReports(newState)).toEqual(false);
     });
   });

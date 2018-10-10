@@ -33,10 +33,12 @@ describe('GeoNodeActionsComponent', () => {
     describe('isToggleAllowed', () => {
       it('returns boolean value representing if toggle on node can be allowed', () => {
         let vmX = createComponent(mockNodes[0], true, false);
+
         expect(vmX.isToggleAllowed).toBeFalsy();
         vmX.$destroy();
 
         vmX = createComponent(mockNodes[1]);
+
         expect(vmX.isToggleAllowed).toBeTruthy();
         vmX.$destroy();
       });
@@ -46,11 +48,13 @@ describe('GeoNodeActionsComponent', () => {
       it('returns label for toggle button for a node', () => {
         let mockNode = Object.assign({}, mockNodes[1]);
         let vmX = createComponent(mockNode);
+
         expect(vmX.nodeToggleLabel).toBe('Disable');
         vmX.$destroy();
 
         mockNode = Object.assign({}, mockNodes[1], { enabled: false });
         vmX = createComponent(mockNode);
+
         expect(vmX.nodeToggleLabel).toBe('Enable');
         vmX.$destroy();
       });
@@ -62,6 +66,7 @@ describe('GeoNodeActionsComponent', () => {
       it('emits showNodeActionModal with actionType `toggle`, node reference, modalMessage and modalActionLabel', () => {
         spyOn(eventHub, '$emit');
         vm.onToggleNode();
+
         expect(eventHub.$emit).toHaveBeenCalledWith('showNodeActionModal', {
           actionType: NODE_ACTIONS.TOGGLE,
           node: vm.node,
@@ -75,6 +80,7 @@ describe('GeoNodeActionsComponent', () => {
       it('emits showNodeActionModal with actionType `remove`, node reference, modalKind, modalMessage and modalActionLabel', () => {
         spyOn(eventHub, '$emit');
         vm.onRemoveNode();
+
         expect(eventHub.$emit).toHaveBeenCalledWith('showNodeActionModal', {
           actionType: NODE_ACTIONS.REMOVE,
           node: vm.node,
@@ -89,6 +95,7 @@ describe('GeoNodeActionsComponent', () => {
       it('emits `repairNode` event with node reference', () => {
         spyOn(eventHub, '$emit');
         vm.onRepairNode();
+
         expect(eventHub.$emit).toHaveBeenCalledWith('repairNode', vm.node);
       });
     });

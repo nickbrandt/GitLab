@@ -46,6 +46,7 @@ describe('newEpic', () => {
 
       Vue.nextTick(() => {
         vm.$el.querySelector('.dropdown-menu .btn-success').click();
+
         expect(vm.service.createEpic).toHaveBeenCalled();
       });
     });
@@ -73,6 +74,7 @@ describe('newEpic', () => {
 
         expect(loadingIcon).toBeNull();
         btnSave.click();
+
         expect(loadingIcon).toBeDefined();
       });
     });

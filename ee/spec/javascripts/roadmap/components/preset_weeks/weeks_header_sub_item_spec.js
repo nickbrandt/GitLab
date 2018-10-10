@@ -27,6 +27,7 @@ describe('MonthsHeaderSubItemComponent', () => {
   describe('data', () => {
     it('sets prop `headerSubItems` with array of dates containing days of week from timeframeItem', () => {
       vm = createComponent({});
+
       expect(Array.isArray(vm.headerSubItems)).toBe(true);
       expect(vm.headerSubItems.length).toBe(7);
       vm.headerSubItems.forEach(subItem => {
@@ -39,6 +40,7 @@ describe('MonthsHeaderSubItemComponent', () => {
     describe('hasToday', () => {
       it('returns true when current week is same as timeframe week', () => {
         vm = createComponent({});
+
         expect(vm.hasToday).toBe(true);
       });
 
@@ -47,6 +49,7 @@ describe('MonthsHeaderSubItemComponent', () => {
           currentDate: new Date(2017, 10, 1), // Nov 1, 2017
           timeframeItem: new Date(2018, 0, 1), // Jan 1, 2018
         });
+
         expect(vm.hasToday).toBe(false);
       });
     });
@@ -59,6 +62,7 @@ describe('MonthsHeaderSubItemComponent', () => {
           currentDate: new Date(2018, 0, 1), // Jan 1, 2018
         });
         const subItem = new Date(2018, 0, 25); // Jan 25, 2018
+
         expect(vm.getSubItemValueClass(subItem)).toBe('label-dark');
       });
 
@@ -68,6 +72,7 @@ describe('MonthsHeaderSubItemComponent', () => {
           currentDate,
         });
         const subItem = currentDate;
+
         expect(vm.getSubItemValueClass(subItem)).toBe('label-dark label-bold');
       });
     });

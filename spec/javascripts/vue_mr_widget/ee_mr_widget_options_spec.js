@@ -75,6 +75,7 @@ describe('ee merge request widget options', () => {
         mock.onGet('vulnerability_feedback_path').reply(200, []);
 
         vm = mountComponent(Component);
+
         expect(vm.$el.querySelector('.js-sast-widget').textContent.trim()).toContain(
           'SAST is loading',
         );
@@ -303,6 +304,7 @@ describe('ee merge request widget options', () => {
         mock.onGet('head.json').reply(200, headIssues);
         mock.onGet('base.json').reply(200, baseIssues);
         vm = mountComponent(Component);
+
         expect(
           removeBreakLine(vm.$el.querySelector('.js-codequality-widget').textContent),
         ).toContain('Loading codeclimate report');
@@ -421,6 +423,7 @@ describe('ee merge request widget options', () => {
         mock.onGet('head.json').reply(200, headPerformance);
         mock.onGet('base.json').reply(200, basePerformance);
         vm = mountComponent(Component);
+
         expect(
           removeBreakLine(vm.$el.querySelector('.js-performance-widget').textContent),
         ).toContain('Loading performance report');
@@ -497,6 +500,7 @@ describe('ee merge request widget options', () => {
 
       it('does not show Expand button', () => {
         const expandButton = vm.$el.querySelector('.js-performance-widget .js-collapse-btn');
+
         expect(expandButton).toBeNull();
       });
 
@@ -833,6 +837,7 @@ describe('ee merge request widget options', () => {
       });
 
       const ciWidget = vm.$el.querySelector('.mr-state-widget .label-branch');
+
       expect(ciWidget).toContainHtml(sourceBranchLink);
     });
   });

@@ -36,6 +36,7 @@ describe('QuartersHeaderItemComponent', () => {
     it('returns default data props', () => {
       vm = createComponent({});
       const currentDate = new Date();
+
       expect(vm.currentDate.getDate()).toBe(currentDate.getDate());
       expect(vm.quarterBeginDate).toBe(mockTimeframeQuarters[mockTimeframeIndex].range[0]);
       expect(vm.quarterEndDate).toBe(mockTimeframeQuarters[mockTimeframeIndex].range[2]);
@@ -46,6 +47,7 @@ describe('QuartersHeaderItemComponent', () => {
     describe('itemStyles', () => {
       it('returns style object for container element based on value of `itemWidth` prop', () => {
         vm = createComponent({});
+
         expect(vm.itemStyles.width).toBe('180px');
       });
     });
@@ -53,6 +55,7 @@ describe('QuartersHeaderItemComponent', () => {
     describe('timelineHeaderLabel', () => {
       it('returns string containing Year and Quarter for current timeline header item', () => {
         vm = createComponent({});
+
         expect(vm.timelineHeaderLabel).toBe('2017 Q4');
       });
 
@@ -61,6 +64,7 @@ describe('QuartersHeaderItemComponent', () => {
           timeframeIndex: mockTimeframeIndex + 2,
           timeframeItem: mockTimeframeQuarters[mockTimeframeIndex + 2],
         });
+
         expect(vm.timelineHeaderLabel).toBe('Q2');
       });
     });
@@ -68,6 +72,7 @@ describe('QuartersHeaderItemComponent', () => {
     describe('timelineHeaderClass', () => {
       it('returns empty string when timeframeItem quarter is less than current quarter', () => {
         vm = createComponent({});
+
         expect(vm.timelineHeaderClass).toBe('');
       });
 
@@ -94,6 +99,7 @@ describe('QuartersHeaderItemComponent', () => {
         });
 
         [vm.currentDate] = mockTimeframeQuarters[0].range;
+
         expect(vm.timelineHeaderClass).toBe('label-dark');
       });
     });
@@ -110,6 +116,7 @@ describe('QuartersHeaderItemComponent', () => {
 
     it('renders item label element class `item-label` and value as `timelineHeaderLabel`', () => {
       const itemLabelEl = vm.$el.querySelector('.item-label');
+
       expect(itemLabelEl).not.toBeNull();
       expect(itemLabelEl.innerText.trim()).toBe('2017 Q4');
     });

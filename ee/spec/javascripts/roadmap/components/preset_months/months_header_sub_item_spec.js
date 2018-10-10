@@ -28,6 +28,7 @@ describe('MonthsHeaderSubItemComponent', () => {
     describe('headerSubItems', () => {
       it('returns array of dates containing Sundays from timeframeItem', () => {
         vm = createComponent({});
+
         expect(Array.isArray(vm.headerSubItems)).toBe(true);
         vm.headerSubItems.forEach(subItem => {
           expect(subItem instanceof Date).toBe(true);
@@ -38,6 +39,7 @@ describe('MonthsHeaderSubItemComponent', () => {
     describe('headerSubItemClass', () => {
       it('returns string containing `label-dark` when timeframe year and month are greater than current year and month', () => {
         vm = createComponent({});
+
         expect(vm.headerSubItemClass).toBe('label-dark');
       });
 
@@ -46,6 +48,7 @@ describe('MonthsHeaderSubItemComponent', () => {
           currentDate: new Date(2017, 10, 1), // Nov 1, 2017
           timeframeItem: new Date(2018, 0, 1), // Jan 1, 2018
         });
+
         expect(vm.headerSubItemClass).toBe('');
       });
     });
@@ -53,6 +56,7 @@ describe('MonthsHeaderSubItemComponent', () => {
     describe('hasToday', () => {
       it('returns true when current month and year is same as timeframe month and year', () => {
         vm = createComponent({});
+
         expect(vm.hasToday).toBe(true);
       });
 
@@ -61,6 +65,7 @@ describe('MonthsHeaderSubItemComponent', () => {
           currentDate: new Date(2017, 10, 1), // Nov 1, 2017
           timeframeItem: new Date(2018, 0, 1), // Jan 1, 2018
         });
+
         expect(vm.hasToday).toBe(false);
       });
     });
@@ -73,6 +78,7 @@ describe('MonthsHeaderSubItemComponent', () => {
           currentDate: new Date(2018, 0, 1), // Jan 1, 2018
         });
         const subItem = new Date(2018, 0, 15); // Jan 15, 2018
+
         expect(vm.getSubItemValueClass(subItem)).toBe('label-dark');
       });
     });

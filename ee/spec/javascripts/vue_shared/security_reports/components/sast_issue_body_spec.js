@@ -122,6 +122,7 @@ describe('sast issue body', () => {
       expect(vm.$el.querySelector('a').getAttribute('href')).toEqual(
         sastIssue.urlPath,
       );
+
       expect(vm.$el.querySelector('a').textContent.trim()).toEqual(
         sastIssue.path,
       );

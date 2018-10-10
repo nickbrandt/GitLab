@@ -32,6 +32,7 @@ describe('ListContent', () => {
         const assignee = mockAssigneesList[0];
 
         vm.handleItemClick(assignee);
+
         expect(vm.$emit).toHaveBeenCalledWith('onItemSelect', assignee);
       });
     });

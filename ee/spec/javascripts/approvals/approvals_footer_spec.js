@@ -43,6 +43,7 @@ describe('Approvals Footer Component', () => {
     it('should correctly set showUnapproveButton when the user can unapprove', () => {
       expect(vm.showUnapproveButton).toBeTruthy();
       vm.mr.state = 'merged';
+
       expect(vm.showUnapproveButton).toBeFalsy();
     });
 
@@ -66,6 +67,7 @@ describe('Approvals Footer Component', () => {
 
       Vue.nextTick(() => {
         const memberImage = document.querySelector('.approvers-list img');
+
         expect(memberImage.src).toMatch(/dummy\.jpg$/);
         done();
       });

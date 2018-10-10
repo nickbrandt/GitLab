@@ -51,16 +51,19 @@ describe('graph component', () => {
 
       it('should include the no-margin class on the first child', function () {
         const firstStageColumnElement = component.$el.querySelector('.stage-column-list .stage-column');
+
         expect(firstStageColumnElement.classList.contains('no-margin')).toEqual(true);
       });
 
       it('should include the has-only-one-job class on the first child', function () {
         const firstStageColumnElement = component.$el.querySelector('.stage-column-list .stage-column');
+
         expect(firstStageColumnElement.classList.contains('has-only-one-job')).toEqual(true);
       });
 
       it('should include the left-margin class on the second child', function () {
         const firstStageColumnElement = component.$el.querySelector('.stage-column-list .stage-column:last-child');
+
         expect(firstStageColumnElement.classList.contains('left-margin')).toEqual(true);
       });
 
@@ -112,6 +115,7 @@ describe('graph component', () => {
     describe('rendered output', function () {
       it('should include the first column with a no margin', function () {
         const firstColumn = component.$el.querySelector('.stage-column:first-child');
+
         expect(firstColumn.classList.contains('no-margin')).toEqual(true);
       });
 

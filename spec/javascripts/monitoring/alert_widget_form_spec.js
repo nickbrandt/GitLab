@@ -19,12 +19,14 @@ describe('AlertWidgetForm', () => {
 
   it('disables the input when disabled prop is set', () => {
     vm = mountComponent(AlertWidgetFormComponent, { ...props, disabled: true });
+
     expect(vm.$refs.cancelButton).toBeDisabled();
     expect(vm.$refs.submitButton).toBeDisabled();
   });
 
   it('emits a "create" event when form submitted without existing alert', done => {
     vm = mountComponent(AlertWidgetFormComponent, props);
+
     expect(vm.$refs.submitButton.innerText).toContain('Add');
     vm.$once('create', alert => {
       expect(alert).toEqual({
@@ -70,6 +72,7 @@ describe('AlertWidgetForm', () => {
       alert: 'alert',
       alertData: { operator: '<', threshold: 5 },
     });
+
     expect(vm.$refs.submitButton.innerText).toContain('Delete');
     vm.$once('update', alert => {
       expect(alert).toEqual({

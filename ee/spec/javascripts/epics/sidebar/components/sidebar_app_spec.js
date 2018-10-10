@@ -98,6 +98,7 @@ describe('epicSidebar', () => {
 
     const startDatePicker = vm.$el.querySelector('.block.start-date');
     const endDatePicker = vm.$el.querySelector('.block.end-date');
+
     expect(startDatePicker.querySelector('.value-type-fixed .value-content').innerText.trim()).toEqual('Jan 1, 2017');
     expect(endDatePicker.querySelector('.value-type-fixed .value-content').innerText.trim()).toEqual('Jan 1, 2018');
   });
@@ -117,6 +118,7 @@ describe('epicSidebar', () => {
     describe('isDateValid', () => {
       it('returns true when fixed start and end dates are valid', () => {
         const component = getComponent();
+
         expect(component.isDateValid).toBe(true);
       });
 
@@ -125,6 +127,7 @@ describe('epicSidebar', () => {
           initialStartDate: '2018-01-01',
           initialEndDate: '2017-01-01',
         });
+
         expect(component.isDateValid).toBe(false);
       });
 
@@ -133,6 +136,7 @@ describe('epicSidebar', () => {
           initialStartDateIsFixed: false,
           initialEndDate: '2018-11-31',
         });
+
         expect(component.isDateValid).toBe(true);
       });
 
@@ -141,6 +145,7 @@ describe('epicSidebar', () => {
           initialStartDateIsFixed: false,
           initialDueDateIsFixed: false,
         });
+
         expect(component.isDateValid).toBe(true);
       });
     });
@@ -181,10 +186,12 @@ describe('epicSidebar', () => {
 
     it('should toggle contentContainer css class', () => {
       const contentContainer = document.querySelector('.page-with-contextual-sidebar');
+
       expect(contentContainer.classList.contains('right-sidebar-expanded')).toEqual(true);
       expect(contentContainer.classList.contains('right-sidebar-collapsed')).toEqual(false);
 
       vm.$el.querySelector('.gutter-toggle').click();
+
       expect(contentContainer.classList.contains('right-sidebar-expanded')).toEqual(false);
       expect(contentContainer.classList.contains('right-sidebar-collapsed')).toEqual(true);
     });
@@ -209,6 +216,7 @@ describe('epicSidebar', () => {
 
     it('should save startDate', (done) => {
       const date = '2017-01-01';
+
       expect(component.store.startDate).toBeUndefined();
       component.saveStartDate(date)
         .then(() => {
@@ -220,6 +228,7 @@ describe('epicSidebar', () => {
 
     it('should save endDate', (done) => {
       const date = '2017-01-01';
+
       expect(component.store.endDate).toBeUndefined();
       component.saveEndDate(date)
         .then(() => {
@@ -255,6 +264,7 @@ describe('epicSidebar', () => {
           dateValue,
           isFixed: true,
         });
+
         expect(component.store.startDateFixed).toBe(dateValue);
         done();
       }, 0);
@@ -286,6 +296,7 @@ describe('epicSidebar', () => {
           dateValue,
           isFixed: true,
         });
+
         expect(component.store.dueDateFixed).toBe(dateValue);
         done();
       }, 0);
@@ -303,6 +314,7 @@ describe('epicSidebar', () => {
     it('initializes `epicContext.labels` as empty array when `label.isAny` is `true`', () => {
       const labelIsAny = { isAny: true };
       vm.handleLabelClick(labelIsAny);
+
       expect(Array.isArray(vm.epicContext.labels)).toBe(true);
       expect(vm.epicContext.labels.length).toBe(0);
     });
@@ -319,6 +331,7 @@ describe('epicSidebar', () => {
     it('filters epicContext.labels to exclude provided `label` if it is already present in `epicContext.labels`', () => {
       vm.handleLabelClick(label); // Select
       vm.handleLabelClick(label); // Un-select
+
       expect(vm.epicContext.labels.length).toBe(1);
       expect(vm.epicContext.labels[0].id).toBe(labels[0].id);
     });
@@ -360,8 +373,10 @@ describe('epicSidebar', () => {
     it('calls `addTodo` on service object when `todoExists` prop is `false`', () => {
       spyOn(vm.service, 'addTodo').and.callThrough();
       vm.store.setTodoExists(false);
+
       expect(vm.savingTodoAction).toBe(false);
       vm.handleToggleTodo();
+
       expect(vm.savingTodoAction).toBe(true);
       expect(vm.service.addTodo).toHaveBeenCalledWith(epicId);
     });
@@ -399,8 +414,10 @@ describe('epicSidebar', () => {
     it('calls `deleteTodo` on service object when `todoExists` prop is `true`', () => {
       spyOn(vm.service, 'deleteTodo').and.callThrough();
       vm.store.setTodoExists(true);
+
       expect(vm.savingTodoAction).toBe(false);
       vm.handleToggleTodo();
+
       expect(vm.savingTodoAction).toBe(true);
       expect(vm.service.deleteTodo).toHaveBeenCalledWith(gl.TEST_HOST);
     });
@@ -456,6 +473,7 @@ describe('epicSidebar', () => {
 
     it('should handle errors gracefully', (done) => {
       const date = '2017-01-01';
+
       expect(component.store.startDate).toBeUndefined();
       component.saveDate('start', date)
         .then(() => {

@@ -28,6 +28,7 @@ describe('SidebarSubscriptions', () => {
       it('emits `toggleSubscription` event on component', () => {
         spyOn(vm, '$emit');
         vm.onToggleSubscription();
+
         expect(vm.$emit).toHaveBeenCalledWith('toggleSubscription');
       });
     });
@@ -36,6 +37,7 @@ describe('SidebarSubscriptions', () => {
       it('emits `toggleCollapse` event on component', () => {
         spyOn(vm, '$emit');
         vm.onToggleSidebar();
+
         expect(vm.$emit).toHaveBeenCalledWith('toggleCollapse');
       });
     });

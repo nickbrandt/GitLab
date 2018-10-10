@@ -18,6 +18,7 @@ describe('GeoNodesListComponent', () => {
   describe('template', () => {
     it('renders container element correctly', () => {
       const vm = createComponent();
+
       expect(vm.$el.classList.contains('card')).toBe(true);
       vm.$destroy();
     });

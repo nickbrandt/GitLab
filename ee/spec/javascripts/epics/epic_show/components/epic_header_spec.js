@@ -42,6 +42,7 @@ describe('epicHeader', () => {
   it('should render status badge', () => {
     const badgeEl = vm.$el.querySelector('.issuable-status-box');
     const badgeIconEl = badgeEl.querySelector('svg use');
+
     expect(badgeEl).not.toBe(null);
     expect(badgeEl.innerText.trim()).toBe('Open');
     expect(badgeIconEl.getAttribute('xlink:href')).toContain('issue-open-m');
@@ -50,6 +51,7 @@ describe('epicHeader', () => {
   it('should render `Close epic` button when `isEpicOpen` & `canUpdate` props are true', () => {
     vm.isEpicOpen = true;
     const closeButtonEl = vm.$el.querySelector('.js-issuable-actions .js-btn-epic-action');
+
     expect(closeButtonEl).not.toBe(null);
     expect(closeButtonEl.innerText.trim()).toBe('Close epic');
   });
@@ -58,11 +60,13 @@ describe('epicHeader', () => {
     describe('statusIcon', () => {
       it('returns `issue-open-m` when `isEpicOpen` prop is true', () => {
         vm.isEpicOpen = true;
+
         expect(vm.statusIcon).toBe('issue-open-m');
       });
 
       it('returns `mobile-issue-close` when `isEpicOpen` prop is false', () => {
         vm.isEpicOpen = false;
+
         expect(vm.statusIcon).toBe('mobile-issue-close');
       });
     });
@@ -70,11 +74,13 @@ describe('epicHeader', () => {
     describe('statusText', () => {
       it('returns `Open` when `isEpicOpen` prop is true', () => {
         vm.isEpicOpen = true;
+
         expect(vm.statusText).toBe('Open');
       });
 
       it('returns `Closed` when `isEpicOpen` prop is false', () => {
         vm.isEpicOpen = false;
+
         expect(vm.statusText).toBe('Closed');
       });
     });
@@ -82,11 +88,13 @@ describe('epicHeader', () => {
     describe('actionButtonClass', () => {
       it('returns classes `btn btn-grouped js-btn-epic-action qa-close-reopen-epic-button` & `btn-close` when `isEpicOpen` prop is true', () => {
         vm.isEpicOpen = true;
+
         expect(vm.actionButtonClass).toContain('btn btn-grouped js-btn-epic-action qa-close-reopen-epic-button btn-close');
       });
 
       it('returns classes `btn btn-grouped js-btn-epic-action qa-close-reopen-epic-button` & `btn-open` when `isEpicOpen` prop is false', () => {
         vm.isEpicOpen = false;
+
         expect(vm.actionButtonClass).toContain('btn btn-grouped js-btn-epic-action qa-close-reopen-epic-button btn-open');
       });
     });
@@ -94,11 +102,13 @@ describe('epicHeader', () => {
     describe('actionButtonText', () => {
       it('returns `Close epic` when `isEpicOpen` prop is true', () => {
         vm.isEpicOpen = true;
+
         expect(vm.actionButtonText).toBe('Close epic');
       });
 
       it('returns `Reopen epic` when `isEpicOpen` prop is false', () => {
         vm.isEpicOpen = false;
+
         expect(vm.actionButtonText).toBe('Reopen epic');
       });
     });
@@ -111,6 +121,7 @@ describe('epicHeader', () => {
 
         vm.isEpicOpen = true;
         vm.toggleStatus();
+
         expect(vm.statusUpdating).toBe(true);
         expect(vm.$emit).toHaveBeenCalledWith('toggleEpicStatus', stateEvent.close);
       });
@@ -120,6 +131,7 @@ describe('epicHeader', () => {
 
         vm.isEpicOpen = false;
         vm.toggleStatus();
+
         expect(vm.statusUpdating).toBe(true);
         expect(vm.$emit).toHaveBeenCalledWith('toggleEpicStatus', stateEvent.reopen);
       });

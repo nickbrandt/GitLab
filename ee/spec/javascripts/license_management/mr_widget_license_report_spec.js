@@ -171,6 +171,7 @@ describe('License Report MR Widget', () => {
 
     it('should be rendered when fullReportPath prop is provided', () => {
       const linkEl = vm.$el.querySelector(selector);
+
       expect(linkEl).not.toBeNull();
       expect(linkEl.getAttribute('href')).toEqual(defaultProps.fullReportPath);
       expect(linkEl.textContent.trim()).toEqual('View full report');
@@ -181,6 +182,7 @@ describe('License Report MR Widget', () => {
       vm = mountComponent({ props });
 
       const linkEl = vm.$el.querySelector(selector);
+
       expect(linkEl).toBeNull();
     });
   });
@@ -190,6 +192,7 @@ describe('License Report MR Widget', () => {
 
     it('should be rendered when licenseManagementSettingsPath prop is provided', () => {
       const linkEl = vm.$el.querySelector(selector);
+
       expect(linkEl).not.toBeNull();
       expect(linkEl.getAttribute('href')).toEqual(defaultProps.licenseManagementSettingsPath);
       expect(linkEl.textContent.trim()).toEqual('Manage licenses');
@@ -200,6 +203,7 @@ describe('License Report MR Widget', () => {
       vm = mountComponent({ props });
 
       const linkEl = vm.$el.querySelector(selector);
+
       expect(linkEl).toBeNull();
     });
   });
@@ -226,11 +230,13 @@ describe('License Report MR Widget', () => {
       },
       undefined,
     );
+
     expect(actions.loadManagedLicenses).toHaveBeenCalledWith(
       jasmine.any(Object),
       undefined,
       undefined,
     );
+
     expect(actions.loadLicenseReport).toHaveBeenCalledWith(
       jasmine.any(Object),
       undefined,

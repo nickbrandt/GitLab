@@ -53,6 +53,7 @@ describe('AppComponent', () => {
         spyOn(vm.store, 'setMembers');
 
         vm.fetchContributedMembers();
+
         expect(vm.isLoading).toBe(true);
         setTimeout(() => {
           expect(vm.isLoading).toBe(false);
@@ -66,6 +67,7 @@ describe('AppComponent', () => {
         mock.onGet(vm.service.memberContributionsPath).reply(500, {});
 
         vm.fetchContributedMembers();
+
         expect(vm.isLoading).toBe(true);
         setTimeout(() => {
           expect(vm.isLoading).toBe(false);
@@ -83,6 +85,7 @@ describe('AppComponent', () => {
 
         const columnName = 'fullname';
         vm.handleColumnClick(columnName);
+
         expect(vm.store.sortMembers).toHaveBeenCalledWith(columnName);
       });
     });
@@ -103,6 +106,7 @@ describe('AppComponent', () => {
         .$nextTick()
         .then(() => {
           const loadingEl = vm.$el.querySelector('.loading-animation');
+
           expect(loadingEl).not.toBeNull();
           expect(loadingEl.querySelector('i').getAttribute('aria-label')).toBe(
             'Loading contribution stats for group members',

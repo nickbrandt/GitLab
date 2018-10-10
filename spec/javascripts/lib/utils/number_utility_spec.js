@@ -17,6 +17,7 @@ describe('Number Utils', () => {
       const formattedNumber = formatRelevantDigits('1000.1234567');
       const rightFromDecimal = formattedNumber.split('.')[1];
       const leftFromDecimal = formattedNumber.split('.')[0];
+
       expect(rightFromDecimal.length).toBe(4);
       expect(leftFromDecimal.length).toBe(4);
     });
@@ -25,6 +26,7 @@ describe('Number Utils', () => {
       const formattedNumber = formatRelevantDigits('0.1234567');
       const rightFromDecimal = formattedNumber.split('.')[1];
       const leftFromDecimal = formattedNumber.split('.')[0];
+
       expect(rightFromDecimal.length).toBe(3);
       expect(leftFromDecimal.length).toBe(1);
     });
@@ -33,6 +35,7 @@ describe('Number Utils', () => {
       const formattedNumber = formatRelevantDigits('10.1234567');
       const rightFromDecimal = formattedNumber.split('.')[1];
       const leftFromDecimal = formattedNumber.split('.')[0];
+
       expect(rightFromDecimal.length).toBe(2);
       expect(leftFromDecimal.length).toBe(2);
     });
@@ -41,6 +44,7 @@ describe('Number Utils', () => {
       const formattedNumber = formatRelevantDigits('100.1234567');
       const rightFromDecimal = formattedNumber.split('.')[1];
       const leftFromDecimal = formattedNumber.split('.')[0];
+
       expect(rightFromDecimal.length).toBe(1);
       expect(leftFromDecimal.length).toBe(3);
     });

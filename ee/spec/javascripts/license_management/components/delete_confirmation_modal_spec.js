@@ -72,12 +72,14 @@ describe('DeleteConfirmationModal', () => {
       it('by clicking the cancel button', () => {
         const linkEl = vm.$el.querySelector('.js-modal-cancel-action');
         linkEl.click();
+
         expect(actions.resetLicenseInModal).toHaveBeenCalled();
       });
 
       it('by clicking the X button', () => {
         const linkEl = vm.$el.querySelector('.js-modal-close-action');
         linkEl.click();
+
         expect(actions.resetLicenseInModal).toHaveBeenCalled();
       });
     });
@@ -86,6 +88,7 @@ describe('DeleteConfirmationModal', () => {
       it('by clicking the confirmation button', () => {
         const linkEl = vm.$el.querySelector('.js-modal-primary-action');
         linkEl.click();
+
         expect(actions.deleteLicense).toHaveBeenCalledWith(
           jasmine.any(Object),
           store.state.currentLicenseInModal,
@@ -98,18 +101,21 @@ describe('DeleteConfirmationModal', () => {
   describe('template', () => {
     it('renders modal title', () => {
       const headerEl = vm.$el.querySelector('.modal-title');
+
       expect(headerEl).not.toBeNull();
       expect(headerEl.innerText.trim()).toBe('Remove license?');
     });
 
     it('renders button in modal footer', () => {
       const footerButton = vm.$el.querySelector('.js-modal-primary-action');
+
       expect(footerButton).not.toBeNull();
       expect(footerButton.innerText.trim()).toBe('Remove license');
     });
 
     it('renders modal body', () => {
       const modalBody = vm.$el.querySelector('.modal-body');
+
       expect(modalBody).not.toBeNull();
       expect(trimText(modalBody.innerText)).toBe(
         `You are about to remove the license, ${approvedLicense.name}, from this project.`,

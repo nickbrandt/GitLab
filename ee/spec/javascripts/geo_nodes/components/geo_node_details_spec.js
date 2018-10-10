@@ -47,6 +47,7 @@ describe('GeoNodeDetailsComponent', () => {
           healthy: false,
         });
         const vmX = createComponent({ nodeDetails });
+
         expect(vmX.errorMessage).toBe('Something went wrong.');
         expect(vmX.hasError).toBeTruthy();
         vmX.$destroy();
@@ -64,6 +65,7 @@ describe('GeoNodeDetailsComponent', () => {
           primaryRevision: 'b93c51850b',
         });
         const vmX = createComponent({ nodeDetails });
+
         expect(vmX.errorMessage).toBe('GitLab version does not match the primary node version');
         expect(vmX.hasVersionMismatch).toBeTruthy();
         vmX.$destroy();

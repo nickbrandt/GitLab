@@ -30,6 +30,7 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
 
     it('should return weightTokenKey as part of tokenKeys', () => {
       const match = tokenKeys.find(tk => tk.key === weightTokenKey.key);
+
       expect(match).toEqual(weightTokenKey);
     });
 
@@ -41,6 +42,7 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
 
     it('should return assignee as an array', () => {
       const assignee = tokenKeys.find(tokenKey => tokenKey.key === 'assignee');
+
       expect(assignee.type).toEqual('array');
     });
   });
@@ -73,6 +75,7 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
 
     it('should return weightConditions as part of conditions', () => {
       const weightConditions = conditions.filter(c => c.tokenKey === 'weight');
+
       expect(weightConditions.length).toBe(2);
     });
   });
@@ -80,12 +83,14 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
   describe('searchByKey', () => {
     it('should return null when key not found', () => {
       const tokenKey = IssuesFilteredSearchTokenKeysEE.searchByKey('notakey');
+
       expect(tokenKey).toBeNull();
     });
 
     it('should return tokenKey when found by key', () => {
       const tokenKeys = IssuesFilteredSearchTokenKeysEE.get();
       const result = IssuesFilteredSearchTokenKeysEE.searchByKey(tokenKeys[0].key);
+
       expect(result).toEqual(tokenKeys[0]);
     });
 
@@ -93,6 +98,7 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
       const tokenKeys = IssuesFilteredSearchTokenKeysEE.get();
       const match = tokenKeys.find(tk => tk.key === weightTokenKey.key);
       const result = IssuesFilteredSearchTokenKeysEE.searchByKey(weightTokenKey.key);
+
       expect(result).toEqual(match);
     });
   });
@@ -100,12 +106,14 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
   describe('searchBySymbol', () => {
     it('should return null when symbol not found', () => {
       const tokenKey = IssuesFilteredSearchTokenKeysEE.searchBySymbol('notasymbol');
+
       expect(tokenKey).toBeNull();
     });
 
     it('should return tokenKey when found by symbol', () => {
       const tokenKeys = IssuesFilteredSearchTokenKeysEE.get();
       const result = IssuesFilteredSearchTokenKeysEE.searchBySymbol(tokenKeys[0].symbol);
+
       expect(result).toEqual(tokenKeys[0]);
     });
 
@@ -113,6 +121,7 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
       const tokenKeys = IssuesFilteredSearchTokenKeysEE.get();
       const match = tokenKeys.find(tk => tk.key === weightTokenKey.key);
       const result = IssuesFilteredSearchTokenKeysEE.searchBySymbol(weightTokenKey.symbol);
+
       expect(result).toEqual(match);
     });
   });
@@ -120,6 +129,7 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
   describe('searchByKeyParam', () => {
     it('should return null when key param not found', () => {
       const tokenKey = IssuesFilteredSearchTokenKeysEE.searchByKeyParam('notakeyparam');
+
       expect(tokenKey).toBeNull();
     });
 
@@ -127,6 +137,7 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
       const tokenKeys = IssuesFilteredSearchTokenKeysEE.get();
       const result = IssuesFilteredSearchTokenKeysEE
         .searchByKeyParam(`${tokenKeys[0].key}_${tokenKeys[0].param}`);
+
       expect(result).toEqual(tokenKeys[0]);
     });
 
@@ -134,6 +145,7 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
       const tokenKeys = IssuesFilteredSearchTokenKeysEE.getAlternatives();
       const result = IssuesFilteredSearchTokenKeysEE
         .searchByKeyParam(`${tokenKeys[0].key}_${tokenKeys[0].param}`);
+
       expect(result).toEqual(tokenKeys[0]);
     });
 
@@ -141,6 +153,7 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
       const tokenKeys = IssuesFilteredSearchTokenKeysEE.get();
       const match = tokenKeys.find(tk => tk.key === weightTokenKey.key);
       const result = IssuesFilteredSearchTokenKeysEE.searchByKeyParam(weightTokenKey.key);
+
       expect(result).toEqual(match);
     });
   });
@@ -148,6 +161,7 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
   describe('searchByConditionUrl', () => {
     it('should return null when condition url not found', () => {
       const condition = IssuesFilteredSearchTokenKeysEE.searchByConditionUrl(null);
+
       expect(condition).toBeNull();
     });
 
@@ -155,6 +169,7 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
       const conditions = IssuesFilteredSearchTokenKeysEE.getConditions();
       const result = IssuesFilteredSearchTokenKeysEE
         .searchByConditionUrl(conditions[0].url);
+
       expect(result).toBe(conditions[0]);
     });
 
@@ -163,6 +178,7 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
       const weightConditions = conditions.filter(c => c.tokenKey === 'weight');
       const result = IssuesFilteredSearchTokenKeysEE
         .searchByConditionUrl(weightConditions[0].url);
+
       expect(result).toBe(weightConditions[0]);
     });
   });
@@ -171,6 +187,7 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
     it('should return null when condition tokenKey and value not found', () => {
       const condition = IssuesFilteredSearchTokenKeysEE
         .searchByConditionKeyValue(null, null);
+
       expect(condition).toBeNull();
     });
 
@@ -178,6 +195,7 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
       const conditions = IssuesFilteredSearchTokenKeysEE.getConditions();
       const result = IssuesFilteredSearchTokenKeysEE
         .searchByConditionKeyValue(conditions[0].tokenKey, conditions[0].value);
+
       expect(result).toEqual(conditions[0]);
     });
 
@@ -186,6 +204,7 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
       const weightConditions = conditions.filter(c => c.tokenKey === 'weight');
       const result = IssuesFilteredSearchTokenKeysEE
         .searchByConditionKeyValue(weightConditions[0].tokenKey, weightConditions[0].value);
+
       expect(result).toEqual(weightConditions[0]);
     });
   });

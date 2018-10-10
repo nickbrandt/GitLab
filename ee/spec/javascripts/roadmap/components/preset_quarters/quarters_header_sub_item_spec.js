@@ -28,6 +28,7 @@ describe('QuartersHeaderSubItemComponent', () => {
     describe('headerSubItems', () => {
       it('returns array of dates containing Months from timeframeItem', () => {
         vm = createComponent({});
+
         expect(Array.isArray(vm.headerSubItems)).toBe(true);
         vm.headerSubItems.forEach(subItem => {
           expect(subItem instanceof Date).toBe(true);
@@ -38,6 +39,7 @@ describe('QuartersHeaderSubItemComponent', () => {
     describe('hasToday', () => {
       it('returns true when current quarter is same as timeframe quarter', () => {
         vm = createComponent({});
+
         expect(vm.hasToday).toBe(true);
       });
 
@@ -46,6 +48,7 @@ describe('QuartersHeaderSubItemComponent', () => {
           currentDate: new Date(2017, 10, 1), // Nov 1, 2017
           timeframeItem: mockTimeframeQuarters[1], // 2018 Apr May Jun
         });
+
         expect(vm.hasToday).toBe(false);
       });
     });
@@ -58,6 +61,7 @@ describe('QuartersHeaderSubItemComponent', () => {
           currentDate: new Date(2018, 0, 1), // Jan 1, 2018
         });
         const subItem = new Date(2018, 1, 15); // Feb 15, 2018
+
         expect(vm.getSubItemValueClass(subItem)).toBe('label-dark');
       });
     });

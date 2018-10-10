@@ -44,6 +44,7 @@ describe('SectionMixin', () => {
 
       it('returns shellWidth after deducating value of SCROLL_BAR_SIZE when `listScrollable` prop is true', () => {
         const vmScrollable = createComponent({ listScrollable: true });
+
         expect(vmScrollable.sectionShellWidth).toBe(mockShellWidth - mockScrollBarSize);
         vmScrollable.$destroy();
       });

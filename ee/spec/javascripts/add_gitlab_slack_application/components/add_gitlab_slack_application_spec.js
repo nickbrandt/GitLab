@@ -37,7 +37,9 @@ describe('AddGitlabSlackApplication', () => {
     vm.$el.querySelector('.js-popup-button').click();
 
     vm.$nextTick()
-      .then(() => expect(vm.$el.querySelector('.js-popup')).toBeDefined())
+      .then(() => {
+          expect(vm.$el.querySelector('.js-popup')).toBeDefined()
+      })
       .then(done)
       .catch(done.fail);
   });
@@ -50,7 +52,9 @@ describe('AddGitlabSlackApplication', () => {
     vm.$nextTick()
       .then(() => vm.$el.querySelector('.js-popup-button').click())
       .then(vm.$nextTick)
-      .then(() => expect(vm.$el.querySelector('.js-popup')).toBeNull())
+      .then(() => {
+          expect(vm.$el.querySelector('.js-popup')).toBeNull()
+      })
       .then(done)
       .catch(done.fail);
   });
@@ -64,7 +68,9 @@ describe('AddGitlabSlackApplication', () => {
     vm.popupOpen = true;
 
     vm.$nextTick()
-      .then(() => expect(vm.$el.querySelector('.js-project-select')).toBeDefined())
+      .then(() => {
+          expect(vm.$el.querySelector('.js-project-select')).toBeDefined()
+      })
       .then(done)
       .catch(done.fail);
   });
@@ -120,7 +126,9 @@ describe('AddGitlabSlackApplication', () => {
       .then(() => vm.$el.querySelector('.js-add-button').click())
       .then(vm.$nextTick)
       .then(addToSlackPromise)
-      .then(() => expect(redirectTo).toHaveBeenCalledWith(redirectLink))
+      .then(() => {
+          expect(redirectTo).toHaveBeenCalledWith(redirectLink)
+      })
       .then(done)
       .catch(done.fail);
   });
