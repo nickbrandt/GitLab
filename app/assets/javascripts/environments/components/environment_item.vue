@@ -456,11 +456,7 @@ export default {
     },
 
     deployIconName() {
-      if (this.model.isDeployBoardVisible) {
-        return 'chevron-down';
-      }
-
-      return 'chevron-right';
+      return this.model.isDeployBoardVisible ? 'chevron-down' : 'chevron-right';
     },
   },
 
