@@ -51,6 +51,7 @@ func NewRepositoryClient(server Server) (*RepositoryClient, error) {
 	return &RepositoryClient{grpcClient}, nil
 }
 
+// NewNamespaceClient is only used by the Gitaly integration tests at present
 func NewNamespaceClient(server Server) (*NamespaceClient, error) {
 	conn, err := getOrCreateConnection(server)
 	if err != nil {
