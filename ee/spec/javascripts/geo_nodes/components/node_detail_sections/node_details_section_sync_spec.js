@@ -29,7 +29,7 @@ describe('NodeDetailsSectionSync', () => {
     it('returns default data props', () => {
       expect(vm.showSectionItems).toBe(false);
       expect(Array.isArray(vm.nodeDetailItems)).toBe(true);
-      expect(vm.nodeDetailItems.length > 0).toBe(true);
+      expect(vm.nodeDetailItems.length).toBeGreaterThan(0);
     });
   });
 

@@ -32,8 +32,8 @@ describe('NodeDetailsSectionVerification', () => {
       expect(vm.showSectionItems).toBe(false);
       expect(Array.isArray(vm.primaryNodeDetailItems)).toBe(true);
       expect(Array.isArray(vm.secondaryNodeDetailItems)).toBe(true);
-      expect(vm.primaryNodeDetailItems.length > 0).toBe(true);
-      expect(vm.secondaryNodeDetailItems.length > 0).toBe(true);
+      expect(vm.primaryNodeDetailItems.length).toBeGreaterThan(0);
+      expect(vm.secondaryNodeDetailItems.length).toBeGreaterThan(0);
     });
   });
 
