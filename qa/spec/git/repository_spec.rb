@@ -8,10 +8,8 @@ describe QA::Git::Repository do
   end
 
   describe '#clone' do
-    it 'redacts credentials from the URI in output' do
-      output, _ = repository.clone
-
-      expect(output).to include("fatal: unable to access 'http://****@foo/bar.git/'")
+    it 'is unable to resolve host' do
+      expect(repository.clone).to include("fatal: unable to access 'http://root@foo/bar.git/'")
     end
   end
 
@@ -20,10 +18,8 @@ describe QA::Git::Repository do
       `git init` # need a repo to push from
     end
 
-    it 'redacts credentials from the URI in output' do
-      output, _ = repository.push_changes
-
-      expect(output).to include("error: failed to push some refs to 'http://****@foo/bar.git'")
+    it 'fails to push changes' do
+      expect(repository.push_changes).to include("error: failed to push some refs to 'http://root@foo/bar.git'")
     end
   end
 
