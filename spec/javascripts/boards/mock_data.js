@@ -1,14 +1,11 @@
 import BoardService from '~/boards/services/board_service';
 
-<<<<<<< HEAD
 export const boardObj = {
   id: 1,
   name: 'test',
   milestone_id: null,
 };
 
-=======
->>>>>>> upstream/master
 export const listObj = {
   id: 300,
   position: 0,
