@@ -184,11 +184,8 @@ const boardsStore = {
   }
 };
 
-<<<<<<< HEAD
 BoardsStoreEE.initEESpecific(boardsStore);
 
-=======
->>>>>>> upstream/master
 // hacks added in order to allow milestone_select to function properly
 // TODO: remove these
 
