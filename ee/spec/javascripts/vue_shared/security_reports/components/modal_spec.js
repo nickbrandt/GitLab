@@ -2,6 +2,8 @@ import Vue from 'vue';
 import component from 'ee/vue_shared/security_reports/components/modal.vue';
 import createState from 'ee/vue_shared/security_reports/store/state';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import { trimText } from 'spec/helpers/vue_component_helper';
+import { TEST_HOST } from 'spec/test_constants';
 
 describe('Security Reports modal', () => {
   const Component = Vue.extend(component);
@@ -149,7 +151,7 @@ describe('Security Reports modal', () => {
         props.modal.data.solution.value =
           'upgrade to ~> 3.2.21, ~> 4.0.11.1, ~> 4.0.12, ~> 4.1.7.1, >= 4.1.8';
         props.modal.data.file.value = 'Gemfile.lock';
-        props.modal.data.file.url = 'path/Gemfile.lock';
+        props.modal.data.file.url = `${TEST_HOST}/path/Gemfile.lock`;
         vm = mountComponent(Component, props);
       });
 
@@ -162,7 +164,7 @@ describe('Security Reports modal', () => {
 
       it('renders link fields with link', () => {
         expect(vm.$el.querySelector('.js-link-file').getAttribute('href')).toEqual(
-          'path/Gemfile.lock',
+          `${TEST_HOST}/path/Gemfile.lock`,
         );
       });
 
@@ -203,6 +205,65 @@ describe('Security Reports modal', () => {
 
     it('does not display the footer', () => {
       expect(vm.$el.classList.contains('modal-hide-footer')).toBeTruthy();
+    });
+  });
+
+  describe('does not render XSS links', () => {
+    // eslint-disable-next-line no-script-url
+    const badUrl = 'javascript:alert("")';
+
+    beforeEach(() => {
+      const props = {
+        modal: createState().modal,
+      };
+
+      props.modal.data.file.value = 'badFile.lock';
+      props.modal.data.file.url = badUrl;
+      props.modal.data.links.value = [
+        {
+          url: badUrl,
+        },
+      ];
+      props.modal.data.identifiers.value = [
+        {
+          type: 'CVE',
+          name: 'BAD_URL',
+          url: badUrl,
+        },
+      ];
+      props.modal.data.instances.value = [
+        {
+          param: 'X-Content-Type-Options',
+          method: 'GET',
+          uri: badUrl,
+        },
+      ];
+
+      vm = mountComponent(Component, props);
+    });
+
+    it('for the link field', () => {
+      const linkEl = vm.$el.querySelector('.js-link-links');
+      expect(linkEl.tagName).not.toBe('A');
+      expect(trimText(linkEl.textContent)).toBe(badUrl);
+    });
+
+    it('for the identifiers field', () => {
+      const linkEl = vm.$el.querySelector('.js-link-identifiers');
+      expect(linkEl.tagName).not.toBe('A');
+      expect(trimText(linkEl.textContent)).toBe('BAD_URL');
+    });
+
+    it('for the file field', () => {
+      const linkEl = vm.$el.querySelector('.js-link-file');
+      expect(linkEl.tagName).not.toBe('A');
+      expect(trimText(linkEl.textContent)).toBe('badFile.lock');
+    });
+
+    it('for the instances field', () => {
+      const linkEl = vm.$el.querySelector('.report-block-list-issue-description-link .break-link');
+      expect(linkEl.tagName).not.toBe('A');
+      expect(trimText(linkEl.textContent)).toBe(badUrl);
     });
   });
 });
