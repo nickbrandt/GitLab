@@ -58,8 +58,8 @@ describe('RoadmapShellComponent', () => {
           const stylesObj = vmWithParentEl.containerStyles;
           // Ensure that value for `width` & `height`
           // is a non-zero number.
-          expect(parseInt(stylesObj.width, 10) !== 0).toBe(true);
-          expect(parseInt(stylesObj.height, 10) !== 0).toBe(true);
+          expect(parseInt(stylesObj.width, 10)).not.toBe(0);
+          expect(parseInt(stylesObj.height, 10)).not.toBe(0);
           vmWithParentEl.$destroy();
           done();
         });

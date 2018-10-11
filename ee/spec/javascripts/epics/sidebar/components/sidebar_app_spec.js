@@ -77,9 +77,9 @@ describe('epicSidebar', () => {
   });
 
   it('should initialize service with correct endpoints', () => {
-    expect(vm.service.endpoint.length > 0).toBe(true);
-    expect(vm.service.subscriptionEndpoint.length > 0).toBe(true);
-    expect(vm.service.todoPath.length > 0).toBe(true);
+    expect(vm.service.endpoint.length).toBeGreaterThan(0);
+    expect(vm.service.subscriptionEndpoint.length).toBeGreaterThan(0);
+    expect(vm.service.todoPath.length).toBeGreaterThan(0);
   });
 
   it('should render right-sidebar-expanded class when not collapsed', () => {
