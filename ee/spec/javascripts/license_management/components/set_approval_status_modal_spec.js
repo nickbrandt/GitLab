@@ -56,6 +56,7 @@ describe('SetApprovalModal', () => {
       it('canApprove is false', () => {
         expect(vm.canApprove).toBe(false);
       });
+
       it('canBlacklist is true', () => {
         expect(vm.canBlacklist).toBe(true);
       });
@@ -101,6 +102,7 @@ describe('SetApprovalModal', () => {
       it('canApprove is true', () => {
         expect(vm.canApprove).toBe(true);
       });
+
       it('canBlacklist is true', () => {
         expect(vm.canBlacklist).toBe(true);
       });
@@ -147,6 +149,7 @@ describe('SetApprovalModal', () => {
       it('canApprove is true', () => {
         expect(vm.canApprove).toBe(true);
       });
+
       it('canBlacklist is false', () => {
         expect(vm.canBlacklist).toBe(false);
       });
@@ -192,6 +195,7 @@ describe('SetApprovalModal', () => {
       it('canApprove is false', () => {
         expect(vm.canApprove).toBe(false);
       });
+
       it('canBlacklist is false', () => {
         expect(vm.canBlacklist).toBe(false);
       });

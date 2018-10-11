@@ -118,11 +118,13 @@ describe('utils', () => {
         STATUS_SUCCESS,
       );
     });
+
     it('returns FAILED status for blacklisted licensens', () => {
       expect(getIssueStatusFromLicenseStatus(LICENSE_APPROVAL_STATUS.BLACKLISTED)).toBe(
         STATUS_FAILED,
       );
     });
+
     it('returns NEUTRAL status for undefined', () => {
       expect(getIssueStatusFromLicenseStatus()).toBe(STATUS_NEUTRAL);
     });
