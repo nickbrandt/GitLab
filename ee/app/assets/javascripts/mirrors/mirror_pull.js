@@ -25,7 +25,9 @@ export default class MirrorPull {
     this.$wellSSHAuth = this.$form.find('.js-well-ssh-auth');
     this.$sshPublicKeyWrap = this.$form.find('.js-ssh-public-key-wrap');
     this.$regeneratePublicSshKeyButton = this.$wellSSHAuth.find('.js-btn-regenerate-ssh-key');
-    this.$regeneratePublicSshKeyModal = this.$wellSSHAuth.find('.js-regenerate-public-ssh-key-confirm-modal');
+    this.$regeneratePublicSshKeyModal = this.$wellSSHAuth.find(
+      '.js-regenerate-public-ssh-key-confirm-modal',
+    );
   }
 
   init() {
@@ -36,9 +38,15 @@ export default class MirrorPull {
     this.$dropdownAuthType.on('change', e => this.handleAuthTypeChange(e));
     this.$btnDetectHostKeys.on('click', e => this.handleDetectHostKeys(e));
     this.$btnSSHHostsShowAdvanced.on('click', e => this.handleSSHHostsAdvanced(e));
-    this.$regeneratePublicSshKeyButton.on('click', () => this.$regeneratePublicSshKeyModal.toggle(true));
-    $('.js-confirm', this.$regeneratePublicSshKeyModal).on('click', e => this.regeneratePublicSshKey(e));
-    $('.js-cancel', this.$regeneratePublicSshKeyModal).on('click', () => this.$regeneratePublicSshKeyModal.toggle(false));
+    this.$regeneratePublicSshKeyButton.on('click', () =>
+      this.$regeneratePublicSshKeyModal.toggle(true),
+    );
+    $('.js-confirm', this.$regeneratePublicSshKeyModal).on('click', e =>
+      this.regeneratePublicSshKey(e),
+    );
+    $('.js-cancel', this.$regeneratePublicSshKeyModal).on('click', () =>
+      this.$regeneratePublicSshKeyModal.toggle(false),
+    );
   }
 
   /**
@@ -77,11 +85,11 @@ export default class MirrorPull {
   handleDetectHostKeys() {
     const projectMirrorSSHEndpoint = this.$form.data('project-mirror-ssh-endpoint');
     const repositoryUrl = this.$repositoryUrl.val();
-    const $btnLoadSpinner = this.$btnDetectHostKeys.find('.detect-host-keys-load-spinner');
+    const $btnLoadSpinner = this.$btnDetectHostKeys.find('.js-spinner');
 
     // Disable button while we make request
     this.$btnDetectHostKeys.disable();
-    $btnLoadSpinner.removeClass('hidden');
+    $btnLoadSpinner.removeClass('d-none');
 
     // Make backOff polling to get data
     backOff((next, stop) => {
@@ -102,7 +110,7 @@ export default class MirrorPull {
         .catch(stop);
     })
       .then(res => {
-        $btnLoadSpinner.addClass('hidden');
+        $btnLoadSpinner.addClass('d-none');
         // Once data is received, we show verification info along with Host keys and fingerprints
         this.$hostKeysInformation
           .find('.js-fingerprint-verification')
