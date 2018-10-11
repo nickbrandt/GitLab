@@ -452,11 +452,7 @@ export default {
     },
 
     folderIconName() {
-      if (this.model.isOpen) {
-        return 'chevron-down';
-      }
-
-      return 'chevron-right';
+      return this.model.isOpen ? 'chevron-down' : 'chevron-right';
     },
 
     deployIconName() {
