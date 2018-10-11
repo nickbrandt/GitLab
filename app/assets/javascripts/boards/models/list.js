@@ -6,10 +6,7 @@ import ListLabel from '~/vue_shared/models/label';
 import ListAssignee from '~/vue_shared/models/assignee';
 import { urlParamsToObject } from '~/lib/utils/common_utils';
 import boardsStore from '../stores/boards_store';
-<<<<<<< HEAD
 import ListMilestone from './milestone';
-=======
->>>>>>> upstream/master
 
 const PER_PAGE = 20;
 
