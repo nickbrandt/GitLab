@@ -277,11 +277,7 @@ removed with one of the future versions of GitLab. You are advised to
 [take ownership](#taking-ownership) of any legacy triggers.
 
 [ee-2017]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/2017
-<<<<<<< HEAD
 [ee-2346]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/2346
-[ci-229]: https://gitlab.com/gitlab-org/gitlab-ci/merge_requests/229
-=======
->>>>>>> upstream/master
 [ee]: https://about.gitlab.com/pricing/
 [variables]: ../variables/README.md
 [predef]: ../variables/README.md#predefined-variables-environment-variables
