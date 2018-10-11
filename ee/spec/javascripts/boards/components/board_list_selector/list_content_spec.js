@@ -1,12 +1,12 @@
 import Vue from 'vue';
 
-import ListContentComponent from 'ee/boards/components/boards_list_selector/list_content.vue';
+import ListContent from 'ee/boards/components/boards_list_selector/list_content.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 import { mockAssigneesList } from 'spec/boards/mock_data';
 
 const createComponent = () => {
-  const Component = Vue.extend(ListContentComponent);
+  const Component = Vue.extend(ListContent);
 
   return mountComponent(Component, {
     items: mockAssigneesList,
@@ -14,7 +14,7 @@ const createComponent = () => {
   });
 };
 
-describe('ListContentComponent', () => {
+describe('ListContent', () => {
   let vm;
 
   beforeEach(() => {

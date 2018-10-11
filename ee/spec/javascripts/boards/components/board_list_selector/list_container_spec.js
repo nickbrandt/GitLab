@@ -1,12 +1,12 @@
 import Vue from 'vue';
 
-import ListContainerComponent from 'ee/boards/components/boards_list_selector/list_container.vue';
+import ListContainer from 'ee/boards/components/boards_list_selector/list_container.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 import { mockAssigneesList } from 'spec/boards/mock_data';
 
 const createComponent = () => {
-  const Component = Vue.extend(ListContainerComponent);
+  const Component = Vue.extend(ListContainer);
 
   return mountComponent(Component, {
     loading: false,
@@ -15,7 +15,7 @@ const createComponent = () => {
   });
 };
 
-describe('ListContainerComponent', () => {
+describe('ListContainer', () => {
   let vm;
 
   beforeEach(() => {
