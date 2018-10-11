@@ -6,7 +6,7 @@ describe Clusters::CreateService do
   let(:user) { create(:user) }
   let!(:cluster) { create(:cluster, :provided_by_gcp, :production_environment, projects: [project]) }
 
-  subject { described_class.new(project, user, params).execute(access_token) }
+  subject { described_class.new(user, params).execute(project: project, access_token: access_token) }
 
   before do
     allow(project).to receive(:feature_available?).and_call_original
