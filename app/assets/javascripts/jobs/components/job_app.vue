@@ -22,7 +22,7 @@
       SharedRunner,
     },
     props: {
-      runnerHelpUrl: {
+      runnerSettingsUrl: {
         type: String,
         required: false,
         default: null,
@@ -81,7 +81,7 @@
         class="js-job-stuck"
         :has-no-runners-for-project="job.runners.available"
         :tags="job.tags"
-        :runners-path="runnerHelpUrl"
+        :runners-path="runnerSettingsUrl"
       />
 
       <shared-runner
