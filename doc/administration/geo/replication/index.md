@@ -8,7 +8,7 @@ Fetching large repositories can take a long time for teams located far from a si
 
 Geo provides local, read-only instances of your GitLab instances, reducing the time it takes to clone and fetch large repositories and speeding up development.
 
-> - Geo is part of [GitLab Premium](https://about.gitlab.com/pricing/).
+> - Geo is part of [GitLab Premium](https://about.gitlab.com/pricing/#self-managed).
 > - Introduced in GitLab Enterprise Edition 8.9.
 > - We recommend you use:
 >   - At least GitLab Enterprise Edition 10.0 for basic Geo features.
