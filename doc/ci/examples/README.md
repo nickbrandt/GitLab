@@ -63,10 +63,6 @@ There's also a collection of repositories with [example projects](https://gitlab
 
 [Scan your dependencies for vulnerabilities](dependency_scanning.md)
 
-## Dependency Scanning **[ULTIMATE]**
-
-[Scan your dependencies for vulnerabilities](https://docs.gitlab.com/ee/ci/examples/dependency_scanning.html)
-
 ## Container Scanning
 
 [Scan your Docker images for vulnerabilities](container_scanning.md)
