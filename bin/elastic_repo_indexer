@@ -10,7 +10,6 @@ require 'benchmark'
 
 $: << File.expand_path('../ee/lib', __dir__)
 
-require 'linguist'
 require 'open3'
 require 'rugged'
 
