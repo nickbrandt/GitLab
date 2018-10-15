@@ -93,7 +93,11 @@ The `element` DSL method in turn declares an element for which a corresponding
 `qa-element-name-dasherized` CSS class need to be added to the view file.
 
 You can also define a value (String or Regexp) to match to the actual view
-code but **this is deprecated** in favor of the above method.
+code but **this is deprecated** in favor of the above method for two reasons:
+
+- Consistency: there is only one way to define an element
+- Separation of concerns: QA uses dedicated CSS classes instead of reusing code
+  or classes used by other components (e.g. `js-*` classes etc.)
 
 ```ruby
 view 'app/views/my/view.html.haml' do
