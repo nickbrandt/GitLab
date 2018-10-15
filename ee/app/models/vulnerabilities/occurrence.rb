@@ -7,6 +7,8 @@ module Vulnerabilities
 
     self.table_name = "vulnerability_occurrences"
 
+    paginates_per 10
+
     # Used for both severity and confidence
     LEVELS = {
       undefined: 0,
@@ -62,6 +64,10 @@ module Vulnerabilities
     scope :ordered, -> { order("severity desc", :id) }
     scope :counted_by_report_and_severity, -> { group(:report_type, :severity).count }
 
+    scope :all_preloaded, -> do
+      preload(:scanner, :identifiers, :project)
+    end
+
     def feedback(feedback_type:)
       params = {
         project_id: project_id,
@@ -75,7 +81,7 @@ module Vulnerabilities
         categories = items.group_by { |i| i[:category] }
         fingerprints = items.group_by { |i| i[:project_fingerprint] }
 
-        VulnerabilityFeedback.where(
+        VulnerabilityFeedback.all_preloaded.where(
           project_id: project_ids.keys,
           category: categories.keys,
           project_fingerprint: fingerprints.keys).find_each do |feedback|

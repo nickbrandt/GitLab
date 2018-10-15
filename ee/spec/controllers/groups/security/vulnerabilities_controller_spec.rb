@@ -86,24 +86,37 @@ describe Groups::Security::VulnerabilitiesController do
         end
 
         context 'with vulnerability feedback' do
+          it "avoids N+1 queries" do
+            create_vulnerabilities(2, project_dev)
+
+            control_count = ActiveRecord::QueryRecorder.new { get_summary }
+
+            create_vulnerabilities(2, project_guest)
+
+            expect { get_summary }.not_to exceed_all_query_limit(control_count)
+          end
+
+          private
+
           def get_summary
             get :index, group_id: group, format: :json
           end
 
-          it "avoids N+1 queries" do
-            control_count = ActiveRecord::QueryRecorder.new { get_summary }
-
-            # Create feedback
-            project_dev.vulnerabilities.each do |occ|
+          def create_vulnerabilities(count, project)
+            pipeline = create(:ci_empty_pipeline, project: project)
+            vulnerabilities = create_list(:vulnerabilities_occurrence, count, project: project)
+            vulnerabilities.each do |occurrence|
               create(:vulnerability_feedback, :sast, :dismissal,
-                     project: project_dev, project_fingerprint: occ.project_fingerprint)
+                     pipeline: pipeline,
+                     project: project_dev,
+                     project_fingerprint: occurrence.project_fingerprint)
 
               create(:vulnerability_feedback, :sast, :issue,
-                     issue: create(:issue, project: project),
-                     project: project_dev, project_fingerprint: occ.project_fingerprint)
+                     pipeline: pipeline,
+                     issue: create(:issue, project: project_dev),
+                     project: project_dev,
+                     project_fingerprint: occurrence.project_fingerprint)
             end
-
-            expect { get_summary }.not_to exceed_query_limit(control_count)
           end
         end
       end

@@ -7,9 +7,11 @@ module Gitlab
   # vulnerabilities (occurrences).
   module Vulnerabilities
     class OccurrencesPreloader
-      def preload(occurrences)
-        occurrences.each(&:issue_feedback)
-        occurrences.each(&:dismissal_feedback)
+      def self.preload!(occurrences)
+        occurrences.all_preloaded.tap do |occurrences|
+          occurrences.each(&:issue_feedback)
+          occurrences.each(&:dismissal_feedback)
+        end
       end
     end
   end

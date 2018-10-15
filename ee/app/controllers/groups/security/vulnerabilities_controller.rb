@@ -6,17 +6,13 @@ class Groups::Security::VulnerabilitiesController < Groups::ApplicationControlle
   def index
     @vulnerabilities = group.all_vulnerabilities.ordered
       .page(params[:page])
-      .per(10)
-      .to_a
-
-    ::Gitlab::Vulnerabilities::OccurrencesPreloader.new.preload(@vulnerabilities) # rubocop:disable CodeReuse/ActiveRecord
 
     respond_to do |format|
       format.json do
         render json: Vulnerabilities::OccurrenceSerializer
           .new(current_user: @current_user)
           .with_pagination(request, response)
-          .represent(@vulnerabilities)
+          .represent(@vulnerabilities, preload: true)
       end
     end
   end
