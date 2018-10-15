@@ -2,7 +2,6 @@
 
 module Clusters
   class CreateService
-<<<<<<< HEAD
     prepend EE::Clusters::CreateService
 
     attr_reader :current_user, :params
@@ -19,22 +18,6 @@ module Clusters
         provider[:access_token] = access_token
       end
 
-=======
-    attr_reader :current_user, :params
-
-    def initialize(user = nil, params = {})
-      @current_user, @params = user, params.dup
-    end
-
-    def execute(project:, access_token: nil)
-      raise ArgumentError.new(_('Instance does not support multiple Kubernetes clusters')) unless can_create_cluster?(project)
-
-      cluster_params = params.merge(user: current_user, projects: [project])
-      cluster_params[:provider_gcp_attributes].try do |provider|
-        provider[:access_token] = access_token
-      end
-
->>>>>>> upstream/master
       create_cluster(cluster_params).tap do |cluster|
         ClusterProvisionWorker.perform_async(cluster.id) if cluster.persisted?
       end
