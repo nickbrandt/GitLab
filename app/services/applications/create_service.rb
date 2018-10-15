@@ -11,6 +11,7 @@ module Applications
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
+    # EE would override and use `request` arg
     def execute(request)
       Doorkeeper::Application.create(@params)
     end
