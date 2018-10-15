@@ -10,6 +10,7 @@ entry.
 - Fix project deletion when there is a export available. !22276
 
 
+<<<<<<< HEAD
 ## 11.3.4 (2018-10-05)
 
 ### Security (3 changes)
@@ -19,6 +20,8 @@ entry.
 - Markdown API no longer displays confidential title references unless authorized.
 
 
+=======
+>>>>>>> upstream/master
 ## 11.3.3 (2018-10-04)
 
 - No changes.
