@@ -544,11 +544,10 @@ msgstr ""
 msgid "Alternatively, you can use a %{personal_access_token_link}. When you create your Personal Access Token, you will need to select the <code>repo</code> scope, so we can display a list of your public and private repositories which are available to import."
 msgstr ""
 
-<<<<<<< HEAD
 msgid "An SSH key will be automatically generated when the form is submitted. For more information, please refer to the documentation."
-=======
+msgstr ""
+
 msgid "Amount of time (in hours) that users are allowed to skip forced configuration of two-factor authentication"
->>>>>>> upstream/master
 msgstr ""
 
 msgid "An application called %{link_to_client} is requesting access to your GitLab account."
@@ -2902,15 +2901,12 @@ msgstr ""
 msgid "Enable group Runners"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Enable or disable certain group features and choose access levels."
 msgstr ""
 
 msgid "Enable or disable the Pseudonymizer data collection."
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "Enable or disable version check and usage ping."
 msgstr ""
 
@@ -8566,11 +8562,10 @@ msgstr ""
 msgid "When enabled, users cannot use GitLab until the terms have been accepted."
 msgstr ""
 
-<<<<<<< HEAD
 msgid "When leaving the URL blank, classification labels can still be specified without disabling cross project features or performing external authorization checks."
-=======
+msgstr ""
+
 msgid "Who can see this group?"
->>>>>>> upstream/master
 msgstr ""
 
 msgid "Wiki"
