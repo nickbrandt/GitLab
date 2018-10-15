@@ -6,7 +6,7 @@ module QA
           module Nodes
             class Show < QA::Page::Base
               view 'ee/app/views/admin/geo/nodes/index.html.haml' do
-                element :new_node_link, /link_to .*New node/
+                element :new_node_link, /link_to .*New node/ # rubocop:disable QA/ElementWithPattern
               end
 
               def new_node!
