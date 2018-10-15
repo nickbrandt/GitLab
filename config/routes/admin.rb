@@ -16,16 +16,10 @@ namespace :admin do
       put :unlock
       put :confirm
       post :impersonate
-      post :reset_runners_minutes
       patch :disable_two_factor
       delete 'remove/:email_id', action: 'remove_email', as: 'remove_email'
     end
   end
-
-  ## EE-specific
-  resource :push_rule, only: [:show, :update]
-  get :instance_review, to: 'instance_review#index'
-  ## EE-specific
 
   resource :impersonation, only: :destroy
 
@@ -48,7 +42,6 @@ namespace :admin do
 
     scope(as: :group) do
       put :members_update
-      post :reset_runners_minutes
       get :edit, action: :edit
       get '/', action: :show
       patch '/', action: :update
@@ -78,11 +71,6 @@ namespace :admin do
   resource :logs, only: [:show]
   resource :health_check, controller: 'health_check', only: [:show]
   resource :background_jobs, controller: 'background_jobs', only: [:show]
-
-  ## EE-specific
-  resource :email, only: [:show, :create]
-  resources :audit_logs, controller: 'audit_logs', only: [:index]
-  ## EE-specific
 
   resource :system_info, controller: 'system_info', only: [:show]
   resources :requests_profiles, only: [:index, :show], param: :name, constraints: { name: /.+\.html/ }
@@ -124,26 +112,6 @@ namespace :admin do
     put :clear_repository_check_states
     get :integrations, :repository, :templates, :ci_cd, :reporting, :metrics_and_profiling, :network, :geo, :preferences
   end
-
-  ## EE-specific
-  resource :license, only: [:show, :new, :create, :destroy] do
-    get :download, on: :member
-  end
-
-  namespace :geo do
-    resources :nodes, only: [:index, :create, :new, :edit, :update]
-
-    resources :projects, only: [:index, :destroy] do
-      member do
-        post :recheck
-        post :resync
-        post :force_redownload
-      end
-    end
-  end
-
-  get '/dashboard/stats', to: 'dashboard#stats'
-  ## EE-specific
 
   resources :labels
 
