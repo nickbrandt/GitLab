@@ -454,13 +454,10 @@ export default {
     folderIconName() {
       return this.model.isOpen ? 'chevron-down' : 'chevron-right';
     },
-<<<<<<< HEAD
 
     deployIconName() {
       return this.model.isDeployBoardVisible ? 'chevron-down' : 'chevron-right';
     },
-=======
->>>>>>> upstream/master
   },
 
   methods: {
