@@ -120,30 +120,9 @@ describe Ci::Build do
       filename: Ci::Build::PERFORMANCE_FILE,
       job_names: %w[performance deploy]
     },
-    has_sast_json?: {
-      filename: Ci::Build::SAST_FILE,
-      job_names: %w[sast]
-    },
-    has_dependency_scanning_json?: {
-      filename: Ci::Build::DEPENDENCY_SCANNING_FILE,
-      job_names: %w[dependency_scanning]
-    },
     has_license_management_json?: {
       filename: Ci::Build::LICENSE_MANAGEMENT_FILE,
       job_names: %w[license_management]
-    },
-    # has_sast_container_json? is deprecated and replaced with has_container_scanning_json (#5778)
-    has_sast_container_json?: {
-      filename: Ci::Build::SAST_CONTAINER_FILE,
-      job_names: %w[sast:container container_scanning]
-    },
-    has_container_scanning_json?: {
-      filename: Ci::Build::CONTAINER_SCANNING_FILE,
-      job_names: %w[sast:container container_scanning]
-    },
-    has_dast_json?: {
-      filename: Ci::Build::DAST_FILE,
-      job_names: %w[dast]
     }
   }
 

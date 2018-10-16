@@ -26,7 +26,7 @@ describe 'Pipeline', :js do
           pipeline: pipeline,
           options: {
             artifacts: {
-              paths: [Ci::Build::SAST_FILE]
+              paths: [Ci::JobArtifact::DEFAULT_FILE_NAMES[:sast]]
             }
           }
         )

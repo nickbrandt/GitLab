@@ -20,15 +20,7 @@ describe Ci::Pipeline do
 
   PIPELINE_ARTIFACTS_METHODS = [
     { method: :performance_artifact, options: [Ci::Build::PERFORMANCE_FILE, 'performance'] },
-    { method: :sast_artifact, options: [Ci::Build::SAST_FILE, 'sast'] },
-    { method: :dependency_scanning_artifact, options: [Ci::Build::DEPENDENCY_SCANNING_FILE, 'dependency_scanning'] },
-    { method: :license_management_artifact, options: [Ci::Build::LICENSE_MANAGEMENT_FILE, 'license_management'] },
-    # sast_container_artifact is deprecated and replaced with container_scanning_artifact (#5778)
-    { method: :sast_container_artifact, options: [Ci::Build::SAST_CONTAINER_FILE, 'sast:container'] },
-    { method: :sast_container_artifact, options: [Ci::Build::SAST_CONTAINER_FILE, 'container_scanning'] },
-    { method: :container_scanning_artifact, options: [Ci::Build::CONTAINER_SCANNING_FILE, 'sast:container'] },
-    { method: :container_scanning_artifact, options: [Ci::Build::CONTAINER_SCANNING_FILE, 'container_scanning'] },
-    { method: :dast_artifact, options: [Ci::Build::DAST_FILE, 'dast'] }
+    { method: :license_management_artifact, options: [Ci::Build::LICENSE_MANAGEMENT_FILE, 'license_management'] }
   ].freeze
 
   PIPELINE_ARTIFACTS_METHODS.each do |method_test|
@@ -64,7 +56,7 @@ describe Ci::Pipeline do
     end
   end
 
-  %w(sast dependency_scanning dast performance sast_container container_scanning).each do |type|
+  %w(performance license_management).each do |type|
     method = "has_#{type}_data?"
 
     describe "##{method}" do
@@ -78,7 +70,7 @@ describe Ci::Pipeline do
     end
   end
 
-  %w(sast dependency_scanning dast performance sast_container container_scanning).each do |type|
+  %w(performance license_management).each do |type|
     method = "expose_#{type}_data?"
 
     describe "##{method}" do
@@ -107,7 +99,7 @@ describe Ci::Pipeline do
         pipeline: pipeline_1,
         options: {
           artifacts: {
-            paths: [Ci::Build::SAST_FILE]
+            paths: [Ci::JobArtifact::DEFAULT_FILE_NAMES[:sast]]
           }
         }
       )
@@ -119,7 +111,7 @@ describe Ci::Pipeline do
         pipeline: pipeline_2,
         options: {
           artifacts: {
-            paths: [Ci::Build::DEPENDENCY_SCANNING_FILE]
+            paths: [Ci::JobArtifact::DEFAULT_FILE_NAMES[:dependency_scanning]]
           }
         }
       )
@@ -131,7 +123,7 @@ describe Ci::Pipeline do
         pipeline: pipeline_3,
         options: {
           artifacts: {
-            paths: [Ci::Build::CONTAINER_SCANNING_FILE]
+            paths: [Ci::JobArtifact::DEFAULT_FILE_NAMES[:container_scanning]]
           }
         }
       )
@@ -143,7 +135,7 @@ describe Ci::Pipeline do
         pipeline: pipeline_4,
         options: {
           artifacts: {
-            paths: [Ci::Build::DAST_FILE]
+            paths: [Ci::JobArtifact::DEFAULT_FILE_NAMES[:dast]]
           }
         }
       )
@@ -152,12 +144,7 @@ describe Ci::Pipeline do
         :success,
         :artifacts,
         name: 'foobar',
-        pipeline: pipeline_5,
-        options: {
-          artifacts: {
-            paths: ['foobar-report.json']
-          }
-        }
+        pipeline: pipeline_5
       )
     end
 
@@ -166,12 +153,12 @@ describe Ci::Pipeline do
     end
   end
 
-  describe '#artifact_for_file_type' do
+  describe '#report_artifact_for_file_type' do
     let(:file_type) { :codequality }
     let!(:build) { create(:ci_build, pipeline: pipeline) }
     let!(:artifact) { create(:ci_job_artifact, :codequality, job: build) }
 
-    subject { pipeline.artifact_for_file_type(file_type) }
+    subject { pipeline.report_artifact_for_file_type(file_type) }
 
     it 'returns the artifact' do
       expect(subject).to eq(artifact)
@@ -221,12 +208,12 @@ describe Ci::Pipeline do
     end
 
     it 'does not perform extra queries when calling pipeline artifacts methods after the first' do
-      create_build('sast', Ci::Build::SAST_FILE)
-      create_build('dependency_scanning', 'gl-dependency-scanning-report.json')
+      create_build('performance', 'performance.json')
+      create_build('license_management', 'gl-license-management-report.json')
 
-      pipeline.sast_artifact
+      pipeline.performance_artifact
 
-      expect { pipeline.dependency_scanning_artifact }.not_to exceed_query_limit(0)
+      expect { pipeline.license_management_artifact }.not_to exceed_query_limit(0)
     end
   end
 end
