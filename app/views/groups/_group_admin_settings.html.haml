@@ -10,7 +10,7 @@
         %br/
         %span.descr This setting can be overridden in each project.
 
-= render partial: 'groups/ee/project_creation_level', locals: { form: f, group: @group }
+= render partial: 'groups/ee/old_project_creation_level', locals: { form: f, group: @group }
 
 .form-group.row
   = f.label :require_two_factor_authentication, 'Two-factor authentication', class: 'col-form-label col-sm-2 pt-0'

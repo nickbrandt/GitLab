@@ -16,13 +16,13 @@ module EE
         end
       end
 
-      expose :codeclimate, if: -> (mr, _) { head_pipeline_downloadable_url_for_report_type(:codequality) } do
+      expose :codeclimate, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:codequality) } do
         expose :head_path do |merge_request|
-          head_pipeline_downloadable_url_for_report_type(:codequality)
+          head_pipeline_downloadable_path_for_report_type(:codequality)
         end
 
         expose :base_path do |merge_request|
-          base_pipeline_downloadable_url_for_report_type(:codequality)
+          base_pipeline_downloadable_path_for_report_type(:codequality)
         end
       end
 
@@ -40,31 +40,23 @@ module EE
         end
       end
 
-      expose :sast, if: -> (mr, _) { mr.expose_sast_data? } do
-        expose :head_path, if: -> (mr, _) { can?(current_user, :read_build, mr.head_sast_artifact) } do |merge_request|
-          raw_project_build_artifacts_url(merge_request.source_project,
-                                          merge_request.head_sast_artifact,
-                                          path: Ci::Build::SAST_FILE)
+      expose :sast, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:sast) } do
+        expose :head_path do |merge_request|
+          head_pipeline_downloadable_path_for_report_type(:sast)
         end
 
-        expose :base_path, if: -> (mr, _) { mr.base_has_sast_data? && can?(current_user, :read_build, mr.base_sast_artifact) } do |merge_request|
-          raw_project_build_artifacts_url(merge_request.target_project,
-                                          merge_request.base_sast_artifact,
-                                          path: Ci::Build::SAST_FILE)
+        expose :base_path do |merge_request|
+          base_pipeline_downloadable_path_for_report_type(:sast)
         end
       end
 
-      expose :dependency_scanning, if: -> (mr, _) { mr.expose_dependency_scanning_data? } do
-        expose :head_path, if: -> (mr, _) { can?(current_user, :read_build, mr.head_dependency_scanning_artifact) } do |merge_request|
-          raw_project_build_artifacts_url(merge_request.source_project,
-                                          merge_request.head_dependency_scanning_artifact,
-                                          path: Ci::Build::DEPENDENCY_SCANNING_FILE)
+      expose :dependency_scanning, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:dependency_scanning) } do
+        expose :head_path do |merge_request|
+          head_pipeline_downloadable_path_for_report_type(:dependency_scanning)
         end
 
-        expose :base_path, if: -> (mr, _) { mr.base_has_dependency_scanning_data? && can?(current_user, :read_build, mr.base_dependency_scanning_artifact) } do |merge_request|
-          raw_project_build_artifacts_url(merge_request.target_project,
-                                          merge_request.base_dependency_scanning_artifact,
-                                          path: Ci::Build::DEPENDENCY_SCANNING_FILE)
+        expose :base_path do |merge_request|
+          base_pipeline_downloadable_path_for_report_type(:dependency_scanning)
         end
       end
 
@@ -98,47 +90,23 @@ module EE
         end
       end
 
-      # expose_sast_container_data? is deprecated and replaced with expose_container_scanning_data? (#5778)
-      expose :sast_container, if: -> (mr, _) { mr.expose_sast_container_data? } do
-        expose :head_path, if: -> (mr, _) { can?(current_user, :read_build, mr.head_sast_container_artifact) } do |merge_request|
-          raw_project_build_artifacts_url(merge_request.source_project,
-                                          merge_request.head_sast_container_artifact,
-                                          path: Ci::Build::SAST_CONTAINER_FILE)
+      expose :sast_container, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:container_scanning) } do
+        expose :head_path do |merge_request|
+          head_pipeline_downloadable_path_for_report_type(:container_scanning)
         end
 
-        expose :base_path, if: -> (mr, _) { mr.base_has_sast_container_data? && can?(current_user, :read_build, mr.base_sast_container_artifact) } do |merge_request|
-          raw_project_build_artifacts_url(merge_request.target_project,
-                                          merge_request.base_sast_container_artifact,
-                                          path: Ci::Build::SAST_CONTAINER_FILE)
+        expose :base_path do |merge_request|
+          base_pipeline_downloadable_path_for_report_type(:container_scanning)
         end
       end
 
-      # We still expose it as `sast_container` to keep compatibility with Frontend (#5778)
-      expose :sast_container, if: -> (mr, _) { mr.expose_container_scanning_data? } do
-        expose :head_path, if: -> (mr, _) { can?(current_user, :read_build, mr.head_container_scanning_artifact) } do |merge_request|
-          raw_project_build_artifacts_url(merge_request.source_project,
-                                          merge_request.head_container_scanning_artifact,
-                                          path: Ci::Build::CONTAINER_SCANNING_FILE)
+      expose :dast, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:dast) } do
+        expose :head_path do |merge_request|
+          head_pipeline_downloadable_path_for_report_type(:dast)
         end
 
-        expose :base_path, if: -> (mr, _) { mr.base_has_container_scanning_data? && can?(current_user, :read_build, mr.base_container_scanning_artifact) } do |merge_request|
-          raw_project_build_artifacts_url(merge_request.target_project,
-                                          merge_request.base_container_scanning_artifact,
-                                          path: Ci::Build::CONTAINER_SCANNING_FILE)
-        end
-      end
-
-      expose :dast, if: -> (mr, _) { mr.expose_dast_data? } do
-        expose :head_path, if: -> (mr, _) { can?(current_user, :read_build, mr.head_dast_artifact) } do |merge_request|
-          raw_project_build_artifacts_url(merge_request.source_project,
-                                          merge_request.head_dast_artifact,
-                                          path: Ci::Build::DAST_FILE)
-        end
-
-        expose :base_path, if: -> (mr, _) { mr.base_has_dast_data? && can?(current_user, :read_build, mr.base_dast_artifact) } do |merge_request|
-          raw_project_build_artifacts_url(merge_request.target_project,
-                                          merge_request.base_dast_artifact,
-                                          path: Ci::Build::DAST_FILE)
+        expose :base_path do |merge_request|
+          base_pipeline_downloadable_path_for_report_type(:dast)
         end
       end
 
@@ -170,12 +138,14 @@ module EE
 
     private
 
-    def head_pipeline_downloadable_url_for_report_type(file_type)
-      object.head_pipeline&.present(current_user: current_user)&.downloadable_url_for_report_type(file_type)
+    def head_pipeline_downloadable_path_for_report_type(file_type)
+      object.head_pipeline&.present(current_user: current_user)
+        &.downloadable_path_for_report_type(file_type)
     end
 
-    def base_pipeline_downloadable_url_for_report_type(file_type)
-      object.base_pipeline&.present(current_user: current_user)&.downloadable_url_for_report_type(file_type)
+    def base_pipeline_downloadable_path_for_report_type(file_type)
+      object.base_pipeline&.present(current_user: current_user)
+        &.downloadable_path_for_report_type(file_type)
     end
   end
 end

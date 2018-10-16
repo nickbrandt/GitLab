@@ -4820,6 +4820,9 @@ msgstr ""
 msgid "Median"
 msgstr ""
 
+msgid "Member lock"
+msgstr ""
+
 msgid "Member since %{date}"
 msgstr ""
 
@@ -5815,6 +5818,9 @@ msgid "Preferences|Navigation theme"
 msgstr ""
 
 msgid "Press Enter or click to search"
+msgstr ""
+
+msgid "Prevent adding new members to project membership within this group"
 msgstr ""
 
 msgid "Preview"
