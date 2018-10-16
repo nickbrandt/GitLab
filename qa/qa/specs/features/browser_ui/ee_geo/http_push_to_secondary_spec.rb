@@ -62,11 +62,11 @@ module QA
 
             # Validate git push worked and new content is visible
             Page::Project::Show.perform do |show|
-              show.wait_for_repository_replication_with(file_content_secondary)
+              show.wait_for_repository_replication_with(file_content)
               show.refresh
 
               expect(page).to have_content(file_name)
-              expect(page).to have_content(file_content_secondary)
+              expect(page).to have_content(file_content)
             end
           end
         end

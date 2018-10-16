@@ -4,10 +4,9 @@ module QA
   context 'Geo', :orchestrated, :geo do
     describe 'GitLab SSH push to secondary' do
       it "is proxy'd to the primary and ultimately replicated to the secondary" do
-        file_name = 'README.md'
         key_title = "key for ssh tests #{Time.now.to_f}"
-        file_content_primary = 'This is a Geo project!  Commit from primary.'
-        file_content_secondary = 'This is a Geo project!  Commit from secondary.'
+        file_name = 'README.md'
+        file_content = 'This is a Geo project!  Commit from secondary.'
 
         Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
           # Visit the primary node and login
@@ -74,15 +73,15 @@ module QA
               push.ssh_key = key
               push.repository_ssh_uri = location.uri
               push.file_name = file_name
-              push.file_content = "# #{file_content_secondary}"
-              push.commit_message = "Update #{file_name}"
+              push.file_content = "# #{file_content}"
+              push.commit_message = 'Update README.md'
             end
 
             # Validate git push worked and new content is visible
             Page::Project::Show.perform do |show|
-              show.wait_for_repository_replication_with(file_content_secondary)
+              show.wait_for_repository_replication_with(file_content)
 
-              expect(page).to have_content(file_content_secondary)
+              expect(page).to have_content(file_content)
             end
           end
         end
