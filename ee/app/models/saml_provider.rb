@@ -8,14 +8,21 @@ class SamlProvider < ActiveRecord::Base
 
   after_initialize :set_defaults, if: :new_record?
 
-  delegate :assertion_consumer_service_url, :issuer, :name_identifier_format, to: :settings
+  delegate :assertion_consumer_service_url, :issuer, :name_identifier_format, to: :defaults
 
   def certificate_fingerprint=(value)
     super(strip_left_to_right_chars(value))
   end
 
   def settings
-    ConfiguredOptions.new(self).to_h
+    defaults.to_h.merge(
+      idp_cert_fingerprint: certificate_fingerprint,
+      idp_sso_target_url: sso_url
+    )
+  end
+
+  def defaults
+    @defaults ||= DefaultOptions.new(group.full_path)
   end
 
   class DefaultOptions
@@ -45,7 +52,8 @@ class SamlProvider < ActiveRecord::Base
       {
         assertion_consumer_service_url: assertion_consumer_service_url,
         issuer: issuer,
-        name_identifier_format: name_identifier_format
+        name_identifier_format: name_identifier_format,
+        idp_sso_target_url_runtime_params: { redirect_to: :RelayState }
       }
     end
 
@@ -53,20 +61,6 @@ class SamlProvider < ActiveRecord::Base
 
     def host
       @host ||= Gitlab.config.gitlab.url
-    end
-  end
-
-  class ConfiguredOptions < DefaultOptions
-    def initialize(saml_provider)
-      @group_path = saml_provider.group.full_path
-      @saml_provider = saml_provider
-    end
-
-    def to_h
-      super.merge(
-          idp_cert_fingerprint: @saml_provider.certificate_fingerprint,
-          idp_sso_target_url: @saml_provider.sso_url
-        )
     end
   end
 

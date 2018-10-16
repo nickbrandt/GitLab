@@ -14,9 +14,8 @@ module OmniAuth
           self.class.invalid_group!(group_lookup.path)
         end
 
-        saml_provider = group_lookup.saml_provider
-        dynamic_settings = Gitlab::Auth::GroupSaml::DynamicSettings.new(saml_provider)
-        env['omniauth.strategy'].options.merge!(dynamic_settings.settings)
+        settings = Gitlab::Auth::GroupSaml::DynamicSettings.new(group_lookup.group).to_h
+        env['omniauth.strategy'].options.merge!(settings)
 
         super
       end

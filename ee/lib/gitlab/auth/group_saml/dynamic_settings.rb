@@ -4,26 +4,26 @@ module Gitlab
       class DynamicSettings
         include Enumerable
 
-        delegate :each, :keys, :[], to: :settings
+        delegate :each, :keys, :[], to: :to_h
 
-        def initialize(saml_provider)
-          @saml_provider = saml_provider
+        def initialize(group)
+          @group = group
         end
 
-        def settings
-          @settings ||= configured_settings.merge(default_settings)
+        def to_h
+          return {} unless @group
+
+          configured_settings || default_settings
         end
 
         private
 
         def configured_settings
-          @saml_provider&.settings || {}
+          @configured_settings ||= @group.saml_provider&.settings
         end
 
         def default_settings
-          {
-            idp_sso_target_url_runtime_params: { redirect_to: :RelayState }
-          }
+          @default_settings ||= SamlProvider::DefaultOptions.new(@group.full_path).to_h
         end
       end
     end
