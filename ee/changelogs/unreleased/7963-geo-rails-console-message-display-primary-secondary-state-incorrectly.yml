@@ -1,0 +1,5 @@
+---
+title: 'Geo: Rails console message display primary/secondary state incorrectly'
+merge_request:
+author:
+type: fixed
