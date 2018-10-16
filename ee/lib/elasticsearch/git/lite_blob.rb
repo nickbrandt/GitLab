@@ -1,7 +1,7 @@
 module Elasticsearch
   module Git
     class LiteBlob
-      include Linguist::BlobHelper
+      include ::Gitlab::BlobHelper
       include Elasticsearch::Git::EncoderHelper
 
       attr_accessor :id, :name, :path, :size, :mode, :commit_id

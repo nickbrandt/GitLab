@@ -151,7 +151,9 @@ module Elasticsearch
                   # https://github.com/elastic/elasticsearch-mapper-attachments/issues/124
                   file_name: blob.path,
 
-                  language: blob.language ? blob.language.name : "Text"
+                  # Linguist is not available in the Ruby indexer. The Go indexer can
+                  # fill in the right language.
+                  language: nil
                 }
               }
             }
