@@ -1541,7 +1541,7 @@ describe Project do
         pipeline: pipeline_1,
         options: {
           artifacts: {
-            paths: [Ci::Build::SAST_FILE]
+            paths: [Ci::JobArtifact::DEFAULT_FILE_NAMES[:sast]]
           }
         }
       )
@@ -1553,7 +1553,7 @@ describe Project do
         pipeline: pipeline_2,
         options: {
           artifacts: {
-            paths: [Ci::Build::SAST_FILE]
+            paths: [Ci::JobArtifact::DEFAULT_FILE_NAMES[:sast]]
           }
         }
       )

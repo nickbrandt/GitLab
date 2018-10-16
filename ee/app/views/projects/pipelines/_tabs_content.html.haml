@@ -1,10 +1,10 @@
 - pipeline = local_assigns.fetch(:pipeline)
 - project = local_assigns.fetch(:project)
 
-- sast_endpoint = pipeline.expose_sast_data? ? sast_artifact_url(pipeline) : nil
-- dependency_scanning_endpoint = pipeline.expose_dependency_scanning_data? ? dependency_scanning_artifact_url(pipeline) : nil
-- dast_endpoint = pipeline.expose_dast_data? ? dast_artifact_url(pipeline) : nil
-- sast_container_endpoint = pipeline.expose_sast_container_data? ? sast_container_artifact_url(pipeline) : pipeline.expose_container_scanning_data? ? container_scanning_artifact_url(pipeline) : nil
+- sast_endpoint = pipeline.downloadable_path_for_report_type(:sast)
+- dependency_scanning_endpoint = pipeline.downloadable_path_for_report_type(:dependency_scanning)
+- dast_endpoint = pipeline.downloadable_path_for_report_type(:dast)
+- sast_container_endpoint = pipeline.downloadable_path_for_report_type(:container_scanning)
 - blob_path = project_blob_path(project, pipeline.sha)
 - license_management_settings_path = can?(current_user, :admin_software_license_policy, project) ? license_management_settings_path(project) : nil
 

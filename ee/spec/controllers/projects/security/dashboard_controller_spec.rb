@@ -23,7 +23,7 @@ describe Projects::Security::DashboardController do
         pipeline: pipeline_1,
         options: {
           artifacts: {
-            paths: [Ci::Build::SAST_FILE]
+            paths: [Ci::JobArtifact::DEFAULT_FILE_NAMES[:sast]]
           }
         }
       )

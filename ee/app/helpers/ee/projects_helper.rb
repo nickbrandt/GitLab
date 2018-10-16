@@ -148,21 +148,12 @@ module EE
           can_create_issue: "false"
         }
       else
-        # Handle old job and artifact names for container scanning
-        sast_container_head_path = if pipeline.expose_sast_container_data?
-                                     sast_container_artifact_url(pipeline)
-                                   elsif pipeline.expose_container_scanning_data?
-                                     container_scanning_artifact_url(pipeline)
-                                   else
-                                     nil
-                                   end
-
         {
           head_blob_path: project_blob_path(project, pipeline.sha),
-          sast_head_path: pipeline.expose_sast_data? ? sast_artifact_url(pipeline) : nil,
-          dependency_scanning_head_path: pipeline.expose_dependency_scanning_data? ? dependency_scanning_artifact_url(pipeline) : nil,
-          dast_head_path: pipeline.expose_dast_data? ? dast_artifact_url(pipeline) : nil,
-          sast_container_head_path: sast_container_head_path,
+          sast_head_path: pipeline.downloadable_path_for_report_type(:sast),
+          dependency_scanning_head_path: pipeline.downloadable_path_for_report_type(:dependency_scanning),
+          dast_head_path: pipeline.downloadable_path_for_report_type(:dast),
+          sast_container_head_path: pipeline.downloadable_path_for_report_type(:container_scanning),
           vulnerability_feedback_path: project_vulnerability_feedback_index_path(project),
           pipeline_id: pipeline.id,
           vulnerability_feedback_help_path: help_page_path("user/project/merge_requests/index", anchor: "interacting-with-security-reports-ultimate"),

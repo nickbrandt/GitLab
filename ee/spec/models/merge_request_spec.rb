@@ -63,11 +63,26 @@ describe MergeRequest do
     end
   end
 
-  %w(sast dast sast_container container_scanning).each do |type|
-    it { is_expected.to delegate_method(:"expose_#{type}_data?").to(:head_pipeline) }
-    it { is_expected.to delegate_method(:"has_#{type}_data?").to(:base_pipeline).with_prefix(:base) }
-    it { is_expected.to delegate_method(:"#{type}_artifact").to(:head_pipeline).with_prefix(:head) }
-    it { is_expected.to delegate_method(:"#{type}_artifact").to(:base_pipeline).with_prefix(:base) }
+  describe '#base_license_management_artifact' do
+    before do
+      allow(subject.base_pipeline).to receive(:license_management_artifact)
+        .and_return(1)
+    end
+
+    it 'delegates to merge request diff' do
+      expect(subject.base_license_management_artifact).to eq(1)
+    end
+  end
+
+  describe '#head_license_management_artifact' do
+    before do
+      allow(subject.head_pipeline).to receive(:license_management_artifact)
+        .and_return(1)
+    end
+
+    it 'delegates to merge request diff' do
+      expect(subject.head_license_management_artifact).to eq(1)
+    end
   end
 
   describe '#expose_performance_data?' do
@@ -84,6 +99,17 @@ describe MergeRequest do
 
     context 'without performance data' do
       it { expect(subject.expose_performance_data?).to be_falsey }
+    end
+  end
+
+  describe '#expose_license_management_data?' do
+    before do
+      allow(subject.head_pipeline).to receive(:expose_license_management_data?)
+        .and_return(1)
+    end
+
+    it 'delegates to merge request diff' do
+      expect(subject.expose_license_management_data?).to eq(1)
     end
   end
 end

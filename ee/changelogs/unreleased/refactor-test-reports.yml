@@ -1,0 +1,5 @@
+---
+title: Refactor test reports to use new artifact architecture.
+merge_request: 7827
+author:
+type: changed
