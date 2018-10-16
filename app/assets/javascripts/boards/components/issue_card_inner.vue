@@ -1,6 +1,9 @@
 <script>
   import $ from 'jquery';
+<<<<<<< HEAD
   import IssueCardWeight from 'ee/boards/components/issue_card_weight.vue';
+=======
+>>>>>>> upstream/master
   import Icon from '~/vue_shared/components/icon.vue';
   import UserAvatarLink from '../../vue_shared/components/user_avatar/user_avatar_link.vue';
   import eventHub from '../eventhub';
@@ -10,7 +13,10 @@
   export default {
     components: {
       UserAvatarLink,
+<<<<<<< HEAD
       IssueCardWeight,
+=======
+>>>>>>> upstream/master
       Icon,
     },
     directives: {
