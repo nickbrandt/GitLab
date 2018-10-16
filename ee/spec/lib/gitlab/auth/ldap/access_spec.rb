@@ -57,18 +57,60 @@ describe Gitlab::Auth::LDAP::Access do
         expect { access.update_user }.not_to change(user, :email)
       end
 
-      it 'does not update the email when in a read-only GitLab instance' do
-        allow(Gitlab::Database).to receive(:read_only?).and_return(true)
+      context 'when mail is different' do
+        before do
+          entry['mail'] = ['new_email@example.com']
+        end
 
-        entry['mail'] = ['new_email@example.com']
+        it 'does not update the email when in a read-only GitLab instance' do
+          allow(Gitlab::Database).to receive(:read_only?).and_return(true)
 
-        expect { access.update_user }.not_to change(user, :email)
+          expect { access.update_user }.not_to change(user, :email)
+        end
+
+        it 'updates the email if the user email is different' do
+          expect { access.update_user }.to change(user, :email)
+        end
+
+        it 'does not update the name if the user email is different' do
+          expect { access.update_user }.not_to change(user, :name)
+        end
+      end
+    end
+
+    context 'name' do
+      before do
+        stub_ldap_person_find_by_dn(entry, provider)
       end
 
-      it 'updates the email if the user email is different' do
-        entry['mail'] = ['new_email@example.com']
+      it 'does not update name if name attribute is not set' do
+        expect { access.update_user }.not_to change(user, :name)
+      end
 
-        expect { access.update_user }.to change(user, :email)
+      it 'does not update the name if the user has the same name in GitLab and in LDAP' do
+        entry['cn'] = [user.name]
+
+        expect { access.update_user }.not_to change(user, :name)
+      end
+
+      context 'when cn is different' do
+        before do
+          entry['cn'] = ['New Name']
+        end
+
+        it 'does not update the name when in a read-only GitLab instance' do
+          allow(Gitlab::Database).to receive(:read_only?).and_return(true)
+
+          expect { access.update_user }.not_to change(user, :name)
+        end
+
+        it 'updates the name if the user name is different' do
+          expect { access.update_user }.to change(user, :name)
+        end
+
+        it 'does not update the email if the user name is different' do
+          expect { access.update_user }.not_to change(user, :email)
+        end
       end
     end
 

@@ -1,0 +1,5 @@
+---
+title: Update user name upon LDAP sync
+merge_request: 10316
+author: '@icode1'
+type: added

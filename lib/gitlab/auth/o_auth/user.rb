@@ -201,22 +201,19 @@ module Gitlab
           # Give preference to LDAP for sensitive information when creating a linked account
           if creating_linked_ldap_user?
             username = ldap_person.username.presence
+            name = ldap_person.name.presence
             email = ldap_person.email.first.presence
           end
 
           username ||= auth_hash.username
+          name ||= auth_hash.name
           email ||= auth_hash.email
 
           valid_username = ::Namespace.clean_path(username)
-
-          uniquify = Uniquify.new
-          valid_username = uniquify.string(valid_username) { |s| !NamespacePathValidator.valid_path?(s) }
-
-          name = auth_hash.name
-          name = valid_username if name.strip.empty?
+          valid_username = Uniquify.new.string(valid_username) { |s| !NamespacePathValidator.valid_path?(s) }
 
           {
-            name:                       name,
+            name:                       name.strip.presence || valid_username,
             username:                   valid_username,
             email:                      email,
             password:                   auth_hash.password,
@@ -249,8 +246,9 @@ module Gitlab
             metadata.provider = auth_hash.provider
           end
 
-          if creating_linked_ldap_user? && gl_user.email == ldap_person.email.first
-            metadata.set_attribute_synced(:email, true)
+          if creating_linked_ldap_user?
+            metadata.set_attribute_synced(:name, true) if gl_user.name == ldap_person.name
+            metadata.set_attribute_synced(:email, true) if gl_user.email == ldap_person.email.first
             metadata.provider = ldap_person.provider
           end
         end
