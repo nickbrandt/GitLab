@@ -11,7 +11,7 @@ using License Management by:
 - Implicitly using [Auto License Management](../../../topics/autodevops/index.md#auto-dependency-scanning)
   that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
 
-In addition, you can [manually approve or black](#manual-license-management) licenses in the project's settings.
+In addition, you can [manually approve or blacklist](#manual-license-management) licenses in the project's settings.
 
 GitLab can show the licenses list right in the merge
 request widget area, highlighting the presence of licenses you don't want to use, or new
@@ -68,8 +68,10 @@ the choice to approve it or blacklist it.
 
 ![License approval decision](img/license_management_decision.png)
 
-The list of licenses and their status can also be managed from the project settings. From the project
-settings, licenses can also be [manually managed](#manual-license-management).
+From the project's settings:
+
+- The list of licenses and their status can be managed.
+- Licenses can be [manually approved or blacklisted](#manual-license-management).
 
 ![License Management Settings](img/license_management_settings.png)
 
@@ -83,7 +85,11 @@ To approve or blacklist a license:
 
 1. Navigate to the project's **Settings > CI/CD**.
 1. Expand the **License Management** section and click the **Add a license** button.
-1. Select a license from the **License name** dropdown.
+1. In the **License name** dropdown, either:
+    - Select one of the available licenses. You can search for licenses in the field
+   at the top of the list.
+    - Enter arbitrary text in the field at the top of the list. This will cause the text to be
+    added as a license name to the list.
 1. Select the **Approve** or **Blacklist** radio button to approve or blacklist respectively
    the selected license.
 
