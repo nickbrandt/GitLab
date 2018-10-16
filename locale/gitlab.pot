@@ -490,7 +490,7 @@ msgstr ""
 msgid "AdminUsers|To confirm, type %{username}"
 msgstr ""
 
-msgid "Advanced"
+msgid "Advanced permissions, Large File Storage and Two-Factor authentication settings."
 msgstr ""
 
 msgid "Advanced settings"
@@ -511,6 +511,9 @@ msgstr ""
 msgid "Allow commits from members who can merge to the target branch."
 msgstr ""
 
+msgid "Allow projects within this group to use Git LFS"
+msgstr ""
+
 msgid "Allow public access to pipelines and job details, including output logs and artifacts"
 msgstr ""
 
@@ -518,6 +521,12 @@ msgid "Allow rendering of PlantUML diagrams in Asciidoc documents."
 msgstr ""
 
 msgid "Allow requests to the local network from hooks and services."
+msgstr ""
+
+msgid "Allow users to request access"
+msgstr ""
+
+msgid "Allow users to request access if visibility is public or internal."
 msgstr ""
 
 msgid "Allows you to add and manage Kubernetes clusters."
@@ -533,6 +542,9 @@ msgid "Alternatively, you can use a %{personal_access_token_link}. When you crea
 msgstr ""
 
 msgid "Alternatively, you can use a %{personal_access_token_link}. When you create your Personal Access Token, you will need to select the <code>repo</code> scope, so we can display a list of your public and private repositories which are available to import."
+msgstr ""
+
+msgid "Amount of time (in hours) that users are allowed to skip forced configuration of two-factor authentication"
 msgstr ""
 
 msgid "An SSH key will be automatically generated when the form is submitted. For more information, please refer to the documentation."
@@ -1393,6 +1405,9 @@ msgid "Charts"
 msgstr ""
 
 msgid "Chat"
+msgstr ""
+
+msgid "Check the %{docs_link_start}documentation%{docs_link_end}."
 msgstr ""
 
 msgid "Checking %{text} availability…"
@@ -2886,9 +2901,6 @@ msgstr ""
 msgid "Enable group Runners"
 msgstr ""
 
-msgid "Enable or disable certain group features and choose access levels."
-msgstr ""
-
 msgid "Enable or disable the Pseudonymizer data collection."
 msgstr ""
 
@@ -3879,6 +3891,9 @@ msgstr ""
 msgid "Group avatar"
 msgstr ""
 
+msgid "Group description (optional)"
+msgstr ""
+
 msgid "Group details"
 msgstr ""
 
@@ -3886,6 +3901,9 @@ msgid "Group info:"
 msgstr ""
 
 msgid "Group maintainers can register group runners in the %{link}"
+msgstr ""
+
+msgid "Group name"
 msgstr ""
 
 msgid "Group: %{group_name}"
@@ -3937,9 +3955,6 @@ msgid "GroupSettings|Learn more about badges."
 msgstr ""
 
 msgid "GroupSettings|Prevent sharing a project within %{group} with other groups"
-msgstr ""
-
-msgid "GroupSettings|Share with group lock"
 msgstr ""
 
 msgid "GroupSettings|This setting is applied on %{ancestor_group} and has been overridden on this subgroup."
@@ -4480,6 +4495,9 @@ msgstr ""
 msgid "Labels|Promoting %{labelTitle} will make it available for all projects inside %{groupName}. Existing project labels with the same title will be merged. This action cannot be reversed."
 msgstr ""
 
+msgid "Large File Storage"
+msgstr ""
+
 msgid "Last %d day"
 msgid_plural "Last %d days"
 msgstr[0] ""
@@ -4802,6 +4820,9 @@ msgstr ""
 msgid "Median"
 msgstr ""
 
+msgid "Member lock"
+msgstr ""
+
 msgid "Member since %{date}"
 msgstr ""
 
@@ -5106,6 +5127,9 @@ msgid "Name your individual key via a title"
 msgstr ""
 
 msgid "Name:"
+msgstr ""
+
+msgid "Naming, visibility"
 msgstr ""
 
 msgid "Nav|Help"
@@ -5553,6 +5577,9 @@ msgstr ""
 msgid "Paste your public SSH key, which is usually contained in the file '~/.ssh/id_rsa.pub' and begins with 'ssh-rsa'. Don't use your private SSH key."
 msgstr ""
 
+msgid "Path, transfer, remove"
+msgstr ""
+
 msgid "Path:"
 msgstr ""
 
@@ -5578,6 +5605,9 @@ msgid "Performance optimization"
 msgstr ""
 
 msgid "Permissions"
+msgstr ""
+
+msgid "Permissions, LFS, 2FA"
 msgstr ""
 
 msgid "Personal Access Token"
@@ -5788,6 +5818,9 @@ msgid "Preferences|Navigation theme"
 msgstr ""
 
 msgid "Press Enter or click to search"
+msgstr ""
+
+msgid "Prevent adding new members to project membership within this group"
 msgstr ""
 
 msgid "Preview"
@@ -6488,10 +6521,19 @@ msgstr ""
 msgid "Remove avatar"
 msgstr ""
 
+msgid "Remove group"
+msgstr ""
+
 msgid "Remove priority"
 msgstr ""
 
 msgid "Remove project"
+msgstr ""
+
+msgid "Removed group can not be restored!"
+msgstr ""
+
+msgid "Removing group will cause all child projects and resources to be removed."
 msgstr ""
 
 msgid "Rename"
@@ -6591,6 +6633,9 @@ msgid "Request Access"
 msgstr ""
 
 msgid "Requests Profiles"
+msgstr ""
+
+msgid "Require all users in this group to setup Two-factor authentication"
 msgstr ""
 
 msgid "Require all users to accept Terms of Service and Privacy Policy when they access GitLab."
@@ -7841,6 +7886,9 @@ msgstr ""
 msgid "This runner will only run on pipelines triggered on protected branches"
 msgstr ""
 
+msgid "This setting can be overridden in each project."
+msgstr ""
+
 msgid "This source diff could not be displayed because it is too large."
 msgstr ""
 
@@ -7866,6 +7914,9 @@ msgid "Time before an issue gets scheduled"
 msgstr ""
 
 msgid "Time before an issue starts implementation"
+msgstr ""
+
+msgid "Time before enforced"
 msgstr ""
 
 msgid "Time between merge request creation and merge/close"
@@ -8193,6 +8244,9 @@ msgstr ""
 msgid "Twitter"
 msgstr ""
 
+msgid "Two-factor authentication"
+msgstr ""
+
 msgid "Type"
 msgstr ""
 
@@ -8268,7 +8322,7 @@ msgstr ""
 msgid "Update now"
 msgstr ""
 
-msgid "Update your group name, description, avatar, and other general settings."
+msgid "Update your group name, description, avatar, and visibility."
 msgstr ""
 
 msgid "Updating"
@@ -8454,6 +8508,9 @@ msgstr ""
 msgid "Visibility and access controls"
 msgstr ""
 
+msgid "Visibility level"
+msgstr ""
+
 msgid "Visibility level:"
 msgstr ""
 
@@ -8509,6 +8566,9 @@ msgid "When enabled, users cannot use GitLab until the terms have been accepted.
 msgstr ""
 
 msgid "When leaving the URL blank, classification labels can still be specified without disabling cross project features or performing external authorization checks."
+msgstr ""
+
+msgid "Who can see this group?"
 msgstr ""
 
 msgid "Wiki"
