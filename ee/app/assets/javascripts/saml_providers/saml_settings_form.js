@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import { __ } from '~/locale';
 import DirtyFormChecker from './dirty_form_checker';
 
 export default class SamlSettingsForm {
@@ -29,14 +30,14 @@ export default class SamlSettingsForm {
 
   testButtonTooltip() {
     if (!this.enabled) {
-      return 'Group SAML must be enabled to test';
+      return __('Group SAML must be enabled to test');
     }
 
     if (this.dirtyFormChecker.isDirty) {
-      return 'Save changes before testing';
+      return __('Save changes before testing');
     }
 
-    return 'Redirect to SAML provider to test configuration';
+    return __('Redirect to SAML provider to test configuration');
   }
 
   updateView() {
