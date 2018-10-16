@@ -2,7 +2,7 @@
 %section.settings.no-animate.expanded.cluster-health-graphs#cluster-health
   %h4= s_('ClusterIntegration|Kubernetes cluster health')
 
-  - if @cluster&.application_prometheus&.installed?
+  - if @cluster&.application_prometheus_available?
     #prometheus-graphs{ data: { "settings-path": edit_project_service_path(@project, 'prometheus'),
       "clusters-path": project_clusters_path(@project),
       "documentation-path": help_page_path('administration/monitoring/prometheus/index.md'),
