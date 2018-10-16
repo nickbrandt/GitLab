@@ -44,7 +44,7 @@ describe('LicenseManagement', () => {
         const buttonEl = vm.$el.querySelector('.js-open-form');
         expect(buttonEl).toBeNull();
         done();
-      });
+      }).catch(done.fail);
     });
 
     it('should render the button if the form is closed', done => {
@@ -56,7 +56,7 @@ describe('LicenseManagement', () => {
         const buttonEl = vm.$el.querySelector('.js-open-form');
         expect(buttonEl).not.toBeNull();
         done();
-      });
+      }).catch(done.fail);
     });
 
     it('clicking the Add a license button opens the form', () => {
@@ -75,7 +75,7 @@ describe('LicenseManagement', () => {
     return Vue.nextTick().then(() => {
       expect(vm.$el.querySelector('.loading-container')).not.toBeNull();
       done();
-    });
+    }).catch(done.fail);
   });
 
   it('should render callout if no licenses are managed', done => {
@@ -86,7 +86,7 @@ describe('LicenseManagement', () => {
       expect(callout).not.toBeNull();
       expect(trimText(callout.innerText)).toBe(vm.$options.emptyMessage);
       done();
-    });
+    }).catch(done.fail);
   });
 
   it('should render delete confirmation modal', done => {
@@ -95,7 +95,7 @@ describe('LicenseManagement', () => {
     return Vue.nextTick().then(() => {
       expect(vm.$el.querySelector('#modal-license-delete-confirmation')).not.toBeNull();
       done();
-    });
+    }).catch(done.fail);
   });
 
   it('should render list of managed licenses', done => {
@@ -106,7 +106,7 @@ describe('LicenseManagement', () => {
       expect(vm.$el.querySelector('.list-group .list-group-item')).not.toBeNull();
       expect(vm.$el.querySelectorAll('.list-group .list-group-item').length).toBe(2);
       done();
-    });
+    }).catch(done.fail);
   });
 
   it('should set api settings after mount and init API calls', () =>
