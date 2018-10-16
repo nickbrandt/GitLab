@@ -34,7 +34,7 @@ class Projects::MergeRequests::DraftsController < Projects::MergeRequests::Appli
   end
 
   def destroy
-    draft_note.destroy!
+    DraftNotes::DestroyService.new(merge_request, current_user).execute(draft_note)
 
     head :ok
   end
@@ -46,7 +46,7 @@ class Projects::MergeRequests::DraftsController < Projects::MergeRequests::Appli
   end
 
   def discard
-    draft_notes.delete_all
+    DraftNotes::DestroyService.new(merge_request, current_user).execute
 
     head :ok
   end
