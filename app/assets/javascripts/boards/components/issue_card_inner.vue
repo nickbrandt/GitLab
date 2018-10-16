@@ -1,10 +1,7 @@
 <script>
   import $ from 'jquery';
-<<<<<<< HEAD
-  import IssueCardWeight from 'ee/boards/components/issue_card_weight.vue';
-=======
->>>>>>> upstream/master
   import Icon from '~/vue_shared/components/icon.vue';
+  import IssueCardWeight from 'ee/boards/components/issue_card_weight.vue';
   import UserAvatarLink from '../../vue_shared/components/user_avatar/user_avatar_link.vue';
   import eventHub from '../eventhub';
   import tooltip from '../../vue_shared/directives/tooltip';
@@ -13,11 +10,8 @@
   export default {
     components: {
       UserAvatarLink,
-<<<<<<< HEAD
-      IssueCardWeight,
-=======
->>>>>>> upstream/master
       Icon,
+      IssueCardWeight,
     },
     directives: {
       tooltip,
