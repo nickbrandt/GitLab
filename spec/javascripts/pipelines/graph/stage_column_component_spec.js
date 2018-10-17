@@ -35,7 +35,10 @@ describe('stage column component', () => {
     component = mountComponent(StageColumnComponent, {
       title: 'foo',
       groups: mockGroups,
+<<<<<<< HEAD
       hasTriggeredBy: false,
+=======
+>>>>>>> upstream/master
     });
   });
 

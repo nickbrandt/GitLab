@@ -3024,7 +3024,7 @@ msgstr ""
 msgid "Environments|Updated"
 msgstr ""
 
-msgid "Environments|You don't have any environments right now."
+msgid "Environments|You don't have any environments right now"
 msgstr ""
 
 msgid "Environments|protected"
@@ -6336,10 +6336,14 @@ msgstr ""
 msgid "Promote to Group Milestone"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Promote to group label"
 msgstr ""
 
 msgid "Promotions|Don't show me this again"
+=======
+msgid "PrometheusService|Common metrics"
+>>>>>>> upstream/master
 msgstr ""
 
 msgid "Promotions|Epics let you manage your portfolio of projects more efficiently and with less effort by tracking groups of issues that share a theme, across projects and milestones."
