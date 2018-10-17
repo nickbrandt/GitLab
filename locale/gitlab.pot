@@ -3888,6 +3888,9 @@ msgstr ""
 msgid "Group Runners"
 msgstr ""
 
+msgid "Group SAML must be enabled to test"
+msgstr ""
+
 msgid "Group avatar"
 msgstr ""
 
@@ -6459,6 +6462,9 @@ msgstr ""
 msgid "Recent searches"
 msgstr ""
 
+msgid "Redirect to SAML provider to test configuration"
+msgstr ""
+
 msgid "Reference:"
 msgstr ""
 
@@ -6803,6 +6809,9 @@ msgid "Save application"
 msgstr ""
 
 msgid "Save changes"
+msgstr ""
+
+msgid "Save changes before testing"
 msgstr ""
 
 msgid "Save pipeline schedule"
@@ -7569,6 +7578,9 @@ msgid "Terms of Service Agreement and Privacy Policy"
 msgstr ""
 
 msgid "Terms of Service and Privacy Policy"
+msgstr ""
+
+msgid "Test SAML SSO"
 msgstr ""
 
 msgid "Test coverage parsing"

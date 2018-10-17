@@ -3,18 +3,20 @@
 module QA
   context :manage, :orchestrated, :group_saml do
     describe 'Group SAML SSO' do
-      it 'User logs in to group with SAML SSO' do
+      before do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
 
         Page::Main::Login.act { sign_in_using_credentials }
 
         Factory::Resource::Sandbox.fabricate!
+      end
 
+      it 'User logs in to group with SAML SSO' do
         EE::Page::Group::Menu.act { go_to_saml_sso_group_settings }
 
         EE::Page::Group::Settings::SamlSSO.act do
-          set_id_provider_sso_url("https://#{QA::Runtime::Env.simple_saml_hostname || 'localhost'}:8443/simplesaml/saml2/idp/SSOService.php")
-          set_cert_fingerprint('119b9e027959cdb7c662cfd075d9e2ef384e445f')
+          set_id_provider_sso_url(QA::EE::Runtime::Saml.idp_sso_url)
+          set_cert_fingerprint(QA::EE::Runtime::Saml.idp_certificate_fingerprint)
           click_save_changes
           click_user_login_url_link
         end
@@ -32,6 +34,22 @@ module QA
         EE::Page::Group::SamlSSOSignIn.act { click_signin }
 
         expect(page).to have_content("Signed in with SAML for #{Runtime::Env.sandbox_name}")
+      end
+
+      it 'Lets group admin test settings' do
+        EE::Page::Group::Menu.act { go_to_saml_sso_group_settings }
+
+        EE::Page::Group::Settings::SamlSSO.act do
+          set_id_provider_sso_url(QA::EE::Runtime::Saml.idp_sso_url)
+          set_cert_fingerprint(QA::EE::Runtime::Saml.idp_certificate_fingerprint)
+          click_save_changes
+
+          click_test_button
+        end
+
+        Vendor::SAMLIdp::Page::Login.act { login }
+
+        expect(page).to have_content("Test SAML SSO")
       end
     end
   end

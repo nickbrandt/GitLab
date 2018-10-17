@@ -6,6 +6,7 @@ module QA
     module Runtime
       autoload :Env, 'qa/ee/runtime/env'
       autoload :Geo, 'qa/ee/runtime/geo'
+      autoload :Saml, 'qa/ee/runtime/saml'
     end
 
     module Page
