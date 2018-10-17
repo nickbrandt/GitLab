@@ -34,13 +34,19 @@ module QA
 
       def username=(username)
         @username = username
-        @uri.user = username
+        # Only include the user in the URI if we're using HTTP as this breaks
+        # SSH authentication.
+        @uri.user = username unless ssh_key_set?
       end
 
       def use_default_credentials
         self.username, self.password = default_credentials
 
-        add_credentials_to_netrc unless ssh_key_set?
+        # Write out .netrc as we need it for:
+        #
+        # git & git-lfs over HTTP
+        # git-lfs over SSH
+        add_credentials_to_netrc if add_credentials?
       end
 
       def clone(opts = '')
@@ -139,6 +145,12 @@ module QA
 
       alias_method :use_lfs?, :use_lfs
 
+      def add_credentials?
+        return true unless ssh_key_set?
+        return true if ssh_key_set? && use_lfs?
+
+        false
+      end
 
       def ssh_key_set?
         !private_key_file.nil?

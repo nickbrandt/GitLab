@@ -59,7 +59,11 @@ module QA
               repository.use_default_credentials unless user
             end
 
+            # Needed so git-lfs can work as it uses HTTP for authentication
+            # regardless of git using SSH or HTTP.
+            #
             repository.use_lfs = use_lfs
+            repository.use_default_credentials
 
             username = 'GitLab QA'
             email = 'root@gitlab.com'
