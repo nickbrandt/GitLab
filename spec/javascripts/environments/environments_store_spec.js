@@ -114,7 +114,11 @@ describe('Store', () => {
     it('should store latest.name when the environment is not a folder', () => {
       store.storeEnvironments(serverData);
 
+<<<<<<< HEAD
       expect(store.state.environments[2].name).toEqual(serverData[2].latest.name);
+=======
+      expect(store.state.environments[0].name).toEqual(serverData[0].latest.name);
+>>>>>>> upstream/master
     });
 
     it('should store root level name when environment is a folder', () => {

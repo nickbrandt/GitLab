@@ -18,6 +18,15 @@ describe('collapsedGroupedDatePicker', () => {
       Vue.nextTick(done);
     });
 
+<<<<<<< HEAD
+=======
+    it('should emit when sidebar is toggled', () => {
+      vm.$el.querySelector('.gutter-toggle').click();
+
+      expect(vm.toggleSidebar).toHaveBeenCalled();
+    });
+
+>>>>>>> upstream/master
     it('should emit when collapsed-calendar-icon is clicked', () => {
       vm.$el.querySelector('.sidebar-collapsed-icon').click();
 
