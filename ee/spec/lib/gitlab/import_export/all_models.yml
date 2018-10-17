@@ -17,6 +17,8 @@ pipelines:
 - triggered_pipelines
 - chat_data
 - job_artifacts
+- vulnerabilities_occurrence_pipelines
+- vulnerabilities
 protected_branches:
 - unprotect_access_levels
 protected_environments:

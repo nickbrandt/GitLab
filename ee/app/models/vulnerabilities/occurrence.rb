@@ -22,15 +22,16 @@ module Vulnerabilities
     }.with_indifferent_access.freeze
 
     sha_attribute :project_fingerprint
-    sha_attribute :primary_identifier_fingerprint
     sha_attribute :location_fingerprint
 
     belongs_to :project
-    belongs_to :pipeline, class_name: 'Ci::Pipeline'
     belongs_to :scanner, class_name: 'Vulnerabilities::Scanner'
+    belongs_to :primary_identifier, class_name: 'Vulnerabilities::Identifier', inverse_of: :primary_occurrences
 
     has_many :occurrence_identifiers, class_name: 'Vulnerabilities::OccurrenceIdentifier'
     has_many :identifiers, through: :occurrence_identifiers, class_name: 'Vulnerabilities::Identifier'
+    has_many :occurrence_pipelines, class_name: 'Vulnerabilities::OccurrencePipeline'
+    has_many :pipelines, through: :occurrence_pipelines, class_name: 'Ci::Pipeline'
 
     REPORT_TYPES = {
       sast: 0,
@@ -43,16 +44,14 @@ module Vulnerabilities
 
     validates :scanner, presence: true
     validates :project, presence: true
-    validates :pipeline, presence: true
     validates :uuid, presence: true
-    validates :ref, presence: true
 
+    validates :primary_identifier, presence: true
     validates :project_fingerprint, presence: true
-    validates :primary_identifier_fingerprint, presence: true
     validates :location_fingerprint, presence: true
     # Uniqueness validation doesn't work with binary columns, so save this useless query. It is enforce by DB constraint anyway.
     # TODO: find out why it fails
-    # validates :location_fingerprint, presence: true, uniqueness: { scope: [:primary_identifier_fingerprint, :scanner_id, :ref, :pipeline_id, :project_id] }
+    # validates :location_fingerprint, presence: true, uniqueness: { scope: [:primary_identifier_id, :scanner_id, :ref, :pipeline_id, :project_id] }
     validates :name, presence: true
     validates :report_type, presence: true
     validates :severity, presence: true, inclusion: { in: LEVELS.keys }
@@ -61,6 +60,7 @@ module Vulnerabilities
     validates :metadata_version, presence: true
     validates :raw_metadata, presence: true
 
+    scope :report_type, -> (type) { where(report_type: self.report_types[type]) }
     scope :ordered, -> { order("severity desc", :id) }
     scope :counted_by_report_and_severity, -> { group(:report_type, :severity).count }
 

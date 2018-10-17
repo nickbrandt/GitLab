@@ -177,6 +177,8 @@
 - geo:geo_repository_verification_primary_single
 - geo:geo_repository_verification_secondary_single
 
+- pipeline_default:store_security_reports
+
 - admin_emails
 - create_github_webhook
 - elastic_batch_project_indexer

@@ -3052,27 +3052,35 @@ ActiveRecord::Schema.define(version: 20181017131623) do
   add_index "vulnerability_occurrence_identifiers", ["identifier_id"], name: "index_vulnerability_occurrence_identifiers_on_identifier_id", using: :btree
   add_index "vulnerability_occurrence_identifiers", ["occurrence_id", "identifier_id"], name: "index_vulnerability_occurrence_identifiers_on_unique_keys", unique: true, using: :btree
 
+  create_table "vulnerability_occurrence_pipelines", id: :bigserial, force: :cascade do |t|
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.integer "occurrence_id", limit: 8, null: false
+    t.integer "pipeline_id", null: false
+  end
+
+  add_index "vulnerability_occurrence_pipelines", ["occurrence_id", "pipeline_id"], name: "vulnerability_occurrence_pipelines_on_unique_keys", unique: true, using: :btree
+  add_index "vulnerability_occurrence_pipelines", ["pipeline_id"], name: "index_vulnerability_occurrence_pipelines_on_pipeline_id", using: :btree
+
   create_table "vulnerability_occurrences", id: :bigserial, force: :cascade do |t|
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
     t.integer "severity", limit: 2, null: false
     t.integer "confidence", limit: 2, null: false
     t.integer "report_type", limit: 2, null: false
-    t.integer "pipeline_id", null: false
     t.integer "project_id", null: false
     t.integer "scanner_id", limit: 8, null: false
+    t.integer "primary_identifier_id", limit: 8, null: false
     t.binary "project_fingerprint", null: false
     t.binary "location_fingerprint", null: false
-    t.binary "primary_identifier_fingerprint", null: false
     t.string "uuid", limit: 36, null: false
-    t.string "ref", null: false
     t.string "name", null: false
     t.string "metadata_version", null: false
     t.text "raw_metadata", null: false
   end
 
-  add_index "vulnerability_occurrences", ["pipeline_id"], name: "index_vulnerability_occurrences_on_pipeline_id", using: :btree
-  add_index "vulnerability_occurrences", ["project_id", "ref", "primary_identifier_fingerprint", "location_fingerprint", "pipeline_id", "scanner_id"], name: "index_vulnerability_occurrences_on_unique_keys", unique: true, using: :btree
+  add_index "vulnerability_occurrences", ["primary_identifier_id"], name: "index_vulnerability_occurrences_on_primary_identifier_id", using: :btree
+  add_index "vulnerability_occurrences", ["project_id", "primary_identifier_id", "location_fingerprint", "scanner_id"], name: "index_vulnerability_occurrences_on_unique_keys", unique: true, using: :btree
   add_index "vulnerability_occurrences", ["scanner_id"], name: "index_vulnerability_occurrences_on_scanner_id", using: :btree
   add_index "vulnerability_occurrences", ["uuid"], name: "index_vulnerability_occurrences_on_uuid", unique: true, using: :btree
 
@@ -3398,8 +3406,10 @@ ActiveRecord::Schema.define(version: 20181017131623) do
   add_foreign_key "vulnerability_identifiers", "projects", on_delete: :cascade
   add_foreign_key "vulnerability_occurrence_identifiers", "vulnerability_identifiers", column: "identifier_id", on_delete: :cascade
   add_foreign_key "vulnerability_occurrence_identifiers", "vulnerability_occurrences", column: "occurrence_id", on_delete: :cascade
-  add_foreign_key "vulnerability_occurrences", "ci_pipelines", column: "pipeline_id", on_delete: :cascade
+  add_foreign_key "vulnerability_occurrence_pipelines", "ci_pipelines", column: "pipeline_id", on_delete: :cascade
+  add_foreign_key "vulnerability_occurrence_pipelines", "vulnerability_occurrences", column: "occurrence_id", on_delete: :cascade
   add_foreign_key "vulnerability_occurrences", "projects", on_delete: :cascade
+  add_foreign_key "vulnerability_occurrences", "vulnerability_identifiers", column: "primary_identifier_id", on_delete: :cascade
   add_foreign_key "vulnerability_occurrences", "vulnerability_scanners", column: "scanner_id", on_delete: :cascade
   add_foreign_key "vulnerability_scanners", "projects", on_delete: :cascade
   add_foreign_key "web_hook_logs", "web_hooks", on_delete: :cascade

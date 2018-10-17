@@ -215,6 +215,14 @@ module EE
       checked_file_template_project&.id
     end
 
+    def store_security_reports_available?
+      ::Feature.enabled?(:store_security_reports, self) && (
+        feature_available?(:sast) ||
+        feature_available?(:dependency_scanning) ||
+        feature_available?(:sast_container) ||
+        feature_available?(:dast))
+    end
+
     private
 
     def validate_plan_name

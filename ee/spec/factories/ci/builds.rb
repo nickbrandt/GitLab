@@ -5,5 +5,11 @@ FactoryBot.define do
       failed
       failure_reason { Ci::Build.failure_reasons[:protected_environment_failure] }
     end
+
+    trait :security_reports do
+      after(:build) do |build|
+        build.job_artifacts << create(:ee_ci_job_artifact, :sast, job: build)
+      end
+    end
   end
 end

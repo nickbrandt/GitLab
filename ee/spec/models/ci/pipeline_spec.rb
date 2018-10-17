@@ -10,6 +10,8 @@ describe Ci::Pipeline do
 
   it { is_expected.to have_one(:chat_data) }
   it { is_expected.to have_many(:job_artifacts).through(:builds) }
+  it { is_expected.to have_many(:vulnerabilities).through(:vulnerabilities_occurrence_pipelines).class_name('Vulnerabilities::Occurrence') }
+  it { is_expected.to have_many(:vulnerabilities_occurrence_pipelines).class_name('Vulnerabilities::OccurrencePipeline') }
 
   describe '.failure_reasons' do
     it 'contains failure reasons about exceeded limits' do
@@ -297,6 +299,143 @@ describe Ci::Pipeline do
       pipeline.performance_artifact
 
       expect { pipeline.license_management_artifact }.not_to exceed_query_limit(0)
+    end
+  end
+
+  describe '#has_security_reports?' do
+    subject { pipeline.has_security_reports? }
+
+    context 'when pipeline has builds with security reports' do
+      before do
+        create(:ee_ci_build, :security_reports, pipeline: pipeline, project: project)
+      end
+
+      context 'when pipeline status is running' do
+        let(:pipeline) { create(:ci_pipeline, :running, project: project) }
+
+        it { is_expected.to be_falsey }
+      end
+
+      context 'when pipeline status is success' do
+        let(:pipeline) { create(:ci_pipeline, :success, project: project) }
+
+        it { is_expected.to be_truthy }
+      end
+    end
+
+    context 'when pipeline does not have builds with security reports' do
+      before do
+        create(:ci_build, :artifacts, pipeline: pipeline, project: project)
+      end
+
+      let(:pipeline) { create(:ci_pipeline, :success, project: project) }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context 'when retried build has security reports' do
+      before do
+        create(:ee_ci_build, :retried, :security_reports, pipeline: pipeline, project: project)
+      end
+
+      let(:pipeline) { create(:ci_pipeline, :success, project: project) }
+
+      it { is_expected.to be_falsey }
+    end
+  end
+
+  describe '#security_reports' do
+    subject { pipeline.security_reports }
+
+    before do
+      stub_licensed_features(sast: true)
+    end
+
+    context 'when pipeline has multiple builds with security reports' do
+      let!(:build_sast_1) { create(:ci_build, :success, name: 'sast_1', pipeline: pipeline, project: project) }
+      let!(:build_sast_2) { create(:ci_build, :success, name: 'sast_2', pipeline: pipeline, project: project) }
+
+      before do
+        create(:ee_ci_job_artifact, :sast, job: build_sast_1, project: project)
+        create(:ee_ci_job_artifact, :sast, job: build_sast_2, project: project)
+      end
+
+      it 'returns security reports with collected data grouped as expected' do
+        expect(subject.reports.keys).to eq(%w(sast))
+        expect(subject.get_report('sast').occurrences.size).to eq(6)
+      end
+
+      context 'when builds are retried' do
+        let!(:build_sast_1) { create(:ci_build, :retried, name: 'sast_1', pipeline: pipeline, project: project) }
+        let!(:build_sast_2) { create(:ci_build, :retried, name: 'sast_2', pipeline: pipeline, project: project) }
+
+        it 'does not take retried builds into account' do
+          expect(subject.reports).to eq({})
+        end
+      end
+    end
+
+    context 'when pipeline does not have any builds with security reports' do
+      it 'returns empty security reports' do
+        expect(subject.reports).to eq({})
+      end
+    end
+  end
+
+  describe 'Store security reports worker' do
+    using RSpec::Parameterized::TableSyntax
+
+    where(:state, :transition) do
+      :success | :succeed
+      :failed | :drop
+      :skipped | :skip
+      :cancelled | :cancel
+    end
+
+    with_them do
+      context 'when pipeline has security reports and ref is the default branch of project' do
+        let(:default_branch) { pipeline.ref }
+
+        before do
+          create(:ee_ci_build, :security_reports, pipeline: pipeline, project: project)
+          allow(project).to receive(:default_branch) { default_branch }
+        end
+
+        context "when transitioning to #{params[:state]}" do
+          it 'schedules store security report worker' do
+            expect(StoreSecurityReportsWorker).to receive(:perform_async).with(pipeline.id)
+
+            pipeline.update!(status_event: transition)
+          end
+        end
+      end
+
+      context 'when pipeline does NOT have security reports' do
+        context "when transitioning to #{params[:state]}" do
+          it 'does NOT schedule store security report worker' do
+            expect(StoreSecurityReportsWorker).not_to receive(:perform_async).with(pipeline.id)
+
+            pipeline.update!(status_event: transition)
+          end
+        end
+      end
+
+      context "when pipeline ref is not the project's default branch" do
+        let(:default_branch) { 'another_branch' }
+
+        before do
+          stub_licensed_features(sast: true)
+          allow(project).to receive(:default_branch) { default_branch }
+        end
+
+        context "when transitioning to #{params[:state]}" do
+          it 'does NOT schedule store security report worker' do
+            expect(StoreSecurityReportsWorker).not_to receive(:perform_async).with(pipeline.id)
+
+            pipeline.update!(status_event: transition)
+          end
+        end
+      end
     end
   end
 end

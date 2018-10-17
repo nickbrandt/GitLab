@@ -9,8 +9,14 @@ module EE
     prepended do
       after_destroy :log_geo_deleted_event
 
+      SECURITY_REPORT_FILE_TYPES = %w[sast dependency_scanning container_scanning dast].freeze
+
       scope :not_expired, -> { where('expire_at IS NULL OR expire_at > ?', Time.current) }
       scope :geo_syncable, -> { with_files_stored_locally.not_expired }
+
+      scope :security_reports, -> do
+        with_file_types(SECURITY_REPORT_FILE_TYPES)
+      end
     end
 
     def log_geo_deleted_event
