@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context :plan do
+  context 'Plan' do
     describe 'Epics Creation' do
       before(:all) do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context :geo, :orchestrated, :geo do
+  context 'Geo', :orchestrated, :geo do
     describe 'GitLab HTTP push to secondary' do
       it 'is redirected to the primary and ultimately replicated to the secondary' do
         file_name = 'README.md'

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context :plan do
+  context 'Plan' do
     describe 'Epics milestone dates API' do
       before(:context) do
         @api_client = Runtime::API::Client.new(:gitlab)

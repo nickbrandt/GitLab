@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context :geo, :orchestrated, :geo do
+  context 'Geo', :orchestrated, :geo do
     describe 'GitLab HTTP push' do
       it 'is replicated to the secondary' do
         file_name = 'README.md'
