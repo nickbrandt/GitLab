@@ -50,15 +50,17 @@ module QA
       end
 
       def clone(opts = '')
-        run("git clone #{opts} #{uri} ./")
+        clone_result = run("git clone #{opts} #{uri} ./")
+        return clone_result.response unless clone_result.success
+
+        enable_lfs_result = enable_lfs if use_lfs?
+
+        clone_result.to_s + enable_lfs_result.to_s
       end
 
-      def checkout(branch_name)
-        run(%Q{git checkout "#{branch_name}"})
-      end
-
-      def checkout_new_branch(branch_name)
-        run(%Q{git checkout -b "#{branch_name}"})
+      def checkout(branch_name, new_branch: false)
+        opts = new_branch ? '-b' : ''
+        run(%Q{git checkout #{opts} "#{branch_name}"}).to_s
       end
 
       def shallow_clone
@@ -80,19 +82,26 @@ module QA
       def add_file(name, contents)
         ::File.write(name, contents)
 
-        run(%Q{git add #{name}})
+        if use_lfs?
+          git_lfs_track_result = run(%Q{git lfs track #{name} --lockable})
+          return git_lfs_track_result.response unless git_lfs_track_result.success
+        end
+
+        git_add_result = run(%Q{git add #{name}})
+
+        git_lfs_track_result.to_s + git_add_result.to_s
       end
 
       def commit(message)
-        run(%Q{git commit -m "#{message}"})
+        run(%Q{git commit -m "#{message}"}).to_s
       end
 
       def push_changes(branch = 'master')
-        run("git push #{uri} #{branch}")
+        run("git push #{uri} #{branch}").to_s
       end
 
       def commits
-        run('git log --oneline').split("\n")
+        run('git log --oneline').to_s.split("\n")
       end
 
       def use_ssh_key(key)
@@ -104,7 +113,8 @@ module QA
         keyscan_params = ['-H']
         keyscan_params << "-p #{uri.port}" if uri.port
         keyscan_params << uri.host
-        run("ssh-keyscan #{keyscan_params.join(' ')} >> #{known_hosts_file.path}")
+        res = run("ssh-keyscan #{keyscan_params.join(' ')} >> #{known_hosts_file.path}")
+        return res.response unless res.success?
 
         self.env_vars << %Q{GIT_SSH_COMMAND="ssh -i #{private_key_file.path} -o UserKnownHostsFile=#{known_hosts_file.path}"}
       end
@@ -145,6 +155,11 @@ module QA
 
       alias_method :use_lfs?, :use_lfs
 
+      Result = Struct.new(:success, :response) do
+        alias_method :success?, :success
+        alias_method :to_s, :response
+      end
+
       def add_credentials?
         return true unless ssh_key_set?
         return true if ssh_key_set? && use_lfs?
@@ -169,13 +184,13 @@ module QA
 
       def run(command_str, *extra_env)
         command = [env_vars, *extra_env, command_str, '2>&1'].compact.join(' ')
-        Runtime::Logger.debug "Git: command=[#{command}]"
+        Runtime::Logger.debug "Git: pwd=[#{Dir.pwd}], command=[#{command}]"
 
-        output, _ = Open3.capture2(command)
-        output = output.chomp.gsub(/\s+$/, '')
-        Runtime::Logger.debug "Git: output=[#{output}]"
+        output, status = Open3.capture2e(command)
+        output.chomp!
+        Runtime::Logger.debug "Git: output=[#{output}], exitstatus=[#{status.exitstatus}]"
 
-        output
+        Result.new(status.exitstatus == 0, output)
       end
 
       def default_credentials
