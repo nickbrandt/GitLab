@@ -17,12 +17,14 @@ describe('DirtyFormChecker', () => {
 
     it('finds editable inputs', () => {
       const editableInputs = dirtyFormChecker.editableInputs.map(input => input.name);
+
       expect(editableInputs).toContain('saml_provider[sso_url]');
       expect(editableInputs).not.toContain('authenticity_token');
     });
 
     it('tracks starting states for editable inputs', () => {
       const enabledStartState = dirtyFormChecker.startingStates['saml_provider[enabled]'];
+
       expect(enabledStartState).toEqual('1');
     });
   });

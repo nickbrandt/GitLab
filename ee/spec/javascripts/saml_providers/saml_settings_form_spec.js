@@ -18,6 +18,7 @@ describe('SamlSettingsForm', () => {
 
     it('disables Test button when form has changes', () => {
       samlSettingsForm.dirtyFormChecker.isDirty = true;
+
       expect(samlSettingsForm.testButton.hasAttribute('disabled')).toBe(false);
 
       samlSettingsForm.updateView();
