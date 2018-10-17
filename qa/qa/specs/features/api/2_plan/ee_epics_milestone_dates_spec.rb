@@ -30,7 +30,7 @@ module QA
         group_name = is_sandbox_group ? Runtime::Namespace.sandbox_name : "group_#{SecureRandom.hex(8)}"
         parent_id = is_sandbox_group ? nil : sandbox_group_id
         create_group_request = create_request("/groups")
-        post create_group_request.url, name: group_name, path: group_name, parent_id: parent_id
+        post create_group_request.url, name: group_name, path: group_name, parent_id: parent_id, visibility: 'public'
         expect_status(201)
         json_body[:id]
       end
