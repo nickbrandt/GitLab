@@ -8,7 +8,7 @@ module QA
           QA::Page::Admin::Menu.act { go_to_license }
 
           EE::Page::Admin::License.act(license) do |key|
-            add_new_license(key) if no_license?
+            add_new_license(key) unless license?
           end
 
           QA::Page::Main::Menu.act { sign_out }

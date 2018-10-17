@@ -45,6 +45,10 @@ module QA
             def initialize
               @address = QA::Runtime::Scenario.geo_primary_address
               @name = QA::Runtime::Scenario.geo_primary_name
+
+              # Alias QA::Runtime::Scenario.gitlab_address to @address since
+              # some components depends on QA::Runtime::Scenario.gitlab_address.
+              QA::Runtime::Scenario.define(:gitlab_address, @address)
             end
 
             def add_license

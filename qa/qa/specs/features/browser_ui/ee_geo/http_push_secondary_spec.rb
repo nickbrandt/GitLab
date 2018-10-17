@@ -19,12 +19,13 @@ module QA
           end
 
           # Perform a git push over HTTP directly to the primary
-          Factory::Repository::Push.fabricate! do |push|
-            push.repository_http_uri = project.repository_http_location.uri
+          Factory::Repository::ProjectPush.fabricate! do |push|
+            push.project = project
             push.file_name = file_name
             push.file_content = "# #{file_content_primary}"
             push.commit_message = 'Add README.md'
           end
+          project.visit!
 
           # Validate git push worked and file exists with content
           Page::Project::Show.perform do |show|

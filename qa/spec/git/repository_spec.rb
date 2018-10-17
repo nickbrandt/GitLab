@@ -1,7 +1,10 @@
 describe QA::Git::Repository do
+  include Support::StubENV
+
   let(:repository) { described_class.new }
 
   before do
+    stub_env('GITLAB_USERNAME', 'root')
     cd_empty_temp_directory
     set_bad_uri
     repository.use_default_credentials
