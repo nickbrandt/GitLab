@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.3.6 (2018-10-17)
+
+### Fixed (1 change)
+
+- Don't reset the default branch when repository mirroring is enabled. !7944
+
+
 ## 11.3.5 (2018-10-15)
 
 ### Fixed (1 change)
