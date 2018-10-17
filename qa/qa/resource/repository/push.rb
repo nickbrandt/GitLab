@@ -12,6 +12,10 @@ module QA
 
         attr_writer :remote_branch
 
+        product :output do |factory|
+          factory.output
+        end
+
         def initialize
           @file_name = 'file.txt'
           @file_content = '# This is test file'
@@ -44,6 +48,8 @@ module QA
 
         def fabricate!
           Git::Repository.perform do |repository|
+            @output = ''
+
             if ssh_key
               repository.uri = repository_ssh_uri
               repository.use_ssh_key(ssh_key)
@@ -62,29 +68,25 @@ module QA
               email = user.email
             end
 
-            repository.clone
+            @output += repository.clone
             repository.configure_identity(username, email)
 
-            if new_branch
-              repository.checkout_new_branch(branch_name)
-            else
-              repository.checkout(branch_name)
-            end
+            @output += repository.checkout(branch_name, new_branch: new_branch)
 
             if @directory
               @directory.each_child do |f|
-                repository.add_file(f.basename, f.read) if f.file?
+                @output += repository.add_file(f.basename, f.read) if f.file?
               end
             elsif @files
               @files.each do |f|
                 repository.add_file(f[:name], f[:content])
               end
             else
-              repository.add_file(file_name, file_content)
+              @output += repository.add_file(file_name, file_content)
             end
 
-            repository.commit(commit_message)
-            @output = repository.push_changes("#{branch_name}:#{remote_branch}")
+            @output += repository.commit(commit_message)
+            @output += repository.push_changes("#{branch_name}:#{remote_branch}")
 
             repository.delete_ssh_key
           end
