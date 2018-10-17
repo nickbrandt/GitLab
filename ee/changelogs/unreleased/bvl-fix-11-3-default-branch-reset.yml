@@ -1,0 +1,5 @@
+---
+title: Don't reset the default branch when repository mirroring is enabled
+merge_request: 7944
+author:
+type: fixed
