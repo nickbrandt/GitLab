@@ -23,9 +23,9 @@ module QA
 
         EE::Page::Group::SamlSSOSignIn.act { click_signin }
 
-        Vendor::SAMLIdp::Page::Login.act { login }
+        Vendor::SAMLIdp::Page::Login.act { login } if page.has_text?('Enter your username and password')
 
-        expect(page).to have_content("SAML for #{Runtime::Env.sandbox_name} was added to your connected accounts")
+        expect(page).to have_content("Signed in with SAML for #{Runtime::Env.sandbox_name}")
 
         EE::Page::Group::Menu.act { go_to_saml_sso_group_settings }
 
@@ -47,7 +47,7 @@ module QA
           click_test_button
         end
 
-        Vendor::SAMLIdp::Page::Login.act { login }
+        Vendor::SAMLIdp::Page::Login.act { login } if page.has_text?('Enter your username and password')
 
         expect(page).to have_content("Test SAML SSO")
       end
