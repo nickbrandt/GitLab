@@ -8,7 +8,7 @@ module QA
       class Push < Base
         attr_accessor :file_name, :file_content, :commit_message,
                       :branch_name, :new_branch, :output, :repository_http_uri,
-                      :repository_ssh_uri, :ssh_key, :user
+                      :repository_ssh_uri, :ssh_key, :user, :use_lfs
 
         attr_writer :remote_branch
 
@@ -24,6 +24,7 @@ module QA
           @new_branch = true
           @repository_http_uri = ""
           @ssh_key = nil
+          @use_lfs = false
         end
 
         def remote_branch
@@ -57,6 +58,8 @@ module QA
               repository.uri = repository_http_uri
               repository.use_default_credentials unless user
             end
+
+            repository.use_lfs = use_lfs
 
             username = 'GitLab QA'
             email = 'root@gitlab.com'

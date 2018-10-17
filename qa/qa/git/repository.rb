@@ -11,7 +11,7 @@ module QA
     class Repository
       include Scenario::Actable
 
-      attr_writer :password
+      attr_writer :password, :use_lfs
       attr_accessor :env_vars
 
       def initialize
@@ -134,10 +134,25 @@ module QA
 
       private
 
-      attr_reader :uri, :username, :password, :known_hosts_file, :private_key_file
+      attr_reader :uri, :username, :password, :known_hosts_file,
+        :private_key_file, :use_lfs
+
+      alias_method :use_lfs?, :use_lfs
+
 
       def ssh_key_set?
         !private_key_file.nil?
+      end
+
+      def enable_lfs
+        # git lfs install *needs* a .gitconfig defined at ${HOME}/.gitconfig
+        FileUtils.mkdir_p(tmp_home_dir)
+        touch_gitconfig_result = run("touch #{tmp_home_dir}/.gitconfig")
+        return touch_gitconfig_result.response unless touch_gitconfig_result.success?
+
+        git_lfs_install_result = run('git lfs install')
+
+        touch_gitconfig_result.to_s + git_lfs_install_result.to_s
       end
 
       def run(command_str, *extra_env)
