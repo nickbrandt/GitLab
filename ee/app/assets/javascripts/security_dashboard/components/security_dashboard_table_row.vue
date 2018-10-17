@@ -2,6 +2,7 @@
 import { SkeletonLoading } from '@gitlab-org/gitlab-ui';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
 import SecurityDashboardActionButtons from './security_dashboard_action_buttons.vue';
+import VulnerabilityIssueLink from './vulnerability_issue_link.vue';
 
 export default {
   name: 'SecurityDashboardTableRow',
@@ -9,6 +10,7 @@ export default {
     SeverityBadge,
     SecurityDashboardActionButtons,
     SkeletonLoading,
+    VulnerabilityIssueLink,
   },
   props: {
     vulnerability: {
@@ -31,7 +33,13 @@ export default {
     },
     projectNamespace() {
       const { project } = this.vulnerability;
-      return project && project.name_with_namespace ? project.name_with_namespace : null;
+      return project && project.full_name ? project.full_name : null;
+    },
+    isDismissed() {
+      return this.vulnerability.dismissal_feedback;
+    },
+    hasIssue() {
+      return this.vulnerability.issue_feedback;
     },
   },
 };
@@ -65,7 +73,13 @@ export default {
           :lines="2"
         />
         <div v-else>
-          <span>{{ vulnerability.description }}</span>
+          <strike v-if="isDismissed">{{ vulnerability.name }}</strike>
+          <span v-else>{{ vulnerability.name }}</span>
+          <vulnerability-issue-link
+            v-if="hasIssue"
+            :issue="vulnerability.issue_feedback"
+            :project-name="vulnerability.project.name"
+          />
           <br />
           <span
             v-if="projectNamespace"
@@ -84,7 +98,8 @@ export default {
         {{ s__('Reports|Confidence') }}
       </div>
       <div class="table-mobile-content text-capitalize">
-        {{ confidence }}
+        <strike v-if="isDismissed">{{ confidence }}</strike>
+        <span v-else>{{ confidence }}</span>
       </div>
     </div>
 

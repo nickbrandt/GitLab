@@ -234,4 +234,46 @@ describe('vulnerabilities actions', () => {
       );
     });
   });
+
+  describe('setVulnerabilitiesEndpoint', () => {
+    it('should commit the correct mutuation', done => {
+      const state = initialState;
+      const endpoint = 'fakepath.json';
+
+      testAction(
+        actions.setVulnerabilitiesEndpoint,
+        endpoint,
+        state,
+        [
+          {
+            type: types.SET_VULNERABILITIES_ENDPOINT,
+            payload: endpoint,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('setVulnerabilitiesCountEndpoint', () => {
+    it('should commit the correct mutuation', done => {
+      const state = initialState;
+      const endpoint = 'fakepath.json';
+
+      testAction(
+        actions.setVulnerabilitiesCountEndpoint,
+        endpoint,
+        state,
+        [
+          {
+            type: types.SET_VULNERABILITIES_COUNT_ENDPOINT,
+            payload: endpoint,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
 });

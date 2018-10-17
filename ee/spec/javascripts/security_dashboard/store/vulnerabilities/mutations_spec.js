@@ -3,13 +3,34 @@ import * as types from 'ee/security_dashboard/store/modules/vulnerabilities/muta
 import mutations from 'ee/security_dashboard/store/modules/vulnerabilities/mutations';
 
 describe('vulnerabilities module mutations', () => {
-  describe('REQUEST_VULNERABILITIES', () => {
-    it('should set `isLoadingVulnerabilities` to `true`', () => {
+  describe('SET_VULNERABILITIES_ENDPOINT', () => {
+    it('should set `vulnerabilitiesEndpoint` to `fakepath.json`', () => {
       const state = initialState;
+      const endpoint = 'fakepath.json';
 
+      mutations[types.SET_VULNERABILITIES_ENDPOINT](state, endpoint);
+
+      expect(state.vulnerabilitiesEndpoint).toEqual(endpoint);
+    });
+  });
+
+  describe('REQUEST_VULNERABILITIES', () => {
+    let state;
+
+    beforeEach(() => {
+      state = {
+        ...initialState,
+        hasError: true,
+      };
       mutations[types.REQUEST_VULNERABILITIES](state);
+    });
 
+    it('should set `isLoadingVulnerabilities` to `true`', () => {
       expect(state.isLoadingVulnerabilities).toBeTruthy();
+    });
+
+    it('should set `hasError` to `false`', () => {
+      expect(state.hasError).toBeFalsy();
     });
   });
 
@@ -28,10 +49,6 @@ describe('vulnerabilities module mutations', () => {
 
     it('should set `isLoadingVulnerabilities` to `false`', () => {
       expect(state.isLoadingVulnerabilities).toBeFalsy();
-    });
-
-    it('should set `errorLoadingData` to `false`', () => {
-      expect(state.errorLoadingData).toBeFalsy();
     });
 
     it('should set `pageInfo`', () => {
@@ -53,13 +70,34 @@ describe('vulnerabilities module mutations', () => {
     });
   });
 
-  describe('REQUEST_VULNERABILITIES_COUNT', () => {
-    it('should set `isLoadingVulnerabilitiesCount` to `true`', () => {
+  describe('SET_VULNERABILITIES_COUNT_ENDPOINT', () => {
+    it('should set `vulnerabilitiesCountEndpoint` to `fakepath.json`', () => {
       const state = initialState;
+      const endpoint = 'fakepath.json';
 
+      mutations[types.SET_VULNERABILITIES_COUNT_ENDPOINT](state, endpoint);
+
+      expect(state.vulnerabilitiesCountEndpoint).toEqual(endpoint);
+    });
+  });
+
+  describe('REQUEST_VULNERABILITIES_COUNT', () => {
+    let state;
+
+    beforeEach(() => {
+      state = {
+        ...initialState,
+        hasError: true,
+      };
       mutations[types.REQUEST_VULNERABILITIES_COUNT](state);
+    });
 
+    it('should set `isLoadingVulnerabilitiesCount` to `true`', () => {
       expect(state.isLoadingVulnerabilitiesCount).toBeTruthy();
+    });
+
+    it('should set `hasError` to `false`', () => {
+      expect(state.hasError).toBeFalsy();
     });
   });
 
@@ -75,10 +113,6 @@ describe('vulnerabilities module mutations', () => {
 
     it('should set `isLoadingVulnerabilitiesCount` to `false`', () => {
       expect(state.isLoadingVulnerabilitiesCount).toBeFalsy();
-    });
-
-    it('should set `errorLoadingData` to `false`', () => {
-      expect(state.errorLoadingData).toBeFalsy();
     });
 
     it('should set `vulnerabilitiesCount`', () => {

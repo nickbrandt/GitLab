@@ -36,9 +36,9 @@ describe('Security Dashboard Table Row', () => {
     beforeEach(() => {
       const vulnerability = {
         severity: 'high',
-        description: 'Test vulnerability',
+        name: 'Test vulnerability',
         confidence: 'medium',
-        project: { name_with_namespace: 'project name' },
+        project: { full_name: 'project name' },
       };
 
       props = { vulnerability };
@@ -55,15 +55,15 @@ describe('Security Dashboard Table Row', () => {
       );
     });
 
-    it('should render the description', () => {
+    it('should render the name', () => {
       expect(vm.$el.querySelectorAll('.table-mobile-content')[1].textContent).toContain(
-        props.vulnerability.description,
+        props.vulnerability.name,
       );
     });
 
     it('should render the project namespace', () => {
       expect(vm.$el.querySelectorAll('.table-mobile-content')[1].textContent).toContain(
-        props.vulnerability.project.name_with_namespace,
+        props.vulnerability.project.full_name,
       );
     });
 

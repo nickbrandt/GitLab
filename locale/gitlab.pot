@@ -6916,6 +6916,18 @@ msgstr ""
 msgid "Security Dashboard"
 msgstr ""
 
+msgid "Security Dashboard|Issue Created"
+msgstr ""
+
+msgid "Security Reports|At this time, the security dashboard only supports SAST. More analyzers are coming soon."
+msgstr ""
+
+msgid "Security Reports|Security Dashboard Roadmap"
+msgstr ""
+
+msgid "Security Reports|There was an error fetching the dashboard. Please try again in a few moments or contact your support team."
+msgstr ""
+
 msgid "SecurityDashboard| The security dashboard displays the latest security report. Use it to find and fix vulnerabilities."
 msgstr ""
 
