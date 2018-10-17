@@ -20,6 +20,10 @@ module EE
           s_('ProjectCreationLevel|Developers + Maintainers') => DEVELOPER_MAINTAINER_PROJECT_ACCESS
         }
       end
+
+      def level_name(name)
+        project_creation_options.key(name)
+      end
     end
   end
 end

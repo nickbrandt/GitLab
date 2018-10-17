@@ -41,6 +41,8 @@ You need Owner [permissions] to view the group Audit Events page.
 To view a group's audit events, navigate to **Group > Settings > Audit Events**.
 From there, you can see the following actions:
 
+- Group name/path changed
+- Group repository size limit changed
 - Group created/deleted
 - Group changed visibility
 - User was added to group and with which [permissions]
@@ -51,6 +53,12 @@ From there, you can see the following actions:
 - [Project shared with group](../user/project/members/share_project_with_groups.md)
   and with which [permissions]
 - Removal of a previously shared group with a project
+- LFS enabled/disabled
+- Shared runners minutes limit changed
+- Membership lock enabled/disabled
+- Request access enabled/disabled
+- 2FA enforcement/grace period changed
+- Roles allowed to create project changed
 
 ### Project events
 
