@@ -3,19 +3,18 @@
 module QA
   context :plan do
     describe 'Epics Creation' do
-      let!(:issue) do
-        Factory::Resource::Issue.fabricate! do |issue|
-          issue.title = 'Issue for epics tests'
-        end
-      end
-
       before(:all) do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.act { sign_in_using_credentials }
       end
 
       it 'user creates, edits, deletes epic' do
+        issue = Factory::Resource::Issue.fabricate! do |issue|
+          issue.title = 'Issue for epics tests'
+        end
+
         epic = EE::Factory::Resource::Epic.fabricate! do |epic|
+          epic.group = issue.project.group
           epic.title = "My First Epic"
         end
 
@@ -33,7 +32,7 @@ module QA
 
         # Add/Remove Issues to/from Epics
         EE::Page::Group::Epic::Show.perform do |show_page|
-          show_page.add_issue_to_epic(issue.location)
+          show_page.add_issue_to_epic(issue.web_url)
           show_page.remove_issue_from_epic
           expect(show_page).to have_content(/removed issue/)
         end
@@ -47,7 +46,7 @@ module QA
         issue.visit!
 
         Page::Project::Issue::Show.perform do |show_page|
-          show_page.comment("/epic #{epic.location}")
+          show_page.comment("/epic #{epic.web_url}")
           show_page.comment("/remove_epic")
           expect(show_page).to have_content(/removed from epic/)
         end

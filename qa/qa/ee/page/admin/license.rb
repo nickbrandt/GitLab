@@ -4,11 +4,12 @@ module QA
       module Admin
         class License < QA::Page::Base
           view 'ee/app/views/admin/licenses/missing.html.haml' do
-            element :missing_license, 'You do not have a license' # rubocop:disable QA/ElementWithPattern
+            element :missing_license
           end
 
           view 'ee/app/views/admin/licenses/show.html.haml' do
             element :license_upload_link, "link_to 'Upload New License'" # rubocop:disable QA/ElementWithPattern
+            element :remove_license_link
           end
 
           view 'ee/app/views/admin/licenses/new.html.haml' do
@@ -19,8 +20,8 @@ module QA
             element :license_upload_buttonm, "submit 'Upload license'" # rubocop:disable QA/ElementWithPattern
           end
 
-          def no_license?
-            page.has_content?('You do not have a license')
+          def license?
+            has_element?(:remove_license_link) || !has_element?(:missing_license)
           end
 
           def add_new_license(key)

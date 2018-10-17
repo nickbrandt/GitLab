@@ -12,14 +12,11 @@ module QA
             project.description = 'Geo test project'
           end
 
-          geo_project_name = Page::Project::Show.act { project_name }
-          expect(geo_project_name).to include 'geo-project'
-
           Factory::Repository::ProjectPush.fabricate! do |push|
+            push.project = project
             push.file_name = 'README.md'
             push.file_content = '# This is Geo project!'
             push.commit_message = 'Add README.md'
-            push.project = project
           end
 
           Runtime::Browser.visit(:geo_secondary, QA::Page::Main::Login) do
@@ -36,9 +33,9 @@ module QA
             end
 
             Page::Dashboard::Projects.perform do |dashboard|
-              dashboard.wait_for_project_replication(geo_project_name)
+              dashboard.wait_for_project_replication(project.name)
 
-              dashboard.go_to_project(geo_project_name)
+              dashboard.go_to_project(project.name)
             end
 
             Page::Project::Show.perform do |show|

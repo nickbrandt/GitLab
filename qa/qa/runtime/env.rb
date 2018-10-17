@@ -5,6 +5,12 @@ module QA
 
       extend self
 
+      attr_writer :personal_access_token
+
+      def verbose?
+        enabled?(ENV['VERBOSE'], default: false)
+      end
+
       # set to 'false' to have Chrome run visibly instead of headless
       def chrome_headless?
         enabled?(ENV['CHROME_HEADLESS'])
@@ -24,7 +30,7 @@ module QA
 
       # specifies token that can be used for the api
       def personal_access_token
-        ENV['PERSONAL_ACCESS_TOKEN']
+        @personal_access_token ||= ENV['PERSONAL_ACCESS_TOKEN']
       end
 
       def user_username
@@ -44,7 +50,7 @@ module QA
       end
 
       def forker?
-        forker_username && forker_password
+        !!(forker_username && forker_password)
       end
 
       def forker_username
