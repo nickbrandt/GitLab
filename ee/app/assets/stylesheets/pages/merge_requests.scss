@@ -77,13 +77,3 @@
   }
 }
 
-.mr-state-widget {
-  .media-section {
-    border: 1px solid $border-color;
-    margin-bottom: -1px;
-
-    &:first-of-type {
-      border-radius: $border-radius-default $border-radius-default 0 0;
-    }
-  }
-}
