@@ -18,7 +18,8 @@ module QA
         # We set HOME to the current working directory (which is a
         # temporary directory created in .perform()) so the temporarily dropped
         # .netrc can be utilised
-        self.env_vars = [%Q{HOME="#{File.dirname(netrc_file_path)}"}]
+        self.env_vars = [%Q{HOME="#{tmp_home_dir}"}]
+        @use_lfs = false
       end
 
       def self.perform(*args)
@@ -158,12 +159,12 @@ module QA
         end
       end
 
-      def tmp_netrc_directory
-        @tmp_netrc_directory ||= File.join(Dir.tmpdir, "qa-netrc-credentials", $$.to_s)
+      def tmp_home_dir
+        @tmp_home_dir ||= File.join(Dir.tmpdir, "qa-netrc-credentials", $$.to_s)
       end
 
       def netrc_file_path
-        @netrc_file_path ||= File.join(tmp_netrc_directory, '.netrc')
+        @netrc_file_path ||= File.join(tmp_home_dir, '.netrc')
       end
 
       def netrc_content
@@ -185,7 +186,7 @@ module QA
         #
         return if netrc_already_contains_content?
 
-        FileUtils.mkdir_p(tmp_netrc_directory)
+        FileUtils.mkdir_p(tmp_home_dir)
         File.open(netrc_file_path, 'a') { |file| file.puts(netrc_content) }
         File.chmod(0600, netrc_file_path)
       end
