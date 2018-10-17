@@ -37,13 +37,7 @@ Rails.application.routes.draw do
     match '*all', via: [:get, :post], to: proc { [404, {}, ['']] }
   end
 
-  namespace :oauth do
-    scope path: 'geo', controller: :geo_auth, as: :geo do
-      get 'auth'
-      get 'callback'
-      get 'logout'
-    end
-  end
+  draw :oauth
 
   use_doorkeeper_openid_connect
 
