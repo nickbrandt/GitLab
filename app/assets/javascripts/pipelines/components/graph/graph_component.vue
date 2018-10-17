@@ -101,7 +101,7 @@ export default {
             'has-only-one-job': stage.groups.length === 1
           }"
           :title="capitalizeStageName(stage.name)"
-          :jobs="stage.groups"
+          :groups="stage.groups"
           :stage-connector-class="stageConnectorClass(index, stage)"
           :is-first-column="isFirstColumn(index)"
           :has-triggered-by="hasTriggeredBy"
