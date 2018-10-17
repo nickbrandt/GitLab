@@ -48,6 +48,20 @@ describe EE::Audit::ProjectChangesAuditor do
         expect { foo_instance.execute }.to change { SecurityEvent.count }.by(1)
         expect(SecurityEvent.last.details[:change]).to eq 'namespace'
       end
+
+      it 'creates an event when the repository size limit changes' do
+        project.update!(repository_size_limit: 100)
+
+        expect { foo_instance.execute }.to change { SecurityEvent.count }.by(1)
+        expect(SecurityEvent.last.details[:change]).to eq 'repository_size_limit'
+      end
+
+      it 'creates an event when the packages enabled setting changes' do
+        project.update!(packages_enabled: false)
+
+        expect { foo_instance.execute }.to change { SecurityEvent.count }.by(1)
+        expect(SecurityEvent.last.details[:change]).to eq 'packages_enabled'
+      end
     end
   end
 end
