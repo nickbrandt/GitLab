@@ -598,16 +598,5 @@ module EE
     def validate_board_limit(board)
       # Board limits are disabled in EE, so this method is just a no-op.
     end
-
-    override :after_rename_repository
-    def after_rename_repository(full_path_before, path_before)
-      super(full_path_before, path_before)
-
-      ::Geo::RepositoryRenamedEventStore.new(
-        self,
-        old_path: path_before,
-        old_path_with_namespace: full_path_before
-      ).create!
-    end
   end
 end
