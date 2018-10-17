@@ -40,6 +40,7 @@ describe('QuartersPresetMixin', () => {
           epic: Object.assign({}, mockEpic, { startDate: mockTimeframeQuarters[1].range[0] }),
           timeframeItem: mockTimeframeQuarters[1],
         });
+
         expect(vm.hasStartDateForQuarter()).toBe(true);
       });
 
@@ -48,6 +49,7 @@ describe('QuartersPresetMixin', () => {
           epic: Object.assign({}, mockEpic, { startDate: mockTimeframeQuarters[0].range[0] }),
           timeframeItem: mockTimeframeQuarters[1],
         });
+
         expect(vm.hasStartDateForQuarter()).toBe(false);
       });
     });
@@ -60,12 +62,14 @@ describe('QuartersPresetMixin', () => {
       it('returns true if provided timeframeItem is under epicEndDate', () => {
         const timeframeItem = mockTimeframeQuarters[1];
         const epicEndDate = mockTimeframeQuarters[1].range[2];
+
         expect(vm.isTimeframeUnderEndDateForQuarter(timeframeItem, epicEndDate)).toBe(true);
       });
 
       it('returns false if provided timeframeItem is NOT under epicEndDate', () => {
         const timeframeItem = mockTimeframeQuarters[1];
         const epicEndDate = mockTimeframeQuarters[2].range[1];
+
         expect(vm.isTimeframeUnderEndDateForQuarter(timeframeItem, epicEndDate)).toBe(false);
       });
     });
@@ -73,6 +77,7 @@ describe('QuartersPresetMixin', () => {
     describe('getBarWidthForSingleQuarter', () => {
       it('returns calculated bar width based on provided cellWidth, daysInQuarter and day of quarter', () => {
         vm = createComponent({});
+
         expect(Math.floor(vm.getBarWidthForSingleQuarter(300, 91, 1))).toBe(3); // 10% size
         expect(Math.floor(vm.getBarWidthForSingleQuarter(300, 91, 45))).toBe(148); // 50% size
         expect(vm.getBarWidthForSingleQuarter(300, 91, 91)).toBe(300); // Full size
@@ -84,6 +89,7 @@ describe('QuartersPresetMixin', () => {
         vm = createComponent({
           epic: Object.assign({}, mockEpic, { startDateOutOfRange: true }),
         });
+
         expect(vm.getTimelineBarStartOffsetForQuarters()).toBe('');
       });
 
@@ -94,6 +100,7 @@ describe('QuartersPresetMixin', () => {
             endDateOutOfRange: true,
           }),
         });
+
         expect(vm.getTimelineBarStartOffsetForQuarters()).toBe('');
       });
 
@@ -103,6 +110,7 @@ describe('QuartersPresetMixin', () => {
             startDate: mockTimeframeQuarters[0].range[0],
           }),
         });
+
         expect(vm.getTimelineBarStartOffsetForQuarters()).toBe('left: 0;');
       });
 
@@ -113,6 +121,7 @@ describe('QuartersPresetMixin', () => {
             endDateOutOfRange: true,
           }),
         });
+
         expect(vm.getTimelineBarStartOffsetForQuarters()).toBe('right: 8px;');
       });
 
@@ -122,6 +131,7 @@ describe('QuartersPresetMixin', () => {
             startDate: mockTimeframeQuarters[0].range[1],
           }),
         });
+
         expect(vm.getTimelineBarStartOffsetForQuarters()).toContain('left: 34');
       });
     });
@@ -136,6 +146,7 @@ describe('QuartersPresetMixin', () => {
             endDate: mockTimeframeQuarters[1].range[1],
           }),
         });
+
         expect(Math.floor(vm.getTimelineBarWidthForQuarters())).toBe(282);
       });
     });

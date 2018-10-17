@@ -30,6 +30,7 @@ describe('AddLicenseForm', () => {
           newStatus: LICENSE_APPROVAL_STATUS.APPROVED,
           license: { name },
         });
+
         expect(vm.$emit).toHaveBeenCalledWith('closeForm');
         done();
       });
@@ -49,12 +50,14 @@ describe('AddLicenseForm', () => {
       it('is true if the approvalStatus is empty', () => {
         vm.licenseName = 'FOO';
         vm.approvalStatus = '';
+
         expect(vm.submitDisabled).toBe(true);
       });
 
       it('is true if the licenseName is empty', () => {
         vm.licenseName = '';
         vm.approvalStatus = LICENSE_APPROVAL_STATUS.APPROVED;
+
         expect(vm.submitDisabled).toBe(true);
       });
 
@@ -62,6 +65,7 @@ describe('AddLicenseForm', () => {
         vm = mountComponent(Component, { managedLicenses: [{ name: 'FOO' }] });
         vm.licenseName = 'FOO';
         vm.approvalStatus = LICENSE_APPROVAL_STATUS.APPROVED;
+
         expect(vm.submitDisabled).toBe(true);
       });
     });
@@ -70,12 +74,14 @@ describe('AddLicenseForm', () => {
       it('is true if the entered license is duplicated', () => {
         vm = mountComponent(Component, { managedLicenses: [{ name: 'FOO' }] });
         vm.licenseName = 'FOO';
+
         expect(vm.isInvalidLicense).toBe(true);
       });
 
       it('is false if the entered license is unique', () => {
         vm = mountComponent(Component, { managedLicenses: [{ name: 'FOO' }] });
         vm.licenseName = 'FOO2';
+
         expect(vm.isInvalidLicense).toBe(false);
       });
     });
@@ -84,11 +90,13 @@ describe('AddLicenseForm', () => {
   describe('template', () => {
     it('renders the license select dropdown', () => {
       const dropdownElement = vm.$el.querySelector('#js-license-dropdown');
+
       expect(dropdownElement).not.toBeNull();
     });
 
     it('renders the license approval radio buttons dropdown', () => {
       const radioButtonParents = vm.$el.querySelectorAll('.form-check');
+
       expect(radioButtonParents.length).toBe(2);
       expect(radioButtonParents[0].innerText.trim()).toBe('Approve');
       expect(radioButtonParents[0].querySelector('.form-check-input')).not.toBeNull();
@@ -101,6 +109,7 @@ describe('AddLicenseForm', () => {
       vm.licenseName = 'FOO';
       Vue.nextTick(() => {
         const feedbackElement = vm.$el.querySelector('.invalid-feedback');
+
         expect(feedbackElement).not.toBeNull();
         expect(feedbackElement.classList).toContain('d-block');
         expect(feedbackElement.innerText.trim()).toBe(
@@ -116,6 +125,7 @@ describe('AddLicenseForm', () => {
         expect(vm.submitDisabled).toBe(true);
 
         const submitButton = vm.$el.querySelector('.js-submit');
+
         expect(submitButton).not.toBeNull();
         expect(submitButton.disabled).toBe(true);
         done();

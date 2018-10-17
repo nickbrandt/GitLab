@@ -20,6 +20,7 @@ describe('Linked pipeline mini list', function() {
 
     it('should render a linked pipeline with the correct href', () => {
       const linkElement = this.component.$el.querySelector('.linked-pipeline-mini-item');
+
       expect(linkElement.getAttribute('href')).toBe('/gitlab-org/gitlab-ce/pipelines/129');
     });
 
@@ -29,18 +30,21 @@ describe('Linked pipeline mini list', function() {
 
     it('should render the correct ci status icon', () => {
       const iconElement = this.component.$el.querySelector('.linked-pipeline-mini-item');
+
       expect(iconElement.classList.contains('ci-status-icon-running')).toBe(true);
       expect(iconElement.innerHTML).toContain('<svg');
     });
 
     it('should render an arrow icon', () => {
       const iconElement = this.component.$el.querySelector('.arrow-icon');
+
       expect(iconElement).not.toBeNull();
       expect(iconElement.innerHTML).toContain('long-arrow');
     });
 
     it('should have an activated tooltip', () => {
       const itemElement = this.component.$el.querySelector('.linked-pipeline-mini-item');
+
       expect(itemElement.getAttribute('data-original-title')).toBe('GitLabCE - running');
     });
 
@@ -81,18 +85,21 @@ describe('Linked pipeline mini list', function() {
 
     it('should render the correct ci status icon', () => {
       const iconElement = this.component.$el.querySelector('.linked-pipeline-mini-item');
+
       expect(iconElement.classList.contains('ci-status-icon-running')).toBe(true);
       expect(iconElement.innerHTML).toContain('<svg');
     });
 
     it('should render an arrow icon', () => {
       const iconElement = this.component.$el.querySelector('.arrow-icon');
+
       expect(iconElement).not.toBeNull();
       expect(iconElement.innerHTML).toContain('long-arrow');
     });
 
     it('should have prepped tooltips', () => {
       const itemElement = this.component.$el.querySelectorAll('.linked-pipeline-mini-item')[2];
+
       expect(itemElement.getAttribute('data-original-title')).toBe('GitLabCE - running');
     });
 

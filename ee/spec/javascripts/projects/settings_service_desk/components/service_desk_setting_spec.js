@@ -63,6 +63,7 @@ describe('ServiceDeskSetting', () => {
 
       it('renders a copy to clipboard button', () => {
         const button = vm.$el.querySelector('.btn-clipboard');
+
         expect(button).not.toBe(null);
         expect(button.dataset.clipboardText).toBe(incomingEmail);
       });
@@ -113,6 +114,7 @@ describe('ServiceDeskSetting', () => {
             checked: true,
           },
         });
+
         expect(onCheckboxToggleSpy).toHaveBeenCalledWith(true);
       });
 
@@ -123,6 +125,7 @@ describe('ServiceDeskSetting', () => {
             checked: false,
           },
         });
+
         expect(onCheckboxToggleSpy).toHaveBeenCalledWith(false);
       });
     });

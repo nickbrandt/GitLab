@@ -40,6 +40,7 @@ describe('NodeDetailsSectionSync', () => {
         Vue.nextTick()
           .then(() => {
             const syncSettings = vm.syncSettings();
+
             expect(syncSettings.syncStatusUnavailable).toBe(true);
             expect(syncSettings.namespaces).toBe(mockNodeDetails.namespaces);
             expect(syncSettings.lastEvent).toBe(mockNodeDetails.lastEvent);

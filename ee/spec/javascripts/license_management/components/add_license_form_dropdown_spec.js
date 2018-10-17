@@ -19,6 +19,7 @@ describe('AddLicenseFormDropdown', () => {
     $(vm.$el)
       .val('LGPL')
       .trigger('change');
+
     expect(vm.$emit).toHaveBeenCalledWith('input', 'LGPL');
   });
 
@@ -45,6 +46,7 @@ describe('AddLicenseFormDropdown', () => {
 
     element.on('select2-open', () => {
       const options = $('.select2-drop .select2-result');
+
       expect(KNOWN_LICENSES.length).toEqual(options.length);
       options.each(function() {
         expect(KNOWN_LICENSES).toContain($(this).text());

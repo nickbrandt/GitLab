@@ -71,11 +71,13 @@ describe('RoadmapShellComponent', () => {
     describe('getWidthOffset', () => {
       it('returns 0 when noScroll prop is true', () => {
         vm.noScroll = true;
+
         expect(vm.getWidthOffset()).toBe(0);
       });
 
       it('returns value of SCROLL_BAR_SIZE when noScroll prop is false', () => {
         vm.noScroll = false;
+
         expect(vm.getWidthOffset()).toBe(mockScrollBarSize);
       });
     });
@@ -88,6 +90,7 @@ describe('RoadmapShellComponent', () => {
       it('emits `epicsListScrolled` event via eventHub', () => {
         vm.noScroll = false;
         vm.handleScroll();
+
         expect(eventHub.$emit).toHaveBeenCalledWith('epicsListScrolled', jasmine.any(Object));
       });
     });

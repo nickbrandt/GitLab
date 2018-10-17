@@ -56,18 +56,21 @@ describe('GeoNodeItemComponent', () => {
     describe('showNodeDetails', () => {
       it('returns `false` if Node details are still loading', () => {
         vm.isNodeDetailsLoading = true;
+
         expect(vm.showNodeDetails).toBeFalsy();
       });
 
       it('returns `false` if Node details failed to load', () => {
         vm.isNodeDetailsLoading = false;
         vm.isNodeDetailsFailed = true;
+
         expect(vm.showNodeDetails).toBeFalsy();
       });
 
       it('returns `true` if Node details loaded', () => {
         vm.isNodeDetailsLoading = false;
         vm.isNodeDetailsFailed = false;
+
         expect(vm.showNodeDetails).toBeTruthy();
       });
     });
@@ -84,6 +87,7 @@ describe('GeoNodeItemComponent', () => {
         const vmNodePrimary = createComponent(mockNodeSecondary);
 
         vmNodePrimary.handleNodeDetails(mockNodeDetails);
+
         expect(vmNodePrimary.isNodeDetailsLoading).toBeFalsy();
         expect(vmNodePrimary.isNodeDetailsFailed).toBeFalsy();
         expect(vmNodePrimary.errorMessage).toBe('');
@@ -93,6 +97,7 @@ describe('GeoNodeItemComponent', () => {
 
         // With default mock data without matching ID
         vm.handleNodeDetails(mockNodeDetails);
+
         expect(vm.isNodeDetailsLoading).toBeTruthy();
         expect(vm.nodeDetails).not.toBe(mockNodeDetails);
         expect(vm.nodeHealthStatus).not.toBe(mockNodeDetails.health);
@@ -104,6 +109,7 @@ describe('GeoNodeItemComponent', () => {
         spyOn(eventHub, '$emit');
 
         vm.handleMounted();
+
         expect(eventHub.$emit).toHaveBeenCalledWith('pollNodeDetails', vm.node);
       });
     });
@@ -114,6 +120,7 @@ describe('GeoNodeItemComponent', () => {
       spyOn(eventHub, '$on');
 
       const vmX = createComponent();
+
       expect(eventHub.$on).toHaveBeenCalledWith('nodeDetailsLoaded', jasmine.any(Function));
       vmX.$destroy();
     });
@@ -125,6 +132,7 @@ describe('GeoNodeItemComponent', () => {
 
       const vmX = createComponent();
       vmX.$destroy();
+
       expect(eventHub.$off).toHaveBeenCalledWith('nodeDetailsLoaded', jasmine.any(Function));
     });
   });

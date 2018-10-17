@@ -45,6 +45,7 @@ describe('VariableList (EE features)', () => {
 
             // Check for the correct default in the new row
             const $environmentInput = $wrapper.find('.js-row:last-child').find('input[name="variables[variables_attributes][][environment_scope]"]');
+
             expect($environmentInput.val()).toBe('*');
           })
           .then(done)
@@ -60,6 +61,7 @@ describe('VariableList (EE features)', () => {
         getSetTimeoutPromise()
           .then(() => {
             const $dropdownItemsBeforeRemove = $row.find('.js-variable-environment-dropdown-wrapper .dropdown-content a');
+
             expect($dropdownItemsBeforeRemove.length).toBe(2);
             expect($dropdownItemsBeforeRemove[0].textContent.trim()).toBe('someenv');
             expect($dropdownItemsBeforeRemove[1].textContent.trim()).toBe('* (All environments)');
@@ -70,6 +72,7 @@ describe('VariableList (EE features)', () => {
           })
           .then(() => {
             const $dropdownItemsAfterRemove = $row.find('.js-variable-environment-dropdown-wrapper .dropdown-content a');
+
             expect($dropdownItemsAfterRemove.length).toBe(1);
             expect($dropdownItemsAfterRemove[0].textContent.trim()).toBe('* (All environments)');
           })

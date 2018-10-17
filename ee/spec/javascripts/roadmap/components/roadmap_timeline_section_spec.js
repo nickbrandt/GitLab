@@ -50,9 +50,11 @@ describe('RoadmapTimelineSectionComponent', () => {
         // hence any value greater than 0 should
         // update scrolledHeaderClass prop
         vm.handleEpicsListScroll({ scrollTop: 1 });
+
         expect(vm.scrolledHeaderClass).toBe('scroll-top-shadow');
 
         vm.handleEpicsListScroll({ scrollTop: 0 });
+
         expect(vm.scrolledHeaderClass).toBe('');
       });
     });
@@ -62,6 +64,7 @@ describe('RoadmapTimelineSectionComponent', () => {
     it('binds `epicsListScrolled` event listener via eventHub', () => {
       spyOn(eventHub, '$on');
       const vmX = createComponent({});
+
       expect(eventHub.$on).toHaveBeenCalledWith('epicsListScrolled', jasmine.any(Function));
       vmX.$destroy();
     });
@@ -72,6 +75,7 @@ describe('RoadmapTimelineSectionComponent', () => {
       spyOn(eventHub, '$off');
       const vmX = createComponent({});
       vmX.$destroy();
+
       expect(eventHub.$off).toHaveBeenCalledWith('epicsListScrolled', jasmine.any(Function));
     });
   });

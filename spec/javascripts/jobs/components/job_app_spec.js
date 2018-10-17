@@ -197,6 +197,7 @@ describe('Job App ', () => {
           props,
           store,
         });
+
         expect(vm.$el.querySelector('.js-shared-runner-limit')).toBeNull();
       });
     });

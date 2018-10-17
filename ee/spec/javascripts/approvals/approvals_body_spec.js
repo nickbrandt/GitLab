@@ -45,6 +45,7 @@ describe('Approvals Body Component', () => {
     describe('approvalsRequiredStringified', () => {
       it('should display the correct string for 1 possible approver', () => {
         const correctText = 'Requires 1 more approval by';
+
         expect(vm.approvalsRequiredStringified).toBe(correctText);
       });
 

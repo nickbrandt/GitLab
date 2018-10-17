@@ -124,24 +124,28 @@ describe('RelatedIssuesBlock', () => {
 
     it('reorder item correctly when an item is moved to the top', () => {
       const beforeAfterIds = vm.getBeforeAfterId(vm.$el.querySelector('ul li:first-child'));
+
       expect(beforeAfterIds.beforeId).toBeNull();
       expect(beforeAfterIds.afterId).toBe(2);
     });
 
     it('reorder item correctly when an item is moved to the bottom', () => {
       const beforeAfterIds = vm.getBeforeAfterId(vm.$el.querySelector('ul li:last-child'));
+
       expect(beforeAfterIds.beforeId).toBe(4);
       expect(beforeAfterIds.afterId).toBeNull();
     });
 
     it('reorder item correctly when an item is swapped with adjecent item', () => {
       const beforeAfterIds = vm.getBeforeAfterId(vm.$el.querySelector('ul li:nth-child(3)'));
+
       expect(beforeAfterIds.beforeId).toBe(2);
       expect(beforeAfterIds.afterId).toBe(4);
     });
 
     it('reorder item correctly when an item is moved somewhere in the middle', () => {
       const beforeAfterIds = vm.getBeforeAfterId(vm.$el.querySelector('ul li:nth-child(4)'));
+
       expect(beforeAfterIds.beforeId).toBe(3);
       expect(beforeAfterIds.afterId).toBe(5);
     });
@@ -149,6 +153,7 @@ describe('RelatedIssuesBlock', () => {
     it('when expanding add related issue form', () => {
       expect(toggleAddRelatedIssuesFormSpy).not.toHaveBeenCalled();
       vm.toggleAddRelatedIssuesForm();
+
       expect(toggleAddRelatedIssuesFormSpy).toHaveBeenCalled();
     });
   });

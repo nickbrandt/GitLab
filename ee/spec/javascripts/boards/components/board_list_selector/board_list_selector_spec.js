@@ -96,6 +96,7 @@ describe('BoardListSelector', () => {
 
         expect(vm.store.findList('title', assignee.name)).not.toBeDefined();
         vm.handleItemClick(assignee);
+
         expect(vm.store.new).toHaveBeenCalledWith(jasmine.any(Object));
       });
     });

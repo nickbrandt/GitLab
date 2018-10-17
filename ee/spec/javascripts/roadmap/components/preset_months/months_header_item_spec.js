@@ -36,6 +36,7 @@ describe('MonthsHeaderItemComponent', () => {
     it('returns default data props', () => {
       vm = createComponent({});
       const currentDate = new Date();
+
       expect(vm.currentDate.getDate()).toBe(currentDate.getDate());
       expect(vm.currentYear).toBe(currentDate.getFullYear());
       expect(vm.currentMonth).toBe(currentDate.getMonth());
@@ -46,6 +47,7 @@ describe('MonthsHeaderItemComponent', () => {
     describe('itemStyles', () => {
       it('returns style object for container element based on value of `itemWidth` prop', () => {
         vm = createComponent({});
+
         expect(vm.itemStyles.width).toBe('180px');
       });
     });
@@ -53,6 +55,7 @@ describe('MonthsHeaderItemComponent', () => {
     describe('timelineHeaderLabel', () => {
       it('returns string containing Year and Month for current timeline header item', () => {
         vm = createComponent({});
+
         expect(vm.timelineHeaderLabel).toBe('2017 Dec');
       });
 
@@ -61,6 +64,7 @@ describe('MonthsHeaderItemComponent', () => {
           timeframeIndex: mockTimeframeIndex + 1,
           timeframeItem: mockTimeframeMonths[mockTimeframeIndex + 1],
         });
+
         expect(vm.timelineHeaderLabel).toBe('2018 Jan');
       });
     });
@@ -68,6 +72,7 @@ describe('MonthsHeaderItemComponent', () => {
     describe('timelineHeaderClass', () => {
       it('returns empty string when timeframeItem year or month is less than current year or month', () => {
         vm = createComponent({});
+
         expect(vm.timelineHeaderClass).toBe('');
       });
 
@@ -75,6 +80,7 @@ describe('MonthsHeaderItemComponent', () => {
         vm = createComponent({
           timeframeItem: new Date(),
         });
+
         expect(vm.timelineHeaderClass).toBe('label-dark label-bold');
       });
 
@@ -92,6 +98,7 @@ describe('MonthsHeaderItemComponent', () => {
 
         vm.currentYear = mockTimeframeMonths[timeframeIndex].getFullYear();
         vm.currentMonth = mockTimeframeMonths[timeframeIndex].getMonth() + 1;
+
         expect(vm.timelineHeaderClass).toBe('label-dark');
       });
     });
@@ -108,6 +115,7 @@ describe('MonthsHeaderItemComponent', () => {
 
     it('renders item label element class `item-label` and value as `timelineHeaderLabel`', () => {
       const itemLabelEl = vm.$el.querySelector('.item-label');
+
       expect(itemLabelEl).not.toBeNull();
       expect(itemLabelEl.innerText.trim()).toBe('2017 Dec');
     });

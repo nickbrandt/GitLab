@@ -31,11 +31,13 @@ describe('SectionRevealButton', () => {
   describe('computed', () => {
     it('return `angle-up` when toggleState prop is true', () => {
       vm.toggleState = true;
+
       expect(vm.toggleButtonIcon).toBe('angle-up');
     });
 
     it('return `angle-down` when toggleState prop is false', () => {
       vm.toggleState = false;
+
       expect(vm.toggleButtonIcon).toBe('angle-down');
     });
   });
@@ -45,12 +47,14 @@ describe('SectionRevealButton', () => {
       it('updates `toggleState` prop to toggle from previous value', () => {
         vm.toggleState = true;
         vm.onClickButton();
+
         expect(vm.toggleState).toBe(false);
       });
 
       it('emits `toggleButton` event on component', () => {
         spyOn(vm, '$emit');
         vm.onClickButton();
+
         expect(vm.$emit).toHaveBeenCalledWith('toggleButton', vm.toggleState);
       });
     });

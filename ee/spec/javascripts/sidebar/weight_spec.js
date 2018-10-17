@@ -53,6 +53,7 @@ describe('Weight', function() {
     expect(vm.$el.querySelector('.js-weight-collapsed-weight-label').textContent.trim()).toEqual(
       `${WEIGHT}`,
     );
+
     expect(vm.$el.querySelector('.js-weight-weight-label-value').textContent.trim()).toEqual(
       `${WEIGHT}`,
     );
@@ -69,6 +70,7 @@ describe('Weight', function() {
     expect(vm.$el.querySelector('.js-weight-collapsed-weight-label').textContent.trim()).toEqual(
       'None',
     );
+
     expect(vm.$el.querySelector('.js-weight-weight-label .no-value').textContent.trim()).toEqual(
       'None',
     );

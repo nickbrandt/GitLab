@@ -28,6 +28,7 @@ describe('SidebarParticipants', () => {
       it('emits `toggleCollapse` event on component', () => {
         spyOn(vm, '$emit');
         vm.onToggleSidebar();
+
         expect(vm.$emit).toHaveBeenCalledWith('toggleCollapse');
       });
     });

@@ -24,6 +24,7 @@ describe('GeoNodeSyncSettingsComponent', () => {
     describe('syncType', () => {
       it('returns string representing sync type', () => {
         const vm = createComponent();
+
         expect(vm.syncType).toBe('Selective (namespaces)');
         vm.$destroy();
       });
@@ -38,12 +39,14 @@ describe('GeoNodeSyncSettingsComponent', () => {
           id: 0,
           timeStamp: 0,
         });
+
         expect(vmEmptyTimestamp.eventTimestampEmpty).toBeTruthy();
         vmEmptyTimestamp.$destroy();
       });
 
       it('return `false` if one of the event timestamp is present', () => {
         const vm = createComponent();
+
         expect(vm.eventTimestampEmpty).toBeFalsy();
         vm.$destroy();
       });
@@ -93,6 +96,7 @@ describe('GeoNodeSyncSettingsComponent', () => {
   describe('template', () => {
     it('renders `Unknown` when `syncStatusUnavailable` prop is true', () => {
       const vmSyncUnavailable = createComponent(true);
+
       expect(vmSyncUnavailable.$el.innerText.trim()).toBe('Unknown');
       vmSyncUnavailable.$destroy();
     });

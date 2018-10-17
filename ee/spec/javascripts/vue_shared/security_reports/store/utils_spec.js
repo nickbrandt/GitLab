@@ -55,6 +55,7 @@ describe('security reports utils', () => {
   describe('parseSastIssues', () => {
     it('should parse the received issues with old JSON format', () => {
       const parsed = parseSastIssues(oldSastIssues, [], 'path')[0];
+
       expect(parsed.title).toEqual(sastIssues[0].message);
       expect(parsed.path).toEqual(sastIssues[0].location.file);
       expect(parsed.location.start_line).toEqual(sastIssues[0].location.start_line);
@@ -65,6 +66,7 @@ describe('security reports utils', () => {
 
     it('should parse the received issues with new JSON format', () => {
       const parsed = parseSastIssues(sastIssues, [], 'path')[0];
+
       expect(parsed.title).toEqual(sastIssues[0].message);
       expect(parsed.path).toEqual(sastIssues[0].location.file);
       expect(parsed.location.start_line).toEqual(sastIssues[0].location.start_line);
@@ -75,6 +77,7 @@ describe('security reports utils', () => {
 
     it('generate correct path to file when there is no line', () => {
       const parsed = parseSastIssues(sastIssues, [], 'path')[1];
+
       expect(parsed.urlPath).toEqual('path/Gemfile.lock');
     });
 
@@ -84,6 +87,7 @@ describe('security reports utils', () => {
         sastFeedbacks,
         'path',
       )[0];
+
       expect(parsed.hasIssue).toEqual(true);
       expect(parsed.isDismissed).toEqual(true);
       expect(parsed.dismissalFeedback).toEqual(sastFeedbacks[0]);
@@ -94,6 +98,7 @@ describe('security reports utils', () => {
   describe('parseDependencyScanningIssues', () => {
     it('should parse the received issues', () => {
       const parsed = parseDependencyScanningIssues(dependencyScanningIssues, [], 'path')[0];
+
       expect(parsed.title).toEqual(dependencyScanningIssues[0].message);
       expect(parsed.path).toEqual(dependencyScanningIssues[0].file);
       expect(parsed.location.start_line).toEqual(sastIssues[0].location.start_line);
@@ -104,6 +109,7 @@ describe('security reports utils', () => {
 
     it('generate correct path to file when there is no line', () => {
       const parsed = parseDependencyScanningIssues(dependencyScanningIssues, [], 'path')[1];
+
       expect(parsed.urlPath).toEqual('path/Gemfile.lock');
     });
 
@@ -113,6 +119,7 @@ describe('security reports utils', () => {
         cve: undefined,
       }));
       const parsed = parseDependencyScanningIssues(issuesWithoutCve, [], 'path')[0];
+
       expect(parsed.project_fingerprint).toEqual(sha1(dependencyScanningIssues[0].message));
     });
 
@@ -122,6 +129,7 @@ describe('security reports utils', () => {
         dependencyScanningFeedbacks,
         'path',
       )[0];
+
       expect(parsed.hasIssue).toEqual(true);
       expect(parsed.isDismissed).toEqual(true);
       expect(parsed.dismissalFeedback).toEqual(dependencyScanningFeedbacks[0]);
@@ -142,6 +150,7 @@ describe('security reports utils', () => {
         value: issue.vulnerability,
         url: `https://cve.mitre.org/cgi-bin/cvename.cgi?name=${issue.vulnerability}`,
       }]);
+
       expect(parsed.project_fingerprint).toEqual(
         sha1(`${issue.namespace}:${issue.vulnerability}:${issue.featurename}:${issue.featureversion}`));
     });
@@ -151,6 +160,7 @@ describe('security reports utils', () => {
         dockerReport.vulnerabilities,
         containerScanningFeedbacks,
       )[0];
+
       expect(parsed.hasIssue).toEqual(true);
       expect(parsed.isDismissed).toEqual(true);
       expect(parsed.dismissalFeedback).toEqual(containerScanningFeedbacks[0]);
@@ -168,6 +178,7 @@ describe('security reports utils', () => {
         dast.site.alerts,
         dastFeedbacks,
       )[0];
+
       expect(parsed.hasIssue).toEqual(true);
       expect(parsed.isDismissed).toEqual(true);
       expect(parsed.dismissalFeedback).toEqual(dastFeedbacks[0]);
@@ -234,6 +245,7 @@ describe('security reports utils', () => {
           expect(groupedTextBuilder('', { head: 'foo', base: 'foo' }, 1, 0, 0)).toEqual(
             ' detected 1 new vulnerability',
           );
+
           expect(groupedTextBuilder('', { head: 'foo', base: 'foo' }, 2, 0, 0)).toEqual(
             ' detected 2 new vulnerabilities',
           );
@@ -245,6 +257,7 @@ describe('security reports utils', () => {
           expect(
             groupedTextBuilder('', { head: 'foo', base: 'foo' }, 1, 1, 0).replace(/\n+\s+/m, ' '),
           ).toEqual(' detected 1 new, and 1 fixed vulnerabilities');
+
           expect(
             groupedTextBuilder('', { head: 'foo', base: 'foo' }, 2, 2, 0).replace(/\n+\s+/m, ' '),
           ).toEqual(' detected 2 new, and 2 fixed vulnerabilities');
@@ -256,6 +269,7 @@ describe('security reports utils', () => {
           expect(groupedTextBuilder('', { head: 'foo', base: 'foo' }, 0, 1, 0)).toEqual(
             ' detected 1 fixed vulnerability',
           );
+
           expect(groupedTextBuilder('', { head: 'foo', base: 'foo' }, 0, 2, 0)).toEqual(
             ' detected 2 fixed vulnerabilities',
           );

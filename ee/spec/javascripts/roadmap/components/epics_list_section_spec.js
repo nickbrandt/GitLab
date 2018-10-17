@@ -41,6 +41,7 @@ describe('EpicsListSectionComponent', () => {
   describe('data', () => {
     it('returns default data props', () => {
       vm = createComponent({});
+
       expect(vm.shellHeight).toBe(0);
       expect(vm.emptyRowHeight).toBe(0);
       expect(vm.showEmptyRow).toBe(false);
@@ -133,6 +134,7 @@ describe('EpicsListSectionComponent', () => {
       it('scrolls table body to put timeline today indicator in focus', () => {
         spyOn(vm.$el, 'scrollTo');
         vm.scrollToTodayIndicator();
+
         expect(vm.$el.scrollTo).toHaveBeenCalledWith(jasmine.any(Number), 0);
       });
     });

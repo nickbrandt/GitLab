@@ -39,6 +39,7 @@ describe('AssigneesListItem', () => {
         const assignee = mockAssigneesList[0];
 
         vm.handleItemClick();
+
         expect(vm.$emit).toHaveBeenCalledWith('onItemSelect', assignee);
       });
     });
@@ -57,6 +58,7 @@ describe('AssigneesListItem', () => {
       expect(
         buttonEl.querySelector('.avatar-container.s32 img.avatar.s32').getAttribute('src'),
       ).toBe(assignee.avatar_url);
+
       expect(buttonEl.querySelector('.dropdown-user-details').innerText).toContain(assignee.name);
       expect(
         buttonEl.querySelector('.dropdown-user-details .dropdown-light-content').innerText,

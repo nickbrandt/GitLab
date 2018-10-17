@@ -29,11 +29,13 @@ describe('Linked pipeline', function() {
 
   it('should render a link', () => {
     const linkElement = this.linkedPipeline.$el.querySelector('.linked-pipeline-content');
+
     expect(linkElement).not.toBeNull();
   });
 
   it('should link to the correct path', () => {
     const linkElement = this.linkedPipeline.$el.querySelector('.linked-pipeline-content');
+
     expect(linkElement.getAttribute('href')).toBe(this.propsData.pipelinePath);
   });
 
@@ -41,22 +43,26 @@ describe('Linked pipeline', function() {
     const projectNameElement = this.linkedPipeline.$el.querySelector(
       '.linked-pipeline-project-name',
     );
+
     expect(projectNameElement.innerText).toContain(this.propsData.projectName);
   });
 
   it('should render an svg within the status container', () => {
     const pipelineStatusElement = this.linkedPipeline.$el.querySelector('.linked-pipeline-status');
+
     expect(pipelineStatusElement.querySelector('svg')).not.toBeNull();
   });
 
   it('should render the pipeline status icon svg', () => {
     const pipelineStatusElement = this.linkedPipeline.$el.querySelector('.linked-pipeline-status');
+
     expect(pipelineStatusElement.querySelector('.ci-status-icon-running')).not.toBeNull();
     expect(pipelineStatusElement.innerHTML).toContain('<svg');
   });
 
   it('should render the correct pipeline status icon style selector', () => {
     const pipelineStatusElement = this.linkedPipeline.$el.querySelector('.linked-pipeline-status');
+
     expect(pipelineStatusElement.firstChild.classList.contains('ci-status-icon-running')).toBe(
       true,
     );
@@ -64,12 +70,14 @@ describe('Linked pipeline', function() {
 
   it('should have a ci-status child component', () => {
     const ciStatusComponent = this.linkedPipeline.$children[0];
+
     expect(ciStatusComponent).toBeDefined();
     expect(ciStatusComponent.$el.classList.contains('ci-status-icon')).toBe(true);
   });
 
   it('should render the pipeline id', () => {
     const pipelineIdElement = this.linkedPipeline.$el.querySelector('.linked-pipeline-id');
+
     expect(pipelineIdElement.innerText).toContain(`#${this.propsData.pipelineId}`);
   });
 

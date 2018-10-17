@@ -28,6 +28,7 @@ describe('ListFilter', () => {
         vm.query = query;
 
         vm.handleInputChange();
+
         expect(vm.$emit).toHaveBeenCalledWith('onSearchInput', query);
       });
     });
@@ -38,6 +39,7 @@ describe('ListFilter', () => {
         vm.query = 'foobar';
 
         vm.handleInputClear();
+
         expect(vm.query).toBe('');
         expect(vm.handleInputChange).toHaveBeenCalled();
       });
@@ -71,6 +73,7 @@ describe('ListFilter', () => {
 
     it('renders search input element', () => {
       const inputEl = vm.$el.querySelector('input.dropdown-input-field');
+
       expect(inputEl).not.toBeNull();
       expect(inputEl.getAttribute('placeholder')).toBe('Search');
     });

@@ -131,6 +131,7 @@ describe('Report issues', () => {
       expect(
         vm.$el.querySelector('.report-block-list li').textContent.trim(),
       ).toContain(dockerReportParsed.unapproved[0].path);
+
       expect(
         vm.$el.querySelector('.report-block-list li').textContent.trim(),
       ).toContain('in');

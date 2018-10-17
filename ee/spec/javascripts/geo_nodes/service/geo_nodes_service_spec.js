@@ -14,6 +14,7 @@ describe('GeoNodesService', () => {
     it('returns axios instance for Geo nodes path', () => {
       spyOn(axios, 'get').and.stub();
       service.getGeoNodes();
+
       expect(axios.get).toHaveBeenCalledWith(service.geoNodesPath);
     });
   });
@@ -22,6 +23,7 @@ describe('GeoNodesService', () => {
     it('returns axios instance for Geo node details path', () => {
       spyOn(axios, 'get').and.stub();
       service.getGeoNodeDetails(2);
+
       expect(axios.get).toHaveBeenCalled();
     });
   });

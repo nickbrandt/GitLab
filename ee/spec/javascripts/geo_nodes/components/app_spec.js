@@ -80,6 +80,7 @@ describe('AppComponent', () => {
           nodeActionActive: false,
         };
         vm.setNodeActionStatus(node, true);
+
         expect(node.nodeActionActive).toBe(true);
       });
     });
@@ -87,6 +88,7 @@ describe('AppComponent', () => {
     describe('initNodeDetailsPolling', () => {
       it('initializes SmartInterval and sets it to component', () => {
         vm.initNodeDetailsPolling(2);
+
         expect(vm.nodePollingInterval).toBeDefined();
       });
     });
@@ -148,6 +150,7 @@ describe('AppComponent', () => {
           .then(() => {
             expect(eventHub.$emit).toHaveBeenCalledWith('nodeDetailsLoaded', jasmine.any(Object));
             const nodeDetails = vm.store.state.nodeDetails['1'];
+
             expect(nodeDetails).toBeDefined();
             expect(nodeDetails.syncStatusUnavailable).toBe(true);
             expect(nodeDetails.health).toBe('Request failed with status code 404');
@@ -166,6 +169,7 @@ describe('AppComponent', () => {
           .then(() => {
             expect(eventHub.$emit).toHaveBeenCalledWith('nodeDetailsLoaded', jasmine.any(Object));
             const nodeDetails = vm.store.state.nodeDetails['1'];
+
             expect(nodeDetails).toBeDefined();
             expect(nodeDetails.syncStatusUnavailable).toBe(true);
             expect(nodeDetails.health).toBe('Network Error');
@@ -184,6 +188,7 @@ describe('AppComponent', () => {
           .then(() => {
             expect(eventHub.$emit).toHaveBeenCalledWith('nodeDetailsLoaded', jasmine.any(Object));
             const nodeDetails = vm.store.state.nodeDetails['1'];
+
             expect(nodeDetails).toBeDefined();
             expect(nodeDetails.syncStatusUnavailable).toBe(true);
             expect(nodeDetails.health).toBe('timeout of 0ms exceeded');
@@ -209,6 +214,7 @@ describe('AppComponent', () => {
             expect(document.querySelector('.flash-text').innerText.trim()).toBe(
               'Node Authentication was successfully repaired.',
             );
+
             expect(node.nodeActionActive).toBe(false);
           })
           .then(done)
@@ -230,6 +236,7 @@ describe('AppComponent', () => {
             expect(document.querySelector('.flash-text').innerText.trim()).toBe(
               'Something went wrong while repairing node',
             );
+
             expect(node.nodeActionActive).toBe(false);
           })
           .then(done)
@@ -279,6 +286,7 @@ describe('AppComponent', () => {
             expect(document.querySelector('.flash-text').innerText.trim()).toBe(
               'Something went wrong while changing node status',
             );
+
             expect(node.nodeActionActive).toBe(false);
           })
           .then(done)
@@ -340,6 +348,7 @@ describe('AppComponent', () => {
         spyOn(vm, 'toggleNode').and.stub();
 
         vm.handleNodeAction();
+
         expect(vm.showModal).toBe(false);
         expect(vm.toggleNode).toHaveBeenCalledWith(vm.targetNode);
       });
@@ -351,6 +360,7 @@ describe('AppComponent', () => {
         spyOn(vm, 'removeNode').and.stub();
 
         vm.handleNodeAction();
+
         expect(vm.showModal).toBe(false);
         expect(vm.removeNode).toHaveBeenCalledWith(vm.targetNode);
       });
@@ -377,6 +387,7 @@ describe('AppComponent', () => {
           modalMessage,
           modalActionLabel,
         });
+
         expect(vm.targetNode).toBe(node);
         expect(vm.targetNodeActionType).toBe(NODE_ACTIONS.TOGGLE);
         expect(vm.modalKind).toBe(modalKind);
@@ -393,6 +404,7 @@ describe('AppComponent', () => {
           modalMessage,
           modalActionLabel,
         });
+
         expect(vm.showModal).toBe(true);
       });
 
@@ -407,6 +419,7 @@ describe('AppComponent', () => {
           modalMessage,
           modalActionLabel,
         });
+
         expect(vm.toggleNode).toHaveBeenCalledWith(vm.targetNode);
       });
 
@@ -419,6 +432,7 @@ describe('AppComponent', () => {
           modalMessage,
           modalActionLabel,
         });
+
         expect(vm.showModal).toBe(true);
       });
     });
@@ -427,6 +441,7 @@ describe('AppComponent', () => {
       it('sets `showModal` to `false`', () => {
         vm.showModal = true;
         vm.hideNodeActionModal();
+
         expect(vm.showModal).toBe(false);
       });
     });
@@ -436,6 +451,7 @@ describe('AppComponent', () => {
     it('binds event handler for `pollNodeDetails`', () => {
       spyOn(eventHub, '$on');
       const vmX = createComponent();
+
       expect(eventHub.$on).toHaveBeenCalledWith('pollNodeDetails', jasmine.any(Function));
       expect(eventHub.$on).toHaveBeenCalledWith('showNodeActionModal', jasmine.any(Function));
       expect(eventHub.$on).toHaveBeenCalledWith('repairNode', jasmine.any(Function));
@@ -448,6 +464,7 @@ describe('AppComponent', () => {
       spyOn(eventHub, '$off');
       const vmX = createComponent();
       vmX.$destroy();
+
       expect(eventHub.$off).toHaveBeenCalledWith('pollNodeDetails', jasmine.any(Function));
       expect(eventHub.$off).toHaveBeenCalledWith('showNodeActionModal', jasmine.any(Function));
       expect(eventHub.$off).toHaveBeenCalledWith('repairNode', jasmine.any(Function));
@@ -461,6 +478,7 @@ describe('AppComponent', () => {
 
     it('renders loading animation when `isLoading` is true', () => {
       vm.isLoading = true;
+
       expect(
         vm.$el.querySelectorAll('.loading-animation.prepend-top-20.append-bottom-20').length,
       ).not.toBe(0);

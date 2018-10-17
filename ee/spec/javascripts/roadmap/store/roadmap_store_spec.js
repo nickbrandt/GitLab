@@ -24,6 +24,7 @@ describe('RoadmapStore', () => {
   describe('setEpics', () => {
     it('sets Epics list to state while filtering out Epics with invalid dates', () => {
       store.setEpics(rawEpics);
+
       expect(store.getEpics().length).toBe(rawEpics.length - 2); // 2 epics have invalid dates
     });
   });
@@ -45,6 +46,7 @@ describe('RoadmapStore', () => {
 
     it('returns formatted Epic object from raw Epic object', () => {
       const epic = RoadmapStore.formatEpicDetails(rawEpic);
+
       expect(epic.id).toBe(rawEpic.id);
       expect(epic.name).toBe(rawEpic.name);
       expect(epic.groupId).toBe(rawEpic.group_id);
@@ -60,6 +62,7 @@ describe('RoadmapStore', () => {
         store.timeframeStartDate,
         store.timeframeEndDate,
       );
+
       expect(epic.id).toBe(rawEpic.id);
       expect(epic.startDateUndefined).toBe(true);
       expect(epic.startDate.getTime()).toBe(store.timeframeStartDate.getTime());
@@ -74,6 +77,7 @@ describe('RoadmapStore', () => {
         store.timeframeStartDate,
         store.timeframeEndDate,
       );
+
       expect(epic.id).toBe(rawEpic.id);
       expect(epic.endDateUndefined).toBe(true);
       expect(epic.endDate.getTime()).toBe(store.timeframeEndDate.getTime());
@@ -89,6 +93,7 @@ describe('RoadmapStore', () => {
         store.timeframeStartDate,
         store.timeframeEndDate,
       );
+
       expect(epic.id).toBe(rawEpic.id);
       expect(epic.startDateOutOfRange).toBe(true);
       expect(epic.startDate.getTime()).toBe(store.timeframeStartDate.getTime());
@@ -105,6 +110,7 @@ describe('RoadmapStore', () => {
         store.timeframeStartDate,
         store.timeframeEndDate,
       );
+
       expect(epic.id).toBe(rawEpic.id);
       expect(epic.endDateOutOfRange).toBe(true);
       expect(epic.endDate.getTime()).toBe(store.timeframeEndDate.getTime());

@@ -30,6 +30,7 @@ describe('ListContainer', () => {
     describe('filteredItems', () => {
       it('returns assignees list as it is when `query` is empty', () => {
         vm.query = '';
+
         expect(vm.filteredItems.length).toBe(mockAssigneesList.length);
       });
 
@@ -37,6 +38,7 @@ describe('ListContainer', () => {
         const assignee = mockAssigneesList[0];
 
         vm.query = assignee.name;
+
         expect(vm.filteredItems.length).toBe(1);
         expect(vm.filteredItems[0].name).toBe(assignee.name);
       });
@@ -45,6 +47,7 @@ describe('ListContainer', () => {
         const assignee = mockAssigneesList[0];
 
         vm.query = assignee.username;
+
         expect(vm.filteredItems.length).toBe(1);
         expect(vm.filteredItems[0].username).toBe(assignee.username);
       });
@@ -56,6 +59,7 @@ describe('ListContainer', () => {
       it('sets value of param `query` to component prop `query`', () => {
         const query = 'foobar';
         vm.handleSearch(query);
+
         expect(vm.query).toBe(query);
       });
     });
@@ -66,6 +70,7 @@ describe('ListContainer', () => {
         const assignee = mockAssigneesList[0];
 
         vm.handleItemClick(assignee);
+
         expect(vm.$emit).toHaveBeenCalledWith('onItemSelect', assignee);
       });
     });

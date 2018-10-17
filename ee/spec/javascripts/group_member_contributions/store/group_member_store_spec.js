@@ -29,6 +29,7 @@ describe('GroupMemberStore', () => {
   describe('setMembers', () => {
     it('sets members to store state', () => {
       store.setMembers(rawMembers);
+
       expect(store.state.members.length).toBe(rawMembers.length);
     });
   });
@@ -39,10 +40,12 @@ describe('GroupMemberStore', () => {
       store.setMembers(rawMembers);
 
       let [firstMember] = store.state.members;
+
       expect(firstMember.fullname).toBe('Administrator');
 
       store.sortMembers('fullname');
       ([firstMember] = store.state.members);
+
       expect(firstMember.fullname).toBe('Terrell Graham');
     });
   });

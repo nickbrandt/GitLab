@@ -25,6 +25,7 @@ describe('Linked Pipelines Column', function() {
     const titleElement = this.linkedPipelinesColumn.$el.querySelector(
       '.linked-pipelines-column-title',
     );
+
     expect(titleElement.innerText).toContain(this.propsData.columnTitle);
   });
 
@@ -36,6 +37,7 @@ describe('Linked Pipelines Column', function() {
     const linkedPipelineElements = this.linkedPipelinesColumn.$el.querySelectorAll(
       '.linked-pipeline',
     );
+
     expect(linkedPipelineElements.length).toBe(this.propsData.linkedPipelines.length);
   });
 });

@@ -40,8 +40,10 @@ describe('LicenseManagement', () => {
 
       return Vue.nextTick().then(() => {
         const formEl = vm.$el.querySelector('.js-add-license-form');
+
         expect(formEl).not.toBeNull();
         const buttonEl = vm.$el.querySelector('.js-open-form');
+
         expect(buttonEl).toBeNull();
         done();
       }).catch(done.fail);
@@ -52,8 +54,10 @@ describe('LicenseManagement', () => {
 
       return Vue.nextTick().then(() => {
         const formEl = vm.$el.querySelector('.js-add-license-form');
+
         expect(formEl).toBeNull();
         const buttonEl = vm.$el.querySelector('.js-open-form');
+
         expect(buttonEl).not.toBeNull();
         done();
       }).catch(done.fail);
@@ -61,6 +65,7 @@ describe('LicenseManagement', () => {
 
     it('clicking the Add a license button opens the form', () => {
       const linkEl = vm.$el.querySelector('.js-open-form');
+
       expect(vm.formIsOpen).toBe(false);
 
       linkEl.click();
@@ -83,6 +88,7 @@ describe('LicenseManagement', () => {
 
     return Vue.nextTick().then(() => {
       const callout = vm.$el.querySelector('.bs-callout');
+
       expect(callout).not.toBeNull();
       expect(trimText(callout.innerText)).toBe(vm.$options.emptyMessage);
       done();
@@ -116,6 +122,7 @@ describe('LicenseManagement', () => {
         { apiUrlManageLicenses: apiUrl },
         undefined,
       );
+
       expect(actions.loadManagedLicenses).toHaveBeenCalledWith(
         jasmine.any(Object),
         undefined,

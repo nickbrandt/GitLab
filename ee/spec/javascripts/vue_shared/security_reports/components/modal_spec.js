@@ -133,6 +133,7 @@ describe('Security Reports modal', () => {
         expect(instances[0].textContent).toContain(
           'http://192.168.32.236:3001/explore?sort=latest_activity_desc',
         );
+
         expect(instances[1].textContent).toContain(
           'http://192.168.32.236:3001/help/user/group/subgroups/index.md',
         );
