@@ -1,4 +1,5 @@
 require 'rspec/core'
+require 'rspec/expectations'
 
 module QA
   module Specs
