@@ -3789,6 +3789,15 @@ msgstr ""
 msgid "Geo|You need a different license to use Geo replication"
 msgstr ""
 
+msgid "Geo|misconfigured"
+msgstr ""
+
+msgid "Geo|primary"
+msgstr ""
+
+msgid "Geo|secondary"
+msgstr ""
+
 msgid "Get a free instance review"
 msgstr ""
 

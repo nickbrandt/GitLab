@@ -9,6 +9,13 @@ module EE
         never: 'circle-o'
     }.freeze
 
+    def self.current_node_human_status
+      return s_('Geo|primary') if ::Gitlab::Geo.primary?
+      return s_('Geo|secondary') if ::Gitlab::Geo.secondary?
+
+      s_('Geo|misconfigured')
+    end
+
     def node_vue_list_properties
       version, revision =
         if ::Gitlab::Geo.primary?
