@@ -87,6 +87,14 @@ module QA
           end
         end
 
+        def go_to_labels
+          hover_issues do
+            within_submenu do
+              click_element(:labels_link)
+            end
+          end
+        end
+
         def click_merge_requests
           within_sidebar do
             click_link('Merge Requests')
@@ -105,7 +113,6 @@ module QA
           end
         end
 
-<<<<<<< HEAD
         def click_repository
           within_sidebar do
             click_link('Repository')
@@ -116,10 +123,6 @@ module QA
           within_sidebar do
             click_link('Epics')
           end
-=======
-        def go_to_labels
-          hover_issues { click_element :labels_link }
->>>>>>> upstream/master
         end
 
         private
