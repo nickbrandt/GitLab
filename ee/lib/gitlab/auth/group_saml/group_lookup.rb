@@ -23,18 +23,12 @@ module Gitlab
         end
 
         def token_discoverable?
-          return unless group_discovery_token.present?
-
-          group_discovery_token == params['token']
+          group&.saml_discovery_token_matches?(params['token'])
         end
 
         private
 
         attr_reader :env
-
-        def group_discovery_token
-          group&.saml_discovery_token
-        end
 
         def path_from_callback_path
           path = env['PATH_INFO']
