@@ -17,6 +17,10 @@ module QA
           attribute :geo_skip_setup?, '--without-setup'
 
           def perform(options, *rspec_options)
+            # Alias QA::Runtime::Scenario.gitlab_address to @address since
+            # some components depends on QA::Runtime::Scenario.gitlab_address.
+            QA::Runtime::Scenario.define(:gitlab_address, QA::Runtime::Scenario.geo_primary_address)
+
             unless options[:geo_skip_setup?]
               Geo::Primary.act do
                 add_license
@@ -45,10 +49,6 @@ module QA
             def initialize
               @address = QA::Runtime::Scenario.geo_primary_address
               @name = QA::Runtime::Scenario.geo_primary_name
-
-              # Alias QA::Runtime::Scenario.gitlab_address to @address since
-              # some components depends on QA::Runtime::Scenario.gitlab_address.
-              QA::Runtime::Scenario.define(:gitlab_address, @address)
             end
 
             def add_license
