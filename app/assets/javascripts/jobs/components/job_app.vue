@@ -5,12 +5,9 @@
   import bp from '~/breakpoints';
   import CiHeader from '~/vue_shared/components/header_ci_component.vue';
   import Callout from '~/vue_shared/components/callout.vue';
-<<<<<<< HEAD
   // ee-only start
   import SharedRunner from 'ee/jobs/components/shared_runner_limit_block.vue';
   // ee-only end
-=======
->>>>>>> upstream/master
   import createStore from '../store';
   import EmptyState from './empty_state.vue';
   import EnvironmentsBlock from './environments_block.vue';
@@ -32,10 +29,7 @@
       Log,
       LogTopBar,
       StuckBlock,
-<<<<<<< HEAD
       SharedRunner,
-=======
->>>>>>> upstream/master
       Sidebar,
     },
     props: {
@@ -213,7 +207,6 @@
           :runners-path="runnerSettingsUrl"
         />
 
-<<<<<<< HEAD
         <shared-runner
           v-if="shouldRenderSharedRunnerLimitWarning"
           class="js-shared-runner-limit"
@@ -222,8 +215,6 @@
           :runners-path="runnerHelpUrl"
         />
 
-=======
->>>>>>> upstream/master
         <environments-block
           v-if="hasEnvironment"
           class="js-job-environment"
@@ -239,13 +230,8 @@
         />
 
         <!--job log -->
-<<<<<<< HEAD
         <div
           v-if="hasTrace"
-=======
-        <div 
-          v-if="hasTrace" 
->>>>>>> upstream/master
           class="build-trace-container prepend-top-default">
           <log-top-bar
             :class="{
