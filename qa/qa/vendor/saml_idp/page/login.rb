@@ -7,12 +7,18 @@ module QA
     module SAMLIdp
       module Page
         class Login < Page::Base
+          def login
+            fill_in 'username', with: 'user1'
+            fill_in 'password', with: 'user1pass'
+            click_on 'Login'
+          end
+
           def login_if_required
-            if page.has_text?('Enter your username and password')
-              fill_in 'username', with: 'user1'
-              fill_in 'password', with: 'user1pass'
-              click_on 'Login'
-            end
+            login if login_required?
+          end
+
+          def login_required?
+            page.has_text?('Enter your username and password')
           end
         end
       end

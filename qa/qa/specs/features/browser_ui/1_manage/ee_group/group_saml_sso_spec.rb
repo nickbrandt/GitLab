@@ -23,9 +23,14 @@ module QA
 
         EE::Page::Group::SamlSSOSignIn.act { click_signin }
 
-        Vendor::SAMLIdp::Page::Login.act { login_if_required }
-
-        expect(page).to have_content("Signed in with SAML for #{Runtime::Env.sandbox_name}")
+        Vendor::SAMLIdp::Page::Login.perform do |login_page|
+          if login_page.login_required?
+            login_page.login
+            expect(page).to have_content("SAML for #{Runtime::Env.sandbox_name} was added to your connected accounts")
+          else
+            expect(page).to have_content("Signed in with SAML for #{Runtime::Env.sandbox_name}")
+          end
+        end
 
         EE::Page::Group::Menu.act { go_to_saml_sso_group_settings }
 
