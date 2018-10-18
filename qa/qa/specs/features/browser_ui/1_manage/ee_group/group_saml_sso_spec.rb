@@ -52,11 +52,9 @@ module QA
     end
 
     def login_to_idp_if_required_and_expect_success
-      Vendor::SAMLIdp::Page::Login.act{ login_if_required }
+      Vendor::SAMLIdp::Page::Login.act { login_if_required }
       expect(page).to have_content("SAML for #{Runtime::Env.sandbox_name} was added to your connected accounts")
         .or have_content("Signed in with SAML for #{Runtime::Env.sandbox_name}")
     end
   end
 end
-
-
