@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181013005024) do
+ActiveRecord::Schema.define(version: 20181017131623) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -1123,13 +1123,18 @@ ActiveRecord::Schema.define(version: 20181013005024) do
     t.integer "cache_invalidation_event_id", limit: 8
   end
 
-  add_index "geo_event_log", ["cache_invalidation_event_id"], name: "index_geo_event_log_on_cache_invalidation_event_id", using: :btree
-  add_index "geo_event_log", ["repositories_changed_event_id"], name: "index_geo_event_log_on_repositories_changed_event_id", using: :btree
-  add_index "geo_event_log", ["repository_created_event_id"], name: "index_geo_event_log_on_repository_created_event_id", using: :btree
-  add_index "geo_event_log", ["repository_deleted_event_id"], name: "index_geo_event_log_on_repository_deleted_event_id", using: :btree
-  add_index "geo_event_log", ["repository_renamed_event_id"], name: "index_geo_event_log_on_repository_renamed_event_id", using: :btree
-  add_index "geo_event_log", ["repository_updated_event_id"], name: "index_geo_event_log_on_repository_updated_event_id", using: :btree
-  add_index "geo_event_log", ["reset_checksum_event_id"], name: "index_geo_event_log_on_reset_checksum_event_id", using: :btree
+  add_index "geo_event_log", ["cache_invalidation_event_id"], name: "index_geo_event_log_on_cache_invalidation_event_id", where: "(cache_invalidation_event_id IS NOT NULL)", using: :btree
+  add_index "geo_event_log", ["hashed_storage_attachments_event_id"], name: "index_geo_event_log_on_hashed_storage_attachments_event_id", where: "(hashed_storage_attachments_event_id IS NOT NULL)", using: :btree
+  add_index "geo_event_log", ["hashed_storage_migrated_event_id"], name: "index_geo_event_log_on_hashed_storage_migrated_event_id", where: "(hashed_storage_migrated_event_id IS NOT NULL)", using: :btree
+  add_index "geo_event_log", ["job_artifact_deleted_event_id"], name: "index_geo_event_log_on_job_artifact_deleted_event_id", where: "(job_artifact_deleted_event_id IS NOT NULL)", using: :btree
+  add_index "geo_event_log", ["lfs_object_deleted_event_id"], name: "index_geo_event_log_on_lfs_object_deleted_event_id", where: "(lfs_object_deleted_event_id IS NOT NULL)", using: :btree
+  add_index "geo_event_log", ["repositories_changed_event_id"], name: "index_geo_event_log_on_repositories_changed_event_id", where: "(repositories_changed_event_id IS NOT NULL)", using: :btree
+  add_index "geo_event_log", ["repository_created_event_id"], name: "index_geo_event_log_on_repository_created_event_id", where: "(repository_created_event_id IS NOT NULL)", using: :btree
+  add_index "geo_event_log", ["repository_deleted_event_id"], name: "index_geo_event_log_on_repository_deleted_event_id", where: "(repository_deleted_event_id IS NOT NULL)", using: :btree
+  add_index "geo_event_log", ["repository_renamed_event_id"], name: "index_geo_event_log_on_repository_renamed_event_id", where: "(repository_renamed_event_id IS NOT NULL)", using: :btree
+  add_index "geo_event_log", ["repository_updated_event_id"], name: "index_geo_event_log_on_repository_updated_event_id", where: "(repository_updated_event_id IS NOT NULL)", using: :btree
+  add_index "geo_event_log", ["reset_checksum_event_id"], name: "index_geo_event_log_on_reset_checksum_event_id", where: "(reset_checksum_event_id IS NOT NULL)", using: :btree
+  add_index "geo_event_log", ["upload_deleted_event_id"], name: "index_geo_event_log_on_upload_deleted_event_id", where: "(upload_deleted_event_id IS NOT NULL)", using: :btree
 
   create_table "geo_hashed_storage_attachments_events", id: :bigserial, force: :cascade do |t|
     t.integer "project_id", null: false
