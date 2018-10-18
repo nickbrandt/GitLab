@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/jfbus/httprs"
+
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 

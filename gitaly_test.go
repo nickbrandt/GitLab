@@ -16,19 +16,18 @@ import (
 	"testing"
 	"time"
 
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/git"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
-
-	pb "gitlab.com/gitlab-org/gitaly-proto/go"
-
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	pb "gitlab.com/gitlab-org/gitaly-proto/go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/git"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
 
 func TestFailedCloneNoGitaly(t *testing.T) {

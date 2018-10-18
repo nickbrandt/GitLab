@@ -15,7 +15,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
-
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/objectstore/test"
 )
 

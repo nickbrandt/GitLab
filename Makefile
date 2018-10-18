@@ -146,7 +146,7 @@ govendor-sync: $(TARGET_SETUP)
 .PHONY: fmt
 fmt: $(TARGET_SETUP) install-goimports
 	$(call message,$@)
-	@goimports -w -l $(LOCAL_GO_FILES)
+	@goimports -w -local $(PKG) -l $(LOCAL_GO_FILES)
 
 .PHONY:	goimports
 install-goimports:	$(TARGET_SETUP)
