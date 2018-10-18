@@ -6,6 +6,14 @@ module EE
         audit_changes(:path, as: 'path', model: model)
         audit_changes(:name, as: 'name', model: model)
         audit_changes(:namespace_id, as: 'namespace', model: model)
+        audit_changes(:repository_size_limit, as: 'repository_size_limit', model: model)
+        audit_changes(:packages_enabled, as: 'packages_enabled', model: model)
+
+        audit_project_feature_changes
+      end
+
+      def audit_project_feature_changes
+        ::EE::Audit::ProjectFeatureChangesAuditor.new(@current_user, model.project_feature, model).execute
       end
 
       def attributes_from_auditable_model(column)
@@ -29,6 +37,11 @@ module EE
           {
             from: model.old_path_with_namespace,
             to: model.full_path
+          }
+        else
+          {
+            from: model.previous_changes[column].first,
+            to: model.previous_changes[column].last
           }
         end.merge(target_details: model.full_path)
       end
