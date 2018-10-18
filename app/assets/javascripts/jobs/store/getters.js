@@ -51,7 +51,6 @@ export const isJobStuck = state =>
   (!_.isEmpty(state.job.status) && state.job.status.group === 'pending') &&
   (!_.isEmpty(state.job.runners) && state.job.runners.available === false);
 
-<<<<<<< HEAD
 // ee-only start
 /**
  * Shared runners limit is only rendered when
@@ -65,8 +64,6 @@ export const shouldRenderSharedRunnerLimitWarning = state =>
   state.job.runners.quota.used >= state.job.runners.quota.limit;
 // ee-only end
 
-=======
->>>>>>> upstream/master
 export const isScrollingDown = state => isScrolledToBottom() && !state.isTraceComplete;
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
