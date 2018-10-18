@@ -8,7 +8,7 @@ module QA
 
         Page::Main::Login.act { sign_in_with_saml }
 
-        Vendor::SAMLIdp::Page::Login.act { login }
+        Vendor::SAMLIdp::Page::Login.act { login_if_required }
 
         expect(page).to have_content('Welcome to GitLab')
       end

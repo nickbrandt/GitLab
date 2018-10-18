@@ -23,7 +23,7 @@ module QA
 
         EE::Page::Group::SamlSSOSignIn.act { click_signin }
 
-        Vendor::SAMLIdp::Page::Login.act { login } if page.has_text?('Enter your username and password')
+        Vendor::SAMLIdp::Page::Login.act { login_if_required }
 
         expect(page).to have_content("Signed in with SAML for #{Runtime::Env.sandbox_name}")
 
@@ -47,7 +47,7 @@ module QA
           click_test_button
         end
 
-        Vendor::SAMLIdp::Page::Login.act { login } if page.has_text?('Enter your username and password')
+        Vendor::SAMLIdp::Page::Login.act { login_if_required }
 
         expect(page).to have_content("Test SAML SSO")
       end
