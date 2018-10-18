@@ -31,15 +31,12 @@ export default {
       default: '',
     },
 
-<<<<<<< HEAD
     hasTriggeredBy: {
       type: Boolean,
       required: true,
     },
   },
 
-=======
->>>>>>> upstream/master
   methods: {
     groupId(group) {
       return `ci-badge-${_.escape(group.name)}`;
