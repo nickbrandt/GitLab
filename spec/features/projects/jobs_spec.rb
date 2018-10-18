@@ -740,6 +740,46 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
         expect(page).not_to have_css('.js-job-sidebar.right-sidebar-collpased')
       end
     end
+
+    context 'stuck', :js do
+      context 'without active runners available' do
+        let(:runner) { create(:ci_runner, :instance, active: false) }
+        let(:job) { create(:ci_build, :pending, pipeline: pipeline, runner: runner) }
+
+        it 'renders message about job being stuck' do
+          visit project_job_path(project, job)
+          wait_for_requests
+
+          expect(page).to have_css('.js-stuck-no-active-runner')
+          expect(page).to have_content("This job is stuck, because you don\'t have any active runners that can run this job.")
+        end
+      end
+
+      context 'without active runners with tags' do
+        let(:runner) { create(:ci_runner, :instance, active: false) }
+        let(:job) { create(:ci_build, :pending, pipeline: pipeline, runner: runner, tag_list: %w(docker linux)) }
+
+        it 'renders message about job being stuck because of no tags' do
+          visit project_job_path(project, job)
+          wait_for_requests
+
+          expect(page).to have_css('.js-stuck-with-tags')
+          expect(page).to have_content("This job is stuck, because you don't have any active runners online with any of these tags assigned to them:")
+        end
+      end
+
+      context 'without active runners assigned to the job' do
+        let(:job) { create(:ci_build, :pending, pipeline: pipeline) }
+
+        it 'renders message about job being stuck' do
+          visit project_job_path(project, job)
+          wait_for_requests
+
+          expect(page).to have_css('.js-stuck-no-active-runner')
+          expect(page).to have_content("This job is stuck, because you don't have any active runners that can run this job.")
+        end
+      end
+    end
   end
 
   describe "POST /:project/jobs/:id/cancel", :js do

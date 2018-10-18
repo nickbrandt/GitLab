@@ -144,6 +144,7 @@ describe('Job App ', () => {
               text: 'pending',
               details_path: 'path',
             },
+            stuck: true,
             runners: {
               available: false,
             },
@@ -169,6 +170,7 @@ describe('Job App ', () => {
               text: 'pending',
               details_path: 'path',
             },
+            stuck: true,
             runners: {
               available: false,
             },
