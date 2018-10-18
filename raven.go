@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"os"
 
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
-
 	"github.com/getsentry/raven-go"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
 func wrapRaven(h http.Handler) http.Handler {

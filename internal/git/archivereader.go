@@ -8,6 +8,7 @@ import (
 	"syscall"
 
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 

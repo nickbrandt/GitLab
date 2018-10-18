@@ -10,6 +10,7 @@ import (
 
 	"github.com/client9/reopen"
 	log "github.com/sirupsen/logrus"
+
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
