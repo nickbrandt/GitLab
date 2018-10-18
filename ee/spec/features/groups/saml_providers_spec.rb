@@ -92,7 +92,8 @@ describe 'SAML provider settings' do
 
         login_url = find('label', text: 'GitLab single sign on URL').find('~* a').text
 
-        expect(login_url).to end_with "/groups/#{group.full_path}/-/saml/sso"
+        expect(login_url).to include "/groups/#{group.full_path}/-/saml/sso"
+        expect(login_url).to end_with "?token=#{group.reload.saml_discovery_token}"
       end
 
       context 'enforced sso enabled' do
