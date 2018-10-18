@@ -8,6 +8,7 @@ module EE
       override :execute
       def execute(issue)
         handle_epic(issue)
+        handle_relate(issue)
         result = super
 
         if issue.previous_changes.include?(:milestone_id) && issue.epic
@@ -32,6 +33,18 @@ module EE
           return unless link
 
           EpicIssues::DestroyService.new(link, current_user).execute
+        end
+      end
+
+      def handle_relate(issue)
+        return unless params.key?(:related_issues)
+
+        relate_param = params.delete(:related_issues)
+
+        if relate_param
+          relate_param.each do |issuable|
+            IssueLinks::CreateService.new(issuable, current_user, { target_issue: issue }).execute
+          end
         end
       end
     end
