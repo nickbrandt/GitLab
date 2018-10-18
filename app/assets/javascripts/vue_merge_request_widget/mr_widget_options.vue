@@ -276,12 +276,13 @@ export default {
       :key="deployment.id"
       :deployment="deployment"
     />
-    <grouped-test-reports-app
-      v-if="mr.testResultsPath"
-      class="js-reports-container"
-      :endpoint="mr.testResultsPath"
-    />
     <div class="mr-section-container">
+      <grouped-test-reports-app
+        v-if="mr.testResultsPath"
+        class="js-reports-container"
+        :endpoint="mr.testResultsPath"
+      />
+
       <div class="mr-widget-section">
         <component
           :is="componentName"
