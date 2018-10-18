@@ -6267,9 +6267,6 @@ msgstr ""
 msgid "PrometheusService|Automatically deploy and configure Prometheus on your clusters to monitor your project’s environments"
 msgstr ""
 
-msgid "PrometheusService|By default, Prometheus listens on ‘http://localhost:9090’. It’s not recommended to change the default address and port as this might affect or conflict with other services running on the GitLab server."
-msgstr ""
-
 msgid "PrometheusService|Common metrics"
 msgstr ""
 
@@ -6336,14 +6333,10 @@ msgstr ""
 msgid "Promote to Group Milestone"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Promote to group label"
 msgstr ""
 
 msgid "Promotions|Don't show me this again"
-=======
-msgid "PrometheusService|Common metrics"
->>>>>>> upstream/master
 msgstr ""
 
 msgid "Promotions|Epics let you manage your portfolio of projects more efficiently and with less effort by tracking groups of issues that share a theme, across projects and milestones."
