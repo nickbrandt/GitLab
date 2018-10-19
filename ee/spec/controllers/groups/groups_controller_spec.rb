@@ -69,6 +69,30 @@ describe GroupsController do
           put :update, id: group.to_param, group: { name: 'world' }
         end.to change { group.reload.name }
       end
+
+      context 'no license' do
+        it 'does not update the file_template_project_id successfully' do
+          project = create(:project, group: group)
+
+          stub_licensed_features(custom_file_templates_for_namespace: false)
+
+          expect do
+            post :update, id: group.to_param, group: { file_template_project_id: project.id }
+          end.not_to change { group.reload.file_template_project_id }
+        end
+      end
+
+      context 'with license' do
+        it 'updates the file_template_project_id successfully' do
+          project = create(:project, group: group)
+
+          stub_licensed_features(custom_file_templates_for_namespace: true)
+
+          expect do
+            post :update, id: group.to_param, group: { file_template_project_id: project.id }
+          end.to change { group.reload.file_template_project_id }.to(project.id)
+        end
+      end
     end
 
     describe 'DELETE #destroy' do

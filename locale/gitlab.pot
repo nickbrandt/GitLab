@@ -6892,6 +6892,9 @@ msgstr ""
 msgid "Search project"
 msgstr ""
 
+msgid "Search projects"
+msgstr ""
+
 msgid "Search users"
 msgstr ""
 
@@ -6959,6 +6962,9 @@ msgid "Select a group to invite"
 msgstr ""
 
 msgid "Select a namespace to fork the project"
+msgstr ""
+
+msgid "Select a template repository"
 msgstr ""
 
 msgid "Select a timezone"
@@ -7031,6 +7037,9 @@ msgid "Session expiration, projects limit and attachment size."
 msgstr ""
 
 msgid "Set a password on your account to pull or push via %{protocol}."
+msgstr ""
+
+msgid "Set a template repository for projects in this group"
 msgstr ""
 
 msgid "Set default and restrict visibility levels. Configure import sources and git access protocol."

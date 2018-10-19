@@ -41,6 +41,7 @@ class License < ActiveRecord::Base
     board_milestone_lists
     cross_project_pipelines
     custom_file_templates
+    custom_file_templates_for_namespace
     email_additional_text
     db_load_balancing
     deploy_board

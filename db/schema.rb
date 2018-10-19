@@ -1815,6 +1815,7 @@ ActiveRecord::Schema.define(version: 20181013005024) do
     t.integer "project_creation_level"
     t.string "runners_token"
     t.datetime_with_timezone "trial_ends_on"
+    t.integer "file_template_project_id"
   end
 
   add_index "namespaces", ["created_at"], name: "index_namespaces_on_created_at", using: :btree
@@ -3265,6 +3266,7 @@ ActiveRecord::Schema.define(version: 20181013005024) do
   add_foreign_key "milestones", "projects", name: "fk_9bd0a0c791", on_delete: :cascade
   add_foreign_key "namespace_statistics", "namespaces", on_delete: :cascade
   add_foreign_key "namespaces", "plans", name: "fk_fdd12e5b80", on_delete: :nullify
+  add_foreign_key "namespaces", "projects", column: "file_template_project_id", name: "fk_319256d87a", on_delete: :nullify
   add_foreign_key "note_diff_files", "notes", column: "diff_note_id", on_delete: :cascade
   add_foreign_key "notes", "projects", name: "fk_99e097b079", on_delete: :cascade
   add_foreign_key "notification_settings", "users", name: "fk_0c95e91db7", on_delete: :cascade

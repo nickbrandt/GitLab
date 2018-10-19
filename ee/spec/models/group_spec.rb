@@ -7,6 +7,33 @@ describe Group do
 
   describe 'associations' do
     it { is_expected.to have_many(:audit_events).dependent(false) }
+    it { is_expected.to belong_to(:file_template_project) }
+  end
+
+  describe 'scopes' do
+    describe '.with_custom_file_templates' do
+      let!(:excluded_group) { create(:group) }
+      let(:included_group) { create(:group) }
+      let(:project) { create(:project, namespace: included_group) }
+
+      before do
+        stub_licensed_features(custom_file_templates_for_namespace: true)
+
+        included_group.update!(file_template_project: project)
+      end
+
+      subject(:relation) { described_class.with_custom_file_templates }
+
+      it { is_expected.to contain_exactly(included_group) }
+
+      it 'preloads everything needed to show a valid checked_file_template_project' do
+        group = relation.first
+
+        expect { group.checked_file_template_project }.not_to exceed_query_limit(0)
+
+        expect(group.checked_file_template_project).to be_present
+      end
+    end
   end
 
   describe 'states' do
@@ -126,6 +153,110 @@ describe Group do
       group = create(:group, project_creation_level: nil)
 
       expect(group.project_creation_level).to eq(Gitlab::CurrentSettings.default_project_creation)
+    end
+  end
+
+  describe '#file_template_project' do
+    it { expect(group.private_methods).to include(:file_template_project) }
+
+    before do
+      stub_licensed_features(custom_file_templates_for_namespace: true)
+    end
+
+    it { expect(group.private_methods).to include(:file_template_project) }
+
+    context 'validation' do
+      let(:project) { create(:project, namespace: group) }
+
+      it 'is cleared if invalid' do
+        invalid_project = create(:project)
+
+        group.file_template_project_id = invalid_project.id
+
+        expect(group).to be_valid
+        expect(group.file_template_project_id).to be_nil
+      end
+
+      it 'is permitted if valid' do
+        valid_project = create(:project, namespace: group)
+
+        group.file_template_project_id = valid_project.id
+
+        expect(group).to be_valid
+        expect(group.file_template_project_id).to eq(valid_project.id)
+      end
+    end
+  end
+
+  describe '#checked_file_template_project' do
+    let(:valid_project) { create(:project, namespace: group) }
+
+    subject { group.checked_file_template_project }
+
+    context 'licensed' do
+      before do
+        stub_licensed_features(custom_file_templates_for_namespace: true)
+      end
+
+      it 'returns nil for an invalid project' do
+        group.file_template_project = create(:project)
+
+        is_expected.to be_nil
+      end
+
+      it 'returns a valid project' do
+        group.file_template_project = valid_project
+
+        is_expected.to eq(valid_project)
+      end
+    end
+
+    context 'unlicensed' do
+      before do
+        stub_licensed_features(custom_file_templates_for_namespace: false)
+      end
+
+      it 'returns nil for a valid project' do
+        group.file_template_project = valid_project
+
+        is_expected.to be_nil
+      end
+    end
+  end
+
+  describe '#checked_file_template_project_id' do
+    let(:valid_project) { create(:project, namespace: group) }
+
+    subject { group.checked_file_template_project_id }
+
+    context 'licensed' do
+      before do
+        stub_licensed_features(custom_file_templates_for_namespace: true)
+      end
+
+      it 'returns nil for an invalid project' do
+        group.file_template_project = create(:project)
+
+        is_expected.to be_nil
+      end
+
+      it 'returns the ID for a valid project' do
+        group.file_template_project = valid_project
+
+        is_expected.to eq(valid_project.id)
+      end
+
+      context 'unlicensed' do
+        before do
+          stub_licensed_features(custom_file_templates_for_namespace: false)
+        end
+
+        it 'returns nil for a valid project' do
+          group.file_template_project = valid_project
+
+          is_expected.to be_nil
+        end
+      end
     end
   end
 end

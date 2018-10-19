@@ -294,6 +294,30 @@ This will disable the option for all users who previously had permissions to
 operate project memberships so no new users can be added. Furthermore, any
 request to add new user to project through API will not be possible.
 
+#### Group-level file templates **[PREMIUM]**
+
+Group-level file templates allow you to share a set of templates for common file
+types with every project in a group. It is analogous to the
+[instance-level template repository](../admin_area/settings/instance_template_repository.md)
+feature, and the selected project should follow the same naming conventions as
+are documented on that page.
+
+Only projects that are in the group may be chosen as the source of templates.
+This includes projects shared with the group, but **excludes** projects in
+subgroups or parent groups of the group being configured.
+
+This feature may be configured for subgroups as well as parent groups. A project
+in a subgroup will have access to the templates for that subgroup, as well as
+any parent groups.
+
+![Group-level file template dropdown](img/group_file_template_dropdown.png)
+
+To enable this feature, navigate to the group settings page, expand the
+**Templates** section, choose a project to act as the template repository, and
+**Save group**.
+
+![Group-level file template settings](img/group_file_template_settings.png)
+
 ### Advanced settings
 
 - **Projects**: view all projects within that group, add members to each project,

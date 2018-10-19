@@ -45,6 +45,91 @@ describe Groups::UpdateService, '#execute' do
     end
   end
 
+  describe 'changing file_template_project_id' do
+    let(:group) { create(:group) }
+    let(:valid_project) { create(:project, namespace: group) }
+    let(:user) { create(:user) }
+
+    def update_file_template_project_id(id)
+      update_group(group, user, file_template_project_id: id)
+    end
+
+    before do
+      stub_licensed_features(custom_file_templates_for_namespace: true)
+    end
+
+    context 'as a group maintainer' do
+      before do
+        group.add_maintainer(user)
+      end
+
+      it 'does not allow a project to be removed' do
+        group.update_columns(file_template_project_id: valid_project.id)
+
+        expect(update_file_template_project_id(nil)).to be_falsy
+        expect(group.errors[:file_template_project_id]).to include('cannot be changed by you')
+      end
+
+      it 'does not allow a project to be set' do
+        expect(update_file_template_project_id(valid_project.id)).to be_falsy
+        expect(group.errors[:file_template_project_id]).to include('cannot be changed by you')
+      end
+    end
+
+    context 'as a group owner' do
+      before do
+        group.add_owner(user)
+      end
+
+      it 'allows a project to be removed' do
+        group.update_columns(file_template_project_id: valid_project.id)
+
+        expect(update_file_template_project_id(nil)).to be_truthy
+        expect(group.reload.file_template_project_id).to be_nil
+      end
+
+      it 'allows a valid project to be set' do
+        expect(update_file_template_project_id(valid_project.id)).to be_truthy
+        expect(group.reload.file_template_project_id).to eq(valid_project.id)
+      end
+
+      it 'does not allow a project outwith the group to be set' do
+        invalid_project = create(:project)
+
+        expect(update_file_template_project_id(invalid_project.id)).to be_falsy
+        expect(group.errors[:file_template_project_id]).to include('is invalid')
+      end
+
+      it 'does not allow a non-existent project to be set' do
+        invalid_project = create(:project)
+        invalid_project.destroy!
+
+        expect(update_file_template_project_id(invalid_project.id)).to be_falsy
+        expect(group.errors[:file_template_project_id]).to include('is invalid')
+      end
+
+      context 'in a subgroup', :nested_groups do
+        let(:parent_group) { create(:group) }
+        let(:hidden_project) { create(:project, :private, namespace: parent_group) }
+        let(:group) { create(:group, parent: parent_group) }
+
+        before do
+          group.update!(parent: parent_group)
+        end
+
+        it 'does not allow a project the group owner cannot see to be set' do
+          expect(update_file_template_project_id(hidden_project.id)).to be_falsy
+          expect(group.reload.file_template_project_id).to be_nil
+        end
+
+        it 'allows a project in the subgroup to be set' do
+          expect(update_file_template_project_id(valid_project.id)).to be_truthy
+          expect(group.reload.file_template_project_id).to eq(valid_project.id)
+        end
+      end
+    end
+  end
+
   def update_group(group, user, opts)
     Groups::UpdateService.new(group, user, opts).execute
   end
