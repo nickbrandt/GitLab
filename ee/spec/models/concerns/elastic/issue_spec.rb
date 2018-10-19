@@ -33,6 +33,13 @@ describe Issue, :elastic do
     expected_hash = issue.attributes.extract!('id', 'iid', 'title', 'description', 'created_at',
                                                 'updated_at', 'state', 'project_id', 'author_id',
                                                 'confidential')
+                                    .merge({
+                                            'join_field' => {
+                                              'name' => issue.es_type,
+                                              'parent' => issue.es_parent
+                                            },
+                                            'type' => issue.es_type
+                                           })
 
     expected_hash['assignee_id'] = [assignee.id]
 

@@ -2,6 +2,10 @@
 
 require 'gitlab/current_settings'
 
+Elasticsearch::Model::Response::Records.prepend GemExtensions::Elasticsearch::Model::Response::Records
+Elasticsearch::Model::Adapter::Multiple::Records.prepend GemExtensions::Elasticsearch::Model::Adapter::Multiple::Records
+Elasticsearch::Model::Indexing::InstanceMethods.prepend GemExtensions::Elasticsearch::Model::Indexing::InstanceMethods
+
 module Elasticsearch
   module Model
     module Client

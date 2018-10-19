@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class ElasticIndexerWorker
   include ApplicationWorker
   include Elasticsearch::Model::Client::ClassMethods
@@ -6,7 +7,7 @@ class ElasticIndexerWorker
 
   ISSUE_TRACKED_FIELDS = %w(assignee_ids author_id confidential).freeze
 
-  def perform(operation, class_name, record_id, options = {})
+  def perform(operation, class_name, record_id, es_id, options = {})
     return true unless Gitlab::CurrentSettings.elasticsearch_indexing?
 
     klass = class_name.constantize
@@ -17,7 +18,7 @@ class ElasticIndexerWorker
       record.__elasticsearch__.client = client
 
       if klass.nested?
-        record.__elasticsearch__.__send__ "#{operation}_document", parent: record.es_parent # rubocop:disable GitlabSecurity/PublicSend
+        record.__elasticsearch__.__send__ "#{operation}_document", routing: record.es_parent # rubocop:disable GitlabSecurity/PublicSend
       else
         record.__elasticsearch__.__send__ "#{operation}_document" # rubocop:disable GitlabSecurity/PublicSend
       end
@@ -28,14 +29,13 @@ class ElasticIndexerWorker
         client.delete(
           index: klass.index_name,
           type: klass.document_type,
-          id: record_id,
-          parent: options["project_id"]
+          id: es_id,
+          routing: options["es_parent"]
         )
       else
-        client.delete index: klass.index_name, type: klass.document_type, id: record_id
+        clear_project_data(record_id, es_id) if klass == Project
+        client.delete index: klass.index_name, type: klass.document_type, id: es_id
       end
-
-      clear_project_data(record_id) if klass == Project
     end
   rescue Elasticsearch::Transport::Transport::Errors::NotFound, ActiveRecord::RecordNotFound
     # These errors can happen in several cases, including:
@@ -51,15 +51,12 @@ class ElasticIndexerWorker
 
   def update_issue_notes(record, changed_fields)
     if changed_fields && (changed_fields & ISSUE_TRACKED_FIELDS).any?
-      Note.import_with_parent query: -> { where(noteable: record) }
+      Note.es_import query: -> { where(noteable: record) }
     end
   end
 
-  def clear_project_data(record_id)
-    remove_children_documents(Repository.document_type, record_id)
-    remove_children_documents(ProjectWiki.document_type, record_id)
-    remove_children_documents(MergeRequest.document_type, record_id)
-    remove_documents_by_project_id(record_id)
+  def clear_project_data(record_id, es_id)
+    remove_children_documents('project', record_id, es_id)
   end
 
   def remove_documents_by_project_id(record_id)
@@ -73,14 +70,17 @@ class ElasticIndexerWorker
     })
   end
 
-  def remove_children_documents(document_type, parent_record_id)
+  def remove_children_documents(parent_type, parent_record_id, parent_es_id)
     client.delete_by_query({
       index: Project.__elasticsearch__.index_name,
+      routing: parent_es_id,
       body: {
         query: {
-          parent_id: {
-            type: document_type,
-            id: parent_record_id
+          has_parent: {
+            parent_type: parent_type,
+            query: {
+              term: { id: parent_record_id }
+            }
           }
         }
       }

@@ -57,7 +57,7 @@ describe Project, :elastic do
       'updated_at',
       'visibility_level',
       'last_activity_at'
-    )
+    ).merge({ 'join_field' => project.es_type, 'type' => project.es_type })
 
     expected_hash.merge!(
       project.project_feature.attributes.extract!(

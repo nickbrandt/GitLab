@@ -8,7 +8,7 @@
 # A note of this type is never resolvable.
 class LegacyDiffNote < Note
   # Elastic search configuration (it does not support STI properly)
-  document_type 'note'
+  document_type 'doc'
   index_name [Rails.application.class.parent_name.downcase, Rails.env].join('-')
   include Elastic::NotesSearch
 

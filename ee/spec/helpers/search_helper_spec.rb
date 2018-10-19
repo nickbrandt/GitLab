@@ -51,7 +51,7 @@ describe SearchHelper do
       Gitlab::Elastic::Helper.refresh_index
       @project_2.destroy
 
-      blob = { _parent: @project_2.id }
+      blob = { _source: { join_field: { parent: @project_2.es_id } } }.as_json
 
       result = find_project_for_result_blob(blob)
 

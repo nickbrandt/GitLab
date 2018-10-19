@@ -59,7 +59,7 @@ class ProjectFeature < ActiveRecord::Base
 
   after_commit on: :update do
     if Gitlab::CurrentSettings.current_application_settings.elasticsearch_indexing?
-      ElasticIndexerWorker.perform_async(:update, 'Project', project_id)
+      ElasticIndexerWorker.perform_async(:update, 'Project', project_id, project.es_id)
     end
   end
 
