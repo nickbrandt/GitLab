@@ -160,7 +160,7 @@ module EE
           sast_help_path: help_page_path('user/project/merge_requests/sast'),
           dependency_scanning_help_path: help_page_path('user/project/merge_requests/dependency_scanning'),
           dast_help_path: help_page_path('user/project/merge_requests/dast'),
-          sast_container_help_path: help_page_path('user/project/merge_requests/sast_container'),
+          sast_container_help_path: help_page_path('user/project/merge_requests/container_scanning'),
           user_path: user_url(pipeline.user),
           user_avatar_path: pipeline.user.avatar_url,
           user_name: pipeline.user.name,
