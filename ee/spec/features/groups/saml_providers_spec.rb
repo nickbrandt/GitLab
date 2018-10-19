@@ -168,10 +168,12 @@ describe 'SAML provider settings' do
       end
 
       context 'when not signed in' do
-        it "doesn't show sso page" do
+        it "shows the sso page so user can sign in" do
           visit sso_group_saml_providers_path(group)
 
-          expect(current_path).to eq(new_user_session_path)
+          expect(page).to have_content('SAML SSO')
+          expect(page).to have_content("Sign in to \"#{group.full_name}\"")
+          expect(page).to have_content('Sign in with Single Sign-On')
         end
       end
 
@@ -219,6 +221,12 @@ describe 'SAML provider settings' do
             visit sso_group_saml_providers_path(group)
 
             expect(current_path).to eq(new_user_session_path)
+          end
+
+          it "shows the sso page if the token is given" do
+            visit sso_group_saml_providers_path(group, token: group.saml_discovery_token)
+
+            expect(current_path).to eq sso_group_saml_providers_path(group)
           end
         end
 
