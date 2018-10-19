@@ -86,9 +86,11 @@ shared_examples 'approvals' do
 end
 
 describe Projects::MergeRequestsController do
+  include ProjectForksHelper
+
   let(:project)       { create(:project, :repository) }
   let(:merge_request) { create(:merge_request_with_diffs, source_project: project, author: create(:user)) }
-  let(:user)          { project.owner }
+  let(:user)          { project.creator }
   let(:viewer)        { user }
 
   before do
@@ -289,7 +291,7 @@ describe Projects::MergeRequestsController do
 
     context 'when the project is a fork' do
       let(:upstream) { create(:project, :repository) }
-      let(:project) { create(:project, :repository, forked_from_project: upstream) }
+      let(:project) { fork_project(upstream, nil, repository: true) }
 
       context 'when the MR target upstream' do
         let(:merge_request) { create(:merge_request, title: 'This is targeting upstream', source_project: project, target_project: upstream) }
@@ -337,12 +339,13 @@ describe Projects::MergeRequestsController do
     end
 
     context 'with a forked project' do
-      let(:fork_project) { create(:project, :repository, forked_from_project: project) }
-      let(:fork_owner) { fork_project.owner }
+      let(:forked_project) { fork_project(project, fork_owner) }
+      let(:fork_owner) { create(:user) }
 
       before do
-        merge_request.update!(source_project: fork_project)
-        fork_project.add_reporter(user)
+        project.add_developer(fork_owner)
+        merge_request.update!(source_project: forked_project)
+        forked_project.add_reporter(user)
       end
 
       it_behaves_like 'approvals'
