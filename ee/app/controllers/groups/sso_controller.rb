@@ -60,7 +60,12 @@ class Groups::SsoController < Groups::ApplicationController
   end
 
   def check_user_can_sign_in_with_provider
-    route_not_found unless can?(current_user, :sign_in_with_saml_provider, @unauthenticated_group.saml_provider)
+    actor = saml_discovery_token_actor || current_user
+    route_not_found unless can?(actor, :sign_in_with_saml_provider, @unauthenticated_group.saml_provider)
+  end
+
+  def saml_discovery_token_actor
+    Gitlab::Auth::GroupSaml::TokenActor.new(params[:token]) if params[:token]
   end
 
   def redirect_if_group_moved
