@@ -211,7 +211,7 @@ issue-count-badge-add-button btn btn-sm btn-default qa-add-issues-button"
           'collapsed': !shouldShowTokenBody,
           'sortable-container': canReorder
         }"
-        class="related-issues-token-body card-body"
+        class="related-issues-token-body"
       >
         <div
           v-if="isFetching"
@@ -237,7 +237,7 @@ issue-count-badge-add-button btn btn-sm btn-default qa-add-issues-button"
             }"
             :data-key="issue.id"
             :data-epic-issue-id="issue.epic_issue_id"
-            class="js-related-issues-token-list-item"
+            class="js-related-issues-token-list-item related-issues-list-item pt-0 pb-0"
           >
             <issue-item
               :id-key="issue.id"
