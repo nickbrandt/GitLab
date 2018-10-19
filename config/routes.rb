@@ -81,6 +81,21 @@ Rails.application.routes.draw do
       resources :milestones, module: :boards, only: [:index]
     end
 
+    resources :clusters, only: [:update, :destroy] do
+      collection do
+        post :create_user
+        post :create_gcp
+      end
+
+      member do
+        scope :applications do
+          post '/:application', to: 'clusters/applications#create', as: :install_applications
+        end
+
+        get :status, format: :json
+      end
+    end
+
     # UserCallouts
     resources :user_callouts, only: [:create]
 
@@ -92,20 +107,7 @@ Rails.application.routes.draw do
   end
 
   concern :clusterable do
-    resources :clusters, except: [:edit, :create], controller: '/clusters' do
-      collection do
-        post :create_gcp
-        post :create_user
-      end
-
-      member do
-        get :status, format: :json
-
-        scope :applications do
-          post '/:application', to: '/clusters/applications#create', as: :install_applications
-        end
-      end
-    end
+    resources :clusters, only: [:index, :new, :show], controller: '/clusters'
   end
 
   draw :api
