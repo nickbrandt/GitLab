@@ -23,6 +23,10 @@ module QA
         end
       end
 
+      module File
+        autoload :Show, 'qa/ee/page/file/show'
+      end
+
       module Main
         autoload :Banner, 'qa/ee/page/main/banner'
       end
