@@ -201,7 +201,7 @@
         <stuck-block
           v-if="job.stuck"
           class="js-job-stuck"
-          :has-no-runners-for-project="job.runners.available"
+          :has-no-runners-for-project="job.runners.available && !job.runners.online"
           :tags="job.tags"
           :runners-path="runnerSettingsUrl"
         />
