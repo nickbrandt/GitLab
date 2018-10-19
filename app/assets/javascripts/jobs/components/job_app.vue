@@ -5,9 +5,12 @@ import { isScrolledToBottom } from '~/lib/utils/scroll_utils';
 import bp from '~/breakpoints';
 import CiHeader from '~/vue_shared/components/header_ci_component.vue';
 import Callout from '~/vue_shared/components/callout.vue';
+<<<<<<< HEAD
 // ee-only start
 import SharedRunner from 'ee/jobs/components/shared_runner_limit_block.vue';
 // ee-only end
+=======
+>>>>>>> upstream/master
 import createStore from '../store';
 import EmptyState from './empty_state.vue';
 import EnvironmentsBlock from './environments_block.vue';
@@ -29,7 +32,10 @@ export default {
     Log,
     LogTopBar,
     StuckBlock,
+<<<<<<< HEAD
     SharedRunner,
+=======
+>>>>>>> upstream/master
     Sidebar,
   },
   props: {
@@ -82,7 +88,10 @@ export default {
       'shouldRenderTriggeredLabel',
       'hasEnvironment',
       'isJobStuck',
+<<<<<<< HEAD
       'shouldRenderSharedRunnerLimitWarning',
+=======
+>>>>>>> upstream/master
       'hasTrace',
       'emptyStateIllustration',
       'isScrollingDown',
@@ -117,11 +126,19 @@ export default {
     window.addEventListener('resize', this.onResize);
     window.addEventListener('scroll', this.updateScroll);
   },
+<<<<<<< HEAD
 
   mounted() {
     this.updateSidebar();
   },
 
+=======
+
+  mounted() {
+    this.updateSidebar();
+  },
+
+>>>>>>> upstream/master
   destroyed() {
     window.removeEventListener('resize', this.onResize);
     window.removeEventListener('scroll', this.updateScroll);
