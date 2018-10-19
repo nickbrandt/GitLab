@@ -31,7 +31,9 @@ module QA
         end
 
         def files=(files)
-          if !files.is_a?(Array) || files.empty?
+          if !files.is_a?(Array) ||
+              files.empty? ||
+              files.any? { |file| !file.has_key?(:name) || !file.has_key?(:content) }
             raise ArgumentError, "Please provide an array of hashes e.g.: [{name: 'file1', content: 'foo'}]"
           end
 
