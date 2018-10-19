@@ -767,6 +767,16 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
         end
       end
 
+      context 'when runners are offline and build has tags' do
+        let(:runner) { create(:ci_runner, :instance, active: true) }
+        let(:job) { create(:ci_build, :pending, pipeline: pipeline, runner: runner, tag_list: %w(docker linux)) }
+
+        it 'renders message about job being stuck because of no runners with the specified tags' do
+          expect(page).to have_css('.js-stuck-with-tags')
+          expect(page).to have_content("This job is stuck, because you don't have any active runners online with any of these tags assigned to them:")
+        end
+      end
+
       context 'without any runners available' do
         let(:job) { create(:ci_build, :pending, pipeline: pipeline) }
 
