@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe Projects::ClustersController do
+describe Clusters::ClusterMetricsController do
   include AccessMatchersForController
 
   set(:project) { create(:project) }
 
-  describe 'GET metrics' do
+  describe 'GET show' do
     let(:cluster) { create(:cluster, :provided_by_gcp, projects: [project]) }
 
     describe 'functionality' do
@@ -69,10 +69,11 @@ describe Projects::ClustersController do
     end
 
     def go
-      get :metrics, format: :json,
-                    namespace_id: project.namespace,
-                    project_id: project,
-                    id: cluster
+      get :show,
+        format: :json,
+        namespace_id: project.namespace.to_param,
+        project_id: project.to_param,
+        id: cluster
     end
 
     describe 'security' do

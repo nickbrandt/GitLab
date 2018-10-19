@@ -88,6 +88,9 @@ Rails.application.routes.draw do
       end
 
       member do
+        # EE specific
+        get :metrics, to: 'clusters/cluster_metrics#show', as: :metrics
+
         scope :applications do
           post '/:application', to: 'clusters/applications#create', as: :install_applications
         end
