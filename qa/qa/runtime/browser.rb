@@ -1,4 +1,5 @@
 require 'rspec/core'
+require 'rspec/expectations'
 require 'capybara/rspec'
 require 'capybara-screenshot/rspec'
 require 'selenium-webdriver'
