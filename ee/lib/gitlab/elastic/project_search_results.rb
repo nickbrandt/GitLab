@@ -75,9 +75,9 @@ module Gitlab
         if project.wiki_enabled? && !project.wiki.empty? && query.present?
           project.wiki.search(
             query,
-            type: :blob,
+            type: :wiki_blob,
             options: { highlight: true }
-          )[:blobs][:results].response
+          )[:wiki_blobs][:results].response
         else
           Kaminari.paginate_array([])
         end

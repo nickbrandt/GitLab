@@ -18,10 +18,15 @@ module Gitlab
           Repository
         ].each do |klass|
           settings.deep_merge!(klass.settings.to_hash)
-          mappings.merge!(klass.mappings.to_hash)
+          mappings.deep_merge!(klass.mappings.to_hash)
         end
 
         client = Project.__elasticsearch__.client
+
+        # ES5.6 needs a setting enabled to support JOIN datatypes that ES6 does not support...
+        if Gitlab::VersionInfo.parse(client.info['version']['number']) < Gitlab::VersionInfo.new(6)
+          settings['index.mapping.single_type'] = true
+        end
 
         if client.indices.exists? index: index_name
           client.indices.delete index: index_name

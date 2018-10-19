@@ -124,7 +124,7 @@ describe Snippet, :elastic do
       'project_id',
       'author_id',
       'visibility_level'
-    )
+    ).merge({ 'type' => snippet.es_type })
 
     expect(snippet.as_indexed_json).to eq(expected_hash)
   end

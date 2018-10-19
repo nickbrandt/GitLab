@@ -74,13 +74,10 @@ namespace :gitlab do
 
         klass = Kernel.const_get(klass_name)
 
-        case klass_name
-        when 'Note'
-          Note.searchable.import_with_parent
-        when 'Project', 'Snippet'
-          klass.import
+        if klass_name == 'Note'
+          Note.searchable.es_import
         else
-          klass.import_with_parent
+          klass.es_import
         end
 
         logger.info("Indexing #{klass_name.pluralize}... " + "done".color(:green))

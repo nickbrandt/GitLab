@@ -9,19 +9,19 @@ Information on how to enable ElasticSearch and perform the initial indexing is k
 It is recommended to use the Docker image. After installing docker you can immediately spin up an instance with
 
 ```
-docker run --name elastic55 -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:5.5.3
+docker run --name elastic56 -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:5.6.12
 ```
 
-and use `docker stop elastic55` and `docker start elastic55` to stop/start it.
+and use `docker stop elastic56` and `docker start elastic56` to stop/start it.
 
 ### Installing on the host
 
-We currently only support Elasticsearch [up to 5.5](https://docs.gitlab.com/ee/integration/elasticsearch.html#requirements), but `brew` only has elasticsearch 6, 5.6, and 2.4 available. While 2.4 would work you probably want to test things out in the latest one we support.
+We currently only support Elasticsearch [5.6 to 6.x](https://docs.gitlab.com/ee/integration/elasticsearch.html#requirements)
 
-In order to install 5.5.2, you would usually have to hunt down an old homebrew-core commit that contains the recipe for it. We've already done the work for you. Simply run:
+Version 5.6 is available on homebrew and is the recommended version to use in order to test compatibility.
 
 ```
-brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/f1a767645f61112762f05e68a610d89b161faa99/Formula/elasticsearch.rb
+brew install elasticsearch@5.6
 ```
 
 There is no need to install any plugins

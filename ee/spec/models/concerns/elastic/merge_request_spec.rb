@@ -44,7 +44,13 @@ describe MergeRequest, :elastic do
       'source_project_id',
       'target_project_id',
       'author_id'
-    )
+    ).merge({
+              'join_field' => {
+                'name' => merge_request.es_type,
+                'parent' => merge_request.es_parent
+              },
+              'type' => merge_request.es_type
+            })
 
     expect(merge_request.as_indexed_json).to eq(expected_hash)
   end

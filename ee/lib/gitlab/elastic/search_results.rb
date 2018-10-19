@@ -172,9 +172,9 @@ module Gitlab
 
           ProjectWiki.search(
             query,
-            type: :blob,
+            type: :wiki_blob,
             options: opt.merge({ highlight: true })
-          )[:blobs][:results].response
+          )[:wiki_blobs][:results].response
         end
       end
 

@@ -11,6 +11,10 @@ module Elastic
         "wiki_#{project.id}"
       end
 
+      def es_type
+        'wiki_blob'
+      end
+
       delegate :id, to: :project, prefix: true
 
       def client_for_indexing

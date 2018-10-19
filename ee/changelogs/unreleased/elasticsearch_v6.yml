@@ -1,0 +1,5 @@
+---
+title: elasticsearch 6 support - migrate from parent/child relationships to join
+merge_request: 7618
+author:
+type: added
