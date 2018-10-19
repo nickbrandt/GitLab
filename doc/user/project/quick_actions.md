@@ -54,6 +54,7 @@ discussions, and descriptions:
 | `/wip`                     | Toggle the Work In Progress status |   | ✓             |
 | `/approve`                 | Approve the merge request      |       | ✓             |
 | `/merge`                   | Merge (when pipeline succeeds) |       | ✓             |
+| `/create_merge_request <branch name>` | Create a new merge request starting from the current issue | ✓ | |
 
 
 ## Quick actions for commit messages
