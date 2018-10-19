@@ -742,39 +742,35 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
     end
 
     context 'stuck', :js do
+      before do
+        visit project_job_path(project, job)
+        wait_for_requests
+      end
+
       context 'without active runners available' do
         let(:runner) { create(:ci_runner, :instance, active: false) }
         let(:job) { create(:ci_build, :pending, pipeline: pipeline, runner: runner) }
 
-        it 'renders message about job being stuck' do
-          visit project_job_path(project, job)
-          wait_for_requests
-
+        it 'renders message about job being stuck because no runners are active' do
           expect(page).to have_css('.js-stuck-no-active-runner')
           expect(page).to have_content("This job is stuck, because you don\'t have any active runners that can run this job.")
         end
       end
 
-      context 'without active runners with tags' do
+      context 'when available runners can not run specified tag' do
         let(:runner) { create(:ci_runner, :instance, active: false) }
         let(:job) { create(:ci_build, :pending, pipeline: pipeline, runner: runner, tag_list: %w(docker linux)) }
 
-        it 'renders message about job being stuck because of no tags' do
-          visit project_job_path(project, job)
-          wait_for_requests
-
+        it 'renders message about job being stuck because of no runners with the specified tags' do
           expect(page).to have_css('.js-stuck-with-tags')
           expect(page).to have_content("This job is stuck, because you don't have any active runners online with any of these tags assigned to them:")
         end
       end
 
-      context 'without active runners assigned to the job' do
+      context 'without any runners available' do
         let(:job) { create(:ci_build, :pending, pipeline: pipeline) }
 
-        it 'renders message about job being stuck' do
-          visit project_job_path(project, job)
-          wait_for_requests
-
+        it 'renders message about job being stuck because not runners are available' do
           expect(page).to have_css('.js-stuck-no-active-runner')
           expect(page).to have_content("This job is stuck, because you don't have any active runners that can run this job.")
         end
@@ -785,9 +781,6 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
         let(:job) { create(:ci_build, :pending, pipeline: pipeline, runner: runner) }
 
         it 'renders message about job being stuck because runners are offline' do
-          visit project_job_path(project, job)
-          wait_for_requests
-
           expect(page).to have_css('.js-stuck-no-runners')
           expect(page).to have_content("This job is stuck, because the project doesn't have any runners online assigned to it.")
         end
