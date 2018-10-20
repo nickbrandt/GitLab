@@ -644,7 +644,7 @@ module QuickActions
 
       if users.empty?
         users =
-          if params == 'me'
+          if params.strip == 'me'
             [current_user]
           else
             User.where(username: params.split(' ').map(&:strip))

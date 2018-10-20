@@ -77,7 +77,10 @@ describe Project do
     it { is_expected.to have_many(:lfs_objects_projects) }
     it { is_expected.to have_many(:project_group_links) }
     it { is_expected.to have_many(:notification_settings).dependent(:delete_all) }
+<<<<<<< HEAD
     it { is_expected.to have_many(:approver_groups).dependent(:destroy) }
+=======
+>>>>>>> upstream/master
     it { is_expected.to have_many(:forked_to_members).class_name('ForkNetworkMember') }
     it { is_expected.to have_many(:forks).through(:forked_to_members) }
     it { is_expected.to have_many(:uploads) }

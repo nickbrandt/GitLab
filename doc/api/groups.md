@@ -452,7 +452,10 @@ PUT /groups/:id
 | `lfs_enabled` (optional) | boolean | no | Enable/disable Large File Storage (LFS) for the projects in this group |
 | `request_access_enabled` | boolean | no | Allow users to request member access. |
 | `file_template_project_id` | integer | no | **(Premium)** The ID of a project to load custom file templates from |
+<<<<<<< HEAD
 | `shared_runners_minutes_limit` | integer | no | (admin-only) Pipeline minutes quota for this group |
+=======
+>>>>>>> upstream/master
 
 ```bash
 curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/groups/5?name=Experimental"
