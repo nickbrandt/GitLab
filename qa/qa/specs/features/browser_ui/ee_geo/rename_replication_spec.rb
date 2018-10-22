@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context :geo, :orchestrated, :geo do
+  context 'Geo', :orchestrated, :geo do
     describe 'GitLab Geo project rename replication' do
       it 'user renames project' do
         # create the project and push code

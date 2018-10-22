@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context :manage, :orchestrated, :group_saml do
+  context 'Manage', :orchestrated, :group_saml do
     describe 'Group SAML SSO' do
       before do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
