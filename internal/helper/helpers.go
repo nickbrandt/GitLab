@@ -19,8 +19,6 @@ import (
 
 const NginxResponseBufferHeader = "X-Accel-Buffering"
 
-var scrubRegexp = regexp.MustCompile(`(?i)([\?&]((?:private|authenticity|rss)[\-_]token)|(?:X-AMZ-)?Signature)=[^&]*`)
-
 func Fail500(w http.ResponseWriter, r *http.Request, err error) {
 	http.Error(w, "Internal server error", 500)
 	if err != nil {
@@ -196,8 +194,82 @@ func CloneRequestWithNewBody(r *http.Request, body []byte) *http.Request {
 	return &newReq
 }
 
+// Based on https://stackoverflow.com/a/52965552/474597
 // ScrubURLParams replaces the content of any sensitive query string parameters
 // in an URL with `[FILTERED]`
-func ScrubURLParams(url string) string {
-	return scrubRegexp.ReplaceAllString(url, "$1=[FILTERED]")
+func ScrubURLParams(originalURL string) string {
+	u, err := url.Parse(originalURL)
+	if err != nil {
+		return "<invalid URL>"
+	}
+
+	buf := bytes.NewBuffer(make([]byte, 0, len(originalURL)))
+
+	for i, queryPart := range bytes.Split([]byte(u.RawQuery), []byte("&")) {
+		if i != 0 {
+			buf.WriteByte(byte('&'))
+		}
+
+		splitParam := bytes.SplitN(queryPart, []byte("="), 2)
+
+		if len(splitParam) == 2 {
+			buf.Write(splitParam[0])
+			buf.WriteByte(byte('='))
+
+			if isParamSensitive(splitParam[0]) {
+				buf.Write([]byte("[FILTERED]"))
+			} else {
+				buf.Write(splitParam[1])
+			}
+		} else {
+			buf.Write(queryPart)
+		}
+	}
+	u.RawQuery = buf.String()
+	return u.String()
+}
+
+// Remember to keep in sync with Rails' filter_parameters
+
+var sensitiveRegexps = []*regexp.Regexp{
+	regexp.MustCompile(`token$`),
+	regexp.MustCompile(`key$`),
+	regexp.MustCompile(`(?i)(?:X\-AMZ\-)?Signature`),
+}
+
+// Not in regexp due to SA6004.
+// Not in string for performance.
+var sensitivePartialMatch = [][]byte{
+	[]byte("password"),
+	[]byte("secret"),
+}
+
+var sensitiveExactMatch = []string{
+	"certificate",
+	"hook",
+	"import_url",
+	"otp_attempt",
+	"sentry_dsn",
+	"trace",
+	"variables",
+	"content",
+}
+
+func isParamSensitive(name []byte) bool {
+	for _, s := range sensitiveExactMatch {
+		if string(name) == s {
+			return true
+		}
+	}
+	for _, r := range sensitiveRegexps {
+		if r.Match(name) {
+			return true
+		}
+	}
+	for _, s := range sensitivePartialMatch {
+		if bytes.Contains(name, s) {
+			return true
+		}
+	}
+	return false
 }
