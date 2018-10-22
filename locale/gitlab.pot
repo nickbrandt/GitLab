@@ -8526,9 +8526,12 @@ msgstr ""
 msgid "View app"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "View epics list"
 msgstr ""
 
+=======
+>>>>>>> upstream/master
 msgid "View file @ "
 msgstr ""
 
