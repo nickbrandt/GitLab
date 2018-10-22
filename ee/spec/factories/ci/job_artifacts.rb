@@ -22,6 +22,36 @@ FactoryBot.define do
       end
     end
 
+    trait :license_management_report do
+      file_type :license_management
+      file_format :raw
+
+      after(:build) do |artifact, evaluator|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/license_management/report.json'), 'application/json')
+      end
+    end
+
+    trait :license_management_report_2 do
+      file_type :license_management
+      file_format :raw
+
+      after(:build) do |artifact, evaluator|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/license_management/report2.json'), 'application/json')
+      end
+    end
+
+    trait :corrupted_license_management_report do
+      file_type :license_management
+      file_format :raw
+
+      after(:build) do |artifact, evaluator|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('ee/spec/fixtures/license_management/report_with_corrupted_data.json'), 'application/json')
+      end
+    end
+
     trait :performance do
       file_format :raw
       file_type :performance

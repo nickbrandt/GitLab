@@ -84,7 +84,7 @@ class Projects::ManagedLicensesController < Projects::ApplicationController
   def software_license_policy
     id = params[:id]
     id = CGI.unescape(id) unless id.is_a?(Integer) || id =~ /^\d+$/
-    @software_license_policy ||= SoftwareLicensePoliciesFinder.new(current_user, project).find_by_name_or_id(id)
+    @software_license_policy ||= SoftwareLicensePoliciesFinder.new(current_user, project, name_or_id: id).find
 
     if @software_license_policy.nil?
       # The license was not found
