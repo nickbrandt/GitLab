@@ -97,10 +97,6 @@ module Users
         if params[:reset_password]
           user_params.merge!(force_random_password: true, password_expires_at: nil)
         end
-
-        if user_default_internal_regex_enabled? && !user_params.key?(:external)
-          user_params[:external] = user_external?
-        end
       else
         allowed_signup_params = signup_params
         allowed_signup_params << :skip_confirmation if skip_authorization
@@ -109,6 +105,10 @@ module Users
         if user_params[:skip_confirmation].nil?
           user_params[:skip_confirmation] = skip_user_confirmation_email_from_setting
         end
+      end
+
+      if user_default_internal_regex_enabled? && !user_params.key?(:external)
+        user_params[:external] = user_external?
       end
 
       user_params
