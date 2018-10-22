@@ -1,7 +1,7 @@
 PREFIX=/usr/local
 PKG := gitlab.com/gitlab-org/gitlab-workhorse
-BUILD_DIR := $(CURDIR)
-TARGET_DIR := $(BUILD_DIR)/_build
+BUILD_DIR ?= $(CURDIR)
+TARGET_DIR ?= $(BUILD_DIR)/_build
 TARGET_SETUP := $(TARGET_DIR)/.ok
 BIN_BUILD_DIR := $(TARGET_DIR)/bin
 PKG_BUILD_DIR := $(TARGET_DIR)/src/$(PKG)
@@ -38,7 +38,7 @@ $(TARGET_SETUP):
 	$(call message,"Setting up target directory")
 	rm -rf $(TARGET_DIR)
 	mkdir -p "$(dir $(PKG_BUILD_DIR))"
-	ln -sf ../../../.. "$(PKG_BUILD_DIR)"
+	ln -sf "$(CURDIR)" "$(PKG_BUILD_DIR)"
 	mkdir -p "$(BIN_BUILD_DIR)"
 	touch "$(TARGET_SETUP)"
 
