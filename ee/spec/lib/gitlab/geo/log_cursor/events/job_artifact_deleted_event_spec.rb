@@ -13,6 +13,12 @@ describe Gitlab::Geo::LogCursor::Events::JobArtifactDeletedEvent, :postgresql, :
     Sidekiq::Testing.inline! { example.run }
   end
 
+  it 'schedules a Geo::FileRegistryRemovalWorker job' do
+    expect(::Geo::FileRegistryRemovalWorker).to receive(:perform_async).with(:job_artifact, job_artifact_deleted_event.job_artifact_id, job_artifact.file.path)
+
+    subject.process
+  end
+
   describe '#process' do
     context 'with a tracking database entry' do
       before do

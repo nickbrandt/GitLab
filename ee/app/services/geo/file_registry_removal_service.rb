@@ -6,6 +6,15 @@ module Geo
 
     LEASE_TIMEOUT = 8.hours.freeze
 
+    # It's possible that LfsObject or Ci::JobArtifact record does not exists anymore
+    # In this case, you need to pass file_path parameter explicitly
+    #
+    def initialize(object_type, object_db_id, file_path = nil)
+      @object_type = object_type.to_sym
+      @object_db_id = object_db_id
+      @object_file_path = file_path
+    end
+
     def execute
       log_info('Executing')
 
@@ -48,6 +57,7 @@ module Geo
 
     def file_path
       strong_memoize(:file_path) do
+        next @object_file_path if @object_file_path
         # When local storage is used, just rely on the existing methods
         next file_uploader.file.path if file_uploader.object_store == ObjectStorage::Store::LOCAL
 

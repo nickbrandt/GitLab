@@ -76,6 +76,16 @@ describe Geo::FileRegistryRemovalService do
 
         it_behaves_like 'removes'
       end
+
+      context 'no lfs_object record' do
+        before do
+          lfs_object.delete
+        end
+
+        it_behaves_like 'removes' do
+          subject(:service) { described_class.new(file_registry.file_type, file_registry.file_id, file_path) }
+        end
+      end
     end
 
     context 'with job artifact' do
@@ -92,6 +102,16 @@ describe Geo::FileRegistryRemovalService do
         end
 
         it_behaves_like 'removes artifact'
+      end
+
+      context 'no job artifact record' do
+        before do
+          job_artifact.delete
+        end
+
+        it_behaves_like 'removes artifact' do
+          subject(:service) { described_class.new('job_artifact', registry.artifact_id, file_path) }
+        end
       end
     end
 
