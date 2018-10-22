@@ -83,18 +83,8 @@ describe Projects::PipelinesController do
 
     context 'with a license management artifact' do
       before do
-        create(
-          :ci_build,
-          :success,
-          :artifacts,
-          name: 'license_management',
-          pipeline: pipeline,
-          options: {
-            artifacts: {
-              paths: [Ci::Build::LICENSE_MANAGEMENT_FILE]
-            }
-          }
-        )
+        build = create(:ci_build, pipeline: pipeline)
+        create(:ee_ci_job_artifact, :license_management, build: build)
       end
 
       context 'with feature enabled' do

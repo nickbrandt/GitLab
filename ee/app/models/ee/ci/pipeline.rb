@@ -59,6 +59,10 @@ module EE
           performance: {
             names: %w(performance deploy),
             files: %w(performance.json)
+          },
+          license_management: {
+            names: %w(license_management),
+            files: %w(gl-license-management-report.json)
           }
         }.freeze
 
@@ -101,17 +105,8 @@ module EE
         nil
       end
 
-      def license_management_artifact
-        @license_management_artifact ||= artifacts_with_files.find(&:has_license_management_json?)
-      end
-
-      def has_license_management_data?
-        license_management_artifact&.success?
-      end
-
       def expose_license_management_data?
-        project.feature_available?(:license_management) &&
-          has_license_management_data?
+        any_report_artifact_for_type(:license_management)
       end
 
       def has_security_reports?

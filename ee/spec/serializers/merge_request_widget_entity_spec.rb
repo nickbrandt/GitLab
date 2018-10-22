@@ -76,16 +76,8 @@ describe MergeRequestWidgetEntity do
 
   describe '#license_management' do
     before do
-      build = create(:ci_build, name: 'license_management', pipeline: pipeline)
-
-      allow(merge_request).to receive_messages(
-        expose_license_management_data?: true,
-        base_has_license_management_data?: true,
-        base_license_management_artifact: build,
-        head_license_management_artifact: build,
-        head_pipeline: pipeline,
-        target_project: project
-      )
+      build = create(:ci_build, pipeline: pipeline)
+      create(:ee_ci_job_artifact, :license_management, build: build)
     end
 
     it 'should not be included, if license management features are off' do

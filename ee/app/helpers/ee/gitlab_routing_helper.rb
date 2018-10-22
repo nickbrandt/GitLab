@@ -30,9 +30,10 @@ module EE
     end
 
     def license_management_artifact_url(pipeline)
-      raw_project_build_artifacts_url(pipeline.project,
-                                      pipeline.license_management_artifact,
-                                      path: Ci::Build::LICENSE_MANAGEMENT_FILE)
+      return unless pipeline
+
+      pipeline.present(current_user: current_user)
+        .downloadable_path_for_report_type(:license_management)
     end
 
     def license_management_api_url(project)

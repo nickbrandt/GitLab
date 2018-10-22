@@ -16,12 +16,8 @@ module EE
 
       validate :validate_approvals_before_merge, unless: :importing?
 
-      delegate :license_management_artifact, to: :head_pipeline, prefix: :head, allow_nil: true
-      delegate :license_management_artifact, to: :base_pipeline, prefix: :base, allow_nil: true
       delegate :sha, to: :head_pipeline, prefix: :head_pipeline, allow_nil: true
       delegate :sha, to: :base_pipeline, prefix: :base_pipeline, allow_nil: true
-      delegate :has_license_management_data?, to: :base_pipeline, prefix: :base, allow_nil: true
-      delegate :expose_license_management_data?, to: :head_pipeline, allow_nil: true
       delegate :merge_requests_author_approval?, to: :target_project, allow_nil: true
 
       participant :participant_approvers

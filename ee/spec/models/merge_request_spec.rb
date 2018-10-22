@@ -40,37 +40,4 @@ describe MergeRequest do
 
     it { expect(subject.base_pipeline).to eq(pipeline) }
   end
-
-  describe '#base_license_management_artifact' do
-    before do
-      allow(subject.base_pipeline).to receive(:license_management_artifact)
-        .and_return(1)
-    end
-
-    it 'delegates to merge request diff' do
-      expect(subject.base_license_management_artifact).to eq(1)
-    end
-  end
-
-  describe '#head_license_management_artifact' do
-    before do
-      allow(subject.head_pipeline).to receive(:license_management_artifact)
-        .and_return(1)
-    end
-
-    it 'delegates to merge request diff' do
-      expect(subject.head_license_management_artifact).to eq(1)
-    end
-  end
-
-  describe '#expose_license_management_data?' do
-    before do
-      allow(subject.head_pipeline).to receive(:expose_license_management_data?)
-        .and_return(1)
-    end
-
-    it 'delegates to merge request diff' do
-      expect(subject.expose_license_management_data?).to eq(1)
-    end
-  end
 end

@@ -33,11 +33,6 @@ module EE
         ::Gitlab::Database::LoadBalancing::Sticking.stick(:build, id)
       end
 
-      def has_license_management_json?
-        name_in?('license_management') &&
-          has_artifact?(LICENSE_MANAGEMENT_FILE)
-      end
-
       def log_geo_deleted_event
         # It is not needed to generate a Geo deleted event
         # since Legacy Artifacts are migrated to multi-build artifacts
