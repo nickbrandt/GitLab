@@ -116,10 +116,6 @@ describe Ci::Build do
   end
 
   build_artifacts_methods = {
-    has_performance_json?: {
-      filename: Ci::Build::PERFORMANCE_FILE,
-      job_names: %w[performance deploy]
-    },
     has_license_management_json?: {
       filename: Ci::Build::LICENSE_MANAGEMENT_FILE,
       job_names: %w[license_management]

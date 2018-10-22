@@ -26,17 +26,13 @@ module EE
         end
       end
 
-      expose :performance, if: -> (mr, _) { mr.expose_performance_data? } do
-        expose :head_path, if: -> (mr, _) { can?(current_user, :read_build, mr.head_performance_artifact) } do |merge_request|
-          raw_project_build_artifacts_url(merge_request.source_project,
-                                          merge_request.head_performance_artifact,
-                                          path: Ci::Build::PERFORMANCE_FILE)
+      expose :performance, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:performance) } do
+        expose :head_path do |merge_request|
+          head_pipeline_downloadable_path_for_report_type(:performance)
         end
 
-        expose :base_path, if: -> (mr, _) { can?(current_user, :read_build, mr.base_performance_artifact) } do |merge_request|
-          raw_project_build_artifacts_url(merge_request.target_project,
-                                          merge_request.base_performance_artifact,
-                                          path: Ci::Build::PERFORMANCE_FILE)
+        expose :base_path do |merge_request|
+          base_pipeline_downloadable_path_for_report_type(:performance)
         end
       end
 

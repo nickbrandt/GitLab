@@ -74,18 +74,6 @@ describe MergeRequestWidgetEntity do
     end
   end
 
-  it 'has performance data' do
-    build = create(:ci_build, name: 'job')
-
-    allow(merge_request).to receive_messages(
-      expose_performance_data?: true,
-      base_performance_artifact: build,
-      head_performance_artifact: build
-    )
-
-    expect(subject.as_json).to include(:performance)
-  end
-
   describe '#license_management' do
     before do
       build = create(:ci_build, name: 'license_management', pipeline: pipeline)

@@ -16,8 +16,6 @@ module EE
 
       validate :validate_approvals_before_merge, unless: :importing?
 
-      delegate :performance_artifact, to: :head_pipeline, prefix: :head, allow_nil: true
-      delegate :performance_artifact, to: :base_pipeline, prefix: :base, allow_nil: true
       delegate :license_management_artifact, to: :head_pipeline, prefix: :head, allow_nil: true
       delegate :license_management_artifact, to: :base_pipeline, prefix: :base, allow_nil: true
       delegate :sha, to: :head_pipeline, prefix: :head_pipeline, allow_nil: true
@@ -38,11 +36,6 @@ module EE
 
     def supports_weight?
       false
-    end
-
-    def expose_performance_data?
-      !!(head_pipeline&.expose_performance_data? &&
-         base_pipeline&.expose_performance_data?)
     end
 
     def validate_approvals_before_merge

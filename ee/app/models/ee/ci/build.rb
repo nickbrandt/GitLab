@@ -8,7 +8,6 @@ module EE
       extend ActiveSupport::Concern
 
       LICENSE_MANAGEMENT_FILE = 'gl-license-management-report.json'.freeze
-      PERFORMANCE_FILE = 'performance.json'.freeze
 
       LICENSED_PARSER_FEATURES = {
         sast: :sast
@@ -32,11 +31,6 @@ module EE
         return unless running?
 
         ::Gitlab::Database::LoadBalancing::Sticking.stick(:build, id)
-      end
-
-      def has_performance_json?
-        name_in?(%w[performance deploy]) &&
-          has_artifact?(PERFORMANCE_FILE)
       end
 
       def has_license_management_json?

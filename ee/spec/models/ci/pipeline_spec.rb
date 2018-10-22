@@ -21,7 +21,6 @@ describe Ci::Pipeline do
   end
 
   PIPELINE_ARTIFACTS_METHODS = [
-    { method: :performance_artifact, options: [Ci::Build::PERFORMANCE_FILE, 'performance'] },
     { method: :license_management_artifact, options: [Ci::Build::LICENSE_MANAGEMENT_FILE, 'license_management'] }
   ].freeze
 
@@ -274,31 +273,6 @@ describe Ci::Pipeline do
           it_behaves_like 'multi-licensed report type', licensed_features
         end
       end
-    end
-  end
-
-  context 'performance' do
-    def create_build(job_name, filename)
-      create(
-        :ci_build,
-        :artifacts,
-        name: job_name,
-        pipeline: pipeline,
-        options: {
-          artifacts: {
-            paths: [filename]
-          }
-        }
-      )
-    end
-
-    it 'does not perform extra queries when calling pipeline artifacts methods after the first' do
-      create_build('performance', 'performance.json')
-      create_build('license_management', 'gl-license-management-report.json')
-
-      pipeline.performance_artifact
-
-      expect { pipeline.license_management_artifact }.not_to exceed_query_limit(0)
     end
   end
 

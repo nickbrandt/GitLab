@@ -27,7 +27,8 @@ module EE
           sast: %i[sast],
           dependency_scanning: %i[dependency_scanning],
           container_scanning: %i[container_scanning sast_container],
-          dast: %i[dast]
+          dast: %i[dast],
+          performance: %i[:merge_request_performance_metrics]
         }.freeze
 
         # Deprecated, to be removed in 12.0
@@ -54,6 +55,10 @@ module EE
           dast: {
             names: %w(dast),
             files: %w(gl-dast-report.json)
+          },
+          performance: {
+            names: %w(performance deploy),
+            files: %w(performance.json)
           }
         }.freeze
 
@@ -96,10 +101,6 @@ module EE
         nil
       end
 
-      def performance_artifact
-        @performance_artifact ||= artifacts_with_files.find(&:has_performance_json?)
-      end
-
       def license_management_artifact
         @license_management_artifact ||= artifacts_with_files.find(&:has_license_management_json?)
       end
@@ -108,18 +109,9 @@ module EE
         license_management_artifact&.success?
       end
 
-      def has_performance_data?
-        performance_artifact&.success?
-      end
-
       def expose_license_management_data?
         project.feature_available?(:license_management) &&
           has_license_management_data?
-      end
-
-      def expose_performance_data?
-        project.feature_available?(:merge_request_performance_metrics) &&
-          has_performance_data?
       end
 
       def has_security_reports?
