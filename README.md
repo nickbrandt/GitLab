@@ -24,7 +24,7 @@ Thank you for purchasing a GitLab subscription!
 For standard subscribers, please see **emergency contact info and other useful information** in [the Standard subscribers README](https://gitlab.com/standard/standard-subscriber-information/tree/master#README).
 
 GitLab Enterprise Edition repository:
-https://gitlab.com/gitlab-com/gitlab-ee
+https://gitlab.com/gitlab-org/gitlab-ee
 
 Download GitLab Enterprise Edition:
 https://about.gitlab.com/downloads-ee
