@@ -1054,6 +1054,14 @@ describe Gitlab::GitAccess do
         # There is still an N+1 query with protected branches
         expect { access.check('git-receive-pack', changes) }.not_to exceed_query_limit(control_count).with_threshold(1)
       end
+
+      it 'raises TimeoutError when #check_single_change_access raises a timeout error' do
+        message = "Push operation timed out\n\nTiming information for debugging purposes:\nRunning checks for ref: wow"
+
+        allow_any_instance_of(Gitlab::Checks::ChangeAccess).to receive(:exec).and_raise(Gitlab::Checks::TimedLogger::TimeoutError)
+
+        expect { access.check('git-receive-pack', changes) }.to raise_error(described_class::TimeoutError, message)
+      end
     end
   end
 
