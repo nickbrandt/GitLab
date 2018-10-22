@@ -7,11 +7,8 @@ module Clusters
       include ReactiveCaching
       include EnumWithNil
 
-<<<<<<< HEAD
       prepend EE::KubernetesService
 
-=======
->>>>>>> upstream/master
       RESERVED_NAMESPACES = %w(gitlab-managed-apps).freeze
 
       self.table_name = 'cluster_platforms_kubernetes'
