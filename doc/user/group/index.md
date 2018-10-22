@@ -281,7 +281,6 @@ Member Lock lets a group owner to lock down any new project membership to all th
 projects within the group, allowing tighter control over project membership.
 Learn more about [Member Lock](https://docs.gitlab.com/ee/user/group/index.html#member-lock).
 
-<<<<<<< HEAD
 For instance, if you want to lock the group for an [Audit Event](../../administration/audit_events.md),
 you enable Member Lock to guarantee that any membership is added or changed
 during the audition.
@@ -318,14 +317,6 @@ To enable this feature, navigate to the group settings page, expand the
 **Save group**.
 
 ![Group-level file template settings](img/group_file_template_settings.png)
-=======
-#### Group-level file templates **[PREMIUM]**
-
-Group-level file templates allow you to share a set of templates for common file
-types with every project in a group.
-
-Learn more about [Group-level file templates](https://docs.gitlab.com/ee/user/group/index.html#group-level-file-templates-premium).
->>>>>>> upstream/master
 
 ### Advanced settings
 
