@@ -1129,37 +1129,6 @@ describe Project do
     end
   end
 
-  describe '#rename_repo' do
-    context 'when running on a primary node' do
-      set(:primary) { create(:geo_node, :primary) }
-      set(:secondary) { create(:geo_node) }
-      let(:project) { create(:project, :repository, :legacy_storage) }
-      let(:gitlab_shell) { Gitlab::Shell.new }
-
-      it 'logs the Geo::RepositoryRenamedEvent for project backed by hashed storage' do
-        project_hashed_storage = create(:project)
-
-        allow(project_hashed_storage).to receive(:gitlab_shell).and_return(gitlab_shell)
-        allow(project_hashed_storage).to receive(:previous_changes).and_return('path' => ['foo'])
-        allow(gitlab_shell).to receive(:mv_repository).twice.and_return(true)
-
-        expect { project_hashed_storage.rename_repo }.to change(Geo::RepositoryRenamedEvent, :count)
-      end
-
-      it 'logs the Geo::RepositoryRenamedEvent for project backed by legacy storage' do
-        allow(project).to receive(:gitlab_shell).and_return(gitlab_shell)
-        allow(project).to receive(:previous_changes).and_return('path' => ['foo'])
-        allow(gitlab_shell).to receive(:mv_repository).twice.and_return(true)
-
-        expect(Geo::RepositoryRenamedEventStore).to receive(:new)
-          .with(instance_of(described_class), old_path: 'foo', old_path_with_namespace: "#{project.namespace.full_path}/foo")
-          .and_call_original
-
-        expect { project.rename_repo }.to change(Geo::RepositoryRenamedEvent, :count).by(1)
-      end
-    end
-  end
-
   shared_examples 'project with disabled services' do
     it 'has some disabled services' do
       stub_const('License::ANY_PLAN_FEATURES', [])
