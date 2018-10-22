@@ -43,6 +43,10 @@ module QA
         end
       end
 
+      module Profile
+        autoload :Menu, 'qa/ee/page/profile/menu'
+      end
+
       module Project
         autoload :Show, 'qa/ee/page/project/show'
 

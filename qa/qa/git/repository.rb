@@ -61,8 +61,6 @@ module QA
       def configure_identity(name, email)
         run(%Q{git config user.name #{name}})
         run(%Q{git config user.email #{email}})
-
-        add_credentials_to_netrc
       end
 
       def commit_file(name, contents, message)
@@ -113,21 +111,17 @@ module QA
 
       attr_reader :uri, :username, :password, :known_hosts_file, :private_key_file
 
-      def debug?
-        Runtime::Env.respond_to?(:verbose?) && Runtime::Env.verbose?
-      end
-
       def ssh_key_set?
         !private_key_file.nil?
       end
 
       def run(command_str)
         command = [env_vars, command_str, '2>&1'].compact.join(' ')
-        warn "DEBUG: command=[#{command}]" if debug?
+        warn "DEBUG: command=[#{command}]" if Runtime::Env.verbose?
 
         output, _ = Open3.capture2(command)
         output = output.chomp.gsub(/\s+$/, '')
-        warn "DEBUG: output=[#{output}]" if debug?
+        warn "DEBUG: output=[#{output}]" if Runtime::Env.verbose?
 
         output
       end
