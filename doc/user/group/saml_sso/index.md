@@ -19,7 +19,7 @@ This allows SAML to be used for adding users to a group on GitLab.com and other 
 | Email | `email`, `mail` | (required) |
 | Full Name | `name` |  |
 | First Name | `first_name`, `firstname`, `firstName` |  |
-| Last Name | `last_name`, `lastname`, `firstName` |  |
+| Last Name | `last_name`, `lastname`, `lastName` |  |
 
 ## Providers
 
