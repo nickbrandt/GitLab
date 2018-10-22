@@ -117,11 +117,11 @@ module QA
 
       def run(command_str)
         command = [env_vars, command_str, '2>&1'].compact.join(' ')
-        warn "DEBUG: command=[#{command}]" if Runtime::Env.verbose?
+        warn "DEBUG: command=[#{command}]" if Runtime::Env.debug?
 
         output, _ = Open3.capture2(command)
         output = output.chomp.gsub(/\s+$/, '')
-        warn "DEBUG: output=[#{output}]" if Runtime::Env.verbose?
+        warn "DEBUG: output=[#{output}]" if Runtime::Env.debug?
 
         output
       end
