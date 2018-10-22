@@ -22,6 +22,7 @@ describe Project do
     it { is_expected.to have_many(:source_pipelines) }
     it { is_expected.to have_many(:audit_events).dependent(false) }
     it { is_expected.to have_many(:protected_environments) }
+    it { is_expected.to have_many(:approver_groups).dependent(:destroy) }
   end
 
   describe 'validations' do
