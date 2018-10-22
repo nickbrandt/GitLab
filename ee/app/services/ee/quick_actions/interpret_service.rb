@@ -72,6 +72,17 @@ module EE
         @updates[:epic] = nil
       end
 
+      desc 'Approve a merge request'
+      explanation 'Approve the current merge request'
+      condition do
+        issuable.is_a?(MergeRequest) && issuable.persisted? && issuable.can_approve?(current_user)
+      end
+      command :approve do
+        if issuable.can_approve?(current_user)
+          ::MergeRequests::ApprovalService.new(issuable.project, current_user).execute(issuable)
+        end
+      end
+
       def extract_epic(params)
         return nil if params.nil?
 

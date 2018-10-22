@@ -51,6 +51,7 @@ discussions, and descriptions:
 | `/move path/to/project`    | Move this issue to another project | ✓ |               |
 | `/target_branch <Local branch Name>` | Set target branch    |       | ✓             |
 | `/wip`                     | Toggle the Work In Progress status |   | ✓             |
+| `/approve`                 | Approve the merge request      |       | ✓             |
 | `/merge`                   | Merge (when pipeline succeeds) |       | ✓             |
 
 

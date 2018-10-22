@@ -177,6 +177,30 @@ describe QuickActions::InterpretService do
         end
       end
     end
+
+    context 'approve command' do
+      let(:merge_request) { create(:merge_request, source_project: project) }
+      let(:content) { '/approve' }
+
+      it 'approves the current merge request' do
+        service.execute(content, merge_request)
+
+        expect(merge_request.approved_by_users).to eq([current_user])
+      end
+
+      context "when the user can't approve" do
+        before do
+          project.team.truncate
+          project.add_guest(current_user)
+        end
+
+        it 'does not approve the MR' do
+          service.execute(content, merge_request)
+
+          expect(merge_request.approved_by_users).to be_empty
+        end
+      end
+    end
   end
 
   describe '#explain' do
