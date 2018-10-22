@@ -15,11 +15,21 @@ module QA
             element :group_settings_item
           end
 
+          view 'ee/app/views/layouts/nav/ee/_epic_link.html.haml' do
+            element :group_epics_link
+          end
+
           def go_to_saml_sso_group_settings
             hover_settings do
               within_submenu do
-                click_element :group_saml_sso_link
+                click_element(:group_saml_sso_link)
               end
+            end
+          end
+
+          def go_to_group_epics
+            within_sidebar do
+              click_element(:group_epics_link)
             end
           end
 
