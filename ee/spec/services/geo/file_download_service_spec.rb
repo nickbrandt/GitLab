@@ -11,6 +11,28 @@ describe Geo::FileDownloadService do
     stub_current_geo_node(secondary)
   end
 
+  shared_examples_for 'a service that handles orphaned uploads' do |file_type|
+    let(:download_service) { described_class.new(file_type, file.id) }
+    let(:registry) { Geo::FileRegistry }
+
+    before do
+      stub_exclusive_lease("file_download_service:#{file_type}:#{file.id}",
+        timeout: Geo::FileDownloadService::LEASE_TIMEOUT)
+
+      file.update_column(:model_id, 22222) # Not-existing record
+    end
+
+    it 'marks upload as successful and missing_on_primary' do
+      expect(Gitlab::Geo::Logger).to receive(:info).with(hash_including(:message,
+                                                                        :download_time_s,
+                                                                        download_success: true,
+                                                                        bytes_downloaded: 0,
+                                                                        primary_missing_file: true)).and_call_original
+
+      expect { download_service.execute }.to change { registry.synced.missing_on_primary.count }.by(1)
+    end
+  end
+
   shared_examples_for 'a service that downloads the file and registers the sync result' do |file_type|
     let(:download_service) { described_class.new(file_type, file.id) }
     let(:registry) { file_type == 'job_artifact' ? Geo::JobArtifactRegistry : Geo::FileRegistry }
@@ -276,51 +298,59 @@ describe Geo::FileDownloadService do
 
   describe '#execute' do
     context 'user avatar' do
-      it_behaves_like "a service that downloads the file and registers the sync result", 'avatar' do
-        let(:file) { create(:upload, model: build(:user)) }
-      end
+      let(:file) { create(:upload, model: build(:user)) }
+
+      it_behaves_like "a service that downloads the file and registers the sync result", 'avatar'
+      it_behaves_like 'a service that handles orphaned uploads', 'avatar'
     end
 
     context 'group avatar' do
-      it_behaves_like "a service that downloads the file and registers the sync result", 'avatar' do
-        let(:file) { create(:upload, model: build(:group)) }
-      end
+      let(:file) { create(:upload, model: build(:group)) }
+
+      it_behaves_like "a service that downloads the file and registers the sync result", 'avatar'
+      it_behaves_like 'a service that handles orphaned uploads', 'avatar'
     end
 
     context 'project avatar' do
-      it_behaves_like "a service that downloads the file and registers the sync result", 'avatar' do
-        let(:file) { create(:upload, model: build(:project)) }
-      end
+      let(:file) { create(:upload, model: build(:project)) }
+
+      it_behaves_like "a service that downloads the file and registers the sync result", 'avatar'
+      it_behaves_like 'a service that handles orphaned uploads', 'avatar'
     end
 
     context 'with an attachment' do
-      it_behaves_like "a service that downloads the file and registers the sync result", 'attachment' do
-        let(:file) { create(:upload, :attachment_upload) }
-      end
+      let(:file) { create(:upload, :attachment_upload) }
+
+      it_behaves_like "a service that downloads the file and registers the sync result", 'attachment'
+      it_behaves_like 'a service that handles orphaned uploads', 'attachment'
     end
 
     context 'with a favicon' do
-      it_behaves_like "a service that downloads the file and registers the sync result", 'favicon' do
-        let(:file) { create(:upload, :favicon_upload) }
-      end
+      let(:file) { create(:upload, :favicon_upload) }
+
+      it_behaves_like "a service that downloads the file and registers the sync result", 'favicon'
+      it_behaves_like 'a service that handles orphaned uploads', 'favicon'
     end
 
     context 'with a snippet' do
-      it_behaves_like "a service that downloads the file and registers the sync result", 'personal_file' do
-        let(:file) { create(:upload, :personal_snippet_upload) }
-      end
+      let(:file) { create(:upload, :personal_snippet_upload) }
+
+      it_behaves_like "a service that downloads the file and registers the sync result", 'personal_file'
+      it_behaves_like 'a service that handles orphaned uploads', 'personal_file'
     end
 
     context 'with file upload' do
-      it_behaves_like "a service that downloads the file and registers the sync result", 'file' do
-        let(:file) { create(:upload, :issuable_upload) }
-      end
+      let(:file) { create(:upload, :issuable_upload) }
+
+      it_behaves_like "a service that downloads the file and registers the sync result", 'file'
+      it_behaves_like 'a service that handles orphaned uploads', 'file'
     end
 
     context 'with namespace file upload' do
-      it_behaves_like "a service that downloads the file and registers the sync result", 'namespace_file' do
-        let(:file) { create(:upload, :namespace_upload) }
-      end
+      let(:file) { create(:upload, :namespace_upload) }
+
+      it_behaves_like "a service that downloads the file and registers the sync result", 'namespace_file'
+      it_behaves_like 'a service that handles orphaned uploads', 'namespace_file'
     end
 
     context 'LFS object' do
@@ -336,9 +366,10 @@ describe Geo::FileDownloadService do
     end
 
     context 'Import/Export' do
-      it_behaves_like "a service that downloads the file and registers the sync result", 'import_export' do
-        let(:file) { create(:upload, model: build(:import_export_upload)) }
-      end
+      let(:file) { create(:upload, model: build(:import_export_upload)) }
+
+      it_behaves_like "a service that downloads the file and registers the sync result", 'import_export'
+      it_behaves_like 'a service that handles orphaned uploads', 'import_export'
     end
 
     context 'bad object type' do
