@@ -78,7 +78,6 @@ class Project < ActiveRecord::Base
   default_value_for :wiki_enabled, gitlab_config_features.wiki
   default_value_for :snippets_enabled, gitlab_config_features.snippets
   default_value_for :only_allow_merge_if_all_discussions_are_resolved, false
-  default_value_for :only_mirror_protected_branches, true
 
   add_authentication_token_field :runners_token
 
@@ -140,7 +139,6 @@ class Project < ActiveRecord::Base
   # Project services
   has_one :campfire_service
   has_one :drone_ci_service
-  has_one :gitlab_slack_application_service
   has_one :emails_on_push_service
   has_one :pipelines_email_service
   has_one :irker_service
@@ -545,14 +543,6 @@ class Project < ActiveRecord::Base
   def ancestors_upto(top = nil)
     Gitlab::GroupHierarchy.new(Group.where(id: namespace_id))
       .base_and_ancestors(upto: top)
-  end
-
-  def root_namespace
-    if namespace.has_parent?
-      namespace.root_ancestor
-    else
-      namespace
-    end
   end
 
   def lfs_enabled?
@@ -1297,7 +1287,6 @@ class Project < ActiveRecord::Base
 
   # Expires various caches before a project is renamed.
   def expire_caches_before_rename(old_path)
-    # TODO: if we start using UUIDs for cache, we don't need to do this HACK anymore
     repo = Repository.new(old_path, self)
     wiki = Repository.new("#{old_path}.wiki", self)
 
