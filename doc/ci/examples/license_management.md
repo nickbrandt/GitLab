@@ -12,18 +12,13 @@ You can then add a new job to `.gitlab-ci.yml`, called `license_management`:
 
 ```yaml
 license_management:
-  image: docker:stable
+  image: 
+    name: "registry.gitlab.com/gitlab-org/security-products/license-management:$CI_SERVER_VERSION_MAJOR-$CI_SERVER_VERSION_MINOR-stable"
+    entrypoint: [""]
   stage: test
-  variables:
-    DOCKER_DRIVER: overlay2
   allow_failure: true
-  services:
-    - docker:stable-dind
   script:
-    - export LICENSE_MANAGEMENT_VERSION=$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')
-    - docker run
-        --volume "$PWD:/code"
-        "registry.gitlab.com/gitlab-org/security-products/license-management:$LICENSE_MANAGEMENT_VERSION" analyze /code
+    - /run.sh analyze .
   artifacts:
     paths: [gl-license-management-report.json]
 ```
