@@ -9,14 +9,27 @@ class Projects::IssuesController < Projects::ApplicationController
   include IssuesCalendar
   include SpammableActions
 
-  prepend_before_action :authenticate_user!, only: [:new, :export_csv]
+  prepend ::EE::Projects::IssuesController
 
-  before_action :whitelist_query_limiting_ee, only: [:update]
+  def self.authenticate_user_only_actions
+    %i[new]
+  end
+
+  def self.issue_except_actions
+    %i[index calendar new create bulk_update]
+  end
+
+  def self.set_issuables_index_only_actions
+    %i[index calendar]
+  end
+
+  prepend_before_action :authenticate_user!, only: authenticate_user_only_actions
+
   before_action :whitelist_query_limiting, only: [:create, :create_merge_request, :move, :bulk_update]
   before_action :check_issues_available!
-  before_action :issue, except: [:index, :calendar, :new, :create, :bulk_update, :export_csv]
+  before_action :issue, except: issue_except_actions
 
-  before_action :set_issuables_index, only: [:index, :calendar]
+  before_action :set_issuables_index, only: set_issuables_index_only_actions
 
   # Allow write(create) issue
   before_action :authorize_create_issue!, only: [:new, :create]
@@ -26,8 +39,6 @@ class Projects::IssuesController < Projects::ApplicationController
 
   # Allow create a new branch and empty WIP merge request from current issue
   before_action :authorize_create_merge_request_from!, only: [:create_merge_request]
-
-  prepend ::EE::Projects::IssuesController
 
   respond_to :html
 
@@ -253,9 +264,5 @@ class Projects::IssuesController < Projects::ApplicationController
     # 2. https://gitlab.com/gitlab-org/gitlab-ce/issues/42424
     # 3. https://gitlab.com/gitlab-org/gitlab-ce/issues/42426
     Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/42422')
-  end
-
-  def whitelist_query_limiting_ee
-    Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ee/issues/4794')
   end
 end

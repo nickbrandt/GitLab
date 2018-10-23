@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module Projects
     module IssuesController
@@ -6,8 +8,26 @@ module EE
       prepended do
         before_action :check_export_issues_available!, only: [:export_csv]
         before_action :check_service_desk_available!, only: [:service_desk]
-        before_action :set_issuables_index, only: [:index, :calendar, :service_desk]
-        skip_before_action :issue, only: [:service_desk]
+        before_action :whitelist_query_limiting_ee, only: [:update]
+      end
+
+      class_methods do
+        extend ::Gitlab::Utils::Override
+
+        override :authenticate_user_only_actions
+        def authenticate_user_only_actions
+          super + %i[export_csv]
+        end
+
+        override :issue_except_actions
+        def issue_except_actions
+          super + %i[export_csv service_desk]
+        end
+
+        override :set_issuables_index_only_actions
+        def set_issuables_index_only_actions
+          super + %i[service_desk]
+        end
       end
 
       def service_desk
@@ -45,6 +65,10 @@ module EE
 
       def service_desk?
         action_name == 'service_desk'
+      end
+
+      def whitelist_query_limiting_ee
+        ::Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ee/issues/4794')
       end
     end
   end
