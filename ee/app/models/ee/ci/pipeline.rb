@@ -19,12 +19,12 @@ module EE
 
         # This structure describes feature levels
         # to access the file types for given reports
-        LEGACY_REPORT_LICENSED_FEATURES = {
+        REPORT_LICENSED_FEATURES = {
           codequality: nil,
-          sast: :sast,
-          dependency_scanning: :dependency_scanning,
-          container_scanning: :sast_container,
-          dast: :dast
+          sast: %i[sast],
+          dependency_scanning: %i[dependency_scanning],
+          container_scanning: %i[container_scanning sast_container],
+          dast: %i[dast]
         }.freeze
 
         # Deprecated, to be removed in 12.0
@@ -112,8 +112,8 @@ module EE
       private
 
       def available_licensed_report_type?(file_type)
-        feature_name = LEGACY_REPORT_LICENSED_FEATURES.fetch(file_type)
-        feature_name.nil? || project.feature_available?(feature_name)
+        feature_names = REPORT_LICENSED_FEATURES.fetch(file_type)
+        feature_names.nil? || feature_names.any? { |feature| project.feature_available?(feature) }
       end
 
       def artifacts_with_files
