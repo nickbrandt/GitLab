@@ -499,7 +499,9 @@ describe API::Internal do
         it 'responds with a gateway timeout' do
           personal_project = create(:project, namespace: user.namespace)
 
-          allow_any_instance_of(Gitlab::GitAccess).to receive(:check).and_raise(Gitlab::GitAccess::TimeoutError, "Foo")
+          expect_next_instance_of(Gitlab::GitAccess) do |access|
+            expect(access).to receive(:check).and_raise(Gitlab::GitAccess::TimeoutError, "Foo")
+          end
           push(key, personal_project)
 
           expect(response).to have_gitlab_http_status(503)

@@ -29,7 +29,8 @@ module Gitlab
         tag_checks: "Checking if you are allowed to change existing tags...",
         protected_tag_checks: "Checking if you are creating, updating or deleting a protected tag...",
         lfs_objects_exist_check: "Scanning repository for blobs stored in LFS and verifying their files have been uploaded to GitLab...",
-        commits_check_file_paths_validation: "Validating commits' file paths..."
+        commits_check_file_paths_validation: "Validating commits' file paths...",
+        commits_check: "Validating commits against blacklisted file names and locked paths..."
       }.freeze
 
       attr_reader :user_access, :project, :skip_authorization, :skip_lfs_integrity_check, :protocol, :oldrev, :newrev, :ref, :branch_name, :tag_name, :logger
@@ -157,12 +158,14 @@ module Gitlab
         return if deletion? || newrev.nil?
         return unless should_run_commit_validations?
 
-        # n+1: https://gitlab.com/gitlab-org/gitlab-ee/issues/3593
-        ::Gitlab::GitalyClient.allow_n_plus_1_calls do
-          commits.each do |commit|
-            logger.check_timeout_reached
+        logger.log_timed(LOG_MESSAGES[__method__]) do
+          # n+1: https://gitlab.com/gitlab-org/gitlab-ee/issues/3593
+          ::Gitlab::GitalyClient.allow_n_plus_1_calls do
+            commits.each do |commit|
+              logger.check_timeout_reached
 
-            commit_check.validate(commit, validations_for_commit(commit))
+              commit_check.validate(commit, validations_for_commit(commit))
+            end
           end
         end
 

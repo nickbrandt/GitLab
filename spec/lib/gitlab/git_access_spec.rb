@@ -1058,7 +1058,9 @@ describe Gitlab::GitAccess do
       it 'raises TimeoutError when #check_single_change_access raises a timeout error' do
         message = "Push operation timed out\n\nTiming information for debugging purposes:\nRunning checks for ref: wow"
 
-        allow_any_instance_of(Gitlab::Checks::ChangeAccess).to receive(:exec).and_raise(Gitlab::Checks::TimedLogger::TimeoutError)
+        expect_next_instance_of(Gitlab::Checks::ChangeAccess) do |check|
+          expect(check).to receive(:exec).and_raise(Gitlab::Checks::TimedLogger::TimeoutError)
+        end
 
         expect { access.check('git-receive-pack', changes) }.to raise_error(described_class::TimeoutError, message)
       end
