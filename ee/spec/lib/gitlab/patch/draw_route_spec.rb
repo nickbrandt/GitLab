@@ -39,4 +39,9 @@ describe Gitlab::Patch::DrawRoute do
       .with(File.read(subject.route_path('ee/config/routes/admin.rb')))
       .once
   end
+
+  it 'raises an error when nothing is drawn' do
+    expect { subject.draw(:non_existing) }
+      .to raise_error(described_class::RoutesNotFound)
+  end
 end

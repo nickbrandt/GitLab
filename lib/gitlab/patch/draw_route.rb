@@ -5,6 +5,8 @@
 module Gitlab
   module Patch
     module DrawRoute
+      prepend EE::Gitlab::Patch::DrawRoute
+
       RoutesNotFound = Class.new(StandardError)
 
       def draw(routes_name)
@@ -16,8 +18,8 @@ module Gitlab
         draw_route(route_path("config/routes/#{routes_name}.rb"))
       end
 
-      def draw_ee(routes_name)
-        draw_route(route_path("ee/config/routes/#{routes_name}.rb"))
+      def draw_ee(_)
+        true
       end
 
       def route_path(routes_name)
