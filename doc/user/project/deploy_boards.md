@@ -60,6 +60,14 @@ specific environment, there are lot of uses cases. To name a few:
 To display the Deploy Boards for a specific [environment] you should:
 
 1. Have a Kubernetes cluster up and running.
+
+    NOTE: **Running on OpenShift:**
+    If you are using OpenShift, ensure that you're using the `Deployment` resource
+    instead of `DeploymentConfiguration`, otherwise the Deploy Boards won't render
+    correctly. For more information, read the
+    [OpenShift docs](https://docs.openshift.com/container-platform/3.7/dev_guide/deployments/kubernetes_deployments.html#kubernetes-deployments-vs-deployment-configurations)
+    and [GitLab issue #4584](https://gitlab.com/gitlab-org/gitlab-ee/issues/4584).
+
 1. [Configure GitLab Runner][runners] with the [Docker][docker-exec] or
    [Kubernetes][kube-exec] executor.
 1. Configure the [Kubernetes service][kube-service] in your project for the
