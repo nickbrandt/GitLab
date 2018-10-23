@@ -12,11 +12,8 @@ module Projects
   #
   #     Projects::AfterRenameService.new(project).execute
   class AfterRenameService
-<<<<<<< HEAD
     prepend ::EE::Projects::AfterRenameService
 
-=======
->>>>>>> upstream/master
     attr_reader :project, :full_path_before, :full_path_after, :path_before
 
     RenameFailedError = Class.new(StandardError)
