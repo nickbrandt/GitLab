@@ -21,7 +21,9 @@ module Ci
       sast: 'gl-sast-report.json',
       dependency_scanning: 'gl-dependency-scanning-report.json',
       container_scanning: 'gl-container-scanning-report.json',
-      dast: 'gl-dast-report.json'
+      dast: 'gl-dast-report.json',
+      license_management: 'gl-license-management-report.json',
+      performance: 'performance.json'
     }.freeze
 
     TYPE_AND_FORMAT_PAIRS = {
@@ -37,7 +39,9 @@ module Ci
       sast: :raw,
       dependency_scanning: :raw,
       container_scanning: :raw,
-      dast: :raw
+      dast: :raw,
+      license_management: :raw,
+      performance: :raw
     }.freeze
 
     belongs_to :project
@@ -83,7 +87,9 @@ module Ci
       dependency_scanning: 6, ## EE-specific
       container_scanning: 7, ## EE-specific
       dast: 8, ## EE-specific
-      codequality: 9 ## EE-specific
+      codequality: 9, ## EE-specific
+      license_management: 10, ## EE-specific
+      performance: 11 ## EE-specific
     }
 
     enum file_format: {
