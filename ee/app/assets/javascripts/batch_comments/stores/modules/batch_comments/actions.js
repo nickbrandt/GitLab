@@ -70,10 +70,11 @@ export const publishReview = ({ commit, dispatch, getters }) => {
 };
 
 export const updateDiscussionsAfterPublish = ({ dispatch, getters, rootGetters }) =>
-  dispatch('fetchDiscussions', getters.getNotesData.discussionsPath, { root: true }).then(() =>
-    dispatch('diffs/assignDiscussionsToDiff', rootGetters.discussionsStructuredByLineCode, {
-      root: true,
-    }),
+  dispatch('fetchDiscussions', { path: getters.getNotesData.discussionsPath }, { root: true }).then(
+    () =>
+      dispatch('diffs/assignDiscussionsToDiff', rootGetters.discussionsStructuredByLineCode, {
+        root: true,
+      }),
   );
 
 export const discardReview = ({ commit, getters }) => {
