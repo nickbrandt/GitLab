@@ -12,10 +12,6 @@ module QA
 
         attr_writer :remote_branch
 
-        product :output do |factory|
-          factory.output
-        end
-
         def initialize
           @file_name = 'file.txt'
           @file_content = '# This is test file'
@@ -59,11 +55,7 @@ module QA
               repository.use_default_credentials unless user
             end
 
-            # Needed so git-lfs can work as it uses HTTP for authentication
-            # regardless of git using SSH or HTTP.
-            #
             repository.use_lfs = use_lfs
-            repository.use_default_credentials
 
             username = 'GitLab QA'
             email = 'root@gitlab.com'
