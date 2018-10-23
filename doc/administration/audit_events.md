@@ -102,6 +102,16 @@ the filter drop-down. You can further filter by specific group, project or user
 
 ![audit log](audit_log.png)
 
+### Missing events
+
+Some events are not being tracked in Audit Events. Please see the following
+epics for more detail on which events are not being tracked and our progress
+on adding these events into GitLab:
+
+- [Project settings and activity](https://gitlab.com/groups/gitlab-org/-/epics/474)
+- [Group settings and activity](https://gitlab.com/groups/gitlab-org/-/epics/475)
+- [Instance-level settings and activity](https://gitlab.com/groups/gitlab-org/-/epics/476)
+
 [ee-2336]: https://gitlab.com/gitlab-org/gitlab-ee/issues/2336
 [ee]: https://about.gitlab.com/pricing/
 [permissions]: ../user/permissions.md
