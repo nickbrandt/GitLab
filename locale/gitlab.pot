@@ -5254,6 +5254,12 @@ msgstr ""
 msgid "No"
 msgstr ""
 
+<<<<<<< HEAD
+=======
+msgid "No Assignee"
+msgstr ""
+
+>>>>>>> upstream/master
 msgid "No Label"
 msgstr ""
 
@@ -7233,6 +7239,7 @@ msgstr ""
 msgid "Something went wrong while closing the %{issuable}. Please try again later"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Something went wrong while fetching %{listType} list"
 msgstr ""
 
@@ -7242,6 +7249,11 @@ msgstr ""
 msgid "Something went wrong while fetching group member contributions"
 msgstr ""
 
+=======
+msgid "Something went wrong while fetching comments. Please try again."
+msgstr ""
+
+>>>>>>> upstream/master
 msgid "Something went wrong while fetching the projects."
 msgstr ""
 
@@ -8374,6 +8386,9 @@ msgid "Unverified"
 msgstr ""
 
 msgid "Up to date"
+msgstr ""
+
+msgid "Upcoming"
 msgstr ""
 
 msgid "Update"

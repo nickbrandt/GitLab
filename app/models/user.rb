@@ -229,8 +229,11 @@ class User < ActiveRecord::Base
   delegate :path, to: :namespace, allow_nil: true, prefix: true
   delegate :notes_filter_for, to: :user_preference
   delegate :set_notes_filter, to: :user_preference
+<<<<<<< HEAD
 
   accepts_nested_attributes_for :namespace
+=======
+>>>>>>> upstream/master
 
   state_machine :state, initial: :active do
     event :block do
