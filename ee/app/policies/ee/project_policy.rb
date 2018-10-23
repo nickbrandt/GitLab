@@ -132,11 +132,11 @@ module EE
 
       rule { deploy_board_disabled & ~is_development }.prevent :read_deploy_board
 
-      rule { packages_disabled }.policy do
+      rule { packages_disabled | repository_disabled }.policy do
         prevent(*create_read_update_admin_destroy(:package))
       end
 
-      rule { feature_flags_disabled }.policy do
+      rule { feature_flags_disabled | repository_disabled }.policy do
         prevent(*create_read_update_admin_destroy(:feature_flag))
       end
 
