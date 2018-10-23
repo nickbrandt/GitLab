@@ -12,6 +12,9 @@ class PrometheusAlert < ActiveRecord::Base
   after_save :clear_prometheus_adapter_cache!
   after_destroy :clear_prometheus_adapter_cache!
 
+  validate :require_valid_environment_project!
+  validate :require_valid_metric_project!
+
   enum operator: [:lt, :eq, :gt]
 
   delegate :title, :query, to: :prometheus_metric
@@ -44,5 +47,17 @@ class PrometheusAlert < ActiveRecord::Base
 
   def clear_prometheus_adapter_cache!
     environment.clear_prometheus_reactive_cache!(:additional_metrics_environment)
+  end
+
+  def require_valid_environment_project!
+    return if project == environment&.project
+
+    errors.add(:environment, "invalid project")
+  end
+
+  def require_valid_metric_project!
+    return if project == prometheus_metric&.project
+
+    errors.add(:prometheus_metric, "invalid project")
   end
 end

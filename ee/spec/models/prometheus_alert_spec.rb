@@ -1,11 +1,37 @@
 require 'spec_helper'
 
 describe PrometheusAlert do
+  set(:project) { build(:project) }
   let(:metric) { create(:prometheus_metric) }
 
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to belong_to(:environment) }
+  end
+
+  describe 'project validations' do
+    let(:environment) { build(:environment, project: project) }
+    let(:metric) { build(:prometheus_metric, project: project) }
+
+    subject do
+      build(:prometheus_alert, prometheus_metric: metric, environment: environment, project: project)
+    end
+
+    context 'when environment and metric belongs same project' do
+      it { is_expected.to be_valid }
+    end
+
+    context 'when environment belongs to different project' do
+      let(:environment) { build(:environment) }
+
+      it { is_expected.not_to be_valid }
+    end
+
+    context 'when metric belongs to different project' do
+      let(:metric) { build(:prometheus_metric) }
+
+      it { is_expected.not_to be_valid }
+    end
   end
 
   describe '#full_query' do
