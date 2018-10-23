@@ -3,16 +3,12 @@
 require 'carrierwave/orm/activerecord'
 
 class Issue < ActiveRecord::Base
-  prepend EE::Issue
-  prepend EE::RelativePositioning
-
   include AtomicInternalId
   include IidRoutes
   include Issuable
   include Noteable
   include Referable
   include Spammable
-  include Elastic::IssuesSearch
   include FasterCacheKeys
   include RelativePositioning
   include TimeTrackable
@@ -44,9 +40,6 @@ class Issue < ActiveRecord::Base
 
   has_many :issue_assignees
   has_many :assignees, class_name: "User", through: :issue_assignees
-
-  has_one :epic_issue
-  has_one :epic, through: :epic_issue
 
   validates :project, presence: true
 
@@ -313,3 +306,5 @@ class Issue < ActiveRecord::Base
     Gitlab::EtagCaching::Store.new.touch(key)
   end
 end
+
+Issue.prepend(EE::Issue)
