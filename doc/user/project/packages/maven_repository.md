@@ -191,8 +191,7 @@ shows how to create a new package each time the `master` branch is updated:
     deploy:
       image: maven:3.3.9-jdk-8
       script:
-        - 'cp ci_settings.xml /root/.m2/settings.xml'
-        - 'mvn deploy'
+        - 'mvn deploy -s ci_settings.xml'
       only:
         - master
     ```
