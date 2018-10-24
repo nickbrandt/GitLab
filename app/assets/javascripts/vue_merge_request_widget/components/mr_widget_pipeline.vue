@@ -1,5 +1,6 @@
 <script>
 /* eslint-disable vue/require-default-prop */
+import { sprintf, __ } from '~/locale';
 import PipelineStage from '~/pipelines/components/stage.vue';
 import CiIcon from '~/vue_shared/components/ci_icon.vue';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -38,6 +39,11 @@ export default {
       type: String,
       required: false,
     },
+    troubleshootingDocsPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   computed: {
     hasPipeline() {
@@ -60,6 +66,12 @@ export default {
     },
     hasCommitInfo() {
       return this.pipeline.commit && Object.keys(this.pipeline.commit).length > 0;
+    },
+    errorText() {
+      return sprintf(__('Could not retrieve the pipeline status. For troubleshooting steps, read the %{linkStart}documentation.%{linkEnd}'), {
+        linkStart: `<a href="${this.troubleshootingDocsPath}">`,
+        linkEnd: '</a>',
+      });
     },
     /* We typically set defaults ([]) in the store or prop declarations, but because triggered
     * and triggeredBy are appended to `pipeline`, we can't set defaults in the store, and we
@@ -91,8 +103,10 @@ export default {
             name="status_failed_borderless"
           />
         </div>
-        <div class="media-body">
-          Could not retrieve the pipeline status. For potential solutions please read the <a :href="mr.troubleshootingDocsPath">documentation</a>.
+        <div
+          class="media-body"
+          v-html="errorText"
+        >
         </div>
       </template>
       <template v-else-if="hasPipeline">
