@@ -12,7 +12,10 @@ module EE
         has_one :chat_data, class_name: 'Ci::PipelineChatData'
 
         has_many :job_artifacts, through: :builds
+        has_many :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::OccurrencePipeline'
+        has_many :vulnerabilities, source: :occurrence, through: :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::Occurrence'
 
+        # Legacy way to fetch security reports based on job name. This has been replaced by the reports feature.
         scope :with_security_reports, -> {
           joins(:artifacts).where(ci_builds: { name: %w[sast dependency_scanning sast:container container_scanning dast] })
         }
@@ -53,6 +56,16 @@ module EE
             files: %w(gl-dast-report.json)
           }
         }.freeze
+
+        state_machine :status do
+          after_transition any => ::Ci::Pipeline::COMPLETED_STATUSES.map(&:to_sym) do |pipeline|
+            next unless pipeline.has_security_reports? && pipeline.default_branch?
+
+            pipeline.run_after_commit do
+              StoreSecurityReportsWorker.perform_async(pipeline.id)
+            end
+          end
+        end
       end
 
       def any_report_artifact_for_type(file_type)
@@ -107,6 +120,18 @@ module EE
       def expose_performance_data?
         project.feature_available?(:merge_request_performance_metrics) &&
           has_performance_data?
+      end
+
+      def has_security_reports?
+        complete? && builds.latest.with_security_reports.any?
+      end
+
+      def security_reports
+        ::Gitlab::Ci::Reports::Security::Reports.new.tap do |security_reports|
+          builds.latest.with_security_reports.each do |build|
+            build.collect_security_reports!(security_reports)
+          end
+        end
       end
 
       private

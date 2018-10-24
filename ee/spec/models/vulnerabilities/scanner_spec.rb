@@ -16,4 +16,26 @@ describe Vulnerabilities::Scanner do
     it { is_expected.to validate_presence_of(:project) }
     it { is_expected.to validate_uniqueness_of(:external_id).scoped_to(:project_id) }
   end
+
+  describe '.with_external_id' do
+    let(:external_id) { 'bandit' }
+
+    subject { described_class.with_external_id(external_id) }
+
+    context 'when scanner has the corresponding external_id' do
+      let!(:scanner) { create(:vulnerabilities_scanner, external_id: external_id) }
+
+      it 'selects the scanner' do
+        is_expected.to eq([scanner])
+      end
+    end
+
+    context 'when scanner does not have the corresponding external_id' do
+      let!(:scanner) { create(:vulnerabilities_scanner) }
+
+      it 'does not select the scanner' do
+        is_expected.to be_empty
+      end
+    end
+  end
 end
