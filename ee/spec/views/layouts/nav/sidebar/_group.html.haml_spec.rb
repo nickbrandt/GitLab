@@ -64,4 +64,26 @@ describe 'layouts/nav/sidebar/_group' do
       end
     end
   end
+
+  describe 'security dashboard tab' do
+    it 'is visible when user has enough permission' do
+      allow(view).to receive(:can?)
+        .with(anything, :read_group_security_dashboard, anything)
+        .and_return(true)
+
+      render
+
+      expect(rendered).to have_text 'Security Dashboard'
+    end
+
+    it 'is not visible when user does not have enough permission' do
+      allow(view).to receive(:can?)
+        .with(anything, :read_group_security_dashboard, anything)
+        .and_return(false)
+
+      render
+
+      expect(rendered).not_to have_text 'Security Dashboard'
+    end
+  end
 end
