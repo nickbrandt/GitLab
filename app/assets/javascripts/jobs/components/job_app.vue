@@ -86,6 +86,7 @@
         'emptyStateIllustration',
         'isScrollingDown',
         'emptyStateAction',
+        'hasRunnersForProject',
       ]),
 
       shouldRenderContent() {
@@ -201,7 +202,7 @@
         <stuck-block
           v-if="job.stuck"
           class="js-job-stuck"
-          :has-no-runners-for-project="job.runners.available && !job.runners.online"
+          :has-no-runners-for-project="hasRunnersForProject"
           :tags="job.tags"
           :runners-path="runnerSettingsUrl"
         />

@@ -229,4 +229,39 @@ describe('Job Store Getters', () => {
       });
     });
   });
+
+  describe('hasRunnersForProject', () => {
+    describe('with available and offline runners', () => {
+      it('returns true', () => {
+        localState.job.runners = {
+          available: true,
+          online: false
+        };
+
+        expect(getters.hasRunnersForProject(localState)).toEqual(true);
+      });
+    });
+
+    describe('with non available runners', () => {
+      it('returns false', () => {
+        localState.job.runners = {
+          available: false,
+          online: false
+        };
+
+        expect(getters.hasRunnersForProject(localState)).toEqual(false);
+      });
+    });
+
+    describe('with online runners', () => {
+      it('returns false', () => {
+        localState.job.runners = {
+          available: false,
+          online: true
+        };
+
+        expect(getters.hasRunnersForProject(localState)).toEqual(false);
+      });
+    });
+  });
 });
