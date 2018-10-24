@@ -23,6 +23,7 @@ describe('MRWidgetPipeline', () => {
           pipeline: mockData.pipeline,
           ciStatus: 'success',
           hasCi: true,
+          troubleshootingDocsPath: 'help',
         });
 
         expect(vm.hasPipeline).toEqual(true);
@@ -31,6 +32,7 @@ describe('MRWidgetPipeline', () => {
       it('should return false when there is no pipeline', () => {
         vm = mountComponent(Component, {
           pipeline: {},
+          troubleshootingDocsPath: 'help',
         });
 
         expect(vm.hasPipeline).toEqual(false);
@@ -43,6 +45,7 @@ describe('MRWidgetPipeline', () => {
           pipeline: mockData.pipeline,
           hasCi: true,
           ciStatus: 'success',
+          troubleshootingDocsPath: 'help',
         });
 
         expect(vm.hasCIError).toEqual(false);
@@ -53,6 +56,7 @@ describe('MRWidgetPipeline', () => {
           pipeline: mockData.pipeline,
           hasCi: true,
           ciStatus: null,
+          troubleshootingDocsPath: 'help',
         });
 
         expect(vm.hasCIError).toEqual(true);
@@ -66,11 +70,12 @@ describe('MRWidgetPipeline', () => {
         pipeline: mockData.pipeline,
         hasCi: true,
         ciStatus: null,
+          troubleshootingDocsPath: 'help',
       });
 
       expect(
         vm.$el.querySelector('.media-body').textContent.trim(),
-      ).toEqual('Could not retrieve the pipeline status. For potential solutions please read the documentation.');
+      ).toContain('Could not retrieve the pipeline status. For troubleshooting steps, read the <a href="help">documentation.</a>');
     });
 
     describe('with a pipeline', () => {
@@ -79,6 +84,7 @@ describe('MRWidgetPipeline', () => {
           pipeline: mockData.pipeline,
           hasCi: true,
           ciStatus: 'success',
+          troubleshootingDocsPath: 'help',
         });
       });
 
@@ -123,6 +129,7 @@ describe('MRWidgetPipeline', () => {
           pipeline: mockCopy.pipeline,
           hasCi: true,
           ciStatus: 'success',
+          troubleshootingDocsPath: 'help',
         });
       });
 
@@ -163,6 +170,7 @@ describe('MRWidgetPipeline', () => {
           pipeline: mockCopy.pipeline,
           hasCi: true,
           ciStatus: 'success',
+          troubleshootingDocsPath: 'help',
         });
 
         expect(
@@ -180,6 +188,7 @@ describe('MRWidgetPipeline', () => {
           pipeline: mockCopy.pipeline,
           hasCi: true,
           ciStatus: 'success',
+          troubleshootingDocsPath: 'help',
         });
 
         expect(vm.$el.querySelector('.js-mini-pipeline-graph')).toEqual(null);

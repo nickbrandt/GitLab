@@ -41,8 +41,7 @@ export default {
     },
     troubleshootingDocsPath: {
       type: String,
-      required: false,
-      default: '',
+      required: true,
     },
   },
   computed: {
