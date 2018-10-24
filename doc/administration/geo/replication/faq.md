@@ -12,25 +12,21 @@ Read the documentation for [Disaster Recovery](../disaster_recovery/index.md).
 We currently replicate project repositories, LFS objects, generated
 attachments / avatars and the whole database. This means user accounts,
 issues, merge requests, groups, project data, etc., will be available for
-query. We currently don't replicate artifact data (`shared/folder`).
+query.
 
 ## Can I git push to a secondary node?
 
-No. All writing operations (this includes `git push`) must be done in your
-primary node.
+Yes, you can push changes to a **secondary** node. The push will be proxied to the **primary** node.
 
 ## How long does it take to have a commit replicated to a secondary node?
 
-All replication operations are asynchronous and are queued to be dispatched in
-a batched request every 10 minutes. Besides that, it depends on a lot of other
+All replication operations are asynchronous and are queued to be dispatched. Therefore, it depends on a lot of
 factors including the amount of traffic, how big your commit is, the
 connectivity between your nodes, your hardware, etc.
 
 ## What if the SSH server runs at a different port?
 
-We send the clone url from the primary server to any secondaries, so it
-doesn't matter. If primary is running on port `2200`, clone url will reflect
-that.
+That's totally fine.  We use HTTP(s) to fetch repository changes from the **primary** node to **secondary** nodes.
 
 ## Is this possible to set up a Docker Registry for a secondary node that mirrors the one on a primary node?
 
