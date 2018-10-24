@@ -42,7 +42,7 @@ module EE
 
           logger.log_timed(LOG_MESSAGES[__method__]) do
             max_file_size = push_rule.max_file_size
-            blobs = project.repository.new_blobs(newrev)
+            blobs = project.repository.new_blobs(newrev, dynamic_timeout: logger.time_left)
 
             large_blob = blobs.find do |blob|
               ::Gitlab::Utils.bytes_to_megabytes(blob.size) > max_file_size
