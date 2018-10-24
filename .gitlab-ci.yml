@@ -80,6 +80,7 @@ stages:
     - mysql:5.7
     - redis:alpine
 
+<<<<<<< HEAD
 # BEGIN EE-only service helpers
 
 .use-pg-9-6: &use-pg-9-6
@@ -106,6 +107,8 @@ stages:
 
 # END EE-only service helpers
 
+=======
+>>>>>>> upstream/master
 .rails5: &rails5
   allow_failure: true
   only:
@@ -1192,5 +1195,9 @@ schedule:review_apps_cleanup:
       - schedules@gitlab-org/gitlab-ee
     kubernetes: active
   except:
+<<<<<<< HEAD
+=======
+    - master
+>>>>>>> upstream/master
     - tags
     - /(^docs[\/-].*|.*-docs$)/

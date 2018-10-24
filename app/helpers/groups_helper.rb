@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 module GroupsHelper
+<<<<<<< HEAD
   prepend EE::GroupsHelper
 
+=======
+>>>>>>> upstream/master
   def group_overview_nav_link_paths
     %w[
       groups#show
