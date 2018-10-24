@@ -18,7 +18,7 @@ describe Geo::RepositoryVerification::Secondary::SchedulerWorker, :postgresql, :
 
   describe '#perform' do
     it 'skips verification for repositories on other shards' do
-      create(:project, repository_storage: 'broken')
+      create(:project, :broken_storage)
 
       allow(Gitlab::GitalyClient).to receive(:call) do
         raise GRPC::Unavailable.new('No Gitaly available')
@@ -43,7 +43,7 @@ describe Geo::RepositoryVerification::Secondary::SchedulerWorker, :postgresql, :
     end
 
     it 'skips verification for projects with downed Gitaly server' do
-      create(:project, repository_storage: 'broken')
+      create(:project, :broken_storage)
 
       expect(Gitlab::HealthChecks::GitalyCheck).to receive(:readiness)
         .and_return([result(true, healthy_shard), result(false, 'broken')])
