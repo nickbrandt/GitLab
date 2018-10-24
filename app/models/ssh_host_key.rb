@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Detected SSH host keys are transiently stored in Redis
 class SshHostKey
   class Fingerprint < Gitlab::SSHPublicKey
@@ -41,11 +43,12 @@ class SshHostKey
       .select(&:valid?)
   end
 
-  attr_reader :project, :url
+  attr_reader :project, :url, :compare_host_keys
 
-  def initialize(project:, url:)
+  def initialize(project:, url:, compare_host_keys: nil)
     @project = project
     @url = normalize_url(url)
+    @compare_host_keys = compare_host_keys
   end
 
   def id
@@ -54,7 +57,7 @@ class SshHostKey
 
   def as_json(*)
     {
-      changes_project_import_data: changes_project_import_data?,
+      host_keys_changed: host_keys_changed?,
       fingerprints: fingerprints,
       known_hosts: known_hosts
     }
@@ -68,15 +71,10 @@ class SshHostKey
     @fingerprints ||= self.class.fingerprint_host_keys(known_hosts)
   end
 
-  # Returns true if the known_hosts data differs from that currently set for
-  # `project.import_data.ssh_known_hosts`. Ordering is ignored.
-  #
-  # Ordering is ignored
-  def changes_project_import_data?
-    our_known_hosts = known_hosts
-    project_known_hosts = project.import_data&.ssh_known_hosts
-
-    cleanup(our_known_hosts.to_s) != cleanup(project_known_hosts.to_s)
+  # Returns true if the known_hosts data differs from the version passed in at
+  # initialization as `compare_host_keys`. Comments, ordering, etc, is ignored
+  def host_keys_changed?
+    cleanup(known_hosts) != cleanup(compare_host_keys)
   end
 
   def error
@@ -112,6 +110,7 @@ class SshHostKey
   # Remove comments and duplicate entries
   def cleanup(data)
     data
+      .to_s
       .each_line
       .map { |line| line unless line.start_with?('#') || line.chomp.empty? }
       .compact

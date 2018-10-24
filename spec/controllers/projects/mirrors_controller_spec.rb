@@ -115,7 +115,7 @@ describe Projects::MirrorsController do
         do_get(project)
 
         expect(response).to have_gitlab_http_status(200)
-        expect(json_response).to eq('known_hosts' => ssh_key, 'fingerprints' => [ssh_fp.stringify_keys], 'changes_project_import_data' => true)
+        expect(json_response).to eq('known_hosts' => ssh_key, 'fingerprints' => [ssh_fp.stringify_keys], 'host_keys_changed' => true)
       end
     end
 

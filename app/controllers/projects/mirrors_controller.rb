@@ -47,7 +47,7 @@ class Projects::MirrorsController < Projects::ApplicationController
   end
 
   def ssh_host_keys
-    lookup = SshHostKey.new(project: project, url: params[:ssh_url])
+    lookup = SshHostKey.new(project: project, url: params[:ssh_url], compare_host_keys: params[:compare_host_keys])
 
     if lookup.error.present?
       # Failed to read keys

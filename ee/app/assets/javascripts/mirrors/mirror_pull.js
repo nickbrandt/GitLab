@@ -13,6 +13,7 @@ export default class MirrorPull {
     this.$form = $(formSelector);
 
     this.$repositoryUrl = this.$form.find('.js-repo-url');
+    this.$knownHosts = this.$form.find('.js-known-hosts');
 
     this.$sectionSSHHostKeys = this.$form.find('.js-ssh-host-keys-section');
     this.$hostKeysInformation = this.$form.find('.js-fingerprint-ssh-info');
@@ -34,7 +35,7 @@ export default class MirrorPull {
     this.handleRepositoryUrlInput(true);
 
     this.$repositoryUrl.on('keyup', () => this.handleRepositoryUrlInput());
-    this.$form.find('.js-known-hosts').on('keyup', e => this.handleSSHKnownHostsInput(e));
+    this.$knownHosts.on('keyup', e => this.handleSSHKnownHostsInput(e));
     this.$dropdownAuthType.on('change', e => this.handleAuthTypeChange(e));
     this.$btnDetectHostKeys.on('click', e => this.handleDetectHostKeys(e));
     this.$btnSSHHostsShowAdvanced.on('click', e => this.handleSSHHostsAdvanced(e));
@@ -85,6 +86,7 @@ export default class MirrorPull {
   handleDetectHostKeys() {
     const projectMirrorSSHEndpoint = this.$form.data('project-mirror-ssh-endpoint');
     const repositoryUrl = this.$repositoryUrl.val();
+    const currentKnownHosts = this.$knownHosts.val();
     const $btnLoadSpinner = this.$btnDetectHostKeys.find('.js-spinner');
 
     // Disable button while we make request
@@ -94,7 +96,7 @@ export default class MirrorPull {
     // Make backOff polling to get data
     backOff((next, stop) => {
       axios
-        .get(`${projectMirrorSSHEndpoint}?ssh_url=${repositoryUrl}`)
+        .get(`${projectMirrorSSHEndpoint}?ssh_url=${repositoryUrl}&compare_host_keys=${encodeURIComponent(currentKnownHosts)}`)
         .then(({ data, status }) => {
           if (status === 204) {
             this.backOffRequestCounter += 1;
@@ -114,7 +116,7 @@ export default class MirrorPull {
         // Once data is received, we show verification info along with Host keys and fingerprints
         this.$hostKeysInformation
           .find('.js-fingerprint-verification')
-          .collapse(res.changes_project_import_data ? 'hide' : 'show');
+          .collapse(res.host_keys_changed ? 'hide' : 'show');
         if (res.known_hosts && res.fingerprints) {
           this.showSSHInformation(res);
         }
