@@ -12,6 +12,8 @@ describe StorageShard do
 
   describe '.build_digest' do
     it 'returns SHA1 digest for the current configuration' do
+      allow(Settings.repositories.storages).to receive(:keys).and_return(%w[default broken])
+
       expect(described_class.build_digest).to eq('aea7849c10b886c202676ff34ce9fdf0940567b8')
     end
   end
