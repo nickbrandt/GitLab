@@ -359,7 +359,7 @@ describe GeoNode, type: :model do
   end
 
   describe '#projects_include?' do
-    let(:unsynced_project) { create(:project, repository_storage: 'broken') }
+    let(:unsynced_project) { create(:project, :broken_storage) }
 
     it 'returns true without selective sync' do
       expect(node.projects_include?(unsynced_project.id)).to eq true
@@ -406,7 +406,7 @@ describe GeoNode, type: :model do
     let(:nested_group_1) { create(:group, parent: group_1) }
     let!(:project_1) { create(:project, group: group_1) }
     let!(:project_2) { create(:project, group: nested_group_1) }
-    let!(:project_3) { create(:project, group: group_2, repository_storage: 'broken') }
+    let!(:project_3) { create(:project, :broken_storage, group: group_2) }
 
     it 'returns all projects without selective sync' do
       expect(node.projects).to match_array([project_1, project_2, project_3])

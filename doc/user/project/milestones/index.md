@@ -74,7 +74,8 @@ From the project issue/merge request list pages and the group issue/merge reques
 
 When filtering by milestone, in addition to choosing a specific project milestone or group milestone, you can choose a special milestone filter.
 
-- **No Milestone**: Show issues or merge requests with no assigned milestone.
+- **None**: Show issues or merge requests with no assigned milestone.
+- **Any**: Show issues or merge requests that have an assigned milestone.
 - **Upcoming**: Show issues or merge requests that have been assigned the open milestone that has the next upcoming due date (i.e. nearest due date in the future).
 - **Started**: Show issues or merge requests that have an assigned milestone with a start date that is before today.
 

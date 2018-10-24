@@ -5254,6 +5254,9 @@ msgstr ""
 msgid "No"
 msgstr ""
 
+msgid "No Assignee"
+msgstr ""
+
 msgid "No Label"
 msgstr ""
 
@@ -8374,6 +8377,9 @@ msgid "Unverified"
 msgstr ""
 
 msgid "Up to date"
+msgstr ""
+
+msgid "Upcoming"
 msgstr ""
 
 msgid "Update"

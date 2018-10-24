@@ -24,8 +24,8 @@ describe Geo::RepositorySyncWorker, :geo, :clean_gitlab_redis_cache do
   describe '#perform' do
     context 'additional shards' do
       it 'skips backfill for repositories on other shards' do
-        create(:project, group: synced_group, repository_storage: 'broken')
-        unhealthy_dirty = create(:project, group: synced_group, repository_storage: 'broken')
+        create(:project, :broken_storage, group: synced_group)
+        unhealthy_dirty = create(:project, :broken_storage, group: synced_group)
         create(:geo_project_registry, :synced, :repository_dirty, project: unhealthy_dirty)
 
         allow(Gitlab::GitalyClient).to receive(:call) do
@@ -68,8 +68,8 @@ describe Geo::RepositorySyncWorker, :geo, :clean_gitlab_redis_cache do
       end
 
       it 'skips backfill for projects with downed Gitaly server' do
-        create(:project, group: synced_group, repository_storage: 'broken')
-        unhealthy_dirty = create(:project, group: synced_group, repository_storage: 'broken')
+        create(:project, :broken_storage, group: synced_group)
+        unhealthy_dirty = create(:project, :broken_storage, group: synced_group)
 
         create(:geo_project_registry, :synced, :repository_dirty, project: unhealthy_dirty)
 
