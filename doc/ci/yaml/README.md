@@ -2032,8 +2032,4 @@ CI with various languages.
 [schedules]: ../../user/project/pipelines/schedules.md
 [variables-expressions]: ../variables/README.md#variables-expressions
 [ee]: https://about.gitlab.com/gitlab-ee/
-<<<<<<< HEAD
 [gitlab-versions]: https://about.gitlab.com/products/
-=======
-[gitlab-versions]: https://about.gitlab.com/products/
->>>>>>> upstream/master
