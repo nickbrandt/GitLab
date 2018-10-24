@@ -7,7 +7,7 @@ module Gitlab
         class Sast
           SastParserError = Class.new(StandardError)
 
-          METADATA_VERSION = 'sast:1.3'
+          METADATA_VERSION = '1.2'
 
           def parse!(json_data, report)
             vulnerabilities = JSON.parse!(json_data)
@@ -39,7 +39,9 @@ module Gitlab
               scanner: scanner,
               identifiers: identifiers,
               raw_metadata: data.to_json,
-              metadata_version: METADATA_VERSION # hardcoded untill provided in the report
+              # Version is hardcoded here untill provided in the report.
+              # See https://gitlab.com/gitlab-org/gitlab-ee/issues/8025
+              metadata_version: METADATA_VERSION
             )
           end
 
