@@ -1,5 +1,5 @@
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
-import { parsePikadayDate } from '~/lib/utils/datefix';
+import { parsePikadayDate } from '~/lib/utils/datetime_utility';
 
 import { PRESET_TYPES } from '../constants';
 
