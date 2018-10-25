@@ -50,6 +50,13 @@ describe OmniAuth::Strategies::GroupSaml, type: :strategy do
 
         expect(auth_hash[:info]['email']).to eq("user@example.com")
       end
+
+      it 'sets omniauth setings from configured settings' do
+        post "/groups/my-group/-/saml/callback", SAMLResponse: saml_response
+
+        options = last_request.env['omniauth.strategy'].options
+        expect(options['idp_cert_fingerprint']).to eq fingerprint
+      end
     end
 
     context 'with invalid SAMLResponse' do

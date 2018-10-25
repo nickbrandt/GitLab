@@ -33,9 +33,11 @@ module Gitlab
           path.match(path_regex).try(:[], :group)
         end
 
-        def path_from_params
-          params = Rack::Request.new(env).params
+        def params
+          @params ||= Rack::Request.new(env).params
+        end
 
+        def path_from_params
           params['group_path']
         end
       end
