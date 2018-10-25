@@ -3,15 +3,15 @@ module QA
     module Factory
       class License < QA::Factory::Base
         def fabricate!(license)
-          QA::Page::Main::Login.act { sign_in_using_admin_credentials }
-          QA::Page::Main::Menu.act { go_to_admin_area }
-          QA::Page::Admin::Menu.act { go_to_license }
+          QA::Page::Main::Login.perform(&:sign_in_using_admin_credentials)
+          QA::Page::Main::Menu.perform(&:go_to_admin_area)
+          QA::Page::Admin::Menu.perform(&:go_to_license)
 
-          EE::Page::Admin::License.act(license) do |key|
-            add_new_license(key) unless license?
+          EE::Page::Admin::License.perform do |page|
+            page.add_new_license(license) unless page.license?
           end
 
-          QA::Page::Main::Menu.act { sign_out }
+          QA::Page::Main::Menu.perform(&:sign_out)
         end
       end
     end
