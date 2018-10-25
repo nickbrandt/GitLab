@@ -41,6 +41,7 @@ export const emptyStateIllustration = state =>
   (state.job && state.job.status && state.job.status.illustration) || {};
 
 export const emptyStateAction = state =>  (state.job && state.job.status && state.job.status.action) || {};
+<<<<<<< HEAD
 
 // ee-only start
 /**
@@ -54,6 +55,8 @@ export const shouldRenderSharedRunnerLimitWarning = state =>
   !_.isEmpty(state.job.runners.quota) &&
   state.job.runners.quota.used >= state.job.runners.quota.limit;
 // ee-only end
+=======
+>>>>>>> upstream/master
 
 export const isScrollingDown = state => isScrolledToBottom() && !state.isTraceComplete;
 

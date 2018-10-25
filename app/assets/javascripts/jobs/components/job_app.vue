@@ -81,7 +81,10 @@
         'shouldRenderCalloutMessage',
         'shouldRenderTriggeredLabel',
         'hasEnvironment',
+<<<<<<< HEAD
         'shouldRenderSharedRunnerLimitWarning',
+=======
+>>>>>>> upstream/master
         'hasTrace',
         'emptyStateIllustration',
         'isScrollingDown',
