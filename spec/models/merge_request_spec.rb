@@ -2180,7 +2180,7 @@ describe MergeRequest do
       end
     end
 
-    let(:project) { create(:project) }
+    let(:project) { create(:project, :repository) }
     let(:merge_request) { create(:merge_request, source_project: project, author: author) }
     let(:author) { create(:user) }
     let(:approver) { create(:user) }

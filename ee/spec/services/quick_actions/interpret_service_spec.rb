@@ -6,7 +6,7 @@ describe QuickActions::InterpretService do
   let(:user2) { create(:user) }
   let(:user3) { create(:user) }
   let(:group) { create(:group) }
-  let(:project) { create(:project, :public, group: group) }
+  let(:project) { create(:project, :repository, :public, group: group) }
   let(:issue) { create(:issue, project: project) }
   let(:service) { described_class.new(project, current_user) }
 
