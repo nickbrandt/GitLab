@@ -203,6 +203,7 @@ describe('MRWidgetPipeline', () => {
           }),
           hasCi: true,
           ciStatus: 'success',
+          troubleshootingDocsPath: 'help',
         });
       });
 
@@ -223,6 +224,7 @@ describe('MRWidgetPipeline', () => {
           }),
           hasCi: true,
           ciStatus: 'success',
+          troubleshootingDocsPath: 'help',
         });
       });
 
