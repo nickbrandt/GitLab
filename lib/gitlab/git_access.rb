@@ -30,6 +30,12 @@ module Gitlab
       cannot_push_to_read_only: "You can't push code to a read-only GitLab instance."
     }.freeze
 
+    LOG_HEADER = <<~MESSAGE
+      Push operation timed out
+
+      Timing information for debugging purposes:
+    MESSAGE
+
     INTERNAL_TIMEOUT = 50.seconds.freeze
     DOWNLOAD_COMMANDS = %w{git-upload-pack git-upload-archive}.freeze
     PUSH_COMMANDS = %w{git-receive-pack}.freeze
@@ -49,7 +55,7 @@ module Gitlab
     end
 
     def check(cmd, changes)
-      @logger = Checks::TimedLogger.new(timeout: INTERNAL_TIMEOUT)
+      @logger = Checks::TimedLogger.new(timeout: INTERNAL_TIMEOUT, header: LOG_HEADER)
       @changes = changes
 
       check_protocol!
@@ -312,13 +318,7 @@ module Gitlab
 
       change_access.exec
     rescue Checks::TimedLogger::TimeoutError
-      header = <<~MESSAGE
-      Push operation timed out
-
-      Timing information for debugging purposes:
-      MESSAGE
-
-      raise TimeoutError, header + logger.log.join("\n")
+      raise TimeoutError, logger.full_message
     end
 
     def deploy_key
