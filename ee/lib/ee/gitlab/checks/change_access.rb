@@ -90,6 +90,8 @@ module EE
 
           logger.log_timed(LOG_MESSAGES[:push_rule_commits_check]) do
             commits.each do |commit|
+              logger.check_timeout_reached
+
               push_rule_commit_check(commit)
             end
           end
