@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 module ClustersHelper
+  prepend EE::ClustersHelper
+
+  # EE overrides this
   def has_multiple_clusters?
-    clusterable.feature_available?(:multiple_clusters)
+    false
   end
 
   def render_gcp_signup_offer
