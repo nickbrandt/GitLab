@@ -175,7 +175,6 @@ describe('Job Store Getters', () => {
     });
   });
 
-<<<<<<< HEAD
   describe('shouldRenderSharedRunnerLimitWarning', () => {
     describe('without runners information', () => {
       it('returns false', () => {
@@ -231,8 +230,6 @@ describe('Job Store Getters', () => {
     });
   });
 
-=======
->>>>>>> upstream/master
   describe('hasRunnersForProject', () => {
     describe('with available and offline runners', () => {
       it('returns true', () => {
