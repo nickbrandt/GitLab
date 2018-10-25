@@ -6,10 +6,7 @@ import GfmAutoComplete from './gfm_auto_complete';
 import ZenMode from './zen_mode';
 import AutoWidthDropdownSelect from './issuable/auto_width_dropdown_select';
 import { parsePikadayDate, pikadayToString } from './lib/utils/datetime_utility';
-<<<<<<< HEAD
 import groupsSelect from './groups_select';
-=======
->>>>>>> upstream/master
 
 export default class IssuableForm {
   constructor(form) {
@@ -24,10 +21,7 @@ export default class IssuableForm {
       gl.GfmAutoComplete && gl.GfmAutoComplete.dataSources,
     ).setup();
     this.usersSelect = new UsersSelect();
-<<<<<<< HEAD
     groupsSelect();
-=======
->>>>>>> upstream/master
     this.zenMode = new ZenMode();
 
     this.titleField = this.form.find('input[name*="[title]"]');
