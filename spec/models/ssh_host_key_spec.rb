@@ -33,6 +33,8 @@ describe SshHostKey do
   let(:extra) { known_hosts + "foo\nbar\n" }
   let(:reversed) { known_hosts.lines.reverse.join }
 
+  let(:compare_host_keys) { nil }
+
   def stub_ssh_keyscan(args, status: true, stdout: "", stderr: "")
     stdin = StringIO.new
     stdout = double(:stdout, read: stdout)
@@ -44,9 +46,9 @@ describe SshHostKey do
     stdin
   end
 
-  let(:project) { build(:project, :mirror) }
+  let(:project) { build(:project) }
 
-  subject(:ssh_host_key) { described_class.new(project: project, url: 'ssh://example.com:2222') }
+  subject(:ssh_host_key) { described_class.new(project: project, url: 'ssh://example.com:2222', compare_host_keys: compare_host_keys) }
 
   describe '#fingerprints', :use_clean_rails_memory_store_caching do
     it 'returns an array of indexed fingerprints when the cache is filled' do
@@ -82,8 +84,8 @@ describe SshHostKey do
     end
   end
 
-  describe '#changes_project_import_data?' do
-    where(:a, :b, :result) do
+  describe '#host_keys_changed?' do
+    where(:known_hosts_a, :known_hosts_b, :result) do
       known_hosts | extra       | true
       known_hosts | "foo\n"     | true
       known_hosts | ''          | true
@@ -97,21 +99,29 @@ describe SshHostKey do
     end
 
     with_them do
-      subject { ssh_host_key.changes_project_import_data? }
+      let(:compare_host_keys) { known_hosts_b }
 
-      it "(normal)" do
-        expect(ssh_host_key).to receive(:known_hosts).and_return(a)
-        project.import_data.ssh_known_hosts = b
+      subject { ssh_host_key.host_keys_changed? }
 
-        is_expected.to eq(result)
+      context '(normal)' do
+        let(:compare_host_keys) { known_hosts_b }
+
+        before do
+          expect(ssh_host_key).to receive(:known_hosts).and_return(known_hosts_a)
+        end
+
+        it { is_expected.to eq(result) }
       end
 
       # Comparisons should be symmetrical, so test the reverse too
-      it "(reversed)" do
-        expect(ssh_host_key).to receive(:known_hosts).and_return(b)
-        project.import_data.ssh_known_hosts = a
+      context '(reversed)' do
+        let(:compare_host_keys) { known_hosts_a }
 
-        is_expected.to eq(result)
+        before do
+          expect(ssh_host_key).to receive(:known_hosts).and_return(known_hosts_b)
+        end
+
+        it { is_expected.to eq(result) }
       end
     end
   end
