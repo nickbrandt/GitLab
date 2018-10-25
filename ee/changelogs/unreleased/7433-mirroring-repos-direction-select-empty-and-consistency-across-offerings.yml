@@ -1,0 +1,5 @@
+---
+title: Remove unneeded permission checks from the mirror repositories partial.
+merge_request: 8077
+author:
+type: other
