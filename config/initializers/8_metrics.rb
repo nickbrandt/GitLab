@@ -187,10 +187,8 @@ if Gitlab::Metrics.enabled? && !Rails.env.test?
 
   GC::Profiler.enable
 
-  Gitlab::Metrics::Samplers::InfluxSampler.initialize_instance.start
-
-  Gitlab::Metrics::Instrumentation.configure do |config|
-    config.instrument_instance_methods(Gitlab::InsecureKeyFingerprint)
+  Gitlab::Cluster::LifecycleEvents.on_worker_start do
+    Gitlab::Metrics::Samplers::InfluxSampler.initialize_instance.start
   end
 
   module TrackNewRedisConnections
