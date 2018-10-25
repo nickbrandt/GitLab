@@ -216,7 +216,7 @@ module EE
     end
 
     def store_security_reports_available?
-      ::Feature.enabled?(:store_security_reports, self) && (
+      ::Feature.enabled?(:store_security_reports, self, default_enabled: true) && (
         feature_available?(:sast) ||
         feature_available?(:dependency_scanning) ||
         feature_available?(:sast_container) ||
