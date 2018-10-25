@@ -320,11 +320,7 @@ created, and is uploaded as an artifact which you can later download and check
 out.
 
 Any differences between the source and target branches are also
-<<<<<<< HEAD
 [shown in the merge request widget](../../user/project/merge_requests/code_quality.md).
-=======
-[shown in the merge request widget](https://docs.gitlab.com/ee/user/project/merge_requests/code_quality.html).
->>>>>>> upstream/master
 
 ### Auto SAST **[ULTIMATE]**
 
@@ -337,14 +333,7 @@ report is created, it's uploaded as an artifact which you can later download and
 check out.
 
 Any security warnings are also
-<<<<<<< HEAD
 [shown in the merge request widget](../../user/project/merge_requests/sast.md).
-
-NOTE: **Note:**
-The Auto SAST stage will be skipped on licenses other than Ultimate.
-=======
-[shown in the merge request widget](https://docs.gitlab.com/ee//user/project/merge_requests/sast.html).
->>>>>>> upstream/master
 
 NOTE: **Note:**
 The Auto SAST stage will be skipped on licenses other than Ultimate.
@@ -365,9 +354,6 @@ Any security warnings are also
 NOTE: **Note:**
 The Auto Dependency Scanning stage will be skipped on licenses other than Ultimate.
 
-NOTE: **Note:**
-The Auto Dependency Scanning stage will be skipped on licenses other than Ultimate.
-
 ### Auto License Management **[ULTIMATE]**
 
 > Introduced in [GitLab Ultimate][ee] 11.0.
@@ -380,9 +366,6 @@ check out.
 
 Any licenses are also
 [shown in the merge request widget](../../user/project/merge_requests/license_management.md).
-
-NOTE: **Note:**
-The Auto License Management stage will be skipped on licenses other than Ultimate.
 
 NOTE: **Note:**
 The Auto License Management stage will be skipped on licenses other than Ultimate.
