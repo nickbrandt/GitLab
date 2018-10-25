@@ -10,8 +10,17 @@ module EE
       LICENSE_MANAGEMENT_FILE = 'gl-license-management-report.json'.freeze
       PERFORMANCE_FILE = 'performance.json'.freeze
 
+      LICENSED_PARSER_FEATURES = {
+        sast: :sast
+      }.with_indifferent_access.freeze
+
       prepended do
         after_save :stick_build_if_status_changed
+
+        scope :with_security_reports, -> do
+          with_existing_job_artifacts(::Ci::JobArtifact.security_reports)
+            .eager_load_job_artifacts
+        end
       end
 
       def shared_runners_minutes_limit_enabled?
@@ -44,6 +53,16 @@ module EE
       def has_artifact?(name)
         options.dig(:artifacts, :paths)&.include?(name) &&
           artifacts_metadata?
+      end
+
+      def collect_security_reports!(security_reports)
+        each_report(::Ci::JobArtifact::SECURITY_REPORT_FILE_TYPES) do |file_type, blob|
+          next unless project.feature_available?(LICENSED_PARSER_FEATURES[file_type])
+
+          security_reports.get_report(file_type).tap do |security_report|
+            ::Gitlab::Ci::Parsers::Security.fabricate!(file_type).parse!(blob, security_report)
+          end
+        end
       end
 
       private

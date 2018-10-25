@@ -31,8 +31,6 @@ module EE
     end
 
     def read_deployments
-      kubeclient = build_kube_client!(api_groups: ['apis/extensions'], api_version: 'v1beta1')
-
       kubeclient.get_deployments(namespace: actual_namespace).as_json
     rescue KubeException => err
       raise err unless err.error_code == 404

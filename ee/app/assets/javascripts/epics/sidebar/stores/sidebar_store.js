@@ -1,4 +1,4 @@
-import { parsePikadayDate } from '~/lib/utils/datefix';
+import { parsePikadayDate } from '~/lib/utils/datetime_utility';
 
 export default class SidebarStore {
   constructor({

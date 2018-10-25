@@ -78,6 +78,7 @@ class License < ActiveRecord::Base
     license_management
     sast
     sast_container
+    container_scanning
     cluster_health
     dast
     epics

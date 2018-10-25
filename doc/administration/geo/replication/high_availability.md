@@ -72,7 +72,6 @@ On the **secondary** backend servers configure the following services:
     geo_postgresql['enable'] = true
 
     geo_postgresql['listen_address'] = '10.1.4.1'
-    geo_postgresql['trust_auth_cidr_addresses'] = ['10.1.0.0/16']
 
     geo_secondary['auto_migrate'] = true
     geo_secondary['db_host'] = '10.1.4.1'
@@ -111,7 +110,7 @@ the addresses of the remote endpoints for PostgreSQL and Redis will need to be s
     postgresql['enable'] = false
     gitlab_rails['auto_migrate'] = false
     gitlab_rails['db_host'] = '10.0.3.1'
-    gitlab_rails['db_password'] = 'DB password'
+    gitlab_rails['db_password'] = 'plaintext DB password'
 
     ##
     ## Disable Redis on the local machine and connect to the remote
@@ -124,12 +123,18 @@ the addresses of the remote endpoints for PostgreSQL and Redis will need to be s
     geo_primary_role['enable'] = true
     ```
 
+NOTE: **Note:**
+If you had set up PostgreSQL cluster using the omnibus package and you had set up `postgresql['sql_user_password'] = 'md5 digest of secret'` setting, keep in mind that `gitlab_rails['db_password']` setting mentioned above contains the plaintext password.
+
+NOTE: **Note:**
+Make sure that current node IP is listed in `postgresql['md5_auth_cidr_addresses']` setting of your remote database.
+
 #### On the GitLab Secondary Frontend servers
 
 On the secondary the remote endpoint for the PostgreSQL Geo database will
 be specified.
 
-1. Edit `/etc/gitlab/gitlab.rb` and ensure the following to disable PostgreSQL and 
+1. Edit `/etc/gitlab/gitlab.rb` and ensure the following to disable PostgreSQL and
    Redis from running locally. Configure the secondary to connect to the Geo tracking database.
 
 
@@ -141,7 +146,7 @@ be specified.
     postgresql['enable'] = false
     gitlab_rails['auto_migrate'] = false
     gitlab_rails['db_host'] = '10.1.3.1'
-    gitlab_rails['db_password'] = 'DB password'
+    gitlab_rails['db_password'] = 'plaintext DB password'
 
     ##
     ## Disable Redis on the local machine and connect to the remote
@@ -162,6 +167,11 @@ be specified.
     geo_postgresql['enable'] = false
     ```
 
+NOTE: **Note:**
+If you had set up PostgreSQL cluster using the omnibus package and you had set up `postgresql['sql_user_password'] = 'md5 digest of secret'` setting, keep in mind that `gitlab_rails['db_password']` setting mentioned above contains the plaintext password.
+
+NOTE: **Note:**
+Make sure that current node IP is listed in `postgresql['md5_auth_cidr_addresses']` setting of your remote database.
 
 After making these changes [Reconfigure GitLab][gitlab-reconfigure] so that they take effect.
 

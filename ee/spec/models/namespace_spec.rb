@@ -596,4 +596,40 @@ describe Namespace do
       expect(namespace.checked_file_template_project_id).to be_nil
     end
   end
+
+  describe '#store_security_reports_available?' do
+    subject { namespace.store_security_reports_available? }
+
+    context 'when store_security_reports feature is enabled' do
+      before do
+        stub_feature_flags(store_security_reports: true)
+        stub_licensed_features(sast: true)
+      end
+
+      it 'returns true' do
+        expect(subject).to be_truthy
+      end
+    end
+
+    context 'when store_security_reports feature is disabled' do
+      before do
+        stub_feature_flags(store_security_reports: false)
+        stub_licensed_features(sast: true)
+      end
+
+      it 'returns false' do
+        expect(subject).to be_falsey
+      end
+    end
+
+    context 'when no security report feature is available' do
+      before do
+        stub_feature_flags(store_security_reports: true)
+      end
+
+      it 'returns false' do
+        expect(subject).to be_falsey
+      end
+    end
+  end
 end

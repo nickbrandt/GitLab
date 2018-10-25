@@ -66,31 +66,35 @@ describe API::Unleash do
     end
   end
 
-  describe 'GET /feature_flags/unleash/:project_id/features' do
-    subject { get api("/feature_flags/unleash/#{project_id}/features"), params, headers }
+  %w(/feature_flags/unleash/:project_id/features /feature_flags/unleash/:project_id/client/features).each do |features_endpoint|
+    describe "GET #{features_endpoint}" do
+      let(:features_url) { features_endpoint.sub(':project_id', project_id) }
 
-    it_behaves_like 'authenticated request'
+      subject { get api("/feature_flags/unleash/#{project_id}/features"), params, headers }
 
-    context 'with a list of feature flag' do
-      let(:client) { create(:operations_feature_flags_client, project: project) }
-      let(:headers) { { "UNLEASH-INSTANCEID" => client.token }}
-      let!(:enable_feature_flag) { create(:operations_feature_flag, project: project, name: 'feature1', active: true) }
-      let!(:disabled_feature_flag) { create(:operations_feature_flag, project: project, name: 'feature2', active: false) }
+      it_behaves_like 'authenticated request'
 
-      it 'responds with a list' do
-        subject
+      context 'with a list of feature flag' do
+        let(:client) { create(:operations_feature_flags_client, project: project) }
+        let(:headers) { { "UNLEASH-INSTANCEID" => client.token }}
+        let!(:enable_feature_flag) { create(:operations_feature_flag, project: project, name: 'feature1', active: true) }
+        let!(:disabled_feature_flag) { create(:operations_feature_flag, project: project, name: 'feature2', active: false) }
 
-        expect(response).to have_gitlab_http_status(200)
-        expect(json_response['version']).to eq(1)
-        expect(json_response['features']).not_to be_empty
-        expect(json_response['features'].first['name']).to eq('feature1')
-      end
+        it 'responds with a list' do
+          subject
 
-      it 'matches json schema' do
-        subject
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response['version']).to eq(1)
+          expect(json_response['features']).not_to be_empty
+          expect(json_response['features'].first['name']).to eq('feature1')
+        end
 
-        expect(response).to have_gitlab_http_status(:ok)
-        expect(response).to match_response_schema('unleash/unleash', dir: 'ee')
+        it 'matches json schema' do
+          subject
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to match_response_schema('unleash/unleash', dir: 'ee')
+        end
       end
     end
   end

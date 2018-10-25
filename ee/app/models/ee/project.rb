@@ -29,6 +29,7 @@ module EE
       has_one :jenkins_service
       has_one :jenkins_deprecated_service
       has_one :github_service
+      has_one :gitlab_slack_application_service
 
       has_many :approvers, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
       has_many :approver_groups, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
@@ -91,6 +92,9 @@ module EE
       end
 
       default_value_for :packages_enabled, true
+      default_value_for :only_mirror_protected_branches, true
+
+      delegate :store_security_reports_available?, to: :namespace
     end
 
     class_methods do
@@ -558,6 +562,14 @@ module EE
     def feature_flags_client_token
       instance = operations_feature_flags_client || create_operations_feature_flags_client!
       instance.token
+    end
+
+    def root_namespace
+      if namespace.has_parent?
+        namespace.root_ancestor
+      else
+        namespace
+      end
     end
 
     private

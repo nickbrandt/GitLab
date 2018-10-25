@@ -19,7 +19,13 @@ module API
             status :ok
           end
 
+          desc 'Get a list of features (deprecated, v2 client support)'
           get 'features' do
+            present project, with: ::EE::API::Entities::UnleashFeatures
+          end
+
+          desc 'Get a list of features'
+          get 'client/features' do
             present project, with: ::EE::API::Entities::UnleashFeatures
           end
 

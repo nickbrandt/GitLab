@@ -1742,4 +1742,16 @@ describe Project do
       end
     end
   end
+
+  describe '#store_security_reports_available?' do
+    let(:project) { create(:project) }
+
+    subject { project.store_security_reports_available? }
+
+    it 'delegates to namespace' do
+      expect(project.namespace).to receive(:store_security_reports_available?).once.and_call_original
+
+      subject
+    end
+  end
 end

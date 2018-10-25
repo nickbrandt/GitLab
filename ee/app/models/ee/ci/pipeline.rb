@@ -12,19 +12,22 @@ module EE
         has_one :chat_data, class_name: 'Ci::PipelineChatData'
 
         has_many :job_artifacts, through: :builds
+        has_many :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::OccurrencePipeline'
+        has_many :vulnerabilities, source: :occurrence, through: :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::Occurrence'
 
+        # Legacy way to fetch security reports based on job name. This has been replaced by the reports feature.
         scope :with_security_reports, -> {
           joins(:artifacts).where(ci_builds: { name: %w[sast dependency_scanning sast:container container_scanning dast] })
         }
 
         # This structure describes feature levels
         # to access the file types for given reports
-        LEGACY_REPORT_LICENSED_FEATURES = {
+        REPORT_LICENSED_FEATURES = {
           codequality: nil,
-          sast: :sast,
-          dependency_scanning: :dependency_scanning,
-          container_scanning: :sast_container,
-          dast: :dast
+          sast: %i[sast],
+          dependency_scanning: %i[dependency_scanning],
+          container_scanning: %i[container_scanning sast_container],
+          dast: %i[dast]
         }.freeze
 
         # Deprecated, to be removed in 12.0
@@ -53,6 +56,16 @@ module EE
             files: %w(gl-dast-report.json)
           }
         }.freeze
+
+        state_machine :status do
+          after_transition any => ::Ci::Pipeline::COMPLETED_STATUSES.map(&:to_sym) do |pipeline|
+            next unless pipeline.has_security_reports? && pipeline.default_branch?
+
+            pipeline.run_after_commit do
+              StoreSecurityReportsWorker.perform_async(pipeline.id)
+            end
+          end
+        end
       end
 
       def any_report_artifact_for_type(file_type)
@@ -109,11 +122,23 @@ module EE
           has_performance_data?
       end
 
+      def has_security_reports?
+        complete? && builds.latest.with_security_reports.any?
+      end
+
+      def security_reports
+        ::Gitlab::Ci::Reports::Security::Reports.new.tap do |security_reports|
+          builds.latest.with_security_reports.each do |build|
+            build.collect_security_reports!(security_reports)
+          end
+        end
+      end
+
       private
 
       def available_licensed_report_type?(file_type)
-        feature_name = LEGACY_REPORT_LICENSED_FEATURES.fetch(file_type)
-        feature_name.nil? || project.feature_available?(feature_name)
+        feature_names = REPORT_LICENSED_FEATURES.fetch(file_type)
+        feature_names.nil? || feature_names.any? { |feature| project.feature_available?(feature) }
       end
 
       def artifacts_with_files

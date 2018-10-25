@@ -11,9 +11,13 @@ class Gitlab::Seeder::Vulnerabilities
     return unless pipeline
 
     10.times do |rank|
-      occurrence = create_occurrence(rank)
-      create_occurrence_identifier(occurrence, rank, primary: true)
-      create_occurrence_identifier(occurrence, rank)
+      primary_identifier = create_identifier(rank)
+      occurrence = create_occurrence(rank, primary_identifier)
+      # Create occurrence_pipeline join model
+      occurrence.pipelines << pipeline
+      # Create occurrence_identifier join models
+      occurrence.identifiers << primary_identifier
+      occurrence.identifiers << create_identifier(rank) if rank % 3 == 0
 
       if author
         case rank % 3
@@ -30,37 +34,28 @@ class Gitlab::Seeder::Vulnerabilities
 
   private
 
-  def create_occurrence(rank)
+  def create_occurrence(rank, primary_identifier)
     project.vulnerabilities.create!(
       uuid: random_uuid,
       name: 'Cipher with no integrity',
-      pipeline: pipeline,
-      ref: project.default_branch,
       report_type: :sast,
       severity: random_level,
       confidence: random_level,
       project_fingerprint: random_fingerprint,
-      primary_identifier_fingerprint: random_fingerprint,
       location_fingerprint: random_fingerprint,
+      primary_identifier: primary_identifier,
       raw_metadata: metadata(rank).to_json,
       metadata_version: 'sast:1.0',
       scanner: scanner)
   end
 
-  def create_occurrence_identifier(occurrence, key, primary: false)
-    type = primary ? 'primary' : 'secondary'
-    fingerprint = if primary
-                    occurrence.primary_identifier_fingerprint
-                  else
-                    Digest::SHA1.hexdigest("sid_fingerprint-#{project.id}-#{key}")
-                  end
-
+  def create_identifier(rank)
     project.vulnerability_identifiers.create!(
-      external_type: "#{type.upcase}_SECURITY_ID",
-      external_id: "#{type.upcase}_SECURITY_#{key}",
-      fingerprint: fingerprint,
-      name: "#{type.capitalize} #{key}",
-      url: "https://security.example.com/#{type.downcase}/#{key}"
+      external_type: "SECURITY_ID",
+      external_id: "SECURITY_#{rank}",
+      fingerprint: random_fingerprint,
+      name: "SECURITY_IDENTIFIER #{rank}",
+      url: "https://security.example.com/#{rank}"
     )
   end
 

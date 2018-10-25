@@ -81,12 +81,12 @@
         'shouldRenderCalloutMessage',
         'shouldRenderTriggeredLabel',
         'hasEnvironment',
-        'isJobStuck',
         'shouldRenderSharedRunnerLimitWarning',
         'hasTrace',
         'emptyStateIllustration',
         'isScrollingDown',
         'emptyStateAction',
+        'hasRunnersForProject',
       ]),
 
       shouldRenderContent() {
@@ -200,9 +200,9 @@
 
         <!-- Body Section -->
         <stuck-block
-          v-if="isJobStuck"
+          v-if="job.stuck"
           class="js-job-stuck"
-          :has-no-runners-for-project="job.runners.available"
+          :has-no-runners-for-project="hasRunnersForProject"
           :tags="job.tags"
           :runners-path="runnerSettingsUrl"
         />

@@ -13,7 +13,7 @@ describe Geo::AttachmentRegistryFinder, :geo do
   let(:synced_subgroup) { create(:group, parent: synced_group) }
   let(:unsynced_group) { create(:group) }
   let(:synced_project) { create(:project, group: synced_group) }
-  let(:unsynced_project) { create(:project, group: unsynced_group, repository_storage: 'broken') }
+  let(:unsynced_project) { create(:project, :broken_storage, group: unsynced_group) }
 
   let(:upload_1) { create(:upload, model: synced_group) }
   let(:upload_2) { create(:upload, model: unsynced_group) }

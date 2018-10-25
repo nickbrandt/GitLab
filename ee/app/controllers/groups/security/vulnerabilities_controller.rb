@@ -1,8 +1,5 @@
 # frozen_string_literal: true
-class Groups::Security::VulnerabilitiesController < Groups::ApplicationController
-  before_action :ensure_security_dashboard_feature_enabled
-  before_action :authorize_read_group_security_dashboard!
-
+class Groups::Security::VulnerabilitiesController < Groups::Security::ApplicationController
   def index
     @vulnerabilities = group.all_vulnerabilities.ordered
       .page(params[:page])
@@ -23,15 +20,5 @@ class Groups::Security::VulnerabilitiesController < Groups::ApplicationControlle
         render json: VulnerabilitySummarySerializer.new.represent(group)
       end
     end
-  end
-
-  private
-
-  def ensure_security_dashboard_feature_enabled
-    render_404 unless @group.feature_available?(:security_dashboard)
-  end
-
-  def authorize_read_group_security_dashboard!
-    render_403 unless can?(current_user, :read_group_security_dashboard, group)
   end
 end
