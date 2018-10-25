@@ -14,6 +14,18 @@ describe MergeRequest do
     it { is_expected.to have_many(:approved_by_users) }
   end
 
+  describe '#code_owners' do
+    subject(:merge_request) { build(:merge_request) }
+    let(:owners) { [double(:owner)] }
+
+    it 'returns code owners, frozen' do
+      allow(::Gitlab::CodeOwners).to receive(:for_merge_request).with(subject).and_return(owners)
+
+      expect(subject.code_owners).to eq(owners)
+      expect(subject.code_owners).to be_frozen
+    end
+  end
+
   describe '#approvals_before_merge' do
     where(:license_value, :db_value, :expected) do
       true  | 5   | 5
