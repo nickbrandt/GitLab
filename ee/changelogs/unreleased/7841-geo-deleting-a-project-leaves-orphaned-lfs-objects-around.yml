@@ -1,0 +1,5 @@
+---
+title: '[Geo] Fix: Deleting a project leaves orphaned LFS objects and CI Job artifacts around'
+merge_request: 8031
+author:
+type: fixed

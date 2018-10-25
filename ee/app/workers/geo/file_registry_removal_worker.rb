@@ -4,10 +4,10 @@ module Geo
     include GeoQueue
     include ::Gitlab::Geo::LogHelpers
 
-    def perform(object_type, object_db_id)
-      log_info('Executing Geo::FileRegistryRemovalService', id: object_db_id, type: object_type)
+    def perform(object_type, object_db_id, file_path = nil)
+      log_info('Executing Geo::FileRegistryRemovalService', id: object_db_id, type: object_type, file_path: file_path)
 
-      ::Geo::FileRegistryRemovalService.new(object_type, object_db_id).execute
+      ::Geo::FileRegistryRemovalService.new(object_type, object_db_id, file_path).execute
     end
   end
 end

@@ -7,11 +7,15 @@ module Gitlab
 
           def process
             # Must always schedule, regardless of shard health
-            job_id = ::Geo::FileRegistryRemovalWorker.perform_async(:job_artifact, event.job_artifact_id)
+            job_id = ::Geo::FileRegistryRemovalWorker.perform_async(:job_artifact, event.job_artifact_id, file_path)
             log_event(job_id)
           end
 
           private
+
+          def file_path
+            @file_path ||= File.join(::JobArtifactUploader.root, event.file_path)
+          end
 
           def log_event(job_id)
             logger.event_info(
