@@ -156,6 +156,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
         ## EE-specific
         resources :approvers, only: :destroy
+        delete 'approvers', to: 'approvers#destroy_via_user_id', as: :approver_via_user_id
         resources :approver_groups, only: :destroy
         ## EE-specific
 
