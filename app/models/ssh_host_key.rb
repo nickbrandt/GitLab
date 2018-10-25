@@ -20,15 +20,16 @@ class SshHostKey
 
   self.reactive_cache_key = ->(key) { [key.class.to_s, key.id] }
 
-  # Do not refresh the data in the background - it is not expected to change
+  # Do not refresh the data in the background - it is not expected to change.
+  # This is achieved by making the lifetime shorter than the refresh interval.
   self.reactive_cache_refresh_interval = 15.minutes
   self.reactive_cache_lifetime = 10.minutes
 
   def self.find_by(opts = {})
-    id = opts.fetch(:id, "")
-    project_id, url = id.split(':', 2)
+    return nil unless opts.key?(:id)
 
-    project = Project.where(id: project_id).includes(:import_data).first
+    project_id, url = opts[:id].split(':', 2)
+    project = Project.find_by(id: project_id)
 
     project.presence && new(project: project, url: url)
   end
@@ -96,13 +97,13 @@ class SshHostKey
 
     # ssh-keyscan returns an exit code 0 in several error conditions, such as an
     # unknown hostname, so check both STDERR and the exit code
-    if !status.success? || errors.present?
+    if status.success? && !errors.present?
+      { known_hosts: known_hosts }
+    else
       Rails.logger.debug("Failed to detect SSH host keys for #{id}: #{errors}")
 
-      return { error: 'Failed to detect SSH host keys' }
+      { error: 'Failed to detect SSH host keys' }
     end
-
-    { known_hosts: known_hosts }
   end
 
   private
@@ -112,8 +113,7 @@ class SshHostKey
     data
       .to_s
       .each_line
-      .map { |line| line unless line.start_with?('#') || line.chomp.empty? }
-      .compact
+      .reject { |line| line.start_with?('#') || line.chomp.empty? }
       .uniq
       .sort
       .join

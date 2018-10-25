@@ -72,10 +72,12 @@ describe Projects::MirrorsController do
     end
 
     context 'invalid URLs' do
-      where(url: %w[INVALID git@example.com:foo/bar.git ssh://git@example.com:foo/bar.git])
-
-      with_them do
-        it 'returns an error with a 400 response' do
+      %w[
+        INVALID
+        git@example.com:foo/bar.git
+        ssh://git@example.com:foo/bar.git
+      ].each do |url|
+        it "returns an error with a 400 response for URL #{url.inspect}" do
           do_get(project, url)
 
           expect(response).to have_gitlab_http_status(400)

@@ -85,7 +85,7 @@ describe SshHostKey do
   end
 
   describe '#host_keys_changed?' do
-    where(:a, :b, :result) do
+    where(:known_hosts_a, :known_hosts_b, :result) do
       known_hosts | extra       | true
       known_hosts | "foo\n"     | true
       known_hosts | ''          | true
@@ -99,15 +99,15 @@ describe SshHostKey do
     end
 
     with_them do
-      let(:compare_host_keys) { b }
+      let(:compare_host_keys) { known_hosts_b }
 
       subject { ssh_host_key.host_keys_changed? }
 
       context '(normal)' do
-        let(:compare_host_keys) { b }
+        let(:compare_host_keys) { known_hosts_b }
 
         before do
-          expect(ssh_host_key).to receive(:known_hosts).and_return(a)
+          expect(ssh_host_key).to receive(:known_hosts).and_return(known_hosts_a)
         end
 
         it { is_expected.to eq(result) }
@@ -115,10 +115,10 @@ describe SshHostKey do
 
       # Comparisons should be symmetrical, so test the reverse too
       context '(reversed)' do
-        let(:compare_host_keys) { a }
+        let(:compare_host_keys) { known_hosts_a }
 
         before do
-          expect(ssh_host_key).to receive(:known_hosts).and_return(b)
+          expect(ssh_host_key).to receive(:known_hosts).and_return(known_hosts_b)
         end
 
         it { is_expected.to eq(result) }
