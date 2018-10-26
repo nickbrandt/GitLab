@@ -155,7 +155,7 @@ class Environment < ActiveRecord::Base
   end
 
   def has_metrics?
-    prometheus_adapter&.can_query? && available? && last_deployment.present?
+    prometheus_adapter&.can_query? && available?
   end
 
   def metrics
