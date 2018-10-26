@@ -1,0 +1,5 @@
+---
+title: Add a metric to the usage ping data to track the number of projects with at least one alert
+merge_request: 8058
+author:
+type: other

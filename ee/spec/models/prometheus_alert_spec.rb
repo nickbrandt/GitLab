@@ -6,6 +6,23 @@ describe PrometheusAlert do
   set(:project) { build(:project) }
   let(:metric) { build(:prometheus_metric) }
 
+  describe '.distinct_projects' do
+    let(:project1) { create(:project) }
+    let(:project2) { create(:project) }
+
+    before do
+      create(:prometheus_alert, project: project1)
+      create(:prometheus_alert, project: project1)
+      create(:prometheus_alert, project: project2)
+    end
+
+    subject { described_class.distinct_projects.count }
+
+    it 'returns a count of all distinct projects which have an alert' do
+      expect(subject).to eq(2)
+    end
+  end
+
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to belong_to(:environment) }
