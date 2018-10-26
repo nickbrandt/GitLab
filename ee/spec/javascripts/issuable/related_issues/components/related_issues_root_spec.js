@@ -21,8 +21,10 @@ describe('RelatedIssuesRoot', () => {
 
   describe('methods', () => {
     describe('onRelatedIssueRemoveRequest', () => {
-      beforeEach((done) => {
-        spyOn(relatedIssuesService.prototype, 'fetchRelatedIssues').and.returnValue(Promise.reject());
+      beforeEach(done => {
+        spyOn(relatedIssuesService.prototype, 'fetchRelatedIssues').and.returnValue(
+          Promise.reject(),
+        );
 
         vm = new RelatedIssuesRoot({
           propsData: defaultProps,
@@ -34,13 +36,18 @@ describe('RelatedIssuesRoot', () => {
         });
       });
 
-      it('remove related issue and succeeds', (done) => {
+      it('remove related issue and succeeds', done => {
         const interceptor = (request, next) => {
-          next(request.respondWith(JSON.stringify({
-            issues: [],
-          }), {
-            status: 200,
-          }));
+          next(
+            request.respondWith(
+              JSON.stringify({
+                issues: [],
+              }),
+              {
+                status: 200,
+              },
+            ),
+          );
         };
         Vue.http.interceptors.push(interceptor);
 
@@ -55,11 +62,13 @@ describe('RelatedIssuesRoot', () => {
         });
       });
 
-      it('remove related issue, fails, and restores to related issues', (done) => {
+      it('remove related issue, fails, and restores to related issues', done => {
         const interceptor = (request, next) => {
-          next(request.respondWith(JSON.stringify({}), {
-            status: 422,
-          }));
+          next(
+            request.respondWith(JSON.stringify({}), {
+              status: 422,
+            }),
+          );
         };
         Vue.http.interceptors.push(interceptor);
 
@@ -117,7 +126,9 @@ describe('RelatedIssuesRoot', () => {
 
     describe('onPendingFormSubmit', () => {
       beforeEach(() => {
-        spyOn(relatedIssuesService.prototype, 'fetchRelatedIssues').and.returnValue(Promise.reject());
+        spyOn(relatedIssuesService.prototype, 'fetchRelatedIssues').and.returnValue(
+          Promise.reject(),
+        );
         vm = new RelatedIssuesRoot({
           propsData: defaultProps,
         }).$mount();
@@ -135,7 +146,7 @@ describe('RelatedIssuesRoot', () => {
         expect(vm.service.addRelatedIssues).toHaveBeenCalledWith([input]);
       });
 
-      it('submit zero pending issue as related issue', (done) => {
+      it('submit zero pending issue as related issue', done => {
         vm.store.setPendingReferences([]);
         vm.onPendingFormSubmit();
 
@@ -147,17 +158,22 @@ describe('RelatedIssuesRoot', () => {
         });
       });
 
-      it('submit pending issue as related issue', (done) => {
+      it('submit pending issue as related issue', done => {
         const interceptor = (request, next) => {
-          next(request.respondWith(JSON.stringify({
-            issues: [issuable1],
-            result: {
-              message: 'something was successfully related',
-              status: 'success',
-            },
-          }), {
-            status: 200,
-          }));
+          next(
+            request.respondWith(
+              JSON.stringify({
+                issues: [issuable1],
+                result: {
+                  message: 'something was successfully related',
+                  status: 'success',
+                },
+              }),
+              {
+                status: 200,
+              },
+            ),
+          );
         };
         Vue.http.interceptors.push(interceptor);
 
@@ -175,17 +191,22 @@ describe('RelatedIssuesRoot', () => {
         });
       });
 
-      it('submit multiple pending issues as related issues', (done) => {
+      it('submit multiple pending issues as related issues', done => {
         const interceptor = (request, next) => {
-          next(request.respondWith(JSON.stringify({
-            issues: [issuable1, issuable2],
-            result: {
-              message: 'something was successfully related',
-              status: 'success',
-            },
-          }), {
-            status: 200,
-          }));
+          next(
+            request.respondWith(
+              JSON.stringify({
+                issues: [issuable1, issuable2],
+                result: {
+                  message: 'something was successfully related',
+                  status: 'success',
+                },
+              }),
+              {
+                status: 200,
+              },
+            ),
+          );
         };
         Vue.http.interceptors.push(interceptor);
 
@@ -225,12 +246,14 @@ describe('RelatedIssuesRoot', () => {
 
     describe('fetchRelatedIssues', () => {
       const interceptor = (request, next) => {
-        next(request.respondWith(JSON.stringify([issuable1, issuable2]), {
-          status: 200,
-        }));
+        next(
+          request.respondWith(JSON.stringify([issuable1, issuable2]), {
+            status: 200,
+          }),
+        );
       };
 
-      beforeEach((done) => {
+      beforeEach(done => {
         Vue.http.interceptors.push(interceptor);
 
         vm = new RelatedIssuesRoot({
@@ -245,7 +268,7 @@ describe('RelatedIssuesRoot', () => {
         Vue.http.interceptors = _.without(Vue.http.interceptors, interceptor);
       });
 
-      it('sets isFetching while fetching', (done) => {
+      it('sets isFetching while fetching', done => {
         vm.fetchRelatedIssues();
 
         expect(vm.isFetching).toEqual(true);
@@ -257,7 +280,7 @@ describe('RelatedIssuesRoot', () => {
         });
       });
 
-      it('should fetch related issues', (done) => {
+      it('should fetch related issues', done => {
         Vue.nextTick(() => {
           expect(vm.state.relatedIssues.length).toEqual(2);
           expect(vm.state.relatedIssues[0].id).toEqual(issuable1.id);

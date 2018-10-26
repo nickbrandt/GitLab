@@ -38,7 +38,7 @@ describe('sidebarItemEpic', () => {
     const epicTitle = 'epic title';
     const url = 'https://gitlab.com/';
 
-    beforeEach((done) => {
+    beforeEach(done => {
       sidebarStore.setEpicData({
         epic: {
           title: epicTitle,
@@ -60,11 +60,13 @@ describe('sidebarItemEpic', () => {
 
     it('shows epic title as collapsed title tooltip', () => {
       expect(vm.$el.querySelector('.sidebar-collapsed-icon').getAttribute('title')).toBeDefined();
-      expect(vm.$el.querySelector('.sidebar-collapsed-icon').getAttribute('data-original-title')).toEqual(epicTitle);
+      expect(
+        vm.$el.querySelector('.sidebar-collapsed-icon').getAttribute('data-original-title'),
+      ).toEqual(epicTitle);
     });
 
     describe('no epic', () => {
-      beforeEach((done) => {
+      beforeEach(done => {
         sidebarStore.epic = {};
         Vue.nextTick(done);
       });

@@ -1,8 +1,11 @@
 class ServiceDeskStore {
   constructor(initialState = {}) {
-    this.state = Object.assign({
-      incomingEmail: '',
-    }, initialState);
+    this.state = Object.assign(
+      {
+        incomingEmail: '',
+      },
+      initialState,
+    );
   }
 
   setIncomingEmail(value) {

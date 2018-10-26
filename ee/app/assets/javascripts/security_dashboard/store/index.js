@@ -4,8 +4,9 @@ import vulnerabilities from './modules/vulnerabilities/index';
 
 Vue.use(Vuex);
 
-export default () => new Vuex.Store({
-  modules: {
-    vulnerabilities,
-  },
-});
+export default () =>
+  new Vuex.Store({
+    modules: {
+      vulnerabilities,
+    },
+  });

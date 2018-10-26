@@ -14,11 +14,12 @@ function mountWeightComponent(mediator) {
     components: {
       sidebarWeight,
     },
-    render: createElement => createElement('sidebar-weight', {
-      props: {
-        mediator,
-      },
-    }),
+    render: createElement =>
+      createElement('sidebar-weight', {
+        props: {
+          mediator,
+        },
+      }),
   });
 }
 

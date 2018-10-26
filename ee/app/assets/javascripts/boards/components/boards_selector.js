@@ -140,8 +140,7 @@ export default Vue.extend({
     handleDropdownTabClick(e) {
       const $addListEl = $('#js-add-list');
       $addListEl.data('preventClose', true);
-      if (e.target.dataset.action === 'tab-assignees' &&
-          !this.hasAssigneesListMounted) {
+      if (e.target.dataset.action === 'tab-assignees' && !this.hasAssigneesListMounted) {
         this.assigneeList = AssigneeList();
         this.hasAssigneesListMounted = true;
       }

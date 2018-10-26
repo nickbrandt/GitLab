@@ -24,11 +24,11 @@ export default function geoNodeForm() {
   const $syncByNamespaces = $('.js-sync-by-namespace', $container);
   const $syncByShards = $('.js-sync-by-shard', $container);
 
-  $primaryCheckbox.on('change', e =>
-    onPrimaryCheckboxChange(e, $namespaces));
+  $primaryCheckbox.on('change', e => onPrimaryCheckboxChange(e, $namespaces));
 
   $selectiveSyncTypeSelect.on('change', e =>
-    onSelectiveSyncTypeChange(e, $syncByNamespaces, $syncByShards));
+    onSelectiveSyncTypeChange(e, $syncByNamespaces, $syncByShards),
+  );
 
   $select2Dropdown.select2({
     placeholder: s__('Geo|Select groups to replicate.'),

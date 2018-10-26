@@ -107,10 +107,9 @@ export default class EEMirrorRepos extends MirrorRepos {
       };
     }
 
-    return super.deleteMirror(event, payload)
-      .then(() => {
-        if (isPullMirror) this.$mirrorDirectionSelect.removeAttr('disabled');
-      });
+    return super.deleteMirror(event, payload).then(() => {
+      if (isPullMirror) this.$mirrorDirectionSelect.removeAttr('disabled');
+    });
   }
 
   removeRow($target) {

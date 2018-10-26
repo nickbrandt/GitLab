@@ -6,8 +6,12 @@ import eventHub from 'ee/geo_nodes/event_hub';
 import { NODE_ACTIONS } from 'ee/geo_nodes/constants';
 import { mockNodes } from '../mock_data';
 
-const createComponent = (node = mockNodes[0], nodeEditAllowed = true,
-                         nodeActionsAllowed = true, nodeMissingOauth = false) => {
+const createComponent = (
+  node = mockNodes[0],
+  nodeEditAllowed = true,
+  nodeActionsAllowed = true,
+  nodeMissingOauth = false,
+) => {
   const Component = Vue.extend(geoNodeActionsComponent);
 
   return mountComponent(Component, {

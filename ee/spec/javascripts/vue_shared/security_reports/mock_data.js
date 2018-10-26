@@ -49,15 +49,19 @@ export const sastIssues = [
       start_line: 5,
       end_line: 10,
     },
-    links: [{
-      url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/rMTQy4oRCGk',
-    }],
-    identifiers: [{
-      type: 'CVE',
-      name: 'CVE-2014-7829',
-      value: 'CVE-2014-7829',
-      link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-7829',
-    }],
+    links: [
+      {
+        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/rMTQy4oRCGk',
+      },
+    ],
+    identifiers: [
+      {
+        type: 'CVE',
+        name: 'CVE-2014-7829',
+        value: 'CVE-2014-7829',
+        link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-7829',
+      },
+    ],
   },
   {
     tool: 'bundler_audit',
@@ -69,15 +73,19 @@ export const sastIssues = [
     location: {
       file: 'Gemfile.lock',
     },
-    links: [{
-      url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
-    }],
-    identifiers: [{
-      type: 'CVE',
-      name: 'CVE-2016-0752',
-      value: 'CVE-2016-0752',
-      link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-0752',
-    }],
+    links: [
+      {
+        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
+      },
+    ],
+    identifiers: [
+      {
+        type: 'CVE',
+        name: 'CVE-2016-0752',
+        value: 'CVE-2016-0752',
+        link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-0752',
+      },
+    ],
   },
   {
     tool: 'bundler_audit',
@@ -89,15 +97,19 @@ export const sastIssues = [
     location: {
       file: 'Gemfile.lock',
     },
-    links: [{
-      url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/9oLY_FCzvoc',
-    }],
-    identifiers: [{
-      type: 'CVE',
-      name: 'CVE-2016-0751',
-      value: 'CVE-2016-0751',
-      link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-0751',
-    }],
+    links: [
+      {
+        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/9oLY_FCzvoc',
+      },
+    ],
+    identifiers: [
+      {
+        type: 'CVE',
+        name: 'CVE-2016-0751',
+        value: 'CVE-2016-0751',
+        link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-0751',
+      },
+    ],
   },
 ];
 
@@ -126,15 +138,19 @@ export const sastIssuesBase = [
       start_line: 5,
       end_line: 10,
     },
-    links: [{
-      url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
-    }],
-    identifiers: [{
-      type: 'CVE',
-      name: 'CVE-2016-9999',
-      value: 'CVE-2016-9999',
-      link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-9999',
-    }],
+    links: [
+      {
+        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
+      },
+    ],
+    identifiers: [
+      {
+        type: 'CVE',
+        name: 'CVE-2016-9999',
+        value: 'CVE-2016-9999',
+        link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-9999',
+      },
+    ],
   },
   {
     tool: 'bundler_audit',
@@ -146,15 +162,19 @@ export const sastIssuesBase = [
     location: {
       file: 'Gemfile.lock',
     },
-    links: [{
-      url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
-    }],
-    identifiers: [{
-      type: 'CVE',
-      name: 'CVE-2016-0752',
-      value: 'CVE-2016-0752',
-      link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-0752',
-    }],
+    links: [
+      {
+        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
+      },
+    ],
+    identifiers: [
+      {
+        type: 'CVE',
+        name: 'CVE-2016-0752',
+        value: 'CVE-2016-0752',
+        link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-0752',
+      },
+    ],
   },
 ];
 
@@ -174,15 +194,19 @@ export const parsedSastIssuesStore = [
       start_line: 5,
       end_line: 10,
     },
-    links: [{
-      url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/rMTQy4oRCGk',
-    }],
-    identifiers: [{
-      type: 'CVE',
-      name: 'CVE-2014-7829',
-      value: 'CVE-2014-7829',
-      link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-7829',
-    }],
+    links: [
+      {
+        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/rMTQy4oRCGk',
+      },
+    ],
+    identifiers: [
+      {
+        type: 'CVE',
+        name: 'CVE-2014-7829',
+        value: 'CVE-2014-7829',
+        link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-7829',
+      },
+    ],
   },
   {
     tool: 'bundler_audit',
@@ -198,15 +222,19 @@ export const parsedSastIssuesStore = [
     location: {
       file: 'Gemfile.lock',
     },
-    links: [{
-      url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
-    }],
-    identifiers: [{
-      type: 'CVE',
-      name: 'CVE-2016-0752',
-      value: 'CVE-2016-0752',
-      link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-0752',
-    }],
+    links: [
+      {
+        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
+      },
+    ],
+    identifiers: [
+      {
+        type: 'CVE',
+        name: 'CVE-2016-0752',
+        value: 'CVE-2016-0752',
+        link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-0752',
+      },
+    ],
   },
   {
     tool: 'bundler_audit',
@@ -222,15 +250,19 @@ export const parsedSastIssuesStore = [
     location: {
       file: 'Gemfile.lock',
     },
-    links: [{
-      url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/9oLY_FCzvoc',
-    }],
-    identifiers: [{
-      type: 'CVE',
-      name: 'CVE-2016-0751',
-      value: 'CVE-2016-0751',
-      link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-0751',
-    }],
+    links: [
+      {
+        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/9oLY_FCzvoc',
+      },
+    ],
+    identifiers: [
+      {
+        type: 'CVE',
+        name: 'CVE-2016-0751',
+        value: 'CVE-2016-0751',
+        link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-0751',
+      },
+    ],
   },
 ];
 
@@ -250,15 +282,19 @@ export const parsedSastIssuesHead = [
       start_line: 5,
       end_line: 10,
     },
-    links: [{
-      url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/rMTQy4oRCGk',
-    }],
-    identifiers: [{
-      type: 'CVE',
-      name: 'CVE-2014-7829',
-      value: 'CVE-2014-7829',
-      link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-7829',
-    }],
+    links: [
+      {
+        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/rMTQy4oRCGk',
+      },
+    ],
+    identifiers: [
+      {
+        type: 'CVE',
+        name: 'CVE-2014-7829',
+        value: 'CVE-2014-7829',
+        link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-7829',
+      },
+    ],
   },
   {
     tool: 'bundler_audit',
@@ -274,15 +310,19 @@ export const parsedSastIssuesHead = [
     location: {
       file: 'Gemfile.lock',
     },
-    links: [{
-      url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/9oLY_FCzvoc',
-    }],
-    identifiers: [{
-      type: 'CVE',
-      name: 'CVE-2016-0751',
-      value: 'CVE-2016-0751',
-      link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-0751',
-    }],
+    links: [
+      {
+        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/9oLY_FCzvoc',
+      },
+    ],
+    identifiers: [
+      {
+        type: 'CVE',
+        name: 'CVE-2016-0751',
+        value: 'CVE-2016-0751',
+        link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-0751',
+      },
+    ],
   },
 ];
 
@@ -303,15 +343,19 @@ export const parsedSastBaseStore = [
       start_line: 5,
       end_line: 10,
     },
-    links: [{
-      url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
-    }],
-    identifiers: [{
-      type: 'CVE',
-      name: 'CVE-2016-9999',
-      value: 'CVE-2016-9999',
-      link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-9999',
-    }],
+    links: [
+      {
+        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
+      },
+    ],
+    identifiers: [
+      {
+        type: 'CVE',
+        name: 'CVE-2016-9999',
+        value: 'CVE-2016-9999',
+        link: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-9999',
+      },
+    ],
   },
 ];
 
@@ -384,9 +428,11 @@ export const parsedDependencyScanningIssuesStore = [
       file: 'Gemfile.lock',
       start_line: 5,
     },
-    links: [{
-      url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/rMTQy4oRCGk',
-    }],
+    links: [
+      {
+        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/rMTQy4oRCGk',
+      },
+    ],
   },
   {
     tool: 'bundler_audit',
@@ -405,9 +451,11 @@ export const parsedDependencyScanningIssuesStore = [
       file: 'Gemfile.lock',
       start_line: undefined,
     },
-    links: [{
-      url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
-    }],
+    links: [
+      {
+        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
+      },
+    ],
   },
   {
     tool: 'bundler_audit',
@@ -426,9 +474,11 @@ export const parsedDependencyScanningIssuesStore = [
       file: 'Gemfile.lock',
       start_line: undefined,
     },
-    links: [{
-      url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/9oLY_FCzvoc',
-    }],
+    links: [
+      {
+        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/9oLY_FCzvoc',
+      },
+    ],
   },
 ];
 
@@ -450,9 +500,11 @@ export const parsedDependencyScanningIssuesHead = [
       file: 'Gemfile.lock',
       start_line: 5,
     },
-    links: [{
-      url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/rMTQy4oRCGk',
-    }],
+    links: [
+      {
+        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/rMTQy4oRCGk',
+      },
+    ],
   },
   {
     tool: 'bundler_audit',
@@ -471,9 +523,11 @@ export const parsedDependencyScanningIssuesHead = [
       file: 'Gemfile.lock',
       start_line: undefined,
     },
-    links: [{
-      url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/9oLY_FCzvoc',
-    }],
+    links: [
+      {
+        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/9oLY_FCzvoc',
+      },
+    ],
   },
 ];
 
@@ -495,9 +549,11 @@ export const parsedDependencyScanningBaseStore = [
       file: 'Gemfile.lock',
       start_line: undefined,
     },
-    links: [{
-      url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
-    }],
+    links: [
+      {
+        url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
+      },
+    ],
   },
 ];
 
@@ -565,12 +621,14 @@ export const dockerNewIssues = [
     severity: 'Negligible',
     title: 'CVE-2017-16232',
     path: 'debian:8',
-    identifiers: [{
-      type: 'CVE',
-      name: 'CVE-2017-16232',
-      value: 'CVE-2017-16232',
-      url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-16232',
-    }],
+    identifiers: [
+      {
+        type: 'CVE',
+        name: 'CVE-2017-16232',
+        value: 'CVE-2017-16232',
+        url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-16232',
+      },
+    ],
     category: 'container_scanning',
     project_fingerprint: '4e010f6d292364a42c6bb05dbd2cc788c2e5e408',
     description: 'debian:8 is affected by CVE-2017-16232.',
@@ -584,12 +642,14 @@ export const dockerOnlyHeadParsed = [
     severity: 'Medium',
     title: 'CVE-2017-12944',
     path: 'debian:8',
-    identifiers: [{
-      type: 'CVE',
-      name: 'CVE-2017-12944',
-      value: 'CVE-2017-12944',
-      url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-12944',
-    }],
+    identifiers: [
+      {
+        type: 'CVE',
+        name: 'CVE-2017-12944',
+        value: 'CVE-2017-12944',
+        url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-12944',
+      },
+    ],
     category: 'container_scanning',
     project_fingerprint: '0693a82ef93c5e9d98c23a35ddcd8ed2cbd047d9',
     description: 'debian:8 is affected by CVE-2017-12944.',
@@ -600,12 +660,14 @@ export const dockerOnlyHeadParsed = [
     severity: 'Negligible',
     title: 'CVE-2017-16232',
     path: 'debian:8',
-    identifiers: [{
-      type: 'CVE',
-      name: 'CVE-2017-16232',
-      value: 'CVE-2017-16232',
-      url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-16232',
-    }],
+    identifiers: [
+      {
+        type: 'CVE',
+        name: 'CVE-2017-16232',
+        value: 'CVE-2017-16232',
+        url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-16232',
+      },
+    ],
     category: 'container_scanning',
     project_fingerprint: '4e010f6d292364a42c6bb05dbd2cc788c2e5e408',
     description: 'debian:8 is affected by CVE-2017-16232.',
@@ -620,12 +682,14 @@ export const dockerReportParsed = {
       severity: 'Medium',
       title: 'CVE-2017-12944',
       path: 'debian:8',
-      identifiers: [{
-        type: 'CVE',
-        name: 'CVE-2017-12944',
-        value: 'CVE-2017-12944',
-        url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-12944',
-      }],
+      identifiers: [
+        {
+          type: 'CVE',
+          name: 'CVE-2017-12944',
+          value: 'CVE-2017-12944',
+          url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-12944',
+        },
+      ],
     },
     {
       vulnerability: 'CVE-2017-16232',
@@ -633,12 +697,14 @@ export const dockerReportParsed = {
       severity: 'Negligible',
       title: 'CVE-2017-16232',
       path: 'debian:8',
-      identifiers: [{
-        type: 'CVE',
-        name: 'CVE-2017-16232',
-        value: 'CVE-2017-16232',
-        url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-16232',
-      }],
+      identifiers: [
+        {
+          type: 'CVE',
+          name: 'CVE-2017-16232',
+          value: 'CVE-2017-16232',
+          url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-16232',
+        },
+      ],
     },
   ],
   approved: [
@@ -648,12 +714,14 @@ export const dockerReportParsed = {
       severity: 'Negligible',
       title: 'CVE-2014-8130',
       path: 'debian:8',
-      identifiers: [{
-        type: 'CVE',
-        name: 'CVE-2017-8130',
-        value: 'CVE-2017-8130',
-        url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-8130',
-      }],
+      identifiers: [
+        {
+          type: 'CVE',
+          name: 'CVE-2017-8130',
+          value: 'CVE-2017-8130',
+          url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-8130',
+        },
+      ],
     },
   ],
   vulnerabilities: [
@@ -663,12 +731,14 @@ export const dockerReportParsed = {
       severity: 'Medium',
       title: 'CVE-2017-12944',
       path: 'debian:8',
-      identifiers: [{
-        type: 'CVE',
-        name: 'CVE-2017-12944',
-        value: 'CVE-2017-12944',
-        url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-v',
-      }],
+      identifiers: [
+        {
+          type: 'CVE',
+          name: 'CVE-2017-12944',
+          value: 'CVE-2017-12944',
+          url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-v',
+        },
+      ],
     },
     {
       vulnerability: 'CVE-2017-16232',
@@ -676,12 +746,14 @@ export const dockerReportParsed = {
       severity: 'Negligible',
       title: 'CVE-2017-16232',
       path: 'debian:8',
-      identifiers: [{
-        type: 'CVE',
-        name: 'CVE-2017-16232',
-        value: 'CVE-2017-16232',
-        url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-16232',
-      }],
+      identifiers: [
+        {
+          type: 'CVE',
+          name: 'CVE-2017-16232',
+          value: 'CVE-2017-16232',
+          url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-16232',
+        },
+      ],
     },
     {
       vulnerability: 'CVE-2014-8130',
@@ -689,12 +761,14 @@ export const dockerReportParsed = {
       severity: 'Negligible',
       title: 'CVE-2014-8130',
       path: 'debian:8',
-      identifiers: [{
-        type: 'CVE',
-        name: 'CVE-2017-8130',
-        value: 'CVE-2017-8130',
-        url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-8130',
-      }],
+      identifiers: [
+        {
+          type: 'CVE',
+          name: 'CVE-2017-8130',
+          value: 'CVE-2017-8130',
+          url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-8130',
+        },
+      ],
     },
   ],
 };
@@ -789,12 +863,14 @@ export const parsedDast = [
     cweid: '3',
     desc: '<p>No Anti-CSRF tokens were found in a HTML submission form.</p>',
     pluginid: '123',
-    identifiers: [{
-      type: 'CWE',
-      name: 'CWE-3',
-      value: '3',
-      url: 'https://cwe.mitre.org/data/definitions/3.html',
-    }],
+    identifiers: [
+      {
+        type: 'CWE',
+        name: 'CWE-3',
+        value: '3',
+        url: 'https://cwe.mitre.org/data/definitions/3.html',
+      },
+    ],
     instances: [
       {
         uri: 'http://192.168.32.236:3001/explore?sort=latest_activity_desc',
@@ -817,12 +893,14 @@ export const parsedDast = [
     name: 'X-Content-Type-Options Header Missing',
     title: 'X-Content-Type-Options Header Missing',
     riskdesc: 'Low (Medium)',
-    identifiers: [{
-      type: 'CWE',
-      name: 'CWE-4',
-      value: '4',
-      url: 'https://cwe.mitre.org/data/definitions/4.html',
-    }],
+    identifiers: [
+      {
+        type: 'CWE',
+        name: 'CWE-4',
+        value: '4',
+        url: 'https://cwe.mitre.org/data/definitions/4.html',
+      },
+    ],
     severity: 'Low',
     confidence: 'Medium',
     cweid: '4',
@@ -848,12 +926,14 @@ export const parsedDastNewIssues = [
     name: 'X-Content-Type-Options Header Missing',
     title: 'X-Content-Type-Options Header Missing',
     riskdesc: 'Low (Medium)',
-    identifiers: [{
-      type: 'CWE',
-      name: 'CWE-4',
-      value: '4',
-      url: 'https://cwe.mitre.org/data/definitions/4.html',
-    }],
+    identifiers: [
+      {
+        type: 'CWE',
+        name: 'CWE-4',
+        value: '4',
+        url: 'https://cwe.mitre.org/data/definitions/4.html',
+      },
+    ],
     severity: 'Low',
     confidence: 'Medium',
     cweid: '4',

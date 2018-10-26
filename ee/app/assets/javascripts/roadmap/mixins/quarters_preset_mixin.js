@@ -65,7 +65,7 @@ export default {
         return `right: ${TIMELINE_END_OFFSET_HALF}px;`;
       }
 
-      return `left: ${startDay / daysInQuarter * 100}%;`;
+      return `left: ${(startDay / daysInQuarter) * 100}%;`;
     },
     /**
      * This method is externally only called when current timeframe cell has timeline

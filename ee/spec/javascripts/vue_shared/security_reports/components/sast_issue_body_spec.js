@@ -17,8 +17,7 @@ describe('sast issue body', () => {
     solution:
       'upgrade to >= 5.0.0.beta1.1, >= 4.2.5.1, ~> 4.2.5, >= 4.1.14.1, ~> 4.1.14, ~> 3.2.22.1',
     tool: 'bundler_audit',
-    url:
-      'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
+    url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/335P1DcLG00',
     urlPath: '/Gemfile.lock',
     severity: 'Medium',
     confidence: 'Low',
@@ -37,7 +36,9 @@ describe('sast issue body', () => {
         status,
       });
 
-      expect(vm.$el.textContent.trim()).toContain(`${sastIssue.severity} (${sastIssue.confidence}):`);
+      expect(vm.$el.textContent.trim()).toContain(
+        `${sastIssue.severity} (${sastIssue.confidence}):`,
+      );
     });
   });
 
@@ -93,9 +94,7 @@ describe('sast issue body', () => {
         status,
       });
 
-      expect(vm.$el.textContent.trim()).not.toContain(
-        sastIssue.priority,
-      );
+      expect(vm.$el.textContent.trim()).not.toContain(sastIssue.priority);
     });
   });
 
@@ -106,9 +105,7 @@ describe('sast issue body', () => {
         status,
       });
 
-      expect(vm.$el.textContent.trim()).toContain(
-        sastIssue.title,
-      );
+      expect(vm.$el.textContent.trim()).toContain(sastIssue.title);
     });
   });
 
@@ -119,13 +116,9 @@ describe('sast issue body', () => {
         status,
       });
 
-      expect(vm.$el.querySelector('a').getAttribute('href')).toEqual(
-        sastIssue.urlPath,
-      );
+      expect(vm.$el.querySelector('a').getAttribute('href')).toEqual(sastIssue.urlPath);
 
-      expect(vm.$el.querySelector('a').textContent.trim()).toEqual(
-        sastIssue.path,
-      );
+      expect(vm.$el.querySelector('a').textContent.trim()).toEqual(sastIssue.path);
     });
   });
 });

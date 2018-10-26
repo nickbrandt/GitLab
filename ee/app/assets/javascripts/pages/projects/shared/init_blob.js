@@ -4,10 +4,7 @@ export default () => {
   const dataEl = document.getElementById('js-file-lock');
 
   if (dataEl) {
-    const {
-      toggle_path,
-      path,
-     } = JSON.parse(dataEl.innerHTML);
+    const { toggle_path, path } = JSON.parse(dataEl.innerHTML);
 
     initPathLocks(toggle_path, path);
   }

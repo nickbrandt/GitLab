@@ -6,7 +6,8 @@ import metrics from './mock_data';
 
 describe('PrometheusMetrics EE', () => {
   const FIXTURE = 'services/prometheus/prometheus_service.html.raw';
-  const customMetricsEndpoint = 'http://test.host/frontend-fixtures/services-project/prometheus/metrics';
+  const customMetricsEndpoint =
+    'http://test.host/frontend-fixtures/services-project/prometheus/metrics';
   let mock;
   preloadFixtures(FIXTURE);
 

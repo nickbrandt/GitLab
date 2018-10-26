@@ -6,11 +6,7 @@ import {
   getIssueStatusFromLicenseStatus,
 } from 'ee/vue_shared/license_management/store/utils';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
-import {
-  STATUS_FAILED,
-  STATUS_NEUTRAL,
-  STATUS_SUCCESS,
-} from '~/reports/constants';
+import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
 import {
   approvedLicense,
   blacklistedLicense,

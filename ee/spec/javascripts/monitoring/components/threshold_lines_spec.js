@@ -2,7 +2,10 @@ import Vue from 'vue';
 import ThresholdLines from 'ee/monitoring/components/threshold_lines.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { generateGraphDrawData } from '~/monitoring/utils/multiple_time_series';
-import { singleRowMetricsMultipleSeries, convertDatesMultipleSeries } from 'spec/monitoring/mock_data';
+import {
+  singleRowMetricsMultipleSeries,
+  convertDatesMultipleSeries,
+} from 'spec/monitoring/mock_data';
 
 const width = 500;
 const height = 200;

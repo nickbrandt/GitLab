@@ -142,7 +142,7 @@ describe('GeoNodeItemComponent', () => {
       expect(vm.$el.classList.contains('card', 'geo-node-item')).toBe(true);
     });
 
-    it('renders node error message', (done) => {
+    it('renders node error message', done => {
       const err = 'Something error message';
       vm.isNodeDetailsFailed = true;
       vm.errorMessage = err;

@@ -31,7 +31,10 @@ export default () => {
       const show = $this.data('show');
       if (currentView !== show) {
         currentView = show;
-        $this.addClass('active').siblings().removeClass('active');
+        $this
+          .addClass('active')
+          .siblings()
+          .removeClass('active');
         switch (show) {
           case 'count':
             chart.setData(openIssuesCount, { label: 'Open issues', animate: true });

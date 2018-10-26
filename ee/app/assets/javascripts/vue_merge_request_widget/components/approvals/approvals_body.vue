@@ -71,9 +71,9 @@ export default {
       }
 
       if (this.approvalsLeft === 0) {
-        return this.userCanApprove ?
-          s__('mrWidget|Merge request approved; you can approve additionally') :
-          s__('mrWidget|Merge request approved');
+        return this.userCanApprove
+          ? s__('mrWidget|Merge request approved; you can approve additionally')
+          : s__('mrWidget|Merge request approved');
       }
 
       if (this.suggestedApprovers.length >= 1) {

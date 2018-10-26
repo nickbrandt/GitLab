@@ -56,6 +56,8 @@ describe('Deploy Board Instance', () => {
       },
     }).$mount();
 
-    expect(component.computedLogPath).toEqual('/root/review-app/environments/12/logs?pod_name=tanuki-1');
+    expect(component.computedLogPath).toEqual(
+      '/root/review-app/environments/12/logs?pod_name=tanuki-1',
+    );
   });
 });

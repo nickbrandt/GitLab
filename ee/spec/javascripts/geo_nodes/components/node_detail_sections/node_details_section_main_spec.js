@@ -35,7 +35,7 @@ describe('NodeDetailsSectionMain', () => {
 
   describe('computed', () => {
     describe('nodeVersion', () => {
-      it('returns `Unknown` when `version` and `revision` are null', (done) => {
+      it('returns `Unknown` when `version` and `revision` are null', done => {
         vm.nodeDetails.version = null;
         vm.nodeDetails.revision = null;
         Vue.nextTick()
@@ -52,7 +52,7 @@ describe('NodeDetailsSectionMain', () => {
     });
 
     describe('nodeHealthStatus', () => {
-      it('returns health status string', (done) => {
+      it('returns health status string', done => {
         // With default mock data
         expect(vm.nodeHealthStatus).toBe('Healthy');
 
@@ -76,7 +76,9 @@ describe('NodeDetailsSectionMain', () => {
 
     it('renders node version element', () => {
       expect(vm.$el.querySelector('.node-detail-title').innerText.trim()).toBe('GitLab version');
-      expect(vm.$el.querySelector('.node-detail-value').innerText.trim()).toBe('10.4.0-pre (b93c51849b)');
+      expect(vm.$el.querySelector('.node-detail-value').innerText.trim()).toBe(
+        '10.4.0-pre (b93c51849b)',
+      );
     });
   });
 });

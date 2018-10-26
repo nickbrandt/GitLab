@@ -1,57 +1,58 @@
 <script>
-  import { monthInWords } from '~/lib/utils/datetime_utility';
+import { monthInWords } from '~/lib/utils/datetime_utility';
 
-  import { PRESET_TYPES } from '../../constants';
+import { PRESET_TYPES } from '../../constants';
 
-  import timelineTodayIndicator from '../timeline_today_indicator.vue';
+import timelineTodayIndicator from '../timeline_today_indicator.vue';
 
-  export default {
-    presetType: PRESET_TYPES.QUARTERS,
-    components: {
-      timelineTodayIndicator,
+export default {
+  presetType: PRESET_TYPES.QUARTERS,
+  components: {
+    timelineTodayIndicator,
+  },
+  props: {
+    currentDate: {
+      type: Date,
+      required: true,
     },
-    props: {
-      currentDate: {
-        type: Date,
-        required: true,
-      },
-      timeframeItem: {
-        type: Object,
-        required: true,
-      },
+    timeframeItem: {
+      type: Object,
+      required: true,
     },
-    data() {
-      return {
-        quarterBeginDate: this.timeframeItem.range[0],
-        quarterEndDate: this.timeframeItem.range[2],
-      };
+  },
+  data() {
+    return {
+      quarterBeginDate: this.timeframeItem.range[0],
+      quarterEndDate: this.timeframeItem.range[2],
+    };
+  },
+  computed: {
+    headerSubItems() {
+      return this.timeframeItem.range;
     },
-    computed: {
-      headerSubItems() {
-        return this.timeframeItem.range;
-      },
-      hasToday() {
-        return this.currentDate >= this.quarterBeginDate &&
-               this.currentDate <= this.quarterEndDate;
-      },
+    hasToday() {
+      return this.currentDate >= this.quarterBeginDate && this.currentDate <= this.quarterEndDate;
     },
-    methods: {
-      getSubItemValueClass(subItem) {
-        let itemValueClass = '';
+  },
+  methods: {
+    getSubItemValueClass(subItem) {
+      let itemValueClass = '';
 
-        if (this.currentDate.getFullYear() === subItem.getFullYear() &&
-            this.currentDate.getMonth() === subItem.getMonth()) {
-          itemValueClass = 'label-dark label-bold';
-        } else if (this.currentDate < subItem) {
-          itemValueClass = 'label-dark';
-        }
-        return itemValueClass;
-      },
-      getSubItemValue(subItem) {
-        return monthInWords(subItem, true);
-      },
+      if (
+        this.currentDate.getFullYear() === subItem.getFullYear() &&
+        this.currentDate.getMonth() === subItem.getMonth()
+      ) {
+        itemValueClass = 'label-dark label-bold';
+      } else if (this.currentDate < subItem) {
+        itemValueClass = 'label-dark';
+      }
+      return itemValueClass;
     },
-  };
+    getSubItemValue(subItem) {
+      return monthInWords(subItem, true);
+    },
+  },
+};
 </script>
 
 <template>

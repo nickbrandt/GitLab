@@ -81,7 +81,7 @@ describe('ListContainer', () => {
       expect(vm.$el.classList.contains('dropdown-assignees-list')).toBe(true);
     });
 
-    it('renders loading animation when prop `loading` is true', (done) => {
+    it('renders loading animation when prop `loading` is true', done => {
       vm.loading = true;
       Vue.nextTick()
         .then(() => {

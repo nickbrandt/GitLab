@@ -80,7 +80,7 @@ describe('TimelineTodayIndicatorComponent', () => {
   });
 
   describe('template', () => {
-    it('renders component container element with class `today-bar`', (done) => {
+    it('renders component container element with class `today-bar`', done => {
       vm = createComponent({});
       vm.handleEpicsListRender({
         height: 100,
@@ -92,4 +92,3 @@ describe('TimelineTodayIndicatorComponent', () => {
     });
   });
 });
-

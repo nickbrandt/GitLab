@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
       merge_requests_created: [],
     };
 
-    outputElIds.forEach((id) => {
+    outputElIds.forEach(id => {
       data[id].data.forEach((d, index) => {
         formattedData[id].push({
           name: data.labels[index],

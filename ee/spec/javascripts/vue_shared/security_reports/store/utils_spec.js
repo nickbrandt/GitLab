@@ -82,11 +82,7 @@ describe('security reports utils', () => {
     });
 
     it('includes vulnerability feedbacks', () => {
-      const parsed = parseSastIssues(
-        sastIssues,
-        sastFeedbacks,
-        'path',
-      )[0];
+      const parsed = parseSastIssues(sastIssues, sastFeedbacks, 'path')[0];
 
       expect(parsed.hasIssue).toEqual(true);
       expect(parsed.isDismissed).toEqual(true);
@@ -144,15 +140,20 @@ describe('security reports utils', () => {
 
       expect(parsed.title).toEqual(issue.vulnerability);
       expect(parsed.path).toEqual(issue.namespace);
-      expect(parsed.identifiers).toEqual([{
-        type: 'CVE',
-        name: issue.vulnerability,
-        value: issue.vulnerability,
-        url: `https://cve.mitre.org/cgi-bin/cvename.cgi?name=${issue.vulnerability}`,
-      }]);
+      expect(parsed.identifiers).toEqual([
+        {
+          type: 'CVE',
+          name: issue.vulnerability,
+          value: issue.vulnerability,
+          url: `https://cve.mitre.org/cgi-bin/cvename.cgi?name=${issue.vulnerability}`,
+        },
+      ]);
 
       expect(parsed.project_fingerprint).toEqual(
-        sha1(`${issue.namespace}:${issue.vulnerability}:${issue.featurename}:${issue.featureversion}`));
+        sha1(
+          `${issue.namespace}:${issue.vulnerability}:${issue.featurename}:${issue.featureversion}`,
+        ),
+      );
     });
 
     it('includes vulnerability feedbacks', () => {
@@ -174,10 +175,7 @@ describe('security reports utils', () => {
     });
 
     it('includes vulnerability feedbacks', () => {
-      const parsed = parseDastIssues(
-        dast.site.alerts,
-        dastFeedbacks,
-      )[0];
+      const parsed = parseDastIssues(dast.site.alerts, dastFeedbacks)[0];
 
       expect(parsed.hasIssue).toEqual(true);
       expect(parsed.isDismissed).toEqual(true);

@@ -102,8 +102,7 @@ describe('AppComponent', () => {
 
     it('shows loading icon when isLoading prop is true', done => {
       vm.isLoading = true;
-      vm
-        .$nextTick()
+      vm.$nextTick()
         .then(() => {
           const loadingEl = vm.$el.querySelector('.loading-animation');
 
@@ -118,8 +117,7 @@ describe('AppComponent', () => {
 
     it('renders table container element', done => {
       vm.isLoading = false;
-      vm
-        .$nextTick()
+      vm.$nextTick()
         .then(() => {
           expect(vm.$el.querySelector('table.table.gl-sortable')).not.toBeNull();
         })

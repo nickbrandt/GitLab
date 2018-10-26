@@ -23,7 +23,7 @@ export default {
       return Math.max(width, TIMELINE_CELL_MIN_WIDTH);
     },
     sectionContainerStyles() {
-      const width = EPIC_DETAILS_CELL_WIDTH + (this.sectionItemWidth * this.timeframe.length);
+      const width = EPIC_DETAILS_CELL_WIDTH + this.sectionItemWidth * this.timeframe.length;
       return {
         width: `${width}px`,
       };

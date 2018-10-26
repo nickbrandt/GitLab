@@ -8,19 +8,22 @@ import { PRESET_TYPES } from 'ee/roadmap/constants';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { mockEpic, mockTimeframeMonths, mockGroupId, mockScrollBarSize } from '../mock_data';
 
-const createComponent = ({
-  epics = [mockEpic],
-  timeframe = mockTimeframeMonths,
-  currentGroupId = mockGroupId,
-}, el) => {
+const createComponent = (
+  { epics = [mockEpic], timeframe = mockTimeframeMonths, currentGroupId = mockGroupId },
+  el,
+) => {
   const Component = Vue.extend(roadmapShellComponent);
 
-  return mountComponent(Component, {
-    presetType: PRESET_TYPES.MONTHS,
-    epics,
-    timeframe,
-    currentGroupId,
-  }, el);
+  return mountComponent(
+    Component,
+    {
+      presetType: PRESET_TYPES.MONTHS,
+      epics,
+      timeframe,
+      currentGroupId,
+    },
+    el,
+  );
 };
 
 describe('RoadmapShellComponent', () => {
@@ -45,14 +48,15 @@ describe('RoadmapShellComponent', () => {
   describe('computed', () => {
     describe('containerStyles', () => {
       beforeEach(() => {
-        document.body.innerHTML += '<div class="roadmap-container"><div id="roadmap-shell"></div></div>';
+        document.body.innerHTML +=
+          '<div class="roadmap-container"><div id="roadmap-shell"></div></div>';
       });
 
       afterEach(() => {
         document.querySelector('.roadmap-container').remove();
       });
 
-      it('returns style object based on shellWidth and current Window width with Scollbar size offset', (done) => {
+      it('returns style object based on shellWidth and current Window width with Scollbar size offset', done => {
         const vmWithParentEl = createComponent({}, document.getElementById('roadmap-shell'));
         Vue.nextTick(() => {
           const stylesObj = vmWithParentEl.containerStyles;
@@ -101,7 +105,7 @@ describe('RoadmapShellComponent', () => {
       expect(vm.$el.classList.contains('roadmap-shell')).toBe(true);
     });
 
-    it('adds `prevent-vertical-scroll` class on component container element', (done) => {
+    it('adds `prevent-vertical-scroll` class on component container element', done => {
       vm.noScroll = true;
       Vue.nextTick(() => {
         expect(vm.$el.classList.contains('prevent-vertical-scroll')).toBe(true);

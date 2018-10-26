@@ -11,15 +11,16 @@ export default function initRelatedIssues() {
       components: {
         relatedIssuesRoot: RelatedIssuesRoot,
       },
-      render: createElement => createElement('related-issues-root', {
-        props: {
-          endpoint: relatedIssuesRootElement.dataset.endpoint,
-          canAdmin: convertPermissionToBoolean(
-            relatedIssuesRootElement.dataset.canAddRelatedIssues,
-          ),
-          helpPath: relatedIssuesRootElement.dataset.helpPath,
-        },
-      }),
+      render: createElement =>
+        createElement('related-issues-root', {
+          props: {
+            endpoint: relatedIssuesRootElement.dataset.endpoint,
+            canAdmin: convertPermissionToBoolean(
+              relatedIssuesRootElement.dataset.canAddRelatedIssues,
+            ),
+            helpPath: relatedIssuesRootElement.dataset.helpPath,
+          },
+        }),
     });
   }
 }

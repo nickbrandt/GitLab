@@ -48,14 +48,16 @@ export default {
       // based on the current presetType
       if (this.presetType === PRESET_TYPES.QUARTERS) {
         left = Math.floor(
-          dayInQuarter(this.currentDate, this.timeframeItem.range) /
-            totalDaysInQuarter(this.timeframeItem.range) *
+          (dayInQuarter(this.currentDate, this.timeframeItem.range) /
+            totalDaysInQuarter(this.timeframeItem.range)) *
             100,
         );
       } else if (this.presetType === PRESET_TYPES.MONTHS) {
-        left = Math.floor(this.currentDate.getDate() / totalDaysInMonth(this.timeframeItem) * 100);
+        left = Math.floor(
+          (this.currentDate.getDate() / totalDaysInMonth(this.timeframeItem)) * 100,
+        );
       } else if (this.presetType === PRESET_TYPES.WEEKS) {
-        left = Math.floor(((this.currentDate.getDay() + 1) / 7 * 100) - 7);
+        left = Math.floor(((this.currentDate.getDay() + 1) / 7) * 100 - 7);
       }
 
       // We add 20 to height to ensure that
@@ -73,7 +75,7 @@ export default {
       const rootOffsetLeft = this.$root.$el.offsetLeft;
 
       // 3px to compensate size of bubble on top of Indicator
-      this.todayBarReady = (indicatorX - rootOffsetLeft) >= (EPIC_DETAILS_CELL_WIDTH + 3);
+      this.todayBarReady = indicatorX - rootOffsetLeft >= EPIC_DETAILS_CELL_WIDTH + 3;
     },
   },
 };

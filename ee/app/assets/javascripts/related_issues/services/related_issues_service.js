@@ -13,9 +13,12 @@ class RelatedIssuesService {
   }
 
   addRelatedIssues(newIssueReferences) {
-    return this.relatedIssuesResource.save({}, {
-      issue_references: newIssueReferences,
-    });
+    return this.relatedIssuesResource.save(
+      {},
+      {
+        issue_references: newIssueReferences,
+      },
+    );
   }
 
   static saveOrder({ endpoint, move_before_id, move_after_id }) {

@@ -1,22 +1,22 @@
 <script>
-  import Participants from '~/sidebar/components/participants/participants.vue';
+import Participants from '~/sidebar/components/participants/participants.vue';
 
-  export default {
-    components: {
-      Participants,
+export default {
+  components: {
+    Participants,
+  },
+  props: {
+    participants: {
+      type: Array,
+      required: true,
     },
-    props: {
-      participants: {
-        type: Array,
-        required: true,
-      },
+  },
+  methods: {
+    onToggleSidebar() {
+      this.$emit('toggleCollapse');
     },
-    methods: {
-      onToggleSidebar() {
-        this.$emit('toggleCollapse');
-      },
-    },
-  };
+  },
+};
 </script>
 
 <template>

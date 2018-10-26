@@ -83,8 +83,7 @@ describe('Weight', function() {
 
     vm.$el.querySelector('.js-weight-collapsed-block').click();
 
-    vm
-      .$nextTick()
+    vm.$nextTick()
       .then(() => {
         expect(vm.$el.classList.contains('collapse-after-update')).toEqual(true);
       })
@@ -102,8 +101,7 @@ describe('Weight', function() {
 
     vm.$el.querySelector('.js-weight-edit-link').click();
 
-    vm
-      .$nextTick()
+    vm.$nextTick()
       .then(() => {
         expect(vm.shouldShowEditField).toEqual(true);
       })

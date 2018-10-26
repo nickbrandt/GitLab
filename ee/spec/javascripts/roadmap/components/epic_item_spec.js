@@ -5,7 +5,13 @@ import epicItemComponent from 'ee/roadmap/components/epic_item.vue';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeMonths, mockEpic, mockGroupId, mockShellWidth, mockItemWidth } from '../mock_data';
+import {
+  mockTimeframeMonths,
+  mockEpic,
+  mockGroupId,
+  mockShellWidth,
+  mockItemWidth,
+} from '../mock_data';
 
 const createComponent = ({
   presetType = PRESET_TYPES.MONTHS,

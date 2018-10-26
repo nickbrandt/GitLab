@@ -1,9 +1,5 @@
 import { n__, sprintf } from '~/locale';
-import {
-  STATUS_FAILED,
-  STATUS_NEUTRAL,
-  STATUS_SUCCESS,
-} from '~/reports/constants';
+import { STATUS_FAILED, STATUS_NEUTRAL, STATUS_SUCCESS } from '~/reports/constants';
 import { LICENSE_APPROVAL_STATUS } from 'ee/vue_shared/license_management/constants';
 
 /**

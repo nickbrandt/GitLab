@@ -1,29 +1,29 @@
 <script>
-  import Subscriptions from '~/sidebar/components/subscriptions/subscriptions.vue';
+import Subscriptions from '~/sidebar/components/subscriptions/subscriptions.vue';
 
-  export default {
-    components: {
-      Subscriptions,
+export default {
+  components: {
+    Subscriptions,
+  },
+  props: {
+    loading: {
+      type: Boolean,
+      required: true,
     },
-    props: {
-      loading: {
-        type: Boolean,
-        required: true,
-      },
-      subscribed: {
-        type: Boolean,
-        required: true,
-      },
+    subscribed: {
+      type: Boolean,
+      required: true,
     },
-    methods: {
-      onToggleSubscription() {
-        this.$emit('toggleSubscription');
-      },
-      onToggleSidebar() {
-        this.$emit('toggleCollapse');
-      },
+  },
+  methods: {
+    onToggleSubscription() {
+      this.$emit('toggleSubscription');
     },
-  };
+    onToggleSidebar() {
+      this.$emit('toggleCollapse');
+    },
+  },
+};
 </script>
 
 <template>

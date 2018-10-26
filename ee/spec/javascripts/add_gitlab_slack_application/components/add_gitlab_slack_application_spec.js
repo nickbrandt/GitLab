@@ -11,13 +11,16 @@ describe('AddGitlabSlackApplication', () => {
   const docsPath = '//docsPath';
   const gitlabLogoPath = '//gitlabLogoPath';
   const slackLogoPath = '//slackLogoPath';
-  const projects = [{
-    id: 4,
-    name: 'test',
-  }, {
-    id: 6,
-    name: 'nope',
-  }];
+  const projects = [
+    {
+      id: 4,
+      name: 'test',
+    },
+    {
+      id: 6,
+      name: 'nope',
+    },
+  ];
   const DEFAULT_PROPS = {
     projects,
     gitlabForSlackGifPath,
@@ -31,20 +34,20 @@ describe('AddGitlabSlackApplication', () => {
 
   const AddGitlabSlackApplication = Vue.extend(addGitlabSlackApplication);
 
-  it('opens popup when button is clicked', (done) => {
+  it('opens popup when button is clicked', done => {
     const vm = mountComponent(AddGitlabSlackApplication, DEFAULT_PROPS);
 
     vm.$el.querySelector('.js-popup-button').click();
 
     vm.$nextTick()
       .then(() => {
-          expect(vm.$el.querySelector('.js-popup')).toBeDefined()
+        expect(vm.$el.querySelector('.js-popup')).toBeDefined();
       })
       .then(done)
       .catch(done.fail);
   });
 
-  it('hides popup when button is clicked', (done) => {
+  it('hides popup when button is clicked', done => {
     const vm = mountComponent(AddGitlabSlackApplication, DEFAULT_PROPS);
 
     vm.popupOpen = true;
@@ -53,13 +56,13 @@ describe('AddGitlabSlackApplication', () => {
       .then(() => vm.$el.querySelector('.js-popup-button').click())
       .then(vm.$nextTick)
       .then(() => {
-          expect(vm.$el.querySelector('.js-popup')).toBeNull()
+        expect(vm.$el.querySelector('.js-popup')).toBeNull();
       })
       .then(done)
       .catch(done.fail);
   });
 
-  it('popup has a project select when signed in', (done) => {
+  it('popup has a project select when signed in', done => {
     const vm = mountComponent(AddGitlabSlackApplication, {
       ...DEFAULT_PROPS,
       isSignedIn: true,
@@ -69,13 +72,13 @@ describe('AddGitlabSlackApplication', () => {
 
     vm.$nextTick()
       .then(() => {
-          expect(vm.$el.querySelector('.js-project-select')).toBeDefined()
+        expect(vm.$el.querySelector('.js-project-select')).toBeDefined();
       })
       .then(done)
       .catch(done.fail);
   });
 
-  it('popup has a message when there is no projects', (done) => {
+  it('popup has a message when there is no projects', done => {
     const vm = mountComponent(AddGitlabSlackApplication, {
       ...DEFAULT_PROPS,
       projects: [],
@@ -86,14 +89,15 @@ describe('AddGitlabSlackApplication', () => {
 
     vm.$nextTick()
       .then(() => {
-        expect(vm.$el.querySelector('.js-no-projects').textContent)
-          .toMatch("You don't have any projects available.");
+        expect(vm.$el.querySelector('.js-no-projects').textContent).toMatch(
+          "You don't have any projects available.",
+        );
       })
       .then(done)
       .catch(done.fail);
   });
 
-  it('popup has a sign in link when logged out', (done) => {
+  it('popup has a sign in link when logged out', done => {
     const vm = mountComponent(AddGitlabSlackApplication, {
       ...DEFAULT_PROPS,
     });
@@ -103,14 +107,15 @@ describe('AddGitlabSlackApplication', () => {
 
     vm.$nextTick()
       .then(() => {
-        expect(vm.$el.querySelector('.js-gitlab-slack-sign-in-link').href)
-          .toMatch(new RegExp(signInPath, 'i'));
+        expect(vm.$el.querySelector('.js-gitlab-slack-sign-in-link').href).toMatch(
+          new RegExp(signInPath, 'i'),
+        );
       })
       .then(done)
       .catch(done.fail);
   });
 
-  it('redirects user to external link when submitted', (done) => {
+  it('redirects user to external link when submitted', done => {
     const vm = mountComponent(AddGitlabSlackApplication, {
       ...DEFAULT_PROPS,
       isSignedIn: true,
@@ -127,7 +132,7 @@ describe('AddGitlabSlackApplication', () => {
       .then(vm.$nextTick)
       .then(addToSlackPromise)
       .then(() => {
-          expect(redirectTo).toHaveBeenCalledWith(redirectLink)
+        expect(redirectTo).toHaveBeenCalledWith(redirectLink);
       })
       .then(done)
       .catch(done.fail);

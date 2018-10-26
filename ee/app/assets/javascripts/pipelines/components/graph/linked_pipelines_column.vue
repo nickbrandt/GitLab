@@ -1,31 +1,31 @@
 <script>
-  import linkedPipeline from './linked_pipeline.vue';
+import linkedPipeline from './linked_pipeline.vue';
 
-  export default {
-    components: {
-      linkedPipeline,
+export default {
+  components: {
+    linkedPipeline,
+  },
+  props: {
+    columnTitle: {
+      type: String,
+      required: true,
     },
-    props: {
-      columnTitle: {
-        type: String,
-        required: true,
-      },
-      linkedPipelines: {
-        type: Array,
-        required: true,
-      },
-      graphPosition: {
-        type: String,
-        required: true,
-      },
+    linkedPipelines: {
+      type: Array,
+      required: true,
     },
+    graphPosition: {
+      type: String,
+      required: true,
+    },
+  },
 
-    computed: {
-      columnClass() {
-        return `graph-position-${this.graphPosition}`;
-      },
+  computed: {
+    columnClass() {
+      return `graph-position-${this.graphPosition}`;
     },
-  };
+  },
+};
 </script>
 
 <template>

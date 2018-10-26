@@ -59,7 +59,7 @@ describe('NodeDetailsSectionOther', () => {
     });
 
     describe('storageShardsStatus', () => {
-      it('returns `Unknown` when `nodeDetails.storageShardsMatch` is null', (done) => {
+      it('returns `Unknown` when `nodeDetails.storageShardsMatch` is null', done => {
         vm.nodeDetails.storageShardsMatch = null;
         Vue.nextTick()
           .then(() => {
@@ -69,7 +69,7 @@ describe('NodeDetailsSectionOther', () => {
           .catch(done.fail);
       });
 
-      it('returns `OK` when `nodeDetails.storageShardsMatch` is true', (done) => {
+      it('returns `OK` when `nodeDetails.storageShardsMatch` is true', done => {
         vm.nodeDetails.storageShardsMatch = true;
         Vue.nextTick()
           .then(() => {
@@ -85,7 +85,7 @@ describe('NodeDetailsSectionOther', () => {
     });
 
     describe('storageShardsCssClass', () => {
-      it('returns CSS class `node-detail-value-bold` when `nodeDetails.storageShardsMatch` is true', (done) => {
+      it('returns CSS class `node-detail-value-bold` when `nodeDetails.storageShardsMatch` is true', done => {
         vm.nodeDetails.storageShardsMatch = true;
         Vue.nextTick()
           .then(() => {
@@ -108,7 +108,9 @@ describe('NodeDetailsSectionOther', () => {
 
     it('renders show section button element', () => {
       expect(vm.$el.querySelector('.btn-show-section')).not.toBeNull();
-      expect(vm.$el.querySelector('.btn-show-section > span').innerText.trim()).toBe('Other information');
+      expect(vm.$el.querySelector('.btn-show-section > span').innerText.trim()).toBe(
+        'Other information',
+      );
     });
 
     it('renders section items container element', () => {

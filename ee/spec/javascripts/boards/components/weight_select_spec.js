@@ -15,7 +15,7 @@ function activeDropdownItem() {
 }
 
 describe('WeightSelect', () => {
-  beforeEach((done) => {
+  beforeEach(done => {
     setFixtures('<div class="test-container"></div>');
 
     board = {
@@ -43,7 +43,7 @@ describe('WeightSelect', () => {
       expect(getSelectedText()).toBe('Any Weight');
     });
 
-    it('displays Any Weight for value -1', (done) => {
+    it('displays Any Weight for value -1', done => {
       vm.value = -1;
       Vue.nextTick(() => {
         expect(getSelectedText()).toEqual('Any Weight');
@@ -51,7 +51,7 @@ describe('WeightSelect', () => {
       });
     });
 
-    it('displays No Weight', (done) => {
+    it('displays No Weight', done => {
       vm.value = 0;
       Vue.nextTick(() => {
         expect(getSelectedText()).toEqual('No Weight');
@@ -59,7 +59,7 @@ describe('WeightSelect', () => {
       });
     });
 
-    it('weight 1', (done) => {
+    it('weight 1', done => {
       vm.value = 1;
       Vue.nextTick(() => {
         expect(getSelectedText()).toEqual('1');
@@ -69,7 +69,7 @@ describe('WeightSelect', () => {
   });
 
   describe('active item in dropdown', () => {
-    it('defaults to Any Weight', (done) => {
+    it('defaults to Any Weight', done => {
       vm.$el.querySelector('.edit-link').click();
 
       setTimeout(() => {
@@ -78,7 +78,7 @@ describe('WeightSelect', () => {
       });
     });
 
-    it('shows No Weight', (done) => {
+    it('shows No Weight', done => {
       vm.value = 0;
       vm.$el.querySelector('.edit-link').click();
 
@@ -88,7 +88,7 @@ describe('WeightSelect', () => {
       });
     });
 
-    it('shows correct weight', (done) => {
+    it('shows correct weight', done => {
       vm.value = 1;
       vm.$el.querySelector('.edit-link').click();
 
@@ -100,7 +100,7 @@ describe('WeightSelect', () => {
   });
 
   describe('changing weight', () => {
-    it('sets value', (done) => {
+    it('sets value', done => {
       vm.$el.querySelector('.edit-link').click();
 
       setTimeout(() => {
@@ -114,7 +114,7 @@ describe('WeightSelect', () => {
       });
     });
 
-    it('sets Any Weight', (done) => {
+    it('sets Any Weight', done => {
       vm.value = 2;
       vm.$el.querySelector('.edit-link').click();
 
@@ -129,7 +129,7 @@ describe('WeightSelect', () => {
       });
     });
 
-    it('sets No Weight', (done) => {
+    it('sets No Weight', done => {
       vm.value = 2;
       vm.$el.querySelector('.edit-link').click();
 

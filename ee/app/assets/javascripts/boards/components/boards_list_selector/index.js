@@ -43,15 +43,17 @@ export default Vue.extend({
         })
         .catch(() => {
           this.loading = false;
-          Flash(sprintf(__('Something went wrong while fetching %{listType} list'), {
-            listType: this.listType,
-          }));
+          Flash(
+            sprintf(__('Something went wrong while fetching %{listType} list'), {
+              listType: this.listType,
+            }),
+          );
         });
     },
     filterItems(term, items) {
       const query = term.toLowerCase();
 
-      return items.filter((item) => {
+      return items.filter(item => {
         const name = item.name ? item.name.toLowerCase() : item.title.toLowerCase();
         const foundName = name.indexOf(query) > -1;
 

@@ -73,7 +73,7 @@ export default {
       }
       // Calculate proportional offset based on startDate and total days in
       // current month.
-      return `left: ${startDate / daysInMonth * 100}%;`;
+      return `left: ${(startDate / daysInMonth) * 100}%;`;
     },
     /**
      * This method is externally only called when current timeframe cell has timeline

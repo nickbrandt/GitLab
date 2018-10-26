@@ -37,7 +37,7 @@ describe('GeoNodeHeader', () => {
         expect(vm.isNodeHTTP).toBe(true);
       });
 
-      it('returns `false` when Node URL protocol is HTTPS', (done) => {
+      it('returns `false` when Node URL protocol is HTTPS', done => {
         vm.node.url = 'https://127.0.0.1:3001/';
         Vue.nextTick()
           .then(() => {
@@ -49,7 +49,7 @@ describe('GeoNodeHeader', () => {
     });
 
     describe('showNodeStatusIcon', () => {
-      it('returns `false` when Node details are still loading', (done) => {
+      it('returns `false` when Node details are still loading', done => {
         vm.nodeDetailsLoading = true;
         Vue.nextTick()
           .then(() => {
@@ -59,7 +59,7 @@ describe('GeoNodeHeader', () => {
           .catch(done.fail);
       });
 
-      it('returns `true` when Node details failed to load', (done) => {
+      it('returns `true` when Node details failed to load', done => {
         vm.nodeDetailsFailed = true;
         Vue.nextTick()
           .then(() => {
@@ -69,7 +69,7 @@ describe('GeoNodeHeader', () => {
           .catch(done.fail);
       });
 
-      it('returns `true` when Node details loaded and Node URL is non-HTTPS', (done) => {
+      it('returns `true` when Node details loaded and Node URL is non-HTTPS', done => {
         vm.nodeDetailsLoading = false;
         vm.nodeDetailsFailed = false;
         vm.node.url = mockNode.url;
@@ -81,7 +81,7 @@ describe('GeoNodeHeader', () => {
           .catch(done.fail);
       });
 
-      it('returns `false` when Node details loaded and Node URL is HTTPS', (done) => {
+      it('returns `false` when Node details loaded and Node URL is HTTPS', done => {
         vm.node.url = 'https://127.0.0.1:3001/';
         Vue.nextTick()
           .then(() => {

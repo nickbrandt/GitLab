@@ -41,7 +41,9 @@ describe('SidebarParticipants', () => {
 
     it('renders participants list element', () => {
       expect(vm.$el.querySelector('.participants-list')).not.toBeNull();
-      expect(vm.$el.querySelectorAll('.js-participants-author').length).toBe(mockParticipants.length);
+      expect(vm.$el.querySelectorAll('.js-participants-author').length).toBe(
+        mockParticipants.length,
+      );
     });
   });
 });

@@ -4,9 +4,7 @@ import NodeDetailsSectionSyncComponent from 'ee/geo_nodes/components/node_detail
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { mockNodeDetails } from 'ee_spec/geo_nodes/mock_data';
 
-const createComponent = (
-  nodeDetails = Object.assign({}, mockNodeDetails),
-) => {
+const createComponent = (nodeDetails = Object.assign({}, mockNodeDetails)) => {
   const Component = Vue.extend(NodeDetailsSectionSyncComponent);
 
   return mountComponent(Component, {
@@ -35,7 +33,7 @@ describe('NodeDetailsSectionSync', () => {
 
   describe('methods', () => {
     describe('syncSettings', () => {
-      it('returns sync settings object', (done) => {
+      it('returns sync settings object', done => {
         vm.nodeDetails.syncStatusUnavailable = true;
         Vue.nextTick()
           .then(() => {
@@ -56,7 +54,7 @@ describe('NodeDetailsSectionSync', () => {
         expect(vm.dbReplicationLag()).toBe('0m');
       });
 
-      it('returns `Unknown` when `dbReplicationLag` is null', (done) => {
+      it('returns `Unknown` when `dbReplicationLag` is null', done => {
         vm.nodeDetails.dbReplicationLag = null;
         Vue.nextTick()
           .then(() => {
@@ -77,8 +75,9 @@ describe('NodeDetailsSectionSync', () => {
     describe('cursorLastEventStatus', () => {
       it('returns event status object', () => {
         expect(vm.cursorLastEventStatus().eventId).toBe(mockNodeDetails.cursorLastEvent.id);
-        expect(vm.cursorLastEventStatus().eventTimeStamp)
-          .toBe(mockNodeDetails.cursorLastEvent.timeStamp);
+        expect(vm.cursorLastEventStatus().eventTimeStamp).toBe(
+          mockNodeDetails.cursorLastEvent.timeStamp,
+        );
       });
     });
   });
@@ -90,7 +89,9 @@ describe('NodeDetailsSectionSync', () => {
 
     it('renders show section button element', () => {
       expect(vm.$el.querySelector('.btn-show-section')).not.toBeNull();
-      expect(vm.$el.querySelector('.btn-show-section > span').innerText.trim()).toBe('Sync information');
+      expect(vm.$el.querySelector('.btn-show-section > span').innerText.trim()).toBe(
+        'Sync information',
+      );
     });
 
     it('renders section items container element', () => {

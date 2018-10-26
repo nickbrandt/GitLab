@@ -46,8 +46,9 @@ const bindEvents = () => {
     const $activeTabProjectName = $('.tab-pane.active #project_name');
     const $activeTabProjectPath = $('.tab-pane.active #project_path');
     $activeTabProjectName.focus();
-    $activeTabProjectName
-      .keyup(() => projectNew.onProjectNameChange($activeTabProjectName, $activeTabProjectPath));
+    $activeTabProjectName.keyup(() =>
+      projectNew.onProjectNameChange($activeTabProjectName, $activeTabProjectPath),
+    );
   }
 
   $useCustomTemplateBtn.on('change', chooseTemplate);
@@ -60,7 +61,6 @@ const bindEvents = () => {
 };
 
 export default () => {
-
   const $navElement = $('.nav-link[href="#custom-templates"]');
   const $tabContent = $('.project-templates-buttons#custom-templates');
 

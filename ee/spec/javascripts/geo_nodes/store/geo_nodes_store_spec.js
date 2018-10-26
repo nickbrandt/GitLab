@@ -40,7 +40,7 @@ describe('GeoNodesStore', () => {
       store.setNodes(mockNodes);
       const nodeToBeRemoved = store.getNodes()[1];
       store.removeNode(nodeToBeRemoved);
-      store.getNodes().forEach((node) => {
+      store.getNodes().forEach(node => {
         expect(node.id).not.toBe(nodeToBeRemoved);
       });
     });
@@ -63,8 +63,9 @@ describe('GeoNodesStore', () => {
       const nodeDetails = GeoNodesStore.formatNodeDetails(rawMockNodeDetails);
 
       expect(nodeDetails.healthStatus).toBe(rawMockNodeDetails.health_status);
-      expect(nodeDetails.replicationSlotWAL)
-        .toBe(rawMockNodeDetails.replication_slots_max_retained_wal_bytes);
+      expect(nodeDetails.replicationSlotWAL).toBe(
+        rawMockNodeDetails.replication_slots_max_retained_wal_bytes,
+      );
     });
   });
 });

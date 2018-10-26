@@ -1,43 +1,41 @@
 <script>
-  import { formatDate } from '~/lib/utils/datetime_utility';
-  import timeAgoMixin from '~/vue_shared/mixins/timeago';
-  import tooltip from '~/vue_shared/directives/tooltip';
+import { formatDate } from '~/lib/utils/datetime_utility';
+import timeAgoMixin from '~/vue_shared/mixins/timeago';
+import tooltip from '~/vue_shared/directives/tooltip';
 
-  export default {
-    directives: {
-      tooltip,
+export default {
+  directives: {
+    tooltip,
+  },
+  mixins: [timeAgoMixin],
+  props: {
+    eventId: {
+      type: Number,
+      required: true,
     },
-    mixins: [
-      timeAgoMixin,
-    ],
-    props: {
-      eventId: {
-        type: Number,
-        required: true,
-      },
-      eventTimeStamp: {
-        type: Number,
-        required: true,
-        default: 0,
-      },
-      eventTypeLogStatus: {
-        type: Boolean,
-        required: false,
-        default: false,
-      },
+    eventTimeStamp: {
+      type: Number,
+      required: true,
+      default: 0,
     },
-    computed: {
-      timeStamp() {
-        return new Date(this.eventTimeStamp * 1000);
-      },
-      timeStampString() {
-        return formatDate(this.timeStamp);
-      },
-      eventString() {
-        return this.eventId;
-      },
+    eventTypeLogStatus: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
-  };
+  },
+  computed: {
+    timeStamp() {
+      return new Date(this.eventTimeStamp * 1000);
+    },
+    timeStampString() {
+      return formatDate(this.timeStamp);
+    },
+    eventString() {
+      return this.eventId;
+    },
+  },
+};
 </script>
 
 <template>

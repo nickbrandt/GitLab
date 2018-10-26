@@ -24,7 +24,7 @@ describe('Dashboard', () => {
   });
 
   describe('metrics without alerts', () => {
-    it('does not show threshold lines', (done) => {
+    it('does not show threshold lines', done => {
       vm = new Component({
         el: document.querySelector('.prometheus-graphs'),
         propsData: {
@@ -59,7 +59,7 @@ describe('Dashboard', () => {
       });
     });
 
-    it('shows single threshold line', (done) => {
+    it('shows single threshold line', done => {
       vm.setAlerts(metricId, {
         alertName: alertParams,
       });
@@ -70,7 +70,7 @@ describe('Dashboard', () => {
       });
     });
 
-    it('shows multiple threshold lines', (done) => {
+    it('shows multiple threshold lines', done => {
       vm.setAlerts(metricId, {
         someAlert: alertParams,
         otherAlert: alertParams,
