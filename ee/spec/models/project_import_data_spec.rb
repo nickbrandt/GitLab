@@ -90,7 +90,7 @@ describe ProjectImportData do
     end
   end
 
-  describe '#ssh_import?' do
+  describe '#ssh_mirror_url?' do
     where(:import_url, :expected) do
       'ssh://example.com'   | true
       'git://example.com'   | false
@@ -100,7 +100,7 @@ describe ProjectImportData do
     end
 
     with_them do
-      subject { import_data.ssh_import? }
+      subject { import_data.ssh_mirror_url? }
 
       it { is_expected.to eq(expected) }
     end
