@@ -6,7 +6,7 @@ import Flash from '~/flash';
 import { backOff } from '~/lib/utils/common_utils';
 import AUTH_METHOD from './constants';
 
-export default class MirrorPull {
+export default class SSHMirror {
   constructor(formSelector) {
     this.backOffRequestCounter = 0;
 
@@ -19,7 +19,7 @@ export default class MirrorPull {
     this.$hostKeysInformation = this.$form.find('.js-fingerprint-ssh-info');
     this.$btnDetectHostKeys = this.$form.find('.js-detect-host-keys');
     this.$btnSSHHostsShowAdvanced = this.$form.find('.btn-show-advanced');
-    this.$dropdownAuthType = this.$form.find('.js-pull-mirror-auth-type');
+    this.$dropdownAuthType = this.$form.find('.js-mirror-auth-type');
 
     this.$wellAuthTypeChanging = this.$form.find('.js-well-changing-auth');
     this.$wellPasswordAuth = this.$form.find('.js-well-password-auth');
@@ -151,9 +151,10 @@ export default class MirrorPull {
    */
   handleSSHHostsAdvanced() {
     const $knownHost = this.$sectionSSHHostKeys.find('.js-ssh-known-hosts');
+    const toggleShowAdvanced = $knownHost.hasClass('show');
 
     $knownHost.collapse('toggle');
-    this.$btnSSHHostsShowAdvanced.toggleClass('show-advanced', !$knownHost.hasClass('in'));
+    this.$btnSSHHostsShowAdvanced.toggleClass('show-advanced', toggleShowAdvanced);
   }
 
   /**
@@ -164,21 +165,21 @@ export default class MirrorPull {
     const $sshPublicKey = this.$sshPublicKeyWrap.find('.ssh-public-key');
     const selectedAuthType = this.$dropdownAuthType.val();
 
-    // Construct request body
-    const authTypeData = {
-      project: {
-        import_data_attributes: {
-          regenerate_ssh_private_key: true,
-        },
-      },
-    };
-
     this.$wellPasswordAuth.collapse('hide');
     this.$wellSSHAuth.collapse('hide');
 
     // This request should happen only if selected Auth type was SSH
     // and SSH Public key was not present on page load
     if (selectedAuthType === AUTH_METHOD.SSH && !$sshPublicKey.text().trim()) {
+      if (!this.$wellSSHAuth.length) return;
+
+      // Construct request body
+      const authTypeData = {
+        project: {
+          ...this.$regeneratePublicSshKeyButton.data().projectData,
+        },
+      };
+
       this.$wellAuthTypeChanging.collapse('show');
       this.$dropdownAuthType.disable();
 
@@ -263,12 +264,17 @@ export default class MirrorPull {
     const button = this.$regeneratePublicSshKeyButton;
     const spinner = $('.js-spinner', button);
     const endpoint = button.data('endpoint');
+    const authTypeData = {
+      project: {
+        ...this.$regeneratePublicSshKeyButton.data().projectData,
+      },
+    };
 
     button.attr('disabled', 'disabled');
     spinner.removeClass('d-none');
 
     axios
-      .patch(endpoint)
+      .patch(endpoint, authTypeData)
       .then(({ data }) => {
         button.removeAttr('disabled');
         spinner.addClass('d-none');
