@@ -288,13 +288,6 @@ ActiveRecord::Schema.define(version: 20181017131623) do
 
   add_index "board_assignees", ["board_id", "assignee_id"], name: "index_board_assignees_on_board_id_and_assignee_id", unique: true, using: :btree
 
-  create_table "board_labels", force: :cascade do |t|
-    t.integer "board_id", null: false
-    t.integer "label_id", null: false
-  end
-
-  add_index "board_labels", ["board_id", "label_id"], name: "index_board_labels_on_board_id_and_label_id", unique: true, using: :btree
-
   create_table "board_group_recent_visits", id: :bigserial, force: :cascade do |t|
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
@@ -307,6 +300,13 @@ ActiveRecord::Schema.define(version: 20181017131623) do
   add_index "board_group_recent_visits", ["group_id"], name: "index_board_group_recent_visits_on_group_id", using: :btree
   add_index "board_group_recent_visits", ["user_id", "group_id", "board_id"], name: "index_board_group_recent_visits_on_user_group_and_board", unique: true, using: :btree
   add_index "board_group_recent_visits", ["user_id"], name: "index_board_group_recent_visits_on_user_id", using: :btree
+
+  create_table "board_labels", force: :cascade do |t|
+    t.integer "board_id", null: false
+    t.integer "label_id", null: false
+  end
+
+  add_index "board_labels", ["board_id", "label_id"], name: "index_board_labels_on_board_id_and_label_id", unique: true, using: :btree
 
   create_table "board_project_recent_visits", id: :bigserial, force: :cascade do |t|
     t.datetime_with_timezone "created_at", null: false
@@ -3176,16 +3176,15 @@ ActiveRecord::Schema.define(version: 20181017131623) do
   add_foreign_key "badges", "projects", on_delete: :cascade
   add_foreign_key "board_assignees", "boards", on_delete: :cascade
   add_foreign_key "board_assignees", "users", column: "assignee_id", on_delete: :cascade
-  add_foreign_key "board_labels", "boards", on_delete: :cascade
-  add_foreign_key "board_labels", "labels", on_delete: :cascade
-  add_foreign_key "boards", "namespaces", column: "group_id", name: "fk_1e9a074a35", on_delete: :cascade
   add_foreign_key "board_group_recent_visits", "boards", on_delete: :cascade
   add_foreign_key "board_group_recent_visits", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "board_group_recent_visits", "users", on_delete: :cascade
+  add_foreign_key "board_labels", "boards", on_delete: :cascade
+  add_foreign_key "board_labels", "labels", on_delete: :cascade
   add_foreign_key "board_project_recent_visits", "boards", on_delete: :cascade
   add_foreign_key "board_project_recent_visits", "projects", on_delete: :cascade
   add_foreign_key "board_project_recent_visits", "users", on_delete: :cascade
-  add_foreign_key "boards", "namespaces", column: "group_id", on_delete: :cascade
+  add_foreign_key "boards", "namespaces", column: "group_id", name: "fk_1e9a074a35", on_delete: :cascade
   add_foreign_key "boards", "projects", name: "fk_f15266b5f9", on_delete: :cascade
   add_foreign_key "chat_teams", "namespaces", on_delete: :cascade
   add_foreign_key "ci_build_trace_chunks", "ci_builds", column: "build_id", on_delete: :cascade
