@@ -67,11 +67,11 @@ export default {
             aria-haspopup="true"
             aria-expanded="false"
           >
-            {{ dropdownText }}
             <icon
               class="float-right"
               name="chevron-down"
             />
+            {{ dropdownText }}
           </button>
           <div
             class="dropdown-menu dropdown-menu-right"
