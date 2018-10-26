@@ -556,6 +556,11 @@ the instructions below:
     ```bash
     gitlab-ctl restart
     ```
+2. Populate the FDW tables
+
+    ```bash
+    gitlab-rake geo:db:refresh_foreign_tables
+    ```
 
 ## PGBouncer support (optional)
 
