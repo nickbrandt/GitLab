@@ -11,11 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 20181017131623) do
-=======
-ActiveRecord::Schema.define(version: 20181016152238) do
->>>>>>> upstream/master
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -285,7 +281,6 @@ ActiveRecord::Schema.define(version: 20181016152238) do
   add_index "badges", ["group_id"], name: "index_badges_on_group_id", using: :btree
   add_index "badges", ["project_id"], name: "index_badges_on_project_id", using: :btree
 
-<<<<<<< HEAD
   create_table "board_assignees", force: :cascade do |t|
     t.integer "board_id", null: false
     t.integer "assignee_id", null: false
@@ -299,7 +294,7 @@ ActiveRecord::Schema.define(version: 20181016152238) do
   end
 
   add_index "board_labels", ["board_id", "label_id"], name: "index_board_labels_on_board_id_and_label_id", unique: true, using: :btree
-=======
+
   create_table "board_group_recent_visits", id: :bigserial, force: :cascade do |t|
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
@@ -325,7 +320,6 @@ ActiveRecord::Schema.define(version: 20181016152238) do
   add_index "board_project_recent_visits", ["project_id"], name: "index_board_project_recent_visits_on_project_id", using: :btree
   add_index "board_project_recent_visits", ["user_id", "project_id", "board_id"], name: "index_board_project_recent_visits_on_user_project_and_board", unique: true, using: :btree
   add_index "board_project_recent_visits", ["user_id"], name: "index_board_project_recent_visits_on_user_id", using: :btree
->>>>>>> upstream/master
 
   create_table "boards", force: :cascade do |t|
     t.integer "project_id"
@@ -3180,13 +3174,11 @@ ActiveRecord::Schema.define(version: 20181016152238) do
   add_foreign_key "approver_groups", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "badges", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "badges", "projects", on_delete: :cascade
-<<<<<<< HEAD
   add_foreign_key "board_assignees", "boards", on_delete: :cascade
   add_foreign_key "board_assignees", "users", column: "assignee_id", on_delete: :cascade
   add_foreign_key "board_labels", "boards", on_delete: :cascade
   add_foreign_key "board_labels", "labels", on_delete: :cascade
   add_foreign_key "boards", "namespaces", column: "group_id", name: "fk_1e9a074a35", on_delete: :cascade
-=======
   add_foreign_key "board_group_recent_visits", "boards", on_delete: :cascade
   add_foreign_key "board_group_recent_visits", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "board_group_recent_visits", "users", on_delete: :cascade
@@ -3194,7 +3186,6 @@ ActiveRecord::Schema.define(version: 20181016152238) do
   add_foreign_key "board_project_recent_visits", "projects", on_delete: :cascade
   add_foreign_key "board_project_recent_visits", "users", on_delete: :cascade
   add_foreign_key "boards", "namespaces", column: "group_id", on_delete: :cascade
->>>>>>> upstream/master
   add_foreign_key "boards", "projects", name: "fk_f15266b5f9", on_delete: :cascade
   add_foreign_key "chat_teams", "namespaces", on_delete: :cascade
   add_foreign_key "ci_build_trace_chunks", "ci_builds", column: "build_id", on_delete: :cascade
