@@ -68,6 +68,11 @@ module Vulnerabilities
       preload(:scanner, :identifiers, :project)
     end
 
+    def self.for_pipelines(pipelines)
+      joins(:occurrence_pipelines)
+        .where(vulnerability_occurrence_pipelines: { pipeline_id: pipelines })
+    end
+
     def feedback(feedback_type:)
       params = {
         project_id: project_id,
