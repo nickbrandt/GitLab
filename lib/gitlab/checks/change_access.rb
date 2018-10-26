@@ -69,7 +69,10 @@ module Gitlab
       def push_checks
         logger.log_timed(LOG_MESSAGES[__method__]) do
           unless can_push?
+<<<<<<< HEAD
             # You are not allowed to push code to this project.
+=======
+>>>>>>> upstream/master
             raise GitAccess::UnauthorizedError, ERROR_MESSAGES[:push_code]
           end
         end

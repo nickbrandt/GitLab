@@ -187,8 +187,11 @@ configuration. Then customize everything from buildpacks to CI/CD.
 - [Deployment of Helm, Ingress, and Prometheus on Kubernetes](user/project/clusters/index.md#installing-applications)
 - [Protected variables](ci/variables/README.md#protected-variables)
 - [Easy creation of Kubernetes clusters on GKE](user/project/clusters/index.md#adding-and-creating-a-new-gke-cluster-via-gitlab)
+<<<<<<< HEAD
 - [Multiple Kubernetes Clusters](user/project/clusters/index.md#multiple-kubernetes-clusters) **[PREMIUM]**
 - [Environment-specific variables](ci/variables/README.md#limiting-environment-scopes-of-variables) **[PREMIUM]**
+=======
+>>>>>>> upstream/master
 - [Executable Runbooks](user/project/clusters/runbooks/index.md)
 
 ### Monitor
