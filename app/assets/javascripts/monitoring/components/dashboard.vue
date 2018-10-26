@@ -169,7 +169,21 @@ export default {
   methods: {
     getGraphsData() {
       this.state = 'loading';
+<<<<<<< HEAD
       Promise.all(this.servicePromises)
+=======
+      Promise.all([
+        this.service.getGraphsData().then(data => this.store.storeMetrics(data)),
+        this.service
+          .getDeploymentData()
+          .then(data => this.store.storeDeploymentData(data))
+          .catch(() => Flash(s__('Metrics|There was an error getting deployment information.'))),
+        this.service
+          .getEnvironmentsData()
+          .then(data => this.store.storeEnvironmentsData(data))
+          .catch(() => Flash(s__('Metrics|There was an error getting environments information.'))),
+      ])
+>>>>>>> upstream/master
         .then(() => {
           if (this.store.groups.length < 1) {
             this.state = 'noData';
