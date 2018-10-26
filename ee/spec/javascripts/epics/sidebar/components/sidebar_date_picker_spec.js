@@ -110,6 +110,7 @@ describe('SidebarParticipants', () => {
         expect(hrefContent).toContain(
           `${gon.gitlab_url}/help/user/group/epics/index.md#start-date-and-due-date`,
         );
+
         expect(hrefContent).toContain('More information');
       });
     });
@@ -125,6 +126,7 @@ describe('SidebarParticipants', () => {
         expect(hrefContent).toContain(
           `${gon.gitlab_url}/help/user/group/epics/index.md#start-date-and-due-date`,
         );
+
         expect(hrefContent).toContain('How can I solve this?');
       });
     });

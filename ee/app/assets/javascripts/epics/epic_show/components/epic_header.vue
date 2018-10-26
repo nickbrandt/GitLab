@@ -70,8 +70,8 @@ export default {
   },
   methods: {
     deleteEpic() {
+      // eslint-disable-next-line no-alert
       if (window.confirm(s__('Epic will be removed! Are you sure?'))) {
-        // eslint-disable-line no-alert
         this.deleteLoading = true;
         this.$emit('deleteEpic');
       }

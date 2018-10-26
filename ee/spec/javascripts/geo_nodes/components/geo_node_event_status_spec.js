@@ -63,6 +63,7 @@ describe('GeoNodeEventStatus', () => {
       expect(vm.$el.querySelector('strong').innerText.trim()).toBe(
         `${mockNodeDetails.lastEvent.id}`,
       );
+
       expect(vm.$el.querySelector('.event-status-timestamp').innerText).toContain('ago');
     });
 

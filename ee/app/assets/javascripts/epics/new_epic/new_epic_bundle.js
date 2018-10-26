@@ -7,8 +7,8 @@ export default () => {
   if (el) {
     const props = el.dataset;
 
+    // eslint-disable-next-line no-new
     new Vue({
-      // eslint-disable-line no-new
       el,
       components: {
         'new-epic-app': NewEpicApp,

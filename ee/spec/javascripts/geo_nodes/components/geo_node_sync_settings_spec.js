@@ -96,6 +96,7 @@ describe('GeoNodeSyncSettingsComponent', () => {
         expect(vm.statusTooltip(1000)).toBe(
           'Node is slow, overloaded, or it just recovered after an outage.',
         );
+
         expect(vm.statusTooltip(4000)).toBe('Node is failing or broken.');
       });
     });

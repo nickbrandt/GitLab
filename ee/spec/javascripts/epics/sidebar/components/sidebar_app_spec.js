@@ -109,6 +109,7 @@ describe('epicSidebar', () => {
     expect(
       startDatePicker.querySelector('.value-type-fixed .value-content').innerText.trim(),
     ).toEqual('Jan 1, 2017');
+
     expect(
       endDatePicker.querySelector('.value-type-fixed .value-content').innerText.trim(),
     ).toEqual('Jan 1, 2018');

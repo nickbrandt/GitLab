@@ -66,6 +66,7 @@ describe('GeoNodeHealthStatusComponent', () => {
       expect(iconContainerEl.querySelector('svg use').getAttribute('xlink:href')).toContain(
         '#status_success',
       );
+
       expect(iconContainerEl.querySelector('.status-text').innerText.trim()).toBe('Healthy');
       vm.$destroy();
     });
