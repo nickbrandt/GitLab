@@ -21,10 +21,9 @@ The JupyterHub app offered via GitLab’s Kubernetes integration now ships
 with Nurtch’s Rubix library, providing a simple way to create DevOps 
 runbooks. A sample runbook is provided, showcasing common operations.
 
-The below video provides an overview of how this is acomplished in GitLab.
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/Q_OqHIIUPjE" 
-frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+**<i class="fa fa-youtube-play youtube" aria-hidden="true"></i>
+Watch this [video](https://www.youtube.com/watch?v=Q_OqHIIUPjE)
+for an overview of how this is acomplished in GitLab!**
 
 ## Requirements
 
