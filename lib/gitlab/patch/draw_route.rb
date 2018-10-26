@@ -5,8 +5,11 @@
 module Gitlab
   module Patch
     module DrawRoute
+<<<<<<< HEAD
       prepend EE::Gitlab::Patch::DrawRoute
 
+=======
+>>>>>>> upstream/master
       RoutesNotFound = Class.new(StandardError)
 
       def draw(routes_name)
