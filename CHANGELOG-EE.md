@@ -104,6 +104,10 @@ Please view this file on the master branch, on stable branches it's out of date.
 - API: Allow issue weight parameter to be greater than or equal to zero.
 
 
+## 11.3.8 (2018-10-27)
+
+- No changes.
+
 ## 11.3.7 (2018-10-26)
 
 ### Security (1 change)
