@@ -2581,6 +2581,14 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["team_id", "alias"], name: "index_slack_integrations_on_team_id_and_alias", unique: true, using: :btree
   end
 
+  create_table "smartcard_identities", id: :bigserial, force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "subject", null: false
+    t.string "issuer", null: false
+    t.index ["subject", "issuer"], name: "index_smartcard_identities_on_subject_and_issuer", unique: true, using: :btree
+    t.index ["user_id"], name: "index_smartcard_identities_on_user_id", using: :btree
+  end
+
   create_table "snippets", force: :cascade do |t|
     t.string "title"
     t.text "content"
@@ -3293,6 +3301,7 @@ ActiveRecord::Schema.define(version: 20181107054254) do
   add_foreign_key "saml_providers", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "services", "projects", name: "fk_71cce407f9", on_delete: :cascade
   add_foreign_key "slack_integrations", "services", on_delete: :cascade
+  add_foreign_key "smartcard_identities", "users", on_delete: :cascade
   add_foreign_key "snippets", "projects", name: "fk_be41fd4bb7", on_delete: :cascade
   add_foreign_key "software_license_policies", "projects", on_delete: :cascade
   add_foreign_key "software_license_policies", "software_licenses", on_delete: :cascade

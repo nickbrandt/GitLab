@@ -57,6 +57,7 @@ class License < ActiveRecord::Base
     object_storage
     group_saml
     service_desk
+    smartcard_auth
     unprotection_restrictions
     variable_environment_scope
     reject_unsigned_commits
