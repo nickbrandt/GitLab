@@ -42,9 +42,17 @@ module EpicIssues
     end
 
     def linkable_issues(issues)
-      return [] unless can?(current_user, :admin_epic, issuable.group)
+      @linkable_issues ||= begin
+        return [] unless can?(current_user, :admin_epic, issuable.group)
 
-      issues.select { |issue| issuable_group_descendants.include?(issue.project.group) }
+        issues.select do |issue|
+          issuable_group_descendants.include?(issue.project.group) && !previous_related_issues.include?(issue)
+        end
+      end
+    end
+
+    def previous_related_issues
+      @related_issues ||= issuable.issues.to_a
     end
 
     def issuable_group_descendants

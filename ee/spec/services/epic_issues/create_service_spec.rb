@@ -24,7 +24,7 @@ describe EpicIssues::CreateService do
 
       it 'creates a new relationship and updates epic' do
         expect(epic).to receive(:update_start_and_due_dates)
-        expect { subject }.to change(EpicIssue, :count).from(1).to(2)
+        expect { subject }.to change(EpicIssue, :count).by(1)
 
         expect(created_link).to have_attributes(epic: epic)
       end
@@ -39,13 +39,13 @@ describe EpicIssues::CreateService do
         expect(subject).to eq(status: :success)
       end
 
-      it 'creates 2 system notes' do
-        expect { subject }.to change { Note.count }.from(0).to(2)
+      it 'creates 1 system note for epic and 1 system note for issue' do
+        expect { subject }.to change { Note.count }.by(2)
       end
 
       it 'creates a note for epic correctly' do
         subject
-        note = Note.find_by(noteable_id: epic.id, noteable_type: 'Epic')
+        note = Note.where(noteable_id: epic.id, noteable_type: 'Epic').last
 
         expect(note.note).to eq("added issue #{issue.to_reference(epic.group)}")
         expect(note.author).to eq(user)
@@ -197,6 +197,36 @@ describe EpicIssues::CreateService do
         subject { assign_issue([valid_reference]) }
 
         include_examples 'returns an error'
+      end
+
+      context 'when assigning issue(s) to the same epic' do
+        before do
+          group.add_developer(user)
+          assign_issue([valid_reference])
+          epic.reload
+        end
+
+        subject { assign_issue([valid_reference]) }
+
+        it 'no relationship is created' do
+          expect { subject }.not_to change { EpicIssue.count }
+        end
+
+        it 'does not create notes' do
+          expect { subject }.not_to change { Note.count }
+        end
+
+        it 'returns an error' do
+          expect(subject).to eq(message: 'Issue(s) already assigned', status: :error, http_status: 409)
+        end
+
+        context 'when at least one of the issues is still not assigned to the epic' do
+          let(:valid_reference) { issue2.to_reference(full: true) }
+
+          subject { assign_issue([valid_reference, issue.to_reference(full: true)]) }
+
+          include_examples 'returns success'
+        end
       end
 
       context 'when an issue is already assigned to another epic' do
