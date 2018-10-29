@@ -14,13 +14,17 @@ describe 'Reset namespace pipeline minutes' do
       end
 
       it 'resets pipeline minutes' do
-        click_link 'Reset pipeline minutes'
+        time = Time.now
+
+        Timecop.freeze(time) do
+          click_link 'Reset pipeline minutes'
+        end
 
         expect(page).to have_selector('.flash-notice')
         expect(current_path).to include(namespace.name)
 
         expect(namespace.namespace_statistics.reload.shared_runners_seconds).to eq(0)
-        expect(namespace.namespace_statistics.reload.shared_runners_seconds_last_reset).to be_like_time(Time.now)
+        expect(namespace.namespace_statistics.reload.shared_runners_seconds_last_reset).to be_like_time(time)
       end
     end
   end
