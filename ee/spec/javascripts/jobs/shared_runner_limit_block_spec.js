@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import component from 'ee/jobs/components/shared_runner_limit_block.vue';
-import mountComponent from '../helpers/vue_mount_component_helper';
-import { trimText } from '../helpers/vue_component_helper';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import { trimText } from 'spec/helpers/vue_component_helper';
 
 describe('Shared Runner Limit Block', () => {
   const Component = Vue.extend(component);

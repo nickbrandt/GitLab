@@ -8,9 +8,9 @@ import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { TEST_HOST } from 'spec/test_constants';
 
 import state from 'ee/vue_shared/security_reports/store/state';
-import mockData, { baseIssues, headIssues, basePerformance, headPerformance } from './mock_data';
+import mockData, { baseIssues, headIssues, basePerformance, headPerformance } from 'spec/vue_mr_widget/mock_data';
 
-import { // eslint-disable-line import/order
+import {
   sastIssues,
   sastIssuesBase,
   dockerReport,
