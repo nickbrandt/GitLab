@@ -12,13 +12,16 @@ describe Gitlab::Checks::ChangeAccess do
     let(:ref) { 'refs/heads/master' }
     let(:changes) { { oldrev: oldrev, newrev: newrev, ref: ref } }
     let(:protocol) { 'ssh' }
+    let(:timeout) { Gitlab::GitAccess::INTERNAL_TIMEOUT }
+    let(:logger) { Gitlab::Checks::TimedLogger.new(timeout: timeout) }
 
     subject(:change_access) do
       described_class.new(
         changes,
         project: project,
         user_access: user_access,
-        protocol: protocol
+        protocol: protocol,
+        logger: logger
       )
     end
 

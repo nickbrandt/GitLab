@@ -7,12 +7,14 @@ module QA
         class Epic < QA::Factory::Base
           attr_accessor :title
 
-          dependency QA::Factory::Resource::Group, as: :group
+          attribute :group do
+            QA::Factory::Resource::Group.fabricate!
+          end
 
           def fabricate!
             group.visit!
 
-            QA::EE::Page::Group::Menu.perform { |menu| menu.go_to_group_epics }
+            QA::EE::Page::Group::Menu.perform(&:go_to_group_epics)
 
             QA::EE::Page::Group::Epic::Index.perform do |page|
               page.click_new_epic

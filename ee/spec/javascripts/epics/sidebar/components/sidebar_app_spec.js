@@ -32,7 +32,9 @@ describe('epicSidebar', () => {
     dueDateFixed,
     dueDateFromMilestones,
     startDateSourcingMilestoneTitle,
+    startDateSourcingMilestoneDates,
     dueDateSourcingMilestoneTitle,
+    dueDateSourcingMilestoneDates,
   } = props;
 
   const defaultPropsData = {
@@ -50,7 +52,9 @@ describe('epicSidebar', () => {
     dueDateFromMilestones,
     updatePath: updateEndpoint,
     startDateSourcingMilestoneTitle,
+    startDateSourcingMilestoneDates,
     dueDateSourcingMilestoneTitle,
+    dueDateSourcingMilestoneDates,
     toggleSubscriptionPath,
     labelsPath,
     labelsWebUrl,
@@ -173,6 +177,44 @@ describe('epicSidebar', () => {
   describe('getDateFromMilestonesTooltip', () => {
     it('returns tooltip string for milestone', () => {
       expect(vm.getDateFromMilestonesTooltip('start')).toBe('To schedule your epic\'s start date based on milestones, assign a milestone with a start date to any issue in the epic.');
+    });
+
+    it('returns tooltip string with milestone dates', () => {
+      const vmDatesFromMilestones = mountComponent(
+        EpicSidebar,
+        Object.assign({}, defaultPropsData, {
+          startDateFromMilestones: startDateSourcingMilestoneDates.startDate,
+          dueDateFromMilestones: dueDateSourcingMilestoneDates.dueDate,
+        })
+      );
+
+      expect(vmDatesFromMilestones.getDateFromMilestonesTooltip('start')).toBe('Milestone for Start Date<br/><span class="text-tertiary">Jan 1, 2010 – Dec 31, 2019</span>');
+
+      vmDatesFromMilestones.$destroy();
+    });
+
+    it('returns tooltip string with milestone dates when dates are from same year', () => {
+      const startDate = '2018-01-01';
+      const dueDate = '2018-03-31';
+      const vmDatesFromMilestones = mountComponent(
+        EpicSidebar,
+        Object.assign({}, defaultPropsData, {
+          startDateSourcingMilestoneDates: {
+            startDate,
+            dueDate,
+          },
+          dueDateSourcingMilestoneDates: {
+            startDate,
+            dueDate,
+          },
+          startDateFromMilestones: startDate,
+          dueDateFromMilestones: dueDate,
+        })
+      );
+
+      expect(vmDatesFromMilestones.getDateFromMilestonesTooltip('start')).toBe('Milestone for Start Date<br/><span class="text-tertiary">Jan 1 – Mar 31, 2018</span>');
+
+      vmDatesFromMilestones.$destroy();
     });
   });
 

@@ -175,6 +175,7 @@ export default {
             this.state = 'noData';
             return;
           }
+
           this.showEmptyState = false;
         })
         .then(this.resize)
@@ -216,7 +217,10 @@ export default {
             name="chevron-down"
           />
         </button>
-        <div class="dropdown-menu dropdown-menu-selectable dropdown-menu-drop-up">
+        <div 
+          v-if="store.environmentsData.length > 0"  
+          class="dropdown-menu dropdown-menu-selectable dropdown-menu-drop-up"
+        >
           <ul>
             <li
               v-for="environment in store.environmentsData"

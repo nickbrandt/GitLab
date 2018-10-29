@@ -14,6 +14,10 @@ describe Gitlab::UsageData do
       create(:ci_build, name: 'dependency_scanning', pipeline: pipeline)
       create(:ci_build, name: 'license_management', pipeline: pipeline)
       create(:ci_build, name: 'sast', pipeline: pipeline)
+
+      create(:prometheus_alert, project: projects[0])
+      create(:prometheus_alert, project: projects[0])
+      create(:prometheus_alert, project: projects[1])
     end
 
     subject { described_class.data }
@@ -54,7 +58,10 @@ describe Gitlab::UsageData do
         dependency_scanning_jobs
         license_management_jobs
         sast_jobs
+        projects_with_prometheus_alerts
       ))
+
+      expect(count_data[:projects_with_prometheus_alerts]).to eq(2)
     end
 
     it 'gathers security products usage data' do

@@ -1,0 +1,5 @@
+---
+title: Do not allow to assign an issue to an epic twice
+merge_request: 8004
+author:
+type: fixed

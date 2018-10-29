@@ -61,7 +61,7 @@
         const dateWords = dateInWords(date, true);
         const parsedDateWords = dateWords ? dateWords.replace(',', '') : dateWords;
 
-        return date ? parsedDateWords : 'None';
+        return date ? parsedDateWords : __('None');
       },
       tooltipText(dateType = 'min') {
         const defaultText = dateType === 'min' ? __('Start date') : __('Due date');
@@ -72,7 +72,10 @@
           `(${timeAgo})`,
         ].join(' ') : '';
 
-        return [defaultText, dateText].join('<br />');
+        if (date) {
+          return [defaultText, dateText].join('<br />');
+        }
+        return __('Start and due date');
       },
     },
   };

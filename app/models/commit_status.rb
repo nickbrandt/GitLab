@@ -52,7 +52,8 @@ class CommitStatus < ActiveRecord::Base
     runner_system_failure: 4,
     missing_dependency_failure: 5,
     runner_unsupported: 6,
-    stale_schedule: 7
+    stale_schedule: 7,
+    job_execution_timeout: 8
   }.merge(EE_FAILURE_REASONS)
 
   ##
@@ -111,7 +112,7 @@ class CommitStatus < ActiveRecord::Base
 
     before_transition any => :failed do |commit_status, transition|
       failure_reason = transition.args.first
-      commit_status.failure_reason = failure_reason
+      commit_status.failure_reason = CommitStatus.failure_reasons[failure_reason]
     end
 
     after_transition do |commit_status, transition|

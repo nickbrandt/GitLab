@@ -1,0 +1,5 @@
+---
+title: 'Rails5: fix flaky mysql reset pipeline minutes spec'
+merge_request: 8122
+author: Jasper Maes
+type: other

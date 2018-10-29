@@ -1,0 +1,5 @@
+---
+title: Fix button rendering in license management in FF
+merge_request: 8046
+author:
+type: fixed
