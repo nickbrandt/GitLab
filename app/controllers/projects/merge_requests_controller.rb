@@ -11,7 +11,6 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   prepend ::EE::Projects::MergeRequestsController
 
   skip_before_action :merge_request, only: [:index, :bulk_update]
-  before_action :whitelist_query_limiting_ee, only: [:merge, :show]
   before_action :whitelist_query_limiting, only: [:assign_related_issues, :update]
   before_action :authorize_update_issuable!, only: [:close, :edit, :update, :remove_wip, :sort]
   before_action :set_issuables_index, only: [:index]
@@ -171,8 +170,9 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   end
 
   def merge
-    return access_denied! unless @merge_request.can_be_merged_by?(current_user)
-    return render_404 unless @merge_request.approved?
+    access_check_result = merge_access_check
+
+    return access_check_result if access_check_result
 
     status = merge!
 
@@ -266,9 +266,9 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
       return :failed
     end
 
-    merge_request_service = ::MergeRequests::MergeService.new(@project, current_user, merge_params)
+    merge_service = ::MergeRequests::MergeService.new(@project, current_user, merge_params)
 
-    unless merge_request_service.hooks_validation_pass?(@merge_request)
+    unless merge_service.hooks_validation_pass?(@merge_request)
       return :hook_validation_error
     end
 
@@ -334,13 +334,12 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     access_denied! unless access_check
   end
 
+  def merge_access_check
+    access_denied! unless @merge_request.can_be_merged_by?(current_user)
+  end
+
   def whitelist_query_limiting
     # Also see https://gitlab.com/gitlab-org/gitlab-ce/issues/42441
     Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/42438')
-  end
-
-  def whitelist_query_limiting_ee
-    # Also see https://gitlab.com/gitlab-org/gitlab-ee/issues/4793
-    Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ee/issues/4792')
   end
 end

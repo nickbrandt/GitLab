@@ -5,6 +5,11 @@ module EE
 
       APPROVAL_RENDERING_ACTIONS = [:approve, :approvals, :unapprove].freeze
 
+      prepended do
+        before_action :whitelist_query_limiting_ee_merge, only: [:merge]
+        before_action :whitelist_query_limiting_ee_show, only: [:show]
+      end
+
       def approve
         unless merge_request.can_approve?(current_user)
           return render_404
@@ -58,6 +63,23 @@ module EE
             render json: entity
           end
         end
+      end
+
+      private
+
+      def merge_access_check
+        super_result = super
+
+        return super_result if super_result
+        return render_404 unless @merge_request.approved?
+      end
+
+      def whitelist_query_limiting_ee_merge
+        ::Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ee/issues/4792')
+      end
+
+      def whitelist_query_limiting_ee_show
+        ::Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ee/issues/4793')
       end
     end
   end

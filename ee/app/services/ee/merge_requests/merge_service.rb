@@ -10,6 +10,7 @@ module EE
         super
       end
 
+      override :hooks_validation_pass?
       def hooks_validation_pass?(merge_request)
         # handle_merge_error needs this. We should move that to a separate
         # object instead of relying on the order of method calls.
