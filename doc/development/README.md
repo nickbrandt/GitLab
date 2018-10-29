@@ -53,6 +53,7 @@ description: 'Learn how to contribute to GitLab.'
 - [Prometheus metrics](prometheus_metrics.md)
 - [Guidelines for reusing abstractions](reusing_abstractions.md)
 - [DeclarativePolicy framework](policies.md)
+- [Geo development](geo.md)
 
 ## Performance guides
 
