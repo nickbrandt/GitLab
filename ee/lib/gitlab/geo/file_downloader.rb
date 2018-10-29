@@ -23,6 +23,7 @@ module Gitlab
       def execute
         upload = Upload.find_by(id: object_db_id)
         return fail_before_transfer unless upload.present?
+        return missing_on_primary if upload.model.nil?
 
         transfer = ::Gitlab::Geo::FileTransfer.new(object_type.to_sym, upload)
         Result.from_transfer_result(transfer.download_from_primary)
@@ -50,6 +51,10 @@ module Gitlab
 
       def fail_before_transfer
         Result.new(success: false, bytes_downloaded: 0, failed_before_transfer: true)
+      end
+
+      def missing_on_primary
+        Result.new(success: true, bytes_downloaded: 0, primary_missing_file: true)
       end
     end
   end
