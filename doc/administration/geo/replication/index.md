@@ -163,7 +163,10 @@ If you installed GitLab using the Omnibus packages (highly recommended):
 1. Optional: [Configure a secondary LDAP server](../../auth/ldap.md) for the secondary node. See [notes on LDAP](#ldap).
 1. [Follow the "Using a Geo Server" guide](using_a_geo_server.md).
 
-### Using GitLab installed from source
+### Using GitLab installed from source (Deprecated)
+
+NOTE: **Note:**
+In GitLab 11.5, support for using Geo in GitLab source installations was deprecated and will be removed in a future release. Please consider [migrating to GitLab Omnibus install](https://docs.gitlab.com/omnibus/update/convert_to_omnibus.html).
 
 If you installed GitLab from source:
 
@@ -183,7 +186,7 @@ After installing GitLab on the secondary nodes and performing the initial config
 For information on configuring Geo, see:
 
 - [Geo configuration (GitLab Omnibus)](configuration.md).
-- [Geo configuration (source)](configuration_source.md).
+- [Geo configuration (source)](configuration_source.md). Configuring Geo in GitLab source installations was **deprecated** in GitLab 11.5.
 
 ### Updating Geo
 

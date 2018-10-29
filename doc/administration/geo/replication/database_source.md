@@ -1,7 +1,8 @@
 # Geo database replication (source)
 
 NOTE: **Note:**
-This is the documentation for installations from source. For installations
+This documentation applies to GitLab source installations. In GitLab 11.5, this documentation was deprecated and will be removed in a future release.
+Please consider [migrating to GitLab Omnibus install](https://docs.gitlab.com/omnibus/update/convert_to_omnibus.html). For installations
 using the Omnibus GitLab packages, follow the
 [**database replication for Omnibus GitLab**][database] guide.
 
