@@ -201,7 +201,8 @@ export default {
     />
     <deployment
       v-for="deployment in mr.deployments"
-      :key="deployment.id"
+      :key="`pre-merge-deploy-${deployment.id}`"
+      class="js-pre-merge-deploy"
       :deployment="deployment"
     />
     <div class="mr-section-container">
@@ -303,5 +304,22 @@ export default {
         <mr-widget-merge-help/>
       </div>
     </div>
+
+    <template v-if="shouldRenderMergedPipeline">
+      <mr-widget-pipeline
+        class="js-post-merge-pipeline prepend-top-default"
+        :pipeline="mr.mergePipeline"
+        :ci-status="mr.ciStatus"
+        :has-ci="mr.hasCI"
+        :source-branch="mr.targetBranch"
+        :source-branch-link="mr.targetBranch"
+      />
+      <deployment
+        v-for="postMergeDeployment in mr.postMergeDeployments"
+        :key="`post-merge-deploy-${postMergeDeployment.id}`"
+        :deployment="postMergeDeployment"
+        class="js-post-deployment"
+      />
+    </template>
   </div>
 </template>
