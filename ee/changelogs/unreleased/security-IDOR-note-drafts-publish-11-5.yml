@@ -1,0 +1,5 @@
+---
+title: Fix IDOR at /drafts/publish
+merge_request:
+author:
+type: security

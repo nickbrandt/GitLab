@@ -2,9 +2,9 @@
 
 module DraftNotes
   class PublishService < DraftNotes::BaseService
-    def execute(draft_id = nil)
-      if draft_id
-        publish_draft_note(draft_id)
+    def execute(draft = nil)
+      if draft
+        publish_draft_note(draft)
       else
         publish_draft_notes
       end
@@ -12,9 +12,7 @@ module DraftNotes
 
     private
 
-    def publish_draft_note(draft_id)
-      draft = DraftNote.find(draft_id)
-
+    def publish_draft_note(draft)
       create_note_from_draft(draft)
       draft.delete
 
