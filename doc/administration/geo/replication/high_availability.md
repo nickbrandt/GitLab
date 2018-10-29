@@ -146,6 +146,18 @@ be specified.
     ##
     gitlab_rails['redis_host'] = '10.1.2.1'
     gitlab_rails['redis_password'] = 'Redis password'
+
+    ##
+    ## If you are using custom users not managed by Omnibus, you need to specify
+    ## UIDs and GIDs like below, and ensure they match between servers in a
+    ## cluster to avoid permissions issues
+    ##
+    user['uid'] = 9000
+    user['gid'] = 9000
+    web_server['uid'] = 9001
+    web_server['gid'] = 9001
+    registry['uid'] = 9002
+    registry['gid'] = 9002
     ```
 
 NOTE: **Note:**
