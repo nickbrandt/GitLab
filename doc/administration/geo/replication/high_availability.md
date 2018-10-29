@@ -105,12 +105,12 @@ Configure the [Geo tracking database][tracking-database].
 
 ### Step 4: Configure the Frontend Application servers on the Geo Secondary
 
-In the architecture overview there are two machines running the GitLab application
-services. These services are enabled selectively in the configuration. Additionally
-the addresses of the remote endpoints for PostgreSQL and Redis will need to be specified.
+In the architecture overview, there are two machines running the GitLab
+application services. These services are enabled selectively in the
+configuration.
 
-On the secondary, the remote endpoint for the PostgreSQL Geo database will
-be specified.
+Configure the application servers following [Configuring GitLab for HA][app-ha],
+then make the following modifications:
 
 1. Edit `/etc/gitlab/gitlab.rb` on each application server in the secondary
    cluster, and add the following:
