@@ -67,6 +67,9 @@ HA set up. See documentation for
 [PostgreSQL][postgresql-ha-configuring-application-nodes] and
 [Redis][redis-ha-configuring-the-application-nodes]
 
+The Geo Primary database will require modification later, as part of
+[Step 2 of Configure a Geo Secondary][step-2-of-configure-a-geo-secondary].
+
 ## Configure a Geo Secondary
 
 A Geo Secondary cluster is similar to any other GitLab HA cluster, with two
@@ -209,3 +212,4 @@ documentation for more information.
 [gitlab-rb-template]: https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/files/gitlab-config-template/gitlab.rb.template
 [gitlab-ha]: ../../high_availability/README.md
 [app-ha]: ../../high_availability/gitlab.md
+[step-2-of-configure-a-geo-secondary]: #step-2-configure-the-main-read-only-replica-postgresql-database-on-the-geo-secondary
