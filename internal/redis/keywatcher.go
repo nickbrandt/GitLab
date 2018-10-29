@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/garyburd/redigo/redis"
+	"github.com/gomodule/redigo/redis"
 	"github.com/jpillora/backoff"
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"

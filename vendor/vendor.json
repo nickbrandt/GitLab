@@ -11,12 +11,12 @@
 			"versionExact": "master"
 		},
 		{
-			"checksumSHA1": "hBqmLpr3P88FPgBk27hzpa5N0mM=",
-			"path": "github.com/FZambia/go-sentinel",
-			"revision": "76bd05e8e22f9f8f5e1dd6d3a85b7951da7cce57",
-			"revisionTime": "2017-12-04T08:54:13Z",
-			"version": "master",
-			"versionExact": "master"
+			"checksumSHA1": "Ky/NqKY9oiS7XQdgUDp/wBWwDtI=",
+			"path": "github.com/FZambia/sentinel",
+			"revision": "e69a8dc549bb0aabdc63fbfd9e8bfe971a368153",
+			"revisionTime": "2018-03-27T06:17:58Z",
+			"version": "v1",
+			"versionExact": "v1.0.0"
 		},
 		{
 			"checksumSHA1": "0rido7hYHQtfq3UJzVT5LClLAWc=",
@@ -59,22 +59,6 @@
 			"revisionTime": "2018-03-08T23:13:08Z",
 			"version": "v3",
 			"versionExact": "v3.2.0"
-		},
-		{
-			"checksumSHA1": "4F1jSQIKlCaSecor3wzxxf/0aso=",
-			"path": "github.com/garyburd/redigo/internal",
-			"revision": "9c11da706d9b7902c6da69c592f75637793fe121",
-			"revisionTime": "2018-03-14T22:34:43Z",
-			"version": "v2",
-			"versionExact": "v2.0.0"
-		},
-		{
-			"checksumSHA1": "81OSg/NapmTaRpSS+oYsPVE0b1Y=",
-			"path": "github.com/garyburd/redigo/redis",
-			"revision": "0d253a66e6e1349f4581d6d2b300ee434ee2da9f",
-			"revisionTime": "2017-02-16T21:49:44Z",
-			"version": "v2",
-			"versionExact": "v2.0.0"
 		},
 		{
 			"checksumSHA1": "hL8smC/vjdkuE1twM8TKpuTiOmw=",
@@ -139,6 +123,22 @@
 			"revisionTime": "2018-08-14T21:14:27Z",
 			"version": "v1",
 			"versionExact": "v1.2.0"
+		},
+		{
+			"checksumSHA1": "w3QCCIYHgZzIXQ+xTl7oLfFrXHs=",
+			"path": "github.com/gomodule/redigo/internal",
+			"revision": "9c11da706d9b7902c6da69c592f75637793fe121",
+			"revisionTime": "2018-03-14T22:34:43Z",
+			"version": "v2",
+			"versionExact": "v2.0.0"
+		},
+		{
+			"checksumSHA1": "HgOVOUtWUYHcNe8aipwuEZ7YLow=",
+			"path": "github.com/gomodule/redigo/redis",
+			"revision": "9c11da706d9b7902c6da69c592f75637793fe121",
+			"revisionTime": "2018-03-14T22:34:43Z",
+			"version": "v2",
+			"versionExact": "v2.0.0"
 		},
 		{
 			"checksumSHA1": "VKx/YhlIAbIJ9dXAxCCHOkjom4U=",
