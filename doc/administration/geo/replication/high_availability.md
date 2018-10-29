@@ -119,7 +119,7 @@ be specified.
     ##
     ## Enable the Geo secondary role
     ##
-    roles ['geo_secondary_role']
+    roles ['geo_secondary_role', 'application_role']
 
     ##
     ## Disable automatic migrations
@@ -138,14 +138,12 @@ be specified.
     ## Configure connection to the streaming replica database, if you haven't
     ## already
     ##
-    postgresql['enable'] = false
     gitlab_rails['db_host'] = '10.1.3.1'
     gitlab_rails['db_password'] = 'plaintext DB password'
 
     ##
     ## Configure connection to Redis, if you haven't already
     ##
-    redis['enable'] = false
     gitlab_rails['redis_host'] = '10.1.2.1'
     gitlab_rails['redis_password'] = 'Redis password'
     ```
