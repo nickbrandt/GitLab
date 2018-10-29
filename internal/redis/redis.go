@@ -7,8 +7,8 @@ import (
 	"net/url"
 	"time"
 
-	sentinel "github.com/FZambia/go-sentinel"
-	"github.com/garyburd/redigo/redis"
+	"github.com/FZambia/sentinel"
+	"github.com/gomodule/redigo/redis"
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 

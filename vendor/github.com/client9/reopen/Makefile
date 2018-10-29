@@ -1,31 +1,38 @@
-all: build test lint
 
-build:
+build:  ## build and lint
 	go build ./...
+	gometalinter \
+                --vendor \
+                --vendored-linters \
+                --deadline=60s \
+                --disable-all \
+                --enable=goimports \
+                --enable=vetshadow \
+                --enable=varcheck \
+                --enable=structcheck \
+                --enable=deadcode \
+                --enable=ineffassign \
+                --enable=unconvert \
+                --enable=goconst \
+                --enable=golint \
+                --enable=gosimple \
+                --enable=gofmt \
+                --enable=misspell \
+                --enable=staticcheck \
+                .
+test:  ## just test
+	go test -cover .
 
-test:
-	go test ./...
-
-lint:
-	golint ./...
-	gofmt -w -s . ./example*
-	goimports -w . ./example*
-
-clean:
-	rm -f *~ ./example*/*~
+clean: ## cleanup
 	rm -f ./example1/example1
 	rm -f ./example2/example2
 	go clean ./...
 	git gc
 
-ci: build test lint
-
-docker-ci:
-	docker run --rm \
-		-e COVERALLS_REPO_TOKEN=$(COVERALLS_REPO_TOKEN) \
-		-v $(PWD):/go/src/github.com/client9/reopen \
-		-w /go/src/github.com/client9/reopen \
-		nickg/golang-dev-docker \
-		make ci
-
-.PHONY: ci docker-ci
+# https://www.client9.com/self-documenting-makefiles/
+help:
+	@awk -F ':|##' '/^[^\t].+?:.*?##/ {\
+        printf "\033[36m%-30s\033[0m %s\n", $$1, $$NF \
+        }' $(MAKEFILE_LIST)
+.DEFAULT_GOAL=help
+.PHONY=help
