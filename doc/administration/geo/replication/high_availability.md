@@ -51,7 +51,7 @@ This cluster will serve as the Geo Primary. Use the
     ##
     ## Enable the Geo primary role
     ##
-    geo_primary_role['enable'] = true
+    roles ['geo_primary_role']
 
     ##
     ## Disable automatic migrations
@@ -119,7 +119,7 @@ be specified.
     ##
     ## Enable the Geo secondary role
     ##
-    geo_secondary_role['enable'] = true
+    roles ['geo_secondary_role']
 
     ##
     ## Disable automatic migrations

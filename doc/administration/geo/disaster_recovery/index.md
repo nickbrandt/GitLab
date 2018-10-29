@@ -96,7 +96,7 @@ must disable the primary.
 
     ```ruby
     ## REMOVE THIS LINE
-    geo_secondary_role['enable'] = true
+    roles ['geo_secondary_role']
     ```
 
     A new secondary should not be added at this time. If you want to add a new
@@ -125,7 +125,7 @@ The command above does the following changes:
 - Executes `gitlab-ctl reconfigure` to apply the changes in `/etc/gitlab/gitlab.rb`
 - Runs `gitlab-rake geo:set_secondary_as_primary`
 
-You need to make sure all the affected machines no longer have `geo_secondary_role['enable'] = true` in
+You need to make sure all the affected machines no longer have `roles ['geo_secondary_role']` in
 `/etc/gitlab/gitlab.rb`, that you execute the database promotion on the required database nodes
 and you execute the `gitlab-rake geo:set_secondary_as_primary` in a machine running the application server.
 
@@ -198,7 +198,7 @@ and after that you also need two extra steps.
 
     ```ruby
     ## Enable a Geo Primary role (if you haven't yet)
-    geo_primary_role['enable'] = true
+    roles ['geo_primary_role']
 
     ##
     # Primary and Secondary addresses
