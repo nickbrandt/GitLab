@@ -1,234 +1,244 @@
 <script>
-  /* eslint-disable vue/require-default-prop */
-  import $ from 'jquery';
-  import issuableApp from '~/issue_show/components/app.vue';
-  import flash from '~/flash';
-  import { __ } from '~/locale';
-  import relatedIssuesRoot from 'ee/related_issues/components/related_issues_root.vue';
-  import epicSidebar from '../../sidebar/components/sidebar_app.vue';
-  import SidebarContext from '../sidebar_context';
-  import epicHeader from './epic_header.vue';
-  import EpicsService from '../../service/epics_service';
-  import { status, stateEvent } from '../../constants';
+/* eslint-disable vue/require-default-prop */
+import $ from 'jquery';
+import issuableApp from '~/issue_show/components/app.vue';
+import flash from '~/flash';
+import { __ } from '~/locale';
+import relatedIssuesRoot from 'ee/related_issues/components/related_issues_root.vue';
+import epicSidebar from '../../sidebar/components/sidebar_app.vue';
+import SidebarContext from '../sidebar_context';
+import epicHeader from './epic_header.vue';
+import EpicsService from '../../service/epics_service';
+import { status, stateEvent } from '../../constants';
 
-  export default {
-    name: 'EpicShowApp',
-    components: {
-      epicHeader,
-      epicSidebar,
-      issuableApp,
-      relatedIssuesRoot,
+export default {
+  name: 'EpicShowApp',
+  components: {
+    epicHeader,
+    epicSidebar,
+    issuableApp,
+    relatedIssuesRoot,
+  },
+  props: {
+    epicId: {
+      type: Number,
+      required: true,
     },
-    props: {
-      epicId: {
-        type: Number,
-        required: true,
-      },
-      endpoint: {
-        type: String,
-        required: true,
-      },
-      updateEndpoint: {
-        type: String,
-        required: true,
-      },
-      canUpdate: {
-        required: true,
-        type: Boolean,
-      },
-      canDestroy: {
-        required: true,
-        type: Boolean,
-      },
-      canAdmin: {
-        required: true,
-        type: Boolean,
-      },
-      markdownPreviewPath: {
-        type: String,
-        required: true,
-      },
-      markdownDocsPath: {
-        type: String,
-        required: true,
-      },
-      groupPath: {
-        type: String,
-        required: true,
-      },
-      initialTitleHtml: {
-        type: String,
-        required: true,
-      },
-      initialTitleText: {
-        type: String,
-        required: true,
-      },
-      initialDescriptionHtml: {
-        type: String,
-        required: false,
-        default: '',
-      },
-      initialDescriptionText: {
-        type: String,
-        required: false,
-        default: '',
-      },
-      created: {
-        type: String,
-        required: true,
-      },
-      author: {
-        type: Object,
-        required: true,
-      },
-      issueLinksEndpoint: {
-        type: String,
-        required: true,
-      },
-      startDateIsFixed: {
-        type: Boolean,
-        required: true,
-      },
-      startDateFixed: {
-        type: String,
-        required: false,
-        default: '',
-      },
-      startDateFromMilestones: {
-        type: String,
-        required: false,
-        default: '',
-      },
-      startDate: {
-        type: String,
-        required: false,
-      },
-      dueDateIsFixed: {
-        type: Boolean,
-        required: true,
-      },
-      dueDateFixed: {
-        type: String,
-        required: false,
-        default: '',
-      },
-      dueDateFromMilestones: {
-        type: String,
-        required: false,
-        default: '',
-      },
-      endDate: {
-        type: String,
-        required: false,
-      },
-      startDateSourcingMilestoneTitle: {
-        type: String,
-        required: false,
-        default: '',
-      },
-      dueDateSourcingMilestoneTitle: {
-        type: String,
-        required: false,
-        default: '',
-      },
-      labels: {
-        type: Array,
-        required: true,
-      },
-      participants: {
-        type: Array,
-        required: true,
-      },
-      subscribed: {
-        type: Boolean,
-        required: true,
-      },
-      todoExists: {
-        type: Boolean,
-        required: true,
-      },
-      namespace: {
-        type: String,
-        required: false,
-        default: '#',
-      },
-      labelsPath: {
-        type: String,
-        required: true,
-      },
-      toggleSubscriptionPath: {
-        type: String,
-        required: true,
-      },
-      todoPath: {
-        type: String,
-        required: true,
-      },
-      todoDeletePath: {
-        type: String,
-        required: false,
-        default: '',
-      },
-      labelsWebUrl: {
-        type: String,
-        required: true,
-      },
-      epicsWebUrl: {
-        type: String,
-        required: true,
-      },
-      state: {
-        type: String,
-        required: true,
-        default: status.open,
-      },
+    endpoint: {
+      type: String,
+      required: true,
     },
-    data() {
-      return {
-        // Epics specific configuration
-        issuableRef: '',
-        projectPath: this.groupPath,
-        projectNamespace: '',
-        service: new EpicsService({
-          endpoint: this.endpoint,
-        }),
-      };
+    updateEndpoint: {
+      type: String,
+      required: true,
     },
-    computed: {
-      open() {
-        return this.state === status.open;
-      },
+    canUpdate: {
+      required: true,
+      type: Boolean,
     },
-    mounted() {
-      this.sidebarContext = new SidebarContext();
+    canDestroy: {
+      required: true,
+      type: Boolean,
     },
-    methods: {
-      triggerDocumentEvent(eventName, isClosed) {
-        $(document).trigger(eventName, isClosed);
-      },
-      toggleEpicStatus(stateEventType) {
-        return this.service
-          .updateStatus(stateEventType)
-          .then(() => {
-            const isClosed = stateEventType === stateEvent.close;
+    canAdmin: {
+      required: true,
+      type: Boolean,
+    },
+    markdownPreviewPath: {
+      type: String,
+      required: true,
+    },
+    markdownDocsPath: {
+      type: String,
+      required: true,
+    },
+    groupPath: {
+      type: String,
+      required: true,
+    },
+    initialTitleHtml: {
+      type: String,
+      required: true,
+    },
+    initialTitleText: {
+      type: String,
+      required: true,
+    },
+    initialDescriptionHtml: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    initialDescriptionText: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    created: {
+      type: String,
+      required: true,
+    },
+    author: {
+      type: Object,
+      required: true,
+    },
+    issueLinksEndpoint: {
+      type: String,
+      required: true,
+    },
+    startDateIsFixed: {
+      type: Boolean,
+      required: true,
+    },
+    startDateFixed: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    startDateFromMilestones: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    startDate: {
+      type: String,
+      required: false,
+    },
+    dueDateIsFixed: {
+      type: Boolean,
+      required: true,
+    },
+    dueDateFixed: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    dueDateFromMilestones: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    endDate: {
+      type: String,
+      required: false,
+    },
+    startDateSourcingMilestoneTitle: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    startDateSourcingMilestoneDates: {
+      type: Object,
+      required: true,
+      default: () => ({ startDate: '', dueDate: '' }),
+    },
+    dueDateSourcingMilestoneTitle: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    dueDateSourcingMilestoneDates: {
+      type: Object,
+      required: true,
+      default: () => ({ startDate: '', dueDate: '' }),
+    },
+    labels: {
+      type: Array,
+      required: true,
+    },
+    participants: {
+      type: Array,
+      required: true,
+    },
+    subscribed: {
+      type: Boolean,
+      required: true,
+    },
+    todoExists: {
+      type: Boolean,
+      required: true,
+    },
+    namespace: {
+      type: String,
+      required: false,
+      default: '#',
+    },
+    labelsPath: {
+      type: String,
+      required: true,
+    },
+    toggleSubscriptionPath: {
+      type: String,
+      required: true,
+    },
+    todoPath: {
+      type: String,
+      required: true,
+    },
+    todoDeletePath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    labelsWebUrl: {
+      type: String,
+      required: true,
+    },
+    epicsWebUrl: {
+      type: String,
+      required: true,
+    },
+    state: {
+      type: String,
+      required: true,
+      default: status.open,
+    },
+  },
+  data() {
+    return {
+      // Epics specific configuration
+      issuableRef: '',
+      projectPath: this.groupPath,
+      projectNamespace: '',
+      service: new EpicsService({
+        endpoint: this.endpoint,
+      }),
+    };
+  },
+  computed: {
+    open() {
+      return this.state === status.open;
+    },
+  },
+  mounted() {
+    this.sidebarContext = new SidebarContext();
+  },
+  methods: {
+    triggerDocumentEvent(eventName, isClosed) {
+      $(document).trigger(eventName, isClosed);
+    },
+    toggleEpicStatus(stateEventType) {
+      return this.service
+        .updateStatus(stateEventType)
+        .then(() => {
+          const isClosed = stateEventType === stateEvent.close;
 
-            // Ensure that status change is reflected across the page.
-            // As `Close`/`Reopen` button is also present under
-            // comment form (part of Notes app)
-            // We've wrapped call to `$(document).trigger` for ease of testing
-            this.triggerDocumentEvent('issuable_vue_app:change', isClosed);
-            this.triggerDocumentEvent('issuable:change', isClosed);
-          })
-          .catch(() => {
-            flash(__('Unable to update this epic at this time.'));
-            const isClosed = stateEventType !== stateEvent.close;
-            this.triggerDocumentEvent('issuable_vue_app:change', isClosed);
-            this.triggerDocumentEvent('issuable:change', isClosed);
-          });
-      },
+          // Ensure that status change is reflected across the page.
+          // As `Close`/`Reopen` button is also present under
+          // comment form (part of Notes app)
+          // We've wrapped call to `$(document).trigger` for ease of testing
+          this.triggerDocumentEvent('issuable_vue_app:change', isClosed);
+          this.triggerDocumentEvent('issuable:change', isClosed);
+        })
+        .catch(() => {
+          flash(__('Unable to update this epic at this time.'));
+          const isClosed = stateEventType !== stateEvent.close;
+          this.triggerDocumentEvent('issuable_vue_app:change', isClosed);
+          this.triggerDocumentEvent('issuable:change', isClosed);
+        });
     },
-  };
+  },
+};
 </script>
 
 <template>
@@ -276,7 +286,9 @@
         :due-date-from-milestones="dueDateFromMilestones"
         :initial-end-date="endDate"
         :start-date-sourcing-milestone-title="startDateSourcingMilestoneTitle"
+        :start-date-sourcing-milestone-dates="startDateSourcingMilestoneDates"
         :due-date-sourcing-milestone-title="dueDateSourcingMilestoneTitle"
+        :due-date-sourcing-milestone-dates="dueDateSourcingMilestoneDates"
         :initial-labels="labels"
         :initial-participants="participants"
         :initial-subscribed="subscribed"

@@ -6,7 +6,7 @@ import EpicShowApp from './components/epic_show_app.vue';
 
 export default () => {
   const el = document.querySelector('#epic-show-app');
-  const metaData = convertObjectPropsToCamelCase(JSON.parse(el.dataset.meta));
+  const metaData = convertObjectPropsToCamelCase(JSON.parse(el.dataset.meta), { deep: true });
   const initialData = JSON.parse(el.dataset.initial);
 
   // Collapse the sidebar on mobile screens by default
@@ -22,8 +22,9 @@ export default () => {
     components: {
       'epic-show-app': EpicShowApp,
     },
-    render: createElement => createElement('epic-show-app', {
-      props,
-    }),
+    render: createElement =>
+      createElement('epic-show-app', {
+        props,
+      }),
   });
 };
