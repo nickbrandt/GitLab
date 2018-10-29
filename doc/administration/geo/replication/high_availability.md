@@ -112,7 +112,8 @@ the addresses of the remote endpoints for PostgreSQL and Redis will need to be s
 On the secondary, the remote endpoint for the PostgreSQL Geo database will
 be specified.
 
-1. Edit `/etc/gitlab/gitlab.rb` and ensure the following to disable PostgreSQL and Redis from running locally.
+1. Edit `/etc/gitlab/gitlab.rb` on each application server in the secondary
+   cluster, and add the following:
 
     ```ruby
     ##
