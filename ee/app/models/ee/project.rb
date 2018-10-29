@@ -108,8 +108,8 @@ module EE
       end
     end
 
-    def latest_pipeline_with_security_reports
-      pipelines.newest_first(default_branch).with_security_reports.first
+    def latest_pipeline_with_legacy_security_reports
+      pipelines.newest_first(default_branch).with_legacy_security_reports.first
     end
 
     def environments_for_scope(scope)
