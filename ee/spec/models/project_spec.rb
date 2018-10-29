@@ -1496,7 +1496,7 @@ describe Project do
     end
   end
 
-  describe '#latest_pipeline_with_security_reports' do
+  describe '#latest_pipeline_with_legacy_security_reports' do
     let(:project) { create(:project) }
     let(:pipeline_1) { create(:ci_pipeline_without_jobs, project: project) }
     let(:pipeline_2) { create(:ci_pipeline_without_jobs, project: project) }
@@ -1530,7 +1530,7 @@ describe Project do
     end
 
     it "returns the latest pipeline with security reports" do
-      expect(project.latest_pipeline_with_security_reports).to eq(pipeline_2)
+      expect(project.latest_pipeline_with_legacy_security_reports).to eq(pipeline_2)
     end
   end
 

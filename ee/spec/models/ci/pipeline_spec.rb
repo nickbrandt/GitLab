@@ -85,7 +85,7 @@ describe Ci::Pipeline do
     end
   end
 
-  describe '#with_security_reports scope' do
+  describe '#with_legacy_security_reports scope' do
     let(:pipeline_1) { create(:ci_pipeline_without_jobs, project: project) }
     let(:pipeline_2) { create(:ci_pipeline_without_jobs, project: project) }
     let(:pipeline_3) { create(:ci_pipeline_without_jobs, project: project) }
@@ -151,7 +151,7 @@ describe Ci::Pipeline do
     end
 
     it "returns pipeline with security reports" do
-      expect(described_class.with_security_reports).to eq([pipeline_1, pipeline_2, pipeline_3, pipeline_4])
+      expect(described_class.with_legacy_security_reports).to eq([pipeline_1, pipeline_2, pipeline_3, pipeline_4])
     end
   end
 
