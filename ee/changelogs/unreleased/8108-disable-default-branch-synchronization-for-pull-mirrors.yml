@@ -1,0 +1,5 @@
+---
+title: Does not synchronize default branch for pull mirrors
+merge_request: 8138
+author:
+type: changed
