@@ -156,5 +156,10 @@ module EE
     def has_current_license?
       License.current.present?
     end
+
+    override :ldap_sync_time
+    def ldap_sync_time
+      ::Gitlab.config.ldap['sync_time']
+    end
   end
 end
