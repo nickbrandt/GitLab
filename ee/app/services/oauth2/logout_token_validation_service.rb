@@ -1,5 +1,7 @@
 module Oauth2
   class LogoutTokenValidationService < ::BaseService
+    include Gitlab::Utils::StrongMemoize
+
     attr_reader :status
 
     def initialize(user, params = {})
@@ -8,32 +10,33 @@ module Oauth2
     end
 
     def execute
-      return error('access token not found') unless access_token
+      return error('Access token not found') unless access_token
 
       status = AccessTokenValidationService.new(access_token).validate
+      return error(status) unless status == AccessTokenValidationService::VALID
 
-      if status == AccessTokenValidationService::VALID
-        user = User.find(access_token.resource_owner_id)
+      user = User.find(access_token.resource_owner_id)
+      success(return_to: geo_node_url) if user == current_user
+    end
 
-        if current_user == user
-          success
+    private
+
+    def access_token
+      strong_memoize(:access_token) do
+        logout_token = oauth_session.extract_logout_token
+
+        if logout_token&.is_utf8?
+          Doorkeeper::AccessToken.by_token(logout_token)
         end
-      else
-        error(status)
       end
     end
 
-    def access_token
-      @access_token ||= begin
-        return unless  params[:state] && !params[:state].empty?
+    def oauth_session
+      @oauth_session ||= Gitlab::Geo::OauthSession.new(state: params[:state])
+    end
 
-        oauth_session = Gitlab::Geo::OauthSession.new(state: params[:state])
-
-        logout_token = oauth_session.extract_logout_token
-        return unless logout_token && logout_token.is_utf8?
-
-        Doorkeeper::AccessToken.by_token(logout_token)
-      end
+    def geo_node_url
+      GeoNode.find_by_oauth_application_id(access_token.application_id)&.url
     end
   end
 end

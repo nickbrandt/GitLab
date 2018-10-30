@@ -35,7 +35,7 @@ module Gitlab
       end
 
       def extract_logout_token
-        return unless state
+        return unless state.present?
 
         salt, encrypted = state.split(':', 2)
         decipher = logout_token_cipher(salt, :decrypt)
