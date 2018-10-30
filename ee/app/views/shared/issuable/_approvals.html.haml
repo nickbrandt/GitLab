@@ -35,7 +35,7 @@
     .card.prepend-top-10
       .card-header
         Approvers
-      %ul.content-list.approver-list
+      %ul.content-list.approver-list.qa-approver-list
         - if presenter.all_approvers_including_groups.empty?
           %li.no-approvers There are no approvers
         - else
@@ -43,7 +43,7 @@
           - item_classes = unsaved_approvers ? ['unsaved-approvers'] : []
           - presenter.overall_approvers.each do |approver|
             %li{ id: dom_id(approver), class: item_classes + ['approver'] }
-              = link_to approver.name, approver
+              = link_to approver.name, approver, class: 'qa-approver'
               - if can_update_approvers
                 .float-right
                   - if unsaved_approvers
