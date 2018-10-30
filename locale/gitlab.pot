@@ -8841,9 +8841,6 @@ msgstr ""
 msgid "You can also star a label to make it a priority label."
 msgstr ""
 
-msgid "You can also test your .gitlab-ci.yml in the %{linkStart}Lint%{linkEnd}"
-msgstr ""
-
 msgid "You can easily contribute to them by requesting to join these groups."
 msgstr ""
 
@@ -8863,6 +8860,9 @@ msgid "You can resolve the merge conflict using either the Interactive mode, by 
 msgstr ""
 
 msgid "You can set up jobs to only use Runners with specific tags. Separate tags with commas."
+msgstr ""
+
+msgid "You can test your .gitlab-ci.yml in %{linkStart}CI Lint%{linkEnd}."
 msgstr ""
 
 msgid "You cannot write to a read-only secondary GitLab Geo instance. Please use %{link_to_primary_node} instead."

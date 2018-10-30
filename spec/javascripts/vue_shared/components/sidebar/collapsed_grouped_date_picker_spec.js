@@ -77,7 +77,7 @@ describe('collapsedGroupedDatePicker', () => {
       expect(icons[0].innerText.trim()).toEqual('None');
     });
 
-    it('should have tooltip as `Start and due dates`', () => {
+    it('should have tooltip as `Start and due date`', () => {
       const icons = vm.$el.querySelectorAll('.sidebar-collapsed-icon');
 
       expect(icons[0].dataset.originalTitle).toBe('Start and due date');
