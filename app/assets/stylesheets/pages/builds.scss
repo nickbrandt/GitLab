@@ -55,29 +55,10 @@
   }
 
   .top-bar {
-    @include build-trace-top-bar(35px, $header-height);
+    @include build-trace-top-bar(35px);
 
-    &.affix {
-      top: $header-height;
-
-      // with sidebar
-      &.sidebar-expanded {
-        right: 306px;
-        left: 16px;
-      }
-
-      // without sidebar
-      &.sidebar-collapsed {
-        right: 16px;
-        left: 16px;
-      }
-    }
-
-    &.affix-top {
-      position: absolute;
-      right: 0;
-      left: 0;
-      top: 0;
+    &.sidebar-expanded {
+      margin-right: calc(#{$gutter-width} - 16px);
     }
 
     .truncated-info {
@@ -156,16 +137,6 @@
   .build-loader-animation {
     @include build-loader-animation;
     float: left;
-  }
-}
-
-.with-performance-bar .build-page {
-  .top-bar {
-    top: $header-height + $performance-bar-height;
-
-    &.affix {
-      top: $header-height + $performance-bar-height;
-    }
   }
 }
 
