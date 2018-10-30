@@ -1,4 +1,4 @@
-image: golang:1.8
+image: golang:1.9
 
 verify:
   image: golang:1.10
@@ -17,9 +17,6 @@ verify:
   - apt update -qq && apt install -y unzip bzip2
   - go version
   - make test
-
-test using go 1.8:
-  <<: *test_definition
 
 test using go 1.9:
   image: golang:1.9
