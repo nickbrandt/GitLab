@@ -50,35 +50,12 @@
     position: relative;
   }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> upstream/master
   .build-trace {
     @include build-trace();
   }
 
   .top-bar {
     @include build-trace-top-bar(35px);
-<<<<<<< HEAD
-=======
-
-    &.affix {
-      top: $header-height;
-
-      // with sidebar
-      &.sidebar-expanded {
-        right: 306px;
-        left: 16px;
-      }
-
-      // without sidebar
-      &.sidebar-collapsed {
-        right: 16px;
-        left: 16px;
-      }
-    }
->>>>>>> upstream/master
 
     &.sidebar-expanded {
       margin-right: calc(#{$gutter-width} - 16px);
@@ -121,15 +98,6 @@
   }
 }
 
-<<<<<<< HEAD
-=======
-.with-performance-bar .build-page {
-  .top-bar.affix {
-    top: $header-height + $performance-bar-height;
-  }
-}
-
->>>>>>> upstream/master
 .build-header {
   .ci-header-container,
   .header-action-buttons {
