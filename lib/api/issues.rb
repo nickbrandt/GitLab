@@ -25,7 +25,7 @@ module API
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
-      params :issues_params do
+      params :issues_params_ce do
         optional :labels, type: String, desc: 'Comma-separated list of label names'
         optional :milestone, type: String, desc: 'Milestone title'
         optional :order_by, type: String, values: %w[created_at updated_at], default: 'created_at',
@@ -48,6 +48,15 @@ module API
         use :pagination
       end
 
+      params :issues_params_ee do
+        optional :weight, types: [Integer, String], integer_none_any: true, desc: 'The weight of the issue'
+      end
+
+      params :issues_params do
+        use :issues_params_ce
+        use :issues_params_ee
+      end
+
       params :issue_params_ce do
         optional :description, type: String, desc: 'The description of an issue'
         optional :assignee_ids, type: Array[Integer], desc: 'The array of user IDs to assign issue'
@@ -60,7 +69,7 @@ module API
       end
 
       params :issue_params_ee do
-        optional :weight, type: [Integer, String], integer_none_any: true, desc: 'The weight of the issue'
+        optional :weight, type: Integer, desc: 'The weight of the issue'
       end
 
       params :issue_params do

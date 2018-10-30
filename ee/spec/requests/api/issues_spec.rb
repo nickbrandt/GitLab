@@ -39,10 +39,11 @@ describe API::Issues, :mailer do
 
       describe "filtering by weight" do
         before do
-          issue2 = create(:issue, author: user2, project: project, weight: 5)
           create(:issue, author: user2, project: project, weight: 1)
           create(:issue, author: user2, project: project, weight: 3)
         end
+
+        let!(:issue2) { create(:issue, author: user2, project: project, weight: 5) }
 
         it 'returns issues with specific weight' do
           get api('/issues', user), weight: 5, scope: 'all'
