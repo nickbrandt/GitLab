@@ -23,8 +23,6 @@ describe Projects::UpdateMirrorService do
     end
 
     it "fetches the upstream repository" do
-      stub_find_remote_root_ref(project)
-
       expect(project).to receive(:fetch_mirror)
 
       service.execute
@@ -32,7 +30,6 @@ describe Projects::UpdateMirrorService do
 
     it 'rescues exceptions from Repository#ff_merge' do
       stub_fetch_mirror(project)
-      stub_find_remote_root_ref(project)
 
       expect(project.repository).to receive(:ff_merge).and_raise(Gitlab::Git::PreReceiveError)
 
@@ -41,7 +38,6 @@ describe Projects::UpdateMirrorService do
 
     it "returns success when updated succeeds" do
       stub_fetch_mirror(project)
-      stub_find_remote_root_ref(project)
 
       result = service.execute
 
@@ -51,7 +47,6 @@ describe Projects::UpdateMirrorService do
     context "updating tags" do
       it "creates new tags" do
         stub_fetch_mirror(project)
-        stub_find_remote_root_ref(project)
 
         service.execute
 
@@ -60,7 +55,6 @@ describe Projects::UpdateMirrorService do
 
       it "only invokes GitTagPushService for tags pointing to commits" do
         stub_fetch_mirror(project)
-        stub_find_remote_root_ref(project)
 
         expect(GitTagPushService).to receive(:new)
           .with(project, project.owner, hash_including(ref: 'refs/tags/new-tag'))
@@ -84,7 +78,6 @@ describe Projects::UpdateMirrorService do
           project.reload
 
           stub_fetch_mirror(project)
-          stub_find_remote_root_ref(project)
 
           service.execute
 
@@ -93,7 +86,6 @@ describe Projects::UpdateMirrorService do
 
         it 'does not create an unprotected branch' do
           stub_fetch_mirror(project)
-          stub_find_remote_root_ref(project)
 
           service.execute
 
@@ -105,7 +97,6 @@ describe Projects::UpdateMirrorService do
           project.reload
 
           stub_fetch_mirror(project)
-          stub_find_remote_root_ref(project)
 
           service.execute
 
@@ -115,7 +106,6 @@ describe Projects::UpdateMirrorService do
 
         it "does not update unprotected branches" do
           stub_fetch_mirror(project)
-          stub_find_remote_root_ref(project)
 
           service.execute
 
@@ -126,7 +116,6 @@ describe Projects::UpdateMirrorService do
 
       it "creates new branches" do
         stub_fetch_mirror(project)
-        stub_find_remote_root_ref(project)
 
         service.execute
 
@@ -135,7 +124,6 @@ describe Projects::UpdateMirrorService do
 
       it "updates existing branches" do
         stub_fetch_mirror(project)
-        stub_find_remote_root_ref(project)
 
         service.execute
 
@@ -146,7 +134,6 @@ describe Projects::UpdateMirrorService do
       context 'with diverged branches' do
         before do
           stub_fetch_mirror(project)
-          stub_find_remote_root_ref(project)
         end
 
         context 'when mirror_overwrites_diverged_branches is true' do
@@ -187,7 +174,6 @@ describe Projects::UpdateMirrorService do
         it 'does not add a default master branch' do
           project    = create(:project_empty_repo, :mirror, import_url: Project::UNKNOWN_IMPORT_URL)
           repository = project.repository
-          stub_find_remote_root_ref(project)
 
           allow(project).to receive(:fetch_mirror) { create_file(repository) }
           expect(CreateBranchService).not_to receive(:create_master_branch)
@@ -209,35 +195,8 @@ describe Projects::UpdateMirrorService do
       end
     end
 
-    context 'synchronize the default branch' do
-      it 'updates the default branch when HEAD has changed' do
-        stub_fetch_mirror(project)
-        stub_find_remote_root_ref(project, ref: 'new-branch')
-
-        expect { service.execute }.to change { project.default_branch }.from('master').to('new-branch')
-      end
-
-      it 'does not update the default branch when HEAD does not change' do
-        stub_fetch_mirror(project)
-        stub_find_remote_root_ref(project, ref: 'master')
-
-        expect { service.execute }.not_to change { project.default_branch }
-      end
-
-      it 'does not update the default branch with SSH mirrors' do
-        project.update(import_url: 'ssh://git@example.com/foo/bar.git')
-
-        expect(project.repository)
-          .not_to receive(:find_remote_root_ref)
-          .with('upstream')
-
-        service.execute
-      end
-    end
-
     it "fails when the mirror user doesn't have access" do
       stub_fetch_mirror(project)
-      stub_find_remote_root_ref(project)
 
       result = described_class.new(project, create(:user)).execute
 
@@ -258,13 +217,6 @@ describe Projects::UpdateMirrorService do
 
       expect(result[:status]).to eq(:success)
     end
-  end
-
-  def stub_find_remote_root_ref(project, remote: 'upstream', ref: 'master')
-    allow(project.repository)
-      .to receive(:find_remote_root_ref)
-      .with(remote)
-      .and_return(ref)
   end
 
   def stub_fetch_mirror(project, repository: project.repository)
