@@ -272,7 +272,7 @@
   }
 }
 
-@mixin build-trace-top-bar($height, $top-position) {
+@mixin build-trace-top-bar($height) {
   height: $height;
   min-height: $height;
   background: $gray-light;
@@ -280,8 +280,12 @@
   color: $gl-text-color;
   position: sticky;
   position: -webkit-sticky;
-  top: $top-position;
+  top: $header-height;
   padding: $grid-size;
+
+  .with-performance-bar & {
+    top: $header-height + $performance-bar-height;
+  }
 }
 
 /*
