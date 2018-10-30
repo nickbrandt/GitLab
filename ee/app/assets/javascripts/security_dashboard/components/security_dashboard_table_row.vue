@@ -1,5 +1,5 @@
 <script>
-import { SkeletonLoading } from '@gitlab-org/gitlab-ui';
+import { GlSkeletonLoading } from '@gitlab-org/gitlab-ui';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
 import SecurityDashboardActionButtons from './security_dashboard_action_buttons.vue';
 import VulnerabilityIssueLink from './vulnerability_issue_link.vue';
@@ -9,7 +9,7 @@ export default {
   components: {
     SeverityBadge,
     SecurityDashboardActionButtons,
-    SkeletonLoading,
+    GlSkeletonLoading,
     VulnerabilityIssueLink,
   },
   props: {
@@ -67,7 +67,7 @@ export default {
         {{ s__('Reports|Vulnerability') }}
       </div>
       <div class="table-mobile-content">
-        <skeleton-loading
+        <gl-skeleton-loading
           v-if="isLoading"
           class="mt-2 js-skeleton-loader"
           :lines="2"
