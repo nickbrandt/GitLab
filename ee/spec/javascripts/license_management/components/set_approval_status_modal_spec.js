@@ -318,6 +318,7 @@ describe('SetApprovalModal', () => {
     Vue.nextTick()
       .then(() => {
         const licenseName = vm.$el.querySelector('.js-license-url');
+
         expect(licenseName).not.toBeNull();
         expect(trimText(licenseName.innerText)).toBe(`URL: ${badURL}`);
 

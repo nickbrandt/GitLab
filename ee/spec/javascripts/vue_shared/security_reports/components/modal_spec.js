@@ -245,24 +245,28 @@ describe('Security Reports modal', () => {
 
     it('for the link field', () => {
       const linkEl = vm.$el.querySelector('.js-link-links');
+
       expect(linkEl.tagName).not.toBe('A');
       expect(trimText(linkEl.textContent)).toBe(badUrl);
     });
 
     it('for the identifiers field', () => {
       const linkEl = vm.$el.querySelector('.js-link-identifiers');
+
       expect(linkEl.tagName).not.toBe('A');
       expect(trimText(linkEl.textContent)).toBe('BAD_URL');
     });
 
     it('for the file field', () => {
       const linkEl = vm.$el.querySelector('.js-link-file');
+
       expect(linkEl.tagName).not.toBe('A');
       expect(trimText(linkEl.textContent)).toBe('badFile.lock');
     });
 
     it('for the instances field', () => {
       const linkEl = vm.$el.querySelector('.report-block-list-issue-description-link .break-link');
+
       expect(linkEl.tagName).not.toBe('A');
       expect(trimText(linkEl.textContent)).toBe(badUrl);
     });
