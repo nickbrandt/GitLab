@@ -93,31 +93,42 @@ describe('epicSidebar', () => {
   it('should render both sidebar-date-picker', () => {
     const startDate = '2017-01-01';
     const endDate = '2018-01-01';
-    vm = mountComponent(EpicSidebar, Object.assign({}, defaultPropsData, {
-      initialStartDate: startDate,
-      initialStartDateFixed: startDate,
-      initialEndDate: endDate,
-      initialDueDateFixed: endDate,
-    }));
+    vm = mountComponent(
+      EpicSidebar,
+      Object.assign({}, defaultPropsData, {
+        initialStartDate: startDate,
+        initialStartDateFixed: startDate,
+        initialEndDate: endDate,
+        initialDueDateFixed: endDate,
+      }),
+    );
 
     const startDatePicker = vm.$el.querySelector('.block.start-date');
     const endDatePicker = vm.$el.querySelector('.block.end-date');
 
-    expect(startDatePicker.querySelector('.value-type-fixed .value-content').innerText.trim()).toEqual('Jan 1, 2017');
-    expect(endDatePicker.querySelector('.value-type-fixed .value-content').innerText.trim()).toEqual('Jan 1, 2018');
+    expect(
+      startDatePicker.querySelector('.value-type-fixed .value-content').innerText.trim(),
+    ).toEqual('Jan 1, 2017');
+
+    expect(
+      endDatePicker.querySelector('.value-type-fixed .value-content').innerText.trim(),
+    ).toEqual('Jan 1, 2018');
   });
 
   describe('computed prop', () => {
-    const getComponent = (customPropsData = {
-      initialStartDateIsFixed: true,
-      startDateFromMilestones: '2018-01-01',
-      initialStartDate: '2017-01-01',
-      initialDueDateIsFixed: true,
-      dueDateFromMilestones: '2018-11-31',
-      initialEndDate: '2018-01-01',
-    }) => new EpicSidebar({
-      propsData: Object.assign({}, defaultPropsData, customPropsData),
-    });
+    const getComponent = (
+      customPropsData = {
+        initialStartDateIsFixed: true,
+        startDateFromMilestones: '2018-01-01',
+        initialStartDate: '2017-01-01',
+        initialDueDateIsFixed: true,
+        dueDateFromMilestones: '2018-11-31',
+        initialEndDate: '2018-01-01',
+      },
+    ) =>
+      new EpicSidebar({
+        propsData: Object.assign({}, defaultPropsData, customPropsData),
+      });
 
     describe('isDateValid', () => {
       it('returns true when fixed start and end dates are valid', () => {
@@ -158,7 +169,10 @@ describe('epicSidebar', () => {
   describe('when collapsed', () => {
     beforeEach(() => {
       Cookies.set('collapsed_gutter', 'true');
-      vm = mountComponent(EpicSidebar, Object.assign({}, defaultPropsData, { initialStartDate: '2017-01-01' }));
+      vm = mountComponent(
+        EpicSidebar,
+        Object.assign({}, defaultPropsData, { initialStartDate: '2017-01-01' }),
+      );
     });
 
     it('should render right-sidebar-collapsed class', () => {
@@ -166,17 +180,23 @@ describe('epicSidebar', () => {
     });
 
     it('should render collapsed grouped date picker', () => {
-      expect(vm.$el.querySelector('.sidebar-grouped-item .sidebar-collapsed-icon span').innerText.trim()).toEqual('From Jan 1 2017');
+      expect(
+        vm.$el.querySelector('.sidebar-grouped-item .sidebar-collapsed-icon span').innerText.trim(),
+      ).toEqual('From Jan 1 2017');
     });
 
     it('should render collapsed labels picker', () => {
-      expect(vm.$el.querySelector('.js-labels-block .sidebar-collapsed-icon span').innerText.trim()).toEqual('1');
+      expect(
+        vm.$el.querySelector('.js-labels-block .sidebar-collapsed-icon span').innerText.trim(),
+      ).toEqual('1');
     });
   });
 
   describe('getDateFromMilestonesTooltip', () => {
     it('returns tooltip string for milestone', () => {
-      expect(vm.getDateFromMilestonesTooltip('start')).toBe('To schedule your epic\'s start date based on milestones, assign a milestone with a start date to any issue in the epic.');
+      expect(vm.getDateFromMilestonesTooltip('start')).toBe(
+        "To schedule your epic's start date based on milestones, assign a milestone with a start date to any issue in the epic.",
+      );
     });
 
     it('returns tooltip string with milestone dates', () => {
@@ -256,11 +276,12 @@ describe('epicSidebar', () => {
       mock.restore();
     });
 
-    it('should save startDate', (done) => {
+    it('should save startDate', done => {
       const date = '2017-01-01';
 
       expect(component.store.startDate).toBeUndefined();
-      component.saveStartDate(date)
+      component
+        .saveStartDate(date)
         .then(() => {
           expect(component.store.startDate).toEqual(date);
           done();
@@ -268,11 +289,12 @@ describe('epicSidebar', () => {
         .catch(done.fail);
     });
 
-    it('should save endDate', (done) => {
+    it('should save endDate', done => {
       const date = '2017-01-01';
 
       expect(component.store.endDate).toBeUndefined();
-      component.saveEndDate(date)
+      component
+        .saveEndDate(date)
         .then(() => {
           expect(component.store.endDate).toEqual(date);
           done();
@@ -280,7 +302,7 @@ describe('epicSidebar', () => {
         .catch(done.fail);
     });
 
-    it('should change start date type as from milestones', (done) => {
+    it('should change start date type as from milestones', done => {
       spyOn(component.service, 'updateStartDate').and.callThrough();
       const dateValue = '2017-01-01';
       component.saveDate('start', dateValue, false);
@@ -295,7 +317,7 @@ describe('epicSidebar', () => {
         .catch(done.fail);
     });
 
-    it('should change start date type as fixed', (done) => {
+    it('should change start date type as fixed', done => {
       spyOn(component.service, 'updateStartDate').and.callThrough();
       const dateValue = '2017-04-01';
       component.saveDate('start', dateValue, true);
@@ -312,7 +334,7 @@ describe('epicSidebar', () => {
       }, 0);
     });
 
-    it('should change end date type as from milestones', (done) => {
+    it('should change end date type as from milestones', done => {
       spyOn(component.service, 'updateEndDate').and.callThrough();
       const dateValue = '2017-01-01';
       component.saveDate('end', dateValue, false);
@@ -327,7 +349,7 @@ describe('epicSidebar', () => {
         .catch(done.fail);
     });
 
-    it('should change end date type as fixed', (done) => {
+    it('should change end date type as fixed', done => {
       spyOn(component.service, 'updateEndDate').and.callThrough();
       const dateValue = '2017-04-01';
       component.saveDate('end', dateValue, true);
@@ -448,7 +470,9 @@ describe('epicSidebar', () => {
       vm.handleToggleTodo();
       setTimeout(() => {
         expect(vm.savingTodoAction).toBe(false);
-        expect(document.querySelector('.flash-text').innerText.trim()).toBe('There was an error adding a todo.');
+        expect(document.querySelector('.flash-text').innerText.trim()).toBe(
+          'There was an error adding a todo.',
+        );
         done();
       }, 0);
     });
@@ -487,7 +511,9 @@ describe('epicSidebar', () => {
       vm.handleToggleTodo();
       setTimeout(() => {
         expect(vm.savingTodoAction).toBe(false);
-        expect(document.querySelector('.flash-text').innerText.trim()).toBe('There was an error deleting the todo.');
+        expect(document.querySelector('.flash-text').innerText.trim()).toBe(
+          'There was an error deleting the todo.',
+        );
         done();
       }, 0);
     });
@@ -499,9 +525,11 @@ describe('epicSidebar', () => {
 
     beforeEach(() => {
       interceptor = (request, next) => {
-        next(request.respondWith(JSON.stringify({}), {
-          status: 500,
-        }));
+        next(
+          request.respondWith(JSON.stringify({}), {
+            status: 500,
+          }),
+        );
       };
       Vue.http.interceptors.push(interceptor);
       component = new EpicSidebar({
@@ -513,11 +541,12 @@ describe('epicSidebar', () => {
       Vue.http.interceptors = _.without(Vue.http.interceptors, interceptor);
     });
 
-    it('should handle errors gracefully', (done) => {
+    it('should handle errors gracefully', done => {
       const date = '2017-01-01';
 
       expect(component.store.startDate).toBeUndefined();
-      component.saveDate('start', date)
+      component
+        .saveDate('start', date)
         .then(() => {
           expect(component.store.startDate).toBeUndefined();
           done();

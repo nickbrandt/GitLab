@@ -13,9 +13,7 @@ export default {
     },
     statusInfoStaleMessage() {
       return sprintf(s__('GeoNodes|Data is out of date from %{timeago}'), {
-        timeago: this.timeFormated(
-          this.nodeDetails.statusCheckTimestamp,
-        ),
+        timeago: this.timeFormated(this.nodeDetails.statusCheckTimestamp),
       });
     },
   },

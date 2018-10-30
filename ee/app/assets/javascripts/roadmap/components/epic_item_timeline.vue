@@ -17,11 +17,7 @@ export default {
   directives: {
     tooltip,
   },
-  mixins: [
-    QuartersPresetMixin,
-    MonthsPresetMixin,
-    WeeksPresetMixin,
-  ],
+  mixins: [QuartersPresetMixin, MonthsPresetMixin, WeeksPresetMixin],
   props: {
     presetType: {
       type: String,

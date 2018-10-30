@@ -80,7 +80,7 @@ export const headerProps = {
     username: '@root',
     name: 'Administrator',
   },
-  created: (new Date()).toISOString(),
+  created: new Date().toISOString(),
   open: true,
   canUpdate: true,
   canDelete: true,

@@ -1,65 +1,65 @@
 <script>
-  import { __, s__ } from '~/locale';
-  import eventHub from '../event_hub';
-  import { NODE_ACTIONS } from '../constants';
-  import Icon from '~/vue_shared/components/icon.vue';
+import { __, s__ } from '~/locale';
+import eventHub from '../event_hub';
+import { NODE_ACTIONS } from '../constants';
+import Icon from '~/vue_shared/components/icon.vue';
 
-  export default {
-    components: {
-      Icon,
+export default {
+  components: {
+    Icon,
+  },
+  props: {
+    node: {
+      type: Object,
+      required: true,
     },
-    props: {
-      node: {
-        type: Object,
-        required: true,
-      },
-      nodeActionsAllowed: {
-        type: Boolean,
-        required: true,
-      },
-      nodeEditAllowed: {
-        type: Boolean,
-        required: true,
-      },
-      nodeMissingOauth: {
-        type: Boolean,
-        required: true,
-      },
+    nodeActionsAllowed: {
+      type: Boolean,
+      required: true,
     },
-    computed: {
-      isToggleAllowed() {
-        return !this.node.primary && this.nodeEditAllowed;
-      },
-      nodeToggleLabel() {
-        return this.node.enabled ? __('Disable') : __('Enable');
-      },
-      isSecondaryNode() {
-        return !this.node.primary;
-      },
+    nodeEditAllowed: {
+      type: Boolean,
+      required: true,
     },
-    methods: {
-      onToggleNode() {
-        eventHub.$emit('showNodeActionModal', {
-          actionType: NODE_ACTIONS.TOGGLE,
-          node: this.node,
-          modalMessage: s__('GeoNodes|Disabling a node stops the sync process. Are you sure?'),
-          modalActionLabel: this.nodeToggleLabel,
-        });
-      },
-      onRemoveNode() {
-        eventHub.$emit('showNodeActionModal', {
-          actionType: NODE_ACTIONS.REMOVE,
-          node: this.node,
-          modalKind: 'danger',
-          modalMessage: s__('GeoNodes|Removing a node stops the sync process. Are you sure?'),
-          modalActionLabel: __('Remove'),
-        });
-      },
-      onRepairNode() {
-        eventHub.$emit('repairNode', this.node);
-      },
+    nodeMissingOauth: {
+      type: Boolean,
+      required: true,
     },
-  };
+  },
+  computed: {
+    isToggleAllowed() {
+      return !this.node.primary && this.nodeEditAllowed;
+    },
+    nodeToggleLabel() {
+      return this.node.enabled ? __('Disable') : __('Enable');
+    },
+    isSecondaryNode() {
+      return !this.node.primary;
+    },
+  },
+  methods: {
+    onToggleNode() {
+      eventHub.$emit('showNodeActionModal', {
+        actionType: NODE_ACTIONS.TOGGLE,
+        node: this.node,
+        modalMessage: s__('GeoNodes|Disabling a node stops the sync process. Are you sure?'),
+        modalActionLabel: this.nodeToggleLabel,
+      });
+    },
+    onRemoveNode() {
+      eventHub.$emit('showNodeActionModal', {
+        actionType: NODE_ACTIONS.REMOVE,
+        node: this.node,
+        modalKind: 'danger',
+        modalMessage: s__('GeoNodes|Removing a node stops the sync process. Are you sure?'),
+        modalActionLabel: __('Remove'),
+      });
+    },
+    onRepairNode() {
+      eventHub.$emit('repairNode', this.node);
+    },
+  },
+};
 </script>
 
 <template>

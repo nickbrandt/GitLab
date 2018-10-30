@@ -7,7 +7,9 @@ export default class SidebarContext {
   constructor() {
     const $issuableSidebar = $('.js-issuable-update');
 
-    Mousetrap.bind('l', () => SidebarContext.openSidebarDropdown($issuableSidebar.find('.js-labels-block')));
+    Mousetrap.bind('l', () =>
+      SidebarContext.openSidebarDropdown($issuableSidebar.find('.js-labels-block')),
+    );
 
     $issuableSidebar
       .off('click', '.js-sidebar-dropdown-toggle')

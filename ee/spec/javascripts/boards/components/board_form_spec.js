@@ -59,7 +59,7 @@ describe('board_form.vue', () => {
     });
 
     describe('cancel', () => {
-      it('resets currentPage', (done) => {
+      it('resets currentPage', done => {
         vm.cancel();
 
         Vue.nextTick()
@@ -73,7 +73,7 @@ describe('board_form.vue', () => {
   });
 
   describe('buttons', () => {
-    it('cancel button triggers cancel()', (done) => {
+    it('cancel button triggers cancel()', done => {
       spyOn(vm, 'cancel');
 
       Vue.nextTick()

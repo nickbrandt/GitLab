@@ -15,13 +15,14 @@ export default class SidebarMediator extends CESidebarMediator {
 
   updateWeight(newWeight) {
     this.store.setLoadingState('weight', true);
-    return this.service.update('issue[weight]', newWeight)
+    return this.service
+      .update('issue[weight]', newWeight)
       .then(res => res.json())
-      .then((data) => {
+      .then(data => {
         this.store.setWeight(data.weight);
         this.store.setLoadingState('weight', false);
       })
-      .catch((err) => {
+      .catch(err => {
         this.store.setLoadingState('weight', false);
         throw err;
       });

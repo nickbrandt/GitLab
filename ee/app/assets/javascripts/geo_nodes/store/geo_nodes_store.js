@@ -8,9 +8,7 @@ export default class GeoNodesStore {
   }
 
   setNodes(nodes) {
-    this.state.nodes = nodes.map(
-      node => GeoNodesStore.formatNode(node),
-    );
+    this.state.nodes = nodes.map(node => GeoNodesStore.formatNode(node));
   }
 
   getNodes() {

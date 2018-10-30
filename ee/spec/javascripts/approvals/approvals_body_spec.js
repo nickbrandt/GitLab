@@ -98,8 +98,9 @@ describe('Approvals Body Component', () => {
         vm.userCanApprove = true;
 
         Vue.nextTick(() => {
-          expect(vm.approvalsRequiredStringified)
-            .toBe('Merge request approved; you can approve additionally');
+          expect(vm.approvalsRequiredStringified).toBe(
+            'Merge request approved; you can approve additionally',
+          );
           done();
         });
       });

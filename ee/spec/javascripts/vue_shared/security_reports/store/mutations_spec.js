@@ -414,21 +414,26 @@ describe('security reports mutations', () => {
           class: 'User',
           method: 'do_something',
         },
-        links: [{
-          url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/rMTQy4oRCGk',
-        }],
-        identifiers: [{
-          type: 'CVE',
-          name: 'CVE-2014-9999',
-          value: 'CVE-2014-9999',
-          url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-9999',
-        }],
-        instances: [{
-          param: 'X-Content-Type-Options',
-          method: 'GET',
-          uri: 'http://example.com/some-path',
-
-        }],
+        links: [
+          {
+            url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/rMTQy4oRCGk',
+          },
+        ],
+        identifiers: [
+          {
+            type: 'CVE',
+            name: 'CVE-2014-9999',
+            value: 'CVE-2014-9999',
+            url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-9999',
+          },
+        ],
+        instances: [
+          {
+            param: 'X-Content-Type-Options',
+            method: 'GET',
+            uri: 'http://example.com/some-path',
+          },
+        ],
         isDismissed: true,
       };
       const status = 'success';

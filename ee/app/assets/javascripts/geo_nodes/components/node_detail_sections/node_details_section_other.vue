@@ -1,93 +1,93 @@
 <script>
-  import { s__, __ } from '~/locale';
-  import { numberToHumanSize } from '~/lib/utils/number_utils';
+import { s__, __ } from '~/locale';
+import { numberToHumanSize } from '~/lib/utils/number_utils';
 
-  import { VALUE_TYPE } from '../../constants';
+import { VALUE_TYPE } from '../../constants';
 
-  import DetailsSectionMixin from '../../mixins/details_section_mixin';
+import DetailsSectionMixin from '../../mixins/details_section_mixin';
 
-  import GeoNodeDetailItem from '../geo_node_detail_item.vue';
-  import SectionRevealButton from './section_reveal_button.vue';
+import GeoNodeDetailItem from '../geo_node_detail_item.vue';
+import SectionRevealButton from './section_reveal_button.vue';
 
-  export default {
-    valueType: VALUE_TYPE,
-    components: {
-      SectionRevealButton,
-      GeoNodeDetailItem,
+export default {
+  valueType: VALUE_TYPE,
+  components: {
+    SectionRevealButton,
+    GeoNodeDetailItem,
+  },
+  mixins: [DetailsSectionMixin],
+  props: {
+    nodeDetails: {
+      type: Object,
+      required: true,
     },
-    mixins: [
-      DetailsSectionMixin,
-    ],
-    props: {
-      nodeDetails: {
-        type: Object,
-        required: true,
-      },
-      nodeTypePrimary: {
-        type: Boolean,
-        required: true,
-      },
+    nodeTypePrimary: {
+      type: Boolean,
+      required: true,
     },
-    data() {
-      return {
-        showSectionItems: false,
-      };
-    },
-    computed: {
-      nodeDetailItems() {
-        if (this.nodeTypePrimary) {
-          // Return primary node detail items
-          const primaryNodeDetailItems = [
-            {
-              itemTitle: s__('GeoNodes|Replication slots'),
-              itemValue: this.nodeDetails.replicationSlots,
-              itemValueType: VALUE_TYPE.GRAPH,
-              successLabel: s__('GeoNodes|Used slots'),
-              neutraLabel: s__('GeoNodes|Unused slots'),
-            },
-          ];
-
-          if (this.nodeDetails.replicationSlots.totalCount) {
-            primaryNodeDetailItems.push(
-              {
-                itemTitle: s__('GeoNodes|Replication slot WAL'),
-                itemValue: numberToHumanSize(this.nodeDetails.replicationSlotWAL),
-                itemValueType: VALUE_TYPE.PLAIN,
-                cssClass: 'node-detail-value-bold',
-              },
-            );
-          }
-
-          return primaryNodeDetailItems;
-        }
-
-        // Return secondary node detail items
-        return [
+  },
+  data() {
+    return {
+      showSectionItems: false,
+    };
+  },
+  computed: {
+    nodeDetailItems() {
+      if (this.nodeTypePrimary) {
+        // Return primary node detail items
+        const primaryNodeDetailItems = [
           {
-            itemTitle: s__('GeoNodes|Storage config'),
-            itemValue: this.storageShardsStatus,
-            itemValueType: VALUE_TYPE.PLAIN,
-            cssClass: this.storageShardsCssClass,
+            itemTitle: s__('GeoNodes|Replication slots'),
+            itemValue: this.nodeDetails.replicationSlots,
+            itemValueType: VALUE_TYPE.GRAPH,
+            successLabel: s__('GeoNodes|Used slots'),
+            neutraLabel: s__('GeoNodes|Unused slots'),
           },
         ];
-      },
-      storageShardsStatus() {
-        if (this.nodeDetails.storageShardsMatch == null) {
-          return __('Unknown');
+
+        if (this.nodeDetails.replicationSlots.totalCount) {
+          primaryNodeDetailItems.push({
+            itemTitle: s__('GeoNodes|Replication slot WAL'),
+            itemValue: numberToHumanSize(this.nodeDetails.replicationSlotWAL),
+            itemValueType: VALUE_TYPE.PLAIN,
+            cssClass: 'node-detail-value-bold',
+          });
         }
-        return this.nodeDetails.storageShardsMatch ? __('OK') : s__('GeoNodes|Does not match the primary storage configuration');
-      },
-      storageShardsCssClass() {
-        const cssClass = 'node-detail-value-bold';
-        return !this.nodeDetails.storageShardsMatch ? `${cssClass} node-detail-value-error` : cssClass;
-      },
+
+        return primaryNodeDetailItems;
+      }
+
+      // Return secondary node detail items
+      return [
+        {
+          itemTitle: s__('GeoNodes|Storage config'),
+          itemValue: this.storageShardsStatus,
+          itemValueType: VALUE_TYPE.PLAIN,
+          cssClass: this.storageShardsCssClass,
+        },
+      ];
     },
-    methods: {
-      handleSectionToggle(toggleState) {
-        this.showSectionItems = toggleState;
-      },
+    storageShardsStatus() {
+      if (this.nodeDetails.storageShardsMatch == null) {
+        return __('Unknown');
+      }
+      return this.nodeDetails.storageShardsMatch
+        ? __('OK')
+        : s__('GeoNodes|Does not match the primary storage configuration');
     },
-  };
+    storageShardsCssClass() {
+      const cssClass = 'node-detail-value-bold';
+      return !this.nodeDetails.storageShardsMatch
+        ? `${cssClass} node-detail-value-error`
+        : cssClass;
+    },
+  },
+  methods: {
+    handleSectionToggle(toggleState) {
+      this.showSectionItems = toggleState;
+    },
+  },
+};
 </script>
 
 <template>

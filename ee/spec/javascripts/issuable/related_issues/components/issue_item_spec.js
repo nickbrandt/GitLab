@@ -23,7 +23,9 @@ describe('issueItem', () => {
   });
 
   it('renders displayReference', () => {
-    expect(vm.$el.querySelector('.text-secondary').innerText.trim()).toEqual(props.displayReference);
+    expect(vm.$el.querySelector('.text-secondary').innerText.trim()).toEqual(
+      props.displayReference,
+    );
   });
 
   it('does not render token state', () => {
@@ -47,7 +49,7 @@ describe('issueItem', () => {
   describe('token state', () => {
     let tokenState;
 
-    beforeEach((done) => {
+    beforeEach(done => {
       vm.state = 'opened';
       Vue.nextTick(() => {
         tokenState = vm.$el.querySelector('.text-secondary svg');
@@ -71,7 +73,7 @@ describe('issueItem', () => {
       expect(tokenState.classList.contains('issue-token-state-icon-open')).toEqual(true);
     });
 
-    it('renders close icon when close state', (done) => {
+    it('renders close icon when close state', done => {
       vm.state = 'closed';
 
       Vue.nextTick(() => {
@@ -84,7 +86,7 @@ describe('issueItem', () => {
   describe('remove button', () => {
     let removeBtn;
 
-    beforeEach((done) => {
+    beforeEach(done => {
       vm.canRemove = true;
       Vue.nextTick(() => {
         removeBtn = vm.$refs.removeButton;
@@ -96,7 +98,7 @@ describe('issueItem', () => {
       expect(removeBtn).toBeDefined();
     });
 
-    it('renders disabled button when removeDisabled', (done) => {
+    it('renders disabled button when removeDisabled', done => {
       vm.removeDisabled = true;
       Vue.nextTick(() => {
         expect(removeBtn.hasAttribute('disabled')).toEqual(true);

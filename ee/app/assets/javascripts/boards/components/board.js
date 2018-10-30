@@ -20,8 +20,8 @@ export default Board.extend({
       }
 
       const { issuesSize, totalWeight } = this.list;
-      return sprintf(__(
-        `${n__('%d issue', '%d issues', issuesSize)} with %{totalWeight} total weight`),
+      return sprintf(
+        __(`${n__('%d issue', '%d issues', issuesSize)} with %{totalWeight} total weight`),
         {
           totalWeight,
         },

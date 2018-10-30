@@ -5,17 +5,20 @@ import { VALUE_TYPE, CUSTOM_TYPE } from 'ee/geo_nodes/constants';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { rawMockNodeDetails } from '../mock_data';
 
-const createComponent = (config) => {
+const createComponent = config => {
   const Component = Vue.extend(geoNodeDetailItemComponent);
-  const defaultConfig = Object.assign({
-    itemTitle: 'GitLab version',
-    cssClass: 'node-version',
-    itemValue: '10.4.0-pre',
-    successLabel: 'Synced',
-    failureLabel: 'Failed',
-    neutralLabel: 'Out of sync',
-    itemValueType: VALUE_TYPE.PLAIN,
-  }, config);
+  const defaultConfig = Object.assign(
+    {
+      itemTitle: 'GitLab version',
+      cssClass: 'node-version',
+      itemValue: '10.4.0-pre',
+      successLabel: 'Synced',
+      failureLabel: 'Failed',
+      neutralLabel: 'Out of sync',
+      itemValueType: VALUE_TYPE.PLAIN,
+    },
+    config,
+  );
 
   return mountComponent(Component, defaultConfig);
 };
@@ -40,7 +43,11 @@ describe('GeoNodeDetailItemComponent', () => {
     });
 
     it('renders item title help info icon and popover with help info', () => {
-      const helpInfo = { title: 'Foo title tooltip', url: 'https://docs.gitlab.com', urlText: 'Help' };
+      const helpInfo = {
+        title: 'Foo title tooltip',
+        url: 'https://docs.gitlab.com',
+        urlText: 'Help',
+      };
       const vm = createComponent({ helpInfo });
       const helpTextIconEl = vm.$el.querySelector('.node-detail-help-text');
 

@@ -1,123 +1,123 @@
 <script>
-  import { s__ } from '~/locale';
-  import popover from '~/vue_shared/directives/popover';
-  import tooltip from '~/vue_shared/directives/tooltip';
-  import Icon from '~/vue_shared/components/icon.vue';
-  import StackedProgressBar from '~/vue_shared/components/stacked_progress_bar.vue';
+import { s__ } from '~/locale';
+import popover from '~/vue_shared/directives/popover';
+import tooltip from '~/vue_shared/directives/tooltip';
+import Icon from '~/vue_shared/components/icon.vue';
+import StackedProgressBar from '~/vue_shared/components/stacked_progress_bar.vue';
 
-  import { VALUE_TYPE, CUSTOM_TYPE } from '../constants';
+import { VALUE_TYPE, CUSTOM_TYPE } from '../constants';
 
-  import GeoNodeSyncSettings from './geo_node_sync_settings.vue';
-  import GeoNodeEventStatus from './geo_node_event_status.vue';
+import GeoNodeSyncSettings from './geo_node_sync_settings.vue';
+import GeoNodeEventStatus from './geo_node_event_status.vue';
 
-  export default {
-    components: {
-      Icon,
-      StackedProgressBar,
-      GeoNodeSyncSettings,
-      GeoNodeEventStatus,
+export default {
+  components: {
+    Icon,
+    StackedProgressBar,
+    GeoNodeSyncSettings,
+    GeoNodeEventStatus,
+  },
+  directives: {
+    popover,
+    tooltip,
+  },
+  props: {
+    itemTitle: {
+      type: String,
+      required: true,
     },
-    directives: {
-      popover,
-      tooltip,
+    cssClass: {
+      type: String,
+      required: false,
+      default: '',
     },
-    props: {
-      itemTitle: {
-        type: String,
-        required: true,
-      },
-      cssClass: {
-        type: String,
-        required: false,
-        default: '',
-      },
-      itemValue: {
-        type: [Object, String, Number],
-        required: true,
-      },
-      itemValueStale: {
-        type: Boolean,
-        required: false,
-        default: false,
-      },
-      itemValueStaleTooltip: {
-        type: String,
-        required: false,
-        default: '',
-      },
-      successLabel: {
-        type: String,
-        required: false,
-        default: s__('GeoNodes|Synced'),
-      },
-      failureLabel: {
-        type: String,
-        required: false,
-        default: s__('GeoNodes|Failed'),
-      },
-      neutralLabel: {
-        type: String,
-        required: false,
-        default: s__('GeoNodes|Out of sync'),
-      },
-      itemValueType: {
-        type: String,
-        required: true,
-      },
-      customType: {
-        type: String,
-        required: false,
-        default: '',
-      },
-      eventTypeLogStatus: {
-        type: Boolean,
-        required: false,
-        default: false,
-      },
-      helpInfo: {
-        type: [Boolean, Object],
-        required: false,
-        default: false,
-      },
+    itemValue: {
+      type: [Object, String, Number],
+      required: true,
     },
-    computed: {
-      hasHelpInfo() {
-        return typeof this.helpInfo === 'object';
-      },
-      isValueTypePlain() {
-        return this.itemValueType === VALUE_TYPE.PLAIN;
-      },
-      isValueTypeGraph() {
-        return this.itemValueType === VALUE_TYPE.GRAPH;
-      },
-      isValueTypeCustom() {
-        return this.itemValueType === VALUE_TYPE.CUSTOM;
-      },
-      isCustomTypeSync() {
-        return this.customType === CUSTOM_TYPE.SYNC;
-      },
-      popoverConfig() {
-        return {
-          html: true,
-          trigger: 'click',
-          placement: 'top',
-          template: `
+    itemValueStale: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    itemValueStaleTooltip: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    successLabel: {
+      type: String,
+      required: false,
+      default: s__('GeoNodes|Synced'),
+    },
+    failureLabel: {
+      type: String,
+      required: false,
+      default: s__('GeoNodes|Failed'),
+    },
+    neutralLabel: {
+      type: String,
+      required: false,
+      default: s__('GeoNodes|Out of sync'),
+    },
+    itemValueType: {
+      type: String,
+      required: true,
+    },
+    customType: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    eventTypeLogStatus: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    helpInfo: {
+      type: [Boolean, Object],
+      required: false,
+      default: false,
+    },
+  },
+  computed: {
+    hasHelpInfo() {
+      return typeof this.helpInfo === 'object';
+    },
+    isValueTypePlain() {
+      return this.itemValueType === VALUE_TYPE.PLAIN;
+    },
+    isValueTypeGraph() {
+      return this.itemValueType === VALUE_TYPE.GRAPH;
+    },
+    isValueTypeCustom() {
+      return this.itemValueType === VALUE_TYPE.CUSTOM;
+    },
+    isCustomTypeSync() {
+      return this.customType === CUSTOM_TYPE.SYNC;
+    },
+    popoverConfig() {
+      return {
+        html: true,
+        trigger: 'click',
+        placement: 'top',
+        template: `
             <div class="popover geo-node-detail-popover" role="tooltip">
               <div class="arrow"></div>
               <p class="popover-header"></p>
               <div class="popover-body"></div>
             </div>
           `,
-          title: this.helpInfo.title,
-          content: `
+        title: this.helpInfo.title,
+        content: `
             <a href="${this.helpInfo.url}">
               ${this.helpInfo.urlText}
             </a>
           `,
-        };
-      },
+      };
     },
-  };
+  },
+};
 </script>
 
 <template>

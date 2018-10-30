@@ -19,7 +19,7 @@ const setupAutoCompleteEpics = ($input, defaultCallbacks) => {
     callbacks: {
       ...defaultCallbacks,
       beforeSave(merges) {
-        return $.map(merges, (m) => {
+        return $.map(merges, m => {
           if (m.title == null) {
             return m;
           }

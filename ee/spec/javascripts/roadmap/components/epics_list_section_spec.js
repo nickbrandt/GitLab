@@ -80,14 +80,14 @@ describe('EpicsListSectionComponent', () => {
     });
 
     describe('initMounted', () => {
-      it('initializes shellHeight based on window.innerHeight and component element position', (done) => {
+      it('initializes shellHeight based on window.innerHeight and component element position', done => {
         vm.$nextTick(() => {
           expect(vm.shellHeight).toBe(600);
           done();
         });
       });
 
-      it('calls initEmptyRow() when there are Epics to render', (done) => {
+      it('calls initEmptyRow() when there are Epics to render', done => {
         spyOn(vm, 'initEmptyRow').and.callThrough();
 
         vm.$nextTick(() => {
@@ -96,7 +96,7 @@ describe('EpicsListSectionComponent', () => {
         });
       });
 
-      it('emits `epicsListRendered` via eventHub', (done) => {
+      it('emits `epicsListRendered` via eventHub', done => {
         spyOn(eventHub, '$emit');
 
         vm.$nextTick(() => {
@@ -107,7 +107,7 @@ describe('EpicsListSectionComponent', () => {
     });
 
     describe('initEmptyRow', () => {
-      it('sets `emptyRowHeight` and `showEmptyRow` props when shellHeight is greater than approximate height of epics list', (done) => {
+      it('sets `emptyRowHeight` and `showEmptyRow` props when shellHeight is greater than approximate height of epics list', done => {
         vm.$nextTick(() => {
           expect(vm.emptyRowHeight).toBe(600);
           expect(vm.showEmptyRow).toBe(true);
@@ -115,7 +115,7 @@ describe('EpicsListSectionComponent', () => {
         });
       });
 
-      it('does not set `emptyRowHeight` and `showEmptyRow` props when shellHeight is less than approximate height of epics list', (done) => {
+      it('does not set `emptyRowHeight` and `showEmptyRow` props when shellHeight is less than approximate height of epics list', done => {
         const initialHeight = window.innerHeight;
         window.innerHeight = 0;
         const vmMoreEpics = createComponent({
@@ -145,21 +145,21 @@ describe('EpicsListSectionComponent', () => {
       vm = createComponent({});
     });
 
-    it('renders component container element with class `epics-list-section`', (done) => {
+    it('renders component container element with class `epics-list-section`', done => {
       vm.$nextTick(() => {
         expect(vm.$el.classList.contains('epics-list-section')).toBe(true);
         done();
       });
     });
 
-    it('renders component container element with `width` property applied via style attribute', (done) => {
+    it('renders component container element with `width` property applied via style attribute', done => {
       vm.$nextTick(() => {
         expect(vm.$el.getAttribute('style')).toBe(`width: ${mockShellWidth}px;`);
         done();
       });
     });
 
-    it('renders bottom shadow element when `showBottomShadow` prop is true', (done) => {
+    it('renders bottom shadow element when `showBottomShadow` prop is true', done => {
       vm.showBottomShadow = true;
       vm.$nextTick(() => {
         expect(vm.$el.querySelector('.scroll-bottom-shadow')).not.toBe(null);

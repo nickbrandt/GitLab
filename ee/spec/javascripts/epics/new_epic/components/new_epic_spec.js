@@ -25,20 +25,24 @@ describe('newEpic', () => {
 
   describe('alignRight', () => {
     it('should not add dropdown-menu-right by default', () => {
-      expect(vm.$el.querySelector('.dropdown-menu').classList.contains('dropdown-menu-right')).toEqual(false);
+      expect(
+        vm.$el.querySelector('.dropdown-menu').classList.contains('dropdown-menu-right'),
+      ).toEqual(false);
     });
 
-    it('should add dropdown-menu-right when alignRight', (done) => {
+    it('should add dropdown-menu-right when alignRight', done => {
       vm.alignRight = true;
       Vue.nextTick(() => {
-        expect(vm.$el.querySelector('.dropdown-menu').classList.contains('dropdown-menu-right')).toEqual(true);
+        expect(
+          vm.$el.querySelector('.dropdown-menu').classList.contains('dropdown-menu-right'),
+        ).toEqual(true);
         done();
       });
     });
   });
 
   describe('creating epic', () => {
-    it('should call createEpic service', (done) => {
+    it('should call createEpic service', done => {
       spyOnDependency(newEpic, 'visitUrl').and.callFake(done);
       spyOn(vm.service, 'createEpic').and.callThrough();
 
@@ -51,8 +55,8 @@ describe('newEpic', () => {
       });
     });
 
-    it('should redirect to epic url after epic creation', (done) => {
-      spyOnDependency(newEpic, 'visitUrl').and.callFake((url) => {
+    it('should redirect to epic url after epic creation', done => {
+      spyOnDependency(newEpic, 'visitUrl').and.callFake(url => {
         expect(url).toEqual(gl.TEST_HOST);
         done();
       });
@@ -64,7 +68,7 @@ describe('newEpic', () => {
       });
     });
 
-    it('should toggle loading button while creating', (done) => {
+    it('should toggle loading button while creating', done => {
       spyOnDependency(newEpic, 'visitUrl').and.callFake(done);
       vm.title = 'test';
 

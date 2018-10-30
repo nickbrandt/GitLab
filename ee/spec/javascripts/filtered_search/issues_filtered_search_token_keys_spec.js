@@ -135,16 +135,18 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
 
     it('should return tokenKey when found by key param', () => {
       const tokenKeys = IssuesFilteredSearchTokenKeysEE.get();
-      const result = IssuesFilteredSearchTokenKeysEE
-        .searchByKeyParam(`${tokenKeys[0].key}_${tokenKeys[0].param}`);
+      const result = IssuesFilteredSearchTokenKeysEE.searchByKeyParam(
+        `${tokenKeys[0].key}_${tokenKeys[0].param}`,
+      );
 
       expect(result).toEqual(tokenKeys[0]);
     });
 
     it('should return alternative tokenKey when found by key param', () => {
       const tokenKeys = IssuesFilteredSearchTokenKeysEE.getAlternatives();
-      const result = IssuesFilteredSearchTokenKeysEE
-        .searchByKeyParam(`${tokenKeys[0].key}_${tokenKeys[0].param}`);
+      const result = IssuesFilteredSearchTokenKeysEE.searchByKeyParam(
+        `${tokenKeys[0].key}_${tokenKeys[0].param}`,
+      );
 
       expect(result).toEqual(tokenKeys[0]);
     });
@@ -167,8 +169,7 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
 
     it('should return condition when found by url', () => {
       const conditions = IssuesFilteredSearchTokenKeysEE.getConditions();
-      const result = IssuesFilteredSearchTokenKeysEE
-        .searchByConditionUrl(conditions[0].url);
+      const result = IssuesFilteredSearchTokenKeysEE.searchByConditionUrl(conditions[0].url);
 
       expect(result).toBe(conditions[0]);
     });
@@ -176,8 +177,7 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
     it('should return weight condition when found by weight url', () => {
       const conditions = IssuesFilteredSearchTokenKeysEE.getConditions();
       const weightConditions = conditions.filter(c => c.tokenKey === 'weight');
-      const result = IssuesFilteredSearchTokenKeysEE
-        .searchByConditionUrl(weightConditions[0].url);
+      const result = IssuesFilteredSearchTokenKeysEE.searchByConditionUrl(weightConditions[0].url);
 
       expect(result).toBe(weightConditions[0]);
     });
@@ -185,16 +185,17 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
 
   describe('searchByConditionKeyValue', () => {
     it('should return null when condition tokenKey and value not found', () => {
-      const condition = IssuesFilteredSearchTokenKeysEE
-        .searchByConditionKeyValue(null, null);
+      const condition = IssuesFilteredSearchTokenKeysEE.searchByConditionKeyValue(null, null);
 
       expect(condition).toBeNull();
     });
 
     it('should return condition when found by tokenKey and value', () => {
       const conditions = IssuesFilteredSearchTokenKeysEE.getConditions();
-      const result = IssuesFilteredSearchTokenKeysEE
-        .searchByConditionKeyValue(conditions[0].tokenKey, conditions[0].value);
+      const result = IssuesFilteredSearchTokenKeysEE.searchByConditionKeyValue(
+        conditions[0].tokenKey,
+        conditions[0].value,
+      );
 
       expect(result).toEqual(conditions[0]);
     });
@@ -202,8 +203,10 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
     it('should return weight condition when found by weight tokenKey and value', () => {
       const conditions = IssuesFilteredSearchTokenKeysEE.getConditions();
       const weightConditions = conditions.filter(c => c.tokenKey === 'weight');
-      const result = IssuesFilteredSearchTokenKeysEE
-        .searchByConditionKeyValue(weightConditions[0].tokenKey, weightConditions[0].value);
+      const result = IssuesFilteredSearchTokenKeysEE.searchByConditionKeyValue(
+        weightConditions[0].tokenKey,
+        weightConditions[0].value,
+      );
 
       expect(result).toEqual(weightConditions[0]);
     });

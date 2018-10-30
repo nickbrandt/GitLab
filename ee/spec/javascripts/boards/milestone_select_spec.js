@@ -30,7 +30,7 @@ const milestone2 = {
 };
 
 describe('Milestone select component', () => {
-  beforeEach((done) => {
+  beforeEach(done => {
     setFixtures('<div class="test-container"></div>');
 
     // eslint-disable-next-line no-new
@@ -49,7 +49,7 @@ describe('Milestone select component', () => {
   });
 
   describe('canEdit', () => {
-    it('hides Edit button', (done) => {
+    it('hides Edit button', done => {
       vm.canEdit = false;
       Vue.nextTick(() => {
         expect(vm.$el.querySelector('.edit-link')).toBeFalsy();
@@ -57,7 +57,7 @@ describe('Milestone select component', () => {
       });
     });
 
-    it('shows Edit button if true', (done) => {
+    it('shows Edit button if true', done => {
       vm.canEdit = true;
       Vue.nextTick(() => {
         expect(vm.$el.querySelector('.edit-link')).toBeTruthy();
@@ -71,7 +71,7 @@ describe('Milestone select component', () => {
       expect(selectedText()).toContain('Any Milestone');
     });
 
-    it('shows No Milestone', (done) => {
+    it('shows No Milestone', done => {
       vm.board.milestone_id = 0;
       Vue.nextTick(() => {
         expect(selectedText()).toContain('No Milestone');
@@ -79,7 +79,7 @@ describe('Milestone select component', () => {
       });
     });
 
-    it('shows selected milestone title', (done) => {
+    it('shows selected milestone title', done => {
       vm.board.milestone_id = 20;
       vm.board.milestone = {
         id: 20,
@@ -96,17 +96,14 @@ describe('Milestone select component', () => {
 
       beforeEach(() => {
         mock = new MockAdapater(axios);
-        mock.onGet('/test/issue-boards/milestones.json').reply(200, [
-          milestone,
-          milestone2,
-        ]);
+        mock.onGet('/test/issue-boards/milestones.json').reply(200, [milestone, milestone2]);
       });
 
       afterEach(() => {
         mock.restore();
       });
 
-      it('sets Any Milestone', (done) => {
+      it('sets Any Milestone', done => {
         vm.board.milestone_id = 0;
         vm.$el.querySelector('.edit-link').click();
 
@@ -121,7 +118,7 @@ describe('Milestone select component', () => {
         });
       });
 
-      it('sets No Milestone', (done) => {
+      it('sets No Milestone', done => {
         vm.$el.querySelector('.edit-link').click();
 
         setTimeout(() => {
@@ -135,7 +132,7 @@ describe('Milestone select component', () => {
         });
       });
 
-      it('sets milestone', (done) => {
+      it('sets milestone', done => {
         vm.$el.querySelector('.edit-link').click();
 
         setTimeout(() => {

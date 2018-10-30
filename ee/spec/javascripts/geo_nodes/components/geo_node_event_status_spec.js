@@ -60,7 +60,10 @@ describe('GeoNodeEventStatus', () => {
     it('renders container elements correctly', () => {
       expect(vm.$el.classList.contains('node-detail-value')).toBeTruthy();
       expect(vm.$el.querySelectorAll('strong').length).not.toBe(0);
-      expect(vm.$el.querySelector('strong').innerText.trim()).toBe(`${mockNodeDetails.lastEvent.id}`);
+      expect(vm.$el.querySelector('strong').innerText.trim()).toBe(
+        `${mockNodeDetails.lastEvent.id}`,
+      );
+
       expect(vm.$el.querySelector('.event-status-timestamp').innerText).toContain('ago');
     });
 

@@ -1,87 +1,90 @@
 <script>
-  import $ from 'jquery';
-  import userAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
-  import timeagoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
-  import Icon from '~/vue_shared/components/icon.vue';
-  import LoadingButton from '~/vue_shared/components/loading_button.vue';
-  import tooltip from '~/vue_shared/directives/tooltip';
-  import { __, s__ } from '~/locale';
-  import eventHub from '../../event_hub';
-  import { stateEvent } from '../../constants';
+import $ from 'jquery';
+import userAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
+import timeagoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
+import Icon from '~/vue_shared/components/icon.vue';
+import LoadingButton from '~/vue_shared/components/loading_button.vue';
+import tooltip from '~/vue_shared/directives/tooltip';
+import { __, s__ } from '~/locale';
+import eventHub from '../../event_hub';
+import { stateEvent } from '../../constants';
 
-  export default {
-    name: 'EpicHeader',
-    directives: {
-      tooltip,
+export default {
+  name: 'EpicHeader',
+  directives: {
+    tooltip,
+  },
+  components: {
+    Icon,
+    LoadingButton,
+    userAvatarLink,
+    timeagoTooltip,
+  },
+  props: {
+    author: {
+      type: Object,
+      required: true,
+      validator: value => value.url && value.username && value.name,
     },
-    components: {
-      Icon,
-      LoadingButton,
-      userAvatarLink,
-      timeagoTooltip,
+    created: {
+      type: String,
+      required: true,
     },
-    props: {
-      author: {
-        type: Object,
-        required: true,
-        validator: value => value.url && value.username && value.name,
-      },
-      created: {
-        type: String,
-        required: true,
-      },
-      open: {
-        type: Boolean,
-        required: true,
-      },
-      canUpdate: {
-        required: true,
-        type: Boolean,
-      },
+    open: {
+      type: Boolean,
+      required: true,
     },
-    data() {
-      return {
-        deleteLoading: false,
-        statusUpdating: false,
-        isEpicOpen: this.open,
-      };
+    canUpdate: {
+      required: true,
+      type: Boolean,
     },
-    computed: {
-      statusIcon() {
-        return this.isEpicOpen ? 'issue-open-m' : 'mobile-issue-close';
-      },
-      statusText() {
-        return this.isEpicOpen ? __('Open') : __('Closed');
-      },
-      actionButtonClass() {
-        return `btn btn-grouped js-btn-epic-action qa-close-reopen-epic-button ${this.isEpicOpen ? 'btn-close' : 'btn-open'}`;
-      },
-      actionButtonText() {
-        return this.isEpicOpen ? __('Close epic') : __('Reopen epic');
-      },
+  },
+  data() {
+    return {
+      deleteLoading: false,
+      statusUpdating: false,
+      isEpicOpen: this.open,
+    };
+  },
+  computed: {
+    statusIcon() {
+      return this.isEpicOpen ? 'issue-open-m' : 'mobile-issue-close';
     },
-    mounted() {
-      $(document).on('issuable_vue_app:change', (e, isClosed) => {
-        this.isEpicOpen = e.detail ? !e.detail.isClosed : !isClosed;
-        this.statusUpdating = false;
-      });
+    statusText() {
+      return this.isEpicOpen ? __('Open') : __('Closed');
     },
-    methods: {
-      deleteEpic() {
-        if (window.confirm(s__('Epic will be removed! Are you sure?'))) { // eslint-disable-line no-alert
-          this.deleteLoading = true;
-          this.$emit('deleteEpic');
-        }
-      },
-      toggleSidebar() {
-        eventHub.$emit('toggleSidebar');
-      },
-      toggleStatus() {
-        this.statusUpdating = true;
-        this.$emit('toggleEpicStatus', this.isEpicOpen ? stateEvent.close : stateEvent.reopen);
-      },
+    actionButtonClass() {
+      return `btn btn-grouped js-btn-epic-action qa-close-reopen-epic-button ${
+        this.isEpicOpen ? 'btn-close' : 'btn-open'
+      }`;
     },
-  };
+    actionButtonText() {
+      return this.isEpicOpen ? __('Close epic') : __('Reopen epic');
+    },
+  },
+  mounted() {
+    $(document).on('issuable_vue_app:change', (e, isClosed) => {
+      this.isEpicOpen = e.detail ? !e.detail.isClosed : !isClosed;
+      this.statusUpdating = false;
+    });
+  },
+  methods: {
+    deleteEpic() {
+      // eslint-disable-next-line no-alert
+      if (window.confirm(s__('Epic will be removed! Are you sure?'))) {
+        this.deleteLoading = true;
+        this.$emit('deleteEpic');
+      }
+    },
+    toggleSidebar() {
+      eventHub.$emit('toggleSidebar');
+    },
+    toggleStatus() {
+      this.statusUpdating = true;
+      this.$emit('toggleEpicStatus', this.isEpicOpen ? stateEvent.close : stateEvent.reopen);
+    },
+  },
+};
 </script>
 
 <template>

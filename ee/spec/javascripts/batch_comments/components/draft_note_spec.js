@@ -114,8 +114,7 @@ describe('Batch comments draft note component', () => {
     it('dispatches updateDraft', done => {
       vm.$el.querySelector('.js-note-edit').click();
 
-      vm
-        .$nextTick()
+      vm.$nextTick()
         .then(() => {
           vm.$el.querySelector('.js-vue-issue-save').click();
 

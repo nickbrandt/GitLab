@@ -1,38 +1,38 @@
 <script>
-  import ciStatus from '~/vue_shared/components/ci_icon.vue';
-  import tooltip from '~/vue_shared/directives/tooltip';
+import ciStatus from '~/vue_shared/components/ci_icon.vue';
+import tooltip from '~/vue_shared/directives/tooltip';
 
-  export default {
-    directives: {
-      tooltip,
+export default {
+  directives: {
+    tooltip,
+  },
+  components: {
+    ciStatus,
+  },
+  props: {
+    pipelineId: {
+      type: Number,
+      required: true,
     },
-    components: {
-      ciStatus,
+    pipelinePath: {
+      type: String,
+      required: true,
     },
-    props: {
-      pipelineId: {
-        type: Number,
-        required: true,
-      },
-      pipelinePath: {
-        type: String,
-        required: true,
-      },
-      pipelineStatus: {
-        type: Object,
-        required: true,
-      },
-      projectName: {
-        type: String,
-        required: true,
-      },
+    pipelineStatus: {
+      type: Object,
+      required: true,
     },
-    computed: {
-      tooltipText() {
-        return `${this.projectName} - ${this.pipelineStatus.label}`;
-      },
+    projectName: {
+      type: String,
+      required: true,
     },
-  };
+  },
+  computed: {
+    tooltipText() {
+      return `${this.projectName} - ${this.pipelineStatus.label}`;
+    },
+  },
+};
 </script>
 
 <template>

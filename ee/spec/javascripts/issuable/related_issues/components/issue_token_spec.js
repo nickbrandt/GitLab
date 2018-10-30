@@ -75,7 +75,7 @@ describe('IssueToken', () => {
   });
 
   describe('with state supplied', () => {
-    describe('`state: \'opened\'`', () => {
+    describe("`state: 'opened'`", () => {
       beforeEach(() => {
         vm = new IssueToken({
           propsData: {
@@ -91,7 +91,7 @@ describe('IssueToken', () => {
       });
     });
 
-    describe('`state: \'reopened\'`', () => {
+    describe("`state: 'reopened'`", () => {
       beforeEach(() => {
         vm = new IssueToken({
           propsData: {
@@ -107,7 +107,7 @@ describe('IssueToken', () => {
       });
     });
 
-    describe('`state: \'closed\'`', () => {
+    describe("`state: 'closed'`", () => {
       beforeEach(() => {
         vm = new IssueToken({
           propsData: {

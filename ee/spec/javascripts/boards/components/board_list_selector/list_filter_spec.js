@@ -51,7 +51,7 @@ describe('ListFilter', () => {
       expect(vm.$el.classList.contains('dropdown-input')).toBe(true);
     });
 
-    it('renders class `has-value` on container element when prop `query` is not empty', (done) => {
+    it('renders class `has-value` on container element when prop `query` is not empty', done => {
       vm.query = 'foobar';
       Vue.nextTick()
         .then(() => {
@@ -61,14 +61,14 @@ describe('ListFilter', () => {
         .catch(done.fail);
     });
 
-    it('removes class `has-value` from container element when prop `query` is empty', (done) => {
+    it('removes class `has-value` from container element when prop `query` is empty', done => {
       vm.query = '';
       Vue.nextTick()
-      .then(() => {
-        expect(vm.$el.classList.contains('has-value')).toBe(false);
-      })
-      .then(done)
-      .catch(done.fail);
+        .then(() => {
+          expect(vm.$el.classList.contains('has-value')).toBe(false);
+        })
+        .then(done)
+        .catch(done.fail);
     });
 
     it('renders search input element', () => {

@@ -49,8 +49,7 @@ describe('BoardListSelector', () => {
         mock.onGet(dummyEndpoint).reply(200, mockAssigneesList);
         boardsStore.state.assignees = [];
 
-        vm
-          .loadList()
+        vm.loadList()
           .then(() => {
             expect(vm.loading).toBe(false);
             expect(vm.store.state.assignees.length).toBe(mockAssigneesList.length);
@@ -63,8 +62,7 @@ describe('BoardListSelector', () => {
         spyOn(axios, 'get');
         boardsStore.state.assignees = mockAssigneesList;
 
-        vm
-          .loadList()
+        vm.loadList()
           .then(() => {
             expect(axios.get).not.toHaveBeenCalled();
           })
@@ -76,8 +74,7 @@ describe('BoardListSelector', () => {
         mock.onGet(dummyEndpoint).replyOnce(500, {});
         boardsStore.state.assignees = [];
 
-        vm
-          .loadList()
+        vm.loadList()
           .then(() => {
             expect(vm.loading).toBe(false);
             expect(document.querySelector('.flash-text').innerText.trim()).toBe(

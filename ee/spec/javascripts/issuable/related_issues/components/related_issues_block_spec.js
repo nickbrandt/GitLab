@@ -86,10 +86,7 @@ describe('RelatedIssuesBlock', () => {
     beforeEach(() => {
       vm = new RelatedIssuesBlock({
         propsData: {
-          relatedIssues: [
-            issuable1,
-            issuable2,
-          ],
+          relatedIssues: [issuable1, issuable2],
         },
       }).$mount();
     });
@@ -105,13 +102,7 @@ describe('RelatedIssuesBlock', () => {
     beforeEach(() => {
       vm = new RelatedIssuesBlock({
         propsData: {
-          relatedIssues: [
-            issuable1,
-            issuable2,
-            issuable3,
-            issuable4,
-            issuable5,
-          ],
+          relatedIssues: [issuable1, issuable2, issuable3, issuable4, issuable5],
         },
       }).$mount();
       toggleAddRelatedIssuesFormSpy = jasmine.createSpy('spy');

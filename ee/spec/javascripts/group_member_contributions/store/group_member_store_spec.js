@@ -44,7 +44,7 @@ describe('GroupMemberStore', () => {
       expect(firstMember.fullname).toBe('Administrator');
 
       store.sortMembers('fullname');
-      ([firstMember] = store.state.members);
+      [firstMember] = store.state.members;
 
       expect(firstMember.fullname).toBe('Terrell Graham');
     });

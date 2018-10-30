@@ -96,7 +96,11 @@ export default class MirrorPull {
     // Make backOff polling to get data
     backOff((next, stop) => {
       axios
-        .get(`${projectMirrorSSHEndpoint}?ssh_url=${repositoryUrl}&compare_host_keys=${encodeURIComponent(currentKnownHosts)}`)
+        .get(
+          `${projectMirrorSSHEndpoint}?ssh_url=${repositoryUrl}&compare_host_keys=${encodeURIComponent(
+            currentKnownHosts,
+          )}`,
+        )
         .then(({ data, status }) => {
           if (status === 204) {
             this.backOffRequestCounter += 1;

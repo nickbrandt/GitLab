@@ -34,13 +34,18 @@ describe('Report issues', () => {
       });
 
       it('should render a list of resolved issues', () => {
-        expect(vm.$el.querySelectorAll('.report-block-list li').length).toEqual(codequalityParsedIssues.length);
+        expect(vm.$el.querySelectorAll('.report-block-list li').length).toEqual(
+          codequalityParsedIssues.length,
+        );
       });
 
       it('should render "Fixed" keyword', () => {
         expect(vm.$el.querySelector('.report-block-list li').textContent).toContain('Fixed');
         expect(
-          vm.$el.querySelector('.report-block-list li').textContent.replace(/\s+/g, ' ').trim(),
+          vm.$el
+            .querySelector('.report-block-list li')
+            .textContent.replace(/\s+/g, ' ')
+            .trim(),
         ).toEqual('Fixed: Insecure Dependency in Gemfile.lock:12');
       });
     });
@@ -55,7 +60,9 @@ describe('Report issues', () => {
       });
 
       it('should render a list of unresolved issues', () => {
-        expect(vm.$el.querySelectorAll('.report-block-list li').length).toEqual(codequalityParsedIssues.length);
+        expect(vm.$el.querySelectorAll('.report-block-list li').length).toEqual(
+          codequalityParsedIssues.length,
+        );
       });
 
       it('should not render "Fixed" keyword', () => {
@@ -74,7 +81,9 @@ describe('Report issues', () => {
     });
 
     it('should render a list of unresolved issues', () => {
-      expect(vm.$el.querySelectorAll('.report-block-list li').length).toEqual(sastParsedIssues.length);
+      expect(vm.$el.querySelectorAll('.report-block-list li').length).toEqual(
+        sastParsedIssues.length,
+      );
     });
   });
 
@@ -87,16 +96,20 @@ describe('Report issues', () => {
       });
 
       expect(vm.$el.querySelector('.report-block-list li').textContent).toContain('in');
-      expect(vm.$el.querySelector('.report-block-list li a').getAttribute('href')).toEqual(sastParsedIssues[0].urlPath);
+      expect(vm.$el.querySelector('.report-block-list li a').getAttribute('href')).toEqual(
+        sastParsedIssues[0].urlPath,
+      );
     });
   });
 
   describe('without location', () => {
     it('should not render location', () => {
       vm = mountComponent(ReportIssues, {
-        issues: [{
-          title: 'foo',
-        }],
+        issues: [
+          {
+            title: 'foo',
+          },
+        ],
         component: componentNames.SastIssueBody,
         status: STATUS_SUCCESS,
       });
@@ -116,31 +129,30 @@ describe('Report issues', () => {
     });
 
     it('renders severity', () => {
-      expect(
-        vm.$el.querySelector('.report-block-list li').textContent.trim(),
-      ).toContain(dockerReportParsed.unapproved[0].severity);
+      expect(vm.$el.querySelector('.report-block-list li').textContent.trim()).toContain(
+        dockerReportParsed.unapproved[0].severity,
+      );
     });
 
     it('renders CVE name', () => {
-      expect(
-        vm.$el.querySelector('.report-block-list button').textContent.trim(),
-      ).toEqual(dockerReportParsed.unapproved[0].title);
+      expect(vm.$el.querySelector('.report-block-list button').textContent.trim()).toEqual(
+        dockerReportParsed.unapproved[0].title,
+      );
     });
 
     it('renders namespace', () => {
-      expect(
-        vm.$el.querySelector('.report-block-list li').textContent.trim(),
-      ).toContain(dockerReportParsed.unapproved[0].path);
+      expect(vm.$el.querySelector('.report-block-list li').textContent.trim()).toContain(
+        dockerReportParsed.unapproved[0].path,
+      );
 
-      expect(
-        vm.$el.querySelector('.report-block-list li').textContent.trim(),
-      ).toContain('in');
+      expect(vm.$el.querySelector('.report-block-list li').textContent.trim()).toContain('in');
     });
   });
 
   describe('for dast issues', () => {
     beforeEach(() => {
-      vm = mountComponentWithStore(ReportIssues, { store,
+      vm = mountComponentWithStore(ReportIssues, {
+        store,
         props: {
           issues: parsedDast,
           component: componentNames.DastIssueBody,
@@ -151,7 +163,9 @@ describe('Report issues', () => {
 
     it('renders severity (confidence) and title', () => {
       expect(vm.$el.textContent).toContain(parsedDast[0].title);
-      expect(vm.$el.textContent).toContain(`${parsedDast[0].severity} (${parsedDast[0].confidence})`);
+      expect(vm.$el.textContent).toContain(
+        `${parsedDast[0].severity} (${parsedDast[0].confidence})`,
+      );
     });
   });
 });

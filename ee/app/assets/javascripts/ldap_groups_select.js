@@ -16,7 +16,7 @@ export default function initLDAPGroupsSelect() {
       id: function(group) {
         return group.cn;
       },
-      placeholder: "Search for a LDAP group",
+      placeholder: 'Search for a LDAP group',
       minimumInputLength: 1,
       query: function(query) {
         var provider;
@@ -24,7 +24,7 @@ export default function initLDAPGroupsSelect() {
         return Api.ldap_groups(query.term, provider, function(groups) {
           var data;
           data = {
-            results: groups
+            results: groups,
           };
           return query.callback(data);
         });
@@ -32,18 +32,18 @@ export default function initLDAPGroupsSelect() {
       initSelection: function(element, callback) {
         var id;
         id = $(element).val();
-        if (id !== "") {
+        if (id !== '') {
           return callback({
-            cn: id
+            cn: id,
           });
         }
       },
       formatResult: ldapGroupResult,
       formatSelection: groupFormatSelection,
-      dropdownCssClass: "ajax-groups-dropdown",
+      dropdownCssClass: 'ajax-groups-dropdown',
       formatNoMatches: function(nomatch) {
-        return "Match not found; try refining your search query.";
-      }
+        return 'Match not found; try refining your search query.';
+      },
     });
   });
   return $('#ldap_group_link_provider').on('change', function() {

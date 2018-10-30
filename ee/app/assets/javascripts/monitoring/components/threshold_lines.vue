@@ -26,17 +26,15 @@ export default {
       const [xMin, xMax] = this.graphDrawData.xDom;
       const [yMin, yMax] = this.graphDrawData.yDom;
 
-      const outOfRange = (this.operator === '>' && this.threshold > yMax) ||
+      const outOfRange =
+        (this.operator === '>' && this.threshold > yMax) ||
         (this.operator === '<' && this.threshold < yMin);
 
       if (outOfRange) {
         return [];
       }
 
-      return [
-        { time: xMin, value: this.threshold },
-        { time: xMax, value: this.threshold },
-      ];
+      return [{ time: xMin, value: this.threshold }, { time: xMax, value: this.threshold }];
     },
     linePath() {
       if (!this.graphDrawData.lineFunction) {

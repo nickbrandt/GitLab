@@ -9,9 +9,7 @@ export const licenseReport = state =>
 export const licenseSummaryText = (state, getters) => {
   const hasReportItems = getters.licenseReport && getters.licenseReport.length;
   const baseReportHasLicenses =
-    state.baseReport
-    && state.baseReport.licenses
-    && state.baseReport.licenses.length;
+    state.baseReport && state.baseReport.licenses && state.baseReport.licenses.length;
 
   if (getters.isLoading) {
     return sprintf(s__('ciReport|Loading %{reportName} report'), {

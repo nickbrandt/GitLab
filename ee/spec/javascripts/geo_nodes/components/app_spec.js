@@ -97,8 +97,7 @@ describe('AppComponent', () => {
       it('calls service.getGeoNodes and sets response to the store on success', done => {
         spyOn(vm.store, 'setNodes');
 
-        vm
-          .fetchGeoNodes()
+        vm.fetchGeoNodes()
           .then(() => {
             expect(vm.store.setNodes).toHaveBeenCalledWith(mockNodes);
             expect(vm.isLoading).toBe(false);
@@ -111,8 +110,7 @@ describe('AppComponent', () => {
         response = 'Something went wrong';
         statusCode = 500;
 
-        vm
-          .fetchGeoNodes()
+        vm.fetchGeoNodes()
           .then(() => {
             expect(vm.isLoading).toBe(false);
             expect(document.querySelector('.flash-text').innerText.trim()).toBe(
@@ -129,8 +127,7 @@ describe('AppComponent', () => {
         mock.onGet(mockNode.statusPath).reply(200, rawMockNodeDetails);
         spyOn(vm.service, 'getGeoNodeDetails').and.callThrough();
 
-        vm
-          .fetchNodeDetails(mockNode)
+        vm.fetchNodeDetails(mockNode)
           .then(() => {
             expect(vm.service.getGeoNodeDetails).toHaveBeenCalled();
             expect(Object.keys(vm.store.state.nodeDetails).length).not.toBe(0);
@@ -145,8 +142,7 @@ describe('AppComponent', () => {
         mock.onGet(mockNode.statusPath).reply(404, {});
         spyOn(vm.service, 'getGeoNodeDetails').and.callThrough();
 
-        vm
-          .fetchNodeDetails(mockNode)
+        vm.fetchNodeDetails(mockNode)
           .then(() => {
             expect(eventHub.$emit).toHaveBeenCalledWith('nodeDetailsLoaded', jasmine.any(Object));
             const nodeDetails = vm.store.state.nodeDetails['1'];
@@ -164,8 +160,7 @@ describe('AppComponent', () => {
         mock.onGet(mockNode.statusPath).networkError();
         spyOn(vm.service, 'getGeoNodeDetails').and.callThrough();
 
-        vm
-          .fetchNodeDetails(mockNode)
+        vm.fetchNodeDetails(mockNode)
           .then(() => {
             expect(eventHub.$emit).toHaveBeenCalledWith('nodeDetailsLoaded', jasmine.any(Object));
             const nodeDetails = vm.store.state.nodeDetails['1'];
@@ -183,8 +178,7 @@ describe('AppComponent', () => {
         mock.onGet(mockNode.statusPath).timeout();
         spyOn(vm.service, 'getGeoNodeDetails').and.callThrough();
 
-        vm
-          .fetchNodeDetails(mockNode)
+        vm.fetchNodeDetails(mockNode)
           .then(() => {
             expect(eventHub.$emit).toHaveBeenCalledWith('nodeDetailsLoaded', jasmine.any(Object));
             const nodeDetails = vm.store.state.nodeDetails['1'];
@@ -207,8 +201,7 @@ describe('AppComponent', () => {
         });
         spyOn(vm.service, 'repairNode').and.callThrough();
 
-        vm
-          .repairNode(node)
+        vm.repairNode(node)
           .then(() => {
             expect(vm.service.repairNode).toHaveBeenCalledWith(node);
             expect(document.querySelector('.flash-text').innerText.trim()).toBe(
@@ -229,8 +222,7 @@ describe('AppComponent', () => {
         });
         spyOn(vm.service, 'repairNode').and.callThrough();
 
-        vm
-          .repairNode(node)
+        vm.repairNode(node)
           .then(() => {
             expect(vm.service.repairNode).toHaveBeenCalledWith(node);
             expect(document.querySelector('.flash-text').innerText.trim()).toBe(
@@ -259,8 +251,7 @@ describe('AppComponent', () => {
         spyOn(vm.service, 'toggleNode').and.callThrough();
         node.enabled = false;
 
-        vm
-          .toggleNode(node)
+        vm.toggleNode(node)
           .then(() => {
             expect(vm.service.toggleNode).toHaveBeenCalledWith(node);
             expect(node.enabled).toBe(true);
@@ -279,8 +270,7 @@ describe('AppComponent', () => {
         spyOn(vm.service, 'toggleNode').and.callThrough();
         node.enabled = false;
 
-        vm
-          .toggleNode(node)
+        vm.toggleNode(node)
           .then(() => {
             expect(vm.service.toggleNode).toHaveBeenCalledWith(node);
             expect(document.querySelector('.flash-text').innerText.trim()).toBe(
@@ -304,8 +294,7 @@ describe('AppComponent', () => {
         spyOn(vm.service, 'removeNode').and.callThrough();
         spyOn(vm.store, 'removeNode').and.stub();
 
-        vm
-          .removeNode(node)
+        vm.removeNode(node)
           .then(() => {
             expect(vm.service.removeNode).toHaveBeenCalledWith(node);
             expect(vm.store.removeNode).toHaveBeenCalledWith(node);
@@ -326,8 +315,7 @@ describe('AppComponent', () => {
         spyOn(vm.service, 'removeNode').and.callThrough();
         spyOn(vm.store, 'removeNode').and.stub();
 
-        vm
-          .removeNode(node)
+        vm.removeNode(node)
           .then(() => {
             expect(vm.service.removeNode).toHaveBeenCalledWith(node);
             expect(vm.store.removeNode).not.toHaveBeenCalled();

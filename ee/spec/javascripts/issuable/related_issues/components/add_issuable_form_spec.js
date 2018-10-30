@@ -80,10 +80,7 @@ describe('AddIssuableForm', () => {
         vm = new AddIssuableForm({
           propsData: {
             inputValue,
-            pendingReferences: [
-              issuable1.reference,
-              issuable2.reference,
-            ],
+            pendingReferences: [issuable1.reference, issuable2.reference],
           },
         }).$mount();
       });
@@ -106,10 +103,7 @@ describe('AddIssuableForm', () => {
         vm = new AddIssuableForm({
           propsData: {
             inputValue: '',
-            pendingReferences: [
-              issuable1.reference,
-              issuable2.reference,
-            ],
+            pendingReferences: [issuable1.reference, issuable2.reference],
             isSubmitting: true,
           },
         }).$mount();
@@ -187,9 +181,7 @@ describe('AddIssuableForm', () => {
       vm = new AddIssuableForm({
         propsData: {
           inputValue: '',
-          pendingIssuables: [
-            issuable1,
-          ],
+          pendingIssuables: [issuable1],
           autoCompleteSources: {
             issues: '/fake/issues/path',
           },
@@ -204,7 +196,7 @@ describe('AddIssuableForm', () => {
       eventHub.$off('addIssuableFormCancel', addIssuableFormCancelSpy);
     });
 
-    it('when clicking somewhere on the input wrapper should focus the input', (done) => {
+    it('when clicking somewhere on the input wrapper should focus the input', done => {
       vm.onInputWrapperClick();
 
       setTimeout(() => {
@@ -227,7 +219,7 @@ describe('AddIssuableForm', () => {
       expect(addIssuableFormInputSpy).toHaveBeenCalledWith(newInputValue, newInputValue.length);
     });
 
-    it('when blurring the input', (done) => {
+    it('when blurring the input', done => {
       expect(addIssuableFormInputSpy).not.toHaveBeenCalled();
 
       const newInputValue = 'filling in things';
@@ -244,14 +236,16 @@ describe('AddIssuableForm', () => {
       });
     });
 
-    it('when using the autocomplete', (done) => {
+    it('when using the autocomplete', done => {
       const $input = $(vm.$refs.input);
 
-      vm.gfmAutoComplete.loadData($input, '#', [{
-        id: 1,
-        iid: 111,
-        title: 'foo',
-      }]);
+      vm.gfmAutoComplete.loadData($input, '#', [
+        {
+          id: 1,
+          iid: 111,
+          title: 'foo',
+        },
+      ]);
 
       $input
         .val('#')

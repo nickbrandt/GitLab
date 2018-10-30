@@ -6,7 +6,15 @@ function WeightSelect(els, options = {}) {
   const $els = $(els || '.js-weight-select');
 
   $els.each(function(i, dropdown) {
-    var $block, $dropdown, $loading, $selectbox, $sidebarCollapsedValue, $value, abilityName, updateUrl, updateWeight;
+    var $block,
+      $dropdown,
+      $loading,
+      $selectbox,
+      $sidebarCollapsedValue,
+      $value,
+      abilityName,
+      updateUrl,
+      updateWeight;
     $dropdown = $(dropdown);
     updateUrl = $dropdown.data('issueUpdate');
     $selectbox = $dropdown.closest('.selectbox');
@@ -15,7 +23,7 @@ function WeightSelect(els, options = {}) {
     $value = $block.find('.value');
     abilityName = $dropdown.data('abilityName');
     $loading = $block.find('.block-loading').fadeOut();
-    const fieldName = options.fieldName || $dropdown.data("fieldName");
+    const fieldName = options.fieldName || $dropdown.data('fieldName');
     const inputField = $dropdown.closest('.selectbox').find(`input[name='${fieldName}']`);
 
     if (Object.keys(options).includes('selected')) {
@@ -25,16 +33,16 @@ function WeightSelect(els, options = {}) {
     return $dropdown.glDropdown({
       selectable: true,
       fieldName,
-      toggleLabel: function (selected, el) {
-        return $(el).data("id");
+      toggleLabel: function(selected, el) {
+        return $(el).data('id');
       },
       hidden: function(e) {
         $selectbox.hide();
         return $value.css('display', '');
       },
       id: function(obj, el) {
-        if ($(el).data("none") == null) {
-          return $(el).data("id");
+        if ($(el).data('none') == null) {
+          return $(el).data('id');
         } else {
           return '';
         }
@@ -51,7 +59,7 @@ function WeightSelect(els, options = {}) {
         } else if ($dropdown.is('.js-issuable-form-weight')) {
           e.preventDefault();
         }
-      }
+      },
     });
   });
 }

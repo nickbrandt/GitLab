@@ -21,14 +21,15 @@ export default {
   data() {
     const timeframeItem = new Date(this.timeframeItem.getTime());
     const headerSubItems = new Array(7)
-                              .fill()
-                              .map(
-                                (val, i) => new Date(
-                                  timeframeItem.getFullYear(),
-                                  timeframeItem.getMonth(),
-                                  timeframeItem.getDate() + i,
-                                ),
-                              );
+      .fill()
+      .map(
+        (val, i) =>
+          new Date(
+            timeframeItem.getFullYear(),
+            timeframeItem.getMonth(),
+            timeframeItem.getDate() + i,
+          ),
+      );
 
     return {
       headerSubItems,

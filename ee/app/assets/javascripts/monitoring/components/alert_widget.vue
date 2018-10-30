@@ -97,14 +97,12 @@ export default {
       this.isLoading = true;
       return Promise.all(
         this.alerts.map(alertPath =>
-          this.service
-            .readAlert(alertPath)
-            .then(alertData => {
-              this.$emit('setAlerts', this.customMetricId, {
-                ...this.alertData,
-                [alertPath]: alertData,
-              });
-            }),
+          this.service.readAlert(alertPath).then(alertData => {
+            this.$emit('setAlerts', this.customMetricId, {
+              ...this.alertData,
+              [alertPath]: alertData,
+            });
+          }),
         ),
       )
         .then(() => {

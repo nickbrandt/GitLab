@@ -119,7 +119,9 @@ export default {
     },
     popoverOptions() {
       return this.getPopoverConfig({
-        title: s__('Epics|These dates affect how your epics appear in the roadmap. Dates from milestones come from the milestones assigned to issues in the epic. You can also set fixed dates or remove them entirely.'),
+        title: s__(
+          'Epics|These dates affect how your epics appear in the roadmap. Dates from milestones come from the milestones assigned to issues in the epic. You can also set fixed dates or remove them entirely.',
+        ),
         content: `
           <a
             href="${gon.gitlab_url}/help/user/group/epics/index.md#start-date-and-due-date"
@@ -304,4 +306,3 @@ export default {
     </div>
   </div>
 </template>
-

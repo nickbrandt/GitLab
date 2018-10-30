@@ -17,17 +17,16 @@ describe('BoardsSelector', () => {
   let scrollContainer;
   let scrollFade;
   let boardServiceResponse;
-  const boards = new Array(20).fill()
-    .map((board, id) => {
-      const name = `board${id}`;
+  const boards = new Array(20).fill().map((board, id) => {
+    const name = `board${id}`;
 
-      return {
-        id,
-        name,
-      };
-    });
+    return {
+      id,
+      name,
+    };
+  });
 
-  beforeEach((done) => {
+  beforeEach(done => {
     loadFixtures('boards/show.html.raw');
 
     window.gl = window.gl || {};
@@ -45,11 +44,15 @@ describe('BoardsSelector', () => {
 
     spyOn(BoardService.prototype, 'allBoards').and.returnValue(boardServiceResponse);
 
-    vm = mountComponent(BoardsSelector, {
-      throttleDuration,
-      currentBoard: {},
-      milestonePath: '',
-    }, document.querySelector('.js-boards-selector'));
+    vm = mountComponent(
+      BoardsSelector,
+      {
+        throttleDuration,
+        currentBoard: {},
+        milestonePath: '',
+      },
+      document.querySelector('.js-boards-selector'),
+    );
 
     vm.$el.querySelector('.js-dropdown-toggle').click();
 
@@ -71,7 +74,7 @@ describe('BoardsSelector', () => {
     window.gl.boardService = undefined;
   });
 
-  it('shows the scroll fade if isScrolledUp', (done) => {
+  it('shows the scroll fade if isScrolledUp', done => {
     scrollContainer.scrollTop = 0;
 
     waitForScroll()
@@ -82,7 +85,7 @@ describe('BoardsSelector', () => {
       .catch(done.fail);
   });
 
-  it('hides the scroll fade if not isScrolledUp', (done) => {
+  it('hides the scroll fade if not isScrolledUp', done => {
     scrollContainer.scrollTop = scrollContainer.scrollHeight;
 
     waitForScroll()

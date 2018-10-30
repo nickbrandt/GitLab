@@ -12,8 +12,7 @@ describe('dast issue body', () => {
     confidence: 'Medium',
     count: '17',
     cweid: '16',
-    desc:
-      '<p>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to "nosniff". </p>',
+    desc: '<p>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to "nosniff". </p>',
     title: 'X-Content-Type-Options Header Missing',
     reference:
       '<p>http://msdn.microsoft.com/en-us/library/ie/gg622941%28v=vs.85%29.aspx</p><p>https://www.owasp.org/index.php/List_of_useful_HTTP_headers</p>',
@@ -35,7 +34,9 @@ describe('dast issue body', () => {
         status,
       });
 
-      expect(vm.$el.textContent.trim()).toContain(`${dastIssue.severity} (${dastIssue.confidence})`);
+      expect(vm.$el.textContent.trim()).toContain(
+        `${dastIssue.severity} (${dastIssue.confidence})`,
+      );
     });
   });
 

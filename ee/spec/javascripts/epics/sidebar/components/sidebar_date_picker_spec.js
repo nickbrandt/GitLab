@@ -99,13 +99,18 @@ describe('SidebarParticipants', () => {
 
     describe('popoverOptions', () => {
       it('returns popover config object containing title with appropriate string', () => {
-        expect(vm.popoverOptions.title).toBe('These dates affect how your epics appear in the roadmap. Dates from milestones come from the milestones assigned to issues in the epic. You can also set fixed dates or remove them entirely.');
+        expect(vm.popoverOptions.title).toBe(
+          'These dates affect how your epics appear in the roadmap. Dates from milestones come from the milestones assigned to issues in the epic. You can also set fixed dates or remove them entirely.',
+        );
       });
 
       it('returns popover config object containing `content` with href pointing to correct documentation', () => {
         const hrefContent = vm.popoverOptions.content.trim();
 
-        expect(hrefContent).toContain(`${gon.gitlab_url}/help/user/group/epics/index.md#start-date-and-due-date`);
+        expect(hrefContent).toContain(
+          `${gon.gitlab_url}/help/user/group/epics/index.md#start-date-and-due-date`,
+        );
+
         expect(hrefContent).toContain('More information');
       });
     });
@@ -118,7 +123,10 @@ describe('SidebarParticipants', () => {
       it('returns popover config object containing `content` with href pointing to correct documentation', () => {
         const hrefContent = vm.dateInvalidPopoverOptions.content.trim();
 
-        expect(hrefContent).toContain(`${gon.gitlab_url}/help/user/group/epics/index.md#start-date-and-due-date`);
+        expect(hrefContent).toContain(
+          `${gon.gitlab_url}/help/user/group/epics/index.md#start-date-and-due-date`,
+        );
+
         expect(hrefContent).toContain('How can I solve this?');
       });
     });
@@ -140,7 +148,7 @@ describe('SidebarParticipants', () => {
           content,
         };
 
-        Object.keys(popoverConfig).forEach((key) => {
+        Object.keys(popoverConfig).forEach(key => {
           if (key === 'template') {
             expect(popoverConfig[key]).toContain(expectedPopoverConfig[key]);
           } else {
@@ -277,7 +285,9 @@ describe('SidebarParticipants', () => {
 
           expect(warningIconEl).not.toBe(null);
           expect(warningIconEl.getAttribute('tabindex')).toBe('0');
-          expect(warningIconEl.querySelector('use').getAttribute('xlink:href')).toContain('warning');
+          expect(warningIconEl.querySelector('use').getAttribute('xlink:href')).toContain(
+            'warning',
+          );
         })
         .then(done)
         .catch(done.fail);

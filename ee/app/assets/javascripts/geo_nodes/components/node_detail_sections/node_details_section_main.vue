@@ -1,49 +1,48 @@
 <script>
-  import { __ } from '~/locale';
+import { __ } from '~/locale';
 
-  import GeoNodeHealthStatus from '../geo_node_health_status.vue';
-  import GeoNodeActions from '../geo_node_actions.vue';
+import GeoNodeHealthStatus from '../geo_node_health_status.vue';
+import GeoNodeActions from '../geo_node_actions.vue';
 
-  export default {
-    components: {
-      GeoNodeHealthStatus,
-      GeoNodeActions,
+export default {
+  components: {
+    GeoNodeHealthStatus,
+    GeoNodeActions,
+  },
+  props: {
+    node: {
+      type: Object,
+      required: true,
     },
-    props: {
-      node: {
-        type: Object,
-        required: true,
-      },
-      nodeDetails: {
-        type: Object,
-        required: true,
-      },
-      nodeActionsAllowed: {
-        type: Boolean,
-        required: true,
-      },
-      nodeEditAllowed: {
-        type: Boolean,
-        required: true,
-      },
-      versionMismatch: {
-        type: Boolean,
-        required: true,
-      },
+    nodeDetails: {
+      type: Object,
+      required: true,
     },
-    computed: {
-      nodeVersion() {
-        if (this.nodeDetails.version == null &&
-            this.nodeDetails.revision == null) {
-          return __('Unknown');
-        }
-        return `${this.nodeDetails.version} (${this.nodeDetails.revision})`;
-      },
-      nodeHealthStatus() {
-        return this.nodeDetails.healthy ? this.nodeDetails.health : this.nodeDetails.healthStatus;
-      },
+    nodeActionsAllowed: {
+      type: Boolean,
+      required: true,
     },
-  };
+    nodeEditAllowed: {
+      type: Boolean,
+      required: true,
+    },
+    versionMismatch: {
+      type: Boolean,
+      required: true,
+    },
+  },
+  computed: {
+    nodeVersion() {
+      if (this.nodeDetails.version == null && this.nodeDetails.revision == null) {
+        return __('Unknown');
+      }
+      return `${this.nodeDetails.version} (${this.nodeDetails.revision})`;
+    },
+    nodeHealthStatus() {
+      return this.nodeDetails.healthy ? this.nodeDetails.health : this.nodeDetails.healthStatus;
+    },
+  },
+};
 </script>
 
 <template>

@@ -15,7 +15,7 @@ describe('EpicShowApp', () => {
   let headerVm;
   let issuableAppVm;
 
-  beforeEach((done) => {
+  beforeEach(done => {
     mock = new MockAdapter(axios);
     mock.onGet(`${gl.TEST_HOST}/realtime_changes`).reply(200, issueShowData.initialRequest);
 

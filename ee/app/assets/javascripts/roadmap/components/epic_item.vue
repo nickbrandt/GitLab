@@ -1,39 +1,39 @@
 <script>
-  import epicItemDetails from './epic_item_details.vue';
-  import epicItemTimeline from './epic_item_timeline.vue';
+import epicItemDetails from './epic_item_details.vue';
+import epicItemTimeline from './epic_item_timeline.vue';
 
-  export default {
-    components: {
-      epicItemDetails,
-      epicItemTimeline,
+export default {
+  components: {
+    epicItemDetails,
+    epicItemTimeline,
+  },
+  props: {
+    presetType: {
+      type: String,
+      required: true,
     },
-    props: {
-      presetType: {
-        type: String,
-        required: true,
-      },
-      epic: {
-        type: Object,
-        required: true,
-      },
-      timeframe: {
-        type: Array,
-        required: true,
-      },
-      currentGroupId: {
-        type: Number,
-        required: true,
-      },
-      shellWidth: {
-        type: Number,
-        required: true,
-      },
-      itemWidth: {
-        type: Number,
-        required: true,
-      },
+    epic: {
+      type: Object,
+      required: true,
     },
-  };
+    timeframe: {
+      type: Array,
+      required: true,
+    },
+    currentGroupId: {
+      type: Number,
+      required: true,
+    },
+    shellWidth: {
+      type: Number,
+      required: true,
+    },
+    itemWidth: {
+      type: Number,
+      required: true,
+    },
+  },
+};
 </script>
 
 <template>

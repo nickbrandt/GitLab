@@ -1,111 +1,115 @@
 <script>
-  import { s__ } from '~/locale';
+import { s__ } from '~/locale';
 
-  import { VALUE_TYPE, HELP_INFO_URL } from '../../constants';
+import { VALUE_TYPE, HELP_INFO_URL } from '../../constants';
 
-  import DetailsSectionMixin from '../../mixins/details_section_mixin';
+import DetailsSectionMixin from '../../mixins/details_section_mixin';
 
-  import GeoNodeDetailItem from '../geo_node_detail_item.vue';
-  import SectionRevealButton from './section_reveal_button.vue';
+import GeoNodeDetailItem from '../geo_node_detail_item.vue';
+import SectionRevealButton from './section_reveal_button.vue';
 
-  export default {
-    components: {
-      GeoNodeDetailItem,
-      SectionRevealButton,
+export default {
+  components: {
+    GeoNodeDetailItem,
+    SectionRevealButton,
+  },
+  mixins: [DetailsSectionMixin],
+  props: {
+    nodeDetails: {
+      type: Object,
+      required: true,
     },
-    mixins: [
-      DetailsSectionMixin,
-    ],
-    props: {
-      nodeDetails: {
-        type: Object,
-        required: true,
-      },
-      nodeTypePrimary: {
-        type: Boolean,
-        required: true,
-      },
+    nodeTypePrimary: {
+      type: Boolean,
+      required: true,
     },
-    data() {
-      return {
-        showSectionItems: false,
-        primaryNodeDetailItems: this.getPrimaryNodeDetailItems(),
-        secondaryNodeDetailItems: this.getSecondaryNodeDetailItems(),
-      };
+  },
+  data() {
+    return {
+      showSectionItems: false,
+      primaryNodeDetailItems: this.getPrimaryNodeDetailItems(),
+      secondaryNodeDetailItems: this.getSecondaryNodeDetailItems(),
+    };
+  },
+  computed: {
+    nodeDetailItems() {
+      return this.nodeTypePrimary
+        ? this.getPrimaryNodeDetailItems()
+        : this.getSecondaryNodeDetailItems();
     },
-    computed: {
-      nodeDetailItems() {
-        return this.nodeTypePrimary ?
-          this.getPrimaryNodeDetailItems() :
-          this.getSecondaryNodeDetailItems();
-      },
-    },
-    methods: {
-      getPrimaryNodeDetailItems() {
-        return [
-          {
-            itemTitle: s__('GeoNodes|Repository checksum progress'),
-            itemValue: this.nodeDetails.repositoriesChecksummed,
-            itemValueType: VALUE_TYPE.GRAPH,
-            successLabel: s__('GeoNodes|Checksummed'),
-            neutraLabel: s__('GeoNodes|Not checksummed'),
-            failureLabel: s__('GeoNodes|Failed'),
-            helpInfo: {
-              title: s__('GeoNodes|Repositories checksummed for verification with their counterparts on Secondary nodes'),
-              url: HELP_INFO_URL,
-              urlText: s__('GeoNodes|Learn more about Repository checksum progress'),
-            },
+  },
+  methods: {
+    getPrimaryNodeDetailItems() {
+      return [
+        {
+          itemTitle: s__('GeoNodes|Repository checksum progress'),
+          itemValue: this.nodeDetails.repositoriesChecksummed,
+          itemValueType: VALUE_TYPE.GRAPH,
+          successLabel: s__('GeoNodes|Checksummed'),
+          neutraLabel: s__('GeoNodes|Not checksummed'),
+          failureLabel: s__('GeoNodes|Failed'),
+          helpInfo: {
+            title: s__(
+              'GeoNodes|Repositories checksummed for verification with their counterparts on Secondary nodes',
+            ),
+            url: HELP_INFO_URL,
+            urlText: s__('GeoNodes|Learn more about Repository checksum progress'),
           },
-          {
-            itemTitle: s__('GeoNodes|Wiki checksum progress'),
-            itemValue: this.nodeDetails.wikisChecksummed,
-            itemValueType: VALUE_TYPE.GRAPH,
-            successLabel: s__('GeoNodes|Checksummed'),
-            neutraLabel: s__('GeoNodes|Not checksummed'),
-            failureLabel: s__('GeoNodes|Failed'),
-            helpInfo: {
-              title: s__('GeoNodes|Wikis checksummed for verification with their counterparts on Secondary nodes'),
-              url: HELP_INFO_URL,
-              urlText: s__('GeoNodes|Learn more about Wiki checksum progress'),
-            },
+        },
+        {
+          itemTitle: s__('GeoNodes|Wiki checksum progress'),
+          itemValue: this.nodeDetails.wikisChecksummed,
+          itemValueType: VALUE_TYPE.GRAPH,
+          successLabel: s__('GeoNodes|Checksummed'),
+          neutraLabel: s__('GeoNodes|Not checksummed'),
+          failureLabel: s__('GeoNodes|Failed'),
+          helpInfo: {
+            title: s__(
+              'GeoNodes|Wikis checksummed for verification with their counterparts on Secondary nodes',
+            ),
+            url: HELP_INFO_URL,
+            urlText: s__('GeoNodes|Learn more about Wiki checksum progress'),
           },
-        ];
-      },
-      getSecondaryNodeDetailItems() {
-        return [
-          {
-            itemTitle: s__('GeoNodes|Repository verification progress'),
-            itemValue: this.nodeDetails.verifiedRepositories,
-            itemValueType: VALUE_TYPE.GRAPH,
-            successLabel: s__('GeoNodes|Verified'),
-            neutraLabel: s__('GeoNodes|Unverified'),
-            failureLabel: s__('GeoNodes|Failed'),
-            helpInfo: {
-              title: s__('GeoNodes|Repositories verified with their counterparts on the Primary node'),
-              url: HELP_INFO_URL,
-              urlText: s__('GeoNodes|Learn more about Repository verification'),
-            },
-          },
-          {
-            itemTitle: s__('GeoNodes|Wiki verification progress'),
-            itemValue: this.nodeDetails.verifiedWikis,
-            itemValueType: VALUE_TYPE.GRAPH,
-            successLabel: s__('GeoNodes|Verified'),
-            neutraLabel: s__('GeoNodes|Unverified'),
-            failureLabel: s__('GeoNodes|Failed'),
-            helpInfo: {
-              title: s__('GeoNodes|Wikis verified with their counterparts on the Primary node'),
-              url: HELP_INFO_URL,
-              urlText: s__('GeoNodes|Learn more about Wiki verification'),
-            },
-          },
-        ];
-      },
-      handleSectionToggle(toggleState) {
-        this.showSectionItems = toggleState;
-      },
+        },
+      ];
     },
-  };
+    getSecondaryNodeDetailItems() {
+      return [
+        {
+          itemTitle: s__('GeoNodes|Repository verification progress'),
+          itemValue: this.nodeDetails.verifiedRepositories,
+          itemValueType: VALUE_TYPE.GRAPH,
+          successLabel: s__('GeoNodes|Verified'),
+          neutraLabel: s__('GeoNodes|Unverified'),
+          failureLabel: s__('GeoNodes|Failed'),
+          helpInfo: {
+            title: s__(
+              'GeoNodes|Repositories verified with their counterparts on the Primary node',
+            ),
+            url: HELP_INFO_URL,
+            urlText: s__('GeoNodes|Learn more about Repository verification'),
+          },
+        },
+        {
+          itemTitle: s__('GeoNodes|Wiki verification progress'),
+          itemValue: this.nodeDetails.verifiedWikis,
+          itemValueType: VALUE_TYPE.GRAPH,
+          successLabel: s__('GeoNodes|Verified'),
+          neutraLabel: s__('GeoNodes|Unverified'),
+          failureLabel: s__('GeoNodes|Failed'),
+          helpInfo: {
+            title: s__('GeoNodes|Wikis verified with their counterparts on the Primary node'),
+            url: HELP_INFO_URL,
+            urlText: s__('GeoNodes|Learn more about Wiki verification'),
+          },
+        },
+      ];
+    },
+    handleSectionToggle(toggleState) {
+      this.showSectionItems = toggleState;
+    },
+  },
+};
 </script>
 
 <template>
