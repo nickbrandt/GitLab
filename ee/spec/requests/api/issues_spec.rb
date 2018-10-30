@@ -49,14 +49,14 @@ describe API::Issues, :mailer do
           get api('/issues', user), weight: 5, scope: 'all'
 
           expect_paginated_array_response(size: 1)
-          expect(first_issue['id']).to eq(issue2.id)
+          expect(json_response.first['id']).to eq(issue2.id)
         end
 
         it 'returns issues with no weight' do
           get api('/issues', user), weight: 'None', scope: 'all'
 
           expect_paginated_array_response(size: 1)
-          expect(first_issue['id']).to eq(issue.id)
+          expect(json_response.first['id']).to eq(issue.id)
         end
 
         it 'returns issues with any weight' do
