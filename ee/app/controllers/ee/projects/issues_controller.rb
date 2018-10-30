@@ -6,6 +6,7 @@ module EE
       extend ActiveSupport::Concern
 
       prepended do
+        before_action :authenticate_user!, only: [:export_csv]
         before_action :check_export_issues_available!, only: [:export_csv]
         before_action :check_service_desk_available!, only: [:service_desk]
         before_action :whitelist_query_limiting_ee, only: [:update]
@@ -13,11 +14,6 @@ module EE
 
       class_methods do
         extend ::Gitlab::Utils::Override
-
-        override :authenticate_user_only_actions
-        def authenticate_user_only_actions
-          super + %i[export_csv]
-        end
 
         override :issue_except_actions
         def issue_except_actions
