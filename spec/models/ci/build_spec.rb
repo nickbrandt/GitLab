@@ -2029,17 +2029,17 @@ describe Ci::Build do
       it { is_expected.to include(tag_variable) }
     end
 
-    context 'when secret variable is defined' do
-      let(:secret_variable) do
+    context 'when CI variable is defined' do
+      let(:ci_variable) do
         { key: 'SECRET_KEY', value: 'secret_value', public: false }
       end
 
       before do
         create(:ci_variable,
-               secret_variable.slice(:key, :value).merge(project: project))
+               ci_variable.slice(:key, :value).merge(project: project))
       end
 
-      it { is_expected.to include(secret_variable) }
+      it { is_expected.to include(ci_variable) }
     end
 
     context 'when protected variable is defined' do
@@ -2074,17 +2074,17 @@ describe Ci::Build do
       end
     end
 
-    context 'when group secret variable is defined' do
-      let(:secret_variable) do
+    context 'when group CI variable is defined' do
+      let(:ci_variable) do
         { key: 'SECRET_KEY', value: 'secret_value', public: false }
       end
 
       before do
         create(:ci_group_variable,
-               secret_variable.slice(:key, :value).merge(group: group))
+               ci_variable.slice(:key, :value).merge(group: group))
       end
 
-      it { is_expected.to include(secret_variable) }
+      it { is_expected.to include(ci_variable) }
     end
 
     context 'when group protected variable is defined' do
@@ -2358,8 +2358,13 @@ describe Ci::Build do
           allow_any_instance_of(Project)
             .to receive(:predefined_variables) { [project_pre_var] }
 
+<<<<<<< HEAD
           allow_any_instance_of(EE::Project)
             .to receive(:secret_variables_for)
+=======
+          allow_any_instance_of(Project)
+            .to receive(:ci_variables_for)
+>>>>>>> upstream/master
             .with(ref: 'master', environment: nil) do
             [create(:ci_variable, key: 'secret', value: 'value')]
           end
@@ -2510,7 +2515,7 @@ describe Ci::Build do
   end
 
   describe '#scoped_variables_hash' do
-    context 'when overriding secret variables' do
+    context 'when overriding CI variables' do
       before do
         project.variables.create!(key: 'MY_VAR', value: 'my value 1')
         pipeline.variables.create!(key: 'MY_VAR', value: 'my value 2')
