@@ -22,8 +22,6 @@ class User < ActiveRecord::Base
   include OptionallySearch
   include FromUnion
 
-  prepend EE::User
-
   DEFAULT_NOTIFICATION_LEVEL = :participating
 
   ignore_column :external_email
@@ -230,8 +228,6 @@ class User < ActiveRecord::Base
   delegate :notes_filter_for, to: :user_preference
   delegate :set_notes_filter, to: :user_preference
 
-  accepts_nested_attributes_for :namespace
-
   state_machine :state, initial: :active do
     event :block do
       transition active: :blocked
@@ -268,11 +264,6 @@ class User < ActiveRecord::Base
   scope :external, -> { where(external: true) }
   scope :active, -> { with_state(:active).non_internal }
   scope :without_projects, -> { joins('LEFT JOIN project_authorizations ON users.id = project_authorizations.user_id').where(project_authorizations: { user_id: nil }) }
-  scope :subscribed_for_admin_email, -> { where(admin_email_unsubscribed_at: nil) }
-  scope :ldap, -> { joins(:identities).where('identities.provider LIKE ?', 'ldap%') }
-  scope :with_provider, ->(provider) do
-    joins(:identities).where(identities: { provider: provider })
-  end
   scope :order_recent_sign_in, -> { reorder(Gitlab::Database.nulls_last_order('current_sign_in_at', 'DESC')) }
   scope :order_oldest_sign_in, -> { reorder(Gitlab::Database.nulls_last_order('current_sign_in_at', 'ASC')) }
   scope :confirmed, -> { where.not(confirmed_at: nil) }
@@ -368,10 +359,6 @@ class User < ActiveRecord::Base
       emails = emails.confirmed if confirmed
 
       from_union([users, emails])
-    end
-
-    def existing_member?(email)
-      User.where(email: email).any? || Email.where(email: email).any?
     end
 
     def filter(filter_name)
@@ -476,7 +463,7 @@ class User < ActiveRecord::Base
     def find_by_personal_access_token(token_string)
       return unless token_string
 
-      PersonalAccessTokensFinder.new(state: 'active').find_by(token: token_string)&.user # rubocop: disable CodeReuse/Finder
+      PersonalAccessTokensFinder.new(state: 'active').find_by_token(token_string)&.user # rubocop: disable CodeReuse/Finder
     end
 
     # Returns a user for the given SSH key.
@@ -487,11 +474,6 @@ class User < ActiveRecord::Base
     def find_by_full_path(path, follow_redirects: false)
       namespace = Namespace.for_user.find_by_full_path(path, follow_redirects: follow_redirects)
       namespace&.owner
-    end
-
-    def non_ldap
-      joins('LEFT JOIN identities ON identities.user_id = users.id')
-        .where('identities.provider IS NULL OR identities.provider NOT LIKE ?', 'ldap%')
     end
 
     def reference_prefix
@@ -1111,10 +1093,6 @@ class User < ActiveRecord::Base
   end
   # rubocop: enable CodeReuse/ServiceClass
 
-  def admin_unsubscribe!
-    update_column :admin_email_unsubscribed_at, Time.now
-  end
-
   def starred?(project)
     starred_projects.exists?(project.id)
   end
@@ -1491,15 +1469,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  def generate_token(token_field)
-    if token_field == :incoming_email_token
-      # Needs to be all lowercase and alphanumeric because it's gonna be used in an email address.
-      SecureRandom.hex.to_i(16).to_s(36)
-    else
-      super
-    end
-  end
-
   def self.unique_internal(scope, username, email_pattern, &block)
     scope.first || create_unique_internal(scope, username, email_pattern, &block)
   end
@@ -1542,3 +1511,5 @@ class User < ActiveRecord::Base
     Gitlab::ExclusiveLease.cancel(lease_key, uuid)
   end
 end
+
+User.prepend(EE::User)

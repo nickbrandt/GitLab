@@ -42,6 +42,14 @@ module EE
 
       scope :excluding_guests, -> { joins(:members).where('members.access_level > ?', ::Gitlab::Access::GUEST).distinct }
 
+      scope :subscribed_for_admin_email, -> { where(admin_email_unsubscribed_at: nil) }
+      scope :ldap, -> { joins(:identities).where('identities.provider LIKE ?', 'ldap%') }
+      scope :with_provider, ->(provider) do
+        joins(:identities).where(identities: { provider: provider })
+      end
+
+      accepts_nested_attributes_for :namespace
+
       enum roadmap_layout: { weeks: 1, months: 4, quarters: 12 }
     end
 
@@ -58,6 +66,15 @@ module EE
       # override
       def internal_attributes
         super + [:support_bot]
+      end
+
+      def non_ldap
+        joins('LEFT JOIN identities ON identities.user_id = users.id')
+          .where('identities.provider IS NULL OR identities.provider NOT LIKE ?', 'ldap%')
+      end
+
+      def existing_member?(email)
+        ::User.where(email: email).any? || ::Email.where(email: email).any?
       end
     end
 
@@ -160,6 +177,10 @@ module EE
     override :ldap_sync_time
     def ldap_sync_time
       ::Gitlab.config.ldap['sync_time']
+    end
+
+    def admin_unsubscribe!
+      update_column :admin_email_unsubscribed_at, Time.now
     end
   end
 end
