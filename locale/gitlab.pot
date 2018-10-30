@@ -775,9 +775,12 @@ msgstr ""
 msgid "Are you sure you want to stop this environment?"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Are you sure you want to unlock %{path_lock_path}?"
 msgstr ""
 
+=======
+>>>>>>> upstream/master
 msgid "Are you sure?"
 msgstr ""
 
@@ -2701,6 +2704,15 @@ msgid "DeployTokens|Your new project deploy token has been created."
 msgstr ""
 
 msgid "Deployed to"
+<<<<<<< HEAD
+=======
+msgstr ""
+
+msgid "Deploying to"
+msgstr ""
+
+msgid "Deprioritize label"
+>>>>>>> upstream/master
 msgstr ""
 
 msgid "Deploying to"
@@ -7254,9 +7266,12 @@ msgstr ""
 msgid "Something went wrong while fetching comments. Please try again."
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Something went wrong while fetching group member contributions"
 msgstr ""
 
+=======
+>>>>>>> upstream/master
 msgid "Something went wrong while fetching the environments for this merge request. Please try again."
 msgstr ""
 
@@ -7452,9 +7467,12 @@ msgstr ""
 msgid "Start a %{new_merge_request} with these changes"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Start a review"
 msgstr ""
 
+=======
+>>>>>>> upstream/master
 msgid "Start and due date"
 msgstr ""
 
@@ -8841,9 +8859,6 @@ msgstr ""
 msgid "You can also star a label to make it a priority label."
 msgstr ""
 
-msgid "You can also test your .gitlab-ci.yml in the %{linkStart}Lint%{linkEnd}"
-msgstr ""
-
 msgid "You can easily contribute to them by requesting to join these groups."
 msgstr ""
 
@@ -8865,7 +8880,11 @@ msgstr ""
 msgid "You can set up jobs to only use Runners with specific tags. Separate tags with commas."
 msgstr ""
 
+<<<<<<< HEAD
 msgid "You cannot write to a read-only secondary GitLab Geo instance. Please use %{link_to_primary_node} instead."
+=======
+msgid "You can test your .gitlab-ci.yml in %{linkStart}CI Lint%{linkEnd}."
+>>>>>>> upstream/master
 msgstr ""
 
 msgid "You cannot write to this read-only GitLab instance."

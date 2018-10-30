@@ -9,8 +9,11 @@ class Projects::IssuesController < Projects::ApplicationController
   include IssuesCalendar
   include SpammableActions
 
+<<<<<<< HEAD
   prepend ::EE::Projects::IssuesController
 
+=======
+>>>>>>> upstream/master
   def self.authenticate_user_only_actions
     %i[new]
   end
