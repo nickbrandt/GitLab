@@ -54,19 +54,17 @@ export default {
       return {
         trigger: 'click',
         placement: 'right',
-        title: s__(
-          'Security Reports|At this time, the security dashboard only supports SAST. More analyzers are coming soon.',
-        ),
+        title: s__('Security Reports|At this time, the security dashboard only supports SAST.'),
         content: `
           <a
-            title="${s__('Security Reports|Security Dashboard Roadmap')}"
+            title="${s__('Security Reports|Security Dashboard Documentation')}"
             href="${this.dashboardDocumentation}"
             target="_blank"
             rel="noopener
             noreferrer"
           >
             <span class="vertical-align-middle">${s__(
-              'Security Reports|Security Dashboard Roadmap',
+              'Security Reports|Security Dashboard Documentation',
             )}</span>
             ${gl.utils.spriteIcon('external-link', 's16 vertical-align-middle')}
           </a>
