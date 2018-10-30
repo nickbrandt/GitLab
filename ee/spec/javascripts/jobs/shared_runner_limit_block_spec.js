@@ -22,6 +22,7 @@ describe('Shared Runner Limit Block', () => {
       expect(vm.$el.textContent).toContain(
         'You have used all your shared Runners pipeline minutes.',
       );
+
       expect(vm.$el.textContent).toContain('1000 of 4000');
     });
   });
