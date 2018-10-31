@@ -8,6 +8,10 @@ module EE
     extend ::Gitlab::Utils::Override
 
     prepended do
+      include TokenAuthenticatable
+
+      add_authentication_token_field :saml_discovery_token, unique: false, token_generator: -> { Devise.friendly_token(8) }
+
       has_many :epics
 
       has_one :saml_provider
@@ -115,12 +119,7 @@ module EE
     # This token conveys that the anonymous user is allowed to know of the group
     # Used to avoid revealing that a group exists on a given path
     def saml_discovery_token
-      super.presence || begin
-        self.saml_discovery_token = Devise.friendly_token(8)
-
-        save if ::Gitlab::Database.read_write?
-        super
-      end
+      ensure_saml_discovery_token!
     end
 
     def project_creation_level
