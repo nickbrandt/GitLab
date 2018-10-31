@@ -9,11 +9,8 @@ module Banzai
   # so we can avoid N+1 queries problem
 
   class IssuableExtractor
-<<<<<<< HEAD
     prepend EE::Banzai::IssuableExtractor
 
-=======
->>>>>>> upstream/master
     attr_reader :context
 
     ISSUE_REFERENCE_TYPE = '@data-reference-type="issue"'.freeze
