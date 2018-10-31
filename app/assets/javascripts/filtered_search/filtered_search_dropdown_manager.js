@@ -156,10 +156,7 @@ export default class FilteredSearchDropdownManager {
   }
 
   static addWordToInput(tokenName, tokenValue = '', clicked = false, options = {}) {
-    const {
-      uppercaseTokenName = false,
-      capitalizeTokenValue = false,
-    } = options;
+    const { uppercaseTokenName = false, capitalizeTokenValue = false } = options;
     const input = FilteredSearchContainer.container.querySelector('.filtered-search');
     FilteredSearchVisualTokens.addFilterVisualToken(tokenName, tokenValue, {
       uppercaseTokenName,

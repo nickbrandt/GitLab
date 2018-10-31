@@ -58,19 +58,22 @@ export default {
     },
     hasStages() {
       return (
-        this.pipeline.details &&
-        this.pipeline.details.stages &&
-        this.pipeline.details.stages.length
+        this.pipeline.details && this.pipeline.details.stages && this.pipeline.details.stages.length
       );
     },
     hasCommitInfo() {
       return this.pipeline.commit && Object.keys(this.pipeline.commit).length > 0;
     },
     errorText() {
-      return sprintf(__('Could not retrieve the pipeline status. For troubleshooting steps, read the %{linkStart}documentation.%{linkEnd}'), {
-        linkStart: `<a href="${this.troubleshootingDocsPath}">`,
-        linkEnd: '</a>',
-      });
+      return sprintf(
+        __(
+          'Could not retrieve the pipeline status. For troubleshooting steps, read the %{linkStart}documentation.%{linkEnd}',
+        ),
+        {
+          linkStart: `<a href="${this.troubleshootingDocsPath}">`,
+          linkEnd: '</a>',
+        },
+      );
     },
     /* We typically set defaults ([]) in the store or prop declarations, but because triggered
     * and triggeredBy are appended to `pipeline`, we can't set defaults in the store, and we

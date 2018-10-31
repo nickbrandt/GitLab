@@ -1,104 +1,102 @@
 <script>
-  import Flash from '../../flash';
-  import { s__ } from '../../locale';
-  import emptyState from './empty_state.vue';
-  import eventHub from '../event_hub';
-  import environmentsMixin from '../mixins/environments_mixin';
-  import CIPaginationMixin from '../../vue_shared/mixins/ci_pagination_api_mixin';
-  import StopEnvironmentModal from './stop_environment_modal.vue';
+import Flash from '../../flash';
+import { s__ } from '../../locale';
+import emptyState from './empty_state.vue';
+import eventHub from '../event_hub';
+import environmentsMixin from '../mixins/environments_mixin';
+import CIPaginationMixin from '../../vue_shared/mixins/ci_pagination_api_mixin';
+import StopEnvironmentModal from './stop_environment_modal.vue';
 
-  export default {
-    components: {
-      emptyState,
-      StopEnvironmentModal,
+export default {
+  components: {
+    emptyState,
+    StopEnvironmentModal,
+  },
+
+  mixins: [CIPaginationMixin, environmentsMixin],
+
+  props: {
+    endpoint: {
+      type: String,
+      required: true,
+    },
+    canCreateEnvironment: {
+      type: Boolean,
+      required: true,
+    },
+    canCreateDeployment: {
+      type: Boolean,
+      required: true,
+    },
+    canReadEnvironment: {
+      type: Boolean,
+      required: true,
+    },
+    cssContainerClass: {
+      type: String,
+      required: true,
+    },
+    newEnvironmentPath: {
+      type: String,
+      required: true,
+    },
+    helpPagePath: {
+      type: String,
+      required: true,
+    },
+  },
+
+  created() {
+    eventHub.$on('toggleFolder', this.toggleFolder);
+    eventHub.$on('toggleDeployBoard', this.toggleDeployBoard);
+  },
+
+  beforeDestroy() {
+    eventHub.$off('toggleFolder');
+    eventHub.$off('toggleDeployBoard');
+  },
+
+  methods: {
+    /**
+     * Toggles the visibility of the deploy boards of the clicked environment.
+     * @param {Object} model
+     */
+    toggleDeployBoard(model) {
+      this.store.toggleDeployBoard(model.id);
     },
 
-    mixins: [
-      CIPaginationMixin,
-      environmentsMixin,
-    ],
+    toggleFolder(folder) {
+      this.store.toggleFolder(folder);
 
-    props: {
-      endpoint: {
-        type: String,
-        required: true,
-      },
-      canCreateEnvironment: {
-        type: Boolean,
-        required: true,
-      },
-      canCreateDeployment: {
-        type: Boolean,
-        required: true,
-      },
-      canReadEnvironment: {
-        type: Boolean,
-        required: true,
-      },
-      cssContainerClass: {
-        type: String,
-        required: true,
-      },
-      newEnvironmentPath: {
-        type: String,
-        required: true,
-      },
-      helpPagePath: {
-        type: String,
-        required: true,
-      },
+      if (!folder.isOpen) {
+        this.fetchChildEnvironments(folder, true);
+      }
     },
 
-    created() {
-      eventHub.$on('toggleFolder', this.toggleFolder);
-      eventHub.$on('toggleDeployBoard', this.toggleDeployBoard);
+    fetchChildEnvironments(folder, showLoader = false) {
+      this.store.updateEnvironmentProp(folder, 'isLoadingFolderContent', showLoader);
+
+      this.service
+        .getFolderContent(folder.folder_path)
+        .then(response => this.store.setfolderContent(folder, response.data.environments))
+        .then(() => this.store.updateEnvironmentProp(folder, 'isLoadingFolderContent', false))
+        .catch(() => {
+          Flash(s__('Environments|An error occurred while fetching the environments.'));
+          this.store.updateEnvironmentProp(folder, 'isLoadingFolderContent', false);
+        });
     },
 
-    beforeDestroy() {
-      eventHub.$off('toggleFolder');
-      eventHub.$off('toggleDeployBoard');
+    successCallback(resp) {
+      this.saveData(resp);
+
+      // We need to verify if any folder is open to also update it
+      const openFolders = this.store.getOpenFolders();
+      if (openFolders.length) {
+        openFolders.forEach(folder => this.fetchChildEnvironments(folder));
+      }
     },
-
-    methods: {
-      /**
-       * Toggles the visibility of the deploy boards of the clicked environment.
-       * @param {Object} model
-       */
-      toggleDeployBoard(model) {
-        this.store.toggleDeployBoard(model.id);
-      },
-
-      toggleFolder(folder) {
-        this.store.toggleFolder(folder);
-
-        if (!folder.isOpen) {
-          this.fetchChildEnvironments(folder, true);
-        }
-      },
-
-      fetchChildEnvironments(folder, showLoader = false) {
-        this.store.updateEnvironmentProp(folder, 'isLoadingFolderContent', showLoader);
-
-        this.service.getFolderContent(folder.folder_path)
-          .then(response => this.store.setfolderContent(folder, response.data.environments))
-          .then(() => this.store.updateEnvironmentProp(folder, 'isLoadingFolderContent', false))
-          .catch(() => {
-            Flash(s__('Environments|An error occurred while fetching the environments.'));
-            this.store.updateEnvironmentProp(folder, 'isLoadingFolderContent', false);
-          });
-      },
-
-      successCallback(resp) {
-        this.saveData(resp);
-
-        // We need to verify if any folder is open to also update it
-        const openFolders = this.store.getOpenFolders();
-        if (openFolders.length) {
-          openFolders.forEach(folder => this.fetchChildEnvironments(folder));
-        }
-      },
-    },
-  };
+  },
+};
 </script>
 <template>
   <div :class="cssContainerClass">

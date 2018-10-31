@@ -10,11 +10,21 @@ export default class Members {
   }
 
   addListeners() {
-    $('.js-ldap-permissions').off('click').on('click', this.showLDAPPermissionsWarning.bind(this));
-    $('.js-ldap-override').off('click').on('click', this.toggleMemberAccessToggle.bind(this));
-    $('.project_member, .group_member').off('ajax:success').on('ajax:success', this.removeRow);
-    $('.js-member-update-control').off('change').on('change', this.formSubmit.bind(this));
-    $('.js-edit-member-form').off('ajax:success').on('ajax:success', this.formSuccess.bind(this));
+    $('.js-ldap-permissions')
+      .off('click')
+      .on('click', this.showLDAPPermissionsWarning.bind(this));
+    $('.js-ldap-override')
+      .off('click')
+      .on('click', this.toggleMemberAccessToggle.bind(this));
+    $('.project_member, .group_member')
+      .off('ajax:success')
+      .on('ajax:success', this.removeRow);
+    $('.js-member-update-control')
+      .off('change')
+      .on('change', this.formSubmit.bind(this));
+    $('.js-edit-member-form')
+      .off('ajax:success')
+      .on('ajax:success', this.formSuccess.bind(this));
     gl.utils.disableButtonIfEmptyField('#user_ids', 'input[name=commit]', 'change');
   }
 
@@ -42,7 +52,7 @@ export default class Members {
 
           return $el.text();
         },
-        clicked: (options) => {
+        clicked: options => {
           const $link = options.$el;
 
           if (!$link.data('revert')) {
@@ -53,11 +63,10 @@ export default class Members {
             $toggle.disable();
             $dateInput.disable();
 
-            this.overrideLdap($memberListItem, $link.data('endpoint'), false)
-              .catch(() => {
-                $toggle.enable();
-                $dateInput.enable();
-              });
+            this.overrideLdap($memberListItem, $link.data('endpoint'), false).catch(() => {
+              $toggle.enable();
+              $dateInput.enable();
+            });
           }
         },
       });
@@ -88,6 +97,7 @@ export default class Members {
 
     $ldapPermissionsElement.toggle();
   }
+
   // eslint-disable-next-line class-methods-use-this
   getMemberListItems($el) {
     const $memberListItem = $el.is('.member') ? $el : $(`#${$el.data('elId')}`);
@@ -111,25 +121,31 @@ export default class Members {
         $toggle.enable();
         $dateInput.enable();
       })
-      .catch((xhr) => {
+      .catch(xhr => {
         $btn.enable();
 
         if (xhr.status === 403) {
-          Flash(__('You do not have the correct permissions to override the settings from the LDAP group sync.'));
+          Flash(
+            __(
+              'You do not have the correct permissions to override the settings from the LDAP group sync.',
+            ),
+          );
         } else {
           Flash(__('An error occurred while saving LDAP override status. Please try again.'));
         }
       });
   }
+
   // eslint-disable-next-line class-methods-use-this
   overrideLdap($memberListitem, endpoint, override) {
-    return axios.patch(endpoint, {
-      group_member: {
-        override,
-      },
-    })
-    .then(() => {
-      $memberListitem.toggleClass('is-overriden', override);
-    });
+    return axios
+      .patch(endpoint, {
+        group_member: {
+          override,
+        },
+      })
+      .then(() => {
+        $memberListitem.toggleClass('is-overriden', override);
+      });
   }
 }

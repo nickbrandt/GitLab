@@ -205,10 +205,12 @@ describe('epicSidebar', () => {
         Object.assign({}, defaultPropsData, {
           startDateFromMilestones: startDateSourcingMilestoneDates.startDate,
           dueDateFromMilestones: dueDateSourcingMilestoneDates.dueDate,
-        })
+        }),
       );
 
-      expect(vmDatesFromMilestones.getDateFromMilestonesTooltip('start')).toBe('Milestone for Start Date<br/><span class="text-tertiary">Jan 1, 2010 – Dec 31, 2019</span>');
+      expect(vmDatesFromMilestones.getDateFromMilestonesTooltip('start')).toBe(
+        'Milestone for Start Date<br/><span class="text-tertiary">Jan 1, 2010 – Dec 31, 2019</span>',
+      );
 
       vmDatesFromMilestones.$destroy();
     });
@@ -229,10 +231,12 @@ describe('epicSidebar', () => {
           },
           startDateFromMilestones: startDate,
           dueDateFromMilestones: dueDate,
-        })
+        }),
       );
 
-      expect(vmDatesFromMilestones.getDateFromMilestonesTooltip('start')).toBe('Milestone for Start Date<br/><span class="text-tertiary">Jan 1 – Mar 31, 2018</span>');
+      expect(vmDatesFromMilestones.getDateFromMilestonesTooltip('start')).toBe(
+        'Milestone for Start Date<br/><span class="text-tertiary">Jan 1 – Mar 31, 2018</span>',
+      );
 
       vmDatesFromMilestones.$destroy();
     });

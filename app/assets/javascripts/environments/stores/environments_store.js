@@ -42,9 +42,9 @@ export default class EnvironmentsStore {
    * @returns {Array}
    */
   storeEnvironments(environments = []) {
-    const filteredEnvironments = environments.map((env) => {
-      const oldEnvironmentState = this.state.environments
-        .find((element) => {
+    const filteredEnvironments = environments.map(env => {
+      const oldEnvironmentState =
+        this.state.environments.find(element => {
           if (env.latest) {
             return element.id === env.latest.id;
           }
@@ -73,10 +73,12 @@ export default class EnvironmentsStore {
       if (filtered.size === 1 && filtered.rollout_status) {
         filtered = Object.assign({}, filtered, {
           hasDeployBoard: true,
-          isDeployBoardVisible: oldEnvironmentState.isDeployBoardVisible === false ?
-            oldEnvironmentState.isDeployBoardVisible :
-            true,
-          deployBoardData: filtered.rollout_status.status === 'found' ? filtered.rollout_status : {},
+          isDeployBoardVisible:
+            oldEnvironmentState.isDeployBoardVisible === false
+              ? oldEnvironmentState.isDeployBoardVisible
+              : true,
+          deployBoardData:
+            filtered.rollout_status.status === 'found' ? filtered.rollout_status : {},
           isLoadingDeployBoard: filtered.rollout_status.status === 'loading',
           isEmptyDeployBoard: filtered.rollout_status.status === 'not_found',
         });
@@ -133,12 +135,12 @@ export default class EnvironmentsStore {
     return count;
   }
 
-  /*
-    * Toggles folder open property for the given folder.
-    *
-    * @param  {Object} folder
-    * @return {Array}
-    */
+  /**
+   * Toggles folder open property for the given folder.
+   *
+   * @param  {Object} folder
+   * @return {Array}
+   */
   toggleFolder(folder) {
     return this.updateEnvironmentProp(folder, 'isOpen', !folder.isOpen);
   }
@@ -152,7 +154,7 @@ export default class EnvironmentsStore {
    * @return {Object}
    */
   setfolderContent(folder, environments) {
-    const updatedEnvironments = environments.map((env) => {
+    const updatedEnvironments = environments.map(env => {
       let updated = env;
 
       if (env.latest) {
@@ -181,7 +183,7 @@ export default class EnvironmentsStore {
   updateEnvironmentProp(environment, prop, newValue) {
     const { environments } = this.state;
 
-    const updatedEnvironments = environments.map((env) => {
+    const updatedEnvironments = environments.map(env => {
       const updateEnv = Object.assign({}, env);
       if (env.id === environment.id) {
         updateEnv[prop] = newValue;
@@ -208,7 +210,7 @@ export default class EnvironmentsStore {
   toggleDeployBoard(environmentID) {
     const environments = this.state.environments.slice();
 
-    this.state.environments = environments.map((env) => {
+    this.state.environments = environments.map(env => {
       let updated = Object.assign({}, env);
 
       if (env.id === environmentID) {
