@@ -9,8 +9,14 @@ module EE
       WEIGHT_ANY = 'Any'.freeze
       WEIGHT_NONE = 'None'.freeze
 
+      prepend EE::RelativePositioning
+      include Elastic::IssuesSearch
+
       scope :order_weight_desc, -> { reorder ::Gitlab::Database.nulls_last_order('weight', 'DESC') }
       scope :order_weight_asc, -> { reorder ::Gitlab::Database.nulls_last_order('weight') }
+
+      has_one :epic_issue
+      has_one :epic, through: :epic_issue
 
       validates :weight, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
     end
