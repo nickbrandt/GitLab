@@ -14,13 +14,11 @@ module Gitlab
       @text = text.is_a?(Array) ? text.join(' ') : text
     end
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def users
       return User.none unless @text.present?
 
       @users ||= User.from_union(union_relations)
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     def usernames
       matches[:usernames]

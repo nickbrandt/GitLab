@@ -16,7 +16,7 @@ module Gitlab
       end
 
       def raw_users
-        return User.none if empty_code_owners? # rubocop: disable CodeReuse/ActiveRecord
+        return User.none if empty_code_owners?
 
         @_raw_users ||= begin
           owner_lines = @paths.map { |path| code_owners_file.owners_for_path(path) }

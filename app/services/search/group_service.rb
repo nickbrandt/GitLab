@@ -11,14 +11,12 @@ module Search
       @group = group
     end
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def projects
       return Project.none unless group
       return @projects if defined? @projects
 
       @projects = super.inside_path(group.full_path)
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     # rubocop: disable CodeReuse/ActiveRecord
     def elastic_projects
