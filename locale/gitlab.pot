@@ -3921,11 +3921,10 @@ msgstr ""
 msgid "Group Runners"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Group SAML must be enabled to test"
-=======
+msgstr ""
+
 msgid "Group URL"
->>>>>>> upstream/master
 msgstr ""
 
 msgid "Group avatar"
