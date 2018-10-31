@@ -894,10 +894,10 @@ describe Project do
     end
   end
 
-  describe '#secret_variables_for' do
+  describe '#ci_variables_for' do
     let(:project) { create(:project) }
 
-    let!(:secret_variable) do
+    let!(:ci_variable) do
       create(:ci_variable, value: 'secret', project: project)
     end
 
@@ -905,7 +905,7 @@ describe Project do
       create(:ci_variable, :protected, value: 'protected', project: project)
     end
 
-    subject { project.secret_variables_for(ref: 'ref') }
+    subject { project.ci_variables_for(ref: 'ref') }
 
     before do
       stub_application_setting(
@@ -916,7 +916,7 @@ describe Project do
       let(:environment) { 'review/name' }
 
       subject do
-        project.secret_variables_for(ref: 'ref', environment: environment)
+        project.ci_variables_for(ref: 'ref', environment: environment)
       end
 
       shared_examples 'matching environment scope' do
@@ -925,8 +925,8 @@ describe Project do
             stub_licensed_features(variable_environment_scope: true)
           end
 
-          it 'contains the secret variable' do
-            is_expected.to contain_exactly(secret_variable)
+          it 'contains the ci variable' do
+            is_expected.to contain_exactly(ci_variable)
           end
         end
 
@@ -935,8 +935,8 @@ describe Project do
             stub_licensed_features(variable_environment_scope: false)
           end
 
-          it 'does not contain the secret variable' do
-            is_expected.not_to contain_exactly(secret_variable)
+          it 'does not contain the ci variable' do
+            is_expected.not_to contain_exactly(ci_variable)
           end
         end
       end
@@ -947,8 +947,8 @@ describe Project do
             stub_licensed_features(variable_environment_scope: true)
           end
 
-          it 'does not contain the secret variable' do
-            is_expected.not_to contain_exactly(secret_variable)
+          it 'does not contain the ci variable' do
+            is_expected.not_to contain_exactly(ci_variable)
           end
         end
 
@@ -957,15 +957,15 @@ describe Project do
             stub_licensed_features(variable_environment_scope: false)
           end
 
-          it 'does not contain the secret variable' do
-            is_expected.not_to contain_exactly(secret_variable)
+          it 'does not contain the ci variable' do
+            is_expected.not_to contain_exactly(ci_variable)
           end
         end
       end
 
       context 'when environment scope is exactly matched' do
         before do
-          secret_variable.update(environment_scope: 'review/name')
+          ci_variable.update(environment_scope: 'review/name')
         end
 
         it_behaves_like 'matching environment scope'
@@ -973,7 +973,7 @@ describe Project do
 
       context 'when environment scope is matched by wildcard' do
         before do
-          secret_variable.update(environment_scope: 'review/*')
+          ci_variable.update(environment_scope: 'review/*')
         end
 
         it_behaves_like 'matching environment scope'
@@ -981,7 +981,7 @@ describe Project do
 
       context 'when environment scope does not match' do
         before do
-          secret_variable.update(environment_scope: 'review/*/special')
+          ci_variable.update(environment_scope: 'review/*/special')
         end
 
         it_behaves_like 'not matching environment scope'
@@ -993,18 +993,18 @@ describe Project do
         end
 
         it 'does not treat it as wildcard' do
-          secret_variable.update(environment_scope: '*_*')
+          ci_variable.update(environment_scope: '*_*')
 
-          is_expected.not_to contain_exactly(secret_variable)
+          is_expected.not_to contain_exactly(ci_variable)
         end
 
         context 'when environment name contains underscore' do
           let(:environment) { 'foo_bar/test' }
 
           it 'matches literally for _' do
-            secret_variable.update(environment_scope: 'foo_bar/*')
+            ci_variable.update(environment_scope: 'foo_bar/*')
 
-            is_expected.to contain_exactly(secret_variable)
+            is_expected.to contain_exactly(ci_variable)
           end
         end
       end
@@ -1019,18 +1019,18 @@ describe Project do
         end
 
         it 'does not treat it as wildcard' do
-          secret_variable.update_attribute(:environment_scope, '*%*')
+          ci_variable.update_attribute(:environment_scope, '*%*')
 
-          is_expected.not_to contain_exactly(secret_variable)
+          is_expected.not_to contain_exactly(ci_variable)
         end
 
         context 'when environment name contains a percent' do
           let(:environment) { 'foo%bar/test' }
 
           it 'matches literally for _' do
-            secret_variable.update(environment_scope: 'foo%bar/*')
+            ci_variable.update(environment_scope: 'foo%bar/*')
 
-            is_expected.to contain_exactly(secret_variable)
+            is_expected.to contain_exactly(ci_variable)
           end
         end
       end
@@ -1038,7 +1038,7 @@ describe Project do
       context 'when variables with the same name have different environment scopes' do
         let!(:partially_matched_variable) do
           create(:ci_variable,
-                 key: secret_variable.key,
+                 key: ci_variable.key,
                  value: 'partial',
                  environment_scope: 'review/*',
                  project: project)
@@ -1046,7 +1046,7 @@ describe Project do
 
         let!(:perfectly_matched_variable) do
           create(:ci_variable,
-                 key: secret_variable.key,
+                 key: ci_variable.key,
                  value: 'prefect',
                  environment_scope: 'review/name',
                  project: project)
@@ -1058,7 +1058,7 @@ describe Project do
 
         it 'puts variables matching environment scope more in the end' do
           is_expected.to eq(
-            [secret_variable,
+            [ci_variable,
              partially_matched_variable,
              perfectly_matched_variable])
         end
