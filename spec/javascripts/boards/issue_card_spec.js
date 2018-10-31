@@ -291,46 +291,42 @@ describe('Issue card component', () => {
         .catch(done.fail);
     });
 
-    it('shows group labels on group boards', (done) => {
-      component.issue.addLabel(new ListLabel({
-        id: _.random(10000),
-        title: 'Group label',
-        type: 'GroupLabel',
-      }));
+    it('shows group labels on group boards', done => {
+      component.issue.addLabel(
+        new ListLabel({
+          id: _.random(10000),
+          title: 'Group label',
+          type: 'GroupLabel',
+        }),
+      );
       component.groupId = 1;
 
       Vue.nextTick()
         .then(() => {
-          expect(
-            component.$el.querySelectorAll('.badge').length,
-          ).toBe(3);
+          expect(component.$el.querySelectorAll('.badge').length).toBe(3);
 
-          expect(
-            component.$el.textContent,
-          ).toContain('Group label');
+          expect(component.$el.textContent).toContain('Group label');
 
           done();
         })
         .catch(done.fail);
     });
 
-    it('shows project labels on group boards', (done) => {
-      component.issue.addLabel(new ListLabel({
-        id: 123,
-        title: 'Project label',
-        type: 'ProjectLabel',
-      }));
+    it('shows project labels on group boards', done => {
+      component.issue.addLabel(
+        new ListLabel({
+          id: 123,
+          title: 'Project label',
+          type: 'ProjectLabel',
+        }),
+      );
       component.groupId = 1;
 
       Vue.nextTick()
         .then(() => {
-          expect(
-            component.$el.querySelectorAll('.badge').length,
-          ).toBe(3);
+          expect(component.$el.querySelectorAll('.badge').length).toBe(3);
 
-          expect(
-            component.$el.textContent,
-          ).toContain('Project label');
+          expect(component.$el.textContent).toContain('Project label');
 
           done();
         })

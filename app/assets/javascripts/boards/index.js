@@ -39,9 +39,9 @@ export default () => {
   const issueBoardsContent = document.querySelector('.content-wrapper > .js-focus-mode-board');
 
   // check for browser back and trigger a hard reload to circumvent browser caching.
-  window.addEventListener('pageshow', (event) => {
-    const isNavTypeBackForward = window.performance &&
-        window.performance.navigation.type === NavigationType.TYPE_BACK_FORWARD;
+  window.addEventListener('pageshow', event => {
+    const isNavTypeBackForward =
+      window.performance && window.performance.navigation.type === NavigationType.TYPE_BACK_FORWARD;
 
     if (event.persisted || isNavTypeBackForward) {
       window.location.reload();

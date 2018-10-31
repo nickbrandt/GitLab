@@ -8,7 +8,12 @@ import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { TEST_HOST } from 'spec/test_constants';
 
 import state from 'ee/vue_shared/security_reports/store/state';
-import mockData, { baseIssues, headIssues, basePerformance, headPerformance } from 'spec/vue_mr_widget/mock_data';
+import mockData, {
+  baseIssues,
+  headIssues,
+  basePerformance,
+  headPerformance,
+} from 'spec/vue_mr_widget/mock_data';
 
 import {
   sastIssues,
@@ -492,9 +497,7 @@ describe('ee merge request widget options', () => {
 
       it('should render provided data', () => {
         expect(
-          removeBreakLine(
-            vm.$el.querySelector('.js-performance-widget .js-code-text').textContent,
-          ),
+          removeBreakLine(vm.$el.querySelector('.js-performance-widget .js-code-text').textContent),
         ).toEqual('No changes to performance metrics');
       });
 
@@ -505,7 +508,9 @@ describe('ee merge request widget options', () => {
       });
 
       it('shows success icon', () => {
-        expect(vm.$el.querySelector('.js-performance-widget .js-ci-status-icon-success')).not.toBeNull();
+        expect(
+          vm.$el.querySelector('.js-performance-widget .js-ci-status-icon-success'),
+        ).not.toBeNull();
       });
     });
 

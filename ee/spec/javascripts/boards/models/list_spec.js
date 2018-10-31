@@ -31,24 +31,32 @@ describe('List model', () => {
   });
 
   describe('getIssues', () => {
-    it('calls CE getIssues', (done) => {
+    it('calls CE getIssues', done => {
       const ceGetIssues = spyOn(CeList.prototype, 'getIssues').and.returnValue(Promise.resolve({}));
 
-      list.getIssues().then(() => {
-        expect(ceGetIssues).toHaveBeenCalled();
-        done();
-      }).catch(done.fail);
+      list
+        .getIssues()
+        .then(() => {
+          expect(ceGetIssues).toHaveBeenCalled();
+          done();
+        })
+        .catch(done.fail);
     });
 
-    it('sets total weight', (done) => {
-      spyOn(CeList.prototype, 'getIssues').and.returnValue(Promise.resolve({
-        total_weight: 11,
-      }));
+    it('sets total weight', done => {
+      spyOn(CeList.prototype, 'getIssues').and.returnValue(
+        Promise.resolve({
+          total_weight: 11,
+        }),
+      );
 
-      list.getIssues().then(() => {
-        expect(list.totalWeight).toBe(11);
-        done();
-      }).catch(done.fail);
+      list
+        .getIssues()
+        .then(() => {
+          expect(list.totalWeight).toBe(11);
+          done();
+        })
+        .catch(done.fail);
     });
   });
 

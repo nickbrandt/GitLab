@@ -19,7 +19,9 @@ describe('Shared Runner Limit Block', () => {
         runnersPath: 'root/project/runners',
       });
 
-      expect(vm.$el.textContent).toContain('You have used all your shared Runners pipeline minutes.');
+      expect(vm.$el.textContent).toContain(
+        'You have used all your shared Runners pipeline minutes.',
+      );
       expect(vm.$el.textContent).toContain('1000 of 4000');
     });
   });
@@ -32,9 +34,10 @@ describe('Shared Runner Limit Block', () => {
         runnersPath: 'root/project/runners',
       });
 
-      expect(trimText(vm.$el.textContent)).toContain('For more information, go to the Runners page.');
+      expect(trimText(vm.$el.textContent)).toContain(
+        'For more information, go to the Runners page.',
+      );
     });
-
   });
 
   describe('without runnersPath', () => {
@@ -44,7 +47,9 @@ describe('Shared Runner Limit Block', () => {
         quotaLimit: 4000,
       });
 
-      expect(trimText(vm.$el.textContent)).not.toContain('For more information, go to the Runners page.');
+      expect(trimText(vm.$el.textContent)).not.toContain(
+        'For more information, go to the Runners page.',
+      );
     });
   });
 });

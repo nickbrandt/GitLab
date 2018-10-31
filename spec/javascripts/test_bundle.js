@@ -200,8 +200,10 @@ if (process.env.BABEL_ENV === 'coverage') {
       require.context('~', true, /\.(js|vue)$/),
       require.context('ee', true, /\.(js|vue)$/),
     ];
-    const allTestFiles = testContexts.reduce((accumulator, context) =>
-      accumulator.concat(context.keys()), []);
+    const allTestFiles = testContexts.reduce(
+      (accumulator, context) => accumulator.concat(context.keys()),
+      [],
+    );
 
     $.holdReady(true);
 

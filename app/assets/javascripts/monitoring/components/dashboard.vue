@@ -152,10 +152,14 @@ export default {
       this.state = 'gettingStarted';
     } else {
       if (this.showEnvironmentDropdown) {
-        this.servicePromises.push(this.service
-        .getEnvironmentsData()
-        .then((data) => this.store.storeEnvironmentsData(data))
-        .catch(() => Flash(s__('Metrics|There was an error getting environments information.'))));
+        this.servicePromises.push(
+          this.service
+            .getEnvironmentsData()
+            .then(data => this.store.storeEnvironmentsData(data))
+            .catch(() =>
+              Flash(s__('Metrics|There was an error getting environments information.')),
+            ),
+        );
       }
       this.getGraphsData();
       window.addEventListener('resize', this.resizeThrottled, false);
