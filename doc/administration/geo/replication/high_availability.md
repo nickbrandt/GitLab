@@ -31,19 +31,22 @@ in setting up this configuration for PostgreSQL and Redis
 it is not covered by this Geo HA documentation.
 
 For more information about setting up a highly available PostgreSQL cluster and Redis cluster using the omnibus package see the high availability documentation for
-[PostgreSQL][postgresql-ha] and [Redis][redis-ha], respectively.
+[PostgreSQL](../../high_availability/database.md) and
+[Redis](../../high_availability/redis.md), respectively.
 
 NOTE: **Note:**
 It is possible to use cloud hosted services for PostgreSQL and Redis but this is beyond the scope of this document.
 
 ## Prerequisites: A working GitLab HA cluster
 
-This cluster will serve as the Geo Primary. Use the
-[GitLab HA documentation][gitlab-ha] to set this up.
+This cluster will serve as the **primary** node. Use the
+[GitLab HA documentation](../../high_availability/README.md) to set this up.
 
-## Configure the working cluster to be a Geo Primary
+## Configure the GitLab cluster to be the **primary** node
 
-### Step 1: Configure the Geo Primary Frontend Servers
+The following steps enable a GitLab cluster to serve as the **primary** node.
+
+### Step 1: Configure the **primary** frontend servers
 
 1. Edit `/etc/gitlab/gitlab.rb` and add the following:
 
@@ -59,63 +62,71 @@ This cluster will serve as the Geo Primary. Use the
     gitlab_rails['auto_migrate'] = false
     ```
 
-After making these changes, [reconfigure GitLab][gitlab-reconfigure] so that they take effect.
+After making these changes, [reconfigure GitLab][gitlab-reconfigure] so the changes take effect.
 
 NOTE: **Note:** PostgreSQL and Redis should have already been disabled on the
-application servers and the connections configured, during normal GitLab
-HA set up. See documentation for
-[PostgreSQL][postgresql-ha-configuring-application-nodes] and
-[Redis][redis-ha-configuring-the-application-nodes]
+application servers, and connections from the application servers to those
+services on the backend servers configured, during normal GitLab HA set up. See
+high availability configuration documentation for
+[PostgreSQL](../../high_availability/database.md#configuring-the-application-nodes)
+and [Redis](../../high_availability/redis.md#example-configuration-for-the-gitlab-application).
 
-The Geo Primary database will require modification later, as part of
-[Step 2 of Configure a Geo Secondary][step-2-of-configure-a-geo-secondary].
+The **primary** database will require modification later, as part of
+[step 2](#step-2-configure-the-main-read-only-replica-postgresql-database-on-the-secondary-node).
 
-## Configure a Geo Secondary
+## Configure a **secondary** node
 
-A Geo Secondary cluster is similar to any other GitLab HA cluster, with two
+A **secondary** cluster is similar to any other GitLab HA cluster, with two
 major differences:
 
-1. The main PostgreSQL database is a read-only replica of the Geo Primary's
-   PostgreSQL database.
-1. There is also a single PostgreSQL database per Geo Secondary cluster, called
-   the "tracking database", which tracks the sync state of various resources.
+* The main PostgreSQL database is a read-only replica of the **primary** node's
+  PostgreSQL database.
+* There is also a single PostgreSQL database for the **secondary** cluster,
+  called the "tracking database", which tracks the synchronization state of
+  various resources.
 
-So, we will set up the HA components one-by-one, and include deviations from
-the normal HA setup.
+Therefore, we will set up the HA components one-by-one, and include deviations
+from the normal HA setup.
 
-### Step 1: Configure the Redis and NFS services on the Geo Secondary
+### Step 1: Configure the Redis and NFS services on the **secondary** node
 
-Configure the following services, again using the non-Geo, HA documentation:
+Configure the following services, again using the non-Geo high availability
+documentation:
 
-* [Redis][redis-ha] for high availability.
-* [NFS Server][nfs-ha] which will store data that is synchronized from the Geo primary.
+* [Configuring Redis for GitLab HA](../../high_availability/redis.md) for high
+  availability.
+* [NFS](../../high_availability/nfs.md) which will store data that is
+  synchronized from the **primary** node.
 
-### Step 2: Configure the main read-only replica PostgreSQL database on the Geo Secondary
+### Step 2: Configure the main read-only replica PostgreSQL database on the **secondary** node
 
-NOTE: **Note:** This documentation assumes the DB will be run on only a single
-machine, rather than as a PostgreSQL cluster.
+NOTE: **Note:** The following documentation assumes the database will be run on
+only a single machine, rather than as a PostgreSQL cluster.
 
-Configure the [secondary Geo PostgreSQL database][database] as a read-only
-secondary of the primary Geo PostgreSQL database. Be sure to follow the
-[External PostgreSQL instances][external-postgresql] section.
+Configure the [**secondary** database](database.md) as a read-only replica of
+the **primary** database. Be sure to follow the
+[External PostgreSQL instances](database.md#external-postgresql-instances)
+section.
 
-### Step 3: Configure the tracking database on the Geo Secondary
+### Step 3: Configure the tracking database on the **secondary** node
 
-NOTE: **Note:** This documentation assumes the tracking DB will be run on only a
-single machine, rather than as a PostgreSQL cluster.
+NOTE: **Note:** This documentation assumes the tracking database will be run on
+only a single machine, rather than as a PostgreSQL cluster.
 
-Configure the [Geo tracking database][tracking-database].
+Configure the
+[tracking database](database.md#tracking-database-for-the-secondary-nodes).
 
-### Step 4: Configure the Frontend Application servers on the Geo Secondary
+### Step 4: Configure the frontend application servers on the **secondary** node
 
 In the architecture overview, there are two machines running the GitLab
 application services. These services are enabled selectively in the
 configuration.
 
-Configure the application servers following [Configuring GitLab for HA][app-ha],
-then make the following modifications:
+Configure the application servers following
+[Configuring GitLab for HA](../../high_availability/gitlab.md), then make the
+following modifications:
 
-1. Edit `/etc/gitlab/gitlab.rb` on each application server in the secondary
+1. Edit `/etc/gitlab/gitlab.rb` on each application server in the **secondary**
    cluster, and add the following:
 
     ```ruby
@@ -173,7 +184,7 @@ servers connect to the databases.
 NOTE: **Note:**
 Make sure that current node IP is listed in `postgresql['md5_auth_cidr_addresses']` setting of your remote database.
 
-After making these changes [Reconfigure GitLab][gitlab-reconfigure] so that they take effect.
+After making these changes [Reconfigure GitLab][gitlab-reconfigure] so the changes take effect.
 
 On the secondary the following GitLab frontend services will be enabled:
 
@@ -190,26 +201,13 @@ On the secondary the following GitLab frontend services will be enabled:
 Verify these services by running `sudo gitlab-ctl status` on the frontend
 application servers.
 
-### Step 5: Set up the LoadBalancer for the Geo Secondary
+### Step 5: Set up the LoadBalancer for the **secondary** node
 
-In this topology there will need to be a load balancers at each geographical
-location to route traffic to the application servers.
+In this topology, a load balancer is required at each geographic location to
+route traffic to the application servers.
 
-See the [Load Balancer for GitLab HA][load-balancer-ha]
-documentation for more information.
+See [Load Balancer for GitLab HA](../../high_availability/load_balancer.md) for
+more information.
 
 [diagram-source]: https://docs.google.com/drawings/d/1z0VlizKiLNXVVVaERFwgsIOuEgjcUqDTWPdQYsE7Z4c/edit
 [gitlab-reconfigure]: ../../restart_gitlab.md#omnibus-gitlab-reconfigure
-[redis-ha]: ../../high_availability/redis.md
-[redis-ha-configuring-the-application-nodes]: ../../high_availability/redis.md#example-configuration-for-the-gitlab-application
-[postgresql-ha]: ../../high_availability/database.md
-[postgresql-ha-configuring-application-nodes]: ../../high_availability/database.md#configuring-the-application-nodes
-[nfs-ha]: ../../high_availability/nfs.md
-[load-balancer-ha]: ../../high_availability/load_balancer.md
-[database]: database.md
-[tracking-database]: database.md#tracking-database-for-the-secondary-nodes
-[external-postgresql]: database.md#external-postgresql-instances
-[gitlab-rb-template]: https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/files/gitlab-config-template/gitlab.rb.template
-[gitlab-ha]: ../../high_availability/README.md
-[app-ha]: ../../high_availability/gitlab.md
-[step-2-of-configure-a-geo-secondary]: #step-2-configure-the-main-read-only-replica-postgresql-database-on-the-geo-secondary

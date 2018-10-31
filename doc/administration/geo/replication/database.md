@@ -3,7 +3,7 @@
 NOTE: **Note:**
 This is the documentation for the Omnibus GitLab packages. For installations
 from source, follow the
-[**database replication for installations from source**][database-source] guide.
+[Geo database replication (source)](database_source.md) guide.
 
 NOTE: **Note:**
 If your GitLab installation uses external PostgreSQL, the Omnibus roles
@@ -104,7 +104,9 @@ The following guide assumes that:
 
     If you are using an external database not managed by Omnibus GitLab, you need
     to create the replicator user and define a password to it manually.
-    Check [How to create replication user][database-source-primary] documentation.
+    For information on how to create a replication user, refer to the
+    [appropriate step](database_source.md#step-1-configure-the-primary-server)
+    in [Geo database replication (source)](database_source.md).
 
 1. Configure PostgreSQL to listen on network interfaces
 
@@ -348,7 +350,7 @@ The following guide assumes that:
     ```
 
     For external PostgreSQL instances, [see additional instructions][external postgresql].
-    If you bring a former primary back online to serve as a secondary then you also need to remove `roles ['geo_primary_role']`.
+    If you bring a former **primary** node back online to serve as a **secondary** node, then you also need to remove `roles ['geo_primary_role']` or `geo_primary_role['enable'] = true`.
 
 1. Reconfigure GitLab for the changes to take effect:
 
@@ -621,8 +623,6 @@ Read the [troubleshooting document](troubleshooting.md).
 [tracking]: database_source.md#enable-tracking-database-on-the-secondary-server
 [FDW]: https://www.postgresql.org/docs/9.6/static/postgres-fdw.html
 [toc]: index.md#using-omnibus-gitlab
-[database-source]: database_source.md
-[database-source-primary]: database_source.md#step-1-configure-the-primary-server
 [rake-maintenance]: ../../raketasks/maintenance.md
 [pg-docs-ssl]: https://www.postgresql.org/docs/9.6/static/libpq-ssl.html#LIBPQ-SSL-PROTECTION
 [pg-docs-runtime-conn]: https://www.postgresql.org/docs/9.6/static/runtime-config-connection.html
