@@ -11,7 +11,6 @@ class SystemNoteMetadata < ActiveRecord::Base
   TYPES_WITH_CROSS_REFERENCES = %w[
     commit cross_reference
     close duplicate
-    relate unrelate
     moved
   ].freeze
 

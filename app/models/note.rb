@@ -9,7 +9,6 @@ class Note < ActiveRecord::Base
 
   include Participable
   include Mentionable
-  include Elastic::NotesSearch
   include Awardable
   include Importable
   include FasterCacheKeys
@@ -103,7 +102,6 @@ class Note < ActiveRecord::Base
   mount_uploader :attachment, AttachmentUploader
 
   # Scopes
-  scope :searchable, -> { where(system: false) }
   scope :for_commit_id, ->(commit_id) { where(noteable_type: "Commit", commit_id: commit_id) }
   scope :system, -> { where(system: true) }
   scope :user, -> { where(system: false) }
@@ -198,10 +196,6 @@ class Note < ActiveRecord::Base
     def search(query)
       fuzzy_search(query, [:note])
     end
-  end
-
-  def searchable?
-    !system
   end
 
   # rubocop: disable CodeReuse/ServiceClass

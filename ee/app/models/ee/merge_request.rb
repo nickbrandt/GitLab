@@ -1,15 +1,20 @@
 module EE
   module MergeRequest
     extend ActiveSupport::Concern
+    extend ::Gitlab::Utils::Override
 
     include ::Approvable
 
     prepended do
+      include Elastic::MergeRequestsSearch
+
       has_many :approvals, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
       has_many :approved_by_users, through: :approvals, source: :user
       has_many :approvers, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
       has_many :approver_groups, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
       has_many :draft_notes
+
+      validate :validate_approvals_before_merge, unless: :importing?
 
       delegate :performance_artifact, to: :head_pipeline, prefix: :head, allow_nil: true
       delegate :performance_artifact, to: :base_pipeline, prefix: :base, allow_nil: true
@@ -22,6 +27,13 @@ module EE
       delegate :merge_requests_author_approval?, to: :target_project, allow_nil: true
 
       participant :participant_approvers
+    end
+
+    override :mergeable?
+    def mergeable?(skip_ci_check: false)
+      return false unless approved?
+
+      super
     end
 
     def supports_weight?

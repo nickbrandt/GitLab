@@ -15,11 +15,10 @@ class Milestone < ActiveRecord::Base
   include Sortable
   include Referable
   include StripAttribute
-  include Elastic::MilestonesSearch
   include Milestoneish
   include Gitlab::SQL::Pattern
 
-  include ::EE::Milestone
+  prepend ::EE::Milestone
 
   cache_markdown_field :title, pipeline: :single_line
   cache_markdown_field :description
@@ -30,7 +29,6 @@ class Milestone < ActiveRecord::Base
   has_internal_id :iid, scope: :project, init: ->(s) { s&.project&.milestones&.maximum(:iid) }
   has_internal_id :iid, scope: :group, init: ->(s) { s&.group&.milestones&.maximum(:iid) }
 
-  has_many :boards
   has_many :issues
   has_many :labels, -> { distinct.reorder('labels.title') },  through: :issues
   has_many :merge_requests
