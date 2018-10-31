@@ -18,7 +18,7 @@ describe Gitlab::Ci::Build::Policy::Variables do
   let(:seed) { double('build seed', to_resource: ci_build) }
 
   describe '#satisfied_by?' do
-    context 'when using project secret variables in environment scope' do
+    context 'when using project ci variables in environment scope' do
       before do
         create(:ci_variable, project: project,
                              key: 'SCOPED_VARIABLE',

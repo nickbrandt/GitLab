@@ -315,7 +315,7 @@ module EE
       end
     end
 
-    def secret_variables_for(ref:, environment: nil)
+    def ci_variables_for(ref:, environment: nil)
       return super.where(environment_scope: '*') unless
         environment && feature_available?(:variable_environment_scope)
 
