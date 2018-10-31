@@ -17,8 +17,11 @@ module API
       end
     end
 
+<<<<<<< HEAD
     prepend EE::API::Issues
 
+=======
+>>>>>>> upstream/master
     helpers do
       # rubocop: disable CodeReuse/ActiveRecord
       def find_issues(args = {})
