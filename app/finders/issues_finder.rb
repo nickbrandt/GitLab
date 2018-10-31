@@ -137,7 +137,6 @@ class IssuesFinder < IssuableFinder
     current_user.blank?
   end
 
-  # rubocop: disable CodeReuse/ActiveRecord
   def by_assignee(items)
     if filter_by_no_assignee?
       items.unassigned
@@ -151,5 +150,4 @@ class IssuesFinder < IssuableFinder
       items
     end
   end
-  # rubocop: enable CodeReuse/ActiveRecord
 end
