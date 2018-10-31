@@ -33,7 +33,6 @@ module Banzai
     end
 
     private
-<<<<<<< HEAD
 
     def issuables_for_nodes(nodes)
       parsers.each_with_object({}) do |parser, result|
@@ -41,15 +40,6 @@ module Banzai
       end
     end
 
-=======
-
-    def issuables_for_nodes(nodes)
-      parsers.each_with_object({}) do |parser, result|
-        result.merge!(parser.records_for_nodes(nodes))
-      end
-    end
-
->>>>>>> upstream/master
     def parsers
       [
         Banzai::ReferenceParser::IssueParser.new(context),
