@@ -135,12 +135,12 @@ export default class EnvironmentsStore {
     return count;
   }
 
-  /*
-    * Toggles folder open property for the given folder.
-    *
-    * @param  {Object} folder
-    * @return {Array}
-    */
+  /**
+   * Toggles folder open property for the given folder.
+   *
+   * @param  {Object} folder
+   * @return {Array}
+   */
   toggleFolder(folder) {
     return this.updateEnvironmentProp(folder, 'isOpen', !folder.isOpen);
   }

@@ -97,6 +97,7 @@ export default class Members {
 
     $ldapPermissionsElement.toggle();
   }
+
   // eslint-disable-next-line class-methods-use-this
   getMemberListItems($el) {
     const $memberListItem = $el.is('.member') ? $el : $(`#${$el.data('elId')}`);
@@ -134,6 +135,7 @@ export default class Members {
         }
       });
   }
+
   // eslint-disable-next-line class-methods-use-this
   overrideLdap($memberListitem, endpoint, override) {
     return axios

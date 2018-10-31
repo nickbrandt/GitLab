@@ -90,7 +90,7 @@ describe('Environments Folder View', () => {
 
     it('should render parent folder name', done => {
       setTimeout(() => {
-        expect(component.$el.querySelector('.js-folder-name').textContent).toContain(
+        expect(component.$el.querySelector('.js-folder-name').textContent.trim()).toContain(
           'Environments / review',
         );
         done();
