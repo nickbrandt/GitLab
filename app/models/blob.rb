@@ -2,10 +2,7 @@
 
 # Blob is a Rails-specific wrapper around Gitlab::Git::Blob, SnippetBlob and Ci::ArtifactBlob
 class Blob < SimpleDelegator
-<<<<<<< HEAD
   prepend EE::Blob
-=======
->>>>>>> upstream/master
   include Presentable
   include BlobLanguageFromGitAttributes
 
