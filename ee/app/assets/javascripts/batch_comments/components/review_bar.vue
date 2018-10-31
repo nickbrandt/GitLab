@@ -2,12 +2,17 @@
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { sprintf, s__ } from '~/locale';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
+import { GlModal, GlModalDirective } from '@gitlab-org/gitlab-ui';
 import PublishButton from './publish_button.vue';
 
 export default {
   components: {
     PublishButton,
     LoadingButton,
+    GlModal,
+  },
+  directives: {
+    'gl-modal': GlModalDirective,
   },
   computed: {
     ...mapState('batchComments', ['isDiscarding']),
@@ -42,7 +47,7 @@ export default {
         />
       </p>
     </nav>
-    <gl-ui-modal
+    <gl-modal
       :title="s__('BatchComments|Discard review?')"
       :ok-title="s__('BatchComments|Delete all pending comments')"
       :modal-id="$options.modalId"
@@ -52,6 +57,6 @@ export default {
     >
       <p v-html="$options.text">
       </p>
-    </gl-ui-modal>
+    </gl-modal>
   </div>
 </template>
