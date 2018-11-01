@@ -205,7 +205,7 @@ that the secondary can act on those notifications immediately.
 Make sure the secondary instance is running and accessible.
 You can login to the secondary node with the same credentials as used in the primary.
 
-### Step 4. (Optional) Enabling hashed storage (from GitLab 10.0)
+### Step 4. Enabling hashed storage (from GitLab 10.0)
 
 CAUTION: **Warning**:
 Hashed storage is in **Beta**. It is not considered production-ready. See
