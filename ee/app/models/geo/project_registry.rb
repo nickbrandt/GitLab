@@ -109,6 +109,21 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     )
   end
 
+  # Retrieve the range of IDs in a relation
+  #
+  # @return [Array] with minimum ID and max ID
+  def self.range
+    pluck('MIN(id)', 'MAX(id)').first
+  end
+
+  # Search for IDs in the range
+  #
+  # @param [Integer] start initial ID
+  # @param [Integer] finish final ID
+  def self.with_range(start, finish)
+    where(id: start..finish)
+  end
+
   # Must be run before fetching the repository to avoid a race condition
   #
   # @param [String] type must be one of the values in TYPES

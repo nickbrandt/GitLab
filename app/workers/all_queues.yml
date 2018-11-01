@@ -161,6 +161,9 @@
 - cronjob:update_all_mirrors
 - cronjob:pseudonymizer
 
+- geo:geo_batch_project_registry
+- geo:geo_batch_project_registry_scheduler
+
 - geo:geo_scheduler_scheduler
 - geo:geo_scheduler_primary_scheduler
 - geo:geo_scheduler_secondary_scheduler
@@ -169,7 +172,6 @@
 - geo:geo_file_registry_removal
 - geo:geo_hashed_storage_attachments_migration
 - geo:geo_hashed_storage_migration
-- geo:geo_project_registry_batch
 - geo:geo_project_sync
 - geo:geo_rename_repository
 - geo:geo_repositories_clean_up

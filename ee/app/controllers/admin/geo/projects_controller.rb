@@ -56,13 +56,13 @@ class Admin::Geo::ProjectsController < Admin::ApplicationController
   end
 
   def recheck_all
-    Geo::ProjectRegistryBatchWorker.perform_async(:recheck_repositories)
+    Geo::Batch::ProjectRegistrySchedulerWorker.perform_async(:recheck_repositories)
 
     redirect_back_or_admin_geo_projects(notice: s_('Geo|All projects are being scheduled for re-check'))
   end
 
   def resync_all
-    Geo::ProjectRegistryBatchWorker.perform_async(:resync_repositories)
+    Geo::Batch::ProjectRegistrySchedulerWorker.perform_async(:resync_repositories)
 
     redirect_back_or_admin_geo_projects(notice: s_('Geo|All projects are being scheduled for re-sync'))
   end
