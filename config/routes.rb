@@ -100,7 +100,7 @@ Rails.application.routes.draw do
 
       member do
         # EE specific
-        get :metrics, to: 'clusters/cluster_metrics#show', as: :metrics
+        get :metrics, format: :json
 
         scope :applications do
           post '/:application', to: 'clusters/applications#create', as: :install_applications

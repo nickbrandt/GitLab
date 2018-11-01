@@ -9,7 +9,7 @@ describe 'Gcp Cluster', :js do
   before do
     project.add_maintainer(user)
     gitlab_sign_in(user)
-    allow(ClustersController).to receive(:STATUS_POLLING_INTERVAL) { 100 }
+    allow(Projects::ClustersController).to receive(:STATUS_POLLING_INTERVAL) { 100 }
   end
 
   context 'when a user has a licence to use multiple clusers' do
