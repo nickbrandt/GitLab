@@ -21,6 +21,10 @@ class Admin::Geo::ProjectsController < Admin::ApplicationController
                   else
                     finder.all_projects.page(params[:page])
                   end
+
+    if params[:name]
+      @registries = @registries.with_search(params[:name])
+    end
   end
 
   def destroy

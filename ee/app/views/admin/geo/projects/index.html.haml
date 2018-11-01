@@ -22,6 +22,8 @@
       = nav_link(html_options: { class: active_when(params[:sync_status] == 'never') }) do
         = link_to admin_geo_projects_path(sync_status: 'never') do
           = s_('Geo|Never')
+    .nav-controls
+      = render(partial: 'shared/projects/search_form', autofocus: true)
 
   - case params[:sync_status]
   - when 'never'
