@@ -6988,10 +6988,10 @@ msgstr ""
 msgid "Security Dashboard|Issue Created"
 msgstr ""
 
-msgid "Security Reports|At this time, the security dashboard only supports SAST. More analyzers are coming soon."
+msgid "Security Reports|At this time, the security dashboard only supports SAST."
 msgstr ""
 
-msgid "Security Reports|Security Dashboard Roadmap"
+msgid "Security Reports|Security Dashboard Documentation"
 msgstr ""
 
 msgid "Security Reports|There was an error fetching the dashboard. Please try again in a few moments or contact your support team."
