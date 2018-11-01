@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Geo::ProjectRegistry do
   using RSpec::Parameterized::TableSyntax
 
-  set(:project) { create(:project) }
+  set(:project) { create(:project, description: 'kitten mittens') }
   set(:registry) { create(:geo_project_registry, project_id: project.id) }
 
   subject { registry }
@@ -138,6 +138,40 @@ describe Geo::ProjectRegistry do
       create(:geo_project_registry)
 
       expect(described_class.retry_due).not_to include(tomorrow)
+    end
+  end
+
+  describe '.with_search', :geo do
+    it 'returns project registries that refers to projects with a matching name' do
+      expect(described_class.with_search(project.name)).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a matching name regardless of the casing' do
+      expect(described_class.with_search(project.name.upcase)).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a matching description' do
+      expect(described_class.with_search(project.description)).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a partially matching description' do
+      expect(described_class.with_search('kitten')).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a matching description regardless of the casing' do
+      expect(described_class.with_search('KITTEN')).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a matching path' do
+      expect(described_class.with_search(project.path)).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a partially matching path' do
+      expect(described_class.with_search(project.path[0..2])).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a matching path regardless of the casing' do
+      expect(described_class.with_search(project.path.upcase)).to eq([registry])
     end
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Geo::ProjectRegistry < Geo::BaseRegistry
   include ::Delay
   include ::EachBatch
@@ -76,6 +78,14 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
         .or(arel_table[:repository_retry_at].eq(nil))
         .or(arel_table[:wiki_retry_at].eq(nil))
     )
+  end
+
+  # Search for a list of projects associated with registries,
+  # based on the query given in `query`.
+  #
+  # @param [String] query term that will search over :path, :name and :description
+  def self.with_search(query)
+    where(project: Geo::Fdw::Project.search(query))
   end
 
   # Must be run before fetching the repository to avoid a race condition
