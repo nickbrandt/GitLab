@@ -113,6 +113,9 @@ msgstr[1] ""
 msgid "%{actionText} & %{openOrClose} %{noteable}"
 msgstr ""
 
+msgid "%{authorsName}'s discussion"
+msgstr ""
+
 msgid "%{commit_author_link} authored %{commit_timeago}"
 msgstr ""
 
@@ -124,6 +127,11 @@ msgstr ""
 
 msgid "%{count} participant"
 msgid_plural "%{count} participants"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "%{count} pending comment"
+msgid_plural "%{count} pending comments"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -3408,6 +3416,9 @@ msgid "Find the newly extracted <code>Takeout/Google Code Project Hosting/Google
 msgstr ""
 
 msgid "Fingerprints"
+msgstr ""
+
+msgid "Finish review"
 msgstr ""
 
 msgid "Finished"

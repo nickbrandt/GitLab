@@ -8,6 +8,7 @@ class DraftNoteEntity < Grape::Entity
   expose :position, if: -> (note, _) { note.on_diff? }
   expose :line_code
   expose :file_hash
+  expose :file_path
   expose :note
   expose :rendered_note, as: :note_html
   expose :references
