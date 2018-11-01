@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -170,34 +169,30 @@ func rebaseUrl(url *url.URL, onto *url.URL, suffix string) *url.URL {
 	return &newUrl
 }
 
-func (api *API) newRequest(r *http.Request, body io.Reader, suffix string) (*http.Request, error) {
+func (api *API) newRequest(r *http.Request, suffix string) (*http.Request, error) {
 	authReq := &http.Request{
 		Method: r.Method,
 		URL:    rebaseUrl(r.URL, api.URL, suffix),
 		Header: helper.HeaderClone(r.Header),
 	}
-	if body != nil {
-		authReq.Body = ioutil.NopCloser(body)
-	}
-	// Clean some headers when issuing a new request without body
-	if body == nil {
-		authReq.Header.Del("Content-Type")
-		authReq.Header.Del("Content-Encoding")
-		authReq.Header.Del("Content-Length")
-		authReq.Header.Del("Content-Disposition")
-		authReq.Header.Del("Accept-Encoding")
 
-		// Hop-by-hop headers. These are removed when sent to the backend.
-		// http://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html
-		authReq.Header.Del("Transfer-Encoding")
-		authReq.Header.Del("Connection")
-		authReq.Header.Del("Keep-Alive")
-		authReq.Header.Del("Proxy-Authenticate")
-		authReq.Header.Del("Proxy-Authorization")
-		authReq.Header.Del("Te")
-		authReq.Header.Del("Trailers")
-		authReq.Header.Del("Upgrade")
-	}
+	// Clean some headers when issuing a new request without body
+	authReq.Header.Del("Content-Type")
+	authReq.Header.Del("Content-Encoding")
+	authReq.Header.Del("Content-Length")
+	authReq.Header.Del("Content-Disposition")
+	authReq.Header.Del("Accept-Encoding")
+
+	// Hop-by-hop headers. These are removed when sent to the backend.
+	// http://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html
+	authReq.Header.Del("Transfer-Encoding")
+	authReq.Header.Del("Connection")
+	authReq.Header.Del("Keep-Alive")
+	authReq.Header.Del("Proxy-Authenticate")
+	authReq.Header.Del("Proxy-Authorization")
+	authReq.Header.Del("Te")
+	authReq.Header.Del("Trailers")
+	authReq.Header.Del("Upgrade")
 
 	// Also forward the Host header, which is excluded from the Header map by the http libary.
 	// This allows the Host header received by the backend to be consistent with other
@@ -227,7 +222,7 @@ func (api *API) newRequest(r *http.Request, body io.Reader, suffix string) (*htt
 //
 // authResponse will only be present if the authorization check was successful
 func (api *API) PreAuthorize(suffix string, r *http.Request) (httpResponse *http.Response, authResponse *Response, outErr error) {
-	authReq, err := api.newRequest(r, nil, suffix)
+	authReq, err := api.newRequest(r, suffix)
 	if err != nil {
 		return nil, nil, fmt.Errorf("preAuthorizeHandler newUpstreamRequest: %v", err)
 	}
