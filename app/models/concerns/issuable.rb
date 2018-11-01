@@ -365,7 +365,7 @@ module Issuable
   end
 
   ##
-  # Overriden in MergeRequest
+  # Overridden in MergeRequest
   #
   def wipless_title_changed(old_title)
     old_title != title

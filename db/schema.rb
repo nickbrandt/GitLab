@@ -11,7 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 20181017131623) do
+=======
+ActiveRecord::Schema.define(version: 20181031190559) do
+>>>>>>> upstream/master
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -1109,6 +1113,7 @@ ActiveRecord::Schema.define(version: 20181017131623) do
 
   add_index "forked_project_links", ["forked_to_project_id"], name: "index_forked_project_links_on_forked_to_project_id", unique: true, using: :btree
 
+<<<<<<< HEAD
   create_table "gcp_clusters", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "user_id"
@@ -1355,6 +1360,8 @@ ActiveRecord::Schema.define(version: 20181017131623) do
 
   add_index "geo_upload_deleted_events", ["upload_id"], name: "index_geo_upload_deleted_events_on_upload_id", using: :btree
 
+=======
+>>>>>>> upstream/master
   create_table "gpg_key_subkeys", force: :cascade do |t|
     t.integer "gpg_key_id", null: false
     t.binary "keyid"
@@ -3275,6 +3282,7 @@ ActiveRecord::Schema.define(version: 20181017131623) do
   add_foreign_key "fork_network_members", "projects", on_delete: :cascade
   add_foreign_key "fork_networks", "projects", column: "root_project_id", name: "fk_e7b436b2b5", on_delete: :nullify
   add_foreign_key "forked_project_links", "projects", column: "forked_to_project_id", name: "fk_434510edb0", on_delete: :cascade
+<<<<<<< HEAD
   add_foreign_key "gcp_clusters", "projects", on_delete: :cascade
   add_foreign_key "gcp_clusters", "services", on_delete: :nullify
   add_foreign_key "gcp_clusters", "users", on_delete: :nullify
@@ -3300,6 +3308,8 @@ ActiveRecord::Schema.define(version: 20181017131623) do
   add_foreign_key "geo_repository_renamed_events", "projects", on_delete: :cascade
   add_foreign_key "geo_repository_updated_events", "projects", on_delete: :cascade
   add_foreign_key "geo_reset_checksum_events", "projects", on_delete: :cascade
+=======
+>>>>>>> upstream/master
   add_foreign_key "gpg_key_subkeys", "gpg_keys", on_delete: :cascade
   add_foreign_key "gpg_keys", "users", on_delete: :cascade
   add_foreign_key "gpg_signatures", "gpg_key_subkeys", on_delete: :nullify
