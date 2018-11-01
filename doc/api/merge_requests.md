@@ -33,7 +33,7 @@ Parameters:
 | `state`             | string   | no       | Return all merge requests or just those that are `opened`, `closed`, `locked`, or `merged`                             |
 | `order_by`          | string   | no       | Return requests ordered by `created_at` or `updated_at` fields. Default is `created_at`                                |
 | `sort`              | string   | no       | Return requests sorted in `asc` or `desc` order. Default is `desc`                                                     |
-| `milestone`         | string   | no       | Return merge requests for a specific milestone                                                                         |
+| `milestone`         | string   | no       | Return merge requests for a specific milestone. `None` returns merge requests with no milestone. `Any` returns merge requests that have an assigned milestone. |
 | `view`              | string   | no       | If `simple`, returns the `iid`, URL, title, description, and basic state of merge request                              |
 | `labels`            | string   | no       | Return merge requests matching a comma separated list of labels                                                        |
 | `created_after`     | datetime | no       | Return merge requests created on or after the given time                                                               |
@@ -158,7 +158,7 @@ Parameters:
 | `state`             | string         | no       | Return all merge requests or just those that are `opened`, `closed`, `locked`, or `merged`                                     |
 | `order_by`          | string         | no       | Return requests ordered by `created_at` or `updated_at` fields. Default is `created_at`                                        |
 | `sort`              | string         | no       | Return requests sorted in `asc` or `desc` order. Default is `desc`                                                             |
-| `milestone`         | string         | no       | Return merge requests for a specific milestone                                                                                 |
+| `milestone`         | string         | no       | Return merge requests for a specific milestone. `None` returns merge requests with no milestone. `Any` returns merge requests that have an assigned milestone. |
 | `view`              | string         | no       | If `simple`, returns the `iid`, URL, title, description, and basic state of merge request                                      |
 | `labels`            | string         | no       | Return merge requests matching a comma separated list of labels                                                                |
 | `created_after`     | datetime       | no       | Return merge requests created on or after the given time                                                                       |
@@ -272,7 +272,7 @@ Parameters:
 | `state`             | string         | no       | Return all merge requests or just those that are `opened`, `closed`, `locked`, or `merged`                                     |
 | `order_by`          | string         | no       | Return merge requests ordered by `created_at` or `updated_at` fields. Default is `created_at`                                  |
 | `sort`              | string         | no       | Return merge requests sorted in `asc` or `desc` order. Default is `desc`                                                       |
-| `milestone`         | string         | no       | Return merge requests for a specific milestone                                                                                 |
+| `milestone`         | string         | no       | Return merge requests for a specific milestone. `None` returns merge requests with no milestone. `Any` returns merge requests that have an assigned milestone. |
 | `view`              | string         | no       | If `simple`, returns the `iid`, URL, title, description, and basic state of merge request                                      |
 | `labels`            | string         | no       | Return merge requests matching a comma separated list of labels                                                                |
 | `created_after`     | datetime       | no       | Return merge requests created on or after the given time                                                                       |
