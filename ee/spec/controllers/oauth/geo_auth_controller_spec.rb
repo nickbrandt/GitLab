@@ -2,9 +2,11 @@ require 'spec_helper'
 
 describe Oauth::GeoAuthController do
   let(:user) { create(:user) }
-  let(:oauth_app) { create(:doorkeeper_application) }
+  let(:node) { create(:geo_node) }
+  let(:oauth_app) { node.oauth_application }
   let(:access_token) { create(:doorkeeper_access_token, resource_owner_id: user.id, application: oauth_app) }
-  let(:auth_state) { Gitlab::Geo::OauthSession.new(access_token: access_token.token, return_to: projects_url).generate_oauth_state }
+  let(:oauth_session) { Gitlab::Geo::OauthSession.new(access_token: access_token.token, return_to: projects_url) }
+  let(:auth_state) { oauth_session.generate_oauth_state }
   let(:primary_node_url) { 'http://localhost:3001/' }
 
   before do
@@ -30,7 +32,8 @@ describe Oauth::GeoAuthController do
   end
 
   describe 'GET callback' do
-    let(:callback_state) { Gitlab::Geo::OauthSession.new(access_token: access_token.token, return_to: projects_url).generate_oauth_state }
+    let(:oauth_session) { Gitlab::Geo::OauthSession.new(access_token: access_token.token, return_to: projects_url) }
+    let(:callback_state) { oauth_session.generate_oauth_state }
     let(:primary_node_oauth_endpoint) { Gitlab::Geo::OauthSession.new.authorize_url(redirect_uri: oauth_geo_callback_url, state: callback_state) }
 
     context 'redirection' do
@@ -50,6 +53,12 @@ describe Oauth::GeoAuthController do
         get :callback, state: callback_state
 
         expect(response).to redirect_to(projects_url)
+      end
+
+      it 'does not display a flash message if state is valid' do
+        get :callback, state: callback_state
+
+        expect(controller).to set_flash[:alert].to(nil)
       end
     end
 

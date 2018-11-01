@@ -11,7 +11,6 @@ module Gitlab
         return false unless state
 
         salt, hmac, return_to = state.split(':', 3)
-
         return false unless return_to
 
         hmac == generate_oauth_hmac(salt, return_to)
@@ -29,7 +28,9 @@ module Gitlab
 
         cipher = logout_token_cipher(oauth_salt, :encrypt)
         encrypted = cipher.update(access_token) + cipher.final
-        self.state = "#{oauth_salt}:#{Base64.urlsafe_encode64(encrypted)}"
+        full_path = ReturnToLocation.new(return_to).full_path
+
+        self.state = "#{oauth_salt}:#{Base64.urlsafe_encode64(encrypted)}:#{full_path}"
       rescue OpenSSL::OpenSSLError
         false
       end
@@ -37,7 +38,8 @@ module Gitlab
       def extract_logout_token
         return unless state.present?
 
-        salt, encrypted = state.split(':', 2)
+        salt, encrypted, _ = state.split(':', 3)
+
         decipher = logout_token_cipher(salt, :decrypt)
         decipher.update(Base64.urlsafe_decode64(encrypted)) + decipher.final
       rescue OpenSSL::OpenSSLError
@@ -46,6 +48,10 @@ module Gitlab
 
       def get_oauth_state_return_to
         state.split(':', 3)[2] if state
+      end
+
+      def get_oauth_state_return_to_full_path
+        ReturnToLocation.new(get_oauth_state_return_to).full_path
       end
 
       def authorize_url(params = {})
@@ -64,6 +70,26 @@ module Gitlab
       end
 
       private
+
+      class ReturnToLocation < Struct.new(:location)
+        def full_path
+          uri = parse_uri(location)
+          full_path_for_uri(uri) if uri
+        end
+
+        private
+
+        def parse_uri(location)
+          location && URI.parse(location)
+        rescue URI::InvalidURIError
+          nil
+        end
+
+        def full_path_for_uri(uri)
+          path_with_query = [uri.path, uri.query].compact.join('?')
+          [path_with_query, uri.fragment].compact.join("#")
+        end
+      end
 
       def generate_oauth_hmac(salt, return_to)
         return false unless return_to
