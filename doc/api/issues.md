@@ -42,10 +42,7 @@ GET /issues?my_reaction_emoji=star
 | `author_id`         | integer          | no         | Return issues created by the given user `id`. Combine with `scope=all` or `scope=assigned_to_me`. _([Introduced][ce-13004] in GitLab 9.5)_          |
 | `assignee_id`       | integer          | no         | Return issues assigned to the given user `id`. `None` returns unassigned issues. `Any` returns issues with an assignee. _([Introduced][ce-13004] in GitLab 9.5)_ |
 | `my_reaction_emoji` | string           | no         | Return issues reacted by the authenticated user by the given `emoji`. `None` returns issues not given a reaction. `Any` returns issues given at least one reaction. _([Introduced][ce-14016] in GitLab 10.0)_ |
-<<<<<<< HEAD
 | `weight`            | integer          | no         | Return issues with the specified `weight`. `None` returns issues with no weight assigned. `Any` returns issues with a weight assigned.              |
-=======
->>>>>>> upstream/master
 | `iids[]`            | Array[integer]   | no         | Return only the issues having the given `iid`                                                                                                       |
 | `order_by`          | string           | no         | Return issues ordered by `created_at` or `updated_at` fields. Default is `created_at`                                                               |
 | `sort`              | string           | no         | Return issues sorted in `asc` or `desc` order. Default is `desc`                                                                                    |
@@ -161,10 +158,7 @@ GET /groups/:id/issues?my_reaction_emoji=star
 | `author_id`         | integer          | no         | Return issues created by the given user `id` _([Introduced][ce-13004] in GitLab 9.5)_                                         |
 | `assignee_id`       | integer          | no         | Return issues assigned to the given user `id`. `None` returns unassigned issues. `Any` returns issues with an assignee. _([Introduced][ce-13004] in GitLab 9.5)_ |
 | `my_reaction_emoji` | string           | no         | Return issues reacted by the authenticated user by the given `emoji`. `None` returns issues not given a reaction. `Any` returns issues given at least one reaction. _([Introduced][ce-14016] in GitLab 10.0)_ |
-<<<<<<< HEAD
 | `weight`            | integer          | no         | Return issues with the specified `weight`. `None` returns issues with no weight assigned. `Any` returns issues with a weight assigned. |
-=======
->>>>>>> upstream/master
 | `order_by`          | string           | no         | Return issues ordered by `created_at` or `updated_at` fields. Default is `created_at`                                         |
 | `sort`              | string           | no         | Return issues sorted in `asc` or `desc` order. Default is `desc`                                                              |
 | `search`            | string           | no         | Search group issues against their `title` and `description`                                                                   |
@@ -280,10 +274,7 @@ GET /projects/:id/issues?my_reaction_emoji=star
 | `author_id`         | integer          | no         | Return issues created by the given user `id` _([Introduced][ce-13004] in GitLab 9.5)_                                         |
 | `assignee_id`       | integer          | no         | Return issues assigned to the given user `id`. `None` returns unassigned issues. `Any` returns issues with an assignee. _([Introduced][ce-13004] in GitLab 9.5)_ |
 | `my_reaction_emoji` | string           | no         | Return issues reacted by the authenticated user by the given `emoji`. `None` returns issues not given a reaction. `Any` returns issues given at least one reaction. _([Introduced][ce-14016] in GitLab 10.0)_ |
-<<<<<<< HEAD
 | `weight`            | integer          | no         | Return issues with the specified `weight`. `None` returns issues with no weight assigned. `Any` returns issues with a weight assigned. |
-=======
->>>>>>> upstream/master
 | `order_by`          | string           | no         | Return issues ordered by `created_at` or `updated_at` fields. Default is `created_at`                                         |
 | `sort`              | string           | no         | Return issues sorted in `asc` or `desc` order. Default is `desc`                                                              |
 | `search`            | string           | no         | Search project issues against their `title` and `description`                                                                 |
