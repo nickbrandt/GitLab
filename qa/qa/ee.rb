@@ -72,15 +72,12 @@ module QA
       end
     end
 
-    module Factory
-      autoload :License, 'qa/ee/factory/license'
+    module Resource
+      autoload :License, 'qa/ee/resource/license'
+      autoload :Epic, 'qa/ee/resource/epic'
 
       module Geo
-        autoload :Node, 'qa/ee/factory/geo/node'
-      end
-
-      module Resource
-        autoload :Epic, 'qa/ee/factory/resource/epic'
+        autoload :Node, 'qa/ee/resource/geo/node'
       end
     end
 

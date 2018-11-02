@@ -9,12 +9,12 @@ module QA
         Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
           Page::Main::Login.act { sign_in_using_credentials }
 
-          project = Factory::Resource::Project.fabricate! do |project|
+          project = Resource::Project.fabricate! do |project|
             project.name = 'project-for-issues'
             project.description = 'project for adding issues'
           end
 
-          issue = Factory::Resource::Issue.fabricate! do |issue|
+          issue = Resource::Issue.fabricate! do |issue|
             issue.title = 'My geo issue'
             issue.project = project
           end

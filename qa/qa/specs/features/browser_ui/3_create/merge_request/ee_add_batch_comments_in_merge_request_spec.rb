@@ -7,11 +7,11 @@ module QA
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform(&:sign_in_using_credentials)
 
-        project = Factory::Resource::Project.fabricate! do |project|
+        project = Resource::Project.fabricate! do |project|
           project.name = 'project-with-merge-request'
         end
 
-        Factory::Resource::MergeRequest.fabricate! do |merge_request|
+        Resource::MergeRequest.fabricate! do |merge_request|
           merge_request.title = 'This is a merge request'
           merge_request.description = 'Great feature'
           merge_request.project = project
