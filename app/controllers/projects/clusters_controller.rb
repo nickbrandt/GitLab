@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Projects::ClustersController < Clusters::ClustersController
-<<<<<<< HEAD
   prepend EE::Projects::ClustersController
 
   include ProjectUnauthorized
@@ -9,13 +8,6 @@ class Projects::ClustersController < Clusters::ClustersController
   prepend_before_action :project
   before_action :repository
 
-=======
-  include ProjectUnauthorized
-
-  prepend_before_action :project
-  before_action :repository
-
->>>>>>> upstream/master
   layout 'project'
 
   private

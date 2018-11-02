@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 
 module ClustersHelper
-<<<<<<< HEAD
   prepend EE::ClustersHelper
 
-=======
->>>>>>> upstream/master
   # EE overrides this
   def has_multiple_clusters?
     false
