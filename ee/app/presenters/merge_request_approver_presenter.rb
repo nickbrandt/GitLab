@@ -40,14 +40,7 @@ class MergeRequestApproverPresenter < Gitlab::View::Presenter::Simple
   private
 
   def users
-    return @users if defined?(@users)
-
-    load_users
-    @users
-  end
-
-  def load_users
-    set_users_from_git_log_authors
+    @users ||= users_from_git_log_authors
   end
 
   def code_owner_enabled?
@@ -56,8 +49,12 @@ class MergeRequestApproverPresenter < Gitlab::View::Presenter::Simple
     end
   end
 
-  def set_users_from_git_log_authors
-    @users = ::Gitlab::AuthorityAnalyzer.new(merge_request, skip_user).calculate.first(merge_request.approvals_required)
+  def users_from_git_log_authors
+    if merge_request.approvals_required > 0
+      ::Gitlab::AuthorityAnalyzer.new(merge_request, skip_user).calculate.first(merge_request.approvals_required)
+    else
+      []
+    end
   end
 
   def code_owner_loader
