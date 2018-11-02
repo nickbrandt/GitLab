@@ -3721,6 +3721,15 @@ msgstr ""
 msgid "Geo|All projects"
 msgstr ""
 
+msgid "Geo|All projects are being scheduled for re-check"
+msgstr ""
+
+msgid "Geo|All projects are being scheduled for re-sync"
+msgstr ""
+
+msgid "Geo|Batch operations"
+msgstr ""
+
 msgid "Geo|Could not remove tracking entry for an existing project."
 msgstr ""
 
@@ -3778,6 +3787,9 @@ msgstr ""
 msgid "Geo|Recheck"
 msgstr ""
 
+msgid "Geo|Recheck all projects"
+msgstr ""
+
 msgid "Geo|Redownload"
 msgstr ""
 
@@ -3788,6 +3800,9 @@ msgid "Geo|Repository sync capacity"
 msgstr ""
 
 msgid "Geo|Resync"
+msgstr ""
+
+msgid "Geo|Resync all projects"
 msgstr ""
 
 msgid "Geo|Retry count"

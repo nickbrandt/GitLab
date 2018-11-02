@@ -161,6 +161,9 @@
 - cronjob:update_all_mirrors
 - cronjob:pseudonymizer
 
+- geo:geo_batch_project_registry
+- geo:geo_batch_project_registry_scheduler
+
 - geo:geo_scheduler_scheduler
 - geo:geo_scheduler_primary_scheduler
 - geo:geo_scheduler_secondary_scheduler
