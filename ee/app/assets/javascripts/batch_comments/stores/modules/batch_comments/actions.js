@@ -1,7 +1,9 @@
 import flash from '~/flash';
 import { __ } from '~/locale';
+import { scrollToElement } from '~/lib/utils/common_utils';
 import service from '../../../services/drafts_service';
 import * as types from './mutation_types';
+import { CHANGES_TAB, DISCUSSION_TAB, SHOW_TAB } from '../../../constants';
 
 export const enableBatchComments = ({ commit }) => {
   commit(types.ENABLE_BATCH_COMMENTS);
@@ -93,6 +95,47 @@ export const updateDraft = ({ commit, getters }, { note, noteText, callback }) =
     .then(data => commit(types.RECEIVE_DRAFT_UPDATE_SUCCESS, data))
     .then(callback)
     .catch(() => flash(__('An error occurred while updating the comment')));
+
+export const scrollToDraft = ({ dispatch, rootGetters }, draft) => {
+  const discussion = draft.discussion_id && rootGetters.getDiscussion(draft.discussion_id);
+  const tab =
+    draft.file_hash || (discussion && discussion.diff_discussion) ? CHANGES_TAB : SHOW_TAB;
+  const tabEl = tab === CHANGES_TAB ? CHANGES_TAB : DISCUSSION_TAB;
+  const draftID = `note_${draft.id}`;
+  const el = document.querySelector(`#${tabEl} #${draftID}`);
+
+  dispatch('closeReviewDropdown');
+
+  window.location.hash = draftID;
+
+  if (window.mrTabs.currentAction !== tab) {
+    window.mrTabs.tabShown(tab);
+  }
+
+  if (discussion) {
+    dispatch('expandDiscussion', { discussionId: discussion.id }, { root: true });
+  }
+
+  if (el) {
+    setTimeout(() => scrollToElement(el.closest('.draft-note-component')));
+  }
+};
+
+export const toggleReviewDropdown = ({ dispatch, state }) => {
+  if (state.showPreviewDropdown) {
+    dispatch('closeReviewDropdown');
+  } else {
+    dispatch('openReviewDropdown');
+  }
+};
+
+export const openReviewDropdown = ({ commit }) => commit(types.OPEN_REVIEW_DROPDOWN);
+export const closeReviewDropdown = ({ commit }) => commit(types.CLOSE_REVIEW_DROPDOWN);
+
+export const expandAllDiscussions = ({ dispatch, state }) =>
+  state.drafts.filter(draft => draft.discussion_id).forEach(draft => {
+    dispatch('expandDiscussion', { discussionId: draft.discussion_id }, { root: true });
+  });
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

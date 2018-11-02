@@ -53,6 +53,7 @@ describe 'Merge request > Batch comments', :js do
       write_comment
 
       page.within('.review-bar-content') do
+        click_button 'Finish review'
         click_button 'Submit review'
       end
 
@@ -155,6 +156,7 @@ describe 'Merge request > Batch comments', :js do
         write_reply_to_discussion(resolve: true)
 
         page.within('.review-bar-content') do
+          click_button 'Finish review'
           click_button 'Submit review'
         end
 
@@ -197,6 +199,7 @@ describe 'Merge request > Batch comments', :js do
         write_reply_to_discussion(button_text: 'Start a review', unresolve: true)
 
         page.within('.review-bar-content') do
+          click_button 'Finish review'
           click_button 'Submit review'
         end
 
