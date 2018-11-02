@@ -1,12 +1,14 @@
 import Vue from 'vue';
 import MockAdapater from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
+
 import component from 'ee/security_dashboard/components/security_dashboard_table.vue';
 import createStore from 'ee/security_dashboard/store';
-import mockDataVulnerabilities from 'ee/security_dashboard/store/modules/vulnerabilities/mock_data_vulnerabilities.json';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import waitForPromises from 'spec/helpers/wait_for_promises';
+
 import { resetStore } from '../helpers';
+import mockDataVulnerabilities from '../store/vulnerabilities/data/mock_data_vulnerabilities.json';
 
 describe('Security Dashboard Table', () => {
   const Component = Vue.extend(component);

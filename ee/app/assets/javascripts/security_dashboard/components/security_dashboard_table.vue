@@ -19,7 +19,7 @@ export default {
     this.fetchVulnerabilities();
   },
   methods: {
-    ...mapActions('vulnerabilities', ['fetchVulnerabilities']),
+    ...mapActions('vulnerabilities', ['fetchVulnerabilities', 'openModal']),
   },
 };
 </script>
@@ -63,6 +63,7 @@ export default {
         v-for="vulnerability in vulnerabilities"
         :key="vulnerability.id"
         :vulnerability="vulnerability"
+        @openModal="openModal({ vulnerability })"
       />
 
       <pagination
