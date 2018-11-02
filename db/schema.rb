@@ -3011,6 +3011,16 @@ ActiveRecord::Schema.define(version: 20181031190559) do
   add_index "users", ["username"], name: "index_users_on_username", using: :btree
   add_index "users", ["username"], name: "index_users_on_username_trigram", using: :gin, opclasses: {"username"=>"gin_trgm_ops"}
 
+  create_table "users_ops_dashboard_projects", id: :bigserial, force: :cascade do |t|
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.integer "user_id", null: false
+    t.integer "project_id", null: false
+  end
+
+  add_index "users_ops_dashboard_projects", ["project_id"], name: "index_users_ops_dashboard_projects_on_project_id", using: :btree
+  add_index "users_ops_dashboard_projects", ["user_id", "project_id"], name: "index_users_ops_dashboard_projects_on_user_id_and_project_id", unique: true, using: :btree
+
   create_table "users_star_projects", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "user_id", null: false
@@ -3412,6 +3422,8 @@ ActiveRecord::Schema.define(version: 20181031190559) do
   add_foreign_key "user_statuses", "users", on_delete: :cascade
   add_foreign_key "user_synced_attributes_metadata", "users", on_delete: :cascade
   add_foreign_key "users", "application_setting_terms", column: "accepted_term_id", name: "fk_789cd90b35", on_delete: :cascade
+  add_foreign_key "users_ops_dashboard_projects", "projects", on_delete: :cascade
+  add_foreign_key "users_ops_dashboard_projects", "users", on_delete: :cascade
   add_foreign_key "users_star_projects", "projects", name: "fk_22cd27ddfc", on_delete: :cascade
   add_foreign_key "vulnerability_feedback", "ci_pipelines", column: "pipeline_id", on_delete: :nullify
   add_foreign_key "vulnerability_feedback", "issues", on_delete: :nullify

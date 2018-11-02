@@ -37,7 +37,7 @@ module EE
       end
 
       def file_template_project_visible?
-        ProjectsFinder.new(
+        ::ProjectsFinder.new(
           current_user: current_user,
           project_ids_relation: [params[:file_template_project_id]]
         ).execute.exists?
