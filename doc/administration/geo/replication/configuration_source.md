@@ -1,7 +1,8 @@
 # Geo configuration (source)
 
 NOTE: **Note:**
-This is the documentation for installations from source. For installations
+This documentation applies to GitLab source installations. In GitLab 11.5, this documentation was deprecated and will be removed in a future release.
+Please consider [migrating to GitLab Omnibus install](https://docs.gitlab.com/omnibus/update/convert_to_omnibus.html). For installations
 using the Omnibus GitLab packages, follow the
 [**Omnibus Geo nodes configuration**][configuration] guide.
 
@@ -122,7 +123,7 @@ replicating missing data from the primary in a process known as backfill.
 Meanwhile, the primary node will start to notify the secondary of any changes, so
 that the secondary can act on those notifications immediately.
 
-Make sure the secondary instance is running and accessible. 
+Make sure the secondary instance is running and accessible.
 You can login to the secondary node with the same credentials as used in the primary.
 
 ### Step 4. Enabling hashed storage (from GitLab 10.0)
