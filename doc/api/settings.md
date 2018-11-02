@@ -249,9 +249,9 @@ are listed in the descriptions of the relevant settings.
 | `signin_enabled`                         | string           | no                                   | (Deprecated: Use `password_authentication_enabled_for_web` instead) Flag indicating if password authentication is enabled for the web interface. |
 | `signup_enabled`                         | boolean          | no                                   | Enable registration. Default is `true`. |
 | `slack_app_enabled`                      | boolean          | no                                   | **(Premium)** (**If enabled, requires:** `slack_app_id`, `slack_app_secret` and `slack_app_secret`) Enable Slack app. |
-| `slack_app_id`                           | string           | required by: slack_app_enabled`      | **(Premium)** The app id of the Slack-app. |
-| `slack_app_secret`                       | string           | required by: slack_app_enabled`      | **(Premium)** The app secret of the Slack-app. |
-| `slack_app_verification_token`           | string           | required by: slack_app_enabled`      | **(Premium)** The verification token of the Slack-app. |
+| `slack_app_id`                           | string           | required by: `slack_app_enabled`      | **(Premium)** The app id of the Slack-app. |
+| `slack_app_secret`                       | string           | required by: `slack_app_enabled`      | **(Premium)** The app secret of the Slack-app. |
+| `slack_app_verification_token`           | string           | required by: `slack_app_enabled`      | **(Premium)** The verification token of the Slack-app. |
 | `terminal_max_session_time`              | integer          | no                                   | Maximum time for web terminal websocket connection (in seconds). Set to `0` for unlimited time. |
 | `terms`                                  | text             | required by: `enforce_terms`         | (**Required by:** `enforce_terms`) Markdown content for the ToS. |
 | `throttle_authenticated_api_enabled`     | boolean          | no                                   | (**If enabled, requires:** `throttle_authenticated_api_period_in_seconds` and `throttle_authenticated_api_requests_per_period`) Enable authenticated API request rate limit. Helps reduce request volume (e.g. from crawlers or abusive bots). |
