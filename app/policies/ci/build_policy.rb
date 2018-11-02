@@ -2,8 +2,6 @@
 
 module Ci
   class BuildPolicy < CommitStatusPolicy
-    prepend EE::Ci::BuildPolicy
-
     condition(:protected_ref) do
       access = ::Gitlab::UserAccess.new(@user, project: @subject.project)
 
@@ -41,3 +39,5 @@ module Ci
     rule { can?(:update_build) & terminal }.enable :create_build_terminal
   end
 end
+
+Ci::BuildPolicy.prepend(EE::Ci::BuildPolicy)
