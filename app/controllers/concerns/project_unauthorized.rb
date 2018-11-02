@@ -2,6 +2,7 @@
 
 module ProjectUnauthorized
   prepend EE::ProjectUnauthorized
+
   extend ActiveSupport::Concern
 
   # EE would override this
