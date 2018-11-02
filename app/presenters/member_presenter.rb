@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class MemberPresenter < Gitlab::View::Presenter::Delegated
-  prepend EE::MemberPresenter
-
   presents :member
 
   def access_level_roles
@@ -40,3 +38,5 @@ class MemberPresenter < Gitlab::View::Presenter::Delegated
     raise NotImplementedError
   end
 end
+
+MemberPresenter.prepend(EE::MemberPresenter)
