@@ -13,6 +13,10 @@ module EE
       end
 
       prepended do
+        # This before_action needs to be redefined so we can use the new values
+        # from `admin_not_required_endpoints`.
+        before_action :authorize_admin_group_member!, except: admin_not_required_endpoints
+
         before_action :authorize_update_group_member!, only: [:update, :override]
       end
 

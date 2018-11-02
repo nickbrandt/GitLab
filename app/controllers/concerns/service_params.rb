@@ -2,8 +2,6 @@
 
 module ServiceParams
   extend ActiveSupport::Concern
-  prepend EE::ServiceParams
-
   ALLOWED_PARAMS_CE = [
     :active,
     :add_pusher,
@@ -86,3 +84,5 @@ module ServiceParams
     ALLOWED_PARAMS_CE
   end
 end
+
+ServiceParams.prepend(EE::ServiceParams)
