@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class GlobalPolicy < BasePolicy
+  prepend EE::GlobalPolicy
+
   desc "User is blocked"
   with_options scope: :user, score: 0
   condition(:blocked) { @user&.blocked? }

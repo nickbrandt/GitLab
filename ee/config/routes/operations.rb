@@ -1,4 +1,6 @@
 # frozen_string_literal: true
 
-# Placeholder for https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/7341
-# Added to resolve https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/8131
+get 'operations' => 'operations#index'
+get 'operations/list' => 'operations#list'
+post 'operations' => 'operations#create', as: :add_operations_project
+delete 'operations' => 'operations#destroy', as: :remove_operations_project

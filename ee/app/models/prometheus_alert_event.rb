@@ -47,6 +47,18 @@ class PrometheusAlertEvent < ActiveRecord::Base
   scope :firing, -> { where(status: status_value_for(:firing)) }
   scope :resolved, -> { where(status: status_value_for(:resolved)) }
 
+  scope :for_environment, -> (environment) do
+    joins(:prometheus_alert).where(prometheus_alerts: { environment_id: environment })
+  end
+
+  scope :count_by_project_id, -> { group(:project_id).count }
+  scope :with_prometheus_alert, -> { includes(:prometheus_alert) }
+
+  def self.last_by_project_id
+    ids = select(arel_table[:id].maximum.as('id')).group(:project_id).map(&:id)
+    with_prometheus_alert.find(ids)
+  end
+
   def self.find_or_initialize_by_payload_key(project, alert, payload_key)
     find_or_initialize_by(project: project, prometheus_alert: alert, payload_key: payload_key)
   end

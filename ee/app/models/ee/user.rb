@@ -35,6 +35,9 @@ module EE
 
       has_many :developer_groups, -> { where(members: { access_level: ::Gitlab::Access::DEVELOPER }) }, through: :group_members, source: :group
 
+      has_many :users_ops_dashboard_projects
+      has_many :ops_dashboard_projects, through: :users_ops_dashboard_projects, source: :project
+
       # Protected Branch Access
       has_many :protected_branch_merge_access_levels, dependent: :destroy, class_name: ::ProtectedBranch::MergeAccessLevel # rubocop:disable Cop/ActiveRecordDependent
       has_many :protected_branch_push_access_levels, dependent: :destroy, class_name: ::ProtectedBranch::PushAccessLevel # rubocop:disable Cop/ActiveRecordDependent
@@ -122,10 +125,10 @@ module EE
     def available_custom_project_templates(search: nil)
       templates = ::Gitlab::CurrentSettings.available_custom_project_templates
 
-      ProjectsFinder.new(current_user: self,
-                         project_ids_relation: templates,
-                         params: { search: search, sort: 'name_asc' })
-                    .execute
+      ::ProjectsFinder.new(current_user: self,
+                           project_ids_relation: templates,
+                           params: { search: search, sort: 'name_asc' })
+                      .execute
     end
 
     def roadmap_layout

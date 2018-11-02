@@ -32,6 +32,9 @@ msgid_plural " improved on %d points"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "\"%{query}\" in projects"
+msgstr ""
+
 msgid "%d addition"
 msgid_plural "%d additions"
 msgstr[0] ""
@@ -114,6 +117,9 @@ msgid "%{commit_author_link} authored %{commit_timeago}"
 msgstr ""
 
 msgid "%{counter_storage} (%{counter_repositories} repositories, %{counter_build_artifacts} build artifacts, %{counter_lfs_objects} LFS)"
+msgstr ""
+
+msgid "%{count} %{alerts}"
 msgstr ""
 
 msgid "%{count} participant"
@@ -406,6 +412,9 @@ msgstr ""
 msgid "Add new directory"
 msgstr ""
 
+msgid "Add projects"
+msgstr ""
+
 msgid "Add reaction"
 msgstr ""
 
@@ -498,6 +507,11 @@ msgstr ""
 
 msgid "Advanced settings"
 msgstr ""
+
+msgid "Alert"
+msgid_plural "Alerts"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "All"
 msgstr ""
@@ -5562,6 +5576,15 @@ msgstr ""
 msgid "Operations Dashboard"
 msgstr ""
 
+msgid "OperationsDashboard|Add a project to the dashboard"
+msgstr ""
+
+msgid "OperationsDashboard|Some projects could not be added to dashboard"
+msgstr ""
+
+msgid "OperationsDashboard|The operations dashboard provides a summary of each project's operational health, including pipeline and alert status."
+msgstr ""
+
 msgid "Optionally, you can %{link_to_customize} how FogBugz email addresses and usernames are imported into GitLab."
 msgstr ""
 
@@ -6952,6 +6975,9 @@ msgstr ""
 msgid "Search users"
 msgstr ""
 
+msgid "Search your projects"
+msgstr ""
+
 msgid "SearchAutocomplete|All GitLab"
 msgstr ""
 
@@ -7305,10 +7331,22 @@ msgstr ""
 msgid "Something went wrong while resolving this discussion. Please try again."
 msgstr ""
 
+msgid "Something went wrong, unable to add %{project} to dashboard"
+msgstr ""
+
+msgid "Something went wrong, unable to get operations projects"
+msgstr ""
+
+msgid "Something went wrong, unable to remove project"
+msgstr ""
+
 msgid "Something went wrong. Please try again."
 msgstr ""
 
 msgid "Sorry, no epics matched your search"
+msgstr ""
+
+msgid "Sorry, no projects matched your search"
 msgstr ""
 
 msgid "Sort by"
@@ -8592,6 +8630,9 @@ msgstr ""
 msgid "Version"
 msgstr ""
 
+msgid "View %{alerts}"
+msgstr ""
+
 msgid "View app"
 msgstr ""
 
@@ -9623,6 +9664,11 @@ msgstr ""
 
 msgid "private key does not match certificate."
 msgstr ""
+
+msgid "project"
+msgid_plural "projects"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "remaining"
 msgstr ""
