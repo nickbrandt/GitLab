@@ -3,8 +3,6 @@
 # Worker for updating any project specific caches.
 class ProjectCacheWorker
   include ApplicationWorker
-  prepend EE::Workers::ProjectCacheWorker
-
   LEASE_TIMEOUT = 15.minutes.to_i
 
   # project_id - The ID of the project for which to flush the cache.
@@ -43,3 +41,5 @@ class ProjectCacheWorker
       .try_obtain
   end
 end
+
+ProjectCacheWorker.prepend(EE::Workers::ProjectCacheWorker)

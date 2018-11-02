@@ -5,8 +5,6 @@ class RepositoryImportWorker
   include ExceptionBacktrace
   include ProjectStartImport
   include ProjectImportOptions
-  prepend EE::RepositoryImportWorker
-
   def perform(project_id)
     @project = Project.find(project_id)
 
@@ -49,3 +47,5 @@ class RepositoryImportWorker
     project.gitlab_project_import?
   end
 end
+
+RepositoryImportWorker.prepend(EE::RepositoryImportWorker)
