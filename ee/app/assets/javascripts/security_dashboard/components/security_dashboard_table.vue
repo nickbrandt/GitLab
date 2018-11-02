@@ -10,9 +10,18 @@ export default {
     SecurityDashboardTableRow,
   },
   computed: {
-    ...mapState('vulnerabilities', ['vulnerabilities', 'pageInfo', 'isLoadingVulnerabilities']),
+    ...mapState('vulnerabilities', [
+      'vulnerabilities',
+      'pageInfo',
+      'isLoadingVulnerabilities',
+      'errorLoadingVulnerabilities',
+      'errorLoadingVulnerabilitiesCount',
+    ]),
     showPagination() {
       return this.pageInfo && this.pageInfo.total;
+    },
+    showError() {
+      return this.errorLoadingVulnerabilities && !this.errorLoadingVulnerabilitiesCount;
     },
   },
   created() {
@@ -47,6 +56,16 @@ export default {
         role="rowheader"
       >
         {{ s__('Reports|Confidence') }}
+      </div>
+    </div>
+    
+    <div class="flash-container">
+      <div 
+        v-if="showError" 
+        class="flash-alert">
+        <div class="flash-text container-fluid container-limited limit-container-width">
+          {{ s__('Security Dashboard|Error fetching the vulnerability list. Please check your network connection and try again.') }}
+        </div>
       </div>
     </div>
 

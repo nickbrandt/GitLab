@@ -9,7 +9,7 @@ export default {
   },
   [types.REQUEST_VULNERABILITIES](state) {
     state.isLoadingVulnerabilities = true;
-    state.hasError = false;
+    state.errorLoadingVulnerabilities = false;
   },
   [types.RECEIVE_VULNERABILITIES_SUCCESS](state, payload) {
     state.isLoadingVulnerabilities = false;
@@ -18,14 +18,14 @@ export default {
   },
   [types.RECEIVE_VULNERABILITIES_ERROR](state) {
     state.isLoadingVulnerabilities = false;
-    state.hasError = true;
+    state.errorLoadingVulnerabilities = true;
   },
   [types.SET_VULNERABILITIES_COUNT_ENDPOINT](state, payload) {
     state.vulnerabilitiesCountEndpoint = payload;
   },
   [types.REQUEST_VULNERABILITIES_COUNT](state) {
     state.isLoadingVulnerabilitiesCount = true;
-    state.hasError = false;
+    state.errorLoadingVulnerabilitiesCount = false;
   },
   [types.RECEIVE_VULNERABILITIES_COUNT_SUCCESS](state, payload) {
     state.isLoadingVulnerabilitiesCount = false;
@@ -33,7 +33,7 @@ export default {
   },
   [types.RECEIVE_VULNERABILITIES_COUNT_ERROR](state) {
     state.isLoadingVulnerabilitiesCount = false;
-    state.hasError = true;
+    state.errorLoadingVulnerabilitiesCount = true;
   },
   [types.SET_MODAL_DATA](state, payload) {
     const { vulnerability } = payload;
