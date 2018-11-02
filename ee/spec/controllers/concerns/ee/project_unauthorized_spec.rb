@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe EE::Projects::ApplicationController do
+describe EE::ProjectUnauthorized do
   include ExternalAuthorizationServiceHelpers
   let(:user) { create(:user) }
 
@@ -10,7 +10,7 @@ describe EE::Projects::ApplicationController do
 
   render_views
 
-  describe '#handle_not_found_or_authorized' do
+  describe '#project_unauthorized_proc' do
     controller(::Projects::ApplicationController) do
       def show
         render nothing: true
