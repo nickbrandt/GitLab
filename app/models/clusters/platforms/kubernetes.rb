@@ -8,8 +8,6 @@ module Clusters
       include EnumWithNil
       include AfterCommitQueue
 
-      prepend EE::KubernetesService
-
       RESERVED_NAMESPACES = %w(gitlab-managed-apps).freeze
 
       self.table_name = 'cluster_platforms_kubernetes'
@@ -240,3 +238,5 @@ module Clusters
     end
   end
 end
+
+Clusters::Platforms::Kubernetes.prepend(EE::KubernetesService)

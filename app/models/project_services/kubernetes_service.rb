@@ -9,8 +9,6 @@ class KubernetesService < DeploymentService
   include Gitlab::Kubernetes
   include ReactiveCaching
 
-  prepend EE::KubernetesService
-
   self.reactive_cache_key = ->(service) { [service.class.model_name.singular, service.project_id] }
 
   # Namespace defaults to the project path, but can be overridden in case that
@@ -254,3 +252,5 @@ class KubernetesService < DeploymentService
     end
   end
 end
+
+KubernetesService.prepend(EE::KubernetesService)

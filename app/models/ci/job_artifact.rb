@@ -2,8 +2,6 @@
 
 module Ci
   class JobArtifact < ActiveRecord::Base
-    prepend EE::Ci::JobArtifact
-
     include AfterCommitQueue
     include ObjectStorage::BackgroundMove
     extend Gitlab::Ci::Model
@@ -192,3 +190,5 @@ module Ci
     end
   end
 end
+
+Ci::JobArtifact.prepend(EE::Ci::JobArtifact)

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class NotificationSetting < ActiveRecord::Base
-  prepend EE::NotificationSetting
   include IgnorableColumn
 
   ignore_column :events
@@ -88,3 +87,5 @@ class NotificationSetting < ActiveRecord::Base
     respond_to?(event) && !!public_send(event) # rubocop:disable GitlabSecurity/PublicSend
   end
 end
+
+NotificationSetting.prepend(EE::NotificationSetting)

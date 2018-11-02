@@ -4,7 +4,7 @@
 #
 # A note of this type can be resolvable.
 class DiscussionNote < Note
-  prepend EE::DiscussionNote
+  prepend EE::DiscussionNote # This prepend must stay here because the `validates` below depends on it.
 
   # Names of all implementers of `Noteable` that support discussions.
   def self.noteable_types

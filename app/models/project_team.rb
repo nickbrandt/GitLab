@@ -3,8 +3,6 @@
 class ProjectTeam
   include BulkMemberAccessLoad
 
-  prepend EE::ProjectTeam
-
   attr_accessor :project
 
   def initialize(project)
@@ -194,3 +192,5 @@ class ProjectTeam
     project.group
   end
 end
+
+ProjectTeam.prepend(EE::ProjectTeam)

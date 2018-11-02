@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Namespace < ActiveRecord::Base
-  prepend EE::Namespace
   include CacheMarkdownField
   include Sortable
   include Gitlab::ShellAdapter
@@ -311,3 +310,5 @@ class Namespace < ActiveRecord::Base
     end
   end
 end
+
+Namespace.prepend(EE::Namespace)

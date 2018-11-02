@@ -2,7 +2,6 @@
 
 module Mentionable
   module ReferenceRegexes
-    prepend EE::Mentionable::ReferenceRegexes
     extend Gitlab::Utils::StrongMemoize
 
     def self.reference_pattern(link_patterns, issue_pattern)
@@ -35,3 +34,5 @@ module Mentionable
     end
   end
 end
+
+Mentionable::ReferenceRegexes.prepend(EE::Mentionable::ReferenceRegexes)

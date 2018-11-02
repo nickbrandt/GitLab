@@ -3,7 +3,6 @@
 # To add new service you should build a class inherited from Service
 # and implement a set of methods
 class Service < ActiveRecord::Base
-  prepend EE::Service
   include Sortable
   include Importable
   include ProjectServicesLoggable
@@ -349,3 +348,5 @@ class Service < ActiveRecord::Base
     activated? && !importing?
   end
 end
+
+Service.prepend(EE::Service)

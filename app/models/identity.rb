@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Identity < ActiveRecord::Base
-  prepend EE::Identity
-
   include Sortable
   include CaseSensitivity
 
@@ -48,3 +46,5 @@ class Identity < ActiveRecord::Base
     user.user_synced_attributes_metadata&.destroy
   end
 end
+
+Identity.prepend(EE::Identity)

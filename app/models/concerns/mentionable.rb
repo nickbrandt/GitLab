@@ -10,8 +10,6 @@
 module Mentionable
   extend ActiveSupport::Concern
 
-  prepend EE::Mentionable
-
   class_methods do
     # Indicate which attributes of the Mentionable to search for GFM references.
     def attr_mentionable(attr, options = {})
@@ -171,3 +169,5 @@ module Mentionable
     {}
   end
 end
+
+Mentionable.prepend(EE::Mentionable)

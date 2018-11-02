@@ -6,8 +6,6 @@ class Appearance < ActiveRecord::Base
   include ObjectStorage::BackgroundMove
   include WithUploads
 
-  prepend EE::Appearance
-
   cache_markdown_field :description
   cache_markdown_field :new_project_guidelines
 
@@ -31,3 +29,5 @@ class Appearance < ActiveRecord::Base
     end
   end
 end
+
+Appearance.prepend(EE::Appearance)

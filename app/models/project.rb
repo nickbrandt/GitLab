@@ -33,8 +33,6 @@ class Project < ActiveRecord::Base
   extend Gitlab::Cache::RequestCache
 
   # EE specific modules
-  prepend EE::Project
-
   extend Gitlab::ConfigHelper
 
   BoardLimitExceeded = Class.new(StandardError)
@@ -2211,3 +2209,5 @@ class Project < ActiveRecord::Base
     @services_templates ||= Service.where(template: true)
   end
 end
+
+Project.prepend(EE::Project)

@@ -3,8 +3,6 @@
 class RemoteMirror < ActiveRecord::Base
   include AfterCommitQueue
 
-  prepend EE::RemoteMirror
-
   PROTECTED_BACKOFF_DELAY   = 1.minute
   UNPROTECTED_BACKOFF_DELAY = 5.minutes
 
@@ -229,3 +227,5 @@ class RemoteMirror < ActiveRecord::Base
     url_changed? || encrypted_credentials_changed?
   end
 end
+
+RemoteMirror.prepend(EE::RemoteMirror)

@@ -7,7 +7,6 @@
 #
 # A note of this type is never resolvable.
 class LegacyDiffNote < Note
-  prepend EE::LegacyDiffNote
   include NoteOnDiff
 
   serialize :st_diff # rubocop:disable Cop/ActiveRecordSerialize
@@ -112,3 +111,5 @@ class LegacyDiffNote < Note
     diffs.find { |d| d.new_path == self.diff.new_path }
   end
 end
+
+LegacyDiffNote.prepend(EE::LegacyDiffNote)

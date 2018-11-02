@@ -2,7 +2,6 @@
 
 # Blob is a Rails-specific wrapper around Gitlab::Git::Blob, SnippetBlob and Ci::ArtifactBlob
 class Blob < SimpleDelegator
-  prepend EE::Blob
   include Presentable
   include BlobLanguageFromGitAttributes
 
@@ -250,3 +249,5 @@ class Blob < SimpleDelegator
     classes.find { |viewer_class| viewer_class.can_render?(self, verify_binary: verify_binary) }
   end
 end
+
+Blob.prepend(EE::Blob)

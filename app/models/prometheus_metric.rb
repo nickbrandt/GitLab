@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class PrometheusMetric < ActiveRecord::Base
-  prepend EE::PrometheusMetric
-
   belongs_to :project, validate: true, inverse_of: :prometheus_metrics
 
   enum group: {
@@ -89,3 +87,5 @@ class PrometheusMetric < ActiveRecord::Base
     end
   end
 end
+
+PrometheusMetric.prepend(EE::PrometheusMetric)

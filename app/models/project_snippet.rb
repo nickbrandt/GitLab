@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class ProjectSnippet < Snippet
-  prepend EE::ProjectSnippet
-
   belongs_to :project
   belongs_to :author, class_name: "User"
 
@@ -14,3 +12,5 @@ class ProjectSnippet < Snippet
   participant :author
   participant :notes_with_associations
 end
+
+ProjectSnippet.prepend(EE::ProjectSnippet)
