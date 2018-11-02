@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class UserProjectAccessChangedService
-  prepend EE::UserProjectAccessChangedService
-
   def initialize(user_ids)
     @user_ids = Array.wrap(user_ids)
   end
@@ -17,3 +15,5 @@ class UserProjectAccessChangedService
     end
   end
 end
+
+UserProjectAccessChangedService.prepend(EE::UserProjectAccessChangedService)

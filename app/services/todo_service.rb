@@ -8,8 +8,6 @@
 #   TodoService.new.new_issue(issue, current_user)
 #
 class TodoService
-  prepend EE::TodoService
-
   # When create an issue we should:
   #
   #  * create a todo for assignee if issue is assigned
@@ -345,3 +343,5 @@ class TodoService
     PendingTodosFinder.new(user, criteria).execute
   end
 end
+
+TodoService.prepend(EE::TodoService)

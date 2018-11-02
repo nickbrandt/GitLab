@@ -2,7 +2,6 @@
 
 module Issues
   class UpdateService < Issues::BaseService
-    prepend EE::Issues::UpdateService
     include SpamCheckService
 
     def execute(issue)
@@ -112,3 +111,5 @@ module Issues
     end
   end
 end
+
+Issues::UpdateService.prepend(EE::Issues::UpdateService)

@@ -4,8 +4,6 @@ module Ci
   # This class responsible for assigning
   # proper pending build to runner on runner API request
   class RegisterJobService
-    prepend EE::Ci::RegisterJobService
-
     attr_reader :runner
 
     JOB_QUEUE_DURATION_SECONDS_BUCKETS = [1, 3, 10, 30].freeze
@@ -174,3 +172,5 @@ module Ci
     end
   end
 end
+
+Ci::RegisterJobService.prepend(EE::Ci::RegisterJobService)

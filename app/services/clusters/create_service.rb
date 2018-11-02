@@ -2,8 +2,6 @@
 
 module Clusters
   class CreateService
-    prepend EE::Clusters::CreateService
-
     attr_reader :current_user, :params
 
     def initialize(user = nil, params = {})
@@ -47,3 +45,5 @@ module Clusters
     end
   end
 end
+
+Clusters::CreateService.prepend(EE::Clusters::CreateService)
