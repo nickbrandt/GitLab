@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 module ProjectUnauthorized
+<<<<<<< HEAD
   prepend EE::ProjectUnauthorized
+=======
+>>>>>>> upstream/master
   extend ActiveSupport::Concern
 
   # EE would override this

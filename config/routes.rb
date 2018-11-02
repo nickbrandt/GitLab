@@ -99,9 +99,12 @@ Rails.application.routes.draw do
       end
 
       member do
+<<<<<<< HEAD
         # EE specific
         get :metrics, format: :json
 
+=======
+>>>>>>> upstream/master
         scope :applications do
           post '/:application', to: 'clusters/applications#create', as: :install_applications
         end
