@@ -47,10 +47,17 @@ module MigrationsHelpers
     # migrated the schema up, otherwise, column information could be
     # outdated. We have a separate method for this so we can override it in EE.
     active_record_base.descendants.each(&method(:reset_column_information))
+  end
 
-    # Without that, we get errors because of missing attributes, e.g.
+  def refresh_attribute_methods
+    # Without this, we get errors because of missing attributes, e.g.
     # super: no superclass method `elasticsearch_indexing' for #<ApplicationSetting:0x00007f85628508d8>
-    ApplicationSetting.define_attribute_methods
+    # attr_encrypted also expects ActiveRecord attribute methods to be
+    # defined, or it will override the accessors:
+    # https://gitlab.com/gitlab-org/gitlab-ee/issues/8234#note_113976421
+    [ApplicationSetting, SystemHook].each do |model|
+      model.define_attribute_methods
+    end
   end
 
   def reset_column_information(klass)
@@ -90,6 +97,7 @@ module MigrationsHelpers
     end
 
     reset_column_in_all_models
+    refresh_attribute_methods
   end
 
   def disable_migrations_output
