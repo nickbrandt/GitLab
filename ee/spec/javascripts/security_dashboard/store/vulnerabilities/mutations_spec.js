@@ -342,12 +342,12 @@ describe('vulnerabilities module mutations', () => {
     });
   });
 
-  describe('REQUEST_UNDO_DISMISSAL', () => {
+  describe('REQUEST_REVERT_DISMISSAL', () => {
     let state;
 
     beforeEach(() => {
       state = createState();
-      mutations[types.REQUEST_UNDO_DISMISSAL](state);
+      mutations[types.REQUEST_REVERT_DISMISSAL](state);
     });
 
     it('should set isDismissingVulnerability to true', () => {
@@ -363,7 +363,7 @@ describe('vulnerabilities module mutations', () => {
     });
   });
 
-  describe('RECEIVE_UNDO_DISMISSAL_SUCCESS', () => {
+  describe('RECEIVE_REVERT_DISMISSAL_SUCCESS', () => {
     let state;
     let payload;
     let vulnerability;
@@ -373,7 +373,7 @@ describe('vulnerabilities module mutations', () => {
       state.vulnerabilities = mockData;
       [vulnerability] = mockData;
       payload = { id: vulnerability.id };
-      mutations[types.RECEIVE_UNDO_DISMISSAL_SUCCESS](state, payload);
+      mutations[types.RECEIVE_REVERT_DISMISSAL_SUCCESS](state, payload);
     });
 
     it('should set the dismissal feedback on the passed vulnerability', () => {
@@ -393,12 +393,12 @@ describe('vulnerabilities module mutations', () => {
     });
   });
 
-  describe('RECEIVE_UNDO_DISMISSAL_ERROR', () => {
+  describe('RECEIVE_REVERT_DISMISSAL_ERROR', () => {
     let state;
 
     beforeEach(() => {
       state = createState();
-      mutations[types.RECEIVE_UNDO_DISMISSAL_ERROR](state);
+      mutations[types.RECEIVE_REVERT_DISMISSAL_ERROR](state);
     });
 
     it('should set isDismissingVulnerability to false', () => {
@@ -410,7 +410,7 @@ describe('vulnerabilities module mutations', () => {
     });
 
     it('should set the error state on the modal', () => {
-      expect(state.modal.error).toEqual('There was an error undoing the dismissal.');
+      expect(state.modal.error).toEqual('There was an error reverting the dismissal.');
     });
   });
 });
