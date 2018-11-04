@@ -16,9 +16,14 @@ module EE
         has_many :vulnerabilities, source: :occurrence, through: :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::Occurrence'
 
         # Legacy way to fetch security reports based on job name. This has been replaced by the reports feature.
-        scope :with_legacy_security_reports, -> {
+        scope :with_legacy_security_reports, -> do
           joins(:artifacts).where(ci_builds: { name: %w[sast dependency_scanning sast:container container_scanning dast] })
-        }
+        end
+
+        # The new `reports:` syntax reports
+        scope :with_security_reports, -> do
+          where('EXISTS (?)', Ci::Build.select(1).latest.with_security_reports.where('ci_pipelines.id=ci_build.commit_id'))
+        end
 
         # This structure describes feature levels
         # to access the file types for given reports
