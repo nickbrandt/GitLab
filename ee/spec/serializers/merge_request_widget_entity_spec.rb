@@ -77,7 +77,7 @@ describe MergeRequestWidgetEntity do
   describe '#license_management' do
     before do
       build = create(:ci_build, pipeline: pipeline)
-      create(:ee_ci_job_artifact, :license_management, build: build)
+      create(:ee_ci_job_artifact, :license_management, job: build)
     end
 
     it 'should not be included, if license management features are off' do

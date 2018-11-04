@@ -39,5 +39,7 @@ FactoryBot.define do
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
           Rails.root.join('spec/fixtures/trace/sample_trace'), 'text/plain')
+      end
+    end
   end
 end
