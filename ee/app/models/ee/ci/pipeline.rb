@@ -22,7 +22,7 @@ module EE
 
         # The new `reports:` syntax reports
         scope :with_security_reports, -> do
-          where('EXISTS (?)', Ci::Build.select(1).latest.with_security_reports.where('ci_pipelines.id=ci_build.commit_id'))
+          where('EXISTS (?)', ::Ci::Build.latest.with_security_reports.where('ci_pipelines.id=ci_builds.commit_id').select(1))
         end
 
         # This structure describes feature levels

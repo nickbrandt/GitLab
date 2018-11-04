@@ -194,22 +194,24 @@ module Ci
     #
     # ref - The name (or names) of the branch(es)/tag(s) to limit the list of
     #       pipelines to.
-    def self.newest_first(ref = nil)
+    # limit - This limits a backlog search, default to 100.
+    def self.newest_first(ref: nil, limit: 100)
       relation = order(id: :desc)
-
-      ref ? relation.where(ref: ref) : relation
+      relation = relation.where(ref: ref) if ref
+      relation = relation.where(id: relation.limit(limit).select(:id)) if limit
+      relation
     end
 
     def self.latest_status(ref = nil)
-      newest_first(ref).pluck(:status).first
+      newest_first(ref: ref).pluck(:status).first
     end
 
     def self.latest_successful_for(ref)
-      newest_first(ref).success.take
+      newest_first(ref: ref).success.take
     end
 
     def self.latest_successful_for_refs(refs)
-      relation = newest_first(refs).success
+      relation = newest_first(ref: refs).success
 
       relation.each_with_object({}) do |pipeline, hash|
         hash[pipeline.ref] ||= pipeline
