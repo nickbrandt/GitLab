@@ -39,16 +39,6 @@ export const hasTrace = state => state.job.has_trace || state.job.status.group =
 export const emptyStateIllustration = state =>
   (state.job && state.job.status && state.job.status.illustration) || {};
 
-/**
- * When the job is pending and there are no available runners
- * we need to render the stuck block;
- *
- * @returns {Boolean}
- */
-export const isJobStuck = state =>
-  state.job.status.group === 'pending' &&
-  (!_.isEmpty(state.job.runners) && state.job.runners.available === false);
-
 // ee-only start
 /**
  * Shared runners limit is only rendered when
@@ -61,6 +51,9 @@ export const shouldRenderSharedRunnerLimitWarning = state =>
   !_.isEmpty(state.job.runners.quota) &&
   state.job.runners.quota.used >= state.job.runners.quota.limit;
 // ee-only end
+
+export const hasRunnersForProject = state => state.job.runners.available
+  && !state.job.runners.online;
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

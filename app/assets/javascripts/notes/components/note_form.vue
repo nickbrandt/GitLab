@@ -204,7 +204,7 @@ js-autosize markdown-area js-vue-issue-note-form js-vue-textarea"
         class="note-form-actions clearfix"
       >
         <template
-          v-if="withBatchComments && noteId === ''"
+          v-if="showBatchCommentsActions"
         >
           <p
             v-if="discussion && discussion.id"

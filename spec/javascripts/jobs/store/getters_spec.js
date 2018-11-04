@@ -170,47 +170,6 @@ describe('Job Store Getters', () => {
     });
   });
 
-  describe('isJobStuck', () => {
-    describe('when job is pending and runners are not available', () => {
-      it('returns true', () => {
-        localState.job.status = {
-          group: 'pending',
-        };
-        localState.job.runners = {
-          available: false,
-        };
-
-        expect(getters.isJobStuck(localState)).toEqual(true);
-      });
-    });
-
-    describe('when job is not pending', () => {
-      it('returns false', () => {
-        localState.job.status = {
-          group: 'running',
-        };
-        localState.job.runners = {
-          available: false,
-        };
-
-        expect(getters.isJobStuck(localState)).toEqual(false);
-      });
-    });
-
-    describe('when runners are available', () => {
-      it('returns false', () => {
-        localState.job.status = {
-          group: 'pending',
-        };
-        localState.job.runners = {
-          available: true,
-        };
-
-        expect(getters.isJobStuck(localState)).toEqual(false);
-      });
-    });
-  });
-
   describe('shouldRenderSharedRunnerLimitWarning', () => {
     describe('without runners information', () => {
       it('returns false', () => {
@@ -259,6 +218,41 @@ describe('Job Store Getters', () => {
           };
           expect(getters.shouldRenderSharedRunnerLimitWarning(localState)).toEqual(true);
         });
+      });
+    });
+  });
+
+  describe('hasRunnersForProject', () => {
+    describe('with available and offline runners', () => {
+      it('returns true', () => {
+        localState.job.runners = {
+          available: true,
+          online: false,
+        };
+
+        expect(getters.hasRunnersForProject(localState)).toEqual(true);
+      });
+    });
+
+    describe('with non available runners', () => {
+      it('returns false', () => {
+        localState.job.runners = {
+          available: false,
+          online: false,
+        };
+
+        expect(getters.hasRunnersForProject(localState)).toEqual(false);
+      });
+    });
+
+    describe('with online runners', () => {
+      it('returns false', () => {
+        localState.job.runners = {
+          available: false,
+          online: true,
+        };
+
+        expect(getters.hasRunnersForProject(localState)).toEqual(false);
       });
     });
   });
