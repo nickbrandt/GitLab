@@ -1,5 +1,16 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.4.5 (2018-11-04)
+
+### Fixed (1 change)
+
+- Stops showing review actions on commit discussions in merge requests. !8007
+
+### Performance (1 change)
+
+- Add indexes to all geo event foreign keys. !7990
+
+
 ## 11.4.4 (2018-10-30)
 
 - No changes.
