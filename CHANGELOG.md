@@ -2,6 +2,21 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+## 11.4.5 (2018-11-04)
+
+### Fixed (5 changes, 1 of them is from the community)
+
+- Fix stuck job warning message. !8060
+- fix link to enable usage ping from convdev index. !22545 (Anand Capur)
+- Update gitlab-ui dependency to 1.8.0-hotfix.1 to fix IE11 bug.
+- Remove duplicate escape in job sidebar.
+- Fixed merge request fill tree toggling not respecting fluid width preference.
+
+### Other (1 change)
+
+- Fix stage dropdown not rendering in different languages.
+
+
 ## 11.4.4 (2018-10-30)
 
 ### Security (1 change)
