@@ -29,49 +29,10 @@ describe Ci::Pipeline do
 
     before do
       create(:ci_build, :legacy_sast, pipeline: pipeline_1)
-      create(
-        :ci_build,
-        :success,
-        :artifacts,
-        name: 'dependency_scanning',
-        pipeline: pipeline_2,
-        options: {
-          artifacts: {
-            paths: [Ci::JobArtifact::DEFAULT_FILE_NAMES[:dependency_scanning]]
-          }
-        }
-      )
-      create(
-        :ci_build,
-        :success,
-        :artifacts,
-        name: 'container_scanning',
-        pipeline: pipeline_3,
-        options: {
-          artifacts: {
-            paths: [Ci::JobArtifact::DEFAULT_FILE_NAMES[:container_scanning]]
-          }
-        }
-      )
-      create(
-        :ci_build,
-        :success,
-        :artifacts,
-        name: 'dast',
-        pipeline: pipeline_4,
-        options: {
-          artifacts: {
-            paths: [Ci::JobArtifact::DEFAULT_FILE_NAMES[:dast]]
-          }
-        }
-      )
-      create(
-        :ci_build,
-        :success,
-        :artifacts,
-        name: 'foobar',
-        pipeline: pipeline_5
-      )
+      create(:ci_build, :legacy_dependency_scanning, pipeline: pipeline_2)
+      create(:ci_build, :legacy_container_scanning, pipeline: pipeline_3)
+      create(:ci_build, :legacy_dast, pipeline: pipeline_4)
+      create(:ci_build, :success, :artifacts, name: 'foobar', pipeline: pipeline_5)
     end
 
     it "returns pipeline with security reports" do
