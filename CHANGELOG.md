@@ -4,9 +4,14 @@ entry.
 
 ## 11.4.5 (2018-11-04)
 
+<<<<<<< HEAD
 ### Fixed (5 changes, 1 of them is from the community)
 
 - Fix stuck job warning message. !8060
+=======
+### Fixed (4 changes, 1 of them is from the community)
+
+>>>>>>> upstream/master
 - fix link to enable usage ping from convdev index. !22545 (Anand Capur)
 - Update gitlab-ui dependency to 1.8.0-hotfix.1 to fix IE11 bug.
 - Remove duplicate escape in job sidebar.
