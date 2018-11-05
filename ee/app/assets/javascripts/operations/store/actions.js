@@ -53,6 +53,7 @@ export const requestAddProjectsToDashboardError = ({ state }) => {
 
 export const addProjectToken = ({ commit }, project) => {
   commit(types.ADD_PROJECT_TOKEN, project);
+  commit(types.SET_INPUT_VALUE, '');
 };
 
 export const clearProjectSearchResults = ({ commit }) => {
