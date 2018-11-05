@@ -46,13 +46,13 @@ export default {
 <template>
   <div v-show="draftsCount > 0">
     <nav class="review-bar-component">
-      <div class="review-bar-content">
+      <div class="review-bar-content qa-review-bar">
         <preview-dropdown />
         <loading-button
           v-gl-modal="$options.modalId"
           :loading="isDiscarding"
           :label="__('Discard review')"
-          class="float-right"
+          class="qa-discard-review float-right"
         />
       </div>
     </nav>
@@ -61,7 +61,7 @@ export default {
       :ok-title="s__('BatchComments|Delete all pending comments')"
       :modal-id="$options.modalId"
       title-tag="h4"
-      ok-variant="danger"
+      ok-variant="danger qa-modal-delete-pending-comments"
       @ok="discardReview"
     >
       <p v-html="$options.text">
