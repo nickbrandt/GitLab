@@ -1,0 +1,5 @@
+---
+title: Ensure LDAP Group Sync by Filter normalizes DNs
+merge_request:
+author:
+type: fixed

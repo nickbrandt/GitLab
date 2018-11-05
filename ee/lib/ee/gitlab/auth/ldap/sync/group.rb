@@ -123,7 +123,7 @@ module EE
             end
 
             def get_member_dns(group_link)
-              group_link.cn ? dns_for_group_cn(group_link.cn) : UserFilter.filter(@proxy, group_link.filter)
+              group_link.cn ? dns_for_group_cn(group_link.cn) : proxy.dns_for_filter(group_link.filter)
             end
 
             def dns_for_group_cn(group_cn)
@@ -134,10 +134,6 @@ module EE
               end
 
               proxy.dns_for_group_cn(group_cn)
-            end
-
-            def dn_for_uid(uid)
-              proxy.dn_for_uid(uid)
             end
 
             def update_existing_group_membership(group, access_levels)

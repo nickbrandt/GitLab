@@ -56,6 +56,13 @@ module EE
             end
           end
 
+          def filter_search(filter)
+            ldap_search(
+              base: config.base,
+              filter: Net::LDAP::Filter.construct(filter)
+            )
+          end
+
           def user_by_certificate_assertion(certificate_assertion)
             options = user_options_for_cert(certificate_assertion)
             users_search(options).first

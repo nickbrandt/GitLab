@@ -428,11 +428,18 @@ describe EE::Gitlab::Auth::LDAP::Sync::Group do
     end
 
     describe '#update_permissions' do
+      let(:group) do
+        create(:group_with_ldap_group_filter_link,
+               :access_requestable,
+               group_access: ::Gitlab::Access::DEVELOPER)
+      end
+      let(:sync_group) { described_class.new(group, proxy(adapter)) }
+
       before do
         # Safe-check because some permissions are removed when `Group#ldap_synced?`
         # is true (e.g. in `GroupPolicy`).
         expect(group).to be_ldap_synced
-        allow(EE::Gitlab::Auth::LDAP::UserFilter).to receive(:filter).and_return([user_dn(user.username)])
+        allow(sync_group.proxy).to receive(:dns_for_filter).and_return([user_dn(user.username)])
 
         group.start_ldap_sync
       end
@@ -440,14 +447,6 @@ describe EE::Gitlab::Auth::LDAP::Sync::Group do
       after do
         group.finish_ldap_sync
       end
-
-      let(:group) do
-        create(:group_with_ldap_group_filter_link,
-               :access_requestable,
-               group_access: ::Gitlab::Access::DEVELOPER)
-      end
-
-      let(:sync_group) { described_class.new(group, proxy(adapter)) }
 
       context 'with all functionality against one LDAP group type' do
         context 'with basic add/update actions' do
