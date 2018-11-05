@@ -18,7 +18,7 @@ describe 'Pipeline', :js do
 
     context 'with a sast artifact' do
       before do
-        create(:ci_build, :legacy_sast, pipeline: pipeline)
+        create(:ee_ci_build, :legacy_sast, pipeline: pipeline)
 
         visit security_project_pipeline_path(project, pipeline)
       end

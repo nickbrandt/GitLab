@@ -29,13 +29,6 @@ module EE
       group_epic_path(entity.group, entity, *args)
     end
 
-    def license_management_artifact_url(pipeline)
-      return unless pipeline
-
-      pipeline.present(current_user: current_user)
-        .downloadable_path_for_report_type(:license_management)
-    end
-
     def license_management_api_url(project)
       api_v4_projects_managed_licenses_path(id: project.id)
     end

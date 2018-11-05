@@ -15,7 +15,7 @@ describe Projects::PipelinesController do
 
     context 'with a sast artifact' do
       before do
-        create(:ci_build, :legacy_sast, pipeline: pipeline)
+        create(:ee_ci_build, :legacy_sast, pipeline: pipeline)
       end
 
       context 'with feature enabled' do

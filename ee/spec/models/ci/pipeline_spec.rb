@@ -28,11 +28,11 @@ describe Ci::Pipeline do
     let(:pipeline_5) { create(:ci_pipeline_without_jobs, project: project) }
 
     before do
-      create(:ci_build, :legacy_sast, pipeline: pipeline_1)
-      create(:ci_build, :legacy_dependency_scanning, pipeline: pipeline_2)
-      create(:ci_build, :legacy_container_scanning, pipeline: pipeline_3)
-      create(:ci_build, :legacy_dast, pipeline: pipeline_4)
-      create(:ci_build, :success, :artifacts, name: 'foobar', pipeline: pipeline_5)
+      create(:ee_ci_build, :legacy_sast, pipeline: pipeline_1)
+      create(:ee_ci_build, :legacy_dependency_scanning, pipeline: pipeline_2)
+      create(:ee_ci_build, :legacy_container_scanning, pipeline: pipeline_3)
+      create(:ee_ci_build, :legacy_dast, pipeline: pipeline_4)
+      create(:ee_ci_build, :success, :artifacts, name: 'foobar', pipeline: pipeline_5)
     end
 
     it "returns pipeline with security reports" do
