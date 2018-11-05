@@ -28,8 +28,8 @@ module EE
           dependency_scanning: %i[dependency_scanning],
           container_scanning: %i[container_scanning sast_container],
           dast: %i[dast],
-          performance: %i[:merge_request_performance_metrics],
-          license_management: nil
+          performance: %i[merge_request_performance_metrics],
+          license_management: %i[license_management]
         }.freeze
 
         # Deprecated, to be removed in 12.0
