@@ -15,8 +15,6 @@ export default () => {
       return createElement('group-security-dashboard-app', {
         props: {
           dashboardDocumentation: el.dataset.dashboardDocumentation,
-          errorStateSvgPath: el.dataset.errorStateSvgPath,
-          emptyStateSvgPath: el.dataset.emptyStateSvgPath,
           vulnerabilitiesEndpoint: el.dataset.vulnerabilitiesEndpoint,
           vulnerabilitiesCountEndpoint: el.dataset.vulnerabilitiesSummaryEndpoint,
         },
