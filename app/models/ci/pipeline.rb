@@ -198,12 +198,14 @@ module Ci
     def self.newest_first(ref: nil, limit: 100)
       relation = order(id: :desc)
       relation = relation.where(ref: ref) if ref
+
       if limit
         ids = relation.limit(limit).select(:id)
         # MySQL does not support limit in subquery
         ids = ids.pluck(:id) if Gitlab::Database.mysql?
         relation = relation.where(id: ids)
       end
+
       relation
     end
 
