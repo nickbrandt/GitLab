@@ -58,8 +58,7 @@ describe MergeRequestWidgetEntity do
 
         context "with new report artifacts" do
           before do
-            job = create(:ci_build, pipeline: pipeline)
-            create(:ci_job_artifact, file_type: artifact_type, file_format: Ci::JobArtifact::TYPE_AND_FORMAT_PAIRS[artifact_type], job: job)
+            create(:ee_ci_build, artifact_type, pipeline: pipeline)
           end
 
           it "has data entry" do
@@ -69,17 +68,7 @@ describe MergeRequestWidgetEntity do
 
         context "with legacy report artifacts" do
           before do
-            create(:ci_build,
-              :success,
-              :artifacts,
-              pipeline: pipeline,
-              name: artifact_type,
-              options: {
-                artifacts: {
-                  paths: [Ci::JobArtifact::DEFAULT_FILE_NAMES[artifact_type]]
-                }
-              }
-            )
+            create(:ee_ci_build, :"legacy_#{artifact_type}", pipeline: pipeline)
           end
 
           it "has data entry" do
