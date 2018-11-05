@@ -11,7 +11,7 @@ FactoryBot.define do
         success
         artifacts
         name report_type
-  
+
         options do
           {
             artifacts: {

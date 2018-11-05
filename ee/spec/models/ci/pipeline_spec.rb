@@ -167,7 +167,7 @@ describe Ci::Pipeline do
 
     context 'when pipeline has builds with security reports' do
       before do
-        create(:ee_ci_build, :security_reports, pipeline: pipeline, project: project)
+        create(:ee_ci_build, :sast, pipeline: pipeline, project: project)
       end
 
       context 'when pipeline status is running' do
@@ -257,7 +257,7 @@ describe Ci::Pipeline do
         let(:default_branch) { pipeline.ref }
 
         before do
-          create(:ee_ci_build, :security_reports, pipeline: pipeline, project: project)
+          create(:ee_ci_build, :sast, pipeline: pipeline, project: project)
           allow(project).to receive(:default_branch) { default_branch }
         end
 
