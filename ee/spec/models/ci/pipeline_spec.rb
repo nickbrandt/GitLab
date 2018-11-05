@@ -28,18 +28,7 @@ describe Ci::Pipeline do
     let(:pipeline_5) { create(:ci_pipeline_without_jobs, project: project) }
 
     before do
-      create(
-        :ci_build,
-        :success,
-        :artifacts,
-        name: 'sast',
-        pipeline: pipeline_1,
-        options: {
-          artifacts: {
-            paths: [Ci::JobArtifact::DEFAULT_FILE_NAMES[:sast]]
-          }
-        }
-      )
+      create(:ci_build, :legacy_sast, pipeline: pipeline_1)
       create(
         :ci_build,
         :success,

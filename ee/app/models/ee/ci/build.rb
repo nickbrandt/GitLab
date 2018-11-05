@@ -7,8 +7,6 @@ module EE
     module Build
       extend ActiveSupport::Concern
 
-      LICENSE_MANAGEMENT_FILE = 'gl-license-management-report.json'.freeze
-
       LICENSED_PARSER_FEATURES = {
         sast: :sast
       }.with_indifferent_access.freeze

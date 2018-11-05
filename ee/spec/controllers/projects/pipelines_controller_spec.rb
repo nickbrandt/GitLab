@@ -15,18 +15,7 @@ describe Projects::PipelinesController do
 
     context 'with a sast artifact' do
       before do
-        create(
-          :ci_build,
-          :success,
-          :artifacts,
-          name: 'sast',
-          pipeline: pipeline,
-          options: {
-            artifacts: {
-              paths: [Ci::JobArtifact::DEFAULT_FILE_NAMES[:sast]]
-            }
-          }
-        )
+        create(:ci_build, :legacy_sast, pipeline: pipeline)
       end
 
       context 'with feature enabled' do
