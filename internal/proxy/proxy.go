@@ -7,7 +7,6 @@ import (
 	"net/url"
 	"time"
 
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
@@ -21,7 +20,7 @@ type Proxy struct {
 	AllowResponseBuffering bool
 }
 
-func NewProxy(myURL *url.URL, version string, roundTripper *badgateway.RoundTripper) *Proxy {
+func NewProxy(myURL *url.URL, version string, roundTripper http.RoundTripper) *Proxy {
 	p := Proxy{Version: version, AllowResponseBuffering: true}
 
 	if myURL == nil {

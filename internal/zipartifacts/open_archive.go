@@ -19,7 +19,7 @@ import (
 // ErrNotAZip will be used when the file is not a zip archive
 var ErrNotAZip = errors.New("not a zip")
 
-// ErrNotAZip will be used when the file can't be found
+// ErrArchiveNotFound will be used when the file can't be found
 var ErrArchiveNotFound = errors.New("archive not found")
 
 var httpClient = &http.Client{

@@ -13,7 +13,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
 
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
@@ -56,7 +55,7 @@ func init() {
 	prometheus.MustRegister(bytesTotal)
 }
 
-func NewAPI(myURL *url.URL, version string, roundTripper *badgateway.RoundTripper) *API {
+func NewAPI(myURL *url.URL, version string, roundTripper http.RoundTripper) *API {
 	return &API{
 		Client:  &http.Client{Transport: roundTripper},
 		URL:     myURL,

@@ -16,14 +16,15 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream/roundtripper"
 )
 
 const testVersion = "123"
 
-func newProxy(url string, rt *badgateway.RoundTripper) *proxy.Proxy {
+func newProxy(url string, rt http.RoundTripper) *proxy.Proxy {
 	parsedURL := helper.URLMustParse(url)
 	if rt == nil {
-		rt = badgateway.TestRoundTripper(parsedURL)
+		rt = roundtripper.NewTestBackendRoundTripper(parsedURL)
 	}
 	return proxy.NewProxy(parsedURL, testVersion, rt)
 }
@@ -96,17 +97,15 @@ func TestProxyReadTimeout(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	rt := &badgateway.RoundTripper{
-		Transport: &http.Transport{
-			Proxy: http.ProxyFromEnvironment,
-			Dial: (&net.Dialer{
-				Timeout:   30 * time.Second,
-				KeepAlive: 30 * time.Second,
-			}).Dial,
-			TLSHandshakeTimeout:   10 * time.Second,
-			ResponseHeaderTimeout: time.Millisecond,
-		},
-	}
+	rt := badgateway.NewRoundTripper(false, &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		Dial: (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}).Dial,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ResponseHeaderTimeout: time.Millisecond,
+	})
 
 	p := newProxy(ts.URL, rt)
 	w := httptest.NewRecorder()

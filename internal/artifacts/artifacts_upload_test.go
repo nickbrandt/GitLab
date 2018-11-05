@@ -15,11 +15,11 @@ import (
 	"testing"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream/roundtripper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/zipartifacts"
 )
 
@@ -113,7 +113,7 @@ func testUploadArtifacts(contentType string, body io.Reader, t *testing.T, ts *h
 	httpRequest.Header.Set("Content-Type", contentType)
 	response := httptest.NewRecorder()
 	parsedURL := helper.URLMustParse(ts.URL)
-	roundTripper := badgateway.TestRoundTripper(parsedURL)
+	roundTripper := roundtripper.NewTestBackendRoundTripper(parsedURL)
 	testhelper.ConfigureSecret()
 	apiClient := api.NewAPI(parsedURL, "123", roundTripper)
 	proxyClient := proxy.NewProxy(parsedURL, "123", roundTripper)

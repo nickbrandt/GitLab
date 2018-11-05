@@ -10,10 +10,10 @@ import (
 	"github.com/dgrijalva/jwt-go"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream/roundtripper"
 )
 
 func okHandler(w http.ResponseWriter, _ *http.Request, _ *api.Response) {
@@ -34,7 +34,7 @@ func runPreAuthorizeHandler(t *testing.T, ts *httptest.Server, suffix string, ur
 	}
 	parsedURL := helper.URLMustParse(ts.URL)
 	testhelper.ConfigureSecret()
-	a := api.NewAPI(parsedURL, "123", badgateway.TestRoundTripper(parsedURL))
+	a := api.NewAPI(parsedURL, "123", roundtripper.NewTestBackendRoundTripper(parsedURL))
 
 	response := httptest.NewRecorder()
 	a.PreAuthorizeHandler(okHandler, suffix).ServeHTTP(response, httpRequest)

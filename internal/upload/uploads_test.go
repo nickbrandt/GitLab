@@ -17,12 +17,12 @@ import (
 	"time"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/objectstore/test"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream/roundtripper"
 )
 
 var nilHandler = http.HandlerFunc(func(http.ResponseWriter, *http.Request) {})
@@ -325,5 +325,5 @@ func TestInvalidFileNames(t *testing.T) {
 
 func newProxy(url string) *proxy.Proxy {
 	parsedURL := helper.URLMustParse(url)
-	return proxy.NewProxy(parsedURL, "123", badgateway.TestRoundTripper(parsedURL))
+	return proxy.NewProxy(parsedURL, "123", roundtripper.NewTestBackendRoundTripper(parsedURL))
 }
