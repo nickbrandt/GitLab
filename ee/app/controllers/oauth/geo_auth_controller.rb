@@ -3,7 +3,7 @@ class Oauth::GeoAuthController < ActionController::Base
   rescue_from OAuth2::Error, with: :auth
 
   def auth
-    unless oauth.oauth_state_valid?
+    unless login_state.valid?
       redirect_to root_url
       return
     end
@@ -12,51 +12,58 @@ class Oauth::GeoAuthController < ActionController::Base
   end
 
   def callback
-    unless oauth.oauth_state_valid?
+    unless login_state.valid?
       redirect_to new_user_session_path
       return
     end
 
     token = oauth.get_token(params[:code], redirect_uri: oauth_geo_callback_url)
-    remote_user = oauth.authenticate_with_gitlab(token)
-    user = UserFinder.new(remote_user['id']).find_by_id
+    user  = user_from_oauth_token(token)
 
     if user && bypass_sign_in(user)
-      after_sign_in_with_gitlab(token, oauth.get_oauth_state_return_to)
+      after_sign_in_with_gitlab(token)
     else
       invalid_credentials
     end
   end
 
   def logout
-    logout = Oauth2::LogoutTokenValidationService.new(current_user, params)
-    result = logout.execute
+    token = Gitlab::Geo::Oauth::LogoutToken.new(current_user, params[:state])
 
-    if result[:status] == :success
+    if token.valid?
       sign_out current_user
-      after_sign_out_with_gitlab(result[:return_to])
+      after_sign_out_with_gitlab(token)
     else
-      access_token_error(result[:message])
+      invalid_access_token(token)
     end
   end
 
   private
 
   def oauth
-    @oauth ||= Gitlab::Geo::OauthSession.new(state: params[:state])
+    @oauth ||= Gitlab::Geo::Oauth::Session.new
   end
 
-  def after_sign_in_with_gitlab(token, return_to)
+  def user_from_oauth_token(token)
+    remote_user = oauth.authenticate(token)
+    UserFinder.new(remote_user['id']).find_by_id if remote_user
+  end
+
+  def login_state
+    Gitlab::Geo::Oauth::LoginState.from_state(params[:state])
+  end
+
+  def after_sign_in_with_gitlab(token)
     session[:access_token] = token
 
     # Prevent alert from popping up on the first page shown after authentication.
     flash[:alert] = nil
 
-    redirect_to(return_to || root_path)
+    redirect_to(login_state.return_to || root_path)
   end
 
-  def after_sign_out_with_gitlab(return_to)
-    session[:user_return_to] = return_to
+  def after_sign_out_with_gitlab(token)
+    session[:user_return_to] = token.return_to
     redirect_to(root_path)
   end
 
@@ -70,8 +77,9 @@ class Oauth::GeoAuthController < ActionController::Base
     render :error, layout: 'errors'
   end
 
-  def access_token_error(status)
-    @error = "There is a problem with the OAuth access_token: #{status}"
+  def invalid_access_token(token)
+    message = token.errors.full_messages.join(', ')
+    @error = "There is a problem with the OAuth access_token: #{message}"
     render :error, layout: 'errors'
   end
 end

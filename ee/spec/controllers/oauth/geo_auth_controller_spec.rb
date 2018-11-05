@@ -1,62 +1,68 @@
 require 'spec_helper'
 
 describe Oauth::GeoAuthController do
-  let(:user) { create(:user) }
-  let(:node) { create(:geo_node) }
-  let(:oauth_app) { node.oauth_application }
-  let(:access_token) { create(:doorkeeper_access_token, resource_owner_id: user.id, application: oauth_app) }
-  let(:oauth_session) { Gitlab::Geo::OauthSession.new(access_token: access_token.token, return_to: projects_url) }
-  let(:auth_state) { oauth_session.generate_oauth_state }
-  let(:primary_node_url) { 'http://localhost:3001/' }
+  include EE::GeoHelpers
 
-  before do
-    allow_any_instance_of(Gitlab::Geo::OauthSession).to receive(:oauth_app) { oauth_app }
-    allow_any_instance_of(Gitlab::Geo::OauthSession).to receive(:primary_node_url) { primary_node_url }
-  end
+  # The Geo OAuth workflow depends on the OAuth application and the URL
+  # defined on the Geo primary node, so we use let! instead of let here
+  # to define a memoized helper method that is called in a `before` hook
+  # doing the proper set up for us.
+  let!(:primary_node) { create(:geo_node, :primary) }
+  let(:secondary_node) { create(:geo_node) }
+  let(:user) { create(:user) }
+  let(:oauth_application) { secondary_node.oauth_application }
+  let(:access_token) { create(:doorkeeper_access_token, application: oauth_application, resource_owner_id: user.id) }
+  let(:login_state) { Gitlab::Geo::Oauth::LoginState.new(return_to: secondary_node.url).encode }
 
   describe 'GET auth' do
-    let(:primary_node_oauth_endpoint) { Gitlab::Geo::OauthSession.new.authorize_url(redirect_uri: oauth_geo_callback_url, state: auth_state) }
+    before do
+      stub_current_geo_node(secondary_node)
+    end
 
     it 'redirects to root_url when state is invalid' do
-      allow_any_instance_of(Gitlab::Geo::OauthSession).to receive(:oauth_state_valid?) { false }
-      get :auth, state: auth_state
+      allow_any_instance_of(Gitlab::Geo::Oauth::LoginState).to receive(:valid?).and_return(false)
+
+      get :auth, state: login_state
 
       expect(response).to redirect_to(root_url)
     end
 
     it "redirects to primary node's oauth endpoint" do
-      get :auth, state: auth_state
+      oauth_endpoint = Gitlab::Geo::Oauth::Session.new.authorize_url(redirect_uri: oauth_geo_callback_url, state: login_state)
 
-      expect(response).to redirect_to(primary_node_oauth_endpoint)
+      get :auth, state: login_state
+
+      expect(response).to redirect_to(oauth_endpoint)
     end
   end
 
   describe 'GET callback' do
-    let(:oauth_session) { Gitlab::Geo::OauthSession.new(access_token: access_token.token, return_to: projects_url) }
-    let(:callback_state) { oauth_session.generate_oauth_state }
-    let(:primary_node_oauth_endpoint) { Gitlab::Geo::OauthSession.new.authorize_url(redirect_uri: oauth_geo_callback_url, state: callback_state) }
+    before do
+      stub_current_geo_node(secondary_node)
+    end
 
     context 'redirection' do
       before do
-        allow_any_instance_of(Gitlab::Geo::OauthSession).to receive(:get_token) { 'token' }
-        allow_any_instance_of(Gitlab::Geo::OauthSession).to receive(:authenticate_with_gitlab) { user.attributes }
+        allow_any_instance_of(Gitlab::Geo::Oauth::Session).to receive(:get_token).and_return('token')
+        allow_any_instance_of(Gitlab::Geo::Oauth::Session).to receive(:authenticate).and_return(user.attributes)
       end
 
       it 'redirects to login screen if state is invalid' do
-        allow_any_instance_of(Gitlab::Geo::OauthSession).to receive(:oauth_state_valid?) { false }
-        get :callback, state: callback_state
+        allow_any_instance_of(Gitlab::Geo::Oauth::LoginState).to receive(:valid?).and_return(false)
+
+        get :callback, state: login_state
 
         expect(response).to redirect_to(new_user_session_path)
       end
 
       it 'redirects to redirect_url if state is valid' do
-        get :callback, state: callback_state
+        get :callback, state: login_state
 
-        expect(response).to redirect_to(projects_url)
+        expect(response).to redirect_to(secondary_node.url)
       end
 
       it 'does not display a flash message if state is valid' do
-        get :callback, state: callback_state
+        get :callback, state: login_state
 
         expect(controller).to set_flash[:alert].to(nil)
       end
@@ -67,27 +73,45 @@ describe Oauth::GeoAuthController do
       let(:oauth_error) { OAuth2::Error.new(OAuth2::Response.new(fake_response)) }
 
       before do
-        expect_any_instance_of(Gitlab::Geo::OauthSession).to receive(:get_token) { access_token.token }
-        expect_any_instance_of(Gitlab::Geo::OauthSession).to receive(:authenticate_with_gitlab).and_raise(oauth_error)
+        allow_any_instance_of(Gitlab::Geo::Oauth::Session).to receive(:get_token).and_return(access_token.token)
+        allow_any_instance_of(Gitlab::Geo::Oauth::Session).to receive(:authenticate).and_raise(oauth_error)
       end
 
       it 'handles invalid credentials error' do
-        get :callback, state: callback_state
+        oauth_endpoint = Gitlab::Geo::Oauth::Session.new.authorize_url(redirect_uri: oauth_geo_callback_url, state: login_state)
 
-        expect(response).to redirect_to(primary_node_oauth_endpoint)
+        get :callback, state: login_state
+
+        expect(response).to redirect_to(oauth_endpoint)
       end
     end
 
-    context 'inexistent local user' do
+    context 'non-existent remote user' do
       render_views
 
       before do
-        expect_any_instance_of(Gitlab::Geo::OauthSession).to receive(:get_token) { 'token' }
-        expect_any_instance_of(Gitlab::Geo::OauthSession).to receive(:authenticate_with_gitlab) { User.new(id: 999999) }
+        allow_any_instance_of(Gitlab::Geo::Oauth::Session).to receive(:get_token).and_return('token')
+        allow_any_instance_of(Gitlab::Geo::Oauth::Session).to receive(:authenticate).and_return(nil)
       end
 
-      it 'handles inexistent local user error' do
-        get :callback, state: callback_state
+      it 'handles non-existent remote user error' do
+        get :callback, state: login_state
+
+        expect(response.code).to eq '200'
+        expect(response.body).to include('Your account may have been deleted')
+      end
+    end
+
+    context 'non-existent local user' do
+      render_views
+
+      before do
+        allow_any_instance_of(Gitlab::Geo::Oauth::Session).to receive(:get_token).and_return('token')
+        allow_any_instance_of(Gitlab::Geo::Oauth::Session).to receive(:authenticate).and_return(id: 999999)
+      end
+
+      it 'handles non-existent local user error' do
+        get :callback, state: login_state
 
         expect(response.code).to eq '200'
         expect(response.body).to include('Your account may have been deleted')
@@ -96,8 +120,7 @@ describe Oauth::GeoAuthController do
   end
 
   describe 'GET logout' do
-    let(:oauth_session) { Gitlab::Geo::OauthSession.new(access_token: access_token.token) }
-    let(:logout_state) { oauth_session.generate_logout_state }
+    let(:logout_state) { Gitlab::Geo::Oauth::LogoutState.new(token: access_token.token).encode }
 
     render_views
 
@@ -109,17 +132,20 @@ describe Oauth::GeoAuthController do
       it 'logs out and redirects to the root_url' do
         get :logout, state: logout_state
 
+        expect(assigns(:current_user)).to be_nil
         expect(response).to redirect_to root_url
       end
     end
 
     context 'when access_token is invalid' do
-      it 'handles access token problems' do
-        allow_any_instance_of(Oauth2::LogoutTokenValidationService).to receive(:execute) { { status: :error, message: :expired } }
+      it 'shows access token errors' do
+        allow(Doorkeeper::AccessToken)
+          .to receive(:by_token)
+          .and_return(double(resource_owner_id: user.id, expired?: true))
 
         get :logout, state: logout_state
 
-        expect(response.body).to include("There is a problem with the OAuth access_token: expired")
+        expect(response.body).to include("There is a problem with the OAuth access_token: Token has expired")
       end
     end
   end
