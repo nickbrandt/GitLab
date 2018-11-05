@@ -90,6 +90,7 @@ export default {
           >{{ vulnerability.name }}</span>
           <vulnerability-issue-link
             v-if="hasIssue"
+            class="prepend-left-10"
             :issue="vulnerability.issue_feedback"
             :project-name="vulnerability.project.name"
           />
