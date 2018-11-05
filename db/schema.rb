@@ -212,7 +212,6 @@ ActiveRecord::Schema.define(version: 20181101144347) do
     t.integer "receive_max_input_size"
     t.integer "diff_max_patch_bytes", default: 102400, null: false
     t.integer "archive_builds_in_seconds"
-<<<<<<< HEAD
   end
 
   create_table "approvals", force: :cascade do |t|
@@ -241,8 +240,6 @@ ActiveRecord::Schema.define(version: 20181101144347) do
     t.integer "user_id", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-=======
->>>>>>> upstream/master
   end
 
   add_index "approvers", ["target_id", "target_type"], name: "index_approvers_on_target_id_and_target_type", using: :btree
@@ -2318,14 +2315,11 @@ ActiveRecord::Schema.define(version: 20181101144347) do
     t.string "external_authorization_classification_label"
     t.boolean "mirror_overwrites_diverged_branches"
     t.boolean "pages_https_only", default: true
-<<<<<<< HEAD
     t.string "external_webhook_token"
     t.boolean "packages_enabled"
     t.boolean "merge_requests_author_approval"
-=======
     t.boolean "remote_mirror_available_overridden"
     t.integer "pool_repository_id", limit: 8
->>>>>>> upstream/master
   end
 
   add_index "projects", ["ci_id"], name: "index_projects_on_ci_id", using: :btree
@@ -3387,15 +3381,12 @@ ActiveRecord::Schema.define(version: 20181101144347) do
   add_foreign_key "project_mirror_data", "projects", name: "fk_d1aad367d7", on_delete: :cascade
   add_foreign_key "project_repository_states", "projects", on_delete: :cascade
   add_foreign_key "project_statistics", "projects", on_delete: :cascade
-<<<<<<< HEAD
+  add_foreign_key "projects", "repositories", column: "pool_repository_id", name: "fk_6e5c14658a", on_delete: :nullify
   add_foreign_key "prometheus_alert_events", "projects", on_delete: :cascade
   add_foreign_key "prometheus_alert_events", "prometheus_alerts", on_delete: :cascade
   add_foreign_key "prometheus_alerts", "environments", on_delete: :cascade
   add_foreign_key "prometheus_alerts", "projects", on_delete: :cascade
   add_foreign_key "prometheus_alerts", "prometheus_metrics", on_delete: :cascade
-=======
-  add_foreign_key "projects", "repositories", column: "pool_repository_id", name: "fk_6e5c14658a", on_delete: :nullify
->>>>>>> upstream/master
   add_foreign_key "prometheus_metrics", "projects", on_delete: :cascade
   add_foreign_key "protected_branch_merge_access_levels", "namespaces", column: "group_id", name: "fk_98f3d044fe", on_delete: :cascade
   add_foreign_key "protected_branch_merge_access_levels", "protected_branches", name: "fk_8a3072ccb3", on_delete: :cascade
@@ -3418,12 +3409,8 @@ ActiveRecord::Schema.define(version: 20181101144347) do
   add_foreign_key "push_event_payloads", "events", name: "fk_36c74129da", on_delete: :cascade
   add_foreign_key "push_rules", "projects", name: "fk_83b29894de", on_delete: :cascade
   add_foreign_key "releases", "projects", name: "fk_47fe2a0596", on_delete: :cascade
-<<<<<<< HEAD
   add_foreign_key "remote_mirrors", "projects", name: "fk_43a9aa4ca8", on_delete: :cascade
-=======
-  add_foreign_key "remote_mirrors", "projects", on_delete: :cascade
   add_foreign_key "repositories", "shards", on_delete: :restrict
->>>>>>> upstream/master
   add_foreign_key "repository_languages", "projects", on_delete: :cascade
   add_foreign_key "resource_label_events", "epics", on_delete: :cascade
   add_foreign_key "resource_label_events", "issues", on_delete: :cascade

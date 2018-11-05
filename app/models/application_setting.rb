@@ -6,10 +6,8 @@ class ApplicationSetting < ActiveRecord::Base
   include TokenAuthenticatable
   include IgnorableColumn
   include ChronicDurationAttribute
-<<<<<<< HEAD
+
   prepend EE::ApplicationSetting
-=======
->>>>>>> upstream/master
 
   add_authentication_token_field :runners_registration_token
   add_authentication_token_field :health_check_access_token
