@@ -1,4 +1,6 @@
 import Vue from 'vue';
+import MockAdapter from 'axios-mock-adapter';
+import axios from '~/lib/utils/axios_utils';
 import store from 'ee/operations/store/index';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import Dashboard from 'ee/operations/components/dashboard/dashboard.vue';
@@ -12,24 +14,28 @@ describe('dashboard component', () => {
   const ProjectSearchComponent = Vue.extend(ProjectSearch);
   const DashboardProjectComponent = Vue.extend(DashboardProject);
   const projectTokens = mockProjectData(1);
+  const mockListPath = 'mock-listPath';
   const mount = () =>
     mountComponentWithStore(DashboardComponent, {
       store,
       props: {
         addPath: 'mock-addPath',
-        listPath: 'mock-listPath',
+        listPath: mockListPath,
         emptyDashboardSvgPath: '/assets/illustrations/operations-dashboard_empty.svg',
       },
     });
   let vm;
+  let mockAxios;
 
   beforeEach(() => {
     vm = mount();
+    mockAxios = new MockAdapter(axios);
   });
 
   afterEach(() => {
     vm.$destroy();
     clearState(store);
+    mockAxios.restore();
   });
 
   it('renders dashboard title', () => {
@@ -94,11 +100,9 @@ describe('dashboard component', () => {
     });
 
     describe('empty state', () => {
-      beforeAll(done => {
-        vm.$store
-          .dispatch('requestProjects')
-          .then(() => vm.$nextTick(done))
-          .catch(done.fail);
+      beforeEach(() => {
+        mockAxios.onGet(mockListPath).replyOnce(200, { data: [] });
+        vm = mount();
       });
 
       it('renders empty state svg after requesting projects with no results', () => {
