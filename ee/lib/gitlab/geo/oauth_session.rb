@@ -21,7 +21,8 @@ module Gitlab
       end
 
       def extract_logout_token
-        LogoutState.new(*state.to_s.split(':', 3)).decode
+        salt, encrypted, return_to = state.to_s.split(':', 3)
+        LogoutState.new(salt, encrypted, return_to).decode
       end
 
       def get_oauth_state_return_to
@@ -49,7 +50,12 @@ module Gitlab
 
       private
 
-      class LoginState < Struct.new(:salt, :return_to)
+      class LoginState
+        def initialize(salt, return_to)
+          @salt      = salt
+          @return_to = return_to
+        end
+
         def valid?(hmac)
           return false unless salt && return_to
 
@@ -64,14 +70,23 @@ module Gitlab
 
         private
 
+        attr_reader :salt, :return_to
+
         def generate_hmac
           digest = OpenSSL::Digest.new('sha256')
-          key = Gitlab::Application.secrets.secret_key_base + salt
+          key    = Gitlab::Application.secrets.secret_key_base + salt
+
           OpenSSL::HMAC.hexdigest(digest, key, return_to)
         end
       end
 
-      class LogoutState < Struct.new(:salt, :token, :return_to)
+      class LogoutState
+        def initialize(salt, token, return_to)
+          @salt      = salt
+          @token     = token
+          @return_to = return_to
+        end
+
         def decode
           return unless salt && token
 
@@ -95,6 +110,8 @@ module Gitlab
 
         private
 
+        attr_reader :salt, :token, :return_to
+
         def cipher(salt, operation)
           cipher = OpenSSL::Cipher::AES.new(128, :CBC)
           cipher.__send__(operation) # rubocop:disable GitlabSecurity/PublicSend
@@ -108,13 +125,19 @@ module Gitlab
         end
       end
 
-      class ReturnToLocation < Struct.new(:location)
+      class ReturnToLocation
+        def initialize(location)
+          @location = location
+        end
+
         def full_path
           uri = parse_uri(location)
           full_path_for_uri(uri) if uri
         end
 
         private
+
+        attr_reader :location
 
         def parse_uri(location)
           location && URI.parse(location)
@@ -129,11 +152,11 @@ module Gitlab
       end
 
       def oauth_salt
-        @salt ||= SecureRandom.hex(8)
+        @oauth_salt ||= SecureRandom.hex(8)
       end
 
       def oauth_client
-        @client ||= begin
+        @oauth_client ||= begin
           ::OAuth2::Client.new(
             oauth_app.uid,
             oauth_app.secret,
