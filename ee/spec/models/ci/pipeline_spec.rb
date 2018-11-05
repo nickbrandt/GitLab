@@ -195,7 +195,7 @@ describe Ci::Pipeline do
 
     context 'when retried build has security reports' do
       before do
-        create(:ee_ci_build, :retried, :security_reports, pipeline: pipeline, project: project)
+        create(:ee_ci_build, :retried, :sast, pipeline: pipeline, project: project)
       end
 
       let(:pipeline) { create(:ci_pipeline, :success, project: project) }

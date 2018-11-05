@@ -119,7 +119,7 @@ describe Ci::Build do
     subject { described_class.with_security_reports }
 
     context 'when build has a security report' do
-      let!(:build) { create(:ee_ci_build, :success, :security_reports) }
+      let!(:build) { create(:ee_ci_build, :success, :sast) }
 
       it 'selects the build' do
         is_expected.to eq([build])
@@ -135,7 +135,7 @@ describe Ci::Build do
     end
 
     context 'when there are multiple builds with security reports' do
-      let!(:builds) { create_list(:ee_ci_build, 5, :success, :security_reports) }
+      let!(:builds) { create_list(:ee_ci_build, 5, :success, :sast) }
 
       it 'does not execute a query for selecting job artifacts one by one' do
         recorded = ActiveRecord::QueryRecorder.new do
