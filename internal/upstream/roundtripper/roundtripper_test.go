@@ -1,4 +1,4 @@
-package badgateway
+package roundtripper
 
 import (
 	"testing"

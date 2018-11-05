@@ -13,10 +13,10 @@ import (
 
 	"github.com/sebest/xff"
 
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upload"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream/roundtripper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/urlprefix"
 )
 
@@ -31,7 +31,7 @@ type upstream struct {
 	config.Config
 	URLPrefix    urlprefix.Prefix
 	Routes       []routeEntry
-	RoundTripper *badgateway.RoundTripper
+	RoundTripper http.RoundTripper
 }
 
 func NewUpstream(cfg config.Config) http.Handler {
@@ -41,7 +41,7 @@ func NewUpstream(cfg config.Config) http.Handler {
 	if up.Backend == nil {
 		up.Backend = DefaultBackend
 	}
-	up.RoundTripper = badgateway.NewRoundTripper(up.Backend, up.Socket, up.ProxyHeadersTimeout, cfg.DevelopmentMode)
+	up.RoundTripper = roundtripper.NewBackendRoundTripper(up.Backend, up.Socket, up.ProxyHeadersTimeout, cfg.DevelopmentMode)
 	up.configureURLPrefix()
 	up.configureRoutes()
 	return &up
