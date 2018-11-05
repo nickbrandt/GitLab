@@ -55,7 +55,11 @@ class CommitStatus < ActiveRecord::Base
     stale_schedule: 7,
     job_execution_timeout: 8,
     archived_failure: 9
+<<<<<<< HEAD
   }.merge(EE_FAILURE_REASONS)
+=======
+  }
+>>>>>>> upstream/master
 
   ##
   # We still create some CommitStatuses outside of CreatePipelineService.

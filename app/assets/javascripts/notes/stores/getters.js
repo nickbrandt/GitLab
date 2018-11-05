@@ -192,9 +192,12 @@ export const firstUnresolvedDiscussionId = (state, getters) => diffOrder => {
   return getters.unresolvedDiscussionsIdsByDate[0];
 };
 
+<<<<<<< HEAD
 export const getDiscussion = state => discussionId =>
   state.discussions.find(discussion => discussion.id === discussionId);
 
+=======
+>>>>>>> upstream/master
 export const commentsDisabled = state => state.commentsDisabled;
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
