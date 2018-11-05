@@ -44,7 +44,7 @@ describe 'Environments page', :js do
       end
 
       it 'shows an enabled play button' do
-        find('.js-dropdown-play-icon-container').click
+        find('.js-environment-actions-dropdown').click
         play_button = %q{button[class="js-manual-action-link no-btn btn"]}
 
         expect(page).to have_selector(play_button)
@@ -126,7 +126,7 @@ describe 'Environments page', :js do
       end
 
       it 'show a disabled play button' do
-        find('.js-dropdown-play-icon-container').click
+        find('.js-environment-actions-dropdown').click
         disabled_play_button = %q{button[class="js-manual-action-link no-btn btn disabled"]}
 
         expect(page).to have_selector(disabled_play_button)
