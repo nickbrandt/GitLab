@@ -9,12 +9,17 @@ module Gitlab
           attr_reader :occurrences
           attr_reader :scanners
           attr_reader :identifiers
+          attr_accessor :error
 
           def initialize(type)
             @type = type
             @occurrences = []
             @scanners = {}
             @identifiers = {}
+          end
+
+          def errored?
+            error.present?
           end
 
           def add_scanner(params)

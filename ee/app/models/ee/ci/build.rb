@@ -57,10 +57,14 @@ module EE
 
       def collect_security_reports!(security_reports)
         each_report(::Ci::JobArtifact::SECURITY_REPORT_FILE_TYPES) do |file_type, blob|
-          next unless project.feature_available?(LICENSED_PARSER_FEATURES[file_type])
-
           security_reports.get_report(file_type).tap do |security_report|
-            ::Gitlab::Ci::Parsers::Security.fabricate!(file_type).parse!(blob, security_report)
+            begin
+              next unless project.feature_available?(LICENSED_PARSER_FEATURES.fetch(file_type))
+
+              ::Gitlab::Ci::Parsers::Security.fabricate!(file_type).parse!(blob, security_report)
+            rescue => e
+              security_report.error = e
+            end
           end
         end
       end

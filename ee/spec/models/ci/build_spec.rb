@@ -234,7 +234,7 @@ describe Ci::Build do
         end
 
         it 'parses blobs and add the results to the report' do
-          expect { subject }.not_to raise_error
+          subject
 
           expect(security_reports.get_report('sast').occurrences.size).to eq(3)
         end
@@ -245,9 +245,24 @@ describe Ci::Build do
           create(:ee_ci_job_artifact, :sast_with_corrupted_data, job: job, project: job.project)
         end
 
-        it 'raises an error' do
-          expect { subject }.to raise_error(::Gitlab::Ci::Parsers::Security::Sast::SastParserError)
+        it 'stores an error' do
+          subject
+
+          expect(security_reports.get_report('sast')).to be_errored
         end
+      end
+    end
+
+    context 'when there is unsupported file type' do
+      before do
+        stub_const("Ci::JobArtifact::SECURITY_REPORT_FILE_TYPES", %w[codequality])
+        create(:ee_ci_job_artifact, :codequality, job: job, project: job.project)
+      end
+
+      it 'stores an error' do
+        subject
+
+        expect(security_reports.get_report('codequality')).to be_errored
       end
     end
   end
