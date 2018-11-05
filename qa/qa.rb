@@ -276,6 +276,7 @@ module QA
       autoload :GroupsFilter, 'qa/page/component/groups_filter'
       autoload :Select2, 'qa/page/component/select2'
       autoload :DropdownFilter, 'qa/page/component/dropdown_filter'
+      autoload :Select2Search, 'qa/page/component/select2_search'
       autoload :UsersSelect, 'qa/page/component/users_select'
 
       module Issuable

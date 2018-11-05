@@ -124,15 +124,15 @@ module QA
           click_element :standard_tab
         end
 
-        private
-
-        def sign_in_using_ldap_credentials
+        def sign_in_using_ldap_credentials(username: Runtime::User.ldap_username, password: Runtime::User.ldap_password)
           switch_to_ldap_tab
 
-          fill_element :username_field, Runtime::User.ldap_username
-          fill_element :password_field, Runtime::User.ldap_password
+          fill_element :username_field, username
+          fill_element :password_field, password
           click_element :sign_in_button
         end
+
+        private
 
         def sign_in_with_saml
           set_initial_password_if_present
