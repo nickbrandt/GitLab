@@ -1,5 +1,0 @@
----
-title: Add indexes to all geo event foreign keys
-merge_request: 7990
-author:
-type: performance

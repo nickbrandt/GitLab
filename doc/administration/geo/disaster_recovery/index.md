@@ -83,7 +83,14 @@ must disable the primary.
    [update the primary domain DNS record](#step-4-optional-updating-the-primary-domain-dns-record),
    you may wish to lower the TTL now to speed up propagation.
 
-### Step 3. Promoting a secondary Geo replica
+### Step 3. Promoting a **secondary** node
+
+NOTE: **Note:**
+A new **secondary** should not be added at this time. If you want to add a new
+**secondary**, do this after you have completed the entire process of promoting
+the **secondary** to the **primary**.
+
+#### Promoting a **secondary** node running on a single machine
 
 1. SSH in to your **secondary** and login as root:
 
@@ -91,43 +98,66 @@ must disable the primary.
     sudo -i
     ```
 
-1. Edit `/etc/gitlab/gitlab.rb` to reflect its new status as primary by
-   removing the following line:
+1. Edit `/etc/gitlab/gitlab.rb` to reflect its new status as **primary** by
+   removing any lines that enabled the `geo_secondary_role`:
 
     ```ruby
-    ## REMOVE THIS LINE
+    ## In pre-11.5 documentation, the role was enabled as follows. Remove this line.
     geo_secondary_role['enable'] = true
+
+    ## In 11.5+ documentation, the role was enabled as follows. Remove this line.
+    roles ['geo_secondary_role']
     ```
 
-    A new secondary should not be added at this time. If you want to add a new
-    secondary, do this after you have completed the entire process of promoting
-    the secondary to the primary.
-
-1. Promote the secondary to primary. Execute:
+1. Promote the **secondary** to **primary**. Execute:
 
     ```bash
     gitlab-ctl promote-to-primary-node
     ```
 
-1. Verify you can connect to the newly promoted primary using the URL used
-   previously for the secondary.
-1. Success! The secondary has now been promoted to primary.
+1. Verify you can connect to the newly promoted **primary** using the URL used
+   previously for the **secondary**.
+1. Success! The **secondary** has now been promoted to **primary**.
 
-#### Promoting a node with HA
+#### Promoting a **secondary** node with HA
 
-The `gitlab-ctl promote-to-primary-node` command cannot be used yet in conjunction with
-High Availability or with multiple machines, as it can only perform changes on
-a single one.
+The `gitlab-ctl promote-to-primary-node` command cannot be used yet in
+conjunction with High Availability or with multiple machines, as it can only
+perform changes on a **secondary** with only a single machine. Instead, you must
+do this manually.
 
-The command above does the following changes:
+1. SSH in to the database node in the **secondary** and trigger PostgreSQL to
+   promote to read-write:
 
-- Promotes the PostgreSQL secondary to primary
-- Executes `gitlab-ctl reconfigure` to apply the changes in `/etc/gitlab/gitlab.rb`
-- Runs `gitlab-rake geo:set_secondary_as_primary`
+    ```bash
+    sudo gitlab-pg-ctl promote
+    ```
 
-You need to make sure all the affected machines no longer have `geo_secondary_role['enable'] = true` in
-`/etc/gitlab/gitlab.rb`, that you execute the database promotion on the required database nodes
-and you execute the `gitlab-rake geo:set_secondary_as_primary` in a machine running the application server.
+1. Edit `/etc/gitlab/gitlab.rb` on every machine in the **secondary** to
+   reflect its new status as **primary** by removing any lines that enabled the
+   `geo_secondary_role`:
+
+    ```ruby
+    ## In pre-11.5 documentation, the role was enabled as follows. Remove this line.
+    geo_secondary_role['enable'] = true
+
+    ## In 11.5+ documentation, the role was enabled as follows. Remove this line.
+    roles ['geo_secondary_role']
+    ```
+
+    After making these changes [Reconfigure GitLab](../../restart_gitlab.md#omnibus-gitlab-reconfigure) each
+    machine so the changes take effect.
+
+1. Promote the **secondary** to **primary**. SSH into a single application
+   server and execute:
+
+    ```bash
+    sudo gitlab-rake geo:set_secondary_as_primary
+    ```
+
+1. Verify you can connect to the newly promoted **primary** using the URL used
+   previously for the **secondary**.
+1. Success! The **secondary** has now been promoted to **primary**.
 
 ### Step 4. (Optional) Updating the primary domain DNS record
 
@@ -198,7 +228,7 @@ and after that you also need two extra steps.
 
     ```ruby
     ## Enable a Geo Primary role (if you haven't yet)
-    geo_primary_role['enable'] = true
+    roles ['geo_primary_role']
 
     ##
     # Primary and Secondary addresses

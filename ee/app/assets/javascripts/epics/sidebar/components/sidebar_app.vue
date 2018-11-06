@@ -226,9 +226,17 @@ export default {
   },
   mounted() {
     eventHub.$on('toggleSidebar', this.toggleSidebar);
+    document.addEventListener(
+      'toggleSidebarRevealLabelsDropdown',
+      this.toggleSidebarRevealLabelsDropdown,
+    );
   },
   beforeDestroy() {
     eventHub.$off('toggleSidebar', this.toggleSidebar);
+    document.removeEventListener(
+      'toggleSidebarRevealLabelsDropdown',
+      this.toggleSidebarRevealLabelsDropdown,
+    );
   },
   methods: {
     getDateValidity(startDate, endDate) {

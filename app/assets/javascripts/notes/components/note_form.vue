@@ -191,7 +191,7 @@ export default {
           :data-supports-quick-actions="!isEditing"
           name="note[note]"
           class="note-textarea js-gfm-input js-note-text
-js-autosize markdown-area js-vue-issue-note-form js-vue-textarea"
+js-autosize markdown-area js-vue-issue-note-form js-vue-textarea qa-reply-input"
           aria-label="Description"
           placeholder="Write a comment or drag your files here…"
           @keydown.meta.enter="handleUpdate()"
@@ -216,6 +216,7 @@ js-autosize markdown-area js-vue-issue-note-form js-vue-textarea"
                 <input
                   v-model="isUnresolving"
                   type="checkbox"
+                  class="qa-unresolve-review-discussion"
                 />
                 {{ __('Unresolve discussion') }}
               </template>
@@ -225,6 +226,7 @@ js-autosize markdown-area js-vue-issue-note-form js-vue-textarea"
                 <input
                   v-model="isResolving"
                   type="checkbox"
+                  class="qa-resolve-review-discussion"
                 />
                 {{ __('Resolve discussion') }}
               </template>
@@ -234,7 +236,7 @@ js-autosize markdown-area js-vue-issue-note-form js-vue-textarea"
             <button
               :disabled="isDisabled"
               type="button"
-              class="btn btn-success"
+              class="btn btn-success qa-start-review"
               @click="handleAddToReview()">
               <template v-if="hasDrafts">
                 {{ __('Add to review') }}
@@ -246,7 +248,7 @@ js-autosize markdown-area js-vue-issue-note-form js-vue-textarea"
             <button
               :disabled="isDisabled"
               type="button"
-              class="btn"
+              class="btn qa-comment-now"
               @click="handleUpdate()">
               {{ __('Add comment now') }}
             </button>

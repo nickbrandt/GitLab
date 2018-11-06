@@ -58,6 +58,8 @@ module API
         optional :sort, type: String, values: %w[asc desc], default: 'desc',
                         desc: 'Return epics sorted in `asc` or `desc` order.'
         optional :search, type: String, desc: 'Search epics for text present in the title or description'
+        optional :state, type: String, values: %w[opened closed all], default: 'all',
+                         desc: 'Return opened, closed, or all epics'
         optional :author_id, type: Integer, desc: 'Return epics which are authored by the user with the given ID'
         optional :labels, type: String, desc: 'Comma-separated list of label names'
       end

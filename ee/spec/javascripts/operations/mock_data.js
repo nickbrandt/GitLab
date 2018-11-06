@@ -34,10 +34,10 @@ export function mockProjectData(
         created_at: deployTimeStamp,
         commit: {
           short_id: 'mock-short_id',
-          tag: isTag,
           title: 'mock-title',
-          web_url: 'https://mock-web_url/',
+          commit_url: 'https://mock-commit_url/',
         },
+        tag: isTag,
         user: {
           avatar_url: null,
           path: 'mock-path',

@@ -72,10 +72,10 @@ export default {
             <commit
               :commit-ref="commitRef"
               :short-sha="project.last_deployment.commit.short_id"
-              :commit-url="project.last_deployment.commit.web_url"
+              :commit-url="project.last_deployment.commit.commit_url"
               :title="project.last_deployment.commit.title"
               :author="author"
-              :tag="project.last_deployment.commit.tag"
+              :tag="project.last_deployment.tag"
             />
           </div>
           <div
