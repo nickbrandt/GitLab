@@ -38,7 +38,7 @@ module QA
         end
 
         # Create a sand box group
-        Factory::Resource::Sandbox.fabricate_via_browser_ui! do |resource|
+        Resource::Sandbox.fabricate_via_browser_ui! do |resource|
           resource.path = "Synched-engineering-group-#{SecureRandom.hex(4)}"
         end
 
@@ -52,10 +52,15 @@ module QA
 
         EE::Page::Group::Menu.perform(&:go_to_members)
 
-        EE::Page::Group::Members.perform(&:click_sync_now)
+        users_synchronised = false
+        EE::Page::Group::Members.perform do |page|
+          page.click_sync_now
+          users_synchronised = page.with_retry(reload: true) do
+            page.has_content?('ENG User 2') && page.has_content?('ENG User 3')
+          end
+        end
 
-        expect(page).to have_content('ENG User 2')
-        expect(page).to have_content('ENG User 3')
+        expect(users_synchronised).to be_truthy
       end
     end
   end

@@ -7,7 +7,7 @@ module QA
     # creating it if it doesn't yet exist.
     #
     class Sandbox < Base
-      attr_reader :path
+      attr_accessor :path
 
       attribute :id
 
@@ -27,7 +27,8 @@ module QA
             Page::Group::New.perform do |group|
               group.set_path(path)
               group.set_description('GitLab QA Sandbox Group')
-              group.set_visibility('Public')
+              # https://gitlab.com/gitlab-org/gitlab-ce/issues/52771
+              # group.set_visibility('Public')
               group.create
             end
           end
