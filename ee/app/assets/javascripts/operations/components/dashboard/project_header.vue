@@ -1,11 +1,15 @@
 <script>
 import Icon from '~/vue_shared/components/icon.vue';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
+import { GlTooltipDirective } from '@gitlab-org/gitlab-ui';
 
 export default {
   components: {
     Icon,
     ProjectAvatar,
+  },
+  directives: {
+    GlTooltip: GlTooltipDirective,
   },
   props: {
     project: {
@@ -38,25 +42,30 @@ export default {
         </span>
       </a>
     </div>
-    <div class="dropdown">
+    <div class="dropdown js-more-actions">
       <div
-        class="d-flex align-items-center ml-2"
+        v-gl-tooltip
+        class="js-more-actions-toggle d-flex align-items-center ml-2"
         data-toggle="dropdown"
+        :title="__('More actions')"
       >
         <icon
           name="ellipsis_v"
           class="text-secondary"
         />
       </div>
-      <div class="dropdown-menu dropdown-menu-right">
-        <button
-          type="button"
-          class="js-remove-button dropdown-item btn-link text-danger prepend-left-default append-right-default outline-0"
-          @click="onRemove"
-        >
-          {{ __('Remove') }}
-        </button>
-      </div>
+      <ul class="dropdown-menu dropdown-menu-right">
+        <li>
+          <button
+            class="btn btn-transparent js-remove-button"
+            type="button"
+            @click="onRemove">
+            <span class="text-danger">
+              {{ __('Remove') }}
+            </span>
+          </button>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
