@@ -1,7 +1,10 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Admin::Geo::ProjectsController, :geo do
+  include EE::GeoHelpers
+
   set(:admin) { create(:admin) }
   let(:synced_registry) { create(:geo_project_registry, :synced) }
 
@@ -28,6 +31,11 @@ describe Admin::Geo::ProjectsController, :geo do
 
       before do
         stub_licensed_features(geo: true)
+        stub_current_geo_node(create(:geo_node))
+      end
+
+      it 'displays a different read-only message based on skip_readonly_message' do
+        expect(subject.body).to match('You may be able to make a limited amount of changes or perform a limited amount of actions on this page')
       end
 
       context 'without sync_status specified' do
