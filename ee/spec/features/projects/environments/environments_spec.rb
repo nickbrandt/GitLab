@@ -28,6 +28,7 @@ describe 'Environments page', :js do
 
       let!(:deployment) do
         create(:deployment,
+               :success,
                environment: environment, deployable: build,
                sha: project.commit.id)
       end
@@ -80,6 +81,7 @@ describe 'Environments page', :js do
 
       let!(:deployment) do
         create(:deployment,
+               :success,
                environment: environment, deployable: build,
                sha: project.commit.id)
       end
@@ -110,6 +112,7 @@ describe 'Environments page', :js do
 
       let!(:deployment) do
         create(:deployment,
+               :success,
                environment: environment, deployable: build,
                sha: project.commit.id)
       end
@@ -162,6 +165,7 @@ describe 'Environments page', :js do
 
       let!(:deployment) do
         create(:deployment,
+               :success,
                environment: environment, deployable: build,
                sha: project.commit.id)
       end
