@@ -132,7 +132,13 @@ module Gitlab
 
         def full_path
           uri = parse_uri(location)
-          full_path_for_uri(uri) if uri
+
+          if uri
+            path = remove_domain_from_uri(uri)
+            path = add_fragment_back_to_path(uri, path)
+
+            path
+          end
         end
 
         private
@@ -140,14 +146,17 @@ module Gitlab
         attr_reader :location
 
         def parse_uri(location)
-          location && URI.parse(location)
+          location && URI.parse(location.sub(/\A\/\/+/, '/'))
         rescue URI::InvalidURIError
           nil
         end
 
-        def full_path_for_uri(uri)
-          path_with_query = [uri.path, uri.query].compact.join('?')
-          [path_with_query, uri.fragment].compact.join("#")
+        def remove_domain_from_uri(uri)
+          [uri.path.sub(/\A\/+/, '/'), uri.query].compact.join('?')
+        end
+
+        def add_fragment_back_to_path(uri, path)
+          [path, uri.fragment].compact.join('#')
         end
       end
 

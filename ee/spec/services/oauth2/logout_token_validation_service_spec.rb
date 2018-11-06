@@ -70,7 +70,7 @@ describe Oauth2::LogoutTokenValidationService do
         it 'returns the fullpath to the Geo node to redirect the user back' do
           result = described_class.new(user, state: logout_state).execute
 
-          expect(result).to include(return_to: URI.join(node.url, oauth_return_to).to_s)
+          expect(result).to include(return_to: "#{node.url.chomp('/')}/project/test")
         end
 
         it 'replaces the host with the Geo node associated with OAuth application' do
@@ -80,7 +80,17 @@ describe Oauth2::LogoutTokenValidationService do
 
           result = described_class.new(user, state: logout_state).execute
 
-          expect(result).to include(return_to: URI.join(node.url, '/project/test').to_s)
+          expect(result).to include(return_to: "#{node.url.chomp('/')}/project/test")
+        end
+
+        it 'handles leading and trailing slashes correctly on return_to path' do
+          oauth_return_to = '//project/test'
+          oauth_session = Gitlab::Geo::OauthSession.new(access_token: access_token.token, return_to: oauth_return_to)
+          logout_state = oauth_session.generate_logout_state
+
+          result = described_class.new(user, state: logout_state).execute
+
+          expect(result).to include(return_to: "#{node.url.chomp('/')}/project/test")
         end
       end
     end

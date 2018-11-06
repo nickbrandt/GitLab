@@ -27,6 +27,8 @@ module Oauth2
 
         if logout_token&.is_utf8?
           Doorkeeper::AccessToken.by_token(logout_token)
+        else
+          nil
         end
       end
     end
@@ -37,7 +39,7 @@ module Oauth2
 
     def user_return_to
       full_path = oauth_session.get_oauth_state_return_to_full_path
-      URI.join(geo_node_url, full_path).to_s
+      Gitlab::Utils.append_path(geo_node_url, full_path)
     end
 
     def geo_node_url
