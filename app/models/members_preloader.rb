@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 class MembersPreloader
+<<<<<<< HEAD
   prepend EE::MembersPreloader
 
+=======
+>>>>>>> upstream/master
   attr_reader :members
 
   def initialize(members)

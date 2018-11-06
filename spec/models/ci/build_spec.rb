@@ -17,7 +17,10 @@ describe Ci::Build do
   it { is_expected.to belong_to(:runner) }
   it { is_expected.to belong_to(:trigger_request) }
   it { is_expected.to belong_to(:erased_by) }
+<<<<<<< HEAD
   it { is_expected.to have_many(:sourced_pipelines) }
+=======
+>>>>>>> upstream/master
   it { is_expected.to have_many(:trace_sections)}
   it { is_expected.to have_one(:deployment) }
   it { is_expected.to have_one(:runner_session)}
@@ -885,6 +888,7 @@ describe Ci::Build do
   describe 'deployment' do
     describe '#has_deployment?' do
       subject { build.has_deployment? }
+<<<<<<< HEAD
 
       context 'when build has a deployment' do
         let!(:deployment) { create(:deployment, deployable: build) }
@@ -892,6 +896,15 @@ describe Ci::Build do
         it { is_expected.to be_truthy }
       end
 
+=======
+
+      context 'when build has a deployment' do
+        let!(:deployment) { create(:deployment, deployable: build) }
+
+        it { is_expected.to be_truthy }
+      end
+
+>>>>>>> upstream/master
       context 'when build does not have a deployment' do
         it { is_expected.to be_falsy }
       end

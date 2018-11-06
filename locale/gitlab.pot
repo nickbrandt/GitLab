@@ -1909,7 +1909,7 @@ msgstr ""
 msgid "ClusterIntegration|Prometheus is an open-source monitoring system with %{gitlabIntegrationLink} to monitor deployed applications."
 msgstr ""
 
-msgid "ClusterIntegration|RBAC-enabled cluster (experimental)"
+msgid "ClusterIntegration|RBAC-enabled cluster"
 msgstr ""
 
 msgid "ClusterIntegration|Read our %{link_to_help_page} on Kubernetes cluster integration."
@@ -1979,9 +1979,6 @@ msgid "ClusterIntegration|Something went wrong while installing %{title}"
 msgstr ""
 
 msgid "ClusterIntegration|The IP address is in the process of being assigned. Please check your Kubernetes cluster or Quotas on Google Kubernetes Engine if it takes a long time."
-msgstr ""
-
-msgid "ClusterIntegration|The default cluster configuration grants access to many functionalities needed to successfully build and deploy a containerised application."
 msgstr ""
 
 msgid "ClusterIntegration|This account must have permissions to create a Kubernetes cluster in the %{link_to_container_project} specified below"
@@ -5992,9 +5989,6 @@ msgstr ""
 msgid "Profiles| You are going to change the username %{currentUsernameBold} to %{newUsernameBold}. Profile and projects will be redirected to the %{newUsername} namespace but this redirect will expire once the %{currentUsername} namespace is registered by another user or group. Please update your Git repository remotes as soon as possible."
 msgstr ""
 
-msgid "Profiles|%{author_name} made a private contribution"
-msgstr ""
-
 msgid "Profiles|Account scheduled for removal."
 msgstr ""
 
@@ -6053,6 +6047,9 @@ msgid "Profiles|Invalid password"
 msgstr ""
 
 msgid "Profiles|Invalid username"
+msgstr ""
+
+msgid "Profiles|Made a private contribution"
 msgstr ""
 
 msgid "Profiles|Main settings"
@@ -7600,6 +7597,9 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
+msgid "Stop environment"
+msgstr ""
+
 msgid "Stop impersonation"
 msgstr ""
 
@@ -7607,6 +7607,9 @@ msgid "Stop this environment"
 msgstr ""
 
 msgid "Stopped"
+msgstr ""
+
+msgid "Stopping this environment is currently not possible as a deployment is in progress"
 msgstr ""
 
 msgid "Storage"
