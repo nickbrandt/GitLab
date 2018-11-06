@@ -40,7 +40,7 @@ describe Projects::Security::DashboardController do
 
       context 'when uses new reports syntax' do
         before do
-          create(:ee_ci_build, :security_reports, pipeline: pipeline)
+          create(:ee_ci_build, :sast, pipeline: pipeline)
         end
 
         it 'renders empty state (not yet supported)' do

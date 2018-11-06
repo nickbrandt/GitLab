@@ -1503,30 +1503,8 @@ describe Project do
     let(:pipeline_3) { create(:ci_pipeline_without_jobs, project: project) }
 
     before do
-      create(
-        :ci_build,
-        :success,
-        :artifacts,
-        name: 'sast',
-        pipeline: pipeline_1,
-        options: {
-          artifacts: {
-            paths: [Ci::JobArtifact::DEFAULT_FILE_NAMES[:sast]]
-          }
-        }
-      )
-      create(
-        :ci_build,
-        :success,
-        :artifacts,
-        name: 'sast',
-        pipeline: pipeline_2,
-        options: {
-          artifacts: {
-            paths: [Ci::JobArtifact::DEFAULT_FILE_NAMES[:sast]]
-          }
-        }
-      )
+      create(:ee_ci_build, :legacy_sast, pipeline: pipeline_1)
+      create(:ee_ci_build, :legacy_sast, pipeline: pipeline_2)
     end
 
     it "returns the latest pipeline with security reports" do

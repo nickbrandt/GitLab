@@ -29,12 +29,6 @@ module EE
       group_epic_path(entity.group, entity, *args)
     end
 
-    def license_management_artifact_url(pipeline)
-      raw_project_build_artifacts_url(pipeline.project,
-                                      pipeline.license_management_artifact,
-                                      path: Ci::Build::LICENSE_MANAGEMENT_FILE)
-    end
-
     def license_management_api_url(project)
       api_v4_projects_managed_licenses_path(id: project.id)
     end
