@@ -4,8 +4,9 @@ class GithubService
 
     attr_reader :sha
 
-    def initialize(project, params)
+    def initialize(project, service, params)
       @project = project
+      @service = service
       @gitlab_status = params[:status]
       @detailed_status = params[:detailed_status]
       @pipeline_id = params[:id]
@@ -14,7 +15,11 @@ class GithubService
     end
 
     def context
-      "ci/gitlab"
+      if @service.static_context?
+        "ci/gitlab/#{::Gitlab.config.gitlab.host}"
+      else
+        "ci/gitlab/#{@ref_name}".truncate(255)
+      end
     end
 
     def description
@@ -50,8 +55,8 @@ class GithubService
       }
     end
 
-    def self.from_pipeline_data(project, data)
-      new(project, data[:object_attributes])
+    def self.from_pipeline_data(project, service, data)
+      new(project, service, data[:object_attributes])
     end
   end
 end

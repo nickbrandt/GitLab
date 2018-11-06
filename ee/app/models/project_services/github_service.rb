@@ -64,7 +64,7 @@ class GithubService < Service
   def execute(data)
     return if disabled?
 
-    status_message = StatusMessage.from_pipeline_data(project, data)
+    status_message = StatusMessage.from_pipeline_data(project, self, data)
 
     update_status(status_message)
   end
