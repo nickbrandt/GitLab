@@ -15,11 +15,7 @@ class GithubService
     end
 
     def context
-      if @service.static_context?
-        "ci/gitlab/#{::Gitlab.config.gitlab.host}"
-      else
-        "ci/gitlab/#{@ref_name}".truncate(255)
-      end
+      context_name.truncate(255)
     end
 
     def description
@@ -57,6 +53,16 @@ class GithubService
 
     def self.from_pipeline_data(project, service, data)
       new(project, service, data[:object_attributes])
+    end
+
+    private
+
+    def context_name
+      if @service.static_context?
+        "ci/gitlab/#{::Gitlab.config.gitlab.host}"
+      else
+        "ci/gitlab/#{@ref_name}"
+      end
     end
   end
 end
