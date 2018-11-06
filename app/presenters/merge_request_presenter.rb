@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class MergeRequestPresenter < Gitlab::View::Presenter::Delegated
-  prepend EE::MergeRequestPresenter
-
   include ActionView::Helpers::UrlHelper
   include GitlabRoutingHelper
   include MarkupHelper
@@ -225,3 +223,5 @@ class MergeRequestPresenter < Gitlab::View::Presenter::Delegated
     can?(current_user, :fork_project, project)
   end
 end
+
+MergeRequestPresenter.prepend(EE::MergeRequestPresenter)
