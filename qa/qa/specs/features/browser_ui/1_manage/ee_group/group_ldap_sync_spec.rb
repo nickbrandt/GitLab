@@ -8,9 +8,9 @@ module QA
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
 
         # Login users to create them
-        login_logout_users(['enguser3', 'enguser2'])
+        login_logout_users(%w[enguser3 enguser2])
 
-        create_sandbox_group_with_user(user: 'enguser1', group_name:'Synched-engineering-group')
+        create_sandbox_group_with_user(user: 'enguser1', group_name: 'Synched-engineering-group')
 
         EE::Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
 
@@ -23,16 +23,15 @@ module QA
         EE::Page::Group::Menu.perform(&:go_to_members)
 
         verify_users_synched(['ENG User 2', 'ENG User 3'])
-
       end
 
       it 'Has LDAP user synced using user filter method' do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
 
         # Login users to create them
-        login_logout_users(['hruser3', 'hruser2'])
+        login_logout_users(%w[hruser3 hruser2])
 
-        create_sandbox_group_with_user(user: 'hruser1', group_name:'Synched-human-resources-group')
+        create_sandbox_group_with_user(user: 'hruser1', group_name: 'Synched-human-resources-group')
 
         EE::Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
 
