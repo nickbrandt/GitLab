@@ -3,7 +3,6 @@
 module QA
   context 'Manage', :orchestrated, :ldap_tls, :ldap_no_tls do
     describe 'LDAP Sync' do
-
       it 'syncs admin users' do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
 
@@ -100,7 +99,6 @@ module QA
           end
           expect(users_synchronised).to be_truthy
         end
-
       end
     end
   end
