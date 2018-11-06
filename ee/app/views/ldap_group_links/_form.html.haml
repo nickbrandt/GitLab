@@ -36,7 +36,7 @@
           = f.label :filter, class: 'col-form-label col-sm-2' do
             LDAP User filter
           .col-sm-10
-            = f.text_field :filter, placeholder: 'Ex. (&(objectCategory=person)(objectClass=developer))', class: 'form-control xxlarge input-mn-300'
+            = f.text_field :filter, placeholder: 'Ex. (&(objectCategory=person)(objectClass=developer))', class: 'form-control xxlarge input-mn-300 qa-ldap-user-filter-text-field'
             .form-text.text-muted
               - ldap_link = link_to 'LDAP Search Filter Syntax', 'https://msdn.microsoft.com/en-us/library/aa746475(v=vs.85).aspx'
               This query must use valid #{ldap_link}. Synchronize #{group.name}'s members with this LDAP user filter.
