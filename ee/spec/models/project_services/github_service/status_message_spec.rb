@@ -4,7 +4,7 @@ describe GithubService::StatusMessage do
   include Rails.application.routes.url_helpers
 
   let(:project) { double(:project, namespace: "me", to_s: 'example_project') }
-  let(:service) { double(:service, :static_context? => false) }
+  let(:service) { double(:service, static_context?: false) }
 
   before do
     stub_config_setting(host: 'instance-host')
