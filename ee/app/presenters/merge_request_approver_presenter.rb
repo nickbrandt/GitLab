@@ -64,7 +64,7 @@ class MergeRequestApproverPresenter < Gitlab::View::Presenter::Simple
 
   def code_owner_enabled?
     strong_memoize(:code_owner_enabled) do
-      merge_request.project.feature_available?(:code_owner_as_approver_suggestion)
+      merge_request.project.feature_available?(:code_owners)
     end
   end
 
