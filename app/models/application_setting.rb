@@ -6,6 +6,7 @@ class ApplicationSetting < ActiveRecord::Base
   include TokenAuthenticatable
   include IgnorableColumn
   include ChronicDurationAttribute
+
   prepend EE::ApplicationSetting
 
   add_authentication_token_field :runners_registration_token
