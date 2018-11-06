@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Admin::UsersController < Admin::ApplicationController
-  prepend EE::Admin::UsersController
-
   before_action :user, except: [:index, :new, :create]
 
   def index
@@ -230,3 +228,5 @@ class Admin::UsersController < Admin::ApplicationController
     result[:status] == :success
   end
 end
+
+Admin::UsersController.prepend(EE::Admin::UsersController)

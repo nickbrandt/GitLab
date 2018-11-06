@@ -3,8 +3,6 @@
 class Projects::MirrorsController < Projects::ApplicationController
   include RepositorySettingsRedirect
 
-  prepend EE::Projects::MirrorsController
-
   # Authorize
   before_action :remote_mirror, only: [:update]
   before_action :check_mirror_available!
@@ -87,3 +85,5 @@ class Projects::MirrorsController < Projects::ApplicationController
     params.require(:project).permit(mirror_params_attributes)
   end
 end
+
+Projects::MirrorsController.prepend(EE::Projects::MirrorsController)

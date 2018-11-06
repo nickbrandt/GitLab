@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module InternalRedirect
-  prepend EE::InternalRedirect
   extend ActiveSupport::Concern
 
   def safe_redirect_path(path)
@@ -46,3 +45,5 @@ module InternalRedirect
     URI(request.referer).path
   end
 end
+
+InternalRedirect.prepend(EE::InternalRedirect)

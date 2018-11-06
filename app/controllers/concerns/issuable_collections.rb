@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module IssuableCollections
-  prepend EE::IssuableCollections
   extend ActiveSupport::Concern
   include CookiesHelper
   include SortingHelper
@@ -179,3 +178,5 @@ module IssuableCollections
                                 end
   end
 end
+
+IssuableCollections.prepend(EE::IssuableCollections)

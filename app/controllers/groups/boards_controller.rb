@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Groups::BoardsController < Groups::ApplicationController
-  prepend EE::Boards::BoardsController
   include BoardsResponses
 
   before_action :assign_endpoint_vars
@@ -51,3 +50,5 @@ class Groups::BoardsController < Groups::ApplicationController
     end
   end
 end
+
+Groups::BoardsController.prepend(EE::Boards::BoardsController)

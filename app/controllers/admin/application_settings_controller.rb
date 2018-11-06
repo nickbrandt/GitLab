@@ -2,8 +2,6 @@
 
 class Admin::ApplicationSettingsController < Admin::ApplicationController
   include InternalRedirect
-  prepend EE::Admin::ApplicationSettingsController
-
   before_action :set_application_setting
 
   def show
@@ -135,3 +133,5 @@ class Admin::ApplicationSettingsController < Admin::ApplicationController
     ]
   end
 end
+
+Admin::ApplicationSettingsController.prepend(EE::Admin::ApplicationSettingsController)
