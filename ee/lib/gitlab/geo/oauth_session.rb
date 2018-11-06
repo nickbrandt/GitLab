@@ -146,13 +146,13 @@ module Gitlab
         attr_reader :location
 
         def parse_uri(location)
-          location && URI.parse(location.sub(/\A\/\/+/, '/'))
+          location && URI.parse(location.sub(%r{\A\/\/+}, '/'))
         rescue URI::InvalidURIError
           nil
         end
 
         def remove_domain_from_uri(uri)
-          [uri.path.sub(/\A\/+/, '/'), uri.query].compact.join('?')
+          [uri.path.sub(%r{\A\/+}, '/'), uri.query].compact.join('?')
         end
 
         def add_fragment_back_to_path(uri, path)
