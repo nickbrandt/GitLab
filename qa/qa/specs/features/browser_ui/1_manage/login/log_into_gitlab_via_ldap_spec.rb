@@ -3,7 +3,7 @@
 module QA
   context 'Manage', :orchestrated, :ldap_no_tls, :ldap_tls do
     describe 'LDAP login' do
-      it 'Login with LDAP and sync admin users' do
+      it 'Logins with LDAP and syncs admin users' do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
 
         Page::Main::Login.perform do |login_page|
