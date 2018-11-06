@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class BuildFinishedWorker
-  prepend EE::BuildFinishedWorker
   include ApplicationWorker
   include PipelineQueue
 
@@ -23,3 +22,5 @@ class BuildFinishedWorker
   end
   # rubocop: enable CodeReuse/ActiveRecord
 end
+
+BuildFinishedWorker.prepend(EE::BuildFinishedWorker)
