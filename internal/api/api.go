@@ -212,7 +212,7 @@ func (api *API) newRequest(r *http.Request, suffix string) (*http.Request, error
 	return authReq, nil
 }
 
-// Perform a pre-authorization check against the API for the given HTTP request
+// PreAuthorize performs a pre-authorization check against the API for the given HTTP request
 //
 // If `outErr` is set, the other fields will be nil and it should be treated as
 // a 500 error.

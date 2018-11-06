@@ -26,6 +26,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/correlation"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/queueing"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/redis"
@@ -147,7 +148,7 @@ func main() {
 		}
 	}
 
-	up := wrapRaven(log.InjectCorrelationID(upstream.NewUpstream(cfg)))
+	up := wrapRaven(correlation.InjectCorrelationID(upstream.NewUpstream(cfg)))
 
 	logger.Fatal(http.Serve(listener, up))
 }

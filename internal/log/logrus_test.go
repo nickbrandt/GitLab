@@ -8,13 +8,13 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/correlation"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
 )
 
 func requireCorrelationID(t *testing.T, getEntry func(ctx context.Context) *logrus.Entry) *logrus.Entry {
 	id := "test-id"
-	ctx := context.WithValue(context.Background(), log.KeyCorrelationID, id)
-
+	ctx := correlation.ContextWithCorrelation(context.Background(), id)
 	e := getEntry(ctx)
 
 	require.NotNil(t, e)

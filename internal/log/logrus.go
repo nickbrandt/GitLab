@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/sirupsen/logrus"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/correlation"
 )
 
 // Fields type, an helper to avoid importing logrus.Fields
@@ -19,19 +21,11 @@ func toLogrusFields(f Fields) logrus.Fields {
 }
 
 func getCorrelationID(ctx context.Context) string {
-	noID := "[MISSING]"
-	if ctx == nil {
-		return noID
+	correlationID := correlation.ExtractFromContext(ctx)
+	if correlationID == "" {
+		return "[MISSING]"
 	}
-
-	id := ctx.Value(KeyCorrelationID)
-
-	str, ok := id.(string)
-	if !ok {
-		return noID
-	}
-
-	return str
+	return correlationID
 }
 
 // WithContext provides a *logrus.Entry with the proper "correlation-id" field.

@@ -1,4 +1,4 @@
-package log
+package correlation
 
 import (
 	"bytes"
@@ -8,7 +8,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -34,7 +33,7 @@ func TestInjectCorrelationID(t *testing.T) {
 				invoked = true
 
 				ctx := r.Context()
-				correlationID := ctx.Value(KeyCorrelationID)
+				correlationID := ExtractFromContext(ctx)
 				require.NotNil(t, correlationID, "CorrelationID is missing")
 				require.NotEmpty(t, correlationID, "CorrelationID is missing")
 			}))
@@ -42,7 +41,7 @@ func TestInjectCorrelationID(t *testing.T) {
 			r := httptest.NewRequest("GET", "http://example.com", nil)
 			h.ServeHTTP(nil, r)
 
-			assert.True(t, invoked, "handler not executed")
+			require.True(t, invoked, "handler not executed")
 		})
 	}
 }

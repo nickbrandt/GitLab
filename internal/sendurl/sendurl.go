@@ -9,6 +9,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/correlation"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
@@ -36,7 +37,7 @@ var rangeHeaderKeys = []string{
 // that are more restrictive than for http.DefaultTransport,
 // they define shorter TLS Handshake, and more agressive connection closing
 // to prevent the connection hanging and reduce FD usage
-var httpTransport = &http.Transport{
+var httpTransport = correlation.NewInstrumentedRoundTripper(&http.Transport{
 	Proxy: http.ProxyFromEnvironment,
 	DialContext: (&net.Dialer{
 		Timeout:   30 * time.Second,
@@ -47,7 +48,7 @@ var httpTransport = &http.Transport{
 	TLSHandshakeTimeout:   10 * time.Second,
 	ExpectContinueTimeout: 10 * time.Second,
 	ResponseHeaderTimeout: 30 * time.Second,
-}
+})
 
 var httpClient = &http.Client{
 	Transport: httpTransport,
@@ -115,6 +116,7 @@ func (e *entry) Inject(w http.ResponseWriter, r *http.Request, sendData string) 
 		helper.Fail500(w, r, fmt.Errorf("SendURL: NewRequest: %v", err))
 		return
 	}
+	newReq = newReq.WithContext(r.Context())
 
 	for _, header := range rangeHeaderKeys {
 		newReq.Header[header] = r.Header[header]

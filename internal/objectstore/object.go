@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"time"
 
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/correlation"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
@@ -16,7 +17,7 @@ import (
 // that are more restrictive than for http.DefaultTransport,
 // they define shorter TLS Handshake, and more agressive connection closing
 // to prevent the connection hanging and reduce FD usage
-var httpTransport = &http.Transport{
+var httpTransport = correlation.NewInstrumentedRoundTripper(&http.Transport{
 	Proxy: http.ProxyFromEnvironment,
 	DialContext: (&net.Dialer{
 		Timeout:   30 * time.Second,
@@ -27,7 +28,7 @@ var httpTransport = &http.Transport{
 	TLSHandshakeTimeout:   10 * time.Second,
 	ExpectContinueTimeout: 10 * time.Second,
 	ResponseHeaderTimeout: 30 * time.Second,
-}
+})
 
 var httpClient = &http.Client{
 	Transport: httpTransport,
