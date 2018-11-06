@@ -2,8 +2,6 @@
 
 module MergeRequests
   class RefreshService < MergeRequests::BaseService
-    prepend EE::MergeRequests::RefreshService
-
     def execute(oldrev, newrev, ref)
       push = Gitlab::Git::Push.new(@project, oldrev, newrev, ref)
       return true unless push.branch_push?
@@ -225,3 +223,5 @@ module MergeRequests
     end
   end
 end
+
+MergeRequests::RefreshService.prepend(EE::MergeRequests::RefreshService)

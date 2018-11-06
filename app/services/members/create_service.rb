@@ -2,8 +2,6 @@
 
 module Members
   class CreateService < Members::BaseService
-    prepend EE::Members::CreateService
-
     DEFAULT_LIMIT = 100
 
     def execute(source)
@@ -35,3 +33,5 @@ module Members
     end
   end
 end
+
+Members::CreateService.prepend(EE::Members::CreateService)

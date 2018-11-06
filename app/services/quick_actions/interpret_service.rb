@@ -3,8 +3,6 @@
 module QuickActions
   class InterpretService < BaseService
     include Gitlab::QuickActions::Dsl
-    prepend EE::QuickActions::InterpretService
-
     attr_reader :issuable
 
     SHRUG = '¯\\＿(ツ)＿/¯'.freeze
@@ -701,3 +699,5 @@ module QuickActions
     # rubocop: enable CodeReuse/ActiveRecord
   end
 end
+
+QuickActions::InterpretService.prepend(EE::QuickActions::InterpretService)

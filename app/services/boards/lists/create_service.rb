@@ -3,8 +3,6 @@
 module Boards
   module Lists
     class CreateService < Boards::BaseService
-      prepend EE::Boards::Lists::CreateService
-
       include Gitlab::Utils::StrongMemoize
 
       def execute(board)
@@ -50,3 +48,5 @@ module Boards
     end
   end
 end
+
+Boards::Lists::CreateService.prepend(EE::Boards::Lists::CreateService)

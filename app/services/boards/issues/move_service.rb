@@ -3,8 +3,6 @@
 module Boards
   module Issues
     class MoveService < Boards::BaseService
-      prepend EE::Boards::Issues::MoveService
-
       def execute(issue)
         return false unless can?(current_user, :update_issue, issue)
         return false if issue_params(issue).empty?
@@ -90,3 +88,5 @@ module Boards
     end
   end
 end
+
+Boards::Issues::MoveService.prepend(EE::Boards::Issues::MoveService)

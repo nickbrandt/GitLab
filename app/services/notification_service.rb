@@ -16,8 +16,6 @@
 #   NotificationService.new.async.new_issue(issue, current_user)
 #
 class NotificationService
-  prepend EE::NotificationService
-
   class Async
     attr_reader :parent
     delegate :respond_to_missing, to: :parent
@@ -589,3 +587,5 @@ class NotificationService
     member.source.respond_to?(:group) && member.source.group
   end
 end
+
+NotificationService.prepend(EE::NotificationService)
