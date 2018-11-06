@@ -5608,10 +5608,10 @@ msgstr ""
 msgid "OperationsDashboard|Add a project to the dashboard"
 msgstr ""
 
-msgid "OperationsDashboard|Some projects could not be added to dashboard"
+msgid "OperationsDashboard|The operations dashboard provides a summary of each project's operational health, including pipeline and alert status."
 msgstr ""
 
-msgid "OperationsDashboard|The operations dashboard provides a summary of each project's operational health, including pipeline and alert status."
+msgid "OperationsDashboard|Unable to add %{invalidProjects}. The Operations Dashboard is available for projects with a Gold subscription."
 msgstr ""
 
 msgid "Optionally, you can %{link_to_customize} how FogBugz email addresses and usernames are imported into GitLab."
