@@ -3841,6 +3841,12 @@ msgstr ""
 msgid "Geo|Waiting for scheduler"
 msgstr ""
 
+msgid "Geo|You are on a secondary, <b>read-only</b> Geo node. If you want to make changes, you must visit this page on the %{primary_node}."
+msgstr ""
+
+msgid "Geo|You are on a secondary, <b>read-only</b> Geo node. You may be able to make a limited amount of changes or perform a limited amount of actions on this page."
+msgstr ""
+
 msgid "Geo|You need a different license to use Geo replication"
 msgstr ""
 
@@ -8990,9 +8996,6 @@ msgid "You are going to transfer %{project_full_name} to another owner. Are you 
 msgstr ""
 
 msgid "You are on a read-only GitLab instance."
-msgstr ""
-
-msgid "You are on a secondary, <b>read-only</b> Geo node. If you want to make changes, you must visit this page on the %{primary_node}."
 msgstr ""
 
 msgid "You can %{linkStart}view the blob%{linkEnd} instead."
