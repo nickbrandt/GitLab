@@ -956,7 +956,6 @@ ActiveRecord::Schema.define(version: 20181101144347) do
   add_index "deployments", ["id"], name: "partial_index_deployments_for_legacy_successful_deployments", where: "((finished_at IS NULL) AND (status = 2))", using: :btree
   add_index "deployments", ["project_id", "iid"], name: "index_deployments_on_project_id_and_iid", unique: true, using: :btree
   add_index "deployments", ["project_id", "status"], name: "index_deployments_on_project_id_and_status", using: :btree
-<<<<<<< .merge_file_GiIkJj
 
   create_table "draft_notes", id: :bigserial, force: :cascade do |t|
     t.integer "merge_request_id", null: false
@@ -972,8 +971,6 @@ ActiveRecord::Schema.define(version: 20181101144347) do
   add_index "draft_notes", ["author_id"], name: "index_draft_notes_on_author_id", using: :btree
   add_index "draft_notes", ["discussion_id"], name: "index_draft_notes_on_discussion_id", using: :btree
   add_index "draft_notes", ["merge_request_id"], name: "index_draft_notes_on_merge_request_id", using: :btree
-=======
->>>>>>> .merge_file_PHGMgM
 
   create_table "emails", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -1118,7 +1115,6 @@ ActiveRecord::Schema.define(version: 20181101144347) do
 
   add_index "forked_project_links", ["forked_to_project_id"], name: "index_forked_project_links_on_forked_to_project_id", unique: true, using: :btree
 
-<<<<<<< .merge_file_GiIkJj
   create_table "geo_cache_invalidation_events", id: :bigserial, force: :cascade do |t|
     t.string "key", null: false
   end
@@ -1335,7 +1331,7 @@ ActiveRecord::Schema.define(version: 20181101144347) do
   end
 
   add_index "geo_upload_deleted_events", ["upload_id"], name: "index_geo_upload_deleted_events_on_upload_id", using: :btree
-=======
+
   create_table "gcp_clusters", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "user_id"
@@ -1364,7 +1360,6 @@ ActiveRecord::Schema.define(version: 20181101144347) do
   end
 
   add_index "gcp_clusters", ["project_id"], name: "index_gcp_clusters_on_project_id", unique: true, using: :btree
->>>>>>> .merge_file_PHGMgM
 
   create_table "gpg_key_subkeys", force: :cascade do |t|
     t.integer "gpg_key_id", null: false
@@ -3314,7 +3309,6 @@ ActiveRecord::Schema.define(version: 20181101144347) do
   add_foreign_key "fork_network_members", "projects", on_delete: :cascade
   add_foreign_key "fork_networks", "projects", column: "root_project_id", name: "fk_e7b436b2b5", on_delete: :nullify
   add_foreign_key "forked_project_links", "projects", column: "forked_to_project_id", name: "fk_434510edb0", on_delete: :cascade
-<<<<<<< .merge_file_GiIkJj
   add_foreign_key "geo_event_log", "geo_cache_invalidation_events", column: "cache_invalidation_event_id", name: "fk_42c3b54bed", on_delete: :cascade
   add_foreign_key "geo_event_log", "geo_hashed_storage_attachments_events", column: "hashed_storage_attachments_event_id", name: "fk_304067fc30", on_delete: :cascade
   add_foreign_key "geo_event_log", "geo_hashed_storage_migrated_events", column: "hashed_storage_migrated_event_id", name: "fk_27548c6db3", on_delete: :cascade
@@ -3337,11 +3331,9 @@ ActiveRecord::Schema.define(version: 20181101144347) do
   add_foreign_key "geo_repository_renamed_events", "projects", on_delete: :cascade
   add_foreign_key "geo_repository_updated_events", "projects", on_delete: :cascade
   add_foreign_key "geo_reset_checksum_events", "projects", on_delete: :cascade
-=======
   add_foreign_key "gcp_clusters", "projects", on_delete: :cascade
   add_foreign_key "gcp_clusters", "services", on_delete: :nullify
   add_foreign_key "gcp_clusters", "users", on_delete: :nullify
->>>>>>> .merge_file_PHGMgM
   add_foreign_key "gpg_key_subkeys", "gpg_keys", on_delete: :cascade
   add_foreign_key "gpg_keys", "users", on_delete: :cascade
   add_foreign_key "gpg_signatures", "gpg_key_subkeys", on_delete: :nullify
