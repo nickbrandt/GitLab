@@ -22,6 +22,17 @@
       = nav_link(html_options: { class: active_when(params[:sync_status] == 'never') }) do
         = link_to admin_geo_projects_path(sync_status: 'never') do
           = s_('Geo|Never')
+    .nav-controls
+      = render(partial: 'shared/projects/search_form', autofocus: true)
+      .dropdown
+        %a.btn.dropdown-toggle{ href: '#', data: { toggle: 'dropdown' }, 'aria-haspopup' => 'true', 'aria-expanded' => 'false' }
+          = icon('gears')
+          = s_('Geo|Batch operations')
+          = icon("caret-down")
+        %ul.dropdown-menu.dropdown-menu-right
+          %li.dropdown-header= s_('Geo|Batch operations')
+          %li= link_to s_('Geo|Resync all projects'), resync_all_admin_geo_projects_path, method: :post
+          %li= link_to s_('Geo|Recheck all projects'), recheck_all_admin_geo_projects_path, method: :post
 
   - case params[:sync_status]
   - when 'never'

@@ -14,7 +14,7 @@ describe 'Environment > Pod Logs', :js do
     stub_licensed_features(pod_logs: true)
 
     create(:cluster, :provided_by_gcp, environment_scope: '*', projects: [project])
-    create(:deployment, environment: environment)
+    create(:deployment, :success, environment: environment)
 
     allow_any_instance_of(EE::KubernetesService).to receive(:read_pod_logs).with(pod_name).and_return(kube_logs_body)
     allow_any_instance_of(EE::Environment).to receive(:pod_names).and_return(pod_names)

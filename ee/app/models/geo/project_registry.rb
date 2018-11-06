@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Geo::ProjectRegistry < Geo::BaseRegistry
   include ::Delay
   include ::EachBatch
@@ -76,6 +78,50 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
         .or(arel_table[:repository_retry_at].eq(nil))
         .or(arel_table[:wiki_retry_at].eq(nil))
     )
+  end
+
+  # Search for a list of projects associated with registries,
+  # based on the query given in `query`.
+  #
+  # @param [String] query term that will search over :path, :name and :description
+  def self.with_search(query)
+    where(project: Geo::Fdw::Project.search(query))
+  end
+
+  def self.flag_repositories_for_resync!
+    update_all(
+      resync_repository: true,
+      repository_verification_checksum_sha: nil,
+      repository_checksum_mismatch: false,
+      last_repository_verification_failure: nil,
+      repository_verification_retry_count: nil,
+      resync_repository_was_scheduled_at: Time.now,
+      repository_retry_count: nil,
+      repository_retry_at: nil
+    )
+  end
+
+  def self.flag_repositories_for_recheck!
+    update_all(
+      repository_verification_checksum_sha: nil,
+      last_repository_verification_failure: nil,
+      repository_checksum_mismatch: false
+    )
+  end
+
+  # Retrieve the range of IDs in a relation
+  #
+  # @return [Array] with minimum ID and max ID
+  def self.range
+    pluck('MIN(id)', 'MAX(id)').first
+  end
+
+  # Search for IDs in the range
+  #
+  # @param [Integer] start initial ID
+  # @param [Integer] finish final ID
+  def self.with_range(start, finish)
+    where(id: start..finish)
   end
 
   # Must be run before fetching the repository to avoid a race condition

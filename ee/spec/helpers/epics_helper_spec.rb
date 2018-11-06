@@ -30,10 +30,12 @@ describe EpicsHelper do
       expected_keys = %i(initial meta namespace labels_path toggle_subscription_path labels_web_url epics_web_url)
       expect(data.keys).to match_array(expected_keys)
       expect(meta_data.keys).to match_array(%w[
-        created author epic_id todo_exists todo_path state
-        start_date start_date_fixed start_date_is_fixed start_date_from_milestones start_date_sourcing_milestone_title
-        end_date due_date due_date_fixed due_date_is_fixed due_date_from_milestones due_date_sourcing_milestone_title
-        start_date_sourcing_milestone_dates due_date_sourcing_milestone_dates
+        epic_id created author todo_exists todo_path start_date
+        start_date_is_fixed start_date_fixed start_date_from_milestones
+        start_date_sourcing_milestone_title start_date_sourcing_milestone_dates
+        due_date due_date_is_fixed due_date_fixed due_date_from_milestones due_date_sourcing_milestone_title
+        due_date_sourcing_milestone_dates end_date state namespace labels_path toggle_subscription_path
+        labels_web_url epics_web_url
       ])
       expect(meta_data['author']).to eq({
         'name' => user.name,
@@ -74,15 +76,21 @@ describe EpicsHelper do
         meta_data = JSON.parse(data[:meta])
 
         expect(meta_data.keys).to match_array(%w[
-          created author epic_id todo_exists todo_path state
-          start_date start_date_fixed start_date_is_fixed start_date_from_milestones start_date_sourcing_milestone_title
-          end_date due_date due_date_fixed due_date_is_fixed due_date_from_milestones due_date_sourcing_milestone_title
-          start_date_sourcing_milestone_dates due_date_sourcing_milestone_dates
+          epic_id created author todo_exists todo_path start_date
+          start_date_is_fixed start_date_fixed start_date_from_milestones
+          start_date_sourcing_milestone_title start_date_sourcing_milestone_dates
+          due_date due_date_is_fixed due_date_fixed due_date_from_milestones due_date_sourcing_milestone_title
+          due_date_sourcing_milestone_dates end_date state namespace labels_path toggle_subscription_path
+          labels_web_url epics_web_url
         ])
         expect(meta_data['start_date']).to eq('2000-01-01')
         expect(meta_data['start_date_sourcing_milestone_title']).to eq(milestone1.title)
+        expect(meta_data['start_date_sourcing_milestone_dates']['start_date']).to eq(milestone1.start_date.to_s)
+        expect(meta_data['start_date_sourcing_milestone_dates']['due_date']).to eq(milestone1.due_date.to_s)
         expect(meta_data['due_date']).to eq('2000-01-02')
         expect(meta_data['due_date_sourcing_milestone_title']).to eq(milestone2.title)
+        expect(meta_data['due_date_sourcing_milestone_dates']['start_date']).to eq(milestone2.start_date.to_s)
+        expect(meta_data['due_date_sourcing_milestone_dates']['due_date']).to eq(milestone2.due_date.to_s)
       end
     end
   end

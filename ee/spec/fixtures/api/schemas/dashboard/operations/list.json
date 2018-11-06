@@ -1,0 +1,58 @@
+{
+  "type": "object",
+  "required": [
+    "projects"
+  ],
+  "properties": {
+    "projects": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/project"
+      }
+    }
+  },
+  "definitions": {
+    "project": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "name_with_namespace",
+        "path",
+        "path_with_namespace",
+        "avatar_url",
+        "remove_path",
+        "alert_count"
+      ],
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "name_with_namespace": { "type": "string" },
+        "path": { "type": "string"},
+        "path_with_namespace": { "type": "string" },
+        "avatar_url": { "type": ["string", "null"] },
+        "remove_path": { "type": "string" },
+        "last_deployment": { "$ref": "../../../../../../../spec/fixtures/api/schemas/deployment.json" },
+        "alert_count": { "type": "integer" },
+        "alert_path": { "type": "string" },
+        "last_alert" : { "$ref": "#/definitions/alert" }
+      }
+    },
+    "alert": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "query",
+        "threshold",
+        "operator",
+        "alert_path"
+      ],
+      "properties": {
+        "id": { "type": "integer" },
+        "title": { "type": "string" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -259,4 +259,37 @@ describe Group do
       end
     end
   end
+
+  describe '#latest_vulnerabilities' do
+    let(:project) { create(:project, namespace: group) }
+    let(:external_project) { create(:project) }
+    let(:failed_pipeline) { create(:ci_pipeline, :failed, project: project) }
+
+    let!(:old_vuln) { create_vulnerability(project) }
+    let!(:new_vuln) { create_vulnerability(project) }
+    let!(:external_vuln) { create_vulnerability(external_project) }
+    let!(:failed_vuln) { create_vulnerability(project, failed_pipeline) }
+
+    subject { group.latest_vulnerabilities }
+
+    def create_vulnerability(project, pipeline = nil)
+      pipeline ||= create(:ci_pipeline, :success, project: project)
+      create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project)
+    end
+
+    it 'returns vulns only for the latest successful pipelines of projects belonging to the group' do
+      is_expected.to contain_exactly(new_vuln)
+    end
+
+    context 'with vulnerabilities from other branches' do
+      let!(:branch_pipeline) { create(:ci_pipeline, :success, project: project, ref: 'feature-x') }
+      let!(:branch_vuln) { create(:vulnerabilities_occurrence, pipelines: [branch_pipeline], project: project) }
+
+      # TODO: This should actually fail and we must scope vulns
+      # per branch as soon as we store them for other branches
+      it 'includes vulnerabilities from all branches' do
+        is_expected.to contain_exactly(branch_vuln)
+      end
+    end
+  end
 end

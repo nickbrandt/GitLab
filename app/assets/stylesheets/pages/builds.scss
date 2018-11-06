@@ -57,10 +57,6 @@
   .top-bar {
     @include build-trace-top-bar(35px);
 
-    &.sidebar-expanded {
-      margin-right: calc(#{$gutter-width} - 16px);
-    }
-
     .truncated-info {
       .truncated-info-size {
         margin: 0 5px;
@@ -74,7 +70,7 @@
     }
 
     .controllers {
-      @include build-controllers(15px, center, false, 0);
+      @include build-controllers(15px, center, false, 0, inline, 0);
     }
   }
 

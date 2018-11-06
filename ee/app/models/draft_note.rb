@@ -80,6 +80,12 @@ class DraftNote < ActiveRecord::Base
     Digest::SHA1.hexdigest(diff_file.file_path)
   end
 
+  def file_path
+    return unless diff_file
+
+    diff_file.file_path
+  end
+
   def publish_params
     attrs = PUBLISH_ATTRS.dup
     attrs.concat(DIFF_ATTRS) if on_diff?

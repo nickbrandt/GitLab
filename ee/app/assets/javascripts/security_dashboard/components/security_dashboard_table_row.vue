@@ -1,15 +1,16 @@
 <script>
+import { mapActions } from 'vuex';
 import { GlSkeletonLoading } from '@gitlab-org/gitlab-ui';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
-import SecurityDashboardActionButtons from './security_dashboard_action_buttons.vue';
+import VulnerabilityActionButtons from './vulnerability_action_buttons.vue';
 import VulnerabilityIssueLink from './vulnerability_issue_link.vue';
 
 export default {
   name: 'SecurityDashboardTableRow',
   components: {
     SeverityBadge,
-    SecurityDashboardActionButtons,
     GlSkeletonLoading,
+    VulnerabilityActionButtons,
     VulnerabilityIssueLink,
   },
   props: {
@@ -31,16 +32,25 @@ export default {
     severity() {
       return this.vulnerability.severity || ' ';
     },
-    projectNamespace() {
+    projectFullName() {
       const { project } = this.vulnerability;
-      return project && project.full_name ? project.full_name : null;
+      return project && project.full_name;
     },
     isDismissed() {
-      return this.vulnerability.dismissal_feedback;
+      return Boolean(this.vulnerability.dismissal_feedback);
     },
     hasIssue() {
-      return this.vulnerability.issue_feedback;
+      return Boolean(this.vulnerability.issue_feedback);
     },
+    canDismissVulnerability() {
+      return Boolean(this.vulnerability.vulnerability_feedback_url);
+    },
+    canCreateIssue() {
+      return this.canDismissVulnerability && !this.hasIssue;
+    },
+  },
+  methods: {
+    ...mapActions('vulnerabilities', ['openModal']),
   },
 };
 </script>
@@ -73,18 +83,22 @@ export default {
           :lines="2"
         />
         <div v-else>
-          <strike v-if="isDismissed">{{ vulnerability.name }}</strike>
-          <span v-else>{{ vulnerability.name }}</span>
+          <span
+            class="js-vulnerability-info"
+            :class="{ strikethrough: isDismissed }"
+            @click="openModal({ vulnerability })"
+          >{{ vulnerability.name }}</span>
           <vulnerability-issue-link
             v-if="hasIssue"
+            class="prepend-left-10"
             :issue="vulnerability.issue_feedback"
             :project-name="vulnerability.project.name"
           />
           <br />
           <span
-            v-if="projectNamespace"
+            v-if="projectFullName"
             class="vulnerability-namespace">
-            {{ projectNamespace }}
+            {{ projectFullName }}
           </span>
         </div>
       </div>
@@ -98,12 +112,10 @@ export default {
         {{ s__('Reports|Confidence') }}
       </div>
       <div class="table-mobile-content text-capitalize">
-        <strike v-if="isDismissed">{{ confidence }}</strike>
-        <span v-else>{{ confidence }}</span>
+        <span :class="{ strikethrough: isDismissed }">{{ confidence }}</span>
       </div>
     </div>
 
-    <!-- This is hidden till we can hook up the actions
     <div class="table-section section-20">
       <div
         class="table-mobile-header"
@@ -112,12 +124,14 @@ export default {
         {{ s__('Reports|Actions') }}
       </div>
       <div class="table-mobile-content vulnerabilities-action-buttons">
-        <security-dashboard-action-buttons
+        <vulnerability-action-buttons
           :vulnerability="vulnerability"
+          :can-create-issue="canCreateIssue"
+          :can-dismiss-vulnerability="canDismissVulnerability"
+          :is-dismissed="isDismissed"
         />
       </div>
     </div>
-    -->
   </div>
 </template>
 

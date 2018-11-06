@@ -1,5 +1,0 @@
----
-title: Stops showing review actions on commit discussions in merge requests
-merge_request: 8007
-author:
-type: fixed

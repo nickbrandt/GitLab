@@ -27,7 +27,7 @@ describe Admin::Geo::ProjectsController, :geo do
       render_views
 
       before do
-        allow(Gitlab::Geo).to receive(:license_allows?).and_return(true)
+        stub_licensed_features(geo: true)
       end
 
       context 'without sync_status specified' do
@@ -87,7 +87,7 @@ describe Admin::Geo::ProjectsController, :geo do
 
     context 'with a valid license' do
       before do
-        allow(Gitlab::Geo).to receive(:license_allows?).and_return(true)
+        stub_licensed_features(geo: true)
       end
 
       context 'with an orphaned registry' do
@@ -117,7 +117,7 @@ describe Admin::Geo::ProjectsController, :geo do
 
     context 'with a valid license' do
       before do
-        allow(Gitlab::Geo).to receive(:license_allows?).and_return(true)
+        stub_licensed_features(geo: true)
       end
 
       it 'flags registry for recheck' do
@@ -135,13 +135,63 @@ describe Admin::Geo::ProjectsController, :geo do
 
     context 'with a valid license' do
       before do
-        allow(Gitlab::Geo).to receive(:license_allows?).and_return(true)
+        stub_licensed_features(geo: true)
       end
 
       it 'flags registry for resync' do
         expect(subject).to redirect_to(admin_geo_projects_path)
         expect(flash[:notice]).to include('is scheduled for re-sync')
         expect(synced_registry.reload.resync_repository?).to be_truthy
+      end
+    end
+  end
+
+  describe '#recheck_all' do
+    subject { post :recheck_all }
+
+    it_behaves_like 'license required'
+
+    context 'with a valid license' do
+      before do
+        stub_licensed_features(geo: true)
+      end
+
+      it 'schedules a batch job' do
+        Sidekiq::Testing.fake! do
+          expect { subject }.to change(Geo::Batch::ProjectRegistrySchedulerWorker.jobs, :size).by(1)
+          expect(Geo::Batch::ProjectRegistrySchedulerWorker.jobs.last['args']).to include('recheck_repositories')
+        end
+      end
+
+      it 'redirects back and display confirmation' do
+        Sidekiq::Testing.inline! do
+          expect(subject).to redirect_to(admin_geo_projects_path)
+          expect(flash[:notice]).to include('All projects are being scheduled for re-check')
+        end
+      end
+    end
+  end
+
+  describe '#resync_all' do
+    subject { post :resync_all }
+
+    it_behaves_like 'license required'
+
+    context 'with a valid license' do
+      before do
+        stub_licensed_features(geo: true)
+      end
+
+      it 'schedules a batch job' do
+        Sidekiq::Testing.fake! do
+          expect { subject }.to change(Geo::Batch::ProjectRegistrySchedulerWorker.jobs, :size).by(1)
+          expect(Geo::Batch::ProjectRegistrySchedulerWorker.jobs.last['args']).to include('resync_repositories')
+        end
+      end
+
+      it 'redirects back and display confirmation' do
+        expect(subject).to redirect_to(admin_geo_projects_path)
+        expect(flash[:notice]).to include('All projects are being scheduled for re-sync')
       end
     end
   end
@@ -153,7 +203,7 @@ describe Admin::Geo::ProjectsController, :geo do
 
     context 'with a valid license' do
       before do
-        allow(Gitlab::Geo).to receive(:license_allows?).and_return(true)
+        stub_licensed_features(geo: true)
       end
 
       it 'flags registry for re-download' do

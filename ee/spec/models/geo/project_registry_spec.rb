@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Geo::ProjectRegistry do
   using RSpec::Parameterized::TableSyntax
 
-  set(:project) { create(:project) }
+  set(:project) { create(:project, description: 'kitten mittens') }
   set(:registry) { create(:geo_project_registry, project_id: project.id) }
 
   subject { registry }
@@ -138,6 +138,73 @@ describe Geo::ProjectRegistry do
       create(:geo_project_registry)
 
       expect(described_class.retry_due).not_to include(tomorrow)
+    end
+  end
+
+  describe '.with_search', :geo do
+    it 'returns project registries that refers to projects with a matching name' do
+      expect(described_class.with_search(project.name)).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a matching name regardless of the casing' do
+      expect(described_class.with_search(project.name.upcase)).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a matching description' do
+      expect(described_class.with_search(project.description)).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a partially matching description' do
+      expect(described_class.with_search('kitten')).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a matching description regardless of the casing' do
+      expect(described_class.with_search('KITTEN')).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a matching path' do
+      expect(described_class.with_search(project.path)).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a partially matching path' do
+      expect(described_class.with_search(project.path[0..2])).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a matching path regardless of the casing' do
+      expect(described_class.with_search(project.path.upcase)).to eq([registry])
+    end
+  end
+
+  describe '.flag_repositories_for_recheck!' do
+    it 'modified record to a recheck state' do
+      registry = create(:geo_project_registry, :repository_verified)
+
+      described_class.flag_repositories_for_recheck!
+
+      expect(registry.reload).to have_attributes(
+        repository_verification_checksum_sha: nil,
+        last_repository_verification_failure: nil,
+        repository_checksum_mismatch: false
+      )
+    end
+  end
+
+  describe '.flag_repositories_for_resync!' do
+    it 'modified record to a resync state' do
+      registry = create(:geo_project_registry, :synced)
+
+      described_class.flag_repositories_for_resync!
+
+      expect(registry.reload).to have_attributes(
+        resync_repository: true,
+        repository_verification_checksum_sha: nil,
+        last_repository_verification_failure: nil,
+        repository_checksum_mismatch: false,
+        repository_verification_retry_count: nil,
+        repository_retry_count: nil,
+        repository_retry_at: nil
+
+      )
     end
   end
 

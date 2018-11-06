@@ -1,20 +1,23 @@
 import Vue from 'vue';
 import component from 'ee/security_dashboard/components/security_dashboard_table_row.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import createStore from 'ee/security_dashboard/store';
+import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
+import mockDataVulnerabilities from '../store/vulnerabilities/data/mock_data_vulnerabilities.json';
 
 describe('Security Dashboard Table Row', () => {
   let vm;
   let props;
+  const store = createStore();
   const Component = Vue.extend(component);
-
-  afterEach(() => {
-    vm.$destroy();
-  });
 
   describe('when loading', () => {
     beforeEach(() => {
       props = { isLoading: true };
-      vm = mountComponent(Component, props);
+      vm = mountComponentWithStore(Component, { store, props });
+    });
+
+    afterEach(() => {
+      vm.$destroy();
     });
 
     it('should display the skeleton loader', () => {
@@ -33,16 +36,15 @@ describe('Security Dashboard Table Row', () => {
   });
 
   describe('when loaded', () => {
-    beforeEach(() => {
-      const vulnerability = {
-        severity: 'high',
-        name: 'Test vulnerability',
-        confidence: 'medium',
-        project: { full_name: 'project name' },
-      };
+    const vulnerability = mockDataVulnerabilities[0];
 
+    beforeEach(() => {
       props = { vulnerability };
-      vm = mountComponent(Component, props);
+      vm = mountComponentWithStore(Component, { store, props });
+    });
+
+    afterEach(() => {
+      vm.$destroy();
     });
 
     it('should not display the skeleton loader', () => {
@@ -55,22 +57,34 @@ describe('Security Dashboard Table Row', () => {
       );
     });
 
-    it('should render the name', () => {
-      expect(vm.$el.querySelectorAll('.table-mobile-content')[1].textContent).toContain(
-        props.vulnerability.name,
-      );
-    });
-
-    it('should render the project namespace', () => {
-      expect(vm.$el.querySelectorAll('.table-mobile-content')[1].textContent).toContain(
-        props.vulnerability.project.full_name,
-      );
-    });
-
     it('should render the confidence', () => {
       expect(vm.$el.querySelectorAll('.table-mobile-content')[2].textContent).toContain(
         props.vulnerability.confidence,
       );
+    });
+
+    describe('the project name', () => {
+      it('should render the name', () => {
+        expect(vm.$el.querySelectorAll('.table-mobile-content')[1].textContent).toContain(
+          props.vulnerability.name,
+        );
+      });
+
+      it('should render the project namespace', () => {
+        expect(vm.$el.querySelectorAll('.table-mobile-content')[1].textContent).toContain(
+          props.vulnerability.project.full_name,
+        );
+      });
+
+      it('should fire the openModal action when clicked', () => {
+        spyOn(vm.$store, 'dispatch');
+
+        vm.$el.querySelector('.js-vulnerability-info').click();
+
+        expect(vm.$store.dispatch).toHaveBeenCalledWith('vulnerabilities/openModal', {
+          vulnerability,
+        });
+      });
     });
   });
 });

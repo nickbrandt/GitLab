@@ -37,6 +37,10 @@ class Key < ActiveRecord::Base
   after_destroy :post_destroy_hook
   after_destroy :refresh_user_cache
 
+  def self.regular_keys
+    where(type: ['Key', nil])
+  end
+
   def key=(value)
     write_attribute(:key, value.present? ? Gitlab::SSHPublicKey.sanitize(value) : nil)
 
@@ -134,3 +138,5 @@ class Key < ActiveRecord::Base
     "type is forbidden. Must be #{allowed_types}"
   end
 end
+
+Key.prepend(EE::Key)

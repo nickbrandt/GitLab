@@ -92,6 +92,7 @@ describe API::Epics do
       let!(:epic) do
         create(:epic,
                group: group,
+               state: :closed,
                created_at: 3.days.ago,
                updated_at: 2.days.ago)
       end
@@ -133,6 +134,18 @@ describe API::Epics do
         get api(url, user), search: epic2.description
 
         expect_array_response([epic2.id])
+      end
+
+      it 'returns epics matching given status' do
+        get api(url, user), state: :opened
+
+        expect_array_response([epic2.id])
+      end
+
+      it 'returns all epics when state set to all' do
+        get api(url, user), state: :all
+
+        expect_array_response([epic2.id, epic.id])
       end
 
       it 'sorts by created_at descending by default' do

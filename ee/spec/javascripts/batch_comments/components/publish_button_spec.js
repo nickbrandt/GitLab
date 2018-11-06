@@ -3,7 +3,7 @@ import PublishButton from 'ee/batch_comments/components/publish_button.vue';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import { createStore } from 'ee/batch_comments/stores';
 
-describe('Batch comments drafts count component', () => {
+describe('Batch comments publish button component', () => {
   let vm;
   let Component;
 
@@ -14,7 +14,7 @@ describe('Batch comments drafts count component', () => {
   beforeEach(() => {
     const store = createStore();
 
-    vm = mountComponentWithStore(Component, { store });
+    vm = mountComponentWithStore(Component, { store, props: { shouldPublish: true } });
 
     spyOn(vm.$store, 'dispatch').and.stub();
   });
@@ -26,9 +26,17 @@ describe('Batch comments drafts count component', () => {
   it('dispatches publishReview on click', () => {
     vm.$el.click();
 
+    expect(vm.$store.dispatch).toHaveBeenCalledWith('batchComments/publishReview', undefined);
+  });
+
+  it('dispatches toggleReviewDropdown when shouldPublish is false on click', () => {
+    vm.shouldPublish = false;
+
+    vm.$el.click();
+
     expect(vm.$store.dispatch).toHaveBeenCalledWith(
-      'batchComments/publishReview',
-      jasmine.anything(),
+      'batchComments/toggleReviewDropdown',
+      undefined,
     );
   });
 

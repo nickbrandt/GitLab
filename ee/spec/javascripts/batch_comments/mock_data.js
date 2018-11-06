@@ -10,6 +10,7 @@ export const createDraft = () => ({
   current_user: { can_edit: true, can_award_emoji: false, can_resolve: false },
   discussion_id: null,
   file_hash: null,
+  file_path: null,
   id: 1,
   line_code: null,
   merge_request_id: 1,
@@ -19,4 +20,5 @@ export const createDraft = () => ({
   references: { users: [], commands: '' },
   resolve_discussion: false,
   isDraft: true,
+  position: null,
 });

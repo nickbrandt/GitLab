@@ -2,6 +2,8 @@
 
 # Helper methods for per-User preferences
 module PreferencesHelper
+  prepend EE::PreferencesHelper
+
   def layout_choices
     [
         ['Fixed', :fixed],

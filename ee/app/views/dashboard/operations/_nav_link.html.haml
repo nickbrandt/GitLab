@@ -1,0 +1,4 @@
+- if can?(current_user, :read_operations_dashboard)
+  = nav_link(controller: 'operations') do
+    = link_to operations_path, title: _('Operations'), aria: { label: _('Operations') } do
+      = sprite_icon('dashboard', size: 18)

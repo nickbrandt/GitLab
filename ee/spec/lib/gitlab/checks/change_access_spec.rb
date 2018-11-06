@@ -184,7 +184,7 @@ describe Gitlab::Checks::ChangeAccess do
         let(:push_rule) { create(:push_rule, member_check: true) }
 
         before do
-          allow(User).to receive(:existing_member?).and_return(false)
+          allow(EE::User).to receive(:existing_member?).and_return(false)
           allow_any_instance_of(Commit).to receive(:author_email).and_return('some@mail.com')
         end
 

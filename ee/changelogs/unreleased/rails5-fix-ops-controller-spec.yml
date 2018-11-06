@@ -1,0 +1,5 @@
+---
+title: 'Rails5: fix operations controller spec nil parameter'
+merge_request: 8209
+author: Jasper Maes
+type: other

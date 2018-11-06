@@ -1,8 +1,10 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
 import { s__ } from '~/locale';
+import { spriteIcon } from '~/lib/utils/common_utils';
 import Tabs from '~/vue_shared/components/tabs/tabs';
 import Tab from '~/vue_shared/components/tabs/tab.vue';
+import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
 import VulnerabilityCountList from './vulnerability_count_list.vue';
 import SvgBlankState from '~/pipelines/components/blank_state.vue';
@@ -16,6 +18,7 @@ export default {
   },
   components: {
     Icon,
+    IssueModal,
     SecurityDashboardTable,
     SvgBlankState,
     Tab,
@@ -46,7 +49,7 @@ export default {
   },
   computed: {
     ...mapGetters('vulnerabilities', ['vulnerabilitiesCountByReportType']),
-    ...mapState('vulnerabilities', ['hasError']),
+    ...mapState('vulnerabilities', ['hasError', 'modal']),
     sastCount() {
       return this.vulnerabilitiesCountByReportType('sast');
     },
@@ -54,21 +57,19 @@ export default {
       return {
         trigger: 'click',
         placement: 'right',
-        title: s__(
-          'Security Reports|At this time, the security dashboard only supports SAST. More analyzers are coming soon.',
-        ),
+        title: s__('Security Reports|At this time, the security dashboard only supports SAST.'),
         content: `
           <a
-            title="${s__('Security Reports|Security Dashboard Roadmap')}"
+            title="${s__('Security Reports|Security Dashboard Documentation')}"
             href="${this.dashboardDocumentation}"
             target="_blank"
             rel="noopener
             noreferrer"
           >
             <span class="vertical-align-middle">${s__(
-              'Security Reports|Security Dashboard Roadmap',
+              'Security Reports|Security Dashboard Documentation',
             )}</span>
-            ${gl.utils.spriteIcon('external-link', 's16 vertical-align-middle')}
+            ${spriteIcon('external-link', 's16 vertical-align-middle')}
           </a>
         `,
         html: true,
@@ -85,6 +86,9 @@ export default {
       'setVulnerabilitiesCountEndpoint',
       'setVulnerabilitiesEndpoint',
       'fetchVulnerabilitiesCount',
+      'createIssue',
+      'dismissVulnerability',
+      'undoDismissal',
     ]),
   },
 };
@@ -92,6 +96,7 @@ export default {
 
 <template>
   <div>
+    <div class="flash-container"></div>
     <svg-blank-state
       v-if="hasError"
       :svg-path="errorStateSvgPath"
@@ -112,7 +117,8 @@ export default {
             </span>
             <span
               v-popover="popoverOptions"
-              class="text-muted ml-1"
+              class="text-muted prepend-left-4"
+              :aria-label="__('help')"
             >
               <icon
                 name="question"
@@ -126,6 +132,14 @@ export default {
           />
         </tab>
       </tabs>
+      <issue-modal
+        :modal="modal"
+        :can-create-issue-permission="true"
+        :can-create-feedback-permission="true"
+        @createNewIssue="createIssue({ vulnerability: modal.vulnerability })"
+        @dismissIssue="dismissVulnerability({ vulnerability: modal.vulnerability })"
+        @revertDismissIssue="undoDismissal({ vulnerability: modal.vulnerability })"
+      />
     </div>
   </div>
 </template>

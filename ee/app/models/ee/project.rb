@@ -74,6 +74,7 @@ module EE
       scope :verified_wikis, -> { joins(:repository_state).merge(ProjectRepositoryState.verified_wikis) }
       scope :verification_failed_repos, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_repos) }
       scope :verification_failed_wikis, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_wikis) }
+      scope :for_plan_name, -> (name) { joins(namespace: :plan).where(plans: { name: name }) }
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         to: :statistics, allow_nil: true
@@ -108,8 +109,9 @@ module EE
       end
     end
 
-    def latest_pipeline_with_legacy_security_reports
-      pipelines.newest_first(default_branch).with_legacy_security_reports.first
+    def latest_pipeline_with_security_reports
+      pipelines.newest_first(ref: default_branch).with_security_reports.first ||
+        pipelines.newest_first(ref: default_branch).with_legacy_security_reports.first
     end
 
     def environments_for_scope(scope)

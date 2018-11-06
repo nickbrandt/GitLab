@@ -14,12 +14,12 @@ module QA
           Page::Main::Login.act { sign_in_using_credentials }
 
           # Create a new SSH key for the user
-          key = Factory::Resource::SSHKey.fabricate! do |resource|
+          key = Resource::SSHKey.fabricate! do |resource|
             resource.title = key_title
           end
 
           # Create a new Project
-          project = Factory::Resource::Project.fabricate! do |project|
+          project = Resource::Project.fabricate! do |project|
             project.name = 'geo-project'
             project.description = 'Geo test project'
           end
@@ -28,7 +28,7 @@ module QA
           #
           # This push is required to ensure we have the primary credentials
           # written out to the .netrc
-          Factory::Repository::ProjectPush.fabricate! do |push|
+          Resource::Repository::ProjectPush.fabricate! do |push|
             push.ssh_key = key
             push.project = project
             push.file_name = file_name
@@ -69,7 +69,7 @@ module QA
             end
 
             # Perform a git push over SSH at the secondary
-            Factory::Repository::Push.fabricate! do |push|
+            Resource::Repository::Push.fabricate! do |push|
               push.new_branch = false
               push.ssh_key = key
               push.repository_ssh_uri = location.uri

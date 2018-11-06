@@ -15,7 +15,7 @@ describe Environment do
       it 'returns the pod_names' do
         pod_name = "pod_1"
         create(:cluster, :provided_by_gcp, environment_scope: '*', projects: [project])
-        create(:deployment, environment: environment)
+        create(:deployment, :success, environment: environment)
 
         allow_any_instance_of(Gitlab::Kubernetes::RolloutStatus).to receive(:instances)
           .and_return([{ pod_name: pod_name }])

@@ -32,6 +32,9 @@ msgid_plural " improved on %d points"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "\"%{query}\" in projects"
+msgstr ""
+
 msgid "%d addition"
 msgid_plural "%d additions"
 msgstr[0] ""
@@ -110,14 +113,25 @@ msgstr[1] ""
 msgid "%{actionText} & %{openOrClose} %{noteable}"
 msgstr ""
 
+msgid "%{authorsName}'s discussion"
+msgstr ""
+
 msgid "%{commit_author_link} authored %{commit_timeago}"
 msgstr ""
 
 msgid "%{counter_storage} (%{counter_repositories} repositories, %{counter_build_artifacts} build artifacts, %{counter_lfs_objects} LFS)"
 msgstr ""
 
+msgid "%{count} %{alerts}"
+msgstr ""
+
 msgid "%{count} participant"
 msgid_plural "%{count} participants"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "%{count} pending comment"
+msgid_plural "%{count} pending comments"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -406,6 +420,9 @@ msgstr ""
 msgid "Add new directory"
 msgstr ""
 
+msgid "Add projects"
+msgstr ""
+
 msgid "Add reaction"
 msgstr ""
 
@@ -498,6 +515,11 @@ msgstr ""
 
 msgid "Advanced settings"
 msgstr ""
+
+msgid "Alert"
+msgid_plural "Alerts"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "All"
 msgstr ""
@@ -2542,7 +2564,7 @@ msgstr ""
 msgid "Define a custom pattern with cron syntax"
 msgstr ""
 
-msgid "DelayedJobs|Are you sure you want to run %{jobName} immediately? This job will run automatically after it's timer finishes."
+msgid "DelayedJobs|Are you sure you want to run %{jobName} immediately? Otherwise this job will run automatically after it's timer finishes."
 msgstr ""
 
 msgid "DelayedJobs|Are you sure you want to run %{job_name} immediately? This job will run automatically after it's timer finishes."
@@ -3396,6 +3418,9 @@ msgstr ""
 msgid "Fingerprints"
 msgstr ""
 
+msgid "Finish review"
+msgstr ""
+
 msgid "Finished"
 msgstr ""
 
@@ -3696,6 +3721,15 @@ msgstr ""
 msgid "Geo|All projects"
 msgstr ""
 
+msgid "Geo|All projects are being scheduled for re-check"
+msgstr ""
+
+msgid "Geo|All projects are being scheduled for re-sync"
+msgstr ""
+
+msgid "Geo|Batch operations"
+msgstr ""
+
 msgid "Geo|Could not remove tracking entry for an existing project."
 msgstr ""
 
@@ -3753,6 +3787,9 @@ msgstr ""
 msgid "Geo|Recheck"
 msgstr ""
 
+msgid "Geo|Recheck all projects"
+msgstr ""
+
 msgid "Geo|Redownload"
 msgstr ""
 
@@ -3763,6 +3800,9 @@ msgid "Geo|Repository sync capacity"
 msgstr ""
 
 msgid "Geo|Resync"
+msgstr ""
+
+msgid "Geo|Resync all projects"
 msgstr ""
 
 msgid "Geo|Retry count"
@@ -5141,6 +5181,9 @@ msgstr ""
 msgid "More"
 msgstr ""
 
+msgid "More actions"
+msgstr ""
+
 msgid "More info"
 msgstr ""
 
@@ -5413,6 +5456,9 @@ msgstr ""
 msgid "Notes|Show comments only"
 msgstr ""
 
+msgid "Notes|Show history only"
+msgstr ""
+
 msgid "Notification events"
 msgstr ""
 
@@ -5560,6 +5606,15 @@ msgid "Operations"
 msgstr ""
 
 msgid "Operations Dashboard"
+msgstr ""
+
+msgid "OperationsDashboard|Add a project to the dashboard"
+msgstr ""
+
+msgid "OperationsDashboard|Some projects could not be added to dashboard"
+msgstr ""
+
+msgid "OperationsDashboard|The operations dashboard provides a summary of each project's operational health, including pipeline and alert status."
 msgstr ""
 
 msgid "Optionally, you can %{link_to_customize} how FogBugz email addresses and usernames are imported into GitLab."
@@ -6638,25 +6693,19 @@ msgstr ""
 msgid "Reports|%{failedString} and %{resolvedString}"
 msgstr ""
 
+msgid "Reports|Actions"
+msgstr ""
+
 msgid "Reports|Class"
 msgstr ""
 
 msgid "Reports|Confidence"
 msgstr ""
 
-msgid "Reports|Dismiss Vulnerability"
-msgstr ""
-
 msgid "Reports|Execution time"
 msgstr ""
 
 msgid "Reports|Failure"
-msgstr ""
-
-msgid "Reports|More info"
-msgstr ""
-
-msgid "Reports|New Issue"
 msgstr ""
 
 msgid "Reports|Severity"
@@ -6952,6 +7001,9 @@ msgstr ""
 msgid "Search users"
 msgstr ""
 
+msgid "Search your projects"
+msgstr ""
+
 msgid "SearchAutocomplete|All GitLab"
 msgstr ""
 
@@ -6988,13 +7040,40 @@ msgstr ""
 msgid "Security Dashboard|Issue Created"
 msgstr ""
 
-msgid "Security Reports|At this time, the security dashboard only supports SAST. More analyzers are coming soon."
+msgid "Security Reports|At this time, the security dashboard only supports SAST."
 msgstr ""
 
-msgid "Security Reports|Security Dashboard Roadmap"
+msgid "Security Reports|Dismiss Vulnerability"
+msgstr ""
+
+msgid "Security Reports|More info"
+msgstr ""
+
+msgid "Security Reports|New Issue"
+msgstr ""
+
+msgid "Security Reports|Security Dashboard Documentation"
+msgstr ""
+
+msgid "Security Reports|There was an error creating the issue."
+msgstr ""
+
+msgid "Security Reports|There was an error dismissing the issue."
+msgstr ""
+
+msgid "Security Reports|There was an error dismissing the vulnerability."
 msgstr ""
 
 msgid "Security Reports|There was an error fetching the dashboard. Please try again in a few moments or contact your support team."
+msgstr ""
+
+msgid "Security Reports|There was an error undoing the dismissal."
+msgstr ""
+
+msgid "Security Reports|There was an error undoing this dismissal."
+msgstr ""
+
+msgid "Security Reports|Undo Dismissal"
 msgstr ""
 
 msgid "SecurityDashboard| The security dashboard displays the latest security report. Use it to find and fix vulnerabilities."
@@ -7305,10 +7384,22 @@ msgstr ""
 msgid "Something went wrong while resolving this discussion. Please try again."
 msgstr ""
 
+msgid "Something went wrong, unable to add %{project} to dashboard"
+msgstr ""
+
+msgid "Something went wrong, unable to get operations projects"
+msgstr ""
+
+msgid "Something went wrong, unable to remove project"
+msgstr ""
+
 msgid "Something went wrong. Please try again."
 msgstr ""
 
 msgid "Sorry, no epics matched your search"
+msgstr ""
+
+msgid "Sorry, no projects matched your search"
 msgstr ""
 
 msgid "Sort by"
@@ -8592,6 +8683,9 @@ msgstr ""
 msgid "Version"
 msgstr ""
 
+msgid "View %{alerts}"
+msgstr ""
+
 msgid "View app"
 msgstr ""
 
@@ -8653,6 +8747,33 @@ msgid "VisibilityLevel|Public"
 msgstr ""
 
 msgid "VisibilityLevel|Unknown"
+msgstr ""
+
+msgid "Vulnerability|Confidence"
+msgstr ""
+
+msgid "Vulnerability|Description"
+msgstr ""
+
+msgid "Vulnerability|File"
+msgstr ""
+
+msgid "Vulnerability|Identifiers"
+msgstr ""
+
+msgid "Vulnerability|Instances"
+msgstr ""
+
+msgid "Vulnerability|Links"
+msgstr ""
+
+msgid "Vulnerability|Project"
+msgstr ""
+
+msgid "Vulnerability|Severity"
+msgstr ""
+
+msgid "Vulnerability|Solution"
 msgstr ""
 
 msgid "Want to see the data? Please ask an administrator for access."
@@ -9312,6 +9433,9 @@ msgstr ""
 msgid "from"
 msgstr ""
 
+msgid "help"
+msgstr ""
+
 msgid "here"
 msgstr ""
 
@@ -9623,6 +9747,11 @@ msgstr ""
 
 msgid "private key does not match certificate."
 msgstr ""
+
+msgid "project"
+msgid_plural "projects"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "remaining"
 msgstr ""
