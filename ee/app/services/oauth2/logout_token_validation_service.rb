@@ -10,13 +10,18 @@ module Oauth2
     end
 
     def execute
-      return error('Access token not found') unless access_token.present?
+      return error('Access token could not be found') unless access_token.present?
 
       status = AccessTokenValidationService.new(access_token).validate
       return error(status) unless status == AccessTokenValidationService::VALID
 
       user = User.find(access_token.resource_owner_id)
-      success(return_to: user_return_to) if user == current_user
+
+      if user && user == current_user
+        success(return_to: user_return_to)
+      else
+        error('User could not be found')
+      end
     end
 
     private

@@ -27,7 +27,7 @@ describe Oauth2::LogoutTokenValidationService do
       expect(result[:status]).to eq(:error)
     end
 
-    it 'returns error when incorrect encoding' do
+    it 'returns error when token has incorrect encoding' do
       allow_any_instance_of(Gitlab::Geo::OauthSession)
         .to receive(:extract_logout_token)
         .and_return("\xD800\xD801\xD802")
@@ -35,6 +35,26 @@ describe Oauth2::LogoutTokenValidationService do
       result = described_class.new(user, state: logout_state).execute
 
       expect(result[:status]).to eq(:error)
+    end
+
+    it 'returns error when current user is nil' do
+      result = described_class.new(nil, state: logout_state).execute
+
+      expect(result).to eq(status: :error, message: 'User could not be found')
+    end
+
+    it 'returns error when token owner could not be found' do
+      allow(User).to receive(:find).with(user.id).and_return(nil)
+
+      result = described_class.new(user, state: logout_state).execute
+
+      expect(result).to eq(status: :error, message: 'User could not be found')
+    end
+
+    it 'returns error when token does not belong to the current user' do
+      result = described_class.new(create(:user), state: logout_state).execute
+
+      expect(result).to eq(status: :error, message: 'User could not be found')
     end
 
     context 'when token is valid' do
