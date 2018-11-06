@@ -213,6 +213,10 @@ describe('actions', () => {
             type: types.ADD_PROJECT_TOKEN,
             payload: mockOneProject,
           },
+          {
+            type: types.SET_INPUT_VALUE,
+            payload: '',
+          },
         ],
         [],
         done,
