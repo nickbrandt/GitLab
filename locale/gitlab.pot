@@ -1684,6 +1684,12 @@ msgstr ""
 msgid "ClusterIntegration|Add Kubernetes cluster"
 msgstr ""
 
+msgid "ClusterIntegration|Add a Kubernetes cluster integration"
+msgstr ""
+
+msgid "ClusterIntegration|Adding a Kubernetes cluster to your group will automatically share the cluster across all your projects. Use review apps, deploy your applications, and easily run your pipelines for all projects using the same cluster."
+msgstr ""
+
 msgid "ClusterIntegration|Adding an integration to your group will share the cluster across all your projects."
 msgstr ""
 
@@ -1858,9 +1864,6 @@ msgstr ""
 msgid "ClusterIntegration|Kubernetes cluster health"
 msgstr ""
 
-msgid "ClusterIntegration|Kubernetes cluster integration"
-msgstr ""
-
 msgid "ClusterIntegration|Kubernetes cluster is being created on Google Kubernetes Engine..."
 msgstr ""
 
@@ -1904,9 +1907,6 @@ msgid "ClusterIntegration|Manage your Kubernetes cluster by visiting %{link_gke}
 msgstr ""
 
 msgid "ClusterIntegration|More information"
-msgstr ""
-
-msgid "ClusterIntegration|Multiple Kubernetes clusters are available in GitLab Enterprise Edition Premium and Ultimate"
 msgstr ""
 
 msgid "ClusterIntegration|No machine types matched your search"
