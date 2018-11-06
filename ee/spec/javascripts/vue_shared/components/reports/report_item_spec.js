@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import reportIssues from '~/reports/components/report_item.vue';
+import reportIssue from '~/reports/components/report_item.vue';
 import { STATUS_FAILED, STATUS_SUCCESS } from '~/reports/constants';
 import { componentNames } from 'ee/vue_shared/components/reports/issue_body';
 import store from 'ee/vue_shared/security_reports/store';
@@ -11,22 +11,22 @@ import {
   parsedDast,
 } from 'ee_spec/vue_shared/security_reports/mock_data';
 
-describe('Report issues', () => {
+describe('Report issue', () => {
   let vm;
-  let ReportIssues;
+  let ReportIssue;
 
   beforeEach(() => {
-    ReportIssues = Vue.extend(reportIssues);
+    ReportIssue = Vue.extend(reportIssue);
   });
 
   afterEach(() => {
     vm.$destroy();
   });
 
-  describe('for codequality issues', () => {
-    describe('resolved issues', () => {
+  describe('for codequality issue', () => {
+    describe('resolved issue', () => {
       beforeEach(() => {
-        vm = mountComponent(ReportIssues, {
+        vm = mountComponent(ReportIssue, {
           issue: codequalityParsedIssues[0],
           component: componentNames.CodequalityIssueBody,
           status: STATUS_SUCCESS,
@@ -41,9 +41,9 @@ describe('Report issues', () => {
       });
     });
 
-    describe('unresolved issues', () => {
+    describe('unresolved issue', () => {
       beforeEach(() => {
-        vm = mountComponent(ReportIssues, {
+        vm = mountComponent(ReportIssue, {
           issue: codequalityParsedIssues[0],
           component: componentNames.CodequalityIssueBody,
           status: STATUS_FAILED,
@@ -58,14 +58,14 @@ describe('Report issues', () => {
 
   describe('with location', () => {
     it('should render location', () => {
-      vm = mountComponent(ReportIssues, {
+      vm = mountComponent(ReportIssue, {
         issue: sastParsedIssues[0],
         component: componentNames.SastIssueBody,
         status: STATUS_FAILED,
       });
 
       expect(vm.$el.textContent).toContain('in');
-      expect(vm.$el.querySelector('.report-block-list-issue a').getAttribute('href')).toEqual(
+      expect(vm.$el.querySelector('li a').getAttribute('href')).toEqual(
         sastParsedIssues[0].urlPath,
       );
     });
@@ -73,7 +73,7 @@ describe('Report issues', () => {
 
   describe('without location', () => {
     it('should not render location', () => {
-      vm = mountComponent(ReportIssues, {
+      vm = mountComponent(ReportIssue, {
         issue: {
           title: 'foo',
         },
@@ -82,13 +82,13 @@ describe('Report issues', () => {
       });
 
       expect(vm.$el.textContent).not.toContain('in');
-      expect(vm.$el.querySelector('.report-block-list-issue a')).toEqual(null);
+      expect(vm.$el.querySelector('a')).toEqual(null);
     });
   });
 
-  describe('for container scanning issues', () => {
+  describe('for container scanning issue', () => {
     beforeEach(() => {
-      vm = mountComponent(ReportIssues, {
+      vm = mountComponent(ReportIssue, {
         issue: dockerReportParsed.unapproved[0],
         component: componentNames.SastContainerIssueBody,
         status: STATUS_FAILED,
@@ -100,7 +100,7 @@ describe('Report issues', () => {
     });
 
     it('renders CVE name', () => {
-      expect(vm.$el.querySelector('.report-block-list-issue button').textContent.trim()).toEqual(
+      expect(vm.$el.querySelector('button').textContent.trim()).toEqual(
         dockerReportParsed.unapproved[0].title,
       );
     });
@@ -112,9 +112,9 @@ describe('Report issues', () => {
     });
   });
 
-  describe('for dast issues', () => {
+  describe('for dast issue', () => {
     beforeEach(() => {
-      vm = mountComponentWithStore(ReportIssues, {
+      vm = mountComponentWithStore(ReportIssue, {
         store,
         props: {
           issue: parsedDast[0],
