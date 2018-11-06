@@ -1,10 +1,10 @@
-package log
+package correlation
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestReverseBase62Conversion(t *testing.T) {
@@ -22,7 +22,7 @@ func TestReverseBase62Conversion(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%d_to_%s", test.n, test.expected), func(t *testing.T) {
-			assert.Equal(t, test.expected, encodeReverseBase62(test.n))
+			require.Equal(t, test.expected, encodeReverseBase62(test.n))
 		})
 	}
 }

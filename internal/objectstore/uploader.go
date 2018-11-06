@@ -79,6 +79,7 @@ func (u *uploader) syncAndDelete(url string) {
 		log.WithError(err).WithField("object", helper.ScrubURLParams(url)).Warning("Delete failed")
 		return
 	}
+	// TODO: consider adding the context to the outgoing request for better instrumentation
 
 	// here we are not using u.ctx because we must perform cleanup regardless of parent context
 	resp, err := httpClient.Do(req)

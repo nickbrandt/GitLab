@@ -3,11 +3,14 @@ package gitaly
 import (
 	"sync"
 
+	"github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
 	"gitlab.com/gitlab-org/gitaly/auth"
 	gitalyclient "gitlab.com/gitlab-org/gitaly/client"
 	"google.golang.org/grpc"
+
+	grpccorrelation "gitlab.com/gitlab-org/gitlab-workhorse/internal/correlation/grpc"
 )
 
 type Server struct {
@@ -108,8 +111,19 @@ func CloseConnections() {
 func newConnection(server Server) (*grpc.ClientConn, error) {
 	connOpts := append(gitalyclient.DefaultDialOpts,
 		grpc.WithPerRPCCredentials(gitalyauth.RPCCredentialsV2(server.Token)),
-		grpc.WithStreamInterceptor(grpc_prometheus.StreamClientInterceptor),
-		grpc.WithUnaryInterceptor(grpc_prometheus.UnaryClientInterceptor),
+		grpc.WithStreamInterceptor(
+			grpc_middleware.ChainStreamClient(
+				grpc_prometheus.StreamClientInterceptor,
+				grpccorrelation.StreamClientCorrelationInterceptor,
+			),
+		),
+
+		grpc.WithUnaryInterceptor(
+			grpc_middleware.ChainUnaryClient(
+				grpc_prometheus.UnaryClientInterceptor,
+				grpccorrelation.UnaryClientCorrelationInterceptor,
+			),
+		),
 	)
 
 	return gitalyclient.Dial(server.Address, connOpts)

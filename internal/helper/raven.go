@@ -5,6 +5,8 @@ import (
 	"reflect"
 
 	"github.com/getsentry/raven-go"
+
+	correlation "gitlab.com/gitlab-org/gitlab-workhorse/internal/correlation/raven"
 )
 
 var ravenHeaderBlacklist = []string{
@@ -14,11 +16,14 @@ var ravenHeaderBlacklist = []string{
 
 func captureRavenError(r *http.Request, err error) {
 	client := raven.DefaultClient
+	extra := raven.Extra{}
 
 	interfaces := []raven.Interface{}
 	if r != nil {
 		CleanHeadersForRaven(r)
 		interfaces = append(interfaces, raven.NewHttp(r))
+
+		extra = correlation.SetExtra(r.Context(), extra)
 	}
 
 	exception := &raven.Exception{
@@ -28,7 +33,7 @@ func captureRavenError(r *http.Request, err error) {
 	}
 	interfaces = append(interfaces, exception)
 
-	packet := raven.NewPacket(err.Error(), interfaces...)
+	packet := raven.NewPacketWithExtra(err.Error(), extra, interfaces...)
 	client.Capture(packet, nil)
 }
 

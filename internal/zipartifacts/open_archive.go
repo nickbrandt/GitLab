@@ -13,6 +13,7 @@ import (
 
 	"github.com/jfbus/httprs"
 
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/correlation"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
@@ -23,7 +24,7 @@ var ErrNotAZip = errors.New("not a zip")
 var ErrArchiveNotFound = errors.New("archive not found")
 
 var httpClient = &http.Client{
-	Transport: &http.Transport{
+	Transport: correlation.NewInstrumentedRoundTripper(&http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 		DialContext: (&net.Dialer{
 			Timeout:   30 * time.Second,
@@ -33,7 +34,7 @@ var httpClient = &http.Client{
 		TLSHandshakeTimeout:   10 * time.Second,
 		ExpectContinueTimeout: 10 * time.Second,
 		ResponseHeaderTimeout: 30 * time.Second,
-	},
+	}),
 }
 
 // OpenArchive will open a zip.Reader from a local path or a remote object store URL
@@ -58,6 +59,7 @@ func openHTTPArchive(ctx context.Context, archivePath string) (*zip.Reader, erro
 	if err != nil {
 		return nil, fmt.Errorf("Can't create HTTP GET %q: %v", scrubbedArchivePath, err)
 	}
+	req = req.WithContext(ctx)
 
 	resp, err := httpClient.Do(req.WithContext(ctx))
 	if err != nil {

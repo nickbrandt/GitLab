@@ -166,6 +166,14 @@
 			"versionExact": "v1.0.0"
 		},
 		{
+			"checksumSHA1": "Rf3QgJeAX2809t/DZvMjZbGHe9U=",
+			"path": "github.com/grpc-ecosystem/go-grpc-middleware/tags",
+			"revision": "c250d6563d4d4c20252cd865923440e829844f4e",
+			"revisionTime": "2018-05-02T09:16:42Z",
+			"version": "v1",
+			"versionExact": "v1.0.0"
+		},
+		{
 			"checksumSHA1": "L5z1C445GhhQmDKSisTFv754LdU=",
 			"path": "github.com/grpc-ecosystem/go-grpc-middleware/util/metautils",
 			"revision": "c250d6563d4d4c20252cd865923440e829844f4e",
