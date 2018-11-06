@@ -27,8 +27,7 @@ module QA
             Page::Group::New.perform do |group|
               group.set_path(path)
               group.set_description('GitLab QA Sandbox Group')
-              # https://gitlab.com/gitlab-org/gitlab-ce/issues/52771
-              # group.set_visibility('Public')
+              group.set_visibility('Public')
               group.create
             end
           end
