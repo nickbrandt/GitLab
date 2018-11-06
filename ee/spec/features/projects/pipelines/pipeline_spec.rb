@@ -18,18 +18,7 @@ describe 'Pipeline', :js do
 
     context 'with a sast artifact' do
       before do
-        create(
-          :ci_build,
-          :success,
-          :artifacts,
-          name: 'sast',
-          pipeline: pipeline,
-          options: {
-            artifacts: {
-              paths: [Ci::JobArtifact::DEFAULT_FILE_NAMES[:sast]]
-            }
-          }
-        )
+        create(:ee_ci_build, :legacy_sast, pipeline: pipeline)
 
         visit security_project_pipeline_path(project, pipeline)
       end
@@ -66,18 +55,7 @@ describe 'Pipeline', :js do
 
     context 'with a license management artifact' do
       before do
-        create(
-          :ci_build,
-          :success,
-          :artifacts,
-          name: 'license_management',
-          pipeline: pipeline,
-          options: {
-            artifacts: {
-              paths: [Ci::Build::LICENSE_MANAGEMENT_FILE]
-            }
-          }
-        )
+        create(:ee_ci_build, :legacy_license_management, pipeline: pipeline)
 
         visit licenses_project_pipeline_path(project, pipeline)
       end

@@ -115,80 +115,11 @@ describe Ci::Build do
     end
   end
 
-  build_artifacts_methods = {
-    has_performance_json?: {
-      filename: Ci::Build::PERFORMANCE_FILE,
-      job_names: %w[performance deploy]
-    },
-    has_license_management_json?: {
-      filename: Ci::Build::LICENSE_MANAGEMENT_FILE,
-      job_names: %w[license_management]
-    }
-  }
-
-  build_artifacts_methods.each do |method, requirements|
-    filename = requirements[:filename]
-    job_names = requirements[:job_names]
-
-    describe "##{method}" do
-      job_names.each do |job_name|
-        context "with a job named #{job_name} and a file named #{filename}" do
-          let(:build) do
-            create(
-              :ci_build,
-              :artifacts,
-              name: job_name,
-              pipeline: pipeline,
-              options: {
-                artifacts: {
-                  paths: [filename, 'some-other-artifact.txt']
-                }
-              }
-            )
-          end
-
-          it { expect(build.send(method)).to be_truthy }
-        end
-      end
-
-      context 'with an invalid filename' do
-        let(:build) do
-          create(
-            :ci_build,
-            :artifacts,
-            name: job_names.first,
-            pipeline: pipeline,
-            options: {}
-          )
-        end
-
-        it { expect(build.send(method)).to be_falsey }
-      end
-
-      context 'with an invalid job name' do
-        let(:build) do
-          create(
-            :ci_build,
-            :artifacts,
-            pipeline: pipeline,
-            options: {
-              artifacts: {
-                paths: [filename, 'some-other-artifact.txt']
-              }
-            }
-          )
-        end
-
-        it { expect(build.send(method)).to be_falsey }
-      end
-    end
-  end
-
   describe '.with_security_reports' do
     subject { described_class.with_security_reports }
 
     context 'when build has a security report' do
-      let!(:build) { create(:ee_ci_build, :success, :security_reports) }
+      let!(:build) { create(:ee_ci_build, :success, :sast) }
 
       it 'selects the build' do
         is_expected.to eq([build])
@@ -204,7 +135,7 @@ describe Ci::Build do
     end
 
     context 'when there are multiple builds with security reports' do
-      let!(:builds) { create_list(:ee_ci_build, 5, :success, :security_reports) }
+      let!(:builds) { create_list(:ee_ci_build, 5, :success, :sast) }
 
       it 'does not execute a query for selecting job artifacts one by one' do
         recorded = ActiveRecord::QueryRecorder.new do
@@ -234,7 +165,7 @@ describe Ci::Build do
         end
 
         it 'parses blobs and add the results to the report' do
-          expect { subject }.not_to raise_error
+          subject
 
           expect(security_reports.get_report('sast').occurrences.size).to eq(3)
         end
@@ -245,9 +176,24 @@ describe Ci::Build do
           create(:ee_ci_job_artifact, :sast_with_corrupted_data, job: job, project: job.project)
         end
 
-        it 'raises an error' do
-          expect { subject }.to raise_error(::Gitlab::Ci::Parsers::Security::Sast::SastParserError)
+        it 'stores an error' do
+          subject
+
+          expect(security_reports.get_report('sast')).to be_errored
         end
+      end
+    end
+
+    context 'when there is unsupported file type' do
+      before do
+        stub_const("Ci::JobArtifact::SECURITY_REPORT_FILE_TYPES", %w[codequality])
+        create(:ee_ci_job_artifact, :codequality, job: job, project: job.project)
+      end
+
+      it 'stores an error' do
+        subject
+
+        expect(security_reports.get_report('codequality')).to be_errored
       end
     end
   end

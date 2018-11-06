@@ -43,10 +43,10 @@ describe Dashboard::Operations::ListService do
       let(:staging) { create(:environment, project: project, name: 'staging') }
 
       let(:production_deployment) do
-        create(:deployment, project: project, environment: production, ref: 'master')
+        create(:deployment, :success, project: project, environment: production, ref: 'master')
       end
       let(:staging_deployment) do
-        create(:deployment, project: project, environment: staging, ref: 'wip')
+        create(:deployment, :success, project: project, environment: staging, ref: 'wip')
       end
 
       before do

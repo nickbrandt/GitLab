@@ -13,6 +13,7 @@ RSpec.shared_examples 'restricts access to protected environments' do |developer
       allow(project).to receive(:feature_available?).and_call_original
       allow(project).to receive(:feature_available?)
         .with(:protected_environments).and_return(true)
+      allow(build).to receive(:project) { project }
 
       project.add_developer(user)
       protected_environment

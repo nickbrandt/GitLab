@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import reportIssues from '~/reports/components/report_issues.vue';
+import reportIssues from '~/reports/components/report_item.vue';
 import { STATUS_FAILED, STATUS_SUCCESS } from '~/reports/constants';
 import { componentNames } from 'ee/vue_shared/components/reports/issue_body';
 import store from 'ee/vue_shared/security_reports/store';
@@ -27,76 +27,45 @@ describe('Report issues', () => {
     describe('resolved issues', () => {
       beforeEach(() => {
         vm = mountComponent(ReportIssues, {
-          issues: codequalityParsedIssues,
+          issue: codequalityParsedIssues[0],
           component: componentNames.CodequalityIssueBody,
           status: STATUS_SUCCESS,
         });
       });
 
-      it('should render a list of resolved issues', () => {
-        expect(vm.$el.querySelectorAll('.report-block-list li').length).toEqual(
-          codequalityParsedIssues.length,
-        );
-      });
-
       it('should render "Fixed" keyword', () => {
-        expect(vm.$el.querySelector('.report-block-list li').textContent).toContain('Fixed');
-        expect(
-          vm.$el
-            .querySelector('.report-block-list li')
-            .textContent.replace(/\s+/g, ' ')
-            .trim(),
-        ).toEqual('Fixed: Insecure Dependency in Gemfile.lock:12');
+        expect(vm.$el.textContent).toContain('Fixed');
+        expect(vm.$el.textContent.replace(/\s+/g, ' ').trim()).toEqual(
+          'Fixed: Insecure Dependency in Gemfile.lock:12',
+        );
       });
     });
 
     describe('unresolved issues', () => {
       beforeEach(() => {
         vm = mountComponent(ReportIssues, {
-          issues: codequalityParsedIssues,
+          issue: codequalityParsedIssues[0],
           component: componentNames.CodequalityIssueBody,
           status: STATUS_FAILED,
         });
       });
 
-      it('should render a list of unresolved issues', () => {
-        expect(vm.$el.querySelectorAll('.report-block-list li').length).toEqual(
-          codequalityParsedIssues.length,
-        );
-      });
-
       it('should not render "Fixed" keyword', () => {
-        expect(vm.$el.querySelector('.report-block-list li').textContent).not.toContain('Fixed');
+        expect(vm.$el.textContent).not.toContain('Fixed');
       });
-    });
-  });
-
-  describe('for security issues', () => {
-    beforeEach(() => {
-      vm = mountComponent(ReportIssues, {
-        issues: sastParsedIssues,
-        component: componentNames.SastIssueBody,
-        status: STATUS_FAILED,
-      });
-    });
-
-    it('should render a list of unresolved issues', () => {
-      expect(vm.$el.querySelectorAll('.report-block-list li').length).toEqual(
-        sastParsedIssues.length,
-      );
     });
   });
 
   describe('with location', () => {
     it('should render location', () => {
       vm = mountComponent(ReportIssues, {
-        issues: sastParsedIssues,
+        issue: sastParsedIssues[0],
         component: componentNames.SastIssueBody,
         status: STATUS_FAILED,
       });
 
-      expect(vm.$el.querySelector('.report-block-list li').textContent).toContain('in');
-      expect(vm.$el.querySelector('.report-block-list li a').getAttribute('href')).toEqual(
+      expect(vm.$el.textContent).toContain('in');
+      expect(vm.$el.querySelector('.report-block-list-issue a').getAttribute('href')).toEqual(
         sastParsedIssues[0].urlPath,
       );
     });
@@ -105,47 +74,41 @@ describe('Report issues', () => {
   describe('without location', () => {
     it('should not render location', () => {
       vm = mountComponent(ReportIssues, {
-        issues: [
-          {
-            title: 'foo',
-          },
-        ],
+        issue: {
+          title: 'foo',
+        },
         component: componentNames.SastIssueBody,
         status: STATUS_SUCCESS,
       });
 
-      expect(vm.$el.querySelector('.report-block-list li').textContent).not.toContain('in');
-      expect(vm.$el.querySelector('.report-block-list li a')).toEqual(null);
+      expect(vm.$el.textContent).not.toContain('in');
+      expect(vm.$el.querySelector('.report-block-list-issue a')).toEqual(null);
     });
   });
 
   describe('for container scanning issues', () => {
     beforeEach(() => {
       vm = mountComponent(ReportIssues, {
-        issues: dockerReportParsed.unapproved,
+        issue: dockerReportParsed.unapproved[0],
         component: componentNames.SastContainerIssueBody,
         status: STATUS_FAILED,
       });
     });
 
     it('renders severity', () => {
-      expect(vm.$el.querySelector('.report-block-list li').textContent.trim()).toContain(
-        dockerReportParsed.unapproved[0].severity,
-      );
+      expect(vm.$el.textContent.trim()).toContain(dockerReportParsed.unapproved[0].severity);
     });
 
     it('renders CVE name', () => {
-      expect(vm.$el.querySelector('.report-block-list button').textContent.trim()).toEqual(
+      expect(vm.$el.querySelector('.report-block-list-issue button').textContent.trim()).toEqual(
         dockerReportParsed.unapproved[0].title,
       );
     });
 
     it('renders namespace', () => {
-      expect(vm.$el.querySelector('.report-block-list li').textContent.trim()).toContain(
-        dockerReportParsed.unapproved[0].path,
-      );
+      expect(vm.$el.textContent.trim()).toContain(dockerReportParsed.unapproved[0].path);
 
-      expect(vm.$el.querySelector('.report-block-list li').textContent.trim()).toContain('in');
+      expect(vm.$el.textContent.trim()).toContain('in');
     });
   });
 
@@ -154,7 +117,7 @@ describe('Report issues', () => {
       vm = mountComponentWithStore(ReportIssues, {
         store,
         props: {
-          issues: parsedDast,
+          issue: parsedDast[0],
           component: componentNames.DastIssueBody,
           status: STATUS_FAILED,
         },
