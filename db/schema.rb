@@ -2318,7 +2318,6 @@ ActiveRecord::Schema.define(version: 20181101144347) do
     t.string "external_webhook_token"
     t.boolean "packages_enabled"
     t.boolean "merge_requests_author_approval"
-    t.boolean "remote_mirror_available_overridden"
     t.integer "pool_repository_id", limit: 8
   end
 
