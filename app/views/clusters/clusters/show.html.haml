@@ -32,7 +32,7 @@
     = render 'integration_form'
 
   -# EE-specific
-  - if @cluster.project.feature_available?(:cluster_health)
+  - if @cluster.project_type? && @cluster.project.feature_available?(:cluster_health)
     = render 'health'
 
   .cluster-applications-table#js-cluster-applications
