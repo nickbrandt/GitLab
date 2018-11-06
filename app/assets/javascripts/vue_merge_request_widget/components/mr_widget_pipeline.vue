@@ -73,6 +73,7 @@ export default {
           linkStart: `<a href="${this.troubleshootingDocsPath}">`,
           linkEnd: '</a>',
         },
+        false,
       );
     },
     /* We typically set defaults ([]) in the store or prop declarations, but because triggered
