@@ -5,7 +5,8 @@ module EE
       :multiproject_enabled,
       :pass_unstable,
       :project_name,
-      :repository_url
+      :repository_url,
+      :static_context
     ].freeze
 
     def allowed_service_params
