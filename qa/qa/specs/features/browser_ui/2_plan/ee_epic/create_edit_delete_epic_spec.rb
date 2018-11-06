@@ -9,11 +9,11 @@ module QA
       end
 
       it 'user creates, edits, deletes epic' do
-        issue = Factory::Resource::Issue.fabricate! do |issue|
+        issue = Resource::Issue.fabricate! do |issue|
           issue.title = 'Issue for epics tests'
         end
 
-        epic = EE::Factory::Resource::Epic.fabricate! do |epic|
+        epic = EE::Resource::Epic.fabricate! do |epic|
           epic.group = issue.project.group
           epic.title = "My First Epic"
         end

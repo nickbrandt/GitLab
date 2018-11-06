@@ -16,7 +16,7 @@ query.
 
 ## Can I git push to a secondary node?
 
-Yes, you can push changes to a **secondary** node. The push will be proxied to the **primary** node.
+Yes!  Pushing directly to a **secondary** node (for both HTTP and SSH, including git-lfs) was [introduced](https://about.gitlab.com/2018/09/22/gitlab-11-3-released/) in [GitLab Premium](https://about.gitlab.com/pricing/#self-managed) 11.3.
 
 ## How long does it take to have a commit replicated to a secondary node?
 

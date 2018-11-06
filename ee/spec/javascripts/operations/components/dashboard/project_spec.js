@@ -74,8 +74,8 @@ describe('project component', () => {
         expect(commit.shortSha).toBe(vm.project.last_deployment.commit.short_id);
       });
 
-      it('binds web_url to commitUrl', () => {
-        expect(commit.commitUrl).toBe(vm.project.last_deployment.commit.web_url);
+      it('binds commitUrl', () => {
+        expect(commit.commitUrl).toBe(vm.project.last_deployment.commit.commit_url);
       });
 
       it('binds title', () => {
@@ -87,7 +87,7 @@ describe('project component', () => {
       });
 
       it('binds tag', () => {
-        expect(commit.tag).toBe(vm.project.last_deployment.commit.tag);
+        expect(commit.tag).toBe(vm.project.last_deployment.tag);
       });
     });
 
