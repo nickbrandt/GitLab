@@ -69,14 +69,18 @@ module EE
     def autocomplete_data_sources(object, noteable_type)
       return {} unless object && noteable_type
 
-      return super unless object.is_a?(Group)
-
-      {
-        members: members_group_autocomplete_sources_path(object, type: noteable_type, type_id: params[:id]),
-        labels: labels_group_autocomplete_sources_path(object),
-        epics: epics_group_autocomplete_sources_path(object),
-        commands: commands_group_autocomplete_sources_path(object, type: noteable_type, type_id: params[:id])
-      }
+      if object.is_a?(Group)
+        {
+          members: members_group_autocomplete_sources_path(object, type: noteable_type, type_id: params[:id]),
+          labels: labels_group_autocomplete_sources_path(object),
+          epics: epics_group_autocomplete_sources_path(object),
+          commands: commands_group_autocomplete_sources_path(object, type: noteable_type, type_id: params[:id])
+        }
+      elsif object.group&.feature_available?(:epics)
+        { epics: epics_project_autocomplete_sources_path(object) }.merge(super)
+      else
+        super
+      end
     end
 
     def instance_review_permitted?

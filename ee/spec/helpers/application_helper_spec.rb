@@ -70,8 +70,26 @@ describe ApplicationHelper do
       let(:object) { create(:project) }
       let(:noteable_type) { Issue }
 
-      it 'returns paths for autocomplete_sources_controller' do
-        expect_autocomplete_data_sources(object, noteable_type, [:members, :issues, :mergeRequests, :labels, :milestones, :commands, :snippets])
+      context 'when epics are enabled' do
+        before do
+          stub_licensed_features(epics: true)
+        end
+
+        it 'returns paths for autocomplete_sources_controller for personal projects' do
+          expect_autocomplete_data_sources(object, noteable_type, [:members, :issues, :mergeRequests, :labels, :milestones, :commands, :snippets])
+        end
+
+        it 'returns paths for autocomplete_sources_controller including epics for group projects' do
+          object.update(group: create(:group))
+
+          expect_autocomplete_data_sources(object, noteable_type, [:members, :issues, :mergeRequests, :labels, :milestones, :commands, :snippets, :epics])
+        end
+      end
+
+      context 'when epics are disabled' do
+        it 'returns paths for autocomplete_sources_controller' do
+          expect_autocomplete_data_sources(object, noteable_type, [:members, :issues, :mergeRequests, :labels, :milestones, :commands, :snippets])
+        end
       end
     end
   end
