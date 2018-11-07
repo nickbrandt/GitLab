@@ -1,6 +1,7 @@
 <script>
 import { mapGetters, mapActions, mapState } from 'vuex';
 import Chart from 'chart.js';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 import bp from '~/breakpoints';
 import { getMonthNames } from '~/lib/utils/datetime_utility';
 import EmptyState from './empty_state.vue';
@@ -9,6 +10,7 @@ import { CHART_OPTNS, CHART_COLORS } from '../constants';
 export default {
   components: {
     EmptyState,
+    GlLoadingIcon,
   },
   props: {
     endpoint: {
