@@ -30,7 +30,7 @@ describe('epicHeader', () => {
   });
 
   it('should render username tooltip', () => {
-    expect(vm.$el.querySelector('.user-avatar-link span').dataset.originalTitle).toEqual(
+    expect(vm.$el.querySelector('.js-user-avatar-link-username').dataset.originalTitle).toEqual(
       author.username,
     );
   });

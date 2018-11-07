@@ -81,7 +81,6 @@ class BoardsStoreEE {
         weight = 'No+Weight';
       }
       updateFilterPath('weight', weight);
-      this.store.cantEdit.push('weight');
     }
     updateFilterPath('assignee_username', this.store.boardConfig.assigneeUsername);
     if (this.store.boardConfig.assigneeUsername) {
