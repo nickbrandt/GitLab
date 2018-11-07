@@ -6,8 +6,10 @@ module EE
       private
 
       override :refresh_merge_requests!
-      def refresh_merge_requests!(push)
-        super && reset_approvals_for_merge_requests(push.ref, push.newrev)
+      def refresh_merge_requests!
+        update_approvers do
+          super && reset_approvals_for_merge_requests(push.ref, push.newrev)
+        end
       end
 
       # Note: Closed merge requests also need approvals reset.
@@ -24,6 +26,53 @@ module EE
             merge_request.approvals.delete_all
           end
         end
+      end
+
+      # @return [Hash<Integer, MergeRequestDiff>] Diffs prior to code push, mapped from merge request id
+      def fetch_latest_merge_request_diffs
+        merge_requests = merge_requests_for_source_branch
+        ActiveRecord::Associations::Preloader.new.preload(merge_requests, :latest_merge_request_diff) # rubocop: disable CodeReuse/ActiveRecord
+        merge_requests.map(&:latest_merge_request_diff)
+      end
+
+      def update_approvers
+        return yield unless project.feature_available?(:code_owners)
+
+        previous_diffs = fetch_latest_merge_request_diffs
+
+        results = yield
+
+        merge_requests = merge_requests_for_source_branch
+        ActiveRecord::Associations::Preloader.new.preload(merge_requests, :latest_merge_request_diff) # rubocop: disable CodeReuse/ActiveRecord)
+
+        merge_requests.each do |merge_request|
+          previous_diff = previous_diffs.find { |diff| diff.merge_request == merge_request }
+          previous_code_owners = ::Gitlab::CodeOwners.for_merge_request(merge_request, merge_request_diff: previous_diff)
+          new_code_owners = merge_request.code_owners - previous_code_owners
+
+          create_approvers(merge_request, new_code_owners)
+        end
+
+        results
+      end
+
+      def create_approvers(merge_request, users)
+        return if users.empty?
+
+        if merge_request.approvers_overwritten?
+          rows = users.map do |user|
+            {
+              target_id: merge_request.id,
+              target_type: merge_request.class.name,
+              user_id: user.id
+            }
+          end
+
+          ::Gitlab::Database.bulk_insert(Approver.table_name, rows)
+        end
+
+        todo_service.add_merge_request_approvers(merge_request, users)
+        notification_service.add_merge_request_approvers(merge_request, users, current_user)
       end
     end
   end
