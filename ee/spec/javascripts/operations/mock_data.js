@@ -1,7 +1,6 @@
 export const mockText = {
   ADD_PROJECTS: 'Add projects',
   ADD_PROJECTS_ERROR: 'Something went wrong, unable to add projects to dashboard',
-  ADD_PROJECTS_DUPLICATE_ERROR: 'Some projects could not be added to dashboard',
   REMOVE_PROJECT_ERROR: 'Something went wrong, unable to remove project',
   DASHBOARD_TITLE: 'Operations Dashboard',
   EMPTY_TITLE: 'Add a project to the dashboard',
