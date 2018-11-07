@@ -25,6 +25,10 @@ module EE
           where('EXISTS (?)', ::Ci::Build.latest.with_security_reports.where('ci_pipelines.id=ci_builds.commit_id').select(1))
         end
 
+        scope :with_vulnerabilities, -> do
+          where('EXISTS (?)', ::Vulnerabilities::OccurrencePipeline.where('ci_pipelines.id=vulnerability_occurrence_pipelines.pipeline_id').select(1))
+        end
+
         # This structure describes feature levels
         # to access the file types for given reports
         REPORT_LICENSED_FEATURES = {

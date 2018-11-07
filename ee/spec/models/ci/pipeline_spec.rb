@@ -40,6 +40,21 @@ describe Ci::Pipeline do
     end
   end
 
+  describe '#with_vulnerabilities scope' do
+    let!(:pipeline_1) { create(:ci_pipeline_without_jobs, project: project) }
+    let!(:pipeline_2) { create(:ci_pipeline_without_jobs, project: project) }
+    let!(:pipeline_3) { create(:ci_pipeline_without_jobs, project: project) }
+
+    before do
+      create(:vulnerabilities_occurrence, pipelines: [pipeline_1], project: pipeline.project)
+      create(:vulnerabilities_occurrence, pipelines: [pipeline_2], project: pipeline.project)
+    end
+
+    it "returns pipeline with vulnerabilities" do
+      expect(described_class.with_vulnerabilities).to contain_exactly(pipeline_1, pipeline_2)
+    end
+  end
+
   shared_examples 'unlicensed report type' do
     context 'when there is no licensed feature for artifact file type' do
       it 'returns the artifact' do
