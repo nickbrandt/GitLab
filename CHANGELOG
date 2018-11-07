@@ -2,6 +2,20 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 7.1.0
+
+- Add structured logFormat for text based logging !275
+- Run make fmt on master !306
+- Allow to configure `BUILD_DIR` and `TARGET_DIR` !308
+- Resolve "Rework test suite to allow dead code to be removed" !307
+- Update Prometheus vendoring !305
+- General vendoring cleanup !310
+- Remove Go 1.8 support !314
+- Remove unused 'body' argument !315
+- Refactor badgateway to use standardlib interfaces !316
+- Pass Correlation-Ids down to backend systems !311
+- Don't fail if /home/git/repositories already exists in Gitaly container !317
+
 v 7.0.0
 
 - Use the new Gitaly auth scheme (v2) !298
