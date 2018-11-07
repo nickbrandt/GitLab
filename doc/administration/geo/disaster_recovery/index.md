@@ -213,10 +213,10 @@ To bring a new secondary online, follow the [Geo setup instructions][setup-geo].
 ### Step 6. (Optional) Removing the secondary's tracking database
 
 Every **secondary** has a special tracking database that is used to save the status of the synchronization of all the items from the **primary**.
-Because the **secondary** is already promoted, that data in the tracking database is no longer required. 
+Because the **secondary** is already promoted, that data in the tracking database is no longer required.
 The data can be removed with the following command:
 
-    ```ssh
+    ```sh
     sudo rm -rf /var/opt/gitlab/geo-postgresql
     ```
 
