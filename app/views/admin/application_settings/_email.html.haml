@@ -26,7 +26,6 @@
       .form-text.text-muted
         - commit_email_hostname_docs_link = link_to _('Learn more'), help_page_path('user/admin_area/settings/email', anchor: 'custom-private-commit-email-hostname'), target: '_blank'
         = _("This setting will update the hostname that is used to generate private commit emails. %{learn_more}").html_safe % { learn_more: commit_email_hostname_docs_link }
-<<<<<<< HEAD
     -# EE-specific start
     - if License.feature_available?(:email_additional_text)
       .form-group
@@ -35,7 +34,5 @@
         .form-text.text-muted
           = _('Add additional text to appear in all email communications. %{character_limit} character limit') % { character_limit: number_with_delimiter(Gitlab::CurrentSettings.email_additional_text_character_limit) }
     -# EE-specific end
-=======
->>>>>>> upstream/master
 
   = f.submit 'Save changes', class: "btn btn-success"
