@@ -1,7 +1,7 @@
 import PersistentUserCallout from '~/persistent_user_callout';
 import initGkeDropdowns from '~/projects/gke_cluster_dropdowns';
 
-function initGcpSignupCallout() {
+function initCallout() {
   const callout = document.querySelector('.gcp-signup-offer');
 
   if (callout) new PersistentUserCallout(callout); // eslint-disable-line no-new
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   if (newClusterViews.indexOf(page) > -1) {
-    initGcpSignupCallout();
+    initCallout();
     initGkeDropdowns();
   }
 });
