@@ -70,9 +70,7 @@ module EE
 
     def add_mr_approvers_email(merge_request, approvers, current_user)
       approvers.each do |approver|
-        recipient = approver.user
-
-        mailer.add_merge_request_approver_email(recipient.id, merge_request.id, current_user.id).deliver_later
+        mailer.add_merge_request_approver_email(approver.id, merge_request.id, current_user.id).deliver_later
       end
     end
 
