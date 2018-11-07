@@ -122,6 +122,43 @@ describe 'New project' do
         end
       end
 
+      it 'creates CI/CD project from GitHub' do
+        visit new_project_path
+        find('#ci-cd-project-tab').click
+
+        page.within '#ci-cd-project-pane' do
+          find('.js-import-github').click
+        end
+
+        expect(page).to have_text('Connect repositories from GitHub')
+
+        allow_any_instance_of(Gitlab::LegacyGithubImport::Client).to receive(:repos).and_return([repo])
+
+        fill_in 'personal_access_token', with: 'fake-token'
+        click_button 'List your GitHub repositories'
+        wait_for_requests
+
+        # Mock the POST `/import/github`
+        allow_any_instance_of(Gitlab::LegacyGithubImport::Client).to receive(:repo).and_return(repo)
+        project = create(:project, name: 'some-github-repo', creator: user, import_type: 'github')
+        create(:import_state, :finished, import_url: repo.clone_url, project: project)
+        allow_any_instance_of(CiCd::SetupProject).to receive(:setup_external_service)
+        CiCd::SetupProject.new(project, user).execute
+        allow_any_instance_of(Gitlab::LegacyGithubImport::ProjectCreator)
+          .to receive(:execute).with(hash_including(ci_cd_only: true))
+          .and_return(project)
+
+        click_button 'Connect'
+        wait_for_requests
+
+        expect(page).to have_text('Done')
+
+        created_project = Project.last
+        expect(created_project.name).to eq('some-github-repo')
+        expect(created_project.mirror).to eq(true)
+        expect(created_project.project_feature).not_to be_issues_enabled
+      end
+
       it 'new GitHub CI/CD project page has link to status page with ?ci_cd_only=true param' do
         visit new_import_github_path(ci_cd_only: true)
 
