@@ -382,6 +382,7 @@ describe User do
           expect(user).to be_valid
         end
       end
+<<<<<<< HEAD
     end
 
     it 'does not allow a user to be both an auditor and an admin' do
@@ -401,6 +402,8 @@ describe User do
       users = described_class.non_ldap
       expect(users.count).to eq 2
       expect(users.detect { |user| user.username == ldap_user.username }).to be_nil
+=======
+>>>>>>> upstream/master
     end
   end
 

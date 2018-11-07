@@ -122,9 +122,12 @@ msgstr ""
 msgid "%{counter_storage} (%{counter_repositories} repositories, %{counter_build_artifacts} build artifacts, %{counter_lfs_objects} LFS)"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "%{count} %{alerts}"
 msgstr ""
 
+=======
+>>>>>>> upstream/master
 msgid "%{count} more assignees"
 msgstr ""
 
@@ -321,6 +324,9 @@ msgstr ""
 msgid "A deleted user"
 msgstr ""
 
+msgid "A member of GitLab's abuse team will review your report as soon as possible."
+msgstr ""
+
 msgid "A new branch will be created in your fork and a new merge request will be started."
 msgstr ""
 
@@ -408,12 +414,15 @@ msgstr ""
 msgid "Add a table"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Add additional text to appear in all email communications. %{character_limit} character limit"
 msgstr ""
 
 msgid "Add comment now"
 msgstr ""
 
+=======
+>>>>>>> upstream/master
 msgid "Add image comment"
 msgstr ""
 
@@ -1669,6 +1678,9 @@ msgstr ""
 msgid "ClusterIntegration|%{boldNotice} This will add some extra resources like a load balancer, which may incur additional costs depending on the hosting provider your Kubernetes cluster is installed on. If you are using Google Kubernetes Engine, you can %{pricingLink}."
 msgstr ""
 
+msgid "ClusterIntegration|A Knative build extends Kubernetes and utilizes existing Kubernetes primitives to provide you with the ability to run on-cluster container builds from source. For example, you can write a build that uses Kubernetes-native resources to obtain your source code from a repository, build it into container a image, and then run that image."
+msgstr ""
+
 msgid "ClusterIntegration|API URL"
 msgstr ""
 
@@ -1826,6 +1838,12 @@ msgid "ClusterIntegration|JupyterHub"
 msgstr ""
 
 msgid "ClusterIntegration|JupyterHub, a multi-user Hub, spawns, manages, and proxies multiple instances of the single-user Jupyter notebook server. JupyterHub can be used to serve notebooks to a class of students, a corporate data science group, or a scientific research group."
+msgstr ""
+
+msgid "ClusterIntegration|Knative"
+msgstr ""
+
+msgid "ClusterIntegration|Knative Domain Name:"
 msgstr ""
 
 msgid "ClusterIntegration|Kubernetes cluster"
@@ -2345,10 +2363,14 @@ msgstr ""
 msgid "Copy file path to clipboard"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Copy incoming email address to clipboard"
 msgstr ""
 
 msgid "Copy name to clipboard"
+=======
+msgid "Copy link"
+>>>>>>> upstream/master
 msgstr ""
 
 msgid "Copy reference to clipboard"
@@ -2604,6 +2626,9 @@ msgid "Delete Package"
 msgstr ""
 
 msgid "Delete Snippet"
+msgstr ""
+
+msgid "Delete comment"
 msgstr ""
 
 msgid "Delete list"
@@ -3230,6 +3255,9 @@ msgid "Expand sidebar"
 msgstr ""
 
 msgid "Expiration date"
+msgstr ""
+
+msgid "Explain the problem. If appropriate, provide a link to the relevant issue or comment."
 msgstr ""
 
 msgid "Explore"
@@ -5977,7 +6005,11 @@ msgstr ""
 msgid "Please try again"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Please wait while we connect to your repository. Refresh at will."
+=======
+msgid "Please use this form to report users to GitLab who create spam issues, comments or behave inappropriately."
+>>>>>>> upstream/master
 msgstr ""
 
 msgid "Please wait while we import the repository for you. Refresh at will."
@@ -6738,7 +6770,11 @@ msgstr ""
 msgid "Reply to this email directly or %{view_it_on_gitlab}."
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Repo by URL"
+=======
+msgid "Report abuse to GitLab"
+>>>>>>> upstream/master
 msgstr ""
 
 msgid "Reporting"
@@ -8049,7 +8085,7 @@ msgstr ""
 msgid "This is a confidential issue."
 msgstr ""
 
-msgid "This is a delayed to run in "
+msgid "This is a delayed job to run in %{remainingTime}"
 msgstr ""
 
 msgid "This is the author's first Merge Request to this project."
@@ -8196,9 +8232,12 @@ msgstr ""
 msgid "Time estimate"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Time in seconds GitLab will wait for a response from the external service. When the service does not respond in time, access will be denied."
 msgstr ""
 
+=======
+>>>>>>> upstream/master
 msgid "Time remaining"
 msgstr ""
 
@@ -8428,12 +8467,15 @@ msgstr ""
 msgid "To validate your GitLab CI configurations, go to 'CI/CD → Pipelines' inside your project, and click on the 'CI Lint' button."
 msgstr ""
 
+<<<<<<< HEAD
 msgid "To view the roadmap, add a start or due date to one of your epics in this group or its subgroups. In the months view, only epics in the past month, current month, and next 5 months are shown."
 msgstr ""
 
 msgid "To widen your search, change or remove filters."
 msgstr ""
 
+=======
+>>>>>>> upstream/master
 msgid "Today"
 msgstr ""
 

@@ -7,9 +7,12 @@ import { polyfillSticky } from '~/lib/utils/sticky';
 import bp from '~/breakpoints';
 import CiHeader from '~/vue_shared/components/header_ci_component.vue';
 import Callout from '~/vue_shared/components/callout.vue';
+<<<<<<< HEAD
 // ee-only start
 import SharedRunner from 'ee/jobs/components/shared_runner_limit_block.vue';
 // ee-only end
+=======
+>>>>>>> upstream/master
 import Icon from '~/vue_shared/components/icon.vue';
 import createStore from '../store';
 import EmptyState from './empty_state.vue';
@@ -19,6 +22,8 @@ import Log from './job_log.vue';
 import LogTopBar from './job_log_controllers.vue';
 import StuckBlock from './stuck_block.vue';
 import Sidebar from './sidebar.vue';
+import { sprintf } from '~/locale';
+import delayedJobMixin from '../mixins/delayed_job_mixin';
 
 export default {
   name: 'JobPageApp',
@@ -29,14 +34,19 @@ export default {
     EmptyState,
     EnvironmentsBlock,
     ErasedBlock,
+<<<<<<< HEAD
     GlLoadingIcon,
+=======
+>>>>>>> upstream/master
     Icon,
     Log,
     LogTopBar,
     StuckBlock,
     SharedRunner,
     Sidebar,
+    GlLoadingIcon,
   },
+  mixins: [delayedJobMixin],
   props: {
     runnerSettingsUrl: {
       type: String,
@@ -96,6 +106,17 @@ export default {
 
     shouldRenderContent() {
       return !this.isLoading && !this.hasError;
+    },
+
+    emptyStateTitle() {
+      const { emptyStateIllustration, remainingTime } = this;
+      const { title } = emptyStateIllustration;
+
+      if (this.isDelayedJob) {
+        return sprintf(title, { remainingTime });
+      }
+
+      return title;
     },
   },
   watch: {
@@ -239,16 +260,28 @@ export default {
           :erased-at="job.erased_at"
         />
 
+<<<<<<< HEAD
         <div
+=======
+        <div 
+>>>>>>> upstream/master
           v-if="job.archived"
           ref="sticky"
           class="js-archived-job prepend-top-default archived-sticky sticky-top"
         >
+<<<<<<< HEAD
           <icon
             name="lock"
             class="align-text-bottom"
           />
 
+=======
+          <icon 
+            name="lock"
+            class="align-text-bottom"
+          />
+                
+>>>>>>> upstream/master
           {{ __('This job is archived. Only the complete pipeline can be retried.') }}
         </div>
         <!--job log -->
@@ -285,7 +318,7 @@ export default {
           class="js-job-empty-state"
           :illustration-path="emptyStateIllustration.image"
           :illustration-size-class="emptyStateIllustration.size"
-          :title="emptyStateIllustration.title"
+          :title="emptyStateTitle"
           :content="emptyStateIllustration.content"
           :action="emptyStateAction"
         />

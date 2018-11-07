@@ -28,4 +28,12 @@ describe IssueSerializer do
       expect(json_entity).to match_schema('entities/issue_sidebar', strict: true)
     end
   end
+
+  context 'board issue serialization' do
+    let(:serializer) { 'board' }
+
+    it 'matches board issue json schema' do
+      expect(json_entity).to match_schema('entities/issue_board')
+    end
+  end
 end

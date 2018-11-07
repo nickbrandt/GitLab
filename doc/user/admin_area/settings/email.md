@@ -4,6 +4,7 @@
 
 The logo in the header of some emails can be customized, see the [logo customization section](../../../customization/branded_page_and_email_header.md).
 
+<<<<<<< HEAD
 ## Custom additional text
 
 >[Introduced][ee-5031] in [GitLab Premium][eep] 10.7.
@@ -20,6 +21,8 @@ legal/auditing/compliance reasons.
 [ee-5031]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/5031
 [eep]: https://about.gitlab.com/pricing/
 
+=======
+>>>>>>> upstream/master
 ## Custom hostname for private commit emails
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/22560) in GitLab 11.5.
@@ -34,5 +37,9 @@ In order to change this option:
 1. Hit **Save** for the changes to take effect.
 
 NOTE: **Note**: Once the hostname gets configured, every private commit email using the previous hostname, will not get
+<<<<<<< HEAD
 recognized by GitLab. This can directly conflict with certain [Push rules](../../../push_rules/push_rules.md) such as
+=======
+recognized by GitLab. This can directly conflict with certain [Push rules](https://docs.gitlab.com/ee/push_rules/push_rules.html) such as
+>>>>>>> upstream/master
 `Check whether author is a GitLab user` and `Check whether committer is the current authenticated user`.

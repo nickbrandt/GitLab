@@ -171,6 +171,7 @@ describe SnippetsFinder do
 
       expect(snippets).to include(@snippet1, @snippet2, @snippet3)
     end
+<<<<<<< HEAD
 
     it "returns all snippets for auditor users" do
       user = create(:user, :auditor)
@@ -179,6 +180,8 @@ describe SnippetsFinder do
 
       expect(snippets).to include(@snippet1, @snippet2, @snippet3)
     end
+=======
+>>>>>>> upstream/master
   end
 
   describe '#execute' do

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181105201455) do
+ActiveRecord::Schema.define(version: 20181107054254) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -213,6 +213,7 @@ ActiveRecord::Schema.define(version: 20181105201455) do
     t.integer "diff_max_patch_bytes", default: 102400, null: false
     t.integer "archive_builds_in_seconds"
     t.string "commit_email_hostname"
+<<<<<<< .merge_file_NCccCp
   end
 
   create_table "approvals", force: :cascade do |t|
@@ -241,6 +242,8 @@ ActiveRecord::Schema.define(version: 20181105201455) do
     t.integer "user_id", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+=======
+>>>>>>> .merge_file_ceNjdO
   end
 
   add_index "approvers", ["target_id", "target_type"], name: "index_approvers_on_target_id_and_target_type", using: :btree
@@ -823,6 +826,16 @@ ActiveRecord::Schema.define(version: 20181105201455) do
     t.text "status_reason"
   end
 
+  create_table "clusters_applications_knative", force: :cascade do |t|
+    t.integer "cluster_id", null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.integer "status", null: false
+    t.string "version", null: false
+    t.string "hostname"
+    t.text "status_reason"
+  end
+
   create_table "clusters_applications_prometheus", force: :cascade do |t|
     t.integer "cluster_id", null: false
     t.integer "status", null: false
@@ -956,6 +969,7 @@ ActiveRecord::Schema.define(version: 20181105201455) do
   add_index "deployments", ["environment_id", "status"], name: "index_deployments_on_environment_id_and_status", using: :btree
   add_index "deployments", ["id"], name: "partial_index_deployments_for_legacy_successful_deployments", where: "((finished_at IS NULL) AND (status = 2))", using: :btree
   add_index "deployments", ["project_id", "iid"], name: "index_deployments_on_project_id_and_iid", unique: true, using: :btree
+  add_index "deployments", ["project_id", "status", "created_at"], name: "index_deployments_on_project_id_and_status_and_created_at", using: :btree
   add_index "deployments", ["project_id", "status"], name: "index_deployments_on_project_id_and_status", using: :btree
 
   create_table "draft_notes", id: :bigserial, force: :cascade do |t|
@@ -3284,7 +3298,12 @@ ActiveRecord::Schema.define(version: 20181105201455) do
   add_foreign_key "clusters_applications_ingress", "clusters", on_delete: :cascade
   add_foreign_key "clusters_applications_jupyter", "clusters", on_delete: :cascade
   add_foreign_key "clusters_applications_jupyter", "oauth_applications", on_delete: :nullify
+<<<<<<< .merge_file_NCccCp
   add_foreign_key "clusters_applications_prometheus", "clusters", on_delete: :cascade
+=======
+  add_foreign_key "clusters_applications_knative", "clusters", on_delete: :cascade
+  add_foreign_key "clusters_applications_prometheus", "clusters", name: "fk_557e773639", on_delete: :cascade
+>>>>>>> .merge_file_ceNjdO
   add_foreign_key "clusters_applications_runners", "ci_runners", column: "runner_id", name: "fk_02de2ded36", on_delete: :nullify
   add_foreign_key "clusters_applications_runners", "clusters", on_delete: :cascade
   add_foreign_key "clusters_kubernetes_namespaces", "cluster_projects", on_delete: :nullify

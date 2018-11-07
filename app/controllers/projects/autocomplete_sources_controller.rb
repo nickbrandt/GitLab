@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 class Projects::AutocompleteSourcesController < Projects::ApplicationController
+<<<<<<< HEAD
   prepend EE::Projects::AutocompleteSourcesController
 
+=======
+>>>>>>> upstream/master
   def members
     render json: ::Projects::ParticipantsService.new(@project, current_user).execute(target)
   end

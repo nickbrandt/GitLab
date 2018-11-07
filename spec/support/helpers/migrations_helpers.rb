@@ -1,6 +1,9 @@
 module MigrationsHelpers
+<<<<<<< HEAD
   prepend EE::MigrationsHelpers
 
+=======
+>>>>>>> upstream/master
   def active_record_base
     ActiveRecord::Base
   end
