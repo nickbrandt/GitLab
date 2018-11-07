@@ -15,6 +15,106 @@ describe API::MavenPackages do
     stub_licensed_features(packages: true)
   end
 
+  describe 'GET /api/v4/packages/maven/*path/:file_name' do
+    let(:package) { create(:maven_package, project: project) }
+    let(:maven_metadatum) { package.maven_metadatum }
+    let(:package_file_xml) { package.package_files.find_by(file_type: 'xml') }
+
+    context 'a public project' do
+      it 'returns the file' do
+        download_file(package_file_xml.file_name)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response.content_type.to_s).to eq('application/octet-stream')
+      end
+
+      it 'returns sha1 of the file' do
+        download_file(package_file_xml.file_name + '.sha1')
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response.content_type.to_s).to eq('text/plain')
+        expect(response.body).to eq(package_file_xml.file_sha1)
+      end
+    end
+
+    context 'internal project' do
+      before do
+        project.team.truncate
+        project.update!(visibility_level: Gitlab::VisibilityLevel::INTERNAL)
+      end
+
+      it 'returns the file' do
+        download_file_with_token(package_file_xml.file_name)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response.content_type.to_s).to eq('application/octet-stream')
+      end
+
+      it 'denies download when no private token' do
+        download_file(package_file_xml.file_name)
+
+        expect(response).to have_gitlab_http_status(403)
+      end
+
+      it 'allows download with job token' do
+        download_file(package_file_xml.file_name, job_token: job.token)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response.content_type.to_s).to eq('application/octet-stream')
+      end
+    end
+
+    context 'private project' do
+      before do
+        project.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
+      end
+
+      it 'returns the file' do
+        download_file_with_token(package_file_xml.file_name)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response.content_type.to_s).to eq('application/octet-stream')
+      end
+
+      it 'denies download when not enough permissions' do
+        project.add_guest(user)
+
+        download_file_with_token(package_file_xml.file_name)
+
+        expect(response).to have_gitlab_http_status(403)
+      end
+
+      it 'denies download when no private token' do
+        download_file(package_file_xml.file_name)
+
+        expect(response).to have_gitlab_http_status(403)
+      end
+
+      it 'allows download with job token' do
+        download_file(package_file_xml.file_name, job_token: job.token)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(response.content_type.to_s).to eq('application/octet-stream')
+      end
+    end
+
+    it 'rejects request if feature is not in the license' do
+      stub_licensed_features(packages: false)
+
+      download_file(package_file_xml.file_name)
+
+      expect(response).to have_gitlab_http_status(403)
+    end
+
+    def download_file(file_name, params = {}, request_headers = headers)
+      get api("/packages/maven/#{maven_metadatum.path}/#{file_name}"), params, request_headers
+    end
+
+    def download_file_with_token(file_name, params = {}, request_headers = headers_with_token)
+      download_file(file_name, params, request_headers)
+    end
+  end
+
   describe 'GET /api/v4/projects/:id/packages/maven/*path/:file_name' do
     let(:package) { create(:maven_package, project: project) }
     let(:maven_metadatum) { package.maven_metadatum }
