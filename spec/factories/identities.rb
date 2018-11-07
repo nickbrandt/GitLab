@@ -7,6 +7,7 @@ FactoryBot.define do
       provider 'group_saml'
       extern_uid { generate(:username) }
       saml_provider
+      user
     end
   end
 end
