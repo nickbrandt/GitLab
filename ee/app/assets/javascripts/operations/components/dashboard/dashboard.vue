@@ -1,5 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 import DashboardProject from './project.vue';
 import ProjectSearch from './project_search.vue';
 
@@ -7,6 +8,7 @@ export default {
   components: {
     DashboardProject,
     ProjectSearch,
+    GlLoadingIcon,
   },
   props: {
     addPath: {

@@ -1,4 +1,5 @@
 <script>
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 import ListFilter from './list_filter.vue';
 import ListContent from './list_content.vue';
 
@@ -6,6 +7,7 @@ export default {
   components: {
     ListFilter,
     ListContent,
+    GlLoadingIcon,
   },
   props: {
     loading: {

@@ -3,6 +3,7 @@ import Sortable from 'sortablejs';
 import tooltip from '~/vue_shared/directives/tooltip';
 import Icon from '~/vue_shared/components/icon.vue';
 import sortableConfig from 'ee/sortable/sortable_config';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 import eventHub from '../event_hub';
 import issueItem from './issue_item.vue';
 import addIssuableForm from './add_issuable_form.vue';
@@ -16,6 +17,7 @@ export default {
     Icon,
     addIssuableForm,
     issueItem,
+    GlLoadingIcon,
   },
   props: {
     isFetching: {

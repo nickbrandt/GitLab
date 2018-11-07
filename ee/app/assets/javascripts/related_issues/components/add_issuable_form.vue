@@ -1,6 +1,7 @@
 <script>
 import $ from 'jquery';
 import GfmAutoComplete from '~/gfm_auto_complete';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 import eventHub from '../event_hub';
 import issueToken from './issue_token.vue';
 
@@ -8,6 +9,7 @@ export default {
   name: 'AddIssuableForm',
   components: {
     issueToken,
+    GlLoadingIcon,
   },
   props: {
     inputValue: {
