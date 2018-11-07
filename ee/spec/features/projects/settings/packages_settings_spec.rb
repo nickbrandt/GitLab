@@ -14,11 +14,29 @@ describe 'Projects > Settings > Packages', :js do
       allow(Gitlab.config.packages).to receive(:enabled).and_return(true)
     end
 
-    it 'displays the packages toggle button' do
-      visit edit_project_path(project)
+    context 'allowed by license' do
+      before do
+        stub_licensed_features(packages: true)
+      end
 
-      expect(page).to have_content('Packages')
-      expect(page).to have_selector('input[name="project[packages_enabled]"] + button', visible: true)
+      it 'displays the packages toggle button' do
+        visit edit_project_path(project)
+
+        expect(page).to have_content('Packages')
+        expect(page).to have_selector('input[name="project[packages_enabled]"] + button', visible: true)
+      end
+    end
+
+    context 'not allowed by license' do
+      before do
+        stub_licensed_features(packages: false)
+      end
+
+      it 'does not show up in UI' do
+        visit edit_project_path(project)
+
+        expect(page).not_to have_content('Packages')
+      end
     end
   end
 
