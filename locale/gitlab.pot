@@ -2589,9 +2589,6 @@ msgstr ""
 msgid "Configure the way a user creates a new account."
 msgstr ""
 
-msgid "Connect"
-msgstr ""
-
 msgid "Connect all repositories"
 msgstr ""
 
@@ -4229,9 +4226,6 @@ msgid "Found errors in your .gitlab-ci.yml:"
 msgstr ""
 
 msgid "Free Trial of GitLab.com Gold"
-msgstr ""
-
-msgid "From %{provider_title}"
 msgstr ""
 
 msgid "From Bitbucket"
