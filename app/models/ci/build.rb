@@ -10,7 +10,6 @@ module Ci
     include Importable
     include Gitlab::Utils::StrongMemoize
     include Deployable
-
     prepend EE::Ci::Build
 
     belongs_to :project, inverse_of: :builds
