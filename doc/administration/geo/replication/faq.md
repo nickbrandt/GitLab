@@ -1,5 +1,9 @@
 # Geo Frequently Asked Questions
 
+## What are the minimum requirements to run Geo?
+
+The requirements are listed [on the index page](index.md#requirements-for-running-geo)
+
 ## Can I use Geo in a disaster recovery situation?
 
 Yes, but there are limitations to what we replicate (see

@@ -85,15 +85,17 @@ Note that the **secondary** node needs two different PostgreSQL databases:
 
 In the secondary nodes, there is an additional daemon: [Geo Log Cursor](#geo-log-cursor).
 
-## Geo Recommendations
+## Requirements for running Geo
 
-We highly recommend that you install Geo on an operating system that supports OpenSSH 6.9 or higher. The following operating systems are known to ship with a current version of OpenSSH:
+The following are required to run Geo:
 
-- [CentOS](https://www.centos.org) 7.4
-- [Ubuntu](https://www.ubuntu.com) 16.04
-
-NOTE: **Note:**
-CentOS 6 and 7.0 ship with an old version of OpenSSH that does not support [fast lookup of authorized SSH keys in the database](../../operations/fast_ssh_key_lookup.md), which Geo requires.
+- An operating system that supports OpenSSH 6.9+ (needed for
+  [fast lookup of authorized SSH keys in the database](../../operations/fast_ssh_key_lookup.md))
+  The following operating systems are known to ship with a current version of OpenSSH:
+    - [CentOS](https://www.centos.org) 7.4+
+    - [Ubuntu](https://www.ubuntu.com) 16.04+
+- PostgreSQL 9.6+ with [FDW](https://www.postgresql.org/docs/9.6/postgres-fdw.html) support and [Streaming Replication](https://wiki.postgresql.org/wiki/Streaming_Replication)
+- Git 2.9+
 
 ### Firewall rules
 
@@ -131,6 +133,7 @@ The tracking database instance is used as metadata to control what needs to be u
 - Fetch changes from a repository that has recently been updated.
 
 Because the replicated database instance is read-only, we need this additional database instance for each **secondary** node.
+The tracking database requires the `postgres_fdw` extension.
 
 ### Geo Log Cursor
 
