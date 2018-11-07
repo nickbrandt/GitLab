@@ -3,10 +3,7 @@ import { GlTooltipDirective } from '@gitlab-org/gitlab-ui';
 import { sprintf, __ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import TooltipOnTruncate from '~/vue_shared/components/tooltip_on_truncate.vue';
-<<<<<<< HEAD
 import IssueCardWeight from 'ee/boards/components/issue_card_weight.vue';
-=======
->>>>>>> upstream/master
 import UserAvatarLink from '../../vue_shared/components/user_avatar/user_avatar_link.vue';
 import eventHub from '../eventhub';
 import IssueDueDate from './issue_due_date.vue';
@@ -19,10 +16,7 @@ export default {
     UserAvatarLink,
     TooltipOnTruncate,
     IssueDueDate,
-<<<<<<< HEAD
     IssueCardWeight,
-=======
->>>>>>> upstream/master
     IssueTimeEstimate,
   },
   directives: {
@@ -222,13 +216,10 @@ export default {
           /><issue-time-estimate
             v-if="issue.timeEstimate"
             :estimate="issue.timeEstimate"
-<<<<<<< HEAD
           /><issue-card-weight
             v-if="issue.weight"
             :weight="issue.weight"
             @click="filterByWeight(issue.weight)"
-=======
->>>>>>> upstream/master
           />
         </span>
       </div>

@@ -105,21 +105,7 @@ module Boards
     end
 
     def serialize_as_json(resource)
-<<<<<<< HEAD
-      resource.as_json(
-        only: [:id, :iid, :project_id, :title, :confidential, :due_date, :relative_position, :weight, :time_estimate],
-        labels: true,
-        issue_endpoints: true,
-        include_full_project_path: board.group_board?,
-        include: {
-          project: { only: [:id, :path] },
-          assignees: { only: [:id, :name, :username], methods: [:avatar_url] },
-          milestone: { only: [:id, :title] }
-        }
-      )
-=======
       serializer.represent(resource, serializer: 'board', include_full_project_path: board.group_board?)
->>>>>>> upstream/master
     end
 
     def whitelist_query_limiting
