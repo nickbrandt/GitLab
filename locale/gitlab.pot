@@ -7091,6 +7091,15 @@ msgstr ""
 msgid "Security Dashboard"
 msgstr ""
 
+msgid "Security Dashboard|Error fetching the dashboard data. Please check your network connection and try again."
+msgstr ""
+
+msgid "Security Dashboard|Error fetching the vulnerability counts. Please check your network connection and try again."
+msgstr ""
+
+msgid "Security Dashboard|Error fetching the vulnerability list. Please check your network connection and try again."
+msgstr ""
+
 msgid "Security Dashboard|Issue Created"
 msgstr ""
 
@@ -7112,13 +7121,7 @@ msgstr ""
 msgid "Security Reports|There was an error creating the issue."
 msgstr ""
 
-msgid "Security Reports|There was an error dismissing the issue."
-msgstr ""
-
 msgid "Security Reports|There was an error dismissing the vulnerability."
-msgstr ""
-
-msgid "Security Reports|There was an error fetching the dashboard. Please try again in a few moments or contact your support team."
 msgstr ""
 
 msgid "Security Reports|There was an error undoing the dismissal."
