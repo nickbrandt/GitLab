@@ -35,6 +35,10 @@ module EE
         links << :epics
       end
 
+      if @group.feature_available?(:issues_analytics)
+        links << :analytics
+      end
+
       links
     end
   end
