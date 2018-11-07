@@ -8,44 +8,29 @@ module Gitlab
       attr_accessor :return_to
 
       def oauth_state_valid?
-        return false unless state
-
-        salt, hmac, return_to = state.split(':', 3)
-
-        return false unless return_to
-
-        hmac == generate_oauth_hmac(salt, return_to)
+        salt, hmac, return_to = state.to_s.split(':', 3)
+        LoginState.new(salt, return_to).valid?(hmac)
       end
 
       def generate_oauth_state
-        return unless return_to
-
-        hmac = generate_oauth_hmac(oauth_salt, return_to)
-        self.state = "#{oauth_salt}:#{hmac}:#{return_to}"
+        self.state = LoginState.new(oauth_salt, return_to).encode
       end
 
       def generate_logout_state
-        return unless access_token
-
-        cipher = logout_token_cipher(oauth_salt, :encrypt)
-        encrypted = cipher.update(access_token) + cipher.final
-        self.state = "#{oauth_salt}:#{Base64.urlsafe_encode64(encrypted)}"
-      rescue OpenSSL::OpenSSLError
-        false
+        self.state = LogoutState.new(oauth_salt, access_token, return_to).encode
       end
 
       def extract_logout_token
-        return unless state
-
-        salt, encrypted = state.split(':', 2)
-        decipher = logout_token_cipher(salt, :decrypt)
-        decipher.update(Base64.urlsafe_decode64(encrypted)) + decipher.final
-      rescue OpenSSL::OpenSSLError
-        false
+        salt, encrypted, return_to = state.to_s.split(':', 3)
+        LogoutState.new(salt, encrypted, return_to).decode
       end
 
       def get_oauth_state_return_to
         state.split(':', 3)[2] if state
+      end
+
+      def get_oauth_state_return_to_full_path
+        ReturnToLocation.new(get_oauth_state_return_to).full_path
       end
 
       def authorize_url(params = {})
@@ -65,28 +50,122 @@ module Gitlab
 
       private
 
-      def generate_oauth_hmac(salt, return_to)
-        return false unless return_to
+      class LoginState
+        def initialize(salt, return_to)
+          @salt      = salt
+          @return_to = return_to
+        end
 
-        digest = OpenSSL::Digest.new('sha256')
-        key = Gitlab::Application.secrets.secret_key_base + salt
-        OpenSSL::HMAC.hexdigest(digest, key, return_to)
+        def valid?(hmac)
+          return false unless salt && return_to
+
+          hmac == generate_hmac
+        end
+
+        def encode
+          return unless salt && return_to
+
+          "#{salt}:#{generate_hmac}:#{return_to}"
+        end
+
+        private
+
+        attr_reader :salt, :return_to
+
+        def generate_hmac
+          digest = OpenSSL::Digest.new('sha256')
+          key    = Gitlab::Application.secrets.secret_key_base + salt
+
+          OpenSSL::HMAC.hexdigest(digest, key, return_to)
+        end
       end
 
-      def logout_token_cipher(salt, operation)
-        cipher = OpenSSL::Cipher::AES.new(128, :CBC)
-        cipher.__send__(operation) # rubocop:disable GitlabSecurity/PublicSend
-        cipher.iv = salt
-        cipher.key = Settings.attr_encrypted_db_key_base[0..15]
-        cipher
+      class LogoutState
+        def initialize(salt, token, return_to)
+          @salt      = salt
+          @token     = token
+          @return_to = return_to
+        end
+
+        def decode
+          return unless salt && token
+
+          decrypt = cipher(salt, :decrypt)
+          decrypt.update(Base64.urlsafe_decode64(token)) + decrypt.final
+        rescue OpenSSL::OpenSSLError
+          nil
+        end
+
+        def encode
+          return unless token
+
+          encrypt   = cipher(salt, :encrypt)
+          encrypted = encrypt.update(token) + encrypt.final
+          encoded   = Base64.urlsafe_encode64(encrypted)
+
+          "#{salt}:#{encoded}:#{full_path}"
+        rescue OpenSSL::OpenSSLError
+          nil
+        end
+
+        private
+
+        attr_reader :salt, :token, :return_to
+
+        def cipher(salt, operation)
+          cipher = OpenSSL::Cipher::AES.new(128, :CBC)
+          cipher.__send__(operation) # rubocop:disable GitlabSecurity/PublicSend
+          cipher.iv = salt
+          cipher.key = Settings.attr_encrypted_db_key_base[0..15]
+          cipher
+        end
+
+        def full_path
+          ReturnToLocation.new(return_to).full_path
+        end
+      end
+
+      class ReturnToLocation
+        def initialize(location)
+          @location = location
+        end
+
+        def full_path
+          uri = parse_uri(location)
+
+          if uri
+            path = remove_domain_from_uri(uri)
+            path = add_fragment_back_to_path(uri, path)
+
+            path
+          end
+        end
+
+        private
+
+        attr_reader :location
+
+        def parse_uri(location)
+          location && URI.parse(location.sub(%r{\A\/\/+}, '/'))
+        rescue URI::InvalidURIError
+          nil
+        end
+
+        def remove_domain_from_uri(uri)
+          [uri.path.sub(%r{\A\/+}, '/'), uri.query].compact.join('?')
+        end
+
+        def add_fragment_back_to_path(uri, path)
+          [path, uri.fragment].compact.join('#')
+        end
       end
 
       def oauth_salt
-        @salt ||= SecureRandom.hex(8)
+        @oauth_salt ||= SecureRandom.hex(8)
       end
 
       def oauth_client
-        @client ||= begin
+        @oauth_client ||= begin
           ::OAuth2::Client.new(
             oauth_app.uid,
             oauth_app.secret,

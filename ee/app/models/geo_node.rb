@@ -89,6 +89,11 @@ class GeoNode < ActiveRecord::Base
       left_join_status.minimum(:cursor_last_event_id)
     end
 
+    # Tries to find a GeoNode by oauth_application_id, returning nil if none could be found.
+    def find_by_oauth_application_id(oauth_application_id)
+      where(oauth_application_id: oauth_application_id).take
+    end
+
     private
 
     def left_join_status
