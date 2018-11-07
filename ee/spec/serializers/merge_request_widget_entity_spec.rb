@@ -108,6 +108,7 @@ describe MergeRequestWidgetEntity do
         expect(subject.as_json[:license_management]).to include(:managed_licenses_path)
         expect(subject.as_json[:license_management]).to include(:can_manage_licenses)
         expect(subject.as_json[:license_management]).to include(:license_management_full_report_path)
+        expect(subject.as_json[:license_management][:head_path]).to include('proxy=true')
       end
 
       context 'when feature is not licensed' do
