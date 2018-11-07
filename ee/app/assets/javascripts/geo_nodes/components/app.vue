@@ -9,11 +9,13 @@ import eventHub from '../event_hub';
 import { NODE_ACTIONS } from '../constants';
 
 import GeoNodeItem from './geo_node_item.vue';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 
 export default {
   components: {
     DeprecatedModal,
     GeoNodeItem,
+    GlLoadingIcon,
   },
   props: {
     store: {
