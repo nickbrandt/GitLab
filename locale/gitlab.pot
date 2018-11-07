@@ -125,6 +125,9 @@ msgstr ""
 msgid "%{count} %{alerts}"
 msgstr ""
 
+msgid "%{count} more assignees"
+msgstr ""
+
 msgid "%{count} participant"
 msgid_plural "%{count} participants"
 msgstr[0] ""
@@ -8187,6 +8190,9 @@ msgstr ""
 msgid "Time between merge request creation and merge/close"
 msgstr ""
 
+msgid "Time estimate"
+msgstr ""
+
 msgid "Time in seconds GitLab will wait for a response from the external service. When the service does not respond in time, access will be denied."
 msgstr ""
 
@@ -8425,6 +8431,9 @@ msgstr ""
 msgid "To widen your search, change or remove filters."
 msgstr ""
 
+msgid "Today"
+msgstr ""
+
 msgid "Todo"
 msgstr ""
 
@@ -8456,6 +8465,9 @@ msgid "ToggleButton|Toggle Status: ON"
 msgstr ""
 
 msgid "Token"
+msgstr ""
+
+msgid "Tomorrow"
 msgstr ""
 
 msgid "Too many changes to show."
@@ -9029,6 +9041,9 @@ msgid "Yes, add it"
 msgstr ""
 
 msgid "Yes, let me map Google Code users to full names or GitLab users."
+msgstr ""
+
+msgid "Yesterday"
 msgstr ""
 
 msgid "You are an admin, which means granting access to <strong>%{client_name}</strong> will allow them to interact with GitLab as an admin as well. Proceed with caution."

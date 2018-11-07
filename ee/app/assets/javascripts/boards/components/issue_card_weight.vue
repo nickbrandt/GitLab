@@ -1,5 +1,5 @@
 <script>
-import tooltip from '~/vue_shared/directives/tooltip';
+import { GlTooltipDirective } from '@gitlab-org/gitlab-ui';
 import icon from '~/vue_shared/components/icon.vue';
 
 export default {
@@ -8,7 +8,7 @@ export default {
     icon,
   },
   directives: {
-    tooltip,
+    GlTooltip: GlTooltipDirective,
   },
   props: {
     weight: {
@@ -20,14 +20,18 @@ export default {
 </script>
 
 <template>
-  <span
-    v-tooltip
+  <a
+    v-gl-tooltip
     :title="__('Weight')"
-    class="board-card-weight card-number d-inline-block"
+    class="board-card-info card-number board-card-weight"
     data-container="body"
     data-placement="bottom"
+    tabindex="1"
+    v-on="$listeners"
   >
-    <icon name="scale" />
-    {{ weight }}
-  </span>
+    <icon
+      name="scale"
+      css-classes="board-card-info-icon"
+    /><span class="board-card-info-text">{{ weight }}</span>
+  </a>
 </template>
