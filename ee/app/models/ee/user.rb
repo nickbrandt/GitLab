@@ -77,10 +77,6 @@ module EE
         joins('LEFT JOIN identities ON identities.user_id = users.id')
           .where('identities.provider IS NULL OR identities.provider NOT LIKE ?', 'ldap%')
       end
-
-      def existing_member?(email)
-        ::User.where(email: email).any? || ::Email.where(email: email).any?
-      end
     end
 
     def cannot_be_admin_and_auditor

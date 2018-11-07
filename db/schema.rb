@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181101144347) do
+ActiveRecord::Schema.define(version: 20181105201455) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -212,6 +212,7 @@ ActiveRecord::Schema.define(version: 20181101144347) do
     t.integer "receive_max_input_size"
     t.integer "diff_max_patch_bytes", default: 102400, null: false
     t.integer "archive_builds_in_seconds"
+    t.string "commit_email_hostname"
   end
 
   create_table "approvals", force: :cascade do |t|
@@ -2198,7 +2199,7 @@ ActiveRecord::Schema.define(version: 20181101144347) do
     t.integer "merge_requests_access_level"
     t.integer "issues_access_level"
     t.integer "wiki_access_level"
-    t.integer "snippets_access_level"
+    t.integer "snippets_access_level", default: 20, null: false
     t.integer "builds_access_level"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -2899,6 +2900,7 @@ ActiveRecord::Schema.define(version: 20181101144347) do
 
   add_index "uploads", ["checksum"], name: "index_uploads_on_checksum", using: :btree
   add_index "uploads", ["model_id", "model_type"], name: "index_uploads_on_model_id_and_model_type", using: :btree
+  add_index "uploads", ["store"], name: "index_uploads_on_store", using: :btree
   add_index "uploads", ["uploader", "path"], name: "index_uploads_on_uploader_and_path", using: :btree
 
   create_table "user_agent_details", force: :cascade do |t|

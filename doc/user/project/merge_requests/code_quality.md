@@ -55,4 +55,4 @@ configuration to reflect that change.
 [cc]: https://codeclimate.com
 [cd]: https://hub.docker.com/r/codeclimate/codeclimate/
 [quality-widget]: img/code_quality.gif
-[cc-docs]: ../../../ci/examples/code_climate.md
+[cc-docs]: ../../../ci/examples/code_quality.md

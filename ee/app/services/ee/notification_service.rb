@@ -42,6 +42,14 @@ module EE
       new_resource_email(epic, :new_epic_email)
     end
 
+    def close_epic(epic, current_user)
+      epic_status_change_email(epic, current_user, 'closed')
+    end
+
+    def reopen_epic(epic, current_user)
+      epic_status_change_email(epic, current_user, 'reopened')
+    end
+
     def project_mirror_user_changed(new_mirror_user, deleted_user_name, project)
       mailer.project_mirror_user_changed_email(new_mirror_user.id, deleted_user_name, project.id).deliver_later
     end
@@ -62,9 +70,7 @@ module EE
 
     def add_mr_approvers_email(merge_request, approvers, current_user)
       approvers.each do |approver|
-        recipient = approver.user
-
-        mailer.add_merge_request_approver_email(recipient.id, merge_request.id, current_user.id).deliver_later
+        mailer.add_merge_request_approver_email(approver.id, merge_request.id, current_user.id).deliver_later
       end
     end
 
@@ -97,6 +103,22 @@ module EE
       return unless issue.subscribed?(support_bot, issue.project)
 
       mailer.service_desk_new_note_email(issue.id, note.id).deliver_later
+    end
+
+    def epic_status_change_email(target, current_user, status)
+      action = status == 'reopened' ? 'reopen' : 'close'
+
+      recipients = NotificationRecipientService.build_recipients(
+        target,
+        current_user,
+        action: action
+      )
+
+      recipients.each do |recipient|
+        mailer.epic_status_changed_email(
+          recipient.user.id, target.id, status, current_user.id, recipient.reason)
+          .deliver_later
+      end
     end
   end
 end

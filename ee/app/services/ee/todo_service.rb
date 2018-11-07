@@ -42,7 +42,7 @@ module EE
 
     def create_approval_required_todos(merge_request, approvers, author)
       attributes = attributes_for_todo(merge_request.project, merge_request, author, ::Todo::APPROVAL_REQUIRED)
-      create_todos(approvers.map(&:user), attributes)
+      create_todos(approvers, attributes)
     end
   end
 end

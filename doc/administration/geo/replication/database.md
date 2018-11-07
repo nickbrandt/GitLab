@@ -49,6 +49,10 @@ The following guide assumes that:
   secondary's IP will be `5.6.7.8`. Note that the primary and secondary servers
   **must** be able to communicate over these addresses. More on this in the
   guide below.
+  
+CAUTION: **Warning:**
+Geo works with streaming replication. Logical replication is not supported at this time. 
+There is an [issue where support is being discussed](https://gitlab.com/gitlab-org/gitlab-ee/issues/7420).
 
 
 ### Step 1. Configure the primary server
@@ -557,6 +561,11 @@ the instructions below:
 
     ```bash
     gitlab-ctl restart
+    ```
+2. Populate the FDW tables
+
+    ```bash
+    gitlab-rake geo:db:refresh_foreign_tables
     ```
 
 ## PGBouncer support (optional)

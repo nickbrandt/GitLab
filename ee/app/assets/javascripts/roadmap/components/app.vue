@@ -3,6 +3,7 @@ import _ from 'underscore';
 import Flash from '~/flash';
 import { s__ } from '~/locale';
 
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 import epicsListEmpty from './epics_list_empty.vue';
 import roadmapShell from './roadmap_shell.vue';
 
@@ -10,6 +11,7 @@ export default {
   components: {
     epicsListEmpty,
     roadmapShell,
+    GlLoadingIcon,
   },
   props: {
     store: {

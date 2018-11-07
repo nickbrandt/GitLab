@@ -50,5 +50,11 @@ module EE
     def participant_approvers
       approval_needed? ? approvers_left : []
     end
+
+    def code_owners
+      strong_memoize(:code_owners) do
+        ::Gitlab::CodeOwners.for_merge_request(self).freeze
+      end
+    end
   end
 end

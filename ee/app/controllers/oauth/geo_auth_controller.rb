@@ -3,7 +3,6 @@ class Oauth::GeoAuthController < ActionController::Base
   rescue_from OAuth2::Error, with: :auth
 
   def auth
-    oauth = Gitlab::Geo::OauthSession.new(state: params[:state])
     unless oauth.oauth_state_valid?
       redirect_to root_url
       return
@@ -12,9 +11,7 @@ class Oauth::GeoAuthController < ActionController::Base
     redirect_to oauth.authorize_url(redirect_uri: oauth_geo_callback_url, state: params[:state])
   end
 
-  # rubocop: disable CodeReuse/ActiveRecord
   def callback
-    oauth = Gitlab::Geo::OauthSession.new(state: params[:state])
     unless oauth.oauth_state_valid?
       redirect_to new_user_session_path
       return
@@ -22,23 +19,22 @@ class Oauth::GeoAuthController < ActionController::Base
 
     token = oauth.get_token(params[:code], redirect_uri: oauth_geo_callback_url)
     remote_user = oauth.authenticate_with_gitlab(token)
+    user = UserFinder.new(remote_user['id']).find_by_id
 
-    user = User.find_by(id: remote_user['id'])
-
-    if user && sign_in(user, bypass: true)
+    if user && bypass_sign_in(user)
       after_sign_in_with_gitlab(token, oauth.get_oauth_state_return_to)
     else
       invalid_credentials
     end
   end
-  # rubocop: enable CodeReuse/ActiveRecord
 
   def logout
     logout = Oauth2::LogoutTokenValidationService.new(current_user, params)
     result = logout.execute
+
     if result[:status] == :success
       sign_out current_user
-      redirect_to root_path
+      after_sign_out_with_gitlab(result[:return_to])
     else
       access_token_error(result[:message])
     end
@@ -46,9 +42,22 @@ class Oauth::GeoAuthController < ActionController::Base
 
   private
 
+  def oauth
+    @oauth ||= Gitlab::Geo::OauthSession.new(state: params[:state])
+  end
+
   def after_sign_in_with_gitlab(token, return_to)
     session[:access_token] = token
+
+    # Prevent alert from popping up on the first page shown after authentication.
+    flash[:alert] = nil
+
     redirect_to(return_to || root_path)
+  end
+
+  def after_sign_out_with_gitlab(return_to)
+    session[:user_return_to] = return_to
+    redirect_to(root_path)
   end
 
   def invalid_credentials

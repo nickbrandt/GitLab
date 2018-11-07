@@ -8,6 +8,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 import DatePicker from '~/vue_shared/components/pikaday.vue';
 import CollapsedCalendarIcon from '~/vue_shared/components/sidebar/collapsed_calendar_icon.vue';
 import ToggleSidebar from '~/vue_shared/components/sidebar/toggle_sidebar.vue';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 
 const label = __('Date picker');
 const pickerLabel = __('Fixed date');
@@ -22,6 +23,7 @@ export default {
     DatePicker,
     CollapsedCalendarIcon,
     ToggleSidebar,
+    GlLoadingIcon,
   },
   props: {
     blockClass: {

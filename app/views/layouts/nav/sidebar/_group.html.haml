@@ -1,6 +1,6 @@
 - issues_count = group_issues_count(state: 'opened')
 - merge_requests_count = group_merge_requests_count(state: 'opened')
-- issues_sub_menu_items = ['groups#issues', 'labels#index', 'milestones#index', 'boards#index', 'boards#show']
+- issues_sub_menu_items = ['groups#issues', 'labels#index', 'milestones#index', 'boards#index', 'boards#show', 'issues_analytics#show']
 
 .nav-sidebar{ class: ("sidebar-collapsed-desktop" if collapsed_sidebar?) }
   .nav-sidebar-inner-scroll
@@ -73,6 +73,8 @@
                 = link_to group_boards_path(@group), title: boards_link_text do
                   %span
                     = boards_link_text
+
+            = render_if_exists 'layouts/nav/issues_analytics_link'
 
             - if group_sidebar_link?(:labels)
               = nav_link(path: 'labels#index') do

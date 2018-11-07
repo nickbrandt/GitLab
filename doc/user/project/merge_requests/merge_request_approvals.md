@@ -19,7 +19,6 @@ To edit the merge request approvals:
 
 1. Navigate to your project's **Settings > General** and expand the
    **Merge requests settings**
-1. Tick the "Merge requests approvals" checkbox
 1. Search for users or groups that will be [eligible to approve](#eligible-approvers)
    merge requests and click the **Add** button to add them as approvers
 1. Set the minimum number of required approvals under the "Approvals required"
@@ -36,36 +35,31 @@ suitable to your workflow:
   [overridden per merge request](#overriding-the-merge-request-approvals-default-settings)
 - Choose whether [approvals will be reset with new pushed commits](#resetting-approvals-on-push)
 
-NOTE: **Note:**
-If the approvers are changed via the project's settings after a merge request
-is created, the merge request retains the previous approvers, but you can always
-change them by [editing the merge request](#overriding-the-merge-request-approvals-default-settings).
-
 ## Eligible approvers
 
-An individual user is an eligible approver if they are a member of the given project,
-a member of the project's immediate parent group, or a member of a group that has share access
-to the project via a [share](../members/share_project_with_groups.md).
+The following can approve merge requests:
 
-A group is also an eligible approver. [In the future](https://gitlab.com/gitlab-org/gitlab-ee/issues/2048),
+- Users being added as approvers at project or merge request level.
+- [Code owners](../code_owners.md) related to the merge request ([introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/7933) in [GitLab Starter](https://about.gitlab.com/pricing/) 11.5).
+
+An individual user can be added as an approver for a project if they are a member of:
+
+- The project.
+- The project's immediate parent group.
+- A group that has access to the project via a [share](../members/share_project_with_groups.md).
+
+A group can also be added as an approver. [In the future](https://gitlab.com/gitlab-org/gitlab-ee/issues/2048),
 group approvers will be restricted.
 
 If a user is added as an individual approver and is also part of a group approver,
 then that user is just counted once. The merge request author does not count as
 an eligible approver, unless [self-approval] is explicitly enabled on the project settings.
 
-Let's say that `m` is the number of required approvals, and `Ω` is the set of
-explicit approvers. Depending on their number, there are different cases:
+### Implicit approvers
 
-- If `m <= count(Ω)`, then only those explicit approvers can approve the merge request.
-- If `m > count(Ω)` , then all the explicit approvers _and_ the members of the given
-  project with Developer role or higher are eligible approvers of the merge
-  request.
-
-NOTE: **Note:**
-If the approvals settings are [overridden](#overriding-the-merge-request-approvals-default-settings)
-for the particular merge request, then the set of explicit approvers is the
-union of the default approvers and the extra approvers set in the merge request.
+If the number of required approvals is greater than the number of approvers,
+other users will become implicit approvers to fill the gap.
+Those implicit approvers include members of the given project with Developer role or higher.
 
 ## Adding or removing an approval
 
@@ -123,6 +117,12 @@ First, you have to enable this option in the project's settings:
     ![Approvals can override](img/approvals_can_override.png)
 
 1. Click **Save changes**
+
+NOTE: **Note:**
+If approver overriding is enabled
+and the project level approvers are changed after a merge request is created,
+the merge request retains the previous approvers.
+However, the approvers can be changed by [editing the merge request](#overriding-the-merge-request-approvals-default-settings).
 
 ---
 
@@ -200,9 +200,3 @@ request itself. It belongs to the target branch's project.
 ## Approver suggestions
 
 Approvers are suggested for merge requests based on the previous authors of the files affected by the merge request.
-
-### CODEOWNERS file
-
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/7437>) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.4.
-
-If the [CODEOWNERS](../code_owners.md) file is present in the target branch, more precise suggestions are provided based on its rules.

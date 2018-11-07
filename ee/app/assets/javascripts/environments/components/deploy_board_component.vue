@@ -12,11 +12,13 @@ import _ from 'underscore';
 import { n__ } from '~/locale';
 import tooltip from '~/vue_shared/directives/tooltip';
 import deployBoardSvg from 'ee_empty_states/icons/_deploy_board.svg';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 import instanceComponent from './deploy_board_instance_component.vue';
 
 export default {
   components: {
     instanceComponent,
+    GlLoadingIcon,
   },
   directives: {
     tooltip,
