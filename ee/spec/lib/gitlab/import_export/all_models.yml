@@ -67,6 +67,7 @@ project:
 - software_license_policies
 - project_registry
 - packages
+- tracing_setting
 prometheus_metrics:
 - project
 - prometheus_alerts
@@ -78,3 +79,5 @@ prometheus_alert_events:
 epic_issues:
 - issue
 - epic
+tracing_setting:
+- project
