@@ -88,6 +88,7 @@ class License < ActiveRecord::Base
     pseudonymizer
     prometheus_alerts
     operations_dashboard
+    tracing
   ].freeze
 
   # List all features available for early adopters,

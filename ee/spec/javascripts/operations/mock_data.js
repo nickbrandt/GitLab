@@ -5,7 +5,7 @@ export const mockText = {
   DASHBOARD_TITLE: 'Operations Dashboard',
   EMPTY_TITLE: 'Add a project to the dashboard',
   EMPTY_SUBTITLE:
-    "The operations dashboard provides a summary of each project's operational health, including pipeline and alert status.",
+    "The operations dashboard provides a summary of each project's operational health, including pipeline and alert statuses.",
   EMPTY_SVG_SOURCE: '/assets/illustrations/operations-dashboard_empty.svg',
   NO_SEARCH_RESULTS: 'Sorry, no projects matched your search',
   RECEIVE_PROJECTS_ERROR: 'Something went wrong, unable to get operations projects',

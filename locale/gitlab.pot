@@ -399,6 +399,9 @@ msgstr ""
 msgid "Add Group Webhooks and GitLab Enterprise Edition."
 msgstr ""
 
+msgid "Add Jaeger URL"
+msgstr ""
+
 msgid "Add Kubernetes cluster"
 msgstr ""
 
@@ -2192,6 +2195,9 @@ msgstr ""
 msgid "Configure Gitaly timeouts."
 msgstr ""
 
+msgid "Configure Tracing"
+msgstr ""
+
 msgid "Configure automatic git checks and housekeeping on repositories."
 msgstr ""
 
@@ -3511,6 +3517,9 @@ msgstr ""
 msgid "For more information, go to the "
 msgstr ""
 
+msgid "For more information, please review %{link_start_tag}Jaeger's configuration doc%{link_end_tag}"
+msgstr ""
+
 msgid "For more information, see the documentation on %{deactivating_usage_ping_link_start}deactivating the usage ping%{deactivating_usage_ping_link_end}."
 msgstr ""
 
@@ -4502,6 +4511,12 @@ msgstr ""
 msgid "IssuesAnalytics|To widen your search, change or remove filters in the filter bar above"
 msgstr ""
 
+msgid "Jaeger URL"
+msgstr ""
+
+msgid "Jaeger tracing"
+msgstr ""
+
 msgid "Jan"
 msgstr ""
 
@@ -4664,6 +4679,9 @@ msgid "Last edited %{date}"
 msgstr ""
 
 msgid "Last edited by %{name}"
+msgstr ""
+
+msgid "Last reply by"
 msgstr ""
 
 msgid "Last update"
@@ -5516,6 +5534,9 @@ msgstr ""
 msgid "Notes|Are you sure you want to cancel creating this comment?"
 msgstr ""
 
+msgid "Notes|Collapse replies"
+msgstr ""
+
 msgid "Notes|Show all activity"
 msgstr ""
 
@@ -5674,10 +5695,13 @@ msgstr ""
 msgid "Operations Dashboard"
 msgstr ""
 
+msgid "Operations Settings"
+msgstr ""
+
 msgid "OperationsDashboard|Add a project to the dashboard"
 msgstr ""
 
-msgid "OperationsDashboard|The operations dashboard provides a summary of each project's operational health, including pipeline and alert status."
+msgid "OperationsDashboard|The operations dashboard provides a summary of each project's operational health, including pipeline and alert statuses."
 msgstr ""
 
 msgid "OperationsDashboard|Unable to add %{invalidProjects}. The Operations Dashboard is available for projects with a Gold subscription."
@@ -7118,6 +7142,15 @@ msgstr ""
 msgid "Security Dashboard"
 msgstr ""
 
+msgid "Security Dashboard|Error fetching the dashboard data. Please check your network connection and try again."
+msgstr ""
+
+msgid "Security Dashboard|Error fetching the vulnerability counts. Please check your network connection and try again."
+msgstr ""
+
+msgid "Security Dashboard|Error fetching the vulnerability list. Please check your network connection and try again."
+msgstr ""
+
 msgid "Security Dashboard|Issue Created"
 msgstr ""
 
@@ -7139,13 +7172,7 @@ msgstr ""
 msgid "Security Reports|There was an error creating the issue."
 msgstr ""
 
-msgid "Security Reports|There was an error dismissing the issue."
-msgstr ""
-
 msgid "Security Reports|There was an error dismissing the vulnerability."
-msgstr ""
-
-msgid "Security Reports|There was an error fetching the dashboard. Please try again in a few moments or contact your support team."
 msgstr ""
 
 msgid "Security Reports|There was an error undoing the dismissal."
@@ -8419,6 +8446,9 @@ msgstr ""
 msgid "To get started you enter your FogBugz URL and login information below. In the next steps, you'll be able to map users and select the projects you want to import."
 msgstr ""
 
+msgid "To get started, link this page to your Jaeger server, or find out how to %{link_start_tag}install Jaeger%{link_end_tag}"
+msgstr ""
+
 msgid "To get started, please enter your Gitea Host URL and a %{link_to_personal_token}."
 msgstr ""
 
@@ -8441,6 +8471,9 @@ msgid "To move or copy an entire GitLab project from another GitLab installation
 msgstr ""
 
 msgid "To only use CI/CD features for an external repository, choose <strong>CI/CD for external repo</strong>."
+msgstr ""
+
+msgid "To open Jaeger and easily view tracing from GitLab, link the %{start_tag}Tracing%{end_tag} page to your server"
 msgstr ""
 
 msgid "To set up SAML authentication for your group through an identity provider like Azure, Okta, Onelogin, Ping Identity, or your custom SAML 2.0 provider:"
@@ -8515,6 +8548,9 @@ msgstr ""
 msgid "Total: %{total}"
 msgstr ""
 
+msgid "Tracing"
+msgstr ""
+
 msgid "Track activity with Contribution Analytics."
 msgstr ""
 
@@ -8545,6 +8581,9 @@ msgstr ""
 msgid "Triggers can force a specific branch or tag to get rebuilt with an API call.  These tokens will impersonate their associated user including their access to projects and their project permissions."
 msgstr ""
 
+msgid "Troubleshoot and monitor your application with tracing"
+msgstr ""
+
 msgid "Try again"
 msgstr ""
 
@@ -8561,6 +8600,9 @@ msgid "Type"
 msgstr ""
 
 msgid "Unable to load the diff. %{button_try_again}"
+msgstr ""
+
+msgid "Unable to save your changes"
 msgstr ""
 
 msgid "Unable to sign you in to the group with SAML due to \"%{reason}\""
@@ -8789,6 +8831,9 @@ msgid "View %{alerts}"
 msgstr ""
 
 msgid "View app"
+msgstr ""
+
+msgid "View documentation"
 msgstr ""
 
 msgid "View epics list"
@@ -9236,6 +9281,9 @@ msgid "Your changes can be committed to %{branch_name} because a merge request i
 msgstr ""
 
 msgid "Your changes have been committed. Commit %{commitId} %{commitStats}"
+msgstr ""
+
+msgid "Your changes have been saved"
 msgstr ""
 
 msgid "Your comment will not be visible to the public."
@@ -9866,6 +9914,11 @@ msgstr ""
 
 msgid "remove weight"
 msgstr ""
+
+msgid "reply"
+msgid_plural "replies"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "source"
 msgstr ""

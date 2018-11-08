@@ -1,11 +1,6 @@
 .draft-note-component {
-  padding: $gl-padding-8 $gl_padding;
   margin: 0;
   background: $orange-50;
-
-  .note-actions {
-    margin-top: -26px;
-  }
 
   p {
     margin: 0;
@@ -31,7 +26,6 @@
   }
 
   .timeline-entry {
-    padding-left: 40px;
     background-color: transparent;
   }
 }
@@ -47,7 +41,7 @@ button[disabled] {
 }
 
 .draft-note-header {
-  padding: $gl-padding-8 0;
+  padding: $gl-padding-8 $gl-padding;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -85,14 +79,16 @@ button[disabled] {
 }
 
 .draft-note-actions {
-  padding: $gl-padding 56px $gl-padding-8;
+  padding: $gl-padding;
 }
 
 .discussion-body,
 .diff-file {
   .notes .note {
     &.draft-note {
-      border-bottom: 0;
+      background-color: $white-light;
+      margin: 0 $gl-padding;
+      border: 1px solid $border-color;
 
       .timeline-entry-inner {
         padding-top: 0;

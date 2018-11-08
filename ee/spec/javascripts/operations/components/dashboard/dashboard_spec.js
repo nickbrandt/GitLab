@@ -22,6 +22,7 @@ describe('dashboard component', () => {
         addPath: 'mock-addPath',
         listPath: mockListPath,
         emptyDashboardSvgPath: '/assets/illustrations/operations-dashboard_empty.svg',
+        emptyDashboardHelpPath: '/help/user/operations_dashboard/index.html',
       },
     });
   let vm;
@@ -121,6 +122,18 @@ describe('dashboard component', () => {
         expect(vm.$el.querySelector('.js-sub-title').innerText.trim()).toBe(
           mockText.EMPTY_SUBTITLE,
         );
+      });
+
+      it('renders link to documentation', () => {
+        const link = vm.$el.querySelector('.js-documentation-link');
+
+        expect(link.innerText.trim()).toBe('View documentation');
+      });
+
+      it('links to documentation', () => {
+        const link = vm.$el.querySelector('.js-documentation-link');
+
+        expect(link.href).toMatch(vm.emptyDashboardHelpPath);
       });
     });
   });

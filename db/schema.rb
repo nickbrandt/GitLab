@@ -2293,6 +2293,15 @@ ActiveRecord::Schema.define(version: 20181107054254) do
   add_index "project_statistics", ["namespace_id"], name: "index_project_statistics_on_namespace_id", using: :btree
   add_index "project_statistics", ["project_id"], name: "index_project_statistics_on_project_id", unique: true, using: :btree
 
+  create_table "project_tracing_settings", id: :bigserial, force: :cascade do |t|
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.integer "project_id", null: false
+    t.string "external_url", null: false
+  end
+
+  add_index "project_tracing_settings", ["project_id"], name: "index_project_tracing_settings_on_project_id", unique: true, using: :btree
+
   create_table "projects", force: :cascade do |t|
     t.string "name"
     t.string "path"
@@ -3430,6 +3439,7 @@ ActiveRecord::Schema.define(version: 20181107054254) do
   add_foreign_key "project_mirror_data", "projects", name: "fk_d1aad367d7", on_delete: :cascade
   add_foreign_key "project_repository_states", "projects", on_delete: :cascade
   add_foreign_key "project_statistics", "projects", on_delete: :cascade
+  add_foreign_key "project_tracing_settings", "projects", on_delete: :cascade
   add_foreign_key "projects", "repositories", column: "pool_repository_id", name: "fk_6e5c14658a", on_delete: :nullify
   add_foreign_key "prometheus_alert_events", "projects", on_delete: :cascade
   add_foreign_key "prometheus_alert_events", "prometheus_alerts", on_delete: :cascade
