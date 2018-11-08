@@ -66,11 +66,7 @@ future GitLab releases.**
 | **CI_JOB_MANUAL**               | 8.12   | all    | The flag to indicate that job was manually started |
 | **CI_JOB_NAME**                 | 9.0    | 0.5    | The name of the job as defined in `.gitlab-ci.yml` |
 | **CI_JOB_STAGE**                | 9.0    | 0.5    | The name of the stage as defined in `.gitlab-ci.yml` |
-<<<<<<< HEAD
 | **CI_JOB_TOKEN**                | 9.0    | 1.2    | Token used for authenticating with [GitLab Container Registry][registry], downloading [dependent repositories][dependent-repositories], authenticate with multi-project pipelines when [triggers][trigger-job-token] are involved, and for [downloading job artifacts][get-job-artifacts]  |
-=======
-| **CI_JOB_TOKEN**                | 9.0    | 1.2    | Token used for authenticating with the [GitLab Container Registry][registry] and downloading [dependent repositories][dependent-repositories] |
->>>>>>> upstream/master
 | **CI_NODE_INDEX**               | 11.5   | all    | Index of the job in the job set. If the job is not parallelized, this variable is not set. |
 | **CI_NODE_TOTAL**               | 11.5   | all    | Total number of instances of this job running in parallel. If the job is not parallelized, this variable is set to `1`. |
 | **CI_JOB_URL**                  | 11.1   | 0.5    | Job details URL |

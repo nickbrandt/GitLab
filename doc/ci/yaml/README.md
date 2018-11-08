@@ -74,11 +74,7 @@ A job is defined by a list of parameters that define the job behavior.
 | after_script  | no       | Override a set of commands that are executed after job |
 | environment   | no       | Defines a name of environment to which deployment is done by this job |
 | coverage      | no       | Define code coverage settings for a given job |
-<<<<<<< HEAD
-| retry         | no       | Define how many times a job can be auto-retried in case of a failure |
-=======
 | retry         | no       | Define when and how many times a job can be auto-retried in case of a failure |
->>>>>>> upstream/master
 | parallel      | no       | Defines how many instances of a job should be run in parallel |
 
 ### `extends`
@@ -1458,8 +1454,6 @@ test:
   retry: 2
 ```
 
-<<<<<<< HEAD
-=======
 By default, a job will be retried on all failure cases. To have a better control
 on which failures to retry, `retry` can be a hash with with the following keys:
 
@@ -1511,7 +1505,6 @@ Possible values for `when` are:
 - `runner_unsupported`: Retry if the runner was unsupported.
 
 
->>>>>>> upstream/master
 ## `parallel`
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/22631) in GitLab 11.5.
