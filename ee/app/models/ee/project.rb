@@ -30,6 +30,7 @@ module EE
       has_one :jenkins_deprecated_service
       has_one :github_service
       has_one :gitlab_slack_application_service
+      has_one :tracing_setting, class_name: 'ProjectTracingSetting'
 
       has_many :approvers, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
       has_many :approver_groups, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
@@ -109,8 +110,13 @@ module EE
       end
     end
 
-    def latest_pipeline_with_legacy_security_reports
-      pipelines.newest_first(default_branch).with_legacy_security_reports.first
+    def tracing_external_url
+      self.tracing_setting.try(:external_url)
+    end
+
+    def latest_pipeline_with_security_reports
+      pipelines.newest_first(ref: default_branch).with_security_reports.first ||
+        pipelines.newest_first(ref: default_branch).with_legacy_security_reports.first
     end
 
     def environments_for_scope(scope)

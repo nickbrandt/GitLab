@@ -9,12 +9,23 @@ module EE
 
     override :sidebar_settings_paths
     def sidebar_settings_paths
-      super + %w(audit_events#index)
+      super + %w[
+        audit_events#index
+        operations#show
+      ]
     end
 
     override :sidebar_repository_paths
     def sidebar_repository_paths
       super + %w(path_locks)
+    end
+
+    override :sidebar_operations_paths
+    def sidebar_operations_paths
+      super + %w[
+        tracings
+        feature_flags
+      ]
     end
 
     override :get_project_nav_tabs

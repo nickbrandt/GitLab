@@ -23,14 +23,23 @@ module VisibleApprovable
   # Before a merge request has been created, author will be nil, so pass the current user
   # on the MR create page.
   #
+  # @return [Array<User>]
   def overall_approvers
-    approvers_relation = approvers_overwritten? ? approvers : target_project.approvers
+    if approvers_overwritten?
+      code_owners = [] # already persisted into database, no need to recompute
+      approvers_relation = approvers
+    else
+      code_owners = self.code_owners.dup
+      approvers_relation = target_project.approvers
+    end
 
     if author && !authors_can_approve?
       approvers_relation = approvers_relation.where.not(user_id: author.id)
     end
 
-    approvers_relation.includes(:user)
+    results = code_owners.concat(approvers_relation.includes(:user).map(&:user))
+    results.uniq!
+    results
   end
 
   def overall_approver_groups
@@ -41,17 +50,13 @@ module VisibleApprovable
     strong_memoize(:all_approvers_including_groups) do
       approvers = []
 
-      # Approvers from direct assignment
-      approvers << approvers_from_users
+      # Approvers not sourced from group level
+      approvers << overall_approvers
 
       approvers << approvers_from_groups
 
       approvers.flatten
     end
-  end
-
-  def approvers_from_users
-    overall_approvers.map(&:user)
   end
 
   def approvers_from_groups

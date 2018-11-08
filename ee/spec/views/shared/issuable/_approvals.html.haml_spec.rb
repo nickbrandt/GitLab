@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'shared/issuable/_approvals.html.haml' do
   let(:user) { create(:user) }
-  let(:project) { build(:project) }
+  let(:project) { create(:project, :repository) }
   let(:merge_request) { create(:merge_request, source_project: project, target_project: project) }
   let(:presenter) { merge_request.present(current_user: user) }
   let(:approver_presenter) { double(any?: false, show_code_owner_tips?: true) }

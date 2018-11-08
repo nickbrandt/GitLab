@@ -40,7 +40,7 @@ describe Projects::Security::DashboardController do
 
       context 'when uses new reports syntax' do
         before do
-          create(:ee_ci_build, :security_reports, pipeline: pipeline)
+          create(:ee_ci_build, :sast, pipeline: pipeline)
         end
 
         it 'renders empty state (not yet supported)' do
@@ -48,7 +48,7 @@ describe Projects::Security::DashboardController do
 
           expect(response).to have_gitlab_http_status(200)
           expect(response).to render_template(:show)
-          expect(response.body).to have_css("div#js-security-report-app[data-has-pipeline-data=false]")
+          expect(response.body).to have_css("div#js-security-report-app[data-has-pipeline-data=true]")
         end
       end
 

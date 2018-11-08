@@ -25,8 +25,6 @@
 #     updated_before: datetime
 #
 class IssuesFinder < IssuableFinder
-  prepend EE::IssuesFinder
-
   CONFIDENTIAL_ACCESS_LEVEL = Gitlab::Access::REPORTER
 
   def self.scalar_params
@@ -151,3 +149,5 @@ class IssuesFinder < IssuableFinder
     end
   end
 end
+
+IssuesFinder.prepend(EE::IssuesFinder)

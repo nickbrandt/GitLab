@@ -2,8 +2,6 @@
 
 module ResourceEvents
   class ChangeLabelsService
-    prepend EE::ResourceEvents::ChangeLabelsService
-
     attr_reader :resource, :user
 
     def initialize(resource, user)
@@ -42,3 +40,5 @@ module ResourceEvents
     end
   end
 end
+
+ResourceEvents::ChangeLabelsService.prepend(EE::ResourceEvents::ChangeLabelsService)

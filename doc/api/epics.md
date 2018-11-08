@@ -26,6 +26,7 @@ Gets all epics of the requested group and its subgroups.
 GET /groups/:id/epics
 GET /groups/:id/epics?author_id=5
 GET /groups/:id/epics?labels=bug,reproduced
+GET /groups/:id/epics?state=opened
 ```
 
 | Attribute           | Type             | Required   | Description                                                                            |
@@ -36,6 +37,7 @@ GET /groups/:id/epics?labels=bug,reproduced
 | `order_by`          | string           | no         | Return epics ordered by `created_at` or `updated_at` fields. Default is `created_at`                                                               |
 | `sort`              | string           | no         | Return epics sorted in `asc` or `desc` order. Default is `desc`                                                                                    |
 | `search`            | string           | no         | Search epics against their `title` and `description`                                                                                               |
+| `state`             | string           | no         | Search epics against their `state`, possible filters: `opened`, `closed` and `all`, default: `all`                                                 |
 
 ```bash
 curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/groups/1/epics

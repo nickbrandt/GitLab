@@ -5,6 +5,7 @@ module Clusters
     prepend EE::Clusters::Cluster
 
     include Presentable
+    include Gitlab::Utils::StrongMemoize
 
     self.table_name = 'clusters'
 
@@ -21,12 +22,10 @@ module Clusters
 
     has_many :cluster_projects, class_name: 'Clusters::Project'
     has_many :projects, through: :cluster_projects, class_name: '::Project'
+    has_one :cluster_project, -> { order(id: :desc) }, class_name: 'Clusters::Project'
 
     has_many :cluster_groups, class_name: 'Clusters::Group'
     has_many :groups, through: :cluster_groups, class_name: '::Group'
-
-    has_one :cluster_group, -> { order(id: :desc) }, class_name: 'Clusters::Group'
-    has_one :group, through: :cluster_group, class_name: '::Group'
 
     # we force autosave to happen when we save `Cluster` model
     has_one :provider_gcp, class_name: 'Clusters::Providers::Gcp', autosave: true
@@ -120,14 +119,28 @@ module Clusters
     end
 
     def first_project
-      return @first_project if defined?(@first_project)
-
-      @first_project = projects.first
+      strong_memoize(:first_project) do
+        projects.first
+      end
     end
     alias_method :project, :first_project
 
+    def first_group
+      strong_memoize(:first_group) do
+        groups.first
+      end
+    end
+    alias_method :group, :first_group
+
     def kubeclient
       platform_kubernetes.kubeclient if kubernetes?
+    end
+
+    def find_or_initialize_kubernetes_namespace(cluster_project)
+      kubernetes_namespaces.find_or_initialize_by(
+        project: cluster_project.project,
+        cluster_project: cluster_project
+      )
     end
 
     private

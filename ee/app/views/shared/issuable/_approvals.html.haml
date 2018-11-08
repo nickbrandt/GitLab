@@ -42,16 +42,16 @@
           - unsaved_approvers = !presenter.approvers_overwritten?
           - item_classes = unsaved_approvers ? ['unsaved-approvers'] : []
           - presenter.overall_approvers.each do |approver|
-            %li{ id: dom_id(approver.user), class: item_classes + ['approver'] }
-              = link_to approver.user.name, approver.user
+            %li{ id: dom_id(approver), class: item_classes + ['approver'] }
+              = link_to approver.name, approver
               - if can_update_approvers
                 .float-right
                   - if unsaved_approvers
-                    = link_to "#", data: { confirm: "Are you sure you want to remove approver #{approver.user.name}"}, class: "btn-sm btn btn-remove", title: 'Remove approver' do
+                    = link_to "#", data: { confirm: "Are you sure you want to remove approver #{approver.name}"}, class: "btn-sm btn btn-remove", title: 'Remove approver' do
                       = icon("sign-out")
                       Remove
                   - else
-                    = link_to project_merge_request_approver_path(@project, issuable, approver), data: { confirm: "Are you sure you want to remove approver #{approver.user.name}"}, method: :delete, class: "btn-sm btn btn-remove", title: 'Remove approver' do
+                    = link_to project_merge_request_approver_via_user_id_path(@project, issuable, user_id: approver.id), data: { confirm: "Are you sure you want to remove approver #{approver.name}"}, method: :delete, class: "btn-sm btn btn-remove", title: 'Remove approver' do
                       = icon("sign-out")
                       Remove
           - presenter.overall_approver_groups.each do |approver_group|
@@ -85,4 +85,4 @@
         .form-text.text-muted
           Tip: add a
           = link_to 'CODEOWNERS', help_page_path('user/project/code_owners'), target: '_blank', tabindex: -1
-          to suggest approvers based on file paths and file types.
+          to automatically add approvers based on file paths and file types.

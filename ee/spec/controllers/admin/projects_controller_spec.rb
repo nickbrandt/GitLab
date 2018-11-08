@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Admin::ProjectsController do
+describe Admin::ProjectsController, :geo do
   include EE::GeoHelpers
 
   let!(:project_registry) { create(:geo_project_registry) }
@@ -30,6 +30,10 @@ describe Admin::ProjectsController do
 
       it 'renders Geo Status widget' do
         expect(subject.body).to match('Geo Status')
+      end
+
+      it 'displays a different read-only message based on skip_readonly_message' do
+        expect(subject.body).to match('You may be able to make a limited amount of changes or perform a limited amount of actions on this page')
       end
     end
 

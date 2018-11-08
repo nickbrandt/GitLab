@@ -4,6 +4,7 @@ import _ from 'underscore';
 import { __, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 import TokenizedInput from '../tokenized_input/input.vue';
 import inputFocus from '../../mixins';
 
@@ -14,6 +15,7 @@ export default {
     Icon,
     ProjectAvatar,
     TokenizedInput,
+    GlLoadingIcon,
   },
   mixins: [inputFocus],
   data() {

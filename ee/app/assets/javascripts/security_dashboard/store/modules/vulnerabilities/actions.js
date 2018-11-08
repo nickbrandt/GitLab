@@ -112,9 +112,16 @@ export const receiveCreateIssueSuccess = ({ commit }, payload) => {
   commit(types.RECEIVE_CREATE_ISSUE_SUCCESS, payload);
 };
 
-export const receiveCreateIssueError = ({ commit }) => {
+export const receiveCreateIssueError = ({ commit }, { flashError }) => {
   commit(types.RECEIVE_CREATE_ISSUE_ERROR);
-  createFlash(s__('Security Reports|There was an error creating the issue.'));
+
+  if (flashError) {
+    createFlash(
+      s__('Security Reports|There was an error creating the issue.'),
+      'alert',
+      document.querySelector('.ci-table'),
+    );
+  }
 };
 
 export const dismissVulnerability = ({ dispatch }, { vulnerability, flashError }) => {
@@ -152,7 +159,11 @@ export const receiveDismissVulnerabilitySuccess = ({ commit }, payload) => {
 export const receiveDismissVulnerabilityError = ({ commit }, { flashError }) => {
   commit(types.RECEIVE_DISMISS_VULNERABILITY_ERROR);
   if (flashError) {
-    createFlash(s__('Security Reports|There was an error dismissing the issue.'));
+    createFlash(
+      s__('Security Reports|There was an error dismissing the vulnerability.'),
+      'alert',
+      document.querySelector('.ci-table'),
+    );
   }
 };
 
@@ -185,7 +196,11 @@ export const receiveUndoDismissalSuccess = ({ commit }, payload) => {
 export const receiveUndoDismissalError = ({ commit }, { flashError }) => {
   commit(types.RECEIVE_UNDO_DISMISSAL_ERROR);
   if (flashError) {
-    createFlash(s__('Security Reports|There was an error undoing this dismissal.'));
+    createFlash(
+      s__('Security Reports|There was an error undoing this dismissal.'),
+      'alert',
+      document.querySelector('.ci-table'),
+    );
   }
 };
 

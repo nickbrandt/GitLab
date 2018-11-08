@@ -7,7 +7,6 @@ import Tab from '~/vue_shared/components/tabs/tab.vue';
 import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
 import SecurityDashboardTable from './security_dashboard_table.vue';
 import VulnerabilityCountList from './vulnerability_count_list.vue';
-import SvgBlankState from '~/pipelines/components/blank_state.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import popover from '~/vue_shared/directives/popover';
 
@@ -20,21 +19,12 @@ export default {
     Icon,
     IssueModal,
     SecurityDashboardTable,
-    SvgBlankState,
     Tab,
     Tabs,
     VulnerabilityCountList,
   },
   props: {
     dashboardDocumentation: {
-      type: String,
-      required: true,
-    },
-    emptyStateSvgPath: {
-      type: String,
-      required: true,
-    },
-    errorStateSvgPath: {
       type: String,
       required: true,
     },
@@ -49,7 +39,7 @@ export default {
   },
   computed: {
     ...mapGetters('vulnerabilities', ['vulnerabilitiesCountByReportType']),
-    ...mapState('vulnerabilities', ['hasError', 'modal']),
+    ...mapState('vulnerabilities', ['modal']),
     sastCount() {
       return this.vulnerabilitiesCountByReportType('sast');
     },
@@ -96,50 +86,39 @@ export default {
 
 <template>
   <div>
-    <div class="flash-container"></div>
-    <svg-blank-state
-      v-if="hasError"
-      :svg-path="errorStateSvgPath"
-      :message="s__(`Security Reports|There was an error fetching the dashboard.
-      Please try again in a few moments or contact your support team.`)"
-    />
-    <div v-else>
-      <vulnerability-count-list />
-      <tabs stop-propagation>
-        <tab active>
-          <template slot="title">
-            <span>{{ __('SAST') }}</span>
-            <span
-              v-if="sastCount"
-              class="badge badge-pill"
-            >
-              {{ sastCount }}
-            </span>
-            <span
-              v-popover="popoverOptions"
-              class="text-muted prepend-left-4"
-              :aria-label="__('help')"
-            >
-              <icon
-                name="question"
-                class="vertical-align-middle"
-              />
-            </span>
-          </template>
+    <vulnerability-count-list />
+    <tabs stop-propagation>
+      <tab active>
+        <template slot="title">
+          <span>{{ __('SAST') }}</span>
+          <span
+            v-if="sastCount"
+            class="badge badge-pill"
+          >
+            {{ sastCount }}
+          </span>
+          <span
+            v-popover="popoverOptions"
+            class="text-muted prepend-left-4"
+            :aria-label="__('help')"
+          >
+            <icon
+              name="question"
+              class="vertical-align-middle"
+            />
+          </span>
+        </template>
 
-          <security-dashboard-table
-            :empty-state-svg-path="emptyStateSvgPath"
-          />
-        </tab>
-      </tabs>
-      <issue-modal
-        :modal="modal"
-        :can-create-issue-permission="true"
-        :can-create-feedback-permission="true"
-        @createNewIssue="createIssue({ vulnerability: modal.vulnerability })"
-        @dismissIssue="dismissVulnerability({ vulnerability: modal.vulnerability })"
-        @revertDismissIssue="undoDismissal({ vulnerability: modal.vulnerability })"
-      />
-    </div>
+        <security-dashboard-table />
+      </tab>
+    </tabs>
+    <issue-modal
+      :modal="modal"
+      :can-create-issue-permission="true"
+      :can-create-feedback-permission="true"
+      @createNewIssue="createIssue({ vulnerability: modal.vulnerability })"
+      @dismissIssue="dismissVulnerability({ vulnerability: modal.vulnerability })"
+      @revertDismissIssue="undoDismissal({ vulnerability: modal.vulnerability })"
+    />
   </div>
 </template>

@@ -4,17 +4,22 @@ describe GithubService::StatusMessage do
   include Rails.application.routes.url_helpers
 
   let(:project) { double(:project, namespace: "me", to_s: 'example_project') }
+  let(:service) { double(:service, static_context?: false) }
+
+  before do
+    stub_config_setting(host: 'instance-host')
+  end
 
   describe '#description' do
     it 'includes human readable gitlab status' do
-      subject = described_class.new(project, detailed_status: 'passed')
+      subject = described_class.new(project, service, detailed_status: 'passed')
 
       expect(subject.description).to eq "Pipeline passed on GitLab"
     end
 
     it 'gets truncated to 140 chars' do
       dummy_text = 'a' * 500
-      subject = described_class.new(project, detailed_status: dummy_text)
+      subject = described_class.new(project, service, detailed_status: dummy_text)
 
       expect(subject.description.length).to eq 140
     end
@@ -36,7 +41,7 @@ describe GithubService::StatusMessage do
 
     with_them do
       it 'transforms status' do
-        subject = described_class.new(project, status: gitlab_status)
+        subject = described_class.new(project, service, status: gitlab_status)
 
         expect(subject.status).to eq github_status
       end
@@ -44,7 +49,7 @@ describe GithubService::StatusMessage do
   end
 
   describe '#status_options' do
-    let(:subject) { described_class.new(project, id: 1) }
+    let(:subject) { described_class.new(project, service, id: 1) }
 
     it 'includes context' do
       expect(subject.status_options[:context]).to be_a String
@@ -59,11 +64,40 @@ describe GithubService::StatusMessage do
     end
   end
 
+  describe '#context' do
+    subject do
+      described_class.new(project, service, ref: 'some-ref')
+    end
+
+    context 'when status context is supposed to be dynamic' do
+      before do
+        allow(service).to receive(:static_context?).and_return(false)
+      end
+
+      it 'appends pipeline reference to the status context' do
+        expect(subject.context).to eq 'ci/gitlab/some-ref'
+      end
+    end
+
+    context 'when status context is supposed to be static' do
+      before do
+        allow(service).to receive(:static_context?).and_return(true)
+      end
+
+      it 'appends instance hostname to the status context' do
+        expect(subject.context).to eq 'ci/gitlab/instance-host'
+      end
+    end
+  end
+
   describe '.from_pipeline_data' do
-    let(:pipeline) { create(:ci_pipeline) }
-    let(:project) { pipeline.project }
+    let(:project) { create(:project) }
+    let(:pipeline) { create(:ci_pipeline, ref: 'some-ref', project: project) }
     let(:sample_data) { Gitlab::DataBuilder::Pipeline.build(pipeline) }
-    let(:subject) { described_class.from_pipeline_data(project, sample_data) }
+
+    subject do
+      described_class.from_pipeline_data(project, service, sample_data)
+    end
 
     it 'builds an instance of GithubService::StatusMessage' do
       expect(subject).to be_a described_class
@@ -87,14 +121,28 @@ describe GithubService::StatusMessage do
       end
 
       specify 'context' do
-        expect(subject.context).to eq "ci/gitlab/#{pipeline.ref}"
+        expect(subject.context).to eq "ci/gitlab/some-ref"
       end
 
-      context 'blocked pipeline' do
+      context 'when pipeline is blocked' do
         let(:pipeline) { create(:ci_pipeline, :blocked) }
 
         it 'uses human readable status which can be used in a sentence' do
           expect(subject.description). to eq 'Pipeline waiting for manual action on GitLab'
+        end
+      end
+
+      context 'when static context has been configured' do
+        before do
+          allow(service).to receive(:static_context?).and_return(true)
+        end
+
+        subject do
+          described_class.from_pipeline_data(project, service, sample_data)
+        end
+
+        it 'appends instance name to the context name' do
+          expect(subject.context).to eq 'ci/gitlab/instance-host'
         end
       end
     end

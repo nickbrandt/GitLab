@@ -21,7 +21,7 @@ describe('vulnerabilities module mutations', () => {
     beforeEach(() => {
       state = {
         ...createState(),
-        hasError: true,
+        errorLoadingVulnerabilities: true,
       };
       mutations[types.REQUEST_VULNERABILITIES](state);
     });
@@ -30,8 +30,8 @@ describe('vulnerabilities module mutations', () => {
       expect(state.isLoadingVulnerabilities).toBeTruthy();
     });
 
-    it('should set `hasError` to `false`', () => {
-      expect(state.hasError).toBeFalsy();
+    it('should set `errorLoadingVulnerabilities` to `false`', () => {
+      expect(state.errorLoadingVulnerabilities).toBeFalsy();
     });
   });
 
@@ -88,7 +88,7 @@ describe('vulnerabilities module mutations', () => {
     beforeEach(() => {
       state = {
         ...createState(),
-        hasError: true,
+        errorLoadingVulnerabilitiesCount: true,
       };
       mutations[types.REQUEST_VULNERABILITIES_COUNT](state);
     });
@@ -97,8 +97,8 @@ describe('vulnerabilities module mutations', () => {
       expect(state.isLoadingVulnerabilitiesCount).toBeTruthy();
     });
 
-    it('should set `hasError` to `false`', () => {
-      expect(state.hasError).toBeFalsy();
+    it('should set `errorLoadingVulnerabilitiesCount` to `false`', () => {
+      expect(state.errorLoadingVulnerabilitiesCount).toBeFalsy();
     });
   });
 

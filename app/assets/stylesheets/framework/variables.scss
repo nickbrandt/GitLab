@@ -10,6 +10,7 @@ $sidebar-breakpoint: 1024px;
 $default-transition-duration: 0.15s;
 $contextual-sidebar-width: 220px;
 $contextual-sidebar-collapsed-width: 50px;
+$toggle-sidebar-height: 48px;
 
 /*
  * Color schema
@@ -195,6 +196,7 @@ $well-light-text-color: #5b6169;
  * Text
  */
 $gl-font-size: 14px;
+$gl-font-size-xs: 11px;
 $gl-font-size-small: 12px;
 $gl-font-weight-normal: 400;
 $gl-font-weight-bold: 600;
@@ -269,6 +271,7 @@ $flash-height: 52px;
 $context-header-height: 60px;
 $breadcrumb-min-height: 48px;
 $project-title-row-height: 24px;
+$gl-line-height: 16px;
 
 // EE-only CSS variables START
 $system-header-height: 35px;
@@ -445,7 +448,7 @@ $ci-skipped-color: #888;
 * Boards
 */
 $issue-boards-font-size: 14px;
-$issue-boards-card-shadow: rgba(186, 186, 186, 0.5);
+$issue-boards-card-shadow: rgba(0, 0, 0, 0.1);
 /*
  The following heights are used in boards.scss and are used for calculation of the board height.
  They probably should be derived in a smarter way.
@@ -669,3 +672,8 @@ $modal-body-height: 134px;
 $modal-border-color: #e9ecef;
 
 $priority-label-empty-state-width: 114px;
+
+/*
+Issues Analytics
+*/
+$issues-analytics-popover-boarder-color: rgba(0, 0, 0, 0.15);

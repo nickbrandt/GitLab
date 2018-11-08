@@ -2,7 +2,6 @@
 
 module MergeRequests
   class BuildService < MergeRequests::BaseService
-    prepend EE::MergeRequests::BuildService
     include Gitlab::Utils::StrongMemoize
 
     def execute
@@ -208,3 +207,5 @@ module MergeRequests
     end
   end
 end
+
+MergeRequests::BuildService.prepend(EE::MergeRequests::BuildService)

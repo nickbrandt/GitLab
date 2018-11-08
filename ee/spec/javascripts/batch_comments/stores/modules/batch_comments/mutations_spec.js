@@ -148,4 +148,20 @@ describe('Batch comments mutations', () => {
       ]);
     });
   });
+
+  describe(types.OPEN_REVIEW_DROPDOWN, () => {
+    it('sets showPreviewDropdown to true', () => {
+      mutations[types.OPEN_REVIEW_DROPDOWN](state);
+
+      expect(state.showPreviewDropdown).toBe(true);
+    });
+  });
+
+  describe(types.CLOSE_REVIEW_DROPDOWN, () => {
+    it('sets showPreviewDropdown to false', () => {
+      mutations[types.CLOSE_REVIEW_DROPDOWN](state);
+
+      expect(state.showPreviewDropdown).toBe(false);
+    });
+  });
 });

@@ -38,6 +38,8 @@ module EE
       has_many :users_ops_dashboard_projects
       has_many :ops_dashboard_projects, through: :users_ops_dashboard_projects, source: :project
 
+      has_many :group_saml_identities, -> { where.not(saml_provider_id: nil) }, source: :identities, class_name: ::Identity
+
       # Protected Branch Access
       has_many :protected_branch_merge_access_levels, dependent: :destroy, class_name: ::ProtectedBranch::MergeAccessLevel # rubocop:disable Cop/ActiveRecordDependent
       has_many :protected_branch_push_access_levels, dependent: :destroy, class_name: ::ProtectedBranch::PushAccessLevel # rubocop:disable Cop/ActiveRecordDependent
@@ -74,10 +76,6 @@ module EE
       def non_ldap
         joins('LEFT JOIN identities ON identities.user_id = users.id')
           .where('identities.provider IS NULL OR identities.provider NOT LIKE ?', 'ldap%')
-      end
-
-      def existing_member?(email)
-        ::User.where(email: email).any? || ::Email.where(email: email).any?
       end
     end
 
@@ -184,6 +182,16 @@ module EE
 
     def admin_unsubscribe!
       update_column :admin_email_unsubscribed_at, Time.now
+    end
+
+    def group_sso?(group)
+      return false unless group
+
+      if group_saml_identities.loaded?
+        group_saml_identities.any? { |identity| identity.saml_provider.group_id == group.id }
+      else
+        group_saml_identities.where(saml_provider: group.saml_provider).any?
+      end
     end
   end
 end

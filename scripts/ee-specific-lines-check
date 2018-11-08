@@ -13,14 +13,18 @@ updated_numstat = updated_diff_numstat(base.ce_head, base.ee_head)
 offenses = updated_numstat.select do |file, updated_delta|
   current_delta = current_numstat[file]
 
-  more_lines =
-    current_delta &&
-    updated_delta > current_delta &&
+  more_lines = updated_delta > current_delta
+
+  allow_prepend_line =
     # Don't complain if we're just adding 1 or 2 more lines, which could be
     # `prepend EE::Module` and a blank line that we want.
-    !(current_delta == 0 && updated_delta <= 2)
+    !(current_delta == 0 && updated_delta <= 2) ||
+    # We only allow Ruby files to have prepend line
+    !file.end_with?('.rb')
 
-  more_lines && !WHITELIST.any? { |pattern| Dir.glob(pattern).include?(file) }
+  more_lines &&
+    allow_prepend_line &&
+    !WHITELIST.any? { |pattern| Dir.glob(pattern).include?(file) }
 end
 
 if offenses.empty?

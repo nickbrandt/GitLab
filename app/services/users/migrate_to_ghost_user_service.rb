@@ -8,7 +8,6 @@
 # when the user is destroyed.
 module Users
   class MigrateToGhostUserService
-    prepend EE::Users::MigrateToGhostUserService
     extend ActiveSupport::Concern
 
     attr_reader :ghost_user, :user
@@ -82,3 +81,5 @@ module Users
     end
   end
 end
+
+Users::MigrateToGhostUserService.prepend(EE::Users::MigrateToGhostUserService)

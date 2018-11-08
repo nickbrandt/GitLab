@@ -4,7 +4,14 @@
 # from an issue, an issue's assignee changes, an issue is closed, etc.
 module EE
   module SystemNoteService
-    extend self
+    extend ActiveSupport::Concern
+
+    prepended do
+      # ::SystemNoteService wants the methods to be available as both class and
+      # instance methods. This removes the need for having to both `include` and
+      # `extend` this module everywhere it is used.
+      extend(EE::SystemNoteService)
+    end
 
     #
     # noteable     - Noteable object

@@ -86,6 +86,7 @@ on projects and code.
   - [Epics](user/group/epics/index.md) **[ULTIMATE]**
   - [Roadmap](user/group/roadmap/index.md) **[ULTIMATE]**
   - [Contribution Analytics](user/group/contribution_analytics/index.md): See detailed statistics of group contributors. **[STARTER]**
+  - [Issues Analytics](user/group/issues_analytics/index.md): Check how many issues were created per month. **[PREMIUM]**
 - [Search through GitLab](user/search/index.md): Search for issues, merge requests, projects, groups, todos, and issues in Issue Boards.
   - [Advanced Global Search](user/search/advanced_global_search.md): Leverage Elasticsearch for faster, more advanced code search across your entire GitLab instance. **[STARTER]**
   - [Advanced Syntax Search](user/search/advanced_search_syntax.md): Use advanced queries for more targeted search results. **[STARTER]**

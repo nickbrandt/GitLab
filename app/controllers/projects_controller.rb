@@ -6,8 +6,6 @@ class ProjectsController < Projects::ApplicationController
   include ExtractsPath
   include PreviewMarkdown
   include SendFileUpload
-  prepend EE::ProjectsController
-
   before_action :whitelist_query_limiting, only: [:create]
   before_action :authenticate_user!, except: [:index, :show, :activity, :refs]
   before_action :redirect_git_extension, only: [:show]
@@ -449,3 +447,5 @@ class ProjectsController < Projects::ApplicationController
     @project = @project.present(current_user: current_user)
   end
 end
+
+ProjectsController.prepend(EE::ProjectsController)

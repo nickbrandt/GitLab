@@ -4,8 +4,6 @@ class RegistrationsController < Devise::RegistrationsController
   include Recaptcha::Verify
   include AcceptsPendingInvitations
 
-  prepend EE::RegistrationsController
-
   before_action :whitelist_query_limiting, only: [:destroy]
   before_action :ensure_terms_accepted,
                 if: -> { Gitlab::CurrentSettings.current_application_settings.enforce_terms? },
@@ -121,3 +119,5 @@ class RegistrationsController < Devise::RegistrationsController
     Gitlab::Utils.to_boolean(params[:terms_opt_in])
   end
 end
+
+RegistrationsController.prepend(EE::RegistrationsController)

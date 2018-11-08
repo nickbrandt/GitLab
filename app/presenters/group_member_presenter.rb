@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class GroupMemberPresenter < MemberPresenter
-  prepend EE::GroupMemberPresenter
-
   private
 
   def admin_member_permission
@@ -17,3 +15,5 @@ class GroupMemberPresenter < MemberPresenter
     :destroy_group_member
   end
 end
+
+GroupMemberPresenter.prepend(EE::GroupMemberPresenter)

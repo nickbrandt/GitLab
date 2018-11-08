@@ -2,8 +2,6 @@
 
 class PostReceive
   include ApplicationWorker
-  prepend EE::PostReceive
-
   def perform(gl_repository, identifier, changes)
     project, is_wiki = Gitlab::GlRepository.parse(gl_repository)
 
@@ -64,3 +62,5 @@ class PostReceive
     Gitlab::GitLogger.error("POST-RECEIVE: #{message}")
   end
 end
+
+PostReceive.prepend(EE::PostReceive)

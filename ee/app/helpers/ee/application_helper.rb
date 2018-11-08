@@ -4,10 +4,14 @@ module EE
 
     override :read_only_message
     def read_only_message
-      return super unless ::Gitlab::Geo.secondary_with_primary?
+      return super unless ::Gitlab::Geo.secondary?
 
-      (_('You are on a secondary, <b>read-only</b> Geo node. If you want to make changes, you must visit this page on the %{primary_node}.') %
-        { primary_node: link_to('primary node', ::Gitlab::Geo.primary_node.url) }).html_safe
+      if @limited_actions_message
+        s_('Geo|You are on a secondary, <b>read-only</b> Geo node. You may be able to make a limited amount of changes or perform a limited amount of actions on this page.').html_safe
+      else
+        (s_('Geo|You are on a secondary, <b>read-only</b> Geo node. If you want to make changes, you must visit this page on the %{primary_node}.') %
+          { primary_node: link_to('primary node', ::Gitlab::Geo.primary_node&.url || '#') }).html_safe
+      end
     end
 
     def render_ce(partial, locals = {})
@@ -65,14 +69,18 @@ module EE
     def autocomplete_data_sources(object, noteable_type)
       return {} unless object && noteable_type
 
-      return super unless object.is_a?(Group)
-
-      {
-        members: members_group_autocomplete_sources_path(object, type: noteable_type, type_id: params[:id]),
-        labels: labels_group_autocomplete_sources_path(object),
-        epics: epics_group_autocomplete_sources_path(object),
-        commands: commands_group_autocomplete_sources_path(object, type: noteable_type, type_id: params[:id])
-      }
+      if object.is_a?(Group)
+        {
+          members: members_group_autocomplete_sources_path(object, type: noteable_type, type_id: params[:id]),
+          labels: labels_group_autocomplete_sources_path(object),
+          epics: epics_group_autocomplete_sources_path(object),
+          commands: commands_group_autocomplete_sources_path(object, type: noteable_type, type_id: params[:id])
+        }
+      elsif object.group&.feature_available?(:epics)
+        { epics: epics_project_autocomplete_sources_path(object) }.merge(super)
+      else
+        super
+      end
     end
 
     def instance_review_permitted?

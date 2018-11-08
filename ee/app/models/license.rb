@@ -70,6 +70,7 @@ class License < ActiveRecord::Base
     code_owner_as_approver_suggestion
     feature_flags
     batch_comments
+    issues_analytics
   ].freeze
 
   EEU_FEATURES = EEP_FEATURES + %i[
@@ -87,6 +88,7 @@ class License < ActiveRecord::Base
     pseudonymizer
     prometheus_alerts
     operations_dashboard
+    tracing
   ].freeze
 
   # List all features available for early adopters,

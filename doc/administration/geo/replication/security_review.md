@@ -116,7 +116,7 @@ over the public Internet in a typical deployment, but this is not a requirement.
 
 - Geo imposes no additional restrictions on operating system (see the
   [GitLab installation](https://about.gitlab.com/installation/) page for more
-  details), however we recommend using the operating systems listed in the [Geo documentation](http://docs.gitlab.com/ee/gitlab-geo/#geo-recommendations). 
+  details), however we recommend using the operating systems listed in the [Geo documentation](index.md#requirements-for-running-geo).
 
 ### What details regarding required OS components and lock‐down needs have been defined?
 

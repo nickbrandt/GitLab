@@ -6,8 +6,6 @@ class SessionsController < Devise::SessionsController
   include Devise::Controllers::Rememberable
   include Recaptcha::ClientHelper
   include Recaptcha::Verify
-  prepend EE::SessionsController
-
   skip_before_action :check_two_factor_requirement, only: [:destroy]
 
   prepend_before_action :check_initial_setup, only: [:new]
@@ -220,3 +218,5 @@ class SessionsController < Devise::SessionsController
     end
   end
 end
+
+SessionsController.prepend(EE::SessionsController)

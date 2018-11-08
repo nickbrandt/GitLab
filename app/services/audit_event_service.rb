@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class AuditEventService
-  prepend EE::AuditEventService
-
   def initialize(author, entity, details = {})
     @author, @entity, @details = author, entity, details
   end
@@ -45,3 +43,5 @@ class AuditEventService
     SecurityEvent.create(base_payload.merge(details: @details))
   end
 end
+
+AuditEventService.prepend(EE::AuditEventService)

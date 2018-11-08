@@ -8,7 +8,7 @@ module QA
 
         Page::Main::Login.act { sign_in_using_credentials }
 
-        Factory::Resource::Sandbox.fabricate_via_browser_ui!
+        Resource::Sandbox.fabricate_via_browser_ui!
       end
 
       it 'User logs in to group with SAML SSO' do

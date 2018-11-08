@@ -2,8 +2,6 @@
 
 module Commits
   class CreateService < ::BaseService
-    prepend EE::Commits::CreateService
-
     ValidationError = Class.new(StandardError)
     ChangeError = Class.new(StandardError)
 
@@ -76,3 +74,5 @@ module Commits
     end
   end
 end
+
+Commits::CreateService.prepend(EE::Commits::CreateService)

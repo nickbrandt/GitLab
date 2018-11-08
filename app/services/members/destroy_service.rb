@@ -2,8 +2,6 @@
 
 module Members
   class DestroyService < Members::BaseService
-    prepend EE::Members::DestroyService
-
     def execute(member, skip_authorization: false)
       raise Gitlab::Access::AccessDeniedError unless skip_authorization || can_destroy_member?(member)
 
@@ -48,3 +46,5 @@ module Members
     end
   end
 end
+
+Members::DestroyService.prepend(EE::Members::DestroyService)

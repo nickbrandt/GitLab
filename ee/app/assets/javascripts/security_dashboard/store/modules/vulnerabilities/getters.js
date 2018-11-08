@@ -8,5 +8,11 @@ export const vulnerabilitiesCountByReportType = state => type => {
   const counts = state.vulnerabilitiesCount[type];
   return counts ? Object.values(counts).reduce(sum, 0) : 0;
 };
+export const dashboardError = state =>
+  state.errorLoadingVulnerabilities && state.errorLoadingVulnerabilitiesCount;
+export const dashboardListError = state =>
+  state.errorLoadingVulnerabilities && !state.errorLoadingVulnerabilitiesCount;
+export const dashboardCountError = state =>
+  !state.errorLoadingVulnerabilities && state.errorLoadingVulnerabilitiesCount;
 
 export default () => {};

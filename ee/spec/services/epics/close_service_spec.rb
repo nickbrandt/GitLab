@@ -50,6 +50,15 @@ describe Epics::CloseService do
             expect(note.note).to eq('closed')
             expect(note.system_note_metadata.action).to eq('closed')
           end
+
+          it 'notifies the subscribers' do
+            notification_service = double
+
+            expect(NotificationService).to receive(:new).and_return(notification_service)
+            expect(notification_service).to receive(:close_epic).with(epic, user)
+
+            subject.execute(epic)
+          end
         end
 
         context 'when trying to close a closed epic' do
@@ -71,6 +80,12 @@ describe Epics::CloseService do
 
           it 'does not create a system note' do
             expect { subject.execute(epic) }.not_to change { epic.notes.count }
+          end
+
+          it 'does not send any emails' do
+            expect(NotificationService).not_to receive(:new)
+
+            subject.execute(epic)
           end
         end
       end

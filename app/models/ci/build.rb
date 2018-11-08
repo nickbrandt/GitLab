@@ -9,7 +9,7 @@ module Ci
     include Presentable
     include Importable
     include Gitlab::Utils::StrongMemoize
-
+    include Deployable
     prepend EE::Ci::Build
 
     belongs_to :project, inverse_of: :builds
@@ -19,13 +19,11 @@ module Ci
 
     has_many :sourced_pipelines, class_name: Ci::Sources::Pipeline, foreign_key: :source_job_id
 
-    has_many :deployments, as: :deployable
-
     RUNNER_FEATURES = {
       upload_multiple_artifacts: -> (build) { build.publishes_artifacts_reports? }
     }.freeze
 
-    has_one :last_deployment, -> { order('deployments.id DESC') }, as: :deployable, class_name: 'Deployment'
+    has_one :deployment, as: :deployable, class_name: 'Deployment'
     has_many :trace_sections, class_name: 'Ci::BuildTraceSection'
     has_many :trace_chunks, class_name: 'Ci::BuildTraceChunk', foreign_key: :build_id
 
@@ -199,6 +197,8 @@ module Ci
       end
 
       after_transition pending: :running do |build|
+        build.deployment&.run
+
         build.run_after_commit do
           BuildHooksWorker.perform_async(id)
         end
@@ -211,14 +211,18 @@ module Ci
       end
 
       after_transition any => [:success] do |build|
+        build.deployment&.succeed
+
         build.run_after_commit do
-          BuildSuccessWorker.perform_async(id)
           PagesWorker.perform_async(:deploy, id) if build.pages_generator?
         end
       end
 
       before_transition any => [:failed] do |build|
         next unless build.project
+
+        build.deployment&.drop
+
         next if build.retries_max.zero?
 
         if build.retries_count < build.retries_max
@@ -237,6 +241,10 @@ module Ci
       after_transition running: any do |build|
         Ci::BuildRunnerSession.where(build: build).delete_all
       end
+
+      after_transition any => [:skipped, :canceled] do |build|
+        build.deployment&.cancel
+      end
     end
 
     def ensure_metadata
@@ -249,8 +257,12 @@ module Ci
         .fabricate!
     end
 
-    def other_actions
+    def other_manual_actions
       pipeline.manual_actions.where.not(name: name)
+    end
+
+    def other_scheduled_actions
+      pipeline.scheduled_actions.where.not(name: name)
     end
 
     def pages_generator?
@@ -258,13 +270,28 @@ module Ci
         self.name == 'pages'
     end
 
+    # degenerated build is one that cannot be run by Runner
+    def degenerated?
+      self.options.nil?
+    end
+
+    def degenerate!
+      self.update!(options: nil, yaml_variables: nil, commands: nil)
+    end
+
+    def archived?
+      return true if degenerated?
+
+      archive_builds_older_than = Gitlab::CurrentSettings.current_application_settings.archive_builds_older_than
+      archive_builds_older_than.present? && created_at < archive_builds_older_than
+    end
+
     def playable?
-      action? && (manual? || scheduled? || retryable?)
+      action? && !archived? && (manual? || scheduled? || retryable?)
     end
 
     def schedulable?
-      Feature.enabled?('ci_enable_scheduled_build', default_enabled: true) &&
-        self.when == 'delayed' && options[:start_in].present?
+      self.when == 'delayed' && options[:start_in].present?
     end
 
     def options_scheduled_at
@@ -288,7 +315,7 @@ module Ci
     end
 
     def retryable?
-      success? || failed? || canceled?
+      !archived? && (success? || failed? || canceled?)
     end
 
     def retries_count
@@ -296,7 +323,7 @@ module Ci
     end
 
     def retries_max
-      self.options.fetch(:retry, 0).to_i
+      self.options.to_h.fetch(:retry, 0).to_i
     end
 
     def latest?
@@ -327,8 +354,12 @@ module Ci
       self.options.fetch(:environment, {}).fetch(:action, 'start') if self.options
     end
 
+    def has_deployment?
+      !!self.deployment
+    end
+
     def outdated_deployment?
-      success? && !last_deployment.try(:last?)
+      success? && !deployment.try(:last?)
     end
 
     def depends_on_builds
@@ -341,6 +372,10 @@ module Ci
 
     def triggered_by?(current_user)
       user == current_user
+    end
+
+    def on_stop
+      options&.dig(:environment, :on_stop)
     end
 
     # A slugified version of the build ref, suitable for inclusion in URLs and
@@ -710,7 +745,7 @@ module Ci
 
       if success?
         return successful_deployment_status
-      elsif complete? && !success?
+      elsif failed?
         return :failed
       end
 
@@ -727,13 +762,11 @@ module Ci
     end
 
     def successful_deployment_status
-      if success? && last_deployment&.last?
-        return :last
-      elsif success? && last_deployment.present?
-        return :out_of_date
+      if deployment&.last?
+        :last
+      else
+        :out_of_date
       end
-
-      :creating
     end
 
     def each_report(report_types)
@@ -785,7 +818,7 @@ module Ci
       end
     end
 
-    def predefined_variables
+    def predefined_variables # rubocop:disable Metrics/AbcSize
       Gitlab::Ci::Variables::Collection.new.tap do |variables|
         variables.append(key: 'CI', value: 'true')
         variables.append(key: 'GITLAB_CI', value: 'true')
@@ -805,6 +838,8 @@ module Ci
         variables.append(key: "CI_COMMIT_TAG", value: ref) if tag?
         variables.append(key: "CI_PIPELINE_TRIGGERED", value: 'true') if trigger_request
         variables.append(key: "CI_JOB_MANUAL", value: 'true') if action?
+        variables.append(key: "CI_NODE_INDEX", value: self.options[:instance].to_s) if self.options&.include?(:instance)
+        variables.append(key: "CI_NODE_TOTAL", value: (self.options&.dig(:parallel) || 1).to_s)
         variables.concat(legacy_variables)
       end
     end

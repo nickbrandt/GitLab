@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 module ClustersHelper
-  def has_multiple_clusters?(project)
-    project.feature_available?(:multiple_clusters)
+  prepend EE::ClustersHelper
+
+  # EE overrides this
+  def has_multiple_clusters?
+    false
   end
 
   def render_gcp_signup_offer
@@ -10,7 +13,7 @@ module ClustersHelper
     return unless show_gcp_signup_offer?
 
     content_tag :section, class: 'no-animate expanded' do
-      render 'projects/clusters/gcp_signup_offer_banner'
+      render 'clusters/clusters/gcp_signup_offer_banner'
     end
   end
 end

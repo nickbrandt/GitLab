@@ -4,8 +4,6 @@ class UsersController < ApplicationController
   include RoutableActions
   include RendersMemberAccess
   include ControllerWithCrossProjectAccessCheck
-  prepend EE::UsersController
-
   requires_cross_project_access show: false,
                                 groups: false,
                                 projects: false,
@@ -165,3 +163,5 @@ class UsersController < ApplicationController
     access_denied! unless can?(current_user, :read_user_profile, user)
   end
 end
+
+UsersController.prepend(EE::UsersController)
