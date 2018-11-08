@@ -56,15 +56,24 @@ export default {
       'value',
       vulnerability.identifiers.length && vulnerability.identifiers,
     );
+    Vue.set(
+      state.modal.data.className,
+      'value',
+      vulnerability.location && vulnerability.location.class,
+    );
     Vue.set(state.modal.data.severity, 'value', vulnerability.severity);
     Vue.set(state.modal.data.confidence, 'value', vulnerability.confidence);
     Vue.set(state.modal.data.solution, 'value', vulnerability.solution);
-    Vue.set(state.modal.data.links, 'value', vulnerability.links);
     Vue.set(state.modal.data.instances, 'value', vulnerability.instances);
     Vue.set(state.modal, 'vulnerability', vulnerability);
     Vue.set(state.modal.vulnerability, 'hasIssue', Boolean(vulnerability.issue_feedback));
     Vue.set(state.modal.vulnerability, 'isDismissed', Boolean(vulnerability.dismissal_feedback));
     Vue.set(state.modal, 'error', null);
+    if (vulnerability.links && vulnerability.links.length) {
+      Vue.set(state.modal.data.links, 'value', vulnerability.links);
+    } else {
+      Vue.set(state.modal.data.links, 'value', null);
+    }
   },
   [types.REQUEST_CREATE_ISSUE](state) {
     state.isCreatingIssue = true;

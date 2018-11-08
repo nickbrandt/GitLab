@@ -36,6 +36,10 @@ export default {
       type: String,
       required: true,
     },
+    vulnerabilityFeedbackHelpPath: {
+      type: String,
+      required: true,
+    },
   },
   computed: {
     ...mapGetters('vulnerabilities', ['vulnerabilitiesCountByReportType']),
@@ -114,6 +118,7 @@ export default {
     </tabs>
     <issue-modal
       :modal="modal"
+      :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
       :can-create-issue-permission="true"
       :can-create-feedback-permission="true"
       @createNewIssue="createIssue({ vulnerability: modal.vulnerability })"

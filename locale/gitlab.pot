@@ -8896,6 +8896,9 @@ msgstr ""
 msgid "VisibilityLevel|Unknown"
 msgstr ""
 
+msgid "Vulnerability|Class"
+msgstr ""
+
 msgid "Vulnerability|Confidence"
 msgstr ""
 
