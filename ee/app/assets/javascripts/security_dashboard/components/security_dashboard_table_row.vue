@@ -1,6 +1,6 @@
 <script>
 import { mapActions } from 'vuex';
-import { GlSkeletonLoading } from '@gitlab-org/gitlab-ui';
+import { GlButton, GlSkeletonLoading } from '@gitlab-org/gitlab-ui';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
 import VulnerabilityActionButtons from './vulnerability_action_buttons.vue';
 import VulnerabilityIssueLink from './vulnerability_issue_link.vue';
@@ -9,6 +9,7 @@ export default {
   name: 'SecurityDashboardTableRow',
   components: {
     SeverityBadge,
+    GlButton,
     GlSkeletonLoading,
     VulnerabilityActionButtons,
     VulnerabilityIssueLink,
@@ -83,11 +84,12 @@ export default {
           :lines="2"
         />
         <div v-else>
-          <span
-            class="js-vulnerability-info"
+          <gl-button
+            class="btn js-vulnerability-info"
+            variant="blank"
             :class="{ strikethrough: isDismissed }"
             @click="openModal({ vulnerability })"
-          >{{ vulnerability.name }}</span>
+          >{{ vulnerability.name }}</gl-button>
           <vulnerability-issue-link
             v-if="hasIssue"
             class="prepend-left-10"
