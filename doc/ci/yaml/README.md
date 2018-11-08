@@ -1457,7 +1457,7 @@ test:
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/22631) in GitLab 11.5.
 
 `parallel` allows you to configure how many instances of a job to run in
-parallel. This value has to be greater than or equal to two (2).
+parallel. This value has to be greater than or equal to two (2) and less or equal than 50.
 
 This creates N instances of the same job that run in parallel. They're named
 sequentially from `job_name 1/N` to `job_name N/N`.
