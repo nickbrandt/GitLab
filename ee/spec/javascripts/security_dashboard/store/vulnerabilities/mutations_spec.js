@@ -132,59 +132,86 @@ describe('vulnerabilities module mutations', () => {
   });
 
   describe('SET_MODAL_DATA', () => {
-    const vulnerability = mockData[0];
-    let payload;
-    let state;
+    describe('with all the data', () => {
+      const vulnerability = mockData[0];
+      let payload;
+      let state;
 
-    beforeEach(() => {
-      state = createState();
-      payload = { vulnerability };
-      mutations[types.SET_MODAL_DATA](state, payload);
+      beforeEach(() => {
+        state = createState();
+        payload = { vulnerability };
+        mutations[types.SET_MODAL_DATA](state, payload);
+      });
+
+      it('should set the modal title', () => {
+        expect(state.modal.title).toEqual(vulnerability.name);
+      });
+
+      it('should set the modal description', () => {
+        expect(state.modal.data.description.value).toEqual(vulnerability.description);
+      });
+
+      it('should set the modal project', () => {
+        expect(state.modal.data.project.value).toEqual(vulnerability.project.full_name);
+        expect(state.modal.data.project.url).toEqual(vulnerability.project.full_path);
+      });
+
+      it('should set the modal file', () => {
+        expect(state.modal.data.file.value).toEqual(vulnerability.location.file);
+      });
+
+      it('should set the modal identifiers', () => {
+        expect(state.modal.data.identifiers.value).toEqual(vulnerability.identifiers);
+      });
+
+      it('should set the modal severity', () => {
+        expect(state.modal.data.severity.value).toEqual(vulnerability.severity);
+      });
+
+      it('should set the modal confidence', () => {
+        expect(state.modal.data.confidence.value).toEqual(vulnerability.confidence);
+      });
+
+      it('should set the modal solution', () => {
+        expect(state.modal.data.solution.value).toEqual(vulnerability.solution);
+      });
+
+      it('should set the modal links', () => {
+        expect(state.modal.data.links.value).toEqual(vulnerability.links);
+      });
+
+      it('should set the modal instances', () => {
+        expect(state.modal.data.instances.value).toEqual(vulnerability.instances);
+      });
+
+      it('should set the modal vulnerability', () => {
+        expect(state.modal.vulnerability).toEqual(vulnerability);
+      });
     });
 
-    it('should set the modal title', () => {
-      expect(state.modal.title).toEqual(vulnerability.name);
-    });
+    describe('with irregular data', () => {
+      const vulnerability = mockData[0];
+      let state;
 
-    it('should set the modal description', () => {
-      expect(state.modal.data.description.value).toEqual(vulnerability.description);
-    });
+      beforeEach(() => {
+        state = createState();
+      });
 
-    it('should set the modal project', () => {
-      expect(state.modal.data.project.value).toEqual(vulnerability.project.full_name);
-      expect(state.modal.data.project.url).toEqual(vulnerability.project.full_path);
-    });
+      it('should set isDismissed when the vulnerabilitiy is dismissed', () => {
+        const payload = {
+          vulnerability: { ...vulnerability, dismissal_feedback: 'I am dismissed' },
+        };
+        mutations[types.SET_MODAL_DATA](state, payload);
 
-    it('should set the modal file', () => {
-      expect(state.modal.data.file.value).toEqual(vulnerability.location.file);
-    });
+        expect(state.modal.vulnerability.isDismissed).toEqual(true);
+      });
 
-    it('should set the modal identifiers', () => {
-      expect(state.modal.data.identifiers.value).toEqual(vulnerability.identifiers);
-    });
+      it('should set hasIssue when the vulnerabilitiy has a related issue', () => {
+        const payload = { vulnerability: { ...vulnerability, issue_feedback: 'I am an issue' } };
+        mutations[types.SET_MODAL_DATA](state, payload);
 
-    it('should set the modal severity', () => {
-      expect(state.modal.data.severity.value).toEqual(vulnerability.severity);
-    });
-
-    it('should set the modal confidence', () => {
-      expect(state.modal.data.confidence.value).toEqual(vulnerability.confidence);
-    });
-
-    it('should set the modal solution', () => {
-      expect(state.modal.data.solution.value).toEqual(vulnerability.solution);
-    });
-
-    it('should set the modal links', () => {
-      expect(state.modal.data.links.value).toEqual(vulnerability.links);
-    });
-
-    it('should set the modal instances', () => {
-      expect(state.modal.data.instances.value).toEqual(vulnerability.instances);
-    });
-
-    it('should set the modal vulnerability', () => {
-      expect(state.modal.vulnerability).toEqual(vulnerability);
+        expect(state.modal.vulnerability.hasIssue).toEqual(true);
+      });
     });
   });
 
