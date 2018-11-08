@@ -7,6 +7,10 @@ v 7.2.0
 - Update CI matrix to go1.10 + go1.11 and fix ResponseWriter bugs !309
 - Add support for Redis URLs (redis:// and rediss://) in Workhorse !321
 
+v 7.1.3
+
+- Redact sensitive url params as in Rails
+
 v 7.1.1
 
 Bad release, use 7.2.0 instead.
@@ -25,9 +29,17 @@ v 7.1.0
 - Pass Correlation-Ids down to backend systems !311
 - Don't fail if /home/git/repositories already exists in Gitaly container !317
 
+v 7.0.1
+
+- Redact sensitive url params as in Rails
+
 v 7.0.0
 
 - Use the new Gitaly auth scheme (v2) !298
+
+v 6.1.2
+
+- Redact sensitive url params as in Rails
 
 v 6.1.1
 
