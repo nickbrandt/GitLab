@@ -185,7 +185,7 @@ Alternatively, you can [lock the sharing with group feature](#share-with-group-l
 In GitLab Enterprise Edition it is possible to manage GitLab group memberships using LDAP groups.
 See [the GitLab Enterprise Edition documentation](../../integration/ldap.md) for more information.
 
-## Epics
+## Epics **[ULTIMATE]**
 
 > Introduced in [GitLab Ultimate][ee] 10.2.
 
@@ -194,6 +194,12 @@ effort by tracking groups of issues that share a theme, across projects and
 milestones.
 
 [Learn more about Epics.](epics/index.md)
+
+## Group Security Dashboard **[ULTIMATE]**
+
+Get an overview of the vulnerabilities of all the projects in a group and its subgroups.
+
+[Learn more about the Group Security Dashboard.](security_dashboard/index.md)
 
 ## Transfer groups to another group
 
