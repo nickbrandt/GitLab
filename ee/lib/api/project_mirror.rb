@@ -44,7 +44,7 @@ module API
     params do
       requires :id, type: String, desc: 'The ID of a project'
     end
-    resource :projects, requirements: API::PROJECT_ENDPOINT_REQUIREMENTS do
+    resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc 'Triggers a pull mirror operation'
       post ":id/mirror/pull" do
         authenticate_with_webhook_token!
