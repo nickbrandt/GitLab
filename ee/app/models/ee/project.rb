@@ -30,6 +30,7 @@ module EE
       has_one :jenkins_deprecated_service
       has_one :github_service
       has_one :gitlab_slack_application_service
+      has_one :tracing_setting, class_name: 'ProjectTracingSetting'
 
       has_many :approvers, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
       has_many :approver_groups, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
@@ -107,6 +108,10 @@ module EE
         joins('LEFT JOIN services ON services.project_id = projects.id AND services.type = \'GitlabSlackApplicationService\' AND services.active IS true')
           .where('services.id IS NULL')
       end
+    end
+
+    def tracing_external_url
+      self.tracing_setting.try(:external_url)
     end
 
     def latest_pipeline_with_security_reports

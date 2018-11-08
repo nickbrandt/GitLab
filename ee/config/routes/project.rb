@@ -8,6 +8,13 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           constraints: { project_id: Gitlab::PathRegex.project_route_regex },
           module: :projects,
           as: :project) do
+
+      resource :tracing, only: [:show]
+
+      namespace :settings do
+        resource :operations, only: [:show, :update, :create]
+      end
+
       resources :autocomplete_sources, only: [] do
         collection do
           get 'epics'
