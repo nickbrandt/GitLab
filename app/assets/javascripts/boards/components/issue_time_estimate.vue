@@ -41,8 +41,7 @@ export default {
       placement="bottom"
       class="js-issue-time-estimate"
     >
-      <span class="bold">{{ __('Time estimate') }}</span>
-      <br /> 
+      <span class="bold d-block">{{ __('Time estimate') }}</span>
       {{ title }}
     </gl-tooltip>
   </span>
