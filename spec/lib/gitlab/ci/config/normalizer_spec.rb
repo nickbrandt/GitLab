@@ -31,8 +31,6 @@ describe Gitlab::Ci::Config::Normalizer do
       expect(configs).to all(eq(original_config))
     end
 
-<<<<<<< HEAD
-=======
     context 'when the job is not parallelized' do
       let(:job_config) { { script: 'rspec', name: 'rspec' } }
 
@@ -41,7 +39,6 @@ describe Gitlab::Ci::Config::Normalizer do
       end
     end
 
->>>>>>> upstream/master
     context 'when there is a job with a slash in it' do
       let(:job_name) { :"rspec 35/2" }
 
