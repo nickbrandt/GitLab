@@ -9912,12 +9912,9 @@ msgstr ""
 msgid "remove due date"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "remove weight"
 msgstr ""
 
-=======
->>>>>>> 7a6cae01c80dda564726ef363191b09d359ec2ba
 msgid "reply"
 msgid_plural "replies"
 msgstr[0] ""
