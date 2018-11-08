@@ -5,11 +5,8 @@ import { truncateSha } from '~/lib/utils/text_utility';
 import { s__ } from '~/locale';
 import systemNote from '~/vue_shared/components/notes/system_note.vue';
 import icon from '~/vue_shared/components/icon.vue';
-<<<<<<< HEAD
 import batchCommentsDiffLineNoteFormMixin from 'ee/batch_comments/mixins/diff_line_note_form';
 import DraftNote from 'ee/batch_comments/components/draft_note.vue';
-=======
->>>>>>> 7a6cae01c80dda564726ef363191b09d359ec2ba
 import Flash from '../../flash';
 import { SYSTEM_NOTE } from '../constants';
 import userAvatarLink from '../../vue_shared/components/user_avatar/user_avatar_link.vue';
@@ -443,11 +440,7 @@ Please check your network connection and try again.`;
                   :draft="draftForDiscussion(discussion.reply_id)"
                 />
                 <div
-<<<<<<< HEAD
                   v-else-if="!isRepliesCollapsed"
-=======
-                  v-if="!isRepliesCollapsed"
->>>>>>> 7a6cae01c80dda564726ef363191b09d359ec2ba
                   :class="{ 'is-replying': isReplying }"
                   class="discussion-reply-holder"
                 >
