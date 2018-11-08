@@ -122,12 +122,9 @@ msgstr ""
 msgid "%{counter_storage} (%{counter_repositories} repositories, %{counter_build_artifacts} build artifacts, %{counter_lfs_objects} LFS)"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "%{count} %{alerts}"
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "%{count} more assignees"
 msgstr ""
 
@@ -414,15 +411,12 @@ msgstr ""
 msgid "Add a table"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Add additional text to appear in all email communications. %{character_limit} character limit"
 msgstr ""
 
 msgid "Add comment now"
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "Add image comment"
 msgstr ""
 
@@ -2363,14 +2357,13 @@ msgstr ""
 msgid "Copy file path to clipboard"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Copy incoming email address to clipboard"
 msgstr ""
 
-msgid "Copy name to clipboard"
-=======
 msgid "Copy link"
->>>>>>> upstream/master
+msgstr ""
+
+msgid "Copy name to clipboard"
 msgstr ""
 
 msgid "Copy reference to clipboard"
@@ -6005,11 +5998,10 @@ msgstr ""
 msgid "Please try again"
 msgstr ""
 
-<<<<<<< HEAD
-msgid "Please wait while we connect to your repository. Refresh at will."
-=======
 msgid "Please use this form to report users to GitLab who create spam issues, comments or behave inappropriately."
->>>>>>> upstream/master
+msgstr ""
+
+msgid "Please wait while we connect to your repository. Refresh at will."
 msgstr ""
 
 msgid "Please wait while we import the repository for you. Refresh at will."
@@ -6770,11 +6762,10 @@ msgstr ""
 msgid "Reply to this email directly or %{view_it_on_gitlab}."
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Repo by URL"
-=======
+msgstr ""
+
 msgid "Report abuse to GitLab"
->>>>>>> upstream/master
 msgstr ""
 
 msgid "Reporting"
@@ -8232,12 +8223,9 @@ msgstr ""
 msgid "Time estimate"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Time in seconds GitLab will wait for a response from the external service. When the service does not respond in time, access will be denied."
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "Time remaining"
 msgstr ""
 
@@ -8467,15 +8455,12 @@ msgstr ""
 msgid "To validate your GitLab CI configurations, go to 'CI/CD → Pipelines' inside your project, and click on the 'CI Lint' button."
 msgstr ""
 
-<<<<<<< HEAD
 msgid "To view the roadmap, add a start or due date to one of your epics in this group or its subgroups. In the months view, only epics in the past month, current month, and next 5 months are shown."
 msgstr ""
 
 msgid "To widen your search, change or remove filters."
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "Today"
 msgstr ""
 
