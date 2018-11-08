@@ -47,6 +47,18 @@
         "name": "Cipher does not check for integrity first?",
         "url": "https://crypto.stackexchange.com/questions/31428/pbewithmd5anddes-cipher-does-not-check-for-integrity-first"
       }
+    ],
+    "instances": [
+      {
+        "param": "X-Content-Type-Options",
+        "method": "GET",
+        "uri": "http://bikebilly-spring-auto-devops-review-feature-br-3y2gpb.35.192.176.43.xip.io"
+      },
+      {
+        "param": "X-Content-Type-Options",
+        "method": "GET",
+        "uri": "http://bikebilly-spring-auto-devops-review-feature-br-3y2gpb.35.192.176.43.xip.io/"
+      }
     ]
   },
   {

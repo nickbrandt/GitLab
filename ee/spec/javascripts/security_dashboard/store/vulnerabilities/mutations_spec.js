@@ -223,6 +223,13 @@ describe('vulnerabilities module mutations', () => {
 
         expect(state.modal.data.links.value).toEqual(null);
       });
+
+      it('should nullify the instances', () => {
+        const payload = { vulnerability: { ...vulnerability, instances: [] } };
+        mutations[types.SET_MODAL_DATA](state, payload);
+
+        expect(state.modal.data.instances.value).toEqual(null);
+      });
     });
   });
 
