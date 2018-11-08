@@ -63,6 +63,7 @@ export default {
     Vue.set(state.modal.data.instances, 'value', vulnerability.instances);
     Vue.set(state.modal, 'vulnerability', vulnerability);
     Vue.set(state.modal.vulnerability, 'hasIssue', Boolean(vulnerability.issue_feedback));
+    Vue.set(state.modal.vulnerability, 'isDismissed', Boolean(vulnerability.dismissal_feedback));
     Vue.set(state.modal, 'error', null);
   },
   [types.REQUEST_CREATE_ISSUE](state) {
