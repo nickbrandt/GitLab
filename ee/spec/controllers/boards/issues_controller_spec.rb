@@ -49,6 +49,15 @@ describe Boards::IssuesController do
           expect(parsed_response['issues'].length).to eq 2
           expect(development.issues.map(&:relative_position)).not_to include(nil)
         end
+
+        it 'returns issues with weight attribute' do
+          create(:labeled_issue, project: project_1, labels: [planning], weight: 3)
+
+          list_issues user: user, board: board, list: list1
+
+          parsed_response = JSON.parse(response.body)
+          expect(parsed_response['issues'].first["weight"]).to eq 3
+        end
       end
 
       context 'with invalid list id' do
