@@ -213,7 +213,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.integer "diff_max_patch_bytes", default: 102400, null: false
     t.integer "archive_builds_in_seconds"
     t.string "commit_email_hostname"
-<<<<<<< .merge_file_NCccCp
   end
 
   create_table "approvals", force: :cascade do |t|
@@ -242,8 +241,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.integer "user_id", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-=======
->>>>>>> .merge_file_ceNjdO
   end
 
   add_index "approvers", ["target_id", "target_type"], name: "index_approvers_on_target_id_and_target_type", using: :btree
@@ -3298,12 +3295,8 @@ ActiveRecord::Schema.define(version: 20181107054254) do
   add_foreign_key "clusters_applications_ingress", "clusters", on_delete: :cascade
   add_foreign_key "clusters_applications_jupyter", "clusters", on_delete: :cascade
   add_foreign_key "clusters_applications_jupyter", "oauth_applications", on_delete: :nullify
-<<<<<<< .merge_file_NCccCp
-  add_foreign_key "clusters_applications_prometheus", "clusters", on_delete: :cascade
-=======
   add_foreign_key "clusters_applications_knative", "clusters", on_delete: :cascade
   add_foreign_key "clusters_applications_prometheus", "clusters", name: "fk_557e773639", on_delete: :cascade
->>>>>>> .merge_file_ceNjdO
   add_foreign_key "clusters_applications_runners", "ci_runners", column: "runner_id", name: "fk_02de2ded36", on_delete: :nullify
   add_foreign_key "clusters_applications_runners", "clusters", on_delete: :cascade
   add_foreign_key "clusters_kubernetes_namespaces", "cluster_projects", on_delete: :nullify
