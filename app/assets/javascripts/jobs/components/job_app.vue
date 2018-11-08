@@ -7,12 +7,9 @@ import { polyfillSticky } from '~/lib/utils/sticky';
 import bp from '~/breakpoints';
 import CiHeader from '~/vue_shared/components/header_ci_component.vue';
 import Callout from '~/vue_shared/components/callout.vue';
-<<<<<<< HEAD
 // ee-only start
 import SharedRunner from 'ee/jobs/components/shared_runner_limit_block.vue';
 // ee-only end
-=======
->>>>>>> upstream/master
 import Icon from '~/vue_shared/components/icon.vue';
 import createStore from '../store';
 import EmptyState from './empty_state.vue';
@@ -34,10 +31,7 @@ export default {
     EmptyState,
     EnvironmentsBlock,
     ErasedBlock,
-<<<<<<< HEAD
     GlLoadingIcon,
-=======
->>>>>>> upstream/master
     Icon,
     Log,
     LogTopBar,
@@ -260,28 +254,16 @@ export default {
           :erased-at="job.erased_at"
         />
 
-<<<<<<< HEAD
         <div
-=======
-        <div 
->>>>>>> upstream/master
           v-if="job.archived"
           ref="sticky"
           class="js-archived-job prepend-top-default archived-sticky sticky-top"
         >
-<<<<<<< HEAD
           <icon
             name="lock"
             class="align-text-bottom"
           />
 
-=======
-          <icon 
-            name="lock"
-            class="align-text-bottom"
-          />
-                
->>>>>>> upstream/master
           {{ __('This job is archived. Only the complete pipeline can be retried.') }}
         </div>
         <!--job log -->
