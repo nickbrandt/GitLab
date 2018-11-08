@@ -146,5 +146,23 @@ upload the maven packages:
 
 1. [Restart GitLab] for the changes to take effect.
 
+### Migrating local packages to object storage
+
+After [configuring the object storage](#using-object-storage), you may use the
+following task to migrate existing packages from the local storage to the remote one.
+The processing will be done in a background worker and requires **no downtime**.
+
+For Omnibus GitLab:
+
+```sh
+sudo gitlab-rake "gitlab:packages:migrate"
+```
+
+For installations from source:
+
+```bash
+RAILS_ENV=production sudo -u git -H bundle exec rake gitlab:packages:migrate
+```
+
 [reconfigure gitlab]: restart_gitlab.md#omnibus-gitlab-reconfigure "How to reconfigure Omnibus GitLab"
 [restart gitlab]: restart_gitlab.md#omnibus-gitlab-reconfigure "How to reconfigure Omnibus GitLab"
