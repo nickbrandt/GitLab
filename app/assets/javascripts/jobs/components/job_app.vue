@@ -38,7 +38,6 @@ export default {
     StuckBlock,
     SharedRunner,
     Sidebar,
-    GlLoadingIcon,
   },
   mixins: [delayedJobMixin],
   props: {
