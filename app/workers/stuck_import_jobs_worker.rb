@@ -10,6 +10,7 @@ class StuckImportJobsWorker
     import_state_without_jid_count = mark_import_states_without_jid_as_failed!
     import_state_with_jid_count = mark_import_states_with_jid_as_failed!
 
+<<<<<<< HEAD
     values = {
       projects_without_jid_count: import_state_without_jid_count,
       projects_with_jid_count: import_state_with_jid_count
@@ -20,6 +21,11 @@ class StuckImportJobsWorker
     stuck_import_jobs_worker_runs_counter.increment
     import_state_without_jid_metric.set({}, import_state_without_jid_count)
     import_state_with_jid_metric.set({}, import_state_with_jid_count)
+=======
+    Gitlab::Metrics.add_event(:stuck_import_jobs,
+                             projects_without_jid_count: import_state_without_jid_count,
+                             projects_with_jid_count: import_state_with_jid_count)
+>>>>>>> upstream/master
   end
 
   private

@@ -812,7 +812,7 @@ deploy to production:
 >   defined, GitLab will automatically trigger a stop action when the associated
 >   branch is deleted.
 
-Closing (stoping) environments can be achieved with the `on_stop` keyword defined under
+Closing (stopping) environments can be achieved with the `on_stop` keyword defined under
 `environment`. It declares a different job that runs in order to close
 the environment.
 
@@ -1510,7 +1510,7 @@ Possible values for `when` are:
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/22631) in GitLab 11.5.
 
 `parallel` allows you to configure how many instances of a job to run in
-parallel. This value has to be greater than or equal to two (2).
+parallel. This value has to be greater than or equal to two (2) and less or equal than 50.
 
 This creates N instances of the same job that run in parallel. They're named
 sequentially from `job_name 1/N` to `job_name N/N`.
