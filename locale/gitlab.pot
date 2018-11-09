@@ -9912,12 +9912,9 @@ msgstr ""
 msgid "remove due date"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "remove weight"
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "reply"
 msgid_plural "replies"
 msgstr[0] ""
