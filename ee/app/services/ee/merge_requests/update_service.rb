@@ -8,11 +8,11 @@ module EE
       override :execute
       def execute(merge_request)
         should_remove_old_approvers = params.delete(:remove_old_approvers)
-        old_approvers = merge_request.overall_approvers.to_a
+        old_approvers = merge_request.overall_approvers
 
         merge_request = super(merge_request)
 
-        new_approvers = merge_request.overall_approvers.to_a - old_approvers
+        new_approvers = merge_request.overall_approvers - old_approvers
 
         if new_approvers.any?
           todo_service.add_merge_request_approvers(merge_request, new_approvers)

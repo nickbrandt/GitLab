@@ -52,10 +52,18 @@ describe Gitlab::Geo::OauthSession do
   end
 
   describe '#get_oauth_state_return_to' do
-    subject { described_class.new(state: valid_state) }
-
     it 'returns return_to value' do
+      subject = described_class.new(state: valid_state)
+
       expect(subject.get_oauth_state_return_to).to eq(oauth_return_to)
+    end
+  end
+
+  describe '#get_oauth_state_return_to_full_path' do
+    it 'removes the domain from return_to value' do
+      subject = described_class.new(state: valid_state)
+
+      expect(subject.get_oauth_state_return_to_full_path).to eq('/oauth/geo/callback')
     end
   end
 
@@ -65,18 +73,41 @@ describe Gitlab::Geo::OauthSession do
     end
 
     it 'returns false when encryptation fails' do
-      allow_any_instance_of(OpenSSL::Cipher::AES).to receive(:final) { raise OpenSSL::OpenSSLError }
+      allow_any_instance_of(OpenSSL::Cipher::AES)
+        .to receive(:final) { raise OpenSSL::OpenSSLError }
+
       expect(subject.generate_logout_state).to be_falsey
     end
 
-    it 'returns a string with salt and encrypted access token colon separated' do
-      state = described_class.new(access_token: access_token).generate_logout_state
+    it 'returns a string with salt, encrypted access token, and return_to colon separated' do
+      subject = described_class.new(access_token: access_token, return_to: oauth_return_to)
+
+      state = subject.generate_logout_state
       expect(state).to be_a String
       expect(state).not_to be_blank
 
-      salt, encrypted = state.split(':', 2)
+      salt, encrypted, return_to = state.split(':', 3)
       expect(salt).not_to be_blank
       expect(encrypted).not_to be_blank
+      expect(return_to).not_to be_blank
+    end
+
+    it 'include a empty value for return_to into state when return_to param is not defined' do
+      subject = described_class.new(access_token: access_token)
+
+      state = subject.generate_logout_state
+      _, _, return_to = state.split(':', 3)
+
+      expect(return_to).to eq ''
+    end
+
+    it 'does not include the host from return_to param into into the state' do
+      subject = described_class.new(access_token: access_token, return_to: oauth_return_to)
+
+      state = subject.generate_logout_state
+      _, _, return_to = state.split(':', 3)
+
+      expect(return_to).to eq '/oauth/geo/callback'
     end
   end
 
@@ -87,9 +118,15 @@ describe Gitlab::Geo::OauthSession do
       expect(subject.extract_logout_token).to be_nil
     end
 
+    it 'returns nil when state is empty' do
+      subject.state = ''
+
+      expect(subject.extract_logout_token).to be_nil
+    end
+
     it 'returns false when decryptation fails' do
-      subject.generate_logout_state
-      allow_any_instance_of(OpenSSL::Cipher::AES).to receive(:final) { raise OpenSSL::OpenSSLError }
+      allow_any_instance_of(OpenSSL::Cipher::AES)
+        .to receive(:final) { raise OpenSSL::OpenSSLError }
 
       expect(subject.extract_logout_token).to be_falsey
     end

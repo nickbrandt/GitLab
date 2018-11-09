@@ -6,8 +6,6 @@
 module PolicyActor
   extend ActiveSupport::Concern
 
-  prepend EE::PolicyActor
-
   def blocked?
     false
   end
@@ -36,3 +34,5 @@ module PolicyActor
     false
   end
 end
+
+PolicyActor.prepend(EE::PolicyActor)

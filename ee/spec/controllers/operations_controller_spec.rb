@@ -53,7 +53,7 @@ describe OperationsController do
     let(:project) { create(:project, :repository) }
     let(:commit) { project.commit }
     let!(:environment) { create(:environment, name: 'production', project: project) }
-    let!(:deployment) { create(:deployment, environment: environment, sha: commit.id, created_at: now) }
+    let!(:deployment) { create(:deployment, :success, environment: environment, sha: commit.id, created_at: now) }
 
     it_behaves_like 'unlicensed', :get, :list
 
@@ -181,13 +181,13 @@ describe OperationsController do
       end
 
       it 'does not add invalid project ids' do
-        post :create, project_ids: [nil, -1, '-2']
+        post :create, project_ids: ['', -1, '-2']
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response).to match_schema('dashboard/operations/add', dir: 'ee')
         expect(json_response['added']).to be_empty
         expect(json_response['duplicate']).to be_empty
-        expect(json_response['invalid']).to contain_exactly(nil, '-1', '-2')
+        expect(json_response['invalid']).to contain_exactly('', '-1', '-2')
 
         user.reload
         expect(user.ops_dashboard_projects).to be_empty

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Admin::ProjectsController < Admin::ApplicationController
+  prepend EE::Admin::ProjectsController
   include MembersPresentation
 
   before_action :project, only: [:show, :transfer, :repository_check]

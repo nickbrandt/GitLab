@@ -115,3 +115,45 @@ Uses an [Edge NGram token filter](https://www.elastic.co/guide/en/elasticsearch/
 
 - Searches can have their own analyzers. Remember to check when editing analyzers
 - `Character` filters (as opposed to token filters) always replace the original character, so they're not a good choice as they can hinder exact searches
+
+## Troubleshooting
+
+### Getting "flood stage disk watermark [95%] exceeded"
+
+You might get an error such as
+
+```
+[2018-10-31T15:54:19,762][WARN ][o.e.c.r.a.DiskThresholdMonitor] [pval5Ct] 
+   flood stage disk watermark [95%] exceeded on 
+   [pval5Ct7SieH90t5MykM5w][pval5Ct][/usr/local/var/lib/elasticsearch/nodes/0] free: 56.2gb[3%], 
+   all indices on this node will be marked read-only
+```
+
+This is because you've exceeded the disk space threshold - it thinks you don't have enough disk space left, based on the default 95% threshold.  
+
+In addition, the `read_only_allow_delete` setting will be set to `true`.  It will block indexing, `forcemerge`, etc
+
+```
+curl "http://localhost:9200/gitlab-development/_settings?pretty"
+```
+
+Add this to your `elasticsearch.yml` file:
+
+```
+# turn off the disk allocator
+cluster.routing.allocation.disk.threshold_enabled: false 
+```
+
+_or_
+
+```
+# set your own limits
+cluster.routing.allocation.disk.threshold_enabled: true 
+cluster.routing.allocation.disk.watermark.flood_stage: 5gb   # ES 6.x only
+cluster.routing.allocation.disk.watermark.low: 15gb 
+cluster.routing.allocation.disk.watermark.high: 10gb
+```
+
+Restart ElasticSearch, and the `read_only_allow_delete` will clear on it's own.
+
+_from "Disk-based Shard Allocation | Elasticsearch Reference" [5.6](https://www.elastic.co/guide/en/elasticsearch/reference/5.6/disk-allocator.html#disk-allocator) and [6.x](https://www.elastic.co/guide/en/elasticsearch/reference/6.x/disk-allocator.html)_

@@ -18,8 +18,6 @@ class AddMissingGeoEvenLogIndexes < ActiveRecord::Migration
                            job_artifact_deleted_event_id
                            upload_deleted_event_id]
 
-  MISSING_FK_COLUMNS = %i[hashed_storage_attachments_event_id]
-
   disable_ddl_transaction!
 
   def up
@@ -35,22 +33,9 @@ class AddMissingGeoEvenLogIndexes < ActiveRecord::Migration
     NON_INDEXED_COLUMNS.each do |col|
       add_concurrent_index_not_null(:geo_event_log, col)
     end
-
-    # Add missing foreign keys
-    MISSING_FK_COLUMNS.each do |col|
-      add_concurrent_foreign_key(:geo_event_log,
-                                 foreign_table_name(col),
-                                 column: col,
-                                 on_delete: :cascade)
-    end
   end
 
   def down
-    # Remove missing foreign keys again
-    MISSING_FK_COLUMNS.each do |col|
-      remove_foreign_key(:geo_event_log, column: col)
-    end
-
     # Drop indexes that didn't exist before
     NON_INDEXED_COLUMNS.each do |col|
       without_foreign_key(:geo_event_log, col) do

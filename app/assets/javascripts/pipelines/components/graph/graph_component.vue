@@ -1,5 +1,6 @@
 <script>
 import _ from 'underscore';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 import StageColumnComponent from './stage_column_component.vue';
 import LinkedPipelinesColumn from 'ee/pipelines/components/graph/linked_pipelines_column.vue'; // eslint-disable-line import/order
 
@@ -7,6 +8,7 @@ export default {
   components: {
     LinkedPipelinesColumn,
     StageColumnComponent,
+    GlLoadingIcon,
   },
   props: {
     isLoading: {

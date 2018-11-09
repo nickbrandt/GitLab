@@ -1,8 +1,15 @@
 class Projects::ApproversController < Projects::ApplicationController
   before_action :authorize_for_subject!
 
+  # @deprecated
   def destroy
     subject.approvers.find(params[:id]).destroy
+
+    redirect_back_or_default(default: { action: 'index' })
+  end
+
+  def destroy_via_user_id
+    subject.approvers.find_by_user_id(params[:user_id]).destroy
 
     redirect_back_or_default(default: { action: 'index' })
   end

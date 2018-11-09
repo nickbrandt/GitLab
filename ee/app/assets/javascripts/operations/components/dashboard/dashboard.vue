@@ -1,5 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 import DashboardProject from './project.vue';
 import ProjectSearch from './project_search.vue';
 
@@ -7,6 +8,7 @@ export default {
   components: {
     DashboardProject,
     ProjectSearch,
+    GlLoadingIcon,
   },
   props: {
     addPath: {
@@ -18,6 +20,10 @@ export default {
       required: true,
     },
     emptyDashboardSvgPath: {
+      type: String,
+      required: true,
+    },
+    emptyDashboardHelpPath: {
       type: String,
       required: true,
     },
@@ -93,10 +99,18 @@ export default {
           {{ s__('OperationsDashboard|Add a project to the dashboard') }}
         </h4>
         <div class="col-12 d-flex justify-content-center">
-          <span class="js-sub-title mw-460 text-tertiary">
+          <span class="js-sub-title mw-460 text-tertiary text-left">
             {{ s__(`OperationsDashboard|The operations dashboard provides a summary of each project's
-              operational health, including pipeline and alert status.`) }}
+              operational health, including pipeline and alert statuses.`) }}
           </span>
+        </div>
+        <div class="col-12">
+          <a
+            :href="emptyDashboardHelpPath"
+            class="js-documentation-link btn btn-primary prepend-top-default append-bottom-default"
+          >
+            {{ __('View documentation') }}
+          </a>
         </div>
       </div>
       <gl-loading-icon

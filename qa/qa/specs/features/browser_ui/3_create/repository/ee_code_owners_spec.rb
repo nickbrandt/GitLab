@@ -19,19 +19,17 @@ module QA
       before do
         # Add two new users to a project as members
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
+        Page::Main::Login.perform(&:sign_in_using_credentials)
 
-        @user = Factory::Resource::User.fabricate!
-        @user2 = Factory::Resource::User.fabricate!
+        @user = Resource::User.fabricate!
+        @user2 = Resource::User.fabricate!
 
-        Page::Main::Menu.perform { |menu| menu.sign_out }
-        Page::Main::Login.perform { |login_page| login_page.sign_in_using_credentials }
-
-        @project = Factory::Resource::Project.fabricate! do |project|
+        @project = Resource::Project.fabricate! do |project|
           project.name = "codeowners"
         end
         @project.visit!
 
-        Page::Project::Menu.perform { |menu| menu.click_members_settings }
+        Page::Project::Menu.perform(&:click_members_settings)
         Page::Project::Settings::Members.perform do |members_page|
           members_page.add_member(@user.username)
           members_page.add_member(@user2.username)
@@ -50,7 +48,7 @@ module QA
         }
 
         # Push CODEOWNERS and test files to the project
-        Factory::Repository::ProjectPush.fabricate! do |push|
+        Resource::Repository::ProjectPush.fabricate! do |push|
           push.project = @project
           push.files = files
           push.commit_message = 'Add CODEOWNERS and test files'

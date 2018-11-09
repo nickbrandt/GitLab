@@ -64,4 +64,10 @@ export default {
       state.drafts.splice(index, 1, processDraft(data));
     }
   },
+  [types.OPEN_REVIEW_DROPDOWN](state) {
+    state.showPreviewDropdown = true;
+  },
+  [types.CLOSE_REVIEW_DROPDOWN](state) {
+    state.showPreviewDropdown = false;
+  },
 };

@@ -1,10 +1,14 @@
 <script>
 import MilestoneSelect from '~/milestone_select';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 
 const ANY_MILESTONE = 'Any Milestone';
 const NO_MILESTONE = 'No Milestone';
 
 export default {
+  components: {
+    GlLoadingIcon,
+  },
   props: {
     board: {
       type: Object,

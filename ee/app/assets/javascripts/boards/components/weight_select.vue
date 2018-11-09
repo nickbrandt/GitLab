@@ -2,11 +2,15 @@
 /* eslint-disable vue/require-default-prop */
 
 import WeightSelect from 'ee/weight_select';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 
 const ANY_WEIGHT = 'Any Weight';
 const NO_WEIGHT = 'No Weight';
 
 export default {
+  components: {
+    GlLoadingIcon,
+  },
   props: {
     board: {
       type: Object,

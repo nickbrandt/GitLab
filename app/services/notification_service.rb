@@ -16,8 +16,6 @@
 #   NotificationService.new.async.new_issue(issue, current_user)
 #
 class NotificationService
-  prepend EE::NotificationService
-
   class Async
     attr_reader :parent
     delegate :respond_to_missing, to: :parent
@@ -131,6 +129,14 @@ class NotificationService
     relabeled_resource_email(issue, added_labels, current_user, :relabeled_issue_email)
   end
 
+  def removed_milestone_issue(issue, current_user)
+    removed_milestone_resource_email(issue, current_user, :removed_milestone_issue_email)
+  end
+
+  def changed_milestone_issue(issue, new_milestone, current_user)
+    changed_milestone_resource_email(issue, new_milestone, current_user, :changed_milestone_issue_email)
+  end
+
   # When create a merge request we should send an email to:
   #
   #  * mr author
@@ -140,9 +146,6 @@ class NotificationService
   #  * users with custom level checked with "new merge request"
   #
   # In EE, approvers of the merge request are also included
-  #
-  # In EE, approvers of the merge request are also included
-  #
   def new_merge_request(merge_request, current_user)
     new_resource_email(merge_request, :new_merge_request_email)
   end
@@ -210,6 +213,14 @@ class NotificationService
   #
   def relabeled_merge_request(merge_request, added_labels, current_user)
     relabeled_resource_email(merge_request, added_labels, current_user, :relabeled_merge_request_email)
+  end
+
+  def removed_milestone_merge_request(merge_request, current_user)
+    removed_milestone_resource_email(merge_request, current_user, :removed_milestone_merge_request_email)
+  end
+
+  def changed_milestone_merge_request(merge_request, new_milestone, current_user)
+    changed_milestone_resource_email(merge_request, new_milestone, current_user, :changed_milestone_merge_request_email)
   end
 
   def close_mr(merge_request, current_user)
@@ -504,6 +515,30 @@ class NotificationService
     end
   end
 
+  def removed_milestone_resource_email(target, current_user, method)
+    recipients = NotificationRecipientService.build_recipients(
+      target,
+      current_user,
+      action: 'removed_milestone'
+    )
+
+    recipients.each do |recipient|
+      mailer.send(method, recipient.user.id, target.id, current_user.id).deliver_later
+    end
+  end
+
+  def changed_milestone_resource_email(target, milestone, current_user, method)
+    recipients = NotificationRecipientService.build_recipients(
+      target,
+      current_user,
+      action: 'changed_milestone'
+    )
+
+    recipients.each do |recipient|
+      mailer.send(method, recipient.user.id, target.id, milestone, current_user.id).deliver_later
+    end
+  end
+
   def reopen_resource_email(target, current_user, method, status)
     recipients = NotificationRecipientService.build_recipients(target, current_user, action: "reopen")
 
@@ -552,3 +587,5 @@ class NotificationService
     member.source.respond_to?(:group) && member.source.group
   end
 end
+
+NotificationService.prepend(EE::NotificationService)

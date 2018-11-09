@@ -2,8 +2,6 @@
 
 class ProjectPolicy < BasePolicy
   extend ClassMethods
-  prepend EE::ProjectPolicy
-
   READONLY_FEATURES_WHEN_ARCHIVED = %i[
     issue
     list
@@ -442,3 +440,5 @@ class ProjectPolicy < BasePolicy
     @subject
   end
 end
+
+ProjectPolicy.prepend(EE::ProjectPolicy)

@@ -6,8 +6,6 @@ class GroupsController < Groups::ApplicationController
   include MergeRequestsAction
   include ParamsBackwardCompatibility
   include PreviewMarkdown
-  prepend EE::GroupsController
-
   respond_to :html
 
   before_action :authenticate_user!, only: [:new, :create]
@@ -199,3 +197,5 @@ class GroupsController < Groups::ApplicationController
     url_for(safe_params)
   end
 end
+
+GroupsController.prepend(EE::GroupsController)

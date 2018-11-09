@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class NotesFinder
-  prepend EE::NotesFinder
-
   FETCH_OVERLAP = 5.seconds
 
   # Used to filter Notes
@@ -143,3 +141,5 @@ class NotesFinder
     @params[:notes_filter].present?
   end
 end
+
+NotesFinder.prepend(EE::NotesFinder)

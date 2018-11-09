@@ -14,6 +14,18 @@ describe MergeRequest do
     it { is_expected.to have_many(:approved_by_users) }
   end
 
+  describe '#code_owners' do
+    subject(:merge_request) { build(:merge_request) }
+    let(:owners) { [double(:owner)] }
+
+    it 'returns code owners, frozen' do
+      allow(::Gitlab::CodeOwners).to receive(:for_merge_request).with(subject).and_return(owners)
+
+      expect(subject.code_owners).to eq(owners)
+      expect(subject.code_owners).to be_frozen
+    end
+  end
+
   describe '#approvals_before_merge' do
     where(:license_value, :db_value, :expected) do
       true  | 5   | 5
@@ -39,77 +51,5 @@ describe MergeRequest do
     let!(:pipeline) { create(:ci_empty_pipeline, project: subject.project, sha: subject.diff_base_sha) }
 
     it { expect(subject.base_pipeline).to eq(pipeline) }
-  end
-
-  describe '#base_performance_artifact' do
-    before do
-      allow(subject.base_pipeline).to receive(:performance_artifact)
-        .and_return(1)
-    end
-
-    it 'delegates to merge request diff' do
-      expect(subject.base_performance_artifact).to eq(1)
-    end
-  end
-
-  describe '#head_performance_artifact' do
-    before do
-      allow(subject.head_pipeline).to receive(:performance_artifact)
-        .and_return(1)
-    end
-
-    it 'delegates to merge request diff' do
-      expect(subject.head_performance_artifact).to eq(1)
-    end
-  end
-
-  describe '#base_license_management_artifact' do
-    before do
-      allow(subject.base_pipeline).to receive(:license_management_artifact)
-        .and_return(1)
-    end
-
-    it 'delegates to merge request diff' do
-      expect(subject.base_license_management_artifact).to eq(1)
-    end
-  end
-
-  describe '#head_license_management_artifact' do
-    before do
-      allow(subject.head_pipeline).to receive(:license_management_artifact)
-        .and_return(1)
-    end
-
-    it 'delegates to merge request diff' do
-      expect(subject.head_license_management_artifact).to eq(1)
-    end
-  end
-
-  describe '#expose_performance_data?' do
-    context 'with performance data' do
-      let(:pipeline) { double(expose_performance_data?: true) }
-
-      before do
-        allow(subject).to receive(:head_pipeline).and_return(pipeline)
-        allow(subject).to receive(:base_pipeline).and_return(pipeline)
-      end
-
-      it { expect(subject.expose_performance_data?).to be_truthy }
-    end
-
-    context 'without performance data' do
-      it { expect(subject.expose_performance_data?).to be_falsey }
-    end
-  end
-
-  describe '#expose_license_management_data?' do
-    before do
-      allow(subject.head_pipeline).to receive(:expose_license_management_data?)
-        .and_return(1)
-    end
-
-    it 'delegates to merge request diff' do
-      expect(subject.expose_license_management_data?).to eq(1)
-    end
   end
 end

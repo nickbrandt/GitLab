@@ -309,4 +309,115 @@ describe('Batch comments store actions', () => {
         .catch(done.fail);
     });
   });
+
+  describe('toggleReviewDropdown', () => {
+    it('dispatches openReviewDropdown', done => {
+      testAction(
+        actions.toggleReviewDropdown,
+        null,
+        { showPreviewDropdown: false },
+        [],
+        [{ type: 'openReviewDropdown' }],
+        done,
+      );
+    });
+
+    it('dispatches closeReviewDropdown when showPreviewDropdown is true', done => {
+      testAction(
+        actions.toggleReviewDropdown,
+        null,
+        { showPreviewDropdown: true },
+        [],
+        [{ type: 'closeReviewDropdown' }],
+        done,
+      );
+    });
+  });
+
+  describe('openReviewDropdown', () => {
+    it('commits OPEN_REVIEW_DROPDOWN', done => {
+      testAction(
+        actions.openReviewDropdown,
+        null,
+        null,
+        [{ type: 'OPEN_REVIEW_DROPDOWN' }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('closeReviewDropdown', () => {
+    it('commits CLOSE_REVIEW_DROPDOWN', done => {
+      testAction(
+        actions.closeReviewDropdown,
+        null,
+        null,
+        [{ type: 'CLOSE_REVIEW_DROPDOWN' }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('expandAllDiscussions', () => {
+    it('dispatches expandDiscussion for all drafts', done => {
+      const state = {
+        drafts: [
+          {
+            discussion_id: '1',
+          },
+        ],
+      };
+
+      testAction(
+        actions.expandAllDiscussions,
+        null,
+        state,
+        [],
+        [
+          {
+            type: 'expandDiscussion',
+            payload: { discussionId: '1' },
+          },
+        ],
+        done,
+      );
+    });
+  });
+
+  describe('scrollToDraft', () => {
+    beforeEach(() => {
+      window.mrTabs = {
+        currentAction: 'notes',
+        tabShown: jasmine.createSpy('tabShown'),
+      };
+    });
+
+    it('scrolls to draft item', () => {
+      const dispatch = jasmine.createSpy('dispatch');
+      const rootGetters = {
+        getDiscussion: () => ({
+          id: '1',
+          diff_discussion: true,
+        }),
+      };
+      const draft = {
+        discussion_id: '1',
+        id: '2',
+      };
+
+      actions.scrollToDraft({ dispatch, rootGetters }, draft);
+
+      expect(dispatch.calls.argsFor(0)).toEqual(['closeReviewDropdown']);
+
+      expect(dispatch.calls.argsFor(1)).toEqual([
+        'expandDiscussion',
+        { discussionId: '1' },
+        { root: true },
+      ]);
+
+      expect(window.mrTabs.tabShown).toHaveBeenCalledWith('diffs');
+    });
+  });
 });

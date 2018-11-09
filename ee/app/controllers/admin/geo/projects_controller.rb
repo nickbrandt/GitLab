@@ -3,6 +3,7 @@
 class Admin::Geo::ProjectsController < Admin::ApplicationController
   before_action :check_license
   before_action :load_registry, except: [:index]
+  before_action :limited_actions_message!
 
   helper ::EE::GeoHelper
 
@@ -53,6 +54,18 @@ class Admin::Geo::ProjectsController < Admin::ApplicationController
     @registry.flag_repository_for_redownload!
 
     redirect_back_or_admin_geo_projects(notice: s_('Geo|%{name} is scheduled for forced re-download') % { name: @registry.project.full_name })
+  end
+
+  def recheck_all
+    Geo::Batch::ProjectRegistrySchedulerWorker.perform_async(:recheck_repositories)
+
+    redirect_back_or_admin_geo_projects(notice: s_('Geo|All projects are being scheduled for re-check'))
+  end
+
+  def resync_all
+    Geo::Batch::ProjectRegistrySchedulerWorker.perform_async(:resync_repositories)
+
+    redirect_back_or_admin_geo_projects(notice: s_('Geo|All projects are being scheduled for re-sync'))
   end
 
   private

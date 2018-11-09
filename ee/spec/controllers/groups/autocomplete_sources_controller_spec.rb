@@ -1,4 +1,5 @@
-# frozen_string_literal: tru
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Groups::AutocompleteSourcesController do

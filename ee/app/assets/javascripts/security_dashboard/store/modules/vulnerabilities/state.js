@@ -1,9 +1,10 @@
 import { s__ } from '~/locale';
 
 export default () => ({
-  hasError: false,
   isLoadingVulnerabilities: true,
+  errorLoadingVulnerabilities: false,
   isLoadingVulnerabilitiesCount: true,
+  errorLoadingVulnerabilitiesCount: false,
   pageInfo: {},
   vulnerabilities: [],
   vulnerabilitiesCount: {},

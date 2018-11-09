@@ -54,11 +54,50 @@
     @include build-trace();
   }
 
+  .archived-sticky {
+    top: $header-height;
+    border-radius: 2px 2px 0 0;
+    color: $orange-600;
+    background-color: $orange-100;
+    border: 1px solid $border-gray-normal;
+    border-bottom: 0;
+    padding: 3px 12px;
+    margin: auto;
+    align-items: center;
+
+    .with-performance-bar & {
+      top: $header-height + $performance-bar-height;
+    }
+  }
+
   .top-bar {
     @include build-trace-top-bar(35px);
 
-    &.sidebar-expanded {
-      margin-right: calc(#{$gutter-width} - 16px);
+    &.has-archived-block {
+      top: $header-height + $performance-bar-height + 28px;
+    }
+
+    &.affix {
+      top: $header-height;
+
+      // with sidebar
+      &.sidebar-expanded {
+        right: 306px;
+        left: 16px;
+      }
+
+      // without sidebar
+      &.sidebar-collapsed {
+        right: 16px;
+        left: 16px;
+      }
+    }
+
+    &.affix-top {
+      position: absolute;
+      right: 0;
+      left: 0;
+      top: 0;
     }
 
     .truncated-info {
@@ -74,7 +113,7 @@
     }
 
     .controllers {
-      @include build-controllers(15px, center, false, 0);
+      @include build-controllers(15px, center, false, 0, inline, 0);
     }
   }
 

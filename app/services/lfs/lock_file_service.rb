@@ -2,8 +2,6 @@
 
 module Lfs
   class LockFileService < BaseService
-    prepend EE::Lfs::LockFileService
-
     def execute
       unless can?(current_user, :push_code, project)
         raise Gitlab::GitAccess::UnauthorizedError, 'You have no permissions'
@@ -43,3 +41,5 @@ module Lfs
     end
   end
 end
+
+Lfs::LockFileService.prepend(EE::Lfs::LockFileService)

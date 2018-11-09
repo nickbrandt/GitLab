@@ -82,8 +82,9 @@ module EE
       end
     end
 
-    def all_vulnerabilities
-      Vulnerabilities::Occurrence.where(project: all_projects)
+    def latest_vulnerabilities
+      Vulnerabilities::Occurrence
+        .for_pipelines(all_pipelines.with_vulnerabilities.latest_successful_ids_per_project)
     end
 
     def human_ldap_access

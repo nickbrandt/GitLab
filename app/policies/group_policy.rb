@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class GroupPolicy < BasePolicy
-  prepend EE::GroupPolicy
-
   desc "Group is public"
   with_options scope: :subject, score: 0
   condition(:public_group) { @subject.public? }
@@ -110,3 +108,5 @@ class GroupPolicy < BasePolicy
     @access_level ||= @subject.max_member_access_for_user(@user)
   end
 end
+
+GroupPolicy.prepend(EE::GroupPolicy)

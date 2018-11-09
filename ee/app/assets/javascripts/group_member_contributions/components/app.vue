@@ -6,12 +6,14 @@ import COLUMNS from '../constants';
 
 import TableHeader from './table_header.vue';
 import TableBody from './table_body.vue';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 
 export default {
   columns: COLUMNS,
   components: {
     TableHeader,
     TableBody,
+    GlLoadingIcon,
   },
   props: {
     store: {

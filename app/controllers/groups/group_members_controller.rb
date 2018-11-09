@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Groups::GroupMembersController < Groups::ApplicationController
-  prepend EE::Groups::GroupMembersController
-
   include MembershipActions
   include MembersPresentation
   include SortingHelper
@@ -45,3 +43,5 @@ class Groups::GroupMembersController < Groups::ApplicationController
   # MembershipActions concern
   alias_method :membershipable, :group
 end
+
+Groups::GroupMembersController.prepend(EE::Groups::GroupMembersController)

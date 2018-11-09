@@ -19,7 +19,8 @@ module EE
           return download_project_job_artifacts_path(
             job_artifact.project,
             job_artifact.job,
-            file_type: file_type)
+            file_type: file_type,
+            proxy: true)
         end
 
         if (build_artifact = legacy_report_artifact_for_file_type(file_type)) &&
