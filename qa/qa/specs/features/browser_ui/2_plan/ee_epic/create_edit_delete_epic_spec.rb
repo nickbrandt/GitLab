@@ -46,6 +46,7 @@ module QA
         issue.visit!
 
         Page::Project::Issue::Show.perform do |show_page|
+          show_page.select_all_activities_filter
           show_page.comment("/epic #{epic.web_url}")
           show_page.comment("/remove_epic")
           expect(show_page).to have_content(/removed from epic/)
