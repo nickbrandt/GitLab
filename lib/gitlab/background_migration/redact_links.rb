@@ -6,11 +6,8 @@ require_relative 'redact_links/redactable'
 module Gitlab
   module BackgroundMigration
     class RedactLinks
-<<<<<<< HEAD
       prepend EE::Gitlab::BackgroundMigration::RedactLinks
 
-=======
->>>>>>> upstream/master
       class Note < ActiveRecord::Base
         include EachBatch
         include ::Gitlab::BackgroundMigration::RedactLinks::Redactable
