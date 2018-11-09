@@ -227,7 +227,7 @@ export default {
       <ul class="dropdown-menu more-actions-dropdown dropdown-open-left">
         <li v-if="canReportAsAbuse">
           <a :href="reportAbusePath">
-            Report as abuse
+            {{ __('Report abuse to GitLab') }}
           </a>
         </li>
         <li v-if="noteUrl">
@@ -236,7 +236,7 @@ export default {
             type="button"
             class="btn-default btn-transparent js-btn-copy-note-link"
           >
-            Copy link
+            {{ __('Copy link') }}
           </button>
         </li>
         <li v-if="canEdit">
@@ -245,7 +245,7 @@ export default {
             type="button"
             @click.prevent="onDelete">
             <span class="text-danger">
-              Delete comment
+              {{ __('Delete comment') }}
             </span>
           </button>
         </li>
