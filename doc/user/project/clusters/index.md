@@ -402,7 +402,6 @@ NOTE: **NOTE:**
 Prior to GitLab 11.5, `KUBE_TOKEN` was the Kubernetes token of the main
 service account of the cluster integration.
 
-<<<<<<< HEAD
 ## Monitoring your Kubernetes cluster **[ULTIMATE]**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/4701) in [GitLab Ultimate][ee] 10.6.
@@ -411,8 +410,6 @@ When [Prometheus is deployed](#installing-applications), GitLab will automatical
 
 ![Cluster Monitoring](img/k8s_cluster_monitoring.png)
 
-=======
->>>>>>> upstream/master
 ## Enabling or disabling the Kubernetes cluster integration
 
 After you have successfully added your cluster information, you can enable the
