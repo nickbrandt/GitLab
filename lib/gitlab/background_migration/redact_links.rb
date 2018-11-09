@@ -3,7 +3,7 @@
 
 module Gitlab
   module BackgroundMigration
-    module RedactLinks
+    class RedactLinks
       prepend EE::Gitlab::BackgroundMigration::RedactLinks
 
       module Redactable
