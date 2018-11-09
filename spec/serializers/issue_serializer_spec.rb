@@ -23,12 +23,9 @@ describe IssueSerializer do
     before do
       create(:epic_issue, issue: resource)
     end
-<<<<<<< HEAD
 
     it 'matches sidebar issue json schema' do
       expect(json_entity).to match_schema('entities/issue_sidebar', strict: true)
     end
-=======
->>>>>>> upstream/master
   end
 end
