@@ -178,18 +178,9 @@ module ApplicationHelper
     without = options.delete(:without)
     add_label = options.delete(:label)
 
-    exist_opts = {
-      state: params[:state],
-      scope: params[:scope],
-      milestone_title: params[:milestone_title],
-      assignee_username: params[:assignee_username],
-      author_username: params[:author_username],
-      search: params[:search],
-      label_name: params[:label_name],
-      my_reaction_emoji: params[:my_reaction_emoji],
-      wip: params[:wip],
-      weight: params[:weight]
-    }
+    exist_opts = filter_bar_params.merge(
+      params.slice(:state, :scope)
+    )
 
     options = exist_opts.merge(options)
 
@@ -204,6 +195,19 @@ module ApplicationHelper
     params.delete(:label_name) unless add_label
 
     "#{request.path}?#{params.to_param}"
+  end
+
+  def filter_bar_params
+    params.slice(
+      :assignee_id,
+      :assignee_username,
+      :author_username,
+      :label_name,
+      :milestone_title,
+      :my_reaction_emoji,
+      :wip,
+      :search
+    )
   end
 
   def outdated_browser?
