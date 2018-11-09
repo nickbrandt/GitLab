@@ -13,7 +13,7 @@ describe MergeRequestApproverPresenter do
     ]
   end
   let(:approvals_required) { 10 }
-  let(:enable_code_owner_as_approver_suggestion) { true }
+  let(:enable_code_owners) { true }
 
   let(:author) { merge_request.author }
   let(:owner_a) { build(:user) }
@@ -31,7 +31,7 @@ describe MergeRequestApproverPresenter do
 
     allow(merge_request).to receive(:approvals_required).and_return(approvals_required)
 
-    stub_licensed_features(code_owner_as_approver_suggestion: enable_code_owner_as_approver_suggestion)
+    stub_licensed_features(code_owners: enable_code_owners)
   end
 
   def expect_code_owner_loader_init
@@ -111,8 +111,8 @@ describe MergeRequestApproverPresenter do
         end
       end
 
-      context 'code_owner_as_approver_suggestion disabled' do
-        let(:enable_code_owner_as_approver_suggestion) { false }
+      context 'code_owner disabled' do
+        let(:enable_code_owners) { false }
 
         before do
           project.add_developer(committer_a)
@@ -198,7 +198,7 @@ describe MergeRequestApproverPresenter do
     end
 
     context 'when code_owner feature is disabled' do
-      let(:enable_code_owner_as_approver_suggestion) { false }
+      let(:enable_code_owners) { false }
 
       it 'returns false' do
         expect(subject.show_code_owner_tips?).to eq(false)

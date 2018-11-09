@@ -203,6 +203,6 @@ Approvers are suggested for merge requests based on the previous authors of the 
 
 ### CODEOWNERS file
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/7437>) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.4.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/7437) in [GitLab Starter](https://about.gitlab.com/pricing/) 11.4.
 
 If the [CODEOWNERS](../code_owners.md) file is present in the target branch, more precise suggestions are provided based on its rules.
