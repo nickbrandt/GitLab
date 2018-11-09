@@ -11,7 +11,7 @@ class IssueBoardEntity < Grape::Entity
   expose :due_date
   expose :project_id
   expose :relative_position
-  expose :weight, if: -> (instance, _) { instance.respond_to?(:weight) }
+  expose :weight, if: -> (*) { respond_to?(:weight) }
   expose :time_estimate
 
   expose :project do |issue|
