@@ -172,6 +172,10 @@ describe('vulnerabilities module mutations', () => {
         expect(state.modal.data.confidence.value).toEqual(vulnerability.confidence);
       });
 
+      it('should set the modal class', () => {
+        expect(state.modal.data.className.value).toEqual(vulnerability.location.class);
+      });
+
       it('should set the modal solution', () => {
         expect(state.modal.data.solution.value).toEqual(vulnerability.solution);
       });
@@ -211,6 +215,20 @@ describe('vulnerabilities module mutations', () => {
         mutations[types.SET_MODAL_DATA](state, payload);
 
         expect(state.modal.vulnerability.hasIssue).toEqual(true);
+      });
+
+      it('should nullify the modal links', () => {
+        const payload = { vulnerability: { ...vulnerability, links: [] } };
+        mutations[types.SET_MODAL_DATA](state, payload);
+
+        expect(state.modal.data.links.value).toEqual(null);
+      });
+
+      it('should nullify the instances', () => {
+        const payload = { vulnerability: { ...vulnerability, instances: [] } };
+        mutations[types.SET_MODAL_DATA](state, payload);
+
+        expect(state.modal.data.instances.value).toEqual(null);
       });
     });
   });
