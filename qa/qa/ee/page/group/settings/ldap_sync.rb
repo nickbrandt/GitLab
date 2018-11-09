@@ -6,7 +6,7 @@ module QA
       module Group
         module Settings
           class LDAPSync < ::QA::Page::Base
-            include QA::Page::Component::Select2Search
+            include QA::Page::Component::Select2
 
             view 'ee/app/views/ldap_group_links/_form.html.haml' do
               element :ldap_group_cn_select
