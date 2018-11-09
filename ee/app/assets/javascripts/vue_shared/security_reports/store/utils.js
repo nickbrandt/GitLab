@@ -31,7 +31,7 @@ function enrichVulnerabilityWithfeedback(vulnerability, feedback = []) {
         return {
           ...vuln,
           hasIssue: true,
-          issueFeedback: fb,
+          issue_feedback: fb,
         };
       }
       return vuln;
