@@ -458,6 +458,7 @@ retrieve-tests-metadata:
 .ee-specific-check: &ee-specific-check
   <<: *dedicated-runner
   stage: test
+  dependencies: []
   before_script: []
   cache: {}
   retry: 0
