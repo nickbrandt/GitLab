@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
-require 'airborne'
 require 'active_support/core_ext/object/deep_dup'
 require 'capybara/dsl'
 
 module QA
   module Resource
     module ApiFabricator
-      include Airborne
       include Capybara::DSL
 
       HTTP_STATUS_OK = 200
@@ -56,8 +54,10 @@ module QA
       end
 
       def api_get_from(get_path)
-        url = Runtime::API::Request.new(api_client, get_path).url
-        response = get(url)
+        response = RestClient::Request.execute(
+          method: :get,
+          url: Runtime::API::Request.new(api_client, get_path).url,
+          verify_ssl: false)
 
         unless response.code == HTTP_STATUS_OK
           raise ResourceNotFoundError, "Resource at #{url} could not be found (#{response.code}): `#{response}`."
@@ -67,9 +67,11 @@ module QA
       end
 
       def api_post
-        response = post(
-          Runtime::API::Request.new(api_client, api_post_path).url,
-          api_post_body)
+        response = RestClient::Request.execute(
+          method: :post,
+          url: Runtime::API::Request.new(api_client, api_post_path).url,
+          payload: api_post_body,
+          verify_ssl: false)
 
         unless response.code == HTTP_STATUS_CREATED
           raise ResourceFabricationFailedError, "Fabrication of #{self.class.name} using the API failed (#{response.code}) with `#{response}`."

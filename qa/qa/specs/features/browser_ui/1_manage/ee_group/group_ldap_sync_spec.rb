@@ -1,116 +1,112 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Manage' do
   context 'Manage', :orchestrated, :ldap_tls, :ldap_no_tls do
-      it 'Has LDAP user synced using group cn method' do
-        users = [
-            {
-                name: 'ENG User 2',
-                username: 'enguser2',
-                email: 'enguser2@example.org',
-                provider: 'ldapmain',
-                extern_uid: 'uid=enguser2,ou=people,ou=global groups,dc=example,dc=org'
-            },
-            {
-                name: 'ENG User 3',
-                username: 'enguser3',
-                email: 'enguser3@example.org',
-                provider: 'ldapmain',
-                extern_uid: 'uid=enguser3,ou=people,ou=global groups,dc=example,dc=org'
-            }
-        ]
+    it 'Has LDAP user synced using group cn method' do
+      users = [
+          {
+              name: 'ENG User 2',
+              username: 'enguser2',
+              email: 'enguser2@example.org',
+              provider: 'ldapmain',
+              extern_uid: 'uid=enguser2,ou=people,ou=global groups,dc=example,dc=org'
+          },
+          {
+              name: 'ENG User 3',
+              username: 'enguser3',
+              email: 'enguser3@example.org',
+              provider: 'ldapmain',
+              extern_uid: 'uid=enguser3,ou=people,ou=global groups,dc=example,dc=org'
+          }
+      ]
 
-        create_users_via_api(users)
+      create_users_via_api(users)
 
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        create_sandbox_group_with_user(user: 'enguser1', group_name: 'Synched-engineering-group')
+      Runtime::Browser.visit(:gitlab, Page::Main::Login)
+      create_sandbox_group_with_user(user: 'enguser1', group_name: 'Synched-engineering-group')
 
-        EE::Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
+      EE::Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
 
-        EE::Page::Group::Settings::LDAPSync.perform do |page|
-          page.set_sync_method('LDAP Group cn')
-          page.set_group_cn('Engineering')
-          page.click_add_sync_button
-        end
-
-        EE::Page::Group::Menu.perform(&:go_to_members)
-
-        verify_users_synched(['ENG User 2', 'ENG User 3'])
+      EE::Page::Group::Settings::LDAPSync.perform do |page|
+        page.set_sync_method('LDAP Group cn')
+        page.set_group_cn('Engineering')
+        page.click_add_sync_button
       end
 
-      it 'Has LDAP user synced using user filter method' do
-        users = [
-            {
-                name: 'HR User 2',
-                username: 'hruser2',
-                email: 'hruser2@example.org',
-                provider: 'ldapmain',
-                extern_uid: 'uid=hruser2,ou=people,ou=global groups,dc=example,dc=org'
-            },
-            {
-                name: 'HR User 3',
-                username: 'hruser3',
-                email: 'hruser3@example.org',
-                provider: 'ldapmain',
-                extern_uid: 'uid=hruser3,ou=people,ou=global groups,dc=example,dc=org'
-            }
-        ]
+      EE::Page::Group::Menu.perform(&:go_to_members)
 
-        create_users_via_api(users)
+      verify_users_synched(['ENG User 2', 'ENG User 3'])
+    end
 
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
+    it 'Has LDAP user synced using user filter method' do
+      users = [
+          {
+              name: 'HR User 2',
+              username: 'hruser2',
+              email: 'hruser2@example.org',
+              provider: 'ldapmain',
+              extern_uid: 'uid=hruser2,ou=people,ou=global groups,dc=example,dc=org'
+          },
+          {
+              name: 'HR User 3',
+              username: 'hruser3',
+              email: 'hruser3@example.org',
+              provider: 'ldapmain',
+              extern_uid: 'uid=hruser3,ou=people,ou=global groups,dc=example,dc=org'
+          }
+      ]
 
-        create_sandbox_group_with_user(user: 'hruser1', group_name: 'Synched-human-resources-group')
+      create_users_via_api(users)
 
-        EE::Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
+      Runtime::Browser.visit(:gitlab, Page::Main::Login)
 
-        EE::Page::Group::Settings::LDAPSync.perform do |page|
-          page.set_user_filter('(&(objectClass=person)(cn=HR*))')
-          page.click_add_sync_button
-        end
+      create_sandbox_group_with_user(user: 'hruser1', group_name: 'Synched-human-resources-group')
 
-        EE::Page::Group::Menu.perform(&:go_to_members)
+      EE::Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
 
-        verify_users_synched(['HR User 2', 'HR User 3'])
+      EE::Page::Group::Settings::LDAPSync.perform do |page|
+        page.set_user_filter('(&(objectClass=person)(cn=HR*))')
+        page.click_add_sync_button
       end
 
-      def create_users_via_api(users)
-        users.each do |user|
-          Resource::User.fabricate_via_api! do |resource|
-            resource.username = user[:username]
-            resource.name = user[:name]
-            resource.email = user[:email]
-            resource.extern_uid = user[:extern_uid]
-            resource.provider = user[:provider]
-          end
-        end
+      EE::Page::Group::Menu.perform(&:go_to_members)
 
+      verify_users_synched(['HR User 2', 'HR User 3'])
+    end
 
-      end
-
-      def create_sandbox_group_with_user(user: nil, group_name: nil)
-        Page::Main::Login.perform do |login_page|
-          login_page.sign_in_using_ldap_credentials(username: user, password: 'password')
-        end
-
-        Page::Main::Menu.perform do |menu|
-          expect(menu).to have_personal_area
-        end
-
-        Resource::Sandbox.fabricate_via_browser_ui! do |resource|
-          resource.path = "#{group_name}-#{SecureRandom.hex(4)}"
+    def create_users_via_api(users)
+      users.each do |user|
+        Resource::User.fabricate_via_api! do |resource|
+          resource.username = user[:username]
+          resource.name = user[:name]
+          resource.email = user[:email]
+          resource.extern_uid = user[:extern_uid]
+          resource.provider = user[:provider]
         end
       end
+    end
 
-      def verify_users_synched(expected_users)
-        EE::Page::Group::Members.perform do |page|
-          page.click_sync_now
-          users_synchronised = page.with_retry(reload: true) do
-            expected_users.map { |user| page.has_content?(user) }.reduce(true) { |a, b| a && b }
-          end
-          expect(users_synchronised).to be_truthy
+    def create_sandbox_group_with_user(user: nil, group_name: nil)
+      Page::Main::Login.perform do |login_page|
+        login_page.sign_in_using_ldap_credentials(username: user, password: 'password')
+      end
+
+      Page::Main::Menu.perform do |menu|
+        expect(menu).to have_personal_area
+      end
+
+      Resource::Sandbox.fabricate_via_browser_ui! do |resource|
+        resource.path = "#{group_name}-#{SecureRandom.hex(4)}"
+      end
+    end
+
+    def verify_users_synched(expected_users)
+      EE::Page::Group::Members.perform do |page|
+        page.click_sync_now
+        users_synchronised = page.with_retry(reload: true) do
+          expected_users.map { |user| page.has_content?(user) }.reduce(true) { |a, b| a && b }
         end
+        expect(users_synchronised).to be_truthy
       end
     end
   end
