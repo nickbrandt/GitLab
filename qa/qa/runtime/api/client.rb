@@ -31,7 +31,7 @@ module QA
         end
 
         def do_create_personal_access_token
-          Page::Main::Login.act { sign_in_using_credentials }
+          Page::Main::Login.act { sign_in_using_admin_credentials }
           Resource::PersonalAccessToken.fabricate!.access_token
         end
       end
