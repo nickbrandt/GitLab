@@ -297,7 +297,7 @@ GEM
       grpc (~> 1.0)
     github-markup (1.7.0)
     gitlab-license (1.0.0)
-    gitlab-markup (1.6.4)
+    gitlab-markup (1.6.5)
     gitlab-sidekiq-fetcher (0.3.0)
       sidekiq (~> 5)
     gitlab-styles (2.4.1)
@@ -1030,7 +1030,7 @@ DEPENDENCIES
   gitaly-proto (~> 0.123.0)
   github-markup (~> 1.7.0)
   gitlab-license (~> 1.0)
-  gitlab-markup (~> 1.6.4)
+  gitlab-markup (~> 1.6.5)
   gitlab-sidekiq-fetcher
   gitlab-styles (~> 2.4)
   gitlab_omniauth-ldap (~> 2.0.4)
