@@ -10,6 +10,10 @@ module DraftNotes
 
     private
 
+    def draft_notes
+      @draft_notes ||= merge_request.draft_notes.authored_by(current_user)
+    end
+
     def project
       merge_request.target_project
     end
