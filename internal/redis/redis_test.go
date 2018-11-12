@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"net"
 	"testing"
 	"time"
 
@@ -11,6 +12,22 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
+
+func mockRedisServer(t *testing.T, connectReceived *bool) string {
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+
+	assert.Nil(t, err)
+
+	go func() {
+		defer ln.Close()
+		conn, err := ln.Accept()
+		assert.Nil(t, err)
+		*connectReceived = true
+		conn.Write([]byte("OK\n"))
+	}()
+
+	return ln.Addr().String()
+}
 
 // Setup a MockPool for Redis
 //
@@ -25,6 +42,37 @@ func setupMockPool() (*redigomock.Conn, func()) {
 	})
 	return conn, func() {
 		pool = nil
+	}
+}
+
+func TestDefaultDialFunc(t *testing.T) {
+	testCases := []struct {
+		scheme string
+	}{
+		{
+			scheme: "tcp",
+		},
+		{
+			scheme: "redis",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.scheme, func(t *testing.T) {
+			connectReceived := false
+			a := mockRedisServer(t, &connectReceived)
+
+			parsedURL := helper.URLMustParse(tc.scheme + "://" + a)
+			cfg := &config.RedisConfig{URL: config.TomlURL{URL: *parsedURL}}
+
+			dialer := DefaultDialFunc(cfg, true)
+			conn, err := dialer()
+
+			assert.Nil(t, err)
+			conn.Receive()
+
+			assert.True(t, connectReceived)
+		})
 	}
 }
 
@@ -99,12 +147,54 @@ func TestSentinelConnNoSentinel(t *testing.T) {
 	assert.Nil(t, s, "Sentinel without urls should return nil")
 }
 
+func TestSentinelConnDialURL(t *testing.T) {
+	testCases := []struct {
+		scheme string
+	}{
+		{
+			scheme: "tcp",
+		},
+		{
+			scheme: "redis",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.scheme, func(t *testing.T) {
+			connectReceived := false
+			a := mockRedisServer(t, &connectReceived)
+
+			addrs := []string{tc.scheme + "://" + a}
+			var sentinelUrls []config.TomlURL
+
+			for _, a := range addrs {
+				parsedURL := helper.URLMustParse(a)
+				sentinelUrls = append(sentinelUrls, config.TomlURL{URL: *parsedURL})
+			}
+
+			s := sentinelConn("foobar", sentinelUrls)
+			assert.Equal(t, len(addrs), len(s.Addrs))
+
+			for i := range addrs {
+				assert.Equal(t, addrs[i], s.Addrs[i])
+			}
+
+			conn, err := s.Dial(s.Addrs[0])
+
+			assert.Nil(t, err)
+			conn.Receive()
+
+			assert.True(t, connectReceived)
+		})
+	}
+}
+
 func TestSentinelConnTwoURLs(t *testing.T) {
-	addrs := []string{"10.0.0.1:12345", "10.0.0.2:12345"}
+	addrs := []string{"tcp://10.0.0.1:12345", "tcp://10.0.0.2:12345"}
 	var sentinelUrls []config.TomlURL
 
 	for _, a := range addrs {
-		parsedURL := helper.URLMustParse(`tcp://` + a)
+		parsedURL := helper.URLMustParse(a)
 		sentinelUrls = append(sentinelUrls, config.TomlURL{URL: *parsedURL})
 	}
 

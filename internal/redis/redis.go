@@ -13,6 +13,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 
 var (
@@ -73,9 +74,10 @@ func sentinelConn(master string, urls []config.TomlURL) *sentinel.Sentinel {
 	}
 	var addrs []string
 	for _, url := range urls {
-		h := url.URL.Host
+		h := url.URL.String()
 		log.WithFields(log.Fields{
-			"host": h,
+			"scheme": url.URL.Scheme,
+			"host":   url.URL.Host,
 		}).Printf("redis: using sentinel")
 		addrs = append(addrs, h)
 	}
@@ -88,7 +90,22 @@ func sentinelConn(master string, urls []config.TomlURL) *sentinel.Sentinel {
 			//  For every address it should try to connect to the Sentinel,
 			//  using a short timeout (in the order of a few hundreds of milliseconds).
 			timeout := 500 * time.Millisecond
-			c, err := redis.Dial("tcp", addr, redis.DialConnectTimeout(timeout), redis.DialReadTimeout(timeout), redis.DialWriteTimeout(timeout))
+			url := helper.URLMustParse(addr)
+
+			var c redis.Conn
+			var err error
+			options := []redis.DialOption{
+				redis.DialConnectTimeout(timeout),
+				redis.DialReadTimeout(timeout),
+				redis.DialWriteTimeout(timeout),
+			}
+
+			if url.Scheme == "redis" || url.Scheme == "redisss" {
+				c, err = redis.DialURL(addr, options...)
+			} else {
+				c, err = redis.Dial("tcp", url.Host, options...)
+			}
+
 			if err != nil {
 				errorCounter.WithLabelValues("dial", "sentinel").Inc()
 				return nil, err
@@ -176,9 +193,25 @@ func defaultDialer(dopts []redis.DialOption, keepAlivePeriod time.Duration, url 
 		if url.Scheme == "unix" {
 			return redisDial(url.Scheme, url.Path, dopts...)
 		}
+
 		dopts = append(dopts, redis.DialNetDial(keepAliveDialer(keepAlivePeriod)))
+
+		// redis.DialURL only works with redis[s]:// URLs
+		if url.Scheme == "redis" || url.Scheme == "rediss" {
+			return redisURLDial(url, dopts...)
+		}
+
 		return redisDial(url.Scheme, url.Host, dopts...)
 	}
+}
+
+func redisURLDial(url url.URL, options ...redis.DialOption) (redis.Conn, error) {
+	log.WithFields(log.Fields{
+		"scheme":  url.Scheme,
+		"address": url.Host,
+	}).Printf("redis: dialing")
+
+	return redis.DialURL(url.String(), options...)
 }
 
 func redisDial(network, address string, options ...redis.DialOption) (redis.Conn, error) {
