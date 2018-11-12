@@ -76,7 +76,7 @@ class JenkinsDeprecatedService < CiService
   # we just parse the URL and make sure it's how we want it.
   def base_project_url
     url = URI.parse(project_url)
-    URI.join(url, '/job').to_s
+    URI.join(url, '/job').to_s # It's intended to discard paths in project_url
   end
 
   def calculate_reactive_cache(sha, ref)
