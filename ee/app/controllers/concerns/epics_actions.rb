@@ -11,7 +11,7 @@ module EpicsActions
   end
 
   def default_sort_order
-    sort_value_end_date
+    sort_value_recently_created
   end
 
   def update_cookie_value(value)
