@@ -423,18 +423,14 @@ review-docs-cleanup:
 # Trigger a docker image build in CNG (Cloud Native GitLab) repository
 #
 cloud-native-image:
-  stage: test
   image: ruby:2.4-alpine
   before_script: []
-<<<<<<< HEAD
-=======
   dependencies: []
   stage: test
->>>>>>> upstream/master
   allow_failure: true
-  cache: {}
   variables:
     GIT_DEPTH: "1"
+  cache: {}
   script:
     - gem install gitlab --no-document
     - CNG_PROJECT_PATH="gitlab-org/build/CNG" BUILD_TRIGGER_TOKEN=$CI_JOB_TOKEN ./scripts/trigger-build cng
