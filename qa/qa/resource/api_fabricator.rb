@@ -54,10 +54,8 @@ module QA
       end
 
       def api_get_from(get_path)
-        response = RestClient::Request.execute(
-          method: :get,
-          url: Runtime::API::Request.new(api_client, get_path).url,
-          verify_ssl: false)
+        url = Runtime::API::Request.new(api_client, get_path).url
+        response = get(url)
 
         unless response.code == HTTP_STATUS_OK
           raise ResourceNotFoundError, "Resource at #{url} could not be found (#{response.code}): `#{response}`."
@@ -67,11 +65,9 @@ module QA
       end
 
       def api_post
-        response = RestClient::Request.execute(
-          method: :post,
-          url: Runtime::API::Request.new(api_client, api_post_path).url,
-          payload: api_post_body,
-          verify_ssl: false)
+        response = post(
+          Runtime::API::Request.new(api_client, api_post_path).url,
+          api_post_body)
 
         unless response.code == HTTP_STATUS_CREATED
           raise ResourceFabricationFailedError, "Fabrication of #{self.class.name} using the API failed (#{response.code}) with `#{response}`."
@@ -97,6 +93,21 @@ module QA
 
       def transform_api_resource(api_resource)
         api_resource
+      end
+
+      def post(url, payload)
+        RestClient::Request.execute(
+          method: :post,
+          url: url,
+          payload: payload,
+          verify_ssl: false)
+      end
+
+      def get(url)
+        RestClient::Request.execute(
+          method: :get,
+          url: url,
+          verify_ssl: false)
       end
     end
   end
