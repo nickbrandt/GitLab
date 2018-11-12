@@ -2,8 +2,11 @@
 
 module Issues
   class MoveService < Issuable::Clone::BaseService
+<<<<<<< HEAD
     prepend ::EE::Issues::MoveService
 
+=======
+>>>>>>> upstream/master
     MoveError = Class.new(StandardError)
 
     def execute(issue, target_project)
