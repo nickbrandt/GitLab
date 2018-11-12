@@ -1,14 +1,29 @@
 # frozen_string_literal: true
 
 module QA
+  context 'Manage' do
   context 'Manage', :orchestrated, :ldap_tls, :ldap_no_tls do
-    describe 'LDAP Group Sync' do
       it 'Has LDAP user synced using group cn method' do
+        users = [
+            {
+                name: 'ENG User 2',
+                username: 'enguser2',
+                email: 'enguser2@example.org',
+                provider: 'ldapmain',
+                extern_uid: 'uid=enguser2,ou=people,ou=global groups,dc=example,dc=org'
+            },
+            {
+                name: 'ENG User 3',
+                username: 'enguser3',
+                email: 'enguser3@example.org',
+                provider: 'ldapmain',
+                extern_uid: 'uid=enguser3,ou=people,ou=global groups,dc=example,dc=org'
+            }
+        ]
+
+        create_users_via_api(users)
+
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
-
-        # Login users to create them
-        login_logout_users(%w[enguser3 enguser2])
-
         create_sandbox_group_with_user(user: 'enguser1', group_name: 'Synched-engineering-group')
 
         EE::Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
@@ -25,10 +40,26 @@ module QA
       end
 
       it 'Has LDAP user synced using user filter method' do
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
+        users = [
+            {
+                name: 'HR User 2',
+                username: 'hruser2',
+                email: 'hruser2@example.org',
+                provider: 'ldapmain',
+                extern_uid: 'uid=hruser2,ou=people,ou=global groups,dc=example,dc=org'
+            },
+            {
+                name: 'HR User 3',
+                username: 'hruser3',
+                email: 'hruser3@example.org',
+                provider: 'ldapmain',
+                extern_uid: 'uid=hruser3,ou=people,ou=global groups,dc=example,dc=org'
+            }
+        ]
 
-        # Login users to create them
-        login_logout_users(%w[hruser3 hruser2])
+        create_users_via_api(users)
+
+        Runtime::Browser.visit(:gitlab, Page::Main::Login)
 
         create_sandbox_group_with_user(user: 'hruser1', group_name: 'Synched-human-resources-group')
 
@@ -44,18 +75,18 @@ module QA
         verify_users_synched(['HR User 2', 'HR User 3'])
       end
 
-      def login_logout_users(users)
+      def create_users_via_api(users)
         users.each do |user|
-          Page::Main::Login.perform do |login_page|
-            login_page.sign_in_using_ldap_credentials(username: user, password: 'password')
+          Resource::User.fabricate_via_api! do |resource|
+            resource.username = user[:username]
+            resource.name = user[:name]
+            resource.email = user[:email]
+            resource.extern_uid = user[:extern_uid]
+            resource.provider = user[:provider]
           end
-
-          Page::Main::Menu.perform do |menu|
-            expect(menu).to have_personal_area
-          end
-
-          Page::Main::Menu.perform(&:sign_out)
         end
+
+
       end
 
       def create_sandbox_group_with_user(user: nil, group_name: nil)
