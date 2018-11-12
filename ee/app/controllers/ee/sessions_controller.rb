@@ -17,7 +17,7 @@ module EE
       oauth = ::Gitlab::Geo::OauthSession.new
 
       # share full url with primary node by oauth state
-      user_return_to = URI.join(root_url, session[:user_return_to].to_s).to_s
+      user_return_to = ::Gitlab::Utils.append_path(root_url, session[:user_return_to])
       oauth.return_to = stored_redirect_uri || user_return_to
 
       redirect_to oauth_geo_auth_url(state: oauth.generate_oauth_state)
