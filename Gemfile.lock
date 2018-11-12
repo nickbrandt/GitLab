@@ -298,10 +298,7 @@ GEM
     gitaly-proto (0.123.0)
       grpc (~> 1.0)
     github-markup (1.7.0)
-<<<<<<< HEAD
     gitlab-license (1.0.0)
-=======
->>>>>>> upstream/master
     gitlab-markup (1.6.5)
     gitlab-sidekiq-fetcher (0.3.0)
       sidekiq (~> 5)
