@@ -87,7 +87,7 @@ describe('security reports utils', () => {
       expect(parsed.hasIssue).toEqual(true);
       expect(parsed.isDismissed).toEqual(true);
       expect(parsed.dismissalFeedback).toEqual(sastFeedbacks[0]);
-      expect(parsed.issueFeedback).toEqual(sastFeedbacks[1]);
+      expect(parsed.issue_feedback).toEqual(sastFeedbacks[1]);
     });
   });
 
@@ -129,7 +129,7 @@ describe('security reports utils', () => {
       expect(parsed.hasIssue).toEqual(true);
       expect(parsed.isDismissed).toEqual(true);
       expect(parsed.dismissalFeedback).toEqual(dependencyScanningFeedbacks[0]);
-      expect(parsed.issueFeedback).toEqual(dependencyScanningFeedbacks[1]);
+      expect(parsed.issue_feedback).toEqual(dependencyScanningFeedbacks[1]);
     });
   });
 
@@ -165,7 +165,7 @@ describe('security reports utils', () => {
       expect(parsed.hasIssue).toEqual(true);
       expect(parsed.isDismissed).toEqual(true);
       expect(parsed.dismissalFeedback).toEqual(containerScanningFeedbacks[0]);
-      expect(parsed.issueFeedback).toEqual(containerScanningFeedbacks[1]);
+      expect(parsed.issue_feedback).toEqual(containerScanningFeedbacks[1]);
     });
   });
 
@@ -180,7 +180,7 @@ describe('security reports utils', () => {
       expect(parsed.hasIssue).toEqual(true);
       expect(parsed.isDismissed).toEqual(true);
       expect(parsed.dismissalFeedback).toEqual(dastFeedbacks[0]);
-      expect(parsed.issueFeedback).toEqual(dastFeedbacks[1]);
+      expect(parsed.issue_feedback).toEqual(dastFeedbacks[1]);
     });
   });
 
