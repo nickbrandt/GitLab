@@ -1,0 +1,5 @@
+---
+title: Authorize users when listing board users and milestones.
+merge_request:
+author:
+type: security
