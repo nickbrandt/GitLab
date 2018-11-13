@@ -7166,16 +7166,19 @@ msgstr ""
 msgid "Security Reports|At this time, the security dashboard only supports SAST."
 msgstr ""
 
-msgid "Security Reports|Dismiss Vulnerability"
+msgid "Security Reports|Create issue"
+msgstr ""
+
+msgid "Security Reports|Dismiss vulnerability"
 msgstr ""
 
 msgid "Security Reports|More info"
 msgstr ""
 
-msgid "Security Reports|New Issue"
+msgid "Security Reports|Revert dismissal"
 msgstr ""
 
-msgid "Security Reports|Security Dashboard Documentation"
+msgid "Security Reports|Security dashboard documentation"
 msgstr ""
 
 msgid "Security Reports|There was an error creating the issue."
@@ -7184,13 +7187,10 @@ msgstr ""
 msgid "Security Reports|There was an error dismissing the vulnerability."
 msgstr ""
 
-msgid "Security Reports|There was an error undoing the dismissal."
+msgid "Security Reports|There was an error reverting the dismissal."
 msgstr ""
 
-msgid "Security Reports|There was an error undoing this dismissal."
-msgstr ""
-
-msgid "Security Reports|Undo Dismissal"
+msgid "Security Reports|There was an error reverting this dismissal."
 msgstr ""
 
 msgid "SecurityDashboard| The security dashboard displays the latest security report. Use it to find and fix vulnerabilities."

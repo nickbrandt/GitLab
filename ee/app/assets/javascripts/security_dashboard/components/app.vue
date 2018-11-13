@@ -54,14 +54,14 @@ export default {
         title: s__('Security Reports|At this time, the security dashboard only supports SAST.'),
         content: `
           <a
-            title="${s__('Security Reports|Security Dashboard Documentation')}"
+            title="${s__('Security Reports|Security dashboard documentation')}"
             href="${this.dashboardDocumentation}"
             target="_blank"
             rel="noopener
             noreferrer"
           >
             <span class="vertical-align-middle">${s__(
-              'Security Reports|Security Dashboard Documentation',
+              'Security Reports|Security dashboard documentation',
             )}</span>
             ${spriteIcon('external-link', 's16 vertical-align-middle')}
           </a>
@@ -82,7 +82,7 @@ export default {
       'fetchVulnerabilitiesCount',
       'createIssue',
       'dismissVulnerability',
-      'undoDismissal',
+      'revertDismissal',
     ]),
   },
 };
@@ -123,7 +123,7 @@ export default {
       :can-create-feedback-permission="true"
       @createNewIssue="createIssue({ vulnerability: modal.vulnerability })"
       @dismissIssue="dismissVulnerability({ vulnerability: modal.vulnerability })"
-      @revertDismissIssue="undoDismissal({ vulnerability: modal.vulnerability })"
+      @revertDismissIssue="revertDismissal({ vulnerability: modal.vulnerability })"
     />
   </div>
 </template>

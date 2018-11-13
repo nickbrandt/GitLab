@@ -116,25 +116,25 @@ export default {
       s__('Security Reports|There was an error dismissing the vulnerability.'),
     );
   },
-  [types.REQUEST_UNDO_DISMISSAL](state) {
+  [types.REQUEST_REVERT_DISMISSAL](state) {
     state.isDismissingVulnerability = true;
     Vue.set(state.modal, 'isDismissingVulnerability', true);
     Vue.set(state.modal, 'error', null);
   },
-  [types.RECEIVE_UNDO_DISMISSAL_SUCCESS](state, payload) {
+  [types.RECEIVE_REVERT_DISMISSAL_SUCCESS](state, payload) {
     const vulnerability = state.vulnerabilities.find(vuln => vuln.id === payload.id);
     vulnerability.dismissal_feedback = null;
     state.isDismissingVulnerability = false;
     Vue.set(state.modal, 'isDismissingVulnerability', false);
     Vue.set(state.modal.vulnerability, 'isDismissed', false);
   },
-  [types.RECEIVE_UNDO_DISMISSAL_ERROR](state) {
+  [types.RECEIVE_REVERT_DISMISSAL_ERROR](state) {
     state.isDismissingVulnerability = false;
     Vue.set(state.modal, 'isDismissingVulnerability', false);
     Vue.set(
       state.modal,
       'error',
-      s__('Security Reports|There was an error undoing the dismissal.'),
+      s__('Security Reports|There was an error reverting the dismissal.'),
     );
   },
 };
