@@ -8,7 +8,11 @@ module Dashboard
       end
 
       def execute(project_ids)
+        return [] unless License.feature_available?(:operations_dashboard)
+
         find_projects(user, project_ids)
+          .to_a
+          .select { |project| project.feature_available?(:operations_dashboard) }
       end
 
       private
@@ -20,16 +24,9 @@ module Dashboard
           current_user: user,
           project_ids_relation: project_ids,
           params: {
-            plans: plan_names_for_operations_dashboard,
             min_access_level: ProjectMember::DEVELOPER
           }
         ).execute
-      end
-
-      def plan_names_for_operations_dashboard
-        return unless Gitlab::CurrentSettings.should_check_namespace_plan?
-
-        Namespace.plans_with_feature(:operations_dashboard)
       end
     end
   end
