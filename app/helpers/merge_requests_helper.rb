@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module MergeRequestsHelper
-  prepend EE::MergeRequestsHelper
-
   def new_mr_path_from_push_event(event)
     target_project = event.project.default_merge_request_target
     project_new_merge_request_path(
@@ -161,3 +159,5 @@ module MergeRequestsHelper
     end
   end
 end
+
+MergeRequestsHelper.prepend(EE::MergeRequestsHelper)

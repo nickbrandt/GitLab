@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module SystemNoteHelper
-  prepend EE::SystemNoteHelper
-
   ICON_NAMES_BY_ACTION = {
     'commit' => 'commit',
     'description' => 'pencil-square',
@@ -40,3 +38,9 @@ module SystemNoteHelper
 
   extend self
 end
+
+SystemNoteHelper.prepend(EE::SystemNoteHelper)
+
+# The methods in `EE::SystemNoteHelper` should be available as both instance and
+# class methods.
+SystemNoteHelper.extend(EE::SystemNoteHelper)
