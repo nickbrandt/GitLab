@@ -58,7 +58,7 @@ func SendFile(h http.Handler) http.Handler {
 		}
 		// Advertise to upstream (Rails) that we support X-Sendfile
 		req.Header.Set("X-Sendfile-Type", "X-Sendfile")
-		defer s.Flush()
+		defer s.flush()
 		h.ServeHTTP(s, req)
 	})
 }
@@ -67,12 +67,12 @@ func (s *sendFileResponseWriter) Header() http.Header {
 	return s.rw.Header()
 }
 
-func (s *sendFileResponseWriter) Write(data []byte) (n int, err error) {
+func (s *sendFileResponseWriter) Write(data []byte) (int, error) {
 	if s.status == 0 {
 		s.WriteHeader(http.StatusOK)
 	}
 	if s.hijacked {
-		return
+		return len(data), nil
 	}
 	return s.rw.Write(data)
 }
@@ -134,6 +134,6 @@ func countSendFileMetrics(size int64, r *http.Request) {
 	sendFileBytes.WithLabelValues(requestType).Add(float64(size))
 }
 
-func (s *sendFileResponseWriter) Flush() {
+func (s *sendFileResponseWriter) flush() {
 	s.WriteHeader(http.StatusOK)
 }

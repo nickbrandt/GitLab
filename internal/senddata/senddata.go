@@ -45,7 +45,7 @@ func SendData(h http.Handler, injecters ...Injecter) http.Handler {
 			req:       r,
 			injecters: injecters,
 		}
-		defer s.Flush()
+		defer s.flush()
 		h.ServeHTTP(&s, r)
 	})
 }
@@ -54,12 +54,12 @@ func (s *sendDataResponseWriter) Header() http.Header {
 	return s.rw.Header()
 }
 
-func (s *sendDataResponseWriter) Write(data []byte) (n int, err error) {
+func (s *sendDataResponseWriter) Write(data []byte) (int, error) {
 	if s.status == 0 {
 		s.WriteHeader(http.StatusOK)
 	}
 	if s.hijacked {
-		return
+		return len(data), nil
 	}
 	return s.rw.Write(data)
 }
@@ -100,6 +100,6 @@ func (s *sendDataResponseWriter) tryInject() bool {
 	return false
 }
 
-func (s *sendDataResponseWriter) Flush() {
+func (s *sendDataResponseWriter) flush() {
 	s.WriteHeader(http.StatusOK)
 }

@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
 
@@ -25,7 +27,10 @@ func TestIfErrorPageIsPresented(t *testing.T) {
 	w := httptest.NewRecorder()
 	h := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(404)
-		fmt.Fprint(w, "Not Found")
+		upstreamBody := "Not Found"
+		n, err := fmt.Fprint(w, upstreamBody)
+		require.NoError(t, err)
+		require.Equal(t, len(upstreamBody), n, "bytes written")
 	})
 	st := &Static{dir}
 	st.ErrorPagesUnless(false, h).ServeHTTP(w, nil)

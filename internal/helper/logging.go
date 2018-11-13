@@ -62,11 +62,11 @@ func (l *statsCollectingResponseWriter) Header() http.Header {
 	return l.rw.Header()
 }
 
-func (l *statsCollectingResponseWriter) Write(data []byte) (n int, err error) {
+func (l *statsCollectingResponseWriter) Write(data []byte) (int, error) {
 	if !l.wroteHeader {
 		l.WriteHeader(http.StatusOK)
 	}
-	n, err = l.rw.Write(data)
+	n, err := l.rw.Write(data)
 
 	l.written += int64(n)
 	return n, err
