@@ -16,7 +16,7 @@ module Epics
     end
 
     def whitelisted_epic_params
-      params.slice(:title, :description, :start_date, :end_date)
+      params.slice(:title, :description, :start_date, :end_date, :milestone, :label_ids)
     end
   end
 end

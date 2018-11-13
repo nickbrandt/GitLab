@@ -71,7 +71,7 @@ class GfmAutoComplete {
       displayTpl(value) {
         if (GfmAutoComplete.isLoading(value)) return GfmAutoComplete.Loading.template;
         // eslint-disable-next-line no-template-curly-in-string
-        let tpl = '<li><span class="name">/${name}</span>';
+        let tpl = '<li class="<%- warningClass %>"><span class="name">/${name}</span>';
         if (value.aliases.length > 0) {
           tpl += ' <small class="aliases">(or /<%- aliases.join(", /") %>)</small>';
         }
@@ -79,10 +79,15 @@ class GfmAutoComplete {
           tpl += ' <small class="params"><%- params.join(" ") %></small>';
         }
         if (value.description !== '') {
-          tpl += '<small class="description"><i><%- description %></i></small>';
+          tpl += '<small class="description"><i><%- description %> <%- warningText %></i></small>';
         }
         tpl += '</li>';
-        return _.template(tpl)(value);
+
+        return _.template(tpl)({
+          ...value,
+          warningClass: value.warning ? 'has-warning' : '',
+          warningText: value.warning ? `(${value.warning})` : '',
+        });
       },
       insertTpl(value) {
         // eslint-disable-next-line no-template-curly-in-string
@@ -111,6 +116,7 @@ class GfmAutoComplete {
               aliases: c.aliases,
               params: c.params,
               description: c.description,
+              warning: c.warning,
               search,
             };
           });
