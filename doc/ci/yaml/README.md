@@ -1337,7 +1337,11 @@ concatenated into a single file. Use a filename pattern (`junit: rspec-*.xml`),
 an array of filenames (`junit: [rspec-1.xml, rspec-2.xml, rspec-3.xml]`), or a
 combination thereof (`junit: [rspec.xml, test-results/TEST-*.xml]`).
 
+<<<<<<< HEAD
 #### `artifacts:reports:codequality`
+=======
+#### `artifacts:reports:codequality` **[STARTER]**
+>>>>>>> upstream/master
 
 > Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
 
@@ -1347,7 +1351,11 @@ as artifacts.
 The collected Code Quality report will be uploaded to GitLab as an artifact and will
 be automatically shown in merge requests.
 
+<<<<<<< HEAD
 #### `artifacts:reports:sast`
+=======
+#### `artifacts:reports:sast` **[ULTIMATE]**
+>>>>>>> upstream/master
 
 > Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
 
@@ -1358,7 +1366,11 @@ The collected SAST report will be uploaded to GitLab as an artifact and will
 be automatically shown in merge requests, pipeline view and provide data for security
 dashboards.
 
+<<<<<<< HEAD
 #### `artifacts:reports:dependency_scanning`
+=======
+#### `artifacts:reports:dependency_scanning` **[ULTIMATE]**
+>>>>>>> upstream/master
 
 > Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
 
@@ -1369,7 +1381,11 @@ The collected Dependency Scanning report will be uploaded to GitLab as an artifa
 be automatically shown in merge requests, pipeline view and provide data for security
 dashboards.
 
+<<<<<<< HEAD
 #### `artifacts:reports:container_scanning`
+=======
+#### `artifacts:reports:container_scanning` **[ULTIMATE]**
+>>>>>>> upstream/master
 
 > Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
 
@@ -1380,7 +1396,11 @@ The collected Container Scanning report will be uploaded to GitLab as an artifac
 be automatically shown in merge requests, pipeline view and provide data for security
 dashboards.
 
+<<<<<<< HEAD
 #### `artifacts:reports:dast`
+=======
+#### `artifacts:reports:dast` **[ULTIMATE]**
+>>>>>>> upstream/master
 
 > Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
 
@@ -1391,7 +1411,11 @@ The collected DAST report will be uploaded to GitLab as an artifact and will
 be automatically shown in merge requests, pipeline view and provide data for security
 dashboards.
 
+<<<<<<< HEAD
 #### `artifacts:reports:license_management`
+=======
+#### `artifacts:reports:license_management` **[ULTIMATE]**
+>>>>>>> upstream/master
 
 > Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
 
@@ -1402,7 +1426,11 @@ The collected License Management report will be uploaded to GitLab as an artifac
 be automatically shown in merge requests, pipeline view and provide data for security
 dashboards.
 
+<<<<<<< HEAD
 #### `artifacts:reports:performance`
+=======
+#### `artifacts:reports:performance` **[PREMIUM]**
+>>>>>>> upstream/master
 
 > Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
 

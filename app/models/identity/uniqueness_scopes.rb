@@ -9,5 +9,8 @@ class Identity < ActiveRecord::Base
     end
   end
 end
+<<<<<<< HEAD
 
 Identity::UniquenessScopes.prepend(EE::Identity::UniquenessScopes)
+=======
+>>>>>>> upstream/master
