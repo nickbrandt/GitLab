@@ -9,8 +9,9 @@ within the GitLab interface.
 ![Environment Dashboard](img/prometheus_dashboard.png)
 
 There are two ways to set up Prometheus integration, depending on where your apps are running:
-* For deployments on Kubernetes, GitLab can automatically [deploy and manage Prometheus](#managed-prometheus-on-kubernetes)
-* For other deployment targets, simply [specify the Prometheus server](#manual-configuration-of-prometheus).
+
+- For deployments on Kubernetes, GitLab can automatically [deploy and manage Prometheus](#managed-prometheus-on-kubernetes).
+- For other deployment targets, simply [specify the Prometheus server](#manual-configuration-of-prometheus).
 
 Once enabled, GitLab will automatically detect metrics from known services in the [metric library](#monitoring-ci-cd-environments). You are also able to [add your own metrics](#adding-additional-metrics) as well.
 
@@ -23,8 +24,8 @@ GitLab can seamlessly deploy and manage Prometheus on a [connected Kubernetes cl
 
 #### Requirements
 
-* A [connected Kubernetes cluster](../clusters/index.md)
-* Helm Tiller [installed by GitLab](../clusters/index.md#installing-applications)
+- A [connected Kubernetes cluster](../clusters/index.md)
+- Helm Tiller [installed by GitLab](../clusters/index.md#installing-applications)
 
 #### Getting started
 
@@ -42,9 +43,9 @@ Prometheus is deployed into the `gitlab-managed-apps` namespace, using the [offi
 
 The Prometheus server will [automatically detect and monitor](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#%3Ckubernetes_sd_config%3E) nodes, pods, and endpoints. To configure a resource to be monitored by Prometheus, simply set the following [Kubernetes annotations](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/):
 
-* `prometheus.io/scrape` to `true` to enable monitoring of the resource.
-* `prometheus.io/port` to define the port of the metrics endpoint.
-* `prometheus.io/path` to define the path of the metrics endpoint. Defaults to `/metrics`.
+- `prometheus.io/scrape` to `true` to enable monitoring of the resource.
+- `prometheus.io/port` to define the port of the metrics endpoint.
+- `prometheus.io/path` to define the path of the metrics endpoint. Defaults to `/metrics`.
 
 CPU and Memory consumption is monitored, but requires [naming conventions](prometheus_library/kubernetes.html#specifying-the-environment) in order to determine the environment. If you are using [Auto DevOps](../../../topics/autodevops/), this is handled automatically.
 
@@ -101,18 +102,19 @@ Additional metrics can be monitored by adding them on the Prometheus integration
 ![Add New Metric](img/prometheus_add_metric.png)
 
 A few fields are required:
-* **Name**: Chart title
-* **Type**: Type of metric. Metrics of the same type will be shown together.
-* **Query**: Valid [PromQL query](https://prometheus.io/docs/prometheus/latest/querying/basics/). Note, no validation is performed at this time. If the query is not valid, the dashboard will display an error.
-* **Y-axis label**: Y axis title to display on the dashboard.
-* **Unit label**: Query units, for example `req / sec`. Shown next to the value.
+
+- **Name**: Chart title
+- **Type**: Type of metric. Metrics of the same type will be shown together.
+- **Query**: Valid [PromQL query](https://prometheus.io/docs/prometheus/latest/querying/basics/). Note, no validation is performed at this time. If the query is not valid, the dashboard will display an error.
+- **Y-axis label**: Y axis title to display on the dashboard.
+- **Unit label**: Query units, for example `req / sec`. Shown next to the value.
 
 #### Query Variables
 
 GitLab supports a limited set of [CI variables](../../../ci/variables/README.html) in the Prometheus query. This is particularly useful for identifying a specific environment, for example with `CI_ENVIRONMENT_SLUG`. The supported variables are:
 
-* CI_ENVIRONMENT_SLUG
-* KUBE_NAMESPACE
+- CI_ENVIRONMENT_SLUG
+- KUBE_NAMESPACE
 
 To specify a variable in a query, enclose it in curly braces with a leading percent. For example: `%{ci_environment_slug}`.
 
@@ -120,15 +122,15 @@ To specify a variable in a query, enclose it in curly braces with a leading perc
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/6590) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.2 for [custom metrics](#adding-additional-metrics), and 11.3 for [library metrics](prometheus_library/metrics.md).
 
-Alerts can be configured for [metricss](#adding-additional-metrics) directly in the performance dashboard. 
+Alerts can be configured for [metricss](#adding-additional-metrics) directly in the performance dashboard.
 
-To set an alert, click on the alarm icon in the top right corner of the metric you want to create the alert for. A dropdown 
+To set an alert, click on the alarm icon in the top right corner of the metric you want to create the alert for. A dropdown
 will appear, with options to set the threshold and operator. Click **Add** to save and activate the alert.
 
 ![Adding an alert](img/prometheus_alert.png)
 
 If the metric exceeds the threshold of the alert for over 5 minutes, an email
-will be sent to all [Maintainers and Owners](../../permissions.md#project-members-permissions) of the project. 
+will be sent to all [Maintainers and Owners](../../permissions.md#project-members-permissions) of the project.
 
 To remove the alert, click back on the alert icon for the desired metric, and click **Delete**.
 
