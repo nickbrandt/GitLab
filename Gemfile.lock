@@ -1048,12 +1048,8 @@ DEPENDENCIES
   graphiql-rails (~> 1.4.10)
   graphql (~> 1.8.0)
   grpc (~> 1.15.0)
-<<<<<<< HEAD
   gssapi
-  haml_lint (~> 0.26.0)
-=======
   haml_lint (~> 0.28.0)
->>>>>>> upstream/master
   hamlit (~> 2.8.8)
   hangouts-chat (~> 0.0.5)
   hashie-forbidden_attributes
