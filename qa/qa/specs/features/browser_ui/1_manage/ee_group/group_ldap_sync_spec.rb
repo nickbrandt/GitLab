@@ -23,7 +23,7 @@ module QA
       create_users_via_api(users)
 
       Runtime::Browser.visit(:gitlab, Page::Main::Login)
-      create_sandbox_group_with_user(user: 'enguser1', group_name: 'Synched-engineering-group')
+      create_group_with_user_via_api(user: 'enguser1', group_name: 'Synched-engineering-group')
 
       EE::Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
 
@@ -60,7 +60,7 @@ module QA
 
       Runtime::Browser.visit(:gitlab, Page::Main::Login)
 
-      create_sandbox_group_with_user(user: 'hruser1', group_name: 'Synched-human-resources-group')
+      create_group_with_user_via_api(user: 'hruser1', group_name: 'Synched-human-resources-group')
 
       EE::Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
 
@@ -86,7 +86,7 @@ module QA
       end
     end
 
-    def create_sandbox_group_with_user(user: nil, group_name: nil)
+    def create_group_with_user_via_api(user: nil, group_name: nil)
       Page::Main::Login.perform do |login_page|
         login_page.sign_in_using_ldap_credentials(username: user, password: 'password')
       end
@@ -95,9 +95,13 @@ module QA
         expect(menu).to have_personal_area
       end
 
-      Resource::Sandbox.fabricate_via_browser_ui! do |resource|
+      Runtime::Env.personal_access_token = Resource::PersonalAccessToken.fabricate!.access_token
+
+      group = Resource::Sandbox.fabricate_via_api! do |resource|
         resource.path = "#{group_name}-#{SecureRandom.hex(4)}"
       end
+
+      group.visit!
     end
 
     def verify_users_synched(expected_users)

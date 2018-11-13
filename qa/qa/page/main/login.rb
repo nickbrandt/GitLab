@@ -65,6 +65,16 @@ module QA
         end
 
         def sign_in_using_admin_credentials
+          # Don't try to log-in if we're already logged-in as admin
+          return if Page::Main::Menu.perform do |menu|
+            menu.has_admin_area_link?(wait: 0)
+          end
+
+          # If already logged in as non admin, logout first
+          Page::Main::Menu.perform do |menu|
+            menu.sign_out if menu.has_personal_area?(wait: 0)
+          end
+
           admin = QA::Resource::User.new.tap do |user|
             user.username = QA::Runtime::User.admin_username
             user.password = QA::Runtime::User.admin_password

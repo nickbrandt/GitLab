@@ -101,6 +101,8 @@ module QA
           url: url,
           payload: payload,
           verify_ssl: false)
+      rescue RestClient::ExceptionWithResponse => e
+        e.response
       end
 
       def get(url)
@@ -108,6 +110,8 @@ module QA
           method: :get,
           url: url,
           verify_ssl: false)
+      rescue RestClient::ExceptionWithResponse => e
+        e.response
       end
     end
   end
