@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module UserCalloutsHelper
+  prepend EE::UserCalloutsHelper
+
   GKE_CLUSTER_INTEGRATION = 'gke_cluster_integration'.freeze
   GCP_SIGNUP_OFFER = 'gcp_signup_offer'.freeze
 
