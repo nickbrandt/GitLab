@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import initEETrialBanner from 'ee/ee_trial_banner';
-import Stats from 'ee/stats';
+import trackNavbarEvents from 'ee/event_tracking/navbar';
 
 $(() => {
   /**
@@ -11,5 +11,5 @@ $(() => {
   // EE specific calls
   initEETrialBanner();
 
-  Stats.bindTrackableContainer('.navbar-gitlab', 'navbar_top');
+  trackNavbarEvents();
 });
