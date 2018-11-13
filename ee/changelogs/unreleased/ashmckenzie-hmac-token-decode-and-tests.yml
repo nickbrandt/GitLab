@@ -1,5 +1,0 @@
----
-title: Move JSONWebToken::HMACToken out from EE
-merge_request: 8353
-author:
-type: changed
