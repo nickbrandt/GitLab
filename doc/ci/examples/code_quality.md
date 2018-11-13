@@ -43,13 +43,7 @@ Due to implementation limitations we always take the latest Code Quality artifac
 TIP: **Tip:**
 For [GitLab Starter][ee] users, this information will be automatically
 extracted and shown right in the merge request widget.
-<<<<<<< HEAD
 [Learn more on Code Quality in merge requests](../../user/project/merge_requests/code_quality.html).
-
-## Previous job definitions
-=======
-[Learn more on Code Quality in merge requests](https://docs.gitlab.com/ee/user/project/merge_requests/code_quality.html).
->>>>>>> upstream/master
 
 ## Previous job definitions
 
@@ -81,16 +75,10 @@ code_quality:
       paths: [gl-code-quality-report.json]
 ```
 
-<<<<<<< HEAD
-Alternatively the job name could be `codeclimate` or `codequality` and the artifact name could be
-`codeclimate.json`. These names have been deprecated with GitLab 11.0 and may be removed
-in next major release, GitLab 12.0.
-=======
 Alternatively the job name could be `codeclimate` or `codequality`
 and the artifact name could be `codeclimate.json`.
 These names have been deprecated with GitLab 11.0
 and may be removed in next major release, GitLab 12.0.
->>>>>>> upstream/master
 
 For GitLab 10.3 and earlier, the job should look like:
 

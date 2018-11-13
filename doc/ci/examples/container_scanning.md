@@ -51,11 +51,7 @@ The above example will create a `container_scanning` job in your CI/CD pipeline,
 the image from the [Container Registry](../../user/project/container_registry.md)
 (whose name is defined from the two `CI_APPLICATION_` variables) and scan it
 for possible vulnerabilities. The report will be saved as a
-<<<<<<< HEAD
 [Container Scanning report artifact](../../ci/yaml/README.md#artifactsreportscontainer_scanning)
-=======
-[Container Scanning report artifact](https://docs.gitlab.com/ee//ci/yaml/README.html#artifactsreportscontainer_scanning)
->>>>>>> upstream/master
 that you can later download and analyze.
 Due to implementation limitations we always take the latest Container Scanning artifact available.
 
@@ -66,11 +62,7 @@ in our case its named `clair-whitelist.yml`.
 TIP: **Tip:**
 For [GitLab Ultimate][ee] users, this information will
 be automatically extracted and shown right in the merge request widget.
-<<<<<<< HEAD
 [Learn more on Container Scanning in merge requests](../../user/project/merge_requests/container_scanning.html).
-=======
-[Learn more on Container Scanning in merge requests](https://docs.gitlab.com/ee/user/project/merge_requests/container_scanning.html).
->>>>>>> upstream/master
 
 CAUTION: **Caution:**
 Starting with GitLab 11.5, Container Scanning feature is licensed under the name `container_scanning`.

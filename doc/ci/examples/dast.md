@@ -17,11 +17,7 @@ It can be very useful combined with [Review Apps](../review_apps/index.md).
 ## Example
 
 First, you need GitLab Runner with
-<<<<<<< HEAD
 [docker executor](https://docs.gitlab.com/runner/executors/docker.html).
-=======
-[docker-in-docker executor](../docker/using_docker_build.md#use-docker-in-docker-executor).
->>>>>>> upstream/master
 
 Once you set up the Runner, add a new job to `.gitlab-ci.yml` that
 generates the expected report:
@@ -44,11 +40,7 @@ dast:
 The above example will create a `dast` job in your CI/CD pipeline which will run
 the tests on the URL defined in the `website` variable (change it to use your
 own) and scan it for possible vulnerabilities. The report will be saved as a
-<<<<<<< HEAD
 [DAST report artifact](../../ci/yaml/README.md#artifactsreportsdast)
-=======
-[DAST report artifact](https://docs.gitlab.com/ee//ci/yaml/README.html#artifactsreportsdast)
->>>>>>> upstream/master
 that you can later download and analyze.
 Due to implementation limitations we always take the latest DAST artifact available.
 
@@ -80,11 +72,7 @@ to learn more about authentication settings.
 TIP: **Tip:**
 For [GitLab Ultimate][ee] users, this information will
 be automatically extracted and shown right in the merge request widget.
-<<<<<<< HEAD
 [Learn more on DAST in merge requests](../../user/project/merge_requests/dast.md).
-=======
-[Learn more on DAST in merge requests](https://docs.gitlab.com/ee/user/project/merge_requests/dast.html).
->>>>>>> upstream/master
 
 ## Previous job definitions
 
