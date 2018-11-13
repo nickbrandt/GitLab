@@ -17,17 +17,17 @@
 
   - if dashboard_nav_link?(:activity)
     = nav_link(path: 'dashboard#activity', html_options: { class: "d-none d-lg-block d-xl-block" }) do
-      = link_to activity_dashboard_path, class: 'dashboard-shortcuts-activity', title: _('Activity') do
+      = link_to activity_dashboard_path(:referrer_id => "navbar"), class: 'dashboard-shortcuts-activity', title: _('Activity') do
         = _('Activity')
 
   - if dashboard_nav_link?(:milestones)
     = nav_link(controller: 'dashboard/milestones', html_options: { class: "d-none d-lg-block d-xl-block" }) do
-      = link_to dashboard_milestones_path, class: 'dashboard-shortcuts-milestones', title: _('Milestones') do
+      = link_to dashboard_milestones_path(:referrer_id => "navbar"), class: 'dashboard-shortcuts-milestones', title: _('Milestones') do
         = _('Milestones')
 
   - if dashboard_nav_link?(:snippets)
     = nav_link(controller: 'dashboard/snippets', html_options: { class: "d-none d-lg-block d-xl-block" }) do
-      = link_to dashboard_snippets_path, class: 'dashboard-shortcuts-snippets', title: _('Snippets') do
+      = link_to dashboard_snippets_path(:referrer_id => "navbar"), class: 'dashboard-shortcuts-snippets', title: _('Snippets') do
         = _('Snippets')
 
   - if any_dashboard_nav_link?([:groups, :milestones, :activity, :snippets])
@@ -39,23 +39,23 @@
         %ul
           - if dashboard_nav_link?(:activity)
             = nav_link(path: 'dashboard#activity') do
-              = link_to activity_dashboard_path, title: _('Activity') do
+              = link_to activity_dashboard_path(:referrer_id => "navbar"), title: _('Activity') do
                 = _('Activity')
 
           - if dashboard_nav_link?(:milestones)
             = nav_link(controller: 'dashboard/milestones') do
-              = link_to dashboard_milestones_path, class: 'dashboard-shortcuts-milestones', title: _('Milestones') do
+              = link_to dashboard_milestones_path(:referrer_id => "navbar"), class: 'dashboard-shortcuts-milestones', title: _('Milestones') do
                 = _('Milestones')
 
           - if dashboard_nav_link?(:snippets)
             = nav_link(controller: 'dashboard/snippets') do
-              = link_to dashboard_snippets_path, class: 'dashboard-shortcuts-snippets', title: _('Snippets') do
+              = link_to dashboard_snippets_path(:referrer_id => "navbar"), class: 'dashboard-shortcuts-snippets', title: _('Snippets') do
                 = _('Snippets')
 
   -# Shortcut to Dashboard > Projects
   - if dashboard_nav_link?(:projects)
     %li.hidden
-      = link_to dashboard_projects_path, title: _('Projects'), class: 'dashboard-shortcuts-projects' do
+      = link_to dashboard_projects_path(:referrer_id => "navbar"), title: _('Projects'), class: 'dashboard-shortcuts-projects' do
         = _('Projects')
 
   - if current_controller?('ide')
@@ -69,15 +69,15 @@
   = render_if_exists 'dashboard/operations/nav_link'
   - if can?(current_user, :read_instance_statistics)
     = nav_link(controller: [:conversational_development_index, :cohorts]) do
-      = link_to instance_statistics_root_path, title: _('Instance Statistics'), aria: { label: _('Instance Statistics') }, data: {toggle: 'tooltip', placement: 'bottom', container: 'body'} do
+      = link_to instance_statistics_root_path(:referrer_id => "navbar"), title: _('Instance Statistics'), aria: { label: _('Instance Statistics') }, data: {toggle: 'tooltip', placement: 'bottom', container: 'body'} do
         = sprite_icon('chart', size: 18)
   - if current_user.admin?
     = nav_link(controller: 'admin/dashboard') do
-      = link_to admin_root_path, class: 'admin-icon qa-admin-area-link', title: _('Admin area'), aria: { label: _('Admin area') }, data: {toggle: 'tooltip', placement: 'bottom', container: 'body'} do
+      = link_to admin_root_path(:referrer_id => "navbar"), class: 'admin-icon qa-admin-area-link', title: _('Admin area'), aria: { label: _('Admin area') }, data: {toggle: 'tooltip', placement: 'bottom', container: 'body'} do
         = sprite_icon('admin', size: 18)
   - if Gitlab::Sherlock.enabled?
     %li
-      = link_to sherlock_transactions_path, class: 'admin-icon', title: _('Sherlock Transactions'),
+      = link_to sherlock_transactions_path(:referrer_id => "navbar"), class: 'admin-icon', title: _('Sherlock Transactions'),
         data: {toggle: 'tooltip', placement: 'bottom', container: 'body'} do
         = icon('tachometer fw')
   - if Gitlab::Geo.secondary? && Gitlab::Geo.primary_node_configured?

@@ -12,10 +12,10 @@
             = _('This group')
           - if create_group_project
             %li.header-new-group-project
-              = link_to _('New project'), new_project_path(namespace_id: @group.id)
+              = link_to _('New project'), new_project_path(namespace_id: @group.id, referrer_id: "navbar")
           - if create_group_subgroup
             %li
-              = link_to _('New subgroup'), new_group_path(parent_id: @group.id)
+              = link_to _('New subgroup'), new_group_path(parent_id: @group.id, referrer_id: "navbar")
           %li.divider
           %li.dropdown-bold-header GitLab
 
@@ -28,20 +28,20 @@
             = _('This project')
           - if create_project_issue
             %li
-              = link_to _('New issue'), new_project_issue_path(@project)
+              = link_to _('New issue'), new_project_issue_path(@project, :referrer_id => "navbar")
           - if merge_project
             %li
-              = link_to _('New merge request'), project_new_merge_request_path(merge_project)
+              = link_to _('New merge request'), project_new_merge_request_path(merge_project, :referrer_id => "navbar")
           - if create_project_snippet
             %li.header-new-project-snippet
-              = link_to _('New snippet'), new_project_snippet_path(@project)
+              = link_to _('New snippet'), new_project_snippet_path(@project, :referrer_id => "navbar")
           %li.divider
           %li.dropdown-bold-header GitLab
       - if current_user.can_create_project?
         %li
-          = link_to _('New project'), new_project_path, class: 'qa-global-new-project-link'
+          = link_to _('New project'), new_project_path(:referrer_id => "navbar"), class: 'qa-global-new-project-link'
       - if current_user.can_create_group?
         %li
-          = link_to _('New group'), new_group_path
+          = link_to _('New group'), new_group_path(:referrer_id => "navbar")
       %li
-        = link_to _('New snippet'), new_snippet_path
+        = link_to _('New snippet'), new_snippet_path(:referrer_id => "navbar")
