@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class LfsObject < ActiveRecord::Base
-  prepend EE::LfsObject
   include AfterCommitQueue
   include ObjectStorage::BackgroundMove
 
@@ -42,3 +41,5 @@ class LfsObject < ActiveRecord::Base
     Digest::SHA256.file(path).hexdigest
   end
 end
+
+LfsObject.prepend(EE::LfsObject)

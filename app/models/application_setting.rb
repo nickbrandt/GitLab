@@ -7,8 +7,6 @@ class ApplicationSetting < ActiveRecord::Base
   include IgnorableColumn
   include ChronicDurationAttribute
 
-  prepend EE::ApplicationSetting
-
   add_authentication_token_field :runners_registration_token
   add_authentication_token_field :health_check_access_token
 
@@ -489,3 +487,5 @@ class ApplicationSetting < ActiveRecord::Base
     Gitlab::PerformanceBar.expire_allowed_user_ids_cache
   end
 end
+
+ApplicationSetting.prepend(EE::ApplicationSetting)

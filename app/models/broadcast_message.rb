@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class BroadcastMessage < ActiveRecord::Base
-  prepend EE::BroadcastMessage
   include CacheMarkdownField
   include Sortable
 
@@ -71,3 +70,5 @@ class BroadcastMessage < ActiveRecord::Base
     Rails.cache.delete(CACHE_KEY)
   end
 end
+
+BroadcastMessage.prepend(EE::BroadcastMessage)

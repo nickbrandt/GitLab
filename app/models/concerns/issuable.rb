@@ -24,8 +24,6 @@ module Issuable
   include CreatedAtFilterable
   include UpdatedAtFilterable
 
-  prepend EE::Issuable
-
   # This object is used to gather issuable meta data for displaying
   # upvotes, downvotes, notes and closing merge requests count for issues and merge requests
   # lists avoiding n+1 queries and improving performance.
@@ -371,3 +369,8 @@ module Issuable
     old_title != title
   end
 end
+
+# We have to prepend into Issuable::ClassMethods, as otherwise the methods
+# defined in EE::Issuable will available on Issuable, and not
+# Issuable::ClassMethods (= what in turn is exposed to classes).
+Issuable::ClassMethods.prepend(EE::Issuable)

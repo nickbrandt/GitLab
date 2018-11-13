@@ -2,8 +2,6 @@
 
 module Clusters
   class Cluster < ActiveRecord::Base
-    prepend EE::Clusters::Cluster
-
     include Presentable
     include Gitlab::Utils::StrongMemoize
 
@@ -174,3 +172,5 @@ module Clusters
     end
   end
 end
+
+Clusters::Cluster.prepend(EE::Clusters::Cluster)

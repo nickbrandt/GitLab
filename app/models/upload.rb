@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Upload < ActiveRecord::Base
-  prepend EE::Upload
-
   # Upper limit for foreground checksum processing
   CHECKSUM_THRESHOLD = 100.megabytes
 
@@ -108,3 +106,5 @@ class Upload < ActiveRecord::Base
     super&.to_sym
   end
 end
+
+Upload.prepend(EE::Upload)

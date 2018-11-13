@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Board < ActiveRecord::Base
-  prepend EE::Board
-
   belongs_to :group
   belongs_to :project
 
@@ -35,3 +33,5 @@ class Board < ActiveRecord::Base
     false
   end
 end
+
+Board.prepend(EE::Board)
