@@ -106,7 +106,7 @@ module QA
         EE::Page::Group::Members.perform do |page|
           page.click_sync_now
           users_synchronised = page.with_retry(reload: true) do
-            expected_users.map { |user| page.has_content?(user) }.reduce(true) { |a, b| a && b }
+            expected_users.map { |user| page.has_content?(user) }.all?
           end
           expect(users_synchronised).to be_truthy
         end
