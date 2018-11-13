@@ -35,7 +35,13 @@ describe Milestone, :elastic do
       'project_id',
       'created_at',
       'updated_at'
-    )
+    ).merge({
+      'join_field' => {
+        'name' => milestone.es_type,
+        'parent' => milestone.es_parent
+      },
+      'type' => milestone.es_type
+    })
 
     expect(milestone.as_indexed_json).to eq(expected_hash)
   end

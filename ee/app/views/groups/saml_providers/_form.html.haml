@@ -1,4 +1,4 @@
-%section.saml_provider
+%section.saml_provider#js-saml-settings-form
   = form_for [group, saml_provider], url: group_saml_providers_path do |f|
     .form-group.row
       = form_errors(saml_provider)
@@ -26,3 +26,5 @@
 
     .form-actions
       = f.submit _("Save changes"), class: 'btn btn-success qa-save-changes-button'
+      #js-saml-test-button.has-tooltip.pull-right
+        = render 'test_button', saml_provider: @saml_provider

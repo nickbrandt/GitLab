@@ -69,7 +69,7 @@
         %p If you remove this license, GitLab will fall back on the previous license, if any.
         %p If there is no previous license or if the previous license has expired, some GitLab functionality will be blocked until a new, valid license is uploaded.
         %br
-        = link_to 'Remove license', admin_license_path, data: { confirm: "Are you sure you want to remove the license?" }, method: :delete, class: "btn btn-remove"
+        = link_to 'Remove license', admin_license_path, data: { confirm: "Are you sure you want to remove the license?" }, method: :delete, class: "btn btn-remove qa-remove-license-link"
 
 = render "breakdown", license: @license
 

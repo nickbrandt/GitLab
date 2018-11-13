@@ -19,11 +19,25 @@ module EE
       # here since Group inherits from Namespace, the entity_type would be set to `Namespace`.
       has_many :audit_events, -> { where(entity_type: ::Group) }, foreign_key: 'entity_id'
 
+      belongs_to :file_template_project, class_name: "Project"
+
+      # Use +checked_file_template_project+ instead, which implements important
+      # visibility checks
+      private :file_template_project
+
       validates :repository_size_limit,
                 numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
 
       scope :where_group_links_with_provider, ->(provider) do
         joins(:ldap_group_links).where(ldap_group_links: { provider: provider })
+      end
+
+      scope :with_custom_file_templates, -> do
+        preload(
+          file_template_project: :route,
+          projects: :route,
+          shared_projects: :route
+        ).where.not(file_template_project_id: nil)
       end
 
       state_machine :ldap_sync_status, namespace: :ldap_sync, initial: :ready do
@@ -68,6 +82,11 @@ module EE
       end
     end
 
+    def latest_vulnerabilities
+      Vulnerabilities::Occurrence
+        .for_pipelines(all_pipelines.with_vulnerabilities.latest_successful_ids_per_project)
+    end
+
     def human_ldap_access
       ::Gitlab::Access.options_with_owner.key(ldap_access)
     end
@@ -110,6 +129,24 @@ module EE
 
     def first_non_empty_project
       projects.detect { |project| !project.empty_repo? }
+    end
+
+    # Overrides a method defined in `::EE::Namespace`
+    override :checked_file_template_project
+    def checked_file_template_project(*args, &blk)
+      project = file_template_project(*args, &blk)
+
+      return nil unless project && (
+          project_ids.include?(project.id) || shared_project_ids.include?(project.id))
+
+      # The license check would normally be the cheapest to perform, so would
+      # come first. In this case, the method is carefully designed to perform
+      # no SQL at all, but `feature_available?` will cause an ApplicationSetting
+      # to be created if it doesn't already exist! This is mostly a problem in
+      # the specs, but best avoided in any case.
+      return nil unless feature_available?(:custom_file_templates_for_namespace)
+
+      project
     end
   end
 end

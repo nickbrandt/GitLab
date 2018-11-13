@@ -37,6 +37,7 @@ GET /groups
     "request_access_enabled": false,
     "full_name": "Foobar Group",
     "full_path": "foo-bar",
+    "file_template_project_id": 1,
     "parent_id": null
   }
 ]
@@ -62,6 +63,7 @@ GET /groups?statistics=true
     "request_access_enabled": false,
     "full_name": "Foobar Group",
     "full_path": "foo-bar",
+    "file_template_project_id": 1,
     "parent_id": null,
     "statistics": {
       "storage_size" : 212,
@@ -122,6 +124,7 @@ GET /groups/:id/subgroups
     "request_access_enabled": false,
     "full_name": "Foobar Group",
     "full_path": "foo-bar",
+    "file_template_project_id": 1,
     "parent_id": 123
   }
 ]
@@ -232,6 +235,7 @@ Example response:
   "request_access_enabled": false,
   "full_name": "Twitter",
   "full_path": "twitter",
+  "file_template_project_id": 1,
   "parent_id": null,
   "shared_runners_minutes_limit": 133,
   "projects": [
@@ -387,6 +391,7 @@ Example response:
   "request_access_enabled": false,
   "full_name": "Twitter",
   "full_path": "twitter",
+  "file_template_project_id": 1,
   "parent_id": null
 }
 ```
@@ -446,6 +451,7 @@ PUT /groups/:id
 | `visibility` | string | no | The visibility level of the group. Can be `private`, `internal`, or `public`. |
 | `lfs_enabled` (optional) | boolean | no | Enable/disable Large File Storage (LFS) for the projects in this group |
 | `request_access_enabled` | boolean | no | Allow users to request member access. |
+| `file_template_project_id` | integer | no | **(Premium)** The ID of a project to load custom file templates from |
 | `shared_runners_minutes_limit` | integer | no | (admin-only) Pipeline minutes quota for this group |
 
 ```bash
@@ -467,6 +473,7 @@ Example response:
   "request_access_enabled": false,
   "full_name": "Foobar Group",
   "full_path": "foo-bar",
+  "file_template_project_id": 1,
   "parent_id": null,
   "projects": [
     {

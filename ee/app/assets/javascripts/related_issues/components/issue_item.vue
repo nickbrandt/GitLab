@@ -28,14 +28,8 @@ export default {
     }"
     class="flex"
   >
-    <div class="block-truncated append-right-10">
-      <a
-        :href="computedPath"
-        class="issue-token-title-text sortable-link"
-      >
-        {{ title }}
-      </a>
-      <div class="block text-secondary">
+    <div class="block-truncated append-right-8 d-inline-flex">
+      <div class="block text-secondary append-right-default">
         <icon
           v-if="hasState"
           v-tooltip
@@ -47,6 +41,12 @@ export default {
         />
         {{ displayReference }}
       </div>
+      <a
+        :href="computedPath"
+        class="issue-token-title-text sortable-link"
+      >
+        {{ title }}
+      </a>
     </div>
     <button
       v-if="canRemove"
@@ -54,7 +54,8 @@ export default {
       v-tooltip
       :disabled="removeDisabled"
       type="button"
-      class="btn btn-default js-issue-item-remove-button flex-align-self-center flex-right"
+      class="btn btn-default js-issue-item-remove-button issue-item-remove-button flex-align-self-center flex-right
+      qa-remove-issue-button"
       title="Remove"
       aria-label="Remove"
       @click="onRemoveRequest"

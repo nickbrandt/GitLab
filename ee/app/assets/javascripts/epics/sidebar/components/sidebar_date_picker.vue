@@ -8,6 +8,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 import DatePicker from '~/vue_shared/components/pikaday.vue';
 import CollapsedCalendarIcon from '~/vue_shared/components/sidebar/collapsed_calendar_icon.vue';
 import ToggleSidebar from '~/vue_shared/components/sidebar/toggle_sidebar.vue';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 
 const label = __('Date picker');
 const pickerLabel = __('Fixed date');
@@ -22,6 +23,7 @@ export default {
     DatePicker,
     CollapsedCalendarIcon,
     ToggleSidebar,
+    GlLoadingIcon,
   },
   props: {
     blockClass: {
@@ -119,7 +121,9 @@ export default {
     },
     popoverOptions() {
       return this.getPopoverConfig({
-        title: s__('Epics|These dates affect how your epics appear in the roadmap. Dates from milestones come from the milestones assigned to issues in the epic. You can also set fixed dates or remove them entirely.'),
+        title: s__(
+          'Epics|These dates affect how your epics appear in the roadmap. Dates from milestones come from the milestones assigned to issues in the epic. You can also set fixed dates or remove them entirely.',
+        ),
         content: `
           <a
             href="${gon.gitlab_url}/help/user/group/epics/index.md#start-date-and-due-date"
@@ -304,4 +308,3 @@ export default {
     </div>
   </div>
 </template>
-

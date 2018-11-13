@@ -6,7 +6,7 @@ describe QuickActions::InterpretService do
   let(:user2) { create(:user) }
   let(:user3) { create(:user) }
   let(:group) { create(:group) }
-  let(:project) { create(:project, :public, group: group) }
+  let(:project) { create(:project, :repository, :public, group: group) }
   let(:issue) { create(:issue, project: project) }
   let(:service) { described_class.new(project, current_user) }
 
@@ -174,6 +174,30 @@ describe QuickActions::InterpretService do
           _, updates = service.execute(content, issue)
 
           expect(updates).to eq(epic: nil)
+        end
+      end
+    end
+
+    context 'approve command' do
+      let(:merge_request) { create(:merge_request, source_project: project) }
+      let(:content) { '/approve' }
+
+      it 'approves the current merge request' do
+        service.execute(content, merge_request)
+
+        expect(merge_request.approved_by_users).to eq([current_user])
+      end
+
+      context "when the user can't approve" do
+        before do
+          project.team.truncate
+          project.add_guest(current_user)
+        end
+
+        it 'does not approve the MR' do
+          service.execute(content, merge_request)
+
+          expect(merge_request.approved_by_users).to be_empty
         end
       end
     end

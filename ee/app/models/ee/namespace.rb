@@ -35,10 +35,16 @@ module EE
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         to: :namespace_statistics, allow_nil: true
 
+      # Opportunistically clear the +file_template_project_id+ if invalid
+      before_validation :clear_file_template_project_id
+
       validate :validate_plan_name
       validate :validate_shared_runner_minutes_support
 
       before_create :sync_membership_lock_with_parent
+
+      # Changing the plan or other details may invalidate this cache
+      before_save :clear_feature_available_cache
     end
 
     class_methods do
@@ -72,6 +78,9 @@ module EE
     # for a given Namespace plan. This method should consider ancestor groups
     # being licensed.
     def feature_available?(feature)
+      # This feature might not be behind a feature flag at all, so default to true
+      return false unless ::Feature.enabled?(feature, default_enabled: true)
+
       available_features = strong_memoize(:feature_available) do
         Hash.new do |h, feature|
           h[feature] = load_feature_available(feature)
@@ -116,7 +125,7 @@ module EE
 
     def shared_runner_minutes_supported?
       if has_parent?
-        !Feature.enabled?(:shared_runner_minutes_on_root_namespace)
+        !::Feature.enabled?(:shared_runner_minutes_on_root_namespace)
       else
         true
       end
@@ -139,7 +148,7 @@ module EE
     end
 
     def shared_runners_enabled?
-      if Feature.enabled?(:shared_runner_minutes_on_root_namespace)
+      if ::Feature.enabled?(:shared_runner_minutes_on_root_namespace)
         all_projects.with_shared_runners.any?
       else
         projects.with_shared_runners.any?
@@ -197,6 +206,23 @@ module EE
         actual_plan_name == FREE_PLAN
     end
 
+    # A namespace may not have a file template project
+    def checked_file_template_project
+      nil
+    end
+
+    def checked_file_template_project_id
+      checked_file_template_project&.id
+    end
+
+    def store_security_reports_available?
+      ::Feature.enabled?(:store_security_reports, self, default_enabled: true) && (
+        feature_available?(:sast) ||
+        feature_available?(:dependency_scanning) ||
+        feature_available?(:sast_container) ||
+        feature_available?(:dast))
+    end
+
     private
 
     def validate_plan_name
@@ -213,6 +239,10 @@ module EE
       end
     end
 
+    def clear_feature_available_cache
+      clear_memoization(:feature_available)
+    end
+
     def load_feature_available(feature)
       globally_available = License.feature_available?(feature)
 
@@ -221,6 +251,13 @@ module EE
       else
         globally_available
       end
+    end
+
+    def clear_file_template_project_id
+      return unless has_attribute?(:file_template_project_id)
+      return if checked_file_template_project_id.present?
+
+      self.file_template_project_id = nil
     end
   end
 end

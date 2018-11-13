@@ -2,8 +2,6 @@
 
 module Boards
   class ListService < Boards::BaseService
-    prepend EE::Boards::ListService
-
     def execute
       create_board! if parent.boards.empty?
       boards
@@ -20,3 +18,5 @@ module Boards
     end
   end
 end
+
+Boards::ListService.prepend(EE::Boards::ListService)

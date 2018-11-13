@@ -34,11 +34,7 @@ export default {
       required: true,
       type: Object,
       validator(mediatorObject) {
-        return (
-          mediatorObject.service &&
-          mediatorObject.service.update &&
-          mediatorObject.store
-        );
+        return mediatorObject.service && mediatorObject.service.update && mediatorObject.store;
       },
     },
   },
@@ -67,8 +63,7 @@ export default {
 
   methods: {
     toggleForm() {
-      this.mediator.store.isLockDialogOpen = !this.mediator.store
-        .isLockDialogOpen;
+      this.mediator.store.isLockDialogOpen = !this.mediator.store.isLockDialogOpen;
     },
 
     updateLockedAttribute(locked) {
@@ -79,9 +74,14 @@ export default {
         .then(() => window.location.reload())
         .catch(() =>
           Flash(
-            sprintf(__('Something went wrong trying to change the locked state of this %{issuableDisplayName}'), {
-              issuableDisplayName: this.issuableDisplayName,
-            }),
+            sprintf(
+              __(
+                'Something went wrong trying to change the locked state of this %{issuableDisplayName}',
+              ),
+              {
+                issuableDisplayName: this.issuableDisplayName,
+              },
+            ),
           ),
         );
     },
@@ -102,7 +102,6 @@ export default {
     >
       <icon
         :name="lockIcon"
-        aria-hidden="true"
         class="sidebar-item-icon is-active"
       />
     </div>
@@ -134,7 +133,6 @@ export default {
         <icon
           :size="16"
           name="lock"
-          aria-hidden="true"
           class="sidebar-item-icon inline is-active"
         />
         {{ __('Locked') }}
@@ -147,7 +145,6 @@ export default {
         <icon
           :size="16"
           name="lock-open"
-          aria-hidden="true"
           class="sidebar-item-icon inline"
         />
         {{ __('Unlocked') }}

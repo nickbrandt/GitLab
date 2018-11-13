@@ -1,71 +1,75 @@
 <script>
-  /* eslint-disable vue/require-default-prop */
+/* eslint-disable vue/require-default-prop */
 
-  import WeightSelect from 'ee/weight_select';
+import WeightSelect from 'ee/weight_select';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 
-  const ANY_WEIGHT = 'Any Weight';
-  const NO_WEIGHT = 'No Weight';
+const ANY_WEIGHT = 'Any Weight';
+const NO_WEIGHT = 'No Weight';
 
-  export default {
-    props: {
-      board: {
-        type: Object,
-        required: true,
-      },
-      value: {
-        type: [Number, String],
-        required: false,
-      },
-      canEdit: {
-        type: Boolean,
-        required: false,
-        default: false,
-      },
-      weights: {
-        type: Array,
-        required: true,
-      },
+export default {
+  components: {
+    GlLoadingIcon,
+  },
+  props: {
+    board: {
+      type: Object,
+      required: true,
     },
-    data() {
-      return {
-        fieldName: 'weight',
-      };
+    value: {
+      type: [Number, String],
+      required: false,
     },
-    computed: {
-      valueClass() {
-        if (this.valueText === ANY_WEIGHT) {
-          return 'text-secondary';
-        }
-        return 'bold';
-      },
-      valueText() {
-        if (this.value > 0) return this.value;
-        if (this.value === 0) return NO_WEIGHT;
-        return ANY_WEIGHT;
-      },
+    canEdit: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
-    mounted() {
-      this.weightDropdown = new WeightSelect(this.$refs.dropdownButton, {
-        handleClick: this.selectWeight,
-        selected: this.value,
-        fieldName: this.fieldName,
-      });
+    weights: {
+      type: Array,
+      required: true,
     },
-    methods: {
-      selectWeight(weight) {
-        this.board.weight = this.weightInt(weight);
-      },
-      weightInt(weight) {
-        if (weight > 0) {
-          return weight;
-        }
-        if (weight === NO_WEIGHT) {
-          return 0;
-        }
-        return -1;
-      },
+  },
+  data() {
+    return {
+      fieldName: 'weight',
+    };
+  },
+  computed: {
+    valueClass() {
+      if (this.valueText === ANY_WEIGHT) {
+        return 'text-secondary';
+      }
+      return 'bold';
     },
-  };
+    valueText() {
+      if (this.value > 0) return this.value;
+      if (this.value === 0) return NO_WEIGHT;
+      return ANY_WEIGHT;
+    },
+  },
+  mounted() {
+    this.weightDropdown = new WeightSelect(this.$refs.dropdownButton, {
+      handleClick: this.selectWeight,
+      selected: this.value,
+      fieldName: this.fieldName,
+    });
+  },
+  methods: {
+    selectWeight(weight) {
+      this.board.weight = this.weightInt(weight);
+    },
+    weightInt(weight) {
+      if (weight > 0) {
+        return weight;
+      }
+      if (weight === NO_WEIGHT) {
+        return 0;
+      }
+      return -1;
+    },
+  },
+};
 </script>
 
 <template>

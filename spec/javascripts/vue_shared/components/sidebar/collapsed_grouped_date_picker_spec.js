@@ -12,7 +12,7 @@ describe('collapsedGroupedDatePicker', () => {
   });
 
   describe('toggleCollapse events', () => {
-    beforeEach((done) => {
+    beforeEach(done => {
       spyOn(vm, 'toggleSidebar');
       vm.minDate = new Date('07/17/2016');
       Vue.nextTick(done);
@@ -20,12 +20,13 @@ describe('collapsedGroupedDatePicker', () => {
 
     it('should emit when collapsed-calendar-icon is clicked', () => {
       vm.$el.querySelector('.sidebar-collapsed-icon').click();
+
       expect(vm.toggleSidebar).toHaveBeenCalled();
     });
   });
 
   describe('minDate and maxDate', () => {
-    beforeEach((done) => {
+    beforeEach(done => {
       vm.minDate = new Date('07/17/2016');
       vm.maxDate = new Date('07/17/2017');
       Vue.nextTick(done);
@@ -33,6 +34,7 @@ describe('collapsedGroupedDatePicker', () => {
 
     it('should render both collapsed-calendar-icon', () => {
       const icons = vm.$el.querySelectorAll('.sidebar-collapsed-icon');
+
       expect(icons.length).toEqual(2);
       expect(icons[0].innerText.trim()).toEqual('Jul 17 2016');
       expect(icons[1].innerText.trim()).toEqual('Jul 17 2017');
@@ -40,26 +42,28 @@ describe('collapsedGroupedDatePicker', () => {
   });
 
   describe('minDate', () => {
-    beforeEach((done) => {
+    beforeEach(done => {
       vm.minDate = new Date('07/17/2016');
       Vue.nextTick(done);
     });
 
     it('should render minDate in collapsed-calendar-icon', () => {
       const icons = vm.$el.querySelectorAll('.sidebar-collapsed-icon');
+
       expect(icons.length).toEqual(1);
       expect(icons[0].innerText.trim()).toEqual('From Jul 17 2016');
     });
   });
 
   describe('maxDate', () => {
-    beforeEach((done) => {
+    beforeEach(done => {
       vm.maxDate = new Date('07/17/2017');
       Vue.nextTick(done);
     });
 
     it('should render maxDate in collapsed-calendar-icon', () => {
       const icons = vm.$el.querySelectorAll('.sidebar-collapsed-icon');
+
       expect(icons.length).toEqual(1);
       expect(icons[0].innerText.trim()).toEqual('Until Jul 17 2017');
     });
@@ -68,8 +72,15 @@ describe('collapsedGroupedDatePicker', () => {
   describe('no dates', () => {
     it('should render None', () => {
       const icons = vm.$el.querySelectorAll('.sidebar-collapsed-icon');
+
       expect(icons.length).toEqual(1);
       expect(icons[0].innerText.trim()).toEqual('None');
+    });
+
+    it('should have tooltip as `Start and due date`', () => {
+      const icons = vm.$el.querySelectorAll('.sidebar-collapsed-icon');
+
+      expect(icons[0].dataset.originalTitle).toBe('Start and due date');
     });
   });
 });

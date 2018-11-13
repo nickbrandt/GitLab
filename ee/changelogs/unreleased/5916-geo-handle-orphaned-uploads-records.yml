@@ -1,0 +1,5 @@
+---
+title: 'Geo: Handle orphaned Uploads records'
+merge_request: 8054
+author:
+type: fixed

@@ -10,8 +10,8 @@ module Vulnerabilities
 
     has_many :occurrence_identifiers, class_name: 'Vulnerabilities::OccurrenceIdentifier'
     has_many :occurrences, through: :occurrence_identifiers, class_name: 'Vulnerabilities::Occurrence'
-    has_many :primary_occurrences,  -> { where(vulnerability_occurrences: { primary_identifier_fingerprint: fingerprint }) },
-      through: :occurrence_identifiers, class_name: 'Vulnerabilities::Occurrence', source: :occurrence
+
+    has_many :primary_occurrences, class_name: 'Vulnerabilities::Occurrence', inverse_of: :primary_identifier
 
     belongs_to :project
 
@@ -23,5 +23,7 @@ module Vulnerabilities
     # TODO: find out why it fails
     # validates :fingerprint, presence: true, uniqueness: { scope: :project_id }
     validates :name, presence: true
+
+    scope :with_fingerprint, -> (fingerprints) { where(fingerprint: fingerprints) }
   end
 end

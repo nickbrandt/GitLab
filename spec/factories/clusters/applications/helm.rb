@@ -42,7 +42,7 @@ FactoryBot.define do
 
     trait :timeouted do
       installing
-      updated_at ClusterWaitForAppInstallationWorker::TIMEOUT.ago
+      updated_at { ClusterWaitForAppInstallationWorker::TIMEOUT.ago }
     end
 
     factory :clusters_applications_ingress, class: Clusters::Applications::Ingress do
@@ -54,6 +54,11 @@ FactoryBot.define do
     end
 
     factory :clusters_applications_runner, class: Clusters::Applications::Runner do
+      cluster factory: %i(cluster with_installed_helm provided_by_gcp)
+    end
+
+    factory :clusters_applications_knative, class: Clusters::Applications::Knative do
+      hostname 'example.com'
       cluster factory: %i(cluster with_installed_helm provided_by_gcp)
     end
 

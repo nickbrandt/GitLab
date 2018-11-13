@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module QA
   module Runtime
     module Env
@@ -5,22 +7,46 @@ module QA
 
       extend self
 
+      attr_writer :personal_access_token
+
+      # The environment variables used to indicate if the environment under test
+      # supports the given feature
+      SUPPORTED_FEATURES = {
+        git_protocol_v2: 'QA_CAN_TEST_GIT_PROTOCOL_V2'
+      }.freeze
+
+      def supported_features
+        SUPPORTED_FEATURES
+      end
+
+      def debug?
+        enabled?(ENV['QA_DEBUG'], default: false)
+      end
+
+      def log_destination
+        ENV['QA_LOG_PATH'] || $stdout
+      end
+
       # set to 'false' to have Chrome run visibly instead of headless
       def chrome_headless?
-        (ENV['CHROME_HEADLESS'] =~ /^(false|no|0)$/i) != 0
+        enabled?(ENV['CHROME_HEADLESS'])
       end
 
       def accept_insecure_certs?
-        (ENV['ACCEPT_INSECURE_CERTS'] =~ /^(false|no|0)$/i) != 0
+        enabled?(ENV['ACCEPT_INSECURE_CERTS'])
       end
 
       def running_in_ci?
         ENV['CI'] || ENV['CI_SERVER']
       end
 
+      def signup_disabled?
+        enabled?(ENV['SIGNUP_DISABLED'], default: false)
+      end
+
       # specifies token that can be used for the api
       def personal_access_token
-        ENV['PERSONAL_ACCESS_TOKEN']
+        @personal_access_token ||= ENV['PERSONAL_ACCESS_TOKEN']
       end
 
       def user_username
@@ -40,7 +66,7 @@ module QA
       end
 
       def forker?
-        forker_username && forker_password
+        !!(forker_username && forker_password)
       end
 
       def forker_username
@@ -88,6 +114,23 @@ module QA
         return unless github_access_token.empty?
 
         raise ArgumentError, "Please provide GITHUB_ACCESS_TOKEN"
+      end
+
+      # Returns true if there is an environment variable that indicates that
+      # the feature is supported in the environment under test.
+      # All features are supported by default.
+      def can_test?(feature)
+        raise ArgumentError, %Q(Unknown feature "#{feature}") unless SUPPORTED_FEATURES.include? feature
+
+        enabled?(ENV[SUPPORTED_FEATURES[feature]], default: true)
+      end
+
+      private
+
+      def enabled?(value, default: true)
+        return default if value.nil?
+
+        (value =~ /^(false|no|0)$/i) != 0
       end
     end
   end

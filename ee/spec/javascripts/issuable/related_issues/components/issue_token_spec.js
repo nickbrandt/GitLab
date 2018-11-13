@@ -75,7 +75,7 @@ describe('IssueToken', () => {
   });
 
   describe('with state supplied', () => {
-    describe('`state: \'opened\'`', () => {
+    describe("`state: 'opened'`", () => {
       beforeEach(() => {
         vm = new IssueToken({
           propsData: {
@@ -91,7 +91,7 @@ describe('IssueToken', () => {
       });
     });
 
-    describe('`state: \'reopened\'`', () => {
+    describe("`state: 'reopened'`", () => {
       beforeEach(() => {
         vm = new IssueToken({
           propsData: {
@@ -107,7 +107,7 @@ describe('IssueToken', () => {
       });
     });
 
-    describe('`state: \'closed\'`', () => {
+    describe("`state: 'closed'`", () => {
       beforeEach(() => {
         vm = new IssueToken({
           propsData: {
@@ -139,6 +139,7 @@ describe('IssueToken', () => {
 
     it('shows reference, title, and state', () => {
       const stateIcon = vm.$refs.reference.querySelector('svg');
+
       expect(stateIcon.getAttribute('aria-label')).toEqual(state);
       expect(vm.$refs.reference.textContent.trim()).toEqual(displayReference);
       expect(vm.$refs.title.textContent.trim()).toEqual(title);
@@ -199,6 +200,7 @@ describe('IssueToken', () => {
     it('when getting checked', () => {
       expect(removeRequestSpy).not.toHaveBeenCalled();
       vm.onRemoveRequest();
+
       expect(removeRequestSpy).toHaveBeenCalled();
     });
   });

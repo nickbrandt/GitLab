@@ -115,101 +115,85 @@ describe Ci::Build do
     end
   end
 
-  build_artifacts_methods = {
-    # has_codeclimate_json? is deprecated and replaced with code_quality_artifact (#5779)
-    has_codeclimate_json?: {
-      filename: Ci::Build::CODECLIMATE_FILE,
-      job_names: %w[codeclimate codequality code_quality]
-    },
-    has_code_quality_json?: {
-      filename: Ci::Build::CODE_QUALITY_FILE,
-      job_names: %w[codeclimate codequality code_quality]
-    },
-    has_performance_json?: {
-      filename: Ci::Build::PERFORMANCE_FILE,
-      job_names: %w[performance deploy]
-    },
-    has_sast_json?: {
-      filename: Ci::Build::SAST_FILE,
-      job_names: %w[sast]
-    },
-    has_dependency_scanning_json?: {
-      filename: Ci::Build::DEPENDENCY_SCANNING_FILE,
-      job_names: %w[dependency_scanning]
-    },
-    has_license_management_json?: {
-      filename: Ci::Build::LICENSE_MANAGEMENT_FILE,
-      job_names: %w[license_management]
-    },
-    # has_sast_container_json? is deprecated and replaced with has_container_scanning_json (#5778)
-    has_sast_container_json?: {
-      filename: Ci::Build::SAST_CONTAINER_FILE,
-      job_names: %w[sast:container container_scanning]
-    },
-    has_container_scanning_json?: {
-      filename: Ci::Build::CONTAINER_SCANNING_FILE,
-      job_names: %w[sast:container container_scanning]
-    },
-    has_dast_json?: {
-      filename: Ci::Build::DAST_FILE,
-      job_names: %w[dast]
-    }
-  }
+  describe '.with_security_reports' do
+    subject { described_class.with_security_reports }
 
-  build_artifacts_methods.each do |method, requirements|
-    filename = requirements[:filename]
-    job_names = requirements[:job_names]
+    context 'when build has a security report' do
+      let!(:build) { create(:ee_ci_build, :success, :sast) }
 
-    describe "##{method}" do
-      job_names.each do |job_name|
-        context "with a job named #{job_name} and a file named #{filename}" do
-          let(:build) do
-            create(
-              :ci_build,
-              :artifacts,
-              name: job_name,
-              pipeline: pipeline,
-              options: {
-                artifacts: {
-                  paths: [filename, 'some-other-artifact.txt']
-                }
-              }
-            )
+      it 'selects the build' do
+        is_expected.to eq([build])
+      end
+    end
+
+    context 'when build does not have security reports' do
+      let!(:build) { create(:ci_build, :success, :trace_artifact) }
+
+      it 'does not select the build' do
+        is_expected.to be_empty
+      end
+    end
+
+    context 'when there are multiple builds with security reports' do
+      let!(:builds) { create_list(:ee_ci_build, 5, :success, :sast) }
+
+      it 'does not execute a query for selecting job artifacts one by one' do
+        recorded = ActiveRecord::QueryRecorder.new do
+          subject.each do |build|
+            build.job_artifacts.map { |a| a.file.exists? }
           end
+        end
 
-          it { expect(build.send(method)).to be_truthy }
+        expect(recorded.count).to eq(2)
+      end
+    end
+  end
+
+  describe '#collect_security_reports!' do
+    let(:security_reports) { ::Gitlab::Ci::Reports::Security::Reports.new }
+
+    subject { job.collect_security_reports!(security_reports) }
+
+    before do
+      stub_licensed_features(sast: true)
+    end
+
+    context 'when build has a security report' do
+      context 'when there is a sast report' do
+        before do
+          create(:ee_ci_job_artifact, :sast, job: job, project: job.project)
+        end
+
+        it 'parses blobs and add the results to the report' do
+          subject
+
+          expect(security_reports.get_report('sast').occurrences.size).to eq(3)
         end
       end
 
-      context 'with an invalid filename' do
-        let(:build) do
-          create(
-            :ci_build,
-            :artifacts,
-            name: job_names.first,
-            pipeline: pipeline,
-            options: {}
-          )
+      context 'when there is a corrupted sast report' do
+        before do
+          create(:ee_ci_job_artifact, :sast_with_corrupted_data, job: job, project: job.project)
         end
 
-        it { expect(build.send(method)).to be_falsey }
+        it 'stores an error' do
+          subject
+
+          expect(security_reports.get_report('sast')).to be_errored
+        end
+      end
+    end
+
+    context 'when there is unsupported file type' do
+      before do
+        stub_const("Ci::JobArtifact::SECURITY_REPORT_FILE_TYPES", %w[codequality])
+        create(:ee_ci_job_artifact, :codequality, job: job, project: job.project)
       end
 
-      context 'with an invalid job name' do
-        let(:build) do
-          create(
-            :ci_build,
-            :artifacts,
-            pipeline: pipeline,
-            options: {
-              artifacts: {
-                paths: [filename, 'some-other-artifact.txt']
-              }
-            }
-          )
-        end
+      it 'stores an error' do
+        subject
 
-        it { expect(build.send(method)).to be_falsey }
+        expect(security_reports.get_report('codequality')).to be_errored
       end
     end
   end

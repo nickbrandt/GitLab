@@ -40,6 +40,12 @@ are still maintained they have been deprecated with GitLab 11.0 and may be remov
 in next major release, GitLab 12.0. You are advised to update your current `.gitlab-ci.yml`
 configuration to reflect that change.
 
+CAUTION: **Caution:**
+Starting with GitLab 11.5, Container Scanning feature is licensed under the name `container_scanning`.
+While the old name `sast_container` is still maintained, it has been deprecated with GitLab 11.5 and
+may be removed in next major release, GitLab 12.0. You are advised to update your current `.gitlab-ci.yml`
+configuration to reflect that change if you are using the `$GITLAB_FEATURES` environment variable.
+
 [ee-3672]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/3672
 [ee]: https://about.gitlab.com/pricing/
 [ci]: ../../../ci/README.md

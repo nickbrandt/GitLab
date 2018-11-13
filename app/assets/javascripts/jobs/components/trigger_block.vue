@@ -1,27 +1,32 @@
 <script>
-  export default {
-    props: {
-      trigger: {
-        type: Object,
-        required: true,
-      },
+import { GlButton } from '@gitlab-org/gitlab-ui';
+
+export default {
+  components: {
+    GlButton,
+  },
+  props: {
+    trigger: {
+      type: Object,
+      required: true,
     },
-    data() {
-      return {
-        areVariablesVisible: false,
-      };
+  },
+  data() {
+    return {
+      areVariablesVisible: false,
+    };
+  },
+  computed: {
+    hasVariables() {
+      return this.trigger.variables && this.trigger.variables.length > 0;
     },
-    computed: {
-      hasVariables() {
-        return this.trigger.variables && this.trigger.variables.length > 0;
-      },
+  },
+  methods: {
+    revealVariables() {
+      this.areVariablesVisible = true;
     },
-    methods: {
-      revealVariables() {
-        this.areVariablesVisible = true;
-      },
-    },
-  };
+  },
+};
 </script>
 
 <template>
@@ -41,15 +46,14 @@
     </p>
 
     <p v-if="hasVariables">
-      <button
+      <gl-button
         v-if="!areVariablesVisible"
         type="button"
         class="btn btn-default group js-reveal-variables"
         @click="revealVariables"
       >
         {{ __('Reveal Variables') }}
-      </button>
-
+      </gl-button>
     </p>
 
     <dl

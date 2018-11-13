@@ -11,7 +11,6 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   prepend ::EE::Projects::MergeRequestsController
 
   skip_before_action :merge_request, only: [:index, :bulk_update]
-  before_action :whitelist_query_limiting_ee, only: [:merge, :show]
   before_action :whitelist_query_limiting, only: [:assign_related_issues, :update]
   before_action :authorize_update_issuable!, only: [:close, :edit, :update, :remove_wip, :sort]
   before_action :set_issuables_index, only: [:index]
@@ -46,12 +45,6 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
 
         @noteable = @merge_request
         @commits_count = @merge_request.commits_count
-
-        # TODO cleanup- Fatih Simon Create an issue to remove these after the refactoring
-        # we no longer render notes here. I see it will require a small frontend refactoring,
-        # since we gather some data from this collection.
-        @discussions = @merge_request.discussions
-        @notes = prepare_notes_for_rendering(@discussions.flat_map(&:notes), @noteable)
 
         labels
 
@@ -90,13 +83,14 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   end
 
   def pipelines
-    @pipelines = @merge_request.all_pipelines
+    @pipelines = @merge_request.all_pipelines.page(params[:page]).per(30)
 
     Gitlab::PollingInterval.set_header(response, interval: 10_000)
 
     render json: {
       pipelines: PipelineSerializer
         .new(project: @project, current_user: @current_user)
+        .with_pagination(request, response)
         .represent(@pipelines),
       count: {
         all: @pipelines.count
@@ -174,8 +168,9 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   end
 
   def merge
-    return access_denied! unless @merge_request.can_be_merged_by?(current_user)
-    return render_404 unless @merge_request.approved?
+    access_check_result = merge_access_check
+
+    return access_check_result if access_check_result
 
     status = merge!
 
@@ -208,43 +203,13 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   end
 
   def ci_environments_status
-    environments =
-      begin
-        @merge_request.environments_for(current_user).map do |environment|
-          project = environment.project
-          deployment = environment.first_deployment_for(@merge_request.diff_head_sha)
+    environments = if ci_environments_status_on_merge_result?
+                     EnvironmentStatus.after_merge_request(@merge_request, current_user)
+                   else
+                     EnvironmentStatus.for_merge_request(@merge_request, current_user)
+                   end
 
-          stop_url =
-            if can?(current_user, :stop_environment, environment)
-              stop_project_environment_path(project, environment)
-            end
-
-          metrics_url =
-            if can?(current_user, :read_environment, environment) && environment.has_metrics?
-              metrics_project_environment_deployment_path(environment.project, environment, deployment)
-            end
-
-          metrics_monitoring_url =
-            if can?(current_user, :read_environment, environment)
-              environment_metrics_path(environment)
-            end
-
-          {
-            id: environment.id,
-            name: environment.name,
-            url: project_environment_path(project, environment),
-            metrics_url: metrics_url,
-            metrics_monitoring_url: metrics_monitoring_url,
-            stop_url: stop_url,
-            external_url: environment.external_url,
-            external_url_formatted: environment.formatted_external_url,
-            deployed_at: deployment.try(:created_at),
-            deployed_at_formatted: deployment.try(:formatted_deployment_time)
-          }
-        end.compact
-      end
-
-    render json: environments
+    render json: EnvironmentStatusSerializer.new(current_user: current_user).represent(environments)
   end
 
   def rebase
@@ -280,6 +245,10 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
 
   private
 
+  def ci_environments_status_on_merge_result?
+    params[:environment_target] == 'merge_commit'
+  end
+
   def target_branch_missing?
     @merge_request.has_no_commits? && !@merge_request.target_branch_exists?
   end
@@ -295,9 +264,9 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
       return :failed
     end
 
-    merge_request_service = ::MergeRequests::MergeService.new(@project, current_user, merge_params)
+    merge_service = ::MergeRequests::MergeService.new(@project, current_user, merge_params)
 
-    unless merge_request_service.hooks_validation_pass?(@merge_request)
+    unless merge_service.hooks_validation_pass?(@merge_request)
       return :hook_validation_error
     end
 
@@ -363,13 +332,12 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     access_denied! unless access_check
   end
 
+  def merge_access_check
+    access_denied! unless @merge_request.can_be_merged_by?(current_user)
+  end
+
   def whitelist_query_limiting
     # Also see https://gitlab.com/gitlab-org/gitlab-ce/issues/42441
     Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/42438')
-  end
-
-  def whitelist_query_limiting_ee
-    # Also see https://gitlab.com/gitlab-org/gitlab-ee/issues/4793
-    Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ee/issues/4792')
   end
 end

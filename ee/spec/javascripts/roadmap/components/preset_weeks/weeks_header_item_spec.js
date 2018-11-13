@@ -36,6 +36,7 @@ describe('WeeksHeaderItemComponent', () => {
     it('returns default data props', () => {
       vm = createComponent({});
       const currentDate = new Date();
+
       expect(vm.currentDate.getDate()).toBe(currentDate.getDate());
       expect(vm.lastDayOfCurrentWeek.getDate()).toBe(
         mockTimeframeWeeks[mockTimeframeIndex].getDate() + 7,
@@ -47,6 +48,7 @@ describe('WeeksHeaderItemComponent', () => {
     describe('itemStyles', () => {
       it('returns style object for container element based on value of `itemWidth` prop', () => {
         vm = createComponent({});
+
         expect(vm.itemStyles.width).toBe('180px');
       });
     });
@@ -54,6 +56,7 @@ describe('WeeksHeaderItemComponent', () => {
     describe('timelineHeaderLabel', () => {
       it('returns string containing Year, Month and Date for current timeline header item', () => {
         vm = createComponent({});
+
         expect(vm.timelineHeaderLabel).toBe('2017 Dec 24');
       });
 
@@ -62,6 +65,7 @@ describe('WeeksHeaderItemComponent', () => {
           timeframeIndex: mockTimeframeIndex + 1,
           timeframeItem: mockTimeframeWeeks[mockTimeframeIndex + 1],
         });
+
         expect(vm.timelineHeaderLabel).toBe('Dec 31');
       });
     });
@@ -69,12 +73,14 @@ describe('WeeksHeaderItemComponent', () => {
     describe('timelineHeaderClass', () => {
       it('returns empty string when timeframeItem week is less than current week', () => {
         vm = createComponent({});
+
         expect(vm.timelineHeaderClass).toBe('');
       });
 
       it('returns string containing `label-dark label-bold` when current week is same as timeframeItem week', () => {
         vm = createComponent({});
         vm.currentDate = mockTimeframeWeeks[mockTimeframeIndex];
+
         expect(vm.timelineHeaderClass).toBe('label-dark label-bold');
       });
 
@@ -87,6 +93,7 @@ describe('WeeksHeaderItemComponent', () => {
         });
 
         [vm.currentDate] = mockTimeframeWeeks;
+
         expect(vm.timelineHeaderClass).toBe('label-dark');
       });
     });
@@ -103,6 +110,7 @@ describe('WeeksHeaderItemComponent', () => {
 
     it('renders item label element class `item-label` and value as `timelineHeaderLabel`', () => {
       const itemLabelEl = vm.$el.querySelector('.item-label');
+
       expect(itemLabelEl).not.toBeNull();
       expect(itemLabelEl.innerText.trim()).toBe('2017 Dec 24');
     });

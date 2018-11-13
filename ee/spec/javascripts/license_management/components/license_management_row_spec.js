@@ -61,11 +61,13 @@ describe('LicenseManagementRow', () => {
     describe('template', () => {
       it('first dropdown element should have a visible icon', () => {
         const firstOption = vm.$el.querySelector('.dropdown-item:nth-child(1) svg');
+
         expect(firstOption.classList).toContain(visibleClass);
       });
 
       it('second dropdown element should have no visible icon', () => {
         const secondOption = vm.$el.querySelector('.dropdown-item:nth-child(2) svg');
+
         expect(secondOption.classList).toContain(invisibleClass);
       });
     });
@@ -94,11 +96,13 @@ describe('LicenseManagementRow', () => {
     describe('template', () => {
       it('first dropdown element should have no visible icon', () => {
         const firstOption = vm.$el.querySelector('.dropdown-item:nth-child(1) svg');
+
         expect(firstOption.classList).toContain(invisibleClass);
       });
 
       it('second dropdown element should have a visible icon', () => {
         const secondOption = vm.$el.querySelector('.dropdown-item:nth-child(2) svg');
+
         expect(secondOption.classList).toContain(visibleClass);
       });
     });
@@ -108,17 +112,21 @@ describe('LicenseManagementRow', () => {
     it('triggering setLicenseInModal by clicking the cancel button', () => {
       const linkEl = vm.$el.querySelector('.js-remove-button');
       linkEl.click();
+
       expect(actions.setLicenseInModal).toHaveBeenCalled();
     });
+
     it('triggering approveLicense by clicking the first dropdown option', () => {
       const linkEl = vm.$el.querySelector('.dropdown-item:nth-child(1)');
       linkEl.click();
+
       expect(actions.approveLicense).toHaveBeenCalled();
     });
 
     it('triggering approveLicense blacklistLicense by clicking the second dropdown option', () => {
       const linkEl = vm.$el.querySelector('.dropdown-item:nth-child(2)');
       linkEl.click();
+
       expect(actions.blacklistLicense).toHaveBeenCalled();
     });
   });
@@ -130,34 +138,41 @@ describe('LicenseManagementRow', () => {
 
     it('renders status icon', () => {
       const iconEl = vm.$el.querySelector('.report-block-list-icon');
+
       expect(iconEl).not.toBeNull();
     });
 
     it('renders license name', () => {
       const nameEl = vm.$el.querySelector('.js-license-name');
+
       expect(nameEl.innerText.trim()).toBe(approvedLicense.name);
     });
 
     it('renders the removal button', () => {
       const buttonEl = vm.$el.querySelector('.js-remove-button');
+
       expect(buttonEl).not.toBeNull();
       expect(buttonEl.querySelector('.ic-remove')).not.toBeNull();
     });
 
     it('renders computed property dropdownText into dropdown toggle', () => {
       const dropdownEl = vm.$el.querySelector('.dropdown [data-toggle="dropdown"]');
+
       expect(dropdownEl.innerText.trim()).toBe(vm.dropdownText);
     });
 
     it('renders the dropdown with `Approved` and `Blacklisted` options', () => {
       const dropdownEl = vm.$el.querySelector('.dropdown');
+
       expect(dropdownEl).not.toBeNull();
 
       const firstOption = dropdownEl.querySelector('.dropdown-item:nth-child(1)');
+
       expect(firstOption).not.toBeNull();
       expect(firstOption.innerText.trim()).toBe('Approved');
 
       const secondOption = dropdownEl.querySelector('.dropdown-item:nth-child(2)');
+
       expect(secondOption).not.toBeNull();
       expect(secondOption.innerText.trim()).toBe('Blacklisted');
     });

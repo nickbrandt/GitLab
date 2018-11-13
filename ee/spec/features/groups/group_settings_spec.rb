@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe 'Edit group settings' do
+  include Select2Helper
+
   let(:user)  { create(:user) }
   let(:developer)  { create(:user) }
   let(:group) { create(:group, path: 'foo') }
@@ -48,8 +50,8 @@ describe 'Edit group settings' do
     end
   end
 
-  context 'with webhook feature enabled' do
-    it 'shows the menu item' do
+  context 'with webhook feature disabled' do
+    it 'does not show the menu item' do
       stub_licensed_features(group_webhooks: false)
 
       visit edit_group_path(group)
@@ -109,6 +111,58 @@ describe 'Edit group settings' do
           visit edit_group_path(group)
 
           expect(page).not_to have_content('Member lock')
+        end
+      end
+    end
+  end
+
+  describe 'Group file templates setting' do
+    context 'without a license key' do
+      before do
+        stub_licensed_features(custom_file_templates_for_namespace: false)
+      end
+
+      it 'is not visible' do
+        visit edit_group_path(group)
+
+        expect(page).not_to have_content('Select a template repository')
+      end
+    end
+
+    context 'with a license key' do
+      before do
+        stub_licensed_features(custom_file_templates_for_namespace: true)
+      end
+
+      it 'is visible' do
+        visit edit_group_path(group)
+
+        expect(page).to have_content('Select a template repository')
+      end
+
+      it 'allows a project to be selected', :js do
+        project = create(:project, namespace: group, name: 'known project')
+
+        visit edit_group_path(group)
+
+        page.within('section#js-templates') do |page|
+          select2(project.id, from: '#group_file_template_project_id')
+          click_button 'Save changes'
+          wait_for_requests
+
+          expect(group.reload.checked_file_template_project).to eq(project)
+        end
+      end
+
+      context 'when current user is not the Owner' do
+        before do
+          sign_in(developer)
+        end
+
+        it 'is not visible' do
+          visit edit_group_path(group)
+
+          expect(page).not_to have_content('Select a template repository')
         end
       end
     end

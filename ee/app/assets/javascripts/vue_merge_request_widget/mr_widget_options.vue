@@ -198,78 +198,81 @@ export default {
       :has-ci="mr.hasCI"
       :source-branch-link="mr.sourceBranchLink"
       :source-branch="mr.sourceBranch"
+      :troubleshooting-docs-path="mr.troubleshootingDocsPath"
     />
     <deployment
       v-for="deployment in mr.deployments"
-      :key="deployment.id"
+      :key="`pre-merge-deploy-${deployment.id}`"
+      class="js-pre-merge-deploy"
       :deployment="deployment"
     />
-    <mr-widget-approvals
-      v-if="shouldRenderApprovals"
-      :mr="mr"
-      :service="service"
-    />
-    <report-section
-      v-if="shouldRenderCodeQuality"
-      :status="codequalityStatus"
-      :loading-text="translateText('codeclimate').loading"
-      :error-text="translateText('codeclimate').error"
-      :success-text="codequalityText"
-      :unresolved-issues="mr.codeclimateMetrics.newIssues"
-      :resolved-issues="mr.codeclimateMetrics.resolvedIssues"
-      :has-issues="hasCodequalityIssues"
-      :component="$options.componentNames.CodequalityIssueBody"
-      class="js-codequality-widget mr-widget-border-top mr-report"
-    />
-    <report-section
-      v-if="shouldRenderPerformance"
-      :status="performanceStatus"
-      :loading-text="translateText('performance').loading"
-      :error-text="translateText('performance').error"
-      :success-text="performanceText"
-      :unresolved-issues="mr.performanceMetrics.degraded"
-      :resolved-issues="mr.performanceMetrics.improved"
-      :has-issues="hasPerformanceMetrics"
-      :component="$options.componentNames.PerformanceIssueBody"
-      class="js-performance-widget mr-widget-border-top mr-report"
-    />
-    <grouped-security-reports-app
-      v-if="shouldRenderSecurityReport"
-      :head-blob-path="mr.headBlobPath"
-      :base-blob-path="mr.baseBlobPath"
-      :sast-head-path="mr.sast.head_path"
-      :sast-base-path="mr.sast.base_path"
-      :sast-help-path="mr.sastHelp"
-      :dast-head-path="mr.dast.head_path"
-      :dast-base-path="mr.dast.base_path"
-      :dast-help-path="mr.dastHelp"
-      :sast-container-head-path="mr.sastContainer.head_path"
-      :sast-container-base-path="mr.sastContainer.base_path"
-      :sast-container-help-path="mr.sastContainerHelp"
-      :dependency-scanning-head-path="mr.dependencyScanning.head_path"
-      :dependency-scanning-base-path="mr.dependencyScanning.base_path"
-      :dependency-scanning-help-path="mr.dependencyScanningHelp"
-      :vulnerability-feedback-path="mr.vulnerabilityFeedbackPath"
-      :vulnerability-feedback-help-path="mr.vulnerabilityFeedbackHelpPath"
-      :pipeline-path="mr.pipeline.path"
-      :pipeline-id="mr.securityReportsPipelineId"
-      :can-create-issue="mr.canCreateIssue"
-      :can-create-feedback="mr.canCreateFeedback"
-    />
-    <mr-widget-licenses
-      v-if="shouldRenderLicenseReport"
-      :api-url="mr.licenseManagement.managed_licenses_path"
-      :pipeline-path="mr.pipeline.path"
-      :can-manage-licenses="mr.licenseManagement.can_manage_licenses"
-      :full-report-path="mr.licenseManagement.license_management_full_report_path"
-      :license-management-settings-path="mr.licenseManagement.license_management_settings_path"
-      :base-path="mr.licenseManagement.base_path"
-      :head-path="mr.licenseManagement.head_path"
-      report-section-class="mr-widget-border-top"
-    />
     <div class="mr-section-container">
+      <mr-widget-approvals
+        v-if="shouldRenderApprovals"
+        :mr="mr"
+        :service="service"
+      />
+      <report-section
+        v-if="shouldRenderCodeQuality"
+        :status="codequalityStatus"
+        :loading-text="translateText('codeclimate').loading"
+        :error-text="translateText('codeclimate').error"
+        :success-text="codequalityText"
+        :unresolved-issues="mr.codeclimateMetrics.newIssues"
+        :resolved-issues="mr.codeclimateMetrics.resolvedIssues"
+        :has-issues="hasCodequalityIssues"
+        :component="$options.componentNames.CodequalityIssueBody"
+        class="js-codequality-widget mr-widget-border-top mr-report"
+      />
+      <report-section
+        v-if="shouldRenderPerformance"
+        :status="performanceStatus"
+        :loading-text="translateText('performance').loading"
+        :error-text="translateText('performance').error"
+        :success-text="performanceText"
+        :unresolved-issues="mr.performanceMetrics.degraded"
+        :resolved-issues="mr.performanceMetrics.improved"
+        :has-issues="hasPerformanceMetrics"
+        :component="$options.componentNames.PerformanceIssueBody"
+        class="js-performance-widget mr-widget-border-top mr-report"
+      />
+      <grouped-security-reports-app
+        v-if="shouldRenderSecurityReport"
+        :head-blob-path="mr.headBlobPath"
+        :base-blob-path="mr.baseBlobPath"
+        :sast-head-path="mr.sast.head_path"
+        :sast-base-path="mr.sast.base_path"
+        :sast-help-path="mr.sastHelp"
+        :dast-head-path="mr.dast.head_path"
+        :dast-base-path="mr.dast.base_path"
+        :dast-help-path="mr.dastHelp"
+        :sast-container-head-path="mr.sastContainer.head_path"
+        :sast-container-base-path="mr.sastContainer.base_path"
+        :sast-container-help-path="mr.sastContainerHelp"
+        :dependency-scanning-head-path="mr.dependencyScanning.head_path"
+        :dependency-scanning-base-path="mr.dependencyScanning.base_path"
+        :dependency-scanning-help-path="mr.dependencyScanningHelp"
+        :vulnerability-feedback-path="mr.vulnerabilityFeedbackPath"
+        :vulnerability-feedback-help-path="mr.vulnerabilityFeedbackHelpPath"
+        :pipeline-path="mr.pipeline.path"
+        :pipeline-id="mr.securityReportsPipelineId"
+        :can-create-issue="mr.canCreateIssue"
+        :can-create-feedback="mr.canCreateFeedback"
+      />
+      <mr-widget-licenses
+        v-if="shouldRenderLicenseReport"
+        :api-url="mr.licenseManagement.managed_licenses_path"
+        :pipeline-path="mr.pipeline.path"
+        :can-manage-licenses="mr.licenseManagement.can_manage_licenses"
+        :full-report-path="mr.licenseManagement.license_management_full_report_path"
+        :license-management-settings-path="mr.licenseManagement.license_management_settings_path"
+        :base-path="mr.licenseManagement.base_path"
+        :head-path="mr.licenseManagement.head_path"
+        report-section-class="mr-widget-border-top"
+      />
       <grouped-test-reports-app
         v-if="mr.testResultsPath"
+        class="js-reports-container"
         :endpoint="mr.testResultsPath"
       />
       <div class="mr-widget-section">
@@ -302,5 +305,23 @@ export default {
         <mr-widget-merge-help/>
       </div>
     </div>
+
+    <template v-if="shouldRenderMergedPipeline">
+      <mr-widget-pipeline
+        class="js-post-merge-pipeline prepend-top-default"
+        :pipeline="mr.mergePipeline"
+        :ci-status="mr.ciStatus"
+        :has-ci="mr.hasCI"
+        :source-branch="mr.targetBranch"
+        :source-branch-link="mr.targetBranch"
+        :troubleshooting-docs-path="mr.troubleshootingDocsPath"
+      />
+      <deployment
+        v-for="postMergeDeployment in mr.postMergeDeployments"
+        :key="`post-merge-deploy-${postMergeDeployment.id}`"
+        :deployment="postMergeDeployment"
+        class="js-post-deployment"
+      />
+    </template>
   </div>
 </template>

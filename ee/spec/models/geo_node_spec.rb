@@ -158,6 +158,24 @@ describe GeoNode, type: :model do
     end
   end
 
+  describe '.find_by_oauth_application_id' do
+    context 'when the Geo node exists' do
+      it 'returns the Geo node' do
+        found = described_class.find_by_oauth_application_id(node.oauth_application_id)
+
+        expect(found).to eq(node)
+      end
+    end
+
+    context 'when the Geo node does not exist' do
+      it 'returns nil' do
+        found = described_class.find_by_oauth_application_id(-1)
+
+        expect(found).to be_nil
+      end
+    end
+  end
+
   describe '#repair' do
     it 'creates an oauth application for a Geo secondary node' do
       stub_current_geo_node(node)
@@ -328,6 +346,18 @@ describe GeoNode, type: :model do
     end
   end
 
+  describe '#geo_projects_url' do
+    it 'returns the Geo Projects url for the specific node' do
+      expected_url = 'https://localhost:3000/gitlab/admin/geo/projects'
+
+      expect(new_node.geo_projects_url).to eq(expected_url)
+    end
+
+    it 'returns nil when node is a primary one' do
+      expect(primary_node.geo_projects_url).to be_nil
+    end
+  end
+
   describe '#missing_oauth_application?' do
     context 'on a primary node' do
       it 'returns false' do
@@ -347,7 +377,7 @@ describe GeoNode, type: :model do
   end
 
   describe '#projects_include?' do
-    let(:unsynced_project) { create(:project, repository_storage: 'broken') }
+    let(:unsynced_project) { create(:project, :broken_storage) }
 
     it 'returns true without selective sync' do
       expect(node.projects_include?(unsynced_project.id)).to eq true
@@ -394,7 +424,7 @@ describe GeoNode, type: :model do
     let(:nested_group_1) { create(:group, parent: group_1) }
     let!(:project_1) { create(:project, group: group_1) }
     let!(:project_2) { create(:project, group: nested_group_1) }
-    let!(:project_3) { create(:project, group: group_2, repository_storage: 'broken') }
+    let!(:project_3) { create(:project, :broken_storage, group: group_2) }
 
     it 'returns all projects without selective sync' do
       expect(node.projects).to match_array([project_1, project_2, project_3])

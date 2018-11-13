@@ -15,11 +15,10 @@ class Milestone < ActiveRecord::Base
   include Sortable
   include Referable
   include StripAttribute
-  include Elastic::MilestonesSearch
   include Milestoneish
   include Gitlab::SQL::Pattern
 
-  include ::EE::Milestone
+  prepend ::EE::Milestone
 
   cache_markdown_field :title, pipeline: :single_line
   cache_markdown_field :description
@@ -30,7 +29,6 @@ class Milestone < ActiveRecord::Base
   has_internal_id :iid, scope: :project, init: ->(s) { s&.project&.milestones&.maximum(:iid) }
   has_internal_id :iid, scope: :group, init: ->(s) { s&.group&.milestones&.maximum(:iid) }
 
-  has_many :boards
   has_many :issues
   has_many :labels, -> { distinct.reorder('labels.title') },  through: :issues
   has_many :merge_requests
@@ -149,7 +147,7 @@ class Milestone < ActiveRecord::Base
   end
 
   def participants
-    User.joins(assigned_issues: :milestone).where("milestones.id = ?", id).uniq
+    User.joins(assigned_issues: :milestone).where("milestones.id = ?", id).distinct
   end
 
   def self.sort_by_attribute(method)
@@ -172,6 +170,22 @@ class Milestone < ActiveRecord::Base
       end
 
     sorted.with_order_id_desc
+  end
+
+  def self.states_count(projects, groups = nil)
+    return STATE_COUNT_HASH unless projects || groups
+
+    counts = Milestone
+               .for_projects_and_groups(projects&.map(&:id), groups&.map(&:id))
+               .reorder(nil)
+               .group(:state)
+               .count
+
+    {
+        opened: counts['active'] || 0,
+        closed: counts['closed'] || 0,
+        all: counts.values.sum
+    }
   end
 
   ##

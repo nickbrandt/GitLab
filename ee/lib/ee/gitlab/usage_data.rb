@@ -83,7 +83,7 @@ module EE
           sast: :sast_jobs
         }
 
-        results = count(::Ci::Build.where(name: types.keys).group(:name))
+        results = count(::Ci::Build.where(name: types.keys).group(:name), fallback: Hash.new(-1))
         results.each_with_object({}) { |(key, value), response| response[types[key.to_sym]] = value  }
       end
       # rubocop: enable CodeReuse/ActiveRecord
@@ -99,7 +99,8 @@ module EE
           ldap_keys: count(::LDAPKey),
           ldap_users: count(::User.ldap),
           projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active),
-          projects_mirrored_with_pipelines_enabled: projects_mirrored_with_pipelines_enabled
+          projects_mirrored_with_pipelines_enabled: projects_mirrored_with_pipelines_enabled,
+          projects_with_prometheus_alerts: count(PrometheusAlert.distinct_projects)
         }).merge(service_desk_counts).merge(security_products_usage)
 
         usage_data

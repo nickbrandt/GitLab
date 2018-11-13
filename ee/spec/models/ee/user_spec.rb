@@ -236,4 +236,47 @@ describe EE::User do
       end
     end
   end
+
+  describe '#group_sso?' do
+    subject(:user) { create(:user) }
+
+    it 'is false without a saml_provider' do
+      expect(subject.group_sso?(nil)).to be_falsey
+      expect(subject.group_sso?(create(:group))).to be_falsey
+    end
+
+    context 'with linked identity' do
+      let!(:identity) { create(:identity, :group_saml, user: user) }
+      let(:saml_provider) { identity.saml_provider }
+      let(:group) { saml_provider.group }
+
+      context 'without preloading' do
+        it 'returns true' do
+          expect(subject.group_sso?(group)).to be_truthy
+        end
+
+        it 'does not cause ActiveRecord to loop through identites' do
+          create(:identity, :group_saml, user: user)
+
+          expect(Identity).not_to receive(:instantiate)
+
+          subject.group_sso?(group)
+        end
+      end
+
+      context 'when identities and saml_providers pre-loaded' do
+        before do
+          ActiveRecord::Associations::Preloader.new.preload(subject, group_saml_identities: :saml_provider)
+        end
+
+        it 'returns true' do
+          expect(subject.group_sso?(group)).to be_truthy
+        end
+
+        it 'does not trigger additional database queries' do
+          expect { subject.group_sso?(group) }.not_to exceed_query_limit(0)
+        end
+      end
+    end
+  end
 end

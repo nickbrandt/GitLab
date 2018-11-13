@@ -1,0 +1,5 @@
+---
+title: Disable Feature Flags and Packages if repository is disabled
+merge_request:
+author:
+type: fixed

@@ -15,7 +15,7 @@ describe('EpicShowApp', () => {
   let headerVm;
   let issuableAppVm;
 
-  beforeEach((done) => {
+  beforeEach(done => {
     mock = new MockAdapter(axios);
     mock.onGet(`${gl.TEST_HOST}/realtime_changes`).reply(200, issueShowData.initialRequest);
 
@@ -74,11 +74,11 @@ describe('EpicShowApp', () => {
   });
 
   it('should render epic-header', () => {
-    expect(vm.$el.innerHTML.indexOf(headerVm.$el.innerHTML) !== -1).toEqual(true);
+    expect(vm.$el.innerHTML.indexOf(headerVm.$el.innerHTML)).not.toBe(-1);
   });
 
   it('should render issuable-app', () => {
-    expect(vm.$el.innerHTML.indexOf(issuableAppVm.$el.innerHTML) !== -1).toEqual(true);
+    expect(vm.$el.innerHTML.indexOf(issuableAppVm.$el.innerHTML)).not.toBe(-1);
   });
 
   it('should render epic-sidebar', () => {

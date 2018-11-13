@@ -10,7 +10,7 @@ if defined?(Rails::Console)
   # EE-specific start
   if Gitlab::Geo.enabled?
     puts " Geo enabled:".ljust(justify) + 'yes'
-    puts " Geo server:".ljust(justify) + (Gitlab::Geo.primary? ? 'primary' : 'secondary')
+    puts " Geo server:".ljust(justify) + EE::GeoHelper.current_node_human_status
   end
 
   # EE specific end

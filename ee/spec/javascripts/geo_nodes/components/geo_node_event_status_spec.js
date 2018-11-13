@@ -45,6 +45,7 @@ describe('GeoNodeEventStatus', () => {
     describe('eventString', () => {
       it('returns computed event string when `eventTypeLogStatus` prop is true', () => {
         const vmWithLogStatus = createComponent({ eventTypeLogStatus: true });
+
         expect(vmWithLogStatus.eventString).toBe(mockNodeDetails.lastEvent.id);
         vmWithLogStatus.$destroy();
       });
@@ -59,7 +60,10 @@ describe('GeoNodeEventStatus', () => {
     it('renders container elements correctly', () => {
       expect(vm.$el.classList.contains('node-detail-value')).toBeTruthy();
       expect(vm.$el.querySelectorAll('strong').length).not.toBe(0);
-      expect(vm.$el.querySelector('strong').innerText.trim()).toBe(`${mockNodeDetails.lastEvent.id}`);
+      expect(vm.$el.querySelector('strong').innerText.trim()).toBe(
+        `${mockNodeDetails.lastEvent.id}`,
+      );
+
       expect(vm.$el.querySelector('.event-status-timestamp').innerText).toContain('ago');
     });
 
@@ -68,6 +72,7 @@ describe('GeoNodeEventStatus', () => {
         eventId: 0,
         eventTimeStamp: 0,
       });
+
       expect(vmWithoutTimestamp.$el.querySelectorAll('strong').length).not.toBe(0);
       expect(vmWithoutTimestamp.$el.querySelectorAll('.event-status-timestamp').length).toBe(0);
       expect(vmWithoutTimestamp.$el.querySelector('strong').innerText.trim()).toBe('Not available');

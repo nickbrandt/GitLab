@@ -16,9 +16,8 @@ special searches:
 | GitLab version | Elasticsearch version |
 | -------------- | --------------------- |
 | GitLab Enterprise Edition 8.4 - 8.17  | Elasticsearch 2.4 with [Delete By Query Plugin](https://www.elastic.co/guide/en/elasticsearch/plugins/2.4/plugins-delete-by-query.html) installed |
-| GitLab Enterprise Edition 9.0+        | Elasticsearch 5.1 - 5.5 |
-
-Elasticsearch 6.0+ is not supported currently. [We will support 6.0+ in the future.](https://gitlab.com/gitlab-org/gitlab-ee/issues/4218)
+| GitLab Enterprise Edition 9.0 - 11.4   | Elasticsearch 5.1 - 5.5 |
+| GitLab Enterprise Edition 11.5+        | Elasticsearch 5.6 - 6.x |
 
 ## Installing Elasticsearch
 
@@ -321,6 +320,10 @@ Here are some common pitfalls and how to overcome them:
 - **I indexed all the repositories but I can't find anything**
 
     Make sure you indexed all the database data [as stated above](#adding-gitlab-data-to-the-elasticsearch-index).
+
+- **I indexed all the repositories but then switched elastic search servers and now I can't find anything**
+
+    You will need to re-run all the rake tasks to re-index the database, repositories, and wikis.
 
 - **"Can't specify parent if no parent field has been configured"**
 

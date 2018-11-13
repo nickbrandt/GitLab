@@ -161,7 +161,6 @@ module API
         requires :username, type: String, desc: 'The username of the user'
         use :optional_attributes
       end
-      # rubocop: disable CodeReuse/ActiveRecord
       post do
         authenticated_as_admin!
 
@@ -172,17 +171,16 @@ module API
           present user, with: Entities::UserPublic, current_user: current_user
         else
           conflict!('Email has already been taken') if User
-              .where(email: user.email)
-              .count > 0
+            .by_any_email(user.email.downcase)
+            .any?
 
           conflict!('Username has already been taken') if User
-              .where(username: user.username)
-              .count > 0
+            .by_username(user.username)
+            .any?
 
           render_validation_error!(user)
         end
       end
-      # rubocop: enable CodeReuse/ActiveRecord
 
       desc 'Update a user. Available only for admins.' do
         success Entities::UserPublic
@@ -204,11 +202,11 @@ module API
         not_found!('User') unless user
 
         conflict!('Email has already been taken') if params[:email] &&
-            User.where(email: params[:email])
+            User.by_any_email(params[:email].downcase)
                 .where.not(id: user.id).count > 0
 
         conflict!('Username has already been taken') if params[:username] &&
-            User.where(username: params[:username])
+            User.by_username(params[:username])
                 .where.not(id: user.id).count > 0
 
         user_params = declared_params(include_missing: false)
@@ -262,7 +260,7 @@ module API
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
-      desc 'Get the SSH keys of a specified user. Available only for admins.' do
+      desc 'Get the SSH keys of a specified user.' do
         success Entities::SSHKey
       end
       params do
@@ -271,10 +269,8 @@ module API
       end
       # rubocop: disable CodeReuse/ActiveRecord
       get ':id/keys' do
-        authenticated_as_admin!
-
         user = User.find_by(id: params[:id])
-        not_found!('User') unless user
+        not_found!('User') unless user && can?(current_user, :read_user, user)
 
         present paginate(user.keys), with: Entities::SSHKey
       end
@@ -522,11 +518,9 @@ module API
               PersonalAccessTokensFinder.new({ user: user, impersonation: true }.merge(options))
             end
 
-            # rubocop: disable CodeReuse/ActiveRecord
             def find_impersonation_token
-              finder.find_by(id: declared_params[:impersonation_token_id]) || not_found!('Impersonation Token')
+              finder.find_by_id(declared_params[:impersonation_token_id]) || not_found!('Impersonation Token')
             end
-            # rubocop: enable CodeReuse/ActiveRecord
           end
 
           before { authenticated_as_admin! }

@@ -3,13 +3,139 @@ import axios from '~/lib/utils/axios_utils';
 import testAction from 'spec/helpers/vuex_action_helper';
 import { TEST_HOST } from 'spec/test_constants';
 
-import mockData from 'ee/security_dashboard/store/modules/vulnerabilities/mock_data.json';
 import initialState from 'ee/security_dashboard/store/modules/vulnerabilities/state';
 import * as types from 'ee/security_dashboard/store/modules/vulnerabilities/mutation_types';
 import * as actions from 'ee/security_dashboard/store/modules/vulnerabilities/actions';
 
-describe('vulnerabilities module actions', () => {
-  const data = mockData;
+import mockDataVulnerabilities from './data/mock_data_vulnerabilities.json';
+import mockDataVulnerabilitiesCount from './data/mock_data_vulnerabilities_count.json';
+
+describe('vulnerabiliites count actions', () => {
+  const data = mockDataVulnerabilitiesCount;
+
+  describe('setVulnerabilitiesCountEndpoint', () => {
+    it('should commit the correct mutuation', done => {
+      const state = initialState;
+      const endpoint = 'fakepath.json';
+
+      testAction(
+        actions.setVulnerabilitiesCountEndpoint,
+        endpoint,
+        state,
+        [
+          {
+            type: types.SET_VULNERABILITIES_COUNT_ENDPOINT,
+            payload: endpoint,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('fetchVulnerabilitesCount', () => {
+    let mock;
+    const state = initialState;
+
+    beforeEach(() => {
+      state.vulnerabilitiesCountEndpoint = `${TEST_HOST}/vulnerabilities_count.json`;
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    describe('on success', () => {
+      beforeEach(() => {
+        mock.onGet(state.vulnerabilitiesCountEndpoint).replyOnce(200, data);
+      });
+
+      it('should dispatch the request and success actions', done => {
+        testAction(
+          actions.fetchVulnerabilitiesCount,
+          {},
+          state,
+          [],
+          [
+            { type: 'requestVulnerabilitiesCount' },
+            {
+              type: 'receiveVulnerabilitiesCountSuccess',
+              payload: { data },
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('on error', () => {
+      beforeEach(() => {
+        mock.onGet(state.vulnerabilitiesCountEndpoint).replyOnce(404, {});
+      });
+
+      it('should dispatch the request and error actions', done => {
+        testAction(
+          actions.fetchVulnerabilitiesCount,
+          {},
+          state,
+          [],
+          [{ type: 'requestVulnerabilitiesCount' }, { type: 'receiveVulnerabilitiesCountError' }],
+          done,
+        );
+      });
+    });
+  });
+
+  describe('requestVulnerabilitesCount', () => {
+    it('should commit the request mutation', done => {
+      const state = initialState;
+
+      testAction(
+        actions.requestVulnerabilitiesCount,
+        {},
+        state,
+        [{ type: types.REQUEST_VULNERABILITIES_COUNT }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveVulnerabilitesCountSuccess', () => {
+    it('should commit the success mutation', done => {
+      const state = initialState;
+
+      testAction(
+        actions.receiveVulnerabilitiesCountSuccess,
+        { data },
+        state,
+        [{ type: types.RECEIVE_VULNERABILITIES_COUNT_SUCCESS, payload: data }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receivetVulnerabilitesCountError', () => {
+    it('should commit the error mutation', done => {
+      const state = initialState;
+
+      testAction(
+        actions.receiveVulnerabilitiesCountError,
+        {},
+        state,
+        [{ type: types.RECEIVE_VULNERABILITIES_COUNT_ERROR }],
+        [],
+        done,
+      );
+    });
+  });
+});
+
+describe('vulnerabilities actions', () => {
+  const data = mockDataVulnerabilities;
   const pageInfo = {
     page: 1,
     nextPage: 2,
@@ -27,12 +153,12 @@ describe('vulnerabilities module actions', () => {
     'X-Total-Pages': pageInfo.totalPages,
   };
 
-  describe('fetch vulnerabilities', () => {
+  describe('fetchVulnerabilities', () => {
     let mock;
     const state = initialState;
 
     beforeEach(() => {
-      state.vulnerabilitiesUrl = `${TEST_HOST}/vulnerabilities.json`;
+      state.vulnerabilitiesEndpoint = `${TEST_HOST}/vulnerabilities.json`;
       mock = new MockAdapter(axios);
     });
 
@@ -42,9 +168,7 @@ describe('vulnerabilities module actions', () => {
 
     describe('on success', () => {
       beforeEach(() => {
-        mock
-          .onGet(state.vulnerabilitiesUrl)
-          .replyOnce(200, data, headers);
+        mock.onGet(state.vulnerabilitiesEndpoint).replyOnce(200, data, headers);
       });
 
       it('should dispatch the request and success actions', done => {
@@ -65,14 +189,9 @@ describe('vulnerabilities module actions', () => {
       });
     });
 
-    // NOTE: This will fail as we're currently mocking the API call in the action
-    // so the mock adaptor can't pick it up.
-    // eslint-disable-next-line
-    xdescribe('on error', () => {
+    describe('on error', () => {
       beforeEach(() => {
-        mock
-          .onGet(state.vulnerabilitiesUrl)
-          .replyOnce(404, {});
+        mock.onGet(state.vulnerabilitiesEndpoint).replyOnce(404, {});
       });
 
       it('should dispatch the request and error actions', done => {
@@ -81,13 +200,7 @@ describe('vulnerabilities module actions', () => {
           {},
           state,
           [],
-          [
-            { type: 'requestVulnerabilities' },
-            {
-              type: 'receiveVulnerabilitiesError',
-              payload: {},
-            },
-          ],
+          [{ type: 'requestVulnerabilities' }, { type: 'receiveVulnerabilitiesError' }],
           done,
         );
       });
@@ -95,7 +208,7 @@ describe('vulnerabilities module actions', () => {
   });
 
   describe('receiveVulnerabilitiesSuccess', () => {
-    it('should commit the required mutations', done => {
+    it('should commit the success mutation', done => {
       const state = initialState;
 
       testAction(
@@ -103,9 +216,10 @@ describe('vulnerabilities module actions', () => {
         { headers, data },
         state,
         [
-          { type: types.SET_LOADING, payload: false },
-          { type: types.SET_VULNERABILITIES, payload: data },
-          { type: types.SET_PAGINATION, payload: pageInfo },
+          {
+            type: types.RECEIVE_VULNERABILITIES_SUCCESS,
+            payload: { pageInfo, vulnerabilities: data },
+          },
         ],
         [],
         done,
@@ -114,16 +228,14 @@ describe('vulnerabilities module actions', () => {
   });
 
   describe('receiveVulnerabilitiesError', () => {
-    it('should commit the loading mutation', done => {
+    it('should commit the error mutation', done => {
       const state = initialState;
 
       testAction(
         actions.receiveVulnerabilitiesError,
         {},
         state,
-        [
-          { type: types.SET_LOADING, payload: false },
-        ],
+        [{ type: types.RECEIVE_VULNERABILITIES_ERROR }],
         [],
         done,
       );
@@ -131,16 +243,391 @@ describe('vulnerabilities module actions', () => {
   });
 
   describe('requestVulnerabilities', () => {
-    it('should commit the loading mutation', done => {
+    it('should commit the request mutation', done => {
       const state = initialState;
 
       testAction(
         actions.requestVulnerabilities,
         {},
         state,
+        [{ type: types.REQUEST_VULNERABILITIES }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('setVulnerabilitiesEndpoint', () => {
+    it('should commit the correct mutuation', done => {
+      const state = initialState;
+      const endpoint = 'fakepath.json';
+
+      testAction(
+        actions.setVulnerabilitiesEndpoint,
+        endpoint,
+        state,
         [
-          { type: types.SET_LOADING, payload: true },
+          {
+            type: types.SET_VULNERABILITIES_ENDPOINT,
+            payload: endpoint,
+          },
         ],
+        [],
+        done,
+      );
+    });
+  });
+});
+
+describe('openModal', () => {
+  it('should commit the SET_MODAL_DATA mutation', done => {
+    const state = initialState;
+    const vulnerability = mockDataVulnerabilities[0];
+
+    testAction(
+      actions.openModal,
+      { vulnerability },
+      state,
+      [
+        {
+          type: types.SET_MODAL_DATA,
+          payload: { vulnerability },
+        },
+      ],
+      [],
+      done,
+    );
+  });
+});
+
+describe('issue creation', () => {
+  describe('createIssue', () => {
+    const vulnerability = mockDataVulnerabilities[0];
+    const data = { issue_url: 'fakepath.html' };
+    let mock;
+
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    describe('on success', () => {
+      beforeEach(() => {
+        mock.onPost(vulnerability.vulnerability_feedback_url).replyOnce(200, { data });
+      });
+
+      it('should dispatch the request and success actions', done => {
+        testAction(
+          actions.createIssue,
+          { vulnerability },
+          {},
+          [],
+          [
+            { type: 'requestCreateIssue' },
+            {
+              type: 'receiveCreateIssueSuccess',
+              payload: { data },
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('on error', () => {
+      beforeEach(() => {
+        mock.onPost(vulnerability.vulnerability_feedback_url).replyOnce(404, {});
+      });
+
+      it('should dispatch the request and error actions', done => {
+        const flashError = false;
+
+        testAction(
+          actions.createIssue,
+          { vulnerability, flashError },
+          {},
+          [],
+          [
+            { type: 'requestCreateIssue' },
+            { type: 'receiveCreateIssueError', payload: { flashError } },
+          ],
+          done,
+        );
+      });
+    });
+  });
+
+  describe('receiveCreateIssueSuccess', () => {
+    it('should commit the success mutation', done => {
+      const state = initialState;
+      const data = mockDataVulnerabilities[0];
+
+      testAction(
+        actions.receiveCreateIssueSuccess,
+        { data },
+        state,
+        [
+          {
+            type: types.RECEIVE_CREATE_ISSUE_SUCCESS,
+            payload: { data },
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveCreateIssueError', () => {
+    it('should commit the error mutation', done => {
+      const state = initialState;
+
+      testAction(
+        actions.receiveCreateIssueError,
+        {},
+        state,
+        [{ type: types.RECEIVE_CREATE_ISSUE_ERROR }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('requestCreateIssue', () => {
+    it('should commit the request mutation', done => {
+      const state = initialState;
+
+      testAction(
+        actions.requestCreateIssue,
+        {},
+        state,
+        [{ type: types.REQUEST_CREATE_ISSUE }],
+        [],
+        done,
+      );
+    });
+  });
+});
+
+describe('vulnerability dismissal', () => {
+  describe('dismissVulnerability', () => {
+    const vulnerability = mockDataVulnerabilities[0];
+    const data = { vulnerability };
+    let mock;
+
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    describe('on success', () => {
+      beforeEach(() => {
+        mock.onPost(vulnerability.vulnerability_feedback_url).replyOnce(200, data);
+      });
+
+      it('should dispatch the request and success actions', done => {
+        testAction(
+          actions.dismissVulnerability,
+          { vulnerability },
+          {},
+          [],
+          [
+            { type: 'requestDismissVulnerability' },
+            {
+              type: 'receiveDismissVulnerabilitySuccess',
+              payload: { data, id: vulnerability.id },
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('on error', () => {
+      beforeEach(() => {
+        mock.onPost(vulnerability.vulnerability_feedback_url).replyOnce(404, {});
+      });
+
+      it('should dispatch the request and error actions', done => {
+        const flashError = false;
+
+        testAction(
+          actions.dismissVulnerability,
+          { vulnerability, flashError },
+          {},
+          [],
+          [
+            { type: 'requestDismissVulnerability' },
+            { type: 'receiveDismissVulnerabilityError', payload: { flashError: false } },
+          ],
+          done,
+        );
+      });
+    });
+  });
+
+  describe('receiveDismissVulnerabilitySuccess', () => {
+    it('should commit the success mutation', done => {
+      const state = initialState;
+      const data = mockDataVulnerabilities[0];
+
+      testAction(
+        actions.receiveDismissVulnerabilitySuccess,
+        { data },
+        state,
+        [
+          {
+            type: types.RECEIVE_DISMISS_VULNERABILITY_SUCCESS,
+            payload: { data },
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveDismissVulnerabilityError', () => {
+    it('should commit the error mutation', done => {
+      const state = initialState;
+
+      testAction(
+        actions.receiveDismissVulnerabilityError,
+        {},
+        state,
+        [{ type: types.RECEIVE_DISMISS_VULNERABILITY_ERROR }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('requestDismissVulnerability', () => {
+    it('should commit the request mutation', done => {
+      const state = initialState;
+
+      testAction(
+        actions.requestDismissVulnerability,
+        {},
+        state,
+        [{ type: types.REQUEST_DISMISS_VULNERABILITY }],
+        [],
+        done,
+      );
+    });
+  });
+});
+
+describe('undo vulnerability dismissal', () => {
+  describe('undoDismissal', () => {
+    const vulnerability = mockDataVulnerabilities[2];
+    const url = `${vulnerability.vulnerability_feedback_url}/${
+      vulnerability.dismissal_feedback.id
+    }`;
+    let mock;
+
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    describe('on success', () => {
+      beforeEach(() => {
+        mock.onDelete(url).replyOnce(200, {});
+      });
+
+      it('should dispatch the request and success actions', done => {
+        testAction(
+          actions.undoDismissal,
+          { vulnerability },
+          {},
+          [],
+          [
+            { type: 'requestUndoDismissal' },
+            { type: 'receiveUndoDismissalSuccess', payload: { id: vulnerability.id } },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('on error', () => {
+      beforeEach(() => {
+        mock.onDelete(url).replyOnce(404, {});
+      });
+
+      it('should dispatch the request and error actions', done => {
+        const flashError = false;
+
+        testAction(
+          actions.undoDismissal,
+          { vulnerability, flashError },
+          {},
+          [],
+          [
+            { type: 'requestUndoDismissal' },
+            { type: 'receiveUndoDismissalError', payload: { flashError: false } },
+          ],
+          done,
+        );
+      });
+    });
+  });
+
+  describe('receiveUndoDismissalSuccess', () => {
+    it('should commit the success mutation', done => {
+      const state = initialState;
+      const data = mockDataVulnerabilities[0];
+
+      testAction(
+        actions.receiveUndoDismissalSuccess,
+        { data },
+        state,
+        [
+          {
+            type: types.RECEIVE_UNDO_DISMISSAL_SUCCESS,
+            payload: { data },
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveUndoDismissalError', () => {
+    it('should commit the error mutation', done => {
+      const state = initialState;
+
+      testAction(
+        actions.receiveUndoDismissalError,
+        {},
+        state,
+        [{ type: types.RECEIVE_UNDO_DISMISSAL_ERROR }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('requestUndoDismissal', () => {
+    it('should commit the request mutation', done => {
+      const state = initialState;
+
+      testAction(
+        actions.requestUndoDismissal,
+        {},
+        state,
+        [{ type: types.REQUEST_UNDO_DISMISSAL }],
         [],
         done,
       );

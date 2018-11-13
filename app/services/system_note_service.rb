@@ -5,7 +5,6 @@
 # Used for creating system notes (e.g., when a user references a merge request
 # from an issue, an issue's assignee changes, an issue is closed, etc.)
 module SystemNoteService
-  prepend EE::SystemNoteService
   extend self
 
   # Called when commits are added to a Merge Request
@@ -212,7 +211,7 @@ module SystemNoteService
   #   "closed via bc17db76"
   #
   # Returns the created Note object
-  def change_status(noteable, project, author, status, source)
+  def change_status(noteable, project, author, status, source = nil)
     body = status.dup
     body << " via #{source.gfm_reference(project)}" if source
 
@@ -678,3 +677,5 @@ module SystemNoteService
     ActionController::Base.helpers.content_tag(*args)
   end
 end
+
+SystemNoteService.prepend(EE::SystemNoteService)

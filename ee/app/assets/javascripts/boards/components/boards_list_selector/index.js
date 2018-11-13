@@ -3,7 +3,7 @@ import _ from 'underscore';
 import { __, sprintf } from '~/locale';
 import Flash from '~/flash';
 import axios from '~/lib/utils/axios_utils';
-
+import boardsStore from '~/boards/stores/boards_store';
 import ListContainer from './list_container.vue';
 
 export default Vue.extend({
@@ -23,7 +23,7 @@ export default Vue.extend({
   data() {
     return {
       loading: true,
-      store: gl.issueBoards.BoardsStore,
+      store: boardsStore,
     };
   },
   mounted() {
@@ -43,15 +43,17 @@ export default Vue.extend({
         })
         .catch(() => {
           this.loading = false;
-          Flash(sprintf(__('Something went wrong while fetching %{listType} list'), {
-            listType: this.listType,
-          }));
+          Flash(
+            sprintf(__('Something went wrong while fetching %{listType} list'), {
+              listType: this.listType,
+            }),
+          );
         });
     },
     filterItems(term, items) {
       const query = term.toLowerCase();
 
-      return items.filter((item) => {
+      return items.filter(item => {
         const name = item.name ? item.name.toLowerCase() : item.title.toLowerCase();
         const foundName = name.indexOf(query) > -1;
 

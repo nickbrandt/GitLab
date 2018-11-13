@@ -8,7 +8,8 @@ const createComponent = (
   syncStatusUnavailable = false,
   selectiveSyncType = mockNodeDetails.selectiveSyncType,
   lastEvent = mockNodeDetails.lastEvent,
-  cursorLastEvent = mockNodeDetails.cursorLastEvent) => {
+  cursorLastEvent = mockNodeDetails.cursorLastEvent,
+) => {
   const Component = Vue.extend(geoNodeSyncSettingsComponent);
 
   return mountComponent(Component, {
@@ -24,6 +25,7 @@ describe('GeoNodeSyncSettingsComponent', () => {
     describe('syncType', () => {
       it('returns string representing sync type', () => {
         const vm = createComponent();
+
         expect(vm.syncType).toBe('Selective (namespaces)');
         vm.$destroy();
       });
@@ -31,19 +33,26 @@ describe('GeoNodeSyncSettingsComponent', () => {
 
     describe('eventTimestampEmpty', () => {
       it('returns `true` if one of the event timestamp is empty', () => {
-        const vmEmptyTimestamp = createComponent(false, mockNodeDetails.namespaces, {
-          id: 0,
-          timeStamp: 0,
-        }, {
-          id: 0,
-          timeStamp: 0,
-        });
+        const vmEmptyTimestamp = createComponent(
+          false,
+          mockNodeDetails.namespaces,
+          {
+            id: 0,
+            timeStamp: 0,
+          },
+          {
+            id: 0,
+            timeStamp: 0,
+          },
+        );
+
         expect(vmEmptyTimestamp.eventTimestampEmpty).toBeTruthy();
         vmEmptyTimestamp.$destroy();
       });
 
       it('return `false` if one of the event timestamp is present', () => {
         const vm = createComponent();
+
         expect(vm.eventTimestampEmpty).toBeFalsy();
         vm.$destroy();
       });
@@ -84,7 +93,10 @@ describe('GeoNodeSyncSettingsComponent', () => {
     describe('statusTooltip', () => {
       it('returns string representing status lag message', () => {
         expect(vm.statusTooltip(250)).toBe('');
-        expect(vm.statusTooltip(1000)).toBe('Node is slow, overloaded, or it just recovered after an outage.');
+        expect(vm.statusTooltip(1000)).toBe(
+          'Node is slow, overloaded, or it just recovered after an outage.',
+        );
+
         expect(vm.statusTooltip(4000)).toBe('Node is failing or broken.');
       });
     });
@@ -93,6 +105,7 @@ describe('GeoNodeSyncSettingsComponent', () => {
   describe('template', () => {
     it('renders `Unknown` when `syncStatusUnavailable` prop is true', () => {
       const vmSyncUnavailable = createComponent(true);
+
       expect(vmSyncUnavailable.$el.innerText.trim()).toBe('Unknown');
       vmSyncUnavailable.$destroy();
     });

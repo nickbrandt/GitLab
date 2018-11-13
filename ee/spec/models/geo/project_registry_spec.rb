@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Geo::ProjectRegistry do
   using RSpec::Parameterized::TableSyntax
 
-  set(:project) { create(:project) }
+  set(:project) { create(:project, description: 'kitten mittens') }
   set(:registry) { create(:geo_project_registry, project_id: project.id) }
 
   subject { registry }
@@ -138,6 +138,73 @@ describe Geo::ProjectRegistry do
       create(:geo_project_registry)
 
       expect(described_class.retry_due).not_to include(tomorrow)
+    end
+  end
+
+  describe '.with_search', :geo do
+    it 'returns project registries that refers to projects with a matching name' do
+      expect(described_class.with_search(project.name)).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a matching name regardless of the casing' do
+      expect(described_class.with_search(project.name.upcase)).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a matching description' do
+      expect(described_class.with_search(project.description)).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a partially matching description' do
+      expect(described_class.with_search('kitten')).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a matching description regardless of the casing' do
+      expect(described_class.with_search('KITTEN')).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a matching path' do
+      expect(described_class.with_search(project.path)).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a partially matching path' do
+      expect(described_class.with_search(project.path[0..2])).to eq([registry])
+    end
+
+    it 'returns project registries that refers to projects with a matching path regardless of the casing' do
+      expect(described_class.with_search(project.path.upcase)).to eq([registry])
+    end
+  end
+
+  describe '.flag_repositories_for_recheck!' do
+    it 'modified record to a recheck state' do
+      registry = create(:geo_project_registry, :repository_verified)
+
+      described_class.flag_repositories_for_recheck!
+
+      expect(registry.reload).to have_attributes(
+        repository_verification_checksum_sha: nil,
+        last_repository_verification_failure: nil,
+        repository_checksum_mismatch: false
+      )
+    end
+  end
+
+  describe '.flag_repositories_for_resync!' do
+    it 'modified record to a resync state' do
+      registry = create(:geo_project_registry, :synced)
+
+      described_class.flag_repositories_for_resync!
+
+      expect(registry.reload).to have_attributes(
+        resync_repository: true,
+        repository_verification_checksum_sha: nil,
+        last_repository_verification_failure: nil,
+        repository_checksum_mismatch: false,
+        repository_verification_retry_count: nil,
+        repository_retry_count: nil,
+        repository_retry_at: nil
+
+      )
     end
   end
 
@@ -821,19 +888,35 @@ describe Geo::ProjectRegistry do
     end
   end
 
-  describe 'verification_pending?' do
+  describe 'pending_verification?' do
     it 'returns true when either wiki or repository verification is pending' do
       repo_registry = create(:geo_project_registry, :repository_verification_outdated)
       wiki_registry = create(:geo_project_registry, :wiki_verification_failed)
 
-      expect(repo_registry.verification_pending?).to be_truthy
-      expect(wiki_registry.verification_pending?).to be_truthy
+      expect(repo_registry.pending_verification?).to be_truthy
+      expect(wiki_registry.pending_verification?).to be_truthy
     end
 
     it 'returns false when both wiki and repository verification is present' do
       registry = create(:geo_project_registry, :repository_verified, :wiki_verified)
 
-      expect(registry.verification_pending?).to be_falsey
+      expect(registry.pending_verification?).to be_falsey
+    end
+  end
+
+  describe 'pending_synchronization?' do
+    it 'returns true when either wiki or repository synchronization is pending' do
+      repo_registry = create(:geo_project_registry)
+      wiki_registry = create(:geo_project_registry)
+
+      expect(repo_registry.pending_synchronization?).to be_truthy
+      expect(wiki_registry.pending_synchronization?).to be_truthy
+    end
+
+    it 'returns false when both wiki and repository synchronization is present' do
+      registry = create(:geo_project_registry, :synced)
+
+      expect(registry.pending_synchronization?).to be_falsey
     end
   end
 
@@ -891,6 +974,32 @@ describe Geo::ProjectRegistry do
       registry = create(:geo_project_registry, :sync_failed, repository_retry_count: 2)
 
       expect(registry.candidate_for_redownload?).to be_truthy
+    end
+  end
+
+  describe '#synchronization_state' do
+    it 'returns :never when no attempt to sync has ever been done' do
+      registry = create(:geo_project_registry)
+
+      expect(registry.synchronization_state).to eq(:never)
+    end
+
+    it 'returns :failed when there is an existing error logged' do
+      registry = create(:geo_project_registry, :sync_failed)
+
+      expect(registry.synchronization_state).to eq(:failed)
+    end
+
+    it 'returns :pending when there is an existing error logged' do
+      registry = create(:geo_project_registry, :synced, :repository_dirty)
+
+      expect(registry.synchronization_state).to eq(:pending)
+    end
+
+    it 'returns :synced when its fully synced and there is no pending action or existing error' do
+      registry = create(:geo_project_registry, :synced, :repository_verified)
+
+      expect(registry.synchronization_state).to eq(:synced)
     end
   end
 end

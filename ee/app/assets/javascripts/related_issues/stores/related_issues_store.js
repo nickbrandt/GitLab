@@ -28,10 +28,10 @@ class RelatedIssuesStore {
   }
 
   removePendingRelatedIssue(indexToRemove) {
-    this.state.pendingReferences =
-      this.state.pendingReferences.filter((reference, index) => index !== indexToRemove);
+    this.state.pendingReferences = this.state.pendingReferences.filter(
+      (reference, index) => index !== indexToRemove,
+    );
   }
-
 }
 
 export default RelatedIssuesStore;

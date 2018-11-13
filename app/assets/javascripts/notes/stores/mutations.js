@@ -216,9 +216,17 @@ export default {
     Object.assign(state, { isNotesFetched: value });
   },
 
+  [types.SET_NOTES_LOADING_STATE](state, value) {
+    state.isLoading = value;
+  },
+
   [types.SET_DISCUSSION_DIFF_LINES](state, { discussionId, diffLines }) {
     const discussion = utils.findNoteObjectById(state.discussions, discussionId);
 
     discussion.truncated_diff_lines = diffLines;
+  },
+
+  [types.DISABLE_COMMENTS](state, value) {
+    state.commentsDisabled = value;
   },
 };

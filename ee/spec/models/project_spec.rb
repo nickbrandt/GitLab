@@ -22,6 +22,7 @@ describe Project do
     it { is_expected.to have_many(:source_pipelines) }
     it { is_expected.to have_many(:audit_events).dependent(false) }
     it { is_expected.to have_many(:protected_environments) }
+    it { is_expected.to have_many(:approver_groups).dependent(:destroy) }
   end
 
   describe 'validations' do
@@ -346,6 +347,14 @@ describe Project do
 
                 it 'returns true' do
                   is_expected.to eq(true)
+                end
+
+                context 'when feature is disabled by a feature flag' do
+                  it 'returns false' do
+                    stub_feature_flags(feature => false)
+
+                    is_expected.to eq(false)
+                  end
                 end
               end
 
@@ -885,10 +894,10 @@ describe Project do
     end
   end
 
-  describe '#secret_variables_for' do
+  describe '#ci_variables_for' do
     let(:project) { create(:project) }
 
-    let!(:secret_variable) do
+    let!(:ci_variable) do
       create(:ci_variable, value: 'secret', project: project)
     end
 
@@ -896,7 +905,7 @@ describe Project do
       create(:ci_variable, :protected, value: 'protected', project: project)
     end
 
-    subject { project.secret_variables_for(ref: 'ref') }
+    subject { project.ci_variables_for(ref: 'ref') }
 
     before do
       stub_application_setting(
@@ -907,7 +916,7 @@ describe Project do
       let(:environment) { 'review/name' }
 
       subject do
-        project.secret_variables_for(ref: 'ref', environment: environment)
+        project.ci_variables_for(ref: 'ref', environment: environment)
       end
 
       shared_examples 'matching environment scope' do
@@ -916,8 +925,8 @@ describe Project do
             stub_licensed_features(variable_environment_scope: true)
           end
 
-          it 'contains the secret variable' do
-            is_expected.to contain_exactly(secret_variable)
+          it 'contains the ci variable' do
+            is_expected.to contain_exactly(ci_variable)
           end
         end
 
@@ -926,8 +935,8 @@ describe Project do
             stub_licensed_features(variable_environment_scope: false)
           end
 
-          it 'does not contain the secret variable' do
-            is_expected.not_to contain_exactly(secret_variable)
+          it 'does not contain the ci variable' do
+            is_expected.not_to contain_exactly(ci_variable)
           end
         end
       end
@@ -938,8 +947,8 @@ describe Project do
             stub_licensed_features(variable_environment_scope: true)
           end
 
-          it 'does not contain the secret variable' do
-            is_expected.not_to contain_exactly(secret_variable)
+          it 'does not contain the ci variable' do
+            is_expected.not_to contain_exactly(ci_variable)
           end
         end
 
@@ -948,15 +957,15 @@ describe Project do
             stub_licensed_features(variable_environment_scope: false)
           end
 
-          it 'does not contain the secret variable' do
-            is_expected.not_to contain_exactly(secret_variable)
+          it 'does not contain the ci variable' do
+            is_expected.not_to contain_exactly(ci_variable)
           end
         end
       end
 
       context 'when environment scope is exactly matched' do
         before do
-          secret_variable.update(environment_scope: 'review/name')
+          ci_variable.update(environment_scope: 'review/name')
         end
 
         it_behaves_like 'matching environment scope'
@@ -964,7 +973,7 @@ describe Project do
 
       context 'when environment scope is matched by wildcard' do
         before do
-          secret_variable.update(environment_scope: 'review/*')
+          ci_variable.update(environment_scope: 'review/*')
         end
 
         it_behaves_like 'matching environment scope'
@@ -972,7 +981,7 @@ describe Project do
 
       context 'when environment scope does not match' do
         before do
-          secret_variable.update(environment_scope: 'review/*/special')
+          ci_variable.update(environment_scope: 'review/*/special')
         end
 
         it_behaves_like 'not matching environment scope'
@@ -984,18 +993,18 @@ describe Project do
         end
 
         it 'does not treat it as wildcard' do
-          secret_variable.update(environment_scope: '*_*')
+          ci_variable.update(environment_scope: '*_*')
 
-          is_expected.not_to contain_exactly(secret_variable)
+          is_expected.not_to contain_exactly(ci_variable)
         end
 
         context 'when environment name contains underscore' do
           let(:environment) { 'foo_bar/test' }
 
           it 'matches literally for _' do
-            secret_variable.update(environment_scope: 'foo_bar/*')
+            ci_variable.update(environment_scope: 'foo_bar/*')
 
-            is_expected.to contain_exactly(secret_variable)
+            is_expected.to contain_exactly(ci_variable)
           end
         end
       end
@@ -1010,18 +1019,18 @@ describe Project do
         end
 
         it 'does not treat it as wildcard' do
-          secret_variable.update_attribute(:environment_scope, '*%*')
+          ci_variable.update_attribute(:environment_scope, '*%*')
 
-          is_expected.not_to contain_exactly(secret_variable)
+          is_expected.not_to contain_exactly(ci_variable)
         end
 
         context 'when environment name contains a percent' do
           let(:environment) { 'foo%bar/test' }
 
           it 'matches literally for _' do
-            secret_variable.update(environment_scope: 'foo%bar/*')
+            ci_variable.update(environment_scope: 'foo%bar/*')
 
-            is_expected.to contain_exactly(secret_variable)
+            is_expected.to contain_exactly(ci_variable)
           end
         end
       end
@@ -1029,7 +1038,7 @@ describe Project do
       context 'when variables with the same name have different environment scopes' do
         let!(:partially_matched_variable) do
           create(:ci_variable,
-                 key: secret_variable.key,
+                 key: ci_variable.key,
                  value: 'partial',
                  environment_scope: 'review/*',
                  project: project)
@@ -1037,7 +1046,7 @@ describe Project do
 
         let!(:perfectly_matched_variable) do
           create(:ci_variable,
-                 key: secret_variable.key,
+                 key: ci_variable.key,
                  value: 'prefect',
                  environment_scope: 'review/name',
                  project: project)
@@ -1049,7 +1058,7 @@ describe Project do
 
         it 'puts variables matching environment scope more in the end' do
           is_expected.to eq(
-            [secret_variable,
+            [ci_variable,
              partially_matched_variable,
              perfectly_matched_variable])
         end
@@ -1117,37 +1126,6 @@ describe Project do
       end
 
       it { is_expected.to eq(expected) }
-    end
-  end
-
-  describe '#rename_repo' do
-    context 'when running on a primary node' do
-      set(:primary) { create(:geo_node, :primary) }
-      set(:secondary) { create(:geo_node) }
-      let(:project) { create(:project, :repository, :legacy_storage) }
-      let(:gitlab_shell) { Gitlab::Shell.new }
-
-      it 'logs the Geo::RepositoryRenamedEvent for project backed by hashed storage' do
-        project_hashed_storage = create(:project)
-
-        allow(project_hashed_storage).to receive(:gitlab_shell).and_return(gitlab_shell)
-        allow(project_hashed_storage).to receive(:previous_changes).and_return('path' => ['foo'])
-        allow(gitlab_shell).to receive(:mv_repository).twice.and_return(true)
-
-        expect { project_hashed_storage.rename_repo }.to change(Geo::RepositoryRenamedEvent, :count)
-      end
-
-      it 'logs the Geo::RepositoryRenamedEvent for project backed by legacy storage' do
-        allow(project).to receive(:gitlab_shell).and_return(gitlab_shell)
-        allow(project).to receive(:previous_changes).and_return('path' => ['foo'])
-        allow(gitlab_shell).to receive(:mv_repository).twice.and_return(true)
-
-        expect(Geo::RepositoryRenamedEventStore).to receive(:new)
-          .with(instance_of(described_class), old_path: 'foo', old_path_with_namespace: "#{project.namespace.full_path}/foo")
-          .and_call_original
-
-        expect { project.rename_repo }.to change(Geo::RepositoryRenamedEvent, :count).by(1)
-      end
     end
   end
 
@@ -1518,64 +1496,44 @@ describe Project do
     end
   end
 
-  describe '#security_reports_feature_available?' do
-    security_features = %i[sast dependency_scanning sast_container dast]
-
-    let(:project) { create(:project) }
-
-    security_features.each do |feature|
-      it "returns true when at least #{feature} is enabled" do
-        allow(project).to receive(:feature_available?) { false }
-        allow(project).to receive(:feature_available?).with(feature) { true }
-
-        expect(project.security_reports_feature_available?).to eq(true)
-      end
-    end
-
-    it "returns false when all security features are disabled" do
-      security_features.each do |feature|
-        allow(project).to receive(:feature_available?).with(feature) { false }
-      end
-
-      expect(project.security_reports_feature_available?).to eq(false)
-    end
-  end
-
   describe '#latest_pipeline_with_security_reports' do
     let(:project) { create(:project) }
-    let(:pipeline_1) { create(:ci_pipeline_without_jobs, project: project) }
-    let(:pipeline_2) { create(:ci_pipeline_without_jobs, project: project) }
-    let(:pipeline_3) { create(:ci_pipeline_without_jobs, project: project) }
+    let!(:pipeline_1) { create(:ci_pipeline_without_jobs, project: project) }
+    let!(:pipeline_2) { create(:ci_pipeline_without_jobs, project: project) }
+    let!(:pipeline_3) { create(:ci_pipeline_without_jobs, project: project) }
 
-    before do
-      create(
-        :ci_build,
-        :success,
-        :artifacts,
-        name: 'sast',
-        pipeline: pipeline_1,
-        options: {
-          artifacts: {
-            paths: [Ci::Build::SAST_FILE]
-          }
-        }
-      )
-      create(
-        :ci_build,
-        :success,
-        :artifacts,
-        name: 'sast',
-        pipeline: pipeline_2,
-        options: {
-          artifacts: {
-            paths: [Ci::Build::SAST_FILE]
-          }
-        }
-      )
+    subject { project.latest_pipeline_with_security_reports }
+
+    context 'when legacy reports are used' do
+      before do
+        create(:ee_ci_build, :legacy_sast, pipeline: pipeline_1)
+        create(:ee_ci_build, :legacy_sast, pipeline: pipeline_2)
+      end
+
+      it "returns the latest pipeline with security reports" do
+        is_expected.to eq(pipeline_2)
+      end
     end
 
-    it "returns the latest pipeline with security reports" do
-      expect(project.latest_pipeline_with_security_reports).to eq(pipeline_2)
+    context 'when new reports are used' do
+      before do
+        create(:ee_ci_build, :sast, pipeline: pipeline_1)
+        create(:ee_ci_build, :sast, pipeline: pipeline_2)
+      end
+
+      it "returns the latest pipeline with security reports" do
+        is_expected.to eq(pipeline_2)
+      end
+
+      context 'when legacy used' do
+        before do
+          create(:ee_ci_build, :legacy_sast, pipeline: pipeline_3)
+        end
+
+        it "prefers the new reports" do
+          is_expected.to eq(pipeline_2)
+        end
+      end
     end
   end
 
@@ -1765,6 +1723,38 @@ describe Project do
         .to receive(:find_remote_root_ref)
         .with('origin')
         .and_return(ref)
+    end
+  end
+
+  describe '#feature_flags_client_token' do
+    let(:project) { create(:project) }
+
+    subject { project.feature_flags_client_token }
+
+    context 'when there is no access token' do
+      it "creates a new one" do
+        is_expected.not_to be_empty
+      end
+    end
+
+    context 'when there is access token' do
+      let!(:instance) { create(:operations_feature_flags_client, project: project, token: 'token') }
+
+      it "provides an existing one" do
+        is_expected.to eq('token')
+      end
+    end
+  end
+
+  describe '#store_security_reports_available?' do
+    let(:project) { create(:project) }
+
+    subject { project.store_security_reports_available? }
+
+    it 'delegates to namespace' do
+      expect(project.namespace).to receive(:store_security_reports_available?).once.and_call_original
+
+      subject
     end
   end
 end

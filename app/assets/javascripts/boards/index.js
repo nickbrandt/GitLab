@@ -12,15 +12,14 @@ import eventHub from './eventhub';
 import sidebarEventHub from '~/sidebar/event_hub';
 import './models/milestone';
 import './models/project';
-import './stores/boards_store';
+import boardsStore from './stores/boards_store';
 import ModalStore from './stores/modal_store';
 import modalMixin from './mixins/modal_mixins';
-import './mixins/sortable_default_options';
 import './filters/due_date_filters';
-import './components/board';
-import './components/board_sidebar';
-import './components/new_list_dropdown';
-import BoardAddIssuesModal from './components/modal/index.vue';
+import Board from 'ee/boards/components/board';
+import BoardSidebar from 'ee/boards/components/board_sidebar';
+import initNewListDropdown from './components/new_list_dropdown';
+import BoardAddIssuesModal from 'ee/boards/components/modal/index';
 import '~/vue_shared/vue_resource_interceptor';
 import { NavigationType } from '~/lib/utils/common_utils';
 
@@ -28,50 +27,42 @@ import 'ee/boards/models/list';
 import 'ee/boards/models/issue';
 import 'ee/boards/models/project';
 import BoardService from 'ee/boards/services/board_service';
-import 'ee/boards/components/board_sidebar';
-import 'ee/boards/components/board';
-import 'ee/boards/components/modal/index';
-import 'ee/boards/components/boards_selector';
+import BoardsSelector from 'ee/boards/components/boards_selector';
 import collapseIcon from 'ee/boards/icons/fullscreen_collapse.svg';
 import expandIcon from 'ee/boards/icons/fullscreen_expand.svg';
 import tooltip from '~/vue_shared/directives/tooltip';
 
+let issueBoardsApp;
+
 export default () => {
   const $boardApp = document.getElementById('board-app');
-  const Store = gl.issueBoards.BoardsStore;
   const issueBoardsContent = document.querySelector('.content-wrapper > .js-focus-mode-board');
 
-  window.gl = window.gl || {};
-
   // check for browser back and trigger a hard reload to circumvent browser caching.
-  window.addEventListener('pageshow', (event) => {
-    const isNavTypeBackForward = window.performance &&
-        window.performance.navigation.type === NavigationType.TYPE_BACK_FORWARD;
+  window.addEventListener('pageshow', event => {
+    const isNavTypeBackForward =
+      window.performance && window.performance.navigation.type === NavigationType.TYPE_BACK_FORWARD;
 
     if (event.persisted || isNavTypeBackForward) {
       window.location.reload();
     }
   });
 
-  if (gl.IssueBoardsApp) {
-    gl.IssueBoardsApp.$destroy(true);
+  if (issueBoardsApp) {
+    issueBoardsApp.$destroy(true);
   }
 
-  Store.create();
+  boardsStore.create();
 
-  // hack to allow sidebar scripts like milestone_select manipulate the BoardsStore
-  gl.issueBoards.boardStoreIssueSet = (...args) => Vue.set(Store.detail.issue, ...args);
-  gl.issueBoards.boardStoreIssueDelete = (...args) => Vue.delete(Store.detail.issue, ...args);
-
-  gl.IssueBoardsApp = new Vue({
+  issueBoardsApp = new Vue({
     el: $boardApp,
     components: {
-      board: gl.issueBoards.Board,
-      'board-sidebar': gl.issueBoards.BoardSidebar,
+      Board,
+      BoardSidebar,
       BoardAddIssuesModal,
     },
     data: {
-      state: Store.state,
+      state: boardsStore.state,
       loading: true,
       boardsEndpoint: $boardApp.dataset.boardsEndpoint,
       listsEndpoint: $boardApp.dataset.listsEndpoint,
@@ -80,7 +71,7 @@ export default () => {
       issueLinkBase: $boardApp.dataset.issueLinkBase,
       rootPath: $boardApp.dataset.rootPath,
       bulkUpdatePath: $boardApp.dataset.bulkUpdatePath,
-      detailIssue: Store.detail,
+      detailIssue: boardsStore.detail,
       defaultAvatar: $boardApp.dataset.defaultAvatar,
     },
     computed: {
@@ -95,7 +86,7 @@ export default () => {
         bulkUpdatePath: this.bulkUpdatePath,
         boardId: this.boardId,
       });
-      Store.rootPath = this.boardsEndpoint;
+      boardsStore.rootPath = this.boardsEndpoint;
 
       eventHub.$on('updateTokens', this.updateTokens);
       eventHub.$on('newDetailIssue', this.updateDetailIssue);
@@ -109,16 +100,16 @@ export default () => {
       sidebarEventHub.$off('toggleSubscription', this.toggleSubscription);
     },
     mounted() {
-      this.filterManager = new FilteredSearchBoards(Store.filter, true, Store.cantEdit);
+      this.filterManager = new FilteredSearchBoards(boardsStore.filter, true, boardsStore.cantEdit);
       this.filterManager.setup();
 
-      Store.disabled = this.disabled;
+      boardsStore.disabled = this.disabled;
       gl.boardService
         .all()
         .then(res => res.data)
         .then(data => {
           data.forEach(board => {
-            const list = Store.addList(board, this.defaultAvatar);
+            const list = boardsStore.addList(board, this.defaultAvatar);
 
             if (list.type === 'closed') {
               list.position = Infinity;
@@ -129,8 +120,8 @@ export default () => {
 
           this.state.lists = _.sortBy(this.state.lists, 'position');
 
-          Store.addBlankState();
-          Store.addPromotionState();
+          boardsStore.addBlankState();
+          boardsStore.addPromotionState();
           this.loading = false;
         })
         .catch(() => {
@@ -166,13 +157,13 @@ export default () => {
             });
         }
 
-        Store.detail.issue = newIssue;
+        boardsStore.detail.issue = newIssue;
       },
       clearDetailIssue() {
-        Store.detail.issue = {};
+        boardsStore.detail.issue = {};
       },
       toggleSubscription(id) {
-        const { issue } = Store.detail;
+        const { issue } = boardsStore.detail;
         if (issue.id === id && issue.toggleSubscriptionEndpoint) {
           issue.setFetchingState('subscriptions', true);
           BoardService.toggleIssueSubscription(issue.toggleSubscriptionEndpoint)
@@ -191,14 +182,15 @@ export default () => {
     },
   });
 
-  gl.IssueBoardsSearch = new Vue({
+  // eslint-disable-next-line no-new
+  new Vue({
     el: document.getElementById('js-add-list'),
     data: {
-      filters: Store.state.filters,
+      filters: boardsStore.state.filters,
       milestoneTitle: $boardApp.dataset.boardMilestoneTitle,
     },
     mounted() {
-      gl.issueBoards.newListDropdownInit();
+      initNewListDropdown();
     },
   });
 
@@ -214,7 +206,7 @@ export default () => {
         return {
           canAdminList: this.$options.el.hasAttribute('data-can-admin-list'),
           hasScope: this.$options.el.hasAttribute('data-has-scope'),
-          state: Store.state,
+          state: boardsStore.state,
         };
       },
       computed: {
@@ -226,7 +218,7 @@ export default () => {
         },
       },
       methods: {
-        showPage: page => gl.issueBoards.BoardsStore.showPage(page),
+        showPage: page => boardsStore.showPage(page),
       },
       template: `
         <div class="prepend-left-10">
@@ -248,13 +240,14 @@ export default () => {
   const issueBoardsModal = document.getElementById('js-add-issues-btn');
 
   if (issueBoardsModal) {
-    gl.IssueBoardsModalAddBtn = new Vue({
+    // eslint-disable-next-line no-new
+    new Vue({
       el: issueBoardsModal,
       mixins: [modalMixin],
       data() {
         return {
           modal: ModalStore.store,
-          store: Store.state,
+          store: boardsStore.state,
           isFullscreen: false,
           focusModeAvailable: $boardApp.hasAttribute('data-focus-mode-available'),
           canAdminList: this.$options.el.hasAttribute('data-can-admin-list'),
@@ -320,11 +313,12 @@ export default () => {
     });
   }
 
-  gl.IssueBoardsToggleFocusBtn = new Vue({
+  // eslint-disable-next-line no-new
+  new Vue({
     el: document.getElementById('js-toggle-focus-btn'),
     data: {
       modal: ModalStore.store,
-      store: Store.state,
+      store: boardsStore.state,
       isFullscreen: false,
       focusModeAvailable: $boardApp.hasAttribute('data-focus-mode-available'),
     },
@@ -362,10 +356,11 @@ export default () => {
     `,
   });
 
-  gl.IssueboardsSwitcher = new Vue({
+  // eslint-disable-next-line no-new
+  new Vue({
     el: '#js-multiple-boards-switcher',
     components: {
-      'boards-selector': gl.issueBoards.BoardsSelector,
+      BoardsSelector,
     },
   });
 };

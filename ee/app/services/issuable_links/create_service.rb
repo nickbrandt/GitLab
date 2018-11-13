@@ -7,7 +7,14 @@ module IssuableLinks
     end
 
     def execute
-      if referenced_issues.blank?
+      # If ALL referenced issues are already assigned to the given epic it renders a conflict status,
+      # otherwise create issue links for the issues which
+      # are still not assigned and return success message.
+      if render_conflict_error?
+        return error('Issue(s) already assigned', 409)
+      end
+
+      if render_not_found_error?
         return error('No Issue found for given params', 404)
       end
 
@@ -17,8 +24,18 @@ module IssuableLinks
 
     private
 
+    def render_conflict_error?
+      referenced_issues.present? && (referenced_issues - previous_related_issues).empty?
+    end
+
+    def render_not_found_error?
+      linkable_issues(referenced_issues).empty?
+    end
+
     def create_issue_links
-      referenced_issues.each do |referenced_issue|
+      issues = linkable_issues(referenced_issues)
+
+      issues.each do |referenced_issue|
         relate_issues(referenced_issue) do |params|
           create_notes(referenced_issue, params)
         end
@@ -29,15 +46,13 @@ module IssuableLinks
       @referenced_issues ||= begin
         target_issue = params[:target_issue]
 
-        issues = if params[:issue_references].present?
-                   extract_issues_from_references
-                 elsif target_issue
-                   [target_issue]
-                 else
-                   []
-                 end
-
-        linkable_issues(issues)
+        if params[:issue_references].present?
+          extract_issues_from_references
+        elsif target_issue
+          [target_issue]
+        else
+          []
+        end
       end
     end
 
@@ -56,6 +71,10 @@ module IssuableLinks
     end
 
     def linkable_issues(issues)
+      raise NotImplementedError
+    end
+
+    def previous_related_issues
       raise NotImplementedError
     end
 

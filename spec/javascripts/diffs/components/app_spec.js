@@ -55,10 +55,13 @@ describe('diffs/components/app', () => {
 
   it('shows comments message, with old mergeRequestDiff', done => {
     vm.$store.state.diffs.mergeRequestDiff = { latest: false };
+    vm.$store.state.diffs.targetBranch = 'master';
 
     vm.$nextTick()
       .then(() => {
-        expect(vm.$el).toContainText("Not all comments are displayed because you're viewing an old version of the diff.");
+        expect(vm.$el).toContainText(
+          "Not all comments are displayed because you're viewing an old version of the diff.",
+        );
       })
       .then(done)
       .catch(done.fail);
@@ -69,7 +72,9 @@ describe('diffs/components/app', () => {
 
     vm.$nextTick()
       .then(() => {
-        expect(vm.$el).toContainText("Not all comments are displayed because you're comparing two versions of the diff.");
+        expect(vm.$el).toContainText(
+          "Not all comments are displayed because you're comparing two versions of the diff.",
+        );
       })
       .then(done)
       .catch(done.fail);

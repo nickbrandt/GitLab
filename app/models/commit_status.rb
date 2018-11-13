@@ -51,7 +51,10 @@ class CommitStatus < ActiveRecord::Base
     stuck_or_timeout_failure: 3,
     runner_system_failure: 4,
     missing_dependency_failure: 5,
-    runner_unsupported: 6
+    runner_unsupported: 6,
+    stale_schedule: 7,
+    job_execution_timeout: 8,
+    archived_failure: 9
   }.merge(EE_FAILURE_REASONS)
 
   ##
@@ -73,7 +76,7 @@ class CommitStatus < ActiveRecord::Base
     end
 
     event :enqueue do
-      transition [:created, :skipped, :manual] => :pending
+      transition [:created, :skipped, :manual, :scheduled] => :pending
     end
 
     event :run do
@@ -85,7 +88,7 @@ class CommitStatus < ActiveRecord::Base
     end
 
     event :drop do
-      transition [:created, :pending, :running] => :failed
+      transition [:created, :pending, :running, :scheduled] => :failed
     end
 
     event :success do
@@ -93,10 +96,10 @@ class CommitStatus < ActiveRecord::Base
     end
 
     event :cancel do
-      transition [:created, :pending, :running, :manual] => :canceled
+      transition [:created, :pending, :running, :manual, :scheduled] => :canceled
     end
 
-    before_transition [:created, :skipped, :manual] => :pending do |commit_status|
+    before_transition [:created, :skipped, :manual, :scheduled] => :pending do |commit_status|
       commit_status.queued_at = Time.now
     end
 
@@ -110,7 +113,7 @@ class CommitStatus < ActiveRecord::Base
 
     before_transition any => :failed do |commit_status, transition|
       failure_reason = transition.args.first
-      commit_status.failure_reason = failure_reason
+      commit_status.failure_reason = CommitStatus.failure_reasons[failure_reason]
     end
 
     after_transition do |commit_status, transition|
@@ -167,13 +170,15 @@ class CommitStatus < ActiveRecord::Base
     false
   end
 
-  # To be overriden when inherrited from
   def retryable?
     false
   end
 
-  # To be overriden when inherrited from
   def cancelable?
+    false
+  end
+
+  def archived?
     false
   end
 

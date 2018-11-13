@@ -1,19 +1,19 @@
-import '~/boards/stores/boards_store';
+import boardsStore from '~/boards/stores/boards_store';
 
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
-import BoardListSelectorComponent from 'ee/boards/components/boards_list_selector/';
+import BoardListSelector from 'ee/boards/components/boards_list_selector/';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 import { mockAssigneesList } from 'spec/boards/mock_data';
 import { TEST_HOST } from 'spec/test_constants';
 
-describe('BoardListSelectorComponent', () => {
+describe('BoardListSelector', () => {
   const dummyEndpoint = `${TEST_HOST}/users.json`;
 
   const createComponent = () =>
-    mountComponent(BoardListSelectorComponent, {
+    mountComponent(BoardListSelector, {
       listPath: dummyEndpoint,
       listType: 'assignees',
     });
@@ -21,8 +21,8 @@ describe('BoardListSelectorComponent', () => {
   let vm;
   let mock;
 
-  gl.issueBoards.BoardsStore.create();
-  gl.issueBoards.BoardsStore.state.assignees = [];
+  boardsStore.create();
+  boardsStore.state.assignees = [];
 
   beforeEach(() => {
     mock = new MockAdapter(axios);
@@ -39,7 +39,7 @@ describe('BoardListSelectorComponent', () => {
   describe('data', () => {
     it('returns default data props', () => {
       expect(vm.loading).toBe(true);
-      expect(vm.store).toBe(gl.issueBoards.BoardsStore);
+      expect(vm.store).toBe(boardsStore);
     });
   });
 
@@ -47,10 +47,9 @@ describe('BoardListSelectorComponent', () => {
     describe('loadList', () => {
       it('calls axios.get and sets response to store.state.assignees', done => {
         mock.onGet(dummyEndpoint).reply(200, mockAssigneesList);
-        gl.issueBoards.BoardsStore.state.assignees = [];
+        boardsStore.state.assignees = [];
 
-        vm
-          .loadList()
+        vm.loadList()
           .then(() => {
             expect(vm.loading).toBe(false);
             expect(vm.store.state.assignees.length).toBe(mockAssigneesList.length);
@@ -61,10 +60,9 @@ describe('BoardListSelectorComponent', () => {
 
       it('does not call axios.get when store.state.assignees is not empty', done => {
         spyOn(axios, 'get');
-        gl.issueBoards.BoardsStore.state.assignees = mockAssigneesList;
+        boardsStore.state.assignees = mockAssigneesList;
 
-        vm
-          .loadList()
+        vm.loadList()
           .then(() => {
             expect(axios.get).not.toHaveBeenCalled();
           })
@@ -74,10 +72,9 @@ describe('BoardListSelectorComponent', () => {
 
       it('calls axios.get and shows Flash error when request fails', done => {
         mock.onGet(dummyEndpoint).replyOnce(500, {});
-        gl.issueBoards.BoardsStore.state.assignees = [];
+        boardsStore.state.assignees = [];
 
-        vm
-          .loadList()
+        vm.loadList()
           .then(() => {
             expect(vm.loading).toBe(false);
             expect(document.querySelector('.flash-text').innerText.trim()).toBe(
@@ -96,6 +93,7 @@ describe('BoardListSelectorComponent', () => {
 
         expect(vm.store.findList('title', assignee.name)).not.toBeDefined();
         vm.handleItemClick(assignee);
+
         expect(vm.store.new).toHaveBeenCalledWith(jasmine.any(Object));
       });
     });

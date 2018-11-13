@@ -2,9 +2,9 @@
 
 >**Note:**
 In GitLab 8.3, Jenkins integration using the
-[GitLab Hook Plugin](https://wiki.jenkins-ci.org/display/JENKINS/GitLab+Hook+Plugin)
+[GitLab Hook Plugin](https://wiki.jenkins.io/display/JENKINS/GitLab+Hook+Plugin)
 was deprecated in favor of the
-[GitLab Plugin](https://wiki.jenkins-ci.org/display/JENKINS/GitLab+Plugin).
+[GitLab Plugin](https://wiki.jenkins.io/display/JENKINS/GitLab+Plugin).
 The deprecated integration has been renamed to [Jenkins CI (Deprecated)](jenkins_deprecated.md) in the
 project service settings. We may remove this in a future release and recommend
 using the new 'Jenkins CI' project service instead which is described in this
@@ -32,8 +32,8 @@ pipelines directly in GitLab.
 
 ## Requirements
 
-* [Jenkins GitLab Plugin](https://wiki.jenkins-ci.org/display/JENKINS/GitLab+Plugin)
-* [Jenkins Git Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Git+Plugin)
+* [Jenkins GitLab Plugin](https://wiki.jenkins.io/display/JENKINS/GitLab+Plugin)
+* [Jenkins Git Plugin](https://wiki.jenkins.io/display/JENKINS/Git+Plugin)
 * Git clone access for Jenkins from the GitLab repository
 * GitLab API access to report build status
 
@@ -53,8 +53,8 @@ when configuring the Jenkins server later.
 
 ## Configure the Jenkins server
 
-Install [Jenkins GitLab Plugin](https://wiki.jenkins-ci.org/display/JENKINS/GitLab+Plugin)
-and [Jenkins Git Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Git+Plugin).
+Install [Jenkins GitLab Plugin](https://wiki.jenkins.io/display/JENKINS/GitLab+Plugin)
+and [Jenkins Git Plugin](https://wiki.jenkins.io/display/JENKINS/Git+Plugin).
 
 Go to Manage Jenkins -> Configure System and scroll down to the 'GitLab' section.
 Enter the GitLab server URL in the 'GitLab host URL' field and paste the API token

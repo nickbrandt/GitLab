@@ -98,7 +98,8 @@ describe('Card security reports app', () => {
       expect(userAvatarLink.querySelector('img').getAttribute('src')).toBe(
         `${TEST_HOST}/img?width=24`,
       );
-      expect(userAvatarLink.textContent).toBe('TestUser');
+
+      expect(userAvatarLink.textContent.trim()).toBe('TestUser');
     });
 
     it('branch and commit information', () => {

@@ -13,6 +13,13 @@ module EE
           push_rule_committer_not_allowed: "You cannot push commits for '%{committer_email}'. You can only push commits that were committed with one of your own verified emails."
         }.freeze
 
+        LOG_MESSAGES = {
+          push_rule_tag_check: "Checking if you are allowed to delete a tag...",
+          push_rule_branch_check: "Checking if branch follows the naming patterns defined by the project...",
+          push_rule_commits_check: "Checking if commits follow defined push rules...",
+          file_size_check: "Checking if any files are larger than the allowed size..."
+        }.freeze
+
         override :exec
         def exec
           return true if skip_authorization
@@ -33,15 +40,17 @@ module EE
         def file_size_check
           return if push_rule.nil? || push_rule.max_file_size.zero?
 
-          max_file_size = push_rule.max_file_size
-          blobs = project.repository.new_blobs(newrev)
+          logger.log_timed(LOG_MESSAGES[__method__]) do
+            max_file_size = push_rule.max_file_size
+            blobs = project.repository.new_blobs(newrev, dynamic_timeout: logger.time_left)
 
-          large_blob = blobs.find do |blob|
-            ::Gitlab::Utils.bytes_to_megabytes(blob.size) > max_file_size
-          end
+            large_blob = blobs.find do |blob|
+              ::Gitlab::Utils.bytes_to_megabytes(blob.size) > max_file_size
+            end
 
-          if large_blob
-            raise ::Gitlab::GitAccess::UnauthorizedError, %Q{File "#{large_blob.path}" is larger than the allowed size of #{max_file_size} MB}
+            if large_blob
+              raise ::Gitlab::GitAccess::UnauthorizedError, %Q{File "#{large_blob.path}" is larger than the allowed size of #{max_file_size} MB}
+            end
           end
         end
 
@@ -60,23 +69,31 @@ module EE
         end
 
         def push_rule_tag_check
-          if tag_deletion_denied_by_push_rule?
-            raise ::Gitlab::GitAccess::UnauthorizedError, 'You cannot delete a tag'
+          logger.log_timed(LOG_MESSAGES[__method__]) do
+            if tag_deletion_denied_by_push_rule?
+              raise ::Gitlab::GitAccess::UnauthorizedError, 'You cannot delete a tag'
+            end
           end
         end
 
         def push_rule_branch_check
-          unless branch_name_allowed_by_push_rule?
-            message = ERROR_MESSAGES[:push_rule_branch_name] % { branch_name_regex: push_rule.branch_name_regex }
-            raise ::Gitlab::GitAccess::UnauthorizedError.new(message)
+          logger.log_timed(LOG_MESSAGES[__method__]) do
+            unless branch_name_allowed_by_push_rule?
+              message = ERROR_MESSAGES[:push_rule_branch_name] % { branch_name_regex: push_rule.branch_name_regex }
+              raise ::Gitlab::GitAccess::UnauthorizedError.new(message)
+            end
           end
 
           commit_validation = push_rule.try(:commit_validation?)
           # if newrev is blank, the branch was deleted
           return if deletion? || !commit_validation
 
-          commits.each do |commit|
-            push_rule_commit_check(commit)
+          logger.log_timed(LOG_MESSAGES[:push_rule_commits_check]) do
+            commits.each do |commit|
+              logger.check_timeout_reached
+
+              push_rule_commit_check(commit)
+            end
           end
         rescue ::PushRule::MatchError => e
           raise ::Gitlab::GitAccess::UnauthorizedError, e.message
@@ -138,12 +155,12 @@ module EE
 
           # Check whether author is a GitLab member
           if push_rule.member_check
-            unless ::User.existing_member?(commit.author_email.downcase)
+            unless ::User.find_by_any_email(commit.author_email).present?
               return "Author '#{commit.author_email}' is not a member of team"
             end
 
             if commit.author_email.casecmp(commit.committer_email) == -1
-              unless ::User.existing_member?(commit.committer_email.downcase)
+              unless ::User.find_by_any_email(commit.committer_email).present?
                 return "Committer '#{commit.committer_email}' is not a member of team"
               end
             end

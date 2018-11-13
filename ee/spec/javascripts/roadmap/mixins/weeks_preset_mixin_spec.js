@@ -40,6 +40,7 @@ describe('WeeksPresetMixin', () => {
           epic: Object.assign({}, mockEpic, { startDate: mockTimeframeWeeks[1] }),
           timeframeItem: mockTimeframeWeeks[1],
         });
+
         expect(vm.hasStartDateForWeek()).toBe(true);
       });
 
@@ -48,6 +49,7 @@ describe('WeeksPresetMixin', () => {
           epic: Object.assign({}, mockEpic, { startDate: mockTimeframeWeeks[0] }),
           timeframeItem: mockTimeframeWeeks[1],
         });
+
         expect(vm.hasStartDateForWeek()).toBe(false);
       });
     });
@@ -56,6 +58,7 @@ describe('WeeksPresetMixin', () => {
       it('returns date object set to last day of the week from provided timeframeItem', () => {
         vm = createComponent({});
         const lastDayOfWeek = vm.getLastDayOfWeek(mockTimeframeWeeks[0]);
+
         expect(lastDayOfWeek.getDate()).toBe(30);
         expect(lastDayOfWeek.getMonth()).toBe(11);
         expect(lastDayOfWeek.getFullYear()).toBe(2017);
@@ -70,12 +73,14 @@ describe('WeeksPresetMixin', () => {
       it('returns true if provided timeframeItem is under epicEndDate', () => {
         const timeframeItem = new Date(2018, 0, 7); // Jan 7, 2018
         const epicEndDate = new Date(2018, 0, 3); // Jan 3, 2018
+
         expect(vm.isTimeframeUnderEndDateForWeek(timeframeItem, epicEndDate)).toBe(true);
       });
 
       it('returns false if provided timeframeItem is NOT under epicEndDate', () => {
         const timeframeItem = new Date(2018, 0, 7); // Jan 7, 2018
         const epicEndDate = new Date(2018, 0, 15); // Jan 15, 2018
+
         expect(vm.isTimeframeUnderEndDateForWeek(timeframeItem, epicEndDate)).toBe(false);
       });
     });
@@ -83,6 +88,7 @@ describe('WeeksPresetMixin', () => {
     describe('getBarWidthForSingleWeek', () => {
       it('returns calculated bar width based on provided cellWidth and day of week', () => {
         vm = createComponent({});
+
         expect(Math.floor(vm.getBarWidthForSingleWeek(300, 1))).toBe(42); // 10% size
         expect(Math.floor(vm.getBarWidthForSingleWeek(300, 3))).toBe(128); // 50% size
         expect(vm.getBarWidthForSingleWeek(300, 7)).toBe(300); // Full size
@@ -92,6 +98,7 @@ describe('WeeksPresetMixin', () => {
     describe('getTimelineBarEndOffsetHalfForWeek', () => {
       it('returns timeline bar end offset for Weeks view', () => {
         vm = createComponent({});
+
         expect(vm.getTimelineBarEndOffsetHalfForWeek()).toBe(28);
       });
     });
@@ -101,6 +108,7 @@ describe('WeeksPresetMixin', () => {
         vm = createComponent({
           epic: Object.assign({}, mockEpic, { startDateOutOfRange: true }),
         });
+
         expect(vm.getTimelineBarStartOffsetForWeeks()).toBe('');
       });
 
@@ -111,6 +119,7 @@ describe('WeeksPresetMixin', () => {
             endDateOutOfRange: true,
           }),
         });
+
         expect(vm.getTimelineBarStartOffsetForWeeks()).toBe('');
       });
 
@@ -120,6 +129,7 @@ describe('WeeksPresetMixin', () => {
             startDate: mockTimeframeWeeks[0],
           }),
         });
+
         expect(vm.getTimelineBarStartOffsetForWeeks()).toBe('left: 0;');
       });
 
@@ -132,6 +142,7 @@ describe('WeeksPresetMixin', () => {
             endDateOutOfRange: true,
           }),
         });
+
         expect(vm.getTimelineBarStartOffsetForWeeks()).toBe('right: 8px;');
       });
 
@@ -141,6 +152,7 @@ describe('WeeksPresetMixin', () => {
             startDate: new Date(2018, 0, 15),
           }),
         });
+
         expect(vm.getTimelineBarStartOffsetForWeeks()).toContain('left: 60');
       });
     });
@@ -155,6 +167,7 @@ describe('WeeksPresetMixin', () => {
             endDate: new Date(2018, 1, 2), // Feb 2, 2018
           }),
         });
+
         expect(Math.floor(vm.getTimelineBarWidthForWeeks())).toBe(1600);
       });
     });

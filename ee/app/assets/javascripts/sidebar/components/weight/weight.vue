@@ -4,10 +4,12 @@ import { s__ } from '~/locale';
 import eventHub from '~/sidebar/event_hub';
 import tooltip from '~/vue_shared/directives/tooltip';
 import icon from '~/vue_shared/components/icon.vue';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 
 export default {
   components: {
     icon,
+    GlLoadingIcon,
   },
   directives: {
     tooltip,
@@ -188,8 +190,7 @@ export default {
         ref="editableField"
         :value="weight"
         class="form-control"
-        type="number"
-        min="0"
+        type="text"
         placeholder="Enter a number"
         @blur="onSubmit"
         @keydown.enter="onSubmit"

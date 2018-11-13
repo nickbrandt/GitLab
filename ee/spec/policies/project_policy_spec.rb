@@ -306,7 +306,7 @@ describe ProjectPolicy do
 
   describe 'read_project_security_dashboard' do
     before do
-      allow(project).to receive(:security_reports_feature_available?).and_return(true)
+      stub_licensed_features(security_dashboard: true)
     end
 
     subject { described_class.new(current_user, project) }
@@ -334,9 +334,9 @@ describe ProjectPolicy do
 
       it { is_expected.to be_allowed(:read_project_security_dashboard) }
 
-      context 'when security reports features are not available' do
+      context 'when security dashboard features is not available' do
         before do
-          allow(project).to receive(:security_reports_feature_available?).and_return(false)
+          stub_licensed_features(security_dashboard: false)
         end
 
         it { is_expected.to be_disallowed(:read_project_security_dashboard) }
@@ -365,6 +365,138 @@ describe ProjectPolicy do
       let(:current_user) { nil }
 
       it { is_expected.to be_disallowed(:read_project_security_dashboard) }
+    end
+  end
+
+  describe 'read_package' do
+    subject { described_class.new(current_user, project) }
+
+    context 'with admin' do
+      let(:current_user) { admin }
+
+      it { is_expected.to be_allowed(:read_package) }
+
+      context 'when repository is disabled' do
+        before do
+          project.project_feature.update(repository_access_level: ProjectFeature::DISABLED)
+        end
+
+        it { is_expected.to be_disallowed(:read_package) }
+      end
+    end
+
+    context 'with owner' do
+      let(:current_user) { owner }
+
+      it { is_expected.to be_allowed(:read_package) }
+    end
+
+    context 'with maintainer' do
+      let(:current_user) { maintainer }
+
+      it { is_expected.to be_allowed(:read_package) }
+    end
+
+    context 'with developer' do
+      let(:current_user) { developer }
+
+      it { is_expected.to be_allowed(:read_package) }
+    end
+
+    context 'with reporter' do
+      let(:current_user) { reporter }
+
+      it { is_expected.to be_allowed(:read_package) }
+    end
+
+    context 'with guest' do
+      let(:current_user) { guest }
+
+      it { is_expected.to be_allowed(:read_package) }
+    end
+
+    context 'with non member' do
+      let(:current_user) { create(:user) }
+
+      it { is_expected.to be_allowed(:read_package) }
+    end
+
+    context 'with anonymous' do
+      let(:current_user) { nil }
+
+      it { is_expected.to be_allowed(:read_package) }
+    end
+  end
+
+  describe 'read_feature_flag' do
+    before do
+      stub_licensed_features(feature_flags: true)
+    end
+
+    subject { described_class.new(current_user, project) }
+
+    context 'with admin' do
+      let(:current_user) { admin }
+
+      it { is_expected.to be_allowed(:read_feature_flag) }
+
+      context 'when repository is disabled' do
+        before do
+          project.project_feature.update(repository_access_level: ProjectFeature::DISABLED)
+        end
+
+        it { is_expected.to be_disallowed(:read_feature_flag) }
+      end
+    end
+
+    context 'with owner' do
+      let(:current_user) { owner }
+
+      it { is_expected.to be_allowed(:read_feature_flag) }
+    end
+
+    context 'with maintainer' do
+      let(:current_user) { maintainer }
+
+      it { is_expected.to be_allowed(:read_feature_flag) }
+    end
+
+    context 'with developer' do
+      let(:current_user) { developer }
+
+      it { is_expected.to be_allowed(:read_feature_flag) }
+
+      context 'when feature flags features is not available' do
+        before do
+          stub_licensed_features(feature_flags: false)
+        end
+
+        it { is_expected.to be_disallowed(:read_feature_flag) }
+      end
+    end
+
+    context 'with reporter' do
+      let(:current_user) { reporter }
+
+      it { is_expected.to be_disallowed(:read_feature_flag) }
+    end
+
+    context 'with guest' do
+      let(:current_user) { guest }
+
+      it { is_expected.to be_disallowed(:read_feature_flag) }
+    end
+
+    context 'with non member' do
+      let(:current_user) { create(:user) }
+
+      it { is_expected.to be_disallowed(:read_feature_flag) }
+    end
+
+    context 'with anonymous' do
+      let(:current_user) { nil }
+
+      it { is_expected.to be_disallowed(:read_feature_flag) }
     end
   end
 

@@ -54,12 +54,10 @@ describe('Environment table', () => {
     });
 
     expect(vm.$el.querySelector('.js-deploy-board-row')).toBeDefined();
-    expect(
-      vm.$el.querySelector('.deploy-board-icon i').classList.contains('fa-caret-right'),
-    ).toEqual(true);
+    expect(vm.$el.querySelector('.deploy-board-icon')).not.toBeNull();
   });
 
-  it('should toggle deploy board visibility when arrow is clicked', () => {
+  it('should toggle deploy board visibility when arrow is clicked', done => {
     const mockItem = {
       name: 'review',
       size: 1,
@@ -67,9 +65,7 @@ describe('Environment table', () => {
       id: 1,
       hasDeployBoard: true,
       deployBoardData: {
-        instances: [
-          { status: 'ready', tooltip: 'foo' },
-        ],
+        instances: [{ status: 'ready', tooltip: 'foo' }],
         abort_url: 'url',
         rollback_url: 'url',
         completion: 100,
@@ -78,8 +74,9 @@ describe('Environment table', () => {
       isDeployBoardVisible: false,
     };
 
-    eventHub.$on('toggleDeployBoard', (env) => {
+    eventHub.$on('toggleDeployBoard', env => {
       expect(env.id).toEqual(mockItem.id);
+      done();
     });
 
     vm = mountComponent(Component, {

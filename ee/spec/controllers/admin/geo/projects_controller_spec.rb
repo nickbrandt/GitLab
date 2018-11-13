@@ -1,7 +1,10 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Admin::Geo::ProjectsController, :geo do
+  include EE::GeoHelpers
+
   set(:admin) { create(:admin) }
   let(:synced_registry) { create(:geo_project_registry, :synced) }
 
@@ -24,13 +27,23 @@ describe Admin::Geo::ProjectsController, :geo do
     it_behaves_like 'license required'
 
     context 'with a valid license' do
+      render_views
+
       before do
-        allow(Gitlab::Geo).to receive(:license_allows?).and_return(true)
+        stub_licensed_features(geo: true)
+        stub_current_geo_node(create(:geo_node))
       end
 
-      it 'renders synced template when no extra get params is specified' do
-        expect(subject).to have_gitlab_http_status(200)
-        expect(subject).to render_template(:index, partial: :synced)
+      it 'displays a different read-only message based on skip_readonly_message' do
+        expect(subject.body).to match('You may be able to make a limited amount of changes or perform a limited amount of actions on this page')
+      end
+
+      context 'without sync_status specified' do
+        it 'renders all template when no extra get params is specified' do
+          expect(subject).to have_gitlab_http_status(200)
+          expect(subject).to render_template(:index)
+          expect(subject).to render_template(partial: 'admin/geo/projects/_all')
+        end
       end
 
       context 'with sync_status=pending' do
@@ -38,7 +51,8 @@ describe Admin::Geo::ProjectsController, :geo do
 
         it 'renders pending template' do
           expect(subject).to have_gitlab_http_status(200)
-          expect(subject).to render_template(:index, partial: :pending)
+          expect(subject).to render_template(:index)
+          expect(subject).to render_template(partial: 'admin/geo/projects/_pending')
         end
       end
 
@@ -47,7 +61,8 @@ describe Admin::Geo::ProjectsController, :geo do
 
         it 'renders failed template' do
           expect(subject).to have_gitlab_http_status(200)
-          expect(subject).to render_template(:index, partial: :failed)
+          expect(subject).to render_template(:index)
+          expect(subject).to render_template(partial: 'admin/geo/projects/_failed')
         end
       end
 
@@ -56,7 +71,18 @@ describe Admin::Geo::ProjectsController, :geo do
 
         it 'renders failed template' do
           expect(subject).to have_gitlab_http_status(200)
-          expect(subject).to render_template(:index, partial: :never)
+          expect(subject).to render_template(:index)
+          expect(subject).to render_template(partial: 'admin/geo/projects/_never')
+        end
+      end
+
+      context 'with sync_status=synced' do
+        subject { get :index, sync_status: 'synced' }
+
+        it 'renders synced template' do
+          expect(subject).to have_gitlab_http_status(200)
+          expect(subject).to render_template(:index)
+          expect(subject).to render_template(partial: 'admin/geo/projects/_synced')
         end
       end
     end
@@ -69,7 +95,7 @@ describe Admin::Geo::ProjectsController, :geo do
 
     context 'with a valid license' do
       before do
-        allow(Gitlab::Geo).to receive(:license_allows?).and_return(true)
+        stub_licensed_features(geo: true)
       end
 
       context 'with an orphaned registry' do
@@ -99,13 +125,13 @@ describe Admin::Geo::ProjectsController, :geo do
 
     context 'with a valid license' do
       before do
-        allow(Gitlab::Geo).to receive(:license_allows?).and_return(true)
+        stub_licensed_features(geo: true)
       end
 
       it 'flags registry for recheck' do
         expect(subject).to redirect_to(admin_geo_projects_path)
         expect(flash[:notice]).to include('is scheduled for re-check')
-        expect(synced_registry.reload.verification_pending?).to be_truthy
+        expect(synced_registry.reload.pending_verification?).to be_truthy
       end
     end
   end
@@ -117,13 +143,63 @@ describe Admin::Geo::ProjectsController, :geo do
 
     context 'with a valid license' do
       before do
-        allow(Gitlab::Geo).to receive(:license_allows?).and_return(true)
+        stub_licensed_features(geo: true)
       end
 
       it 'flags registry for resync' do
         expect(subject).to redirect_to(admin_geo_projects_path)
         expect(flash[:notice]).to include('is scheduled for re-sync')
         expect(synced_registry.reload.resync_repository?).to be_truthy
+      end
+    end
+  end
+
+  describe '#recheck_all' do
+    subject { post :recheck_all }
+
+    it_behaves_like 'license required'
+
+    context 'with a valid license' do
+      before do
+        stub_licensed_features(geo: true)
+      end
+
+      it 'schedules a batch job' do
+        Sidekiq::Testing.fake! do
+          expect { subject }.to change(Geo::Batch::ProjectRegistrySchedulerWorker.jobs, :size).by(1)
+          expect(Geo::Batch::ProjectRegistrySchedulerWorker.jobs.last['args']).to include('recheck_repositories')
+        end
+      end
+
+      it 'redirects back and display confirmation' do
+        Sidekiq::Testing.inline! do
+          expect(subject).to redirect_to(admin_geo_projects_path)
+          expect(flash[:notice]).to include('All projects are being scheduled for re-check')
+        end
+      end
+    end
+  end
+
+  describe '#resync_all' do
+    subject { post :resync_all }
+
+    it_behaves_like 'license required'
+
+    context 'with a valid license' do
+      before do
+        stub_licensed_features(geo: true)
+      end
+
+      it 'schedules a batch job' do
+        Sidekiq::Testing.fake! do
+          expect { subject }.to change(Geo::Batch::ProjectRegistrySchedulerWorker.jobs, :size).by(1)
+          expect(Geo::Batch::ProjectRegistrySchedulerWorker.jobs.last['args']).to include('resync_repositories')
+        end
+      end
+
+      it 'redirects back and display confirmation' do
+        expect(subject).to redirect_to(admin_geo_projects_path)
+        expect(flash[:notice]).to include('All projects are being scheduled for re-sync')
       end
     end
   end
@@ -135,7 +211,7 @@ describe Admin::Geo::ProjectsController, :geo do
 
     context 'with a valid license' do
       before do
-        allow(Gitlab::Geo).to receive(:license_allows?).and_return(true)
+        stub_licensed_features(geo: true)
       end
 
       it 'flags registry for re-download' do

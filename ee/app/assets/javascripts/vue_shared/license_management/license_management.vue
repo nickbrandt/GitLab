@@ -1,6 +1,8 @@
 <script>
 import { mapState, mapActions } from 'vuex';
+import { GlButton, GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 import { s__ } from '~/locale';
+import AddLicenseForm from './components/add_license_form.vue';
 import LicenseManagementRow from './components/license_management_row.vue';
 import DeleteConfirmationModal from './components/delete_confirmation_modal.vue';
 import createStore from './store/index';
@@ -10,14 +12,20 @@ const store = createStore();
 export default {
   name: 'LicenseManagement',
   components: {
+    AddLicenseForm,
     DeleteConfirmationModal,
     LicenseManagementRow,
+    GlButton,
+    GlLoadingIcon,
   },
   props: {
     apiUrl: {
       type: String,
       required: true,
     },
+  },
+  data() {
+    return { formIsOpen: false };
   },
   store,
   emptyMessage: s__(
@@ -33,7 +41,13 @@ export default {
     this.loadManagedLicenses();
   },
   methods: {
-    ...mapActions(['setAPISettings', 'loadManagedLicenses']),
+    ...mapActions(['loadManagedLicenses', 'setAPISettings', 'setLicenseApproval']),
+    openAddLicenseForm() {
+      this.formIsOpen = true;
+    },
+    closeAddLicenseForm() {
+      this.formIsOpen = false;
+    },
   },
 };
 </script>
@@ -56,6 +70,22 @@ export default {
       class="bs-callout bs-callout-warning"
     >
       {{ $options.emptyMessage }}
+    </div>
+    <div class="prepend-top-default">
+      <add-license-form
+        v-if="formIsOpen"
+        :managed-licenses="managedLicenses"
+        @addLicense="setLicenseApproval"
+        @closeForm="closeAddLicenseForm"
+      />
+      <gl-button
+        v-else
+        class="js-open-form"
+        variant="default"
+        @click="openAddLicenseForm"
+      >
+        {{ s__('LicenseManagement|Add a license') }}
+      </gl-button>
     </div>
   </div>
 </template>

@@ -1,5 +1,6 @@
 import _ from 'underscore';
 import { __ } from '~/locale';
+import { isScrolledToBottom } from '~/lib/utils/scroll_utils';
 
 export const headerActions = state => {
   if (state.job.new_issue_path) {
@@ -22,26 +23,44 @@ export const shouldRenderCalloutMessage = state =>
   !_.isEmpty(state.job.status) && !_.isEmpty(state.job.callout_message);
 
 /**
- * When job has not started the key will be `false`
+ * When job has not started the key will be null
  * When job started the key will be a string with a date.
  */
-export const jobHasStarted = state => !(state.job.started === false);
+export const shouldRenderTriggeredLabel = state => _.isString(state.job.started);
 
 export const hasEnvironment = state => !_.isEmpty(state.job.deployment_status);
 
 /**
- * When the job is pending and there are no available runners
- * we need to render the stuck block;
+ * Checks if it the job has trace.
+ * Used to check if it should render the job log or the empty state
+ * @returns {Boolean}
+ */
+export const hasTrace = state =>
+  state.job.has_trace || (!_.isEmpty(state.job.status) && state.job.status.group === 'running');
+
+export const emptyStateIllustration = state =>
+  (state.job && state.job.status && state.job.status.illustration) || {};
+
+export const emptyStateAction = state =>
+  (state.job && state.job.status && state.job.status.action) || {};
+
+// ee-only start
+/**
+ * Shared runners limit is only rendered when
+ * used quota is bigger or equal than the limit
  *
  * @returns {Boolean}
  */
-export const isJobStuck = state =>
-  state.job.status.group === 'pending' && state.job.runners && state.job.runners.available === false;
-
-// ee-only start
 export const shouldRenderSharedRunnerLimitWarning = state =>
-  state.job.runner && state.job.runner.quota && state.job.ruuner.quota.used;
+  !_.isEmpty(state.job.runners) &&
+  !_.isEmpty(state.job.runners.quota) &&
+  state.job.runners.quota.used >= state.job.runners.quota.limit;
 // ee-only end
+
+export const isScrollingDown = state => isScrolledToBottom() && !state.isTraceComplete;
+
+export const hasRunnersForProject = state =>
+  state.job.runners.available && !state.job.runners.online;
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

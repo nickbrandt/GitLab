@@ -72,12 +72,14 @@ describe('Grouped security reports app', () => {
         expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
           'Security scanning failed loading any results',
         );
+
         expect(vm.$el.querySelector('.js-collapse-btn').textContent.trim()).toEqual('Expand');
 
         expect(trimText(vm.$el.textContent)).toContain('SAST: Loading resulted in an error');
         expect(trimText(vm.$el.textContent)).toContain(
           'Dependency scanning: Loading resulted in an error',
         );
+
         expect(vm.$el.textContent).toContain('Container scanning: Loading resulted in an error');
         expect(vm.$el.textContent).toContain('DAST: Loading resulted in an error');
         done();
@@ -125,6 +127,7 @@ describe('Grouped security reports app', () => {
       expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
         'Security scanning is loading',
       );
+
       expect(vm.$el.querySelector('.js-collapse-btn').textContent.trim()).toEqual('Expand');
 
       expect(vm.$el.textContent).toContain('SAST is loading');
@@ -212,6 +215,7 @@ describe('Grouped security reports app', () => {
           expect(vm.$el.querySelector('.modal-title').textContent.trim()).toEqual(
             sastIssues[0].message,
           );
+
           expect(vm.$el.querySelector('.modal-body').textContent).toContain(sastIssues[0].solution);
 
           done();

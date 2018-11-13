@@ -12,13 +12,16 @@ describe Gitlab::Checks::ChangeAccess do
     let(:ref) { 'refs/heads/master' }
     let(:changes) { { oldrev: oldrev, newrev: newrev, ref: ref } }
     let(:protocol) { 'ssh' }
+    let(:timeout) { Gitlab::GitAccess::INTERNAL_TIMEOUT }
+    let(:logger) { Gitlab::Checks::TimedLogger.new(timeout: timeout) }
 
     subject(:change_access) do
       described_class.new(
         changes,
         project: project,
         user_access: user_access,
-        protocol: protocol
+        protocol: protocol,
+        logger: logger
       )
     end
 
@@ -180,15 +183,33 @@ describe Gitlab::Checks::ChangeAccess do
       context 'existing member rules' do
         let(:push_rule) { create(:push_rule, member_check: true) }
 
-        before do
-          allow(User).to receive(:existing_member?).and_return(false)
-          allow_any_instance_of(Commit).to receive(:author_email).and_return('some@mail.com')
+        context 'with private commit email' do
+          it 'returns error if private commit email was not associated to a user' do
+            user_email = "#{User.maximum(:id).next}-foo@#{::Gitlab::CurrentSettings.current_application_settings.commit_email_hostname}"
+
+            allow_any_instance_of(Commit).to receive(:author_email).and_return(user_email)
+
+            expect { subject.exec }.to raise_error(Gitlab::GitAccess::UnauthorizedError, "Author '#{user_email}' is not a member of team")
+          end
+
+          it 'returns true when private commit email was associated to a user' do
+            allow_any_instance_of(Commit).to receive(:committer_email).and_return(user.private_commit_email)
+            allow_any_instance_of(Commit).to receive(:author_email).and_return(user.private_commit_email)
+
+            expect { subject.exec }.not_to raise_error
+          end
         end
 
-        it_behaves_like 'check ignored when push rule unlicensed'
+        context 'without private commit email' do
+          before do
+            allow_any_instance_of(Commit).to receive(:author_email).and_return('some@mail.com')
+          end
 
-        it 'returns an error if the commit author is not a GitLab member' do
-          expect { subject.exec }.to raise_error(Gitlab::GitAccess::UnauthorizedError, "Author 'some@mail.com' is not a member of team")
+          it_behaves_like 'check ignored when push rule unlicensed'
+
+          it 'returns an error if the commit author is not a GitLab member' do
+            expect { subject.exec }.to raise_error(Gitlab::GitAccess::UnauthorizedError, "Author 'some@mail.com' is not a member of team")
+          end
         end
       end
 
@@ -379,34 +400,58 @@ describe Gitlab::Checks::ChangeAccess do
           allow(project.repository).to receive(:new_commits).and_return(
             project.repository.commits_between('be93687618e4b132087f430a4d8fc3a609c9b77c', '54fcc214b94e78d7a41a9a8fe6d87a5e59500e51')
           )
-          allow_any_instance_of(Commit).to receive(:committer_email).and_return(user.email)
         end
 
-        it 'does not return an error' do
-          expect { subject.exec }.not_to raise_error
+        context 'with private commit email' do
+          it 'allows the commit when they were done with private commit email of the current user' do
+            allow_any_instance_of(Commit).to receive(:committer_email).and_return(user.private_commit_email)
+
+            expect { subject.exec }.not_to raise_error
+          end
+
+          it 'raises an error when using an unknown private commit email' do
+            user_email = "#{User.maximum(:id).next}-foobar@users.noreply.gitlab.com"
+
+            allow_any_instance_of(Commit).to receive(:committer_email).and_return(user_email)
+
+            expect { subject.exec }
+              .to raise_error(Gitlab::GitAccess::UnauthorizedError,
+                              "You cannot push commits for '#{user_email}'. You can only push commits that were committed with one of your own verified emails.")
+          end
         end
 
-        it 'allows the commit when they were done with another email that belongs to the current user' do
-          user.emails.create(email: 'secondary_email@user.com', confirmed_at: Time.now)
-          allow_any_instance_of(Commit).to receive(:committer_email).and_return('secondary_email@user.com')
+        context 'without private commit email' do
+          before do
+            allow_any_instance_of(Commit).to receive(:committer_email).and_return(user.email)
+          end
 
-          expect { subject.exec }.not_to raise_error
-        end
+          it 'does not return an error' do
+            expect { subject.exec }.not_to raise_error
+          end
 
-        it 'raises an error when the commit was done with an unverified email' do
-          user.emails.create(email: 'secondary_email@user.com')
-          allow_any_instance_of(Commit).to receive(:committer_email).and_return('secondary_email@user.com')
+          it 'allows the commit when they were done with another email that belongs to the current user' do
+            user.emails.create(email: 'secondary_email@user.com', confirmed_at: Time.now)
+            allow_any_instance_of(Commit).to receive(:committer_email).and_return('secondary_email@user.com')
 
-          expect { subject.exec }
-            .to raise_error(Gitlab::GitAccess::UnauthorizedError,
-                            "Committer email 'secondary_email@user.com' is not verified.")
-        end
+            expect { subject.exec }.not_to raise_error
+          end
 
-        it 'raises an error when using an unknown email' do
-          allow_any_instance_of(Commit).to receive(:committer_email).and_return('some@mail.com')
-          expect { subject.exec }
-            .to raise_error(Gitlab::GitAccess::UnauthorizedError,
-                            "You cannot push commits for 'some@mail.com'. You can only push commits that were committed with one of your own verified emails.")
+          it 'raises an error when the commit was done with an unverified email' do
+            user.emails.create(email: 'secondary_email@user.com')
+            allow_any_instance_of(Commit).to receive(:committer_email).and_return('secondary_email@user.com')
+
+            expect { subject.exec }
+              .to raise_error(Gitlab::GitAccess::UnauthorizedError,
+                              "Committer email 'secondary_email@user.com' is not verified.")
+          end
+
+          it 'raises an error when using an unknown email' do
+            allow_any_instance_of(Commit).to receive(:committer_email).and_return('some@mail.com')
+
+            expect { subject.exec }
+              .to raise_error(Gitlab::GitAccess::UnauthorizedError,
+                              "You cannot push commits for 'some@mail.com'. You can only push commits that were committed with one of your own verified emails.")
+          end
         end
       end
 

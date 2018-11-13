@@ -7,14 +7,16 @@ export default () => {
   if (el) {
     const props = el.dataset;
 
-    new Vue({ // eslint-disable-line no-new
+    // eslint-disable-next-line no-new
+    new Vue({
       el,
       components: {
         'new-epic-app': NewEpicApp,
       },
-      render: createElement => createElement('new-epic-app', {
-        props,
-      }),
+      render: createElement =>
+        createElement('new-epic-app', {
+          props,
+        }),
     });
   }
 };

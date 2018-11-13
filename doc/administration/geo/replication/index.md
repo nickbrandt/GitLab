@@ -8,7 +8,7 @@ Fetching large repositories can take a long time for teams located far from a si
 
 Geo provides local, read-only instances of your GitLab instances, reducing the time it takes to clone and fetch large repositories and speeding up development.
 
-> - Geo is part of [GitLab Premium](https://about.gitlab.com/pricing/).
+> - Geo is part of [GitLab Premium](https://about.gitlab.com/pricing/#self-managed).
 > - Introduced in GitLab Enterprise Edition 8.9.
 > - We recommend you use:
 >   - At least GitLab Enterprise Edition 10.0 for basic Geo features.
@@ -30,21 +30,21 @@ Implementing Geo provides the following benefits:
 
 - Reduce from minutes to seconds the time taken for your distributed developers to clone and fetch large repositories and projects.
 - Enable all of your developers to contribute ideas and work in parallel, no matter where they are.
-- Balance the load between your primary and secondary nodes, or offload your automated tests to the Geo secondary node.
+- Balance the load between your **primary** and **secondary** nodes, or offload your automated tests to the **secondary** node.
 
 In addition, it:
 
 - Can be used for cloning and fetching projects, in addition to reading any data available in the GitLab web interface (see [current limitations](#current-limitations)).
 - Overcomes slow connections between distant offices, saving time by improving speed for distributed teams.
 - Helps reducing the loading time for automated tasks, custom integrations, and internal workflows.
-- Can quickly fail over to a Geo secondary node in a [disaster recovery](../disaster_recovery/index.md) scenario.
-- Allows [planned failover](../disaster_recovery/planned_failover.md) to a Geo secondary node.
+- Can quickly fail over to a **secondary** node in a [disaster recovery](../disaster_recovery/index.md) scenario.
+- Allows [planned failover](../disaster_recovery/planned_failover.md) to a **secondary** node.
 
 Geo provides:
 
-- Read-only secondary nodes: Maintain one primary GitLab node while still enabling a read-only secondary node for each of your distributed teams.
-- Authentication system hooks: The secondary node receives all authentication data (like user accounts and logins) from the primary instance.
-- An intuitive UI: Secondary nodes utilize the same web interface your team has grown accustomed to. In addition, there are visual notifications that block write operations and make it clear that a user is on a secondary node.
+- Read-only **secondary** nodes: Maintain one **primary** GitLab node while still enabling a read-only **secondary** node for each of your distributed teams.
+- Authentication system hooks: The **secondary** node receives all authentication data (like user accounts and logins) from the **primary** instance.
+- An intuitive UI: **Secondary** nodes utilize the same web interface your team has grown accustomed to. In addition, there are visual notifications that block write operations and make it clear that a user is on a **secondary** node.
 
 ## How it works
 
@@ -59,10 +59,12 @@ When Geo is enabled, the:
 
 Keep in mind that:
 
-- Secondary nodes talk to the primary node to:
+- **Secondary** nodes talk to the **primary** node to:
   - Get user data for logins (API).
   - Replicate repositories, LFS Objects, and Attachments (HTTPS + JWT).
-- Since GitLab Premium 10.0, the primary node no longer talks to secondary nodes to notify for changes (API).
+- Since GitLab Premium 10.0, the **primary** node no longer talks to **secondary** nodes to notify for changes (API).
+- Pushing directly to a **secondary** node (for both HTTP and SSH, including git-lfs) was [introduced](https://about.gitlab.com/2018/09/22/gitlab-11-3-released/) in [GitLab Premium](https://about.gitlab.com/pricing/#self-managed) 11.3.
+- There are [limitations](#current-limitations) in the current implementation.
 
 ### Architecture
 
@@ -72,30 +74,32 @@ The following diagram illustrates the underlying architecture of Geo.
 
 In this diagram:
 
-- There is one primary node and one secondary node.
-- The secondary node clones repositories via Git over HTTPS. Attachments, LFS objects, and other files are downloaded via HTTPS using the GitLab API to authenticate, with a special endpoint protected by JWT.
-- Writes to the database and Git repositories can only be performed on the primary node. The secondary node receives database updates via PostgreSQL streaming replication.
+- There is one **primary** node and one **secondary** node.
+- The **secondary** node clones repositories via Git over HTTPS. Attachments, LFS objects, and other files are downloaded via HTTPS using the GitLab API to authenticate, with a special endpoint protected by JWT.
+- Writes to the database and Git repositories can only be performed on the **primary** node. The **secondary** node receives database updates via PostgreSQL streaming replication.
 
-Note that the secondary node needs two different PostgreSQL databases:
+Note that the **secondary** node needs two different PostgreSQL databases:
 
 - A read-only database instance that streams data from the main GitLab database.
-- [Another database instance](#geo-tracking-database) used internally by the secondary node to record what data has been replicated.
+- [Another database instance](#geo-tracking-database) used internally by the **secondary** node to record what data has been replicated.
 
 In the secondary nodes, there is an additional daemon: [Geo Log Cursor](#geo-log-cursor).
 
-## Geo Recommendations
+## Requirements for running Geo
 
-We highly recommend that you install Geo on an operating system that supports OpenSSH 6.9 or higher. The following operating systems are known to ship with a current version of OpenSSH:
+The following are required to run Geo:
 
-- [CentOS](https://www.centos.org) 7.4
-- [Ubuntu](https://www.ubuntu.com) 16.04
-
-NOTE: **Note:**
-CentOS 6 and 7.0 ship with an old version of OpenSSH that does not support [fast lookup of authorized SSH keys in the database](../../operations/fast_ssh_key_lookup.md), which Geo requires.
+- An operating system that supports OpenSSH 6.9+ (needed for
+  [fast lookup of authorized SSH keys in the database](../../operations/fast_ssh_key_lookup.md))
+  The following operating systems are known to ship with a current version of OpenSSH:
+    - [CentOS](https://www.centos.org) 7.4+
+    - [Ubuntu](https://www.ubuntu.com) 16.04+
+- PostgreSQL 9.6+ with [FDW](https://www.postgresql.org/docs/9.6/postgres-fdw.html) support and [Streaming Replication](https://wiki.postgresql.org/wiki/Streaming_Replication)
+- Git 2.9+
 
 ### Firewall rules
 
-The following table lists basic ports that must be open between the primary and secondary nodes for Geo.
+The following table lists basic ports that must be open between the **primary** and **secondary** nodes for Geo.
 
 | Primary server | Server secondary | Protocol        |
 | -------------- | ---------------- | --------------- |
@@ -116,7 +120,7 @@ If you wish to terminate SSL at the GitLab application server instead, use TCP p
 
 ### LDAP
 
-We recommend that if you use LDAP on your primary node, you also set up a secondary LDAP server for the secondary node. Otherwise, users will not be able to perform Git operations over HTTP(s) on the secondary node using HTTP Basic Authentication. However, Git via SSH and personal access tokens will still work.
+We recommend that if you use LDAP on your **primary** node, you also set up a secondary LDAP server for the **secondary** node. Otherwise, users will not be able to perform Git operations over HTTP(s) on the **secondary** node using HTTP Basic Authentication. However, Git via SSH and personal access tokens will still work.
 
 Check with your LDAP provider for instructions on how to set up replication. For example, OpenLDAP provides [these instructions](https://www.openldap.org/doc/admin24/replication.html).
 
@@ -128,25 +132,26 @@ The tracking database instance is used as metadata to control what needs to be u
 - Fetch new LFS Objects.
 - Fetch changes from a repository that has recently been updated.
 
-Because the replicated database instance is read-only, we need this additional database instance for each secondary node.
+Because the replicated database instance is read-only, we need this additional database instance for each **secondary** node.
+The tracking database requires the `postgres_fdw` extension.
 
 ### Geo Log Cursor
 
 This daemon:
 
-- Reads a log of events replicated by the primary node to the secondary database instance.
+- Reads a log of events replicated by the **primary** node to the secondary database instance.
 - Updates the Geo Tracking Database instance with changes that need to be executed.
 
-When something is marked to be updated in the tracking database instance, asynchronous jobs running on the secondary node will execute the required operations and update the state.
+When something is marked to be updated in the tracking database instance, asynchronous jobs running on the **secondary** node will execute the required operations and update the state.
 
-This new architecture allows GitLab to be resilient to connectivity issues between the nodes. It doesn't matter how long the secondary node is disconnected from the primary node as it will be able to replay all the events in the correct order and become synchronized with the primary node again.
+This new architecture allows GitLab to be resilient to connectivity issues between the nodes. It doesn't matter how long the **secondary** node is disconnected from the **primary** node as it will be able to replay all the events in the correct order and become synchronized with the **primary** node again.
 
 ## Setup instructions
 
 These instructions assume you have a working instance of GitLab. They guide you through:
 
-1. Making your existing instance the primary node.
-1. Adding secondary nodes.
+1. Making your existing instance the **primary** node.
+1. Adding **secondary** nodes.
 
 CAUTION: **Caution:**
 The steps below should be followed in the order they appear. **Make sure the GitLab version is the same on all nodes.**
@@ -155,35 +160,38 @@ The steps below should be followed in the order they appear. **Make sure the Git
 
 If you installed GitLab using the Omnibus packages (highly recommended):
 
-1. [Install GitLab Enterprise Edition](https://about.gitlab.com/installation/) on the server that will serve as the **secondary** node. Do not create an account or log in to the new secondary node.
+1. [Install GitLab Enterprise Edition](https://about.gitlab.com/installation/) on the server that will serve as the **secondary** node. Do not create an account or log in to the new **secondary** node.
 1. [Upload the GitLab License](../../../user/admin_area/license.md) on the **primary** node to unlock Geo. The license must be for [GitLab Premium](https://about.gitlab.com/pricing/) or higher.
 1. [Set up the database replication](database.md) (`primary (read-write) <-> secondary (read-only)` topology).
-1. [Configure fast lookup of authorized SSH keys in the database](../../operations/fast_ssh_key_lookup.md). This step is required and needs to be done on **both** the primary and secondary nodes.
-1. [Configure GitLab](configuration.md) to set the primary and secondary nodes.
-1. Optional: [Configure a secondary LDAP server](../../auth/ldap.md) for the secondary node. See [notes on LDAP](#ldap).
+1. [Configure fast lookup of authorized SSH keys in the database](../../operations/fast_ssh_key_lookup.md). This step is required and needs to be done on **both** the **primary** and **secondary** nodes.
+1. [Configure GitLab](configuration.md) to set the **primary** and **secondary** nodes.
+1. Optional: [Configure a secondary LDAP server](../../auth/ldap.md) for the **secondary** node. See [notes on LDAP](#ldap).
 1. [Follow the "Using a Geo Server" guide](using_a_geo_server.md).
 
-### Using GitLab installed from source
+### Using GitLab installed from source (Deprecated)
+
+NOTE: **Note:**
+In GitLab 11.5, support for using Geo in GitLab source installations was deprecated and will be removed in a future release. Please consider [migrating to GitLab Omnibus install](https://docs.gitlab.com/omnibus/update/convert_to_omnibus.html).
 
 If you installed GitLab from source:
 
-1. [Install GitLab Enterprise Edition](../../../install/installation.md) on the server that will serve as the **secondary** node. Do not create an account or log in to the new secondary node.
+1. [Install GitLab Enterprise Edition](../../../install/installation.md) on the server that will serve as the **secondary** node. Do not create an account or log in to the new **secondary** node.
 1. [Upload the GitLab License](../../../user/admin_area/license.md) on the **primary** node to unlock Geo. The license must be for [GitLab Premium](https://about.gitlab.com/pricing/) or higher.
 1. [Set up the database replication](database_source.md) (`primary (read-write) <-> secondary (read-only)` topology).
-1. [Configure fast lookup of authorized SSH keys in the database](../../operations/fast_ssh_key_lookup.md). Do this step for **both** primary and secondary nodes.
-1. [Configure GitLab](configuration_source.md) to set the primary and secondary nodes.
+1. [Configure fast lookup of authorized SSH keys in the database](../../operations/fast_ssh_key_lookup.md). Do this step for **both** **primary** and **secondary** nodes.
+1. [Configure GitLab](configuration_source.md) to set the **primary** and **secondary** nodes.
 1. [Follow the "Using a Geo Server" guide](using_a_geo_server.md).
 
 ## Post-installation documentation
 
-After installing GitLab on the secondary nodes and performing the initial configuration, see the following documentation for post-installation information.
+After installing GitLab on the **secondary** nodes and performing the initial configuration, see the following documentation for post-installation information.
 
 ### Configuring Geo
 
 For information on configuring Geo, see:
 
 - [Geo configuration (GitLab Omnibus)](configuration.md).
-- [Geo configuration (source)](configuration_source.md).
+- [Geo configuration (source)](configuration_source.md). Configuring Geo in GitLab source installations was **deprecated** in GitLab 11.5.
 
 ### Updating Geo
 
@@ -203,7 +211,7 @@ For information on using Geo in disaster recovery situations to mitigate data-lo
 
 ### Replicating the Container Registry
 
-For more information on how to replicate the Container Registry, see [Docker Registry for a secondary node](docker_registry.md).
+For more information on how to replicate the Container Registry, see [Docker Registry for a **secondary** node](docker_registry.md).
 
 ### Security Review
 
@@ -218,17 +226,15 @@ For more information on tuning Geo, see [Tuning Geo](tuning.md).
 CAUTION: **Caution:**
 This list of limitations only reflects the latest version of GitLab. If you are using an older version, extra limitations may be in place.
 
-- Pushing code to a secondary node redirects the request to the primary node instead of handling it directly [gitlab-ee#1381](https://gitlab.com/gitlab-org/gitlab-ee/issues/1381):
-  - Push via HTTP and SSH supported.
-  - Git LFS also supported.
-- The primary node has to be online for OAuth login to happen. Existing sessions and Git are not affected.
+- Pushing directly to a **secondary** node redirects (for HTTP) or proxies (for SSH) the request to the **primary** node instead of [handling it directly](https://gitlab.com/gitlab-org/gitlab-ee/issues/1381), except when using Git over HTTP with credentials embedded within the URI. For example, `https://user:password@secondary.tld`.
+- The **primary** node has to be online for OAuth login to happen. Existing sessions and Git are not affected.
 - The installation takes multiple manual steps that together can take about an hour depending on circumstances. We are working on improving this experience. See [gitlab-org/omnibus-gitlab#2978](https://gitlab.com/gitlab-org/omnibus-gitlab/issues/2978) for details.
-- Real-time updates of issues/merge requests (for example, via long polling) doesn't work on the secondary node.
-- [Selective synchronization](configuration.md#selective-synchronization) applies only to files and repositories. Other datasets are replicated to the secondary node in full, making it inappropriate for use as an access control mechanism.
+- Real-time updates of issues/merge requests (for example, via long polling) doesn't work on the **secondary** node.
+- [Selective synchronization](configuration.md#selective-synchronization) applies only to files and repositories. Other datasets are replicated to the **secondary** node in full, making it inappropriate for use as an access control mechanism.
 
 ### Limitations on replication
 
-Only the following items are replicated to the secondary node:
+Only the following items are replicated to the **secondary** node:
 
 - All database content. For example, snippets, epics, issues, merge requests, groups, and project metadata.
 - Project repositories.
@@ -237,7 +243,7 @@ Only the following items are replicated to the secondary node:
 - CI job artifacts and traces.
 
 DANGER: **DANGER**
-Data not on this list is unavailable on the secondary node. Failing over without manually replicating data not on this list will cause the data to be **lost**.
+Data not on this list is unavailable on the **secondary** node. Failing over without manually replicating data not on this list will cause the data to be **lost**.
 
 ### Examples of data not replicated
 
@@ -254,7 +260,7 @@ Examples include:
 - [Mattermost integration](https://docs.gitlab.com/omnibus/gitlab-mattermost/).
 
 CAUTION: **Caution:**
-If you wish to use them on a secondary node, or to execute a failover successfully, you will need to replicate their data using some other means.
+If you wish to use them on a **secondary** node, or to execute a failover successfully, you will need to replicate their data using some other means.
 
 ## Frequently Asked Questions
 

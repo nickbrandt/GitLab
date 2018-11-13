@@ -2,8 +2,6 @@
 
 module Boards
   class BaseService < ::BaseService
-    prepend EE::Boards::BaseService
-
     # Parent can either a group or a project
     attr_accessor :parent, :current_user, :params
 
@@ -12,3 +10,5 @@ module Boards
     end
   end
 end
+
+Boards::BaseService.prepend(EE::Boards::BaseService)

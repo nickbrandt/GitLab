@@ -5,6 +5,13 @@ module EE
 
     prepended do
       include ::ObjectStorage::BackgroundMove
+      include Elastic::NotesSearch
+
+      scope :searchable, -> { where(system: false) }
+    end
+
+    def searchable?
+      !system
     end
 
     def for_epic?

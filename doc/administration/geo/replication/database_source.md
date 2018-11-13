@@ -1,7 +1,8 @@
 # Geo database replication (source)
 
 NOTE: **Note:**
-This is the documentation for installations from source. For installations
+This documentation applies to GitLab source installations. In GitLab 11.5, this documentation was deprecated and will be removed in a future release.
+Please consider [migrating to GitLab Omnibus install](https://docs.gitlab.com/omnibus/update/convert_to_omnibus.html). For installations
 using the Omnibus GitLab packages, follow the
 [**database replication for Omnibus GitLab**][database] guide.
 
@@ -42,6 +43,10 @@ The following guide assumes that:
   secondary's IP will be `5.6.7.8`. Note that the primary and secondary servers
   **must** be able to communicate over these addresses. These IP addresses can either
   be public or private.
+  
+CAUTION: **Warning:**
+Geo works with streaming replication. Logical replication is not supported at this time. 
+There is an [issue where support is being discussed](https://gitlab.com/gitlab-org/gitlab-ee/issues/7420).
 
 ### Step 1. Configure the primary server
 

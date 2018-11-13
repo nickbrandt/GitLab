@@ -10,7 +10,14 @@ import RoadmapService from 'ee/roadmap/service/roadmap_service';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeMonths, mockGroupId, epicsPath, mockNewEpicEndpoint, rawEpics, mockSvgPath } from '../mock_data';
+import {
+  mockTimeframeMonths,
+  mockGroupId,
+  epicsPath,
+  mockNewEpicEndpoint,
+  rawEpics,
+  mockSvgPath,
+} from '../mock_data';
 
 const createComponent = () => {
   const Component = Vue.extend(appComponent);
@@ -85,6 +92,7 @@ describe('AppComponent', () => {
         vm.isLoading = false;
         vm.isEpicsListEmpty = false;
         vm.hasError = false;
+
         expect(vm.showRoadmap).toBe(true);
       });
 
@@ -92,14 +100,17 @@ describe('AppComponent', () => {
         vm.isLoading = true;
         vm.isEpicsListEmpty = false;
         vm.hasError = false;
+
         expect(vm.showRoadmap).toBe(false);
         vm.isLoading = false;
         vm.isEpicsListEmpty = true;
         vm.hasError = false;
+
         expect(vm.showRoadmap).toBe(false);
         vm.isLoading = false;
         vm.isEpicsListEmpty = false;
         vm.hasError = true;
+
         expect(vm.showRoadmap).toBe(false);
       });
     });
@@ -119,11 +130,12 @@ describe('AppComponent', () => {
         document.querySelector('.flash-container').remove();
       });
 
-      it('calls service.getEpics and sets response to the store on success', (done) => {
+      it('calls service.getEpics and sets response to the store on success', done => {
         mock.onGet(vm.service.epicsPath).reply(200, rawEpics);
         spyOn(vm.store, 'setEpics');
 
         vm.fetchEpics();
+
         expect(vm.hasError).toBe(false);
         setTimeout(() => {
           expect(vm.isLoading).toBe(false);
@@ -132,11 +144,12 @@ describe('AppComponent', () => {
         }, 0);
       });
 
-      it('calls service.getEpics and sets `isEpicsListEmpty` to true if response is empty', (done) => {
+      it('calls service.getEpics and sets `isEpicsListEmpty` to true if response is empty', done => {
         mock.onGet(vm.service.epicsPath).reply(200, []);
         spyOn(vm.store, 'setEpics');
 
         vm.fetchEpics();
+
         expect(vm.isEpicsListEmpty).toBe(false);
         setTimeout(() => {
           expect(vm.isEpicsListEmpty).toBe(true);
@@ -145,14 +158,17 @@ describe('AppComponent', () => {
         }, 0);
       });
 
-      it('calls service.getEpics and sets `hasError` to true and shows flash message if request failed', (done) => {
+      it('calls service.getEpics and sets `hasError` to true and shows flash message if request failed', done => {
         mock.onGet(vm.service.epicsPath).reply(500, {});
 
         vm.fetchEpics();
+
         expect(vm.hasError).toBe(false);
         setTimeout(() => {
           expect(vm.hasError).toBe(true);
-          expect(document.querySelector('.flash-text').innerText.trim()).toBe('Something went wrong while fetching epics');
+          expect(document.querySelector('.flash-text').innerText.trim()).toBe(
+            'Something went wrong while fetching epics',
+          );
           done();
         }, 0);
       });
@@ -165,7 +181,11 @@ describe('AppComponent', () => {
       const vmX = createComponent();
 
       expect(vmX.handleResizeThrottled).toBeDefined();
-      expect(window.addEventListener).toHaveBeenCalledWith('resize', vmX.handleResizeThrottled, false);
+      expect(window.addEventListener).toHaveBeenCalledWith(
+        'resize',
+        vmX.handleResizeThrottled,
+        false,
+      );
       vmX.$destroy();
     });
   });
@@ -176,7 +196,11 @@ describe('AppComponent', () => {
       const vmX = createComponent();
       vmX.$destroy();
 
-      expect(window.removeEventListener).toHaveBeenCalledWith('resize', vmX.handleResizeThrottled, false);
+      expect(window.removeEventListener).toHaveBeenCalledWith(
+        'resize',
+        vmX.handleResizeThrottled,
+        false,
+      );
     });
   });
 
@@ -185,7 +209,7 @@ describe('AppComponent', () => {
       expect(vm.$el.classList.contains('roadmap-container')).toBe(true);
     });
 
-    it('renders roadmap container with classes `roadmap-container overflow-reset` when isEpicsListEmpty prop is true', (done) => {
+    it('renders roadmap container with classes `roadmap-container overflow-reset` when isEpicsListEmpty prop is true', done => {
       vm.isEpicsListEmpty = true;
       Vue.nextTick()
         .then(() => {

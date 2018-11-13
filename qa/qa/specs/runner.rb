@@ -1,4 +1,5 @@
 require 'rspec/core'
+require 'rspec/expectations'
 
 module QA
   module Specs
@@ -21,6 +22,12 @@ module QA
           tags.each { |tag| args.push(['--tag', tag.to_s]) }
         else
           args.push(%w[--tag ~orchestrated]) unless (%w[-t --tag] & options).any?
+        end
+
+        args.push(%w[--tag ~skip_signup_disabled]) if QA::Runtime::Env.signup_disabled?
+
+        QA::Runtime::Env.supported_features.each_key do |key|
+          args.push(["--tag", "~requires_#{key}"]) unless QA::Runtime::Env.can_test? key
         end
 
         args.push(options)

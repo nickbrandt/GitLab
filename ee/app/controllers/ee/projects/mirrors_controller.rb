@@ -4,22 +4,6 @@ module EE
       extend ::Gitlab::Utils::Override
       extend ActiveSupport::Concern
 
-      def ssh_host_keys
-        lookup = SshHostKey.new(project: project, url: params[:ssh_url])
-
-        if lookup.error.present?
-          # Failed to read keys
-          render json: { message: lookup.error }, status: :bad_request
-        elsif lookup.known_hosts.nil?
-          # Still working, come back later
-          render body: nil, status: :no_content
-        else
-          render json: lookup
-        end
-      rescue ArgumentError => err
-        render json: { message: err.message }, status: :bad_request
-      end
-
       override :update
       def update
         result = ::Projects::UpdateService.new(project, current_user, safe_mirror_params).execute

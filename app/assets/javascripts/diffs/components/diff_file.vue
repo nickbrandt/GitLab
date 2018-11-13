@@ -1,8 +1,9 @@
 <script>
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 import _ from 'underscore';
 import { __, sprintf } from '~/locale';
 import createFlash from '~/flash';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 import DiffFileHeader from './diff_file_header.vue';
 import DiffContent from './diff_content.vue';
 
@@ -10,6 +11,7 @@ export default {
   components: {
     DiffFileHeader,
     DiffContent,
+    GlLoadingIcon,
   },
   props: {
     file: {
@@ -28,7 +30,8 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['isNotesFetched', 'discussionsStructuredByLineCode']),
+    ...mapState('diffs', ['currentDiffFileId']),
+    ...mapGetters(['isNotesFetched']),
     isCollapsed() {
       return this.file.collapsed || false;
     },
@@ -45,10 +48,10 @@ export default {
     showExpandMessage() {
       return (
         this.isCollapsed ||
-        !this.file.highlightedDiffLines &&
-        !this.isLoadingCollapsedDiff &&
-        !this.file.tooLarge &&
-        this.file.text
+        (!this.file.highlightedDiffLines &&
+          !this.isLoadingCollapsedDiff &&
+          !this.file.tooLarge &&
+          this.file.text)
       );
     },
     showLoadingIcon() {
@@ -78,7 +81,7 @@ export default {
         .then(() => {
           requestIdleCallback(
             () => {
-              this.assignDiscussionsToDiff(this.discussionsStructuredByLineCode);
+              this.assignDiscussionsToDiff();
             },
             { timeout: 1000 },
           );
@@ -101,6 +104,9 @@ export default {
 <template>
   <div
     :id="file.fileHash"
+    :class="{
+      'is-active': currentDiffFileId === file.fileHash
+    }"
     class="diff-file file-holder"
   >
     <diff-file-header
@@ -168,3 +174,20 @@ export default {
     </div>
   </div>
 </template>
+
+<style>
+@keyframes shadow-fade {
+  from {
+    box-shadow: 0 0 4px #919191;
+  }
+
+  to {
+    box-shadow: 0 0 0 #dfdfdf;
+  }
+}
+
+.diff-file.is-active {
+  box-shadow: 0 0 0 #dfdfdf;
+  animation: shadow-fade 1.2s 0.1s 1;
+}
+</style>

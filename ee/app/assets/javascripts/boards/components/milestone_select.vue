@@ -1,67 +1,71 @@
 <script>
-  import MilestoneSelect from '~/milestone_select';
+import MilestoneSelect from '~/milestone_select';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 
-  const ANY_MILESTONE = 'Any Milestone';
-  const NO_MILESTONE = 'No Milestone';
+const ANY_MILESTONE = 'Any Milestone';
+const NO_MILESTONE = 'No Milestone';
 
-  export default {
-    props: {
-      board: {
-        type: Object,
-        required: true,
-      },
-      milestonePath: {
-        type: String,
-        required: true,
-      },
-      canEdit: {
-        type: Boolean,
-        required: false,
-        default: false,
-      },
+export default {
+  components: {
+    GlLoadingIcon,
+  },
+  props: {
+    board: {
+      type: Object,
+      required: true,
     },
+    milestonePath: {
+      type: String,
+      required: true,
+    },
+    canEdit: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+  },
 
-    computed: {
-      milestoneTitle() {
-        if (this.noMilestone) return NO_MILESTONE;
-        return this.board.milestone ? this.board.milestone.title : ANY_MILESTONE;
-      },
-      noMilestone() {
-        return this.milestoneId === 0;
-      },
-      milestoneId() {
-        return this.board.milestone_id;
-      },
-      milestoneTitleClass() {
-        return this.milestoneTitle === ANY_MILESTONE ? 'text-secondary' : 'bold';
-      },
-      selected() {
-        if (this.noMilestone) return NO_MILESTONE;
-        return this.board.milestone ? this.board.milestone.name : '';
-      },
+  computed: {
+    milestoneTitle() {
+      if (this.noMilestone) return NO_MILESTONE;
+      return this.board.milestone ? this.board.milestone.title : ANY_MILESTONE;
     },
-    mounted() {
-      this.milestoneDropdown = new MilestoneSelect(null, this.$refs.dropdownButton, {
-        handleClick: this.selectMilestone,
-      });
+    noMilestone() {
+      return this.milestoneId === 0;
     },
-    methods: {
-      selectMilestone(milestone) {
-        let { id } = milestone;
-        // swap the IDs of 'Any' and 'No' milestone to what backend requires
-        if (milestone.title === ANY_MILESTONE) {
-          id = -1;
-        } else if (milestone.title === NO_MILESTONE) {
-          id = 0;
-        }
-        this.board.milestone_id = id;
-        this.board.milestone = {
-          ...milestone,
-          id,
-        };
-      },
+    milestoneId() {
+      return this.board.milestone_id;
     },
-  };
+    milestoneTitleClass() {
+      return this.milestoneTitle === ANY_MILESTONE ? 'text-secondary' : 'bold';
+    },
+    selected() {
+      if (this.noMilestone) return NO_MILESTONE;
+      return this.board.milestone ? this.board.milestone.name : '';
+    },
+  },
+  mounted() {
+    this.milestoneDropdown = new MilestoneSelect(null, this.$refs.dropdownButton, {
+      handleClick: this.selectMilestone,
+    });
+  },
+  methods: {
+    selectMilestone(milestone) {
+      let { id } = milestone;
+      // swap the IDs of 'Any' and 'No' milestone to what backend requires
+      if (milestone.title === ANY_MILESTONE) {
+        id = -1;
+      } else if (milestone.title === NO_MILESTONE) {
+        id = 0;
+      }
+      this.board.milestone_id = id;
+      this.board.milestone = {
+        ...milestone,
+        id,
+      };
+    },
+  },
+};
 </script>
 
 <template>

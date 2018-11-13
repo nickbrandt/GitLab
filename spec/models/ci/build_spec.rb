@@ -17,9 +17,9 @@ describe Ci::Build do
   it { is_expected.to belong_to(:runner) }
   it { is_expected.to belong_to(:trigger_request) }
   it { is_expected.to belong_to(:erased_by) }
-  it { is_expected.to have_many(:deployments) }
   it { is_expected.to have_many(:sourced_pipelines) }
   it { is_expected.to have_many(:trace_sections)}
+  it { is_expected.to have_one(:deployment) }
   it { is_expected.to have_one(:runner_session)}
   it { is_expected.to validate_presence_of(:ref) }
   it { is_expected.to respond_to(:has_trace?) }
@@ -206,6 +206,143 @@ describe Ci::Build do
       it 'does not change build status' do
         expect(build.actionize).to be false
         expect(build.reload).to be_pending
+      end
+    end
+  end
+
+  describe '#schedulable?' do
+    subject { build.schedulable? }
+
+    context 'when build is schedulable' do
+      let(:build) { create(:ci_build, :created, :schedulable, project: project) }
+
+      it { expect(subject).to be_truthy }
+    end
+
+    context 'when build is not schedulable' do
+      let(:build) { create(:ci_build, :created, project: project) }
+
+      it { expect(subject).to be_falsy }
+    end
+  end
+
+  describe '#schedule' do
+    subject { build.schedule }
+
+    before do
+      project.add_developer(user)
+    end
+
+    let(:build) { create(:ci_build, :created, :schedulable, user: user, project: project) }
+
+    it 'transits to scheduled' do
+      allow(Ci::BuildScheduleWorker).to receive(:perform_at)
+
+      subject
+
+      expect(build).to be_scheduled
+    end
+
+    it 'updates scheduled_at column' do
+      allow(Ci::BuildScheduleWorker).to receive(:perform_at)
+
+      subject
+
+      expect(build.scheduled_at).not_to be_nil
+    end
+
+    it 'schedules BuildScheduleWorker at the right time' do
+      Timecop.freeze do
+        expect(Ci::BuildScheduleWorker)
+          .to receive(:perform_at).with(be_like_time(1.minute.since), build.id)
+
+        subject
+      end
+    end
+  end
+
+  describe '#unschedule' do
+    subject { build.unschedule }
+
+    context 'when build is scheduled' do
+      let(:build) { create(:ci_build, :scheduled, pipeline: pipeline) }
+
+      it 'cleans scheduled_at column' do
+        subject
+
+        expect(build.scheduled_at).to be_nil
+      end
+
+      it 'transits to manual' do
+        subject
+
+        expect(build).to be_manual
+      end
+    end
+
+    context 'when build is not scheduled' do
+      let(:build) { create(:ci_build, :created, pipeline: pipeline) }
+
+      it 'does not transit status' do
+        subject
+
+        expect(build).to be_created
+      end
+    end
+  end
+
+  describe '#options_scheduled_at' do
+    subject { build.options_scheduled_at }
+
+    let(:build) { build_stubbed(:ci_build, options: option) }
+
+    context 'when start_in is 1 day' do
+      let(:option) { { start_in: '1 day' } }
+
+      it 'returns date after 1 day' do
+        Timecop.freeze do
+          is_expected.to eq(1.day.since)
+        end
+      end
+    end
+
+    context 'when start_in is 1 week' do
+      let(:option) { { start_in: '1 week' } }
+
+      it 'returns date after 1 week' do
+        Timecop.freeze do
+          is_expected.to eq(1.week.since)
+        end
+      end
+    end
+  end
+
+  describe '#enqueue_scheduled' do
+    subject { build.enqueue_scheduled }
+
+    context 'when build is scheduled and the right time has not come yet' do
+      let(:build) { create(:ci_build, :scheduled, pipeline: pipeline) }
+
+      it 'does not transits the status' do
+        subject
+
+        expect(build).to be_scheduled
+      end
+    end
+
+    context 'when build is scheduled and the right time has already come' do
+      let(:build) { create(:ci_build, :expired_scheduled, pipeline: pipeline) }
+
+      it 'cleans scheduled_at column' do
+        subject
+
+        expect(build.scheduled_at).to be_nil
+      end
+
+      it 'transits to pending' do
+        subject
+
+        expect(build).to be_pending
       end
     end
   end
@@ -663,17 +800,100 @@ describe Ci::Build do
     end
   end
 
+  describe 'state transition as a deployable' do
+    let!(:build) { create(:ci_build, :start_review_app) }
+    let(:deployment) { build.deployment }
+    let(:environment) { deployment.environment }
+
+    it 'has deployments record with created status' do
+      expect(deployment).to be_created
+      expect(environment.name).to eq('review/master')
+    end
+
+    context 'when transits to running' do
+      before do
+        build.run!
+      end
+
+      it 'transits deployment status to running' do
+        expect(deployment).to be_running
+      end
+    end
+
+    context 'when transits to success' do
+      before do
+        allow(Deployments::SuccessWorker).to receive(:perform_async)
+        build.success!
+      end
+
+      it 'transits deployment status to success' do
+        expect(deployment).to be_success
+      end
+    end
+
+    context 'when transits to failed' do
+      before do
+        build.drop!
+      end
+
+      it 'transits deployment status to failed' do
+        expect(deployment).to be_failed
+      end
+    end
+
+    context 'when transits to skipped' do
+      before do
+        build.skip!
+      end
+
+      it 'transits deployment status to canceled' do
+        expect(deployment).to be_canceled
+      end
+    end
+
+    context 'when transits to canceled' do
+      before do
+        build.cancel!
+      end
+
+      it 'transits deployment status to canceled' do
+        expect(deployment).to be_canceled
+      end
+    end
+  end
+
+  describe '#on_stop' do
+    subject { build.on_stop }
+
+    context 'when a job has a specification that it can be stopped from the other job' do
+      let(:build) { create(:ci_build, :start_review_app) }
+
+      it 'returns the other job name' do
+        is_expected.to eq('stop_review_app')
+      end
+    end
+
+    context 'when a job does not have environment information' do
+      let(:build) { create(:ci_build) }
+
+      it 'returns nil' do
+        is_expected.to be_nil
+      end
+    end
+  end
+
   describe 'deployment' do
-    describe '#last_deployment' do
-      subject { build.last_deployment }
+    describe '#has_deployment?' do
+      subject { build.has_deployment? }
 
-      context 'when multiple deployments are created' do
-        let!(:deployment1) { create(:deployment, deployable: build) }
-        let!(:deployment2) { create(:deployment, deployable: build) }
+      context 'when build has a deployment' do
+        let!(:deployment) { create(:deployment, deployable: build) }
 
-        it 'returns the latest one' do
-          is_expected.to eq(deployment2)
-        end
+        it { is_expected.to be_truthy }
+      end
+
+      context 'when build does not have a deployment' do
+        it { is_expected.to be_falsy }
       end
     end
 
@@ -682,14 +902,14 @@ describe Ci::Build do
 
       context 'when build succeeded' do
         let(:build) { create(:ci_build, :success) }
-        let!(:deployment) { create(:deployment, deployable: build) }
+        let!(:deployment) { create(:deployment, :success, deployable: build) }
 
         context 'current deployment is latest' do
           it { is_expected.to be_falsey }
         end
 
         context 'current deployment is not latest on environment' do
-          let!(:deployment2) { create(:deployment, environment: deployment.environment) }
+          let!(:deployment2) { create(:deployment, :success, environment: deployment.environment) }
 
           it { is_expected.to be_truthy }
         end
@@ -1178,6 +1398,14 @@ describe Ci::Build do
 
           it { is_expected.not_to be_retryable }
         end
+
+        context 'when build is degenerated' do
+          before do
+            build.degenerate!
+          end
+
+          it { is_expected.not_to be_retryable }
+        end
       end
     end
 
@@ -1190,6 +1418,12 @@ describe Ci::Build do
 
       context 'when is set to manual' do
         let(:value) { 'manual' }
+
+        it { is_expected.to be_truthy }
+      end
+
+      context 'when is set to delayed' do
+        let(:value) { 'delayed' }
 
         it { is_expected.to be_truthy }
       end
@@ -1239,19 +1473,125 @@ describe Ci::Build do
     end
 
     describe '#retries_max' do
-      context 'when max retries value is defined' do
-        subject { create(:ci_build, options: { retry: 1 }) }
+      context 'with retries max config option' do
+        subject { create(:ci_build, options: { retry: { max: 1 } }) }
 
-        it 'returns a number of configured max retries' do
+        it 'returns the number of configured max retries' do
           expect(subject.retries_max).to eq 1
         end
       end
 
-      context 'when max retries value is not defined' do
+      context 'without retries max config option' do
         subject { create(:ci_build) }
 
         it 'returns zero' do
           expect(subject.retries_max).to eq 0
+        end
+      end
+
+      context 'when build is degenerated' do
+        subject { create(:ci_build, :degenerated) }
+
+        it 'returns zero' do
+          expect(subject.retries_max).to eq 0
+        end
+      end
+
+      context 'with integer only config option' do
+        subject { create(:ci_build, options: { retry: 1 }) }
+
+        it 'returns the number of configured max retries' do
+          expect(subject.retries_max).to eq 1
+        end
+      end
+    end
+
+    describe '#retry_when' do
+      context 'with retries when config option' do
+        subject { create(:ci_build, options: { retry: { when: ['some_reason'] } }) }
+
+        it 'returns the configured when' do
+          expect(subject.retry_when).to eq ['some_reason']
+        end
+      end
+
+      context 'without retries when config option' do
+        subject { create(:ci_build) }
+
+        it 'returns always array' do
+          expect(subject.retry_when).to eq ['always']
+        end
+      end
+
+      context 'with integer only config option' do
+        subject { create(:ci_build, options: { retry: 1 }) }
+
+        it 'returns always array' do
+          expect(subject.retry_when).to eq ['always']
+        end
+      end
+    end
+
+    describe '#retry_failure?' do
+      subject { create(:ci_build) }
+
+      context 'when retries max is zero' do
+        before do
+          expect(subject).to receive(:retries_max).at_least(:once).and_return(0)
+        end
+
+        it 'returns false' do
+          expect(subject.retry_failure?).to eq false
+        end
+      end
+
+      context 'when retries max equals retries count' do
+        before do
+          expect(subject).to receive(:retries_max).at_least(:once).and_return(1)
+          expect(subject).to receive(:retries_count).at_least(:once).and_return(1)
+        end
+
+        it 'returns false' do
+          expect(subject.retry_failure?).to eq false
+        end
+      end
+
+      context 'when retries max is higher than retries count' do
+        before do
+          expect(subject).to receive(:retries_max).at_least(:once).and_return(2)
+          expect(subject).to receive(:retries_count).at_least(:once).and_return(1)
+        end
+
+        context 'and retry when is always' do
+          before do
+            expect(subject).to receive(:retry_when).at_least(:once).and_return(['always'])
+          end
+
+          it 'returns true' do
+            expect(subject.retry_failure?).to eq true
+          end
+        end
+
+        context 'and retry when includes the failure_reason' do
+          before do
+            expect(subject).to receive(:failure_reason).at_least(:once).and_return('some_reason')
+            expect(subject).to receive(:retry_when).at_least(:once).and_return(['some_reason'])
+          end
+
+          it 'returns true' do
+            expect(subject.retry_failure?).to eq true
+          end
+        end
+
+        context 'and retry when does not include failure_reason' do
+          before do
+            expect(subject).to receive(:failure_reason).at_least(:once).and_return('some_reason')
+            expect(subject).to receive(:retry_when).at_least(:once).and_return(['some', 'other failure'])
+          end
+
+          it 'returns false' do
+            expect(subject.retry_failure?).to eq false
+          end
         end
       end
     end
@@ -1369,11 +1709,11 @@ describe Ci::Build do
     end
   end
 
-  describe '#other_actions' do
+  describe '#other_manual_actions' do
     let(:build) { create(:ci_build, :manual, pipeline: pipeline) }
     let!(:other_build) { create(:ci_build, :manual, pipeline: pipeline, name: 'other action') }
 
-    subject { build.other_actions }
+    subject { build.other_manual_actions }
 
     before do
       project.add_developer(user)
@@ -1400,6 +1740,48 @@ describe Ci::Build do
 
       it 'returns a retried build' do
         is_expected.to contain_exactly(retried_build)
+      end
+    end
+  end
+
+  describe '#other_scheduled_actions' do
+    let(:build) { create(:ci_build, :scheduled, pipeline: pipeline) }
+
+    subject { build.other_scheduled_actions }
+
+    before do
+      project.add_developer(user)
+    end
+
+    context "when other build's status is success" do
+      let!(:other_build) { create(:ci_build, :schedulable, :success, pipeline: pipeline, name: 'other action') }
+
+      it 'returns other actions' do
+        is_expected.to contain_exactly(other_build)
+      end
+    end
+
+    context "when other build's status is failed" do
+      let!(:other_build) { create(:ci_build, :schedulable, :failed, pipeline: pipeline, name: 'other action') }
+
+      it 'returns other actions' do
+        is_expected.to contain_exactly(other_build)
+      end
+    end
+
+    context "when other build's status is running" do
+      let!(:other_build) { create(:ci_build, :schedulable, :running, pipeline: pipeline, name: 'other action') }
+
+      it 'does not return other actions' do
+        is_expected.to be_empty
+      end
+    end
+
+    context "when other build's status is scheduled" do
+      let!(:other_build) { create(:ci_build, :scheduled, pipeline: pipeline, name: 'other action') }
+
+      it 'does not return other actions' do
+        is_expected.to contain_exactly(other_build)
       end
     end
   end
@@ -1475,6 +1857,18 @@ describe Ci::Build do
 
         it { is_expected.to be_playable }
       end
+
+      context 'when build is a manual and degenerated' do
+        subject { build_stubbed(:ci_build, :manual, :degenerated, status: :manual) }
+
+        it { is_expected.not_to be_playable }
+      end
+    end
+
+    context 'when build is scheduled' do
+      subject { build_stubbed(:ci_build, :scheduled) }
+
+      it { is_expected.to be_playable }
     end
 
     context 'when build is not a manual action' do
@@ -1693,6 +2087,7 @@ describe Ci::Build do
 
   describe '#variables' do
     let(:container_registry_enabled) { false }
+    let(:gitlab_version_info) { Gitlab::VersionInfo.parse(Gitlab::VERSION) }
     let(:predefined_variables) do
       [
         { key: 'CI_PIPELINE_ID', value: pipeline.id.to_s, public: true },
@@ -1710,6 +2105,9 @@ describe Ci::Build do
         { key: 'GITLAB_FEATURES', value: project.licensed_features.join(','), public: true },
         { key: 'CI_SERVER_NAME', value: 'GitLab', public: true },
         { key: 'CI_SERVER_VERSION', value: Gitlab::VERSION, public: true },
+        { key: 'CI_SERVER_VERSION_MAJOR', value: gitlab_version_info.major.to_s, public: true },
+        { key: 'CI_SERVER_VERSION_MINOR', value: gitlab_version_info.minor.to_s, public: true },
+        { key: 'CI_SERVER_VERSION_PATCH', value: gitlab_version_info.patch.to_s, public: true },
         { key: 'CI_SERVER_REVISION', value: Gitlab.revision, public: true },
         { key: 'CI_JOB_NAME', value: 'test', public: true },
         { key: 'CI_JOB_STAGE', value: 'test', public: true },
@@ -1717,6 +2115,7 @@ describe Ci::Build do
         { key: 'CI_COMMIT_BEFORE_SHA', value: build.before_sha, public: true },
         { key: 'CI_COMMIT_REF_NAME', value: build.ref, public: true },
         { key: 'CI_COMMIT_REF_SLUG', value: build.ref_slug, public: true },
+        { key: 'CI_NODE_TOTAL', value: '1', public: true },
         { key: 'CI_BUILD_REF', value: build.sha, public: true },
         { key: 'CI_BUILD_BEFORE_SHA', value: build.before_sha, public: true },
         { key: 'CI_BUILD_REF_NAME', value: build.ref, public: true },
@@ -1864,17 +2263,17 @@ describe Ci::Build do
       it { is_expected.to include(tag_variable) }
     end
 
-    context 'when secret variable is defined' do
-      let(:secret_variable) do
+    context 'when CI variable is defined' do
+      let(:ci_variable) do
         { key: 'SECRET_KEY', value: 'secret_value', public: false }
       end
 
       before do
         create(:ci_variable,
-               secret_variable.slice(:key, :value).merge(project: project))
+               ci_variable.slice(:key, :value).merge(project: project))
       end
 
-      it { is_expected.to include(secret_variable) }
+      it { is_expected.to include(ci_variable) }
     end
 
     context 'when protected variable is defined' do
@@ -1909,17 +2308,17 @@ describe Ci::Build do
       end
     end
 
-    context 'when group secret variable is defined' do
-      let(:secret_variable) do
+    context 'when group CI variable is defined' do
+      let(:ci_variable) do
         { key: 'SECRET_KEY', value: 'secret_value', public: false }
       end
 
       before do
         create(:ci_group_variable,
-               secret_variable.slice(:key, :value).merge(group: group))
+               ci_variable.slice(:key, :value).merge(group: group))
       end
 
-      it { is_expected.to include(secret_variable) }
+      it { is_expected.to include(ci_variable) }
     end
 
     context 'when group protected variable is defined' do
@@ -2178,6 +2577,29 @@ describe Ci::Build do
       end
     end
 
+    context 'when build is parallelized' do
+      let(:total) { 5 }
+      let(:index) { 3 }
+
+      before do
+        build.options[:parallel] = total
+        build.options[:instance] = index
+        build.name = "#{build.name} #{index}/#{total}"
+      end
+
+      it 'includes CI_NODE_INDEX' do
+        is_expected.to include(
+          { key: 'CI_NODE_INDEX', value: index.to_s, public: true }
+        )
+      end
+
+      it 'includes correct CI_NODE_TOTAL' do
+        is_expected.to include(
+          { key: 'CI_NODE_TOTAL', value: total.to_s, public: true }
+        )
+      end
+    end
+
     describe 'variables ordering' do
       context 'when variables hierarchy is stubbed' do
         let(:build_pre_var) { { key: 'build', value: 'value', public: true } }
@@ -2194,7 +2616,7 @@ describe Ci::Build do
             .to receive(:predefined_variables) { [project_pre_var] }
 
           allow_any_instance_of(EE::Project)
-            .to receive(:secret_variables_for)
+            .to receive(:ci_variables_for)
             .with(ref: 'master', environment: nil) do
             [create(:ci_variable, key: 'secret', value: 'value')]
           end
@@ -2345,7 +2767,7 @@ describe Ci::Build do
   end
 
   describe '#scoped_variables_hash' do
-    context 'when overriding secret variables' do
+    context 'when overriding CI variables' do
       before do
         project.variables.create!(key: 'MY_VAR', value: 'my value 1')
         pipeline.variables.create!(key: 'MY_VAR', value: 'my value 2')
@@ -2565,7 +2987,7 @@ describe Ci::Build do
     end
 
     context 'when build is configured to be retried' do
-      subject { create(:ci_build, :running, options: { retry: 3 }, project: project, user: user) }
+      subject { create(:ci_build, :running, options: { retry: { max: 3 } }, project: project, user: user) }
 
       it 'retries build and assigns the same user to it' do
         expect(described_class).to receive(:retry)
@@ -2994,10 +3416,14 @@ describe Ci::Build do
   end
 
   describe '#deployment_status' do
+    before do
+      allow_any_instance_of(described_class).to receive(:create_deployment)
+    end
+
     context 'when build is a last deployment' do
       let(:build) { create(:ci_build, :success, environment: 'production') }
       let(:environment) { create(:environment, name: 'production', project: build.project) }
-      let!(:deployment) { create(:deployment, environment: environment, project: environment.project, deployable: build) }
+      let!(:deployment) { create(:deployment, :success, environment: environment, project: environment.project, deployable: build) }
 
       it { expect(build.deployment_status).to eq(:last) }
     end
@@ -3005,8 +3431,8 @@ describe Ci::Build do
     context 'when there is a newer build with deployment' do
       let(:build) { create(:ci_build, :success, environment: 'production') }
       let(:environment) { create(:environment, name: 'production', project: build.project) }
-      let!(:deployment) { create(:deployment, environment: environment, project: environment.project, deployable: build) }
-      let!(:last_deployment) { create(:deployment, environment: environment, project: environment.project) }
+      let!(:deployment) { create(:deployment, :success, environment: environment, project: environment.project, deployable: build) }
+      let!(:last_deployment) { create(:deployment, :success, environment: environment, project: environment.project) }
 
       it { expect(build.deployment_status).to eq(:out_of_date) }
     end
@@ -3014,7 +3440,7 @@ describe Ci::Build do
     context 'when build with deployment has failed' do
       let(:build) { create(:ci_build, :failed, environment: 'production') }
       let(:environment) { create(:environment, name: 'production', project: build.project) }
-      let!(:deployment) { create(:deployment, environment: environment, project: environment.project, deployable: build) }
+      let!(:deployment) { create(:deployment, :success, environment: environment, project: environment.project, deployable: build) }
 
       it { expect(build.deployment_status).to eq(:failed) }
     end
@@ -3022,16 +3448,59 @@ describe Ci::Build do
     context 'when build with deployment is running' do
       let(:build) { create(:ci_build, environment: 'production') }
       let(:environment) { create(:environment, name: 'production', project: build.project) }
-      let!(:deployment) { create(:deployment, environment: environment, project: environment.project, deployable: build) }
+      let!(:deployment) { create(:deployment, :success, environment: environment, project: environment.project, deployable: build) }
 
       it { expect(build.deployment_status).to eq(:creating) }
     end
+  end
 
-    context 'when build is successful but deployment is not ready yet' do
-      let(:build) { create(:ci_build, :success, environment: 'production') }
-      let(:environment) { create(:environment, name: 'production', project: build.project) }
+  describe '#degenerated?' do
+    context 'when build is degenerated' do
+      subject { create(:ci_build, :degenerated) }
 
-      it { expect(build.deployment_status).to eq(:creating) }
+      it { is_expected.to be_degenerated }
+    end
+
+    context 'when build is valid' do
+      subject { create(:ci_build) }
+
+      it { is_expected.not_to be_degenerated }
+
+      context 'and becomes degenerated' do
+        before do
+          subject.degenerate!
+        end
+
+        it { is_expected.to be_degenerated }
+      end
+    end
+  end
+
+  describe '#archived?' do
+    context 'when build is degenerated' do
+      subject { create(:ci_build, :degenerated) }
+
+      it { is_expected.to be_archived }
+    end
+
+    context 'for old build' do
+      subject { create(:ci_build, created_at: 1.day.ago) }
+
+      context 'when archive_builds_in is set' do
+        before do
+          stub_application_setting(archive_builds_in_seconds: 3600)
+        end
+
+        it { is_expected.to be_archived }
+      end
+
+      context 'when archive_builds_in is not set' do
+        before do
+          stub_application_setting(archive_builds_in_seconds: nil)
+        end
+
+        it { is_expected.not_to be_archived }
+      end
     end
   end
 end

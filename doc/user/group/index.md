@@ -185,7 +185,7 @@ Alternatively, you can [lock the sharing with group feature](#share-with-group-l
 In GitLab Enterprise Edition it is possible to manage GitLab group memberships using LDAP groups.
 See [the GitLab Enterprise Edition documentation](../../integration/ldap.md) for more information.
 
-## Epics
+## Epics **[ULTIMATE]**
 
 > Introduced in [GitLab Ultimate][ee] 10.2.
 
@@ -194,6 +194,12 @@ effort by tracking groups of issues that share a theme, across projects and
 milestones.
 
 [Learn more about Epics.](epics/index.md)
+
+## Group Security Dashboard **[ULTIMATE]**
+
+Get an overview of the vulnerabilities of all the projects in a group and its subgroups.
+
+[Learn more about the Group Security Dashboard.](security_dashboard/index.md)
 
 ## Transfer groups to another group
 
@@ -294,12 +300,35 @@ This will disable the option for all users who previously had permissions to
 operate project memberships so no new users can be added. Furthermore, any
 request to add new user to project through API will not be possible.
 
+#### Group-level file templates **[PREMIUM]**
+
+Group-level file templates allow you to share a set of templates for common file
+types with every project in a group. It is analogous to the
+[instance-level template repository](../admin_area/settings/instance_template_repository.md)
+feature, and the selected project should follow the same naming conventions as
+are documented on that page.
+
+Only projects that are in the group may be chosen as the source of templates.
+This includes projects shared with the group, but **excludes** projects in
+subgroups or parent groups of the group being configured.
+
+This feature may be configured for subgroups as well as parent groups. A project
+in a subgroup will have access to the templates for that subgroup, as well as
+any parent groups.
+
+![Group-level file template dropdown](img/group_file_template_dropdown.png)
+
+To enable this feature, navigate to the group settings page, expand the
+**Templates** section, choose a project to act as the template repository, and
+**Save group**.
+
+![Group-level file template settings](img/group_file_template_settings.png)
+
 ### Advanced settings
 
 - **Projects**: view all projects within that group, add members to each project,
 access each project's settings, and remove any project from the same screen.
 - **Webhooks**: configure [webhooks](../project/integrations/webhooks.md) to your group.
-- **Push rules**: configure [push rules](https://docs.gitlab.com/ee/push_rules/push_rules.html#push-rules) to your group. **[STARTER]**
 - **Audit Events**: view [Audit Events](https://docs.gitlab.com/ee/administration/audit_events.html#audit-events)
 for the group. **[STARTER ONLY]**
 - **Pipelines quota**: keep track of the [pipeline quota](../admin_area/settings/continuous_integration.md) for the group
@@ -310,5 +339,10 @@ With [GitLab Contribution Analytics](contribution_analytics/index.md)
 you have an overview of the contributions (pushes, merge requests,
 and issues) performed my your group members.
 
+## Issues analytics **[PREMIUM]**
+
+With [GitLab Issues Analytics](issues_analytics/index.md), in groups, you can see a bar chart of the number of issues created each month.
+
 [ee]: https://about.gitlab.com/pricing/
 [ee-2534]: https://gitlab.com/gitlab-org/gitlab-ee/issues/2534
+

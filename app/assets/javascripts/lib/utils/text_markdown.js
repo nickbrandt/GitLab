@@ -1,6 +1,8 @@
-/* eslint-disable func-names, no-var, no-param-reassign, quotes, one-var, one-var-declaration-per-line, operator-assignment, no-else-return, prefer-template, prefer-arrow-callback, max-len, consistent-return, no-unused-vars, max-len */
+/* eslint-disable func-names, no-var, no-param-reassign, one-var, operator-assignment, no-else-return, prefer-template, prefer-arrow-callback, consistent-return, no-unused-vars */
 import $ from 'jquery';
 import { insertText } from '~/lib/utils/common_utils';
+
+const LINK_TAG_PATTERN = '[{text}](url)';
 
 function selectedText(text, textarea) {
   return text.substring(textarea.selectionStart, textarea.selectionEnd);
@@ -8,12 +10,18 @@ function selectedText(text, textarea) {
 
 function lineBefore(text, textarea) {
   var split;
-  split = text.substring(0, textarea.selectionStart).trim().split('\n');
+  split = text
+    .substring(0, textarea.selectionStart)
+    .trim()
+    .split('\n');
   return split[split.length - 1];
 }
 
 function lineAfter(text, textarea) {
-  return text.substring(textarea.selectionEnd).trim().split('\n')[0];
+  return text
+    .substring(textarea.selectionEnd)
+    .trim()
+    .split('\n')[0];
 }
 
 function blockTagText(text, textArea, blockTag, selected) {
@@ -27,7 +35,7 @@ function blockTagText(text, textArea, blockTag, selected) {
     }
     return selected;
   } else {
-    return blockTag + "\n" + selected + "\n" + blockTag;
+    return blockTag + '\n' + selected + '\n' + blockTag;
   }
 }
 
@@ -58,10 +66,32 @@ function moveCursor({ textArea, tag, wrapped, removedLastNewLine, select }) {
 }
 
 export function insertMarkdownText({ textArea, text, tag, blockTag, selected, wrap, select }) {
-  var textToInsert, inserted, selectedSplit, startChar, removedLastNewLine, removedFirstNewLine, currentLineEmpty, lastNewLine;
+  var textToInsert,
+    inserted,
+    selectedSplit,
+    startChar,
+    removedLastNewLine,
+    removedFirstNewLine,
+    currentLineEmpty,
+    lastNewLine;
   removedLastNewLine = false;
   removedFirstNewLine = false;
   currentLineEmpty = false;
+
+  // check for link pattern and selected text is an URL
+  // if so fill in the url part instead of the text part of the pattern.
+  if (tag === LINK_TAG_PATTERN) {
+    if (URL) {
+      try {
+        const ignoredUrl = new URL(selected);
+        // valid url
+        tag = '[text]({text})';
+        select = 'text';
+      } catch (e) {
+        // ignore - no valid url
+      }
+    }
+  }
 
   // Remove the first newline
   if (selected.indexOf('\n') === 0) {
@@ -94,21 +124,23 @@ export function insertMarkdownText({ textArea, text, tag, blockTag, selected, wr
     if (blockTag != null && blockTag !== '') {
       textToInsert = blockTagText(text, textArea, blockTag, selected);
     } else {
-      textToInsert = selectedSplit.map(function(val) {
-        if (tag.indexOf(textPlaceholder) > -1) {
-          return tag.replace(textPlaceholder, val);
-        }
-        if (val.indexOf(tag) === 0) {
-          return "" + (val.replace(tag, ''));
-        } else {
-          return "" + tag + val;
-        }
-      }).join('\n');
+      textToInsert = selectedSplit
+        .map(function(val) {
+          if (tag.indexOf(textPlaceholder) > -1) {
+            return tag.replace(textPlaceholder, val);
+          }
+          if (val.indexOf(tag) === 0) {
+            return '' + val.replace(tag, '');
+          } else {
+            return '' + tag + val;
+          }
+        })
+        .join('\n');
     }
   } else if (tag.indexOf(textPlaceholder) > -1) {
     textToInsert = tag.replace(textPlaceholder, selected);
   } else {
-    textToInsert = "" + startChar + tag + selected + (wrap ? tag : ' ');
+    textToInsert = '' + startChar + tag + selected + (wrap ? tag : ' ');
   }
 
   if (removedFirstNewLine) {
@@ -120,7 +152,13 @@ export function insertMarkdownText({ textArea, text, tag, blockTag, selected, wr
   }
 
   insertText(textArea, textToInsert);
-  return moveCursor({ textArea, tag: tag.replace(textPlaceholder, selected), wrap, removedLastNewLine, select });
+  return moveCursor({
+    textArea,
+    tag: tag.replace(textPlaceholder, selected),
+    wrap,
+    removedLastNewLine,
+    select,
+  });
 }
 
 function updateText({ textArea, tag, blockTag, wrap, select }) {
@@ -138,15 +176,18 @@ function replaceRange(s, start, end, substitute) {
 }
 
 export function addMarkdownListeners(form) {
-  return $('.js-md', form).off('click').on('click', function() {
-    const $this = $(this);
-    return updateText({
-      textArea: $this.closest('.md-area').find('textarea'),
-      tag: $this.data('mdTag'),
-      blockTag: $this.data('mdBlock'),
-      wrap: !$this.data('mdPrepend'),
-      select: $this.data('mdSelect') });
-  });
+  return $('.js-md', form)
+    .off('click')
+    .on('click', function() {
+      const $this = $(this);
+      return updateText({
+        textArea: $this.closest('.md-area').find('textarea'),
+        tag: $this.data('mdTag'),
+        blockTag: $this.data('mdBlock'),
+        wrap: !$this.data('mdPrepend'),
+        select: $this.data('mdSelect'),
+      });
+    });
 }
 
 export function removeMarkdownListeners(form) {

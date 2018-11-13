@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'base64'
 
 require 'gitaly'
@@ -23,7 +25,7 @@ module Gitlab
         stacks = most_invoked_stack.join('\n') if most_invoked_stack
 
         msg = "GitalyClient##{call_site} called #{invocation_count} times from single request. Potential n+1?"
-        msg << "\nThe following call site called into Gitaly #{max_call_stack} times:\n#{stacks}\n" if stacks
+        msg = "#{msg}\nThe following call site called into Gitaly #{max_call_stack} times:\n#{stacks}\n" if stacks
 
         super(msg)
       end
@@ -220,7 +222,7 @@ module Gitlab
       result
     end
 
-    SERVER_FEATURE_FLAGS = %w[gogit_findcommit git_v2].freeze
+    SERVER_FEATURE_FLAGS = %w[gogit_findcommit].freeze
 
     def self.server_feature_flags
       SERVER_FEATURE_FLAGS.map do |f|

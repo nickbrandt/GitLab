@@ -17,10 +17,9 @@ module Projects
       end
 
       update_branches
-      update_root_ref
 
       success
-    rescue Gitlab::Shell::Error, UpdateError => e
+    rescue Gitlab::Shell::Error, Gitlab::Git::BaseError, UpdateError => e
       error(e.message)
     end
 
@@ -59,11 +58,6 @@ module Projects
       unless errors.empty?
         raise UpdateError, errors.join("\n\n")
       end
-    end
-
-    # Update the default branch querying the remote to determine its HEAD
-    def update_root_ref
-      project.update_root_ref(::Repository::MIRROR_REMOTE)
     end
 
     def update_tags(&block)

@@ -1,8 +1,8 @@
-const Store = gl.issueBoards.BoardsStore;
+import boardsStore from '~/boards/stores/boards_store';
 
 export default {
   template: '#js-board-promotion',
   methods: {
-    clearPromotionState: Store.removePromotionState.bind(Store),
+    clearPromotionState: boardsStore.removePromotionState.bind(boardsStore),
   },
 };

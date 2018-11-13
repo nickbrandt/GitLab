@@ -218,6 +218,22 @@ describe Namespace do
         is_expected.to be_falsy
       end
     end
+
+    context 'when feature is disabled by a feature flag' do
+      it 'returns false' do
+        stub_feature_flags(feature => false)
+
+        is_expected.to eq(false)
+      end
+    end
+
+    context 'when feature is enabled by a feature flag' do
+      it 'returns true' do
+        stub_feature_flags(feature => true)
+
+        is_expected.to eq(true)
+      end
+    end
   end
 
   describe '#max_active_pipelines' do
@@ -550,6 +566,69 @@ describe Namespace do
     context 'when namespace does not have plan associated' do
       it 'returns a free plan name' do
         expect(namespace.actual_plan_name).to eq 'free'
+      end
+    end
+  end
+
+  describe '#file_template_project_id' do
+    it 'is cleared before validation' do
+      project = create(:project, namespace: namespace)
+
+      namespace.file_template_project_id = project.id
+
+      expect(namespace).to be_valid
+      expect(namespace.file_template_project_id).to be_nil
+    end
+  end
+
+  describe '#checked_file_template_project' do
+    it 'is always nil' do
+      namespace.file_template_project_id = create(:project, namespace: namespace).id
+
+      expect(namespace.checked_file_template_project).to be_nil
+    end
+  end
+
+  describe '#checked_file_template_project_id' do
+    it 'is always nil' do
+      namespace.file_template_project_id = create(:project, namespace: namespace).id
+
+      expect(namespace.checked_file_template_project_id).to be_nil
+    end
+  end
+
+  describe '#store_security_reports_available?' do
+    subject { namespace.store_security_reports_available? }
+
+    context 'when store_security_reports feature is enabled' do
+      before do
+        stub_feature_flags(store_security_reports: true)
+        stub_licensed_features(sast: true)
+      end
+
+      it 'returns true' do
+        expect(subject).to be_truthy
+      end
+    end
+
+    context 'when store_security_reports feature is disabled' do
+      before do
+        stub_feature_flags(store_security_reports: false)
+        stub_licensed_features(sast: true)
+      end
+
+      it 'returns false' do
+        expect(subject).to be_falsey
+      end
+    end
+
+    context 'when no security report feature is available' do
+      before do
+        stub_feature_flags(store_security_reports: true)
+      end
+
+      it 'returns false' do
+        expect(subject).to be_falsey
       end
     end
   end

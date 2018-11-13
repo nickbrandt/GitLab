@@ -31,12 +31,14 @@ describe('TableBodyComponent', () => {
   describe('template', () => {
     it('renders row item element', () => {
       const rowEl = vm.$el.querySelector('tr');
+
       expect(rowEl).not.toBeNull();
       expect(rowEl.querySelectorAll('td').length).toBe(7);
     });
 
     it('renders username row cell element', () => {
       const cellEl = vm.$el.querySelector('td strong');
+
       expect(cellEl).not.toBeNull();
       expect(cellEl.querySelector('a').getAttribute('href')).toBe(rawMembers[0].user_web_url);
     });

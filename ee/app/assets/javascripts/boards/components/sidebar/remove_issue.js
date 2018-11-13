@@ -1,12 +1,11 @@
 import base from '~/boards/components/sidebar/remove_issue.vue';
-
-const Store = gl.issueBoards.BoardsStore;
+import boardsStore from '~/boards/stores/boards_store';
 
 export default base.extend({
   methods: {
     seedPatchRequest(issue, req) {
       /* eslint-disable no-param-reassign */
-      const board = Store.state.currentBoard;
+      const board = boardsStore.state.currentBoard;
       const boardLabelIds = board.labels.map(label => label.id);
 
       req.label_ids = req.label_ids.filter(id => !boardLabelIds.includes(id));

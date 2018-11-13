@@ -53,6 +53,7 @@ describe('AppComponent', () => {
         spyOn(vm.store, 'setMembers');
 
         vm.fetchContributedMembers();
+
         expect(vm.isLoading).toBe(true);
         setTimeout(() => {
           expect(vm.isLoading).toBe(false);
@@ -66,6 +67,7 @@ describe('AppComponent', () => {
         mock.onGet(vm.service.memberContributionsPath).reply(500, {});
 
         vm.fetchContributedMembers();
+
         expect(vm.isLoading).toBe(true);
         setTimeout(() => {
           expect(vm.isLoading).toBe(false);
@@ -83,6 +85,7 @@ describe('AppComponent', () => {
 
         const columnName = 'fullname';
         vm.handleColumnClick(columnName);
+
         expect(vm.store.sortMembers).toHaveBeenCalledWith(columnName);
       });
     });
@@ -99,10 +102,10 @@ describe('AppComponent', () => {
 
     it('shows loading icon when isLoading prop is true', done => {
       vm.isLoading = true;
-      vm
-        .$nextTick()
+      vm.$nextTick()
         .then(() => {
           const loadingEl = vm.$el.querySelector('.loading-animation');
+
           expect(loadingEl).not.toBeNull();
           expect(loadingEl.querySelector('i').getAttribute('aria-label')).toBe(
             'Loading contribution stats for group members',
@@ -114,8 +117,7 @@ describe('AppComponent', () => {
 
     it('renders table container element', done => {
       vm.isLoading = false;
-      vm
-        .$nextTick()
+      vm.$nextTick()
         .then(() => {
           expect(vm.$el.querySelector('table.table.gl-sortable')).not.toBeNull();
         })

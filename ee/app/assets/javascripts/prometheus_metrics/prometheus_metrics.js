@@ -11,18 +11,32 @@ export default class EEPrometheusMetrics extends PrometheusMetrics {
     super(wrapperSelector);
 
     this.$wrapperCustomMetrics = $(wrapperSelector);
-    this.$monitoredCustomMetricsPanel = this.$wrapperCustomMetrics.find('.js-panel-custom-monitored-metrics');
-    this.$monitoredCustomMetricsCount = this.$monitoredCustomMetricsPanel.find('.js-custom-monitored-count');
-    this.$monitoredCustomMetricsLoading = this.$monitoredCustomMetricsPanel.find('.js-loading-custom-metrics');
-    this.$monitoredCustomMetricsEmpty = this.$monitoredCustomMetricsPanel.find('.js-empty-custom-metrics');
-    this.$monitoredCustomMetricsList = this.$monitoredCustomMetricsPanel.find('.js-custom-metrics-list');
+    this.$monitoredCustomMetricsPanel = this.$wrapperCustomMetrics.find(
+      '.js-panel-custom-monitored-metrics',
+    );
+    this.$monitoredCustomMetricsCount = this.$monitoredCustomMetricsPanel.find(
+      '.js-custom-monitored-count',
+    );
+    this.$monitoredCustomMetricsLoading = this.$monitoredCustomMetricsPanel.find(
+      '.js-loading-custom-metrics',
+    );
+    this.$monitoredCustomMetricsEmpty = this.$monitoredCustomMetricsPanel.find(
+      '.js-empty-custom-metrics',
+    );
+    this.$monitoredCustomMetricsList = this.$monitoredCustomMetricsPanel.find(
+      '.js-custom-metrics-list',
+    );
     this.$newCustomMetricButton = this.$monitoredCustomMetricsPanel.find('.js-new-metric-button');
     this.$flashCustomMetricsContainer = this.$wrapperCustomMetrics.find('.flash-container');
     this.customMetrics = [];
     this.environmentsData = [];
 
-    this.activeCustomMetricsEndpoint = this.$monitoredCustomMetricsPanel.data('active-custom-metrics');
-    this.environmentsDataEndpoint = this.$monitoredCustomMetricsPanel.data('environments-data-endpoint');
+    this.activeCustomMetricsEndpoint = this.$monitoredCustomMetricsPanel.data(
+      'active-custom-metrics',
+    );
+    this.environmentsDataEndpoint = this.$monitoredCustomMetricsPanel.data(
+      'environments-data-endpoint',
+    );
   }
 
   showMonitoringCustomMetricsPanelState(stateName) {
@@ -49,20 +63,25 @@ export default class EEPrometheusMetrics extends PrometheusMetrics {
   }
 
   populateCustomMetrics() {
-    const sortedMetrics = _(this.customMetrics).chain()
+    const sortedMetrics = _(this.customMetrics)
+      .chain()
       .map(metric => ({ ...metric, group: capitalizeFirstCharacter(metric.group) }))
       .sortBy('title')
       .sortBy('group')
       .value();
 
-    sortedMetrics.forEach((metric) => {
+    sortedMetrics.forEach(metric => {
       this.$monitoredCustomMetricsList.append(EEPrometheusMetrics.customMetricTemplate(metric));
     });
 
     this.$monitoredCustomMetricsCount.text(this.customMetrics.length);
     this.showMonitoringCustomMetricsPanelState(PANEL_STATE.LIST);
     if (!this.environmentsData) {
-      this.showFlashMessage(s__('PrometheusService|These metrics will only be monitored after your first deployment to an environment'));
+      this.showFlashMessage(
+        s__(
+          'PrometheusService|These metrics will only be monitored after your first deployment to an environment',
+        ),
+      );
     }
   }
 
@@ -86,7 +105,7 @@ export default class EEPrometheusMetrics extends PrometheusMetrics {
           this.populateCustomMetrics(customMetrics.data.metrics);
         }
       })
-      .catch((customMetricError) => {
+      .catch(customMetricError => {
         this.showFlashMessage(customMetricError);
         this.showMonitoringCustomMetricsPanelState(PANEL_STATE.EMPTY);
       });

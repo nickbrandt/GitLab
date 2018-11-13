@@ -1,0 +1,5 @@
+---
+title: 'Audit log: Add audit events for group setting changes'
+merge_request: 7987
+author:
+type: added

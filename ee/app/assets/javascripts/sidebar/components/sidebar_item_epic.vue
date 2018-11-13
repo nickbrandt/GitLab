@@ -1,54 +1,62 @@
 <script>
-  import { __ } from '~/locale';
-  import tooltip from '~/vue_shared/directives/tooltip';
-  import { spriteIcon } from '~/lib/utils/common_utils';
-  import Store from '../stores/sidebar_store';
+import { __ } from '~/locale';
+import tooltip from '~/vue_shared/directives/tooltip';
+import { spriteIcon } from '~/lib/utils/common_utils';
+import Store from '../stores/sidebar_store';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 
-  export default {
-    name: 'SidebarItemEpic',
-    directives: {
-      tooltip,
+export default {
+  name: 'SidebarItemEpic',
+  directives: {
+    tooltip,
+  },
+  components: {
+    GlLoadingIcon,
+  },
+  data() {
+    return {
+      store: new Store(),
+    };
+  },
+  computed: {
+    isLoading() {
+      return this.store.isFetching.epic;
     },
-    data() {
-      return {
-        store: new Store(),
-      };
+    epicIcon() {
+      return spriteIcon('epic');
     },
-    computed: {
-      isLoading() {
-        return this.store.isFetching.epic;
-      },
-      epicIcon() {
-        return spriteIcon('epic');
-      },
-      epicUrl() {
-        return this.store.epic.url;
-      },
-      epicTitle() {
-        return this.store.epic.title;
-      },
-      hasEpic() {
-        return this.epicUrl && this.epicTitle;
-      },
-      collapsedTitle() {
-        return this.hasEpic ? this.epicTitle : 'None';
-      },
-      tooltipTitle() {
-        if (!this.hasEpic) {
-          return __('Epic');
-        }
-        let tooltipTitle = this.epicTitle;
+    epicUrl() {
+      return this.store.epic.url;
+    },
+    epicTitle() {
+      return this.store.epic.title;
+    },
+    hasEpic() {
+      return this.epicUrl && this.epicTitle;
+    },
+    collapsedTitle() {
+      return this.hasEpic ? this.epicTitle : 'None';
+    },
+    tooltipTitle() {
+      if (!this.hasEpic) {
+        return __('Epic');
+      }
+      let tooltipTitle = this.epicTitle;
 
-        if (this.store.epic.human_readable_end_date || this.store.epic.human_readable_timestamp) {
-          tooltipTitle += '<br />';
-          tooltipTitle += this.store.epic.human_readable_end_date ? `${this.store.epic.human_readable_end_date} ` : '';
-          tooltipTitle += this.store.epic.human_readable_timestamp ? `(${this.store.epic.human_readable_timestamp})` : '';
-        }
+      if (this.store.epic.human_readable_end_date || this.store.epic.human_readable_timestamp) {
+        tooltipTitle += '<br />';
+        tooltipTitle += this.store.epic.human_readable_end_date
+          ? `${this.store.epic.human_readable_end_date} `
+          : '';
+        tooltipTitle += this.store.epic.human_readable_timestamp
+          ? `(${this.store.epic.human_readable_timestamp})`
+          : '';
+      }
 
-        return tooltipTitle;
-      },
+      return tooltipTitle;
     },
-  };
+  },
+};
 </script>
 
 <template>

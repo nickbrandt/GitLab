@@ -1,10 +1,11 @@
-/* eslint-disable no-underscore-dangle, class-methods-use-this, consistent-return, no-shadow, no-param-reassign, max-len */
+/* eslint-disable no-underscore-dangle, class-methods-use-this, consistent-return, no-shadow, no-param-reassign */
 /* global ListIssue */
 
 import { __ } from '~/locale';
 import ListLabel from '~/vue_shared/models/label';
 import ListAssignee from '~/vue_shared/models/assignee';
 import { urlParamsToObject } from '~/lib/utils/common_utils';
+import boardsStore from '../stores/boards_store';
 import ListMilestone from './milestone';
 
 const PER_PAGE = 20;
@@ -95,9 +96,9 @@ class List {
   }
 
   destroy() {
-    const index = gl.issueBoards.BoardsStore.state.lists.indexOf(this);
-    gl.issueBoards.BoardsStore.state.lists.splice(index, 1);
-    gl.issueBoards.BoardsStore.updateNewListDropdown(this.id);
+    const index = boardsStore.state.lists.indexOf(this);
+    boardsStore.state.lists.splice(index, 1);
+    boardsStore.updateNewListDropdown(this.id);
 
     gl.boardService.destroyList(this.id).catch(() => {
       // TODO: handle request error
@@ -122,7 +123,7 @@ class List {
 
   getIssues(emptyIssues = true) {
     const data = {
-      ...urlParamsToObject(gl.issueBoards.BoardsStore.filter.path),
+      ...urlParamsToObject(boardsStore.filter.path),
       page: this.page,
     };
 
@@ -246,11 +247,11 @@ class List {
     });
   }
 
-  getTypeInfo (type) {
+  getTypeInfo(type) {
     return TYPES[type] || {};
   }
 
-  onNewIssueResponse (issue, data) {
+  onNewIssueResponse(issue, data) {
     issue.id = data.id;
     issue.iid = data.iid;
     issue.project = data.project;

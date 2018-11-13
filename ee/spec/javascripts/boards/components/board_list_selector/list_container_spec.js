@@ -1,12 +1,12 @@
 import Vue from 'vue';
 
-import ListContainerComponent from 'ee/boards/components/boards_list_selector/list_container.vue';
+import ListContainer from 'ee/boards/components/boards_list_selector/list_container.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 import { mockAssigneesList } from 'spec/boards/mock_data';
 
 const createComponent = () => {
-  const Component = Vue.extend(ListContainerComponent);
+  const Component = Vue.extend(ListContainer);
 
   return mountComponent(Component, {
     loading: false,
@@ -15,7 +15,7 @@ const createComponent = () => {
   });
 };
 
-describe('ListContainerComponent', () => {
+describe('ListContainer', () => {
   let vm;
 
   beforeEach(() => {
@@ -30,6 +30,7 @@ describe('ListContainerComponent', () => {
     describe('filteredItems', () => {
       it('returns assignees list as it is when `query` is empty', () => {
         vm.query = '';
+
         expect(vm.filteredItems.length).toBe(mockAssigneesList.length);
       });
 
@@ -37,6 +38,7 @@ describe('ListContainerComponent', () => {
         const assignee = mockAssigneesList[0];
 
         vm.query = assignee.name;
+
         expect(vm.filteredItems.length).toBe(1);
         expect(vm.filteredItems[0].name).toBe(assignee.name);
       });
@@ -45,6 +47,7 @@ describe('ListContainerComponent', () => {
         const assignee = mockAssigneesList[0];
 
         vm.query = assignee.username;
+
         expect(vm.filteredItems.length).toBe(1);
         expect(vm.filteredItems[0].username).toBe(assignee.username);
       });
@@ -56,6 +59,7 @@ describe('ListContainerComponent', () => {
       it('sets value of param `query` to component prop `query`', () => {
         const query = 'foobar';
         vm.handleSearch(query);
+
         expect(vm.query).toBe(query);
       });
     });
@@ -66,6 +70,7 @@ describe('ListContainerComponent', () => {
         const assignee = mockAssigneesList[0];
 
         vm.handleItemClick(assignee);
+
         expect(vm.$emit).toHaveBeenCalledWith('onItemSelect', assignee);
       });
     });
@@ -76,7 +81,7 @@ describe('ListContainerComponent', () => {
       expect(vm.$el.classList.contains('dropdown-assignees-list')).toBe(true);
     });
 
-    it('renders loading animation when prop `loading` is true', (done) => {
+    it('renders loading animation when prop `loading` is true', done => {
       vm.loading = true;
       Vue.nextTick()
         .then(() => {

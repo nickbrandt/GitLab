@@ -1,4 +1,5 @@
 <script>
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 import ListFilter from './list_filter.vue';
 import ListContent from './list_content.vue';
 
@@ -6,6 +7,7 @@ export default {
   components: {
     ListFilter,
     ListContent,
+    GlLoadingIcon,
   },
   props: {
     loading: {
@@ -31,7 +33,7 @@ export default {
       if (!this.query) return this.items;
 
       const query = this.query.toLowerCase();
-      return this.items.filter((item) => {
+      return this.items.filter(item => {
         const name = item.name ? item.name.toLowerCase() : item.title.toLowerCase();
 
         if (this.listType === 'milestones') {

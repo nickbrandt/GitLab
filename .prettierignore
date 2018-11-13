@@ -4,4 +4,6 @@
 /vendor/
 /tmp/
 
-ee/app/assets/javascripts/shared/snowplow/sp.js
+# ignore stylesheets for now as this clashes with our linter
+*.css
+*.scss

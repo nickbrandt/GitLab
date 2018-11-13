@@ -17,6 +17,10 @@ describe 'SAML provider settings' do
     click_button('Save changes')
   end
 
+  def test_sso
+    click_link('Test SAML SSO')
+  end
+
   def stub_saml_config
     stub_licensed_features(group_saml: true)
     allow(Devise).to receive(:omniauth_providers).and_return(%i(group_saml))
@@ -70,6 +74,23 @@ describe 'SAML provider settings' do
         login_url = find('label', text: 'GitLab single sign on URL').find('~* a').text
 
         expect(login_url).to end_with "/groups/#{group.full_path}/-/saml/sso"
+      end
+    end
+
+    describe 'test button' do
+      let!(:saml_provider) { create(:saml_provider, group: group) }
+
+      before do
+        sign_in(user)
+        allow_any_instance_of(OmniAuth::Strategies::GroupSaml).to receive(:callback_url) { callback_path }
+      end
+
+      it 'POSTs to the SSO path for the group' do
+        visit group_saml_providers_path(group)
+
+        test_sso
+
+        expect(current_path).to eq callback_path
       end
     end
   end

@@ -99,12 +99,18 @@ describe('SidebarParticipants', () => {
 
     describe('popoverOptions', () => {
       it('returns popover config object containing title with appropriate string', () => {
-        expect(vm.popoverOptions.title).toBe('These dates affect how your epics appear in the roadmap. Dates from milestones come from the milestones assigned to issues in the epic. You can also set fixed dates or remove them entirely.');
+        expect(vm.popoverOptions.title).toBe(
+          'These dates affect how your epics appear in the roadmap. Dates from milestones come from the milestones assigned to issues in the epic. You can also set fixed dates or remove them entirely.',
+        );
       });
 
       it('returns popover config object containing `content` with href pointing to correct documentation', () => {
         const hrefContent = vm.popoverOptions.content.trim();
-        expect(hrefContent).toContain(`${gon.gitlab_url}/help/user/group/epics/index.md#start-date-and-due-date`);
+
+        expect(hrefContent).toContain(
+          `${gon.gitlab_url}/help/user/group/epics/index.md#start-date-and-due-date`,
+        );
+
         expect(hrefContent).toContain('More information');
       });
     });
@@ -116,7 +122,11 @@ describe('SidebarParticipants', () => {
 
       it('returns popover config object containing `content` with href pointing to correct documentation', () => {
         const hrefContent = vm.dateInvalidPopoverOptions.content.trim();
-        expect(hrefContent).toContain(`${gon.gitlab_url}/help/user/group/epics/index.md#start-date-and-due-date`);
+
+        expect(hrefContent).toContain(
+          `${gon.gitlab_url}/help/user/group/epics/index.md#start-date-and-due-date`,
+        );
+
         expect(hrefContent).toContain('How can I solve this?');
       });
     });
@@ -138,7 +148,7 @@ describe('SidebarParticipants', () => {
           content,
         };
 
-        Object.keys(popoverConfig).forEach((key) => {
+        Object.keys(popoverConfig).forEach(key => {
           if (key === 'template') {
             expect(popoverConfig[key]).toContain(expectedPopoverConfig[key]);
           } else {
@@ -152,6 +162,7 @@ describe('SidebarParticipants', () => {
       it('sets `editing` prop to `false` and emits `toggleDateType` event on component', () => {
         spyOn(vm, '$emit');
         vm.stopEditing();
+
         expect(vm.editing).toBe(false);
         expect(vm.$emit).toHaveBeenCalledWith('toggleDateType', true, true);
       });
@@ -161,6 +172,7 @@ describe('SidebarParticipants', () => {
       it('flips value of `editing` prop from `true` to `false` and vice-versa', () => {
         vm.editing = true;
         vm.toggleDatePicker();
+
         expect(vm.editing).toBe(false);
       });
     });
@@ -170,6 +182,7 @@ describe('SidebarParticipants', () => {
         spyOn(vm, '$emit');
         const date = new Date();
         vm.newDateSelected(date);
+
         expect(vm.editing).toBe(false);
         expect(vm.$emit).toHaveBeenCalledWith('saveDate', date);
       });
@@ -179,6 +192,7 @@ describe('SidebarParticipants', () => {
       it('emits `toggleDateType` event on component', () => {
         spyOn(vm, '$emit');
         vm.toggleDateType(true);
+
         expect(vm.$emit).toHaveBeenCalledWith('toggleDateType', true);
       });
     });
@@ -187,6 +201,7 @@ describe('SidebarParticipants', () => {
       it('emits `toggleCollapse` event on component', () => {
         spyOn(vm, '$emit');
         vm.toggleSidebar();
+
         expect(vm.$emit).toHaveBeenCalledWith('toggleCollapse');
       });
     });
@@ -227,6 +242,7 @@ describe('SidebarParticipants', () => {
 
     it('renders help icon', () => {
       const helpIconEl = vm.$el.querySelector('.help-icon');
+
       expect(helpIconEl).not.toBe(null);
       expect(helpIconEl.getAttribute('tabindex')).toBe('0');
       expect(helpIconEl.querySelector('use').getAttribute('xlink:href')).toContain('question-o');
@@ -234,6 +250,7 @@ describe('SidebarParticipants', () => {
 
     it('renderts edit button', () => {
       const buttonEl = vm.$el.querySelector('button.btn-sidebar-action');
+
       expect(buttonEl).not.toBe(null);
       expect(buttonEl.innerText.trim()).toBe('Edit');
     });
@@ -245,6 +262,7 @@ describe('SidebarParticipants', () => {
 
     it('renders fixed type date selection element', () => {
       const valueFixedEl = vm.$el.querySelector('.value .value-type-fixed');
+
       expect(valueFixedEl.querySelector('input[type="radio"]')).not.toBe(null);
       expect(valueFixedEl.innerText.trim()).toContain('Fixed:');
       expect(valueFixedEl.querySelector('.value-content').innerText.trim()).toContain('None');
@@ -252,6 +270,7 @@ describe('SidebarParticipants', () => {
 
     it('renders dynamic type date selection element', () => {
       const valueDynamicEl = vm.$el.querySelector('.value abbr.value-type-dynamic');
+
       expect(valueDynamicEl.querySelector('input[type="radio"]')).not.toBe(null);
       expect(valueDynamicEl.innerText.trim()).toContain('From milestones:');
       expect(valueDynamicEl.querySelector('.value-content').innerText.trim()).toContain('None');
@@ -263,9 +282,12 @@ describe('SidebarParticipants', () => {
       Vue.nextTick()
         .then(() => {
           const warningIconEl = vm.$el.querySelector('.date-warning-icon');
+
           expect(warningIconEl).not.toBe(null);
           expect(warningIconEl.getAttribute('tabindex')).toBe('0');
-          expect(warningIconEl.querySelector('use').getAttribute('xlink:href')).toContain('warning');
+          expect(warningIconEl.querySelector('use').getAttribute('xlink:href')).toContain(
+            'warning',
+          );
         })
         .then(done)
         .catch(done.fail);

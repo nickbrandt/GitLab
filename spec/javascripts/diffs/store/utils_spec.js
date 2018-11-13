@@ -62,10 +62,12 @@ describe('DiffsStoreUtils', () => {
       const atParallelIndex = diffFile.parallelDiffLines[parallelIndex];
 
       utils.removeMatchLine(diffFile, lineNumbers, false);
+
       expect(diffFile.highlightedDiffLines[inlineIndex]).not.toEqual(atInlineIndex);
       expect(diffFile.parallelDiffLines[parallelIndex]).not.toEqual(atParallelIndex);
 
       utils.removeMatchLine(diffFile, lineNumbers, true);
+
       expect(diffFile.highlightedDiffLines[inlineIndex + 1]).not.toEqual(atInlineIndex);
       expect(diffFile.parallelDiffLines[parallelIndex + 1]).not.toEqual(atParallelIndex);
     });
@@ -87,11 +89,13 @@ describe('DiffsStoreUtils', () => {
       };
 
       utils.addContextLines(options);
+
       expect(inlineLines[inlineLines.length - 1]).toEqual(contextLines[0]);
       expect(parallelLines[parallelLines.length - 1]).toEqual(normalizedParallelLine);
 
       delete options.bottom;
       utils.addContextLines(options);
+
       expect(inlineLines[inlineIndex]).toEqual(contextLines[0]);
       expect(parallelLines[parallelIndex]).toEqual(normalizedParallelLine);
     });
@@ -274,6 +278,7 @@ describe('DiffsStoreUtils', () => {
       };
 
       utils.trimFirstCharOfLineContent(lineObj);
+
       expect(lineObj).toEqual({ discussions: [], richText: ' diff' });
     });
 
@@ -288,19 +293,23 @@ describe('DiffsStoreUtils', () => {
       utils.prepareDiffData(preparedDiff);
 
       const firstParallelDiffLine = preparedDiff.diffFiles[0].parallelDiffLines[2];
+
       expect(firstParallelDiffLine.left.discussions.length).toBe(0);
       expect(firstParallelDiffLine.left).not.toHaveAttr('text');
       expect(firstParallelDiffLine.right.discussions.length).toBe(0);
       expect(firstParallelDiffLine.right).not.toHaveAttr('text');
       const firstParallelChar = firstParallelDiffLine.right.richText.charAt(0);
+
       expect(firstParallelChar).not.toBe(' ');
       expect(firstParallelChar).not.toBe('+');
       expect(firstParallelChar).not.toBe('-');
 
       const checkLine = preparedDiff.diffFiles[0].highlightedDiffLines[0];
+
       expect(checkLine.discussions.length).toBe(0);
       expect(checkLine).not.toHaveAttr('text');
       const firstChar = checkLine.richText.charAt(0);
+
       expect(firstChar).not.toBe(' ');
       expect(firstChar).not.toBe('+');
       expect(firstChar).not.toBe('-');
@@ -333,20 +342,12 @@ describe('DiffsStoreUtils', () => {
 
     const discussions = {
       upToDateDiscussion1: {
-        original_position: {
-          formatter: diffPosition,
-        },
-        position: {
-          formatter: wrongDiffPosition,
-        },
+        original_position: diffPosition,
+        position: wrongDiffPosition,
       },
       outDatedDiscussion1: {
-        original_position: {
-          formatter: wrongDiffPosition,
-        },
-        position: {
-          formatter: wrongDiffPosition,
-        },
+        original_position: wrongDiffPosition,
+        position: wrongDiffPosition,
       },
     };
 
@@ -419,6 +420,137 @@ describe('DiffsStoreUtils', () => {
           latestDiff: false,
         }),
       ).toBe(false);
+    });
+  });
+
+  describe('generateTreeList', () => {
+    let files;
+
+    beforeAll(() => {
+      files = [
+        {
+          newPath: 'app/index.js',
+          deletedFile: false,
+          newFile: false,
+          removedLines: 10,
+          addedLines: 0,
+          fileHash: 'test',
+        },
+        {
+          newPath: 'app/test/index.js',
+          deletedFile: false,
+          newFile: true,
+          removedLines: 0,
+          addedLines: 0,
+          fileHash: 'test',
+        },
+        {
+          newPath: 'app/test/filepathneedstruncating.js',
+          deletedFile: false,
+          newFile: true,
+          removedLines: 0,
+          addedLines: 0,
+          fileHash: 'test',
+        },
+        {
+          newPath: 'package.json',
+          deletedFile: true,
+          newFile: false,
+          removedLines: 0,
+          addedLines: 0,
+          fileHash: 'test',
+        },
+      ];
+    });
+
+    it('creates a tree of files', () => {
+      const { tree } = utils.generateTreeList(files);
+
+      expect(tree).toEqual([
+        {
+          key: 'app',
+          path: 'app',
+          name: 'app',
+          type: 'tree',
+          tree: [
+            {
+              addedLines: 0,
+              changed: true,
+              deleted: false,
+              fileHash: 'test',
+              key: 'app/index.js',
+              name: 'index.js',
+              path: 'app/index.js',
+              removedLines: 10,
+              tempFile: false,
+              type: 'blob',
+              tree: [],
+            },
+            {
+              key: 'app/test',
+              path: 'app/test',
+              name: 'test',
+              type: 'tree',
+              opened: true,
+              tree: [
+                {
+                  addedLines: 0,
+                  changed: true,
+                  deleted: false,
+                  fileHash: 'test',
+                  key: 'app/test/index.js',
+                  name: 'index.js',
+                  path: 'app/test/index.js',
+                  removedLines: 0,
+                  tempFile: true,
+                  type: 'blob',
+                  tree: [],
+                },
+                {
+                  addedLines: 0,
+                  changed: true,
+                  deleted: false,
+                  fileHash: 'test',
+                  key: 'app/test/filepathneedstruncating.js',
+                  name: 'filepathneedstruncating.js',
+                  path: 'app/test/filepathneedstruncating.js',
+                  removedLines: 0,
+                  tempFile: true,
+                  type: 'blob',
+                  tree: [],
+                },
+              ],
+            },
+          ],
+          opened: true,
+        },
+        {
+          key: 'package.json',
+          path: 'package.json',
+          name: 'package.json',
+          type: 'blob',
+          changed: true,
+          tempFile: false,
+          deleted: true,
+          fileHash: 'test',
+          addedLines: 0,
+          removedLines: 0,
+          tree: [],
+        },
+      ]);
+    });
+
+    it('creates flat list of blobs & folders', () => {
+      const { treeEntries } = utils.generateTreeList(files);
+
+      expect(Object.keys(treeEntries)).toEqual([
+        'app',
+        'app/index.js',
+        'app/test',
+        'app/test/index.js',
+        'app/test/filepathneedstruncating.js',
+        'package.json',
+      ]);
     });
   });
 });

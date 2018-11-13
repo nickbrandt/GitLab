@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context :geo, :orchestrated, :geo do
+  context 'Geo', :orchestrated, :geo do
     describe 'Geo Nodes API' do
       before(:all) do
         get_personal_access_token

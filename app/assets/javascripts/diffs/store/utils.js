@@ -1,5 +1,6 @@
 import _ from 'underscore';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
+import { diffModes } from '~/ide/constants';
 import {
   LINE_POSITION_LEFT,
   LINE_POSITION_RIGHT,
@@ -25,7 +26,7 @@ export const getReversePosition = linePosition => {
   return LINE_POSITION_RIGHT;
 };
 
-export function getNoteFormData(params) {
+export function getFormData(params) {
   const {
     note,
     noteableType,
@@ -34,6 +35,7 @@ export function getNoteFormData(params) {
     noteTargetLine,
     diffViewType,
     linePosition,
+    positionType,
   } = params;
 
   const position = JSON.stringify({
@@ -42,9 +44,13 @@ export function getNoteFormData(params) {
     head_sha: diffFile.diffRefs.headSha,
     old_path: diffFile.oldPath,
     new_path: diffFile.newPath,
-    position_type: TEXT_DIFF_POSITION_TYPE,
-    old_line: noteTargetLine.oldLine,
-    new_line: noteTargetLine.newLine,
+    position_type: positionType || TEXT_DIFF_POSITION_TYPE,
+    old_line: noteTargetLine ? noteTargetLine.oldLine : null,
+    new_line: noteTargetLine ? noteTargetLine.newLine : null,
+    x: params.x,
+    y: params.y,
+    width: params.width,
+    height: params.height,
   });
 
   const postData = {
@@ -66,13 +72,19 @@ export function getNoteFormData(params) {
         diffFile.diffRefs.startSha && diffFile.diffRefs.headSha
           ? DIFF_NOTE_TYPE
           : LEGACY_DIFF_NOTE_TYPE,
-      line_code: noteTargetLine.lineCode,
+      line_code: noteTargetLine ? noteTargetLine.lineCode : null,
     },
   };
 
+  return postData;
+}
+
+export function getNoteFormData(params) {
+  const data = getFormData(params);
+
   return {
-    endpoint: noteableData.create_note_path,
-    data: postData,
+    endpoint: params.noteableData.create_note_path,
+    data,
   };
 }
 
@@ -219,6 +231,7 @@ export function prepareDiffData(diffData) {
     Object.assign(file, {
       renderIt: showingLines < LINES_TO_BE_RENDERED_DIRECTLY,
       collapsed: file.text && showingLines > MAX_LINES_TO_BE_RENDERED,
+      discussions: [],
     });
   }
 }
@@ -244,6 +257,7 @@ export function getDiffPositionByLineCode(diffFiles) {
             oldLine,
             newLine,
             lineCode,
+            positionType: 'text',
           };
         }
       });
@@ -259,11 +273,62 @@ export function isDiscussionApplicableToLine({ discussion, diffPosition, latestD
   const { lineCode, ...diffPositionCopy } = diffPosition;
 
   if (discussion.original_position && discussion.position) {
-    const originalRefs = convertObjectPropsToCamelCase(discussion.original_position.formatter);
-    const refs = convertObjectPropsToCamelCase(discussion.position.formatter);
+    const originalRefs = convertObjectPropsToCamelCase(discussion.original_position);
+    const refs = convertObjectPropsToCamelCase(discussion.position);
 
     return _.isEqual(refs, diffPositionCopy) || _.isEqual(originalRefs, diffPositionCopy);
   }
 
   return latestDiff && discussion.active && lineCode === discussion.line_code;
 }
+
+export const generateTreeList = files =>
+  files.reduce(
+    (acc, file) => {
+      const { fileHash, addedLines, removedLines, newFile, deletedFile, newPath } = file;
+      const split = newPath.split('/');
+
+      split.forEach((name, i) => {
+        const parent = acc.treeEntries[split.slice(0, i).join('/')];
+        const path = `${parent ? `${parent.path}/` : ''}${name}`;
+
+        if (!acc.treeEntries[path]) {
+          const type = path === newPath ? 'blob' : 'tree';
+          acc.treeEntries[path] = {
+            key: path,
+            path,
+            name,
+            type,
+            tree: [],
+          };
+
+          const entry = acc.treeEntries[path];
+
+          if (type === 'blob') {
+            Object.assign(entry, {
+              changed: true,
+              tempFile: newFile,
+              deleted: deletedFile,
+              fileHash,
+              addedLines,
+              removedLines,
+            });
+          } else {
+            Object.assign(entry, {
+              opened: true,
+            });
+          }
+
+          (parent ? parent.tree : acc.tree).push(entry);
+        }
+      });
+
+      return acc;
+    },
+    { treeEntries: {}, tree: [] },
+  );
+
+export const getDiffMode = diffFile => {
+  const diffModeKey = Object.keys(diffModes).find(key => diffFile[`${key}File`]);
+  return diffModes[diffModeKey] || diffModes.replaced;
+};

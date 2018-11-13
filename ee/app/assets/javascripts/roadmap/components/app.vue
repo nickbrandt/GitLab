@@ -1,121 +1,124 @@
 <script>
-  import _ from 'underscore';
-  import Flash from '~/flash';
-  import { s__ } from '~/locale';
+import _ from 'underscore';
+import Flash from '~/flash';
+import { s__ } from '~/locale';
 
-  import epicsListEmpty from './epics_list_empty.vue';
-  import roadmapShell from './roadmap_shell.vue';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
+import epicsListEmpty from './epics_list_empty.vue';
+import roadmapShell from './roadmap_shell.vue';
 
-  export default {
-    components: {
-      epicsListEmpty,
-      roadmapShell,
+export default {
+  components: {
+    epicsListEmpty,
+    roadmapShell,
+    GlLoadingIcon,
+  },
+  props: {
+    store: {
+      type: Object,
+      required: true,
     },
-    props: {
-      store: {
-        type: Object,
-        required: true,
-      },
-      service: {
-        type: Object,
-        required: true,
-      },
-      presetType: {
-        type: String,
-        required: true,
-      },
-      hasFiltersApplied: {
-        type: Boolean,
-        required: true,
-      },
-      newEpicEndpoint: {
-        type: String,
-        required: true,
-      },
-      emptyStateIllustrationPath: {
-        type: String,
-        required: true,
-      },
+    service: {
+      type: Object,
+      required: true,
     },
-    data() {
-      return {
-        isLoading: true,
-        isEpicsListEmpty: false,
-        hasError: false,
-        handleResizeThrottled: {},
-      };
+    presetType: {
+      type: String,
+      required: true,
     },
-    computed: {
-      epics() {
-        return this.store.getEpics();
-      },
-      timeframe() {
-        return this.store.getTimeframe();
-      },
-      timeframeStart() {
-        return this.timeframe[0];
-      },
-      timeframeEnd() {
-        const last = this.timeframe.length - 1;
-        return this.timeframe[last];
-      },
-      currentGroupId() {
-        return this.store.getCurrentGroupId();
-      },
-      showRoadmap() {
-        return !this.hasError && !this.isLoading && !this.isEpicsListEmpty;
-      },
+    hasFiltersApplied: {
+      type: Boolean,
+      required: true,
     },
-    mounted() {
-      this.fetchEpics();
-      this.handleResizeThrottled = _.throttle(this.handleResize, 600);
-      window.addEventListener('resize', this.handleResizeThrottled, false);
+    newEpicEndpoint: {
+      type: String,
+      required: true,
     },
-    beforeDestroy() {
-      window.removeEventListener('resize', this.handleResizeThrottled, false);
+    emptyStateIllustrationPath: {
+      type: String,
+      required: true,
     },
-    methods: {
-      fetchEpics() {
-        this.hasError = false;
-        this.service.getEpics()
-          .then(res => res.data)
-          .then((epics) => {
-            this.isLoading = false;
-            if (epics.length) {
-              this.store.setEpics(epics);
-            } else {
-              this.isEpicsListEmpty = true;
-            }
-          })
-          .catch(() => {
-            this.isLoading = false;
-            this.hasError = true;
-            Flash(s__('GroupRoadmap|Something went wrong while fetching epics'));
-          });
-      },
-      /**
-       * Roadmap view works with absolute sizing and positioning
-       * of following child components of RoadmapShell;
-       *
-       * - RoadmapTimelineSection
-       * - TimelineTodayIndicator
-       * - EpicItemTimeline
-       *
-       * And hence when window is resized, any size attributes passed
-       * down to child components are no longer valid, so best approach
-       * to refresh entire app is to re-render it on resize, hence
-       * we toggle `isLoading` variable which is bound to `RoadmapShell`.
-       */
-      handleResize() {
-        this.isLoading = true;
-        // We need to debounce the toggle to make sure loading animation
-        // shows up while app is being rerendered.
-        _.debounce(() => {
+  },
+  data() {
+    return {
+      isLoading: true,
+      isEpicsListEmpty: false,
+      hasError: false,
+      handleResizeThrottled: {},
+    };
+  },
+  computed: {
+    epics() {
+      return this.store.getEpics();
+    },
+    timeframe() {
+      return this.store.getTimeframe();
+    },
+    timeframeStart() {
+      return this.timeframe[0];
+    },
+    timeframeEnd() {
+      const last = this.timeframe.length - 1;
+      return this.timeframe[last];
+    },
+    currentGroupId() {
+      return this.store.getCurrentGroupId();
+    },
+    showRoadmap() {
+      return !this.hasError && !this.isLoading && !this.isEpicsListEmpty;
+    },
+  },
+  mounted() {
+    this.fetchEpics();
+    this.handleResizeThrottled = _.throttle(this.handleResize, 600);
+    window.addEventListener('resize', this.handleResizeThrottled, false);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleResizeThrottled, false);
+  },
+  methods: {
+    fetchEpics() {
+      this.hasError = false;
+      this.service
+        .getEpics()
+        .then(res => res.data)
+        .then(epics => {
           this.isLoading = false;
-        }, 200)();
-      },
+          if (epics.length) {
+            this.store.setEpics(epics);
+          } else {
+            this.isEpicsListEmpty = true;
+          }
+        })
+        .catch(() => {
+          this.isLoading = false;
+          this.hasError = true;
+          Flash(s__('GroupRoadmap|Something went wrong while fetching epics'));
+        });
     },
-  };
+    /**
+     * Roadmap view works with absolute sizing and positioning
+     * of following child components of RoadmapShell;
+     *
+     * - RoadmapTimelineSection
+     * - TimelineTodayIndicator
+     * - EpicItemTimeline
+     *
+     * And hence when window is resized, any size attributes passed
+     * down to child components are no longer valid, so best approach
+     * to refresh entire app is to re-render it on resize, hence
+     * we toggle `isLoading` variable which is bound to `RoadmapShell`.
+     */
+    handleResize() {
+      this.isLoading = true;
+      // We need to debounce the toggle to make sure loading animation
+      // shows up while app is being rerendered.
+      _.debounce(() => {
+        this.isLoading = false;
+      }, 200)();
+    },
+  },
+};
 </script>
 
 <template>

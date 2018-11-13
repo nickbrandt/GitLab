@@ -1,43 +1,67 @@
 require 'spec_helper'
 
 describe LicenseTemplateFinder do
+  set(:project) { create(:project) }
+
+  let(:params) { {} }
+  let(:fake_template_source) { double(::Gitlab::CustomFileTemplates) }
+  let(:custom_template) { ::LicenseTemplate.new(key: 'foo', name: 'foo', category: nil, content: 'Template') }
+  let(:custom_templates) { [custom_template] }
+
+  subject(:finder) { described_class.new(project, params) }
+
   describe '#execute' do
-    subject(:result) { described_class.new(params).execute }
-
-    let(:params) { {} }
-
-    let(:project) { create(:project) }
-    let(:custom) { result.select { |template| template.category == :Custom } }
+    subject(:result) { finder.execute }
 
     before do
-      stub_ee_application_setting(file_template_project: project)
-      allow(Gitlab::Template::CustomLicenseTemplate)
+      expect(Gitlab::CustomFileTemplates)
+        .to receive(:new)
+        .with(::Gitlab::Template::CustomLicenseTemplate, project)
+        .and_return(fake_template_source)
+
+      allow(fake_template_source)
+        .to receive(:find)
+        .with(custom_template.key)
+        .and_return(custom_template)
+
+      allow(fake_template_source)
         .to receive(:all)
-        .with(project)
-        .and_return([OpenStruct.new(name: "custom template")])
+        .and_return(custom_templates)
     end
 
-    context 'custom file templates feature enabled' do
+    context 'custom templates enabled' do
       before do
-        stub_licensed_features(custom_file_templates: true)
+        allow(fake_template_source).to receive(:enabled?).and_return(true)
       end
 
-      it 'includes custom file templates' do
-        expect(custom.map(&:name)).to contain_exactly("custom template")
+      it 'returns custom templates' do
+        is_expected.to include(custom_template)
       end
 
-      it 'skips custom file templates when only "popular" templates are requested' do
-        params[:popular] = true
+      context 'popular_only requested' do
+        let(:params) { { popular: true } }
 
-        expect(custom).to be_empty
+        it 'does not return any custom templates' do
+          is_expected.not_to include(custom_template)
+        end
+      end
+
+      context 'a custom template is specified by name' do
+        let(:params) { { name: custom_template.key } }
+
+        it 'returns the custom template if its name is specified' do
+          is_expected.to eq(custom_template)
+        end
       end
     end
 
-    context 'custom file templates feature disabled' do
-      it 'does not include custom file templates' do
-        stub_licensed_features(custom_file_templates: false)
+    context 'custom templates disabled' do
+      before do
+        allow(fake_template_source).to receive(:enabled?).and_return(false)
+      end
 
-        expect(custom).to be_empty
+      it 'does not return any custom templates' do
+        is_expected.not_to include(custom_template)
       end
     end
   end

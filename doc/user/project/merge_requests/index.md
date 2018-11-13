@@ -33,6 +33,7 @@ With GitLab merge requests, you can:
 
 With **[GitLab Enterprise Edition][ee]**, you can also:
 
+- Prepare a full review and submit it once it's ready with [Merge Request Reviews](../../discussions/index.md#merge-request-reviews) **[PREMIUM]**
 - View the deployment process across projects with [Multi-Project Pipelines](../../../ci/multi_project_pipelines.md#multi-project-pipeline-graphs) **[PREMIUM]**
 - Request [approvals](merge_request_approvals.md) from your managers **[STARTER]**
 - Analyze the impact of your changes with [Code Quality reports](code_quality.md) **[STARTER]**
@@ -149,6 +150,14 @@ you hide discussions that are no longer relevant.
 
 [Read more about resolving discussion comments in merge requests reviews.](../../discussions/index.md)
 
+## Perform a Review **[PREMIUM]**
+
+Start a review in order to create multiple comments on a diff and publish them once you're ready.
+Starting a review allows you to get all your thoughts in order and ensure you haven't missed anything
+before submitting all your comments.
+
+[Learn more about Merge Request Reviews](../../discussions/index.md#merge-request-reviews)
+
 ## Squash and merge
 
 GitLab allows you to squash all changes present in a merge request into a single
@@ -180,6 +189,23 @@ this feature. If it's not enabled to your instance, you may ask your GitLab
 administrator to do so.
 
 ![Create new merge requests by email](img/create_from_email.png)
+
+### Adding patches when creating a merge request via e-mail
+
+> **Note**: This feature was [implemented in GitLab 11.5](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/22723)
+
+You can add commits to the merge request being created by adding
+patches as attachments to the email, all attachments with a filename
+ending in `.patch` will be considered patches. The patches will be processed
+ordered by name.
+
+The combined size of the patches can be 2MB.
+
+If the source branch from the subject does not exist, it will be
+created from the repository's HEAD or the specified target branch to
+apply the patches. The target branch can be specified using the
+[`/target_branch` quick action](../quick_actions.md). If the source
+branch already exists, the patches will be applied on top of it.
 
 ## Find the merge request that introduced a change
 
@@ -309,9 +335,9 @@ all your changes will be available to preview by anyone with the Review Apps lin
 
 ## Merge request diff file navigation
 
-The diff view has a persistent dropdown for file navigation. As you scroll through
-diffs with a large number of files and/or many changes in those files, you can
-easily jump to any changed file through the dropdown navigation.
+The diff view has a file tree for file navigation. As you scroll through
+diffs with a large number of files, you can easily jump to any changed file
+using the file tree.
 
 ![Merge request diff file navigation](img/merge_request_diff_file_navigation.png)
 
@@ -339,6 +365,35 @@ all your changes will be available to preview by anyone with the Review Apps lin
 ## Bulk editing merge requests
 
 Find out about [bulk editing merge requests](../../project/bulk_editing.md).
+
+## Troubleshooting
+
+Sometimes things don't go as expected in a merge request, here are some
+troubleshooting steps.
+
+### Merge request cannot retrieve the pipeline status
+
+This can occur for one of two reasons:
+
+* Sidekiq doesn't pick up the changes fast enough
+* Because of the bug described in [#41545](https://gitlab.com/gitlab-org/gitlab-ce/issues/41545)
+
+#### Sidekiq
+
+Sidekiq didn't process the CI state change fast enough. Please wait a few
+seconds and the status will update automatically.
+
+#### Bug
+
+Merge Request pipeline statuses can't be retrieved when the following occurs:
+
+1. A Merge Requst is created
+1. The Merge Request is closed
+1. Changes are made in the project
+1. The Merge Request is reopened
+
+To enable the pipeline status to be properly retrieved, close and reopen the
+Merge Request again.
 
 ## Tips
 

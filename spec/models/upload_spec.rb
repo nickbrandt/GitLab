@@ -21,7 +21,8 @@ describe Upload do
           path: __FILE__,
           size: described_class::CHECKSUM_THRESHOLD + 1.kilobyte,
           model: build_stubbed(:user),
-          uploader: double('ExampleUploader')
+          uploader: double('ExampleUploader'),
+          store: ObjectStorage::Store::LOCAL
         )
 
         expect(UploadChecksumWorker)
@@ -35,7 +36,8 @@ describe Upload do
           path: __FILE__,
           size: described_class::CHECKSUM_THRESHOLD,
           model: build_stubbed(:user),
-          uploader: double('ExampleUploader')
+          uploader: double('ExampleUploader'),
+          store: ObjectStorage::Store::LOCAL
         )
 
         expect { upload.save }
@@ -60,7 +62,7 @@ describe Upload do
   describe '#absolute_path' do
     it 'returns the path directly when already absolute' do
       path = '/path/to/namespace/project/secret/file.jpg'
-      upload = described_class.new(path: path)
+      upload = described_class.new(path: path, store: ObjectStorage::Store::LOCAL)
 
       expect(upload).not_to receive(:uploader_class)
 
@@ -69,7 +71,7 @@ describe Upload do
 
     it "delegates to the uploader's absolute_path method" do
       uploader = spy('FakeUploader')
-      upload = described_class.new(path: 'secret/file.jpg')
+      upload = described_class.new(path: 'secret/file.jpg', store: ObjectStorage::Store::LOCAL)
       expect(upload).to receive(:uploader_class).and_return(uploader)
 
       upload.absolute_path
@@ -81,7 +83,8 @@ describe Upload do
   describe '#calculate_checksum!' do
     let(:upload) do
       described_class.new(path: __FILE__,
-                          size: described_class::CHECKSUM_THRESHOLD - 1.megabyte)
+                          size: described_class::CHECKSUM_THRESHOLD - 1.megabyte,
+                          store: ObjectStorage::Store::LOCAL)
     end
 
     it 'sets `checksum` to SHA256 sum of the file' do
@@ -91,7 +94,7 @@ describe Upload do
         .to change { upload.checksum }.from(nil).to(expected)
     end
 
-    it 'sets `checksum` to nil for a non-existant file' do
+    it 'sets `checksum` to nil for a non-existent file' do
       expect(upload).to receive(:exist?).and_return(false)
 
       checksum = Digest::SHA256.file(__FILE__).hexdigest
@@ -104,14 +107,14 @@ describe Upload do
 
   describe '#exist?' do
     it 'returns true when the file exists' do
-      upload = described_class.new(path: __FILE__)
+      upload = described_class.new(path: __FILE__, store: ObjectStorage::Store::LOCAL)
 
       expect(upload).to exist
     end
 
     context 'when the file does not exist' do
       it 'returns false' do
-        upload = described_class.new(path: "#{__FILE__}-nope")
+        upload = described_class.new(path: "#{__FILE__}-nope", store: ObjectStorage::Store::LOCAL)
 
         expect(upload).not_to exist
       end
@@ -139,7 +142,7 @@ describe Upload do
 
       context 'when the record is not persisted' do
         it 'does not send a message to Sentry' do
-          upload = described_class.new(path: "#{__FILE__}-nope")
+          upload = described_class.new(path: "#{__FILE__}-nope", store: ObjectStorage::Store::LOCAL)
 
           expect(Raven).not_to receive(:capture_message)
 
@@ -147,7 +150,7 @@ describe Upload do
         end
 
         it 'does not increment a metric counter' do
-          upload = described_class.new(path: "#{__FILE__}-nope")
+          upload = described_class.new(path: "#{__FILE__}-nope", store: ObjectStorage::Store::LOCAL)
 
           expect(Gitlab::Metrics).not_to receive(:counter)
 

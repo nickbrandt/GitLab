@@ -31,9 +31,7 @@ describe('Issue card component', () => {
       groupId: null,
     });
 
-    expect(
-      vm.$el.querySelector('.board-card-weight'),
-    ).toBeNull();
+    expect(vm.$el.querySelector('.board-card-weight')).toBeNull();
   });
 
   it('renders issue weight if specified', () => {

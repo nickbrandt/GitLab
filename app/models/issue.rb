@@ -3,16 +3,12 @@
 require 'carrierwave/orm/activerecord'
 
 class Issue < ActiveRecord::Base
-  prepend EE::Issue
-  prepend EE::RelativePositioning
-
   include AtomicInternalId
   include IidRoutes
   include Issuable
   include Noteable
   include Referable
   include Spammable
-  include Elastic::IssuesSearch
   include FasterCacheKeys
   include RelativePositioning
   include TimeTrackable
@@ -44,9 +40,6 @@ class Issue < ActiveRecord::Base
 
   has_many :issue_assignees
   has_many :assignees, class_name: "User", through: :issue_assignees
-
-  has_one :epic_issue
-  has_one :epic, through: :epic_issue
 
   validates :project, presence: true
 
@@ -177,41 +170,6 @@ class Issue < ActiveRecord::Base
     "#{project.to_reference(from, full: full)}#{reference}"
   end
 
-  # All branches containing the current issue's ID, except for
-  # those with a merge request open referencing the current issue.
-  # rubocop: disable CodeReuse/ServiceClass
-  def related_branches(current_user)
-    branches_with_iid = project.repository.branch_names.select do |branch|
-      branch =~ /\A#{iid}-(?!\d+-stable)/i
-    end
-
-    branches_with_merge_request =
-      Issues::ReferencedMergeRequestsService
-        .new(project, current_user)
-        .referenced_merge_requests(self)
-        .map(&:source_branch)
-
-    branches_with_iid - branches_with_merge_request
-  end
-  # rubocop: enable CodeReuse/ServiceClass
-
-  def related_issues(current_user, preload: nil)
-    related_issues = Issue
-                       .select(['issues.*', 'issue_links.id AS issue_link_id'])
-                       .joins("INNER JOIN issue_links ON
-                                 (issue_links.source_id = issues.id AND issue_links.target_id = #{id})
-                                 OR
-                                 (issue_links.target_id = issues.id AND issue_links.source_id = #{id})")
-                       .preload(preload)
-                       .reorder('issue_link_id')
-
-    cross_project_filter = -> (issues) { issues.where(project: project) }
-    Ability.issues_readable_by_user(
-      related_issues, current_user,
-      filters: { read_cross_project: cross_project_filter }
-    )
-  end
-
   def suggested_branch_name
     return to_branch_name unless project.repository.branch_exists?(to_branch_name)
 
@@ -282,7 +240,8 @@ class Issue < ActiveRecord::Base
           reference_path: issue_reference,
           real_path: url_helper.project_issue_path(project, self),
           issue_sidebar_endpoint: url_helper.project_issue_path(project, self, format: :json, serializer: 'sidebar'),
-          toggle_subscription_endpoint: url_helper.toggle_subscription_project_issue_path(project, self)
+          toggle_subscription_endpoint: url_helper.toggle_subscription_project_issue_path(project, self),
+          assignable_labels_endpoint: url_helper.project_labels_path(project, format: :json, include_ancestor_groups: true)
         )
       end
 
@@ -348,3 +307,5 @@ class Issue < ActiveRecord::Base
     Gitlab::EtagCaching::Store.new.touch(key)
   end
 end
+
+Issue.prepend(EE::Issue)

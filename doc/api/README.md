@@ -20,13 +20,14 @@ following locations:
 - [Custom Attributes](custom_attributes.md)
 - [Deployments](deployments.md)
 - [Deploy Keys](deploy_keys.md)
+- [Dockerfile templates](templates/dockerfiles.md)
 - [Environments](environments.md)
 - [Epics](epics.md) **[ULTIMATE]**
 - [Epic Issues](epic_issues.md) **[ULTIMATE]**
 - [Events](events.md)
 - [Feature flags](features.md)
 - [Geo Nodes](geo_nodes.md) **[PREMIUM]**
-- [Gitignores templates](templates/gitignores.md)
+- [Gitignore templates](templates/gitignores.md)
 - [GitLab CI Config templates](templates/gitlab_ci_ymls.md)
 - [Groups](groups.md)
 - [Group Access Requests](access_requests.md)
@@ -62,10 +63,12 @@ following locations:
 - [Project import/export](project_import_export.md)
 - [Project Members](members.md)
 - [Project Snippets](project_snippets.md)
+- [Project Templates](project_templates.md)
 - [Protected Branches](protected_branches.md)
 - [Protected Tags](protected_tags.md)
 - [Repositories](repositories.md)
 - [Repository Files](repository_files.md)
+- [Repository Submodules](repository_submodules.md)
 - [Runners](runners.md)
 - [Search](search.md)
 - [Services](services.md)
@@ -74,6 +77,7 @@ following locations:
 - [System Hooks](system_hooks.md)
 - [Tags](tags.md)
 - [Todos](todos.md)
+- [Triggering Pipelines](../ci/triggers/README.md)
 - [Users](users.md)
 - [Validate CI configuration](lint.md)
 - [V3 to V4](v3_to_v4.md)
@@ -239,6 +243,9 @@ provided you are authenticated as an administrator with an OAuth or Personal Acc
 You need to pass the `sudo` parameter either via query string or a header with an ID/username of
 the user you want to perform the operation as. If passed as a header, the
 header name must be `Sudo`.
+
+NOTE: **Note:**
+Usernames are case insensitive.
 
 If a non administrative access token is provided, an error message will
 be returned with status code `403`:

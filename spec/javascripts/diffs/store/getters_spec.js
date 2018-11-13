@@ -49,15 +49,17 @@ describe('Diffs Module Getters', () => {
     });
   });
 
-  describe('areAllFilesCollapsed', () => {
+  describe('hasCollapsedFile', () => {
     it('returns true when all files are collapsed', () => {
       localState.diffFiles = [{ collapsed: true }, { collapsed: true }];
-      expect(getters.areAllFilesCollapsed(localState)).toEqual(true);
+
+      expect(getters.hasCollapsedFile(localState)).toEqual(true);
     });
 
-    it('returns false when at least one file is not collapsed', () => {
+    it('returns true when at least one file is collapsed', () => {
       localState.diffFiles = [{ collapsed: false }, { collapsed: true }];
-      expect(getters.areAllFilesCollapsed(localState)).toEqual(false);
+
+      expect(getters.hasCollapsedFile(localState)).toEqual(true);
     });
   });
 
@@ -244,6 +246,7 @@ describe('Diffs Module Getters', () => {
 
     it('returns false when no line discussions were found', () => {
       line.discussions = [];
+
       expect(getters.shouldRenderInlineCommentRow(localState)(line)).toEqual(false);
     });
 
@@ -288,7 +291,35 @@ describe('Diffs Module Getters', () => {
 
     it('returns null if no matching file is found', () => {
       localState.diffFiles = [];
+
       expect(getters.getDiffFileByHash(localState)('123')).toBeUndefined();
+    });
+  });
+
+  describe('allBlobs', () => {
+    it('returns an array of blobs', () => {
+      localState.treeEntries = {
+        file: {
+          type: 'blob',
+        },
+        tree: {
+          type: 'tree',
+        },
+      };
+
+      expect(getters.allBlobs(localState)).toEqual([
+        {
+          type: 'blob',
+        },
+      ]);
+    });
+  });
+
+  describe('diffFilesLength', () => {
+    it('returns length of diff files', () => {
+      localState.diffFiles.push('test', 'test 2');
+
+      expect(getters.diffFilesLength(localState)).toBe(2);
     });
   });
 });

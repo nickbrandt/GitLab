@@ -1,6 +1,5 @@
 import _ from 'underscore';
 import * as constants from '../constants';
-import { reduceDiscussionsToLineCodes } from './utils';
 import { collapseSystemNotes } from './collapse_utils';
 
 export const discussions = state => collapseSystemNotes(state.discussions);
@@ -10,6 +9,8 @@ export const targetNoteHash = state => state.targetNoteHash;
 export const getNotesData = state => state.notesData;
 
 export const isNotesFetched = state => state.isNotesFetched;
+
+export const isLoading = state => state.isLoading;
 
 export const getNotesDataByProp = state => prop => state.notesData[prop];
 
@@ -28,9 +29,6 @@ export const notesById = state =>
     note.notes.every(n => Object.assign(acc, { [n.id]: n }));
     return acc;
   }, {});
-
-export const discussionsStructuredByLineCode = state =>
-  reduceDiscussionsToLineCodes(state.discussions);
 
 export const noteableType = state => {
   const { ISSUE_NOTEABLE_TYPE, MERGE_REQUEST_NOTEABLE_TYPE, EPIC_NOTEABLE_TYPE } = constants;
@@ -73,6 +71,9 @@ export const allDiscussions = (state, getters) => {
 
   return Object.values(resolved).concat(unresolved);
 };
+
+export const isDiscussionResolved = (state, getters) => discussionId =>
+  getters.resolvedDiscussionsById[discussionId] !== undefined;
 
 export const allResolvableDiscussions = (state, getters) =>
   getters.allDiscussions.filter(d => !d.individual_note && d.resolvable);
@@ -126,8 +127,8 @@ export const unresolvedDiscussionsIdsByDiff = (state, getters) =>
       const filenameComparison = a.diff_file.file_path.localeCompare(b.diff_file.file_path);
 
       // Get the line numbers, to compare within the same file
-      const aLines = [a.position.formatter.new_line, a.position.formatter.old_line];
-      const bLines = [b.position.formatter.new_line, b.position.formatter.old_line];
+      const aLines = [a.position.new_line, a.position.old_line];
+      const bLines = [b.position.new_line, b.position.old_line];
 
       return filenameComparison < 0 ||
         (filenameComparison === 0 &&
@@ -190,6 +191,11 @@ export const firstUnresolvedDiscussionId = (state, getters) => diffOrder => {
   }
   return getters.unresolvedDiscussionsIdsByDate[0];
 };
+
+export const getDiscussion = state => discussionId =>
+  state.discussions.find(discussion => discussion.id === discussionId);
+
+export const commentsDisabled = state => state.commentsDisabled;
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

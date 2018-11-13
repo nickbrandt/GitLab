@@ -3,6 +3,7 @@ import Sortable from 'sortablejs';
 import tooltip from '~/vue_shared/directives/tooltip';
 import Icon from '~/vue_shared/components/icon.vue';
 import sortableConfig from 'ee/sortable/sortable_config';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 import eventHub from '../event_hub';
 import issueItem from './issue_item.vue';
 import addIssuableForm from './add_issuable_form.vue';
@@ -16,6 +17,7 @@ export default {
     Icon,
     addIssuableForm,
     issueItem,
+    GlLoadingIcon,
   },
   props: {
     isFetching: {
@@ -147,7 +149,7 @@ export default {
         :class="{ 'panel-empty-heading border-bottom-0': !hasBody }"
         class="card-header"
       >
-        <h3 class="card-title mt-0 mb-0">
+        <h3 class="card-title mt-0 mb-0 h5">
           {{ title }}
           <a
             v-if="hasHelpPath"
@@ -179,7 +181,7 @@ fa fa-question-circle"
               ref="issueCountBadgeAddButton"
               type="button"
               class="js-issue-count-badge-add-button
-issue-count-badge-add-button btn btn-sm btn-default"
+issue-count-badge-add-button btn btn-sm btn-default qa-add-issues-button"
               aria-label="Add an issue"
               data-placement="top"
               @click="toggleAddRelatedIssuesForm"
@@ -211,7 +213,7 @@ issue-count-badge-add-button btn btn-sm btn-default"
           'collapsed': !shouldShowTokenBody,
           'sortable-container': canReorder
         }"
-        class="related-issues-token-body card-body"
+        class="related-issues-token-body"
       >
         <div
           v-if="isFetching"
@@ -237,7 +239,7 @@ issue-count-badge-add-button btn btn-sm btn-default"
             }"
             :data-key="issue.id"
             :data-epic-issue-id="issue.epic_issue_id"
-            class="js-related-issues-token-list-item"
+            class="js-related-issues-token-list-item related-issues-list-item pt-0 pb-0"
           >
             <issue-item
               :id-key="issue.id"

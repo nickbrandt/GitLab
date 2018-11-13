@@ -1,0 +1,5 @@
+---
+title: Allow filtering by weight in issues API
+merge_request: 8140
+author: Heinrich Lee Yu
+type: added

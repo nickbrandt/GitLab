@@ -18,8 +18,8 @@ describe Geo::RepositoryVerification::Primary::BatchWorker, :postgresql, :clean_
 
   describe '#perform' do
     it 'skips backfill for repositories on other shards' do
-      create(:project, repository_storage: 'broken')
-      unhealthy_outdated = create(:project, repository_storage: 'broken')
+      create(:project, :broken_storage)
+      unhealthy_outdated = create(:project, :broken_storage)
 
       create(:repository_state, :repository_outdated, project: unhealthy_outdated)
 
@@ -50,8 +50,8 @@ describe Geo::RepositoryVerification::Primary::BatchWorker, :postgresql, :clean_
     end
 
     it 'skips backfill for projects with downed Gitaly server' do
-      create(:project, repository_storage: 'broken')
-      unhealthy_outdated = create(:project, repository_storage: 'broken')
+      create(:project, :broken_storage)
+      unhealthy_outdated = create(:project, :broken_storage)
 
       create(:repository_state, :repository_outdated, project: unhealthy_outdated)
 

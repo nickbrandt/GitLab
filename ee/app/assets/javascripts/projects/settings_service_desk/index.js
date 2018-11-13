@@ -14,9 +14,7 @@ export default () => {
       data() {
         const { dataset } = serviceDeskRootElement;
         return {
-          initialIsEnabled: convertPermissionToBoolean(
-            dataset.enabled,
-          ),
+          initialIsEnabled: convertPermissionToBoolean(dataset.enabled),
           endpoint: dataset.endpoint,
           incomingEmail: dataset.incomingEmail,
         };

@@ -1,0 +1,5 @@
+---
+title: Geo - Redirect user back to the secondary after a logout & re-login via the primary
+merge_request: 8157
+author:
+type: fixed

@@ -7,7 +7,7 @@ import eventHub from '~/sidebar/event_hub';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import Mock from './ee_mock_data';
 
-describe('Sidebar Weight', function () {
+describe('Sidebar Weight', function() {
   let vm;
   let sidebarMediator;
   let SidebarWeight;

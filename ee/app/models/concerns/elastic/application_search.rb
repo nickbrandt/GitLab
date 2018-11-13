@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Elastic
   module ApplicationSearch
     extend ActiveSupport::Concern
@@ -6,6 +7,9 @@ module Elastic
       include Elasticsearch::Model
 
       index_name [Rails.application.class.parent_name.downcase, Rails.env].join('-')
+
+      # ES6 requires a single type per index
+      document_type 'doc'
 
       settings \
         index: {
@@ -37,9 +41,159 @@ module Elastic
           }
         }
 
+      # Since we can't have multiple types in ES6, but want to be able to use JOINs, we must declare all our
+      # fields together instead of per model
+      mappings do
+        ### Shared fields
+        indexes :id, type: :integer
+        indexes :created_at, type: :date
+        indexes :updated_at, type: :date
+
+        # ES6-compatible way of having a parent, this is shared with all
+        # Please note that if we add a parent to `project` we'll have to use that "grand-parent" as the routing value
+        # for all children of project - therefore it is not advised.
+        indexes :join_field, type: :join,
+                             relations: {
+                               project: %i(
+                                 issue
+                                 merge_request
+                                 milestone
+                                 note
+                                 blob
+                                 wiki_blob
+                                 commit
+                               )
+                             }
+        # ES6 requires a single type per index, so we implement our own "type"
+        indexes :type, type: :keyword
+
+        indexes :iid, type: :integer
+
+        indexes :title, type: :text,
+                        index_options: 'offsets'
+        indexes :description, type: :text,
+                              index_options: 'offsets'
+        indexes :state, type: :text
+        indexes :project_id, type: :integer
+        indexes :author_id, type: :integer
+
+        ## Projects and Snippets
+        indexes :visibility_level, type: :integer
+
+        ### ISSUES
+        indexes :confidential, type: :boolean
+
+        # The field assignee_id does not exist in issues table anymore.
+        # Nevertheless we'll keep this field as is because we don't want users to rebuild index
+        # + the ES treats arrays transparently so
+        # to any integer field you can write any array of integers and you don't have to change mapping.
+        # More over you can query those items just like a single integer value.
+        indexes :assignee_id, type: :integer
+
+        ### MERGE REQUESTS
+        indexes :target_branch, type: :text,
+                                index_options: 'offsets'
+        indexes :source_branch, type: :text,
+                                index_options: 'offsets'
+        indexes :merge_status, type: :text
+        indexes :source_project_id, type: :integer
+        indexes :target_project_id, type: :integer
+
+        ### NOTES
+        indexes :note, type: :text,
+                       index_options: 'offsets'
+
+        indexes :issue do
+          indexes :assignee_id, type: :integer
+          indexes :author_id, type: :integer
+          indexes :confidential, type: :boolean
+        end
+
+        # ES6 gets rid of "index: :not_analyzed" option, but a keyword type behaves the same
+        # as it is not analyzed and is only searchable by its exact value.
+        indexes :noteable_type, type: :keyword
+        indexes :noteable_id, type: :keyword
+
+        ### PROJECTS
+        indexes :name, type: :text,
+                       index_options: 'offsets'
+        indexes :path, type: :text,
+                       index_options: 'offsets'
+        indexes :name_with_namespace, type: :text,
+                                      index_options: 'offsets',
+                                      analyzer: :my_ngram_analyzer
+        indexes :path_with_namespace, type: :text,
+                                      index_options: 'offsets'
+        indexes :namespace_id, type: :integer
+        indexes :archived, type: :boolean
+
+        indexes :issues_access_level, type: :integer
+        indexes :merge_requests_access_level, type: :integer
+        indexes :snippets_access_level, type: :integer
+        indexes :wiki_access_level, type: :integer
+        indexes :repository_access_level, type: :integer
+
+        indexes :last_activity_at, type: :date
+        indexes :last_pushed_at, type: :date
+
+        ### SNIPPETS
+        indexes :file_name, type: :text,
+                            index_options: 'offsets'
+        indexes :content, type: :text,
+                          index_options: 'offsets'
+
+        ### REPOSITORIES
+        indexes :blob do
+          indexes :id, type: :text,
+                       index_options: 'offsets',
+                       analyzer: :sha_analyzer
+          indexes :rid, type: :keyword
+          indexes :oid, type: :text,
+                        index_options: 'offsets',
+                        analyzer: :sha_analyzer
+          indexes :commit_sha, type: :text,
+                               index_options: 'offsets',
+                               analyzer: :sha_analyzer
+          indexes :path, type: :text,
+                         analyzer: :path_analyzer
+          indexes :file_name, type: :text,
+                              analyzer: :code_analyzer,
+                              search_analyzer: :code_search_analyzer
+          indexes :content, type: :text,
+                            index_options: 'offsets',
+                            analyzer: :code_analyzer,
+                            search_analyzer: :code_search_analyzer
+          indexes :language, type: :keyword
+        end
+
+        indexes :commit do
+          indexes :id, type: :text,
+                       index_options: 'offsets',
+                       analyzer: :sha_analyzer
+          indexes :rid, type: :keyword
+          indexes :sha, type: :text,
+                        index_options: 'offsets',
+                        analyzer: :sha_analyzer
+
+          indexes :author do
+            indexes :name, type: :text, index_options: 'offsets'
+            indexes :email, type: :text, index_options: 'offsets'
+            indexes :time, type: :date, format: :basic_date_time_no_millis
+          end
+
+          indexes :commiter do
+            indexes :name, type: :text, index_options: 'offsets'
+            indexes :email, type: :text, index_options: 'offsets'
+            indexes :time, type: :date, format: :basic_date_time_no_millis
+          end
+
+          indexes :message, type: :text, index_options: 'offsets'
+        end
+      end
+
       after_commit on: :create do
         if Gitlab::CurrentSettings.elasticsearch_indexing? && self.searchable?
-          ElasticIndexerWorker.perform_async(:index, self.class.to_s, self.id)
+          ElasticIndexerWorker.perform_async(:index, self.class.to_s, self.id, self.es_id)
         end
       end
 
@@ -49,6 +203,7 @@ module Elastic
             :update,
             self.class.to_s,
             self.id,
+            self.es_id,
             changed_fields: self.previous_changes.keys
           )
         end
@@ -60,7 +215,8 @@ module Elastic
             :delete,
             self.class.to_s,
             self.id,
-            project_id: self.es_parent
+            self.es_id,
+            es_parent: self.es_parent
           )
         end
       end
@@ -70,8 +226,26 @@ module Elastic
         true
       end
 
+      def generic_attributes
+        {
+          'join_field' => {
+            'name' => es_type,
+            'parent' => es_parent
+          },
+          'type' => es_type
+        }
+      end
+
       def es_parent
-        project_id if respond_to?(:project_id)
+        "project_#{project_id}" unless is_a?(Project) || self&.project_id.nil?
+      end
+
+      def es_type
+        self.class.es_type
+      end
+
+      def es_id
+        "#{es_type}_#{id}"
       end
 
       # Some attributes are actually complicated methods. Bad data can cause
@@ -91,6 +265,10 @@ module Elastic
         false
       end
 
+      def es_type
+        name.underscore
+      end
+
       def highlight_options(fields)
         es_fields = fields.map { |field| field.split('^').first }.each_with_object({}) do |field, memo|
           memo[field.to_sym] = {}
@@ -99,9 +277,11 @@ module Elastic
         { fields: es_fields }
       end
 
-      def import_with_parent(options = {})
+      def es_import(options = {})
         transform = lambda do |r|
-          { index: { _id: r.id, _parent: r.es_parent, data: r.__elasticsearch__.as_indexed_json } }
+          { index: { _id: r.es_id, data: r.__elasticsearch__.as_indexed_json } }.tap do |data|
+            data[:index][:routing] = r.es_parent if r.es_parent
+          end
         end
 
         options[:transform] = transform
@@ -120,6 +300,9 @@ module Elastic
                                  query: query,
                                  default_operator: :and
                                }
+                             }],
+                             filter: [{
+                               term: { type: self.es_type }
                              }]
                            }
                          }

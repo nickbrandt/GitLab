@@ -29,6 +29,8 @@ module EE
       has_one :jenkins_service
       has_one :jenkins_deprecated_service
       has_one :github_service
+      has_one :gitlab_slack_application_service
+      has_one :tracing_setting, class_name: 'ProjectTracingSetting'
 
       has_many :approvers, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
       has_many :approver_groups, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
@@ -48,6 +50,10 @@ module EE
       has_many :source_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :project_id
 
       has_many :prometheus_alerts, inverse_of: :project
+      has_many :prometheus_alert_events, inverse_of: :project
+
+      has_many :operations_feature_flags, class_name: 'Operations::FeatureFlag'
+      has_one :operations_feature_flags_client, class_name: 'Operations::FeatureFlagsClient'
 
       scope :with_shared_runners_limit_enabled, -> { with_shared_runners.non_public_only }
 
@@ -69,6 +75,7 @@ module EE
       scope :verified_wikis, -> { joins(:repository_state).merge(ProjectRepositoryState.verified_wikis) }
       scope :verification_failed_repos, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_repos) }
       scope :verification_failed_wikis, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_wikis) }
+      scope :for_plan_name, -> (name) { joins(namespace: :plan).where(plans: { name: name }) }
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
         to: :statistics, allow_nil: true
@@ -87,6 +94,9 @@ module EE
       end
 
       default_value_for :packages_enabled, true
+      default_value_for :only_mirror_protected_branches, true
+
+      delegate :store_security_reports_available?, to: :namespace
     end
 
     class_methods do
@@ -100,15 +110,13 @@ module EE
       end
     end
 
-    def security_reports_feature_available?
-      feature_available?(:sast) ||
-        feature_available?(:dependency_scanning) ||
-        feature_available?(:sast_container) ||
-        feature_available?(:dast)
+    def tracing_external_url
+      self.tracing_setting.try(:external_url)
     end
 
     def latest_pipeline_with_security_reports
-      pipelines.newest_first(default_branch).with_security_reports.first
+      pipelines.newest_first(ref: default_branch).with_security_reports.first ||
+        pipelines.newest_first(ref: default_branch).with_legacy_security_reports.first
     end
 
     def environments_for_scope(scope)
@@ -124,7 +132,7 @@ module EE
     end
 
     def shared_runners_limit_namespace
-      if Feature.enabled?(:shared_runner_minutes_on_root_namespace)
+      if ::Feature.enabled?(:shared_runner_minutes_on_root_namespace)
         root_namespace
       else
         namespace
@@ -262,7 +270,7 @@ module EE
       if ProjectFeature::FEATURES.include?(feature)
         super
       else
-        licensed_feature_available?(feature)
+        licensed_feature_available?(feature, user)
       end
     end
 
@@ -314,7 +322,7 @@ module EE
       end
     end
 
-    def secret_variables_for(ref:, environment: nil)
+    def ci_variables_for(ref:, environment: nil)
       return super.where(environment_scope: '*') unless
         environment && feature_available?(:variable_environment_scope)
 
@@ -558,6 +566,19 @@ module EE
       change_head(root_ref) if root_ref.present? && root_ref != default_branch
     end
 
+    def feature_flags_client_token
+      instance = operations_feature_flags_client || create_operations_feature_flags_client!
+      instance.token
+    end
+
+    def root_namespace
+      if namespace.has_parent?
+        namespace.root_ancestor
+      else
+        namespace
+      end
+    end
+
     private
 
     def set_override_pull_mirror_available
@@ -569,7 +590,10 @@ module EE
       import_state.set_next_execution_to_now
     end
 
-    def licensed_feature_available?(feature)
+    def licensed_feature_available?(feature, user = nil)
+      # This feature might not be behind a feature flag at all, so default to true
+      return false unless ::Feature.enabled?(feature, user, default_enabled: true)
+
       available_features = strong_memoize(:licensed_feature_available) do
         Hash.new do |h, feature|
           h[feature] = load_licensed_feature_available(feature)
@@ -592,17 +616,6 @@ module EE
 
     def validate_board_limit(board)
       # Board limits are disabled in EE, so this method is just a no-op.
-    end
-
-    override :after_rename_repository
-    def after_rename_repository(full_path_before, path_before)
-      super(full_path_before, path_before)
-
-      ::Geo::RepositoryRenamedEventStore.new(
-        self,
-        old_path: path_before,
-        old_path_with_namespace: full_path_before
-      ).create!
     end
   end
 end

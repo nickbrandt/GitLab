@@ -5,6 +5,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
 import CIIcon from '~/vue_shared/components/ci_icon.vue';
 import TimeAgoTooltip from '~/vue_shared/components/time_ago_tooltip.vue';
+import CommitPipelineStatus from '~/projects/tree/components/commit_pipeline_status_component.vue';
 
 /**
  * CommitItem
@@ -29,6 +30,7 @@ export default {
     ClipboardButton,
     CIIcon,
     TimeAgoTooltip,
+    CommitPipelineStatus,
   },
   props: {
     commit: {
@@ -41,7 +43,9 @@ export default {
       return (this.commit.author && this.commit.author.name) || this.commit.authorName;
     },
     authorUrl() {
-      return (this.commit.author && this.commit.author.webUrl) || `mailto:${this.commit.authorEmail}`;
+      return (
+        (this.commit.author && this.commit.author.webUrl) || `mailto:${this.commit.authorEmail}`
+      );
     },
     authorAvatar() {
       return (this.commit.author && this.commit.author.avatarUrl) || this.commit.authorGravatarUrl;
@@ -102,6 +106,14 @@ export default {
         ></pre>
       </div>
       <div class="commit-actions flex-row d-none d-sm-flex">
+        <div
+          v-if="commit.signatureHtml"
+          v-html="commit.signatureHtml"
+        ></div>
+        <commit-pipeline-status
+          v-if="commit.pipelineStatusPath"
+          :endpoint="commit.pipelineStatusPath"
+        />
         <div class="commit-sha-group">
           <div
             class="label label-monospace"

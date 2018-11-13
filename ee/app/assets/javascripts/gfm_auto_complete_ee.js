@@ -9,7 +9,7 @@ const setupAutoCompleteEpics = ($input, defaultCallbacks) => {
     displayTpl(value) {
       let tmpl = GfmAutoComplete.Loading.template;
       if (value.title != null) {
-        tmpl = GfmAutoComplete.Issues.template;
+        tmpl = GfmAutoComplete.Issues.templateFunction(value.id, value.title);
       }
       return tmpl;
     },
@@ -19,7 +19,7 @@ const setupAutoCompleteEpics = ($input, defaultCallbacks) => {
     callbacks: {
       ...defaultCallbacks,
       beforeSave(merges) {
-        return $.map(merges, (m) => {
+        return $.map(merges, m => {
           if (m.title == null) {
             return m;
           }

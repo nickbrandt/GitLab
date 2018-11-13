@@ -152,10 +152,14 @@ export default {
       this.state = 'gettingStarted';
     } else {
       if (this.showEnvironmentDropdown) {
-        this.servicePromises.push(this.service
-        .getEnvironmentsData()
-        .then((data) => this.store.storeEnvironmentsData(data))
-        .catch(() => Flash(s__('Metrics|There was an error getting environments information.'))));
+        this.servicePromises.push(
+          this.service
+            .getEnvironmentsData()
+            .then(data => this.store.storeEnvironmentsData(data))
+            .catch(() =>
+              Flash(s__('Metrics|There was an error getting environments information.')),
+            ),
+        );
       }
       this.getGraphsData();
       window.addEventListener('resize', this.resizeThrottled, false);
@@ -175,6 +179,7 @@ export default {
             this.state = 'noData';
             return;
           }
+
           this.showEmptyState = false;
         })
         .then(this.resize)
@@ -216,7 +221,10 @@ export default {
             name="chevron-down"
           />
         </button>
-        <div class="dropdown-menu dropdown-menu-selectable dropdown-menu-drop-up">
+        <div 
+          v-if="store.environmentsData.length > 0"  
+          class="dropdown-menu dropdown-menu-selectable dropdown-menu-drop-up"
+        >
           <ul>
             <li
               v-for="environment in store.environmentsData"
@@ -252,12 +260,26 @@ export default {
         :small-graph="forceSmallGraph"
       >
         <!-- EE content -->
+        <template
+          slot="additionalSvgContent"
+          scope="{ graphDrawData }"
+        >
+          <threshold-lines
+            v-for="(alert, alertName) in alertData[graphData.id]"
+            :key="alertName"
+            :operator="alert.operator"
+            :threshold="alert.threshold"
+            :graph-draw-data="graphDrawData"
+          />
+        </template>
         <alert-widget
           v-if="alertsEndpoint && graphData.id"
           :alerts-endpoint="alertsEndpoint"
           :label="getGraphLabel(graphData)"
           :current-alerts="getQueryAlerts(graphData)"
           :custom-metric-id="graphData.id"
+          :alert-data="alertData[graphData.id]"
+          @setAlerts="setAlerts"
         />
       </graph>
     </graph-group>

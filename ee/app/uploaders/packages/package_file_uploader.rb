@@ -5,6 +5,8 @@ class Packages::PackageFileUploader < GitlabUploader
 
   storage_options Gitlab.config.packages
 
+  alias_method :upload, :model
+
   def filename
     model.file_name
   end

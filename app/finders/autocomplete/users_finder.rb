@@ -2,8 +2,6 @@
 
 module Autocomplete
   class UsersFinder
-    prepend EE::Autocomplete::UsersFinder
-
     # The number of users to display in the results is hardcoded to 20, and
     # pagination is not supported. This ensures that performance remains
     # consistent and removes the need for implementing keyset pagination to
@@ -74,7 +72,6 @@ module Autocomplete
       author_id.present? && current_user
     end
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def find_users
       if project
         project.authorized_users.union_with_user(author_id)
@@ -86,6 +83,7 @@ module Autocomplete
         User.none
       end
     end
-    # rubocop: enable CodeReuse/ActiveRecord
   end
 end
+
+Autocomplete::UsersFinder.prepend(EE::Autocomplete::UsersFinder)

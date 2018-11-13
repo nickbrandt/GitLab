@@ -29,23 +29,19 @@ Any change in the URL will need to be reflected on disk (when groups / users or
 projects are renamed). This can add a lot of load in big installations,
 especially if using any type of network based filesystem.
 
+CAUTION: **Caution:**
 For Geo in particular: Geo does work with legacy storage, but in some
 edge cases due to race conditions it can lead to errors when a project is
 renamed multiple times in short succession, or a project is deleted and
 recreated under the same name very quickly. We expect these race events to be
 rare, and we have not observed a race condition side-effect happening yet.
-
 This pattern also exists in other objects stored in GitLab, like issue
 Attachments, GitLab Pages artifacts, Docker Containers for the integrated
-Registry, etc.
+Registry, etc. Hashed storage is a requirement for Geo. 
 
 ## Hashed Storage
 
-> **Warning:** Hashed storage is in **Beta**. For the latest updates, check the
-> associated [issue](https://gitlab.com/gitlab-com/infrastructure/issues/3542)
-> and please report any problems you encounter.
-
-Hashed Storage is the new storage behavior we are rolling out with 10.0. Instead
+Hashed Storage is the new storage behavior we rolled out with 10.0. Instead
 of coupling project URL and the folder structure where the repository will be
 stored on disk, we are coupling a hash, based on the project's ID. This makes
 the folder structure immutable, and therefore eliminates any requirement to

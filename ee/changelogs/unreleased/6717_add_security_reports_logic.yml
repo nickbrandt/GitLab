@@ -1,0 +1,5 @@
+---
+title: Parse SAST reports and store vulnerabilities in database
+merge_request: 7578
+author:
+type: added

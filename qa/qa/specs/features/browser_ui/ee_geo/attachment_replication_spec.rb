@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  context :geo, :orchestrated, :geo do
+  context 'Geo', :orchestrated, :geo do
     describe 'GitLab Geo attachment replication' do
       let(:file_to_attach) { File.absolute_path(File.join('spec', 'fixtures', 'banana_sample.gif')) }
 
@@ -9,12 +9,12 @@ module QA
         Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
           Page::Main::Login.act { sign_in_using_credentials }
 
-          project = Factory::Resource::Project.fabricate! do |project|
+          project = Resource::Project.fabricate! do |project|
             project.name = 'project-for-issues'
             project.description = 'project for adding issues'
           end
 
-          issue = Factory::Resource::Issue.fabricate! do |issue|
+          issue = Resource::Issue.fabricate! do |issue|
             issue.title = 'My geo issue'
             issue.project = project
           end
@@ -34,7 +34,7 @@ module QA
 
             expect(page).to have_content 'You are on a secondary, read-only Geo node'
 
-            Page::Menu::Main.perform do |menu|
+            Page::Main::Menu.perform do |menu|
               menu.go_to_projects
             end
 
@@ -44,7 +44,7 @@ module QA
               dashboard.go_to_project(project.name)
             end
 
-            Page::Menu::Side.act { click_issues }
+            Page::Project::Menu.act { click_issues }
 
             Page::Project::Issue::Index.perform do |index|
               index.wait_for_issue_replication(issue)

@@ -12,53 +12,12 @@ module Elasticsearch
         include Elasticsearch::Git::Model
         include Elasticsearch::Git::EncoderHelper
 
-        mapping _parent: { type: 'project' } do
-          indexes :blob do
-            indexes :id,          type: :text,
-                                  index_options: 'offsets',
-                                  analyzer: :sha_analyzer
-            indexes :rid,         type: :keyword
-            indexes :oid,         type: :text,
-                                  index_options: 'offsets',
-                                  analyzer: :sha_analyzer
-            indexes :commit_sha,  type: :text,
-                                  index_options: 'offsets',
-                                  analyzer: :sha_analyzer
-            indexes :path,        type: :text,
-                                  analyzer: :path_analyzer
-            indexes :file_name,   type: :text,
-                                  analyzer: :code_analyzer,
-                                  search_analyzer: :code_search_analyzer
-            indexes :content,     type: :text,
-                                  index_options: 'offsets',
-                                  analyzer: :code_analyzer,
-                                  search_analyzer: :code_search_analyzer
-            indexes :language,    type: :keyword
-          end
+        def es_parent
+          "project_#{project_id}"
+        end
 
-          indexes :commit do
-            indexes :id,          type: :text,
-                                  index_options: 'offsets',
-                                  analyzer: :sha_analyzer
-            indexes :rid,         type: :keyword
-            indexes :sha,         type: :text,
-                                  index_options: 'offsets',
-                                  analyzer: :sha_analyzer
-
-            indexes :author do
-              indexes :name,      type: :text, index_options: 'offsets'
-              indexes :email,     type: :text, index_options: 'offsets'
-              indexes :time,      type: :date, format: :basic_date_time_no_millis
-            end
-
-            indexes :commiter do
-              indexes :name,      type: :text, index_options: 'offsets'
-              indexes :email,     type: :text, index_options: 'offsets'
-              indexes :time,      type: :date, format: :basic_date_time_no_millis
-            end
-
-            indexes :message,     type: :text, index_options: 'offsets'
-          end
+        def es_type
+          'blob'
         end
 
         # Indexing all text-like blobs in repository
@@ -118,9 +77,9 @@ module Elasticsearch
           {
             delete: {
               _index: "#{self.class.index_name}",
-              _type: self.class.name.underscore,
+              _type: 'doc',
               _id: "#{repository_id}_#{blob.path}",
-              _parent: project_id
+              routing: es_parent
             }
           }
         end
@@ -131,12 +90,11 @@ module Elasticsearch
           {
             index:  {
               _index: "#{self.class.index_name}",
-              _type: self.class.name.underscore,
+              _type: 'doc',
               _id: "#{repository_id}_#{blob.path}",
-              _parent: project_id,
+              routing: es_parent,
               data: {
                 blob: {
-                  type: "blob",
                   oid: blob.id,
                   rid: repository_id,
                   content: blob.data,
@@ -150,8 +108,15 @@ module Elasticsearch
                   # install newest versions
                   # https://github.com/elastic/elasticsearch-mapper-attachments/issues/124
                   file_name: blob.path,
+                  # Linguist is not available in the Ruby indexer. The Go indexer can
+                  # fill in the right language.
+                  language: nil
+                },
+                type: es_type,
+                join_field: {
+                  'name' => es_type,
+                  'parent' => es_parent
 
-                  language: blob.language ? blob.language.name : "Text"
                 }
               }
             }
@@ -215,12 +180,11 @@ module Elasticsearch
           {
             index:  {
               _index: "#{self.class.index_name}",
-              _type: self.class.name.underscore,
+              _type: 'doc',
               _id: "#{repository_id}_#{commit.oid}",
-              _parent: project_id,
+              routing: es_parent,
               data: {
                 commit: {
-                  type: "commit",
                   rid: repository_id,
                   sha: commit.oid,
                   author: {
@@ -234,6 +198,11 @@ module Elasticsearch
                     time: committer[:time].strftime('%Y%m%dT%H%M%S%z')
                   },
                   message: encode!(commit.message)
+                },
+                type: 'commit',
+                join_field: {
+                  'name' => 'commit',
+                  'parent' => es_parent
                 }
               }
             }
@@ -286,7 +255,6 @@ module Elasticsearch
               if b.text?
                 result.push(
                   {
-                    type: 'blob',
                     id: "#{target_sha}_#{b.path}",
                     rid: repository_id,
                     oid: b.id,
@@ -310,7 +278,6 @@ module Elasticsearch
             if b.text?
               result.push(
                 {
-                  type: 'blob',
                   id: "#{repository_for_indexing.head.target.oid}_#{path}#{blob[:name]}",
                   rid: repository_id,
                   oid: b.id,
@@ -336,7 +303,6 @@ module Elasticsearch
             if obj.type == :commit
               res.push(
                 {
-                  type: 'commit',
                   sha: obj.oid,
                   author: obj.author,
                   committer: obj.committer,
@@ -408,10 +374,11 @@ module Elasticsearch
           when :all
             results[:blobs] = search_blob(query, page: page, per: per, options: options)
             results[:commits] = search_commit(query, page: page, per: per, options: options)
-          when :blob
-            results[:blobs] = search_blob(query, page: page, per: per, options: options)
+            results[:wiki_blobs] = search_blob(query, type: :wiki_blob, page: page, per: per, options: options)
           when :commit
             results[:commits] = search_commit(query, page: page, per: per, options: options)
+          when :blob, :wiki_blob
+            results[type.to_s.pluralize.to_sym] = search_blob(query, type: type, page: page, per: per, options: options)
           end
 
           results
@@ -432,7 +399,7 @@ module Elasticsearch
                     default_operator: :and
                   }
                 },
-                filter: [{ term: { 'commit.type' => 'commit' } }]
+                filter: [{ term: { 'type' => 'commit' } }]
               }
             },
             size: per,
@@ -479,7 +446,7 @@ module Elasticsearch
           }
         end
 
-        def search_blob(query, type: :all, page: 1, per: 20, options: {})
+        def search_blob(query, type: :blob, page: 1, per: 20, options: {})
           page ||= 1
 
           query = ::Gitlab::Search::Query.new(query) do
@@ -498,7 +465,9 @@ module Elasticsearch
                     fields: %w[blob.content blob.file_name]
                   }
                 },
-                filter: [{ term: { 'blob.type' => 'blob' } }]
+                filter: [
+                  { term: { type: type } }
+                ]
               }
             },
             size: per,

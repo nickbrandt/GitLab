@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 module QA
-  context :geo, :orchestrated, :geo do
+  context 'Geo', :orchestrated, :geo do
     describe 'GitLab Geo project rename replication' do
       it 'user renames project' do
         # create the project and push code
         Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
           Page::Main::Login.act { sign_in_using_credentials }
 
-          project = Factory::Resource::Project.fabricate! do |project|
+          project = Resource::Project.fabricate! do |project|
             project.name = 'geo-before-rename'
             project.description = 'Geo project to be renamed'
           end
@@ -16,7 +16,7 @@ module QA
           geo_project_name = project.name
           expect(project.name).to include 'geo-before-rename'
 
-          Factory::Repository::ProjectPush.fabricate! do |push|
+          Resource::Repository::ProjectPush.fabricate! do |push|
             push.project = project
             push.file_name = 'README.md'
             push.file_content = '# This is Geo project!'
@@ -24,13 +24,13 @@ module QA
           end
 
           # rename the project
-          Page::Menu::Main.act { go_to_projects }
+          Page::Main::Menu.act { go_to_projects }
 
           Page::Dashboard::Projects.perform do |dashboard|
             dashboard.go_to_project(geo_project_name)
           end
 
-          Page::Menu::Side.act { go_to_settings }
+          Page::Project::Menu.act { go_to_settings }
 
           geo_project_renamed = "geo-after-rename-#{SecureRandom.hex(8)}"
           Page::Project::Settings::Main.perform do |settings|
@@ -49,7 +49,7 @@ module QA
               expect(banner).to have_secondary_read_only_banner
             end
 
-            Page::Menu::Main.perform do |menu|
+            Page::Main::Menu.perform do |menu|
               menu.go_to_projects
             end
 

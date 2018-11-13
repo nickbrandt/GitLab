@@ -1,36 +1,36 @@
 <script>
-  import tooltip from '~/vue_shared/directives/tooltip';
-  import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
-  import eventHub from '../event_hub';
+import tooltip from '~/vue_shared/directives/tooltip';
+import ClipboardButton from '~/vue_shared/components/clipboard_button.vue';
+import eventHub from '../event_hub';
 
-  export default {
-    name: 'ServiceDeskSetting',
-    directives: {
-      tooltip,
-    },
+export default {
+  name: 'ServiceDeskSetting',
+  directives: {
+    tooltip,
+  },
 
-    components: {
-      ClipboardButton,
-    },
+  components: {
+    ClipboardButton,
+  },
 
-    props: {
-      isEnabled: {
-        type: Boolean,
-        required: true,
-      },
-      incomingEmail: {
-        type: String,
-        required: false,
-        default: '',
-      },
+  props: {
+    isEnabled: {
+      type: Boolean,
+      required: true,
     },
-    methods: {
-      onCheckboxToggle(e) {
-        const isChecked = e.target.checked;
-        eventHub.$emit('serviceDeskEnabledCheckboxToggled', isChecked);
-      },
+    incomingEmail: {
+      type: String,
+      required: false,
+      default: '',
     },
-  };
+  },
+  methods: {
+    onCheckboxToggle(e) {
+      const isChecked = e.target.checked;
+      eventHub.$emit('serviceDeskEnabledCheckboxToggled', isChecked);
+    },
+  },
+};
 </script>
 
 <template>

@@ -95,4 +95,3 @@ export default {
     </div>
   </gl-modal>
 </template>
-

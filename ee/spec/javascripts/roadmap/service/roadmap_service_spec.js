@@ -14,6 +14,7 @@ describe('RoadmapService', () => {
     it('returns axios instance for Epics path', () => {
       spyOn(axios, 'get').and.stub();
       service.getEpics();
+
       expect(axios.get).toHaveBeenCalledWith(service.epicsPath);
     });
   });

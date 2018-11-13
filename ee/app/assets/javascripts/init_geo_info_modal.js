@@ -11,18 +11,16 @@ export default () => {
       modal: true,
       show: false,
     })
-    .on('show.bs.modal', (e) => {
-      const {
-        cloneUrlPrimary,
-        cloneUrlSecondary,
-      } = $(e.currentTarget).data();
+    .on('show.bs.modal', e => {
+      const { cloneUrlPrimary, cloneUrlSecondary } = $(e.currentTarget).data();
 
       $('#geo-info-1').val(
-        `git clone ${(cloneUrlSecondary || '<clone url for secondary repository>')}`,
+        `git clone ${cloneUrlSecondary || '<clone url for secondary repository>'}`,
       );
 
       $('#geo-info-2').val(
-        `git remote set-url --push origin ${(cloneUrlPrimary || '<clone url for primary repository>')}`,
+        `git remote set-url --push origin ${cloneUrlPrimary ||
+          '<clone url for primary repository>'}`,
       );
     });
 };

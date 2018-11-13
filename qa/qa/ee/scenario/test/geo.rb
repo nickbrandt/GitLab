@@ -17,6 +17,10 @@ module QA
           attribute :geo_skip_setup?, '--without-setup'
 
           def perform(options, *rspec_options)
+            # Alias QA::Runtime::Scenario.gitlab_address to @address since
+            # some components depends on QA::Runtime::Scenario.gitlab_address.
+            QA::Runtime::Scenario.define(:gitlab_address, QA::Runtime::Scenario.geo_primary_address)
+
             unless options[:geo_skip_setup?]
               Geo::Primary.act do
                 add_license
@@ -51,7 +55,7 @@ module QA
               puts 'Adding GitLab EE license ...'
 
               QA::Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
-                Factory::License.fabricate!(ENV['EE_LICENSE'])
+                Resource::License.fabricate!(ENV['EE_LICENSE'])
               end
             end
 
@@ -59,7 +63,7 @@ module QA
               puts 'Enabling hashed repository storage setting ...'
 
               QA::Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
-                QA::Factory::Settings::HashedStorage.fabricate!(:enabled)
+                QA::Resource::Settings::HashedStorage.fabricate!(:enabled)
               end
             end
 
@@ -67,7 +71,7 @@ module QA
               puts 'Adding new Geo secondary node ...'
 
               QA::Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
-                Factory::Geo::Node.fabricate! do |node|
+                Resource::Geo::Node.fabricate! do |node|
                   node.address = QA::Runtime::Scenario.geo_secondary_address
                 end
               end

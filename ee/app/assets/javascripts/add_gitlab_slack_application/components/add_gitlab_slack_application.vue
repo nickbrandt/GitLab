@@ -1,98 +1,96 @@
 <script>
-  import Flash from '~/flash';
-  import { redirectTo } from '~/lib/utils/url_utility';
+import Flash from '~/flash';
+import { redirectTo } from '~/lib/utils/url_utility';
 
-  import GitlabSlackService from '../services/gitlab_slack_service';
+import GitlabSlackService from '../services/gitlab_slack_service';
 
-  export default {
-    props: {
-      projects: {
-        type: Array,
-        required: false,
-        default: () => [],
-      },
-
-      isSignedIn: {
-        type: Boolean,
-        required: true,
-      },
-
-      gitlabForSlackGifPath: {
-        type: String,
-        required: true,
-      },
-
-      signInPath: {
-        type: String,
-        required: true,
-      },
-
-      slackLinkPath: {
-        type: String,
-        required: true,
-      },
-
-      gitlabLogoPath: {
-        type: String,
-        required: true,
-      },
-
-      slackLogoPath: {
-        type: String,
-        required: true,
-      },
-
-      docsPath: {
-        type: String,
-        required: true,
-      },
+export default {
+  props: {
+    projects: {
+      type: Array,
+      required: false,
+      default: () => [],
     },
 
-    data() {
-      return {
-        popupOpen: false,
-        selectedProjectId: this.projects && this.projects.length ? this.projects[0].id : 0,
-      };
+    isSignedIn: {
+      type: Boolean,
+      required: true,
     },
 
-    computed: {
-      doubleHeadedArrowSvg() {
-        return gl.utils.spriteIcon('double-headed-arrow');
-      },
-
-      arrowRightSvg() {
-        return gl.utils.spriteIcon('arrow-right');
-      },
-
-      hasProjects() {
-        return this.projects.length > 0;
-      },
+    gitlabForSlackGifPath: {
+      type: String,
+      required: true,
     },
 
-    methods: {
-      togglePopup() {
-        this.popupOpen = !this.popupOpen;
-      },
-
-      addToSlack() {
-        GitlabSlackService.addToSlack(this.slackLinkPath, this.selectedProjectId)
-          .then(response => redirectTo(response.data.add_to_slack_link))
-          .catch(() => Flash('Unable to build Slack link.'));
-      },
+    signInPath: {
+      type: String,
+      required: true,
     },
-  };
+
+    slackLinkPath: {
+      type: String,
+      required: true,
+    },
+
+    gitlabLogoPath: {
+      type: String,
+      required: true,
+    },
+
+    slackLogoPath: {
+      type: String,
+      required: true,
+    },
+
+    docsPath: {
+      type: String,
+      required: true,
+    },
+  },
+
+  data() {
+    return {
+      popupOpen: false,
+      selectedProjectId: this.projects && this.projects.length ? this.projects[0].id : 0,
+    };
+  },
+
+  computed: {
+    doubleHeadedArrowSvg() {
+      return gl.utils.spriteIcon('double-headed-arrow');
+    },
+
+    arrowRightSvg() {
+      return gl.utils.spriteIcon('arrow-right');
+    },
+
+    hasProjects() {
+      return this.projects.length > 0;
+    },
+  },
+
+  methods: {
+    togglePopup() {
+      this.popupOpen = !this.popupOpen;
+    },
+
+    addToSlack() {
+      GitlabSlackService.addToSlack(this.slackLinkPath, this.selectedProjectId)
+        .then(response => redirectTo(response.data.add_to_slack_link))
+        .catch(() => Flash('Unable to build Slack link.'));
+    },
+  },
+};
 </script>
 
 <template>
-  <div>
-    <div class="center append-right-default">
-      <h1>GitLab for Slack</h1>
-      <p>Track your GitLab projects with GitLab for Slack.</p>
-    </div>
+  <div class="text-center">
+    <h1>GitLab for Slack</h1>
+    <p>Track your GitLab projects with GitLab for Slack.</p>
 
     <div
       v-once
-      class="append-bottom-20 center"
+      class="prepend-top-20 append-bottom-20"
     >
       <img
         :src="gitlabLogoPath"
@@ -111,7 +109,7 @@
 
     <button
       type="button"
-      class="btn btn-red mx-auto js-popup-button"
+      class="btn btn-red mx-auto js-popup-button prepend-top-default"
       @click="togglePopup"
     >
       Add GitLab to Slack
@@ -129,8 +127,7 @@
 
         <select
           v-model="selectedProjectId"
-          class="gitlab-slack-project-select
-js-project-select form-control prepend-top-10 append-bottom-10"
+          class="js-project-select form-control prepend-top-10 append-bottom-10"
         >
           <option
             v-for="project in projects"
@@ -178,9 +175,9 @@ js-project-select form-control prepend-top-10 append-bottom-10"
 
     <div
       v-once
-      class="gitlab-slack-example"
+      class="text-center"
     >
-      <h3 class="center">How it works</h3>
+      <h3>How it works</h3>
 
       <div class="well gitlab-slack-well mx-auto">
         <code
@@ -195,13 +192,16 @@ js-project-select form-control prepend-top-10 append-bottom-10"
           Shows the issue with id
           <strong>&lt;id&gt;</strong>
         </span>
+
+        <div class="prepend-top-default">
+          <a
+            :href="docsPath"
+          >
+            More Slack commands
+          </a>
+        </div>
       </div>
 
-      <div class="center">
-        <a :href="docsPath">
-          More Slack commands
-        </a>
-      </div>
     </div>
   </div>
 </template>

@@ -1,79 +1,81 @@
 <script>
-  /**
-   * Renders a deploy board.
-   *
-   * A deploy board is composed by:
-   * - Information area with percentage of completion.
-   * - Instances with status.
-   * - Button Actions.
-   * [Mockup](https://gitlab.com/gitlab-org/gitlab-ce/uploads/2f655655c0eadf655d0ae7467b53002a/environments__deploy-graphic.png)
-   */
-  import _ from 'underscore';
-  import { n__ } from '~/locale';
-  import tooltip from '~/vue_shared/directives/tooltip';
-  import deployBoardSvg from 'ee_empty_states/icons/_deploy_board.svg';
-  import instanceComponent from './deploy_board_instance_component.vue';
+/**
+ * Renders a deploy board.
+ *
+ * A deploy board is composed by:
+ * - Information area with percentage of completion.
+ * - Instances with status.
+ * - Button Actions.
+ * [Mockup](https://gitlab.com/gitlab-org/gitlab-ce/uploads/2f655655c0eadf655d0ae7467b53002a/environments__deploy-graphic.png)
+ */
+import _ from 'underscore';
+import { n__ } from '~/locale';
+import tooltip from '~/vue_shared/directives/tooltip';
+import deployBoardSvg from 'ee_empty_states/icons/_deploy_board.svg';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
+import instanceComponent from './deploy_board_instance_component.vue';
 
-  export default {
-    components: {
-      instanceComponent,
+export default {
+  components: {
+    instanceComponent,
+    GlLoadingIcon,
+  },
+  directives: {
+    tooltip,
+  },
+  props: {
+    deployBoardData: {
+      type: Object,
+      required: true,
     },
-    directives: {
-      tooltip,
+    isLoading: {
+      type: Boolean,
+      required: true,
     },
-    props: {
-      deployBoardData: {
-        type: Object,
-        required: true,
-      },
-      isLoading: {
-        type: Boolean,
-        required: true,
-      },
-      isEmpty: {
-        type: Boolean,
-        required: true,
-      },
-      logsPath: {
-        type: String,
-        required: false,
-        default: '',
-      },
+    isEmpty: {
+      type: Boolean,
+      required: true,
     },
-    computed: {
-      canRenderDeployBoard() {
-        return !this.isLoading && !this.isEmpty && !_.isEmpty(this.deployBoardData);
-      },
-      canRenderEmptyState() {
-        return !this.isLoading && this.isEmpty;
-      },
-      instanceCount() {
-        const { instances } = this.deployBoardData;
+    logsPath: {
+      type: String,
+      required: false,
+      default: '',
+    },
+  },
+  computed: {
+    canRenderDeployBoard() {
+      return !this.isLoading && !this.isEmpty && !_.isEmpty(this.deployBoardData);
+    },
+    canRenderEmptyState() {
+      return !this.isLoading && this.isEmpty;
+    },
+    instanceCount() {
+      const { instances } = this.deployBoardData;
 
-        return Array.isArray(instances) ? instances.length : 0;
-      },
-      instanceIsCompletedCount() {
-        const completionPercentage = this.deployBoardData.completion / 100;
-        const completionCount = Math.floor(completionPercentage * this.instanceCount);
-
-        return Number.isNaN(completionCount) ? 0 : completionCount;
-      },
-      instanceIsCompletedText() {
-        const title = n__('instance completed', 'instances completed', this.instanceIsCompletedCount);
-
-        return `${this.instanceIsCompletedCount} ${title}`;
-      },
-      instanceTitle() {
-        return n__('Instance', 'Instances', this.instanceCount);
-      },
-      projectName() {
-        return '<projectname>';
-      },
-      deployBoardSvg() {
-        return deployBoardSvg;
-      },
+      return Array.isArray(instances) ? instances.length : 0;
     },
-  };
+    instanceIsCompletedCount() {
+      const completionPercentage = this.deployBoardData.completion / 100;
+      const completionCount = Math.floor(completionPercentage * this.instanceCount);
+
+      return Number.isNaN(completionCount) ? 0 : completionCount;
+    },
+    instanceIsCompletedText() {
+      const title = n__('instance completed', 'instances completed', this.instanceIsCompletedCount);
+
+      return `${this.instanceIsCompletedCount} ${title}`;
+    },
+    instanceTitle() {
+      return n__('Instance', 'Instances', this.instanceCount);
+    },
+    projectName() {
+      return '<projectname>';
+    },
+    deployBoardSvg() {
+      return deployBoardSvg;
+    },
+  },
+};
 </script>
 <template>
   <div class="js-deploy-board deploy-board">

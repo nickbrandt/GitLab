@@ -5,29 +5,6 @@ module Elastic
     included do
       include ApplicationSearch
 
-      mappings _parent: { type: 'project' } do
-        indexes :id,          type: :integer
-        indexes :iid,         type: :integer
-        indexes :title,       type: :text,
-                              index_options: 'offsets'
-        indexes :description, type: :text,
-                              index_options: 'offsets'
-        indexes :created_at,  type: :date
-        indexes :updated_at,  type: :date
-        indexes :state,       type: :text
-        indexes :project_id,  type: :integer
-        indexes :author_id,   type: :integer
-
-        # The field assignee_id does not exist in issues table anymore.
-        # Nevertheless we'll keep this field as is because we don't want users to rebuild index
-        # + the ES treats arrays transparently so
-        # to any integer field you can write any array of integers and you don't have to change mapping.
-        # More over you can query those items just like a single integer value.
-        indexes :assignee_id, type: :integer
-
-        indexes :confidential, type: :boolean
-      end
-
       def as_indexed_json(options = {})
         data = {}
 
@@ -39,7 +16,7 @@ module Elastic
 
         data['assignee_id'] = safely_read_attribute_for_elasticsearch(:assignee_ids)
 
-        data
+        data.merge(generic_attributes)
       end
 
       def self.nested?

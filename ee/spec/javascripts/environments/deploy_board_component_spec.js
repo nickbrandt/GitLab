@@ -33,9 +33,7 @@ describe('Deploy Board', () => {
       const renderedTotal = component.$el.querySelector('.deploy-board-instances .total-instances');
       const actualTotal = deployBoardMockData.instances.length;
 
-      expect(
-        renderedTotal.textContent,
-      ).toEqual(`(${actualTotal})`);
+      expect(renderedTotal.textContent).toEqual(`(${actualTotal})`);
     });
 
     it('should render all instances', () => {
@@ -44,7 +42,9 @@ describe('Deploy Board', () => {
       expect(instances.length).toEqual(deployBoardMockData.instances.length);
 
       expect(
-        instances[2].classList.contains(`deploy-board-instance-${deployBoardMockData.instances[2].status}`),
+        instances[2].classList.contains(
+          `deploy-board-instance-${deployBoardMockData.instances[2].status}`,
+        ),
       ).toBe(true);
     });
 
@@ -72,7 +72,9 @@ describe('Deploy Board', () => {
 
     it('should render the empty state', () => {
       expect(component.$el.querySelector('.deploy-board-empty-state-svg svg')).toBeDefined();
-      expect(component.$el.querySelector('.deploy-board-empty-state-text .title').textContent).toContain('Kubernetes deployment not found');
+      expect(
+        component.$el.querySelector('.deploy-board-empty-state-text .title').textContent,
+      ).toContain('Kubernetes deployment not found');
     });
   });
 

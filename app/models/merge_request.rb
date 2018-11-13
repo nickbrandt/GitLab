@@ -26,7 +26,6 @@ class MergeRequest < ActiveRecord::Base
                 :deleted_at
 
   prepend ::EE::MergeRequest
-  include Elastic::MergeRequestsSearch
 
   belongs_to :target_project, class_name: "Project"
   belongs_to :source_project, class_name: "Project"
@@ -163,7 +162,6 @@ class MergeRequest < ActiveRecord::Base
   validates :merge_user, presence: true, if: :merge_when_pipeline_succeeds?, unless: :importing?
   validate :validate_branches, unless: [:allow_broken, :importing?, :closed_without_fork?]
   validate :validate_fork, unless: :closed_without_fork?
-  validate :validate_approvals_before_merge, unless: :importing?
   validate :validate_target_project, on: :create
 
   scope :by_source_or_target_branch, ->(branch_name) do
@@ -206,6 +204,12 @@ class MergeRequest < ActiveRecord::Base
   # For more information check: https://gitlab.com/gitlab-org/gitlab-ce/issues/40004
   def actual_head_pipeline
     head_pipeline&.sha == diff_head_sha ? head_pipeline : nil
+  end
+
+  def merge_pipeline
+    return unless merged?
+
+    target_project.pipeline_for(target_branch, merge_commit_sha)
   end
 
   # Pattern used to extract `!123` merge request references from text
@@ -265,7 +269,7 @@ class MergeRequest < ActiveRecord::Base
     end
   end
 
-  WIP_REGEX = /\A\s*(\[WIP\]\s*|WIP:\s*|WIP\s+)+\s*/i.freeze
+  WIP_REGEX = /\A*(\[WIP\]\s*|WIP:\s*|WIP\s+)+\s*/i.freeze
 
   def self.work_in_progress?(title)
     !!(title =~ WIP_REGEX)
@@ -351,6 +355,15 @@ class MergeRequest < ActiveRecord::Base
     end
   end
 
+  # Returns true if there are commits that match at least one commit SHA.
+  def includes_any_commits?(shas)
+    if persisted?
+      merge_request_diff.commits_by_shas(shas).exists?
+    else
+      (commit_shas & shas).present?
+    end
+  end
+
   # Calls `MergeWorker` to proceed with the merge process and
   # updates `merge_jid` with the MergeWorker#jid.
   # This helps tracking enqueued and ongoing merge jobs.
@@ -396,6 +409,18 @@ class MergeRequest < ActiveRecord::Base
     # Calling `merge_request_diff.diffs.real_size` will also perform
     # highlighting, which we don't need here.
     merge_request_diff&.real_size || diffs.real_size
+  end
+
+  def modified_paths(past_merge_request_diff: nil)
+    diffs = if past_merge_request_diff
+              past_merge_request_diff
+            elsif compare
+              compare
+            else
+              self.merge_request_diff
+            end
+
+    diffs.modified_paths
   end
 
   def diff_base_commit
@@ -672,7 +697,6 @@ class MergeRequest < ActiveRecord::Base
   end
 
   def mergeable?(skip_ci_check: false)
-    return false unless approved?
     return false unless mergeable_state?(skip_ci_check: skip_ci_check)
 
     check_if_can_be_merged

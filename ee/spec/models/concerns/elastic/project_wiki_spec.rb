@@ -16,7 +16,7 @@ describe ProjectWiki, :elastic do
       Gitlab::Elastic::Helper.refresh_index
     end
 
-    expect(project.wiki.search('term1', type: :blob)[:blobs][:total_count]).to eq(1)
-    expect(project.wiki.search('term1 | term2', type: :blob)[:blobs][:total_count]).to eq(2)
+    expect(project.wiki.search('term1', type: :wiki_blob)[:wiki_blobs][:total_count]).to eq(1)
+    expect(project.wiki.search('term1 | term2', type: :wiki_blob)[:wiki_blobs][:total_count]).to eq(2)
   end
 end

@@ -2,26 +2,30 @@ module SystemCheck
   module Geo
     class HttpConnectionCheck < SystemCheck::BaseCheck
       set_name 'GitLab Geo HTTP(S) connectivity'
-      set_skip_reason 'Geo is not enabled'
+
+      NOT_SECONDARY_NODE = 'not a secondary node'.freeze
+      GEO_NOT_ENABLED = 'Geo is not enabled'.freeze
 
       def skip?
-        !Gitlab::Geo.enabled?
+        unless Gitlab::Geo.enabled?
+          self.skip_reason = GEO_NOT_ENABLED
+
+          return true
+        end
+
+        unless Gitlab::Geo.secondary?
+          self.skip_reason = NOT_SECONDARY_NODE
+
+          return true
+        end
+
+        false
       end
 
       def multi_check
         $stdout.puts
-
-        if Gitlab::Geo.primary?
-          Gitlab::Geo.secondary_nodes.each do |node|
-            $stdout.print "* Can connect to secondary node: '#{node.url}' ... "
-            check_gitlab_geo_node(node)
-          end
-        end
-
-        if Gitlab::Geo.secondary?
-          $stdout.print '* Can connect to the primary node ... '
-          check_gitlab_geo_node(Gitlab::Geo.primary_node)
-        end
+        $stdout.print '* Can connect to the primary node ... '
+        check_gitlab_geo_node(Gitlab::Geo.primary_node)
       end
 
       private

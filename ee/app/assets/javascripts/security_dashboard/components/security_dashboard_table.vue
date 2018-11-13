@@ -1,16 +1,17 @@
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import { mapActions, mapState, mapGetters } from 'vuex';
 import Pagination from '~/vue_shared/components/pagination_links.vue';
 import SecurityDashboardTableRow from './security_dashboard_table_row.vue';
 
 export default {
   name: 'SecurityDashboardTable',
   components: {
-    SecurityDashboardTableRow,
     Pagination,
+    SecurityDashboardTableRow,
   },
   computed: {
-    ...mapGetters(['vulnerabilities', 'pageInfo', 'isLoading']),
+    ...mapState('vulnerabilities', ['vulnerabilities', 'pageInfo', 'isLoadingVulnerabilities']),
+    ...mapGetters('vulnerabilities', ['dashboardListError']),
     showPagination() {
       return this.pageInfo && this.pageInfo.total;
     },
@@ -19,7 +20,7 @@ export default {
     this.fetchVulnerabilities();
   },
   methods: {
-    ...mapActions(['fetchVulnerabilities']),
+    ...mapActions('vulnerabilities', ['fetchVulnerabilities', 'openModal']),
   },
 };
 </script>
@@ -27,7 +28,7 @@ export default {
 <template>
   <div class="ci-table">
     <div
-      class="gl-responsive-table-row table-row-header"
+      class="gl-responsive-table-row table-row-header vulnerabilities-row-header"
       role="row"
     >
       <div
@@ -49,17 +50,31 @@ export default {
         {{ s__('Reports|Confidence') }}
       </div>
     </div>
+    
+    <div class="flash-container">
+      <div 
+        v-if="dashboardListError" 
+        class="flash-alert">
+        <div class="flash-text container-fluid container-limited limit-container-width">
+          {{ s__('Security Dashboard|Error fetching the vulnerability list. Please check your network connection and try again.') }}
+        </div>
+      </div>
+    </div>
 
-    <gl-loading-icon
-      v-if="isLoading"
-      :size="2"
-    />
+    <div v-if="isLoadingVulnerabilities">
+      <security-dashboard-table-row
+        v-for="n in 10"
+        :key="n"
+        :is-loading="true"
+      />
+    </div>
 
     <div v-else>
       <security-dashboard-table-row
         v-for="vulnerability in vulnerabilities"
         :key="vulnerability.id"
         :vulnerability="vulnerability"
+        @openModal="openModal({ vulnerability })"
       />
 
       <pagination
@@ -72,3 +87,10 @@ export default {
   </div>
 </template>
 
+<style>
+.vulnerabilities-row-header {
+  color: #707070;
+  padding-left: 0.4em;
+  padding-right: 0.4em;
+}
+</style>

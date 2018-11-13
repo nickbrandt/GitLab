@@ -230,6 +230,7 @@ export default {
     '/help/user/project/merge_requests/index#interacting-with-security-reports-ultimate',
   merge_commit_path:
     'http://localhost:3000/root/acets-app/commit/53027d060246c8f47e4a9310fb332aa52f221775',
+  troubleshooting_docs_path: 'help',
 };
 // Codeclimate
 export const headIssues = [

@@ -12,7 +12,14 @@ export default () => {
       GroupSecurityDashboardApp,
     },
     render(createElement) {
-      return createElement('group-security-dashboard-app');
+      return createElement('group-security-dashboard-app', {
+        props: {
+          dashboardDocumentation: el.dataset.dashboardDocumentation,
+          vulnerabilityFeedbackHelpPath: el.dataset.vulnerabilityFeedbackHelpPath,
+          vulnerabilitiesEndpoint: el.dataset.vulnerabilitiesEndpoint,
+          vulnerabilitiesCountEndpoint: el.dataset.vulnerabilitiesSummaryEndpoint,
+        },
+      });
     },
   });
 };

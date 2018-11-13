@@ -1,73 +1,89 @@
 <script>
-  import { mapActions, mapState } from 'vuex';
-  import { s__ } from '~/locale';
-  import Modal from '~/vue_shared/components/gl_modal.vue';
-  import LoadingButton from '~/vue_shared/components/loading_button.vue';
-  import Icon from '~/vue_shared/components/icon.vue';
-  import ExpandButton from '~/vue_shared/components/expand_button.vue';
+import { s__ } from '~/locale';
+import Modal from '~/vue_shared/components/gl_modal.vue';
+import LoadingButton from '~/vue_shared/components/loading_button.vue';
+import Icon from '~/vue_shared/components/icon.vue';
+import ExpandButton from '~/vue_shared/components/expand_button.vue';
+import SafeLink from 'ee/vue_shared/components/safe_link.vue';
 
-  export default {
-    components: {
-      Modal,
-      LoadingButton,
-      ExpandButton,
-      Icon,
+export default {
+  components: {
+    SafeLink,
+    Modal,
+    LoadingButton,
+    ExpandButton,
+    Icon,
+  },
+  props: {
+    modal: {
+      type: Object,
+      required: true,
     },
-    computed: {
-      ...mapState([
-        'modal',
-        'vulnerabilityFeedbackHelpPath',
-        'canCreateIssuePermission',
-        'canCreateFeedbackPermission',
-      ]),
-      revertTitle() {
-        return this.modal.vulnerability.isDismissed
-          ? s__('ciReport|Revert dismissal')
-          : s__('ciReport|Dismiss vulnerability');
-      },
-      hasDismissedBy() {
-        return (
-          this.modal.vulnerability.dismissalFeedback &&
-          this.modal.vulnerability.dismissalFeedback.pipeline &&
-          this.modal.vulnerability.dismissalFeedback.author
-        );
-      },
-      /**
-       * The slot for the footer should be rendered if any of the conditions is true.
-       */
-      shouldRenderFooterSection() {
-        return (
-          !this.modal.isResolved &&
-          (this.canCreateFeedbackPermission || this.canCreateIssuePermission)
-        );
-      },
+    vulnerabilityFeedbackHelpPath: {
+      type: String,
+      required: false,
+      default: '',
     },
-    methods: {
-      ...mapActions(['dismissIssue', 'revertDismissIssue', 'createNewIssue']),
-      handleDismissClick() {
-        if (this.modal.vulnerability.isDismissed) {
-          this.revertDismissIssue();
-        } else {
-          this.dismissIssue();
-        }
-      },
-      isLastValue(index, values) {
-        return index < values.length - 1;
-      },
-      hasValue(field) {
-        return field.value && field.value.length > 0;
-      },
-      hasInstances(field, key) {
-        return key === 'instances' && this.hasValue(field);
-      },
-      hasIdentifiers(field, key) {
-        return key === 'identifiers' && this.hasValue(field);
-      },
-      hasLinks(field, key) {
-        return key === 'links' && this.hasValue(field);
-      },
+    canCreateIssuePermission: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
-  };
+    canCreateFeedbackPermission: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+  },
+  computed: {
+    revertTitle() {
+      return this.modal.vulnerability.isDismissed
+        ? s__('ciReport|Revert dismissal')
+        : s__('ciReport|Dismiss vulnerability');
+    },
+    hasDismissedBy() {
+      return (
+        this.modal.vulnerability &&
+        this.modal.vulnerability.dismissalFeedback &&
+        this.modal.vulnerability.dismissalFeedback.pipeline &&
+        this.modal.vulnerability.dismissalFeedback.author
+      );
+    },
+    /**
+     * The slot for the footer should be rendered if any of the conditions is true.
+     */
+    shouldRenderFooterSection() {
+      return (
+        !this.modal.isResolved &&
+        (this.canCreateFeedbackPermission || this.canCreateIssuePermission)
+      );
+    },
+  },
+  methods: {
+    handleDismissClick() {
+      if (this.modal.vulnerability.isDismissed) {
+        this.$emit('revertDismissIssue');
+      } else {
+        this.$emit('dismissIssue');
+      }
+    },
+    isLastValue(index, values) {
+      return index < values.length - 1;
+    },
+    hasValue(field) {
+      return field.value && field.value.length > 0;
+    },
+    hasInstances(field, key) {
+      return key === 'instances' && this.hasValue(field);
+    },
+    hasIdentifiers(field, key) {
+      return key === 'identifiers' && this.hasValue(field);
+    },
+    hasLinks(field, key) {
+      return key === 'links' && this.hasValue(field);
+    },
+  },
+};
 </script>
 <template>
   <modal
@@ -108,14 +124,14 @@
                     {{ instance.method }}
                   </div>
                   <div class="report-block-list-issue-description-link">
-                    <a
+                    <safe-link
                       :href="instance.uri"
                       target="_blank"
                       rel="noopener noreferrer nofollow"
                       class="break-link"
                     >
                       {{ instance.uri }}
-                    </a>
+                    </safe-link>
                   </div>
                   <expand-button v-if="instance.evidence">
                     <pre
@@ -132,7 +148,7 @@
               v-for="(identifier, i) in field.value"
               :key="i"
             >
-              <a
+              <safe-link
                 v-if="identifier.url"
                 :class="`js-link-${key}`"
                 :href="identifier.url"
@@ -140,7 +156,7 @@
                 rel="noopener noreferrer"
               >
                 {{ identifier.name }}
-              </a>
+              </safe-link>
               <span v-else>
                 {{ identifier.name }}
               </span>
@@ -152,26 +168,26 @@
               v-for="(link, i) in field.value"
               :key="i"
             >
-              <a
+              <safe-link
                 :class="`js-link-${key}`"
                 :href="link.url"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 {{ link.value || link.url }}
-              </a>
+              </safe-link>
               <span v-if="isLastValue(i, field.value)">,&nbsp;</span>
             </span>
           </template>
           <template v-else>
-            <a
+            <safe-link
               v-if="field.isLink"
               :class="`js-link-${key}`"
               :href="field.url"
               target="_blank"
             >
               {{ field.value }}
-            </a>
+            </safe-link>
             <span v-else>
               {{ field.value }}
             </span>
@@ -196,6 +212,7 @@
             >#{{ modal.vulnerability.dismissalFeedback.pipeline.id }}</a>.
           </template>
           <a
+            v-if="vulnerabilityFeedbackHelpPath"
             :href="vulnerabilityFeedbackHelpPath"
             class="js-link-vulnerabilityFeedbackHelpPath"
           >
@@ -232,7 +249,7 @@
 
         <a
           v-if="modal.vulnerability.hasIssue"
-          :href="modal.vulnerability.issueFeedback && modal.vulnerability.issueFeedback.issue_url"
+          :href="modal.vulnerability.issue_feedback && modal.vulnerability.issue_feedback.issue_url"
           rel="noopener noreferrer nofollow"
           class="btn btn-success btn-inverted"
         >
@@ -245,7 +262,7 @@
           :disabled="modal.isCreatingNewIssue"
           :label="__('Create issue')"
           container-class="js-create-issue-btn btn btn-success btn-inverted"
-          @click="createNewIssue"
+          @click="$emit('createNewIssue')"
         />
       </template>
     </div>

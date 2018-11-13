@@ -14,7 +14,8 @@ export default {
     },
     createdAt: {
       type: String,
-      required: true,
+      required: false,
+      default: null,
     },
     actionText: {
       type: String,
@@ -22,8 +23,9 @@ export default {
       default: '',
     },
     noteId: {
-      type: String,
-      required: true,
+      type: [String, Number],
+      required: false,
+      default: null,
     },
     includeToggle: {
       type: Boolean,
@@ -42,6 +44,9 @@ export default {
     },
     noteTimestampLink() {
       return `#note_${this.noteId}`;
+    },
+    hasAuthor() {
+      return this.author && Object.keys(this.author).length;
     },
   },
   methods: {
@@ -74,7 +79,7 @@ export default {
       </button>
     </div>
     <a
-      v-if="Object.keys(author).length"
+      v-if="hasAuthor"
       :href="author.path"
     >
       <span class="note-header-author-name">{{ author.name }}</span>
@@ -90,24 +95,27 @@ export default {
     </span>
     <span class="note-headline-light">
       <span class="note-headline-meta">
-        <template v-if="actionText">
-          {{ actionText }}
-        </template>
         <span class="system-note-message">
           <slot></slot>
         </span>
-        <span class="system-note-separator">
-          &middot;
-        </span>
-        <a
-          :href="noteTimestampLink"
-          class="note-timestamp system-note-separator"
-          @click="updateTargetNoteHash">
-          <time-ago-tooltip
-            :time="createdAt"
-            tooltip-placement="bottom"
-          />
-        </a>
+        <template
+          v-if="createdAt"
+        >
+          <span class="system-note-separator">
+            <template v-if="actionText">
+              {{ actionText }}
+            </template>
+          </span>
+          <a
+            :href="noteTimestampLink"
+            class="note-timestamp system-note-separator"
+            @click="updateTargetNoteHash">
+            <time-ago-tooltip
+              :time="createdAt"
+              tooltip-placement="bottom"
+            />
+          </a>
+        </template>
         <i
           class="fa fa-spinner fa-spin editing-spinner"
           aria-label="Comment is being updated"

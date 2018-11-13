@@ -12,6 +12,10 @@ module QA
               element :save_changes_button
             end
 
+            view 'ee/app/views/groups/saml_providers/_test_button.html.haml' do
+              element :saml_settings_test_button
+            end
+
             view 'ee/app/views/groups/saml_providers/_info.html.haml' do
               element :user_login_url_link
             end
@@ -26,6 +30,10 @@ module QA
 
             def click_save_changes
               click_element :save_changes_button
+            end
+
+            def click_test_button
+              click_element :saml_settings_test_button
             end
 
             def click_user_login_url_link

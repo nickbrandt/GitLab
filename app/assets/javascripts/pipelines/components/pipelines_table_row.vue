@@ -47,7 +47,7 @@ export default {
       required: true,
     },
     cancelingPipeline: {
-      type: String,
+      type: Number,
       required: false,
       default: null,
     },
@@ -59,6 +59,13 @@ export default {
     };
   },
   computed: {
+    actions() {
+      if (!this.pipeline || !this.pipeline.details) {
+        return [];
+      }
+      const { details } = this.pipeline;
+      return [...(details.manual_actions || []), ...(details.scheduled_actions || [])];
+    },
     /**
      * If provided, returns the commit tag.
      * Needed to render the commit component column.
@@ -254,7 +261,7 @@ export default {
         class="table-mobile-header"
         role="rowheader"
       >
-        Status
+        {{ s__('Pipeline|Status') }}
       </div>
       <div class="table-mobile-content">
         <ci-badge
@@ -272,8 +279,9 @@ export default {
     <div class="table-section section-20">
       <div
         class="table-mobile-header"
-        role="rowheader">
-        Commit
+        role="rowheader"
+      >
+        {{ s__('Pipeline|Commit') }}
       </div>
       <div class="table-mobile-content">
         <commit-component
@@ -291,8 +299,9 @@ export default {
     <div class="table-section section-wrap section-20 stage-cell">
       <div
         class="table-mobile-header"
-        role="rowheader">
-        Stages
+        role="rowheader"
+      >
+        {{ s__('Pipeline|Stages') }}
       </div>
       <div class="table-mobile-content">
         <template v-if="pipeline.details.stages.length > 0">
@@ -321,8 +330,8 @@ export default {
     >
       <div class="btn-group table-action-buttons">
         <pipelines-actions-component
-          v-if="pipeline.details.manual_actions.length"
-          :actions="pipeline.details.manual_actions"
+          v-if="actions.length > 0"
+          :actions="actions"
         />
 
         <pipelines-artifacts-component

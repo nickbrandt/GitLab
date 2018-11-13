@@ -1,17 +1,29 @@
 <script>
+import { mapActions } from 'vuex';
+import { GlButton, GlSkeletonLoading } from '@gitlab-org/gitlab-ui';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
-import SecurityDashboardActionButtons from './security_dashboard_action_buttons.vue';
+import VulnerabilityActionButtons from './vulnerability_action_buttons.vue';
+import VulnerabilityIssueLink from './vulnerability_issue_link.vue';
 
 export default {
   name: 'SecurityDashboardTableRow',
   components: {
     SeverityBadge,
-    SecurityDashboardActionButtons,
+    GlButton,
+    GlSkeletonLoading,
+    VulnerabilityActionButtons,
+    VulnerabilityIssueLink,
   },
   props: {
     vulnerability: {
       type: Object,
-      required: true,
+      required: false,
+      default: () => ({}),
+    },
+    isLoading: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   computed: {
@@ -19,15 +31,27 @@ export default {
       return this.vulnerability.confidence || '–';
     },
     severity() {
-      return this.vulnerability.severity || '–';
+      return this.vulnerability.severity || ' ';
     },
-    description() {
-      return this.vulnerability.description;
-    },
-    projectNamespace() {
+    projectFullName() {
       const { project } = this.vulnerability;
-      return project && project.name_with_namespace ? project.name_with_namespace : null;
+      return project && project.full_name;
     },
+    isDismissed() {
+      return Boolean(this.vulnerability.dismissal_feedback);
+    },
+    hasIssue() {
+      return Boolean(this.vulnerability.issue_feedback);
+    },
+    canDismissVulnerability() {
+      return Boolean(this.vulnerability.vulnerability_feedback_url);
+    },
+    canCreateIssue() {
+      return this.canDismissVulnerability && !this.hasIssue;
+    },
+  },
+  methods: {
+    ...mapActions('vulnerabilities', ['openModal']),
   },
 };
 </script>
@@ -54,13 +78,31 @@ export default {
         {{ s__('Reports|Vulnerability') }}
       </div>
       <div class="table-mobile-content">
-        <span>{{ description }}</span>
-        <br />
-        <span
-          v-if="projectNamespace"
-          class="vulnerability-namespace">
-          {{ projectNamespace }}
-        </span>
+        <gl-skeleton-loading
+          v-if="isLoading"
+          class="mt-2 js-skeleton-loader"
+          :lines="2"
+        />
+        <div v-else>
+          <gl-button
+            class="btn js-vulnerability-info"
+            variant="blank"
+            :class="{ strikethrough: isDismissed }"
+            @click="openModal({ vulnerability })"
+          >{{ vulnerability.name }}</gl-button>
+          <vulnerability-issue-link
+            v-if="hasIssue"
+            class="prepend-left-10"
+            :issue="vulnerability.issue_feedback"
+            :project-name="vulnerability.project.name"
+          />
+          <br />
+          <span
+            v-if="projectFullName"
+            class="vulnerability-namespace">
+            {{ projectFullName }}
+          </span>
+        </div>
       </div>
     </div>
 
@@ -71,12 +113,11 @@ export default {
       >
         {{ s__('Reports|Confidence') }}
       </div>
-      <div class="table-mobile-content">
-        {{ confidence }}
+      <div class="table-mobile-content text-capitalize">
+        <span :class="{ strikethrough: isDismissed }">{{ confidence }}</span>
       </div>
     </div>
 
-    <!-- This is hidden till we can hook up the actions
     <div class="table-section section-20">
       <div
         class="table-mobile-header"
@@ -85,19 +126,21 @@ export default {
         {{ s__('Reports|Actions') }}
       </div>
       <div class="table-mobile-content vulnerabilities-action-buttons">
-        <security-dashboard-action-buttons
+        <vulnerability-action-buttons
           :vulnerability="vulnerability"
+          :can-create-issue="canCreateIssue"
+          :can-dismiss-vulnerability="canDismissVulnerability"
+          :is-dismissed="isDismissed"
         />
       </div>
     </div>
-    -->
   </div>
 </template>
 
 <style>
 @media (min-width: 768px) {
   .vulnerabilities-row {
-    padding: .6em .4em;
+    padding: 0.6em 0.4em;
   }
 
   .vulnerabilities-row:hover,
@@ -126,6 +169,6 @@ export default {
 
 .vulnerability-namespace {
   color: #707070;
-  font-size: .8em;
+  font-size: 0.8em;
 }
 </style>

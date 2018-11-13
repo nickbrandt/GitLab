@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module EE
   module SearchHelper
     extend ::Gitlab::Utils::Override
@@ -12,7 +13,7 @@ module EE
     override :find_project_for_result_blob
     # rubocop: disable CodeReuse/ActiveRecord
     def find_project_for_result_blob(result)
-      super || ::Project.find_by(id: result['_parent'])
+      super || ::Project.find_by(id: result.dig('_source', 'join_field', 'parent')&.split('_')&.last)
     end
     # rubocop: enable CodeReuse/ActiveRecord
 

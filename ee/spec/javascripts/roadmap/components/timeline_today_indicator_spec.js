@@ -37,6 +37,7 @@ describe('TimelineTodayIndicatorComponent', () => {
   describe('data', () => {
     it('returns default data props', () => {
       vm = createComponent({});
+
       expect(vm.todayBarStyles).toBe('');
       expect(vm.todayBarReady).toBe(false);
     });
@@ -50,6 +51,7 @@ describe('TimelineTodayIndicatorComponent', () => {
           height: 100,
         });
         const stylesObj = vm.todayBarStyles;
+
         expect(stylesObj.height).toBe('120px');
         expect(stylesObj.left).toBe('48%');
         expect(vm.todayBarReady).toBe(true);
@@ -61,6 +63,7 @@ describe('TimelineTodayIndicatorComponent', () => {
     it('binds `epicsListRendered` event listener via eventHub', () => {
       spyOn(eventHub, '$on');
       const vmX = createComponent({});
+
       expect(eventHub.$on).toHaveBeenCalledWith('epicsListRendered', jasmine.any(Function));
       vmX.$destroy();
     });
@@ -71,12 +74,13 @@ describe('TimelineTodayIndicatorComponent', () => {
       spyOn(eventHub, '$off');
       const vmX = createComponent({});
       vmX.$destroy();
+
       expect(eventHub.$off).toHaveBeenCalledWith('epicsListRendered', jasmine.any(Function));
     });
   });
 
   describe('template', () => {
-    it('renders component container element with class `today-bar`', (done) => {
+    it('renders component container element with class `today-bar`', done => {
       vm = createComponent({});
       vm.handleEpicsListRender({
         height: 100,
@@ -88,4 +92,3 @@ describe('TimelineTodayIndicatorComponent', () => {
     });
   });
 });
-

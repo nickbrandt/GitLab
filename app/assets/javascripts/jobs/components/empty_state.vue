@@ -1,38 +1,43 @@
 <script>
-  export default {
-    props: {
-      illustrationPath: {
-        type: String,
-        required: true,
-      },
-      illustrationSizeClass: {
-        type: String,
-        required: true,
-      },
-      title: {
-        type: String,
-        required: true,
-      },
-      content: {
-        type: String,
-        required: false,
-        default: null,
-      },
-      action: {
-        type: Object,
-        required: false,
-        default: null,
-        validator(value) {
-          return (
-            value === null ||
-            (Object.prototype.hasOwnProperty.call(value, 'path') &&
-              Object.prototype.hasOwnProperty.call(value, 'method') &&
-              Object.prototype.hasOwnProperty.call(value, 'title'))
-          );
-        },
+import { GlLink } from '@gitlab-org/gitlab-ui';
+
+export default {
+  components: {
+    GlLink,
+  },
+  props: {
+    illustrationPath: {
+      type: String,
+      required: true,
+    },
+    illustrationSizeClass: {
+      type: String,
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+    content: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    action: {
+      type: Object,
+      required: false,
+      default: null,
+      validator(value) {
+        return (
+          value === null ||
+          (Object.prototype.hasOwnProperty.call(value, 'path') &&
+            Object.prototype.hasOwnProperty.call(value, 'method') &&
+            Object.prototype.hasOwnProperty.call(value, 'button_title'))
+        );
       },
     },
-  };
+  },
+};
 </script>
 <template>
   <div class="row empty-state">
@@ -62,13 +67,13 @@
           v-if="action"
           class="text-center"
         >
-          <a
+          <gl-link
             :href="action.path"
             :data-method="action.method"
             class="js-job-empty-state-action btn btn-primary"
           >
-            {{ action.title }}
-          </a>
+            {{ action.button_title }}
+          </gl-link>
         </div>
       </div>
     </div>

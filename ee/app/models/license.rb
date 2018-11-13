@@ -41,6 +41,7 @@ class License < ActiveRecord::Base
     board_milestone_lists
     cross_project_pipelines
     custom_file_templates
+    custom_file_templates_for_namespace
     email_additional_text
     db_load_balancing
     deploy_board
@@ -66,13 +67,19 @@ class License < ActiveRecord::Base
     system_header_footer
     custom_project_templates
     packages
+    code_owner_as_approver_suggestion
+    feature_flags
+    batch_comments
+    issues_analytics
   ].freeze
 
   EEU_FEATURES = EEP_FEATURES + %i[
+    security_dashboard
     dependency_scanning
     license_management
     sast
     sast_container
+    container_scanning
     cluster_health
     dast
     epics
@@ -80,6 +87,8 @@ class License < ActiveRecord::Base
     pod_logs
     pseudonymizer
     prometheus_alerts
+    operations_dashboard
+    tracing
   ].freeze
 
   # List all features available for early adopters,
@@ -290,6 +299,9 @@ class License < ActiveRecord::Base
 
   def feature_available?(feature)
     return false if trial? && expired?
+
+    # This feature might not be behind a feature flag at all, so default to true
+    return false unless ::Feature.enabled?(feature, default_enabled: true)
 
     features.include?(feature)
   end

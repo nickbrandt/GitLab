@@ -36,6 +36,35 @@ describe API::Issues, :mailer do
         expect(response).to have_gitlab_http_status(200)
         expect(response).to match_response_schema('public_api/v4/issues', dir: 'ee')
       end
+
+      describe "filtering by weight" do
+        before do
+          create(:issue, author: user2, project: project, weight: 1)
+          create(:issue, author: user2, project: project, weight: 3)
+        end
+
+        let!(:issue2) { create(:issue, author: user2, project: project, weight: 5) }
+
+        it 'returns issues with specific weight' do
+          get api('/issues', user), weight: 5, scope: 'all'
+
+          expect_paginated_array_response(size: 1)
+          expect(json_response.first['id']).to eq(issue2.id)
+        end
+
+        it 'returns issues with no weight' do
+          get api('/issues', user), weight: 'None', scope: 'all'
+
+          expect_paginated_array_response(size: 1)
+          expect(json_response.first['id']).to eq(issue.id)
+        end
+
+        it 'returns issues with any weight' do
+          get api('/issues', user), weight: 'Any', scope: 'all'
+
+          expect_paginated_array_response(size: 3)
+        end
+      end
     end
   end
 

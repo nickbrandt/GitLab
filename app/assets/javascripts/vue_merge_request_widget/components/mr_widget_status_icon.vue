@@ -1,33 +1,35 @@
 <script>
-  import ciIcon from '../../vue_shared/components/ci_icon.vue';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
+import ciIcon from '../../vue_shared/components/ci_icon.vue';
 
-  export default {
-    components: {
-      ciIcon,
+export default {
+  components: {
+    ciIcon,
+    GlLoadingIcon,
+  },
+  props: {
+    status: {
+      type: String,
+      required: true,
     },
-    props: {
-      status: {
-        type: String,
-        required: true,
-      },
-      showDisabledButton: {
-        type: Boolean,
-        required: false,
-        default: false,
-      },
+    showDisabledButton: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
-    computed: {
-      isLoading() {
-        return this.status === 'loading';
-      },
-      statusObj() {
-        return {
-          group: this.status,
-          icon: `status_${this.status}`,
-        };
-      },
+  },
+  computed: {
+    isLoading() {
+      return this.status === 'loading';
     },
-  };
+    statusObj() {
+      return {
+        group: this.status,
+        icon: `status_${this.status}`,
+      };
+    },
+  },
+};
 </script>
 <template>
   <div class="space-children d-flex append-right-10 widget-status-icon">

@@ -2,8 +2,6 @@
 
 module Lfs
   class UnlockFileService < BaseService
-    prepend EE::Lfs::UnlockFileService
-
     def execute
       unless can?(current_user, :push_code, project)
         raise Gitlab::GitAccess::UnauthorizedError, _('You have no permissions')
@@ -47,3 +45,5 @@ module Lfs
     # rubocop: enable CodeReuse/ActiveRecord
   end
 end
+
+Lfs::UnlockFileService.prepend(EE::Lfs::UnlockFileService)

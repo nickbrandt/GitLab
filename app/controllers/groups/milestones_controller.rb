@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Groups::MilestonesController < Groups::ApplicationController
-  prepend EE::Groups::MilestonesController
-
   include MilestoneActions
 
   before_action :group_projects
@@ -12,7 +10,7 @@ class Groups::MilestonesController < Groups::ApplicationController
   def index
     respond_to do |format|
       format.html do
-        @milestone_states = GlobalMilestone.states_count(group_projects, group)
+        @milestone_states = Milestone.states_count(group_projects, [group])
         @milestones = Kaminari.paginate_array(milestones).page(params[:page])
       end
       format.json do
@@ -115,3 +113,5 @@ class Groups::MilestonesController < Groups::ApplicationController
     params.permit(:state).merge(group_ids: group.id)
   end
 end
+
+Groups::MilestonesController.prepend(EE::Groups::MilestonesController)

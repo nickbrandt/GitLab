@@ -43,7 +43,7 @@ export default {
      */
     getTimelineBarEndOffsetHalfForWeek() {
       const dayWidth = this.getCellWidth() / 7;
-      return TIMELINE_END_OFFSET_HALF + (dayWidth * 0.5);
+      return TIMELINE_END_OFFSET_HALF + dayWidth * 0.5;
     },
     /**
      * In case startDate for any epic is undefined or is out of range
@@ -82,7 +82,7 @@ export default {
         return `right: ${TIMELINE_END_OFFSET_HALF}px;`;
       }
 
-      return `left: ${(startDate * dayWidth) - (dayWidth / 2)}px;`;
+      return `left: ${startDate * dayWidth - dayWidth / 2}px;`;
     },
     /**
      * This method is externally only called when current timeframe cell has timeline

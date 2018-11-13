@@ -6,6 +6,7 @@ import Cookies from 'js-cookie';
 import flash from '~/flash';
 import { __, s__, sprintf } from '~/locale';
 import { capitalizeFirstCharacter } from '~/lib/utils/text_utility';
+import { dateInWords, parsePikadayDate } from '~/lib/utils/datetime_utility';
 import ListLabel from '~/vue_shared/models/label';
 import SidebarTodo from '~/sidebar/components/todo_toggle/todo.vue';
 import SidebarCollapsedGroupedDatePicker from '~/vue_shared/components/sidebar/collapsed_grouped_date_picker.vue';
@@ -85,10 +86,18 @@ export default {
       required: false,
       default: '',
     },
+    startDateSourcingMilestoneDates: {
+      type: Object,
+      required: true,
+    },
     dueDateSourcingMilestoneTitle: {
       type: String,
       required: false,
       default: '',
+    },
+    dueDateSourcingMilestoneDates: {
+      type: Object,
+      required: true,
     },
     initialLabels: {
       type: Array,
@@ -217,9 +226,17 @@ export default {
   },
   mounted() {
     eventHub.$on('toggleSidebar', this.toggleSidebar);
+    document.addEventListener(
+      'toggleSidebarRevealLabelsDropdown',
+      this.toggleSidebarRevealLabelsDropdown,
+    );
   },
   beforeDestroy() {
     eventHub.$off('toggleSidebar', this.toggleSidebar);
+    document.removeEventListener(
+      'toggleSidebarRevealLabelsDropdown',
+      this.toggleSidebarRevealLabelsDropdown,
+    );
   },
   methods: {
     getDateValidity(startDate, endDate) {
@@ -233,17 +250,33 @@ export default {
     getDateTypeString(dateType) {
       return dateType === DateTypes.start ? s__('Epics|start') : s__('Epics|due');
     },
-    getDateFromMilestonesTooltip(dateType = 'start') {
+    getDateFromMilestonesTooltip(dateType = DateTypes.start) {
       const { startDateTimeFromMilestones, dueDateTimeFromMilestones } = this.store;
       const dateSourcingMilestoneTitle = this[`${dateType}DateSourcingMilestoneTitle`];
+      const sourcingMilestoneDates =
+        dateType === DateTypes.start
+          ? this.startDateSourcingMilestoneDates
+          : this.dueDateSourcingMilestoneDates;
 
       if (startDateTimeFromMilestones && dueDateTimeFromMilestones) {
-        return dateSourcingMilestoneTitle;
+        const startDate = parsePikadayDate(sourcingMilestoneDates.startDate);
+        const dueDate = parsePikadayDate(sourcingMilestoneDates.dueDate);
+
+        return `${dateSourcingMilestoneTitle}<br/><span class="text-tertiary">${dateInWords(
+          startDate,
+          true,
+          startDate.getFullYear() === dueDate.getFullYear(),
+        )} – ${dateInWords(dueDate, true)}</span>`;
       }
 
-      return sprintf(s__('Epics|To schedule your epic\'s %{epicDateType} date based on milestones, assign a milestone with a %{epicDateType} date to any issue in the epic.'), {
-        epicDateType: this.getDateTypeString(dateType),
-      });
+      return sprintf(
+        s__(
+          "Epics|To schedule your epic's %{epicDateType} date based on milestones, assign a milestone with a %{epicDateType} date to any issue in the epic.",
+        ),
+        {
+          epicDateType: this.getDateTypeString(dateType),
+        },
+      );
     },
     toggleSidebar() {
       this.collapsed = !this.collapsed;
@@ -293,9 +326,11 @@ export default {
         })
         .catch(() => {
           this[savingBoolean] = false;
-          flash(sprintf(s__('Epics|An error occurred while saving %{epicDateType} date'), {
-            epicDateType: this.getDateTypeString(dateType),
-          }));
+          flash(
+            sprintf(s__('Epics|An error occurred while saving %{epicDateType} date'), {
+              epicDateType: this.getDateTypeString(dateType),
+            }),
+          );
         });
     },
     changeStartDateType(dateTypeIsFixed, typeChangeOnEdit) {

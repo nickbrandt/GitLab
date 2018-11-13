@@ -1,26 +1,25 @@
 module EpicIssues
   class CreateService < IssuableLinks::CreateService
-    def execute
-      result = super
-      issuable.update_start_and_due_dates
-      result
-    end
-
     private
 
     # rubocop: disable CodeReuse/ActiveRecord
     def relate_issues(referenced_issue)
       link = EpicIssue.find_or_initialize_by(issue: referenced_issue)
 
-      params = if link.persisted?
-                 { issue_moved: true, original_epic: link.epic }
-               else
-                 {}
-               end
+      affected_epics = [issuable]
+
+      if link.persisted?
+        affected_epics << link.epic
+        params = { issue_moved: true, original_epic: link.epic }
+      else
+        params = {}
+      end
 
       link.epic = issuable
       link.move_to_start
       link.save!
+
+      affected_epics.each(&:update_start_and_due_dates)
 
       yield params
     end
@@ -43,9 +42,17 @@ module EpicIssues
     end
 
     def linkable_issues(issues)
-      return [] unless can?(current_user, :admin_epic, issuable.group)
+      @linkable_issues ||= begin
+        return [] unless can?(current_user, :admin_epic, issuable.group)
 
-      issues.select { |issue| issuable_group_descendants.include?(issue.project.group) }
+        issues.select do |issue|
+          issuable_group_descendants.include?(issue.project.group) && !previous_related_issues.include?(issue)
+        end
+      end
+    end
+
+    def previous_related_issues
+      @related_issues ||= issuable.issues.to_a
     end
 
     def issuable_group_descendants

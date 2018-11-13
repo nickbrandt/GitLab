@@ -40,12 +40,14 @@ describe('LicenseIssueBody', () => {
 
     it('renders button to open modal', () => {
       const linkEl = vm.$el.querySelector('.license-item > .btn-link');
+
       expect(linkEl).not.toBeNull();
       expect(linkEl.innerText.trim()).toBe(issue.name);
     });
 
     it('renders packages list', () => {
       const packagesEl = vm.$el.querySelector('.license-packages');
+
       expect(packagesEl).not.toBeNull();
       expect(trimText(packagesEl.innerText)).toBe('Used by pg, puma, foo, and 2 more');
     });

@@ -7,8 +7,6 @@ class PasswordsController < Devise::PasswordsController
   before_action :check_password_authentication_available, only: [:create]
   before_action :throttle_reset,      only: [:create]
 
-  prepend EE::PasswordsController
-
   # rubocop: disable CodeReuse/ActiveRecord
   def edit
     super
@@ -66,3 +64,5 @@ class PasswordsController < Devise::PasswordsController
       notice: I18n.t('devise.passwords.send_paranoid_instructions')
   end
 end
+
+PasswordsController.prepend(EE::PasswordsController)

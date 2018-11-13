@@ -33,6 +33,11 @@ $token-spacing-bottom: 0.5em;
 
   li .issuable-info-container {
     padding-left: $gl-padding;
+    padding-right: $gl-padding-4;
+
+    @include media-breakpoint-down(sm) {
+      padding-left: $gl-padding-8;
+    }
   }
 
   a.issuable-main-info:hover {

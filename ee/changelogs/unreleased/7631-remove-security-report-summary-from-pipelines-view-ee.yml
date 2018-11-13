@@ -1,0 +1,5 @@
+---
+title: Remove security report summary from pipelines view
+merge_request: 7844
+author:
+type: removed

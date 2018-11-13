@@ -61,6 +61,9 @@ GET /users?active=true
 GET /users?blocked=true
 ```
 
+NOTE: **Note:**
+Username search is case insensitive.
+
 ### For admins
 
 ```
@@ -563,7 +566,7 @@ Parameters:
 
 ## List SSH keys for user
 
-Get a list of a specified user's SSH keys. Available only for admin
+Get a list of a specified user's SSH keys.
 
 ```
 GET /users/:id/keys

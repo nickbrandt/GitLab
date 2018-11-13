@@ -1,4 +1,4 @@
-/* global BoardService */
+import BoardService from '~/boards/services/board_service';
 
 export const boardObj = {
   id: 1,

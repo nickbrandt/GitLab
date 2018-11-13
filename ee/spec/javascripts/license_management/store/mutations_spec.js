@@ -145,6 +145,7 @@ describe('License store mutations', () => {
       expect(store.state.managedLicenses).toEqual([
         { name: 'Foo', approvalStatus: LICENSE_APPROVAL_STATUS.approved },
       ]);
+
       expect(store.state.isLoadingManagedLicenses).toBe(false);
       expect(store.state.loadManagedLicensesError).toBe(false);
     });

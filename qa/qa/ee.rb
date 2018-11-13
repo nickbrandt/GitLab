@@ -6,6 +6,7 @@ module QA
     module Runtime
       autoload :Env, 'qa/ee/runtime/env'
       autoload :Geo, 'qa/ee/runtime/geo'
+      autoload :Saml, 'qa/ee/runtime/saml'
     end
 
     module Page
@@ -14,6 +15,7 @@ module QA
       end
 
       module Group
+        autoload :Menu, 'qa/ee/page/group/menu'
         autoload :SamlSSOSignIn, 'qa/ee/page/group/saml_sso_sign_in'
 
         module Settings
@@ -21,16 +23,16 @@ module QA
         end
       end
 
+      module File
+        autoload :Show, 'qa/ee/page/file/show'
+      end
+
       module Main
         autoload :Banner, 'qa/ee/page/main/banner'
       end
 
-      module Menu
-        autoload :Admin, 'qa/ee/page/menu/admin'
-        autoload :Side, 'qa/ee/page/menu/side'
-      end
-
       module Admin
+        autoload :Menu, 'qa/ee/page/admin/menu'
         autoload :License, 'qa/ee/page/admin/license'
 
         module Geo
@@ -39,6 +41,10 @@ module QA
             autoload :New, 'qa/ee/page/admin/geo/nodes/new'
           end
         end
+      end
+
+      module Profile
+        autoload :Menu, 'qa/ee/page/profile/menu'
       end
 
       module Project
@@ -56,13 +62,22 @@ module QA
       module MergeRequest
         autoload :Show, 'qa/ee/page/merge_request/show'
       end
+
+      module Group
+        module Epic
+          autoload :Index, 'qa/ee/page/group/epic/index'
+          autoload :Show, 'qa/ee/page/group/epic/show'
+          autoload :Edit, 'qa/ee/page/group/epic/edit'
+        end
+      end
     end
 
-    module Factory
-      autoload :License, 'qa/ee/factory/license'
+    module Resource
+      autoload :License, 'qa/ee/resource/license'
+      autoload :Epic, 'qa/ee/resource/epic'
 
       module Geo
-        autoload :Node, 'qa/ee/factory/geo/node'
+        autoload :Node, 'qa/ee/resource/geo/node'
       end
     end
 

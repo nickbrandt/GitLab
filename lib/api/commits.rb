@@ -98,6 +98,7 @@ module API
         optional :start_branch, type: String, desc: 'Name of the branch to start the new commit from'
         optional :author_email, type: String, desc: 'Author email for commit'
         optional :author_name, type: String, desc: 'Author name for commit'
+        optional :stats, type: Boolean, default: true, desc: 'Include commit stats'
       end
       post ':id/repository/commits' do
         authorize_push_to_branch!(params[:branch])
@@ -113,7 +114,7 @@ module API
 
           Gitlab::WebIdeCommitsCounter.increment if find_user_from_warden
 
-          present commit_detail, with: Entities::CommitDetail
+          present commit_detail, with: Entities::CommitDetail, stats: params[:stats]
         else
           render_api_error!(result[:message], 400)
         end
@@ -193,11 +194,47 @@ module API
           branch_name: params[:branch]
         }
 
-        result = ::Commits::CherryPickService.new(user_project, current_user, commit_params).execute
+        result = ::Commits::CherryPickService
+          .new(user_project, current_user, commit_params)
+          .execute
 
         if result[:status] == :success
-          branch = find_branch!(params[:branch])
-          present user_project.repository.commit(branch.dereferenced_target), with: Entities::Commit
+          present user_project.repository.commit(result[:result]),
+            with: Entities::Commit
+        else
+          render_api_error!(result[:message], 400)
+        end
+      end
+
+      desc 'Revert a commit in a branch' do
+        detail 'This feature was introduced in GitLab 11.6'
+        success Entities::Commit
+      end
+      params do
+        requires :sha, type: String, desc: 'Commit SHA to revert'
+        requires :branch, type: String, desc: 'Target branch name', allow_blank: false
+      end
+      post ':id/repository/commits/:sha/revert', requirements: API::COMMIT_ENDPOINT_REQUIREMENTS do
+        authorize_push_to_branch!(params[:branch])
+
+        commit = user_project.commit(params[:sha])
+        not_found!('Commit') unless commit
+
+        find_branch!(params[:branch])
+
+        commit_params = {
+          commit: commit,
+          start_branch: params[:branch],
+          branch_name: params[:branch]
+        }
+
+        result = ::Commits::RevertService
+          .new(user_project, current_user, commit_params)
+          .execute
+
+        if result[:status] == :success
+          present user_project.repository.commit(result[:result]),
+            with: Entities::Commit
         else
           render_api_error!(result[:message], 400)
         end

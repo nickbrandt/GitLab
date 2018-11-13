@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Admin::LogsController < Admin::ApplicationController
-  prepend EE::Admin::LogsController
-
   before_action :loggers
 
   def show
@@ -21,3 +19,5 @@ class Admin::LogsController < Admin::ApplicationController
     ]
   end
 end
+
+Admin::LogsController.prepend(EE::Admin::LogsController)

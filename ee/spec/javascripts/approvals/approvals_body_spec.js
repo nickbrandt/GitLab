@@ -45,6 +45,7 @@ describe('Approvals Body Component', () => {
     describe('approvalsRequiredStringified', () => {
       it('should display the correct string for 1 possible approver', () => {
         const correctText = 'Requires 1 more approval by';
+
         expect(vm.approvalsRequiredStringified).toBe(correctText);
       });
 
@@ -97,8 +98,9 @@ describe('Approvals Body Component', () => {
         vm.userCanApprove = true;
 
         Vue.nextTick(() => {
-          expect(vm.approvalsRequiredStringified)
-            .toBe('Merge request approved; you can approve additionally');
+          expect(vm.approvalsRequiredStringified).toBe(
+            'Merge request approved; you can approve additionally',
+          );
           done();
         });
       });

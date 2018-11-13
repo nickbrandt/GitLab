@@ -8,6 +8,7 @@ module EE
       approvers
       vulnerability_feedback
       license_management
+      feature_flag
     ].freeze
 
     prepended do
@@ -54,7 +55,9 @@ module EE
       end
 
       with_scope :subject
-      condition(:security_reports_feature_available) { @subject.security_reports_feature_available? }
+      condition(:security_dashboard_feature_disabled) do
+        !@subject.feature_available?(:security_dashboard)
+      end
 
       condition(:prometheus_alerts_enabled) do
         @subject.feature_available?(:prometheus_alerts, @user)
@@ -63,6 +66,11 @@ module EE
       with_scope :subject
       condition(:license_management_enabled) do
         @subject.feature_available?(:license_management)
+      end
+
+      with_scope :subject
+      condition(:feature_flags_disabled) do
+        !@subject.feature_available?(:feature_flags)
       end
 
       rule { admin }.enable :change_repository_storage
@@ -99,11 +107,22 @@ module EE
         enable :admin_board
         enable :admin_vulnerability_feedback
         enable :create_package
+        enable :read_feature_flag
+        enable :create_feature_flag
+        enable :update_feature_flag
+        enable :destroy_feature_flag
+        enable :admin_feature_flag
       end
 
       rule { can?(:public_access) }.enable :read_package
 
-      rule { can?(:developer_access) & security_reports_feature_available }.enable :read_project_security_dashboard
+      rule { can?(:developer_access) }.policy do
+        enable :read_project_security_dashboard
+      end
+
+      rule { security_dashboard_feature_disabled }.policy do
+        prevent :read_project_security_dashboard
+      end
 
       rule { can?(:read_project) }.enable :read_vulnerability_feedback
 
@@ -113,8 +132,12 @@ module EE
 
       rule { deploy_board_disabled & ~is_development }.prevent :read_deploy_board
 
-      rule { packages_disabled }.policy do
+      rule { packages_disabled | repository_disabled }.policy do
         prevent(*create_read_update_admin_destroy(:package))
+      end
+
+      rule { feature_flags_disabled | repository_disabled }.policy do
+        prevent(*create_read_update_admin_destroy(:feature_flag))
       end
 
       rule { can?(:maintainer_access) }.policy do

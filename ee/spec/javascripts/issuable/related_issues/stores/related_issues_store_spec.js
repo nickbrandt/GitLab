@@ -49,6 +49,7 @@ describe('RelatedIssuesStore', () => {
 
       expect(store.state.relatedIssues[3].id).toBe(issuable4.id);
       store.updateIssueOrder(3, 0);
+
       expect(store.state.relatedIssues[0].id).toBe(issuable4.id);
     });
   });

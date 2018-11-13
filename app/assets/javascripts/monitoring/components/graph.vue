@@ -82,6 +82,7 @@ export default {
       showFlag: false,
       showFlagContent: false,
       timeSeries: [],
+      graphDrawData: {},
       realPixelRatio: 1,
       seriesUnderMouse: [],
     };
@@ -120,6 +121,7 @@ export default {
     draw() {
       const breakpointSize = bp.getBreakpointSize();
       const query = this.graphData.queries[0];
+      const svgWidth = this.$refs.baseSvg.getBoundingClientRect().width;
       this.margin = measurements.large.margin;
       if (this.smallGraph || breakpointSize === 'xs' || breakpointSize === 'sm') {
         this.graphHeight = 300;
@@ -129,13 +131,13 @@ export default {
       this.unitOfDisplay = query.unit || '';
       this.yAxisLabel = this.graphData.y_label || 'Values';
       this.legendTitle = query.label || 'Average';
-      this.graphWidth = this.$refs.baseSvg.clientWidth - this.margin.left - this.margin.right;
+      this.graphWidth = svgWidth - this.margin.left - this.margin.right;
       this.graphHeight = this.graphHeight - this.margin.top - this.margin.bottom;
       this.baseGraphHeight = this.graphHeight - 50;
       this.baseGraphWidth = this.graphWidth;
 
       // pixel offsets inside the svg and outside are not 1:1
-      this.realPixelRatio = this.$refs.baseSvg.clientWidth / this.baseGraphWidth;
+      this.realPixelRatio = svgWidth / this.baseGraphWidth;
 
       this.renderAxesPaths();
       this.formatDeployments();
@@ -147,7 +149,7 @@ export default {
       point = point.matrixTransform(this.$refs.graphData.getScreenCTM().inverse());
       point.x += 7;
 
-      this.seriesUnderMouse = this.timeSeries.filter((series) => {
+      this.seriesUnderMouse = this.timeSeries.filter(series => {
         const mouseX = series.timeSeriesScaleX.invert(point.x);
         let minDistance = Infinity;
 
@@ -180,12 +182,12 @@ export default {
       });
     },
     renderAxesPaths() {
-      this.timeSeries = createTimeSeries(
+      ({ timeSeries: this.timeSeries, graphDrawData: this.graphDrawData } = createTimeSeries(
         this.graphData.queries,
         this.graphWidth,
         this.graphHeight,
         this.graphHeightOffset,
-      );
+      ));
 
       if (_.findWhere(this.timeSeries, { renderCanary: true })) {
         this.timeSeries = this.timeSeries.map(series => ({ ...series, renderCanary: true }));
@@ -220,21 +222,18 @@ export default {
         .scale(axisYScale)
         .ticks(measurements.yTicks);
 
-      d3
-        .select(this.$refs.baseSvg)
+      d3.select(this.$refs.baseSvg)
         .select('.x-axis')
         .call(xAxis);
 
       const width = this.graphWidth;
-      d3
-        .select(this.$refs.baseSvg)
+      d3.select(this.$refs.baseSvg)
         .select('.y-axis')
         .call(yAxis)
         .selectAll('.tick')
         .each(function createTickLines(d, i) {
           if (i > 0) {
-            d3
-              .select(this)
+            d3.select(this)
               .select('line')
               .attr('x2', width)
               .attr('class', 'axis-tick');
@@ -288,6 +287,10 @@ export default {
           :viewBox="innerViewBox"
           class="graph-data"
         >
+          <slot
+            name="additionalSvgContent"
+            :graphDrawData="graphDrawData"
+          />
           <graph-path
             v-for="(path, index) in timeSeries"
             :key="index"

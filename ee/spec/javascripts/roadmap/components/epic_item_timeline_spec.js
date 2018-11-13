@@ -41,6 +41,7 @@ describe('EpicItemTimelineComponent', () => {
   describe('data', () => {
     it('returns default data props', () => {
       vm = createComponent({});
+
       expect(vm.timelineBarReady).toBe(false);
       expect(vm.timelineBarStyles).toBe('');
     });
@@ -50,6 +51,7 @@ describe('EpicItemTimelineComponent', () => {
     describe('itemStyles', () => {
       it('returns CSS min-width based on getCellWidth() method', () => {
         vm = createComponent({});
+
         expect(vm.itemStyles.width).toBe(`${mockItemWidth}px`);
       });
     });
@@ -59,6 +61,7 @@ describe('EpicItemTimelineComponent', () => {
     describe('getCellWidth', () => {
       it('returns proportionate width based on timeframe length and shellWidth', () => {
         vm = createComponent({});
+
         expect(vm.getCellWidth()).toBe(240);
       });
 
@@ -66,6 +69,7 @@ describe('EpicItemTimelineComponent', () => {
         vm = createComponent({
           shellWidth: 1000,
         });
+
         expect(vm.getCellWidth()).toBe(TIMELINE_CELL_MIN_WIDTH);
       });
     });
@@ -78,6 +82,7 @@ describe('EpicItemTimelineComponent', () => {
             endDateOutOfRange: true,
           }),
         });
+
         expect(vm.getTimelineBarEndOffset()).toBe(TIMELINE_END_OFFSET_FULL);
       });
 
@@ -88,6 +93,7 @@ describe('EpicItemTimelineComponent', () => {
             endDateOutOfRange: true,
           }),
         });
+
         expect(vm.getTimelineBarEndOffset()).toBe(TIMELINE_END_OFFSET_FULL);
       });
 
@@ -97,11 +103,13 @@ describe('EpicItemTimelineComponent', () => {
             endDateOutOfRange: true,
           }),
         });
+
         expect(vm.getTimelineBarEndOffset()).toBe(TIMELINE_END_OFFSET_HALF);
       });
 
       it('returns 0 when both Epic startDate and endDate is defined and within range', () => {
         vm = createComponent({});
+
         expect(vm.getTimelineBarEndOffset()).toBe(0);
       });
     });
@@ -113,6 +121,7 @@ describe('EpicItemTimelineComponent', () => {
           timeframeItem: mockTimeframeMonths[1],
         });
         vm.renderTimelineBar();
+
         expect(vm.timelineBarStyles).toBe('width: 1216px; left: 0;');
         expect(vm.timelineBarReady).toBe(true);
       });
@@ -123,6 +132,7 @@ describe('EpicItemTimelineComponent', () => {
           timeframeItem: mockTimeframeMonths[1],
         });
         vm.renderTimelineBar();
+
         expect(vm.timelineBarStyles).toBe('');
         expect(vm.timelineBarReady).toBe(false);
       });
@@ -132,11 +142,13 @@ describe('EpicItemTimelineComponent', () => {
   describe('template', () => {
     it('renders component container element with class `epic-timeline-cell`', () => {
       vm = createComponent({});
+
       expect(vm.$el.classList.contains('epic-timeline-cell')).toBe(true);
     });
 
     it('renders component container element with `min-width` property applied via style attribute', () => {
       vm = createComponent({});
+
       expect(vm.$el.getAttribute('style')).toBe(`width: ${mockItemWidth}px;`);
     });
 
@@ -145,6 +157,7 @@ describe('EpicItemTimelineComponent', () => {
         epic: Object.assign({}, mockEpic, { startDate: mockTimeframeMonths[1] }),
         timeframeItem: mockTimeframeMonths[1],
       });
+
       expect(vm.$el.querySelector('.timeline-bar-wrapper .timeline-bar')).not.toBeNull();
     });
 

@@ -260,7 +260,7 @@ class Commit
   request_cache(:author) { author_email.downcase }
 
   def committer
-    @committer ||= User.find_by_any_email(committer_email.downcase)
+    @committer ||= User.find_by_any_email(committer_email)
   end
 
   def parents
@@ -319,7 +319,11 @@ class Commit
   def status(ref = nil)
     return @statuses[ref] if @statuses.key?(ref)
 
-    @statuses[ref] = project.pipelines.latest_status_per_commit(id, ref)[id]
+    @statuses[ref] = status_for_project(ref, project)
+  end
+
+  def status_for_project(ref, pipeline_project)
+    pipeline_project.pipelines.latest_status_per_commit(id, ref)[id]
   end
 
   def set_status_for_ref(ref, status)

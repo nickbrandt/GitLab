@@ -113,10 +113,10 @@ export default {
       if (issueToRemove) {
         RelatedIssuesService.remove(issueToRemove.relation_path)
           .then(res => res.json())
-          .then((data) => {
+          .then(data => {
             this.store.setRelatedIssues(data.issues);
           })
-          .catch((res) => {
+          .catch(res => {
             if (res && res.status !== 404) {
               Flash('An error occurred while removing issues.');
             }
@@ -136,9 +136,10 @@ export default {
 
       if (this.state.pendingReferences.length > 0) {
         this.isSubmitting = true;
-        this.service.addRelatedIssues(this.state.pendingReferences)
+        this.service
+          .addRelatedIssues(this.state.pendingReferences)
           .then(res => res.json())
-          .then((data) => {
+          .then(data => {
             // We could potentially lose some pending issues in the interim here
             this.store.setPendingReferences([]);
             this.store.setRelatedIssues(data.issues);
@@ -147,9 +148,9 @@ export default {
             // Close the form on submission
             this.isFormVisible = false;
           })
-          .catch((res) => {
+          .catch(res => {
             this.isSubmitting = false;
-            let errorMessage = 'We can\'t find an issue that matches what you are looking for.';
+            let errorMessage = "We can't find an issue that matches what you are looking for.";
             if (res.data && res.data.message) {
               errorMessage = res.data.message;
             }
@@ -164,9 +165,10 @@ export default {
     },
     fetchRelatedIssues() {
       this.isFetching = true;
-      this.service.fetchRelatedIssues()
+      this.service
+        .fetchRelatedIssues()
         .then(res => res.json())
-        .then((issues) => {
+        .then(issues => {
           this.store.setRelatedIssues(issues);
           this.isFetching = false;
         })
@@ -185,27 +187,26 @@ export default {
           move_before_id: beforeId,
           move_after_id: afterId,
         })
-        .then(res => res.json())
-        .then((res) => {
-          if (!res.message) {
-            this.store.updateIssueOrder(oldIndex, newIndex);
-          }
-        })
-        .catch(() => {
-          Flash('An error occurred while reordering issues.');
-        });
+          .then(res => res.json())
+          .then(res => {
+            if (!res.message) {
+              this.store.updateIssueOrder(oldIndex, newIndex);
+            }
+          })
+          .catch(() => {
+            Flash('An error occurred while reordering issues.');
+          });
       }
     },
     onInput(newValue, caretPos) {
-      const rawReferences = newValue
-        .split(/\s/);
+      const rawReferences = newValue.split(/\s/);
 
       let touchedReference;
       let iteratingPos = 0;
       const untouchedRawReferences = rawReferences
-        .filter((reference) => {
+        .filter(reference => {
           let isTouched = false;
-          if (caretPos >= iteratingPos && caretPos <= (iteratingPos + reference.length)) {
+          if (caretPos >= iteratingPos && caretPos <= iteratingPos + reference.length) {
             touchedReference = reference;
             isTouched = true;
           }
@@ -216,22 +217,16 @@ export default {
         })
         .filter(reference => reference.trim().length > 0);
 
-      this.store.setPendingReferences(
-        this.state.pendingReferences.concat(untouchedRawReferences),
-      );
+      this.store.setPendingReferences(this.state.pendingReferences.concat(untouchedRawReferences));
       this.inputValue = `${touchedReference}`;
     },
     onBlur(newValue) {
       this.processAllReferences(newValue);
     },
     processAllReferences(value = '') {
-      const rawReferences = value
-        .split(/\s+/)
-        .filter(reference => reference.trim().length > 0);
+      const rawReferences = value.split(/\s+/).filter(reference => reference.trim().length > 0);
 
-      this.store.setPendingReferences(
-        this.state.pendingReferences.concat(rawReferences),
-      );
+      this.store.setPendingReferences(this.state.pendingReferences.concat(rawReferences));
       this.inputValue = '';
     },
   },

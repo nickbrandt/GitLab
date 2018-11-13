@@ -142,6 +142,7 @@ module API
     mount ::API::Projects
     mount ::API::ProjectSnapshots
     mount ::API::ProjectSnippets
+    mount ::API::ProjectTemplates
     mount ::API::ProtectedBranches
     mount ::API::ProtectedTags
     mount ::API::Repositories
@@ -152,6 +153,7 @@ module API
     mount ::API::Settings
     mount ::API::SidekiqMetrics
     mount ::API::Snippets
+    mount ::API::Submodules
     mount ::API::Subscriptions
     mount ::API::SystemHooks
     mount ::API::Tags
@@ -167,6 +169,7 @@ module API
     mount ::EE::API::Boards
     mount ::EE::API::GroupBoards
 
+    mount ::API::Unleash
     mount ::API::EpicIssues
     mount ::API::Epics
     mount ::API::Geo

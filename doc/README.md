@@ -33,7 +33,7 @@ provides solutions for all the stages of the DevOps lifecycle:
 [plan](#plan), [create](#create), [verify](#verify), [package](#package),
 [release](#release), [configure](#configure), [monitor](#monitor).
 
-![DevOps Lifecycle](img/devops_lifecycle.png)
+<img class="image-noshadow" src="img/devops_lifecycle.png" alt="DevOps Lifecycle">
 
 ### Plan
 
@@ -86,6 +86,7 @@ on projects and code.
   - [Epics](user/group/epics/index.md) **[ULTIMATE]**
   - [Roadmap](user/group/roadmap/index.md) **[ULTIMATE]**
   - [Contribution Analytics](user/group/contribution_analytics/index.md): See detailed statistics of group contributors. **[STARTER]**
+  - [Issues Analytics](user/group/issues_analytics/index.md): Check how many issues were created per month. **[PREMIUM]**
 - [Search through GitLab](user/search/index.md): Search for issues, merge requests, projects, groups, todos, and issues in Issue Boards.
   - [Advanced Global Search](user/search/advanced_global_search.md): Leverage Elasticsearch for faster, more advanced code search across your entire GitLab instance. **[STARTER]**
   - [Advanced Syntax Search](user/search/advanced_search_syntax.md): Use advanced queries for more targeted search results. **[STARTER]**
@@ -189,6 +190,7 @@ configuration. Then customize everything from buildpacks to CI/CD.
 - [Easy creation of Kubernetes clusters on GKE](user/project/clusters/index.md#adding-and-creating-a-new-gke-cluster-via-gitlab)
 - [Multiple Kubernetes Clusters](user/project/clusters/index.md#multiple-kubernetes-clusters) **[PREMIUM]**
 - [Environment-specific variables](ci/variables/README.md#limiting-environment-scopes-of-variables) **[PREMIUM]**
+- [Executable Runbooks](user/project/clusters/runbooks/index.md)
 
 ### Monitor
 

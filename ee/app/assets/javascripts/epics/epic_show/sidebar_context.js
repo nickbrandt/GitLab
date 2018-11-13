@@ -1,13 +1,10 @@
 import $ from 'jquery';
-import Mousetrap from 'mousetrap';
 import Cookies from 'js-cookie';
 import bp from '~/breakpoints';
 
 export default class SidebarContext {
   constructor() {
     const $issuableSidebar = $('.js-issuable-update');
-
-    Mousetrap.bind('l', () => SidebarContext.openSidebarDropdown($issuableSidebar.find('.js-labels-block')));
 
     $issuableSidebar
       .off('click', '.js-sidebar-dropdown-toggle')
@@ -43,9 +40,5 @@ export default class SidebarContext {
         Cookies.set('collapsed_gutter', true);
       }
     });
-  }
-
-  static openSidebarDropdown($block) {
-    $block.find('.js-sidebar-dropdown-toggle').trigger('click');
   }
 }

@@ -48,6 +48,7 @@ describe('security reports mutations', () => {
   describe('SET_VULNERABILITY_FEEDBACK_PATH', () => {
     it('should set the vulnerabilities endpoint', () => {
       mutations[types.SET_VULNERABILITY_FEEDBACK_PATH](stateCopy, 'vulnerability_path');
+
       expect(stateCopy.vulnerabilityFeedbackPath).toEqual('vulnerability_path');
     });
   });
@@ -55,6 +56,7 @@ describe('security reports mutations', () => {
   describe('SET_VULNERABILITY_FEEDBACK_HELP_PATH', () => {
     it('should set the vulnerabilities help path', () => {
       mutations[types.SET_VULNERABILITY_FEEDBACK_HELP_PATH](stateCopy, 'vulnerability_help_path');
+
       expect(stateCopy.vulnerabilityFeedbackHelpPath).toEqual('vulnerability_help_path');
     });
   });
@@ -62,6 +64,7 @@ describe('security reports mutations', () => {
   describe('SET_PIPELINE_ID', () => {
     it('should set the pipeline id', () => {
       mutations[types.SET_PIPELINE_ID](stateCopy, 123);
+
       expect(stateCopy.pipelineId).toEqual(123);
     });
   });
@@ -69,6 +72,7 @@ describe('security reports mutations', () => {
   describe('SET_CAN_CREATE_ISSUE_PERMISSION', () => {
     it('should set permission for create issue', () => {
       mutations[types.SET_CAN_CREATE_ISSUE_PERMISSION](stateCopy, true);
+
       expect(stateCopy.canCreateIssuePermission).toEqual(true);
     });
   });
@@ -76,6 +80,7 @@ describe('security reports mutations', () => {
   describe('SET_CAN_CREATE_FEEDBACK_PERMISSION', () => {
     it('should set permission for create feedback', () => {
       mutations[types.SET_CAN_CREATE_FEEDBACK_PERMISSION](stateCopy, true);
+
       expect(stateCopy.canCreateFeedbackPermission).toEqual(true);
     });
   });
@@ -139,6 +144,7 @@ describe('security reports mutations', () => {
   describe('RECEIVE_SAST_REPORTS_ERROR', () => {
     it('should set loading flag to false and error flag to true for sast', () => {
       mutations[types.RECEIVE_SAST_REPORTS_ERROR](stateCopy);
+
       expect(stateCopy.sast.isLoading).toEqual(false);
       expect(stateCopy.sast.hasError).toEqual(true);
     });
@@ -306,6 +312,7 @@ describe('security reports mutations', () => {
         expect(stateCopy.dependencyScanning.resolvedIssues).toEqual(
           parsedDependencyScanningBaseStore,
         );
+
         expect(stateCopy.summaryCounts).toEqual({ added: 2, fixed: 1, existing: 1 });
       });
     });
@@ -316,6 +323,7 @@ describe('security reports mutations', () => {
         mutations[types.RECEIVE_DEPENDENCY_SCANNING_REPORTS](stateCopy, {
           head: dependencyScanningIssues,
         });
+
         expect(stateCopy.dependencyScanning.isLoading).toEqual(false);
         expect(stateCopy.dependencyScanning.newIssues).toEqual(parsedDependencyScanningIssuesStore);
         expect(stateCopy.summaryCounts).toEqual({ added: 3, fixed: 0, existing: 0 });
@@ -406,21 +414,26 @@ describe('security reports mutations', () => {
           class: 'User',
           method: 'do_something',
         },
-        links: [{
-          url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/rMTQy4oRCGk',
-        }],
-        identifiers: [{
-          type: 'CVE',
-          name: 'CVE-2014-9999',
-          value: 'CVE-2014-9999',
-          url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-9999',
-        }],
-        instances: [{
-          param: 'X-Content-Type-Options',
-          method: 'GET',
-          uri: 'http://example.com/some-path',
-
-        }],
+        links: [
+          {
+            url: 'https://groups.google.com/forum/#!topic/rubyonrails-security/rMTQy4oRCGk',
+          },
+        ],
+        identifiers: [
+          {
+            type: 'CVE',
+            name: 'CVE-2014-9999',
+            value: 'CVE-2014-9999',
+            url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-9999',
+          },
+        ],
+        instances: [
+          {
+            param: 'X-Content-Type-Options',
+            method: 'GET',
+            uri: 'http://example.com/some-path',
+          },
+        ],
         isDismissed: true,
       };
       const status = 'success';
@@ -448,6 +461,7 @@ describe('security reports mutations', () => {
   describe('REQUEST_DISMISS_ISSUE', () => {
     it('sets isDismissingIssue prop to true and resets error', () => {
       mutations[types.REQUEST_DISMISS_ISSUE](stateCopy);
+
       expect(stateCopy.modal.isDismissingIssue).toEqual(true);
       expect(stateCopy.modal.error).toBeNull();
     });
@@ -456,6 +470,7 @@ describe('security reports mutations', () => {
   describe('RECEIVE_DISMISS_ISSUE_SUCCESS', () => {
     it('sets isDismissingIssue prop to false', () => {
       mutations[types.RECEIVE_DISMISS_ISSUE_SUCCESS](stateCopy);
+
       expect(stateCopy.modal.isDismissingIssue).toEqual(false);
     });
   });
@@ -463,6 +478,7 @@ describe('security reports mutations', () => {
   describe('RECEIVE_DISMISS_ISSUE_ERROR', () => {
     it('sets isDismissingIssue prop to false and sets error', () => {
       mutations[types.RECEIVE_DISMISS_ISSUE_ERROR](stateCopy, 'error');
+
       expect(stateCopy.modal.isDismissingIssue).toEqual(false);
       expect(stateCopy.modal.error).toEqual('error');
     });
@@ -471,6 +487,7 @@ describe('security reports mutations', () => {
   describe('REQUEST_CREATE_ISSUE', () => {
     it('sets isCreatingNewIssue prop to true and resets error', () => {
       mutations[types.REQUEST_CREATE_ISSUE](stateCopy);
+
       expect(stateCopy.modal.isCreatingNewIssue).toEqual(true);
       expect(stateCopy.modal.error).toBeNull();
     });
@@ -479,6 +496,7 @@ describe('security reports mutations', () => {
   describe('RECEIVE_CREATE_ISSUE_SUCCESS', () => {
     it('sets isCreatingNewIssue prop to false', () => {
       mutations[types.RECEIVE_CREATE_ISSUE_SUCCESS](stateCopy);
+
       expect(stateCopy.modal.isCreatingNewIssue).toEqual(false);
     });
   });
@@ -486,6 +504,7 @@ describe('security reports mutations', () => {
   describe('RECEIVE_CREATE_ISSUE_ERROR', () => {
     it('sets isCreatingNewIssue prop to false and sets error', () => {
       mutations[types.RECEIVE_CREATE_ISSUE_ERROR](stateCopy, 'error');
+
       expect(stateCopy.modal.isCreatingNewIssue).toEqual(false);
       expect(stateCopy.modal.error).toEqual('error');
     });
@@ -502,6 +521,7 @@ describe('security reports mutations', () => {
       };
 
       mutations[types.UPDATE_SAST_ISSUE](stateCopy, updatedIssue);
+
       expect(stateCopy.sast.newIssues[0]).toEqual(updatedIssue);
     });
 
@@ -515,6 +535,7 @@ describe('security reports mutations', () => {
       };
 
       mutations[types.UPDATE_SAST_ISSUE](stateCopy, updatedIssue);
+
       expect(stateCopy.sast.resolvedIssues[0]).toEqual(updatedIssue);
     });
 
@@ -528,6 +549,7 @@ describe('security reports mutations', () => {
       };
 
       mutations[types.UPDATE_SAST_ISSUE](stateCopy, updatedIssue);
+
       expect(stateCopy.sast.allIssues[0]).toEqual(updatedIssue);
     });
   });
@@ -543,6 +565,7 @@ describe('security reports mutations', () => {
       };
 
       mutations[types.UPDATE_DEPENDENCY_SCANNING_ISSUE](stateCopy, updatedIssue);
+
       expect(stateCopy.dependencyScanning.newIssues[0]).toEqual(updatedIssue);
     });
 
@@ -556,6 +579,7 @@ describe('security reports mutations', () => {
       };
 
       mutations[types.UPDATE_DEPENDENCY_SCANNING_ISSUE](stateCopy, updatedIssue);
+
       expect(stateCopy.sast.resolvedIssues[0]).toEqual(updatedIssue);
     });
 
@@ -569,6 +593,7 @@ describe('security reports mutations', () => {
       };
 
       mutations[types.UPDATE_DEPENDENCY_SCANNING_ISSUE](stateCopy, updatedIssue);
+
       expect(stateCopy.dependencyScanning.allIssues[0]).toEqual(updatedIssue);
     });
   });
@@ -584,6 +609,7 @@ describe('security reports mutations', () => {
       };
 
       mutations[types.UPDATE_CONTAINER_SCANNING_ISSUE](stateCopy, updatedIssue);
+
       expect(stateCopy.sastContainer.newIssues[0]).toEqual(updatedIssue);
     });
 
@@ -596,6 +622,7 @@ describe('security reports mutations', () => {
       };
 
       mutations[types.UPDATE_CONTAINER_SCANNING_ISSUE](stateCopy, updatedIssue);
+
       expect(stateCopy.sastContainer.resolvedIssues[0]).toEqual(updatedIssue);
     });
   });
@@ -610,6 +637,7 @@ describe('security reports mutations', () => {
       };
 
       mutations[types.UPDATE_DAST_ISSUE](stateCopy, updatedIssue);
+
       expect(stateCopy.dast.newIssues[0]).toEqual(updatedIssue);
     });
 
@@ -622,6 +650,7 @@ describe('security reports mutations', () => {
       };
 
       mutations[types.UPDATE_DAST_ISSUE](stateCopy, updatedIssue);
+
       expect(stateCopy.dast.resolvedIssues[0]).toEqual(updatedIssue);
     });
   });

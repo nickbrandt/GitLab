@@ -6,11 +6,13 @@ import eventHub from '../eventhub';
 import DeployKeysService from '../service';
 import DeployKeysStore from '../store';
 import KeysPanel from './keys_panel.vue';
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 
 export default {
   components: {
     KeysPanel,
     NavigationTabs,
+    GlLoadingIcon,
   },
   props: {
     endpoint: {
@@ -95,8 +97,10 @@ export default {
         .catch(() => new Flash(s__('DeployKeys|Error enabling deploy key')));
     },
     disableKey(deployKey, callback) {
-      // eslint-disable-next-line no-alert
-      if (window.confirm(s__('DeployKeys|You are going to remove this deploy key. Are you sure?'))) {
+      if (
+        // eslint-disable-next-line no-alert
+        window.confirm(s__('DeployKeys|You are going to remove this deploy key. Are you sure?'))
+      ) {
         this.service
           .disableKey(deployKey.id)
           .then(this.fetchKeys)

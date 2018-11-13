@@ -7,12 +7,18 @@ module IssueLinks
     end
 
     def linkable_issues(issues)
-      issues.select { |issue| can?(current_user, :admin_issue_link, issue) }
+      @linkable_issues ||= begin
+        issues.select { |issue| can?(current_user, :admin_issue_link, issue) }
+      end
     end
 
     def create_notes(referenced_issue, params)
       SystemNoteService.relate_issue(issuable, referenced_issue, current_user)
       SystemNoteService.relate_issue(referenced_issue, issuable, current_user)
+    end
+
+    def previous_related_issues
+      @related_issues ||= issuable.related_issues(current_user).to_a
     end
   end
 end

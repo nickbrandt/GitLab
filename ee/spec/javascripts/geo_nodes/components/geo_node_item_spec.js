@@ -56,18 +56,21 @@ describe('GeoNodeItemComponent', () => {
     describe('showNodeDetails', () => {
       it('returns `false` if Node details are still loading', () => {
         vm.isNodeDetailsLoading = true;
+
         expect(vm.showNodeDetails).toBeFalsy();
       });
 
       it('returns `false` if Node details failed to load', () => {
         vm.isNodeDetailsLoading = false;
         vm.isNodeDetailsFailed = true;
+
         expect(vm.showNodeDetails).toBeFalsy();
       });
 
       it('returns `true` if Node details loaded', () => {
         vm.isNodeDetailsLoading = false;
         vm.isNodeDetailsFailed = false;
+
         expect(vm.showNodeDetails).toBeTruthy();
       });
     });
@@ -84,6 +87,7 @@ describe('GeoNodeItemComponent', () => {
         const vmNodePrimary = createComponent(mockNodeSecondary);
 
         vmNodePrimary.handleNodeDetails(mockNodeDetails);
+
         expect(vmNodePrimary.isNodeDetailsLoading).toBeFalsy();
         expect(vmNodePrimary.isNodeDetailsFailed).toBeFalsy();
         expect(vmNodePrimary.errorMessage).toBe('');
@@ -93,19 +97,10 @@ describe('GeoNodeItemComponent', () => {
 
         // With default mock data without matching ID
         vm.handleNodeDetails(mockNodeDetails);
+
         expect(vm.isNodeDetailsLoading).toBeTruthy();
         expect(vm.nodeDetails).not.toBe(mockNodeDetails);
         expect(vm.nodeHealthStatus).not.toBe(mockNodeDetails.health);
-      });
-    });
-
-    describe('handleNodeDetailsFailure', () => {
-      it('initializes props for Node details failure', () => {
-        const err = 'Something went wrong';
-        vm.handleNodeDetailsFailure(1, { message: err });
-        expect(vm.isNodeDetailsLoading).toBeFalsy();
-        expect(vm.isNodeDetailsFailed).toBeTruthy();
-        expect(vm.errorMessage).toBe(err);
       });
     });
 
@@ -114,6 +109,7 @@ describe('GeoNodeItemComponent', () => {
         spyOn(eventHub, '$emit');
 
         vm.handleMounted();
+
         expect(eventHub.$emit).toHaveBeenCalledWith('pollNodeDetails', vm.node);
       });
     });
@@ -124,8 +120,8 @@ describe('GeoNodeItemComponent', () => {
       spyOn(eventHub, '$on');
 
       const vmX = createComponent();
+
       expect(eventHub.$on).toHaveBeenCalledWith('nodeDetailsLoaded', jasmine.any(Function));
-      expect(eventHub.$on).toHaveBeenCalledWith('nodeDetailsLoadFailed', jasmine.any(Function));
       vmX.$destroy();
     });
   });
@@ -136,8 +132,8 @@ describe('GeoNodeItemComponent', () => {
 
       const vmX = createComponent();
       vmX.$destroy();
+
       expect(eventHub.$off).toHaveBeenCalledWith('nodeDetailsLoaded', jasmine.any(Function));
-      expect(eventHub.$off).toHaveBeenCalledWith('nodeDetailsLoadFailed', jasmine.any(Function));
     });
   });
 
@@ -146,7 +142,7 @@ describe('GeoNodeItemComponent', () => {
       expect(vm.$el.classList.contains('card', 'geo-node-item')).toBe(true);
     });
 
-    it('renders node error message', (done) => {
+    it('renders node error message', done => {
       const err = 'Something error message';
       vm.isNodeDetailsFailed = true;
       vm.errorMessage = err;

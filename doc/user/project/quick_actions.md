@@ -1,9 +1,9 @@
 # GitLab quick actions
 
-Quick actions are textual shortcuts for common actions on issues, epics, merge requests, 
+Quick actions are textual shortcuts for common actions on issues, epics, merge requests,
 and commits that are usually done by clicking buttons or dropdowns in GitLab's UI.
 You can enter these commands while creating a new issue or merge request, or
-in comments of issues, epics, merge requests, and commits. Each command should be 
+in comments of issues, epics, merge requests, and commits. Each command should be
 on a separate line in order to be properly detected and executed. Once executed,
 the commands are removed from the text body and not visible to anyone else.
 
@@ -24,6 +24,7 @@ discussions, and descriptions:
 | `/reopen`                  | Reopen                         | ✓     | ✓             |
 | `/title <New title>`       | Change title                   | ✓     |  ✓            |
 | `/award :emoji:`           | Toggle emoji award             | ✓     | ✓             |
+| `/assign me`               | Assign yourself                | ✓     | ✓             |
 | `/assign @user`            | Assign one user                | ✓     | ✓             |
 | `/assign @user1 @user2`    | Assign multiple users **[STARTER]** | ✓ |              |
 | `/unassign`                | Remove assignee(s)             | ✓     | ✓             |
@@ -38,17 +39,20 @@ discussions, and descriptions:
 | `/remove_estimate`       | Remove time estimate             | ✓     | ✓             |
 | <code>/spend &lt;time(1h 30m &#124; -1h 5m)&gt; &lt;date(YYYY-MM-DD)&gt;</code> | Add or subtract spent time; optionally, specify the date that time was spent on | ✓     | ✓             |
 | `/remove_time_spent`       | Remove time spent              | ✓     | ✓             |
-| <code>/due &lt;in 2 days &#124; this Friday &#124; December 31st&gt;</code>| Set due date | ✓ |
+| `/lock`                    | Lock the discussion            | ✓     | ✓             |
+| `/unlock`                  | Unlock the discussion          | ✓     | ✓             |
+| <code>/due &lt;in 2 days &#124; this Friday &#124; December 31st&gt;</code>| Set due date | ✓ | |
 | `/remove_due_date`         | Remove due date                | ✓     |               |
 | `/weight 0,1,2, ...`       | Set weight **[STARTER]**       | ✓     |               |
 | `/clear_weight`            | Clears weight **[STARTER]**    | ✓     |               |
-| `/epic <group&epic &#124; Epic URL>` | Add to epic **[ULTIMATE]** | ✓ |             |
+| `/epic <&epic &#124; group&epic &#124; Epic URL>` | Add to epic **[ULTIMATE]** | ✓ |             |
 | `/remove_epic`             | Removes from epic **[ULTIMATE]** | ✓   |               |
 | `/confidential`            | Make confidential              | ✓     |               |
 | `/duplicate #issue`        | Mark this issue as a duplicate of another issue | ✓    |
 | `/move path/to/project`    | Move this issue to another project | ✓ |               |
 | `/target_branch <Local branch Name>` | Set target branch    |       | ✓             |
 | `/wip`                     | Toggle the Work In Progress status |   | ✓             |
+| `/approve`                 | Approve the merge request      |       | ✓             |
 | `/merge`                   | Merge (when pipeline succeeds) |       | ✓             |
 
 
@@ -68,7 +72,7 @@ The following quick actions are applicable for epics threads and description:
 |:---------------------------|:----------------------------------------|
 | `/tableflip <Comment>`     | Append the comment with `(╯°□°)╯︵ ┻━┻` |
 | `/shrug <Comment>`         | Append the comment with `¯\＿(ツ)＿/¯`  |
-| `/todo`                    | Add a todo                              | 
+| `/todo`                    | Add a todo                              |
 | `/done`                    | Mark todo as done                       |
 | `/subscribe`               | Subscribe                               |
 | `/unsubscribe`             | Unsubscribe                             |

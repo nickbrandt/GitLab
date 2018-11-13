@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Geo::ProjectRegistry < Geo::BaseRegistry
   include ::Delay
   include ::EachBatch
@@ -33,6 +35,7 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
   scope :verification_failed_wikis, -> { where.not(last_wiki_verification_failure: nil) }
   scope :repository_checksum_mismatch, -> { where(repository_checksum_mismatch: true) }
   scope :wiki_checksum_mismatch, -> { where(wiki_checksum_mismatch: true) }
+  scope :with_routes, -> { includes(project: :route).includes(project: { namespace: :route }) }
 
   def self.failed
     repository_sync_failed = arel_table[:repository_retry_count].gt(0)
@@ -75,6 +78,50 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
         .or(arel_table[:repository_retry_at].eq(nil))
         .or(arel_table[:wiki_retry_at].eq(nil))
     )
+  end
+
+  # Search for a list of projects associated with registries,
+  # based on the query given in `query`.
+  #
+  # @param [String] query term that will search over :path, :name and :description
+  def self.with_search(query)
+    where(project: Geo::Fdw::Project.search(query))
+  end
+
+  def self.flag_repositories_for_resync!
+    update_all(
+      resync_repository: true,
+      repository_verification_checksum_sha: nil,
+      repository_checksum_mismatch: false,
+      last_repository_verification_failure: nil,
+      repository_verification_retry_count: nil,
+      resync_repository_was_scheduled_at: Time.now,
+      repository_retry_count: nil,
+      repository_retry_at: nil
+    )
+  end
+
+  def self.flag_repositories_for_recheck!
+    update_all(
+      repository_verification_checksum_sha: nil,
+      last_repository_verification_failure: nil,
+      repository_checksum_mismatch: false
+    )
+  end
+
+  # Retrieve the range of IDs in a relation
+  #
+  # @return [Array] with minimum ID and max ID
+  def self.range
+    pluck('MIN(id)', 'MAX(id)').first
+  end
+
+  # Search for IDs in the range
+  #
+  # @param [Integer] start initial ID
+  # @param [Integer] finish final ID
+  def self.with_range(start, finish)
+    where(id: start..finish)
   end
 
   # Must be run before fetching the repository to avoid a race condition
@@ -201,13 +248,17 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     self.wiki_verification_checksum_sha.nil?
   end
 
-  # Returns wheter verification is pending for either wiki or repository
+  # Returns whether verification is pending for either wiki or repository
   #
   # This will check for missing verification checksum sha for both wiki and repository
   #
   # @return [Boolean] whether verification is pending for either wiki or repository
-  def verification_pending?
+  def pending_verification?
     repository_verification_pending? || wiki_verification_pending?
+  end
+
+  def pending_synchronization?
+    resync_repository? || resync_wiki?
   end
 
   def syncs_since_gc
@@ -274,7 +325,41 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
     self.repository_retry_count && self.repository_retry_count > 1
   end
 
+  # Returns a synchronization state based on existing attribute values
+  #
+  # It takes into account things like if a successful replication has been done
+  # if there are pending actions or existing errors
+  #
+  # @return [Symbol] :never, :failed:, :pending or :synced
+  def synchronization_state
+    return :never if has_never_attempted_any_operation?
+    return :failed if has_failed_operation?
+    return :pending if has_pending_operation?
+
+    :synced
+  end
+
   private
+
+  # Whether any operation has ever been attempted
+  #
+  # This is intended to determine if it's a brand new registry that has never tried to sync before
+  def has_never_attempted_any_operation?
+    last_repository_successful_sync_at.nil? && last_repository_synced_at.nil?
+  end
+
+  # Whether there is a pending synchronization or verification
+  #
+  # This check is intended to be used as part of the #synchronization_state
+  # It does omit previous checks as they are intended to be done in sequence.
+  def has_pending_operation?
+    resync_repository || repository_verification_checksum_sha.nil?
+  end
+
+  # Whether a synchronization or verification failed
+  def has_failed_operation?
+    repository_retry_count || last_repository_verification_failure || repository_checksum_mismatch
+  end
 
   def fetches_since_gc_redis_key
     "projects/#{project_id}/fetches_since_gc"

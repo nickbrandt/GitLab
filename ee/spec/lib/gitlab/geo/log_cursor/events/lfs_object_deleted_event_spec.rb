@@ -25,7 +25,7 @@ describe Gitlab::Geo::LogCursor::Events::LfsObjectDeletedEvent, :postgresql, :cl
     end
 
     it 'schedules a Geo::FileRegistryRemovalWorker job' do
-      expect(::Geo::FileRegistryRemovalWorker).to receive(:perform_async).with(:lfs, lfs_object_deleted_event.lfs_object_id)
+      expect(::Geo::FileRegistryRemovalWorker).to receive(:perform_async).with(:lfs, lfs_object_deleted_event.lfs_object_id, lfs_object.file.path)
 
       subject.process
     end

@@ -6,6 +6,7 @@ module Geo
       include ExclusiveLeaseGuard
       include ::Gitlab::Geo::LogHelpers
       include ::Gitlab::Utils::StrongMemoize
+      include GeoBackoffDelay
 
       DB_RETRIEVE_BATCH_SIZE = 1000
       LEASE_TIMEOUT = 60.minutes
@@ -70,10 +71,6 @@ module Geo
 
       private
 
-      def should_be_skipped?
-        false
-      end
-
       # Subclasses should override this method to provide additional metadata
       # in log messages
       def worker_metadata
@@ -110,6 +107,10 @@ module Geo
 
       def over_time?
         (Time.now.utc - start_time) >= run_time
+      end
+
+      def should_apply_backoff?
+        pending_resources.empty?
       end
 
       # rubocop: disable CodeReuse/ActiveRecord
@@ -166,7 +167,10 @@ module Geo
       end
 
       def update_pending_resources
-        @pending_resources = load_pending_resources if reload_queue?
+        if reload_queue?
+          @pending_resources = load_pending_resources
+          set_backoff_time! if should_apply_backoff?
+        end
       end
 
       def schedule_jobs

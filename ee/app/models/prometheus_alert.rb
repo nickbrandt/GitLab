@@ -9,6 +9,8 @@ class PrometheusAlert < ActiveRecord::Base
   belongs_to :project, required: true, validate: true, inverse_of: :prometheus_alerts
   belongs_to :prometheus_metric, required: true, validate: true, inverse_of: :prometheus_alerts
 
+  has_many :prometheus_alert_events, inverse_of: :prometheus_alert
+
   after_save :clear_prometheus_adapter_cache!
   after_destroy :clear_prometheus_adapter_cache!
 
@@ -18,6 +20,13 @@ class PrometheusAlert < ActiveRecord::Base
   enum operator: [:lt, :eq, :gt]
 
   delegate :title, :query, to: :prometheus_metric
+
+  scope :for_metric, -> (metric) { where(prometheus_metric: metric) }
+
+  def self.distinct_projects
+    sub_query = self.group(:project_id).select(1)
+    self.from(sub_query)
+  end
 
   def self.operator_to_enum(op)
     OPERATORS_MAP.invert.fetch(op)

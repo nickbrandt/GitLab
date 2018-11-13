@@ -21,6 +21,7 @@ describe('GroupMemberService', () => {
     it('returns axios instance for memberContributionsPath', () => {
       spyOn(axios, 'get').and.stub();
       service.getContributedMembers();
+
       expect(axios.get).toHaveBeenCalledWith(service.memberContributionsPath);
     });
   });

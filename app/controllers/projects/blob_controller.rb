@@ -9,7 +9,7 @@ class Projects::BlobController < Projects::ApplicationController
   include ActionView::Helpers::SanitizeHelper
   prepend_before_action :authenticate_user!, only: [:edit]
 
-  before_action :set_request_format, only: [:edit, :show, :update]
+  before_action :set_request_format, only: [:edit, :show, :update, :destroy]
   before_action :require_non_empty_project, except: [:new, :create]
   before_action :authorize_download_code!
 
@@ -83,7 +83,7 @@ class Projects::BlobController < Projects::ApplicationController
 
   def destroy
     create_commit(Files::DeleteService, success_notice: "The file has been successfully deleted.",
-                                        success_path: -> { project_tree_path(@project, @branch_name) },
+                                        success_path: -> { after_delete_path },
                                         failure_view: :show,
                                         failure_path: project_blob_path(@project, @id))
   end
@@ -92,7 +92,7 @@ class Projects::BlobController < Projects::ApplicationController
     apply_diff_view_cookie!
 
     @blob.load_all_data!
-    @lines = Gitlab::Highlight.highlight(@blob.path, @blob.data, repository: @repository).lines
+    @lines = @blob.present.highlight.lines
 
     @form = UnfoldForm.new(params)
 
@@ -122,7 +122,7 @@ class Projects::BlobController < Projects::ApplicationController
     @lines.map! do |line|
       # These are marked as context lines but are loaded from blobs.
       # We also have context lines loaded from diffs in other places.
-      diff_line = Gitlab::Diff::Line.new(line, 'context', nil, nil, nil)
+      diff_line = Gitlab::Diff::Line.new(line, expanded_diff_line_type, nil, nil, nil)
       diff_line.rich_text = line
       diff_line
     end
@@ -130,6 +130,11 @@ class Projects::BlobController < Projects::ApplicationController
     add_match_line
 
     render json: DiffLineSerializer.new.represent(@lines)
+  end
+
+  def expanded_diff_line_type
+    # Context lines can't receive comments.
+    Feature.enabled?(:comment_in_any_diff_line, @project) ? nil : 'context'
   end
 
   def add_match_line
@@ -190,6 +195,15 @@ class Projects::BlobController < Projects::ApplicationController
     end
   end
   # rubocop: enable CodeReuse/ActiveRecord
+
+  def after_delete_path
+    branch = BranchesFinder.new(@repository, search: @ref).execute.first
+    if @repository.tree(branch.target, tree_path).entries.empty?
+      project_tree_path(@project, @ref)
+    else
+      project_tree_path(@project, File.join(@ref, tree_path))
+    end
+  end
 
   def editor_variables
     @branch_name = params[:branch_name]
@@ -255,9 +269,6 @@ class Projects::BlobController < Projects::ApplicationController
 
   def show_json
     set_last_commit_sha
-    path_segments = @path.split('/')
-    path_segments.pop
-    tree_path = path_segments.join('/')
 
     json = {
       id: @blob.id,
@@ -282,5 +293,9 @@ class Projects::BlobController < Projects::ApplicationController
     json.merge!(blob_json(@blob) || {}) unless params[:viewer] == 'none'
 
     render json: json
+  end
+
+  def tree_path
+    @path.rpartition('/').first
   end
 end

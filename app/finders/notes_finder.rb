@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class NotesFinder
-  prepend EE::NotesFinder
-
   FETCH_OVERLAP = 5.seconds
 
   # Used to filter Notes
@@ -26,6 +24,8 @@ class NotesFinder
   def execute
     notes = init_collection
     notes = since_fetch_at(notes)
+    notes = notes.with_notes_filter(@params[:notes_filter]) if notes_filter?
+
     notes.fresh
   end
 
@@ -136,4 +136,10 @@ class NotesFinder
     last_fetched_at = Time.at(@params.fetch(:last_fetched_at, 0).to_i)
     notes.updated_after(last_fetched_at - FETCH_OVERLAP)
   end
+
+  def notes_filter?
+    @params[:notes_filter].present?
+  end
 end
+
+NotesFinder.prepend(EE::NotesFinder)

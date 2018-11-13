@@ -14,6 +14,18 @@ describe MergeRequest do
     it { is_expected.to have_many(:approved_by_users) }
   end
 
+  describe '#code_owners' do
+    subject(:merge_request) { build(:merge_request) }
+    let(:owners) { [double(:owner)] }
+
+    it 'returns code owners, frozen' do
+      allow(::Gitlab::CodeOwners).to receive(:for_merge_request).with(subject).and_return(owners)
+
+      expect(subject.code_owners).to eq(owners)
+      expect(subject.code_owners).to be_frozen
+    end
+  end
+
   describe '#approvals_before_merge' do
     where(:license_value, :db_value, :expected) do
       true  | 5   | 5
@@ -39,107 +51,5 @@ describe MergeRequest do
     let!(:pipeline) { create(:ci_empty_pipeline, project: subject.project, sha: subject.diff_base_sha) }
 
     it { expect(subject.base_pipeline).to eq(pipeline) }
-  end
-
-  describe '#base_codeclimate_artifact' do
-    before do
-      allow(subject.base_pipeline).to receive(:codeclimate_artifact)
-        .and_return(1)
-    end
-
-    it 'delegates to merge request diff' do
-      expect(subject.base_codeclimate_artifact).to eq(1)
-    end
-  end
-
-  describe '#head_codeclimate_artifact' do
-    before do
-      allow(subject.head_pipeline).to receive(:codeclimate_artifact)
-        .and_return(1)
-    end
-
-    it 'delegates to merge request diff' do
-      expect(subject.head_codeclimate_artifact).to eq(1)
-    end
-  end
-
-  describe '#base_performance_artifact' do
-    before do
-      allow(subject.base_pipeline).to receive(:performance_artifact)
-        .and_return(1)
-    end
-
-    it 'delegates to merge request diff' do
-      expect(subject.base_performance_artifact).to eq(1)
-    end
-  end
-
-  describe '#head_performance_artifact' do
-    before do
-      allow(subject.head_pipeline).to receive(:performance_artifact)
-        .and_return(1)
-    end
-
-    it 'delegates to merge request diff' do
-      expect(subject.head_performance_artifact).to eq(1)
-    end
-  end
-
-  %w(sast dast sast_container container_scanning).each do |type|
-    it { is_expected.to delegate_method(:"expose_#{type}_data?").to(:head_pipeline) }
-    it { is_expected.to delegate_method(:"has_#{type}_data?").to(:base_pipeline).with_prefix(:base) }
-    it { is_expected.to delegate_method(:"#{type}_artifact").to(:head_pipeline).with_prefix(:head) }
-    it { is_expected.to delegate_method(:"#{type}_artifact").to(:base_pipeline).with_prefix(:base) }
-  end
-
-  describe '#expose_codeclimate_data?' do
-    context 'with codeclimate data' do
-      let(:pipeline) { double(expose_codeclimate_data?: true) }
-
-      before do
-        allow(subject).to receive(:head_pipeline).and_return(pipeline)
-        allow(subject).to receive(:base_pipeline).and_return(pipeline)
-      end
-
-      it { expect(subject.expose_codeclimate_data?).to be_truthy }
-    end
-
-    context 'without codeclimate data' do
-      it { expect(subject.expose_codeclimate_data?).to be_falsey }
-    end
-  end
-
-  describe '#expose_code_quality_data?' do
-    context 'with code_quality data' do
-      let(:pipeline) { double(expose_code_quality_data?: true) }
-
-      before do
-        allow(subject).to receive(:head_pipeline).and_return(pipeline)
-        allow(subject).to receive(:base_pipeline).and_return(pipeline)
-      end
-
-      it { expect(subject.expose_code_quality_data?).to be_truthy }
-    end
-
-    context 'without code_quality data' do
-      it { expect(subject.expose_code_quality_data?).to be_falsey }
-    end
-  end
-
-  describe '#expose_performance_data?' do
-    context 'with performance data' do
-      let(:pipeline) { double(expose_performance_data?: true) }
-
-      before do
-        allow(subject).to receive(:head_pipeline).and_return(pipeline)
-        allow(subject).to receive(:base_pipeline).and_return(pipeline)
-      end
-
-      it { expect(subject.expose_performance_data?).to be_truthy }
-    end
-
-    context 'without performance data' do
-      it { expect(subject.expose_performance_data?).to be_falsey }
-    end
   end
 end

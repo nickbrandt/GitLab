@@ -74,7 +74,7 @@ To authenticate with a CI job token, add a corresponding section to your
         <httpHeaders>
           <property>
             <name>Job-Token</name>
-            <value>CI_JOB_TOKEN</value>
+            <value>${env.CI_JOB_TOKEN}</value>
           </property>
         </httpHeaders>
       </configuration>
@@ -152,7 +152,7 @@ shows how to create a new package each time the `master` branch is updated:
             <httpHeaders>
               <property>
                 <name>Job-Token</name>
-                <value>CI_JOB_TOKEN</value>
+                <value>${env.CI_JOB_TOKEN}</value>
               </property>
             </httpHeaders>
           </configuration>
@@ -167,24 +167,23 @@ shows how to create a new package each time the `master` branch is updated:
     <repositories>
       <repository>
         <id>gitlab-maven</id>
-        <url>https://gitlab.com/api/v4/projects/PROJECT_ID/packages/maven</url>
+        <url>https://gitlab.com/api/v4/projects/${env.CI_PROJECT_ID}packages/maven</url>
       </repository>
     </repositories>
     <distributionManagement>
       <repository>
         <id>gitlab-maven</id>
-        <url>https://gitlab.com/api/v4/projects/PROJECT_ID/packages/maven</url>
+        <url>https://gitlab.com/api/v4/projects/${env.CI_PROJECT_ID}/packages/maven</url>
       </repository>
       <snapshotRepository>
         <id>gitlab-maven</id>
-        <url>https://gitlab.com/api/v4/projects/PROJECT_ID/packages/maven</url>
+        <url>https://gitlab.com/api/v4/projects/${env.CI_PROJECT_ID}/packages/maven</url>
       </snapshotRepository>
     </distributionManagement>
     ```
 
     TIP: **Tip:**
-    You can either leave GitLab CI/CD to replace your project ID value while
-    the deploy job is running or hardcode your project's ID.
+    You can either let Maven utilize the CI environment variables or hardcode your project's ID.
 
 1. Add a `deploy` job to your `.gitlab-ci.yml` file:
 
@@ -192,10 +191,7 @@ shows how to create a new package each time the `master` branch is updated:
     deploy:
       image: maven:3.3.9-jdk-8
       script:
-        - 'cp ci_settings.xml /root/.m2/settings.xml'
-        - 'sed -i "s/CI_JOB_TOKEN/${CI_JOB_TOKEN}/g" /root/.m2/settings.xml'
-        - 'sed -i "s/PROJECT_ID/${CI_PROJECT_ID}/g" pom.xml'
-        - 'mvn deploy'
+        - 'mvn deploy -s ci_settings.xml'
       only:
         - master
     ```
@@ -204,6 +200,5 @@ shows how to create a new package each time the `master` branch is updated:
 
 The next time the `deploy` job runs, it will copy `ci_settings.xml` to the
 user's home location (in this case the user is `root` since it runs in a
-Docker container), and `sed` will replace the placeholder values with the
-contents of the actual
+Docker container), and Maven will utilize the configured CI
 [environment variables](../../../ci/variables/README.md#predefined-variables-environment-variables).

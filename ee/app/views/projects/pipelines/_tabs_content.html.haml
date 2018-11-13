@@ -1,10 +1,10 @@
 - pipeline = local_assigns.fetch(:pipeline)
 - project = local_assigns.fetch(:project)
 
-- sast_endpoint = pipeline.expose_sast_data? ? sast_artifact_url(pipeline) : nil
-- dependency_scanning_endpoint = pipeline.expose_dependency_scanning_data? ? dependency_scanning_artifact_url(pipeline) : nil
-- dast_endpoint = pipeline.expose_dast_data? ? dast_artifact_url(pipeline) : nil
-- sast_container_endpoint = pipeline.expose_sast_container_data? ? sast_container_artifact_url(pipeline) : pipeline.expose_container_scanning_data? ? container_scanning_artifact_url(pipeline) : nil
+- sast_endpoint = pipeline.downloadable_path_for_report_type(:sast)
+- dependency_scanning_endpoint = pipeline.downloadable_path_for_report_type(:dependency_scanning)
+- dast_endpoint = pipeline.downloadable_path_for_report_type(:dast)
+- sast_container_endpoint = pipeline.downloadable_path_for_report_type(:container_scanning)
 - blob_path = project_blob_path(project, pipeline.sha)
 - license_management_settings_path = can?(current_user, :admin_software_license_policy, project) ? license_management_settings_path(project) : nil
 
@@ -21,13 +21,13 @@
     sast_help_path: help_page_path('user/project/merge_requests/sast'),
     dependency_scanning_help_path: help_page_path('user/project/merge_requests/dependency_scanning'),
     dast_help_path: help_page_path('user/project/merge_requests/dast'),
-    sast_container_help_path: help_page_path('user/project/merge_requests/sast_container'),
+    sast_container_help_path: help_page_path('user/project/merge_requests/container_scanning'),
     can_create_feedback: can?(current_user, :admin_vulnerability_feedback, project).to_s,
     can_create_issue: show_new_issue_link?(project).to_s } }
 
 - if pipeline.expose_license_management_data?
   #js-tab-licenses.tab-pane
-    #js-licenses-app{ data: { license_head_path: pipeline.expose_license_management_data? ? license_management_artifact_url(pipeline) : nil,
+    #js-licenses-app{ data: { license_head_path: pipeline.downloadable_path_for_report_type(:license_management),
     api_url: license_management_api_url(project),
     license_management_settings_path: license_management_settings_path,
     can_manage_licenses: can?(current_user, :admin_software_license_policy, project).to_s } }

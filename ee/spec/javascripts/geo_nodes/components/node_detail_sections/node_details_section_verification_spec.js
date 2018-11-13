@@ -4,10 +4,7 @@ import NodeDetailsSectionVerificationComponent from 'ee/geo_nodes/components/nod
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { mockNodeDetails } from 'ee_spec/geo_nodes/mock_data';
 
-const createComponent = ({
-  nodeDetails = mockNodeDetails,
-  nodeTypePrimary = false,
-}) => {
+const createComponent = ({ nodeDetails = mockNodeDetails, nodeTypePrimary = false }) => {
   const Component = Vue.extend(NodeDetailsSectionVerificationComponent);
 
   return mountComponent(Component, {
@@ -32,8 +29,8 @@ describe('NodeDetailsSectionVerification', () => {
       expect(vm.showSectionItems).toBe(false);
       expect(Array.isArray(vm.primaryNodeDetailItems)).toBe(true);
       expect(Array.isArray(vm.secondaryNodeDetailItems)).toBe(true);
-      expect(vm.primaryNodeDetailItems.length > 0).toBe(true);
-      expect(vm.secondaryNodeDetailItems.length > 0).toBe(true);
+      expect(vm.primaryNodeDetailItems.length).toBeGreaterThan(0);
+      expect(vm.secondaryNodeDetailItems.length).toBeGreaterThan(0);
     });
   });
 
@@ -86,7 +83,7 @@ describe('NodeDetailsSectionVerification', () => {
       expect(vm.$el.classList.contains('verification-section')).toBe(true);
     });
 
-    it('renders section items container element', (done) => {
+    it('renders section items container element', done => {
       vm.showSectionItems = true;
       Vue.nextTick(() => {
         expect(vm.$el.querySelector('.section-items-container')).not.toBeNull();

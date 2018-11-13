@@ -39,11 +39,11 @@ module EE
     end
 
     def filter_by_no_weight?
-      params[:weight] == ::Issue::WEIGHT_NONE
+      params[:weight].to_s.downcase == ::IssuesFinder::FILTER_NONE
     end
 
     def filter_by_any_weight?
-      params[:weight] == ::Issue::WEIGHT_ANY
+      params[:weight].to_s.downcase == ::IssuesFinder::FILTER_ANY
     end
 
     override :by_assignee

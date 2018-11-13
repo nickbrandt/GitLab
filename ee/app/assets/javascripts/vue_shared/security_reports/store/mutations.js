@@ -230,10 +230,16 @@ export default {
   [types.RECEIVE_DEPENDENCY_SCANNING_REPORTS](state, reports) {
     if (reports.base && reports.head) {
       const filterKey = 'cve';
-      const parsedHead = parseDependencyScanningIssues(reports.head, reports.enrichData,
-        state.blobPath.head);
-      const parsedBase = parseDependencyScanningIssues(reports.base, reports.enrichData,
-        state.blobPath.base);
+      const parsedHead = parseDependencyScanningIssues(
+        reports.head,
+        reports.enrichData,
+        state.blobPath.head,
+      );
+      const parsedBase = parseDependencyScanningIssues(
+        reports.base,
+        reports.enrichData,
+        state.blobPath.base,
+      );
 
       const newIssues = filterByKey(parsedHead, parsedBase, filterKey);
       const resolvedIssues = filterByKey(parsedBase, parsedHead, filterKey);
@@ -250,8 +256,11 @@ export default {
     }
 
     if (reports.head && !reports.base) {
-      const newIssues = parseDependencyScanningIssues(reports.head, reports.enrichData,
-        state.blobPath.head);
+      const newIssues = parseDependencyScanningIssues(
+        reports.head,
+        reports.enrichData,
+        state.blobPath.head,
+      );
       Vue.set(state.dependencyScanning, 'newIssues', newIssues);
       Vue.set(state.dependencyScanning, 'isLoading', false);
 

@@ -1,8 +1,7 @@
 import $ from 'jquery';
 import Vue from 'vue';
-
+import boardsStore from '~/boards/stores/boards_store';
 import boardForm from 'ee/boards/components/board_form.vue';
-
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
 describe('board_form.vue', () => {
@@ -15,7 +14,7 @@ describe('board_form.vue', () => {
 
   beforeEach(() => {
     spyOn($, 'ajax');
-    gl.issueBoards.BoardsStore.state.currentPage = 'edit';
+    boardsStore.state.currentPage = 'edit';
     const Component = Vue.extend(boardForm);
     vm = mountComponent(Component, props);
   });
@@ -36,12 +35,14 @@ describe('board_form.vue', () => {
       it('initializes `board.labels` as empty array when `label.isAny` is `true`', () => {
         const labelIsAny = { isAny: true };
         vm.handleLabelClick(labelIsAny);
+
         expect(Array.isArray(vm.board.labels)).toBe(true);
         expect(vm.board.labels.length).toBe(0);
       });
 
       it('adds provided `label` to board.labels', () => {
         vm.handleLabelClick(label);
+
         expect(vm.board.labels.length).toBe(1);
         expect(vm.board.labels[0].id).toBe(label.id);
         vm.handleLabelClick(label);
@@ -51,18 +52,19 @@ describe('board_form.vue', () => {
         const label2 = Object.assign({}, label, { id: 2 });
         vm.handleLabelClick(label);
         vm.handleLabelClick(label2);
+
         expect(vm.board.labels.length).toBe(1);
         expect(vm.board.labels[0].id).toBe(label2.id);
       });
     });
 
     describe('cancel', () => {
-      it('resets currentPage', (done) => {
+      it('resets currentPage', done => {
         vm.cancel();
 
         Vue.nextTick()
           .then(() => {
-            expect(gl.issueBoards.BoardsStore.state.currentPage).toBe('');
+            expect(boardsStore.state.currentPage).toBe('');
           })
           .then(done)
           .catch(done.fail);
@@ -71,7 +73,7 @@ describe('board_form.vue', () => {
   });
 
   describe('buttons', () => {
-    it('cancel button triggers cancel()', (done) => {
+    it('cancel button triggers cancel()', done => {
       spyOn(vm, 'cancel');
 
       Vue.nextTick()

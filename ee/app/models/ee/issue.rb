@@ -9,8 +9,14 @@ module EE
       WEIGHT_ANY = 'Any'.freeze
       WEIGHT_NONE = 'None'.freeze
 
+      prepend EE::RelativePositioning
+      include Elastic::IssuesSearch
+
       scope :order_weight_desc, -> { reorder ::Gitlab::Database.nulls_last_order('weight', 'DESC') }
       scope :order_weight_asc, -> { reorder ::Gitlab::Database.nulls_last_order('weight') }
+
+      has_one :epic_issue
+      has_one :epic, through: :epic_issue
 
       validates :weight, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
     end
@@ -68,6 +74,22 @@ module EE
 
     def supports_weight?
       project&.feature_available?(:issue_weights)
+    end
+
+    def related_issues(current_user, preload: nil)
+      related_issues = ::Issue
+                           .select(['issues.*', 'issue_links.id AS issue_link_id'])
+                           .joins("INNER JOIN issue_links ON
+                                 (issue_links.source_id = issues.id AND issue_links.target_id = #{id})
+                                 OR
+                                 (issue_links.target_id = issues.id AND issue_links.source_id = #{id})")
+                           .preload(preload)
+                           .reorder('issue_link_id')
+
+      cross_project_filter = -> (issues) { issues.where(project: project) }
+      Ability.issues_readable_by_user(related_issues,
+                                      current_user,
+                                      filters: { read_cross_project: cross_project_filter })
     end
 
     class_methods do

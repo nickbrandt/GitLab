@@ -6,13 +6,16 @@ import markdownField from '../../vue_shared/components/markdown/field.vue';
 import issuableStateMixin from '../mixins/issuable_state';
 import resolvable from '../mixins/resolvable';
 
+// eslint-disable-next-line import/order
+import noteFormMixin from 'ee/batch_comments/mixins/note_form';
+
 export default {
   name: 'NoteForm',
   components: {
     issueWarning,
     markdownField,
   },
-  mixins: [issuableStateMixin, resolvable],
+  mixins: [issuableStateMixin, resolvable, noteFormMixin],
   props: {
     noteBody: {
       type: String,
@@ -20,7 +23,7 @@ export default {
       default: '',
     },
     noteId: {
-      type: String,
+      type: [String, Number],
       required: false,
       default: '',
     },
@@ -55,6 +58,7 @@ export default {
       conflictWhileEditing: false,
       isSubmitting: false,
       isResolving: false,
+      isUnresolving: false,
       resolveAsThread: true,
     };
   },
@@ -102,6 +106,18 @@ export default {
   },
   methods: {
     ...mapActions(['toggleResolveNote']),
+    shouldToggleResolved(shouldResolve, beforeSubmitDiscussionState) {
+      // shouldBeResolved() checks the actual resolution state,
+      // considering batchComments (EEP), if applicable/enabled.
+      const newResolvedStateAfterUpdate =
+        this.shouldBeResolved && this.shouldBeResolved(shouldResolve);
+
+      const shouldToggleState =
+        newResolvedStateAfterUpdate !== undefined &&
+        beforeSubmitDiscussionState !== newResolvedStateAfterUpdate;
+
+      return shouldResolve || shouldToggleState;
+    },
     handleUpdate(shouldResolve) {
       const beforeSubmitDiscussionState = this.discussionResolved;
       this.isSubmitting = true;
@@ -109,7 +125,7 @@ export default {
       this.$emit('handleFormUpdate', this.updatedNoteBody, this.$refs.editNoteForm, () => {
         this.isSubmitting = false;
 
-        if (shouldResolve) {
+        if (this.shouldToggleResolved(shouldResolve, beforeSubmitDiscussionState)) {
           this.resolveHandler(beforeSubmitDiscussionState);
         }
       });
@@ -175,7 +191,7 @@ export default {
           :data-supports-quick-actions="!isEditing"
           name="note[note]"
           class="note-textarea js-gfm-input js-note-text
-js-autosize markdown-area js-vue-issue-note-form js-vue-textarea"
+js-autosize markdown-area js-vue-issue-note-form js-vue-textarea qa-reply-input"
           aria-label="Description"
           placeholder="Write a comment or drag your files here…"
           @keydown.meta.enter="handleUpdate()"
@@ -184,27 +200,90 @@ js-autosize markdown-area js-vue-issue-note-form js-vue-textarea"
           @keydown.esc="cancelHandler(true)">
         </textarea>
       </markdown-field>
-      <div class="note-form-actions clearfix">
-        <button
-          :disabled="isDisabled"
-          type="button"
-          class="js-vue-issue-save btn btn-success js-comment-button "
-          @click="handleUpdate()">
-          {{ saveButtonTitle }}
-        </button>
-        <button
-          v-if="discussion.resolvable"
-          class="btn btn-nr btn-default append-right-10 js-comment-resolve-button"
-          @click.prevent="handleUpdate(true)"
+      <div
+        class="note-form-actions clearfix"
+      >
+        <template
+          v-if="showBatchCommentsActions"
         >
-          {{ resolveButtonTitle }}
-        </button>
-        <button
-          class="btn btn-cancel note-edit-cancel js-close-discussion-note-form"
-          type="button"
-          @click="cancelHandler()">
-          Cancel
-        </button>
+          <p
+            v-if="discussion && discussion.id"
+          >
+            <label>
+              <template
+                v-if="discussionResolved"
+              >
+                <input
+                  v-model="isUnresolving"
+                  type="checkbox"
+                  class="qa-unresolve-review-discussion"
+                />
+                {{ __('Unresolve discussion') }}
+              </template>
+              <template
+                v-else
+              >
+                <input
+                  v-model="isResolving"
+                  type="checkbox"
+                  class="qa-resolve-review-discussion"
+                />
+                {{ __('Resolve discussion') }}
+              </template>
+            </label>
+          </p>
+          <div>
+            <button
+              :disabled="isDisabled"
+              type="button"
+              class="btn btn-success qa-start-review"
+              @click="handleAddToReview()">
+              <template v-if="hasDrafts">
+                {{ __('Add to review') }}
+              </template>
+              <template v-else>
+                {{ __('Start a review') }}
+              </template>
+            </button>
+            <button
+              :disabled="isDisabled"
+              type="button"
+              class="btn qa-comment-now"
+              @click="handleUpdate()">
+              {{ __('Add comment now') }}
+            </button>
+            <button
+              class="btn btn-cancel note-edit-cancel js-close-discussion-note-form"
+              type="button"
+              @click="cancelHandler()">
+              {{ __('Cancel') }}
+            </button>
+          </div>
+        </template>
+        <template
+          v-else
+        >
+          <button
+            :disabled="isDisabled"
+            type="button"
+            class="js-vue-issue-save btn btn-success js-comment-button"
+            @click="handleUpdate()">
+            {{ saveButtonTitle }}
+          </button>
+          <button
+            v-if="discussion.resolvable"
+            class="btn btn-nr btn-default append-right-10 js-comment-resolve-button"
+            @click.prevent="handleUpdate(true)"
+          >
+            {{ resolveButtonTitle }}
+          </button>
+          <button
+            class="btn btn-cancel note-edit-cancel js-close-discussion-note-form"
+            type="button"
+            @click="cancelHandler()">
+            Cancel
+          </button>
+        </template>
       </div>
     </form>
   </div>

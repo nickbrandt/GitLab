@@ -82,13 +82,6 @@ gem 'gpgme'
 gem 'gitlab_omniauth-ldap', '~> 2.0.4', require: 'omniauth-ldap'
 gem 'net-ldap'
 
-# Git Wiki
-# Only used to compute wiki page slugs
-gem 'gitlab-gollum-lib', '~> 4.2', require: false
-
-# Language detection
-gem 'github-linguist', '~> 5.3.3', require: 'linguist'
-
 # API
 gem 'grape', '~> 1.1'
 gem 'grape-entity', '~> 0.7.1'
@@ -141,7 +134,7 @@ gem 'faraday_middleware-aws-signers-v4'
 # Markdown and HTML processing
 gem 'html-pipeline', '~> 2.8'
 gem 'deckar01-task_list', '2.0.0'
-gem 'gitlab-markup', '~> 1.6.4'
+gem 'gitlab-markup', '~> 1.6.5'
 gem 'github-markup', '~> 1.7.0', require: 'github/markup'
 gem 'redcarpet', '~> 3.4'
 gem 'commonmarker', '~> 0.17'
@@ -156,6 +149,7 @@ gem 'rouge', '~> 3.1'
 gem 'truncato', '~> 0.7.9'
 gem 'bootstrap_form', '~> 2.7.0'
 gem 'nokogiri', '~> 1.8.2'
+gem 'escape_utils', '~> 1.1'
 
 # Calendar rendering
 gem 'icalendar'
@@ -167,6 +161,11 @@ gem 'diffy', '~> 3.1.0'
 group :unicorn do
   gem 'unicorn', '~> 5.1.0'
   gem 'unicorn-worker-killer', '~> 0.4.4'
+end
+
+group :puma do
+  gem 'puma', '~> 3.12', require: false
+  gem 'puma_worker_killer', require: false
 end
 
 # State machine
@@ -215,6 +214,9 @@ gem 'redis-rails', '~> 5.0.2'
 gem 'redis', '~> 3.2'
 gem 'connection_pool', '~> 2.0'
 
+# Discord integration
+gem 'discordrb-webhooks-blackst0ne', '~> 3.3', require: false
+
 # HipChat integration
 gem 'hipchat', '~> 1.5.0'
 
@@ -222,7 +224,7 @@ gem 'hipchat', '~> 1.5.0'
 gem 'jira-ruby', '~> 1.4'
 
 # Flowdock integration
-gem 'gitlab-flowdock-git-hook', '~> 1.0.1'
+gem 'flowdock', '~> 0.7'
 
 # Slack integration
 gem 'slack-notifier', '~> 1.5.1'
@@ -254,9 +256,6 @@ gem 'rack-attack', '~> 4.4.1'
 
 # Ace editor
 gem 'ace-rails-ap', '~> 4.1.0'
-
-# Keyboard shortcuts
-gem 'mousetrap-rails', '~> 1.4.6'
 
 # Detect and convert string character encoding
 gem 'charlock_holmes', '~> 0.7.5'
@@ -307,6 +306,7 @@ gem 'peek-mysql2', '~> 1.1.0', group: :mysql
 gem 'peek-pg', '~> 1.3.0', group: :postgres
 gem 'peek-rblineprof', '~> 0.2.0'
 gem 'peek-redis', '~> 1.2.0'
+gem 'gitlab-sidekiq-fetcher', require: 'sidekiq-reliable-fetch'
 
 # Metrics
 group :metrics do
@@ -434,11 +434,10 @@ group :ed25519 do
 end
 
 # Gitaly GRPC client
-gem 'gitaly-proto', '~> 0.118.1', require: 'gitaly'
-gem 'grpc', '~> 1.11.0'
+gem 'gitaly-proto', '~> 0.123.0', require: 'gitaly'
+gem 'grpc', '~> 1.15.0'
 
-# Locked until https://github.com/google/protobuf/issues/4210 is closed
-gem 'google-protobuf', '= 3.5.1'
+gem 'google-protobuf', '~> 3.6'
 
 gem 'toml-rb', '~> 1.0.0', require: false
 
@@ -450,6 +449,3 @@ gem 'flipper-active_support_cache_store', '~> 0.13.0'
 # Structured logging
 gem 'lograge', '~> 0.5'
 gem 'grape_logging', '~> 1.7'
-
-# Asset synchronization
-gem 'asset_sync', '~> 2.4'

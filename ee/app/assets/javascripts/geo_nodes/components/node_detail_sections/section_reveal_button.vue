@@ -1,33 +1,33 @@
 <script>
-  import icon from '~/vue_shared/components/icon.vue';
+import icon from '~/vue_shared/components/icon.vue';
 
-  export default {
-    components: {
-      icon,
+export default {
+  components: {
+    icon,
+  },
+  props: {
+    buttonTitle: {
+      type: String,
+      required: true,
     },
-    props: {
-      buttonTitle: {
-        type: String,
-        required: true,
-      },
+  },
+  data() {
+    return {
+      toggleState: false,
+    };
+  },
+  computed: {
+    toggleButtonIcon() {
+      return this.toggleState ? 'angle-up' : 'angle-down';
     },
-    data() {
-      return {
-        toggleState: false,
-      };
+  },
+  methods: {
+    onClickButton() {
+      this.toggleState = !this.toggleState;
+      this.$emit('toggleButton', this.toggleState);
     },
-    computed: {
-      toggleButtonIcon() {
-        return this.toggleState ? 'angle-up' : 'angle-down';
-      },
-    },
-    methods: {
-      onClickButton() {
-        this.toggleState = !this.toggleState;
-        this.$emit('toggleButton', this.toggleState);
-      },
-    },
-  };
+  },
+};
 </script>
 
 <template>

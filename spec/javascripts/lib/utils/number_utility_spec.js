@@ -1,4 +1,11 @@
-import { formatRelevantDigits, bytesToKiB, bytesToMiB, bytesToGiB, numberToHumanSize } from '~/lib/utils/number_utils';
+import {
+  formatRelevantDigits,
+  bytesToKiB,
+  bytesToMiB,
+  bytesToGiB,
+  numberToHumanSize,
+  sum,
+} from '~/lib/utils/number_utils';
 
 describe('Number Utils', () => {
   describe('formatRelevantDigits', () => {
@@ -10,6 +17,7 @@ describe('Number Utils', () => {
       const formattedNumber = formatRelevantDigits('1000.1234567');
       const rightFromDecimal = formattedNumber.split('.')[1];
       const leftFromDecimal = formattedNumber.split('.')[0];
+
       expect(rightFromDecimal.length).toBe(4);
       expect(leftFromDecimal.length).toBe(4);
     });
@@ -18,6 +26,7 @@ describe('Number Utils', () => {
       const formattedNumber = formatRelevantDigits('0.1234567');
       const rightFromDecimal = formattedNumber.split('.')[1];
       const leftFromDecimal = formattedNumber.split('.')[0];
+
       expect(rightFromDecimal.length).toBe(3);
       expect(leftFromDecimal.length).toBe(1);
     });
@@ -26,6 +35,7 @@ describe('Number Utils', () => {
       const formattedNumber = formatRelevantDigits('10.1234567');
       const rightFromDecimal = formattedNumber.split('.')[1];
       const leftFromDecimal = formattedNumber.split('.')[0];
+
       expect(rightFromDecimal.length).toBe(2);
       expect(leftFromDecimal.length).toBe(2);
     });
@@ -34,6 +44,7 @@ describe('Number Utils', () => {
       const formattedNumber = formatRelevantDigits('100.1234567');
       const rightFromDecimal = formattedNumber.split('.')[1];
       const leftFromDecimal = formattedNumber.split('.')[0];
+
       expect(rightFromDecimal.length).toBe(1);
       expect(leftFromDecimal.length).toBe(3);
     });
@@ -75,6 +86,16 @@ describe('Number Utils', () => {
 
     it('should return GiB', () => {
       expect(numberToHumanSize(10737418240)).toEqual('10.00 GiB');
+    });
+  });
+
+  describe('sum', () => {
+    it('should add up two values', () => {
+      expect(sum(1, 2)).toEqual(3);
+    });
+
+    it('should add up all the values in an array when passed to a reducer', () => {
+      expect([1, 2, 3, 4, 5].reduce(sum)).toEqual(15);
     });
   });
 });
