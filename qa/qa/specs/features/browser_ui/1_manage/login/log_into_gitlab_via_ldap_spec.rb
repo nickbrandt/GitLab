@@ -3,22 +3,15 @@
 module QA
   context 'Manage', :orchestrated, :ldap_no_tls, :ldap_tls do
     describe 'LDAP login' do
-      it 'Logins with LDAP and syncs admin users' do
+      it 'user logs into GitLab using LDAP credentials' do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
+        Page::Main::Login.act { sign_in_using_credentials }
 
-        Page::Main::Login.perform do |login_page|
-          login_page.sign_in_using_ldap_credentials(username: 'adminuser1', password: 'password')
-        end
-
+        # TODO, since `Signed in successfully` message was removed
+        # this is the only way to tell if user is signed in correctly.
+        #
         Page::Main::Menu.perform do |menu|
           expect(menu).to have_personal_area
-
-          # The ldap_sync_worker_cron job is set to run every minute
-          admin_synchronised = menu.wait(max: 80, time: 1, reload: true) do
-            menu.has_admin_area_link?
-          end
-
-          expect(admin_synchronised).to be_truthy
         end
       end
     end
