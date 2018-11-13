@@ -48,7 +48,7 @@ license_management:
     entrypoint: [""]
   stage: test
   variables:
-    SETUP_CMD=./my-custom-install-script.sh
+    SETUP_CMD: ./my-custom-install-script.sh
   allow_failure: true
   script:
     - /run.sh analyze .
