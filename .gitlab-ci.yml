@@ -1140,6 +1140,7 @@ review:
     - install_tiller
     - install_external_dns
     - deploy
+    - add_license
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: https://gitlab-$CI_ENVIRONMENT_SLUG.$REVIEW_APPS_DOMAIN
