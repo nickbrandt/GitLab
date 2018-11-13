@@ -50,6 +50,7 @@ This setting is set per job and can be overridden in
 [`.gitlab-ci.yml`](../../../ci/yaml/README.md#artifacts-expire_in).
 To disable the expiration, set it to `0`. The default unit is in seconds.
 
+<<<<<<< HEAD
 ## Shared Runners pipeline minutes quota **[STARTER ONLY]**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/1078)
@@ -92,6 +93,8 @@ the group.
 
 ![Group pipelines quota](img/group_pipelines_quota.png)
 
+=======
+>>>>>>> upstream/master
 ## Archive jobs **[CORE ONLY]**
 
 Archiving jobs is useful for reducing the CI/CD footprint on the system by
