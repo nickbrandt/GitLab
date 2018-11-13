@@ -33,7 +33,6 @@ class Project < ActiveRecord::Base
   include IgnorableColumn
   extend Gitlab::Cache::RequestCache
 
-  # EE specific modules
   extend Gitlab::ConfigHelper
 
   BoardLimitExceeded = Class.new(StandardError)

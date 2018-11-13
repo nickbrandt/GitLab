@@ -4,6 +4,10 @@ module EE
   module Key
     extend ActiveSupport::Concern
 
+    prepended do
+      scope :ldap, -> { where(type: 'LDAPKey') }
+    end
+
     class_methods do
       def regular_keys
         where(type: ['LDAPKey', 'Key', nil])

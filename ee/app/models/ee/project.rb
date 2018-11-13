@@ -189,7 +189,7 @@ module EE
     end
 
     def feature_available?(feature, user = nil)
-      if ProjectFeature::FEATURES.include?(feature)
+      if ::ProjectFeature::FEATURES.include?(feature)
         super
       else
         licensed_feature_available?(feature, user)

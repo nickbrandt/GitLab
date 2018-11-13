@@ -12,6 +12,8 @@ module EE
     MIRROR_REMOTE = "upstream".freeze
 
     prepended do
+      include Elastic::RepositoriesSearch
+
       delegate :checksum, :find_remote_root_ref, to: :raw_repository
     end
 

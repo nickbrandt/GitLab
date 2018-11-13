@@ -437,9 +437,9 @@ module Elastic
 
         limit =
           if include_members_only
-            { terms: { "#{feature}_access_level" => [ProjectFeature::ENABLED, ProjectFeature::PRIVATE] } }
+            { terms: { "#{feature}_access_level" => [::ProjectFeature::ENABLED, ::ProjectFeature::PRIVATE] } }
           else
-            { term: { "#{feature}_access_level" => ProjectFeature::ENABLED } }
+            { term: { "#{feature}_access_level" => ::ProjectFeature::ENABLED } }
           end
 
         { bool: { filter: [condition, limit] } }

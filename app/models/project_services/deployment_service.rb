@@ -33,13 +33,9 @@ class DeploymentService < Service
     raise NotImplementedError
   end
 
-  # Environments have a rollout status. This represents the current state of
-  # deployments to that environment.
-  def rollout_status(environment)
-    raise NotImplementedError
-  end
-
   def can_test?
     false
   end
 end
+
+DeploymentService.prepend(EE::DeploymentService)

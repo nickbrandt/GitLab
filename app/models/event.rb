@@ -92,12 +92,6 @@ class Event < ActiveRecord::Base
   end
 
   scope :for_milestone_id, ->(milestone_id) { where(target_type: "Milestone", target_id: milestone_id) }
-  scope :issues, -> { where(target_type: 'Issue') }
-  scope :merge_requests, -> { where(target_type: 'MergeRequest') }
-  scope :created, -> { where(action: CREATED) }
-  scope :closed, -> { where(action: CLOSED) }
-  scope :merged, -> { where(action: MERGED) }
-  scope :totals_by_author, -> { group(:author_id).count }
 
   # Authors are required as they're used to display who pushed data.
   #
@@ -426,3 +420,5 @@ class Event < ActiveRecord::Base
     UserInteractedProject.track(self) if UserInteractedProject.available?
   end
 end
+
+Event.prepend(EE::Event)

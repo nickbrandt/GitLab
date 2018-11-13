@@ -12,8 +12,6 @@ module Ci
     include AtomicInternalId
     include EnumWithNil
 
-    prepend ::EE::Ci::Pipeline
-
     belongs_to :project, inverse_of: :all_pipelines
     belongs_to :user
     belongs_to :auto_canceled_by, class_name: 'Ci::Pipeline'
@@ -23,15 +21,6 @@ module Ci
     has_internal_id :iid, scope: :project, presence: false, init: ->(s) do
       s&.project&.all_pipelines&.maximum(:iid) || s&.project&.all_pipelines&.count
     end
-
-    has_one :source_pipeline, class_name: Ci::Sources::Pipeline
-    has_many :sourced_pipelines, class_name: Ci::Sources::Pipeline, foreign_key: :source_pipeline_id
-
-    has_one :triggered_by_pipeline, through: :source_pipeline, source: :source_pipeline
-    has_many :triggered_pipelines, through: :sourced_pipelines, source: :pipeline
-
-    has_many :auto_canceled_pipelines, class_name: 'Ci::Pipeline', foreign_key: 'auto_canceled_by_id'
-    has_many :auto_canceled_jobs, class_name: 'CommitStatus', foreign_key: 'auto_canceled_by_id'
 
     has_many :stages, -> { order(position: :asc) }, inverse_of: :pipeline
     has_many :statuses, class_name: 'CommitStatus', foreign_key: :commit_id, inverse_of: :pipeline
@@ -762,3 +751,5 @@ module Ci
     end
   end
 end
+
+Ci::Pipeline.prepend(EE::Ci::Pipeline)

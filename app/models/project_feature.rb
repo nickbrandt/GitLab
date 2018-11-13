@@ -57,12 +57,6 @@ class ProjectFeature < ActiveRecord::Base
   default_value_for :wiki_access_level,           value: ENABLED, allows_nil: false
   default_value_for :repository_access_level,     value: ENABLED, allows_nil: false
 
-  after_commit on: :update do
-    if Gitlab::CurrentSettings.current_application_settings.elasticsearch_indexing?
-      ElasticIndexerWorker.perform_async(:update, 'Project', project_id, project.es_id)
-    end
-  end
-
   def feature_available?(feature, user)
     # This feature might not be behind a feature flag at all, so default to true
     return false unless ::Feature.enabled?(feature, user, default_enabled: true)
@@ -140,3 +134,5 @@ class ProjectFeature < ActiveRecord::Base
     end
   end
 end
+
+ProjectFeature.prepend(EE::ProjectFeature)

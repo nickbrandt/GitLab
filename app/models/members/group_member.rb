@@ -15,11 +15,6 @@ class GroupMember < Member
   after_create :update_two_factor_requirement, unless: :invite?
   after_destroy :update_two_factor_requirement, unless: :invite?
 
-  scope :with_ldap_dn, -> { joins(user: :identities).where("identities.provider LIKE ?", 'ldap%') }
-  scope :with_identity_provider, ->(provider) do
-    joins(user: :identities).where(identities: { provider: provider })
-  end
-
   def self.access_level_roles
     Gitlab::Access.options_with_owner
   end
@@ -75,3 +70,5 @@ class GroupMember < Member
     super
   end
 end
+
+GroupMember.prepend(EE::GroupMember)
