@@ -10,6 +10,13 @@ describe Dashboard::Operations::ListService do
   let!(:user) { create(:user) }
 
   describe '#execute' do
+    let(:projects_service) { double(Dashboard::Operations::ProjectsService) }
+
+    before do
+      allow(Dashboard::Operations::ProjectsService)
+        .to receive(:new).with(user).and_return(projects_service)
+    end
+
     shared_examples 'no projects' do
       it 'returns an empty list' do
         expect(subject).to be_empty
@@ -51,7 +58,9 @@ describe Dashboard::Operations::ListService do
 
       before do
         user.ops_dashboard_projects << project
-        project.add_developer(user)
+
+        allow(projects_service)
+          .to receive(:execute).with([project]).and_return([project])
       end
 
       it 'returns a list of projects' do
@@ -107,42 +116,15 @@ describe Dashboard::Operations::ListService do
               alert2_prd = create(:prometheus_alert, project: project2, environment: production2)
               create(:prometheus_alert_event, prometheus_alert: alert2_prd)
 
-              project2.add_developer(user)
               user.ops_dashboard_projects << project2
+
+              allow(projects_service)
+                .to receive(:execute)
+                .with([project, project2])
+                .and_return([project, project2])
             end
 
             it_behaves_like 'avoiding N+1 queries'
-          end
-        end
-
-        describe 'checking plans' do
-          using RSpec::Parameterized::TableSyntax
-
-          where(:check_namespace_plan, :plan, :available) do
-            true  | :gold_plan   | true
-            true  | :silver_plan | false
-            true  | nil          | false
-            false | :gold_plan   | true
-            false | :silver_plan | true
-            false | nil          | true
-          end
-
-          with_them do
-            before do
-              stub_application_setting(check_namespace_plan: check_namespace_plan)
-              project.namespace.update!(plan: create(plan)) if plan
-            end
-
-            if params[:available]
-              it 'returns this project' do
-                expect(subject.size).to eq(1)
-                expect(dashboard_project.project).to eq(project)
-              end
-            else
-              it 'does not return this project' do
-                expect(subject).to be_empty
-              end
-            end
           end
         end
       end
@@ -158,17 +140,14 @@ describe Dashboard::Operations::ListService do
       context 'without deployments' do
         it_behaves_like 'no deployment information'
       end
-
-      context 'without sufficient access level' do
-        before do
-          project.add_reporter(user)
-        end
-
-        it_behaves_like 'no projects'
-      end
     end
 
     context 'without added projects' do
+      before do
+        allow(projects_service)
+          .to receive(:execute).with([]).and_return([])
+      end
+
       it_behaves_like 'no projects'
     end
   end
