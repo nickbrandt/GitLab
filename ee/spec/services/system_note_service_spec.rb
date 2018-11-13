@@ -99,7 +99,7 @@ describe SystemNoteService do
 
     context '.issue_promoted' do
       context 'note on the epic' do
-        subject { described_class.issue_promoted(epic, issue, author) }
+        subject { described_class.issue_promoted(epic, issue, author, direction: :from) }
 
         it_behaves_like 'a system note' do
           let(:action) { 'moved' }
@@ -112,7 +112,7 @@ describe SystemNoteService do
       end
 
       context 'note on the issue' do
-        subject { described_class.issue_promoted(issue, epic, author) }
+        subject { described_class.issue_promoted(issue, epic, author, direction: :to) }
 
         it_behaves_like 'a system note' do
           let(:action) { 'moved' }

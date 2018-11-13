@@ -16,9 +16,7 @@ describe Epics::IssuePromoteService do
 
   subject { described_class.new(issue.project, user) }
 
-  def epic
-    Epic.last
-  end
+  let(:epic) { Epic.last }
 
   describe '#execute' do
     context 'when epics are not enabled' do
@@ -52,7 +50,7 @@ describe Epics::IssuePromoteService do
             other_issue = create(:issue, project: create(:project))
 
             expect { subject.execute(other_issue) }
-            .to raise_error(Epics::IssuePromoteService::PromoteError, /group/)
+              .to raise_error(Epics::IssuePromoteService::PromoteError, /group/)
           end
         end
 
@@ -70,7 +68,7 @@ describe Epics::IssuePromoteService do
           end
 
           it 'copies group labels assigned to the issue' do
-            expect(Epic.last.labels).to eq([label1])
+            expect(epic.labels).to eq([label1])
           end
 
           it 'creates a system note on the issue' do

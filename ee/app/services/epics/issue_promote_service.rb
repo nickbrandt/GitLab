@@ -33,11 +33,11 @@ module Epics
     end
 
     def add_note_from
-      SystemNoteService.issue_promoted(new_entity, original_entity, current_user)
+      SystemNoteService.issue_promoted(new_entity, original_entity, current_user, direction: :from)
     end
 
     def add_note_to
-      SystemNoteService.issue_promoted(original_entity, new_entity, current_user)
+      SystemNoteService.issue_promoted(original_entity, new_entity, current_user, direction: :to)
     end
   end
 end
