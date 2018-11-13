@@ -36,7 +36,9 @@ Due to implementation limitations we always take the latest License Management a
 
 ## Install custom project dependencies
 
-The `license_management` image already embeds many auto-detection scripts, languages,
+> Introduced in GitLab Ultimate 11.4.
+
+The `license_management` image already embeds many auto-detection scripts, languages, 
 and packages. Nevertheless, it's almost impossible to cover all cases, for all projects.
 That's why sometimes it's necessary to install extra packages, or to have extra steps
 in the project automated setup, like the download and installation of a certificate.
