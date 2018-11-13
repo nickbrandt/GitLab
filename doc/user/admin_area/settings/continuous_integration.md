@@ -91,3 +91,19 @@ You can see there an overview of the pipeline minutes quota of all projects of
 the group.
 
 ![Group pipelines quota](img/group_pipelines_quota.png)
+
+## Archive jobs **[CORE ONLY]**
+
+Archiving jobs is useful for reducing the CI/CD footprint on the system by
+removing some of the capabilities of the jobs (metadata needed to run the job),
+but persisting the traces and artifacts for auditing purposes.
+
+To set the duration for which the jobs will be considered as old and expired:
+
+1. Go to **Admin area > Settings > CI/CD > Continuous Integration and Deployment**.
+1. Change the value of "Archive jobs".
+1. Hit **Save changes** for the changes to take effect.
+
+Once that time passes, the jobs will be archived and no longer able to be
+retried. Make it empty to never expire jobs. It has to be no less than 1 day,
+for example: <code>15 days</code>, <code>1 month</code>, <code>2 years</code>.
