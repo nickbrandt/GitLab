@@ -36,12 +36,12 @@ func (s *errorPageResponseWriter) Header() http.Header {
 	return s.rw.Header()
 }
 
-func (s *errorPageResponseWriter) Write(data []byte) (n int, err error) {
+func (s *errorPageResponseWriter) Write(data []byte) (int, error) {
 	if s.status == 0 {
 		s.WriteHeader(http.StatusOK)
 	}
 	if s.hijacked {
-		return 0, nil
+		return len(data), nil
 	}
 	return s.rw.Write(data)
 }
@@ -76,7 +76,7 @@ func (s *errorPageResponseWriter) WriteHeader(status int) {
 	s.rw.WriteHeader(status)
 }
 
-func (s *errorPageResponseWriter) Flush() {
+func (s *errorPageResponseWriter) flush() {
 	s.WriteHeader(http.StatusOK)
 }
 
@@ -89,7 +89,7 @@ func (st *Static) ErrorPagesUnless(disabled bool, handler http.Handler) http.Han
 			rw:   w,
 			path: st.DocumentRoot,
 		}
-		defer rw.Flush()
+		defer rw.flush()
 		handler.ServeHTTP(&rw, r)
 	})
 }

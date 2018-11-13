@@ -12,7 +12,7 @@ import (
 func Block(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rw := &blocker{rw: w, r: r}
-		defer rw.Flush()
+		defer rw.flush()
 		h.ServeHTTP(rw, r)
 	})
 }
@@ -33,7 +33,7 @@ func (b *blocker) Write(data []byte) (int, error) {
 		b.WriteHeader(http.StatusOK)
 	}
 	if b.hijacked {
-		return 0, nil
+		return len(data), nil
 	}
 
 	return b.rw.Write(data)
@@ -56,6 +56,6 @@ func (b *blocker) WriteHeader(status int) {
 	b.rw.WriteHeader(b.status)
 }
 
-func (b *blocker) Flush() {
+func (b *blocker) flush() {
 	b.WriteHeader(http.StatusOK)
 }

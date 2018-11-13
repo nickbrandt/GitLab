@@ -24,12 +24,12 @@ func (c *countingResponseWriter) Header() http.Header {
 	return c.rw.Header()
 }
 
-func (c *countingResponseWriter) Write(data []byte) (n int, err error) {
+func (c *countingResponseWriter) Write(data []byte) (int, error) {
 	if c.status == 0 {
 		c.WriteHeader(http.StatusOK)
 	}
 
-	n, err = c.rw.Write(data)
+	n, err := c.rw.Write(data)
 	c.count += int64(n)
 	return n, err
 }
