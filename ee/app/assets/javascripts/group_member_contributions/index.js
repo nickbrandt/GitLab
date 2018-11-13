@@ -3,7 +3,6 @@ import Vue from 'vue';
 import Translate from '~/vue_shared/translate';
 
 import GroupMemberStore from './store/group_member_store';
-import GroupMemberService from './service/group_member_service';
 
 import GroupMemberContributionsApp from './components/app.vue';
 
@@ -16,19 +15,19 @@ export default () => {
     return false;
   }
 
+  const { memberContributionsPath } = el.dataset;
+  const store = new GroupMemberStore(memberContributionsPath);
+
+  store.fetchContributedMembers();
+
   return new Vue({
     el,
     components: {
       GroupMemberContributionsApp,
     },
     data() {
-      const { memberContributionsPath } = el.dataset;
-      const store = new GroupMemberStore();
-      const service = new GroupMemberService(memberContributionsPath);
-
       return {
         store,
-        service,
       };
     },
     render(createElement) {

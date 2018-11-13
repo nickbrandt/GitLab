@@ -1,12 +1,9 @@
 <script>
-import { __ } from '~/locale';
-import Flash from '~/flash';
-
+import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 import COLUMNS from '../constants';
 
 import TableHeader from './table_header.vue';
 import TableBody from './table_body.vue';
-import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
 
 export default {
   columns: COLUMNS,
@@ -20,17 +17,11 @@ export default {
       type: Object,
       required: true,
     },
-    service: {
-      type: Object,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      isLoading: true,
-    };
   },
   computed: {
+    isLoading() {
+      return this.store.isLoading;
+    },
     members() {
       return this.store.members;
     },
@@ -38,24 +29,7 @@ export default {
       return this.store.sortOrders;
     },
   },
-  mounted() {
-    this.fetchContributedMembers();
-  },
   methods: {
-    fetchContributedMembers() {
-      this.service
-        .getContributedMembers()
-        .then(res => res.data)
-        .then(members => {
-          this.store.setColumns(this.$options.columns);
-          this.store.setMembers(members);
-          this.isLoading = false;
-        })
-        .catch(() => {
-          this.isLoading = false;
-          Flash(__('Something went wrong while fetching group member contributions'));
-        });
-    },
     handleColumnClick(columnName) {
       this.store.sortMembers(columnName);
     },
