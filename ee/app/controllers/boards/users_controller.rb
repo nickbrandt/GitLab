@@ -4,6 +4,11 @@ module Boards
     # If board parent is a project it only enumerates project members
     # If board parent is a group it enumerates all members of current group,
     # ancestors, and descendants
+
+    include BoardsResponses
+
+    before_action :authorize_read_parent, only: [:index]
+
     def index
       user_ids = user_finder.execute.select(:user_id)
 
