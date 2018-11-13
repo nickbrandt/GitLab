@@ -69,17 +69,9 @@ module Ci
 
     after_create :keep_around_commits, unless: :importing?
 
-    enum_with_nil source: {
-      unknown: nil,
-      push: 1,
-      web: 2,
-      trigger: 3,
-      schedule: 4,
-      api: 5,
-      external: 6,
-      pipeline: 7,
-      chat: 8
-    }
+    # We use `Ci::PipelineEnums.sources` here so that EE can more easily extend
+    # this `Hash` with new values.
+    enum_with_nil source: ::Ci::PipelineEnums.sources
 
     enum_with_nil config_source: {
       unknown_source: nil,
@@ -87,10 +79,9 @@ module Ci
       auto_devops_source: 2
     }
 
-    enum failure_reason: {
-      unknown_failure: 0,
-      config_error: 1
-    }.merge(EE_FAILURE_REASONS)
+    # We use `Ci::PipelineEnums.failure_reasons` here so that EE can more easily
+    # extend this `Hash` with new values.
+    enum failure_reason: ::Ci::PipelineEnums.failure_reasons
 
     state_machine :status, initial: :created do
       event :enqueue do
