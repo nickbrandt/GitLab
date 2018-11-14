@@ -41,7 +41,7 @@ module QA
           # we are already logged-in so we check both cases here.
           wait(max: 500) do
             has_css?('.login-page') ||
-              Page::Main::Menu.act { has_personal_area?(wait: 0) }
+                Page::Main::Menu.act { has_personal_area?(wait: 0) }
           end
         end
 
@@ -65,16 +65,6 @@ module QA
         end
 
         def sign_in_using_admin_credentials
-          # Don't try to log-in if we're already logged-in as admin
-          return if Page::Main::Menu.perform do |menu|
-            menu.has_admin_area_link?(wait: 0)
-          end
-
-          # If already logged in as non admin, logout first
-          Page::Main::Menu.perform do |menu|
-            menu.sign_out if menu.has_personal_area?(wait: 0)
-          end
-
           admin = QA::Resource::User.new.tap do |user|
             user.username = QA::Runtime::User.admin_username
             user.password = QA::Runtime::User.admin_password
@@ -134,15 +124,15 @@ module QA
           click_element :standard_tab
         end
 
-        def sign_in_using_ldap_credentials(username: Runtime::User.ldap_username, password: Runtime::User.ldap_password)
+        private
+
+        def sign_in_using_ldap_credentials
           switch_to_ldap_tab
 
-          fill_element :username_field, username
-          fill_element :password_field, password
+          fill_element :username_field, Runtime::User.ldap_username
+          fill_element :password_field, Runtime::User.ldap_password
           click_element :sign_in_button
         end
-
-        private
 
         def sign_in_with_saml
           set_initial_password_if_present

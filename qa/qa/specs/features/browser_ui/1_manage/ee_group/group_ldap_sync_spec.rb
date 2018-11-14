@@ -85,8 +85,11 @@ module QA
       end
 
       def create_group_with_user_via_api(user: nil, group_name: nil)
+        Runtime::Env.ldap_username = user
+        Runtime::Env.ldap_password = 'password'
+
         Page::Main::Login.perform do |login_page|
-          login_page.sign_in_using_ldap_credentials(username: user, password: 'password')
+          login_page.sign_in_using_credentials
         end
 
         Page::Main::Menu.perform do |menu|

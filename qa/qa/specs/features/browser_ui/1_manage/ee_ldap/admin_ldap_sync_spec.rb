@@ -7,7 +7,10 @@ module QA
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
 
         Page::Main::Login.perform do |login_page|
-          login_page.sign_in_using_ldap_credentials(username: 'adminuser1', password: 'password')
+          Runtime::Env.ldap_username = 'adminuser1'
+          Runtime::Env.ldap_password = 'password'
+
+          login_page.sign_in_using_credentials
         end
 
         Page::Main::Menu.perform do |menu|
