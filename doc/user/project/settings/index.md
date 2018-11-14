@@ -120,3 +120,9 @@ GitLab administrators can use the admin interface to move any project to any
 namespace if needed.
 
 [permissions]: ../../permissions.md##project-members-permissions
+
+## Operations settings
+
+### Jaeger tracing
+
+Add the URL of a Jaeger server to allow your users to [easily access the Jaeger UI from within GitLab](../operations/tracing.md).
