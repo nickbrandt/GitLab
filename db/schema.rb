@@ -144,10 +144,7 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.integer "geo_status_timeout", default: 10
     t.string "uuid"
     t.decimal "polling_interval_multiplier", default: "1.0", null: false
-<<<<<<< .merge_file_clpLlL
     t.boolean "elasticsearch_experimental_indexer"
-=======
->>>>>>> .merge_file_anHOcl
     t.integer "cached_markdown_version"
     t.boolean "clientside_sentry_enabled", default: false, null: false
     t.string "clientside_sentry_dsn"
@@ -279,15 +276,12 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["project_id"], name: "index_badges_on_project_id", using: :btree
   end
 
-<<<<<<< .merge_file_clpLlL
   create_table "board_assignees", force: :cascade do |t|
     t.integer "board_id", null: false
     t.integer "assignee_id", null: false
     t.index ["board_id", "assignee_id"], name: "index_board_assignees_on_board_id_and_assignee_id", unique: true, using: :btree
   end
 
-=======
->>>>>>> .merge_file_anHOcl
   create_table "board_group_recent_visits", id: :bigserial, force: :cascade do |t|
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
@@ -300,15 +294,12 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["user_id"], name: "index_board_group_recent_visits_on_user_id", using: :btree
   end
 
-<<<<<<< .merge_file_clpLlL
   create_table "board_labels", force: :cascade do |t|
     t.integer "board_id", null: false
     t.integer "label_id", null: false
     t.index ["board_id", "label_id"], name: "index_board_labels_on_board_id_and_label_id", unique: true, using: :btree
   end
 
-=======
->>>>>>> .merge_file_anHOcl
   create_table "board_project_recent_visits", id: :bigserial, force: :cascade do |t|
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
@@ -328,13 +319,9 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.string "name", default: "Development", null: false
     t.integer "milestone_id"
     t.integer "group_id"
-<<<<<<< .merge_file_clpLlL
     t.integer "weight"
     t.index ["group_id"], name: "index_boards_on_group_id", using: :btree
     t.index ["milestone_id"], name: "index_boards_on_milestone_id", using: :btree
-=======
-    t.index ["group_id"], name: "index_boards_on_group_id", using: :btree
->>>>>>> .merge_file_anHOcl
     t.index ["project_id"], name: "index_boards_on_project_id", using: :btree
   end
 
@@ -390,13 +377,8 @@ ActiveRecord::Schema.define(version: 20181107054254) do
 
   create_table "ci_build_trace_sections", force: :cascade do |t|
     t.integer "project_id", null: false
-<<<<<<< .merge_file_clpLlL
     t.datetime "date_start", null: false
     t.datetime "date_end", null: false
-=======
-    t.datetime_with_timezone "date_start", null: false
-    t.datetime_with_timezone "date_end", null: false
->>>>>>> .merge_file_anHOcl
     t.bigint "byte_start", null: false
     t.bigint "byte_end", null: false
     t.integer "build_id", null: false
@@ -458,10 +440,7 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["commit_id", "type", "name", "ref"], name: "index_ci_builds_on_commit_id_and_type_and_name_and_ref", using: :btree
     t.index ["commit_id", "type", "ref"], name: "index_ci_builds_on_commit_id_and_type_and_ref", using: :btree
     t.index ["id"], name: "partial_index_ci_builds_on_id_with_legacy_artifacts", where: "(artifacts_file <> ''::text)", using: :btree
-<<<<<<< .merge_file_clpLlL
     t.index ["name"], name: "index_ci_builds_on_name_for_security_products_values", where: "((name)::text = ANY (ARRAY[('container_scanning'::character varying)::text, ('dast'::character varying)::text, ('dependency_scanning'::character varying)::text, ('license_management'::character varying)::text, ('sast'::character varying)::text]))", using: :btree
-=======
->>>>>>> .merge_file_anHOcl
     t.index ["project_id", "id"], name: "index_ci_builds_on_project_id_and_id", using: :btree
     t.index ["protected"], name: "index_ci_builds_on_protected", using: :btree
     t.index ["runner_id"], name: "index_ci_builds_on_runner_id", using: :btree
@@ -508,10 +487,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.integer "project_id", null: false
     t.integer "job_id", null: false
     t.integer "file_type", null: false
-<<<<<<< .merge_file_clpLlL
-=======
-    t.integer "file_store"
->>>>>>> .merge_file_anHOcl
     t.bigint "size"
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
@@ -527,7 +502,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["project_id"], name: "index_ci_job_artifacts_on_project_id", using: :btree
   end
 
-<<<<<<< .merge_file_clpLlL
   create_table "ci_pipeline_chat_data", id: :bigserial, force: :cascade do |t|
     t.integer "pipeline_id", null: false
     t.integer "chat_name_id", null: false
@@ -535,8 +509,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["pipeline_id"], name: "index_ci_pipeline_chat_data_on_pipeline_id", unique: true, using: :btree
   end
 
-=======
->>>>>>> .merge_file_anHOcl
   create_table "ci_pipeline_schedule_variables", force: :cascade do |t|
     t.string "key", null: false
     t.text "value"
@@ -651,7 +623,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["token"], name: "index_ci_runners_on_token", using: :btree
   end
 
-<<<<<<< .merge_file_clpLlL
   create_table "ci_sources_pipelines", force: :cascade do |t|
     t.integer "project_id"
     t.integer "pipeline_id"
@@ -665,8 +636,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["source_project_id"], name: "index_ci_sources_pipelines_on_source_project_id", using: :btree
   end
 
-=======
->>>>>>> .merge_file_anHOcl
   create_table "ci_stages", force: :cascade do |t|
     t.integer "project_id"
     t.integer "pipeline_id"
@@ -740,13 +709,8 @@ ActiveRecord::Schema.define(version: 20181107054254) do
   create_table "cluster_projects", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "cluster_id", null: false
-<<<<<<< .merge_file_clpLlL
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-=======
-    t.datetime_with_timezone "created_at", null: false
-    t.datetime_with_timezone "updated_at", null: false
->>>>>>> .merge_file_anHOcl
     t.index ["cluster_id"], name: "index_cluster_projects_on_cluster_id", using: :btree
     t.index ["project_id"], name: "index_cluster_projects_on_project_id", using: :btree
   end
@@ -956,7 +920,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["project_id", "iid"], name: "index_deployments_on_project_id_and_iid", unique: true, using: :btree
     t.index ["project_id", "status", "created_at"], name: "index_deployments_on_project_id_and_status_and_created_at", using: :btree
     t.index ["project_id", "status"], name: "index_deployments_on_project_id_and_status", using: :btree
-<<<<<<< .merge_file_clpLlL
   end
 
   create_table "draft_notes", id: :bigserial, force: :cascade do |t|
@@ -971,8 +934,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["author_id"], name: "index_draft_notes_on_author_id", using: :btree
     t.index ["discussion_id"], name: "index_draft_notes_on_discussion_id", using: :btree
     t.index ["merge_request_id"], name: "index_draft_notes_on_merge_request_id", using: :btree
-=======
->>>>>>> .merge_file_anHOcl
   end
 
   create_table "emails", force: :cascade do |t|
@@ -981,13 +942,8 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "confirmation_token"
-<<<<<<< .merge_file_clpLlL
     t.datetime "confirmed_at"
     t.datetime "confirmation_sent_at"
-=======
-    t.datetime_with_timezone "confirmed_at"
-    t.datetime_with_timezone "confirmation_sent_at"
->>>>>>> .merge_file_anHOcl
     t.index ["confirmation_token"], name: "index_emails_on_confirmation_token", unique: true, using: :btree
     t.index ["email"], name: "index_emails_on_email", unique: true, using: :btree
     t.index ["user_id"], name: "index_emails_on_user_id", using: :btree
@@ -1002,15 +958,11 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.string "environment_type"
     t.string "state", default: "available", null: false
     t.string "slug", null: false
-<<<<<<< .merge_file_clpLlL
     t.index ["name"], name: "index_environments_on_name_varchar_pattern_ops", using: :btree, opclasses: {"name"=>"varchar_pattern_ops"}
-=======
->>>>>>> .merge_file_anHOcl
     t.index ["project_id", "name"], name: "index_environments_on_project_id_and_name", unique: true, using: :btree
     t.index ["project_id", "slug"], name: "index_environments_on_project_id_and_slug", unique: true, using: :btree
   end
 
-<<<<<<< .merge_file_clpLlL
   create_table "epic_issues", force: :cascade do |t|
     t.integer "epic_id", null: false
     t.integer "issue_id", null: false
@@ -1064,8 +1016,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["start_date"], name: "index_epics_on_start_date", using: :btree
   end
 
-=======
->>>>>>> .merge_file_anHOcl
   create_table "events", force: :cascade do |t|
     t.integer "project_id"
     t.integer "author_id", null: false
@@ -1116,7 +1066,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["forked_to_project_id"], name: "index_forked_project_links_on_forked_to_project_id", unique: true, using: :btree
-<<<<<<< .merge_file_clpLlL
   end
 
   create_table "geo_cache_invalidation_events", id: :bigserial, force: :cascade do |t|
@@ -1321,10 +1270,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["upload_id"], name: "index_geo_upload_deleted_events_on_upload_id", using: :btree
   end
 
-=======
-  end
-
->>>>>>> .merge_file_anHOcl
   create_table "gpg_key_subkeys", force: :cascade do |t|
     t.integer "gpg_key_id", null: false
     t.binary "keyid"
@@ -1374,7 +1319,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["key", "value"], name: "index_group_custom_attributes_on_key_and_value", using: :btree
   end
 
-<<<<<<< .merge_file_clpLlL
   create_table "historical_data", force: :cascade do |t|
     t.date "date", null: false
     t.integer "active_user_count"
@@ -1382,20 +1326,15 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.datetime "updated_at"
   end
 
-=======
->>>>>>> .merge_file_anHOcl
   create_table "identities", force: :cascade do |t|
     t.string "extern_uid"
     t.string "provider"
     t.integer "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-<<<<<<< .merge_file_clpLlL
     t.string "secondary_extern_uid"
     t.integer "saml_provider_id"
     t.index ["saml_provider_id"], name: "index_identities_on_saml_provider_id", where: "(saml_provider_id IS NOT NULL)", using: :btree
-=======
->>>>>>> .merge_file_anHOcl
     t.index ["user_id"], name: "index_identities_on_user_id", using: :btree
   end
 
@@ -1408,7 +1347,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["updated_at"], name: "index_import_export_uploads_on_updated_at", using: :btree
   end
 
-<<<<<<< .merge_file_clpLlL
   create_table "index_statuses", force: :cascade do |t|
     t.integer "project_id", null: false
     t.datetime "indexed_at"
@@ -1419,8 +1357,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["project_id"], name: "index_index_statuses_on_project_id", unique: true, using: :btree
   end
 
-=======
->>>>>>> .merge_file_anHOcl
   create_table "internal_ids", id: :bigserial, force: :cascade do |t|
     t.integer "project_id"
     t.integer "usage", null: false
@@ -1437,7 +1373,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["user_id"], name: "index_issue_assignees_on_user_id", using: :btree
   end
 
-<<<<<<< .merge_file_clpLlL
   create_table "issue_links", force: :cascade do |t|
     t.integer "source_id", null: false
     t.integer "target_id", null: false
@@ -1448,8 +1383,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["target_id"], name: "index_issue_links_on_target_id", using: :btree
   end
 
-=======
->>>>>>> .merge_file_anHOcl
   create_table "issue_metrics", force: :cascade do |t|
     t.integer "issue_id", null: false
     t.datetime "first_mentioned_in_commit_at"
@@ -1556,7 +1489,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["type", "project_id"], name: "index_labels_on_type_and_project_id", using: :btree
   end
 
-<<<<<<< .merge_file_clpLlL
   create_table "ldap_group_links", force: :cascade do |t|
     t.string "cn"
     t.integer "group_access", null: false
@@ -1567,8 +1499,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.string "filter"
   end
 
-=======
->>>>>>> .merge_file_anHOcl
   create_table "lfs_file_locks", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "user_id", null: false
@@ -1597,15 +1527,12 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["project_id"], name: "index_lfs_objects_projects_on_project_id", using: :btree
   end
 
-<<<<<<< .merge_file_clpLlL
   create_table "licenses", force: :cascade do |t|
     t.text "data", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-=======
->>>>>>> .merge_file_anHOcl
   create_table "lists", force: :cascade do |t|
     t.integer "board_id", null: false
     t.integer "label_id"
@@ -1613,7 +1540,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.integer "position"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-<<<<<<< .merge_file_clpLlL
     t.integer "user_id"
     t.integer "milestone_id"
     t.index ["board_id", "label_id"], name: "index_lists_on_board_id_and_label_id", unique: true, using: :btree
@@ -1621,11 +1547,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["list_type"], name: "index_lists_on_list_type", using: :btree
     t.index ["milestone_id"], name: "index_lists_on_milestone_id", using: :btree
     t.index ["user_id"], name: "index_lists_on_user_id", using: :btree
-=======
-    t.index ["board_id", "label_id"], name: "index_lists_on_board_id_and_label_id", unique: true, using: :btree
-    t.index ["label_id"], name: "index_lists_on_label_id", using: :btree
-    t.index ["list_type"], name: "index_lists_on_list_type", using: :btree
->>>>>>> .merge_file_anHOcl
   end
 
   create_table "members", force: :cascade do |t|
@@ -1643,11 +1564,8 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.datetime "invite_accepted_at"
     t.datetime "requested_at"
     t.date "expires_at"
-<<<<<<< .merge_file_clpLlL
     t.boolean "ldap", default: false, null: false
     t.boolean "override", default: false, null: false
-=======
->>>>>>> .merge_file_anHOcl
     t.index ["access_level"], name: "index_members_on_access_level", using: :btree
     t.index ["invite_token"], name: "index_members_on_invite_token", unique: true, using: :btree
     t.index ["requested_at"], name: "index_members_on_requested_at", using: :btree
@@ -1805,7 +1723,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["title"], name: "index_milestones_on_title_trigram", using: :gin, opclasses: {"title"=>"gin_trgm_ops"}
   end
 
-<<<<<<< .merge_file_clpLlL
   create_table "namespace_statistics", force: :cascade do |t|
     t.integer "namespace_id", null: false
     t.integer "shared_runners_seconds", default: 0, null: false
@@ -1813,8 +1730,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["namespace_id"], name: "index_namespace_statistics_on_namespace_id", unique: true, using: :btree
   end
 
-=======
->>>>>>> .merge_file_anHOcl
   create_table "namespaces", force: :cascade do |t|
     t.string "name", null: false
     t.string "path", null: false
@@ -1844,30 +1759,21 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.integer "plan_id"
     t.integer "project_creation_level"
     t.string "runners_token"
-<<<<<<< .merge_file_clpLlL
     t.datetime_with_timezone "trial_ends_on"
     t.integer "file_template_project_id"
     t.index ["created_at"], name: "index_namespaces_on_created_at", using: :btree
     t.index ["ldap_sync_last_successful_update_at"], name: "index_namespaces_on_ldap_sync_last_successful_update_at", using: :btree
     t.index ["ldap_sync_last_update_at"], name: "index_namespaces_on_ldap_sync_last_update_at", using: :btree
-=======
-    t.index ["created_at"], name: "index_namespaces_on_created_at", using: :btree
->>>>>>> .merge_file_anHOcl
     t.index ["name", "parent_id"], name: "index_namespaces_on_name_and_parent_id", unique: true, using: :btree
     t.index ["name"], name: "index_namespaces_on_name_trigram", using: :gin, opclasses: {"name"=>"gin_trgm_ops"}
     t.index ["owner_id"], name: "index_namespaces_on_owner_id", using: :btree
     t.index ["parent_id", "id"], name: "index_namespaces_on_parent_id_and_id", unique: true, using: :btree
     t.index ["path"], name: "index_namespaces_on_path", using: :btree
     t.index ["path"], name: "index_namespaces_on_path_trigram", using: :gin, opclasses: {"path"=>"gin_trgm_ops"}
-<<<<<<< .merge_file_clpLlL
     t.index ["plan_id"], name: "index_namespaces_on_plan_id", using: :btree
     t.index ["require_two_factor_authentication"], name: "index_namespaces_on_require_two_factor_authentication", using: :btree
     t.index ["runners_token"], name: "index_namespaces_on_runners_token", unique: true, using: :btree
     t.index ["trial_ends_on"], name: "index_namespaces_on_trial_ends_on", where: "(trial_ends_on IS NOT NULL)", using: :btree
-=======
-    t.index ["require_two_factor_authentication"], name: "index_namespaces_on_require_two_factor_authentication", using: :btree
-    t.index ["runners_token"], name: "index_namespaces_on_runners_token", unique: true, using: :btree
->>>>>>> .merge_file_anHOcl
     t.index ["type"], name: "index_namespaces_on_type", using: :btree
   end
 
@@ -1941,10 +1847,7 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.boolean "success_pipeline"
     t.boolean "push_to_merge_request"
     t.boolean "issue_due"
-<<<<<<< .merge_file_clpLlL
     t.boolean "new_epic"
-=======
->>>>>>> .merge_file_anHOcl
     t.index ["source_id", "source_type"], name: "index_notification_settings_on_source_id_and_source_type", using: :btree
     t.index ["user_id", "source_id", "source_type"], name: "index_notifications_on_user_id_and_source_id_and_source_type", unique: true, using: :btree
     t.index ["user_id"], name: "index_notification_settings_on_user_id", using: :btree
@@ -2063,7 +1966,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["verified_at"], name: "index_pages_domains_on_verified_at", using: :btree
   end
 
-<<<<<<< .merge_file_clpLlL
   create_table "path_locks", force: :cascade do |t|
     t.string "path", null: false
     t.integer "project_id"
@@ -2075,8 +1977,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["user_id"], name: "index_path_locks_on_user_id", using: :btree
   end
 
-=======
->>>>>>> .merge_file_anHOcl
   create_table "personal_access_tokens", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "token"
@@ -2093,7 +1993,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["user_id"], name: "index_personal_access_tokens_on_user_id", using: :btree
   end
 
-<<<<<<< .merge_file_clpLlL
   create_table "plans", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2104,8 +2003,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["name"], name: "index_plans_on_name", using: :btree
   end
 
-=======
->>>>>>> .merge_file_anHOcl
   create_table "programming_languages", force: :cascade do |t|
     t.string "name", null: false
     t.string "color", null: false
@@ -2198,20 +2095,15 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.string "status"
     t.string "jid"
     t.text "last_error"
-<<<<<<< .merge_file_clpLlL
     t.datetime_with_timezone "last_update_at"
     t.datetime_with_timezone "last_successful_update_at"
     t.index ["jid"], name: "index_project_mirror_data_on_jid", using: :btree
     t.index ["last_successful_update_at"], name: "index_project_mirror_data_on_last_successful_update_at", using: :btree
     t.index ["next_execution_timestamp", "retry_count"], name: "index_mirror_data_on_next_execution_and_retry_count", using: :btree
-=======
-    t.index ["jid"], name: "index_project_mirror_data_on_jid", using: :btree
->>>>>>> .merge_file_anHOcl
     t.index ["project_id"], name: "index_project_mirror_data_on_project_id", unique: true, using: :btree
     t.index ["status"], name: "index_project_mirror_data_on_status", using: :btree
   end
 
-<<<<<<< .merge_file_clpLlL
   create_table "project_repository_states", force: :cascade do |t|
     t.integer "project_id", null: false
     t.binary "repository_verification_checksum"
@@ -2228,8 +2120,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["project_id"], name: "index_project_repository_states_on_project_id", unique: true, using: :btree
   end
 
-=======
->>>>>>> .merge_file_anHOcl
   create_table "project_statistics", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "namespace_id", null: false
@@ -2238,7 +2128,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.bigint "repository_size", default: 0, null: false
     t.bigint "lfs_objects_size", default: 0, null: false
     t.bigint "build_artifacts_size", default: 0, null: false
-<<<<<<< .merge_file_clpLlL
     t.bigint "shared_runners_seconds", default: 0, null: false
     t.datetime "shared_runners_seconds_last_reset"
     t.index ["namespace_id"], name: "index_project_statistics_on_namespace_id", using: :btree
@@ -2251,10 +2140,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.integer "project_id", null: false
     t.string "external_url", null: false
     t.index ["project_id"], name: "index_project_tracing_settings_on_project_id", unique: true, using: :btree
-=======
-    t.index ["namespace_id"], name: "index_project_statistics_on_namespace_id", using: :btree
-    t.index ["project_id"], name: "index_project_statistics_on_project_id", unique: true, using: :btree
->>>>>>> .merge_file_anHOcl
   end
 
   create_table "projects", force: :cascade do |t|
@@ -2325,33 +2210,22 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.string "external_authorization_classification_label"
     t.boolean "mirror_overwrites_diverged_branches"
     t.boolean "pages_https_only", default: true
-<<<<<<< .merge_file_clpLlL
     t.string "external_webhook_token"
     t.boolean "packages_enabled"
     t.boolean "merge_requests_author_approval"
-=======
-    t.boolean "remote_mirror_available_overridden"
->>>>>>> .merge_file_anHOcl
     t.bigint "pool_repository_id"
     t.index ["ci_id"], name: "index_projects_on_ci_id", using: :btree
     t.index ["created_at"], name: "index_projects_on_created_at", using: :btree
     t.index ["creator_id"], name: "index_projects_on_creator_id", using: :btree
     t.index ["description"], name: "index_projects_on_description_trigram", using: :gin, opclasses: {"description"=>"gin_trgm_ops"}
-<<<<<<< .merge_file_clpLlL
     t.index ["id", "repository_storage", "last_repository_updated_at"], name: "idx_projects_on_repository_storage_last_repository_updated_at", using: :btree
     t.index ["id"], name: "index_projects_on_id_partial_for_visibility", unique: true, where: "(visibility_level = ANY (ARRAY[10, 20]))", using: :btree
     t.index ["id"], name: "index_projects_on_mirror_and_mirror_trigger_builds_both_true", where: "((mirror IS TRUE) AND (mirror_trigger_builds IS TRUE))", using: :btree
-=======
-    t.index ["id"], name: "index_projects_on_id_partial_for_visibility", unique: true, where: "(visibility_level = ANY (ARRAY[10, 20]))", using: :btree
->>>>>>> .merge_file_anHOcl
     t.index ["last_activity_at"], name: "index_projects_on_last_activity_at", using: :btree
     t.index ["last_repository_check_at"], name: "index_projects_on_last_repository_check_at", where: "(last_repository_check_at IS NOT NULL)", using: :btree
     t.index ["last_repository_check_failed"], name: "index_projects_on_last_repository_check_failed", using: :btree
     t.index ["last_repository_updated_at"], name: "index_projects_on_last_repository_updated_at", using: :btree
-<<<<<<< .merge_file_clpLlL
     t.index ["mirror_last_successful_update_at"], name: "index_projects_on_mirror_last_successful_update_at", using: :btree
-=======
->>>>>>> .merge_file_anHOcl
     t.index ["name"], name: "index_projects_on_name_trigram", using: :gin, opclasses: {"name"=>"gin_trgm_ops"}
     t.index ["namespace_id"], name: "index_projects_on_namespace_id", using: :btree
     t.index ["path"], name: "index_projects_on_path", using: :btree
@@ -2364,7 +2238,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["star_count"], name: "index_projects_on_star_count", using: :btree
     t.index ["visibility_level"], name: "index_projects_on_visibility_level", using: :btree
   end
-<<<<<<< .merge_file_clpLlL
 
   create_table "prometheus_alert_events", id: :bigserial, force: :cascade do |t|
     t.integer "project_id", null: false
@@ -2389,8 +2262,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["project_id", "prometheus_metric_id"], name: "index_prometheus_alerts_on_project_id_and_prometheus_metric_id", unique: true, using: :btree
     t.index ["prometheus_metric_id"], name: "index_prometheus_alerts_on_prometheus_metric_id", using: :btree
   end
-=======
->>>>>>> .merge_file_anHOcl
 
   create_table "prometheus_metrics", force: :cascade do |t|
     t.integer "project_id"
@@ -2415,14 +2286,10 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.integer "access_level", default: 40
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-<<<<<<< .merge_file_clpLlL
     t.integer "user_id"
     t.integer "group_id"
     t.index ["protected_branch_id"], name: "index_protected_branch_merge_access", using: :btree
     t.index ["user_id"], name: "index_protected_branch_merge_access_levels_on_user_id", using: :btree
-=======
-    t.index ["protected_branch_id"], name: "index_protected_branch_merge_access", using: :btree
->>>>>>> .merge_file_anHOcl
   end
 
   create_table "protected_branch_push_access_levels", force: :cascade do |t|
@@ -2430,7 +2297,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.integer "access_level", default: 40
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-<<<<<<< .merge_file_clpLlL
     t.integer "user_id"
     t.integer "group_id"
     t.index ["protected_branch_id"], name: "index_protected_branch_push_access", using: :btree
@@ -2447,11 +2313,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["user_id"], name: "index_protected_branch_unprotect_access_levels_on_user_id", using: :btree
   end
 
-=======
-    t.index ["protected_branch_id"], name: "index_protected_branch_push_access", using: :btree
-  end
-
->>>>>>> .merge_file_anHOcl
   create_table "protected_branches", force: :cascade do |t|
     t.integer "project_id", null: false
     t.string "name", null: false
@@ -2460,7 +2321,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["project_id"], name: "index_protected_branches_on_project_id", using: :btree
   end
 
-<<<<<<< .merge_file_clpLlL
   create_table "protected_environment_deploy_access_levels", force: :cascade do |t|
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
@@ -2482,8 +2342,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["project_id"], name: "index_protected_environments_on_project_id", using: :btree
   end
 
-=======
->>>>>>> .merge_file_anHOcl
   create_table "protected_tag_create_access_levels", force: :cascade do |t|
     t.integer "protected_tag_id", null: false
     t.integer "access_level", default: 40
@@ -2516,7 +2374,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["event_id"], name: "index_push_event_payloads_on_event_id", unique: true, using: :btree
   end
 
-<<<<<<< .merge_file_clpLlL
   create_table "push_rules", force: :cascade do |t|
     t.string "force_push_regex"
     t.string "delete_branch_regex"
@@ -2540,8 +2397,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["project_id"], name: "index_push_rules_on_project_id", using: :btree
   end
 
-=======
->>>>>>> .merge_file_anHOcl
   create_table "redirect_routes", force: :cascade do |t|
     t.integer "source_id", null: false
     t.string "source_type", null: false
@@ -2577,12 +2432,9 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.string "encrypted_credentials_salt"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-<<<<<<< .merge_file_clpLlL
     t.datetime "last_update_started_at"
     t.boolean "only_protected_branches", default: false, null: false
     t.string "remote_name"
-=======
->>>>>>> .merge_file_anHOcl
     t.index ["last_successful_update_at"], name: "index_remote_mirrors_on_last_successful_update_at", using: :btree
     t.index ["project_id"], name: "index_remote_mirrors_on_project_id", using: :btree
   end
@@ -2612,10 +2464,7 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.integer "cached_markdown_version"
     t.text "reference"
     t.text "reference_html"
-<<<<<<< .merge_file_clpLlL
     t.index ["epic_id"], name: "index_resource_label_events_on_epic_id", using: :btree
-=======
->>>>>>> .merge_file_anHOcl
     t.index ["issue_id"], name: "index_resource_label_events_on_issue_id", using: :btree
     t.index ["label_id"], name: "index_resource_label_events_on_label_id", using: :btree
     t.index ["merge_request_id"], name: "index_resource_label_events_on_merge_request_id", using: :btree
@@ -2634,7 +2483,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["source_type", "source_id"], name: "index_routes_on_source_type_and_source_id", unique: true, using: :btree
   end
 
-<<<<<<< .merge_file_clpLlL
   create_table "saml_providers", force: :cascade do |t|
     t.integer "group_id", null: false
     t.boolean "enabled", null: false
@@ -2643,8 +2491,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["group_id"], name: "index_saml_providers_on_group_id", using: :btree
   end
 
-=======
->>>>>>> .merge_file_anHOcl
   create_table "sent_notifications", force: :cascade do |t|
     t.integer "project_id"
     t.integer "noteable_id"
@@ -2729,7 +2575,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["visibility_level"], name: "index_snippets_on_visibility_level", using: :btree
   end
 
-<<<<<<< .merge_file_clpLlL
   create_table "software_license_policies", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "software_license_id", null: false
@@ -2742,8 +2587,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["name"], name: "index_software_licenses_on_name", using: :btree
   end
 
-=======
->>>>>>> .merge_file_anHOcl
   create_table "spam_logs", force: :cascade do |t|
     t.integer "user_id"
     t.string "source_ip"
@@ -2816,11 +2659,7 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.datetime "updated_at", null: false
     t.integer "issue_id"
     t.integer "merge_request_id"
-<<<<<<< .merge_file_clpLlL
     t.datetime "spent_at"
-=======
-    t.datetime_with_timezone "spent_at"
->>>>>>> .merge_file_anHOcl
     t.index ["issue_id"], name: "index_timelogs_on_issue_id", using: :btree
     t.index ["merge_request_id"], name: "index_timelogs_on_merge_request_id", using: :btree
     t.index ["user_id"], name: "index_timelogs_on_user_id", using: :btree
@@ -2879,10 +2718,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.integer "store"
     t.string "mount_point"
     t.string "secret"
-<<<<<<< .merge_file_clpLlL
-=======
-    t.integer "store"
->>>>>>> .merge_file_anHOcl
     t.index ["checksum"], name: "index_uploads_on_checksum", using: :btree
     t.index ["model_id", "model_type"], name: "index_uploads_on_model_id_and_model_type", using: :btree
     t.index ["store"], name: "index_uploads_on_store", using: :btree
@@ -3039,7 +2874,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["name"], name: "index_users_on_name_trigram", using: :gin, opclasses: {"name"=>"gin_trgm_ops"}
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
     t.index ["state"], name: "index_users_on_state", using: :btree
-<<<<<<< .merge_file_clpLlL
     t.index ["state"], name: "index_users_on_state_and_internal_attrs", where: "((ghost <> true) AND (support_bot <> true))", using: :btree
     t.index ["support_bot"], name: "index_users_on_support_bot", using: :btree
     t.index ["username"], name: "index_users_on_username", using: :btree
@@ -3053,10 +2887,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.integer "project_id", null: false
     t.index ["project_id"], name: "index_users_ops_dashboard_projects_on_project_id", using: :btree
     t.index ["user_id", "project_id"], name: "index_users_ops_dashboard_projects_on_user_id_and_project_id", unique: true, using: :btree
-=======
-    t.index ["username"], name: "index_users_on_username", using: :btree
-    t.index ["username"], name: "index_users_on_username_trigram", using: :gin, opclasses: {"username"=>"gin_trgm_ops"}
->>>>>>> .merge_file_anHOcl
   end
 
   create_table "users_star_projects", force: :cascade do |t|
@@ -3066,7 +2896,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.datetime "updated_at"
     t.index ["project_id"], name: "index_users_star_projects_on_project_id", using: :btree
     t.index ["user_id", "project_id"], name: "index_users_star_projects_on_user_id_and_project_id", unique: true, using: :btree
-<<<<<<< .merge_file_clpLlL
   end
 
   create_table "vulnerability_feedback", force: :cascade do |t|
@@ -3145,10 +2974,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["project_id", "external_id"], name: "index_vulnerability_scanners_on_project_id_and_external_id", unique: true, using: :btree
   end
 
-=======
-  end
-
->>>>>>> .merge_file_anHOcl
   create_table "web_hook_logs", force: :cascade do |t|
     t.integer "web_hook_id", null: false
     t.string "trigger"
@@ -3194,11 +3019,8 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.index ["type"], name: "index_web_hooks_on_type", using: :btree
   end
 
-<<<<<<< .merge_file_clpLlL
   add_foreign_key "application_settings", "namespaces", column: "custom_project_templates_group_id", on_delete: :nullify
   add_foreign_key "application_settings", "projects", column: "file_template_project_id", name: "fk_ec757bd087", on_delete: :nullify
-=======
->>>>>>> .merge_file_anHOcl
   add_foreign_key "application_settings", "users", column: "usage_stats_set_by_user_id", name: "fk_964370041d", on_delete: :nullify
   add_foreign_key "approvals", "merge_requests", name: "fk_310d714958", on_delete: :cascade
   add_foreign_key "approver_groups", "namespaces", column: "group_id", on_delete: :cascade
