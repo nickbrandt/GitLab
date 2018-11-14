@@ -15,7 +15,6 @@ class Groups::EpicsController < Groups::ApplicationController
   skip_before_action :labels
 
   def index
-    set_default_state
     @epics = @issuables
 
     respond_to do |format|
@@ -98,18 +97,7 @@ class Groups::EpicsController < Groups::ApplicationController
     @preload_for_collection ||= [:group, :author]
   end
 
-  # we need to override the default state which is opened for now because we don't have
-  # states for epics and need all as default for navigation to work correctly (#4017)
-  def set_default_state
-    params[:state] = 'opened' if params[:state].blank?
-  end
-
   def authorize_create_epic!
     return render_404 unless can?(current_user, :create_epic, group)
-  end
-
-  def filter_params
-    set_sort_order_from_cookie
-    super.merge(start_date: params[:start_date], end_date: params[:end_date])
   end
 end

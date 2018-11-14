@@ -86,14 +86,15 @@ module IssuableCollections
 
   # rubocop:disable Gitlab/ModuleWithInstanceVariables
   def finder_options
+    params[:state] = default_state if params[:state].blank?
+
     options = {
       scope: params[:scope],
-      state: params[:state].presence || 'opened',
+      state: params[:state],
       sort: set_sort_order_from_cookie || default_sort_order
     }
 
     # Used by view to highlight active option
-    params[:state] = options[:state]
     @sort = options[:sort]
 
     if @project
@@ -107,6 +108,10 @@ module IssuableCollections
     params.permit(finder_type.valid_params).merge(options)
   end
   # rubocop:enable Gitlab/ModuleWithInstanceVariables
+
+  def default_state
+    'opened'
+  end
 
   def set_sort_order_from_cookie
     sort_param = params[:sort] if params[:sort].present?
