@@ -87,11 +87,6 @@ module EE
       ::Gitlab::CurrentSettings.instance_review_permitted? && current_user&.admin?
     end
 
-    override :filter_bar_params
-    def filter_bar_params
-      super.merge(params.slice(:weight))
-    end
-
     private
 
     def appearance

@@ -178,11 +178,7 @@ module ApplicationHelper
     without = options.delete(:without)
     add_label = options.delete(:label)
 
-    exist_opts = filter_bar_params.merge(
-      params.slice(:state, :scope)
-    )
-
-    options = exist_opts.merge(options)
+    options = request.query_parameters.merge(options)
 
     if without.present?
       without.each do |key|
@@ -195,19 +191,6 @@ module ApplicationHelper
     params.delete(:label_name) unless add_label
 
     "#{request.path}?#{params.to_param}"
-  end
-
-  def filter_bar_params
-    params.slice(
-      :assignee_id,
-      :assignee_username,
-      :author_username,
-      :label_name,
-      :milestone_title,
-      :my_reaction_emoji,
-      :wip,
-      :search
-    )
   end
 
   def outdated_browser?
