@@ -16,7 +16,7 @@ describe Gitlab::Ci::Parsers::Security::Sast do
       end
     end
 
-    it "parses all identifiers and occurences" do
+    it "parses all identifiers and occurrences" do
       expect(report.occurrences.length).to eq(3)
       expect(report.identifiers.length).to eq(4)
       expect(report.scanners.length).to eq(3)

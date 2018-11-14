@@ -80,7 +80,7 @@ describe Gitlab::Geo::Oauth::LogoutState do
       expect(subject.return_to).to be_nil
     end
 
-    it 'returns an emtpy string when return_to is empty' do
+    it 'returns an empty string when return_to is empty' do
       subject = described_class.new(salt: salt, token: access_token, return_to: '')
 
       expect(subject.return_to).to eq('')

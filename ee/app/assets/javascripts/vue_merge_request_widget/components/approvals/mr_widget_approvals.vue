@@ -45,7 +45,7 @@ export default {
   },
   created() {
     const flashErrorMessage = s__(
-      'mrWidget|An error occured while retrieving approval data for this merge request.',
+      'mrWidget|An error occurred while retrieving approval data for this merge request.',
     );
 
     this.service

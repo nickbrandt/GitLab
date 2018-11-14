@@ -17,7 +17,7 @@ module OmniAuth
       end
 
       # Prevent access to SLO and metadata endpoints
-      # These will need addtional work to securely support
+      # These will need additional work to securely support
       def other_phase
         call_app!
       end

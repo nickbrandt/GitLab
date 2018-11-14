@@ -62,7 +62,7 @@ describe EE::NamespacesHelper, :postgresql do
       end
 
       context 'when DEVELOPER_MAINTAINER_PROJECT_ACCESS is set globally' do
-        it 'return groups where default is not overriden' do
+        it 'return groups where default is not overridden' do
           allow(helper).to receive(:current_user).and_return(user)
           stub_application_setting(default_project_creation: ::EE::Gitlab::Access::DEVELOPER_MAINTAINER_PROJECT_ACCESS)
           admin_group.add_user(user, GroupMember::DEVELOPER)
