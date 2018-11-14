@@ -219,7 +219,6 @@ stages:
 .rspec-metadata-mysql-rails4: &rspec-metadata-mysql-rails4
   <<: *rspec-metadata-mysql
   <<: *rails4
-<<<<<<< HEAD
 
 .rspec-metadata-ee: &rspec-metadata-ee
   <<: *rspec-metadata
@@ -278,8 +277,6 @@ stages:
 .rspec-geo-pg-10-2-rails4: &rspec-metadata-pg-geo-10-2-rails4
   <<: *rspec-metadata-pg-geo-10-2
   <<: *rails4
-=======
->>>>>>> upstream/master
 
 .only-canonical-masters: &only-canonical-masters
   only:
