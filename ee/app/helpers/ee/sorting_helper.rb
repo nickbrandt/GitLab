@@ -42,6 +42,10 @@ module EE
       'end_date_asc'
     end
 
+    def sort_value_end_date_later
+      'end_date_desc'
+    end
+
     def sort_value_less_weight
       'weight_asc'
     end

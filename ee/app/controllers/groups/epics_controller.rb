@@ -5,6 +5,7 @@ class Groups::EpicsController < Groups::ApplicationController
   include ToggleSubscriptionAction
   include RendersNotes
   include EpicsActions
+  include EpicsSorting
 
   before_action :check_epics_available!
   before_action :epic, except: [:index, :create]
@@ -109,7 +110,8 @@ class Groups::EpicsController < Groups::ApplicationController
   end
 
   def filter_params
-    set_sort_order_from_cookie
+    set_epics_sorting
+
     super.merge(start_date: params[:start_date], end_date: params[:end_date])
   end
 end
