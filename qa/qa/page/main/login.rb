@@ -41,7 +41,7 @@ module QA
           # we are already logged-in so we check both cases here.
           wait(max: 500) do
             has_css?('.login-page') ||
-                Page::Main::Menu.act { has_personal_area?(wait: 0) }
+              Page::Main::Menu.act { has_personal_area?(wait: 0) }
           end
         end
 
