@@ -80,6 +80,7 @@ stages:
     - mysql:5.7
     - redis:alpine
 
+<<<<<<< HEAD
 # BEGIN EE-only service helpers
 
 .use-pg-9-6: &use-pg-9-6
@@ -106,6 +107,8 @@ stages:
 
 # END EE-only service helpers
 
+=======
+>>>>>>> upstream/master
 .rails4: &rails4
   allow_failure: false
   except:
@@ -219,6 +222,7 @@ stages:
 .rspec-metadata-mysql-rails4: &rspec-metadata-mysql-rails4
   <<: *rspec-metadata-mysql
   <<: *rails4
+<<<<<<< HEAD
 
 .rspec-metadata-ee: &rspec-metadata-ee
   <<: *rspec-metadata
@@ -277,6 +281,8 @@ stages:
 .rspec-geo-pg-10-2-rails4: &rspec-metadata-pg-geo-10-2-rails4
   <<: *rspec-metadata-pg-geo-10-2
   <<: *rails4
+=======
+>>>>>>> upstream/master
 
 .only-canonical-masters: &only-canonical-masters
   only:
