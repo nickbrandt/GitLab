@@ -30,7 +30,7 @@ export default {
     v-on="$listeners"
   >
     <icon
-      name="scale"
+      name="weight"
       css-classes="board-card-info-icon"
     /><span class="board-card-info-text">{{ weight }}</span>
   </a>

@@ -154,7 +154,7 @@ export default {
     >
       <icon
         :size="16"
-        name="scale"
+        name="weight"
       />
       <gl-loading-icon
         v-if="fetching"
