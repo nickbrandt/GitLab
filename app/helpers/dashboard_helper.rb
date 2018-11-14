@@ -2,11 +2,11 @@
 
 module DashboardHelper
   def assigned_issues_dashboard_path
-    issues_dashboard_path(assignee_id: current_user.id)
+    issues_dashboard_path(assignee_id: current_user.id, referrer_id: "navbar")
   end
 
   def assigned_mrs_dashboard_path
-    merge_requests_dashboard_path(assignee_id: current_user.id)
+    merge_requests_dashboard_path(assignee_id: current_user.id, referrer_id: "navbar")
   end
 
   def dashboard_nav_links
