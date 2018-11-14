@@ -2149,6 +2149,13 @@ ActiveRecord::Schema.define(version: 20181126153547) do
     t.index ["status"], name: "index_project_mirror_data_on_status", using: :btree
   end
 
+  create_table "project_repositories", id: :bigserial, force: :cascade do |t|
+    t.integer "shard_id", null: false
+    t.string "disk_path", null: false
+    t.index ["disk_path"], name: "index_project_repositories_on_disk_path", unique: true, using: :btree
+    t.index ["shard_id"], name: "index_project_repositories_on_shard_id", using: :btree
+  end
+
   create_table "project_repository_states", force: :cascade do |t|
     t.integer "project_id", null: false
     t.binary "repository_verification_checksum"
@@ -2259,6 +2266,7 @@ ActiveRecord::Schema.define(version: 20181126153547) do
     t.boolean "packages_enabled"
     t.boolean "merge_requests_author_approval"
     t.bigint "pool_repository_id"
+    t.bigint "repository_id"
     t.index ["ci_id"], name: "index_projects_on_ci_id", using: :btree
     t.index ["created_at"], name: "index_projects_on_created_at", using: :btree
     t.index ["creator_id"], name: "index_projects_on_creator_id", using: :btree
@@ -2277,6 +2285,7 @@ ActiveRecord::Schema.define(version: 20181126153547) do
     t.index ["path"], name: "index_projects_on_path_trigram", using: :gin, opclasses: {"path"=>"gin_trgm_ops"}
     t.index ["pending_delete"], name: "index_projects_on_pending_delete", using: :btree
     t.index ["pool_repository_id"], name: "index_projects_on_pool_repository_id", where: "(pool_repository_id IS NOT NULL)", using: :btree
+    t.index ["repository_id"], name: "index_projects_on_repository_id", where: "(repository_id IS NOT NULL)", using: :btree
     t.index ["repository_storage", "created_at"], name: "idx_project_repository_check_partial", where: "(last_repository_check_at IS NULL)", using: :btree
     t.index ["repository_storage"], name: "index_projects_on_repository_storage", using: :btree
     t.index ["runners_token"], name: "index_projects_on_runners_token", using: :btree
@@ -3269,10 +3278,12 @@ ActiveRecord::Schema.define(version: 20181126153547) do
   add_foreign_key "project_group_links", "projects", name: "fk_daa8cee94c", on_delete: :cascade
   add_foreign_key "project_import_data", "projects", name: "fk_ffb9ee3a10", on_delete: :cascade
   add_foreign_key "project_mirror_data", "projects", name: "fk_d1aad367d7", on_delete: :cascade
+  add_foreign_key "project_repositories", "shards", on_delete: :restrict
   add_foreign_key "project_repository_states", "projects", on_delete: :cascade
   add_foreign_key "project_statistics", "projects", on_delete: :cascade
   add_foreign_key "project_tracing_settings", "projects", on_delete: :cascade
   add_foreign_key "projects", "pool_repositories", name: "fk_6e5c14658a", on_delete: :nullify
+  add_foreign_key "projects", "project_repositories", column: "repository_id"
   add_foreign_key "prometheus_alert_events", "projects", on_delete: :cascade
   add_foreign_key "prometheus_alert_events", "prometheus_alerts", on_delete: :cascade
   add_foreign_key "prometheus_alerts", "environments", on_delete: :cascade
