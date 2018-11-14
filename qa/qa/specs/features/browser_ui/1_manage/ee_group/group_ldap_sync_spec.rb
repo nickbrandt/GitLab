@@ -73,6 +73,8 @@ module QA
       end
 
       def create_users_via_api(users)
+        create_admin_personal_access_token
+
         users.each do |user|
           Resource::User.fabricate_via_api! do |resource|
             resource.username = user[:username]
@@ -82,6 +84,13 @@ module QA
             resource.provider = user[:provider]
           end
         end
+      end
+
+      def create_admin_personal_access_token
+        Runtime::Browser.visit(:gitlab, Page::Main::Login)
+        Page::Main::Login.perform(&:sign_in_using_admin_credentials)
+        Runtime::Env.personal_access_token = Resource::PersonalAccessToken.fabricate!.access_token
+        Page::Main::Menu.perform(&:sign_out)
       end
 
       def create_group_with_user_via_api(user: nil, group_name: nil)
