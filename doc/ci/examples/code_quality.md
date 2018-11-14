@@ -75,9 +75,10 @@ code_quality:
       paths: [gl-code-quality-report.json]
 ```
 
-Alternatively the job name could be `codeclimate` or `codequality` and the artifact name could be
-`codeclimate.json`. These names have been deprecated with GitLab 11.0 and may be removed
-in next major release, GitLab 12.0.
+Alternatively the job name could be `codeclimate` or `codequality`
+and the artifact name could be `codeclimate.json`.
+These names have been deprecated with GitLab 11.0
+and may be removed in next major release, GitLab 12.0.
 
 For GitLab 10.3 and earlier, the job should look like:
 
