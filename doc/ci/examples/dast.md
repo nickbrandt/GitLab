@@ -17,7 +17,7 @@ It can be very useful combined with [Review Apps](../review_apps/index.md).
 ## Example
 
 First, you need GitLab Runner with
-[docker executor](https://docs.gitlab.com/runner/executors/docker.html).
+[docker-in-docker executor](../docker/using_docker_build.md#use-docker-in-docker-executor).
 
 Once you set up the Runner, add a new job to `.gitlab-ci.yml` that
 generates the expected report:
