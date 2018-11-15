@@ -612,6 +612,7 @@ rspec-pg-rails4:
 rspec-mysql-rails4:
   <<: *rspec-metadata-mysql-rails4
   parallel: 30
+<<<<<<< HEAD
 
 # EE jobs START
 rspec-pg-ee:
@@ -636,6 +637,8 @@ rspec-mysql-ee-rails4:
 rspec-pg-geo-rails4: *rspec-metadata-pg-geo-9-6-rails4
 rspec-pg-10-geo-rails4: *rspec-metadata-pg-geo-10-2-rails4
 # EE jobs END
+=======
+>>>>>>> upstream/master
 
 static-analysis:
   <<: *dedicated-no-docs-no-db-pull-cache-job
