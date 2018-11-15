@@ -159,6 +159,24 @@ describe Project do
     end
   end
 
+  describe '.missing_kubernetes_namespace' do
+    let!(:project) { create(:project) }
+    let!(:cluster) { create(:cluster, :provided_by_user, :group) }
+    let(:kubernetes_namespaces) { project.kubernetes_namespaces }
+
+    subject { described_class.missing_kubernetes_namespace(kubernetes_namespaces) }
+
+    it { is_expected.to contain_exactly(project) }
+
+    context 'kubernetes namespace exists' do
+      before do
+        create(:cluster_kubernetes_namespace, project: project, cluster: cluster)
+      end
+
+      it { is_expected.to be_empty }
+    end
+  end
+
   describe 'validation' do
     let!(:project) { create(:project) }
 
