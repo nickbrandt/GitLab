@@ -31,7 +31,7 @@ export const draftsPerFileHashAndLine = state =>
 export const shouldRenderDraftRow = (state, getters) => (diffFileSha, line) =>
   !!(
     diffFileSha in getters.draftsPerFileHashAndLine &&
-    getters.draftsPerFileHashAndLine[diffFileSha][line.lineCode]
+    getters.draftsPerFileHashAndLine[diffFileSha][line.line_code]
   );
 
 export const shouldRenderParallelDraftRow = (state, getters) => (diffFileSha, line) => {
@@ -50,7 +50,7 @@ export const draftForDiscussion = (state, getters) => discussionId =>
 export const draftForLine = (state, getters) => (diffFileSha, line, side = null) => {
   const draftsForFile = getters.draftsPerFileHashAndLine[diffFileSha];
 
-  const key = side !== null ? parallelLineKey(line, side) : line.lineCode;
+  const key = side !== null ? parallelLineKey(line, side) : line.line_code;
 
   if (draftsForFile) {
     const draft = draftsForFile[key];
