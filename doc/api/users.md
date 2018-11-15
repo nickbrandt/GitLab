@@ -1077,7 +1077,6 @@ Example response:
 [
    {
       "active" : true,
-      "token" : "EsMo-vhKfXGwX9RKrwiy",
       "scopes" : [
          "api"
       ],
@@ -1094,7 +1093,6 @@ Example response:
          "read_user"
       ],
       "revoked" : true,
-      "token" : "ZcZRpLeEuQRprkRjYydY",
       "name" : "mytoken2",
       "created_at" : "2017-03-17T17:19:28.697Z",
       "id" : 3,
@@ -1130,7 +1128,6 @@ Example response:
 ```json
 {
    "active" : true,
-   "token" : "EsMo-vhKfXGwX9RKrwiy",
    "scopes" : [
       "api"
    ],
@@ -1146,6 +1143,8 @@ Example response:
 ## Create an impersonation token
 
 > Requires admin permissions.
+
+> Token values are returned once. Make sure you save it - you won't be able to access it again.
 
 It creates a new impersonation token. Note that only administrators can do this.
 You are only able to create impersonation tokens to impersonate the user and perform
