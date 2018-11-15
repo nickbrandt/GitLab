@@ -49,8 +49,8 @@ export default {
         >
           <parallel-diff-table-row
             :key="index"
-            :file-hash="diffFile.fileHash"
-            :context-lines-path="diffFile.contextLinesPath"
+            :file-hash="diffFile.file_hash"
+            :context-lines-path="diffFile.context_lines_path"
             :line="line"
             :is-bottom="index + 1 === diffLinesLength"
           />
@@ -58,7 +58,7 @@ export default {
             v-if="shouldRenderParallelCommentRow(line)"
             :key="`dcr-${index}`"
             :line="line"
-            :diff-file-hash="diffFile.fileHash"
+            :diff-file-hash="diffFile.file_hash"
             :line-index="index"
           />
           <parallel-draft-comment-row
