@@ -14,6 +14,7 @@ module EE
           boards: %w[milestone_id],
           draft_notes: %w[discussion_id],
           epics: %w[updated_by_id last_edited_by_id start_date_sourcing_milestone_id due_date_sourcing_milestone_id],
+          geo_event_log: %w[hashed_storage_attachments_event_id],
           geo_job_artifact_deleted_events: %w[job_artifact_id],
           geo_lfs_object_deleted_events: %w[lfs_object_id],
           geo_node_statuses: %w[last_event_id cursor_last_event_id],
