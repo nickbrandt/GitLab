@@ -4,8 +4,6 @@ require 'digest/md5'
 require 'uri'
 
 module ApplicationHelper
-  prepend EE::ApplicationHelper
-
   # See https://docs.gitlab.com/ee/development/ee_features.html#code-in-app-views
   # rubocop: disable CodeReuse/ActiveRecord
   def render_if_exists(partial, locals = {})
@@ -303,3 +301,5 @@ module ApplicationHelper
     }
   end
 end
+
+ApplicationHelper.prepend(EE::ApplicationHelper)

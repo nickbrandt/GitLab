@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module EmailsHelper
-  prepend EE::EmailsHelper
-
   include AppearancesHelper
 
   # Google Actions
@@ -101,3 +99,5 @@ module EmailsHelper
     "#{string} on #{Gitlab.config.gitlab.host}"
   end
 end
+
+EmailsHelper.prepend(EE::EmailsHelper)

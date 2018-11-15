@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module IssuesHelper
-  include EE::IssuesHelper
-
   def issue_css_classes(issue)
     classes = ["issue"]
     classes << "closed" if issue.closed?
@@ -142,3 +140,5 @@ module IssuesHelper
   module_function :url_for_internal_issue
   module_function :url_for_tracker_issue
 end
+
+IssuesHelper.include(EE::IssuesHelper)

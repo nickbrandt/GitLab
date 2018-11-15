@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module ApplicationSettingsHelper
-  prepend EE::ApplicationSettingsHelper
   extend self
 
   delegate  :allow_signup?,
@@ -227,3 +226,9 @@ module ApplicationSettingsHelper
     Rails.env.test?
   end
 end
+
+ApplicationSettingsHelper.prepend(EE::ApplicationSettingsHelper)
+
+# The methods in `EE::ApplicationSettingsHelper` should be available as both
+# instance and class methods.
+ApplicationSettingsHelper.extend(EE::ApplicationSettingsHelper)

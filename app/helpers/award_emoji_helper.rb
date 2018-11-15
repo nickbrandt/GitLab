@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module AwardEmojiHelper
-  prepend EE::AwardEmojiHelper
-
   def toggle_award_url(awardable)
     return url_for([:toggle_award_emoji, awardable]) unless @project || awardable.is_a?(Note)
 
@@ -18,3 +16,5 @@ module AwardEmojiHelper
     end
   end
 end
+
+AwardEmojiHelper.prepend(EE::AwardEmojiHelper)

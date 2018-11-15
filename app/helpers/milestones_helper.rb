@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module MilestonesHelper
-  prepend EE::MilestonesHelper
   include EntityDateHelper
 
   def milestones_filter_path(opts = {})
@@ -245,3 +244,5 @@ module MilestonesHelper
     end
   end
 end
+
+MilestonesHelper.prepend(EE::MilestonesHelper)

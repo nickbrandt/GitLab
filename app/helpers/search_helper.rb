@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module SearchHelper
-  prepend EE::SearchHelper
-
   def search_autocomplete_opts(term)
     return unless current_user
 
@@ -193,3 +191,5 @@ module SearchHelper
     count > limit ? "#{limit}+" : count
   end
 end
+
+SearchHelper.prepend(EE::SearchHelper)

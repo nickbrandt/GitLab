@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module AuthHelper
-  prepend EE::AuthHelper
-
   PROVIDERS_WITH_ICONS = %w(twitter github gitlab bitbucket google_oauth2 facebook azure_oauth2 authentiq).freeze
   LDAP_PROVIDER = /\Aldap/
 
@@ -80,3 +78,9 @@ module AuthHelper
 
   extend self
 end
+
+AuthHelper.prepend(EE::AuthHelper)
+
+# The methods added in EE should be available as both class and instance
+# methods, just like the methods provided by `AuthHelper` itself.
+AuthHelper.extend(EE::AuthHelper)
