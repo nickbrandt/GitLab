@@ -62,10 +62,10 @@ export default {
             :line-index="index"
           />
           <parallel-draft-comment-row
-            v-if="shouldRenderParallelDraftRow(diffFile.fileHash, line)"
+            v-if="shouldRenderParallelDraftRow(diffFile.file_hash, line)"
             :key="`drafts-${index}`"
             :line="line"
-            :diff-file-content-sha="diffFile.fileHash"
+            :diff-file-content-sha="diffFile.file_hash"
           />
         </template>
       </tbody>

@@ -60,9 +60,9 @@ export default {
           :line-index="index"
         />
         <inline-draft-comment-row
-          v-if="shouldRenderDraftRow(diffFile.fileHash, line)"
+          v-if="shouldRenderDraftRow(diffFile.file_hash, line)"
           :key="`draft_${index}`"
-          :draft="draftForLine(diffFile.fileHash, line)"
+          :draft="draftForLine(diffFile.file_hash, line)"
         />
       </template>
     </tbody>
