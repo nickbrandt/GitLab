@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class OperationsController < ApplicationController
-  layout 'fullscreen'
-
   before_action :authorize_read_operations_dashboard!
 
   respond_to :json, only: [:list]
