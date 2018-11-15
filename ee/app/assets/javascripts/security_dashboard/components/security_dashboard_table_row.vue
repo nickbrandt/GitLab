@@ -59,7 +59,7 @@ export default {
 <template>
   <div
     class="gl-responsive-table-row vulnerabilities-row"
-    :class="{ dismissed: isDismissed }"
+    :class="{ 'dismissed': isDismissed }"
   >
     <div class="table-section section-10">
       <div
@@ -93,7 +93,7 @@ export default {
             @click="openModal({ vulnerability })"
           >{{ vulnerability.name }}</gl-button>
           <span
-            v-if="isDismissed"
+            v-show="isDismissed"
             class="prepend-left-8 vertical-align-middle"
           >DISMISSED</span>
           <vulnerability-issue-link
