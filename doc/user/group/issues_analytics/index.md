@@ -2,7 +2,12 @@
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/7478) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.5.
 
-GitLab can display a bar chart of the number of issues created each month. By default, GitLab displays the number of all issues created in the last 12 months but this is configurable.
+GitLab by default displays a bar chart of the number of issues created each month, for the
+current month, and 12 months prior, for a total of 13 months.
+
+You can change the total number of months displayed by setting a URL parameter. 
+For example, `https://gitlab.com/groups/gitlab-org/-/issues_analytics?months_back=15`
+would show a total of 15 months for the chart in the GitLab.org grouop.
 
 The **Search or filter results...** field can be used for filtering the issues by any attribute. For example, labels, assignee, milestone, and author.
 
