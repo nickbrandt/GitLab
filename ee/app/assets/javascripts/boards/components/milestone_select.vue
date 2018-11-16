@@ -1,6 +1,6 @@
 <script>
 import MilestoneSelect from '~/milestone_select';
-import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
+import { GlLoadingIcon } from '@gitlab/ui';
 
 const ANY_MILESTONE = 'Any Milestone';
 const NO_MILESTONE = 'No Milestone';

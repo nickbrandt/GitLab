@@ -2,7 +2,7 @@
 /**
  * Render environments table.
  */
-import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
+import { GlLoadingIcon } from '@gitlab/ui';
 import environmentItem from './environment_item.vue';
 
 import deployBoard from 'ee/environments/components/deploy_board_component.vue'; // eslint-disable-line import/order

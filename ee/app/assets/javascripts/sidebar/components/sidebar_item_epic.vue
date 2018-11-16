@@ -3,7 +3,7 @@ import { __ } from '~/locale';
 import tooltip from '~/vue_shared/directives/tooltip';
 import { spriteIcon } from '~/lib/utils/common_utils';
 import Store from '../stores/sidebar_store';
-import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
+import { GlLoadingIcon } from '@gitlab/ui';
 
 export default {
   name: 'SidebarItemEpic',

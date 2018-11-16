@@ -1,6 +1,6 @@
 <script>
 import { mapActions } from 'vuex';
-import { GlButton, GlSkeletonLoading } from '@gitlab-org/gitlab-ui';
+import { GlButton, GlSkeletonLoading } from '@gitlab/ui';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
 import VulnerabilityActionButtons from './vulnerability_action_buttons.vue';
 import VulnerabilityIssueLink from './vulnerability_issue_link.vue';

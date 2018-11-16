@@ -2,7 +2,7 @@
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { sprintf, s__ } from '~/locale';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
-import { GlModal, GlModalDirective } from '@gitlab-org/gitlab-ui';
+import { GlModal, GlModalDirective } from '@gitlab/ui';
 import PreviewDropdown from './preview_dropdown.vue';
 
 export default {
