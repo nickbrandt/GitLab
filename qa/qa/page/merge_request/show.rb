@@ -173,6 +173,12 @@ module QA
         def edit!
           click_element :edit_button
         end
+
+        def approvers
+          within_element :approver_list do
+            all_elements(:approver).map(&:text)
+          end
+        end
       end
     end
   end
