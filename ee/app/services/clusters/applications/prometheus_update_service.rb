@@ -148,7 +148,8 @@ module Clusters
           alert.to_param.tap do |hash|
             hash['expr'] %= {
               ci_environment_slug: ci_environment_slug,
-              kube_namespace: kube_namespace
+              kube_namespace: kube_namespace,
+              environment_filter: %{container_name!="POD",environment="#{environment.slug}"}
             }
           end
         end

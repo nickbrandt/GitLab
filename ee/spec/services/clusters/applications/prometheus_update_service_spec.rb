@@ -30,9 +30,11 @@ describe Clusters::Applications::PrometheusUpdateService do
 
       context 'when prometheus alerts exist' do
         let(:metric) do
-          create(:prometheus_metric,
-                 project: project,
-                 query: '{pod_name=~"^%{ci_environment_slug}",namespace="%{kube_namespace}"}')
+          query = 'pod_name=~"^%{ci_environment_slug}",' \
+            'namespace="%{kube_namespace}",' \
+            '%{environment_filter}'
+
+          create(:prometheus_metric, project: project, query: query)
         end
 
         let!(:alert) do
@@ -57,7 +59,10 @@ describe Clusters::Applications::PrometheusUpdateService do
           expect(alerts.size).to eq(1)
           expect(alerts.dig(0, 'name')).to eq("#{environment.name}.rules")
           expect(alerts.dig(0, 'rules', 0, 'expr')).to include(
-            environment.slug, environment.deployment_platform.actual_namespace)
+            environment.slug,
+            environment.deployment_platform.actual_namespace,
+            %{container_name!="POD",environment="#{environment.slug}"}
+          )
         end
       end
 
