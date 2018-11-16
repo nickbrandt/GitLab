@@ -2,7 +2,7 @@
 /* eslint-disable vue/require-default-prop */
 
 import WeightSelect from 'ee/weight_select';
-import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
+import { GlLoadingIcon } from '@gitlab/ui';
 
 const ANY_WEIGHT = 'Any Weight';
 const NO_WEIGHT = 'No Weight';

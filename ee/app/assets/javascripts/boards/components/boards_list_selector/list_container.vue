@@ -1,5 +1,5 @@
 <script>
-import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
+import { GlLoadingIcon } from '@gitlab/ui';
 import ListFilter from './list_filter.vue';
 import ListContent from './list_content.vue';
 

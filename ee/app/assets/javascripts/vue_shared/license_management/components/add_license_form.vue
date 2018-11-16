@@ -1,5 +1,5 @@
 <script>
-import { GlButton } from '@gitlab-org/gitlab-ui';
+import { GlButton } from '@gitlab/ui';
 import { LICENSE_APPROVAL_STATUS } from '../constants';
 import AddLicenseFormDropdown from './add_license_form_dropdown.vue';
 import { s__ } from '~/locale';

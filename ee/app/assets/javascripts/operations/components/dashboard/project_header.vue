@@ -1,7 +1,7 @@
 <script>
 import Icon from '~/vue_shared/components/icon.vue';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
-import { GlTooltipDirective } from '@gitlab-org/gitlab-ui';
+import { GlTooltipDirective } from '@gitlab/ui';
 
 export default {
   components: {

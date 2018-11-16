@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlButton, GlLoadingIcon } from '@gitlab-org/gitlab-ui';
+import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import AddLicenseForm from './components/add_license_form.vue';
 import LicenseManagementRow from './components/license_management_row.vue';

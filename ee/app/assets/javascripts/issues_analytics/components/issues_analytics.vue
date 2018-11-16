@@ -1,7 +1,7 @@
 <script>
 import { mapGetters, mapActions, mapState } from 'vuex';
 import Chart from 'chart.js';
-import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
+import { GlLoadingIcon } from '@gitlab/ui';
 import bp from '~/breakpoints';
 import { getMonthNames } from '~/lib/utils/datetime_utility';
 import EmptyState from './empty_state.vue';
@@ -199,18 +199,18 @@ export default {
         <div class="arrow"></div>
         <h3 class="popover-header">{{ popoverTitle }}</h3>
         <div class="popover-body">
-          <span class="popover-label">{{ s__('IssuesAnalytics|Issues Created') }}</span> 
+          <span class="popover-label">{{ s__('IssuesAnalytics|Issues Created') }}</span>
           {{ popoverContent }}
         </div>
       </div>
     </div>
-    <empty-state 
+    <empty-state
       v-if="showFiltersEmptyState"
       image="illustrations/issues.svg"
       :title="s__('IssuesAnalytics|Sorry, your filter produced no results')"
       :summary="s__('IssuesAnalytics|To widen your search, change or remove filters in the filter bar above')"
     />
-    <empty-state 
+    <empty-state
       v-if="showNoDataEmptyState"
       image="illustrations/monitoring/getting_started.svg"
       :title="s__('IssuesAnalytics|There are no issues for the projects in your group')"

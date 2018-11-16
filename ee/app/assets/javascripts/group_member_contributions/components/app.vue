@@ -1,5 +1,5 @@
 <script>
-import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
+import { GlLoadingIcon } from '@gitlab/ui';
 import COLUMNS from '../constants';
 
 import TableHeader from './table_header.vue';
