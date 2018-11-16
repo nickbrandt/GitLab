@@ -286,11 +286,6 @@ kubectl get svc --all-namespaces -o jsonpath='{range.items[?(@.status.loadBalanc
 ```
 
 > **Note**: Some Kubernetes clusters return a hostname instead, like [Amazon EKS](https://aws.amazon.com/eks/). For these platforms, run:
-<<<<<<< HEAD
->
-=======
-
->>>>>>> upstream/master
 > ```bash
 > kubectl get service ingress-nginx-ingress-controller -n gitlab-managed-apps -o jsonpath="{.status.loadBalancer.ingress[0].hostname}".
 > ```
@@ -502,17 +497,11 @@ the deployment variables above, ensuring any pods you create are labelled with
 
 ## Integrating Amazon EKS cluster with GitLab
 
-<<<<<<< HEAD
-Learn how to [connect and deploy to an Amazon EKS cluster](eks_and_gitlab/index.md).
-=======
-### Integrating Amazon EKS cluster with GitLab
-
 - Learn how to [connect and deploy to an Amazon EKS cluster](eks_and_gitlab/index.md).
 
 ### Serverless
 
 - [Run serverless workloads on Kubernetes with Knative.](serverless/index.md)
->>>>>>> upstream/master
 
 [permissions]: ../../permissions.md
 [ee]: https://about.gitlab.com/pricing/
