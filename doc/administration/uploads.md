@@ -197,11 +197,7 @@ _The uploads are stored by default in
 
 [reconfigure gitlab]: restart_gitlab.md#omnibus-gitlab-reconfigure "How to reconfigure Omnibus GitLab"
 [restart gitlab]: restart_gitlab.md#installations-from-source "How to restart GitLab"
-<<<<<<< HEAD
 [eep]: https://about.gitlab.com/gitlab-ee/ "GitLab Premium"
-=======
-[eep]: https://about.gitlab.com/gitlab-ee/ "GitLab Enterprise Edition Premium"
->>>>>>> upstream/master
 [ce]: https://about.gitlab.com/gitlab-ce/ "GitLab Community Edition"
 [ee-3867]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/3867
 [ce-17358]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/17358
