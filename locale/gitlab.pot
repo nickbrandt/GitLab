@@ -5085,9 +5085,6 @@ msgstr ""
 msgid "Merge request"
 msgstr ""
 
-msgid "Merge request approvals"
-msgstr ""
-
 msgid "Merge requests"
 msgstr ""
 
