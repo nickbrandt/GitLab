@@ -40,7 +40,7 @@ module QA
       it 'Has LDAP user synced using group cn method' do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
 
-        create_group_with_user_via_api(user: 'enguser1', group_name: 'Synched-engineering-group')
+        sigin_in_and_create_group_with_user_via_api(user: 'enguser1', group_name: 'Synched-engineering-group')
 
         EE::Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
 
@@ -52,13 +52,13 @@ module QA
 
         EE::Page::Group::Menu.perform(&:go_to_members)
 
-        verify_users_synched(['ENG User 2', 'ENG User 3'])
+        verify_users_synced(['ENG User 2', 'ENG User 3'])
       end
 
       it 'Has LDAP user synced using user filter method' do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
 
-        create_group_with_user_via_api(user: 'hruser1', group_name: 'Synched-human-resources-group')
+        sigin_in_and_create_group_with_user_via_api(user: 'hruser1', group_name: 'Synched-human-resources-group')
 
         EE::Page::Group::Menu.perform(&:go_to_ldap_sync_settings)
 
@@ -69,7 +69,7 @@ module QA
 
         EE::Page::Group::Menu.perform(&:go_to_members)
 
-        verify_users_synched(['HR User 2', 'HR User 3'])
+        verify_users_synced(['HR User 2', 'HR User 3'])
       end
 
       def create_users_via_api(users)
@@ -86,6 +86,13 @@ module QA
         end
       end
 
+      def add_user_to_sandbox_group_via_api(user)
+        sandbox_group_path = Resource::Sandbox.fabricate_via_api!.path
+        api_client = Runtime::API::Client.new(:gitlab, personal_access_token: Runtime::Env.personal_access_token)
+        get Runtime::API::Request.new(api_client, "/users?username=#{user}").url
+        post Runtime::API::Request.new(api_client, "/groups/#{sandbox_group_path}/members").url, user_id: json_body.first[:id], access_level: '50'
+      end
+
       def create_admin_personal_access_token
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform(&:sign_in_using_admin_credentials)
@@ -93,7 +100,7 @@ module QA
         Page::Main::Menu.perform(&:sign_out)
       end
 
-      def create_group_with_user_via_api(user: nil, group_name: nil)
+      def sigin_in_and_create_group_with_user_via_api(user: nil, group_name: nil)
         Runtime::Env.ldap_username = user
         Runtime::Env.ldap_password = 'password'
 
@@ -105,16 +112,18 @@ module QA
           expect(menu).to have_personal_area
         end
 
+        add_user_to_sandbox_group_via_api(user)
+
         Runtime::Env.personal_access_token = Resource::PersonalAccessToken.fabricate!.access_token
 
-        group = Resource::Sandbox.fabricate_via_api! do |resource|
+        group = Resource::Group.fabricate_via_api! do |resource|
           resource.path = "#{group_name}-#{SecureRandom.hex(4)}"
         end
 
         group.visit!
       end
 
-      def verify_users_synched(expected_users)
+      def verify_users_synced(expected_users)
         EE::Page::Group::Members.perform do |page|
           page.click_sync_now
           users_synchronised = page.with_retry(reload: true) do
