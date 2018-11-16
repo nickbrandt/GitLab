@@ -4,16 +4,20 @@ describe Clusters::Applications::PrometheusUpdateService do
   describe '#execute' do
     let(:project) { create(:project) }
     let(:environment) { create(:environment, project: project) }
-    let(:cluster) { create(:cluster, :with_installed_helm, projects: [project]) }
+    let(:cluster) { create(:cluster, :provided_by_user, :with_installed_helm, projects: [project]) }
     let(:application) { create(:clusters_applications_prometheus, :installed, cluster: cluster) }
     let!(:get_command_values) { OpenStruct.new(data: OpenStruct.new('values.yaml': application.values)) }
     let!(:upgrade_command) { application.upgrade_command("") }
+    let(:upgrade_values_yaml) { StringIO.new }
+    let(:upgrade_values) { YAML.safe_load(upgrade_values_yaml.string) }
     let(:helm_client) { instance_double(::Gitlab::Kubernetes::Helm::Api) }
 
     subject(:service) { described_class.new(application, project) }
 
     before do
-      allow(service).to receive(:upgrade_command).and_return(upgrade_command)
+      allow(service)
+        .to receive(:upgrade_command) { |values| upgrade_values_yaml.write(values) }
+        .and_return(upgrade_command)
       allow(service).to receive(:helm_api).and_return(helm_client)
     end
 
@@ -25,20 +29,45 @@ describe Clusters::Applications::PrometheusUpdateService do
       end
 
       context 'when prometheus alerts exist' do
+        let(:metric) do
+          create(:prometheus_metric,
+                 project: project,
+                 query: '{pod_name=~"^%{ci_environment_slug}",namespace="%{kube_namespace}"}')
+        end
+
+        let!(:alert) do
+          create(:prometheus_alert,
+                 project: project,
+                 environment: environment,
+                 prometheus_metric: metric)
+        end
+
         it 'generates the alert manager values' do
-          create(:prometheus_alert, project: project, environment: environment)
-
-          expect(service).to receive(:generate_alert_manager).once
-
           service.execute
+
+          expect(upgrade_values.dig('alertmanager', 'enabled')).to eq(true)
+
+          alertmanager = upgrade_values.dig('alertmanagerFiles', 'alertmanager.yml')
+          expect(alertmanager).not_to be_nil
+          expect(alertmanager.dig('receivers', 0, 'name')).to eq('gitlab')
+          expect(alertmanager.dig('route', 'receiver')).to eq('gitlab')
+
+          alerts = upgrade_values.dig('serverFiles', 'alerts', 'groups')
+          expect(alerts).not_to be_nil
+          expect(alerts.size).to eq(1)
+          expect(alerts.dig(0, 'name')).to eq("#{environment.name}.rules")
+          expect(alerts.dig(0, 'rules', 0, 'expr')).to include(
+            environment.slug, environment.deployment_platform.actual_namespace)
         end
       end
 
       context 'when prometheus alerts do not exist' do
         it 'resets the alert manager values' do
-          expect(service).to receive(:reset_alert_manager).once
-
           service.execute
+
+          expect(upgrade_values.dig('alertmanager', 'enabled')).to eq(false)
+          expect(upgrade_values).not_to include('alertmanagerFiles')
+          expect(upgrade_values.dig('serverFiles', 'alerts')).to eq({})
         end
       end
 

@@ -132,12 +132,26 @@ module Clusters
         @environments_with_alerts ||=
           environments.each_with_object({}) do |environment, hsh|
             name = rule_name(environment)
-            hsh[name] = environment.prometheus_alerts.map(&:to_param)
+            hsh[name] = alerts(environment)
           end
       end
 
       def rule_name(environment)
         "#{environment.name}.rules"
+      end
+
+      def alerts(environment)
+        ci_environment_slug = environment.slug
+        kube_namespace = environment.deployment_platform&.actual_namespace || ''
+
+        environment.prometheus_alerts.map do |alert|
+          alert.to_param.tap do |hash|
+            hash['expr'] %= {
+              ci_environment_slug: ci_environment_slug,
+              kube_namespace: kube_namespace
+            }
+          end
+        end
       end
 
       def environments
