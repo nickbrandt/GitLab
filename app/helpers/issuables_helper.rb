@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module IssuablesHelper
-  prepend EE::IssuablesHelper
-
   include GitlabRoutingHelper
 
   def sidebar_gutter_toggle_icon
@@ -440,3 +438,5 @@ module IssuablesHelper
     end
   end
 end
+
+IssuablesHelper.prepend(EE::IssuablesHelper)

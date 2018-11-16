@@ -249,7 +249,7 @@ export default {
 
         <a
           v-if="modal.vulnerability.hasIssue"
-          :href="modal.vulnerability.issueFeedback && modal.vulnerability.issueFeedback.issue_url"
+          :href="modal.vulnerability.issue_feedback && modal.vulnerability.issue_feedback.issue_url"
           rel="noopener noreferrer nofollow"
           class="btn btn-success btn-inverted"
         >

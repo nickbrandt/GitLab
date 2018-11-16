@@ -47,6 +47,18 @@
         "name": "Cipher does not check for integrity first?",
         "url": "https://crypto.stackexchange.com/questions/31428/pbewithmd5anddes-cipher-does-not-check-for-integrity-first"
       }
+    ],
+    "instances": [
+      {
+        "param": "X-Content-Type-Options",
+        "method": "GET",
+        "uri": "http://bikebilly-spring-auto-devops-review-feature-br-3y2gpb.35.192.176.43.xip.io"
+      },
+      {
+        "param": "X-Content-Type-Options",
+        "method": "GET",
+        "uri": "http://bikebilly-spring-auto-devops-review-feature-br-3y2gpb.35.192.176.43.xip.io/"
+      }
     ]
   },
   {
@@ -143,7 +155,7 @@
         "status_tooltip_html": null,
         "path": "/user6"
       },
-      "issue_id": null,
+      "issue_iid": null,
       "pipeline": {
         "id": 2,
         "path": "/namespace5/project5/pipelines/2"
@@ -216,7 +228,7 @@
         "status_tooltip_html": null,
         "path": "/user8"
       },
-      "issue_id": 1,
+      "issue_iid": 1,
       "pipeline": {
         "id": 3,
         "path": "/namespace6/project6/pipelines/3"
@@ -288,7 +300,7 @@
         "status_tooltip_html": null,
         "path": "/user6"
       },
-      "issue_id": null,
+      "issue_iid": null,
       "pipeline": {
         "id": 2,
         "path": "/namespace5/project5/pipelines/2"
@@ -311,7 +323,7 @@
         "status_tooltip_html": null,
         "path": "/user8"
       },
-      "issue_id": 1,
+      "issue_iid": 1,
       "pipeline": {
         "id": 3,
         "path": "/namespace6/project6/pipelines/3"

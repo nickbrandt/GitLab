@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module BoardsHelper
-  prepend EE::BoardsHelper
-
   def board
     @board ||= @board || @boards.first
   end
@@ -91,3 +89,5 @@ module BoardsHelper
     s_("IssueBoards|Board")
   end
 end
+
+BoardsHelper.prepend(EE::BoardsHelper)

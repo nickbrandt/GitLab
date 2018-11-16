@@ -13,17 +13,18 @@ module Deployable
         name: expanded_environment_name
       )
 
-      environment.deployments.create!(
+      # If we failed to persist envirionment record by validation error, such as name with invalid character,
+      # the job will fall back to a non-environment job.
+      return unless environment.persisted?
+
+      create_deployment!(
         project_id: environment.project_id,
         environment: environment,
         ref: ref,
         tag: tag,
         sha: sha,
         user: user,
-        deployable: self,
-        on_stop: on_stop).tap do |_|
-        self.reload # Reload relationships
-      end
+        on_stop: on_stop)
     end
   end
 end

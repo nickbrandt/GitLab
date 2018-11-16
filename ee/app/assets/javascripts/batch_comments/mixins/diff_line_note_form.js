@@ -55,7 +55,7 @@ export default {
 
       return this.saveDraft(postData)
         .then(() => {
-          this.handleClearForm(this.line.lineCode);
+          this.handleClearForm(this.line.line_code);
         })
         .catch(() => {
           createFlash(s__('MergeRequests|An error occurred while saving the draft comment.'));

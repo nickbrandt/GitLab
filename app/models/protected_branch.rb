@@ -3,9 +3,6 @@
 class ProtectedBranch < ActiveRecord::Base
   include Gitlab::ShellAdapter
   include ProtectedRef
-  prepend EE::ProtectedRef
-  prepend EE::ProtectedBranch
-
   protected_ref_access_levels :merge, :push
 
   def self.protected_ref_accessible_to?(ref, user, project:, action:, protected_refs: nil)
@@ -31,3 +28,5 @@ class ProtectedBranch < ActiveRecord::Base
       Gitlab::CurrentSettings.default_branch_protection == Gitlab::Access::PROTECTION_DEV_CAN_MERGE
   end
 end
+
+ProtectedBranch.prepend(EE::ProtectedBranch)

@@ -1,13 +1,16 @@
 # Dependency Scanning **[ULTIMATE]**
 
-> [Introduced][ee-5105] in [GitLab Ultimate][ee] 10.7.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/5105)
+in [GitLab Ultimate][ee] 10.7.
 
 ## Overview
 
-If you are using [GitLab CI/CD][ci], you can analyze your dependencies for known
-vulnerabilities using Dependency Scanning, either by
-including the CI job in your [existing `.gitlab-ci.yml` file][cc-docs] or
-by implicitly using [Auto Dependency Scanning](../../../topics/autodevops/index.md#auto-dependency-scanning)
+If you are using [GitLab CI/CD](../../../ci/README.md), you can analyze your dependencies for known
+vulnerabilities using Dependency Scanning.
+
+You can take advantage of Dependency Scanning by either [including the CI job](../../../ci/examples/dependency_scanning.md) in
+your existing `.gitlab-ci.yml` file or by implicitly using
+[Auto Dependency Scanning](../../../topics/autodevops/index.md#auto-dependency-scanning)
 that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
 
 Going a step further, GitLab can show the vulnerability list right in the merge
@@ -36,25 +39,12 @@ check [GitLab Dependency Scanning documentation](https://gitlab.com/gitlab-org/s
 
 ## How it works
 
-First of all, you need to define a job named `dependency_scanning` in your
-`.gitlab-ci.yml` file. [Check how the `dependency_scanning` job should look like][cc-docs].
+First of all, you need to define a job in your `.gitlab-ci.yml` file that generates the
+[Dependency Scanning report artifact](../../../ci/yaml/README.md#artifactsreportsdependency_scanning).
+For more information on how the Dependency Scanning job should look like, check the
+example on [Dependency Scanning with GitLab CI/CD](../../../ci/examples/dependency_scanning.md).
 
-In order for the report to show in the merge request, there are two
-prerequisites:
-
-- the specified job **must** be named `dependency_scanning`
-- the resulting report **must** be named `gl-dependency-scanning-report.json`
-  and uploaded as an artifact
-
-The `dependency_scanning` job will perform an analysis on the application
-dependencies, the resulting JSON file will be uploaded as an artifact, and
-GitLab will then check this file and show the information inside the merge
-request.
+GitLab then checks this report, compares the found vulnerabilities between the source and target
+branches, and shows the information right on the merge request.
 
 ![Dependency Scanning Widget](img/dependency_scanning.png)
-
-[ee-4682]: https://gitlab.com/gitlab-org/gitlab-ee/issues/4682
-[ee-5105]: https://gitlab.com/gitlab-org/gitlab-ee/issues/5105
-[ee]: https://about.gitlab.com/pricing/
-[ci]: ../../../ci/README.md
-[cc-docs]: ../../../ci/examples/dependency_scanning.md

@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class SystemNoteMetadata < ActiveRecord::Base
-  prepend EE::SystemNoteMetadata
-
   # These notes's action text might contain a reference that is external.
   # We should always force a deep validation upon references that are found
   # in this note type.
@@ -34,3 +32,5 @@ class SystemNoteMetadata < ActiveRecord::Base
     TYPES_WITH_CROSS_REFERENCES
   end
 end
+
+SystemNoteMetadata.prepend(EE::SystemNoteMetadata)

@@ -294,7 +294,23 @@ describe Projects::MergeRequests::DraftsController do
       create(:draft_note, merge_request: merge_request, author: user)
     end
 
-    it 'destroys the draft note' do
+    context 'without permissions' do
+      before do
+        sign_in(user2)
+        project.add_developer(user2)
+      end
+
+      it 'does not allow destroying a draft note belonging to someone else' do
+        draft = create(:draft_note, merge_request: merge_request, author: user)
+
+        expect { post :destroy, params.merge(id: draft.id) }
+          .not_to change { DraftNote.count }
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+
+    it 'destroys the draft note when ID is given' do
       draft = create_draft
 
       expect { delete :destroy, params.merge(id: draft.id) }.to change { DraftNote.count }.by(-1)
@@ -321,6 +337,22 @@ describe Projects::MergeRequests::DraftsController do
 
       expect { delete :discard, params }.to change { DraftNote.count }.by(-6)
       expect(response).to have_gitlab_http_status(200)
+    end
+
+    context 'without permissions' do
+      before do
+        sign_in(user2)
+        project.add_developer(user2)
+      end
+
+      it 'does not destroys a draft note belonging to someone else' do
+        create(:draft_note, merge_request: merge_request, author: user)
+
+        expect { post :discard, params }
+          .not_to change { DraftNote.count }
+
+        expect(response).to have_gitlab_http_status(200)
+      end
     end
   end
 

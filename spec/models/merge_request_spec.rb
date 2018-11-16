@@ -3080,6 +3080,10 @@ describe MergeRequest do
 
   describe '#includes_any_commits?' do
     it 'returns false' do
+      expect(subject.includes_any_commits?([])).to be_falsey
+    end
+
+    it 'returns false' do
       expect(subject.includes_any_commits?([Gitlab::Git::BLANK_SHA])).to be_falsey
     end
 

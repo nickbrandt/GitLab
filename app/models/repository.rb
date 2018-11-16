@@ -22,7 +22,6 @@ class Repository
   include Gitlab::ShellAdapter
   include Gitlab::RepositoryCacheAdapter
 
-  prepend EE::Repository
   include Elastic::RepositoriesSearch
 
   attr_accessor :full_path, :disk_path, :project, :is_wiki
@@ -1088,3 +1087,5 @@ class Repository
     Gitlab::Git::Repository.new(project.repository_storage, disk_path + '.git', Gitlab::GlRepository.gl_repository(project, is_wiki))
   end
 end
+
+Repository.prepend(EE::Repository)

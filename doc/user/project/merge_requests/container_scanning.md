@@ -1,12 +1,20 @@
 # Container Scanning **[ULTIMATE]**
 
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/3672)
+in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.4.
+
 > [Introduced][ee-3672] in [GitLab Ultimate][ee] 10.4.
 
 ## Overview
 
-If you are using [GitLab CI/CD][ci], you can analyze your Docker images for known
+If you are using [GitLab CI/CD](../../../ci/README.md), you can analyze your Docker images for known
 vulnerabilities using [Clair](https://github.com/coreos/clair),
 a Vulnerability Static Analysis tool for containers.
+
+You can take advantage of Container Scanning by either [including the CI job](../../../ci/examples/dependency_scanning.md) in
+your existing `.gitlab-ci.yml` file or by implicitly using
+[Auto Container Scanning](../../../topics/autodevops/index.md#auto-container-scanning)
+that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
 
 Going a step further, GitLab can show the vulnerability list right in the merge
 request widget area.
@@ -25,28 +33,10 @@ to perform audits for your Docker-based apps.
 
 ## How it works
 
-In order for the report to show in the merge request, you need to specify a
-`container_scanning` job (exact name) that will analyze the code and upload the
-resulting `gl-container-scanning-report.json` file as an artifact (exact filename).
-GitLab will then check this file and show the information inside the merge request.
+First of all, you need to define a job in your `.gitlab-ci.yml` file that generates the
+[Container Scanning report artifact](../../../ci/yaml/README.md#artifactsreportscontainer_scanning).
+For more information on how the Container Scanning job should look like, check the
+example on [Container Scanning with GitLab CI/CD](../../../ci/examples/container_scanning.md).
 
-For more information on how the `container_scanning` job should look like, check the
-example on [analyzing a Docker image for vulnerabilities][cc-docs].
-
-CAUTION: **Caution:**
-Container Scanning was previously using `sast:container` for job name and
-`gl-sast-container-report.json` for the artifact name. While these old names
-are still maintained they have been deprecated with GitLab 11.0 and may be removed
-in next major release, GitLab 12.0. You are advised to update your current `.gitlab-ci.yml`
-configuration to reflect that change.
-
-CAUTION: **Caution:**
-Starting with GitLab 11.5, Container Scanning feature is licensed under the name `container_scanning`.
-While the old name `sast_container` is still maintained, it has been deprecated with GitLab 11.5 and
-may be removed in next major release, GitLab 12.0. You are advised to update your current `.gitlab-ci.yml`
-configuration to reflect that change if you are using the `$GITLAB_FEATURES` environment variable.
-
-[ee-3672]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/3672
-[ee]: https://about.gitlab.com/pricing/
-[ci]: ../../../ci/README.md
-[cc-docs]: ../../../ci/examples/container_scanning.md
+GitLab then checks this report, compares the found vulnerabilities between the source and target
+branches, and shows the information right on the merge request.

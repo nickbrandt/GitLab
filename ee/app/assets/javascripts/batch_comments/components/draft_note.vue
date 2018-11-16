@@ -63,7 +63,7 @@ export default {
 <template>
   <article
     :class="componentClasses"
-    class="draft-note-component"
+    class="draft-note-component note-wrapper"
   >
     <header class="draft-note-header">
       <strong class="badge draft-pending-label">

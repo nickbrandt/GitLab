@@ -71,7 +71,7 @@ class DraftNote < ActiveRecord::Base
   end
 
   def line_code
-    @line_code ||= original_position&.line_code(project.repository)
+    @line_code ||= diff_file&.line_code_for_position(original_position)
   end
 
   def file_hash
@@ -99,11 +99,13 @@ class DraftNote < ActiveRecord::Base
     ActiveRecord::Associations::Preloader.new.preload(draft_notes, { author: :status })
   end
 
-  private
-
   def diff_file
     strong_memoize(:diff_file) do
-      original_position&.diff_file(project.repository)
+      file = original_position&.diff_file(project.repository)
+
+      file&.unfold_diff_lines(original_position)
+
+      file
     end
   end
 end

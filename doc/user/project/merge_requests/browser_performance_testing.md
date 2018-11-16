@@ -1,6 +1,7 @@
 # Browser Performance Testing **[PREMIUM]**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/3507) in [GitLab Premium](https://about.gitlab.com/pricing/) 10.3.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/3507)
+in [GitLab Premium](https://about.gitlab.com/pricing/) 10.3.
 
 ## Overview
 
@@ -19,6 +20,9 @@ is a composite value based on best practices, and we will be expanding support
 for [additional metrics](https://gitlab.com/gitlab-org/gitlab-ee/issues/4370)
 in a future release.
 
+Going a step further, GitLab can show the Performance report right
+in the merge request widget area:
+
 ## Use cases
 
 For instance, consider the following workflow:
@@ -32,25 +36,19 @@ For instance, consider the following workflow:
 
 ## How it works
 
-First of all, you need to define a job named `performance` in your `.gitlab-ci.yml`
-file. [Check how the `performance` job should look like](../../../ci/examples/browser_performance.md).
+First of all, you need to define a job in your `.gitlab-ci.yml` file that generates the
+[Performance report artifact](../../../ci/yaml/README.md#artifactsreportsperformance).
+For more information on how the Performance job should look like, check the
+example on [Testing Browser Performance](../../../ci/examples/browser_performance.md).
 
-GitLab runs the [Sitespeed.io container](https://hub.docker.com/r/sitespeedio/sitespeed.io/)
-and compares key performance metrics for each page between the source and target
-branches of a merge request. The difference for each page is then shown right on
-the merge request.
+GitLab then checks this report, compares key performance metrics for each page
+between the source and target branches, and shows the information right on the merge request.
 
-In order for the report to show in the merge request, there are two
-prerequisites:
-
-- the specified job **must** be named `performance`
-- the resulting report **must** be named `performance.json` and uploaded as an
-  artifact
-
-If the performance report doesn't have anything to compare to, no information
+>**Note:**
+If the Performance report doesn't have anything to compare to, no information
 will be displayed in the merge request area. That is the case when you add the
-`performance` job in your `.gitlab-ci.yml` for the very first time.
-Consecutive merge requests will have something to compare to and the performance
+Performance job in your `.gitlab-ci.yml` for the very first time.
+Consecutive merge requests will have something to compare to and the Performance
 report will be shown properly.
 
 ![Performance Widget](img/browser_performance_testing.png)

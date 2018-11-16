@@ -41,10 +41,14 @@ module Clusters
         )
       end
 
+      def client
+        cluster.platform_kubernetes.kubeclient.knative_client
+      end
+
       private
 
       def install_script
-        ["/usr/bin/kubectl apply -f #{ISTIO_CRDS} >/dev/null"]
+        ["/usr/bin/kubectl apply -f #{ISTIO_CRDS}"]
       end
     end
   end

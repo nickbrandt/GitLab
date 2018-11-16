@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module GroupsHelper
-  prepend EE::GroupsHelper
-
   def group_overview_nav_link_paths
     %w[
       groups#show
@@ -142,6 +140,10 @@ module GroupsHelper
       can?(current_user, "read_group_#{resource}".to_sym, @group)
     end
 
+    if can?(current_user, :read_cluster, @group) && Feature.enabled?(:group_clusters)
+      links << :kubernetes
+    end
+
     if can?(current_user, :admin_group, @group)
       links << :settings
     end
@@ -197,3 +199,5 @@ module GroupsHelper
     s_("GroupSettings|This setting is applied on %{ancestor_group} and has been overridden on this subgroup.").html_safe % { ancestor_group: ancestor_group(group) }
   end
 end
+
+GroupsHelper.prepend(EE::GroupsHelper)

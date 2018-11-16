@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module AppearancesHelper
-  prepend EE::AppearancesHelper
-
   def brand_title
     current_appearance&.title.presence || 'GitLab Enterprise Edition'
   end
@@ -38,3 +36,5 @@ module AppearancesHelper
     end
   end
 end
+
+AppearancesHelper.prepend(EE::AppearancesHelper)

@@ -10,7 +10,6 @@ module Ci
     include Importable
     include Gitlab::Utils::StrongMemoize
     include Deployable
-    prepend EE::Ci::Build
 
     belongs_to :project, inverse_of: :builds
     belongs_to :runner
@@ -930,3 +929,5 @@ module Ci
     end
   end
 end
+
+Ci::Build.prepend(EE::Ci::Build)

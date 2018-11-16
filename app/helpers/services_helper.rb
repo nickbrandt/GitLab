@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module ServicesHelper
-  prepend EE::ServicesHelper
-
   def service_event_description(event)
     case event
     when "push", "push_events"
@@ -46,3 +44,9 @@ module ServicesHelper
 
   extend self
 end
+
+ServicesHelper.prepend(EE::ServicesHelper)
+
+# The methods in `EE::ServicesHelper` should be available as both instance and
+# class methods.
+ServicesHelper.extend(EE::ServicesHelper)

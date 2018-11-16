@@ -10,8 +10,6 @@
 module Mentionable
   extend ActiveSupport::Concern
 
-  prepend EE::Mentionable
-
   class_methods do
     # Indicate which attributes of the Mentionable to search for GFM references.
     def attr_mentionable(attr, options = {})
@@ -99,9 +97,9 @@ module Mentionable
   # Allows heavy processing to be skipped
   def matches_cross_reference_regex?
     reference_pattern = if !project || project.default_issues_tracker?
-                          ReferenceRegexes::DEFAULT_PATTERN
+                          ReferenceRegexes.default_pattern
                         else
-                          ReferenceRegexes::EXTERNAL_PATTERN
+                          ReferenceRegexes.external_pattern
                         end
 
     self.class.mentionable_attrs.any? do |attr, _|
@@ -171,3 +169,5 @@ module Mentionable
     {}
   end
 end
+
+Mentionable.prepend(EE::Mentionable)

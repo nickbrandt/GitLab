@@ -5,8 +5,6 @@ class ProjectImportState < ActiveRecord::Base
 
   self.table_name = "project_mirror_data"
 
-  prepend EE::ProjectImportState
-
   belongs_to :project, inverse_of: :import_state
 
   validates :project, presence: true
@@ -72,3 +70,5 @@ class ProjectImportState < ActiveRecord::Base
     @errors = original_errors
   end
 end
+
+ProjectImportState.prepend(EE::ProjectImportState)
