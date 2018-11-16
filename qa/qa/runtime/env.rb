@@ -78,7 +78,7 @@ module QA
       end
 
       def gitlab_qa_username_1
-        ENV['GITLAB_QA_USERNAME_1']
+        ENV['GITLAB_QA_USERNAME_1'] || 'gitlab-qa-user1'
       end
 
       def gitlab_qa_password_1
@@ -86,7 +86,7 @@ module QA
       end
 
       def gitlab_qa_username_2
-        ENV['GITLAB_QA_USERNAME_2']
+        ENV['GITLAB_QA_USERNAME_2'] || 'gitlab-qa-user2'
       end
 
       def gitlab_qa_password_2
