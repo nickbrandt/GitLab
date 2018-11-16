@@ -120,6 +120,8 @@ class Project < ActiveRecord::Base
   after_create :ensure_storage_path_exists
   after_save :ensure_storage_path_exists, if: :namespace_id_changed?
 
+  after_create :create_project_repository
+
   acts_as_ordered_taggable
 
   attr_accessor :old_path_with_namespace
@@ -130,6 +132,7 @@ class Project < ActiveRecord::Base
   alias_attribute :title, :name
 
   # Relations
+  belongs_to :project_repository, foreign_key: :repository_id
   belongs_to :pool_repository
   belongs_to :creator, class_name: 'User'
   belongs_to :group, -> { where(type: 'Group') }, foreign_key: 'namespace_id'
@@ -1205,6 +1208,10 @@ class Project < ActiveRecord::Base
     true
   rescue GRPC::Internal # if the path is too long
     false
+  end
+
+  def create_project_repository
+    update(project_repository: ProjectRepository.create!(shard_name: repository_storage, disk_path: disk_path))
   end
 
   def create_repository(force: false)

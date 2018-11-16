@@ -8,6 +8,7 @@ describe Project do
     it { is_expected.to belong_to(:group) }
     it { is_expected.to belong_to(:namespace) }
     it { is_expected.to belong_to(:creator).class_name('User') }
+    it { is_expected.to belong_to(:project_repository) }
     it { is_expected.to belong_to(:pool_repository) }
     it { is_expected.to have_many(:users) }
     it { is_expected.to have_many(:services) }
@@ -1726,6 +1727,18 @@ describe Project do
 
     context 'when group is internal project can not be public' do
       it { expect(internal_project.visibility_level_allowed?(Gitlab::VisibilityLevel::PUBLIC)).to be_falsey }
+    end
+  end
+
+  describe '#create_project_repository' do
+    let(:project) { create(:project, :repository) }
+
+    it 'creates a project_repository' do
+      project.create_project_repository
+
+      expect(project).to have_project_repository
+      expect(project.project_repository.disk_path).to eq(project.disk_path)
+      expect(project.project_repository.shard_name).to eq(project.repository_storage)
     end
   end
 
