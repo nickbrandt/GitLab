@@ -18,8 +18,5 @@ module CommitStatusEnums
     }
   end
 end
-<<<<<<< HEAD
 
 CommitStatusEnums.prepend(EE::CommitStatusEnums)
-=======
->>>>>>> upstream/master

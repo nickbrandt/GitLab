@@ -14,8 +14,5 @@ module UserCalloutEnums
     }
   end
 end
-<<<<<<< HEAD
 
 UserCalloutEnums.prepend(EE::UserCalloutEnums)
-=======
->>>>>>> upstream/master

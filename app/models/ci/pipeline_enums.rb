@@ -26,8 +26,5 @@ module Ci
     end
   end
 end
-<<<<<<< HEAD
 
 Ci::PipelineEnums.prepend(EE::Ci::PipelineEnums)
-=======
->>>>>>> upstream/master
