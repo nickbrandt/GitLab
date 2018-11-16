@@ -141,16 +141,9 @@ module Clusters
       end
 
       def alerts(environment)
-        ci_environment_slug = environment.slug
-        kube_namespace = environment.deployment_platform&.actual_namespace || ''
-
         environment.prometheus_alerts.map do |alert|
           alert.to_param.tap do |hash|
-            hash['expr'] %= {
-              ci_environment_slug: ci_environment_slug,
-              kube_namespace: kube_namespace,
-              environment_filter: %{container_name!="POD",environment="#{environment.slug}"}
-            }
+            hash['expr'] %= Gitlab::Prometheus::QueryVariables.call(environment)
           end
         end
       end
