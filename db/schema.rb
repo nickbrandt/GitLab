@@ -212,7 +212,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.integer "diff_max_patch_bytes", default: 102400, null: false
     t.integer "archive_builds_in_seconds"
     t.string "commit_email_hostname"
-<<<<<<< .merge_file_PdnNCP
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id", using: :btree
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id", using: :btree
     t.index ["usage_stats_set_by_user_id"], name: "index_application_settings_on_usage_stats_set_by_user_id", using: :btree
@@ -244,9 +243,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.datetime "updated_at"
     t.index ["target_id", "target_type"], name: "index_approvers_on_target_id_and_target_type", using: :btree
     t.index ["user_id"], name: "index_approvers_on_user_id", using: :btree
-=======
-    t.index ["usage_stats_set_by_user_id"], name: "index_application_settings_on_usage_stats_set_by_user_id", using: :btree
->>>>>>> .merge_file_jJdkfe
   end
 
   create_table "audit_events", force: :cascade do |t|
@@ -817,10 +813,7 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.text "status_reason"
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
-<<<<<<< .merge_file_PdnNCP
     t.datetime_with_timezone "last_update_started_at"
-=======
->>>>>>> .merge_file_jJdkfe
     t.index ["cluster_id"], name: "index_clusters_applications_prometheus_on_cluster_id", unique: true, using: :btree
   end
 
@@ -1930,7 +1923,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.integer "access_grant_id", null: false
     t.string "nonce", null: false
     t.index ["access_grant_id"], name: "index_oauth_openid_requests_on_access_grant_id", using: :btree
-<<<<<<< .merge_file_PdnNCP
   end
 
   create_table "operations_feature_flags", id: :bigserial, force: :cascade do |t|
@@ -1981,8 +1973,6 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.string "name", null: false
     t.string "version"
     t.index ["project_id"], name: "index_packages_packages_on_project_id", using: :btree
-=======
->>>>>>> .merge_file_jJdkfe
   end
 
   create_table "pages_domains", force: :cascade do |t|
