@@ -31,7 +31,8 @@ and operations that enables Concurrent DevOps, making the software lifecycle
 three times faster and radically improving the speed of business. GitLab
 provides solutions for all the stages of the DevOps lifecycle:
 [plan](#plan), [create](#create), [verify](#verify), [package](#package),
-[release](#release), [configure](#configure), [monitor](#monitor).
+[release](#release), [configure](#configure), [monitor](#monitor), and
+[secure](#secure).
 
 <img class="image-noshadow" src="img/devops_lifecycle.png" alt="DevOps Lifecycle">
 
@@ -206,6 +207,22 @@ instant how code changes impact your production environment.
 - [Health check](user/admin_area/monitoring/health_check.md): GitLab provides liveness and readiness probes to indicate service health and reachability to required services.
 - [GitLab Cycle Analytics](user/project/cycle_analytics.md): Cycle Analytics measures the time it takes to go from an
   [idea to production](https://about.gitlab.com/2016/08/05/continuous-integration-delivery-and-deployment-with-gitlab/#from-idea-to-production-with-gitlab) for each project you have.
+
+### Secure
+
+Check your application for security vulnerabilities that may lead to unauthorized access,
+data leaks, and denial of services. GitLab will perform static and dynamic tests on the
+code of your application, looking for known flaws and report them in the merge request
+so you can fix them before merging. Security teams can use dashboards to get a
+high-level view on projects and groups, and start remediation processes when needed:
+
+- [Static Application Security Testing (SAST)](user/project/merge_requests/sast.md)
+- [Dynamic Application Security Testing (DAST)](user/project/merge_requests/dast.md)
+- [Dependency Scanning](user/project/merge_requests/dependency_scanning.md)
+- [Container Scanning](user/project/merge_requests/container_scanning.md)
+- [License Management](user/project/merge_requests/license_management.md)
+- [Group Security Dashboard](user/group/security_dashboard/index.md)
+- [Project Security Dashboard](user/project/security_dashboard.md)
 
 ## Getting started with GitLab
 
