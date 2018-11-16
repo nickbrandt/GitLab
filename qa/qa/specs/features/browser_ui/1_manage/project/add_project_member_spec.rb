@@ -7,7 +7,7 @@ module QA
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform(&:sign_in_using_credentials)
 
-        user = Resource::User.fabricate!
+        user = create_or_use_existing_user(Runtime::Env.gitlab_qa_username_1, Runtime::Env.gitlab_qa_password_1)
 
         project = Resource::Project.fabricate! do |resource|
           resource.name = 'add-member-project'
@@ -20,6 +20,17 @@ module QA
         end
 
         expect(page).to have_content("#{user.name} @#{user.username} Given access")
+      end
+
+      def create_or_use_existing_user(username, password)
+        if Runtime::Env.signup_disabled?
+          Resource::User.new.tap do |user|
+            user.username = username
+            user.password = password
+          end
+        else
+          Resource::User.fabricate!
+        end
       end
     end
   end
