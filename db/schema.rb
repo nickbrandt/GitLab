@@ -1761,6 +1761,7 @@ ActiveRecord::Schema.define(version: 20181107054254) do
     t.string "runners_token"
     t.datetime_with_timezone "trial_ends_on"
     t.integer "file_template_project_id"
+    t.string "saml_discovery_token"
     t.index ["created_at"], name: "index_namespaces_on_created_at", using: :btree
     t.index ["ldap_sync_last_successful_update_at"], name: "index_namespaces_on_ldap_sync_last_successful_update_at", using: :btree
     t.index ["ldap_sync_last_update_at"], name: "index_namespaces_on_ldap_sync_last_update_at", using: :btree
