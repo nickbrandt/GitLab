@@ -421,13 +421,8 @@ When [Prometheus is deployed](#installing-applications), GitLab will automatical
 After you have successfully added your cluster information, you can enable the
 Kubernetes cluster integration:
 
-<<<<<<< HEAD
-1.  Click the "Enabled/Disabled" switch
-1.  Hit **Save** for the changes to take effect
-=======
 1. Click the **Enabled/Disabled** switch
 1. Hit **Save** for the changes to take effect
->>>>>>> upstream/master
 
 You can now start using your Kubernetes cluster for your deployments.
 
