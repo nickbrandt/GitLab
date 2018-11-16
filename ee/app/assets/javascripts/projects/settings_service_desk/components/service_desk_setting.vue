@@ -42,29 +42,18 @@ export default {
           ref="enabled-checkbox"
           :checked="isEnabled"
           type="checkbox"
-          @change="onCheckboxToggle($event)"
+          @change="onCheckboxToggle($event);"
         />
-        <span class="descr">
-          Activate Service Desk
-        </span>
+        <span class="descr"> Activate Service Desk </span>
       </label>
     </div>
-    <div
-      v-if="isEnabled"
-      class="panel-slim "
-    >
+    <div v-if="isEnabled" class="panel-slim ">
       <div class="card-header">
-        <h3 class="card-title">
-          Forward external support email address to:
-        </h3>
+        <h3 class="card-title">Forward external support email address to:</h3>
       </div>
       <div class="card-body">
         <template v-if="incomingEmail">
-          <span
-            ref="service-desk-incoming-email"
-          >
-            {{ incomingEmail }}
-          </span>
+          <span ref="service-desk-incoming-email"> {{ incomingEmail }} </span>
           <clipboard-button
             :title="__('Copy incoming email address to clipboard')"
             :text="incomingEmail"
@@ -72,13 +61,8 @@ export default {
           />
         </template>
         <template v-else>
-          <i
-            class="fa fa-spinner fa-spin"
-            aria-hidden="true">
-          </i>
-          <span class="sr-only">
-            Fetching incoming email
-          </span>
+          <i class="fa fa-spinner fa-spin" aria-hidden="true"> </i>
+          <span class="sr-only"> Fetching incoming email </span>
         </template>
       </div>
     </div>

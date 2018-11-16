@@ -99,30 +99,16 @@ export default {
         :key="index"
         class="row prepend-top-10 append-bottom-10"
       >
-        <label class="col-sm-3 text-right font-weight-bold">
-          {{ field.text }}:
-        </label>
+        <label class="col-sm-3 text-right font-weight-bold"> {{ field.text }}: </label>
         <div class="col-sm-9 text-secondary">
-          <div
-            v-if="hasInstances(field, key)"
-            class="info-well"
-          >
+          <div v-if="hasInstances(field, key)" class="info-well">
             <ul class="report-block-list">
-              <li
-                v-for="(instance, i) in field.value"
-                :key="i"
-                class="report-block-list-issue"
-              >
+              <li v-for="(instance, i) in field.value" :key="i" class="report-block-list-issue">
                 <div class="report-block-list-icon append-right-5 failed">
-                  <icon
-                    :size="32"
-                    name="status_failed_borderless"
-                  />
+                  <icon :size="32" name="status_failed_borderless" />
                 </div>
                 <div class="report-block-list-issue-description prepend-top-5 append-bottom-5">
-                  <div class="report-block-list-issue-description-text">
-                    {{ instance.method }}
-                  </div>
+                  <div class="report-block-list-issue-description-text">{{ instance.method }}</div>
                   <div class="report-block-list-issue-description-link">
                     <safe-link
                       :href="instance.uri"
@@ -137,17 +123,16 @@ export default {
                     <pre
                       slot="expanded"
                       class="block report-block-dast-code prepend-top-10 report-block-issue-code"
-                    >{{ instance.evidence }}</pre>
+                    >
+                      {{ instance.evidence }}</pre
+                    >
                   </expand-button>
                 </div>
               </li>
             </ul>
           </div>
           <template v-else-if="hasIdentifiers(field, key)">
-            <span
-              v-for="(identifier, i) in field.value"
-              :key="i"
-            >
+            <span v-for="(identifier, i) in field.value" :key="i">
               <safe-link
                 v-if="identifier.url"
                 :class="`js-link-${key}`"
@@ -157,17 +142,12 @@ export default {
               >
                 {{ identifier.name }}
               </safe-link>
-              <span v-else>
-                {{ identifier.name }}
-              </span>
+              <span v-else> {{ identifier.name }} </span>
               <span v-if="isLastValue(i, field.value)">,&nbsp;</span>
             </span>
           </template>
           <template v-else-if="hasLinks(field, key)">
-            <span
-              v-for="(link, i) in field.value"
-              :key="i"
-            >
+            <span v-for="(link, i) in field.value" :key="i">
               <safe-link
                 :class="`js-link-${key}`"
                 :href="link.url"
@@ -188,9 +168,7 @@ export default {
             >
               {{ field.value }}
             </safe-link>
-            <span v-else>
-              {{ field.value }}
-            </span>
+            <span v-else> {{ field.value }} </span>
           </template>
         </div>
       </div>
@@ -199,17 +177,13 @@ export default {
         <div class="col-sm-9 offset-sm-3 text-secondary">
           <template v-if="hasDismissedBy">
             {{ s__('ciReport|Dismissed by') }}
-            <a
-              :href="modal.vulnerability.dismissalFeedback.author.web_url"
-              class="pipeline-id"
-            >
+            <a :href="modal.vulnerability.dismissalFeedback.author.web_url" class="pipeline-id">
               @{{ modal.vulnerability.dismissalFeedback.author.username }}
             </a>
             {{ s__('ciReport|on pipeline') }}
-            <a
-              :href="modal.vulnerability.dismissalFeedback.pipeline.path"
-              class="pipeline-id"
-            >#{{ modal.vulnerability.dismissalFeedback.pipeline.id }}</a>.
+            <a :href="modal.vulnerability.dismissalFeedback.pipeline.path" class="pipeline-id"
+              >#{{ modal.vulnerability.dismissalFeedback.pipeline.id }}</a
+            >.
           </template>
           <a
             v-if="vulnerabilityFeedbackHelpPath"
@@ -221,21 +195,12 @@ export default {
         </div>
       </div>
 
-      <div
-        v-if="modal.error"
-        class="alert alert-danger"
-      >
-        {{ modal.error }}
-      </div>
+      <div v-if="modal.error" class="alert alert-danger">{{ modal.error }}</div>
     </slot>
     <div slot="footer">
       <template v-if="shouldRenderFooterSection">
-        <button
-          type="button"
-          class="btn btn-default"
-          data-dismiss="modal"
-        >
-          {{ __('Cancel' ) }}
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+          {{ __('Cancel') }}
         </button>
 
         <loading-button
@@ -253,7 +218,7 @@ export default {
           rel="noopener noreferrer nofollow"
           class="btn btn-success btn-inverted"
         >
-          {{ __('View issue' ) }}
+          {{ __('View issue') }}
         </a>
 
         <loading-button
@@ -262,7 +227,7 @@ export default {
           :disabled="modal.isCreatingNewIssue"
           :label="__('Create issue')"
           container-class="js-create-issue-btn btn btn-success btn-inverted"
-          @click="$emit('createNewIssue')"
+          @click="$emit('createNewIssue');"
         />
       </template>
     </div>

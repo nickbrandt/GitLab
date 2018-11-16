@@ -57,45 +57,24 @@ export default {
 </script>
 
 <template>
-  <div
-    class="gl-responsive-table-row vulnerabilities-row"
-    :class="{ 'dismissed': isDismissed }"
-  >
+  <div class="gl-responsive-table-row vulnerabilities-row" :class="{ dismissed: isDismissed }">
     <div class="table-section section-10">
-      <div
-        class="table-mobile-header"
-        role="rowheader"
-      >
-        {{ s__('Reports|Severity') }}
-      </div>
-      <div class="table-mobile-content">
-        <severity-badge :severity="severity"/>
-      </div>
+      <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Severity') }}</div>
+      <div class="table-mobile-content"><severity-badge :severity="severity" /></div>
     </div>
 
     <div class="table-section section-60">
-      <div
-        class="table-mobile-header"
-        role="rowheader"
-      >
-        {{ s__('Reports|Vulnerability') }}
-      </div>
+      <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Vulnerability') }}</div>
       <div class="table-mobile-content">
-        <gl-skeleton-loading
-          v-if="isLoading"
-          class="mt-2 js-skeleton-loader"
-          :lines="2"
-        />
+        <gl-skeleton-loading v-if="isLoading" class="mt-2 js-skeleton-loader" :lines="2" />
         <div v-else>
           <gl-button
             class="btn js-vulnerability-info"
             variant="blank"
-            @click="openModal({ vulnerability })"
-          >{{ vulnerability.name }}</gl-button>
-          <span
-            v-show="isDismissed"
-            class="prepend-left-8 vertical-align-middle"
-          >DISMISSED</span>
+            @click="openModal({ vulnerability });"
+            >{{ vulnerability.name }}</gl-button
+          >
+          <span v-show="isDismissed" class="prepend-left-8 vertical-align-middle">DISMISSED</span>
           <vulnerability-issue-link
             v-if="hasIssue"
             class="prepend-left-8"
@@ -103,9 +82,7 @@ export default {
             :project-name="vulnerability.project.name"
           />
           <br />
-          <span
-            v-if="projectFullName"
-            class="vulnerability-namespace">
+          <span v-if="projectFullName" class="vulnerability-namespace">
             {{ projectFullName }}
           </span>
         </div>
@@ -113,24 +90,12 @@ export default {
     </div>
 
     <div class="table-section section-10">
-      <div
-        class="table-mobile-header"
-        role="rowheader"
-      >
-        {{ s__('Reports|Confidence') }}
-      </div>
-      <div class="table-mobile-content text-capitalize">
-        {{ confidence }}
-      </div>
+      <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Confidence') }}</div>
+      <div class="table-mobile-content text-capitalize">{{ confidence }}</div>
     </div>
 
     <div class="table-section section-20">
-      <div
-        class="table-mobile-header"
-        role="rowheader"
-      >
-        {{ s__('Reports|Actions') }}
-      </div>
+      <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Actions') }}</div>
       <div class="table-mobile-content action-buttons">
         <vulnerability-action-buttons
           :vulnerability="vulnerability"

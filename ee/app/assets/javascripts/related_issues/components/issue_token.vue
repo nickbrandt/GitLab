@@ -57,13 +57,11 @@ export default {
         :class="{
           'issue-token-title issue-token-end': isCondensed,
           'issue-title block-truncated': !isCondensed,
-          'issue-token-title-standalone': !canRemove
+          'issue-token-title-standalone': !canRemove,
         }"
         class="js-issue-token-title"
       >
-        <span class="issue-token-title-text">
-          {{ title }}
-        </span>
+        <span class="issue-token-title-text"> {{ title }} </span>
       </component>
       <component
         :is="innerComponentType"
@@ -91,7 +89,7 @@ export default {
       v-tooltip
       :class="{
         'issue-token-remove-button': isCondensed,
-        'btn btn-default': !isCondensed
+        'btn btn-default': !isCondensed,
       }"
       :title="removeButtonLabel"
       :aria-label="removeButtonLabel"
@@ -100,10 +98,7 @@ export default {
       class="js-issue-token-remove-button"
       @click="onRemoveRequest"
     >
-      <i
-        class="fa fa-times"
-        aria-hidden="true">
-      </i>
+      <i class="fa fa-times" aria-hidden="true"> </i>
     </button>
   </div>
 </template>

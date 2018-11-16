@@ -121,9 +121,7 @@ export default {
       />
     </div>
     <template v-if="showSectionItems">
-      <div
-        class="col-md-6 prepend-left-15 prepend-top-10 section-items-container"
-      >
+      <div class="col-md-6 prepend-left-15 prepend-top-10 section-items-container">
         <geo-node-detail-item
           v-for="(nodeDetailItem, index) in nodeDetailItems"
           :key="index"

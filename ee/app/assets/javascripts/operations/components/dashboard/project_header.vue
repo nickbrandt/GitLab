@@ -27,19 +27,10 @@ export default {
 
 <template>
   <div class="project-header d-flex align-items-center">
-    <project-avatar
-      :project="project"
-      :size="20"
-      class="flex-shrink-0"
-    />
+    <project-avatar :project="project" :size="20" class="flex-shrink-0" />
     <div class="flex-grow-1">
-      <a
-        class="js-project-link cgray"
-        :href="project.web_url"
-      >
-        <span class="js-name-with-namespace bold">
-          {{ project.name_with_namespace }}
-        </span>
+      <a class="js-project-link cgray" :href="project.web_url">
+        <span class="js-name-with-namespace bold"> {{ project.name_with_namespace }} </span>
       </a>
     </div>
     <div class="dropdown js-more-actions">
@@ -49,20 +40,12 @@ export default {
         data-toggle="dropdown"
         :title="__('More actions')"
       >
-        <icon
-          name="ellipsis_v"
-          class="text-secondary"
-        />
+        <icon name="ellipsis_v" class="text-secondary" />
       </div>
       <ul class="dropdown-menu dropdown-menu-right">
         <li>
-          <button
-            class="btn btn-transparent js-remove-button"
-            type="button"
-            @click="onRemove">
-            <span class="text-danger">
-              {{ __('Remove') }}
-            </span>
+          <button class="btn btn-transparent js-remove-button" type="button" @click="onRemove">
+            <span class="text-danger"> {{ __('Remove') }} </span>
           </button>
         </li>
       </ul>

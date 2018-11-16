@@ -46,18 +46,13 @@ export default {
       :size="2"
       class="loading-animation prepend-top-20 append-bottom-20"
     />
-    <table
-      v-else
-      class="table gl-sortable"
-    >
+    <table v-else class="table gl-sortable">
       <table-header
         :columns="$options.columns"
         :sort-orders="sortOrders"
         @onColumnClick="handleColumnClick"
       />
-      <table-body
-        :rows="members"
-      />
+      <table-body :rows="members" />
     </table>
   </div>
 </template>

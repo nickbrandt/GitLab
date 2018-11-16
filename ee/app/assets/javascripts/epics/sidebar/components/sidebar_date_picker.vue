@@ -186,20 +186,11 @@ export default {
 </script>
 
 <template>
-  <div
-    :class="blockClass"
-    class="block date"
-  >
-    <collapsed-calendar-icon
-      :text="collapsedText"
-      class="sidebar-collapsed-icon"
-    />
+  <div :class="blockClass" class="block date">
+    <collapsed-calendar-icon :text="collapsedText" class="sidebar-collapsed-icon" />
     <div class="title">
       {{ label }}
-      <gl-loading-icon
-        v-if="isLoading"
-        :inline="true"
-      />
+      <gl-loading-icon v-if="isLoading" :inline="true" />
       <div class="float-right d-flex">
         <icon
           v-popover="popoverOptions"
@@ -215,11 +206,7 @@ export default {
         >
           {{ __('Edit') }}
         </button>
-        <toggle-sidebar
-          v-if="showToggleSidebar"
-          :collapsed="collapsed"
-          @toggle="toggleSidebar"
-        />
+        <toggle-sidebar v-if="showToggleSidebar" :collapsed="collapsed" @toggle="toggleSidebar" />
       </div>
     </div>
     <div class="value">
@@ -232,12 +219,9 @@ export default {
           :name="fieldName"
           :checked="selectedDateIsFixed"
           type="radio"
-          @click="toggleDateType(true)"
+          @click="toggleDateType(true);"
         />
-        <span
-          v-show="!editing"
-          class="prepend-left-5"
-        >{{ __('Fixed:') }}</span>
+        <span v-show="!editing" class="prepend-left-5">{{ __('Fixed:') }}</span>
         <date-picker
           v-if="editing"
           :selected-date="dateFixed"
@@ -245,10 +229,7 @@ export default {
           @newDateSelected="newDateSelected"
           @hidePicker="stopEditing"
         />
-        <span
-          v-else
-          class="d-flex value-content"
-        >
+        <span v-else class="d-flex value-content">
           <template v-if="dateFixed">
             <span>{{ dateFixedWords }}</span>
             <icon
@@ -258,26 +239,18 @@ export default {
               css-classes="date-warning-icon append-right-5 prepend-left-5"
               tab-index="0"
             />
-            <span
-              v-if="selectedAndEditable"
-              class="no-value"
-            >
+            <span v-if="selectedAndEditable" class="no-value">
               -
               <button
                 type="button"
                 class="btn-blank btn-link btn-default-hover-link"
-                @click="newDateSelected(null)"
+                @click="newDateSelected(null);"
               >
                 {{ __('remove') }}
               </button>
             </span>
           </template>
-          <span
-            v-else
-            class="no-value"
-          >
-            {{ __('None') }}
-          </span>
+          <span v-else class="no-value"> {{ __('None') }} </span>
         </span>
       </div>
       <abbr
@@ -293,7 +266,7 @@ export default {
           :name="fieldName"
           :checked="!selectedDateIsFixed"
           type="radio"
-          @click="toggleDateType(false)"
+          @click="toggleDateType(false);"
         />
         <span class="prepend-left-5">{{ __('From milestones:') }}</span>
         <span class="value-content">{{ dateFromMilestonesWords }}</span>

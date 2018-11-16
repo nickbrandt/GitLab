@@ -39,13 +39,9 @@ export default {
 </script>
 
 <template>
-  <div
-    class="node-detail-value"
-  >
+  <div class="node-detail-value">
     <template v-if="eventTimeStamp">
-      <strong>
-        {{ eventString }}
-      </strong>
+      <strong> {{ eventString }} </strong>
       <span
         v-if="eventTimeStamp"
         v-tooltip
@@ -56,10 +52,6 @@ export default {
         ({{ timeFormated(timeStamp) }})
       </span>
     </template>
-    <strong
-      v-else
-    >
-      {{ __('Not available') }}
-    </strong>
+    <strong v-else> {{ __('Not available') }} </strong>
   </div>
 </template>

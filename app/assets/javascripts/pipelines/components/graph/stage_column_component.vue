@@ -47,13 +47,8 @@ export default {
 };
 </script>
 <template>
-  <li
-    :class="stageConnectorClass"
-    class="stage-column"
-  >
-    <div class="stage-name">
-      {{ title }}
-    </div>
+  <li :class="stageConnectorClass" class="stage-column">
+    <div class="stage-name">{{ title }}</div>
     <div class="builds-container">
       <ul>
         <li
@@ -63,7 +58,6 @@ export default {
           :class="buildConnnectorClass(index)"
           class="build"
         >
-
           <div class="curve"></div>
 
           <job-item

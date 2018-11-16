@@ -62,19 +62,8 @@ export default {
 </script>
 
 <template>
-  <span
-    :style="itemStyles"
-    class="timeline-header-item"
-  >
-    <div
-      :class="timelineHeaderClass"
-      class="item-label"
-    >
-      {{ timelineHeaderLabel }}
-    </div>
-    <quarters-header-sub-item
-      :timeframe-item="timeframeItem"
-      :current-date="currentDate"
-    />
+  <span :style="itemStyles" class="timeline-header-item">
+    <div :class="timelineHeaderClass" class="item-label">{{ timelineHeaderLabel }}</div>
+    <quarters-header-sub-item :timeframe-item="timeframeItem" :current-date="currentDate" />
   </span>
 </template>

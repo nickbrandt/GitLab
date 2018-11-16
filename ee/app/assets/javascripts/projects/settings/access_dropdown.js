@@ -342,18 +342,20 @@ export default class AccessDropdown {
     /*
      * Build users
      */
-    const users = selectedItems.filter(item => item.type === LEVEL_TYPES.USER).map(item => {
-      // Save identifiers for easy-checking more later
-      map.push(LEVEL_TYPES.USER + item.user_id);
+    const users = selectedItems
+      .filter(item => item.type === LEVEL_TYPES.USER)
+      .map(item => {
+        // Save identifiers for easy-checking more later
+        map.push(LEVEL_TYPES.USER + item.user_id);
 
-      return {
-        id: item.user_id,
-        name: item.name,
-        username: item.username,
-        avatar_url: item.avatar_url,
-        type: LEVEL_TYPES.USER,
-      };
-    });
+        return {
+          id: item.user_id,
+          name: item.name,
+          username: item.username,
+          avatar_url: item.avatar_url,
+          type: LEVEL_TYPES.USER,
+        };
+      });
 
     // Has to be checked against server response
     // because the selected item can be in filter results

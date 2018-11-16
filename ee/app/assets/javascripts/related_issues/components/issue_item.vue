@@ -41,12 +41,7 @@ export default {
         />
         {{ displayReference }}
       </div>
-      <a
-        :href="computedPath"
-        class="issue-token-title-text sortable-link"
-      >
-        {{ title }}
-      </a>
+      <a :href="computedPath" class="issue-token-title-text sortable-link"> {{ title }} </a>
     </div>
     <button
       v-if="canRemove"
@@ -60,11 +55,7 @@ export default {
       aria-label="Remove"
       @click="onRemoveRequest"
     >
-      <i
-        class="fa fa-times"
-        aria-hidden="true"
-      >
-      </i>
+      <i class="fa fa-times" aria-hidden="true"> </i>
     </button>
   </div>
 </template>

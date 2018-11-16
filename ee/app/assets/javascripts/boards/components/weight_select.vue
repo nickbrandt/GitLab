@@ -76,28 +76,11 @@ export default {
   <div class="block weight">
     <div class="title append-bottom-10">
       Weight
-      <button
-        v-if="canEdit"
-        type="button"
-        class="edit-link btn btn-blank float-right"
-      >
-        Edit
-      </button>
+      <button v-if="canEdit" type="button" class="edit-link btn btn-blank float-right">Edit</button>
     </div>
-    <div
-      :class="valueClass"
-      class="value"
-    >
-      {{ valueText }}
-    </div>
-    <div
-      class="selectbox"
-      style="display: none;"
-    >
-      <input
-        :name="fieldName"
-        type="hidden"
-      />
+    <div :class="valueClass" class="value">{{ valueText }}</div>
+    <div class="selectbox" style="display: none;">
+      <input :name="fieldName" type="hidden" />
       <div class="dropdown">
         <button
           ref="dropdownButton"
@@ -106,36 +89,20 @@ export default {
           data-default-label="Weight"
           data-toggle="dropdown"
         >
-          <span class="dropdown-toggle-text is-default">
-            Weight
-          </span>
-          <i
-            aria-hidden="true"
-            data-hidden="true"
-            class="fa fa-chevron-down"
-          >
-          </i>
+          <span class="dropdown-toggle-text is-default"> Weight </span>
+          <i aria-hidden="true" data-hidden="true" class="fa fa-chevron-down"> </i>
         </button>
         <div class="dropdown-menu dropdown-select dropdown-menu-selectable dropdown-menu-weight">
           <div class="dropdown-content ">
             <ul>
-              <li
-                v-for="weight in weights"
-                :key="weight"
-              >
-                <a
-                  :class="{'is-active': weight == valueText}"
-                  :data-id="weight"
-                  href="#"
-                >
+              <li v-for="weight in weights" :key="weight">
+                <a :class="{ 'is-active': weight == valueText }" :data-id="weight" href="#">
                   {{ weight }}
                 </a>
               </li>
             </ul>
           </div>
-          <div class="dropdown-loading">
-            <gl-loading-icon />
-          </div>
+          <div class="dropdown-loading"><gl-loading-icon /></div>
         </div>
       </div>
     </div>

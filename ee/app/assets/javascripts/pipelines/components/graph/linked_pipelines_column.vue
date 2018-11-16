@@ -29,18 +29,15 @@ export default {
 </script>
 
 <template>
-  <div
-    :class="columnClass"
-    class="stage-column linked-pipelines-column"
-  >
-    <div class="stage-name linked-pipelines-column-title"> {{ columnTitle }} </div>
+  <div :class="columnClass" class="stage-column linked-pipelines-column">
+    <div class="stage-name linked-pipelines-column-title">{{ columnTitle }}</div>
     <div class="cross-project-triangle"></div>
     <ul>
       <linked-pipeline
         v-for="(pipeline, index) in linkedPipelines"
         :key="pipeline.id"
         :class="{
-          'flat-connector-before': index === 0 && graphPosition === 'right'
+          'flat-connector-before': index === 0 && graphPosition === 'right',
         }"
         :pipeline-id="pipeline.id"
         :project-name="pipeline.project.name"

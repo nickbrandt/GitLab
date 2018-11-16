@@ -232,27 +232,17 @@ export default {
     :has-issues="true"
     class="mr-widget-border-top grouped-security-reports mr-report"
   >
-    <div
-      v-if="pipelinePath"
-      slot="actionButtons"
-    >
+    <div v-if="pipelinePath" slot="actionButtons">
       <a
         :href="securityTab"
         target="_blank"
         class="btn btn-default btn-sm float-right append-right-default"
       >
-        <span>{{ s__("ciReport|View full report") }}</span>
-        <icon
-          :size="16"
-          name="external-link"
-        />
+        <span>{{ s__('ciReport|View full report') }}</span> <icon :size="16" name="external-link" />
       </a>
     </div>
 
-    <div
-      slot="body"
-      class="mr-widget-grouped-section report-block"
-    >
+    <div slot="body" class="mr-widget-grouped-section report-block">
       <template v-if="sastHeadPath">
         <summary-row
           :summary="groupedSastText"

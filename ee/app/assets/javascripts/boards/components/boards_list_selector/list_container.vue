@@ -58,15 +58,8 @@ export default {
 
 <template>
   <div class="dropdown-assignees-list">
-    <div
-      v-if="loading"
-      class="dropdown-loading"
-    >
-      <gl-loading-icon />
-    </div>
-    <list-filter
-      @onSearchInput="handleSearch"
-    />
+    <div v-if="loading" class="dropdown-loading"><gl-loading-icon /></div>
+    <list-filter @onSearchInput="handleSearch" />
     <list-content
       v-if="!loading"
       :items="filteredItems"
