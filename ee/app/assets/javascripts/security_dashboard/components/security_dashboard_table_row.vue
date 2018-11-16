@@ -57,7 +57,10 @@ export default {
 </script>
 
 <template>
-  <div class="gl-responsive-table-row vulnerabilities-row">
+  <div
+    class="gl-responsive-table-row vulnerabilities-row"
+    :class="{ 'dismissed': isDismissed }"
+  >
     <div class="table-section section-10">
       <div
         class="table-mobile-header"
@@ -87,12 +90,15 @@ export default {
           <gl-button
             class="btn js-vulnerability-info"
             variant="blank"
-            :class="{ strikethrough: isDismissed }"
             @click="openModal({ vulnerability })"
           >{{ vulnerability.name }}</gl-button>
+          <span
+            v-show="isDismissed"
+            class="prepend-left-8 vertical-align-middle"
+          >DISMISSED</span>
           <vulnerability-issue-link
             v-if="hasIssue"
-            class="prepend-left-10"
+            class="prepend-left-8"
             :issue="vulnerability.issue_feedback"
             :project-name="vulnerability.project.name"
           />
@@ -114,7 +120,7 @@ export default {
         {{ s__('Reports|Confidence') }}
       </div>
       <div class="table-mobile-content text-capitalize">
-        <span :class="{ strikethrough: isDismissed }">{{ confidence }}</span>
+        {{ confidence }}
       </div>
     </div>
 
@@ -125,7 +131,7 @@ export default {
       >
         {{ s__('Reports|Actions') }}
       </div>
-      <div class="table-mobile-content vulnerabilities-action-buttons">
+      <div class="table-mobile-content action-buttons">
         <vulnerability-action-buttons
           :vulnerability="vulnerability"
           :can-create-issue="canCreateIssue"
@@ -137,7 +143,7 @@ export default {
   </div>
 </template>
 
-<style>
+<style scoped>
 @media (min-width: 768px) {
   .vulnerabilities-row {
     padding: 0.6em 0.4em;
@@ -151,14 +157,14 @@ export default {
     margin-top: -1px;
   }
 
-  .vulnerabilities-row .vulnerabilities-action-buttons {
+  .vulnerabilities-row .action-buttons {
     opacity: 0;
     padding-right: 1em;
     text-align: right;
   }
 
-  .vulnerabilities-row:hover .vulnerabilities-action-buttons,
-  .vulnerabilities-row:focus .vulnerabilities-action-buttons {
+  .vulnerabilities-row:hover .action-buttons,
+  .vulnerabilities-row:focus .action-buttons {
     opacity: 1;
   }
 }
@@ -170,5 +176,9 @@ export default {
 .vulnerability-namespace {
   color: #707070;
   font-size: 0.8em;
+}
+
+.dismissed .table-mobile-content:not(.action-buttons) {
+  opacity: 0.5;
 }
 </style>
