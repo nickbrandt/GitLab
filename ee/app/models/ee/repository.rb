@@ -42,7 +42,7 @@ module EE
       branch_commit = commit("refs/heads/#{branch_name}")
       upstream_commit = commit("refs/remotes/#{MIRROR_REMOTE}/#{branch_name}")
 
-      if upstream_commit
+      if branch_commit && upstream_commit
         !raw_repository.ancestor?(branch_commit.id, upstream_commit.id)
       else
         false
@@ -53,7 +53,7 @@ module EE
       branch_commit = commit("refs/heads/#{branch_name}")
       upstream_commit = commit("refs/remotes/#{remote_ref}/#{branch_name}")
 
-      if upstream_commit
+      if branch_commit && upstream_commit
         !raw_repository.ancestor?(upstream_commit.id, branch_commit.id)
       else
         false
@@ -64,7 +64,7 @@ module EE
       branch_commit = commit("refs/heads/#{branch_name}")
       upstream_commit = commit("refs/remotes/#{MIRROR_REMOTE}/#{branch_name}")
 
-      if upstream_commit
+      if branch_commit && upstream_commit
         ancestor?(branch_commit.id, upstream_commit.id)
       else
         false
