@@ -105,14 +105,14 @@ module Clusters
       end
 
       def has_alerts?
-        environments_with_alerts.values.flatten.any?
+        environments_with_alerts.values.flatten(1).any?
       end
 
       def environments_with_alerts
         @environments_with_alerts ||=
-          environments.each_with_object({}) do |environment, hsh|
+          environments.each_with_object({}) do |environment, hash|
             name = rule_name(environment)
-            hsh[name] = alerts(environment)
+            hash[name] = alerts(environment)
           end
       end
 
@@ -121,11 +121,16 @@ module Clusters
       end
 
       def alerts(environment)
+        variables = Gitlab::Prometheus::QueryVariables.call(environment)
+
         environment.prometheus_alerts.map do |alert|
-          alert.to_param.tap do |hash|
-            hash['expr'] %= Gitlab::Prometheus::QueryVariables.call(environment)
-          end
+          substitute_query_variables(alert.to_param, variables)
         end
+      end
+
+      def substitute_query_variables(hash, variables)
+        hash['expr'] %= variables
+        hash
       end
 
       def environments
