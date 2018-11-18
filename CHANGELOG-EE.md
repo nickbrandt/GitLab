@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.4.6 (2018-11-18)
+
+### Security (1 change)
+
+- Prevent templated services from being imported.
+
+
 ## 11.4.5 (2018-11-04)
 
 ### Fixed (1 change)
