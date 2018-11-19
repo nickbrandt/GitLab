@@ -6,6 +6,20 @@ describe API::Projects do
   let(:user) { create(:user) }
   let(:project) { create(:project, namespace: user.namespace) }
 
+  describe 'GET /projects' do
+    it 'does not break on license checks' do
+      stub_licensed_features(external_authorization_service: true)
+      enable_namespace_license_check!
+
+      create(:project, :private, namespace: user.namespace)
+      create(:project, :public, namespace: user.namespace)
+
+      get api('/projects', user)
+
+      expect(response).to have_gitlab_http_status(200)
+    end
+  end
+
   describe 'POST /projects' do
     context 'when importing with mirror attributes' do
       let(:import_url) { generate(:url) }
