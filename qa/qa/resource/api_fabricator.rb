@@ -40,6 +40,7 @@ module QA
       end
 
       private
+
       include Support::Api
       attr_writer :api_resource, :api_response
 
