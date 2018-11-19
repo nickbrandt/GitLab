@@ -1042,10 +1042,7 @@ DEPENDENCIES
   gitaly-proto (~> 0.123.0)
   github-markup (~> 1.7.0)
   gitlab-default_value_for (~> 3.1.1)
-<<<<<<< HEAD
   gitlab-license (~> 1.0)
-=======
->>>>>>> upstream/master
   gitlab-markup (~> 1.6.5)
   gitlab-sidekiq-fetcher
   gitlab-styles (~> 2.4)
