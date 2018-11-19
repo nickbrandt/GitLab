@@ -97,10 +97,10 @@ describe 'Scoped issue boards', :js do
           visit group_boards_path(group)
           wait_for_requests
 
-          expect(page).to have_css('#js-multiple-boards-switcher')
-          page.within '#js-multiple-boards-switcher' do
+          expect(page).to have_css('.js-boards-selector')
+          page.within '.js-boards-selector' do
             find('.dropdown-menu-toggle').click
-            click_link 'Create new board'
+            click_button 'Create new board'
           end
 
           click_button 'Expand'
@@ -433,10 +433,10 @@ describe 'Scoped issue boards', :js do
     end
 
     it "doesn't show the input when creating a board" do
-      page.within '#js-multiple-boards-switcher' do
+      page.within '.js-boards-selector' do
         find('.dropdown-menu-toggle').click
 
-        click_link 'Create new board'
+        click_button 'Create new board'
 
         # To make sure the form is shown
         expect(page).to have_field('board-new-name')
@@ -501,11 +501,11 @@ describe 'Scoped issue boards', :js do
   end
 
   def create_board_scope(filter, value)
-    page.within '#js-multiple-boards-switcher' do
+    page.within '.js-boards-selector' do
       find('.dropdown-menu-toggle').click
     end
 
-    click_link 'Create new board'
+    click_button 'Create new board'
 
     find('#board-new-name').set 'test'
 

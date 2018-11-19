@@ -2,46 +2,14 @@
 - milestone_filter_opts = { format: :json }
 - milestone_filter_opts = milestone_filter_opts.merge(only_group_milestones: true) if board.group_board?
 
-%boards-selector.js-boards-selector{ "inline-template" => true,
-  ":current-board" => current_board_json,
-  "milestone-path" => milestones_filter_path(milestone_filter_opts) }
-  %span.boards-selector-wrapper.js-boards-selector-wrapper
-    .dropdown
-      %button.dropdown-menu-toggle.js-dropdown-toggle{ "v-on:click" => "loadBoards",
-        data: { toggle: "dropdown" } }
-        {{ board.name }}
-        = icon("chevron-down")
-      .dropdown-menu{ ":class" => "{ 'is-loading': loading }" }
-        .dropdown-content-faded-mask.js-scroll-fade{ ":class" => "scrollFadeClass" }
-          %ul.dropdown-list.js-dropdown-list{ "v-if" => "!loading", "v-on:scroll.passive" => "throttledSetScrollFade", ref: "content" }
-            %li.dropdown-item.js-dropdown-item{ "v-for" => "board in boards" }
-              %a{ ":href" => "'#{board_base_url}/' + board.id" }
-                {{ board.name }}
-            - if !multiple_boards_available? && current_board_parent.boards.size > 1
-              %li
-                .small.unclickable
-                  Some of your boards are hidden, activate a license to see them again.
-
-        .dropdown-loading{ "v-if" => "loading" }
-          = icon("spin spinner")
-
-        - if can?(current_user, :admin_board, parent)
-          .dropdown-footer
-            %ul.dropdown-footer-list
-              - if parent.multiple_issue_boards_available?
-                %li
-                  %a{ "href" => "#", "v-on:click.prevent" => "showPage('new')" }
-                    Create new board
-              %li{ "v-if" => "showDelete" }
-                %a{ "href" => "#", "v-on:click.prevent" => "showPage('delete')" }
-                  %span.text-danger
-                    Delete board
-
-    %board-form{ ":milestone-path" => "milestonePath",
-      "labels-path" => labels_filter_path_with_defaults(only_group_labels: true, include_descendant_groups: true),
-      ":project-id" => "Number(#{@project&.id})",
-      ":group-id" => "Number(#{@group&.id})",
-      ":can-admin-board" => can?(current_user, :admin_board, parent),
-      ":scoped-issue-board-feature-enabled" => parent.feature_available?(:scoped_issue_board) ? 'true' : 'false',
-      "weights" => [Issue::WEIGHT_ANY] + Issue.weight_options,
-      "v-if" => "currentPage" }
+#js-multiple-boards-switcher.inline.boards-switcher{ data: { current_board: current_board_json,
+    milestone_path: milestones_filter_path(milestone_filter_opts),
+    board_base_url: board_base_url,
+    has_missing_boards: (!multiple_boards_available? && current_board_parent.boards.size > 1).to_s,
+    can_admin_board: can?(current_user, :admin_board, parent).to_s,
+    multiple_issue_boards_available: parent.multiple_issue_boards_available?.to_s,
+    labels_path: labels_filter_path_with_defaults(only_group_labels: true, include_descendant_groups: true),
+    project_id: @project&.id,
+    group_id: @group&.id,
+    scoped_issue_board_feature_enabled: parent.feature_available?(:scoped_issue_board) ? 'true' : 'false',
+    weights: ([Issue::WEIGHT_ANY] + Issue.weight_options).to_json } }

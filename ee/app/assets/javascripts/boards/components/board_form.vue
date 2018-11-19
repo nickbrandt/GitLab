@@ -57,9 +57,9 @@ export default {
       default: 0,
     },
     weights: {
-      type: String,
+      type: Array,
       required: false,
-      default: '',
+      default: () => [],
     },
   },
   data() {
@@ -125,9 +125,6 @@ export default {
     },
     readonly() {
       return !this.canAdminBoard;
-    },
-    weightsArray() {
-      return JSON.parse(this.weights);
     },
     submitDisabled() {
       return this.isLoading || this.board.name.length === 0;
@@ -269,7 +266,7 @@ export default {
             <board-weight-select
               v-model="board.weight"
               :board="board"
-              :weights="weightsArray"
+              :weights="weights"
               :can-edit="canAdminBoard"
             />
           </div>
