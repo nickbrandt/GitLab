@@ -8,9 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os/exec"
 	"path/filepath"
-	"strings"
 	"sync"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
@@ -67,22 +65,6 @@ func repoPreAuthorizeHandler(myAPI *api.API, handleFunc api.HandleFunc) http.Han
 	}, "")
 }
 
-func startGitCommand(a *api.Response, stdin io.Reader, stdout io.Writer, action string, options ...string) (cmd *exec.Cmd, err error) {
-	// Prepare our Git subprocess
-	args := []string{subCommand(action), "--stateless-rpc"}
-	args = append(args, options...)
-	args = append(args, a.RepoPath)
-	cmd = gitCommandApi(a, "git", args...)
-	cmd.Stdin = stdin
-	cmd.Stdout = stdout
-
-	if err = cmd.Start(); err != nil {
-		return nil, fmt.Errorf("start %v: %v", cmd.Args, err)
-	}
-
-	return cmd, nil
-}
-
 func writePostRPCHeader(w http.ResponseWriter, action string) {
 	w.Header().Set("Content-Type", fmt.Sprintf("application/x-%s-result", action))
 	w.Header().Set("Cache-Control", "no-cache")
@@ -93,10 +75,6 @@ func getService(r *http.Request) string {
 		return r.URL.Query().Get("service")
 	}
 	return filepath.Base(r.URL.Path)
-}
-
-func subCommand(rpc string) string {
-	return strings.TrimPrefix(rpc, "git-")
 }
 
 type countReadCloser struct {
