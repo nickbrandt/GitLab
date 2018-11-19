@@ -13,7 +13,6 @@ import (
 	"os/exec"
 	"path"
 	"regexp"
-	"strconv"
 	"testing"
 	"time"
 
@@ -379,22 +378,6 @@ func TestSendURLForArtifacts(t *testing.T) {
 
 	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resourcePath)
 	assert.Equal(t, fileContents, string(body), "GET %q: response body", resourcePath)
-}
-
-func TestGetGitBlob(t *testing.T) {
-	blobID := "50b27c6518be44c42c4d87966ae2481ce895624c" // the LICENSE file in the test repository
-	blobLength := 1075
-	jsonParams := fmt.Sprintf(`{"RepoPath":"%s","BlobId":"%s"}`, path.Join(testRepoRoot, testRepo), blobID)
-	expectedBody := "The MIT License (MIT)"
-
-	resp, body, err := doSendDataRequest("/something", "git-blob", jsonParams)
-	require.NoError(t, err)
-
-	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
-	assert.Equal(t, expectedBody, string(body[:len(expectedBody)]), "GET %q: response body", resp.Request.URL)
-	assert.Equal(t, blobLength, len(body), "GET %q: body size", resp.Request.URL)
-	testhelper.AssertResponseHeader(t, resp, "Content-Length", strconv.Itoa(blobLength))
-	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
 }
 
 func TestGetGitDiff(t *testing.T) {

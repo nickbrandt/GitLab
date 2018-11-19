@@ -11,7 +11,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -325,28 +324,6 @@ func TestPostUploadPackProxiedToGitalyInterrupted(t *testing.T) {
 	case <-time.After(10 * time.Second):
 		t.Fatal("time out waiting for gitaly handler to return")
 	}
-}
-
-func TestGetBlobProxiedToGitalySuccessfully(t *testing.T) {
-	gitalyServer, socketPath := startGitalyServer(t, codes.OK)
-	defer gitalyServer.Stop()
-
-	gitalyAddress := "unix://" + socketPath
-	repoStorage := "default"
-	oid := "54fcc214b94e78d7a41a9a8fe6d87a5e59500e51"
-	repoRelativePath := "foo/bar.git"
-	jsonParams := fmt.Sprintf(`{"GitalyServer":{"Address":"%s","Token":""},"GetBlobRequest":{"repository":{"storage_name":"%s","relative_path":"%s"},"oid":"%s","limit":-1}}`,
-		gitalyAddress, repoStorage, repoRelativePath, oid)
-	expectedBody := testhelper.GitalyGetBlobResponseMock
-	blobLength := len(expectedBody)
-
-	resp, body, err := doSendDataRequest("/something", "git-blob", jsonParams)
-	require.NoError(t, err)
-
-	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
-	assert.Equal(t, expectedBody, string(body), "GET %q: response body", resp.Request.URL)
-	assert.Equal(t, blobLength, len(body), "GET %q: body size", resp.Request.URL)
-	testhelper.AssertResponseHeader(t, resp, "Content-Length", strconv.Itoa(blobLength))
 }
 
 func TestGetDiffProxiedToGitalySuccessfully(t *testing.T) {

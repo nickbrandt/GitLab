@@ -7,13 +7,16 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strconv"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	pb "gitlab.com/gitlab-org/gitaly-proto/go"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
 
 var (
@@ -128,7 +131,7 @@ func TestAllowedPush(t *testing.T) {
 	require.NoError(t, ensureGitalyRepository(t, apiResponse))
 
 	// Prepare the test server and backend
-	ts := testAuthServer(nil, 200, realGitalyOkBody(t))
+	ts := testAuthServer(nil, 200, apiResponse)
 	defer ts.Close()
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
@@ -137,4 +140,38 @@ func TestAllowedPush(t *testing.T) {
 	pushCmd := exec.Command("git", "push", fmt.Sprintf("%s/%s", ws.URL, testRepo), fmt.Sprintf("master:%s", newBranch()))
 	pushCmd.Dir = checkoutDir
 	runOrFail(t, pushCmd)
+}
+
+func TestAllowedGetGitBlob(t *testing.T) {
+	skipUnlessRealGitaly(t)
+
+	// Create the repository in the Gitaly server
+	apiResponse := realGitalyOkBody(t)
+	require.NoError(t, ensureGitalyRepository(t, apiResponse))
+
+	// the LICENSE file in the test repository
+	oid := "50b27c6518be44c42c4d87966ae2481ce895624c"
+	expectedBody := "The MIT License (MIT)"
+	bodyLen := 1075
+
+	jsonParams := fmt.Sprintf(
+		`{
+			"GitalyServer":{"Address":"%s", "Token":""},
+			"GetBlobRequest":{
+				"repository":{"storage_name":"%s", "relative_path":"%s"},
+				"oid":"%s",
+				"limit":-1
+			}
+		}`,
+		gitalyAddress, apiResponse.Repository.StorageName, apiResponse.Repository.RelativePath, oid,
+	)
+
+	resp, body, err := doSendDataRequest("/something", "git-blob", jsonParams)
+	require.NoError(t, err)
+	shortBody := string(body[:len(expectedBody)])
+
+	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	assert.Equal(t, expectedBody, shortBody, "GET %q: response body", resp.Request.URL)
+	testhelper.AssertResponseHeader(t, resp, "Content-Length", strconv.Itoa(bodyLen))
+	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
 }
