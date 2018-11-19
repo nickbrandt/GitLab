@@ -313,6 +313,7 @@ export default {
       :key="`pre-merge-deploy-${deployment.id}`"
       class="js-pre-merge-deploy"
       :deployment="deployment"
+      :show-metrics="false"
     />
     <div class="mr-section-container">
       <grouped-test-reports-app
@@ -367,6 +368,7 @@ export default {
         v-for="postMergeDeployment in mr.postMergeDeployments"
         :key="`post-merge-deploy-${postMergeDeployment.id}`"
         :deployment="postMergeDeployment"
+        :show-metrics="true"
         class="js-post-deployment"
       />
     </template>

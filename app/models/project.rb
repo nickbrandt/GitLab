@@ -1965,7 +1965,7 @@ class Project < ActiveRecord::Base
   end
 
   def migrate_to_hashed_storage!
-    return if hashed_storage?(:repository)
+    return unless storage_upgradable?
 
     update!(repository_read_only: true)
 

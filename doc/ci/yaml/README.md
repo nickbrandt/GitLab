@@ -1770,7 +1770,7 @@ stages:
 
 production:
   script:
-    - install_depedencies
+    - install_dependencies
     - deploy
     - notify_owner
 ```
