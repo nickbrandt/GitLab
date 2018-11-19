@@ -11,8 +11,5 @@ module Projects
     end
   end
 end
-<<<<<<< HEAD
 
 Projects::DisableDeployKeyService.prepend(EE::Projects::DisableDeployKeyService)
-=======
->>>>>>> upstream/master
