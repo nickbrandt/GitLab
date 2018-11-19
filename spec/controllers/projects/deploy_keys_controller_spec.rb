@@ -127,10 +127,7 @@ describe Projects::DeployKeysController do
         expect do
           put :enable, id: deploy_key.id, namespace_id: project.namespace, project_id: project
         end.to change { DeployKeysProject.count }.by(1)
-<<<<<<< HEAD
            .and change { AuditEvent.count }.by(1) ## EE only
-=======
->>>>>>> upstream/master
 
         expect(DeployKeysProject.where(project_id: project.id, deploy_key_id: deploy_key.id).count).to eq(1)
         expect(response).to have_http_status(302)
@@ -196,10 +193,7 @@ describe Projects::DeployKeysController do
         expect do
           put :disable, id: deploy_key.id, namespace_id: project.namespace, project_id: project
         end.to change { DeployKey.count }.by(-1)
-<<<<<<< HEAD
            .and change { AuditEvent.count }.by(1) ## EE only
-=======
->>>>>>> upstream/master
 
         expect(response).to have_http_status(302)
         expect(response).to redirect_to(namespace_project_settings_repository_path(anchor: 'js-deploy-keys-settings'))
