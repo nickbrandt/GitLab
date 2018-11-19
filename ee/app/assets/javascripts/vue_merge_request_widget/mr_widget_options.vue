@@ -205,6 +205,7 @@ export default {
       :key="`pre-merge-deploy-${deployment.id}`"
       class="js-pre-merge-deploy"
       :deployment="deployment"
+      :show-metrics="false"
     />
     <div class="mr-section-container">
       <mr-widget-approvals
@@ -320,6 +321,7 @@ export default {
         v-for="postMergeDeployment in mr.postMergeDeployments"
         :key="`post-merge-deploy-${postMergeDeployment.id}`"
         :deployment="postMergeDeployment"
+        :show-metrics="true"
         class="js-post-deployment"
       />
     </template>
