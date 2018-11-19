@@ -14,8 +14,9 @@
     post: true,
     contexts: {
         webPage: true,
-    },
-    stateStorageStrategy: "localStorage"
+    }
+    // Uncomment in https://gitlab.com/gitlab-org/gitlab-ee/issues/8432
+    // stateStorageStrategy: "localStorage"
   });
 
   window.snowplow('enableActivityTracking', 30, 30);
