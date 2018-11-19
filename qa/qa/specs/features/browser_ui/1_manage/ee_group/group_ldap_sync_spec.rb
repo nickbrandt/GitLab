@@ -3,6 +3,8 @@
 module QA
   context 'Manage', :orchestrated, :ldap_tls, :ldap_no_tls do
     describe 'LDAP Group sync' do
+      include Support::Api
+
       before(:all) do
         users = [
             {
@@ -52,7 +54,7 @@ module QA
 
         EE::Page::Group::Menu.perform(&:go_to_members)
 
-        verify_users_synced(['ENG User 2', 'ENG User 3'])
+        verify_users_synced(['ENG User 2', 'ENG ser 3'])
       end
 
       it 'Has LDAP user synced using user filter method' do
@@ -89,8 +91,9 @@ module QA
       def add_user_to_sandbox_group_via_api(user)
         sandbox_group_path = Resource::Sandbox.fabricate_via_api!.path
         api_client = Runtime::API::Client.new(:gitlab, personal_access_token: Runtime::Env.personal_access_token)
-        get Runtime::API::Request.new(api_client, "/users?username=#{user}").url
-        post Runtime::API::Request.new(api_client, "/groups/#{sandbox_group_path}/members").url, user_id: json_body.first[:id], access_level: '50'
+        response = get Runtime::API::Request.new(api_client, "/users?username=#{user}").url
+
+        post Runtime::API::Request.new(api_client, "/groups/#{sandbox_group_path}/members").url, { user_id: parse_body(response).first[:id], access_level: '50' }
       end
 
       def create_admin_personal_access_token
