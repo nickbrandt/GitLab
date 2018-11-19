@@ -20,6 +20,18 @@ describe IssuablesAnalytics do
       end
     end
 
+    context 'when issuable relation is ordered by priority' do
+      it 'generates chart data correctly' do
+        issues = project.issues.order_by_position_and_priority
+        data = described_class.new(issuables: issues).data
+
+        seed.each_pair do |months_back, issues_count|
+          date = months_back.months.ago.strftime(described_class::DATE_FORMAT)
+          expect(data[date]).to eq(issues_count)
+        end
+      end
+    end
+
     context 'when months_back parameter is nil' do
       it 'returns a hash containing the issues count created in the past 12 months' do
         data = described_class.new(issuables: project.issues).data
