@@ -13,7 +13,7 @@ msgstr ""
 "X-Crowdin-Project: gitlab-ee\n"
 "X-Crowdin-Language: ja\n"
 "X-Crowdin-File: /master/locale/gitlab.pot\n"
-"PO-Revision-Date: 2018-11-19 16:44\n"
+"PO-Revision-Date: 2018-11-19 17:17\n"
 
 msgid " Status"
 msgstr " ステータス"
@@ -2199,8 +2199,7 @@ msgid "Connect repositories from GitHub"
 msgstr "GitHubからリポジトリに接続"
 
 msgid "Connect your external repositories, and CI/CD pipelines will run for new commits. A GitLab project will be created with only CI/CD features enabled."
-msgstr "外部リポジトリに接続して、新しいコミットがあると\n"
-" CI/CD パイプラインを実行します。CI/CD の機能が有効であるときのみ、GitLab プロジェクトは作成されます。"
+msgstr ""
 
 msgid "Connecting..."
 msgstr "接続しています..."
@@ -3303,6 +3302,9 @@ msgstr ""
 
 msgid "Failed to remove the pipeline schedule"
 msgstr "パイプラインスケジュールを削除できませんでした"
+
+msgid "Failed to signing using smartcard authentication"
+msgstr ""
 
 msgid "Failed to update issues, please try again."
 msgstr "課題の更新に失敗しました。もう一度やり直してください。"
@@ -4846,6 +4848,9 @@ msgid "Locked to current projects"
 msgstr "現在のプロジェクトはロックされています"
 
 msgid "Locks give the ability to lock specific file or folder."
+msgstr ""
+
+msgid "Login with smartcard"
 msgstr ""
 
 msgid "Logs"
@@ -7416,6 +7421,12 @@ msgid "Slack integration allows you to interact with GitLab via slash commands i
 msgstr ""
 
 msgid "Slower but makes sure the project workspace is pristine as it clones the repository from scratch for every job"
+msgstr ""
+
+msgid "Smartcard"
+msgstr ""
+
+msgid "Smartcard authentication failed: client certificate header is missing."
 msgstr ""
 
 msgid "Snippets"
