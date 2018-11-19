@@ -13,7 +13,7 @@ msgstr ""
 "X-Crowdin-Project: gitlab-ee\n"
 "X-Crowdin-Language: zh-TW\n"
 "X-Crowdin-File: /master/locale/gitlab.pot\n"
-"PO-Revision-Date: 2018-11-19 16:48\n"
+"PO-Revision-Date: 2018-11-19 17:21\n"
 
 msgid " Status"
 msgstr " 狀態"
@@ -3303,6 +3303,9 @@ msgstr ""
 msgid "Failed to remove the pipeline schedule"
 msgstr "無法刪除流水線排程"
 
+msgid "Failed to signing using smartcard authentication"
+msgstr ""
+
 msgid "Failed to update issues, please try again."
 msgstr "更新議題時發生錯誤，請稍後重試。"
 
@@ -4845,6 +4848,9 @@ msgstr "已鎖定目前專案"
 
 msgid "Locks give the ability to lock specific file or folder."
 msgstr "《鎖定》提供了鎖定特定檔案或資料夾的能力。"
+
+msgid "Login with smartcard"
+msgstr ""
 
 msgid "Logs"
 msgstr "記錄檔"
@@ -7415,6 +7421,12 @@ msgstr ""
 
 msgid "Slower but makes sure the project workspace is pristine as it clones the repository from scratch for every job"
 msgstr "速度較慢，但確保項目工作空間是原始的，因為它為每項工作從頭開始複製檔案庫"
+
+msgid "Smartcard"
+msgstr ""
+
+msgid "Smartcard authentication failed: client certificate header is missing."
+msgstr ""
 
 msgid "Snippets"
 msgstr "程式碼片段"
