@@ -13,7 +13,7 @@ msgstr ""
 "X-Crowdin-Project: gitlab-ee\n"
 "X-Crowdin-Language: ja\n"
 "X-Crowdin-File: /master/locale/gitlab.pot\n"
-"PO-Revision-Date: 2018-11-19 17:17\n"
+"PO-Revision-Date: 2018-11-19 17:46\n"
 
 msgid " Status"
 msgstr " ステータス"
@@ -4271,8 +4271,7 @@ msgid "Identities"
 msgstr "ID"
 
 msgid "Identity provider single sign on URL"
-msgstr "アイデンティティプロバイダのシングルサインオン\n"
-" URL"
+msgstr ""
 
 msgid "If disabled, a diverged local branch will not be automatically updated with commits from its remote counterpart, to prevent local data loss. If the default branch (%{default_branch}) has diverged and cannot be updated, mirroring will fail. Other diverged branches are silently ignored."
 msgstr ""
