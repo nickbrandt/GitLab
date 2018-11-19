@@ -16,6 +16,7 @@ module EE
       has_many :approved_by_users, through: :approvals, source: :user
       has_many :approvers, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
       has_many :approver_groups, as: :target, dependent: :delete_all # rubocop:disable Cop/ActiveRecordDependent
+      has_many :approval_rules, class_name: 'ApprovalMergeRequestRule'
       has_many :draft_notes
 
       validate :validate_approvals_before_merge, unless: :importing?
