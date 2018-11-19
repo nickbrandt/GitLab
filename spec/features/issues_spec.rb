@@ -179,7 +179,7 @@ describe 'Issues' do
         visit project_issues_path(project)
 
         page.within(first('.issuable-info')) do
-          expect(page).to have_selector('.fa-balance-scale')
+          expect(page).to have_selector('.issue-weight-icon')
           expect(page).to have_content(2)
         end
       end
