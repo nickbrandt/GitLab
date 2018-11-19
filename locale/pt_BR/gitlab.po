@@ -13,7 +13,7 @@ msgstr ""
 "X-Crowdin-Project: gitlab-ee\n"
 "X-Crowdin-Language: pt-BR\n"
 "X-Crowdin-File: /master/locale/gitlab.pot\n"
-"PO-Revision-Date: 2018-11-19 16:44\n"
+"PO-Revision-Date: 2018-11-19 17:17\n"
 
 msgid " Status"
 msgstr " Status"
@@ -3339,6 +3339,9 @@ msgstr ""
 msgid "Failed to remove the pipeline schedule"
 msgstr "Erro ao excluir o agendamento do pipeline"
 
+msgid "Failed to signing using smartcard authentication"
+msgstr ""
+
 msgid "Failed to update issues, please try again."
 msgstr "Falha ao atualizar Issues. Por favor, tente novamente."
 
@@ -4885,6 +4888,9 @@ msgstr "Travado para projetos existentes"
 
 msgid "Locks give the ability to lock specific file or folder."
 msgstr "Travas possibilitam travar um arquivo ou uma pasta específica."
+
+msgid "Login with smartcard"
+msgstr ""
 
 msgid "Logs"
 msgstr "Logs"
@@ -7460,6 +7466,12 @@ msgstr "A integração com o Slack permite que você interaja com o GitLab por m
 
 msgid "Slower but makes sure the project workspace is pristine as it clones the repository from scratch for every job"
 msgstr "Mais lento, mas certifica-se que o espaço de trabalho do projeto está íntegro enquanto clona o repositório do zero para cada tarefa"
+
+msgid "Smartcard"
+msgstr ""
+
+msgid "Smartcard authentication failed: client certificate header is missing."
+msgstr ""
 
 msgid "Snippets"
 msgstr "Snippets"
