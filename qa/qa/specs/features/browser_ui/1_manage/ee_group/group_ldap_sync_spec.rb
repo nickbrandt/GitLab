@@ -54,7 +54,7 @@ module QA
 
         EE::Page::Group::Menu.perform(&:go_to_members)
 
-        verify_users_synced(['ENG User 2', 'ENG ser 3'])
+        verify_users_synced(['ENG User 2', 'ENG User 3'])
       end
 
       it 'Has LDAP user synced using user filter method' do
