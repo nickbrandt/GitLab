@@ -24,7 +24,7 @@ module EE
           expose :only_mirror_protected_branches, if: ->(project, _) { project.mirror? }
           expose :mirror_overwrites_diverged_branches, if: ->(project, _) { project.mirror? }
           expose :external_authorization_classification_label,
-                 if: ->(project, _) { project.feature_available?(:external_authorization_service) }
+                 if: ->(_, _) { License.feature_available?(:external_authorization_service) }
         end
       end
 
