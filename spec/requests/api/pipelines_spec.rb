@@ -458,8 +458,7 @@ describe API::Pipelines do
 
       context 'when audit events is enabled' do
         before do
-          allow(License).to receive(:feature_available?).and_call_original
-          allow(License).to receive(:feature_available?).with(:extended_audit_events).and_return(true)
+          stub_licensed_features(extended_audit_events: true)
         end
 
         it 'logs an audit event' do
