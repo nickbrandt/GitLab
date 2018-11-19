@@ -325,14 +325,17 @@ comment itself.
 
 ### Submitting a review
 
-If you have any comments that have not been submitted, you will see a bar at the bottom of the screen with two buttons:
+If you have any comments that have not been submitted, you will see a bar at the
+bottom of the screen with two buttons:
 
 - **Discard**: Discards all comments that have not been submitted.
-- **Submit review**: All comments are published. Any quick actions submitted are performed at this time.
+- **Finish review**: Opens a list of comments ready to be submitted for review.
+   Clicking **Submit review** will publish all comments. Any quick actions
+   submitted are performed at this time.
 
-Alternatively, every pending comment has a button to submit the entire review.
+Alternatively, every pending comment has a button to finish the entire review.
 
-![MR Review bar](img/mr_review_bar.png)
+![Review submission](img/review_preview.png)
 
 [ce-5022]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/5022
 [ce-7125]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/7125
