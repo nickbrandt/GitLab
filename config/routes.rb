@@ -89,6 +89,7 @@ Rails.application.routes.draw do
 
     draw :operations
     draw :instance_statistics
+    draw :smartcard
 
     if ENV['GITLAB_ENABLE_CHAOS_ENDPOINTS']
       get '/chaos/leakmem' => 'chaos#leakmem'
