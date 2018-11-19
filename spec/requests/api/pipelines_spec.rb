@@ -456,8 +456,15 @@ describe API::Pipelines do
         expect(json_response['message']).to eq '404 Not found'
       end
 
-      it 'logs an audit event' do
-        expect { delete api("/projects/#{project.id}/pipelines/#{pipeline.id}", owner) }.to change { SecurityEvent.count }.by(1)
+      context 'when audit events is enabled' do
+        before do
+          allow(License).to receive(:feature_available?).and_call_original
+          allow(License).to receive(:feature_available?).with(:extended_audit_events).and_return(true)
+        end
+
+        it 'logs an audit event' do
+          expect { delete api("/projects/#{project.id}/pipelines/#{pipeline.id}", owner) }.to change { SecurityEvent.count }.by(1)
+        end
       end
 
       context 'when the pipeline has jobs' do
