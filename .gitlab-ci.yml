@@ -600,19 +600,19 @@ danger-review:
 
 rspec-pg:
   <<: *rspec-metadata-pg
-  parallel: 30
+  parallel: 50
 
 rspec-mysql:
   <<: *rspec-metadata-mysql
-  parallel: 30
+  parallel: 50
 
 rspec-pg-rails4:
   <<: *rspec-metadata-pg-rails4
-  parallel: 30
+  parallel: 50
 
 rspec-mysql-rails4:
   <<: *rspec-metadata-mysql-rails4
-  parallel: 30
+  parallel: 50
 
 # EE jobs START
 rspec-pg-ee:
