@@ -2,13 +2,6 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
-<<<<<<< HEAD
-## 11.4.7 (2018-11-20)
-
-- No changes.
-
-=======
->>>>>>> upstream/master
 ## 11.4.6 (2018-11-18)
 
 ### Security (1 change)
@@ -18,9 +11,8 @@ entry.
 
 ## 11.4.5 (2018-11-04)
 
-### Fixed (5 changes, 1 of them is from the community)
+### Fixed (4 changes, 1 of them is from the community)
 
-- Fix stuck job warning message. !8060
 - fix link to enable usage ping from convdev index. !22545 (Anand Capur)
 - Update gitlab-ui dependency to 1.8.0-hotfix.1 to fix IE11 bug.
 - Remove duplicate escape in job sidebar.
@@ -327,7 +319,6 @@ entry.
 - Fix loading issue on some merge request discussion. !21982
 - Fix project deletion when there is a export available. !22276
 
-- No changes.
 
 ## 11.3.3 (2018-10-04)
 
