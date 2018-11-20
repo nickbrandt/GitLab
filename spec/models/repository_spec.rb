@@ -424,6 +424,7 @@ describe Repository do
     shared_examples 'finding commits by message' do
       it 'returns commits with messages containing a given string' do
         commit_ids = repository.find_commits_by_message('submodule').map(&:id)
+<<<<<<< HEAD
 
         expect(commit_ids).to include(
           '5937ac0a7beb003549fc5fd26fc247adbce4a52e',
@@ -436,6 +437,20 @@ describe Repository do
       it 'is case insensitive' do
         commit_ids = repository.find_commits_by_message('SUBMODULE').map(&:id)
 
+=======
+
+        expect(commit_ids).to include(
+          '5937ac0a7beb003549fc5fd26fc247adbce4a52e',
+          '6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9',
+          'cfe32cf61b73a0d5e9f13e774abde7ff789b1660'
+        )
+        expect(commit_ids).not_to include('913c66a37b4a45b9769037c55c2d238bd0942d2e')
+      end
+
+      it 'is case insensitive' do
+        commit_ids = repository.find_commits_by_message('SUBMODULE').map(&:id)
+
+>>>>>>> upstream/master
         expect(commit_ids).to include('5937ac0a7beb003549fc5fd26fc247adbce4a52e')
       end
     end
@@ -2194,11 +2209,19 @@ describe Repository do
       it 'it is an ancestor' do
         expect(repository.ancestor?(ancestor.id, commit.id)).to eq(true)
       end
+<<<<<<< HEAD
 
       it 'it is not an ancestor' do
         expect(repository.ancestor?(commit.id, ancestor.id)).to eq(false)
       end
 
+=======
+
+      it 'it is not an ancestor' do
+        expect(repository.ancestor?(commit.id, ancestor.id)).to eq(false)
+      end
+
+>>>>>>> upstream/master
       it 'returns false on nil-values' do
         expect(repository.ancestor?(nil, commit.id)).to eq(false)
         expect(repository.ancestor?(ancestor.id, nil)).to eq(false)
@@ -2401,6 +2424,24 @@ describe Repository do
       expect(Gitlab::GitalyClient).to receive(:call).once.and_call_original
 
       repository.merge_base('master', 'fix')
+    end
+  end
+
+  describe '#cache' do
+    subject(:cache) { repository.send(:cache) }
+
+    it 'returns a RepositoryCache' do
+      expect(subject).to be_kind_of Gitlab::RepositoryCache
+    end
+
+    it 'when is_wiki it includes wiki as part of key' do
+      allow(repository).to receive(:is_wiki) { true }
+
+      expect(subject.namespace).to include('wiki')
+    end
+
+    it 'when is_wiki is false extra_namespace is nil' do
+      expect(subject.namespace).not_to include('wiki')
     end
   end
 end

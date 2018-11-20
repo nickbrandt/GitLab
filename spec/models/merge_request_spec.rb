@@ -51,11 +51,19 @@ describe MergeRequest do
 
         expect(subject.squash_in_progress?).to be_falsey
       end
+<<<<<<< HEAD
 
       it 'returns false when the squash directory has expired' do
         time = 20.minutes.ago.to_time
         File.utime(time, time, squash_path)
 
+=======
+
+      it 'returns false when the squash directory has expired' do
+        time = 20.minutes.ago.to_time
+        File.utime(time, time, squash_path)
+
+>>>>>>> upstream/master
         expect(subject.squash_in_progress?).to be_falsey
       end
 

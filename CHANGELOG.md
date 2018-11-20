@@ -2,10 +2,13 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+<<<<<<< HEAD
 ## 11.4.7 (2018-11-20)
 
 - No changes.
 
+=======
+>>>>>>> upstream/master
 ## 11.4.6 (2018-11-18)
 
 ### Security (1 change)

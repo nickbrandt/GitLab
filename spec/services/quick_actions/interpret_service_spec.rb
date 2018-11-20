@@ -1602,6 +1602,7 @@ describe QuickActions::InterpretService do
         end
       end
     end
+<<<<<<< HEAD
 
     # EE-specific tests
 
@@ -1623,5 +1624,7 @@ describe QuickActions::InterpretService do
         expect(explanations).to eq(["Moves this issue to test/project."])
       end
     end
+=======
+>>>>>>> upstream/master
   end
 end

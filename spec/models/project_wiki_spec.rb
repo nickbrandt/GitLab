@@ -220,11 +220,19 @@ describe ProjectWiki do
 
       before do
         subject.wiki # Make sure the wiki repo exists
+<<<<<<< HEAD
 
         repo_path = Gitlab::GitalyClient::StorageSettings.allow_disk_access do
           subject.repository.path_to_repo
         end
 
+=======
+
+        repo_path = Gitlab::GitalyClient::StorageSettings.allow_disk_access do
+          subject.repository.path_to_repo
+        end
+
+>>>>>>> upstream/master
         BareRepoOperations.new(repo_path).commit_file(image, 'image.png')
       end
 
@@ -241,11 +249,19 @@ describe ProjectWiki do
         file = subject.find_file('image.png')
         expect(file).to be_a Gitlab::Git::WikiFile
       end
+<<<<<<< HEAD
 
       it 'returns the whole file' do
         file = subject.find_file('image.png')
         image.rewind
 
+=======
+
+      it 'returns the whole file' do
+        file = subject.find_file('image.png')
+        image.rewind
+
+>>>>>>> upstream/master
         expect(file.raw_data.b).to eq(image.read.b)
       end
     end
