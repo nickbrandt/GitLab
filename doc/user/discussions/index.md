@@ -5,6 +5,7 @@ The ability to contribute conversationally is offered throughout GitLab.
 You can leave a comment in the following places:
 
 - issues
+- epics
 - merge requests
 - snippets
 - commits
@@ -283,7 +284,7 @@ in order to allow you to submit them all as a single action.
 
 ### Starting a review
 
-In order to start a review, simply write a comment on a diff as normal under the **Changes** tab 
+In order to start a review, simply write a comment on a diff as normal under the **Changes** tab
 in an MR and click on the **Start a review** button.
 
 ![Starting a review](img/mr_review_start.png)
@@ -314,13 +315,13 @@ Review comments can also resolve/unresolve [resolvable discussions](#resolvable-
 When replying to a comment, you will see a checkbox that you can click in order to resolve or unresolve
 the discussion once published.
 
-![Resolve checkbox](img/mr_review_resolve.png) 
+![Resolve checkbox](img/mr_review_resolve.png)
 ![Unresolve checkbox](img/mr_review_unresolve.png)
 
 If a particular pending comment will resolve or unresolve the discussion, this will be shown on the pending
 comment itself.
 
-![Resolve status](img/mr_review_resolve2.png) 
+![Resolve status](img/mr_review_resolve2.png)
 ![Unresolve status](img/mr_review_unresolve2.png)
 
 ### Submitting a review
