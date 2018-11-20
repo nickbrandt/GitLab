@@ -14,6 +14,27 @@ describe MergeRequest do
     it { is_expected.to have_many(:approved_by_users) }
   end
 
+  describe '#participant_approvers' do
+    let!(:approver) { create(:approver, target: project) }
+    let(:code_owners) { [double(:code_owner)] }
+
+    before do
+      allow(subject).to receive(:code_owners).and_return(code_owners)
+    end
+
+    it 'returns empty array if approval not needed' do
+      allow(subject).to receive(:approval_needed?).and_return(false)
+
+      expect(subject.participant_approvers).to eq([])
+    end
+
+    it 'returns approvers if approval is needed, excluding code owners' do
+      allow(subject).to receive(:approval_needed?).and_return(true)
+
+      expect(subject.participant_approvers).to eq([approver.user])
+    end
+  end
+
   describe '#code_owners' do
     subject(:merge_request) { build(:merge_request) }
     let(:owners) { [double(:owner)] }

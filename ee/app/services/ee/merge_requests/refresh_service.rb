@@ -58,21 +58,17 @@ module EE
 
       def create_approvers(merge_request, users)
         return if users.empty?
+        return unless merge_request.approvers_overwritten?
 
-        if merge_request.approvers_overwritten?
-          rows = users.map do |user|
-            {
-              target_id: merge_request.id,
-              target_type: merge_request.class.name,
-              user_id: user.id
-            }
-          end
-
-          ::Gitlab::Database.bulk_insert(Approver.table_name, rows)
+        rows = users.map do |user|
+          {
+            target_id: merge_request.id,
+            target_type: merge_request.class.name,
+            user_id: user.id
+          }
         end
 
-        todo_service.add_merge_request_approvers(merge_request, users)
-        notification_service.add_merge_request_approvers(merge_request, users, current_user)
+        ::Gitlab::Database.bulk_insert(Approver.table_name, rows)
       end
     end
   end
