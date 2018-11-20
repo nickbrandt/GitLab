@@ -641,6 +641,7 @@ msgstr ""
 msgid "An error occurred when toggling the notification subscription"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "An error occurred when updating the issue weight"
 msgstr ""
 
@@ -650,6 +651,8 @@ msgstr ""
 msgid "An error occurred while deleting the comment"
 msgstr ""
 
+=======
+>>>>>>> upstream/master
 msgid "An error occurred while detecting host keys"
 msgstr ""
 
@@ -3517,9 +3520,12 @@ msgstr ""
 msgid "Fingerprints"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Finish review"
 msgstr ""
 
+=======
+>>>>>>> upstream/master
 msgid "Finished"
 msgstr ""
 
@@ -4268,6 +4274,12 @@ msgid "Help page"
 msgstr ""
 
 msgid "Help page text and support page url."
+msgstr ""
+
+msgid "Here is the public SSH key that needs to be added to the remote server. For more information, please refer to the documentation."
+msgstr ""
+
+msgid "Hide host keys manual input"
 msgstr ""
 
 msgid "Here is the public SSH key that needs to be added to the remote server. For more information, please refer to the documentation."
