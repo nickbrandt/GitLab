@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.4.7 (2018-11-20)
+
+### Fixed (1 change)
+
+- Fix code owner as merge request suggestion not available under Starter plan. !8248
+
+
 ## 11.4.6 (2018-11-18)
 
 ### Security (1 change)
