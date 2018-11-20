@@ -6,7 +6,7 @@ setup act as clients while the NFS server plays host.
 
 > Note: The instructions provided in this documentation allow for setting a quick
 proof of concept but will leave NFS as potential single point of failure and 
-therefore not recommended for use in porduction. Explore options such as [Pacemaker 
+therefore not recommended for use in production. Explore options such as [Pacemaker 
 and Corosync](http://clusterlabs.org/) for highly available NFS in production.
 
 Below are instructions for setting up an application node(client) in an HA cluster
