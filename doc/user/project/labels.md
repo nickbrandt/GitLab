@@ -19,6 +19,7 @@ A permission level of `Developer` or higher is required to create labels.
 ### New project label
 
 To create a **project label**, navigate to **Issues > Labels** in the project.
+This page only shows project labels in this project and group labels of this project's parent group.
 
 Click the **New label** button. Enter the title, an optional description, and the background color. Click **Create label** to create the label.
 
@@ -33,6 +34,7 @@ GitLab will add the following default labels to the project:
 ### New group label
 
 To create a **group label**, follow similar steps from above to project labels. Navigate to **Issues > Labels** in the group and create it from there.
+This page only shows group labels in this group.
 Alternatively, you can create group labels also from Epic sidebar. Please note that the created label will belong to the immediate group to which epic belongs.
 
 ![Create Labels from Epic](img/labels_epic_sidebar.png)
