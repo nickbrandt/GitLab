@@ -73,7 +73,7 @@ export default {
         })
         .catch(() => {
           this.unapproving = false;
-          Flash(s__('mrWidget|An error occured while removing your approval.'));
+          Flash(s__('mrWidget|An error occurred while removing your approval.'));
         });
     },
   },

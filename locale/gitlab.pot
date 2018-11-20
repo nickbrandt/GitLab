@@ -9689,10 +9689,10 @@ msgstr ""
 msgid "mrWidget|Allows commits from members who can merge to the target branch"
 msgstr ""
 
-msgid "mrWidget|An error occured while removing your approval."
+msgid "mrWidget|An error occurred while removing your approval."
 msgstr ""
 
-msgid "mrWidget|An error occured while retrieving approval data for this merge request."
+msgid "mrWidget|An error occurred while retrieving approval data for this merge request."
 msgstr ""
 
 msgid "mrWidget|An error occurred while submitting your approval."
