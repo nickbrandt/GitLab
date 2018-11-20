@@ -2354,6 +2354,9 @@ msgstr ""
 msgid "Copy SSH clone URL"
 msgstr ""
 
+msgid "Copy SSH public key"
+msgstr ""
+
 msgid "Copy SSH public key to clipboard"
 msgstr ""
 

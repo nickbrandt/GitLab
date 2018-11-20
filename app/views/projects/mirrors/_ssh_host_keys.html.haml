@@ -1,18 +1,18 @@
-- import_data = f.object
-- verified_by = import_data.ssh_known_hosts_verified_by
-- verified_at = import_data.ssh_known_hosts_verified_at
+- mirror = f.object
+- verified_by = mirror.ssh_known_hosts_verified_by
+- verified_at = mirror.ssh_known_hosts_verified_at
 
-.form-group.js-ssh-host-keys-section{ class: ('collapse' unless import_data.ssh_import?) }
+.form-group.js-ssh-host-keys-section{ class: ('collapse' unless mirror.ssh_mirror_url?) }
   %button.btn.btn-inverted.btn-success.inline.js-detect-host-keys.append-right-10{ type: 'button' }
     = icon('spinner spin', class: 'js-spinner d-none')
     = _('Detect host keys')
-  .fingerprint-ssh-info.js-fingerprint-ssh-info.prepend-top-10.append-bottom-10{ class: ('collapse' unless import_data.ssh_import?) }
+  .fingerprint-ssh-info.js-fingerprint-ssh-info.prepend-top-10.append-bottom-10{ class: ('collapse' unless mirror.ssh_mirror_url?) }
     %label.label-bold
       = _('Fingerprints')
     .fingerprints-list.js-fingerprints-list
-      - import_data.ssh_known_hosts_fingerprints.each do |fp|
+      - mirror.ssh_known_hosts_fingerprints.each do |fp|
         %code= fp.fingerprint
-    - if verified_by || verified_at
+    - if verified_at
       .form-text.text-muted.js-fingerprint-verification
         %i.fa.fa-check.fingerprint-verified
         Verified by
