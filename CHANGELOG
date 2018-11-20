@@ -2,10 +2,14 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
-v 7.1.1
+v 7.2.0
 
 - Update CI matrix to go1.10 + go1.11 and fix ResponseWriter bugs !309
 - Add support for Redis URLs (redis:// and rediss://) in Workhorse !321
+
+v 7.1.1
+
+Bad release, use 7.2.0 instead.
 
 v 7.1.0
 
