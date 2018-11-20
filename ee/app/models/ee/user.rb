@@ -45,6 +45,8 @@ module EE
       has_many :protected_branch_push_access_levels, dependent: :destroy, class_name: ::ProtectedBranch::PushAccessLevel # rubocop:disable Cop/ActiveRecordDependent
       has_many :protected_branch_unprotect_access_levels, dependent: :destroy, class_name: ::ProtectedBranch::UnprotectAccessLevel # rubocop:disable Cop/ActiveRecordDependent
 
+      has_many :smartcard_identities
+
       scope :excluding_guests, -> { joins(:members).where('members.access_level > ?', ::Gitlab::Access::GUEST).distinct }
 
       scope :subscribed_for_admin_email, -> { where(admin_email_unsubscribed_at: nil) }
@@ -76,6 +78,11 @@ module EE
       def non_ldap
         joins('LEFT JOIN identities ON identities.user_id = users.id')
           .where('identities.provider IS NULL OR identities.provider NOT LIKE ?', 'ldap%')
+      end
+
+      def find_by_smartcard_identity(certificate_subject, certificate_issuer)
+        joins(:smartcard_identities)
+          .find_by(smartcard_identities: { subject: certificate_subject, issuer: certificate_issuer })
       end
     end
 

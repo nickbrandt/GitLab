@@ -50,6 +50,9 @@ if Settings.ldap['enabled'] || Rails.env.test?
   end
 end
 
+Settings['smartcard'] ||= Settingslogic.new({})
+Settings.smartcard['enabled'] = false if Settings.smartcard['enabled'].nil?
+
 Settings['omniauth'] ||= Settingslogic.new({})
 Settings.omniauth['enabled'] = true if Settings.omniauth['enabled'].nil?
 Settings.omniauth['auto_sign_in_with_provider'] = false if Settings.omniauth['auto_sign_in_with_provider'].nil?

@@ -48,9 +48,9 @@ class Projects::DeployKeysController < Projects::ApplicationController
   end
 
   def enable
-    load_key
-    Projects::EnableDeployKeyService.new(@project, current_user, params).execute
-    log_audit_event(@key.title, action: :create)
+    key = Projects::EnableDeployKeyService.new(@project, current_user, params).execute
+
+    return render_404 unless key
 
     respond_to do |format|
       format.html { redirect_to_repository_settings(@project, anchor: 'js-deploy-keys-settings') }
@@ -58,21 +58,16 @@ class Projects::DeployKeysController < Projects::ApplicationController
     end
   end
 
-  # rubocop: disable CodeReuse/ActiveRecord
   def disable
-    deploy_key_project = @project.deploy_keys_projects.find_by(deploy_key_id: params[:id])
+    deploy_key_project = Projects::DisableDeployKeyService.new(@project, current_user, params).execute
+
     return render_404 unless deploy_key_project
 
-    load_key
-    deploy_key_project.destroy!
-    log_audit_event(@key.title, action: :destroy)
-
     respond_to do |format|
       format.html { redirect_to_repository_settings(@project, anchor: 'js-deploy-keys-settings') }
       format.json { head :ok }
     end
   end
-  # rubocop: enable CodeReuse/ActiveRecord
 
   protected
 
@@ -98,9 +93,5 @@ class Projects::DeployKeysController < Projects::ApplicationController
   def log_audit_event(key_title, options = {})
     AuditEventService.new(current_user, @project, options)
       .for_deploy_key(key_title).security_event
-  end
-
-  def load_key
-    @key ||= current_user.accessible_deploy_keys.find(params[:id])
   end
 end
