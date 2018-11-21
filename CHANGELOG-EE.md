@@ -1,5 +1,108 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.5.0 (2018-11-22)
+
+### Security (2 changes)
+
+- Escape entity title while autocomplete template rendering to prevent XSS. !696
+- Prevent templated services from being imported.
+
+### Removed (1 change)
+
+- Remove security report summary from pipelines view. !7844
+
+### Fixed (25 changes, 3 of them are from the community)
+
+- Geo: Remove connectivity check from primary to secondary from gitlab:geo:check rake task. !7821
+- Include (closed) for closed epics in parsed text. !7946
+- Add new state to the cluster application vue app. !7954
+- Do not allow to assign an issue to an epic twice. !8004
+- [Geo] Fix: Deleting a project leaves orphaned LFS objects and CI Job artifacts around. !8031
+- Support `/client/features` Unleash endpoint. !8045
+- Fix button rendering in license management in FF. !8046
+- Geo: Handle orphaned Uploads records. !8054
+- Geo - Redirect user back to the secondary after a logout & re-login via the primary. !8157
+- Fix approver removal still being conducted even when "Cancel" is clicked in confirmation prompt. !8178
+- Link project short SHA to commit url. !8214
+- Update ops dashboard remove dropdown button. !8236 (George Tsiolis)
+- Clear ops dashboard project search input on submit. !8239 (George Tsiolis)
+- Fixes a dismissed vulnerability bug on the group security dashboard. !8343
+- Fixes missing fields on the group security dashboard. !8360
+- Fixes the view issue button in the Group Security Dashboard. !8385
+- Ops Dashboard should be available for public projects on GitLab.com. !8399
+- Update draft comments design to match new design. !8405
+- Change issues analytics breadcrumb. !8414 (George Tsiolis)
+- Include classification label in project API. !8426
+- Fix Pod Log topbar position when perf bar is disabled.
+- Always proxy reports downloads.
+- Removes extra rigth margin from job page.
+- Geo: Rails console message display primary/secondary state incorrectly.
+- Disable Feature Flags and Packages if repository is disabled.
+
+### Changed (13 changes, 1 of them is from the community)
+
+- Add test button to Group SAML settings. !5622
+- Group SAML status badges on members page. !5807
+- Update related issues list styling to be more space efficient. !7784
+- Refactor test reports to use new artifact architecture. !7827
+- Add timeline icon for issue weights. !7847 (George Tsiolis)
+- Added a search bar to `Admin > Geo > Projects`. !8079
+- Geo: Deprecate source installations instructions. !8134
+- Does not synchronize default branch for pull mirrors. !8138
+- Adds split error states for the group security dashboard. !8208
+- Geo: Improve read-only message in secondary nodes for actionable screens. !8238
+- Improve error messages for operations dashboard. !8244
+- Add documentation link to ops dashboard. !8296
+- Issue board card design. !21229
+
+### Added (24 changes, 1 of them is from the community)
+
+- Group-level file templates. !7391
+- Adds group-level Security Dashboard counts. !7564
+- Parse SAST reports and store vulnerabilities in database. !7578
+- elasticsearch 6 support - migrate from parent/child relationships to join. !7618
+- Geo: Admin > Geo > Projects support for batch operations. !7806
+- Create system notes for epic close and reopen. !7850
+- Add Tracing landing and settings page. !7903
+- Add modals and actions to the vulnerabilities in the Group security dashboard. !7910
+- Assign code owner as approver. !7933
+- Enable previewing of draft review comments. !7936
+- Audit log: Add logging for project feature changes. !7962
+- Add project operations dashboard. !7973
+- Audit log: Add audit events for group setting changes. !7987
+- Add approve quick action. !7989
+- Show actual Milestone dates within tooltips for Milestones in Epics sidebar. !8048
+- Allow filtering by weight in issues API. !8140 (Heinrich Lee Yu)
+- Filter epics by state in API. !8179
+- Support epics autocomplete for project objects. !8180
+- Add 'l', 'r' and 'e' keyboard shortcuts support in Epic. !8203
+- Configurable GitHub static context for statuses integration. !8235
+- Send notifications for epic status change. !8247
+- Support license management and performance using new reports syntax.
+- Support reports: for project security dashboard.
+- Add chart of issues created per month.
+
+### Other (17 changes, 11 of them are from the community)
+
+- Update boards list selector specs. !6266 (George Tsiolis)
+- Write some Geo development documentation. !7452
+- Connects the Group Security Dashboard API and Frontend. !7793
+- Rails5: Fix epics finder count_key method In Rails5, the state enum value is passed instead of the database integer. !7822 (Jasper Maes)
+- Rails 5: fix presence message validation for prometheus_alert. !7823 (Jasper Maes)
+- Rails 5: fix mysql milliseconds problem in prometheus alert event spec. !7828 (Jasper Maes)
+- Rails5: fix VulnerabilitySummaryEntity. !7893 (Jasper Maes)
+- Update feature flags empty state. !7967 (George Tsiolis)
+- Adds the security dashboard link. !7974
+- Remove tooltip on sidebar text buttons. !8021 (George Tsiolis)
+- Add a metric to the usage ping data to track the number of projects with at least one alert. !8058
+- Remove unneeded permission checks from the mirror repositories partial. !8077
+- Rails5: fix flaky mysql reset pipeline minutes spec. !8122 (Jasper Maes)
+- Move `prepend` outside the `class` block for finders. !8192 (George Tsiolis)
+- Rails5: fix operations controller spec nil parameter. !8209 (Jasper Maes)
+- Update related issues title typography. !8267 (George Tsiolis)
+- Geo: Clarify Geo HA documentation.
+
+
 ## 11.4.5 (2018-11-04)
 
 ### Fixed (1 change)
