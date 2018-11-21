@@ -65,10 +65,7 @@ export default {
 </script>
 
 <template>
-  <div
-    :class="headerSubItemClass"
-    class="item-sublabel"
-  >
+  <div :class="headerSubItemClass" class="item-sublabel">
     <span
       v-for="(subItem, index) in headerSubItems"
       :key="index"

@@ -139,14 +139,11 @@ export default {
 </script>
 <template>
   <div>
-    <div
-      v-if="hasPipelineData"
-      class="card security-dashboard prepend-top-default"
-    >
+    <div v-if="hasPipelineData" class="card security-dashboard prepend-top-default">
       <div class="card-header">
         <span class="js-security-dashboard-left">
           <span v-html="headline"></span>
-          <timeago-tooltip :time="pipeline.created"/>
+          <timeago-tooltip :time="pipeline.created" />
           {{ __('by') }}
           <user-avatar-link
             :link-href="triggeredBy.path"
@@ -158,17 +155,9 @@ export default {
           />
         </span>
         <span class="js-security-dashboard-right pull-right">
-          <icon name="branch"/>
-          <a
-            :href="branch.path"
-            class="monospace"
-          >{{ branch.id }}</a>
+          <icon name="branch" /> <a :href="branch.path" class="monospace">{{ branch.id }}</a>
           <span class="text-muted prepend-left-5 append-right-5">&middot;</span>
-          <icon name="commit"/>
-          <a
-            :href="commit.path"
-            class="monospace"
-          >{{ commit.id }}</a>
+          <icon name="commit" /> <a :href="commit.path" class="monospace">{{ commit.id }}</a>
         </span>
       </div>
       <split-security-report

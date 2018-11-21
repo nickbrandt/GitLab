@@ -98,7 +98,7 @@ export default {
 </script>
 <template>
   <div>
-    <set-license-approval-modal/>
+    <set-license-approval-modal />
     <report-section
       :status="licenseReportStatus"
       :success-text="licenseSummaryText"
@@ -111,18 +111,14 @@ export default {
       :always-open="alwaysOpen"
       class="license-report-widget mr-report"
     >
-      <div
-        v-if="showActionButtons"
-        slot="actionButtons"
-        class="append-right-default"
-      >
+      <div v-if="showActionButtons" slot="actionButtons" class="append-right-default">
         <a
           v-if="licenseManagementSettingsPath"
-          :class="{'append-right-8': fullReportPath}"
+          :class="{ 'append-right-8': fullReportPath }"
           :href="licenseManagementSettingsPath"
           class="btn btn-default btn-sm js-manage-licenses"
         >
-          {{ s__("ciReport|Manage licenses") }}
+          {{ s__('ciReport|Manage licenses') }}
         </a>
         <a
           v-if="fullReportPath"
@@ -130,11 +126,7 @@ export default {
           target="_blank"
           class="btn btn-default btn-sm js-full-report"
         >
-          {{ s__("ciReport|View full report") }}
-          <icon
-            :size="16"
-            name="external-link"
-          />
+          {{ s__('ciReport|View full report') }} <icon :size="16" name="external-link" />
         </a>
       </div>
     </report-section>

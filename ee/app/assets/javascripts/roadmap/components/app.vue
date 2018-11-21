@@ -122,10 +122,7 @@ export default {
 </script>
 
 <template>
-  <div
-    :class="{ 'overflow-reset': isEpicsListEmpty }"
-    class="roadmap-container"
-  >
+  <div :class="{ 'overflow-reset': isEpicsListEmpty }" class="roadmap-container">
     <gl-loading-icon
       v-if="isLoading"
       :label="s__('GroupRoadmap|Loading roadmap')"

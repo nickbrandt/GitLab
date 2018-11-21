@@ -95,21 +95,13 @@ export default {
       <tab active>
         <template slot="title">
           <span>{{ __('SAST') }}</span>
-          <span
-            v-if="sastCount"
-            class="badge badge-pill"
-          >
-            {{ sastCount }}
-          </span>
+          <span v-if="sastCount" class="badge badge-pill"> {{ sastCount }} </span>
           <span
             v-popover="popoverOptions"
             class="text-muted prepend-left-4"
             :aria-label="__('help')"
           >
-            <icon
-              name="question"
-              class="vertical-align-middle"
-            />
+            <icon name="question" class="vertical-align-middle" />
           </span>
         </template>
 
@@ -121,9 +113,9 @@ export default {
       :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
       :can-create-issue-permission="true"
       :can-create-feedback-permission="true"
-      @createNewIssue="createIssue({ vulnerability: modal.vulnerability })"
-      @dismissIssue="dismissVulnerability({ vulnerability: modal.vulnerability })"
-      @revertDismissIssue="revertDismissal({ vulnerability: modal.vulnerability })"
+      @createNewIssue="createIssue({ vulnerability: modal.vulnerability });"
+      @dismissIssue="dismissVulnerability({ vulnerability: modal.vulnerability });"
+      @revertDismissIssue="revertDismissal({ vulnerability: modal.vulnerability });"
     />
   </div>
 </template>

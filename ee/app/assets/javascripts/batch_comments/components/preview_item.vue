@@ -68,20 +68,18 @@ export default {
   <button
     type="button"
     class="review-preview-item menu-item"
-    :class="[componentClasses, {
-      'is-last': isLast
-    }]"
-    @click="scrollToDraft(draft)"
+    :class="[
+      componentClasses,
+      {
+        'is-last': isLast,
+      },
+    ]"
+    @click="scrollToDraft(draft);"
   >
     <span class="review-preview-item-header">
-      <icon
-        class="append-right-8 flex-shrink-0"
-        :name="iconName"
-      />
+      <icon class="append-right-8 flex-shrink-0" :name="iconName" />
       <span class="bold">
-        <span class="review-preview-item-header-text block-truncated">
-          {{ titleText }}
-        </span>
+        <span class="review-preview-item-header-text block-truncated"> {{ titleText }} </span>
         <template v-if="showLinePosition">
           :{{ linePosition }}
         </template>
@@ -94,11 +92,7 @@ export default {
       v-if="draft.discussion_id && resolvedStatusMessage"
       class="review-preview-item-footer draft-note-resolution p-0"
     >
-      <icon
-        class="append-right-8"
-        name="status_success"
-      />
-      {{ resolvedStatusMessage }}
+      <icon class="append-right-8" name="status_success" /> {{ resolvedStatusMessage }}
     </span>
   </button>
 </template>

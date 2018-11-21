@@ -80,10 +80,7 @@ export default {
 };
 </script>
 <template>
-  <div
-    v-if="approvedBy.length"
-    class="approved-by-users approvals-footer clearfix mr-info-list"
-  >
+  <div v-if="approvedBy.length" class="approved-by-users approvals-footer clearfix mr-info-list">
     <div class="approvers-prefix">
       <p>{{ approvedByText }}</p>
       <div class="approvers-list">
@@ -112,12 +109,7 @@ export default {
         class="btn btn-sm unapprove-btn-wrap"
         @click="unapproveMergeRequest"
       >
-        <i
-          v-if="unapproving"
-          class="fa fa-spinner fa-spin"
-          aria-hidden="true"
-        >
-        </i>
+        <i v-if="unapproving" class="fa fa-spinner fa-spin" aria-hidden="true"> </i>
         {{ removeApprovalText }}
       </button>
     </div>

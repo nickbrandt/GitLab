@@ -59,10 +59,5 @@ export default {
 };
 </script>
 <template>
-  <component
-    :is="componentName"
-    v-bind="linkAttributes"
-  >
-    <slot></slot>
-  </component>
+  <component :is="componentName" v-bind="linkAttributes"> <slot></slot> </component>
 </template>

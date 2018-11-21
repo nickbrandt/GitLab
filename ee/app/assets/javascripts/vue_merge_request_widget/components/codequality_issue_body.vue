@@ -37,9 +37,6 @@ export default {
       {{ issue.name }}
     </div>
 
-    <report-link
-      v-if="issue.path"
-      :issue="issue"
-    />
+    <report-link v-if="issue.path" :issue="issue" />
   </div>
 </template>

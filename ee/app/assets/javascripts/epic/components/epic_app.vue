@@ -12,7 +12,7 @@ export default {
 
 <template>
   <div class="epic-page-container">
-    <epic-header/>
-    <epic-body/>
+    <epic-header />
+    <epic-body />
   </div>
 </template>

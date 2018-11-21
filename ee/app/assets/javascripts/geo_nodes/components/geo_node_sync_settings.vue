@@ -105,15 +105,8 @@ export default {
 </script>
 
 <template>
-  <div
-    class="node-detail-value"
-  >
-    <span
-      v-if="syncStatusUnavailable"
-      class="node-detail-value-bold"
-    >
-      {{ __('Unknown') }}
-    </span>
+  <div class="node-detail-value">
+    <span v-if="syncStatusUnavailable" class="node-detail-value-bold"> {{ __('Unknown') }} </span>
     <span
       v-else
       v-tooltip
@@ -122,14 +115,8 @@ export default {
       data-placement="bottom"
     >
       <strong>{{ syncType }}</strong>
-      <icon
-        name="retry"
-        css-classes="sync-status-icon prepend-left-5"
-      />
-      <span
-        v-if="!eventTimestampEmpty"
-        class="sync-status-event-info prepend-left-5"
-      >
+      <icon name="retry" css-classes="sync-status-icon prepend-left-5" />
+      <span v-if="!eventTimestampEmpty" class="sync-status-event-info prepend-left-5">
         {{ syncStatusEventInfo }}
       </span>
     </span>

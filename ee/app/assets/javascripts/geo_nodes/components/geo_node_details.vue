@@ -68,26 +68,15 @@ export default {
       :node-edit-allowed="nodeEditAllowed"
       :version-mismatch="hasVersionMismatch"
     />
-    <node-details-section-sync
-      v-if="!node.primary"
-      :node-details="nodeDetails"
-    />
+    <node-details-section-sync v-if="!node.primary" :node-details="nodeDetails" />
     <node-details-section-verification
       v-if="nodeDetails.repositoryVerificationEnabled"
       :node-details="nodeDetails"
       :node-type-primary="node.primary"
     />
-    <node-details-section-other
-      :node-details="nodeDetails"
-      :node-type-primary="node.primary"
-    />
-    <div
-      v-if="hasError || hasVersionMismatch"
-      class="node-health-message-container"
-    >
-      <p class="node-health-message">
-        {{ errorMessage }}
-      </p>
+    <node-details-section-other :node-details="nodeDetails" :node-type-primary="node.primary" />
+    <div v-if="hasError || hasVersionMismatch" class="node-health-message-container">
+      <p class="node-health-message">{{ errorMessage }}</p>
     </div>
   </div>
 </template>
