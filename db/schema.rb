@@ -2175,6 +2175,8 @@ ActiveRecord::Schema.define(version: 20181204135932) do
     t.datetime_with_timezone "wiki_retry_at"
     t.integer "repository_retry_count"
     t.integer "wiki_retry_count"
+    t.datetime_with_timezone "last_repository_verification_ran_at"
+    t.datetime_with_timezone "last_wiki_verification_ran_at"
     t.index ["last_repository_verification_failure"], name: "idx_repository_states_on_repository_failure_partial", where: "(last_repository_verification_failure IS NOT NULL)", using: :btree
     t.index ["last_wiki_verification_failure"], name: "idx_repository_states_on_wiki_failure_partial", where: "(last_wiki_verification_failure IS NOT NULL)", using: :btree
     t.index ["project_id"], name: "idx_repository_states_outdated_checksums", where: "(((repository_verification_checksum IS NULL) AND (last_repository_verification_failure IS NULL)) OR ((wiki_verification_checksum IS NULL) AND (last_wiki_verification_failure IS NULL)))", using: :btree
