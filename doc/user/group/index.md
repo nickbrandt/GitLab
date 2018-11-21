@@ -83,11 +83,11 @@ Add the following information:
 
 ![new group info](img/create_new_group_info.png)
 
-1. Set the **Group path** which will be the **namespace** under which your projects
+1. The **Group name** will populate the path automatically. Optionally, you can
+   change it. This is the name that will me displayed in the group views.
+1. Set the **Group URL** which will be the **namespace** under which your projects
    will be hosted (path can contain only letters, digits, underscores, dashes
    and dots; it cannot start with dashes or end in dot).
-1. The **Group name** will populate with the path. Optionally, you can change
-   it. This is the name that will display in the group views.
 1. Optionally, you can add a description so that others can briefly understand
    what this group is about.
 1. Optionally, choose an avatar for your project.
