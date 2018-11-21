@@ -121,19 +121,11 @@ export default {
     <div v-if="showFlagContent" :class="flagOrientation" class="prometheus-graph-flag popover">
       <div class="arrow-shadow"></div>
       <div class="arrow"></div>
-<<<<<<< HEAD
       <div class="popover-header">
         <h5 v-if="deploymentFlagData">Deployed</h5>
         {{ formatDate }} <strong>{{ formatTime }}</strong>
       </div>
       <div v-if="deploymentFlagData" class="popover-body deploy-meta-content">
-=======
-      <div class="popover-title">
-        <h5 v-if="deploymentFlagData">Deployed</h5>
-        {{ formatDate }} <strong>{{ formatTime }}</strong>
-      </div>
-      <div v-if="deploymentFlagData" class="popover-content deploy-meta-content">
->>>>>>> upstream/master
         <div>
           <icon :size="12" name="commit" />
           <a :href="deploymentFlagData.commitUrl"> {{ deploymentFlagData.sha.slice(0, 8) }} </a>
