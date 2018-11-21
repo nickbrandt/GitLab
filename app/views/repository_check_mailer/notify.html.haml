@@ -6,7 +6,6 @@
 
 %p
   = _("You are receiving this message because you are a GitLab administrator for %{url}.") % { url: Gitlab.config.gitlab.url }
-<<<<<<< HEAD
 
 -# EE-specific start
 - if Gitlab::CurrentSettings.email_additional_text.present?
@@ -16,5 +15,3 @@
     %br
       = Gitlab::Utils.nlbr(Gitlab::CurrentSettings.email_additional_text)
 -# EE-specific end
-=======
->>>>>>> upstream/master
