@@ -274,6 +274,7 @@ edit existing comments. Non-team members are restricted from adding or editing c
 
 Additionally locked issues can not be reopened.
 
+<<<<<<< HEAD
 ## Merge Request Reviews **[PREMIUM]**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/4213) in GitLab 11.4.
@@ -337,6 +338,27 @@ bottom of the screen with two buttons:
 Alternatively, every pending comment has a button to finish the entire review.
 
 ![Review submission](img/review_preview.png)
+=======
+## Filtering notes
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/26723) in GitLab 11.5. 
+
+For issues with many comments like activity notes and user comments, sometimes 
+finding useful information can be hard. There is a way to filter comments from single notes and discussions for merge requests and issues.  
+
+From a merge request's **Discussion** tab, or from an issue overview, find the filter's dropdown menu on the right side of the page, from which you can choose one of the following options:
+
+- **Show all activity**: displays all user comments and system notes
+(issue updates, mentions from other issues, changes to the description, etc).
+- **Show comments only**: only displays user comments in the list.
+- **Show history only**: only displays activity notes. 
+
+![Notes filters dropdown options](img/index_notes_filters.png)
+
+Once you select one of the filters in a given issue or MR, GitLab will save
+your preference, so that it will persist when you visit the same page again
+from any device you're logged into.
+>>>>>>> upstream/master
 
 [ce-5022]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/5022
 [ce-7125]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/7125
