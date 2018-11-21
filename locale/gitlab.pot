@@ -8473,7 +8473,7 @@ msgstr ""
 msgid "To only use CI/CD features for an external repository, choose <strong>CI/CD for external repo</strong>."
 msgstr ""
 
-msgid "To open Jaeger and easily view tracing from GitLab, link the %{start_tag}Tracing%{end_tag} page to your server"
+msgid "To open Jaeger and easily view tracing from GitLab, link the %{link} page to your server"
 msgstr ""
 
 msgid "To set up SAML authentication for your group through an identity provider like Azure, Okta, Onelogin, Ping Identity, or your custom SAML 2.0 provider:"
