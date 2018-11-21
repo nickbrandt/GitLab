@@ -21,7 +21,7 @@ module EE
 
       # We cannot simply set `has_many :audit_events, as: :entity, dependent: :destroy`
       # here since Group inherits from Namespace, the entity_type would be set to `Namespace`.
-      has_many :audit_events, -> { where(entity_type: ::Group) }, foreign_key: 'entity_id'
+      has_many :audit_events, -> { where(entity_type: ::Group.name) }, foreign_key: 'entity_id'
 
       belongs_to :file_template_project, class_name: "Project"
 
