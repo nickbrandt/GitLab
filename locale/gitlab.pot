@@ -8974,9 +8974,6 @@ msgstr ""
 msgid "View epics list"
 msgstr ""
 
-msgid "View details: %{details_url}"
-msgstr ""
-
 msgid "View file @ "
 msgstr ""
 
