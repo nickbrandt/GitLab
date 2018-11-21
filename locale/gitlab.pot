@@ -447,6 +447,9 @@ msgstr ""
 msgid "Add user(s) to the group:"
 msgstr ""
 
+msgid "Add users or groups who are allowed to approve every merge request"
+msgstr ""
+
 msgid "Add users to group"
 msgstr ""
 
@@ -776,6 +779,12 @@ msgstr ""
 msgid "Applications"
 msgstr ""
 
+msgid "Approvals required"
+msgstr ""
+
+msgid "Approvers"
+msgstr ""
+
 msgid "Apr"
 msgstr ""
 
@@ -801,6 +810,12 @@ msgid "Are you sure you want to regenerate the public key? You will have to upda
 msgstr ""
 
 msgid "Are you sure you want to remove %{group_name}?"
+msgstr ""
+
+msgid "Are you sure you want to remove approver %{name}?"
+msgstr ""
+
+msgid "Are you sure you want to remove group %{name}?"
 msgstr ""
 
 msgid "Are you sure you want to remove this identity?"
@@ -1403,6 +1418,9 @@ msgid "CICD|instance enabled"
 msgstr ""
 
 msgid "Callback URL"
+msgstr ""
+
+msgid "Can override approvers and approvals required per merge request"
 msgstr ""
 
 msgid "Can't find HEAD commit for this branch"
@@ -2555,6 +2573,9 @@ msgstr ""
 msgid "Customize how Google Code email addresses and usernames are imported into GitLab. In the next step, you'll be able to select the projects you want to import."
 msgstr ""
 
+msgid "Customize your merge request approval settings."
+msgstr ""
+
 msgid "Customize your pipeline configuration, view your pipeline status and coverage report."
 msgstr ""
 
@@ -3023,6 +3044,9 @@ msgid "Enable or disable version check and usage ping."
 msgstr ""
 
 msgid "Enable reCAPTCHA or Akismet and set IP limits."
+msgstr ""
+
+msgid "Enable self approval of merge requests"
 msgstr ""
 
 msgid "Enable the Performance Bar for a given group."
@@ -4099,6 +4123,9 @@ msgstr ""
 msgid "Group name"
 msgstr ""
 
+msgid "Group:"
+msgstr ""
+
 msgid "Group: %{group_name}"
 msgstr ""
 
@@ -5083,6 +5110,9 @@ msgid "Merge events"
 msgstr ""
 
 msgid "Merge request"
+msgstr ""
+
+msgid "Merge request approvals"
 msgstr ""
 
 msgid "Merge requests"
@@ -6837,6 +6867,12 @@ msgstr ""
 msgid "Remove Runner"
 msgstr ""
 
+msgid "Remove all approvals in a merge request when new commits are pushed to its source branch"
+msgstr ""
+
+msgid "Remove approver"
+msgstr ""
+
 msgid "Remove avatar"
 msgstr ""
 
@@ -7386,6 +7422,9 @@ msgid "Set max session time for web terminal."
 msgstr ""
 
 msgid "Set notification email for abuse reports."
+msgstr ""
+
+msgid "Set number of approvers required before open merge requests can be merged"
 msgstr ""
 
 msgid "Set requirements for a user to sign-in. Enable mandatory two-factor authentication."
@@ -8116,6 +8155,9 @@ msgid "The user map is a mapping of the FogBugz users that participated on your 
 msgstr ""
 
 msgid "The value lying at the midpoint of a series of observed values. E.g., between 3, 5, 9, the median is 5. Between 3, 5, 7, 8, the median is (5+7)/2 = 6."
+msgstr ""
+
+msgid "There are no approvers"
 msgstr ""
 
 msgid "There are no archived projects yet"
