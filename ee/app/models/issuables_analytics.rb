@@ -34,6 +34,7 @@ class IssuablesAnalytics
   def issues_created_at_dates
     strong_memoize(:issues_created_at_dates) do
       issuables
+        .reorder(nil)
         .where('issues.created_at >= ?', months_back.months.ago.beginning_of_month)
         .pluck('issues.created_at')
         .map { |date| date.strftime(DATE_FORMAT) }
