@@ -119,8 +119,12 @@ describe MergeRequests::RefreshService do
             it 'creates Approver' do
               expect { subject }.to change { Approver.count }.by(1)
 
+              new_approver = merge_request.approvers.last
+
               expect(merge_request.approvers.first.user).to eq(existing_approver)
-              expect(merge_request.approvers.last.user).to eq(owner)
+              expect(new_approver.user).to eq(owner)
+              expect(new_approver.created_at).to be_present
+              expect(new_approver.updated_at).to be_present
             end
           end
         end
