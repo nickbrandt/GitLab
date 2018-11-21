@@ -69,9 +69,11 @@ class GfmAutoComplete {
       skipMarkdownCharacterTest: true,
       data: GfmAutoComplete.defaultLoadingData,
       displayTpl(value) {
+        const cssClasses = [];
+
         if (GfmAutoComplete.isLoading(value)) return GfmAutoComplete.Loading.template;
         // eslint-disable-next-line no-template-curly-in-string
-        let tpl = '<li class="<%- warningClass %>"><span class="name">/${name}</span>';
+        let tpl = '<li class="<%- className %>"><span class="name">/${name}</span>';
         if (value.aliases.length > 0) {
           tpl += ' <small class="aliases">(or /<%- aliases.join(", /") %>)</small>';
         }
@@ -83,9 +85,13 @@ class GfmAutoComplete {
         }
         tpl += '</li>';
 
+        if (value.warning) {
+          cssClasses.push('has-warning');
+        }
+
         return _.template(tpl)({
           ...value,
-          warningClass: value.warning ? 'has-warning' : '',
+          className: cssClasses.join(' '),
           warningText: value.warning ? `(${value.warning})` : '',
         });
       },
