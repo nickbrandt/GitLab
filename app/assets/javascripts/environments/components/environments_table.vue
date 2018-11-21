@@ -71,6 +71,7 @@ export default {
         :can-read-environment="canReadEnvironment"
       />
 
+<<<<<<< HEAD
       <div
         v-if="model.hasDeployBoard && model.isDeployBoardVisible"
         :key="`deploy-board-row-${i}`"
@@ -86,6 +87,8 @@ export default {
         </div>
       </div>
 
+=======
+>>>>>>> upstream/master
       <template v-if="shouldRenderFolderContent(model)">
         <div v-if="model.isLoadingFolderContent" :key="`loading-item-${i}`">
           <gl-loading-icon :size="2" />

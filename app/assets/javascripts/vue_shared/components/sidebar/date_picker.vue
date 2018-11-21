@@ -97,6 +97,12 @@ export default {
 
 <template>
   <div :class="blockClass" class="block">
+<<<<<<< HEAD
+=======
+    <div class="issuable-sidebar-header">
+      <toggle-sidebar :collapsed="collapsed" @toggle="toggleSidebar" />
+    </div>
+>>>>>>> upstream/master
     <collapsed-calendar-icon :text="collapsedText" class="sidebar-collapsed-icon" />
     <div class="title">
       {{ label }}
@@ -130,7 +136,11 @@ export default {
             -
             <button
               type="button"
+<<<<<<< HEAD
               class="btn-blank btn-link btn-default-hover-link"
+=======
+              class="btn-blank btn-link btn-secondary-hover-link"
+>>>>>>> upstream/master
               @click="newDateSelected(null);"
             >
               remove

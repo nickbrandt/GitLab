@@ -199,7 +199,11 @@ export default {
 
 <template>
   <div v-if="!showEmptyState" :key="forceRedraw" class="prometheus-graphs prepend-top-default">
+<<<<<<< HEAD
     <div v-if="showEnvironmentDropdown" class="environments d-flex align-items-center">
+=======
+    <div class="environments d-flex align-items-center">
+>>>>>>> upstream/master
       {{ s__('Metrics|Environment') }}
       <div class="dropdown prepend-left-10">
         <button class="dropdown-menu-toggle" data-toggle="dropdown" type="button">

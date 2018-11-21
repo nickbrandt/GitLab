@@ -471,6 +471,7 @@ export default {
       <div v-if="!model.isFolder" class="table-mobile-header" role="rowheader">
         {{ s__('Environments|Environment') }}
       </div>
+<<<<<<< HEAD
 
       <span v-if="model.hasDeployBoard" class="deploy-board-icon" @click="toggleDeployBoard">
         <icon :name="deployIconName" />
@@ -489,6 +490,18 @@ export default {
 
         <span> {{ model.folderName }} </span>
 
+=======
+      <span v-if="!model.isFolder" class="environment-name table-mobile-content">
+        <a class="qa-environment-link" :href="environmentPath"> {{ model.name }} </a>
+      </span>
+      <span v-else class="folder-name" role="button" @click="onClickFolder">
+        <icon :name="folderIconName" class="folder-icon" />
+
+        <icon name="folder" class="folder-icon" />
+
+        <span> {{ model.folderName }} </span>
+
+>>>>>>> upstream/master
         <span class="badge badge-pill"> {{ model.size }} </span>
       </span>
     </div>
