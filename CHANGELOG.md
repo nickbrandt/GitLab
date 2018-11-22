@@ -83,10 +83,6 @@ entry.
 - Fix a race condition intermittently breaking GitLab startup. !23028
 - Adds margin after a deleted branch name in the activity feed. !23038
 - Ignore environment validation failure. !23100
-<<<<<<< HEAD
-=======
-- Fixes broken borders for reports section in MR widget.
->>>>>>> upstream/master
 - Adds CI favicon back to jobs page.
 - Redirect to the pipeline builds page when a build is canceled. (Eva Kadlecova)
 - Fixed diff stats not showing when performance bar is enabled.
@@ -95,7 +91,6 @@ entry.
 - Fix bug causing not all emails to show up in commit email selectbox.
 - Remove duplicate escape in job sidebar.
 - Fixing styling issues on the scheduled pipelines page.
-<<<<<<< HEAD
 - Fixes broken test in master.
 - Renders stuck block when runners are stuck.
 - Removes extra border from test reports in the merge request widget.
@@ -103,14 +98,6 @@ entry.
 - Only render link to branch when branch still exists in pipeline page.
 - Fixed source project not filtering in merge request creation compare form.
 - Do not reload self on hooks when creating deployment.
-=======
-- Renders stuck block when runners are stuck.
-- Removes extra border from test reports in the merge request widget.
-- Only render link to branch when branch still exists in pipeline page.
-- Fixed source project not filtering in merge request creation compare form.
-- Do not reload self on hooks when creating deployment.
-- Fixes broken test in master.
->>>>>>> upstream/master
 
 ### Changed (38 changes, 12 of them are from the community)
 
@@ -277,13 +264,10 @@ entry.
 - Disables stop environment button while the deploy is in progress.
 
 
-<<<<<<< HEAD
-=======
 ## 11.4.7 (2018-11-20)
 
 - No changes.
 
->>>>>>> upstream/master
 ## 11.4.6 (2018-11-18)
 
 ### Security (1 change)
