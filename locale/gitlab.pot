@@ -5570,12 +5570,6 @@ msgstr ""
 msgid "None"
 msgstr ""
 
-msgid "Not all comments are displayed because you're comparing two versions of the diff."
-msgstr ""
-
-msgid "Not all comments are displayed because you're viewing an old version of the diff."
-msgstr ""
-
 msgid "Not allowed to merge"
 msgstr ""
 
@@ -5726,9 +5720,6 @@ msgid "One or more of your Google Code projects cannot be imported into GitLab d
 msgstr ""
 
 msgid "Only admins"
-msgstr ""
-
-msgid "Only comments from the following commit are shown below"
 msgstr ""
 
 msgid "Only mirror protected branches"
@@ -7478,9 +7469,6 @@ msgstr ""
 msgid "Show latest version"
 msgstr ""
 
-msgid "Show latest version of the diff"
-msgstr ""
-
 msgid "Show parent pages"
 msgstr ""
 
@@ -9008,6 +8996,9 @@ msgid "View replaced file @ "
 msgstr ""
 
 msgid "View the documentation"
+msgstr ""
+
+msgid "Viewing commit"
 msgstr ""
 
 msgid "Visibility and access controls"
