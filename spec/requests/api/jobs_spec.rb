@@ -544,7 +544,7 @@ describe API::Jobs do
         end
 
         context 'when artifacts are stored remotely' do
-          let(:job) { create(:ci_build, pipeline: pipeline, user: api_user) }
+          let(:job) { create(:ci_build, :running, pipeline: pipeline, user: api_user) }
           let!(:artifact) { create(:ci_job_artifact, :archive, :remote_store, job: job) }
 
           before do
@@ -586,12 +586,14 @@ describe API::Jobs do
       end
 
       context 'when using job_token to authenticate' do
+        let(:running_job) { create(:ci_build, :artifacts, pipeline: pipeline, user: api_user) }
+
         before do
           pipeline.reload
           pipeline.update(ref: 'master',
                           sha: project.commit('master').sha)
 
-          get api("/projects/#{project.id}/jobs/artifacts/master/download"), job: job.name, job_token: job.token
+          get api("/projects/#{project.id}/jobs/artifacts/master/download"), job: job.name, job_token: running_job.token
         end
 
         context 'when user is reporter' do

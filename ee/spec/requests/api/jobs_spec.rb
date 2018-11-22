@@ -12,6 +12,7 @@ describe API::Jobs do
   end
 
   let!(:job) { create(:ci_build, :success, pipeline: pipeline) }
+  let!(:running_job) { create(:ci_build, :running, pipeline: pipeline) }
 
   let(:user) { create(:user) }
   let(:api_user) { user }
@@ -41,7 +42,7 @@ describe API::Jobs do
       let(:job) { create(:ci_build, :artifacts, pipeline: pipeline, user: api_user) }
 
       before do
-        get api("/projects/#{project.id}/jobs/#{job.id}/artifacts"), job_token: job.token
+        get api("/projects/#{project.id}/jobs/#{job.id}/artifacts"), job_token: running_job.token
       end
 
       context 'user is developer' do
