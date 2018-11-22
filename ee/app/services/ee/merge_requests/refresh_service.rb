@@ -60,11 +60,15 @@ module EE
         return if users.empty?
         return unless merge_request.approvers_overwritten?
 
+        now = Time.now
+
         rows = users.map do |user|
           {
             target_id: merge_request.id,
             target_type: merge_request.class.name,
-            user_id: user.id
+            user_id: user.id,
+            created_at: now,
+            updated_at: now
           }
         end
 
