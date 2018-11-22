@@ -98,10 +98,6 @@ class Groups::EpicsController < Groups::ApplicationController
     @preload_for_collection ||= [:group, :author]
   end
 
-  def default_sort_order
-    sort_value_recently_created
-  end
-
   def authorize_create_epic!
     return render_404 unless can?(current_user, :create_epic, group)
   end
