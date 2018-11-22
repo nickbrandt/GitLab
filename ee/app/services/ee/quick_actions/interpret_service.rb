@@ -85,6 +85,19 @@ module EE
             ::MergeRequests::ApprovalService.new(issuable.project, current_user).execute(issuable)
           end
         end
+
+        desc 'Promote issue to an epic'
+        explanation 'Promote issue to an epic'
+        warning 'may expose confidential information'
+        condition do
+          issuable.is_a?(Issue) &&
+            issuable.persisted? &&
+            current_user.can?(:admin_issue, project) &&
+            current_user.can?(:create_epic, project.group)
+        end
+        command :promote do
+          Epics::IssuePromoteService.new(issuable.project, current_user).execute(issuable)
+        end
       end
 
       def extract_epic(params)
