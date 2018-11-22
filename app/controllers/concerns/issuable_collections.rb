@@ -91,7 +91,7 @@ module IssuableCollections
     options = {
       scope: params[:scope],
       state: params[:state],
-      sort: set_sort_order_from_cookie || default_sort_order
+      sort: params[:sort] || set_sort_order_from_cookie || default_sort_order
     }
 
     # Used by view to highlight active option

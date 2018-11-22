@@ -14,6 +14,15 @@ module EE
       }.merge(super)
     end
 
+    def epics_sort_options_hash
+      {
+        sort_value_recently_created => sort_title_created_date,
+        sort_value_recently_updated => sort_title_recently_updated,
+        sort_value_start_date  => sort_title_start_date,
+        sort_value_end_date => sort_title_end_date
+      }
+    end
+
     def sort_title_start_date
       s_('SortOptions|Start date')
     end

@@ -7,11 +7,10 @@ module Groups
     before_action :check_epics_available!
     before_action :group
     before_action :persist_roadmap_layout, only: [:show]
+    before_action :set_epics_sorting, only: :index
 
     def show
       # show roadmap for a group
-      set_epics_sorting
-
       @sort = params[:sort] || default_sort_order
       @epics_count = EpicsFinder.new(current_user, group_id: @group.id).execute.count
     end

@@ -9,6 +9,11 @@ class Groups::EpicsController < Groups::ApplicationController
 
   before_action :check_epics_available!
   before_action :epic, except: [:index, :create]
+
+  # This callback should be executed before the :set_issuables_index
+  # otherwise sorting will be ignored for epics.
+  before_action :set_epics_sorting, only: :index
+
   before_action :set_issuables_index, only: :index
   before_action :authorize_update_issuable!, only: :update
   before_action :authorize_create_epic!, only: [:create]
@@ -100,11 +105,5 @@ class Groups::EpicsController < Groups::ApplicationController
 
   def authorize_create_epic!
     return render_404 unless can?(current_user, :create_epic, group)
-  end
-
-  def filter_params
-    set_epics_sorting
-
-    super.merge(start_date: params[:start_date], end_date: params[:end_date])
   end
 end
