@@ -274,7 +274,6 @@ edit existing comments. Non-team members are restricted from adding or editing c
 
 Additionally locked issues can not be reopened.
 
-<<<<<<< HEAD
 ## Merge Request Reviews **[PREMIUM]**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/4213) in GitLab 11.4.
@@ -338,7 +337,6 @@ bottom of the screen with two buttons:
 Alternatively, every pending comment has a button to finish the entire review.
 
 ![Review submission](img/review_preview.png)
-=======
 ## Filtering notes
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/26723) in GitLab 11.5. 
@@ -358,7 +356,6 @@ From a merge request's **Discussion** tab, or from an issue overview, find the f
 Once you select one of the filters in a given issue or MR, GitLab will save
 your preference, so that it will persist when you visit the same page again
 from any device you're logged into.
->>>>>>> upstream/master
 
 [ce-5022]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/5022
 [ce-7125]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/7125
