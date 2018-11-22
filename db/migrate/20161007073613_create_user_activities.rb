@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-=======
-class CreateUserActivities < ActiveRecord::Migration[4.2]
-  DOWNTIME = false
->>>>>>> upstream/master
 
 class CreateUserActivities < ActiveRecord::Migration[4.2]
   # Set this constant to true if this migration requires downtime.
