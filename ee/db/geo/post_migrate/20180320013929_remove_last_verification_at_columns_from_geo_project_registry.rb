@@ -1,4 +1,4 @@
-class RemoveLastVerificationAtColumnsFromGeoProjectRegistry < ActiveRecord::Migration
+class RemoveLastVerificationAtColumnsFromGeoProjectRegistry < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def up

@@ -1,5 +1,5 @@
 # rubocop:disable all
-class GitHooksProjectIdIndex < ActiveRecord::Migration
+class GitHooksProjectIdIndex < ActiveRecord::Migration[4.2]
   disable_ddl_transaction!
 
   def change

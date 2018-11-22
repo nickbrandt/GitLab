@@ -1,4 +1,4 @@
-class RenameLdapGroupToLdapGroupLink < ActiveRecord::Migration
+class RenameLdapGroupToLdapGroupLink < ActiveRecord::Migration[4.2]
   def up
     rename_table :ldap_groups, :ldap_group_links
 

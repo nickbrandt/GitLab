@@ -1,4 +1,4 @@
-class AddExternalAuthorizationServiceClassificationLabelToProjects < ActiveRecord::Migration
+class AddExternalAuthorizationServiceClassificationLabelToProjects < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

@@ -1,4 +1,4 @@
-class AddBasicSnowplowAttributesToApplicationSettings < ActiveRecord::Migration
+class AddBasicSnowplowAttributesToApplicationSettings < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-class AddPackagesEnabledToProject < ActiveRecord::Migration
+class AddPackagesEnabledToProject < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

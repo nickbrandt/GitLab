@@ -1,4 +1,4 @@
-class RemoveLastVericationFailedColumnsFromProjectRepositoryStates < ActiveRecord::Migration
+class RemoveLastVericationFailedColumnsFromProjectRepositoryStates < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def up

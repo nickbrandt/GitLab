@@ -1,5 +1,5 @@
 
-class CreateUserActivities < ActiveRecord::Migration
+class CreateUserActivities < ActiveRecord::Migration[4.2]
   # Set this constant to true if this migration requires downtime.
   DOWNTIME = true
 

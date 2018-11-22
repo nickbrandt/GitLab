@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AddForeignKeyToEpics < ActiveRecord::Migration
+class AddForeignKeyToEpics < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

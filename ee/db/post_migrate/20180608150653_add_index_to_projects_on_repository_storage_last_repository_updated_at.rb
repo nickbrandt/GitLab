@@ -1,4 +1,4 @@
-class AddIndexToProjectsOnRepositoryStorageLastRepositoryUpdatedAt < ActiveRecord::Migration
+class AddIndexToProjectsOnRepositoryStorageLastRepositoryUpdatedAt < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

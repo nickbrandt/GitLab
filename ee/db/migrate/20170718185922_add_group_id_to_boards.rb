@@ -1,4 +1,4 @@
-class AddGroupIdToBoards < ActiveRecord::Migration
+class AddGroupIdToBoards < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def up

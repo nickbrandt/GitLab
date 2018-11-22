@@ -1,4 +1,4 @@
-class AddRemoteMirrorAvailableToApplicationSettings < ActiveRecord::Migration
+class AddRemoteMirrorAvailableToApplicationSettings < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

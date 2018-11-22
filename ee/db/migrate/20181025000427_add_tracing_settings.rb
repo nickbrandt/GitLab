@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AddTracingSettings < ActiveRecord::Migration
+class AddTracingSettings < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

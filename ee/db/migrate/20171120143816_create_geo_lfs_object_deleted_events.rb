@@ -1,4 +1,4 @@
-class CreateGeoLfsObjectDeletedEvents < ActiveRecord::Migration
+class CreateGeoLfsObjectDeletedEvents < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def change

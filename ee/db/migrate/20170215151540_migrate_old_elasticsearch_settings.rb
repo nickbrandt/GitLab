@@ -1,4 +1,4 @@
-class MigrateOldElasticsearchSettings < ActiveRecord::Migration
+class MigrateOldElasticsearchSettings < ActiveRecord::Migration[4.2]
   include Gitlab::Database::ArelMethods
   include Gitlab::Database::MigrationHelpers
 

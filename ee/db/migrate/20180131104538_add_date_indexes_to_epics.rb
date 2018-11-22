@@ -1,4 +1,4 @@
-class AddDateIndexesToEpics < ActiveRecord::Migration
+class AddDateIndexesToEpics < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

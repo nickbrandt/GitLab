@@ -1,5 +1,5 @@
 # rubocop:disable Migration/Timestamps
-class CreateRemoteMirrorsEE < ActiveRecord::Migration
+class CreateRemoteMirrorsEE < ActiveRecord::Migration[4.2]
   def up
     # When moving from CE to EE, remote_mirrors may already exist
     return if table_exists?(:remote_mirrors)
