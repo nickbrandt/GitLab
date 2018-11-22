@@ -1,4 +1,4 @@
-class AddFilterToLdapGroupLinks < ActiveRecord::Migration
+class AddFilterToLdapGroupLinks < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def change

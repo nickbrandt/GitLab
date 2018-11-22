@@ -1,4 +1,4 @@
-class AddMilestoneToLists < ActiveRecord::Migration
+class AddMilestoneToLists < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def up

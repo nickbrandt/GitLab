@@ -1,4 +1,4 @@
-class AddExternalAuthorizationServiceTimeoutToApplicationSettings < ActiveRecord::Migration
+class AddExternalAuthorizationServiceTimeoutToApplicationSettings < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

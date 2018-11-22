@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-class AddClosedColumnsToEpic < ActiveRecord::Migration
+class AddClosedColumnsToEpic < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def up

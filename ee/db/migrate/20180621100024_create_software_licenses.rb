@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # A software license. Used in the License Management feature for CI/CD.
-class CreateSoftwareLicenses < ActiveRecord::Migration
+class CreateSoftwareLicenses < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

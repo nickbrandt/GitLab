@@ -1,5 +1,5 @@
 # rubocop:disable Migration/SaferBooleanColumn
-class AddElasticsearchExperimentalIndexerToApplicationSettings < ActiveRecord::Migration
+class AddElasticsearchExperimentalIndexerToApplicationSettings < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

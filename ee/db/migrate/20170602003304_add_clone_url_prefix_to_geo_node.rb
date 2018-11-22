@@ -1,7 +1,7 @@
 # See http://doc.gitlab.com/ce/development/migration_style_guide.html
 # for more information on how to write migrations for GitLab.
 
-class AddCloneUrlPrefixToGeoNode < ActiveRecord::Migration
+class AddCloneUrlPrefixToGeoNode < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def change

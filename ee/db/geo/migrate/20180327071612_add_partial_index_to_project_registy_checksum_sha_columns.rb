@@ -1,4 +1,4 @@
-class AddPartialIndexToProjectRegistyChecksumShaColumns < ActiveRecord::Migration
+class AddPartialIndexToProjectRegistyChecksumShaColumns < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

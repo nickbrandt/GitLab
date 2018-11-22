@@ -1,4 +1,4 @@
-class AddAwsElasticsearch < ActiveRecord::Migration
+class AddAwsElasticsearch < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

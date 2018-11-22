@@ -1,4 +1,4 @@
-class AddResyncWasScheduledAtToProjectRegistry < ActiveRecord::Migration
+class AddResyncWasScheduledAtToProjectRegistry < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false
