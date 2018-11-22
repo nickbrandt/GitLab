@@ -599,13 +599,13 @@ msgstr ""
 msgid "An error has occurred"
 msgstr ""
 
-msgid "An error occurred creating the new branch."
-msgstr ""
-
 msgid "An error occurred adding a draft to the discussion."
 msgstr ""
 
 msgid "An error occurred adding a new draft."
+msgstr ""
+
+msgid "An error occurred creating the new branch."
 msgstr ""
 
 msgid "An error occurred previewing the blob"
@@ -1597,14 +1597,10 @@ msgstr ""
 msgid "CiVariable|All environments"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "CiVariable|Create wildcard"
 msgstr ""
 
-msgid "CiVariable|Error occured while saving variables"
-=======
 msgid "CiVariable|Error occurred while saving variables"
->>>>>>> upstream/master
 msgstr ""
 
 msgid "CiVariable|New environment"
