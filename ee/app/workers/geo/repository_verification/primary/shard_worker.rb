@@ -52,7 +52,7 @@ module Geo
           remaining_capacity = db_retrieve_batch_size - resources.size
           return resources if remaining_capacity.zero?
 
-          resources + find_failed_project_ids(batch_size: remaining_capacity)
+          resources + find_project_ids_to_reverify(batch_size: remaining_capacity)
         end
 
         # rubocop: disable CodeReuse/ActiveRecord
@@ -66,6 +66,13 @@ module Geo
           finder.find_outdated_projects(batch_size: batch_size).pluck(:id)
         end
         # rubocop: enable CodeReuse/ActiveRecord
+
+        def find_project_ids_to_reverify(batch_size:)
+          failed_project_ids = find_failed_project_ids(batch_size: batch_size)
+          reverifiable_project_ids = find_reverifiable_projects_ids(batch_size: batch_size)
+
+          take_batch(failed_project_ids, reverifiable_project_ids, batch_size: batch_size)
+        end
 
         def find_failed_project_ids(batch_size:)
           repositories_ids = find_failed_repositories_ids(batch_size: batch_size)
@@ -85,6 +92,24 @@ module Geo
           finder.find_failed_wikis(batch_size: batch_size).pluck(:id)
         end
         # rubocop: enable CodeReuse/ActiveRecord
+
+        # rubocop: disable CodeReuse/ActiveRecord
+        def find_reverifiable_projects_ids(batch_size:)
+          return [] unless reverification_enabled?
+
+          jitter   = (minimum_reverification_interval.seconds * rand(15)) / 100
+          interval = minimum_reverification_interval.ago + jitter.seconds
+
+          repository_ids = finder.find_reverifiable_repositories(interval: interval, batch_size: batch_size).pluck(:id)
+          wiki_ids = finder.find_reverifiable_wikis(interval: interval, batch_size: batch_size).pluck(:id)
+
+          take_batch(repository_ids, wiki_ids, batch_size: batch_size)
+        end
+        # rubocop: enable CodeReuse/ActiveRecord
+
+        def minimum_reverification_interval
+          ::Gitlab::Geo.current_node.minimum_reverification_interval.days
+        end
       end
     end
   end
