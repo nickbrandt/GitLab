@@ -9247,11 +9247,10 @@ msgstr ""
 msgid "Wiki|Wiki Pages"
 msgstr ""
 
-<<<<<<< HEAD
-msgid "With contribution analytics you can have an overview for the activity of issues, merge requests and push events of your organization and its members."
-=======
 msgid "Will deploy to"
->>>>>>> upstream/master
+msgstr ""
+
+msgid "With contribution analytics you can have an overview for the activity of issues, merge requests and push events of your organization and its members."
 msgstr ""
 
 msgid "Withdraw Access Request"
