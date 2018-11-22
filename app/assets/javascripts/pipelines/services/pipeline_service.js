@@ -15,6 +15,10 @@ export default class PipelineService {
   }
 
   static getSecurityReport(endpoint) {
-    return axios.get(endpoint);
+    return axios.get(`${endpoint}.json`);
+  }
+
+  static getUpstreamDownstream(endpoint) {
+    return axios.get(`${endpoint}.json`)
   }
 }

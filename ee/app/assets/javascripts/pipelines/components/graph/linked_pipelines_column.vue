@@ -1,9 +1,9 @@
 <script>
-import linkedPipeline from './linked_pipeline.vue';
+import LinkedPipeline from './linked_pipeline.vue';
 
 export default {
   components: {
-    linkedPipeline,
+    LinkedPipeline,
   },
   props: {
     columnTitle: {
@@ -19,7 +19,6 @@ export default {
       required: true,
     },
   },
-
   computed: {
     columnClass() {
       return `graph-position-${this.graphPosition}`;
@@ -42,7 +41,7 @@ export default {
         :pipeline-id="pipeline.id"
         :project-name="pipeline.project.name"
         :pipeline-status="pipeline.details.status"
-        :pipeline-path="pipeline.path"
+        @pipelineClicked="$emit('linkedPipelineClick', pipeline)"
       />
     </ul>
   </div>

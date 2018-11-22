@@ -1,21 +1,18 @@
 <script>
-import ciStatus from '~/vue_shared/components/ci_icon.vue';
-import tooltip from '~/vue_shared/directives/tooltip';
+import { GlTooltipDirective, GlButton } from '@gitlab/ui'
+import CiStatus from '~/vue_shared/components/ci_icon.vue';
 
 export default {
   directives: {
-    tooltip,
+    GlTooltip: GlTooltipDirective,
   },
   components: {
-    ciStatus,
+    CiStatus,
+    GlButton,
   },
   props: {
     pipelineId: {
       type: Number,
-      required: true,
-    },
-    pipelinePath: {
-      type: String,
       required: true,
     },
     pipelineStatus: {
@@ -39,20 +36,18 @@ export default {
   <li class="linked-pipeline build">
     <div class="curve"></div>
     <div>
-      <a
-        v-tooltip
-        :href="pipelinePath"
+      <gl-button
+        v-gl-tooltip
+        @click="$emit('pipelineClicked')"
         :title="tooltipText"
         class="linked-pipeline-content"
-        data-container="body"
       >
-        <span class="linked-pipeline-status ci-status-text">
-          <ci-status :status="pipelineStatus" />
-        </span>
-        <span class="linked-pipeline-project-name">{{ projectName }}</span>
-        <span class="project-name-pipeline-id-separator">&#8226;</span>
-        <span class="linked-pipeline-id">#{{ pipelineId }}</span>
-      </a>
+        <ci-status :status="pipelineStatus" class="js-linked-pipeline-status" />
+
+        <span class="linked-pipeline-project-name ci-status-text">{{ projectName }}</span>
+        <span class="project-name-pipeline-id-separator ci-status-text">&#8226;</span>
+        <span class="linked-pipeline-id ci-status-text">#{{ pipelineId }}</span>
+      </gl-button>
     </div>
   </li>
 </template>

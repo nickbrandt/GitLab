@@ -44,7 +44,8 @@ export default class pipelinesMediator {
     this.store.storePipeline(response.data);
   }
 
-  errorCallback() {
+  errorCallback(error) {
+    console.log(error)
     this.state.isLoading = false;
     Flash(__('An error occurred while fetching the pipeline.'));
   }
@@ -57,5 +58,27 @@ export default class pipelinesMediator {
       .then(response => this.successCallback(response))
       .catch(() => this.errorCallback())
       .finally(() => this.poll.restart());
+  }
+
+  fetchTriggeredPipeline(pipeline) {
+    this.store.requestTriggeredPipeline(pipeline);
+
+    return PipelineService.getUpstreamDownstream(pipeline.path)
+      .then(({data}) => this.store.receiveTriggeredPipelineSuccess(pipeline, data))
+      .catch(() => {
+        this.store.receiveTriggeredPipelineError(pipeline);
+        Flash(__('An error occured while fetching this upstream pipeline. Please try again'))
+      })
+  }
+
+  fetchTriggeredByPipeline(pipeline) {
+    this.store.requestTriggeredByPipeline(pipeline);
+
+    return PipelineService.getUpstreamDownstream(pipeline.path)
+      .then(({data}) => this.store.receiveTriggeredByPipelineSuccess(pipeline, data))
+      .catch(() => {
+        this.store.receiveTriggeredByPipelineError(pipeline);
+        Flash(__('An error occured while fetching this upstream pipeline. Please try again'))
+      })
   }
 }

@@ -19,27 +19,51 @@ export default {
       type: Object,
       required: true,
     },
+    triggered: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
+    tiggeredBy: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
+    triggeredByPipelines: {
+      type: Array,
+      required: false,
+      default: [],
+    },
+    triggeredPipelines: {
+      type: Array,
+      required: false,
+      default: [],
+    }
   },
 
   computed: {
     graph() {
       return this.pipeline.details && this.pipeline.details.stages;
     },
-    triggered() {
-      return this.pipeline.triggered || [];
+    triggeredGraph() {
+      return this.triggered && this.triggered.details && this.triggered.details.stages;
     },
-    triggeredBy() {
-      const response = this.pipeline.triggered_by;
-      return response ? [response] : [];
+    triggeredByGraph() {
+      return this.triggeredBy && this.triggeredBy.details && this.triggeredBy.details.stages;
     },
     hasTriggered() {
-      return !!this.triggered.length;
+      return this.triggeredPipelines.length > 0;
     },
     hasTriggeredBy() {
-      return !!this.triggeredBy.length;
+      return this.triggeredByPipelines.length > 0;
+    },
+    shouldRenderTriggeredPipeline() {
+      return !this.isLoading && !_.isEmpty(this.triggered)
+    },
+    shouldRenderTriggeredByPipeline() {
+      return !this.isLoading && !_.isEmpty(this.triggeredBy)
     },
   },
-
   methods: {
     capitalizeStageName(name) {
       const escapedName = _.escape(name);
@@ -75,11 +99,19 @@ export default {
     <div class="pipeline-visualization pipeline-graph pipeline-tab-content">
       <div class="text-center"><gl-loading-icon v-if="isLoading" :size="3" /></div>
 
+      <ul
+        v-if="shouldRenderTriggeredPipeline"
+        class="stage-column-list"
+      >
+        triggered pipeline should open here 
+      </ul>
+
       <linked-pipelines-column
         v-if="hasTriggeredBy"
-        :linked-pipelines="triggeredBy"
-        column-title="Upstream"
+        :linked-pipelines="triggeredByPipelines"
+        :column-title="__('Upstream')"
         graph-position="left"
+        @linkedPipelineClick="(pipeline) => $emit('onClickTriggeredBy', pipeline)"
       />
 
       <ul
@@ -108,9 +140,10 @@ export default {
 
       <linked-pipelines-column
         v-if="hasTriggered"
-        :linked-pipelines="triggered"
-        column-title="Downstream"
+        :linked-pipelines="triggeredPipelines"
+        :column-title="__('Downstream')"
         graph-position="right"
+        @linkedPipelineClick="(pipeline) => $emit('onClickTriggered', pipeline)"
       />
     </div>
   </div>
