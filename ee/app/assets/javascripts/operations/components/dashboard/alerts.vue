@@ -56,38 +56,16 @@ export default {
 
 <template>
   <div class="row">
-    <div
-      class="col-12 d-flex align-items-center"
-    >
-      <icon
-        :class="alertClasses"
-        name="warning"
-      />
-      <span
-        class="js-alert-count text-secondary prepend-left-4"
-      >
-        {{ alertCount }}
-      </span>
+    <div class="col-12 d-flex align-items-center">
+      <icon :class="alertClasses" name="warning" />
+      <span class="js-alert-count text-secondary prepend-left-4"> {{ alertCount }} </span>
     </div>
     <div class="js-last-alert col-12">
-      <a
-        v-if="alertPath"
-        :href="alertPath"
-        class="js-alert-link cgray"
-      >
-        <span
-          v-if="lastAlert"
-          class="str-truncated-60"
-        >
-          {{ lastAlert.title }}
-        </span>
-        <span>
-          {{ lastAlertText }}
-        </span>
+      <a v-if="alertPath" :href="alertPath" class="js-alert-link cgray">
+        <span v-if="lastAlert" class="str-truncated-60"> {{ lastAlert.title }} </span>
+        <span> {{ lastAlertText }} </span>
       </a>
-      <span v-else>
-        {{ lastAlertText }}
-      </span>
+      <span v-else> {{ lastAlertText }} </span>
     </div>
   </div>
 </template>

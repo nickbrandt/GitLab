@@ -46,6 +46,7 @@ export default {
         'is-requesting being-posted': this.isRequesting,
         'disabled-content': this.isDeleting,
         target: this.isTarget,
+        'is-editable': this.note.current_user.can_edit,
       };
     },
     canResolve() {
@@ -186,11 +187,7 @@ export default {
           :img-alt="author.name"
           :img-size="40"
         >
-          <slot
-            slot="avatar-badge"
-            name="avatar-badge"
-          >
-          </slot>
+          <slot slot="avatar-badge" name="avatar-badge"> </slot>
         </user-avatar-link>
       </div>
       <div class="timeline-content">

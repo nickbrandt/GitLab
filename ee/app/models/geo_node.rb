@@ -240,7 +240,7 @@ class GeoNode < ActiveRecord::Base
   end
 
   def api_url(suffix)
-    URI.join(uri, "#{uri.path}", "api/#{API::API.version}/#{suffix}").to_s
+    Gitlab::Utils.append_path(uri.to_s, "api/#{API::API.version}/#{suffix}")
   end
 
   def ensure_access_keys!

@@ -1,7 +1,7 @@
 <script>
 import { mapGetters, mapActions, mapState } from 'vuex';
 import Chart from 'chart.js';
-import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
+import { GlLoadingIcon } from '@gitlab/ui';
 import bp from '~/breakpoints';
 import { getMonthNames } from '~/lib/utils/datetime_utility';
 import EmptyState from './empty_state.vue';
@@ -166,57 +166,58 @@ export default {
 </script>
 <template>
   <div class="issues-analytics-wrapper">
-    <div
-      v-if="loading"
-      class="issues-analytics-loading text-center"
-    >
-      <gl-loading-icon
-        :inline="true"
-        :size="4"
-      />
+    <div v-if="loading" class="issues-analytics-loading text-center">
+      <gl-loading-icon :inline="true" :size="4" />
     </div>
-    <div
-      v-if="showChart"
-      class="issues-analytics-chart">
+    <div v-if="showChart" class="issues-analytics-chart">
       <h4 class="chart-title">{{ s__('IssuesAnalytics|Issues created per month') }}</h4>
       <div class="d-flex">
-        <div class="chart-legend d-none d-sm-block bold align-self-center">{{ s__('IssuesAnalytics|Issues Created') }}</div>
+        <div class="chart-legend d-none d-sm-block bold align-self-center">
+          {{ s__('IssuesAnalytics|Issues Created') }}
+        </div>
         <div class="chart-canvas-wrapper">
-          <canvas
-            ref="issuesChart"
-            height="300"
-            class="append-bottom-15"
-          ></canvas>
+          <canvas ref="issuesChart" height="300" class="append-bottom-15"></canvas>
         </div>
       </div>
-      <p class="bold text-center">{{ s__('IssuesAnalytics|Last 12 months') }} ({{ chartDateRange }})</p>
+      <p class="bold text-center">
+        {{ s__('IssuesAnalytics|Last 12 months') }} ({{ chartDateRange }})
+      </p>
       <div
         ref="chartTooltip"
-        :class="[showPopover ? 'show' : 'hide', popoverPositionLeft ? 'bs-popover-right' : 'bs-popover-left']"
+        :class="[
+          showPopover ? 'show' : 'hide',
+          popoverPositionLeft ? 'bs-popover-right' : 'bs-popover-left',
+        ]"
         class="popover no-pointer-events"
         role="tooltip"
       >
         <div class="arrow"></div>
         <h3 class="popover-header">{{ popoverTitle }}</h3>
         <div class="popover-body">
-          <span class="popover-label">{{ s__('IssuesAnalytics|Issues Created') }}</span> 
+          <span class="popover-label">{{ s__('IssuesAnalytics|Issues Created') }}</span>
           {{ popoverContent }}
         </div>
       </div>
     </div>
-    <empty-state 
+    <empty-state
       v-if="showFiltersEmptyState"
       image="illustrations/issues.svg"
       :title="s__('IssuesAnalytics|Sorry, your filter produced no results')"
-      :summary="s__('IssuesAnalytics|To widen your search, change or remove filters in the filter bar above')"
+      :summary="
+        s__(
+          'IssuesAnalytics|To widen your search, change or remove filters in the filter bar above',
+        )
+      "
     />
-    <empty-state 
+    <empty-state
       v-if="showNoDataEmptyState"
       image="illustrations/monitoring/getting_started.svg"
       :title="s__('IssuesAnalytics|There are no issues for the projects in your group')"
-      :summary="s__(
-        'IssuesAnalytics|After you begin creating issues for your projects, we can start tracking and displaying metrics for them'
-      )"
+      :summary="
+        s__(
+          'IssuesAnalytics|After you begin creating issues for your projects, we can start tracking and displaying metrics for them',
+        )
+      "
     />
   </div>
 </template>

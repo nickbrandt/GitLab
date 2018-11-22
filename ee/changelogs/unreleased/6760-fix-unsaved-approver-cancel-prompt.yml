@@ -1,5 +1,0 @@
----
-title: Fix approver removal still being conducted even when "Cancel" is clicked in confirmation prompt
-merge_request: 8178
-author:
-type: fixed

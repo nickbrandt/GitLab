@@ -605,7 +605,7 @@ msgstr ""
 msgid "An error occured whilst fetching the job trace."
 msgstr ""
 
-msgid "An error occured whilst fetching the latest pipline."
+msgid "An error occured whilst fetching the latest pipeline."
 msgstr ""
 
 msgid "An error occured whilst loading all the files."
@@ -1339,6 +1339,9 @@ msgstr ""
 msgid "CI / CD"
 msgstr ""
 
+msgid "CI / CD Charts"
+msgstr ""
+
 msgid "CI / CD Settings"
 msgstr ""
 
@@ -1448,6 +1451,9 @@ msgid "Changelog"
 msgstr ""
 
 msgid "Changes are shown as if the <b>source</b> revision was being merged into the <b>target</b> revision."
+msgstr ""
+
+msgid "Changes suppressed. Click to show."
 msgstr ""
 
 msgid "Charts"
@@ -2303,6 +2309,9 @@ msgstr ""
 msgid "Contribution"
 msgstr ""
 
+msgid "Contribution Charts"
+msgstr ""
+
 msgid "Contribution guide"
 msgstr ""
 
@@ -2352,6 +2361,9 @@ msgid "Copy ID to clipboard"
 msgstr ""
 
 msgid "Copy SSH clone URL"
+msgstr ""
+
+msgid "Copy SSH public key"
 msgstr ""
 
 msgid "Copy SSH public key to clipboard"
@@ -2612,6 +2624,9 @@ msgstr ""
 msgid "Define a custom pattern with cron syntax"
 msgstr ""
 
+msgid "Define environments in the deploy stage(s) in <code>.gitlab-ci.yml</code> to track deployments here."
+msgstr ""
+
 msgid "DelayedJobs|Are you sure you want to run %{jobName} immediately? Otherwise this job will run automatically after it's timer finishes."
 msgstr ""
 
@@ -2869,6 +2884,9 @@ msgstr ""
 msgid "Dismiss Merge Request promotion"
 msgstr ""
 
+msgid "Dismiss trial promotion"
+msgstr ""
+
 msgid "Do you want to customize how Google Code email addresses and usernames are imported into GitLab?"
 msgstr ""
 
@@ -2938,6 +2956,9 @@ msgstr ""
 msgid "Edit application"
 msgstr ""
 
+msgid "Edit environment"
+msgstr ""
+
 msgid "Edit files in the editor and commit changes here"
 msgstr ""
 
@@ -2950,7 +2971,7 @@ msgstr ""
 msgid "Elasticsearch"
 msgstr ""
 
-msgid "Elasticsearch intergration. Elasticsearch AWS IAM."
+msgid "Elasticsearch integration. Elasticsearch AWS IAM."
 msgstr ""
 
 msgid "Email"
@@ -3037,6 +3058,9 @@ msgstr ""
 msgid "Environments"
 msgstr ""
 
+msgid "Environments allow you to track deployments of your application %{link_to_read_more}."
+msgstr ""
+
 msgid "Environments|An error occurred while fetching the environments."
 msgstr ""
 
@@ -3110,6 +3134,9 @@ msgid "Environments|Stop"
 msgstr ""
 
 msgid "Environments|Stop environment"
+msgstr ""
+
+msgid "Environments|Stopping"
 msgstr ""
 
 msgid "Environments|Updated"
@@ -3289,6 +3316,9 @@ msgstr ""
 msgid "External Classification Policy Authorization"
 msgstr ""
 
+msgid "External URL"
+msgstr ""
+
 msgid "External authentication"
 msgstr ""
 
@@ -3335,6 +3365,9 @@ msgid "Failed to remove mirror."
 msgstr ""
 
 msgid "Failed to remove the pipeline schedule"
+msgstr ""
+
+msgid "Failed to signing using smartcard authentication"
 msgstr ""
 
 msgid "Failed to update issues, please try again."
@@ -3428,6 +3461,18 @@ msgid "February"
 msgstr ""
 
 msgid "Fields on this page are now uneditable, you can configure"
+msgstr ""
+
+msgid "File added"
+msgstr ""
+
+msgid "File deleted"
+msgstr ""
+
+msgid "File mode changed from %{a_mode} to %{b_mode}"
+msgstr ""
+
+msgid "File moved"
 msgstr ""
 
 msgid "File templates"
@@ -3551,6 +3596,9 @@ msgid "Format"
 msgstr ""
 
 msgid "Found errors in your .gitlab-ci.yml:"
+msgstr ""
+
+msgid "Free Trial of GitLab.com Gold"
 msgstr ""
 
 msgid "From %{provider_title}"
@@ -4469,6 +4517,12 @@ msgstr ""
 msgid "Invite"
 msgstr ""
 
+msgid "Invoke Count"
+msgstr ""
+
+msgid "Invoke Time"
+msgstr ""
+
 msgid "Issue"
 msgstr ""
 
@@ -4881,6 +4935,9 @@ msgstr ""
 msgid "Locks give the ability to lock specific file or folder."
 msgstr ""
 
+msgid "Login with smartcard"
+msgstr ""
+
 msgid "Logs"
 msgstr ""
 
@@ -5092,6 +5149,9 @@ msgid "Metrics - Prometheus"
 msgstr ""
 
 msgid "Metrics and profiling"
+msgstr ""
+
+msgid "Metrics for environment"
 msgstr ""
 
 msgid "Metrics|Business"
@@ -5337,6 +5397,9 @@ msgstr ""
 msgid "New Application"
 msgstr ""
 
+msgid "New Environment"
+msgstr ""
+
 msgid "New Group"
 msgstr ""
 
@@ -5367,6 +5430,9 @@ msgid "New branch unavailable"
 msgstr ""
 
 msgid "New directory"
+msgstr ""
+
+msgid "New environment"
 msgstr ""
 
 msgid "New epic"
@@ -5435,6 +5501,9 @@ msgstr ""
 msgid "No contributions were found"
 msgstr ""
 
+msgid "No credit card required."
+msgstr ""
+
 msgid "No due date"
 msgstr ""
 
@@ -5469,6 +5538,9 @@ msgid "No other labels with such name or description"
 msgstr ""
 
 msgid "No packages stored for this project."
+msgstr ""
+
+msgid "No preview for this file type"
 msgstr ""
 
 msgid "No prioritised labels with such name or description"
@@ -5816,6 +5888,9 @@ msgid "Permissions, LFS, 2FA"
 msgstr ""
 
 msgid "Personal Access Token"
+msgstr ""
+
+msgid "Pick a name"
 msgstr ""
 
 msgid "Pipeline"
@@ -6685,6 +6760,9 @@ msgstr ""
 msgid "Read more"
 msgstr ""
 
+msgid "Read more about environments"
+msgstr ""
+
 msgid "Read more about project permissions <strong>%{link_to_help}</strong>"
 msgstr ""
 
@@ -6718,6 +6796,9 @@ msgid "Regex pattern"
 msgstr ""
 
 msgid "Register / Sign In"
+msgstr ""
+
+msgid "Register U2F device"
 msgstr ""
 
 msgid "Register and see your runners for this group."
@@ -7166,16 +7247,19 @@ msgstr ""
 msgid "Security Reports|At this time, the security dashboard only supports SAST."
 msgstr ""
 
-msgid "Security Reports|Dismiss Vulnerability"
+msgid "Security Reports|Create issue"
+msgstr ""
+
+msgid "Security Reports|Dismiss vulnerability"
 msgstr ""
 
 msgid "Security Reports|More info"
 msgstr ""
 
-msgid "Security Reports|New Issue"
+msgid "Security Reports|Revert dismissal"
 msgstr ""
 
-msgid "Security Reports|Security Dashboard Documentation"
+msgid "Security Reports|Security dashboard documentation"
 msgstr ""
 
 msgid "Security Reports|There was an error creating the issue."
@@ -7184,13 +7268,10 @@ msgstr ""
 msgid "Security Reports|There was an error dismissing the vulnerability."
 msgstr ""
 
-msgid "Security Reports|There was an error undoing the dismissal."
+msgid "Security Reports|There was an error reverting the dismissal."
 msgstr ""
 
-msgid "Security Reports|There was an error undoing this dismissal."
-msgstr ""
-
-msgid "Security Reports|Undo Dismissal"
+msgid "Security Reports|There was an error reverting this dismissal."
 msgstr ""
 
 msgid "SecurityDashboard| The security dashboard displays the latest security report. Use it to find and fix vulnerabilities."
@@ -7200,6 +7281,12 @@ msgid "SecurityDashboard|Monitor vulnerabilities in your code"
 msgstr ""
 
 msgid "SecurityDashboard|Pipeline %{pipelineLink} triggered"
+msgstr ""
+
+msgid "See metrics"
+msgstr ""
+
+msgid "See the affected projects in the GitLab admin panel"
 msgstr ""
 
 msgid "Select"
@@ -7319,6 +7406,9 @@ msgstr ""
 msgid "Set up assertions/attributes/claims (email, first_name, last_name) and NameID according to %{docsLinkStart}the documentation %{icon}%{docsLinkEnd}"
 msgstr ""
 
+msgid "Set up new U2F device"
+msgstr ""
+
 msgid "Set up your project to automatically push and/or pull changes to/from another repository. Branches, tags, and commits will be synced automatically."
 msgstr ""
 
@@ -7426,6 +7516,9 @@ msgstr ""
 msgid "Sign in to %{group_name}"
 msgstr ""
 
+msgid "Sign in via 2FA code"
+msgstr ""
+
 msgid "Sign in with Single Sign-On"
 msgstr ""
 
@@ -7451,6 +7544,12 @@ msgid "Slack integration allows you to interact with GitLab via slash commands i
 msgstr ""
 
 msgid "Slower but makes sure the project workspace is pristine as it clones the repository from scratch for every job"
+msgstr ""
+
+msgid "Smartcard"
+msgstr ""
+
+msgid "Smartcard authentication failed: client certificate header is missing."
 msgstr ""
 
 msgid "Snippets"
@@ -7705,6 +7804,9 @@ msgstr ""
 msgid "Start the Runner!"
 msgstr ""
 
+msgid "Start your trial"
+msgstr ""
+
 msgid "Started"
 msgstr ""
 
@@ -7763,9 +7865,6 @@ msgid "Subscribe at project level"
 msgstr ""
 
 msgid "Subscribed"
-msgstr ""
-
-msgid "Summary of issues, merge requests, push events, and comments (Timezone: %{utcFormatted})"
 msgstr ""
 
 msgid "Switch branch/tag"
@@ -7885,6 +7984,9 @@ msgid "Template"
 msgstr ""
 
 msgid "Templates"
+msgstr ""
+
+msgid "Terminal for environment"
 msgstr ""
 
 msgid "Terms of Service Agreement and Privacy Policy"
@@ -8070,6 +8172,9 @@ msgstr ""
 msgid "Third party offers"
 msgstr ""
 
+msgid "This %{viewer} could not be displayed because %{reason}."
+msgstr ""
+
 msgid "This GitLab instance does not provide any shared Runners yet. Instance administrators can register shared Runners in the admin area."
 msgstr ""
 
@@ -8095,6 +8200,9 @@ msgid "This date is before the start date, so this epic won't appear in the road
 msgstr ""
 
 msgid "This diff is collapsed."
+msgstr ""
+
+msgid "This diff was suppressed by a .gitattributes entry."
 msgstr ""
 
 msgid "This directory"
@@ -8485,6 +8593,9 @@ msgstr ""
 msgid "To open Jaeger and easily view tracing from GitLab, link the %{start_tag}Tracing%{end_tag} page to your server"
 msgstr ""
 
+msgid "To preserve performance only <strong>%{display_size} of ${real_size}</strong> files are displayed."
+msgstr ""
+
 msgid "To set up SAML authentication for your group through an identity provider like Azure, Okta, Onelogin, Ping Identity, or your custom SAML 2.0 provider:"
 msgstr ""
 
@@ -8513,6 +8624,9 @@ msgid "Todos"
 msgstr ""
 
 msgid "Toggle Sidebar"
+msgstr ""
+
+msgid "Toggle comments for this file"
 msgstr ""
 
 msgid "Toggle commit description"
@@ -8594,6 +8708,15 @@ msgid "Troubleshoot and monitor your application with tracing"
 msgstr ""
 
 msgid "Try again"
+msgstr ""
+
+msgid "Try again?"
+msgstr ""
+
+msgid "Try all GitLab has to offer for 30 days."
+msgstr ""
+
+msgid "Trying to communicate with your device. Plug it in (if you haven't already) and press the button on the device now."
 msgstr ""
 
 msgid "Turn on Service Desk"
@@ -8788,9 +8911,6 @@ msgstr ""
 msgid "UserProfile|Personal projects"
 msgstr ""
 
-msgid "UserProfile|Recent contributions"
-msgstr ""
-
 msgid "UserProfile|Report abuse"
 msgstr ""
 
@@ -8840,6 +8960,12 @@ msgid "View %{alerts}"
 msgstr ""
 
 msgid "View app"
+msgstr ""
+
+msgid "View deployment"
+msgstr ""
+
+msgid "View details: %{details_url}"
 msgstr ""
 
 msgid "View documentation"
@@ -8942,6 +9068,9 @@ msgid "We detected potential spam in the %{humanized_resource_name}. Please solv
 msgstr ""
 
 msgid "We don't have enough data to show this stage."
+msgstr ""
+
+msgid "We heard back from your U2F device. You have been authenticated."
 msgstr ""
 
 msgid "We want to be sure it is you, please confirm you are not a robot."
@@ -9151,6 +9280,9 @@ msgstr ""
 msgid "You are on a read-only GitLab instance."
 msgstr ""
 
+msgid "You are receiving this message because you are a GitLab administrator for %{url}."
+msgstr ""
+
 msgid "You can %{linkStart}view the blob%{linkEnd} instead."
 msgstr ""
 
@@ -9202,6 +9334,9 @@ msgstr ""
 msgid "You don't have any authorized applications"
 msgstr ""
 
+msgid "You don't have any deployments right now."
+msgstr ""
+
 msgid "You have no permissions"
 msgstr ""
 
@@ -9221,6 +9356,9 @@ msgid "You need git-lfs version %{min_git_lfs_version} (or greater) to continue.
 msgstr ""
 
 msgid "You need permission."
+msgstr ""
+
+msgid "You need to register a two-factor authentication app before you can set up a U2F device."
 msgstr ""
 
 msgid "You will loose all changes you've made to this file. This action cannot be undone."
@@ -9283,10 +9421,16 @@ msgstr ""
 msgid "Your Todos"
 msgstr ""
 
+msgid "Your U2F device needs to be set up. Plug it in (if not already) and click the button on the left."
+msgstr ""
+
 msgid "Your applications (%{size})"
 msgstr ""
 
 msgid "Your authorized applications"
+msgstr ""
+
+msgid "Your browser doesn't support U2F. Please use Google Chrome desktop (version 41 or newer)."
 msgstr ""
 
 msgid "Your changes can be committed to %{branch_name} because a merge request is open."
@@ -9299,6 +9443,9 @@ msgid "Your changes have been saved"
 msgstr ""
 
 msgid "Your comment will not be visible to the public."
+msgstr ""
+
+msgid "Your device was successfully set up! Give it a name and register it with the GitLab server."
 msgstr ""
 
 msgid "Your groups"
@@ -9569,6 +9716,9 @@ msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "deleted"
+msgstr ""
+
 msgid "deploy token"
 msgstr ""
 
@@ -9584,6 +9734,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "enabled"
+msgstr ""
+
+msgid "error code:"
 msgstr ""
 
 msgid "estimateCommand|%{slash_command} will update the estimated time with the latest command."
@@ -9662,10 +9815,10 @@ msgstr ""
 msgid "mrWidget|Allows commits from members who can merge to the target branch"
 msgstr ""
 
-msgid "mrWidget|An error occured while removing your approval."
+msgid "mrWidget|An error occurred while removing your approval."
 msgstr ""
 
-msgid "mrWidget|An error occured while retrieving approval data for this merge request."
+msgid "mrWidget|An error occurred while retrieving approval data for this merge request."
 msgstr ""
 
 msgid "mrWidget|An error occurred while submitting your approval."

@@ -1,5 +1,5 @@
 <script>
-import { GlTooltipDirective } from '@gitlab-org/gitlab-ui';
+import { GlTooltipDirective } from '@gitlab/ui';
 import { sprintf, __ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import TooltipOnTruncate from '~/vue_shared/components/tooltip_on_truncate.vue';
@@ -171,17 +171,12 @@ export default {
           :title="__('Confidential')"
           class="confidential-icon append-right-4"
           :aria-label="__('Confidential')"
-        /><a
-          :href="issue.path"
-          :title="issue.title"
-          class="js-no-trigger"
-          @mousemove.stop>{{ issue.title }}</a>
+        /><a :href="issue.path" :title="issue.title" class="js-no-trigger" @mousemove.stop>{{
+          issue.title
+        }}</a>
       </h4>
     </div>
-    <div
-      v-if="showLabelFooter"
-      class="board-card-labels prepend-top-4 d-flex flex-wrap"
-    >
+    <div v-if="showLabelFooter" class="board-card-labels prepend-top-4 d-flex flex-wrap">
       <button
         v-for="label in issue.labels"
         v-if="showLabel(label)"
@@ -191,13 +186,15 @@ export default {
         :title="label.description"
         class="badge color-label append-right-4 prepend-top-4"
         type="button"
-        @click="filterByLabel(label)"
+        @click="filterByLabel(label);"
       >
         {{ label.title }}
       </button>
     </div>
     <div class="board-card-footer d-flex justify-content-between align-items-end">
-      <div class="d-flex align-items-start flex-wrap-reverse board-card-number-container js-board-card-number-container">
+      <div
+        class="d-flex align-items-start flex-wrap-reverse board-card-number-container js-board-card-number-container"
+      >
         <span
           v-if="issue.referencePath"
           class="board-card-number d-flex append-right-8 prepend-top-8"
@@ -207,19 +204,17 @@ export default {
             :title="issueReferencePath"
             placement="bottom"
             class="board-issue-path block-truncated bold"
-          >{{ issueReferencePath }}</tooltip-on-truncate>#{{ issue.iid }}
+            >{{ issueReferencePath }}</tooltip-on-truncate
+          >#{{ issue.iid }}
         </span>
         <span class="board-info-items prepend-top-8 d-inline-block">
-          <issue-due-date
-            v-if="issue.dueDate"
-            :date="issue.dueDate"
-          /><issue-time-estimate
+          <issue-due-date v-if="issue.dueDate" :date="issue.dueDate" /><issue-time-estimate
             v-if="issue.timeEstimate"
             :estimate="issue.timeEstimate"
           /><issue-card-weight
             v-if="issue.weight"
             :weight="issue.weight"
-            @click="filterByWeight(issue.weight)"
+            @click="filterByWeight(issue.weight);"
           />
         </span>
       </div>
@@ -236,8 +231,7 @@ export default {
           tooltip-placement="bottom"
         >
           <span class="js-assignee-tooltip">
-            <span class="bold d-block">Assignee</span>
-            {{ assignee.name }} 
+            <span class="bold d-block">Assignee</span> {{ assignee.name }}
             <span class="text-white-50">@{{ assignee.username }}</span>
           </span>
         </user-avatar-link>

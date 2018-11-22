@@ -3,7 +3,7 @@ import _ from 'underscore';
 import Flash from '~/flash';
 import { s__ } from '~/locale';
 
-import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
+import { GlLoadingIcon } from '@gitlab/ui';
 import epicsListEmpty from './epics_list_empty.vue';
 import roadmapShell from './roadmap_shell.vue';
 
@@ -122,10 +122,7 @@ export default {
 </script>
 
 <template>
-  <div
-    :class="{ 'overflow-reset': isEpicsListEmpty }"
-    class="roadmap-container"
-  >
+  <div :class="{ 'overflow-reset': isEpicsListEmpty }" class="roadmap-container">
     <gl-loading-icon
       v-if="isLoading"
       :label="s__('GroupRoadmap|Loading roadmap')"

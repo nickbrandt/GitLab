@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module AuthHelper
-  prepend EE::AuthHelper
-
   PROVIDERS_WITH_ICONS = %w(twitter github gitlab bitbucket google_oauth2 facebook azure_oauth2 authentiq).freeze
   LDAP_PROVIDER = /\Aldap/
 
@@ -24,6 +22,23 @@ module AuthHelper
 
   def label_for_provider(name)
     Gitlab::Auth::OAuth::Provider.label_for(name)
+  end
+
+  def form_based_provider_priority
+    ['crowd', /^ldap/, 'kerberos']
+  end
+
+  def form_based_provider_with_highest_priority
+    @form_based_provider_with_highest_priority ||= begin
+      form_based_provider_priority.each do |provider_regexp|
+        highest_priority = form_based_providers.find {  |provider| provider.match?(provider_regexp) }
+        break highest_priority unless highest_priority.nil?
+      end
+    end
+  end
+
+  def form_based_auth_provider_has_active_class?(provider)
+    form_based_provider_with_highest_priority == provider
   end
 
   def form_based_provider?(name)
@@ -80,3 +95,9 @@ module AuthHelper
 
   extend self
 end
+
+AuthHelper.prepend(EE::AuthHelper)
+
+# The methods added in EE should be available as both class and instance
+# methods, just like the methods provided by `AuthHelper` itself.
+AuthHelper.extend(EE::AuthHelper)

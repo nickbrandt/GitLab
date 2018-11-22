@@ -25,27 +25,13 @@ export default {
 <template>
   <div class="row empty-state">
     <div class="col-12">
-      <div class="svg-content">
-        <img
-          :src="illustrationPath"
-        />
-      </div>
+      <div class="svg-content"><img :src="illustrationPath" /></div>
     </div>
     <div class="col-12">
       <div class="text-content text-center">
-        <h4>
-          {{ s__('SecurityDashboard|Monitor vulnerabilities in your code') }}
-        </h4>
-        <p>
-          {{ paragraphText }}
-        </p>
-        <a
-          :href="helpPath"
-          class="btn btn-success"
-          rel="nofollow"
-        >
-          {{ __('Learn more') }}
-        </a>
+        <h4>{{ s__('SecurityDashboard|Monitor vulnerabilities in your code') }}</h4>
+        <p>{{ paragraphText }}</p>
+        <a :href="helpPath" class="btn btn-success" rel="nofollow"> {{ __('Learn more') }} </a>
       </div>
     </div>
   </div>

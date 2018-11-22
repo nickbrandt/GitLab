@@ -1,19 +1,21 @@
 # License Management **[ULTIMATE]**
 
-> [Introduced][ee-5483] in [GitLab Ultimate][ee] 11.0.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/5483)
+in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.0.
 
 ## Overview
 
-If you are using [GitLab CI/CD][ci], you can search your project dependencies for their licenses
-using License Management by:
+If you are using [GitLab CI/CD](../../../ci/README.md), you can search your project dependencies for their licenses
+using License Management.
 
-- Including the CI job in your [existing `.gitlab-ci.yml` file][cc-docs].
-- Implicitly using [Auto License Management](../../../topics/autodevops/index.md#auto-dependency-scanning)
-  that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
+You can take advantage of License Management by either [including the CI job](../../../ci/examples/dependency_scanning.md) in
+your existing `.gitlab-ci.yml` file or by implicitly using
+[Auto License Management](../../../topics/autodevops/index.md#auto-license-management)
+that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
 
 In addition, you can [manually approve or blacklist](#manual-license-management) licenses in the project's settings.
 
-GitLab can show the licenses list right in the merge
+Going a step further, GitLab can show the licenses list right in the merge
 request widget area, highlighting the presence of licenses you don't want to use, or new
 ones that need a decision.
 
@@ -38,15 +40,15 @@ The following languages and package managers are supported.
 
 ## How it works
 
-First, you need to define a job named `license_management` in your
-`.gitlab-ci.yml` file. [Check how the `license_management` job should look like][cc-docs].
+First of all, you need to define a job in your `.gitlab-ci.yml` file that generates the
+[License Management report artifact](../../../ci/yaml/README.md#artifactsreportslicense_management).
+For more information on how the License Management job should look like, check the
+example on [Dependencies license management with GitLab CI/CD](../../../ci/examples/license_management.md).
 
-In order for the report to show in the merge request, there are two
-prerequisites:
-
-- the specified job **must** be named `license_management`
-- the resulting report **must** be named `gl-license-management-report.json`
-  and uploaded as an artifact
+GitLab then checks this report, compares the licenses between the source and target
+branches, and shows the information right on the merge request.
+Blacklisted licenses will be clearly visible, as well as new licenses which
+need a decision from you.
 
 >**Note:**
 If the license management report doesn't have anything to compare to, no information
@@ -54,12 +56,6 @@ will be displayed in the merge request area. That is the case when you add the
 `license_management` job in your `.gitlab-ci.yml` for the first time.
 Consecutive merge requests will have something to compare to and the license
 management report will be shown properly.
-
-The `license_management` job will search the application dependencies for licenses,
-the resulting JSON file will be uploaded as an artifact, and
-GitLab will then check this file and show the information inside the merge
-request. Blacklisted licenses will be clearly visible, as well as new licenses which
-need a decision from you.
 
 ![License Management Widget](img/license_management.png)
 
@@ -77,7 +73,8 @@ From the project's settings:
 
 ### Manual license management
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/5940) in [GitLab Ultimate][ee] 11.4.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/5940)
+in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.4.
 
 Licenses can be manually approved or blacklisted in a project's settings.
 
@@ -95,16 +92,11 @@ To approve or blacklist a license:
 
 ## License Management report under pipelines
 
-> [Introduced][ee-5491] in [GitLab Ultimate][ee] 11.2.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/5491)
+in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.2.
 
 From your project's left sidebar, navigate to **CI/CD > Pipelines** and click on the
 pipeline ID that has a `license_management` job to see the Licenses tab with the listed
 licenses (if any).
 
 ![License Management Pipeline Tab](img/license_management_pipeline_tab.png)
-
-[ee-5483]: https://gitlab.com/gitlab-org/gitlab-ee/issues/5483
-[ee-5491]: https://gitlab.com/gitlab-org/gitlab-ee/issues/5491
-[ee]: https://about.gitlab.com/pricing/
-[ci]: ../../../ci/README.md
-[cc-docs]: ../../../ci/examples/license_management.md

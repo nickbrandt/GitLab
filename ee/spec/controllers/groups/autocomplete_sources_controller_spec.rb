@@ -42,7 +42,10 @@ describe Groups::AutocompleteSourcesController do
 
       expect(json_response).to be_an(Array)
       expect(json_response).to include(
-        { 'name' => 'close', 'aliases' => [], 'description' => 'Close this epic', 'params' => [] }
+        {
+          'name' => 'close', 'aliases' => [], 'description' => 'Close this epic',
+          'params' => [], 'warning' => ''
+        }
       )
     end
   end

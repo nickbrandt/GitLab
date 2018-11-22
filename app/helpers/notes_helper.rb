@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module NotesHelper
-  prepend EE::NotesHelper
-
   def note_target_fields(note)
     if note.noteable
       hidden_field_tag(:target_type, note.noteable.class.name.underscore) +
@@ -195,3 +193,5 @@ module NotesHelper
     rendered_for_merge_request? || params['html'].nil?
   end
 end
+
+NotesHelper.prepend(EE::NotesHelper)

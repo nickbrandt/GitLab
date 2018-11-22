@@ -20,14 +20,12 @@ export default {
 <template>
   <div class="bs-callout bs-callout-warning">
     <p>
-      {{ s__("Runners|You have used all your shared Runners pipeline minutes.") }}
+      {{ s__('Runners|You have used all your shared Runners pipeline minutes.') }}
       {{ quotaUsed }} of {{ quotaLimit }}
 
       <template v-if="runnersPath">
-        {{ __("For more information, go to the ") }}
-        <a :href="runnersPath">
-          {{ __("Runners page.") }}
-        </a>
+        {{ __('For more information, go to the ') }}
+        <a :href="runnersPath"> {{ __('Runners page.') }} </a>
       </template>
     </p>
   </div>

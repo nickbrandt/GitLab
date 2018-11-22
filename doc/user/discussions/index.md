@@ -5,6 +5,7 @@ The ability to contribute conversationally is offered throughout GitLab.
 You can leave a comment in the following places:
 
 - issues
+- epics
 - merge requests
 - snippets
 - commits
@@ -283,7 +284,7 @@ in order to allow you to submit them all as a single action.
 
 ### Starting a review
 
-In order to start a review, simply write a comment on a diff as normal under the **Changes** tab 
+In order to start a review, simply write a comment on a diff as normal under the **Changes** tab
 in an MR and click on the **Start a review** button.
 
 ![Starting a review](img/mr_review_start.png)
@@ -314,25 +315,28 @@ Review comments can also resolve/unresolve [resolvable discussions](#resolvable-
 When replying to a comment, you will see a checkbox that you can click in order to resolve or unresolve
 the discussion once published.
 
-![Resolve checkbox](img/mr_review_resolve.png) 
+![Resolve checkbox](img/mr_review_resolve.png)
 ![Unresolve checkbox](img/mr_review_unresolve.png)
 
 If a particular pending comment will resolve or unresolve the discussion, this will be shown on the pending
 comment itself.
 
-![Resolve status](img/mr_review_resolve2.png) 
+![Resolve status](img/mr_review_resolve2.png)
 ![Unresolve status](img/mr_review_unresolve2.png)
 
 ### Submitting a review
 
-If you have any comments that have not been submitted, you will see a bar at the bottom of the screen with two buttons:
+If you have any comments that have not been submitted, you will see a bar at the
+bottom of the screen with two buttons:
 
 - **Discard**: Discards all comments that have not been submitted.
-- **Submit review**: All comments are published. Any quick actions submitted are performed at this time.
+- **Finish review**: Opens a list of comments ready to be submitted for review.
+   Clicking **Submit review** will publish all comments. Any quick actions
+   submitted are performed at this time.
 
-Alternatively, every pending comment has a button to submit the entire review.
+Alternatively, every pending comment has a button to finish the entire review.
 
-![MR Review bar](img/mr_review_bar.png)
+![Review submission](img/review_preview.png)
 
 [ce-5022]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/5022
 [ce-7125]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/7125

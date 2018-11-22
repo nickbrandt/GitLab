@@ -80,17 +80,12 @@ export default {
   <span
     v-if="linkedPipelines"
     :class="{
-      'is-upstream' : isUpstream,
-      'is-downstream': isDownstream
+      'is-upstream': isUpstream,
+      'is-downstream': isDownstream,
     }"
     class="linked-pipeline-mini-list"
   >
-
-    <icon
-      v-if="isDownstream"
-      class="arrow-icon"
-      name="long-arrow"
-    />
+    <icon v-if="isDownstream" class="arrow-icon" name="long-arrow" />
 
     <a
       v-for="pipeline in linkedPipelinesTrimmed"
@@ -103,9 +98,7 @@ export default {
       data-placement="top"
       data-container="body"
     >
-      <icon
-        :name="getStatusIcon(pipeline.details.status.icon)"
-      />
+      <icon :name="getStatusIcon(pipeline.details.status.icon)" />
     </a>
 
     <a
@@ -120,10 +113,6 @@ export default {
       {{ counterLabel }}
     </a>
 
-    <icon
-      v-if="isUpstream"
-      class="arrow-icon"
-      name="long-arrow"
-    />
+    <icon v-if="isUpstream" class="arrow-icon" name="long-arrow" />
   </span>
 </template>

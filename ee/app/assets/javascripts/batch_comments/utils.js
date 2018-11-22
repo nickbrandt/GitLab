@@ -10,7 +10,7 @@ export const getDraftFormData = params => ({
   data: getFormData(params),
 });
 
-export const parallelLineKey = (line, side) => (line[side] ? line[side].lineCode : '');
+export const parallelLineKey = (line, side) => (line[side] ? line[side].line_code : '');
 
 export const showDraftOnSide = (line, side) => {
   // inline mode
@@ -21,8 +21,8 @@ export const showDraftOnSide = (line, side) => {
   // parallel
   if (side === 'left' || side === 'right') {
     const otherSide = side === 'left' ? 'right' : 'left';
-    const thisCode = (line[side] && line[side].lineCode) || '';
-    const otherCode = (line[otherSide] && line[otherSide].lineCode) || '';
+    const thisCode = (line[side] && line[side].line_code) || '';
+    const otherCode = (line[otherSide] && line[otherSide].line_code) || '';
 
     // either the lineCodes are different
     // or if they're the same, only show on the left side

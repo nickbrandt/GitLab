@@ -1,7 +1,7 @@
 <script>
 import $ from 'jquery';
 import GfmAutoComplete from '~/gfm_auto_complete';
-import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
+import { GlLoadingIcon } from '@gitlab/ui';
 import eventHub from '../event_hub';
 import issueToken from './issue_token.vue';
 
@@ -117,7 +117,8 @@ export default {
       :class="{ focus: isInputFocused }"
       class="add-issuable-form-input-wrapper form-control"
       role="button"
-      @click="onInputWrapperClick">
+      @click="onInputWrapperClick"
+    >
       <ul class="add-issuable-form-input-token-list">
         <!--
           We need to ensure this key changes any time the pendingReferences array is updated
@@ -146,7 +147,8 @@ export default {
             class="js-add-issuable-form-input add-issuable-form-input qa-add-issue-input"
             @input="onInput"
             @focus="onFocus"
-            @blur="onBlur" />
+            @blur="onBlur"
+          />
         </li>
       </ul>
     </div>
@@ -155,17 +157,12 @@ export default {
         ref="addButton"
         :disabled="isSubmitButtonDisabled"
         type="submit"
-        class="js-add-issuable-form-add-button btn btn-success float-left qa-add-issue-button">
+        class="js-add-issuable-form-add-button btn btn-success float-left qa-add-issue-button"
+      >
         Add
-        <gl-loading-icon
-          v-if="isSubmitting"
-          ref="loadingIcon"
-          :inline="true" />
+        <gl-loading-icon v-if="isSubmitting" ref="loadingIcon" :inline="true" />
       </button>
-      <button
-        type="button"
-        class="btn btn-default float-right"
-        @click="onFormCancel">
+      <button type="button" class="btn btn-default float-right" @click="onFormCancel">
         Cancel
       </button>
     </div>

@@ -28,6 +28,17 @@ describe EE::User do
     end
   end
 
+  describe '.find_by_smartcard_identity' do
+    let!(:user) { create(:user) }
+    let!(:smartcard_identity) { create(:smartcard_identity, user: user) }
+
+    it 'returns the user' do
+      expect(User.find_by_smartcard_identity(smartcard_identity.subject,
+                                             smartcard_identity.issuer))
+        .to eq(user)
+    end
+  end
+
   describe '#access_level=' do
     let(:user) { build(:user) }
 

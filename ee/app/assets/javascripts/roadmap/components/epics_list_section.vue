@@ -143,10 +143,7 @@ export default {
 </script>
 
 <template>
-  <div
-    :style="sectionContainerStyles"
-    class="epics-list-section"
-  >
+  <div :style="sectionContainerStyles" class="epics-list-section">
     <epic-item
       v-for="(epic, index) in epics"
       :key="index"
@@ -171,10 +168,6 @@ export default {
       >
       </span>
     </div>
-    <div
-      v-if="showBottomShadow"
-      :style="shadowCellStyles"
-      class="scroll-bottom-shadow"
-    ></div>
+    <div v-if="showBottomShadow" :style="shadowCellStyles" class="scroll-bottom-shadow"></div>
   </div>
 </template>

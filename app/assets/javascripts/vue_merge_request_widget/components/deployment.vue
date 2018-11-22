@@ -33,6 +33,10 @@ export default {
       type: Object,
       required: true,
     },
+    showMetrics: {
+      type: Boolean,
+      required: true,
+    },
   },
   deployedTextMap: {
     running: __('Deploying to'),
@@ -40,10 +44,8 @@ export default {
     failed: __('Failed to deploy to'),
   },
   data() {
-    const features = window.gon.features || {};
     return {
       isStopping: false,
-      enableCiEnvironmentsStatusChanges: features.ciEnvironmentsStatusChanges,
     };
   },
   computed: {
@@ -74,10 +76,10 @@ export default {
         : '';
     },
     shouldRenderDropdown() {
-      return (
-        this.enableCiEnvironmentsStatusChanges &&
-        (this.deployment.changes && this.deployment.changes.length > 0)
-      );
+      return this.deployment.changes && this.deployment.changes.length > 0;
+    },
+    showMemoryUsage() {
+      return this.hasMetrics && this.showMetrics;
     },
   },
   methods: {
@@ -114,9 +116,7 @@ export default {
         <div class="deploy-body">
           <div class="js-deployment-info deployment-info">
             <template v-if="hasDeploymentMeta">
-              <span>
-                {{ deployedText }}
-              </span>
+              <span> {{ deployedText }} </span>
               <tooltip-on-truncate
                 :title="deployment.name"
                 truncate-target="child"
@@ -141,7 +141,7 @@ export default {
               {{ deployTimeago }}
             </span>
             <memory-usage
-              v-if="hasMetrics"
+              v-if="showMemoryUsage"
               :metrics-url="deployment.metrics_url"
               :metrics-monitoring-url="deployment.metrics_monitoring_url"
             />
@@ -155,20 +155,14 @@ export default {
                 :main-action-link="deployment.external_url"
                 filter-key="path"
               >
-                <template
-                  slot="mainAction"
-                  slot-scope="slotProps"
-                >
+                <template slot="mainAction" slot-scope="slotProps">
                   <review-app-link
                     :link="deployment.external_url"
                     :css-class="`deploy-link js-deploy-url inline ${slotProps.className}`"
                   />
                 </template>
 
-                <template
-                  slot="result"
-                  slot-scope="slotProps"
-                >
+                <template slot="result" slot-scope="slotProps">
                   <a
                     :href="slotProps.result.external_url"
                     target="_blank"
@@ -191,11 +185,11 @@ export default {
                 css-class="js-deploy-url js-deploy-url-feature-flag deploy-link btn btn-default btn-sm inlin"
               />
             </template>
-            <span 
+            <span
               v-if="deployment.stop_url"
-              v-tooltip 
+              v-tooltip
               :title="deployInProgressTooltip"
-              class="d-inline-block" 
+              class="d-inline-block"
               tabindex="0"
             >
               <loading-button

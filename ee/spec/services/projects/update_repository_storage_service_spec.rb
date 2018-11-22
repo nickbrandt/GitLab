@@ -69,7 +69,9 @@ describe Projects::UpdateRepositoryStorageService do
 
       context 'when the move succeeds' do
         it 'moves the repository and its wiki to the new storage and unmarks the repository as read only' do
-          old_path = project.repository.path_to_repo
+          old_path = Gitlab::GitalyClient::StorageSettings.allow_disk_access do
+            project.repository.path_to_repo
+          end
           old_wiki_path = project.wiki.full_path
 
           expect(repository_double).to receive(:fetch_repository_as_mirror)

@@ -98,17 +98,13 @@ export default {
 
 <template>
   <div class="alert-form">
-    <div
-      :aria-label="s__('PrometheusAlerts|Operator')"
-      class="form-group btn-group"
-      role="group"
-    >
+    <div :aria-label="s__('PrometheusAlerts|Operator')" class="form-group btn-group" role="group">
       <button
         :class="{ active: operator === operators.greaterThan }"
         :disabled="disabled"
         type="button"
         class="btn btn-default"
-        @click="operator = operators.greaterThan"
+        @click="operator = operators.greaterThan;"
       >
         {{ operators.greaterThan }}
       </button>
@@ -117,7 +113,7 @@ export default {
         :disabled="disabled"
         type="button"
         class="btn btn-default"
-        @click="operator = operators.equalTo"
+        @click="operator = operators.equalTo;"
       >
         {{ operators.equalTo }}
       </button>
@@ -126,19 +122,14 @@ export default {
         :disabled="disabled"
         type="button"
         class="btn btn-default"
-        @click="operator = operators.lessThan"
+        @click="operator = operators.lessThan;"
       >
         {{ operators.lessThan }}
       </button>
     </div>
     <div class="form-group">
       <label>{{ s__('PrometheusAlerts|Threshold') }}</label>
-      <input
-        v-model.number="threshold"
-        :disabled="disabled"
-        type="number"
-        class="form-control"
-      />
+      <input v-model.number="threshold" :disabled="disabled" type="number" class="form-control" />
     </div>
     <div class="action-group">
       <button

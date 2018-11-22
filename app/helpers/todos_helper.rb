@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module TodosHelper
-  prepend EE::NotesHelper
-
   def todos_pending_count
     @todos_pending_count ||= current_user.todos_pending_count
   end
@@ -179,3 +177,5 @@ module TodosHelper
     groups.unshift({ id: '', text: 'Any Group' }).to_json
   end
 end
+
+TodosHelper.prepend(EE::NotesHelper)

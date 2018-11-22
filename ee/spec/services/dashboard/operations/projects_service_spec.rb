@@ -3,77 +3,150 @@
 require 'spec_helper'
 
 describe Dashboard::Operations::ProjectsService do
+  PUBLIC = Gitlab::VisibilityLevel::PUBLIC
+  PRIVATE = Gitlab::VisibilityLevel::PRIVATE
+
+  let!(:license) { create(:license, plan: License::ULTIMATE_PLAN) }
+
   let(:user) { create(:user) }
-  let(:project) { create(:project) }
+  let(:project) { create(:project, namespace: namespace, visibility_level: PRIVATE) }
+  let(:namespace) { create(:namespace, visibility_level: PRIVATE) }
   let(:service) { described_class.new(user) }
 
   describe '#execute' do
+    let(:result) { service.execute(projects) }
+
+    shared_examples 'project not found' do
+      it 'returns an empty list' do
+        expect(result).to be_empty
+      end
+    end
+
+    shared_examples 'project found' do
+      it 'returns the project' do
+        expect(result).to contain_exactly(project)
+      end
+    end
+
     before do
       project.add_developer(user)
     end
 
-    it 'returns the project when passing a project id' do
-      projects = service.execute([project.id])
+    context 'when passing a project id' do
+      let(:projects) { [project.id] }
 
-      expect(projects).to contain_exactly(project)
+      it_behaves_like 'project found'
     end
 
-    it 'returns the project when passing a project record' do
-      projects = service.execute([project])
+    context 'when passing a project record' do
+      let(:projects) { [project] }
 
-      expect(projects).to contain_exactly(project)
+      it_behaves_like 'project found'
     end
 
-    describe 'with plans' do
-      let!(:gold_project) { create(:project, namespace: create(:namespace, plan: :gold_plan)) }
-      let!(:silver_project) { create(:project, namespace: create(:namespace, plan: :silver_plan)) }
-      let!(:no_plan_project) { create(:project, namespace: create(:namespace)) }
+    context 'when passing invalid project id' do
+      let(:projects) { [-1] }
 
-      let(:projects) { service.execute([gold_project, silver_project, no_plan_project]) }
-
-      before do
-        gold_project.add_developer(user)
-        silver_project.add_developer(user)
-        no_plan_project.add_developer(user)
-      end
-
-      context 'when namespace plan check is enabled' do
-        before do
-          stub_application_setting(check_namespace_plan: true)
-        end
-
-        it 'returns the gold project' do
-          expect(projects).to contain_exactly(gold_project)
-        end
-      end
-
-      context 'when namespace plan check is disabled' do
-        before do
-          stub_application_setting(check_namespace_plan: false)
-        end
-
-        it 'returns all projects' do
-          expect(projects).to contain_exactly(gold_project, silver_project, no_plan_project)
-        end
-      end
+      it_behaves_like 'project not found'
     end
 
     context 'with insufficient access' do
+      let(:projects) { [project] }
+
       before do
         project.add_reporter(user)
       end
 
-      it 'returns an empty list' do
-        projects = service.execute([project.id])
+      it_behaves_like 'project not found'
+    end
 
-        expect(projects).to be_empty
+    describe 'checking license' do
+      let(:projects) { [project] }
+
+      using RSpec::Parameterized::TableSyntax
+
+      before do
+        stub_application_setting(check_namespace_plan: true)
+        namespace.update!(plan: create(:gold_plan))
+      end
+
+      where(:plan, :trial, :expired, :available) do
+        License::ULTIMATE_PLAN  | false | false | true
+        License::ULTIMATE_PLAN  | false | true  | true
+        License::ULTIMATE_PLAN  | true  | false | false
+        License::ULTIMATE_PLAN  | true  | true  | false
+        License::PREMIUM_PLAN   | false | false | false
+        nil                     | false | false | false
+      end
+
+      with_them do
+        let!(:license) { create(:license, plan: plan, trial: trial, expired: expired) }
+
+        if params[:available]
+          it_behaves_like 'project found'
+        else
+          it_behaves_like 'project not found'
+        end
       end
     end
 
-    it 'does not find by invalid project id' do
-      projects = service.execute([-1])
+    describe 'checking plans' do
+      let(:projects) { [project] }
 
-      expect(projects).to be_empty
+      using RSpec::Parameterized::TableSyntax
+
+      where(:check_namespace_plan, :plan, :available) do
+        true  | :gold_plan   | true
+        true  | :silver_plan | false
+        true  | nil          | false
+        false | :gold_plan   | true
+        false | :silver_plan | true
+        false | nil          | true
+      end
+
+      with_them do
+        before do
+          stub_application_setting(check_namespace_plan: check_namespace_plan)
+          namespace.update!(plan: create(plan)) if plan
+        end
+
+        if params[:available]
+          it_behaves_like 'project found'
+        else
+          it_behaves_like 'project not found'
+        end
+      end
+    end
+
+    describe 'checking availability of public projects on GitLab.com' do
+      let(:projects) { [project] }
+
+      using RSpec::Parameterized::TableSyntax
+
+      where(:check_namespace_plan, :project_visibility, :namespace_visibility, :available) do
+        true  | PUBLIC  | PUBLIC  | true
+        true  | PRIVATE | PUBLIC  | false
+        true  | PUBLIC  | PRIVATE | false
+        true  | PRIVATE | PRIVATE | false
+        false | PUBLIC  | PUBLIC  | true
+        false | PRIVATE | PUBLIC  | true
+        false | PUBLIC  | PRIVATE | true
+        false | PRIVATE | PRIVATE | true
+      end
+
+      with_them do
+        before do
+          stub_application_setting(check_namespace_plan: check_namespace_plan)
+          project.update!(visibility_level: project_visibility)
+          namespace.update!(visibility_level: namespace_visibility)
+        end
+
+        if params[:available]
+          it_behaves_like 'project found'
+        else
+          it_behaves_like 'project not found'
+        end
+      end
     end
   end
 end

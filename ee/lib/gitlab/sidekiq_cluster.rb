@@ -70,14 +70,16 @@ module Gitlab
     #
     # Returns the PID of the started process.
     def self.start_sidekiq(queues, env, directory = Dir.pwd, max_concurrency = 50, dryrun: false)
+      counts = count_by_queue(queues)
+
       cmd = %w[bundle exec sidekiq]
       cmd << "-c #{self.concurrency(queues, max_concurrency)}"
       cmd << "-e#{env}"
-      cmd << "-gqueues: #{queues.join(', ')}"
+      cmd << "-gqueues: #{proc_details(counts)}"
       cmd << "-r#{directory}"
 
-      queues.each do |q|
-        cmd << "-q#{q},1"
+      counts.each do |queue, count|
+        cmd << "-q#{queue},#{count}"
       end
 
       if dryrun
@@ -95,6 +97,20 @@ module Gitlab
       wait_async(pid)
 
       pid
+    end
+
+    def self.count_by_queue(queues)
+      queues.each_with_object(Hash.new(0)) { |element, hash| hash[element] += 1 }
+    end
+
+    def self.proc_details(counts)
+      counts.map do |queue, count|
+        if count == 1
+          queue
+        else
+          "#{queue} (#{count})"
+        end
+      end.join(', ')
     end
 
     def self.concurrency(queues, max_concurrency)

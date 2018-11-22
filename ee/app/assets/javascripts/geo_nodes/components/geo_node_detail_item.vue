@@ -123,9 +123,7 @@ export default {
 <template>
   <div class="node-detail-item prepend-top-15 prepend-left-10">
     <div class="node-detail-title">
-      <span>
-        {{ itemTitle }}
-      </span>
+      <span> {{ itemTitle }} </span>
       <icon
         v-if="hasHelpInfo"
         v-popover="popoverConfig"
@@ -134,18 +132,8 @@ export default {
         name="question"
       />
     </div>
-    <div
-      v-if="isValueTypePlain"
-      :class="cssClass"
-      class="node-detail-value"
-    >
-      {{ itemValue }}
-    </div>
-    <div
-      v-if="isValueTypeGraph"
-      :class="{ 'd-flex': itemValueStale }"
-      class="node-detail-value"
-    >
+    <div v-if="isValueTypePlain" :class="cssClass" class="node-detail-value">{{ itemValue }}</div>
+    <div v-if="isValueTypeGraph" :class="{ 'd-flex': itemValueStale }" class="node-detail-value">
       <stacked-progress-bar
         :css-class="itemValueStale ? 'flex-fill' : ''"
         :success-label="successLabel"

@@ -1,6 +1,6 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
-import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
+import { GlLoadingIcon } from '@gitlab/ui';
 import { sprintf, n__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import DraftsCount from './drafts_count.vue';
@@ -60,7 +60,7 @@ export default {
   <div
     class="dropdown float-right review-preview-dropdown"
     :class="{
-      show: showPreviewDropdown
+      show: showPreviewDropdown,
     }"
   >
     <button
@@ -71,14 +71,12 @@ export default {
     >
       {{ __('Finish review') }}
       <drafts-count />
-      <icon
-        name="angle-up"
-      />
+      <icon name="angle-up" />
     </button>
     <div
       class="dropdown-menu dropdown-menu-large dropdown-menu-right dropdown-open-top"
       :class="{
-        show: showPreviewDropdown
+        show: showPreviewDropdown,
       }"
     >
       <div class="dropdown-title">
@@ -89,28 +87,16 @@ export default {
           class="dropdown-title-button dropdown-menu-close"
           @click="toggleReviewDropdown"
         >
-          <icon
-            name="close"
-          />
+          <icon name="close" />
         </button>
       </div>
       <div class="dropdown-content">
         <ul v-if="isNotesFetched">
-          <li
-            v-for="(draft, index) in sortedDrafts"
-            :key="draft.id"
-          >
-            <preview-item
-              :draft="draft"
-              :is-last="isLast(index)"
-            />
+          <li v-for="(draft, index) in sortedDrafts" :key="draft.id">
+            <preview-item :draft="draft" :is-last="isLast(index)" />
           </li>
         </ul>
-        <gl-loading-icon
-          v-else
-          :size="2"
-          class="prepend-top-default append-bottom-default"
-        />
+        <gl-loading-icon v-else :size="2" class="prepend-top-default append-bottom-default" />
       </div>
       <div class="dropdown-footer">
         <publish-button

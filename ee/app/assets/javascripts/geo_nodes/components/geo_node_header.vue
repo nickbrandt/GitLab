@@ -2,7 +2,7 @@
 import { s__ } from '~/locale';
 import icon from '~/vue_shared/components/icon.vue';
 import tooltip from '~/vue_shared/directives/tooltip';
-import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
+import { GlLoadingIcon } from '@gitlab/ui';
 
 export default {
   components: {
@@ -71,9 +71,7 @@ export default {
     <div class="row">
       <div class="col-md-8 clearfix">
         <span class="d-flex float-left append-right-10">
-          <strong class="node-url">
-            {{ node.url }}
-          </strong>
+          <strong class="node-url"> {{ node.url }} </strong>
           <gl-loading-icon
             v-if="nodeDetailsLoading || node.nodeActionActive"
             class="node-details-loading prepend-left-10 inline"
@@ -90,16 +88,10 @@ export default {
           />
         </span>
         <span class="inline node-type-badges">
-          <span
-            v-if="node.current"
-            class="node-badge current-node"
-          >
+          <span v-if="node.current" class="node-badge current-node">
             {{ s__('Current node') }}
           </span>
-          <span
-            v-if="node.primary"
-            class="prepend-left-5 node-badge primary-node"
-          >
+          <span v-if="node.primary" class="prepend-left-5 node-badge primary-node">
             {{ s__('Primary') }}
           </span>
         </span>

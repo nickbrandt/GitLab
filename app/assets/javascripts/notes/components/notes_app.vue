@@ -122,6 +122,7 @@ export default {
       setTargetNoteHash: 'setTargetNoteHash',
       toggleDiscussion: 'toggleDiscussion',
       setNotesFetchedState: 'setNotesFetchedState',
+      startTaskList: 'startTaskList',
     }),
     getComponentName(discussion) {
       if (discussion.isSkeletonNote) {
@@ -157,6 +158,7 @@ export default {
           this.isFetching = false;
         })
         .then(() => this.$nextTick())
+        .then(() => this.startTaskList())
         .then(() => this.checkLocationHash())
         .catch(() => {
           this.setLoadingState(false);
@@ -196,14 +198,8 @@ export default {
 </script>
 
 <template>
-  <div
-    v-show="shouldShow"
-    id="notes"
-  >
-    <ul
-      id="notes-list"
-      class="notes main-notes-list timeline"
-    >
+  <div v-show="shouldShow" id="notes">
+    <ul id="notes-list" class="notes main-notes-list timeline">
       <component
         :is="getComponentName(discussion)"
         v-for="discussion in allDiscussions"

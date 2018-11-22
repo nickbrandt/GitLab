@@ -1,6 +1,54 @@
 require 'spec_helper'
 
 describe SearchHelper do
+  describe '#search_filter_input_options' do
+    let(:options) { helper.search_filter_input_options(:issues) }
+
+    context 'with multiple issue assignees feature' do
+      before do
+        stub_licensed_features(multiple_issue_assignees: true)
+      end
+
+      it 'allows multiple assignees in project context' do
+        @project = create :project
+
+        expect(options[:data][:'multiple-assignees']).to eq('true')
+      end
+
+      it 'allows multiple assignees in group context' do
+        @group = create :group
+
+        expect(options[:data][:'multiple-assignees']).to eq('true')
+      end
+
+      it 'allows multiple assignees in dashboard context' do
+        expect(options[:data][:'multiple-assignees']).to eq('true')
+      end
+    end
+
+    context 'without multiple issue assignees feature' do
+      before do
+        stub_licensed_features(multiple_issue_assignees: false)
+      end
+
+      it 'does not allow multiple assignees in project context' do
+        @project = create :project
+
+        expect(options[:data][:'multiple-assignees']).to be(nil)
+      end
+
+      it 'does not allow multiple assignees in group context' do
+        @group = create :group
+
+        expect(options[:data][:'multiple-assignees']).to be(nil)
+      end
+
+      it 'allows multiple assignees in dashboard context' do
+        expect(options[:data][:'multiple-assignees']).to eq('true')
+      end
+    end
+  end
+
   describe '#parse_search_result_from_elastic' do
     let(:user) { create(:user) }
 

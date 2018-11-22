@@ -13,18 +13,15 @@ export default {
       type: String,
       required: true,
     },
-
     groups: {
       type: Array,
       required: true,
     },
-
     isFirstColumn: {
       type: Boolean,
       required: false,
       default: false,
     },
-
     stageConnectorClass: {
       type: String,
       required: false,
@@ -36,16 +33,13 @@ export default {
       required: true,
     },
   },
-
   methods: {
     groupId(group) {
       return `ci-badge-${_.escape(group.name)}`;
     },
-
     buildConnnectorClass(index) {
       return index === 0 && (!this.isFirstColumn || this.hasTriggeredBy) ? 'left-connector' : '';
     },
-
     pipelineActionRequestComplete() {
       this.$emit('refreshPipelineGraph');
     },
@@ -53,12 +47,8 @@ export default {
 };
 </script>
 <template>
-  <li
-    :class="stageConnectorClass"
-    class="stage-column">
-    <div class="stage-name">
-      {{ title }}
-    </div>
+  <li :class="stageConnectorClass" class="stage-column">
+    <div class="stage-name">{{ title }}</div>
     <div class="builds-container">
       <ul>
         <li
@@ -68,7 +58,6 @@ export default {
           :class="buildConnnectorClass(index)"
           class="build"
         >
-
           <div class="curve"></div>
 
           <job-item
@@ -83,7 +72,6 @@ export default {
             :group="group"
             @pipelineActionRequestComplete="pipelineActionRequestComplete"
           />
-
         </li>
       </ul>
     </div>

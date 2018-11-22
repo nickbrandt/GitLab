@@ -1933,7 +1933,7 @@ describe MergeRequest do
           allow(subject).to receive(:head_pipeline) { nil }
         end
 
-        it { expect(subject.mergeable_ci_state?).to be_truthy }
+        it { expect(subject.mergeable_ci_state?).to be_falsey }
       end
     end
 
@@ -3079,6 +3079,10 @@ describe MergeRequest do
   end
 
   describe '#includes_any_commits?' do
+    it 'returns false' do
+      expect(subject.includes_any_commits?([])).to be_falsey
+    end
+
     it 'returns false' do
       expect(subject.includes_any_commits?([Gitlab::Git::BLANK_SHA])).to be_falsey
     end

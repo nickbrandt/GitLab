@@ -133,9 +133,11 @@ export const openReviewDropdown = ({ commit }) => commit(types.OPEN_REVIEW_DROPD
 export const closeReviewDropdown = ({ commit }) => commit(types.CLOSE_REVIEW_DROPDOWN);
 
 export const expandAllDiscussions = ({ dispatch, state }) =>
-  state.drafts.filter(draft => draft.discussion_id).forEach(draft => {
-    dispatch('expandDiscussion', { discussionId: draft.discussion_id }, { root: true });
-  });
+  state.drafts
+    .filter(draft => draft.discussion_id)
+    .forEach(draft => {
+      dispatch('expandDiscussion', { discussionId: draft.discussion_id }, { root: true });
+    });
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

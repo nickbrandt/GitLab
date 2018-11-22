@@ -10,7 +10,6 @@ module Ci
     include Importable
     include Gitlab::Utils::StrongMemoize
     include Deployable
-    prepend EE::Ci::Build
 
     belongs_to :project, inverse_of: :builds
     belongs_to :runner
@@ -101,7 +100,7 @@ module Ci
 
     scope :matches_tag_ids, -> (tag_ids) do
       matcher = ::ActsAsTaggableOn::Tagging
-        .where(taggable_type: CommitStatus)
+        .where(taggable_type: CommitStatus.name)
         .where(context: 'tags')
         .where('taggable_id = ci_builds.id')
         .where.not(tag_id: tag_ids).select('1')
@@ -111,7 +110,7 @@ module Ci
 
     scope :with_any_tags, -> do
       matcher = ::ActsAsTaggableOn::Tagging
-        .where(taggable_type: CommitStatus)
+        .where(taggable_type: CommitStatus.name)
         .where(context: 'tags')
         .where('taggable_id = ci_builds.id').select('1')
 
@@ -467,7 +466,9 @@ module Ci
     end
 
     def repo_url
-      auth = "gitlab-ci-token:#{ensure_token!}@"
+      return unless token
+
+      auth = "gitlab-ci-token:#{token}@"
       project.http_url_to_repo.sub(%r{^https?://}) do |prefix|
         prefix + auth
       end
@@ -728,7 +729,7 @@ module Ci
 
       trace = trace.dup
       Gitlab::Ci::MaskSecret.mask!(trace, project.runners_token) if project
-      Gitlab::Ci::MaskSecret.mask!(trace, token)
+      Gitlab::Ci::MaskSecret.mask!(trace, token) if token
       trace
     end
 
@@ -817,12 +818,12 @@ module Ci
           .concat(pipeline.persisted_variables)
           .append(key: 'CI_JOB_ID', value: id.to_s)
           .append(key: 'CI_JOB_URL', value: Gitlab::Routing.url_helpers.project_job_url(project, self))
-          .append(key: 'CI_JOB_TOKEN', value: token, public: false)
+          .append(key: 'CI_JOB_TOKEN', value: token.to_s, public: false)
           .append(key: 'CI_BUILD_ID', value: id.to_s)
-          .append(key: 'CI_BUILD_TOKEN', value: token, public: false)
+          .append(key: 'CI_BUILD_TOKEN', value: token.to_s, public: false)
           .append(key: 'CI_REGISTRY_USER', value: CI_REGISTRY_USER)
-          .append(key: 'CI_REGISTRY_PASSWORD', value: token, public: false)
-          .append(key: 'CI_REPOSITORY_URL', value: repo_url, public: false)
+          .append(key: 'CI_REGISTRY_PASSWORD', value: token.to_s, public: false)
+          .append(key: 'CI_REPOSITORY_URL', value: repo_url.to_s, public: false)
           .concat(deploy_token_variables)
       end
     end
@@ -834,9 +835,9 @@ module Ci
         variables.append(key: 'GITLAB_FEATURES', value: project.licensed_features.join(','))
         variables.append(key: 'CI_SERVER_NAME', value: 'GitLab')
         variables.append(key: 'CI_SERVER_VERSION', value: Gitlab::VERSION)
-        variables.append(key: 'CI_SERVER_VERSION_MAJOR', value: gitlab_version_info.major.to_s)
-        variables.append(key: 'CI_SERVER_VERSION_MINOR', value: gitlab_version_info.minor.to_s)
-        variables.append(key: 'CI_SERVER_VERSION_PATCH', value: gitlab_version_info.patch.to_s)
+        variables.append(key: 'CI_SERVER_VERSION_MAJOR', value: Gitlab.version_info.major.to_s)
+        variables.append(key: 'CI_SERVER_VERSION_MINOR', value: Gitlab.version_info.minor.to_s)
+        variables.append(key: 'CI_SERVER_VERSION_PATCH', value: Gitlab.version_info.patch.to_s)
         variables.append(key: 'CI_SERVER_REVISION', value: Gitlab.revision)
         variables.append(key: 'CI_JOB_NAME', value: name)
         variables.append(key: 'CI_JOB_STAGE', value: stage)
@@ -851,10 +852,6 @@ module Ci
         variables.append(key: "CI_NODE_TOTAL", value: (self.options&.dig(:parallel) || 1).to_s)
         variables.concat(legacy_variables)
       end
-    end
-
-    def gitlab_version_info
-      @gitlab_version_info ||= Gitlab::VersionInfo.parse(Gitlab::VERSION)
     end
 
     def legacy_variables
@@ -930,3 +927,5 @@ module Ci
     end
   end
 end
+
+Ci::Build.prepend(EE::Ci::Build)

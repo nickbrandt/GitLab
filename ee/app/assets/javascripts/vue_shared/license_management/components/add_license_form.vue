@@ -1,5 +1,5 @@
 <script>
-import { GlButton } from '@gitlab-org/gitlab-ui';
+import { GlButton } from '@gitlab/ui';
 import { LICENSE_APPROVAL_STATUS } from '../constants';
 import AddLicenseFormDropdown from './add_license_form_dropdown.vue';
 import { s__ } from '~/locale';
@@ -53,10 +53,7 @@ export default {
 <template>
   <div class="col-sm-6 js-add-license-form">
     <div class="form-group">
-      <label
-        class="label-bold"
-        for="js-license-dropdown"
-      >
+      <label class="label-bold" for="js-license-dropdown">
         {{ s__('LicenseManagement|Add licenses manually to approve or blacklist') }}
       </label>
       <add-license-form-dropdown
@@ -64,19 +61,12 @@ export default {
         v-model="licenseName"
         :placeholder="s__('LicenseManagement|License name')"
       />
-      <div
-        class="invalid-feedback"
-        :class="{'d-block': isInvalidLicense}"
-      >
+      <div class="invalid-feedback" :class="{ 'd-block': isInvalidLicense }">
         {{ s__('LicenseManagement|This license already exists in this project.') }}
       </div>
     </div>
     <div class="form-group">
-      <div
-        v-for="option in $options.approvalStatusOptions"
-        :key="option.value"
-        class="form-check"
-      >
+      <div v-for="option in $options.approvalStatusOptions" :key="option.value" class="form-check">
         <input
           :id="`js-${option.value}-license-radio`"
           v-model="approvalStatus"
@@ -84,27 +74,15 @@ export default {
           type="radio"
           :value="option.value"
         />
-        <label
-          :for="`js-${option.value}-license-radio`"
-          class="form-check-label"
-        >
+        <label :for="`js-${option.value}-license-radio`" class="form-check-label">
           {{ option.label }}
         </label>
       </div>
     </div>
-    <gl-button
-      class="js-submit"
-      variant="default"
-      :disabled="submitDisabled"
-      @click="addLicense"
-    >
+    <gl-button class="js-submit" variant="default" :disabled="submitDisabled" @click="addLicense">
       {{ s__('LicenseManagement|Submit') }}
     </gl-button>
-    <gl-button
-      class="js-cancel"
-      variant="default"
-      @click="closeForm"
-    >
+    <gl-button class="js-cancel" variant="default" @click="closeForm">
       {{ s__('LicenseManagement|Cancel') }}
     </gl-button>
   </div>

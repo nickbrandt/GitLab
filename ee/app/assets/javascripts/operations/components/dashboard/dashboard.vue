@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
+import { GlLoadingIcon } from '@gitlab/ui';
 import DashboardProject from './project.vue';
 import ProjectSearch from './project_search.vue';
 
@@ -56,9 +56,7 @@ export default {
   <div class="operations-dashboard">
     <nav class="breadcrumbs container-fluid container-limited">
       <div class="breadcrumbs-container">
-        <h2 class="js-dashboard-title breadcrumbs-sub-title">
-          {{ __('Operations Dashboard') }}
-        </h2>
+        <h2 class="js-dashboard-title breadcrumbs-sub-title">{{ __('Operations Dashboard') }}</h2>
       </div>
     </nav>
     <div class="container-fluid container-limited prepend-top-default">
@@ -73,10 +71,7 @@ export default {
           {{ __('Add projects') }}
         </button>
       </div>
-      <div
-        v-if="projects.length"
-        class="row m-0 prepend-top-default"
-      >
+      <div v-if="projects.length" class="row m-0 prepend-top-default">
         <div
           v-for="project in projects"
           :key="project.id"
@@ -85,23 +80,19 @@ export default {
           <dashboard-project :project="project" />
         </div>
       </div>
-      <div
-        v-else-if="!isLoadingProjects"
-        class="row prepend-top-20 text-center"
-      >
+      <div v-else-if="!isLoadingProjects" class="row prepend-top-20 text-center">
         <div class="col-12 d-flex justify-content-center svg-content">
-          <img
-            :src="emptyDashboardSvgPath"
-            class="js-empty-state-svg col-12 prepend-top-20"
-          />
+          <img :src="emptyDashboardSvgPath" class="js-empty-state-svg col-12 prepend-top-20" />
         </div>
         <h4 class="js-title col-12 prepend-top-20">
           {{ s__('OperationsDashboard|Add a project to the dashboard') }}
         </h4>
         <div class="col-12 d-flex justify-content-center">
           <span class="js-sub-title mw-460 text-tertiary text-left">
-            {{ s__(`OperationsDashboard|The operations dashboard provides a summary of each project's
-              operational health, including pipeline and alert statuses.`) }}
+            {{
+              s__(`OperationsDashboard|The operations dashboard provides a summary of each project's
+              operational health, including pipeline and alert statuses.`)
+            }}
           </span>
         </div>
         <div class="col-12">
@@ -113,11 +104,7 @@ export default {
           </a>
         </div>
       </div>
-      <gl-loading-icon
-        v-else
-        :size="2"
-        class="prepend-top-20"
-      />
+      <gl-loading-icon v-else :size="2" class="prepend-top-20" />
     </div>
   </div>
 </template>

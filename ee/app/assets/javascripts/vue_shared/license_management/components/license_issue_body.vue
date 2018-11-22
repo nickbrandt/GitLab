@@ -23,13 +23,10 @@ export default {
       type="button"
       data-toggle="modal"
       data-target="#modal-set-license-approval"
-      @click="setLicenseInModal(issue)"
+      @click="setLicenseInModal(issue);"
     >
       {{ issue.name }}
     </button>
-    <license-packages
-      :packages="issue.packages"
-      class="text-secondary"
-    />
+    <license-packages :packages="issue.packages" class="text-secondary" />
   </div>
 </template>

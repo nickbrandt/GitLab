@@ -29,11 +29,7 @@ export default {
     <div class="report-block-list-issue-description-text">
       {{ issue.severity }} ({{ issue.confidence }}):
 
-      <modal-open-name
-        :issue="issue"
-        :status="status"
-        class="js-modal-dast"
-      />
+      <modal-open-name :issue="issue" :status="status" class="js-modal-dast" />
     </div>
   </div>
 </template>

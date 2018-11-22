@@ -99,26 +99,15 @@ export default {
 <template>
   <div class="row empty-state">
     <div class="col-12">
-      <div class="svg-content">
-        <img
-          :src="emptyStateIllustrationPath"
-        />
-      </div>
+      <div class="svg-content"><img :src="emptyStateIllustrationPath" /></div>
     </div>
     <div class="col-12">
       <div class="text-content">
         <h4>{{ message }}</h4>
         <p v-html="subMessage"></p>
         <div class="text-center">
-          <new-epic
-            v-if="!hasFiltersApplied"
-            :endpoint="newEpicEndpoint"
-          />
-          <a
-            :title="__('List')"
-            :href="newEpicEndpoint"
-            class="btn btn-default"
-          >
+          <new-epic v-if="!hasFiltersApplied" :endpoint="newEpicEndpoint" />
+          <a :title="__('List')" :href="newEpicEndpoint" class="btn btn-default">
             <span>{{ s__('View epics list') }}</span>
           </a>
         </div>

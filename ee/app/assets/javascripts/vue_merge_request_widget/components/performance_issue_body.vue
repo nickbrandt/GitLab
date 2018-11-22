@@ -32,17 +32,16 @@ export default {
 <template>
   <div class="report-block-list-issue-description prepend-top-5 append-bottom-5">
     <div class="report-block-list-issue-description-text">
-      {{ issue.name }}<template v-if="issue.score">:
-      <strong>{{ formatScore(issue.score) }}</strong></template>
+      {{ issue.name
+      }}<template v-if="issue.score"
+        >: <strong>{{ formatScore(issue.score) }}</strong></template
+      >
 
       <template v-if="issue.delta != null">
         ({{ issue.delta >= 0 ? '+' : '' }}{{ formatScore(issue.delta) }})
       </template>
     </div>
 
-    <report-link
-      v-if="issue.path"
-      :issue="issue"
-    />
+    <report-link v-if="issue.path" :issue="issue" />
   </div>
 </template>
