@@ -8,8 +8,9 @@ import (
 	"net/url"
 	"time"
 
+	"gitlab.com/gitlab-org/labkit/correlation"
+
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/correlation"
 )
 
 func mustParseAddress(address, scheme string) string {

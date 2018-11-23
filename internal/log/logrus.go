@@ -5,7 +5,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/correlation"
+	"gitlab.com/gitlab-org/labkit/correlation"
 )
 
 // Fields type, an helper to avoid importing logrus.Fields

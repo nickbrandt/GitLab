@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+UNRELEASED
+
+- Extract correlation code out to the LabKit project !323
+
 v 7.2.0
 
 - Update CI matrix to go1.10 + go1.11 and fix ResponseWriter bugs !309

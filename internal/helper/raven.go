@@ -6,7 +6,7 @@ import (
 
 	"github.com/getsentry/raven-go"
 
-	correlation "gitlab.com/gitlab-org/gitlab-workhorse/internal/correlation/raven"
+	correlation "gitlab.com/gitlab-org/labkit/correlation/raven"
 )
 
 var ravenHeaderBlacklist = []string{

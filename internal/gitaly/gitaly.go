@@ -10,7 +10,7 @@ import (
 	gitalyclient "gitlab.com/gitlab-org/gitaly/client"
 	"google.golang.org/grpc"
 
-	grpccorrelation "gitlab.com/gitlab-org/gitlab-workhorse/internal/correlation/grpc"
+	grpccorrelation "gitlab.com/gitlab-org/labkit/correlation/grpc"
 )
 
 type Server struct {
@@ -114,14 +114,14 @@ func newConnection(server Server) (*grpc.ClientConn, error) {
 		grpc.WithStreamInterceptor(
 			grpc_middleware.ChainStreamClient(
 				grpc_prometheus.StreamClientInterceptor,
-				grpccorrelation.StreamClientCorrelationInterceptor,
+				grpccorrelation.StreamClientCorrelationInterceptor(),
 			),
 		),
 
 		grpc.WithUnaryInterceptor(
 			grpc_middleware.ChainUnaryClient(
 				grpc_prometheus.UnaryClientInterceptor,
-				grpccorrelation.UnaryClientCorrelationInterceptor,
+				grpccorrelation.UnaryClientCorrelationInterceptor(),
 			),
 		),
 	)
