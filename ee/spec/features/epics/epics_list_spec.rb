@@ -67,7 +67,6 @@ describe 'epics list', :js do
 
     it 'sorts by the selected value and stores the selection for epic list & roadmap' do
       page.within('.epics-other-filters') do
-        live_debug
         click_button 'Due date'
         sort_options = find('ul.dropdown-menu-sort li').all('a').collect(&:text)
 
