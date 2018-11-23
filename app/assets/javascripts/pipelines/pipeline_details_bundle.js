@@ -35,18 +35,20 @@ export default () => {
           .refreshPipeline()
           .catch(() => Flash(__('An error occurred while making the request.')));
       },
-      clickPipeline(method, pipeline) {
+      clickPipeline(method, storeKey, resetStoreKey, pipeline) {
+        debugger;
         if (pipeline.collapsed) {
           this.mediator[method](pipeline);
         } else {
-          this.mediator.store.closePipeline(pipeline);
+          this.mediator.store.closePipeline(storeKey, pipeline);
+          this.mediator.store.resetTriggered(resetStoreKey)
         }
       },
       clickTriggered(triggered) {
-        this.clickPipeline('fetchTriggeredPipeline', triggered);
+        this.clickPipeline('fetchTriggeredPipeline', 'triggeredPipelines', 'triggered', triggered);
       },
       clickTriggeredBy(triggeredBy) {
-        this.clickPipeline('fetchTriggeredByPipeline', triggeredBy);
+        this.clickPipeline('fetchTriggeredByPipeline', 'triggeredByPipelines', 'triggeredBy', triggeredBy);
       }
     },
     render(createElement) {
@@ -58,7 +60,6 @@ export default () => {
           triggered: this.mediator.store.state.triggered,
           triggeredByPipelines: this.mediator.store.state.triggeredByPipelines,
           triggeredBy: this.mediator.store.state.triggeredBy,
-
         },
         on: {
           refreshPipelineGraph: this.requestRefreshPipelineGraph,

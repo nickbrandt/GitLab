@@ -23,6 +23,9 @@ export default {
     columnClass() {
       return `graph-position-${this.graphPosition}`;
     },
+    connectorPosition() {
+      return `connector-${this.graphPosition}`;
+    }
   },
 };
 </script>
@@ -35,12 +38,14 @@ export default {
       <linked-pipeline
         v-for="(pipeline, index) in linkedPipelines"
         :key="pipeline.id"
-        :class="{
+        :class="[connectorPosition, {
           'flat-connector-before': index === 0 && graphPosition === 'right',
-        }"
+          'active': !pipeline.collapsed || pipeline.isLoading
+        }]"
         :pipeline-id="pipeline.id"
         :project-name="pipeline.project.name"
         :pipeline-status="pipeline.details.status"
+        :is-loading="pipeline.isLoading"
         @pipelineClicked="$emit('linkedPipelineClick', pipeline)"
       />
     </ul>

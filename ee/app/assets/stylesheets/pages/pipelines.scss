@@ -129,6 +129,10 @@
       @include flat-connector-before($linked-project-column-margin);
     }
 
+    &.active {
+      background: $blue-500;
+    }
+
     &::after {
       right: -$linked-project-column-margin;
       width: $linked-project-column-margin;

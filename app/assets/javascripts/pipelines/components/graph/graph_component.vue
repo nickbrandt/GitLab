@@ -24,7 +24,7 @@ export default {
       required: false,
       default: () => ({}),
     },
-    tiggeredBy: {
+    triggeredBy: {
       type: Object,
       required: false,
       default: () => ({}),
@@ -100,10 +100,21 @@ export default {
       <div class="text-center"><gl-loading-icon v-if="isLoading" :size="3" /></div>
 
       <ul
-        v-if="shouldRenderTriggeredPipeline"
-        class="stage-column-list"
+        v-if="shouldRenderTriggeredByPipeline"
+        class="stage-column linked-pipelines-column graph-position-left"
       >
-        triggered pipeline should open here 
+         <stage-column-component
+          v-for="(stage, index) in triggeredByGraph"
+          :key="stage.name"
+          :class="{
+            'has-only-one-job': stage.groups.length === 1,
+          }"
+          :title="capitalizeStageName(stage.name)"
+          :groups="stage.groups"
+          :stage-connector-class="stageConnectorClass(index, stage)"
+          :is-first-column="isFirstColumn(index)"
+          @refreshPipelineGraph="refreshPipelineGraph"
+        />
       </ul>
 
       <linked-pipelines-column

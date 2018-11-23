@@ -40,27 +40,52 @@ export default class PipelineStore {
     });
   }
 
+  collapseTriggeredPipeline(pipeline) {
+    const requestedPipeline = this.getPipelineIndex('triggeredPipelines', pipeline.id);
+
+    this.state.triggeredPipelines.splice(requestedPipeline, 1, Object.assign({}, pipeline, { collapsed: true }))
+  }
+
+  resetTriggered(storeKey) {
+    this.state[storeKey] = {};
+  }
+
+  collapsePipeline(storeKey, pipeline) {
+    const requestedPipeline = this.getPipelineIndex(storeKey, pipeline.id);
+
+    this.state[storeKey].splice(requestedPipeline, 1, Object.assign({}, pipeline, { collapsed: true }))
+  }
+
+  /**
+   * Updates the pipelines to reflect which one was just requested.
+   * 
+   * @param {*} storeKey 
+   * @param {*} pipeline 
+   */
   updateStoreOnRequest(storeKey, pipeline) {
     this.state[storeKey] = this.state[storeKey].map((triggered) => {
+      debugger;
       if (triggered.id === pipeline.id) {
         return Object.assign({}, triggered, { isLoading: true, collapsed: false });
       }
+
       return PipelineStore.parsePipeline(triggered);
-    })
+    });
+    debugger;
   }
 
   /**
-   * Returns the upstream/downstream that matches the given ID
+   * Returns the index of THE upstream/downstream that matches the given ID
    * 
    * @param {Object} pipeline 
-   * @returns {Object}
+   * @returns {Number}
    */
-  getPipeline(storeKey, pipelineId) {
-    return this.state[storeKey].find(triggered => triggered.id === pipelineId)
+  getPipelineIndex(storeKey, pipelineId) {
+    return this.state[storeKey].indexOf(triggered => triggered.id === pipelineId)
   }
 
   /**
-   * Resets collapsed and isLoading props for all triggered pipelines
+   * Resets collapsed and isLoading props for all triggered (downstream) pipelines
    * Sets isLoading to true for the requested one.
    * 
    * @param {Object} pipeline 
@@ -70,6 +95,8 @@ export default class PipelineStore {
   }
 
   /**
+   * Success callback for the downstream pipeline requested.
+   * 
    * Updates loading state for the request pipeline
    * Updates the visible pipeline with the response
    * 
@@ -77,43 +104,55 @@ export default class PipelineStore {
    * @param {Object} response 
    */
   receiveTriggeredPipelineSuccess(pipeline, response) {
-    const requestedPipeline = this.getPipeline('triggeredPipelines', pipeline.id);
-    requestedPipeline.isLoading = false;
+    const requestedPipeline = this.getPipelineIndex('triggeredPipelines', pipeline.id);
 
+    this.state.triggeredPipelines.splice(requestedPipeline, 1, Object.assign({}, pipeline, { isLoading: false }))
     this.state.triggered = response;
   }
 
   /**
+   * Error callback for the downstream pipeline requested
    * Resets the loading state + collpased state
    * Resets triggeredBy pipeline
    */
   receiveTriggeredPipelineError(pipeline) {
-    const requestedPipeline = this.getPipeline('triggeredPipelines', pipeline.id);
-    requestedPipeline.isLoading = false;
-    requestedPipeline.collapsed = true;
-
+    const requestedPipeline = this.getPipelineIndex('triggeredPipelines', pipeline.id);
+   
+    this.state.triggeredPipelines.splice(requestedPipeline, 1, Object.assign({}, pipeline, { isLoading: false, collapsed: true }))
     this.state.triggered = {};
   }
 
   /**
-   * 
+   * Handle the request for the upstream pipeline
+   * Updates the given pipeline with isLoading: true and collapsed: false
    * @param {Object} pipeline 
    */
   requestTriggeredByPipeline(pipeline) {
     this.updateStoreOnRequest('triggeredByPipelines', pipeline);
   }
 
+  /**
+   * Success callback for the upstream pipeline received
+   * 
+   * @param {Object} pipeline 
+   * @param {Object} response 
+   */
   receiveTriggeredByPipelineSuccess(pipeline, response) {
-    const requestedPipeline =  this.getPipeline('triggeredByPipelines', pipeline.id);
-    requestedPipeline.isLoading = false;
+    const requestedPipeline = this.getPipelineIndex('triggeredByPipelines', pipeline.id);
 
+    this.state.triggeredByPipelines.splice(requestedPipeline, 1, Object.assign({}, pipeline, { isLoading: false }))
     this.state.triggeredBy = response;
   }
 
+  /**
+   * Error callback for the upstream callback
+   * @param {Object} pipeline 
+   */
   receiveTriggeredByPipelineError(pipeline) {
-    const requestedPipeline =  this.getPipeline('triggeredByPipelines', pipeline.id);
-    requestedPipeline.isLoading = false;
-    requestedPipeline.collapsed = true;
+    const requestedPipeline =  this.getPipelineIndex('triggeredByPipelines', pipeline.id);
+    
+    this.state.triggeredByPipelines.splice(requestedPipeline, 1, Object.assign({}, pipeline, { isLoading: false, collapsed: true }))
+
 
     this.state.triggeredBy = {};
   }

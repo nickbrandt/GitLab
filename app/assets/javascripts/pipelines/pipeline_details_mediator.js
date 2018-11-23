@@ -4,6 +4,7 @@ import Poll from '../lib/utils/poll';
 import { __ } from '../locale';
 import PipelineStore from './stores/pipeline_store';
 import PipelineService from './services/pipeline_service';
+import pipelineMock from './stores/data1';
 
 export default class pipelinesMediator {
   constructor(options = {}) {
@@ -44,8 +45,7 @@ export default class pipelinesMediator {
     this.store.storePipeline(response.data);
   }
 
-  errorCallback(error) {
-    console.log(error)
+  errorCallback() {
     this.state.isLoading = false;
     Flash(__('An error occurred while fetching the pipeline.'));
   }
@@ -63,22 +63,27 @@ export default class pipelinesMediator {
   fetchTriggeredPipeline(pipeline) {
     this.store.requestTriggeredPipeline(pipeline);
 
-    return PipelineService.getUpstreamDownstream(pipeline.path)
-      .then(({data}) => this.store.receiveTriggeredPipelineSuccess(pipeline, data))
-      .catch(() => {
-        this.store.receiveTriggeredPipelineError(pipeline);
-        Flash(__('An error occured while fetching this upstream pipeline. Please try again'))
-      })
+    this.store.receiveTriggeredPipelineSuccess(pipeline, pipelineMock);
+
+    // return PipelineService.getUpstreamDownstream(pipeline.path)
+    //   .then(({data}) => this.store.receiveTriggeredPipelineSuccess(pipeline, data))
+    //   .catch(() => {
+    //     this.store.receiveTriggeredPipelineError(pipeline);
+    //     Flash(__('An error occured while fetching this downstream pipeline. Please try again'))
+    //   })
   }
+
 
   fetchTriggeredByPipeline(pipeline) {
     this.store.requestTriggeredByPipeline(pipeline);
 
-    return PipelineService.getUpstreamDownstream(pipeline.path)
-      .then(({data}) => this.store.receiveTriggeredByPipelineSuccess(pipeline, data))
-      .catch(() => {
-        this.store.receiveTriggeredByPipelineError(pipeline);
-        Flash(__('An error occured while fetching this upstream pipeline. Please try again'))
-      })
+    this.store.receiveTriggeredByPipelineSuccess(pipeline, pipelineMock);
+
+    // return PipelineService.getUpstreamDownstream(pipeline.path)
+    //   .then(({data}) => this.store.receiveTriggeredByPipelineSuccess(pipeline, data))
+    //   .catch(() => {
+    //     this.store.receiveTriggeredByPipelineError(pipeline);
+    //     Flash(__('An error occured while fetching this downstream pipeline. Please try again'))
+    //   })
   }
 }
