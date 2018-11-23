@@ -7645,6 +7645,9 @@ msgstr ""
 msgid "Sorry, no projects matched your search"
 msgstr ""
 
+msgid "Sorry, your filter produced no results"
+msgstr ""
+
 msgid "Sort by"
 msgstr ""
 
@@ -8160,9 +8163,6 @@ msgstr ""
 msgid "There are no labels yet"
 msgstr ""
 
-msgid "There are no merge requests to show"
-msgstr ""
-
 msgid "There are no projects shared with this group yet"
 msgstr ""
 
@@ -8639,6 +8639,9 @@ msgid "To validate your GitLab CI configurations, go to 'CI/CD → Pipelines' in
 msgstr ""
 
 msgid "To view the roadmap, add a start or due date to one of your epics in this group or its subgroups. In the months view, only epics in the past month, current month, and next 5 months are shown."
+msgstr ""
+
+msgid "To widen your search, change or remove filters above"
 msgstr ""
 
 msgid "To widen your search, change or remove filters."
