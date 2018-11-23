@@ -1730,15 +1730,27 @@ describe Project do
     end
   end
 
-  describe '#create_project_repository' do
+  describe '#save_project_repository' do
     let(:project) { create(:project, :repository) }
 
     it 'creates a project_repository' do
-      project.create_project_repository
+      project.save_project_repository
 
-      expect(project).to have_project_repository
+      expect(project.reload.project_repository).to be_present
       expect(project.project_repository.disk_path).to eq(project.disk_path)
       expect(project.project_repository.shard_name).to eq(project.repository_storage)
+    end
+
+    it 'updates the project_repository' do
+      project.save_project_repository
+
+      allow(project).to receive(:disk_path).and_return('@fancy/new/path')
+
+      expect do
+        project.save_project_repository
+      end.not_to change(ProjectRepository, :count)
+
+      expect(project.reload.project_repository.disk_path).to eq(project.disk_path)
     end
   end
 

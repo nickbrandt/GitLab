@@ -120,7 +120,7 @@ class Project < ActiveRecord::Base
   after_create :ensure_storage_path_exists
   after_save :ensure_storage_path_exists, if: :namespace_id_changed?
 
-  after_create :create_project_repository
+  after_create :save_project_repository
 
   acts_as_ordered_taggable
 
@@ -1210,8 +1210,17 @@ class Project < ActiveRecord::Base
     false
   end
 
-  def create_project_repository
-    update(project_repository: ProjectRepository.create!(shard_name: repository_storage, disk_path: disk_path))
+  def save_project_repository
+    return unless hashed_storage?(:repository)
+
+    project_repo = project_repository || build_project_repository
+    project_repo.assign_attributes(shard_name: repository_storage, disk_path: disk_path)
+
+    if project_repo.persisted?
+      project_repo.save
+    else
+      update(project_repository: project_repo)
+    end
   end
 
   def create_repository(force: false)
