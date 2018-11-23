@@ -1,5 +1,9 @@
 module Boards
   class MilestonesController < Boards::ApplicationController
+    include BoardsResponses
+
+    before_action :authorize_read_milestone, only: [:index]
+
     def index
       milestones_finder = Boards::MilestonesFinder.new(board, current_user)
 
