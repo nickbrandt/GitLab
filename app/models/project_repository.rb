@@ -3,7 +3,7 @@
 class ProjectRepository < ActiveRecord::Base
   include RepositoryOnShard
 
-  has_one :project, foreign_key: :repository_id
+  belongs_to :project
 
   class << self
     def find_project(disk_path)

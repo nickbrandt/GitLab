@@ -132,7 +132,6 @@ class Project < ActiveRecord::Base
   alias_attribute :title, :name
 
   # Relations
-  belongs_to :project_repository, foreign_key: :repository_id
   belongs_to :pool_repository
   belongs_to :creator, class_name: 'User'
   belongs_to :group, -> { where(type: 'Group') }, foreign_key: 'namespace_id'
@@ -190,6 +189,7 @@ class Project < ActiveRecord::Base
 
   has_one :import_state, autosave: true, class_name: 'ProjectImportState', inverse_of: :project
   has_one :import_export_upload, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
+  has_one :project_repository
 
   # Merge Requests for target project should be removed with it
   has_many :merge_requests, foreign_key: 'target_project_id', inverse_of: :target_project
@@ -1214,13 +1214,7 @@ class Project < ActiveRecord::Base
     return unless hashed_storage?(:repository)
 
     project_repo = project_repository || build_project_repository
-    project_repo.assign_attributes(shard_name: repository_storage, disk_path: disk_path)
-
-    if project_repo.persisted?
-      project_repo.save
-    else
-      update(project_repository: project_repo)
-    end
+    project_repo.update(shard_name: repository_storage, disk_path: disk_path)
   end
 
   def create_repository(force: false)

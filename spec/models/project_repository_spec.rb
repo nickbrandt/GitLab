@@ -5,7 +5,7 @@ require 'spec_helper'
 describe ProjectRepository do
   describe 'associations' do
     it { is_expected.to belong_to(:shard) }
-    it { is_expected.to have_one(:project) }
+    it { is_expected.to belong_to(:project) }
   end
 
   describe '.find_project' do

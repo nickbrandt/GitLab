@@ -8,7 +8,6 @@ describe Project do
     it { is_expected.to belong_to(:group) }
     it { is_expected.to belong_to(:namespace) }
     it { is_expected.to belong_to(:creator).class_name('User') }
-    it { is_expected.to belong_to(:project_repository) }
     it { is_expected.to belong_to(:pool_repository) }
     it { is_expected.to have_many(:users) }
     it { is_expected.to have_many(:services) }
@@ -56,6 +55,7 @@ describe Project do
     it { is_expected.to have_one(:gitlab_issue_tracker_service) }
     it { is_expected.to have_one(:external_wiki_service) }
     it { is_expected.to have_one(:project_feature) }
+    it { is_expected.to have_one(:project_repository) }
     it { is_expected.to have_one(:statistics).class_name('ProjectStatistics') }
     it { is_expected.to have_one(:import_data).class_name('ProjectImportData') }
     it { is_expected.to have_one(:last_event).class_name('Event') }
