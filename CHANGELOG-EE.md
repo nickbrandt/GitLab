@@ -1,5 +1,45 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.3.10 (2018-11-18)
+
+- No changes.
+
+## 11.3.9 (2018-10-31)
+
+- No changes.
+
+## 11.3.8 (2018-10-27)
+
+- No changes.
+
+## 11.3.7 (2018-10-26)
+
+### Security (1 change)
+
+- Escape entity title while autocomplete template rendering to prevent XSS. !697
+
+
+## 11.3.6 (2018-10-17)
+
+### Fixed (1 change)
+
+- Don't reset the default branch when repository mirroring is enabled. !7944
+
+
+## 11.3.5 (2018-10-15)
+
+### Fixed (1 change)
+
+- Fix epic milestone dates incorrect after issue is linked to another epic. !7809
+
+
+## 11.3.4 (2018-10-05)
+
+### Security (1 change)
+
+- Properly filter private references from system notes.
+
+
 ## 11.3.3 (2018-10-04)
 
 - No changes.
