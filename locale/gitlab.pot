@@ -7639,14 +7639,13 @@ msgstr ""
 msgid "Something went wrong. Please try again."
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Sorry, no epics matched your search"
 msgstr ""
 
 msgid "Sorry, no projects matched your search"
-=======
+msgstr ""
+
 msgid "Sorry, your filter produced no results"
->>>>>>> upstream/master
 msgstr ""
 
 msgid "Sort by"
@@ -8639,14 +8638,13 @@ msgstr ""
 msgid "To validate your GitLab CI configurations, go to 'CI/CD → Pipelines' inside your project, and click on the 'CI Lint' button."
 msgstr ""
 
-<<<<<<< HEAD
 msgid "To view the roadmap, add a start or due date to one of your epics in this group or its subgroups. In the months view, only epics in the past month, current month, and next 5 months are shown."
 msgstr ""
 
-msgid "To widen your search, change or remove filters."
-=======
 msgid "To widen your search, change or remove filters above"
->>>>>>> upstream/master
+msgstr ""
+
+msgid "To widen your search, change or remove filters."
 msgstr ""
 
 msgid "Today"
