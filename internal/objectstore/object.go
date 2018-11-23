@@ -9,7 +9,8 @@ import (
 	"net/http"
 	"time"
 
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/correlation"
+	"gitlab.com/gitlab-org/labkit/correlation"
+
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
 

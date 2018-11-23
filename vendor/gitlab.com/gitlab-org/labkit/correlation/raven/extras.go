@@ -5,7 +5,7 @@ import (
 
 	raven "github.com/getsentry/raven-go"
 
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/correlation"
+	"gitlab.com/gitlab-org/labkit/correlation"
 )
 
 const ravenSentryExtraKey = "gitlab.CorrelationID"
