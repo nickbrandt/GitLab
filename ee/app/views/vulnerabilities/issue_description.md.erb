@@ -8,6 +8,12 @@
 <% if vulnerability.confidence.present? %>
 * Confidence: <%= vulnerability.confidence %>
 <% end %>
+<% if defined?(vulnerability.file) && vulnerability.file.present?
+     location_text = [vulnerability.file, vulnerability.line].compact.join(':')
+     location_link = [vulnerability.file, vulnerability.line].compact.join('#L')
+%>
+* Location: [<%= location_text %>](<%= location_link %>)
+<% end %>
 
 <% if vulnerability.solution.present? %>
 ### Solution:
