@@ -74,6 +74,8 @@ common actions on issues or merge requests
      timeout (defines the maximum amount of time in minutes that a job is able run), custom path for `.gitlab-ci.yml`, test coverage parsing, pipeline's visibility, and much more
   - [GKE cluster integration](clusters/index.md): Connecting your GitLab project
     with Google Kubernetes Engine
+  - [Feature Flags](operations/feature_flags.md): Feature flags allow you to ship a project in
+    different flavors by dynamically toggling certain functionality **[PREMIUM]**
 - [GitLab Pages](pages/index.md): Build, test, and deploy your static
 website with GitLab Pages
 
@@ -84,10 +86,11 @@ website with GitLab Pages
 - [Cycle Analytics](cycle_analytics.md): Review your development lifecycle
 - [Security Dashboard](security_dashboard.md): Security Dashboard
 - [Syntax highlighting](highlighting.md): An alternative to customize
-your code blocks, overriding GitLab's default choice of language
+  your code blocks, overriding GitLab's default choice of language
 - [Badges](badges.md): Badges for the project overview
 - [Maven packages](packages/maven_repository.md): Your private Maven repository in GitLab **[PREMIUM]**
 - [Code owners](code_owners.md): Specify code owners for certain files **[STARTER]**
+- [License Management](merge_requests/license_management.md): Approve and blacklist licenses for projects **[ULTIMATE]**
 
 ### Project's integrations
 

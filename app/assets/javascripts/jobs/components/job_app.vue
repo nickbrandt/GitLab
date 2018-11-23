@@ -22,7 +22,7 @@
       SharedRunner,
     },
     props: {
-      runnerHelpUrl: {
+      runnerSettingsUrl: {
         type: String,
         required: false,
         default: null,
@@ -34,12 +34,12 @@
         'headerActions',
         'headerTime',
         'shouldRenderCalloutMessage',
-        'jobHasStarted',
+        'shouldRenderTriggeredLabel',
         'hasEnvironment',
-        'isJobStuck',
         'shouldRenderSharedRunnerLimitWarning',
         'hasTrace',
         'emptyStateIllustration',
+        'hasRunnersForProject',
       ]),
     },
   };
@@ -63,7 +63,7 @@
             :user="job.user"
             :actions="headerActions"
             :has-sidebar-button="true"
-            :should-render-triggered-label="jobHasStarted"
+            :should-render-triggered-label="shouldRenderTriggeredLabel"
             :item-name="__('Job')"
           />
         </div>
@@ -77,11 +77,11 @@
 
       <!-- Body Section -->
       <stuck-block
-        v-if="isJobStuck"
+        v-if="job.stuck"
         class="js-job-stuck"
-        :has-no-runners-for-project="job.runners.available"
+        :has-no-runners-for-project="hasRunnersForProject"
         :tags="job.tags"
-        :runners-path="runnerHelpUrl"
+        :runners-path="runnerSettingsUrl"
       />
 
       <shared-runner
@@ -100,8 +100,8 @@
       />
 
       <erased-block
-        v-if="job.erased"
-        class="js-job-erased"
+        v-if="job.erased_at"
+        class="js-job-erased-block"
         :user="job.erased_by"
         :erased-at="job.erased_at"
       />

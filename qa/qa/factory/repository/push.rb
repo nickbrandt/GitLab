@@ -30,6 +30,16 @@ module QA
           @directory = dir
         end
 
+        def files=(files)
+          if !files.is_a?(Array) ||
+              files.empty? ||
+              files.any? { |file| !file.has_key?(:name) || !file.has_key?(:content) }
+            raise ArgumentError, "Please provide an array of hashes e.g.: [{name: 'file1', content: 'foo'}]"
+          end
+
+          @files = files
+        end
+
         def fabricate!
           Git::Repository.perform do |repository|
             if ssh_key
@@ -62,6 +72,10 @@ module QA
             if @directory
               @directory.each_child do |f|
                 repository.add_file(f.basename, f.read) if f.file?
+              end
+            elsif @files
+              @files.each do |f|
+                repository.add_file(f[:name], f[:content])
               end
             else
               repository.add_file(file_name, file_content)

@@ -151,9 +151,8 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
       end
 
       it 'renders escaped tooltip name' do
-        page.within('aside.right-sidebar') do
-          expect(find('.active.build-job a')['data-original-title']).to eq('&lt;img src=x onerror=alert(document.domain)&gt; - passed')
-        end
+        page.find('.active.build-job a').hover
+        expect(page).to have_content('<img src=x onerror=alert(document.domain)> - passed')
       end
     end
 
@@ -423,6 +422,31 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
       end
     end
 
+    context 'when job stops environment', :js do
+      let(:environment) { create(:environment, name: 'production', project: project) }
+      let(:build) do
+        create(
+          :ci_build,
+          :success,
+          :trace_live,
+          environment: environment.name,
+          pipeline: pipeline,
+          options: { environment: { action: 'stop' } }
+        )
+      end
+
+      before do
+        visit project_job_path(project, build)
+        wait_for_requests
+      end
+
+      it 'does not show environment information banner' do
+        expect(page).not_to have_selector('.js-environment-container')
+        expect(page).not_to have_selector('.environment-information')
+        expect(page).not_to have_text(environment.name)
+      end
+    end
+
     describe 'environment info in job view', :js do
       before do
         visit project_job_path(project, job)
@@ -661,6 +685,112 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
 
         expect(job).not_to have_trace
         expect(page).to have_content('This job does not have a trace.')
+      end
+    end
+
+    context 'with erased job', :js do
+      let(:job) { create(:ci_build, :erased, pipeline: pipeline) }
+
+      it 'renders erased job warning' do
+        visit project_job_path(project, job)
+        wait_for_requests
+
+        page.within('.js-job-erased-block') do
+          expect(page).to have_content('Job has been erased')
+        end
+      end
+    end
+
+    context 'without erased job', :js do
+      let(:job) { create(:ci_build, pipeline: pipeline) }
+
+      it 'does not render erased job warning' do
+        visit project_job_path(project, job)
+        wait_for_requests
+
+        expect(page).not_to have_css('.js-job-erased-block')
+      end
+    end
+
+    context 'on mobile', :js do
+      let(:job) { create(:ci_build, pipeline: pipeline) }
+
+      it 'renders collpased sidebar' do
+        page.current_window.resize_to(600, 800)
+
+        visit project_job_path(project, job)
+        wait_for_requests
+
+        expect(page).to have_css('.js-build-sidebar.right-sidebar-collapsed', visible: false)
+        expect(page).not_to have_css('.js-build-sidebar.right-sidebar-expanded', visible: false)
+      end
+    end
+
+    context 'on desktop', :js do
+      let(:job) { create(:ci_build, pipeline: pipeline) }
+
+      it 'renders expanded sidebar' do
+        visit project_job_path(project, job)
+        wait_for_requests
+
+        expect(page).to have_css('.js-build-sidebar.right-sidebar-expanded')
+        expect(page).not_to have_css('.js-build-sidebar.right-sidebar-collpased')
+      end
+    end
+
+    context 'stuck', :js do
+      before do
+        visit project_job_path(project, job)
+        wait_for_requests
+      end
+
+      context 'without active runners available' do
+        let(:runner) { create(:ci_runner, :instance, active: false) }
+        let(:job) { create(:ci_build, :pending, pipeline: pipeline, runner: runner) }
+
+        it 'renders message about job being stuck because no runners are active' do
+          expect(page).to have_css('.js-stuck-no-active-runner')
+          expect(page).to have_content("This job is stuck, because you don't have any active runners that can run this job.")
+        end
+      end
+
+      context 'when available runners can not run specified tag' do
+        let(:runner) { create(:ci_runner, :instance, active: false) }
+        let(:job) { create(:ci_build, :pending, pipeline: pipeline, runner: runner, tag_list: %w(docker linux)) }
+
+        it 'renders message about job being stuck because of no runners with the specified tags' do
+          expect(page).to have_css('.js-stuck-with-tags')
+          expect(page).to have_content("This job is stuck, because you don't have any active runners online with any of these tags assigned to them:")
+        end
+      end
+
+      context 'when runners are offline and build has tags' do
+        let(:runner) { create(:ci_runner, :instance, active: true) }
+        let(:job) { create(:ci_build, :pending, pipeline: pipeline, runner: runner, tag_list: %w(docker linux)) }
+
+        it 'renders message about job being stuck because of no runners with the specified tags' do
+          expect(page).to have_css('.js-stuck-with-tags')
+          expect(page).to have_content("This job is stuck, because you don't have any active runners online with any of these tags assigned to them:")
+        end
+      end
+
+      context 'without any runners available' do
+        let(:job) { create(:ci_build, :pending, pipeline: pipeline) }
+
+        it 'renders message about job being stuck because not runners are available' do
+          expect(page).to have_css('.js-stuck-no-active-runner')
+          expect(page).to have_content("This job is stuck, because you don't have any active runners that can run this job.")
+        end
+      end
+
+      context 'without available runners online' do
+        let(:runner) { create(:ci_runner, :instance, active: true) }
+        let(:job) { create(:ci_build, :pending, pipeline: pipeline, runner: runner) }
+
+        it 'renders message about job being stuck because runners are offline' do
+          expect(page).to have_css('.js-stuck-no-runners')
+          expect(page).to have_content("This job is stuck, because the project doesn't have any runners online assigned to it.")
+        end
       end
     end
   end

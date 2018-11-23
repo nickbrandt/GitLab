@@ -66,7 +66,6 @@ class License < ActiveRecord::Base
     system_header_footer
     custom_project_templates
     packages
-    code_owner_as_approver_suggestion
     feature_flags
     batch_comments
   ].freeze

@@ -33,6 +33,7 @@ With GitLab merge requests, you can:
 
 With **[GitLab Enterprise Edition][ee]**, you can also:
 
+- Prepare a full review and submit it once it's ready with [Merge Request Reviews](../../discussions/index.md#merge-request-reviews) **[PREMIUM]**
 - View the deployment process across projects with [Multi-Project Pipelines](../../../ci/multi_project_pipelines.md#multi-project-pipeline-graphs) **[PREMIUM]**
 - Request [approvals](merge_request_approvals.md) from your managers **[STARTER]**
 - Analyze the impact of your changes with [Code Quality reports](code_quality.md) **[STARTER]**
@@ -148,6 +149,14 @@ Resolving comments prevents you from forgetting to address feedback and lets
 you hide discussions that are no longer relevant.
 
 [Read more about resolving discussion comments in merge requests reviews.](../../discussions/index.md)
+
+## Perform a Review **[PREMIUM]**
+
+Start a review in order to create multiple comments on a diff and publish them once you're ready.
+Starting a review allows you to get all your thoughts in order and ensure you haven't missed anything
+before submitting all your comments.
+
+[Learn more about Merge Request Reviews](../../discussions/index.md#merge-request-reviews)
 
 ## Squash and merge
 
@@ -309,9 +318,9 @@ all your changes will be available to preview by anyone with the Review Apps lin
 
 ## Merge request diff file navigation
 
-The diff view has a persistent dropdown for file navigation. As you scroll through
-diffs with a large number of files and/or many changes in those files, you can
-easily jump to any changed file through the dropdown navigation.
+The diff view has a file tree for file navigation. As you scroll through
+diffs with a large number of files, you can easily jump to any changed file
+using the file tree.
 
 ![Merge request diff file navigation](img/merge_request_diff_file_navigation.png)
 

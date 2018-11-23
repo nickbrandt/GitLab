@@ -6,6 +6,9 @@ export default {
       withBatchComments: state => state.batchComments && state.batchComments.withBatchComments,
     }),
     ...mapGetters('batchComments', ['hasDrafts']),
+    showBatchCommentsActions() {
+      return this.withBatchComments && this.noteId === '' && !this.discussion.for_commit;
+    },
   },
   methods: {
     shouldBeResolved(resolveStatus) {
