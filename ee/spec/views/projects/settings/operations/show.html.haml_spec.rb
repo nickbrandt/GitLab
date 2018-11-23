@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'layouts/nav/sidebar/_project' do
+describe 'projects/settings/operations/show' do
   let(:project) { create(:project, :repository) }
 
   before do
@@ -14,33 +14,17 @@ describe 'layouts/nav/sidebar/_project' do
   end
 
   describe 'Operations > Tracing' do
-    it 'is not visible when no valid license' do
-      allow(view).to receive(:can?).and_return(true)
-      stub_licensed_features(tracing: false)
-
-      render
-
-      expect(rendered).not_to have_text 'Tracing'
-    end
-
-    it 'is not visible to unauthorized user' do
-      render
-
-      expect(rendered).not_to have_text 'Tracing'
-    end
-
     context 'with project.tracing_external_url' do
       let(:tracing_url) { 'https://tracing.url' }
       let(:tracing_settings) { create(:project_tracing_setting, project: project, external_url: tracing_url) }
 
       before do
         allow(view).to receive(:can?).and_return(true)
+
+        assign(:tracing_settings, tracing_settings)
       end
 
       it 'links to project.tracing_external_url' do
-        expect(tracing_settings.external_url).to eq(tracing_url)
-        expect(project.tracing_external_url).to eq(tracing_url)
-
         render
 
         expect(rendered).to have_link('Tracing', href: tracing_url)
@@ -55,8 +39,6 @@ describe 'layouts/nav/sidebar/_project' do
         end
 
         it 'sanitizes external_url' do
-          expect(project.tracing_external_url).to eq(malicious_tracing_url)
-
           render
 
           expect(tracing_settings.external_url).to eq(malicious_tracing_url)
@@ -66,8 +48,14 @@ describe 'layouts/nav/sidebar/_project' do
     end
 
     context 'without project.tracing_external_url' do
+      let(:tracing_settings) { build(:project_tracing_setting, project: project) }
+
       before do
         allow(view).to receive(:can?).and_return(true)
+
+        tracing_settings.external_url = nil
+
+        assign(:tracing_settings, tracing_settings)
       end
 
       it 'links to Tracing page' do
@@ -75,31 +63,6 @@ describe 'layouts/nav/sidebar/_project' do
 
         expect(rendered).to have_link('Tracing', href: project_tracing_path(project))
       end
-    end
-  end
-
-  describe 'Settings > Operations' do
-    it 'is not visible when no valid license' do
-      allow(view).to receive(:can?).and_return(true)
-      stub_licensed_features(tracing: false)
-
-      render
-
-      expect(rendered).not_to have_link project_settings_operations_path(project)
-    end
-
-    it 'is not visible to unauthorized user' do
-      render
-
-      expect(rendered).not_to have_link project_settings_operations_path(project)
-    end
-
-    it 'links to settings page' do
-      allow(view).to receive(:can?).and_return(true)
-
-      render
-
-      expect(rendered).to have_link('Operations', href: project_settings_operations_path(project))
     end
   end
 end
