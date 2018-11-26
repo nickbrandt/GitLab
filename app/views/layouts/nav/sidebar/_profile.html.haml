@@ -34,7 +34,7 @@
             .nav-icon-container
               = custom_icon('credit_card')
             %span.nav-item-name
-              Billing
+              = _("Billing")
           %ul.sidebar-sub-level-items.is-fly-out-only
             = nav_link(controller: :billings, html_options: { class: "fly-out-top-item" } ) do
               = link_to profile_billings_path do
@@ -167,11 +167,11 @@
           .nav-icon-container
             = custom_icon('pipeline')
           %span.nav-item-name
-            Pipeline quota
+            = _('Pipeline quota')
         %ul.sidebar-sub-level-items.is-fly-out-only
           = nav_link(path: 'profiles#pipeline_quota', html_options: { class: "fly-out-top-item" } ) do
             = link_to profile_pipeline_quota_path do
               %strong.fly-out-top-item-name
-                #{ _('Pipeline quota') }
+                = _('Pipeline quota')
 
     = render 'shared/sidebar_toggle_button'
