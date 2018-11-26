@@ -3064,6 +3064,9 @@ msgstr ""
 msgid "Enable reCAPTCHA or Akismet and set IP limits."
 msgstr ""
 
+msgid "Enable self approval of merge requests"
+msgstr ""
+
 msgid "Enable shared Runners"
 msgstr ""
 
@@ -3715,10 +3718,7 @@ msgstr ""
 msgid "GeoNodes|Does not match the primary storage configuration"
 msgstr ""
 
-msgid "GitLab Shared Runners execute code of different projects on the same Runner unless you configure GitLab Runner Autoscale with MaxBuilds 1 (which it is on GitLab.com)."
-msgstr ""
-
-msgid "GitLab User"
+msgid "GeoNodes|Failed"
 msgstr ""
 
 msgid "GeoNodes|Full"
@@ -4040,6 +4040,9 @@ msgid "GitLab Group Runners can execute code for all the projects in this group.
 msgstr ""
 
 msgid "GitLab Import"
+msgstr ""
+
+msgid "GitLab Shared Runners execute code of different projects on the same Runner unless you configure GitLab Runner Autoscale with MaxBuilds 1 (which it is on GitLab.com)."
 msgstr ""
 
 msgid "GitLab User"
