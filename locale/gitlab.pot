@@ -995,7 +995,7 @@ msgstr ""
 msgid "Available group Runners : %{runners}."
 msgstr ""
 
-msgid "Available shared Runners :"
+msgid "Available shared Runners:"
 msgstr ""
 
 msgid "Available specific runners"
@@ -1450,12 +1450,15 @@ msgstr ""
 msgid "Cannot modify managed Kubernetes cluster"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Certificate fingerprint"
 msgstr ""
 
 msgid "Change Weight"
 msgstr ""
 
+=======
+>>>>>>> upstream/master
 msgid "Change permissions"
 msgstr ""
 
@@ -3769,7 +3772,14 @@ msgstr ""
 msgid "GeoNodes|Learn more about Wiki checksum progress"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "GeoNodes|Learn more about Wiki verification"
+=======
+msgid "Given access %{time_ago}"
+msgstr ""
+
+msgid "Go Back"
+>>>>>>> upstream/master
 msgstr ""
 
 msgid "GeoNodes|Loading nodes"
@@ -3793,7 +3803,14 @@ msgstr ""
 msgid "GeoNodes|Node was successfully removed."
 msgstr ""
 
+<<<<<<< HEAD
 msgid "GeoNodes|Not checksummed"
+=======
+msgid "Grant access"
+msgstr ""
+
+msgid "Graph"
+>>>>>>> upstream/master
 msgstr ""
 
 msgid "GeoNodes|Out of sync"
@@ -4640,6 +4657,7 @@ msgstr ""
 msgid "Issues, merge requests, pushes and comments."
 msgstr ""
 
+<<<<<<< HEAD
 msgid "IssuesAnalytics|After you begin creating issues for your projects, we can start tracking and displaying metrics for them"
 msgstr ""
 
@@ -4670,6 +4688,11 @@ msgstr ""
 msgid "Jaeger tracing"
 msgstr ""
 
+=======
+msgid "It's you"
+msgstr ""
+
+>>>>>>> upstream/master
 msgid "Jan"
 msgstr ""
 
