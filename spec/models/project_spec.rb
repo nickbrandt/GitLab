@@ -233,7 +233,6 @@ describe Project do
       end
     end
 
-<<<<<<< HEAD
     context '#mark_stuck_remote_mirrors_as_failed!' do
       it 'fails stuck remote mirrors' do
         project = create(:project, :repository, :remote_mirror)
@@ -256,13 +255,9 @@ describe Project do
       it { is_expected.to validate_presence_of(:mirror_user) }
     end
 
-    it 'does not allow an invalid URI as import_url' do
-      project2 = build(:project, import_url: 'invalid://')
-=======
     describe 'import_url' do
       it 'does not allow an invalid URI as import_url' do
         project2 = build(:project, import_url: 'invalid://')
->>>>>>> ecbdef090277848d409ed7f97f69f53bbac7a92c
 
         expect(project2).not_to be_valid
       end
