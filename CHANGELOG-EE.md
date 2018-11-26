@@ -1,5 +1,18 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.3.11 (2018-11-26)
+
+### Security (7 changes)
+
+- Escape entity title while autocomplete template rendering to prevent XSS. !697
+- Properly filter private references from system notes.
+- Authorize users when listing board users and milestones.
+- Project groups approvers no longer leak private groups info.
+- Resolve: Guest can set weight of a new issue.
+- Fixes XSS with merge request approvers selection.
+- Protect against CSRF attacks when adding Slack app.
+
+
 ## 11.3.10 (2018-11-18)
 
 - No changes.
