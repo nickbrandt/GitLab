@@ -120,7 +120,7 @@ class Project < ActiveRecord::Base
   after_create :ensure_storage_path_exists
   after_save :ensure_storage_path_exists, if: :namespace_id_changed?
 
-  after_create :save_project_repository
+  after_create :track_project_repository
 
   acts_as_ordered_taggable
 
@@ -1210,7 +1210,7 @@ class Project < ActiveRecord::Base
     false
   end
 
-  def save_project_repository
+  def track_project_repository
     return unless hashed_storage?(:repository)
 
     project_repo = project_repository || build_project_repository

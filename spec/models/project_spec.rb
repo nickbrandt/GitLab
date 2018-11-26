@@ -1730,11 +1730,11 @@ describe Project do
     end
   end
 
-  describe '#save_project_repository' do
+  describe '#track_project_repository' do
     let(:project) { create(:project, :repository) }
 
     it 'creates a project_repository' do
-      project.save_project_repository
+      project.track_project_repository
 
       expect(project.reload.project_repository).to be_present
       expect(project.project_repository.disk_path).to eq(project.disk_path)
@@ -1742,12 +1742,12 @@ describe Project do
     end
 
     it 'updates the project_repository' do
-      project.save_project_repository
+      project.track_project_repository
 
       allow(project).to receive(:disk_path).and_return('@fancy/new/path')
 
       expect do
-        project.save_project_repository
+        project.track_project_repository
       end.not_to change(ProjectRepository, :count)
 
       expect(project.reload.project_repository.disk_path).to eq(project.disk_path)
