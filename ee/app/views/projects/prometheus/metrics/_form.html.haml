@@ -56,4 +56,4 @@
       = f.submit save_button_text, class: 'btn btn-success'
       = link_to _('Cancel'), edit_project_service_path(project, PrometheusService), class: 'btn btn-default float-right'
       - if metric.persisted?
-        = link_to _('Delete'), project_prometheus_metric_path(project, metric), data: { confirm: s_("This will delete the custom metric, Are you sure?") }, method: :delete, class: "btn btn-danger float-right append-right-default"
+        #delete-custom-metric-modal-wrapper{ data: { delete_metric_url: project_prometheus_metric_path(project, metric) } }
