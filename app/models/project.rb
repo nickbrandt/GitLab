@@ -189,7 +189,7 @@ class Project < ActiveRecord::Base
 
   has_one :import_state, autosave: true, class_name: 'ProjectImportState', inverse_of: :project
   has_one :import_export_upload, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
-  has_one :project_repository
+  has_one :project_repository, inverse_of: :project
 
   # Merge Requests for target project should be removed with it
   has_many :merge_requests, foreign_key: 'target_project_id', inverse_of: :target_project

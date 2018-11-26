@@ -3,7 +3,7 @@
 class ProjectRepository < ActiveRecord::Base
   include RepositoryOnShard
 
-  belongs_to :project
+  belongs_to :project, inverse_of: :project_repository
 
   class << self
     def find_project(disk_path)
