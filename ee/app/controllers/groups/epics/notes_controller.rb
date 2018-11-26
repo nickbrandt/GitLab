@@ -39,4 +39,11 @@ class Groups::Epics::NotesController < Groups::ApplicationController
   def note_serializer
     EpicNoteSerializer.new(project: nil, noteable: noteable, current_user: current_user)
   end
+
+  def normalize_create_params
+    params[:note].try do |note|
+      note[:noteable_id] = params[:epic_id]
+      note[:noteable_type] = 'Epic'
+    end
+  end
 end
