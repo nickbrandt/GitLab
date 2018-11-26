@@ -11,7 +11,7 @@ describe 'Every Sidekiq worker' do
     expect(Gitlab::SidekiqConfig.cron_workers.map(&:queue)).to all(start_with('cronjob:'))
   end
 
-  it 'has its queue in app/workers/all_queues.yml', :aggregate_failures do
+  it 'has its queue in Gitlab::SidekiqConfig::QUEUE_CONFIG_PATHS', :aggregate_failures do
     file_worker_queues = Gitlab::SidekiqConfig.worker_queues.to_set
 
     worker_queues = Gitlab::SidekiqConfig.workers.map(&:queue).to_set
@@ -19,10 +19,10 @@ describe 'Every Sidekiq worker' do
     worker_queues << 'default'
 
     missing_from_file = worker_queues - file_worker_queues - DEPRECATED_QUEUES
-    expect(missing_from_file).to be_empty, "expected #{missing_from_file.to_a.inspect} to be in app/workers/all_queues.yml"
+    expect(missing_from_file).to be_empty, "expected #{missing_from_file.to_a.inspect} to be in Gitlab::SidekiqConfig::QUEUE_CONFIG_PATHS"
 
     unncessarily_in_file = file_worker_queues - worker_queues - DEPRECATED_QUEUES
-    expect(unncessarily_in_file).to be_empty, "expected #{unncessarily_in_file.to_a.inspect} not to be in app/workers/all_queues.yml"
+    expect(unncessarily_in_file).to be_empty, "expected #{unncessarily_in_file.to_a.inspect} not to be in Gitlab::SidekiqConfig::QUEUE_CONFIG_PATHS"
   end
 
   it 'has its queue or namespace in config/sidekiq_queues.yml', :aggregate_failures do
