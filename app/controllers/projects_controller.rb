@@ -6,7 +6,6 @@ class ProjectsController < Projects::ApplicationController
   include SendFileUpload
   prepend EE::ProjectsController
 
-
   prepend_before_action(only: [:show]) { authenticate_sessionless_user!(:rss) }
 
   before_action :whitelist_query_limiting, only: [:create]
