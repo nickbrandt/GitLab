@@ -151,13 +151,10 @@ class ApplicationController < ActionController::Base
     end
   end
 
-<<<<<<< HEAD
   def verify_namespace_plan_check_enabled
     render_404 unless Gitlab::CurrentSettings.should_check_namespace_plan?
   end
 
-=======
->>>>>>> ecbdef090277848d409ed7f97f69f53bbac7a92c
   def log_exception(exception)
     Raven.capture_exception(exception) if sentry_enabled?
 
