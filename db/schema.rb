@@ -11,6 +11,7 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema.define(version: 20181114163403) do
+
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "pg_trgm"
@@ -2803,6 +2804,7 @@ ActiveRecord::Schema.define(version: 20181114163403) do
     t.integer "merge_request_notes_filter", limit: 2, default: 0, null: false
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
+    t.string "epics_sort"
     t.index ["user_id"], name: "index_user_preferences_on_user_id", unique: true, using: :btree
   end
 
