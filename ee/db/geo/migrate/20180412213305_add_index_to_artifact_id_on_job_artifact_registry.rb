@@ -1,4 +1,4 @@
-class AddIndexToArtifactIdOnJobArtifactRegistry < ActiveRecord::Migration
+class AddIndexToArtifactIdOnJobArtifactRegistry < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

@@ -97,6 +97,9 @@ export default {
 
 <template>
   <div :class="blockClass" class="block">
+    <div class="issuable-sidebar-header">
+      <toggle-sidebar :collapsed="collapsed" @toggle="toggleSidebar" />
+    </div>
     <collapsed-calendar-icon :text="collapsedText" class="sidebar-collapsed-icon" />
     <div class="title">
       {{ label }}
@@ -130,7 +133,7 @@ export default {
             -
             <button
               type="button"
-              class="btn-blank btn-link btn-default-hover-link"
+              class="btn-blank btn-link btn-secondary-hover-link"
               @click="newDateSelected(null);"
             >
               remove

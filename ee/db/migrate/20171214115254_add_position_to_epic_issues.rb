@@ -1,4 +1,4 @@
-class AddPositionToEpicIssues < ActiveRecord::Migration
+class AddPositionToEpicIssues < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

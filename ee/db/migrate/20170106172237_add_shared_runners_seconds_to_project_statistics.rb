@@ -1,5 +1,5 @@
 # rubocop:disable Migration/Datetime
-class AddSharedRunnersSecondsToProjectStatistics < ActiveRecord::Migration
+class AddSharedRunnersSecondsToProjectStatistics < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

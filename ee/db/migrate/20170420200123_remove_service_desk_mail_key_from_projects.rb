@@ -1,5 +1,5 @@
 # rubocop:disable Migration/RemoveColumn
-class RemoveServiceDeskMailKeyFromProjects < ActiveRecord::Migration
+class RemoveServiceDeskMailKeyFromProjects < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def change

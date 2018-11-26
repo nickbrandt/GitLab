@@ -447,6 +447,9 @@ msgstr ""
 msgid "Add user(s) to the group:"
 msgstr ""
 
+msgid "Add users or groups who are allowed to approve every merge request"
+msgstr ""
+
 msgid "Add users to group"
 msgstr ""
 
@@ -599,40 +602,13 @@ msgstr ""
 msgid "An error has occurred"
 msgstr ""
 
-msgid "An error occured creating the new branch."
-msgstr ""
-
-msgid "An error occured whilst fetching the job trace."
-msgstr ""
-
-msgid "An error occured whilst fetching the latest pipeline."
-msgstr ""
-
-msgid "An error occured whilst loading all the files."
-msgstr ""
-
-msgid "An error occured whilst loading the file content."
-msgstr ""
-
-msgid "An error occured whilst loading the file."
-msgstr ""
-
-msgid "An error occured whilst loading the merge request changes."
-msgstr ""
-
-msgid "An error occured whilst loading the merge request version data."
-msgstr ""
-
-msgid "An error occured whilst loading the merge request."
-msgstr ""
-
-msgid "An error occured whilst loading the pipelines jobs."
-msgstr ""
-
 msgid "An error occurred adding a draft to the discussion."
 msgstr ""
 
 msgid "An error occurred adding a new draft."
+msgstr ""
+
+msgid "An error occurred creating the new branch."
 msgstr ""
 
 msgid "An error occurred previewing the blob"
@@ -743,6 +719,33 @@ msgstr ""
 msgid "An error occurred while validating username"
 msgstr ""
 
+msgid "An error occurred whilst fetching the job trace."
+msgstr ""
+
+msgid "An error occurred whilst fetching the latest pipeline."
+msgstr ""
+
+msgid "An error occurred whilst loading all the files."
+msgstr ""
+
+msgid "An error occurred whilst loading the file content."
+msgstr ""
+
+msgid "An error occurred whilst loading the file."
+msgstr ""
+
+msgid "An error occurred whilst loading the merge request changes."
+msgstr ""
+
+msgid "An error occurred whilst loading the merge request version data."
+msgstr ""
+
+msgid "An error occurred whilst loading the merge request."
+msgstr ""
+
+msgid "An error occurred whilst loading the pipelines jobs."
+msgstr ""
+
 msgid "An error occurred. Please try again."
 msgstr ""
 
@@ -776,6 +779,12 @@ msgstr ""
 msgid "Applications"
 msgstr ""
 
+msgid "Approvals required"
+msgstr ""
+
+msgid "Approvers"
+msgstr ""
+
 msgid "Apr"
 msgstr ""
 
@@ -801,6 +810,12 @@ msgid "Are you sure you want to regenerate the public key? You will have to upda
 msgstr ""
 
 msgid "Are you sure you want to remove %{group_name}?"
+msgstr ""
+
+msgid "Are you sure you want to remove approver %{name}?"
+msgstr ""
+
+msgid "Are you sure you want to remove group %{name}?"
 msgstr ""
 
 msgid "Are you sure you want to remove this identity?"
@@ -1405,6 +1420,9 @@ msgstr ""
 msgid "Callback URL"
 msgstr ""
 
+msgid "Can override approvers and approvals required per merge request"
+msgstr ""
+
 msgid "Can't find HEAD commit for this branch"
 msgstr ""
 
@@ -1600,7 +1618,7 @@ msgstr ""
 msgid "CiVariable|Create wildcard"
 msgstr ""
 
-msgid "CiVariable|Error occured while saving variables"
+msgid "CiVariable|Error occurred while saving variables"
 msgstr ""
 
 msgid "CiVariable|New environment"
@@ -1708,13 +1726,13 @@ msgstr ""
 msgid "ClusterIntegration|An error occured while trying to fetch project zones: %{error}"
 msgstr ""
 
-msgid "ClusterIntegration|An error occured while trying to fetch your projects: %{error}"
-msgstr ""
-
-msgid "ClusterIntegration|An error occured while trying to fetch zone machine types: %{error}"
-msgstr ""
-
 msgid "ClusterIntegration|An error occurred when trying to contact the Google Cloud API. Please try again later."
+msgstr ""
+
+msgid "ClusterIntegration|An error occurred while trying to fetch your projects: %{error}"
+msgstr ""
+
+msgid "ClusterIntegration|An error occurred while trying to fetch zone machine types: %{error}"
 msgstr ""
 
 msgid "ClusterIntegration|Applications"
@@ -1724,6 +1742,9 @@ msgid "ClusterIntegration|Are you sure you want to remove this Kubernetes cluste
 msgstr ""
 
 msgid "ClusterIntegration|CA Certificate"
+msgstr ""
+
+msgid "ClusterIntegration|Cert-Manager"
 msgstr ""
 
 msgid "ClusterIntegration|Certificate Authority bundle (PEM format)"
@@ -1897,6 +1918,9 @@ msgstr ""
 msgid "ClusterIntegration|Learn more about group Kubernetes clusters"
 msgstr ""
 
+msgid "ClusterIntegration|Let's Encrypt"
+msgstr ""
+
 msgid "ClusterIntegration|Machine type"
 msgstr ""
 
@@ -2057,6 +2081,9 @@ msgid "ClusterIntegration|Zone"
 msgstr ""
 
 msgid "ClusterIntegration|access to Google Kubernetes Engine"
+msgstr ""
+
+msgid "ClusterIntegration|cert-manager is a native Kubernetes certificate management controller that helps with issuing certificates. Installing cert-manager on your cluster will issue a certificate by %{letsEncrypt} and ensure that certificates are valid and up to date."
 msgstr ""
 
 msgid "ClusterIntegration|check the pricing here"
@@ -2555,6 +2582,9 @@ msgstr ""
 msgid "Customize how Google Code email addresses and usernames are imported into GitLab. In the next step, you'll be able to select the projects you want to import."
 msgstr ""
 
+msgid "Customize your merge request approval settings."
+msgstr ""
+
 msgid "Customize your pipeline configuration, view your pipeline status and coverage report."
 msgstr ""
 
@@ -3023,6 +3053,9 @@ msgid "Enable or disable version check and usage ping."
 msgstr ""
 
 msgid "Enable reCAPTCHA or Akismet and set IP limits."
+msgstr ""
+
+msgid "Enable self approval of merge requests"
 msgstr ""
 
 msgid "Enable the Performance Bar for a given group."
@@ -4097,6 +4130,9 @@ msgid "Group maintainers can register group runners in the %{link}"
 msgstr ""
 
 msgid "Group name"
+msgstr ""
+
+msgid "Group:"
 msgstr ""
 
 msgid "Group: %{group_name}"
@@ -5570,12 +5606,6 @@ msgstr ""
 msgid "None"
 msgstr ""
 
-msgid "Not all comments are displayed because you're comparing two versions of the diff."
-msgstr ""
-
-msgid "Not all comments are displayed because you're viewing an old version of the diff."
-msgstr ""
-
 msgid "Not allowed to merge"
 msgstr ""
 
@@ -5726,9 +5756,6 @@ msgid "One or more of your Google Code projects cannot be imported into GitLab d
 msgstr ""
 
 msgid "Only admins"
-msgstr ""
-
-msgid "Only comments from the following commit are shown below"
 msgstr ""
 
 msgid "Only mirror protected branches"
@@ -6840,6 +6867,12 @@ msgstr ""
 msgid "Remove Runner"
 msgstr ""
 
+msgid "Remove all approvals in a merge request when new commits are pushed to its source branch"
+msgstr ""
+
+msgid "Remove approver"
+msgstr ""
+
 msgid "Remove avatar"
 msgstr ""
 
@@ -7349,6 +7382,9 @@ msgstr ""
 msgid "Send email"
 msgstr ""
 
+msgid "Send report"
+msgstr ""
+
 msgid "Send usage data"
 msgstr ""
 
@@ -7389,6 +7425,9 @@ msgid "Set max session time for web terminal."
 msgstr ""
 
 msgid "Set notification email for abuse reports."
+msgstr ""
+
+msgid "Set number of approvers required before open merge requests can be merged"
 msgstr ""
 
 msgid "Set requirements for a user to sign-in. Enable mandatory two-factor authentication."
@@ -7473,9 +7512,6 @@ msgid "Show complete raw log"
 msgstr ""
 
 msgid "Show latest version"
-msgstr ""
-
-msgid "Show latest version of the diff"
 msgstr ""
 
 msgid "Show parent pages"
@@ -7616,6 +7652,9 @@ msgid "Sorry, no epics matched your search"
 msgstr ""
 
 msgid "Sorry, no projects matched your search"
+msgstr ""
+
+msgid "Sorry, your filter produced no results"
 msgstr ""
 
 msgid "Sort by"
@@ -8121,6 +8160,9 @@ msgstr ""
 msgid "The value lying at the midpoint of a series of observed values. E.g., between 3, 5, 9, the median is 5. Between 3, 5, 7, 8, the median is (5+7)/2 = 6."
 msgstr ""
 
+msgid "There are no approvers"
+msgstr ""
+
 msgid "There are no archived projects yet"
 msgstr ""
 
@@ -8128,9 +8170,6 @@ msgid "There are no issues to show"
 msgstr ""
 
 msgid "There are no labels yet"
-msgstr ""
-
-msgid "There are no merge requests to show"
 msgstr ""
 
 msgid "There are no projects shared with this group yet"
@@ -8286,7 +8325,7 @@ msgstr ""
 msgid "This job requires a manual action"
 msgstr ""
 
-msgid "This job will automatically run after it's timer finishes. Often they are used for incremental roll-out deploys to production environments. When unscheduled it converts into a manual action."
+msgid "This job will automatically run after its timer finishes. Often they are used for incremental roll-out deploys to production environments. When unscheduled it converts into a manual action."
 msgstr ""
 
 msgid "This means you can not push code until you create an empty repository or import existing one."
@@ -8609,6 +8648,9 @@ msgid "To validate your GitLab CI configurations, go to 'CI/CD → Pipelines' in
 msgstr ""
 
 msgid "To view the roadmap, add a start or due date to one of your epics in this group or its subgroups. In the months view, only epics in the past month, current month, and next 5 months are shown."
+msgstr ""
+
+msgid "To widen your search, change or remove filters above"
 msgstr ""
 
 msgid "To widen your search, change or remove filters."
@@ -9007,6 +9049,9 @@ msgstr ""
 msgid "View the documentation"
 msgstr ""
 
+msgid "Viewing commit"
+msgstr ""
+
 msgid "Visibility and access controls"
 msgstr ""
 
@@ -9242,6 +9287,9 @@ msgid "Wiki|Pages"
 msgstr ""
 
 msgid "Wiki|Wiki Pages"
+msgstr ""
+
+msgid "Will deploy to"
 msgstr ""
 
 msgid "With contribution analytics you can have an overview for the activity of issues, merge requests and push events of your organization and its members."

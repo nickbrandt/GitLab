@@ -1,4 +1,4 @@
-class AddEsToApplicationSettings < ActiveRecord::Migration
+class AddEsToApplicationSettings < ActiveRecord::Migration[4.2]
   def up
     add_column :application_settings, :elasticsearch_indexing, :boolean, default: false, null: false
     add_column :application_settings, :elasticsearch_search, :boolean, default: false, null: false

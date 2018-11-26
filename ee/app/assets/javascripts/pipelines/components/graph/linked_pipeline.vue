@@ -25,8 +25,9 @@ export default {
       required: true,
     },
     isLoading: {
-      type: Boolean, 
-      required: true,
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   computed: {
@@ -52,14 +53,16 @@ export default {
         :id="`js-linked-pipeline-${pipelineId}`"
         @click="onClickLinkedPipeline"
         :title="tooltipText"
-        class="linked-pipeline-content"
+        class="js-linked-pipeline-content linked-pipeline-content"
       >
-        <gl-loading-icon v-if="isLoading" />
-        <ci-status v-else :status="pipelineStatus" class="js-linked-pipeline-status" />
+        <span class="js-linked-pipeline-status ci-status-text">
+          <gl-loading-icon v-if="isLoading" class="js-linked-pipeline-loading" />
+          <ci-status v-else :status="pipelineStatus" class="js-linked-pipeline-status" />
+        </span>
 
-        <span class="linked-pipeline-project-name ci-status-text">{{ projectName }}</span>
-        <span class="project-name-pipeline-id-separator ci-status-text">&#8226;</span>
-        <span class="linked-pipeline-id ci-status-text">#{{ pipelineId }}</span>
+        <span class="linked-pipeline-project-name">{{ projectName }}</span>
+        <span class="project-name-pipeline-id-separator">&#8226;</span>
+        <span class="js-linked-pipeline-id">#{{ pipelineId }}</span>
       </gl-button>
     </div>
   </li>

@@ -1,4 +1,4 @@
-class CreateGeoNodes < ActiveRecord::Migration
+class CreateGeoNodes < ActiveRecord::Migration[4.2]
   def change
     create_table :geo_nodes do |t|
       t.string :schema

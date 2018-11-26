@@ -1,4 +1,4 @@
-class FixPartialIndexToProjectRepositoryStatesChecksumColumns < ActiveRecord::Migration
+class FixPartialIndexToProjectRepositoryStatesChecksumColumns < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

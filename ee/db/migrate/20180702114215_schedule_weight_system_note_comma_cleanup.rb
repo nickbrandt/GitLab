@@ -1,4 +1,4 @@
-class ScheduleWeightSystemNoteCommaCleanup < ActiveRecord::Migration
+class ScheduleWeightSystemNoteCommaCleanup < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

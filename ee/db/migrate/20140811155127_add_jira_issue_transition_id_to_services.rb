@@ -1,5 +1,5 @@
 # rubocop:disable all
-class AddJiraIssueTransitionIdToServices < ActiveRecord::Migration
+class AddJiraIssueTransitionIdToServices < ActiveRecord::Migration[4.2]
   def up
     add_column :services, :jira_issue_transition_id, :string, default: '2'
     Service.reset_column_information

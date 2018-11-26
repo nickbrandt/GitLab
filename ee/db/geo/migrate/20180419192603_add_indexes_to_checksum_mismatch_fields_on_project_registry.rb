@@ -1,4 +1,4 @@
-class AddIndexesToChecksumMismatchFieldsOnProjectRegistry < ActiveRecord::Migration
+class AddIndexesToChecksumMismatchFieldsOnProjectRegistry < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

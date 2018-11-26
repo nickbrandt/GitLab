@@ -93,7 +93,7 @@ class Projects::ManagedLicensesController < Projects::ApplicationController
   end
 
   def render_ok
-    render status: :ok, nothing: true
+    head :ok
   end
 
   def render_software_license_policy

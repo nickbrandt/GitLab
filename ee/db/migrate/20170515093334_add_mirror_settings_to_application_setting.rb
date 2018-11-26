@@ -1,4 +1,4 @@
-class AddMirrorSettingsToApplicationSetting < ActiveRecord::Migration
+class AddMirrorSettingsToApplicationSetting < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

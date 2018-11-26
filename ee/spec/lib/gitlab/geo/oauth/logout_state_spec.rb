@@ -3,14 +3,15 @@
 require 'spec_helper'
 
 describe Gitlab::Geo::Oauth::LogoutState do
-  let(:salt) { '100d8cbd1750a2bb' }
+  let(:salt) { 'MTAwZDhjYmQxNzUw' }
+  let(:tag) { 'Y0D_b1xDW3uO-qN86c83HQ==' }
   let(:return_to) { 'http://fake-secondary.com:3000/project/test' }
   let(:access_token) { '48622af3df5b5b3e09b9754f2a3e5f3f10a94b4147d155b1029d827c112524d1' }
-  let(:encrypted_token) { 'fDyMq6IrHGhToG5NHiXnQ4O8AsHmSDqDTqbLP64MK0L9j0rkPEnrNDBSoWU-QS2l7sIt_Q4UMItxFhFH6xMh68uspgydVysRG9fmr_PXIU4=' }
+  let(:encrypted_token) { 't5fPL8_1KcFC5L945n9fcMRr7N-1J60LrOREQ9BAdur_K97tU1IpmWrN5-9P9aqpFvdL3SxzvP_z6CfO92BPsA==' }
 
   before do
-    allow(Settings).to receive(:attr_encrypted_db_key_base)
-      .and_return('4587f5984bf8f807ee320ed7b783e0c56b644a18fdcf5bc79bb2b5b38edbbb1a7037e8d79cbc880cc593880cd3ce87906ebb38466428dfd0dc70a626bb28b7ba')
+    allow(Settings).to receive(:attr_encrypted_db_key_base_truncated)
+      .and_return('4587f5984bf8f807ee320ed7b783e0c5')
   end
 
   describe '#encode' do
@@ -21,7 +22,7 @@ describe Gitlab::Geo::Oauth::LogoutState do
     end
 
     it 'returns nil when encryption fails' do
-      allow_any_instance_of(OpenSSL::Cipher::AES)
+      allow_any_instance_of(OpenSSL::Cipher::AES256)
         .to receive(:final) { raise OpenSSL::OpenSSLError }
 
       subject = described_class.new(token: access_token, return_to: return_to)
@@ -29,10 +30,10 @@ describe Gitlab::Geo::Oauth::LogoutState do
       expect(subject.encode).to be_nil
     end
 
-    it 'returns a string with salt, encrypted access token, and return_to full path colon separated' do
+    it 'returns a string with salt, tag, encrypted access token, and return_to full path colon separated' do
       subject = described_class.new(salt: salt, token: access_token, return_to: return_to)
 
-      expect(subject.encode).to eq("#{salt}:#{encrypted_token}:/project/test")
+      expect(subject.encode).to eq("#{salt}:#{tag}:#{encrypted_token}:/project/test")
     end
 
     it 'includes a empty value for return_to into state when return_to is nil' do
@@ -40,7 +41,7 @@ describe Gitlab::Geo::Oauth::LogoutState do
 
       state = subject.encode
 
-      expect(state.split(':', 3)[2]).to eq ''
+      expect(state.split(':', 4)[3]).to eq ''
     end
   end
 
@@ -51,23 +52,59 @@ describe Gitlab::Geo::Oauth::LogoutState do
       expect(subject.decode).to be_nil
     end
 
+    it 'returns nil when salt has invalid base64' do
+      subject = described_class.new(salt: 'invalid', tag: tag, token: encrypted_token, return_to: return_to)
+
+      expect(subject.decode).to be_nil
+    end
+
+    it 'returns nil when tag is nil' do
+      subject = described_class.new(salt: salt, tag: nil, token: encrypted_token, return_to: return_to)
+
+      expect(subject.decode).to be_nil
+    end
+
+    it 'returns nil when encrypted token has invalid base64' do
+      subject = described_class.new(salt: salt, tag: tag, token: 'invalid', return_to: return_to)
+
+      expect(subject.decode).to be_nil
+    end
+
     it 'returns nil when encrypted token is nil' do
-      subject = described_class.new(salt: salt, token: nil, return_to: return_to)
+      subject = described_class.new(salt: salt, tag: tag, token: nil, return_to: return_to)
 
       expect(subject.decode).to be_nil
     end
 
     it 'returns nil when decryption fails' do
-      allow_any_instance_of(OpenSSL::Cipher::AES)
+      allow_any_instance_of(OpenSSL::Cipher::AES256)
         .to receive(:final) { raise OpenSSL::OpenSSLError }
 
-      subject = described_class.new(salt: salt, token: encrypted_token, return_to: return_to)
+      subject = described_class.new(salt: salt, tag: tag, token: encrypted_token, return_to: return_to)
+
+      expect(subject.decode).to be_nil
+    end
+
+    it 'returns nil when tag has an invalid byte size' do
+      subject = described_class.new(salt: salt, tag: 'aW52YWxpZA==', token: encrypted_token, return_to: return_to)
+
+      expect(subject.decode).to be_nil
+    end
+
+    it 'returns nil when tag has been modified' do
+      subject = described_class.new(salt: salt, tag: 'MGY4MzY5YmU0OTk0', token: encrypted_token, return_to: return_to)
+
+      expect(subject.decode).to be_nil
+    end
+
+    it 'returns nil when return_to has been modified' do
+      subject = described_class.new(salt: salt, tag: tag, token: encrypted_token, return_to: '/foo/bar')
 
       expect(subject.decode).to be_nil
     end
 
     it 'returns access_token when token is recoverable' do
-      subject = described_class.new(salt: salt, token: encrypted_token, return_to: return_to)
+      subject = described_class.new(salt: salt, tag: tag, token: encrypted_token, return_to: return_to)
 
       expect(subject.decode).to eq(access_token)
     end

@@ -1,4 +1,4 @@
-class RemoveGeoSshRepoSync < ActiveRecord::Migration
+class RemoveGeoSshRepoSync < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

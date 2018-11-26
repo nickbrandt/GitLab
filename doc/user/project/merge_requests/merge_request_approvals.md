@@ -17,8 +17,8 @@ Merge request approvals enable enforced code review by requiring specified peopl
 
 To edit the merge request approvals:
 
-1. Navigate to your project's **Settings > General** and expand the
-   **Merge requests settings**
+1. Navigate to your project's **Settings > General** and expand
+   **Merge request approvals**
 1. Search for users or groups that will be [eligible to approve](#eligible-approvers)
    merge requests and click the **Add** button to add them as approvers
 1. Set the minimum number of required approvals under the "Approvals required"
@@ -109,8 +109,8 @@ level and change them later when creating or editing the merge request.
 
 First, you have to enable this option in the project's settings:
 
-1. Navigate to your project's **Settings > General** and expand the
-   **Merge requests settings**
+1. Navigate to your project's **Settings > General** and expand
+   **Merge request approvals**
 1. Tick the "Can override approvers and approvals required per merge request"
    checkbox
 
@@ -155,8 +155,8 @@ If approvals are [set at the project level](#editing-approvals),
 you can choose whether all approvals on a merge request are removed when
 new commits are pushed to the source branch of the merge request:
 
-1. Navigate to your project's **Settings > General** and expand the
-   **Merge requests settings**
+1. Navigate to your project's **Settings > General** and expand
+   **Merge request approvals**
 1. Tick the "Can override approvers and approvals required per merge request"
    checkbox
 
@@ -179,8 +179,8 @@ enabling it [at the project level](#editing-approvals). Authors
 also need to be included in the approvers list in order to be able to
 approve their merge request.
 
-1. Navigate to your project's **Settings > General** and expand the
-   **Merge requests settings**
+1. Navigate to your project's **Settings > General** and expand
+   **Merge request approvals**
 1. Tick the "Enable self approval of merge requests" checkbox
 1. Click **Save changes**
 

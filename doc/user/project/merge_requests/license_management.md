@@ -8,7 +8,7 @@ in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.0.
 If you are using [GitLab CI/CD](../../../ci/README.md), you can search your project dependencies for their licenses
 using License Management.
 
-You can take advantage of License Management by either [including the CI job](../../../ci/examples/dependency_scanning.md) in
+You can take advantage of License Management by either [including the CI job](../../../ci/examples/license_management.md) in
 your existing `.gitlab-ci.yml` file or by implicitly using
 [Auto License Management](../../../topics/autodevops/index.md#auto-license-management)
 that is provided by [Auto DevOps](../../../topics/autodevops/index.md).

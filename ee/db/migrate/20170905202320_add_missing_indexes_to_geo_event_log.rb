@@ -1,4 +1,4 @@
-class AddMissingIndexesToGeoEventLog < ActiveRecord::Migration
+class AddMissingIndexesToGeoEventLog < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

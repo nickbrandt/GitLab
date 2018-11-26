@@ -1,4 +1,4 @@
-class RemoveOldRepositoryVerificationChecksumFromGeoProjectRegistry < ActiveRecord::Migration
+class RemoveOldRepositoryVerificationChecksumFromGeoProjectRegistry < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def up

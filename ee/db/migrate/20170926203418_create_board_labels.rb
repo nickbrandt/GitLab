@@ -1,4 +1,4 @@
-class CreateBoardLabels < ActiveRecord::Migration
+class CreateBoardLabels < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   disable_ddl_transaction!

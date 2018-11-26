@@ -11,7 +11,7 @@ describe 'EE > Projects > Settings > User manages merge requests template' do
 
   it 'saves merge request template' do
     fill_in 'project_merge_requests_template', with: "This merge request should contain the following."
-    page.within '.merge-requests-feature' do
+    page.within '#js-merge-request-settings' do
       click_button 'Save changes'
     end
 

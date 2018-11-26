@@ -84,3 +84,4 @@ The following quick actions are applicable for epics threads and description:
 | `/label ~label1 ~label2`   | Add label(s)                            |
 | `/unlabel ~label1 ~label2` | Remove all or specific label(s)         |
 | `/relabel ~label1 ~label2` | Replace label                           |
+| `/promote`                 | Promote an issue to an epic             |

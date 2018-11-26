@@ -1,4 +1,4 @@
-class MigrateCiJobArtifactsToSeparateRegistry < ActiveRecord::Migration
+class MigrateCiJobArtifactsToSeparateRegistry < ActiveRecord::Migration[4.2]
   def up
     tracking_db.create_table :job_artifact_registry, force: :cascade do |t|
       t.datetime_with_timezone "created_at"
