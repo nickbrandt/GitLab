@@ -3064,11 +3064,7 @@ msgstr ""
 msgid "Enable reCAPTCHA or Akismet and set IP limits."
 msgstr ""
 
-<<<<<<< HEAD
-msgid "Enable self approval of merge requests"
-=======
 msgid "Enable shared Runners"
->>>>>>> upstream/master
 msgstr ""
 
 msgid "Enable the Performance Bar for a given group."
@@ -3719,14 +3715,10 @@ msgstr ""
 msgid "GeoNodes|Does not match the primary storage configuration"
 msgstr ""
 
-<<<<<<< HEAD
-msgid "GeoNodes|Failed"
-=======
 msgid "GitLab Shared Runners execute code of different projects on the same Runner unless you configure GitLab Runner Autoscale with MaxBuilds 1 (which it is on GitLab.com)."
 msgstr ""
 
 msgid "GitLab User"
->>>>>>> upstream/master
 msgstr ""
 
 msgid "GeoNodes|Full"
