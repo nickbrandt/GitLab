@@ -27,7 +27,7 @@ import 'ee/boards/models/list';
 import 'ee/boards/models/issue';
 import 'ee/boards/models/project';
 import BoardService from 'ee/boards/services/board_service';
-import BoardsSelector from 'ee/boards/components/boards_selector';
+import BoardsSelector from 'ee/boards/components/boards_selector.vue';
 import collapseIcon from 'ee/boards/icons/fullscreen_collapse.svg';
 import expandIcon from 'ee/boards/icons/fullscreen_expand.svg';
 import tooltip from '~/vue_shared/directives/tooltip';
@@ -356,11 +356,34 @@ export default () => {
     `,
   });
 
+  const boardsSwitcherElement = document.getElementById('js-multiple-boards-switcher');
   // eslint-disable-next-line no-new
   new Vue({
-    el: '#js-multiple-boards-switcher',
+    el: boardsSwitcherElement,
     components: {
       BoardsSelector,
+    },
+    data() {
+      const { dataset } = boardsSwitcherElement;
+
+      const boardsSelectorProps = {
+        ...dataset,
+        currentBoard: JSON.parse(dataset.currentBoard),
+        hasMissingBoards: dataset.hasMissingBoards === 'true',
+        canAdminBoard: dataset.canAdminBoard === 'true',
+        multipleIssueBoardsAvailable: dataset.multipleIssueBoardsAvailable === 'true',
+        projectId: Number(dataset.projectId),
+        groupId: Number(dataset.groupId),
+        scopedIssueBoardFeatureEnabled: dataset.scopedIssueBoardFeatureEnabled === 'true',
+        weights: JSON.parse(dataset.weights),
+      };
+
+      return { boardsSelectorProps };
+    },
+    render(createElement) {
+      return createElement(BoardsSelector, {
+        props: this.boardsSelectorProps,
+      });
     },
   });
 };

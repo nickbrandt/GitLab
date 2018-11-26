@@ -1,8 +1,9 @@
 import Vue from 'vue';
 import BoardService from 'ee/boards/services/board_service';
-import BoardsSelector from 'ee/boards/components/boards_selector';
+import BoardsSelector from 'ee/boards/components/boards_selector.vue';
 import setTimeoutPromiseHelper from 'spec/helpers/set_timeout_promise_helper';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import { TEST_HOST } from 'spec/test_constants';
 
 const throttleDuration = 1;
 
@@ -27,8 +28,7 @@ describe('BoardsSelector', () => {
   });
 
   beforeEach(done => {
-    loadFixtures('boards/show.html.raw');
-
+    setFixtures('<div class="js-boards-selector"></div>');
     window.gl = window.gl || {};
 
     window.gl.boardService = new BoardService({
@@ -44,12 +44,29 @@ describe('BoardsSelector', () => {
 
     spyOn(BoardService.prototype, 'allBoards').and.returnValue(boardServiceResponse);
 
+    const Component = Vue.extend(BoardsSelector);
     vm = mountComponent(
-      BoardsSelector,
+      Component,
       {
         throttleDuration,
-        currentBoard: {},
-        milestonePath: '',
+        currentBoard: {
+          id: 1,
+          name: 'Development',
+          milestone_id: null,
+          weight: null,
+          assignee_id: null,
+          labels: [],
+        },
+        milestonePath: `${TEST_HOST}/milestone/path`,
+        boardBaseUrl: `${TEST_HOST}/board/base/url`,
+        hasMissingBoards: false,
+        canAdminBoard: true,
+        multipleIssueBoardsAvailable: true,
+        labelsPath: `${TEST_HOST}/labels/path`,
+        projectId: 42,
+        groupId: 19,
+        scopedIssueBoardFeatureEnabled: true,
+        weights: [],
       },
       document.querySelector('.js-boards-selector'),
     );

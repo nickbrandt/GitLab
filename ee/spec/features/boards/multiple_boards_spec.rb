@@ -51,7 +51,7 @@ describe 'Multiple Issue Boards', :js do
         click_button board.name
 
         page.within('.dropdown-menu') do
-          click_link 'Create new board'
+          click_button 'Create new board'
         end
 
         fill_in 'board-new-name', with: 'This is a new board'
@@ -67,7 +67,7 @@ describe 'Multiple Issue Boards', :js do
         wait_for_requests
 
         page.within('.dropdown-menu') do
-          click_link 'Delete board'
+          click_button 'Delete board'
         end
 
         expect(page).to have_content('Are you sure you want to delete this board?')
