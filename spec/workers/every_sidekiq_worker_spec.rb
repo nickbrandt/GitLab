@@ -18,10 +18,17 @@ describe 'Every Sidekiq worker' do
     worker_queues << ActionMailer::DeliveryJob.new.queue_name
     worker_queues << 'default'
 
+<<<<<<< HEAD
     missing_from_file = worker_queues - file_worker_queues - DEPRECATED_QUEUES
     expect(missing_from_file).to be_empty, "expected #{missing_from_file.to_a.inspect} to be in Gitlab::SidekiqConfig::QUEUE_CONFIG_PATHS"
 
     unncessarily_in_file = file_worker_queues - worker_queues - DEPRECATED_QUEUES
+=======
+    missing_from_file = worker_queues - file_worker_queues
+    expect(missing_from_file).to be_empty, "expected #{missing_from_file.to_a.inspect} to be in Gitlab::SidekiqConfig::QUEUE_CONFIG_PATHS"
+
+    unncessarily_in_file = file_worker_queues - worker_queues
+>>>>>>> upstream/master
     expect(unncessarily_in_file).to be_empty, "expected #{unncessarily_in_file.to_a.inspect} not to be in Gitlab::SidekiqConfig::QUEUE_CONFIG_PATHS"
   end
 
