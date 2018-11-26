@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class LogFinder
   PER_PAGE = 25
   ENTITY_COLUMN_TYPES = {

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   class RegistryFinder
     attr_reader :current_node

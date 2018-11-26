@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Projects::ServiceDeskController < Projects::ApplicationController
   before_action :authorize_admin_project!
 

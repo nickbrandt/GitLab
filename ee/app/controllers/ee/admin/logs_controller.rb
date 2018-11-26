@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE::Admin::LogsController
   include ::Gitlab::Utils::StrongMemoize
   extend ::Gitlab::Utils::Override

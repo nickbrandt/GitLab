@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Admin::LicensesController < Admin::ApplicationController
   before_action :license, only: [:show, :download, :destroy]
   before_action :require_license, only: [:download, :destroy]
