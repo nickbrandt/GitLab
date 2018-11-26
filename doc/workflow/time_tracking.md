@@ -69,17 +69,11 @@ The following time units are available:
 * hours (h)
 * minutes (m)
 
-<<<<<<< HEAD
-Default conversion rates are
-* 1 week = 5 days,
-* 1 day = 8 hours.
+Default conversion rates are 1mo = 4w, 1w = 5d and 1d = 8h.
 
 Other interesting links:
 
 - [Time Tracking landing page on about.gitlab.com][landing]
-=======
-Default conversion rates are 1mo = 4w, 1w = 5d and 1d = 8h.
->>>>>>> upstream/master
 
 [landing]: https://about.gitlab.com/features/time-tracking
 [quick actions]: ../user/project/quick_actions.md
