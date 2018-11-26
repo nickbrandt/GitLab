@@ -4,6 +4,9 @@ class DashboardController < Dashboard::ApplicationController
   include IssuesAction
   include MergeRequestsAction
 
+  prepend_before_action(only: [:issues]) { authenticate_sessionless_user!(:rss) }
+  prepend_before_action(only: [:issues_calendar]) { authenticate_sessionless_user!(:ics) }
+
   FILTER_PARAMS = [
     :author_id,
     :assignee_id,
