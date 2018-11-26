@@ -153,6 +153,7 @@ describe Projects::MergeRequests::DraftsController do
     context 'without permissions' do
       before do
         sign_in(user2)
+        project.add_developer(user2)
       end
 
       it 'does not allow editing draft note belonging to someone else' do
@@ -176,6 +177,22 @@ describe Projects::MergeRequests::DraftsController do
   end
 
   describe 'POST #publish' do
+    context 'without permissions' do
+      before do
+        sign_in(user2)
+        project.add_developer(user2)
+      end
+
+      it 'does not allow publishing draft note belonging to someone else' do
+        draft = create(:draft_note, merge_request: merge_request, author: user)
+
+        expect { post :publish, params.merge(id: draft.id) }.to change { Note.count }.by(0)
+          .and change { DraftNote.count }.by(0)
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+
     it 'publishes draft notes with position' do
       diff_refs = project.commit(RepoHelpers.sample_commit.id).try(:diff_refs)
 
