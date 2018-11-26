@@ -1,4 +1,4 @@
-# Project Security Dashboard
+# Project Security Dashboard **[ULTIMATE]**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/6165) in [GitLab Ultimate](https://about.gitlab.com/pricing) 11.1.
 
