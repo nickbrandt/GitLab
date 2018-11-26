@@ -2,16 +2,16 @@ module Groups
   class RoadmapController < Groups::ApplicationController
     include IssuableCollections
     include EpicsActions
-    include EpicsSorting
 
     before_action :check_epics_available!
     before_action :group
     before_action :persist_roadmap_layout, only: [:show]
-    before_action :set_epics_sorting, only: :show
 
+    # show roadmap for a group
     def show
-      # show roadmap for a group
-      @sort = params[:sort] || default_sort_order
+      # Used only to show to correct sort dropdown option on filter bar
+      @sort = params[:sort] || current_user&.user_preference&.epics_sort || default_sort_order
+
       @epics_count = EpicsFinder.new(current_user, group_id: @group.id).execute.count
     end
 

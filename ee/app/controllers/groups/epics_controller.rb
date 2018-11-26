@@ -5,15 +5,9 @@ class Groups::EpicsController < Groups::ApplicationController
   include ToggleSubscriptionAction
   include RendersNotes
   include EpicsActions
-  include EpicsSorting
 
   before_action :check_epics_available!
   before_action :epic, except: [:index, :create]
-
-  # This callback should be executed before the :set_issuables_index
-  # otherwise sorting will be ignored for epics.
-  before_action :set_epics_sorting, only: :index
-
   before_action :set_issuables_index, only: :index
   before_action :authorize_update_issuable!, only: :update
   before_action :authorize_create_epic!, only: [:create]
@@ -97,6 +91,10 @@ class Groups::EpicsController < Groups::ApplicationController
 
   def finder_type
     EpicsFinder
+  end
+
+  def issuable_sorting_field
+    :epics_sort
   end
 
   def preload_for_collection

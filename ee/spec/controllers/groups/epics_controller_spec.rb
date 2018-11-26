@@ -57,11 +57,25 @@ describe Groups::EpicsController do
         expect(response).to have_gitlab_http_status(200)
       end
 
-      it 'stores sorting param in a cookie' do
-        get :index, group_id: group, sort: 'start_date_asc'
+      context 'when there is no logged user' do
+        it 'stores sorting param in a cookie' do
+          group.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+          sign_out(user)
 
-        expect(cookies['epic_sort']).to eq('start_date_asc')
-        expect(response).to have_gitlab_http_status(200)
+          get :index, group_id: group, sort: 'start_date_asc'
+
+          expect(cookies['epic_sort']).to eq('start_date_asc')
+          expect(response).to have_gitlab_http_status(200)
+        end
+      end
+
+      context 'when there is a logged user' do
+        it 'stores sorting param in user preferences' do
+          get :index, group_id: group, sort: 'start_date_asc'
+
+          expect(user.user_preference.epics_sort).to eq('start_date_asc')
+          expect(response).to have_gitlab_http_status(200)
+        end
       end
 
       context 'with page param' do
