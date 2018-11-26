@@ -5253,6 +5253,12 @@ msgstr ""
 msgid "Metrics|Create metric"
 msgstr ""
 
+msgid "Metrics|Delete metric"
+msgstr ""
+
+msgid "Metrics|Delete metric?"
+msgstr ""
+
 msgid "Metrics|Edit metric"
 msgstr ""
 
@@ -5326,6 +5332,9 @@ msgid "Metrics|Used if the query returns a single series. If it returns multiple
 msgstr ""
 
 msgid "Metrics|Y-axis label"
+msgstr ""
+
+msgid "Metrics|You're about to permanently delete this metric. This cannot be undone."
 msgstr ""
 
 msgid "Metrics|e.g. HTTP requests"
@@ -8449,9 +8458,6 @@ msgid "This user will be the author of all events in the activity feed that are 
 msgstr ""
 
 msgid "This user will be the author of all events in the activity feed that are the result of an update, like new branches being created or new commits being pushed to existing branches. Upon creation or when reassigning you can only assign yourself to be the mirror user."
-msgstr ""
-
-msgid "This will delete the custom metric, Are you sure?"
 msgstr ""
 
 msgid "Those emails automatically become issues (with the comments becoming the email conversation) listed here."
