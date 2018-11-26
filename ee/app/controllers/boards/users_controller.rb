@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Boards
   class UsersController < Boards::ApplicationController
     # Enumerates all users that are members of the board parent

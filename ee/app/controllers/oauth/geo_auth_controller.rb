@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Oauth::GeoAuthController < ActionController::Base
   rescue_from Gitlab::Geo::OauthApplicationUndefinedError, with: :undefined_oauth_application
   rescue_from OAuth2::Error, with: :auth

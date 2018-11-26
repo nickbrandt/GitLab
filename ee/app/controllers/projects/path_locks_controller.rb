@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Projects::PathLocksController < Projects::ApplicationController
   include PathLocksHelper
   include ExtractsPath

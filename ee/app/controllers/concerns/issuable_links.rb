@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module IssuableLinks
   def index
     render json: issues

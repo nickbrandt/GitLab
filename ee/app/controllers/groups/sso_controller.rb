@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Groups::SsoController < Groups::ApplicationController
   skip_before_action :group
   before_action :unauthenticated_group
