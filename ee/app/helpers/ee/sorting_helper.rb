@@ -3,9 +3,6 @@ module EE
   module SortingHelper
     extend ::Gitlab::Utils::Override
 
-    ORDER_ASC = 'asc'.freeze
-    ORDER_DESC = 'desc'.freeze
-
     override :sort_options_hash
     def sort_options_hash
       {
