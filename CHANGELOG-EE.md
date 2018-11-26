@@ -1,5 +1,17 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.5.1 (2018-11-26)
+
+### Security (6 changes)
+
+- Sanitize tracing external_urls before saving to DB and when displaying the URL to prevent XSS issues.
+- Prevent reporter roles from viewing the Jaeger tracing settings page.
+- Fix IDOR at /drafts/publish.
+- Authorize users when listing board users and milestones.
+- Resolve: Guest can set weight of a new issue.
+- Fixes XSS with merge request approvers selection.
+
+
 ## 11.5.0 (2018-11-22)
 
 ### Security (2 changes)
