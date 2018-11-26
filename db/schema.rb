@@ -2154,7 +2154,7 @@ ActiveRecord::Schema.define(version: 20181126153547) do
     t.string "disk_path", null: false
     t.integer "project_id", null: false
     t.index ["disk_path"], name: "index_project_repositories_on_disk_path", unique: true, using: :btree
-    t.index ["project_id"], name: "index_project_repositories_on_project_id", using: :btree
+    t.index ["project_id"], name: "index_project_repositories_on_project_id", unique: true, using: :btree
     t.index ["shard_id"], name: "index_project_repositories_on_shard_id", using: :btree
   end
 
