@@ -51,9 +51,11 @@ module Gitlab
     # check whether the underlying database is in read-only mode
     def self.db_read_only?
       if postgresql?
-        ActiveRecord::Base.connection.execute('SELECT pg_is_in_recovery()')
-          .first
-          .fetch('pg_is_in_recovery') == 't'
+        pg_is_in_recovery =
+          ActiveRecord::Base.connection.execute('SELECT pg_is_in_recovery()')
+            .first.fetch('pg_is_in_recovery')
+
+        Gitlab::Utils.to_boolean(pg_is_in_recovery)
       else
         false
       end
