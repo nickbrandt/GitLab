@@ -323,9 +323,25 @@ describe Gitlab::Database::LoadBalancing::Host, :postgresql do
       expect(host.caught_up?('foo')).to eq(true)
     end
 
+    # TODO: remove rails5-only tag after removing rails4 tests
+    it 'returns true when a host has caught up', :rails5 do
+      allow(host).to receive(:connection).and_return(connection)
+      expect(connection).to receive(:select_all).and_return([{ 'result' => true }])
+
+      expect(host.caught_up?('foo')).to eq(true)
+    end
+
     it 'returns false when a host has not caught up' do
       allow(host).to receive(:connection).and_return(connection)
       expect(connection).to receive(:select_all).and_return([{ 'result' => 'f' }])
+
+      expect(host.caught_up?('foo')).to eq(false)
+    end
+
+    # TODO: remove rails5-only tag after removing rails4 tests
+    it 'returns false when a host has not caught up', :rails5 do
+      allow(host).to receive(:connection).and_return(connection)
+      expect(connection).to receive(:select_all).and_return([{ 'result' => false }])
 
       expect(host.caught_up?('foo')).to eq(false)
     end
