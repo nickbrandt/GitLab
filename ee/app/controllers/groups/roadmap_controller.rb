@@ -7,7 +7,7 @@ module Groups
     before_action :check_epics_available!
     before_action :group
     before_action :persist_roadmap_layout, only: [:show]
-    before_action :set_epics_sorting, only: :index
+    before_action :set_epics_sorting, only: :show
 
     def show
       # show roadmap for a group

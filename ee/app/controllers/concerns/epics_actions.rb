@@ -13,4 +13,13 @@ module EpicsActions
   def default_sort_order
     sort_value_recently_created
   end
+
+  def update_cookie_value(value)
+    case value
+    when 'start_date_asc'  then sort_value_start_date
+    when 'end_date_asc'    then sort_value_end_date
+    else
+      super(value)
+    end
+  end
 end
