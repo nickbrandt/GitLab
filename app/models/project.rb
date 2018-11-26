@@ -1214,7 +1214,7 @@ class Project < ActiveRecord::Base
     return unless hashed_storage?(:repository)
 
     project_repo = project_repository || build_project_repository
-    project_repo.update(shard_name: repository_storage, disk_path: disk_path)
+    project_repo.update!(shard_name: repository_storage, disk_path: disk_path)
   end
 
   def create_repository(force: false)
