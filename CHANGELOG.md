@@ -4,17 +4,18 @@ entry.
 
 ## 11.5.0 (2018-11-22)
 
-### Security (9 changes, 1 of them is from the community)
+### Security (10 changes, 1 of them is from the community)
 
 - Escape entity title while autocomplete template rendering to prevent XSS. !2556
 - Update moment to 2.22.2. !22648 (Takuya Noguchi)
-- Fix XSS in merge request source branch name.
+- Redact personal tokens in unsubscribe links.
 - Escape user fullname while rendering autocomplete template to prevent XSS.
 - Persist only SHA digest of PersonalAccessToken#token.
 - Monkey kubeclient to not follow any redirects.
 - Prevent SSRF attacks in HipChat integration.
+- Prevent templated services from being imported.
 - Validate Wiki attachments are valid temporary files.
-- Redact personal tokens in unsubscribe links.
+- Fix XSS in merge request source branch name.
 
 ### Removed (2 changes)
 
