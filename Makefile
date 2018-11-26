@@ -6,7 +6,11 @@ TARGET_SETUP := $(TARGET_DIR)/.ok
 BIN_BUILD_DIR := $(TARGET_DIR)/bin
 PKG_BUILD_DIR := $(TARGET_DIR)/src/$(PKG)
 COVERAGE_DIR := $(TARGET_DIR)/cover
-VERSION := $(shell git describe)-$(shell date -u +%Y%m%d.%H%M%S)
+VERSION_STRING := $(shell git describe)
+ifeq ($(strip $(VERSION_STRING)),)
+VERSION_STRING := v$(shell cat VERSION)
+endif
+VERSION := ${VERSION_STRING}-$(shell date -u +%Y%m%d.%H%M%S)
 GOBUILD := go build -ldflags "-X main.Version=$(VERSION)"
 EXE_ALL := gitlab-zip-cat gitlab-zip-metadata gitlab-workhorse
 INSTALL := install
