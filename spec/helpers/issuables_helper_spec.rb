@@ -212,7 +212,7 @@ describe IssuablesHelper do
         issuableRef: "&#{epic.iid}",
         markdownPreviewPath: "/groups/#{@group.full_path}/preview_markdown",
         markdownDocsPath: '/help/user/markdown',
-        markdownVersion: 11,
+        markdownVersion: 12,
         issuableTemplates: nil,
         groupPath: @group.path,
         initialTitleHtml: epic.title,
