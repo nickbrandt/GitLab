@@ -13,7 +13,7 @@ describe 'Packages' do
     it 'shows no packages message' do
       visit_project_packages
 
-      expect(page).to have_content 'No packages stored for this project.'
+      expect(page).to have_content 'There are no packages yet'
     end
   end
 
