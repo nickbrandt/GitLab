@@ -13,8 +13,4 @@ export default class PipelineService {
   postAction(endpoint) {
     return axios.post(`${endpoint}.json`);
   }
-
-  static getSecurityReport(endpoint) {
-    return axios.get(endpoint);
-  }
 }
