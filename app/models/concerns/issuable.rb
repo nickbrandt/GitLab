@@ -146,7 +146,7 @@ module Issuable
       sorted =
         case method.to_s
         when 'downvotes_desc'                       then order_downvotes_desc
-        when 'label_priority', 'label_priority_asc' then order_labels_priority(excluded_labels: excluded_labels)
+        when 'label_priority'                       then order_labels_priority(excluded_labels: excluded_labels)
         when 'label_priority_desc'                  then order_labels_priority('DESC', excluded_labels: excluded_labels)
         when 'milestone', 'milestone_due_asc'       then order_milestone_due_asc
         when 'milestone_due_desc'                   then order_milestone_due_desc

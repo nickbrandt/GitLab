@@ -21,7 +21,7 @@ describe SortingHelper do
 
   describe '#issuable_sort_direction_button' do
     before do
-      allow(self).to receive(:request).and_return(double(path: 'http://test.com'))
+      allow(self).to receive(:request).and_return(double(path: 'http://test.com', query_parameters: {}))
     end
 
     it 'returns icon with sort-highest when sort is created_date' do

@@ -162,7 +162,7 @@ module SortingHelper
   end
 
   def issuable_sort_direction_button(sort_value)
-    link_class = 'btn btn-default'
+    link_class = 'btn btn-default has-tooltip reverse-sort-btn qa-reverse-sort'
     reverse_sort = issuable_reverse_sort_order_hash[sort_value]
 
     if reverse_sort
@@ -172,7 +172,7 @@ module SortingHelper
       link_class += ' disabled'
     end
 
-    link_to(reverse_url, type: 'button', class: link_class) do
+    link_to(reverse_url, type: 'button', class: link_class, title: 'Sort direction') do
       icon_suffix =
         case sort_value
         when sort_value_milestone, sort_value_due_date, /_asc\z/
