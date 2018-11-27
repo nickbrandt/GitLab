@@ -43,9 +43,12 @@ module EE
     # Creates a button with the opposite ordering for the current field in UI.
     def sort_order_button(sort)
       opposite_sorting_param = epics_ordering_options_hash[sort] || epics_ordering_options_hash.key(sort)
-      sort_icon = sort.end_with?('desc') ? 'sort-highest' : ' sort-lowest'
+      sort_icon = sort.end_with?('desc') ? 'sort-highest' : 'sort-lowest'
 
-      link_to sort_icon, page_filter_path(sort: opposite_sorting_param, label: true)
+      link_to sprite_icon(sort_icon, size: 16),
+              page_filter_path(sort: opposite_sorting_param, label: true),
+              class: "dropdown-toggle-split btn-sort-direction",
+              title: sort.end_with?('desc') ? _("Descending") : _("Ascending")
     end
 
     def sort_title_start_date

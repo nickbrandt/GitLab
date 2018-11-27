@@ -11,7 +11,4 @@
         = sortable_item(sort_title_recently_updated, page_filter_path(sort: sort_value_recently_updated, label: true), sorted_by)
         = sortable_item(sort_title_start_date, page_filter_path(sort: sort_value_start_date_later, label: true), sorted_by)
         = sortable_item(sort_title_end_date, page_filter_path(sort: sort_value_end_date_later, label: true), sorted_by)
-    %button.dropdown-toggle-split.pt-2{ type: 'button' }
-      = sort_order_button(@sort)
-      -#= sprite_icon('sort-highest', size: 16)
-      -#= sprite_icon('sort-lowest', size: 16)
+    = sort_order_button(@sort)
