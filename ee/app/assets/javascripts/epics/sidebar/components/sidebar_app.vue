@@ -12,6 +12,7 @@ import SidebarTodo from '~/sidebar/components/todo_toggle/todo.vue';
 import SidebarCollapsedGroupedDatePicker from '~/vue_shared/components/sidebar/collapsed_grouped_date_picker.vue';
 import ToggleSidebar from '~/vue_shared/components/sidebar/toggle_sidebar.vue';
 import SidebarLabelsSelect from '~/vue_shared/components/sidebar/labels_select/base.vue';
+import { parseBoolean } from '~/lib/utils/common_utils';
 import eventHub from '../../event_hub';
 import SidebarDatePicker from './sidebar_date_picker.vue';
 import SidebarParticipants from './sidebar_participants.vue';
@@ -167,7 +168,7 @@ export default {
     return {
       store,
       // Backend will pass the appropriate css class for the contentContainer
-      collapsed: Cookies.get('collapsed_gutter') === 'true',
+      collapsed: parseBoolean(Cookies.get('collapsed_gutter')),
       isUserSignedIn: !!gon.current_user_id,
       autoExpanded: false,
       savingStartDate: false,
