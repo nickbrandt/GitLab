@@ -22,7 +22,6 @@ import initNewListDropdown from './components/new_list_dropdown';
 import BoardAddIssuesModal from 'ee/boards/components/modal/index';
 import '~/vue_shared/vue_resource_interceptor';
 import { NavigationType, parseBoolean } from '~/lib/utils/common_utils';
-<<<<<<< HEAD
 
 import 'ee/boards/models/list';
 import 'ee/boards/models/issue';
@@ -32,8 +31,6 @@ import BoardsSelector from 'ee/boards/components/boards_selector.vue';
 import collapseIcon from 'ee/boards/icons/fullscreen_collapse.svg';
 import expandIcon from 'ee/boards/icons/fullscreen_expand.svg';
 import tooltip from '~/vue_shared/directives/tooltip';
-=======
->>>>>>> upstream/master
 
 let issueBoardsApp;
 
