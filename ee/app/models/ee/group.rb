@@ -93,6 +93,11 @@ module EE
         .for_pipelines(all_pipelines.with_vulnerabilities.latest_successful_ids_per_project)
     end
 
+    def all_vulnerabilities
+      Vulnerabilities::Occurrence
+        .for_pipelines(all_pipelines.with_vulnerabilities.success)
+    end
+
     def human_ldap_access
       ::Gitlab::Access.options_with_owner.key(ldap_access)
     end
