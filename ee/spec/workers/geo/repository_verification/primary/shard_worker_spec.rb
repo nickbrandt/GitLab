@@ -91,26 +91,58 @@ describe Geo::RepositoryVerification::Primary::ShardWorker, :postgresql, :clean_
       subject.perform(shard_name)
     end
 
-    it 'performs Geo::RepositoryVerification::Primary::SingleWorker for projects where repository should be reverified' do
-      project_to_be_reverified = create(:project)
+    context 'reverification' do
+      context 'feature geo_repository_reverification flag is enabled' do
+        before do
+          stub_feature_flags(geo_repository_reverification: true)
+        end
 
-      create(:repository_state, :repository_verified, :wiki_verified,
-        project: project_to_be_reverified, last_repository_verification_ran_at: 10.days.ago)
+        it 'performs Geo::RepositoryVerification::Primary::SingleWorker for projects where repository should be reverified' do
+          project_to_be_reverified = create(:project)
 
-      expect(primary_singleworker).to receive(:perform_async).with(project_to_be_reverified.id)
+          create(:repository_state, :repository_verified, :wiki_verified,
+            project: project_to_be_reverified, last_repository_verification_ran_at: 10.days.ago)
 
-      subject.perform(shard_name)
-    end
+          expect(primary_singleworker).to receive(:perform_async).with(project_to_be_reverified.id)
 
-    it 'performs Geo::RepositoryVerification::Primary::SingleWorker for projects where wiki should be reverified' do
-      project_to_be_reverified = create(:project)
+          subject.perform(shard_name)
+        end
 
-      create(:repository_state, :repository_verified, :wiki_verified,
-        project: project_to_be_reverified, last_wiki_verification_ran_at: 10.days.ago)
+        it 'performs Geo::RepositoryVerification::Primary::SingleWorker for projects where wiki should be reverified' do
+          project_to_be_reverified = create(:project)
 
-      expect(primary_singleworker).to receive(:perform_async).with(project_to_be_reverified.id)
+          create(:repository_state, :repository_verified, :wiki_verified,
+            project: project_to_be_reverified, last_wiki_verification_ran_at: 10.days.ago)
 
-      subject.perform(shard_name)
+          expect(primary_singleworker).to receive(:perform_async).with(project_to_be_reverified.id)
+
+          subject.perform(shard_name)
+        end
+      end
+
+      context 'feature geo_repository_reverification flag is disabled' do
+        before do
+          stub_feature_flags(geo_repository_reverification: false)
+        end
+
+        it 'does not perform Geo::RepositoryVerification::Primary::SingleWorker for projects where repository should be reverified' do
+          create(:repository_state, :repository_verified, :wiki_verified,
+            last_repository_verification_ran_at: 10.days.ago)
+
+          expect(primary_singleworker).not_to receive(:perform_async)
+
+          subject.perform(shard_name)
+        end
+
+        it 'does not Geo::RepositoryVerification::Primary::SingleWorker for projects where wiki should be reverified' do
+          create(:repository_state, :repository_verified, :wiki_verified,
+            last_wiki_verification_ran_at: 10.days.ago)
+
+          expect(primary_singleworker).not_to receive(:perform_async)
+
+          subject.perform(shard_name)
+        end
+      end
     end
 
     it 'does not perform Geo::RepositoryVerification::Primary::SingleWorker when shard becomes unhealthy' do

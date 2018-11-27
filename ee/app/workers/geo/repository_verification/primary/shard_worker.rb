@@ -110,6 +110,10 @@ module Geo
         def minimum_reverification_interval
           ::Gitlab::Geo.current_node.minimum_reverification_interval.days
         end
+
+        def reverification_enabled?
+          ::Feature.enabled?(:geo_repository_reverification, default_enabled: true)
+        end
       end
     end
   end
