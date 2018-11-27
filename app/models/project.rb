@@ -120,8 +120,6 @@ class Project < ActiveRecord::Base
   after_create :ensure_storage_path_exists
   after_save :ensure_storage_path_exists, if: :namespace_id_changed?
 
-  after_create :track_project_repository
-
   acts_as_ordered_taggable
 
   attr_accessor :old_path_with_namespace

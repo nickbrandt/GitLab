@@ -11,6 +11,7 @@ describe ProjectRepository do
   describe '.find_project' do
     it 'finds project by disk path' do
       project = create(:project)
+      project.track_project_repository
 
       expect(described_class.find_project(project.disk_path)).to eq(project)
     end
