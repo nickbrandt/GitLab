@@ -49,11 +49,7 @@ There's also a collection of repositories with [example projects](https://gitlab
 
 ## Code Quality analysis **[STARTER]**
 
-<<<<<<< HEAD
-[Analyze your project's Code Quality](code_quality.md).
-=======
 **(Starter)** [Analyze your project's Code Quality](code_quality.md)
->>>>>>> upstream/master
 
 ## Dependencies license management **[ULTIMATE]**
 
