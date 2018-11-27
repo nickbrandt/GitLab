@@ -51,7 +51,7 @@ module API
 
         break render_api_error!('The project is not mirrored', 400) unless project.mirror?
 
-        project.force_import_job!
+        project.import_state.force_import_job!
 
         status 200
       end

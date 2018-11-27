@@ -177,7 +177,7 @@ describe API::Projects do
           mirror_params[:mirror_user_id] = admin.id
           project.add_maintainer(admin)
 
-          expect_any_instance_of(EE::Project).to receive(:force_import_job!).once
+          expect_any_instance_of(EE::ProjectImportState).to receive(:force_import_job!).once
 
           put(api("/projects/#{project.id}", admin), mirror_params)
 
@@ -194,7 +194,7 @@ describe API::Projects do
       end
 
       it 'updates mirror related attributes' do
-        expect_any_instance_of(EE::Project).to receive(:force_import_job!).once
+        expect_any_instance_of(EE::ProjectImportState).to receive(:force_import_job!).once
 
         put(api("/projects/#{project.id}", user), mirror_params)
 
