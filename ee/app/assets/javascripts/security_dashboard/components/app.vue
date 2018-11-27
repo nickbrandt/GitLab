@@ -28,6 +28,10 @@ export default {
       type: String,
       required: true,
     },
+    emptyStateSvgPath: {
+      type: String,
+      required: true,
+    },
     vulnerabilitiesEndpoint: {
       type: String,
       required: true,
@@ -105,7 +109,10 @@ export default {
           </span>
         </template>
 
-        <security-dashboard-table />
+        <security-dashboard-table
+          :dashboard-documentation="dashboardDocumentation"
+          :empty-state-svg-path="emptyStateSvgPath"
+        />
       </tab>
     </tabs>
     <issue-modal

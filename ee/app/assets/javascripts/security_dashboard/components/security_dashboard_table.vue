@@ -2,12 +2,24 @@
 import { mapActions, mapState, mapGetters } from 'vuex';
 import Pagination from '~/vue_shared/components/pagination_links.vue';
 import SecurityDashboardTableRow from './security_dashboard_table_row.vue';
+import EmptyState from './empty_state.vue';
 
 export default {
   name: 'SecurityDashboardTable',
   components: {
+    EmptyState,
     Pagination,
     SecurityDashboardTableRow,
+  },
+  props: {
+    dashboardDocumentation: {
+      type: String,
+      required: true,
+    },
+    emptyStateSvgPath: {
+      type: String,
+      required: true,
+    },
   },
   computed: {
     ...mapState('vulnerabilities', ['vulnerabilities', 'pageInfo', 'isLoadingVulnerabilities']),
@@ -57,6 +69,12 @@ export default {
         :key="vulnerability.id"
         :vulnerability="vulnerability"
         @openModal="openModal({ vulnerability });"
+      />
+
+      <empty-state
+        v-if="!vulnerabilities.length"
+        :svg-path="emptyStateSvgPath"
+        :link="dashboardDocumentation"
       />
 
       <pagination

@@ -7367,7 +7367,13 @@ msgstr ""
 msgid "Security Reports|Dismiss vulnerability"
 msgstr ""
 
+msgid "Security Reports|Learn more about setting up your dashboard"
+msgstr ""
+
 msgid "Security Reports|More info"
+msgstr ""
+
+msgid "Security Reports|No Vulnerabilities"
 msgstr ""
 
 msgid "Security Reports|Revert dismissal"
@@ -7386,6 +7392,12 @@ msgid "Security Reports|There was an error reverting the dismissal."
 msgstr ""
 
 msgid "Security Reports|There was an error reverting this dismissal."
+msgstr ""
+
+msgid "Security Reports|We've found no vulnerabilities for your group"
+msgstr ""
+
+msgid "Security Reports|While it's rare to have no vulnerabilities for your group, it can happen. In any event, we ask that you please double check your settings to make sure you've set up your dashboard correctly."
 msgstr ""
 
 msgid "SecurityDashboard| The security dashboard displays the latest security report. Use it to find and fix vulnerabilities."
