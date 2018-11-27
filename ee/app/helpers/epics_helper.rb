@@ -3,7 +3,7 @@
 module EpicsHelper
   def epic_show_app_data(epic, opts)
     group = epic.group
-    todo = issuable_todo(epic)
+    todo = epic_pending_todo(epic)
 
     epic_meta = {
       epic_id: epic.id,
@@ -57,6 +57,10 @@ module EpicsHelper
       labels_web_url: group_labels_path(group),
       epics_web_url: group_epics_path(group)
     }
+  end
+
+  def epic_pending_todo(epic)
+    current_user.pending_todo_for(epic) if current_user
   end
 
   def epic_author(epic, opts)
