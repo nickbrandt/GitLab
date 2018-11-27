@@ -5,7 +5,7 @@ module EE
 
       def migrate_records
         migrate_epics
-        migrate_vulnerability_feedback
+        migrate_vulnerabilities_feedback
         super
       end
 
@@ -16,7 +16,7 @@ module EE
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
-      def migrate_vulnerability_feedback
+      def migrate_vulnerabilities_feedback
         user.vulnerability_feedback.update_all(author_id: ghost_user.id)
       end
     end
