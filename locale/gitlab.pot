@@ -7642,6 +7642,9 @@ msgstr ""
 msgid "Sign-up restrictions"
 msgstr ""
 
+msgid "Similar issues"
+msgstr ""
+
 msgid "Size"
 msgstr ""
 
@@ -8278,6 +8281,9 @@ msgid "There was an error when subscribing to this label."
 msgstr ""
 
 msgid "There was an error when unsubscribing from this label."
+msgstr ""
+
+msgid "These existing issues have a similar title. It might be better to comment there instead of creating another similar issue."
 msgstr ""
 
 msgid "They can be managed using the %{link}."
@@ -10227,6 +10233,9 @@ msgid "to help your contributors communicate effectively!"
 msgstr ""
 
 msgid "toggle collapse"
+msgstr ""
+
+msgid "updated"
 msgstr ""
 
 msgid "username"

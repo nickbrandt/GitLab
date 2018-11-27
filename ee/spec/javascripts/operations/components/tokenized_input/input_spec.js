@@ -1,14 +1,12 @@
 import Vue from 'vue';
 import store from 'ee/operations/store/index';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import Icon from '~/vue_shared/components/icon.vue';
 import TokenizedInput from 'ee/operations/components/tokenized_input/input.vue';
-import { getChildInstances, clearState } from '../../helpers';
+import { clearState } from '../../helpers';
 import { mockProjectData } from '../../mock_data';
 
 describe('tokenized input component', () => {
   const TokenizedInputComponent = Vue.extend(TokenizedInput);
-  const IconComponent = Vue.extend(Icon);
   const mockProjects = mockProjectData(1);
   const [mockOneProject] = mockProjects;
   const mockInputValue = 'mock-inputValue';
@@ -74,15 +72,11 @@ describe('tokenized input component', () => {
   describe('wrapped components', () => {
     describe('icon', () => {
       it('should render close for input tokens', () => {
-        expect(
-          getChildInstances(vm, IconComponent).filter(icon => icon.name === 'close').length,
-        ).toBe(mockProjects.length);
+        expect(vm.$el.querySelectorAll('.ic-close').length).toBe(mockProjects.length);
       });
 
       it('should render search', () => {
-        const search = getChildInstances(vm, IconComponent)[1];
-
-        expect(search.name).toBe('search');
+        expect(vm.$el.querySelector('.ic-search')).not.toBe(null);
       });
     });
   });
