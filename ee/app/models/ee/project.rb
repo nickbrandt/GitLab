@@ -36,7 +36,7 @@ module EE
       has_many :approver_groups, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
       has_many :audit_events, as: :entity
       has_many :path_locks
-      has_many :vulnerability_feedback
+      has_many :vulnerability_feedback, class_name: 'Vulnerabilities::Feedback'
       has_many :vulnerabilities, class_name: 'Vulnerabilities::Occurrence'
       has_many :vulnerability_identifiers, class_name: 'Vulnerabilities::Identifier'
       has_many :vulnerability_scanners, class_name: 'Vulnerabilities::Scanner'

@@ -1,4 +1,6 @@
-class VulnerabilityFeedbackEntity < Grape::Entity
+# frozen_string_literal: true
+
+class Vulnerabilities::FeedbackEntity < Grape::Entity
   include Gitlab::Routing
   include GitlabRoutingHelper
 

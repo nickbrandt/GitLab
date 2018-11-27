@@ -5,7 +5,7 @@ FactoryBot.define do
     Digest::SHA1.hexdigest n.to_s
   end
 
-  factory :vulnerability_feedback do
+  factory :vulnerability_feedback, class: Vulnerabilities::Feedback do
     project
     author
     issue nil

@@ -9,8 +9,8 @@ class Vulnerabilities::OccurrenceEntity < Grape::Entity
   expose :project_fingerprint
   expose :vulnerability_feedback_url, if: ->(*) { can_admin_vulnerability_feedback? }
   expose :project, using: ::ProjectEntity
-  expose :dismissal_feedback, using: VulnerabilityFeedbackEntity
-  expose :issue_feedback, using: VulnerabilityFeedbackEntity
+  expose :dismissal_feedback, using: Vulnerabilities::FeedbackEntity
+  expose :issue_feedback, using: Vulnerabilities::FeedbackEntity
 
   expose :metadata, merge: true, if: ->(occurrence, _) { occurrence.raw_metadata } do
     expose :description
