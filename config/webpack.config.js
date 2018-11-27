@@ -91,7 +91,7 @@ module.exports = {
   },
 
   resolve: {
-    extensions: ['.js'],
+    extensions: ['.js', '.gql', '.graphql'],
     alias: {
       '~': path.join(ROOT_PATH, 'app/assets/javascripts'),
       emojis: path.join(ROOT_PATH, 'fixtures/emojis'),
@@ -115,6 +115,11 @@ module.exports = {
     strictExportPresence: true,
     rules: [
       {
+        type: 'javascript/auto',
+        test: /\.mjs$/,
+        use: [],
+      },
+      {
         test: /\.js$/,
         exclude: path => /node_modules|vendor[\\/]assets/.test(path) && !/\.vue\.js/.test(path),
         loader: 'babel-loader',
@@ -134,6 +139,11 @@ module.exports = {
             VUE_LOADER_VERSION,
           ].join('|'),
         },
+      },
+      {
+        test: /\.(graphql|gql)$/,
+        exclude: /node_modules/,
+        loader: 'graphql-tag/loader',
       },
       {
         test: /\.svg$/,

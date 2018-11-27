@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import Icon from '~/vue_shared/components/icon.vue';
 import Commit from '~/vue_shared/components/commit.vue';
 import Project from 'ee/operations/components/dashboard/project.vue';
 import ProjectHeader from 'ee/operations/components/dashboard/project_header.vue';
@@ -13,7 +12,6 @@ describe('project component', () => {
   const ProjectHeaderComponent = Vue.extend(ProjectHeader);
   const AlertsComponent = Vue.extend(Alerts);
   const CommitComponent = Vue.extend(Commit);
-  const IconComponent = Vue.extend(Icon);
   let vm;
 
   beforeEach(() => {
@@ -93,12 +91,7 @@ describe('project component', () => {
 
     describe('last deploy', () => {
       it('renders calendar icon', () => {
-        const icons = getChildInstances(vm, IconComponent);
-
-        expect(icons.length).toBe(1);
-        const [icon] = icons;
-
-        expect(icon.name).toBe('calendar');
+        expect(vm.$el.querySelector('.ic-calendar')).not.toBe(null);
       });
 
       it('renders time ago of last deploy', () => {
