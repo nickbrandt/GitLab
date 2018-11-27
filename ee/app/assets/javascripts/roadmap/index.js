@@ -2,7 +2,7 @@ import Vue from 'vue';
 
 import Translate from '~/vue_shared/translate';
 
-import { convertPermissionToBoolean } from '~/lib/utils/common_utils';
+import { parseBoolean } from '~/lib/utils/common_utils';
 import { visitUrl, mergeUrlParams } from '~/lib/utils/url_utility';
 
 import { PRESET_TYPES } from './constants';
@@ -42,7 +42,7 @@ export default () => {
     data() {
       const supportedPresetTypes = Object.keys(PRESET_TYPES);
       const { dataset } = this.$options.el;
-      const hasFiltersApplied = convertPermissionToBoolean(dataset.hasFiltersApplied);
+      const hasFiltersApplied = parseBoolean(dataset.hasFiltersApplied);
       const presetType =
         supportedPresetTypes.indexOf(dataset.presetType) > -1
           ? dataset.presetType

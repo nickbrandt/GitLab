@@ -21,7 +21,7 @@ import BoardSidebar from 'ee/boards/components/board_sidebar';
 import initNewListDropdown from './components/new_list_dropdown';
 import BoardAddIssuesModal from 'ee/boards/components/modal/index';
 import '~/vue_shared/vue_resource_interceptor';
-import { NavigationType } from '~/lib/utils/common_utils';
+import { NavigationType, parseBoolean } from '~/lib/utils/common_utils';
 
 import 'ee/boards/models/list';
 import 'ee/boards/models/issue';
@@ -67,7 +67,7 @@ export default () => {
       boardsEndpoint: $boardApp.dataset.boardsEndpoint,
       listsEndpoint: $boardApp.dataset.listsEndpoint,
       boardId: $boardApp.dataset.boardId,
-      disabled: $boardApp.dataset.disabled === 'true',
+      disabled: parseBoolean($boardApp.dataset.disabled),
       issueLinkBase: $boardApp.dataset.issueLinkBase,
       rootPath: $boardApp.dataset.rootPath,
       bulkUpdatePath: $boardApp.dataset.bulkUpdatePath,
@@ -369,12 +369,12 @@ export default () => {
       const boardsSelectorProps = {
         ...dataset,
         currentBoard: JSON.parse(dataset.currentBoard),
-        hasMissingBoards: dataset.hasMissingBoards === 'true',
-        canAdminBoard: dataset.canAdminBoard === 'true',
-        multipleIssueBoardsAvailable: dataset.multipleIssueBoardsAvailable === 'true',
+        hasMissingBoards: parseBoolean(dataset.hasMissingBoards),
+        canAdminBoard: parseBoolean(dataset.canAdminBoard),
+        multipleIssueBoardsAvailable: parseBoolean(dataset.multipleIssueBoardsAvailable),
         projectId: Number(dataset.projectId),
         groupId: Number(dataset.groupId),
-        scopedIssueBoardFeatureEnabled: dataset.scopedIssueBoardFeatureEnabled === 'true',
+        scopedIssueBoardFeatureEnabled: parseBoolean(dataset.scopedIssueBoardFeatureEnabled),
         weights: JSON.parse(dataset.weights),
       };
 

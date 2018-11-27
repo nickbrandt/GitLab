@@ -5,7 +5,7 @@ import { __ } from '~/locale';
 import BoardService from 'ee/boards/services/board_service';
 import sidebarEventHub from '~/sidebar/event_hub';
 import createFlash from '~/flash';
-import { convertPermissionToBoolean } from '~/lib/utils/common_utils';
+import { parseBoolean } from '~/lib/utils/common_utils';
 
 class BoardsStoreEE {
   initEESpecific(boardsStore) {
@@ -30,7 +30,7 @@ class BoardsStoreEE {
           weight: parseInt(this.$boardApp.dataset.boardWeight, 10),
         };
         this.store.cantEdit = [];
-        this.store.weightFeatureAvailable = convertPermissionToBoolean(
+        this.store.weightFeatureAvailable = parseBoolean(
           this.$boardApp.dataset.weightFeatureAvailable,
         );
         this.initBoardFilters();
@@ -137,7 +137,7 @@ class BoardsStoreEE {
   }
 
   promotionIsHidden() {
-    return Cookies.get('promotion_issue_board_hidden') === 'true';
+    return parseBoolean(Cookies.get('promotion_issue_board_hidden'));
   }
 
   updateWeight(newWeight, id) {
