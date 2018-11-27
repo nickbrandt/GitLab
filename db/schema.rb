@@ -2577,6 +2577,7 @@ ActiveRecord::Schema.define(version: 20181126153547) do
     t.index ["name"], name: "index_shards_on_name", unique: true, using: :btree
   end
 
+<<<<<<< .merge_file_BDkhIJ
   create_table "site_statistics", force: :cascade do |t|
     t.integer "repositories_count", default: 0, null: false
   end
@@ -2601,6 +2602,8 @@ ActiveRecord::Schema.define(version: 20181126153547) do
     t.index ["user_id"], name: "index_smartcard_identities_on_user_id", using: :btree
   end
 
+=======
+>>>>>>> .merge_file_fNGHHa
   create_table "snippets", force: :cascade do |t|
     t.string "title"
     t.text "content"
