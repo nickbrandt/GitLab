@@ -115,6 +115,17 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Geo: Clarify Geo HA documentation.
 
 
+## 11.4.8 (2018-11-27)
+
+### Security (5 changes)
+
+- Escape entity title while autocomplete template rendering to prevent XSS. !707
+- Authorize users when listing board users and milestones.
+- Fix IDOR at /drafts/publish.
+- Resolve: Guest can set weight of a new issue.
+- Fixes XSS with merge request approvers selection.
+
+
 ## 11.4.7 (2018-11-20)
 
 ### Fixed (1 change)
