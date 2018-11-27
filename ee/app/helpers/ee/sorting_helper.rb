@@ -16,6 +16,7 @@ module EE
 
     def epics_sort_options_hash
       {
+        sort_value_created_date => sort_title_created_date,
         sort_value_oldest_created => sort_title_created_date,
         sort_value_recently_created => sort_title_created_date,
         sort_value_oldest_updated => sort_title_recently_updated,

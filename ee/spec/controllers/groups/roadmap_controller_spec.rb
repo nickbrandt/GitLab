@@ -31,11 +31,25 @@ describe Groups::RoadmapController do
         expect(response).to have_gitlab_http_status(200)
       end
 
-      it 'stores sorting param in a cookie' do
-        get :show, group_id: group, sort: 'start_date_asc'
+      context 'when user is logged in' do
+        it 'stores sorting param in a cookie' do
+          group.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+          sign_out(user)
 
-        expect(cookies['epic_sort']).to eq('start_date_asc')
-        expect(response).to have_gitlab_http_status(200)
+          get :show, group_id: group, sort: 'start_date_asc'
+
+          expect(cookies['epic_sort']).to eq('start_date_asc')
+          expect(response).to have_gitlab_http_status(200)
+        end
+      end
+
+      context 'when there is no user logged in' do
+        it 'stores sorting param in a cookie' do
+          get :show, group_id: group, sort: 'start_date_asc'
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(user.reload.user_preference.epics_sort).to eq('start_date_asc')
+        end
       end
     end
   end

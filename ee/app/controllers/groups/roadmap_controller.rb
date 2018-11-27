@@ -10,12 +10,16 @@ module Groups
     # show roadmap for a group
     def show
       # Used only to show to correct sort dropdown option on filter bar
-      @sort = params[:sort] || current_user&.user_preference&.epics_sort || default_sort_order
+      @sort = set_sort_order
 
       @epics_count = EpicsFinder.new(current_user, group_id: @group.id).execute.count
     end
 
     private
+
+    def issuable_sorting_field
+      :epics_sort
+    end
 
     def persist_roadmap_layout
       return unless current_user
