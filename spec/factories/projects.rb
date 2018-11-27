@@ -30,6 +30,11 @@ FactoryBot.define do
       # we can't assign the delegated `#ci_cd_settings` attributes directly, as the
       # `#ci_cd_settings` relation needs to be created first
       group_runners_enabled nil
+      import_status nil
+      import_jid nil
+      last_update_at nil
+      last_successful_update_at nil
+      retry_count 0
     end
 
     after(:create) do |project, evaluator|
@@ -64,6 +69,16 @@ FactoryBot.define do
 
       # assign the delegated `#ci_cd_settings` attributes after create
       project.reload.group_runners_enabled = evaluator.group_runners_enabled unless evaluator.group_runners_enabled.nil?
+
+      if evaluator.import_status
+        import_state = project.import_state || project.build_import_state
+        import_state.status = evaluator.import_status
+        import_state.last_update_at = evaluator.last_update_at
+        import_state.last_successful_update_at = evaluator.last_successful_update_at
+        import_state.retry_count = evaluator.retry_count
+        import_state.jid = evaluator.import_jid
+        import_state.save
+      end
     end
 
     trait :public do
@@ -102,22 +117,19 @@ FactoryBot.define do
       timestamp = Time.now
 
       import_status :finished
-      mirror_last_update_at timestamp
-      mirror_last_successful_update_at timestamp
+      last_update_at timestamp
+      last_successful_update_at timestamp
     end
 
     trait :import_failed do
       import_status :failed
-      mirror_last_update_at { Time.now }
+      last_update_at { Time.now }
     end
 
     trait :import_hard_failed do
       import_status :failed
-      mirror_last_update_at { Time.now - 1.minute }
-
-      after(:create) do |project|
-        project.import_state&.update_attributes(retry_count: Gitlab::Mirror::MAX_RETRY + 1)
-      end
+      last_update_at { Time.now - 1.minute }
+      retry_count { Gitlab::Mirror::MAX_RETRY + 1 }
     end
 
     trait :disabled_mirror do
