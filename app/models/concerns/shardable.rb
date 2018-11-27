@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module RepositoryOnShard
+module Shardable
   extend ActiveSupport::Concern
 
   included do

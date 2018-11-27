@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PoolRepository < ActiveRecord::Base
-  include RepositoryOnShard
+  include Shardable
 
   has_many :member_projects, class_name: 'Project'
 
