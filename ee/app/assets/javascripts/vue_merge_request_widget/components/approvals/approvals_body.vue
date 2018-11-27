@@ -137,28 +137,18 @@ export default {
 
 <template>
   <div class="approvals-body space-children">
-    <span
-      v-if="showApproveButton"
-      class="approvals-approve-button-wrap"
-    >
+    <span v-if="showApproveButton" class="approvals-approve-button-wrap">
       <button
         :disabled="approving"
         :class="approveButtonClass"
         class="btn btn-primary btn-sm approve-btn"
         @click="approveMergeRequest"
       >
-        <i
-          v-if="approving"
-          class="fa fa-spinner fa-spin"
-          aria-hidden="true"
-        ></i>
+        <i v-if="approving" class="fa fa-spinner fa-spin" aria-hidden="true"></i>
         {{ approveButtonText }}
       </button>
     </span>
-    <span
-      :class="approvalsOptional ? 'text-muted' : 'bold'"
-      class="approvals-required-text"
-    >
+    <span :class="approvalsOptional ? 'text-muted' : 'bold'" class="approvals-required-text">
       {{ approvalsRequiredStringified }}
       <a
         v-if="showApprovalDocLink"
@@ -170,9 +160,7 @@ export default {
         rel="noopener noreferrer nofollow"
         data-container="body"
       >
-        <icon
-          name="question-o"
-        />
+        <icon name="question-o" />
       </a>
       <span v-if="showSuggestedApprovers">
         <mr-widget-author

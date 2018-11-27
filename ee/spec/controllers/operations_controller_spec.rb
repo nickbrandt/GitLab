@@ -239,7 +239,7 @@ describe OperationsController do
         user.ops_dashboard_projects << project
       end
 
-      it 'removes a project succesfully' do
+      it 'removes a project successfully' do
         delete :destroy, project_id: project.id
 
         expect(response).to have_gitlab_http_status(200)

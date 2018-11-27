@@ -1,0 +1,57 @@
+---
+- cronjob:clear_shared_runners_minutes
+- cronjob:geo_file_download_dispatch
+- cronjob:geo_metrics_update
+- cronjob:geo_prune_event_log
+- cronjob:geo_migrated_local_files_clean_up
+- cronjob:geo_repository_sync
+- cronjob:geo_repository_verification_primary_batch
+- cronjob:geo_repository_verification_secondary_scheduler
+- cronjob:geo_sidekiq_cron_config
+- cronjob:geo_scheduler_per_shard_scheduler
+- cronjob:geo_scheduler_primary_per_shard_scheduler
+- cronjob:geo_scheduler_secondary_per_shard_scheduler
+- cronjob:geo_repository_verification_secondary_shard
+- cronjob:historical_data
+- cronjob:ldap_all_groups_sync
+- cronjob:ldap_sync
+- cronjob:update_all_mirrors
+- cronjob:pseudonymizer
+
+- gcp_cluster:cluster_update_app
+- gcp_cluster:cluster_wait_for_app_update
+
+- geo:geo_batch_project_registry
+- geo:geo_batch_project_registry_scheduler
+- geo:geo_file_download
+- geo:geo_file_removal
+- geo:geo_file_registry_removal
+- geo:geo_hashed_storage_attachments_migration
+- geo:geo_hashed_storage_migration
+- geo:geo_project_sync
+- geo:geo_rename_repository
+- geo:geo_repositories_clean_up
+- geo:geo_repository_destroy
+- geo:geo_repository_shard_sync
+- geo:geo_repository_verification_primary_shard
+- geo:geo_repository_verification_primary_single
+- geo:geo_repository_verification_secondary_single
+- geo:geo_scheduler_scheduler
+- geo:geo_scheduler_primary_scheduler
+- geo:geo_scheduler_secondary_scheduler
+
+- pipeline_default:store_security_reports
+
+- admin_emails
+- chat_notification
+- create_github_webhook
+- elastic_batch_project_indexer
+- elastic_commit_indexer
+- elastic_indexer
+- export_csv
+- ldap_group_sync
+- new_epic
+- project_import_schedule
+- project_update_repository_storage
+- rebase
+- repository_update_mirror

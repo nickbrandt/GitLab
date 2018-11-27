@@ -1,7 +1,7 @@
 # See http://doc.gitlab.com/ce/development/migration_style_guide.html
 # for more information on how to write migrations for GitLab.
 
-class UpdateAuthorizedKeysFile < ActiveRecord::Migration
+class UpdateAuthorizedKeysFile < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   class ApplicationSetting < ActiveRecord::Base

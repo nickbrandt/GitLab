@@ -91,43 +91,19 @@ describe MergeRequests::RefreshService do
           [forked_merge_request].each do |merge_request|
             expect(::Gitlab::CodeOwners).not_to receive(:for_merge_request).with(merge_request, anything)
           end
-        end
 
-        shared_examples 'notification and todo' do
-          it 'does nothing if owners do not change' do
-            expect(service.todo_service).not_to receive(:add_merge_request_approvers)
-            expect(service.notification_service).not_to receive(:add_merge_request_approvers)
-
-            subject
-          end
-
-          context 'when new owners are being added' do
-            let(:new_owners) { [owner] }
-
-            it 'notifies new owner' do
-              relevant_merge_requests.each do |merge_request|
-                expect(todo_service).to receive(:add_merge_request_approvers).with(merge_request, [owner])
-                expect(notification_service).to receive(:add_merge_request_approvers).with(merge_request, [owner], current_user)
-              end
-
-              subject
-            end
-          end
-
-          context 'when old owners are being removed' do
-            let(:old_owners) { [owner] }
-
-            it 'does nothing' do
-              expect(service.todo_service).not_to receive(:add_merge_request_approvers)
-              expect(service.notification_service).not_to receive(:add_merge_request_approvers)
-
-              subject
-            end
-          end
+          expect(service.todo_service).not_to receive(:add_merge_request_approvers)
+          expect(service.notification_service).not_to receive(:add_merge_request_approvers)
         end
 
         context 'merge request has overwritten approvers' do
-          include_examples 'notification and todo'
+          context 'when new owners are being added' do
+            let(:new_owners) { [owner] }
+
+            it 'does not create Approver' do
+              expect { subject }.not_to change { Approver.count }
+            end
+          end
         end
 
         context 'merge request has default approvers' do
@@ -137,19 +113,18 @@ describe MergeRequests::RefreshService do
             create(:approver, target: merge_request, user: existing_approver)
           end
 
-          include_examples 'notification and todo'
-
           context 'when new owners are being added' do
             let(:new_owners) { [owner] }
 
             it 'creates Approver' do
-              allow(service.todo_service).to receive(:add_merge_request_approvers)
-              allow(service.notification_service).to receive(:add_merge_request_approvers)
+              expect { subject }.to change { Approver.count }.by(1)
 
-              subject
+              new_approver = merge_request.approvers.last
 
               expect(merge_request.approvers.first.user).to eq(existing_approver)
-              expect(merge_request.approvers.last.user).to eq(owner)
+              expect(new_approver.user).to eq(owner)
+              expect(new_approver.created_at).to be_present
+              expect(new_approver.updated_at).to be_present
             end
           end
         end

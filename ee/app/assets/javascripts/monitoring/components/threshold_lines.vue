@@ -65,22 +65,8 @@ export default {
 </script>
 
 <template>
-  <g
-    v-if="thresholdData.length"
-    transform="translate(-5, 20)"
-    class="js-threshold-lines"
-  >
-    <path
-      v-if="areaPath"
-      :d="areaPath"
-      :fill="red50"
-    />
-    <path
-      :d="linePath"
-      fill="none"
-      :stroke="red400"
-      stroke-width="1"
-      stroke-dasharray="solid"
-    />
+  <g v-if="thresholdData.length" transform="translate(-5, 20)" class="js-threshold-lines">
+    <path v-if="areaPath" :d="areaPath" :fill="red50" />
+    <path :d="linePath" fill="none" :stroke="red400" stroke-width="1" stroke-dasharray="solid" />
   </g>
 </template>

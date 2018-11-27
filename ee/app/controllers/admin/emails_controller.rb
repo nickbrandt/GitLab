@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Admin::EmailsController < Admin::ApplicationController
   def show
   end

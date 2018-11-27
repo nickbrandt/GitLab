@@ -1,4 +1,4 @@
-class IndexGeoNodesUrl < ActiveRecord::Migration
+class IndexGeoNodesUrl < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

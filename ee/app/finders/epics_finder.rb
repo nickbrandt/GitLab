@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EpicsFinder < IssuableFinder
   def self.scalar_params
     @scalar_params ||= %i[

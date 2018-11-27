@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Shared actions between Groups::BoardsController and Projects::BoardsController
 module EE
   module Boards

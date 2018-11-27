@@ -42,10 +42,10 @@ For each of the dates in the sidebar of an epic, you can choose to either:
 - Enter a fixed value.
 - Inherit a dynamic value called "From milestones".
 
-If you select "From milestones" for the start date, GitLab will automatically set the 
-date to be earliest start date across all milestones that are currently assigned 
+If you select "From milestones" for the start date, GitLab will automatically set the
+date to be earliest start date across all milestones that are currently assigned
 to the issues that are attached to the epic. Similarly, if you select "From milestones"
-for the due date, GitLab will set it to be the latest due date across all 
+for the due date, GitLab will set it to be the latest due date across all
 milestones that are currently assigned to those issues.
 
 These are dynamic dates in that if milestones are re-assigned to the issues, if the
@@ -90,6 +90,13 @@ If an issue belongs to an epic, you can navigate to the containing epic with the
 link in the issue sidebar.
 
 ![containing epic](img/containing_epic.png)
+
+## Promoting an issue to an epic
+
+A user who has permissions to close an issue and create an epic in the parent group
+can promote an issue to an epic.
+The epic is created in the group the issue project belongs to (direct parent group).
+Only issues from projects that are in groups can be promoted.
 
 ## Searching for an epic from epics list page
 

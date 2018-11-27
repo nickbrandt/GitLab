@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module NotesFinder
     extend ActiveSupport::Concern

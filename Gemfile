@@ -14,6 +14,9 @@ source 'https://rubygems.org'
 gem 'rails', gem_versions['rails']
 gem 'rails-deprecated_sanitizer', '~> 1.0.3'
 
+# Improves copy-on-write performance for MRI
+gem 'nakayoshi_fork', '~> 0.0.4'
+
 # Responders respond_to and respond_with
 gem 'responders', '~> 2.0'
 
@@ -146,7 +149,7 @@ gem 'rdoc', '~> 6.0'
 gem 'org-ruby', '~> 0.9.12'
 gem 'creole', '~> 0.5.0'
 gem 'wikicloth', '0.8.1'
-gem 'asciidoctor', '~> 1.5.6'
+gem 'asciidoctor', '~> 1.5.8'
 gem 'asciidoctor-plantuml', '0.0.8'
 gem 'rouge', '~> 3.1'
 gem 'truncato', '~> 0.7.9'
@@ -236,13 +239,13 @@ gem 'slack-notifier', '~> 1.5.1'
 gem 'hangouts-chat', '~> 0.0.5'
 
 # Asana integration
-gem 'asana', '~> 0.6.0'
+gem 'asana', '~> 0.8.1'
 
 # FogBugz integration
 gem 'ruby-fogbugz', '~> 0.2.1'
 
 # Kubernetes integration
-gem 'kubeclient', '~> 3.1.0'
+gem 'kubeclient', '~> 4.0.0'
 
 # Sanitize user input
 gem 'sanitize', '~> 4.6'
@@ -329,7 +332,7 @@ group :development do
   gem 'rblineprof', '~> 0.3.6', platform: :mri, require: false
 
   # Better errors handler
-  gem 'better_errors', '~> 2.1.0'
+  gem 'better_errors', '~> 2.5.0'
   gem 'binding_of_caller', '~> 0.8.0'
 
   # thin instead webrick
@@ -398,7 +401,7 @@ group :test do
   gem 'rails-controller-testing' if rails5? # Rails5 only gem.
   gem 'test_after_commit', '~> 1.1' unless rails5? # Remove this gem when migrated to rails 5.0. It's been integrated to rails 5.0.
   gem 'sham_rack', '~> 1.3.6'
-  gem 'concurrent-ruby', '~> 1.0.5'
+  gem 'concurrent-ruby', '~> 1.1'
   gem 'test-prof', '~> 0.2.5'
   gem 'rspec_junit_formatter'
 end
@@ -437,7 +440,7 @@ group :ed25519 do
 end
 
 # Gitaly GRPC client
-gem 'gitaly-proto', '~> 0.123.0', require: 'gitaly'
+gem 'gitaly-proto', '~> 1.1.0', require: 'gitaly'
 gem 'grpc', '~> 1.15.0'
 
 gem 'google-protobuf', '~> 3.6'

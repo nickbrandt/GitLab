@@ -64,42 +64,22 @@ export default {
 
 <template>
   <div class="geo-node-actions">
-    <div
-      v-if="isSecondaryNode"
-      class="node-action-container"
-    >
-      <a
-        :href="node.geoProjectsUrl"
-        class="btn btn-sm btn-node-action"
-        target="_blank"
-      >
-        <icon
-          name="external-link"
-        />
-        {{ __('Open projects') }}
+    <div v-if="isSecondaryNode" class="node-action-container">
+      <a :href="node.geoProjectsUrl" class="btn btn-sm btn-node-action" target="_blank">
+        <icon name="external-link" /> {{ __('Open projects') }}
       </a>
     </div>
     <template v-if="nodeActionsAllowed">
-      <div
-        v-if="nodeMissingOauth"
-        class="node-action-container"
-      >
-        <button
-          type="button"
-          class="btn btn-default btn-sm btn-node-action"
-          @click="onRepairNode"
-        >
+      <div v-if="nodeMissingOauth" class="node-action-container">
+        <button type="button" class="btn btn-default btn-sm btn-node-action" @click="onRepairNode">
           {{ s__('Repair authentication') }}
         </button>
       </div>
-      <div
-        v-if="isToggleAllowed"
-        class="node-action-container"
-      >
+      <div v-if="isToggleAllowed" class="node-action-container">
         <button
           :class="{
             'btn-warning': node.enabled,
-            'btn-success': !node.enabled
+            'btn-success': !node.enabled,
           }"
           type="button"
           class="btn btn-sm btn-node-action"
@@ -108,23 +88,11 @@ export default {
           {{ nodeToggleLabel }}
         </button>
       </div>
-      <div
-        v-if="nodeEditAllowed"
-        class="node-action-container"
-      >
-        <a
-          :href="node.editPath"
-          class="btn btn-sm btn-node-action"
-        >
-          {{ __('Edit') }}
-        </a>
+      <div v-if="nodeEditAllowed" class="node-action-container">
+        <a :href="node.editPath" class="btn btn-sm btn-node-action"> {{ __('Edit') }} </a>
       </div>
       <div class="node-action-container">
-        <button
-          type="button"
-          class="btn btn-sm btn-node-action btn-danger"
-          @click="onRemoveNode"
-        >
+        <button type="button" class="btn btn-sm btn-node-action btn-danger" @click="onRemoveNode">
           {{ __('Remove') }}
         </button>
       </div>

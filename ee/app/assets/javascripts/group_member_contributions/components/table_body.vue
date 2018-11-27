@@ -11,10 +11,7 @@ export default {
 
 <template>
   <tbody>
-    <tr
-      v-for="(row, index) of rows"
-      :key="index"
-    >
+    <tr v-for="(row, index) of rows" :key="index">
       <td>
         <strong>
           <a :href="row.userWebUrl">{{ row.fullname }}</a>

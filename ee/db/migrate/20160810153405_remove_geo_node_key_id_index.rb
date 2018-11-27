@@ -2,7 +2,7 @@
 # for more information on how to write migrations for GitLab.
 
 # rubocop:disable RemoveIndex
-class RemoveGeoNodeKeyIdIndex < ActiveRecord::Migration
+class RemoveGeoNodeKeyIdIndex < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

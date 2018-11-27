@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Profiles::PipelineQuotaController < Profiles::ApplicationController
   def index
     @namespace = current_user.namespace

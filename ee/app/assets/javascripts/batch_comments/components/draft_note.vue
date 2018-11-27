@@ -61,22 +61,11 @@ export default {
 };
 </script>
 <template>
-  <article
-    :class="componentClasses"
-    class="draft-note-component note-wrapper"
-  >
+  <article :class="componentClasses" class="draft-note-component note-wrapper">
     <header class="draft-note-header">
-      <strong class="badge draft-pending-label">
-        {{ __('Pending') }}
-      </strong>
-      <p
-        v-if="draft.discussion_id"
-        class="draft-note-resolution"
-      >
-        <Icon
-          :size="16"
-          name="status_success"
-        />
+      <strong class="badge draft-pending-label"> {{ __('Pending') }} </strong>
+      <p v-if="draft.discussion_id" class="draft-note-resolution">
+        <Icon :size="16" name="status_success" />
         {{ __(resolvedStatusMessage) }}
       </p>
     </header>
@@ -92,15 +81,12 @@ export default {
       />
     </ul>
 
-    <template
-      v-if="!isEditingDraft"
-    >
+    <template v-if="!isEditingDraft">
       <div
         v-if="draftCommands"
         class="referenced-commands draft-note-commands"
         v-html="draftCommands"
-      >
-      </div>
+      ></div>
 
       <p class="draft-note-actions">
         <publish-button

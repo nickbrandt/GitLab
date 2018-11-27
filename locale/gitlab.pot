@@ -261,6 +261,9 @@ msgstr[1] ""
 msgid "1st contribution!"
 msgstr ""
 
+msgid "2FA"
+msgstr ""
+
 msgid "2FA enabled"
 msgstr ""
 
@@ -447,6 +450,9 @@ msgstr ""
 msgid "Add user(s) to the group:"
 msgstr ""
 
+msgid "Add users or groups who are allowed to approve every merge request"
+msgstr ""
+
 msgid "Add users to group"
 msgstr ""
 
@@ -599,40 +605,13 @@ msgstr ""
 msgid "An error has occurred"
 msgstr ""
 
-msgid "An error occured creating the new branch."
-msgstr ""
-
-msgid "An error occured whilst fetching the job trace."
-msgstr ""
-
-msgid "An error occured whilst fetching the latest pipeline."
-msgstr ""
-
-msgid "An error occured whilst loading all the files."
-msgstr ""
-
-msgid "An error occured whilst loading the file content."
-msgstr ""
-
-msgid "An error occured whilst loading the file."
-msgstr ""
-
-msgid "An error occured whilst loading the merge request changes."
-msgstr ""
-
-msgid "An error occured whilst loading the merge request version data."
-msgstr ""
-
-msgid "An error occured whilst loading the merge request."
-msgstr ""
-
-msgid "An error occured whilst loading the pipelines jobs."
-msgstr ""
-
 msgid "An error occurred adding a draft to the discussion."
 msgstr ""
 
 msgid "An error occurred adding a new draft."
+msgstr ""
+
+msgid "An error occurred creating the new branch."
 msgstr ""
 
 msgid "An error occurred previewing the blob"
@@ -743,6 +722,33 @@ msgstr ""
 msgid "An error occurred while validating username"
 msgstr ""
 
+msgid "An error occurred whilst fetching the job trace."
+msgstr ""
+
+msgid "An error occurred whilst fetching the latest pipeline."
+msgstr ""
+
+msgid "An error occurred whilst loading all the files."
+msgstr ""
+
+msgid "An error occurred whilst loading the file content."
+msgstr ""
+
+msgid "An error occurred whilst loading the file."
+msgstr ""
+
+msgid "An error occurred whilst loading the merge request changes."
+msgstr ""
+
+msgid "An error occurred whilst loading the merge request version data."
+msgstr ""
+
+msgid "An error occurred whilst loading the merge request."
+msgstr ""
+
+msgid "An error occurred whilst loading the pipelines jobs."
+msgstr ""
+
 msgid "An error occurred. Please try again."
 msgstr ""
 
@@ -776,6 +782,12 @@ msgstr ""
 msgid "Applications"
 msgstr ""
 
+msgid "Approvals required"
+msgstr ""
+
+msgid "Approvers"
+msgstr ""
+
 msgid "Apr"
 msgstr ""
 
@@ -801,6 +813,12 @@ msgid "Are you sure you want to regenerate the public key? You will have to upda
 msgstr ""
 
 msgid "Are you sure you want to remove %{group_name}?"
+msgstr ""
+
+msgid "Are you sure you want to remove approver %{name}?"
+msgstr ""
+
+msgid "Are you sure you want to remove group %{name}?"
 msgstr ""
 
 msgid "Are you sure you want to remove this identity?"
@@ -975,6 +993,12 @@ msgid "Available group Runners : %{runners}"
 msgstr ""
 
 msgid "Available group Runners : %{runners}."
+msgstr ""
+
+msgid "Available shared Runners:"
+msgstr ""
+
+msgid "Available specific runners"
 msgstr ""
 
 msgid "Avatar will be removed. Are you sure?"
@@ -1160,6 +1184,9 @@ msgstr ""
 msgid "Bitbucket import"
 msgstr ""
 
+msgid "Blocked"
+msgstr ""
+
 msgid "Blog"
 msgstr ""
 
@@ -1339,6 +1366,9 @@ msgstr ""
 msgid "CI / CD"
 msgstr ""
 
+msgid "CI / CD Charts"
+msgstr ""
+
 msgid "CI / CD Settings"
 msgstr ""
 
@@ -1402,6 +1432,9 @@ msgstr ""
 msgid "Callback URL"
 msgstr ""
 
+msgid "Can override approvers and approvals required per merge request"
+msgstr ""
+
 msgid "Can't find HEAD commit for this branch"
 msgstr ""
 
@@ -1421,6 +1454,9 @@ msgid "Certificate fingerprint"
 msgstr ""
 
 msgid "Change Weight"
+msgstr ""
+
+msgid "Change permissions"
 msgstr ""
 
 msgid "Change template"
@@ -1448,6 +1484,9 @@ msgid "Changelog"
 msgstr ""
 
 msgid "Changes are shown as if the <b>source</b> revision was being merged into the <b>target</b> revision."
+msgstr ""
+
+msgid "Changes suppressed. Click to show."
 msgstr ""
 
 msgid "Charts"
@@ -1594,7 +1633,7 @@ msgstr ""
 msgid "CiVariable|Create wildcard"
 msgstr ""
 
-msgid "CiVariable|Error occured while saving variables"
+msgid "CiVariable|Error occurred while saving variables"
 msgstr ""
 
 msgid "CiVariable|New environment"
@@ -1675,9 +1714,6 @@ msgstr ""
 msgid "ClusterIntegration|%{boldNotice} This will add some extra resources like a load balancer, which may incur additional costs depending on the hosting provider your Kubernetes cluster is installed on. If you are using Google Kubernetes Engine, you can %{pricingLink}."
 msgstr ""
 
-msgid "ClusterIntegration|A Knative build extends Kubernetes and utilizes existing Kubernetes primitives to provide you with the ability to run on-cluster container builds from source. For example, you can write a build that uses Kubernetes-native resources to obtain your source code from a repository, build it into container a image, and then run that image."
-msgstr ""
-
 msgid "ClusterIntegration|API URL"
 msgstr ""
 
@@ -1702,13 +1738,13 @@ msgstr ""
 msgid "ClusterIntegration|An error occured while trying to fetch project zones: %{error}"
 msgstr ""
 
-msgid "ClusterIntegration|An error occured while trying to fetch your projects: %{error}"
-msgstr ""
-
-msgid "ClusterIntegration|An error occured while trying to fetch zone machine types: %{error}"
-msgstr ""
-
 msgid "ClusterIntegration|An error occurred when trying to contact the Google Cloud API. Please try again later."
+msgstr ""
+
+msgid "ClusterIntegration|An error occurred while trying to fetch your projects: %{error}"
+msgstr ""
+
+msgid "ClusterIntegration|An error occurred while trying to fetch zone machine types: %{error}"
 msgstr ""
 
 msgid "ClusterIntegration|Applications"
@@ -1718,6 +1754,9 @@ msgid "ClusterIntegration|Are you sure you want to remove this Kubernetes cluste
 msgstr ""
 
 msgid "ClusterIntegration|CA Certificate"
+msgstr ""
+
+msgid "ClusterIntegration|Cert-Manager"
 msgstr ""
 
 msgid "ClusterIntegration|Certificate Authority bundle (PEM format)"
@@ -1739,6 +1778,9 @@ msgid "ClusterIntegration|Copy Ingress IP Address to clipboard"
 msgstr ""
 
 msgid "ClusterIntegration|Copy Jupyter Hostname to clipboard"
+msgstr ""
+
+msgid "ClusterIntegration|Copy Knative IP Address to clipboard"
 msgstr ""
 
 msgid "ClusterIntegration|Copy Kubernetes cluster name"
@@ -1852,7 +1894,13 @@ msgstr ""
 msgid "ClusterIntegration|Knative"
 msgstr ""
 
+msgid "ClusterIntegration|Knative (pronounced kay-nay-tiv) extends Kubernetes to provide a set of middleware components that are essential to build modern, source-centric, and container-based applications that can run anywhere: on premises, in the cloud, or even in a third-party data center."
+msgstr ""
+
 msgid "ClusterIntegration|Knative Domain Name:"
+msgstr ""
+
+msgid "ClusterIntegration|Knative IP Address:"
 msgstr ""
 
 msgid "ClusterIntegration|Kubernetes cluster"
@@ -1889,6 +1937,9 @@ msgid "ClusterIntegration|Learn more about Kubernetes"
 msgstr ""
 
 msgid "ClusterIntegration|Learn more about group Kubernetes clusters"
+msgstr ""
+
+msgid "ClusterIntegration|Let's Encrypt"
 msgstr ""
 
 msgid "ClusterIntegration|Machine type"
@@ -2051,6 +2102,9 @@ msgid "ClusterIntegration|Zone"
 msgstr ""
 
 msgid "ClusterIntegration|access to Google Kubernetes Engine"
+msgstr ""
+
+msgid "ClusterIntegration|cert-manager is a native Kubernetes certificate management controller that helps with issuing certificates. Installing cert-manager on your cluster will issue a certificate by %{letsEncrypt} and ensure that certificates are valid and up to date."
 msgstr ""
 
 msgid "ClusterIntegration|check the pricing here"
@@ -2303,6 +2357,9 @@ msgstr ""
 msgid "Contribution"
 msgstr ""
 
+msgid "Contribution Charts"
+msgstr ""
+
 msgid "Contribution guide"
 msgstr ""
 
@@ -2352,6 +2409,9 @@ msgid "Copy ID to clipboard"
 msgstr ""
 
 msgid "Copy SSH clone URL"
+msgstr ""
+
+msgid "Copy SSH public key"
 msgstr ""
 
 msgid "Copy SSH public key to clipboard"
@@ -2543,6 +2603,9 @@ msgstr ""
 msgid "Customize how Google Code email addresses and usernames are imported into GitLab. In the next step, you'll be able to select the projects you want to import."
 msgstr ""
 
+msgid "Customize your merge request approval settings."
+msgstr ""
+
 msgid "Customize your pipeline configuration, view your pipeline status and coverage report."
 msgstr ""
 
@@ -2610,6 +2673,9 @@ msgid "Default: Map a FogBugz account ID to a full name"
 msgstr ""
 
 msgid "Define a custom pattern with cron syntax"
+msgstr ""
+
+msgid "Define environments in the deploy stage(s) in <code>.gitlab-ci.yml</code> to track deployments here."
 msgstr ""
 
 msgid "DelayedJobs|Are you sure you want to run %{jobName} immediately? Otherwise this job will run automatically after it's timer finishes."
@@ -2833,6 +2899,12 @@ msgstr ""
 msgid "Disable group Runners"
 msgstr ""
 
+msgid "Disable shared Runners"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
 msgid "Discard"
 msgstr ""
 
@@ -2941,6 +3013,9 @@ msgstr ""
 msgid "Edit application"
 msgstr ""
 
+msgid "Edit environment"
+msgstr ""
+
 msgid "Edit files in the editor and commit changes here"
 msgstr ""
 
@@ -3007,6 +3082,12 @@ msgstr ""
 msgid "Enable reCAPTCHA or Akismet and set IP limits."
 msgstr ""
 
+msgid "Enable self approval of merge requests"
+msgstr ""
+
+msgid "Enable shared Runners"
+msgstr ""
+
 msgid "Enable the Performance Bar for a given group."
 msgstr ""
 
@@ -3038,6 +3119,9 @@ msgid "Enter the merge request title"
 msgstr ""
 
 msgid "Environments"
+msgstr ""
+
+msgid "Environments allow you to track deployments of your application %{link_to_read_more}."
 msgstr ""
 
 msgid "Environments|An error occurred while fetching the environments."
@@ -3113,6 +3197,9 @@ msgid "Environments|Stop"
 msgstr ""
 
 msgid "Environments|Stop environment"
+msgstr ""
+
+msgid "Environments|Stopping"
 msgstr ""
 
 msgid "Environments|Updated"
@@ -3253,6 +3340,9 @@ msgstr ""
 msgid "Every week (Sundays at 4:00am)"
 msgstr ""
 
+msgid "Everyone"
+msgstr ""
+
 msgid "Everyone can contribute"
 msgstr ""
 
@@ -3266,6 +3356,9 @@ msgid "Expand sidebar"
 msgstr ""
 
 msgid "Expiration date"
+msgstr ""
+
+msgid "Expires in %{expires_at}"
 msgstr ""
 
 msgid "Explain the problem. If appropriate, provide a link to the relevant issue or comment."
@@ -3290,6 +3383,9 @@ msgid "Explore public groups"
 msgstr ""
 
 msgid "External Classification Policy Authorization"
+msgstr ""
+
+msgid "External URL"
 msgstr ""
 
 msgid "External authentication"
@@ -3436,6 +3532,18 @@ msgstr ""
 msgid "Fields on this page are now uneditable, you can configure"
 msgstr ""
 
+msgid "File added"
+msgstr ""
+
+msgid "File deleted"
+msgstr ""
+
+msgid "File mode changed from %{a_mode} to %{b_mode}"
+msgstr ""
+
+msgid "File moved"
+msgstr ""
+
 msgid "File templates"
 msgstr ""
 
@@ -3458,6 +3566,9 @@ msgid "Filter by %{issuable_type} that are currently opened."
 msgstr ""
 
 msgid "Filter by commit message"
+msgstr ""
+
+msgid "Filter by two-factor authentication"
 msgstr ""
 
 msgid "Filter..."
@@ -3958,6 +4069,9 @@ msgstr ""
 msgid "GitLab Import"
 msgstr ""
 
+msgid "GitLab Shared Runners execute code of different projects on the same Runner unless you configure GitLab Runner Autoscale with MaxBuilds 1 (which it is on GitLab.com)."
+msgstr ""
+
 msgid "GitLab User"
 msgstr ""
 
@@ -3991,6 +4105,9 @@ msgstr ""
 msgid "Gitea Import"
 msgstr ""
 
+msgid "Given access %{time_ago}"
+msgstr ""
+
 msgid "Go Back"
 msgstr ""
 
@@ -4013,6 +4130,9 @@ msgid "Google authentication is not %{link_to_documentation}. Ask your GitLab ad
 msgstr ""
 
 msgid "Got it!"
+msgstr ""
+
+msgid "Grant access"
 msgstr ""
 
 msgid "Graph"
@@ -4058,6 +4178,9 @@ msgid "Group maintainers can register group runners in the %{link}"
 msgstr ""
 
 msgid "Group name"
+msgstr ""
+
+msgid "Group:"
 msgstr ""
 
 msgid "Group: %{group_name}"
@@ -4478,6 +4601,12 @@ msgstr ""
 msgid "Invite"
 msgstr ""
 
+msgid "Invoke Count"
+msgstr ""
+
+msgid "Invoke Time"
+msgstr ""
+
 msgid "Issue"
 msgstr ""
 
@@ -4494,6 +4623,15 @@ msgid "IssueBoards|Board"
 msgstr ""
 
 msgid "IssueBoards|Boards"
+msgstr ""
+
+msgid "IssueBoards|Create new board"
+msgstr ""
+
+msgid "IssueBoards|Delete board"
+msgstr ""
+
+msgid "IssueBoards|Some of your boards are hidden, activate a license to see them again."
 msgstr ""
 
 msgid "Issues"
@@ -4527,6 +4665,9 @@ msgid "IssuesAnalytics|There are no issues for the projects in your group"
 msgstr ""
 
 msgid "IssuesAnalytics|To widen your search, change or remove filters in the filter bar above"
+msgstr ""
+
+msgid "It's you"
 msgstr ""
 
 msgid "Jaeger URL"
@@ -5106,6 +5247,9 @@ msgstr ""
 msgid "Metrics and profiling"
 msgstr ""
 
+msgid "Metrics for environment"
+msgstr ""
+
 msgid "Metrics|Business"
 msgstr ""
 
@@ -5113,6 +5257,12 @@ msgid "Metrics|Check out the CI/CD documentation on deploying to an environment"
 msgstr ""
 
 msgid "Metrics|Create metric"
+msgstr ""
+
+msgid "Metrics|Delete metric"
+msgstr ""
+
+msgid "Metrics|Delete metric?"
 msgstr ""
 
 msgid "Metrics|Edit metric"
@@ -5188,6 +5338,9 @@ msgid "Metrics|Used if the query returns a single series. If it returns multiple
 msgstr ""
 
 msgid "Metrics|Y-axis label"
+msgstr ""
+
+msgid "Metrics|You're about to permanently delete this metric. This cannot be undone."
 msgstr ""
 
 msgid "Metrics|e.g. HTTP requests"
@@ -5337,6 +5490,9 @@ msgstr ""
 msgid "Nav|Sign out and sign in with a different account"
 msgstr ""
 
+msgid "Need help?"
+msgstr ""
+
 msgid "Network"
 msgstr ""
 
@@ -5347,6 +5503,9 @@ msgid "New"
 msgstr ""
 
 msgid "New Application"
+msgstr ""
+
+msgid "New Environment"
 msgstr ""
 
 msgid "New Group"
@@ -5379,6 +5538,9 @@ msgid "New branch unavailable"
 msgstr ""
 
 msgid "New directory"
+msgstr ""
+
+msgid "New environment"
 msgstr ""
 
 msgid "New epic"
@@ -5486,6 +5648,9 @@ msgstr ""
 msgid "No packages stored for this project."
 msgstr ""
 
+msgid "No preview for this file type"
+msgstr ""
+
 msgid "No prioritised labels with such name or description"
 msgstr ""
 
@@ -5511,12 +5676,6 @@ msgid "Nodes"
 msgstr ""
 
 msgid "None"
-msgstr ""
-
-msgid "Not all comments are displayed because you're comparing two versions of the diff."
-msgstr ""
-
-msgid "Not all comments are displayed because you're viewing an old version of the diff."
 msgstr ""
 
 msgid "Not allowed to merge"
@@ -5669,9 +5828,6 @@ msgid "One or more of your Google Code projects cannot be imported into GitLab d
 msgstr ""
 
 msgid "Only admins"
-msgstr ""
-
-msgid "Only comments from the following commit are shown below"
 msgstr ""
 
 msgid "Only mirror protected branches"
@@ -5831,6 +5987,9 @@ msgid "Permissions, LFS, 2FA"
 msgstr ""
 
 msgid "Personal Access Token"
+msgstr ""
+
+msgid "Pick a name"
 msgstr ""
 
 msgid "Pipeline"
@@ -6700,6 +6859,9 @@ msgstr ""
 msgid "Read more"
 msgstr ""
 
+msgid "Read more about environments"
+msgstr ""
+
 msgid "Read more about project permissions <strong>%{link_to_help}</strong>"
 msgstr ""
 
@@ -6733,6 +6895,9 @@ msgid "Regex pattern"
 msgstr ""
 
 msgid "Register / Sign In"
+msgstr ""
+
+msgid "Register U2F device"
 msgstr ""
 
 msgid "Register and see your runners for this group."
@@ -6772,6 +6937,12 @@ msgid "Remove"
 msgstr ""
 
 msgid "Remove Runner"
+msgstr ""
+
+msgid "Remove all approvals in a merge request when new commits are pushed to its source branch"
+msgstr ""
+
+msgid "Remove approver"
 msgstr ""
 
 msgid "Remove avatar"
@@ -6885,6 +7056,9 @@ msgstr ""
 msgid "Request Access"
 msgstr ""
 
+msgid "Requested %{time_ago}"
+msgstr ""
+
 msgid "Requests Profiles"
 msgstr ""
 
@@ -6892,6 +7066,9 @@ msgid "Require all users in this group to setup Two-factor authentication"
 msgstr ""
 
 msgid "Require all users to accept Terms of Service and Privacy Policy when they access GitLab."
+msgstr ""
+
+msgid "Resend invite"
 msgstr ""
 
 msgid "Reset health check access token"
@@ -6996,6 +7173,9 @@ msgid "Runners"
 msgstr ""
 
 msgid "Runners API"
+msgstr ""
+
+msgid "Runners activated for this project"
 msgstr ""
 
 msgid "Runners can be placed on separate users, servers, and even on your local machine."
@@ -7217,6 +7397,12 @@ msgstr ""
 msgid "SecurityDashboard|Pipeline %{pipelineLink} triggered"
 msgstr ""
 
+msgid "See metrics"
+msgstr ""
+
+msgid "See the affected projects in the GitLab admin panel"
+msgstr ""
+
 msgid "Select"
 msgstr ""
 
@@ -7277,6 +7463,9 @@ msgstr ""
 msgid "Send email"
 msgstr ""
 
+msgid "Send report"
+msgstr ""
+
 msgid "Send usage data"
 msgstr ""
 
@@ -7319,6 +7508,9 @@ msgstr ""
 msgid "Set notification email for abuse reports."
 msgstr ""
 
+msgid "Set number of approvers required before open merge requests can be merged"
+msgstr ""
+
 msgid "Set requirements for a user to sign-in. Enable mandatory two-factor authentication."
 msgstr ""
 
@@ -7332,6 +7524,9 @@ msgid "Set up a specific Runner automatically"
 msgstr ""
 
 msgid "Set up assertions/attributes/claims (email, first_name, last_name) and NameID according to %{docsLinkStart}the documentation %{icon}%{docsLinkEnd}"
+msgstr ""
+
+msgid "Set up new U2F device"
 msgstr ""
 
 msgid "Set up your project to automatically push and/or pull changes to/from another repository. Branches, tags, and commits will be synced automatically."
@@ -7400,9 +7595,6 @@ msgstr ""
 msgid "Show latest version"
 msgstr ""
 
-msgid "Show latest version of the diff"
-msgstr ""
-
 msgid "Show parent pages"
 msgstr ""
 
@@ -7439,6 +7631,9 @@ msgid "Sign in / Register"
 msgstr ""
 
 msgid "Sign in to %{group_name}"
+msgstr ""
+
+msgid "Sign in via 2FA code"
 msgstr ""
 
 msgid "Sign in with Single Sign-On"
@@ -7538,6 +7733,9 @@ msgid "Sorry, no epics matched your search"
 msgstr ""
 
 msgid "Sorry, no projects matched your search"
+msgstr ""
+
+msgid "Sorry, your filter produced no results"
 msgstr ""
 
 msgid "Sort by"
@@ -7789,9 +7987,6 @@ msgstr ""
 msgid "Subscribed"
 msgstr ""
 
-msgid "Summary of issues, merge requests, push events, and comments (Timezone: %{utcFormatted})"
-msgstr ""
-
 msgid "Switch branch/tag"
 msgstr ""
 
@@ -7909,6 +8104,9 @@ msgid "Template"
 msgstr ""
 
 msgid "Templates"
+msgstr ""
+
+msgid "Terminal for environment"
 msgstr ""
 
 msgid "Terms of Service Agreement and Privacy Policy"
@@ -8043,6 +8241,9 @@ msgstr ""
 msgid "The value lying at the midpoint of a series of observed values. E.g., between 3, 5, 9, the median is 5. Between 3, 5, 7, 8, the median is (5+7)/2 = 6."
 msgstr ""
 
+msgid "There are no approvers"
+msgstr ""
+
 msgid "There are no archived projects yet"
 msgstr ""
 
@@ -8050,9 +8251,6 @@ msgid "There are no issues to show"
 msgstr ""
 
 msgid "There are no labels yet"
-msgstr ""
-
-msgid "There are no merge requests to show"
 msgstr ""
 
 msgid "There are no projects shared with this group yet"
@@ -8094,6 +8292,9 @@ msgstr ""
 msgid "Third party offers"
 msgstr ""
 
+msgid "This %{viewer} could not be displayed because %{reason}."
+msgstr ""
+
 msgid "This GitLab instance does not provide any shared Runners yet. Instance administrators can register shared Runners in the admin area."
 msgstr ""
 
@@ -8119,6 +8320,9 @@ msgid "This date is before the start date, so this epic won't appear in the road
 msgstr ""
 
 msgid "This diff is collapsed."
+msgstr ""
+
+msgid "This diff was suppressed by a .gitattributes entry."
 msgstr ""
 
 msgid "This directory"
@@ -8202,7 +8406,7 @@ msgstr ""
 msgid "This job requires a manual action"
 msgstr ""
 
-msgid "This job will automatically run after it's timer finishes. Often they are used for incremental roll-out deploys to production environments. When unscheduled it converts into a manual action."
+msgid "This job will automatically run after its timer finishes. Often they are used for incremental roll-out deploys to production environments. When unscheduled it converts into a manual action."
 msgstr ""
 
 msgid "This means you can not push code until you create an empty repository or import existing one."
@@ -8260,9 +8464,6 @@ msgid "This user will be the author of all events in the activity feed that are 
 msgstr ""
 
 msgid "This user will be the author of all events in the activity feed that are the result of an update, like new branches being created or new commits being pushed to existing branches. Upon creation or when reassigning you can only assign yourself to be the mirror user."
-msgstr ""
-
-msgid "This will delete the custom metric, Are you sure?"
 msgstr ""
 
 msgid "Those emails automatically become issues (with the comments becoming the email conversation) listed here."
@@ -8509,10 +8710,16 @@ msgstr ""
 msgid "To open Jaeger and easily view tracing from GitLab, link the %{start_tag}Tracing%{end_tag} page to your server"
 msgstr ""
 
+msgid "To preserve performance only <strong>%{display_size} of ${real_size}</strong> files are displayed."
+msgstr ""
+
 msgid "To set up SAML authentication for your group through an identity provider like Azure, Okta, Onelogin, Ping Identity, or your custom SAML 2.0 provider:"
 msgstr ""
 
 msgid "To start serving your jobs you can add Runners to your group"
+msgstr ""
+
+msgid "To start serving your jobs you can either add specific Runners to your project or use shared Runners"
 msgstr ""
 
 msgid "To this GitLab instance"
@@ -8522,6 +8729,9 @@ msgid "To validate your GitLab CI configurations, go to 'CI/CD → Pipelines' in
 msgstr ""
 
 msgid "To view the roadmap, add a start or due date to one of your epics in this group or its subgroups. In the months view, only epics in the past month, current month, and next 5 months are shown."
+msgstr ""
+
+msgid "To widen your search, change or remove filters above"
 msgstr ""
 
 msgid "To widen your search, change or remove filters."
@@ -8537,6 +8747,9 @@ msgid "Todos"
 msgstr ""
 
 msgid "Toggle Sidebar"
+msgstr ""
+
+msgid "Toggle comments for this file"
 msgstr ""
 
 msgid "Toggle commit description"
@@ -8620,7 +8833,13 @@ msgstr ""
 msgid "Try again"
 msgstr ""
 
+msgid "Try again?"
+msgstr ""
+
 msgid "Try all GitLab has to offer for 30 days."
+msgstr ""
+
+msgid "Trying to communicate with your device. Plug it in (if you haven't already) and press the button on the device now."
 msgstr ""
 
 msgid "Turn on Service Desk"
@@ -8815,9 +9034,6 @@ msgstr ""
 msgid "UserProfile|Personal projects"
 msgstr ""
 
-msgid "UserProfile|Recent contributions"
-msgstr ""
-
 msgid "UserProfile|Report abuse"
 msgstr ""
 
@@ -8837,6 +9053,9 @@ msgid "UserProfile|View user in admin area"
 msgstr ""
 
 msgid "Users"
+msgstr ""
+
+msgid "Users requesting access to"
 msgstr ""
 
 msgid "Variables"
@@ -8867,6 +9086,12 @@ msgid "View %{alerts}"
 msgstr ""
 
 msgid "View app"
+msgstr ""
+
+msgid "View deployment"
+msgstr ""
+
+msgid "View details: %{details_url}"
 msgstr ""
 
 msgid "View documentation"
@@ -8906,6 +9131,9 @@ msgid "View replaced file @ "
 msgstr ""
 
 msgid "View the documentation"
+msgstr ""
+
+msgid "Viewing commit"
 msgstr ""
 
 msgid "Visibility and access controls"
@@ -8969,6 +9197,9 @@ msgid "We detected potential spam in the %{humanized_resource_name}. Please solv
 msgstr ""
 
 msgid "We don't have enough data to show this stage."
+msgstr ""
+
+msgid "We heard back from your U2F device. You have been authenticated."
 msgstr ""
 
 msgid "We want to be sure it is you, please confirm you are not a robot."
@@ -9142,6 +9373,9 @@ msgstr ""
 msgid "Wiki|Wiki Pages"
 msgstr ""
 
+msgid "Will deploy to"
+msgstr ""
+
 msgid "With contribution analytics you can have an overview for the activity of issues, merge requests and push events of your organization and its members."
 msgstr ""
 
@@ -9176,6 +9410,9 @@ msgid "You are going to transfer %{project_full_name} to another owner. Are you 
 msgstr ""
 
 msgid "You are on a read-only GitLab instance."
+msgstr ""
+
+msgid "You are receiving this message because you are a GitLab administrator for %{url}."
 msgstr ""
 
 msgid "You can %{linkStart}view the blob%{linkEnd} instead."
@@ -9229,6 +9466,9 @@ msgstr ""
 msgid "You don't have any authorized applications"
 msgstr ""
 
+msgid "You don't have any deployments right now."
+msgstr ""
+
 msgid "You have no permissions"
 msgstr ""
 
@@ -9248,6 +9488,9 @@ msgid "You need git-lfs version %{min_git_lfs_version} (or greater) to continue.
 msgstr ""
 
 msgid "You need permission."
+msgstr ""
+
+msgid "You need to register a two-factor authentication app before you can set up a U2F device."
 msgstr ""
 
 msgid "You will loose all changes you've made to this file. This action cannot be undone."
@@ -9310,10 +9553,16 @@ msgstr ""
 msgid "Your Todos"
 msgstr ""
 
+msgid "Your U2F device needs to be set up. Plug it in (if not already) and click the button on the left."
+msgstr ""
+
 msgid "Your applications (%{size})"
 msgstr ""
 
 msgid "Your authorized applications"
+msgstr ""
+
+msgid "Your browser doesn't support U2F. Please use Google Chrome desktop (version 41 or newer)."
 msgstr ""
 
 msgid "Your changes can be committed to %{branch_name} because a merge request is open."
@@ -9326,6 +9575,9 @@ msgid "Your changes have been saved"
 msgstr ""
 
 msgid "Your comment will not be visible to the public."
+msgstr ""
+
+msgid "Your device was successfully set up! Give it a name and register it with the GitLab server."
 msgstr ""
 
 msgid "Your groups"
@@ -9596,6 +9848,9 @@ msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "deleted"
+msgstr ""
+
 msgid "deploy token"
 msgstr ""
 
@@ -9611,6 +9866,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "enabled"
+msgstr ""
+
+msgid "error code:"
 msgstr ""
 
 msgid "estimateCommand|%{slash_command} will update the estimated time with the latest command."
@@ -9689,10 +9947,10 @@ msgstr ""
 msgid "mrWidget|Allows commits from members who can merge to the target branch"
 msgstr ""
 
-msgid "mrWidget|An error occured while removing your approval."
+msgid "mrWidget|An error occurred while removing your approval."
 msgstr ""
 
-msgid "mrWidget|An error occured while retrieving approval data for this merge request."
+msgid "mrWidget|An error occurred while retrieving approval data for this merge request."
 msgstr ""
 
 msgid "mrWidget|An error occurred while submitting your approval."

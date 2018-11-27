@@ -94,10 +94,7 @@ export default {
         :class="{ 'status-box-open': isEpicOpen, 'status-box-issue-closed': !isEpicOpen }"
         class="issuable-status-box status-box"
       >
-        <icon
-          :name="statusIcon"
-          css-classes="d-block d-sm-none"
-        />
+        <icon :name="statusIcon" css-classes="d-block d-sm-none" />
         <span class="d-none d-sm-block">{{ statusText }}</span>
       </div>
       <div class="issuable-meta">
@@ -116,10 +113,7 @@ export default {
         </strong>
       </div>
     </div>
-    <div
-      v-if="canUpdate"
-      class="detail-page-header-actions js-issuable-actions"
-    >
+    <div v-if="canUpdate" class="detail-page-header-actions js-issuable-actions">
       <loading-button
         :label="actionButtonText"
         :loading="statusUpdating"

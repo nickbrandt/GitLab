@@ -49,9 +49,7 @@ export default {
   <div class="row-fluid clearfix node-detail-section primary-section">
     <div class="col-md-8 section-items-container">
       <div class="detail-section-item node-version">
-        <div class="node-detail-title">
-          {{ s__('GeoNodes|GitLab version') }}
-        </div>
+        <div class="node-detail-title">{{ s__('GeoNodes|GitLab version') }}</div>
         <div
           :class="{ 'node-detail-value-error': versionMismatch }"
           class="node-detail-value node-detail-value-bold"
@@ -59,9 +57,7 @@ export default {
           {{ nodeVersion }}
         </div>
       </div>
-      <geo-node-health-status
-        :status="nodeHealthStatus"
-      />
+      <geo-node-health-status :status="nodeHealthStatus" />
     </div>
     <geo-node-actions
       :node="node"

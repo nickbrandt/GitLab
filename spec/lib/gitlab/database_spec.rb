@@ -443,51 +443,9 @@ describe Gitlab::Database do
     end
   end
 
-  describe '#disable_prepared_statements' do
-    it 'disables prepared statements' do
-      config = {}
-
-      expect(ActiveRecord::Base.configurations).to receive(:[])
-        .with(Rails.env)
-        .and_return(config)
-
-      expect(ActiveRecord::Base).to receive(:establish_connection)
-        .with({ 'prepared_statements' => false })
-
-      described_class.disable_prepared_statements
-
-      expect(config['prepared_statements']).to eq(false)
-    end
-  end
-
   describe '.read_only?' do
-    context 'with Geo enabled' do
-      before do
-        allow(Gitlab::Geo).to receive(:enabled?) { true }
-        allow(Gitlab::Geo).to receive(:current_node) { geo_node }
-      end
-
-      context 'is Geo secondary node' do
-        let(:geo_node) { create(:geo_node) }
-
-        it 'returns true' do
-          expect(described_class.read_only?).to be_truthy
-        end
-      end
-
-      context 'is Geo primary node' do
-        let(:geo_node) { create(:geo_node, :primary) }
-
-        it 'returns false when is Geo primary node' do
-          expect(described_class.read_only?).to be_falsey
-        end
-      end
-    end
-
-    context 'with Geo disabled' do
-      it 'returns false' do
-        expect(described_class.read_only?).to be_falsey
-      end
+    it 'returns false' do
+      expect(described_class.read_only?).to be_falsey
     end
   end
 
@@ -495,7 +453,7 @@ describe Gitlab::Database do
     context 'when using PostgreSQL' do
       before do
         allow(ActiveRecord::Base.connection).to receive(:execute).and_call_original
-        expect(described_class).to receive(:postgresql?).and_return(true)
+        allow(described_class).to receive(:postgresql?).and_return(true)
       end
 
       it 'detects a read only database' do
@@ -504,8 +462,22 @@ describe Gitlab::Database do
         expect(described_class.db_read_only?).to be_truthy
       end
 
+      # TODO: remove rails5-only tag after removing rails4 tests
+      it 'detects a read only database', :rails5 do
+        allow(ActiveRecord::Base.connection).to receive(:execute).with('SELECT pg_is_in_recovery()').and_return([{ "pg_is_in_recovery" => true }])
+
+        expect(described_class.db_read_only?).to be_truthy
+      end
+
       it 'detects a read write database' do
         allow(ActiveRecord::Base.connection).to receive(:execute).with('SELECT pg_is_in_recovery()').and_return([{ "pg_is_in_recovery" => "f" }])
+
+        expect(described_class.db_read_only?).to be_falsey
+      end
+
+      # TODO: remove rails5-only tag after removing rails4 tests
+      it 'detects a read write database', :rails5 do
+        allow(ActiveRecord::Base.connection).to receive(:execute).with('SELECT pg_is_in_recovery()').and_return([{ "pg_is_in_recovery" => false }])
 
         expect(described_class.db_read_only?).to be_falsey
       end

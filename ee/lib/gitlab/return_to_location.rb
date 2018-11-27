@@ -2,18 +2,21 @@
 
 module Gitlab
   class ReturnToLocation
+    include ::Gitlab::Utils::StrongMemoize
+
     def initialize(location)
       @location = location
     end
 
     def full_path
-      uri = parse_uri
+      strong_memoize(:full_path) do
+        uri = parse_uri
 
-      if uri
-        path = remove_domain_from_uri(uri)
-        path = add_fragment_back_to_path(uri, path)
-
-        path
+        if uri
+          path = remove_domain_from_uri(uri)
+          path = add_fragment_back_to_path(uri, path)
+          path
+        end
       end
     end
 

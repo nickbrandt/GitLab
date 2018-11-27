@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Translate from '~/vue_shared/translate';
 import SecurityReportApp from 'ee/vue_shared/security_reports/split_security_reports_app.vue';
 import createStore from 'ee/vue_shared/security_reports/store';
-import { convertPermissionToBoolean } from '~/lib/utils/common_utils';
+import { parseBoolean } from '~/lib/utils/common_utils';
 import { updateBadgeCount } from './utils';
 
 Vue.use(Translate);
@@ -55,8 +55,8 @@ export default () => {
             sastContainerHeadPath,
             dastHelpPath,
             sastContainerHelpPath,
-            canCreateFeedback: convertPermissionToBoolean(canCreateFeedback),
-            canCreateIssue: convertPermissionToBoolean(canCreateIssue),
+            canCreateFeedback: parseBoolean(canCreateFeedback),
+            canCreateIssue: parseBoolean(canCreateIssue),
           },
           on: {
             updateBadgeCount: count => {

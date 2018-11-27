@@ -1,4 +1,4 @@
-class SetResyncFlagForRetriedProjects < ActiveRecord::Migration
+class SetResyncFlagForRetriedProjects < ActiveRecord::Migration[4.2]
   def up
     execute <<-SQL
       UPDATE project_registry SET resync_repository = 't' WHERE repository_retry_count > 0 AND resync_repository = 'f';

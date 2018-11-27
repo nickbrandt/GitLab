@@ -28,13 +28,24 @@ Having your vulnerabilities in GitLab allows you to keep track of them and actio
 You want to measure how secure your projects are without having to look into
 each one separately.
 
+## Supported features
+
+The group security dashboard supports [SAST](../../project/merge_requests/sast.md) reports.
+
 ## Requirements
 
 To use the group security dashboard:
 
 1. At least one project inside a group must be configured with
    [Static Application Security Testing](../../project/merge_requests/sast.md).
-2. The configured jobs must use the [new `reports` syntax](../../../ci/yaml/README.md#artifactsreports).
+2. The configured jobs must use the [new `reports` syntax](../../../ci/yaml/README.md#artifactsreports) (see an [example job](../../../ci/examples/sast.md)).
+3. [GitLab Runner](https://docs.gitlab.com/runner/) 11.5 or above must be used to execute the jobs.
+
+## Auto DevOps compatibility
+
+[Auto DevOps](../../../topics/autodevops/index.md) is currently not supported by
+the Group Security Dashboard because it still uses the old job syntax. It will
+be supported in a future release.
 
 ## Viewing the vulnerabilities
 

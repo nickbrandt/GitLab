@@ -66,7 +66,7 @@ export default class ProtectedEnvironmentCreate {
         callback(results);
       })
       .catch(() => {
-        Flash('An error occured while fetching environments.');
+        Flash('An error occurred while fetching environments.');
         callback([]);
       });
   }

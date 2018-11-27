@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe 'Every Sidekiq worker' do
-  DEPRECATED_QUEUES = %w(geo_base_scheduler geo_file_download geo_project_sync geo_repository_shard_sync).freeze
-
   it 'does not use the default queue' do
     expect(Gitlab::SidekiqConfig.workers.map(&:queue)).not_to include('default')
   end
@@ -11,18 +9,18 @@ describe 'Every Sidekiq worker' do
     expect(Gitlab::SidekiqConfig.cron_workers.map(&:queue)).to all(start_with('cronjob:'))
   end
 
-  it 'has its queue in app/workers/all_queues.yml', :aggregate_failures do
+  it 'has its queue in Gitlab::SidekiqConfig::QUEUE_CONFIG_PATHS', :aggregate_failures do
     file_worker_queues = Gitlab::SidekiqConfig.worker_queues.to_set
 
     worker_queues = Gitlab::SidekiqConfig.workers.map(&:queue).to_set
     worker_queues << ActionMailer::DeliveryJob.new.queue_name
     worker_queues << 'default'
 
-    missing_from_file = worker_queues - file_worker_queues - DEPRECATED_QUEUES
-    expect(missing_from_file).to be_empty, "expected #{missing_from_file.to_a.inspect} to be in app/workers/all_queues.yml"
+    missing_from_file = worker_queues - file_worker_queues
+    expect(missing_from_file).to be_empty, "expected #{missing_from_file.to_a.inspect} to be in Gitlab::SidekiqConfig::QUEUE_CONFIG_PATHS"
 
-    unncessarily_in_file = file_worker_queues - worker_queues - DEPRECATED_QUEUES
-    expect(unncessarily_in_file).to be_empty, "expected #{unncessarily_in_file.to_a.inspect} not to be in app/workers/all_queues.yml"
+    unncessarily_in_file = file_worker_queues - worker_queues
+    expect(unncessarily_in_file).to be_empty, "expected #{unncessarily_in_file.to_a.inspect} not to be in Gitlab::SidekiqConfig::QUEUE_CONFIG_PATHS"
   end
 
   it 'has its queue or namespace in config/sidekiq_queues.yml', :aggregate_failures do

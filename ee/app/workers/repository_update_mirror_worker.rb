@@ -8,7 +8,7 @@ class RepositoryUpdateMirrorWorker
   LEASE_KEY = 'repository_update_mirror_worker_start_scheduler'.freeze
   LEASE_TIMEOUT = 2.seconds
 
-  # Retry not neccessary. It will try again at the next update interval.
+  # Retry not necessary. It will try again at the next update interval.
   sidekiq_options retry: false, status_expiration: StuckImportJobsWorker::IMPORT_JOBS_EXPIRATION
 
   attr_accessor :project, :repository, :current_user

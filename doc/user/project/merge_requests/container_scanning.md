@@ -11,7 +11,7 @@ If you are using [GitLab CI/CD](../../../ci/README.md), you can analyze your Doc
 vulnerabilities using [Clair](https://github.com/coreos/clair),
 a Vulnerability Static Analysis tool for containers.
 
-You can take advantage of Container Scanning by either [including the CI job](../../../ci/examples/dependency_scanning.md) in
+You can take advantage of Container Scanning by either [including the CI job](../../../ci/examples/container_scanning.md) in
 your existing `.gitlab-ci.yml` file or by implicitly using
 [Auto Container Scanning](../../../topics/autodevops/index.md#auto-container-scanning)
 that is provided by [Auto DevOps](../../../topics/autodevops/index.md).

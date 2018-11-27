@@ -17,9 +17,11 @@ module QA
       module Group
         autoload :Menu, 'qa/ee/page/group/menu'
         autoload :SamlSSOSignIn, 'qa/ee/page/group/saml_sso_sign_in'
+        autoload :Members, 'qa/ee/page/group/members'
 
         module Settings
           autoload :SamlSSO, 'qa/ee/page/group/settings/saml_sso'
+          autoload :LDAPSync, 'qa/ee/page/group/settings/ldap_sync'
         end
       end
 

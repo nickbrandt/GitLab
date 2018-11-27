@@ -64,8 +64,7 @@ export default {
       ok-variant="danger qa-modal-delete-pending-comments"
       @ok="discardReview"
     >
-      <p v-html="$options.text">
-      </p>
+      <p v-html="$options.text"></p>
     </gl-modal>
   </div>
 </template>

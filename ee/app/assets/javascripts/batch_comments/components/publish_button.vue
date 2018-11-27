@@ -49,9 +49,7 @@ export default {
   >
     <span>
       {{ label }}
-      <drafts-count
-        v-if="showCount"
-      />
+      <drafts-count v-if="showCount" />
     </span>
   </loading-button>
 </template>

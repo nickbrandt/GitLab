@@ -1,7 +1,7 @@
 # rubocop:disable Migration/UpdateColumnInBatches
 # rubocop:disable Migration/UpdateLargeTable
 # rubocop:disable Migration/RemoveColumn
-class ConvertProjectsRepositorySizeLimitToBytes < ActiveRecord::Migration
+class ConvertProjectsRepositorySizeLimitToBytes < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

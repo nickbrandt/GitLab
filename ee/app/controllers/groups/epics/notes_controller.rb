@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Groups::Epics::NotesController < Groups::ApplicationController
   include NotesActions
   include NotesHelper

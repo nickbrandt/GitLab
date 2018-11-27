@@ -20,6 +20,7 @@ ActiveSupport::Inflector.inflections do |inflect|
     file_registry
     job_artifact_registry
     vulnerability_feedback
+    vulnerabilities_feedback
   )
   inflect.acronym 'EE'
 end

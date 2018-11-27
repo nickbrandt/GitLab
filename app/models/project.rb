@@ -1395,7 +1395,7 @@ class Project < ActiveRecord::Base
   def change_head(branch)
     if repository.branch_exists?(branch)
       repository.before_change_head
-      repository.raw_repository.write_ref('HEAD', "refs/heads/#{branch}", shell: false)
+      repository.raw_repository.write_ref('HEAD', "refs/heads/#{branch}")
       repository.copy_gitattributes(branch)
       repository.after_change_head
       reload_default_branch
@@ -1965,7 +1965,7 @@ class Project < ActiveRecord::Base
   end
 
   def migrate_to_hashed_storage!
-    return if hashed_storage?(:repository)
+    return unless storage_upgradable?
 
     update!(repository_read_only: true)
 

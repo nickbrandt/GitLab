@@ -113,9 +113,6 @@ export default {
 <template>
   <div>
     <div class="flash-container"></div>
-    <service-desk-setting
-      :is-enabled="isEnabled"
-      :incoming-email="state.incomingEmail"
-    />
+    <service-desk-setting :is-enabled="isEnabled" :incoming-email="state.incomingEmail" />
   </div>
 </template>

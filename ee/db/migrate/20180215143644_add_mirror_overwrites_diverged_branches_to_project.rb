@@ -1,4 +1,4 @@
-class AddMirrorOverwritesDivergedBranchesToProject < ActiveRecord::Migration
+class AddMirrorOverwritesDivergedBranchesToProject < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def change

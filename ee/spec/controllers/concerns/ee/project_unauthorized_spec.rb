@@ -13,7 +13,7 @@ describe EE::ProjectUnauthorized do
   describe '#project_unauthorized_proc' do
     controller(::Projects::ApplicationController) do
       def show
-        render nothing: true
+        head :ok
       end
     end
 

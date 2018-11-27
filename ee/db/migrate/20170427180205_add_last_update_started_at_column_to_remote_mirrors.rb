@@ -1,5 +1,5 @@
 # rubocop:disable Migration/Datetime
-class AddLastUpdateStartedAtColumnToRemoteMirrors < ActiveRecord::Migration
+class AddLastUpdateStartedAtColumnToRemoteMirrors < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Groups::AuditEventsController < Groups::ApplicationController
   before_action :authorize_admin_group!
   before_action :check_audit_events_available!

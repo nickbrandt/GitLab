@@ -16,10 +16,7 @@ export default {
 </script>
 
 <template>
-  <div
-    class="severity-badge"
-    :class="className"
-  >{{ severity }}</div>
+  <div class="severity-badge" :class="className">{{ severity }}</div>
 </template>
 
 <style>

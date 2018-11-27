@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Projects::ApproversController < Projects::ApplicationController
   before_action :authorize_for_subject!
 

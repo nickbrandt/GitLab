@@ -29,9 +29,8 @@ export default {
     tabindex="1"
     v-on="$listeners"
   >
-    <icon
-      name="weight"
-      css-classes="board-card-info-icon"
-    /><span class="board-card-info-text">{{ weight }}</span>
+    <icon name="weight" css-classes="board-card-info-icon" /><span class="board-card-info-text">{{
+      weight
+    }}</span>
   </a>
 </template>

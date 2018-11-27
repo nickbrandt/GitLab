@@ -54,6 +54,7 @@ discussions, and descriptions:
 | `/wip`                     | Toggle the Work In Progress status |   | ✓             |
 | `/approve`                 | Approve the merge request      |       | ✓             |
 | `/merge`                   | Merge (when pipeline succeeds) |       | ✓             |
+| `/create_merge_request <branch name>` | Create a new merge request starting from the current issue | ✓ | |
 
 
 ## Quick actions for commit messages
@@ -83,3 +84,4 @@ The following quick actions are applicable for epics threads and description:
 | `/label ~label1 ~label2`   | Add label(s)                            |
 | `/unlabel ~label1 ~label2` | Remove all or specific label(s)         |
 | `/relabel ~label1 ~label2` | Replace label                           |
+| `/promote`                 | Promote an issue to an epic             |
