@@ -8,12 +8,16 @@
   %h4
     = _("Jaeger tracing")
   %p
-    - tracing_url = has_jaeger_url ? @project.tracing_external_url : project_tracing_path(@project)
-    - meta = has_jaeger_url ? 'rel="noopener noreferrer" target="_blank"' : ''
-    - icon = has_jaeger_url ? sprite_icon('external-link', size: 16, css_class: 'ml-1 vertical-align-middle') : ''
-    - tracing_start_tag = "<a href='#{tracing_url}' #{meta}>".html_safe
-    - tracing_end_tag = "#{icon}</a>".html_safe
-    = _("To open Jaeger and easily view tracing from GitLab, link the %{start_tag}Tracing%{end_tag} page to your server").html_safe % { start_tag: tracing_start_tag, end_tag: tracing_end_tag }
+    - if has_jaeger_url
+      - tracing_link = link_to sanitize(@project.tracing_external_url, tags: []), target: "_blank", rel: 'noopener noreferrer' do
+        %span
+          = _('Tracing')
+          = sprite_icon('external-link', size: 16, css_class: 'ml-1 vertical-align-middle')
+    - else
+      - tracing_link = link_to project_tracing_path(@project) do
+        %span
+          = _('Tracing')
+    = _("To open Jaeger and easily view tracing from GitLab, link the %{link} page to your server").html_safe % { link: tracing_link }
   = form_for @tracing_settings, as: :tracing_settings, url: project_settings_operations_path(@project) do |f|
     = form_errors(@tracing_settings)
     .form-group
