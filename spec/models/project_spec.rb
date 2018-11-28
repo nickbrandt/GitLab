@@ -1815,7 +1815,6 @@ describe Project do
   end
 
   describe 'handling import URL' do
-<<<<<<< HEAD
     context 'when project is a mirror' do
       it 'returns the full URL' do
         project = create(:project, :mirror, import_url: 'http://user:pass@test.com')
@@ -1834,14 +1833,6 @@ describe Project do
 
         expect(project.reload.import_url).to eq('http://test.com')
       end
-=======
-    it 'returns the sanitized URL' do
-      project = create(:project, :import_started, import_url: 'http://user:pass@test.com')
-
-      project.import_state.finish
-
-      expect(project.reload.import_url).to eq('http://test.com')
->>>>>>> upstream/master
     end
   end
 
@@ -3732,7 +3723,6 @@ describe Project do
 
       expect(project.wiki_repository_exists?).to eq(true)
     end
-<<<<<<< HEAD
 
     it 'returns false when the wiki repository does not exist' do
       project = create(:project)
@@ -3754,8 +3744,6 @@ describe Project do
         is_expected.to eq(root_ancestor)
       end
     end
-=======
->>>>>>> upstream/master
 
     context 'when namespace is root ancestor' do
       let(:parent) { build(:group) }
