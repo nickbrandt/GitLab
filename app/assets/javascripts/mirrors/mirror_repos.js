@@ -2,8 +2,8 @@ import $ from 'jquery';
 import _ from 'underscore';
 import { __ } from '~/locale';
 import Flash from '~/flash';
-import axios from '~/lib/utils/axios_utils';
 import SSHMirror from './ssh_mirror';
+import Api from '~/api';
 
 export default class MirrorRepos {
   constructor(container) {
@@ -13,7 +13,6 @@ export default class MirrorRepos {
     this.$urlInput = $('.js-mirror-url', this.$form);
     this.$protectedBranchesInput = $('.js-mirror-protected', this.$form);
     this.$table = $('.js-mirrors-table-body', this.$container);
-    this.mirrorEndpoint = this.$form.data('projectMirrorEndpoint');
   }
 
   init() {
@@ -78,23 +77,10 @@ export default class MirrorRepos {
     this.$passwordGroup.collapse(isPassword ? 'show' : 'hide');
   }
 
-  deleteMirror(event, existingPayload) {
+  deleteMirror(event) {
     const $target = $(event.currentTarget);
-    let payload = existingPayload;
 
-    if (!payload) {
-      payload = {
-        project: {
-          remote_mirrors_attributes: {
-            id: $target.data('mirrorId'),
-            enabled: 0,
-          },
-        },
-      };
-    }
-
-    return axios
-      .put(this.mirrorEndpoint, payload)
+    return Api.deleteProjectRemoteMirror(this.$form.data('projectId'), $target.data('mirrorId'))
       .then(() => this.removeRow($target))
       .catch(() => Flash(__('Failed to remove mirror.')));
   }

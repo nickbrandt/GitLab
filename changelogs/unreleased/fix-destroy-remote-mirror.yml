@@ -1,0 +1,6 @@
+---
+title: Fix issue where deleting a project's remote mirror doesnt remove the mirror
+  from the database
+merge_request:
+author:
+type: security
