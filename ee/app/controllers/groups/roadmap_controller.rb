@@ -9,7 +9,7 @@ module Groups
 
     # show roadmap for a group
     def show
-      # Used only to show to correct sort dropdown option on filter bar
+      # Used to persist the order and show the correct sorting dropdown on UI.
       @sort = set_sort_order
 
       @epics_count = EpicsFinder.new(current_user, group_id: @group.id).execute.count

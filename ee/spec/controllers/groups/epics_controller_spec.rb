@@ -70,11 +70,24 @@ describe Groups::EpicsController do
       end
 
       context 'when there is a logged user' do
-        it 'stores sorting param in user preferences' do
-          get :index, group_id: group, sort: 'start_date_asc'
+        context 'when epics_sort is nil' do
+          it 'stores sorting param in user preferences' do
+            get :index, group_id: group, sort: 'start_date_asc'
 
-          expect(user.user_preference.epics_sort).to eq('start_date_asc')
-          expect(response).to have_gitlab_http_status(200)
+            expect(user.user_preference.epics_sort).to eq('start_date_asc')
+            expect(response).to have_gitlab_http_status(200)
+          end
+        end
+
+        context 'when epics_sort is present' do
+          it 'update epics_sort with current value' do
+            user.user_preference.update(epics_sort: 'created_desc')
+
+            get :index, group_id: group, sort: 'start_date_asc'
+
+            expect(user.reload.user_preference.epics_sort).to eq('start_date_asc')
+            expect(response).to have_gitlab_http_status(200)
+          end
         end
       end
 

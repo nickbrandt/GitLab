@@ -48,8 +48,16 @@ describe Epic do
       expect(epics(:start_date_asc)).to eq([epic1, epic2, epic4, epic3])
     end
 
+    it 'orders by start_date DESC' do
+      expect(epics(:start_date_desc)).to eq([epic2, epic1, epic4, epic3])
+    end
+
     it 'orders by end_date ASC' do
       expect(epics(:end_date_asc)).to eq([epic3, epic1, epic4, epic2])
+    end
+
+    it 'orders by end_date DESC' do
+      expect(epics(:end_date_desc)).to eq([epic1, epic3, epic4, epic2])
     end
 
     it 'orders by updated_at ASC' do
