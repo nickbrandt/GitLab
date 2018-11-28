@@ -71,6 +71,7 @@ class StuckImportJobsWorker
 
   def error_message
     _("Import timed out. Import took longer than %{import_jobs_expiration} seconds") % { import_jobs_expiration: IMPORT_JOBS_EXPIRATION }
+<<<<<<< HEAD
   end
 
   def stuck_import_jobs_worker_runs_counter
@@ -84,5 +85,7 @@ class StuckImportJobsWorker
 
   def import_state_with_jid_metric
     @import_state_with_jid_metric ||= Gitlab::Metrics.gauge(:gitlab_projects_with_jid, 'Projects with Job ids')
+=======
+>>>>>>> upstream/master
   end
 end
