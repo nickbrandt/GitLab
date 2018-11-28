@@ -1699,7 +1699,6 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Close epic"
 msgstr ""
 
@@ -1709,11 +1708,6 @@ msgstr ""
 msgid "Closed issues"
 msgstr ""
 
-=======
-msgid "Closed"
-msgstr ""
-
->>>>>>> upstream/master
 msgid "ClusterIntegration|%{appList} was successfully installed on your Kubernetes cluster"
 msgstr ""
 
@@ -5863,15 +5857,12 @@ msgstr ""
 msgid "Opened"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Opened MR"
 msgstr ""
 
 msgid "Opened issues"
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "OpenedNDaysAgo|Opened"
 msgstr ""
 
@@ -7672,12 +7663,9 @@ msgstr ""
 msgid "Similar issues"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Size"
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "Size and domain settings for static websites"
 msgstr ""
 
@@ -10259,15 +10247,12 @@ msgstr ""
 msgid "this document"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "to help your contributors communicate effectively!"
 msgstr ""
 
 msgid "toggle collapse"
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "updated"
 msgstr ""
 
