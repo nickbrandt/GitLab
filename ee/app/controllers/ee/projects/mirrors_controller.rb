@@ -41,7 +41,7 @@ module EE
           project.update_remote_mirrors
           flash[:notice] = "The remote repository is being updated..."
         else
-          project.force_import_job!
+          project.import_state.force_import_job!
           flash[:notice] = "The repository is being updated..."
         end
 

@@ -8,7 +8,7 @@ module EE
 
       # Explicitly enqueue mirror for update so
       # that upstream remote is created and fetched
-      project.force_import_job! if project.mirror?
+      project.import_state.force_import_job! if project.mirror?
     end
 
     override :template_import?
