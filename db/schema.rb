@@ -2031,6 +2031,7 @@ ActiveRecord::Schema.define(version: 20181126153547) do
     t.index ["user_id"], name: "index_personal_access_tokens_on_user_id", using: :btree
   end
 
+<<<<<<< .merge_file_CHNeEG
   create_table "plans", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2039,6 +2040,13 @@ ActiveRecord::Schema.define(version: 20181126153547) do
     t.integer "active_pipelines_limit"
     t.integer "pipeline_size_limit"
     t.index ["name"], name: "index_plans_on_name", using: :btree
+=======
+  create_table "pool_repositories", id: :bigserial, force: :cascade do |t|
+    t.integer "shard_id", null: false
+    t.string "disk_path"
+    t.index ["disk_path"], name: "index_pool_repositories_on_disk_path", unique: true, using: :btree
+    t.index ["shard_id"], name: "index_pool_repositories_on_shard_id", using: :btree
+>>>>>>> .merge_file_MMoIlE
   end
 
   create_table "programming_languages", force: :cascade do |t|
@@ -2478,13 +2486,6 @@ ActiveRecord::Schema.define(version: 20181126153547) do
     t.string "remote_name"
     t.index ["last_successful_update_at"], name: "index_remote_mirrors_on_last_successful_update_at", using: :btree
     t.index ["project_id"], name: "index_remote_mirrors_on_project_id", using: :btree
-  end
-
-  create_table "repositories", id: :bigserial, force: :cascade do |t|
-    t.integer "shard_id", null: false
-    t.string "disk_path", null: false
-    t.index ["disk_path"], name: "index_repositories_on_disk_path", unique: true, using: :btree
-    t.index ["shard_id"], name: "index_repositories_on_shard_id", using: :btree
   end
 
   create_table "repository_languages", id: false, force: :cascade do |t|
@@ -3257,6 +3258,7 @@ ActiveRecord::Schema.define(version: 20181126153547) do
   add_foreign_key "path_locks", "projects", name: "fk_5265c98f24", on_delete: :cascade
   add_foreign_key "path_locks", "users"
   add_foreign_key "personal_access_tokens", "users"
+  add_foreign_key "pool_repositories", "shards", on_delete: :restrict
   add_foreign_key "project_authorizations", "projects", on_delete: :cascade
   add_foreign_key "project_authorizations", "users", on_delete: :cascade
   add_foreign_key "project_auto_devops", "projects", on_delete: :cascade
@@ -3270,6 +3272,7 @@ ActiveRecord::Schema.define(version: 20181126153547) do
   add_foreign_key "project_mirror_data", "projects", name: "fk_d1aad367d7", on_delete: :cascade
   add_foreign_key "project_repository_states", "projects", on_delete: :cascade
   add_foreign_key "project_statistics", "projects", on_delete: :cascade
+<<<<<<< .merge_file_CHNeEG
   add_foreign_key "project_tracing_settings", "projects", on_delete: :cascade
   add_foreign_key "projects", "repositories", column: "pool_repository_id", name: "fk_6e5c14658a", on_delete: :nullify
   add_foreign_key "prometheus_alert_events", "projects", on_delete: :cascade
@@ -3277,6 +3280,9 @@ ActiveRecord::Schema.define(version: 20181126153547) do
   add_foreign_key "prometheus_alerts", "environments", on_delete: :cascade
   add_foreign_key "prometheus_alerts", "projects", on_delete: :cascade
   add_foreign_key "prometheus_alerts", "prometheus_metrics", on_delete: :cascade
+=======
+  add_foreign_key "projects", "pool_repositories", name: "fk_6e5c14658a", on_delete: :nullify
+>>>>>>> .merge_file_MMoIlE
   add_foreign_key "prometheus_metrics", "projects", on_delete: :cascade
   add_foreign_key "protected_branch_merge_access_levels", "namespaces", column: "group_id", name: "fk_98f3d044fe", on_delete: :cascade
   add_foreign_key "protected_branch_merge_access_levels", "protected_branches", name: "fk_8a3072ccb3", on_delete: :cascade
@@ -3299,8 +3305,12 @@ ActiveRecord::Schema.define(version: 20181126153547) do
   add_foreign_key "push_event_payloads", "events", name: "fk_36c74129da", on_delete: :cascade
   add_foreign_key "push_rules", "projects", name: "fk_83b29894de", on_delete: :cascade
   add_foreign_key "releases", "projects", name: "fk_47fe2a0596", on_delete: :cascade
+<<<<<<< .merge_file_CHNeEG
   add_foreign_key "remote_mirrors", "projects", name: "fk_43a9aa4ca8", on_delete: :cascade
   add_foreign_key "repositories", "shards", on_delete: :restrict
+=======
+  add_foreign_key "remote_mirrors", "projects", on_delete: :cascade
+>>>>>>> .merge_file_MMoIlE
   add_foreign_key "repository_languages", "projects", on_delete: :cascade
   add_foreign_key "resource_label_events", "epics", on_delete: :cascade
   add_foreign_key "resource_label_events", "issues", on_delete: :cascade
