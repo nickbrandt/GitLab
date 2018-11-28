@@ -32,12 +32,9 @@ FactoryBot.define do
       group_runners_enabled nil
       import_status nil
       import_jid nil
-<<<<<<< HEAD
       last_update_at nil
       last_successful_update_at nil
       retry_count 0
-=======
->>>>>>> upstream/master
     end
 
     after(:create) do |project, evaluator|
@@ -76,12 +73,9 @@ FactoryBot.define do
       if evaluator.import_status
         import_state = project.import_state || project.build_import_state
         import_state.status = evaluator.import_status
-<<<<<<< HEAD
         import_state.last_update_at = evaluator.last_update_at
         import_state.last_successful_update_at = evaluator.last_successful_update_at
         import_state.retry_count = evaluator.retry_count
-=======
->>>>>>> upstream/master
         import_state.jid = evaluator.import_jid
         import_state.save
       end
