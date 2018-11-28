@@ -6,14 +6,14 @@ describe DraftNotes::PublishService do
   let(:project) { merge_request.target_project }
   let(:user) { merge_request.author }
 
-  def publish(id: nil)
-    DraftNotes::PublishService.new(merge_request, user).execute(id)
+  def publish(draft: nil)
+    DraftNotes::PublishService.new(merge_request, user).execute(draft)
   end
 
   it 'publishes a single draft note' do
     drafts = create_list(:draft_note, 2, merge_request: merge_request, author: user)
 
-    expect { publish(id: drafts.first.id) }.to change { DraftNote.count }.by(-1).and change { Note.count }.by(1)
+    expect { publish(draft: drafts.first) }.to change { DraftNote.count }.by(-1).and change { Note.count }.by(1)
     expect(DraftNote.count).to eq(1)
   end
 
@@ -58,7 +58,7 @@ describe DraftNotes::PublishService do
     let(:draft_note) { create(:draft_note, merge_request: merge_request, author: user, resolve_discussion: true, discussion_id: note.discussion.reply_id) }
 
     it 'resolves the discussion' do
-      publish(id: draft_note.id)
+      publish(draft: draft_note)
 
       expect(note.discussion.resolved?).to be true
     end
