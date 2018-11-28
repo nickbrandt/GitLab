@@ -24,5 +24,11 @@ describe ProjectTracingSetting do
       tracing_setting.external_url = " "
       expect(tracing_setting).not_to be_valid
     end
+
+    it 'sanitizes the url' do
+      tracing_setting.external_url = "https://replaceme.com/'><script>alert(document.cookie)</script>"
+      expect(tracing_setting).to be_valid
+      expect(tracing_setting.external_url).to eq("https://replaceme.com/'>")
+    end
   end
 end
