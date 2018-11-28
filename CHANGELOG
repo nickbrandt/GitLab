@@ -4,7 +4,10 @@ Formerly known as 'gitlab-git-http-server'.
 
 UNRELEASED
 
+v 7.2.1
+
 - Extract correlation code out to the LabKit project !323
+- Log X-Forwarded-For IPs when UNIX domain sockets are in use !324
 
 v 7.2.0
 
