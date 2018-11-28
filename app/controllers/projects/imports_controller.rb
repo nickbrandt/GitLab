@@ -68,7 +68,6 @@ class Projects::ImportsController < Projects::ApplicationController
   end
 
   def import_params
-<<<<<<< HEAD
     params.require(:project).permit(:import_url, :mirror, :mirror_user_id)
   end
 
@@ -76,12 +75,5 @@ class Projects::ImportsController < Projects::ApplicationController
     return import_params if valid_mirror_user?(import_params)
 
     import_params.merge(mirror_user_id: current_user.id)
-=======
-    params.require(:project).permit(:import_url)
-  end
-
-  def safe_import_params
-    import_params
->>>>>>> upstream/master
   end
 end
