@@ -78,6 +78,10 @@ module SystemCheck
         $stdout.puts '  Reason:'.color(:blue)
         $stdout.puts "  #{exception.message}"
       end
+
+      def see_custom_certificate_doc
+        'https://docs.gitlab.com/omnibus/common_installation_problems/README.html#using-self-signed-certificate-or-custom-certificate-authorities'
+      end
     end
   end
 end
