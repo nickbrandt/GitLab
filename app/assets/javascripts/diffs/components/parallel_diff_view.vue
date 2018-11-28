@@ -24,10 +24,7 @@ export default {
   },
   computed: {
     ...mapGetters('diffs', ['commitId']),
-<<<<<<< HEAD
     ...mapGetters('batchComments', ['shouldRenderParallelDraftRow', 'draftForLine']),
-=======
->>>>>>> upstream/master
     diffLinesLength() {
       return this.diffLines.length;
     },
