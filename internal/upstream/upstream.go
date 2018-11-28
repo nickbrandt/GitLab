@@ -56,7 +56,11 @@ func (u *upstream) configureURLPrefix() {
 }
 
 func (u *upstream) ServeHTTP(ow http.ResponseWriter, r *http.Request) {
-	// Automatic quasi-intelligent X-Forwarded-For parsing
+	// Unix domain sockets have a remote addr of @. This will make the
+	// xff package lookup the X-Forwarded-For address if available.
+	if r.RemoteAddr == "@" {
+		r.RemoteAddr = "127.0.0.1:0"
+	}
 	r.RemoteAddr = xff.GetRemoteAddr(r)
 
 	w := helper.NewStatsCollectingResponseWriter(ow)
