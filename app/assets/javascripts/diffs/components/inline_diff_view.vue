@@ -24,7 +24,10 @@ export default {
   },
   computed: {
     ...mapGetters('diffs', ['commitId']),
+<<<<<<< HEAD
     ...mapGetters('batchComments', ['shouldRenderDraftRow', 'draftForLine']),
+=======
+>>>>>>> upstream/master
     diffLinesLength() {
       return this.diffLines.length;
     },
@@ -52,11 +55,14 @@ export default {
           :key="`icr-${index}`"
           :diff-file-hash="diffFile.file_hash"
           :line="line"
+<<<<<<< HEAD
         />
         <inline-draft-comment-row
           v-if="shouldRenderDraftRow(diffFile.file_hash, line)"
           :key="`draft_${index}`"
           :draft="draftForLine(diffFile.file_hash, line)"
+=======
+>>>>>>> upstream/master
         />
       </template>
     </tbody>
