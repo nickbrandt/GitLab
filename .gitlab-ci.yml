@@ -1152,7 +1152,6 @@ review-deploy:
     - source ./scripts/review_apps/review-apps.sh
     - gem install gitlab-qa --no-document ${GITLAB_QA_VERSION:+ --version ${GITLAB_QA_VERSION}}
     - wait_for_job_to_be_done "review-deploy"
-<<<<<<< HEAD
 
 review-qa-smoke:
   <<: *review-qa-base
@@ -1165,20 +1164,6 @@ review-qa-all:
     - gitlab-qa Test::Instance::Any "${QA_IMAGE}" "${CI_ENVIRONMENT_URL}"
   when: manual
 
-=======
-
-review-qa-smoke:
-  <<: *review-qa-base
-  script:
-    - gitlab-qa Test::Instance::Smoke "${QA_IMAGE}" "${CI_ENVIRONMENT_URL}"
-
-review-qa-all:
-  <<: *review-qa-base
-  script:
-    - gitlab-qa Test::Instance::Any "${QA_IMAGE}" "${CI_ENVIRONMENT_URL}"
-  when: manual
-
->>>>>>> upstream/master
 review-stop:
   <<: *review-base
   <<: *single-script-job
