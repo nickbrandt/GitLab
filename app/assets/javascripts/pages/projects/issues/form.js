@@ -8,10 +8,7 @@ import MilestoneSelect from '~/milestone_select';
 import ShortcutsNavigation from '~/behaviors/shortcuts/shortcuts_navigation';
 import IssuableTemplateSelectors from '~/templates/issuable_template_selectors';
 import initSuggestions from '~/issuable_suggestions';
-<<<<<<< HEAD
 import WeightSelect from 'ee/weight_select';
-=======
->>>>>>> upstream/master
 
 export default () => {
   new ShortcutsNavigation();
@@ -24,9 +21,6 @@ export default () => {
   if (gon.features.issueSuggestions && gon.features.graphql) {
     initSuggestions();
   }
-<<<<<<< HEAD
 
   new WeightSelect();
-=======
->>>>>>> upstream/master
 };
