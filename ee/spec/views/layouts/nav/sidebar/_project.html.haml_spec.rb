@@ -13,6 +13,33 @@ describe 'layouts/nav/sidebar/_project' do
     stub_licensed_features(tracing: true)
   end
 
+  describe 'Operations main link' do
+    describe 'when ci/cd is disabled' do
+      let(:feature) { ProjectFeature::DISABLED }
+
+      it 'links to feature flags page' do
+        allow(view).to receive(:can?).with(:read_environment).and_return(false)
+        allow(view).to receive(:can?).with(:read_cluster).and_return(false)
+        allow(view).to receive(:can?).with(:read_feature_flag).and_return(true)
+        render
+
+        expect(rendered).to have_link('Operations', :href=> project_feature_flags_path(project))
+      end
+    end
+
+    describe 'when ci/cd is enabled' do
+      let(:feature) { ProjectFeature::ENABLED }
+
+      it 'links to metrics page' do 
+        allow(view).to receive(:can?).and_return(true)
+
+        render
+
+        expect(rendered).to have_link('Operations', :href=> metrics_project_environments_path(project))        
+      end
+    end
+  end
+
   describe 'Operations > Tracing' do
     it 'is not visible when no valid license' do
       allow(view).to receive(:can?).and_return(true)
