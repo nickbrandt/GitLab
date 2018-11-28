@@ -1,8 +1,10 @@
 <script>
-import { mapGetters, mapState } from 'vuex';
-import InlineDraftCommentRow from 'ee/batch_comments/components/inline_draft_comment_row.vue';
+import { mapGetters } from 'vuex';
 import inlineDiffTableRow from './inline_diff_table_row.vue';
 import inlineDiffCommentRow from './inline_diff_comment_row.vue';
+
+// eslint-disable-next-line import/order
+import InlineDraftCommentRow from 'ee/batch_comments/components/inline_draft_comment_row.vue';
 
 export default {
   components: {
@@ -21,24 +23,19 @@ export default {
     },
   },
   computed: {
-    ...mapGetters('diffs', ['commitId', 'shouldRenderInlineCommentRow']),
+    ...mapGetters('diffs', ['commitId']),
     ...mapGetters('batchComments', ['shouldRenderDraftRow', 'draftForLine']),
-    ...mapState({
-      diffLineCommentForms: state => state.diffs.diffLineCommentForms,
-    }),
     diffLinesLength() {
       return this.diffLines.length;
     },
-    userColorScheme() {
-      return window.gon.user_color_scheme;
-    },
   },
+  userColorScheme: window.gon.user_color_scheme,
 };
 </script>
 
 <template>
   <table
-    :class="userColorScheme"
+    :class="$options.userColorScheme"
     :data-commit-id="commitId"
     class="code diff-wrap-lines js-syntax-highlight text-file js-diff-inline-view"
   >
@@ -52,11 +49,9 @@ export default {
           :is-bottom="index + 1 === diffLinesLength"
         />
         <inline-diff-comment-row
-          v-if="shouldRenderInlineCommentRow(line)"
-          :key="index"
+          :key="`icr-${index}`"
           :diff-file-hash="diffFile.file_hash"
           :line="line"
-          :line-index="index"
         />
         <inline-draft-comment-row
           v-if="shouldRenderDraftRow(diffFile.file_hash, line)"
