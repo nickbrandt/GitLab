@@ -2,7 +2,7 @@
 
 class Projects::TracingsController < Projects::ApplicationController
   before_action :check_license
-  before_action :authorize_read_environment!, only: [:show]
+  before_action :authorize_update_environment!
 
   def show
   end

@@ -10,21 +10,27 @@ describe Projects::Settings::OperationsController do
   end
 
   describe 'GET show' do
-    shared_examples 'user without access to project' do |project_visibility|
+    shared_examples 'user without read access' do |project_visibility|
       let(:project) { create(:project, project_visibility) }
 
-      it 'returns 404' do
-        get :show, namespace_id: project.namespace, project_id: project
+      %w[guest reporter developer].each do |role|
+        before do
+          project.public_send("add_#{role}", user)
+        end
 
-        expect(response).to have_gitlab_http_status(:not_found)
+        it 'returns 404' do
+          get :show, namespace_id: project.namespace, project_id: project
+
+          expect(response).to have_gitlab_http_status(:not_found)
+        end
       end
     end
 
-    shared_examples 'user with access to project' do |project_visibility|
+    shared_examples 'user with read access' do |project_visibility|
       let(:project) { create(:project, project_visibility) }
 
       before do
-        project.add_reporter(user)
+        project.add_maintainer(user)
       end
 
       it 'renders ok' do
@@ -50,16 +56,16 @@ describe Projects::Settings::OperationsController do
         stub_licensed_features(tracing: true)
       end
 
-      context 'when logged in with correct permission' do
-        it_behaves_like 'user with access to project', :public
-        it_behaves_like 'user with access to project', :private
-        it_behaves_like 'user with access to project', :internal
+      context 'with maintainer role' do
+        it_behaves_like 'user with read access', :public
+        it_behaves_like 'user with read access', :private
+        it_behaves_like 'user with read access', :internal
       end
 
-      context 'when logged in without correct permission' do
-        it_behaves_like 'user without access to project', :public
-        it_behaves_like 'user without access to project', :private
-        it_behaves_like 'user without access to project', :internal
+      context 'without maintainer role' do
+        it_behaves_like 'user without read access', :public
+        it_behaves_like 'user without read access', :private
+        it_behaves_like 'user without read access', :internal
       end
 
       context 'when user not logged in' do
@@ -67,7 +73,7 @@ describe Projects::Settings::OperationsController do
           sign_out(user)
         end
 
-        it_behaves_like 'user without access to project', :public
+        it_behaves_like 'user without read access', :public
 
         it_behaves_like 'user needs to login', :private
         it_behaves_like 'user needs to login', :internal
@@ -79,9 +85,9 @@ describe Projects::Settings::OperationsController do
         stub_licensed_features(tracing: false)
       end
 
-      it_behaves_like 'user without access to project', :public
-      it_behaves_like 'user without access to project', :private
-      it_behaves_like 'user without access to project', :internal
+      it_behaves_like 'user without read access', :public
+      it_behaves_like 'user without read access', :private
+      it_behaves_like 'user without read access', :internal
     end
   end
 
@@ -99,10 +105,16 @@ describe Projects::Settings::OperationsController do
     shared_examples 'user without write access' do |project_visibility|
       let(:project) { create(:project, project_visibility) }
 
-      it 'does not update tracing external_url' do
-        update_project(project, external_url: 'https://gitlab.com')
+      %w[guest reporter developer].each do |role|
+        before do
+          project.public_send("add_#{role}", user)
+        end
 
-        expect(project.tracing_setting).to be_nil
+        it 'does not update tracing external_url' do
+          update_project(project, external_url: 'https://gitlab.com')
+
+          expect(project.tracing_setting).to be_nil
+        end
       end
     end
 
@@ -125,13 +137,13 @@ describe Projects::Settings::OperationsController do
         end
       end
 
-      context 'with authorized user' do
+      context 'with maintainer role' do
         it_behaves_like 'user with write access', :public, 'https://gitlab.com', 'https://gitlab.com'
         it_behaves_like 'user with write access', :private, 'https://gitlab.com', 'https://gitlab.com'
         it_behaves_like 'user with write access', :internal, 'https://gitlab.com', 'https://gitlab.com'
       end
 
-      context 'with unauthorized user' do
+      context 'with non maintainer roles' do
         it_behaves_like 'user without write access', :public
         it_behaves_like 'user without write access', :private
         it_behaves_like 'user without write access', :internal
