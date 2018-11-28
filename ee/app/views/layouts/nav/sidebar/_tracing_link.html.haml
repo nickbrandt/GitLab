@@ -3,7 +3,7 @@
 - if project_nav_tab? :settings
   = nav_link(controller: :tracings, action: [:show]) do
     - if @project.tracing_external_url.present?
-      = link_to @project.tracing_external_url, target: "_blank", rel: 'noopener noreferrer' do
+      = link_to sanitize(@project.tracing_external_url, tags: []), target: "_blank", rel: 'noopener noreferrer' do
         %span
           = _('Tracing')
           %i.strong.ml-1.fa.fa-external-link
