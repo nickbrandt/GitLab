@@ -122,7 +122,6 @@ excluded_attributes:
     - :mirror_overwrites_diverged_branches
     - :description_html
     - :repository_languages
-<<<<<<< HEAD
     - :packages_enabled
     - :mirror_last_update_at
     - :mirror_last_successful_update_at
@@ -131,11 +130,6 @@ excluded_attributes:
     - :jid
     - :last_update_at
     - :last_successful_update_at
-=======
-  project_import_state:
-    - :last_error
-    - :jid
->>>>>>> upstream/master
   prometheus_metrics:
     - :common
     - :identifier
