@@ -31,8 +31,8 @@ describe Groups::RoadmapController do
         expect(response).to have_gitlab_http_status(200)
       end
 
-      context 'when user is logged in' do
-        it 'stores sorting param in a cookie' do
+      context 'when there is no logged user' do
+        it 'stores epics sorting param in a cookie' do
           group.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
           sign_out(user)
 
@@ -43,8 +43,8 @@ describe Groups::RoadmapController do
         end
       end
 
-      context 'when there is no user logged in' do
-        it 'stores sorting param in a cookie' do
+      context 'when there is a user logged in' do
+        it 'stores epics sorting param in user preference' do
           get :show, group_id: group, sort: 'start_date_asc'
 
           expect(response).to have_gitlab_http_status(200)
