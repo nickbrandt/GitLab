@@ -33,18 +33,22 @@ $column-right-gradient: linear-gradient(
       border-bottom-right-radius: 0;
     }
 
-    .dropdown-toggle-split {
-      padding-top: $gl-btn-vert-padding;
-      border: 1px solid $border-color;
+    .btn-sort-direction {
       border-left: 0;
-      border-top-right-radius: $border-radius-base;
-      border-bottom-right-radius: $border-radius-base;
-      background-color: $white-light;
-      color: $gl-text-color-secondary;
 
       &:hover {
-        color: $gl-text-color;
         border-color: $gray-darkest;
+      }
+    }
+
+    @include media-breakpoint-down(xs) {
+      display: flex;
+
+      .dropdown-toggle .fa-chevron-down {
+        position: relative;
+        top: 5px;
+        right: 0;
+        float: right;
       }
     }
   }

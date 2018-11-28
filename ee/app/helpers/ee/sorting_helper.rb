@@ -48,8 +48,8 @@ module EE
 
       link_to sprite_icon(sort_icon, size: 16),
               page_filter_path(sort: opposite_sorting_param, label: true),
-              class: "dropdown-toggle-split btn-sort-direction",
-              title: sort.end_with?('desc') ? _("Descending") : _("Ascending")
+              class: "btn btn-default has-tooltip qa-reverse-sort btn-sort-direction",
+              title: _("Sort direction")
     end
 
     def sort_title_start_date
