@@ -4524,7 +4524,6 @@ msgstr ""
 msgid "Import timed out. Import took longer than %{import_jobs_expiration} seconds"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "ImportButtons|Connect repositories from"
 msgstr ""
 
@@ -4537,8 +4536,6 @@ msgstr ""
 msgid "Improve search with Advanced Global Search and GitLab Enterprise Edition."
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "In order to enable instance-level analytics, please ask an admin to enable %{usage_ping_link_start}usage ping%{usage_ping_link_end}."
 msgstr ""
 
