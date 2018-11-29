@@ -6838,11 +6838,7 @@ msgstr ""
 msgid "Provider"
 msgstr ""
 
-<<<<<<< HEAD
-msgid "Pseudonymizer data collection"
-=======
 msgid "Public"
->>>>>>> upstream/master
 msgstr ""
 
 msgid "Public - The group and any public projects can be viewed without any authentication."
