@@ -100,7 +100,6 @@ module EE
       end
 
       default_value_for :packages_enabled, true
-      default_value_for :only_mirror_protected_branches, true
 
       delegate :store_security_reports_available?, to: :namespace
     end
