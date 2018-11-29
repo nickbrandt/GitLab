@@ -111,10 +111,11 @@ export default {
       this.$refs.noteBody.resetAutoSave();
       this.$emit('updateSuccess');
     },
-    formUpdateHandler(noteText, parentElement, callback) {
+    formUpdateHandler(noteText, parentElement, callback, resolveDiscussion) {
       this.$emit('handleUpdateNote', {
         note: this.note,
         noteText,
+        resolveDiscussion,
         callback: () => this.updateSuccess(),
       });
 
@@ -198,7 +199,9 @@ export default {
             :created-at="note.created_at"
             :note-id="note.id"
             action-text="commented"
-          />
+          >
+            <slot slot="note-header-info" name="note-header-info"> </slot>
+          </note-header>
           <note-actions
             :author-id="author.id"
             :note-id="note.id"
@@ -208,12 +211,16 @@ export default {
             :can-award-emoji="note.current_user.can_award_emoji"
             :can-delete="note.current_user.can_edit"
             :can-report-as-abuse="canReportAsAbuse"
-            :can-resolve="note.current_user.can_resolve"
+            :can-resolve="
+              note.current_user.can_resolve || (note.isDraft && note.discussion_id !== null)
+            "
             :report-abuse-path="note.report_abuse_path"
-            :resolvable="note.resolvable"
-            :is-resolved="note.resolved"
+            :resolvable="note.resolvable || note.isDraft"
+            :is-resolved="note.resolved || note.resolve_discussion"
             :is-resolving="isResolving"
             :resolved-by="note.resolved_by"
+            :discussion-id="note.isDraft && note.discussion_id"
+            :resolve-discussion="note.isDraft && note.resolve_discussion"
             @handleEdit="editHandler"
             @handleDelete="deleteHandler"
             @handleResolve="resolveHandler"

@@ -1,4 +1,5 @@
 <script>
+import { mapGetters } from 'vuex';
 import $ from 'jquery';
 import noteEditedText from './note_edited_text.vue';
 import noteAwardsList from './note_awards_list.vue';
@@ -30,8 +31,14 @@ export default {
     },
   },
   computed: {
+    ...mapGetters(['getDiscussion']),
     noteBody() {
       return this.note.note;
+    },
+    discussion() {
+      if (!this.note.isDraft) return {};
+
+      return this.getDiscussion(this.note.discussion_id);
     },
   },
   mounted() {
@@ -56,8 +63,8 @@ export default {
     renderGFM() {
       $(this.$refs['note-body']).renderGFM();
     },
-    handleFormUpdate(note, parentElement, callback) {
-      this.$emit('handleFormUpdate', note, parentElement, callback);
+    handleFormUpdate(note, parentElement, callback, resolveDiscussion) {
+      this.$emit('handleFormUpdate', note, parentElement, callback, resolveDiscussion);
     },
     formCancelHandler(shouldConfirm, isDirty) {
       this.$emit('cancelForm', shouldConfirm, isDirty);
@@ -76,6 +83,8 @@ export default {
       :note-body="noteBody"
       :note-id="note.id"
       :markdown-version="note.cached_markdown_version"
+      :discussion="discussion"
+      :resolve-discussion="note.resolve_discussion"
       @handleFormUpdate="handleFormUpdate"
       @cancelForm="formCancelHandler"
     />

@@ -70,4 +70,16 @@ export default {
   [types.CLOSE_REVIEW_DROPDOWN](state) {
     state.showPreviewDropdown = false;
   },
+  [types.TOGGLE_RESOLVE_DISCUSSION](state, draftId) {
+    state.drafts = state.drafts.map(draft => {
+      if (draft.id === draftId) {
+        return {
+          ...draft,
+          resolve_discussion: !draft.resolve_discussion,
+        };
+      }
+
+      return draft;
+    });
+  },
 };

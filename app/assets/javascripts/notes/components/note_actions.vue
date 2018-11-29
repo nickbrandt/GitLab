@@ -2,6 +2,7 @@
 import { mapGetters } from 'vuex';
 import Icon from '~/vue_shared/components/icon.vue';
 import { GlLoadingIcon, GlTooltipDirective } from '@gitlab/ui';
+import resolvedStatusMixin from 'ee/batch_comments/mixins/resolved_status';
 
 export default {
   name: 'NoteActions',
@@ -12,6 +13,7 @@ export default {
   directives: {
     GlTooltip: GlTooltipDirective,
   },
+  mixins: [resolvedStatusMixin],
   props: {
     authorId: {
       type: Number,
@@ -93,6 +95,8 @@ export default {
       return this.getUserDataByProp('id');
     },
     resolveButtonTitle() {
+      if (this.discussionId) return this.resolvedStatusMessage;
+
       let title = 'Mark as resolved';
 
       if (this.resolvedBy) {
@@ -113,6 +117,7 @@ export default {
       this.$emit('handleResolve');
     },
   },
+  showStaysResolved: true,
 };
 </script>
 
