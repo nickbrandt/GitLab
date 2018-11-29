@@ -9,15 +9,12 @@ class Projects::IssuesController < Projects::ApplicationController
   include IssuesCalendar
   include SpammableActions
 
-<<<<<<< HEAD
   prepend ::EE::Projects::IssuesController
 
   def self.authenticate_user_only_actions
     %i[new]
   end
 
-=======
->>>>>>> upstream/master
   def self.issue_except_actions
     %i[index calendar new create bulk_update]
   end
