@@ -11,10 +11,6 @@ class Projects::IssuesController < Projects::ApplicationController
 
   prepend ::EE::Projects::IssuesController
 
-  def self.authenticate_user_only_actions
-    %i[new]
-  end
-
   def self.issue_except_actions
     %i[index calendar new create bulk_update]
   end

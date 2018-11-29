@@ -5,6 +5,10 @@ class Groups::Epics::NotesController < Groups::ApplicationController
   include NotesHelper
   include ToggleAwardEmoji
 
+  # Re-defining the before_action set in NotesActions here without prepending pushes it farther down the callback stack
+  # and we do this here since we need variables instantiated in other before_actions
+  before_action :normalize_create_params, only: [:create]
+
   before_action :epic
   before_action :authorize_create_note!, only: [:create]
 
@@ -40,5 +44,12 @@ class Groups::Epics::NotesController < Groups::ApplicationController
 
   def note_serializer
     EpicNoteSerializer.new(project: nil, noteable: noteable, current_user: current_user)
+  end
+
+  def normalize_create_params
+    params[:note].try do |note|
+      note[:noteable_id] = epic.id
+      note[:noteable_type] = 'Epic'
+    end
   end
 end
