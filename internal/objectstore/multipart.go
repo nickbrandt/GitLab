@@ -109,7 +109,7 @@ func (m *Multipart) cleanup(ctx context.Context) {
 		return
 	}
 
-	// We have now succesfully uploaded the file to object storage. Another
+	// We have now successfully uploaded the file to object storage. Another
 	// goroutine will hand off the object to gitlab-rails.
 	<-ctx.Done()
 

@@ -49,7 +49,7 @@ Options:
   -authSocket string
     	Optional: Unix domain socket to dial authBackend at
   -developmentMode
-    	Allow to serve assets from Rails app
+    	Allow the assets to be served from Rails app
   -documentRoot string
     	Path to static files content (default "public")
   -listenAddr string
