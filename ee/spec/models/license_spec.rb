@@ -597,6 +597,33 @@ describe License do
     end
   end
 
+  describe '#overage' do
+    it 'returns 0 if restricted_user_count is nil' do
+      allow(license).to receive(:restricted_user_count) { nil }
+
+      expect(license.overage).to eq(0)
+    end
+
+    it 'returns the difference between user_count and restricted_user_count' do
+      allow(license).to receive(:restricted_user_count) { 10 }
+
+      expect(license.overage(14)).to eq(4)
+    end
+
+    it 'returns the difference using current_active_users_count as user_count if no user_count argument provided' do
+      allow(license).to receive(:current_active_users_count) { 110 }
+      allow(license).to receive(:restricted_user_count) { 100 }
+
+      expect(license.overage).to eq(10)
+    end
+
+    it 'returns 0 if the difference is a negative number' do
+      allow(license).to receive(:restricted_user_count) { 2 }
+
+      expect(license.overage(1)).to eq(0)
+    end
+  end
+
   def set_restrictions(opts)
     gl_license.restrictions = {
       active_user_count: opts[:restricted_user_count],
