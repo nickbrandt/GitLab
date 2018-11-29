@@ -1221,6 +1221,9 @@ msgstr ""
 msgid "Are you sure you want to lose your issue information?"
 msgstr ""
 
+msgid "Are you sure you want to permanently delete this license?"
+msgstr ""
+
 msgid "Are you sure you want to regenerate the public key? You will have to update the public key on the remote server before mirroring will work again."
 msgstr ""
 
@@ -2834,6 +2837,9 @@ msgstr ""
 msgid "Commit…"
 msgstr ""
 
+msgid "Company"
+msgstr ""
+
 msgid "Compare"
 msgstr ""
 
@@ -3374,6 +3380,9 @@ msgstr ""
 msgid "Delete comment"
 msgstr ""
 
+msgid "Delete license"
+msgstr ""
+
 msgid "Delete list"
 msgstr ""
 
@@ -3384,6 +3393,15 @@ msgid "Delete this attachment"
 msgstr ""
 
 msgid "Deleted"
+msgstr ""
+
+msgid "Deleting the license failed."
+msgstr ""
+
+msgid "Deleting the license failed. The license was not found."
+msgstr ""
+
+msgid "Deleting the license failed. You are not permitted to perform this action."
 msgstr ""
 
 msgid "Deny"
@@ -3679,6 +3697,9 @@ msgstr ""
 msgid "Download asset"
 msgstr ""
 
+msgid "Download license"
+msgstr ""
+
 msgid "Download source code"
 msgstr ""
 
@@ -3770,6 +3791,9 @@ msgid "Elastic|None. Select projects to index."
 msgstr ""
 
 msgid "Email"
+msgstr ""
+
+msgid "Email address"
 msgstr ""
 
 msgid "Email patch"
@@ -3866,6 +3890,9 @@ msgid "Enabled sources for code import during project creation. OmniAuth must be
 msgstr ""
 
 msgid "Enabling this will only make licensed EE features available to projects if the project namespace's plan includes the feature or if the project is public."
+msgstr ""
+
+msgid "End date"
 msgstr ""
 
 msgid "Ends at (UTC)"
@@ -4273,6 +4300,9 @@ msgstr ""
 msgid "Expiration date"
 msgstr ""
 
+msgid "Expired"
+msgstr ""
+
 msgid "Expired %{expiredOn}"
 msgstr ""
 
@@ -4517,6 +4547,15 @@ msgid "February"
 msgstr ""
 
 msgid "Fetching incoming email"
+msgstr ""
+
+msgid "Fetching licenses failed."
+msgstr ""
+
+msgid "Fetching licenses failed. The request endpoint was not found."
+msgstr ""
+
+msgid "Fetching licenses failed. You are not permitted to perform this action."
 msgstr ""
 
 msgid "Fields on this page are now uneditable, you can configure"
@@ -5160,6 +5199,9 @@ msgstr ""
 msgid "GitLab CI Linter has been moved"
 msgstr ""
 
+msgid "GitLab Enterprise Edition %{plan}"
+msgstr ""
+
 msgid "GitLab Geo"
 msgstr ""
 
@@ -5173,6 +5215,9 @@ msgid "GitLab Shared Runners execute code of different projects on the same Runn
 msgstr ""
 
 msgid "GitLab User"
+msgstr ""
+
+msgid "GitLab allows you to continue using your license even if you exceed the number of seats you purchased. You will be required to pay for these seats when you renew your license."
 msgstr ""
 
 msgid "GitLab metadata URL"
@@ -5836,6 +5881,9 @@ msgstr ""
 msgid "Instance does not support multiple Kubernetes clusters"
 msgstr ""
 
+msgid "Instance license"
+msgstr ""
+
 msgid "Integrations"
 msgstr ""
 
@@ -6354,6 +6402,9 @@ msgstr ""
 msgid "LicenseManagement|You are about to remove the license, %{name}, from this project."
 msgstr ""
 
+msgid "Licensed to"
+msgstr ""
+
 msgid "Licenses"
 msgstr ""
 
@@ -6461,6 +6512,9 @@ msgstr ""
 msgid "Make sure you're logged into the account that owns the projects you'd like to import."
 msgstr ""
 
+msgid "Manage"
+msgstr ""
+
 msgid "Manage Git repositories with fine-grained access controls that keep your code secure. Perform code reviews and enhance collaboration with merge requests. Each project can also have an issue tracker and a wiki."
 msgstr ""
 
@@ -6537,6 +6591,9 @@ msgid "Maven Metadata"
 msgstr ""
 
 msgid "Max access level"
+msgstr ""
+
+msgid "Max seats used"
 msgstr ""
 
 msgid "Maximum artifacts size (MB)"
@@ -7157,6 +7214,9 @@ msgid "No labels with such name or description"
 msgstr ""
 
 msgid "No license. All rights reserved"
+msgstr ""
+
+msgid "No licenses found."
 msgstr ""
 
 msgid "No matching results"
@@ -8702,6 +8762,9 @@ msgstr ""
 msgid "Register and see your runners for this project."
 msgstr ""
 
+msgid "Registration"
+msgstr ""
+
 msgid "Registry"
 msgstr ""
 
@@ -8775,6 +8838,9 @@ msgid "Removed group can not be restored!"
 msgstr ""
 
 msgid "Removing group will cause all child projects and resources to be removed."
+msgstr ""
+
+msgid "Removing license…"
 msgstr ""
 
 msgid "Rename"
@@ -9264,6 +9330,12 @@ msgid "SearchAutocomplete|in this project"
 msgstr ""
 
 msgid "SearchResults|Showing %{from} - %{to} of %{count} %{scope} for \"%{term}\""
+msgstr ""
+
+msgid "Seats currently in use"
+msgstr ""
+
+msgid "Seats in license"
 msgstr ""
 
 msgid "Secret"
@@ -10779,6 +10851,9 @@ msgstr ""
 msgid "This is the author's first Merge Request to this project."
 msgstr ""
 
+msgid "This is the maximum number of users that have existed at the same time since the license started. This is the minimum number of seats you will need to buy when you renew your license."
+msgstr ""
+
 msgid "This issue is confidential"
 msgstr ""
 
@@ -11392,6 +11467,9 @@ msgstr ""
 msgid "Unknown"
 msgstr ""
 
+msgid "Unlimited"
+msgstr ""
+
 msgid "Unlock"
 msgstr ""
 
@@ -11521,10 +11599,16 @@ msgstr ""
 msgid "UploadLink|click to upload"
 msgstr ""
 
+msgid "Uploaded on"
+msgstr ""
+
 msgid "Upstream"
 msgstr ""
 
 msgid "Upvotes"
+msgstr ""
+
+msgid "Usage"
 msgstr ""
 
 msgid "Usage ping is not enabled"
@@ -11689,10 +11773,16 @@ msgstr ""
 msgid "Users"
 msgstr ""
 
+msgid "Users outside of license"
+msgstr ""
+
 msgid "Users requesting access to"
 msgstr ""
 
 msgid "Users were successfully added."
+msgstr ""
+
+msgid "Users with a Guest role or those who don't belong to any projects or groups don't count towards seats in use."
 msgstr ""
 
 msgid "Validate"
@@ -11702,6 +11792,9 @@ msgid "Validate your GitLab CI configuration file"
 msgstr ""
 
 msgid "Validations failed."
+msgstr ""
+
+msgid "Validity"
 msgstr ""
 
 msgid "Value"
