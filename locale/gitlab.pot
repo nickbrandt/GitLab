@@ -4882,6 +4882,9 @@ msgstr ""
 msgid "Latest changes"
 msgstr ""
 
+msgid "Learn how to %{no_packages_link_start}publish and share your Maven packages%{no_packages_link_end} with GitLab. Additional package types will be supported in future releases."
+msgstr ""
+
 msgid "Learn more"
 msgstr ""
 
@@ -5667,9 +5670,6 @@ msgid "No messages were logged"
 msgstr ""
 
 msgid "No other labels with such name or description"
-msgstr ""
-
-msgid "No packages stored for this project."
 msgstr ""
 
 msgid "No preview for this file type"
@@ -8305,6 +8305,9 @@ msgid "There are no issues to show"
 msgstr ""
 
 msgid "There are no labels yet"
+msgstr ""
+
+msgid "There are no packages yet"
 msgstr ""
 
 msgid "There are no projects shared with this group yet"

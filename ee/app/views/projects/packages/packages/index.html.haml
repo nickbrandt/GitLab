@@ -40,5 +40,12 @@
                   = icon('trash')
     = paginate @packages, theme: "gitlab"
 - else
-  .nothing-here-block
-    = _('No packages stored for this project.')
+  .row.empty-state
+    .col-12
+      .svg-content= image_tag 'illustrations/no-packages.svg'
+      .text-content
+        %h4.text-center= _('There are no packages yet')
+        %p
+          - no_packages_url = help_page_path('user/project/packages/maven_repository.html')
+          - no_packages_link_start = '<a href="%{url}" target="_blank" rel="noopener noreferrer">'.html_safe % { url: no_packages_url }
+          = _('Learn how to %{no_packages_link_start}publish and share your Maven packages%{no_packages_link_end} with GitLab. Additional package types will be supported in future releases.').html_safe % { no_packages_link_start: no_packages_link_start, no_packages_link_end: '</a>'.html_safe }
