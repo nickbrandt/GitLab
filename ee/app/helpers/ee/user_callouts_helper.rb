@@ -2,7 +2,7 @@
 
 module EE
   module UserCalloutsHelper
-    GOLD_TRIAL = 'gold_trial'.freeze
+    GOLD_TRIAL = 'gold_trial'
 
     def show_gold_trial?(user = current_user)
       !user_dismissed?(GOLD_TRIAL) &&
