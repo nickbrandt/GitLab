@@ -17,7 +17,7 @@ describe Geo::RepositoryVerificationFinder, :postgresql do
       expect(subject.find_failed_repositories(batch_size: 10)).to be_empty
     end
 
-    it 'does not return projects where repository verification is outdated' do
+    it 'does not return projects where repository was recently updated' do
       create(:repository_state, :repository_outdated, project: project)
 
       expect(subject.find_failed_repositories(batch_size: 10)).to be_empty
@@ -66,7 +66,7 @@ describe Geo::RepositoryVerificationFinder, :postgresql do
       expect(subject.find_failed_wikis(batch_size: 10)).to be_empty
     end
 
-    it 'does not return projects where wiki verification is outdated' do
+    it 'does not return projects where wiki was recently updated' do
       create(:repository_state, :wiki_outdated, project: project)
 
       expect(subject.find_failed_wikis(batch_size: 10)).to be_empty
@@ -101,45 +101,45 @@ describe Geo::RepositoryVerificationFinder, :postgresql do
     end
   end
 
-  describe '#find_outdated_projects' do
-    it 'returns projects where repository verification is outdated' do
+  describe '#find_recently_updated_projects' do
+    it 'returns projects where repository was recently updated' do
       create(:repository_state, :repository_outdated, project: project)
 
-      expect(subject.find_outdated_projects(batch_size: 10))
+      expect(subject.find_recently_updated_projects(batch_size: 10))
         .to match_array(project)
     end
 
     it 'returns projects where repository verification is pending' do
       create(:repository_state, :wiki_verified, project: project)
 
-      expect(subject.find_outdated_projects(batch_size: 10))
+      expect(subject.find_recently_updated_projects(batch_size: 10))
         .to match_array(project)
     end
 
     it 'does not return projects where repository verification failed' do
       create(:repository_state, :repository_failed, :wiki_verified, project: project)
 
-      expect(subject.find_outdated_projects(batch_size: 10)).to be_empty
+      expect(subject.find_recently_updated_projects(batch_size: 10)).to be_empty
     end
 
-    it 'returns projects where wiki verification is outdated' do
+    it 'returns projects where wiki was recently updated' do
       create(:repository_state, :wiki_outdated, project: project)
 
-      expect(subject.find_outdated_projects(batch_size: 10))
+      expect(subject.find_recently_updated_projects(batch_size: 10))
         .to match_array(project)
     end
 
     it 'returns projects where wiki verification is pending' do
       create(:repository_state, :repository_verified, project: project)
 
-      expect(subject.find_outdated_projects(batch_size: 10))
+      expect(subject.find_recently_updated_projects(batch_size: 10))
         .to match_array(project)
     end
 
     it 'does not return projects where wiki verification failed' do
       create(:repository_state, :repository_verified, :wiki_failed, project: project)
 
-      expect(subject.find_outdated_projects(batch_size: 10)).to be_empty
+      expect(subject.find_recently_updated_projects(batch_size: 10)).to be_empty
     end
 
     it 'returns less active projects first' do
@@ -149,7 +149,7 @@ describe Geo::RepositoryVerificationFinder, :postgresql do
       project.update_column(:last_repository_updated_at, 30.minutes.ago)
       less_active_project.update_column(:last_repository_updated_at, 2.days.ago)
 
-      expect(subject.find_outdated_projects(batch_size: 10)).to eq [less_active_project, project]
+      expect(subject.find_recently_updated_projects(batch_size: 10)).to eq [less_active_project, project]
     end
 
     context 'with shard restriction' do
@@ -161,18 +161,18 @@ describe Geo::RepositoryVerificationFinder, :postgresql do
         create(:repository_state, :repository_outdated, project: project)
         create(:repository_state, :repository_outdated, project: project_other_shard)
 
-        expect(subject.find_outdated_projects(batch_size: 10))
+        expect(subject.find_recently_updated_projects(batch_size: 10))
           .to match_array(project)
       end
     end
   end
 
-  describe '#find_unverified_projects' do
+  describe '#find_never_verified_projects' do
     it 'returns projects that never have been verified' do
       create(:repository_state, :repository_outdated)
       create(:repository_state, :wiki_outdated)
 
-      expect(subject.find_unverified_projects(batch_size: 10))
+      expect(subject.find_never_verified_projects(batch_size: 10))
         .to match_array(project)
     end
 
@@ -183,109 +183,73 @@ describe Geo::RepositoryVerificationFinder, :postgresql do
         project_other_shard = create(:project)
         project_other_shard.update_column(:repository_storage, 'other')
 
-        expect(subject.find_unverified_projects(batch_size: 10))
+        expect(subject.find_never_verified_projects(batch_size: 10))
+          .to match_array(project)
+      end
+    end
+  end
+
+  shared_examples 'find reverifiable projects' do |type|
+    let(:failed) { "#{type}_failed".to_sym }
+    let(:verified) { "#{type}_verified".to_sym }
+    let(:outdated) { "#{type}_outdated".to_sym }
+    let(:last_verification_ran_at) { "last_#{type}_verification_ran_at" }
+    let(:finder_method) { "find_reverifiable_#{type.to_s.pluralize}" }
+
+    it "returns projects where #{type} was verified before the minimum re-verification interval" do
+      project_recently_verified = create(:project)
+      create(:repository_state, verified, project: project, last_verification_ran_at => 2.days.ago)
+      create(:repository_state, verified, project: project_recently_verified, last_verification_ran_at => Time.now)
+
+      expect(subject.public_send(finder_method, interval: 1.day.ago, batch_size: 10))
+        .to match_array(project)
+    end
+
+    it "does not return projects where #{type} was recently updated" do
+      create(:repository_state, outdated, project: project, last_verification_ran_at => 2.days.ago)
+
+      expect(subject.public_send(finder_method, interval: 1.day.ago, batch_size: 10))
+        .to be_empty
+    end
+
+    it "does not return projects where #{type} verification failed" do
+      create(:repository_state, failed, project: project, last_verification_ran_at => 2.days.ago)
+
+      expect(subject.public_send(finder_method, interval: 1.day.ago, batch_size: 10))
+        .to be_empty
+    end
+
+    it 'returns less active projects first' do
+      less_active_project = create(:project)
+      create(:repository_state, verified, project: project, last_verification_ran_at => 2.days.ago)
+      create(:repository_state, verified, project: less_active_project, last_verification_ran_at => 2.days.ago)
+      project.update_column(:last_repository_updated_at, 30.minutes.ago)
+      less_active_project.update_column(:last_repository_updated_at, 2.days.ago)
+
+      expect(subject.public_send(finder_method, interval: 1.day.ago, batch_size: 10))
+        .to eq [less_active_project, project]
+    end
+
+    context 'with shard restriction' do
+      subject { described_class.new(shard_name: project.repository_storage) }
+
+      it 'does not return projects on other shards' do
+        project_other_shard = create(:project)
+        project_other_shard.update_column(:repository_storage, 'other')
+        create(:repository_state, verified, project: project, last_verification_ran_at => 2.days.ago)
+        create(:repository_state, verified, project: project_other_shard, last_verification_ran_at => 2.days.ago)
+
+        expect(subject.public_send(finder_method, interval: 1.day.ago, batch_size: 10))
           .to match_array(project)
       end
     end
   end
 
   describe '#find_reverifiable_repositories' do
-    it 'returns projects where repository was verified before the minimum re-verification interval' do
-      project_recently_verified = create(:project)
-      create(:repository_state, :repository_verified, project: project, last_repository_verification_ran_at: 2.days.ago)
-      create(:repository_state, :repository_verified, project: project_recently_verified, last_repository_verification_ran_at: Time.now)
-
-      expect(subject.find_reverifiable_repositories(interval: 1.day.ago, batch_size: 10))
-        .to match_array(project)
-    end
-
-    it 'does not return projects where repository verification is outdated' do
-      create(:repository_state, :repository_outdated, project: project, last_repository_verification_ran_at: 2.days.ago)
-
-      expect(subject.find_reverifiable_repositories(interval: 1.day.ago, batch_size: 10))
-        .to be_empty
-    end
-
-    it 'does not return projects where repository verification failed' do
-      create(:repository_state, :repository_failed, project: project, last_repository_verification_ran_at: 2.days.ago)
-
-      expect(subject.find_reverifiable_repositories(interval: 1.day.ago, batch_size: 10))
-        .to be_empty
-    end
-
-    it 'returns less active projects first' do
-      less_active_project = create(:project)
-      create(:repository_state, :repository_verified, project: project, last_repository_verification_ran_at: 2.days.ago)
-      create(:repository_state, :repository_verified, project: less_active_project, last_repository_verification_ran_at: 2.days.ago)
-      project.update_column(:last_repository_updated_at, 30.minutes.ago)
-      less_active_project.update_column(:last_repository_updated_at, 2.days.ago)
-
-      expect(subject.find_reverifiable_repositories(interval: 1.day.ago, batch_size: 10))
-        .to eq [less_active_project, project]
-    end
-
-    context 'with shard restriction' do
-      subject { described_class.new(shard_name: project.repository_storage) }
-
-      it 'does not return projects on other shards' do
-        project_other_shard = create(:project)
-        project_other_shard.update_column(:repository_storage, 'other')
-        create(:repository_state, :repository_verified, project: project, last_repository_verification_ran_at: 2.days.ago)
-        create(:repository_state, :repository_verified, project: project_other_shard, last_repository_verification_ran_at: 2.days.ago)
-
-        expect(subject.find_reverifiable_repositories(interval: 1.day.ago, batch_size: 10))
-          .to match_array(project)
-      end
-    end
+    it_behaves_like 'find reverifiable projects', :repository
   end
 
   describe '#find_reverifiable_wikis' do
-    it 'returns projects where wiki was verified before the minimum re-verification interval' do
-      project_recently_verified = create(:project)
-      create(:repository_state, :wiki_verified, project: project, last_wiki_verification_ran_at: 2.days.ago)
-      create(:repository_state, :wiki_verified, project: project_recently_verified, last_wiki_verification_ran_at: Time.now)
-
-      expect(subject.find_reverifiable_wikis(interval: 1.day.ago, batch_size: 10))
-        .to match_array(project)
-    end
-
-    it 'does not return projects where wiki verification is outdated' do
-      create(:repository_state, :wiki_outdated, project: project, last_wiki_verification_ran_at: 2.days.ago)
-
-      expect(subject.find_reverifiable_wikis(interval: 1.day.ago, batch_size: 10))
-        .to be_empty
-    end
-
-    it 'does not return projects where wiki verification failed' do
-      create(:repository_state, :wiki_failed, project: project, last_wiki_verification_ran_at: 2.days.ago)
-
-      expect(subject.find_reverifiable_wikis(interval: 1.day.ago, batch_size: 10))
-        .to be_empty
-    end
-
-    it 'returns less active projects first' do
-      less_active_project = create(:project)
-      create(:repository_state, :wiki_verified, project: project, last_wiki_verification_ran_at: 2.days.ago)
-      create(:repository_state, :wiki_verified, project: less_active_project, last_wiki_verification_ran_at: 2.days.ago)
-      project.update_column(:last_repository_updated_at, 30.minutes.ago)
-      less_active_project.update_column(:last_repository_updated_at, 2.days.ago)
-
-      expect(subject.find_reverifiable_wikis(interval: 1.day.ago, batch_size: 10))
-        .to eq [less_active_project, project]
-    end
-
-    context 'with shard restriction' do
-      subject { described_class.new(shard_name: project.repository_storage) }
-
-      it 'does not return projects on other shards' do
-        project_other_shard = create(:project)
-        project_other_shard.update_column(:repository_storage, 'other')
-        create(:repository_state, :wiki_verified, project: project, last_wiki_verification_ran_at: 2.days.ago)
-        create(:repository_state, :wiki_verified, project: project_other_shard, last_wiki_verification_ran_at: 2.days.ago)
-
-        expect(subject.find_reverifiable_wikis(interval: 1.day.ago, batch_size: 10))
-          .to match_array(project)
-      end
-    end
+    it_behaves_like 'find reverifiable projects', :wiki
   end
 end

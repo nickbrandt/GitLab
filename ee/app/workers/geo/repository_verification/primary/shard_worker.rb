@@ -44,11 +44,11 @@ module Geo
         end
 
         def load_pending_resources
-          resources = find_unverified_project_ids(batch_size: db_retrieve_batch_size)
+          resources = find_never_verified_project_ids(batch_size: db_retrieve_batch_size)
           remaining_capacity = db_retrieve_batch_size - resources.size
           return resources if remaining_capacity.zero?
 
-          resources += find_outdated_project_ids(batch_size: remaining_capacity)
+          resources += find_recently_updated_project_ids(batch_size: remaining_capacity)
           remaining_capacity = db_retrieve_batch_size - resources.size
           return resources if remaining_capacity.zero?
 
@@ -56,14 +56,14 @@ module Geo
         end
 
         # rubocop: disable CodeReuse/ActiveRecord
-        def find_unverified_project_ids(batch_size:)
-          finder.find_unverified_projects(batch_size: batch_size).pluck(:id)
+        def find_never_verified_project_ids(batch_size:)
+          finder.find_never_verified_projects(batch_size: batch_size).pluck(:id)
         end
         # rubocop: enable CodeReuse/ActiveRecord
 
         # rubocop: disable CodeReuse/ActiveRecord
-        def find_outdated_project_ids(batch_size:)
-          finder.find_outdated_projects(batch_size: batch_size).pluck(:id)
+        def find_recently_updated_project_ids(batch_size:)
+          finder.find_recently_updated_projects(batch_size: batch_size).pluck(:id)
         end
         # rubocop: enable CodeReuse/ActiveRecord
 
