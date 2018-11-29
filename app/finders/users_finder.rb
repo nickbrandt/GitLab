@@ -14,7 +14,6 @@
 #     active: boolean
 #     blocked: boolean
 #     external: boolean
-#     skip_ldap: boolean
 #
 class UsersFinder
   include CreatedAtFilter
@@ -38,7 +37,6 @@ class UsersFinder
     users = by_2fa(users)
     users = by_created_at(users)
     users = by_custom_attributes(users)
-    users = by_non_ldap(users)
 
     users
   end
@@ -86,12 +84,6 @@ class UsersFinder
   end
   # rubocop: enable CodeReuse/ActiveRecord
 
-  def by_non_ldap(users)
-    return users unless params[:skip_ldap]
-
-    users.non_ldap
-  end
-
   def by_2fa(users)
     case params[:two_factor]
     when 'enabled'
@@ -103,3 +95,5 @@ class UsersFinder
     end
   end
 end
+
+UsersFinder.prepend(EE::UsersFinder)
