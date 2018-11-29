@@ -153,7 +153,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-<<<<<<< HEAD
   # This filter handles personal access tokens, and atom requests with rss tokens
   def authenticate_sessionless_user!
     user = Gitlab::Auth::RequestAuthenticator.new(request).find_sessionless_user
@@ -165,8 +164,6 @@ class ApplicationController < ActionController::Base
     render_404 unless Gitlab::CurrentSettings.should_check_namespace_plan?
   end
 
-=======
->>>>>>> upstream/master
   def log_exception(exception)
     Raven.capture_exception(exception) if sentry_enabled?
 
