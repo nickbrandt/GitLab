@@ -15,6 +15,16 @@ export default () => {
     Cookies.set('collapsed_gutter', true);
   }
 
+  // TODO remove once API provides proper data
+  initialData.epicLinksEndpoint = '/';
+  metaData.parentEpic = {
+    id: 7,
+    title: 'Epic with out of range end date',
+    url: '/groups/gitlab-org/-/epics/7',
+    human_readable_timestamp: '<strong>30</strong> days remaining',
+    human_readable_end_date: 'Dec 28, 2018',
+  };
+
   const props = Object.assign({}, initialData, metaData, el.dataset);
 
   return new Vue({

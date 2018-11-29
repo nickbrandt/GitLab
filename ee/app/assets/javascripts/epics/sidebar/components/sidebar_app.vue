@@ -12,6 +12,7 @@ import SidebarTodo from '~/sidebar/components/todo_toggle/todo.vue';
 import SidebarCollapsedGroupedDatePicker from '~/vue_shared/components/sidebar/collapsed_grouped_date_picker.vue';
 import ToggleSidebar from '~/vue_shared/components/sidebar/toggle_sidebar.vue';
 import SidebarLabelsSelect from '~/vue_shared/components/sidebar/labels_select/base.vue';
+import SidebarItemEpic from 'ee/sidebar/components/sidebar_item_epic.vue';
 import { parseBoolean } from '~/lib/utils/common_utils';
 import eventHub from '../../event_hub';
 import SidebarDatePicker from './sidebar_date_picker.vue';
@@ -33,6 +34,7 @@ export default {
     SidebarDatePicker,
     SidebarCollapsedGroupedDatePicker,
     SidebarLabelsSelect,
+    SidebarItemEpic,
     SidebarParticipants,
     SidebarSubscriptions,
   },
@@ -114,6 +116,10 @@ export default {
     },
     initialTodoExists: {
       type: Boolean,
+      required: true,
+    },
+    parentEpic: {
+      type: Object,
       required: true,
     },
     namespace: {
@@ -462,7 +468,7 @@ export default {
     <div class="issuable-sidebar js-issuable-update">
       <div class="block issuable-sidebar-header">
         <span class="issuable-header-text hide-collapsed float-left">{{ __('Todo') }}</span>
-        <toggle-sidebar :collapsed="collapsed" css-classes="float-right" @toggle="toggleSidebar" />
+        <toggle-sidebar :collapsed="collapsed" css-classes="float-right" @toggle="toggleSidebar"/>
         <sidebar-todo
           v-if="!collapsed"
           :collapsed="collapsed"
@@ -547,9 +553,11 @@ export default {
         @onLabelClick="handleLabelClick"
         @onDropdownClose="handleDropdownClose"
         @toggleCollapse="toggleSidebarRevealLabelsDropdown"
-        >{{ __('None') }}</sidebar-labels-select
-      >
-      <sidebar-participants :participants="initialParticipants" @toggleCollapse="toggleSidebar" />
+      >{{ __('None') }}</sidebar-labels-select>
+      <div class="block parent-epic">
+        <sidebar-item-epic :block-title="__('Parent epic')" :initial-epic="parentEpic"/>
+      </div>
+      <sidebar-participants :participants="initialParticipants" @toggleCollapse="toggleSidebar"/>
       <sidebar-subscriptions
         :loading="savingSubscription"
         :subscribed="store.subscribed"

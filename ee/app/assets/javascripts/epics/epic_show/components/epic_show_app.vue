@@ -82,6 +82,10 @@ export default {
       type: Object,
       required: true,
     },
+    epicLinksEndpoint: {
+      type: String,
+      required: true,
+    },
     issueLinksEndpoint: {
       type: String,
       required: true,
@@ -144,6 +148,10 @@ export default {
     },
     labels: {
       type: Array,
+      required: true,
+    },
+    parentEpic: {
+      type: Object,
       required: true,
     },
     participants: {
@@ -293,6 +301,7 @@ export default {
         :initial-participants="participants"
         :initial-subscribed="subscribed"
         :initial-todo-exists="todoExists"
+        :parent-epic="parentEpic"
         :namespace="namespace"
         :update-path="updateEndpoint"
         :labels-path="labelsPath"
@@ -301,6 +310,13 @@ export default {
         :todo-delete-path="todoDeletePath"
         :labels-web-url="labelsWebUrl"
         :epics-web-url="epicsWebUrl"
+      />
+      <related-issues-root
+        :endpoint="epicLinksEndpoint"
+        :can-admin="canAdmin"
+        :can-reorder="canAdmin"
+        :allow-auto-complete="false"
+        title="Epics"
       />
       <related-issues-root
         :endpoint="issueLinksEndpoint"
