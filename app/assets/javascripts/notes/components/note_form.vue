@@ -199,7 +199,6 @@ export default {
         ></textarea>
       </markdown-field>
       <div class="note-form-actions clearfix">
-<<<<<<< HEAD
         <p v-if="(discussion && discussion.id) || isDraft">
           <label>
             <template v-if="discussionResolved">
@@ -266,30 +265,6 @@ export default {
             Cancel
           </button>
         </template>
-=======
-        <button
-          :disabled="isDisabled"
-          type="button"
-          class="js-vue-issue-save btn btn-success js-comment-button"
-          @click="handleUpdate();"
-        >
-          {{ saveButtonTitle }}
-        </button>
-        <button
-          v-if="discussion.resolvable"
-          class="btn btn-nr btn-default append-right-10 js-comment-resolve-button"
-          @click.prevent="handleUpdate(true);"
-        >
-          {{ resolveButtonTitle }}
-        </button>
-        <button
-          class="btn btn-cancel note-edit-cancel js-close-discussion-note-form"
-          type="button"
-          @click="cancelHandler();"
-        >
-          Cancel
-        </button>
->>>>>>> upstream/master
       </div>
     </form>
   </div>
