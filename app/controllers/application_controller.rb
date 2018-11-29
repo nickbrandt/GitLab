@@ -153,13 +153,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # This filter handles personal access tokens, and atom requests with rss tokens
-  def authenticate_sessionless_user!
-    user = Gitlab::Auth::RequestAuthenticator.new(request).find_sessionless_user
-
-    sessionless_sign_in(user) if user
-  end
-
   def verify_namespace_plan_check_enabled
     render_404 unless Gitlab::CurrentSettings.should_check_namespace_plan?
   end
