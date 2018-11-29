@@ -7621,6 +7621,9 @@ msgstr ""
 msgid "Sort by"
 msgstr ""
 
+msgid "Sort direction"
+msgstr ""
+
 msgid "SortOptions|Access level, ascending"
 msgstr ""
 
