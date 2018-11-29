@@ -5202,16 +5202,16 @@ msgstr ""
 msgid "MergeRequests|An error occurred while saving the draft comment."
 msgstr ""
 
-msgid "MergeRequests|Discussion stays resolved."
+msgid "MergeRequests|Discussion stays resolved"
 msgstr ""
 
-msgid "MergeRequests|Discussion stays unresolved."
+msgid "MergeRequests|Discussion stays unresolved"
 msgstr ""
 
-msgid "MergeRequests|Discussion will be resolved."
+msgid "MergeRequests|Discussion will be resolved"
 msgstr ""
 
-msgid "MergeRequests|Discussion will be unresolved."
+msgid "MergeRequests|Discussion will be unresolved"
 msgstr ""
 
 msgid "MergeRequests|Resolve this discussion in a new issue"
