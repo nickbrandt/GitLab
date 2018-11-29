@@ -28,6 +28,7 @@ describe Projects::UpdateRepositoryStorageService do
           expect(project).not_to be_repository_read_only
           expect(project.repository_storage).to eq('test_second_storage')
           expect(gitlab_shell.exists?('default', old_path)).to be(false)
+          expect(project.project_repository.shard_name).to eq('test_second_storage')
         end
       end
 

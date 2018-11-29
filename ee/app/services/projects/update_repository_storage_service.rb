@@ -17,6 +17,7 @@ module Projects
         mark_old_paths_for_archive
 
         project.update(repository_storage: new_repository_storage_key, repository_read_only: false)
+        project.track_project_repository
       else
         project.update(repository_read_only: false)
       end
