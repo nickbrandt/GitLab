@@ -7,6 +7,11 @@ gem_versions = {}
 gem_versions['activerecord_sane_schema_dumper'] = rails5? ? '1.0'    : '0.2'
 gem_versions['rails']                           = rails5? ? '5.0.7'  : '4.2.10'
 gem_versions['rails-i18n']                      = rails5? ? '~> 5.1' : '~> 4.0.9'
+
+# The 2.0.6 version of rack requires monkeypatch to be present in
+# `config.ru`. This can be removed once a new update for Rack
+# is available that contains https://github.com/rack/rack/pull/1201.
+gem_versions['rack']                            = rails5? ? '2.0.6' : '1.6.11'
 # --- The end of special code for migrating to Rails 5.0 ---
 
 source 'https://rubygems.org'
@@ -164,6 +169,8 @@ gem 'icalendar'
 gem 'diffy', '~> 3.1.0'
 
 # Application server
+gem 'rack', gem_versions['rack']
+
 group :unicorn do
   gem 'unicorn', '~> 5.1.0'
   gem 'unicorn-worker-killer', '~> 0.4.4'
@@ -440,7 +447,7 @@ group :ed25519 do
 end
 
 # Gitaly GRPC client
-gem 'gitaly-proto', '~> 1.1.0', require: 'gitaly'
+gem 'gitaly-proto', '~> 1.2.0', require: 'gitaly'
 gem 'grpc', '~> 1.15.0'
 
 gem 'google-protobuf', '~> 3.6'

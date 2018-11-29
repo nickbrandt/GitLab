@@ -188,6 +188,9 @@ msgstr ""
 msgid "%{usage_ping_link_start}Learn more%{usage_ping_link_end} about what information is shared with GitLab Inc."
 msgstr ""
 
+msgid "%{user_name} profile page"
+msgstr ""
+
 msgid "+ %{count} more"
 msgstr ""
 
@@ -1361,6 +1364,9 @@ msgid "Built-In"
 msgstr ""
 
 msgid "Business metrics (Custom)"
+msgstr ""
+
+msgid "By %{user_name}"
 msgstr ""
 
 msgid "ByAuthor|by"
@@ -3016,6 +3022,9 @@ msgstr ""
 msgid "Edit application"
 msgstr ""
 
+msgid "Edit comment"
+msgstr ""
+
 msgid "Edit environment"
 msgstr ""
 
@@ -4470,6 +4479,9 @@ msgstr ""
 msgid "ImageDiffViewer|Swipe"
 msgstr ""
 
+msgid "Impersonation has been disabled"
+msgstr ""
+
 msgid "Import"
 msgstr ""
 
@@ -4590,6 +4602,9 @@ msgid "Integrations Settings"
 msgstr ""
 
 msgid "Interested parties can even contribute by pushing commits if they want to."
+msgstr ""
+
+msgid "Internal"
 msgstr ""
 
 msgid "Internal - The group and any internal projects can be viewed by any logged in user."
@@ -5738,6 +5753,9 @@ msgstr ""
 msgid "Notes|Show history only"
 msgstr ""
 
+msgid "Nothing here."
+msgstr ""
+
 msgid "Notification events"
 msgstr ""
 
@@ -6254,6 +6272,9 @@ msgid "Prioritized Labels"
 msgstr ""
 
 msgid "Prioritized label"
+msgstr ""
+
+msgid "Private"
 msgstr ""
 
 msgid "Private - Project access must be granted explicitly to each user."
@@ -6821,6 +6842,9 @@ msgid "Provider"
 msgstr ""
 
 msgid "Pseudonymizer data collection"
+msgstr ""
+
+msgid "Public"
 msgstr ""
 
 msgid "Public - The group and any public projects can be viewed without any authentication."
