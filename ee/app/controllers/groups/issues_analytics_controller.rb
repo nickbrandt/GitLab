@@ -33,8 +33,8 @@ class Groups::IssuesAnalyticsController < Groups::ApplicationController
     IssuesFinder
   end
 
-  def set_default_state
-    params[:state] = 'all' if params[:state].blank?
+  def default_state
+    'all'
   end
 
   def preload_for_collection

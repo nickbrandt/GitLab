@@ -159,7 +159,7 @@ module Gitlab
 
           row = query_and_release(query)
 
-          row['result'] == 't'
+          ::Gitlab::Utils.to_boolean(row['result'])
         rescue *CONNECTION_ERRORS
           false
         end

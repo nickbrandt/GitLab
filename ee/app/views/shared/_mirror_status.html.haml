@@ -1,7 +1,7 @@
-- last_successful_update_at = @project.mirror_last_successful_update_at
+- last_successful_update_at = @project.import_state.last_successful_update_at
 - raw_message = local_assigns.fetch(:raw_message, false)
 
-- case @project.mirror_last_update_status
+- case @project.import_state.last_update_status
 - when :success
   Updated #{time_ago_with_tooltip(last_successful_update_at)}.
 - when :failed

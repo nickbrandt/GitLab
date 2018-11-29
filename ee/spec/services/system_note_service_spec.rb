@@ -10,7 +10,7 @@ describe SystemNoteService do
   set(:author)   { create(:user) }
   let(:noteable) { create(:issue, project: project) }
   let(:issue)    { noteable }
-  let(:epic)     { create(:epic) }
+  let(:epic)     { create(:epic, group: group) }
 
   shared_examples_for 'a system note' do
     let(:expected_noteable) { noteable }
@@ -94,6 +94,33 @@ describe SystemNoteService do
 
       it 'sets the note text' do
         expect(subject.note).to eq 'removed the start date'
+      end
+    end
+
+    context '.issue_promoted' do
+      context 'note on the epic' do
+        subject { described_class.issue_promoted(epic, issue, author, direction: :from) }
+
+        it_behaves_like 'a system note' do
+          let(:action) { 'moved' }
+          let(:expected_noteable) { epic }
+        end
+
+        it 'sets the note text' do
+          expect(subject.note).to eq("promoted from issue #{issue.to_reference(group)}")
+        end
+      end
+
+      context 'note on the issue' do
+        subject { described_class.issue_promoted(issue, epic, author, direction: :to) }
+
+        it_behaves_like 'a system note' do
+          let(:action) { 'moved' }
+        end
+
+        it 'sets the note text' do
+          expect(subject.note).to eq("promoted to epic #{epic.to_reference(project)}")
+        end
       end
     end
   end

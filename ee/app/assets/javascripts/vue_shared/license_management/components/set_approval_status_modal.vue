@@ -52,9 +52,7 @@ export default {
         <label class="col-sm-3 text-right font-weight-bold">
           {{ s__('LicenseManagement|License') }}:
         </label>
-        <div class="col-sm-9 text-secondary">
-          {{ currentLicenseInModal.name }}
-        </div>
+        <div class="col-sm-9 text-secondary">{{ currentLicenseInModal.name }}</div>
       </div>
       <div
         v-if="currentLicenseInModal.url"
@@ -68,7 +66,8 @@ export default {
             :href="currentLicenseInModal.url"
             target="_blank"
             rel="noopener noreferrer nofollow"
-          >{{ currentLicenseInModal.url }}</safe-link>
+            >{{ currentLicenseInModal.url }}</safe-link
+          >
         </div>
       </div>
       <div class="row prepend-top-10 append-bottom-10 js-license-packages">
@@ -94,7 +93,7 @@ export default {
         v-if="canBlacklist"
         class="btn btn-remove btn-inverted js-modal-secondary-action"
         data-dismiss="modal"
-        @click="blacklistLicense(currentLicenseInModal)"
+        @click="blacklistLicense(currentLicenseInModal);"
       >
         {{ s__('LicenseManagement|Blacklist license') }}
       </button>
@@ -103,7 +102,7 @@ export default {
         type="button"
         class="btn btn-success js-modal-primary-action"
         data-dismiss="modal"
-        @click="approveLicense(currentLicenseInModal)"
+        @click="approveLicense(currentLicenseInModal);"
       >
         {{ s__('LicenseManagement|Approve license') }}
       </button>

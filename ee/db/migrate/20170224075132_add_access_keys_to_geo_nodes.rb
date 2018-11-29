@@ -1,5 +1,5 @@
 # rubocop:disable RemoveIndex
-class AddAccessKeysToGeoNodes < ActiveRecord::Migration
+class AddAccessKeysToGeoNodes < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

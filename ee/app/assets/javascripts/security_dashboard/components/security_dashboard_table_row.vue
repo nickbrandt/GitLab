@@ -1,6 +1,6 @@
 <script>
 import { mapActions } from 'vuex';
-import { GlButton, GlSkeletonLoading } from '@gitlab-org/gitlab-ui';
+import { GlButton, GlSkeletonLoading } from '@gitlab/ui';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
 import VulnerabilityActionButtons from './vulnerability_action_buttons.vue';
 import VulnerabilityIssueLink from './vulnerability_issue_link.vue';
@@ -57,49 +57,32 @@ export default {
 </script>
 
 <template>
-  <div class="gl-responsive-table-row vulnerabilities-row">
+  <div class="gl-responsive-table-row vulnerabilities-row" :class="{ dismissed: isDismissed }">
     <div class="table-section section-10">
-      <div
-        class="table-mobile-header"
-        role="rowheader"
-      >
-        {{ s__('Reports|Severity') }}
-      </div>
-      <div class="table-mobile-content">
-        <severity-badge :severity="severity"/>
-      </div>
+      <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Severity') }}</div>
+      <div class="table-mobile-content"><severity-badge :severity="severity" /></div>
     </div>
 
     <div class="table-section section-60">
-      <div
-        class="table-mobile-header"
-        role="rowheader"
-      >
-        {{ s__('Reports|Vulnerability') }}
-      </div>
+      <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Vulnerability') }}</div>
       <div class="table-mobile-content">
-        <gl-skeleton-loading
-          v-if="isLoading"
-          class="mt-2 js-skeleton-loader"
-          :lines="2"
-        />
+        <gl-skeleton-loading v-if="isLoading" class="mt-2 js-skeleton-loader" :lines="2" />
         <div v-else>
           <gl-button
             class="btn js-vulnerability-info"
             variant="blank"
-            :class="{ strikethrough: isDismissed }"
-            @click="openModal({ vulnerability })"
-          >{{ vulnerability.name }}</gl-button>
+            @click="openModal({ vulnerability });"
+            >{{ vulnerability.name }}</gl-button
+          >
+          <span v-show="isDismissed" class="prepend-left-8 vertical-align-middle">DISMISSED</span>
           <vulnerability-issue-link
             v-if="hasIssue"
-            class="prepend-left-10"
+            class="prepend-left-8"
             :issue="vulnerability.issue_feedback"
             :project-name="vulnerability.project.name"
           />
           <br />
-          <span
-            v-if="projectFullName"
-            class="vulnerability-namespace">
+          <span v-if="projectFullName" class="vulnerability-namespace">
             {{ projectFullName }}
           </span>
         </div>
@@ -107,25 +90,13 @@ export default {
     </div>
 
     <div class="table-section section-10">
-      <div
-        class="table-mobile-header"
-        role="rowheader"
-      >
-        {{ s__('Reports|Confidence') }}
-      </div>
-      <div class="table-mobile-content text-capitalize">
-        <span :class="{ strikethrough: isDismissed }">{{ confidence }}</span>
-      </div>
+      <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Confidence') }}</div>
+      <div class="table-mobile-content text-capitalize">{{ confidence }}</div>
     </div>
 
     <div class="table-section section-20">
-      <div
-        class="table-mobile-header"
-        role="rowheader"
-      >
-        {{ s__('Reports|Actions') }}
-      </div>
-      <div class="table-mobile-content vulnerabilities-action-buttons">
+      <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Actions') }}</div>
+      <div class="table-mobile-content action-buttons">
         <vulnerability-action-buttons
           :vulnerability="vulnerability"
           :can-create-issue="canCreateIssue"
@@ -137,7 +108,7 @@ export default {
   </div>
 </template>
 
-<style>
+<style scoped>
 @media (min-width: 768px) {
   .vulnerabilities-row {
     padding: 0.6em 0.4em;
@@ -151,14 +122,14 @@ export default {
     margin-top: -1px;
   }
 
-  .vulnerabilities-row .vulnerabilities-action-buttons {
+  .vulnerabilities-row .action-buttons {
     opacity: 0;
     padding-right: 1em;
     text-align: right;
   }
 
-  .vulnerabilities-row:hover .vulnerabilities-action-buttons,
-  .vulnerabilities-row:focus .vulnerabilities-action-buttons {
+  .vulnerabilities-row:hover .action-buttons,
+  .vulnerabilities-row:focus .action-buttons {
     opacity: 1;
   }
 }
@@ -170,5 +141,9 @@ export default {
 .vulnerability-namespace {
   color: #707070;
   font-size: 0.8em;
+}
+
+.dismissed .table-mobile-content:not(.action-buttons) {
+  opacity: 0.5;
 }
 </style>

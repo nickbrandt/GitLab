@@ -13,7 +13,7 @@ module EE
     override :new_issuable
     def new_issuable(issuable, author)
       if issuable.is_a?(MergeRequest)
-        create_approval_required_todos(issuable, issuable.overall_approvers, author)
+        create_approval_required_todos(issuable, issuable.overall_approvers(exclude_code_owners: true), author)
       end
 
       super

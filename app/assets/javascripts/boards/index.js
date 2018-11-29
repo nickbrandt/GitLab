@@ -21,13 +21,13 @@ import BoardSidebar from 'ee/boards/components/board_sidebar';
 import initNewListDropdown from './components/new_list_dropdown';
 import BoardAddIssuesModal from 'ee/boards/components/modal/index';
 import '~/vue_shared/vue_resource_interceptor';
-import { NavigationType } from '~/lib/utils/common_utils';
+import { NavigationType, parseBoolean } from '~/lib/utils/common_utils';
 
 import 'ee/boards/models/list';
 import 'ee/boards/models/issue';
 import 'ee/boards/models/project';
 import BoardService from 'ee/boards/services/board_service';
-import BoardsSelector from 'ee/boards/components/boards_selector';
+import BoardsSelector from 'ee/boards/components/boards_selector.vue';
 import collapseIcon from 'ee/boards/icons/fullscreen_collapse.svg';
 import expandIcon from 'ee/boards/icons/fullscreen_expand.svg';
 import tooltip from '~/vue_shared/directives/tooltip';
@@ -67,7 +67,7 @@ export default () => {
       boardsEndpoint: $boardApp.dataset.boardsEndpoint,
       listsEndpoint: $boardApp.dataset.listsEndpoint,
       boardId: $boardApp.dataset.boardId,
-      disabled: $boardApp.dataset.disabled === 'true',
+      disabled: parseBoolean($boardApp.dataset.disabled),
       issueLinkBase: $boardApp.dataset.issueLinkBase,
       rootPath: $boardApp.dataset.rootPath,
       bulkUpdatePath: $boardApp.dataset.bulkUpdatePath,
@@ -356,11 +356,34 @@ export default () => {
     `,
   });
 
+  const boardsSwitcherElement = document.getElementById('js-multiple-boards-switcher');
   // eslint-disable-next-line no-new
   new Vue({
-    el: '#js-multiple-boards-switcher',
+    el: boardsSwitcherElement,
     components: {
       BoardsSelector,
+    },
+    data() {
+      const { dataset } = boardsSwitcherElement;
+
+      const boardsSelectorProps = {
+        ...dataset,
+        currentBoard: JSON.parse(dataset.currentBoard),
+        hasMissingBoards: parseBoolean(dataset.hasMissingBoards),
+        canAdminBoard: parseBoolean(dataset.canAdminBoard),
+        multipleIssueBoardsAvailable: parseBoolean(dataset.multipleIssueBoardsAvailable),
+        projectId: Number(dataset.projectId),
+        groupId: Number(dataset.groupId),
+        scopedIssueBoardFeatureEnabled: parseBoolean(dataset.scopedIssueBoardFeatureEnabled),
+        weights: JSON.parse(dataset.weights),
+      };
+
+      return { boardsSelectorProps };
+    },
+    render(createElement) {
+      return createElement(BoardsSelector, {
+        props: this.boardsSelectorProps,
+      });
     },
   });
 };

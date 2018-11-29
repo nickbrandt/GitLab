@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Environment < ActiveRecord::Base
-  prepend EE::Environment
-
   # Used to generate random suffixes for the slug
   LETTERS = 'a'..'z'
   NUMBERS = '0'..'9'
@@ -250,3 +248,5 @@ class Environment < ActiveRecord::Base
     (0..5).map { SUFFIX_CHARS.sample }.join
   end
 end
+
+Environment.prepend(EE::Environment)

@@ -1,4 +1,4 @@
-class CorrectProtectedAccessLevelsForeignKeys < ActiveRecord::Migration
+class CorrectProtectedAccessLevelsForeignKeys < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   # Set this constant to true if this migration requires downtime.

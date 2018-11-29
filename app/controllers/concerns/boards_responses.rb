@@ -85,3 +85,5 @@ module BoardsResponses
     end
   end
 end
+
+BoardsResponses.prepend(EE::BoardsResponses)

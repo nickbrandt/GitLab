@@ -1,5 +1,0 @@
----
-title: Move `prepend` outside the `class` block for finders
-merge_request: 8192
-author: George Tsiolis
-type: other

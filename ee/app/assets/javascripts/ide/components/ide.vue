@@ -12,7 +12,5 @@ export default {
 </script>
 
 <template>
-  <ide
-    :right-pane-component="$options.EERightPane"
-  />
+  <ide :right-pane-component="$options.EERightPane" />
 </template>

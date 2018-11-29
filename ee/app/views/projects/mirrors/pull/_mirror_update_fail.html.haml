@@ -5,4 +5,4 @@
     .card-body
       %pre
         :preserve
-          #{h(@project.import_error.try(:strip))}
+          #{h(@project.import_state.last_error.try(:strip))}

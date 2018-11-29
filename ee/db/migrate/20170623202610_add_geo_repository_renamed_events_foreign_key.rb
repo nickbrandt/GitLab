@@ -1,4 +1,4 @@
-class AddGeoRepositoryRenamedEventsForeignKey < ActiveRecord::Migration
+class AddGeoRepositoryRenamedEventsForeignKey < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

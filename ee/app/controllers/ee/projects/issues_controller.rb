@@ -6,6 +6,7 @@ module EE
       extend ActiveSupport::Concern
 
       prepended do
+        before_action :authenticate_user!, only: [:export_csv]
         before_action :check_export_issues_available!, only: [:export_csv]
         before_action :check_service_desk_available!, only: [:service_desk]
         before_action :whitelist_query_limiting_ee, only: [:update]
@@ -13,11 +14,6 @@ module EE
 
       class_methods do
         extend ::Gitlab::Utils::Override
-
-        override :authenticate_user_only_actions
-        def authenticate_user_only_actions
-          super + %i[export_csv]
-        end
 
         override :issue_except_actions
         def issue_except_actions
@@ -36,7 +32,7 @@ module EE
       end
 
       def export_csv
-        ExportCsvWorker.perform_async(current_user.id, project.id, filter_params.to_h)
+        ExportCsvWorker.perform_async(current_user.id, project.id, finder_options.to_h)
 
         index_path = project_issues_path(project)
         redirect_to(index_path, notice: "Your CSV export has started. It will be emailed to #{current_user.notification_email} when complete.")
@@ -51,16 +47,16 @@ module EE
         attrs
       end
 
-      def filter_params
-        params = super
-        params.reject! { |key| key == 'weight' } unless project.feature_available?(:issue_weights)
+      def finder_options
+        options = super
+        options.reject! { |key| key == 'weight' } unless project.feature_available?(:issue_weights)
 
         if service_desk?
-          params.reject! { |key| key == 'author_username' || key == 'author_id' }
-          params[:author_id] = ::User.support_bot
+          options.reject! { |key| key == 'author_username' || key == 'author_id' }
+          options[:author_id] = ::User.support_bot
         end
 
-        params
+        options
       end
 
       def service_desk?

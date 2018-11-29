@@ -153,10 +153,7 @@ export default {
 </script>
 
 <template>
-  <span
-    :style="itemStyles"
-    class="epic-timeline-cell"
-  >
+  <span :style="itemStyles" class="epic-timeline-cell">
     <div class="timeline-bar-wrapper">
       <a
         v-if="showTimelineBar"

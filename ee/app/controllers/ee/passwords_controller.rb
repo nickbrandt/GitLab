@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module PasswordsController
     extend ActiveSupport::Concern

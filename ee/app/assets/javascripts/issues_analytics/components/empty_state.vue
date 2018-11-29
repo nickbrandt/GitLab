@@ -26,12 +26,7 @@ export default {
 <template>
   <div class="row empty-state">
     <div class="col-12">
-      <div class="svg-content">
-        <img
-          class="content-image"
-          :src="imagePath"
-        />
-      </div>
+      <div class="svg-content"><img class="content-image" :src="imagePath" /></div>
     </div>
     <div class="col-12">
       <div class="text-content">

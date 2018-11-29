@@ -155,7 +155,7 @@
         "status_tooltip_html": null,
         "path": "/user6"
       },
-      "issue_id": null,
+      "issue_iid": null,
       "pipeline": {
         "id": 2,
         "path": "/namespace5/project5/pipelines/2"
@@ -228,7 +228,7 @@
         "status_tooltip_html": null,
         "path": "/user8"
       },
-      "issue_id": 1,
+      "issue_iid": 1,
       "pipeline": {
         "id": 3,
         "path": "/namespace6/project6/pipelines/3"
@@ -300,7 +300,7 @@
         "status_tooltip_html": null,
         "path": "/user6"
       },
-      "issue_id": null,
+      "issue_iid": null,
       "pipeline": {
         "id": 2,
         "path": "/namespace5/project5/pipelines/2"
@@ -323,7 +323,7 @@
         "status_tooltip_html": null,
         "path": "/user8"
       },
-      "issue_id": 1,
+      "issue_iid": 1,
       "pipeline": {
         "id": 3,
         "path": "/namespace6/project6/pipelines/3"

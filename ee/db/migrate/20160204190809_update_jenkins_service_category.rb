@@ -1,4 +1,4 @@
-class UpdateJenkinsServiceCategory < ActiveRecord::Migration
+class UpdateJenkinsServiceCategory < ActiveRecord::Migration[4.2]
   def up
     category = quote_column_name('category')
     type = quote_column_name('type')

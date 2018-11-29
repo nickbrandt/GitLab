@@ -4,6 +4,7 @@ module EE
     extend ::Gitlab::Utils::Override
 
     include ::Approvable
+    include ::Gitlab::Utils::StrongMemoize
 
     prepended do
       include Elastic::MergeRequestsSearch
@@ -48,7 +49,15 @@ module EE
     end
 
     def participant_approvers
-      approval_needed? ? approvers_left : []
+      strong_memoize(:participant_approvers) do
+        next [] unless approval_needed?
+
+        approvers = []
+        approvers.concat(overall_approvers(exclude_code_owners: true))
+        approvers.concat(approvers_from_groups)
+
+        ::User.where(id: approvers.map(&:id)).where.not(id: approved_by_users.select(:id))
+      end
     end
 
     def code_owners

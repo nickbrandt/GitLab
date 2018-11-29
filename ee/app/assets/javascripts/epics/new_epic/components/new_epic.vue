@@ -69,10 +69,7 @@ export default {
     >
       {{ s__('New epic') }}
     </button>
-    <div
-      :class="{ 'dropdown-menu-right' : alignRight }"
-      class="dropdown-menu"
-    >
+    <div :class="{ 'dropdown-menu-right': alignRight }" class="dropdown-menu">
       <input
         ref="title"
         v-model="title"

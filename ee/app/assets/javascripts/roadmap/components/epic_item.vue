@@ -38,10 +38,7 @@ export default {
 
 <template>
   <div class="epics-list-item clearfix">
-    <epic-item-details
-      :epic="epic"
-      :current-group-id="currentGroupId"
-    />
+    <epic-item-details :epic="epic" :current-group-id="currentGroupId" />
     <epic-item-timeline
       v-for="(timeframeItem, index) in timeframe"
       :key="index"

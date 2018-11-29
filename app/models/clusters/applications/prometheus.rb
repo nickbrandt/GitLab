@@ -14,8 +14,6 @@ module Clusters
       include ::Clusters::Concerns::ApplicationVersion
       include ::Clusters::Concerns::ApplicationData
 
-      prepend EE::Clusters::Applications::Prometheus
-
       default_value_for :version, VERSION
 
       state_machine :status do
@@ -79,3 +77,5 @@ module Clusters
     end
   end
 end
+
+Clusters::Applications::Prometheus.prepend(EE::Clusters::Applications::Prometheus)

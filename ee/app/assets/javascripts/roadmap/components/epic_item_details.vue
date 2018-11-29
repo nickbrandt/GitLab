@@ -74,13 +74,7 @@ export default {
 <template>
   <span class="epic-details-cell">
     <div class="epic-title">
-      <a
-        v-tooltip
-        :href="epic.webUrl"
-        :title="epic.title"
-        data-container="body"
-        class="epic-url"
-      >
+      <a v-tooltip :href="epic.webUrl" :title="epic.title" data-container="body" class="epic-url">
         {{ epic.title }}
       </a>
     </div>
@@ -95,11 +89,7 @@ export default {
       >
         {{ epic.groupName }} &middot;
       </span>
-      <span
-        class="epic-timeframe"
-        v-html="timeframeString"
-      >
-      </span>
+      <span class="epic-timeframe" v-html="timeframeString"> </span>
     </div>
   </span>
 </template>

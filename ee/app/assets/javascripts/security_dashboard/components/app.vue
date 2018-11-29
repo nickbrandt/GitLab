@@ -28,6 +28,10 @@ export default {
       type: String,
       required: true,
     },
+    emptyStateSvgPath: {
+      type: String,
+      required: true,
+    },
     vulnerabilitiesEndpoint: {
       type: String,
       required: true,
@@ -54,14 +58,14 @@ export default {
         title: s__('Security Reports|At this time, the security dashboard only supports SAST.'),
         content: `
           <a
-            title="${s__('Security Reports|Security Dashboard Documentation')}"
+            title="${s__('Security Reports|Security dashboard documentation')}"
             href="${this.dashboardDocumentation}"
             target="_blank"
             rel="noopener
             noreferrer"
           >
             <span class="vertical-align-middle">${s__(
-              'Security Reports|Security Dashboard Documentation',
+              'Security Reports|Security dashboard documentation',
             )}</span>
             ${spriteIcon('external-link', 's16 vertical-align-middle')}
           </a>
@@ -82,7 +86,7 @@ export default {
       'fetchVulnerabilitiesCount',
       'createIssue',
       'dismissVulnerability',
-      'undoDismissal',
+      'revertDismissal',
     ]),
   },
 };
@@ -95,25 +99,20 @@ export default {
       <tab active>
         <template slot="title">
           <span>{{ __('SAST') }}</span>
-          <span
-            v-if="sastCount"
-            class="badge badge-pill"
-          >
-            {{ sastCount }}
-          </span>
+          <span v-if="sastCount" class="badge badge-pill"> {{ sastCount }} </span>
           <span
             v-popover="popoverOptions"
             class="text-muted prepend-left-4"
             :aria-label="__('help')"
           >
-            <icon
-              name="question"
-              class="vertical-align-middle"
-            />
+            <icon name="question" class="vertical-align-middle" />
           </span>
         </template>
 
-        <security-dashboard-table />
+        <security-dashboard-table
+          :dashboard-documentation="dashboardDocumentation"
+          :empty-state-svg-path="emptyStateSvgPath"
+        />
       </tab>
     </tabs>
     <issue-modal
@@ -121,9 +120,9 @@ export default {
       :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
       :can-create-issue-permission="true"
       :can-create-feedback-permission="true"
-      @createNewIssue="createIssue({ vulnerability: modal.vulnerability })"
-      @dismissIssue="dismissVulnerability({ vulnerability: modal.vulnerability })"
-      @revertDismissIssue="undoDismissal({ vulnerability: modal.vulnerability })"
+      @createNewIssue="createIssue({ vulnerability: modal.vulnerability });"
+      @dismissIssue="dismissVulnerability({ vulnerability: modal.vulnerability });"
+      @revertDismissIssue="revertDismissal({ vulnerability: modal.vulnerability });"
     />
   </div>
 </template>

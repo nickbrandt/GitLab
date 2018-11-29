@@ -22,7 +22,7 @@ describe Projects::UpdateService, '#execute' do
       }
 
       stub_licensed_features(repository_mirrors: true)
-      expect(project).to receive(:force_import_job!).once
+      expect_any_instance_of(EE::ProjectImportState).to receive(:force_import_job!).once
 
       update_project(project, user, opts)
     end

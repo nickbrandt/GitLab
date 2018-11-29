@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Groups::LdapGroupLinksController < Groups::ApplicationController
   before_action :group
   before_action :require_ldap_enabled

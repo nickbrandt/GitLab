@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   class RepositoryVerificationFinder
     def initialize(shard_name: nil)

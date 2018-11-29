@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Admin::PushRulesController < Admin::ApplicationController
   before_action :check_push_rules_available!
   before_action :push_rule

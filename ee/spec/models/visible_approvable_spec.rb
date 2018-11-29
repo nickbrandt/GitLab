@@ -35,11 +35,24 @@ describe VisibleApprovable do
 
   describe '#overall_approvers' do
     let!(:project_approver) { create(:approver, target: project) }
+    let(:code_owner) { build(:user) }
+
+    before do
+      allow(resource).to receive(:code_owners).and_return([code_owner])
+    end
 
     subject { resource.overall_approvers }
 
     it 'returns a list of all the project approvers' do
-      is_expected.to match_array(project_approver.user)
+      is_expected.to contain_exactly(project_approver.user, code_owner)
+    end
+
+    context 'when exclude_code_owners is true' do
+      subject { resource.overall_approvers(exclude_code_owners: true) }
+
+      it 'excludes code owners' do
+        is_expected.to contain_exactly(project_approver.user)
+      end
     end
 
     context 'when author is approver' do
@@ -60,7 +73,7 @@ describe VisibleApprovable do
       let!(:approver) { create(:approver, target: resource) }
 
       it 'returns the list of all the merge request user approvers' do
-        is_expected.to match_array(approver.user)
+        is_expected.to contain_exactly(approver.user)
       end
     end
   end

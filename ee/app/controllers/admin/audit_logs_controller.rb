@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Admin::AuditLogsController < Admin::ApplicationController
   before_action :check_license_admin_audit_log_available!
 

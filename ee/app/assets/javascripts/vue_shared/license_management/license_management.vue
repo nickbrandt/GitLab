@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlButton, GlLoadingIcon } from '@gitlab-org/gitlab-ui';
+import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import AddLicenseForm from './components/add_license_form.vue';
 import LicenseManagementRow from './components/license_management_row.vue';
@@ -53,24 +53,16 @@ export default {
 </script>
 <template>
   <div class="license-management">
-    <delete-confirmation-modal/>
-    <gl-loading-icon v-if="isLoadingManagedLicenses"/>
-    <ul
-      v-if="managedLicenses.length"
-      class="list-group list-group-flush"
-    >
+    <delete-confirmation-modal />
+    <gl-loading-icon v-if="isLoadingManagedLicenses" />
+    <ul v-if="managedLicenses.length" class="list-group list-group-flush">
       <license-management-row
         v-for="license in managedLicenses"
         :key="license.name"
         :license="license"
       />
     </ul>
-    <div
-      v-else
-      class="bs-callout bs-callout-warning"
-    >
-      {{ $options.emptyMessage }}
-    </div>
+    <div v-else class="bs-callout bs-callout-warning">{{ $options.emptyMessage }}</div>
     <div class="prepend-top-default">
       <add-license-form
         v-if="formIsOpen"
@@ -78,12 +70,7 @@ export default {
         @addLicense="setLicenseApproval"
         @closeForm="closeAddLicenseForm"
       />
-      <gl-button
-        v-else
-        class="js-open-form"
-        variant="default"
-        @click="openAddLicenseForm"
-      >
+      <gl-button v-else class="js-open-form" variant="default" @click="openAddLicenseForm">
         {{ s__('LicenseManagement|Add a license') }}
       </gl-button>
     </div>

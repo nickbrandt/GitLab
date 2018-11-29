@@ -1,4 +1,4 @@
-class AddGeoUploadDeletedEventsForeignKey < ActiveRecord::Migration
+class AddGeoUploadDeletedEventsForeignKey < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

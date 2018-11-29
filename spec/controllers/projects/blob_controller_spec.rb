@@ -141,28 +141,6 @@ describe Projects::BlobController do
           expect(lines.first).to have_key('rich_text')
         end
 
-        context 'comment in any diff line feature flag' do
-          it 'renders context lines when feature disabled' do
-            stub_feature_flags(comment_in_any_diff_line: false)
-
-            do_get(since: 1, to: 5, offset: 10, from_merge_request: true)
-            lines = JSON.parse(response.body)
-            all_context = lines.all? { |line| line['type'] == 'context' }
-
-            expect(all_context).to be(true)
-          end
-
-          it 'renders unchanged lines when feature enabled' do
-            stub_feature_flags(comment_in_any_diff_line: true)
-
-            do_get(since: 1, to: 5, offset: 10, from_merge_request: true)
-            lines = JSON.parse(response.body)
-            all_unchanged = lines.all? { |line| line['type'].nil? }
-
-            expect(all_unchanged).to be(true)
-          end
-        end
-
         context 'when rendering match lines' do
           it 'adds top match line when "since" is less than 1' do
             do_get(since: 5, to: 10, offset: 10, from_merge_request: true)
@@ -174,7 +152,7 @@ describe Projects::BlobController do
             expect(match_line['meta_data']).to have_key('new_pos')
           end
 
-          it 'does not add top match line when when "since" is equal 1' do
+          it 'does not add top match line when "since" is equal 1' do
             do_get(since: 1, to: 10, offset: 10, from_merge_request: true)
 
             match_line = JSON.parse(response.body).first

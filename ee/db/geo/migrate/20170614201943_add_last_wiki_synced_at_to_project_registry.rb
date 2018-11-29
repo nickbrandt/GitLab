@@ -1,4 +1,4 @@
-class AddLastWikiSyncedAtToProjectRegistry < ActiveRecord::Migration
+class AddLastWikiSyncedAtToProjectRegistry < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def change

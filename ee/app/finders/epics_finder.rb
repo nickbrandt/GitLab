@@ -1,4 +1,21 @@
+# frozen_string_literal: true
+
 class EpicsFinder < IssuableFinder
+  def self.scalar_params
+    @scalar_params ||= %i[
+      author_id
+      author_username
+      label_name
+      start_date
+      end_date
+      search
+    ]
+  end
+
+  def self.array_params
+    @array_params ||= { label_name: [] }
+  end
+
   def klass
     Epic
   end

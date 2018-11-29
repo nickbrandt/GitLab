@@ -1,5 +1,5 @@
 # rubocop:disable Migration/UpdateLargeTable
-class AddSyncScheduleToProjectsAndRemoteProjects < ActiveRecord::Migration
+class AddSyncScheduleToProjectsAndRemoteProjects < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

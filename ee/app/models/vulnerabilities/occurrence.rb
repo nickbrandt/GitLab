@@ -86,7 +86,7 @@ module Vulnerabilities
         categories = items.group_by { |i| i[:category] }
         fingerprints = items.group_by { |i| i[:project_fingerprint] }
 
-        VulnerabilityFeedback.all_preloaded.where(
+        Vulnerabilities::Feedback.all_preloaded.where(
           project_id: project_ids.keys,
           category: categories.keys,
           project_fingerprint: fingerprints.keys).find_each do |feedback|

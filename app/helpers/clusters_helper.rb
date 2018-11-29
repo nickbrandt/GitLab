@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module ClustersHelper
-  prepend EE::ClustersHelper
-
   # EE overrides this
   def has_multiple_clusters?
     false
@@ -17,3 +15,5 @@ module ClustersHelper
     end
   end
 end
+
+ClustersHelper.prepend(EE::ClustersHelper)

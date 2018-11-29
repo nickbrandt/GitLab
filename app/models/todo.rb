@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Todo < ActiveRecord::Base
-  prepend EE::Todo
   include Sortable
   include FromUnion
 
@@ -192,3 +191,5 @@ class Todo < ActiveRecord::Base
     project.repository.keep_around(self.commit_id)
   end
 end
+
+Todo.prepend(EE::Todo)

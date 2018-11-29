@@ -6,6 +6,20 @@ describe API::Projects do
   let(:user) { create(:user) }
   let(:project) { create(:project, namespace: user.namespace) }
 
+  describe 'GET /projects' do
+    it 'does not break on license checks' do
+      stub_licensed_features(external_authorization_service: true)
+      enable_namespace_license_check!
+
+      create(:project, :private, namespace: user.namespace)
+      create(:project, :public, namespace: user.namespace)
+
+      get api('/projects', user)
+
+      expect(response).to have_gitlab_http_status(200)
+    end
+  end
+
   describe 'POST /projects' do
     context 'when importing with mirror attributes' do
       let(:import_url) { generate(:url) }
@@ -163,7 +177,7 @@ describe API::Projects do
           mirror_params[:mirror_user_id] = admin.id
           project.add_maintainer(admin)
 
-          expect_any_instance_of(EE::Project).to receive(:force_import_job!).once
+          expect_any_instance_of(EE::ProjectImportState).to receive(:force_import_job!).once
 
           put(api("/projects/#{project.id}", admin), mirror_params)
 
@@ -180,7 +194,7 @@ describe API::Projects do
       end
 
       it 'updates mirror related attributes' do
-        expect_any_instance_of(EE::Project).to receive(:force_import_job!).once
+        expect_any_instance_of(EE::ProjectImportState).to receive(:force_import_job!).once
 
         put(api("/projects/#{project.id}", user), mirror_params)
 
@@ -254,6 +268,54 @@ describe API::Projects do
         expect(json_response).to be_an Array
         expect(json_response.length).to eq(1)
         expect(json_response.first['id']).to eq project.id
+      end
+    end
+  end
+
+  describe 'GET /projects/:id' do
+    context 'with external authorization' do
+      let(:project) do
+        create(:project,
+               namespace: user.namespace,
+               external_authorization_classification_label: 'the-label')
+      end
+
+      context 'when the user has access to the project' do
+        before do
+          external_service_allow_access(user, project)
+        end
+
+        it 'includes the label in the response' do
+          get api("/projects/#{project.id}", user)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response['external_authorization_classification_label']).to eq('the-label')
+        end
+      end
+
+      context 'when the external service denies access' do
+        before do
+          external_service_deny_access(user, project)
+        end
+
+        it 'returns a 404' do
+          get api("/projects/#{project.id}", user)
+
+          expect(response).to have_gitlab_http_status(404)
+        end
+      end
+
+      context 'it does not return the label when the feature is not available' do
+        before do
+          stub_licensed_features(external_authorization_service: false)
+        end
+
+        it 'does not include the label in the response' do
+          get api("/projects/#{project.id}", user)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response['external_authorization_classification_label']).to be_nil
+        end
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Boards
   class UsersFinder
     def initialize(board, current_user = nil)

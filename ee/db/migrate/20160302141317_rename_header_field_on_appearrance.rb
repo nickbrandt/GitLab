@@ -1,5 +1,5 @@
 # rubocop:disable Migration/RemoveColumn
-class RenameHeaderFieldOnAppearrance < ActiveRecord::Migration
+class RenameHeaderFieldOnAppearrance < ActiveRecord::Migration[4.2]
   def up
     unless column_exists?(:appearances, :header_logo)
       rename_column :appearances, :light_logo, :header_logo

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class SlackSlashCommandsService < SlashCommandsService
-  prepend EE::SlackSlashCommandsService
   include TriggersHelper
 
   def title
@@ -29,3 +28,5 @@ class SlackSlashCommandsService < SlashCommandsService
     Slack::Notifier::LinkFormatter.format(text) if text
   end
 end
+
+SlackSlashCommandsService.prepend(EE::SlackSlashCommandsService)

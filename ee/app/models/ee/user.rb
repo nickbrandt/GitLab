@@ -28,7 +28,7 @@ module EE
       has_many :epics,                    foreign_key: :author_id
       has_many :assigned_epics,           foreign_key: :assignee_id, class_name: "Epic"
       has_many :path_locks,               dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
-      has_many :vulnerability_feedback,  foreign_key: :author_id
+      has_many :vulnerability_feedback,  foreign_key: :author_id, class_name: 'Vulnerabilities::Feedback'
 
       has_many :approvals,                dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
       has_many :approvers,                dependent: :destroy # rubocop: disable Cop/ActiveRecordDependent
@@ -44,6 +44,8 @@ module EE
       has_many :protected_branch_merge_access_levels, dependent: :destroy, class_name: ::ProtectedBranch::MergeAccessLevel # rubocop:disable Cop/ActiveRecordDependent
       has_many :protected_branch_push_access_levels, dependent: :destroy, class_name: ::ProtectedBranch::PushAccessLevel # rubocop:disable Cop/ActiveRecordDependent
       has_many :protected_branch_unprotect_access_levels, dependent: :destroy, class_name: ::ProtectedBranch::UnprotectAccessLevel # rubocop:disable Cop/ActiveRecordDependent
+
+      has_many :smartcard_identities
 
       scope :excluding_guests, -> { joins(:members).where('members.access_level > ?', ::Gitlab::Access::GUEST).distinct }
 
@@ -76,6 +78,11 @@ module EE
       def non_ldap
         joins('LEFT JOIN identities ON identities.user_id = users.id')
           .where('identities.provider IS NULL OR identities.provider NOT LIKE ?', 'ldap%')
+      end
+
+      def find_by_smartcard_identity(certificate_subject, certificate_issuer)
+        joins(:smartcard_identities)
+          .find_by(smartcard_identities: { subject: certificate_subject, issuer: certificate_issuer })
       end
     end
 
@@ -170,9 +177,34 @@ module EE
                     project_creation_level: project_creation_levels)
     end
 
+    def any_namespace_with_trial?
+      ::Namespace
+        .from("(#{namespace_union(:trial_ends_on)}) #{::Namespace.table_name}")
+        .where('trial_ends_on > ?', Time.now.utc)
+        .any?
+    end
+
+    def any_namespace_with_gold?
+      ::Namespace
+        .includes(:plan)
+        .where("namespaces.id IN (#{namespace_union})") # rubocop:disable GitlabSecurity/SqlInjection
+        .where.not(plans: { id: nil })
+        .any?
+    end
+
     override :has_current_license?
     def has_current_license?
       License.current.present?
+    end
+
+    def group_sso?(group)
+      return false unless group
+
+      if group_saml_identities.loaded?
+        group_saml_identities.any? { |identity| identity.saml_provider.group_id == group.id }
+      else
+        group_saml_identities.where(saml_provider: group.saml_provider).any?
+      end
     end
 
     override :ldap_sync_time
@@ -184,14 +216,13 @@ module EE
       update_column :admin_email_unsubscribed_at, Time.now
     end
 
-    def group_sso?(group)
-      return false unless group
+    private
 
-      if group_saml_identities.loaded?
-        group_saml_identities.any? { |identity| identity.saml_provider.group_id == group.id }
-      else
-        group_saml_identities.where(saml_provider: group.saml_provider).any?
-      end
+    def namespace_union(select = :id)
+      ::Gitlab::SQL::Union.new([
+        ::Namespace.select(select).where(type: nil, owner: self),
+        owned_groups.select(select).where(parent_id: nil)
+      ]).to_sql
     end
   end
 end

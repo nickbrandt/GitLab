@@ -21,9 +21,6 @@ export default {
 
 <template>
   <div class="block participants">
-    <participants
-      :participants="participants"
-      @toggleSidebar="onToggleSidebar"
-    />
+    <participants :participants="participants" @toggleSidebar="onToggleSidebar" />
   </div>
 </template>

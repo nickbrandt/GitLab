@@ -1,4 +1,4 @@
-class AddCiPipelineSourcePipelineIndexes < ActiveRecord::Migration
+class AddCiPipelineSourcePipelineIndexes < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

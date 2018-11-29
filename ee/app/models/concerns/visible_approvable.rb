@@ -24,12 +24,14 @@ module VisibleApprovable
   # on the MR create page.
   #
   # @return [Array<User>]
-  def overall_approvers
+  def overall_approvers(exclude_code_owners: false)
+    code_owners = [] if exclude_code_owners
+
     if approvers_overwritten?
-      code_owners = [] # already persisted into database, no need to recompute
+      code_owners ||= [] # already persisted into database, no need to recompute
       approvers_relation = approvers
     else
-      code_owners = self.code_owners.dup
+      code_owners ||= self.code_owners.dup
       approvers_relation = target_project.approvers
     end
 

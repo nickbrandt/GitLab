@@ -63,34 +63,38 @@ describe ProjectImportData do
   end
 
   describe 'credential fields accessors' do
-    let(:accessors) { %i[auth_method password ssh_known_hosts ssh_known_hosts_verified_at ssh_known_hosts_verified_by_id ssh_private_key user] }
+    %i[
+      auth_method
+      password
+      ssh_known_hosts
+      ssh_known_hosts_verified_at
+      ssh_known_hosts_verified_by_id
+      ssh_private_key
+      user
+    ].each do |field|
+      context "#{field} accessor" do
+        it 'sets the value in the credentials hash' do
+          import_data.send("#{field}=", 'foo')
 
-    it { expect(described_class::CREDENTIALS_FIELDS).to contain_exactly(*accessors) }
+          expect(import_data.credentials[field]).to eq('foo')
+        end
 
-    where(:field) { described_class::CREDENTIALS_FIELDS }
+        it 'sets a not-present value to nil' do
+          import_data.send("#{field}=", '')
 
-    with_them do
-      it 'sets the value in the credentials hash' do
-        import_data.send("#{field}=", 'foo')
+          expect(import_data.credentials[field]).to be_nil
+        end
 
-        expect(import_data.credentials[field]).to eq('foo')
-      end
+        it 'returns the data in the credentials hash' do
+          import_data.credentials[field] = 'foo'
 
-      it 'sets a not-present value to nil' do
-        import_data.send("#{field}=", '')
-
-        expect(import_data.credentials[field]).to be_nil
-      end
-
-      it 'returns the data in the credentials hash' do
-        import_data.credentials[field] = 'foo'
-
-        expect(import_data.send(field)).to eq('foo')
+          expect(import_data.send(field)).to eq('foo')
+        end
       end
     end
   end
 
-  describe '#ssh_import?' do
+  describe '#ssh_mirror_url?' do
     where(:import_url, :expected) do
       'ssh://example.com'   | true
       'git://example.com'   | false
@@ -100,7 +104,7 @@ describe ProjectImportData do
     end
 
     with_them do
-      subject { import_data.ssh_import? }
+      subject { import_data.ssh_mirror_url? }
 
       it { is_expected.to eq(expected) }
     end

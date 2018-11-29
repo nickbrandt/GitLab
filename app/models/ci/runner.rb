@@ -8,8 +8,6 @@ module Ci
     include RedisCacheable
     include ChronicDurationAttribute
     include FromUnion
-    prepend EE::Ci::Runner
-
     enum access_level: {
       not_protected: 0,
       ref_protected: 1
@@ -321,3 +319,5 @@ module Ci
     end
   end
 end
+
+Ci::Runner.prepend(EE::Ci::Runner)

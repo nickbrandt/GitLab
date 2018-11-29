@@ -18,10 +18,7 @@ export default {
 </script>
 
 <template>
-  <div
-    :class="{ 'has-value': !!query }"
-    class="dropdown-input"
-  >
+  <div :class="{ 'has-value': !!query }" class="dropdown-input">
     <input
       v-model.trim="query"
       :placeholder="__('Search')"
@@ -29,11 +26,7 @@ export default {
       class="dropdown-input-field"
       @keyup="handleInputChange"
     />
-    <i
-      class="fa fa-search dropdown-input-search"
-      aria-hidden="true"
-      data-hidden="true"
-    ></i>
+    <i class="fa fa-search dropdown-input-search" aria-hidden="true" data-hidden="true"></i>
     <i
       role="button"
       class="fa fa-times dropdown-input-clear"

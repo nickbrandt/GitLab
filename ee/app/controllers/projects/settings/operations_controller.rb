@@ -4,8 +4,7 @@ module Projects
   module Settings
     class OperationsController < Projects::ApplicationController
       before_action :check_license
-      before_action :authorize_update_environment!, only: [:create, :update]
-      before_action :authorize_read_environment!, only: [:show]
+      before_action :authorize_update_environment!
 
       def show
         @tracing_settings ||= ProjectTracingSetting.for_project(@project)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Groups::OmniauthCallbacksController < OmniauthCallbacksController
   extend ::Gitlab::Utils::Override
 

@@ -1,8 +1,10 @@
 <script>
-import { mapState, mapGetters } from 'vuex';
-import ParallelDraftCommentRow from 'ee/batch_comments/components/parallel_draft_comment_row.vue';
+import { mapGetters } from 'vuex';
 import parallelDiffTableRow from './parallel_diff_table_row.vue';
 import parallelDiffCommentRow from './parallel_diff_comment_row.vue';
+
+// eslint-disable-next-line import/order
+import ParallelDraftCommentRow from 'ee/batch_comments/components/parallel_draft_comment_row.vue';
 
 export default {
   components: {
@@ -21,51 +23,43 @@ export default {
     },
   },
   computed: {
-    ...mapGetters('diffs', ['commitId', 'shouldRenderParallelCommentRow']),
+    ...mapGetters('diffs', ['commitId']),
     ...mapGetters('batchComments', ['shouldRenderParallelDraftRow', 'draftForLine']),
-    ...mapState({
-      diffLineCommentForms: state => state.diffs.diffLineCommentForms,
-    }),
     diffLinesLength() {
       return this.diffLines.length;
     },
-    userColorScheme() {
-      return window.gon.user_color_scheme;
-    },
   },
+  userColorScheme: window.gon.user_color_scheme,
 };
 </script>
 
 <template>
   <div
-    :class="userColorScheme"
+    :class="$options.userColorScheme"
     :data-commit-id="commitId"
     class="code diff-wrap-lines js-syntax-highlight text-file"
   >
     <table>
       <tbody>
-        <template
-          v-for="(line, index) in diffLines"
-        >
+        <template v-for="(line, index) in diffLines">
           <parallel-diff-table-row
             :key="index"
-            :file-hash="diffFile.fileHash"
-            :context-lines-path="diffFile.contextLinesPath"
+            :file-hash="diffFile.file_hash"
+            :context-lines-path="diffFile.context_lines_path"
             :line="line"
             :is-bottom="index + 1 === diffLinesLength"
           />
           <parallel-diff-comment-row
-            v-if="shouldRenderParallelCommentRow(line)"
             :key="`dcr-${index}`"
             :line="line"
-            :diff-file-hash="diffFile.fileHash"
+            :diff-file-hash="diffFile.file_hash"
             :line-index="index"
           />
           <parallel-draft-comment-row
-            v-if="shouldRenderParallelDraftRow(diffFile.fileHash, line)"
+            v-if="shouldRenderParallelDraftRow(diffFile.file_hash, line)"
             :key="`drafts-${index}`"
             :line="line"
-            :diff-file-content-sha="diffFile.fileHash"
+            :diff-file-content-sha="diffFile.file_hash"
           />
         </template>
       </tbody>

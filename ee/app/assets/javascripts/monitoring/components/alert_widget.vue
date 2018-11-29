@@ -3,7 +3,7 @@ import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import AlertWidgetForm from './alert_widget_form.vue';
 import AlertsService from '../services/alerts_service';
-import { GlLoadingIcon } from '@gitlab-org/gitlab-ui';
+import { GlLoadingIcon } from '@gitlab/ui';
 
 export default {
   components: {
@@ -185,24 +185,10 @@ export default {
 </script>
 
 <template>
-  <div
-    :class="{ show: isOpen }"
-    class="prometheus-alert-widget dropdown"
-  >
-    <span
-      v-if="errorMessage"
-      class="alert-error-message"
-    >
-      {{ errorMessage }}
-    </span>
-    <span
-      v-else
-      class="alert-current-setting"
-    >
-      <gl-loading-icon
-        v-show="isLoading"
-        :inline="true"
-      />
+  <div :class="{ show: isOpen }" class="prometheus-alert-widget dropdown">
+    <span v-if="errorMessage" class="alert-error-message"> {{ errorMessage }} </span>
+    <span v-else class="alert-current-setting">
+      <gl-loading-icon v-show="isLoading" :inline="true" />
       {{ alertSummary }}
     </span>
     <button
@@ -211,22 +197,10 @@ export default {
       type="button"
       @click="handleDropdownToggle"
     >
-      <icon
-        :name="alertIcon"
-        :size="16"
-        aria-hidden="true"
-      />
-      <icon
-        :size="16"
-        name="arrow-down"
-        aria-hidden="true"
-        class="chevron"
-      />
+      <icon :name="alertIcon" :size="16" aria-hidden="true" />
+      <icon :size="16" name="arrow-down" aria-hidden="true" class="chevron" />
     </button>
-    <div
-      ref="dropdownMenu"
-      class="dropdown-menu alert-dropdown-menu"
-    >
+    <div ref="dropdownMenu" class="dropdown-menu alert-dropdown-menu">
       <div class="dropdown-title">
         <span>{{ dropdownTitle }}</span>
         <button
@@ -235,11 +209,7 @@ export default {
           aria-label="Close"
           @click="handleDropdownClose"
         >
-          <icon
-            :size="12"
-            name="close"
-            aria-hidden="true"
-          />
+          <icon :size="12" name="close" aria-hidden="true" />
         </button>
       </div>
       <div class="dropdown-content">

@@ -1,14 +1,11 @@
 import Vue from 'vue';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import Alerts from 'ee/operations/components/dashboard/alerts.vue';
-import Icon from '~/vue_shared/components/icon.vue';
 import { removeWhitespace } from 'spec/helpers/vue_component_helper';
-import { getChildInstances } from '../../helpers';
 import { mockOneProject } from '../../mock_data';
 
 describe('alerts component', () => {
   const AlertsComponent = Vue.extend(Alerts);
-  const IconComponent = Vue.extend(Icon);
   const mockPath = 'https://mock-alert_path/';
   const mount = (props = {}) => mountComponentWithStore(AlertsComponent, { props });
   let vm;
@@ -65,12 +62,7 @@ describe('alerts component', () => {
   describe('wrapped components', () => {
     describe('icon', () => {
       it('renders warning', () => {
-        const icons = getChildInstances(vm, IconComponent);
-
-        expect(icons.length).toBe(1);
-        const [icon] = icons;
-
-        expect(icon.name).toBe('warning');
+        expect(vm.$el.querySelector('.ic-warning')).not.toBe(null);
       });
     });
   });

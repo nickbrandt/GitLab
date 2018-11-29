@@ -1095,7 +1095,21 @@ describe Gitlab::Git::Repository, :seed_helper do
     end
 
     it 'returns no Gitaly::DiffStats when there is a nil SHA' do
+      expect_any_instance_of(Gitlab::GitalyClient::CommitService)
+        .not_to receive(:diff_stats)
+
       collection = repository.diff_stats(nil, 'master')
+
+      expect(collection).to be_a(Gitlab::Git::DiffStatsCollection)
+      expect(collection).to be_a(Enumerable)
+      expect(collection.to_a).to be_empty
+    end
+
+    it 'returns no Gitaly::DiffStats when there is a BLANK_SHA' do
+      expect_any_instance_of(Gitlab::GitalyClient::CommitService)
+        .not_to receive(:diff_stats)
+
+      collection = repository.diff_stats(Gitlab::Git::BLANK_SHA, 'master')
 
       expect(collection).to be_a(Gitlab::Git::DiffStatsCollection)
       expect(collection).to be_a(Enumerable)
@@ -1454,6 +1468,19 @@ describe Gitlab::Git::Repository, :seed_helper do
           expect { repository.write_ref(ref_path, ref) }.to raise_error(ArgumentError)
         end
       end
+    end
+
+    it 'writes the HEAD' do
+      repository.write_ref('HEAD', 'refs/heads/feature')
+
+      expect(repository.commit('HEAD')).to eq(repository.commit('feature'))
+      expect(repository.root_ref).to eq('feature')
+    end
+
+    it 'writes other refs' do
+      repository.write_ref('refs/heads/feature', SeedRepo::Commit::ID)
+
+      expect(repository.commit('feature').sha).to eq(SeedRepo::Commit::ID)
     end
   end
 

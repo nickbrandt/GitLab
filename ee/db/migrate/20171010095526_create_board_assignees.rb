@@ -1,4 +1,4 @@
-class CreateBoardAssignees < ActiveRecord::Migration
+class CreateBoardAssignees < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   disable_ddl_transaction!

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 
 import Translate from '~/vue_shared/translate';
-import { convertPermissionToBoolean } from '~/lib/utils/common_utils';
+import { parseBoolean } from '~/lib/utils/common_utils';
 
 import GeoNodesStore from './store/geo_nodes_store';
 import GeoNodesService from './service/geo_nodes_service';
@@ -24,8 +24,8 @@ export default () => {
     },
     data() {
       const { dataset } = this.$options.el;
-      const nodeActionsAllowed = convertPermissionToBoolean(dataset.nodeActionsAllowed);
-      const nodeEditAllowed = convertPermissionToBoolean(dataset.nodeEditAllowed);
+      const nodeActionsAllowed = parseBoolean(dataset.nodeActionsAllowed);
+      const nodeEditAllowed = parseBoolean(dataset.nodeEditAllowed);
       const store = new GeoNodesStore(dataset.primaryVersion, dataset.primaryRevision);
       const service = new GeoNodesService();
 

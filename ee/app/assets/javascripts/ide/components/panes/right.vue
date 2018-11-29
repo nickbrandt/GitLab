@@ -16,5 +16,5 @@ export default {
 </script>
 
 <template>
-  <right-pane :extension-tabs="extensionTabs"/>
+  <right-pane :extension-tabs="extensionTabs" />
 </template>

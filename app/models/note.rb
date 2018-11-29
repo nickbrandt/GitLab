@@ -5,8 +5,6 @@
 # A note of this type is never resolvable.
 class Note < ActiveRecord::Base
   extend ActiveModel::Naming
-  prepend EE::Note
-
   include Participable
   include Mentionable
   include Awardable
@@ -326,7 +324,7 @@ class Note < ActiveRecord::Base
   end
 
   def to_ability_name
-    for_personal_snippet? ? 'personal_snippet' : noteable_type.underscore
+    for_snippet? ? noteable.class.name.underscore : noteable_type.underscore
   end
 
   def can_be_discussion_note?
@@ -491,3 +489,5 @@ class Note < ActiveRecord::Base
     system_note_metadata&.cross_reference_types&.include?(system_note_metadata&.action)
   end
 end
+
+Note.prepend(EE::Note)

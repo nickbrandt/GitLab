@@ -1,5 +1,5 @@
 # rubocop:disable Migration/Timestamps
-class CreateAppearances < ActiveRecord::Migration
+class CreateAppearances < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def change

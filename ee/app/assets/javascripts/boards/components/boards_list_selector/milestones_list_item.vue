@@ -15,14 +15,8 @@ export default {
 </script>
 
 <template>
-  <li
-    class="filter-dropdown-item"
-    @click="handleItemClick"
-  >
-    <button
-      class="btn btn-link dropdown-user"
-      type="button"
-    >
+  <li class="filter-dropdown-item" @click="handleItemClick">
+    <button class="btn btn-link dropdown-user" type="button">
       <div class="dropdown-user-details">
         <div :title="item.title">{{ item.title }}</div>
       </div>

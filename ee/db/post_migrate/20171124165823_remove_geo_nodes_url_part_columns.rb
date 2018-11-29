@@ -1,4 +1,4 @@
-class RemoveGeoNodesUrlPartColumns < ActiveRecord::Migration
+class RemoveGeoNodesUrlPartColumns < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

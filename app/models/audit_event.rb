@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class AuditEvent < ActiveRecord::Base
-  prepend EE::AuditEvent
-
   serialize :details, Hash # rubocop:disable Cop/ActiveRecordSerialize
 
   belongs_to :user, foreign_key: :author_id
@@ -21,3 +19,5 @@ class AuditEvent < ActiveRecord::Base
     self.user.name
   end
 end
+
+AuditEvent.prepend(EE::AuditEvent)

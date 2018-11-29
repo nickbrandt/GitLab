@@ -69,6 +69,19 @@ module EE
       create_note(NoteSummary.new(object_epic, nil, user, body, action: action))
     end
 
+    def issue_promoted(noteable, noteable_ref, author, direction:)
+      unless [:to, :from].include?(direction)
+        raise ArgumentError, "Invalid direction `#{direction}`"
+      end
+
+      project = noteable.project
+
+      cross_reference = noteable_ref.to_reference(project || noteable.group)
+      body = "promoted #{direction} #{noteable_ref.class.to_s.downcase} #{cross_reference}"
+
+      create_note(NoteSummary.new(noteable, project, author, body, action: 'moved'))
+    end
+
     def issue_on_epic(issue, epic, user, type)
       return unless validate_epic_issue_action_type(type)
 

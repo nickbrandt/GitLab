@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module VersionCheckHelper
-  prepend EE::VersionCheckHelper
-
   def version_status_badge
     return unless Rails.env.production?
     return unless Gitlab::CurrentSettings.version_check_enabled
@@ -25,3 +23,5 @@ module VersionCheckHelper
     'gitlab-ce'
   end
 end
+
+VersionCheckHelper.prepend(EE::VersionCheckHelper)

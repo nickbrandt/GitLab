@@ -1,6 +1,6 @@
 # rubocop:disable Migration/UpdateColumnInBatches
 # rubocop:disable Migration/UpdateLargeTable
-class UpdateMirrorWhenEmptyImportUrlInProjects < ActiveRecord::Migration
+class UpdateMirrorWhenEmptyImportUrlInProjects < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   disable_ddl_transaction!

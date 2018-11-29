@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AddRoadmapLayoutToUsers < ActiveRecord::Migration
+class AddRoadmapLayoutToUsers < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

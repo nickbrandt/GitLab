@@ -1,10 +1,19 @@
 module EE
   module Ci
     module PipelinePresenter
-      EE_FAILURE_REASONS = {
-        activity_limit_exceeded: 'Pipeline activity limit exceeded!',
-        size_limit_exceeded: 'Pipeline size limit exceeded!'
-      }.freeze
+      extend ActiveSupport::Concern
+
+      class_methods do
+        extend ::Gitlab::Utils::Override
+
+        override :failure_reasons
+        def failure_reasons
+          super.merge(
+            activity_limit_exceeded: 'Pipeline activity limit exceeded!',
+            size_limit_exceeded: 'Pipeline size limit exceeded!'
+          )
+        end
+      end
 
       def expose_security_dashboard?
         any_report_artifact_for_type(:sast) ||

@@ -2,12 +2,13 @@
 
 module Ci
   class PipelinePresenter < Gitlab::View::Presenter::Delegated
-    prepend ::EE::Ci::PipelinePresenter
     include Gitlab::Utils::StrongMemoize
 
-    FAILURE_REASONS = {
-      config_error: 'CI/CD YAML configuration error!'
-    }.merge(EE_FAILURE_REASONS)
+    # We use a class method here instead of a constant, allowing EE to redefine
+    # the returned `Hash` more easily.
+    def self.failure_reasons
+      { config_error: 'CI/CD YAML configuration error!' }
+    end
 
     presents :pipeline
 
@@ -22,7 +23,7 @@ module Ci
     def failure_reason
       return unless pipeline.failure_reason?
 
-      FAILURE_REASONS[pipeline.failure_reason.to_sym] ||
+      self.class.failure_reasons[pipeline.failure_reason.to_sym] ||
         pipeline.failure_reason
     end
 
@@ -33,3 +34,5 @@ module Ci
     end
   end
 end
+
+Ci::PipelinePresenter.prepend(EE::Ci::PipelinePresenter)

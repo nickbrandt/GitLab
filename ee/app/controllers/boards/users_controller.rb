@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Boards
   class UsersController < Boards::ApplicationController
     # Enumerates all users that are members of the board parent
@@ -5,6 +7,11 @@ module Boards
     # If board parent is a group it enumerates all members of current group,
     # ancestors, and descendants
     # rubocop: disable CodeReuse/ActiveRecord
+
+    include BoardsResponses
+
+    before_action :authorize_read_parent, only: [:index]
+
     def index
       user_ids = user_finder.execute.select(:user_id)
 

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Namespace < ActiveRecord::Base
-  prepend EE::Namespace
   include CacheMarkdownField
   include Sortable
   include Gitlab::ShellAdapter
@@ -191,7 +190,7 @@ class Namespace < ActiveRecord::Base
       .base_and_ancestors
   end
 
-  # returns all ancestors upto but excluding the the given namespace
+  # returns all ancestors upto but excluding the given namespace
   # when no namespace is given, all ancestors upto the top are returned
   def ancestors_upto(top = nil)
     Gitlab::GroupHierarchy.new(self.class.where(id: id))
@@ -311,3 +310,5 @@ class Namespace < ActiveRecord::Base
     end
   end
 end
+
+Namespace.prepend(EE::Namespace)

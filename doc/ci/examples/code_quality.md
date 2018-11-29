@@ -1,22 +1,18 @@
 # Analyze your project's Code Quality
 
 CAUTION: **Caution:**
-The job definition shown below is supported on GitLab 11.4 and later versions.
-For earlier versions, use the [old job definition](#old-job-definition).
-
-CAUTION: **Caution:**
-Code Quality was previously using `codeclimate` and `codequality` for job name and
-`codeclimate.json` for the artifact name. While these old names
-are still maintained they have been deprecated with GitLab 11.0 and may be removed
-in next major release, GitLab 12.0. You are advised to update your current `.gitlab-ci.yml`
-configuration to reflect that change.
+The job definition shown below is supported on GitLab 11.5 and later versions.
+It also requires the GitLab Runner 11.5 or later.
+For earlier versions, use the [previous job definitions](#previous-job-definitions).
 
 This example shows how to run Code Quality on your code by using GitLab CI/CD
 and Docker.
 
-First, you need GitLab Runner with [docker-in-docker executor][dind].
+First, you need GitLab Runner with
+[docker-in-docker executor](../docker/using_docker_build.md#use-docker-in-docker-executor).
 
-Once you set up the Runner, add a new job to `.gitlab-ci.yml`.
+Once you set up the Runner, add a new job to `.gitlab-ci.yml` that
+generates the expected report:
 
 ```yaml
 code_quality:
@@ -35,29 +31,30 @@ code_quality:
         "registry.gitlab.com/gitlab-org/security-products/codequality:$SP_VERSION" /code
   artifacts:
     reports:
-      codequality: [gl-code-quality-report.json]
+      codequality: gl-code-quality-report.json
 ```
 
 The above example will create a `code_quality` job in your CI/CD pipeline which
-will scan your source code for code quality issues. The report will be saved
-as an artifact that you can later download and analyze.
+will scan your source code for code quality issues. The report will be saved as a
+[Code Quality report artifact](../../ci/yaml/README.md#artifactsreportscodequality)
+that you can later download and analyze.
+Due to implementation limitations we always take the latest Code Quality artifact available.
 
 TIP: **Tip:**
-Starting with [GitLab Starter][ee] 11.4, this information will be automatically
-extracted and shown right in the merge request widget. To do so, the CI/CD job
-must have a codequality report artifact. Due to implementation limitations we
-always take the latest codequality artifact available.
-[Learn more on Code Quality in merge requests](https://docs.gitlab.com/ee/user/project/merge_requests/code_quality.html).
+For [GitLab Starter][ee] users, this information will be automatically
+extracted and shown right in the merge request widget.
+[Learn more on Code Quality in merge requests](../../user/project/merge_requests/code_quality.html).
 
-TIP: **Tip:**
-Starting with [GitLab Starter][ee] 9.3, this information will
-be automatically extracted and shown right in the merge request widget. To do
-so, the CI/CD job must be named `code_quality` and the artifact path must be
-`gl-code-quality-report.json`.
+## Previous job definitions
 
-## Old job definition
+CAUTION: **Caution:**
+Before GitLab 11.5, Code Quality job and artifact had to be named specifically
+to automatically extract report data and show it in the merge request widget.
+While these old job definitions are still maintained they have been deprecated
+and may be removed in next major release, GitLab 12.0.
+You are advised to update your current `.gitlab-ci.yml` configuration to reflect that change.
 
-For GitLab 11.3 and earlier, the job should look like:
+For GitLab 11.4 and earlier, the job should look like:
 
 ```yaml
 code_quality:
@@ -78,6 +75,11 @@ code_quality:
       paths: [gl-code-quality-report.json]
 ```
 
+Alternatively the job name could be `codeclimate` or `codequality`
+and the artifact name could be `codeclimate.json`.
+These names have been deprecated with GitLab 11.0
+and may be removed in next major release, GitLab 12.0.
+
 For GitLab 10.3 and earlier, the job should look like:
 
 ```yaml
@@ -96,5 +98,4 @@ codequality:
 ```
 
 [cli]: https://github.com/codeclimate/codeclimate
-[dind]: ../docker/using_docker_build.md#use-docker-in-docker-executor
 [ee]: https://about.gitlab.com/pricing/

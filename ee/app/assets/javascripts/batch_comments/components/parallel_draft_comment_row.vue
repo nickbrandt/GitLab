@@ -32,31 +32,14 @@ export default {
 </script>
 
 <template>
-  <tr
-    :class="className"
-    class="notes_holder"
-  >
+  <tr :class="className" class="notes_holder">
     <td class="notes_line old"></td>
     <td class="notes_content parallel old">
-      <div
-        v-if="leftDraft.isDraft"
-        class="content"
-      >
-        <draft-note
-          :draft="leftDraft"
-        />
-      </div>
+      <div v-if="leftDraft.isDraft" class="content"><draft-note :draft="leftDraft" /></div>
     </td>
     <td class="notes_line new"></td>
     <td class="notes_content parallel new">
-      <div
-        v-if="rightDraft.isDraft"
-        class="content"
-      >
-        <draft-note
-          :draft="rightDraft"
-        />
-      </div>
+      <div v-if="rightDraft.isDraft" class="content"><draft-note :draft="rightDraft" /></div>
     </td>
   </tr>
 </template>

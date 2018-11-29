@@ -29,9 +29,9 @@ Each line contains a JSON line that can be ingested by Elasticsearch, Splunk, et
 In this example, you can see this was a GET request for a specific issue. Notice each line also contains performance data:
 
 1. `duration`: the total time taken to retrieve the request
-2. `view`: total time taken inside the Rails views
-3. `db`: total time to retrieve data from the database
-4. `gitaly_calls`: total number of calls made to Gitaly
+1. `view`: total time taken inside the Rails views
+1. `db`: total time to retrieve data from the database
+1. `gitaly_calls`: total number of calls made to Gitaly
 
 User clone/fetch activity using http transport appears in this log as `action: git_upload_pack`.
 
@@ -119,11 +119,30 @@ This file lives in `/var/log/gitlab/gitlab-rails/integrations_json.log` for
 Omnibus GitLab packages or in `/home/git/gitlab/log/integrations_json.log` for
 installations from source.
 
-It contains information about [integrations](../user/project/integrations/project_services.md) activities such as JIRA, Asana and Irker services. It uses JSON format like the example below:  
+It contains information about [integrations](../user/project/integrations/project_services.md) activities such as JIRA, Asana and Irker services. It uses JSON format like the example below:
 
 ``` json
 {"severity":"ERROR","time":"2018-09-06T14:56:20.439Z","service_class":"JiraService","project_id":8,"project_path":"h5bp/html5-boilerplate","message":"Error sending message","client_url":"http://jira.gitlap.com:8080","error":"execution expired"}
 {"severity":"INFO","time":"2018-09-06T17:15:16.365Z","service_class":"JiraService","project_id":3,"project_path":"namespace2/project2","message":"Successfully posted","client_url":"http://jira.example.net"}
+```
+
+## `kubernetes.log`
+
+Introduced in GitLab 11.6. This file lives in
+`/var/log/gitlab/gitlab-rails/kubernetes.log` for Omnibus GitLab
+packages or in `/home/git/gitlab/log/kubernetes.log` for
+installations from source.
+
+It logs information related to the Kubernetes Integration including errors
+during installing cluster applications on your GitLab managed Kubernetes
+clusters.
+
+Each line contains a JSON line that can be ingested by Elasticsearch, Splunk,
+etc. For example:
+
+```json
+{"severity":"ERROR","time":"2018-11-23T15:14:54.652Z","exception":"Kubeclient::HttpError","error_code":401,"service":"Clusters::Applications::CheckInstallationProgressService","app_id":14,"project_ids":[1],"group_ids":[],"message":"Unauthorized"}
+{"severity":"ERROR","time":"2018-11-23T15:42:11.647Z","exception":"Kubeclient::HttpError","error_code":null,"service":"Clusters::Applications::InstallService","app_id":2,"project_ids":[19],"group_ids":[],"message":"SSL_connect returned=1 errno=0 state=error: certificate verify failed (unable to get local issuer certificate)"}
 ```
 
 ## `githost.log`
@@ -257,8 +276,8 @@ importer. Future importers may use this file.
 
 ## Reconfigure Logs
 
-Reconfigure log files live in `/var/log/gitlab/reconfigure` for Omnibus GitLab 
-packages. Installations from source don't have reconfigure logs. A reconfigure log 
+Reconfigure log files live in `/var/log/gitlab/reconfigure` for Omnibus GitLab
+packages. Installations from source don't have reconfigure logs. A reconfigure log
 is populated whenever `gitlab-ctl reconfigure` is run manually or as part of an upgrade.
 
 Reconfigure logs files are named according to the UNIX timestamp of when the reconfigure

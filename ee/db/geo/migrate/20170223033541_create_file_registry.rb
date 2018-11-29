@@ -1,4 +1,4 @@
-class CreateFileRegistry < ActiveRecord::Migration
+class CreateFileRegistry < ActiveRecord::Migration[4.2]
   def change
     create_table :file_registry do |t|
       t.string  :file_type, null: false

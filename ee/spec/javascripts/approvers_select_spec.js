@@ -59,4 +59,22 @@ describe('ApproversSelect', () => {
       expect(output).not.toContain('<script>alert("testing")</script>');
     });
   });
+
+  describe('formatSelection', () => {
+    it('escapes full name', () => {
+      expect(
+        ApproversSelect.formatSelection({
+          full_name: '<script>alert("testing")</script>',
+        }),
+      ).not.toBe('<script>alert("testing")</script>');
+    });
+
+    it('escapes name', () => {
+      expect(
+        ApproversSelect.formatSelection({
+          name: '<script>alert("testing")</script>',
+        }),
+      ).not.toBe('<script>alert("testing")</script>');
+    });
+  });
 });
