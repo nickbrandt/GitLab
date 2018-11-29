@@ -5,10 +5,20 @@ module EE
     GOLD_TRIAL = 'gold_trial'
 
     def show_gold_trial?(user = current_user)
-      !user_dismissed?(GOLD_TRIAL) &&
-        (::Gitlab.com? || Rails.env.development?) &&
-        !user.any_namespace_with_gold? &&
-        !user.any_namespace_with_trial?
+      return false if user_dismissed?(GOLD_TRIAL)
+      return false unless show_gold_trial_suitable_env?
+
+      users_namespaces_clean?(user)
+    end
+
+    def show_gold_trial_suitable_env?
+      ::Gitlab.com? || Rails.env.development?
+    end
+
+    def users_namespaces_clean?(user)
+      return false if user.any_namespace_with_gold?
+
+      !user.any_namespace_with_trial?
     end
   end
 end
