@@ -94,7 +94,7 @@ export default class KubernetesPodLogs extends LogOutputBehaviours {
       `);
     });
 
-    $podDropdownMenu.find('li').on('click', this.changePodLog.bind(this));
+    $podDropdownMenu.find('button').on('click', this.changePodLog.bind(this));
   }
 
   changePodLog(el) {
