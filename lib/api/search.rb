@@ -92,7 +92,7 @@ module API
       end
     end
 
-    resource :groups, requirements: API::PROJECT_ENDPOINT_REQUIREMENTS do
+    resource :groups, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc 'Search on GitLab' do
         detail 'This feature was introduced in GitLab 10.5.'
       end
@@ -114,7 +114,7 @@ module API
       end
     end
 
-    resource :projects, requirements: API::PROJECT_ENDPOINT_REQUIREMENTS do
+    resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc 'Search on GitLab' do
         detail 'This feature was introduced in GitLab 10.5.'
       end

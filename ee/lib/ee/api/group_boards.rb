@@ -20,7 +20,7 @@ module EE
         requires :id, type: String, desc: 'The ID of a group'
       end
 
-      resource :groups, requirements: ::API::API::PROJECT_ENDPOINT_REQUIREMENTS do
+      resource :groups, requirements: ::API::API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
         segment ':id/boards' do
           desc 'Create a group board' do
             detail 'This feature was introduced in 10.4'
