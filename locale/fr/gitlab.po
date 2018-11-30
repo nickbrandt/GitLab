@@ -2952,13 +2952,8 @@ msgstr "Modifier l’identité de %{user_name}"
 msgid "Elasticsearch"
 msgstr "Elasticsearch"
 
-<<<<<<< HEAD
-msgid "Elasticsearch intergration. Elasticsearch AWS IAM."
-msgstr "Intégration d’Elasticsearch. AWS Elasticsearch IAM."
-=======
 msgid "Elasticsearch integration. Elasticsearch AWS IAM."
 msgstr ""
->>>>>>> c64d11fc7d2... Merge branch 'master-i18n' into 'master'
 
 msgid "Email"
 msgstr "Courriel"

@@ -2916,13 +2916,8 @@ msgstr "%{user_name} の ID を編集する"
 msgid "Elasticsearch"
 msgstr "Elasticsearch"
 
-<<<<<<< HEAD
-msgid "Elasticsearch intergration. Elasticsearch AWS IAM."
-msgstr "Elasticsearch の統合。Elasticsearch AWS IAM。"
-=======
 msgid "Elasticsearch integration. Elasticsearch AWS IAM."
 msgstr ""
->>>>>>> c64d11fc7d2... Merge branch 'master-i18n' into 'master'
 
 msgid "Email"
 msgstr "メール"
