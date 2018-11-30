@@ -55,7 +55,7 @@ describe Groups::Security::VulnerabilitiesController do
         context 'when no page request' do
           before do
             projects.each do |project|
-              create(:vulnerabilities_occurrence, project: project)
+              create_vulnerabilities(1, project)
             end
           end
 
@@ -72,7 +72,7 @@ describe Groups::Security::VulnerabilitiesController do
         context 'when page requested' do
           before do
             projects.each do |project|
-              create_list(:vulnerabilities_occurrence, 11, project: project)
+              create_vulnerabilities(11, project)
             end
           end
 
@@ -87,11 +87,11 @@ describe Groups::Security::VulnerabilitiesController do
 
         context 'with vulnerability feedback' do
           it "avoids N+1 queries" do
-            create_vulnerabilities(2, project_dev)
+            create_vulnerabilities(2, project_dev, with_feedback: true)
 
             control_count = ActiveRecord::QueryRecorder.new { get_summary }
 
-            create_vulnerabilities(2, project_guest)
+            create_vulnerabilities(2, project_guest, with_feedback: true)
 
             expect { get_summary }.not_to exceed_all_query_limit(control_count)
           end
@@ -101,22 +101,24 @@ describe Groups::Security::VulnerabilitiesController do
           def get_summary
             get :index, group_id: group, format: :json
           end
+        end
 
-          def create_vulnerabilities(count, project)
-            pipeline = create(:ci_empty_pipeline, project: project)
-            vulnerabilities = create_list(:vulnerabilities_occurrence, count, project: project)
-            vulnerabilities.each do |occurrence|
-              create(:vulnerability_feedback, :sast, :dismissal,
-                     pipeline: pipeline,
-                     project: project_dev,
-                     project_fingerprint: occurrence.project_fingerprint)
+        def create_vulnerabilities(count, project, options = {})
+          pipeline = create(:ci_pipeline, :success, project: project)
+          vulnerabilities = create_list(:vulnerabilities_occurrence, count, pipelines: [pipeline], project: project)
+          return vulnerabilities unless options[:with_feedback]
 
-              create(:vulnerability_feedback, :sast, :issue,
-                     pipeline: pipeline,
-                     issue: create(:issue, project: project_dev),
-                     project: project_dev,
-                     project_fingerprint: occurrence.project_fingerprint)
-            end
+          vulnerabilities.each do |occurrence|
+            create(:vulnerability_feedback, :sast, :dismissal,
+                   pipeline: pipeline,
+                   project: project_dev,
+                   project_fingerprint: occurrence.project_fingerprint)
+
+            create(:vulnerability_feedback, :sast, :issue,
+                   pipeline: pipeline,
+                   issue: create(:issue, project: project),
+                   project: project_dev,
+                   project_fingerprint: occurrence.project_fingerprint)
           end
         end
       end
@@ -142,20 +144,22 @@ describe Groups::Security::VulnerabilitiesController do
       before do
         stub_licensed_features(security_dashboard: true)
 
+        pipeline = create(:ci_pipeline, :success, project: project_dev)
+
         create_list(:vulnerabilities_occurrence, 3,
-                    project: project_dev, report_type: :sast, severity: :high)
+                    pipelines: [pipeline], project: project_dev, report_type: :sast, severity: :high)
 
         create_list(:vulnerabilities_occurrence, 1,
-                    project: project_dev, report_type: :dependency_scanning, severity: :low)
+                    pipelines: [pipeline], project: project_dev, report_type: :dependency_scanning, severity: :low)
 
         create_list(:vulnerabilities_occurrence, 2,
-                    project: project_guest, report_type: :dependency_scanning, severity: :low)
+                    pipelines: [pipeline], project: project_guest, report_type: :dependency_scanning, severity: :low)
 
         create_list(:vulnerabilities_occurrence, 1,
-                    project: project_guest, report_type: :dast, severity: :medium)
+                    pipelines: [pipeline], project: project_guest, report_type: :dast, severity: :medium)
 
         create_list(:vulnerabilities_occurrence, 1,
-                    project: project_other, report_type: :dast, severity: :low)
+                    pipelines: [pipeline], project: project_other, report_type: :dast, severity: :low)
       end
 
       context 'when user has guest access' do

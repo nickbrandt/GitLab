@@ -2,8 +2,6 @@
 
 class ProjectPolicy < BasePolicy
   extend ClassMethods
-  prepend EE::ProjectPolicy
-
   READONLY_FEATURES_WHEN_ARCHIVED = %i[
     issue
     list
@@ -259,6 +257,8 @@ class ProjectPolicy < BasePolicy
     enable :update_pages
     enable :read_cluster
     enable :create_cluster
+    enable :update_cluster
+    enable :admin_cluster
     enable :create_environment_terminal
   end
 
@@ -442,3 +442,5 @@ class ProjectPolicy < BasePolicy
     @subject
   end
 end
+
+ProjectPolicy.prepend(EE::ProjectPolicy)

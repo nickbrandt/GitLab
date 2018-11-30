@@ -1,4 +1,4 @@
-class AddWeightToBoards < ActiveRecord::Migration
+class AddWeightToBoards < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   disable_ddl_transaction!

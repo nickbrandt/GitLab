@@ -114,6 +114,9 @@ production: &base
     # The default is 'shared/cache/archive/' relative to the root of the Rails app.
     # repository_downloads_path: shared/cache/archive/
 
+    ## Impersonation settings
+    impersonation_enabled: true
+
   ## Reply by email
   # Allow users to comment on issues and merge requests by replying to notification emails.
   # For documentation on how to set this up, see http://doc.gitlab.com/ce/administration/reply_by_email.html
@@ -549,6 +552,17 @@ production: &base
       #   label:
       #   host:
       #   ....
+
+  ## Smartcard authentication settings
+  smartcard:
+    # Allow smartcard authentication
+    enabled: false
+
+    # Path to a file containing a CA certificate
+    ca_file: '/etc/ssl/certs/CA.pem'
+
+    # Port where the client side certificate is requested by the webserver (NGINX/Apache)
+    # client_certificate_required_port: 3444
 
   ## Kerberos settings
   kerberos:

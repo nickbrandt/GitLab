@@ -34,6 +34,11 @@ namespace :admin do
         post :resync
         post :force_redownload
       end
+
+      collection do
+        post :recheck_all
+        post :resync_all
+      end
     end
   end
 

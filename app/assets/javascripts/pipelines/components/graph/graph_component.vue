@@ -1,5 +1,6 @@
 <script>
 import _ from 'underscore';
+import { GlLoadingIcon } from '@gitlab/ui';
 import StageColumnComponent from './stage_column_component.vue';
 import LinkedPipelinesColumn from 'ee/pipelines/components/graph/linked_pipelines_column.vue'; // eslint-disable-line import/order
 
@@ -7,6 +8,7 @@ export default {
   components: {
     LinkedPipelinesColumn,
     StageColumnComponent,
+    GlLoadingIcon,
   },
   props: {
     isLoading: {
@@ -71,12 +73,7 @@ export default {
 <template>
   <div class="build-content middle-block js-pipeline-graph">
     <div class="pipeline-visualization pipeline-graph pipeline-tab-content">
-      <div class="text-center">
-        <gl-loading-icon
-          v-if="isLoading"
-          :size="3"
-        />
-      </div>
+      <div class="text-center"><gl-loading-icon v-if="isLoading" :size="3" /></div>
 
       <linked-pipelines-column
         v-if="hasTriggeredBy"
@@ -88,7 +85,7 @@ export default {
       <ul
         v-if="!isLoading"
         :class="{
-          'has-linked-pipelines': hasTriggered || hasTriggeredBy
+          'has-linked-pipelines': hasTriggered || hasTriggeredBy,
         }"
         class="stage-column-list"
       >
@@ -98,7 +95,7 @@ export default {
           :class="{
             'has-upstream': index === 0 && hasTriggeredBy,
             'has-downstream': index === graph.length - 1 && hasTriggered,
-            'has-only-one-job': stage.groups.length === 1
+            'has-only-one-job': stage.groups.length === 1,
           }"
           :title="capitalizeStageName(stage.name)"
           :groups="stage.groups"

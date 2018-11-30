@@ -4,6 +4,8 @@
 #
 # Automatically sets the layout and ensures an administrator is logged in
 class Admin::ApplicationController < ApplicationController
+  prepend EE::Admin::ApplicationController
+
   before_action :authenticate_admin!
   layout 'admin'
 

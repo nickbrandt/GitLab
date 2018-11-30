@@ -68,6 +68,11 @@ module Vulnerabilities
       preload(:scanner, :identifiers, :project)
     end
 
+    def self.for_pipelines(pipelines)
+      joins(:occurrence_pipelines)
+        .where(vulnerability_occurrence_pipelines: { pipeline_id: pipelines })
+    end
+
     def feedback(feedback_type:)
       params = {
         project_id: project_id,
@@ -81,7 +86,7 @@ module Vulnerabilities
         categories = items.group_by { |i| i[:category] }
         fingerprints = items.group_by { |i| i[:project_fingerprint] }
 
-        VulnerabilityFeedback.all_preloaded.where(
+        Vulnerabilities::Feedback.all_preloaded.where(
           project_id: project_ids.keys,
           category: categories.keys,
           project_fingerprint: fingerprints.keys).find_each do |feedback|

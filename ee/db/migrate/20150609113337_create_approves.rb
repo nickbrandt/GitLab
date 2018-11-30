@@ -1,5 +1,5 @@
 # rubocop:disable Migration/Timestamps
-class CreateApproves < ActiveRecord::Migration
+class CreateApproves < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def change

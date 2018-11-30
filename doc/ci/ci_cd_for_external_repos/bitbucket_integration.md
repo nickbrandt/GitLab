@@ -39,7 +39,7 @@ your Git repository via URL.
 
     ![Bitbucket Cloud webhook](img/bitbucket_app_password.png)
 
-1. In GitLab from **Settings > CI/CD > Secret variables** add variables to allow
+1. In GitLab from **Settings > CI/CD > Variables** add variables to allow
    communication with Bitbucket via the Bitbucket API.
 
     `BITBUCKET_ACCESS_TOKEN`: the Bitbucket app password created above

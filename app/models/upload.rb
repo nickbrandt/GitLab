@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Upload < ActiveRecord::Base
-  prepend EE::Upload
-
   # Upper limit for foreground checksum processing
   CHECKSUM_THRESHOLD = 100.megabytes
 
@@ -13,7 +11,7 @@ class Upload < ActiveRecord::Base
   validates :model, presence: true
   validates :uploader, presence: true
 
-  scope :with_files_stored_locally, -> { where(store: [nil, ObjectStorage::Store::LOCAL]) }
+  scope :with_files_stored_locally, -> { where(store: ObjectStorage::Store::LOCAL) }
   scope :with_files_stored_remotely, -> { where(store: ObjectStorage::Store::REMOTE) }
 
   before_save  :calculate_checksum!, if: :foreground_checksummable?
@@ -71,8 +69,6 @@ class Upload < ActiveRecord::Base
   end
 
   def local?
-    return true if store.nil?
-
     store == ObjectStorage::Store::LOCAL
   end
 
@@ -110,3 +106,5 @@ class Upload < ActiveRecord::Base
     super&.to_sym
   end
 end
+
+Upload.prepend(EE::Upload)

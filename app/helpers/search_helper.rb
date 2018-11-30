@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module SearchHelper
-  prepend EE::SearchHelper
-
   def search_autocomplete_opts(term)
     return unless current_user
 
@@ -165,13 +163,24 @@ module SearchHelper
     if @project.present?
       opts[:data]['project-id'] = @project.id
       opts[:data]['base-endpoint'] = project_path(@project)
-    else
-      # Group context
+    elsif @group.present?
       opts[:data]['group-id'] = @group.id
       opts[:data]['base-endpoint'] = group_canonical_path(@group)
+    else
+      opts[:data]['base-endpoint'] = root_dashboard_path
     end
 
     opts
+  end
+
+  def search_history_storage_prefix
+    if @project.present?
+      @project.full_path
+    elsif @group.present?
+      @group.full_path
+    else
+      'dashboard'
+    end
   end
 
   # Sanitize a HTML field for search display. Most tags are stripped out and the
@@ -193,3 +202,5 @@ module SearchHelper
     count > limit ? "#{limit}+" : count
   end
 end
+
+SearchHelper.prepend(EE::SearchHelper)

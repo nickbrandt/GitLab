@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class SentNotificationsController < ApplicationController
-  prepend EE::SentNotificationsController
-
   skip_before_action :authenticate_user!
 
   def unsubscribe
@@ -38,3 +36,5 @@ class SentNotificationsController < ApplicationController
     end
   end
 end
+
+SentNotificationsController.prepend(EE::SentNotificationsController)

@@ -158,6 +158,24 @@ describe GeoNode, type: :model do
     end
   end
 
+  describe '.find_by_oauth_application_id' do
+    context 'when the Geo node exists' do
+      it 'returns the Geo node' do
+        found = described_class.find_by_oauth_application_id(node.oauth_application_id)
+
+        expect(found).to eq(node)
+      end
+    end
+
+    context 'when the Geo node does not exist' do
+      it 'returns nil' do
+        found = described_class.find_by_oauth_application_id(-1)
+
+        expect(found).to be_nil
+      end
+    end
+  end
+
   describe '#repair' do
     it 'creates an oauth application for a Geo secondary node' do
       stub_current_geo_node(node)

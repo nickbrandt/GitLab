@@ -2,8 +2,6 @@
 
 module WikiPages
   class BaseService < ::BaseService
-    prepend EE::WikiPages::BaseService
-
     private
 
     def execute_hooks(page, action = 'create')
@@ -13,3 +11,5 @@ module WikiPages
     end
   end
 end
+
+WikiPages::BaseService.prepend(EE::WikiPages::BaseService)

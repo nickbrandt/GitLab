@@ -1,18 +1,12 @@
 module EpicsHelper
   def epic_show_app_data(epic, opts)
-    author = epic.author
     group = epic.group
     todo = issuable_todo(epic)
 
     epic_meta = {
       epic_id: epic.id,
       created: epic.created_at,
-      author: {
-        name: author.name,
-        url: user_path(author),
-        username: "@#{author.username}",
-        src: opts[:author_icon]
-      },
+      author: epic_author(epic, opts),
       todo_exists: todo.present?,
       todo_path: group_todos_path(group),
       start_date: epic.start_date,
@@ -34,7 +28,12 @@ module EpicsHelper
         due_date: epic.due_date_sourcing_milestone&.due_date
       },
       end_date: epic.end_date,
-      state: epic.state
+      state: epic.state,
+      namespace: group.path,
+      labels_path: group_labels_path(group, format: :json, only_group_labels: true, include_ancestor_groups: true),
+      toggle_subscription_path: toggle_subscription_group_epic_path(group, epic),
+      labels_web_url: group_labels_path(group),
+      epics_web_url: group_epics_path(group)
     }
 
     epic_meta[:todo_delete_path] = dashboard_todo_path(todo) if todo.present?
@@ -44,6 +43,8 @@ module EpicsHelper
                                    participants: participants,
                                    subscribed: epic.subscribed?(current_user))
 
+    # TODO: Remove from `namespace` to epics_web_url
+    # from below as it is already included in `epic_meta`
     {
       initial: initial.to_json,
       meta: epic_meta.to_json,
@@ -52,6 +53,15 @@ module EpicsHelper
       toggle_subscription_path: toggle_subscription_group_epic_path(group, epic),
       labels_web_url: group_labels_path(group),
       epics_web_url: group_epics_path(group)
+    }
+  end
+
+  def epic_author(epic, opts)
+    {
+      name: epic.author.name,
+      url: user_path(epic.author),
+      username: "@#{epic.author.username}",
+      src: opts[:author_icon]
     }
   end
 

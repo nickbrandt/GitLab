@@ -15,18 +15,7 @@ describe Projects::PipelinesController do
 
     context 'with a sast artifact' do
       before do
-        create(
-          :ci_build,
-          :success,
-          :artifacts,
-          name: 'sast',
-          pipeline: pipeline,
-          options: {
-            artifacts: {
-              paths: [Ci::JobArtifact::DEFAULT_FILE_NAMES[:sast]]
-            }
-          }
-        )
+        create(:ee_ci_build, :legacy_sast, pipeline: pipeline)
       end
 
       context 'with feature enabled' do
@@ -83,18 +72,8 @@ describe Projects::PipelinesController do
 
     context 'with a license management artifact' do
       before do
-        create(
-          :ci_build,
-          :success,
-          :artifacts,
-          name: 'license_management',
-          pipeline: pipeline,
-          options: {
-            artifacts: {
-              paths: [Ci::Build::LICENSE_MANAGEMENT_FILE]
-            }
-          }
-        )
+        build = create(:ci_build, pipeline: pipeline)
+        create(:ee_ci_job_artifact, :license_management, job: build)
       end
 
       context 'with feature enabled' do

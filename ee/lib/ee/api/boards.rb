@@ -17,7 +17,7 @@ module EE
       params do
         requires :id, type: String, desc: 'The ID of a project'
       end
-      resource :projects, requirements: ::API::API::PROJECT_ENDPOINT_REQUIREMENTS do
+      resource :projects, requirements: ::API::API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
         segment ':id/boards' do
           desc 'Create a project board' do
             detail 'This feature was introduced in 10.4'

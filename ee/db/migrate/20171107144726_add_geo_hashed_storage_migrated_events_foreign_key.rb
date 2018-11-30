@@ -1,4 +1,4 @@
-class AddGeoHashedStorageMigratedEventsForeignKey < ActiveRecord::Migration
+class AddGeoHashedStorageMigratedEventsForeignKey < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

@@ -82,7 +82,7 @@ describe Projects::EnvironmentsController do
 
       create(:cluster, :provided_by_gcp,
              environment_scope: '*', projects: [project])
-      create(:deployment, environment: environment)
+      create(:deployment, :success, environment: environment)
 
       allow_any_instance_of(EE::KubernetesService).to receive(:read_pod_logs).with(pod_name).and_return(kube_logs_body)
       allow_any_instance_of(Gitlab::Kubernetes::RolloutStatus).to receive(:instances).and_return([{ pod_name: pod_name }])

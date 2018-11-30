@@ -28,17 +28,13 @@ export default {
 <template>
   <div class="report-block-list-issue-description prepend-top-5 append-bottom-5">
     <div class="report-block-list-issue-description-text">
-      <template v-if="issue.severity">{{ issue.severity }}:</template>
+      <template v-if="issue.severity"
+        >{{ issue.severity }}:</template
+      >
 
-      <modal-open-name
-        :issue="issue"
-        :status="status"
-      />
+      <modal-open-name :issue="issue" :status="status" />
     </div>
 
-    <report-link
-      v-if="issue.path"
-      :issue="issue"
-    />
+    <report-link v-if="issue.path" :issue="issue" />
   </div>
 </template>

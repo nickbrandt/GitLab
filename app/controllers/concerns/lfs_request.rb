@@ -15,7 +15,6 @@ module LfsRequest
   CONTENT_TYPE = 'application/vnd.git-lfs+json'.freeze
 
   included do
-    prepend EE::LfsRequest
     before_action :require_lfs_enabled!
     before_action :lfs_check_access!
   end
@@ -124,3 +123,5 @@ module LfsRequest
     (authentication_abilities || []).include?(capability)
   end
 end
+
+LfsRequest.prepend(EE::LfsRequest)

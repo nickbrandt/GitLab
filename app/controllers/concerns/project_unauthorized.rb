@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module ProjectUnauthorized
-  prepend EE::ProjectUnauthorized
-
   extend ActiveSupport::Concern
 
   # EE would override this
@@ -10,3 +8,5 @@ module ProjectUnauthorized
     # no-op
   end
 end
+
+ProjectUnauthorized.prepend(EE::ProjectUnauthorized)

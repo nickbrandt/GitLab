@@ -255,25 +255,25 @@ describe EE::NotificationService, :mailer do
     end
   end
 
-  describe 'Notes' do
+  describe 'epics' do
+    set(:group) { create(:group, :private) }
+    set(:epic) { create(:epic, group: group) }
+
     around do |example|
       perform_enqueued_jobs do
         example.run
       end
     end
 
+    before do
+      stub_licensed_features(epics: true)
+      group.add_developer(epic.author)
+    end
+
     context 'epic notes' do
-      set(:group) { create(:group, :private) }
-      set(:epic) { create(:epic, group: group) }
       set(:note) { create(:note, project: nil, noteable: epic, note: '@mention referenced, @unsubscribed_mentioned and @outsider also') }
 
-      before(:all) do
-        create(:group_member, group: group, user: epic.author)
-        create(:group_member, group: group, user: note.author)
-      end
-
       before do
-        stub_licensed_features(epics: true)
         build_group_members(group)
 
         @u_custom_off = create_user_with_notification(:custom, 'custom_off', group)
@@ -289,11 +289,11 @@ describe EE::NotificationService, :mailer do
 
         update_custom_notification(:new_note, @u_guest_custom, resource: group)
         update_custom_notification(:new_note, @u_custom_global)
+        add_users_with_subscription(group, epic)
       end
 
       describe '#new_note' do
         it do
-          add_users_with_subscription(group, epic)
           reset_delivered_emails!
 
           expect(SentNotification).to receive(:record).with(epic, any_args).exactly(9).times
@@ -319,6 +319,59 @@ describe EE::NotificationService, :mailer do
           should_not_email(@u_lazy_participant)
         end
       end
+    end
+
+    shared_examples 'epic notifications' do
+      let(:watcher) { create(:user) }
+      let(:participating) { create(:user) }
+      let(:other_user) { create(:user) }
+
+      before do
+        create_global_setting_for(watcher, :watch)
+        create_global_setting_for(participating, :participating)
+
+        group.add_developer(watcher)
+        group.add_developer(participating)
+        group.add_developer(other_user)
+
+        reset_delivered_emails!
+      end
+
+      it 'sends notification to watcher when no user participates' do
+        execute
+
+        should_email(watcher)
+        should_not_email(participating)
+        should_not_email(other_user)
+      end
+
+      it 'sends notification to watcher and a participator' do
+        epic.subscriptions.create(user: participating, subscribed: true)
+
+        execute
+
+        should_email(watcher)
+        should_email(participating)
+        should_not_email(other_user)
+      end
+    end
+
+    context 'close epic' do
+      let(:execute) { subject.close_epic(epic, epic.author) }
+
+      include_examples 'epic notifications'
+    end
+
+    context 'reopen epic' do
+      let(:execute) { subject.reopen_epic(epic, epic.author) }
+
+      include_examples 'epic notifications'
+    end
+
+    context 'new epic' do
+      let(:execute) { subject.new_epic(epic) }
+
+      include_examples 'epic notifications'
     end
   end
 

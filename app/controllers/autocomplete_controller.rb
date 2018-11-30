@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class AutocompleteController < ApplicationController
-  prepend EE::AutocompleteController
-
   skip_before_action :authenticate_user!, only: [:users, :award_emojis]
 
   def users
@@ -41,3 +39,5 @@ class AutocompleteController < ApplicationController
     render json: AwardedEmojiFinder.new(current_user).execute
   end
 end
+
+AutocompleteController.prepend(EE::AutocompleteController)

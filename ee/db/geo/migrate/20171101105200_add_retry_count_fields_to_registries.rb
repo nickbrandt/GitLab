@@ -1,4 +1,4 @@
-class AddRetryCountFieldsToRegistries < ActiveRecord::Migration
+class AddRetryCountFieldsToRegistries < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

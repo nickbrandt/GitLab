@@ -64,6 +64,8 @@ Below is the table of events users can be notified of:
 |------------------------------|-------------------------------------------------------------------|------------------------------|
 | New SSH key added            | User                                                              | Security email, always sent. |
 | New email added              | User                                                              | Security email, always sent. |
+| Email changed                | User                                                              | Security email, always sent. |
+| Password changed             | User                                                              | Security email, always sent. |
 | New user created             | User                                                              | Sent on user creation, except for omniauth (LDAP)|
 | User added to project        | User                                                              | Sent when user is added to project |
 | Project access level changed | User                                                              | Sent when user project access level is changed |
@@ -71,18 +73,18 @@ Below is the table of events users can be notified of:
 | Group access level changed   | User                                                              | Sent when user group access level is changed |
 | Project moved                | Project members [1]                                               | [1] not disabled |
 
-### Issue / Merge request events
+### Issue / Epics / Merge request events
 
 In most of the below cases, the notification will be sent to:
 
 - Participants:
   - the author and assignee of the issue/merge request
   - authors of comments on the issue/merge request
-  - anyone mentioned by `@username` in the issue/merge request title or description
-  - anyone mentioned by `@username` in any of the comments on the issue/merge request
+  - anyone mentioned by `@username` in the issue/epic/merge request title or description
+  - anyone mentioned by `@username` in any of the comments on the issue/epic/merge request
      ...with notification level "Participating" or higher
 - Watchers: users with notification level "Watch"
-- Subscribers: anyone who manually subscribed to the issue/merge request
+- Subscribers: anyone who manually subscribed to the issue/epic/merge request
 - Custom: Users with notification level "custom" who turned on notifications for any of the events present in the table below
 
 | Event                  | Sent to |
@@ -106,6 +108,8 @@ In most of the below cases, the notification will be sent to:
 | Failed pipeline        | The author of the pipeline |
 | Successful pipeline    | The author of the pipeline, if they have the custom notification setting for successful pipelines set |
 | New epic               | |
+| Close epic             | |
+| Reopen epic            | |
 
 In addition, if the title or description of an Issue or Merge Request is
 changed, notifications will be sent to any **new** mentions by `@username` as

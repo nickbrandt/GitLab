@@ -1,4 +1,5 @@
 <script>
+import { GlLoadingIcon } from '@gitlab/ui';
 import ListFilter from './list_filter.vue';
 import ListContent from './list_content.vue';
 
@@ -6,6 +7,7 @@ export default {
   components: {
     ListFilter,
     ListContent,
+    GlLoadingIcon,
   },
   props: {
     loading: {
@@ -56,15 +58,8 @@ export default {
 
 <template>
   <div class="dropdown-assignees-list">
-    <div
-      v-if="loading"
-      class="dropdown-loading"
-    >
-      <gl-loading-icon />
-    </div>
-    <list-filter
-      @onSearchInput="handleSearch"
-    />
+    <div v-if="loading" class="dropdown-loading"><gl-loading-icon /></div>
+    <list-filter @onSearchInput="handleSearch" />
     <list-content
       v-if="!loading"
       :items="filteredItems"

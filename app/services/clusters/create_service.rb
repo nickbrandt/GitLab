@@ -2,8 +2,6 @@
 
 module Clusters
   class CreateService
-    prepend EE::Clusters::CreateService
-
     attr_reader :current_user, :params
 
     def initialize(user = nil, params = {})
@@ -38,6 +36,10 @@ module Clusters
       case clusterable
       when ::Project
         { cluster_type: :project_type, projects: [clusterable] }
+      when ::Group
+        { cluster_type: :group_type, groups: [clusterable] }
+      else
+        raise NotImplementedError
       end
     end
 
@@ -47,3 +49,5 @@ module Clusters
     end
   end
 end
+
+Clusters::CreateService.prepend(EE::Clusters::CreateService)

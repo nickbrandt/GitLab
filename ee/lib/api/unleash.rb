@@ -3,7 +3,7 @@ module API
     include PaginationParams
 
     namespace :feature_flags do
-      resource :unleash, requirements: API::PROJECT_ENDPOINT_REQUIREMENTS do
+      resource :unleash, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
         params do
           requires :project_id, type: String, desc: 'The ID of a project'
           optional :instance_id, type: String, desc: 'The Instance ID of Unleash Client'

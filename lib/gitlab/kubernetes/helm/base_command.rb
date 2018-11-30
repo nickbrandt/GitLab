@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Kubernetes
     module Helm
@@ -10,7 +12,7 @@ module Gitlab
 
         def generate_script
           <<~HEREDOC
-            set -eo pipefail
+            set -xeo pipefail
           HEREDOC
         end
 

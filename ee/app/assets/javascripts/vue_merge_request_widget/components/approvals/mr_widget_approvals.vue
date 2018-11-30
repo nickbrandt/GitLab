@@ -45,7 +45,7 @@ export default {
   },
   created() {
     const flashErrorMessage = s__(
-      'mrWidget|An error occured while retrieving approval data for this merge request.',
+      'mrWidget|An error occurred while retrieving approval data for this merge request.',
     );
 
     this.service
@@ -67,18 +67,10 @@ export default {
       :class="approvalsOptional ? 'zero-approvals' : ''"
       :status="fetchingApprovals ? 'loading' : status"
     />
-    <div
-      v-show="fetchingApprovals"
-      class="mr-approvals-loading-state media-body"
-    >
-      <span class="approvals-loading-text">
-        Checking approval status
-      </span>
+    <div v-show="fetchingApprovals" class="mr-approvals-loading-state media-body">
+      <span class="approvals-loading-text"> Checking approval status </span>
     </div>
-    <div
-      v-if="!fetchingApprovals"
-      class="approvals-components media-body"
-    >
+    <div v-if="!fetchingApprovals" class="approvals-components media-body">
       <approvals-body
         :mr="mr"
         :service="service"

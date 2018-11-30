@@ -4,6 +4,7 @@ describe Gitlab::BackgroundMigration::RedactLinks, :migration, schema: 201810141
   let(:namespaces) { table(:namespaces) }
   let(:projects) { table(:projects) }
   let(:issues) { table(:issues) }
+  let(:epics) { table(:epics) }
   let(:notes) { table(:notes) }
   let(:snippets) { table(:snippets) }
   let(:users) { table(:users) }
@@ -39,6 +40,12 @@ describe Gitlab::BackgroundMigration::RedactLinks, :migration, schema: 201810141
     params.merge!(id: id, author_id: user.id)
 
     snippets.create(params)
+  end
+
+  def create_epic(id, params)
+    params.merge!(id: id, iid: id, title: "epic#{id}", title_html: "epic#{id}", author_id: user.id, group_id: namespace.id)
+
+    epics.create(params)
   end
 
   def create_resource(model, id, params)
@@ -90,6 +97,13 @@ describe Gitlab::BackgroundMigration::RedactLinks, :migration, schema: 201810141
   context 'resource is Snippet' do
     it_behaves_like 'redactable resource' do
       let(:model) { Snippet }
+      let(:field) { :description }
+    end
+  end
+
+  context 'resource is Epic' do
+    it_behaves_like 'redactable resource' do
+      let(:model) { Epic }
       let(:field) { :description }
     end
   end

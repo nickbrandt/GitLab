@@ -10,7 +10,7 @@ const weightTokenKey = {
   type: 'string',
   param: '',
   symbol: '',
-  icon: 'scale',
+  icon: 'weight',
   tag: 'number',
 };
 

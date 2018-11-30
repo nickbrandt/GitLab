@@ -3,8 +3,6 @@
 class Admin::GroupsController < Admin::ApplicationController
   include MembersPresentation
 
-  prepend EE::Admin::GroupsController
-
   before_action :group, only: [:edit, :update, :destroy, :project_update, :members_update]
 
   def index
@@ -95,3 +93,5 @@ class Admin::GroupsController < Admin::ApplicationController
     ]
   end
 end
+
+Admin::GroupsController.prepend(EE::Admin::GroupsController)

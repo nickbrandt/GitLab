@@ -28,7 +28,7 @@
                 = markdown_field(Gitlab::CurrentSettings.current_application_settings, :sign_in_text)
 
               - if Gitlab::CurrentSettings.help_text.present?
-                %h3 Need help?
+                %h3= _("Need help?")
                 %hr
                 %p.slead
                   = markdown(Gitlab::CurrentSettings.help_text)

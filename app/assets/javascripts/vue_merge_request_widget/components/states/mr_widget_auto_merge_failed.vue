@@ -1,4 +1,5 @@
 <script>
+import { GlLoadingIcon } from '@gitlab/ui';
 import eventHub from '../../event_hub';
 import statusIcon from '../mr_widget_status_icon.vue';
 
@@ -6,6 +7,7 @@ export default {
   name: 'MRWidgetAutoMergeFailed',
   components: {
     statusIcon,
+    GlLoadingIcon,
   },
   props: {
     mr: {
@@ -33,8 +35,10 @@ export default {
     <status-icon status="warning" />
     <div class="media-body space-children">
       <span class="bold">
-        <template v-if="mr.mergeError">{{ mr.mergeError }}.</template>
-        {{ s__("mrWidget|This merge request failed to be merged automatically") }}
+        <template v-if="mr.mergeError"
+          >{{ mr.mergeError }}.</template
+        >
+        {{ s__('mrWidget|This merge request failed to be merged automatically') }}
       </span>
       <button
         :disabled="isRefreshing"
@@ -42,11 +46,8 @@ export default {
         class="btn btn-sm btn-default"
         @click="refreshWidget"
       >
-        <gl-loading-icon
-          v-if="isRefreshing"
-          :inline="true"
-        />
-        {{ s__("mrWidget|Refresh") }}
+        <gl-loading-icon v-if="isRefreshing" :inline="true" />
+        {{ s__('mrWidget|Refresh') }}
       </button>
     </div>
   </div>

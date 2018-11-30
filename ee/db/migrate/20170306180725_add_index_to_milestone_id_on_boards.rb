@@ -1,5 +1,5 @@
 # rubocop:disable RemoveIndex
-class AddIndexToMilestoneIdOnBoards < ActiveRecord::Migration
+class AddIndexToMilestoneIdOnBoards < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

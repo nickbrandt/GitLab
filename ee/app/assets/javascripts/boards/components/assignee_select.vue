@@ -1,10 +1,12 @@
 <script>
 import UsersSelect from '~/users_select';
 import UserAvatarImage from '~/vue_shared/components/user_avatar/user_avatar_image.vue';
+import { GlLoadingIcon } from '@gitlab/ui';
 
 export default {
   components: {
     UserAvatarImage,
+    GlLoadingIcon,
   },
   props: {
     anyUserText: {
@@ -92,52 +94,25 @@ export default {
 </script>
 
 <template>
-  <div
-    :class="wrapperClass"
-    class="block"
-  >
+  <div :class="wrapperClass" class="block">
     <div class="title append-bottom-10">
       {{ label }}
-      <button
-        v-if="canEdit"
-        type="button"
-        class="edit-link btn btn-blank float-right"
-      >
-        Edit
-      </button>
+      <button v-if="canEdit" type="button" class="edit-link btn btn-blank float-right">Edit</button>
     </div>
     <div class="value">
-      <div
-        v-if="hasValue"
-        class="media"
-      >
+      <div v-if="hasValue" class="media">
         <div class="align-center">
-          <user-avatar-image
-            :img-src="selected.avatar_url"
-            :size="32"
-          />
+          <user-avatar-image :img-src="selected.avatar_url" :size="32" />
         </div>
         <div class="media-body">
-          <div class="bold author">
-            {{ selected.name }}
-          </div>
-          <div class="username">
-            @{{ selected.username }}
-          </div>
+          <div class="bold author">{{ selected.name }}</div>
+          <div class="username">@{{ selected.username }}</div>
         </div>
       </div>
-      <div
-        v-else
-        class="text-secondary"
-      >
-        {{ anyUserText }}
-      </div>
+      <div v-else class="text-secondary">{{ anyUserText }}</div>
     </div>
 
-    <div
-      class="selectbox"
-      style="display: none"
-    >
+    <div class="selectbox" style="display: none">
       <div class="dropdown">
         <button
           ref="dropdown"
@@ -152,15 +127,8 @@ export default {
           aria-expanded="false"
           type="button"
         >
-          <span class="dropdown-toggle-text">
-            {{ placeholderText }}
-          </span>
-          <i
-            aria-hidden="true"
-            class="fa fa-chevron-down"
-            data-hidden="true"
-          >
-          </i>
+          <span class="dropdown-toggle-text"> {{ placeholderText }} </span>
+          <i aria-hidden="true" class="fa fa-chevron-down" data-hidden="true"> </i>
         </button>
         <div
           class="dropdown-menu dropdown-select dropdown-menu-paging
@@ -173,11 +141,7 @@ dropdown-menu-user dropdown-menu-selectable dropdown-menu-author"
               placeholder="Search"
               type="search"
             />
-            <i
-              aria-hidden="true"
-              class="fa fa-search dropdown-input-search"
-              data-hidden="true"
-            >
+            <i aria-hidden="true" class="fa fa-search dropdown-input-search" data-hidden="true">
             </i>
             <i
               aria-hidden="true"
@@ -188,9 +152,7 @@ dropdown-menu-user dropdown-menu-selectable dropdown-menu-author"
             </i>
           </div>
           <div class="dropdown-content"></div>
-          <div class="dropdown-loading">
-            <gl-loading-icon />
-          </div>
+          <div class="dropdown-loading"><gl-loading-icon /></div>
         </div>
       </div>
     </div>

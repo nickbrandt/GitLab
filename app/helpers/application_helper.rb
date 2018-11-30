@@ -4,8 +4,6 @@ require 'digest/md5'
 require 'uri'
 
 module ApplicationHelper
-  prepend EE::ApplicationHelper
-
   # See https://docs.gitlab.com/ee/development/ee_features.html#code-in-app-views
   # rubocop: disable CodeReuse/ActiveRecord
   def render_if_exists(partial, locals = {})
@@ -178,18 +176,7 @@ module ApplicationHelper
     without = options.delete(:without)
     add_label = options.delete(:label)
 
-    exist_opts = {
-      state: params[:state],
-      scope: params[:scope],
-      milestone_title: params[:milestone_title],
-      assignee_id: params[:assignee_id],
-      author_id: params[:author_id],
-      search: params[:search],
-      label_name: params[:label_name],
-      weight: params[:weight]
-    }
-
-    options = exist_opts.merge(options)
+    options = request.query_parameters.merge(options)
 
     if without.present?
       without.each do |key|
@@ -303,3 +290,5 @@ module ApplicationHelper
     }
   end
 end
+
+ApplicationHelper.prepend(EE::ApplicationHelper)

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Projects::BoardsController < Projects::ApplicationController
-  prepend EE::Boards::BoardsController
   include BoardsResponses
   include IssuableCollections
 
@@ -59,3 +58,5 @@ class Projects::BoardsController < Projects::ApplicationController
     end
   end
 end
+
+Projects::BoardsController.prepend(EE::Boards::BoardsController)

@@ -9,7 +9,7 @@ export default {
   },
   [types.REQUEST_VULNERABILITIES](state) {
     state.isLoadingVulnerabilities = true;
-    state.hasError = false;
+    state.errorLoadingVulnerabilities = false;
   },
   [types.RECEIVE_VULNERABILITIES_SUCCESS](state, payload) {
     state.isLoadingVulnerabilities = false;
@@ -18,14 +18,14 @@ export default {
   },
   [types.RECEIVE_VULNERABILITIES_ERROR](state) {
     state.isLoadingVulnerabilities = false;
-    state.hasError = true;
+    state.errorLoadingVulnerabilities = true;
   },
   [types.SET_VULNERABILITIES_COUNT_ENDPOINT](state, payload) {
     state.vulnerabilitiesCountEndpoint = payload;
   },
   [types.REQUEST_VULNERABILITIES_COUNT](state) {
     state.isLoadingVulnerabilitiesCount = true;
-    state.hasError = false;
+    state.errorLoadingVulnerabilitiesCount = false;
   },
   [types.RECEIVE_VULNERABILITIES_COUNT_SUCCESS](state, payload) {
     state.isLoadingVulnerabilitiesCount = false;
@@ -33,7 +33,7 @@ export default {
   },
   [types.RECEIVE_VULNERABILITIES_COUNT_ERROR](state) {
     state.isLoadingVulnerabilitiesCount = false;
-    state.hasError = true;
+    state.errorLoadingVulnerabilitiesCount = true;
   },
   [types.SET_MODAL_DATA](state, payload) {
     const { vulnerability } = payload;
@@ -56,14 +56,30 @@ export default {
       'value',
       vulnerability.identifiers.length && vulnerability.identifiers,
     );
+    Vue.set(
+      state.modal.data.className,
+      'value',
+      vulnerability.location && vulnerability.location.class,
+    );
     Vue.set(state.modal.data.severity, 'value', vulnerability.severity);
     Vue.set(state.modal.data.confidence, 'value', vulnerability.confidence);
     Vue.set(state.modal.data.solution, 'value', vulnerability.solution);
-    Vue.set(state.modal.data.links, 'value', vulnerability.links);
-    Vue.set(state.modal.data.instances, 'value', vulnerability.instances);
     Vue.set(state.modal, 'vulnerability', vulnerability);
     Vue.set(state.modal.vulnerability, 'hasIssue', Boolean(vulnerability.issue_feedback));
+    Vue.set(state.modal.vulnerability, 'isDismissed', Boolean(vulnerability.dismissal_feedback));
     Vue.set(state.modal, 'error', null);
+
+    if (vulnerability.instances && vulnerability.instances.length) {
+      Vue.set(state.modal.data.instances, 'value', vulnerability.instances);
+    } else {
+      Vue.set(state.modal.data.instances, 'value', null);
+    }
+
+    if (vulnerability.links && vulnerability.links.length) {
+      Vue.set(state.modal.data.links, 'value', vulnerability.links);
+    } else {
+      Vue.set(state.modal.data.links, 'value', null);
+    }
   },
   [types.REQUEST_CREATE_ISSUE](state) {
     state.isCreatingIssue = true;
@@ -100,25 +116,25 @@ export default {
       s__('Security Reports|There was an error dismissing the vulnerability.'),
     );
   },
-  [types.REQUEST_UNDO_DISMISSAL](state) {
+  [types.REQUEST_REVERT_DISMISSAL](state) {
     state.isDismissingVulnerability = true;
     Vue.set(state.modal, 'isDismissingVulnerability', true);
     Vue.set(state.modal, 'error', null);
   },
-  [types.RECEIVE_UNDO_DISMISSAL_SUCCESS](state, payload) {
+  [types.RECEIVE_REVERT_DISMISSAL_SUCCESS](state, payload) {
     const vulnerability = state.vulnerabilities.find(vuln => vuln.id === payload.id);
     vulnerability.dismissal_feedback = null;
     state.isDismissingVulnerability = false;
     Vue.set(state.modal, 'isDismissingVulnerability', false);
     Vue.set(state.modal.vulnerability, 'isDismissed', false);
   },
-  [types.RECEIVE_UNDO_DISMISSAL_ERROR](state) {
+  [types.RECEIVE_REVERT_DISMISSAL_ERROR](state) {
     state.isDismissingVulnerability = false;
     Vue.set(state.modal, 'isDismissingVulnerability', false);
     Vue.set(
       state.modal,
       'error',
-      s__('Security Reports|There was an error undoing the dismissal.'),
+      s__('Security Reports|There was an error reverting the dismissal.'),
     );
   },
 };

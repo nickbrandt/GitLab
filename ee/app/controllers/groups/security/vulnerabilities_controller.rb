@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 class Groups::Security::VulnerabilitiesController < Groups::Security::ApplicationController
   def index
-    @vulnerabilities = group.all_vulnerabilities.ordered
+    @vulnerabilities = group.latest_vulnerabilities.ordered
       .page(params[:page])
 
     respond_to do |format|

@@ -3,8 +3,6 @@
 module Boards
   module Issues
     class MoveService < Boards::BaseService
-      prepend EE::Boards::Issues::MoveService
-
       def execute(issue)
         return false unless can?(current_user, :update_issue, issue)
         return false if issue_params(issue).empty?
@@ -72,10 +70,8 @@ module Boards
         label_ids =
           if moving_to_list.movable?
             moving_from_list.label_id
-          elsif board.group_board?
-            ::Label.on_group_boards(parent.id).pluck(:label_id)
           else
-            ::Label.on_project_boards(parent.id).pluck(:label_id)
+            ::Label.on_board(board.id).pluck(:label_id)
           end
 
         Array(label_ids).compact
@@ -90,3 +86,5 @@ module Boards
     end
   end
 end
+
+Boards::Issues::MoveService.prepend(EE::Boards::Issues::MoveService)

@@ -30,48 +30,38 @@ describe MergeRequest do
   end
 
   describe '#squash_in_progress?' do
-    shared_examples 'checking whether a squash is in progress' do
-      let(:repo_path) do
-        Gitlab::GitalyClient::StorageSettings.allow_disk_access do
-          subject.source_project.repository.path
-        end
-      end
-      let(:squash_path) { File.join(repo_path, "gitlab-worktree", "squash-#{subject.id}") }
-
-      before do
-        system(*%W(#{Gitlab.config.git.bin_path} -C #{repo_path} worktree add --detach #{squash_path} master))
-      end
-
-      it 'returns true when there is a current squash directory' do
-        expect(subject.squash_in_progress?).to be_truthy
-      end
-
-      it 'returns false when there is no squash directory' do
-        FileUtils.rm_rf(squash_path)
-
-        expect(subject.squash_in_progress?).to be_falsey
-      end
-
-      it 'returns false when the squash directory has expired' do
-        time = 20.minutes.ago.to_time
-        File.utime(time, time, squash_path)
-
-        expect(subject.squash_in_progress?).to be_falsey
-      end
-
-      it 'returns false when the source project has been removed' do
-        allow(subject).to receive(:source_project).and_return(nil)
-
-        expect(subject.squash_in_progress?).to be_falsey
+    let(:repo_path) do
+      Gitlab::GitalyClient::StorageSettings.allow_disk_access do
+        subject.source_project.repository.path
       end
     end
+    let(:squash_path) { File.join(repo_path, "gitlab-worktree", "squash-#{subject.id}") }
 
-    context 'when Gitaly squash_in_progress is enabled' do
-      it_behaves_like 'checking whether a squash is in progress'
+    before do
+      system(*%W(#{Gitlab.config.git.bin_path} -C #{repo_path} worktree add --detach #{squash_path} master))
     end
 
-    context 'when Gitaly squash_in_progress is disabled', :disable_gitaly do
-      it_behaves_like 'checking whether a squash is in progress'
+    it 'returns true when there is a current squash directory' do
+      expect(subject.squash_in_progress?).to be_truthy
+    end
+
+    it 'returns false when there is no squash directory' do
+      FileUtils.rm_rf(squash_path)
+
+      expect(subject.squash_in_progress?).to be_falsey
+    end
+
+    it 'returns false when the squash directory has expired' do
+      time = 20.minutes.ago.to_time
+      File.utime(time, time, squash_path)
+
+      expect(subject.squash_in_progress?).to be_falsey
+    end
+
+    it 'returns false when the source project has been removed' do
+      allow(subject).to receive(:source_project).and_return(nil)
+
+      expect(subject.squash_in_progress?).to be_falsey
     end
   end
 
@@ -628,6 +618,44 @@ describe MergeRequest do
         expect(Gitlab::Diff::Highlight).not_to receive(:new)
 
         merge_request.diff_size
+      end
+    end
+  end
+
+  describe '#modified_paths' do
+    let(:paths) { double(:paths) }
+    subject(:merge_request) { build(:merge_request) }
+
+    before do
+      expect(diff).to receive(:modified_paths).and_return(paths)
+    end
+
+    context 'when past_merge_request_diff is specified' do
+      let(:another_diff) { double(:merge_request_diff) }
+      let(:diff) { another_diff }
+
+      it 'returns affected file paths from specified past_merge_request_diff' do
+        expect(merge_request.modified_paths(past_merge_request_diff: another_diff)).to eq(paths)
+      end
+    end
+
+    context 'when compare is present' do
+      let(:compare) { double(:compare) }
+      let(:diff) { compare }
+
+      it 'returns affected file paths from compare' do
+        merge_request.compare = compare
+
+        expect(merge_request.modified_paths).to eq(paths)
+      end
+    end
+
+    context 'when no arguments provided' do
+      let(:diff) { merge_request.merge_request_diff }
+      subject(:merge_request) { create(:merge_request, source_branch: 'feature', target_branch: 'master') }
+
+      it 'returns affected file paths for merge_request_diff' do
+        expect(merge_request.modified_paths).to eq(paths)
       end
     end
   end
@@ -1895,7 +1923,7 @@ describe MergeRequest do
           allow(subject).to receive(:head_pipeline) { nil }
         end
 
-        it { expect(subject.mergeable_ci_state?).to be_truthy }
+        it { expect(subject.mergeable_ci_state?).to be_falsey }
       end
     end
 
@@ -1987,8 +2015,8 @@ describe MergeRequest do
       let(:environments) { create_list(:environment, 3, project: project) }
 
       before do
-        create(:deployment, environment: environments.first, ref: 'master', sha: project.commit('master').id)
-        create(:deployment, environment: environments.second, ref: 'feature', sha: project.commit('feature').id)
+        create(:deployment, :success, environment: environments.first, ref: 'master', sha: project.commit('master').id)
+        create(:deployment, :success, environment: environments.second, ref: 'feature', sha: project.commit('feature').id)
       end
 
       it 'selects deployed environments' do
@@ -2008,7 +2036,7 @@ describe MergeRequest do
       let(:source_environment) { create(:environment, project: source_project) }
 
       before do
-        create(:deployment, environment: source_environment, ref: 'feature', sha: merge_request.diff_head_sha)
+        create(:deployment, :success, environment: source_environment, ref: 'feature', sha: merge_request.diff_head_sha)
       end
 
       it 'selects deployed environments' do
@@ -2019,7 +2047,7 @@ describe MergeRequest do
         let(:target_environment) { create(:environment, project: project) }
 
         before do
-          create(:deployment, environment: target_environment, tag: true, sha: merge_request.diff_head_sha)
+          create(:deployment, :success, environment: target_environment, tag: true, sha: merge_request.diff_head_sha)
         end
 
         it 'selects deployed environments' do
@@ -2142,7 +2170,7 @@ describe MergeRequest do
       end
     end
 
-    let(:project) { create(:project) }
+    let(:project) { create(:project, :repository) }
     let(:merge_request) { create(:merge_request, source_project: project, author: author) }
     let(:author) { create(:user) }
     let(:approver) { create(:user) }
@@ -2978,14 +3006,6 @@ describe MergeRequest do
         expect(subject.rebase_in_progress?).to be_falsey
       end
     end
-
-    context 'when Gitaly rebase_in_progress is enabled' do
-      it_behaves_like 'checking whether a rebase is in progress'
-    end
-
-    context 'when Gitaly rebase_in_progress is enabled', :disable_gitaly do
-      it_behaves_like 'checking whether a rebase is in progress'
-    end
   end
 
   describe '#allow_collaboration' do
@@ -3037,6 +3057,36 @@ describe MergeRequest do
                                    .and_return(true)
 
       expect(merge_request.collaborative_push_possible?).to be_falsy
+    end
+  end
+
+  describe '#includes_any_commits?' do
+    it 'returns false' do
+      expect(subject.includes_any_commits?([])).to be_falsey
+    end
+
+    it 'returns false' do
+      expect(subject.includes_any_commits?([Gitlab::Git::BLANK_SHA])).to be_falsey
+    end
+
+    it 'returns true' do
+      expect(subject.includes_any_commits?([subject.merge_request_diff.head_commit_sha])).to be_truthy
+    end
+
+    it 'returns true even when there is a non-existent comit' do
+      expect(subject.includes_any_commits?([Gitlab::Git::BLANK_SHA, subject.merge_request_diff.head_commit_sha])).to be_truthy
+    end
+
+    context 'unpersisted merge request' do
+      let(:new_mr) { build(:merge_request) }
+
+      it 'returns false' do
+        expect(new_mr.includes_any_commits?([Gitlab::Git::BLANK_SHA])).to be_falsey
+      end
+
+      it 'returns true' do
+        expect(new_mr.includes_any_commits?([subject.merge_request_diff.head_commit_sha])).to be_truthy
+      end
     end
   end
 

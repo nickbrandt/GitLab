@@ -2,9 +2,9 @@
 
 module DraftNotes
   class PublishService < DraftNotes::BaseService
-    def execute(draft_id = nil)
-      if draft_id
-        publish_draft_note(draft_id)
+    def execute(draft = nil)
+      if draft
+        publish_draft_note(draft)
       else
         publish_draft_notes
       end
@@ -12,9 +12,7 @@ module DraftNotes
 
     private
 
-    def publish_draft_note(draft_id)
-      draft = DraftNote.find(draft_id)
-
+    def publish_draft_note(draft)
       create_note_from_draft(draft)
       draft.delete
 
@@ -29,6 +27,10 @@ module DraftNotes
     end
 
     def create_note_from_draft(draft)
+      # Make sure the diff file is unfolded in order to find the correct line
+      # codes.
+      draft.diff_file&.unfold_diff_lines(draft.original_position)
+
       note = Notes::CreateService.new(draft.project, draft.author, draft.publish_params).execute
       set_discussion_resolve_status(note, draft)
     end
@@ -43,10 +45,6 @@ module DraftNotes
       else
         discussion.unresolve!
       end
-    end
-
-    def draft_notes
-      @draft_notes ||= merge_request.draft_notes.authored_by(current_user)
     end
   end
 end

@@ -2,18 +2,19 @@
 
 module Clusters
   class Cluster < ActiveRecord::Base
-    prepend EE::Clusters::Cluster
-
     include Presentable
+    include Gitlab::Utils::StrongMemoize
 
     self.table_name = 'clusters'
 
     APPLICATIONS = {
       Applications::Helm.application_name => Applications::Helm,
       Applications::Ingress.application_name => Applications::Ingress,
+      Applications::CertManager.application_name => Applications::CertManager,
       Applications::Prometheus.application_name => Applications::Prometheus,
       Applications::Runner.application_name => Applications::Runner,
-      Applications::Jupyter.application_name => Applications::Jupyter
+      Applications::Jupyter.application_name => Applications::Jupyter,
+      Applications::Knative.application_name => Applications::Knative
     }.freeze
     DEFAULT_ENVIRONMENT = '*'.freeze
 
@@ -26,19 +27,18 @@ module Clusters
     has_many :cluster_groups, class_name: 'Clusters::Group'
     has_many :groups, through: :cluster_groups, class_name: '::Group'
 
-    has_one :cluster_group, -> { order(id: :desc) }, class_name: 'Clusters::Group'
-    has_one :group, through: :cluster_group, class_name: '::Group'
-
     # we force autosave to happen when we save `Cluster` model
     has_one :provider_gcp, class_name: 'Clusters::Providers::Gcp', autosave: true
 
-    has_one :platform_kubernetes, class_name: 'Clusters::Platforms::Kubernetes', autosave: true
+    has_one :platform_kubernetes, class_name: 'Clusters::Platforms::Kubernetes', inverse_of: :cluster, autosave: true
 
     has_one :application_helm, class_name: 'Clusters::Applications::Helm'
     has_one :application_ingress, class_name: 'Clusters::Applications::Ingress'
+    has_one :application_cert_manager, class_name: 'Clusters::Applications::CertManager'
     has_one :application_prometheus, class_name: 'Clusters::Applications::Prometheus'
     has_one :application_runner, class_name: 'Clusters::Applications::Runner'
     has_one :application_jupyter, class_name: 'Clusters::Applications::Jupyter'
+    has_one :application_knative, class_name: 'Clusters::Applications::Knative'
 
     has_many :kubernetes_namespaces
     has_one :kubernetes_namespace, -> { order(id: :desc) }, class_name: 'Clusters::KubernetesNamespace'
@@ -102,9 +102,11 @@ module Clusters
       [
         application_helm || build_application_helm,
         application_ingress || build_application_ingress,
+        application_cert_manager || build_application_cert_manager,
         application_prometheus || build_application_prometheus,
         application_runner || build_application_runner,
-        application_jupyter || build_application_jupyter
+        application_jupyter || build_application_jupyter,
+        application_knative || build_application_knative
       ]
     end
 
@@ -121,11 +123,18 @@ module Clusters
     end
 
     def first_project
-      return @first_project if defined?(@first_project)
-
-      @first_project = projects.first
+      strong_memoize(:first_project) do
+        projects.first
+      end
     end
     alias_method :project, :first_project
+
+    def first_group
+      strong_memoize(:first_group) do
+        groups.first
+      end
+    end
+    alias_method :group, :first_group
 
     def kubeclient
       platform_kubernetes.kubeclient if kubernetes?
@@ -136,6 +145,10 @@ module Clusters
         project: cluster_project.project,
         cluster_project: cluster_project
       )
+    end
+
+    def allow_user_defined_namespace?
+      project_type?
     end
 
     private
@@ -162,3 +175,5 @@ module Clusters
     end
   end
 end
+
+Clusters::Cluster.prepend(EE::Clusters::Cluster)

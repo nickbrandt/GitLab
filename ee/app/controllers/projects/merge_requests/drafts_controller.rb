@@ -8,6 +8,7 @@ class Projects::MergeRequests::DraftsController < Projects::MergeRequests::Appli
   before_action :check_draft_notes_available!, except: [:index]
   before_action :authorize_create_draft!, only: [:create]
   before_action :authorize_admin_draft!, only: [:update, :destroy]
+  before_action :authorize_admin_draft!, only: [:publish], if: -> { params[:id].present? }
 
   def index
     drafts = prepare_notes_for_rendering(draft_notes)
@@ -34,29 +35,32 @@ class Projects::MergeRequests::DraftsController < Projects::MergeRequests::Appli
   end
 
   def destroy
-    draft_note.destroy!
+    DraftNotes::DestroyService.new(merge_request, current_user).execute(draft_note)
 
     head :ok
   end
 
   def publish
-    DraftNotes::PublishService.new(merge_request, current_user).execute(params[:id])
+    DraftNotes::PublishService.new(merge_request, current_user).execute(draft_note(allow_nil: true))
 
     head :ok
   end
 
   def discard
-    draft_notes.delete_all
+    DraftNotes::DestroyService.new(merge_request, current_user).execute
 
     head :ok
   end
 
   private
 
-  def draft_note
+  def draft_note(allow_nil: false)
     strong_memoize(:draft_note) do
-      draft_notes.try(:find, params[:id])
+      draft_notes.find(params[:id])
     end
+  rescue ActiveRecord::RecordNotFound => ex
+    # draft_note is allowed to be nil in #publish
+    raise ex unless allow_nil
   end
 
   def draft_notes

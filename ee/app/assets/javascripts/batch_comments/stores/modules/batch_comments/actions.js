@@ -88,9 +88,13 @@ export const discardReview = ({ commit, getters }) => {
     .catch(() => commit(types.RECEIVE_DISCARD_REVIEW_ERROR));
 };
 
-export const updateDraft = ({ commit, getters }, { note, noteText, callback }) =>
+export const updateDraft = ({ commit, getters }, { note, noteText, resolveDiscussion, callback }) =>
   service
-    .update(getters.getNotesData.draftsPath, { draftId: note.id, note: noteText })
+    .update(getters.getNotesData.draftsPath, {
+      draftId: note.id,
+      note: noteText,
+      resolveDiscussion,
+    })
     .then(res => res.json())
     .then(data => commit(types.RECEIVE_DRAFT_UPDATE_SUCCESS, data))
     .then(callback)
@@ -133,9 +137,15 @@ export const openReviewDropdown = ({ commit }) => commit(types.OPEN_REVIEW_DROPD
 export const closeReviewDropdown = ({ commit }) => commit(types.CLOSE_REVIEW_DROPDOWN);
 
 export const expandAllDiscussions = ({ dispatch, state }) =>
-  state.drafts.filter(draft => draft.discussion_id).forEach(draft => {
-    dispatch('expandDiscussion', { discussionId: draft.discussion_id }, { root: true });
-  });
+  state.drafts
+    .filter(draft => draft.discussion_id)
+    .forEach(draft => {
+      dispatch('expandDiscussion', { discussionId: draft.discussion_id }, { root: true });
+    });
+
+export const toggleResolveDiscussion = ({ commit }, draftId) => {
+  commit(types.TOGGLE_RESOLVE_DISCUSSION, draftId);
+};
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

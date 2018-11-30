@@ -6,7 +6,7 @@ describe('Filtered Search Token Keys (Issues EE)', () => {
     type: 'string',
     param: '',
     symbol: '',
-    icon: 'scale',
+    icon: 'weight',
     tag: 'number',
   };
 

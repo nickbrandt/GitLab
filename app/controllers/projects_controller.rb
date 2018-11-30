@@ -6,7 +6,8 @@ class ProjectsController < Projects::ApplicationController
   include ExtractsPath
   include PreviewMarkdown
   include SendFileUpload
-  prepend EE::ProjectsController
+
+  prepend_before_action(only: [:show]) { authenticate_sessionless_user!(:rss) }
 
   before_action :whitelist_query_limiting, only: [:create]
   before_action :authenticate_user!, except: [:index, :show, :activity, :refs]
@@ -449,3 +450,5 @@ class ProjectsController < Projects::ApplicationController
     @project = @project.present(current_user: current_user)
   end
 end
+
+ProjectsController.prepend(EE::ProjectsController)

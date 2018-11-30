@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module IssuablesHelper
-  prepend EE::IssuablesHelper
-
   include GitlabRoutingHelper
 
   def sidebar_gutter_toggle_icon
@@ -364,6 +362,10 @@ module IssuablesHelper
     end
   end
 
+  def has_filter_bar_param?
+    finder.class.scalar_params.any? { |p| params[p].present? }
+  end
+
   private
 
   def sidebar_gutter_collapsed?
@@ -440,3 +442,5 @@ module IssuablesHelper
     end
   end
 end
+
+IssuablesHelper.prepend(EE::IssuablesHelper)

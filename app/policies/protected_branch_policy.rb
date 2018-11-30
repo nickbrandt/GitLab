@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class ProtectedBranchPolicy < BasePolicy
-  prepend EE::ProtectedBranchPolicy
-
   delegate { @subject.project }
 
   rule { can?(:admin_project) }.policy do
@@ -11,3 +9,5 @@ class ProtectedBranchPolicy < BasePolicy
     enable :destroy_protected_branch
   end
 end
+
+ProtectedBranchPolicy.prepend(EE::ProtectedBranchPolicy)

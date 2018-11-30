@@ -1,6 +1,7 @@
 <script>
 import _ from 'underscore';
 import { mapActions, mapState } from 'vuex';
+import { GlLink, GlButton } from '@gitlab/ui';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
 import { timeIntervalInWords } from '~/lib/utils/datetime_utility';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -21,6 +22,8 @@ export default {
     TriggerBlock,
     StagesDropdown,
     JobsContainer,
+    GlLink,
+    GlButton,
   },
   mixins: [timeagoMixin],
   props: {
@@ -104,18 +107,12 @@ export default {
 };
 </script>
 <template>
-  <aside
-    class="right-sidebar build-sidebar"
-    data-offset-top="101"
-    data-spy="affix"
-  >
+  <aside class="right-sidebar build-sidebar" data-offset-top="101" data-spy="affix">
     <div class="sidebar-container">
       <div class="blocks-container">
         <div class="block">
-          <strong class="inline prepend-top-8">
-            {{ job.name }}
-          </strong>
-          <a
+          <strong class="inline prepend-top-8"> {{ job.name }} </strong>
+          <gl-link
             v-if="job.retry_path"
             :class="retryButtonClass"
             :href="job.retry_path"
@@ -123,43 +120,35 @@ export default {
             rel="nofollow"
           >
             {{ __('Retry') }}
-          </a>
-          <a
+          </gl-link>
+          <gl-link
             v-if="job.terminal_path"
             :href="job.terminal_path"
             class="js-terminal-link pull-right btn btn-primary
       btn-inverted visible-md-block visible-lg-block"
             target="_blank"
           >
-            {{ __('Debug') }}
-            <icon name="external-link" />
-          </a>
-          <button
+            {{ __('Debug') }} <icon name="external-link" />
+          </gl-link>
+          <gl-button
             :aria-label="__('Toggle Sidebar')"
             type="button"
             class="btn btn-blank gutter-toggle
         float-right d-block d-md-none js-sidebar-build-toggle"
             @click="toggleSidebar"
           >
-            <i
-              aria-hidden="true"
-              data-hidden="true"
-              class="fa fa-angle-double-right"
-            ></i>
-          </button>
+            <i aria-hidden="true" data-hidden="true" class="fa fa-angle-double-right"></i>
+          </gl-button>
         </div>
-        <div
-          v-if="job.retry_path || job.new_issue_path"
-          class="block retry-link"
-        >
-          <a
+        <div v-if="job.retry_path || job.new_issue_path" class="block retry-link">
+          <gl-link
             v-if="job.new_issue_path"
             :href="job.new_issue_path"
             class="js-new-issue btn btn-success btn-inverted"
           >
             {{ __('New issue') }}
-          </a>
-          <a
+          </gl-link>
+          <gl-link
             v-if="job.retry_path"
             :href="job.retry_path"
             class="js-retry-job btn btn-inverted-secondary"
@@ -167,19 +156,12 @@ export default {
             rel="nofollow"
           >
             {{ __('Retry') }}
-          </a>
+          </gl-link>
         </div>
-        <div :class="{ block : renderBlock }">
-          <p
-            v-if="job.merge_request"
-            class="build-detail-row js-job-mr"
-          >
-            <span class="build-light-text">
-              {{ __('Merge Request:') }}
-            </span>
-            <a :href="job.merge_request.path">
-              !{{ job.merge_request.iid }}
-            </a>
+        <div :class="{ block: renderBlock }">
+          <p v-if="job.merge_request" class="build-detail-row js-job-mr">
+            <span class="build-light-text"> {{ __('Merge Request:') }} </span>
+            <gl-link :href="job.merge_request.path"> !{{ job.merge_request.iid }} </gl-link>
           </p>
 
           <detail-row
@@ -200,12 +182,7 @@ export default {
             class="js-job-erased"
             title="Erased"
           />
-          <detail-row
-            v-if="job.queued"
-            :value="queued"
-            class="js-job-queued"
-            title="Queued"
-          />
+          <detail-row v-if="job.queued" :value="queued" class="js-job-queued" title="Queued" />
           <detail-row
             v-if="hasTimeout"
             :help-url="runnerHelpUrl"
@@ -213,56 +190,34 @@ export default {
             class="js-job-timeout"
             title="Timeout"
           />
-          <detail-row
-            v-if="job.runner"
-            :value="runnerId"
-            class="js-job-runner"
-            title="Runner"
-          />
+          <detail-row v-if="job.runner" :value="runnerId" class="js-job-runner" title="Runner" />
           <detail-row
             v-if="job.coverage"
             :value="coverage"
             class="js-job-coverage"
             title="Coverage"
           />
-          <p
-            v-if="job.tags.length"
-            class="build-detail-row js-job-tags"
-          >
-            <span class="build-light-text">
-              {{ __('Tags:') }}
-            </span>
-            <span
-              v-for="(tag, i) in job.tags"
-              :key="i"
-              class="label label-primary">
+          <p v-if="job.tags.length" class="build-detail-row js-job-tags">
+            <span class="build-light-text"> {{ __('Tags:') }} </span>
+            <span v-for="(tag, i) in job.tags" :key="i" class="badge badge-primary">
               {{ tag }}
             </span>
           </p>
 
-          <div
-            v-if="job.cancel_path"
-            class="btn-group prepend-top-5"
-            role="group">
-            <a
+          <div v-if="job.cancel_path" class="btn-group prepend-top-5" role="group">
+            <gl-link
               :href="job.cancel_path"
               class="js-cancel-job btn btn-sm btn-default"
               data-method="post"
               rel="nofollow"
             >
               {{ __('Cancel') }}
-            </a>
+            </gl-link>
           </div>
         </div>
 
-        <artifacts-block
-          v-if="hasArtifact"
-          :artifact="job.artifact"
-        />
-        <trigger-block
-          v-if="hasTriggers"
-          :trigger="job.trigger"
-        />
+        <artifacts-block v-if="hasArtifact" :artifact="job.artifact" />
+        <trigger-block v-if="hasTriggers" :trigger="job.trigger" />
         <commit-block
           :is-last-block="hasStages"
           :commit="commit"
@@ -278,11 +233,7 @@ export default {
         />
       </div>
 
-      <jobs-container
-        v-if="jobs.length"
-        :jobs="jobs"
-        :job-id="job.id"
-      />
+      <jobs-container v-if="jobs.length" :jobs="jobs" :job-id="job.id" />
     </div>
   </aside>
 </template>

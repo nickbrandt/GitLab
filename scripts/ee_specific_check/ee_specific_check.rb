@@ -278,7 +278,7 @@ module EESpecificCheck
 
   def scan_diff_numstat(numstat)
     numstat.scan(/(\d+)\s+(\d+)\s+(.+)/)
-      .each_with_object({}) do |(added, deleted, file), result|
+      .each_with_object(Hash.new(0)) do |(added, deleted, file), result|
         result[file] = added.to_i + deleted.to_i
       end
   end

@@ -28,6 +28,17 @@ describe EE::User do
     end
   end
 
+  describe '.find_by_smartcard_identity' do
+    let!(:user) { create(:user) }
+    let!(:smartcard_identity) { create(:smartcard_identity, user: user) }
+
+    it 'returns the user' do
+      expect(User.find_by_smartcard_identity(smartcard_identity.subject,
+                                             smartcard_identity.issuer))
+        .to eq(user)
+    end
+  end
+
   describe '#access_level=' do
     let(:user) { build(:user) }
 
@@ -233,6 +244,49 @@ describe EE::User do
 
       it 'returns set value' do
         expect(subject.roadmap_layout).to eq('quarters')
+      end
+    end
+  end
+
+  describe '#group_sso?' do
+    subject(:user) { create(:user) }
+
+    it 'is false without a saml_provider' do
+      expect(subject.group_sso?(nil)).to be_falsey
+      expect(subject.group_sso?(create(:group))).to be_falsey
+    end
+
+    context 'with linked identity' do
+      let!(:identity) { create(:identity, :group_saml, user: user) }
+      let(:saml_provider) { identity.saml_provider }
+      let(:group) { saml_provider.group }
+
+      context 'without preloading' do
+        it 'returns true' do
+          expect(subject.group_sso?(group)).to be_truthy
+        end
+
+        it 'does not cause ActiveRecord to loop through identites' do
+          create(:identity, :group_saml, user: user)
+
+          expect(Identity).not_to receive(:instantiate)
+
+          subject.group_sso?(group)
+        end
+      end
+
+      context 'when identities and saml_providers pre-loaded' do
+        before do
+          ActiveRecord::Associations::Preloader.new.preload(subject, group_saml_identities: :saml_provider)
+        end
+
+        it 'returns true' do
+          expect(subject.group_sso?(group)).to be_truthy
+        end
+
+        it 'does not trigger additional database queries' do
+          expect { subject.group_sso?(group) }.not_to exceed_query_limit(0)
+        end
       end
     end
   end

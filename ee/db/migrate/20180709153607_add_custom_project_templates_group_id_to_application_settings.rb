@@ -1,4 +1,4 @@
-class AddCustomProjectTemplatesGroupIdToApplicationSettings < ActiveRecord::Migration
+class AddCustomProjectTemplatesGroupIdToApplicationSettings < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def up

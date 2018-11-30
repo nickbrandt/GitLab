@@ -12,13 +12,13 @@ module QA
           Page::Main::Login.act { sign_in_using_credentials }
 
           # Create a new Project
-          project = Factory::Resource::Project.fabricate! do |project|
+          project = Resource::Project.fabricate! do |project|
             project.name = 'geo-project'
             project.description = 'Geo test project'
           end
 
           # Perform a git push over HTTP directly to the primary
-          Factory::Repository::ProjectPush.fabricate! do |push|
+          Resource::Repository::ProjectPush.fabricate! do |push|
             push.project = project
             push.file_name = file_name
             push.file_content = "# #{file_content}"

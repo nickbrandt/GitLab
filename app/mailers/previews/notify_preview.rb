@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class NotifyPreview < ActionMailer::Preview
-  prepend EE::Preview::NotifyPreview
-
   def note_merge_request_email_for_individual_note
     note_email(:note_merge_request_email) do
       note = <<-MD.strip_heredoc
@@ -196,3 +194,5 @@ class NotifyPreview < ActionMailer::Preview
     email
   end
 end
+
+NotifyPreview.prepend(EE::Preview::NotifyPreview)

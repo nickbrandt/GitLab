@@ -9,8 +9,6 @@
 # For users who haven't customized the setting, we simply delegate to
 # `DashboardController#show`, which is the default.
 class RootController < Dashboard::ProjectsController
-  prepend EE::RootController
-
   skip_before_action :authenticate_user!, only: [:index]
 
   before_action :redirect_unlogged_user, if: -> { current_user.nil? }
@@ -47,9 +45,9 @@ class RootController < Dashboard::ProjectsController
     when 'todos'
       redirect_to(dashboard_todos_path)
     when 'issues'
-      redirect_to(issues_dashboard_path(assignee_id: current_user.id))
+      redirect_to(issues_dashboard_path(assignee_username: current_user.username))
     when 'merge_requests'
-      redirect_to(merge_requests_dashboard_path(assignee_id: current_user.id))
+      redirect_to(merge_requests_dashboard_path(assignee_username: current_user.username))
     end
   end
 
@@ -64,3 +62,5 @@ class RootController < Dashboard::ProjectsController
     root_urls.exclude?(home_page_url)
   end
 end
+
+RootController.prepend(EE::RootController)

@@ -524,8 +524,8 @@ describe('vulnerability dismissal', () => {
   });
 });
 
-describe('undo vulnerability dismissal', () => {
-  describe('undoDismissal', () => {
+describe('revert vulnerability dismissal', () => {
+  describe('revertDismissal', () => {
     const vulnerability = mockDataVulnerabilities[2];
     const url = `${vulnerability.vulnerability_feedback_url}/${
       vulnerability.dismissal_feedback.id
@@ -547,13 +547,13 @@ describe('undo vulnerability dismissal', () => {
 
       it('should dispatch the request and success actions', done => {
         testAction(
-          actions.undoDismissal,
+          actions.revertDismissal,
           { vulnerability },
           {},
           [],
           [
-            { type: 'requestUndoDismissal' },
-            { type: 'receiveUndoDismissalSuccess', payload: { id: vulnerability.id } },
+            { type: 'requestRevertDismissal' },
+            { type: 'receiveRevertDismissalSuccess', payload: { id: vulnerability.id } },
           ],
           done,
         );
@@ -569,13 +569,13 @@ describe('undo vulnerability dismissal', () => {
         const flashError = false;
 
         testAction(
-          actions.undoDismissal,
+          actions.revertDismissal,
           { vulnerability, flashError },
           {},
           [],
           [
-            { type: 'requestUndoDismissal' },
-            { type: 'receiveUndoDismissalError', payload: { flashError: false } },
+            { type: 'requestRevertDismissal' },
+            { type: 'receiveRevertDismissalError', payload: { flashError: false } },
           ],
           done,
         );
@@ -583,18 +583,18 @@ describe('undo vulnerability dismissal', () => {
     });
   });
 
-  describe('receiveUndoDismissalSuccess', () => {
+  describe('receiveRevertDismissalSuccess', () => {
     it('should commit the success mutation', done => {
       const state = initialState;
       const data = mockDataVulnerabilities[0];
 
       testAction(
-        actions.receiveUndoDismissalSuccess,
+        actions.receiveRevertDismissalSuccess,
         { data },
         state,
         [
           {
-            type: types.RECEIVE_UNDO_DISMISSAL_SUCCESS,
+            type: types.RECEIVE_REVERT_DISMISSAL_SUCCESS,
             payload: { data },
           },
         ],
@@ -604,30 +604,30 @@ describe('undo vulnerability dismissal', () => {
     });
   });
 
-  describe('receiveUndoDismissalError', () => {
+  describe('receiveRevertDismissalError', () => {
     it('should commit the error mutation', done => {
       const state = initialState;
 
       testAction(
-        actions.receiveUndoDismissalError,
+        actions.receiveRevertDismissalError,
         {},
         state,
-        [{ type: types.RECEIVE_UNDO_DISMISSAL_ERROR }],
+        [{ type: types.RECEIVE_REVERT_DISMISSAL_ERROR }],
         [],
         done,
       );
     });
   });
 
-  describe('requestUndoDismissal', () => {
+  describe('requestRevertDismissal', () => {
     it('should commit the request mutation', done => {
       const state = initialState;
 
       testAction(
-        actions.requestUndoDismissal,
+        actions.requestRevertDismissal,
         {},
         state,
-        [{ type: types.REQUEST_UNDO_DISMISSAL }],
+        [{ type: types.REQUEST_REVERT_DISMISSAL }],
         [],
         done,
       );

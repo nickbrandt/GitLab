@@ -112,9 +112,16 @@ export const receiveCreateIssueSuccess = ({ commit }, payload) => {
   commit(types.RECEIVE_CREATE_ISSUE_SUCCESS, payload);
 };
 
-export const receiveCreateIssueError = ({ commit }) => {
+export const receiveCreateIssueError = ({ commit }, { flashError }) => {
   commit(types.RECEIVE_CREATE_ISSUE_ERROR);
-  createFlash(s__('Security Reports|There was an error creating the issue.'));
+
+  if (flashError) {
+    createFlash(
+      s__('Security Reports|There was an error creating the issue.'),
+      'alert',
+      document.querySelector('.ci-table'),
+    );
+  }
 };
 
 export const dismissVulnerability = ({ dispatch }, { vulnerability, flashError }) => {
@@ -152,40 +159,48 @@ export const receiveDismissVulnerabilitySuccess = ({ commit }, payload) => {
 export const receiveDismissVulnerabilityError = ({ commit }, { flashError }) => {
   commit(types.RECEIVE_DISMISS_VULNERABILITY_ERROR);
   if (flashError) {
-    createFlash(s__('Security Reports|There was an error dismissing the issue.'));
+    createFlash(
+      s__('Security Reports|There was an error dismissing the vulnerability.'),
+      'alert',
+      document.querySelector('.ci-table'),
+    );
   }
 };
 
-export const undoDismissal = ({ dispatch }, { vulnerability, flashError }) => {
+export const revertDismissal = ({ dispatch }, { vulnerability, flashError }) => {
   const { vulnerability_feedback_url, dismissal_feedback } = vulnerability;
   // eslint-disable-next-line camelcase
   const url = `${vulnerability_feedback_url}/${dismissal_feedback.id}`;
 
-  dispatch('requestUndoDismissal');
+  dispatch('requestRevertDismissal');
 
   axios
     .delete(url)
     .then(() => {
       const { id } = vulnerability;
-      dispatch('receiveUndoDismissalSuccess', { id });
+      dispatch('receiveRevertDismissalSuccess', { id });
     })
     .catch(() => {
-      dispatch('receiveUndoDismissalError', { flashError });
+      dispatch('receiveRevertDismissalError', { flashError });
     });
 };
 
-export const requestUndoDismissal = ({ commit }) => {
-  commit(types.REQUEST_UNDO_DISMISSAL);
+export const requestRevertDismissal = ({ commit }) => {
+  commit(types.REQUEST_REVERT_DISMISSAL);
 };
 
-export const receiveUndoDismissalSuccess = ({ commit }, payload) => {
-  commit(types.RECEIVE_UNDO_DISMISSAL_SUCCESS, payload);
+export const receiveRevertDismissalSuccess = ({ commit }, payload) => {
+  commit(types.RECEIVE_REVERT_DISMISSAL_SUCCESS, payload);
 };
 
-export const receiveUndoDismissalError = ({ commit }, { flashError }) => {
-  commit(types.RECEIVE_UNDO_DISMISSAL_ERROR);
+export const receiveRevertDismissalError = ({ commit }, { flashError }) => {
+  commit(types.RECEIVE_REVERT_DISMISSAL_ERROR);
   if (flashError) {
-    createFlash(s__('Security Reports|There was an error undoing this dismissal.'));
+    createFlash(
+      s__('Security Reports|There was an error reverting this dismissal.'),
+      'alert',
+      document.querySelector('.ci-table'),
+    );
   }
 };
 

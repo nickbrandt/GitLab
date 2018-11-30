@@ -3,7 +3,6 @@
 module Boards
   module Issues
     class ListService < Boards::BaseService
-      prepend EE::Boards::Issues::ListService
       include Gitlab::Utils::StrongMemoize
 
       def execute
@@ -111,3 +110,5 @@ module Boards
     end
   end
 end
+
+Boards::Issues::ListService.prepend(EE::Boards::Issues::ListService)

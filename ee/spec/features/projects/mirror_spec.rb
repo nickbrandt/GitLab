@@ -24,7 +24,7 @@ describe 'Project mirror', :js do
         it 'forces import' do
           import_state.update(last_update_at: timestamp - 8.minutes)
 
-          expect_any_instance_of(EE::Project).to receive(:force_import_job!)
+          expect_any_instance_of(EE::ProjectImportState).to receive(:force_import_job!)
 
           Timecop.freeze(timestamp) do
             visit project_mirror_path(project)
@@ -38,7 +38,7 @@ describe 'Project mirror', :js do
         it 'does not force import' do
           import_state.update(last_update_at: timestamp - 3.minutes)
 
-          expect_any_instance_of(EE::Project).not_to receive(:force_import_job!)
+          expect_any_instance_of(EE::ProjectImportState).not_to receive(:force_import_job!)
 
           Timecop.freeze(timestamp) do
             visit project_mirror_path(project)

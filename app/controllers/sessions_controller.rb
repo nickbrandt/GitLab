@@ -6,8 +6,6 @@ class SessionsController < Devise::SessionsController
   include Devise::Controllers::Rememberable
   include Recaptcha::ClientHelper
   include Recaptcha::Verify
-  prepend EE::SessionsController
-
   skip_before_action :check_two_factor_requirement, only: [:destroy]
 
   prepend_before_action :check_initial_setup, only: [:new]
@@ -105,7 +103,7 @@ class SessionsController < Devise::SessionsController
   end
 
   def failed_login?
-    (options = env["warden.options"]) && options[:action] == "unauthenticated"
+    (options = request.env["warden.options"]) && options[:action] == "unauthenticated"
   end
 
   # Handle an "initial setup" state, where there's only one user, it's an admin,
@@ -220,3 +218,5 @@ class SessionsController < Devise::SessionsController
     end
   end
 end
+
+SessionsController.prepend(EE::SessionsController)

@@ -83,11 +83,11 @@ Add the following information:
 
 ![new group info](img/create_new_group_info.png)
 
-1. Set the **Group path** which will be the **namespace** under which your projects
+1. The **Group name** will populate the path automatically. Optionally, you can
+   change it. This is the name that will me displayed in the group views.
+1. Set the **Group URL** which will be the **namespace** under which your projects
    will be hosted (path can contain only letters, digits, underscores, dashes
    and dots; it cannot start with dashes or end in dot).
-1. The **Group name** will populate with the path. Optionally, you can change
-   it. This is the name that will display in the group views.
 1. Optionally, you can add a description so that others can briefly understand
    what this group is about.
 1. Optionally, choose an avatar for your project.
@@ -185,7 +185,7 @@ Alternatively, you can [lock the sharing with group feature](#share-with-group-l
 In GitLab Enterprise Edition it is possible to manage GitLab group memberships using LDAP groups.
 See [the GitLab Enterprise Edition documentation](../../integration/ldap.md) for more information.
 
-## Epics
+## Epics **[ULTIMATE]**
 
 > Introduced in [GitLab Ultimate][ee] 10.2.
 
@@ -194,6 +194,12 @@ effort by tracking groups of issues that share a theme, across projects and
 milestones.
 
 [Learn more about Epics.](epics/index.md)
+
+## Group Security Dashboard **[ULTIMATE]**
+
+Get an overview of the vulnerabilities of all the projects in a group and its subgroups.
+
+[Learn more about the Group Security Dashboard.](security_dashboard/index.md)
 
 ## Transfer groups to another group
 
@@ -294,11 +300,11 @@ This will disable the option for all users who previously had permissions to
 operate project memberships so no new users can be added. Furthermore, any
 request to add new user to project through API will not be possible.
 
-#### Group-level file templates **[PREMIUM]**
+#### Group file templates **[PREMIUM]**
 
-Group-level file templates allow you to share a set of templates for common file
+Group file templates allow you to share a set of templates for common file
 types with every project in a group. It is analogous to the
-[instance-level template repository](../admin_area/settings/instance_template_repository.md)
+[instance template repository](../admin_area/settings/instance_template_repository.md)
 feature, and the selected project should follow the same naming conventions as
 are documented on that page.
 
@@ -310,13 +316,13 @@ This feature may be configured for subgroups as well as parent groups. A project
 in a subgroup will have access to the templates for that subgroup, as well as
 any parent groups.
 
-![Group-level file template dropdown](img/group_file_template_dropdown.png)
+![Group file template dropdown](img/group_file_template_dropdown.png)
 
 To enable this feature, navigate to the group settings page, expand the
 **Templates** section, choose a project to act as the template repository, and
 **Save group**.
 
-![Group-level file template settings](img/group_file_template_settings.png)
+![Group file template settings](img/group_file_template_settings.png)
 
 ### Advanced settings
 
@@ -333,5 +339,10 @@ With [GitLab Contribution Analytics](contribution_analytics/index.md)
 you have an overview of the contributions (pushes, merge requests,
 and issues) performed my your group members.
 
+## Issues analytics **[PREMIUM]**
+
+With [GitLab Issues Analytics](issues_analytics/index.md), in groups, you can see a bar chart of the number of issues created each month.
+
 [ee]: https://about.gitlab.com/pricing/
 [ee-2534]: https://gitlab.com/gitlab-org/gitlab-ee/issues/2534
+

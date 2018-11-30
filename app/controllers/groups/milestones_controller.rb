@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Groups::MilestonesController < Groups::ApplicationController
-  prepend EE::Groups::MilestonesController
-
   include MilestoneActions
 
   before_action :group_projects
@@ -115,3 +113,5 @@ class Groups::MilestonesController < Groups::ApplicationController
     params.permit(:state).merge(group_ids: group.id)
   end
 end
+
+Groups::MilestonesController.prepend(EE::Groups::MilestonesController)

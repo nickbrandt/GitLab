@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import createStore from 'ee/vue_shared/security_reports/store';
 import SecurityReportApp from 'ee/vue_shared/security_reports/card_security_reports_app.vue';
+import { parseBoolean } from '~/lib/utils/common_utils';
 
 document.addEventListener('DOMContentLoaded', () => {
   const securityTab = document.getElementById('js-security-report-app');
@@ -37,9 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
       return createElement('security-report-app', {
         props: {
           pipelineId: parsedPipelineId,
-          hasPipelineData: hasPipelineData === 'true',
-          canCreateIssue: canCreateIssue === 'true',
-          canCreateFeedback: canCreateFeedback === 'true',
+          hasPipelineData: parseBoolean(hasPipelineData),
+          canCreateIssue: parseBoolean(canCreateIssue),
+          canCreateFeedback: parseBoolean(canCreateFeedback),
           triggeredBy: {
             avatarPath: userAvatarPath,
             name: userName,

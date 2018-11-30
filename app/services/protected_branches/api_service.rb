@@ -2,8 +2,6 @@
 
 module ProtectedBranches
   class ApiService < BaseService
-    prepend EE::ProtectedBranches::ApiService
-
     def create
       @push_params = AccessLevelParams.new(:push, params)
       @merge_params = AccessLevelParams.new(:merge, params)
@@ -28,3 +26,5 @@ module ProtectedBranches
     end
   end
 end
+
+ProtectedBranches::ApiService.prepend(EE::ProtectedBranches::ApiService)

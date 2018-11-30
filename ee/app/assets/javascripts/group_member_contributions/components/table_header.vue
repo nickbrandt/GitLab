@@ -57,13 +57,9 @@ export default {
         :key="index"
         :title="getColumnSortTooltip(column.name)"
         class="header"
-        @click="onColumnClick(column.name)"
+        @click="onColumnClick(column.name);"
       >
-        {{ column.text }}
-        <icon
-          :size="12"
-          :name="getColumnSortIcon(column.name)"
-        />
+        {{ column.text }} <icon :size="12" :name="getColumnSortIcon(column.name)" />
       </th>
     </tr>
   </thead>

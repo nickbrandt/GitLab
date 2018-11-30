@@ -1,15 +1,16 @@
 <script>
 import { mapActions, mapGetters } from 'vuex';
-import emojiSmiling from 'icons/_emoji_slightly_smiling_face.svg';
-import emojiSmile from 'icons/_emoji_smile.svg';
-import emojiSmiley from 'icons/_emoji_smiley.svg';
+import { GlTooltipDirective } from '@gitlab/ui';
+import Icon from '~/vue_shared/components/icon.vue';
 import Flash from '../../flash';
 import { glEmojiTag } from '../../emoji';
-import tooltip from '../../vue_shared/directives/tooltip';
 
 export default {
+  components: {
+    Icon,
+  },
   directives: {
-    tooltip,
+    GlTooltip: GlTooltipDirective,
   },
   props: {
     awards: {
@@ -71,11 +72,6 @@ export default {
     isAuthoredByMe() {
       return this.noteAuthorId === this.getUserData.id;
     },
-  },
-  created() {
-    this.emojiSmiling = emojiSmiling;
-    this.emojiSmile = emojiSmile;
-    this.emojiSmiley = emojiSmiley;
   },
   methods: {
     ...mapActions(['toggleAwardRequest']),
@@ -171,46 +167,40 @@ export default {
       <button
         v-for="(awardList, awardName, index) in groupedAwards"
         :key="index"
-        v-tooltip
+        v-gl-tooltip.bottom="{ boundary: 'viewport' }"
         :class="getAwardClassBindings(awardList)"
         :title="awardTitle(awardList)"
         class="btn award-control"
-        data-boundary="viewport"
-        data-placement="bottom"
         type="button"
-        @click="handleAward(awardName)">
+        @click="handleAward(awardName);"
+      >
         <span v-html="getAwardHTML(awardName)"></span>
-        <span class="award-control-text js-counter">
-          {{ awardList.length }}
-        </span>
+        <span class="award-control-text js-counter">{{ awardList.length }}</span>
       </button>
-      <div
-        v-if="canAwardEmoji"
-        class="award-menu-holder">
+      <div v-if="canAwardEmoji" class="award-menu-holder">
         <button
-          v-tooltip
+          v-gl-tooltip
           :class="{ 'js-user-authored': isAuthoredByMe }"
           class="award-control btn js-add-award"
           title="Add reaction"
           aria-label="Add reaction"
           data-boundary="viewport"
           data-placement="bottom"
-          type="button">
-          <span
-            class="award-control-icon award-control-icon-neutral"
-            v-html="emojiSmiling">
+          type="button"
+        >
+          <span class="award-control-icon award-control-icon-neutral">
+            <icon name="emoji_slightly_smiling_face" />
           </span>
-          <span
-            class="award-control-icon award-control-icon-positive"
-            v-html="emojiSmiley">
+          <span class="award-control-icon award-control-icon-positive">
+            <icon name="emoji_smiley" />
           </span>
-          <span
-            class="award-control-icon award-control-icon-super-positive"
-            v-html="emojiSmile">
+          <span class="award-control-icon award-control-icon-super-positive">
+            <icon name="emoji_smiley" />
           </span>
           <i
             aria-hidden="true"
-            class="fa fa-spinner fa-spin award-control-icon award-control-icon-loading"></i>
+            class="fa fa-spinner fa-spin award-control-icon award-control-icon-loading"
+          ></i>
         </button>
       </div>
     </div>

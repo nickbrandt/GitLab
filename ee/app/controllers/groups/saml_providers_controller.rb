@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Groups::SamlProvidersController < Groups::ApplicationController
   before_action :require_top_level_group
   before_action :authorize_manage_saml!

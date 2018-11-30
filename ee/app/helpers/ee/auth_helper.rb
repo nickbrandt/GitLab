@@ -16,13 +16,31 @@ module EE
       super - GROUP_LEVEL_PROVIDERS
     end
 
+    override :form_based_provider_priority
+    def form_based_provider_priority
+      super << 'smartcard'
+    end
+
     override :form_based_provider?
     def form_based_provider?(name)
       super || name.to_s == 'kerberos'
     end
 
+    override :form_based_providers
+    def form_based_providers
+      providers = super
+
+      providers << :smartcard if smartcard_enabled?
+
+      providers
+    end
+
     def kerberos_enabled?
       auth_providers.include?(:kerberos)
+    end
+
+    def smartcard_enabled?
+      ::Gitlab::Auth::Smartcard.enabled?
     end
 
     def slack_redirect_uri(project)

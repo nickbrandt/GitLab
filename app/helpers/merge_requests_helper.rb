@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module MergeRequestsHelper
-  prepend EE::MergeRequestsHelper
-
   def new_mr_path_from_push_event(event)
     target_project = event.project.default_merge_request_target
     project_new_merge_request_path(
@@ -13,10 +11,10 @@ module MergeRequestsHelper
 
   def new_mr_from_push_event(event, target_project)
     {
-      merge_request_source_branch: event.branch_name,
       merge_request: {
         source_project_id: event.project.id,
         target_project_id: target_project.id,
+        source_branch: event.branch_name,
         target_branch: target_project.repository.root_ref
       }
     }
@@ -53,10 +51,10 @@ module MergeRequestsHelper
   def mr_change_branches_path(merge_request)
     project_new_merge_request_path(
       @project,
-      merge_request_source_branch: merge_request.source_branch,
       merge_request: {
         source_project_id: merge_request.source_project_id,
         target_project_id: merge_request.target_project_id,
+        source_branch: merge_request.source_branch,
         target_branch: merge_request.target_branch
       },
       change_branches: true
@@ -161,3 +159,5 @@ module MergeRequestsHelper
     end
   end
 end
+
+MergeRequestsHelper.prepend(EE::MergeRequestsHelper)

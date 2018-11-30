@@ -1,4 +1,4 @@
-class AddMissingOnPrimaryToJobArtifactRegistry < ActiveRecord::Migration
+class AddMissingOnPrimaryToJobArtifactRegistry < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

@@ -26,13 +26,34 @@ export const filterProjectTokensById = ({ commit, state }, ids) => {
   commit(types.SET_PROJECT_TOKENS, tokens);
 };
 
-export const requestAddProjectsToDashboardSuccess = ({ dispatch }, data) => {
+export const requestAddProjectsToDashboardSuccess = ({ dispatch, state }, data) => {
   const { added, invalid } = data;
 
   dispatch('clearInputValue');
 
   if (invalid.length) {
-    createFlash(s__('OperationsDashboard|Some projects could not be added to dashboard'));
+    const projectNames = state.projectTokens.reduce((accumulator, project) => {
+      if (invalid.includes(project.id)) {
+        accumulator.push(project.name);
+      }
+      return accumulator;
+    }, []);
+    let invalidProjects;
+    if (projectNames.length > 2) {
+      invalidProjects = `${projectNames.slice(0, -1).join(', ')}, and ${projectNames.pop()}`;
+    } else if (projectNames.length > 1) {
+      invalidProjects = projectNames.join(' and ');
+    } else {
+      [invalidProjects] = projectNames;
+    }
+    createFlash(
+      sprintf(
+        s__(
+          'OperationsDashboard|Unable to add %{invalidProjects}. The Operations Dashboard is available for projects with a Gold subscription.',
+        ),
+        { invalidProjects },
+      ),
+    );
     dispatch('filterProjectTokensById', invalid);
   } else {
     dispatch('clearProjectTokens');
@@ -53,6 +74,7 @@ export const requestAddProjectsToDashboardError = ({ state }) => {
 
 export const addProjectToken = ({ commit }, project) => {
   commit(types.ADD_PROJECT_TOKEN, project);
+  commit(types.SET_INPUT_VALUE, '');
 };
 
 export const clearProjectSearchResults = ({ commit }) => {

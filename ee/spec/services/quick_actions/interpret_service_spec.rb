@@ -6,7 +6,7 @@ describe QuickActions::InterpretService do
   let(:user2) { create(:user) }
   let(:user3) { create(:user) }
   let(:group) { create(:group) }
-  let(:project) { create(:project, :public, group: group) }
+  let(:project) { create(:project, :repository, :public, group: group) }
   let(:issue) { create(:issue, project: project) }
   let(:service) { described_class.new(project, current_user) }
 
@@ -145,6 +145,56 @@ describe QuickActions::InterpretService do
           _, updates = service.execute(content, issue)
 
           expect(updates).to be_empty
+        end
+      end
+    end
+
+    context 'promote command' do
+      let(:content) { "/promote" }
+
+      context 'when epics are enabled' do
+        context 'when a user does not have permissions to promote an issue' do
+          it 'does not promote an issue to an epic' do
+            expect { service.execute(content, issue) }.not_to change { Epic.count }
+          end
+        end
+
+        context 'when a user has permissions to promote an issue' do
+          before do
+            group.add_developer(current_user)
+          end
+
+          context 'when epics are enabled' do
+            before do
+              stub_licensed_features(epics: true)
+            end
+
+            it 'promotes an issue to an epic' do
+              expect { service.execute(content, issue) }.to change { Epic.count }.by(1)
+            end
+
+            context 'when an issue belongs to a project without group' do
+              let(:user_project) { create(:project) }
+              let(:issue)        { create(:issue, project: user_project) }
+
+              before do
+                user_project.add_developer(user)
+              end
+
+              it 'does not promote an issue to an epic' do
+                expect { service.execute(content, issue) }
+                  .to raise_error(Epics::IssuePromoteService::PromoteError)
+              end
+            end
+          end
+        end
+      end
+
+      context 'when epics are disabled' do
+        it 'does not promote an issue to an epic' do
+          group.add_developer(current_user)
+
+          expect { service.execute(content, issue) }.not_to change { Epic.count }
         end
       end
     end

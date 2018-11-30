@@ -89,6 +89,14 @@ Rails.application.routes.draw do
 
     draw :operations
     draw :instance_statistics
+    draw :smartcard
+
+    if ENV['GITLAB_ENABLE_CHAOS_ENDPOINTS']
+      get '/chaos/leakmem' => 'chaos#leakmem'
+      get '/chaos/cpuspin' => 'chaos#cpuspin'
+      get '/chaos/sleep' => 'chaos#sleep'
+      get '/chaos/kill' => 'chaos#kill'
+    end
   end
 
   concern :clusterable do

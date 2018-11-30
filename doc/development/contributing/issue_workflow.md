@@ -8,7 +8,7 @@ Most issues will have labels for at least one of the following:
 
 - Type: ~"feature proposal", ~bug, ~customer, etc.
 - Subject: ~wiki, ~"container registry", ~ldap, ~api, ~frontend, etc.
-- Team: ~"CI/CD", ~Plan, ~Manage, ~Quality, etc.
+- Team: ~Plan, ~Manage, ~Quality, etc.
 - Stage: ~"devops:plan", ~"devops:create", etc.
 - Release Scoping: ~Deliverable, ~Stretch, ~"Next Patch Release"
 - Priority: ~P1, ~P2, ~P3, ~P4
@@ -61,7 +61,6 @@ people.
 The current team labels are:
 
 - ~Configure
-- ~"CI/CD"
 - ~Create
 - ~Distribution
 - ~Documentation
@@ -74,6 +73,7 @@ The current team labels are:
 - ~Release
 - ~Secure
 - ~UX
+- ~Verify
 
 The descriptions on the [labels page][labels-page] explain what falls under the
 responsibility of each team.
@@ -175,7 +175,7 @@ Severity levels can be applied further depending on the facet of the impact; e.g
 | ~S1      | >50% users affected (possible company extinction level event)       | Significant impact on all of GitLab.com            |                              |
 | ~S2      | Many users or multiple paid customers affected (but not apocalyptic)| Significant impact on large portions of GitLab.com | Degradation is guaranteed to occur in the near future |
 | ~S3      | A few users or a single paid customer affected                      | Limited impact on important portions of GitLab.com | Degradation is likely to occur in the near future     |
-| ~S4      | No paid users/customer affected, or expected to in the near future  | Minor impact on on GitLab.com                      | Degradation _may_ occur but it's not likely           |
+| ~S4      | No paid users/customer affected, or expected to in the near future  | Minor impact on GitLab.com                         | Degradation _may_ occur but it's not likely           |
 
 ## Label for community contributors
 

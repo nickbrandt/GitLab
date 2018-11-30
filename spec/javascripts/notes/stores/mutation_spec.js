@@ -427,4 +427,61 @@ describe('Notes Store mutations', () => {
       expect(state.discussions[0].expanded).toBe(true);
     });
   });
+
+  describe('DISABLE_COMMENTS', () => {
+    it('should set comments disabled state', () => {
+      const state = {};
+
+      mutations.DISABLE_COMMENTS(state, true);
+
+      expect(state.commentsDisabled).toEqual(true);
+    });
+  });
+
+  describe('UPDATE_RESOLVABLE_DISCUSSIONS_COUNTS', () => {
+    it('updates resolvableDiscussionsCount', () => {
+      const state = {
+        discussions: [
+          { individual_note: false, resolvable: true, notes: [] },
+          { individual_note: true, resolvable: true, notes: [] },
+          { individual_note: false, resolvable: false, notes: [] },
+        ],
+        resolvableDiscussionsCount: 0,
+      };
+
+      mutations.UPDATE_RESOLVABLE_DISCUSSIONS_COUNTS(state);
+
+      expect(state.resolvableDiscussionsCount).toBe(1);
+    });
+
+    it('updates unresolvedDiscussionsCount', () => {
+      const state = {
+        discussions: [
+          { individual_note: false, resolvable: true, notes: [{ resolved: false }] },
+          { individual_note: true, resolvable: true, notes: [{ resolved: false }] },
+          { individual_note: false, resolvable: false, notes: [{ resolved: false }] },
+        ],
+        unresolvedDiscussionsCount: 0,
+      };
+
+      mutations.UPDATE_RESOLVABLE_DISCUSSIONS_COUNTS(state);
+
+      expect(state.unresolvedDiscussionsCount).toBe(1);
+    });
+
+    it('updates hasUnresolvedDiscussions', () => {
+      const state = {
+        discussions: [
+          { individual_note: false, resolvable: true, notes: [{ resolved: false }] },
+          { individual_note: false, resolvable: true, notes: [{ resolved: false }] },
+          { individual_note: false, resolvable: false, notes: [{ resolved: false }] },
+        ],
+        hasUnresolvedDiscussions: 0,
+      };
+
+      mutations.UPDATE_RESOLVABLE_DISCUSSIONS_COUNTS(state);
+
+      expect(state.hasUnresolvedDiscussions).toBe(true);
+    });
+  });
 });

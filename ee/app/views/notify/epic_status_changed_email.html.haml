@@ -1,0 +1,6 @@
+%p
+  Epic was #{@status} by #{@updated_by.name}
+
+%p
+  Epic
+  = link_to @epic.to_reference, group_epic_url(@epic.group, @epic)

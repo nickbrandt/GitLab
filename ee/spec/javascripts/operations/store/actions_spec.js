@@ -165,9 +165,7 @@ describe('actions', () => {
       );
     });
 
-    it('displays an error when user tries to add invalid project to dashboard', done => {
-      const spy = spyOnDependency(defaultActions, 'createFlash');
-
+    it('does not remove projectTokens when user adds invalid projects to dashbaord', done => {
       testAction(
         actions.requestAddProjectsToDashboardSuccess,
         {
@@ -188,8 +186,49 @@ describe('actions', () => {
         ],
         done,
       );
+    });
 
-      expect(spy).toHaveBeenCalledWith(mockText.ADD_PROJECTS_DUPLICATE_ERROR);
+    const errorMessage =
+      'The Operations Dashboard is available for projects with a Gold subscription.';
+    const addTokens = count => {
+      for (let i = 0; i < count; i += 1) {
+        store.dispatch('addProjectToken', {
+          id: i,
+          name: 'mock-name',
+        });
+      }
+    };
+    const addInvalidProjects = invalid =>
+      store.dispatch('requestAddProjectsToDashboardSuccess', {
+        added: [],
+        invalid,
+        duplicate: [],
+      });
+
+    it('displays an error when user tries to add one invalid project to dashboard', () => {
+      const spy = spyOnDependency(defaultActions, 'createFlash');
+      addTokens(1);
+      addInvalidProjects([0]);
+
+      expect(spy).toHaveBeenCalledWith(`Unable to add mock-name. ${errorMessage}`);
+    });
+
+    it('displays an error when user tries to add two invalid projects to dashboard', () => {
+      const spy = spyOnDependency(defaultActions, 'createFlash');
+      addTokens(2);
+      addInvalidProjects([0, 1]);
+
+      expect(spy).toHaveBeenCalledWith(`Unable to add mock-name and mock-name. ${errorMessage}`);
+    });
+
+    it('displays an error when user tries to add more than two invalid projects to dashboard', () => {
+      const spy = spyOnDependency(defaultActions, 'createFlash');
+      addTokens(3);
+      addInvalidProjects([0, 1, 2]);
+
+      expect(spy).toHaveBeenCalledWith(
+        `Unable to add mock-name, mock-name, and mock-name. ${errorMessage}`,
+      );
     });
   });
 
@@ -212,6 +251,10 @@ describe('actions', () => {
           {
             type: types.ADD_PROJECT_TOKEN,
             payload: mockOneProject,
+          },
+          {
+            type: types.SET_INPUT_VALUE,
+            payload: '',
           },
         ],
         [],

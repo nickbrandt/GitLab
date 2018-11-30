@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Groups
   class RoadmapController < Groups::ApplicationController
     include IssuableCollections
@@ -9,8 +11,7 @@ module Groups
 
     def show
       # show roadmap for a group
-      set_sort_order_from_cookie
-      @sort = params[:sort] || default_sort_order
+      @sort = set_sort_order_from_cookie || default_sort_order
       @epics_count = EpicsFinder.new(current_user, group_id: @group.id).execute.count
     end
 

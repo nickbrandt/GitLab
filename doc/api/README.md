@@ -68,6 +68,7 @@ following locations:
 - [Protected Tags](protected_tags.md)
 - [Repositories](repositories.md)
 - [Repository Files](repository_files.md)
+- [Repository Submodules](repository_submodules.md)
 - [Runners](runners.md)
 - [Search](search.md)
 - [Services](services.md)
@@ -111,7 +112,7 @@ not explicit. This allows for a stable API endpoint, but also means new
 features can be added to the API in the same version number.
 
 New features and bug fixes are released in tandem with a new GitLab, and apart
-from incidental patch and security releases, are released on the 22nd each
+from incidental patch and security releases, are released on the 22nd of each
 month. Backward incompatible changes (e.g. endpoints removal, parameters
 removal etc.), as well as removal of entire API versions are done in tandem
 with a major point release of GitLab itself. All deprecations and changes
@@ -231,6 +232,43 @@ For more information, refer to the
 Impersonation tokens are used exactly like regular personal access tokens, and can be passed in either the
 `private_token` parameter or the `Private-Token` header.
 
+#### Disable impersonation
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/40385) in GitLab
+11.6.
+
+By default, impersonation is enabled. To disable impersonation, GitLab must be
+reconfigured:
+
+**For Omnibus installations**
+
+1. Edit `/etc/gitlab/gitlab.rb`:
+
+    ```ruby
+    gitlab_rails['impersonation_enabled'] = false
+    ```
+
+1. Save the file and [reconfigure](../administration/restart_gitlab.md#omnibus-gitlab-reconfigure)
+   GitLab for the changes to take effect.
+
+To re-enable impersonation, remove this configuration and reconfigure GitLab.
+
+---
+
+**For installations from source**
+
+1. Edit `config/gitlab.yml`:
+
+    ```yaml
+    gitlab:
+      impersonation_enabled: false
+    ```
+
+1. Save the file and [restart](../administration/restart_gitlab.md#installations-from-source)
+   GitLab for the changes to take effect.
+
+To re-enable impersonation, remove this configuration and restart GitLab.
+
 ### Sudo
 
 NOTE: **Note:**
@@ -241,7 +279,7 @@ provided you are authenticated as an administrator with an OAuth or Personal Acc
 
 You need to pass the `sudo` parameter either via query string or a header with an ID/username of
 the user you want to perform the operation as. If passed as a header, the
-header name must be `Sudo`. 
+header name must be `Sudo`.
 
 NOTE: **Note:**
 Usernames are case insensitive.
@@ -546,7 +584,7 @@ When you try to access an API URL that does not exist you will receive 404 Not F
 ```
 HTTP/1.1 404 Not Found
 Content-Type: application/json
-{
+{ f
     "error": "404 Not Found"
 }
 ```

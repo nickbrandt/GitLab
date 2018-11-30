@@ -80,7 +80,7 @@ module Gitlab
         return unless tokens.count == 2
         return unless tokens[0] == Gitlab::Geo::BaseRequest::GITLAB_GEO_AUTH_TOKEN_TYPE
 
-        # Split at the first occurence of a colon
+        # Split at the first occurrence of a colon
         geo_tokens = tokens[1].split(':', 2)
 
         return unless geo_tokens.count == 2

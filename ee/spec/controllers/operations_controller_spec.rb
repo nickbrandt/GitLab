@@ -53,7 +53,7 @@ describe OperationsController do
     let(:project) { create(:project, :repository) }
     let(:commit) { project.commit }
     let!(:environment) { create(:environment, name: 'production', project: project) }
-    let!(:deployment) { create(:deployment, environment: environment, sha: commit.id, created_at: now) }
+    let!(:deployment) { create(:deployment, :success, environment: environment, sha: commit.id, created_at: now) }
 
     it_behaves_like 'unlicensed', :get, :list
 
@@ -239,7 +239,7 @@ describe OperationsController do
         user.ops_dashboard_projects << project
       end
 
-      it 'removes a project succesfully' do
+      it 'removes a project successfully' do
         delete :destroy, project_id: project.id
 
         expect(response).to have_gitlab_http_status(200)

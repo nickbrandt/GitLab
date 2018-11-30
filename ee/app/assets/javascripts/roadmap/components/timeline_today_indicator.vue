@@ -82,10 +82,5 @@ export default {
 </script>
 
 <template>
-  <span
-    :class="{ 'invisible': !todayBarReady }"
-    :style="todayBarStyles"
-    class="today-bar"
-  >
-  </span>
+  <span :class="{ invisible: !todayBarReady }" :style="todayBarStyles" class="today-bar"> </span>
 </template>

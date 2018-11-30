@@ -3,11 +3,15 @@ import { __ } from '~/locale';
 import tooltip from '~/vue_shared/directives/tooltip';
 import { spriteIcon } from '~/lib/utils/common_utils';
 import Store from '../stores/sidebar_store';
+import { GlLoadingIcon } from '@gitlab/ui';
 
 export default {
   name: 'SidebarItemEpic',
   directives: {
     tooltip,
+  },
+  components: {
+    GlLoadingIcon,
   },
   data() {
     return {
@@ -67,37 +71,15 @@ export default {
       data-boundary="viewport"
     >
       <div v-html="epicIcon"></div>
-      <span
-        v-if="!isLoading"
-        class="collapse-truncated-title"
-      >
-        {{ collapsedTitle }}
-      </span>
+      <span v-if="!isLoading" class="collapse-truncated-title"> {{ collapsedTitle }} </span>
     </div>
     <div class="title hide-collapsed">
       Epic
-      <gl-loading-icon
-        v-if="isLoading"
-        :inline="true"
-      />
+      <gl-loading-icon v-if="isLoading" :inline="true" />
     </div>
-    <div
-      v-if="!isLoading"
-      class="value hide-collapsed"
-    >
-      <a
-        v-if="hasEpic"
-        :href="epicUrl"
-        class="bold"
-      >
-        {{ epicTitle }}
-      </a>
-      <span
-        v-else
-        class="no-value"
-      >
-        None
-      </span>
+    <div v-if="!isLoading" class="value hide-collapsed">
+      <a v-if="hasEpic" :href="epicUrl" class="bold"> {{ epicTitle }} </a>
+      <span v-else class="no-value"> None </span>
     </div>
   </div>
 </template>

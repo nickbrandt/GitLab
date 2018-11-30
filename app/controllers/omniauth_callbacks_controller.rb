@@ -3,8 +3,6 @@
 class OmniauthCallbacksController < Devise::OmniauthCallbacksController
   include AuthenticatesWithTwoFactor
   include Devise::Controllers::Rememberable
-  prepend EE::OmniauthCallbacksController
-
   protect_from_forgery except: [:kerberos, :saml, :cas3], prepend: true
 
   def handle_omniauth
@@ -201,3 +199,5 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
     (request_params['remember_me'] == '1') if request_params.present?
   end
 end
+
+OmniauthCallbacksController.prepend(EE::OmniauthCallbacksController)

@@ -50,6 +50,9 @@ if Settings.ldap['enabled'] || Rails.env.test?
   end
 end
 
+Settings['smartcard'] ||= Settingslogic.new({})
+Settings.smartcard['enabled'] = false if Settings.smartcard['enabled'].nil?
+
 Settings['omniauth'] ||= Settingslogic.new({})
 Settings.omniauth['enabled'] = true if Settings.omniauth['enabled'].nil?
 Settings.omniauth['auto_sign_in_with_provider'] = false if Settings.omniauth['auto_sign_in_with_provider'].nil?
@@ -163,6 +166,7 @@ Settings.gitlab['domain_whitelist'] ||= []
 Settings.gitlab['import_sources'] ||= Gitlab::ImportSources.values
 Settings.gitlab['trusted_proxies'] ||= []
 Settings.gitlab['no_todos_messages'] ||= YAML.load_file(Rails.root.join('config', 'no_todos_messages.yml'))
+Settings.gitlab['impersonation_enabled'] ||= true if Settings.gitlab['impersonation_enabled'].nil?
 Settings.gitlab['usage_ping_enabled'] = true if Settings.gitlab['usage_ping_enabled'].nil?
 
 #

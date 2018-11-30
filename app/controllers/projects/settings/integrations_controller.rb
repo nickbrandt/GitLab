@@ -3,8 +3,6 @@
 module Projects
   module Settings
     class IntegrationsController < Projects::ApplicationController
-      prepend EE::Projects::Settings::IntegrationsController
-
       include ServiceParams
 
       before_action :authorize_admin_project!
@@ -27,3 +25,5 @@ module Projects
     end
   end
 end
+
+Projects::Settings::IntegrationsController.prepend(EE::Projects::Settings::IntegrationsController)

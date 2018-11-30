@@ -6,9 +6,10 @@ class GroupsController < Groups::ApplicationController
   include MergeRequestsAction
   include ParamsBackwardCompatibility
   include PreviewMarkdown
-  prepend EE::GroupsController
-
   respond_to :html
+
+  prepend_before_action(only: [:show, :issues]) { authenticate_sessionless_user!(:rss) }
+  prepend_before_action(only: [:issues_calendar]) { authenticate_sessionless_user!(:ics) }
 
   before_action :authenticate_user!, only: [:new, :create]
   before_action :group, except: [:index, :new, :create]
@@ -199,3 +200,5 @@ class GroupsController < Groups::ApplicationController
     url_for(safe_params)
   end
 end
+
+GroupsController.prepend(EE::GroupsController)

@@ -12,11 +12,13 @@ import _ from 'underscore';
 import { n__ } from '~/locale';
 import tooltip from '~/vue_shared/directives/tooltip';
 import deployBoardSvg from 'ee_empty_states/icons/_deploy_board.svg';
+import { GlLoadingIcon } from '@gitlab/ui';
 import instanceComponent from './deploy_board_instance_component.vue';
 
 export default {
   components: {
     instanceComponent,
+    GlLoadingIcon,
   },
   directives: {
     tooltip,
@@ -77,16 +79,11 @@ export default {
 </script>
 <template>
   <div class="js-deploy-board deploy-board">
-
     <gl-loading-icon v-if="isLoading" />
 
     <div v-if="canRenderDeployBoard">
-
       <section class="deploy-board-information">
-        <span
-          v-tooltip
-          :title="instanceIsCompletedText"
-        >
+        <span v-tooltip :title="instanceIsCompletedText">
           <span class="percentage">{{ deployBoardData.completion }}%</span>
           <span class="text">Complete</span>
         </span>
@@ -121,7 +118,8 @@ export default {
           :href="deployBoardData.rollback_url"
           class="btn"
           data-method="post"
-          rel="nofollow">
+          rel="nofollow"
+        >
           Rollback
         </a>
 
@@ -130,24 +128,22 @@ export default {
           :href="deployBoardData.abort_url"
           class="btn btn-red btn-inverted"
           data-method="post"
-          rel="nofollow">
+          rel="nofollow"
+        >
           Abort
         </a>
       </section>
     </div>
 
     <div v-if="canRenderEmptyState">
-      <section
-        class="deploy-board-empty-state-svg"
-        v-html="deployBoardSvg">
-      </section>
+      <section class="deploy-board-empty-state-svg" v-html="deployBoardSvg"></section>
 
       <section class="deploy-board-empty-state-text">
         <span class="title">Kubernetes deployment not found</span>
         <span>
-          To see deployment progress for your environments,
-          make sure your deployments are in Kubernetes namespace
-          <code>{{ projectName }}</code> and labeled with <code>app=$CI_ENVIRONMENT_SLUG</code>.
+          To see deployment progress for your environments, make sure your deployments are in
+          Kubernetes namespace <code>{{ projectName }}</code> and labeled with
+          <code>app=$CI_ENVIRONMENT_SLUG</code>.
         </span>
       </section>
     </div>

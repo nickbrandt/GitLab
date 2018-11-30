@@ -23,13 +23,14 @@ description: 'Learn how to contribute to GitLab.'
 
 ## UX and frontend guides
 
-- [UX guide](ux_guide/index.md) for building GitLab with existing CSS styles and elements
+- [GitLab Design System](https://design.gitlab.com/) for building GitLab with existing CSS styles and elements
 - [Frontend guidelines](fe_guide/index.md)
 - [Emoji guide](fe_guide/emojis.md)
 
 ## Backend guides
 
 - [GitLab utilities](utilities.md)
+- [Logging](logging.md)
 - [API styleguide](api_styleguide.md) Use this styleguide if you are
   contributing to the API.
 - [GraphQL API styleguide](api_graphql_styleguide.md) Use this
@@ -54,6 +55,7 @@ description: 'Learn how to contribute to GitLab.'
 - [Guidelines for reusing abstractions](reusing_abstractions.md)
 - [DeclarativePolicy framework](policies.md)
 - [Geo development](geo.md)
+- [Switching to Rails 5](switching_to_rails5.md)
 
 ## Performance guides
 

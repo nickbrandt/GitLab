@@ -27,7 +27,7 @@ describe Geo::PruneEventLogWorker, :geo do
       end
 
       it 'does nothing when database is not feeling healthy' do
-        allow(Gitlab::Database).to receive(:healthy?).and_return(false)
+        allow(EE::Gitlab::Database).to receive(:healthy?).and_return(false)
 
         expect(Geo::PruneEventLogService).not_to receive(:new)
 

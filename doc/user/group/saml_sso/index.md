@@ -4,6 +4,10 @@
 
 This allows SAML to be used for adding users to a group on GitLab.com and other instances where using [site-wide SAML](../../../integration/saml.md) is not possible.
 
+When using a group SAML SSO link, users should already have an account on the GitLab instance with the email address that matches the user account from the provider.
+
+NOTE: **Note:** SAML SSO for groups is used only as a convenient way to add users and does not sync users between providers. Group owners will still need to manage user accounts, such as removing users when necessary.
+
 ## How to configure
 
 1. Navigate to the group and click Settings -> SAML SSO.

@@ -3,8 +3,6 @@
 module Users
   class UpdateService < BaseService
     include NewUserNotifier
-    prepend EE::Users::UpdateService
-
     def initialize(current_user, params = {})
       @current_user = current_user
       @user = params.delete(:user)
@@ -58,3 +56,5 @@ module Users
     end
   end
 end
+
+Users::UpdateService.prepend(EE::Users::UpdateService)

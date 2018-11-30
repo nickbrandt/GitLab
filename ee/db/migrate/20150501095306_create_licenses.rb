@@ -1,5 +1,5 @@
 # rubocop:disable Migration/Timestamps
-class CreateLicenses < ActiveRecord::Migration
+class CreateLicenses < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def change

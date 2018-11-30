@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Groups::AutocompleteSourcesController < Groups::ApplicationController
   before_action :load_autocomplete_service, except: [:members]
 

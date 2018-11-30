@@ -8,7 +8,7 @@ module QA
         Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
           Page::Main::Login.act { sign_in_using_credentials }
 
-          project = Factory::Resource::Project.fabricate! do |project|
+          project = Resource::Project.fabricate! do |project|
             project.name = 'geo-before-rename'
             project.description = 'Geo project to be renamed'
           end
@@ -16,7 +16,7 @@ module QA
           geo_project_name = project.name
           expect(project.name).to include 'geo-before-rename'
 
-          Factory::Repository::ProjectPush.fabricate! do |push|
+          Resource::Repository::ProjectPush.fabricate! do |push|
             push.project = project
             push.file_name = 'README.md'
             push.file_content = '# This is Geo project!'

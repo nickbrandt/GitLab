@@ -175,6 +175,39 @@ describe Geo::ProjectRegistry do
     end
   end
 
+  describe '.flag_repositories_for_recheck!' do
+    it 'modified record to a recheck state' do
+      registry = create(:geo_project_registry, :repository_verified)
+
+      described_class.flag_repositories_for_recheck!
+
+      expect(registry.reload).to have_attributes(
+        repository_verification_checksum_sha: nil,
+        last_repository_verification_failure: nil,
+        repository_checksum_mismatch: false
+      )
+    end
+  end
+
+  describe '.flag_repositories_for_resync!' do
+    it 'modified record to a resync state' do
+      registry = create(:geo_project_registry, :synced)
+
+      described_class.flag_repositories_for_resync!
+
+      expect(registry.reload).to have_attributes(
+        resync_repository: true,
+        repository_verification_checksum_sha: nil,
+        last_repository_verification_failure: nil,
+        repository_checksum_mismatch: false,
+        repository_verification_retry_count: nil,
+        repository_retry_count: nil,
+        repository_retry_at: nil
+
+      )
+    end
+  end
+
   describe '#repository_sync_due?' do
     where(:last_synced_at, :resync, :retry_at, :expected) do
       now = Time.now

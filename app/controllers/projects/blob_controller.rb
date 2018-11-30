@@ -122,7 +122,7 @@ class Projects::BlobController < Projects::ApplicationController
     @lines.map! do |line|
       # These are marked as context lines but are loaded from blobs.
       # We also have context lines loaded from diffs in other places.
-      diff_line = Gitlab::Diff::Line.new(line, 'context', nil, nil, nil)
+      diff_line = Gitlab::Diff::Line.new(line, nil, nil, nil, nil)
       diff_line.rich_text = line
       diff_line
     end
@@ -233,7 +233,7 @@ class Projects::BlobController < Projects::ApplicationController
 
   def validate_diff_params
     if [:since, :to, :offset].any? { |key| params[key].blank? }
-      render nothing: true
+      head :ok
     end
   end
 

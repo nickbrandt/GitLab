@@ -57,6 +57,7 @@ class License < ActiveRecord::Base
     object_storage
     group_saml
     service_desk
+    smartcard_auth
     unprotection_restrictions
     variable_environment_scope
     reject_unsigned_commits
@@ -70,6 +71,7 @@ class License < ActiveRecord::Base
     code_owner_as_approver_suggestion
     feature_flags
     batch_comments
+    issues_analytics
   ].freeze
 
   EEU_FEATURES = EEP_FEATURES + %i[
@@ -87,6 +89,7 @@ class License < ActiveRecord::Base
     pseudonymizer
     prometheus_alerts
     operations_dashboard
+    tracing
   ].freeze
 
   # List all features available for early adopters,

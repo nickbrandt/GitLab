@@ -27,7 +27,7 @@
 
 - if pipeline.expose_license_management_data?
   #js-tab-licenses.tab-pane
-    #js-licenses-app{ data: { license_head_path: pipeline.expose_license_management_data? ? license_management_artifact_url(pipeline) : nil,
+    #js-licenses-app{ data: { license_head_path: pipeline.downloadable_path_for_report_type(:license_management),
     api_url: license_management_api_url(project),
     license_management_settings_path: license_management_settings_path,
     can_manage_licenses: can?(current_user, :admin_software_license_policy, project).to_s } }

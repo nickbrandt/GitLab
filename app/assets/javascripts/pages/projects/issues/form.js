@@ -7,6 +7,7 @@ import LabelsSelect from '~/labels_select';
 import MilestoneSelect from '~/milestone_select';
 import ShortcutsNavigation from '~/behaviors/shortcuts/shortcuts_navigation';
 import IssuableTemplateSelectors from '~/templates/issuable_template_selectors';
+import initSuggestions from '~/issuable_suggestions';
 import WeightSelect from 'ee/weight_select';
 
 export default () => {
@@ -16,5 +17,10 @@ export default () => {
   new LabelsSelect();
   new MilestoneSelect();
   new IssuableTemplateSelectors();
+
+  if (gon.features.issueSuggestions && gon.features.graphql) {
+    initSuggestions();
+  }
+
   new WeightSelect();
 };

@@ -2,8 +2,6 @@
 
 module Commits
   class CreateService < ::BaseService
-    prepend EE::Commits::CreateService
-
     ValidationError = Class.new(StandardError)
     ChangeError = Class.new(StandardError)
 
@@ -21,7 +19,12 @@ module Commits
       new_commit = create_commit!
 
       success(result: new_commit)
-    rescue ValidationError, ChangeError, Gitlab::Git::Index::IndexError, Gitlab::Git::CommitError, Gitlab::Git::PreReceiveError => ex
+    rescue ValidationError,
+           ChangeError,
+           Gitlab::Git::Index::IndexError,
+           Gitlab::Git::CommitError,
+           Gitlab::Git::PreReceiveError,
+           Gitlab::Git::CommandError => ex
       error(ex.message)
     end
 
@@ -76,3 +79,5 @@ module Commits
     end
   end
 end
+
+Commits::CreateService.prepend(EE::Commits::CreateService)

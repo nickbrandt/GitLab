@@ -16,8 +16,6 @@
 #   NotificationService.new.async.new_issue(issue, current_user)
 #
 class NotificationService
-  prepend EE::NotificationService
-
   class Async
     attr_reader :parent
     delegate :respond_to_missing, to: :parent
@@ -52,7 +50,7 @@ class NotificationService
 
   # Always notify the user about gpg key added
   #
-  # This is a security email so it will be sent even if the user user disabled
+  # This is a security email so it will be sent even if the user disabled
   # notifications
   def new_gpg_key(gpg_key)
     if gpg_key.user&.can?(:receive_notifications)
@@ -589,3 +587,5 @@ class NotificationService
     member.source.respond_to?(:group) && member.source.group
   end
 end
+
+NotificationService.prepend(EE::NotificationService)

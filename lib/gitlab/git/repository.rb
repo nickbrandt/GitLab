@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'tempfile'
 require 'forwardable'
 require "rubygems/package"
@@ -78,7 +80,13 @@ module Gitlab
       end
 
       def ==(other)
-        [storage, relative_path] == [other.storage, other.relative_path]
+        other.is_a?(self.class) && [storage, relative_path] == [other.storage, other.relative_path]
+      end
+
+      alias_method :eql?, :==
+
+      def hash
+        [self.class, storage, relative_path].hash
       end
 
       # This method will be removed when Gitaly reaches v1.1.
@@ -419,13 +427,17 @@ module Gitlab
       end
 
       def diff_stats(left_id, right_id)
+        if [left_id, right_id].any? { |ref| ref.blank? || Gitlab::Git.blank_ref?(ref) }
+          return empty_diff_stats
+        end
+
         stats = wrapped_gitaly_errors do
           gitaly_commit_client.diff_stats(left_id, right_id)
         end
 
         Gitlab::Git::DiffStatsCollection.new(stats)
       rescue CommandError, TypeError
-        Gitlab::Git::DiffStatsCollection.new([])
+        empty_diff_stats
       end
 
       # Returns a RefName for a given SHA
@@ -435,7 +447,7 @@ module Gitlab
         gitaly_ref_client.find_ref_name(sha, ref_path)
       end
 
-      # Get refs hash which key is is the commit id
+      # Get refs hash which key is the commit id
       # and value is a Gitlab::Git::Tag or Gitlab::Git::Branch
       # Note that both inherit from Gitlab::Git::Ref
       def refs_hash
@@ -571,6 +583,20 @@ module Gitlab
         end
       end
 
+      def update_submodule(user:, submodule:, commit_sha:, message:, branch:)
+        args = {
+          user: user,
+          submodule: submodule,
+          commit_sha: commit_sha,
+          branch: branch,
+          message: message
+        }
+
+        wrapped_gitaly_errors do
+          gitaly_operation_client.user_update_submodule(args)
+        end
+      end
+
       # Delete the specified branch from the repository
       def delete_branch(branch_name)
         wrapped_gitaly_errors do
@@ -697,11 +723,11 @@ module Gitlab
         delete_refs(tmp_ref)
       end
 
-      def write_ref(ref_path, ref, old_ref: nil, shell: true)
+      def write_ref(ref_path, ref, old_ref: nil)
         ref_path = "#{Gitlab::Git::BRANCH_REF_PREFIX}#{ref_path}" unless ref_path.start_with?("refs/") || ref_path == "HEAD"
 
         wrapped_gitaly_errors do
-          gitaly_repository_client.write_ref(ref_path, ref, old_ref, shell)
+          gitaly_repository_client.write_ref(ref_path, ref, old_ref)
         end
       end
 
@@ -717,6 +743,26 @@ module Gitlab
       def fetch_repository_as_mirror(repository)
         wrapped_gitaly_errors do
           gitaly_remote_client.fetch_internal_remote(repository)
+        end
+      end
+
+      # Fetch remote for repository
+      #
+      # remote - remote name
+      # ssh_auth - SSH known_hosts data and a private key to use for public-key authentication
+      # forced - should we use --force flag?
+      # no_tags - should we use --no-tags flag?
+      # prune - should we use --prune flag?
+      def fetch_remote(remote, ssh_auth: nil, forced: false, no_tags: false, prune: true)
+        wrapped_gitaly_errors do
+          gitaly_repository_client.fetch_remote(
+            remote,
+            ssh_auth: ssh_auth,
+            forced: forced,
+            no_tags: no_tags,
+            prune: prune,
+            timeout: GITLAB_PROJECTS_TIMEOUT
+          )
         end
       end
 
@@ -845,12 +891,6 @@ module Gitlab
         Gitlab::GitalyClient::ConflictsService.new(self, our_commit_oid, their_commit_oid)
       end
 
-      def gitaly_migrate(method, status: Gitlab::GitalyClient::MigrationStatus::OPT_IN, &block)
-        wrapped_gitaly_errors do
-          Gitlab::GitalyClient.migrate(method, status: status, &block)
-        end
-      end
-
       def clean_stale_repository_files
         wrapped_gitaly_errors do
           gitaly_repository_client.cleanup if exists?
@@ -927,6 +967,10 @@ module Gitlab
       end
 
       private
+
+      def empty_diff_stats
+        Gitlab::Git::DiffStatsCollection.new([])
+      end
 
       def uncached_has_local_branches?
         wrapped_gitaly_errors do

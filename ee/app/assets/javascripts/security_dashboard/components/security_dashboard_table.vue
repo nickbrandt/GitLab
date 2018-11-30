@@ -1,16 +1,29 @@
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapState, mapGetters } from 'vuex';
 import Pagination from '~/vue_shared/components/pagination_links.vue';
 import SecurityDashboardTableRow from './security_dashboard_table_row.vue';
+import EmptyState from './empty_state.vue';
 
 export default {
   name: 'SecurityDashboardTable',
   components: {
+    EmptyState,
     Pagination,
     SecurityDashboardTableRow,
   },
+  props: {
+    dashboardDocumentation: {
+      type: String,
+      required: true,
+    },
+    emptyStateSvgPath: {
+      type: String,
+      required: true,
+    },
+  },
   computed: {
     ...mapState('vulnerabilities', ['vulnerabilities', 'pageInfo', 'isLoadingVulnerabilities']),
+    ...mapGetters('vulnerabilities', ['dashboardListError']),
     showPagination() {
       return this.pageInfo && this.pageInfo.total;
     },
@@ -26,36 +39,28 @@ export default {
 
 <template>
   <div class="ci-table">
-    <div
-      class="gl-responsive-table-row table-row-header vulnerabilities-row-header"
-      role="row"
-    >
-      <div
-        class="table-section section-10"
-        role="rowheader"
-      >
-        {{ s__('Reports|Severity') }}
-      </div>
-      <div
-        class="table-section section-60"
-        role="rowheader"
-      >
+    <div class="gl-responsive-table-row table-row-header vulnerabilities-row-header" role="row">
+      <div class="table-section section-10" role="rowheader">{{ s__('Reports|Severity') }}</div>
+      <div class="table-section section-60" role="rowheader">
         {{ s__('Reports|Vulnerability') }}
       </div>
-      <div
-        class="table-section section-30"
-        role="rowheader"
-      >
-        {{ s__('Reports|Confidence') }}
+      <div class="table-section section-30" role="rowheader">{{ s__('Reports|Confidence') }}</div>
+    </div>
+
+    <div class="flash-container">
+      <div v-if="dashboardListError" class="flash-alert">
+        <div class="flash-text container-fluid container-limited limit-container-width">
+          {{
+            s__(
+              'Security Dashboard|Error fetching the vulnerability list. Please check your network connection and try again.',
+            )
+          }}
+        </div>
       </div>
     </div>
 
     <div v-if="isLoadingVulnerabilities">
-      <security-dashboard-table-row
-        v-for="n in 10"
-        :key="n"
-        :is-loading="true"
-      />
+      <security-dashboard-table-row v-for="n in 10" :key="n" :is-loading="true" />
     </div>
 
     <div v-else>
@@ -63,7 +68,13 @@ export default {
         v-for="vulnerability in vulnerabilities"
         :key="vulnerability.id"
         :vulnerability="vulnerability"
-        @openModal="openModal({ vulnerability })"
+        @openModal="openModal({ vulnerability });"
+      />
+
+      <empty-state
+        v-if="!vulnerabilities.length"
+        :svg-path="emptyStateSvgPath"
+        :link="dashboardDocumentation"
       />
 
       <pagination

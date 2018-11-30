@@ -25,22 +25,10 @@ export default {
 
 <template>
   <div class="prepend-top-15 detail-section-item">
-    <div class="node-detail-title">
-      {{ s__('GeoNodes|Health status') }}
-    </div>
-    <div
-      :class="healthCssClass"
-      class="node-detail-value node-health-status"
-    >
-      <icon
-        :size="16"
-        :name="statusIconName"
-      />
-      <span
-        class="status-text prepend-left-5"
-      >
-        {{ status }}
-      </span>
+    <div class="node-detail-title">{{ s__('GeoNodes|Health status') }}</div>
+    <div :class="healthCssClass" class="node-detail-value node-health-status">
+      <icon :size="16" :name="statusIconName" />
+      <span class="status-text prepend-left-5"> {{ status }} </span>
     </div>
   </div>
 </template>

@@ -2,8 +2,6 @@
 
 module Keys
   class DestroyService < ::Keys::BaseService
-    prepend EE::Keys::DestroyService
-
     def execute(key)
       key.destroy if destroy_possible?(key)
     end
@@ -14,3 +12,5 @@ module Keys
     end
   end
 end
+
+Keys::DestroyService.prepend(EE::Keys::DestroyService)

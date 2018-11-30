@@ -2,8 +2,6 @@
 
 module Ci
   class ProcessBuildService < BaseService
-    prepend EE::Ci::ProcessBuildService
-
     def execute(build, current_status)
       if valid_statuses_for_when(build.when).include?(current_status)
         if build.schedulable?
@@ -45,3 +43,5 @@ module Ci
     end
   end
 end
+
+Ci::ProcessBuildService.prepend(EE::Ci::ProcessBuildService)

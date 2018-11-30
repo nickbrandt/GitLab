@@ -1,5 +1,7 @@
 module Geo
   class RepositoryDestroyService
+    include ::Gitlab::Geo::LogHelpers
+
     attr_reader :id, :name, :disk_path, :repository_storage
 
     def initialize(id, name, disk_path, repository_storage)
@@ -14,10 +16,23 @@ module Geo
     end
 
     def execute
-      ::Projects::DestroyService.new(deleted_project, nil).geo_replicate
+      destroy_project
+      delete_project_registry_entries
     end
 
     private
+
+    def destroy_project
+      ::Projects::DestroyService.new(deleted_project, nil).geo_replicate
+    end
+
+    # rubocop: disable CodeReuse/ActiveRecord
+    def delete_project_registry_entries
+      ::Geo::ProjectRegistry.where(project_id: id).delete_all
+
+      log_info("Project registry entry removed", project_id: id)
+    end
+    # rubocop: enable CodeReuse/ActiveRecord
 
     def deleted_project
       # We don't have access to the original model anymore, so we are

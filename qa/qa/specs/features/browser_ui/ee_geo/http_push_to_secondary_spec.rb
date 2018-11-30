@@ -13,7 +13,7 @@ module QA
           Page::Main::Login.act { sign_in_using_credentials }
 
           # Create a new Project
-          project = Factory::Resource::Project.fabricate! do |project|
+          project = Resource::Project.fabricate! do |project|
             project.name = 'geo-project'
             project.description = 'Geo test project'
           end
@@ -22,7 +22,7 @@ module QA
           #
           # This push is required to ensure we have the primary credentials
           # written out to the .netrc
-          Factory::Repository::ProjectPush.fabricate! do |push|
+          Resource::Repository::ProjectPush.fabricate! do |push|
             push.project = project
             push.file_name = file_name
             push.file_content = "# #{file_content_primary}"
@@ -52,7 +52,7 @@ module QA
             end
 
             # Perform a git push over HTTP at the secondary
-            Factory::Repository::Push.fabricate! do |push|
+            Resource::Repository::Push.fabricate! do |push|
               push.new_branch = false
               push.repository_http_uri = location.uri
               push.file_name = file_name

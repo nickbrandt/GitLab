@@ -8,7 +8,7 @@ class RepositoryUpdateMirrorWorker
   LEASE_KEY = 'repository_update_mirror_worker_start_scheduler'.freeze
   LEASE_TIMEOUT = 2.seconds
 
-  # Retry not neccessary. It will try again at the next update interval.
+  # Retry not necessary. It will try again at the next update interval.
   sidekiq_options retry: false, status_expiration: StuckImportJobsWorker::IMPORT_JOBS_EXPIRATION
 
   attr_accessor :project, :repository, :current_user
@@ -45,38 +45,31 @@ class RepositoryUpdateMirrorWorker
   end
 
   def start_mirror(project)
-    if start(project)
-      Rails.logger.info("Mirror update for #{project.full_path} started. Waiting duration: #{project.mirror_waiting_duration}")
-      metric_mirror_waiting_duration_seconds.observe({}, project.mirror_waiting_duration)
+    import_state = project.import_state
 
-      Gitlab::Metrics.add_event_with_values(
-        :mirrors_running,
-        { duration: project.mirror_waiting_duration },
-        { path: project.full_path })
+    if start(import_state)
+      Rails.logger.info("Mirror update for #{project.full_path} started. Waiting duration: #{import_state.mirror_waiting_duration}")
+      metric_mirror_waiting_duration_seconds.observe({}, import_state.mirror_waiting_duration)
 
       true
     else
-      Rails.logger.info("Project #{project.full_path} was in inconsistent state: #{project.import_status}")
+      Rails.logger.info("Project #{project.full_path} was in inconsistent state: #{import_state.status}")
       false
     end
   end
 
   def fail_mirror(project, message)
-    project.mark_import_as_failed(message)
+    project.import_state.mark_as_failed(message)
 
     Rails.logger.error("Mirror update for #{project.full_path} failed with the following message: #{message}")
-    Gitlab::Metrics.add_event(:mirrors_failed)
   end
 
   def finish_mirror(project)
-    project.import_finish
+    import_state = project.import_state
+    import_state.finish
 
-    Rails.logger.info("Mirror update for #{project.full_path} successfully finished. Update duration: #{project.mirror_update_duration}}.")
-    Gitlab::Metrics.add_event_with_values(
-      :mirrors_finished,
-      { duration: project.mirror_update_duration })
-
-    metric_mirror_update_duration_seconds.observe({}, project.mirror_update_duration)
+    Rails.logger.info("Mirror update for #{project.full_path} successfully finished. Update duration: #{import_state.mirror_update_duration}}.")
+    metric_mirror_update_duration_seconds.observe({}, import_state.mirror_update_duration)
   end
 
   def metric_mirror_update_duration_seconds

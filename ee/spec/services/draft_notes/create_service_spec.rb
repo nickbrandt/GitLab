@@ -65,4 +65,30 @@ describe DraftNotes::CreateService do
     expect(draft.note).to eq('Comment on diff')
     expect(draft.original_position.to_json).to eq(position.to_json)
   end
+
+  context 'diff highlight cache clearing' do
+    context 'when diff file is unfolded and it is not a reply' do
+      it 'clears diff highlighting cache' do
+        expect_next_instance_of(DraftNote) do |draft|
+          allow(draft).to receive_message_chain(:diff_file, :unfolded?) { true }
+        end
+
+        expect(merge_request).to receive_message_chain(:diffs, :clear_cache)
+
+        create_draft(note: 'This is a test')
+      end
+    end
+
+    context 'when diff file is not unfolded and it is not a reply' do
+      it 'clears diff highlighting cache' do
+        expect_next_instance_of(DraftNote) do |draft|
+          allow(draft).to receive_message_chain(:diff_file, :unfolded?) { false }
+        end
+
+        expect(merge_request).not_to receive(:diffs)
+
+        create_draft(note: 'This is a test')
+      end
+    end
+  end
 end

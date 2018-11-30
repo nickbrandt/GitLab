@@ -1,4 +1,4 @@
-class AddLastSyncFailureToProjectRegistry < ActiveRecord::Migration
+class AddLastSyncFailureToProjectRegistry < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def change

@@ -2,8 +2,6 @@
 
 module ApplicationSettings
   class UpdateService < ApplicationSettings::BaseService
-    prepend EE::ApplicationSettings::UpdateService
-
     attr_reader :params, :application_setting
 
     def execute
@@ -46,3 +44,5 @@ module ApplicationSettings
     end
   end
 end
+
+ApplicationSettings::UpdateService.prepend(EE::ApplicationSettings::UpdateService)

@@ -80,7 +80,10 @@ describe GithubService do
     it 'uses StatusMessage to build message' do
       allow(subject).to receive(:update_status)
 
-      expect(GithubService::StatusMessage).to receive(:from_pipeline_data).with(project, pipeline_sample_data).and_return(status_message)
+      expect(GithubService::StatusMessage)
+        .to receive(:from_pipeline_data)
+        .with(project, subject, pipeline_sample_data)
+        .and_return(status_message)
 
       subject.execute(pipeline_sample_data)
     end

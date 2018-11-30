@@ -53,11 +53,7 @@ export default {
 
 <template>
   <div class="card">
-    <project-header
-      :project="project"
-      class="card-header"
-      @remove="removeProject"
-    />
+    <project-header :project="project" class="card-header" @remove="removeProject" />
     <div class="card-body">
       <div class="row">
         <div class="col-6 col-sm-4 col-md-6 col-lg-4 pr-1">
@@ -72,24 +68,18 @@ export default {
             <commit
               :commit-ref="commitRef"
               :short-sha="project.last_deployment.commit.short_id"
-              :commit-url="project.last_deployment.commit.web_url"
+              :commit-url="project.last_deployment.commit.commit_url"
               :title="project.last_deployment.commit.title"
               :author="author"
-              :tag="project.last_deployment.commit.tag"
+              :tag="project.last_deployment.tag"
             />
           </div>
           <div
             class="js-project-container col-12 col-sm-4 col-md-12 col-lg-4 pl-1 d-flex justify-content-end"
           >
-            <div
-              class="d-flex align-items-end justify-content-end"
-            >
+            <div class="d-flex align-items-end justify-content-end">
               <div class="prepend-top-default text-secondary d-flex align-items-center flex-wrap">
-                <icon
-                  name="calendar"
-                  class="append-right-4"
-                />
-                {{ lastDeployed }}
+                <icon name="calendar" class="append-right-4" /> {{ lastDeployed }}
               </div>
             </div>
           </div>

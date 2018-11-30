@@ -1,10 +1,14 @@
 <script>
 import MilestoneSelect from '~/milestone_select';
+import { GlLoadingIcon } from '@gitlab/ui';
 
 const ANY_MILESTONE = 'Any Milestone';
 const NO_MILESTONE = 'No Milestone';
 
 export default {
+  components: {
+    GlLoadingIcon,
+  },
   props: {
     board: {
       type: Object,
@@ -68,29 +72,11 @@ export default {
   <div class="block milestone">
     <div class="title append-bottom-10">
       Milestone
-      <button
-        v-if="canEdit"
-        type="button"
-        class="edit-link btn btn-blank float-right"
-      >
-        Edit
-      </button>
+      <button v-if="canEdit" type="button" class="edit-link btn btn-blank float-right">Edit</button>
     </div>
-    <div
-      :class="milestoneTitleClass"
-      class="value"
-    >
-      {{ milestoneTitle }}
-    </div>
-    <div
-      class="selectbox"
-      style="display: none;"
-    >
-      <input
-        :value="milestoneId"
-        name="milestone_id"
-        type="hidden"
-      />
+    <div :class="milestoneTitleClass" class="value">{{ milestoneTitle }}</div>
+    <div class="selectbox" style="display: none;">
+      <input :value="milestoneId" name="milestone_id" type="hidden" />
       <div class="dropdown">
         <button
           ref="dropdownButton"
@@ -105,29 +91,17 @@ export default {
           data-toggle="dropdown"
           type="button"
         >
-          Milestone
-          <i
-            aria-hidden="true"
-            data-hidden="true"
-            class="fa fa-chevron-down"
-          >
-          </i>
+          Milestone <i aria-hidden="true" data-hidden="true" class="fa fa-chevron-down"> </i>
         </button>
         <div class="dropdown-menu dropdown-select dropdown-menu-selectable">
-          <div
-            class="dropdown-input"
-          >
+          <div class="dropdown-input">
             <input
               type="search"
               class="dropdown-input-field"
               placeholder="Search milestones"
               autocomplete="off"
             />
-            <i
-              aria-hidden="true"
-              data-hidden="true"
-              class="fa fa-search dropdown-input-search"
-            >
+            <i aria-hidden="true" data-hidden="true" class="fa fa-search dropdown-input-search">
             </i>
             <i
               role="button"
@@ -137,11 +111,8 @@ export default {
             >
             </i>
           </div>
-          <div class="dropdown-content">
-          </div>
-          <div class="dropdown-loading">
-            <gl-loading-icon />
-          </div>
+          <div class="dropdown-content"></div>
+          <div class="dropdown-loading"><gl-loading-icon /></div>
         </div>
       </div>
     </div>

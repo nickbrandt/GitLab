@@ -7,14 +7,14 @@ in GitLab 11.3. To learn how to use
 When the GitLab Maven Repository is enabled, every project in GitLab will have
 its own space to store [Maven](https://maven.apache.org/) packages.
 
-To learn how to use it, see the [user documentation](../user/project/packages/maven.md).
+To learn how to use it, see the [user documentation](../user/project/packages/maven_repository.md).
 
 ## Enabling the Maven Repository
 
 NOTE: **Note:**
 Once enabled, newly created projects will have the Packages feature enabled by
 default. Existing projects will need to
-[explicitly enabled it](../user/project/packages/maven.md#enabling-the-packages-repository).
+[explicitly enabled it](../user/project/packages/maven_repository.md#enabling-the-packages-repository).
 
 To enable the Maven repository:
 
@@ -145,6 +145,24 @@ upload the maven packages:
     ```
 
 1. [Restart GitLab] for the changes to take effect.
+
+### Migrating local packages to object storage
+
+After [configuring the object storage](#using-object-storage), you may use the
+following task to migrate existing packages from the local storage to the remote one.
+The processing will be done in a background worker and requires **no downtime**.
+
+For Omnibus GitLab:
+
+```sh
+sudo gitlab-rake "gitlab:packages:migrate"
+```
+
+For installations from source:
+
+```bash
+RAILS_ENV=production sudo -u git -H bundle exec rake gitlab:packages:migrate
+```
 
 [reconfigure gitlab]: restart_gitlab.md#omnibus-gitlab-reconfigure "How to reconfigure Omnibus GitLab"
 [restart gitlab]: restart_gitlab.md#omnibus-gitlab-reconfigure "How to reconfigure Omnibus GitLab"

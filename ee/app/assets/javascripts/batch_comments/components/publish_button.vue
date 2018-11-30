@@ -44,14 +44,12 @@ export default {
 <template>
   <loading-button
     :loading="isPublishing"
-    container-class="btn btn-success js-publish-draft-button"
+    container-class="btn btn-success js-publish-draft-button qa-submit-review"
     @click="onClick"
   >
     <span>
       {{ label }}
-      <drafts-count
-        v-if="showCount"
-      />
+      <drafts-count v-if="showCount" />
     </span>
   </loading-button>
 </template>

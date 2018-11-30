@@ -400,10 +400,7 @@ tables:
     - merge_requests_ff_only_enabled
     - issues_template
     - mirror
-    - mirror_last_update_at
-    - mirror_last_successful_update_at
     - mirror_user_id
-    - import_error
     - ci_id
     - shared_runners_enabled
     - build_coverage_regex
@@ -428,7 +425,6 @@ tables:
     - printing_merge_request_link_enabled
     - auto_cancel_pending_pipelines
     - service_desk_enabled
-    - import_jid
     - delete_error
     - last_repository_updated_at
     - disable_overriding_approvers_per_merge_request

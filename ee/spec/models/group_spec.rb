@@ -259,4 +259,70 @@ describe Group do
       end
     end
   end
+
+  describe '#latest_vulnerabilities' do
+    let(:project) { create(:project, namespace: group) }
+    let(:external_project) { create(:project) }
+    let(:failed_pipeline) { create(:ci_pipeline, :failed, project: project) }
+
+    let!(:old_vuln) { create_vulnerability(project) }
+    let!(:new_vuln) { create_vulnerability(project) }
+    let!(:external_vuln) { create_vulnerability(external_project) }
+    let!(:failed_vuln) { create_vulnerability(project, failed_pipeline) }
+
+    subject { group.latest_vulnerabilities }
+
+    def create_vulnerability(project, pipeline = nil)
+      pipeline ||= create(:ci_pipeline, :success, project: project)
+      create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project)
+    end
+
+    it 'returns vulns only for the latest successful pipelines of projects belonging to the group' do
+      is_expected.to contain_exactly(new_vuln)
+    end
+
+    context 'with vulnerabilities from other branches' do
+      let!(:branch_pipeline) { create(:ci_pipeline, :success, project: project, ref: 'feature-x') }
+      let!(:branch_vuln) { create(:vulnerabilities_occurrence, pipelines: [branch_pipeline], project: project) }
+
+      # TODO: This should actually fail and we must scope vulns
+      # per branch as soon as we store them for other branches
+      it 'includes vulnerabilities from all branches' do
+        is_expected.to contain_exactly(branch_vuln)
+      end
+    end
+  end
+
+  describe '#saml_discovery_token' do
+    it 'returns existing tokens' do
+      group = create(:group, saml_discovery_token: 'existing')
+
+      expect(group.saml_discovery_token).to eq 'existing'
+    end
+
+    context 'when missing on read' do
+      it 'generates a token' do
+        expect(group.saml_discovery_token.length).to eq 8
+      end
+
+      it 'saves the generated token' do
+        expect { group.saml_discovery_token }.to change { group.reload.read_attribute(:saml_discovery_token) }
+      end
+
+      context 'in read only mode' do
+        before do
+          allow(Gitlab::Database).to receive(:read_only?).and_return(true)
+          allow(group).to receive(:create_or_update).and_raise(ActiveRecord::ReadOnlyRecord)
+        end
+
+        it "doesn't raise an error as that could expose group existance" do
+          expect { group.saml_discovery_token }.not_to raise_error
+        end
+
+        it 'returns a random value to prevent access' do
+          expect(group.saml_discovery_token).not_to be_blank
+        end
+      end
+    end
+  end
 end

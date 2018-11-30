@@ -48,7 +48,7 @@ module API
       requires :id, type: String, desc: 'The ID of a group'
     end
 
-    resource :groups, requirements: API::PROJECT_ENDPOINT_REQUIREMENTS do
+    resource :groups, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc 'Get epics for the group' do
         success EE::API::Entities::Epic
       end
@@ -58,6 +58,8 @@ module API
         optional :sort, type: String, values: %w[asc desc], default: 'desc',
                         desc: 'Return epics sorted in `asc` or `desc` order.'
         optional :search, type: String, desc: 'Search epics for text present in the title or description'
+        optional :state, type: String, values: %w[opened closed all], default: 'all',
+                         desc: 'Return opened, closed, or all epics'
         optional :author_id, type: Integer, desc: 'Return epics which are authored by the user with the given ID'
         optional :labels, type: String, desc: 'Comma-separated list of label names'
       end

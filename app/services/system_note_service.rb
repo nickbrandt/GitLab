@@ -5,7 +5,6 @@
 # Used for creating system notes (e.g., when a user references a merge request
 # from an issue, an issue's assignee changes, an issue is closed, etc.)
 module SystemNoteService
-  prepend EE::SystemNoteService
   extend self
 
   # Called when commits are added to a Merge Request
@@ -408,9 +407,15 @@ module SystemNoteService
   def new_issue_branch(issue, project, author, branch)
     link = url_helpers.project_compare_url(project, from: project.default_branch, to: branch)
 
-    body = "created branch [`#{branch}`](#{link})"
+    body = "created branch [`#{branch}`](#{link}) to address this issue"
 
     create_note(NoteSummary.new(issue, project, author, body, action: 'branch'))
+  end
+
+  def new_merge_request(issue, project, author, merge_request)
+    body = "created merge request #{merge_request.to_reference} to address this issue"
+
+    create_note(NoteSummary.new(issue, project, author, body, action: 'merge'))
   end
 
   # Called when a Mentionable references a Noteable
@@ -678,3 +683,5 @@ module SystemNoteService
     ActionController::Base.helpers.content_tag(*args)
   end
 end
+
+SystemNoteService.prepend(EE::SystemNoteService)

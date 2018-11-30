@@ -155,12 +155,12 @@ module EE
 
           # Check whether author is a GitLab member
           if push_rule.member_check
-            unless ::User.existing_member?(commit.author_email.downcase)
+            unless ::User.find_by_any_email(commit.author_email).present?
               return "Author '#{commit.author_email}' is not a member of team"
             end
 
             if commit.author_email.casecmp(commit.committer_email) == -1
-              unless ::User.existing_member?(commit.committer_email.downcase)
+              unless ::User.find_by_any_email(commit.committer_email).present?
                 return "Committer '#{commit.committer_email}' is not a member of team"
               end
             end

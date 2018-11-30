@@ -1,0 +1,3 @@
+export const SET_FILTERS = 'SET_FILTERS';
+export const SET_CHART_DATA = 'SET_CHART_DATA';
+export const SET_LOADING_STATE = 'SET_LOADING_STATE';

@@ -70,7 +70,7 @@ describe('Kubernetes Logs', () => {
 
         anotherPod.click();
 
-        expect(changePodLogSpy).toHaveBeenCalled();
+        expect(changePodLogSpy.calls.count()).toEqual(2);
         done();
       }, 0);
     });

@@ -87,7 +87,7 @@ POST /projects/:id/repository/commits
 | `action` | string | yes | The action to perform, `create`, `delete`, `move`, `update`, `chmod`|
 | `file_path` | string | yes | Full path to the file. Ex. `lib/class.rb` |
 | `previous_path` | string | no | Original full path to the file being moved. Ex. `lib/class1.rb`. Only considered for `move` action. |
-| `content` | string | no | File content, required for all except `delete` and `chmod`. Optional for `move` |
+| `content` | string | no | File content, required for all except `delete`, `chmod`, and `move`. Move actions that do not specify `content` will preserve the existing file content, and any other value of `content` will overwrite the file content. |
 | `encoding` | string | no | `text` or `base64`. `text` is default. |
 | `last_commit_id` | string | no | Last known file commit id. Will be only considered in update, move and delete actions. |
 | `execute_filemode` | boolean | no | When `true/false` enables/disables the execute flag on the file. Only considered for `chmod` action. |
@@ -285,6 +285,47 @@ Example response:
   "parent_ids": [
     "a738f717824ff53aebad8b090c1b79a14f2bd9e8"
   ]
+}
+```
+
+## Revert a commit
+
+> [Introduced][ce-22919] in GitLab 11.5.
+
+Reverts a commit in a given branch.
+
+```
+POST /projects/:id/repository/commits/:sha/revert
+```
+
+Parameters:
+
+| Attribute | Type           | Required | Description                                                                     |
+| --------- | ----           | -------- | -----------                                                                     |
+| `id`      | integer/string | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
+| `sha`     | string         | yes      | Commit SHA to revert                                                            |
+| `branch`  | string         | yes      | Target branch name                                                              |
+
+```bash
+curl --request POST --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" --form "branch=master" "https://gitlab.example.com/api/v4/projects/5/repository/commits/a738f717824ff53aebad8b090c1b79a14f2bd9e8/revert"
+```
+
+Example response:
+
+```json
+{
+  "id":"8b090c1b79a14f2bd9e8a738f717824ff53aebad",
+  "short_id": "8b090c1b",
+  "title":"Revert \"Feature added\"",
+  "created_at":"2018-11-08T15:55:26.000Z",
+  "parent_ids":["a738f717824ff53aebad8b090c1b79a14f2bd9e8"],
+  "message":"Revert \"Feature added\"\n\nThis reverts commit a738f717824ff53aebad8b090c1b79a14f2bd9e8",
+  "author_name":"Administrator",
+  "author_email":"admin@example.com",
+  "authored_date":"2018-11-08T15:55:26.000Z",
+  "committer_name":"Administrator",
+  "committer_email":"admin@example.com",
+  "committed_date":"2018-11-08T15:55:26.000Z"
 }
 ```
 
@@ -619,3 +660,4 @@ Example response:
 [ce-8047]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/8047
 [ce-15026]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/15026
 [ce-18004]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/18004
+[ce-22919]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/22919

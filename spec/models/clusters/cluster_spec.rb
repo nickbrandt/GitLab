@@ -311,12 +311,14 @@ describe Clusters::Cluster do
     context 'when applications are created' do
       let!(:helm) { create(:clusters_applications_helm, cluster: cluster) }
       let!(:ingress) { create(:clusters_applications_ingress, cluster: cluster) }
+      let!(:cert_manager) { create(:clusters_applications_cert_managers, cluster: cluster) }
       let!(:prometheus) { create(:clusters_applications_prometheus, cluster: cluster) }
       let!(:runner) { create(:clusters_applications_runner, cluster: cluster) }
       let!(:jupyter) { create(:clusters_applications_jupyter, cluster: cluster) }
+      let!(:knative) { create(:clusters_applications_knative, cluster: cluster) }
 
       it 'returns a list of created applications' do
-        is_expected.to contain_exactly(helm, ingress, prometheus, runner, jupyter)
+        is_expected.to contain_exactly(helm, ingress, cert_manager, prometheus, runner, jupyter, knative)
       end
     end
   end
@@ -340,6 +342,28 @@ describe Clusters::Cluster do
       end
 
       it { is_expected.to eq(false) }
+    end
+  end
+
+  describe '#allow_user_defined_namespace?' do
+    let(:cluster) { create(:cluster, :provided_by_gcp) }
+
+    subject { cluster.allow_user_defined_namespace? }
+
+    context 'project type cluster' do
+      it { is_expected.to be_truthy }
+    end
+
+    context 'group type cluster' do
+      let(:cluster) { create(:cluster, :provided_by_gcp, :group) }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context 'instance type cluster' do
+      let(:cluster) { create(:cluster, :provided_by_gcp, :instance) }
+
+      it { is_expected.to be_falsey }
     end
   end
 end

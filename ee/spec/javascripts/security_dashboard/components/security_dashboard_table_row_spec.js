@@ -87,4 +87,25 @@ describe('Security Dashboard Table Row', () => {
       });
     });
   });
+
+  describe('with a dismissed vulnerability', () => {
+    const vulnerability = mockDataVulnerabilities[2];
+
+    beforeEach(() => {
+      props = { vulnerability };
+      vm = mountComponentWithStore(Component, { store, props });
+    });
+
+    afterEach(() => {
+      vm.$destroy();
+    });
+
+    it('should have a `dismissed` class', () => {
+      expect(vm.$el.classList).toContain('dismissed');
+    });
+
+    it('should render a `DISMISSED` tag', () => {
+      expect(vm.$el.textContent).toContain('DISMISSED');
+    });
+  });
 });

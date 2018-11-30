@@ -1,11 +1,11 @@
 <script>
+import _ from 'underscore';
 import { mapActions, mapGetters } from 'vuex';
-import resolveDiscussionsSvg from 'icons/_icon_mr_issue.svg';
-import nextDiscussionsSvg from 'icons/_next_discussion.svg';
-import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
+import { GlTooltipDirective } from '@gitlab/ui';
 import { truncateSha } from '~/lib/utils/text_utility';
+import { s__, __, sprintf } from '~/locale';
 import systemNote from '~/vue_shared/components/notes/system_note.vue';
-import { s__ } from '~/locale';
+import icon from '~/vue_shared/components/icon.vue';
 import batchCommentsDiffLineNoteFormMixin from 'ee/batch_comments/mixins/diff_line_note_form';
 import DraftNote from 'ee/batch_comments/components/draft_note.vue';
 import Flash from '../../flash';
@@ -13,6 +13,7 @@ import { SYSTEM_NOTE } from '../constants';
 import userAvatarLink from '../../vue_shared/components/user_avatar/user_avatar_link.vue';
 import noteableNote from './noteable_note.vue';
 import noteHeader from './note_header.vue';
+import toggleRepliesWidget from './toggle_replies_widget.vue';
 import noteSignedOutWidget from './note_signed_out_widget.vue';
 import noteEditedText from './note_edited_text.vue';
 import noteForm from './note_form.vue';
@@ -23,25 +24,25 @@ import autosave from '../mixins/autosave';
 import noteable from '../mixins/noteable';
 import resolvable from '../mixins/resolvable';
 import discussionNavigation from '../mixins/discussion_navigation';
-import tooltip from '../../vue_shared/directives/tooltip';
 
 export default {
   name: 'NoteableDiscussion',
   components: {
+    icon,
     noteableNote,
-    diffWithNote,
     userAvatarLink,
     noteHeader,
     noteSignedOutWidget,
     noteEditedText,
     noteForm,
+    toggleRepliesWidget,
     placeholderNote,
     placeholderSystemNote,
     systemNote,
     DraftNote,
   },
   directives: {
-    tooltip,
+    GlTooltip: GlTooltipDirective,
   },
   mixins: [
     autosave,
@@ -54,11 +55,6 @@ export default {
     discussion: {
       type: Object,
       required: true,
-    },
-    renderHeader: {
-      type: Boolean,
-      required: false,
-      default: true,
     },
     renderDiffFile: {
       type: Boolean,
@@ -82,45 +78,33 @@ export default {
       isResolving: false,
       isUnresolving: false,
       resolveAsThread: true,
+      isRepliesToggledByUser: false,
     };
   },
   computed: {
     ...mapGetters([
       'getNoteableData',
-      'discussionCount',
-      'resolvedDiscussionCount',
-      'allDiscussions',
-      'unresolvedDiscussionsIdsByDiff',
-      'unresolvedDiscussionsIdsByDate',
-      'unresolvedDiscussions',
-      'unresolvedDiscussionsIdsOrdered',
       'nextUnresolvedDiscussionId',
-      'isLastUnresolvedDiscussion',
+      'unresolvedDiscussionsCount',
+      'hasUnresolvedDiscussions',
     ]),
-    transformedDiscussion() {
-      return {
-        ...this.discussion.notes[0],
-        truncatedDiffLines: this.discussion.truncated_diff_lines || [],
-        truncatedDiffLinesPath: this.discussion.truncated_diff_lines_path,
-        diffFile: this.discussion.diff_file,
-        diffDiscussion: this.discussion.diff_discussion,
-        imageDiffHtml: this.discussion.image_diff_html,
-        active: this.discussion.active,
-        discussionPath: this.discussion.discussion_path,
-        resolved: this.discussion.resolved,
-        resolvedBy: this.discussion.resolved_by,
-        resolvedByPush: this.discussion.resolved_by_push,
-        resolvedAt: this.discussion.resolved_at,
-      };
-    },
     author() {
-      return this.transformedDiscussion.author;
+      return this.initialDiscussion.author;
     },
     canReply() {
       return this.getNoteableData.current_user.can_create_note;
     },
     newNotePath() {
       return this.getNoteableData.create_note_path;
+    },
+    hasReplies() {
+      return this.discussion.notes.length > 1;
+    },
+    initialDiscussion() {
+      return this.discussion.notes.slice(0, 1)[0];
+    },
+    replies() {
+      return this.discussion.notes.slice(1);
     },
     lastUpdatedBy() {
       const { notes } = this.discussion;
@@ -141,34 +125,78 @@ export default {
       return null;
     },
     resolvedText() {
-      return this.transformedDiscussion.resolvedByPush ? 'Automatically resolved' : 'Resolved';
-    },
-    hasMultipleUnresolvedDiscussions() {
-      return this.unresolvedDiscussions.length > 1;
-    },
-    showJumpToNextDiscussion() {
-      return (
-        this.hasMultipleUnresolvedDiscussions &&
-        !this.isLastUnresolvedDiscussion(this.discussion.id, this.discussionsByDiffOrder)
-      );
+      return this.discussion.resolved_by_push ? __('Automatically resolved') : __('Resolved');
     },
     shouldRenderDiffs() {
-      const { diffDiscussion, diffFile } = this.transformedDiscussion;
-
-      return diffDiscussion && diffFile && this.renderDiffFile;
+      return this.discussion.diff_discussion && this.renderDiffFile;
+    },
+    shouldGroupReplies() {
+      return !this.shouldRenderDiffs && !this.discussion.diff_discussion;
     },
     wrapperComponent() {
       return this.shouldRenderDiffs ? diffWithNote : 'div';
     },
     wrapperComponentProps() {
       if (this.shouldRenderDiffs) {
-        return { discussion: convertObjectPropsToCamelCase(this.discussion) };
+        return { discussion: this.discussion };
       }
 
       return {};
     },
-    wrapperClass() {
-      return this.isDiffDiscussion ? '' : 'card discussion-wrapper';
+    componentClassName() {
+      if (this.shouldRenderDiffs) {
+        if (!this.lastUpdatedAt && !this.discussion.resolved) {
+          return 'unresolved';
+        }
+      }
+
+      return '';
+    },
+    shouldShowDiscussions() {
+      const { expanded, resolved } = this.discussion;
+      const isResolvedNonDiffDiscussion = !this.discussion.diff_discussion && resolved;
+
+      return expanded || this.alwaysExpanded || isResolvedNonDiffDiscussion;
+    },
+    isRepliesCollapsed() {
+      const { discussion, isRepliesToggledByUser } = this;
+      const { resolved, notes } = discussion;
+      const hasReplies = notes.length > 1;
+
+      return (
+        (!discussion.diff_discussion && resolved && hasReplies && !isRepliesToggledByUser) || false
+      );
+    },
+    actionText() {
+      const commitId = this.discussion.commit_id ? truncateSha(this.discussion.commit_id) : '';
+      const linkStart = `<a href="${_.escape(this.discussion.discussion_path)}">`;
+      const linkEnd = '</a>';
+
+      let text = s__('MergeRequests|started a discussion');
+
+      if (this.discussion.for_commit) {
+        text = s__(
+          'MergeRequests|started a discussion on commit %{linkStart}%{commitId}%{linkEnd}',
+        );
+      } else if (this.discussion.diff_discussion) {
+        if (this.discussion.active) {
+          text = s__('MergeRequests|started a discussion on %{linkStart}the diff%{linkEnd}');
+        } else {
+          text = s__(
+            'MergeRequests|started a discussion on %{linkStart}an old version of the diff%{linkEnd}',
+          );
+        }
+      }
+
+      return sprintf(
+        text,
+        {
+          commitId,
+          linkStart,
+          linkEnd,
+        },
+        false,
+      );
     },
   },
   watch: {
@@ -176,16 +204,12 @@ export default {
       if (this.isReplying) {
         this.$nextTick(() => {
           // Pass an extra key to separate reply and note edit forms
-          this.initAutoSave(this.transformedDiscussion, ['Reply']);
+          this.initAutoSave({ ...this.initialDiscussion, ...this.discussion }, ['Reply']);
         });
       } else {
         this.disposeAutoSave();
       }
     },
-  },
-  created() {
-    this.resolveDiscussionsSvg = resolveDiscussionsSvg;
-    this.nextDiscussionsSvg = nextDiscussionsSvg;
   },
   methods: {
     ...mapActions([
@@ -216,6 +240,9 @@ export default {
     },
     toggleDiscussionHandler() {
       this.toggleDiscussion({ discussionId: this.discussion.id });
+    },
+    toggleReplies() {
+      this.isRepliesToggledByUser = !this.isRepliesToggledByUser;
     },
     showReplyForm() {
       this.isReplying = true;
@@ -284,59 +311,34 @@ Please check your network connection and try again.`;
 </script>
 
 <template>
-  <li class="note note-discussion timeline-entry">
+  <li class="note note-discussion timeline-entry" :class="componentClassName">
     <div class="timeline-entry-inner">
-      <div class="timeline-icon">
-        <user-avatar-link
-          v-if="author"
-          :link-href="author.path"
-          :img-src="author.avatar_url"
-          :img-alt="author.name"
-          :img-size="40"
-        />
-      </div>
       <div class="timeline-content">
-        <div
-          :data-discussion-id="transformedDiscussion.discussion_id"
-          class="discussion js-discussion-container"
-        >
-          <div
-            v-if="renderHeader"
-            class="discussion-header"
-          >
+        <div :data-discussion-id="discussion.id" class="discussion js-discussion-container">
+          <div v-if="shouldRenderDiffs" class="discussion-header note-wrapper">
+            <div v-once class="timeline-icon">
+              <user-avatar-link
+                v-if="author"
+                :link-href="author.path"
+                :img-src="author.avatar_url"
+                :img-alt="author.name"
+                :img-size="40"
+              />
+            </div>
             <note-header
               :author="author"
-              :created-at="transformedDiscussion.created_at"
-              :note-id="transformedDiscussion.id"
+              :created-at="initialDiscussion.created_at"
+              :note-id="initialDiscussion.id"
               :include-toggle="true"
               :expanded="discussion.expanded"
               @toggleHandler="toggleDiscussionHandler"
             >
-              <template v-if="transformedDiscussion.diffDiscussion">
-                started a discussion on
-                <a :href="transformedDiscussion.discussionPath">
-                  <template v-if="transformedDiscussion.active">
-                    the diff
-                  </template>
-                  <template v-else>
-                    an old version of the diff
-                  </template>
-                </a>
-              </template>
-              <template v-else-if="discussion.for_commit">
-                started a discussion on commit
-                <a :href="discussion.discussion_path">
-                  {{ truncateSha(discussion.commit_id) }}
-                </a>
-              </template>
-              <template v-else>
-                started a discussion
-              </template>
+              <span v-html="actionText"></span>
             </note-header>
             <note-edited-text
-              v-if="transformedDiscussion.resolved"
-              :edited-at="transformedDiscussion.resolvedAt"
-              :edited-by="transformedDiscussion.resolvedBy"
+              v-if="discussion.resolved"
+              :edited-at="discussion.resolved_at"
+              :edited-by="discussion.resolved_by"
               :action-text="resolvedText"
               class-name="discussion-headline-light js-discussion-headline"
             />
@@ -348,23 +350,49 @@ Please check your network connection and try again.`;
               class-name="discussion-headline-light js-discussion-headline"
             />
           </div>
-          <div
-            v-if="discussion.expanded || alwaysExpanded"
-            class="discussion-body">
+          <div v-if="shouldShowDiscussions" class="discussion-body">
             <component
               :is="wrapperComponent"
               v-bind="wrapperComponentProps"
-              :class="wrapperClass"
+              class="card discussion-wrapper"
             >
               <div class="discussion-notes">
                 <ul class="notes">
-                  <component
-                    :is="componentName(note)"
-                    v-for="note in discussion.notes"
-                    :key="note.id"
-                    :note="componentData(note)"
-                    @handleDeleteNote="deleteNoteHandler"
-                  />
+                  <template v-if="shouldGroupReplies">
+                    <component
+                      :is="componentName(initialDiscussion)"
+                      :note="componentData(initialDiscussion)"
+                      @handleDeleteNote="deleteNoteHandler"
+                    >
+                      <slot slot="avatar-badge" name="avatar-badge"></slot>
+                    </component>
+                    <toggle-replies-widget
+                      v-if="hasReplies"
+                      :collapsed="isRepliesCollapsed"
+                      :replies="replies"
+                      @toggle="toggleReplies"
+                    />
+                    <template v-if="!isRepliesCollapsed">
+                      <component
+                        :is="componentName(note)"
+                        v-for="note in replies"
+                        :key="note.id"
+                        :note="componentData(note)"
+                        @handleDeleteNote="deleteNoteHandler"
+                      />
+                    </template>
+                  </template>
+                  <template v-else>
+                    <component
+                      :is="componentName(note)"
+                      v-for="(note, index) in discussion.notes"
+                      :key="note.id"
+                      :note="componentData(note)"
+                      @handleDeleteNote="deleteNoteHandler"
+                    >
+                      <slot v-if="index === 0" slot="avatar-badge" name="avatar-badge"></slot>
+                    </component>
+                  </template>
                 </ul>
                 <draft-note
                   v-if="showDraft(discussion.reply_id)"
@@ -372,31 +400,25 @@ Please check your network connection and try again.`;
                   :draft="draftForDiscussion(discussion.reply_id)"
                 />
                 <div
-                  v-else
+                  v-else-if="!isRepliesCollapsed"
                   :class="{ 'is-replying': isReplying }"
                   class="discussion-reply-holder"
                 >
                   <template v-if="!isReplying && canReply">
-                    <div
-                      class="btn-group d-flex discussion-with-resolve-btn"
-                      role="group">
-                      <div
-                        class="btn-group w-100"
-                        role="group">
+                    <div class="discussion-with-resolve-btn">
+                      <button
+                        type="button"
+                        class="js-vue-discussion-reply btn btn-text-field mr-sm-2 qa-discussion-reply"
+                        title="Add a reply"
+                        @click="showReplyForm"
+                      >
+                        Reply...
+                      </button>
+                      <div v-if="discussion.resolvable">
                         <button
                           type="button"
-                          class="js-vue-discussion-reply btn btn-text-field mr-2"
-                          title="Add a reply"
-                          @click="showReplyForm">Reply...</button>
-                      </div>
-                      <div
-                        v-if="discussion.resolvable"
-                        class="btn-group"
-                        role="group">
-                        <button
-                          type="button"
-                          class="btn btn-default"
-                          @click="resolveHandler()"
+                          class="btn btn-default mr-sm-2"
+                          @click="resolveHandler();"
                         >
                           <i
                             v-if="isResolving"
@@ -408,36 +430,27 @@ Please check your network connection and try again.`;
                       </div>
                       <div
                         v-if="discussion.resolvable"
-                        class="btn-group discussion-actions"
+                        class="btn-group discussion-actions ml-sm-2"
                         role="group"
                       >
-                        <div
-                          v-if="!discussionResolved"
-                          class="btn-group"
-                          role="group">
+                        <div v-if="!discussionResolved" class="btn-group" role="group">
                           <a
-                            v-tooltip
+                            v-gl-tooltip
                             :href="discussion.resolve_with_issue_path"
                             :title="s__('MergeRequests|Resolve this discussion in a new issue')"
-                            class="new-issue-for-discussion btn
-                              btn-default discussion-create-issue-btn"
-                            data-container="body"
+                            class="new-issue-for-discussion btn btn-default discussion-create-issue-btn"
                           >
-                            <span v-html="resolveDiscussionsSvg"></span>
+                            <icon name="issue-new" />
                           </a>
                         </div>
-                        <div
-                          v-if="showJumpToNextDiscussion"
-                          class="btn-group"
-                          role="group">
+                        <div v-if="hasUnresolvedDiscussions" class="btn-group" role="group">
                           <button
-                            v-tooltip
+                            v-gl-tooltip
                             class="btn btn-default discussion-next-btn"
                             title="Jump to next unresolved discussion"
-                            data-container="body"
                             @click="jumpToNextDiscussion"
                           >
-                            <span v-html="nextDiscussionsSvg"></span>
+                            <icon name="comment-next" />
                           </button>
                         </div>
                       </div>

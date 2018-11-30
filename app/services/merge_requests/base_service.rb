@@ -2,8 +2,6 @@
 
 module MergeRequests
   class BaseService < ::IssuableBaseService
-    prepend EE::MergeRequests::BaseService
-
     def create_note(merge_request, state = merge_request.state)
       SystemNoteService.change_status(merge_request, merge_request.target_project, current_user, state, nil)
     end
@@ -87,3 +85,5 @@ module MergeRequests
     end
   end
 end
+
+MergeRequests::BaseService.prepend(EE::MergeRequests::BaseService)

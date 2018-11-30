@@ -17,6 +17,7 @@ document.addEventListener(
             listPath: this.$el.dataset.listPath,
             addPath: this.$el.dataset.addPath,
             emptyDashboardSvgPath: this.$el.dataset.emptyDashboardSvgPath,
+            emptyDashboardHelpPath: this.$el.dataset.emptyDashboardHelpPath,
           },
         });
       },

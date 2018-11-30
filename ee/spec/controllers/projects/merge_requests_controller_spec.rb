@@ -339,7 +339,7 @@ describe Projects::MergeRequestsController do
     end
 
     context 'with a forked project' do
-      let(:forked_project) { fork_project(project, fork_owner) }
+      let(:forked_project) { fork_project(project, fork_owner, repository: true) }
       let(:fork_owner) { create(:user) }
 
       before do

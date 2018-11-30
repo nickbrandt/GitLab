@@ -4,7 +4,14 @@
 # from an issue, an issue's assignee changes, an issue is closed, etc.
 module EE
   module SystemNoteService
-    extend self
+    extend ActiveSupport::Concern
+
+    prepended do
+      # ::SystemNoteService wants the methods to be available as both class and
+      # instance methods. This removes the need for having to both `include` and
+      # `extend` this module everywhere it is used.
+      extend(EE::SystemNoteService)
+    end
 
     #
     # noteable     - Noteable object
@@ -60,6 +67,19 @@ module EE
              " epic #{subject_epic.to_reference(object_epic.group)}"
 
       create_note(NoteSummary.new(object_epic, nil, user, body, action: action))
+    end
+
+    def issue_promoted(noteable, noteable_ref, author, direction:)
+      unless [:to, :from].include?(direction)
+        raise ArgumentError, "Invalid direction `#{direction}`"
+      end
+
+      project = noteable.project
+
+      cross_reference = noteable_ref.to_reference(project || noteable.group)
+      body = "promoted #{direction} #{noteable_ref.class.to_s.downcase} #{cross_reference}"
+
+      create_note(NoteSummary.new(noteable, project, author, body, action: 'moved'))
     end
 
     def issue_on_epic(issue, epic, user, type)

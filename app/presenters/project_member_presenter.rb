@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class ProjectMemberPresenter < MemberPresenter
-  prepend EE::ProjectMemberPresenter
-
   private
 
   def admin_member_permission
@@ -17,3 +15,5 @@ class ProjectMemberPresenter < MemberPresenter
     :destroy_project_member
   end
 end
+
+ProjectMemberPresenter.prepend(EE::ProjectMemberPresenter)

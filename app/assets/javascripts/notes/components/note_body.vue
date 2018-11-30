@@ -1,10 +1,10 @@
 <script>
+import { mapGetters } from 'vuex';
 import $ from 'jquery';
 import noteEditedText from './note_edited_text.vue';
 import noteAwardsList from './note_awards_list.vue';
 import noteAttachment from './note_attachment.vue';
 import noteForm from './note_form.vue';
-import TaskList from '../../task_list';
 import autosave from '../mixins/autosave';
 
 export default {
@@ -31,20 +31,24 @@ export default {
     },
   },
   computed: {
+    ...mapGetters(['getDiscussion']),
     noteBody() {
       return this.note.note;
+    },
+    discussion() {
+      if (!this.note.isDraft) return {};
+
+      return this.getDiscussion(this.note.discussion_id);
     },
   },
   mounted() {
     this.renderGFM();
-    this.initTaskList();
 
     if (this.isEditing) {
       this.initAutoSave(this.note);
     }
   },
   updated() {
-    this.initTaskList();
     this.renderGFM();
 
     if (this.isEditing) {
@@ -59,17 +63,8 @@ export default {
     renderGFM() {
       $(this.$refs['note-body']).renderGFM();
     },
-    initTaskList() {
-      if (this.canEdit) {
-        this.taskList = new TaskList({
-          dataType: 'note',
-          fieldName: 'note',
-          selector: '.notes',
-        });
-      }
-    },
-    handleFormUpdate(note, parentElement, callback) {
-      this.$emit('handleFormUpdate', note, parentElement, callback);
+    handleFormUpdate(note, parentElement, callback, resolveDiscussion) {
+      this.$emit('handleFormUpdate', note, parentElement, callback, resolveDiscussion);
     },
     formCancelHandler(shouldConfirm, isDirty) {
       this.$emit('cancelForm', shouldConfirm, isDirty);
@@ -79,13 +74,8 @@ export default {
 </script>
 
 <template>
-  <div
-    ref="note-body"
-    :class="{ 'js-task-list-container': canEdit }"
-    class="note-body">
-    <div
-      class="note-text md"
-      v-html="note.note_html"></div>
+  <div ref="note-body" :class="{ 'js-task-list-container': canEdit }" class="note-body">
+    <div class="note-text md" v-html="note.note_html"></div>
     <note-form
       v-if="isEditing"
       ref="noteForm"
@@ -93,6 +83,8 @@ export default {
       :note-body="noteBody"
       :note-id="note.id"
       :markdown-version="note.cached_markdown_version"
+      :discussion="discussion"
+      :resolve-discussion="note.resolve_discussion"
       @handleFormUpdate="handleFormUpdate"
       @cancelForm="formCancelHandler"
     />
@@ -100,7 +92,8 @@ export default {
       v-if="canEdit"
       v-model="note.note"
       :data-update-url="note.path"
-      class="hidden js-task-list-field"></textarea>
+      class="hidden js-task-list-field"
+    ></textarea>
     <note-edited-text
       v-if="note.last_edited_at"
       :edited-at="note.last_edited_at"
@@ -116,9 +109,6 @@ export default {
       :toggle-award-path="note.toggle_award_path"
       :can-award-emoji="note.current_user.can_award_emoji"
     />
-    <note-attachment
-      v-if="note.attachment"
-      :attachment="note.attachment"
-    />
+    <note-attachment v-if="note.attachment" :attachment="note.attachment" />
   </div>
 </template>

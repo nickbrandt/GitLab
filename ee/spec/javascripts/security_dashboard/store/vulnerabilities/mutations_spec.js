@@ -21,7 +21,7 @@ describe('vulnerabilities module mutations', () => {
     beforeEach(() => {
       state = {
         ...createState(),
-        hasError: true,
+        errorLoadingVulnerabilities: true,
       };
       mutations[types.REQUEST_VULNERABILITIES](state);
     });
@@ -30,8 +30,8 @@ describe('vulnerabilities module mutations', () => {
       expect(state.isLoadingVulnerabilities).toBeTruthy();
     });
 
-    it('should set `hasError` to `false`', () => {
-      expect(state.hasError).toBeFalsy();
+    it('should set `errorLoadingVulnerabilities` to `false`', () => {
+      expect(state.errorLoadingVulnerabilities).toBeFalsy();
     });
   });
 
@@ -88,7 +88,7 @@ describe('vulnerabilities module mutations', () => {
     beforeEach(() => {
       state = {
         ...createState(),
-        hasError: true,
+        errorLoadingVulnerabilitiesCount: true,
       };
       mutations[types.REQUEST_VULNERABILITIES_COUNT](state);
     });
@@ -97,8 +97,8 @@ describe('vulnerabilities module mutations', () => {
       expect(state.isLoadingVulnerabilitiesCount).toBeTruthy();
     });
 
-    it('should set `hasError` to `false`', () => {
-      expect(state.hasError).toBeFalsy();
+    it('should set `errorLoadingVulnerabilitiesCount` to `false`', () => {
+      expect(state.errorLoadingVulnerabilitiesCount).toBeFalsy();
     });
   });
 
@@ -132,59 +132,104 @@ describe('vulnerabilities module mutations', () => {
   });
 
   describe('SET_MODAL_DATA', () => {
-    const vulnerability = mockData[0];
-    let payload;
-    let state;
+    describe('with all the data', () => {
+      const vulnerability = mockData[0];
+      let payload;
+      let state;
 
-    beforeEach(() => {
-      state = createState();
-      payload = { vulnerability };
-      mutations[types.SET_MODAL_DATA](state, payload);
+      beforeEach(() => {
+        state = createState();
+        payload = { vulnerability };
+        mutations[types.SET_MODAL_DATA](state, payload);
+      });
+
+      it('should set the modal title', () => {
+        expect(state.modal.title).toEqual(vulnerability.name);
+      });
+
+      it('should set the modal description', () => {
+        expect(state.modal.data.description.value).toEqual(vulnerability.description);
+      });
+
+      it('should set the modal project', () => {
+        expect(state.modal.data.project.value).toEqual(vulnerability.project.full_name);
+        expect(state.modal.data.project.url).toEqual(vulnerability.project.full_path);
+      });
+
+      it('should set the modal file', () => {
+        expect(state.modal.data.file.value).toEqual(vulnerability.location.file);
+      });
+
+      it('should set the modal identifiers', () => {
+        expect(state.modal.data.identifiers.value).toEqual(vulnerability.identifiers);
+      });
+
+      it('should set the modal severity', () => {
+        expect(state.modal.data.severity.value).toEqual(vulnerability.severity);
+      });
+
+      it('should set the modal confidence', () => {
+        expect(state.modal.data.confidence.value).toEqual(vulnerability.confidence);
+      });
+
+      it('should set the modal class', () => {
+        expect(state.modal.data.className.value).toEqual(vulnerability.location.class);
+      });
+
+      it('should set the modal solution', () => {
+        expect(state.modal.data.solution.value).toEqual(vulnerability.solution);
+      });
+
+      it('should set the modal links', () => {
+        expect(state.modal.data.links.value).toEqual(vulnerability.links);
+      });
+
+      it('should set the modal instances', () => {
+        expect(state.modal.data.instances.value).toEqual(vulnerability.instances);
+      });
+
+      it('should set the modal vulnerability', () => {
+        expect(state.modal.vulnerability).toEqual(vulnerability);
+      });
     });
 
-    it('should set the modal title', () => {
-      expect(state.modal.title).toEqual(vulnerability.name);
-    });
+    describe('with irregular data', () => {
+      const vulnerability = mockData[0];
+      let state;
 
-    it('should set the modal description', () => {
-      expect(state.modal.data.description.value).toEqual(vulnerability.description);
-    });
+      beforeEach(() => {
+        state = createState();
+      });
 
-    it('should set the modal project', () => {
-      expect(state.modal.data.project.value).toEqual(vulnerability.project.full_name);
-      expect(state.modal.data.project.url).toEqual(vulnerability.project.full_path);
-    });
+      it('should set isDismissed when the vulnerabilitiy is dismissed', () => {
+        const payload = {
+          vulnerability: { ...vulnerability, dismissal_feedback: 'I am dismissed' },
+        };
+        mutations[types.SET_MODAL_DATA](state, payload);
 
-    it('should set the modal file', () => {
-      expect(state.modal.data.file.value).toEqual(vulnerability.location.file);
-    });
+        expect(state.modal.vulnerability.isDismissed).toEqual(true);
+      });
 
-    it('should set the modal identifiers', () => {
-      expect(state.modal.data.identifiers.value).toEqual(vulnerability.identifiers);
-    });
+      it('should set hasIssue when the vulnerabilitiy has a related issue', () => {
+        const payload = { vulnerability: { ...vulnerability, issue_feedback: 'I am an issue' } };
+        mutations[types.SET_MODAL_DATA](state, payload);
 
-    it('should set the modal severity', () => {
-      expect(state.modal.data.severity.value).toEqual(vulnerability.severity);
-    });
+        expect(state.modal.vulnerability.hasIssue).toEqual(true);
+      });
 
-    it('should set the modal confidence', () => {
-      expect(state.modal.data.confidence.value).toEqual(vulnerability.confidence);
-    });
+      it('should nullify the modal links', () => {
+        const payload = { vulnerability: { ...vulnerability, links: [] } };
+        mutations[types.SET_MODAL_DATA](state, payload);
 
-    it('should set the modal solution', () => {
-      expect(state.modal.data.solution.value).toEqual(vulnerability.solution);
-    });
+        expect(state.modal.data.links.value).toEqual(null);
+      });
 
-    it('should set the modal links', () => {
-      expect(state.modal.data.links.value).toEqual(vulnerability.links);
-    });
+      it('should nullify the instances', () => {
+        const payload = { vulnerability: { ...vulnerability, instances: [] } };
+        mutations[types.SET_MODAL_DATA](state, payload);
 
-    it('should set the modal instances', () => {
-      expect(state.modal.data.instances.value).toEqual(vulnerability.instances);
-    });
-
-    it('should set the modal vulnerability', () => {
-      expect(state.modal.vulnerability).toEqual(vulnerability);
+        expect(state.modal.data.instances.value).toEqual(null);
+      });
     });
   });
 
@@ -315,12 +360,12 @@ describe('vulnerabilities module mutations', () => {
     });
   });
 
-  describe('REQUEST_UNDO_DISMISSAL', () => {
+  describe('REQUEST_REVERT_DISMISSAL', () => {
     let state;
 
     beforeEach(() => {
       state = createState();
-      mutations[types.REQUEST_UNDO_DISMISSAL](state);
+      mutations[types.REQUEST_REVERT_DISMISSAL](state);
     });
 
     it('should set isDismissingVulnerability to true', () => {
@@ -336,7 +381,7 @@ describe('vulnerabilities module mutations', () => {
     });
   });
 
-  describe('RECEIVE_UNDO_DISMISSAL_SUCCESS', () => {
+  describe('RECEIVE_REVERT_DISMISSAL_SUCCESS', () => {
     let state;
     let payload;
     let vulnerability;
@@ -346,7 +391,7 @@ describe('vulnerabilities module mutations', () => {
       state.vulnerabilities = mockData;
       [vulnerability] = mockData;
       payload = { id: vulnerability.id };
-      mutations[types.RECEIVE_UNDO_DISMISSAL_SUCCESS](state, payload);
+      mutations[types.RECEIVE_REVERT_DISMISSAL_SUCCESS](state, payload);
     });
 
     it('should set the dismissal feedback on the passed vulnerability', () => {
@@ -366,12 +411,12 @@ describe('vulnerabilities module mutations', () => {
     });
   });
 
-  describe('RECEIVE_UNDO_DISMISSAL_ERROR', () => {
+  describe('RECEIVE_REVERT_DISMISSAL_ERROR', () => {
     let state;
 
     beforeEach(() => {
       state = createState();
-      mutations[types.RECEIVE_UNDO_DISMISSAL_ERROR](state);
+      mutations[types.RECEIVE_REVERT_DISMISSAL_ERROR](state);
     });
 
     it('should set isDismissingVulnerability to false', () => {
@@ -383,7 +428,7 @@ describe('vulnerabilities module mutations', () => {
     });
 
     it('should set the error state on the modal', () => {
-      expect(state.modal.error).toEqual('There was an error undoing the dismissal.');
+      expect(state.modal.error).toEqual('There was an error reverting the dismissal.');
     });
   });
 });

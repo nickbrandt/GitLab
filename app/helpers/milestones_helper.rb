@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module MilestonesHelper
-  prepend EE::MilestonesHelper
   include EntityDateHelper
+  include Gitlab::Utils::StrongMemoize
 
   def milestones_filter_path(opts = {})
     if @project
@@ -244,4 +244,18 @@ module MilestonesHelper
       dashboard_milestone_path(milestone.safe_title, title: milestone.title)
     end
   end
+
+  def can_admin_project_milestones?
+    strong_memoize(:can_admin_project_milestones) do
+      can?(current_user, :admin_milestone, @project)
+    end
+  end
+
+  def can_admin_group_milestones?
+    strong_memoize(:can_admin_group_milestones) do
+      can?(current_user, :admin_milestone, @project.group)
+    end
+  end
 end
+
+MilestonesHelper.prepend(EE::MilestonesHelper)

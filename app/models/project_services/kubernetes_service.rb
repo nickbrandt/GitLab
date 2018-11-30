@@ -9,8 +9,6 @@ class KubernetesService < DeploymentService
   include Gitlab::Kubernetes
   include ReactiveCaching
 
-  prepend EE::KubernetesService
-
   self.reactive_cache_key = ->(service) { [service.class.model_name.singular, service.project_id] }
 
   # Namespace defaults to the project path, but can be overridden in case that
@@ -205,9 +203,7 @@ class KubernetesService < DeploymentService
     kubeclient = build_kube_client!
 
     kubeclient.get_pods(namespace: actual_namespace).as_json
-  rescue Kubeclient::HttpError => err
-    raise err unless err.error_code == 404
-
+  rescue Kubeclient::ResourceNotFoundError
     []
   end
 
@@ -254,3 +250,5 @@ class KubernetesService < DeploymentService
     end
   end
 end
+
+KubernetesService.prepend(EE::KubernetesService)

@@ -35,24 +35,37 @@ describe VisibleApprovable do
 
   describe '#overall_approvers' do
     let!(:project_approver) { create(:approver, target: project) }
+    let(:code_owner) { build(:user) }
+
+    before do
+      allow(resource).to receive(:code_owners).and_return([code_owner])
+    end
 
     subject { resource.overall_approvers }
 
     it 'returns a list of all the project approvers' do
-      is_expected.to match_array(project_approver)
+      is_expected.to contain_exactly(project_approver.user, code_owner)
+    end
+
+    context 'when exclude_code_owners is true' do
+      subject { resource.overall_approvers(exclude_code_owners: true) }
+
+      it 'excludes code owners' do
+        is_expected.to contain_exactly(project_approver.user)
+      end
     end
 
     context 'when author is approver' do
       let!(:author_approver) { create(:approver, target: project, user: resource.author) }
 
       it 'excludes author if authors cannot approve' do
-        is_expected.not_to include(author_approver)
+        is_expected.not_to include(author_approver.user)
       end
 
       it 'includes author if authors are able to approve' do
         project.update(merge_requests_author_approval: true)
 
-        is_expected.to include(author_approver)
+        is_expected.to include(author_approver.user)
       end
     end
 
@@ -60,7 +73,7 @@ describe VisibleApprovable do
       let!(:approver) { create(:approver, target: resource) }
 
       it 'returns the list of all the merge request user approvers' do
-        is_expected.to match_array(approver)
+        is_expected.to contain_exactly(approver.user)
       end
     end
   end
@@ -95,7 +108,7 @@ describe VisibleApprovable do
     subject { resource.all_approvers_including_groups }
 
     it 'only queries once' do
-      expect(resource).to receive(:approvers_from_users).and_call_original.once
+      expect(resource).to receive(:overall_approvers).and_call_original.once
 
       3.times { subject }
     end

@@ -27,6 +27,12 @@ describe Geo::RepositoryDestroyService do
       service.execute
     end
 
+    it 'removes the tracking entry' do
+      create(:geo_project_registry, project: project)
+
+      expect { service.execute }.to change(Geo::ProjectRegistry, :count).by(-1)
+    end
+
     context 'legacy storage project' do
       let(:project) { create(:project_empty_repo, :legacy_storage) }
 

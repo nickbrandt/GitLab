@@ -2,7 +2,6 @@
 
 module Issues
   class UpdateService < Issues::BaseService
-    prepend EE::Issues::UpdateService
     include SpamCheckService
 
     def execute(issue)
@@ -10,6 +9,12 @@ module Issues
       filter_spam_check_params
       change_issue_duplicate(issue)
       move_issue_to_new_project(issue) || update(issue)
+    end
+
+    def update(issue)
+      create_merge_request_from_quick_action
+
+      super
     end
 
     def before_update(issue)
@@ -94,6 +99,13 @@ module Issues
 
     private
 
+    def create_merge_request_from_quick_action
+      create_merge_request_params = params.delete(:create_merge_request)
+      return unless create_merge_request_params
+
+      MergeRequests::CreateFromIssueService.new(project, current_user, create_merge_request_params).execute
+    end
+
     def handle_milestone_change(issue)
       return if skip_milestone_email
 
@@ -126,3 +138,5 @@ module Issues
     end
   end
 end
+
+Issues::UpdateService.prepend(EE::Issues::UpdateService)

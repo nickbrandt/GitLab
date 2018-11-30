@@ -74,7 +74,8 @@ A job is defined by a list of parameters that define the job behavior.
 | after_script  | no       | Override a set of commands that are executed after job |
 | environment   | no       | Defines a name of environment to which deployment is done by this job |
 | coverage      | no       | Define code coverage settings for a given job |
-| retry         | no       | Define how many times a job can be auto-retried in case of a failure |
+| retry         | no       | Define when and how many times a job can be auto-retried in case of a failure |
+| parallel      | no       | Defines how many instances of a job should be run in parallel |
 
 ### `extends`
 
@@ -102,7 +103,7 @@ rspec:
       - $RSPEC
 ```
 
-In the example above, the `rspec` job inherits from the `.tests` template job. 
+In the example above, the `rspec` job inherits from the `.tests` template job.
 GitLab will perform a reverse deep merge based on the keys. GitLab will:
 
 - Merge the `rspec` contents into `.tests` recursively.
@@ -333,7 +334,7 @@ There are a few rules that apply to the usage of job policy:
 
 * `only` and `except` are inclusive. If both `only` and `except` are defined
    in a job specification, the ref is filtered by `only` and `except`.
-* `only` and `except` allow the use of regular expressions.
+* `only` and `except` allow the use of regular expressions (using [Ruby regexp syntax](https://ruby-doc.org/core/Regexp.html)).
 * `only` and `except` allow to specify a repository path to filter jobs for
    forks.
 
@@ -399,7 +400,7 @@ except master.
 > `changes` policy [introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/19232) in 11.4
 
 CAUTION: **Warning:**
-This an _alpha_ feature, and it it subject to change at any time without
+This an _alpha_ feature, and it is subject to change at any time without
 prior notice!
 
 Since GitLab 10.0 it is possible to define a more elaborate only/except job
@@ -475,6 +476,7 @@ docker build:
       - Dockerfile
       - docker/scripts/*
       - dockerfiles/**/*
+      - more_scripts/*.{rb,py,sh}
 ```
 
 In the scenario above, if you are pushing multiple commits to GitLab to an
@@ -484,6 +486,7 @@ one of the commits contains changes to either:
 - The `Dockerfile` file.
 - Any of the files inside `docker/scripts/` directory.
 - Any of the files and subfolders inside `dockerfiles` directory.
+- Any of the files with `rb`, `py`, `sh` extensions inside `more_scripts` directory.
 
 CAUTION: **Warning:**
 There are some caveats when using this feature with new branches and tags. See
@@ -811,7 +814,7 @@ deploy to production:
 >   defined, GitLab will automatically trigger a stop action when the associated
 >   branch is deleted.
 
-Closing (stoping) environments can be achieved with the `on_stop` keyword defined under
+Closing (stopping) environments can be achieved with the `on_stop` keyword defined under
 `environment`. It declares a different job that runs in order to close
 the environment.
 
@@ -1294,12 +1297,16 @@ GitLab 11.2. Requires GitLab Runner 11.2 and above.
 
 The `reports` keyword is used for collecting test reports from jobs and
 exposing them in GitLab's UI (merge requests, pipeline views). Read how to use
-this with [JUnit reports](#artifacts-reports-junit).
+this with [JUnit reports](#artifactsreportsjunit).
 
 NOTE: **Note:**
 The test reports are collected regardless of the job results (success or failure).
 You can use [`artifacts:expire_in`](#artifacts-expire_in) to set up an expiration
 date for their artifacts.
+
+NOTE: **Note:** 
+If you also want the ability to browse the report output files, include the
+[`artifacts:paths`](#artifactspaths) keyword.
 
 #### `artifacts:reports:junit`
 
@@ -1309,8 +1316,9 @@ GitLab 11.2. Requires GitLab Runner 11.2 and above.
 The `junit` report collects [JUnit XML files](https://www.ibm.com/support/knowledgecenter/en/SSQ2R2_14.1.0/com.ibm.rsar.analysis.codereview.cobol.doc/topics/cac_useresults_junit.html)
 as artifacts. Although JUnit was originally developed in Java, there are many
 [third party ports](https://en.wikipedia.org/wiki/JUnit#Ports) for other
-languages like Javascript, Python, Ruby, etc.
+languages like JavaScript, Python, Ruby, etc.
 
+See [JUnit test reports](../junit_test_reports.md) for more details and examples.
 Below is an example of collecting a JUnit XML file from Ruby's RSpec test tool:
 
 ```yaml
@@ -1327,14 +1335,87 @@ rspec:
 The collected JUnit reports will be uploaded to GitLab as an artifact and will
 be automatically shown in merge requests.
 
-For more examples, see [JUnit test reports](../junit_test_reports.md).
-
 NOTE: **Note:**
 In case the JUnit tool you use exports to multiple XML files, you can specify
 multiple test report paths within a single job and they will be automatically
 concatenated into a single file. Use a filename pattern (`junit: rspec-*.xml`),
 an array of filenames (`junit: [rspec-1.xml, rspec-2.xml, rspec-3.xml]`), or a
 combination thereof (`junit: [rspec.xml, test-results/TEST-*.xml]`).
+
+#### `artifacts:reports:codequality` **[STARTER]**
+
+> Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
+
+The `codequality` report collects [CodeQuality issues](https://docs.gitlab.com/ee/user/project/merge_requests/code_quality.html)
+as artifacts.
+
+The collected Code Quality report will be uploaded to GitLab as an artifact and will
+be automatically shown in merge requests.
+
+#### `artifacts:reports:sast` **[ULTIMATE]**
+
+> Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
+
+The `sast` report collects [SAST vulnerabilities](https://docs.gitlab.com/ee/user/project/merge_requests/sast.html)
+as artifacts.
+
+The collected SAST report will be uploaded to GitLab as an artifact and will
+be automatically shown in merge requests, pipeline view and provide data for security
+dashboards.
+
+#### `artifacts:reports:dependency_scanning` **[ULTIMATE]**
+
+> Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
+
+The `dependency_scanning` report collects [Dependency Scanning vulnerabilities](https://docs.gitlab.com/ee/user/project/merge_requests/dependency_scanning.html)
+as artifacts.
+
+The collected Dependency Scanning report will be uploaded to GitLab as an artifact and will
+be automatically shown in merge requests, pipeline view and provide data for security
+dashboards.
+
+#### `artifacts:reports:container_scanning` **[ULTIMATE]**
+
+> Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
+
+The `container_scanning` report collects [Container Scanning vulnerabilities](https://docs.gitlab.com/ee/user/project/merge_requests/container_scanning.html)
+as artifacts.
+
+The collected Container Scanning report will be uploaded to GitLab as an artifact and will
+be automatically shown in merge requests, pipeline view and provide data for security
+dashboards.
+
+#### `artifacts:reports:dast` **[ULTIMATE]**
+
+> Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
+
+The `dast` report collects [DAST vulnerabilities](https://docs.gitlab.com/ee/user/project/merge_requests/dast.html)
+as artifacts.
+
+The collected DAST report will be uploaded to GitLab as an artifact and will
+be automatically shown in merge requests, pipeline view and provide data for security
+dashboards.
+
+#### `artifacts:reports:license_management` **[ULTIMATE]**
+
+> Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
+
+The `license_management` report collects [Licenses](https://docs.gitlab.com/ee/user/project/merge_requests/license_management.html)
+as artifacts.
+
+The collected License Management report will be uploaded to GitLab as an artifact and will
+be automatically shown in merge requests, pipeline view and provide data for security
+dashboards.
+
+#### `artifacts:reports:performance` **[PREMIUM]**
+
+> Introduced in GitLab 11.5. Requires GitLab Runner 11.5 and above.
+
+The `performance` report collects [Performance metrics](https://docs.gitlab.com/ee//user/project/merge_requests/browser_performance_testing.html)
+as artifacts.
+
+The collected Performance report will be uploaded to GitLab as an artifact and will
+be automatically shown in merge requests.
 
 ## `dependencies`
 
@@ -1432,18 +1513,20 @@ job1:
 ## `retry`
 
 > [Introduced][ce-12909] in GitLab 9.5.
+> [Behaviour expanded](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/21758)
+> in GitLab 11.5 to control on which failures to retry.
 
 `retry` allows you to configure how many times a job is going to be retried in
 case of a failure.
 
-When a job fails, and has `retry` configured it is going to be processed again
+When a job fails and has `retry` configured, it is going to be processed again
 up to the amount of times specified by the `retry` keyword.
 
 If `retry` is set to 2, and a job succeeds in a second run (first retry), it won't be retried
 again. `retry` value has to be a positive integer, equal or larger than 0, but
 lower or equal to 2 (two retries maximum, three runs in total).
 
-A simple example:
+A simple example to retry in all failure cases:
 
 ```yaml
 test:
@@ -1451,12 +1534,84 @@ test:
   retry: 2
 ```
 
+By default, a job will be retried on all failure cases. To have a better control
+on which failures to retry, `retry` can be a hash with the following keys:
+
+- `max`: The maximum number of retries.
+- `when`: The failure cases to retry.
+
+To retry only runner system failures at maximum two times:
+
+```yaml
+test:
+  script: rspec
+  retry:
+    max: 2
+    when: runner_system_failure
+```
+
+If there is another failure, other than a runner system failure, the job will
+not be retried.
+
+To retry on multiple failure cases, `when` can also be an array of failures:
+
+```yaml
+test:
+  script: rspec
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+```
+
+Possible values for `when` are:
+
+<!--
+  Please make sure to update `RETRY_WHEN_IN_DOCUMENTATION` array in
+  `spec/lib/gitlab/ci/config/entry/retry_spec.rb` if you change any of
+  the documented values below. The test there makes sure that all documented
+  values are really valid as a config option and therefore should always
+  stay in sync with this documentation.
+ -->
+
+- `always`: Retry on any failure (default).
+- `unknown_failure`: Retry when the failure reason is unknown.
+- `script_failure`: Retry when the script failed.
+- `api_failure`: Retry on API failure.
+- `stuck_or_timeout_failure`: Retry when the job got stuck or timed out.
+- `runner_system_failure`: Retry if there was a runner system failure (e.g. setting up the job failed).
+- `missing_dependency_failure`: Retry if a dependency was missing.
+- `runner_unsupported`: Retry if the runner was unsupported.
+
+
+## `parallel`
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/22631) in GitLab 11.5.
+
+`parallel` allows you to configure how many instances of a job to run in
+parallel. This value has to be greater than or equal to two (2) and less or equal than 50.
+
+This creates N instances of the same job that run in parallel. They're named
+sequentially from `job_name 1/N` to `job_name N/N`.
+
+For every job, `CI_NODE_INDEX` and `CI_NODE_TOTAL` [environment variables](../variables/README.html#predefined-variables-environment-variables) are set.
+
+A simple example:
+
+```yaml
+test:
+  script: rspec
+  parallel: 5
+```
+
 ## `include`
 
-> Introduced in [GitLab Edition Premium][ee] 10.5.
-> Available for Starter, Premium and Ultimate [versions][gitlab-versions] since 10.6.
+> Introduced in [GitLab Premium](https://about.gitlab.com/pricing/) 10.5.
+> Available for Starter, Premium and Ultimate since 10.6.
 > Behaviour expanded in GitLab 10.8 to allow more flexible overriding.
-> Available for Libre since [11.4](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/21603)
+> [Moved](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/21603)
+to GitLab Core in 11.4
 
 Using the `include` keyword, you can allow the inclusion of external YAML files.
 
@@ -1481,6 +1636,10 @@ rspec:
   script:
     - bundle exec rspec
 ```
+
+NOTE: **Note:**
+`include` requires the external YAML files to have the extensions `.yml` or `.yaml`. 
+The external file will not be included if the extension is missing.
 
 You can define it either as a single string, or, in case you want to include
 more than one files, an array of different values . The following examples
@@ -1529,6 +1688,11 @@ include:
 
     NOTE: **Note:**
     The remote file must be publicly accessible through a simple GET request, as we don't support authentication schemas in the remote URL.
+
+    NOTE: **Note:**
+    In order to include files from another repository inside your local network, 
+    you may need to enable the **Allow requests to the local network from hooks and services** checkbox
+    located in the **Settings > Network > Outbound requests** section within the **Admin area**.
 
 ---
 
@@ -1618,7 +1782,7 @@ stages:
 
 production:
   script:
-    - install_depedencies
+    - install_dependencies
     - deploy
     - notify_owner
 ```
@@ -1656,13 +1820,6 @@ variables:
 These variables can be later used in all executed commands and scripts.
 The YAML-defined variables are also set to all created service containers,
 thus allowing to fine tune them.
-
-To turn off global defined variables in a specific job, define an empty hash:
-
-```yaml
-job_name:
-  variables: {}
-```
 
 Except for the user defined variables, there are also the ones [set up by the
 Runner itself](../variables/README.md#predefined-variables-environment-variables).
@@ -2033,5 +2190,3 @@ CI with various languages.
 [ce-12909]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/12909
 [schedules]: ../../user/project/pipelines/schedules.md
 [variables-expressions]: ../variables/README.md#variables-expressions
-[ee]: https://about.gitlab.com/gitlab-ee/
-[gitlab-versions]: https://about.gitlab.com/products/

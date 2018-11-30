@@ -2,8 +2,6 @@
 
 class Ldap::OmniauthCallbacksController < OmniauthCallbacksController
   extend ::Gitlab::Utils::Override
-  prepend EE::OmniauthCallbacksController
-  prepend EE::Ldap::OmniauthCallbacksController
 
   def self.define_providers!
     return unless Gitlab::Auth::LDAP::Config.enabled?
@@ -33,3 +31,6 @@ class Ldap::OmniauthCallbacksController < OmniauthCallbacksController
     redirect_to new_user_session_path
   end
 end
+
+Ldap::OmniauthCallbacksController.prepend(EE::OmniauthCallbacksController)
+Ldap::OmniauthCallbacksController.prepend(EE::Ldap::OmniauthCallbacksController)

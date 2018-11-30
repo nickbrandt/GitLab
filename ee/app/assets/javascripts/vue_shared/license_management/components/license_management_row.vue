@@ -52,10 +52,7 @@ export default {
 </script>
 <template>
   <li class="list-group-item">
-    <issue-status-icon
-      :status="status"
-      class="float-left append-right-default"
-    />
+    <issue-status-icon :status="status" class="float-left append-right-default" />
     <span class="js-license-name">{{ license.name }}</span>
     <div class="float-right">
       <div class="d-flex">
@@ -67,35 +64,15 @@ export default {
             aria-haspopup="true"
             aria-expanded="false"
           >
-            <icon
-              class="float-right"
-              name="chevron-down"
-            />
-            {{ dropdownText }}
+            <icon class="float-right" name="chevron-down" /> {{ dropdownText }}
           </button>
-          <div
-            class="dropdown-menu dropdown-menu-right"
-          >
-            <button
-              class="dropdown-item"
-              type="button"
-              @click="approveLicense(license)"
-            >
-              <icon
-                :class="approveIconClass"
-                name="mobile-issue-close"
-              />
+          <div class="dropdown-menu dropdown-menu-right">
+            <button class="dropdown-item" type="button" @click="approveLicense(license);">
+              <icon :class="approveIconClass" name="mobile-issue-close" />
               {{ $options[$options.LICENSE_APPROVAL_STATUS.APPROVED] }}
             </button>
-            <button
-              class="dropdown-item"
-              type="button"
-              @click="blacklistLicense(license)"
-            >
-              <icon
-                :class="blacklistIconClass"
-                name="mobile-issue-close"
-              />
+            <button class="dropdown-item" type="button" @click="blacklistLicense(license);">
+              <icon :class="blacklistIconClass" name="mobile-issue-close" />
               {{ $options[$options.LICENSE_APPROVAL_STATUS.BLACKLISTED] }}
             </button>
           </div>
@@ -105,9 +82,9 @@ export default {
           type="button"
           data-toggle="modal"
           data-target="#modal-license-delete-confirmation"
-          @click="setLicenseInModal(license)"
+          @click="setLicenseInModal(license);"
         >
-          <icon name="remove"/>
+          <icon name="remove" />
         </button>
       </div>
     </div>

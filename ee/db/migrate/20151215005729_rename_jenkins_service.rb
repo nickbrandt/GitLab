@@ -1,4 +1,4 @@
-class RenameJenkinsService < ActiveRecord::Migration
+class RenameJenkinsService < ActiveRecord::Migration[4.2]
   def up
     execute "UPDATE services SET type = 'JenkinsDeprecatedService' WHERE type = 'JenkinsService';"
   end

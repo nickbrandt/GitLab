@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Groups::ApplicationController < ApplicationController
-  prepend EE::Groups::ApplicationController
   include RoutableActions
   include ControllerWithCrossProjectAccessCheck
 
@@ -39,3 +38,5 @@ class Groups::ApplicationController < ApplicationController
     url_for(safe_params)
   end
 end
+
+Groups::ApplicationController.prepend(EE::Groups::ApplicationController)

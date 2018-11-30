@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 class Admin::UsersController < Admin::ApplicationController
-  prepend EE::Admin::UsersController
-
   before_action :user, except: [:index, :new, :create]
+  before_action :check_impersonation_availability, only: :impersonate
 
   def index
     @users = User.order_name_asc.filter(params[:filter])
@@ -229,4 +228,10 @@ class Admin::UsersController < Admin::ApplicationController
 
     result[:status] == :success
   end
+
+  def check_impersonation_availability
+    access_denied! unless Gitlab.config.gitlab.impersonation_enabled
+  end
 end
+
+Admin::UsersController.prepend(EE::Admin::UsersController)

@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Admin::AppearancesController < Admin::ApplicationController
-  prepend EE::Admin::AppearancesController
-
   before_action :set_appearance, except: :create
 
   def show
@@ -79,3 +77,5 @@ class Admin::AppearancesController < Admin::ApplicationController
     ]
   end
 end
+
+Admin::AppearancesController.prepend(EE::Admin::AppearancesController)

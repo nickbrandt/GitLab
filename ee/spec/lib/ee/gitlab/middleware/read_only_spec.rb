@@ -41,46 +41,30 @@ describe Gitlab::Middleware::ReadOnly do
       allow(Gitlab::Database).to receive(:read_only?) { true }
     end
 
+    shared_examples 'whitelisted request' do |request_type, request_url|
+      it "expects a #{request_type.upcase} request to #{request_url} to be allowed" do
+        expect(Rails.application.routes).to receive(:recognize_path).and_call_original
+        response = request.send(request_type, request_url)
+
+        expect(response).not_to be_redirect
+        expect(subject).not_to disallow_request
+      end
+    end
+
     context 'whitelisted requests' do
-      it 'expects a PATCH request to geo_nodes update URL to be allowed' do
-        expect(Rails.application.routes).to receive(:recognize_path).and_call_original
-        response = request.patch('/admin/geo/nodes/1')
+      it_behaves_like 'whitelisted request', :patch, '/admin/geo/nodes/1'
 
-        expect(response).not_to be_redirect
-        expect(subject).not_to disallow_request
-      end
+      it_behaves_like 'whitelisted request', :delete, '/admin/geo/projects/1'
 
-      it 'expects a DELETE request to geo projects delete URL to be allowed' do
-        expect(Rails.application.routes).to receive(:recognize_path).and_call_original
-        response = request.delete('/admin/geo/projects/1')
+      it_behaves_like 'whitelisted request', :post, '/admin/geo/projects/1/resync'
 
-        expect(response).not_to be_redirect
-        expect(subject).not_to disallow_request
-      end
+      it_behaves_like 'whitelisted request', :post, '/admin/geo/projects/1/recheck'
 
-      it 'expects a POST request to geo projects resync URL to be allowed' do
-        expect(Rails.application.routes).to receive(:recognize_path).and_call_original
-        response = request.post('/admin/geo/projects/1/resync')
+      it_behaves_like 'whitelisted request', :post, '/admin/geo/projects/recheck_all'
 
-        expect(response).not_to be_redirect
-        expect(subject).not_to disallow_request
-      end
+      it_behaves_like 'whitelisted request', :post, '/admin/geo/projects/resync_all'
 
-      it 'expects a POST request to geo projects recheck URL to be allowed' do
-        expect(Rails.application.routes).to receive(:recognize_path).and_call_original
-        response = request.post('/admin/geo/projects/1/recheck')
-
-        expect(response).not_to be_redirect
-        expect(subject).not_to disallow_request
-      end
-
-      it 'expects a POST request to geo projects force redownload URL to be allowed' do
-        expect(Rails.application.routes).to receive(:recognize_path).and_call_original
-        response = request.post('/admin/geo/projects/1/force_redownload')
-
-        expect(response).not_to be_redirect
-        expect(subject).not_to disallow_request
-      end
+      it_behaves_like 'whitelisted request', :post, '/admin/geo/projects/1/force_redownload'
     end
   end
 end

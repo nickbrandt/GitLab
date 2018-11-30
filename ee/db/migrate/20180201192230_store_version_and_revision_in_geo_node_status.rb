@@ -1,4 +1,4 @@
-class StoreVersionAndRevisionInGeoNodeStatus < ActiveRecord::Migration
+class StoreVersionAndRevisionInGeoNodeStatus < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def change

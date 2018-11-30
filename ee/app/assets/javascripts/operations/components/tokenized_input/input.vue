@@ -34,20 +34,15 @@ export default {
     class="form-control tokenized-input-wrapper d-flex flex-wrap align-items-center"
     @click="focusInput"
   >
-    <div
-      v-for="(token, index) in projectTokens"
-      :key="token.id"
-      class="d-flex"
-      @click.stop
-    >
+    <div v-for="(token, index) in projectTokens" :key="token.id" class="d-flex" @click.stop>
       <div class="js-input-token input-token text-secondary py-0 pl-2 pr-1 rounded-left">
         {{ token.name_with_namespace }}
       </div>
       <div
         class="js-token-remove tokenized-input-token-remove d-flex align-items-center text-secondary py-0 px-1 rounded-right"
-        @click="removeProjectTokenAt(index)"
+        @click="removeProjectTokenAt(index);"
       >
-        <icon name="close"/>
+        <icon name="close" />
       </div>
     </div>
     <div class="d-flex align-items-center flex-grow-1">
@@ -60,10 +55,7 @@ export default {
         @focus="onFocus"
         @blur="onBlur"
       />
-      <icon
-        name="search"
-        class="text-secondary"
-      />
+      <icon name="search" class="text-secondary" />
     </div>
   </div>
 </template>

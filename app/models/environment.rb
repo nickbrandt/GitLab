@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Environment < ActiveRecord::Base
-  prepend EE::Environment
-
   # Used to generate random suffixes for the slug
   LETTERS = 'a'..'z'
   NUMBERS = '0'..'9'
@@ -10,9 +8,9 @@ class Environment < ActiveRecord::Base
 
   belongs_to :project, required: true
 
-  has_many :deployments, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
+  has_many :deployments, -> { success }, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
 
-  has_one :last_deployment, -> { order('deployments.id DESC') }, class_name: 'Deployment'
+  has_one :last_deployment, -> { success.order('deployments.id DESC') }, class_name: 'Deployment'
 
   before_validation :nullify_external_url
   before_validation :generate_slug, if: ->(env) { env.slug.blank? }
@@ -52,6 +50,7 @@ class Environment < ActiveRecord::Base
   scope :in_review_folder, -> { where(environment_type: "review") }
   scope :for_name, -> (name) { where(name: name) }
   scope :for_project, -> (project) { where(project_id: project) }
+  scope :with_deployment, -> (sha) { where('EXISTS (?)', Deployment.select(1).where('deployments.environment_id = environments.id').where(sha: sha)) }
 
   state_machine :state, initial: :available do
     event :start do
@@ -249,3 +248,5 @@ class Environment < ActiveRecord::Base
     (0..5).map { SUFFIX_CHARS.sample }.join
   end
 end
+
+Environment.prepend(EE::Environment)

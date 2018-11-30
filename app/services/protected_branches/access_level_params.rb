@@ -2,8 +2,6 @@
 
 module ProtectedBranches
   class AccessLevelParams
-    prepend EE::ProtectedBranches::AccessLevelParams
-
     attr_reader :type, :params
 
     def initialize(type, params)
@@ -35,3 +33,5 @@ module ProtectedBranches
     end
   end
 end
+
+ProtectedBranches::AccessLevelParams.prepend(EE::ProtectedBranches::AccessLevelParams)

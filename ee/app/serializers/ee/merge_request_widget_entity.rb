@@ -26,17 +26,13 @@ module EE
         end
       end
 
-      expose :performance, if: -> (mr, _) { mr.expose_performance_data? } do
-        expose :head_path, if: -> (mr, _) { can?(current_user, :read_build, mr.head_performance_artifact) } do |merge_request|
-          raw_project_build_artifacts_url(merge_request.source_project,
-                                          merge_request.head_performance_artifact,
-                                          path: Ci::Build::PERFORMANCE_FILE)
+      expose :performance, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:performance) } do
+        expose :head_path do |merge_request|
+          head_pipeline_downloadable_path_for_report_type(:performance)
         end
 
-        expose :base_path, if: -> (mr, _) { can?(current_user, :read_build, mr.base_performance_artifact) } do |merge_request|
-          raw_project_build_artifacts_url(merge_request.target_project,
-                                          merge_request.base_performance_artifact,
-                                          path: Ci::Build::PERFORMANCE_FILE)
+        expose :base_path do |merge_request|
+          base_pipeline_downloadable_path_for_report_type(:performance)
         end
       end
 
@@ -60,17 +56,13 @@ module EE
         end
       end
 
-      expose :license_management, if: -> (mr, _) { mr.expose_license_management_data? } do
-        expose :head_path, if: -> (mr, _) { can?(current_user, :read_build, mr.head_license_management_artifact) } do |merge_request|
-          raw_project_build_artifacts_url(merge_request.source_project,
-                                          merge_request.head_license_management_artifact,
-                                          path: Ci::Build::LICENSE_MANAGEMENT_FILE)
+      expose :license_management, if: -> (mr, _) { head_pipeline_downloadable_path_for_report_type(:license_management) } do
+        expose :head_path do |merge_request|
+          head_pipeline_downloadable_path_for_report_type(:license_management)
         end
 
-        expose :base_path, if: -> (mr, _) { mr.base_has_license_management_data? && can?(current_user, :read_build, mr.base_license_management_artifact) } do |merge_request|
-          raw_project_build_artifacts_url(merge_request.target_project,
-                                          merge_request.base_license_management_artifact,
-                                          path: Ci::Build::LICENSE_MANAGEMENT_FILE)
+        expose :base_path do |merge_request|
+          base_pipeline_downloadable_path_for_report_type(:license_management)
         end
 
         expose :managed_licenses_path do |merge_request|
@@ -81,7 +73,7 @@ module EE
           can?(current_user, :admin_software_license_policy, merge_request)
         end
 
-        expose :license_management_settings_path, if: -> (mr, _) {can?(current_user, :admin_software_license_policy, mr.target_project)} do |merge_request|
+        expose :license_management_settings_path, if: -> (mr, _) { can?(current_user, :admin_software_license_policy, mr.target_project) } do |merge_request|
           license_management_settings_path(merge_request.target_project)
         end
 

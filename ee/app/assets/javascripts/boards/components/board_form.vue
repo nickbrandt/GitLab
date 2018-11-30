@@ -57,9 +57,9 @@ export default {
       default: 0,
     },
     weights: {
-      type: String,
+      type: Array,
       required: false,
-      default: '',
+      default: () => [],
     },
   },
   data() {
@@ -125,9 +125,6 @@ export default {
     },
     readonly() {
       return !this.canAdminBoard;
-    },
-    weightsArray() {
-      return JSON.parse(this.weights);
     },
     submitDisabled() {
       return this.isLoading || this.board.name.length === 0;
@@ -212,24 +209,10 @@ export default {
     @submit="submit"
   >
     <template slot="body">
-      <p v-if="isDeleteForm">
-        Are you sure you want to delete this board?
-      </p>
-      <form
-        v-else
-        class="js-board-config-modal"
-        @submit.prevent
-      >
-        <div
-          v-if="!readonly"
-          class="append-bottom-20"
-        >
-          <label
-            class="form-section-title label-bold"
-            for="board-new-name"
-          >
-            Board name
-          </label>
+      <p v-if="isDeleteForm">Are you sure you want to delete this board?</p>
+      <form v-else class="js-board-config-modal" @submit.prevent>
+        <div v-if="!readonly" class="append-bottom-20">
+          <label class="form-section-title label-bold" for="board-new-name"> Board name </label>
           <input
             id="board-new-name"
             ref="name"
@@ -241,19 +224,9 @@ export default {
           />
         </div>
         <div v-if="scopedIssueBoardFeatureEnabled">
-          <div
-            v-if="canAdminBoard"
-            class="media append-bottom-10"
-          >
-            <label class="form-section-title label-bold media-body">
-              Board scope
-            </label>
-            <button
-              v-if="collapseScope"
-              type="button"
-              class="btn"
-              @click="expanded = !expanded"
-            >
+          <div v-if="canAdminBoard" class="media append-bottom-10">
+            <label class="form-section-title label-bold media-body"> Board scope </label>
+            <button v-if="collapseScope" type="button" class="btn" @click="expanded = !expanded;">
               {{ expandButtonText }}
             </button>
           </div>
@@ -293,7 +266,7 @@ export default {
             <board-weight-select
               v-model="board.weight"
               :board="board"
-              :weights="weightsArray"
+              :weights="weights"
               :can-edit="canAdminBoard"
             />
           </div>

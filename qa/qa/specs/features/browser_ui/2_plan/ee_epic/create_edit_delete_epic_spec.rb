@@ -9,11 +9,11 @@ module QA
       end
 
       it 'user creates, edits, deletes epic' do
-        issue = Factory::Resource::Issue.fabricate! do |issue|
+        issue = Resource::Issue.fabricate! do |issue|
           issue.title = 'Issue for epics tests'
         end
 
-        epic = EE::Factory::Resource::Epic.fabricate! do |epic|
+        epic = EE::Resource::Epic.fabricate! do |epic|
           epic.group = issue.project.group
           epic.title = "My First Epic"
         end
@@ -46,6 +46,7 @@ module QA
         issue.visit!
 
         Page::Project::Issue::Show.perform do |show_page|
+          show_page.select_all_activities_filter
           show_page.comment("/epic #{epic.web_url}")
           show_page.comment("/remove_epic")
           expect(show_page).to have_content(/removed from epic/)

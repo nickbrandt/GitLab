@@ -2,8 +2,6 @@
 
 module Ci
   class JobArtifact < ActiveRecord::Base
-    prepend EE::Ci::JobArtifact
-
     include AfterCommitQueue
     include ObjectStorage::BackgroundMove
     extend Gitlab::Ci::Model
@@ -17,7 +15,7 @@ module Ci
       metadata: nil,
       trace: nil,
       junit: 'junit.xml',
-      codequality: 'codequality.json',
+      codequality: 'gl-code-quality-report.json',
       sast: 'gl-sast-report.json',
       dependency_scanning: 'gl-dependency-scanning-report.json',
       container_scanning: 'gl-container-scanning-report.json',
@@ -192,3 +190,5 @@ module Ci
     end
   end
 end
+
+Ci::JobArtifact.prepend(EE::Ci::JobArtifact)

@@ -68,6 +68,37 @@ describe Gitlab::Auth::LDAP::User do
           end
         end
       end
+
+      context 'with "user_default_external" application setting' do
+        using RSpec::Parameterized::TableSyntax
+
+        where(:user_default_external, :user_default_internal_regex, :user_is_in_external_group, :expected_to_be_external) do
+          true  | nil           | false | false
+          true  | 'example.com' | false | false
+
+          true  | nil           | true | true
+          true  | 'example.com' | true | true
+
+          false | nil           | false | false
+          false | 'example.com' | false | false
+
+          false | nil           | true | true
+          false | 'example.com' | true | true
+        end
+
+        with_them do
+          let(:group_member_dns) { ['uid=someone_else,ou=people,dc=example,dc=com', user_is_in_external_group ? auth_hash.uid : nil].compact }
+
+          before do
+            stub_application_setting(user_default_external: user_default_external)
+            stub_application_setting(user_default_internal_regex: user_default_internal_regex)
+          end
+
+          it "sets the user's external flag appropriately" do
+            expect(gl_user.external).to eq(expected_to_be_external)
+          end
+        end
+      end
     end
 
     context 'when there is more than one external group' do

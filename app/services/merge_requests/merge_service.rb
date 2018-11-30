@@ -8,8 +8,6 @@ module MergeRequests
   # Executed when you do merge via GitLab UI
   #
   class MergeService < MergeRequests::BaseService
-    prepend EE::MergeRequests::MergeService
-
     MergeError = Class.new(StandardError)
 
     attr_reader :merge_request, :source
@@ -140,3 +138,5 @@ module MergeRequests
     end
   end
 end
+
+MergeRequests::MergeService.prepend(EE::MergeRequests::MergeService)

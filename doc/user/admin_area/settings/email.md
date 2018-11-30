@@ -19,3 +19,20 @@ legal/auditing/compliance reasons.
 
 [ee-5031]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/5031
 [eep]: https://about.gitlab.com/pricing/
+
+## Custom hostname for private commit emails
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/22560) in GitLab 11.5.
+
+This configuration option sets the email hostname for [private commit emails](../../profile/index.md#private-commit-email),
+and it's, by default, set to `users.noreply.YOUR_CONFIGURED_HOSTNAME`.
+
+In order to change this option:
+
+1. Go to **Admin area > Settings** (`/admin/application_settings`).
+1. Under the **Email** section, change the **Custom hostname (for private commit emails)** field.
+1. Hit **Save** for the changes to take effect.
+
+NOTE: **Note**: Once the hostname gets configured, every private commit email using the previous hostname, will not get
+recognized by GitLab. This can directly conflict with certain [Push rules](../../../push_rules/push_rules.md) such as
+`Check whether author is a GitLab user` and `Check whether committer is the current authenticated user`.

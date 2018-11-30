@@ -10,8 +10,13 @@ module EE
       end
 
       def unique_environment_scope
-        if project && project.clusters.where(environment_scope: environment_scope).where.not(id: self.id).exists?
+        if project && project.clusters.where(environment_scope: environment_scope).where.not(id: id).exists?
           errors.add(:base, "cannot add duplicated environment scope")
+          return false
+        end
+
+        if group && group.clusters.where(environment_scope: environment_scope).where.not(id: id).exists?
+          errors.add(:base, 'cannot add duplicated environment scope')
           return false
         end
 

@@ -1,13 +1,16 @@
 # Static Application Security Testing (SAST) **[ULTIMATE]**
 
-> [Introduced][ee-3775] in [GitLab Ultimate][ee] 10.3.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/3775)
+in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.3.
 
 ## Overview
 
-If you are using [GitLab CI/CD][ci], you can analyze your source code for known
-vulnerabilities using Static Application Security Testing (SAST), either by
-including the CI job in your [existing `.gitlab-ci.yml` file][cc-docs] or
-by implicitly using [Auto SAST](../../../topics/autodevops/index.md#auto-sast)
+If you are using [GitLab CI/CD](../../../ci/README.md), you can analyze your source code for known
+vulnerabilities using Static Application Security Testing (SAST).
+
+You can take advantage of SAST by either [including the CI job](../../../ci/examples/sast.md) in
+your existing `.gitlab-ci.yml` file or by implicitly using
+[Auto SAST](../../../topics/autodevops/index.md#auto-sast)
 that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
 
 Going a step further, GitLab can show the vulnerability list right in the merge
@@ -40,33 +43,22 @@ The following languages and frameworks are supported.
 
 ## How it works
 
-First of all, you need to define a job named `sast` in your `.gitlab-ci.yml`
-file. [Check how the `sast` job should look like][cc-docs].
+First of all, you need to define a job in your `.gitlab-ci.yml` file that generates the
+[SAST report artifact](../../../ci/yaml/README.md#artifactsreportssast).
+For more information on how the SAST job should look like, check the
+example on [Static Application Security Testing with GitLab CI/CD](../../../ci/examples/sast.md).
 
-In order for the report to show in the merge request, there are two
-prerequisites:
-
-- the specified job **must** be named `sast`
-- the resulting report **must** be named `gl-sast-report.json` and uploaded as
-  an artifact
-
-The `sast` job will perform an analysis on the running web application, the
-resulting JSON file will be uploaded as an artifact, and GitLab will then check
-this file and show the information inside the merge request.
+GitLab then checks this report, compares the found vulnerabilities between the source and target
+branches, and shows the information right on the merge request.
 
 ![SAST Widget](img/sast.png)
 
 ## Security report under pipelines
 
-> [Introduced][ee-3776] in [GitLab Ultimate][ee] 10.6.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/3776)
+in [GitLab Ultimate](https://about.gitlab.com/pricing) 10.6.
 
 Visit any pipeline page which has a `sast` job and you will be able to see
 the security report tab with the listed vulnerabilities (if any).
 
 ![Security Report](img/security_report.png)
-
-[ee-3775]: https://gitlab.com/gitlab-org/gitlab-ee/issues/3775
-[ee-3776]: https://gitlab.com/gitlab-org/gitlab-ee/issues/3776
-[ee]: https://about.gitlab.com/pricing
-[ci]: ../../../ci/README.md
-[cc-docs]: ../../../ci/examples/sast.md

@@ -16,8 +16,6 @@ module Clusters
           configure_kubernetes_token
 
           kubernetes_namespace.save!
-        rescue ::Kubeclient::HttpError => err
-          raise err unless err.error_code = 404
         end
 
         private
@@ -25,7 +23,7 @@ module Clusters
         attr_reader :cluster, :kubernetes_namespace, :platform
 
         def configure_kubernetes_namespace
-          kubernetes_namespace.configure_predefined_credentials
+          kubernetes_namespace.set_defaults
         end
 
         def create_project_service_account

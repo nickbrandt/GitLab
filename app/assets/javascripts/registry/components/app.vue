@@ -1,5 +1,6 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
+import { GlLoadingIcon } from '@gitlab/ui';
 import Flash from '../../flash';
 import store from '../stores';
 import collapsibleContainer from './collapsible_container.vue';
@@ -9,6 +10,7 @@ export default {
   name: 'RegistryListApp',
   components: {
     collapsibleContainer,
+    GlLoadingIcon,
   },
   props: {
     endpoint: {
@@ -33,10 +35,7 @@ export default {
 </script>
 <template>
   <div>
-    <gl-loading-icon
-      v-if="isLoading"
-      :size="3"
-    />
+    <gl-loading-icon v-if="isLoading" :size="3" />
 
     <collapsible-container
       v-for="(item, index) in repos"
@@ -46,8 +45,10 @@ export default {
     />
 
     <p v-else-if="!isLoading && !repos.length">
-      {{ __(`No container images stored for this project.
-Add one by following the instructions above.`) }}
+      {{
+        __(`No container images stored for this project.
+Add one by following the instructions above.`)
+      }}
     </p>
   </div>
 </template>

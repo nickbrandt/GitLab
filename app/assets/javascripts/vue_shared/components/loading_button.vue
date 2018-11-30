@@ -1,4 +1,5 @@
 <script>
+import { GlLoadingIcon } from '@gitlab/ui';
 /* eslint-disable vue/require-default-prop */
 /* This is a re-usable vue component for rendering a button
     that will probably be sending off ajax requests and need
@@ -18,6 +19,9 @@
   */
 
 export default {
+  components: {
+    GlLoadingIcon,
+  },
   props: {
     loading: {
       type: Boolean,
@@ -48,30 +52,20 @@ export default {
 </script>
 
 <template>
-  <button
-    :class="containerClass"
-    :disabled="loading || disabled"
-    type="button"
-    @click="onClick"
-  >
+  <button :class="containerClass" :disabled="loading || disabled" type="button" @click="onClick">
     <transition name="fade">
       <gl-loading-icon
         v-if="loading"
         :inline="true"
         :class="{
-          'append-right-5': label
+          'append-right-5': label,
         }"
         class="js-loading-button-icon"
       />
     </transition>
     <transition name="fade">
       <slot>
-        <span
-          v-if="label"
-          class="js-loading-button-label"
-        >
-          {{ label }}
-        </span>
+        <span v-if="label" class="js-loading-button-label"> {{ label }} </span>
       </slot>
     </transition>
   </button>

@@ -8,7 +8,7 @@ module Geo
       fetch_repository
 
       mark_sync_as_successful
-    rescue Gitlab::Shell::Error, ProjectWiki::CouldNotCreateWikiError => e
+    rescue Gitlab::Shell::Error, Gitlab::Git::BaseError, ProjectWiki::CouldNotCreateWikiError => e
       # In some cases repository does not exist, the only way to know about this is to parse the error text.
       # If it does not exist we should consider it as successfully downloaded.
       if e.message.include? Gitlab::GitAccess::ERROR_MESSAGES[:no_repo]

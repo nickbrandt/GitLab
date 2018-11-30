@@ -4,10 +4,12 @@ import { s__ } from '~/locale';
 import eventHub from '~/sidebar/event_hub';
 import tooltip from '~/vue_shared/directives/tooltip';
 import icon from '~/vue_shared/components/icon.vue';
+import { GlLoadingIcon } from '@gitlab/ui';
 
 export default {
   components: {
     icon,
+    GlLoadingIcon,
   },
   directives: {
     tooltip,
@@ -137,10 +139,7 @@ export default {
 </script>
 
 <template>
-  <div
-    :class="{ 'collapse-after-update': collapsedAfterUpdate }"
-    class="block weight"
-  >
+  <div :class="{ 'collapse-after-update': collapsedAfterUpdate }" class="block weight">
     <div
       v-tooltip
       :title="tooltipTitle"
@@ -150,40 +149,23 @@ export default {
       data-boundary="viewport"
       @click="onCollapsedClick"
     >
-      <icon
-        :size="16"
-        name="scale"
-      />
-      <gl-loading-icon
-        v-if="fetching"
-        class="js-weight-collapsed-loading-icon"
-      />
-      <span
-        v-else
-        class="js-weight-collapsed-weight-label"
-        v-html="collapsedWeightLabel"
-      ></span>
+      <icon :size="16" name="weight" />
+      <gl-loading-icon v-if="fetching" class="js-weight-collapsed-loading-icon" />
+      <span v-else class="js-weight-collapsed-weight-label" v-html="collapsedWeightLabel"></span>
     </div>
     <div class="title hide-collapsed">
       {{ s__('Sidebar|Weight') }}
-      <gl-loading-icon
-        v-if="fetching || loading"
-        :inline="true"
-        class="js-weight-loading-icon"
-      />
+      <gl-loading-icon v-if="fetching || loading" :inline="true" class="js-weight-loading-icon" />
       <a
         v-if="editable"
         class="float-right js-weight-edit-link"
         href="#"
-        @click="showEditField(!shouldShowEditField)"
+        @click="showEditField(!shouldShowEditField);"
       >
         {{ __('Edit') }}
       </a>
     </div>
-    <div
-      v-if="shouldShowEditField"
-      class="hide-collapsed"
-    >
+    <div v-if="shouldShowEditField" class="hide-collapsed">
       <input
         ref="editableField"
         :value="weight"
@@ -193,24 +175,14 @@ export default {
         @blur="onSubmit"
         @keydown.enter="onSubmit"
       />
-      <span
-        v-if="!hasValidInput"
-        class="gl-field-error"
-      >
-        <icon
-          :size="24"
-          name="merge-request-close-m"
-        />
+      <span v-if="!hasValidInput" class="gl-field-error">
+        <icon :size="24" name="merge-request-close-m" />
         {{ s__('Sidebar|Only numeral characters allowed') }}
       </span>
     </div>
-    <div
-      v-if="shouldShowWeight"
-      class="value hide-collapsed js-weight-weight-label"
-    >
+    <div v-if="shouldShowWeight" class="value hide-collapsed js-weight-weight-label">
       <span v-if="!isNoValue">
-        <strong class="js-weight-weight-label-value">{{ weight }}</strong>
-        &nbsp;-&nbsp;
+        <strong class="js-weight-weight-label-value">{{ weight }}</strong> &nbsp;-&nbsp;
         <a
           v-if="editable"
           class="btn-default-hover-link js-weight-remove-link"
@@ -220,11 +192,7 @@ export default {
           {{ __('remove weight') }}
         </a>
       </span>
-      <span
-        v-else
-        class="no-value">
-        {{ noValueLabel }}
-      </span>
+      <span v-else class="no-value"> {{ noValueLabel }} </span>
     </div>
   </div>
 </template>

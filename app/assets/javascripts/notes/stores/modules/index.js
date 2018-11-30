@@ -21,6 +21,10 @@ export default () => ({
     noteableData: {
       current_user: {},
     },
+    commentsDisabled: false,
+    resolvableDiscussionsCount: 0,
+    unresolvedDiscussionsCount: 0,
+    hasUnresolvedDiscussions: false,
   },
   actions,
   getters,

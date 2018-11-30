@@ -39,17 +39,13 @@ export default {
       <template v-else-if="issue.confidence">
         ({{ issue.confidence }}):
       </template>
-      <template v-else-if="issue.priority">{{ issue.priority }}:</template>
+      <template v-else-if="issue.priority"
+        >{{ issue.priority }}:</template
+      >
 
-      <modal-open-name
-        :issue="issue"
-        :status="status"
-      />
+      <modal-open-name :issue="issue" :status="status" />
     </div>
 
-    <report-link
-      v-if="issue.path"
-      :issue="issue"
-    />
+    <report-link v-if="issue.path" :issue="issue" />
   </div>
 </template>

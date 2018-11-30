@@ -12,6 +12,7 @@ import SidebarTodo from '~/sidebar/components/todo_toggle/todo.vue';
 import SidebarCollapsedGroupedDatePicker from '~/vue_shared/components/sidebar/collapsed_grouped_date_picker.vue';
 import ToggleSidebar from '~/vue_shared/components/sidebar/toggle_sidebar.vue';
 import SidebarLabelsSelect from '~/vue_shared/components/sidebar/labels_select/base.vue';
+import { parseBoolean } from '~/lib/utils/common_utils';
 import eventHub from '../../event_hub';
 import SidebarDatePicker from './sidebar_date_picker.vue';
 import SidebarParticipants from './sidebar_participants.vue';
@@ -167,7 +168,7 @@ export default {
     return {
       store,
       // Backend will pass the appropriate css class for the contentContainer
-      collapsed: Cookies.get('collapsed_gutter') === 'true',
+      collapsed: parseBoolean(Cookies.get('collapsed_gutter')),
       isUserSignedIn: !!gon.current_user_id,
       autoExpanded: false,
       savingStartDate: false,
@@ -226,9 +227,17 @@ export default {
   },
   mounted() {
     eventHub.$on('toggleSidebar', this.toggleSidebar);
+    document.addEventListener(
+      'toggleSidebarRevealLabelsDropdown',
+      this.toggleSidebarRevealLabelsDropdown,
+    );
   },
   beforeDestroy() {
     eventHub.$off('toggleSidebar', this.toggleSidebar);
+    document.removeEventListener(
+      'toggleSidebarRevealLabelsDropdown',
+      this.toggleSidebarRevealLabelsDropdown,
+    );
   },
   methods: {
     getDateValidity(startDate, endDate) {
@@ -434,20 +443,14 @@ export default {
 
 <template>
   <aside
-    :class="{ 'right-sidebar-expanded' : !collapsed, 'right-sidebar-collapsed': collapsed }"
+    :class="{ 'right-sidebar-expanded': !collapsed, 'right-sidebar-collapsed': collapsed }"
     v-bind="isUserSignedIn ? { 'data-signed-in': true } : {}"
     class="right-sidebar epic-sidebar"
   >
     <div class="issuable-sidebar js-issuable-update">
       <div class="block issuable-sidebar-header">
-        <span class="issuable-header-text hide-collapsed float-left">
-          {{ __('Todo') }}
-        </span>
-        <toggle-sidebar
-          :collapsed="collapsed"
-          css-classes="float-right"
-          @toggle="toggleSidebar"
-        />
+        <span class="issuable-header-text hide-collapsed float-left"> {{ __('Todo') }} </span>
+        <toggle-sidebar :collapsed="collapsed" css-classes="float-right" @toggle="toggleSidebar" />
         <sidebar-todo
           v-if="!collapsed"
           :collapsed="collapsed"
@@ -458,10 +461,7 @@ export default {
           @toggleTodo="handleToggleTodo"
         />
       </div>
-      <div
-        v-if="collapsed && isUserSignedIn"
-        class="block todo"
-      >
+      <div v-if="collapsed && isUserSignedIn" class="block todo">
         <sidebar-todo
           :collapsed="collapsed"
           :issuable-id="epicId"
@@ -485,8 +485,10 @@ export default {
         :show-toggle-sidebar="!isUserSignedIn"
         :date-picker-label="__('Fixed start date')"
         :label="__('Start date')"
-        :date-invalid-tooltip="__(`This date is after the due date,
-          so this epic won't appear in the roadmap.`)"
+        :date-invalid-tooltip="
+          __(`This date is after the due date,
+          so this epic won't appear in the roadmap.`)
+        "
         block-class="start-date"
         @saveDate="saveStartDate"
         @toggleDateType="changeStartDateType"
@@ -505,8 +507,10 @@ export default {
         :date-from-milestones-tooltip="getDateFromMilestonesTooltip('due')"
         :date-picker-label="__('Fixed due date')"
         :label="__('Due date')"
-        :date-invalid-tooltip="__(`This date is before the start date,
-          so this epic won't appear in the roadmap.`)"
+        :date-invalid-tooltip="
+          __(`This date is before the start date,
+          so this epic won't appear in the roadmap.`)
+        "
         block-class="end-date"
         @saveDate="saveEndDate"
         @toggleDateType="changeEndDateType"
@@ -534,10 +538,7 @@ export default {
       >
         {{ __('None') }}
       </sidebar-labels-select>
-      <sidebar-participants
-        :participants="initialParticipants"
-        @toggleCollapse="toggleSidebar"
-      />
+      <sidebar-participants :participants="initialParticipants" @toggleCollapse="toggleSidebar" />
       <sidebar-subscriptions
         :loading="savingSubscription"
         :subscribed="store.subscribed"

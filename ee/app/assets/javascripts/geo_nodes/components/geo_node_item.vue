@@ -71,10 +71,7 @@ export default {
 </script>
 
 <template>
-  <div
-    :class="{ 'node-action-active': node.nodeActionActive }"
-    class="card geo-node-item"
-  >
+  <div :class="{ 'node-action-active': node.nodeActionActive }" class="card geo-node-item">
     <geo-node-header
       :node="node"
       :node-details="nodeDetails"
@@ -88,13 +85,8 @@ export default {
       :node-edit-allowed="nodeEditAllowed"
       :node-actions-allowed="nodeActionsAllowed"
     />
-    <div
-      v-if="isNodeDetailsFailed"
-      class="node-health-message-container"
-    >
-      <p class="health-message node-health-message">
-        {{ errorMessage }}
-      </p>
+    <div v-if="isNodeDetailsFailed" class="node-health-message-container">
+      <p class="health-message node-health-message">{{ errorMessage }}</p>
     </div>
   </div>
 </template>

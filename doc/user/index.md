@@ -177,3 +177,8 @@ Learn what is [Git](../topics/git/index.md) and its best practices.
 ## Instance statistics
 
 See [various statistics](instance_statistics/index.md) of your GitLab instance.
+
+## Operations Dashboard
+
+See [Operations Dashboard](operations_dashboard/index.md) for a summary of each
+project's operational health.

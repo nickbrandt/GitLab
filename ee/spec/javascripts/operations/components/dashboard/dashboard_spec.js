@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import store from 'ee/operations/store/index';
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import Dashboard from 'ee/operations/components/dashboard/dashboard.vue';
 import ProjectSearch from 'ee/operations/components/dashboard/project_search.vue';
 import DashboardProject from 'ee/operations/components/dashboard/project.vue';
@@ -13,14 +12,18 @@ describe('dashboard component', () => {
   const DashboardProjectComponent = Vue.extend(DashboardProject);
   const projectTokens = mockProjectData(1);
   const mount = () =>
-    mountComponentWithStore(DashboardComponent, {
+    new DashboardComponent({
       store,
-      props: {
+      propsData: {
         addPath: 'mock-addPath',
         listPath: 'mock-listPath',
         emptyDashboardSvgPath: '/assets/illustrations/operations-dashboard_empty.svg',
+        emptyDashboardHelpPath: '/help/user/operations_dashboard/index.html',
       },
-    });
+      methods: {
+        fetchProjects: () => {},
+      },
+    }).$mount();
   let vm;
 
   beforeEach(() => {
@@ -50,7 +53,7 @@ describe('dashboard component', () => {
     });
 
     it('calls action to add projects on click if projectTokens have been added', () => {
-      const spy = spyOn(vm, 'addProjectsToDashboard');
+      const spy = spyOn(vm, 'addProjectsToDashboard').and.stub();
       vm.$store.state.projectTokens = projectTokens;
       button.click();
 
@@ -58,7 +61,7 @@ describe('dashboard component', () => {
     });
 
     it('does not call action to add projects on click when projectTokens is empty', () => {
-      const spy = spyOn(vm, 'addProjectsToDashboard');
+      const spy = spyOn(vm, 'addProjectsToDashboard').and.stub();
       button.click();
 
       expect(spy).not.toHaveBeenCalled();
@@ -94,19 +97,15 @@ describe('dashboard component', () => {
     });
 
     describe('empty state', () => {
-      beforeAll(done => {
-        vm.$store
-          .dispatch('requestProjects')
-          .then(() => vm.$nextTick(done))
-          .catch(done.fail);
+      beforeEach(() => {
+        store.state.projects = [];
+        vm = mount();
       });
 
       it('renders empty state svg after requesting projects with no results', () => {
-        const svgSrc = vm.$el
-          .querySelector('.js-empty-state-svg')
-          .src.slice(-mockText.EMPTY_SVG_SOURCE.length);
+        const svgSrc = vm.$el.querySelector('.js-empty-state-svg').src;
 
-        expect(svgSrc).toBe(mockText.EMPTY_SVG_SOURCE);
+        expect(svgSrc).toMatch(mockText.EMPTY_SVG_SOURCE);
       });
 
       it('renders title', () => {
@@ -117,6 +116,18 @@ describe('dashboard component', () => {
         expect(vm.$el.querySelector('.js-sub-title').innerText.trim()).toBe(
           mockText.EMPTY_SUBTITLE,
         );
+      });
+
+      it('renders link to documentation', () => {
+        const link = vm.$el.querySelector('.js-documentation-link');
+
+        expect(link.innerText.trim()).toBe('View documentation');
+      });
+
+      it('links to documentation', () => {
+        const link = vm.$el.querySelector('.js-documentation-link');
+
+        expect(link.href).toMatch(vm.emptyDashboardHelpPath);
       });
     });
   });

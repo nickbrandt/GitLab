@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module IssuableActions
-  prepend EE::IssuableActions
   extend ActiveSupport::Concern
   include Gitlab::Utils::StrongMemoize
 
@@ -227,3 +226,5 @@ module IssuableActions
     @project || @group # rubocop:disable Gitlab/ModuleWithInstanceVariables
   end
 end
+
+IssuableActions.prepend(EE::IssuableActions)

@@ -16,7 +16,7 @@ module EE
           end
         end
 
-        resource :groups, requirements: ::API::API::PROJECT_ENDPOINT_REQUIREMENTS do
+        resource :groups, requirements: ::API::API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
           desc 'Create a todo on an epic' do
             success ::API::Entities::Todo
           end

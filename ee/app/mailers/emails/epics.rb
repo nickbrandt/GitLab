@@ -11,6 +11,18 @@ module Emails
       mail_new_thread(@epic, epic_thread_options(@epic.author_id, recipient_id, reason))
     end
 
+    def epic_status_changed_email(recipient_id, epic_id, status, updated_by_user_id, reason = nil)
+      @epic = Epic.find_by_id(epic_id)
+      return unless @epic
+
+      setup_epic_mail(recipient_id)
+
+      @status = status
+      @updated_by = User.find(updated_by_user_id)
+
+      mail_answer_thread(@epic, epic_thread_options(updated_by_user_id, recipient_id, reason))
+    end
+
     private
 
     def setup_epic_mail(recipient_id)

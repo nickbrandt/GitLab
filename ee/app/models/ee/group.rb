@@ -8,6 +8,10 @@ module EE
     extend ::Gitlab::Utils::Override
 
     prepended do
+      include TokenAuthenticatable
+
+      add_authentication_token_field :saml_discovery_token, unique: false, token_generator: -> { Devise.friendly_token(8) }
+
       has_many :epics
 
       has_one :saml_provider
@@ -17,7 +21,7 @@ module EE
 
       # We cannot simply set `has_many :audit_events, as: :entity, dependent: :destroy`
       # here since Group inherits from Namespace, the entity_type would be set to `Namespace`.
-      has_many :audit_events, -> { where(entity_type: ::Group) }, foreign_key: 'entity_id'
+      has_many :audit_events, -> { where(entity_type: ::Group.name) }, foreign_key: 'entity_id'
 
       belongs_to :file_template_project, class_name: "Project"
 
@@ -82,8 +86,9 @@ module EE
       end
     end
 
-    def all_vulnerabilities
-      Vulnerabilities::Occurrence.where(project: all_projects)
+    def latest_vulnerabilities
+      Vulnerabilities::Occurrence
+        .for_pipelines(all_pipelines.with_vulnerabilities.latest_successful_ids_per_project)
     end
 
     def human_ldap_access
@@ -109,6 +114,12 @@ module EE
 
       fail_ldap_sync
       update_column(:ldap_sync_error, ::Gitlab::UrlSanitizer.sanitize(error_message))
+    end
+
+    # This token conveys that the anonymous user is allowed to know of the group
+    # Used to avoid revealing that a group exists on a given path
+    def saml_discovery_token
+      ensure_saml_discovery_token!
     end
 
     def project_creation_level

@@ -4,8 +4,6 @@ module Ci
   # This class responsible for assigning
   # proper pending build to runner on runner API request
   class RegisterJobService
-    prepend EE::Ci::RegisterJobService
-
     attr_reader :runner
 
     JOB_QUEUE_DURATION_SECONDS_BUCKETS = [1, 3, 10, 30].freeze
@@ -38,7 +36,7 @@ module Ci
         builds = builds.with_any_tags
       end
 
-      builds.find do |build|
+      builds.each do |build|
         next unless runner.can_pick?(build)
 
         begin
@@ -47,7 +45,7 @@ module Ci
           if assign_runner!(build, params)
             register_success(build)
 
-            return Result.new(build, true) # rubocop:disable Cop/AvoidReturnFromBlocks
+            return Result.new(build, true)
           end
         rescue StateMachines::InvalidTransition, ActiveRecord::StaleObjectError
           # We are looping to find another build that is not conflicting
@@ -81,6 +79,11 @@ module Ci
 
       unless build.supported_runner?(params.dig(:info, :features))
         build.drop!(:runner_unsupported)
+        return false
+      end
+
+      if build.archived?
+        build.drop!(:archived_failure)
         return false
       end
 
@@ -174,3 +177,5 @@ module Ci
     end
   end
 end
+
+Ci::RegisterJobService.prepend(EE::Ci::RegisterJobService)

@@ -1,5 +1,5 @@
 # rubocop:disable Migration/UpdateLargeTable
-class AddSquashToMergeRequestsEE < ActiveRecord::Migration
+class AddSquashToMergeRequestsEE < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
   disable_ddl_transaction!
 

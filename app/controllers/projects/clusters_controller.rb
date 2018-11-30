@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Projects::ClustersController < Clusters::ClustersController
-  prepend EE::Projects::ClustersController
-
   include ProjectUnauthorized
 
   prepend_before_action :project
@@ -24,3 +22,5 @@ class Projects::ClustersController < Clusters::ClustersController
     @repository ||= project.repository
   end
 end
+
+Projects::ClustersController.prepend(EE::Projects::ClustersController)

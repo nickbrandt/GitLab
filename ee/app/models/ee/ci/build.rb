@@ -7,9 +7,6 @@ module EE
     module Build
       extend ActiveSupport::Concern
 
-      LICENSE_MANAGEMENT_FILE = 'gl-license-management-report.json'.freeze
-      PERFORMANCE_FILE = 'performance.json'.freeze
-
       LICENSED_PARSER_FEATURES = {
         sast: :sast
       }.with_indifferent_access.freeze
@@ -34,16 +31,6 @@ module EE
         ::Gitlab::Database::LoadBalancing::Sticking.stick(:build, id)
       end
 
-      def has_performance_json?
-        name_in?(%w[performance deploy]) &&
-          has_artifact?(PERFORMANCE_FILE)
-      end
-
-      def has_license_management_json?
-        name_in?('license_management') &&
-          has_artifact?(LICENSE_MANAGEMENT_FILE)
-      end
-
       def log_geo_deleted_event
         # It is not needed to generate a Geo deleted event
         # since Legacy Artifacts are migrated to multi-build artifacts
@@ -57,10 +44,14 @@ module EE
 
       def collect_security_reports!(security_reports)
         each_report(::Ci::JobArtifact::SECURITY_REPORT_FILE_TYPES) do |file_type, blob|
-          next unless project.feature_available?(LICENSED_PARSER_FEATURES[file_type])
-
           security_reports.get_report(file_type).tap do |security_report|
-            ::Gitlab::Ci::Parsers::Security.fabricate!(file_type).parse!(blob, security_report)
+            begin
+              next unless project.feature_available?(LICENSED_PARSER_FEATURES.fetch(file_type))
+
+              ::Gitlab::Ci::Parsers::Security.fabricate!(file_type).parse!(blob, security_report)
+            rescue => e
+              security_report.error = e
+            end
           end
         end
       end

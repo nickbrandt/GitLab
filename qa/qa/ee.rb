@@ -17,9 +17,11 @@ module QA
       module Group
         autoload :Menu, 'qa/ee/page/group/menu'
         autoload :SamlSSOSignIn, 'qa/ee/page/group/saml_sso_sign_in'
+        autoload :Members, 'qa/ee/page/group/members'
 
         module Settings
           autoload :SamlSSO, 'qa/ee/page/group/settings/saml_sso'
+          autoload :LDAPSync, 'qa/ee/page/group/settings/ldap_sync'
         end
       end
 
@@ -72,15 +74,12 @@ module QA
       end
     end
 
-    module Factory
-      autoload :License, 'qa/ee/factory/license'
+    module Resource
+      autoload :License, 'qa/ee/resource/license'
+      autoload :Epic, 'qa/ee/resource/epic'
 
       module Geo
-        autoload :Node, 'qa/ee/factory/geo/node'
-      end
-
-      module Resource
-        autoload :Epic, 'qa/ee/factory/resource/epic'
+        autoload :Node, 'qa/ee/resource/geo/node'
       end
     end
 

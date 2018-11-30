@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Projects
   module Security
     class DashboardController < Projects::ApplicationController
@@ -5,7 +7,7 @@ module Projects
       before_action :authorize_read_project_security_dashboard!
 
       def show
-        @pipeline = @project.latest_pipeline_with_legacy_security_reports
+        @pipeline = @project.latest_pipeline_with_security_reports
           &.present(current_user: current_user)
       end
 

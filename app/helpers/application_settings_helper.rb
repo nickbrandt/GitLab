@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module ApplicationSettingsHelper
-  prepend EE::ApplicationSettingsHelper
   extend self
 
   delegate  :allow_signup?,
@@ -116,6 +115,7 @@ module ApplicationSettingsHelper
       :akismet_api_key,
       :akismet_enabled,
       :allow_local_requests_from_hooks_and_services,
+      :archive_builds_in_human_readable,
       :authorized_keys_enabled,
       :auto_devops_enabled,
       :auto_devops_domain,
@@ -217,7 +217,8 @@ module ApplicationSettingsHelper
       :user_oauth_applications,
       :version_check_enabled,
       :web_ide_clientside_preview_enabled,
-      :diff_max_patch_bytes
+      :diff_max_patch_bytes,
+      :commit_email_hostname
     ]
   end
 
@@ -225,3 +226,9 @@ module ApplicationSettingsHelper
     Rails.env.test?
   end
 end
+
+ApplicationSettingsHelper.prepend(EE::ApplicationSettingsHelper)
+
+# The methods in `EE::ApplicationSettingsHelper` should be available as both
+# instance and class methods.
+ApplicationSettingsHelper.extend(EE::ApplicationSettingsHelper)

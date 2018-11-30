@@ -89,6 +89,11 @@ class GeoNode < ActiveRecord::Base
       left_join_status.minimum(:cursor_last_event_id)
     end
 
+    # Tries to find a GeoNode by oauth_application_id, returning nil if none could be found.
+    def find_by_oauth_application_id(oauth_application_id)
+      where(oauth_application_id: oauth_application_id).take
+    end
+
     private
 
     def left_join_status
@@ -235,7 +240,7 @@ class GeoNode < ActiveRecord::Base
   end
 
   def api_url(suffix)
-    URI.join(uri, "#{uri.path}", "api/#{API::API.version}/#{suffix}").to_s
+    Gitlab::Utils.append_path(uri.to_s, "api/#{API::API.version}/#{suffix}")
   end
 
   def ensure_access_keys!

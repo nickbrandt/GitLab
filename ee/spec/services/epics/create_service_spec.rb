@@ -8,7 +8,7 @@ describe Epics::CreateService do
   subject { described_class.new(group, user, params).execute }
 
   describe '#execute' do
-    it 'creates one issue correctly' do
+    it 'creates one epic correctly' do
       allow(NewEpicWorker).to receive(:perform_async)
 
       expect { subject }.to change { Epic.count }.from(0).to(1)

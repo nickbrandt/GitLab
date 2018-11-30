@@ -2,6 +2,8 @@
 
 module Projects
   class AutocompleteService < BaseService
+    prepend EE::Projects::AutocompleteService
+
     include LabelsAsHash
     def issues
       IssuesFinder.new(current_user, project_id: project.id, state: 'opened').execute.select([:iid, :title])

@@ -4,8 +4,6 @@ class UsersController < ApplicationController
   include RoutableActions
   include RendersMemberAccess
   include ControllerWithCrossProjectAccessCheck
-  prepend EE::UsersController
-
   requires_cross_project_access show: false,
                                 groups: false,
                                 projects: false,
@@ -15,6 +13,7 @@ class UsersController < ApplicationController
                                 calendar_activities: true
 
   skip_before_action :authenticate_user!
+  prepend_before_action(only: [:show]) { authenticate_sessionless_user!(:rss) }
   before_action :user, except: [:exists]
   before_action :authorize_read_user_profile!,
                 only: [:calendar, :calendar_activities, :groups, :projects, :contributed_projects, :snippets]
@@ -165,3 +164,5 @@ class UsersController < ApplicationController
     access_denied! unless can?(current_user, :read_user_profile, user)
   end
 end
+
+UsersController.prepend(EE::UsersController)
