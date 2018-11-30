@@ -5331,6 +5331,9 @@ msgstr ""
 msgid "Metrics|New metric"
 msgstr ""
 
+msgid "Metrics|No data to display"
+msgstr ""
+
 msgid "Metrics|No deployed environments"
 msgstr ""
 
@@ -5385,14 +5388,7 @@ msgstr ""
 msgid "Metrics|e.g. HTTP requests"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Metrics|e.g. Requests/second"
-=======
-msgid "Metrics|No data to display"
-msgstr ""
-
-msgid "Metrics|No deployed environments"
->>>>>>> upstream/master
 msgstr ""
 
 msgid "Metrics|e.g. Throughput"
