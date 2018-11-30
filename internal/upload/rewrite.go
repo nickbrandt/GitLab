@@ -27,7 +27,7 @@ var (
 	multipartFileUploadBytes = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "gitlab_workhorse_multipart_upload_bytes",
-			Help: "How many disk bytes of multipart file parts have been succesfully written by gitlab-workhorse. Partitioned by type.",
+			Help: "How many disk bytes of multipart file parts have been successfully written by gitlab-workhorse. Partitioned by type.",
 		},
 		[]string{"type"},
 	)
