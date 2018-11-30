@@ -4,6 +4,10 @@ Formerly known as 'gitlab-git-http-server'.
 
 UNRELEASED
 
+v 7.3.0
+
+- Redact sensitive url params as in Rails
+
 v 7.2.1
 
 - Extract correlation code out to the LabKit project !323
