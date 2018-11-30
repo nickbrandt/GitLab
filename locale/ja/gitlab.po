@@ -573,7 +573,7 @@ msgid "An error occured whilst fetching the job trace."
 msgstr "ジョブトレースの取得中にエラーが発生しました。"
 
 msgid "An error occured whilst fetching the latest pipeline."
-msgstr "最新のパイプラインの取得中にエラーが発生しました。"
+msgstr ""
 
 msgid "An error occured whilst loading all the files."
 msgstr "すべてのファイルの読込中にエラーが発生しました。"
@@ -3751,11 +3751,19 @@ msgid "Geo|All projects"
 msgstr "すべてのプロジェクト"
 
 msgid "Geo|All projects are being scheduled for re-check"
+<<<<<<< HEAD
 msgstr ""
 
 msgid "Geo|All projects are being scheduled for re-sync"
 msgstr ""
 
+=======
+msgstr ""
+
+msgid "Geo|All projects are being scheduled for re-sync"
+msgstr ""
+
+>>>>>>> 7c22aa5c99debc4cb6cba4fb416b3c87f9a7d0e4
 msgid "Geo|Batch operations"
 msgstr ""
 

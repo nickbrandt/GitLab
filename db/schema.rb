@@ -2721,23 +2721,6 @@ ActiveRecord::Schema.define(version: 20181116100917) do
 
   add_index "shards", ["name"], name: "index_shards_on_name", unique: true, using: :btree
 
-  create_table "site_statistics", force: :cascade do |t|
-    t.integer "repositories_count", default: 0, null: false
-  end
-
-  create_table "slack_integrations", force: :cascade do |t|
-    t.integer "service_id", null: false
-    t.string "team_id", null: false
-    t.string "team_name", null: false
-    t.string "alias", null: false
-    t.string "user_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  add_index "slack_integrations", ["service_id"], name: "index_slack_integrations_on_service_id", using: :btree
-  add_index "slack_integrations", ["team_id", "alias"], name: "index_slack_integrations_on_team_id_and_alias", unique: true, using: :btree
-
   create_table "snippets", force: :cascade do |t|
     t.string "title"
     t.text "content"
