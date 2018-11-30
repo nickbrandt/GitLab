@@ -27,6 +27,7 @@ describe 'group epic roadmap', :js do
   context 'when epics exist for the group' do
     let!(:epic_with_bug) { create(:labeled_epic, group: group, start_date: 10.days.ago, end_date: 1.day.ago, labels: [bug_label]) }
     let!(:epic_with_critical) { create(:labeled_epic, group: group, start_date: 20.days.ago, end_date: 2.days.ago, labels: [critical_label]) }
+    let!(:closed_epic) { create(:epic, :closed, group: group, start_date: 20.days.ago, end_date: 2.days.ago) }
 
     before do
       visit group_roadmap_path(group)
@@ -70,7 +71,7 @@ describe 'group epic roadmap', :js do
 
       it 'renders all group epics within roadmap' do
         page.within('.roadmap-container .epics-list-section') do
-          expect(page).to have_selector('.epics-list-item .epic-title', count: 2)
+          expect(page).to have_selector('.epics-list-item .epic-title', count: 3)
         end
       end
     end

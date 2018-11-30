@@ -213,7 +213,9 @@ export const getEpicsPathForPreset = ({
 
   const startDate = `${start.getFullYear()}-${start.getMonth() + 1}-${start.getDate()}`;
   const endDate = `${end.getFullYear()}-${end.getMonth() + 1}-${end.getDate()}`;
-  epicsPath += `?start_date=${startDate}&end_date=${endDate}`;
+
+  epicsPath += epicsPath.indexOf('?') > -1 ? '&' : '?';
+  epicsPath += `start_date=${startDate}&end_date=${endDate}`;
 
   if (filterQueryString) {
     epicsPath += `&${filterQueryString}`;

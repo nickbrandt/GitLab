@@ -187,4 +187,20 @@ describe('getEpicsPathForPreset', () => {
       `${basePath}?start_date=2017-12-1&end_date=2018-6-30&scope=all&utf8=✓&state=opened&label_name[]=Bug`,
     );
   });
+
+  it('returns epics path string when basePath already contains a query param', () => {
+    const basePathWithQuery = `${basePath}?state=all`;
+
+    const timeframeMonths = getTimeframeForMonthsView(new Date(2018, 0, 1));
+    const epicsPath = getEpicsPathForPreset({
+      basePath: basePathWithQuery,
+      filterQueryString,
+      timeframe: timeframeMonths,
+      presetType: PRESET_TYPES.MONTHS,
+    });
+
+    expect(epicsPath).toBe(
+      `${basePathWithQuery}&start_date=2017-12-1&end_date=2018-6-30&scope=all&utf8=✓&state=opened&label_name[]=Bug`,
+    );
+  });
 });
