@@ -19,6 +19,7 @@ module EE
             optional :only_mirror_protected_branches, type: Grape::API::Boolean, desc: 'Only mirror protected branches'
             optional :mirror_overwrites_diverged_branches, type: Grape::API::Boolean, desc: 'Pull mirror overwrites diverged branches'
             optional :import_url, type: String, desc: 'URL from which the project is imported'
+            optional :packages_enabled, type: Grape::API::Boolean, desc: 'Enable project packages feature'
           end
 
           def apply_filters(projects)
@@ -65,7 +66,8 @@ module EE
             :approvals_before_merge,
             :repository_storage,
             :external_authorization_classification_label,
-            :import_url
+            :import_url,
+            :packages_enabled
           ]
         end
       end

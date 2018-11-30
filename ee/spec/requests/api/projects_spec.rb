@@ -238,6 +238,40 @@ describe API::Projects do
         expect(response).to have_gitlab_http_status(:forbidden)
       end
     end
+
+    describe 'updating packages_enabled attribute' do
+      it 'is enabled by default' do
+        expect(project.packages_enabled).to be true
+      end
+
+      context 'packages feature is allowed by license' do
+        before do
+          stub_licensed_features(packages: true)
+        end
+
+        it 'disables project packages feature' do
+          put(api("/projects/#{project.id}", user), packages_enabled: false)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(project.reload.packages_enabled).to be false
+          expect(json_response['packages_enabled']).to eq(false)
+        end
+      end
+
+      context 'packages feature is not allowed by license' do
+        before do
+          stub_licensed_features(packages: false)
+        end
+
+        it 'disables project packages feature but does not return packages_enabled attribute' do
+          put(api("/projects/#{project.id}", user), packages_enabled: false)
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(project.reload.packages_enabled).to be false
+          expect(json_response['packages_enabled']).to be_nil
+        end
+      end
+    end
   end
 
   describe 'GET /projects' do
@@ -315,6 +349,24 @@ describe API::Projects do
 
           expect(response).to have_gitlab_http_status(200)
           expect(json_response['external_authorization_classification_label']).to be_nil
+        end
+      end
+
+      describe 'packages_enabled attribute' do
+        it 'exposed when the feature is available' do
+          stub_licensed_features(packages: true)
+
+          get api("/projects/#{project.id}", user)
+
+          expect(json_response).to have_key 'packages_enabled'
+        end
+
+        it 'not exposed when the feature is available' do
+          stub_licensed_features(packages: false)
+
+          get api("/projects/#{project.id}", user)
+
+          expect(json_response).not_to have_key 'packages_enabled'
         end
       end
     end
