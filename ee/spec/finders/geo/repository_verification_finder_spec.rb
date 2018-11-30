@@ -4,11 +4,17 @@ describe Geo::RepositoryVerificationFinder, :postgresql do
   set(:project) { create(:project) }
 
   describe '#find_failed_repositories' do
-    it 'returns projects where repository verification failed' do
+    it 'returns projects where next retry attempt is in the past' do
       create(:repository_state, :repository_failed, :wiki_verified, project: project)
 
       expect(subject.find_failed_repositories(batch_size: 10))
         .to match_array(project)
+    end
+
+    it 'does not return projects where next retry attempt is in the future' do
+      create(:repository_state, :repository_failed, :wiki_verified, repository_retry_at: 5.minutes.from_now)
+
+      expect(subject.find_failed_repositories(batch_size: 10)).to be_empty
     end
 
     it 'does not return projects where repository verification is outdated' do
@@ -25,10 +31,10 @@ describe Geo::RepositoryVerificationFinder, :postgresql do
 
     it 'returns projects ordered by next retry time' do
       next_project = create(:project)
-      create(:repository_state, :repository_failed, repository_retry_at: 1.hour.from_now, project: project)
-      create(:repository_state, :repository_failed, repository_retry_at: 30.minutes.from_now, project: next_project)
+      create(:repository_state, :repository_failed, repository_retry_at: 1.hour.ago, project: project)
+      create(:repository_state, :repository_failed, repository_retry_at: 30.minutes.ago, project: next_project)
 
-      expect(subject.find_failed_repositories(batch_size: 10)).to eq [next_project, project]
+      expect(subject.find_failed_repositories(batch_size: 10)).to eq [project, next_project]
     end
 
     context 'with shard restriction' do
@@ -47,11 +53,17 @@ describe Geo::RepositoryVerificationFinder, :postgresql do
   end
 
   describe '#find_failed_wikis' do
-    it 'returns projects where wiki verification failed' do
+    it 'returns projects where next retry attempt is in the past' do
       create(:repository_state, :repository_verified, :wiki_failed, project: project)
 
       expect(subject.find_failed_wikis(batch_size: 10))
         .to match_array(project)
+    end
+
+    it 'does not return projects where next retry attempt is in the future' do
+      create(:repository_state, :repository_verified, :wiki_failed, wiki_retry_at: 5.minutes.from_now)
+
+      expect(subject.find_failed_wikis(batch_size: 10)).to be_empty
     end
 
     it 'does not return projects where wiki verification is outdated' do
@@ -68,10 +80,10 @@ describe Geo::RepositoryVerificationFinder, :postgresql do
 
     it 'returns projects ordered by next retry time' do
       next_project = create(:project)
-      create(:repository_state, :wiki_failed, wiki_retry_at: 1.hour.from_now, project: project)
-      create(:repository_state, :wiki_failed, wiki_retry_at: 30.minutes.from_now, project: next_project)
+      create(:repository_state, :wiki_failed, wiki_retry_at: 1.hour.ago, project: project)
+      create(:repository_state, :wiki_failed, wiki_retry_at: 30.minutes.ago, project: next_project)
 
-      expect(subject.find_failed_wikis(batch_size: 10)).to eq [next_project, project]
+      expect(subject.find_failed_wikis(batch_size: 10)).to eq [project, next_project]
     end
 
     context 'with shard restriction' do
