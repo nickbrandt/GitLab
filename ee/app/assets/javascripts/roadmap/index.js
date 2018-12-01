@@ -54,6 +54,7 @@ export default () => {
         filterQueryString,
         presetType,
         timeframe,
+        state: dataset.epicsState
       });
 
       const store = new RoadmapStore(parseInt(dataset.groupId, 0), timeframe, presetType);

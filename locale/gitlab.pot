@@ -171,6 +171,9 @@ msgstr ""
 msgid "%{percent}%% complete"
 msgstr ""
 
+msgid "%{state} epics"
+msgstr ""
+
 msgid "%{text} %{files}"
 msgid_plural "%{text} %{files} files"
 msgstr[0] ""

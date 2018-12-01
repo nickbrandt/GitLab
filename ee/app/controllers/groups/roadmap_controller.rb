@@ -15,6 +15,7 @@ module Groups
       @sort = set_sort_order
 
       @epics_count = EpicsFinder.new(current_user, group_id: @group.id).execute.count
+      @epics_state = params[:state] || 'all'
     end
 
     private
