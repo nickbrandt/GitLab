@@ -200,9 +200,13 @@ export default {
           :created-at="note.created_at"
           :note-id="note.id"
           action-text="commented"
+<<<<<<< HEAD
         >
           <slot slot="note-header-info" name="note-header-info"> </slot>
         </note-header>
+=======
+        />
+>>>>>>> upstream/master
         <note-actions
           :author-id="author.id"
           :note-id="note.id"
@@ -212,6 +216,7 @@ export default {
           :can-award-emoji="note.current_user.can_award_emoji"
           :can-delete="note.current_user.can_edit"
           :can-report-as-abuse="canReportAsAbuse"
+<<<<<<< HEAD
           :can-resolve="
             note.current_user.can_resolve || (note.isDraft && note.discussion_id !== null)
           "
@@ -222,6 +227,14 @@ export default {
           :resolved-by="note.resolved_by"
           :discussion-id="note.isDraft && note.discussion_id"
           :resolve-discussion="note.isDraft && note.resolve_discussion"
+=======
+          :can-resolve="note.current_user.can_resolve"
+          :report-abuse-path="note.report_abuse_path"
+          :resolvable="note.resolvable"
+          :is-resolved="note.resolved"
+          :is-resolving="isResolving"
+          :resolved-by="note.resolved_by"
+>>>>>>> upstream/master
           @handleEdit="editHandler"
           @handleDelete="deleteHandler"
           @handleResolve="resolveHandler"

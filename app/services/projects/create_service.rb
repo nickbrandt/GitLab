@@ -11,7 +11,7 @@ module Projects
     end
 
     def execute
-      if @params[:template_name]&.present?
+      if @params[:template_name].present?
         return ::Projects::CreateFromTemplateService.new(current_user, params).execute
       end
 

@@ -366,8 +366,13 @@ append-right-10 comment-type-dropdown js-comment-type-dropdown droplab-dropdown"
               >
                 <button
                   :disabled="isSubmitButtonDisabled"
+<<<<<<< HEAD
                   class="btn btn-success comment-btn js-comment-button js-comment-submit-button
                   qa-comment-button"
+=======
+                  class="btn btn-create comment-btn js-comment-button js-comment-submit-button
+                    qa-comment-button"
+>>>>>>> upstream/master
                   type="submit"
                   @click.prevent="handleSave();"
                 >
