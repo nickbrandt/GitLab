@@ -313,6 +313,46 @@ curl --request POST 'http://localhost:9200/_forcemerge?max_num_segments=5'
 
 Enable Elasticsearch search in **Admin > Settings**. That's it. Enjoy it!
 
+## Tuning
+
+### Deleted documents
+
+Whenever a change or deletion is made to an indexed GitLab object (a merge request description is changed, a file is deleted from the master branch in a repository, a project is deleted, etc), a document in the index is deleted.  However, since these are "soft" deletes, the overall number of "deleted documents", and therefore wasted space, increases.  Elasticsearch attempts to do intelligent merging of segments in order to remove these deleted documents.  However, depending on the amount and type of activity in your GitLab installation, it's possible to see as much as 50% wasted space in the index.
+
+One option is doing a [force merge][force-merge].  This merges segments into the largest possible segments, removing any deleted documents.  However, this can take significant time and potentially degrade your system, and we do not recommend it unless you really know what you are doing.  A warning in the [documentation][force-merge] states:
+
+> Running force merge against a read-write index can cause very large segments to be produced (>5Gb per segment), and the merge policy will never consider it for merging again until it mostly consists of deleted docs. This can cause very large segments to remain in the shards.
+
+In general, you should allow the built-in merge policies to manage how segments are merged.  A great blog entry to read is [Lucene's Handling of Deleted Documents][lucene-handling-of-deleted-documents].
+
+There are a couple of settings that can be used to tune the merge policy: `index.merge.policy.max_merged_segment` and `index.merge.policy.reclaim_deletes_weight`.
+
+**index.merge.policy.max_merged_segment**
+
+> A maximum sized segment (default: 5 GB) will only be eligible for merging once it accumulates 50% deletions. If this is too slow for your usage, try decreasing that maximum (`index.merge.policy.max_merged_segment`): this will result in a somewhat larger segment count, but the reclaiming should happen more quickly, especially when there is a pattern to the deletions.
+
+```bash
+curl --request PUT http://localhost:9200/gitlab-production/_settings --data '{
+  "index" : {
+    "merge.policy.max_merged_segment": "2gb"
+  }
+}'
+```
+
+**index.merge.policy.max_merged_segment**
+
+> While it does have a tunable setting (`index.merge.policy.reclaim_deletes_weight`) to control how aggressively it targets deletions, it is dangerous to increase this too much otherwise it could select poor (costly) merge choices, dwarfing any gains from slightly fewer deleted documents.
+
+```bash
+curl --request PUT http://localhost:9200/gitlab-production/_settings --data '{
+  "index" : {
+    "merge.policy.reclaim_deletes_weight": "3.0"
+  }
+}'
+```
+
+Good advice from the [blog][lucene-handling-of-deleted-documents]:  _"Overall, besides perhaps decreasing the maximum segment size, it is best to leave Lucene's defaults as-is and not fret too much about when deletes are reclaimed."_
+
 ## Troubleshooting
 
 Here are some common pitfalls and how to overcome them:
@@ -377,3 +417,5 @@ Here are some common pitfalls and how to overcome them:
 [pkg]: https://about.gitlab.com/downloads/ "Download Omnibus GitLab"
 [elastic-settings]: https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration.html#settings "Elasticsearch configuration settings"
 [ee]: https://about.gitlab.com/pricing/
+[force-merge]: https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-forcemerge.html "Force Merge"
+[lucene-handling-of-deleted-documents]: https://www.elastic.co/blog/lucenes-handling-of-deleted-documents "Lucene's Handling of Deleted Documents"
