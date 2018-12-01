@@ -8,6 +8,7 @@ describe 'group epic roadmap', :js do
   let(:filtered_search) { find('.filtered-search') }
   let(:js_dropdown_label) { '#js-dropdown-label' }
   let(:filter_dropdown) { find("#{js_dropdown_label} .filter-dropdown") }
+  let(:state_dropdown) { find('.dropdown-epics-state') }
 
   let(:bug_label) { create(:group_label, group: group, title: 'Bug') }
   let(:critical_label) { create(:group_label, group: group, title: 'Critical') }
@@ -50,7 +51,7 @@ describe 'group epic roadmap', :js do
       end
 
       it 'renders the sort dropdown correctly' do
-        page.within('.content-wrapper .content .epics-filters') do
+        page.within('.content-wrapper .content .epics-other-filters') do
           expect(page).to have_css('.filter-dropdown-container')
           find('.dropdown-toggle').click
           page.within('.dropdown-menu') do
@@ -72,6 +73,40 @@ describe 'group epic roadmap', :js do
       it 'renders all group epics within roadmap' do
         page.within('.roadmap-container .epics-list-section') do
           expect(page).to have_selector('.epics-list-item .epic-title', count: 3)
+        end
+      end
+    end
+
+    describe 'roadmap page with epics state filter' do
+      before do
+        state_dropdown.find('.dropdown-toggle').click
+      end
+
+      it 'renders open epics only' do
+        state_dropdown.find('a', text: 'Open epics').click
+
+        page.within('.roadmap-container .epics-list-section') do
+          expect(page).to have_selector('.epics-list-item .epic-title', count: 2)
+        end
+      end
+
+      it 'renders closed epics only' do
+        state_dropdown.find('a', text: 'Closed epics').click
+
+        page.within('.roadmap-container .epics-list-section') do
+          expect(page).to have_selector('.epics-list-item .epic-title', count: 1)
+        end
+      end
+
+      it 'saves last selected epic state' do
+        state_dropdown.find('a', text: 'Open epics').click
+
+        visit group_roadmap_path(group)
+        wait_for_requests
+
+        expect(state_dropdown.find('.dropdown-toggle')).to have_text("Open epics")
+        page.within('.roadmap-container .epics-list-section') do
+          expect(page).to have_selector('.epics-list-item .epic-title', count: 2)
         end
       end
     end
