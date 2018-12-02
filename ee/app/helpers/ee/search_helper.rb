@@ -19,11 +19,9 @@ module EE
 
     override :parse_search_result
     def parse_search_result(result)
-      return super if result.is_a?(Array)
+      return super if result.is_a?(::Gitlab::Search::FoundBlob)
 
-      blob = ::Gitlab::Elastic::SearchResults.parse_search_result(result)
-
-      [blob.filename, blob]
+      ::Gitlab::Elastic::SearchResults.parse_search_result(result)
     end
 
     override :search_blob_title
