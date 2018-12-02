@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module BranchesHelper
     # Returns a hash were keys are types of access levels (user, role), and

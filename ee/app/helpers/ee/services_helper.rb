@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module ServicesHelper
     def add_to_slack_link(project, slack_app_id)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This module is intended to centralize all database access to the secondary
 # tracking database for Geo.
 module Geo
@@ -14,7 +16,7 @@ module Geo
     def self.connection
       unless ::Gitlab::Geo.geo_database_configured?
         message = NOT_CONFIGURED_MSG
-        message += "\nIn the GDK root, try running `make geo-setup`" if Rails.env.development?
+        message = "#{message}\nIn the GDK root, try running `make geo-setup`" if Rails.env.development?
         raise SecondaryNotConfigured.new(message)
       end
 

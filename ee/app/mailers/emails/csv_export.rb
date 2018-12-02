@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Emails
   module CsvExport
     def issues_csv_email(user, project, csv_data, export_status)

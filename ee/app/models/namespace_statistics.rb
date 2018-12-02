@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class NamespaceStatistics < ActiveRecord::Base
   belongs_to :namespace
 

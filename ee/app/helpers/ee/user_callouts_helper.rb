@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module UserCalloutsHelper
     GOLD_TRIAL = 'gold_trial'.freeze

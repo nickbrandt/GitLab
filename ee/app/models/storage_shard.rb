@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'digest'
 # This is an in-memory structure only. The repository storage configuration is
 # in gitlab.yml and not in the database. This model makes it easier to work

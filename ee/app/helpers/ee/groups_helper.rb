@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module GroupsHelper
     extend ::Gitlab::Utils::Override

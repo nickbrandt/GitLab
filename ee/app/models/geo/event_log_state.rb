@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Geo::EventLogState < Geo::BaseRegistry
   self.primary_key = :event_id
 

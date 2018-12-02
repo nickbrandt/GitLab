@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class HistoricalData < ActiveRecord::Base
   validates :date, presence: true
 

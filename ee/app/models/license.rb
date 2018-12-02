@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class License < ActiveRecord::Base
   include ActionView::Helpers::NumberHelper
 
@@ -434,25 +436,25 @@ class License < ActiveRecord::Base
         add_limit_error(user_count: current_active_users_count)
       end
     else
-      message = "You have applied a True-up for #{trueup_qty} #{"user".pluralize(trueup_qty)} "
-      message << "but you need one for #{expected_trueup_qty} #{"user".pluralize(expected_trueup_qty)}. "
+      message = ["You have applied a True-up for #{trueup_qty} #{"user".pluralize(trueup_qty)}"]
+      message << "but you need one for #{expected_trueup_qty} #{"user".pluralize(expected_trueup_qty)}."
       message << "Please contact sales at renewals@gitlab.com"
 
-      self.errors.add(:base, message)
+      self.errors.add(:base, message.join(' '))
     end
   end
 
   def add_limit_error(current_period: true, user_count:)
     overage = user_count - restricted_user_count
 
-    message =  current_period ? "This GitLab installation currently has " : "During the year before this license started, this GitLab installation had "
-    message << "#{number_with_delimiter(user_count)} active #{"user".pluralize(user_count)}, "
-    message << "exceeding this license's limit of #{number_with_delimiter(restricted_user_count)} by "
-    message << "#{number_with_delimiter(overage)} #{"user".pluralize(overage)}. "
-    message << "Please upload a license for at least "
+    message =  [current_period ? "This GitLab installation currently has" : "During the year before this license started, this GitLab installation had"]
+    message << "#{number_with_delimiter(user_count)} active #{"user".pluralize(user_count)},"
+    message << "exceeding this license's limit of #{number_with_delimiter(restricted_user_count)} by"
+    message << "#{number_with_delimiter(overage)} #{"user".pluralize(overage)}."
+    message << "Please upload a license for at least"
     message << "#{number_with_delimiter(user_count)} #{"user".pluralize(user_count)} or contact sales at renewals@gitlab.com"
 
-    self.errors.add(:base, message)
+    self.errors.add(:base, message.join(' '))
   end
 
   def not_expired

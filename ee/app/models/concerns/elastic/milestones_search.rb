@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Elastic
   module MilestonesSearch
     extend ActiveSupport::Concern

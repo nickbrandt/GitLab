@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GroupMembersHelper
   def clear_ldap_permission_cache_message
     markdown(

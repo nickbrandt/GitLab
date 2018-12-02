@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BoardAssignee < ActiveRecord::Base
   belongs_to :board
   belongs_to :assignee, class_name: 'User'

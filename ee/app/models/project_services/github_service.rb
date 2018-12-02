@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GithubService < Service
   include Gitlab::Routing
   include ActionView::Helpers::UrlHelper

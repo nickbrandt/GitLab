@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PushRulesHelper
   def reject_unsigned_commits_description(push_rule)
     message = s_("ProjectSettings|Only signed commits can be pushed to this repository.")
