@@ -1,6 +1,7 @@
 <script>
 import Flash from '~/flash';
-import statusIcon from '~/vue_merge_request_widget/components/mr_widget_status_icon.vue';
+import MrWidgetContainer from '~/vue_merge_request_widget/components/mr_widget_container.vue';
+import MrWidgetIcon from '~/vue_merge_request_widget/components/mr_widget_icon.vue';
 import { s__ } from '~/locale';
 import ApprovalsBody from './approvals_body.vue';
 import ApprovalsFooter from './approvals_footer.vue';
@@ -10,7 +11,8 @@ export default {
   components: {
     ApprovalsBody,
     ApprovalsFooter,
-    statusIcon,
+    MrWidgetContainer,
+    MrWidgetIcon,
   },
   props: {
     mr: {
@@ -59,36 +61,32 @@ export default {
 };
 </script>
 <template>
-  <section
-    v-if="mr.approvalsRequired"
-    class="mr-widget-approvals-container mr-widget-section media media-section"
-  >
-    <status-icon
-      :class="approvalsOptional ? 'zero-approvals' : ''"
-      :status="fetchingApprovals ? 'loading' : status"
-    />
-    <div v-show="fetchingApprovals" class="mr-approvals-loading-state media-body">
-      <span class="approvals-loading-text"> Checking approval status </span>
+  <mr-widget-container>
+    <div v-if="mr.approvalsRequired" class="media media-section js-mr-approvals align-items-center">
+      <mr-widget-icon name="approval" />
+      <div v-show="fetchingApprovals" class="mr-approvals-loading-state media-body">
+        <span class="approvals-loading-text"> {{ __('Checking approval status') }} </span>
+      </div>
+      <div v-if="!fetchingApprovals" class="approvals-components media-body">
+        <approvals-body
+          :mr="mr"
+          :service="service"
+          :user-can-approve="mr.approvals.user_can_approve"
+          :user-has-approved="mr.approvals.user_has_approved"
+          :approved-by="mr.approvals.approved_by"
+          :approvals-left="mr.approvals.approvals_left"
+          :approvals-optional="approvalsOptional"
+          :suggested-approvers="mr.approvals.suggested_approvers"
+        />
+        <approvals-footer
+          :mr="mr"
+          :service="service"
+          :user-can-approve="mr.approvals.user_can_approve"
+          :user-has-approved="mr.approvals.user_has_approved"
+          :approved-by="mr.approvals.approved_by"
+          :approvals-left="mr.approvals.approvals_left"
+        />
+      </div>
     </div>
-    <div v-if="!fetchingApprovals" class="approvals-components media-body">
-      <approvals-body
-        :mr="mr"
-        :service="service"
-        :user-can-approve="mr.approvals.user_can_approve"
-        :user-has-approved="mr.approvals.user_has_approved"
-        :approved-by="mr.approvals.approved_by"
-        :approvals-left="mr.approvals.approvals_left"
-        :approvals-optional="approvalsOptional"
-        :suggested-approvers="mr.approvals.suggested_approvers"
-      />
-      <approvals-footer
-        :mr="mr"
-        :service="service"
-        :user-can-approve="mr.approvals.user_can_approve"
-        :user-has-approved="mr.approvals.user_has_approved"
-        :approved-by="mr.approvals.approved_by"
-        :approvals-left="mr.approvals.approvals_left"
-      />
-    </div>
-  </section>
+  </mr-widget-container>
 </template>

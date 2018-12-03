@@ -19,8 +19,8 @@ describe 'Merge request > User sees approval widget', :js do
     end
 
     it 'does not show checking ability text' do
-      expect(find('.mr-widget-approvals-container')).not_to have_text('Checking ability to merge automatically')
-      expect(find('.mr-widget-approvals-container')).to have_selector('.approvals-body')
+      expect(find('.js-mr-approvals')).not_to have_text('Checking ability to merge automatically')
+      expect(find('.js-mr-approvals')).to have_selector('.approvals-body')
     end
   end
 end

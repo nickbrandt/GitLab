@@ -11,14 +11,6 @@
   }
 }
 
-.mr-widget-approvals-container {
-  align-items: center;
-
-  .zero-approvals .ci-status-icon-success svg {
-    fill: $gray-darkest;
-  }
-}
-
 .approvals-body {
   @include media-breakpoint-up(md) {
     display: flex;

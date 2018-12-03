@@ -191,24 +191,18 @@ export default {
 <template>
   <div class="mr-state-widget prepend-top-default">
     <mr-widget-header :mr="mr" />
-    <mr-widget-pipeline
+    <mr-widget-pipeline-container
       v-if="shouldRenderPipelines"
-      :pipeline="mr.pipeline"
-      :ci-status="mr.ciStatus"
-      :has-ci="mr.hasCI"
-      :source-branch-link="mr.sourceBranchLink"
-      :source-branch="mr.sourceBranch"
-      :troubleshooting-docs-path="mr.troubleshootingDocsPath"
+      class="mr-widget-workflow"
+      :mr="mr"
     />
-    <deployment
-      v-for="deployment in mr.deployments"
-      :key="`pre-merge-deploy-${deployment.id}`"
-      class="js-pre-merge-deploy"
-      :deployment="deployment"
-      :show-metrics="false"
+    <mr-widget-approvals
+      v-if="shouldRenderApprovals"
+      class="mr-widget-workflow"
+      :mr="mr"
+      :service="service"
     />
-    <div class="mr-section-container">
-      <mr-widget-approvals v-if="shouldRenderApprovals" :mr="mr" :service="service" />
+    <div class="mr-section-container mr-widget-workflow">
       <report-section
         v-if="shouldRenderCodeQuality"
         :status="codequalityStatus"
@@ -288,24 +282,11 @@ export default {
       </div>
       <div v-if="shouldRenderMergeHelp" class="mr-widget-footer"><mr-widget-merge-help /></div>
     </div>
-
-    <template v-if="shouldRenderMergedPipeline">
-      <mr-widget-pipeline
-        class="js-post-merge-pipeline prepend-top-default"
-        :pipeline="mr.mergePipeline"
-        :ci-status="mr.ciStatus"
-        :has-ci="mr.hasCI"
-        :source-branch="mr.targetBranch"
-        :source-branch-link="mr.targetBranch"
-        :troubleshooting-docs-path="mr.troubleshootingDocsPath"
-      />
-      <deployment
-        v-for="postMergeDeployment in mr.postMergeDeployments"
-        :key="`post-merge-deploy-${postMergeDeployment.id}`"
-        :deployment="postMergeDeployment"
-        :show-metrics="true"
-        class="js-post-deployment"
-      />
-    </template>
+    <mr-widget-pipeline-container
+      v-if="shouldRenderMergedPipeline"
+      class="js-post-merge-pipeline mr-widget-workflow"
+      :mr="mr"
+      :is-post-merge="true"
+    />
   </div>
 </template>
