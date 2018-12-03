@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # `pg_replication_slots` is a PostgreSQL view
 class PgReplicationSlot
   def self.count

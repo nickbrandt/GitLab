@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IssueLink < ActiveRecord::Base
   belongs_to :source, class_name: 'Issue'
   belongs_to :target, class_name: 'Issue'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module FormHelper
     def issue_assignees_dropdown_options

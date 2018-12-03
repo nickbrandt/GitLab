@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SamlProvider < ActiveRecord::Base
   belongs_to :group
   has_many :identities

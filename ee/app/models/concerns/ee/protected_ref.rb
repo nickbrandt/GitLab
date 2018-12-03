@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module ProtectedRef
     def protected_ref_access_levels(*types)

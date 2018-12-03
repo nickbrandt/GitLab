@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class JenkinsService < CiService
   prop_accessor :jenkins_url, :project_name, :username, :password
 

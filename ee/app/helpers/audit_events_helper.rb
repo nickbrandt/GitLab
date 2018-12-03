@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AuditEventsHelper
   def human_text(details)
     details.map { |key, value| select_keys(key, value) }.join(" ").humanize

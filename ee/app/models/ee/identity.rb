@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module Identity
     extend ActiveSupport::Concern

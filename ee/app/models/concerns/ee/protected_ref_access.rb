@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # EE-specific code related to protected branch/tag access levels.
 #
 # Note: Don't directly include this concern into a model class.

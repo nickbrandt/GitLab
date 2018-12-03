@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BillingPlansHelper
   def subscription_plan_info(plans_data, current_plan_code)
     plans_data.find { |plan| plan.code == current_plan_code }

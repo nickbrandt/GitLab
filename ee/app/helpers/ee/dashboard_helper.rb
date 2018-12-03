@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module DashboardHelper
     def controller_action_to_child_dashboards(controller = controller_name, action = action_name)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Operations
   class FeatureFlag < ActiveRecord::Base
     self.table_name = 'operations_feature_flags'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Epic::Metrics < ActiveRecord::Base
   belongs_to :epic
 

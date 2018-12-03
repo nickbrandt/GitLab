@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module NamespacesHelper
     def namespace_shared_runner_limits_quota(namespace)

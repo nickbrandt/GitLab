@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module LicenseHelper
   include ActionView::Helpers::AssetTagHelper
   include ActionView::Helpers::UrlHelper

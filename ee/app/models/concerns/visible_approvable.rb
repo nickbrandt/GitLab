@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This module may only be used by presenters or modules
 # that include the Approvable concern
 module VisibleApprovable

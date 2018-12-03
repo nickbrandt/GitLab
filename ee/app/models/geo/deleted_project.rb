@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Geo::DeletedProject
   attr_reader :id, :name, :disk_path
 
