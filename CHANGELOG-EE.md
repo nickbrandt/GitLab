@@ -115,6 +115,10 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Geo: Clarify Geo HA documentation.
 
 
+## 11.4.9 (2018-12-03)
+
+- No changes.
+
 ## 11.4.8 (2018-11-27)
 
 ### Security (5 changes)
