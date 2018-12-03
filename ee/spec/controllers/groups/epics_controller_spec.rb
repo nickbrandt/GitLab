@@ -57,7 +57,7 @@ describe Groups::EpicsController do
         expect(response).to have_gitlab_http_status(200)
       end
 
-      context 'when there is no logged user' do
+      context 'when there is no logged in user' do
         it 'stores sorting param in a cookie' do
           group.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
           sign_out(user)
@@ -69,7 +69,7 @@ describe Groups::EpicsController do
         end
       end
 
-      context 'when there is a logged user' do
+      context 'when there is a logged in user' do
         context 'when epics_sort is nil' do
           it 'stores sorting param in user preferences' do
             get :index, group_id: group, sort: 'start_date_asc'
