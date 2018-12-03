@@ -314,6 +314,7 @@ Please check your network connection and try again.`;
 
 <template>
   <timeline-entry-item class="note note-discussion" :class="componentClassName">
+    <div class="timeline-content">
     <div :data-discussion-id="discussion.id" class="discussion js-discussion-container">
       <div v-if="shouldRenderDiffs" class="discussion-header note-wrapper">
         <div v-once class="timeline-icon">
@@ -467,6 +468,7 @@ Please check your network connection and try again.`;
           </div>
         </component>
       </div>
+    </div>
     </div>
   </timeline-entry-item>
 </template>
