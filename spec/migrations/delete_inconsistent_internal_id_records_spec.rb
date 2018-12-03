@@ -95,16 +95,10 @@ describe DeleteInconsistentInternalIdRecords, :migration do
 
   context 'for milestones (by group)' do
     # milestones (by group) is a little different than most of the other models
-<<<<<<< HEAD
-    let!(:group1) { create(:group) }
-    let!(:group2) { create(:group) }
-    let!(:group3) { create(:group) }
-=======
     let(:groups)  { table(:namespaces) }
     let(:group1) { groups.create(name: 'Group 1', type: 'Group', path: 'group_1') }
     let(:group2) { groups.create(name: 'Group 2', type: 'Group', path: 'group_2') }
     let(:group3) { groups.create(name: 'Group 2', type: 'Group', path: 'group_3') }
->>>>>>> upstream/master
 
     let(:internal_id_query) { ->(group) { InternalId.where(usage: InternalId.usages['milestones'], namespace: group) } }
 
