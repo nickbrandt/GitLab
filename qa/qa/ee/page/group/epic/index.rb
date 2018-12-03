@@ -12,6 +12,10 @@ module QA
               element :create_epic_button
             end
 
+            view 'ee/app/views/groups/epics/_epic.html.haml' do
+              element :epic_title_text
+            end
+
             def click_new_epic
               click_element :new_epic_button
             end
@@ -22,6 +26,10 @@ module QA
 
             def create_new_epic
               click_element :create_epic_button
+            end
+
+            def click_first_epic
+              all_elements(:epic_title_text).first.click
             end
           end
         end
