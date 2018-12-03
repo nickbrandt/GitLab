@@ -12,6 +12,7 @@ special searches:
 - [Advanced Syntax Search](../user/search/advanced_search_syntax.md)
 
 ## Version Requirements
+<!-- Please remember to update ee/lib/system_check/app/elasticsearch_check.rb if this changes -->
 
 | GitLab version | Elasticsearch version |
 | -------------- | --------------------- |
