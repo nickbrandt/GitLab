@@ -3752,17 +3752,10 @@ msgstr "所有项目"
 
 msgid "Geo|All projects are being scheduled for re-check"
 msgstr "正在计划所有项目重新检查"
-<<<<<<< HEAD
 
 msgid "Geo|All projects are being scheduled for re-sync"
 msgstr "正在计划所有项目重新同步"
 
-=======
-
-msgid "Geo|All projects are being scheduled for re-sync"
-msgstr "正在计划所有项目重新同步"
-
->>>>>>> 7c22aa5c99debc4cb6cba4fb416b3c87f9a7d0e4
 msgid "Geo|Batch operations"
 msgstr "批量操作"
 
@@ -3890,19 +3883,11 @@ msgid "Geo|misconfigured"
 msgstr ""
 
 msgid "Geo|primary"
-<<<<<<< HEAD
 msgstr ""
 
 msgid "Geo|secondary"
 msgstr ""
 
-=======
-msgstr ""
-
-msgid "Geo|secondary"
-msgstr ""
-
->>>>>>> 7c22aa5c99debc4cb6cba4fb416b3c87f9a7d0e4
 msgid "Get a free instance review"
 msgstr "获得免费的实例评估"
 

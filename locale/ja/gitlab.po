@@ -3751,19 +3751,11 @@ msgid "Geo|All projects"
 msgstr "すべてのプロジェクト"
 
 msgid "Geo|All projects are being scheduled for re-check"
-<<<<<<< HEAD
 msgstr ""
 
 msgid "Geo|All projects are being scheduled for re-sync"
 msgstr ""
 
-=======
-msgstr ""
-
-msgid "Geo|All projects are being scheduled for re-sync"
-msgstr ""
-
->>>>>>> 7c22aa5c99debc4cb6cba4fb416b3c87f9a7d0e4
 msgid "Geo|Batch operations"
 msgstr ""
 

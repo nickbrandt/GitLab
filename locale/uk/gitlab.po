@@ -3025,11 +3025,7 @@ msgid "Elasticsearch"
 msgstr "Elasticsearch"
 
 msgid "Elasticsearch integration. Elasticsearch AWS IAM."
-<<<<<<< HEAD
-msgstr "Інтеграція з Elasticsearch. Elasticsearch AWS IAM."
-=======
 msgstr ""
->>>>>>> 7c22aa5c99debc4cb6cba4fb416b3c87f9a7d0e4
 
 msgid "Email"
 msgstr "Електронна пошта"
@@ -3992,18 +3988,6 @@ msgid "Geo|You need a different license to use Geo replication"
 msgstr "Вам потрібна інша ліцензія на використання географічної реплікації"
 
 msgid "Geo|misconfigured"
-<<<<<<< HEAD
-=======
-msgstr ""
-
-msgid "Geo|primary"
-msgstr ""
-
-msgid "Geo|secondary"
-msgstr ""
-
-msgid "Get a free instance review"
->>>>>>> 7c22aa5c99debc4cb6cba4fb416b3c87f9a7d0e4
 msgstr ""
 
 msgid "Geo|primary"
@@ -5076,19 +5060,11 @@ msgid "MarkdownToolbar|Add bold text"
 msgstr ""
 
 msgid "MarkdownToolbar|Add italic text"
-<<<<<<< HEAD
 msgstr ""
 
 msgid "MarkdownToolbar|Go full screen"
 msgstr ""
 
-=======
-msgstr ""
-
-msgid "MarkdownToolbar|Go full screen"
-msgstr ""
-
->>>>>>> 7c22aa5c99debc4cb6cba4fb416b3c87f9a7d0e4
 msgid "MarkdownToolbar|Insert a quote"
 msgstr ""
 
@@ -7302,7 +7278,6 @@ msgid "Security Reports|More info"
 msgstr "Детальніше"
 
 msgid "Security Reports|Revert dismissal"
-<<<<<<< HEAD
 msgstr ""
 
 msgid "Security Reports|Security dashboard documentation"
@@ -7320,25 +7295,6 @@ msgstr ""
 msgid "Security Reports|There was an error reverting this dismissal."
 msgstr ""
 
-=======
-msgstr ""
-
-msgid "Security Reports|Security dashboard documentation"
-msgstr ""
-
-msgid "Security Reports|There was an error creating the issue."
-msgstr ""
-
-msgid "Security Reports|There was an error dismissing the vulnerability."
-msgstr ""
-
-msgid "Security Reports|There was an error reverting the dismissal."
-msgstr ""
-
-msgid "Security Reports|There was an error reverting this dismissal."
-msgstr ""
-
->>>>>>> 7c22aa5c99debc4cb6cba4fb416b3c87f9a7d0e4
 msgid "SecurityDashboard| The security dashboard displays the latest security report. Use it to find and fix vulnerabilities."
 msgstr "На панелі безпеки відображається останній звіт про безпеку. Використовуйте його для пошуку та виправлення вразливостей."
 

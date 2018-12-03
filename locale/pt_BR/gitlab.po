@@ -3790,19 +3790,11 @@ msgid "Geo|All projects are being scheduled for re-check"
 msgstr ""
 
 msgid "Geo|All projects are being scheduled for re-sync"
-<<<<<<< HEAD
 msgstr ""
 
 msgid "Geo|Batch operations"
 msgstr ""
 
-=======
-msgstr ""
-
-msgid "Geo|Batch operations"
-msgstr ""
-
->>>>>>> 7c22aa5c99debc4cb6cba4fb416b3c87f9a7d0e4
 msgid "Geo|Could not remove tracking entry for an existing project."
 msgstr ""
 
@@ -3915,30 +3907,9 @@ msgid "Geo|Waiting for scheduler"
 msgstr ""
 
 msgid "Geo|You are on a secondary, <b>read-only</b> Geo node. If you want to make changes, you must visit this page on the %{primary_node}."
-<<<<<<< HEAD
 msgstr ""
 
 msgid "Geo|You are on a secondary, <b>read-only</b> Geo node. You may be able to make a limited amount of changes or perform a limited amount of actions on this page."
-msgstr ""
-
-msgid "Geo|You need a different license to use Geo replication"
-msgstr ""
-
-msgid "Geo|misconfigured"
-msgstr ""
-
-msgid "Geo|primary"
-msgstr ""
-
-msgid "Geo|secondary"
-msgstr ""
-
-msgid "Get a free instance review"
-=======
-msgstr ""
-
-msgid "Geo|You are on a secondary, <b>read-only</b> Geo node. You may be able to make a limited amount of changes or perform a limited amount of actions on this page."
->>>>>>> 7c22aa5c99debc4cb6cba4fb416b3c87f9a7d0e4
 msgstr ""
 
 msgid "Geo|You need a different license to use Geo replication"
