@@ -232,7 +232,6 @@ export default {
     'http://localhost:3000/root/acets-app/commit/53027d060246c8f47e4a9310fb332aa52f221775',
   troubleshooting_docs_path: 'help',
 };
-<<<<<<< HEAD
 // Codeclimate
 export const headIssues = [
   {
@@ -402,8 +401,6 @@ export const codequalityParsedIssues = [
     urlPath: 'foo/Gemfile.lock',
   },
 ];
-=======
->>>>>>> upstream/master
 
 export const mockStore = {
   pipeline: { id: 0 },
