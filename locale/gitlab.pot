@@ -1510,6 +1510,9 @@ msgstr ""
 msgid "Checking %{text} availability…"
 msgstr ""
 
+msgid "Checking approval status"
+msgstr ""
+
 msgid "Checking branch availability..."
 msgstr ""
 
