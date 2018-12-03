@@ -2,6 +2,7 @@
 
 class IssueBoardEntity < Grape::Entity
   include RequestAwareEntity
+  prepend ::EE::IssueBoardEntity
 
   expose :id
   expose :iid
@@ -11,7 +12,6 @@ class IssueBoardEntity < Grape::Entity
   expose :due_date
   expose :project_id
   expose :relative_position
-  expose :weight, if: -> (*) { respond_to?(:weight) }
 
   expose :project do |issue|
     API::Entities::Project.represent issue.project, only: [:id, :path]
