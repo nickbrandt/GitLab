@@ -314,159 +314,159 @@ Please check your network connection and try again.`;
 
 <template>
   <timeline-entry-item class="note note-discussion" :class="componentClassName">
-      <div :data-discussion-id="discussion.id" class="discussion js-discussion-container">
-        <div v-if="shouldRenderDiffs" class="discussion-header note-wrapper">
-          <div v-once class="timeline-icon">
-            <user-avatar-link
-              v-if="author"
-              :link-href="author.path"
-              :img-src="author.avatar_url"
-              :img-alt="author.name"
-              :img-size="40"
-            />
-          </div>
-          <note-header
-            :author="author"
-            :created-at="initialDiscussion.created_at"
-            :note-id="initialDiscussion.id"
-            :include-toggle="true"
-            :expanded="discussion.expanded"
-            @toggleHandler="toggleDiscussionHandler"
-          >
-            <span v-html="actionText"></span>
-          </note-header>
-          <note-edited-text
-            v-if="discussion.resolved"
-            :edited-at="discussion.resolved_at"
-            :edited-by="discussion.resolved_by"
-            :action-text="resolvedText"
-            class-name="discussion-headline-light js-discussion-headline"
-          />
-          <note-edited-text
-            v-else-if="lastUpdatedAt"
-            :edited-at="lastUpdatedAt"
-            :edited-by="lastUpdatedBy"
-            action-text="Last updated"
-            class-name="discussion-headline-light js-discussion-headline"
+    <div :data-discussion-id="discussion.id" class="discussion js-discussion-container">
+      <div v-if="shouldRenderDiffs" class="discussion-header note-wrapper">
+        <div v-once class="timeline-icon">
+          <user-avatar-link
+            v-if="author"
+            :link-href="author.path"
+            :img-src="author.avatar_url"
+            :img-alt="author.name"
+            :img-size="40"
           />
         </div>
-        <div v-if="shouldShowDiscussions" class="discussion-body">
-          <component
-            :is="wrapperComponent"
-            v-bind="wrapperComponentProps"
-            class="card discussion-wrapper"
-          >
-            <div class="discussion-notes">
-              <ul class="notes">
-                <template v-if="shouldGroupReplies">
-                  <component
-                    :is="componentName(initialDiscussion)"
-                    :note="componentData(initialDiscussion)"
-                    @handleDeleteNote="deleteNoteHandler"
-                  >
-                    <slot slot="avatar-badge" name="avatar-badge"></slot>
-                  </component>
-                  <toggle-replies-widget
-                    v-if="hasReplies"
-                    :collapsed="isRepliesCollapsed"
-                    :replies="replies"
-                    @toggle="toggleReplies"
-                  />
-                  <template v-if="!isRepliesCollapsed">
-                    <component
-                      :is="componentName(note)"
-                      v-for="note in replies"
-                      :key="note.id"
-                      :note="componentData(note)"
-                      @handleDeleteNote="deleteNoteHandler"
-                    />
-                  </template>
-                </template>
-                <template v-else>
+        <note-header
+          :author="author"
+          :created-at="initialDiscussion.created_at"
+          :note-id="initialDiscussion.id"
+          :include-toggle="true"
+          :expanded="discussion.expanded"
+          @toggleHandler="toggleDiscussionHandler"
+        >
+          <span v-html="actionText"></span>
+        </note-header>
+        <note-edited-text
+          v-if="discussion.resolved"
+          :edited-at="discussion.resolved_at"
+          :edited-by="discussion.resolved_by"
+          :action-text="resolvedText"
+          class-name="discussion-headline-light js-discussion-headline"
+        />
+        <note-edited-text
+          v-else-if="lastUpdatedAt"
+          :edited-at="lastUpdatedAt"
+          :edited-by="lastUpdatedBy"
+          action-text="Last updated"
+          class-name="discussion-headline-light js-discussion-headline"
+        />
+      </div>
+      <div v-if="shouldShowDiscussions" class="discussion-body">
+        <component
+          :is="wrapperComponent"
+          v-bind="wrapperComponentProps"
+          class="card discussion-wrapper"
+        >
+          <div class="discussion-notes">
+            <ul class="notes">
+              <template v-if="shouldGroupReplies">
+                <component
+                  :is="componentName(initialDiscussion)"
+                  :note="componentData(initialDiscussion)"
+                  @handleDeleteNote="deleteNoteHandler"
+                >
+                  <slot slot="avatar-badge" name="avatar-badge"></slot>
+                </component>
+                <toggle-replies-widget
+                  v-if="hasReplies"
+                  :collapsed="isRepliesCollapsed"
+                  :replies="replies"
+                  @toggle="toggleReplies"
+                />
+                <template v-if="!isRepliesCollapsed">
                   <component
                     :is="componentName(note)"
-                    v-for="(note, index) in discussion.notes"
+                    v-for="note in replies"
                     :key="note.id"
                     :note="componentData(note)"
                     @handleDeleteNote="deleteNoteHandler"
-                  >
-                    <slot v-if="index === 0" slot="avatar-badge" name="avatar-badge"></slot>
-                  </component>
+                  />
                 </template>
-              </ul>
-              <draft-note
-                v-if="showDraft(discussion.reply_id)"
-                :key="`draft_${discussion.id}`"
-                :draft="draftForDiscussion(discussion.reply_id)"
-              />
-              <div
-                v-else-if="!isRepliesCollapsed"
-                :class="{ 'is-replying': isReplying }"
-                class="discussion-reply-holder"
-              >
-                <template v-if="!isReplying && canReply">
-                  <div class="discussion-with-resolve-btn">
+              </template>
+              <template v-else>
+                <component
+                  :is="componentName(note)"
+                  v-for="(note, index) in discussion.notes"
+                  :key="note.id"
+                  :note="componentData(note)"
+                  @handleDeleteNote="deleteNoteHandler"
+                >
+                  <slot v-if="index === 0" slot="avatar-badge" name="avatar-badge"></slot>
+                </component>
+              </template>
+            </ul>
+            <draft-note
+              v-if="showDraft(discussion.reply_id)"
+              :key="`draft_${discussion.id}`"
+              :draft="draftForDiscussion(discussion.reply_id)"
+            />
+            <div
+              v-else-if="!isRepliesCollapsed"
+              :class="{ 'is-replying': isReplying }"
+              class="discussion-reply-holder"
+            >
+              <template v-if="!isReplying && canReply">
+                <div class="discussion-with-resolve-btn">
+                  <button
+                    type="button"
+                    class="js-vue-discussion-reply btn btn-text-field mr-sm-2 qa-discussion-reply"
+                    title="Add a reply"
+                    @click="showReplyForm"
+                  >
+                    Reply...
+                  </button>
+                  <div v-if="discussion.resolvable">
                     <button
                       type="button"
-                      class="js-vue-discussion-reply btn btn-text-field mr-sm-2 qa-discussion-reply"
-                      title="Add a reply"
-                      @click="showReplyForm"
+                      class="btn btn-default mr-sm-2"
+                      @click="resolveHandler();"
                     >
-                      Reply...
+                      <i v-if="isResolving" aria-hidden="true" class="fa fa-spinner fa-spin"></i>
+                      {{ resolveButtonTitle }}
                     </button>
-                    <div v-if="discussion.resolvable">
-                      <button
-                        type="button"
-                        class="btn btn-default mr-sm-2"
-                        @click="resolveHandler();"
+                  </div>
+                  <div
+                    v-if="discussion.resolvable"
+                    class="btn-group discussion-actions ml-sm-2"
+                    role="group"
+                  >
+                    <div v-if="!discussionResolved" class="btn-group" role="group">
+                      <a
+                        v-gl-tooltip
+                        :href="discussion.resolve_with_issue_path"
+                        :title="s__('MergeRequests|Resolve this discussion in a new issue')"
+                        class="new-issue-for-discussion btn btn-default discussion-create-issue-btn"
                       >
-                        <i v-if="isResolving" aria-hidden="true" class="fa fa-spinner fa-spin"></i>
-                        {{ resolveButtonTitle }}
+                        <icon name="issue-new" />
+                      </a>
+                    </div>
+                    <div v-if="hasUnresolvedDiscussions" class="btn-group" role="group">
+                      <button
+                        v-gl-tooltip
+                        class="btn btn-default discussion-next-btn"
+                        title="Jump to next unresolved discussion"
+                        @click="jumpToNextDiscussion"
+                      >
+                        <icon name="comment-next" />
                       </button>
                     </div>
-                    <div
-                      v-if="discussion.resolvable"
-                      class="btn-group discussion-actions ml-sm-2"
-                      role="group"
-                    >
-                      <div v-if="!discussionResolved" class="btn-group" role="group">
-                        <a
-                          v-gl-tooltip
-                          :href="discussion.resolve_with_issue_path"
-                          :title="s__('MergeRequests|Resolve this discussion in a new issue')"
-                          class="new-issue-for-discussion btn btn-default discussion-create-issue-btn"
-                        >
-                          <icon name="issue-new" />
-                        </a>
-                      </div>
-                      <div v-if="hasUnresolvedDiscussions" class="btn-group" role="group">
-                        <button
-                          v-gl-tooltip
-                          class="btn btn-default discussion-next-btn"
-                          title="Jump to next unresolved discussion"
-                          @click="jumpToNextDiscussion"
-                        >
-                          <icon name="comment-next" />
-                        </button>
-                      </div>
-                    </div>
                   </div>
-                </template>
-                <note-form
-                  v-if="isReplying"
-                  ref="noteForm"
-                  :discussion="discussion"
-                  :is-editing="false"
-                  save-button-title="Comment"
-                  @handleFormUpdateAddToReview="addReplyToReview"
-                  @handleFormUpdate="saveReply"
-                  @cancelForm="cancelReplyForm"
-                />
-                <note-signed-out-widget v-if="!canReply" />
-              </div>
+                </div>
+              </template>
+              <note-form
+                v-if="isReplying"
+                ref="noteForm"
+                :discussion="discussion"
+                :is-editing="false"
+                save-button-title="Comment"
+                @handleFormUpdateAddToReview="addReplyToReview"
+                @handleFormUpdate="saveReply"
+                @cancelForm="cancelReplyForm"
+              />
+              <note-signed-out-widget v-if="!canReply" />
             </div>
-          </component>
-        </div>
+          </div>
+        </component>
       </div>
+    </div>
   </timeline-entry-item>
 </template>
