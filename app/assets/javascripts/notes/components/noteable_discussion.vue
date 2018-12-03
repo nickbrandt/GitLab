@@ -6,12 +6,9 @@ import { truncateSha } from '~/lib/utils/text_utility';
 import { s__, __, sprintf } from '~/locale';
 import systemNote from '~/vue_shared/components/notes/system_note.vue';
 import icon from '~/vue_shared/components/icon.vue';
-<<<<<<< HEAD
 import batchCommentsDiffLineNoteFormMixin from 'ee/batch_comments/mixins/diff_line_note_form';
 import DraftNote from 'ee/batch_comments/components/draft_note.vue';
-=======
 import TimelineEntryItem from '~/vue_shared/components/notes/timeline_entry_item.vue';
->>>>>>> upstream/master
 import Flash from '../../flash';
 import { SYSTEM_NOTE } from '../constants';
 import userAvatarLink from '../../vue_shared/components/user_avatar/user_avatar_link.vue';
@@ -43,11 +40,8 @@ export default {
     placeholderNote,
     placeholderSystemNote,
     systemNote,
-<<<<<<< HEAD
     DraftNote,
-=======
     TimelineEntryItem,
->>>>>>> upstream/master
   },
   directives: {
     GlTooltip: GlTooltipDirective,
@@ -320,7 +314,6 @@ Please check your network connection and try again.`;
 
 <template>
   <timeline-entry-item class="note note-discussion" :class="componentClassName">
-    <div class="timeline-content">
       <div :data-discussion-id="discussion.id" class="discussion js-discussion-container">
         <div v-if="shouldRenderDiffs" class="discussion-header note-wrapper">
           <div v-once class="timeline-icon">
@@ -388,21 +381,6 @@ Please check your network connection and try again.`;
                       @handleDeleteNote="deleteNoteHandler"
                     />
                   </template>
-<<<<<<< HEAD
-                </ul>
-                <draft-note
-                  v-if="showDraft(discussion.reply_id)"
-                  :key="`draft_${discussion.id}`"
-                  :draft="draftForDiscussion(discussion.reply_id)"
-                />
-                <div
-                  v-else-if="!isRepliesCollapsed"
-                  :class="{ 'is-replying': isReplying }"
-                  class="discussion-reply-holder"
-                >
-                  <template v-if="!isReplying && canReply">
-                    <div class="discussion-with-resolve-btn">
-=======
                 </template>
                 <template v-else>
                   <component
@@ -416,8 +394,13 @@ Please check your network connection and try again.`;
                   </component>
                 </template>
               </ul>
+              <draft-note
+                v-if="showDraft(discussion.reply_id)"
+                :key="`draft_${discussion.id}`"
+                :draft="draftForDiscussion(discussion.reply_id)"
+              />
               <div
-                v-if="!isRepliesCollapsed"
+                v-else-if="!isRepliesCollapsed"
                 :class="{ 'is-replying': isReplying }"
                 class="discussion-reply-holder"
               >
@@ -432,7 +415,6 @@ Please check your network connection and try again.`;
                       Reply...
                     </button>
                     <div v-if="discussion.resolvable">
->>>>>>> upstream/master
                       <button
                         type="button"
                         class="btn btn-default mr-sm-2"
@@ -468,21 +450,6 @@ Please check your network connection and try again.`;
                         </button>
                       </div>
                     </div>
-<<<<<<< HEAD
-                  </template>
-                  <note-form
-                    v-if="isReplying"
-                    ref="noteForm"
-                    :discussion="discussion"
-                    :is-editing="false"
-                    save-button-title="Comment"
-                    @handleFormUpdateAddToReview="addReplyToReview"
-                    @handleFormUpdate="saveReply"
-                    @cancelForm="cancelReplyForm"
-                  />
-                  <note-signed-out-widget v-if="!canReply" />
-                </div>
-=======
                   </div>
                 </template>
                 <note-form
@@ -491,16 +458,15 @@ Please check your network connection and try again.`;
                   :discussion="discussion"
                   :is-editing="false"
                   save-button-title="Comment"
+                  @handleFormUpdateAddToReview="addReplyToReview"
                   @handleFormUpdate="saveReply"
                   @cancelForm="cancelReplyForm"
                 />
                 <note-signed-out-widget v-if="!canReply" />
->>>>>>> upstream/master
               </div>
             </div>
           </component>
         </div>
       </div>
-    </div>
   </timeline-entry-item>
 </template>
