@@ -51,6 +51,14 @@ describe 'SAML provider settings' do
       expect(response_headers['Content-Type']).to have_content("application/xml")
     end
 
+    it 'does not show metadata link when feature disabled' do
+      stub_feature_flags(group_saml_metadata_available: false)
+
+      visit group_saml_providers_path(group)
+
+      expect(page).not_to have_content('metadata')
+    end
+
     it 'allows creation of new provider' do
       visit group_saml_providers_path(group)
 

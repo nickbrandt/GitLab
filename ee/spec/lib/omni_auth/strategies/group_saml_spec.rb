@@ -125,6 +125,14 @@ describe OmniAuth::Strategies::GroupSaml, type: :strategy do
       end.to raise_error(ActionController::RoutingError)
     end
 
+    it 'returns 404 when feature disabled' do
+      stub_feature_flags(group_saml_metadata_available: false)
+
+      post '/users/auth/group_saml/metadata', group_path: 'my-group', token: group.saml_discovery_token
+
+      expect(last_response.status).to eq 404
+    end
+
     it 'returns metadata when a valid token is provided' do
       post '/users/auth/group_saml/metadata', group_path: 'my-group', token: group.saml_discovery_token
 

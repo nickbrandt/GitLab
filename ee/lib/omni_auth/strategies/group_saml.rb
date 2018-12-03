@@ -5,7 +5,7 @@ module OmniAuth
       option :callback_path, ->(env) { callback?(env) }
 
       def setup_phase
-        if on_subpath?(:metadata)
+        if metadata_phase?
           require_discovery_token
         else
           require_saml_provider
@@ -23,7 +23,7 @@ module OmniAuth
       # Prevent access to SLO endpoints. These make less sense at
       # group level and would need additional work to securely support
       def other_phase
-        if on_subpath?(:metadata)
+        if metadata_phase?
           super
         else
           call_app!
@@ -39,6 +39,14 @@ module OmniAuth
       end
 
       private
+
+      def metadata_phase?
+        on_subpath?(:metadata) && metadata_enabled?
+      end
+
+      def metadata_enabled?
+        Feature.enabled?(:group_saml_metadata_available)
+      end
 
       def group_lookup
         @group_lookup ||= Gitlab::Auth::GroupSaml::GroupLookup.new(env)
