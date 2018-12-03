@@ -1,0 +1,5 @@
+---
+title: Geo - Respect the next retry time when re-verifying failed repositories
+merge_request: 8661
+author:
+type: fixed

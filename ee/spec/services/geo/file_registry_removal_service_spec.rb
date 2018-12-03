@@ -171,7 +171,7 @@ describe Geo::FileRegistryRemovalService do
       let(:file) { fixture_file_upload('spec/fixtures/dk.png', 'image/png') }
       let!(:upload) do
         NamespaceFileUploader.new(group).store!(file)
-        Upload.find_by(model: group, uploader: NamespaceFileUploader)
+        Upload.find_by(model: group, uploader: NamespaceFileUploader.name)
       end
 
       let!(:file_registry) { create(:geo_file_registry, :namespace_file, file_id: upload.id) }
@@ -194,7 +194,7 @@ describe Geo::FileRegistryRemovalService do
       let(:file) { fixture_file_upload('spec/fixtures/dk.png', 'image/png') }
       let!(:upload) do
         PersonalFileUploader.new(snippet).store!(file)
-        Upload.find_by(model: snippet, uploader: PersonalFileUploader)
+        Upload.find_by(model: snippet, uploader: PersonalFileUploader.name)
       end
       let!(:file_registry) { create(:geo_file_registry, :personal_file, file_id: upload.id) }
       let!(:file_path) { upload.build_uploader.file.path }
@@ -216,7 +216,7 @@ describe Geo::FileRegistryRemovalService do
       let(:file) { fixture_file_upload('spec/fixtures/dk.png', 'image/png') }
       let!(:upload) do
         FaviconUploader.new(appearance).store!(file)
-        Upload.find_by(model: appearance, uploader: FaviconUploader)
+        Upload.find_by(model: appearance, uploader: FaviconUploader.name)
       end
       let!(:file_registry) { create(:geo_file_registry, :favicon, file_id: upload.id) }
       let!(:file_path) { upload.build_uploader.file.path }
