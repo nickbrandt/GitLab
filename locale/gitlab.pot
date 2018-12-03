@@ -5753,11 +5753,10 @@ msgstr ""
 msgid "Note that the master branch is automatically protected. %{link_to_protected_branches}"
 msgstr ""
 
-<<<<<<< HEAD
-msgid "Note: As an administrator you may like to configure %{github_integration_link}, which will allow login via GitHub and allow connecting repositories without generating a Personal Access Token."
-=======
 msgid "Note that this invitation was sent to %{mail_to_invite_email}, but you are signed in as %{link_to_current_user} with email %{mail_to_current_user}."
->>>>>>> upstream/master
+msgstr ""
+
+msgid "Note: As an administrator you may like to configure %{github_integration_link}, which will allow login via GitHub and allow connecting repositories without generating a Personal Access Token."
 msgstr ""
 
 msgid "Note: As an administrator you may like to configure %{github_integration_link}, which will allow login via GitHub and allow importing repositories without generating a Personal Access Token."
@@ -9976,11 +9975,10 @@ msgstr ""
 msgid "from"
 msgstr ""
 
-<<<<<<< HEAD
-msgid "help"
-=======
 msgid "group"
->>>>>>> upstream/master
+msgstr ""
+
+msgid "help"
 msgstr ""
 
 msgid "here"
@@ -10292,7 +10290,6 @@ msgstr ""
 msgid "personal access token"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "private key does not match certificate."
 msgstr ""
 
@@ -10300,10 +10297,6 @@ msgid "project"
 msgid_plural "projects"
 msgstr[0] ""
 msgstr[1] ""
-=======
-msgid "project"
-msgstr ""
->>>>>>> upstream/master
 
 msgid "remaining"
 msgstr ""
