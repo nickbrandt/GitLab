@@ -231,6 +231,7 @@ This list of limitations only reflects the latest version of GitLab. If you are 
 - The installation takes multiple manual steps that together can take about an hour depending on circumstances. We are working on improving this experience. See [gitlab-org/omnibus-gitlab#2978](https://gitlab.com/gitlab-org/omnibus-gitlab/issues/2978) for details.
 - Real-time updates of issues/merge requests (for example, via long polling) doesn't work on the **secondary** node.
 - [Selective synchronization](configuration.md#selective-synchronization) applies only to files and repositories. Other datasets are replicated to the **secondary** node in full, making it inappropriate for use as an access control mechanism.
+- Object pools for forked project deduplication work only on the **primary** node, and are duplicated on the **secondary** node.
 
 ### Limitations on replication
 
