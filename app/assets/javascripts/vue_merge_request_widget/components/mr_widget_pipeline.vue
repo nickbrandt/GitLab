@@ -138,7 +138,6 @@ export default {
         </div>
         <div>
           <span class="mr-widget-pipeline-graph">
-<<<<<<< HEAD
             <span class="stage-cell">
               <linked-pipelines-mini-list v-if="triggeredBy.length" :triggered-by="triggeredBy" />
               <template v-if="hasStages">
@@ -157,17 +156,6 @@ export default {
             </span>
 
             <linked-pipelines-mini-list v-if="triggered.length" :triggered="triggered" />
-=======
-            <span v-if="hasStages" class="stage-cell">
-              <div
-                v-for="(stage, i) in pipeline.details.stages"
-                :key="i"
-                class="stage-container dropdown js-mini-pipeline-graph mr-widget-pipeline-stages"
-              >
-                <pipeline-stage :stage="stage" />
-              </div>
-            </span>
->>>>>>> upstream/master
           </span>
         </div>
       </div>
