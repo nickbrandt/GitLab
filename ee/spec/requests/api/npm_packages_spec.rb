@@ -35,16 +35,6 @@ describe API::NpmPackages do
 
         expect_a_valid_package_response
       end
-
-      context 'project path with a dot' do
-        let(:project) { create(:project, :public, namespace: group, path: 'foo.bar') }
-
-        it 'returns the package info' do
-          get_package(package)
-
-          expect_a_valid_package_response
-        end
-      end
     end
 
     context 'internal project' do
@@ -81,7 +71,7 @@ describe API::NpmPackages do
     end
 
     def get_package(package, params = {})
-      get api("/packages/npm/#{package.name}"), params: params
+      get api("/packages/npm/#{package.name}"), params
     end
 
     def get_package_with_token(package, params = {})
@@ -139,7 +129,7 @@ describe API::NpmPackages do
 
     def get_file(package_file, params = {})
       get api("/projects/#{project.id}/packages/npm/" \
-              "#{package_file.package.name}/-/#{package_file.file_name}"), params: params
+              "#{package_file.package.name}/-/#{package_file.file_name}"), params
     end
 
     def get_file_with_token(package_file, params = {})
@@ -149,38 +139,57 @@ describe API::NpmPackages do
 
   describe 'PUT /api/v4/projects/:id/packages/npm/:package_name' do
     context 'when params are correct' do
-      context 'invalid package record' do
-        context 'unscoped package' do
-          let(:package_name) { 'my_unscoped_package' }
-          let(:params) { upload_params(package_name) }
-
-          it 'handles an ActiveRecord::RecordInvalid exception with 400 error' do
-            expect { upload_package_with_token(package_name, params) }
-              .not_to change { project.packages.count }
-
-            expect(response).to have_gitlab_http_status(400)
-          end
+      context 'unscoped package' do
+        let(:params) do
+          {
+            name: 'foo',
+            versions: {
+              '1.0.1' => {
+                dist: {
+                  shasum: 'f572d396fae9206628714fb2ce00f72e94f2258f'
+                }
+              }
+            },
+            '_attachments' => {
+              "foo-1.0.1.tgz" => {
+                'data' => 'aGVsbG8K',
+                'length' => 8
+              }
+            }
+          }
         end
 
-        context 'invalid package name' do
-          let(:package_name) { "@#{group.path}/my_inv@lid_package_name" }
-          let(:params) { upload_params(package_name) }
+        it 'creates npm package with file' do
+          expect { upload_package_with_token('foo', params) }
+            .to change { project.packages.count }.by(1)
+            .and change { Packages::PackageFile.count }.by(1)
 
-          it 'handles an ActiveRecord::RecordInvalid exception with 400 error' do
-            expect { upload_package_with_token(package_name, params) }
-              .not_to change { project.packages.count }
-
-            expect(response).to have_gitlab_http_status(400)
-          end
+          expect(response).to have_gitlab_http_status(200)
         end
       end
 
       context 'scoped package' do
-        let(:package_name) { "@#{group.path}/my_package_name" }
-        let(:params) { upload_params(package_name) }
+        let(:params) do
+          {
+            name: '@bar/foo',
+            versions: {
+              '1.0.1' => {
+                dist: {
+                  shasum: 'f572d396fae9206628714fb2ce00f72e94f2258f'
+                }
+              }
+            },
+            '_attachments' => {
+              "@bar/foo-1.0.1.tgz" => {
+                'data' => 'aGVsbG8K',
+                'length' => 8
+              }
+            }
+          }
+        end
 
         it 'creates npm package with file' do
-          expect { upload_package_with_token(package_name, params) }
+          expect { upload_package_with_token('@bar%2Ffoo', params) }
             .to change { project.packages.count }.by(1)
             .and change { Packages::PackageFile.count }.by(1)
 
@@ -203,17 +212,11 @@ describe API::NpmPackages do
     end
 
     def upload_package(package_name, params = {})
-      put api("/projects/#{project.id}/packages/npm/#{package_name.sub('/', '%2f')}"), params: params
+      put api("/projects/#{project.id}/packages/npm/#{package_name}"), params
     end
 
     def upload_package_with_token(package_name, params = {})
       upload_package(package_name, params.merge(access_token: token.token))
-    end
-
-    def upload_params(package_name)
-      JSON.parse(
-        fixture_file('npm/payload.json', dir: 'ee')
-          .gsub('@root/npm-test', package_name))
     end
   end
 

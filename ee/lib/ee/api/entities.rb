@@ -734,24 +734,6 @@ module EE
       class NpmPackage < Grape::Entity
         expose :name
         expose :versions
-        expose :dist_tags, as: 'dist-tags'
-      end
-
-      class Package < Grape::Entity
-        expose :id
-        expose :name
-        expose :version
-        expose :package_type
-      end
-
-      class PackageFile < Grape::Entity
-        expose :id, :package_id, :created_at
-        expose :file_name, :size
-        expose :file_md5, :file_sha1
-      end
-
-      class ManagedLicense < Grape::Entity
-        expose :id, :name, :approval_status
       end
 
       class ProjectAlias < Grape::Entity

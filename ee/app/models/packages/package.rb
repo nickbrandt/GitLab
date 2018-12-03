@@ -19,10 +19,6 @@ class Packages::Package < ApplicationRecord
   enum package_type: { maven: 1, npm: 2 }
 
   scope :with_name, ->(name) { where(name: name) }
-  scope :with_version, ->(version) { where(version: version) }
-  scope :has_version, -> { where.not(version: nil) }
-  scope :preload_files, -> { preload(:package_files) }
-  scope :last_of_each_version, -> { where(id: all.select('MAX(id) AS id').group(:version)) }
 
   def self.for_projects(projects)
     return none unless projects.any?
@@ -35,7 +31,7 @@ class Packages::Package < ApplicationRecord
   end
 
   def self.by_name_and_file_name(name, file_name)
-    with_name(name)
+    where(name: name)
       .joins(:package_files)
       .where(packages_package_files: { file_name: file_name }).last!
   end

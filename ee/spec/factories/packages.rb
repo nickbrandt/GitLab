@@ -61,13 +61,9 @@ FactoryBot.define do
     trait(:npm) do
       file { fixture_file_upload('ee/spec/fixtures/npm/foo-1.0.1.tgz') }
       file_name 'foo-1.0.1.tgz'
-      file_sha1 'be93151dc23ac34a82752444556fe79b32c7a1ad'
+      file_sha1 'f572d396fae9206628714fb2ce00f72e94f2258f'
       file_type 'tgz'
       size { 400.kilobytes }
-    end
-
-    trait :object_storage do
-      file_store { Packages::PackageFileUploader::Store::REMOTE }
     end
   end
 

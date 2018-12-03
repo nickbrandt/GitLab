@@ -6,6 +6,18 @@ module EE
       extend ActiveSupport::Concern
 
       class_methods do
+        def environment_scope_regex_chars
+          "#{environment_name_regex_chars}\\*"
+        end
+
+        def environment_scope_regex
+          @environment_scope_regex ||= /\A[#{environment_scope_regex_chars}]+\z/.freeze
+        end
+
+      def package_name_regex
+        @package_name_regex ||= %r{\A(([\w\-\.\@]*)/)*([\w\-\.]*)\z}.freeze
+      end
+
         def package_name_regex
           @package_name_regex ||= %r{\A\@?(([\w\-\.]*)/)*([\w\-\.]*)\z}.freeze
         end
