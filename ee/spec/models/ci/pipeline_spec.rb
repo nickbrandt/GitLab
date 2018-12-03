@@ -223,29 +223,32 @@ describe Ci::Pipeline do
     subject { pipeline.security_reports }
 
     before do
-      stub_licensed_features(sast: true)
+      stub_licensed_features(sast: true, dependency_scanning: true)
     end
 
     context 'when pipeline has multiple builds with security reports' do
-      let!(:build_sast_1) { create(:ci_build, :success, name: 'sast_1', pipeline: pipeline, project: project) }
-      let!(:build_sast_2) { create(:ci_build, :success, name: 'sast_2', pipeline: pipeline, project: project) }
+      let(:build_sast_1) { create(:ci_build, :success, name: 'sast_1', pipeline: pipeline, project: project) }
+      let(:build_sast_2) { create(:ci_build, :success, name: 'sast_2', pipeline: pipeline, project: project) }
+      let(:build_ds_1) { create(:ci_build, :success, name: 'ds_1', pipeline: pipeline, project: project) }
 
       before do
         create(:ee_ci_job_artifact, :sast, job: build_sast_1, project: project)
         create(:ee_ci_job_artifact, :sast, job: build_sast_2, project: project)
+        create(:ee_ci_job_artifact, :dependency_scanning, job: build_ds_1, project: project)
       end
 
       it 'returns security reports with collected data grouped as expected' do
-        expect(subject.reports.keys).to eq(%w(sast))
+        expect(subject.reports.keys).to contain_exactly('sast', 'dependency_scanning')
         expect(subject.get_report('sast').occurrences.size).to eq(6)
+        expect(subject.get_report('dependency_scanning').occurrences.size).to eq(4)
       end
 
       context 'when builds are retried' do
-        let!(:build_sast_1) { create(:ci_build, :retried, name: 'sast_1', pipeline: pipeline, project: project) }
-        let!(:build_sast_2) { create(:ci_build, :retried, name: 'sast_2', pipeline: pipeline, project: project) }
+        let(:build_sast_1) { create(:ci_build, :retried, name: 'sast_1', pipeline: pipeline, project: project) }
 
         it 'does not take retried builds into account' do
-          expect(subject.reports).to eq({})
+          expect(subject.get_report('sast').occurrences.size).to eq(3)
+          expect(subject.get_report('dependency_scanning').occurrences.size).to eq(4)
         end
       end
     end

@@ -3,36 +3,45 @@
 require 'spec_helper'
 
 describe Security::StoreReportService, '#execute' do
-  let(:artifact) { create(:ee_ci_job_artifact, :sast) }
+  let(:artifact) { create(:ee_ci_job_artifact, report_type) }
   let(:project) { artifact.project }
   let(:pipeline) { artifact.job.pipeline }
-  let(:report) { pipeline.security_reports.get_report('sast') }
+  let(:report) { pipeline.security_reports.get_report(report_type.to_s) }
 
   before do
-    stub_licensed_features(sast: true)
+    stub_licensed_features(sast: true, dependency_scanning: true)
   end
 
   subject { described_class.new(pipeline, report).execute }
 
   context 'without existing data' do
-    it 'inserts all scanners' do
-      expect { subject }.to change { Vulnerabilities::Scanner.count }.by(3)
+    using RSpec::Parameterized::TableSyntax
+
+    where(:case_name, :report_type, :scanners, :identifiers, :occurrences, :occurrence_identifiers, :occurrence_pipelines) do
+      'with SAST report'                | :sast                | 3 | 4 | 3 | 5 | 3
+      'with Dependency Scanning report' | :dependency_scanning | 2 | 7 | 4 | 7 | 4
     end
 
-    it 'inserts all identifiers' do
-      expect { subject }.to change { Vulnerabilities::Identifier.count }.by(4)
-    end
+    with_them do
+      it 'inserts all scanners' do
+        expect { subject }.to change { Vulnerabilities::Scanner.count }.by(scanners)
+      end
 
-    it 'inserts all occurrences' do
-      expect { subject }.to change { Vulnerabilities::Occurrence.count }.by(3)
-    end
+      it 'inserts all identifiers' do
+        expect { subject }.to change { Vulnerabilities::Identifier.count }.by(identifiers)
+      end
 
-    it 'inserts all occurrence identifiers (join model)' do
-      expect { subject }.to change { Vulnerabilities::OccurrenceIdentifier.count }.by(5)
-    end
+      it 'inserts all occurrences' do
+        expect { subject }.to change { Vulnerabilities::Occurrence.count }.by(occurrences)
+      end
 
-    it 'inserts all occurrence pipelines (join model)' do
-      expect { subject }.to change { Vulnerabilities::OccurrencePipeline.count }.by(3)
+      it 'inserts all occurrence identifiers (join model)' do
+        expect { subject }.to change { Vulnerabilities::OccurrenceIdentifier.count }.by(occurrence_identifiers)
+      end
+
+      it 'inserts all occurrence pipelines (join model)' do
+        expect { subject }.to change { Vulnerabilities::OccurrencePipeline.count }.by(occurrence_pipelines)
+      end
     end
   end
 
@@ -42,7 +51,8 @@ describe Security::StoreReportService, '#execute' do
     let!(:new_artifact) { create(:ee_ci_job_artifact, :sast, job: new_build) }
     let(:new_build) { create(:ci_build, pipeline: new_pipeline) }
     let(:new_pipeline) { create(:ci_pipeline, project: project) }
-    let(:new_report) { new_pipeline.security_reports.get_report('sast') }
+    let(:new_report) { new_pipeline.security_reports.get_report(report_type.to_s) }
+    let(:report_type) { :sast }
 
     let!(:occurrence) do
       create(:vulnerabilities_occurrence,
@@ -75,6 +85,7 @@ describe Security::StoreReportService, '#execute' do
 
   context 'with existing data from same pipeline' do
     let!(:occurrence) { create(:vulnerabilities_occurrence, project: project, pipelines: [pipeline]) }
+    let(:report_type) { :sast }
 
     it 'skips report' do
       expect(subject).to eq({

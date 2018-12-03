@@ -155,7 +155,7 @@ describe Ci::Build do
     subject { job.collect_security_reports!(security_reports) }
 
     before do
-      stub_licensed_features(sast: true)
+      stub_licensed_features(sast: true, dependency_scanning: true)
     end
 
     context 'when build has a security report' do
@@ -168,6 +168,20 @@ describe Ci::Build do
           subject
 
           expect(security_reports.get_report('sast').occurrences.size).to eq(3)
+        end
+      end
+
+      context 'when there are multiple report' do
+        before do
+          create(:ee_ci_job_artifact, :sast, job: job, project: job.project)
+          create(:ee_ci_job_artifact, :dependency_scanning, job: job, project: job.project)
+        end
+
+        it 'parses blobs and add the results to the reports' do
+          subject
+
+          expect(security_reports.get_report('sast').occurrences.size).to eq(3)
+          expect(security_reports.get_report('dependency_scanning').occurrences.size).to eq(4)
         end
       end
 
