@@ -426,6 +426,8 @@ cloud-native-image:
   stage: test
   image: ruby:2.4-alpine
   before_script: []
+  dependencies: []
+  stage: post-test
   allow_failure: true
   cache: {}
   variables:

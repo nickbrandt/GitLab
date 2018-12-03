@@ -4,8 +4,9 @@ entry.
 
 ## 11.5.1 (2018-11-26)
 
-### Security (16 changes)
+### Security (17 changes)
 
+- Escape user fullname while rendering autocomplete template to prevent XSS.
 - Fix CRLF vulnerability in Project hooks.
 - Fix possible XSS attack in Markdown urls with spaces.
 - Redact sensitive information on gitlab-workhorse log.

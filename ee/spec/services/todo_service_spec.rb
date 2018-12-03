@@ -1,15 +1,17 @@
 require 'spec_helper'
 
 describe TodoService do
+  let(:author) { create(:user, username: 'author') }
+  let(:non_member) { create(:user, username: 'non_member') }
+  let(:member) { create(:user, username: 'member') }
+  let(:guest) { create(:user, username: 'guest') }
+  let(:admin) { create(:admin, username: 'administrator') }
+  let(:john_doe) { create(:user, username: 'john_doe') }
+  let(:skipped) { create(:user, username: 'skipped') }
+  let(:skip_users) { [skipped] }
+  let(:service) { described_class.new }
+
   describe 'Epics' do
-    let(:author) { create(:user, username: 'author') }
-    let(:non_member) { create(:user, username: 'non_member') }
-    let(:member) { create(:user, username: 'member') }
-    let(:guest) { create(:user, username: 'guest') }
-    let(:admin) { create(:admin, username: 'administrator') }
-    let(:john_doe) { create(:user, username: 'john_doe') }
-    let(:skipped) { create(:user, username: 'skipped') }
-    let(:skip_users) { [skipped] }
     let(:users) { [author, non_member, member, guest, admin, john_doe, skipped] }
     let(:mentions) { users.map(&:to_reference).join(' ') }
     let(:combined_mentions) { member.to_reference + ", what do you think? cc: " + [guest, admin, skipped].map(&:to_reference).join(' ') }
@@ -19,8 +21,6 @@ describe TodoService do
 
     let(:group) { create(:group) }
     let(:epic) { create(:epic, group: group,  author: author, description: description_mentions) }
-
-    let(:service) { described_class.new }
 
     let(:todos_for) { [] }
     let(:todos_not_for) { [] }
@@ -244,5 +244,82 @@ describe TodoService do
         end
       end
     end
+  end
+
+  context 'Merge Requests' do
+    let(:project) { create(:project, :repository) }
+    let(:merge_request) { create(:merge_request, source_project: project, author: author, description: description) }
+
+    let(:assignee) { create(:user) }
+    let(:approver_1) { create(:user) }
+    let(:approver_2) { create(:user) }
+    let(:approver_3) { create(:user) }
+    let(:code_owner) { create(:user, username: 'codeowner') }
+    let(:description) { 'FYI: ' + [john_doe, approver_1].map(&:to_reference).join(' ') }
+
+    before do
+      project.add_guest(guest)
+      project.add_developer(author)
+      project.add_developer(member)
+      project.add_developer(john_doe)
+      project.add_developer(skipped)
+      project.add_developer(approver_1)
+      project.add_developer(approver_2)
+      project.add_developer(approver_3)
+      project.add_developer(code_owner)
+
+      create(:approver, user: approver_1, target: project)
+      create(:approver, user: approver_2, target: project)
+
+      allow(merge_request).to receive(:code_owners).and_return([code_owner])
+
+      service.new_merge_request(merge_request, author)
+    end
+
+    describe '#new_merge_request' do
+      context 'when the merge request has approvers' do
+        it 'creates a todo' do
+          # for each approver
+          should_create_todo(user: approver_1, target: merge_request, action: Todo::APPROVAL_REQUIRED)
+          should_create_todo(user: approver_2, target: merge_request, action: Todo::APPROVAL_REQUIRED)
+          should_not_create_todo(user: approver_3, target: merge_request, action: Todo::APPROVAL_REQUIRED)
+
+          # for each valid mentioned user
+          should_create_todo(user: john_doe, target: merge_request, action: Todo::MENTIONED)
+          should_not_create_todo(user: approver_1, target: merge_request, action: Todo::MENTIONED)
+
+          # skip for code owner
+          should_not_create_todo(user: code_owner, target: merge_request, action: Todo::APPROVAL_REQUIRED)
+        end
+
+        context 'when code owner is mentioned' do
+          let(:description) { 'FYI: ' + [code_owner].map(&:to_reference).join(' ') }
+
+          it 'creates a todo' do
+            should_create_todo(user: code_owner, target: merge_request, action: Todo::MENTIONED)
+          end
+        end
+      end
+    end
+  end
+
+  def should_create_todo(attributes = {})
+    attributes.reverse_merge!(
+      project: project,
+      author: author,
+      state: :pending
+    )
+
+    expect(Todo.where(attributes).count).to eq 1
+  end
+
+  def should_not_create_todo(attributes = {})
+    attributes.reverse_merge!(
+      project: project,
+      author: author,
+      state: :pending
+    )
+
+    expect(Todo.where(attributes).count).to eq 0
   end
 end

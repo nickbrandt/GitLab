@@ -5,6 +5,7 @@ The ability to contribute conversationally is offered throughout GitLab.
 You can leave a comment in the following places:
 
 - issues
+- epics
 - merge requests
 - snippets
 - commits
@@ -283,7 +284,7 @@ in order to allow you to submit them all as a single action.
 
 ### Starting a review
 
-In order to start a review, simply write a comment on a diff as normal under the **Changes** tab 
+In order to start a review, simply write a comment on a diff as normal under the **Changes** tab
 in an MR and click on the **Start a review** button.
 
 ![Starting a review](img/mr_review_start.png)
@@ -314,13 +315,13 @@ Review comments can also resolve/unresolve [resolvable discussions](#resolvable-
 When replying to a comment, you will see a checkbox that you can click in order to resolve or unresolve
 the discussion once published.
 
-![Resolve checkbox](img/mr_review_resolve.png) 
+![Resolve checkbox](img/mr_review_resolve.png)
 ![Unresolve checkbox](img/mr_review_unresolve.png)
 
 If a particular pending comment will resolve or unresolve the discussion, this will be shown on the pending
 comment itself.
 
-![Resolve status](img/mr_review_resolve2.png) 
+![Resolve status](img/mr_review_resolve2.png)
 ![Unresolve status](img/mr_review_unresolve2.png)
 
 ### Submitting a review
@@ -336,6 +337,26 @@ bottom of the screen with two buttons:
 Alternatively, every pending comment has a button to finish the entire review.
 
 ![Review submission](img/review_preview.png)
+
+## Filtering notes
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/26723) in GitLab 11.5.
+
+For issues with many comments like activity notes and user comments, sometimes
+finding useful information can be hard. There is a way to filter comments from single notes and discussions for merge requests and issues.
+
+From a merge request's **Discussion** tab, or from an issue overview, find the filter's dropdown menu on the right side of the page, from which you can choose one of the following options:
+
+- **Show all activity**: displays all user comments and system notes
+(issue updates, mentions from other issues, changes to the description, etc).
+- **Show comments only**: only displays user comments in the list.
+- **Show history only**: only displays activity notes.
+
+![Notes filters dropdown options](img/index_notes_filters.png)
+
+Once you select one of the filters in a given issue or MR, GitLab will save
+your preference, so that it will persist when you visit the same page again
+from any device you're logged into.
 
 [ce-5022]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/5022
 [ce-7125]: https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/7125

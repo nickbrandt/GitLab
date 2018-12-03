@@ -21,8 +21,8 @@ module QA
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform(&:sign_in_using_credentials)
 
-        @user = Resource::User.fabricate!
-        @user2 = Resource::User.fabricate!
+        @user = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_1, Runtime::Env.gitlab_qa_password_1)
+        @user2 = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_2, Runtime::Env.gitlab_qa_password_2)
 
         @project = Resource::Project.fabricate! do |project|
           project.name = "codeowners"
