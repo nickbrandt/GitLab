@@ -2,10 +2,11 @@ import Vue from 'vue';
 import Flash from '~/flash';
 import Translate from '~/vue_shared/translate';
 import { __ } from '~/locale';
-import PipelinesMediator from './pipeline_details_mediator';
+import PipelinesMediator from 'ee/pipelines/pipeline_details_mediator';
 import pipelineGraph from './components/graph/graph_component.vue';
 import pipelineHeader from './components/header_component.vue';
 import eventHub from './event_hub';
+import GraphEEMixin from 'ee/pipelines/mixins/graph_pipeline_bundle_mixin'; // eslint-disable-line import/order
 
 Vue.use(Translate);
 
@@ -22,6 +23,7 @@ export default () => {
     components: {
       pipelineGraph,
     },
+    mixins: [GraphEEMixin],
     data() {
       return {
         mediator,
@@ -41,9 +43,21 @@ export default () => {
         props: {
           isLoading: this.mediator.state.isLoading,
           pipeline: this.mediator.store.state.pipeline,
+          // EE-only start
+          triggeredPipelines: this.mediator.store.state.triggeredPipelines,
+          triggered: this.mediator.store.state.triggered,
+          triggeredByPipelines: this.mediator.store.state.triggeredByPipelines,
+          triggeredBy: this.mediator.store.state.triggeredBy,
+          // EE-only end
         },
         on: {
           refreshPipelineGraph: this.requestRefreshPipelineGraph,
+          // EE-only start
+          refreshTriggeredPipelineGraph: this.mediator.refreshTriggeredByPipelineGraph,
+          refreshTriggeredByPipelineGraph: this.mediator.refreshTriggeredByPipelineGraph,
+          onClickTriggeredBy: pipeline => this.clickTriggeredBy(pipeline),
+          onClickTriggered: pipeline => this.clickTriggered(pipeline),
+          // EE-only end
         },
       });
     },
