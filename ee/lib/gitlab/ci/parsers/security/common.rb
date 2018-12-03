@@ -4,8 +4,8 @@ module Gitlab
   module Ci
     module Parsers
       module Security
-        class Sast
-          SastParserError = Class.new(StandardError)
+        class Common
+          SecurityReportParserError = Class.new(StandardError)
 
           METADATA_VERSION = '1.2'
 
@@ -16,9 +16,9 @@ module Gitlab
               create_vulnerability(report, vulnerability)
             end
           rescue JSON::ParserError
-            raise SastParserError, 'JSON parsing failed'
+            raise SecurityReportParserError, 'JSON parsing failed'
           rescue
-            raise SastParserError, 'SAST report parsing failed'
+            raise SecurityReportParserError, "#{report.type} security report parsing failed"
           end
 
           protected

@@ -9,16 +9,19 @@ describe Security::StoreReportsService, '#execute' do
 
   context 'when there are reports' do
     before do
-      stub_licensed_features(sast: true)
+      stub_licensed_features(sast: true, dependency_scanning: true)
       create(:ee_ci_build, :sast, pipeline: pipeline)
+      create(:ee_ci_build, :dependency_scanning, pipeline: pipeline)
     end
 
-    it 'initializes a new StoreReportService and execute it' do
+    it 'initializes and execute a StoreReportService for each report' do
       expect(Security::StoreReportService).to receive(:new)
-        .with(pipeline, instance_of(::Gitlab::Ci::Reports::Security::Report)).and_call_original
-
-      expect_any_instance_of(Security::StoreReportService).to receive(:execute)
-        .once.and_call_original
+        .twice.with(pipeline, instance_of(::Gitlab::Ci::Reports::Security::Report))
+        .and_wrap_original do |method, *original_args|
+          method.call(*original_args).tap do |store_service|
+            expect(store_service).to receive(:execute).once.and_call_original
+          end
+        end
 
       subject
     end

@@ -8,7 +8,8 @@ module EE
       extend ActiveSupport::Concern
 
       LICENSED_PARSER_FEATURES = {
-        sast: :sast
+        sast: :sast,
+        dependency_scanning: :dependency_scanning
       }.with_indifferent_access.freeze
 
       prepended do

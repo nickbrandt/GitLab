@@ -103,18 +103,40 @@ describe Groups::Security::VulnerabilitiesController do
           end
         end
 
+        context 'whith multiple report types' do
+          before do
+            projects.each do |project|
+              create_vulnerabilities(2, project_guest, { report_type: :sast })
+              create_vulnerabilities(1, project_dev, { report_type: :dependency_scanning })
+            end
+          end
+
+          # FIXME: we only support SAST in group dashboard until https://gitlab.com/gitlab-org/gitlab-ee/issues/6240
+          # and https://gitlab.com/gitlab-org/gitlab-ee/issues/8481
+          it "returns a list of vulnerabilities but only for SAST report type" do
+            subject
+
+            expect(response).to have_gitlab_http_status(200)
+            expect(json_response).to be_an(Array)
+            expect(json_response.length).to eq 2
+            expect(json_response.map { |v| v['report_type'] }.uniq).to contain_exactly('sast')
+            expect(response).to match_response_schema('vulnerabilities/occurrence_list', dir: 'ee')
+          end
+        end
+
         def create_vulnerabilities(count, project, options = {})
+          report_type = options[:report_type] || :sast
           pipeline = create(:ci_pipeline, :success, project: project)
-          vulnerabilities = create_list(:vulnerabilities_occurrence, count, pipelines: [pipeline], project: project)
+          vulnerabilities = create_list(:vulnerabilities_occurrence, count, report_type: report_type, pipelines: [pipeline], project: project)
           return vulnerabilities unless options[:with_feedback]
 
           vulnerabilities.each do |occurrence|
-            create(:vulnerability_feedback, :sast, :dismissal,
+            create(:vulnerability_feedback, report_type, :dismissal,
                    pipeline: pipeline,
                    project: project_dev,
                    project_fingerprint: occurrence.project_fingerprint)
 
-            create(:vulnerability_feedback, :sast, :issue,
+            create(:vulnerability_feedback, report_type, :issue,
                    pipeline: pipeline,
                    issue: create(:issue, project: project),
                    project: project_dev,
