@@ -48,43 +48,26 @@ describe('Linked pipeline', () => {
       expect(vm.$el.tagName).toBe('LI');
     });
 
-    it('should render a link', () => {
+    it('should render a button', () => {
       const linkElement = vm.$el.querySelector('.js-linked-pipeline-content');
 
       expect(linkElement).not.toBeNull();
     });
 
-    it('should link to the correct path', () => {
-      const linkElement = vm.$el.querySelector('.js-linked-pipeline-content');
-
-      expect(linkElement.getAttribute('href')).toBe(props.pipelinePath);
-    });
-
     it('should render the project name', () => {
-      const projectNameElement = vm.$el.querySelector('.linked-pipeline-project-name');
-
-      expect(projectNameElement.innerText).toContain(props.projectName);
+      expect(vm.$el.innerText).toContain(props.projectName);
     });
 
     it('should render an svg within the status container', () => {
+      console.log(vm.$el);
       const pipelineStatusElement = vm.$el.querySelector('.js-linked-pipeline-status');
 
       expect(pipelineStatusElement.querySelector('svg')).not.toBeNull();
     });
 
     it('should render the pipeline status icon svg', () => {
-      const pipelineStatusElement = vm.$el.querySelector('.js-linked-pipeline-status');
-
-      expect(pipelineStatusElement.querySelector('.ci-status-icon-running')).not.toBeNull();
-      expect(pipelineStatusElement.innerHTML).toContain('<svg');
-    });
-
-    it('should render the correct pipeline status icon style selector', () => {
-      const pipelineStatusElement = vm.$el.querySelector('.js-linked-pipeline-status');
-
-      expect(pipelineStatusElement.firstChild.classList.contains('ci-status-icon-running')).toBe(
-        true,
-      );
+      expect(vm.$el.querySelector('.js-ci-status-icon-running')).not.toBeNull();
+      expect(vm.$el.querySelector('.js-ci-status-icon-running').innerHTML).toContain('<svg');
     });
 
     it('should have a ci-status child component', () => {
@@ -92,9 +75,7 @@ describe('Linked pipeline', () => {
     });
 
     it('should render the pipeline id', () => {
-      const pipelineIdElement = vm.$el.querySelector('.js-linked-pipeline-id');
-
-      expect(pipelineIdElement.innerText).toContain(`#${props.pipelineId}`);
+      expect(vm.$el.innerText).toContain(`#${props.pipelineId}`);
     });
 
     it('should correctly compute the tooltip text', () => {
@@ -108,6 +89,37 @@ describe('Linked pipeline', () => {
 
       expect(titleAttr).toContain(mockPipeline.project.name);
       expect(titleAttr).toContain(mockPipeline.details.status.label);
+    });
+  });
+
+  describe('on click', () => {
+    const props = {
+      pipelineId: mockPipeline.id,
+      pipelinePath: mockPipeline.path,
+      pipelineStatus: mockPipeline.details.status,
+      projectName: mockPipeline.project.name,
+      isLoading: false,
+    };
+
+    beforeEach(() => {
+      vm = mountComponent(Component, props);
+    });
+
+    it('emits `pipelineClicked` event', () => {
+      spyOn(vm, '$emit');
+      vm.$el.querySelector('button').click();
+
+      expect(vm.$emit).toHaveBeenCalledWith('pipelineClicked');
+    });
+
+    it('should emit `bv::hide::tooltip` to close the tooltip', () => {
+      spyOn(vm.$root, '$emit');
+      vm.$el.querySelector('button').click();
+
+      expect(vm.$root.$emit).toHaveBeenCalledWith(
+        'bv::hide::tooltip',
+        `js-linked-pipeline-${props.pipelineId}`,
+      );
     });
   });
 });
