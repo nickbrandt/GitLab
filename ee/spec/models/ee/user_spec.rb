@@ -257,7 +257,7 @@ describe EE::User do
     end
 
     context 'with linked identity' do
-      let!(:identity) { create(:identity, :group_saml, user: user) }
+      let!(:identity) { create(:group_saml_identity, user: user) }
       let(:saml_provider) { identity.saml_provider }
       let(:group) { saml_provider.group }
 
@@ -267,7 +267,7 @@ describe EE::User do
         end
 
         it 'does not cause ActiveRecord to loop through identites' do
-          create(:identity, :group_saml, user: user)
+          create(:group_saml_identity, user: user)
 
           expect(Identity).not_to receive(:instantiate)
 

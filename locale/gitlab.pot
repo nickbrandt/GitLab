@@ -7295,6 +7295,9 @@ msgstr ""
 msgid "SAML Single Sign On Settings"
 msgstr ""
 
+msgid "SAML for %{group_name}"
+msgstr ""
+
 msgid "SAST"
 msgstr ""
 
