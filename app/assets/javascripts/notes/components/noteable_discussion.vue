@@ -75,12 +75,14 @@ export default {
     },
   },
   data() {
+    const { diff_discussion: isDiffDiscussion, resolved } = this.discussion;
+
     return {
       isReplying: false,
       isResolving: false,
       isUnresolving: false,
       resolveAsThread: true,
-      isRepliesToggledByUser: false,
+      isRepliesCollapsed: Boolean(!isDiffDiscussion && resolved),
     };
   },
   computed: {
@@ -160,15 +162,6 @@ export default {
 
       return expanded || this.alwaysExpanded || isResolvedNonDiffDiscussion;
     },
-    isRepliesCollapsed() {
-      const { discussion, isRepliesToggledByUser } = this;
-      const { resolved, notes } = discussion;
-      const hasReplies = notes.length > 1;
-
-      return (
-        (!discussion.diff_discussion && resolved && hasReplies && !isRepliesToggledByUser) || false
-      );
-    },
     actionText() {
       const commitId = this.discussion.commit_id ? truncateSha(this.discussion.commit_id) : '';
       const linkStart = `<a href="${_.escape(this.discussion.discussion_path)}">`;
@@ -244,7 +237,7 @@ export default {
       this.toggleDiscussion({ discussionId: this.discussion.id });
     },
     toggleReplies() {
-      this.isRepliesToggledByUser = !this.isRepliesToggledByUser;
+      this.isRepliesCollapsed = !this.isRepliesCollapsed;
     },
     showReplyForm() {
       this.isReplying = true;
