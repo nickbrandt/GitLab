@@ -3834,9 +3834,9 @@ describe Project do
 
     subject { project.root_namespace }
 
-    context 'when namespace has parent group' do
+    context 'when namespace has parent group', :nested_groups do
       let(:root_ancestor) { create(:group) }
-      let(:parent) { build(:group, parent: root_ancestor) }
+      let(:parent) { create(:group, parent: root_ancestor) }
 
       it 'returns root ancestor' do
         is_expected.to eq(root_ancestor)
@@ -3844,7 +3844,7 @@ describe Project do
     end
 
     context 'when namespace is root ancestor' do
-      let(:parent) { build(:group) }
+      let(:parent) { create(:group) }
 
       it 'returns current namespace' do
         is_expected.to eq(parent)
