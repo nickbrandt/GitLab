@@ -13,9 +13,4 @@
       - if issuable.weight
         = form.hidden_field :weight
 
-      = weight_dropdown_tag(issuable, toggle_class: 'js-issuable-form-weight') do
-        %ul
-          - Issue.weight_options.each do |weight|
-            %li
-              %a{ href: '#', data: { id: weight, none: weight === Issue::WEIGHT_NONE }, class: ("is-active" if issuable.weight == weight) }
-                = weight
+      = form.text_field :weight, class: "datepicker form-control", placeholder: "Enter a number", autocomplete: "off", type: "text"

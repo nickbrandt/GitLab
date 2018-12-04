@@ -152,11 +152,7 @@ describe 'New/edit issue', :js do
       expect(page.all('input[name="issue[label_ids][]"]', visible: false)[1].value).to match(label.id.to_s)
       expect(page.all('input[name="issue[label_ids][]"]', visible: false)[2].value).to match(label2.id.to_s)
 
-      click_button 'Weight'
-
-      page.within '.dropdown-menu-weight' do
-        click_link '1'
-      end
+      fill_in 'issue_weight', with: '1'
 
       click_button 'Submit issue'
 
