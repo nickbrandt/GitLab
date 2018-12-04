@@ -103,6 +103,7 @@ excluded_attributes:
     - :import_source
     - :mirror
     - :runners_token
+    - :runners_token_encrypted
     - :repository_storage
     - :repository_read_only
     - :lfs_enabled
@@ -125,6 +126,9 @@ excluded_attributes:
     - :packages_enabled
     - :mirror_last_update_at
     - :mirror_last_successful_update_at
+  namespaces:
+    - :runners_token
+    - :runners_token_encrypted
   project_import_state:
     - :last_error
     - :jid
@@ -168,6 +172,9 @@ excluded_attributes:
     - :encrypted_token_iv
     - :encrypted_url
     - :encrypted_url_iv
+  runners:
+    - :token
+    - :token_encrypted
   services:
     - :template
 
