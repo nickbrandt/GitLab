@@ -1369,7 +1369,7 @@ msgstr ""
 msgid "Browse files"
 msgstr ""
 
-msgid "Built-In"
+msgid "Built-in"
 msgstr ""
 
 msgid "Business metrics (Custom)"
