@@ -3,12 +3,19 @@
 module Gitlab
   module Checks
     class ChangeAccess
+<<<<<<< HEAD
       prepend EE::Gitlab::Checks::ChangeAccess
 
       ATTRIBUTES = %i[user_access project skip_authorization
                       skip_lfs_integrity_check protocol oldrev newrev ref
                       branch_name tag_name logger commits].freeze
 
+=======
+      ATTRIBUTES = %i[user_access project skip_authorization
+                      skip_lfs_integrity_check protocol oldrev newrev ref
+                      branch_name tag_name logger commits].freeze
+
+>>>>>>> upstream/master
       attr_reader(*ATTRIBUTES)
 
       def initialize(

@@ -4,7 +4,10 @@ module Gitlab
   module Checks
     class DiffCheck < BaseChecker
       include Gitlab::Utils::StrongMemoize
+<<<<<<< HEAD
       prepend EE::Gitlab::Checks::DiffCheck
+=======
+>>>>>>> upstream/master
 
       LOG_MESSAGES = {
         validate_file_paths: "Validating diffs' file paths...",
