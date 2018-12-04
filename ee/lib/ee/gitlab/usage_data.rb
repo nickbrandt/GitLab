@@ -100,7 +100,8 @@ module EE
           ldap_users: count(::User.ldap),
           projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active),
           projects_mirrored_with_pipelines_enabled: projects_mirrored_with_pipelines_enabled,
-          projects_with_prometheus_alerts: count(PrometheusAlert.distinct_projects)
+          projects_with_prometheus_alerts: count(PrometheusAlert.distinct_projects),
+          projects_with_packages: count(::Packages::Package.select('distinct project_id'))
         }).merge(service_desk_counts).merge(security_products_usage)
 
         usage_data
