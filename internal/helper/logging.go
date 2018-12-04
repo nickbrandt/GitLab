@@ -94,8 +94,11 @@ func (l *statsCollectingResponseWriter) writeAccessLog(r *http.Request) {
 func (l *statsCollectingResponseWriter) accessLogFields(r *http.Request) log.Fields {
 	duration := time.Since(l.started)
 
+	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+
 	return log.Fields{
 		"host":       r.Host,
+		"remoteIp":   ip,
 		"remoteAddr": r.RemoteAddr,
 		"method":     r.Method,
 		"uri":        ScrubURLParams(r.RequestURI),

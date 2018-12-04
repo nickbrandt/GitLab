@@ -3,7 +3,7 @@ package secret
 import (
 	"fmt"
 
-	"github.com/dgrijalva/jwt-go"
+	jwt "github.com/dgrijalva/jwt-go"
 )
 
 var (

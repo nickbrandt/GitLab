@@ -10,6 +10,40 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Test_statsCollectingResponseWriter_remoteIp_accessLogFields(t *testing.T) {
+	testCases := []struct {
+		remoteAddr string
+		expected   string
+	}{
+		{remoteAddr: "", expected: ""},
+		{remoteAddr: "bogus", expected: ""},
+		{remoteAddr: "8.8.8.8:1234", expected: "8.8.8.8"},
+		{remoteAddr: "8.8.8.8", expected: ""},
+		{remoteAddr: "[2001:db8:85a3:8d3:1319:8a2e:370:7348]", expected: ""},
+		{remoteAddr: "[2001:db8:85a3:8d3:1319:8a2e:370:7348]:443", expected: "2001:db8:85a3:8d3:1319:8a2e:370:7348"},
+	}
+
+	for _, tc := range testCases {
+		req, err := http.NewRequest("GET", "/blah", nil)
+		req.RemoteAddr = tc.remoteAddr
+		assert.Nil(t, err)
+
+		l := &statsCollectingResponseWriter{
+			rw:          nil,
+			status:      200,
+			wroteHeader: true,
+			written:     50,
+			started:     time.Now(),
+		}
+
+		fields := l.accessLogFields(req)
+
+		ip := fields["remoteIp"].(string)
+
+		assert.Equal(t, tc.expected, ip)
+	}
+}
+
 func Test_statsCollectingResponseWriter_accessLogFields(t *testing.T) {
 	passwords := []string{
 		"should_be_filtered",        // Basic case
