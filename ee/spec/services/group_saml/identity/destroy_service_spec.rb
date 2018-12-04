@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe GroupSaml::Identity::DestroyService do
-  let(:identity) { create(:identity, :group_saml) }
+  let(:identity) { create(:group_saml_identity) }
 
   subject { described_class.new(identity) }
 

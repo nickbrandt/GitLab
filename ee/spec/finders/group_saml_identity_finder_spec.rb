@@ -6,7 +6,7 @@ describe GroupSamlIdentityFinder do
   include Gitlab::Routing
 
   let(:user) { create(:user) }
-  let!(:identity) { create(:identity, :group_saml, user: user) }
+  let!(:identity) { create(:group_saml_identity, user: user) }
   let(:group) { identity.saml_provider.group }
 
   subject { described_class.new(user: user) }
