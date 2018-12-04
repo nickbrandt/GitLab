@@ -78,7 +78,8 @@ module Ci
     enum_with_nil config_source: {
       unknown_source: nil,
       repository_source: 1,
-      auto_devops_source: 2
+      auto_devops_source: 2,
+      webide_source: 3 ## EE-specific
     }
 
     # We use `Ci::PipelineEnums.failure_reasons` here so that EE can more easily
@@ -181,6 +182,8 @@ module Ci
     end
 
     scope :internal, -> { where(source: internal_sources) }
+
+    scope :for_user, -> (user) { where(user: user) }
 
     # Returns the pipelines in descending order (= newest first), optionally
     # limited to a number of references.
@@ -507,6 +510,8 @@ module Ci
     end
 
     def ci_yaml_file_path
+      return unless repository_source? || unknown_source?
+
       if project.ci_config_path.blank?
         '.gitlab-ci.yml'
       else
@@ -675,6 +680,7 @@ module Ci
     def ci_yaml_from_repo
       return unless project
       return unless sha
+      return unless ci_yaml_file_path
 
       project.repository.gitlab_ci_yml_for(sha, ci_yaml_file_path)
     rescue GRPC::NotFound, GRPC::Internal

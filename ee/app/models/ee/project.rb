@@ -55,6 +55,8 @@ module EE
 
       has_many :source_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :project_id
 
+      has_many :webide_pipelines, -> { webide_source }, class_name: 'Ci::Pipeline', inverse_of: :project
+
       has_many :prometheus_alerts, inverse_of: :project
       has_many :prometheus_alert_events, inverse_of: :project
 
@@ -480,6 +482,10 @@ module EE
       else
         namespace
       end
+    end
+
+    def active_webide_pipelines(user:)
+      webide_pipelines.running_or_pending.for_user(user)
     end
 
     private
