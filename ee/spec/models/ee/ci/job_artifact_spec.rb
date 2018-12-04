@@ -7,7 +7,7 @@ describe EE::Ci::JobArtifact do
     subject { Ci::JobArtifact.license_management_reports }
 
     context 'when there is a license management report' do
-      let!(:artifact) { create(:ee_ci_job_artifact, :license_management_report) }
+      let!(:artifact) { create(:ee_ci_job_artifact, :license_management) }
 
       it { is_expected.to eq([artifact]) }
     end

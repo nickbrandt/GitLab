@@ -8,10 +8,11 @@ module Gitlab
           SecurityReportParserError = Class.new(Gitlab::Ci::Parsers::ParserError)
 
           def parse!(json_data, report)
-            vulnerabilities = JSON.parse!(json_data)
+            report_data = parse_report(json_data)
+            raise SecurityReportParserError, "Invalid report format" unless report_data.is_a?(Hash)
 
-            vulnerabilities.each do |vulnerability|
-              create_vulnerability(report, vulnerability)
+            report_data["vulnerabilities"].each do |vulnerability|
+              create_vulnerability(report, vulnerability, report_data["version"])
             end
           rescue JSON::ParserError
             raise SecurityReportParserError, 'JSON parsing failed'
@@ -22,7 +23,11 @@ module Gitlab
 
           protected
 
-          def create_vulnerability(report, data)
+          def parse_report(json_data)
+            JSON.parse!(json_data)
+          end
+
+          def create_vulnerability(report, data, version)
             scanner = create_scanner(report, data['scanner'] || mutate_scanner_tool(data['tool']))
             identifiers = create_identifiers(report, data['identifiers'])
 
@@ -38,9 +43,7 @@ module Gitlab
               scanner: scanner,
               identifiers: identifiers,
               raw_metadata: data.to_json,
-              # Version is hardcoded here untill provided in the report.
-              # See https://gitlab.com/gitlab-org/gitlab-ee/issues/8025
-              metadata_version: metadata_version(data)
+              metadata_version: version
             )
           end
 
