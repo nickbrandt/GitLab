@@ -27,7 +27,7 @@ class Profiles::AccountsController < Profiles::ApplicationController
   private
 
   def show_view_variables
-    { user: current_user }
+    {}
   end
 end
 
