@@ -92,6 +92,7 @@ class License < ActiveRecord::Base
     prometheus_alerts
     operations_dashboard
     tracing
+    webide_terminal
   ].freeze
 
   # List all features available for early adopters,
