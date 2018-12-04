@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/getsentry/raven-go"
+	raven "github.com/getsentry/raven-go"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )

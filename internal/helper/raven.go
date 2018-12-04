@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/getsentry/raven-go"
+	raven "github.com/getsentry/raven-go"
 
 	correlation "gitlab.com/gitlab-org/labkit/correlation/raven"
 )
