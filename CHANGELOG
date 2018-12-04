@@ -4,6 +4,10 @@ Formerly known as 'gitlab-git-http-server'.
 
 UNRELEASED
 
+v 7.4.0
+
+- Strip port and include remote IP in access logs !337
+
 v 7.3.0
 
 - Redact sensitive url params as in Rails
