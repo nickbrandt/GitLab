@@ -64,32 +64,59 @@ describe EE::UserCalloutsHelper do
     before do
       allow(Gitlab).to receive(:com?).and_return(gitlab_com)
       allow(Rails.env).to receive(:development?).and_return(rails_dev_env)
+      allow(Gitlab::Database).to receive(:read_only?).and_return(db_read_only)
     end
 
-    context "when we're neither GitLab.com or a Rails development env" do
-      let(:gitlab_com) { false }
-      let(:rails_dev_env) { false }
+    context 'with a writable DB' do
+      let(:db_read_only) { false }
 
-      it 'returns true' do
-        expect(helper.show_gold_trial_suitable_env?).to be_falsey
+      context "when we're neither GitLab.com or a Rails development env" do
+        let(:gitlab_com) { false }
+        let(:rails_dev_env) { false }
+
+        it 'returns true' do
+          expect(helper.show_gold_trial_suitable_env?).to be_falsey
+        end
+      end
+
+      context "when we're GitLab.com" do
+        let(:gitlab_com) { true }
+        let(:rails_dev_env) { false }
+
+        it 'returns true' do
+          expect(helper.show_gold_trial_suitable_env?).to be_truthy
+        end
+      end
+
+      context "when we're a Rails development env" do
+        let(:gitlab_com) { false }
+        let(:rails_dev_env) { true }
+
+        it 'returns true' do
+          expect(helper.show_gold_trial_suitable_env?).to be_truthy
+        end
       end
     end
 
-    context "when we're GitLab.com" do
-      let(:gitlab_com) { true }
-      let(:rails_dev_env) { false }
+    context 'with a readonly DB' do
+      let(:db_read_only) { true }
 
-      it 'returns true' do
-        expect(helper.show_gold_trial_suitable_env?).to be_truthy
+      context "when we're GitLab.com" do
+        let(:gitlab_com) { true }
+        let(:rails_dev_env) { false }
+
+        it 'returns true' do
+          expect(helper.show_gold_trial_suitable_env?).to be_falsey
+        end
       end
-    end
 
-    context "when we're a Rails development env" do
-      let(:gitlab_com) { false }
-      let(:rails_dev_env) { true }
+      context "when we're a Rails development env" do
+        let(:gitlab_com) { false }
+        let(:rails_dev_env) { true }
 
-      it 'returns true' do
-        expect(helper.show_gold_trial_suitable_env?).to be_truthy
+        it 'returns true' do
+          expect(helper.show_gold_trial_suitable_env?).to be_falsey
+        end
       end
     end
   end

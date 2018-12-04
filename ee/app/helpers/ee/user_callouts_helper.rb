@@ -12,7 +12,8 @@ module EE
     end
 
     def show_gold_trial_suitable_env?
-      ::Gitlab.com? || Rails.env.development?
+      (::Gitlab.com? || Rails.env.development?) &&
+        !::Gitlab::Database.read_only?
     end
 
     def users_namespaces_clean?(user)
