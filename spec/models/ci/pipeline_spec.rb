@@ -1284,6 +1284,23 @@ describe Ci::Pipeline, :mailer do
       end
     end
 
+    context 'the source is the repository' do
+      let(:implied_yml) { Gitlab::Template::GitlabCiYmlTemplate.find('Auto-DevOps').content }
+
+      before do
+        pipeline.repository_source!
+      end
+
+      it 'returns the configuration if found' do
+        allow(pipeline.project.repository).to receive(:gitlab_ci_yml_for)
+          .and_return('config')
+
+        expect(pipeline.ci_yaml_file).to be_a(String)
+        expect(pipeline.ci_yaml_file).not_to eq(implied_yml)
+        expect(pipeline.yaml_errors).to be_nil
+      end
+    end
+
     context 'when pipeline is for auto-devops' do
       before do
         pipeline.config_source = 'auto_devops_source'
