@@ -1269,7 +1269,6 @@ describe Ci::Pipeline, :mailer do
 
           is_expected.to eq('custom/path')
         end
-<<<<<<< HEAD
 
         it 'returns default when custom path is nil' do
           allow(pipeline.project).to receive(:ci_config_path) { nil }
@@ -1282,20 +1281,6 @@ describe Ci::Pipeline, :mailer do
 
           is_expected.to eq('.gitlab-ci.yml')
         end
-=======
-
-        it 'returns default when custom path is nil' do
-          allow(pipeline.project).to receive(:ci_config_path) { nil }
-
-          is_expected.to eq('.gitlab-ci.yml')
-        end
-
-        it 'returns default when custom path is empty' do
-          allow(pipeline.project).to receive(:ci_config_path) { '' }
-
-          is_expected.to eq('.gitlab-ci.yml')
-        end
->>>>>>> upstream/master
       end
     end
 
