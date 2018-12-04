@@ -3,10 +3,7 @@
 module Gitlab
   module Checks
     class BaseChecker
-<<<<<<< HEAD
       prepend EE::Gitlab::Checks::BaseChecker
-=======
->>>>>>> upstream/master
       include Gitlab::Utils::StrongMemoize
 
       attr_reader :change_access
