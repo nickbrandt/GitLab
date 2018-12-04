@@ -7226,6 +7226,9 @@ msgstr ""
 msgid "Run CI/CD pipelines for external repositories"
 msgstr ""
 
+msgid "Run tests against your code live using the Web Terminal"
+msgstr ""
+
 msgid "Run untagged jobs"
 msgstr ""
 
@@ -8200,6 +8203,9 @@ msgid "Template"
 msgstr ""
 
 msgid "Templates"
+msgstr ""
+
+msgid "Terminal"
 msgstr ""
 
 msgid "Terminal for environment"
@@ -9314,6 +9320,9 @@ msgid "We want to be sure it is you, please confirm you are not a robot."
 msgstr ""
 
 msgid "Web IDE"
+msgstr ""
+
+msgid "Web Terminal"
 msgstr ""
 
 msgid "Web terminal"
