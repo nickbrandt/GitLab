@@ -5732,6 +5732,9 @@ msgstr ""
 msgid "No schedules"
 msgstr ""
 
+msgid "No start date"
+msgstr ""
+
 msgid "No, directly import the existing email addresses and usernames."
 msgstr ""
 
