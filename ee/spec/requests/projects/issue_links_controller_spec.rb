@@ -38,26 +38,26 @@ describe Projects::IssueLinksController do
 
     context 'with success' do
       let(:user_role) { :developer }
-      let(:issue_references) { [issue_b.to_reference] }
+      let(:issuable_references) { [issue_b.to_reference] }
 
       it 'returns success JSON' do
-        post namespace_project_issue_links_path(issue_links_params(issue_references: issue_references))
+        post namespace_project_issue_links_path(issue_links_params(issuable_references: issuable_references))
 
         list_service_response = IssueLinks::ListService.new(issue, user).execute
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response).to eq('message' => nil,
-                                    'issues' => list_service_response.as_json)
+                                    'issuables' => list_service_response.as_json)
       end
     end
 
     context 'with failure' do
       context 'when unauthorized' do
         let(:user_role) { :guest }
-        let(:issue_references) { [issue_b.to_reference] }
+        let(:issuable_references) { [issue_b.to_reference] }
 
         it 'returns 403' do
-          post namespace_project_issue_links_path(issue_links_params(issue_references: issue_references))
+          post namespace_project_issue_links_path(issue_links_params(issuable_references: issuable_references))
 
           expect(response).to have_gitlab_http_status(403)
         end
@@ -65,15 +65,15 @@ describe Projects::IssueLinksController do
 
       context 'when failing service result' do
         let(:user_role) { :developer }
-        let(:issue_references) { ['#999'] }
+        let(:issuable_references) { ['#999'] }
 
         it 'returns failure JSON' do
-          post namespace_project_issue_links_path(issue_links_params(issue_references: issue_references))
+          post namespace_project_issue_links_path(issue_links_params(issuable_references: issuable_references))
 
           list_service_response = IssueLinks::ListService.new(issue, user).execute
 
           expect(response).to have_gitlab_http_status(404)
-          expect(json_response).to eq('message' => 'No Issue found for given params', 'issues' => list_service_response.as_json)
+          expect(json_response).to eq('message' => 'No Issue found for given params', 'issuables' => list_service_response.as_json)
         end
       end
     end
@@ -121,7 +121,7 @@ describe Projects::IssueLinksController do
 
         list_service_response = IssueLinks::ListService.new(issue, user).execute
 
-        expect(json_response).to eq('issues' => list_service_response.as_json)
+        expect(json_response).to eq('issuables' => list_service_response.as_json)
       end
     end
 

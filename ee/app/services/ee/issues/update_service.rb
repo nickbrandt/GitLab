@@ -25,7 +25,7 @@ module EE
         epic_param = params.delete(:epic)
 
         if epic_param
-          EpicIssues::CreateService.new(epic_param, current_user, { target_issue: issue }).execute
+          EpicIssues::CreateService.new(epic_param, current_user, { target_issuable: issue }).execute
         else
           link = EpicIssue.find_by(issue_id: issue.id) # rubocop: disable CodeReuse/ActiveRecord
 

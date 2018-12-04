@@ -65,7 +65,7 @@ describe Groups::EpicIssuesController do
     subject do
       reference = [issue.to_reference(full: true)]
 
-      post :create, group_id: group, epic_id: epic.to_param, issue_references: reference
+      post :create, group_id: group, epic_id: epic.to_param, issuable_references: reference
     end
 
     it_behaves_like 'unlicensed epics action'
@@ -81,7 +81,7 @@ describe Groups::EpicIssuesController do
           list_service_response = EpicIssues::ListService.new(epic, user).execute
 
           expect(response).to have_gitlab_http_status(200)
-          expect(json_response).to eq('message' => nil, 'issues' => list_service_response.as_json)
+          expect(json_response).to eq('message' => nil, 'issuables' => list_service_response.as_json)
         end
 
         it 'creates a new EpicIssue record' do

@@ -4,7 +4,7 @@ module IssueLinks
 
     private
 
-    def issues
+    def child_issuables
       issuable.related_issues(current_user, preload: { project: :namespace })
     end
 
