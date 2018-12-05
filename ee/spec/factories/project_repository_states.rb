@@ -6,7 +6,7 @@ FactoryBot.define do
       repository_verification_checksum nil
       last_repository_verification_failure 'Could not calculate the checksum'
       repository_retry_count 1
-      repository_retry_at { Time.now + 5.minutes }
+      repository_retry_at { 5.minutes.ago }
     end
 
     trait :repository_outdated do
@@ -25,7 +25,7 @@ FactoryBot.define do
       wiki_verification_checksum nil
       last_wiki_verification_failure 'Could not calculate the checksum'
       wiki_retry_count 1
-      wiki_retry_at { Time.now + 5.minutes }
+      wiki_retry_at { 5.minutes.ago }
     end
 
     trait :wiki_outdated do

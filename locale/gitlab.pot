@@ -360,6 +360,9 @@ msgstr ""
 msgid "Abuse reports"
 msgstr ""
 
+msgid "Accept invitation"
+msgstr ""
+
 msgid "Accept terms"
 msgstr ""
 
@@ -606,6 +609,12 @@ msgid "An error accured whilst committing your changes."
 msgstr ""
 
 msgid "An error has occurred"
+msgstr ""
+
+msgid "An error occured while fetching this downstream pipeline. Please try again"
+msgstr ""
+
+msgid "An error occured while fetching this upstream pipeline. Please try again"
 msgstr ""
 
 msgid "An error occurred adding a draft to the discussion."
@@ -1360,7 +1369,7 @@ msgstr ""
 msgid "Browse files"
 msgstr ""
 
-msgid "Built-In"
+msgid "Built-in"
 msgstr ""
 
 msgid "Business metrics (Custom)"
@@ -1508,6 +1517,9 @@ msgid "Check the %{docs_link_start}documentation%{docs_link_end}."
 msgstr ""
 
 msgid "Checking %{text} availability…"
+msgstr ""
+
+msgid "Checking approval status"
 msgstr ""
 
 msgid "Checking branch availability..."
@@ -1903,13 +1915,13 @@ msgstr ""
 msgid "ClusterIntegration|Knative"
 msgstr ""
 
-msgid "ClusterIntegration|Knative (pronounced kay-nay-tiv) extends Kubernetes to provide a set of middleware components that are essential to build modern, source-centric, and container-based applications that can run anywhere: on premises, in the cloud, or even in a third-party data center."
-msgstr ""
-
 msgid "ClusterIntegration|Knative Domain Name:"
 msgstr ""
 
 msgid "ClusterIntegration|Knative IP Address:"
+msgstr ""
+
+msgid "ClusterIntegration|Knative extends Kubernetes to provide a set of middleware components that are essential to build modern, source-centric, and container-based applications that can run anywhere: on premises, in the cloud, or even in a third-party data center."
 msgstr ""
 
 msgid "ClusterIntegration|Kubernetes cluster"
@@ -2666,6 +2678,9 @@ msgstr ""
 msgid "December"
 msgstr ""
 
+msgid "Decline"
+msgstr ""
+
 msgid "Decline and sign out"
 msgstr ""
 
@@ -2993,6 +3008,9 @@ msgid "DownloadCommit|Plain Diff"
 msgstr ""
 
 msgid "DownloadSource|Download"
+msgstr ""
+
+msgid "Downstream"
 msgstr ""
 
 msgid "Downvotes"
@@ -4392,6 +4410,9 @@ msgstr ""
 msgid "Housekeeping successfully started"
 msgstr ""
 
+msgid "However, you are already a member of this %{member_source}. Sign in using a different account to accept the invitation."
+msgstr ""
+
 msgid "I accept the %{terms_link}"
 msgstr ""
 
@@ -4620,6 +4641,9 @@ msgid "Interval Pattern"
 msgstr ""
 
 msgid "Introducing Cycle Analytics"
+msgstr ""
+
+msgid "Invitation"
 msgstr ""
 
 msgid "Invite"
@@ -5247,6 +5271,18 @@ msgstr ""
 msgid "MergeRequests|View replaced file @ %{commitId}"
 msgstr ""
 
+msgid "MergeRequests|started a discussion"
+msgstr ""
+
+msgid "MergeRequests|started a discussion on %{linkStart}an old version of the diff%{linkEnd}"
+msgstr ""
+
+msgid "MergeRequests|started a discussion on %{linkStart}the diff%{linkEnd}"
+msgstr ""
+
+msgid "MergeRequests|started a discussion on commit %{linkStart}%{commitId}%{linkEnd}"
+msgstr ""
+
 msgid "MergeRequest| %{paragraphStart}changed the description %{descriptionChangedTimes} times %{timeDifferenceMinutes}%{paragraphEnd}"
 msgstr ""
 
@@ -5317,6 +5353,9 @@ msgid "Metrics|Name"
 msgstr ""
 
 msgid "Metrics|New metric"
+msgstr ""
+
+msgid "Metrics|No data to display"
 msgstr ""
 
 msgid "Metrics|No deployed environments"
@@ -5693,6 +5732,9 @@ msgstr ""
 msgid "No schedules"
 msgstr ""
 
+msgid "No start date"
+msgstr ""
+
 msgid "No, directly import the existing email addresses and usernames."
 msgstr ""
 
@@ -5724,6 +5766,9 @@ msgid "Not now"
 msgstr ""
 
 msgid "Note that the master branch is automatically protected. %{link_to_protected_branches}"
+msgstr ""
+
+msgid "Note that this invitation was sent to %{mail_to_invite_email}, but you are signed in as %{link_to_current_user} with email %{mail_to_current_user}."
 msgstr ""
 
 msgid "Note: As an administrator you may like to configure %{github_integration_link}, which will allow login via GitHub and allow connecting repositories without generating a Personal Access Token."
@@ -7184,6 +7229,9 @@ msgstr ""
 msgid "Run CI/CD pipelines for external repositories"
 msgstr ""
 
+msgid "Run tests against your code live using the Web Terminal"
+msgstr ""
+
 msgid "Run untagged jobs"
 msgstr ""
 
@@ -7245,6 +7293,9 @@ msgid "SAML Single Sign On"
 msgstr ""
 
 msgid "SAML Single Sign On Settings"
+msgstr ""
+
+msgid "SAML for %{group_name}"
 msgstr ""
 
 msgid "SAST"
@@ -8160,6 +8211,9 @@ msgstr ""
 msgid "Templates"
 msgstr ""
 
+msgid "Terminal"
+msgstr ""
+
 msgid "Terminal for environment"
 msgstr ""
 
@@ -9025,6 +9079,9 @@ msgstr ""
 msgid "UploadLink|click to upload"
 msgstr ""
 
+msgid "Upstream"
+msgstr ""
+
 msgid "Upvotes"
 msgstr ""
 
@@ -9220,6 +9277,9 @@ msgstr ""
 msgid "VisibilityLevel|Unknown"
 msgstr ""
 
+msgid "Vulnerability List"
+msgstr ""
+
 msgid "Vulnerability|Class"
 msgstr ""
 
@@ -9266,6 +9326,9 @@ msgid "We want to be sure it is you, please confirm you are not a robot."
 msgstr ""
 
 msgid "Web IDE"
+msgstr ""
+
+msgid "Web Terminal"
 msgstr ""
 
 msgid "Web terminal"
@@ -9943,6 +10006,9 @@ msgid "for this project"
 msgstr ""
 
 msgid "from"
+msgstr ""
+
+msgid "group"
 msgstr ""
 
 msgid "help"

@@ -79,8 +79,10 @@ module Geo
         projects_table
           .join(repository_state_table).on(project_id_matcher)
           .project(projects_table[:id], repository_state_table["#{type}_retry_at"])
-          .where(repository_state_table["last_#{type}_verification_failure"].not_eq(nil))
-          .take(batch_size)
+          .where(
+            repository_state_table["#{type}_retry_at"].lt(Time.now)
+              .and(repository_state_table["last_#{type}_verification_failure"].not_eq(nil))
+          ).take(batch_size)
 
       query = apply_shard_restriction(query) if shard_name.present?
       query

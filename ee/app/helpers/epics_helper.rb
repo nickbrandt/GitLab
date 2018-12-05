@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EpicsHelper
   def epic_show_app_data(epic, opts)
     group = epic.group

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AuditLogsHelper
   def event_type_options
     [

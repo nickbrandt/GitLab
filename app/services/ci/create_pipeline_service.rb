@@ -4,6 +4,8 @@ module Ci
   class CreatePipelineService < BaseService
     attr_reader :pipeline
 
+    CreateError = Class.new(StandardError)
+
     SEQUENCE = [Gitlab::Ci::Pipeline::Chain::Build,
                 EE::Gitlab::Ci::Pipeline::Chain::RemoveUnwantedChatJobs,
                 Gitlab::Ci::Pipeline::Chain::Validate::Abilities,
@@ -15,7 +17,7 @@ module Ci
                 Gitlab::Ci::Pipeline::Chain::Create,
                 EE::Gitlab::Ci::Pipeline::Chain::Limit::Activity].freeze
 
-    def execute(source, ignore_skip_ci: false, save_on_errors: true, trigger_request: nil, schedule: nil, mirror_update: false, &block)
+    def execute(source, ignore_skip_ci: false, save_on_errors: true, trigger_request: nil, schedule: nil, merge_request: nil, mirror_update: false, &block)
       @pipeline = Ci::Pipeline.new
 
       command = Gitlab::Ci::Pipeline::Chain::Command.new(
@@ -26,6 +28,7 @@ module Ci
         before_sha: params[:before],
         trigger_request: trigger_request,
         schedule: schedule,
+        merge_request: merge_request,
         ignore_skip_ci: ignore_skip_ci,
         save_incompleted: save_on_errors,
         seeds_block: block,
@@ -53,6 +56,14 @@ module Ci
       end
 
       pipeline
+    end
+
+    def execute!(*args, &block)
+      execute(*args, &block).tap do |pipeline|
+        unless pipeline.persisted?
+          raise CreateError, pipeline.errors.full_messages.join(',')
+        end
+      end
     end
 
     private

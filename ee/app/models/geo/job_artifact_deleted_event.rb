@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   class JobArtifactDeletedEvent < ActiveRecord::Base
     include Geo::Model

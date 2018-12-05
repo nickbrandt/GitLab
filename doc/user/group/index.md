@@ -324,6 +324,11 @@ To enable this feature, navigate to the group settings page, expand the
 
 ![Group file template settings](img/group_file_template_settings.png)
 
+#### Group-level project templates **[PREMIUM]**
+
+Define project templates at a group-level by setting a group as a template source.
+[Learn more about group-level project templates](custom_project_templates.md).
+
 ### Advanced settings
 
 - **Projects**: view all projects within that group, add members to each project,

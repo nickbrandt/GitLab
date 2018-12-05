@@ -18,6 +18,10 @@ describe Gitlab::UsageData do
       create(:prometheus_alert, project: projects[0])
       create(:prometheus_alert, project: projects[0])
       create(:prometheus_alert, project: projects[1])
+
+      create(:package, project: projects[0])
+      create(:package, project: projects[0])
+      create(:package, project: projects[1])
     end
 
     subject { described_class.data }
@@ -59,9 +63,11 @@ describe Gitlab::UsageData do
         license_management_jobs
         sast_jobs
         projects_with_prometheus_alerts
+        projects_with_packages
       ))
 
       expect(count_data[:projects_with_prometheus_alerts]).to eq(2)
+      expect(count_data[:projects_with_packages]).to eq(2)
     end
 
     it 'gathers security products usage data' do

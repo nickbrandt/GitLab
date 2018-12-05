@@ -26,7 +26,7 @@ module API
       requires :id, type: String, desc: 'The ID of a project'
       requires :merge_request_iid, type: Integer, desc: 'The IID of a merge request'
     end
-    resource :projects, requirements: ::API::API::PROJECT_ENDPOINT_REQUIREMENTS do
+    resource :projects, requirements: ::API::API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       segment ':id/merge_requests/:merge_request_iid' do
         # Get the status of the merge request's approvals
         #

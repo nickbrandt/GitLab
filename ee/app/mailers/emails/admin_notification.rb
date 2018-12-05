@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Emails
   module AdminNotification
     def send_admin_notification(user_id, subject, body)

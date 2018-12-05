@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module ProjectsHelper
     extend ::Gitlab::Utils::Override

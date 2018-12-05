@@ -23,7 +23,7 @@ describe 'Project' do
 
       it 'shows built-in templates tab' do
         page.within '.project-template .built-in-tab' do
-          expect(page).to have_content 'Built-In'
+          expect(page).to have_content 'Built-in'
         end
       end
 

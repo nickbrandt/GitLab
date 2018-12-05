@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PrometheusAlert < ActiveRecord::Base
   OPERATORS_MAP = {
     lt: "<",

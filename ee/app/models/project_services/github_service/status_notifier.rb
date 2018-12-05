@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GithubService
   class StatusNotifier
     def initialize(access_token, repo_path, api_endpoint: nil)

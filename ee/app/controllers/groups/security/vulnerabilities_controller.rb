@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 class Groups::Security::VulnerabilitiesController < Groups::Security::ApplicationController
   def index
-    @vulnerabilities = group.latest_vulnerabilities.ordered
+    @vulnerabilities = group.latest_vulnerabilities
+      .sast # FIXME: workaround until https://gitlab.com/gitlab-org/gitlab-ee/issues/6240
+      .ordered
       .page(params[:page])
 
     respond_to do |format|

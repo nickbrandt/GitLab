@@ -33,7 +33,7 @@ module API
       requires :id, type: String, desc: 'The ID of a group'
     end
 
-    resource :groups, requirements: API::PROJECT_ENDPOINT_REQUIREMENTS do
+    resource :groups, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc 'Update epic issue association' do
       end
       params do

@@ -44,6 +44,12 @@ describe Projects::UpdateMirrorService do
       expect(result[:status]).to eq(:success)
     end
 
+    it "disables mirroring protected branches only by default" do
+      new_project = create(:project, :repository, :mirror, import_url: Project::UNKNOWN_IMPORT_URL)
+
+      expect(new_project.only_mirror_protected_branches).to be_falsey
+    end
+
     context "updating tags" do
       it "creates new tags" do
         stub_fetch_mirror(project)

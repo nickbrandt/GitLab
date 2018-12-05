@@ -153,7 +153,15 @@ export default class MergeRequestStore extends CEMergeRequestStore {
           if (issue.location.lines && issue.location.lines.begin) {
             parsedIssue.line = issue.location.lines.begin;
             parseCodeQualityUrl += `#L${issue.location.lines.begin}`;
+          } else if (
+            issue.location.positions &&
+            issue.location.positions.begin &&
+            issue.location.positions.begin.line
+          ) {
+            parsedIssue.line = issue.location.positions.begin.line;
+            parseCodeQualityUrl += `#L${issue.location.positions.begin.line}`;
           }
+
           parsedIssue.urlPath = parseCodeQualityUrl;
         }
       }

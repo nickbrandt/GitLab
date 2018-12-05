@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CustomModelNaming
   # Extracted from: https://github.com/stevenbarragan/spree_random_subscriptions/blob/5426ccaf8a2084c495b2cac9dfbd27e30ade0cec/lib/custom_model_naming.rb
 

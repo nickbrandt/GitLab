@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EpicIssue < ActiveRecord::Base
   include RelativePositioning
 

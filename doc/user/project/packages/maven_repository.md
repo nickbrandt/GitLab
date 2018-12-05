@@ -192,7 +192,7 @@ shows how to create a new package each time the `master` branch is updated:
     <repositories>
       <repository>
         <id>gitlab-maven</id>
-        <url>https://gitlab.com/api/v4/projects/${env.CI_PROJECT_ID}packages/maven</url>
+        <url>https://gitlab.com/api/v4/projects/${env.CI_PROJECT_ID}/packages/maven</url>
       </repository>
     </repositories>
     <distributionManagement>

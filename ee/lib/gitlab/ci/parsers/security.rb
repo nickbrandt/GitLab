@@ -7,7 +7,8 @@ module Gitlab
         ParserNotFoundError = Class.new(StandardError)
 
         PARSERS = {
-          sast: ::Gitlab::Ci::Parsers::Security::Sast
+          sast: ::Gitlab::Ci::Parsers::Security::Common,
+          dependency_scanning: ::Gitlab::Ci::Parsers::Security::Common
         }.freeze
 
         def self.fabricate!(file_type)

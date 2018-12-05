@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module AppearancesHelper
     def header_message
@@ -26,10 +28,10 @@ module EE
     end
 
     def message_style
-      style = ''
+      style = []
       style << "background-color: #{current_appearance.message_background_color};"
       style << "color: #{current_appearance.message_font_color}"
-      style
+      style.join
     end
   end
 end

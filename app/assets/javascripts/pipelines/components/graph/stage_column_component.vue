@@ -27,10 +27,10 @@ export default {
       required: false,
       default: '',
     },
-
     hasTriggeredBy: {
       type: Boolean,
-      required: true,
+      required: false,
+      default: false,
     },
   },
   methods: {

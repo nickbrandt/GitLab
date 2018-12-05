@@ -260,14 +260,26 @@ export default {
           : this.dueDateSourcingMilestoneDates;
 
       if (startDateTimeFromMilestones && dueDateTimeFromMilestones) {
-        const startDate = parsePikadayDate(sourcingMilestoneDates.startDate);
-        const dueDate = parsePikadayDate(sourcingMilestoneDates.dueDate);
+        const { startDate, dueDate } = sourcingMilestoneDates;
+        let startDateInWords = __('No start date');
+        let dueDateInWords = __('No due date');
 
-        return `${dateSourcingMilestoneTitle}<br/><span class="text-tertiary">${dateInWords(
-          startDate,
-          true,
-          startDate.getFullYear() === dueDate.getFullYear(),
-        )} – ${dateInWords(dueDate, true)}</span>`;
+        if (startDate && dueDate) {
+          const startDateObj = parsePikadayDate(startDate);
+          const dueDateObj = parsePikadayDate(dueDate);
+          startDateInWords = dateInWords(
+            startDateObj,
+            true,
+            startDateObj.getFullYear() === dueDateObj.getFullYear(),
+          );
+          dueDateInWords = dateInWords(dueDateObj, true);
+        } else if (startDate && !dueDate) {
+          startDateInWords = dateInWords(parsePikadayDate(startDate), true);
+        } else {
+          dueDateInWords = dateInWords(parsePikadayDate(dueDate), true);
+        }
+
+        return `${dateSourcingMilestoneTitle}<br/><span class="text-tertiary">${startDateInWords} – ${dueDateInWords}</span>`;
       }
 
       return sprintf(
@@ -449,7 +461,7 @@ export default {
   >
     <div class="issuable-sidebar js-issuable-update">
       <div class="block issuable-sidebar-header">
-        <span class="issuable-header-text hide-collapsed float-left"> {{ __('Todo') }} </span>
+        <span class="issuable-header-text hide-collapsed float-left">{{ __('Todo') }}</span>
         <toggle-sidebar :collapsed="collapsed" css-classes="float-right" @toggle="toggleSidebar" />
         <sidebar-todo
           v-if="!collapsed"
@@ -535,9 +547,8 @@ export default {
         @onLabelClick="handleLabelClick"
         @onDropdownClose="handleDropdownClose"
         @toggleCollapse="toggleSidebarRevealLabelsDropdown"
+        >{{ __('None') }}</sidebar-labels-select
       >
-        {{ __('None') }}
-      </sidebar-labels-select>
       <sidebar-participants :participants="initialParticipants" @toggleCollapse="toggleSidebar" />
       <sidebar-subscriptions
         :loading="savingSubscription"

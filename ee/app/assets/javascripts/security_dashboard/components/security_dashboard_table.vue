@@ -89,7 +89,8 @@ export default {
 
 <style>
 .vulnerabilities-row-header {
-  color: #707070;
+  background-color: #fafafa;
+  font-size: 1rem;
   padding-left: 0.4em;
   padding-right: 0.4em;
 }

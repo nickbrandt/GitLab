@@ -15,7 +15,7 @@ module EE
 
         override :sources
         def sources
-          super.merge(pipeline: 7, chat: 8)
+          super.merge(pipeline: 7, chat: 8, webide: 9)
         end
       end
     end

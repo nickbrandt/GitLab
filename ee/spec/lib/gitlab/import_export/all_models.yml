@@ -68,6 +68,7 @@ project:
 - project_registry
 - packages
 - tracing_setting
+- webide_pipelines
 prometheus_metrics:
 - project
 - prometheus_alerts

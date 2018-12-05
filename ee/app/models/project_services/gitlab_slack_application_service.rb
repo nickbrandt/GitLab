@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GitlabSlackApplicationService < Service
   default_value_for :category, 'chat'
 

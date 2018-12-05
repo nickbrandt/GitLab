@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GeoNodeNamespaceLink < ActiveRecord::Base
   belongs_to :geo_node, inverse_of: :namespaces
   belongs_to :namespace

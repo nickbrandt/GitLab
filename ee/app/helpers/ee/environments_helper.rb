@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module EnvironmentsHelper
     def metrics_data(project, environment)

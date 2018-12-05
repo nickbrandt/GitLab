@@ -780,6 +780,7 @@ PUT /projects/:id
 | `mirror_trigger_builds` | boolean | no | Pull mirroring triggers builds |
 | `only_mirror_protected_branches` | boolean | no | Only mirror protected branches |
 | `mirror_overwrites_diverged_branches` | boolean | no | Pull mirror overwrites diverged branches |
+| `packages_enabled` | boolean | no | Enable or disable packages repository feature |
 
 >**Note**: If your HTTP repository is not publicly accessible,
 add authentication information to the URL: `https://username:password@gitlab.company.com/group/project.git`

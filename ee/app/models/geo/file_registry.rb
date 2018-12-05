@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Geo::FileRegistry < Geo::BaseRegistry
   include Geo::Syncable
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module MergeRequestsHelper
     def render_items_list(items, separator = "and")

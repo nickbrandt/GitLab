@@ -33,13 +33,30 @@ export default class PipelineStore extends CePipelineStore {
     super.storePipeline(pipeline);
 
     if (pipeline.triggered && pipeline.triggered.length) {
-      this.state.triggeredPipelines = pipeline.triggered.map(triggered =>
-        PipelineStore.parsePipeline(triggered),
-      );
+      this.state.triggeredPipelines = pipeline.triggered.map(triggered => {
+        // because we are polling we need to make sure we do not hijack user's clicks.
+        const oldPipeline = this.state.triggeredPipelines.find(
+          oldValue => oldValue.id === triggered.id,
+        );
+
+        return Object.assign({}, triggered, {
+          isCollapsed: oldPipeline ? oldPipeline.isCollapsed : true,
+          isLoading: oldPipeline ? oldPipeline.isLoading : false,
+        });
+      });
     }
 
     if (pipeline.triggered_by) {
-      this.state.triggeredByPipelines = [PipelineStore.parsePipeline(pipeline.triggered_by)];
+      this.state.triggeredByPipelines = [
+        Object.assign({}, pipeline.triggered_by, {
+          isCollapsed: this.state.triggeredByPipelines.length
+            ? this.state.triggeredByPipelines[0].isCollapsed
+            : true,
+          isLoading: this.state.triggeredByPipelines.length
+            ? this.state.triggeredByPipelines[0].isLoading
+            : false,
+        }),
+      ];
     }
   }
 
@@ -72,7 +89,7 @@ export default class PipelineStore extends CePipelineStore {
     this.updatePipeline(
       pipelinesKeys.triggeredPipelines,
       pipeline,
-      { isLoading: false },
+      { isLoading: false, isCollapsed: false },
       pipelinesKeys.triggered,
       response,
     );
@@ -121,7 +138,7 @@ export default class PipelineStore extends CePipelineStore {
     this.updatePipeline(
       pipelinesKeys.triggeredByPipelines,
       pipeline,
-      { isLoading: false },
+      { isLoading: false, isCollapsed: false },
       pipelinesKeys.triggeredBy,
       response,
     );
@@ -183,7 +200,6 @@ export default class PipelineStore extends CePipelineStore {
       if (triggered.id === pipeline.id) {
         return Object.assign({}, triggered, { isLoading: true, isCollapsed: false });
       }
-
       // reset the others, in case another was one opened
       return PipelineStore.parsePipeline(triggered);
     });
