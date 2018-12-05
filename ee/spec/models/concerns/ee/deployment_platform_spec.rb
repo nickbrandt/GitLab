@@ -2,7 +2,8 @@ require 'rails_helper'
 
 describe EE::DeploymentPlatform do
   describe '#deployment_platform' do
-    let(:project) { create(:project) }
+    let(:group) { create(:group) }
+    let(:project) { create(:project, group: group) }
 
     shared_examples 'matching environment scope' do
       context 'when multiple clusters license is available' do
@@ -48,9 +49,87 @@ describe EE::DeploymentPlatform do
       end
     end
 
+    context 'when project does not have a cluster but has group clusters' do
+      let!(:default_cluster) do
+        create(:cluster, :provided_by_user,
+               cluster_type: :group_type, groups: [group], environment_scope: '*')
+      end
+
+      let!(:cluster) do
+        create(:cluster, :provided_by_user,
+               cluster_type: :group_type, environment_scope: 'review/*', groups: [group])
+      end
+
+      let(:environment) { 'review/name' }
+
+      subject { project.deployment_platform(environment: environment) }
+
+      context 'when environment scope is exactly matched' do
+        before do
+          cluster.update!(environment_scope: 'review/name')
+        end
+
+        it_behaves_like 'matching environment scope'
+      end
+
+      context 'when environment scope is matched by wildcard' do
+        before do
+          cluster.update!(environment_scope: 'review/*')
+        end
+
+        it_behaves_like 'matching environment scope'
+      end
+
+      context 'when environment scope does not match' do
+        before do
+          cluster.update!(environment_scope: 'review/*/special')
+        end
+
+        it_behaves_like 'not matching environment scope'
+      end
+
+      context 'when group belongs to a parent group' do
+        let(:parent_group) { create(:group) }
+        let(:group) { create(:group, parent: parent_group) }
+
+        context 'when parent_group has a cluster with default scope' do
+          let!(:parent_group_cluster) do
+            create(:cluster, :provided_by_user,
+                   cluster_type: :group_type, environment_scope: '*', groups: [parent_group])
+          end
+
+          it_behaves_like 'matching environment scope'
+        end
+
+        context 'when parent_group has a cluster that is an exact match' do
+          let!(:parent_group_cluster) do
+            create(:cluster, :provided_by_user,
+                   cluster_type: :group_type, environment_scope: 'review/name', groups: [parent_group])
+          end
+
+          it_behaves_like 'matching environment scope'
+        end
+      end
+
+      context 'when feature flag disabled' do
+        before do
+          stub_feature_flags(group_clusters: false)
+        end
+
+        it 'returns nil' do
+          expect(subject).to be_nil
+        end
+      end
+    end
+
     context 'when environment is specified' do
       let!(:default_cluster) { create(:cluster, :provided_by_user, projects: [project], environment_scope: '*') }
       let!(:cluster) { create(:cluster, :provided_by_user, environment_scope: 'review/*', projects: [project]) }
+
+      let!(:group_default_cluster) do
+        create(:cluster, :provided_by_user,
+               cluster_type: :group_type, groups: [group], environment_scope: '*')
+      end
 
       let(:environment) { 'review/name' }
 
