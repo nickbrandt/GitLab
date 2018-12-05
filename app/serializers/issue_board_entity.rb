@@ -2,10 +2,7 @@
 
 class IssueBoardEntity < Grape::Entity
   include RequestAwareEntity
-<<<<<<< HEAD
   prepend ::EE::IssueBoardEntity
-=======
->>>>>>> upstream/master
 
   expose :id
   expose :iid
