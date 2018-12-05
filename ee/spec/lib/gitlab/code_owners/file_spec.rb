@@ -160,5 +160,23 @@ describe Gitlab::CodeOwners::File do
         expect(owners).not_to include('username', 'and-email@lookalikes.com')
       end
     end
+
+    context 'a glob on the root directory' do
+      let(:file_content) do
+        '/* @user-1 @user-2'
+      end
+
+      it 'matches files in the root directory' do
+        owners = file.owners_for_path('README.md')
+
+        expect(owners).to include('user-1', 'user-2')
+      end
+
+      it 'does not match nested files' do
+        owners = file.owners_for_path('nested/path/README.md')
+
+        expect(owners).to be_nil
+      end
+    end
   end
 end

@@ -3,6 +3,8 @@
 module Gitlab
   module CodeOwners
     class File
+      ROOT_DIR_PATTERN = '/*'
+
       def initialize(blob)
         @blob = blob
       end
@@ -52,6 +54,8 @@ module Gitlab
       end
 
       def normalize_pattern(pattern)
+        return ROOT_DIR_PATTERN if pattern == ROOT_DIR_PATTERN
+
         # Remove `\` when escaping `\#`
         pattern = pattern.sub(/\A\\#/, '#')
         # Replace all whitespace preceded by a \ with a regular whitespace
@@ -74,7 +78,11 @@ module Gitlab
       def path_matches?(pattern, path)
         flags = ::File::FNM_DOTMATCH
 
-        if pattern.ends_with?('/*')
+        if pattern == ROOT_DIR_PATTERN
+          # Matching everyting on the root, but only one level deep
+          flags |= ::File::FNM_PATHNAME
+          ::File.fnmatch?('*', path, flags)
+        elsif pattern.ends_with?('/*')
           # Then the pattern ends in a wildcard, we only want to go one level deep
           # setting `::File::FNM_PATHNAME` makes the `*` not match directory
           # separators
