@@ -81,5 +81,23 @@ module EE
 
       compare_reports(::Ci::CompareLicenseManagementReportsService)
     end
+
+    def finalize_approvals
+      return unless merged?
+
+      copy_project_approval_rules unless approval_rules.regular.exists?
+
+      approval_rules.each(&:sync_approvals)
+    end
+
+    private
+
+    def copy_project_approval_rules
+      target_project.approval_rules.each do |project_rule|
+        rule = approval_rules.create!(project_rule.attributes.slice('approvals_required', 'name'))
+        rule.users = project_rule.users
+        rule.groups = project_rule.groups
+      end
+    end
   end
 end
