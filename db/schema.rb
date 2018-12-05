@@ -1238,6 +1238,7 @@ ActiveRecord::Schema.define(version: 20181204135932) do
     t.string "selective_sync_type"
     t.text "selective_sync_shards"
     t.integer "verification_max_capacity", default: 100, null: false
+    t.integer "minimum_reverification_interval", default: 7, null: false
     t.index ["access_key"], name: "index_geo_nodes_on_access_key", using: :btree
     t.index ["primary"], name: "index_geo_nodes_on_primary", using: :btree
     t.index ["url"], name: "index_geo_nodes_on_url", unique: true, using: :btree
@@ -2175,8 +2176,12 @@ ActiveRecord::Schema.define(version: 20181204135932) do
     t.datetime_with_timezone "wiki_retry_at"
     t.integer "repository_retry_count"
     t.integer "wiki_retry_count"
+    t.datetime_with_timezone "last_repository_verification_ran_at"
+    t.datetime_with_timezone "last_wiki_verification_ran_at"
     t.index ["last_repository_verification_failure"], name: "idx_repository_states_on_repository_failure_partial", where: "(last_repository_verification_failure IS NOT NULL)", using: :btree
     t.index ["last_wiki_verification_failure"], name: "idx_repository_states_on_wiki_failure_partial", where: "(last_wiki_verification_failure IS NOT NULL)", using: :btree
+    t.index ["project_id", "last_repository_verification_ran_at"], name: "idx_repository_states_on_last_repository_verification_ran_at", where: "((repository_verification_checksum IS NOT NULL) AND (last_repository_verification_failure IS NULL))", using: :btree
+    t.index ["project_id", "last_wiki_verification_ran_at"], name: "idx_repository_states_on_last_wiki_verification_ran_at", where: "((wiki_verification_checksum IS NOT NULL) AND (last_wiki_verification_failure IS NULL))", using: :btree
     t.index ["project_id"], name: "idx_repository_states_outdated_checksums", where: "(((repository_verification_checksum IS NULL) AND (last_repository_verification_failure IS NULL)) OR ((wiki_verification_checksum IS NULL) AND (last_wiki_verification_failure IS NULL)))", using: :btree
     t.index ["project_id"], name: "index_project_repository_states_on_project_id", unique: true, using: :btree
   end

@@ -2417,6 +2417,9 @@ msgstr ""
 msgid "Control the maximum concurrency of verification operations for this Geo node"
 msgstr ""
 
+msgid "Control the minimum interval in days that a repository should be reverified for this primary node"
+msgstr ""
+
 msgid "ConvDev Index"
 msgstr ""
 
@@ -3992,6 +3995,9 @@ msgid "Geo|Projects in certain groups"
 msgstr ""
 
 msgid "Geo|Projects in certain storage shards"
+msgstr ""
+
+msgid "Geo|Re-verification interval"
 msgstr ""
 
 msgid "Geo|Recheck"
