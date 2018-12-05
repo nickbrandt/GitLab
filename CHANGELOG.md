@@ -4,12 +4,13 @@ entry.
 
 ## 11.3.11 (2018-11-26)
 
-### Security (32 changes)
+### Security (33 changes)
 
 - Filter user sensitive data from discussions JSON. !2537
 - Escape entity title while autocomplete template rendering to prevent XSS. !2557
-- Resolve reflected XSS in Ouath authorize window.
+- Restrict Personal Access Tokens to API scope on web requests.
 - Fix XSS in merge request source branch name.
+- Escape user fullname while rendering autocomplete template to prevent XSS.
 - Fix CRLF vulnerability in Project hooks.
 - Fix possible XSS attack in Markdown urls with spaces.
 - Redact sensitive information on gitlab-workhorse log.
@@ -21,8 +22,13 @@ entry.
 - Markdown API no longer displays confidential title references unless authorized.
 - Provide email notification when a user changes their email address.
 - Properly filter private references from system notes.
+<<<<<<< HEAD
 - Restrict Personal Access Tokens to API scope on web requests.
 - Redact personal tokens in unsubscribe links.
+=======
+- Redact personal tokens in unsubscribe links.
+- Resolve reflected XSS in Ouath authorize window.
+>>>>>>> 90d09306d976fb6ca96be6fce09e4e89b9a34c97
 - Fix SSRF in project integrations.
 - Fix stored XSS in merge requests from imported repository.
 - Fixed ability to comment on locked/confidential issues.
