@@ -111,7 +111,7 @@ class Gitlab::Seeder::Pipelines
   end
 
   def create_pipeline!(project, ref, commit)
-    project.pipelines.create!(sha: commit.id, ref: ref, source: :push)
+    project.ci_pipelines.create!(sha: commit.id, ref: ref, source: :push)
   end
 
   def build_create!(pipeline, opts = {})

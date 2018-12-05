@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import pendingAvatarSvg from 'ee_icons/_icon_dotted_circle.svg';
 import ApprovalsFooter from 'ee/vue_merge_request_widget/components/approvals/approvals_footer.vue';
 import { TEST_HOST } from 'spec/test_constants';
 
@@ -13,8 +12,7 @@ describe('Approvals Footer Component', () => {
     userCanApprove: false,
     userHasApproved: true,
     approvedBy: [],
-    approvalsLeft: 1,
-    pendingAvatarSvg,
+    approvalsLeft: 3,
   };
 
   beforeEach(() => {
@@ -58,17 +56,46 @@ describe('Approvals Footer Component', () => {
   });
 
   describe('approvers list', () => {
+    const avatarUrl = `${TEST_HOST}/dummy.jpg`;
+
     it('shows link to member avatar for for each approver', done => {
-      vm.approvedBy.push({
-        user: {
-          avatar_url: `${TEST_HOST}/dummy.jpg`,
+      vm.approvedBy = [
+        {
+          user: {
+            username: 'Tanuki',
+            avatar_url: avatarUrl,
+          },
         },
-      });
+      ];
 
       Vue.nextTick(() => {
         const memberImage = document.querySelector('.approvers-list img');
 
-        expect(memberImage.src).toMatch(/dummy\.jpg$/);
+        expect(memberImage.src).toContain(avatarUrl);
+        done();
+      });
+    });
+
+    it('allows to add multiple approvers withoutd duplicate-key errors', done => {
+      vm.approvedBy = [
+        {
+          user: {
+            username: 'Tanuki',
+            avatar_url: avatarUrl,
+          },
+        },
+        {
+          user: {
+            username: 'Tanuki2',
+            avatar_url: avatarUrl,
+          },
+        },
+      ];
+
+      Vue.nextTick(() => {
+        const approvers = document.querySelectorAll('.approvers-list img');
+
+        expect(approvers.length).toBe(2);
         done();
       });
     });

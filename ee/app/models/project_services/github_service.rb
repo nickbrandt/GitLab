@@ -56,7 +56,7 @@ class GithubService < Service
   end
 
   def can_test?
-    project.pipelines.any?
+    project.ci_pipelines.any?
   end
 
   def disabled_title
@@ -72,7 +72,7 @@ class GithubService < Service
   end
 
   def test_data(project, user)
-    pipeline = project.pipelines.newest_first.first
+    pipeline = project.ci_pipelines.newest_first.first
 
     raise disabled_title unless pipeline
 

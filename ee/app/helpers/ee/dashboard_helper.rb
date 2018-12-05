@@ -22,7 +22,9 @@ module EE
     end
 
     def user_default_dashboard?(user = current_user)
-      controller_action_to_child_dashboards.any? {|dashboard| dashboard == user.dashboard }
+      return false unless user
+
+      controller_action_to_child_dashboards.any? { |dashboard| dashboard == user.dashboard }
     end
   end
 end

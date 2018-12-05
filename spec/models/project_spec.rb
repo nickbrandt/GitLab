@@ -64,7 +64,7 @@ describe Project do
     it { is_expected.to have_one(:forked_from_project).through(:fork_network_member) }
     it { is_expected.to have_one(:auto_devops).class_name('ProjectAutoDevops') }
     it { is_expected.to have_many(:commit_statuses) }
-    it { is_expected.to have_many(:pipelines) }
+    it { is_expected.to have_many(:ci_pipelines) }
     it { is_expected.to have_many(:builds) }
     it { is_expected.to have_many(:build_trace_section_names)}
     it { is_expected.to have_many(:runner_projects) }
@@ -132,6 +132,29 @@ describe Project do
 
       it_behaves_like 'members and requesters associations' do
         let(:namespace) { project }
+      end
+    end
+
+    describe 'ci_pipelines association' do
+      context 'when feature flag pipeline_ci_sources_only is enabled' do
+        it 'returns only pipelines from ci_sources' do
+          stub_feature_flags(pipeline_ci_sources_only: true)
+
+          expect(Ci::Pipeline).to receive(:ci_sources).and_call_original
+
+          subject.ci_pipelines
+        end
+      end
+
+      context 'when feature flag pipeline_ci_sources_only is disabled' do
+        it 'returns all pipelines' do
+          stub_feature_flags(pipeline_ci_sources_only: false)
+
+          expect(Ci::Pipeline).not_to receive(:ci_sources).and_call_original
+          expect(Ci::Pipeline).to receive(:all).and_call_original.at_least(:once)
+
+          subject.ci_pipelines
+        end
       end
     end
   end
@@ -2991,6 +3014,17 @@ describe Project do
     end
   end
 
+  describe '#lfs_http_url_to_repo' do
+    let(:project) { create(:project) }
+
+    it 'returns the url to the repo without a username' do
+      lfs_http_url_to_repo = project.lfs_http_url_to_repo('operation_that_doesnt_matter')
+
+      expect(lfs_http_url_to_repo).to eq("#{project.web_url}.git")
+      expect(lfs_http_url_to_repo).not_to include('@')
+    end
+  end
+
   describe '#pipeline_status' do
     let(:project) { create(:project, :repository) }
     it 'builds a pipeline status' do
@@ -3643,7 +3677,7 @@ describe Project do
 
     context 'with a ref that is not the default branch' do
       it 'returns the latest successful pipeline for the given ref' do
-        expect(project.pipelines).to receive(:latest_successful_for).with('foo')
+        expect(project.ci_pipelines).to receive(:latest_successful_for).with('foo')
 
         project.latest_successful_pipeline_for('foo')
       end
@@ -3671,7 +3705,7 @@ describe Project do
     it 'memoizes and returns the latest successful pipeline for the default branch' do
       pipeline = double(:pipeline)
 
-      expect(project.pipelines).to receive(:latest_successful_for)
+      expect(project.ci_pipelines).to receive(:latest_successful_for)
         .with(project.default_branch)
         .and_return(pipeline)
         .once

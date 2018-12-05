@@ -10,6 +10,9 @@ module EE
     extend ::Gitlab::Utils::Override
     extend ::Gitlab::Cache::RequestCache
     include ::Gitlab::Utils::StrongMemoize
+    include ::EE::GitlabRoutingHelper
+
+    GIT_LFS_DOWNLOAD_OPERATION = 'download'.freeze
 
     prepended do
       include Elastic::ProjectsSearch
@@ -124,8 +127,8 @@ module EE
     end
 
     def latest_pipeline_with_security_reports
-      pipelines.newest_first(ref: default_branch).with_security_reports.first ||
-        pipelines.newest_first(ref: default_branch).with_legacy_security_reports.first
+      ci_pipelines.newest_first(ref: default_branch).with_security_reports.first ||
+        ci_pipelines.newest_first(ref: default_branch).with_legacy_security_reports.first
     end
 
     def environments_for_scope(scope)
@@ -486,6 +489,14 @@ module EE
 
     def active_webide_pipelines(user:)
       webide_pipelines.running_or_pending.for_user(user)
+    end
+
+    override :lfs_http_url_to_repo
+    def lfs_http_url_to_repo(operation)
+      return super unless ::Gitlab::Geo.secondary_with_primary?
+      return super if operation == GIT_LFS_DOWNLOAD_OPERATION # download always comes from secondary
+
+      geo_primary_http_url_to_repo(self)
     end
 
     private
