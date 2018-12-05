@@ -1,13 +1,16 @@
 <script>
 import Flash from '~/flash';
-import LinkToMemberAvatar from 'ee/vue_shared/components/link_to_member_avatar.vue';
+import Icon from '~/vue_shared/components/icon.vue';
+import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link.vue';
+
 import { s__ } from '~/locale';
 import eventHub from '~/vue_merge_request_widget/event_hub';
 
 export default {
   name: 'ApprovalsFooter',
   components: {
-    LinkToMemberAvatar,
+    Icon,
+    UserAvatarLink,
   },
   props: {
     mr: {
@@ -84,22 +87,22 @@ export default {
     <div class="approvers-prefix">
       <p>{{ approvedByText }}</p>
       <div class="approvers-list">
-        <link-to-member-avatar
-          v-for="(approver, index) in approvedBy"
-          :key="index"
-          :avatar-size="20"
-          :avatar-url="approver.user.avatar_url"
-          :display-name="approver.user.name"
-          :profile-url="approver.user.web_url"
-          :show-tooltip="true"
-          extra-link-class="approver-avatar js-approver-list-member"
+        <user-avatar-link
+          v-for="approver in approvedBy"
+          :key="approver.user.username"
+          class="js-approver-list-member"
+          :img-size="20"
+          :img-src="approver.user.avatar_url"
+          :img-alt="approver.user.name"
+          :link-href="approver.user.web_url"
+          :tooltip-text="approver.user.name"
+          tooltip-placement="bottom"
         />
-        <link-to-member-avatar
+        <icon
           v-for="n in approvalsLeft"
           :key="n"
-          :avatar-size="20"
-          :clickable="false"
-          :show-tooltip="false"
+          name="dotted-circle"
+          class="avatar avatar-placeholder s20"
         />
       </div>
       <button
