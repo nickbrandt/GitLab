@@ -1,0 +1,5 @@
+---
+title: Changes initial state for disabled prometheus integrations
+merge_request: 8434
+author:
+type: fixed
