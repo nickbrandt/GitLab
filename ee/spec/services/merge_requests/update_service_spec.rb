@@ -56,5 +56,17 @@ describe MergeRequests::UpdateService, :mailer do
         end.not_to change { ActionMailer::Base.deliveries.count }
       end
     end
+
+    context 'when approvals_before_merge changes' do
+      it "updates approval_rules' approvals_required" do
+        rule = create(:approval_merge_request_rule, merge_request: merge_request)
+        code_owner_rule = create(:approval_merge_request_rule, merge_request: merge_request, code_owner: true)
+
+        update_merge_request(approvals_before_merge: 42)
+
+        expect(rule.reload.approvals_required).to eq(42)
+        expect(code_owner_rule.reload.approvals_required).to eq(0)
+      end
+    end
   end
 end
