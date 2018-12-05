@@ -31,8 +31,5 @@ module SystemCheck
     end
   end
 end
-<<<<<<< HEAD
 
 SystemCheck::RakeTask::GitlabTask.prepend(EE::SystemCheck::RakeTask::GitlabTask)
-=======
->>>>>>> upstream/master
