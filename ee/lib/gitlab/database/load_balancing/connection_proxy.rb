@@ -30,7 +30,7 @@ module Gitlab
           read_using_load_balancer(:select, args)
         end
 
-        def select_all(arel, name = nil, binds = [])
+        def select_all(arel, name = nil, binds = [], preparable: nil)
           if arel.respond_to?(:locked) && arel.locked
             # SELECT ... FOR UPDATE queries should be sent to the primary.
             write_using_load_balancer(:select_all, [arel, name, binds],
