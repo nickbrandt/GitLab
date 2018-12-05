@@ -47,7 +47,7 @@ describe 'User activates GitHub Service' do
 
     context 'with pipelines', :js do
       let(:pipeline) { create(:ci_pipeline) }
-      let(:project) { create(:project, pipelines: [pipeline])}
+      let(:project) { create(:project, ci_pipelines: [pipeline])}
 
       it 'tests service before save' do
         click_button 'Test settings and save changes'

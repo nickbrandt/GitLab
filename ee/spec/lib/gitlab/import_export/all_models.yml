@@ -10,7 +10,7 @@ merge_requests:
 - approver_groups
 - approved_by_users
 - draft_notes
-pipelines:
+ci_pipelines:
 - source_pipeline
 - sourced_pipelines
 - triggered_by_pipeline
