@@ -102,6 +102,9 @@ describe MergeRequests::RefreshService do
 
             it 'does not create Approver' do
               expect { subject }.not_to change { Approver.count }
+
+              rule = merge_request.approval_rules.code_owner.first
+              expect(rule.users).to eq(new_owners)
             end
           end
         end
@@ -125,6 +128,9 @@ describe MergeRequests::RefreshService do
               expect(new_approver.user).to eq(owner)
               expect(new_approver.created_at).to be_present
               expect(new_approver.updated_at).to be_present
+
+              rule = merge_request.approval_rules.code_owner.first
+              expect(rule.users).to eq(new_owners)
             end
           end
         end
