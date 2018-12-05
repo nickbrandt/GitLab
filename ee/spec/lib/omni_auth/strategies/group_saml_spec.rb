@@ -114,15 +114,50 @@ describe OmniAuth::Strategies::GroupSaml, type: :strategy do
 
   describe 'POST /users/auth/group_saml/metadata' do
     it 'returns 404 when the group is not found' do
-      post '/users/auth/group_saml/metadata', group_path: 'not-a-group'
-
-      expect(last_response).to be_not_found
+      expect do
+        post '/users/auth/group_saml/metadata', group_path: 'not-a-group'
+      end.to raise_error(ActionController::RoutingError)
     end
 
     it 'returns 404 to avoid disclosing group existence' do
-      post '/users/auth/group_saml/metadata', group_path: 'my-group'
+      expect do
+        post '/users/auth/group_saml/metadata', group_path: 'my-group'
+      end.to raise_error(ActionController::RoutingError)
+    end
 
-      expect(last_response).to be_not_found
+    it 'returns 404 when feature disabled' do
+      stub_feature_flags(group_saml_metadata_available: false)
+
+      post '/users/auth/group_saml/metadata', group_path: 'my-group', token: group.saml_discovery_token
+
+      expect(last_response.status).to eq 404
+    end
+
+    it 'returns metadata when a valid token is provided' do
+      post '/users/auth/group_saml/metadata', group_path: 'my-group', token: group.saml_discovery_token
+
+      expect(last_response.status).to eq 200
+      expect(last_response.body).to start_with('<?xml')
+      expect(last_response.header["Content-Type"]).to eq "application/xml"
+    end
+
+    it 'returns 404 when an invalid token is provided' do
+      expect do
+        post '/users/auth/group_saml/metadata', group_path: 'my-group', token: 'invalidtoken'
+      end.to raise_error(ActionController::RoutingError)
+    end
+
+    it 'returns 404 when if group is not found but a token is provided' do
+      expect do
+        post '/users/auth/group_saml/metadata', group_path: 'not-a-group', token: 'dummytoken'
+      end.to raise_error(ActionController::RoutingError)
+    end
+
+    it 'sets omniauth setings from default settings' do
+      post '/users/auth/group_saml/metadata', group_path: 'my-group', token: group.saml_discovery_token
+
+      options = last_request.env['omniauth.strategy'].options
+      expect(options['assertion_consumer_service_url']).to end_with "/groups/my-group/-/saml/callback"
     end
   end
 
