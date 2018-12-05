@@ -189,7 +189,7 @@ describe('actions', () => {
     });
 
     const errorMessage =
-      'The Operations Dashboard is available for projects with a Gold subscription.';
+      'The Operations Dashboard is available for public projects, and private projects in groups with a Gold plan.';
     const addTokens = count => {
       for (let i = 0; i < count; i += 1) {
         store.dispatch('addProjectToken', {
