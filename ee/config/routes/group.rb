@@ -70,6 +70,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       resources :vulnerabilities, only: [:index], controller: :vulnerabilities do
         collection do
           get :summary
+          get :history
         end
       end
     end
