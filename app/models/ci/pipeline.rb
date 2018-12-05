@@ -12,11 +12,8 @@ module Ci
     include AtomicInternalId
     include EnumWithNil
 
-<<<<<<< HEAD
     prepend ::EE::Ci::Pipeline
 
-=======
->>>>>>> upstream/master
     belongs_to :project, inverse_of: :all_pipelines
     belongs_to :user
     belongs_to :auto_canceled_by, class_name: 'Ci::Pipeline'
