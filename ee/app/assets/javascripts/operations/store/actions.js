@@ -49,7 +49,7 @@ export const requestAddProjectsToDashboardSuccess = ({ dispatch, state }, data) 
     createFlash(
       sprintf(
         s__(
-          'OperationsDashboard|Unable to add %{invalidProjects}. The Operations Dashboard is available for projects with a Gold subscription.',
+          'OperationsDashboard|Unable to add %{invalidProjects}. The Operations Dashboard is available for public projects, and private projects in groups with a Gold plan.',
         ),
         { invalidProjects },
       ),
