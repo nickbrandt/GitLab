@@ -50,3 +50,5 @@ module Projects
     end
   end
 end
+
+::Projects::CleanupService.prepend(::EE::Projects::CleanupService)
