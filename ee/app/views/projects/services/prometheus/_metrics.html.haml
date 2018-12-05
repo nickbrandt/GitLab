@@ -1,6 +1,6 @@
 - project = local_assigns.fetch(:project)
 
-.card.custom-monitored-metrics.js-panel-custom-monitored-metrics{ data: { active_custom_metrics: project_prometheus_metrics_path(project), environments_data: environments_list_data } }
+.card.custom-monitored-metrics.js-panel-custom-monitored-metrics{ data: { active_custom_metrics: project_prometheus_metrics_path(project), environments_data: environments_list_data, service_active: "#{@service.active}" } }
   .card-header
     %h3.card-title
       = s_('PrometheusService|Custom metrics')
@@ -15,7 +15,9 @@
         = icon('spinner spin', class: 'metrics-load-spinner')
         = s_('PrometheusService|Finding custom metrics...')
     .empty-metrics.hidden.js-empty-custom-metrics
-      = link_to s_('PrometheusService|New metric'), new_project_prometheus_metric_path(project), class: 'btn btn-success prepend-top-10 prepend-left-10 append-bottom-10'
+      %p.text-tertiary.prepend-top-10.prepend-left-10.js-no-active-integration-text.hidden
+        = s_('PrometheusService|Enable Prometheus to define custom metrics, using either option above')
+      = link_to s_('PrometheusService|New metric'), new_project_prometheus_metric_path(project), class: 'btn btn-success prepend-top-10 prepend-left-10 append-bottom-10 js-new-metric-body-button hidden'
     %ul.list-unstyled.metrics-list.hidden.js-custom-metrics-list
 
 = render_ce 'projects/services/prometheus/metrics', project: project

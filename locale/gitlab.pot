@@ -6778,6 +6778,9 @@ msgstr ""
 msgid "PrometheusService|Custom metrics"
 msgstr ""
 
+msgid "PrometheusService|Enable Prometheus to define custom metrics, using either option above"
+msgstr ""
+
 msgid "PrometheusService|Finding and configuring metrics..."
 msgstr ""
 
