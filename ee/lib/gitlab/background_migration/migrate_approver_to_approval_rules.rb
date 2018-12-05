@@ -94,9 +94,10 @@ module Gitlab
 
       # @param target_type [String] class of target, either 'MergeRequest' or 'Project'
       # @param target_id [Integer] id of target
-      def perform(target_type, target_id)
+      def perform(target_type, target_id, sync_code_owner_rule: true)
         @target_type = target_type
         @target_id = target_id
+        @sync_code_owner_rule = sync_code_owner_rule
 
         raise "Incorrect target_type #{target_type}" unless ALLOWED_TARGET_TYPES.include?(@target_type)
 
@@ -117,7 +118,7 @@ module Gitlab
           rule.approval_project_rule = target.target_project.approval_rules.regular.first
         end
 
-        target.sync_code_owners_with_approvers
+        target.sync_code_owners_with_approvers if @sync_code_owner_rule
       end
 
       def handle_project
