@@ -213,11 +213,8 @@ ActiveRecord::Schema.define(version: 20181126153547) do
     t.integer "archive_builds_in_seconds"
     t.string "commit_email_hostname"
     t.string "runners_registration_token_encrypted"
-<<<<<<< .merge_file_DEFhlJ
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id", using: :btree
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id", using: :btree
-=======
->>>>>>> .merge_file_pKLiIm
     t.index ["usage_stats_set_by_user_id"], name: "index_application_settings_on_usage_stats_set_by_user_id", using: :btree
   end
 
@@ -1800,12 +1797,9 @@ ActiveRecord::Schema.define(version: 20181126153547) do
     t.integer "plan_id"
     t.integer "project_creation_level"
     t.string "runners_token"
-<<<<<<< .merge_file_DEFhlJ
     t.datetime_with_timezone "trial_ends_on"
     t.integer "file_template_project_id"
     t.string "saml_discovery_token"
-=======
->>>>>>> .merge_file_pKLiIm
     t.string "runners_token_encrypted"
     t.index ["created_at"], name: "index_namespaces_on_created_at", using: :btree
     t.index ["file_template_project_id"], name: "index_namespaces_on_file_template_project_id", using: :btree
