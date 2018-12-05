@@ -154,14 +154,36 @@ describe 'SAML provider settings' do
       context 'when signed in' do
         before do
           sign_in(user)
-
-          visit sso_group_saml_providers_path(group)
         end
 
-        it 'Sign in button redirects to auth flow and back to group' do
-          click_link 'Sign in with Single Sign-On'
+        it 'shows warning that linking accounts authorizes control over sign in' do
+          visit sso_group_saml_providers_path(group)
+
+          expect(page).to have_content(/Allow .* to sign you in/)
+          expect(page).to have_content(saml_provider.sso_url)
+          expect(page).to have_content('Authorize')
+        end
+
+        it 'Authorize/link button redirects to auth flow' do
+          visit sso_group_saml_providers_path(group)
+
+          click_link 'Authorize'
 
           expect(current_path).to eq callback_path
+        end
+
+        context 'with linked account' do
+          before do
+            create(:group_saml_identity, saml_provider: saml_provider, user: user)
+          end
+
+          it 'Sign in button redirects to auth flow' do
+            visit sso_group_saml_providers_path(group)
+
+            click_link 'Sign in with Single Sign-On'
+
+            expect(current_path).to eq callback_path
+          end
         end
       end
 
@@ -187,7 +209,7 @@ describe 'SAML provider settings' do
             expect(current_path).to eq sso_group_saml_providers_path(group)
 
             within '.login-box' do
-              expect(page).to have_link 'Sign in with Single Sign-On'
+              expect(page).to have_link 'Authorize'
             end
           end
 

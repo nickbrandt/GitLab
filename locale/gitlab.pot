@@ -557,6 +557,9 @@ msgstr ""
 msgid "All users"
 msgstr ""
 
+msgid "Allow \"%{group_name}\" to sign you in"
+msgstr ""
+
 msgid "Allow commits from members who can merge to the target branch."
 msgstr ""
 
@@ -5929,6 +5932,9 @@ msgstr ""
 msgid "Only mirror protected branches"
 msgstr ""
 
+msgid "Only proceed if you trust %{idp_url} to control your GitLab account sign in."
+msgstr ""
+
 msgid "Only project members can comment."
 msgstr ""
 
@@ -7756,7 +7762,7 @@ msgstr ""
 msgid "Sign in / Register"
 msgstr ""
 
-msgid "Sign in to %{group_name}"
+msgid "Sign in to \"%{group_name}\""
 msgstr ""
 
 msgid "Sign in via 2FA code"
@@ -8259,6 +8265,9 @@ msgstr ""
 msgid "Thanks! Don't show me this again"
 msgstr ""
 
+msgid "The \"%{group_path}\" group allows you to sign in with your Single Sign-On Account"
+msgstr ""
+
 msgid "The Advanced Global Search in GitLab is a powerful search service that saves you time. Instead of creating duplicate code and wasting time, you can now search for code within other teams that can help your own project."
 msgstr ""
 
@@ -8475,9 +8484,6 @@ msgstr ""
 msgid "This group"
 msgstr ""
 
-msgid "This group allows you to sign in with your %{group_name} Single Sign-On account. This will redirect you to an external sign in page."
-msgstr ""
-
 msgid "This group does not provide any group Runners yet."
 msgstr ""
 
@@ -8608,6 +8614,9 @@ msgid "This user will be the author of all events in the activity feed that are 
 msgstr ""
 
 msgid "This user will be the author of all events in the activity feed that are the result of an update, like new branches being created or new commits being pushed to existing branches. Upon creation or when reassigning you can only assign yourself to be the mirror user."
+msgstr ""
+
+msgid "This will redirect you to an external sign in page."
 msgstr ""
 
 msgid "Those emails automatically become issues (with the comments becoming the email conversation) listed here."

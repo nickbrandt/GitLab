@@ -15,6 +15,8 @@ class Groups::SsoController < Groups::ApplicationController
   def saml
     @group_path = params[:group_id]
     @group_name = @unauthenticated_group.full_name
+    @group_saml_identity = linked_identity
+    @idp_url = @unauthenticated_group.saml_provider.sso_url
   end
 
   def unlink
