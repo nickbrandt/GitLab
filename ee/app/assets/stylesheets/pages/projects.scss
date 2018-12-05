@@ -134,6 +134,50 @@
 }
 
 .project-template {
+  .template-header,
+  .template-option {
+    padding: $gl-padding $gl-padding-8;
+    border-top: 1px solid $border-color;
+  }
+
+  .template-header {
+    cursor: pointer;
+
+    .template-options-icon-container {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .template-group-options {
+    .options-expanded-icon {
+      display: none;
+    }
+
+    .template-option {
+      display: none;
+      background: $gray-light;
+
+      .avatar-container {
+        margin-left: 34px;
+      }
+    }
+
+    &.expanded {
+      .template-option {
+        display: flex;
+      }
+
+      .options-expanded-icon {
+        display: block;
+      }
+
+      .options-collapsed-icon {
+        display: none;
+      }
+    }
+  }
+
   .template-input-group {
     .selected-icon {
       .avatar {

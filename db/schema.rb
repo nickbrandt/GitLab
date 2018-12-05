@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181203154104) do
+ActiveRecord::Schema.define(version: 20181204135932) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -1803,7 +1803,9 @@ ActiveRecord::Schema.define(version: 20181203154104) do
     t.integer "file_template_project_id"
     t.string "saml_discovery_token"
     t.string "runners_token_encrypted"
+    t.integer "custom_project_templates_group_id"
     t.index ["created_at"], name: "index_namespaces_on_created_at", using: :btree
+    t.index ["custom_project_templates_group_id", "type"], name: "index_namespaces_on_custom_project_templates_group_id_and_type", where: "(custom_project_templates_group_id IS NOT NULL)", using: :btree
     t.index ["file_template_project_id"], name: "index_namespaces_on_file_template_project_id", using: :btree
     t.index ["ldap_sync_last_successful_update_at"], name: "index_namespaces_on_ldap_sync_last_successful_update_at", using: :btree
     t.index ["ldap_sync_last_update_at"], name: "index_namespaces_on_ldap_sync_last_update_at", using: :btree
@@ -3258,6 +3260,7 @@ ActiveRecord::Schema.define(version: 20181203154104) do
   add_foreign_key "milestones", "namespaces", column: "group_id", name: "fk_95650a40d4", on_delete: :cascade
   add_foreign_key "milestones", "projects", name: "fk_9bd0a0c791", on_delete: :cascade
   add_foreign_key "namespace_statistics", "namespaces", on_delete: :cascade
+  add_foreign_key "namespaces", "namespaces", column: "custom_project_templates_group_id", name: "fk_e7a0b20a6b", on_delete: :nullify
   add_foreign_key "namespaces", "plans", name: "fk_fdd12e5b80", on_delete: :nullify
   add_foreign_key "namespaces", "projects", column: "file_template_project_id", name: "fk_319256d87a", on_delete: :nullify
   add_foreign_key "note_diff_files", "notes", column: "diff_note_id", on_delete: :cascade
