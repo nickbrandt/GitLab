@@ -167,4 +167,83 @@ describe 'Edit group settings' do
       end
     end
   end
+
+  context 'when custom_project_templates feature', :postgresql do
+    let!(:subgroup) { create(:group, :public, parent: group) }
+    let!(:subgroup_1) { create(:group, :public, parent: subgroup) }
+
+    shared_examples 'shows custom project templates settings' do
+      it 'shows the custom project templates selection menu' do
+        expect(page).to have_content('Custom project templates')
+      end
+
+      context 'group selection menu', :js do
+        before do
+          slow_requests do
+            find('#s2id_group_custom_project_templates_group_id').click
+            wait_for_all_requests
+          end
+        end
+
+        it 'shows only the subgroups' do
+          # the default value of 0.2 from the slow_requests helper isn't
+          # enough when this spec is exec along with other feature specs.
+          sleep 0.5
+
+          page.within('.select2-drop .select2-results') do
+            results = find_all('.select2-result')
+
+            expect(results.count).to eq(1)
+            expect(results.last.text).to eq "#{nested_group.full_name} #{nested_group.full_path}"
+          end
+        end
+      end
+    end
+
+    shared_examples 'does not show custom project templates settings' do
+      it 'does not show the custom project templates selection menu' do
+        expect(page).not_to have_content('Custom project templates')
+      end
+    end
+
+    context 'is enabled' do
+      before do
+        stub_licensed_features(custom_project_templates: true)
+        visit edit_group_path(selected_group)
+      end
+
+      context 'when the group is a top parent group' do
+        let(:selected_group) { group }
+        let(:nested_group) { subgroup }
+
+        it_behaves_like 'shows custom project templates settings'
+      end
+
+      context 'when the group is a subgroup' do
+        let(:selected_group) { subgroup }
+        let(:nested_group) { subgroup_1 }
+
+        it_behaves_like 'shows custom project templates settings'
+      end
+    end
+
+    context 'is disabled' do
+      before do
+        stub_licensed_features(custom_project_templates: false)
+        visit edit_group_path(selected_group)
+      end
+
+      context 'when the group is the top parent group' do
+        let(:selected_group) { group }
+
+        it_behaves_like 'does not show custom project templates settings'
+      end
+
+      context 'when the group is a subgroup' do
+        let(:selected_group) { subgroup }
+
+        it_behaves_like 'does not show custom project templates settings'
+      end
+    end
+  end
 end

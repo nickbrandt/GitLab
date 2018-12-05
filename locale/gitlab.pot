@@ -2597,9 +2597,6 @@ msgstr ""
 msgid "CurrentUser|Settings"
 msgstr ""
 
-msgid "Custom"
-msgstr ""
-
 msgid "Custom CI config path"
 msgstr ""
 
@@ -2613,6 +2610,9 @@ msgid "Custom notification levels are the same as participating levels. With cus
 msgstr ""
 
 msgid "Custom project templates"
+msgstr ""
+
+msgid "Custom project templates have not been set up for groups that you are a member of. They are enabled from a group’s settings page. Contact your group’s Owner or Maintainer to setup custom project templates."
 msgstr ""
 
 msgid "Customize colors"
@@ -4261,13 +4261,22 @@ msgstr ""
 msgid "GroupSettings|Badges"
 msgstr ""
 
+msgid "GroupSettings|Custom project templates"
+msgstr ""
+
 msgid "GroupSettings|Customize your group badges."
 msgstr ""
 
 msgid "GroupSettings|Learn more about badges."
 msgstr ""
 
+msgid "GroupSettings|Learn more about group-level project templates."
+msgstr ""
+
 msgid "GroupSettings|Prevent sharing a project within %{group} with other groups"
+msgstr ""
+
+msgid "GroupSettings|Select a sub-group as the custom project template source for this group."
 msgstr ""
 
 msgid "GroupSettings|This setting is applied on %{ancestor_group} and has been overridden on this subgroup."
@@ -4919,6 +4928,12 @@ msgid "Learn more about %{issue_boards_url}, to keep track of issues in multiple
 msgstr ""
 
 msgid "Learn more about Kubernetes"
+msgstr ""
+
+msgid "Learn more about custom project templates"
+msgstr ""
+
+msgid "Learn more about group-level project templates"
 msgstr ""
 
 msgid "Learn more about protected branches"
@@ -8358,6 +8373,9 @@ msgstr ""
 msgid "There are no archived projects yet"
 msgstr ""
 
+msgid "There are no custom project templates set up for this GitLab instance. They are enabled from GitLab's Admin Area. Contact your GitLab instance administrator to setup custom project templates."
+msgstr ""
+
 msgid "There are no issues to show"
 msgstr ""
 
@@ -10044,6 +10062,9 @@ msgid "is invalid because there is upstream lock"
 msgstr ""
 
 msgid "is not a valid X509 certificate."
+msgstr ""
+
+msgid "is out of the hierarchy of the Group owning the template"
 msgstr ""
 
 msgid "issue boards"
