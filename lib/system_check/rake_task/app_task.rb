@@ -36,5 +36,8 @@ module SystemCheck
     end
   end
 end
+<<<<<<< HEAD
 
 SystemCheck::RakeTask::AppTask.prepend(EE::SystemCheck::RakeTask::AppTask)
+=======
+>>>>>>> upstream/master

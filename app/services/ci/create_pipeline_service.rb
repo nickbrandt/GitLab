@@ -17,7 +17,11 @@ module Ci
                 Gitlab::Ci::Pipeline::Chain::Create,
                 EE::Gitlab::Ci::Pipeline::Chain::Limit::Activity].freeze
 
+<<<<<<< HEAD
     def execute(source, ignore_skip_ci: false, save_on_errors: true, trigger_request: nil, schedule: nil, merge_request: nil, mirror_update: false, &block)
+=======
+    def execute(source, ignore_skip_ci: false, save_on_errors: true, trigger_request: nil, schedule: nil, merge_request: nil, &block)
+>>>>>>> upstream/master
       @pipeline = Ci::Pipeline.new
 
       command = Gitlab::Ci::Pipeline::Chain::Command.new(

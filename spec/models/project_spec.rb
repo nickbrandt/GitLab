@@ -158,6 +158,29 @@ describe Project do
         end
       end
     end
+
+    describe 'ci_pipelines association' do
+      context 'when feature flag pipeline_ci_sources_only is enabled' do
+        it 'returns only pipelines from ci_sources' do
+          stub_feature_flags(pipeline_ci_sources_only: true)
+
+          expect(Ci::Pipeline).to receive(:ci_sources).and_call_original
+
+          subject.ci_pipelines
+        end
+      end
+
+      context 'when feature flag pipeline_ci_sources_only is disabled' do
+        it 'returns all pipelines' do
+          stub_feature_flags(pipeline_ci_sources_only: false)
+
+          expect(Ci::Pipeline).not_to receive(:ci_sources).and_call_original
+          expect(Ci::Pipeline).to receive(:all).and_call_original.at_least(:once)
+
+          subject.ci_pipelines
+        end
+      end
+    end
   end
 
   describe 'modules' do
@@ -170,6 +193,7 @@ describe Project do
     it { is_expected.to include_module(Sortable) }
   end
 
+<<<<<<< HEAD
   describe 'scopes' do
     context '#with_wiki_enabled' do
       it 'returns a project' do
@@ -182,6 +206,8 @@ describe Project do
     end
   end
 
+=======
+>>>>>>> upstream/master
   describe '.missing_kubernetes_namespace' do
     let!(:project) { create(:project) }
     let!(:cluster) { create(:cluster, :provided_by_user, :group) }

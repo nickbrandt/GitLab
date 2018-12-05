@@ -2,16 +2,24 @@
   "type": "object",
   "required" : [
     "issues",
+<<<<<<< HEAD
     "size",
     "total_weight"
+=======
+    "size"
+>>>>>>> upstream/master
   ],
   "properties" : {
     "issues": {
       "type": "array",
       "items": { "$ref": "issue_board.json" }
     },
+<<<<<<< HEAD
     "size": { "type": "integer" },
     "total_weight": { "type": "integer" }
+=======
+    "size": { "type": "integer" }
+>>>>>>> upstream/master
   },
   "additionalProperties": false
 }

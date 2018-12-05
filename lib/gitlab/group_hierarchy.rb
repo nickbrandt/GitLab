@@ -36,12 +36,15 @@ module Gitlab
     # rubocop: disable CodeReuse/ActiveRecord
     def ancestors(upto: nil, hierarchy_order: nil)
       base_and_ancestors(upto: upto, hierarchy_order: hierarchy_order).where.not(id: ancestors_base.select(:id))
+<<<<<<< HEAD
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
     # rubocop: disable CodeReuse/ActiveRecord
     def roots
       base_and_ancestors.where(namespaces: { parent_id: nil })
+=======
+>>>>>>> upstream/master
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
@@ -127,10 +130,17 @@ module Gitlab
     def base_and_ancestors_cte(stop_id = nil, hierarchy_order = nil)
       cte = SQL::RecursiveCTE.new(:base_and_ancestors)
       depth_column = :depth
+<<<<<<< HEAD
 
       base_query = ancestors_base.except(:order)
       base_query = base_query.select("1 as #{depth_column}", groups_table[Arel.star]) if hierarchy_order
 
+=======
+
+      base_query = ancestors_base.except(:order)
+      base_query = base_query.select("1 as #{depth_column}", groups_table[Arel.star]) if hierarchy_order
+
+>>>>>>> upstream/master
       cte << base_query
 
       # Recursively get all the ancestors of the base set.
