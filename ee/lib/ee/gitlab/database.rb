@@ -3,6 +3,25 @@ module EE
     module Database
       extend ::Gitlab::Utils::Override
 
+      override :read_only?
+      def read_only?
+        ::Gitlab::Geo.secondary?
+      end
+
+      def healthy?
+        return true unless postgresql?
+
+        !Postgresql::ReplicationSlot.lag_too_great?
+      end
+
+      # Disables prepared statements for the current database connection.
+      def disable_prepared_statements
+        config = ActiveRecord::Base.configurations[Rails.env]
+        config['prepared_statements'] = false
+
+        ActiveRecord::Base.establish_connection(config)
+      end
+
       override :add_post_migrate_path_to_rails
       def add_post_migrate_path_to_rails(force: false)
         super

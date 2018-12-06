@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Operations
   class FeatureFlagsClient < ActiveRecord::Base
     include TokenAuthenticatable

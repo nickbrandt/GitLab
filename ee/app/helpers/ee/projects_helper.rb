@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module ProjectsHelper
     extend ::Gitlab::Utils::Override
@@ -32,7 +34,9 @@ module EE
     def get_project_nav_tabs(project, current_user)
       nav_tabs = super
 
-      if ::Gitlab.config.packages.enabled && can?(current_user, :read_package, project)
+      if ::Gitlab.config.packages.enabled &&
+          project.feature_available?(:packages) &&
+          can?(current_user, :read_package, project)
         nav_tabs << :packages
       end
 
@@ -60,7 +64,7 @@ module EE
     override :project_permissions_panel_data
     def project_permissions_panel_data(project)
       super.merge(
-        packagesAvailable: ::Gitlab.config.packages.enabled,
+        packagesAvailable: ::Gitlab.config.packages.enabled && project.feature_available?(:packages),
         packagesHelpPath: help_page_path('user/project/packages/maven_repository')
       )
     end
@@ -129,6 +133,12 @@ module EE
       else
         false
       end
+    end
+
+    def group_project_templates_count(group_id)
+      allowed_subgroups = current_user.available_subgroups_with_custom_project_templates(group_id)
+
+      ::Project.in_namespace(allowed_subgroups).count
     end
 
     def share_project_description

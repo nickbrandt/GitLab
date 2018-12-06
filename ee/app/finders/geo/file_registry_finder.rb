@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   class FileRegistryFinder < RegistryFinder
     # @abstract Subclass is expected to implement the declared methods

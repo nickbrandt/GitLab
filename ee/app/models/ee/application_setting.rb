@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   # ApplicationSetting EE mixin
   #
@@ -188,8 +190,10 @@ module EE
       custom_project_templates_enabled? && super
     end
 
-    def available_custom_project_templates
-      return [] unless group_id = custom_project_templates_group_id
+    def available_custom_project_templates(subgroup_id = nil)
+      group_id = subgroup_id || custom_project_templates_group_id
+
+      return ::Project.none unless group_id
 
       ::Project.where(namespace_id: group_id)
     end

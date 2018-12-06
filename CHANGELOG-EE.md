@@ -1,5 +1,25 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.5.2 (2018-12-03)
+
+### Fixed (2 changes)
+
+- Fix inability to scroll dashboard. !8459
+- Fix issues analytics query when ordering issues by priority. !8509
+
+
+## 11.5.1 (2018-11-26)
+
+### Security (6 changes)
+
+- Sanitize tracing external_urls before saving to DB and when displaying the URL to prevent XSS issues.
+- Prevent reporter roles from viewing the Jaeger tracing settings page.
+- Fix IDOR at /drafts/publish.
+- Authorize users when listing board users and milestones.
+- Resolve: Guest can set weight of a new issue.
+- Fixes XSS with merge request approvers selection.
+
+
 ## 11.5.0 (2018-11-22)
 
 ### Security (2 changes)
@@ -101,6 +121,21 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Rails5: fix operations controller spec nil parameter. !8209 (Jasper Maes)
 - Update related issues title typography. !8267 (George Tsiolis)
 - Geo: Clarify Geo HA documentation.
+
+
+## 11.4.9 (2018-12-03)
+
+- No changes.
+
+## 11.4.8 (2018-11-27)
+
+### Security (5 changes)
+
+- Escape entity title while autocomplete template rendering to prevent XSS. !707
+- Authorize users when listing board users and milestones.
+- Fix IDOR at /drafts/publish.
+- Resolve: Guest can set weight of a new issue.
+- Fixes XSS with merge request approvers selection.
 
 
 ## 11.4.7 (2018-11-20)
@@ -234,6 +269,19 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Group weight icon and text on issue list and issue boards. !7484 (George Tsiolis)
 - Adds expandable/collapsable section for Snowplow. !7798
 - API: Allow issue weight parameter to be greater than or equal to zero.
+
+
+## 11.3.11 (2018-11-26)
+
+### Security (7 changes)
+
+- Escape entity title while autocomplete template rendering to prevent XSS. !697
+- Properly filter private references from system notes.
+- Authorize users when listing board users and milestones.
+- Project groups approvers no longer leak private groups info.
+- Resolve: Guest can set weight of a new issue.
+- Fixes XSS with merge request approvers selection.
+- Protect against CSRF attacks when adding Slack app.
 
 
 ## 11.3.10 (2018-11-18)

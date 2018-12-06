@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module LockHelper
     def lock_file_link(project = @project, path = @path, html_options: {})

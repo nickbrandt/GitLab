@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Elastic
   module MergeRequestsSearch
     extend ActiveSupport::Concern

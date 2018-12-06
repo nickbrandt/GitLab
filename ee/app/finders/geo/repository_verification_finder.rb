@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   class RepositoryVerificationFinder
     def initialize(shard_name: nil)
@@ -27,9 +29,9 @@ module Geo
     # rubocop: enable CodeReuse/ActiveRecord
 
     # rubocop: disable CodeReuse/ActiveRecord
-    def find_outdated_projects(batch_size:)
-      query = build_query_to_find_outdated_projects(batch_size: batch_size)
-      cte   = Gitlab::SQL::CTE.new(:outdated_projects, query)
+    def find_recently_updated_projects(batch_size:)
+      query = build_query_to_find_recently_updated_projects(batch_size: batch_size)
+      cte   = Gitlab::SQL::CTE.new(:recently_updated_projects, query)
 
       Project.with(cte.to_arel)
              .from(cte.alias_to(projects_table))
@@ -38,18 +40,25 @@ module Geo
     # rubocop: enable CodeReuse/ActiveRecord
 
     # rubocop: disable CodeReuse/ActiveRecord
-    def find_unverified_projects(batch_size:)
+    def find_never_verified_projects(batch_size:)
       relation =
         Project.select(:id)
          .with_route
          .joins(left_join_repository_state)
-         .where(repository_never_verified)
+         .where(repository_state_table[:project_id].eq(nil))
          .limit(batch_size)
 
-      relation = apply_shard_restriction(relation) if shard_name.present?
-      relation
+      apply_shard_restriction(relation)
     end
     # rubocop: enable CodeReuse/ActiveRecord
+
+    def find_reverifiable_repositories(interval:, batch_size:)
+      build_query_to_find_reverifiable_projects(type: :repository, interval: interval, batch_size: batch_size)
+    end
+
+    def find_reverifiable_wikis(interval:, batch_size:)
+      build_query_to_find_reverifiable_projects(type: :wiki, interval: interval, batch_size: batch_size)
+    end
 
     def count_verified_repositories
       Project.verified_repos.count
@@ -77,25 +86,55 @@ module Geo
         projects_table
           .join(repository_state_table).on(project_id_matcher)
           .project(projects_table[:id], repository_state_table["#{type}_retry_at"])
-          .where(repository_state_table["last_#{type}_verification_failure"].not_eq(nil))
-          .take(batch_size)
+          .where(
+            repository_state_table["#{type}_retry_at"].lt(Time.now)
+              .and(repository_state_table["last_#{type}_verification_failure"].not_eq(nil))
+          ).take(batch_size)
 
-      query = apply_shard_restriction(query) if shard_name.present?
-      query
+      apply_shard_restriction(query)
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
     # rubocop: disable CodeReuse/ActiveRecord
-    def build_query_to_find_outdated_projects(batch_size:)
+    def build_query_to_find_recently_updated_projects(batch_size:)
+      repository_recently_updated =
+        repository_state_table[:repository_verification_checksum].eq(nil)
+          .and(repository_state_table[:last_repository_verification_failure].eq(nil))
+
+      wiki_recently_updated =
+        repository_state_table[:wiki_verification_checksum].eq(nil)
+          .and(repository_state_table[:last_wiki_verification_failure].eq(nil))
+
       query =
         projects_table
           .join(repository_state_table).on(project_id_matcher)
           .project(projects_table[:id], projects_table[:last_repository_updated_at])
-          .where(repository_outdated.or(wiki_outdated))
+          .where(repository_recently_updated.or(wiki_recently_updated))
           .take(batch_size)
 
-      query = apply_shard_restriction(query) if shard_name.present?
-      query
+      apply_shard_restriction(query)
+    end
+    # rubocop: enable CodeReuse/ActiveRecord
+
+    # rubocop: disable CodeReuse/ActiveRecord
+    def build_query_to_find_reverifiable_projects(type:, interval:, batch_size:)
+      verification_succeded =
+        repository_state_table["#{type}_verification_checksum"].not_eq(nil)
+          .and(repository_state_table["last_#{type}_verification_failure"].eq(nil))
+
+      verified_before_interval =
+        repository_state_table["last_#{type}_verification_ran_at"].eq(nil).or(
+          repository_state_table["last_#{type}_verification_ran_at"].lteq(interval))
+
+      # We should prioritize less active projects first because high active
+      # projects have their repositories verified more frequently.
+      query =
+        Project.joins(:repository_state)
+          .where(verification_succeded.and(verified_before_interval))
+          .order(last_repository_updated_at_asc)
+          .limit(batch_size)
+
+      apply_shard_restriction(query)
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
@@ -118,27 +157,15 @@ module Geo
         .join_sources
     end
 
-    def repository_outdated
-      repository_state_table[:repository_verification_checksum].eq(nil)
-        .and(repository_state_table[:last_repository_verification_failure].eq(nil))
-    end
-
-    def wiki_outdated
-      repository_state_table[:wiki_verification_checksum].eq(nil)
-        .and(repository_state_table[:last_wiki_verification_failure].eq(nil))
-    end
-
-    def repository_never_verified
-      repository_state_table[:project_id].eq(nil)
-    end
-
     def last_repository_updated_at_asc
       Gitlab::Database.nulls_last_order('projects.last_repository_updated_at', 'ASC')
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
-    def apply_shard_restriction(relation)
-      relation.where(projects_table[:repository_storage].eq(shard_name))
+    def apply_shard_restriction(query)
+      return query unless shard_name.present?
+
+      query.where(projects_table[:repository_storage].eq(shard_name))
     end
     # rubocop: enable CodeReuse/ActiveRecord
   end

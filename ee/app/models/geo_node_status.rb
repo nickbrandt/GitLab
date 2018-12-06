@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GeoNodeStatus < ActiveRecord::Base
   include ShaAttribute
 

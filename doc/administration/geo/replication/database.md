@@ -428,13 +428,6 @@ data before running `pg_basebackup`.
      - When not in a production machine you can disable backup step if you
        really sure this is what you want by adding `--skip-backup`
 
-1. Verify that the secondary is configured correctly and that the primary is
-   reachable:
-
-    ```
-    gitlab-rake gitlab:geo:check
-    ```
-
 The replication process is now complete.
 
 ### External PostgreSQL instances

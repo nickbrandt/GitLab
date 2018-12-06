@@ -28,7 +28,11 @@ export default {
   discard(endpoint) {
     return Vue.http.delete(endpoint);
   },
-  update(endpoint, { draftId, note }) {
-    return Vue.http.put(`${endpoint}/${draftId}`, { draft_note: { note } }, { emulateJSON: true });
+  update(endpoint, { draftId, note, resolveDiscussion }) {
+    return Vue.http.put(
+      `${endpoint}/${draftId}`,
+      { draft_note: { note, resolve_discussion: resolveDiscussion } },
+      { emulateJSON: true },
+    );
   },
 };

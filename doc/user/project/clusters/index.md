@@ -92,13 +92,47 @@ To add an existing Kubernetes cluster to your project:
       the `ca.crt` contents here.
     - **Token** -
       GitLab authenticates against Kubernetes using service tokens, which are
-      scoped to a particular `namespace`. If you don't have a service token yet,
-      you can follow the
-      [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/)
-      to create one. You can also view or create service tokens in the
-      [Kubernetes dashboard](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/)
-      (under **Config > Secrets**). **The account that will issue the service token
-      must have admin privileges on the cluster.**
+      scoped to a particular `namespace`.
+      **The token used should belong to a service account with
+      [`cluster-admin`](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles)
+      privileges.** To create this service account:
+
+      1. Create a `gitlab` service account in the `default` namespace:
+
+          ```bash
+          kubectl create -f - <<EOF
+            apiVersion: v1
+            kind: ServiceAccount
+            metadata:
+              name: gitlab
+              namespace: default
+          EOF
+          ```
+      1. Create a cluster role binding to give the `gitlab` service account
+         `cluster-admin` privileges:
+
+          ```bash
+          kubectl create -f - <<EOF
+          kind: ClusterRoleBinding
+          apiVersion: rbac.authorization.k8s.io/v1
+          metadata:
+            name: gitlab-cluster-admin
+          subjects:
+          - kind: ServiceAccount
+            name: gitlab
+            namespace: default
+          roleRef:
+            kind: ClusterRole
+            name: cluster-admin
+            apiGroup: rbac.authorization.k8s.io
+          EOF
+          ```
+      NOTE: **Note:**
+      For GKE clusters, you will need the
+      `container.clusterRoleBindings.create` permission to create a cluster
+      role binding. You can follow the [Google Cloud
+      documentation](https://cloud.google.com/iam/docs/granting-changing-revoking-access)
+      to grant access.
     - **Project namespace** (optional) - You don't have to fill it in; by leaving
       it blank, GitLab will create one for you. Also:
        - Each project should have a unique namespace.
@@ -143,8 +177,9 @@ Whether ABAC or RBAC is enabled, GitLab will create the necessary
 service accounts and privileges in order to install and run
 [GitLab managed applications](#installing-applications):
 
-- A `gitlab` service account with `cluster-admin` privileges will be created in the
-  `default` namespace, which will be used by GitLab to manage the newly created cluster.
+- If GitLab is creating the cluster, a `gitlab` service account with
+  `cluster-admin` privileges will be created in the `default` namespace,
+  which will be used by GitLab to manage the newly created cluster.
 
 - A project service account with [`edit`
   privileges](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles)
@@ -226,6 +261,7 @@ twice, which can lead to confusion during deployments.
 | ----------- | :------------: | ----------- | --------------- |
 | [Helm Tiller](https://docs.helm.sh/) | 10.2+ | Helm is a package manager for Kubernetes and is required to install all the other applications. It is installed in its own pod inside the cluster which can run the `helm` CLI in a safe environment. | n/a |
 | [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) | 10.2+ | Ingress can provide load balancing, SSL termination, and name-based virtual hosting. It acts as a web proxy for your applications and is useful if you want to use [Auto DevOps] or deploy your own web apps. | [stable/nginx-ingress](https://github.com/helm/charts/tree/master/stable/nginx-ingress) |
+| [Cert Manager](http://docs.cert-manager.io/en/latest/) | 11.6+ | Cert Manager is a native Kubernetes certificate management controller that helps with issuing certificates. Installing Cert Manager on your cluster will issue a certificate by [Let's Encrypt](https://letsencrypt.org/) and ensure that certificates are valid and up to date. The email address used by Let's Encrypt registration will be taken from the GitLab user that installed Cert Manager on the cluster. | [stable/cert-manager](https://github.com/helm/charts/tree/master/stable/cert-manager) |
 | [Prometheus](https://prometheus.io/docs/introduction/overview/) | 10.4+ | Prometheus is an open-source monitoring and alerting system useful to supervise your deployed applications. | [stable/prometheus](https://github.com/helm/charts/tree/master/stable/prometheus) |
 | [GitLab Runner](https://docs.gitlab.com/runner/) | 10.6+ | GitLab Runner is the open source project that is used to run your jobs and send the results back to GitLab. It is used in conjunction with [GitLab CI/CD](https://about.gitlab.com/features/gitlab-ci-cd/), the open-source continuous integration service included with GitLab that coordinates the jobs. When installing the GitLab Runner via the applications, it will run in **privileged mode** by default. Make sure you read the [security implications](#security-implications) before doing so. | [runner/gitlab-runner](https://gitlab.com/charts/gitlab-runner) |
 | [JupyterHub](http://jupyter.org/) | 11.0+ | [JupyterHub](https://jupyterhub.readthedocs.io/en/stable/) is a multi-user service for managing notebooks across a team. [Jupyter Notebooks](https://jupyter-notebook.readthedocs.io/en/latest/) provide a web-based interactive programming environment used for data analysis, visualization, and machine learning. We use [this](https://gitlab.com/gitlab-org/jupyterhub-user-image/blob/master/Dockerfile) custom Jupyter image that installs additional useful packages on top of the base Jupyter. You will also see ready-to-use DevOps Runbooks built with Nurtch's [Rubix library](https://github.com/amit1rrr/rubix). More information on creating executable runbooks can be found at [Nurtch Documentation](http://docs.nurtch.com/en/latest).  **Note**: Authentication will be enabled for any user of the GitLab server via OAuth2. HTTPS will be supported in a future release. | [jupyter/jupyterhub](https://jupyterhub.github.io/helm-chart/) |
@@ -238,13 +274,10 @@ by GitLab before installing any of the above applications.
 ## Getting the external IP address
 
 NOTE: **Note:**
-You need a load balancer installed in your cluster in order to obtain the
-external IP address with the following procedure. It can be deployed using the
-[**Ingress** application](#installing-applications).
-
-NOTE: **Note:**
-Knative will include its own load balancer in the form of [Istio](https://istio.io).
-At this time, to determine the external IP address, you will need to follow the manual approach.
+With the following procedure, a load balancer must be installed in your cluster
+to obtain the external IP address. You can use either
+[Ingress](#installing-applications), or Knative's own load balancer
+([Istio](https://istio.io)) if using [Knative](#installing-applications).
 
 In order to publish your web application, you first need to find the external IP
 address associated to your load balancer.
@@ -253,7 +286,7 @@ address associated to your load balancer.
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/17052) in GitLab 10.6.
 
-If you installed the Ingress [via the **Applications**](#installing-applications),
+If you [installed Ingress or Knative](#installing-applications),
 you should see the Ingress IP address on this same page within a few minutes.
 If you don't see this, GitLab might not be able to determine the IP address of
 your ingress application in which case you should manually determine it.
@@ -400,11 +433,33 @@ GitLab CI/CD build environment.
 | `KUBE_NAMESPACE` | The Kubernetes namespace is auto-generated if not specified. The default value is `<project_name>-<project_id>`. You can overwrite it to use different one if needed, otherwise the `KUBE_NAMESPACE` variable will receive the default value. |
 | `KUBE_CA_PEM_FILE` | Path to a file containing PEM data. Only present if a custom CA bundle was specified. |
 | `KUBE_CA_PEM` | (**deprecated**) Raw PEM data. Only if a custom CA bundle was specified. |
-| `KUBECONFIG` | Path to a file containing `kubeconfig` for this deployment. CA bundle would be embedded if specified. |
+| `KUBECONFIG` | Path to a file containing `kubeconfig` for this deployment. CA bundle would be embedded if specified. This config also embeds the same token defined in `KUBE_TOKEN` so you likely will only need this variable. This variable name is also automatically picked up by `kubectl` so you won't actually need to reference it explicitly if using `kubectl`. |
 
 NOTE: **NOTE:**
 Prior to GitLab 11.5, `KUBE_TOKEN` was the Kubernetes token of the main
 service account of the cluster integration.
+
+### Troubleshooting missing `KUBECONFIG` or `KUBE_TOKEN`
+
+GitLab will create a new service account specifically for your CI builds. The
+new service account is created when the cluster is added to the project.
+Sometimes there may be errors that cause the service account creation to fail.
+
+In such instances, your build will not be passed the `KUBECONFIG` or
+`KUBE_TOKEN` variables and, if you are using Auto DevOps, your Auto DevOps
+pipelines will no longer trigger a `production` deploy build. You will need to
+check the [logs](../../../administration/logs.md) to debug why the service
+account creation failed.
+
+A common reason for failure is that the token you gave GitLab did not have
+[`cluster-admin`](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles)
+privileges as GitLab expects.
+
+Another common problem for why these variables are not being passed to your
+builds is that they must have a matching
+[`environment:name`](../../../ci/environments.md#defining-environments). If
+your build has no `environment:name` set, it will not be passed the Kubernetes
+credentials.
 
 ## Monitoring your Kubernetes cluster **[ULTIMATE]**
 

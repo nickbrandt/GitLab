@@ -51,14 +51,19 @@ export default {
       required: false,
       default: '',
     },
+    resolveDiscussion: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
       updatedNoteBody: this.noteBody,
       conflictWhileEditing: false,
       isSubmitting: false,
-      isResolving: false,
-      isUnresolving: false,
+      isResolving: this.resolveDiscussion,
+      isUnresolving: !this.resolveDiscussion,
       resolveAsThread: true,
     };
   },
@@ -122,13 +127,19 @@ export default {
       const beforeSubmitDiscussionState = this.discussionResolved;
       this.isSubmitting = true;
 
-      this.$emit('handleFormUpdate', this.updatedNoteBody, this.$refs.editNoteForm, () => {
-        this.isSubmitting = false;
+      this.$emit(
+        'handleFormUpdate',
+        this.updatedNoteBody,
+        this.$refs.editNoteForm,
+        () => {
+          this.isSubmitting = false;
 
-        if (this.shouldToggleResolved(shouldResolve, beforeSubmitDiscussionState)) {
-          this.resolveHandler(beforeSubmitDiscussionState);
-        }
-      });
+          if (this.shouldToggleResolved(shouldResolve, beforeSubmitDiscussionState)) {
+            this.resolveHandler(beforeSubmitDiscussionState);
+          }
+        },
+        this.discussionResolved ? !this.isUnresolving : this.isResolving,
+      );
     },
     editMyLastNote() {
       if (this.updatedNoteBody === '') {
@@ -153,7 +164,7 @@ export default {
   <div ref="editNoteForm" class="note-edit-form current-note-edit-form js-discussion-note-form">
     <div v-if="conflictWhileEditing" class="js-conflict-edit-warning alert alert-danger">
       This comment has changed since you started editing, please review the
-      <a :href="noteHash" target="_blank" rel="noopener noreferrer"> updated comment </a> to ensure
+      <a :href="noteHash" target="_blank" rel="noopener noreferrer">updated comment</a> to ensure
       information is not lost.
     </div>
     <div class="flash-container timeline-content"></div>
@@ -178,71 +189,63 @@ export default {
           v-model="updatedNoteBody"
           :data-supports-quick-actions="!isEditing"
           name="note[note]"
-          class="note-textarea js-gfm-input js-note-text
-js-autosize markdown-area js-vue-issue-note-form js-vue-textarea qa-reply-input"
+          class="note-textarea js-gfm-input js-note-text js-autosize markdown-area js-vue-issue-note-form js-vue-textarea qa-reply-input"
           aria-label="Description"
           placeholder="Write a comment or drag your files here…"
           @keydown.meta.enter="handleUpdate();"
           @keydown.ctrl.enter="handleUpdate();"
           @keydown.up="editMyLastNote();"
           @keydown.esc="cancelHandler(true);"
-        >
-        </textarea>
+        ></textarea>
       </markdown-field>
       <div class="note-form-actions clearfix">
-        <template v-if="showBatchCommentsActions">
-          <p v-if="discussion && discussion.id">
-            <label>
-              <template v-if="discussionResolved">
-                <input
-                  v-model="isUnresolving"
-                  type="checkbox"
-                  class="qa-unresolve-review-discussion"
-                />
-                {{ __('Unresolve discussion') }}
-              </template>
-              <template v-else>
-                <input v-model="isResolving" type="checkbox" class="qa-resolve-review-discussion" />
-                {{ __('Resolve discussion') }}
-              </template>
-            </label>
-          </p>
-          <div>
-            <button
-              :disabled="isDisabled"
-              type="button"
-              class="btn btn-success qa-start-review"
-              @click="handleAddToReview();"
-            >
-              <template v-if="hasDrafts">
-                {{ __('Add to review') }}
-              </template>
-              <template v-else>
-                {{ __('Start a review') }}
-              </template>
-            </button>
-            <button
-              :disabled="isDisabled"
-              type="button"
-              class="btn qa-comment-now"
-              @click="handleUpdate();"
-            >
-              {{ __('Add comment now') }}
-            </button>
-            <button
-              class="btn btn-cancel note-edit-cancel js-close-discussion-note-form"
-              type="button"
-              @click="cancelHandler();"
-            >
-              {{ __('Cancel') }}
-            </button>
-          </div>
-        </template>
+        <p v-if="(discussion && discussion.id) || isDraft">
+          <label>
+            <template v-if="discussionResolved">
+              <input
+                v-model="isUnresolving"
+                type="checkbox"
+                class="qa-unresolve-review-discussion"
+              />
+              {{ __('Unresolve discussion') }}
+            </template>
+            <template v-else>
+              <input v-model="isResolving" type="checkbox" class="qa-resolve-review-discussion" />
+              {{ __('Resolve discussion') }}
+            </template>
+          </label>
+        </p>
+        <div v-if="showBatchCommentsActions">
+          <button
+            :disabled="isDisabled"
+            type="button"
+            class="btn btn-success qa-start-review"
+            @click="handleAddToReview"
+          >
+            <template v-if="hasDrafts">{{ __('Add to review') }}</template>
+            <template v-else>{{ __('Start a review') }}</template>
+          </button>
+          <button
+            :disabled="isDisabled"
+            type="button"
+            class="btn qa-comment-now"
+            @click="handleUpdate();"
+          >
+            {{ __('Add comment now') }}
+          </button>
+          <button
+            class="btn btn-cancel note-edit-cancel js-close-discussion-note-form"
+            type="button"
+            @click="cancelHandler();"
+          >
+            {{ __('Cancel') }}
+          </button>
+        </div>
         <template v-else>
           <button
             :disabled="isDisabled"
             type="button"
-            class="js-vue-issue-save btn btn-success js-comment-button "
+            class="js-vue-issue-save btn btn-success js-comment-button"
             @click="handleUpdate();"
           >
             {{ saveButtonTitle }}

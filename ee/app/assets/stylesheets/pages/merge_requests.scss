@@ -1,24 +1,3 @@
-.link-to-member-avatar {
-  .disabled {
-    pointer-events: none;
-    cursor: default;
-  }
-
-  .avatar {
-    margin-bottom: 0;
-    margin-left: 7px;
-    display: block;
-  }
-}
-
-.mr-widget-approvals-container {
-  align-items: center;
-
-  .zero-approvals .ci-status-icon-success svg {
-    fill: $gray-darkest;
-  }
-}
-
 .approvals-body {
   @include media-breakpoint-up(md) {
     display: flex;
@@ -49,12 +28,11 @@
   .approvers-list {
     display: flex;
     align-items: center;
+    margin-left: 7px;
+  }
 
-    .link-to-member-avatar:not(:first-child) {
-      img {
-        margin-left: 0;
-      }
-    }
+  .avatar-placeholder {
+    color: $gray-darkest;
   }
 
   .unapprove-btn {
@@ -70,10 +48,6 @@
     &:focus {
       outline: none;
     }
-  }
-
-  .approver-avatar {
-    position: relative;
   }
 }
 

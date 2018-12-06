@@ -12,7 +12,6 @@ module API
     before do
       require_packages_enabled!
       authenticate_non_get!
-      authorize_packages_feature!
     end
 
     helpers do
@@ -54,10 +53,44 @@ module API
       end
     end
 
+    desc 'Download the maven package file at instance level' do
+      detail 'This feature was introduced in GitLab 11.6'
+    end
+    params do
+      requires :path, type: String, desc: 'Package path'
+      requires :file_name, type: String, desc: 'Package file name'
+    end
+    route_setting :authentication, job_token_allowed: true
+    get 'packages/maven/*path/:file_name', requirements: MAVEN_ENDPOINT_REQUIREMENTS do
+      file_name, format = extract_format(params[:file_name])
+
+      package = ::Packages::MavenPackageFinder.new(params[:path]).execute!
+
+      forbidden! unless package.project.feature_available?(:packages)
+
+      authorize!(:read_package, package.project)
+
+      package_file = ::Packages::PackageFileFinder
+        .new(package, file_name).execute!
+
+      case format
+      when 'md5'
+        package_file.file_md5
+      when 'sha1'
+        package_file.file_sha1
+      when nil
+        present_carrierwave_file!(package_file.file)
+      end
+    end
+
     params do
       requires :id, type: String, desc: 'The ID of a project'
     end
-    resource :projects, requirements: API::PROJECT_ENDPOINT_REQUIREMENTS do
+    resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
+      before do
+        authorize_packages_feature!
+      end
+
       desc 'Download the maven package file' do
         detail 'This feature was introduced in GitLab 11.3'
       end
@@ -72,7 +105,7 @@ module API
         file_name, format = extract_format(params[:file_name])
 
         package = ::Packages::MavenPackageFinder
-          .new(user_project, params[:path]).execute!
+          .new(params[:path], user_project).execute!
 
         package_file = ::Packages::PackageFileFinder
           .new(package, file_name).execute!

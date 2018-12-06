@@ -1,9 +1,9 @@
 <script>
-import linkedPipeline from './linked_pipeline.vue';
+import LinkedPipeline from './linked_pipeline.vue';
 
 export default {
   components: {
-    linkedPipeline,
+    LinkedPipeline,
   },
   props: {
     columnTitle: {
@@ -19,7 +19,6 @@ export default {
       required: true,
     },
   },
-
   computed: {
     columnClass() {
       return `graph-position-${this.graphPosition}`;
@@ -38,11 +37,15 @@ export default {
         :key="pipeline.id"
         :class="{
           'flat-connector-before': index === 0 && graphPosition === 'right',
+          active: !pipeline.isCollapsed || pipeline.isLoading,
+          'left-connector': !pipeline.isCollapsed && graphPosition === 'left',
         }"
         :pipeline-id="pipeline.id"
         :project-name="pipeline.project.name"
         :pipeline-status="pipeline.details.status"
         :pipeline-path="pipeline.path"
+        :is-loading="pipeline.isLoading"
+        @pipelineClicked="$emit('linkedPipelineClick', pipeline, index);"
       />
     </ul>
   </div>

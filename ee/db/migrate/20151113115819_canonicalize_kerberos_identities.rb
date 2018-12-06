@@ -1,4 +1,4 @@
-class CanonicalizeKerberosIdentities < ActiveRecord::Migration
+class CanonicalizeKerberosIdentities < ActiveRecord::Migration[4.2]
   # This migration can be performed online without errors.
   # It makes sure that all Kerberos identities are in canonical form
   # with a realm name (`username` => `username@DEFAULT.REALM`).

@@ -64,6 +64,7 @@ export default {
     handleClearForm(lineCode) {
       this.cancelCommentForm({
         lineCode,
+        fileHash: this.diffFileHash,
       });
       this.$nextTick(() => {
         this.resetAutoSave();

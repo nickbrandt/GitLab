@@ -98,6 +98,10 @@
   display: inline-block;
 }
 
+.upstream-pipeline {
+  margin-right: 84px;
+}
+
 .linked-pipelines-column.stage-column {
   position: relative;
 
@@ -119,6 +123,16 @@
     .cross-project-triangle {
       left: -64px;
     }
+
+    // reset connectors for the downstream pipeline
+    .linked-pipeline.build {
+      .curve::before,
+      &::after {
+        content: '';
+        width: 0;
+        border: 0;
+      }
+    }
   }
 
   .linked-pipeline.build {
@@ -129,16 +143,36 @@
       @include flat-connector-before($linked-project-column-margin);
     }
 
-    &::after {
-      right: -$linked-project-column-margin;
-      width: $linked-project-column-margin;
+    &.active, {
+      .linked-pipeline-content,
+      .linked-pipeline-content:hover,
+      .linked-pipeline-content:focus, {
+        background-color: $blue-100;
+      }
+
+      &.left-connector {
+        @include flat-connector-before(88px)
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 48%;
+        right: -88px;
+        border-top: 2px solid $border-color;
+        width: 88px;
+        height: 1px;
+      }
     }
 
     .linked-pipeline-content {
       @include build-content(0);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      text-align: inherit;
+      min-height: 42px;
+
+      svg {
+        top: 0;
+      }
     }
   }
 }

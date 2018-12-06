@@ -1,4 +1,4 @@
-class GeoRepositoriesChangedEvents < ActiveRecord::Migration
+class GeoRepositoriesChangedEvents < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

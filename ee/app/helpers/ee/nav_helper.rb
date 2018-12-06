@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module NavHelper
     extend ::Gitlab::Utils::Override

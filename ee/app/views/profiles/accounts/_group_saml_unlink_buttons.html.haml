@@ -1,0 +1,7 @@
+- group_saml_identities.each do |identity|
+  - group = identity.saml_provider.group
+  .provider-btn-group
+    .provider-btn-image
+      = _("SAML for %{group_name}") % { group_name: group.name }
+    = link_to unlink_group_saml_providers_path(group), method: :delete, class: 'provider-btn' do
+      Disconnect

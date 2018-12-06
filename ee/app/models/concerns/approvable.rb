@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Approvable
   # A method related to approvers that is user facing
   # should be moved to VisibleApprovable because

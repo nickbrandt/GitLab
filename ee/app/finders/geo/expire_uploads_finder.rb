@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   class ExpireUploadsFinder
     def find_project_uploads(project)

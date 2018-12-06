@@ -1,4 +1,4 @@
-class AddIndexToProjectIdOnProjectRegistry < ActiveRecord::Migration
+class AddIndexToProjectIdOnProjectRegistry < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

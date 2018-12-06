@@ -39,21 +39,22 @@ module Gitlab
       adapter_name.casecmp('postgresql').zero?
     end
 
-    # Overridden in EE
     def self.read_only?
-      Gitlab::Geo.secondary?
+      false
     end
 
     def self.read_write?
       !self.read_only?
     end
 
-    # check whether the underlying database is in read-only mode
+    # Check whether the underlying database is in read-only mode
     def self.db_read_only?
       if postgresql?
-        ActiveRecord::Base.connection.execute('SELECT pg_is_in_recovery()')
-          .first
-          .fetch('pg_is_in_recovery') == 't'
+        pg_is_in_recovery =
+          ActiveRecord::Base.connection.execute('SELECT pg_is_in_recovery()')
+            .first.fetch('pg_is_in_recovery')
+
+        Gitlab::Utils.to_boolean(pg_is_in_recovery)
       else
         false
       end
@@ -101,12 +102,6 @@ module Gitlab
       Gitlab::Database.postgresql_9_or_less? ? 'pg_last_xlog_replay_location' : 'pg_last_wal_replay_lsn'
     end
 
-    def self.healthy?
-      return true unless postgresql?
-
-      !Postgresql::ReplicationSlot.lag_too_great?
-    end
-
     def self.nulls_last_order(field, direction = 'ASC')
       order = "#{field} #{direction}"
 
@@ -137,10 +132,6 @@ module Gitlab
 
     def self.random
       postgresql? ? "RANDOM()" : "RAND()"
-    end
-
-    def self.minute_interval(value)
-      postgresql? ? "#{value} * '1 minute'::interval" : "INTERVAL #{value} MINUTE"
     end
 
     def self.true_value
@@ -234,14 +225,6 @@ module Gitlab
           ConnectionSpecification::Resolver.new(config).spec(env.to_sym)
 
       ActiveRecord::ConnectionAdapters::ConnectionPool.new(spec)
-    end
-
-    # Disables prepared statements for the current database connection.
-    def self.disable_prepared_statements
-      config = ActiveRecord::Base.configurations[Rails.env]
-      config['prepared_statements'] = false
-
-      ActiveRecord::Base.establish_connection(config)
     end
 
     def self.connection

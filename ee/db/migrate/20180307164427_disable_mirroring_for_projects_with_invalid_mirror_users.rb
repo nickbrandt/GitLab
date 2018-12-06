@@ -1,4 +1,4 @@
-class DisableMirroringForProjectsWithInvalidMirrorUsers < ActiveRecord::Migration
+class DisableMirroringForProjectsWithInvalidMirrorUsers < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def up

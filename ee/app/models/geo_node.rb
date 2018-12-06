@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GeoNode < ActiveRecord::Base
   include Presentable
 
@@ -32,13 +34,14 @@ class GeoNode < ActiveRecord::Base
   validates :repos_max_capacity, numericality: { greater_than_or_equal_to: 0 }
   validates :files_max_capacity, numericality: { greater_than_or_equal_to: 0 }
   validates :verification_max_capacity, numericality: { greater_than_or_equal_to: 0 }
+  validates :minimum_reverification_interval, numericality: { greater_than_or_equal_to: 1 }
 
   validate :check_not_adding_primary_as_secondary, if: :secondary?
 
   after_save :expire_cache!
   after_destroy :expire_cache!
-  before_validation :update_dependents_attributes
 
+  before_validation :update_dependents_attributes
   before_validation :ensure_access_keys!
 
   alias_method :repair, :save # the `update_dependents_attributes` hook will take care of it

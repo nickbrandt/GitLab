@@ -1,4 +1,4 @@
-class CreateGeoHashedStorageMigratedEvents < ActiveRecord::Migration
+class CreateGeoHashedStorageMigratedEvents < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def change

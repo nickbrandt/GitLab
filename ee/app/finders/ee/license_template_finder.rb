@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module LicenseTemplateFinder
     extend ::Gitlab::Utils::Override

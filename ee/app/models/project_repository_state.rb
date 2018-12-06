@@ -1,10 +1,10 @@
+# frozen_string_literal: true
+
 class ProjectRepositoryState < ActiveRecord::Base
   include IgnorableColumn
   include ShaAttribute
 
-  ignore_column :last_repository_verification_at
   ignore_column :last_repository_verification_failed
-  ignore_column :last_wiki_verification_at
   ignore_column :last_wiki_verification_failed
 
   sha_attribute :repository_verification_checksum

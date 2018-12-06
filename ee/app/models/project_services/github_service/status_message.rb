@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GithubService
   class StatusMessage
     include Gitlab::Routing

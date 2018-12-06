@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module GitlabRoutingHelper
     include ::ProjectsHelper
@@ -35,6 +37,22 @@ module EE
 
     def license_management_settings_path(project)
       project_settings_ci_cd_path(project, anchor: 'js-license-management')
+    end
+
+    def self.url_helper(route_name)
+      define_method("#{route_name}_url") do |*args|
+        path = public_send(:"#{route_name}_path", *args) # rubocop:disable GitlabSecurity/PublicSend
+        options = Rails.application.routes.default_url_options.merge(path: path)
+        ActionDispatch::Http::URL.full_url_for(options)
+      end
+    end
+
+    url_helper :user_group_saml_omniauth_metadata
+    def user_group_saml_omniauth_metadata_path(group)
+      params = { group_path: group.path, token:  group.saml_discovery_token }
+      path = '/users/auth/group_saml/metadata'
+
+      ActionDispatch::Http::URL.path_for(path: path, params: params)
     end
   end
 end

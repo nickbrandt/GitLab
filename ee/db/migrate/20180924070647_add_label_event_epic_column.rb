@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AddLabelEventEpicColumn < ActiveRecord::Migration
+class AddLabelEventEpicColumn < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def up

@@ -1,4 +1,4 @@
-class AddFileRegistrySuccess < ActiveRecord::Migration
+class AddFileRegistrySuccess < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

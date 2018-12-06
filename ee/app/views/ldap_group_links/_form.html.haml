@@ -25,7 +25,7 @@
         = f.label :cn, class: 'col-form-label col-sm-2' do
           LDAP Group cn
         .col-sm-10
-          = f.hidden_field :cn, placeholder: 'Ex. QA group', class: 'xxlarge ajax-ldap-groups-select input-mn-300'
+          = f.hidden_field :cn, placeholder: 'Ex. QA group', class: 'xxlarge ajax-ldap-groups-select input-mn-300 qa-ldap-group-cn-select'
           .form-text.text-muted
             Synchronize #{group.name}'s members with this LDAP group.
             %br
@@ -36,7 +36,7 @@
           = f.label :filter, class: 'col-form-label col-sm-2' do
             LDAP User filter
           .col-sm-10
-            = f.text_field :filter, placeholder: 'Ex. (&(objectCategory=person)(objectClass=developer))', class: 'form-control xxlarge input-mn-300'
+            = f.text_field :filter, placeholder: 'Ex. (&(objectCategory=person)(objectClass=developer))', class: 'form-control xxlarge input-mn-300 qa-ldap-user-filter-text-field'
             .form-text.text-muted
               - ldap_link = link_to 'LDAP Search Filter Syntax', 'https://msdn.microsoft.com/en-us/library/aa746475(v=vs.85).aspx'
               This query must use valid #{ldap_link}. Synchronize #{group.name}'s members with this LDAP user filter.
@@ -54,4 +54,4 @@
             You can manage permission levels for individual group members in the Members tab.
 
     .form-actions
-      = f.submit 'Add synchronization', class: 'btn btn-success'
+      = f.submit 'Add synchronization', class: 'btn btn-success qa-add-sync-button'

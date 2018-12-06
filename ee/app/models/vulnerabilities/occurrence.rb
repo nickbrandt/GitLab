@@ -73,6 +73,14 @@ module Vulnerabilities
         .where(vulnerability_occurrence_pipelines: { pipeline_id: pipelines })
     end
 
+    def self.count_by_day_and_severity(period)
+      joins(:occurrence_pipelines)
+        .select('CAST(vulnerability_occurrence_pipelines.created_at AS DATE) AS day', :severity, 'COUNT(distinct vulnerability_occurrences.id) as count')
+        .where(['vulnerability_occurrence_pipelines.created_at >= ?', Date.today - period])
+        .group(:day, :severity)
+        .order('day')
+    end
+
     def feedback(feedback_type:)
       params = {
         project_id: project_id,
@@ -86,7 +94,7 @@ module Vulnerabilities
         categories = items.group_by { |i| i[:category] }
         fingerprints = items.group_by { |i| i[:project_fingerprint] }
 
-        VulnerabilityFeedback.all_preloaded.where(
+        Vulnerabilities::Feedback.all_preloaded.where(
           project_id: project_ids.keys,
           category: categories.keys,
           project_fingerprint: fingerprints.keys).find_each do |feedback|

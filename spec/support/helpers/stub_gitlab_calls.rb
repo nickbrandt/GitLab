@@ -1,4 +1,6 @@
 module StubGitlabCalls
+  prepend EE::StubGitlabCalls
+
   def stub_gitlab_calls
     stub_user
     stub_project_8

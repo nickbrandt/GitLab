@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { convertPermissionToBoolean } from '~/lib/utils/common_utils';
+import { parseBoolean } from '~/lib/utils/common_utils';
 import serviceDeskRoot from './components/service_desk_root.vue';
 
 export default () => {
@@ -14,7 +14,7 @@ export default () => {
       data() {
         const { dataset } = serviceDeskRootElement;
         return {
-          initialIsEnabled: convertPermissionToBoolean(dataset.enabled),
+          initialIsEnabled: parseBoolean(dataset.enabled),
           endpoint: dataset.endpoint,
           incomingEmail: dataset.incomingEmail,
         };

@@ -10,7 +10,7 @@ merge_requests:
 - approver_groups
 - approved_by_users
 - draft_notes
-pipelines:
+ci_pipelines:
 - source_pipeline
 - sourced_pipelines
 - triggered_by_pipeline
@@ -68,6 +68,7 @@ project:
 - project_registry
 - packages
 - tracing_setting
+- webide_pipelines
 prometheus_metrics:
 - project
 - prometheus_alerts

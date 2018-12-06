@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module SystemCheck
   module App
     class ElasticsearchCheck < SystemCheck::BaseCheck
-      set_name 'Elasticsearch version 5.1 - 5.5?'
+      set_name 'Elasticsearch version 5.6 - 6.x?'
       set_skip_reason 'skipped (elasticsearch is disabled)'
       set_check_pass -> { "yes (#{self.current_version})" }
       set_check_fail -> { "no (#{self.current_version})" }
@@ -18,7 +20,14 @@ module SystemCheck
       end
 
       def check?
-        self.class.current_version.major == 5 && (1..5).cover?(self.class.current_version.minor)
+        case self.class.current_version.major
+        when 5
+          !(1..5).cover?(self.class.current_version.minor)
+        when 6
+          true
+        else
+          false
+        end
       end
 
       def show_error

@@ -1,4 +1,4 @@
-class CreateEpicIssuesTable < ActiveRecord::Migration
+class CreateEpicIssuesTable < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   disable_ddl_transaction!

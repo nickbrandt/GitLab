@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Elastic
   module IssuesSearch
     extend ActiveSupport::Concern

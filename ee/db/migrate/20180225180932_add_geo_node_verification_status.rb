@@ -1,4 +1,4 @@
-class AddGeoNodeVerificationStatus < ActiveRecord::Migration
+class AddGeoNodeVerificationStatus < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   # Set this constant to true if this migration requires downtime.

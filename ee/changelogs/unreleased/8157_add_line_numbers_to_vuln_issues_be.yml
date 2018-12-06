@@ -1,0 +1,5 @@
+---
+title: Add file and line numbers to issues created from SAST vulnerabilities
+merge_request: 8578
+author:
+type: changed

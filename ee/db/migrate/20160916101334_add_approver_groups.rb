@@ -2,7 +2,7 @@
 # for more information on how to write migrations for GitLab.
 
 # rubocop:disable Migration/Timestamps
-class AddApproverGroups < ActiveRecord::Migration
+class AddApproverGroups < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = true

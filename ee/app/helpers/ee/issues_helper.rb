@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module IssuesHelper
     def weight_dropdown_tag(issuable, opts = {}, &block)

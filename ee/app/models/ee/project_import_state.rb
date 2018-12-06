@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module ProjectImportState
     extend ActiveSupport::Concern
@@ -72,6 +74,58 @@ module EE
       end
     end
 
+    override :in_progress?
+    def in_progress?
+      # If we're importing while we do have a repository, we're simply updating the mirror.
+      super && !project.mirror_with_content?
+    end
+
+    def mirror_waiting_duration
+      return unless mirror?
+
+      (last_update_started_at.to_i - last_update_scheduled_at.to_i).seconds
+    end
+
+    def mirror_update_duration
+      return unless mirror?
+
+      (last_update_at.to_i - last_update_started_at.to_i).seconds
+    end
+
+    def updating_mirror?
+      (scheduled? || started?) && project.mirror_with_content?
+    end
+
+    def mirror_update_due?
+      return false unless project.mirror_with_content?
+      return false if hard_failed?
+      return false if updating_mirror?
+
+      next_execution_timestamp <= Time.now
+    end
+
+    def last_update_status
+      return unless state_updated?
+
+      if last_update_at == last_successful_update_at
+        :success
+      else
+        :failed
+      end
+    end
+
+    def last_update_succeeded?
+      last_update_status == :success
+    end
+
+    def last_update_failed?
+      last_update_status == :failed
+    end
+
+    def ever_updated_successfully?
+      state_updated? && last_successful_update_at
+    end
+
     def reset_retry_count
       self.retry_count = 0
     end
@@ -91,8 +145,19 @@ module EE
       self.next_execution_timestamp = timestamp + delay
     end
 
+    def force_import_job!
+      return if mirror_update_due? || updating_mirror?
+
+      set_next_execution_to_now
+      reset_retry_count if hard_failed?
+
+      save!
+
+      UpdateAllMirrorsWorker.perform_async
+    end
+
     def set_next_execution_to_now
-      return unless project.mirror?
+      return unless mirror?
 
       self.next_execution_timestamp = Time.now
     end
@@ -100,8 +165,13 @@ module EE
     def retry_limit_exceeded?
       self.retry_count > ::Gitlab::Mirror::MAX_RETRY
     end
+    alias_method :hard_failed?, :retry_limit_exceeded?
 
     private
+
+    def state_updated?
+      mirror? && last_update_at
+    end
 
     def base_delay(timestamp)
       return 0 unless self.last_update_started_at

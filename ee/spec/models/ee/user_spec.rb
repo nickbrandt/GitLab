@@ -230,6 +230,83 @@ describe EE::User do
     end
   end
 
+  describe '#available_subgroups_with_custom_project_templates', :postgresql do
+    let(:user) { create(:user) }
+
+    context 'without Groups with custom project templates' do
+      before do
+        group = create(:group)
+
+        group.add_maintainer(user)
+      end
+
+      it 'returns an empty collection' do
+        expect(user.available_subgroups_with_custom_project_templates).to be_empty
+      end
+    end
+
+    context 'with Groups with custom project templates' do
+      let!(:group_1) { create(:group, name: 'group-1') }
+      let!(:group_2) { create(:group, name: 'group-2') }
+      let!(:group_3) { create(:group, name: 'group-3') }
+
+      let!(:subgroup_1) { create(:group, parent: group_1, name: 'subgroup-1') }
+      let!(:subgroup_2) { create(:group, parent: group_2, name: 'subgroup-2') }
+      let!(:subgroup_3) { create(:group, parent: group_3, name: 'subgroup-3') }
+
+      before do
+        group_1.update!(custom_project_templates_group_id: subgroup_1.id)
+        group_2.update!(custom_project_templates_group_id: subgroup_2.id)
+        group_3.update!(custom_project_templates_group_id: subgroup_3.id)
+
+        create(:project, namespace: subgroup_1)
+        create(:project, namespace: subgroup_2)
+      end
+
+      context 'when the access level of the user is below the required one' do
+        before do
+          group_1.add_developer(user)
+        end
+
+        it 'returns an empty collection' do
+          expect(user.available_subgroups_with_custom_project_templates).to be_empty
+        end
+      end
+
+      context 'when the access level of the user is the correct' do
+        before do
+          group_1.add_maintainer(user)
+          group_2.add_maintainer(user)
+          group_3.add_maintainer(user)
+        end
+
+        context 'when a Group ID is passed' do
+          it 'returns a single Group' do
+            groups = user.available_subgroups_with_custom_project_templates(group_1.id)
+
+            expect(groups.size).to eq(1)
+            expect(groups.first.name).to eq('subgroup-1')
+          end
+        end
+
+        context 'when a Group ID is not passed' do
+          it 'returns all available Groups' do
+            groups = user.available_subgroups_with_custom_project_templates
+
+            expect(groups.size).to eq(2)
+            expect(groups.map(&:name)).to include('subgroup-1', 'subgroup-2')
+          end
+
+          it 'excludes Groups with the configured setting but without projects' do
+            groups = user.available_subgroups_with_custom_project_templates
+
+            expect(groups.map(&:name)).not_to include('subgroup-3')
+          end
+        end
+      end
+    end
+  end
+
   describe '#roadmap_layout' do
     context 'not set' do
       subject { build(:user, roadmap_layout: nil) }
@@ -257,7 +334,7 @@ describe EE::User do
     end
 
     context 'with linked identity' do
-      let!(:identity) { create(:identity, :group_saml, user: user) }
+      let!(:identity) { create(:group_saml_identity, user: user) }
       let(:saml_provider) { identity.saml_provider }
       let(:group) { saml_provider.group }
 
@@ -267,7 +344,7 @@ describe EE::User do
         end
 
         it 'does not cause ActiveRecord to loop through identites' do
-          create(:identity, :group_saml, user: user)
+          create(:group_saml_identity, user: user)
 
           expect(Identity).not_to receive(:instantiate)
 

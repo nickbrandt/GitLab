@@ -44,14 +44,14 @@ module API
     params do
       requires :id, type: String, desc: 'The ID of a project'
     end
-    resource :projects, requirements: API::PROJECT_ENDPOINT_REQUIREMENTS do
+    resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc 'Triggers a pull mirror operation'
       post ":id/mirror/pull" do
         authenticate_with_webhook_token!
 
         break render_api_error!('The project is not mirrored', 400) unless project.mirror?
 
-        project.force_import_job!
+        project.import_state.force_import_job!
 
         status 200
       end

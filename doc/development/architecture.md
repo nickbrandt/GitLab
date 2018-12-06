@@ -42,7 +42,7 @@ run: unicorn: (pid 30960) 14204s; run: log: (pid 13809) 2432047s
 GitLab can be considered to have two layers from a process perspective:
 
 - **Monitoring**: Anything from this layer is not required to deliver GitLab the application, but will allow administrators more insight into their infrastructure and what the service as a whole is doing.
-- **Core**: Any process that is vital for the delivery of GitLab as as platform. If any of these processes halt there will be a GitLab outage. For the Core layer, you can further divide into:
+- **Core**: Any process that is vital for the delivery of GitLab as a platform. If any of these processes halt there will be a GitLab outage. For the Core layer, you can further divide into:
   - **Processors**: These processes are responsible for actually performing operations and presenting the service.
   - **Data**: These services store/expose structured data for the GitLab service.
 
@@ -55,7 +55,7 @@ GitLab can be considered to have two layers from a process perspective:
 
 ### gitaly
 
-- [Omnibus confiugration options](https://gitlab.com/gitlab-org/gitaly/tree/master/doc/configuration) 
+- [Omnibus configuration options](https://gitlab.com/gitlab-org/gitaly/tree/master/doc/configuration) 
 - Layer: Core Service (Data)
 
 Gitaly is a service designed by GitLab to remove our need for NFS for Git storage in distributed deployments of GitLab. (Think GitLab.com or High Availablity Deployments) As of 11.3.0, This service handles all Git level access in GitLab. You can read more about the project [in the project's readme](https://gitlab.com/gitlab-org/gitaly).
@@ -86,7 +86,7 @@ GitLab is comprised of a large number of services that all log. We started bundl
 - [Omnibus configuration options](https://docs.gitlab.com/omnibus/settings/nginx.html)
 - Layer: Core Service (Processor)
 
-Nginx as as an ingress port for all HTTP requests and routes them to the approriate sub-systems within GitLab. We are bundling an unmodified version of the popular open source webserver.
+Nginx as an ingress port for all HTTP requests and routes them to the approriate sub-systems within GitLab. We are bundling an unmodified version of the popular open source webserver.
 
 ### node-exporter
 

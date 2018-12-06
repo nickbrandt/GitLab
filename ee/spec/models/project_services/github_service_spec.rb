@@ -167,7 +167,7 @@ describe GithubService do
 
   describe '#can_test?' do
     it 'is false if there are no pipelines' do
-      project.pipelines.delete_all
+      project.ci_pipelines.delete_all
 
       expect(subject.can_test?).to eq false
     end
@@ -184,7 +184,7 @@ describe GithubService do
     let(:test_data) { subject.test_data(project, user) }
 
     it 'raises error if no pipeline found' do
-      project.pipelines.delete_all
+      project.ci_pipelines.delete_all
 
       expect { test_data }.to raise_error 'Please set up a pipeline on your repository.'
     end

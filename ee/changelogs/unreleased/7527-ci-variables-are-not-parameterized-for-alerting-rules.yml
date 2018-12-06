@@ -1,0 +1,5 @@
+---
+title: Parameterize alerting rules with variables
+merge_request: 8481
+author:
+type: fixed

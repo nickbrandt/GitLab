@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PushRule < ActiveRecord::Base
   extend Gitlab::Cache::RequestCache
 

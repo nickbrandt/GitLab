@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   # Group EE mixin
   #
@@ -23,6 +25,8 @@ module EE
       # here since Group inherits from Namespace, the entity_type would be set to `Namespace`.
       has_many :audit_events, -> { where(entity_type: ::Group.name) }, foreign_key: 'entity_id'
 
+      has_many :project_templates, through: :projects, foreign_key: 'custom_project_templates_group_id'
+
       belongs_to :file_template_project, class_name: "Project"
 
       # Use +checked_file_template_project+ instead, which implements important
@@ -32,8 +36,15 @@ module EE
       validates :repository_size_limit,
                 numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
 
+      validate :custom_project_templates_group_allowed, if: :custom_project_templates_group_id_changed?
+
       scope :where_group_links_with_provider, ->(provider) do
         joins(:ldap_group_links).where(ldap_group_links: { provider: provider })
+      end
+
+      scope :with_project_templates, -> do
+        joins("INNER JOIN projects ON projects.namespace_id = namespaces.custom_project_templates_group_id")
+        .distinct
       end
 
       scope :with_custom_file_templates, -> do
@@ -89,6 +100,11 @@ module EE
     def latest_vulnerabilities
       Vulnerabilities::Occurrence
         .for_pipelines(all_pipelines.with_vulnerabilities.latest_successful_ids_per_project)
+    end
+
+    def all_vulnerabilities
+      Vulnerabilities::Occurrence
+        .for_pipelines(all_pipelines.with_vulnerabilities.success)
     end
 
     def human_ldap_access
@@ -157,6 +173,15 @@ module EE
       return nil unless feature_available?(:custom_file_templates_for_namespace)
 
       project
+    end
+
+    private
+
+    def custom_project_templates_group_allowed
+      return if custom_project_templates_group_id.blank?
+      return if descendants.exists?(id: custom_project_templates_group_id)
+
+      errors.add(:custom_project_templates_group_id, "has to be a descendant of the group")
     end
   end
 end

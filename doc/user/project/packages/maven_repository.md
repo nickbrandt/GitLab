@@ -119,6 +119,31 @@ on the home page of your project.
 If you have a self-hosted GitLab installation, replace `gitlab.com` with your
 domain name.
 
+## Instance level Maven endpoint
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/8274) in GitLab Premium 11.6.
+
+If you rely on many packages, it might be inefficient to include the `repository` section 
+with a unique URL for each package. Instead, you can use the instance level endpoint for 
+all maven packages stored in GitLab. Only packages you have access to 
+will be available for download. Here's how the relevant `repository` section of 
+your `pom.xml` would look like:
+
+```xml
+<repositories>
+  <repository>
+    <id>gitlab-maven</id>
+    <url>https://gitlab.com/api/v4/packages/maven</url>
+  </repository>
+</repositories>
+```
+
+If you have a self-hosted GitLab installation, replace `gitlab.com` with your
+domain name.
+
+You still need a project specific URL for uploading a package 
+in the `distributionManagement` section.
+
 ## Uploading packages
 
 Once you have set up the [authorization](#authorizing-with-the-gitlab-maven-repository)
@@ -167,7 +192,7 @@ shows how to create a new package each time the `master` branch is updated:
     <repositories>
       <repository>
         <id>gitlab-maven</id>
-        <url>https://gitlab.com/api/v4/projects/${env.CI_PROJECT_ID}packages/maven</url>
+        <url>https://gitlab.com/api/v4/projects/${env.CI_PROJECT_ID}/packages/maven</url>
       </repository>
     </repositories>
     <distributionManagement>

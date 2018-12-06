@@ -27,14 +27,14 @@ describe 'Merge request > User approves', :js do
         approve_merge_request
 
         expect(page).to have_content('Approved by')
-        expect(page).to have_css('.approver-avatar')
+        expect(page).to have_css('.js-approver-list-member')
       end
 
       it 'I am able to unapprove' do
         approve_merge_request
         unapprove_merge_request
 
-        expect(page).to have_no_css('.approver-avatar')
+        expect(page).to have_no_css('.js-approver-list-member')
       end
     end
 
@@ -48,14 +48,14 @@ describe 'Merge request > User approves', :js do
         approve_merge_request
 
         expect(page).to have_content('Approved by')
-        expect(page).to have_css('.approver-avatar')
+        expect(page).to have_css('.js-approver-list-member')
       end
 
       it 'I am able to unapprove' do
         approve_merge_request
         unapprove_merge_request
 
-        expect(page).to have_no_css('.approver-avatar')
+        expect(page).to have_no_css('.js-approver-list-member')
       end
     end
 
@@ -94,8 +94,8 @@ describe 'Merge request > User approves', :js do
     end
 
     it 'does not show checking ability text' do
-      expect(find('.mr-widget-approvals-container')).not_to have_text('Checking ability to merge automatically')
-      expect(find('.mr-widget-approvals-container')).to have_selector('.approvals-body')
+      expect(find('.js-mr-approvals')).not_to have_text('Checking ability to merge automatically')
+      expect(find('.js-mr-approvals')).to have_selector('.approvals-body')
     end
   end
 end

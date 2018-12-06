@@ -1,4 +1,4 @@
-class CreatePrometheusAlerts < ActiveRecord::Migration
+class CreatePrometheusAlerts < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def up

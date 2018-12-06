@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Profiles::BillingsController < Profiles::ApplicationController
   before_action :verify_namespace_plan_check_enabled
 

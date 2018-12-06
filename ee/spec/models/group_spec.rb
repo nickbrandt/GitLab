@@ -36,6 +36,42 @@ describe Group do
     end
   end
 
+  describe 'validations' do
+    context 'validates if custom_project_templates_group_id is allowed' do
+      let(:subgroup_1) { create(:group, parent: group) }
+
+      it 'rejects change if the assigned group is not a descendant' do
+        group.custom_project_templates_group_id = create(:group).id
+
+        expect(group).not_to be_valid
+        expect(group.errors.messages[:custom_project_templates_group_id]).to eq ['has to be a descendant of the group']
+      end
+
+      it 'allows value if the current group is a top parent and the value is from a descendant' do
+        subgroup = create(:group, parent: group)
+        group.custom_project_templates_group_id = subgroup.id
+
+        expect(group).to be_valid
+      end
+
+      it 'allows value if the current group is a subgroup and the value is from a descendant' do
+        subgroup_1_1 = create(:group, parent: subgroup_1)
+        subgroup_1.custom_project_templates_group_id = subgroup_1_1.id
+
+        expect(group).to be_valid
+      end
+
+      it 'allows value when it is blank' do
+        subgroup = create(:group, parent: group)
+        group.update!(custom_project_templates_group_id: subgroup.id)
+
+        group.custom_project_templates_group_id = ""
+
+        expect(group).to be_valid
+      end
+    end
+  end
+
   describe 'states' do
     it { is_expected.to be_ldap_sync_ready }
 
@@ -289,6 +325,39 @@ describe Group do
       # per branch as soon as we store them for other branches
       it 'includes vulnerabilities from all branches' do
         is_expected.to contain_exactly(branch_vuln)
+      end
+    end
+  end
+
+  describe '#all_vulnerabilities' do
+    let(:project) { create(:project, namespace: group) }
+    let(:external_project) { create(:project) }
+    let(:failed_pipeline) { create(:ci_pipeline, :failed, project: project) }
+
+    let!(:old_vuln) { create_vulnerability(project) }
+    let!(:new_vuln) { create_vulnerability(project) }
+    let!(:external_vuln) { create_vulnerability(external_project) }
+    let!(:failed_vuln) { create_vulnerability(project, failed_pipeline) }
+
+    subject { group.all_vulnerabilities }
+
+    def create_vulnerability(project, pipeline = nil)
+      pipeline ||= create(:ci_pipeline, :success, project: project)
+      create(:vulnerabilities_occurrence, pipelines: [pipeline], project: project)
+    end
+
+    it 'returns vulns for all successful pipelines of projects belonging to the group' do
+      is_expected.to contain_exactly(old_vuln, new_vuln)
+    end
+
+    context 'with vulnerabilities from other branches' do
+      let!(:branch_pipeline) { create(:ci_pipeline, :success, project: project, ref: 'feature-x') }
+      let!(:branch_vuln) { create(:vulnerabilities_occurrence, pipelines: [branch_pipeline], project: project) }
+
+      # TODO: This should actually fail and we must scope vulns
+      # per branch as soon as we store them for other branches
+      it 'includes vulnerabilities from all branches' do
+        is_expected.to contain_exactly(old_vuln, new_vuln, branch_vuln)
       end
     end
   end

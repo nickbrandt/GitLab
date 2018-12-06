@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SamlProvider < ActiveRecord::Base
   belongs_to :group
   has_many :identities
@@ -26,6 +28,8 @@ class SamlProvider < ActiveRecord::Base
   end
 
   class DefaultOptions
+    include Gitlab::Routing
+
     NAME_IDENTIFIER_FORMAT = 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'.freeze
 
     def initialize(group_path)
@@ -36,16 +40,12 @@ class SamlProvider < ActiveRecord::Base
       NAME_IDENTIFIER_FORMAT
     end
 
-    def full_group_path
-      "#{host}/groups/#{@group_path}"
-    end
-
     def issuer
-      full_group_path
+      group_canonical_url(@group_path)
     end
 
     def assertion_consumer_service_url
-      "#{full_group_path}/-/saml/callback"
+      callback_group_saml_providers_url(@group_path)
     end
 
     def to_h
@@ -55,12 +55,6 @@ class SamlProvider < ActiveRecord::Base
         name_identifier_format: name_identifier_format,
         idp_sso_target_url_runtime_params: { redirect_to: :RelayState }
       }
-    end
-
-    private
-
-    def host
-      @host ||= Gitlab.config.gitlab.url
     end
   end
 

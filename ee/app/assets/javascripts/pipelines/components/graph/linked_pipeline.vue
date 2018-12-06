@@ -1,21 +1,19 @@
 <script>
-import ciStatus from '~/vue_shared/components/ci_icon.vue';
-import tooltip from '~/vue_shared/directives/tooltip';
+import { GlLoadingIcon, GlTooltipDirective, GlButton } from '@gitlab/ui';
+import CiStatus from '~/vue_shared/components/ci_icon.vue';
 
 export default {
   directives: {
-    tooltip,
+    GlTooltip: GlTooltipDirective,
   },
   components: {
-    ciStatus,
+    CiStatus,
+    GlLoadingIcon,
+    GlButton,
   },
   props: {
     pipelineId: {
       type: Number,
-      required: true,
-    },
-    pipelinePath: {
-      type: String,
       required: true,
     },
     pipelineStatus: {
@@ -26,10 +24,24 @@ export default {
       type: String,
       required: true,
     },
+    isLoading: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   computed: {
     tooltipText() {
       return `${this.projectName} - ${this.pipelineStatus.label}`;
+    },
+    buttonId() {
+      return `js-linked-pipeline-${this.pipelineId}`;
+    },
+  },
+  methods: {
+    onClickLinkedPipeline() {
+      this.$root.$emit('bv::hide::tooltip', this.buttonId);
+      this.$emit('pipelineClicked');
     },
   },
 };
@@ -38,21 +50,17 @@ export default {
 <template>
   <li class="linked-pipeline build">
     <div class="curve"></div>
-    <div>
-      <a
-        v-tooltip
-        :href="pipelinePath"
-        :title="tooltipText"
-        class="linked-pipeline-content"
-        data-container="body"
-      >
-        <span class="linked-pipeline-status ci-status-text">
-          <ci-status :status="pipelineStatus" />
-        </span>
-        <span class="linked-pipeline-project-name">{{ projectName }}</span>
-        <span class="project-name-pipeline-id-separator">&#8226;</span>
-        <span class="linked-pipeline-id">#{{ pipelineId }}</span>
-      </a>
-    </div>
+    <gl-button
+      :id="buttonId"
+      v-gl-tooltip
+      :title="tooltipText"
+      class="js-linked-pipeline-content linked-pipeline-content"
+      @click="onClickLinkedPipeline"
+    >
+      <gl-loading-icon v-if="isLoading" class="js-linked-pipeline-loading d-inline" />
+      <ci-status v-else :status="pipelineStatus" class="js-linked-pipeline-status" />
+
+      <span class="str-truncated align-bottom"> {{ projectName }} &#8226; #{{ pipelineId }} </span>
+    </gl-button>
   </li>
 </template>

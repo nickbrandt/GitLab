@@ -124,7 +124,7 @@ class Projects::EnvironmentsController < Projects::ApplicationController
       set_workhorse_internal_api_content_type
       render json: Gitlab::Workhorse.terminal_websocket(terminal)
     else
-      render text: 'Not found', status: :not_found
+      render html: 'Not found', status: :not_found
     end
   end
 

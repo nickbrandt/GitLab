@@ -1,4 +1,5 @@
 import Cookies from 'js-cookie';
+import { parseBoolean } from '~/lib/utils/common_utils';
 
 export default class EETrialBanner {
   constructor($trialBanner) {
@@ -70,7 +71,7 @@ export default class EETrialBanner {
       this.toggleBanner(true);
     } else {
       // Cookie was defined, let's read value and show/hide banner
-      this.toggleBanner(Cookies.get(this.COOKIE_KEY) === 'true');
+      this.toggleBanner(parseBoolean(Cookies.get(this.COOKIE_KEY)));
     }
   }
 

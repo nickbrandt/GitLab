@@ -28,6 +28,10 @@ export default {
       type: String,
       required: true,
     },
+    emptyStateSvgPath: {
+      type: String,
+      required: true,
+    },
     vulnerabilitiesEndpoint: {
       type: String,
       required: true,
@@ -90,7 +94,6 @@ export default {
 
 <template>
   <div>
-    <vulnerability-count-list />
     <tabs stop-propagation>
       <tab active>
         <template slot="title">
@@ -104,8 +107,12 @@ export default {
             <icon name="question" class="vertical-align-middle" />
           </span>
         </template>
-
-        <security-dashboard-table />
+        <vulnerability-count-list />
+        <h5 class="mt-4 mb-4">{{ __('Vulnerability List') }}</h5>
+        <security-dashboard-table
+          :dashboard-documentation="dashboardDocumentation"
+          :empty-state-svg-path="emptyStateSvgPath"
+        />
       </tab>
     </tabs>
     <issue-modal

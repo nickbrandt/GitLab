@@ -138,12 +138,12 @@
           .nav-icon-container
             = sprite_icon('license')
           %span.nav-item-name
-            License
+            = _('License')
         %ul.sidebar-sub-level-items.is-fly-out-only
           = nav_link(controller: :licenses, html_options: { class: "fly-out-top-item" } ) do
             = link_to admin_license_path do
               %strong.fly-out-top-item-name
-                #{ _('License') }
+                = _('License')
 
       - if akismet_enabled?
         = nav_link(controller: :spam_logs) do
@@ -163,12 +163,12 @@
           .nav-icon-container
             = sprite_icon('push-rules')
           %span.nav-item-name
-            Push Rules
+            = _('Push Rules')
         %ul.sidebar-sub-level-items.is-fly-out-only
           = nav_link(controller: :push_rules, html_options: { class: "fly-out-top-item" } ) do
             = link_to admin_push_rule_path do
               %strong.fly-out-top-item-name
-                #{ _('Push Rules') }
+                = _('Push Rules')
 
       = nav_link(controller: %w(admin/geo/nodes admin/geo/projects)) do
         = link_to admin_geo_nodes_path, class: "qa-link-geo-menu" do
@@ -190,7 +190,7 @@
             = nav_link(path: 'admin/geo/projects#index') do
               = link_to admin_geo_projects_path, title: 'Projects' do
                 %span
-                  #{ _('Projects') }
+                  = _('Projects')
 
       = nav_link(controller: :deploy_keys) do
         = link_to admin_deploy_keys_path do

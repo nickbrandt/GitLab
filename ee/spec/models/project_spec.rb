@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe Project do
   include ExternalAuthorizationServiceHelpers
+  include ::EE::GeoHelpers
   using RSpec::Parameterized::TableSyntax
 
   describe 'associations' do
@@ -233,17 +234,6 @@ describe Project do
     end
   end
 
-  describe 'hard failing a mirror' do
-    it 'sends a notification' do
-      project = create(:project, :mirror, :import_started)
-      project.import_state.update(retry_count: Gitlab::Mirror::MAX_RETRY)
-
-      expect_any_instance_of(EE::NotificationService).to receive(:mirror_was_hard_failed).with(project)
-
-      project.import_fail
-    end
-  end
-
   describe '#push_rule' do
     let(:project) { create(:project, push_rule: create(:push_rule)) }
 
@@ -433,33 +423,6 @@ describe Project do
     end
   end
 
-  describe '#force_import_job!' do
-    it 'sets next execution timestamp to now and schedules UpdateAllMirrorsWorker' do
-      timestamp = 1.second.from_now.change(usec: 0)
-      project = create(:project, :mirror)
-
-      expect(UpdateAllMirrorsWorker).to receive(:perform_async)
-
-      Timecop.freeze(timestamp) do
-        expect { project.force_import_job! }.to change(project.import_state, :next_execution_timestamp).to(timestamp)
-      end
-    end
-
-    context 'when mirror is hard failed' do
-      it 'resets retry count and schedules a mirroring worker' do
-        timestamp = Time.now
-        project = create(:project, :mirror, :import_hard_failed)
-
-        expect(UpdateAllMirrorsWorker).to receive(:perform_async)
-
-        Timecop.freeze(timestamp) do
-          expect { project.force_import_job! }.to change(project.import_state, :retry_count).to(0)
-          expect(project.import_state.next_execution_timestamp).to be_like_time(timestamp)
-        end
-      end
-    end
-  end
-
   describe '#fetch_mirror' do
     where(:import_url, :auth_method, :expected) do
       'http://foo:bar@example.com' | 'password'       | 'http://foo:bar@example.com'
@@ -485,185 +448,6 @@ describe Project do
       expect(RepositoryRemoveRemoteWorker).to receive(:perform_async).with(project.id, ::Repository::MIRROR_REMOTE).and_call_original
 
       project.update(import_url: "http://test.com")
-    end
-  end
-
-  describe '#mirror_waiting_duration' do
-    it 'returns in seconds the time spent in the queue' do
-      project = create(:project, :mirror, :import_scheduled)
-      import_state = project.import_state
-
-      import_state.update(last_update_started_at: import_state.last_update_scheduled_at + 5.minutes)
-
-      expect(project.mirror_waiting_duration).to eq(300)
-    end
-  end
-
-  describe '#mirror_update_duration' do
-    it 'returns in seconds the time spent updating' do
-      project = create(:project, :mirror, :import_started)
-
-      project.update(mirror_last_update_at: project.import_state.last_update_started_at + 5.minutes)
-
-      expect(project.mirror_update_duration).to eq(300)
-    end
-  end
-
-  describe '#mirror_about_to_update?' do
-    context 'when mirror is expected to run soon' do
-      it 'returns true' do
-        timestamp = Time.now
-        project = create(:project, :mirror, :import_finished, :repository)
-        project.mirror_last_update_at = timestamp - 3.minutes
-        project.import_state.next_execution_timestamp = timestamp - 2.minutes
-
-        expect(project.mirror_about_to_update?).to be true
-      end
-    end
-
-    context 'when mirror was scheduled' do
-      it 'returns false' do
-        project = create(:project, :mirror, :import_scheduled, :repository)
-
-        expect(project.mirror_about_to_update?).to be false
-      end
-    end
-
-    context 'when mirror is hard_failed' do
-      it 'returns false' do
-        project = create(:project, :mirror, :import_hard_failed)
-
-        expect(project.mirror_about_to_update?).to be false
-      end
-    end
-  end
-
-  describe '#import_in_progress?' do
-    let(:traits) { [] }
-    let(:project) { create(:project, *traits, import_url: Project::UNKNOWN_IMPORT_URL) }
-
-    shared_examples 'import in progress' do
-      context 'when project is a mirror' do
-        before do
-          traits << :mirror
-        end
-
-        context 'when repository is empty' do
-          it 'returns true' do
-            expect(project.import_in_progress?).to be_truthy
-          end
-        end
-
-        context 'when repository is not empty' do
-          before do
-            traits << :repository
-          end
-
-          it 'returns false' do
-            expect(project.import_in_progress?).to be_falsey
-          end
-        end
-      end
-
-      context 'when project is not a mirror' do
-        it 'returns true' do
-          expect(project.import_in_progress?).to be_truthy
-        end
-      end
-    end
-
-    context 'when import status is scheduled' do
-      before do
-        traits << :import_scheduled
-      end
-
-      it_behaves_like 'import in progress'
-    end
-
-    context 'when import status is started' do
-      before do
-        traits << :import_started
-      end
-
-      it_behaves_like 'import in progress'
-    end
-
-    context 'when import status is finished' do
-      before do
-        traits << :import_finished
-      end
-
-      it 'returns false' do
-        expect(project.import_in_progress?).to be_falsey
-      end
-    end
-  end
-
-  describe  '#updating_mirror?' do
-    context 'when repository is empty' do
-      it 'returns false' do
-        project = create(:project, :mirror, :import_started)
-
-        expect(project.updating_mirror?).to be false
-      end
-    end
-
-    context 'when project is not a mirror' do
-      it 'returns false' do
-        project = create(:project, :import_started)
-
-        expect(project.updating_mirror?).to be false
-      end
-    end
-
-    context 'when mirror is started' do
-      it 'returns true' do
-        project = create(:project, :mirror, :import_started, :repository)
-
-        expect(project.updating_mirror?).to be true
-      end
-    end
-
-    context 'when mirror is scheduled' do
-      it 'returns true' do
-        project = create(:project, :mirror, :import_scheduled, :repository)
-
-        expect(project.updating_mirror?).to be true
-      end
-    end
-  end
-
-  describe '#mirror_last_update_status' do
-    let(:project) { create(:project, :mirror) }
-
-    context 'when mirror has not updated' do
-      it 'returns nil' do
-        expect(project.mirror_last_update_status).to be_nil
-      end
-    end
-
-    context 'when mirror has updated' do
-      let(:timestamp) { Time.now }
-
-      before do
-        project.mirror_last_update_at = timestamp
-      end
-
-      context 'when last update time equals the time of the last successful update' do
-        it 'returns success' do
-          project.mirror_last_successful_update_at = timestamp
-
-          expect(project.mirror_last_update_status).to eq(:success)
-        end
-      end
-
-      context 'when last update time does not equal the time of the last successful update' do
-        it 'returns failed' do
-          project.mirror_last_successful_update_at = Time.now - 1.minute
-
-          expect(project.mirror_last_update_status).to eq(:failed)
-        end
-      end
     end
   end
 
@@ -719,6 +503,29 @@ describe Project do
 
       it 'shared runners are not available' do
         expect(project.shared_runners_available?).to be_falsey
+      end
+    end
+  end
+
+  describe '#root_namespace' do
+    let(:project) { build(:project, namespace: parent) }
+
+    subject { project.root_namespace }
+
+    context 'when namespace has parent group', :nested_groups do
+      let(:root_ancestor) { create(:group) }
+      let(:parent) { create(:group, parent: root_ancestor) }
+
+      it 'returns root ancestor' do
+        is_expected.to eq(root_ancestor)
+      end
+    end
+
+    context 'when namespace is root ancestor' do
+      let(:parent) { create(:group) }
+
+      it 'returns current namespace' do
+        is_expected.to eq(parent)
       end
     end
   end
@@ -1313,79 +1120,6 @@ describe Project do
     end
   end
 
-  describe 'project import state transitions' do
-    context 'state transition: [:started] => [:finished]' do
-      context 'elasticsearch indexing disabled' do
-        before do
-          stub_ee_application_setting(elasticsearch_indexing: false)
-        end
-
-        it 'does not index the repository' do
-          project = create(:project, :import_started, import_type: :github)
-
-          expect(ElasticCommitIndexerWorker).not_to receive(:perform_async)
-
-          project.import_finish
-        end
-      end
-
-      context 'elasticsearch indexing enabled' do
-        let(:project) { create(:project, :import_started, import_type: :github) }
-
-        before do
-          stub_ee_application_setting(elasticsearch_indexing: true)
-        end
-
-        context 'no index status' do
-          it 'schedules a full index of the repository' do
-            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, nil)
-
-            project.import_finish
-          end
-        end
-
-        context 'with index status' do
-          let!(:index_status) { project.create_index_status!(indexed_at: Time.now, last_commit: 'foo') }
-
-          it 'schedules a progressive index of the repository' do
-            expect(ElasticCommitIndexerWorker).to receive(:perform_async).with(project.id, index_status.last_commit)
-
-            project.import_finish
-          end
-        end
-      end
-    end
-  end
-
-  describe 'Project import job' do
-    let(:project) { create(:project, import_url: generate(:url)) }
-
-    before do
-      allow_any_instance_of(Gitlab::Shell).to receive(:import_repository)
-        .with(project.repository_storage, project.disk_path, project.import_url)
-        .and_return(true)
-
-      # Works around https://github.com/rspec/rspec-mocks/issues/910
-      allow(described_class).to receive(:find).with(project.id).and_return(project)
-      expect(project.repository).to receive(:after_import)
-        .and_call_original
-      expect(project.wiki.repository).to receive(:after_import)
-        .and_call_original
-    end
-
-    context 'with a mirrored project' do
-      let(:project) { create(:project, :mirror) }
-
-      it 'calls RepositoryImportWorker and inserts in front of the mirror scheduler queue' do
-        allow_any_instance_of(described_class).to receive(:repository_exists?).and_return(false, true)
-        expect_any_instance_of(EE::Project).to receive(:force_import_job!)
-        expect(RepositoryImportWorker).to receive(:perform_async).with(project.id).and_call_original
-
-        expect { project.import_schedule }.to change { project.import_jid }
-      end
-    end
-  end
-
   describe '#licensed_features' do
     let(:plan_license) { :free_plan }
     let(:global_license) { create(:license) }
@@ -1624,6 +1358,8 @@ describe Project do
     let(:wiki_updated_service) { instance_double('::Geo::RepositoryUpdatedService') }
 
     before do
+      create(:import_state, project: project)
+
       allow(::Geo::RepositoryUpdatedService)
         .to receive(:new)
         .with(project.repository)
@@ -1651,6 +1387,78 @@ describe Project do
       expect(wiki_updated_service).not_to receive(:execute)
 
       project.after_import
+    end
+  end
+
+  describe '#lfs_http_url_to_repo' do
+    let(:project) { create(:project) }
+    let(:project_path) { "#{Gitlab::Routing.url_helpers.project_path(project)}.git" }
+
+    let(:primary_base_host) { 'primary.geo' }
+    let(:primary_base_url) { "http://#{primary_base_host}" }
+    let(:primary_url) { "#{primary_base_url}#{project_path}" }
+
+    context 'with a Geo setup that is a primary' do
+      let(:primary_node) { create(:geo_node, url: primary_base_url) }
+
+      before do
+        stub_current_geo_node(primary_node)
+        stub_default_url_options(primary_base_host)
+      end
+
+      context 'for an upload operation' do
+        it 'returns the project HTTP URL for the primary' do
+          expect(project.lfs_http_url_to_repo('upload')).to eq(primary_url)
+        end
+      end
+    end
+
+    context 'with a Geo setup that is a secondary' do
+      let(:secondary_base_host) { 'secondary.geo' }
+      let(:secondary_base_url) { "http://#{secondary_base_host}" }
+      let(:secondary_node) { create(:geo_node, url: secondary_base_url) }
+      let(:secondary_url) { "#{secondary_base_url}#{project_path}"  }
+
+      before do
+        stub_current_geo_node(secondary_node)
+        stub_default_url_options(current_rails_hostname)
+      end
+
+      context 'and has a primary' do
+        let(:primary_node) { create(:geo_node, url: primary_base_url) }
+
+        context 'for an upload operation' do
+          let(:current_rails_hostname) { primary_base_host }
+
+          it 'returns the project HTTP URL for the primary' do
+            expect(project.lfs_http_url_to_repo('upload')).to eq(primary_url)
+          end
+        end
+
+        context 'for a download operation' do
+          let(:current_rails_hostname) { secondary_base_host }
+
+          it 'returns the project HTTP URL for the secondary' do
+            expect(project.lfs_http_url_to_repo('download')).to eq(secondary_url)
+          end
+        end
+      end
+
+      context 'without a primary' do
+        let(:current_rails_hostname) { secondary_base_host }
+
+        it 'returns the project HTTP URL for the secondary' do
+          expect(project.lfs_http_url_to_repo('operation_that_doesnt_matter')).to eq(secondary_url)
+        end
+      end
+    end
+
+    context 'without a Geo setup' do
+      it 'returns the project HTTP URL for the main node' do
+        project_url = "#{Gitlab::Routing.url_helpers.project_url(project)}.git"
+
+        expect(project.lfs_http_url_to_repo('operation_that_doesnt_matter')).to eq(project_url)
+      end
     end
   end
 
@@ -1756,5 +1564,14 @@ describe Project do
 
       subject
     end
+  end
+
+  # Despite stubbing the current node as the primary or secondary, the
+  # behaviour for EE::Project#lfs_http_url_to_repo() is to call
+  # Project#lfs_http_url_to_repo() which does not have a Geo context.
+  def stub_default_url_options(host)
+    allow(Rails.application.routes)
+      .to receive(:default_url_options)
+      .and_return(host: host)
   end
 end

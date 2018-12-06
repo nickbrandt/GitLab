@@ -1,5 +1,5 @@
 # rubocop:disable Migration/Timestamps
-class CreateIssueLinksTable < ActiveRecord::Migration
+class CreateIssueLinksTable < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

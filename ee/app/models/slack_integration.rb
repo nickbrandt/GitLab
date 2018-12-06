@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SlackIntegration < ActiveRecord::Base
   belongs_to :service
 

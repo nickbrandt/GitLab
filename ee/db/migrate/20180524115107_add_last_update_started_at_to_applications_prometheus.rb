@@ -1,4 +1,4 @@
-class AddLastUpdateStartedAtToApplicationsPrometheus < ActiveRecord::Migration
+class AddLastUpdateStartedAtToApplicationsPrometheus < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def change

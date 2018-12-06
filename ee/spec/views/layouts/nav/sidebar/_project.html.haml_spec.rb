@@ -31,25 +31,43 @@ describe 'layouts/nav/sidebar/_project' do
 
     context 'with project.tracing_external_url' do
       let(:tracing_url) { 'https://tracing.url' }
+      let(:tracing_settings) { create(:project_tracing_setting, project: project, external_url: tracing_url) }
 
       before do
         allow(view).to receive(:can?).and_return(true)
-
-        allow(project).to receive(:tracing_external_url).and_return(tracing_url)
       end
 
       it 'links to project.tracing_external_url' do
+        expect(tracing_settings.external_url).to eq(tracing_url)
+        expect(project.tracing_external_url).to eq(tracing_url)
+
         render
 
         expect(rendered).to have_link('Tracing', href: tracing_url)
+      end
+
+      context 'with malicious external_url' do
+        let(:malicious_tracing_url) { "https://replaceme.com/'><script>alert(document.cookie)</script>" }
+        let(:cleaned_url) { "https://replaceme.com/'>" }
+
+        before do
+          tracing_settings.update_column(:external_url, malicious_tracing_url)
+        end
+
+        it 'sanitizes external_url' do
+          expect(project.tracing_external_url).to eq(malicious_tracing_url)
+
+          render
+
+          expect(tracing_settings.external_url).to eq(malicious_tracing_url)
+          expect(rendered).to have_link('Tracing', href: cleaned_url)
+        end
       end
     end
 
     context 'without project.tracing_external_url' do
       before do
         allow(view).to receive(:can?).and_return(true)
-
-        allow(project).to receive(:tracing_external_url).and_return(nil)
       end
 
       it 'links to Tracing page' do

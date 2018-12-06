@@ -1,4 +1,4 @@
-class CreateGeoEventLog < ActiveRecord::Migration
+class CreateGeoEventLog < ActiveRecord::Migration[4.2]
   DOWNTIME = false
 
   def change

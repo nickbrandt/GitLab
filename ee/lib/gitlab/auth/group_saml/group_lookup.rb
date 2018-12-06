@@ -22,6 +22,10 @@ module Gitlab
           saml_provider && group.feature_available?(:group_saml)
         end
 
+        def token_discoverable?
+          group&.saml_discovery_token_matches?(params['token'])
+        end
+
         private
 
         attr_reader :env

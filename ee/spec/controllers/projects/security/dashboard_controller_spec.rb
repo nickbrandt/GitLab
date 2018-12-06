@@ -43,7 +43,7 @@ describe Projects::Security::DashboardController do
           create(:ee_ci_build, :sast, pipeline: pipeline)
         end
 
-        it 'renders empty state (not yet supported)' do
+        it 'returns the latest pipeline with security reports for project' do
           show_security_dashboard
 
           expect(response).to have_gitlab_http_status(200)

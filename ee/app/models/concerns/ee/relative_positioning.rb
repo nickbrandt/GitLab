@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   # Issue position on list boards should be relative to all group projects
   module RelativePositioning

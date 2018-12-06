@@ -3,7 +3,6 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 import Icon from '~/vue_shared/components/icon.vue';
 import NoteableNote from '~/notes/components/noteable_note.vue';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
-import resolvedStatusMixin from '../mixins/resolved_status';
 import PublishButton from './publish_button.vue';
 
 export default {
@@ -13,7 +12,6 @@ export default {
     Icon,
     LoadingButton,
   },
-  mixins: [resolvedStatusMixin],
   props: {
     draft: {
       type: Object,
@@ -43,6 +41,7 @@ export default {
       'updateDraft',
       'publishSingleDraft',
       'scrollToDraft',
+      'toggleResolveDiscussion',
     ]),
     update(data) {
       this.updateDraft(data);
@@ -57,18 +56,10 @@ export default {
       this.isEditingDraft = false;
     },
   },
-  showStaysResolved: true,
 };
 </script>
 <template>
-  <article :class="componentClasses" class="draft-note-component note-wrapper">
-    <header class="draft-note-header">
-      <strong class="badge draft-pending-label"> {{ __('Pending') }} </strong>
-      <p v-if="draft.discussion_id" class="draft-note-resolution">
-        <Icon :size="16" name="status_success" />
-        {{ __(resolvedStatusMessage) }}
-      </p>
-    </header>
+  <article class="draft-note-component note-wrapper">
     <ul class="notes draft-notes">
       <noteable-note
         :note="draft"
@@ -78,7 +69,12 @@ export default {
         @updateSuccess="handleNotEditing"
         @handleDeleteNote="deleteDraft"
         @handleUpdateNote="update"
-      />
+        @toggleResolveStatus="toggleResolveDiscussion(draft.id);"
+      >
+        <strong slot="note-header-info" class="badge draft-pending-label append-right-4">
+          {{ __('Pending') }}
+        </strong>
+      </noteable-note>
     </ul>
 
     <template v-if="!isEditingDraft">
@@ -88,11 +84,11 @@ export default {
         v-html="draftCommands"
       ></div>
 
-      <p class="draft-note-actions">
+      <p class="draft-note-actions d-flex">
         <publish-button
           :show-count="true"
           :should-publish="false"
-          class="btn btn-success btn-inverted"
+          class="btn btn-success btn-inverted append-right-8"
         />
         <loading-button
           :loading="isPublishingDraft(draft.id) || isPublishing"

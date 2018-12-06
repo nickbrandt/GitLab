@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   # Project EE mixin
   #
@@ -8,11 +10,18 @@ module EE
     extend ::Gitlab::Utils::Override
     extend ::Gitlab::Cache::RequestCache
     include ::Gitlab::Utils::StrongMemoize
+    include ::EE::GitlabRoutingHelper
+
+    GIT_LFS_DOWNLOAD_OPERATION = 'download'.freeze
 
     prepended do
       include Elastic::ProjectsSearch
       include EE::DeploymentPlatform
       include EachBatch
+
+      ignore_column :mirror_last_update_at,
+        :mirror_last_successful_update_at,
+        :next_execution_timestamp
 
       before_save :set_override_pull_mirror_available, unless: -> { ::Gitlab::CurrentSettings.mirror_available }
       before_save :set_next_execution_timestamp_to_now, if: ->(project) { project.mirror? && project.mirror_changed? && project.import_state }
@@ -36,7 +45,7 @@ module EE
       has_many :approver_groups, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
       has_many :audit_events, as: :entity
       has_many :path_locks
-      has_many :vulnerability_feedback
+      has_many :vulnerability_feedback, class_name: 'Vulnerabilities::Feedback'
       has_many :vulnerabilities, class_name: 'Vulnerabilities::Occurrence'
       has_many :vulnerability_identifiers, class_name: 'Vulnerabilities::Identifier'
       has_many :vulnerability_scanners, class_name: 'Vulnerabilities::Scanner'
@@ -49,6 +58,8 @@ module EE
 
       has_many :source_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :project_id
 
+      has_many :webide_pipelines, -> { webide_source }, class_name: 'Ci::Pipeline', inverse_of: :project
+
       has_many :prometheus_alerts, inverse_of: :project
       has_many :prometheus_alert_events, inverse_of: :project
 
@@ -59,11 +70,9 @@ module EE
 
       scope :mirror, -> { where(mirror: true) }
 
-      scope :inner_joins_import_state, -> { joins("INNER JOIN project_mirror_data import_state ON import_state.project_id = projects.id") }
-
       scope :mirrors_to_sync, ->(freeze_at) do
         mirror
-          .inner_joins_import_state
+          .joins_import_state
           .where.not(import_state: { status: [:scheduled, :started] })
           .where("import_state.next_execution_timestamp <= ?", freeze_at)
           .where("import_state.retry_count <= ?", ::Gitlab::Mirror::MAX_RETRY)
@@ -83,6 +92,10 @@ module EE
       delegate :actual_shared_runners_minutes_limit,
         :shared_runners_minutes_used?, to: :shared_runners_limit_namespace
 
+      delegate :last_update_succeeded?, :last_update_failed?,
+        :ever_updated_successfully?, :hard_failed?,
+        to: :import_state, prefix: :mirror, allow_nil: true
+
       validates :repository_size_limit,
         numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
 
@@ -94,7 +107,6 @@ module EE
       end
 
       default_value_for :packages_enabled, true
-      default_value_for :only_mirror_protected_branches, true
 
       delegate :store_security_reports_available?, to: :namespace
     end
@@ -115,8 +127,8 @@ module EE
     end
 
     def latest_pipeline_with_security_reports
-      pipelines.newest_first(ref: default_branch).with_security_reports.first ||
-        pipelines.newest_first(ref: default_branch).with_legacy_security_reports.first
+      ci_pipelines.newest_first(ref: default_branch).with_security_reports.first ||
+        ci_pipelines.newest_first(ref: default_branch).with_legacy_security_reports.first
     end
 
     def environments_for_scope(scope)
@@ -144,99 +156,8 @@ module EE
     end
     alias_method :mirror?, :mirror
 
-    def mirror_updated?
-      mirror? && self.mirror_last_update_at
-    end
-
-    def mirror_waiting_duration
-      return unless mirror?
-
-      (import_state.last_update_started_at.to_i -
-        import_state.last_update_scheduled_at.to_i).seconds
-    end
-
-    def mirror_update_duration
-      return unless mirror?
-
-      (mirror_last_update_at.to_i -
-        import_state.last_update_started_at.to_i).seconds
-    end
-
     def mirror_with_content?
       mirror? && !empty_repo?
-    end
-
-    def import_state_args
-      super.merge(last_update_at: self[:mirror_last_update_at],
-                  last_successful_update_at: self[:mirror_last_successful_update_at])
-    end
-
-    def mirror_last_update_at=(new_value)
-      ensure_import_state
-
-      import_state&.last_update_at = new_value
-    end
-
-    def mirror_last_update_at
-      ensure_import_state
-
-      import_state&.last_update_at
-    end
-
-    def mirror_last_successful_update_at=(new_value)
-      ensure_import_state
-
-      import_state&.last_successful_update_at = new_value
-    end
-
-    def mirror_last_successful_update_at
-      ensure_import_state
-
-      import_state&.last_successful_update_at
-    end
-
-    override :import_in_progress?
-    def import_in_progress?
-      # If we're importing while we do have a repository, we're simply updating the mirror.
-      super && !mirror_with_content?
-    end
-
-    def mirror_about_to_update?
-      return false unless mirror_with_content?
-      return false if mirror_hard_failed?
-      return false if updating_mirror?
-
-      self.import_state.next_execution_timestamp <= Time.now
-    end
-
-    def updating_mirror?
-      (import_scheduled? || import_started?) && mirror_with_content?
-    end
-
-    def mirror_last_update_status
-      return unless mirror_updated?
-
-      if self.mirror_last_update_at == self.mirror_last_successful_update_at
-        :success
-      else
-        :failed
-      end
-    end
-
-    def mirror_last_update_succeeded?
-      mirror_last_update_status == :success
-    end
-
-    def mirror_last_update_failed?
-      mirror_last_update_status == :failed
-    end
-
-    def mirror_ever_updated_successfully?
-      mirror_updated? && self.mirror_last_successful_update_at
-    end
-
-    def mirror_hard_failed?
-      self.import_state.retry_limit_exceeded?
     end
 
     def fetch_mirror
@@ -291,19 +212,6 @@ module EE
       wildcard = ::Gitlab::IncomingEmail::WILDCARD_PLACEHOLDER
 
       config.address&.gsub(wildcard, full_path)
-    end
-
-    def force_import_job!
-      return if mirror_about_to_update? || updating_mirror?
-
-      import_state = self.import_state
-
-      import_state.set_next_execution_to_now
-      import_state.reset_retry_count if import_state.retry_limit_exceeded?
-
-      import_state.save!
-
-      UpdateAllMirrorsWorker.perform_async
     end
 
     override :add_import_job
@@ -577,6 +485,18 @@ module EE
       else
         namespace
       end
+    end
+
+    def active_webide_pipelines(user:)
+      webide_pipelines.running_or_pending.for_user(user)
+    end
+
+    override :lfs_http_url_to_repo
+    def lfs_http_url_to_repo(operation)
+      return super unless ::Gitlab::Geo.secondary_with_primary?
+      return super if operation == GIT_LFS_DOWNLOAD_OPERATION # download always comes from secondary
+
+      geo_primary_http_url_to_repo(self)
     end
 
     private

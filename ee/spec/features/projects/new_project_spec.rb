@@ -203,4 +203,204 @@ describe 'New project' do
       end
     end
   end
+
+  context 'Group-level project templates', :js, :postgresql do
+    def visit_create_from_group_template_tab
+      visit url
+      click_link 'Create from template'
+
+      page.within('#create-from-template-pane') do
+        click_link 'Group'
+        wait_for_all_requests
+      end
+    end
+
+    let(:url) { new_project_path }
+
+    context 'when licensed' do
+      before do
+        stub_licensed_features(custom_project_templates: true)
+      end
+
+      it 'shows Group tab in Templates section' do
+        visit url
+        click_link 'Create from template'
+
+        expect(page).to have_css('.custom-group-project-templates-tab')
+      end
+
+      shared_examples 'group templates displayed' do
+        before do
+          visit_create_from_group_template_tab
+        end
+
+        it 'the tab badge displays the number of templates available' do
+          page.within('.custom-group-project-templates-tab') do
+            expect(page).to have_selector('span.badge', text: template_number)
+          end
+        end
+
+        it 'the tab shows the list of templates available' do
+          page.within('#custom-group-project-templates') do
+            # Show templates in case they're collapsed
+            page.all(:xpath, "//div[@class='js-template-group-options template-group-options']").each(&:click)
+
+            expect(page).to have_selector('.template-option', count: template_number)
+          end
+        end
+      end
+
+      shared_examples 'template selected' do
+        before do
+          visit_create_from_group_template_tab
+
+          page.within('.custom-project-templates') do
+            page.find(".template-option input[value='#{subgroup1_project1.name}']").first(:xpath, './/..').click
+            wait_for_all_requests
+          end
+        end
+
+        context 'when template is selected' do
+          context 'namespace selector' do
+            it "only shows the template's group hierarchy options" do
+              page.within('#create-from-template-pane') do
+                elements = page.find_all("#project_namespace_id option:not(.hidden)", visible: false).map { |e| e['data-name'] }
+                expect(elements).to contain_exactly(group1.name, subgroup1.name, subsubgroup1.name)
+              end
+            end
+
+            it 'does not show the user namespace options' do
+              page.within('#create-from-template-pane') do
+                expect(page.find_all("#project_namespace_id optgroup.hidden[label='Users']", visible: false)).not_to be_empty
+              end
+            end
+          end
+        end
+
+        context 'when user changes template' do
+          let(:url) { new_project_path }
+
+          before do
+            page.within('#create-from-template-pane') do
+              click_button 'Change template'
+
+              page.find(:xpath, "//input[@type='radio' and @value='#{subgroup1_project1.name}']/..").click
+
+              wait_for_all_requests
+            end
+          end
+
+          it 'list the appropriate groups' do
+            page.within('#create-from-template-pane') do
+              elements = page.find_all("#project_namespace_id option:not(.hidden)", visible: false).map { |e| e['data-name'] }
+
+              expect(elements).to contain_exactly(group1.name, subgroup1.name, subsubgroup1.name)
+            end
+          end
+        end
+      end
+
+      context 'when custom project group template is set' do
+        let(:group1) { create(:group) }
+        let(:group2) { create(:group) }
+        let(:group3) { create(:group) }
+        let(:group4) { create(:group) }
+        let(:subgroup1) { create(:group, parent: group1) }
+        let(:subgroup2) { create(:group, parent: group2) }
+        let(:subgroup4) { create(:group, parent: group4) }
+        let(:subsubgroup1) { create(:group, parent: subgroup1) }
+        let(:subsubgroup4) { create(:group, parent: subgroup4) }
+        let!(:subgroup1_project1) { create(:project, namespace: subgroup1) }
+        let!(:subgroup1_project2) { create(:project, namespace: subgroup1) }
+        let!(:subgroup2_project) { create(:project, namespace: subgroup2) }
+        let!(:subsubgroup1_project) { create(:project, namespace: subsubgroup1) }
+        let!(:subsubgroup4_project1) { create(:project, namespace: subsubgroup4) }
+        let!(:subsubgroup4_project2) { create(:project, namespace: subsubgroup4) }
+
+        before do
+          group1.add_owner(user)
+          group2.add_owner(user)
+          group4.add_owner(user)
+          group1.update(custom_project_templates_group_id: subgroup1.id)
+          group2.update(custom_project_templates_group_id: subgroup2.id)
+          subgroup4.update(custom_project_templates_group_id: subsubgroup4.id)
+        end
+
+        context 'when top level context' do
+          it_behaves_like 'group templates displayed' do
+            let(:template_number) { 5 }
+          end
+
+          it_behaves_like 'template selected'
+        end
+
+        context 'when namespace context' do
+          let(:url) { new_project_path(namespace_id: group1.id) }
+
+          it_behaves_like 'group templates displayed' do
+            let(:template_number) { 2 }
+          end
+
+          it_behaves_like 'template selected'
+        end
+
+        context 'when creating project from subgroup when template set on top-level group' do
+          let(:url) { new_project_path(namespace_id: subgroup1.id) }
+
+          it_behaves_like 'group templates displayed' do
+            let(:template_number) { 2 }
+          end
+
+          it_behaves_like 'template selected'
+        end
+
+        context 'when creating project from top-level group when template set on a sub-subgroup' do
+          let(:url) { new_project_path(namespace_id: group4.id) }
+
+          it_behaves_like 'group templates displayed' do
+            let(:template_number) { 0 }
+          end
+        end
+
+        context 'when using a Group without a custom project template' do
+          let(:url) { new_project_path(namespace_id: group3.id) }
+
+          before do
+            visit_create_from_group_template_tab
+          end
+
+          it 'shows a total of 0 templates' do
+            page.within('.custom-group-project-templates-tab') do
+              expect(page).to have_selector('span.badge', text: 0)
+            end
+          end
+
+          it 'does not list any templates' do
+            page.within('#custom-group-project-templates') do
+              expect(page).to have_selector('.template-option', count: 0)
+            end
+          end
+        end
+      end
+
+      context 'when group template is not set' do
+        it_behaves_like 'group templates displayed' do
+          let(:template_number) { 0 }
+        end
+      end
+    end
+
+    context 'when unlicensed' do
+      before do
+        stub_licensed_features(custom_project_templates: false)
+      end
+
+      it 'does not show Group tab in Templates section' do
+        visit url
+        click_link 'Create from template'
+
+        expect(page).not_to have_css('.custom-group-project-templates-tab')
+      end
+    end
+  end
 end

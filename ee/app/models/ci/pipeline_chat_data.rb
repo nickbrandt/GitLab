@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Ci
   class PipelineChatData < ActiveRecord::Base
     self.table_name = 'ci_pipeline_chat_data'

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class CreatePrometheusAlertEvents < ActiveRecord::Migration
+class CreatePrometheusAlertEvents < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

@@ -1,5 +1,5 @@
 # rubocop:disable Migration/Timestamps
-class CreateIndexStatuses < ActiveRecord::Migration
+class CreateIndexStatuses < ActiveRecord::Migration[4.2]
   def change
     create_table :index_statuses do |t|
       t.integer :project_id, null: false

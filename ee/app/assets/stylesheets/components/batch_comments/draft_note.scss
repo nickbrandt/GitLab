@@ -47,37 +47,6 @@ button[disabled] {
   }
 }
 
-.draft-note-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.draft-note-resolution {
-  padding: 0 $gl-padding;
-  line-height: 1;
-  font-size: $label-font-size;
-  color: $theme-gray-700;
-  flex-grow: 1;
-
-  svg {
-    vertical-align: text-bottom;
-    display: inline-block;
-  }
-
-  .is-resolving-discussion & {
-    svg {
-      color: $green-600;
-    }
-  }
-
-  .is-unresolving-discussion & {
-    svg {
-      color: $gray-darkest;
-    }
-  }
-}
-
 .draft-pending-label {
   background: $orange-600;
   color: $white-light;
@@ -88,13 +57,9 @@ button[disabled] {
 .diff-file {
   .notes .note {
     &.draft-note {
-      margin: $gl-padding-8 0 $gl-padding;
+      margin: 0 0 $gl-padding;
       padding: 0;
       border: 0;
-
-      .note-actions {
-        margin-top: -26px;
-      }
 
       &.is-editing {
         margin-bottom: 0;

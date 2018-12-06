@@ -35,58 +35,13 @@ describe('Batch comments draft note component', () => {
 
   describe('in discussion', () => {
     beforeEach(done => {
-      vm.draft.discussion_id = 123;
+      vm.draft.discussion_id = '123';
 
       vm.$nextTick(done);
     });
 
     it('renders resolution status', () => {
-      expect(vm.$el.querySelector('.draft-note-resolution')).not.toBe(null);
-    });
-
-    describe('resolvedStatusMessage', () => {
-      describe('resolve discussion', () => {
-        it('return will be resolved text', () => {
-          vm.draft.resolve_discussion = true;
-
-          expect(vm.resolvedStatusMessage).toBe('Discussion will be resolved.');
-        });
-
-        it('return will be stays resolved text', () => {
-          spyOnProperty(vm, 'isDiscussionResolved').and.returnValue(() => true);
-          vm.draft.resolve_discussion = true;
-
-          expect(vm.resolvedStatusMessage).toBe('Discussion stays resolved.');
-        });
-      });
-
-      describe('unresolve discussion', () => {
-        it('return will be stays unresolved text', () => {
-          expect(vm.resolvedStatusMessage).toBe('Discussion stays unresolved.');
-        });
-
-        it('return will be unresolved text', () => {
-          spyOnProperty(vm, 'isDiscussionResolved').and.returnValue(() => true);
-
-          vm.$forceUpdate();
-
-          expect(vm.resolvedStatusMessage).toBe('Discussion stays unresolved.');
-        });
-      });
-
-      it('adds resolving class to element', done => {
-        vm.draft.resolve_discussion = true;
-
-        vm.$nextTick(() => {
-          expect(vm.$el.classList).toContain('is-resolving-discussion');
-
-          done();
-        });
-      });
-
-      it('adds unresolving class to element', () => {
-        expect(vm.$el.classList).toContain('is-unresolving-discussion');
-      });
+      expect(vm.$el.querySelector('.line-resolve-btn')).not.toBe(null);
     });
   });
 
@@ -121,6 +76,7 @@ describe('Batch comments draft note component', () => {
           expect(vm.$store.dispatch).toHaveBeenCalledWith('batchComments/updateDraft', {
             note: draft,
             noteText: 'a',
+            resolveDiscussion: false,
             callback: jasmine.any(Function),
           });
         })
