@@ -223,8 +223,7 @@ Once you set them, they will be available for all subsequent pipelines.
 
 ### Limiting environment scopes of variables **[PREMIUM]**
 
->**Notes:**
-[Introduced][ee-2112] in [GitLab Premium][premium] 9.4.
+> [Introduced][ee-2112] in [GitLab Premium](https://about.gitlab.com/pricing/) 9.4.
 
 You can limit the environment scope of a variable by
 [defining which environments][envs] it can be available for.
@@ -593,7 +592,6 @@ Below you can find supported syntax reference:
     `/pattern/i` to make a pattern case-insensitive.
 
 [ee-2112]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/2112
-[premium]: https://about.gitlab.com/pricing/ "Available only in GitLab Premium"
 [ce-13784]: https://gitlab.com/gitlab-org/gitlab-ce/issues/13784 "Simple protection of CI variables"
 [envs]: ../environments.md
 [protected branches]: ../../user/project/protected_branches.md
