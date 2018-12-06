@@ -193,7 +193,6 @@ describe Project do
     it { is_expected.to include_module(Sortable) }
   end
 
-<<<<<<< HEAD
   describe 'scopes' do
     context '#with_wiki_enabled' do
       it 'returns a project' do
@@ -206,8 +205,6 @@ describe Project do
     end
   end
 
-=======
->>>>>>> upstream/master
   describe '.missing_kubernetes_namespace' do
     let!(:project) { create(:project) }
     let!(:cluster) { create(:cluster, :provided_by_user, :group) }
