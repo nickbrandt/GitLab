@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module DashboardHelper
-  prepend EE::DashboardHelper
-
   def assigned_issues_dashboard_path
     issues_dashboard_path(assignee_username: current_user.username)
   end
