@@ -8983,6 +8983,12 @@ msgstr ""
 msgid "Try again"
 msgstr ""
 
+msgid "Try again?"
+msgstr ""
+
+msgid "Trying to communicate with your device. Plug it in (if you haven't already) and press the button on the device now."
+msgstr ""
+
 msgid "Turn on Service Desk"
 msgstr ""
 
