@@ -1,7 +1,7 @@
 # Smartcard authentication
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/726) in
-[GitLab Premium](https://about.gitlab.com/pricing/) 11.5 as an experimental
+[GitLab Premium](https://about.gitlab.com/pricing/) 11.6 as an experimental
 feature. Smartcard authentication may change or be removed completely in future
 releases.
 
