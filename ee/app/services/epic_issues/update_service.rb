@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EpicIssues
   class UpdateService < BaseService
     attr_reader :epic_issue, :current_user, :params

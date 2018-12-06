@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # X509CertificateCredentialsValidator
 #
 # Custom validator to check if certificate-attribute was signed using the

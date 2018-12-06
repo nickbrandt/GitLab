@@ -129,13 +129,24 @@ module EE
       email_opted_in_source_id == EMAIL_OPT_IN_SOURCE_ID_GITLAB_COM ? 'GitLab.com' : ''
     end
 
-    def available_custom_project_templates(search: nil)
-      templates = ::Gitlab::CurrentSettings.available_custom_project_templates
+    def available_custom_project_templates(search: nil, subgroup_id: nil)
+      templates = ::Gitlab::CurrentSettings.available_custom_project_templates(subgroup_id)
 
       ::ProjectsFinder.new(current_user: self,
                            project_ids_relation: templates,
                            params: { search: search, sort: 'name_asc' })
                       .execute
+    end
+
+    def available_subgroups_with_custom_project_templates(group_id = nil)
+      groups = group_id ? ::Group.find(group_id).self_and_ancestors : ::Group.all
+
+      GroupsFinder.new(self, min_access_level: ::Gitlab::Access::MAINTAINER)
+                  .execute
+                  .where(id: groups.with_project_templates.select(:custom_project_templates_group_id))
+                  .includes(:projects)
+                  .reorder(nil)
+                  .distinct
     end
 
     def roadmap_layout

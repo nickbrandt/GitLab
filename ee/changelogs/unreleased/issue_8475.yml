@@ -1,5 +1,0 @@
----
-title: Fix issues analytics query when ordering issues by priority
-merge_request: 8509
-author:
-type: fixed

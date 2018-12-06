@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   class NodeUpdateService
     attr_reader :geo_node, :old_namespace_ids, :old_shards, :params

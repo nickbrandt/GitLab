@@ -5,3 +5,5 @@ module AccountsHelper
     current_user.incoming_email_token && Gitlab::IncomingEmail.supports_issue_creation?
   end
 end
+
+AccountsHelper.prepend(EE::AccountsHelper)

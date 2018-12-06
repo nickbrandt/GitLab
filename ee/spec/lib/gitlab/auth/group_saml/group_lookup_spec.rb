@@ -58,4 +58,33 @@ describe Gitlab::Auth::GroupSaml::GroupLookup do
 
     expect(subject.saml_provider).to be_a(SamlProvider)
   end
+
+  context 'on metadata path' do
+    let(:path_info) { '/users/auth/group_saml/metadata' }
+    let(:saml_provider) { create(:saml_provider) }
+    let(:group) { saml_provider.group }
+    let(:group_params) { { group_path: group.full_path } }
+
+    describe '#token_discoverable?' do
+      it 'returns false when missing the discovery token' do
+        subject("QUERY_STRING" => group_params.to_query)
+
+        expect(subject).not_to be_token_discoverable
+      end
+
+      it 'returns false for incorrect discovery token' do
+        query_string = group_params.merge(token: 'wrongtoken').to_query
+        subject("QUERY_STRING" => query_string)
+
+        expect(subject).not_to be_token_discoverable
+      end
+
+      it 'returns true when discovery token matches' do
+        query_string = group_params.merge(token: group.saml_discovery_token).to_query
+        subject("QUERY_STRING" => query_string)
+
+        expect(subject).to be_token_discoverable
+      end
+    end
+  end
 end

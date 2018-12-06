@@ -109,7 +109,7 @@ module Gitlab
 
         data = content.lines[from..to]
 
-        ::Gitlab::SearchResults::FoundBlob.new(
+        ::Gitlab::Search::FoundBlob.new(
           filename: filename,
           basename: basename,
           ref: ref,

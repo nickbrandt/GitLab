@@ -270,7 +270,7 @@ msgstr ""
 msgid "2FA enabled"
 msgstr ""
 
-msgid "403|Please contact your GitLab administrator to get the permission."
+msgid "403|Please contact your GitLab administrator to get permission."
 msgstr ""
 
 msgid "403|You don't have the permission to access this page."
@@ -762,6 +762,12 @@ msgid "An error occurred whilst loading the pipelines jobs."
 msgstr ""
 
 msgid "An error occurred. Please try again."
+msgstr ""
+
+msgid "An unexpected error occurred while checking the project environment."
+msgstr ""
+
+msgid "An unexpected error occurred while checking the project runners."
 msgstr ""
 
 msgid "Analytics"
@@ -1369,7 +1375,7 @@ msgstr ""
 msgid "Browse files"
 msgstr ""
 
-msgid "Built-In"
+msgid "Built-in"
 msgstr ""
 
 msgid "Business metrics (Custom)"
@@ -1541,6 +1547,9 @@ msgid "Choose File ..."
 msgstr ""
 
 msgid "Choose a branch/tag (e.g. %{master}) or enter a commit (e.g. %{sha}) to see what's changed or to create a merge request."
+msgstr ""
+
+msgid "Choose a file"
 msgstr ""
 
 msgid "Choose a template..."
@@ -1915,13 +1924,13 @@ msgstr ""
 msgid "ClusterIntegration|Knative"
 msgstr ""
 
-msgid "ClusterIntegration|Knative (pronounced kay-nay-tiv) extends Kubernetes to provide a set of middleware components that are essential to build modern, source-centric, and container-based applications that can run anywhere: on premises, in the cloud, or even in a third-party data center."
-msgstr ""
-
 msgid "ClusterIntegration|Knative Domain Name:"
 msgstr ""
 
 msgid "ClusterIntegration|Knative IP Address:"
+msgstr ""
+
+msgid "ClusterIntegration|Knative extends Kubernetes to provide a set of middleware components that are essential to build modern, source-centric, and container-based applications that can run anywhere: on premises, in the cloud, or even in a third-party data center."
 msgstr ""
 
 msgid "ClusterIntegration|Kubernetes cluster"
@@ -2276,10 +2285,16 @@ msgstr ""
 msgid "Confidentiality"
 msgstr ""
 
+msgid "Configure GitLab runners to start using Web Terminal. %{helpStart}Learn more.%{helpEnd}"
+msgstr ""
+
 msgid "Configure Gitaly timeouts."
 msgstr ""
 
 msgid "Configure Tracing"
+msgstr ""
+
+msgid "Configure a <code>.gitlab-webide.yml</code> file in the <code>.gitlab</code> directory to start using the Web Terminal. %{helpStart}Learn more.%{helpEnd}"
 msgstr ""
 
 msgid "Configure automatic git checks and housekeeping on repositories."
@@ -2415,6 +2430,9 @@ msgid "Control the maximum concurrency of repository backfill for this secondary
 msgstr ""
 
 msgid "Control the maximum concurrency of verification operations for this Geo node"
+msgstr ""
+
+msgid "Control the minimum interval in days that a repository should be reverified for this primary node"
 msgstr ""
 
 msgid "ConvDev Index"
@@ -2597,9 +2615,6 @@ msgstr ""
 msgid "CurrentUser|Settings"
 msgstr ""
 
-msgid "Custom"
-msgstr ""
-
 msgid "Custom CI config path"
 msgstr ""
 
@@ -2613,6 +2628,9 @@ msgid "Custom notification levels are the same as participating levels. With cus
 msgstr ""
 
 msgid "Custom project templates"
+msgstr ""
+
+msgid "Custom project templates have not been set up for groups that you are a member of. They are enabled from a group’s settings page. Contact your group’s Owner or Maintainer to setup custom project templates."
 msgstr ""
 
 msgid "Customize colors"
@@ -3472,6 +3490,9 @@ msgstr ""
 msgid "Failed to update issues, please try again."
 msgstr ""
 
+msgid "Failed to upload object map file"
+msgstr ""
+
 msgid "Failure"
 msgstr ""
 
@@ -3988,6 +4009,9 @@ msgstr ""
 msgid "Geo|Projects in certain storage shards"
 msgstr ""
 
+msgid "Geo|Re-verification interval"
+msgstr ""
+
 msgid "Geo|Recheck"
 msgstr ""
 
@@ -4100,6 +4124,9 @@ msgid "GitLab Shared Runners execute code of different projects on the same Runn
 msgstr ""
 
 msgid "GitLab User"
+msgstr ""
+
+msgid "GitLab metadata URL"
 msgstr ""
 
 msgid "GitLab project export"
@@ -4252,13 +4279,22 @@ msgstr ""
 msgid "GroupSettings|Badges"
 msgstr ""
 
+msgid "GroupSettings|Custom project templates"
+msgstr ""
+
 msgid "GroupSettings|Customize your group badges."
 msgstr ""
 
 msgid "GroupSettings|Learn more about badges."
 msgstr ""
 
+msgid "GroupSettings|Learn more about group-level project templates."
+msgstr ""
+
 msgid "GroupSettings|Prevent sharing a project within %{group} with other groups"
+msgstr ""
+
+msgid "GroupSettings|Select a sub-group as the custom project template source for this group."
 msgstr ""
 
 msgid "GroupSettings|This setting is applied on %{ancestor_group} and has been overridden on this subgroup."
@@ -4462,6 +4498,9 @@ msgid "Identities"
 msgstr ""
 
 msgid "Identity provider single sign on URL"
+msgstr ""
+
+msgid "If any job surpasses this timeout threshold, it will be marked as failed. Human readable time input language is accepted like \"1 hour\". Values without specification represent seconds."
 msgstr ""
 
 msgid "If disabled, a diverged local branch will not be automatically updated with commits from its remote counterpart, to prevent local data loss. If the default branch (%{default_branch}) has diverged and cannot be updated, mirroring will fail. Other diverged branches are silently ignored."
@@ -4910,6 +4949,15 @@ msgid "Learn more about %{issue_boards_url}, to keep track of issues in multiple
 msgstr ""
 
 msgid "Learn more about Kubernetes"
+msgstr ""
+
+msgid "Learn more about Web Terminal"
+msgstr ""
+
+msgid "Learn more about custom project templates"
+msgstr ""
+
+msgid "Learn more about group-level project templates"
 msgstr ""
 
 msgid "Learn more about protected branches"
@@ -5678,6 +5726,9 @@ msgstr ""
 msgid "No file chosen"
 msgstr ""
 
+msgid "No file selected"
+msgstr ""
+
 msgid "No files found."
 msgstr ""
 
@@ -5721,6 +5772,9 @@ msgid "No runners found"
 msgstr ""
 
 msgid "No schedules"
+msgstr ""
+
+msgid "No start date"
 msgstr ""
 
 msgid "No, directly import the existing email addresses and usernames."
@@ -5944,7 +5998,7 @@ msgstr ""
 msgid "OperationsDashboard|The operations dashboard provides a summary of each project's operational health, including pipeline and alert statuses."
 msgstr ""
 
-msgid "OperationsDashboard|Unable to add %{invalidProjects}. The Operations Dashboard is available for projects with a Gold subscription."
+msgid "OperationsDashboard|Unable to add %{invalidProjects}. The Operations Dashboard is available for public projects, and private projects in groups with a Gold plan."
 msgstr ""
 
 msgid "Optionally, you can %{link_to_customize} how FogBugz email addresses and usernames are imported into GitLab."
@@ -6029,9 +6083,6 @@ msgid "Pending"
 msgstr ""
 
 msgid "People without permission will never get a notification and won't be able to comment."
-msgstr ""
-
-msgid "Per job. If a job passes this threshold, it will be marked as failed"
 msgstr ""
 
 msgid "Perform advanced options such as changing path, transferring, or removing the group."
@@ -6748,6 +6799,9 @@ msgstr ""
 msgid "PrometheusService|Custom metrics"
 msgstr ""
 
+msgid "PrometheusService|Enable Prometheus to define custom metrics, using either option above"
+msgstr ""
+
 msgid "PrometheusService|Finding and configuring metrics..."
 msgstr ""
 
@@ -7104,6 +7158,12 @@ msgstr ""
 msgid "Repository URL"
 msgstr ""
 
+msgid "Repository cleanup"
+msgstr ""
+
+msgid "Repository cleanup has started. You will receive an email once the cleanup operation is complete."
+msgstr ""
+
 msgid "Repository has no locks."
 msgstr ""
 
@@ -7217,6 +7277,9 @@ msgstr ""
 msgid "Run CI/CD pipelines for external repositories"
 msgstr ""
 
+msgid "Run tests against your code live using the Web Terminal"
+msgstr ""
+
 msgid "Run untagged jobs"
 msgstr ""
 
@@ -7278,6 +7341,9 @@ msgid "SAML Single Sign On"
 msgstr ""
 
 msgid "SAML Single Sign On Settings"
+msgstr ""
+
+msgid "SAML for %{group_name}"
 msgstr ""
 
 msgid "SAST"
@@ -7825,6 +7891,9 @@ msgstr ""
 msgid "Sort by"
 msgstr ""
 
+msgid "Sort direction"
+msgstr ""
+
 msgid "SortOptions|Access level, ascending"
 msgstr ""
 
@@ -7996,6 +8065,9 @@ msgstr ""
 msgid "Starred projects"
 msgstr ""
 
+msgid "Start Web Terminal"
+msgstr ""
+
 msgid "Start a %{new_merge_request} with these changes"
 msgstr ""
 
@@ -8003,6 +8075,9 @@ msgid "Start a review"
 msgstr ""
 
 msgid "Start and due date"
+msgstr ""
+
+msgid "Start cleanup"
 msgstr ""
 
 msgid "Start date"
@@ -8190,6 +8265,9 @@ msgstr ""
 msgid "Templates"
 msgstr ""
 
+msgid "Terminal"
+msgstr ""
+
 msgid "Terminal for environment"
 msgstr ""
 
@@ -8245,6 +8323,9 @@ msgid "The import will time out after %{timeout}. For repositories that take lon
 msgstr ""
 
 msgid "The issue stage shows the time it takes from creating an issue to assigning the issue to a milestone, or add the issue to a list on your Issue Board. Begin creating issues to see data for this stage."
+msgstr ""
+
+msgid "The maximum file size allowed is %{max_attachment_size}mb"
 msgstr ""
 
 msgid "The maximum file size allowed is 200KB."
@@ -8329,6 +8410,9 @@ msgid "There are no approvers"
 msgstr ""
 
 msgid "There are no archived projects yet"
+msgstr ""
+
+msgid "There are no custom project templates set up for this GitLab instance. They are enabled from GitLab's Admin Area. Contact your GitLab instance administrator to setup custom project templates."
 msgstr ""
 
 msgid "There are no issues to show"
@@ -8544,7 +8628,7 @@ msgstr ""
 msgid "This source diff could not be displayed because it is too large."
 msgstr ""
 
-msgid "This timeout will take precedence when lower than Project-defined timeout"
+msgid "This timeout will take precedence when lower than project-defined timeout and accepts a human readable time input language like \"1 hour\". Values without specification represent seconds."
 msgstr ""
 
 msgid "This user has no identities"
@@ -8923,6 +9007,12 @@ msgstr ""
 msgid "Try again"
 msgstr ""
 
+msgid "Try again?"
+msgstr ""
+
+msgid "Trying to communicate with your device. Plug it in (if you haven't already) and press the button on the device now."
+msgstr ""
+
 msgid "Turn on Service Desk"
 msgstr ""
 
@@ -9043,6 +9133,9 @@ msgstr ""
 msgid "Upload file"
 msgstr ""
 
+msgid "Upload object map"
+msgstr ""
+
 msgid "UploadLink|click to upload"
 msgstr ""
 
@@ -9080,6 +9173,9 @@ msgid "Use your global notification setting"
 msgstr ""
 
 msgid "Used by members to sign in to your group in GitLab"
+msgstr ""
+
+msgid "Used to help configure your identity provider"
 msgstr ""
 
 msgid "User Cohorts are only shown when the %{usage_ping_link_start}usage ping%{usage_ping_link_end} is enabled."
@@ -9293,6 +9389,9 @@ msgid "We want to be sure it is you, please confirm you are not a robot."
 msgstr ""
 
 msgid "Web IDE"
+msgstr ""
+
+msgid "Web Terminal"
 msgstr ""
 
 msgid "Web terminal"
@@ -9542,6 +9641,9 @@ msgid "You cannot write to this read-only GitLab instance."
 msgstr ""
 
 msgid "You do not have any subscriptions yet"
+msgstr ""
+
+msgid "You do not have permission to run the Web Terminal. Please contact a project administrator."
 msgstr ""
 
 msgid "You do not have the correct permissions to override the settings from the LDAP group sync."
@@ -10002,6 +10104,9 @@ msgid "is invalid because there is upstream lock"
 msgstr ""
 
 msgid "is not a valid X509 certificate."
+msgstr ""
+
+msgid "is out of the hierarchy of the Group owning the template"
 msgstr ""
 
 msgid "issue boards"

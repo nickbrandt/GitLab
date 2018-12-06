@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Epics
   class BaseService < IssuableBaseService
     attr_reader :group

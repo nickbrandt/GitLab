@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ClearSharedRunnersMinutesWorker
   LEASE_TIMEOUT = 3600
 

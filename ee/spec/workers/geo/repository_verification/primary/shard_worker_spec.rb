@@ -91,6 +91,60 @@ describe Geo::RepositoryVerification::Primary::ShardWorker, :postgresql, :clean_
       subject.perform(shard_name)
     end
 
+    context 'reverification' do
+      context 'feature geo_repository_reverification flag is enabled' do
+        before do
+          stub_feature_flags(geo_repository_reverification: true)
+        end
+
+        it 'performs Geo::RepositoryVerification::Primary::SingleWorker for projects where repository should be reverified' do
+          project_to_be_reverified = create(:project)
+
+          create(:repository_state, :repository_verified, :wiki_verified,
+            project: project_to_be_reverified, last_repository_verification_ran_at: 10.days.ago)
+
+          expect(primary_singleworker).to receive(:perform_async).with(project_to_be_reverified.id)
+
+          subject.perform(shard_name)
+        end
+
+        it 'performs Geo::RepositoryVerification::Primary::SingleWorker for projects where wiki should be reverified' do
+          project_to_be_reverified = create(:project)
+
+          create(:repository_state, :repository_verified, :wiki_verified,
+            project: project_to_be_reverified, last_wiki_verification_ran_at: 10.days.ago)
+
+          expect(primary_singleworker).to receive(:perform_async).with(project_to_be_reverified.id)
+
+          subject.perform(shard_name)
+        end
+      end
+
+      context 'feature geo_repository_reverification flag is disabled' do
+        before do
+          stub_feature_flags(geo_repository_reverification: false)
+        end
+
+        it 'does not perform Geo::RepositoryVerification::Primary::SingleWorker for projects where repository should be reverified' do
+          create(:repository_state, :repository_verified, :wiki_verified,
+            last_repository_verification_ran_at: 10.days.ago)
+
+          expect(primary_singleworker).not_to receive(:perform_async)
+
+          subject.perform(shard_name)
+        end
+
+        it 'does not Geo::RepositoryVerification::Primary::SingleWorker for projects where wiki should be reverified' do
+          create(:repository_state, :repository_verified, :wiki_verified,
+            last_wiki_verification_ran_at: 10.days.ago)
+
+          expect(primary_singleworker).not_to receive(:perform_async)
+
+          subject.perform(shard_name)
+        end
+      end
+    end
+
     it 'does not perform Geo::RepositoryVerification::Primary::SingleWorker when shard becomes unhealthy' do
       create(:project)
 
@@ -172,6 +226,8 @@ describe Geo::RepositoryVerification::Primary::ShardWorker, :postgresql, :clean_
       let(:project_wiki_unverified) { create(:repository_state).project }
       let(:project_repo_failed_wiki_verified) { create(:repository_state, :repository_failed, :wiki_verified).project }
       let(:project_repo_verified_wiki_failed) { create(:repository_state, :repository_verified, :wiki_failed).project }
+      let(:project_repo_reverify) { create(:repository_state, :repository_verified, :wiki_verified, last_repository_verification_ran_at: 10.days.ago).project }
+      let(:project_wiki_reverify) { create(:repository_state, :repository_verified, :wiki_verified, last_wiki_verification_ran_at: 10.days.ago).project }
 
       it 'handles multiple batches of projects needing verification' do
         expect(primary_singleworker).to receive(:perform_async).with(project_repo_unverified.id).once.and_call_original
@@ -182,7 +238,7 @@ describe Geo::RepositoryVerification::Primary::ShardWorker, :postgresql, :clean_
         end
       end
 
-      it 'handles multiple batches of projects needing verification, including failed repos' do
+      it 'handles multiple batches of projects needing verification' do
         expect(primary_singleworker).to receive(:perform_async).with(project_repo_unverified.id).once.and_call_original
         expect(primary_singleworker).to receive(:perform_async).with(project_wiki_unverified.id).once.and_call_original
         expect(primary_singleworker).to receive(:perform_async).with(project_repo_verified.id).once.and_call_original
@@ -190,8 +246,10 @@ describe Geo::RepositoryVerification::Primary::ShardWorker, :postgresql, :clean_
         expect(primary_singleworker).to receive(:perform_async).with(project_both_failed.id).once.and_call_original
         expect(primary_singleworker).to receive(:perform_async).with(project_repo_failed_wiki_verified.id).once.and_call_original
         expect(primary_singleworker).to receive(:perform_async).with(project_repo_verified_wiki_failed.id).once.and_call_original
+        expect(primary_singleworker).to receive(:perform_async).with(project_repo_reverify.id).once.and_call_original
+        expect(primary_singleworker).to receive(:perform_async).with(project_wiki_reverify.id).once.and_call_original
 
-        8.times do
+        10.times do
           Sidekiq::Testing.inline! { subject.perform(shard_name) }
         end
       end

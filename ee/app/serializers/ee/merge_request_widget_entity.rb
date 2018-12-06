@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module MergeRequestWidgetEntity
     include ::API::Helpers::RelatedResourcesHelpers
@@ -66,7 +68,7 @@ module EE
         end
 
         expose :managed_licenses_path do |merge_request|
-          api_v4_projects_managed_licenses_path(id: merge_request.source_project.id)
+          api_v4_projects_managed_licenses_path(id: merge_request.target_project.id)
         end
 
         expose :can_manage_licenses do |merge_request|

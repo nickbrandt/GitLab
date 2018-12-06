@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe Project do
   include ExternalAuthorizationServiceHelpers
+  include ::EE::GeoHelpers
   using RSpec::Parameterized::TableSyntax
 
   describe 'associations' do
@@ -502,6 +503,29 @@ describe Project do
 
       it 'shared runners are not available' do
         expect(project.shared_runners_available?).to be_falsey
+      end
+    end
+  end
+
+  describe '#root_namespace' do
+    let(:project) { build(:project, namespace: parent) }
+
+    subject { project.root_namespace }
+
+    context 'when namespace has parent group', :nested_groups do
+      let(:root_ancestor) { create(:group) }
+      let(:parent) { create(:group, parent: root_ancestor) }
+
+      it 'returns root ancestor' do
+        is_expected.to eq(root_ancestor)
+      end
+    end
+
+    context 'when namespace is root ancestor' do
+      let(:parent) { create(:group) }
+
+      it 'returns current namespace' do
+        is_expected.to eq(parent)
       end
     end
   end
@@ -1366,6 +1390,78 @@ describe Project do
     end
   end
 
+  describe '#lfs_http_url_to_repo' do
+    let(:project) { create(:project) }
+    let(:project_path) { "#{Gitlab::Routing.url_helpers.project_path(project)}.git" }
+
+    let(:primary_base_host) { 'primary.geo' }
+    let(:primary_base_url) { "http://#{primary_base_host}" }
+    let(:primary_url) { "#{primary_base_url}#{project_path}" }
+
+    context 'with a Geo setup that is a primary' do
+      let(:primary_node) { create(:geo_node, url: primary_base_url) }
+
+      before do
+        stub_current_geo_node(primary_node)
+        stub_default_url_options(primary_base_host)
+      end
+
+      context 'for an upload operation' do
+        it 'returns the project HTTP URL for the primary' do
+          expect(project.lfs_http_url_to_repo('upload')).to eq(primary_url)
+        end
+      end
+    end
+
+    context 'with a Geo setup that is a secondary' do
+      let(:secondary_base_host) { 'secondary.geo' }
+      let(:secondary_base_url) { "http://#{secondary_base_host}" }
+      let(:secondary_node) { create(:geo_node, url: secondary_base_url) }
+      let(:secondary_url) { "#{secondary_base_url}#{project_path}"  }
+
+      before do
+        stub_current_geo_node(secondary_node)
+        stub_default_url_options(current_rails_hostname)
+      end
+
+      context 'and has a primary' do
+        let(:primary_node) { create(:geo_node, url: primary_base_url) }
+
+        context 'for an upload operation' do
+          let(:current_rails_hostname) { primary_base_host }
+
+          it 'returns the project HTTP URL for the primary' do
+            expect(project.lfs_http_url_to_repo('upload')).to eq(primary_url)
+          end
+        end
+
+        context 'for a download operation' do
+          let(:current_rails_hostname) { secondary_base_host }
+
+          it 'returns the project HTTP URL for the secondary' do
+            expect(project.lfs_http_url_to_repo('download')).to eq(secondary_url)
+          end
+        end
+      end
+
+      context 'without a primary' do
+        let(:current_rails_hostname) { secondary_base_host }
+
+        it 'returns the project HTTP URL for the secondary' do
+          expect(project.lfs_http_url_to_repo('operation_that_doesnt_matter')).to eq(secondary_url)
+        end
+      end
+    end
+
+    context 'without a Geo setup' do
+      it 'returns the project HTTP URL for the main node' do
+        project_url = "#{Gitlab::Routing.url_helpers.project_url(project)}.git"
+
+        expect(project.lfs_http_url_to_repo('operation_that_doesnt_matter')).to eq(project_url)
+      end
+    end
+  end
+
   describe '#add_import_job' do
     let(:project) { create(:project) }
 
@@ -1468,5 +1564,14 @@ describe Project do
 
       subject
     end
+  end
+
+  # Despite stubbing the current node as the primary or secondary, the
+  # behaviour for EE::Project#lfs_http_url_to_repo() is to call
+  # Project#lfs_http_url_to_repo() which does not have a Geo context.
+  def stub_default_url_options(host)
+    allow(Rails.application.routes)
+      .to receive(:default_url_options)
+      .and_return(host: host)
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Groups
   class ParticipantsService < Groups::BaseService
     include Users::ParticipableService

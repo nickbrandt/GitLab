@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ClusterUpdateAppWorker
   UpdateAlreadyInProgressError = Class.new(StandardError)
 

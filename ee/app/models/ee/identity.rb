@@ -18,5 +18,11 @@ module EE
         iwhere(secondary_extern_uid: normalize_uid(provider, secondary_extern_uid)).with_provider(provider)
       end
     end
+
+    class_methods do
+      def preload_saml_group
+        preload(saml_provider: { group: :route })
+      end
+    end
   end
 end

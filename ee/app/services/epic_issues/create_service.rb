@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module EpicIssues
   class CreateService < IssuableLinks::CreateService
     private
 
     # rubocop: disable CodeReuse/ActiveRecord
-    def relate_issues(referenced_issue)
+    def relate_issuables(referenced_issue)
       link = EpicIssue.find_or_initialize_by(issue: referenced_issue)
 
       affected_epics = [issuable]
@@ -41,17 +43,17 @@ module EpicIssues
       { group: issuable.group }
     end
 
-    def linkable_issues(issues)
+    def linkable_issuables(issues)
       @linkable_issues ||= begin
         return [] unless can?(current_user, :admin_epic, issuable.group)
 
         issues.select do |issue|
-          issuable_group_descendants.include?(issue.project.group) && !previous_related_issues.include?(issue)
+          issuable_group_descendants.include?(issue.project.group) && !previous_related_issuables.include?(issue)
         end
       end
     end
 
-    def previous_related_issues
+    def previous_related_issuables
       @related_issues ||= issuable.issues.to_a
     end
 

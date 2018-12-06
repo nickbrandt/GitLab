@@ -163,7 +163,7 @@ describe('RelatedIssuesRoot', () => {
           next(
             request.respondWith(
               JSON.stringify({
-                issues: [issuable1],
+                issuables: [issuable1],
                 result: {
                   message: 'something was successfully related',
                   status: 'success',
@@ -196,7 +196,7 @@ describe('RelatedIssuesRoot', () => {
           next(
             request.respondWith(
               JSON.stringify({
-                issues: [issuable1, issuable2],
+                issuables: [issuable1, issuable2],
                 result: {
                   message: 'something was successfully related',
                   status: 'success',

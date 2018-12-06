@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ValidatesClassificationLabel
   def validate_classification_label(record, attribute_name)
     return unless EE::Gitlab::ExternalAuthorization.enabled?

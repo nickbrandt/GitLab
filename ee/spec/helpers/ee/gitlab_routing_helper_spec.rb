@@ -84,4 +84,32 @@ describe EE::GitlabRoutingHelper do
       end
     end
   end
+
+  describe '#user_group_saml_omniauth_metadata_path' do
+    subject do
+      helper.user_group_saml_omniauth_metadata_path(group)
+    end
+
+    before do
+      group.update!(saml_discovery_token: 'sometoken')
+    end
+
+    it 'uses metadata path' do
+      expect(subject).to start_with('/users/auth/group_saml/metadata')
+    end
+
+    it 'appends group path and token' do
+      expect(subject).to end_with('?group_path=foo&token=sometoken')
+    end
+  end
+
+  describe '#user_group_saml_omniauth_metadata_url' do
+    subject do
+      helper.user_group_saml_omniauth_metadata_url(group)
+    end
+
+    it 'creates full metadata URL' do
+      expect(subject).to start_with 'http://localhost/users/auth/group_saml/metadata?group_path=foo&token='
+    end
+  end
 end

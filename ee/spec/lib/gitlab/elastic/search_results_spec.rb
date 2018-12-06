@@ -31,7 +31,7 @@ describe Gitlab::Elastic::SearchResults do
     it 'returns an unhighlighted blob when no highlight data is present' do
       parsed = described_class.parse_search_result('_source' => blob)
 
-      expect(parsed).to be_kind_of(::Gitlab::SearchResults::FoundBlob)
+      expect(parsed).to be_kind_of(::Gitlab::Search::FoundBlob)
       expect(parsed).to have_attributes(
         startline: 1,
         data: "foo\n"
@@ -48,7 +48,7 @@ describe Gitlab::Elastic::SearchResults do
 
       parsed = described_class.parse_search_result(result)
 
-      expect(parsed).to be_kind_of(::Gitlab::SearchResults::FoundBlob)
+      expect(parsed).to be_kind_of(::Gitlab::Search::FoundBlob)
       expect(parsed).to have_attributes(
         id: nil,
         filename: 'path/file.ext',

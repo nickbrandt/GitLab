@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Concern that encapsulates logic to remove all
 # approvers in a project that were not added during
 # the current transaction

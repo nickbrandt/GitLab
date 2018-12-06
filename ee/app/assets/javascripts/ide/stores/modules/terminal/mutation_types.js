@@ -1,0 +1,7 @@
+export const SET_VISIBLE = 'SET_VISIBLE';
+export const HIDE_SPLASH = 'HIDE_SPLASH';
+export const SET_PATHS = 'SET_PATHS';
+
+export const REQUEST_CHECK = 'REQUEST_CHECK';
+export const RECEIVE_CHECK_SUCCESS = 'RECEIVE_CHECK_SUCCESS';
+export const RECEIVE_CHECK_ERROR = 'RECEIVE_CHECK_ERROR';

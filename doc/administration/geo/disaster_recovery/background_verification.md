@@ -24,10 +24,9 @@ these failures, so you should follow [these instructions][reset-verification].
 If verification is lagging significantly behind replication, consider giving
 the node more time before scheduling a planned failover.
 
-### Disabling or enabling the automatic background verification
+## Disabling or enabling the automatic background verification
 
-The following commands are to be issues in a Rails console on
-the **primary**:
+Run the following commands in a Rails console on the **primary** node:
 
 ```sh
 # Omnibus GitLab
@@ -38,25 +37,25 @@ cd /home/git/gitlab
 sudo -u git -H bin/rails console RAILS_ENV=production
 ```
 
-**To check if automatic background verification is enabled:**
+To check if automatic background verification is enabled:
 
 ```ruby
 Gitlab::Geo.repository_verification_enabled?
 ```
 
-**To disable automatic background verification:**
+To disable automatic background verification:
 
 ```ruby
 Feature.disable('geo_repository_verification')
 ```
 
-**To enable automatic background verification:**
+To enable automatic background verification:
 
 ```ruby
 Feature.enable('geo_repository_verification')
 ```
 
-# Repository verification
+## Repository verification
 
 Navigate to the **Admin Area > Geo** dashboard on the **primary** node and expand
 the **Verification information** tab for that node to view automatic checksumming
@@ -72,7 +71,7 @@ green, pending work in grey, and failures in red.
 
 ![Verification status](img/verification-status-secondary.png)
 
-# Using checksums to compare Geo nodes
+## Using checksums to compare Geo nodes
 
 To check the health of Geo secondary nodes, we use a checksum over the list of
 Git references and their values. The checksum includes `HEAD`, `heads`, `tags`,
@@ -81,7 +80,49 @@ have the same checksum, then they definitely hold the same references. We comput
 the checksum for every node after every update to make sure that they are all
 in sync.
 
-# Reset verification for projects where verification has failed
+## Repository re-verification
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/8550) in GitLab Enterprise Edition 11.6. Available in [GitLab Premium](https://about.gitlab.com/pricing/).
+
+Due to bugs or transient infrastructure failures, it is possible for Git
+repositories to change unexpectedly without being marked for verification.
+Geo constantly reverifies the repositories to ensure the integrity of the
+data. The default and recommended re-verification interval is 7 days, though
+an interval as short as 1 day can be set. Shorter intervals reduce risk but
+increase load and vice versa.
+
+Navigate to the **Admin Area > Geo** dashboard on the **primary** node, and
+click the **Edit** button for the **primary** node to customize the minimum
+re-verification interval:
+
+![Re-verification interval](img/reverification-interval.png)
+
+The automatic background re-verification is enabled by default, but you can
+disable if you need. Run the following commands in a Rails console on the
+**primary** node:
+
+```sh
+# Omnibus GitLab
+gitlab-rails console
+
+# Installation from source
+cd /home/git/gitlab
+sudo -u git -H bin/rails console RAILS_ENV=production
+```
+
+To disable automatic background re-verification:
+
+```ruby
+Feature.disable('geo_repository_reverification')
+```
+
+To enable automatic background re-verification:
+
+```ruby
+Feature.enable('geo_repository_reverification')
+```
+
+## Reset verification for projects where verification has failed
 
 Geo actively try to correct verification failures marking the repository to
 be resynced with a backoff period. If you want to reset them manually, this
@@ -116,7 +157,7 @@ sudo gitlab-rake geo:verification:wiki:reset
 sudo -u git -H bundle exec rake geo:verification:wiki:reset RAILS_ENV=production
 ```
 
-# Current limitations
+## Current limitations
 
 Until [issue #5064][ee-5064] is completed, background verification doesn't cover
 CI job artifacts and traces, LFS objects, or user uploads in file storage.

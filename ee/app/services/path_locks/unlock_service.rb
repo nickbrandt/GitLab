@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PathLocks
   class UnlockService < BaseService
     AccessDenied = Class.new(StandardError)

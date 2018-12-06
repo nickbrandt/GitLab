@@ -214,4 +214,123 @@ describe Groups::Security::VulnerabilitiesController do
       end
     end
   end
+
+  describe 'GET history.json' do
+    subject { get :history,  group_id: group, format: :json }
+
+    context 'when security dashboard feature is disabled' do
+      before do
+        stub_licensed_features(security_dashboard: false)
+      end
+
+      it 'returns 404' do
+        subject
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+
+    context 'when group security dashboard history feature flag is disabled' do
+      before do
+        stub_licensed_features(security_dashboard: true)
+        stub_feature_flags(group_security_dashboard_history: false)
+        group.add_developer(user)
+      end
+
+      it 'returns 404' do
+        subject
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+
+    context 'when security dashboard feature is enabled' do
+      before do
+        stub_licensed_features(security_dashboard: true)
+
+        travel_to(Time.zone.parse('2018-11-10')) do
+          pipeline_1 = create(:ci_pipeline, :success, project: project_dev)
+          pipeline_2 = create(:ci_pipeline, :success, project: project_dev)
+
+          create_list(:vulnerabilities_occurrence, 2,
+            pipelines: [pipeline_1], project: project_dev, report_type: :sast, severity: :high)
+
+          create_list(:vulnerabilities_occurrence, 1,
+            pipelines: [pipeline_1], project: project_dev, report_type: :dependency_scanning, severity: :low)
+
+          create_list(:vulnerabilities_occurrence, 1,
+            pipelines: [pipeline_1, pipeline_2], project: project_dev, report_type: :sast, severity: :critical)
+
+          create_list(:vulnerabilities_occurrence, 1,
+            pipelines: [pipeline_1, pipeline_2], project: project_dev, report_type: :dependency_scanning, severity: :low)
+        end
+
+        travel_to(Time.zone.parse('2018-11-12')) do
+          pipeline = create(:ci_pipeline, :success, project: project_dev)
+
+          create_list(:vulnerabilities_occurrence, 2,
+            pipelines: [pipeline], project: project_dev, report_type: :dependency_scanning, severity: :low)
+
+          create_list(:vulnerabilities_occurrence, 1,
+            pipelines: [pipeline], project: project_dev, report_type: :dast, severity: :medium)
+
+          create_list(:vulnerabilities_occurrence, 1,
+            pipelines: [pipeline], project: project_dev, report_type: :dast, severity: :low)
+        end
+      end
+
+      context 'when user has guest access' do
+        before do
+          group.add_guest(user)
+        end
+
+        it 'returns 403' do
+          subject
+
+          expect(response).to have_gitlab_http_status(403)
+        end
+      end
+
+      context 'when user has developer access' do
+        before do
+          group.add_developer(user)
+        end
+
+        it 'returns vulnerability history within last 90 days' do
+          travel_to(Time.zone.parse('2019-02-10')) do
+            subject
+          end
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response).to be_an(Hash)
+          expect(json_response['total']).to eq({ '2018-11-10' => 5, '2018-11-12' => 4 })
+          expect(json_response['critical']).to eq({ '2018-11-10' => 1 })
+          expect(json_response['high']).to eq({ '2018-11-10' => 2 })
+          expect(json_response['medium']).to eq({ '2018-11-12' => 1 })
+          expect(json_response['low']).to eq({ '2018-11-10' => 2, '2018-11-12' => 3 })
+          expect(response).to match_response_schema('vulnerabilities/history', dir: 'ee')
+        end
+
+        it 'returns empty history if there are no vulnerabilities within last 90 days' do
+          travel_to(Time.zone.parse('2019-02-13')) do
+            subject
+          end
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(json_response).to be_an(Hash)
+          expect(json_response).to eq({
+            "undefined" => {},
+            "ignore" => {},
+            "unknown" => {},
+            "experimental" => {},
+            "low" => {},
+            "medium" => {},
+            "high" => {},
+            "critical" => {},
+            "total" => {}
+          })
+          expect(response).to match_response_schema('vulnerabilities/history', dir: 'ee')
+        end
+      end
+    end
+  end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ClusterWaitForAppUpdateWorker
   include ApplicationWorker
   include ClusterQueue

@@ -3,11 +3,12 @@ import { s__ } from '~/locale';
 import '~/flash';
 import Api from '~/api';
 
-const onPrimaryCheckboxChange = function onPrimaryCheckboxChange(e, $namespaces) {
+const onPrimaryCheckboxChange = function onPrimaryCheckboxChange(e, $namespaces, $reverification) {
   const $namespacesSelect = $('.select2', $namespaces);
 
   $namespacesSelect.select2('data', null);
   $namespaces.toggleClass('hidden', e.currentTarget.checked);
+  $reverification.toggleClass('hidden', !e.currentTarget.checked);
 };
 
 const onSelectiveSyncTypeChange = function onSelectiveSyncTypeChange(e, $byNamespaces, $byShards) {
@@ -18,13 +19,14 @@ const onSelectiveSyncTypeChange = function onSelectiveSyncTypeChange(e, $byNames
 export default function geoNodeForm() {
   const $container = $('.js-geo-node-form');
   const $namespaces = $('.js-hide-if-geo-primary', $container);
+  const $reverification = $('.js-hide-if-geo-secondary', $container);
   const $primaryCheckbox = $('input[type="checkbox"]', $container);
   const $selectiveSyncTypeSelect = $('.js-geo-node-selective-sync-type', $container);
   const $select2Dropdown = $('.js-geo-node-namespaces', $container);
   const $syncByNamespaces = $('.js-sync-by-namespace', $container);
   const $syncByShards = $('.js-sync-by-shard', $container);
 
-  $primaryCheckbox.on('change', e => onPrimaryCheckboxChange(e, $namespaces));
+  $primaryCheckbox.on('change', e => onPrimaryCheckboxChange(e, $namespaces, $reverification));
 
   $selectiveSyncTypeSelect.on('change', e =>
     onSelectiveSyncTypeChange(e, $syncByNamespaces, $syncByShards),

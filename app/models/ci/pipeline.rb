@@ -14,13 +14,14 @@ module Ci
 
     prepend ::EE::Ci::Pipeline
 
-    belongs_to :project, inverse_of: :pipelines
+    belongs_to :project, inverse_of: :all_pipelines
     belongs_to :user
     belongs_to :auto_canceled_by, class_name: 'Ci::Pipeline'
     belongs_to :pipeline_schedule, class_name: 'Ci::PipelineSchedule'
+    belongs_to :merge_request, class_name: 'MergeRequest'
 
     has_internal_id :iid, scope: :project, presence: false, init: ->(s) do
-      s&.project&.pipelines&.maximum(:iid) || s&.project&.pipelines&.count
+      s&.project&.all_pipelines&.maximum(:iid) || s&.project&.all_pipelines&.count
     end
 
     has_one :source_pipeline, class_name: Ci::Sources::Pipeline
@@ -61,6 +62,9 @@ module Ci
 
     validates :sha, presence: { unless: :importing? }
     validates :ref, presence: { unless: :importing? }
+    validates :merge_request, presence: { if: :merge_request? }
+    validates :merge_request, absence: { unless: :merge_request? }
+    validates :tag, inclusion: { in: [false], if: :merge_request? }
     validates :status, presence: { unless: :importing? }
     validate :valid_commit_sha, unless: :importing?
 
@@ -78,7 +82,8 @@ module Ci
     enum_with_nil config_source: {
       unknown_source: nil,
       repository_source: 1,
-      auto_devops_source: 2
+      auto_devops_source: 2,
+      webide_source: 3 ## EE-specific
     }
 
     # We use `Ci::PipelineEnums.failure_reasons` here so that EE can more easily
@@ -181,6 +186,16 @@ module Ci
     end
 
     scope :internal, -> { where(source: internal_sources) }
+    scope :ci_sources, -> { where(config_source: ci_sources_values) }
+
+    scope :sort_by_merge_request_pipelines, -> do
+      sql = 'CASE ci_pipelines.source WHEN (?) THEN 0 ELSE 1 END, ci_pipelines.id DESC'
+      query = ActiveRecord::Base.send(:sanitize_sql_array, [sql, sources[:merge_request]]) # rubocop:disable GitlabSecurity/PublicSend
+
+      order(query)
+    end
+
+    scope :for_user, -> (user) { where(user: user) }
 
     # Returns the pipelines in descending order (= newest first), optionally
     # limited to a number of references.
@@ -267,6 +282,10 @@ module Ci
 
     def self.internal_sources
       sources.reject { |source| source == "external" }.values
+    end
+
+    def self.ci_sources_values
+      config_sources.values_at(:repository_source, :auto_devops_source, :unknown_source)
     end
 
     def stages_count
@@ -381,7 +400,7 @@ module Ci
     end
 
     def branch?
-      !tag?
+      !tag? && !merge_request?
     end
 
     def stuck?
@@ -507,6 +526,8 @@ module Ci
     end
 
     def ci_yaml_file_path
+      return unless repository_source? || unknown_source?
+
       if project.ci_config_path.blank?
         '.gitlab-ci.yml'
       else
@@ -626,7 +647,12 @@ module Ci
 
     # All the merge requests for which the current pipeline runs/ran against
     def all_merge_requests
-      @all_merge_requests ||= project.merge_requests.where(source_branch: ref)
+      @all_merge_requests ||=
+        if merge_request?
+          project.merge_requests.where(id: merge_request.id)
+        else
+          project.merge_requests.where(source_branch: ref)
+        end
     end
 
     def detailed_status(current_user)
@@ -675,6 +701,7 @@ module Ci
     def ci_yaml_from_repo
       return unless project
       return unless sha
+      return unless ci_yaml_file_path
 
       project.repository.gitlab_ci_yml_for(sha, ci_yaml_file_path)
     rescue GRPC::NotFound, GRPC::Internal
@@ -701,6 +728,8 @@ module Ci
 
     def git_ref
       if branch?
+        Gitlab::Git::BRANCH_REF_PREFIX + ref.to_s
+      elsif merge_request?
         Gitlab::Git::BRANCH_REF_PREFIX + ref.to_s
       elsif tag?
         Gitlab::Git::TAG_REF_PREFIX + ref.to_s

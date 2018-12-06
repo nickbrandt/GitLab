@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ClearNamespaceSharedRunnersMinutesService < BaseService
   def initialize(namespace)
     @namespace = namespace

@@ -1,5 +1,17 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.5.3 (2018-12-06)
+
+- No changes.
+
+## 11.5.2 (2018-12-03)
+
+### Fixed (2 changes)
+
+- Fix inability to scroll dashboard. !8459
+- Fix issues analytics query when ordering issues by priority. !8509
+
+
 ## 11.5.1 (2018-11-26)
 
 ### Security (6 changes)

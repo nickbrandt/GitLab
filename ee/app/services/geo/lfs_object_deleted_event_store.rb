@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   class LfsObjectDeletedEventStore < EventStore
     extend ::Gitlab::Utils::Override

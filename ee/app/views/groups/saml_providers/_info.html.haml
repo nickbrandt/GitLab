@@ -21,6 +21,12 @@
   .well-segment.borderless
     = render 'info_row', field: :issuer, label_text: 'Identifier'
     .form-text.text-muted= _('Also called "Issuer" or "Relying party trust identifier"')
+  - if group_saml_metadata_enabled?(@group)
+    .well-segment.borderless
+      %label= _("GitLab metadata URL")
+      - metadata_url = user_group_saml_omniauth_metadata_url(@group)
+      %div= link_to metadata_url, metadata_url
+      .form-text.text-muted= _("Used to help configure your identity provider")
   - if @saml_provider.persisted?
     .well-segment.borderless
       %label= _("GitLab single sign on URL")

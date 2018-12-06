@@ -89,7 +89,7 @@ module API
 
         issue = Issue.find(params[:issue_id])
 
-        create_params = { target_issue: issue }
+        create_params = { target_issuable: issue }
 
         result = ::EpicIssues::CreateService.new(epic, current_user, create_params).execute
 

@@ -19,11 +19,7 @@ describe "User creates issue", :js do
       weight = "7"
 
       fill_in("Title", with: issue_title)
-      click_button("Weight")
-
-      page.within(".dropdown-menu-weight") do
-        click_link(weight)
-      end
+      fill_in("issue_weight", with: weight)
 
       click_button("Submit issue")
 
