@@ -53,11 +53,5 @@ shared_examples 'gold trial callout' do
 
       expect(page).not_to have_selector '.promotion-callout'
     end
-
-    it 'hides promotion callout if database is in a readonly state' do
-      allow(Gitlab::Database).to receive(:read_only?).and_return(true)
-
-      expect(page).not_to have_selector '.promotion-callout'
-    end
   end
 end
