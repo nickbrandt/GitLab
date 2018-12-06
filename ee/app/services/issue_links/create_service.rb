@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module IssueLinks
   class CreateService < IssuableLinks::CreateService
     def relate_issuables(referenced_issue)

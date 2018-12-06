@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EpicPolicy < BasePolicy
   delegate { @subject.group }
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   class FileDownloadDispatchWorker
     # This class is meant to be inherited, and is responsible for generating

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Issues
   class ExportCsvService
     include Gitlab::Routing.url_helpers

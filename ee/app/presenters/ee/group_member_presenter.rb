@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module GroupMemberPresenter
     def group_sso?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   class BaseNotify
     def notify(notify_url, content)

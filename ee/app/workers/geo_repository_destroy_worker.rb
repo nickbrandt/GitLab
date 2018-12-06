@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GeoRepositoryDestroyWorker
   include ApplicationWorker
   include GeoQueue

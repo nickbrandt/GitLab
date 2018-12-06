@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AuditEventPresenter < Gitlab::View::Presenter::Simple
   presents :audit_event
 

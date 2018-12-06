@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EpicBaseEntity < Grape::Entity
   include RequestAwareEntity
   include EntityDateHelper

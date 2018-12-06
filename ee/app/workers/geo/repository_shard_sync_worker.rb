@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   class RepositoryShardSyncWorker < Geo::Scheduler::Secondary::SchedulerWorker
     sidekiq_options retry: false

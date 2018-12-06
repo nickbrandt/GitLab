@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   class NodeCreateService
     attr_reader :params

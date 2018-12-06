@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module IssueLinks
   class ListService < IssuableLinks::ListService
     include Gitlab::Utils::StrongMemoize

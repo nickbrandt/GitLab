@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   class NodeStatusPostService
     include Gitlab::Geo::LogHelpers
