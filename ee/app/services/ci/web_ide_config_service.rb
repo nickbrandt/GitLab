@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Ci
-  class WebideConfigService < ::BaseService
+  class WebIdeConfigService < ::BaseService
     include ::Gitlab::Utils::StrongMemoize
 
     ValidationError = Class.new(StandardError)
@@ -37,12 +37,12 @@ module Ci
     end
 
     def load_config!
-      @config = Gitlab::Webide::Config.new(config_content)
+      @config = Gitlab::WebIde::Config.new(config_content)
 
       unless @config.valid?
         raise ValidationError, @config.errors.first
       end
-    rescue Gitlab::Webide::Config::ConfigError => e
+    rescue Gitlab::WebIde::Config::ConfigError => e
       raise ValidationError, e.message
     end
 

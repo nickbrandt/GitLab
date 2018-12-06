@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Webide::Config::Entry::Global do
+describe Gitlab::WebIde::Config::Entry::Global do
   let(:global) { described_class.new(hash) }
 
   describe '.nodes' do
@@ -39,7 +39,7 @@ describe Gitlab::Webide::Config::Entry::Global do
 
         it 'creates node object using valid class' do
           expect(global.descendants.first)
-            .to be_an_instance_of Gitlab::Webide::Config::Entry::Terminal
+            .to be_an_instance_of Gitlab::WebIde::Config::Entry::Terminal
         end
 
         it 'sets correct description for nodes' do
@@ -149,7 +149,7 @@ describe Gitlab::Webide::Config::Entry::Global do
     context 'when entry exists' do
       it 'returns correct entry' do
         expect(global[:terminal])
-          .to be_an_instance_of Gitlab::Webide::Config::Entry::Terminal
+          .to be_an_instance_of Gitlab::WebIde::Config::Entry::Terminal
         expect(global[:terminal][:before_script].value).to eq ['ls']
       end
     end
