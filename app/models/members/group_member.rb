@@ -44,33 +44,33 @@ class GroupMember < Member
   private
 
   def send_invite
-    run_after_commit_or_now { notification_service.invite_group_member(self, @raw_invite_token) } unless @skip_notification
+    run_after_commit_or_now { notification_service.invite_group_member(self, @raw_invite_token) }
 
     super
   end
 
   def post_create_hook
-    run_after_commit_or_now { notification_service.new_group_member(self) } unless @skip_notification
+    run_after_commit_or_now { notification_service.new_group_member(self) }
 
     super
   end
 
   def post_update_hook
     if access_level_changed?
-      run_after_commit { notification_service.update_group_member(self) } unless @skip_notification
+      run_after_commit { notification_service.update_group_member(self) }
     end
 
     super
   end
 
   def after_accept_invite
-    notification_service.accept_group_invite(self) unless @skip_notification
+    notification_service.accept_group_invite(self)
 
     super
   end
 
   def after_decline_invite
-    notification_service.decline_group_invite(self) unless @skip_notification
+    notification_service.decline_group_invite(self)
 
     super
   end
