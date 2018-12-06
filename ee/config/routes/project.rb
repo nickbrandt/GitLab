@@ -20,6 +20,17 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           get 'epics'
         end
       end
+
+      resources :web_ide_terminals, path: :ide_terminals, only: [:create, :show], constraints: { id: /\d+/, format: :json } do
+        member do
+          post :cancel
+          post :retry
+        end
+
+        collection do
+          post :check_config
+        end
+      end
     end
   end
 end

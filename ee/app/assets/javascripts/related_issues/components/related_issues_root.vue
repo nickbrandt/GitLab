@@ -114,7 +114,7 @@ export default {
         RelatedIssuesService.remove(issueToRemove.relation_path)
           .then(res => res.json())
           .then(data => {
-            this.store.setRelatedIssues(data.issues);
+            this.store.setRelatedIssues(data.issuables);
           })
           .catch(res => {
             if (res && res.status !== 404) {
@@ -142,7 +142,7 @@ export default {
           .then(data => {
             // We could potentially lose some pending issues in the interim here
             this.store.setPendingReferences([]);
-            this.store.setRelatedIssues(data.issues);
+            this.store.setRelatedIssues(data.issuables);
 
             this.isSubmitting = false;
             // Close the form on submission

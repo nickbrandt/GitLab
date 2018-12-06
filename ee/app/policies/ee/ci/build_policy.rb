@@ -11,6 +11,23 @@ module EE
           prevent :update_build
         end
 
+        condition(:is_web_ide_terminal, scope: :subject) do
+          @subject.pipeline.webide?
+        end
+
+        rule { is_web_ide_terminal & can?(:create_web_ide_terminal) & (admin | owner_of_job) }.policy do
+          enable :read_web_ide_terminal
+          enable :update_web_ide_terminal
+        end
+
+        rule { is_web_ide_terminal & ~can?(:update_web_ide_terminal) }.policy do
+          prevent :create_build_terminal
+        end
+
+        rule { can?(:update_web_ide_terminal) & terminal }.policy do
+          enable :create_build_terminal
+        end
+
         private
 
         alias_method :current_user, :user

@@ -14,7 +14,7 @@ describe EpicIssues::CreateService do
     let!(:existing_link) { create(:epic_issue, epic: epic, issue: issue3) }
 
     def assign_issue(references)
-      params = { issue_references: references }
+      params = { issuable_references: references }
 
       described_class.new(epic, user, params).execute
     end
@@ -93,9 +93,9 @@ describe EpicIssues::CreateService do
         end
 
         context 'when the reference list is empty' do
-          it 'returns an error' do
-            expect(assign_issue([])).to eq(message: 'No Issue found for given params', status: :error, http_status: 404)
-          end
+          subject { assign_issue([]) }
+
+          include_examples 'returns an error'
 
           it 'does not create a system note' do
             expect { assign_issue([]) }.not_to change { Note.count }
@@ -124,7 +124,7 @@ describe EpicIssues::CreateService do
               allow(extractor).to receive(:analyze)
               allow(extractor).to receive(:issues).and_return([issue])
 
-              params = { issue_references: [valid_reference] }
+              params = { issuable_references: [valid_reference] }
               control_count = ActiveRecord::QueryRecorder.new { described_class.new(epic, user, params).execute }.count
 
               user = create(:user)
@@ -135,7 +135,7 @@ describe EpicIssues::CreateService do
               group.add_developer(user)
 
               allow(extractor).to receive(:issues).and_return(issues)
-              params = { issue_references: issues.map { |i| i.to_reference(full: true) } }
+              params = { issuable_references: issues.map { |i| i.to_reference(full: true) } }
 
               # threshold 24 because 6 queries are generated for each insert
               # (savepoint, find, exists, relative_position get, insert, release savepoint)
@@ -238,7 +238,7 @@ describe EpicIssues::CreateService do
         let(:another_epic) { create(:epic, group: group) }
 
         subject do
-          params = { issue_references: [valid_reference] }
+          params = { issuable_references: [valid_reference] }
 
           described_class.new(another_epic, user, params).execute
         end

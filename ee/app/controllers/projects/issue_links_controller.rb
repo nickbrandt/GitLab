@@ -9,10 +9,6 @@ module Projects
 
     private
 
-    def issues
-      IssueLinks::ListService.new(issue, current_user).execute
-    end
-
     def authorize_admin_issue_link!
       render_403 unless can?(current_user, :admin_issue_link, @project)
     end
@@ -28,6 +24,10 @@ module Projects
                     .find_by!(iid: params[:issue_id])
     end
     # rubocop: enable CodeReuse/ActiveRecord
+
+    def list_service
+      IssueLinks::ListService.new(issue, current_user)
+    end
 
     def create_service
       IssueLinks::CreateService.new(issue, current_user, create_params)
