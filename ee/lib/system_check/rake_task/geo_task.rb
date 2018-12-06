@@ -23,7 +23,9 @@ module SystemCheck
           SystemCheck::Geo::ClocksSynchronizationCheck,
           SystemCheck::App::GitUserDefaultSSHConfigCheck,
           SystemCheck::Geo::AuthorizedKeysCheck,
-          SystemCheck::Geo::AuthorizedKeysFlagCheck
+          SystemCheck::Geo::AuthorizedKeysFlagCheck,
+          SystemCheck::App::HashedStorageEnabledCheck,
+          SystemCheck::App::HashedStorageAllProjectsCheck
         ]
       end
     end
