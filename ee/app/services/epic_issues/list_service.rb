@@ -2,7 +2,7 @@ module EpicIssues
   class ListService < IssuableLinks::ListService
     private
 
-    def issues
+    def child_issuables
       return [] unless issuable&.group&.feature_available?(:epics)
 
       issuable.issues_readable_by(current_user)
