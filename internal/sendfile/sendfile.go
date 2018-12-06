@@ -7,16 +7,18 @@ via the X-Sendfile mechanism. All that is needed in the Rails code is the
 package sendfile
 
 import (
+	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"regexp"
 
 	"github.com/prometheus/client_golang/prometheus"
 
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/headers"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
 )
-
-const sendFileResponseHeader = "X-Sendfile"
 
 var (
 	sendFileRequests = prometheus.NewCounterVec(
@@ -57,7 +59,7 @@ func SendFile(h http.Handler) http.Handler {
 			req: req,
 		}
 		// Advertise to upstream (Rails) that we support X-Sendfile
-		req.Header.Set("X-Sendfile-Type", "X-Sendfile")
+		req.Header.Set(headers.XSendFileTypeHeader, headers.XSendFileHeader)
 		defer s.flush()
 		h.ServeHTTP(s, req)
 	})
@@ -88,8 +90,8 @@ func (s *sendFileResponseWriter) WriteHeader(status int) {
 		return
 	}
 
-	if file := s.Header().Get(sendFileResponseHeader); file != "" {
-		s.Header().Del(sendFileResponseHeader)
+	file := s.Header().Get(headers.XSendFileHeader)
+	if file != "" && !s.hijacked {
 		// Mark this connection as hijacked
 		s.hijacked = true
 
@@ -109,6 +111,15 @@ func sendFileFromDisk(w http.ResponseWriter, r *http.Request, file string) {
 		"uri":    helper.ScrubURLParams(r.RequestURI),
 	}).Print("Send file")
 
+	contentTypeHeaderPresent := false
+
+	if headers.IsDetectContentTypeHeaderPresent(w) {
+		// Removing the GitlabWorkhorseDetectContentTypeHeader header to
+		// avoid handling the response by the senddata handler
+		w.Header().Del(headers.GitlabWorkhorseDetectContentTypeHeader)
+		contentTypeHeaderPresent = true
+	}
+
 	content, fi, err := helper.OpenFile(file)
 	if err != nil {
 		http.NotFound(w, r)
@@ -117,6 +128,20 @@ func sendFileFromDisk(w http.ResponseWriter, r *http.Request, file string) {
 	defer content.Close()
 
 	countSendFileMetrics(fi.Size(), r)
+
+	if contentTypeHeaderPresent {
+		data, err := ioutil.ReadAll(io.LimitReader(content, headers.MaxDetectSize))
+		if err != nil {
+			helper.Fail500(w, r, fmt.Errorf("Error reading the file"))
+			return
+		}
+
+		content.Seek(0, io.SeekStart)
+
+		contentType, contentDisposition := headers.SafeContentHeaders(data, w.Header().Get(headers.ContentDispositionHeader))
+		w.Header().Set(headers.ContentTypeHeader, contentType)
+		w.Header().Set(headers.ContentDispositionHeader, contentDisposition)
+	}
 
 	http.ServeContent(w, r, "", fi.ModTime(), content)
 }

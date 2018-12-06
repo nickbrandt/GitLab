@@ -9,20 +9,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/headers"
 )
-
-func TestHeaderDelete(t *testing.T) {
-	for _, code := range []int{200, 400} {
-		recorder := httptest.NewRecorder()
-		rw := &sendDataResponseWriter{rw: recorder, req: &http.Request{}}
-		rw.Header().Set(HeaderKey, "foobar")
-		rw.WriteHeader(code)
-
-		if header := recorder.Header().Get(HeaderKey); header != "" {
-			t.Fatalf("HTTP %d response: expected header to be empty, found %q", code, header)
-		}
-	}
-}
 
 func TestWriter(t *testing.T) {
 	upstreamResponse := "hello world"
@@ -49,7 +38,7 @@ func TestWriter(t *testing.T) {
 			recorder := httptest.NewRecorder()
 			rw := &sendDataResponseWriter{rw: recorder, injecters: []Injecter{&testInjecter{}}}
 
-			rw.Header().Set(HeaderKey, tc.headerValue)
+			rw.Header().Set(headers.GitlabWorkhorseSendDataHeader, tc.headerValue)
 
 			n, err := rw.Write([]byte(upstreamResponse))
 			require.NoError(t, err)

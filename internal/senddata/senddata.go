@@ -3,9 +3,11 @@ package senddata
 import (
 	"net/http"
 
-	"github.com/prometheus/client_golang/prometheus"
-
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/headers"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata/contentprocessor"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 var (
@@ -39,7 +41,7 @@ type sendDataResponseWriter struct {
 }
 
 func SendData(h http.Handler, injecters ...Injecter) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return contentprocessor.SetContentHeaders(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		s := sendDataResponseWriter{
 			rw:        w,
 			req:       r,
@@ -47,7 +49,7 @@ func SendData(h http.Handler, injecters ...Injecter) http.Handler {
 		}
 		defer s.flush()
 		h.ServeHTTP(&s, r)
-	})
+	}))
 }
 
 func (s *sendDataResponseWriter) Header() http.Header {
@@ -74,13 +76,15 @@ func (s *sendDataResponseWriter) WriteHeader(status int) {
 		return
 	}
 
-	s.Header().Del(HeaderKey)
 	s.rw.WriteHeader(s.status)
 }
 
 func (s *sendDataResponseWriter) tryInject() bool {
-	header := s.Header().Get(HeaderKey)
-	s.Header().Del(HeaderKey)
+	if s.hijacked {
+		return false
+	}
+
+	header := s.Header().Get(headers.GitlabWorkhorseSendDataHeader)
 	if header == "" {
 		return false
 	}
