@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -150,4 +151,12 @@ func RootDir() string {
 		panic(errors.New("RootDir: calling runtime.Caller failed"))
 	}
 	return path.Join(path.Dir(currentFile), "../..")
+}
+
+func LoadFile(t *testing.T, filePath string) string {
+	content, err := ioutil.ReadFile(path.Join(RootDir(), filePath))
+	if err != nil {
+		t.Fatal(err)
+	}
+	return string(content)
 }
