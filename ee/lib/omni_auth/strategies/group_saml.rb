@@ -1,9 +1,12 @@
 module OmniAuth
   module Strategies
     class GroupSaml < SAML
+      extend ::Gitlab::Utils::Override
+
       option :name, 'group_saml'
       option :callback_path, ->(env) { callback?(env) }
 
+      override :setup_phase
       def setup_phase
         if metadata_phase?
           require_discovery_token
@@ -22,6 +25,7 @@ module OmniAuth
 
       # Prevent access to SLO endpoints. These make less sense at
       # group level and would need additional work to securely support
+      override :other_phase
       def other_phase
         if metadata_phase?
           super
