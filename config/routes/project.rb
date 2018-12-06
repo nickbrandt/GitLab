@@ -532,6 +532,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
         resource :repository, only: [:show], controller: :repository do
           post :create_deploy_token, path: 'deploy_token/create'
+          post :cleanup
         end
       end
 
