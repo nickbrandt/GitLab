@@ -43,23 +43,23 @@ describe 'epics list', :js do
       end
     end
 
-    it 'sorts by end_date ASC by default' do
-      expect(page).to have_button('Due date')
+    it 'sorts by created_at DESC by default' do
+      expect(page).to have_button('Created date')
 
       page.within('.content-wrapper .content') do
         expect(find('.top-area')).to have_content('All 3')
 
         page.within(".issuable-list") do
           page.within("li:nth-child(1)") do
-            expect(page).to have_content(epic1.title)
-          end
-
-          page.within("li:nth-child(2)") do
             expect(page).to have_content(epic3.title)
           end
 
-          page.within("li:nth-child(3)") do
+          page.within("li:nth-child(2)") do
             expect(page).to have_content(epic2.title)
+          end
+
+          page.within("li:nth-child(3)") do
+            expect(page).to have_content(epic1.title)
           end
         end
       end
@@ -67,7 +67,7 @@ describe 'epics list', :js do
 
     it 'sorts by the selected value and stores the selection for epic list & roadmap' do
       page.within('.epics-other-filters') do
-        click_button 'Due date'
+        click_button 'Created date'
         sort_options = find('ul.dropdown-menu-sort li').all('a').collect(&:text)
 
         expect(sort_options[0]).to eq('Created date')
