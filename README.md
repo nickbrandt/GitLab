@@ -37,37 +37,43 @@ gitlab-workhorse'][brief-history-blog].
 
 Options:
   -apiCiLongPollingDuration duration
-        Long polling duration for job requesting for runners (default 0s - disabled)
+      Long polling duration for job requesting for runners (default 50s - enabled) (default 50ns)
   -apiLimit uint
-        Number of API requests allowed at single time
+      Number of API requests allowed at single time
   -apiQueueDuration duration
-        Maximum queueing duration of requests (default 30s)
+      Maximum queueing duration of requests (default 30s)
   -apiQueueLimit uint
-        Number of API requests allowed to be queued
+      Number of API requests allowed to be queued
   -authBackend string
-    	Authentication/authorization backend (default "http://localhost:8080")
+      Authentication/authorization backend (default "http://localhost:8080")
   -authSocket string
-    	Optional: Unix domain socket to dial authBackend at
-  -developmentMode
-    	Allow the assets to be served from Rails app
-  -documentRoot string
-    	Path to static files content (default "public")
-  -listenAddr string
-    	Listen address for HTTP server (default "localhost:8181")
-  -listenNetwork string
-    	Listen 'network' (tcp, tcp4, tcp6, unix) (default "tcp")
-  -listenUmask int
-    	Umask for Unix socket
-  -pprofListenAddr string
-    	pprof listening address, e.g. 'localhost:6060'
-  -proxyHeadersTimeout duration
-    	How long to wait for response headers when proxying the request (default 5m0s)
-  -secretPath string
-    	File with secret key to authenticate with authBackend (default "./.gitlab_workhorse_secret")
+      Optional: Unix domain socket to dial authBackend at
   -config string
-    	File that hold configuration. Currently only for redis. File is in TOML-format (default "")
+      TOML file to load config from
+  -developmentMode
+      Allow the assets to be served from Rails app
+  -documentRoot string
+      Path to static files content (default "public")
+  -listenAddr string
+      Listen address for HTTP server (default "localhost:8181")
+  -listenNetwork string
+      Listen 'network' (tcp, tcp4, tcp6, unix) (default "tcp")
+  -listenUmask int
+      Umask for Unix socket
+  -logFile string
+      Log file location
+  -logFormat string
+      Log format to use defaults to text (text, json, structured, none) (default "text")
+  -pprofListenAddr string
+      pprof listening address, e.g. 'localhost:6060'
+  -prometheusListenAddr string
+      Prometheus listening address, e.g. 'localhost:9229'
+  -proxyHeadersTimeout duration
+      How long to wait for response headers when proxying the request (default 5m0s)
+  -secretPath string
+      File with secret key to authenticate with authBackend (default "./.gitlab_workhorse_secret")
   -version
-    	Print version and exit
+      Print version and exit
 ```
 
 The 'auth backend' refers to the GitLab Rails application. The name is
@@ -80,8 +86,8 @@ can also open a second listening TCP listening socket with the Go
 
 Gitlab-workhorse can listen on redis events (currently only builds/register
 for runners). This requires you to pass a valid TOML config file via
-`-config` flag.  
-For regular setups it only requires the following (replacing the string 
+`-config` flag.
+For regular setups it only requires the following (replacing the string
 with the actual socket)
 
 ### Redis
