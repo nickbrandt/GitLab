@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module Gitlab
-  module Webide
+  module WebIde
     #
-    # Base GitLab Webide Configuration facade
+    # Base GitLab WebIde Configuration facade
     #
     class Config
       ConfigError = Class.new(StandardError)

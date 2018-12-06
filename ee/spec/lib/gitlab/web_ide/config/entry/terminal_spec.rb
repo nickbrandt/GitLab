@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Gitlab::Webide::Config::Entry::Terminal do
+describe Gitlab::WebIde::Config::Entry::Terminal do
   let(:entry) { described_class.new(config) }
 
   describe '.nodes' do

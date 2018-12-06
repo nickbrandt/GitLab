@@ -631,4 +631,70 @@ describe ProjectPolicy do
       it { is_expected.to be_allowed(:read_software_license_policy) }
     end
   end
+
+  describe 'create_web_ide_terminal' do
+    before do
+      stub_licensed_features(web_ide_terminal: true)
+    end
+
+    subject { described_class.new(current_user, project) }
+
+    context 'without ide terminal feature available' do
+      before do
+        stub_licensed_features(web_ide_terminal: false)
+      end
+
+      let(:current_user) { admin }
+
+      it { is_expected.to be_disallowed(:create_web_ide_terminal) }
+    end
+
+    context 'with admin' do
+      let(:current_user) { admin }
+
+      it { is_expected.to be_allowed(:create_web_ide_terminal) }
+    end
+
+    context 'with owner' do
+      let(:current_user) { owner }
+
+      it { is_expected.to be_allowed(:create_web_ide_terminal) }
+    end
+
+    context 'with maintainer' do
+      let(:current_user) { maintainer }
+
+      it { is_expected.to be_allowed(:create_web_ide_terminal) }
+    end
+
+    context 'with developer' do
+      let(:current_user) { developer }
+
+      it { is_expected.to be_disallowed(:create_web_ide_terminal) }
+    end
+
+    context 'with reporter' do
+      let(:current_user) { reporter }
+
+      it { is_expected.to be_disallowed(:create_web_ide_terminal) }
+    end
+
+    context 'with guest' do
+      let(:current_user) { guest }
+
+      it { is_expected.to be_disallowed(:create_web_ide_terminal) }
+    end
+
+    context 'with non member' do
+      let(:current_user) { create(:user) }
+
+      it { is_expected.to be_disallowed(:create_web_ide_terminal) }
+    end
+
+    context 'with anonymous' do
+      let(:current_user) { nil }
+
+      it { is_expected.to be_disallowed(:create_web_ide_terminal) }
+    end
+  end
 end

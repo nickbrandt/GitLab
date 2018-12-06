@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 module Gitlab
-  module Webide
+  module WebIde
     class Config
       module Entry
         ##
         # This class represents a global entry - root Entry for entire
-        # GitLab Webide Configuration file.
+        # GitLab WebIde Configuration file.
         #
         class Global < ::Gitlab::Config::Entry::Node
           include ::Gitlab::Config::Entry::Configurable
