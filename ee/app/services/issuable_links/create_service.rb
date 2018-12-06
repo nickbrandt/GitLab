@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module IssuableLinks
   class CreateService < BaseService
     attr_reader :issuable, :current_user, :params

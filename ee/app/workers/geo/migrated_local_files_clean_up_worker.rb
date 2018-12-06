@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   class MigratedLocalFilesCleanUpWorker < ::Geo::Scheduler::Secondary::SchedulerWorker
     include ::CronjobQueue

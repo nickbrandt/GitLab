@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   class RenameRepositoryService
     attr_reader :project_id, :old_disk_path, :new_disk_path

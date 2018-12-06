@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module IssuableLinks
   class DestroyService < BaseService
     attr_reader :link, :current_user

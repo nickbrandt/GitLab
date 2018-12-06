@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class LdapGroupResetService
   def execute(group, current_user)
     # Only for ldap connected users

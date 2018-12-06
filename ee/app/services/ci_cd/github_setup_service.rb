@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CiCd
   class GithubSetupService
     attr_reader :project

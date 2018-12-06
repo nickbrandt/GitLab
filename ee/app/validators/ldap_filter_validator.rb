@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # LdapFilteralidator
 #
 # Custom validator for LDAP filters

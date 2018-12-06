@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CiCd
   class SetupProject < ::BaseService
     def execute

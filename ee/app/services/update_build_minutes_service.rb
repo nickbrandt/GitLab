@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UpdateBuildMinutesService < BaseService
   def execute(build)
     return unless build.shared_runners_minutes_limit_enabled?

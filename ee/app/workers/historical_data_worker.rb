@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class HistoricalDataWorker
   include ApplicationWorker
   include CronjobQueue

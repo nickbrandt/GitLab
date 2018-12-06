@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module IssueLinks
   class DestroyService < IssuableLinks::DestroyService
     private
