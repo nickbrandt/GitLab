@@ -195,7 +195,7 @@
                     = _('Charts')
 
       - if project_nav_tab? :operations
-        - if can?(current_user, :read_environment, @project) || can?(current_user, :read_cluster, @project) 
+        - if can?(current_user, :read_environment, @project) || can?(current_user, :read_cluster, @project)
           - main_link = metrics_project_environments_path(@project)
         - elsif can?(current_user, :read_feature_flag, @project)
           - main_link = project_feature_flags_path(@project)
