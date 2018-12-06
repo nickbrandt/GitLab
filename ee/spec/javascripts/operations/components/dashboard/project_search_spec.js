@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import store from 'ee/operations/store/index';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { GlLoadingIcon } from '@gitlab/ui';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 import ProjectSearch from 'ee/operations/components/dashboard/project_search.vue';
 import TokenizedInput from 'ee/operations/components/tokenized_input/input.vue';
@@ -10,7 +9,6 @@ import { getChildInstances, mouseEvent, clearState } from '../../helpers';
 
 describe('project search component', () => {
   const ProjectSearchComponent = Vue.extend(ProjectSearch);
-  const GlLoadingIconComponent = Vue.extend(GlLoadingIcon);
   const TokenizedInputComponent = Vue.extend(TokenizedInput);
   const ProjectAvatarComponent = Vue.extend(ProjectAvatar);
 
@@ -84,7 +82,7 @@ describe('project search component', () => {
       store.state.searchCount = 1;
       vm = mount();
 
-      expect(getChildInstances(vm, GlLoadingIconComponent).length).toBe(1);
+      expect(vm.$el).toContainElement('.loading-container');
     });
 
     it('renders search results', () => {
