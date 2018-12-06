@@ -2,6 +2,8 @@
 
 module EE
   module AppearancesHelper
+    extend ::Gitlab::Utils::Override
+
     def header_message
       return unless current_appearance&.show_header?
 
@@ -15,6 +17,11 @@ module EE
       return unless current_appearance&.show_footer?
 
       render_message(:footer_message)
+    end
+
+    override :default_brand_title
+    def default_brand_title
+      'GitLab Enterprise Edition'
     end
 
     private
