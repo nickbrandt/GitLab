@@ -179,34 +179,9 @@ module EE
                     project_creation_level: project_creation_levels)
     end
 
-    def any_namespace_with_trial?
-      ::Namespace
-        .from("(#{namespace_union(:trial_ends_on)}) #{::Namespace.table_name}")
-        .where('trial_ends_on > ?', Time.now.utc)
-        .any?
-    end
-
-    def any_namespace_with_gold?
-      ::Namespace
-        .includes(:plan)
-        .where("namespaces.id IN (#{namespace_union})") # rubocop:disable GitlabSecurity/SqlInjection
-        .where.not(plans: { id: nil })
-        .any?
-    end
-
     override :has_current_license?
     def has_current_license?
       License.current.present?
-    end
-
-    def group_sso?(group)
-      return false unless group
-
-      if group_saml_identities.loaded?
-        group_saml_identities.any? { |identity| identity.saml_provider.group_id == group.id }
-      else
-        group_saml_identities.where(saml_provider: group.saml_provider).any?
-      end
     end
 
     override :ldap_sync_time
@@ -218,13 +193,14 @@ module EE
       update_column :admin_email_unsubscribed_at, Time.now
     end
 
-    private
+    def group_sso?(group)
+      return false unless group
 
-    def namespace_union(select = :id)
-      ::Gitlab::SQL::Union.new([
-        ::Namespace.select(select).where(type: nil, owner: self),
-        owned_groups.select(select).where(parent_id: nil)
-      ]).to_sql
+      if group_saml_identities.loaded?
+        group_saml_identities.any? { |identity| identity.saml_provider.group_id == group.id }
+      else
+        group_saml_identities.where(saml_provider: group.saml_provider).any?
+      end
     end
   end
 end
