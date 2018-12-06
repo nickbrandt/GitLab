@@ -764,6 +764,12 @@ msgstr ""
 msgid "An error occurred. Please try again."
 msgstr ""
 
+msgid "An unexpected error occurred while checking the project environment."
+msgstr ""
+
+msgid "An unexpected error occurred while checking the project runners."
+msgstr ""
+
 msgid "Analytics"
 msgstr ""
 
@@ -2276,10 +2282,16 @@ msgstr ""
 msgid "Confidentiality"
 msgstr ""
 
+msgid "Configure GitLab runners to start using Web Terminal. %{helpStart}Learn more.%{helpEnd}"
+msgstr ""
+
 msgid "Configure Gitaly timeouts."
 msgstr ""
 
 msgid "Configure Tracing"
+msgstr ""
+
+msgid "Configure a <code>.gitlab-webide.yml</code> file in the <code>.gitlab</code> directory to start using the Web Terminal. %{helpStart}Learn more.%{helpEnd}"
 msgstr ""
 
 msgid "Configure automatic git checks and housekeeping on repositories."
@@ -4934,6 +4946,9 @@ msgid "Learn more about %{issue_boards_url}, to keep track of issues in multiple
 msgstr ""
 
 msgid "Learn more about Kubernetes"
+msgstr ""
+
+msgid "Learn more about Web Terminal"
 msgstr ""
 
 msgid "Learn more about custom project templates"
@@ -8041,6 +8056,9 @@ msgstr ""
 msgid "Starred projects"
 msgstr ""
 
+msgid "Start Web Terminal"
+msgstr ""
+
 msgid "Start a %{new_merge_request} with these changes"
 msgstr ""
 
@@ -9611,6 +9629,9 @@ msgid "You cannot write to this read-only GitLab instance."
 msgstr ""
 
 msgid "You do not have any subscriptions yet"
+msgstr ""
+
+msgid "You do not have permission to run the Web Terminal. Please contact a project administrator."
 msgstr ""
 
 msgid "You do not have the correct permissions to override the settings from the LDAP group sync."

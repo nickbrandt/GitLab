@@ -1,31 +1,87 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import { TEST_HOST } from 'spec/test_constants';
-import TerminalView from 'ee/ide/components/terminal/view.vue';
 import TerminalEmptyState from 'ee/ide/components/terminal/empty_state.vue';
+import TerminalView from 'ee/ide/components/terminal/view.vue';
 
+const TEST_HELP_PATH = `${TEST_HOST}/help`;
 const TEST_SVG_PATH = `${TEST_HOST}/illustration.svg`;
 
 const localVue = createLocalVue();
-
 localVue.use(Vuex);
 
-describe('TerminalView', () => {
+describe('EE IDE TerminalView', () => {
+  let state;
+  let actions;
+  let getters;
+  let wrapper;
+
   const factory = () => {
     const store = new Vuex.Store({
-      state: {
-        emptyStateSvgPath: TEST_SVG_PATH,
+      modules: {
+        terminal: {
+          namespaced: true,
+          state,
+          actions,
+          getters,
+        },
       },
     });
 
-    return shallowMount(TerminalView, { localVue, store });
+    wrapper = shallowMount(localVue.extend(TerminalView), { localVue, store });
   };
 
+  beforeEach(() => {
+    state = {
+      isShowSplash: true,
+      paths: {
+        webTerminalHelpPath: TEST_HELP_PATH,
+        webTerminalSvgPath: TEST_SVG_PATH,
+      },
+    };
+
+    actions = {
+      hideSplash: jasmine.createSpy('hideSplash'),
+    };
+
+    getters = {
+      allCheck: () => ({
+        isLoading: false,
+        isValid: false,
+        message: 'bad',
+      }),
+    };
+  });
+
+  afterEach(() => {
+    wrapper.destroy();
+  });
+
   it('renders empty state', () => {
-    const wrapper = factory();
+    factory();
 
     expect(wrapper.find(TerminalEmptyState).props()).toEqual({
+      helpPath: TEST_HELP_PATH,
       illustrationPath: TEST_SVG_PATH,
+      ...getters.allCheck(),
     });
+  });
+
+  it('hides splash when started', () => {
+    factory();
+
+    expect(actions.hideSplash).not.toHaveBeenCalled();
+
+    wrapper.find(TerminalEmptyState).vm.$emit('start');
+
+    expect(actions.hideSplash).toHaveBeenCalled();
+  });
+
+  it('shows Web Terminal when started', () => {
+    state.isShowSplash = false;
+    factory();
+
+    expect(wrapper.find(TerminalEmptyState).exists()).toBe(false);
+    expect(wrapper.text()).toContain('Web Terminal');
   });
 });
