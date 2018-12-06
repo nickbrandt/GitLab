@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe MergeRequestWidgetEntity do
+  include ProjectForksHelper
+
   set(:user) { create(:user) }
   set(:project) { create :project, :repository }
   set(:merge_request) { create(:merge_request, source_project: project, target_project: project) }
@@ -148,6 +150,33 @@ describe MergeRequestWidgetEntity do
         expect(subject.as_json[:license_management]).to include(:managed_licenses_path)
         expect(subject.as_json[:license_management]).to include(:can_manage_licenses)
         expect(subject.as_json[:license_management]).to include(:license_management_full_report_path)
+      end
+    end
+
+    describe '#managed_licenses_path' do
+      let(:managed_licenses_path) { api_v4_projects_managed_licenses_path(id: project.id) }
+
+      before do
+        create(:ee_ci_build, :legacy_license_management, pipeline: pipeline)
+      end
+
+      it 'should be a path for target project' do
+        expect(subject.as_json[:license_management][:managed_licenses_path]).to eq(managed_licenses_path)
+      end
+
+      context 'with fork' do
+        let(:source_project) { fork_project(project, user, repository: true) }
+        let(:fork_merge_request) { create(:merge_request, source_project: source_project, target_project: project) }
+        let(:subject_json) { described_class.new(fork_merge_request, current_user: user, request: request).as_json }
+
+        before do
+          allow(fork_merge_request).to receive_messages(head_pipeline: pipeline)
+          stub_licensed_features(license_management: true)
+        end
+
+        it 'should be a path for target project' do
+          expect(subject_json[:license_management][:managed_licenses_path]).to eq(managed_licenses_path)
+        end
       end
     end
   end
