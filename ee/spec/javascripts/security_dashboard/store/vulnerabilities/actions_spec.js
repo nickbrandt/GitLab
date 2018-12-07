@@ -9,6 +9,7 @@ import * as actions from 'ee/security_dashboard/store/modules/vulnerabilities/ac
 
 import mockDataVulnerabilities from './data/mock_data_vulnerabilities.json';
 import mockDataVulnerabilitiesCount from './data/mock_data_vulnerabilities_count.json';
+import mockDataVulnerabilitiesHistory from './data/mock_data_vulnerabilities_history.json';
 
 describe('vulnerabiliites count actions', () => {
   const data = mockDataVulnerabilitiesCount;
@@ -628,6 +629,133 @@ describe('revert vulnerability dismissal', () => {
         {},
         state,
         [{ type: types.REQUEST_REVERT_DISMISSAL }],
+        [],
+        done,
+      );
+    });
+  });
+});
+
+describe('vulnerabiliites timeline actions', () => {
+  const data = mockDataVulnerabilitiesHistory;
+
+  describe('setVulnerabilitiesHistoryEndpoint', () => {
+    it('should commit the correct mutuation', done => {
+      const state = initialState;
+      const endpoint = 'fakepath.json';
+
+      testAction(
+        actions.setVulnerabilitiesHistoryEndpoint,
+        endpoint,
+        state,
+        [
+          {
+            type: types.SET_VULNERABILITIES_HISTORY_ENDPOINT,
+            payload: endpoint,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('fetchVulnerabilitesTimeline', () => {
+    let mock;
+    const state = initialState;
+
+    beforeEach(() => {
+      state.vulnerabilitiesCountEndpoint = `${TEST_HOST}/vulnerabilitIES_HISTORY.json`;
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    describe('on success', () => {
+      beforeEach(() => {
+        mock.onGet(state.vulnerabilitiesHistoryEndpoint).replyOnce(200, data);
+      });
+
+      it('should dispatch the request and success actions', done => {
+        testAction(
+          actions.fetchVulnerabilitiesHistory,
+          {},
+          state,
+          [],
+          [
+            { type: 'requestVulnerabilitiesHistory' },
+            {
+              type: 'receiveVulnerabilitiesHistorySuccess',
+              payload: { data },
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('on error', () => {
+      beforeEach(() => {
+        mock.onGet(state.vulnerabilitiesHistoryEndpoint).replyOnce(404, {});
+      });
+
+      it('should dispatch the request and error actions', done => {
+        testAction(
+          actions.fetchVulnerabilitiesHistory,
+          {},
+          state,
+          [],
+          [
+            { type: 'requestVulnerabilitiesHistory' },
+            { type: 'receiveVulnerabilitiesHistoryError' },
+          ],
+          done,
+        );
+      });
+    });
+  });
+
+  describe('requestVulnerabilitesTimeline', () => {
+    it('should commit the request mutation', done => {
+      const state = initialState;
+
+      testAction(
+        actions.requestVulnerabilitiesHistory,
+        {},
+        state,
+        [{ type: types.REQUEST_VULNERABILITIES_HISTORY }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveVulnerabilitesTimelineSuccess', () => {
+    it('should commit the success mutation', done => {
+      const state = initialState;
+
+      testAction(
+        actions.receiveVulnerabilitiesHistorySuccess,
+        { data },
+        state,
+        [{ type: types.RECEIVE_VULNERABILITIES_HISTORY_SUCCESS, payload: data }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receivetVulnerabilitesTimelineError', () => {
+    it('should commit the error mutation', done => {
+      const state = initialState;
+
+      testAction(
+        actions.receiveVulnerabilitiesHistoryError,
+        {},
+        state,
+        [{ type: types.RECEIVE_VULNERABILITIES_HISTORY_ERROR }],
         [],
         done,
       );
