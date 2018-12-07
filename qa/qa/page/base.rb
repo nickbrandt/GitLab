@@ -100,10 +100,6 @@ module QA
         find_element(name).set(content)
       end
 
-      def hover_element(name)
-        find_element(name).hover
-      end
-
       def select_element(name, value)
         element = find_element(name)
 

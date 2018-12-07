@@ -575,6 +575,8 @@ class Project < ActiveRecord::Base
       .base_and_ancestors(upto: top, hierarchy_order: hierarchy_order)
   end
 
+  alias_method :ancestors, :ancestors_upto
+
   def lfs_enabled?
     return namespace.lfs_enabled? if self[:lfs_enabled].nil?
 
