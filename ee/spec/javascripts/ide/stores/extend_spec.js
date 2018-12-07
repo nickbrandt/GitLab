@@ -6,10 +6,10 @@ import terminalModule from 'ee/ide/stores/modules/terminal';
 import extendStore from 'ee/ide/stores/extend';
 
 const TEST_DATASET = {
-  eeCiYamlHelpPath: `${TEST_HOST}/ci/yaml/help`,
-  eeCiRunnersHelpPath: `${TEST_HOST}/ci/runners/help`,
-  eeWebTerminalHelpPath: `${TEST_HOST}/web/terminal/help`,
   eeWebTerminalSvgPath: `${TEST_HOST}/web/terminal/svg`,
+  eeWebTerminalHelpPath: `${TEST_HOST}/web/terminal/help`,
+  eeWebTerminalConfigHelpPath: `${TEST_HOST}/web/terminal/config/help`,
+  eeWebTerminalRunnersHelpPath: `${TEST_HOST}/web/terminal/runners/help`,
 };
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -39,10 +39,10 @@ describe('ee/ide/stores/extend', () => {
 
   it('dispatches terminal/setPaths', () => {
     expect(store.dispatch).toHaveBeenCalledWith('terminal/setPaths', {
-      ciYamlHelpPath: TEST_DATASET.eeCiYamlHelpPath,
-      ciRunnersHelpPath: TEST_DATASET.eeCiRunnersHelpPath,
-      webTerminalHelpPath: TEST_DATASET.eeWebTerminalHelpPath,
       webTerminalSvgPath: TEST_DATASET.eeWebTerminalSvgPath,
+      webTerminalHelpPath: TEST_DATASET.eeWebTerminalHelpPath,
+      webTerminalConfigHelpPath: TEST_DATASET.eeWebTerminalConfigHelpPath,
+      webTerminalRunnersHelpPath: TEST_DATASET.eeWebTerminalRunnersHelpPath,
     });
   });
 

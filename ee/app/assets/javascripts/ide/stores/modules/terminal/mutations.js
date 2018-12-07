@@ -41,4 +41,24 @@ export default {
       },
     });
   },
+  [types.SET_SESSION](state, session) {
+    Object.assign(state, {
+      session,
+    });
+  },
+  [types.SET_SESSION_STATUS](state, status) {
+    const session = {
+      ...(state.session || {}),
+      status,
+    };
+
+    Object.assign(state, {
+      session,
+    });
+  },
+  [types.SET_SESSION_STATUS_INTERVAL](state, sessionStatusInterval) {
+    Object.assign(state, {
+      sessionStatusInterval,
+    });
+  },
 };

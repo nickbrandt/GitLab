@@ -1,18 +1,21 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
 import EmptyState from './empty_state.vue';
+import TerminalSession from './session.vue';
 
 export default {
   components: {
     EmptyState,
+    TerminalSession,
   },
   computed: {
     ...mapState('terminal', ['isShowSplash', 'paths']),
     ...mapGetters('terminal', ['allCheck']),
   },
   methods: {
-    ...mapActions('terminal', ['hideSplash']),
+    ...mapActions('terminal', ['startSession', 'hideSplash']),
     start() {
+      this.startSession();
       this.hideSplash();
     },
   },
@@ -32,7 +35,7 @@ export default {
       />
     </div>
     <template v-else>
-      <h5>{{ __('Web Terminal') }}</h5>
+      <terminal-session />
     </template>
   </div>
 </template>
