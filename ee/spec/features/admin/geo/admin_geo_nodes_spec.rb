@@ -38,6 +38,18 @@ describe 'admin Geo Nodes', :js do
       end
     end
 
+    it 'changes re-verification interval field visibility based on primary node checkbox' do
+      expect(page).not_to have_field('Re-verification interval')
+
+      check 'This is a primary node'
+
+      expect(page).to have_field('Re-verification interval')
+
+      uncheck 'This is a primary node'
+
+      expect(page).not_to have_field('Re-verification interval')
+    end
+
     it 'returns an error message when a duplicate primary is added' do
       create(:geo_node, :primary)
 

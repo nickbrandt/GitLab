@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'ee/gitlab/service_desk'
 
 module EE

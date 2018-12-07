@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EpicEntity < IssuableEntity
   expose :group_id
   expose :group_name do |epic|

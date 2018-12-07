@@ -115,7 +115,7 @@ class Gitlab::Seeder::Vulnerabilities
   end
 
   def pipeline
-    @pipeline ||= project.pipelines.where(ref: project.default_branch).last
+    @pipeline ||= project.ci_pipelines.where(ref: project.default_branch).last
   end
 
   def author
@@ -124,7 +124,7 @@ class Gitlab::Seeder::Vulnerabilities
 end
 
 Gitlab::Seeder.quiet do
-  Project.joins(:pipelines).uniq.all.sample(5).each do |project|
+  Project.joins(:ci_pipelines).uniq.all.sample(5).each do |project|
     seeder = Gitlab::Seeder::Vulnerabilities.new(project)
     seeder.seed!
   end

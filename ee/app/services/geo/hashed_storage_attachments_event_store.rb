@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   class HashedStorageAttachmentsEventStore < EventStore
     self.event_type = :hashed_storage_attachments_event

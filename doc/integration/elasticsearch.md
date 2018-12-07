@@ -12,6 +12,7 @@ special searches:
 - [Advanced Syntax Search](../user/search/advanced_search_syntax.md)
 
 ## Version Requirements
+<!-- Please remember to update ee/lib/system_check/app/elasticsearch_check.rb if this changes -->
 
 | GitLab version | Elasticsearch version |
 | -------------- | --------------------- |
@@ -57,7 +58,7 @@ installed before running `make`.
 
 To install on Debian or Ubutu, run:
 
-```
+```sh
 sudo apt install libicu-dev
 ```
 
@@ -65,7 +66,7 @@ sudo apt install libicu-dev
 
 To install on macOS, run:
 
-```
+```sh
 brew install icu4c
 export PKG_CONFIG_PATH="/usr/local/opt/icu4c/lib/pkgconfig:$PKG_CONFIG_PATH"
 ```
@@ -74,7 +75,7 @@ export PKG_CONFIG_PATH="/usr/local/opt/icu4c/lib/pkgconfig:$PKG_CONFIG_PATH"
 
 To build and install the indexer, run:
 
-```
+```sh
 make
 sudo make install
 ```
@@ -86,7 +87,7 @@ Please remember to pass the `-E` flag to `sudo` if you do so.
 
 Example:
 
-```
+```sh
 PREFIX=/usr sudo -E make install
 ```
 
@@ -137,7 +138,7 @@ To disable the Elasticsearch integration:
 
 Configure Elasticsearch's host and port in **Admin > Settings**. Then create empty indexes using one of the following commands:
 
-```
+```sh
 # Omnibus installations
 sudo gitlab-rake gitlab:elastic:create_empty_index
 
@@ -147,7 +148,7 @@ bundle exec rake gitlab:elastic:create_empty_index RAILS_ENV=production
 
 Then enable Elasticsearch indexing and run repository indexing tasks:
 
-```
+```sh
 # Omnibus installations
 sudo gitlab-rake gitlab:elastic:index
 
@@ -161,7 +162,7 @@ Enable Elasticsearch search.
 
 Configure Elasticsearch's host and port in **Admin > Settings**. Then create empty indexes using one of the following commands:
 
-```
+```sh
 # Omnibus installations
 sudo gitlab-rake gitlab:elastic:create_empty_index
 
@@ -183,7 +184,7 @@ curl --request PUT localhost:9200/gitlab-production/_settings --data '{
 
 Then enable Elasticsearch indexing and run repository indexing tasks:
 
-```
+```sh
 # Omnibus installations
 sudo gitlab-rake gitlab:elastic:index_repositories_async
 
@@ -195,8 +196,7 @@ This enqueues a number of Sidekiq jobs to index your existing repositories.
 You can view the jobs in the admin panel (they are placed in the `elastic_batch_project_indexer`)
 queue), or you can query indexing status using a rake task:
 
-
-```
+```sh
 # Omnibus installations
 sudo gitlab-rake gitlab:elastic:index_repositories_status
 
@@ -214,7 +214,7 @@ You can also run the initial indexing synchronously - this is most useful if
 you have a small number of projects, or need finer-grained control over indexing
 than Sidekiq permits:
 
-```
+```sh
 # Omnibus installations
 sudo gitlab-rake gitlab:elastic:index_repositories
 
@@ -227,7 +227,7 @@ It might take a while depending on how big your Git repositories are.
 If you want to run several tasks in parallel (probably in separate terminal
 windows) you can provide the `ID_FROM` and `ID_TO` parameters:
 
-```
+```sh
 # Omnibus installations
 sudo gitlab-rake gitlab:elastic:index_repositories ID_FROM=1001 ID_TO=2000
 
@@ -238,7 +238,7 @@ bundle exec rake gitlab:elastic:index_repositories ID_FROM=1001 ID_TO=2000 RAILS
 Where `ID_FROM` and `ID_TO` are project IDs. Both parameters are optional.
 As an example, if you have 3,000 repositories and you want to run three separate indexing tasks, you might run:
 
-```
+```sh
 # Omnibus installations
 sudo gitlab-rake gitlab:elastic:index_repositories ID_TO=1000
 sudo gitlab-rake gitlab:elastic:index_repositories ID_FROM=1001 ID_TO=2000
@@ -260,7 +260,7 @@ database, you can run the indexer with the special parameter `UPDATE_INDEX` and
 it will check every project repository again to make sure that every commit in
 that repository is indexed, it can be useful in case if your index is outdated:
 
-```
+```sh
 # Omnibus installations
 sudo gitlab-rake gitlab:elastic:index_repositories UPDATE_INDEX=true ID_TO=1000
 
@@ -274,7 +274,7 @@ start.
 
 To index all wikis:
 
-```
+```sh
 # Omnibus installations
 sudo gitlab-rake gitlab:elastic:index_wikis
 
@@ -287,7 +287,7 @@ to limit a project set.
 
 Index all database entities (Keep in mind it can take a while so consider using `screen` or `tmux`):
 
-```
+```sh
 # Omnibus installations
 sudo gitlab-rake gitlab:elastic:index_database
 
@@ -317,6 +317,12 @@ Enable Elasticsearch search in **Admin > Settings**. That's it. Enjoy it!
 
 Here are some common pitfalls and how to overcome them:
 
+- **I updated GitLab and now I can't find anything**
+
+    We continuously make updates to our indexing strategies and aim to support
+    newer versions of Elasticsearch. When indexing changes are made, it may
+    be necessary for you to [reindex](#adding-gitlabs-data-to-the-elasticsearch-index) after updating GitLab.
+
 - **I indexed all the repositories but I can't find anything**
 
     Make sure you indexed all the database data [as stated above](#adding-gitlab-data-to-the-elasticsearch-index).
@@ -330,7 +336,7 @@ Here are some common pitfalls and how to overcome them:
     If you enabled Elasticsearch before GitLab 8.12 and have not rebuilt indexes you will get
     exception in lots of different cases:
 
-    ```
+    ```text
     Elasticsearch::Transport::Transport::Errors::BadRequest([400] {
         "error": {
             "root_cause": [{
@@ -354,7 +360,7 @@ Here are some common pitfalls and how to overcome them:
 
 - Exception `Elasticsearch::Transport::Transport::Errors::RequestEntityTooLarge`
 
-    ```
+    ```text
     [413] {"Message":"Request size exceeded 10485760 bytes"}
     ```
 

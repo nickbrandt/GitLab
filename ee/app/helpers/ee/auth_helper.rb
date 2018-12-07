@@ -8,6 +8,11 @@ module EE
 
     delegate :slack_app_id, to: :'Gitlab::CurrentSettings.current_application_settings'
 
+    override :display_providers_on_profile?
+    def display_providers_on_profile?
+      super || group_saml_enabled?
+    end
+
     override :button_based_providers
     def button_based_providers
       super - GROUP_LEVEL_PROVIDERS
@@ -43,6 +48,10 @@ module EE
 
     def smartcard_enabled?
       ::Gitlab::Auth::Smartcard.enabled?
+    end
+
+    def group_saml_enabled?
+      auth_providers.include?(:group_saml)
     end
 
     def slack_redirect_uri(project)

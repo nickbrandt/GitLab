@@ -122,7 +122,7 @@ module API
         {
           username: token_handler.actor_name,
           lfs_token: token_handler.token,
-          repository_http_path: project.http_url_to_repo
+          repository_http_path: project.lfs_http_url_to_repo(params[:operation])
         }
       end
       # rubocop: enable CodeReuse/ActiveRecord

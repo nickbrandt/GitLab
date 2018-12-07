@@ -14,6 +14,44 @@ module EE
       }.merge(super)
     end
 
+    def epics_sort_options_hash
+      {
+        sort_value_created_date => sort_title_created_date,
+        sort_value_oldest_created => sort_title_created_date,
+        sort_value_recently_created => sort_title_created_date,
+        sort_value_oldest_updated => sort_title_recently_updated,
+        sort_value_recently_updated => sort_title_recently_updated,
+        sort_value_start_date_later => sort_title_start_date,
+        sort_value_start_date_soon => sort_title_start_date,
+        sort_value_end_date_later => sort_title_end_date,
+        sort_value_end_date => sort_title_end_date
+      }
+    end
+
+    # This method is used to find the opposite ordering parameter for the sort button in the UI.
+    # Hash key is the descending sorting order and the sort value is the opposite of it for the same field.
+    # For example: created_at_asc => created_at_desc
+    def epics_ordering_options_hash
+      {
+        sort_value_oldest_created => sort_value_recently_created,
+        sort_value_oldest_updated => sort_value_recently_updated,
+        sort_value_start_date_soon => sort_value_start_date_later,
+        sort_value_end_date => sort_value_end_date_later
+
+      }
+    end
+
+    # Creates a button with the opposite ordering for the current field in UI.
+    def sort_order_button(sort)
+      opposite_sorting_param = epics_ordering_options_hash[sort] || epics_ordering_options_hash.key(sort)
+      sort_icon = sort.end_with?('desc') ? 'sort-highest' : 'sort-lowest'
+
+      link_to sprite_icon(sort_icon, size: 16),
+              page_filter_path(sort: opposite_sorting_param, label: true),
+              class: "btn btn-default has-tooltip qa-reverse-sort btn-sort-direction",
+              title: _("Sort direction")
+    end
+
     def sort_title_start_date
       s_('SortOptions|Start date')
     end
@@ -40,6 +78,10 @@ module EE
 
     def sort_value_end_date
       'end_date_asc'
+    end
+
+    def sort_value_end_date_later
+      'end_date_desc'
     end
 
     def sort_value_less_weight

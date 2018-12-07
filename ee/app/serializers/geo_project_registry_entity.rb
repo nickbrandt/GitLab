@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GeoProjectRegistryEntity < Grape::Entity
   expose :project_id
   expose :last_repository_synced_at

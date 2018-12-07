@@ -53,11 +53,14 @@ First, navigate to the Security Dashboard found under your group's
 **Overview > Security Dashboard**.
 
 Once you're on the dashboard, on the top you should see an overview of all the
-vulnerabilities, grouped by severity. Underneath these overviews is a list of
-all the vulnerabilities in the group, sorted by severity.
+vulnerabilities, grouped by severity. Underneath these overviews is a timeline
+chart that shows how many open vulnerabilities you had at various points in time.
+You can hover over the chart to get more details about the open vulnerabilities
+at that time.
 
-![dashboard with action buttons](img/dashboard.png)
+![dashboard with action buttons and metrics](img/dashboard.png)
 
+Finally, there is a list of all the vulnerabilities in the group, sorted by severity.
 In that list, you can see the severity of the vulnerability, its name, its
 confidence (likelihood of the vulnerability to be a positive one), and the project
 it's from.

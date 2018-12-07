@@ -135,6 +135,12 @@ module EE
       end
     end
 
+    def group_project_templates_count(group_id)
+      allowed_subgroups = current_user.available_subgroups_with_custom_project_templates(group_id)
+
+      ::Project.in_namespace(allowed_subgroups).count
+    end
+
     def share_project_description
       share_with_group   = @project.allowed_to_share_with_group?
       share_with_members = !membership_locked?

@@ -240,6 +240,58 @@ describe('epicSidebar', () => {
 
       vmDatesFromMilestones.$destroy();
     });
+
+    it('returns tooltip string containing `No due date` when dueDate from dates sourcing milestone is missing', () => {
+      const startDate = '2018-01-01';
+      const dueDate = '2018-03-31';
+      const vmMissingDueDate = mountComponent(
+        EpicSidebar,
+        Object.assign({}, defaultPropsData, {
+          startDateSourcingMilestoneDates: {
+            startDate,
+            dueDate: null,
+          },
+          dueDateSourcingMilestoneDates: {
+            startDate,
+            dueDate,
+          },
+          startDateFromMilestones: startDate,
+          dueDateFromMilestones: dueDate,
+        }),
+      );
+
+      expect(vmMissingDueDate.getDateFromMilestonesTooltip('start')).toBe(
+        'Milestone for Start Date<br/><span class="text-tertiary">Jan 1, 2018 – No due date</span>',
+      );
+
+      vmMissingDueDate.$destroy();
+    });
+
+    it('returns tooltip string containing `No start date` when startDate from dates sourcing milestone is missing', () => {
+      const startDate = '2018-01-01';
+      const dueDate = '2018-03-31';
+      const vmMissingStartDate = mountComponent(
+        EpicSidebar,
+        Object.assign({}, defaultPropsData, {
+          startDateSourcingMilestoneDates: {
+            startDate: null,
+            dueDate,
+          },
+          dueDateSourcingMilestoneDates: {
+            startDate,
+            dueDate,
+          },
+          startDateFromMilestones: startDate,
+          dueDateFromMilestones: dueDate,
+        }),
+      );
+
+      expect(vmMissingStartDate.getDateFromMilestonesTooltip('start')).toBe(
+        'Milestone for Start Date<br/><span class="text-tertiary">No start date – Mar 31, 2018</span>',
+      );
+
+      vmMissingStartDate.$destroy();
+    });
   });
 
   describe('toggleSidebar', () => {

@@ -60,3 +60,11 @@
     = form.number_field :verification_max_capacity, class: 'form-control', min: 0
     .form-text.text-muted
       #{ s_('Control the maximum concurrency of verification operations for this Geo node') }
+
+.form-group.row.js-hide-if-geo-secondary{ class: ('hidden' unless geo_node.primary?) }
+  .col-sm-2
+    = form.label :minimum_reverification_interval, s_('Geo|Re-verification interval'), class: 'col-form-label'
+  .col-sm-10
+    = form.number_field :minimum_reverification_interval, class: 'form-control', min: 1
+    .form-text.text-muted
+      #{ s_('Control the minimum interval in days that a repository should be reverified for this primary node') }

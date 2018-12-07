@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module Projects
     module CreateFromTemplateService
@@ -26,7 +28,8 @@ module EE
 
       def template_project
         strong_memoize(:template_project) do
-          current_user.available_custom_project_templates(search: template_name).first
+          current_user.available_custom_project_templates(search: template_name, subgroup_id: params[:group_with_project_templates_id])
+                      .first
         end
       end
     end

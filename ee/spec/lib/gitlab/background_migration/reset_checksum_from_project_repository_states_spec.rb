@@ -4,10 +4,42 @@ require 'spec_helper'
 
 describe Gitlab::BackgroundMigration::ResetChecksumFromProjectRepositoryStates, :migration, schema: 20180914195058 do
   describe '#perform' do
+    let(:users) { table(:users) }
+    let(:projects) { table(:projects) }
+    let(:repository_states) { table(:project_repository_states) }
+
+    def create_repository_state(params = {})
+      attrs = {
+        repository_verification_checksum: 'f079a831cab27bcda7d81cd9b48296d0c3dd92ee',
+        last_repository_verification_failure: nil,
+        repository_retry_count: nil,
+        repository_retry_at: nil,
+        wiki_verification_checksum: 'e079a831cab27bcda7d81cd9b48296d0c3dd92ef',
+        last_wiki_verification_failure: nil,
+        wiki_retry_count: nil,
+        wiki_retry_at: nil
+      }.merge(params)
+
+      repository_states.create!(attrs)
+    end
+
     it 'processes all repository states in batch' do
-      repository_state_1 = create(:repository_state, :repository_verified, :wiki_verified)
-      repository_state_2 = create(:repository_state, :repository_failed, :wiki_failed)
-      repository_state_3 = create(:repository_state, :repository_verified, :wiki_verified)
+      users.create!(email: 'test@example.com', projects_limit: 100, username: 'test')
+      projects.create!(id: 1, name: 'project-1', path: 'project-1', visibility_level: 0, namespace_id: 1)
+      projects.create!(id: 2, name: 'project-2', path: 'project-2', visibility_level: 0, namespace_id: 1)
+      projects.create!(id: 3, name: 'project-3', path: 'project-3', visibility_level: 0, namespace_id: 1)
+
+      repository_state_1 = create_repository_state(project_id: 1)
+
+      repository_state_2 = create_repository_state(
+        project_id: 2,
+        wiki_verification_checksum: nil,
+        last_wiki_verification_failure: 'Could not calculate the checksum',
+        wiki_retry_count: 1,
+        wiki_retry_at: Time.now + 5.minutes
+      )
+
+      repository_state_3 = create_repository_state(project_id: 3)
 
       subject.perform(repository_state_1.project_id, repository_state_2.project_id)
 

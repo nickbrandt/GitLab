@@ -20,7 +20,7 @@ describe IssueLinks::CreateService do
 
     context 'when the reference list is empty' do
       let(:params) do
-        { issue_references: [] }
+        { issuable_references: [] }
       end
 
       it 'returns error' do
@@ -30,7 +30,7 @@ describe IssueLinks::CreateService do
 
     context 'when Issue not found' do
       let(:params) do
-        { issue_references: ['#999'] }
+        { issuable_references: ['#999'] }
       end
 
       it 'returns error' do
@@ -43,14 +43,14 @@ describe IssueLinks::CreateService do
     end
 
     context 'when user has no permission to target project Issue' do
-      let(:target_issue) { create :issue }
+      let(:target_issuable) { create :issue }
 
       let(:params) do
-        { issue_references: [target_issue.to_reference(project)] }
+        { issuable_references: [target_issuable.to_reference(project)] }
       end
 
       it 'returns error' do
-        target_issue.project.add_guest(user)
+        target_issuable.project.add_guest(user)
 
         is_expected.to eq(message: 'No Issue found for given params', status: :error, http_status: 404)
       end
@@ -62,7 +62,7 @@ describe IssueLinks::CreateService do
 
     context 'source and target are the same issue' do
       let(:params) do
-        { issue_references: [issue.to_reference] }
+        { issuable_references: [issue.to_reference] }
       end
 
       it 'does not create notes' do
@@ -85,7 +85,7 @@ describe IssueLinks::CreateService do
       let(:another_project_issue_ref) { another_project_issue.to_reference(project) }
 
       let(:params) do
-        { issue_references: [issue_a_ref, another_project_issue_ref] }
+        { issuable_references: [issue_a_ref, another_project_issue_ref] }
       end
 
       before do
@@ -129,7 +129,7 @@ describe IssueLinks::CreateService do
       end
 
       let(:params) do
-        { issue_references: [issue_b.to_reference, issue_a.to_reference] }
+        { issuable_references: [issue_b.to_reference, issue_a.to_reference] }
       end
 
       it 'returns success status' do

@@ -8,7 +8,7 @@ describe 'SAML provider settings' do
   let(:callback_path) { "/groups/#{group.path}/-/saml/callback" }
 
   before do
-    stub_config_setting(url: 'https://localhost')
+    stub_default_url_options(protocol: "https")
     stub_saml_config
     group.add_owner(user)
   end
@@ -38,6 +38,25 @@ describe 'SAML provider settings' do
         expect(find_field('Assertion consumer service URL').value).to eq group.build_saml_provider.assertion_consumer_service_url
         expect(find_field('Identifier').value).to eq "https://localhost/groups/#{group.full_path}"
       end
+    end
+
+    it 'provides metadata XML' do
+      visit group_saml_providers_path(group)
+
+      StrategyHelpers.without_test_mode do
+        click_link('metadata')
+      end
+
+      expect(page.body).to include(callback_path)
+      expect(response_headers['Content-Type']).to have_content("application/xml")
+    end
+
+    it 'does not show metadata link when feature disabled' do
+      stub_feature_flags(group_saml_metadata_available: false)
+
+      visit group_saml_providers_path(group)
+
+      expect(page).not_to have_content('metadata')
     end
 
     it 'allows creation of new provider' do

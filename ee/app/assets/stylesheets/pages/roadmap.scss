@@ -4,14 +4,59 @@ $details-cell-width: 320px;
 $border-style: 1px solid $border-gray-normal;
 $roadmap-gradient-dark-gray: rgba(0, 0, 0, 0.15);
 $roadmap-gradient-gray: rgba(255, 255, 255, 0.001);
-$scroll-top-gradient: linear-gradient(to bottom, $roadmap-gradient-dark-gray 0%, $roadmap-gradient-gray 100%);
-$scroll-bottom-gradient: linear-gradient(to bottom, $roadmap-gradient-gray 0%, $roadmap-gradient-dark-gray 100%);
-$column-right-gradient: linear-gradient(to right, $roadmap-gradient-dark-gray 0%, $roadmap-gradient-gray 100%);
+$scroll-top-gradient: linear-gradient(
+  to bottom,
+  $roadmap-gradient-dark-gray 0%,
+  $roadmap-gradient-gray 100%
+);
+$scroll-bottom-gradient: linear-gradient(
+  to bottom,
+  $roadmap-gradient-gray 0%,
+  $roadmap-gradient-dark-gray 100%
+);
+$column-right-gradient: linear-gradient(
+  to right,
+  $roadmap-gradient-dark-gray 0%,
+  $roadmap-gradient-gray 100%
+);
 
 @mixin roadmap-scroll-mixin {
   height: $grid-size;
   width: $details-cell-width;
   pointer-events: none;
+}
+
+.epics-details-filters {
+  .btn-group {
+    .dropdown-toggle {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    .btn-sort-direction {
+      border-left: 0;
+
+      &:hover {
+        border-color: $gray-darkest;
+      }
+    }
+
+    @include media-breakpoint-down(xs) {
+      display: flex;
+
+      .dropdown-menu-sort {
+        // This is a hack to fix dropdown alignment in small screens
+        // where Bootstrap applies inline `transform: translate3d(...)`
+        // and since our dropdown button has sort direction button
+        // present, alignment needs to compensate for that space
+        // without which it appears shifted towards left.
+        //
+        // One more approach is to override `transform` using `!important`
+        // but that too involves using magic number
+        margin-left: 27px;
+      }
+    }
+  }
 }
 
 .epics-roadmap-filters {
@@ -52,7 +97,7 @@ $column-right-gradient: linear-gradient(to right, $roadmap-gradient-dark-gray 0%
 
 .roadmap-timeline-section .timeline-header-blank::after,
 .epics-list-section .epic-details-cell::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   right: -$grid-size;
@@ -136,7 +181,7 @@ $column-right-gradient: linear-gradient(to right, $roadmap-gradient-dark-gray 0%
       }
 
       .today-bar::before {
-        content: '';
+        content: "";
         position: absolute;
         top: -2px;
         left: -3px;
@@ -150,7 +195,7 @@ $column-right-gradient: linear-gradient(to right, $roadmap-gradient-dark-gray 0%
 
   &.scroll-top-shadow .timeline-header-blank::before {
     @include roadmap-scroll-mixin;
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     bottom: -$grid-size;
@@ -256,7 +301,7 @@ $column-right-gradient: linear-gradient(to right, $roadmap-gradient-dark-gray 0%
 
         &.start-date-outside::before,
         &.end-date-outside::after {
-          content: '';
+          content: "";
           position: absolute;
           top: 0;
           height: 100%;
@@ -269,11 +314,21 @@ $column-right-gradient: linear-gradient(to right, $roadmap-gradient-dark-gray 0%
         }
 
         &.start-date-undefined {
-          background: linear-gradient(to right, $roadmap-gradient-gray 0%, $blue-200 50%, $blue-500 100%);
+          background: linear-gradient(
+            to right,
+            $roadmap-gradient-gray 0%,
+            $blue-200 50%,
+            $blue-500 100%
+          );
         }
 
         &.end-date-undefined {
-          background: linear-gradient(to right, $blue-500 0%, $blue-200 50%, $roadmap-gradient-gray 100%);
+          background: linear-gradient(
+            to right,
+            $blue-500 0%,
+            $blue-200 50%,
+            $roadmap-gradient-gray 100%
+          );
         }
 
         &.start-date-outside {

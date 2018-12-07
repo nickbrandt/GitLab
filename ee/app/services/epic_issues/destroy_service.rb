@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EpicIssues
   class DestroyService < IssuableLinks::DestroyService
     def execute

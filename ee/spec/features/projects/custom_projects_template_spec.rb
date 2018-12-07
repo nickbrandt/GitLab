@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe 'Project' do
-  describe 'Custom projects templates' do
+  describe 'Custom instance-level projects templates' do
     let(:user) { create(:user) }
     let(:group) { create(:group) }
     let!(:projects) { create_list(:project, 3, :public, namespace: group) }
@@ -23,18 +23,18 @@ describe 'Project' do
 
       it 'shows built-in templates tab' do
         page.within '.project-template .built-in-tab' do
-          expect(page).to have_content 'Built-In'
+          expect(page).to have_content 'Built-in'
         end
       end
 
       it 'shows custom projects templates tab' do
-        page.within '.project-template .custom-templates-tab' do
-          expect(page).to have_content 'Custom'
+        page.within '.project-template .custom-instance-project-templates-tab' do
+          expect(page).to have_content 'Instance'
         end
       end
 
       it 'displays the number of projects templates available to the user' do
-        page.within '.project-template .custom-templates-tab span.badge' do
+        page.within '.project-template .custom-instance-project-templates-tab span.badge' do
           expect(page).to have_content '3'
         end
       end
@@ -43,7 +43,7 @@ describe 'Project' do
         new_name = 'example_custom_project_template'
 
         find('#create-from-template-tab').click
-        find('.project-template .custom-templates-tab').click
+        find('.project-template .custom-instance-project-templates-tab').click
         find("label[for='#{projects.first.name}']").click
 
         page.within '.project-fields-form' do
@@ -63,7 +63,7 @@ describe 'Project' do
         last_project = "label[for='#{projects.last.name}']"
 
         find('#create-from-template-tab').click
-        find('.project-template .custom-templates-tab').click
+        find('.project-template .custom-instance-project-templates-tab').click
 
         expect(page).to have_css('.custom-project-templates .gl-pagination')
         expect(page).not_to have_css(last_project)

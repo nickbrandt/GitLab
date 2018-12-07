@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ProjectImportScheduleWorker
   ImportStateNotFound = Class.new(StandardError)
 

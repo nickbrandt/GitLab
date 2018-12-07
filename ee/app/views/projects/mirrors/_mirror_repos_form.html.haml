@@ -9,7 +9,7 @@
 
 .form-group
   = label_tag :mirror_direction, _('Mirror direction'), class: 'label-light'
-  = select_tag :mirror_direction, options_for_select(options), class: 'form-control js-mirror-direction', disabled: (options.count == 1) || has_existing_pull_mirror
+  = select_tag :mirror_direction, options_for_select(options), class: 'form-control js-mirror-direction qa-mirror-direction', disabled: (options.count == 1) || has_existing_pull_mirror
 
 .js-form-insertion-point
 

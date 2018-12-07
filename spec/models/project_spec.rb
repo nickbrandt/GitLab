@@ -4,6 +4,8 @@ describe Project do
   include ProjectForksHelper
   include GitHelpers
 
+  it_behaves_like 'having unique enum values'
+
   describe 'associations' do
     it { is_expected.to belong_to(:group) }
     it { is_expected.to belong_to(:namespace) }
@@ -62,7 +64,7 @@ describe Project do
     it { is_expected.to have_one(:forked_from_project).through(:fork_network_member) }
     it { is_expected.to have_one(:auto_devops).class_name('ProjectAutoDevops') }
     it { is_expected.to have_many(:commit_statuses) }
-    it { is_expected.to have_many(:pipelines) }
+    it { is_expected.to have_many(:ci_pipelines) }
     it { is_expected.to have_many(:builds) }
     it { is_expected.to have_many(:build_trace_section_names)}
     it { is_expected.to have_many(:runner_projects) }
@@ -86,6 +88,7 @@ describe Project do
     it { is_expected.to have_many(:pipeline_schedules) }
     it { is_expected.to have_many(:members_and_requesters) }
     it { is_expected.to have_many(:clusters) }
+    it { is_expected.to have_many(:kubernetes_namespaces) }
     it { is_expected.to have_many(:custom_attributes).class_name('ProjectCustomAttribute') }
     it { is_expected.to have_many(:project_badges).class_name('ProjectBadge') }
     it { is_expected.to have_many(:lfs_file_locks) }
@@ -132,6 +135,52 @@ describe Project do
         let(:namespace) { project }
       end
     end
+
+    describe 'ci_pipelines association' do
+      context 'when feature flag pipeline_ci_sources_only is enabled' do
+        it 'returns only pipelines from ci_sources' do
+          stub_feature_flags(pipeline_ci_sources_only: true)
+
+          expect(Ci::Pipeline).to receive(:ci_sources).and_call_original
+
+          subject.ci_pipelines
+        end
+      end
+
+      context 'when feature flag pipeline_ci_sources_only is disabled' do
+        it 'returns all pipelines' do
+          stub_feature_flags(pipeline_ci_sources_only: false)
+
+          expect(Ci::Pipeline).not_to receive(:ci_sources).and_call_original
+          expect(Ci::Pipeline).to receive(:all).and_call_original.at_least(:once)
+
+          subject.ci_pipelines
+        end
+      end
+    end
+
+    describe 'ci_pipelines association' do
+      context 'when feature flag pipeline_ci_sources_only is enabled' do
+        it 'returns only pipelines from ci_sources' do
+          stub_feature_flags(pipeline_ci_sources_only: true)
+
+          expect(Ci::Pipeline).to receive(:ci_sources).and_call_original
+
+          subject.ci_pipelines
+        end
+      end
+
+      context 'when feature flag pipeline_ci_sources_only is disabled' do
+        it 'returns all pipelines' do
+          stub_feature_flags(pipeline_ci_sources_only: false)
+
+          expect(Ci::Pipeline).not_to receive(:ci_sources).and_call_original
+          expect(Ci::Pipeline).to receive(:all).and_call_original.at_least(:once)
+
+          subject.ci_pipelines
+        end
+      end
+    end
   end
 
   describe 'modules' do
@@ -153,6 +202,24 @@ describe Project do
         expect(described_class.with_wiki_enabled).to include(project)
         expect(described_class.with_wiki_enabled).not_to include(project1)
       end
+    end
+  end
+
+  describe '.missing_kubernetes_namespace' do
+    let!(:project) { create(:project) }
+    let!(:cluster) { create(:cluster, :provided_by_user, :group) }
+    let(:kubernetes_namespaces) { project.kubernetes_namespaces }
+
+    subject { described_class.missing_kubernetes_namespace(kubernetes_namespaces) }
+
+    it { is_expected.to contain_exactly(project) }
+
+    context 'kubernetes namespace exists' do
+      before do
+        create(:cluster_kubernetes_namespace, project: project, cluster: cluster)
+      end
+
+      it { is_expected.to be_empty }
     end
   end
 
@@ -425,6 +492,8 @@ describe Project do
 
     it { is_expected.to delegate_method(:members).to(:team).with_prefix(true) }
     it { is_expected.to delegate_method(:name).to(:owner).with_prefix(true).with_arguments(allow_nil: true) }
+    it { is_expected.to delegate_method(:group_clusters_enabled?).to(:group).with_arguments(allow_nil: true) }
+    it { is_expected.to delegate_method(:root_ancestor).to(:namespace).with_arguments(allow_nil: true) }
   end
 
   describe '#to_reference_with_postfix' do
@@ -2262,6 +2331,39 @@ describe Project do
     it 'includes ancestors upto but excluding the given ancestor' do
       expect(project.ancestors_upto(parent)).to contain_exactly(child2, child)
     end
+
+    describe 'with hierarchy_order' do
+      it 'returns ancestors ordered by descending hierarchy' do
+        expect(project.ancestors_upto(hierarchy_order: :desc)).to eq([parent, child, child2])
+      end
+
+      it 'can be used with upto option' do
+        expect(project.ancestors_upto(parent, hierarchy_order: :desc)).to eq([child, child2])
+      end
+    end
+  end
+
+  describe '#root_ancestor' do
+    let(:project) { create(:project) }
+
+    subject { project.root_ancestor }
+
+    it { is_expected.to eq(project.namespace) }
+
+    context 'in a group' do
+      let(:group) { create(:group) }
+      let(:project) { create(:project, group: group) }
+
+      it { is_expected.to eq(group) }
+    end
+
+    context 'in a nested group', :nested_groups do
+      let(:root) { create(:group) }
+      let(:child) { create(:group, parent: root) }
+      let(:project) { create(:project, group: child) }
+
+      it { is_expected.to eq(root) }
+    end
   end
 
   describe '#lfs_enabled?' do
@@ -2989,6 +3091,17 @@ describe Project do
     end
   end
 
+  describe '#lfs_http_url_to_repo' do
+    let(:project) { create(:project) }
+
+    it 'returns the url to the repo without a username' do
+      lfs_http_url_to_repo = project.lfs_http_url_to_repo('operation_that_doesnt_matter')
+
+      expect(lfs_http_url_to_repo).to eq("#{project.web_url}.git")
+      expect(lfs_http_url_to_repo).not_to include('@')
+    end
+  end
+
   describe '#pipeline_status' do
     let(:project) { create(:project, :repository) }
     it 'builds a pipeline status' do
@@ -3641,7 +3754,7 @@ describe Project do
 
     context 'with a ref that is not the default branch' do
       it 'returns the latest successful pipeline for the given ref' do
-        expect(project.pipelines).to receive(:latest_successful_for).with('foo')
+        expect(project.ci_pipelines).to receive(:latest_successful_for).with('foo')
 
         project.latest_successful_pipeline_for('foo')
       end
@@ -3669,7 +3782,7 @@ describe Project do
     it 'memoizes and returns the latest successful pipeline for the default branch' do
       pipeline = double(:pipeline)
 
-      expect(project.pipelines).to receive(:latest_successful_for)
+      expect(project.ci_pipelines).to receive(:latest_successful_for)
         .with(project.default_branch)
         .and_return(pipeline)
         .once
@@ -3770,29 +3883,6 @@ describe Project do
       project = create(:project)
 
       expect(project.wiki_repository_exists?).to eq(false)
-    end
-  end
-
-  describe '#root_namespace' do
-    let(:project) { build(:project, namespace: parent) }
-
-    subject { project.root_namespace }
-
-    context 'when namespace has parent group' do
-      let(:root_ancestor) { create(:group) }
-      let(:parent) { build(:group, parent: root_ancestor) }
-
-      it 'returns root ancestor' do
-        is_expected.to eq(root_ancestor)
-      end
-    end
-
-    context 'when namespace is root ancestor' do
-      let(:parent) { build(:group) }
-
-      it 'returns current namespace' do
-        is_expected.to eq(parent)
-      end
     end
   end
 
@@ -4282,6 +4372,27 @@ describe Project do
       user = create(:user)
 
       expect(project.snippets_visible?(user)).to eq(false)
+    end
+  end
+
+  describe '#all_clusters' do
+    let(:project) { create(:project) }
+    let(:cluster) { create(:cluster, cluster_type: :project_type, projects: [project]) }
+
+    subject { project.all_clusters }
+
+    it 'returns project level cluster' do
+      expect(subject).to eq([cluster])
+    end
+
+    context 'project belongs to a group' do
+      let(:group_cluster) { create(:cluster, :group) }
+      let(:group) { group_cluster.group }
+      let(:project) { create(:project, group: group) }
+
+      it 'returns clusters for groups of this project' do
+        expect(subject).to contain_exactly(cluster, group_cluster)
+      end
     end
   end
 

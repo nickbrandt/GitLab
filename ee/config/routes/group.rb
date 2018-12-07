@@ -70,6 +70,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
       resources :vulnerabilities, only: [:index], controller: :vulnerabilities do
         collection do
           get :summary
+          get :history
         end
       end
     end
@@ -77,6 +78,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     resource :saml_providers, path: 'saml', only: [:show, :create, :update] do
       post :callback, to: 'omniauth_callbacks#group_saml'
       get :sso, to: 'sso#saml'
+      delete :unlink, to: 'sso#unlink'
     end
 
     resource :roadmap, only: [:show], controller: 'roadmap'

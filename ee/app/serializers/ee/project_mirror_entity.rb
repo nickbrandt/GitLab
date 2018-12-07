@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module ProjectMirrorEntity
     extend ActiveSupport::Concern

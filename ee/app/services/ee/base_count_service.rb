@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module BaseCountService
     extend ::Gitlab::Utils::Override

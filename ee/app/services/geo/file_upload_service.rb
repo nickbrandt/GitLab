@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   # This class is responsible for:
   #   * Handling file requests from the secondary over the API

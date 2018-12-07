@@ -58,7 +58,7 @@ describe SamlProvider do
     subject(:saml_provider) { create(:saml_provider, group: group) }
 
     before do
-      stub_config_setting(url: 'https://localhost')
+      stub_default_url_options(protocol: "https")
     end
 
     it 'generates callback URL' do

@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module IssueLinks
   class ListService < IssuableLinks::ListService
     include Gitlab::Utils::StrongMemoize
 
     private
 
-    def issues
+    def child_issuables
       issuable.related_issues(current_user, preload: { project: :namespace })
     end
 

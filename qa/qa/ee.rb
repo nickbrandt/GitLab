@@ -58,6 +58,7 @@ module QA
 
         module Settings
           autoload :ProtectedBranches, 'qa/ee/page/project/settings/protected_branches'
+          autoload :MirroringRepositories, 'qa/ee/page/project/settings/mirroring_repositories'
         end
       end
 

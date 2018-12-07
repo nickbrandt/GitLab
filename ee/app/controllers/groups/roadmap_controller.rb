@@ -9,13 +9,19 @@ module Groups
     before_action :group
     before_action :persist_roadmap_layout, only: [:show]
 
+    # show roadmap for a group
     def show
-      # show roadmap for a group
-      @sort = set_sort_order_from_cookie || default_sort_order
+      # Used to persist the order and show the correct sorting dropdown on UI.
+      @sort = set_sort_order
+
       @epics_count = EpicsFinder.new(current_user, group_id: @group.id).execute.count
     end
 
     private
+
+    def issuable_sorting_field
+      :epics_sort
+    end
 
     def persist_roadmap_layout
       return unless current_user
