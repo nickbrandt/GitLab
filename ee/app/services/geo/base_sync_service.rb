@@ -118,6 +118,10 @@ module Geo
     # will be enqueued by the log cursor, which should resolve any problems
     # it is possible to fix.
     def fetch_snapshot
+      # Snapshots will miss the data that are shared in object pools, and snapshotting should
+      # be avoided to guard against data loss.
+      return if project.pool_repository
+
       log_info("Attempting to fetch repository via snapshot")
 
       temp_repo.create_from_snapshot(
