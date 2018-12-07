@@ -4,7 +4,7 @@ import UsersCache from '~/lib/utils/users_cache';
 describe('UsersCache', () => {
   const dummyUsername = 'win';
   const dummyUserId = 123;
-  const dummyUser = { name: 'has a farm' };
+  const dummyUser = { name: 'has a farm', username: 'farmer' };
   const dummyUserStatus = 'my status';
 
   beforeEach(() => {
