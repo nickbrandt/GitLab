@@ -88,6 +88,11 @@ module EE
       end
     end
 
+    override :sidebar_operations_link_path
+    def sidebar_operations_link_path(project = @project)
+      super || project_feature_flags_path(project)
+    end
+
     # Given the current GitLab configuration, check whether the GitLab URL for Kerberos is going to be different than the HTTP URL
     def alternative_kerberos_url?
       ::Gitlab.config.alternative_gitlab_kerberos_url?

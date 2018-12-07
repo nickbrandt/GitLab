@@ -195,13 +195,8 @@
                     = _('Charts')
 
       - if project_nav_tab? :operations
-        - if can?(current_user, :read_environment, @project) || can?(current_user, :read_cluster, @project)
-          - main_link = metrics_project_environments_path(@project)
-        - elsif can?(current_user, :read_feature_flag, @project)
-          - main_link = project_feature_flags_path(@project)
-
         = nav_link(controller: sidebar_operations_paths) do
-          = link_to main_link, class: 'shortcuts-operations' do
+          = link_to sidebar_operations_link_path, class: 'shortcuts-operations' do
             .nav-icon-container
               = sprite_icon('cloud-gear')
             %span.nav-item-name
@@ -209,7 +204,7 @@
 
           %ul.sidebar-sub-level-items
             = nav_link(controller: sidebar_operations_paths, html_options: { class: "fly-out-top-item" } ) do
-              = link_to metrics_project_environments_path(@project) do
+              = link_to sidebar_operations_link_path do
                 %strong.fly-out-top-item-name
                   =  _('Operations')
             %li.divider.fly-out-top-item
