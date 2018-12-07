@@ -51,7 +51,7 @@ project_tree:
     - resource_label_events:
       - label:
           :priorities
-  - pipelines:
+  - ci_pipelines:
     - notes:
       - :author
       - events:
@@ -126,6 +126,7 @@ excluded_attributes:
     - :packages_enabled
     - :mirror_last_update_at
     - :mirror_last_successful_update_at
+    - :bfg_object_map
   namespaces:
     - :runners_token
     - :runners_token_encrypted
@@ -155,6 +156,7 @@ excluded_attributes:
   statuses:
     - :trace
     - :token
+    - :token_encrypted
     - :when
     - :artifacts_file
     - :artifacts_metadata

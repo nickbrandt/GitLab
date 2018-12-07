@@ -121,7 +121,9 @@ You can also sort epics list by:
 - **Created date**
 - **Last updated**
 - **Start date**
-- **Due date**
+- **Due date**  
+
+Each option contains a button that can toggle the order between **ascending** and **descending**. The sort option and order will be persisted to be used wherever epics are browsed including the [roadmap](../roadmap/index.md).  
 
 ![epics sort](img/epics_sort.png)
 

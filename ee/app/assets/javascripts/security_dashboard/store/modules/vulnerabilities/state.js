@@ -3,12 +3,16 @@ import { s__ } from '~/locale';
 export default () => ({
   isLoadingVulnerabilities: true,
   errorLoadingVulnerabilities: false,
+  vulnerabilities: [],
   isLoadingVulnerabilitiesCount: true,
   errorLoadingVulnerabilitiesCount: false,
-  pageInfo: {},
-  vulnerabilities: [],
   vulnerabilitiesCount: {},
+  isLoadingVulnerabilitiesHistory: true,
+  errorLoadingVulnerabilitiesHistory: false,
+  vulnerabilitiesHistory: {},
+  pageInfo: {},
   vulnerabilitiesCountEndpoint: null,
+  vulnerabilitiesHistoryEndpoint: null,
   vulnerabilitiesEndpoint: null,
   activeVulnerability: null,
   modal: {

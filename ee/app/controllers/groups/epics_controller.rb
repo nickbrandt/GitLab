@@ -95,6 +95,10 @@ class Groups::EpicsController < Groups::ApplicationController
     EpicsFinder
   end
 
+  def issuable_sorting_field
+    :epics_sort
+  end
+
   def preload_for_collection
     @preload_for_collection ||= [:group, :author]
   end

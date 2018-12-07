@@ -93,17 +93,22 @@ module EE
         extend ActiveSupport::Concern
 
         prepended do
-          def scoped_issue_available?(board)
-            board.parent.feature_available?(:scoped_issue_board)
-          end
-
           # Default filtering configuration
           expose :name
           expose :group
-          expose :milestone, using: ::API::Entities::Milestone, if: ->(board, _) { scoped_issue_available?(board) }
-          expose :assignee, using: ::API::Entities::UserBasic, if: ->(board, _) { scoped_issue_available?(board) }
-          expose :labels, using: ::API::Entities::LabelBasic, if: ->(board, _) { scoped_issue_available?(board) }
-          expose :weight, if: ->(board, _) { scoped_issue_available?(board) }
+
+          with_options if: ->(board, _) { board.parent.feature_available?(:scoped_issue_board) } do
+            expose :milestone do |board|
+              if board.milestone.is_a?(Milestone)
+                ::API::Entities::Milestone.represent(board.milestone)
+              else
+                SpecialBoardFilter.represent(board.milestone)
+              end
+            end
+            expose :assignee, using: ::API::Entities::UserBasic
+            expose :labels, using: ::API::Entities::LabelBasic
+            expose :weight
+          end
         end
       end
 
@@ -211,6 +216,10 @@ module EE
       class IssueLink < Grape::Entity
         expose :source, as: :source_issue, using: ::API::Entities::IssueBasic
         expose :target, as: :target_issue, using: ::API::Entities::IssueBasic
+      end
+
+      class SpecialBoardFilter < Grape::Entity
+        expose :title
       end
 
       class Approvals < Grape::Entity

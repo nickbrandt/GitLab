@@ -18,8 +18,10 @@ describe Geo::RepositoryVerificationPrimaryService do
 
       expect(project.repository_state).to have_attributes(
         repository_verification_checksum: 'f123',
+        last_repository_verification_ran_at: be_present,
         last_repository_verification_failure: nil,
         wiki_verification_checksum: 'e321',
+        last_wiki_verification_ran_at: be_present,
         last_wiki_verification_failure: nil,
         repository_retry_at: nil,
         repository_retry_count: nil,
@@ -42,8 +44,10 @@ describe Geo::RepositoryVerificationPrimaryService do
 
       expect(repository_state.reload).to have_attributes(
         repository_verification_checksum: 'f123',
+        last_repository_verification_ran_at: be_present,
         last_repository_verification_failure: nil,
         wiki_verification_checksum: 'e321',
+        last_wiki_verification_ran_at: be_present,
         last_wiki_verification_failure: nil,
         repository_retry_at: nil,
         repository_retry_count: nil,
@@ -66,8 +70,10 @@ describe Geo::RepositoryVerificationPrimaryService do
 
       expect(repository_state.reload).to have_attributes(
         repository_verification_checksum: 'f123',
+        last_repository_verification_ran_at: be_present,
         last_repository_verification_failure: nil,
         wiki_verification_checksum: 'e321',
+        last_wiki_verification_ran_at: be_present,
         last_wiki_verification_failure: nil,
         repository_retry_at: nil,
         repository_retry_count: nil,
@@ -83,12 +89,19 @@ describe Geo::RepositoryVerificationPrimaryService do
       create(:repository_state,
         project: project,
         repository_verification_checksum: 'f079a831cab27bcda7d81cd9b48296d0c3dd92ee',
-        wiki_verification_checksum: 'e079a831cab27bcda7d81cd9b48296d0c3dd92ef')
+        last_repository_verification_ran_at: 1.day.ago,
+        wiki_verification_checksum: 'e079a831cab27bcda7d81cd9b48296d0c3dd92ef',
+        last_wiki_verification_ran_at: 1.day.ago)
 
       expect(repository).to receive(:checksum)
       expect(wiki).to receive(:checksum)
 
       subject.execute
+
+      expect(project.repository_state).to have_attributes(
+        last_repository_verification_ran_at: be_within(100.seconds).of(Time.now),
+        last_wiki_verification_ran_at: be_within(100.seconds).of(Time.now)
+      )
     end
 
     it 'calculates the wiki checksum even when wiki is not enabled for project' do
@@ -101,8 +114,10 @@ describe Geo::RepositoryVerificationPrimaryService do
 
       expect(project.repository_state).to have_attributes(
         repository_verification_checksum: 'f123',
+        last_repository_verification_ran_at: be_present,
         last_repository_verification_failure: nil,
         wiki_verification_checksum: 'e321',
+        last_wiki_verification_ran_at: be_present,
         last_wiki_verification_failure: nil,
         repository_retry_at: nil,
         repository_retry_count: nil,
@@ -116,8 +131,10 @@ describe Geo::RepositoryVerificationPrimaryService do
 
       expect(project.repository_state).to have_attributes(
         repository_verification_checksum: '0000000000000000000000000000000000000000',
+        last_repository_verification_ran_at: be_present,
         last_repository_verification_failure: nil,
         wiki_verification_checksum: '0000000000000000000000000000000000000000',
+        last_wiki_verification_ran_at: be_present,
         last_wiki_verification_failure: nil,
         repository_retry_at: nil,
         repository_retry_count: nil,
@@ -134,8 +151,10 @@ describe Geo::RepositoryVerificationPrimaryService do
 
       expect(project_broken_repo.repository_state).to have_attributes(
         repository_verification_checksum: '0000000000000000000000000000000000000000',
+        last_repository_verification_ran_at: be_present,
         last_repository_verification_failure: nil,
         wiki_verification_checksum: '0000000000000000000000000000000000000000',
+        last_wiki_verification_ran_at: be_present,
         last_wiki_verification_failure: nil,
         repository_retry_at: nil,
         repository_retry_count: nil,
@@ -176,8 +195,10 @@ describe Geo::RepositoryVerificationPrimaryService do
 
         expect(project.repository_state).to have_attributes(
           repository_verification_checksum: nil,
+          last_repository_verification_ran_at: be_present,
           last_repository_verification_failure: 'Something went wrong with repository',
           wiki_verification_checksum: nil,
+          last_wiki_verification_ran_at: be_present,
           last_wiki_verification_failure: 'Something went wrong with wiki',
           repository_retry_at: be_present,
           repository_retry_count: 1,
@@ -197,8 +218,10 @@ describe Geo::RepositoryVerificationPrimaryService do
 
         expect(repository_state.reload).to have_attributes(
           repository_verification_checksum: nil,
+          last_repository_verification_ran_at: be_present,
           last_repository_verification_failure: 'Something went wrong with repository',
           wiki_verification_checksum: nil,
+          last_wiki_verification_ran_at: be_present,
           last_wiki_verification_failure: 'Something went wrong with wiki',
           repository_retry_at: be_within(100.seconds).of(Time.now + 7.days),
           repository_retry_count: 31,

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Vulnerabilities::OccurrenceSerializer < BaseSerializer
   include WithPagination
 

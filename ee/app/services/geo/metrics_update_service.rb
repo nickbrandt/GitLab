@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   class MetricsUpdateService
     METRIC_PREFIX = 'geo_'.freeze

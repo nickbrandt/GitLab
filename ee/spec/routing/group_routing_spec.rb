@@ -61,4 +61,30 @@ describe 'Group routing', "routing" do
       end
     end
   end
+
+  describe 'security' do
+    it 'shows group dashboard' do
+      allow(Group).to receive(:find_by_full_path).with('gitlabhq', any_args).and_return(true)
+
+      expect(get('/groups/gitlabhq/-/security/dashboard')).to route_to('groups/security/dashboard#show', group_id: 'gitlabhq')
+    end
+
+    it 'lists vulnerabilities' do
+      allow(Group).to receive(:find_by_full_path).with('gitlabhq', any_args).and_return(true)
+
+      expect(get('/groups/gitlabhq/-/security/vulnerabilities')).to route_to('groups/security/vulnerabilities#index', group_id: 'gitlabhq')
+    end
+
+    it 'shows vulnerability summary' do
+      allow(Group).to receive(:find_by_full_path).with('gitlabhq', any_args).and_return(true)
+
+      expect(get('/groups/gitlabhq/-/security/vulnerabilities/summary')).to route_to('groups/security/vulnerabilities#summary', group_id: 'gitlabhq')
+    end
+
+    it 'shows vulnerability history' do
+      allow(Group).to receive(:find_by_full_path).with('gitlabhq', any_args).and_return(true)
+
+      expect(get('/groups/gitlabhq/-/security/vulnerabilities/history')).to route_to('groups/security/vulnerabilities#history', group_id: 'gitlabhq')
+    end
+  end
 end

@@ -12,6 +12,8 @@ FactoryBot.define do
 
     trait :primary do
       primary true
+      minimum_reverification_interval 7
+
       url do
         uri = URI.parse("http://#{Gitlab.config.gitlab.host}:#{Gitlab.config.gitlab.relative_url_root}")
         uri.port = Gitlab.config.gitlab.port

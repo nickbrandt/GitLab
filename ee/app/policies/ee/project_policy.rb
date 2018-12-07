@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module ProjectPolicy
     extend ActiveSupport::Concern
@@ -203,7 +205,7 @@ module EE
       end
 
       condition(:web_ide_terminal_available) do
-        @subject.feature_available?(:webide_terminal)
+        @subject.feature_available?(:web_ide_terminal)
       end
 
       rule { web_ide_terminal_available & can?(:create_pipeline) & can?(:maintainer_access) }.enable :create_web_ide_terminal

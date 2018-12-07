@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Epics
   class UpdateService < Epics::BaseService
     EPIC_DATE_FIELDS = %I[

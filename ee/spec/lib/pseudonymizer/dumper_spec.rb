@@ -76,7 +76,7 @@ describe Pseudonymizer::Dumper do
 
     it "all whitelisted attributes exist" do
       options.config['tables'].each do |table, table_def|
-        whitelisted = table_def['whitelist']
+        whitelisted = table_def.fetch('whitelist', [])
         existing_columns = ActiveRecord::Base.connection.columns(table.to_sym).map(&:name)
         diff = whitelisted - existing_columns
 
@@ -86,8 +86,8 @@ describe Pseudonymizer::Dumper do
 
     it "all pseudonymized attributes are whitelisted" do
       options.config['tables'].each do |table, table_def|
-        whitelisted = table_def['whitelist']
-        pseudonymized = table_def['pseudo']
+        whitelisted = table_def.fetch('whitelist', [])
+        pseudonymized = table_def.fetch('pseudo', [])
         diff = pseudonymized - whitelisted
 
         expect(diff).to be_empty, "#{table} should whitelist columns #{pseudonymized.inspect}: missing #{diff.inspect}"

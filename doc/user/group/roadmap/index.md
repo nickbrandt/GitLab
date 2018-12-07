@@ -13,6 +13,8 @@ Epics in the view can be sorted by:
 - **Start date**
 - **Due date**
 
+Each option contains a button that can toggle the order between **ascending** and **descending**. The sort option and order will be persisted to be used wherever epics are browsed including the [epics list view](../epics/index.md).
+
 ![roadmap view](img/roadmap_view.png)
 
 ## Timeline duration

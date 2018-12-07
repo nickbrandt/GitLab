@@ -14,6 +14,7 @@ const Api = {
   projectMergeRequestPath: '/api/:version/projects/:id/merge_requests/:mrid',
   projectMergeRequestChangesPath: '/api/:version/projects/:id/merge_requests/:mrid/changes',
   projectMergeRequestVersionsPath: '/api/:version/projects/:id/merge_requests/:mrid/versions',
+  projectRunnersPath: '/api/:version/projects/:id/runners',
   mergeRequestsPath: '/api/:version/merge_requests',
   groupLabelsPath: '/groups/:namespace_path/-/labels',
   ldapGroupsPath: '/api/:version/ldap/:provider/groups.json',
@@ -124,6 +125,15 @@ const Api = {
       .replace(':mrid', mergeRequestId);
 
     return axios.get(url);
+  },
+
+  projectRunners(projectPath, config = {}) {
+    const url = Api.buildUrl(Api.projectRunnersPath).replace(
+      ':id',
+      encodeURIComponent(projectPath),
+    );
+
+    return axios.get(url, config);
   },
 
   mergeRequests(params = {}) {

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module MergeRequestPolicy
     extend ActiveSupport::Concern

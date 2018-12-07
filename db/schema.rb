@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181126153547) do
+ActiveRecord::Schema.define(version: 20181204135932) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -439,6 +439,7 @@ ActiveRecord::Schema.define(version: 20181126153547) do
     t.boolean "protected"
     t.integer "failure_reason"
     t.datetime_with_timezone "scheduled_at"
+    t.string "token_encrypted"
     t.index ["artifacts_expire_at"], name: "index_ci_builds_on_artifacts_expire_at", where: "(artifacts_file <> ''::text)", using: :btree
     t.index ["auto_canceled_by_id"], name: "index_ci_builds_on_auto_canceled_by_id", using: :btree
     t.index ["commit_id", "stage_idx", "created_at"], name: "index_ci_builds_on_commit_id_and_stage_idx_and_created_at", using: :btree
@@ -455,6 +456,7 @@ ActiveRecord::Schema.define(version: 20181126153547) do
     t.index ["stage_id"], name: "index_ci_builds_on_stage_id", using: :btree
     t.index ["status", "type", "runner_id"], name: "index_ci_builds_on_status_and_type_and_runner_id", using: :btree
     t.index ["token"], name: "index_ci_builds_on_token", unique: true, using: :btree
+    t.index ["token_encrypted"], name: "index_ci_builds_on_token_encrypted", unique: true, where: "(token_encrypted IS NOT NULL)", using: :btree
     t.index ["updated_at"], name: "index_ci_builds_on_updated_at", using: :btree
     t.index ["user_id"], name: "index_ci_builds_on_user_id", using: :btree
   end
@@ -1238,6 +1240,7 @@ ActiveRecord::Schema.define(version: 20181126153547) do
     t.string "selective_sync_type"
     t.text "selective_sync_shards"
     t.integer "verification_max_capacity", default: 100, null: false
+    t.integer "minimum_reverification_interval", default: 7, null: false
     t.index ["access_key"], name: "index_geo_nodes_on_access_key", using: :btree
     t.index ["primary"], name: "index_geo_nodes_on_primary", using: :btree
     t.index ["url"], name: "index_geo_nodes_on_url", unique: true, using: :btree
@@ -1803,7 +1806,9 @@ ActiveRecord::Schema.define(version: 20181126153547) do
     t.integer "file_template_project_id"
     t.string "saml_discovery_token"
     t.string "runners_token_encrypted"
+    t.integer "custom_project_templates_group_id"
     t.index ["created_at"], name: "index_namespaces_on_created_at", using: :btree
+    t.index ["custom_project_templates_group_id", "type"], name: "index_namespaces_on_custom_project_templates_group_id_and_type", where: "(custom_project_templates_group_id IS NOT NULL)", using: :btree
     t.index ["file_template_project_id"], name: "index_namespaces_on_file_template_project_id", using: :btree
     t.index ["ldap_sync_last_successful_update_at"], name: "index_namespaces_on_ldap_sync_last_successful_update_at", using: :btree
     t.index ["ldap_sync_last_update_at"], name: "index_namespaces_on_ldap_sync_last_update_at", using: :btree
@@ -2173,8 +2178,12 @@ ActiveRecord::Schema.define(version: 20181126153547) do
     t.datetime_with_timezone "wiki_retry_at"
     t.integer "repository_retry_count"
     t.integer "wiki_retry_count"
+    t.datetime_with_timezone "last_repository_verification_ran_at"
+    t.datetime_with_timezone "last_wiki_verification_ran_at"
     t.index ["last_repository_verification_failure"], name: "idx_repository_states_on_repository_failure_partial", where: "(last_repository_verification_failure IS NOT NULL)", using: :btree
     t.index ["last_wiki_verification_failure"], name: "idx_repository_states_on_wiki_failure_partial", where: "(last_wiki_verification_failure IS NOT NULL)", using: :btree
+    t.index ["project_id", "last_repository_verification_ran_at"], name: "idx_repository_states_on_last_repository_verification_ran_at", where: "((repository_verification_checksum IS NOT NULL) AND (last_repository_verification_failure IS NULL))", using: :btree
+    t.index ["project_id", "last_wiki_verification_ran_at"], name: "idx_repository_states_on_last_wiki_verification_ran_at", where: "((wiki_verification_checksum IS NOT NULL) AND (last_wiki_verification_failure IS NULL))", using: :btree
     t.index ["project_id"], name: "idx_repository_states_outdated_checksums", where: "(((repository_verification_checksum IS NULL) AND (last_repository_verification_failure IS NULL)) OR ((wiki_verification_checksum IS NULL) AND (last_wiki_verification_failure IS NULL)))", using: :btree
     t.index ["project_id"], name: "index_project_repository_states_on_project_id", unique: true, using: :btree
   end
@@ -2274,6 +2283,7 @@ ActiveRecord::Schema.define(version: 20181126153547) do
     t.boolean "merge_requests_author_approval"
     t.bigint "pool_repository_id"
     t.string "runners_token_encrypted"
+    t.string "bfg_object_map"
     t.index ["ci_id"], name: "index_projects_on_ci_id", using: :btree
     t.index ["created_at"], name: "index_projects_on_created_at", using: :btree
     t.index ["creator_id"], name: "index_projects_on_creator_id", using: :btree
@@ -2827,6 +2837,7 @@ ActiveRecord::Schema.define(version: 20181126153547) do
     t.integer "merge_request_notes_filter", limit: 2, default: 0, null: false
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
+    t.string "epics_sort"
     t.index ["user_id"], name: "index_user_preferences_on_user_id", unique: true, using: :btree
   end
 
@@ -3258,6 +3269,7 @@ ActiveRecord::Schema.define(version: 20181126153547) do
   add_foreign_key "milestones", "namespaces", column: "group_id", name: "fk_95650a40d4", on_delete: :cascade
   add_foreign_key "milestones", "projects", name: "fk_9bd0a0c791", on_delete: :cascade
   add_foreign_key "namespace_statistics", "namespaces", on_delete: :cascade
+  add_foreign_key "namespaces", "namespaces", column: "custom_project_templates_group_id", name: "fk_e7a0b20a6b", on_delete: :nullify
   add_foreign_key "namespaces", "plans", name: "fk_fdd12e5b80", on_delete: :nullify
   add_foreign_key "namespaces", "projects", column: "file_template_project_id", name: "fk_319256d87a", on_delete: :nullify
   add_foreign_key "note_diff_files", "notes", column: "diff_note_id", on_delete: :cascade

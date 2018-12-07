@@ -204,4 +204,38 @@ export const receiveRevertDismissalError = ({ commit }, { flashError }) => {
   }
 };
 
+export const setVulnerabilitiesHistoryEndpoint = ({ commit }, endpoint) => {
+  commit(types.SET_VULNERABILITIES_HISTORY_ENDPOINT, endpoint);
+};
+
+export const fetchVulnerabilitiesHistory = ({ state, dispatch }) => {
+  dispatch('requestVulnerabilitiesHistory');
+
+  axios({
+    method: 'GET',
+    url: state.vulnerabilitiesHistoryEndpoint,
+  })
+    .then(response => {
+      const { data } = response;
+      dispatch('receiveVulnerabilitiesHistorySuccess', { data });
+    })
+    .catch(() => {
+      dispatch('receiveVulnerabilitiesHistoryError');
+    });
+};
+
+export const requestVulnerabilitiesHistory = ({ commit }) => {
+  commit(types.REQUEST_VULNERABILITIES_HISTORY);
+};
+
+export const receiveVulnerabilitiesHistorySuccess = ({ commit }, { data }) => {
+  commit(types.RECEIVE_VULNERABILITIES_HISTORY_SUCCESS, data);
+};
+
+export const receiveVulnerabilitiesHistoryError = ({ commit }) => {
+  commit(types.RECEIVE_VULNERABILITIES_HISTORY_ERROR);
+};
+
+// prevent babel-plugin-rewire from generating an invalid default during karma tests
+// This is no longer needed after gitlab-ce#52179 is merged
 export default () => {};

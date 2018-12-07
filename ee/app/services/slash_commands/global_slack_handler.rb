@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SlashCommands
   class GlobalSlackHandler
     attr_reader :project_alias, :params

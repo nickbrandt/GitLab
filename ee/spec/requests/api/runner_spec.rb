@@ -14,12 +14,12 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
     describe 'POST /api/v4/jobs/request' do
       context 'for web-ide job' do
         let(:user) { create(:user) }
-        let(:service) { Ci::CreateWebideTerminalService.new(project, user, ref: 'master').execute }
+        let(:service) { Ci::CreateWebIdeTerminalService.new(project, user, ref: 'master').execute }
         let(:pipeline) { service[:pipeline] }
         let(:build) { pipeline.builds.first }
 
         before do
-          stub_licensed_features(webide_terminal: true)
+          stub_licensed_features(web_ide_terminal: true)
           stub_webide_config_file(config_content)
           project.add_maintainer(user)
 

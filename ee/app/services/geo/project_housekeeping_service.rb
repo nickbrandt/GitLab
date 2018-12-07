@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Geo::ProjectHousekeepingService class
 #
 # Used for git housekeeping in Geo Secondary node

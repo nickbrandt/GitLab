@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   # Base class for event store classes.
   #

@@ -111,7 +111,7 @@ future GitLab releases.**
 | **GITLAB_FEATURES**             | 10.6   | all    | The comma separated list of licensed features available for your instance and plan |
 | **RESTORE_CACHE_ATTEMPTS**      | 8.15   | 1.9    | Number of attempts to restore the cache running a job |
 
-## 9.0 Renaming
+## GitLab 9.0 renaming
 
 To follow conventions of naming across GitLab, and to further move away from the
 `build` term and toward `job` CI variables have been renamed for the 9.0
@@ -140,7 +140,7 @@ future GitLab releases.**
 ## `.gitlab-ci.yml` defined variables
 
 NOTE **Note:**
-This feature requires GitLab Runner 0.5.0 or higher and GitLab CI 7.14 or higher.
+This feature requires GitLab Runner 0.5.0 or higher and GitLab 7.14 or higher.
 
 GitLab CI allows you to add to `.gitlab-ci.yml` variables that are set in the
 build environment. The variables are hence saved in the repository, and they
@@ -179,8 +179,7 @@ script:
 
 ## Variables
 
-NOTE: **Note:**
-Group-level variables were added in GitLab 9.4.
+> Group-level variables were introduced in GitLab 9.4.
 
 CAUTION: **Important:**
 Be aware that variables are not masked, and their values can be shown
@@ -209,8 +208,7 @@ Once you set them, they will be available for all subsequent pipelines. You can 
 
 ### Protected variables
 
->**Notes:**
-This feature requires GitLab 9.3 or higher.
+> Introduced in GitLab 9.3.
 
 Variables could be protected. Whenever a variable is
 protected, it would only be securely passed to pipelines running on the
@@ -225,8 +223,7 @@ Once you set them, they will be available for all subsequent pipelines.
 
 ### Limiting environment scopes of variables **[PREMIUM]**
 
->**Notes:**
-[Introduced][ee-2112] in [GitLab Premium][premium] 9.4.
+> [Introduced][ee-2112] in [GitLab Premium](https://about.gitlab.com/pricing/) 9.4.
 
 You can limit the environment scope of a variable by
 [defining which environments][envs] it can be available for.
@@ -249,8 +246,7 @@ Variables can be specified for a single pipeline run when a [manual pipeline](..
 
 ## Deployment variables
 
-NOTE: **Note:**
-This feature requires GitLab CI 8.15 or higher.
+> Introduced in GitLab 8.15.
 
 [Project services](../../user/project/integrations/project_services.md) that are
 responsible for deployment configuration may define their own variables that
@@ -511,7 +507,7 @@ export CI_REGISTRY_PASSWORD="longalfanumstring"
 
 ## Variables expressions
 
-> Variables expressions were added in GitLab 10.7.
+> Introduced in GitLab 10.7.
 
 It is possible to use variables expressions with only / except policies in
 `.gitlab-ci.yml`. By using this approach you can limit what jobs are going to
@@ -596,7 +592,6 @@ Below you can find supported syntax reference:
     `/pattern/i` to make a pattern case-insensitive.
 
 [ee-2112]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/2112
-[premium]: https://about.gitlab.com/pricing/ "Available only in GitLab Premium"
 [ce-13784]: https://gitlab.com/gitlab-org/gitlab-ce/issues/13784 "Simple protection of CI variables"
 [envs]: ../environments.md
 [protected branches]: ../../user/project/protected_branches.md

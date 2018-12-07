@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   class RepositoryDeletedEventStore < EventStore
     self.event_type = :repository_deleted_event

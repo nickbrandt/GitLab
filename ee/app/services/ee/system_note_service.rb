@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # SystemNoteService
 #
 # Used for creating system notes (e.g., when a user references a merge request

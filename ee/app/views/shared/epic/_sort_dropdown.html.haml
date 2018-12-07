@@ -1,12 +1,14 @@
-- sorted_by = sort_options_hash[@sort]
+- sorted_by = epics_sort_options_hash[@sort]
 
 .dropdown.inline.prepend-left-10
-  %button.dropdown-toggle{ type: 'button', data: { toggle: 'dropdown' } }
-    = sorted_by
-    = icon('chevron-down')
-  %ul.dropdown-menu.dropdown-menu-right.dropdown-menu-selectable.dropdown-menu-sort
-    %li
-      = sortable_item(sort_title_created_date,     page_filter_path(sort: sort_value_created_date,     label: true), sorted_by)
-      = sortable_item(sort_title_recently_updated, page_filter_path(sort: sort_value_recently_updated, label: true), sorted_by)
-      = sortable_item(sort_title_start_date,       page_filter_path(sort: sort_value_start_date, label: true), sorted_by)
-      = sortable_item(sort_title_end_date,         page_filter_path(sort: sort_value_end_date, label: true), sorted_by)
+  .btn-group
+    %button.dropdown-toggle{ type: 'button', data: { toggle: 'dropdown' } }
+      = sorted_by
+      = icon('chevron-down')
+    %ul.dropdown-menu.dropdown-menu-right.dropdown-menu-selectable.dropdown-menu-sort
+      %li
+        = sortable_item(sort_title_created_date, page_filter_path(sort: sort_value_recently_created, label: true), sorted_by)
+        = sortable_item(sort_title_recently_updated, page_filter_path(sort: sort_value_recently_updated, label: true), sorted_by)
+        = sortable_item(sort_title_start_date, page_filter_path(sort: sort_value_start_date_soon, label: true), sorted_by)
+        = sortable_item(sort_title_end_date, page_filter_path(sort: sort_value_end_date, label: true), sorted_by)
+    = sort_order_button(@sort)

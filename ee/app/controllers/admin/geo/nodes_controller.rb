@@ -18,7 +18,7 @@ class Admin::Geo::NodesController < Admin::ApplicationController
   # rubocop: enable CodeReuse/ActiveRecord
 
   def create
-    @node = Geo::NodeCreateService.new(geo_node_params).execute
+    @node = ::Geo::NodeCreateService.new(geo_node_params).execute
 
     if @node.persisted?
       redirect_to admin_geo_nodes_path, notice: 'Node was successfully created.'
@@ -34,7 +34,7 @@ class Admin::Geo::NodesController < Admin::ApplicationController
   end
 
   def update
-    if Geo::NodeUpdateService.new(@node, geo_node_params).execute
+    if ::Geo::NodeUpdateService.new(@node, geo_node_params).execute
       redirect_to admin_geo_nodes_path, notice: 'Node was successfully updated.'
     else
       render :edit
@@ -52,7 +52,8 @@ class Admin::Geo::NodesController < Admin::ApplicationController
       :namespace_ids,
       :repos_max_capacity,
       :files_max_capacity,
-      :verification_max_capacity
+      :verification_max_capacity,
+      :minimum_reverification_interval
     )
   end
 

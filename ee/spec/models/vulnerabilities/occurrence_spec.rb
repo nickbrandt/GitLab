@@ -81,4 +81,48 @@ describe Vulnerabilities::Occurrence do
       end
     end
   end
+
+  describe '.count_by_day_and_severity' do
+    let(:project) { create(:project) }
+    let(:date_1) { Time.zone.parse('2018-11-10') }
+    let(:date_2) { Time.zone.parse('2018-11-12') }
+
+    before do
+      travel_to(date_1) do
+        pipeline = create(:ci_pipeline, :success, project: project)
+
+        create_list(:vulnerabilities_occurrence, 2,
+          pipelines: [pipeline], project: project, report_type: :sast, severity: :high)
+      end
+
+      travel_to(date_2) do
+        pipeline = create(:ci_pipeline, :success, project: project)
+
+        create_list(:vulnerabilities_occurrence, 2,
+          pipelines: [pipeline], project: project, report_type: :dependency_scanning, severity: :low)
+
+        create_list(:vulnerabilities_occurrence, 1,
+          pipelines: [pipeline], project: project, report_type: :dast, severity: :medium)
+
+        create_list(:vulnerabilities_occurrence, 1,
+          pipelines: [pipeline], project: project, report_type: :dast, severity: :low)
+      end
+    end
+
+    subject do
+      travel_to(Time.zone.parse('2018-11-15')) do
+        described_class.count_by_day_and_severity(3.days)
+      end
+    end
+
+    it 'returns expected counts for occurrences within given period' do
+      first, second = subject
+      expect(first.day).to eq(date_2)
+      expect(first.severity).to eq('low')
+      expect(first.count).to eq(3)
+      expect(second.day).to eq(date_2)
+      expect(second.severity).to eq('medium')
+      expect(second.count).to eq(1)
+    end
+  end
 end

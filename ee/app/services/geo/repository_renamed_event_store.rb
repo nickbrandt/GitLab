@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Geo
   class RepositoryRenamedEventStore < EventStore
     self.event_type = :repository_renamed_event

@@ -239,6 +239,7 @@ class Project < ActiveRecord::Base
   has_one :cluster_project, class_name: 'Clusters::Project'
   has_many :clusters, through: :cluster_project, class_name: 'Clusters::Cluster'
   has_many :cluster_ingresses, through: :clusters, source: :application_ingress, class_name: 'Clusters::Applications::Ingress'
+  has_many :kubernetes_namespaces, class_name: 'Clusters::KubernetesNamespace'
 
   has_many :prometheus_metrics
 
@@ -248,7 +249,17 @@ class Project < ActiveRecord::Base
   has_many :container_repositories, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
 
   has_many :commit_statuses
-  has_many :pipelines, class_name: 'Ci::Pipeline', inverse_of: :project
+  # The relation :all_pipelines is intented to be used when we want to get the
+  # whole list of pipelines associated to the project
+  has_many :all_pipelines, class_name: 'Ci::Pipeline', inverse_of: :project
+  # The relation :ci_pipelines is intented to be used when we want to get only
+  # those pipeline which are directly related to CI. There are
+  # other pipelines, like webide ones, that we won't retrieve
+  # if we use this relation.
+  has_many :ci_pipelines,
+          -> { Feature.enabled?(:pipeline_ci_sources_only, default_enabled: true) ? ci_sources : all },
+          class_name: 'Ci::Pipeline',
+          inverse_of: :project
   has_many :stages, class_name: 'Ci::Stage', inverse_of: :project
 
   # Ci::Build objects store data on the file system such as artifact files and
@@ -291,6 +302,8 @@ class Project < ActiveRecord::Base
   delegate :add_guest, :add_reporter, :add_developer, :add_maintainer, :add_role, to: :team
   delegate :add_master, to: :team # @deprecated
   delegate :group_runners_enabled, :group_runners_enabled=, :group_runners_enabled?, to: :ci_cd_settings
+  delegate :group_clusters_enabled?, to: :group, allow_nil: true
+  delegate :root_ancestor, to: :namespace, allow_nil: true
 
   # Validations
   validates :creator, presence: true, on: :create
@@ -327,6 +340,7 @@ class Project < ActiveRecord::Base
     presence: true,
     inclusion: { in: ->(_object) { Gitlab.config.repositories.storages.keys } }
   validates :variables, variable_duplicates: { scope: :environment_scope }
+  validates :bfg_object_map, file_size: { maximum: :max_attachment_size }
 
   # Scopes
   scope :pending_delete, -> { where(pending_delete: true) }
@@ -383,15 +397,25 @@ class Project < ActiveRecord::Base
     .where(project_ci_cd_settings: { group_runners_enabled: true })
   end
 
+  scope :missing_kubernetes_namespace, -> (kubernetes_namespaces) do
+    subquery = kubernetes_namespaces.select('1').where('clusters_kubernetes_namespaces.project_id = projects.id')
+
+    where('NOT EXISTS (?)', subquery)
+  end
+
   enum auto_cancel_pending_pipelines: { disabled: 0, enabled: 1 }
 
-  chronic_duration_attr :build_timeout_human_readable, :build_timeout, default: 3600
+  chronic_duration_attr :build_timeout_human_readable, :build_timeout,
+    default: 3600, error_message: 'Maximum job timeout has a value which could not be accepted'
 
   validates :build_timeout, allow_nil: true,
                             numericality: { greater_than_or_equal_to: 10.minutes,
                                             less_than: 1.month,
                                             only_integer: true,
                                             message: 'needs to be beetween 10 minutes and 1 month' }
+
+  # Used by Projects::CleanupService to hold a map of rewritten object IDs
+  mount_uploader :bfg_object_map, AttachmentUploader
 
   # Returns a project, if it is not about to be removed.
   #
@@ -546,9 +570,9 @@ class Project < ActiveRecord::Base
 
   # returns all ancestor-groups upto but excluding the given namespace
   # when no namespace is given, all ancestors upto the top are returned
-  def ancestors_upto(top = nil)
+  def ancestors_upto(top = nil, hierarchy_order: nil)
     Gitlab::GroupHierarchy.new(Group.where(id: namespace_id))
-      .base_and_ancestors(upto: top)
+      .base_and_ancestors(upto: top, hierarchy_order: hierarchy_order)
   end
 
   def lfs_enabled?
@@ -621,7 +645,7 @@ class Project < ActiveRecord::Base
 
   # ref can't be HEAD, can only be branch/tag name or SHA
   def latest_successful_builds_for(ref = default_branch)
-    latest_pipeline = pipelines.latest_successful_for(ref)
+    latest_pipeline = ci_pipelines.latest_successful_for(ref)
 
     if latest_pipeline
       latest_pipeline.builds.latest.with_artifacts_archive
@@ -1061,6 +1085,12 @@ class Project < ActiveRecord::Base
     path
   end
 
+  def all_clusters
+    group_clusters = Clusters::Cluster.joins(:groups).where(cluster_groups: { group_id: ancestors_upto } )
+
+    Clusters::Cluster.from_union([clusters, group_clusters])
+  end
+
   def items_for(entity)
     case entity
     when 'issue' then
@@ -1376,7 +1406,7 @@ class Project < ActiveRecord::Base
 
     return unless sha
 
-    pipelines.order(id: :desc).find_by(sha: sha, ref: ref)
+    ci_pipelines.order(id: :desc).find_by(sha: sha, ref: ref)
   end
 
   def latest_successful_pipeline_for_default_branch
@@ -1385,12 +1415,12 @@ class Project < ActiveRecord::Base
     end
 
     @latest_successful_pipeline_for_default_branch =
-      pipelines.latest_successful_for(default_branch)
+      ci_pipelines.latest_successful_for(default_branch)
   end
 
   def latest_successful_pipeline_for(ref = nil)
     if ref && ref != default_branch
-      pipelines.latest_successful_for(ref)
+      ci_pipelines.latest_successful_for(ref)
     else
       latest_successful_pipeline_for_default_branch
     end
@@ -1944,6 +1974,10 @@ class Project < ActiveRecord::Base
 
   def snippets_visible?(user = nil)
     Ability.allowed?(user, :read_project_snippet, self)
+  end
+
+  def max_attachment_size
+    Gitlab::CurrentSettings.max_attachment_size.megabytes.to_i
   end
 
   private

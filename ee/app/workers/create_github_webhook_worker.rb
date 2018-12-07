@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateGithubWebhookWorker
   include ApplicationWorker
   include GrapePathHelpers::NamedRouteMatcher

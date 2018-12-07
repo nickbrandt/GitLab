@@ -16,7 +16,7 @@ class RelatedIssuesService {
     return this.relatedIssuesResource.save(
       {},
       {
-        issue_references: newIssueReferences,
+        issuable_references: newIssueReferences,
       },
     );
   }
