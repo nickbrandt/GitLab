@@ -7,15 +7,16 @@ describe ProjectPresenter do
 
   let(:user) { create(:user) }
 
-  describe '#extra_statistics_anchors' do
+  describe '#extra_statistics_buttons' do
     let(:project) { create(:project) }
     let(:pipeline) { create(:ci_pipeline, project: project) }
     let(:presenter) { described_class.new(project, current_user: user) }
 
     let(:security_dashboard_data) do
-      OpenStruct.new(enabled: true,
-                     label: _('Security Dashboard'),
-                     link: project_security_dashboard_path(project))
+      OpenStruct.new(is_link: false,
+                     label: a_string_including('Security Dashboard'),
+                     link: project_security_dashboard_path(project),
+                     class_modifier: 'default')
     end
 
     context 'user is allowed to read security dashboard' do
@@ -24,7 +25,7 @@ describe ProjectPresenter do
       end
 
       it 'has security dashboard link' do
-        expect(presenter.extra_statistics_anchors).to include(security_dashboard_data)
+        expect(presenter.extra_statistics_buttons.find { |button| button[:link] == project_security_dashboard_path(project) }).not_to be_nil
       end
     end
 
@@ -34,7 +35,7 @@ describe ProjectPresenter do
       end
 
       it 'has no security dashboard link' do
-        expect(presenter.extra_statistics_anchors).not_to include(security_dashboard_data)
+        expect(presenter.extra_statistics_buttons.find { |button| button[:link] == project_security_dashboard_path(project) }).to be_nil
       end
     end
   end
