@@ -17,6 +17,11 @@ your account with Google Kubernetes Engine (GKE) so that you can [create new
 clusters](#adding-and-creating-a-new-gke-cluster-via-gitlab) from within GitLab,
 or provide the credentials to an [existing Kubernetes cluster](#adding-an-existing-kubernetes-cluster).
 
+NOTE: **Note:**
+From [GitLab 11.6](https://gitlab.com/gitlab-org/gitlab-ce/issues/34758) you
+can also associate a Kubernetes cluster to your groups. Learn more about
+[group Kubernetes clusters](../../group/clusters/index.md).
+
 ## Adding and creating a new GKE cluster via GitLab
 
 TIP: **Tip:**
@@ -246,16 +251,18 @@ install it manually.
 
 ## Installing applications
 
-GitLab provides a one-click install for various applications which will be
-added directly to your configured cluster. Those applications are needed for
-[Review Apps](../../../ci/review_apps/index.md) and [deployments](../../../ci/environments.md).
+GitLab provides a one-click install for various applications which can
+be added directly to your configured cluster. Those applications are
+needed for [Review Apps](../../../ci/review_apps/index.md) and
+[deployments](../../../ci/environments.md).
 
 NOTE: **Note:**
 With the exception of Knative, the applications will be installed in a dedicated namespace called
 `gitlab-managed-apps`. In case you have added an existing Kubernetes cluster
 with Tiller already installed, you should be careful as GitLab cannot
-detect it. By installing it via the applications will result into having it
-twice, which can lead to confusion during deployments.
+detect it. In this event, installing Tiller via the applications will
+result in the cluster having it twice. This can lead to confusion during
+deployments.
 
 | Application | GitLab version | Description | Helm Chart |
 | ----------- | :------------: | ----------- | --------------- |
@@ -362,15 +369,11 @@ differentiate the new cluster with the rest.
 
 ## Setting the environment scope **[PREMIUM]**
 
-NOTE: **Note:**
-This is only available for [GitLab Premium][ee] where you can add more than
-one Kubernetes cluster.
-
-When adding more than one Kubernetes clusters to your project, you need to
-differentiate them with an environment scope. The environment scope associates
-clusters and [environments](../../../ci/environments.md) in an 1:1 relationship
-similar to how the
-[environment-specific variables](../../../ci/variables/README.md#limiting-environment-scopes-of-variables)
+When adding more than one Kubernetes clusters to your project, you need
+to differentiate them with an environment scope. The environment scope
+associates clusters with [environments](../../../ci/environments.md)
+similar to how the [environment-specific
+variables](../../../ci/variables/README.md#limiting-environment-scopes-of-variables)
 work.
 
 The default environment scope is `*`, which means all jobs, regardless of their
@@ -416,9 +419,9 @@ deploy to production:
 
 The result will then be:
 
-* The development cluster will be used for the "test" job.
-* The staging cluster will be used for the "deploy to staging" job.
-* The production cluster will be used for the "deploy to production" job.
+- The development cluster will be used for the "test" job.
+- The staging cluster will be used for the "deploy to staging" job.
+- The production cluster will be used for the "deploy to production" job.
 
 ## Deployment variables
 
