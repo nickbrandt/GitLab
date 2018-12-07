@@ -51,3 +51,5 @@ class UserPreference < ActiveRecord::Base
     "#{field_key}_notes_filter"
   end
 end
+
+UserPreference.prepend(EE::UserPreference)
