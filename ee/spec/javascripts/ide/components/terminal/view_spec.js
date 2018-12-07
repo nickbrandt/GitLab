@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import { TEST_HOST } from 'spec/test_constants';
 import TerminalEmptyState from 'ee/ide/components/terminal/empty_state.vue';
 import TerminalView from 'ee/ide/components/terminal/view.vue';
+import TerminalSession from 'ee/ide/components/terminal/session.vue';
 
 const TEST_HELP_PATH = `${TEST_HOST}/help`;
 const TEST_SVG_PATH = `${TEST_HOST}/illustration.svg`;
@@ -42,6 +43,7 @@ describe('EE IDE TerminalView', () => {
 
     actions = {
       hideSplash: jasmine.createSpy('hideSplash'),
+      startSession: jasmine.createSpy('startSession'),
     };
 
     getters = {
@@ -67,13 +69,15 @@ describe('EE IDE TerminalView', () => {
     });
   });
 
-  it('hides splash when started', () => {
+  it('hides splash and starts, when started', () => {
     factory();
 
+    expect(actions.startSession).not.toHaveBeenCalled();
     expect(actions.hideSplash).not.toHaveBeenCalled();
 
     wrapper.find(TerminalEmptyState).vm.$emit('start');
 
+    expect(actions.startSession).toHaveBeenCalled();
     expect(actions.hideSplash).toHaveBeenCalled();
   });
 
@@ -82,6 +86,6 @@ describe('EE IDE TerminalView', () => {
     factory();
 
     expect(wrapper.find(TerminalEmptyState).exists()).toBe(false);
-    expect(wrapper.text()).toContain('Web Terminal');
+    expect(wrapper.find(TerminalSession).exists()).toBe(true);
   });
 });

@@ -3,6 +3,7 @@ import httpStatus from '~/lib/utils/http_status';
 import * as types from '../mutation_types';
 import * as messages from '../messages';
 import { CHECK_CONFIG, CHECK_RUNNERS, RETRY_RUNNERS_INTERVAL } from '../../../../constants';
+import * as terminalService from '../../../../services/terminals';
 
 export const requestConfigCheck = ({ commit }) => {
   commit(types.REQUEST_CHECK, CHECK_CONFIG);
@@ -20,15 +21,18 @@ export const receiveConfigCheckError = ({ commit, state }, e) => {
   const isVisible = status !== httpStatus.FORBIDDEN && status !== httpStatus.NOT_FOUND;
   commit(types.SET_VISIBLE, isVisible);
 
-  const message = messages.configCheckError(status, paths.ciYamlHelpPath);
+  const message = messages.configCheckError(status, paths.webTerminalConfigHelpPath);
   commit(types.RECEIVE_CHECK_ERROR, { type: CHECK_CONFIG, message });
 };
 
-export const fetchConfigCheck = ({ dispatch }) => {
+export const fetchConfigCheck = ({ dispatch, rootState, rootGetters }) => {
   dispatch('requestConfigCheck');
 
-  // This will use a real endpoint in https://gitlab.com/gitlab-org/gitlab-ee/issues/5426
-  Promise.resolve({})
+  const { currentBranchId } = rootState;
+  const { currentProject } = rootGetters;
+
+  terminalService
+    .checkConfig(currentProject.path_with_namespace, currentBranchId)
     .then(() => {
       dispatch('receiveConfigCheckSuccess');
     })
@@ -49,7 +53,7 @@ export const receiveRunnersCheckSuccess = ({ commit, dispatch, state }, data) =>
 
     commit(types.RECEIVE_CHECK_ERROR, {
       type: CHECK_RUNNERS,
-      message: messages.runnersCheckEmpty(paths.ciRunnersHelpPath),
+      message: messages.runnersCheckEmpty(paths.webTerminalRunnersHelpPath),
     });
 
     dispatch('retryRunnersCheck');

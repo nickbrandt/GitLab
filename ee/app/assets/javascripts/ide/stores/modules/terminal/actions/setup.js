@@ -1,11 +1,9 @@
 import * as types from '../mutation_types';
 
-// This will be used in https://gitlab.com/gitlab-org/gitlab-ee/issues/5426
-// export const init = ({ dispatch }) => {
-//   dispatch('fetchConfigCheck');
-//   dispatch('fetchRunnersCheck');
-// };
-export const init = () => {};
+export const init = ({ dispatch }) => {
+  dispatch('fetchConfigCheck');
+  dispatch('fetchRunnersCheck');
+};
 
 export const hideSplash = ({ commit }) => {
   commit(types.HIDE_SPLASH);

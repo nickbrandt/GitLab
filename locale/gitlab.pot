@@ -776,6 +776,15 @@ msgstr ""
 msgid "An unexpected error occurred while checking the project runners."
 msgstr ""
 
+msgid "An unexpected error occurred while communicating with the Web Terminal."
+msgstr ""
+
+msgid "An unexpected error occurred while starting the Web Terminal."
+msgstr ""
+
+msgid "An unexpected error occurred while stopping the Web Terminal."
+msgstr ""
+
 msgid "Analytics"
 msgstr ""
 
@@ -2291,7 +2300,7 @@ msgstr ""
 msgid "Confidentiality"
 msgstr ""
 
-msgid "Configure GitLab runners to start using Web Terminal. %{helpStart}Learn more.%{helpEnd}"
+msgid "Configure GitLab runners to start using the Web Terminal. %{helpStart}Learn more.%{helpEnd}"
 msgstr ""
 
 msgid "Configure Gitaly timeouts."
@@ -7242,6 +7251,9 @@ msgstr ""
 msgid "Response metrics (NGINX)"
 msgstr ""
 
+msgid "Restart Terminal"
+msgstr ""
+
 msgid "Resume"
 msgstr ""
 
@@ -8101,6 +8113,9 @@ msgstr ""
 msgid "Started"
 msgstr ""
 
+msgid "Starting..."
+msgstr ""
+
 msgid "Starts at (UTC)"
 msgstr ""
 
@@ -8108,6 +8123,9 @@ msgid "State your message to activate"
 msgstr ""
 
 msgid "Status"
+msgstr ""
+
+msgid "Stop Terminal"
 msgstr ""
 
 msgid "Stop environment"
@@ -8123,6 +8141,9 @@ msgid "Stopped"
 msgstr ""
 
 msgid "Stopping this environment is currently not possible as a deployment is in progress"
+msgstr ""
+
+msgid "Stopping..."
 msgstr ""
 
 msgid "Storage"

@@ -8,9 +8,9 @@ module EE
     def ide_data
       super.merge({
         "ee-web-terminal-svg-path" => image_path('illustrations/web-ide_promotion.svg'),
-        "ee-ci-yaml-help-path" => help_page_path('ci/yaml/README.md'),
-        "ee-ci-runners-help-path" => help_page_path('ci/runners/README.md'),
-        "ee-web-terminal-help-path" => help_page_path('user/project/web_ide/index.md', anchor: 'client-side-evaluation')
+        "ee-web-terminal-help-path" => help_page_path('user/project/web_ide/index.md', anchor: 'interactive-terminal-ultimate'),
+        "ee-web-terminal-config-help-path" => help_page_path('user/project/web_ide/index.md', anchor: 'web-ide-configuration-file'),
+        "ee-web-terminal-runners-help-path" => help_page_path('user/project/web_ide/index.md', anchor: 'runner-configuration-ultimate-only')
       })
     end
   end
