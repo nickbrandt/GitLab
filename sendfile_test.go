@@ -1,17 +1,17 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"io/ioutil"
+	"mime"
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"os/exec"
 	"path"
 	"testing"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDeniedLfsDownload(t *testing.T) {
@@ -37,9 +37,8 @@ func allowedXSendfileDownload(t *testing.T, contentFilename string, filePath str
 	// Prepare test server and backend
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Println("UPSTREAM", r.Method, r.URL)
-		if xSendfileType := r.Header.Get("X-Sendfile-Type"); xSendfileType != "X-Sendfile" {
-			t.Fatalf(`X-Sendfile-Type want "X-Sendfile" got %q`, xSendfileType)
-		}
+		require.Equal(t, "X-Sendfile", r.Header.Get("X-Sendfile-Type"))
+
 		w.Header().Set("X-Sendfile", contentPath)
 		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, contentFilename))
 		w.Header().Set("Content-Type", fmt.Sprintf(`application/octet-stream`))
@@ -49,25 +48,20 @@ func allowedXSendfileDownload(t *testing.T, contentFilename string, filePath str
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
 
-	if err := os.MkdirAll(cacheDir, 0755); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, os.MkdirAll(cacheDir, 0755))
 	contentBytes := []byte("content")
-	if err := ioutil.WriteFile(contentPath, contentBytes, 0644); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, ioutil.WriteFile(contentPath, contentBytes, 0644))
 
-	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("%s/%s", ws.URL, filePath))
-	downloadCmd.Dir = scratchDir
-	runOrFail(t, downloadCmd)
+	resp, err := http.Get(fmt.Sprintf("%s/%s", ws.URL, filePath))
+	require.NoError(t, err)
 
-	actual, err := ioutil.ReadFile(path.Join(scratchDir, contentFilename))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !bytes.Equal(actual, contentBytes) {
-		t.Fatal("Unexpected file contents in download")
-	}
+	requireAttachmentName(t, resp, contentFilename)
+
+	actual, err := ioutil.ReadAll(resp.Body)
+	require.NoError(t, err)
+	require.NoError(t, resp.Body.Close())
+
+	require.Equal(t, actual, contentBytes, "response body")
 }
 
 func deniedXSendfileDownload(t *testing.T, contentFilename string, filePath string) {
@@ -76,9 +70,8 @@ func deniedXSendfileDownload(t *testing.T, contentFilename string, filePath stri
 	// Prepare test server and backend
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Println("UPSTREAM", r.Method, r.URL)
-		if xSendfileType := r.Header.Get("X-Sendfile-Type"); xSendfileType != "X-Sendfile" {
-			t.Fatalf(`X-Sendfile-Type want "X-Sendfile" got %q`, xSendfileType)
-		}
+		require.Equal(t, "X-Sendfile", r.Header.Get("X-Sendfile-Type"))
+
 		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, contentFilename))
 		w.WriteHeader(200)
 		fmt.Fprint(w, "Denied")
@@ -87,15 +80,22 @@ func deniedXSendfileDownload(t *testing.T, contentFilename string, filePath stri
 	ws := startWorkhorseServer(ts.URL)
 	defer ws.Close()
 
-	downloadCmd := exec.Command("curl", "-J", "-O", fmt.Sprintf("%s/%s", ws.URL, filePath))
-	downloadCmd.Dir = scratchDir
-	runOrFail(t, downloadCmd)
+	resp, err := http.Get(fmt.Sprintf("%s/%s", ws.URL, filePath))
+	require.NoError(t, err)
 
-	actual, err := ioutil.ReadFile(path.Join(scratchDir, contentFilename))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !bytes.Equal(actual, []byte("Denied")) {
-		t.Fatal("Unexpected file contents in download")
-	}
+	requireAttachmentName(t, resp, contentFilename)
+
+	actual, err := ioutil.ReadAll(resp.Body)
+	require.NoError(t, err, "read body")
+	require.NoError(t, resp.Body.Close())
+
+	require.Equal(t, []byte("Denied"), actual, "response body")
+}
+
+func requireAttachmentName(t *testing.T, resp *http.Response, filename string) {
+	mediaType, params, err := mime.ParseMediaType(resp.Header.Get("Content-Disposition"))
+	require.NoError(t, err)
+
+	require.Equal(t, "attachment", mediaType)
+	require.Equal(t, filename, params["filename"], "filename")
 }
