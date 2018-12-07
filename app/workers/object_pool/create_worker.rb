@@ -37,8 +37,6 @@ module ObjectPool
       "object_pool:create:#{pool.id}"
     end
 
-    private
-
     def lease_timeout
       1.hour
     end
