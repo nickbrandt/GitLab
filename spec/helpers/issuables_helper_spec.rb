@@ -204,6 +204,7 @@ describe IssuablesHelper do
 
       expected_data = {
         endpoint: "/groups/#{@group.full_path}/-/epics/#{epic.iid}",
+        epicLinksEndpoint: "/groups/#{@group.full_path}/-/epics/#{epic.iid}/links",
         updateEndpoint: "/groups/#{@group.full_path}/-/epics/#{epic.iid}.json",
         issueLinksEndpoint: "/groups/#{@group.full_path}/-/epics/#{epic.iid}/issues",
         canUpdate: true,
