@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'sidekiq/testing/inline'
+require 'sidekiq/testing'
 
 # If Sidekiq::Testing.inline! is used, SQL transactions done inside
 # Sidekiq worker are included in the SQL query limit (in a real
