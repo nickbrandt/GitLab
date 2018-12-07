@@ -20,7 +20,7 @@
 
           .form-group.has-feedback
             = label_tag :url, _('Git repository URL'), class: 'label-light'
-            = text_field_tag :url, nil, class: 'form-control js-mirror-url js-repo-url qa-mirror-repository-url-input', placeholder: _('Input your repository URL'), required: true, pattern: "(#{protocols}):\/\/.+", title: 'A valid repository URL is required'
+            = text_field_tag :url, nil, class: 'form-control js-mirror-url js-repo-url qa-mirror-repository-url-input', placeholder: _('Input your repository URL'), required: true, pattern: "(#{protocols}):\/\/.+"
 
           = render 'projects/mirrors/instructions'
 
