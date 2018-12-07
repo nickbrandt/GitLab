@@ -37,15 +37,12 @@ module API
       end
 
       def process_results(results)
-<<<<<<< HEAD
         return [] if results.empty?
 
         if results.is_a?(Elasticsearch::Model::Response::Response)
           return paginate(results).map { |blob| Gitlab::Elastic::SearchResults.parse_search_result(blob) }
         end
 
-=======
->>>>>>> ec6b20776e20948e617e81eff8e9362bf739c591
         paginate(results)
       end
 
