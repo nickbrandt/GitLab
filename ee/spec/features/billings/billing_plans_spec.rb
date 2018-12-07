@@ -141,12 +141,14 @@ describe 'Billing plan pages', :feature do
   end
 
   context 'on sub-group', :nested_groups do
+    let(:user2) { create(:user) }
+    let(:user3) { create(:user) }
     let(:group) { create(:group, plan: :bronze_plan) }
     let!(:group_member) { create(:group_member, :maintainer, group: group, user: user) }
     let(:subgroup1) { create(:group, parent: group, plan: :silver_plan) }
-    let!(:subgroup1_member) { create(:group_member, :owner, group: subgroup1, user: user) }
+    let!(:subgroup1_member) { create(:group_member, :owner, group: subgroup1, user: user2) }
     let(:subgroup2) { create(:group, parent: subgroup1) }
-    let!(:subgroup2_member) { create(:group_member, :owner, group: subgroup2, user: user) }
+    let!(:subgroup2_member) { create(:group_member, :owner, group: subgroup2, user: user3) }
 
     before do
       visit group_billings_path(subgroup2)
