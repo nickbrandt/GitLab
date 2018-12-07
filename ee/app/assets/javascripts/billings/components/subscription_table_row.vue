@@ -1,0 +1,71 @@
+<script>
+import { dateInWords } from '~/lib/utils/datetime_utility';
+import Icon from '~/vue_shared/components/icon.vue';
+import Popover from '~/vue_shared/components/help_popover.vue';
+
+export default {
+  name: 'SubscriptionTableRow',
+  components: {
+    Icon,
+    Popover,
+  },
+  props: {
+    header: {
+      type: Object,
+      required: true,
+    },
+    columns: {
+      type: Array,
+      required: true,
+    },
+    isFreePlan: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+  },
+  methods: {
+    getPopoverOptions(col) {
+      const defaults = {
+        placement: 'bottom',
+      };
+      return { ...defaults, ...col.popover };
+    },
+    getDisplayValue(col) {
+      if (col.isDate && col.value) {
+        return dateInWords(new Date(col.value));
+      }
+
+      // let's display '-' instead of 0 for the 'Free' plan
+      if (this.isFreePlan && col.value === 0) {
+        return ' - ';
+      }
+
+      return typeof col.value !== 'undefined' && col.value !== null ? col.value : ' - ';
+    },
+  },
+};
+</script>
+
+<template>
+  <div class="grid-row d-flex flex-grow-1 flex-column flex-sm-column flex-md-column flex-lg-row">
+    <div class="grid-cell header-cell">
+      <span class="icon-wrapper">
+        <icon v-if="header.icon" class="append-right-8" :name="header.icon" aria-hidden="true" />
+        {{ header.title }}
+      </span>
+    </div>
+    <template v-for="(col, i) in columns">
+      <div :key="`subscription-col-${i}`" class="grid-cell" :class="[col.hidden ? 'no-value' : '']">
+        <span class="property-label"> {{ col.label }} </span>
+        <popover v-if="col.popover" :options="getPopoverOptions(col)" />
+        <p
+          class="property-value prepend-top-5 append-bottom-0"
+          :class="[col.colClass ? col.colClass : '']"
+        >
+          {{ getDisplayValue(col) }}
+        </p>
+      </div>
+    </template>
+  </div>
+</template>

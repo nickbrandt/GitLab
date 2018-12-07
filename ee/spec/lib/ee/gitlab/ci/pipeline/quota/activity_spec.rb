@@ -1,10 +1,15 @@
 require 'spec_helper'
 
 describe EE::Gitlab::Ci::Pipeline::Quota::Activity do
-  set(:namespace) { create(:namespace, plan: :gold_plan) }
+  set(:namespace) { create(:namespace) }
+  set(:gold_plan) { create(:gold_plan) }
   set(:project) { create(:project, namespace: namespace) }
 
   let(:limit) { described_class.new(namespace, project) }
+
+  before do
+    create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
+  end
 
   shared_context 'pipeline activity limit exceeded' do
     before do
@@ -12,20 +17,20 @@ describe EE::Gitlab::Ci::Pipeline::Quota::Activity do
       create(:ci_pipeline, project: project, status: 'pending')
       create(:ci_pipeline, project: project, status: 'running')
 
-      namespace.plan.update_column(:active_pipelines_limit, 1)
+      gold_plan.update_column(:active_pipelines_limit, 1)
     end
   end
 
   shared_context 'pipeline activity limit not exceeded' do
     before do
-      namespace.plan.update_column(:active_pipelines_limit, 2)
+      gold_plan.update_column(:active_pipelines_limit, 2)
     end
   end
 
   describe '#enabled?' do
     context 'when limit is enabled in plan' do
       before do
-        namespace.plan.update_column(:active_pipelines_limit, 10)
+        gold_plan.update_column(:active_pipelines_limit, 10)
       end
 
       it 'is enabled' do
@@ -35,7 +40,7 @@ describe EE::Gitlab::Ci::Pipeline::Quota::Activity do
 
     context 'when limit is not enabled' do
       before do
-        namespace.plan.update_column(:active_pipelines_limit, 0)
+        gold_plan.update_column(:active_pipelines_limit, 0)
       end
 
       it 'is not enabled' do

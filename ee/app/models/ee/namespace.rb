@@ -31,6 +31,7 @@ module EE
       belongs_to :plan
 
       has_one :namespace_statistics
+      has_one :gitlab_subscription
 
       scope :with_plan, -> { where.not(plan_id: nil) }
 
@@ -42,6 +43,8 @@ module EE
 
       validate :validate_plan_name
       validate :validate_shared_runner_minutes_support
+
+      delegate :trial?, :trial_ends_on, to: :gitlab_subscription, allow_nil: true
 
       before_create :sync_membership_lock_with_parent
 
@@ -104,11 +107,10 @@ module EE
       available_features[feature]
     end
 
-    # The main difference between the "plan" column and this method is that "plan"
-    # returns nil / "" when it has no plan. Having no plan means it's a "free" plan.
-    #
     def actual_plan
-      self.plan || Plan.find_by(name: FREE_PLAN)
+      subscription = find_or_create_subscription
+
+      subscription&.hosted_plan
     end
 
     def actual_plan_name
@@ -185,10 +187,18 @@ module EE
     def plans
       @plans ||=
         if parent_id
-          Plan.where(id: self_and_ancestors.with_plan.reorder(nil).select(:plan_id))
+          Plan.hosted_plans_for_namespaces(self_and_ancestors.select(:id))
         else
-          Array(plan)
+          Plan.hosted_plans_for_namespaces(self)
         end
+    end
+
+    # When a purchasing a GL.com plan for a User namespace
+    # we only charge for a single user.
+    # This method is overwritten in Group where we made the calculation
+    # for Group namespaces.
+    def billable_members_count(_requested_hosted_plan = nil)
+      1
     end
 
     def eligible_for_trial?
@@ -199,7 +209,7 @@ module EE
     end
 
     def trial_active?
-      trial_ends_on.present? && trial_ends_on >= Date.today
+      trial? && trial_ends_on.present? && trial_ends_on >= Date.today
     end
 
     def trial_expired?
@@ -260,6 +270,22 @@ module EE
       return if checked_file_template_project_id.present?
 
       self.file_template_project_id = nil
+    end
+
+    def find_or_create_subscription
+      # Hosted subscriptions are only available for root groups for now.
+      return if parent_id
+
+      gitlab_subscription || generate_subscription
+    end
+
+    def generate_subscription
+      create_gitlab_subscription(
+        plan_code: plan&.name,
+        trial: trial_active?,
+        start_date: created_at,
+        seats: 0
+      )
     end
   end
 end

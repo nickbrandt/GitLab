@@ -280,7 +280,9 @@ describe PushRule do
       end
 
       context 'with GL.com plans' do
-        let(:group) { create(:group, plan: plan) }
+        let(:group) { create(:group) }
+        let(:plan) { :free }
+        let!(:gitlab_subscription) { create(:gitlab_subscription, plan, namespace: group) }
         let(:project) { create(:project, namespace: group) }
         let(:push_rule) { create(:push_rule, project: project) }
 
@@ -290,19 +292,19 @@ describe PushRule do
         end
 
         context 'with a Bronze plan' do
-          let(:plan) { :bronze_plan }
+          let(:plan) { :bronze }
 
           it_behaves_like 'an unavailable push_rule'
         end
 
         context 'with a Silver plan' do
-          let(:plan) { :silver_plan }
+          let(:plan) { :silver }
 
           it_behaves_like 'an available push_rule'
         end
 
         context 'with a Gold plan' do
-          let(:plan) { :gold_plan }
+          let(:plan) { :gold }
 
           it_behaves_like 'an available push_rule'
         end

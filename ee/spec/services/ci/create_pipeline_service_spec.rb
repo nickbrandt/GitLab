@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 describe Ci::CreatePipelineService, '#execute' do
-  set(:namespace) { create(:namespace, plan: :gold_plan) }
+  set(:namespace) { create(:namespace) }
+  set(:gold_plan) { create(:gold_plan) }
   set(:project) { create(:project, :repository, namespace: namespace) }
   set(:user) { create(:user) }
 
@@ -15,6 +16,8 @@ describe Ci::CreatePipelineService, '#execute' do
   end
 
   before do
+    create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
+
     project.add_developer(user)
     stub_ci_pipeline_to_return_yaml_file
   end
@@ -31,7 +34,7 @@ describe Ci::CreatePipelineService, '#execute' do
 
     context 'when pipeline activity limit is exceeded' do
       before do
-        namespace.plan.update_column(:active_pipelines_limit, 2)
+        gold_plan.update_column(:active_pipelines_limit, 2)
 
         create(:ci_pipeline, project: project, status: 'pending')
         create(:ci_pipeline, project: project, status: 'running')
@@ -50,7 +53,7 @@ describe Ci::CreatePipelineService, '#execute' do
 
     context 'when pipeline size limit is exceeded' do
       before do
-        namespace.plan.update_column(:pipeline_size_limit, 2)
+        gold_plan.update_column(:pipeline_size_limit, 2)
       end
 
       it 'drops pipeline without creating jobs' do

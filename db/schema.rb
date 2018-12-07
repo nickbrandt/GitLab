@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181204135932) do
+ActiveRecord::Schema.define(version: 20181206121340) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -1305,6 +1305,21 @@ ActiveRecord::Schema.define(version: 20181204135932) do
     t.string "model_type", null: false
     t.string "uploader", null: false
     t.index ["upload_id"], name: "index_geo_upload_deleted_events_on_upload_id", using: :btree
+  end
+
+  create_table "gitlab_subscriptions", id: :bigserial, force: :cascade do |t|
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.date "start_date"
+    t.date "end_date"
+    t.date "trial_ends_on"
+    t.integer "namespace_id"
+    t.integer "hosted_plan_id"
+    t.integer "max_seats_used", default: 0
+    t.integer "seats", default: 0
+    t.boolean "trial", default: false
+    t.index ["hosted_plan_id"], name: "index_gitlab_subscriptions_on_hosted_plan_id", using: :btree
+    t.index ["namespace_id"], name: "index_gitlab_subscriptions_on_namespace_id", unique: true, using: :btree
   end
 
   create_table "gpg_key_subkeys", force: :cascade do |t|
@@ -3215,6 +3230,8 @@ ActiveRecord::Schema.define(version: 20181204135932) do
   add_foreign_key "geo_repository_renamed_events", "projects", on_delete: :cascade
   add_foreign_key "geo_repository_updated_events", "projects", on_delete: :cascade
   add_foreign_key "geo_reset_checksum_events", "projects", on_delete: :cascade
+  add_foreign_key "gitlab_subscriptions", "namespaces"
+  add_foreign_key "gitlab_subscriptions", "plans", column: "hosted_plan_id", name: "fk_bd0c4019c3", on_delete: :cascade
   add_foreign_key "gpg_key_subkeys", "gpg_keys", on_delete: :cascade
   add_foreign_key "gpg_keys", "users", on_delete: :cascade
   add_foreign_key "gpg_signatures", "gpg_key_subkeys", on_delete: :nullify

@@ -131,8 +131,7 @@ describe Projects::CreateService, '#execute' do
 
         context 'when licensed on a namespace' do
           it 'allows enabling mirrors' do
-            plan = create(:gold_plan)
-            user.namespace.update!(plan: plan)
+            create(:gitlab_subscription, :gold, namespace: user.namespace)
 
             project = create_project(user, opts)
 

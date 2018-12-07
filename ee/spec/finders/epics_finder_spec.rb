@@ -133,7 +133,7 @@ describe EpicsFinder do
               .to receive(:should_check_namespace_plan?)
               .and_return(true)
 
-            group.update(plan: create(:gold_plan))
+            create(:gitlab_subscription, :gold, namespace: group)
 
             amount = ActiveRecord::QueryRecorder.new { epics.to_a }.count
 

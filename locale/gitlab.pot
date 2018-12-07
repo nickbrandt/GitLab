@@ -701,6 +701,9 @@ msgstr ""
 msgid "An error occurred while loading the file"
 msgstr ""
 
+msgid "An error occurred while loading the subscription details."
+msgstr ""
+
 msgid "An error occurred while making the request."
 msgstr ""
 
@@ -8153,6 +8156,72 @@ msgid "Subscribe at project level"
 msgstr ""
 
 msgid "Subscribed"
+msgstr ""
+
+msgid "SubscriptionTable|Billing"
+msgstr ""
+
+msgid "SubscriptionTable|Free"
+msgstr ""
+
+msgid "SubscriptionTable|GitLab allows you to continue using your subscription even if you exceed the number of seats you purchased. You will be required to pay for these seats upon renewal."
+msgstr ""
+
+msgid "SubscriptionTable|GitLab.com %{planName} %{suffix}"
+msgstr ""
+
+msgid "SubscriptionTable|Last invoice"
+msgstr ""
+
+msgid "SubscriptionTable|Loading subscriptions"
+msgstr ""
+
+msgid "SubscriptionTable|Manage"
+msgstr ""
+
+msgid "SubscriptionTable|Max seats used"
+msgstr ""
+
+msgid "SubscriptionTable|Next invoice"
+msgstr ""
+
+msgid "SubscriptionTable|Seats currently in use"
+msgstr ""
+
+msgid "SubscriptionTable|Seats in subscription"
+msgstr ""
+
+msgid "SubscriptionTable|Seats owed"
+msgstr ""
+
+msgid "SubscriptionTable|Subscription end date"
+msgstr ""
+
+msgid "SubscriptionTable|Subscription start date"
+msgstr ""
+
+msgid "SubscriptionTable|This is the last time the GitLab.com team was in contact with you to settle any outstanding balances."
+msgstr ""
+
+msgid "SubscriptionTable|This is the maximum number of users that have existed at the same time since this subscription started."
+msgstr ""
+
+msgid "SubscriptionTable|This is the next date when the GitLab.com team is scheduled to get in contact with you to settle any outstanding balances."
+msgstr ""
+
+msgid "SubscriptionTable|Trial"
+msgstr ""
+
+msgid "SubscriptionTable|Upgrade"
+msgstr ""
+
+msgid "SubscriptionTable|Usage"
+msgstr ""
+
+msgid "SubscriptionTable|Usage count is performed once a day at 12:00 PM."
+msgstr ""
+
+msgid "SubscriptionTable|subscription"
 msgstr ""
 
 msgid "Switch branch/tag"

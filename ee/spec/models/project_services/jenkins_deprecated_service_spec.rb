@@ -161,7 +161,8 @@ ICON_STATUS_HTML
         end
 
         context 'when namespace has a plan' do
-          let(:namespace) { create(:group, :private, plan: :bronze_plan) }
+          let(:namespace) { create(:group, :private) }
+          let!(:gitlab_subscription) { create(:gitlab_subscription, :bronze, namespace: namespace) }
 
           it_behaves_like 'an enabled jenkins deprecated service'
         end

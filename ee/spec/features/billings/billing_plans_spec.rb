@@ -128,14 +128,20 @@ describe 'Billing plan pages', :feature do
         visit group_billings_path(group)
       end
 
-      include_examples 'displays all plans and correct actions'
-
       it 'displays plan header' do
         page.within('.billing-plan-header') do
           expect(page).to have_content("#{group.name} is currently on the Bronze plan")
 
           expect(page).to have_css('.billing-plan-logo svg')
         end
+      end
+
+      it 'does not display the billing plans table' do
+        expect(page).not_to have_css('.billing-plans')
+      end
+
+      it 'displays subscription table', :js do
+        expect(page).to have_selector('.js-subscription-table')
       end
     end
   end
@@ -152,7 +158,7 @@ describe 'Billing plan pages', :feature do
       visit group_billings_path(subgroup2)
     end
 
-    it 'displays plan header only' do
+    it 'displays plan header' do
       page.within('.billing-plan-header') do
         expect(page).to have_content("#{subgroup2.full_name} is currently on the Bronze plan")
         expect(page).to have_css('.billing-plan-logo svg')
