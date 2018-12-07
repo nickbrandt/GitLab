@@ -35,6 +35,21 @@ export default {
     state.isLoadingVulnerabilitiesCount = false;
     state.errorLoadingVulnerabilitiesCount = true;
   },
+  [types.SET_VULNERABILITIES_HISTORY_ENDPOINT](state, payload) {
+    state.vulnerabilitiesHistoryEndpoint = payload;
+  },
+  [types.REQUEST_VULNERABILITIES_HISTORY](state) {
+    state.isLoadingVulnerabilitiesHistory = true;
+    state.errorLoadingVulnerabilitiesHistory = false;
+  },
+  [types.RECEIVE_VULNERABILITIES_HISTORY_SUCCESS](state, payload) {
+    state.isLoadingVulnerabilitiesHistory = false;
+    state.vulnerabilitiesHistory = payload;
+  },
+  [types.RECEIVE_VULNERABILITIES_HISTORY_ERROR](state) {
+    state.isLoadingVulnerabilitiesHistory = false;
+    state.errorLoadingVulnerabilitiesHistory = true;
+  },
   [types.SET_MODAL_DATA](state, payload) {
     const { vulnerability } = payload;
 

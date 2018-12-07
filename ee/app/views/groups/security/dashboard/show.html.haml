@@ -1,8 +1,10 @@
 - breadcrumb_title _("Security Dashboard")
 - page_title  _("Security Dashboard")
+- vulnerabilities_history_endpoint = Feature.enabled?(:group_security_dashboard_history, @group) ? history_group_security_vulnerabilities_path(@group) : ''
 
 #js-group-security-dashboard{ data: { vulnerabilities_endpoint: group_security_vulnerabilities_path(@group),
   vulnerabilities_summary_endpoint: summary_group_security_vulnerabilities_path(@group),
+  vulnerabilities_history_endpoint: vulnerabilities_history_endpoint,
   vulnerability_feedback_help_path: help_page_path("user/project/merge_requests/index", anchor: "interacting-with-security-reports-ultimate"),
   empty_state_svg_path: image_path('illustrations/security-dashboard-empty-state.svg'),
   dashboard_documentation: help_page_path('user/group/security_dashboard/index') } }
