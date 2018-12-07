@@ -4939,6 +4939,9 @@ msgstr ""
 msgid "Latest changes"
 msgstr ""
 
+msgid "Latest pipeline for this branch"
+msgstr ""
+
 msgid "Learn how to %{no_packages_link_start}publish and share your Maven packages%{no_packages_link_end} with GitLab. Additional package types will be supported in future releases."
 msgstr ""
 
@@ -4946,6 +4949,9 @@ msgid "Learn more"
 msgstr ""
 
 msgid "Learn more about %{issue_boards_url}, to keep track of issues in multiple lists, using labels, assignees, and milestones. If you’re missing something from issue boards, please create an issue on %{gitlab_issues_url}."
+msgstr ""
+
+msgid "Learn more about Auto DevOps"
 msgstr ""
 
 msgid "Learn more about Kubernetes"
@@ -8599,6 +8605,9 @@ msgid "This page is unavailable because you are not allowed to read information 
 msgstr ""
 
 msgid "This page will be removed in a future release."
+msgstr ""
+
+msgid "This pipeline makes use of a predefined CI/CD configuration enabled by <b>Auto DevOps.</b>"
 msgstr ""
 
 msgid "This project"
