@@ -62,8 +62,10 @@ describe UpdateAllMirrorsWorker do
 
     context 'licensed' do
       def scheduled_mirror(at:, licensed:)
-        namespace = create(:group, :public, plan: (:bronze_plan if licensed))
+        namespace = create(:group, :public)
         project = create(:project, :public, :mirror, namespace: namespace)
+
+        create(:gitlab_subscription, (licensed ? :bronze : :free), namespace: namespace)
 
         project.import_state.update!(next_execution_timestamp: at)
         project.update!(visibility_level: Gitlab::VisibilityLevel::PRIVATE)

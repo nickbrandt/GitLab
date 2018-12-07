@@ -154,3 +154,56 @@
     }
   }
 }
+
+.subscription-table {
+  .flex-grid {
+    .grid-cell {
+      .property-label {
+        color: $gl-text-color-secondary;
+      }
+
+      .btn-help {
+        color: $blue-600;
+      }
+
+      .property-value {
+        color: $gl-text-color;
+
+        &.number {
+          font-size: 20px;
+          line-height: 24px;
+        }
+      }
+
+      .icon-wrapper {
+        line-height: 16px;
+        vertical-align: baseline;
+
+        svg {
+          vertical-align: middle;
+        }
+      }
+
+      &.header-cell {
+        font-weight: $gl-font-weight-bold;
+      }
+
+      &.no-value {
+        > * {
+          display: none;
+        }
+
+        @include media-breakpoint-down(sm) {
+          display: none;
+        }
+      }
+    }
+
+    @include media-breakpoint-up(lg) {
+      .header-cell {
+        width: 144px;
+        flex: none;
+      }
+    }
+  }
+}

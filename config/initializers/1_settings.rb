@@ -393,6 +393,10 @@ Settings.cron_jobs['prune_web_hook_logs_worker'] ||= Settingslogic.new({})
 Settings.cron_jobs['prune_web_hook_logs_worker']['cron'] ||= '0 */1 * * *'
 Settings.cron_jobs['prune_web_hook_logs_worker']['job_class'] = 'PruneWebHookLogsWorker'
 
+Settings.cron_jobs['update_max_seats_used_for_gitlab_com_subscriptions_worker'] ||= Settingslogic.new({})
+Settings.cron_jobs['update_max_seats_used_for_gitlab_com_subscriptions_worker']['cron'] ||= '0 12 * * *'
+Settings.cron_jobs['update_max_seats_used_for_gitlab_com_subscriptions_worker']['job_class'] = 'UpdateMaxSeatsUsedForGitlabComSubscriptionsWorker'
+
 #
 # Sidekiq
 #

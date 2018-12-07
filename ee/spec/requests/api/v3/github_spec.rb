@@ -246,10 +246,10 @@ describe API::V3::Github do
     end
 
     it 'filters unlicensed namespace projects' do
-      silver_plan = create(:silver_plan)
       licensed_project = create(:project, :empty_repo, group: group)
       licensed_project.add_reporter(user)
-      licensed_project.namespace.update!(plan_id: silver_plan.id)
+
+      create(:gitlab_subscription, :silver, namespace: licensed_project.namespace)
 
       stub_licensed_features(jira_dev_panel_integration: true)
       stub_application_setting_on_object(project, should_check_namespace_plan: true)

@@ -73,7 +73,8 @@ describe Projects::IssuesController do
 
     context 'licensed by namespace' do
       let(:globally_licensed) { true }
-      let(:namespace) { create(:group, :private, plan: :bronze_plan) }
+      let(:namespace) { create(:group, :private) }
+      let!(:gitlab_subscriptions) { create(:gitlab_subscription, :bronze, namespace: namespace) }
       let(:project) { create(:project, namespace: namespace) }
 
       before do

@@ -68,7 +68,8 @@ describe Projects::Settings::IntegrationsController do
         end
 
         context 'and namespace has a plan' do
-          let(:namespace) { create(:group, :private, plan: :bronze_plan) }
+          let(:namespace) { create(:group, :private) }
+          let!(:gitlab_subscription) { create(:gitlab_subscription, :bronze, namespace: namespace) }
 
           it_behaves_like 'endpoint without disabled services'
         end

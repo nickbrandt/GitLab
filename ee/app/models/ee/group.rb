@@ -175,6 +175,18 @@ module EE
       project
     end
 
+    # For now, we are not billing for members with a Guest role for subscriptions
+    # with a Gold plan. The other plans will treat Guest members as a regular member
+    # for billing purposes.
+    override :billable_members_count
+    def billable_members_count(requested_hosted_plan = nil)
+      if [actual_plan_name, requested_hosted_plan].include?(Namespace::GOLD_PLAN)
+        users_with_descendants.excluding_guests.count
+      else
+        users_with_descendants.count
+      end
+    end
+
     private
 
     def custom_project_templates_group_allowed
