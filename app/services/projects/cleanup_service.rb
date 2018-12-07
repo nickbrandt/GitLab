@@ -50,8 +50,5 @@ module Projects
     end
   end
 end
-<<<<<<< HEAD
 
 ::Projects::CleanupService.prepend(::EE::Projects::CleanupService)
-=======
->>>>>>> ec6b20776e20948e617e81eff8e9362bf739c591
