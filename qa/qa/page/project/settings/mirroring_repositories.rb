@@ -5,11 +5,8 @@ module QA
     module Project
       module Settings
         class MirroringRepositories < Page::Base
-<<<<<<< HEAD
           prepend EE::Page::Project::Settings::MirroringRepositories
 
-=======
->>>>>>> upstream/master
           view 'app/views/projects/mirrors/_authentication_method.html.haml' do
             element :authentication_method
             element :password
