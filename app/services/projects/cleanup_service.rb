@@ -50,5 +50,8 @@ module Projects
     end
   end
 end
+<<<<<<< HEAD
 
 ::Projects::CleanupService.prepend(::EE::Projects::CleanupService)
+=======
+>>>>>>> upstream/master

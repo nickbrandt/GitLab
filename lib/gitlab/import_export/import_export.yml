@@ -123,9 +123,12 @@ excluded_attributes:
     - :mirror_overwrites_diverged_branches
     - :description_html
     - :repository_languages
+<<<<<<< HEAD
     - :packages_enabled
     - :mirror_last_update_at
     - :mirror_last_successful_update_at
+=======
+>>>>>>> upstream/master
     - :bfg_object_map
   namespaces:
     - :runners_token

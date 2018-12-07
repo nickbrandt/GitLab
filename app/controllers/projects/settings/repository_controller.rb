@@ -6,8 +6,11 @@ module Projects
       before_action :authorize_admin_project!
       before_action :remote_mirror, only: [:show]
       before_action :check_cleanup_feature_flag!, only: :cleanup
+<<<<<<< HEAD
 
       prepend ::EE::Projects::Settings::RepositoryController
+=======
+>>>>>>> upstream/master
 
       def show
         render_show
