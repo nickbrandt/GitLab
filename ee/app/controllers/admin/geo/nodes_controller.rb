@@ -48,12 +48,12 @@ class Admin::Geo::NodesController < Admin::ApplicationController
       :url,
       :primary,
       :selective_sync_type,
-      :selective_sync_shards,
       :namespace_ids,
       :repos_max_capacity,
       :files_max_capacity,
       :verification_max_capacity,
-      :minimum_reverification_interval
+      :minimum_reverification_interval,
+      selective_sync_shards: []
     )
   end
 
