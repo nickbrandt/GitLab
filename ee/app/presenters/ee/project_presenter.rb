@@ -4,19 +4,19 @@ module EE
   module ProjectPresenter
     extend ::Gitlab::Utils::Override
 
-    override :statistics_anchors
-    def statistics_anchors(show_auto_devops_callout:)
-      super + extra_statistics_anchors
+    override :statistics_buttons
+    def statistics_buttons(show_auto_devops_callout:)
+      super + extra_statistics_buttons
     end
 
-    def extra_statistics_anchors
-      anchors = []
+    def extra_statistics_buttons
+      buttons = []
 
       if can?(current_user, :read_project_security_dashboard, project)
-        anchors << security_dashboard_data
+        buttons << security_dashboard_data
       end
 
-      anchors
+      buttons
     end
 
     def approver_groups
@@ -26,9 +26,10 @@ module EE
     private
 
     def security_dashboard_data
-      OpenStruct.new(enabled: true,
-                     label: _('Security Dashboard'),
-                     link: project_security_dashboard_path(project))
+      OpenStruct.new(is_link: false,
+                     label: statistic_icon('lock') + _('Security Dashboard'),
+                     link: project_security_dashboard_path(project),
+                     class_modifier: 'default')
     end
   end
 end
