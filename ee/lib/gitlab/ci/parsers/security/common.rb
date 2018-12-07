@@ -7,8 +7,6 @@ module Gitlab
         class Common
           SecurityReportParserError = Class.new(StandardError)
 
-          METADATA_VERSION = '1.2'
-
           def parse!(json_data, report)
             vulnerabilities = JSON.parse!(json_data)
 
@@ -41,7 +39,7 @@ module Gitlab
               raw_metadata: data.to_json,
               # Version is hardcoded here untill provided in the report.
               # See https://gitlab.com/gitlab-org/gitlab-ee/issues/8025
-              metadata_version: METADATA_VERSION
+              metadata_version: metadata_version(data)
             )
           end
 
@@ -78,10 +76,6 @@ module Gitlab
 
           def parse_level(input)
             input.blank? ? 'undefined' : input.downcase
-          end
-
-          def generate_location_fingerprint(location)
-            Digest::SHA1.hexdigest("#{location['file']}:#{location['start_line']}:#{location['end_line']}")
           end
 
           def generate_project_fingerprint(compare_key)
