@@ -74,6 +74,7 @@ learn how to leverage its potential even more.
 - [Caching dependencies](caching/index.md)
 - [Git submodules](git_submodules.md) - How to run your CI jobs when Git
   submodules are involved
+- [Pipelines for merge requests](merge_request_pipelines/index.md)
 - [Use SSH keys in your build environment](ssh_keys/README.md)
   and status of each CI environment running on Kubernetes
 - [Trigger pipelines through the GitLab API](triggers/README.md)
