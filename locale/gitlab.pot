@@ -7170,12 +7170,9 @@ msgstr ""
 msgid "Repository cleanup has started. You will receive an email once the cleanup operation is complete."
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Repository has no locks."
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "Repository maintenance"
 msgstr ""
 
@@ -7634,9 +7631,6 @@ msgstr ""
 msgid "Server version"
 msgstr ""
 
-<<<<<<< HEAD
-msgid "Service Desk"
-=======
 msgid "Serverless"
 msgstr ""
 
@@ -7674,7 +7668,9 @@ msgid "Serverless|Runtime"
 msgstr ""
 
 msgid "Serverless|There is currently no function data available from Knative. This could be for a variety of reasons including:"
->>>>>>> upstream/master
+msgstr ""
+
+msgid "Service Desk"
 msgstr ""
 
 msgid "Service Templates"
