@@ -44,6 +44,7 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
         get 'labels'
         get 'epics'
         get 'commands'
+        get 'milestones'
       end
     end
 

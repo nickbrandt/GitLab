@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe Groups::AutocompleteService do
-  let!(:group) { create(:group, :nested, avatar: fixture_file_upload('spec/fixtures/dk.png')) }
-  let!(:sub_group) { create(:group, parent: group) }
+  let!(:group) { create(:group, :nested, :private, avatar: fixture_file_upload('spec/fixtures/dk.png')) }
+  let!(:sub_group) { create(:group, :private, parent: group) }
   let(:user) { create(:user) }
   let!(:epic) { create(:epic, group: group, author: user) }
 
@@ -80,6 +80,49 @@ describe Groups::AutocompleteService do
             [:todo, :unsubscribe, :award, :shrug, :tableflip, :cc, :title, :close]
           )
       end
+    end
+  end
+
+  describe '#milestones' do
+    let!(:group_milestone) { create(:milestone, group: group) }
+    let!(:subgroup_milestone) { create(:milestone, group: sub_group) }
+
+    before do
+      sub_group.add_guest(user)
+    end
+
+    context 'when group is public' do
+      it 'returns milestones from groups', :nested_groups do
+        group = create(:group, :public)
+        subgroup = create(:group, :public, parent: group)
+        group_milestone = create(:milestone, group: group)
+        subgroup_milestone = create(:milestone, group: subgroup)
+        subgroup.add_guest(user)
+        group.add_guest(user)
+
+        subject = described_class.new(subgroup, user)
+
+        expect(subject.milestones).to match_array([group_milestone, subgroup_milestone])
+      end
+    end
+
+    it 'returns milestones from group' do
+      expect(subject.milestones).to include(group_milestone)
+    end
+
+    it 'returns milestones from groups and subgroups', :nested_groups do
+      milestones = described_class.new(sub_group, user).milestones
+
+      expect(milestones).to include(group_milestone, subgroup_milestone)
+    end
+
+    it 'returns only milestones that user can read', :nested_groups do
+      user = create(:user)
+      sub_group.add_guest(user)
+
+      milestones = described_class.new(sub_group, user).milestones
+
+      expect(milestones).to match_array([subgroup_milestone])
     end
   end
 end
