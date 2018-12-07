@@ -171,9 +171,12 @@ msgstr ""
 msgid "%{percent}%% complete"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "%{state} epics"
 msgstr ""
 
+=======
+>>>>>>> upstream/master
 msgid "%{strong_start}%{branch_count}%{strong_end} Branch"
 msgid_plural "%{strong_start}%{branch_count}%{strong_end} Branches"
 msgstr[0] ""
@@ -417,6 +420,7 @@ msgstr ""
 msgid "Activity"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Add"
 msgstr ""
 
@@ -430,6 +434,12 @@ msgid "Add Group Webhooks and GitLab Enterprise Edition."
 msgstr ""
 
 msgid "Add Jaeger URL"
+=======
+msgid "Add CHANGELOG"
+msgstr ""
+
+msgid "Add CONTRIBUTING"
+>>>>>>> upstream/master
 msgstr ""
 
 msgid "Add Kubernetes cluster"
@@ -1745,10 +1755,26 @@ msgstr ""
 msgid "Client authentication certificate"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Client authentication key"
 msgstr ""
 
 msgid "Client authentication key password"
+=======
+msgid "Clone"
+msgstr ""
+
+msgid "Clone repository"
+msgstr ""
+
+msgid "Clone with %{http_label}"
+msgstr ""
+
+msgid "Clone with SSH"
+msgstr ""
+
+msgid "Close"
+>>>>>>> upstream/master
 msgstr ""
 
 msgid "Clients"
@@ -1827,6 +1853,9 @@ msgid "ClusterIntegration|CA Certificate"
 msgstr ""
 
 msgid "ClusterIntegration|Cert-Manager"
+msgstr ""
+
+msgid "ClusterIntegration|Cert-Manager is a native Kubernetes certificate management controller that helps with issuing certificates. Installing Cert-Manager on your cluster will issue a certificate by %{letsEncrypt} and ensure that certificates are valid and up-to-date."
 msgstr ""
 
 msgid "ClusterIntegration|Certificate Authority bundle (PEM format)"
@@ -1950,6 +1979,12 @@ msgid "ClusterIntegration|Integrate Kubernetes cluster automation"
 msgstr ""
 
 msgid "ClusterIntegration|Integration status"
+msgstr ""
+
+msgid "ClusterIntegration|Issuer Email"
+msgstr ""
+
+msgid "ClusterIntegration|Issuers represent a certificate authority. You must provide an email address for your Issuer. "
 msgstr ""
 
 msgid "ClusterIntegration|Jupyter Hostname"
@@ -2172,9 +2207,6 @@ msgid "ClusterIntegration|Zone"
 msgstr ""
 
 msgid "ClusterIntegration|access to Google Kubernetes Engine"
-msgstr ""
-
-msgid "ClusterIntegration|cert-manager is a native Kubernetes certificate management controller that helps with issuing certificates. Installing cert-manager on your cluster will issue a certificate by %{letsEncrypt} and ensure that certificates are valid and up to date."
 msgstr ""
 
 msgid "ClusterIntegration|check the pricing here"
@@ -2435,9 +2467,12 @@ msgid "Contribution Charts"
 msgstr ""
 
 msgid "Contributions for <strong>%{calendar_date}</strong>"
+<<<<<<< HEAD
 msgstr ""
 
 msgid "Contributions per group member"
+=======
+>>>>>>> upstream/master
 msgstr ""
 
 msgid "Contributors"
@@ -3645,9 +3680,12 @@ msgstr ""
 msgid "Files"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Fill in the fields below, turn on <strong>%{enable_label}</strong>, and press <strong>%{save_changes}</strong>"
 msgstr ""
 
+=======
+>>>>>>> upstream/master
 msgid "Filter"
 msgstr ""
 
@@ -3810,7 +3848,14 @@ msgstr ""
 msgid "Geo Nodes"
 msgstr ""
 
+<<<<<<< HEAD
 msgid "Geo allows you to replicate your GitLab instance to other geographical locations."
+=======
+msgid "Git global setup"
+msgstr ""
+
+msgid "Git repository URL"
+>>>>>>> upstream/master
 msgstr ""
 
 msgid "GeoNodeSyncStatus|Node is failing or broken."
@@ -4474,6 +4519,9 @@ msgid "Hide value"
 msgid_plural "Hide values"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "Hide values"
+msgstr ""
 
 msgid "Hide whitespace changes"
 msgstr ""
@@ -7301,13 +7349,13 @@ msgstr ""
 msgid "Retry verification"
 msgstr ""
 
-msgid "Reveal Variables"
-msgstr ""
-
 msgid "Reveal value"
 msgid_plural "Reveal values"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "Reveal values"
+msgstr ""
 
 msgid "Revert this commit"
 msgstr ""
@@ -9413,6 +9461,9 @@ msgid "Variables"
 msgstr ""
 
 msgid "Variables are applied to environments via the runner. They can be protected by only exposing them to protected branches or tags. You can use variables for passwords, secret keys, or whatever you want."
+msgstr ""
+
+msgid "Variables:"
 msgstr ""
 
 msgid "Various container registry settings."
