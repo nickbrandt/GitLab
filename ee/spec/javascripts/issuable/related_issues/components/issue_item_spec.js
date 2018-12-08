@@ -2,14 +2,22 @@ import Vue from 'vue';
 import issueItem from 'ee/related_issues/components/issue_item.vue';
 import eventHub from 'ee/related_issues/event_hub';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import { defaultMilestone, defaultAssignees } from '../mock_data';
 
 describe('issueItem', () => {
   let vm;
   const props = {
     idKey: 1,
-    displayReference: '#1',
+    displayReference: 'gitlab-org/gitlab-test#1',
+    pathIdSeparator: '#',
     path: `${gl.TEST_HOST}/path`,
     title: 'title',
+    confidential: true,
+    dueDate: '2018-12-31',
+    weight: 10,
+    createdAt: '2018-12-01T00:00:00.00Z',
+    milestone: defaultMilestone,
+    assignees: defaultAssignees,
   };
 
   beforeEach(() => {
@@ -22,12 +30,6 @@ describe('issueItem', () => {
     expect(vm.$el.querySelector('.issuable-info-container')).toBeNull();
   });
 
-  it('renders displayReference', () => {
-    expect(vm.$el.querySelector('.text-secondary').innerText.trim()).toEqual(
-      props.displayReference,
-    );
-  });
-
   it('does not render token state', () => {
     expect(vm.$el.querySelector('.text-secondary svg')).toBeNull();
   });
@@ -38,11 +40,17 @@ describe('issueItem', () => {
 
   describe('token title', () => {
     it('links to computedPath', () => {
-      expect(vm.$el.querySelector('a').href).toEqual(props.path);
+      expect(vm.$el.querySelector('.item-title a').href).toEqual(props.path);
+    });
+
+    it('renders confidential icon', () => {
+      expect(
+        vm.$el.querySelector('.item-title svg.confidential-icon use').getAttribute('xlink:href'),
+      ).toContain('eye-slash');
     });
 
     it('renders title', () => {
-      expect(vm.$el.querySelector('a').innerText.trim()).toEqual(props.title);
+      expect(vm.$el.querySelector('.item-title a').innerText.trim()).toEqual(props.title);
     });
   });
 
@@ -52,7 +60,7 @@ describe('issueItem', () => {
     beforeEach(done => {
       vm.state = 'opened';
       Vue.nextTick(() => {
-        tokenState = vm.$el.querySelector('.text-secondary svg');
+        tokenState = vm.$el.querySelector('.item-meta svg');
         done();
       });
     });
@@ -62,7 +70,12 @@ describe('issueItem', () => {
     });
 
     it('renders state title', () => {
-      expect(tokenState.getAttribute('data-original-title')).toEqual('Open');
+      const stateTitle = tokenState.getAttribute('data-original-title').trim();
+
+      expect(stateTitle).toContain('<span class="bold">Opened</span>');
+      expect(stateTitle).toContain(
+        '<span class="text-tertiary">Dec 1, 2018 12:00am GMT+0000</span>',
+      );
     });
 
     it('renders aria label', () => {
@@ -75,11 +88,63 @@ describe('issueItem', () => {
 
     it('renders close icon when close state', done => {
       vm.state = 'closed';
+      vm.closedAt = '2018-12-01T00:00:00.00Z';
 
       Vue.nextTick(() => {
         expect(tokenState.classList.contains('issue-token-state-icon-closed')).toEqual(true);
         done();
       });
+    });
+  });
+
+  describe('token metadata', () => {
+    let tokenMetadata;
+
+    beforeEach(done => {
+      Vue.nextTick(() => {
+        tokenMetadata = vm.$el.querySelector('.item-meta');
+        done();
+      });
+    });
+
+    it('renders item path and ID', () => {
+      const pathAndID = tokenMetadata.querySelector('.item-path-id').innerText.trim();
+
+      expect(pathAndID).toContain('gitlab-org/gitlab-test');
+      expect(pathAndID).toContain('#1');
+    });
+
+    it('renders milestone icon and name', () => {
+      const milestoneIconEl = tokenMetadata.querySelector('.item-milestone svg use');
+      const milestoneTitle = tokenMetadata.querySelector('.item-milestone .milestone-title');
+
+      expect(milestoneIconEl.getAttribute('xlink:href')).toContain('clock');
+      expect(milestoneTitle.innerText.trim()).toContain('Milestone title');
+    });
+
+    it('renders date icon and due date', () => {
+      const dueDateIconEl = tokenMetadata.querySelector('.item-due-date svg use');
+      const dueDateEl = tokenMetadata.querySelector('.item-due-date time');
+
+      expect(dueDateIconEl.getAttribute('xlink:href')).toContain('calendar');
+      expect(dueDateEl.innerText.trim()).toContain('Dec 31');
+    });
+
+    it('renders weight icon and value', () => {
+      const dueDateIconEl = tokenMetadata.querySelector('.item-weight svg use');
+      const dueDateEl = tokenMetadata.querySelector('.item-weight span');
+
+      expect(dueDateIconEl.getAttribute('xlink:href')).toContain('weight');
+      expect(dueDateEl.innerText.trim()).toContain('10');
+    });
+  });
+
+  describe('token assignees', () => {
+    it('renders assignees avatars', () => {
+      const assigneesEl = vm.$el.querySelector('.item-assignees');
+
+      expect(assigneesEl.querySelectorAll('.user-avatar-link').length).toBe(2);
+      expect(assigneesEl.querySelector('.avatar-counter').innerText.trim()).toContain('+2');
     });
   });
 

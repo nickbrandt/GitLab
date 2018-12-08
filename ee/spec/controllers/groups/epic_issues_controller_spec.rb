@@ -3,9 +3,10 @@ require 'spec_helper'
 describe Groups::EpicIssuesController do
   let(:group) { create(:group, :public) }
   let(:project) { create(:project, :public, group: group) }
+  let(:milestone) { create(:milestone, project: project) }
   let(:epic) { create(:epic, group: group) }
-  let(:issue) { create(:issue, project: project) }
-  let(:user)  { create(:user) }
+  let(:user) { create(:user) }
+  let(:issue) { create(:issue, project: project, milestone: milestone, assignees: [user]) }
 
   before do
     stub_licensed_features(epics: true)
@@ -45,18 +46,7 @@ describe Groups::EpicIssuesController do
       end
 
       it 'returns the correct json' do
-        expected_result = [
-          {
-            'id' => issue.id,
-            'title' => issue.title,
-            'state' => issue.state,
-            'reference' => "#{project.full_path}##{issue.iid}",
-            'path' => "/#{project.full_path}/issues/#{issue.iid}",
-            'relation_path' => "/groups/#{group.full_path}/-/epics/#{epic.iid}/issues/#{epic_issue.id}",
-            'epic_issue_id' => epic_issue.id
-           }
-        ]
-        expect(JSON.parse(response.body)).to eq(expected_result)
+        expect(JSON.parse(response.body)).to match_schema('related_issues', dir: 'ee')
       end
     end
   end
