@@ -1,9 +1,23 @@
 <script>
-import { __ } from '~/locale';
+import { GlTooltipDirective } from '@gitlab/ui';
+import { __, sprintf } from '~/locale';
+import IssueMilestone from '~/vue_shared/components/issue/issue_milestone.vue';
+import IssueAssignees from '~/vue_shared/components/issue/issue_assignees.vue';
+import IssueDueDate from '~/boards/components/issue_due_date.vue';
+import IssueWeight from 'ee/boards/components/issue_card_weight.vue';
 import relatedIssueMixin from '../mixins/related_issues_mixin';
 
 export default {
   name: 'IssueItem',
+  components: {
+    IssueMilestone,
+    IssueDueDate,
+    IssueAssignees,
+    IssueWeight,
+  },
+  directives: {
+    GlTooltip: GlTooltipDirective,
+  },
   mixins: [relatedIssueMixin],
   props: {
     canReorder: {
@@ -14,7 +28,14 @@ export default {
   },
   computed: {
     stateTitle() {
-      return this.isOpen ? __('Open') : __('Closed');
+      return sprintf(
+        '<span class="bold">%{state}</span> %{timeInWords}<br/><span class="text-tertiary">%{timestamp}</span>',
+        {
+          state: this.isOpen ? __('Opened') : __('Closed'),
+          timeInWords: this.isOpen ? this.createdAtInWords : this.closedAtInWords,
+          timestamp: this.isOpen ? this.createdAtTimestamp : this.closedAtTimestamp,
+        },
+      );
     },
   },
 };
@@ -26,22 +47,70 @@ export default {
       'issuable-info-container': !canReorder,
       'card-body': canReorder,
     }"
-    class="flex"
+    class="item-body"
   >
-    <div class="block-truncated append-right-8 d-inline-flex">
-      <div class="block text-secondary append-right-default">
+    <div class="item-contents">
+      <div class="item-title d-flex align-items-center">
         <icon
           v-if="hasState"
           v-tooltip
           :css-classes="iconClass"
           :name="iconName"
-          :size="12"
+          :size="16"
           :title="stateTitle"
           :aria-label="state"
+          data-html="true"
         />
-        {{ displayReference }}
+        <icon
+          v-if="confidential"
+          v-gl-tooltip
+          name="eye-slash"
+          :size="16"
+          :title="__('Confidential')"
+          class="confidential-icon append-right-4"
+          :aria-label="__('Confidential')"
+        />
+        <a :href="computedPath" class="sortable-link">{{ title }}</a>
       </div>
-      <a :href="computedPath" class="issue-token-title-text sortable-link"> {{ title }} </a>
+      <div class="item-meta">
+        <div class="d-flex align-items-center item-path-id">
+          <icon
+            v-if="hasState"
+            v-tooltip
+            :css-classes="iconClass"
+            :name="iconName"
+            :size="16"
+            :title="stateTitle"
+            :aria-label="state"
+            data-html="true"
+          />
+          <span v-tooltip :title="itemPath" class="path-id-text">{{ itemPath }}</span>
+          {{ pathIdSeparator }}{{ itemId }}
+        </div>
+        <div class="item-meta-child d-flex align-items-center">
+          <issue-milestone
+            v-if="milestone"
+            :milestone="milestone"
+            class="d-flex align-items-center item-milestone"
+          />
+          <issue-due-date
+            v-if="dueDate"
+            :date="dueDate"
+            tooltip-placement="top"
+            css-class="item-due-date d-flex align-items-center"
+          />
+          <issue-weight
+            v-if="weight"
+            :weight="weight"
+            class="item-weight d-flex align-items-center"
+          />
+        </div>
+        <issue-assignees
+          v-if="assignees.length"
+          :assignees="assignees"
+          class="item-assignees d-inline-flex"
+        />
+      </div>
     </div>
     <button
       v-if="canRemove"
@@ -49,13 +118,12 @@ export default {
       v-tooltip
       :disabled="removeDisabled"
       type="button"
-      class="btn btn-default js-issue-item-remove-button issue-item-remove-button flex-align-self-center flex-right
-      qa-remove-issue-button"
+      class="btn btn-default btn-svg btn-item-remove js-issue-item-remove-button qa-remove-issue-button"
       title="Remove"
       aria-label="Remove"
       @click="onRemoveRequest"
     >
-      <i class="fa fa-times" aria-hidden="true"> </i>
+      <icon :size="16" class="btn-item-remove-icon" name="close" />
     </button>
   </div>
 </template>

@@ -1,14 +1,12 @@
 <script>
-import { GlTooltipDirective } from '@gitlab/ui';
+import { GlTooltip } from '@gitlab/ui';
 import icon from '~/vue_shared/components/icon.vue';
 
 export default {
   name: 'IssueCardWeight',
   components: {
     icon,
-  },
-  directives: {
-    GlTooltip: GlTooltipDirective,
+    GlTooltip,
   },
   props: {
     weight: {
@@ -21,16 +19,19 @@ export default {
 
 <template>
   <a
-    v-gl-tooltip
-    :title="__('Weight')"
+    ref="itemWeight"
     class="board-card-info card-number board-card-weight"
-    data-container="body"
-    data-placement="bottom"
     tabindex="1"
     v-on="$listeners"
   >
-    <icon name="weight" css-classes="board-card-info-icon" /><span class="board-card-info-text">{{
-      weight
-    }}</span>
+    <icon name="weight" css-classes="board-card-info-icon" />
+    <span class="board-card-info-text"> {{ weight }} </span>
+    <gl-tooltip
+      :target="() => $refs.itemWeight"
+      placement="bottom"
+      container="body"
+      class="js-item-weight"
+      >{{ __('Weight') }}<br /><span class="text-tertiary">{{ weight }}</span>
+    </gl-tooltip>
   </a>
 </template>

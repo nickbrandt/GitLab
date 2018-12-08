@@ -39,8 +39,9 @@ describe IssueLinks::ListService do
         control_count = ActiveRecord::QueryRecorder.new { subject }.count
 
         project = create :project, :public
-        issue_x = create :issue, project: project
-        issue_y = create :issue, project: project
+        milestone = create :milestone, project: project
+        issue_x = create :issue, project: project, milestone: milestone
+        issue_y = create :issue, project: project, assignees: [user]
         issue_z = create :issue, project: project
         create :issue_link, source: issue_x, target: issue_y
         create :issue_link, source: issue_x, target: issue_z

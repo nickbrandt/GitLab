@@ -32,7 +32,7 @@ describe 'Epic Issues', :js do
     end
 
     it 'user can see issues from public project but cannot delete the associations' do
-      within('.related-issues-block ul.issuable-list') do
+      within('.related-issues-block ul.related-items-list') do
         expect(page).to have_selector('li', count: 1)
         expect(page).to have_content(public_issue.title)
         expect(page).not_to have_selector('button.js-issue-item-remove-button')
@@ -70,7 +70,7 @@ describe 'Epic Issues', :js do
     end
 
     it 'user can see all issues of the group and delete the associations' do
-      within('.related-issues-block ul.issuable-list') do
+      within('.related-issues-block ul.related-items-list') do
         expect(page).to have_selector('li', count: 2)
         expect(page).to have_content(public_issue.title)
         expect(page).to have_content(private_issue.title)
@@ -80,7 +80,7 @@ describe 'Epic Issues', :js do
 
       wait_for_requests
 
-      within('.related-issues-block ul.issuable-list') do
+      within('.related-issues-block ul.related-items-list') do
         expect(page).to have_selector('li', count: 1)
       end
     end
@@ -100,7 +100,7 @@ describe 'Epic Issues', :js do
       expect(page).not_to have_selector('.content-wrapper .alert-wrapper .flash-text')
       expect(page).not_to have_content('No Issue found for given params')
 
-      within('.related-issues-block ul.issuable-list') do
+      within('.related-issues-block ul.related-items-list') do
         expect(page).to have_selector('li', count: 3)
         expect(page).to have_content(issue_to_add.title)
       end
@@ -110,7 +110,7 @@ describe 'Epic Issues', :js do
       expect(first('.js-related-issues-token-list-item')).to have_content(public_issue.title)
       expect(page.all('.js-related-issues-token-list-item').last).to have_content(private_issue.title)
 
-      drag_to(selector: '.issuable-list', to_index: 1)
+      drag_to(selector: '.related-items-list', to_index: 1)
 
       expect(first('.js-related-issues-token-list-item')).to have_content(private_issue.title)
       expect(page.all('.js-related-issues-token-list-item').last).to have_content(public_issue.title)

@@ -31,6 +31,10 @@ export default {
       required: false,
       default: false,
     },
+    pathIdSeparator: {
+      type: String,
+      required: true,
+    },
   },
 
   data() {
@@ -135,6 +139,7 @@ export default {
             :display-reference="reference"
             :can-remove="true"
             :is-condensed="true"
+            :path-id-separator="pathIdSeparator"
             event-namespace="pendingIssuable"
           />
         </li>
