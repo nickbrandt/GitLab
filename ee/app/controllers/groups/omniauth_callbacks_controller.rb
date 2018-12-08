@@ -9,9 +9,11 @@ class Groups::OmniauthCallbacksController < OmniauthCallbacksController
     @unauthenticated_group = Group.find_by_full_path(params[:group_id])
     @saml_provider = @unauthenticated_group.saml_provider
 
-    identity_linker = Gitlab::Auth::GroupSaml::IdentityLinker.new(current_user, oauth, @saml_provider)
+    identity_linker = Gitlab::Auth::GroupSaml::IdentityLinker.new(current_user, oauth, @saml_provider, session)
 
     omniauth_flow(Gitlab::Auth::GroupSaml, identity_linker: identity_linker)
+  rescue Gitlab::Auth::GroupSaml::IdentityLinker::UnverifiedRequest
+    redirect_unverified_saml_initiation
   end
 
   private
@@ -42,6 +44,12 @@ class Groups::OmniauthCallbacksController < OmniauthCallbacksController
     flash[:notice] = "Signed in with SAML for #{@unauthenticated_group.name}"
 
     super
+  end
+
+  def redirect_unverified_saml_initiation
+    flash[:notice] = "Request to link SAML account must be authorized"
+
+    redirect_to sso_group_saml_providers_path(@unauthenticated_group)
   end
 
   override :after_sign_in_path_for
