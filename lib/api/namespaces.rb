@@ -17,11 +17,8 @@ module API
       end
     end
 
-<<<<<<< HEAD
     prepend EE::API::Namespaces
 
-=======
->>>>>>> upstream/master
     resource :namespaces do
       desc 'Get a namespaces list' do
         success Entities::Namespace
