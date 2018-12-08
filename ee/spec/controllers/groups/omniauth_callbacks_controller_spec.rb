@@ -9,6 +9,9 @@ describe Groups::OmniauthCallbacksController do
   let(:provider) { :group_saml }
   let(:group) { create(:group, :private) }
   let!(:saml_provider) { create(:saml_provider, group: group) }
+  let(:in_response_to) { '12345' }
+  let(:last_request_id) { in_response_to }
+  let(:saml_response) { instance_double(OneLogin::RubySaml::Response, in_response_to: in_response_to) }
 
   before do
     stub_licensed_features(group_saml: true)
@@ -20,6 +23,10 @@ describe Groups::OmniauthCallbacksController do
 
   def create_linked_user
     create(:omniauth_user, extern_uid: uid, provider: provider, saml_provider: saml_provider)
+  end
+
+  def stub_last_request_id(id)
+    session["last_authn_request_id"] = id
   end
 
   context "when request hasn't been validated by omniauth middleware" do
@@ -34,8 +41,9 @@ describe Groups::OmniauthCallbacksController do
 
   context "valid credentials" do
     before do
-      mock_auth_hash(provider, uid, user.email)
+      mock_auth_hash(provider, uid, user.email, response_object: saml_response)
       stub_omniauth_provider(provider, context: request)
+      stub_last_request_id(last_request_id)
     end
 
     shared_examples "and identity already linked" do
@@ -103,6 +111,22 @@ describe Groups::OmniauthCallbacksController do
           post provider, params: { group_id: group }
 
           expect(flash[:notice]).to match(/SAML for .* was added/)
+        end
+
+        context 'with IdP initiated request' do
+          let(:last_request_id) { '99999' }
+
+          it 'redirects to account link page' do
+            post provider, params: { group_id: group }
+
+            expect(response).to redirect_to(sso_group_saml_providers_path(group))
+          end
+
+          it "lets the user know their account isn't linked yet" do
+            post provider, params: { group_id: group }
+
+            expect(flash[:notice]).to eq 'Request to link SAML account must be authorized'
+          end
         end
       end
     end
