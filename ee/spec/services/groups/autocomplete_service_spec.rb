@@ -88,7 +88,7 @@ describe Groups::AutocompleteService do
     let!(:subgroup_milestone) { create(:milestone, group: sub_group) }
 
     before do
-      sub_group.add_guest(user)
+      sub_group.add_master(user)
     end
 
     context 'when group is public' do
