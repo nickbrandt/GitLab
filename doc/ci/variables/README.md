@@ -119,10 +119,7 @@ future GitLab releases.**
 | **GITLAB_USER_ID**                        | 8.12   | all    | The id of the user who started the job |
 | **GITLAB_USER_LOGIN**                     | 10.0   | all    | The login username of the user who started the job |
 | **GITLAB_USER_NAME**                      | 10.0   | all    | The real name of the user who started the job |
-<<<<<<< HEAD
 | **GITLAB_FEATURES**                       | 10.6   | all    | The comma separated list of licensed features available for your instance and plan |
-=======
->>>>>>> upstream/master
 | **RESTORE_CACHE_ATTEMPTS**                | 8.15   | 1.9    | Number of attempts to restore the cache running a job |
 
 ## GitLab 9.0 renaming
