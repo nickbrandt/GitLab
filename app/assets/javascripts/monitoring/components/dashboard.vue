@@ -247,6 +247,7 @@ export default {
         :small-graph="forceSmallGraph"
       >
         <!-- EE content -->
+<<<<<<< HEAD
         <template slot="additionalSvgContent" scope="{ graphDrawData }">
           <threshold-lines
             v-for="(alert, alertName) in alertData[graphData.id]"
@@ -265,6 +266,9 @@ export default {
           :alert-data="alertData[graphData.id]"
           @setAlerts="setAlerts"
         />
+=======
+        {{ null }}
+>>>>>>> upstream/master
       </component>
     </graph-group>
   </div>

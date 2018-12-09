@@ -47,6 +47,10 @@ const handleUserPopoverMouseOver = event => {
       bio: null,
       organization: null,
       status: null,
+<<<<<<< HEAD
+=======
+      loaded: false,
+>>>>>>> upstream/master
     };
     if (userId || username) {
       const UserPopoverComponent = Vue.extend(UserPopover);
@@ -94,6 +98,7 @@ const handleUserPopoverMouseOver = event => {
           renderedPopover = null;
         });
     }
+<<<<<<< HEAD
   }, 200);
 };
 
@@ -102,6 +107,13 @@ export default elements => {
   if (!elements) {
     userLinks = [...document.querySelectorAll('.js-user-link')];
   }
+=======
+  }, 200); // 200ms delay so not every mouseover triggers Popover + API Call
+};
+
+export default elements => {
+  const userLinks = elements || [...document.querySelectorAll('.js-user-link')];
+>>>>>>> upstream/master
 
   userLinks.forEach(el => {
     el.addEventListener('mouseenter', handleUserPopoverMouseOver);

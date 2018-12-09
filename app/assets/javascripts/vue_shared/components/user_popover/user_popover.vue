@@ -53,10 +53,17 @@ export default {
       return !this.user.name;
     },
     jobInfoIsLoading() {
+<<<<<<< HEAD
       return !this.loaded && this.user.organization === null;
     },
     locationIsLoading() {
       return !this.loaded && this.user.location === null;
+=======
+      return !this.user.loaded && this.user.organization === null;
+    },
+    locationIsLoading() {
+      return !this.user.loaded && this.user.location === null;
+>>>>>>> upstream/master
     },
   },
 };

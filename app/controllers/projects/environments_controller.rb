@@ -15,8 +15,11 @@ class Projects::EnvironmentsController < Projects::ApplicationController
     push_frontend_feature_flag(:area_chart, project)
   end
 
+<<<<<<< HEAD
   prepend ::EE::Projects::EnvironmentsController
 
+=======
+>>>>>>> upstream/master
   def index
     @environments = project.environments
       .with_state(params[:scope] || :available)

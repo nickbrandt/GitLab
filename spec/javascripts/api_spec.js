@@ -333,6 +333,7 @@ describe('Api', () => {
     });
   });
 
+<<<<<<< HEAD
   describe('ldap_groups', () => {
     it('calls callback on completion', done => {
       const query = 'query';
@@ -355,6 +356,8 @@ describe('Api', () => {
     });
   });
 
+=======
+>>>>>>> upstream/master
   describe('user', () => {
     it('fetches single user', done => {
       const userId = '123456';

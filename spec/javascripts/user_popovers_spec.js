@@ -48,7 +48,11 @@ describe('User Popovers', () => {
         expect(document.querySelector('.popover')).toBeNull();
         done();
       });
+<<<<<<< HEAD
     }, 210);
+=======
+    }, 210); // We need to wait until the 200ms mouseover delay is over, only then the popover will be visible
+>>>>>>> upstream/master
   });
 
   it('Should Not show a popover on short mouse over', done => {
