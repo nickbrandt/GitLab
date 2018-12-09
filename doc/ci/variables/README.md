@@ -43,11 +43,8 @@ future GitLab releases.**
 | Variable                                  | GitLab | Runner | Description |
 |-------------------------------------------|--------|--------|-------------|
 | **ARTIFACT_DOWNLOAD_ATTEMPTS**            | 8.15   | 1.9    | Number of attempts to download artifacts running a job |
-<<<<<<< HEAD
 | **CHAT_INPUT**                            | 10.6  | all    | Additional arguments passed in the [ChatOps](../chatops/README.md) command **[ULTIMATE]** |
 | **CHAT_CHANNEL**                          | 10.6  | all    | Source chat channel which triggered the [ChatOps](../chatops/README.md) command **[ULTIMATE]** |
-=======
->>>>>>> upstream/master
 | **CI**                                    | all    | 0.4    | Mark that job is executed in CI environment |
 | **CI_COMMIT_REF_NAME**                    | 9.0    | all    | The branch or tag name for which project is built |
 | **CI_COMMIT_REF_SLUG**                    | 9.0    | all    | `$CI_COMMIT_REF_NAME` lowercased, shortened to 63 bytes, and with everything except `0-9` and `a-z` replaced with `-`. No leading / trailing `-`. Use in URLs, host names and domain names. |
@@ -69,11 +66,7 @@ future GitLab releases.**
 | **CI_JOB_MANUAL**                         | 8.12   | all    | The flag to indicate that job was manually started |
 | **CI_JOB_NAME**                           | 9.0    | 0.5    | The name of the job as defined in `.gitlab-ci.yml` |
 | **CI_JOB_STAGE**                          | 9.0    | 0.5    | The name of the stage as defined in `.gitlab-ci.yml` |
-<<<<<<< HEAD
 | **CI_JOB_TOKEN**                          | 9.0    | 1.2    | Token used for authenticating with [GitLab Container Registry][registry], downloading [dependent repositories][dependent-repositories], authenticate with multi-project pipelines when [triggers][trigger-job-token] are involved, and for [downloading job artifacts][get-job-artifacts]  |
-=======
-| **CI_JOB_TOKEN**                          | 9.0    | 1.2    | Token used for authenticating with the [GitLab Container Registry][registry] and downloading [dependent repositories][dependent-repositories] |
->>>>>>> upstream/master
 | **CI_MERGE_REQUEST_ID**                   | 11.6   | all    | The ID of the merge request if it's [pipelines for merge requests](../merge_request_pipelines/index.md) |
 | **CI_MERGE_REQUEST_IID**                  | 11.6   | all    | The IID of the merge request if it's [pipelines for merge requests](../merge_request_pipelines/index.md) |
 | **CI_MERGE_REQUEST_REF_PATH**             | 11.6   | all    | The ref path of the merge request if it's [pipelines for merge requests](../merge_request_pipelines/index.md). (e.g. `refs/merge-requests/1/head`) |
