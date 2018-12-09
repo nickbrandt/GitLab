@@ -3,8 +3,19 @@
 = render 'devise/shared/tab_single', tab_title: _('SAML SSO')
 .login-box
   .login-body
-    %h4= _("Sign in to %{group_name}") % { group_name: @group_name }
+    - if @group_saml_identity
+      %h4= _('Sign in to "%{group_name}"') % { group_name: @group_name }
+    - else
+      %h4= _('Allow "%{group_name}" to sign you in') % { group_name: @group_name }
 
-    %p= _("This group allows you to sign in with your %{group_name} Single Sign-On account. This will redirect you to an external sign in page.") % { group_name: @group_name }
+    %p= _('The "%{group_path}" group allows you to sign in with your Single Sign-On Account') % { group_path: @group_path }
 
-    = saml_link _('Sign in with Single Sign-On'), @group_path, html_class: 'btn btn-success btn-block qa-saml-sso-signin-button'
+    - if @group_saml_identity
+      %p= _("This will redirect you to an external sign in page.")
+
+      = saml_link _('Sign in with Single Sign-On'), @group_path, html_class: 'btn btn-success btn-block qa-saml-sso-signin-button'
+    - else
+      .card.card-body.bs-callout-warning
+        = _("Only proceed if you trust %{idp_url} to control your GitLab account sign in.") % { idp_url: @idp_url }
+
+      = saml_link _('Authorize'), @group_path, html_class: 'btn btn-success btn-block qa-saml-sso-signin-button'

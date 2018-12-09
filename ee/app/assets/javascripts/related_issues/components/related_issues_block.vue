@@ -60,6 +60,11 @@ export default {
       required: false,
       default: '',
     },
+    pathIdSeparator: {
+      type: String,
+      required: false,
+      default: '#',
+    },
     helpPath: {
       type: String,
       required: false,
@@ -148,16 +153,13 @@ export default {
           {{ title }}
           <a v-if="hasHelpPath" :href="helpPath">
             <i
-              class="related-issues-header-help-icon
-fa fa-question-circle"
+              class="related-issues-header-help-icon fa fa-question-circle"
               aria-label="Read more about related issues"
-            >
-            </i>
+            ></i>
           </a>
           <div class="d-inline-flex lh-100 align-middle">
             <div
-              class="js-related-issues-header-issue-count
-  related-issues-header-issue-count issue-count-badge mx-1"
+              class="js-related-issues-header-issue-count related-issues-header-issue-count issue-count-badge mx-1"
             >
               <span class="issue-count-badge-count">
                 <icon name="issues" class="mr-1 text-secondary" /> {{ badgeLabel }}
@@ -167,13 +169,12 @@ fa fa-question-circle"
               v-if="canAdmin"
               ref="issueCountBadgeAddButton"
               type="button"
-              class="js-issue-count-badge-add-button
-issue-count-badge-add-button btn btn-sm btn-default qa-add-issues-button"
+              class="js-issue-count-badge-add-button issue-count-badge-add-button btn btn-sm btn-default qa-add-issues-button"
               aria-label="Add an issue"
               data-placement="top"
               @click="toggleAddRelatedIssuesForm"
             >
-              <i class="fa fa-plus" aria-hidden="true"> </i>
+              <i class="fa fa-plus" aria-hidden="true"></i>
             </button>
           </div>
         </h3>
@@ -190,6 +191,7 @@ issue-count-badge-add-button btn btn-sm btn-default qa-add-issues-button"
           :input-value="inputValue"
           :pending-references="pendingReferences"
           :auto-complete-sources="autoCompleteSources"
+          :path-id-separator="pathIdSeparator"
         />
       </div>
       <div
@@ -206,7 +208,7 @@ issue-count-badge-add-button btn btn-sm btn-default qa-add-issues-button"
             class="prepend-top-5"
           />
         </div>
-        <ul ref="list" :class="{ 'content-list': !canReorder }" class="flex-list issuable-list">
+        <ul ref="list" :class="{ 'content-list': !canReorder }" class="related-items-list">
           <li
             v-for="issue in relatedIssues"
             :key="issue.id"
@@ -217,16 +219,24 @@ issue-count-badge-add-button btn btn-sm btn-default qa-add-issues-button"
             }"
             :data-key="issue.id"
             :data-epic-issue-id="issue.epic_issue_id"
-            class="js-related-issues-token-list-item related-issues-list-item pt-0 pb-0"
+            class="js-related-issues-token-list-item list-item pt-0 pb-0"
           >
             <issue-item
               :id-key="issue.id"
               :display-reference="issue.reference"
+              :confidential="issue.confidential"
               :title="issue.title"
               :path="issue.path"
               :state="issue.state"
+              :milestone="issue.milestone"
+              :due-date="issue.due_date"
+              :assignees="issue.assignees"
+              :weight="issue.weight"
+              :created-at="issue.created_at"
+              :closed-at="issue.closed_at"
               :can-remove="canAdmin"
               :can-reorder="canReorder"
+              :path-id-separator="pathIdSeparator"
               event-namespace="relatedIssue"
             />
           </li>

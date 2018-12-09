@@ -246,6 +246,7 @@ export default {
     :input-value="inputValue"
     :auto-complete-sources="autoCompleteSources"
     :title="title"
+    path-id-separator="#"
     @saveReorder="saveIssueOrder"
   />
 </template>

@@ -6,6 +6,7 @@ describe('IssueToken', () => {
   const idKey = 200;
   const displayReference = 'foo/bar#123';
   const title = 'some title';
+  const pathIdSeparator = '#';
   let IssueToken;
   let vm;
 
@@ -25,6 +26,7 @@ describe('IssueToken', () => {
         propsData: {
           idKey,
           displayReference,
+          pathIdSeparator,
         },
       }).$mount();
     });
@@ -45,6 +47,7 @@ describe('IssueToken', () => {
         propsData: {
           idKey,
           displayReference,
+          pathIdSeparator,
           title,
         },
       }).$mount();
@@ -63,6 +66,7 @@ describe('IssueToken', () => {
         propsData: {
           idKey,
           displayReference,
+          pathIdSeparator,
           title,
           path,
         },
@@ -81,6 +85,7 @@ describe('IssueToken', () => {
           propsData: {
             idKey,
             displayReference,
+            pathIdSeparator,
             state: 'opened',
           },
         }).$mount();
@@ -97,6 +102,7 @@ describe('IssueToken', () => {
           propsData: {
             idKey,
             displayReference,
+            pathIdSeparator,
             state: 'reopened',
           },
         }).$mount();
@@ -113,6 +119,7 @@ describe('IssueToken', () => {
           propsData: {
             idKey,
             displayReference,
+            pathIdSeparator,
             state: 'closed',
           },
         }).$mount();
@@ -131,6 +138,7 @@ describe('IssueToken', () => {
         propsData: {
           idKey,
           displayReference,
+          pathIdSeparator,
           title,
           state,
         },
@@ -153,6 +161,7 @@ describe('IssueToken', () => {
           propsData: {
             idKey,
             displayReference,
+            pathIdSeparator,
           },
         }).$mount();
       });
@@ -168,6 +177,7 @@ describe('IssueToken', () => {
           propsData: {
             idKey,
             displayReference,
+            pathIdSeparator,
             canRemove: true,
           },
         }).$mount();
@@ -187,6 +197,7 @@ describe('IssueToken', () => {
         propsData: {
           idKey,
           displayReference,
+          pathIdSeparator,
         },
       }).$mount();
       removeRequestSpy = jasmine.createSpy('spy');
