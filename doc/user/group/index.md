@@ -338,7 +338,6 @@ access each project's settings, and remove any project from the same screen.
 - **Audit Events**: view [Audit Events](https://docs.gitlab.com/ee/administration/audit_events.html#audit-events)
 for the group. **[STARTER ONLY]**
 - **Pipelines quota**: keep track of the [pipeline quota](../admin_area/settings/continuous_integration.md) for the group.
-<<<<<<< HEAD
 
 ## User contribution analysis **[STARTER]**
 
@@ -352,5 +351,3 @@ With [GitLab Issues Analytics](issues_analytics/index.md), in groups, you can se
 
 [ee]: https://about.gitlab.com/pricing/
 [ee-2534]: https://gitlab.com/gitlab-org/gitlab-ee/issues/2534
-=======
->>>>>>> upstream/master
