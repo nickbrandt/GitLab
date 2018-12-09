@@ -84,7 +84,6 @@
   - [object_pool, 1]
   - [repository_cleanup, 1]
   - [delete_stored_files, 1]
-<<<<<<< HEAD
 
   # EE-specific queues
   - [ldap_group_sync, 2]
@@ -106,5 +105,3 @@
   - geo_file_download
   - geo_project_sync
   - geo_repository_shard_sync
-=======
->>>>>>> upstream/master
