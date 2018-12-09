@@ -355,7 +355,6 @@ to reach your apps. This heavily depends on your domain provider, but in case
 you aren't sure, just create an A record with a wildcard host like
 `*.example.com.`.
 
-<<<<<<< HEAD
 ## Multiple Kubernetes clusters **[PREMIUM]**
 
 > Introduced in [GitLab Premium][ee] 10.3.
@@ -370,10 +369,6 @@ differentiate the new cluster with the rest.
 
 ## Setting the environment scope **[PREMIUM]**
 
-=======
-## Setting the environment scope **[PREMIUM]**
-
->>>>>>> upstream/master
 When adding more than one Kubernetes clusters to your project, you need
 to differentiate them with an environment scope. The environment scope
 associates clusters with [environments](../../../ci/environments.md)
