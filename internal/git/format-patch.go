@@ -2,7 +2,6 @@ package git
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 
 	"github.com/golang/protobuf/jsonpb"
@@ -10,15 +9,11 @@ import (
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
-	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 )
 
 type patch struct{ senddata.Prefix }
 type patchParams struct {
-	RepoPath        string
-	ShaFrom         string
-	ShaTo           string
 	GitalyServer    gitaly.Server
 	RawPatchRequest string
 }
@@ -31,22 +26,17 @@ func (p *patch) Inject(w http.ResponseWriter, r *http.Request, sendData string) 
 		helper.Fail500(w, r, fmt.Errorf("SendPatch: unpack sendData: %v", err))
 		return
 	}
-	if params.GitalyServer.Address != "" {
-		handleSendPatchWithGitaly(w, r, &params)
-	} else {
-		handleSendPatchLocally(w, r, &params)
-	}
-}
 
-func handleSendPatchWithGitaly(w http.ResponseWriter, r *http.Request, params *patchParams) {
 	request := &pb.RawPatchRequest{}
 	if err := jsonpb.UnmarshalString(params.RawPatchRequest, request); err != nil {
 		helper.Fail500(w, r, fmt.Errorf("diff.RawPatch: %v", err))
+		return
 	}
 
 	diffClient, err := gitaly.NewDiffClient(params.GitalyServer)
 	if err != nil {
 		helper.Fail500(w, r, fmt.Errorf("diff.RawPatch: %v", err))
+		return
 	}
 
 	if err := diffClient.SendRawPatch(r.Context(), w, request); err != nil {
@@ -54,38 +44,6 @@ func handleSendPatchWithGitaly(w http.ResponseWriter, r *http.Request, params *p
 			r,
 			&copyError{fmt.Errorf("diff.RawPatch: request=%v, err=%v", request, err)},
 		)
-	}
-}
-
-func handleSendPatchLocally(w http.ResponseWriter, r *http.Request, params *patchParams) {
-	log.WithFields(r.Context(), log.Fields{
-		"shaFrom": params.ShaFrom,
-		"shaTo":   params.ShaTo,
-		"path":    r.URL.Path,
-	}).Print("SendPatch: sending patch")
-
-	gitRange := fmt.Sprintf("%s..%s", params.ShaFrom, params.ShaTo)
-	gitPatchCmd := gitCommand("git", "--git-dir="+params.RepoPath, "format-patch", gitRange, "--stdout")
-
-	stdout, err := gitPatchCmd.StdoutPipe()
-	if err != nil {
-		helper.Fail500(w, r, fmt.Errorf("SendPatch: create stdout pipe: %v", err))
-		return
-	}
-
-	if err := gitPatchCmd.Start(); err != nil {
-		helper.Fail500(w, r, fmt.Errorf("SendPatch: start %v: %v", gitPatchCmd.Args, err))
-		return
-	}
-	defer helper.CleanUpProcessGroup(gitPatchCmd)
-
-	w.Header().Del("Content-Length")
-	if _, err := io.Copy(w, stdout); err != nil {
-		helper.LogError(r, &copyError{fmt.Errorf("SendPatch: copy %v stdout: %v", gitPatchCmd.Args, err)})
-		return
-	}
-	if err := gitPatchCmd.Wait(); err != nil {
-		helper.LogError(r, fmt.Errorf("SendPatch: wait for %v: %v", gitPatchCmd.Args, err))
 		return
 	}
 }

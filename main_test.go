@@ -380,22 +380,6 @@ func TestSendURLForArtifacts(t *testing.T) {
 	assert.Equal(t, fileContents, string(body), "GET %q: response body", resourcePath)
 }
 
-func TestGetGitPatch(t *testing.T) {
-	// HEAD of master branch against HEAD of fix branch
-	fromSha := "6907208d755b60ebeacb2e9dfea74c92c3449a1f"
-	toSha := "48f0be4bd10c1decee6fae52f9ae6d10f77b60f4"
-	jsonParams := fmt.Sprintf(`{"RepoPath":"%s","ShaFrom":"%s","ShaTo":"%s"}`, path.Join(testRepoRoot, testRepo), fromSha, toSha)
-
-	resp, body, err := doSendDataRequest("/something", "git-format-patch", jsonParams)
-	require.NoError(t, err)
-
-	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
-	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
-
-	// Only the two commits on the fix branch should be included
-	testhelper.AssertPatchSeries(t, body, "12d65c8dd2b2676fa3ac47d955accc085a37a9c1", toSha)
-}
-
 func TestApiContentTypeBlock(t *testing.T) {
 	wrongResponse := `{"hello":"world"}`
 	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, _ *http.Request) {
