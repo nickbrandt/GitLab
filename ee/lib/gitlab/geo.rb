@@ -9,8 +9,6 @@ module Gitlab
       geo_primary_node
       geo_secondary_nodes
       geo_node_enabled
-      geo_node_primary
-      geo_node_secondary
       geo_oauth_application
     ).freeze
 
