@@ -15,6 +15,13 @@ module Groups
       end
     end
 
+    def milestones
+      group_ids =
+        ParentGroupsFinder.new(current_user, group).execute.map(&:id)
+
+      MilestonesFinder.new(group_ids: group_ids).execute
+    end
+
     def labels_as_hash(target)
       super(target, group_id: group.id, only_group_labels: true)
     end

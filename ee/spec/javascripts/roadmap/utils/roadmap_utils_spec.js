@@ -149,7 +149,7 @@ describe('getEpicsPathForPreset', () => {
       presetType: PRESET_TYPES.QUARTERS,
     });
 
-    expect(epicsPath).toBe(`${basePath}?start_date=2017-10-1&end_date=2019-3-31`);
+    expect(epicsPath).toBe(`${basePath}?state=all&start_date=2017-10-1&end_date=2019-3-31`);
   });
 
   it('returns epics path string based on provided basePath and timeframe for Months', () => {
@@ -160,7 +160,7 @@ describe('getEpicsPathForPreset', () => {
       presetType: PRESET_TYPES.MONTHS,
     });
 
-    expect(epicsPath).toBe(`${basePath}?start_date=2017-12-1&end_date=2018-6-30`);
+    expect(epicsPath).toBe(`${basePath}?state=all&start_date=2017-12-1&end_date=2018-6-30`);
   });
 
   it('returns epics path string based on provided basePath and timeframe for Weeks', () => {
@@ -171,7 +171,7 @@ describe('getEpicsPathForPreset', () => {
       presetType: PRESET_TYPES.WEEKS,
     });
 
-    expect(epicsPath).toBe(`${basePath}?start_date=2017-12-24&end_date=2018-2-3`);
+    expect(epicsPath).toBe(`${basePath}?state=all&start_date=2017-12-24&end_date=2018-2-3`);
   });
 
   it('returns epics path string while preserving filterQueryString', () => {
@@ -184,7 +184,7 @@ describe('getEpicsPathForPreset', () => {
     });
 
     expect(epicsPath).toBe(
-      `${basePath}?start_date=2017-12-1&end_date=2018-6-30&scope=all&utf8=✓&state=opened&label_name[]=Bug`,
+      `${basePath}?state=all&start_date=2017-12-1&end_date=2018-6-30&scope=all&utf8=✓&state=opened&label_name[]=Bug`,
     );
   });
 });

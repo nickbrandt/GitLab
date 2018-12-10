@@ -1,4 +1,4 @@
-import { CHECK_CONFIG, CHECK_RUNNERS } from 'ee/ide/constants';
+import { CHECK_CONFIG, CHECK_RUNNERS, RUNNING, STOPPING } from 'ee/ide/constants';
 import createState from 'ee/ide/stores/modules/terminal/state';
 import * as types from 'ee/ide/stores/modules/terminal/mutation_types';
 import mutations from 'ee/ide/stores/modules/terminal/mutations';
@@ -83,6 +83,55 @@ describe('EE IDE store terminal mutations', () => {
         isValid: true,
         message: null,
       });
+    });
+  });
+
+  describe(types.SET_SESSION, () => {
+    it('sets session', () => {
+      const session = {
+        terminalPath: 'terminal/foo',
+        status: RUNNING,
+      };
+
+      mutations[types.SET_SESSION](state, session);
+
+      expect(state.session).toBe(session);
+    });
+  });
+
+  describe(types.SET_SESSION_STATUS, () => {
+    it('sets session if a session does not exists', () => {
+      const status = RUNNING;
+
+      mutations[types.SET_SESSION_STATUS](state, status);
+
+      expect(state.session).toEqual({
+        status,
+      });
+    });
+
+    it('sets session status', () => {
+      state.session = {
+        terminalPath: 'terminal/foo',
+        status: RUNNING,
+      };
+
+      mutations[types.SET_SESSION_STATUS](state, STOPPING);
+
+      expect(state.session).toEqual({
+        terminalPath: 'terminal/foo',
+        status: STOPPING,
+      });
+    });
+  });
+
+  describe(types.SET_SESSION_STATUS_INTERVAL, () => {
+    it('sets sessionStatusInterval', () => {
+      const val = 7;
+
+      mutations[types.SET_SESSION_STATUS_INTERVAL](state, val);
+
+      expect(state.sessionStatusInterval).toEqual(val);
     });
   });
 });

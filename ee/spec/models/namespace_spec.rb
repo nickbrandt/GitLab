@@ -2,13 +2,20 @@ require 'spec_helper'
 
 describe Namespace do
   let!(:namespace) { create(:namespace) }
+  let!(:free_plan) { create(:free_plan) }
+  let!(:bronze_plan) { create(:bronze_plan) }
+  let!(:silver_plan) { create(:silver_plan) }
+  let!(:gold_plan) { create(:gold_plan) }
 
   it { is_expected.to have_one(:namespace_statistics) }
+  it { is_expected.to have_one(:gitlab_subscription) }
   it { is_expected.to belong_to(:plan) }
 
   it { is_expected.to delegate_method(:shared_runners_minutes).to(:namespace_statistics) }
   it { is_expected.to delegate_method(:shared_runners_seconds).to(:namespace_statistics) }
   it { is_expected.to delegate_method(:shared_runners_seconds_last_reset).to(:namespace_statistics) }
+  it { is_expected.to delegate_method(:trial?).to(:gitlab_subscription) }
+  it { is_expected.to delegate_method(:trial_ends_on).to(:gitlab_subscription) }
 
   context 'scopes' do
     describe '.with_plan' do
@@ -138,14 +145,16 @@ describe Namespace do
   end
 
   describe '#feature_available?' do
-    let(:plan_license) { :bronze_plan }
-    let(:group) { create(:group, plan: plan_license) }
+    let(:hosted_plan) { create(:bronze_plan) }
+    let(:group) { create(:group) }
     let(:licensed_feature) { :service_desk }
     let(:feature) { licensed_feature }
 
     subject { group.feature_available?(feature) }
 
     before do
+      create(:gitlab_subscription, namespace: group, hosted_plan: hosted_plan)
+
       stub_licensed_features(licensed_feature => true)
     end
 
@@ -171,7 +180,7 @@ describe Namespace do
       end
 
       context 'when feature available on the plan' do
-        let(:plan_license) { :gold_plan }
+        let(:hosted_plan) { create(:gold_plan) }
 
         context 'when feature available for current group' do
           it 'returns true' do
@@ -192,7 +201,7 @@ describe Namespace do
 
       context 'when feature not available in the plan' do
         let(:feature) { :deploy_board }
-        let(:plan_license) { :bronze_plan }
+        let(:hosted_plan) { create(:bronze_plan) }
 
         it 'returns false' do
           is_expected.to be_falsy
@@ -201,7 +210,6 @@ describe Namespace do
     end
 
     context 'when the feature is temporarily available on the entire instance' do
-      let(:license_plan) { :free_plan }
       let(:feature) { :ci_cd_projects }
 
       before do
@@ -245,7 +253,7 @@ describe Namespace do
 
     context 'when free plan has limit defined' do
       before do
-        create(:free_plan, active_pipelines_limit: 40)
+        free_plan.update_column(:active_pipelines_limit, 40)
       end
 
       it 'returns a free plan limits' do
@@ -255,7 +263,7 @@ describe Namespace do
 
     context 'when associated plan has no limit defined' do
       before do
-        namespace.plan = create(:gold_plan)
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
       end
 
       it 'returns zero' do
@@ -265,8 +273,8 @@ describe Namespace do
 
     context 'when limit is defined' do
       before do
-        namespace.plan = create(:gold_plan)
-        namespace.plan.update_column(:active_pipelines_limit, 10)
+        gold_plan.update_column(:active_pipelines_limit, 10)
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
       end
 
       it 'returns a number of maximum active pipelines' do
@@ -284,7 +292,7 @@ describe Namespace do
 
     context 'when free plan has limit defined' do
       before do
-        create(:free_plan, pipeline_size_limit: 40)
+        free_plan.update_column(:pipeline_size_limit, 40)
       end
 
       it 'returns a free plan limits' do
@@ -294,7 +302,7 @@ describe Namespace do
 
     context 'when associated plan has no limits defined' do
       before do
-        namespace.plan = create(:gold_plan)
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
       end
 
       it 'returns zero' do
@@ -304,8 +312,8 @@ describe Namespace do
 
     context 'when limit is defined' do
       before do
-        namespace.plan = create(:gold_plan)
-        namespace.plan.update_column(:pipeline_size_limit, 15)
+        gold_plan.update_column(:pipeline_size_limit, 15)
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
       end
 
       it 'returns a number of maximum pipeline size' do
@@ -531,31 +539,38 @@ describe Namespace do
   describe '#actual_plan' do
     context 'when namespace has a plan associated' do
       before do
-        namespace.plan = create(:gold_plan)
+        namespace.update_attribute(:plan, gold_plan)
       end
 
-      it 'returns an associated plan' do
-        expect(namespace.plan).not_to be_nil
-        expect(namespace.actual_plan.name).to eq 'gold'
+      it 'generates a subscription with that plan code' do
+        expect(namespace.actual_plan).to eq(gold_plan)
+        expect(namespace.gitlab_subscription).to be_present
       end
     end
 
-    context 'when namespace does not have plan associated' do
+    context 'when namespace has a subscription associated' do
       before do
-        create(:free_plan)
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
       end
 
-      it 'returns a free plan object' do
-        expect(namespace.plan).to be_nil
-        expect(namespace.actual_plan.name).to eq 'free'
+      it 'returns the plan from the subscription' do
+        expect(namespace.actual_plan).to eq(gold_plan)
+        expect(namespace.gitlab_subscription).to be_present
+      end
+    end
+
+    context 'when namespace does not have a subscription associated' do
+      it 'generates a subscription with the Free plan' do
+        expect(namespace.actual_plan).to eq(free_plan)
+        expect(namespace.gitlab_subscription).to be_present
       end
     end
   end
 
   describe '#actual_plan_name' do
-    context 'when namespace has a plan associated' do
+    context 'when namespace has a subscription associated' do
       before do
-        namespace.plan = create(:gold_plan)
+        create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
       end
 
       it 'returns an associated plan name' do
@@ -563,9 +578,48 @@ describe Namespace do
       end
     end
 
-    context 'when namespace does not have plan associated' do
+    context 'when namespace does not have subscription associated' do
       it 'returns a free plan name' do
         expect(namespace.actual_plan_name).to eq 'free'
+      end
+    end
+  end
+
+  describe '#billable_members_count' do
+    context 'with a user namespace' do
+      let(:user) { create(:user) }
+
+      it 'returns 1' do
+        expect(user.namespace.billable_members_count).to eq(1)
+      end
+    end
+
+    context 'with a group namespace' do
+      let(:group) { create(:group) }
+      let(:developer) { create(:user) }
+      let(:guest) { create(:user) }
+
+      before do
+        group.add_developer(developer)
+        group.add_guest(guest)
+      end
+
+      context 'with a gold plan' do
+        it 'does not count guest users' do
+          create(:gitlab_subscription, namespace: group, hosted_plan: gold_plan)
+
+          expect(group.billable_members_count).to eq(1)
+        end
+      end
+
+      context 'with other plans' do
+        %i[bronze_plan silver_plan].each do |plan|
+          it 'counts guest users' do
+            create(:gitlab_subscription, namespace: group, hosted_plan: send(plan))
+
+            expect(group.billable_members_count).to eq(2)
+          end
+        end
       end
     end
   end

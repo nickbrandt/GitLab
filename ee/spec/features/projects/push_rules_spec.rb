@@ -50,7 +50,7 @@ describe 'Projects > Push Rules', :js do
 
           context 'when disabled' do
             it 'does not render the setting checkbox' do
-              project.namespace.update!(plan_id: bronze_plan.id)
+              create(:gitlab_subscription, :bronze, namespace: project.namespace)
 
               visit project_settings_repository_path(project)
 
@@ -60,7 +60,7 @@ describe 'Projects > Push Rules', :js do
 
           context 'when enabled' do
             it 'renders the setting checkbox' do
-              project.namespace.update!(plan_id: gold_plan.id)
+              create(:gitlab_subscription, :gold, namespace: project.namespace)
 
               visit project_settings_repository_path(project)
 

@@ -18,6 +18,10 @@ module IssuableLinks
 
     private
 
+    def preload_for_collection
+      [{ project: :namespace }, :assignees]
+    end
+
     def relation_path(object)
       raise NotImplementedError
     end
@@ -30,15 +34,24 @@ module IssuableLinks
       project_issue_path(object.project, object.iid)
     end
 
+    # rubocop: disable CodeReuse/Serializer
     def to_hash(object)
       {
         id: object.id,
+        confidential: object.confidential,
         title: object.title,
+        assignees: UserSerializer.new.represent(object.assignees),
         state: object.state,
+        milestone: MilestoneSerializer.new.represent(object.milestone),
+        weight: object.weight,
         reference: reference(object),
         path: issuable_path(object),
-        relation_path: relation_path(object)
+        relation_path: relation_path(object),
+        due_date: object.due_date,
+        created_at: object.created_at&.to_s,
+        closed_at: object.closed_at
       }
     end
+    # rubocop: enable CodeReuse/Serializer
   end
 end

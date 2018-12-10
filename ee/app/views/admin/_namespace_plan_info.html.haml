@@ -3,10 +3,10 @@
 
 %li
   %span.light Plan:
-  - if namespace.plan.present?
-    %strong.plan-badge.inline{ data: { plan: namespace.plan.name } }
+  - if namespace.actual_plan.present?
+    %strong.plan-badge.inline{ data: { plan: namespace.actual_plan.name } }
       = custom_icon('icon_premium')
-      = namespace.plan.title
+      = namespace.actual_plan.title
   - else
     %strong.plan-badge.inline
       = custom_icon('icon_premium')

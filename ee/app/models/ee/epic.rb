@@ -219,9 +219,10 @@ module EE
     def update_project_counter_caches
     end
 
-    def issues_readable_by(current_user)
+    def issues_readable_by(current_user, preload: nil)
       related_issues = ::Issue.select('issues.*, epic_issues.id as epic_issue_id, epic_issues.relative_position')
         .joins(:epic_issue)
+        .preload(preload)
         .where("epic_issues.epic_id = #{id}")
         .order('epic_issues.relative_position, epic_issues.id')
 

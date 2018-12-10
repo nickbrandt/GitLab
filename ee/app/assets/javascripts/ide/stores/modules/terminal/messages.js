@@ -8,8 +8,17 @@ export const UNEXPECTED_ERROR_CONFIG = __(
 export const UNEXPECTED_ERROR_RUNNERS = __(
   'An unexpected error occurred while checking the project runners.',
 );
+export const UNEXPECTED_ERROR_STATUS = __(
+  'An unexpected error occurred while communicating with the Web Terminal.',
+);
+export const UNEXPECTED_ERROR_STARTING = __(
+  'An unexpected error occurred while starting the Web Terminal.',
+);
+export const UNEXPECTED_ERROR_STOPPING = __(
+  'An unexpected error occurred while stopping the Web Terminal.',
+);
 export const EMPTY_RUNNERS = __(
-  'Configure GitLab runners to start using Web Terminal. %{helpStart}Learn more.%{helpEnd}',
+  'Configure GitLab runners to start using the Web Terminal. %{helpStart}Learn more.%{helpEnd}',
 );
 export const ERROR_CONFIG = __(
   'Configure a <code>.gitlab-webide.yml</code> file in the <code>.gitlab</code> directory to start using the Web Terminal. %{helpStart}Learn more.%{helpEnd}',

@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Groups::AutocompleteSourcesController do
   let(:user) { create(:user) }
-  let(:group) { create(:group) }
+  let(:group) { create(:group, :private) }
   let!(:epic) { create(:epic, group: group) }
 
   before do
@@ -26,6 +26,26 @@ describe Groups::AutocompleteSourcesController do
       expect(json_response).to be_an(Array)
       expect(json_response.first).to include(
         'id' => epic.id, 'iid' => epic.iid, 'title' => epic.title
+      )
+    end
+  end
+
+  context '#milestones' do
+    it 'returns correct response' do
+      parent_group = create(:group, :private)
+      group.update!(parent: parent_group)
+      sub_group = create(:group, :private, parent: sub_group)
+      create(:milestone, group: parent_group)
+      create(:milestone, group: sub_group)
+      group_milestone = create(:milestone, group: group)
+
+      get :milestones, group_id: group
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(json_response.count).to eq(1)
+      expect(response).to match_response_schema('public_api/v4/milestones')
+      expect(json_response.first).to include(
+        'id' => group_milestone.id, 'iid' => group_milestone.iid, 'title' => group_milestone.title
       )
     end
   end

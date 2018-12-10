@@ -4,7 +4,32 @@ module EE
       extend ActiveSupport::Concern
 
       prepended do
+        helpers do
+          extend ::Gitlab::Utils::Override
+
+          params :optional_list_params_ee do
+            # Used only by GitLab.com
+            optional :requested_hosted_plan, type: String, desc: "Name of the hosted plan requested by the customer"
+          end
+
+          override :custom_namespace_present_options
+          def custom_namespace_present_options
+            { requested_hosted_plan: params[:requested_hosted_plan] }
+          end
+        end
+
         resource :namespaces do
+          helpers do
+            params :gitlab_subscription_optional_attributes do
+              optional :seats, type: Integer, default: 0, desc: 'The number of seats purchased'
+              optional :max_seats_used, type: Integer, default: 0, desc: 'The max number of active users detected in the last month'
+              optional :plan_code, type: String, desc: 'The code of the purchased plan'
+              optional :end_date, type: Date, desc: 'The date when subscription expires'
+              optional :trial, type: Grape::API::Boolean, desc: 'Wether the subscription is trial'
+              optional :trial_ends_on, type: Date, desc: 'The date when the trial expires'
+            end
+          end
+
           desc 'Update a namespace' do
             success Entities::Namespace
           end
@@ -17,15 +42,70 @@ module EE
             authenticated_as_admin!
 
             namespace = find_namespace(params[:id])
-            trial_ends_on = params[:trial_ends_on]
 
             break not_found!('Namespace') unless namespace
-            break bad_request!("Invalid trial expiration date") if trial_ends_on&.past?
 
             if namespace.update(declared_params)
               present namespace, with: ::API::Entities::Namespace, current_user: current_user
             else
               render_validation_error!(namespace)
+            end
+          end
+
+          desc 'Create a subscription for the namespace' do
+            success ::EE::API::Entities::GitlabSubscription
+          end
+          params do
+            requires :start_date, type: Date, desc: 'The date when subscription was started'
+
+            use :gitlab_subscription_optional_attributes
+          end
+          post ":id/gitlab_subscription" do
+            authenticated_as_admin!
+
+            namespace = find_namespace!(params[:id])
+
+            subscription_params = declared_params(include_missing: false)
+            subscription = namespace.create_gitlab_subscription(subscription_params)
+            if subscription.persisted?
+              present subscription, with: ::EE::API::Entities::GitlabSubscription
+            else
+              render_validation_error!(subscription)
+            end
+          end
+
+          desc 'Returns the subscription for the namespace' do
+            success ::EE::API::Entities::GitlabSubscription
+          end
+          get ":id/gitlab_subscription" do
+            namespace = find_namespace!(params[:id])
+            authorize! :admin_namespace, namespace
+
+            present namespace.gitlab_subscription || {}, with: ::EE::API::Entities::GitlabSubscription
+          end
+
+          desc 'Update the subscription for the namespace' do
+            success ::EE::API::Entities::GitlabSubscription
+          end
+          params do
+            optional :start_date, type: Date, desc: 'The date when subscription was started'
+
+            use :gitlab_subscription_optional_attributes
+          end
+          put ":id/gitlab_subscription" do
+            authenticated_as_admin!
+
+            namespace = find_namespace!(params[:id])
+            subscription = namespace.gitlab_subscription
+            trial_ends_on = params[:trial_ends_on]
+
+            not_found!('GitlabSubscription') unless subscription
+            bad_request!("Invalid trial expiration date") if trial_ends_on&.past?
+
+            if subscription.update(declared_params(include_missing: false))
+              present subscription, with: ::EE::API::Entities::GitlabSubscription
+            else
+              render_validation_error!(subscription)
             end
           end
         end

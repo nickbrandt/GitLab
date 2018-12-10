@@ -30,6 +30,7 @@ import initUsagePingConsent from './usage_ping_consent';
 import initPerformanceBar from './performance_bar';
 import initSearchAutocomplete from './search_autocomplete';
 import GlFieldErrors from './gl_field_errors';
+import initUserPopovers from './user_popovers';
 
 // EE-only scripts
 import 'ee/main';
@@ -81,6 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initTodoToggle();
   initLogoAnimation();
   initUsagePingConsent();
+  initUserPopovers();
 
   if (document.querySelector('.search')) initSearchAutocomplete();
   if (document.querySelector('#js-peek')) initPerformanceBar({ container: '#js-peek' });

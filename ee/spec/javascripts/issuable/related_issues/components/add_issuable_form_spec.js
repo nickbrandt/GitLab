@@ -21,6 +21,8 @@ const issuable2 = {
   state: 'opened',
 };
 
+const pathIdSeparator = '#';
+
 describe('AddIssuableForm', () => {
   let AddIssuableForm;
   let vm;
@@ -47,6 +49,7 @@ describe('AddIssuableForm', () => {
             propsData: {
               inputValue: '',
               pendingReferences: [],
+              pathIdSeparator,
             },
           }).$mount();
         });
@@ -63,6 +66,7 @@ describe('AddIssuableForm', () => {
             propsData: {
               inputValue: 'foo',
               pendingReferences: [],
+              pathIdSeparator,
             },
           }).$mount();
         });
@@ -81,6 +85,7 @@ describe('AddIssuableForm', () => {
           propsData: {
             inputValue,
             pendingReferences: [issuable1.reference, issuable2.reference],
+            pathIdSeparator,
           },
         }).$mount();
       });
@@ -105,6 +110,7 @@ describe('AddIssuableForm', () => {
             inputValue: '',
             pendingReferences: [issuable1.reference, issuable2.reference],
             isSubmitting: true,
+            pathIdSeparator,
           },
         }).$mount();
       });
@@ -125,6 +131,7 @@ describe('AddIssuableForm', () => {
             autoCompleteSources: {
               issues: '/fake/issues/path',
             },
+            pathIdSeparator,
           },
         }).$mount();
       });
@@ -144,6 +151,7 @@ describe('AddIssuableForm', () => {
           propsData: {
             inputValue: '',
             autoCompleteSources: {},
+            pathIdSeparator,
           },
         }).$mount();
       });
@@ -185,6 +193,7 @@ describe('AddIssuableForm', () => {
           autoCompleteSources: {
             issues: '/fake/issues/path',
           },
+          pathIdSeparator,
         },
       }).$mount(el);
     });

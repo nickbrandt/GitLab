@@ -184,6 +184,7 @@ export const getEpicsPathForPreset = ({
   filterQueryString = '',
   presetType = '',
   timeframe = [],
+  state = 'all',
 }) => {
   let start;
   let end;
@@ -213,7 +214,7 @@ export const getEpicsPathForPreset = ({
 
   const startDate = `${start.getFullYear()}-${start.getMonth() + 1}-${start.getDate()}`;
   const endDate = `${end.getFullYear()}-${end.getMonth() + 1}-${end.getDate()}`;
-  epicsPath += `?start_date=${startDate}&end_date=${endDate}`;
+  epicsPath += `?state=${state}&start_date=${startDate}&end_date=${endDate}`;
 
   if (filterQueryString) {
     epicsPath += `&${filterQueryString}`;

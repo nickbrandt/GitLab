@@ -1,11 +1,16 @@
 require 'spec_helper'
 
 describe EE::Gitlab::Ci::Pipeline::Quota::Size do
-  set(:namespace) { create(:namespace, plan: :gold_plan) }
+  set(:namespace) { create(:namespace) }
+  set(:gold_plan) { create(:gold_plan) }
   set(:project) { create(:project, :repository, namespace: namespace) }
 
   let(:pipeline) { build_stubbed(:ci_pipeline, project: project) }
   let(:limit) { described_class.new(namespace, pipeline) }
+
+  before do
+    create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
+  end
 
   shared_context 'pipeline size limit exceeded' do
     let(:pipeline) do
@@ -16,7 +21,7 @@ describe EE::Gitlab::Ci::Pipeline::Quota::Size do
     end
 
     before do
-      namespace.plan.update_column(:pipeline_size_limit, 1)
+      gold_plan.update_column(:pipeline_size_limit, 1)
     end
   end
 
@@ -24,14 +29,14 @@ describe EE::Gitlab::Ci::Pipeline::Quota::Size do
     let(:pipeline) { build(:ci_pipeline_with_one_job, project: project) }
 
     before do
-      namespace.plan.update_column(:pipeline_size_limit, 2)
+      gold_plan.update_column(:pipeline_size_limit, 2)
     end
   end
 
   describe '#enabled?' do
     context 'when limit is enabled in plan' do
       before do
-        namespace.plan.update_column(:pipeline_size_limit, 10)
+        gold_plan.update_column(:pipeline_size_limit, 10)
       end
 
       it 'is enabled' do
@@ -41,7 +46,7 @@ describe EE::Gitlab::Ci::Pipeline::Quota::Size do
 
     context 'when limit is not enabled' do
       before do
-        namespace.plan.update_column(:pipeline_size_limit, 0)
+        gold_plan.update_column(:pipeline_size_limit, 0)
       end
 
       it 'is not enabled' do

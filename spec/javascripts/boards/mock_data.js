@@ -130,3 +130,12 @@ export const mockAssigneesList = [
     path: '/root',
   },
 ];
+
+export const mockMilestone = {
+  id: 1,
+  state: 'active',
+  title: 'Milestone title',
+  description: 'Harum corporis aut consequatur quae dolorem error sequi quia.',
+  start_date: '2018-01-01',
+  due_date: '2019-12-31',
+};

@@ -1,8 +1,8 @@
 # Elasticsearch integration **[STARTER ONLY]**
 
-> [Introduced][ee-109] in GitLab [Starter][ee] 8.4. Support
-> for [Amazon Elasticsearch][aws-elastic] was [introduced][ee-1305] in GitLab
-> [Starter][ee] 9.0.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/109 "Elasticsearch Merge Request") in GitLab [Starter](https://about.gitlab.com/pricing/) 8.4. Support
+> for [Amazon Elasticsearch](http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-gsg.html) was [introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/1305) in GitLab
+> [Starter](https://about.gitlab.com/pricing/) 9.0.
 
 This document describes how to set up Elasticsearch with GitLab. Once enabled,
 you'll have the benefit of fast search response times and the advantage of two
@@ -28,12 +28,12 @@ GitLab from source. Providing detailed information on installing Elasticsearch
 is out of the scope of this document.
 
 Once the data is added to the database or repository and [Elasticsearch is
-enabled in the admin area](#enable-elasticsearch) the search index will be
+enabled in the admin area](#enabling-elasticsearch) the search index will be
 updated automatically. Elasticsearch can be installed on the same machine as
-GitLab, or on a separate server, or you can use the [Amazon Elasticsearch][aws-elastic]
+GitLab, or on a separate server, or you can use the [Amazon Elasticsearch](http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-gsg.html)
 service.
 
-You can follow the steps as described in the [official web site][install] or
+You can follow the steps as described in the [official web site](https://www.elastic.co/guide/en/elasticsearch/reference/current/_installation.html "Elasticsearch installation documentation") or
 use the packages that are available for your OS.
 
 ## Elasticsearch repository indexer (beta)
@@ -118,7 +118,7 @@ The following Elasticsearch settings are available:
 | `Use the new repository indexer (beta)` | Perform repository indexing using [GitLab Elasticsearch Indexer](https://gitlab.com/gitlab-org/gitlab-elasticsearch-indexer). |
 | `Search with Elasticsearch enabled` | Enables/disables using Elasticsearch in search. |
 | `URL`                              | The URL to use for connecting to Elasticsearch. Use a comma-separated list to support clustering (e.g., "http://host1, https://host2:9200"). If your Elasticsearch instance is password protected, pass the `username:password` in the URL (e.g., `http://<username>:<password>@<elastic_host>:9200/`). |
-| `Using AWS hosted Elasticsearch with IAM credentials` | Sign your Elasticsearch requests using [AWS IAM authorization][aws-iam] or [AWS EC2 Instance Profile Credentials][aws-instance-profile]. The policies must be configured to allow `es:*` actions. |
+| `Using AWS hosted Elasticsearch with IAM credentials` | Sign your Elasticsearch requests using [AWS IAM authorization](http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html) or [AWS EC2 Instance Profile Credentials](http://docs.aws.amazon.com/codedeploy/latest/userguide/getting-started-create-iam-instance-profile.html#getting-started-create-iam-instance-profile-cli). The policies must be configured to allow `es:*` actions. |
 | `AWS Region` | The AWS region your Elasticsearch service is located in. |
 | `AWS Access Key` | The AWS access key. |
 | `AWS Secret Access Key` | The AWS secret access key. |
@@ -313,6 +313,38 @@ curl --request POST 'http://localhost:9200/_forcemerge?max_num_segments=5'
 
 Enable Elasticsearch search in **Admin > Settings**. That's it. Enjoy it!
 
+## Tuning
+
+### Deleted documents
+
+Whenever a change or deletion is made to an indexed GitLab object (a merge request description is changed, a file is deleted from the master branch in a repository, a project is deleted, etc), a document in the index is deleted.  However, since these are "soft" deletes, the overall number of "deleted documents", and therefore wasted space, increases.  Elasticsearch does intelligent merging of segments in order to remove these deleted documents.  However, depending on the amount and type of activity in your GitLab installation, it's possible to see as much as 50% wasted space in the index.
+
+In general, we recommend simply letting Elasticseach merge and reclaim space automatically, with the default settings.  From [Lucene's Handling of Deleted Documents](https://www.elastic.co/blog/lucenes-handling-of-deleted-documents "Lucene's Handling of Deleted Documents"), _"Overall, besides perhaps decreasing the maximum segment size, it is best to leave Lucene's defaults as-is and not fret too much about when deletes are reclaimed."_
+
+However, some larger installations may wish to tune the merge policy settings: 
+
+- Consider reducing the `index.merge.policy.max_merged_segment` size from the default 5 GB to maybe 2 GB or 3 GB.  Merging only happens when a segment has at least 50% deletions.  Smaller segment sizes will allow merging to happen more frequently.
+
+  ```bash
+  curl --request PUT http://localhost:9200/gitlab-production/_settings --data '{
+    "index" : {
+      "merge.policy.max_merged_segment": "2gb"
+    }
+  }'
+  ```
+
+- You can also adjust `index.merge.policy.reclaim_deletes_weight`, which controls how aggressively deletions are targetd.  But this can lead to costly merge decisions, so we recommend not changing this unless you understand the tradeoffs.
+
+  ```bash
+  curl --request PUT http://localhost:9200/gitlab-production/_settings --data '{
+    "index" : {
+      "merge.policy.reclaim_deletes_weight": "3.0"
+    }
+  }'
+  ```
+
+- Do not do a [force merge](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-forcemerge.html "Force Merge") to remove deleted documents.  A warning in the [documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-forcemerge.html "Force Merge") states that this can lead to very large segments that may never get reclaimed, and can also cause significant performance or availability issues.
+
 ## Troubleshooting
 
 Here are some common pitfalls and how to overcome them:
@@ -325,7 +357,7 @@ Here are some common pitfalls and how to overcome them:
 
 - **I indexed all the repositories but I can't find anything**
 
-    Make sure you indexed all the database data [as stated above](#adding-gitlab-data-to-the-elasticsearch-index).
+    Make sure you indexed all the database data [as stated above](#adding-gitlabs-data-to-the-elasticsearch-index).
 
 - **I indexed all the repositories but then switched elastic search servers and now I can't find anything**
 
@@ -355,7 +387,7 @@ Here are some common pitfalls and how to overcome them:
 
 - Exception `Elasticsearch::Transport::Transport::Errors::BadRequest`
 
-    If you have this exception (just like in the case above but the actual message is different) please check if you have the correct Elasticsearch version and you met the other [requirements](#requirements).
+    If you have this exception (just like in the case above but the actual message is different) please check if you have the correct Elasticsearch version and you met the other [requirements](#system-requirements).
     There is also an easy way to check it automatically with `sudo gitlab-rake gitlab:check` command.
 
 - Exception `Elasticsearch::Transport::Transport::Errors::RequestEntityTooLarge`
@@ -373,13 +405,3 @@ Here are some common pitfalls and how to overcome them:
     for this setting ("Maximum Size of HTTP Request Payloads"), based on the size of
     the underlying instance.
 
-[ee-1305]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/1305
-[aws-elastic]: http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-gsg.html
-[aws-iam]: http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html
-[aws-instance-profile]: http://docs.aws.amazon.com/codedeploy/latest/userguide/getting-started-create-iam-instance-profile.html#getting-started-create-iam-instance-profile-cli
-[ee-109]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/109 "Elasticsearch Merge Request"
-[elasticsearch]: https://www.elastic.co/products/elasticsearch "Elasticsearch website"
-[install]: https://www.elastic.co/guide/en/elasticsearch/reference/current/_installation.html "Elasticsearch installation documentation"
-[pkg]: https://about.gitlab.com/downloads/ "Download Omnibus GitLab"
-[elastic-settings]: https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration.html#settings "Elasticsearch configuration settings"
-[ee]: https://about.gitlab.com/pricing/

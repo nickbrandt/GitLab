@@ -17,6 +17,7 @@
 - cronjob:ldap_sync
 - cronjob:update_all_mirrors
 - cronjob:pseudonymizer
+- cronjob:update_max_seats_used_for_gitlab_com_subscriptions
 
 - gcp_cluster:cluster_update_app
 - gcp_cluster:cluster_wait_for_app_update

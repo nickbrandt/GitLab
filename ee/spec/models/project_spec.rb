@@ -309,9 +309,11 @@ describe Project do
   end
 
   describe '#feature_available?' do
-    let(:namespace) { build_stubbed(:namespace) }
-    let(:project) { build_stubbed(:project, namespace: namespace) }
-    let(:user) { build_stubbed(:user) }
+    let(:namespace) { create(:namespace) }
+    let(:plan_license) { nil }
+    let!(:gitlab_subscription) { create(:gitlab_subscription, namespace: namespace, hosted_plan: plan_license) }
+    let(:project) { create(:project, namespace: namespace) }
+    let(:user) { create(:user) }
 
     subject { project.feature_available?(feature, user) }
 
@@ -677,7 +679,7 @@ describe Project do
       end
 
       context 'Service Desk available in namespace plan' do
-        let(:namespace) { create(:namespace, plan: :silver_plan) }
+        let!(:gitlab_subscription) { create(:gitlab_subscription, :silver, namespace: namespace) }
 
         it 'is enabled' do
           expect(project.service_desk_enabled?).to be_truthy
@@ -979,6 +981,7 @@ describe Project do
 
         context 'and namespace has a plan' do
           let(:namespace) { create(:group, :private, plan: :silver_plan) }
+          let!(:gitlab_subscription) { create(:gitlab_subscription, :silver, namespace: namespace) }
 
           it_behaves_like 'project without disabled services'
         end
@@ -1121,9 +1124,10 @@ describe Project do
   end
 
   describe '#licensed_features' do
-    let(:plan_license) { :free_plan }
+    let(:plan_license) { :free }
     let(:global_license) { create(:license) }
-    let(:group) { create(:group, plan: plan_license) }
+    let(:group) { create(:group) }
+    let!(:gitlab_subscription) { create(:gitlab_subscription, plan_license, namespace: group) }
     let(:project) { create(:project, group: group) }
 
     before do
@@ -1144,7 +1148,7 @@ describe Project do
       end
 
       context 'when bronze' do
-        let(:plan_license) { :bronze_plan }
+        let(:plan_license) { :bronze }
 
         it 'filters for bronze features' do
           is_expected.to contain_exactly(:audit_events, :geo)
@@ -1152,7 +1156,7 @@ describe Project do
       end
 
       context 'when silver' do
-        let(:plan_license) { :silver_plan }
+        let(:plan_license) { :silver }
 
         it 'filters for silver features' do
           is_expected.to contain_exactly(:service_desk, :audit_events, :geo)
@@ -1160,7 +1164,7 @@ describe Project do
       end
 
       context 'when gold' do
-        let(:plan_license) { :gold_plan }
+        let(:plan_license) { :gold }
 
         it 'filters for gold features' do
           is_expected.to contain_exactly(:epics, :service_desk, :audit_events, :geo)
@@ -1168,14 +1172,15 @@ describe Project do
       end
 
       context 'when free plan' do
-        let(:plan_license) { :free_plan }
+        let(:plan_license) { :free }
 
         it 'filters out paid features' do
           is_expected.to contain_exactly(:geo)
         end
 
         context 'when public project and namespace' do
-          let(:group) { create(:group, :public, plan: plan_license) }
+          let(:group) { create(:group, :public) }
+          let!(:gitlab_subscription) { create(:gitlab_subscription, :free, namespace: group) }
           let(:project) { create(:project, :public, group: group) }
 
           it 'includes all features in global license' do

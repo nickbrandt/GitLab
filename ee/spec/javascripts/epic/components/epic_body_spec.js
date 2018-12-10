@@ -55,7 +55,7 @@ describe('EpicBodyComponent', () => {
       expect(vm.$el.querySelector('.related-issues-block')).not.toBeNull();
       expect(vm.$el.querySelector('.js-related-issues-header-issue-count')).not.toBeNull();
       expect(vm.$el.querySelector('.related-issues-token-body')).not.toBeNull();
-      expect(vm.$el.querySelector('.issuable-list')).not.toBeNull();
+      expect(vm.$el.querySelector('.related-items-list')).not.toBeNull();
     });
   });
 });
