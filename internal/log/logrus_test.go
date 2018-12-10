@@ -19,8 +19,8 @@ func requireCorrelationID(t *testing.T, getEntry func(ctx context.Context) *logr
 	e := getEntry(ctx)
 
 	require.NotNil(t, e)
-	require.Contains(t, e.Data, "correlation-id")
-	require.Equal(t, id, e.Data["correlation-id"])
+	require.Contains(t, e.Data, "correlation_id")
+	require.Equal(t, id, e.Data["correlation_id"])
 
 	return e
 }
@@ -84,7 +84,7 @@ func TestNoContext(t *testing.T) {
 	require.Equal(t, logrus.StandardLogger(), logger)
 
 	e := logger.WithField(key, value)
-	require.NotContains(t, e.Data, "correlation-id")
+	require.NotContains(t, e.Data, "correlation_id")
 
 	require.Contains(t, e.Data, key)
 	require.Equal(t, value, e.Data[key])
