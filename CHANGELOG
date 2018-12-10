@@ -4,6 +4,8 @@ Formerly known as 'gitlab-git-http-server'.
 
 UNRELEASED
 
+- Rename correlation-id structured logging field to correlation_id !343
+
 v 7.5.0
 
 - Add proxy layer to calculate content type and disposition headers !335
