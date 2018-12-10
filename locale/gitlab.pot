@@ -113,12 +113,9 @@ msgstr[1] ""
 msgid "%{actionText} & %{openOrClose} %{noteable}"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "%{authorsName}'s discussion"
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "%{bio} at %{organization}"
 msgstr ""
 
@@ -8217,12 +8214,9 @@ msgstr ""
 msgid "Started %{startsIn}"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Starting..."
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "Starts %{startsIn}"
 msgstr ""
 
