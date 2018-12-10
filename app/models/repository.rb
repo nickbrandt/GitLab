@@ -19,7 +19,6 @@ class Repository
     #{REF_ENVIRONMENTS}
   ].freeze
 
-  include Gitlab::ShellAdapter
   include Gitlab::RepositoryCacheAdapter
 
   include Elastic::RepositoriesSearch
