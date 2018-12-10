@@ -9,6 +9,10 @@ v 7.6.0
 - Remove curl from sendfile_test.go !344
 - Update README.md usage example !342
 
+v 7.5.1
+
+- Rename correlation-id structured logging field to correlation_id !343
+
 v 7.5.0
 
 - Add proxy layer to calculate content type and disposition headers !335
