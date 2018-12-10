@@ -84,24 +84,24 @@ module Gitlab
     end
 
     def self.cache_value(raw_key, &block)
-      return yield unless RequestStore.active?
+      return yield unless Gitlab::SafeRequestStore.active?
 
       key = cache_key_for(raw_key)
 
-      RequestStore.fetch(key) do
+      Gitlab::SafeRequestStore.fetch(key) do
         # We need a short expire time as we can't manually expire on a secondary node
         Rails.cache.fetch(key, expires_in: 15.seconds) { yield }
       end
     end
 
     def self.expire_cache!
-      return true unless RequestStore.active?
+      return true unless Gitlab::SafeRequestStore.active?
 
       CACHE_KEYS.each do |raw_key|
         key = cache_key_for(raw_key)
 
         Rails.cache.delete(key)
-        RequestStore.delete(key)
+        Gitlab::SafeRequestStore.delete(key)
       end
 
       true
