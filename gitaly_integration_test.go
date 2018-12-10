@@ -225,3 +225,30 @@ func TestAllowedGetGitArchive(t *testing.T) {
 
 	assert.True(t, foundEntry, "Couldn't find %v directory entry", archivePrefix)
 }
+
+func TestAllowedGetGitDiff(t *testing.T) {
+	skipUnlessRealGitaly(t)
+
+	// Create the repository in the Gitaly server
+	apiResponse := realGitalyOkBody(t)
+	require.NoError(t, ensureGitalyRepository(t, apiResponse))
+
+	leftCommit := "8a0f2ee90d940bfb0ba1e14e8214b0649056e4ab"
+	rightCommit := "e395f646b1499e8e0279445fc99a0596a65fab7e"
+	expectedBody := "diff --git a/README.md b/README.md"
+
+	msg := serializedMessage("RawDiffRequest", &pb.RawDiffRequest{
+		Repository:    &apiResponse.Repository,
+		LeftCommitId:  leftCommit,
+		RightCommitId: rightCommit,
+	})
+	jsonParams := buildGitalyRPCParams(gitalyAddress, msg)
+
+	resp, body, err := doSendDataRequest("/something", "git-diff", jsonParams)
+	require.NoError(t, err)
+	shortBody := string(body[:len(expectedBody)])
+
+	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	assert.Equal(t, expectedBody, shortBody, "GET %q: response body", resp.Request.URL)
+	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
+}
