@@ -2,9 +2,12 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
-UNRELEASED
+v 7.6.0
 
 - Rename correlation-id structured logging field to correlation_id !343
+- Remove local git receive-pack implementation !326
+- Remove curl from sendfile_test.go !344
+- Update README.md usage example !342
 
 v 7.5.0
 
