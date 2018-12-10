@@ -1878,6 +1878,7 @@ ActiveRecord::Schema.define(version: 20181206121340) do
     t.integer "cached_markdown_version"
     t.text "change_position"
     t.boolean "resolved_by_push"
+    t.bigint "review_id"
     t.index ["author_id"], name: "index_notes_on_author_id", using: :btree
     t.index ["commit_id"], name: "index_notes_on_commit_id", using: :btree
     t.index ["created_at"], name: "index_notes_on_created_at", using: :btree
@@ -1887,6 +1888,7 @@ ActiveRecord::Schema.define(version: 20181206121340) do
     t.index ["noteable_id", "noteable_type"], name: "index_notes_on_noteable_id_and_noteable_type", using: :btree
     t.index ["noteable_type"], name: "index_notes_on_noteable_type", using: :btree
     t.index ["project_id", "noteable_type"], name: "index_notes_on_project_id_and_noteable_type", using: :btree
+    t.index ["review_id"], name: "index_notes_on_review_id", using: :btree
   end
 
   create_table "notification_settings", force: :cascade do |t|
@@ -2554,6 +2556,16 @@ ActiveRecord::Schema.define(version: 20181206121340) do
     t.index ["label_id"], name: "index_resource_label_events_on_label_id", using: :btree
     t.index ["merge_request_id"], name: "index_resource_label_events_on_merge_request_id", using: :btree
     t.index ["user_id"], name: "index_resource_label_events_on_user_id", using: :btree
+  end
+
+  create_table "reviews", id: :bigserial, force: :cascade do |t|
+    t.integer "author_id"
+    t.integer "merge_request_id", null: false
+    t.integer "project_id", null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.index ["author_id"], name: "index_reviews_on_author_id", using: :btree
+    t.index ["merge_request_id"], name: "index_reviews_on_merge_request_id", using: :btree
+    t.index ["project_id"], name: "index_reviews_on_project_id", using: :btree
   end
 
   create_table "routes", force: :cascade do |t|
@@ -3296,6 +3308,7 @@ ActiveRecord::Schema.define(version: 20181206121340) do
   add_foreign_key "namespaces", "projects", column: "file_template_project_id", name: "fk_319256d87a", on_delete: :nullify
   add_foreign_key "note_diff_files", "notes", column: "diff_note_id", on_delete: :cascade
   add_foreign_key "notes", "projects", name: "fk_99e097b079", on_delete: :cascade
+  add_foreign_key "notes", "reviews", name: "fk_2e82291620", on_delete: :nullify
   add_foreign_key "notification_settings", "users", name: "fk_0c95e91db7", on_delete: :cascade
   add_foreign_key "oauth_openid_requests", "oauth_access_grants", column: "access_grant_id", name: "fk_oauth_openid_requests_oauth_access_grants_access_grant_id"
   add_foreign_key "operations_feature_flags", "projects", on_delete: :cascade
@@ -3360,6 +3373,9 @@ ActiveRecord::Schema.define(version: 20181206121340) do
   add_foreign_key "resource_label_events", "labels", on_delete: :nullify
   add_foreign_key "resource_label_events", "merge_requests", on_delete: :cascade
   add_foreign_key "resource_label_events", "users", on_delete: :nullify
+  add_foreign_key "reviews", "merge_requests", on_delete: :cascade
+  add_foreign_key "reviews", "projects", on_delete: :cascade
+  add_foreign_key "reviews", "users", column: "author_id", on_delete: :nullify
   add_foreign_key "saml_providers", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "services", "projects", name: "fk_71cce407f9", on_delete: :cascade
   add_foreign_key "slack_integrations", "services", on_delete: :cascade

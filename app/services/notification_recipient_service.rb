@@ -390,3 +390,5 @@ module NotificationRecipientService
     end
   end
 end
+
+NotificationRecipientService.prepend(EE::NotificationRecipientService)
