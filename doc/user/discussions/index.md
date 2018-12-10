@@ -337,6 +337,12 @@ bottom of the screen with two buttons:
 Alternatively, every pending comment has a button to finish the entire review.
 
 ![Review submission](img/review_preview.png)
+
+Submitting the review will send a single email to every notifiable user of the
+merge request with all the comments associated to it.
+
+Replying to this email will, consequentially, create a new comment on the associated merge request.
+
 ## Filtering notes
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/26723) in GitLab 11.5. 

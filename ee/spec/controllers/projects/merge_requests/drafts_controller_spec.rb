@@ -193,6 +193,22 @@ describe Projects::MergeRequests::DraftsController do
       end
     end
 
+    context 'when PublishService errors' do
+      it 'returns message and 500 response' do
+        create(:draft_note, merge_request: merge_request, author: user)
+        error_message = "Something went wrong"
+
+        expect_next_instance_of(DraftNotes::PublishService) do |service|
+          allow(service).to receive(:execute).and_return({ message: error_message, status: :error })
+        end
+
+        post :publish, params
+
+        expect(response).to have_gitlab_http_status(:error)
+        expect(json_response["message"]).to include(error_message)
+      end
+    end
+
     it 'publishes draft notes with position' do
       diff_refs = project.commit(RepoHelpers.sample_commit.id).try(:diff_refs)
 
