@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Geo
     OauthApplicationUndefinedError = Class.new(StandardError)
@@ -6,24 +8,22 @@ module Gitlab
     InvalidSignatureTimeError = Class.new(StandardError)
 
     CACHE_KEYS = %i(
-      geo_primary_node
-      geo_secondary_nodes
-      geo_node_enabled
-      geo_node_primary
-      geo_node_secondary
-      geo_oauth_application
+      primary_node
+      secondary_nodes
+      node_enabled
+      oauth_application
     ).freeze
 
     def self.current_node
-      self.cache_value(:geo_node_current) { GeoNode.current_node }
+      self.cache_value(:current_node) { GeoNode.current_node }
     end
 
     def self.primary_node
-      self.cache_value(:geo_primary_node) { GeoNode.primary_node }
+      self.cache_value(:primary_node) { GeoNode.primary_node }
     end
 
     def self.secondary_nodes
-      self.cache_value(:geo_secondary_nodes) { GeoNode.secondary_nodes }
+      self.cache_value(:secondary_nodes) { GeoNode.secondary_nodes }
     end
 
     def self.connected?
@@ -31,7 +31,7 @@ module Gitlab
     end
 
     def self.enabled?
-      cache_value(:geo_node_enabled) { GeoNode.exists? }
+      cache_value(:node_enabled) { GeoNode.exists? }
     end
 
     def self.primary?
@@ -74,24 +74,34 @@ module Gitlab
     def self.oauth_authentication
       return false unless Gitlab::Geo.secondary?
 
-      self.cache_value(:geo_oauth_application) do
+      self.cache_value(:oauth_application) do
         Gitlab::Geo.current_node.oauth_application || raise(OauthApplicationUndefinedError)
       end
     end
 
-    def self.cache_value(key, &block)
-      return yield unless RequestStore.active?
+    def self.cache_key_for(key)
+      "geo:#{key}:#{Rails.version}"
+    end
 
-      # We need a short expire time as we can't manually expire on a secondary node
-      RequestStore.fetch(key) { Rails.cache.fetch(key, expires_in: 15.seconds) { yield } }
+    def self.cache_value(raw_key, &block)
+      return yield unless Gitlab::SafeRequestStore.active?
+
+      key = cache_key_for(raw_key)
+
+      Gitlab::SafeRequestStore.fetch(key) do
+        # We need a short expire time as we can't manually expire on a secondary node
+        Rails.cache.fetch(key, expires_in: 15.seconds) { yield }
+      end
     end
 
     def self.expire_cache!
-      return true unless RequestStore.active?
+      return true unless Gitlab::SafeRequestStore.active?
 
-      CACHE_KEYS.each do |key|
+      CACHE_KEYS.each do |raw_key|
+        key = cache_key_for(raw_key)
+
         Rails.cache.delete(key)
-        RequestStore.delete(key)
+        Gitlab::SafeRequestStore.delete(key)
       end
 
       true
