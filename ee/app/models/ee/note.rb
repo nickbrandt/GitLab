@@ -46,6 +46,11 @@ module EE
       for_epic? || super
     end
 
+    override :parent
+    def parent
+      for_epic? ? noteable.group : super
+    end
+
     private
 
     def banzai_context_params

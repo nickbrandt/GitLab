@@ -29,4 +29,13 @@ describe Note do
       end
     end
   end
+
+  describe '#parent' do
+    it 'returns group for epic notes' do
+      group = create(:group)
+      note = create(:note_on_epic, noteable: create(:epic, group: group))
+
+      expect(note.parent).to eq(group)
+    end
+  end
 end

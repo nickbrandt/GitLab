@@ -14,6 +14,7 @@ FactoryBot.define do
     factory :note_on_merge_request,      traits: [:on_merge_request]
     factory :note_on_project_snippet,    traits: [:on_project_snippet]
     factory :note_on_personal_snippet,   traits: [:on_personal_snippet]
+    factory :note_on_epic,               traits: [:on_epic]
     factory :system_note,                traits: [:system]
 
     factory :discussion_note, class: DiscussionNote
@@ -130,6 +131,11 @@ FactoryBot.define do
 
     trait :on_personal_snippet do
       noteable { create(:personal_snippet) }
+      project nil
+    end
+
+    trait :on_epic do
+      noteable { create(:epic) }
       project nil
     end
 

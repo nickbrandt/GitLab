@@ -199,6 +199,51 @@ describe QuickActions::InterpretService do
       end
     end
 
+    context 'label command for epics' do
+      let(:epic) { create(:epic, group: group)}
+      let(:label) { create(:group_label, title: 'bug', group: group) }
+      let(:project_label) { create(:label, title: 'project_label') }
+      let(:content) { "/label ~#{label.title} ~#{project_label.title}" }
+
+      let(:service) { described_class.new(nil, current_user) }
+
+      context 'when epics are enabled' do
+        before do
+          stub_licensed_features(epics: true)
+        end
+
+        context 'when a user has permissions to label an epic' do
+          before do
+            group.add_developer(current_user)
+          end
+
+          it 'populates valid label ids' do
+            _, updates = service.execute(content, epic)
+
+            expect(updates).to eq(add_label_ids: [label.id])
+          end
+        end
+
+        context 'when a user does not have permissions to label an epic' do
+          it 'does not populate any lables' do
+            _, updates = service.execute(content, epic)
+
+            expect(updates).to be_empty
+          end
+        end
+      end
+
+      context 'when epics are disabled' do
+        it 'does not populate any lables' do
+          group.add_developer(current_user)
+
+          _, updates = service.execute(content, epic)
+
+          expect(updates).to be_empty
+        end
+      end
+    end
+
     context 'remove_epic command' do
       let(:epic) { create(:epic, group: group)}
       let(:content) { "/remove_epic #{epic.to_reference(project)}" }

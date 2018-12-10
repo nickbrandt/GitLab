@@ -2,6 +2,7 @@
 
 module QuickActions
   class InterpretService < BaseService
+    include Gitlab::Utils::StrongMemoize
     include Gitlab::QuickActions::Dsl
     attr_reader :issuable
 
@@ -209,15 +210,11 @@ module QuickActions
     end
     params '~label1 ~"label 2"'
     condition do
-      if project
-        available_labels = LabelsFinder
-          .new(current_user, project_id: project.id, include_ancestor_groups: true)
-          .execute
-      end
+      parent = project || issuable_group
 
-      project &&
-        current_user.can?(:"admin_#{issuable.to_ability_name}", project) &&
-        available_labels.any?
+      parent &&
+        current_user.can?(:"admin_#{issuable.to_ability_name}", parent) &&
+        find_labels.any?
     end
     command :label do |labels_param|
       label_ids = find_label_ids(labels_param)
@@ -673,9 +670,23 @@ module QuickActions
       MilestonesFinder.new(params.merge(project_ids: [project.id], group_ids: [project.group&.id])).execute
     end
 
-    def find_labels(labels_param)
-      extract_references(labels_param, :label) |
-        LabelsFinder.new(current_user, project_id: project.id, name: labels_param.split, include_ancestor_groups: true).execute
+    def issuable_group
+      strong_memoize(:issuable_group) do
+        issuable.group if issuable.respond_to?(:group)
+      end
+    end
+
+    def find_labels(label_references = nil)
+      labels_params = { include_ancestor_groups: true }
+      labels_params[:project_id] = project.id if project
+      labels_params[:group_id] = issuable_group.id if issuable_group
+      labels_params[:name] = label_references.split if label_references
+
+      result = LabelsFinder.new(current_user, labels_params).execute
+
+      return result unless label_references
+
+      extract_references(label_references, :label) | result
     end
 
     def find_label_references(labels_param)
@@ -708,7 +719,7 @@ module QuickActions
     def extract_references(arg, type)
       ext = Gitlab::ReferenceExtractor.new(project, current_user)
 
-      ext.analyze(arg, author: current_user)
+      ext.analyze(arg, author: current_user, group: issuable_group)
 
       ext.references(type)
     end
