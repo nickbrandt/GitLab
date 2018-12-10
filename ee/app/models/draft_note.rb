@@ -13,6 +13,8 @@ class DraftNote < ActiveRecord::Base
   # Text with quick actions filtered out
   attr_accessor :rendered_note
 
+  attr_accessor :review
+
   belongs_to :author, class_name: 'User'
   belongs_to :merge_request
 
@@ -91,6 +93,7 @@ class DraftNote < ActiveRecord::Base
     attrs.concat(DIFF_ATTRS) if on_diff?
     params = slice(*attrs)
     params[:in_reply_to_discussion_id] = discussion_id if discussion_id.present?
+    params[:review_id] = review.id if review.present?
 
     params
   end

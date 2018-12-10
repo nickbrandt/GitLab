@@ -5,6 +5,7 @@ issues:
 milestone:
 - boards
 merge_requests:
+- reviews
 - approvals
 - approvers
 - approver_groups
@@ -69,6 +70,7 @@ project:
 - packages
 - tracing_setting
 - webide_pipelines
+- reviews
 prometheus_metrics:
 - project
 - prometheus_alerts
@@ -82,3 +84,10 @@ epic_issues:
 - epic
 tracing_setting:
 - project
+notes:
+- review
+reviews:
+- project
+- merge_request
+- author
+- notes

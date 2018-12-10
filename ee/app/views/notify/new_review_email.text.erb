@@ -1,0 +1,10 @@
+<%= "Merge request #{merge_request_url(@merge_request)} was reviewed by #{@author_name}" %>
+
+--
+<% @notes.each_with_index do |note, index| %>
+  <%= render 'note_email', note: note, diff_limit: 3 %>
+
+  <% if index != @notes.length-1 %>
+--
+  <% end %>
+<% end %>

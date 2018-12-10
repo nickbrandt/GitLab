@@ -41,9 +41,13 @@ class Projects::MergeRequests::DraftsController < Projects::MergeRequests::Appli
   end
 
   def publish
-    DraftNotes::PublishService.new(merge_request, current_user).execute(draft_note(allow_nil: true))
+    result = DraftNotes::PublishService.new(merge_request, current_user).execute(draft_note(allow_nil: true))
 
-    head :ok
+    if result[:status] == :success
+      head :ok
+    else
+      render json: { message: result[:message] }, status: result[:status]
+    end
   end
 
   def discard

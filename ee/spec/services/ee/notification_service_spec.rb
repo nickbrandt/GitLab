@@ -121,6 +121,90 @@ describe EE::NotificationService, :mailer do
     end
   end
 
+  context 'new review' do
+    let(:project) { create(:project, :repository) }
+    let(:user) { create(:user) }
+    let(:reviewer) { create(:user) }
+    let(:merge_request) { create(:merge_request, source_project: project, assignee: user, author: create(:user)) }
+    let(:review) { create(:review, merge_request: merge_request, project: project, author: reviewer) }
+    let(:note) { create(:diff_note_on_merge_request, project: project, noteable: merge_request, author: reviewer, review: review) }
+
+    before do
+      build_team(review.project, merge_request)
+      project.add_maintainer(merge_request.author)
+      project.add_maintainer(reviewer)
+      project.add_maintainer(merge_request.assignee)
+
+      create(:diff_note_on_merge_request,
+             project: project,
+             noteable: merge_request,
+             author: reviewer,
+             review: review,
+             note: "cc @mention")
+    end
+
+    it 'sends emails' do
+      expect(Notify).not_to receive(:new_review_email).with(review.author.id, review.id)
+      expect(Notify).not_to receive(:new_review_email).with(@unsubscriber.id, review.id)
+      expect(Notify).to receive(:new_review_email).with(merge_request.assignee.id, review.id).and_call_original
+      expect(Notify).to receive(:new_review_email).with(merge_request.author.id, review.id).and_call_original
+      expect(Notify).to receive(:new_review_email).with(@u_watcher.id, review.id).and_call_original
+      expect(Notify).to receive(:new_review_email).with(@u_mentioned.id, review.id).and_call_original
+      expect(Notify).to receive(:new_review_email).with(@subscriber.id, review.id).and_call_original
+      expect(Notify).to receive(:new_review_email).with(@watcher_and_subscriber.id, review.id).and_call_original
+      expect(Notify).to receive(:new_review_email).with(@subscribed_participant.id, review.id).and_call_original
+
+      subject.new_review(review)
+    end
+
+    def build_team(project, merge_request)
+      @u_watcher               = create_global_setting_for(create(:user), :watch)
+      @u_participating         = create_global_setting_for(create(:user), :participating)
+      @u_participant_mentioned = create_global_setting_for(create(:user, username: 'participant'), :participating)
+      @u_disabled              = create_global_setting_for(create(:user), :disabled)
+      @u_mentioned             = create_global_setting_for(create(:user, username: 'mention'), :mention)
+      @u_committer             = create(:user, username: 'committer')
+      @u_not_mentioned         = create_global_setting_for(create(:user, username: 'regular'), :participating)
+      @u_outsider_mentioned    = create(:user, username: 'outsider')
+      @u_custom_global         = create_global_setting_for(create(:user, username: 'custom_global'), :custom)
+
+      # subscribers
+      @subscriber = create :user
+      @unsubscriber = create :user
+      @subscribed_participant = create_global_setting_for(create(:user, username: 'subscribed_participant'), :participating)
+      @watcher_and_subscriber = create_global_setting_for(create(:user), :watch)
+
+      # User to be participant by default
+      # This user does not contain any record in notification settings table
+      # It should be treated with a :participating notification_level
+      @u_lazy_participant = create(:user, username: 'lazy-participant')
+
+      @u_guest_watcher = create_user_with_notification(:watch, 'guest_watching')
+      @u_guest_custom = create_user_with_notification(:custom, 'guest_custom')
+
+      project.add_maintainer(@u_watcher)
+      project.add_maintainer(@u_participating)
+      project.add_maintainer(@u_participant_mentioned)
+      project.add_maintainer(@u_disabled)
+      project.add_maintainer(@u_mentioned)
+      project.add_maintainer(@u_committer)
+      project.add_maintainer(@u_not_mentioned)
+      project.add_maintainer(@u_lazy_participant)
+      project.add_maintainer(@u_custom_global)
+      project.add_maintainer(@subscriber)
+      project.add_maintainer(@unsubscriber)
+      project.add_maintainer(@subscribed_participant)
+      project.add_maintainer(@watcher_and_subscriber)
+
+      merge_request.subscriptions.create(user: @unsubscribed_mentioned, subscribed: false)
+      merge_request.subscriptions.create(user: @subscriber, subscribed: true)
+      merge_request.subscriptions.create(user: @subscribed_participant, subscribed: true)
+      merge_request.subscriptions.create(user: @unsubscriber, subscribed: false)
+      # Make the watcher a subscriber to detect dupes
+      merge_request.subscriptions.create(user: @watcher_and_subscriber, subscribed: true)
+    end
+  end
+
   describe 'mirror hard failed' do
     let(:user) { create(:user) }
 
