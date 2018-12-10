@@ -3,10 +3,13 @@
 package main
 
 import (
+	"archive/tar"
+	"bytes"
 	"context"
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"strconv"
 	"testing"
 
@@ -20,11 +23,13 @@ import (
 )
 
 var (
-	gitalyAddress string
+	gitalyAddress    string
+	jsonGitalyServer string
 )
 
 func init() {
 	gitalyAddress = os.Getenv("GITALY_ADDRESS")
+	jsonGitalyServer = fmt.Sprintf(`"GitalyServer":{"Address":"%s", "Token": ""}`, gitalyAddress)
 }
 
 func skipUnlessRealGitaly(t *testing.T) {
@@ -156,14 +161,14 @@ func TestAllowedGetGitBlob(t *testing.T) {
 
 	jsonParams := fmt.Sprintf(
 		`{
-			"GitalyServer":{"Address":"%s", "Token":""},
+			%s,
 			"GetBlobRequest":{
 				"repository":{"storage_name":"%s", "relative_path":"%s"},
 				"oid":"%s",
 				"limit":-1
 			}
 		}`,
-		gitalyAddress, apiResponse.Repository.StorageName, apiResponse.Repository.RelativePath, oid,
+		jsonGitalyServer, apiResponse.Repository.StorageName, apiResponse.Repository.RelativePath, oid,
 	)
 
 	resp, body, err := doSendDataRequest("/something", "git-blob", jsonParams)
@@ -174,4 +179,49 @@ func TestAllowedGetGitBlob(t *testing.T) {
 	assert.Equal(t, expectedBody, shortBody, "GET %q: response body", resp.Request.URL)
 	testhelper.AssertResponseHeader(t, resp, "Content-Length", strconv.Itoa(bodyLen))
 	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
+}
+
+func TestAllowedGetGitArchive(t *testing.T) {
+	skipUnlessRealGitaly(t)
+
+	// Create the repository in the Gitaly server
+	apiResponse := realGitalyOkBody(t)
+	repo := apiResponse.Repository
+	require.NoError(t, ensureGitalyRepository(t, apiResponse))
+
+	archivePath := path.Join(scratchDir, "my/path")
+	archivePrefix := "repo-1"
+
+	jsonParams := fmt.Sprintf(
+		`{
+			%s,
+			"GitalyRepository":{"storage_name":"%s","relative_path":"%s"},
+			"ArchivePath":"%s",
+			"ArchivePrefix":"%s",
+			"CommitId":"%s"
+		}`,
+		jsonGitalyServer, repo.StorageName, repo.RelativePath, archivePath, archivePrefix, "HEAD",
+	)
+
+	resp, body, err := doSendDataRequest("/archive.tar", "git-archive", jsonParams)
+	require.NoError(t, err)
+	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
+
+	// Ensure the tar file is readable
+	foundEntry := false
+	tr := tar.NewReader(bytes.NewReader(body))
+	for {
+		hdr, err := tr.Next()
+		if err != nil {
+			break
+		}
+
+		if hdr.Name == archivePrefix+"/" {
+			foundEntry = true
+			break
+		}
+	}
+
+	assert.True(t, foundEntry, "Couldn't find %v directory entry", archivePrefix)
 }

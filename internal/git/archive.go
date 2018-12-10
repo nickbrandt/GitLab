@@ -25,7 +25,6 @@ import (
 
 type archive struct{ senddata.Prefix }
 type archiveParams struct {
-	RepoPath         string
 	ArchivePath      string
 	ArchivePrefix    string
 	CommitId         string
@@ -100,17 +99,10 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 	}
 
 	var archiveReader io.Reader
-	if params.GitalyServer.Address != "" {
-		archiveReader, err = handleArchiveWithGitaly(r, params, format)
 
-		if err != nil {
-			err = fmt.Errorf("operations.GetArchive: %v", err)
-		}
-	} else {
-		archiveReader, err = newArchiveReader(r.Context(), params.RepoPath, format, params.ArchivePrefix, params.CommitId)
-	}
+	archiveReader, err = handleArchiveWithGitaly(r, params, format)
 	if err != nil {
-		helper.Fail500(w, r, err)
+		helper.Fail500(w, r, fmt.Errorf("operations.GetArchive: %v", err))
 		return
 	}
 

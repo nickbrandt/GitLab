@@ -527,27 +527,6 @@ func testAuthServer(url *regexp.Regexp, code int, body interface{}) *httptest.Se
 	})
 }
 
-func archiveOKServer(t *testing.T, archiveName string) *httptest.Server {
-	return testhelper.TestServerWithHandler(regexp.MustCompile("."), func(w http.ResponseWriter, r *http.Request) {
-		cwd, err := os.Getwd()
-		require.NoError(t, err)
-
-		archivePath := path.Join(cwd, cacheDir, archiveName)
-
-		params := struct{ RepoPath, ArchivePath, CommitID, ArchivePrefix string }{
-			repoPath(t),
-			archivePath,
-			"c7fbe50c7c7419d9701eebe64b1fdacc3df5b9dd",
-			"foobar123",
-		}
-		jsonData, err := json.Marshal(params)
-		require.NoError(t, err)
-
-		encodedJSON := base64.URLEncoding.EncodeToString(jsonData)
-		w.Header().Set("Gitlab-Workhorse-Send-Data", "git-archive:"+encodedJSON)
-	})
-}
-
 func newUpstreamConfig(authBackend string) *config.Config {
 	return &config.Config{
 		Version:      "123",
