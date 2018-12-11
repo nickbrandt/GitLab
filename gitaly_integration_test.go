@@ -252,3 +252,36 @@ func TestAllowedGetGitDiff(t *testing.T) {
 	assert.Equal(t, expectedBody, shortBody, "GET %q: response body", resp.Request.URL)
 	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
 }
+
+func TestAllowedGetGitFormatPatch(t *testing.T) {
+	skipUnlessRealGitaly(t)
+
+	// Create the repository in the Gitaly server
+	apiResponse := realGitalyOkBody(t)
+	require.NoError(t, ensureGitalyRepository(t, apiResponse))
+
+	leftCommit := "8a0f2ee90d940bfb0ba1e14e8214b0649056e4ab"
+	rightCommit := "e395f646b1499e8e0279445fc99a0596a65fab7e"
+	msg := serializedMessage("RawPatchRequest", &pb.RawPatchRequest{
+		Repository:    &apiResponse.Repository,
+		LeftCommitId:  leftCommit,
+		RightCommitId: rightCommit,
+	})
+	jsonParams := buildGitalyRPCParams(gitalyAddress, msg)
+
+	resp, body, err := doSendDataRequest("/something", "git-format-patch", jsonParams)
+	require.NoError(t, err)
+
+	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
+	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
+
+	testhelper.AssertPatchSeries(
+		t,
+		body,
+		"372ab6950519549b14d220271ee2322caa44d4eb",
+		"57290e673a4c87f51294f5216672cbc58d485d25",
+		"41ae11ba5d091d73d5de671f6fa7d1a4539e979e",
+		"742518b2be68fc750bb4c357c0df821a88113286",
+		rightCommit,
+	)
+}

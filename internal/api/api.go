@@ -106,9 +106,6 @@ type Response struct {
 	// GL_REPOSITORY is an environment variable used by gitlab-shell hooks during
 	// 'git push' and 'git pull'
 	GL_REPOSITORY string
-	// RepoPath is the full path on disk to the Git repository the request is
-	// about
-	RepoPath string
 	// GitConfigOptions holds the custom options that we want to pass to the git command
 	GitConfigOptions []string
 	// StoreLFSPath is provided by the GitLab Rails application to mark where the tmp file should be placed.
@@ -132,8 +129,7 @@ type Response struct {
 	Terminal *TerminalSettings
 	// GitalyServer specifies an address and authentication token for a gitaly server we should connect to.
 	GitalyServer gitaly.Server
-	// Repository object for making gRPC requests to Gitaly. This will
-	// eventually replace the RepoPath field.
+	// Repository object for making gRPC requests to Gitaly.
 	Repository pb.Repository
 	// For git-http, does the requestor have the right to view all refs?
 	ShowAllRefs bool
