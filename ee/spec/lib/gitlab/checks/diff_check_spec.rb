@@ -78,9 +78,10 @@ describe Gitlab::Checks::DiffCheck do
 
     context 'file lock rules' do
       let(:project) { create(:project, :repository) }
+      let(:path_lock) { create(:path_lock, path: 'README', project: project) }
 
       it 'returns an error if the changes update a path locked by another user' do
-        path_lock = create(:path_lock, path: 'README', project: project)
+        path_lock
 
         expect { subject.validate! }.to raise_error(Gitlab::GitAccess::UnauthorizedError, "The path 'README' is locked by #{path_lock.user.name}")
       end
@@ -89,6 +90,26 @@ describe Gitlab::Checks::DiffCheck do
         expect(project).to receive(:any_path_locks?).once.and_call_original
 
         2.times { subject.validate! }
+      end
+
+      context 'when the branch is being deleted' do
+        let(:newrev) { Gitlab::Git::BLANK_SHA }
+
+        it 'does not run' do
+          path_lock
+
+          expect { subject.validate! }.not_to raise_error
+        end
+      end
+
+      context 'when there is no valid change' do
+        let(:changes) { { oldrev: '_any', newrev: nil, ref: nil } }
+
+        it 'does not run' do
+          path_lock
+
+          expect { subject.validate! }.not_to raise_error
+        end
       end
     end
   end
