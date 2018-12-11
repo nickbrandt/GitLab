@@ -380,21 +380,6 @@ func TestSendURLForArtifacts(t *testing.T) {
 	assert.Equal(t, fileContents, string(body), "GET %q: response body", resourcePath)
 }
 
-func TestGetGitDiff(t *testing.T) {
-	fromSha := "be93687618e4b132087f430a4d8fc3a609c9b77c"
-	toSha := "54fcc214b94e78d7a41a9a8fe6d87a5e59500e51"
-	jsonParams := fmt.Sprintf(`{"RepoPath":"%s","ShaFrom":"%s","ShaTo":"%s"}`, path.Join(testRepoRoot, testRepo), fromSha, toSha)
-	expectedBody := "diff --git a/README b/README"
-
-	resp, body, err := doSendDataRequest("/something", "git-diff", jsonParams)
-	require.NoError(t, err)
-
-	assert.Equal(t, 200, resp.StatusCode, "GET %q: status code", resp.Request.URL)
-	assert.Equal(t, expectedBody, string(body[:len(expectedBody)]), "GET %q: response body", resp.Request.URL)
-	assert.Equal(t, 155, len(body), "GET %q: body size", resp.Request.URL)
-	assertNginxResponseBuffering(t, "no", resp, "GET %q: nginx response buffering", resp.Request.URL)
-}
-
 func TestGetGitPatch(t *testing.T) {
 	// HEAD of master branch against HEAD of fix branch
 	fromSha := "6907208d755b60ebeacb2e9dfea74c92c3449a1f"
