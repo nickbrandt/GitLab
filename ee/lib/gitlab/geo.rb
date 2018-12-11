@@ -80,11 +80,11 @@ module Gitlab
     end
 
     def self.cache
-      @cache ||= Gitlab::Geo::Cache.new
+      @cache ||= Gitlab::JsonCache.new(:geo)
     end
 
     def self.request_store_cache
-      @request_store_cache ||= Gitlab::Geo::Cache.new(backend: Gitlab::SafeRequestStore)
+      @request_store_cache ||= Gitlab::JsonCache.new(:geo, backend: Gitlab::SafeRequestStore)
     end
 
     def self.cache_value(key, klass: nil, &block)

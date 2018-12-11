@@ -2,20 +2,21 @@
 
 require 'spec_helper'
 
-describe Gitlab::Geo::Cache do
+describe Gitlab::JsonCache do
   let(:backend) { double('backend').as_null_object }
+  let(:namespace) { 'geo' }
   let(:key) { 'foo' }
-  let(:expanded_key) { "geo:#{key}:#{Rails.version}" }
+  let(:expanded_key) { "#{namespace}:#{key}:#{Rails.version}" }
   let(:node) { create(:geo_node) }
 
-  subject(:cache) { described_class.new(backend: backend) }
+  subject(:cache) { described_class.new(namespace, backend: backend) }
 
   describe '#active?' do
     context 'when backend respond to active? method' do
       it 'delegates to the underlying cache implementation' do
         backend = double('backend', active?: false)
 
-        cache = described_class.new(backend: backend)
+        cache = described_class.new(namespace, backend: backend)
 
         expect(cache.active?).to eq(false)
       end
@@ -25,7 +26,7 @@ describe Gitlab::Geo::Cache do
       it 'returns true' do
         backend = double('backend')
 
-        cache = described_class.new(backend: backend)
+        cache = described_class.new(namespace, backend: backend)
 
         expect(cache.active?).to eq(true)
       end
