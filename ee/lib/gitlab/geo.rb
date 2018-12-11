@@ -15,15 +15,15 @@ module Gitlab
     ).freeze
 
     def self.current_node
-      self.cache_value(:current_node, klass: GeoNode) { GeoNode.current_node }
+      self.cache_value(:current_node, as: GeoNode) { GeoNode.current_node }
     end
 
     def self.primary_node
-      self.cache_value(:primary_node, klass: GeoNode) { GeoNode.primary_node }
+      self.cache_value(:primary_node, as: GeoNode) { GeoNode.primary_node }
     end
 
     def self.secondary_nodes
-      self.cache_value(:secondary_nodes, klass: GeoNode) { GeoNode.secondary_nodes }
+      self.cache_value(:secondary_nodes, as: GeoNode) { GeoNode.secondary_nodes }
     end
 
     def self.connected?
@@ -80,19 +80,19 @@ module Gitlab
     end
 
     def self.cache
-      @cache ||= Gitlab::JsonCache.new(:geo)
+      @cache ||= Gitlab::JsonCache.new(namespace: :geo)
     end
 
     def self.request_store_cache
-      @request_store_cache ||= Gitlab::JsonCache.new(:geo, backend: Gitlab::SafeRequestStore)
+      @request_store_cache ||= Gitlab::JsonCache.new(namespace: :geo, backend: Gitlab::SafeRequestStore)
     end
 
-    def self.cache_value(key, klass: nil, &block)
+    def self.cache_value(key, as: nil, &block)
       return yield unless request_store_cache.active?
 
-      request_store_cache.fetch(key, klass: klass) do
+      request_store_cache.fetch(key, as: as) do
         # We need a short expire time as we can't manually expire on a secondary node
-        cache.fetch(key, klass: klass, expires_in: 15.seconds) { yield }
+        cache.fetch(key, as: as, expires_in: 15.seconds) { yield }
       end
     end
 

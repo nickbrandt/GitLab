@@ -2,11 +2,12 @@
 
 module Gitlab
   class JsonCache
-    attr_reader :namespace, :backend
+    attr_reader :backend, :cache_key_with_version, :namespace
 
-    def initialize(namespace, backend: Rails.cache)
-      @backend = backend
-      @namespace = namespace
+    def initialize(options = {})
+      @backend = options.fetch(:backend, Rails.cache)
+      @namespace = options.fetch(:namespace, nil)
+      @cache_key_with_version = options.fetch(:cache_key_with_version, true)
     end
 
     def active?
@@ -18,7 +19,13 @@ module Gitlab
     end
 
     def cache_key(key)
-      "#{namespace}:#{key}:#{Rails.version}"
+      expanded_cache_key = [namespace, key].compact
+
+      if cache_key_with_version
+        expanded_cache_key << Rails.version
+      end
+
+      expanded_cache_key.join(':')
     end
 
     def expire(key)
@@ -36,8 +43,9 @@ module Gitlab
     end
 
     def fetch(key, options = {}, &block)
-      klass = options.delete(:klass)
+      klass = options.delete(:as)
       value = read(key, klass)
+
       return value unless value.nil?
 
       value = yield

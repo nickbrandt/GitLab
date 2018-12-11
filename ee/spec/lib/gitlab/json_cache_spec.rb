@@ -9,14 +9,14 @@ describe Gitlab::JsonCache do
   let(:expanded_key) { "#{namespace}:#{key}:#{Rails.version}" }
   let(:node) { create(:geo_node) }
 
-  subject(:cache) { described_class.new(namespace, backend: backend) }
+  subject(:cache) { described_class.new(namespace: namespace, backend: backend) }
 
   describe '#active?' do
     context 'when backend respond to active? method' do
       it 'delegates to the underlying cache implementation' do
         backend = double('backend', active?: false)
 
-        cache = described_class.new(namespace, backend: backend)
+        cache = described_class.new(namespace: namespace, backend: backend)
 
         expect(cache.active?).to eq(false)
       end
@@ -26,7 +26,7 @@ describe Gitlab::JsonCache do
       it 'returns true' do
         backend = double('backend')
 
-        cache = described_class.new(namespace, backend: backend)
+        cache = described_class.new(namespace: namespace, backend: backend)
 
         expect(cache.active?).to eq(true)
       end
@@ -34,10 +34,44 @@ describe Gitlab::JsonCache do
   end
 
   describe '#cache_key' do
-    it 'expands out the key with namespace and Rails version' do
-      cache_key = cache.cache_key(key)
+    context 'when namespace is not defined' do
+      it 'expands out the key with Rails version' do
+        cache = described_class.new(cache_key_with_version: true)
 
-      expect(cache_key).to eq(expanded_key)
+        cache_key = cache.cache_key(key)
+
+        expect(cache_key).to eq("#{key}:#{Rails.version}")
+      end
+    end
+
+    context 'when cache_key_with_version is true' do
+      it 'expands out the key with namespace and Rails version' do
+        cache = described_class.new(namespace: namespace, cache_key_with_version: true)
+
+        cache_key = cache.cache_key(key)
+
+        expect(cache_key).to eq("#{namespace}:#{key}:#{Rails.version}")
+      end
+    end
+
+    context 'when cache_key_with_version is false' do
+      it 'expands out the key with namespace' do
+        cache = described_class.new(namespace: namespace, cache_key_with_version: false)
+
+        cache_key = cache.cache_key(key)
+
+        expect(cache_key).to eq("#{namespace}:#{key}")
+      end
+    end
+
+    context 'when namespace is nil, and cache_key_with_version is false' do
+      it 'returns the key' do
+        cache = described_class.new(namespace: nil, cache_key_with_version: false)
+
+        cache_key = cache.cache_key(key)
+
+        expect(cache_key).to eq(key)
+      end
     end
   end
 
@@ -251,18 +285,18 @@ describe Gitlab::JsonCache do
         end
 
         it 'parses the cached value' do
-          result = cache.fetch(key, klass: GeoNode) { 'block result' }
+          result = cache.fetch(key, as: GeoNode) { 'block result' }
 
           expect(result).to eq(node)
         end
 
-        it 'returns the result of the block when klass is nil' do
-          result = cache.fetch(key, klass: nil) { 'block result' }
+        it "returns the result of the block when 'as' option is nil" do
+          result = cache.fetch(key, as: nil) { 'block result' }
 
           expect(result).to eq('block result')
         end
 
-        it 'returns the result of the block when klass is not informed' do
+        it "returns the result of the block when 'as' option is not informed" do
           result = cache.fetch(key) { 'block result' }
 
           expect(result).to eq('block result')
@@ -275,18 +309,18 @@ describe Gitlab::JsonCache do
         end
 
         it 'parses the cached value' do
-          result = cache.fetch(key, klass: GeoNode) { 'block result' }
+          result = cache.fetch(key, as: GeoNode) { 'block result' }
 
           expect(result).to eq([node])
         end
 
-        it 'returns an empty array when klass is nil' do
-          result = cache.fetch(key, klass: nil) { 'block result' }
+        it "returns an empty array when 'as' option is nil" do
+          result = cache.fetch(key, as: nil) { 'block result' }
 
           expect(result).to eq([])
         end
 
-        it 'returns an empty array when klass is not informed' do
+        it "returns an empty array when 'as' option is not informed" do
           result = cache.fetch(key) { 'block result' }
 
           expect(result).to eq([])
