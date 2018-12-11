@@ -2,6 +2,13 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 8.0.0
+
+- Remove local git archive support !304
+- Remove local git diff handling !345
+- Remove local git format-patch handling !346
+- Remove RepoPath from the API response
+
 v 7.6.0
 
 - Rename correlation-id structured logging field to correlation_id !343
