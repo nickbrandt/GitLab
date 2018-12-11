@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module QA
-  # context 'Manage', :orchestrated, :ldap_tls, :ldap_no_tls do
-  context 'Manage' do
+  context 'Manage', :orchestrated, :ldap_tls, :ldap_no_tls do
     describe 'LDAP Group sync' do
       include Support::Api
 
