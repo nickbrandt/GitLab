@@ -36,7 +36,6 @@ func TestFailedCloneNoGitaly(t *testing.T) {
 	authBody := &api.Response{
 		GL_ID:       "user-123",
 		GL_USERNAME: "username",
-		RepoPath:    repoPath(t),
 		// This will create a failure to connect to Gitaly
 		GitalyServer: gitaly.Server{Address: "unix:/nonexistent"},
 	}

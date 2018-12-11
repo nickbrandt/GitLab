@@ -522,23 +522,14 @@ func runOrFail(t *testing.T, cmd *exec.Cmd) {
 }
 
 func gitOkBody(t *testing.T) *api.Response {
-	repoPath := repoPath(t)
 	return &api.Response{
 		GL_ID:       "user-123",
 		GL_USERNAME: "username",
-		RepoPath:    repoPath,
 		Repository: pb.Repository{
 			StorageName:  "default",
 			RelativePath: "foo/bar.git",
 		},
 	}
-}
-
-func repoPath(t *testing.T) string {
-	cwd, err := os.Getwd()
-	require.NoError(t, err)
-
-	return path.Join(cwd, testRepoRoot, testRepo)
 }
 
 func httpGet(t *testing.T, url string, headers map[string]string) (*http.Response, string) {
