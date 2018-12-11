@@ -55,7 +55,7 @@ module QA
             raise NotImplementedError if Runtime::User.ldap_user? && user&.credentials_given?
 
             if Runtime::User.ldap_user?
-              sign_in_using_ldap_credentials
+              sign_in_using_ldap_credentials(user || Runtime::User)
             else
               sign_in_using_gitlab_credentials(user || Runtime::User)
             end
@@ -126,11 +126,11 @@ module QA
 
         private
 
-        def sign_in_using_ldap_credentials
+        def sign_in_using_ldap_credentials(user)
           switch_to_ldap_tab
 
-          fill_element :username_field, Runtime::User.ldap_username
-          fill_element :password_field, Runtime::User.ldap_password
+          fill_element :username_field, user.ldap_username
+          fill_element :password_field, user.ldap_password
           click_element :sign_in_button
         end
 
