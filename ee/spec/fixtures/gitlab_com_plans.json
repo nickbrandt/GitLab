@@ -1,0 +1,166 @@
+[
+    {
+        "about_page_href": "https://about.gitlab.com/gitlab-com/",
+        "code": "free",
+        "features": [
+            {
+                "highlight": false,
+                "title": "Unlimited repositories"
+            },
+            {
+                "highlight": false,
+                "title": "2,000 CI pipeline minutes/month"
+            },
+            {
+                "highlight": false,
+                "title": "Basic support"
+            },
+            {
+                "highlight": false,
+                "title": "Built-in CI/CD"
+            },
+            {
+                "highlight": false,
+                "title": "Cycle Analytics"
+            },
+            {
+                "highlight": false,
+                "title": "Issue Boards"
+            },
+            {
+                "highlight": false,
+                "title": "Time tracking"
+            },
+            {
+                "highlight": false,
+                "title": "GitLab Pages"
+            }
+        ],
+        "free": true,
+        "name": "Free",
+        "price_per_month": 0.0,
+        "price_per_year": 0.0,
+        "purchase_link": {
+            "action": "current_plan",
+            "href": null
+        }
+    },
+    {
+        "about_page_href": "https://about.gitlab.com/gitlab-com/",
+        "code": "bronze",
+        "features": [
+            {
+                "highlight": false,
+                "title": "Unlimited repositories"
+            },
+            {
+                "highlight": false,
+                "title": "2,000 CI pipeline minutes/month"
+            },
+            {
+                "highlight": false,
+                "title": "Next day support"
+            },
+            {
+                "highlight": true,
+                "title": "All Free features"
+            },
+            {
+                "highlight": false,
+                "title": "Multiple issue boards"
+            },
+            {
+                "highlight": false,
+                "title": "Burndown charts"
+            },
+            {
+                "highlight": false,
+                "title": "Push rules"
+            },
+            {
+                "highlight": false,
+                "title": "Related Issues"
+            }
+        ],
+        "free": false,
+        "name": "Bronze",
+        "price_per_month": 4.0,
+        "price_per_year": 48.0,
+        "purchase_link": {
+            "action": "upgrade",
+            "href": "http://customers.gitlab.com/subscriptions/new?plan_id=2c92a0ff5a840412015aa3cde86f2ba6"
+        }
+    },
+    {
+        "about_page_href": "https://about.gitlab.com/gitlab-com/",
+        "code": "silver",
+        "features": [
+            {
+                "highlight": false,
+                "title": "Unlimited repositories"
+            },
+            {
+                "highlight": false,
+                "title": "10,000 CI pipeline minutes/month"
+            },
+            {
+                "highlight": false,
+                "title": "4 hour support"
+            },
+            {
+                "highlight": true,
+                "title": "All Bronze features"
+            },
+            {
+                "highlight": false,
+                "title": "Service desk"
+            }
+        ],
+        "free": false,
+        "name": "Silver",
+        "price_per_month": 19.0,
+        "price_per_year": 228.0,
+        "purchase_link": {
+            "action": "upgrade",
+            "href": "http://customers.gitlab.com/subscriptions/new?plan_id=2c92a0fd5a840403015aa6d9ea2c46d6"
+        }
+    },
+    {
+        "about_page_href": "https://about.gitlab.com/gitlab-com/",
+        "code": "gold",
+        "features": [
+            {
+                "highlight": false,
+                "title": "Unlimited repositories"
+            },
+            {
+                "highlight": false,
+                "title": "50,000 CI pipeline minutes/month"
+            },
+            {
+                "highlight": false,
+                "title": "4 hour support"
+            },
+            {
+                "highlight": true,
+                "title": "All Silver features"
+            },
+            {
+                "highlight": false,
+                "title": "Epics (preview)"
+            },
+            {
+                "highlight": false,
+                "title": "New features coming soon"
+            }
+        ],
+        "free": false,
+        "name": "Gold",
+        "price_per_month": 99.0,
+        "price_per_year": 1188.0,
+        "purchase_link": {
+            "action": "upgrade",
+            "href": "http://customers.gitlab.com/subscriptions/new?plan_id=2c92a0fc5a83f01d015aa6db83c45aac"
+        }
+    }
+]

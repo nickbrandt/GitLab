@@ -1,0 +1,12 @@
+.dropdown.inline.dropdown-epics-state
+  %button.dropdown-toggle{ type: 'button', data: { toggle: 'dropdown' } }
+    = epic_state_title(@epics_state)
+    = icon('chevron-down')
+  %ul.dropdown-menu.dropdown-menu-selectable
+    %li
+      = epic_state_dropdown_link('all', @epics_state)
+    .dropdown-divider
+    %li
+      = epic_state_dropdown_link('opened', @epics_state)
+    %li
+      = epic_state_dropdown_link('closed', @epics_state)

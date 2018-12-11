@@ -7,7 +7,7 @@ module IssueLinks
     private
 
     def child_issuables
-      issuable.related_issues(current_user, preload: { project: :namespace })
+      issuable.related_issues(current_user, preload: preload_for_collection)
     end
 
     def relation_path(issue)

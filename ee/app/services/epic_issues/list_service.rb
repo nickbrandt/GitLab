@@ -7,7 +7,7 @@ module EpicIssues
     def child_issuables
       return [] unless issuable&.group&.feature_available?(:epics)
 
-      issuable.issues_readable_by(current_user)
+      issuable.issues_readable_by(current_user, preload: preload_for_collection)
     end
 
     def relation_path(issue)

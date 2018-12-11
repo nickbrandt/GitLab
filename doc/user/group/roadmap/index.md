@@ -6,6 +6,12 @@ An Epic within a group containing **Start date** and/or **Due date**
 can be visualized in a form of a timeline (e.g. a Gantt chart). The Epics Roadmap page
 shows such a visualization for all the epics which are under a group and/or its subgroups.
 
+![roadmap view](img/roadmap_view.png)
+
+A dropdown allows you to show only open or closed epics. By default, all epics are shown.
+
+![epics state dropdown](img/epics_state_dropdown.png)
+
 Epics in the view can be sorted by:
 
 - **Created date**
@@ -14,8 +20,6 @@ Epics in the view can be sorted by:
 - **Due date**
 
 Each option contains a button that can toggle the order between **ascending** and **descending**. The sort option and order will be persisted to be used wherever epics are browsed including the [epics list view](../epics/index.md).
-
-![roadmap view](img/roadmap_view.png)
 
 ## Timeline duration
 

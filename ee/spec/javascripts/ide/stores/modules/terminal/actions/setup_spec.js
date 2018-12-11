@@ -3,6 +3,19 @@ import * as mutationTypes from 'ee/ide/stores/modules/terminal/mutation_types';
 import * as actions from 'ee/ide/stores/modules/terminal/actions/setup';
 
 describe('EE IDE store terminal setup actions', () => {
+  describe('init', () => {
+    it('dispatches checks', done => {
+      testAction(
+        actions.init,
+        null,
+        {},
+        [],
+        [{ type: 'fetchConfigCheck' }, { type: 'fetchRunnersCheck' }],
+        done,
+      );
+    });
+  });
+
   describe('hideSplash', () => {
     it('commits HIDE_SPLASH', done => {
       testAction(actions.hideSplash, null, {}, [{ type: mutationTypes.HIDE_SPLASH }], [], done);

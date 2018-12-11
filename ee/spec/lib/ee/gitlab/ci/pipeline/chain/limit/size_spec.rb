@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe EE::Gitlab::Ci::Pipeline::Chain::Limit::Size do
-  set(:namespace) { create(:namespace, plan: :gold_plan) }
+  set(:namespace) { create(:namespace) }
   set(:project) { create(:project, :repository, namespace: namespace) }
   set(:user) { create(:user) }
 
@@ -19,7 +19,8 @@ describe EE::Gitlab::Ci::Pipeline::Chain::Limit::Size do
 
   context 'when pipeline size limit is exceeded' do
     before do
-      project.namespace.plan.update_column(:pipeline_size_limit, 1)
+      gold_plan = create(:gold_plan, pipeline_size_limit: 1)
+      create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
 
       step.perform!
     end

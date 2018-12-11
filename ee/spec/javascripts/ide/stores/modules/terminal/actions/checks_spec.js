@@ -8,22 +8,35 @@ import * as mutationTypes from 'ee/ide/stores/modules/terminal/mutation_types';
 import * as messages from 'ee/ide/stores/modules/terminal/messages';
 import * as actions from 'ee/ide/stores/modules/terminal/actions/checks';
 
+const TEST_PROJECT_PATH = 'lorem/root';
+const TEST_BRANCH_ID = 'master';
 const TEST_YAML_HELP_PATH = `${TEST_HOST}/test/yaml/help`;
 const TEST_RUNNERS_HELP_PATH = `${TEST_HOST}/test/runners/help`;
 
 describe('EE IDE store terminal check actions', () => {
   let mock;
   let state;
+  let rootState;
+  let rootGetters;
 
   beforeEach(() => {
     mock = new MockAdapter(axios);
     state = {
       paths: {
-        ciYamlHelpPath: TEST_YAML_HELP_PATH,
-        ciRunnersHelpPath: TEST_RUNNERS_HELP_PATH,
+        webTerminalConfigHelpPath: TEST_YAML_HELP_PATH,
+        webTerminalRunnersHelpPath: TEST_RUNNERS_HELP_PATH,
       },
       checks: {
         config: { isLoading: true },
+      },
+    };
+    rootState = {
+      currentBranchId: TEST_BRANCH_ID,
+    };
+    rootGetters = {
+      currentProject: {
+        id: 7,
+        path_with_namespace: TEST_PROJECT_PATH,
       },
     };
     jasmine.clock().install();
@@ -114,12 +127,36 @@ describe('EE IDE store terminal check actions', () => {
 
   describe('fetchConfigCheck', () => {
     it('dispatches request and receive', done => {
+      mock.onPost(/.*\/ide_terminals\/check_config/).reply(200, {});
+
       testAction(
         actions.fetchConfigCheck,
         null,
-        {},
+        {
+          ...rootGetters,
+          ...rootState,
+        },
         [],
         [{ type: 'requestConfigCheck' }, { type: 'receiveConfigCheckSuccess' }],
+        done,
+      );
+    });
+
+    it('when error, dispatches request and receive', done => {
+      mock.onPost(/.*\/ide_terminals\/check_config/).reply(400, {});
+
+      testAction(
+        actions.fetchConfigCheck,
+        null,
+        {
+          ...rootGetters,
+          ...rootState,
+        },
+        [],
+        [
+          { type: 'requestConfigCheck' },
+          { type: 'receiveConfigCheckError', payload: jasmine.any(Error) },
+        ],
         done,
       );
     });
@@ -218,14 +255,6 @@ describe('EE IDE store terminal check actions', () => {
   });
 
   describe('fetchRunnersCheck', () => {
-    let rootGetters;
-
-    beforeEach(() => {
-      rootGetters = {
-        currentProject: { id: 7 },
-      };
-    });
-
     it('dispatches request and receive', done => {
       mock.onGet(/api\/.*\/projects\/.*\/runners/, { params: { scope: 'active' } }).reply(200, []);
 

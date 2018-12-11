@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 class Packages::MavenPackageFinder
-  attr_reader :path, :project
+  attr_reader :project, :path
 
-  def initialize(path, project = nil)
-    @path = path
+  def initialize(project, path)
     @project = project
+    @path = path
   end
 
   def execute
@@ -17,17 +17,9 @@ class Packages::MavenPackageFinder
 
   private
 
-  def scope
-    if project
-      project.packages
-    else
-      ::Packages::Package.all
-    end
-  end
-
   # rubocop: disable CodeReuse/ActiveRecord
   def packages
-    scope.joins(:maven_metadatum)
+    project.packages.joins(:maven_metadatum)
       .where(packages_maven_metadata: { path: path })
   end
   # rubocop: enable CodeReuse/ActiveRecord

@@ -19,6 +19,7 @@ export default () => {
           vulnerabilityFeedbackHelpPath: el.dataset.vulnerabilityFeedbackHelpPath,
           vulnerabilitiesEndpoint: el.dataset.vulnerabilitiesEndpoint,
           vulnerabilitiesCountEndpoint: el.dataset.vulnerabilitiesSummaryEndpoint,
+          vulnerabilitiesHistoryEndpoint: el.dataset.vulnerabilitiesHistoryEndpoint,
         },
       });
     },

@@ -19,6 +19,10 @@ class Groups::AutocompleteSourcesController < Groups::ApplicationController
     render json: @autocomplete_service.commands(target)
   end
 
+  def milestones
+    render json: @autocomplete_service.milestones
+  end
+
   private
 
   def load_autocomplete_service

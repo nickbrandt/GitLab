@@ -86,7 +86,7 @@ describe Admin::Geo::NodesController, :postgresql do
   end
 
   describe '#update' do
-    let(:geo_node_attributes) { { url: 'http://example.com' } }
+    let(:geo_node_attributes) { { url: 'http://example.com', selective_sync_shards: %w[foo bar] } }
 
     let(:geo_node) { create(:geo_node) }
 
@@ -113,6 +113,7 @@ describe Admin::Geo::NodesController, :postgresql do
 
         geo_node.reload
         expect(geo_node.url.chomp('/')).to eq(geo_node_attributes[:url])
+        expect(geo_node.selective_sync_shards).to eq(%w[foo bar])
       end
 
       it 'delegates the update of the Geo node to Geo::NodeUpdateService' do

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe EE::Gitlab::Ci::Pipeline::Chain::Limit::Activity do
-  set(:namespace) { create(:namespace, plan: :gold_plan) }
+  set(:namespace) { create(:namespace) }
   set(:project) { create(:project, namespace: namespace) }
   set(:user) { create(:user) }
 
@@ -17,7 +17,8 @@ describe EE::Gitlab::Ci::Pipeline::Chain::Limit::Activity do
 
   context 'when active pipelines limit is exceeded' do
     before do
-      project.namespace.plan.update_column(:active_pipelines_limit, 1)
+      gold_plan = create(:gold_plan, active_pipelines_limit: 1)
+      create(:gitlab_subscription, namespace: namespace, hosted_plan: gold_plan)
 
       create(:ci_pipeline, project: project, status: 'pending')
       create(:ci_pipeline, project: project, status: 'running')

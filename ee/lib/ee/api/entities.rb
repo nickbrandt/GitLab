@@ -81,10 +81,12 @@ module EE
         extend ActiveSupport::Concern
 
         prepended do
-          expose :trial_ends_on
           expose :shared_runners_minutes_limit, if: ->(_, options) { options[:current_user]&.admin? }
+          expose :billable_members_count do |namespace, options|
+            namespace.billable_members_count(options[:requested_hosted_plan])
+          end
           expose :plan, if: ->(namespace, opts) { ::Ability.allowed?(opts[:current_user], :admin_namespace, namespace) } do |namespace, _|
-            namespace.plan&.name
+            namespace.actual_plan&.name
           end
         end
       end
@@ -467,6 +469,27 @@ module EE
 
         def features
           object.operations_feature_flags.ordered
+        end
+      end
+
+      class GitlabSubscription < Grape::Entity
+        expose :plan do
+          expose :plan_name, as: :code
+          expose :plan_title, as: :name
+          expose :trial
+        end
+
+        expose :usage do
+          expose :seats, as: :seats_in_subscription
+          expose :seats_in_use
+          expose :max_seats_used
+          expose :seats_owed
+        end
+
+        expose :billing do
+          expose :start_date, as: :subscription_start_date
+          expose :end_date, as: :subscription_end_date
+          expose :trial_ends_on
         end
       end
     end

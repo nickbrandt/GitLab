@@ -23,7 +23,21 @@ describe 'GFM autocomplete', :js do
 
       # It should show all the epics on "&".
       type(note, '&')
-      expect_epics(shown: [epic, epic2])
+      expect_resources(shown: [epic, epic2])
+    end
+  end
+
+  context 'milestone' do
+    it 'shows group milestones' do
+      project = create(:project, namespace: group)
+      milestone_1 = create(:milestone, title: 'milestone_1', group: group)
+      milestone_2 = create(:milestone, title: 'milestone_2', group: group)
+      milestone_3 = create(:milestone, title: 'milestone_3', project: project)
+      note = find('#note-body')
+
+      type(note, '%')
+
+      expect_resources(shown: [milestone_1, milestone_2], not_shown: [milestone_3])
     end
   end
 
@@ -39,19 +53,19 @@ describe 'GFM autocomplete', :js do
 
         # It should show all the labels on "~".
         type(note, '~')
-        expect_labels(shown: [backend, bug, feature_proposal])
+        expect_resources(shown: [backend, bug, feature_proposal])
 
         # It should show all the labels on "/label ~".
         type(note, '/label ~')
-        expect_labels(shown: [backend, bug, feature_proposal])
+        expect_resources(shown: [backend, bug, feature_proposal])
 
         # It should show all the labels on "/relabel ~".
         type(note, '/relabel ~')
-        expect_labels(shown: [backend, bug, feature_proposal])
+        expect_resources(shown: [backend, bug, feature_proposal])
 
         # It should show no labels on "/unlabel ~".
         type(note, '/unlabel ~')
-        expect_labels(not_shown: [backend, bug, feature_proposal])
+        expect_resources(not_shown: [backend, bug, feature_proposal])
       end
     end
 
@@ -65,19 +79,19 @@ describe 'GFM autocomplete', :js do
 
         # It should show all the labels on "~".
         type(note, '~')
-        expect_labels(shown: [backend, bug, feature_proposal])
+        expect_resources(shown: [backend, bug, feature_proposal])
 
         # It should show only unset labels on "/label ~".
         type(note, '/label ~')
-        expect_labels(shown: [bug, feature_proposal], not_shown: [backend])
+        expect_resources(shown: [bug, feature_proposal], not_shown: [backend])
 
         # It should show all the labels on "/relabel ~".
         type(note, '/relabel ~')
-        expect_labels(shown: [backend, bug, feature_proposal])
+        expect_resources(shown: [backend, bug, feature_proposal])
 
         # It should show only set labels on "/unlabel ~".
         type(note, '/unlabel ~')
-        expect_labels(shown: [backend], not_shown: [bug, feature_proposal])
+        expect_resources(shown: [backend], not_shown: [bug, feature_proposal])
       end
     end
 
@@ -91,19 +105,19 @@ describe 'GFM autocomplete', :js do
 
         # It should show all the labels on "~".
         type(note, '~')
-        expect_labels(shown: [backend, bug, feature_proposal])
+        expect_resources(shown: [backend, bug, feature_proposal])
 
         # It should show no labels on "/label ~".
         type(note, '/label ~')
-        expect_labels(not_shown: [backend, bug, feature_proposal])
+        expect_resources(not_shown: [backend, bug, feature_proposal])
 
         # It should show all the labels on "/relabel ~".
         type(note, '/relabel ~')
-        expect_labels(shown: [backend, bug, feature_proposal])
+        expect_resources(shown: [backend, bug, feature_proposal])
 
         # It should show all the labels on "/unlabel ~".
         type(note, '/unlabel ~')
-        expect_labels(shown: [backend, bug, feature_proposal])
+        expect_resources(shown: [backend, bug, feature_proposal])
       end
     end
   end
@@ -123,30 +137,16 @@ describe 'GFM autocomplete', :js do
     end
   end
 
-  def expect_labels(shown: nil, not_shown: nil)
+  def expect_resources(shown: nil, not_shown: nil)
     page.within('.atwho-container') do
       if shown
         expect(page).to have_selector('.atwho-view li', count: shown.size)
-        shown.each { |label| expect(page).to have_content(label.title) }
+        shown.each { |resource| expect(page).to have_content(resource.title) }
       end
 
       if not_shown
         expect(page).not_to have_selector('.atwho-view li') unless shown
-        not_shown.each { |label| expect(page).not_to have_content(label.title) }
-      end
-    end
-  end
-
-  def expect_epics(shown: nil, not_shown: nil)
-    page.within('.atwho-container') do
-      if shown
-        expect(page).to have_selector('.atwho-view li', count: shown.size)
-        shown.each { |epic| expect(page).to have_content(epic.title) }
-      end
-
-      if not_shown
-        expect(page).not_to have_selector('.atwho-view li') unless shown
-        not_shown.each { |epic| expect(page).not_to have_content(epic.title) }
+        not_shown.each { |resource| expect(page).not_to have_content(resource.title) }
       end
     end
   end

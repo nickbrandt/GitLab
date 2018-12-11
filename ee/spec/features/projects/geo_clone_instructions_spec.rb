@@ -23,20 +23,12 @@ describe 'Geo clone instructions', :js do
       create(:personal_key, user: developer)
     end
 
-    it 'defaults to SSH' do
+    it 'displays clone instructions' do
       visit_project
 
       show_geo_clone_instructions
 
       expect_instructions_for('ssh')
-    end
-
-    it 'switches to HTTP' do
-      visit_project
-      select_protocol('HTTP')
-
-      show_geo_clone_instructions
-
       expect_instructions_for('http')
     end
   end
@@ -45,13 +37,9 @@ describe 'Geo clone instructions', :js do
     visit project_path(project)
   end
 
-  def select_protocol(protocol)
-    find('#clone-dropdown').click
-    find(".#{protocol.downcase}-selector").click
-  end
-
   def show_geo_clone_instructions
-    find('.btn-geo').click
+    find('.qa-clone-dropdown').click
+    find('.btn-geo', match: :first).click
   end
 
   def expect_instructions_for(protocol)
@@ -59,9 +47,9 @@ describe 'Geo clone instructions', :js do
     secondary_remote = secondary_url(protocol)
 
     expect(page).to have_content('How to work faster with Geo')
-    expect(page.find('#geo-info-1').value).to eq "git clone #{secondary_remote}"
+    expect(page.find("#geo-info-1-#{protocol}").value).to eq "git clone #{secondary_remote}"
     # the primary_url does not return the full url, but just the part up to the host:
-    expect(page.find('#geo-info-2').value).to start_with("git remote set-url --push origin #{primary_remote}")
+    expect(page.find("#geo-info-2-#{protocol}").value).to start_with("git remote set-url --push origin #{primary_remote}")
   end
 
   def primary_url(protocol)

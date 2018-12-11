@@ -9,6 +9,6 @@
 - if @epics_count != 0
   = render 'shared/epic/search_bar', type: :epics, show_roadmap_presets: true
 
-  #js-roadmap{ data: { epics_path: group_epics_path(@group, format: :json), group_id: @group.id, empty_state_illustration: image_path('illustrations/epics/roadmap.svg'), has_filters_applied: "#{has_filters_applied}", new_epic_endpoint: group_epics_path(@group), preset_type: roadmap_layout } }
+  #js-roadmap{ data: { epics_path: group_epics_path(@group, format: :json), group_id: @group.id, empty_state_illustration: image_path('illustrations/epics/roadmap.svg'), has_filters_applied: "#{has_filters_applied}", new_epic_endpoint: group_epics_path(@group), preset_type: roadmap_layout, epics_state: @epics_state } }
 - else
   = render 'shared/empty_states/roadmap'

@@ -8,4 +8,6 @@ export default () => ({
   isVisible: false,
   isShowSplash: true,
   paths: {},
+  session: null,
+  sessionStatusInterval: 0,
 });

@@ -48,6 +48,6 @@ describe('Issue card component', () => {
     const el = vm.$el.querySelector('.board-card-weight');
 
     expect(el).not.toBeNull();
-    expect(el.textContent.trim()).toBe('2');
+    expect(el.textContent.trim()).toContain('2');
   });
 });

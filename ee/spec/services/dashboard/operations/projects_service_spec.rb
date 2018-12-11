@@ -67,7 +67,7 @@ describe Dashboard::Operations::ProjectsService do
 
       before do
         stub_application_setting(check_namespace_plan: true)
-        namespace.update!(plan: create(:gold_plan))
+        create(:gitlab_subscription, :gold, namespace: namespace)
       end
 
       where(:plan, :trial, :expired, :available) do
@@ -96,18 +96,19 @@ describe Dashboard::Operations::ProjectsService do
       using RSpec::Parameterized::TableSyntax
 
       where(:check_namespace_plan, :plan, :available) do
-        true  | :gold_plan   | true
-        true  | :silver_plan | false
-        true  | nil          | false
-        false | :gold_plan   | true
-        false | :silver_plan | true
-        false | nil          | true
+        true  | :gold   | true
+        true  | :silver | false
+        true  | nil     | false
+        false | :gold   | true
+        false | :silver | true
+        false | nil     | true
       end
 
       with_them do
         before do
           stub_application_setting(check_namespace_plan: check_namespace_plan)
-          namespace.update!(plan: create(plan)) if plan
+
+          create(:gitlab_subscription, plan, namespace: namespace) if plan
         end
 
         if params[:available]
