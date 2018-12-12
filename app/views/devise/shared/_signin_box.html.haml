@@ -21,8 +21,6 @@
       .login-body
         = render 'devise/sessions/new_base'
 
-  = render_if_exists 'devise/sessions/new_smartcard'
-
 - elsif password_authentication_enabled_for_web?
   .login-box.tab-pane.active{ id: 'login-pane', role: 'tabpanel' }
     .login-body

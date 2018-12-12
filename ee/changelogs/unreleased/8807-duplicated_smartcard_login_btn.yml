@@ -1,0 +1,5 @@
+---
+title: Remove duplicated smartcard login button
+merge_request: 8793
+author:
+type: fixed
