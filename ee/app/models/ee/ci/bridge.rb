@@ -6,6 +6,7 @@ module EE
       extend ActiveSupport::Concern
 
       prepended do
+        serialize :options # rubocop:disable Cop/ActiveRecordSerialize
         has_many :sourced_pipelines, class_name: ::Ci::Sources::Pipeline,
                                      foreign_key: :source_job_id
 
@@ -35,7 +36,19 @@ module EE
       end
 
       def schedule_downstream_pipeline!
-        raise NotImplementedError
+        CreateCrossProjectPipelineWorker.perform_async(self.id)
+      end
+
+      def target_user
+        self.user
+      end
+
+      def target_project_name
+        options.dig(:trigger, :project)
+      end
+
+      def target_ref
+        options.dig(:trigger, :branch)
       end
     end
   end
