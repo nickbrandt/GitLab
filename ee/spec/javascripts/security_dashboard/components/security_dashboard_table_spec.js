@@ -78,4 +78,29 @@ describe('Security Dashboard Table', () => {
         .catch(done.fail);
     });
   });
+
+  describe('on error', () => {
+    beforeEach(() => {
+      mock.onGet(vulnerabilitiesEndpoint).replyOnce(404, []);
+      vm = mountComponentWithStore(Component, { store, props });
+    });
+
+    it('should not render the empty state', done => {
+      waitForPromises()
+        .then(() => {
+          expect(vm.$el.querySelector('.empty-state')).toBeNull();
+          done();
+        })
+        .catch(done.fail);
+    });
+
+    it('should render the error alert', done => {
+      waitForPromises()
+        .then(() => {
+          expect(vm.$el.querySelector('.flash-alert')).not.toBeNull();
+          done();
+        })
+        .catch(done.fail);
+    });
+  });
 });
