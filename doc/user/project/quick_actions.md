@@ -47,6 +47,7 @@ discussions, and descriptions:
 | `/clear_weight`            | Clears weight **[STARTER]**    | ✓     |               |
 | `/epic <&epic &#124; group&epic &#124; Epic URL>` | Add to epic **[ULTIMATE]** | ✓ |             |
 | `/remove_epic`             | Removes from epic **[ULTIMATE]** | ✓   |               |
+| `/promote`                 | Promote issue to epic **[ULTIMATE]** | ✓   |               |
 | `/confidential`            | Make confidential              | ✓     |               |
 | `/duplicate #issue`        | Mark this issue as a duplicate of another issue | ✓    |
 | `/move path/to/project`    | Move this issue to another project | ✓ |               |
@@ -84,4 +85,3 @@ The following quick actions are applicable for epics threads and description:
 | `/label ~label1 ~label2`   | Add label(s)                            |
 | `/unlabel ~label1 ~label2` | Remove all or specific label(s)         |
 | `/relabel ~label1 ~label2` | Replace label                           |
-| `/promote`                 | Promote an issue to an epic             |
