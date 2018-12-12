@@ -16,6 +16,8 @@ module Gitlab
       end
 
       def owners_for_path(path)
+        path = "/#{path}" unless path.start_with?('/')
+
         matching_pattern = parsed_data.keys.reverse.detect do |pattern|
           path_matches?(pattern, path)
         end
@@ -57,35 +59,25 @@ module Gitlab
         # Replace all whitespace preceded by a \ with a regular whitespace
         pattern = pattern.gsub(/\\\s+/, ' ')
 
-        if pattern.starts_with?('/')
-          # Remove the leading slash when only matching root directory as the
-          # paths that we will be matching will always be passed in starting
-          # from the root of the repsitory.
-          pattern = pattern.sub(%r{\A/}, '')
-        elsif !pattern.starts_with?('*')
-          # If the pattern is a regular match, prepend it with ** so we match
-          # nested in every directory
-          pattern = "**#{pattern}"
+        return '/**/*' if pattern == '*'
+
+        unless pattern.starts_with?('/')
+          pattern = "/**/#{pattern}"
+        end
+
+        if pattern.end_with?('/')
+          pattern = "#{pattern}**/*"
         end
 
         pattern
       end
 
       def path_matches?(pattern, path)
-        flags = ::File::FNM_DOTMATCH
+        # `FNM_DOTMATCH` makes sure we also match files starting with a `.`
+        # `FNM_PATHNAME` makes sure ** matches path separators
+        flags = ::File::FNM_DOTMATCH | ::File::FNM_PATHNAME
 
-        if pattern.ends_with?('/*')
-          # Then the pattern ends in a wildcard, we only want to go one level deep
-          # setting `::File::FNM_PATHNAME` makes the `*` not match directory
-          # separators
-          flags |= ::File::FNM_PATHNAME
-          ::File.fnmatch?(pattern, path, flags)
-        else
-          # Replace a pattern ending with `/` to `/*` to match everything within
-          # that directory
-          nested_pattern = pattern.sub(%r{/\z}, '/*')
-          ::File.fnmatch?(nested_pattern, path, flags)
-        end
+        ::File.fnmatch?(pattern, path, flags)
       end
     end
   end
