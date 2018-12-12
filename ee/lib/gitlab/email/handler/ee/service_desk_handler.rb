@@ -24,19 +24,32 @@ module Gitlab
 
           private
 
+          # mail key should end in `-` ie: `h5bp-html5-boilerplate-8-`
+          # but continue to support legacy style ie: `h5bp/html5-boilerplate`
           def service_desk_key
-            return unless mail_key && mail_key.include?('/') && !mail_key.include?('+')
+            return unless mail_key && (mail_key.end_with?('-') || mail_key.include?('/') && !mail_key.include?('+'))
 
             mail_key
+          end
+
+          def extract_project_id(key)
+            key.split('-').last.to_i
           end
 
           # rubocop: disable CodeReuse/ActiveRecord
           def project
             return @project if instance_variable_defined?(:@project)
 
-            found_project =
-              Project.where(service_desk_enabled: true)
-                .find_by_full_path(service_desk_key)
+            found_project = Project.where(service_desk_enabled: true)
+            found_project = if mail_key.end_with?('-')
+                              found_project.find_by_id(extract_project_id(service_desk_key))
+                            else
+                              found_project.find_by_full_path(service_desk_key)
+                            end
+
+            # found_project =
+            #   Project.where(service_desk_enabled: true)
+            #     .find_by_full_path(service_desk_key)
 
             @project = found_project&.service_desk_enabled? ? found_project : nil
           end

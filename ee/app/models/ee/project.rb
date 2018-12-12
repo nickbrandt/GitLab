@@ -213,7 +213,7 @@ module EE
       config = ::Gitlab.config.incoming_email
       wildcard = ::Gitlab::IncomingEmail::WILDCARD_PLACEHOLDER
 
-      config.address&.gsub(wildcard, full_path)
+      config.address&.gsub(wildcard, "#{full_path_slug}-#{id}-")
     end
 
     override :add_import_job
