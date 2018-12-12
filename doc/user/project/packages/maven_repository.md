@@ -119,6 +119,50 @@ on the home page of your project.
 If you have a self-hosted GitLab installation, replace `gitlab.com` with your
 domain name.
 
+## Instance level Maven endpoint
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/8274) in GitLab Premium 11.7.
+
+If you rely on many packages, it might be inefficient to include the `repository` section
+with a unique URL for each package. Instead, you can use the instance level endpoint for
+all maven packages stored in GitLab and the packages you have access to will be available
+for download.
+
+Note that only packages that have the same path as the project are exposed via
+the instance level endpoint.
+
+| Project | Package | Instance level endpoint available |
+| ------- | ------- | --------------------------------- |
+| `foo/bar`              | `foo/bar/1.0-SNAPSHOT`              | Yes |
+| `gitlab-org/gitlab-ce` | `foo/bar/1.0-SNAPSHOT`              | No  |
+| `gitlab-org/gitlab-ce` | `gitlab-org/gitlab-ce/1.0-SNAPSHOT` | Yes |
+
+The example below shows how the relevant `repository` section of your `pom.xml`
+would look like. You still need a project specific URL for uploading a package in
+the `distributionManagement` section:
+
+```xml
+<repositories>
+  <repository>
+    <id>gitlab-maven</id>
+    <url>https://gitlab.com/api/v4/packages/maven</url>
+  </repository>
+</repositories>
+<distributionManagement>
+  <repository>
+    <id>gitlab-maven</id>
+    <url>https://gitlab.com/api/v4/projects/PROJECT_ID/packages/maven</url>
+  </repository>
+  <snapshotRepository>
+    <id>gitlab-maven</id>
+    <url>https://gitlab.com/api/v4/projects/PROJECT_ID/packages/maven</url>
+  </snapshotRepository>
+</distributionManagement>
+```
+
+If you have a self-hosted GitLab installation, replace `gitlab.com` with your
+domain name.
+
 ## Uploading packages
 
 Once you have set up the [authorization](#authorizing-with-the-gitlab-maven-repository)

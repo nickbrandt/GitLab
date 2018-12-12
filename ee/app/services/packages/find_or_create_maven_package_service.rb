@@ -5,7 +5,7 @@ module Packages
 
     def execute
       package = ::Packages::MavenPackageFinder
-        .new(project, params[:path]).execute
+        .new(params[:path], project).execute
 
       unless package
         if params[:file_name] == MAVEN_METADATA_FILE
