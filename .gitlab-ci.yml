@@ -661,22 +661,22 @@ rspec-mysql-rails4:
 # EE jobs START
 rspec-pg-ee:
   <<: *rspec-ee-pg
-  parallel: 4
+  parallel: 10
 
 rspec-mysql-ee:
   <<: *rspec-ee-mysql
-  parallel: 4
+  parallel: 10
 
 rspec-pg geo: *rspec-metadata-pg-geo-9-6
 rspec-pg-10 geo: *rspec-metadata-pg-geo-10-2
 
 rspec-pg-ee-rails4:
   <<: *rspec-ee-pg-rails4
-  parallel: 4
+  parallel: 10
 
 rspec-mysql-ee-rails4:
   <<: *rspec-ee-mysql-rails4
-  parallel: 4
+  parallel: 10
 
 rspec-pg-geo-rails4: *rspec-metadata-pg-geo-9-6-rails4
 rspec-pg-10-geo-rails4: *rspec-metadata-pg-geo-10-2-rails4
