@@ -48,10 +48,7 @@ module QA
               end
 
               # Grab the HTTP URI for the secondary and store as 'location'
-              location = Page::Project::Show.act do
-                choose_repository_clone_http
-                repository_location
-              end
+              location = Page::Project::Show.act { repository_clone_http_location }
 
               # Perform a git push over HTTP at the secondary
               push = Resource::Repository::Push.fabricate! do |push|
@@ -127,10 +124,7 @@ module QA
               end
 
               # Grab the HTTP URI for the secondary and store as 'location'
-              location = Page::Project::Show.act do
-                choose_repository_clone_http
-                repository_location
-              end
+              location = Page::Project::Show.act { repository_clone_http_location }
 
               # Perform a git push over HTTP at the secondary
               push = Resource::Repository::Push.fabricate! do |push|
