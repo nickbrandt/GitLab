@@ -6,20 +6,43 @@ class SoftwareLicensePoliciesFinder
 
   attr_accessor :current_user, :project
 
-  def initialize(current_user, project)
+  def initialize(current_user, project, params = {})
     @current_user = current_user
     @project = project
+    @params = params
   end
 
   # rubocop: disable CodeReuse/ActiveRecord
-  def find_by_name_or_id(id)
-    return nil unless can?(current_user, :read_software_license_policy, project)
+  def execute
+    return SoftwareLicensePolicy.none unless can?(current_user, :read_software_license_policy, project)
 
-    software_licenses = SoftwareLicense.arel_table
-    software_license_policies = SoftwareLicensePolicy.arel_table
-    project.software_license_policies.joins(:software_license).where(
-      software_licenses[:name].eq(id).or(software_license_policies[:id].eq(id))
-    ).take
+    items = init_collection
+
+    if license_id
+      items.where(id: license_id)
+    elsif license_name
+      items.with_license_by_name(license_name)
+    end
   end
   # rubocop: enable CodeReuse/ActiveRecord
+
+  # rubocop: disable CodeReuse/ActiveRecord
+  def find
+    execute.take
+  end
+  # rubocop: enable CodeReuse/ActiveRecord
+
+  private
+
+  def init_collection
+    SoftwareLicensePolicy.with_license.including_license.for_project(@project)
+  end
+
+  def license_id
+    @params[:name_or_id].to_i if @params[:name_or_id] =~ /\A\d+\Z/
+  end
+
+  def license_name
+    @params[:name] || @params[:name_or_id]
+  end
 end

@@ -10,7 +10,8 @@ module API
       # Make the software license policy specified by id in the request available
       def software_license_policy
         id = params[:managed_license_id]
-        @software_license_policy ||= SoftwareLicensePoliciesFinder.new(current_user, user_project).find_by_name_or_id(id)
+        @software_license_policy ||=
+          SoftwareLicensePoliciesFinder.new(current_user, user_project, name_or_id: id).find
       end
 
       def authorize_can_read!
