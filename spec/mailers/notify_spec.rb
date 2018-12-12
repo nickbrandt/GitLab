@@ -28,15 +28,6 @@ describe Notify do
                    description: 'My awesome description!')
   end
 
-  def have_referable_subject(referable, reply: false)
-    prefix = (referable.project ? "#{referable.project.name} | " : '').freeze
-    prefix = "Re: #{prefix}" if reply
-
-    suffix = "#{referable.title} (#{referable.to_reference})"
-
-    have_subject [prefix, suffix].compact.join
-  end
-
   context 'for a project' do
     shared_examples 'an assignee email' do
       it 'is sent to the assignee as the author' do
