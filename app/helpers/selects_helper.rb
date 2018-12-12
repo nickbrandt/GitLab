@@ -28,7 +28,6 @@ module SelectsHelper
   def groups_select_tag(id, opts = {})
     classes = Array.wrap(opts[:class])
     classes << 'ajax-groups-select'
-    classes << 'multiselect' if opts[:multiple]
 
     # EE requires this line to be present, but there is no easy way of injecting
     # this into EE without causing merge conflicts. Given this line is very
