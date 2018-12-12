@@ -73,11 +73,10 @@ module Gitlab
       end
 
       def path_matches?(pattern, path)
+        # `FNM_DOTMATCH` makes sure we also match files starting with a `.`
+        # `FNM_PATHNAME` makes sure ** matches path separators
         flags = ::File::FNM_DOTMATCH | ::File::FNM_PATHNAME
 
-        # Then the pattern ends in a wildcard, we only want to go one level deep
-        # setting `::File::FNM_PATHNAME` makes the `*` not match directory
-        # separators
         ::File.fnmatch?(pattern, path, flags)
       end
     end
