@@ -53,10 +53,10 @@ export default {
       return !this.user.name;
     },
     jobInfoIsLoading() {
-      return !this.loaded && this.user.organization === null;
+      return !this.user.loaded && this.user.organization === null;
     },
     locationIsLoading() {
-      return !this.loaded && this.user.location === null;
+      return !this.user.loaded && this.user.location === null;
     },
   },
 };
