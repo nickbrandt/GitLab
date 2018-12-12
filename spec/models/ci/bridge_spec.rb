@@ -5,7 +5,7 @@ describe Ci::Bridge do
   set(:pipeline) { create(:ci_pipeline, project: project) }
 
   let(:bridge) do
-    create(:ci_bridge, pipeline: pipeline)
+    create(:ci_bridge, status: :success, pipeline: pipeline)
   end
 
   describe '#tags' do

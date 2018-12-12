@@ -6,7 +6,7 @@ FactoryBot.define do
     ref 'master'
     tag false
     created_at 'Di 29. Okt 09:50:00 CET 2013'
-    status :success
+    status :created
 
     pipeline factory: :ci_pipeline
 

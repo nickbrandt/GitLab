@@ -25,6 +25,8 @@ module Ci
     private
 
     def can_create_cross_pipeline?
+      # TODO should we check update_pipeline in the first condition?
+      #
       can?(current_user, :create_pipeline, project) &&
         can?(current_user, :create_pipeline, target_project) &&
         can?(@bridge.target_user, :create_pipeline, target_project)

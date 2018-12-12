@@ -9,7 +9,8 @@ module EE
 
       override :failure_reasons
       def failure_reasons
-        super.merge(protected_environment_failure: 1_000)
+        super.merge(protected_environment_failure: 1_000,
+                    insufficient_permissions: 1_001)
       end
     end
   end
