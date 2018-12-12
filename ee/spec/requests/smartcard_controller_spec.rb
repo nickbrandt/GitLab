@@ -76,6 +76,32 @@ describe SmartcardController, type: :request  do
         end
       end
 
+      context 'certificate header formats from NGINX' do
+        shared_examples 'valid certificate header' do
+          it 'authenticates user' do
+            expect(Gitlab::Auth::Smartcard::Certificate).to receive(:new).with(expected_certificate).and_call_original
+
+            subject
+
+            expect(request.env['warden']).to be_authenticated
+          end
+        end
+
+        let(:expected_certificate) { "-----BEGIN CERTIFICATE-----\nrow\nrow\n-----END CERTIFICATE-----" }
+
+        context 'escaped format' do
+          let(:certificate_headers) { { 'X-SSL-CLIENT-CERTIFICATE': '-----BEGIN%20CERTIFICATE-----%0Arow%0Arow%0A-----END%20CERTIFICATE-----' } }
+
+          it_behaves_like 'valid certificate header'
+        end
+
+        context 'deprecated format' do
+          let(:certificate_headers) { { 'X-SSL-CLIENT-CERTIFICATE': '-----BEGIN CERTIFICATE----- row row -----END CERTIFICATE-----' } }
+
+          it_behaves_like 'valid certificate header'
+        end
+      end
+
       context 'missing certificate headers' do
         let(:certificate_headers) { nil }
 
