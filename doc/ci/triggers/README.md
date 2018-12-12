@@ -228,6 +228,7 @@ stages:
 - package
 
 run_tests:
+  stage: test
   script:
   - make test
 
