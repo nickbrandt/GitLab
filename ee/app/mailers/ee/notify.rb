@@ -13,6 +13,7 @@ module EE
       include ::Emails::CsvExport
       include ::Emails::ServiceDesk
       include ::Emails::Epics
+      include ::Emails::Reviews
     end
 
     attr_reader :group

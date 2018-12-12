@@ -9,6 +9,8 @@ module EE
       include ::ObjectStorage::BackgroundMove
       include Elastic::NotesSearch
 
+      belongs_to :review, inverse_of: :notes
+
       scope :searchable, -> { where(system: false) }
     end
 

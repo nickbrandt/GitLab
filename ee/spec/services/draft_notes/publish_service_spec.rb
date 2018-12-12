@@ -10,18 +10,84 @@ describe DraftNotes::PublishService do
     DraftNotes::PublishService.new(merge_request, user).execute(draft)
   end
 
-  it 'publishes a single draft note' do
-    drafts = create_list(:draft_note, 2, merge_request: merge_request, author: user)
+  context 'single draft note' do
+    let!(:drafts) { create_list(:draft_note, 2, merge_request: merge_request, author: user) }
 
-    expect { publish(draft: drafts.first) }.to change { DraftNote.count }.by(-1).and change { Note.count }.by(1)
-    expect(DraftNote.count).to eq(1)
+    it 'publishes' do
+      expect { publish(draft: drafts.first) }.to change { DraftNote.count }.by(-1).and change { Note.count }.by(1)
+      expect(DraftNote.count).to eq(1)
+    end
+
+    it 'does not skip notification' do
+      expect(Notes::CreateService).to receive(:new).with(project, user, drafts.first.publish_params).and_call_original
+      expect_next_instance_of(NotificationService) do |notification_service|
+        expect(notification_service).to receive(:new_note)
+      end
+
+      result = publish(draft: drafts.first)
+
+      expect(result[:status]).to eq(:success)
+    end
   end
 
-  it 'publishes all draft notes for a user in a merge request' do
-    create_list(:draft_note, 2, merge_request: merge_request, author: user)
+  context 'multiple draft notes' do
+    before do
+      create_list(:draft_note, 2, merge_request: merge_request, author: user)
+    end
 
-    expect { publish }.to change { DraftNote.count }.by(-2).and change { Note.count }.by(2)
-    expect(DraftNote.count).to eq(0)
+    context 'when review fails to create' do
+      before do
+        expect_next_instance_of(Review) do |review|
+          allow(review).to receive(:save!).and_raise(ActiveRecord::RecordInvalid.new(review))
+        end
+      end
+
+      it 'does not publish any draft note' do
+        expect { publish }.not_to change { DraftNote.count }
+      end
+
+      it 'returns an error' do
+        result = publish
+
+        expect(result[:status]).to eq(:error)
+        expect(result[:message]).to match(/Unable to save Review/)
+      end
+    end
+
+    it 'returns success' do
+      result = publish
+
+      expect(result[:status]).to eq(:success)
+    end
+
+    it 'publishes all draft notes for a user in a merge request' do
+      expect { publish }.to change { DraftNote.count }.by(-2).and change { Note.count }.by(2).and change { Review.count }.by(1)
+      expect(DraftNote.count).to eq(0)
+    end
+
+    context 'when batch_review_notification feature is enabled' do
+      it 'sends batch notification' do
+        expect_next_instance_of(NotificationService) do |notification_service|
+          expect(notification_service).to receive_message_chain(:async, :new_review).with(kind_of(Review))
+        end
+
+        publish
+      end
+    end
+
+    context 'when batch_review_notification feature is disabled' do
+      it 'send a notification for each note' do
+        stub_feature_flags(batch_review_notification: false)
+
+        2.times do
+          expect_next_instance_of(NotificationService) do |notification_service|
+            expect(notification_service).to receive(:new_note).with(kind_of(Note))
+          end
+        end
+
+        publish
+      end
+    end
   end
 
   it 'only publishes the draft notes belonging to the current user' do
@@ -54,8 +120,8 @@ describe DraftNotes::PublishService do
   end
 
   context 'with drafts that resolve discussions' do
-    let(:note) { create(:discussion_note_on_merge_request, noteable: merge_request, project: project) }
-    let(:draft_note) { create(:draft_note, merge_request: merge_request, author: user, resolve_discussion: true, discussion_id: note.discussion.reply_id) }
+    let!(:note) { create(:discussion_note_on_merge_request, noteable: merge_request, project: project) }
+    let!(:draft_note) { create(:draft_note, merge_request: merge_request, author: user, resolve_discussion: true, discussion_id: note.discussion.reply_id) }
 
     it 'resolves the discussion' do
       publish(draft: draft_note)

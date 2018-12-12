@@ -3,6 +3,10 @@ require 'spec_helper'
 describe Note do
   include ::EE::GeoHelpers
 
+  describe 'associations' do
+    it { is_expected.to belong_to(:review).inverse_of(:notes) }
+  end
+
   context 'object storage with background upload' do
     before do
       stub_uploads_object_storage(AttachmentUploader, background_upload: true)

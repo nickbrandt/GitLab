@@ -4,6 +4,7 @@ describe EE::User do
   describe 'associations' do
     subject { build(:user) }
 
+    it { is_expected.to have_many(:reviews) }
     it { is_expected.to have_many(:vulnerability_feedback) }
   end
 
