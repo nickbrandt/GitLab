@@ -90,6 +90,17 @@ module EE
       ::Gitlab::CurrentSettings.instance_review_permitted? && current_user&.admin?
     end
 
+    override :show_last_push_widget?
+    def show_last_push_widget?(event)
+      show = super
+      project = event.project
+
+      # Skip if this was a mirror update
+      return false if project.mirror? && project.repository.up_to_date_with_upstream?(event.branch_name)
+
+      show
+    end
+
     private
 
     def appearance

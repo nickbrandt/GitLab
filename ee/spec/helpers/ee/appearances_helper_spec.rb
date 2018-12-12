@@ -59,4 +59,14 @@ describe AppearancesHelper do
       end
     end
   end
+
+  describe '#brand_title' do
+    it 'returns the default EE title when no appearance is present' do
+      allow(helper)
+        .to receive(:current_appearance)
+        .and_return(nil)
+
+      expect(helper.brand_title).to eq('GitLab Enterprise Edition')
+    end
+  end
 end
