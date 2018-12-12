@@ -84,6 +84,7 @@
   - [object_pool, 1]
   - [repository_cleanup, 1]
   - [delete_stored_files, 1]
+  - [remote_mirror_notification, 2]
 
   # EE-specific queues
   - [ldap_group_sync, 2]
