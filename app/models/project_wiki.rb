@@ -4,9 +4,6 @@ class ProjectWiki
   include Gitlab::ShellAdapter
   include Storage::LegacyProjectWiki
 
-  # EE only modules
-  include Elastic::WikiRepositoriesSearch
-
   MARKUPS = {
     'Markdown' => :markdown,
     'RDoc'     => :rdoc,
@@ -53,11 +50,6 @@ class ProjectWiki
 
   def http_url_to_repo
     "#{Gitlab.config.gitlab.url}/#{full_path}.git"
-  end
-
-  # No need to have a Kerberos Web url. Kerberos URL will be used only to clone
-  def kerberos_url_to_repo
-    [Gitlab.config.build_gitlab_kerberos_url, '/', full_path, '.git'].join('')
   end
 
   def wiki_base_path
@@ -122,8 +114,6 @@ class ProjectWiki
 
     wiki.write_page(title, format.to_sym, content, commit)
 
-    update_elastic_index
-
     update_project_activity
   rescue Gitlab::Git::Wiki::DuplicatePageError => e
     @error_message = "Duplicate page: #{e.message}"
@@ -135,8 +125,6 @@ class ProjectWiki
 
     wiki.update_page(page.path, title || page.name, format.to_sym, content, commit)
 
-    update_elastic_index
-
     update_project_activity
   end
 
@@ -144,8 +132,6 @@ class ProjectWiki
     return unless page
 
     wiki.delete_page(page.path, commit_details(:deleted, message, page.title))
-
-    update_elastic_index
 
     update_project_activity
   end
@@ -214,16 +200,6 @@ class ProjectWiki
   def update_project_activity
     @project.touch(:last_activity_at, :last_repository_updated_at)
   end
-
-  # EE only
-
-  def update_elastic_index
-    index_blobs if Gitlab::CurrentSettings.elasticsearch_indexing?
-  end
-
-  def path_to_repo
-    @path_to_repo ||=
-      File.join(Gitlab.config.repositories.storages[project.repository_storage].legacy_disk_path,
-                "#{disk_path}.git")
-  end
 end
+
+ProjectWiki.prepend(EE::ProjectWiki)

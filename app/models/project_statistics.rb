@@ -9,10 +9,6 @@ class ProjectStatistics < ActiveRecord::Base
   COLUMNS_TO_REFRESH = [:repository_size, :lfs_objects_size, :commit_count].freeze
   INCREMENTABLE_COLUMNS = { build_artifacts_size: %i[storage_size] }.freeze
 
-  def shared_runners_minutes
-    shared_runners_seconds.to_i / 60
-  end
-
   def total_repository_size
     repository_size + lfs_objects_size
   end
@@ -69,3 +65,5 @@ class ProjectStatistics < ActiveRecord::Base
     update_all(updates.join(', '))
   end
 end
+
+ProjectStatistics.prepend(EE::ProjectStatistics)

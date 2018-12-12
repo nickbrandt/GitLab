@@ -16,8 +16,6 @@ module Ci
     belongs_to :trigger_request
     belongs_to :erased_by, class_name: 'User'
 
-    has_many :sourced_pipelines, class_name: Ci::Sources::Pipeline, foreign_key: :source_job_id
-
     RUNNER_FEATURES = {
       upload_multiple_artifacts: -> (build) { build.publishes_artifacts_reports? }
     }.freeze

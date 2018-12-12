@@ -13,8 +13,6 @@ class ProjectMember < Member
 
   scope :in_project, ->(project) { where(source_id: project.id) }
 
-  before_destroy :delete_member_branch_protection
-
   class << self
     # Add users to projects with passed access option
     #
@@ -93,13 +91,6 @@ class ProjectMember < Member
 
   private
 
-  def delete_member_branch_protection
-    if user.present? && project.present?
-      project.protected_branches.merge_access_by_user(user).destroy_all # rubocop: disable DestroyAll
-      project.protected_branches.push_access_by_user(user).destroy_all # rubocop: disable DestroyAll
-    end
-  end
-
   def send_invite
     run_after_commit_or_now { notification_service.invite_project_member(self, @raw_invite_token) }
 
@@ -151,3 +142,5 @@ class ProjectMember < Member
   end
   # rubocop: enable CodeReuse/ServiceClass
 end
+
+ProjectMember.prepend(EE::ProjectMember)

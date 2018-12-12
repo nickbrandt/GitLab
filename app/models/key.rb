@@ -25,9 +25,6 @@ class Key < ActiveRecord::Base
 
   validate :key_meets_restrictions
 
-  # EE-only
-  scope :ldap, -> { where(type: 'LDAPKey') }
-
   delegate :name, :email, to: :user, prefix: true
 
   after_commit :add_to_shell, on: :create

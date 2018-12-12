@@ -271,18 +271,14 @@ class Service < ActiveRecord::Base
       prometheus
       pushover
       redmine
-      slack
       slack_slash_commands
+      slack
       teamcity
       microsoft_teams
     ]
 
     if Rails.env.development?
       service_names += %w[mock_ci mock_deployment mock_monitoring]
-    end
-
-    if Gitlab.com? || Rails.env.development?
-      service_names.push('gitlab_slack_application')
     end
 
     service_names.sort_by(&:downcase)

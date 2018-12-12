@@ -19,8 +19,8 @@ describe Projects::EnvironmentsController do
   describe 'GET index' do
     context 'when requesting JSON response for folders' do
       before do
-        allow_any_instance_of(Environment).to receive(:has_terminals?).and_return(true)
-        allow_any_instance_of(Environment).to receive(:rollout_status).and_return(kube_deployment_rollout_status)
+        allow_any_instance_of(EE::Environment).to receive(:has_terminals?).and_return(true)
+        allow_any_instance_of(EE::Environment).to receive(:rollout_status).and_return(kube_deployment_rollout_status)
 
         create(:environment, project: project,
                              name: 'staging/review-1',
