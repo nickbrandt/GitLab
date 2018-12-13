@@ -199,7 +199,7 @@ export default {
         ></textarea>
       </markdown-field>
       <div class="note-form-actions clearfix">
-        <p v-if="(discussion && discussion.id) || isDraft">
+        <p v-if="showResolveDiscussionToggle">
           <label>
             <template v-if="discussionResolved">
               <input
