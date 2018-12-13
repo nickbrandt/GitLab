@@ -21,6 +21,7 @@ module EE
         has_many :sourced_pipelines, class_name: ::Ci::Sources::Pipeline, foreign_key: :source_pipeline_id
 
         has_one :triggered_by_pipeline, through: :source_pipeline, source: :source_pipeline
+        has_one :source_bridge, through: :source_pipeline, source: :source_bridge
         has_many :triggered_pipelines, through: :sourced_pipelines, source: :pipeline
 
         has_many :auto_canceled_pipelines, class_name: 'Ci::Pipeline', foreign_key: 'auto_canceled_by_id'
@@ -95,7 +96,23 @@ module EE
               StoreSecurityReportsWorker.perform_async(pipeline.id)
             end
           end
+
+          after_transition created: :pending do |pipeline|
+            next unless pipeline.bridge_triggered?
+
+            pipeline.update_bridge_status!
+          end
         end
+      end
+
+      def bridge_triggered?
+        source_bridge.present?
+      end
+
+      def update_bridge_status!
+        raise HasStatus::UnknownStatusError if source_bridge.complete?
+
+        source_bridge.success!
       end
 
       def any_report_artifact_for_type(file_type)

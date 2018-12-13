@@ -1,10 +1,13 @@
 require 'spec_helper'
 
 describe Ci::CreateCrossProjectPipelineService, '#execute' do
+  set(:user) { create(:user) }
   set(:upstream_project) { create(:project, :repository) }
   set(:downstream_project) { create(:project, :repository) }
-  set(:upstream_pipeline) { create(:ci_pipeline, project: upstream_project) }
-  set(:user) { create(:user) }
+
+  set(:upstream_pipeline) do
+    create(:ci_pipeline, :running, project: upstream_project)
+  end
 
   let(:trigger) do
     {
@@ -16,7 +19,8 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
   end
 
   let(:bridge) do
-    create(:ci_bridge, user: user,
+    create(:ci_bridge, status: :pending,
+                       user: user,
                        options: trigger,
                        pipeline: upstream_pipeline)
   end
@@ -51,17 +55,19 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
     it 'creates a new pipeline in a downstream project' do
       pipeline = service.execute(bridge)
 
+      expect(pipeline.user).to eq bridge.user
       expect(pipeline.project).to eq downstream_project
       expect(bridge.sourced_pipelines.first.pipeline).to eq pipeline
-      expect(pipeline.source_pipeline.source_pipeline).to eq upstream_pipeline
-      expect(pipeline.source_pipeline.source_job).to eq bridge
-      expect(pipeline.source_pipeline.source_job).to be_a ::Ci::Bridge
+      expect(pipeline.triggered_by_pipeline).to eq upstream_pipeline
+      expect(pipeline.source_bridge).to eq bridge
+      expect(pipeline.source_bridge).to be_a ::Ci::Bridge
     end
 
-    it 'delegates permissions to newly created pipelines' do
+    it 'changes bridge status when downstream pipeline gets proceesed' do
       pipeline = service.execute(bridge)
 
-      expect(pipeline.user).to eq bridge.user
+      expect(pipeline.reload).to be_pending
+      expect(bridge.reload).to be_success
     end
   end
 end
