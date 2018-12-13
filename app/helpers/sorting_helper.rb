@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module SortingHelper
-  prepend ::EE::SortingHelper
+  prepend ::EE::SortingHelper # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   def sort_options_hash
     {

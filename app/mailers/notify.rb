@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Notify < BaseMailer
-  prepend ::EE::Notify
+  prepend ::EE::Notify # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   include ActionDispatch::Routing::PolymorphicRoutes
   include GitlabRoutingHelper

@@ -17,7 +17,7 @@ class CommitStatusPresenter < Gitlab::View::Presenter::Delegated
 
   presents :build
 
-  prepend ::EE::CommitStatusPresenter
+  prepend ::EE::CommitStatusPresenter # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   def self.callout_failure_messages
     CALLOUT_FAILURE_MESSAGES

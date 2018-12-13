@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class MergeRequestWidgetEntity < IssuableEntity
-  prepend ::EE::MergeRequestWidgetEntity
+  prepend ::EE::MergeRequestWidgetEntity # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   expose :state
   expose :in_progress_merge_commit_sha

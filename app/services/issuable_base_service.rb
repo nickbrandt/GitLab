@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class IssuableBaseService < BaseService
-  prepend ::EE::IssuableBaseService
+  prepend ::EE::IssuableBaseService # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   private
 

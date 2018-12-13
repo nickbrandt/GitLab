@@ -3,7 +3,7 @@
 class TemplateFinder
   include Gitlab::Utils::StrongMemoize
 
-  prepend ::EE::TemplateFinder
+  prepend ::EE::TemplateFinder # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   VENDORED_TEMPLATES = HashWithIndifferentAccess.new(
     dockerfiles: ::Gitlab::Template::DockerfileTemplate,
