@@ -7,7 +7,8 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
   set(:user) { create(:user) }
 
   let(:trigger) do
-    { trigger: {
+    {
+      trigger: {
         project: downstream_project.full_path,
         branch: 'feature'
       }
@@ -19,7 +20,6 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
                        options: trigger,
                        pipeline: upstream_pipeline)
   end
-
 
   let(:service) { described_class.new(upstream_project, user) }
 
