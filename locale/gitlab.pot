@@ -839,6 +839,12 @@ msgstr ""
 msgid "Applications"
 msgstr ""
 
+msgid "Applied"
+msgstr ""
+
+msgid "Apply suggestion"
+msgstr ""
+
 msgid "Approvals required"
 msgstr ""
 
@@ -4694,6 +4700,9 @@ msgstr ""
 msgid "Input your repository URL"
 msgstr ""
 
+msgid "Insert suggestion"
+msgstr ""
+
 msgid "Install GitLab Runner"
 msgstr ""
 
@@ -7965,6 +7974,9 @@ msgstr ""
 msgid "Something went wrong when toggling the button"
 msgstr ""
 
+msgid "Something went wrong while applying the suggestion. Please try again."
+msgstr ""
+
 msgid "Something went wrong while closing the %{issuable}. Please try again later"
 msgstr ""
 
@@ -8350,6 +8362,9 @@ msgid "SubscriptionTable|Usage count is performed once a day at 12:00 PM."
 msgstr ""
 
 msgid "SubscriptionTable|subscription"
+msgstr ""
+
+msgid "Suggested change"
 msgstr ""
 
 msgid "Switch branch/tag"

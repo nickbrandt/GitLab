@@ -27,6 +27,16 @@ export default {
       type: Object,
       required: true,
     },
+    line: {
+      type: Object,
+      required: false,
+      default: null,
+    },
+    helpPagePath: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   data() {
     return {
@@ -230,8 +240,10 @@ export default {
       <note-body
         ref="noteBody"
         :note="note"
+        :line="line"
         :can-edit="note.current_user.can_edit"
         :is-editing="isEditing"
+        :help-page-path="helpPagePath"
         @handleFormUpdate="formUpdateHandler"
         @cancelForm="formCancelHandler"
       />
