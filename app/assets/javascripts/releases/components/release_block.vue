@@ -36,7 +36,8 @@ export default {
     },
     author: {
       type: Object,
-      required: true,
+      required: false,
+      default: null,
     },
     createdAt: {
       type: String,
@@ -94,7 +95,7 @@ export default {
           <span v-gl-tooltip.bottom :title="tooltipTitle(createdAt)">{{ releasedTimeAgo }}</span>
         </div>
 
-        <div class="d-flex">
+        <div v-if="author" class="d-flex">
           by
           <user-avatar-link
             class="prepend-left-4"
@@ -114,7 +115,8 @@ export default {
         <ul class="pl-0 mb-0 prepend-top-8 list-unstyled js-assets-list">
           <li v-for="link in links" :key="link.name" class="append-bottom-8">
             <gl-link v-gl-tooltip.bottom :title="__('Download asset')" :href="link.url">
-              <icon name="package" class="align-middle append-right-4" /> {{ link.name }}
+              <icon name="package" class="align-middle append-right-4 align-text-bottom" />
+              {{ link.name }}
             </gl-link>
           </li>
         </ul>

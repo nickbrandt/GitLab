@@ -2,4 +2,4 @@
 - page_title _('Releases')
 
 %div{ 'class' => container_class }
-  #js-releases-page
+  #js-releases-page{ data: { endpoint: project_releases_path(@project, format: :json), illustration_path: image_path('illustrations/releases.svg'), documentation_path: help_page_path('todo') } }
