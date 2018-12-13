@@ -121,5 +121,23 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
         expect(pipeline.ref).to eq 'master'
       end
     end
+
+    context 'when circular dependency is defined' do
+      let(:trigger) do
+        { trigger: { project: upstream_project.full_path } }
+      end
+
+      it 'does not create a new pipeline' do
+        expect { service.execute(bridge) }
+          .not_to change { Ci::Pipeline.count }
+      end
+
+      it 'changes status of the bridge build' do
+        service.execute(bridge)
+
+        expect(bridge.reload).to be_failed
+        expect(bridge.failure_reason).to eq 'invalid_bridge_trigger'
+      end
+    end
   end
 end
