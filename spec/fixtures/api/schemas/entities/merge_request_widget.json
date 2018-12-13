@@ -121,6 +121,7 @@
     "rebase_path": { "type": ["string", "null"] },
     "squash": { "type": "boolean" },
     "test_reports_path": { "type": ["string", "null"] },
+    "can_receive_suggestion": { "type": "boolean" },
 
     // EE-specific
     "approvals_before_merge": { "type": ["integer", "null"] },

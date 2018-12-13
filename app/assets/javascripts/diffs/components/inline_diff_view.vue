@@ -21,6 +21,11 @@ export default {
       type: Array,
       required: true,
     },
+    helpPagePath: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   computed: {
     ...mapGetters('diffs', ['commitId']),
@@ -52,6 +57,7 @@ export default {
           :key="`icr-${index}`"
           :diff-file-hash="diffFile.file_hash"
           :line="line"
+          :help-page-path="helpPagePath"
         />
         <inline-draft-comment-row
           v-if="shouldRenderDraftRow(diffFile.file_hash, line)"

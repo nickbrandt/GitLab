@@ -2715,6 +2715,16 @@ ActiveRecord::Schema.define(version: 20181206121340) do
     t.index ["subscribable_id", "subscribable_type", "user_id", "project_id"], name: "index_subscriptions_on_subscribable_and_user_id_and_project_id", unique: true, using: :btree
   end
 
+  create_table "suggestions", id: :bigserial, force: :cascade do |t|
+    t.integer "note_id", null: false
+    t.integer "relative_order", limit: 2, null: false
+    t.boolean "applied", default: false, null: false
+    t.string "commit_id"
+    t.text "from_content", null: false
+    t.text "to_content", null: false
+    t.index ["note_id", "relative_order"], name: "index_suggestions_on_note_id_and_relative_order", unique: true, using: :btree
+  end
+
   create_table "system_note_metadata", force: :cascade do |t|
     t.integer "note_id", null: false
     t.integer "commit_count"
@@ -3384,6 +3394,7 @@ ActiveRecord::Schema.define(version: 20181206121340) do
   add_foreign_key "software_license_policies", "projects", on_delete: :cascade
   add_foreign_key "software_license_policies", "software_licenses", on_delete: :cascade
   add_foreign_key "subscriptions", "projects", on_delete: :cascade
+  add_foreign_key "suggestions", "notes", on_delete: :cascade
   add_foreign_key "system_note_metadata", "notes", name: "fk_d83a918cb1", on_delete: :cascade
   add_foreign_key "term_agreements", "application_setting_terms", column: "term_id"
   add_foreign_key "term_agreements", "users", on_delete: :cascade
