@@ -32,13 +32,53 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
     upstream_project.add_developer(user)
   end
 
-  context 'when user does not have ability to create a pipeline' do
-    it 'changes status of the bridge build' do
+  context 'when downstream project has not been found' do
+    let(:trigger) do
+      { trigger: { project: 'unknown/project' } }
+    end
+
+    it 'does not create a pipeline' do
       expect { service.execute(bridge) }
         .not_to change { Ci::Pipeline.count }
+    end
 
-      expect(bridge).to be_failed
-      expect(bridge.failure_reason).to eq 'insufficient_permissions'
+    it 'changes pipeline bridge job status to failed' do
+      service.execute(bridge)
+
+      expect(bridge.reload).to be_failed
+      expect(bridge.failure_reason).to eq 'invalid_bridge_trigger'
+    end
+  end
+
+  context 'when user can not access downstream project' do
+    it 'does not create a new pipeline' do
+      expect { service.execute(bridge) }
+        .not_to change { Ci::Pipeline.count }
+    end
+
+    it 'changes status of the bridge build' do
+      service.execute(bridge)
+
+      expect(bridge.reload).to be_failed
+      expect(bridge.failure_reason).to eq 'invalid_bridge_trigger'
+    end
+  end
+
+  context 'when user does not have access to create pipeline' do
+    before do
+      downstream_project.add_guest(user)
+    end
+
+    it 'does not create a new pipeline' do
+      expect { service.execute(bridge) }
+        .not_to change { Ci::Pipeline.count }
+    end
+
+    it 'changes status of the bridge build' do
+      service.execute(bridge)
+
+      expect(bridge.reload).to be_failed
+      expect(bridge.failure_reason).to eq 'insufficient_bridge_permissions'
     end
   end
 
@@ -47,7 +87,7 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
       downstream_project.add_developer(user)
     end
 
-    it 'creates a new pipeline' do
+    it 'creates only one new pipeline' do
       expect { service.execute(bridge) }
         .to change { Ci::Pipeline.count }.by(1)
     end
@@ -63,11 +103,23 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
       expect(pipeline.source_bridge).to be_a ::Ci::Bridge
     end
 
-    it 'changes bridge status when downstream pipeline gets proceesed' do
+    it 'updates bridge status when downstream pipeline gets proceesed' do
       pipeline = service.execute(bridge)
 
       expect(pipeline.reload).to be_pending
       expect(bridge.reload).to be_success
+    end
+
+    context 'when target ref is not specified' do
+      let(:trigger) do
+        { trigger: { project: downstream_project.full_path } }
+      end
+
+      it 'is using default branch name' do
+        pipeline = service.execute(bridge)
+
+        expect(pipeline.ref).to eq 'master'
+      end
     end
   end
 end

@@ -7,8 +7,12 @@ module Ci
     def execute(bridge)
       @bridge = bridge
 
+      unless target_project_exists?
+        return bridge.drop!(:invalid_bridge_trigger)
+      end
+
       unless can_create_cross_pipeline?
-        return bridge.drop!(:insufficient_permissions)
+        return bridge.drop!(:insufficient_bridge_permissions)
       end
 
       create_pipeline do |pipeline|
@@ -24,20 +28,32 @@ module Ci
 
     private
 
+    def target_project_exists?
+      target_project.present? &&
+        can?(current_user, :read_project, target_project)
+    end
+
     def can_create_cross_pipeline?
-      # TODO should we check update_pipeline in the first condition?
-      #
-      can?(current_user, :create_pipeline, project) &&
-        can?(current_user, :create_pipeline, target_project) &&
-        can?(@bridge.target_user, :create_pipeline, target_project)
+      can?(current_user, :update_pipeline, project) &&
+        can?(target_user, :create_pipeline, target_project)
     end
 
     def create_pipeline
       ::Ci::CreatePipelineService
-        .new(target_project, @bridge.target_user, ref: @bridge.target_ref)
+        .new(target_project, target_user, ref: target_ref)
         .execute(:pipeline, ignore_skip_ci: true) do |pipeline|
           yield pipeline
         end
+    end
+
+    def target_user
+      strong_memoize(:target_user) { @bridge.target_user }
+    end
+
+    def target_ref
+      strong_memoize(:target_ref) do
+        @bridge.target_ref || target_project.default_branch
+      end
     end
 
     def target_project
