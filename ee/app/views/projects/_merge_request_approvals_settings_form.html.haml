@@ -7,7 +7,7 @@
   = hidden_field_tag "project[approver_group_ids]"
   .input-group.input-btn-group
     = hidden_field_tag :approver_user_and_group_ids, '', { class: 'js-select-user-and-group input-large', tabindex: 1, 'data-name': 'project', :style => "max-width: unset;" }
-    %button.btn.btn-success.js-add-approvers{ type: 'button', title: 'Add approvers(s)' }
+    %button.btn.btn-success.js-add-approvers{ type: 'button', title: _('Add approver(s)') }
       = _("Add")
   .form-text.text-muted
     = _("Add users or groups who are allowed to approve every merge request")
