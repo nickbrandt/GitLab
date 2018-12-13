@@ -55,6 +55,7 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
       expect(bridge.sourced_pipelines.first.pipeline).to eq pipeline
       expect(pipeline.source_pipeline.source_pipeline).to eq upstream_pipeline
       expect(pipeline.source_pipeline.source_job).to eq bridge
+      expect(pipeline.source_pipeline.source_job).to be_a ::Ci::Bridge
     end
 
     it 'delegates permissions to newly created pipelines' do
