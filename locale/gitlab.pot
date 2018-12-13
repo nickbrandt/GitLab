@@ -4071,6 +4071,9 @@ msgstr ""
 msgid "Geo|Last sync attempt"
 msgstr ""
 
+msgid "Geo|Last time verified"
+msgstr ""
+
 msgid "Geo|Never"
 msgstr ""
 
