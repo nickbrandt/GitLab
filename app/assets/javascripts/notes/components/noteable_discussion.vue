@@ -428,7 +428,7 @@ Please check your network connection and try again.`;
                 :draft="draftForDiscussion(discussion.reply_id)"
               />
               <div
-                v-else-if="!isRepliesCollapsed"
+                v-else-if="!isRepliesCollapsed || !hasReplies"
                 :class="{ 'is-replying': isReplying }"
                 class="discussion-reply-holder"
               >
