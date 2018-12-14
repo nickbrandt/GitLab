@@ -914,6 +914,9 @@ msgstr ""
 msgid "Assertion consumer service URL"
 msgstr ""
 
+msgid "Assets"
+msgstr ""
+
 msgid "Assign custom color like #FF0000"
 msgstr ""
 
