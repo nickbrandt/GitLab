@@ -3057,6 +3057,9 @@ msgstr ""
 msgid "Download"
 msgstr ""
 
+msgid "Download asset"
+msgstr ""
+
 msgid "Download tar"
 msgstr ""
 
@@ -8392,6 +8395,9 @@ msgid "System metrics (Custom)"
 msgstr ""
 
 msgid "System metrics (Kubernetes)"
+msgstr ""
+
+msgid "Tag"
 msgstr ""
 
 msgid "Tags"
