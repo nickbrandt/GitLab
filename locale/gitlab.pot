@@ -3024,7 +3024,7 @@ msgstr ""
 msgid "Discard review"
 msgstr ""
 
-msgid "Discover GitLab Geo."
+msgid "Discover GitLab Geo"
 msgstr ""
 
 msgid "Discover projects, groups and snippets. Share your projects with others"
@@ -3994,6 +3994,9 @@ msgid "GeoNodes|Wikis checksummed for verification with their counterparts on Se
 msgstr ""
 
 msgid "GeoNodes|Wikis verified with their counterparts on the Primary node"
+msgstr ""
+
+msgid "GeoNodes|With %{geo} you can install a special read-only and replicated instance anywhere. Before you add nodes, follow the %{instructions} in the exact order they appear."
 msgstr ""
 
 msgid "GeoNodes|You have configured Geo nodes using an insecure HTTP connection. We recommend the use of HTTPS."
