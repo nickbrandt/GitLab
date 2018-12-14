@@ -113,6 +113,11 @@ export const sastIssues = [
   },
 ];
 
+export const sastIssuesMajor2 = {
+  version: '2.0',
+  vulnerabilities: sastIssues,
+};
+
 export const oldSastIssues = [
   {
     tool: 'bundler_audit',

@@ -13,6 +13,7 @@ import {
 import {
   oldSastIssues,
   sastIssues,
+  sastIssuesMajor2,
   sastFeedbacks,
   dependencyScanningIssues,
   dependencyScanningFeedbacks,
@@ -73,6 +74,18 @@ describe('security reports utils', () => {
       expect(parsed.location.end_line).toEqual(sastIssues[0].location.end_line);
       expect(parsed.urlPath).toEqual('path/Gemfile.lock#L5-10');
       expect(parsed.project_fingerprint).toEqual(sha1(sastIssues[0].cve));
+    });
+
+    it('should parse the received issues with new JSON format (2.0)', () => {
+      const raw = sastIssues[0];
+      const parsed = parseSastIssues(sastIssuesMajor2, [], 'path')[0];
+
+      expect(parsed.title).toEqual(raw.message);
+      expect(parsed.path).toEqual(raw.location.file);
+      expect(parsed.location.start_line).toEqual(raw.location.start_line);
+      expect(parsed.location.end_line).toEqual(raw.location.end_line);
+      expect(parsed.urlPath).toEqual('path/Gemfile.lock#L5-10');
+      expect(parsed.project_fingerprint).toEqual(sha1(raw.cve));
     });
 
     it('generate correct path to file when there is no line', () => {

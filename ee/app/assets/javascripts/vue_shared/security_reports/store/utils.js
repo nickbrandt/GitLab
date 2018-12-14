@@ -2,6 +2,9 @@ import sha1 from 'sha1';
 import _ from 'underscore';
 import { stripHtml } from '~/lib/utils/text_utility';
 import { n__, s__, sprintf } from '~/locale';
+import {
+  DEPRECATED_SAST_REPORT_VERSION,
+} from 'ee/vue_shared/security_reports/store/constants';
 
 /**
  * Returns the index of an issue in given list
@@ -62,7 +65,7 @@ function fileUrl(location, pathPrefix) {
  * @param {Object} issue
  * @returns {Object}
  */
-function adaptDeprecatedFormat(issue) {
+function adaptDeprecatedIssueFormat(issue) {
   // Skip issue with new format (old format does not have a location property)
   if (issue.location) {
     return issue;
@@ -91,17 +94,36 @@ function adaptDeprecatedFormat(issue) {
 }
 
 /**
+ *
+ * Wraps old report formats (plain array of vulnerabilities).
+ *
+ * @param {Array|Object} report
+ * @param {String} deprecatedReportVersion
+ * @returns {Object}
+ */
+function adaptDeprecatedReportFormat(report, deprecatedReportVersion) {
+  if (Array.isArray(report)) {
+    return {
+      version: deprecatedReportVersion,
+      vulnerabilities: report,
+    };
+  }
+
+  return report;
+}
+
+/**
  * Parses SAST results into a common format to allow to use the same Vue component.
  *
- * @param {Array} issues
+ * @param {Array|Object} report
  * @param {Array} feedback
  * @param {String} path
  * @returns {Array}
  */
-export const parseSastIssues = (issues = [], feedback = [], path = '') =>
-  issues.map(issue => {
+export const parseSastIssues = (report = [], feedback = [], path = '') =>
+  adaptDeprecatedReportFormat(report, DEPRECATED_SAST_REPORT_VERSION).vulnerabilities.map(issue => {
     const parsed = {
-      ...adaptDeprecatedFormat(issue),
+      ...adaptDeprecatedIssueFormat(issue),
       category: 'sast',
       project_fingerprint: sha1(issue.cve),
       title: issue.message,
