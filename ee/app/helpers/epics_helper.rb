@@ -79,7 +79,7 @@ module EpicsHelper
   end
 
   def epic_state_dropdown_link(state, selected_state)
-    link_to epic_state_title(state), page_filter_path(state: state, label: true), class: state == selected_state ? 'is-active' : ''
+    link_to epic_state_title(state), page_filter_path(state: state), class: state == selected_state ? 'is-active' : ''
   end
 
   def epic_state_title(state)
