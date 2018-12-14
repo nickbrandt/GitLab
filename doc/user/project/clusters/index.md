@@ -148,7 +148,7 @@ To add an existing Kubernetes cluster to your project:
          with limited permissions, the secret's namespace and project namespace may
          be the same.
 
-1.  Finally, click the **Create Kubernetes cluster** button.
+1. Finally, click the **Create Kubernetes cluster** button.
 
 After a couple of minutes, your cluster will be ready to go. You can now proceed
 to install some [pre-defined applications](#installing-applications).
@@ -556,7 +556,7 @@ containers. To use this integration, you should deploy to Kubernetes using
 the deployment variables above, ensuring any pods you create are labelled with
 `app=$CI_ENVIRONMENT_SLUG`. GitLab will do the rest!
 
-## Integrating Amazon EKS cluster with GitLab
+### Integrating Amazon EKS cluster with GitLab
 
 - Learn how to [connect and deploy to an Amazon EKS cluster](eks_and_gitlab/index.md).
 
