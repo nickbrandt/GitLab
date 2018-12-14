@@ -13,6 +13,7 @@ import { status, stateEvent } from '../../constants';
 
 export default {
   name: 'EpicShowApp',
+  epicsPathIdSeparator: '&',
   components: {
     epicHeader,
     epicSidebar,
@@ -43,6 +44,11 @@ export default {
     canAdmin: {
       required: true,
       type: Boolean,
+    },
+    subepicsSupported: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
     markdownPreviewPath: {
       type: String,
@@ -150,9 +156,10 @@ export default {
       type: Array,
       required: true,
     },
-    parentEpic: {
+    parent: {
       type: Object,
-      required: true,
+      required: false,
+      default: () => ({}),
     },
     participants: {
       type: Array,
@@ -206,7 +213,9 @@ export default {
     return {
       // Epics specific configuration
       issuableRef: '',
+      hasRelatedEpicsFeature: this.subepicsSupported && gon.features && gon.features.epicLinks,
       projectPath: this.groupPath,
+      parentEpic: this.parent ? this.parent : {},
       projectNamespace: '',
       service: new EpicsService({
         endpoint: this.endpoint,
@@ -301,7 +310,7 @@ export default {
         :initial-participants="participants"
         :initial-subscribed="subscribed"
         :initial-todo-exists="todoExists"
-        :parent-epic="parentEpic"
+        :parent="parentEpic"
         :namespace="namespace"
         :update-path="updateEndpoint"
         :labels-path="labelsPath"
@@ -312,18 +321,23 @@ export default {
         :epics-web-url="epicsWebUrl"
       />
       <related-issues-root
+        v-if="hasRelatedEpicsFeature"
         :endpoint="epicLinksEndpoint"
         :can-admin="canAdmin"
         :can-reorder="canAdmin"
         :allow-auto-complete="false"
-        title="Epics"
+        :path-id-separator="$options.epicsPathIdSeparator"
+        :title="__('Epics')"
+        css-class="js-related-epics-block"
       />
       <related-issues-root
         :endpoint="issueLinksEndpoint"
         :can-admin="canAdmin"
         :can-reorder="canAdmin"
         :allow-auto-complete="false"
-        title="Issues"
+        :title="__('Issues')"
+        css-class="js-related-issues-block"
+        path-id-separator="#"
       />
     </div>
   </div>

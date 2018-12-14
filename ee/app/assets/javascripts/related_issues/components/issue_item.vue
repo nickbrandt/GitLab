@@ -89,7 +89,7 @@ export default {
         </div>
         <div class="item-meta-child d-flex align-items-center">
           <issue-milestone
-            v-if="milestone"
+            v-if="hasMilestone"
             :milestone="milestone"
             class="d-flex align-items-center item-milestone"
           />

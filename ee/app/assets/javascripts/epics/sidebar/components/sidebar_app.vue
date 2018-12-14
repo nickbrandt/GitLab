@@ -118,7 +118,7 @@ export default {
       type: Boolean,
       required: true,
     },
-    parentEpic: {
+    parent: {
       type: Object,
       required: true,
     },
@@ -468,7 +468,7 @@ export default {
     <div class="issuable-sidebar js-issuable-update">
       <div class="block issuable-sidebar-header">
         <span class="issuable-header-text hide-collapsed float-left">{{ __('Todo') }}</span>
-        <toggle-sidebar :collapsed="collapsed" css-classes="float-right" @toggle="toggleSidebar"/>
+        <toggle-sidebar :collapsed="collapsed" css-classes="float-right" @toggle="toggleSidebar" />
         <sidebar-todo
           v-if="!collapsed"
           :collapsed="collapsed"
@@ -553,11 +553,12 @@ export default {
         @onLabelClick="handleLabelClick"
         @onDropdownClose="handleDropdownClose"
         @toggleCollapse="toggleSidebarRevealLabelsDropdown"
-      >{{ __('None') }}</sidebar-labels-select>
+        >{{ __('None') }}</sidebar-labels-select
+      >
       <div class="block parent-epic">
-        <sidebar-item-epic :block-title="__('Parent epic')" :initial-epic="parentEpic"/>
+        <sidebar-item-epic :block-title="__('Parent epic')" :initial-epic="parent" />
       </div>
-      <sidebar-participants :participants="initialParticipants" @toggleCollapse="toggleSidebar"/>
+      <sidebar-participants :participants="initialParticipants" @toggleCollapse="toggleSidebar" />
       <sidebar-subscriptions
         :loading="savingSubscription"
         :subscribed="store.subscribed"
