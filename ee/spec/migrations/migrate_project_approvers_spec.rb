@@ -13,6 +13,7 @@ describe MigrateProjectApprovers, :migration do
     let(:approval_project_rules) { table(:approval_project_rules) }
     let(:approval_project_rules_users) { table(:approval_project_rules_users) }
     let(:users) { table(:users) }
+    let(:features) { table(:features) }
 
     before do
       namespaces.create(id: 1, name: 'gitlab-org', path: 'gitlab-org')
@@ -35,6 +36,7 @@ describe MigrateProjectApprovers, :migration do
 
       expect(approval_project_rules_users.where(approval_project_rule_id: rule_ids.first).pluck(:user_id)).to contain_exactly(1)
       expect(approval_project_rules_users.where(approval_project_rule_id: rule_ids.last).pluck(:user_id)).to contain_exactly(2)
+      expect(features.where(key: 'approval_rule').exists?).to eq(true)
     end
   end
 end

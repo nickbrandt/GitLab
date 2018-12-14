@@ -16,7 +16,10 @@ class MigrateProjectApprovers < ActiveRecord::Migration[5.0]
     Project.each_batch(of: BATCH_SIZE) do |scope, _|
       jobs << ['MigrateApproverToApprovalRulesInBatch', ['Project', scope.pluck(:id)]]
     end
-    BackgroundMigration.bulk_perform_async(jobs)
+    BackgroundMigrationWorker.bulk_perform_async(jobs)
+
+    check_time = Gitlab::BackgroundMigration::MigrateApproverToApprovalRulesCheckProgress::RESCHEDULE_DELAY
+    BackgroundMigrationWorker.bulk_perform_in(check_time, [['MigrateApproverToApprovalRulesCheckProgress']])
   end
 
   def down
