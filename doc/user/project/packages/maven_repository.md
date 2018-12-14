@@ -89,7 +89,26 @@ You can read more on
 ## Configuring your project to use the GitLab Maven repository URL
 
 To download and upload packages from GitLab, you need a `repository` and
-`distributionManagement` section respectively in your `pom.xml` file:
+`distributionManagement` section in your `pom.xml` file.
+
+Depending on your workflow and the amount of Maven packages you have, there are
+3 ways you can configure your project to use the GitLab endpoint for Maven packages:
+
+- **Project level**: Useful when you have few Maven packages which are not under
+  the same GitLab group.
+- **Group level**: Useful when you have many Maven packages under the same GitLab
+  group.
+- **Instance level**: Useful when you have many Maven packages under different
+  GitLab groups or on their own namespace.
+
+NOTE: **Note:**
+In all cases, you need a project specific URL for uploading a package in
+the `distributionManagement` section.
+
+### Project level Maven endpoint
+
+The example below shows how the relevant `repository` section of your `pom.xml`
+would look like:
 
 ```xml
 <repositories>
@@ -113,13 +132,60 @@ To download and upload packages from GitLab, you need a `repository` and
 The `id` must be the same with what you
 [defined in `settings.xml`](#authorizing-with-the-maven-repository).
 
-In both examples, replace `PROJECT_ID` with your project ID which can be found
-on the home page of your project.
+Replace `PROJECT_ID` with your project ID which can be found on the home page
+of your project.
 
 If you have a self-hosted GitLab installation, replace `gitlab.com` with your
 domain name.
 
-## Instance level Maven endpoint
+### Group level Maven endpoint
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/8798) in GitLab Premium 11.7.
+
+If you rely on many packages, it might be inefficient to include the `repository` section
+with a unique URL for each package. Instead, you can use the group level endpoint for
+all your Maven packages stored within one GitLab group. Only packages you have access to
+will be available for download.
+
+The group level endpoint works with any package names, which means the you
+have the flexibility of naming compared to [instance level endpoint](#instance-level-maven-endpoint).
+However, GitLab will not guarantee the uniqueness of the package names within
+the group. You can have two projects with the same package name and package
+version. As a result, GitLab will serve whichever one is more recent.
+
+The example below shows how the relevant `repository` section of your `pom.xml`
+would look like. You still need a project specific URL for uploading a package in
+the `distributionManagement` section:
+
+```xml
+<repositories>
+  <repository>
+    <id>gitlab-maven</id>
+    <url>https://gitlab.com/api/v4/groups/my-group/-/packages/maven</url>
+  </repository>
+</repositories>
+<distributionManagement>
+  <repository>
+    <id>gitlab-maven</id>
+    <url>https://gitlab.com/api/v4/projects/PROJECT_ID/packages/maven</url>
+  </repository>
+  <snapshotRepository>
+    <id>gitlab-maven</id>
+    <url>https://gitlab.com/api/v4/projects/PROJECT_ID/packages/maven</url>
+  </snapshotRepository>
+</distributionManagement>
+```
+
+The `id` must be the same with what you
+[defined in `settings.xml`](#authorizing-with-the-maven-repository).
+
+Replace `my-group` with your group name and `PROJECT_ID` with your project ID
+which can be found on the home page of your project.
+
+If you have a self-hosted GitLab installation, replace `gitlab.com` with your
+domain name.
+
+### Instance level Maven endpoint
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/8274) in GitLab Premium 11.7.
 
@@ -128,7 +194,7 @@ with a unique URL for each package. Instead, you can use the instance level endp
 all maven packages stored in GitLab and the packages you have access to will be available
 for download.
 
-Note that only packages that have the same path as the project are exposed via
+Note that **only packages that have the same path as the project** are exposed via
 the instance level endpoint.
 
 | Project | Package | Instance level endpoint available |
@@ -160,36 +226,14 @@ the `distributionManagement` section:
 </distributionManagement>
 ```
 
-If you have a self-hosted GitLab installation, replace `gitlab.com` with your
-domain name.
+The `id` must be the same with what you
+[defined in `settings.xml`](#authorizing-with-the-maven-repository).
 
-## Group level Maven endpoint
-
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/8798) in GitLab Premium 11.7.
-
-If you rely on many packages, it might be inefficient to include the `repository` section 
-with a unique URL for each package. Instead, you can use the group level endpoint for 
-all your maven packages stored within one GitLab group. Only packages you have access to 
-will be available for download. Here's how the relevant `repository` section of 
-your `pom.xml` would look like:
-
-```xml
-<repositories>
-  <repository>
-    <id>gitlab-maven</id>
-    <url>https://gitlab.com/api/v4/groups/my-company/-/packages/maven</url>
-  </repository>
-</repositories>
-```
+Replace `PROJECT_ID` with your project ID which can be found on the home page
+of your project.
 
 If you have a self-hosted GitLab installation, replace `gitlab.com` with your
 domain name.
-
-**Notes**:
-
-- Group level endpoint works with any package names. That means if you have a flexibility of naming compared to instance level endpoint. However, that means GitLab will not guarantee uniqueness of package names withing the group. You can have two projects with a same package name and a package version. As result, GitLab will serve whichever one is more recent.  
-- You still need a project specific URL for uploading a package 
-in the `distributionManagement` section.
 
 ## Uploading packages
 
