@@ -2,9 +2,6 @@ import sha1 from 'sha1';
 import _ from 'underscore';
 import { stripHtml } from '~/lib/utils/text_utility';
 import { n__, s__, sprintf } from '~/locale';
-import {
-  DEPRECATED_SAST_REPORT_VERSION,
-} from 'ee/vue_shared/security_reports/store/constants';
 
 /**
  * Returns the index of an issue in given list
@@ -98,13 +95,11 @@ function adaptDeprecatedIssueFormat(issue) {
  * Wraps old report formats (plain array of vulnerabilities).
  *
  * @param {Array|Object} report
- * @param {String} deprecatedReportVersion
  * @returns {Object}
  */
-function adaptDeprecatedReportFormat(report, deprecatedReportVersion) {
+function adaptDeprecatedReportFormat(report) {
   if (Array.isArray(report)) {
     return {
-      version: deprecatedReportVersion,
       vulnerabilities: report,
     };
   }
@@ -121,7 +116,7 @@ function adaptDeprecatedReportFormat(report, deprecatedReportVersion) {
  * @returns {Array}
  */
 export const parseSastIssues = (report = [], feedback = [], path = '') =>
-  adaptDeprecatedReportFormat(report, DEPRECATED_SAST_REPORT_VERSION).vulnerabilities.map(issue => {
+  adaptDeprecatedReportFormat(report).vulnerabilities.map(issue => {
     const parsed = {
       ...adaptDeprecatedIssueFormat(issue),
       category: 'sast',
@@ -140,15 +135,15 @@ export const parseSastIssues = (report = [], feedback = [], path = '') =>
 /**
  * Parses Dependency Scanning results into a common format to allow to use the same Vue component.
  *
- * @param {Array} issues
+ * @param {Array|Object} report
  * @param {Array} feedback
  * @param {String} path
  * @returns {Array}
  */
-export const parseDependencyScanningIssues = (issues = [], feedback = [], path = '') =>
-  issues.map(issue => {
+export const parseDependencyScanningIssues = (report = [], feedback = [], path = '') =>
+  adaptDeprecatedReportFormat(report).vulnerabilities.map(issue => {
     const parsed = {
-      ...adaptDeprecatedFormat(issue),
+      ...adaptDeprecatedIssueFormat(issue),
       category: 'dependency_scanning',
       project_fingerprint: sha1(issue.cve || issue.message),
       title: issue.message,
