@@ -144,12 +144,11 @@ module QA
       end
 
       def signin_and_visit_group_as_user(user_name, group)
-        Runtime::Env.ldap_username = user_name
-        Runtime::Env.ldap_password = 'password'
+        user = Struct.new(:ldap_username, :ldap_password).new(user_name, 'password')
 
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform do |login_page|
-          login_page.sign_in_using_credentials
+          login_page.sign_in_using_ldap_credentials(user)
         end
 
         group.visit!
