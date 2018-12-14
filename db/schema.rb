@@ -2509,6 +2509,10 @@ ActiveRecord::Schema.define(version: 20181206121340) do
     t.datetime "updated_at"
     t.text "description_html"
     t.integer "cached_markdown_version"
+    t.integer "author_id"
+    t.string "name"
+    t.string "sha"
+    t.index ["author_id"], name: "index_releases_on_author_id", using: :btree
     t.index ["project_id", "tag"], name: "index_releases_on_project_id_and_tag", using: :btree
     t.index ["project_id"], name: "index_releases_on_project_id", using: :btree
   end
