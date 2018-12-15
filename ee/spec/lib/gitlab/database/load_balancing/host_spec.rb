@@ -19,15 +19,9 @@ describe Gitlab::Database::LoadBalancing::Host, :postgresql do
   end
 
   def wrapped_exception(wrapper, original)
-    if Gitlab.rails5?
-      begin
-        raise_and_wrap(wrapper, original.new)
-      rescue wrapper => error
-        error
-      end
-    else
-      wrapper.new('boom', original.new)
-    end
+    raise_and_wrap(wrapper, original.new)
+  rescue wrapper => error
+    error
   end
 
   describe '#connection' do

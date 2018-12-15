@@ -97,12 +97,7 @@ describe 'New project' do
 
           created_project = Project.last
 
-          if Gitlab.rails5?
-            expect(current_path).to eq(project_import_path(created_project))
-          else
-            expect(current_path).to eq(project_path(created_project))
-          end
-
+          expect(current_path).to eq(project_import_path(created_project))
           expect(created_project.project_feature).to be_issues_enabled
         end
       end
