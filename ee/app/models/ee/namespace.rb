@@ -31,7 +31,7 @@ module EE
       belongs_to :plan
 
       has_one :namespace_statistics
-      has_one :gitlab_subscription
+      has_one :gitlab_subscription, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
 
       scope :with_plan, -> { where.not(plan_id: nil) }
 
