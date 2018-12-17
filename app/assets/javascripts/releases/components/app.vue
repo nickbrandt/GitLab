@@ -55,7 +55,11 @@ export default {
       class="js-empty-state"
       :title="__('Getting started with releases')"
       :svg-path="illustrationPath"
-      :description="__('Releases mark specific points in a project\'s development history, communicate information about the type of change, and deliver on prepared, often compiled, versions of the software to be reused elsewhere. Currently, releases can only be created through the API.')"
+      :description="
+        __(
+          'Releases mark specific points in a project\'s development history, communicate information about the type of change, and deliver on prepared, often compiled, versions of the software to be reused elsewhere. Currently, releases can only be created through the API.',
+        )
+      "
       :primary-button-link="documentationLink"
       :primary-button-text="__('Open Documentation')"
     />
