@@ -1,7 +1,7 @@
 import $ from 'jquery';
-import approvals from 'ee/approvals';
+import setup from 'ee/approvals/setup_single_rule_approvals';
 
-describe('Approvals', () => {
+describe('EE setup_single_rule_approvals', () => {
   preloadFixtures('merge_requests_ee/merge_request_edit.html.raw');
 
   let $approversEl;
@@ -11,7 +11,7 @@ describe('Approvals', () => {
     loadFixtures('merge_requests_ee/merge_request_edit.html.raw');
     $approversEl = $('ul.approver-list');
     $suggestionEl = $('.suggested-approvers');
-    approvals();
+    setup();
   });
 
   describe('add suggested approver', () => {
