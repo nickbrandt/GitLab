@@ -18,7 +18,7 @@ class Milestone < ActiveRecord::Base
   include Milestoneish
   include Gitlab::SQL::Pattern
 
-  prepend ::EE::Milestone
+  prepend ::EE::Milestone # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   cache_markdown_field :title, pipeline: :single_line
   cache_markdown_field :description

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ConfirmationsController < Devise::ConfirmationsController
-  prepend ::EE::ConfirmationsController
+  prepend ::EE::ConfirmationsController # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   include AcceptsPendingInvitations
 

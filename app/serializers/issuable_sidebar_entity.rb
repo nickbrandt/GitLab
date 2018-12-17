@@ -3,7 +3,7 @@
 class IssuableSidebarEntity < Grape::Entity
   include TimeTrackableEntity
   include RequestAwareEntity
-  prepend ::EE::IssuableSidebarEntity
+  prepend ::EE::IssuableSidebarEntity # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   expose :participants, using: ::API::Entities::UserBasic do |issuable|
     issuable.participants(request.current_user)

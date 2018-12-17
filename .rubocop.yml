@@ -175,3 +175,9 @@ GitlabSecurity/PublicSend:
     - 'ee/db/**/*'
     - 'ee/lib/**/*.rake'
     - 'ee/spec/**/*'
+
+Cop/InjectEnterpriseEditionModule:
+  Enabled: true
+  Exclude:
+    - 'spec/**/*'
+    - 'ee/spec/**/*'

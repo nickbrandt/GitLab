@@ -2,7 +2,7 @@
 
 class EnvironmentEntity < Grape::Entity
   include RequestAwareEntity
-  prepend ::EE::EnvironmentEntity
+  prepend ::EE::EnvironmentEntity # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   expose :id
   expose :name

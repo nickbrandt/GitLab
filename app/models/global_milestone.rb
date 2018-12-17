@@ -3,7 +3,7 @@
 class GlobalMilestone
   include Milestoneish
 
-  include ::EE::GlobalMilestone
+  include ::EE::GlobalMilestone # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   EPOCH = DateTime.parse('1970-01-01')
   STATE_COUNT_HASH = { opened: 0, closed: 0, all: 0 }.freeze
