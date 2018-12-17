@@ -24,11 +24,9 @@ class Projects::DeployKeysController < Projects::ApplicationController
   end
 
   def create
-    @key = DeployKeys::CreateService.new(current_user, create_params).execute
+    @key = DeployKeys::CreateService.new(current_user, create_params).execute(project: @project)
 
-    if @key.valid?
-      log_audit_event(@key.title, action: :create)
-    else
+    unless @key.valid?
       flash[:alert] = @key.errors.full_messages.join(', ').html_safe
     end
 
@@ -88,10 +86,5 @@ class Projects::DeployKeysController < Projects::ApplicationController
 
   def authorize_update_deploy_key!
     access_denied! unless can?(current_user, :update_deploy_key, deploy_key)
-  end
-
-  def log_audit_event(key_title, options = {})
-    AuditEventService.new(current_user, @project, options)
-      .for_deploy_key(key_title).security_event
   end
 end
