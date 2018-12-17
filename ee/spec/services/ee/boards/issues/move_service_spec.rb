@@ -102,7 +102,7 @@ describe Boards::Issues::MoveService, services: true do
   end
 
   shared_examples 'moving an issue to/from assignee lists' do
-    let(:issue)  { create(:labeled_issue, project: project, labels: [bug, development]) }
+    let(:issue)  { create(:labeled_issue, project: project, labels: [bug, development], milestone: milestone1) }
     let(:params) { { board_id: board1.id, from_list_id: label_list1.id, to_list_id: label_list2.id } }
 
     context 'from assignee to label list' do
@@ -116,11 +116,12 @@ describe Boards::Issues::MoveService, services: true do
         issue.reload
         expect(issue.labels).to contain_exactly(bug, development, testing)
         expect(issue.assignees).to contain_exactly(user_list1.user)
+        expect(issue.milestone).to eq(milestone1)
       end
     end
 
     context 'from assignee to backlog' do
-      it 'removes assignment' do
+      it 'removes assignment and keeps milestone' do
         params = { board_id: board1.id, from_list_id: user_list1.id, to_list_id: backlog.id }
         issue.assignees.push(user_list1.user)
         expect(issue.assignees).to contain_exactly(user_list1.user)
@@ -130,6 +131,7 @@ describe Boards::Issues::MoveService, services: true do
         issue.reload
         expect(issue.assignees).to eq([])
         expect(issue).not_to be_closed
+        expect(issue.milestone).to eq(milestone1)
       end
     end
 
@@ -144,6 +146,7 @@ describe Boards::Issues::MoveService, services: true do
         issue.reload
         expect(issue.assignees).to contain_exactly(user_list1.user)
         expect(issue).to be_closed
+        expect(issue.milestone).to eq(milestone1)
       end
     end
 
@@ -156,6 +159,7 @@ describe Boards::Issues::MoveService, services: true do
         issue.reload
         expect(issue.labels).to contain_exactly(bug, development)
         expect(issue.assignees).to contain_exactly(user_list1.user)
+        expect(issue.milestone).to eq(milestone1)
       end
     end
 
@@ -170,6 +174,7 @@ describe Boards::Issues::MoveService, services: true do
         issue.reload
         expect(issue.labels).to contain_exactly(bug, development)
         expect(issue.assignees).to contain_exactly(user)
+        expect(issue.milestone).to eq(milestone1)
       end
     end
   end

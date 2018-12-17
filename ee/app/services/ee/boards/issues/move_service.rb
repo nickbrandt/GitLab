@@ -41,7 +41,7 @@ module EE
 
         def milestone_id(issue)
           # We want to nullify the issue milestone.
-          return if moving_to_list.backlog?
+          return if moving_to_list.backlog? && moving_from_list.milestone?
 
           # Moving to a list which is not a 'milestone list' will keep
           # the already existent milestone.
