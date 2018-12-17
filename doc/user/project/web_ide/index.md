@@ -128,7 +128,7 @@ IDE. An example `package.json` is below.
 }
 ```
 
-## Interactive Web Terminals for the Web IDE **[ULTIMATE]**
+## Interactive Web Terminals for the Web IDE **[ULTIMATE ONLY]**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/5426) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.6.
 
