@@ -55,7 +55,13 @@ class EpicsFinder < IssuableFinder
   private
 
   def count_key(value)
-    Array(value).last.to_sym
+    last_value = Array(value).last
+
+    if last_value.is_a?(Integer)
+      Epic.states.invert[last_value].to_sym
+    else
+      last_value.to_sym
+    end
   end
 
   # rubocop: disable CodeReuse/ActiveRecord
