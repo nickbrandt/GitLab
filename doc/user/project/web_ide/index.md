@@ -128,23 +128,25 @@ IDE. An example `package.json` is below.
 }
 ```
 
-## Interactive Terminals for the Web IDE **[ULTIMATE]**
+## Interactive Web Terminals for the Web IDE **[ULTIMATE ONLY]**
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/5426) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.6.
 
-[Interactive terminals](../../../ci/interactive_web_terminal/index.md)
-give the user access to a terminal to interact with the Runner directly from the GitLab
-UI. These terminals can be also accessed via Web IDE.
+CAUTION: **Warning:**
+Interactive Web Terminals for the Web IDE is currently in **Beta**.
+
+[Interactive web terminals](../../../ci/interactive_web_terminal/index.md)
+give the user access to a terminal to interact with the Runner directly from
+GitLab, including through the Web IDE.
 
 Only project [**maintainers**](../../permissions.md#project-members-permissions)
-can run Interactive Terminals through the Web IDE.
+can run Interactive Web Terminals through the Web IDE.
+
+CAUTION: **Warning:**
+GitLab.com [does not support Interactive Web Terminals yet](https://gitlab.com/gitlab-org/gitlab-ce/issues/52611).
+Shared Runners in private instances are not supported either.
 
 ### Runner configuration
-
-Web IDE Interactive Terminals are not supported by Shared Runners.
-To make use of this feature, you need to provide your
-[own Runner](https://docs.gitlab.com/runner/install/) and properly
-[configure it](#configuration).
 
 Some things need to be configured in the runner for the interactive web terminal
 to work:
