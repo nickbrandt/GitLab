@@ -4062,13 +4062,13 @@ msgstr ""
 msgid "Geo|In sync"
 msgstr ""
 
+msgid "Geo|Last repository check run"
+msgstr ""
+
 msgid "Geo|Last successful sync"
 msgstr ""
 
 msgid "Geo|Last sync attempt"
-msgstr ""
-
-msgid "Geo|Last time verified"
 msgstr ""
 
 msgid "Geo|Never"
