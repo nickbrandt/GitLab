@@ -195,14 +195,14 @@ describe Gitlab::JsonCache do
     it 'writes value to the cache with the given key' do
       cache.write(key, true)
 
-      expect(backend).to have_received(:write).with(expanded_key, "true")
+      expect(backend).to have_received(:write).with(expanded_key, "true", nil)
     end
 
     it 'writes a string containing a JSON representation of the value to the cache' do
       cache.write(key, node)
 
       expect(backend).to have_received(:write)
-        .with(expanded_key, node.to_json)
+        .with(expanded_key, node.to_json, nil)
     end
 
     it 'passes options the underlying cache implementation' do
@@ -212,18 +212,18 @@ describe Gitlab::JsonCache do
         .with(expanded_key, "true", expires_in: 15.seconds)
     end
 
-    it 'does not pass options to the underlying cache implementation when options is empty' do
+    it 'passes options the underlying cache implementation when options is empty' do
       cache.write(key, true, {})
 
       expect(backend).to have_received(:write)
-        .with(expanded_key, "true")
+        .with(expanded_key, "true", {})
     end
 
-    it 'does not pass options to the underlying cache implementation when options is nil' do
+    it 'passes options the underlying cache implementation when options is nil' do
       cache.write(key, true, nil)
 
       expect(backend).to have_received(:write)
-        .with(expanded_key, "true")
+        .with(expanded_key, "true", nil)
     end
   end
 
@@ -232,6 +232,13 @@ describe Gitlab::JsonCache do
 
     it 'requires a block' do
       expect { cache.fetch(key) }.to raise_error(LocalJumpError)
+    end
+
+    it 'passes options the underlying cache implementation' do
+      expect(backend).to receive(:write)
+        .with(expanded_key, "true", expires_in: 15.seconds)
+
+      cache.fetch(key, expires_in: 15.seconds) { true }
     end
 
     context 'when the given key does not exist in the cache' do
@@ -243,7 +250,7 @@ describe Gitlab::JsonCache do
         end
 
         it 'caches the value' do
-          expect(backend).to receive(:write).with(expanded_key, "true")
+          expect(backend).to receive(:write).with(expanded_key, "true", {})
 
           cache.fetch(key) { true }
         end
@@ -257,7 +264,7 @@ describe Gitlab::JsonCache do
         end
 
         it 'caches the value' do
-          expect(backend).to receive(:write).with(expanded_key, "false")
+          expect(backend).to receive(:write).with(expanded_key, "false", {})
 
           cache.fetch(key) { false }
         end
@@ -271,14 +278,14 @@ describe Gitlab::JsonCache do
         end
 
         it 'caches the value' do
-          expect(backend).to receive(:write).with(expanded_key, "null")
+          expect(backend).to receive(:write).with(expanded_key, "null", {})
 
           cache.fetch(key) { nil }
         end
       end
     end
 
-    context 'whenn the given key exists in the cache' do
+    context 'when the given key exists in the cache' do
       context 'when the cached value is a hash' do
         before do
           backend.write(expanded_key, node.to_json)
@@ -384,7 +391,7 @@ describe Gitlab::JsonCache do
 
         it 'writes the result of the block to the cache' do
           expect(backend).to receive(:write)
-            .with(expanded_key, 'block result'.to_json)
+            .with(expanded_key, 'block result'.to_json, {})
 
           cache.fetch(key) { 'block result' }
         end

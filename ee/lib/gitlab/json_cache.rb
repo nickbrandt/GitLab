@@ -38,8 +38,8 @@ module Gitlab
       value
     end
 
-    def write(key, value, options = {})
-      backend.write(cache_key(key), *[value.to_json, options].reject(&:blank?))
+    def write(key, value, options = nil)
+      backend.write(cache_key(key), value.to_json, options)
     end
 
     def fetch(key, options = {}, &block)
