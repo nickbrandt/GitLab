@@ -37,7 +37,7 @@ Certificate:
     gitlab_rails['smartcard_client_certificate_required_port'] = 3444
     ```
 
-1. Save the file and [reconfigure](../administration/restart_gitlab.md#omnibus-gitlab-reconfigure)
+1. Save the file and [reconfigure](../restart_gitlab.md#omnibus-gitlab-reconfigure)
    GitLab for the changes to take effect.
 
 ---
@@ -120,5 +120,5 @@ Certificate:
      client_certificate_required_port: 3444
    ```
 
-1. Save the file and [restart](../administration/restart_gitlab.md#installations-from-source)
+1. Save the file and [restart](../restart_gitlab.md#installations-from-source)
    GitLab for the changes to take effect.
