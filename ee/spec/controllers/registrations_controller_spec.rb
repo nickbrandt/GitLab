@@ -6,7 +6,7 @@ describe RegistrationsController do
       let(:user_params) { { user: attributes_for(:user, email_opted_in: '1') } }
 
       it 'sets the rest of the email_opted_in fields' do
-        post :create, user_params
+        post :create, params: user_params
         user = User.find_by_username!(user_params[:user][:username])
         expect(user.email_opted_in).to be_truthy
         expect(user.email_opted_in_ip).to be_present
@@ -19,7 +19,7 @@ describe RegistrationsController do
       let(:user_params) { { user: attributes_for(:user, email_opted_in: '0') } }
 
       it 'does not set the rest of the email_opted_in fields' do
-        post :create, user_params
+        post :create, params: user_params
         user = User.find_by_username!(user_params[:user][:username])
         expect(user.email_opted_in).to be_falsey
         expect(user.email_opted_in_ip).to be_blank

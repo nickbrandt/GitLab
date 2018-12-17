@@ -41,7 +41,7 @@ describe Groups::AnalyticsController do
   it 'returns 404 when feature is not available and we dont show promotions' do
     stub_licensed_features(contribution_analytics: false)
 
-    get :show, group_id: group.path
+    get :show, params: { group_id: group.path }
 
     expect(response).to have_gitlab_http_status(404)
   end
@@ -56,14 +56,14 @@ describe Groups::AnalyticsController do
     it 'returns page when feature is not available and we show promotions' do
       stub_licensed_features(contribution_analytics: false)
 
-      get :show, group_id: group.path
+      get :show, params: { group_id: group.path }
 
       expect(response).to have_gitlab_http_status(200)
     end
   end
 
   it 'sets instance variables properly', :aggregate_failures do
-    get :show, group_id: group.path
+    get :show, params: { group_id: group.path }
 
     expect(response).to have_gitlab_http_status(200)
 
@@ -78,7 +78,7 @@ describe Groups::AnalyticsController do
   end
 
   it "returns member contributions JSON when format is JSON" do
-    get :show, group_id: group.path, format: :json
+    get :show, params: { group_id: group.path }, format: :json
 
     expect(json_response.length).to eq(3)
 
@@ -96,14 +96,14 @@ describe Groups::AnalyticsController do
 
   it 'does not cause N+1 queries when the format is JSON' do
     control_count = ActiveRecord::QueryRecorder.new do
-      get :show, group_id: group.path, format: :json
+      get :show, params: { group_id: group.path }, format: :json
     end
 
     controller.instance_variable_set(:@group, nil)
     user4 = create(:user)
     group.add_user(user4, GroupMember::DEVELOPER)
 
-    expect { get :show, group_id: group.path, format: :json }
+    expect { get :show, params: { group_id: group.path }, format: :json }
       .not_to exceed_query_limit(control_count)
   end
 
@@ -111,19 +111,19 @@ describe Groups::AnalyticsController do
     render_views
 
     it 'avoids a N+1 query in #show' do
-      control_count = ActiveRecord::QueryRecorder.new { get :show, group_id: group.path }.count
+      control_count = ActiveRecord::QueryRecorder.new { get :show, params: { group_id: group.path } }.count
 
       # Clear out controller state to force a refresh of the group
       controller.instance_variable_set(:@group, nil)
       user4 = create(:user)
       group.add_user(user4, GroupMember::DEVELOPER)
 
-      expect { get :show, group_id: group.path }.not_to exceed_query_limit(control_count)
+      expect { get :show, params: { group_id: group.path } }.not_to exceed_query_limit(control_count)
     end
   end
 
   describe 'GET #index' do
-    subject { get :show, group_id: group.to_param }
+    subject { get :show, params: { group_id: group.to_param } }
 
     it_behaves_like 'disabled when using an external authorization service'
   end

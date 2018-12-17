@@ -134,8 +134,10 @@ describe API::ManagedLicenses do
       it 'creates managed license' do
         expect do
           post api("/projects/#{project.id}/managed_licenses", maintainer_user),
-            name: 'NEW_LICENSE_NAME',
-            approval_status: 'approved'
+            params: {
+              name: 'NEW_LICENSE_NAME',
+              approval_status: 'approved'
+            }
         end.to change {project.software_license_policies.count}.by(1)
 
         expect(response).to have_gitlab_http_status(201)
@@ -147,8 +149,10 @@ describe API::ManagedLicenses do
       it 'does not allow to duplicate managed license name' do
         expect do
           post api("/projects/#{project.id}/managed_licenses", maintainer_user),
-            name: software_license_policy.name,
-            approval_status: 'blacklisted'
+            params: {
+              name: software_license_policy.name,
+              approval_status: 'blacklisted'
+            }
         end.not_to change {project.software_license_policies.count}
 
         expect(response).to have_gitlab_http_status(400)
@@ -158,8 +162,10 @@ describe API::ManagedLicenses do
     context 'authorized user with read permissions' do
       it 'does not create managed license' do
         post api("/projects/#{project.id}/managed_licenses", dev_user),
-          name: 'NEW_LICENSE_NAME',
-          approval_status: 'approved'
+          params: {
+            name: 'NEW_LICENSE_NAME',
+            approval_status: 'approved'
+          }
 
         expect(response).to have_gitlab_http_status(403)
       end
@@ -168,8 +174,10 @@ describe API::ManagedLicenses do
     context 'authorized user without permissions' do
       it 'does not create managed license' do
         post api("/projects/#{project.id}/managed_licenses", reporter_user),
-          name: 'NEW_LICENSE_NAME',
-          approval_status: 'approved'
+          params: {
+            name: 'NEW_LICENSE_NAME',
+            approval_status: 'approved'
+          }
 
         expect(response).to have_gitlab_http_status(403)
       end
@@ -178,8 +186,10 @@ describe API::ManagedLicenses do
     context 'unauthorized user' do
       it 'does not create managed license' do
         post api("/projects/#{project.id}/managed_licenses"),
-          name: 'NEW_LICENSE_NAME',
-          approval_status: 'approved'
+          params: {
+            name: 'NEW_LICENSE_NAME',
+            approval_status: 'approved'
+          }
 
         expect(response).to have_gitlab_http_status(401)
       end
@@ -194,7 +204,7 @@ describe API::ManagedLicenses do
         initial_name = initial_license.name
         initial_approval_status = initial_license.approval_status
         patch api("/projects/#{project.id}/managed_licenses/#{software_license_policy.id}", maintainer_user),
-          approval_status: 'blacklisted'
+          params: { approval_status: 'blacklisted' }
 
         updated_software_license_policy = project.software_license_policies.reload.first
 

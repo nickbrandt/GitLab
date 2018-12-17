@@ -12,7 +12,7 @@ describe API::Epics do
       it 'returns 403 forbidden error' do
         group.add_developer(user)
 
-        get api(url, user), params
+        get api(url, user), params: params
 
         expect(response).to have_gitlab_http_status(403)
       end
@@ -23,7 +23,7 @@ describe API::Epics do
         end
 
         it 'returns 401 unauthorized error for non authenticated user' do
-          get api(url), params
+          get api(url), params: params
 
           expect(response).to have_gitlab_http_status(401)
         end
@@ -32,7 +32,7 @@ describe API::Epics do
           project.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
           group.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
 
-          get api(url, user), params
+          get api(url, user), params: params
 
           expect(response).to have_gitlab_http_status(404)
         end
@@ -47,7 +47,7 @@ describe API::Epics do
       RSpec::Matchers.define_negated_matcher :exclude, :include
 
       it 'returns epic with extra date fields' do
-        get api(url, user), params
+        get api(url, user), params: params
 
         expect(Array.wrap(JSON.parse(response.body))).to all(exclude(*extra_date_fields))
       end
@@ -59,7 +59,7 @@ describe API::Epics do
       end
 
       it 'returns epic with extra date fields' do
-        get api(url, user), params
+        get api(url, user), params: params
 
         expect(Array.wrap(JSON.parse(response.body))).to all(include(*extra_date_fields))
       end
@@ -119,31 +119,31 @@ describe API::Epics do
       end
 
       it 'returns epics authored by the given author id' do
-        get api(url, user), author_id: user2.id
+        get api(url, user), params: { author_id: user2.id }
 
         expect_array_response([epic2.id])
       end
 
       it 'returns epics matching given search string for title' do
-        get api(url, user), search: epic2.title
+        get api(url, user), params: { search: epic2.title }
 
         expect_array_response([epic2.id])
       end
 
       it 'returns epics matching given search string for description' do
-        get api(url, user), search: epic2.description
+        get api(url, user), params: { search: epic2.description }
 
         expect_array_response([epic2.id])
       end
 
       it 'returns epics matching given status' do
-        get api(url, user), state: :opened
+        get api(url, user), params: { state: :opened }
 
         expect_array_response([epic2.id])
       end
 
       it 'returns all epics when state set to all' do
-        get api(url, user), state: :all
+        get api(url, user), params: { state: :all }
 
         expect_array_response([epic2.id, epic.id])
       end
@@ -155,25 +155,25 @@ describe API::Epics do
       end
 
       it 'sorts ascending when requested' do
-        get api(url, user), sort: :asc
+        get api(url, user), params: { sort: :asc }
 
         expect_array_response([epic.id, epic2.id])
       end
 
       it 'sorts by updated_at descending when requested' do
-        get api(url, user), order_by: :updated_at
+        get api(url, user), params: { order_by: :updated_at }
 
         expect_array_response([epic.id, epic2.id])
       end
 
       it 'sorts by updated_at ascending when requested' do
-        get api(url, user), order_by: :updated_at, sort: :asc
+        get api(url, user), params: { order_by: :updated_at, sort: :asc }
 
         expect_array_response([epic2.id, epic.id])
       end
 
       it 'returns an array of labeled epics' do
-        get api(url, user), labels: label.title
+        get api(url, user), params: { labels: label.title }
 
         expect_array_response([epic2.id])
       end
@@ -231,7 +231,7 @@ describe API::Epics do
         it 'returns 400' do
           group.add_developer(user)
 
-          post api(url, user), description: 'epic description'
+          post api(url, user), params: { description: 'epic description' }
 
           expect(response).to have_gitlab_http_status(400)
         end
@@ -241,7 +241,7 @@ describe API::Epics do
         before do
           group.add_developer(user)
 
-          post api(url, user), params
+          post api(url, user), params: params
         end
 
         it 'returns 201 status' do
@@ -301,7 +301,7 @@ describe API::Epics do
 
       context 'when a user does not have permissions to create an epic' do
         it 'returns 403 forbidden error' do
-          put api(url, user), params
+          put api(url, user), params: params
 
           expect(response).to have_gitlab_http_status(403)
         end
@@ -324,7 +324,7 @@ describe API::Epics do
 
         context 'with basic params' do
           before do
-            put api(url, user), params
+            put api(url, user), params: params
           end
 
           it 'returns 200 status' do
@@ -351,7 +351,7 @@ describe API::Epics do
 
         context 'when state_event is close' do
           it 'allows epic to be closed' do
-            put api(url, user), state_event: 'close'
+            put api(url, user), params: { state_event: 'close' }
 
             expect(epic.reload).to be_closed
           end
@@ -361,7 +361,7 @@ describe API::Epics do
           it 'allows epic to be reopend' do
             epic.update!(state: 'closed')
 
-            put api(url, user), state_event: 'reopen'
+            put api(url, user), params: { state_event: 'reopen' }
 
             expect(epic.reload).to be_opened
           end
@@ -373,7 +373,7 @@ describe API::Epics do
           let(:new_due_date) { epic.end_date + 1.day }
 
           it 'updates start_date_fixed and due_date_fixed' do
-            put api(url, user), start_date: new_start_date, end_date: new_due_date
+            put api(url, user), params: { start_date: new_start_date, end_date: new_due_date }
 
             result = epic.reload
 
@@ -388,7 +388,7 @@ describe API::Epics do
           let(:new_due_date) { epic.end_date + 1.day }
 
           it 'updates start_date_is_fixed' do
-            put api(url, user), start_date_is_fixed: false
+            put api(url, user), params: { start_date_is_fixed: false }
 
             result = epic.reload
 

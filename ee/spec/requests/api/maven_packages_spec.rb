@@ -118,7 +118,7 @@ describe API::MavenPackages do
     end
 
     def download_file(file_name, params = {}, request_headers = headers)
-      get api("/packages/maven/#{maven_metadatum.path}/#{file_name}"), params, request_headers
+      get api("/packages/maven/#{maven_metadatum.path}/#{file_name}"), params: params, headers: request_headers
     end
 
     def download_file_with_token(file_name, params = {}, request_headers = headers_with_token)
@@ -223,7 +223,7 @@ describe API::MavenPackages do
     end
 
     def download_file(file_name, params = {}, request_headers = headers)
-      get api("/groups/#{group.id}/-/packages/maven/#{maven_metadatum.path}/#{file_name}"), params, request_headers
+      get api("/groups/#{group.id}/-/packages/maven/#{maven_metadatum.path}/#{file_name}"), params: params, headers: request_headers
     end
 
     def download_file_with_token(file_name, params = {}, request_headers = headers_with_token)
@@ -297,7 +297,7 @@ describe API::MavenPackages do
 
     def download_file(file_name, params = {}, request_headers = headers)
       get api("/projects/#{project.id}/packages/maven/" \
-              "#{maven_metadatum.path}/#{file_name}"), params, request_headers
+              "#{maven_metadatum.path}/#{file_name}"), params: params, headers: request_headers
     end
 
     def download_file_with_token(file_name, params = {}, request_headers = headers_with_token)
@@ -345,7 +345,7 @@ describe API::MavenPackages do
     end
 
     def authorize_upload(params = {}, request_headers = headers)
-      put api("/projects/#{project.id}/packages/maven/com/example/my-app/1.0-SNAPSHOT/maven-metadata.xml/authorize"), params, request_headers
+      put api("/projects/#{project.id}/packages/maven/com/example/my-app/1.0-SNAPSHOT/maven-metadata.xml/authorize"), params: params, headers: request_headers
     end
 
     def authorize_upload_with_token(params = {}, request_headers = headers_with_token)
@@ -408,7 +408,7 @@ describe API::MavenPackages do
     end
 
     def upload_file(params = {}, request_headers = headers)
-      put api("/projects/#{project.id}/packages/maven/com/example/my-app/1.0-SNAPSHOT/maven-metadata.xml"), params, request_headers
+      put api("/projects/#{project.id}/packages/maven/com/example/my-app/1.0-SNAPSHOT/maven-metadata.xml"), params: params, headers: request_headers
     end
 
     def upload_file_with_token(params = {}, request_headers = headers_with_token)

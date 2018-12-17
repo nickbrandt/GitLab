@@ -69,10 +69,12 @@ describe Projects::ClustersController do
     end
 
     def go
-      get :metrics, format: :json,
-                    namespace_id: project.namespace,
-                    project_id: project,
-                    id: cluster
+      get :metrics, params: {
+                      namespace_id: project.namespace,
+                      project_id: project,
+                      id: cluster
+                    },
+                    format: :json
     end
 
     describe 'security' do

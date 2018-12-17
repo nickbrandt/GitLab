@@ -122,7 +122,7 @@ describe Projects::JobsController, :clean_gitlab_redis_shared_state do
           project_id: project
       }
 
-      get :show, params.merge(extra_params)
+      get :show, params: params.merge(extra_params)
     end
   end
 end

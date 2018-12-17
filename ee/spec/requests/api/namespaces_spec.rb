@@ -113,7 +113,7 @@ describe API::Namespaces do
 
     context 'when authenticated as admin' do
       it 'updates namespace using full_path' do
-        put api("/namespaces/#{group1.full_path}", admin), plan: 'silver', shared_runners_minutes_limit: 9001
+        put api("/namespaces/#{group1.full_path}", admin), params: { plan: 'silver', shared_runners_minutes_limit: 9001 }
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response['plan']).to eq('silver')
@@ -121,7 +121,7 @@ describe API::Namespaces do
       end
 
       it 'updates namespace using id' do
-        put api("/namespaces/#{group1.id}", admin), plan: 'silver', shared_runners_minutes_limit: 9001
+        put api("/namespaces/#{group1.id}", admin), params: { plan: 'silver', shared_runners_minutes_limit: 9001 }
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response['plan']).to eq('silver')
@@ -131,7 +131,7 @@ describe API::Namespaces do
 
     context 'when not authenticated as admin' do
       it 'retuns 403' do
-        put api("/namespaces/#{group1.id}", user), plan: 'silver'
+        put api("/namespaces/#{group1.id}", user), params: { plan: 'silver' }
 
         expect(response).to have_gitlab_http_status(403)
       end
@@ -139,7 +139,7 @@ describe API::Namespaces do
 
     context 'when namespace not found' do
       it 'returns 404' do
-        put api("/namespaces/12345", admin), plan: 'silver'
+        put api("/namespaces/12345", admin), params: { plan: 'silver' }
 
         expect(response).to have_gitlab_http_status(404)
         expect(json_response).to eq('message' => '404 Namespace Not Found')
@@ -148,7 +148,7 @@ describe API::Namespaces do
 
     context 'when invalid params' do
       it 'returns validation error' do
-        put api("/namespaces/#{group1.id}", admin), plan: 'unknown'
+        put api("/namespaces/#{group1.id}", admin), params: { plan: 'unknown' }
 
         expect(response).to have_gitlab_http_status(400)
         expect(json_response['message']).to eq('plan' => ['is not included in the list'])
@@ -165,7 +165,7 @@ describe API::Namespaces do
     end
 
     def do_post(current_user, payload)
-      post api("/namespaces/#{group1.id}/gitlab_subscription", current_user), payload
+      post api("/namespaces/#{group1.id}/gitlab_subscription", current_user), params: payload
     end
 
     context 'when authenticated as a regular user' do
@@ -239,7 +239,7 @@ describe API::Namespaces do
 
   describe 'PUT :id/gitlab_subscription' do
     def do_put(namespace_id, current_user, payload)
-      put api("/namespaces/#{namespace_id}/gitlab_subscription", current_user), payload
+      put api("/namespaces/#{namespace_id}/gitlab_subscription", current_user), params: payload
     end
 
     set(:namespace) { create(:group) }

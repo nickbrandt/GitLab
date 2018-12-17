@@ -151,7 +151,7 @@ describe API::ProjectMirror do
         let(:project_mirrored) { create(:project, :repository, :mirror, :import_finished, visibility: visibility) }
 
         def do_post
-          post api("/projects/#{project_mirrored.id}/mirror/pull"), {}, { 'X-Hub-Signature' => 'signature' }
+          post api("/projects/#{project_mirrored.id}/mirror/pull"), params: {}, headers: { 'X-Hub-Signature' => 'signature' }
         end
 
         context "when it's valid" do
@@ -184,7 +184,7 @@ describe API::ProjectMirror do
           it "doesn't sync the mirror" do
             expect(project_mirrored.import_state).not_to receive(:force_import_job!)
 
-            post api("/projects/#{project_mirrored.id}/mirror/pull"), {}, { 'X-Hub-Signature' => 'signature' }
+            post api("/projects/#{project_mirrored.id}/mirror/pull"), params: {}, headers: { 'X-Hub-Signature' => 'signature' }
           end
 
           context 'with a public project' do

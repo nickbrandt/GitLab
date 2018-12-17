@@ -12,7 +12,7 @@ describe Projects::PushRulesController do
 
   describe '#update' do
     def do_update
-      patch :update, namespace_id: project.namespace, project_id: project, id: 1, push_rule: { prevent_secrets: true }
+      patch :update, params: { namespace_id: project.namespace, project_id: project, id: 1, push_rule: { prevent_secrets: true } }
     end
 
     it 'updates the push rule' do
@@ -40,7 +40,7 @@ describe Projects::PushRulesController do
           let(:user) { create(:admin) }
 
           it 'updates the setting' do
-            patch :update, namespace_id: project.namespace, project_id: project, id: 1, push_rule: { rule_attr => true }
+            patch :update, params: { namespace_id: project.namespace, project_id: project, id: 1, push_rule: { rule_attr => true } }
 
             expect(project.push_rule(true).public_send(rule_attr)).to be_truthy
           end
@@ -53,7 +53,7 @@ describe Projects::PushRulesController do
 
           context 'when global setting is disabled' do
             it 'updates the setting' do
-              patch :update, namespace_id: project.namespace, project_id: project, id: 1, push_rule: { rule_attr => true }
+              patch :update, params: { namespace_id: project.namespace, project_id: project, id: 1, push_rule: { rule_attr => true } }
 
               expect(project.push_rule(true).public_send(rule_attr)).to be_truthy
             end
@@ -65,7 +65,7 @@ describe Projects::PushRulesController do
             end
 
             it 'does not update the setting' do
-              patch :update, namespace_id: project.namespace, project_id: project, id: 1, push_rule: { rule_attr => false }
+              patch :update, params: { namespace_id: project.namespace, project_id: project, id: 1, push_rule: { rule_attr => false } }
 
               expect(project.push_rule(true).public_send(rule_attr)).to be_truthy
             end
@@ -78,7 +78,7 @@ describe Projects::PushRulesController do
           end
 
           it 'does not update the setting' do
-            patch :update, namespace_id: project.namespace, project_id: project, id: 1, push_rule: { rule_attr => true }
+            patch :update, params: { namespace_id: project.namespace, project_id: project, id: 1, push_rule: { rule_attr => true } }
 
             expect(project.push_rule(true).public_send(rule_attr)).to be_falsy
           end

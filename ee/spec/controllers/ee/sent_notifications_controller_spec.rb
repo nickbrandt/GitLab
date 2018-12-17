@@ -13,7 +13,7 @@ describe SentNotificationsController do
 
     before do
       sign_in(user)
-      get(:unsubscribe, id: sent_notification.reply_key)
+      get(:unsubscribe, params: { id: sent_notification.reply_key })
     end
 
     it 'unsubscribes the user' do

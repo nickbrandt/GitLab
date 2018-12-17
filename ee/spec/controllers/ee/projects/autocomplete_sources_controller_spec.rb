@@ -15,7 +15,7 @@ describe Projects::AutocompleteSourcesController do
 
   context 'when epics feture is disabled' do
     it 'returns 404 status' do
-      get :epics, namespace_id: project.namespace, project_id: project
+      get :epics, params: { namespace_id: project.namespace, project_id: project }
 
       expect(response).to have_gitlab_http_status(404)
     end
@@ -28,7 +28,7 @@ describe Projects::AutocompleteSourcesController do
 
     context '#epics' do
       it 'returns the correct response' do
-        get :epics, namespace_id: project.namespace, project_id: project
+        get :epics, params: { namespace_id: project.namespace, project_id: project }
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response).to be_an(Array)

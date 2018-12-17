@@ -19,7 +19,7 @@ describe Groups::GroupMembersController do
 
     describe 'GET #index' do
       it 'is successful' do
-        get :index, group_id: group
+        get :index, params: { group_id: group }
 
         expect(response).to have_gitlab_http_status(200)
       end
@@ -27,7 +27,7 @@ describe Groups::GroupMembersController do
 
     describe 'POST #create' do
       it 'is successful' do
-        post :create, group_id: group, users: user, access_level: Gitlab::Access::GUEST
+        post :create, params: { group_id: group, users: user, access_level: Gitlab::Access::GUEST }
 
         expect(response).to have_gitlab_http_status(302)
       end
@@ -36,9 +36,11 @@ describe Groups::GroupMembersController do
     describe 'PUT #update' do
       it 'is successful' do
         put :update,
-            group_member: { access_level: Gitlab::Access::GUEST },
-            group_id: group,
-            id: membership,
+            params: {
+              group_member: { access_level: Gitlab::Access::GUEST },
+              group_id: group,
+              id: membership
+            },
             format: :js
 
         expect(response).to have_gitlab_http_status(200)
@@ -47,7 +49,7 @@ describe Groups::GroupMembersController do
 
     describe 'DELETE #destroy' do
       it 'is successful' do
-        delete :destroy, group_id: group, id: membership
+        delete :destroy, params: { group_id: group, id: membership }
 
         expect(response).to have_gitlab_http_status(302)
       end
@@ -57,7 +59,7 @@ describe Groups::GroupMembersController do
       it 'is successful' do
         sign_in(create(:user))
 
-        post :request_access, group_id: group
+        post :request_access, params: { group_id: group }
 
         expect(response).to have_gitlab_http_status(302)
       end
@@ -66,7 +68,7 @@ describe Groups::GroupMembersController do
     describe 'POST #approve_request_access' do
       it 'is successful' do
         access_request = create(:group_member, :access_request, group: group)
-        post :approve_access_request, group_id: group, id: access_request
+        post :approve_access_request, params: { group_id: group, id: access_request }
 
         expect(response).to have_gitlab_http_status(302)
       end
@@ -76,7 +78,7 @@ describe Groups::GroupMembersController do
       it 'is successful' do
         group.add_owner(create(:user))
 
-        delete :leave, group_id: group
+        delete :leave, params: { group_id: group }
 
         expect(response).to have_gitlab_http_status(302)
       end
@@ -84,7 +86,7 @@ describe Groups::GroupMembersController do
 
     describe 'POST #resend_invite' do
       it 'is successful' do
-        post :resend_invite, group_id: group, id: membership
+        post :resend_invite, params: { group_id: group, id: membership }
 
         expect(response).to have_gitlab_http_status(302)
       end
@@ -98,9 +100,11 @@ describe Groups::GroupMembersController do
         allow(Ability).to receive(:allowed?).with(user, :override_group_member, membership) { true }
 
         post :override,
-             group_id: group,
-             id: membership,
-             group_member: { override: true },
+             params: {
+               group_id: group,
+               id: membership,
+               group_member: { override: true }
+             },
              format: :js
 
         expect(response).to have_gitlab_http_status(200)

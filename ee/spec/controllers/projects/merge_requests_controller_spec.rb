@@ -16,9 +16,11 @@ shared_examples 'approvals' do
   describe 'approve' do
     before do
       post :approve,
-           namespace_id: project.namespace.to_param,
-           project_id: project.to_param,
-           id: merge_request.iid,
+           params: {
+             namespace_id: project.namespace.to_param,
+             project_id: project.to_param,
+             id: merge_request.iid
+           },
            format: :json
     end
 
@@ -41,9 +43,11 @@ shared_examples 'approvals' do
 
     before do
       get :approvals,
-          namespace_id: project.namespace.to_param,
-          project_id: project.to_param,
-          id: merge_request.iid,
+          params: {
+            namespace_id: project.namespace.to_param,
+            project_id: project.to_param,
+            id: merge_request.iid
+          },
           format: :json
     end
 
@@ -66,9 +70,11 @@ shared_examples 'approvals' do
 
     before do
       delete :unapprove,
-             namespace_id: project.namespace.to_param,
-             project_id: project.to_param,
-             id: merge_request.iid,
+             params: {
+               namespace_id: project.namespace.to_param,
+               project_id: project.to_param,
+               id: merge_request.iid
+             },
              format: :json
     end
 
@@ -106,10 +112,12 @@ describe Projects::MergeRequestsController do
 
     def update_merge_request(params = {})
       post :update,
-           namespace_id: merge_request.target_project.namespace.to_param,
-           project_id: merge_request.target_project.to_param,
-           id: merge_request.iid,
-           merge_request: params
+           params: {
+             namespace_id: merge_request.target_project.namespace.to_param,
+             project_id: merge_request.target_project.to_param,
+             id: merge_request.iid,
+             merge_request: params
+           }
     end
 
     context 'when the merge request requires approval' do
@@ -319,7 +327,7 @@ describe Projects::MergeRequestsController do
 
   describe 'POST #rebase' do
     def post_rebase
-      post :rebase, namespace_id: project.namespace, project_id: project, id: merge_request
+      post :rebase, params: { namespace_id: project.namespace, project_id: project, id: merge_request }
     end
 
     def expect_rebase_worker_for(user)

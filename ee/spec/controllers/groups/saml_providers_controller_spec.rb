@@ -26,19 +26,19 @@ describe Groups::SamlProvidersController do
 
   shared_examples 'configuration is prevented' do
     describe 'GET #show' do
-      subject { get :show, group_id: group }
+      subject { get :show, params: { group_id: group } }
 
       it_behaves_like '404 status'
     end
 
     describe 'POST #create' do
-      subject { post :create, group_id: group, saml_provider: { enabled: 'false' } }
+      subject { post :create, params: { group_id: group, saml_provider: { enabled: 'false' } } }
 
       it_behaves_like '404 status'
     end
 
     describe 'PUT #update' do
-      subject { put :update, group_id: group, saml_provider: { enabled: 'false' } }
+      subject { put :update, params: { group_id: group, saml_provider: { enabled: 'false' } } }
 
       it_behaves_like '404 status'
     end
@@ -69,7 +69,7 @@ describe Groups::SamlProvidersController do
     end
 
     describe 'GET #show' do
-      subject { get :show, group_id: group }
+      subject { get :show, params: { group_id: group } }
 
       it 'shows configuration page' do
         group.add_owner(user)

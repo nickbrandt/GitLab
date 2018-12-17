@@ -23,7 +23,7 @@ describe Projects::MergeRequests::CreationsController do
         }.merge(overrides)
       }
 
-      post :create, params
+      post :create, params: params
     end
 
     context 'the approvals_before_merge param' do

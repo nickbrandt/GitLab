@@ -14,13 +14,13 @@ describe Groups::SsoController do
     let!(:saml_provider) { create(:saml_provider, group: group) }
 
     it 'has status 200' do
-      get :saml, group_id: group
+      get :saml, params: { group_id: group }
 
       expect(response).to have_gitlab_http_status(200)
     end
 
     it 'passes group name to the view' do
-      get :saml, group_id: group
+      get :saml, params: { group_id: group }
 
       expect(assigns[:group_name]).to eq 'our-group'
     end
@@ -29,7 +29,7 @@ describe Groups::SsoController do
       it 'acts as route not found' do
         sign_out(user)
 
-        get :saml, group_id: group
+        get :saml, params: { group_id: group }
 
         expect(response).to redirect_to(new_user_session_path)
       end
@@ -39,7 +39,7 @@ describe Groups::SsoController do
       let(:redirect_route) { group.redirect_routes.create(path: 'old-path') }
 
       it 'redirects to new location' do
-        get :saml, group_id: redirect_route.path
+        get :saml, params: { group_id: redirect_route.path }
 
         expect(response).to redirect_to(sso_group_saml_providers_path(group))
       end
@@ -49,7 +49,7 @@ describe Groups::SsoController do
   context 'saml_provider is unconfigured for the group' do
     context 'when user cannot configure Group SAML' do
       it 'renders 404' do
-        get :saml, group_id: group
+        get :saml, params: { group_id: group }
 
         expect(response).to have_gitlab_http_status(404)
       end
@@ -61,13 +61,13 @@ describe Groups::SsoController do
       end
 
       it 'redirects to the Group SAML config page' do
-        get :saml, group_id: group
+        get :saml, params: { group_id: group }
 
         expect(response).to redirect_to(group_saml_providers_path)
       end
 
       it 'sets a flash message explaining that setup is required' do
-        get :saml, group_id: group
+        get :saml, params: { group_id: group }
 
         expect(flash[:notice]).to match /not been configured/
       end
@@ -76,7 +76,7 @@ describe Groups::SsoController do
 
   context 'group does not exist' do
     it 'renders 404' do
-      get :saml, group_id: 'not-a-group'
+      get :saml, params: { group_id: 'not-a-group' }
 
       expect(response).to have_gitlab_http_status(404)
     end
@@ -85,7 +85,7 @@ describe Groups::SsoController do
       it 'acts as route not found' do
         sign_out(user)
 
-        get :saml, group_id: 'not-a-group'
+        get :saml, params: { group_id: 'not-a-group' }
 
         expect(response).to redirect_to(new_user_session_path)
       end

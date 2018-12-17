@@ -22,7 +22,7 @@ describe Projects::PipelinesController do
         before do
           stub_licensed_features(sast: true)
 
-          get :security, namespace_id: project.namespace, project_id: project, id: pipeline
+          get :security, params: { namespace_id: project.namespace, project_id: project, id: pipeline }
         end
 
         it do
@@ -33,7 +33,7 @@ describe Projects::PipelinesController do
 
       context 'with feature disabled' do
         before do
-          get :security, namespace_id: project.namespace, project_id: project, id: pipeline
+          get :security, params: { namespace_id: project.namespace, project_id: project, id: pipeline }
         end
 
         it do
@@ -47,7 +47,7 @@ describe Projects::PipelinesController do
         before do
           stub_licensed_features(sast: true)
 
-          get :security, namespace_id: project.namespace, project_id: project, id: pipeline
+          get :security, params: { namespace_id: project.namespace, project_id: project, id: pipeline }
         end
 
         it do
@@ -57,7 +57,7 @@ describe Projects::PipelinesController do
 
       context 'with feature disabled' do
         before do
-          get :security, namespace_id: project.namespace, project_id: project, id: pipeline
+          get :security, params: { namespace_id: project.namespace, project_id: project, id: pipeline }
         end
 
         it do
@@ -80,7 +80,7 @@ describe Projects::PipelinesController do
         before do
           stub_licensed_features(license_management: true)
 
-          get :licenses, namespace_id: project.namespace, project_id: project, id: pipeline
+          get :licenses, params: { namespace_id: project.namespace, project_id: project, id: pipeline }
         end
 
         it do
@@ -91,7 +91,7 @@ describe Projects::PipelinesController do
 
       context 'with feature disabled' do
         before do
-          get :licenses, namespace_id: project.namespace, project_id: project, id: pipeline
+          get :licenses, params: { namespace_id: project.namespace, project_id: project, id: pipeline }
         end
 
         it do
@@ -105,7 +105,7 @@ describe Projects::PipelinesController do
         before do
           stub_licensed_features(license_management: true)
 
-          get :licenses, namespace_id: project.namespace, project_id: project, id: pipeline
+          get :licenses, params: { namespace_id: project.namespace, project_id: project, id: pipeline }
         end
 
         it do
@@ -115,7 +115,7 @@ describe Projects::PipelinesController do
 
       context 'with feature disabled' do
         before do
-          get :licenses, namespace_id: project.namespace, project_id: project, id: pipeline
+          get :licenses, params: { namespace_id: project.namespace, project_id: project, id: pipeline }
         end
 
         it do

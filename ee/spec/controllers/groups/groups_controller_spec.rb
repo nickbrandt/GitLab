@@ -18,13 +18,13 @@ describe GroupsController do
 
     describe 'GET #show' do
       it 'is successful' do
-        get :show, id: group.to_param
+        get :show, params: { id: group.to_param }
 
         expect(response).to have_gitlab_http_status(200)
       end
 
       it 'does not allow other formats' do
-        get :show, id: group.to_param, format: :atom
+        get :show, params: { id: group.to_param }, format: :atom
 
         expect(response).to have_gitlab_http_status(403)
       end
@@ -32,7 +32,7 @@ describe GroupsController do
 
     describe 'GET #edit' do
       it 'is successful' do
-        get :edit, id: group.to_param
+        get :edit, params: { id: group.to_param }
 
         expect(response).to have_gitlab_http_status(200)
       end
@@ -58,7 +58,7 @@ describe GroupsController do
     describe 'POST #create' do
       it 'creates a group' do
         expect do
-          post :create, group: { name: 'a name', path: 'a-name' }
+          post :create, params: { group: { name: 'a name', path: 'a-name' } }
         end.to change { Group.count }.by(1)
       end
     end
@@ -66,7 +66,7 @@ describe GroupsController do
     describe 'PUT #update' do
       it 'updates a group' do
         expect do
-          put :update, id: group.to_param, group: { name: 'world' }
+          put :update, params: { id: group.to_param, group: { name: 'world' } }
         end.to change { group.reload.name }
       end
 
@@ -77,7 +77,7 @@ describe GroupsController do
           stub_licensed_features(custom_file_templates_for_namespace: false)
 
           expect do
-            post :update, id: group.to_param, group: { file_template_project_id: project.id }
+            post :update, params: { id: group.to_param, group: { file_template_project_id: project.id } }
           end.not_to change { group.reload.file_template_project_id }
         end
       end
@@ -89,7 +89,7 @@ describe GroupsController do
           stub_licensed_features(custom_file_templates_for_namespace: true)
 
           expect do
-            post :update, id: group.to_param, group: { file_template_project_id: project.id }
+            post :update, params: { id: group.to_param, group: { file_template_project_id: project.id } }
           end.to change { group.reload.file_template_project_id }.to(project.id)
         end
       end
@@ -97,7 +97,7 @@ describe GroupsController do
 
     describe 'DELETE #destroy' do
       it 'deletes the group' do
-        delete :destroy, id: group.to_param
+        delete :destroy, params: { id: group.to_param }
 
         expect(response).to have_gitlab_http_status(302)
       end
@@ -105,19 +105,19 @@ describe GroupsController do
   end
 
   describe 'GET #activity' do
-    subject { get :activity, id: group.to_param }
+    subject { get :activity, params: { id: group.to_param } }
 
     it_behaves_like 'disabled when using an external authorization service'
   end
 
   describe 'GET #issues' do
-    subject { get :issues, id: group.to_param }
+    subject { get :issues, params: { id: group.to_param } }
 
     it_behaves_like 'disabled when using an external authorization service'
   end
 
   describe 'GET #merge_requests' do
-    subject { get :merge_requests, id: group.to_param }
+    subject { get :merge_requests, params: { id: group.to_param } }
 
     it_behaves_like 'disabled when using an external authorization service'
   end

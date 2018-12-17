@@ -155,7 +155,7 @@ describe OperationsController do
       end
 
       it 'adds projects to the dasboard' do
-        post :create, project_ids: [project_a.id, project_b.id.to_s]
+        post :create, params: { project_ids: [project_a.id, project_b.id.to_s] }
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response).to match_schema('dashboard/operations/add', dir: 'ee')
@@ -168,7 +168,7 @@ describe OperationsController do
       end
 
       it 'cannot add a project twice' do
-        post :create, project_ids: [project_a.id, project_a.id]
+        post :create, params: { project_ids: [project_a.id, project_a.id] }
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response).to match_schema('dashboard/operations/add', dir: 'ee')
@@ -181,7 +181,7 @@ describe OperationsController do
       end
 
       it 'does not add invalid project ids' do
-        post :create, project_ids: ['', -1, '-2']
+        post :create, params: { project_ids: ['', -1, '-2'] }
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response).to match_schema('dashboard/operations/add', dir: 'ee')
@@ -203,7 +203,7 @@ describe OperationsController do
       end
 
       it 'does not add already added project' do
-        post :create, project_ids: [project.id]
+        post :create, params: { project_ids: [project.id] }
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response).to match_schema('dashboard/operations/add', dir: 'ee')
@@ -240,7 +240,7 @@ describe OperationsController do
       end
 
       it 'removes a project successfully' do
-        delete :destroy, project_id: project.id
+        delete :destroy, params: { project_id: project.id }
 
         expect(response).to have_gitlab_http_status(200)
 
@@ -251,7 +251,7 @@ describe OperationsController do
 
     context 'without projects' do
       it 'cannot remove invalid project' do
-        delete :destroy, project_id: -1
+        delete :destroy, params: { project_id: -1 }
 
         expect(response).to have_gitlab_http_status(204)
       end

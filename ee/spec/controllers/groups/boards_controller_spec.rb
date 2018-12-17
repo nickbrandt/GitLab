@@ -48,7 +48,7 @@ describe Groups::BoardsController do
     end
 
     def list_boards(format: :html)
-      get :index, group_id: group, format: format
+      get :index, params: { group_id: group }, format: format
     end
   end
 

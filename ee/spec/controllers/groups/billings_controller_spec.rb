@@ -19,7 +19,7 @@ describe Groups::BillingsController do
       it 'renders index with 200 status code' do
         allow_any_instance_of(FetchSubscriptionPlansService).to receive(:execute)
 
-        get :index, group_id: group
+        get :index, params: { group_id: group }
 
         expect(response).to have_gitlab_http_status(200)
         expect(response).to render_template(:index)
@@ -29,7 +29,7 @@ describe Groups::BillingsController do
         data = double
         expect_any_instance_of(FetchSubscriptionPlansService).to receive(:execute).and_return(data)
 
-        get :index, group_id: group
+        get :index, params: { group_id: group }
 
         expect(assigns(:plans_data)).to eq(data)
       end
@@ -40,7 +40,7 @@ describe Groups::BillingsController do
         group.add_developer(user)
         sign_in(user)
 
-        get :index, group_id: group.id
+        get :index, params: { group_id: group.id }
 
         expect(response).to have_gitlab_http_status(404)
       end
@@ -50,7 +50,7 @@ describe Groups::BillingsController do
         group.add_owner(user)
         sign_in(user)
 
-        get :index, group_id: group
+        get :index, params: { group_id: group }
 
         expect(response).to have_gitlab_http_status(404)
       end
