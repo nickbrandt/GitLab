@@ -113,7 +113,7 @@ keys must be manually replicated to the secondary node.
     ```
 
     If you only have access through a user with **sudo** privileges:
-    
+
     ```bash
     # Run this from your primary node:
     sudo tar --transform 's/.*\///g' -zcvf ~/geo-host-key.tar.gz /etc/ssh/ssh_host_*_key*
@@ -129,15 +129,15 @@ keys must be manually replicated to the secondary node.
     chown root:root /etc/ssh/ssh_host_*_key*
     chmod 0600 /etc/ssh/ssh_host_*_key*
     ```
-    
+
 1. To verify key fingerprint matches, execute the following command on both nodes:
 
     ```bash
     for file in /etc/ssh/ssh_host_*_key; do ssh-keygen -lf $file; done
     ```
-    
+
     You should get an output similar to this one and they should be identical on both nodes:
-    
+
     ```bash
     1024 SHA256:FEZX2jQa2bcsd/fn/uxBzxhKdx4Imc4raXrHwsbtP0M root@serverhostname (DSA)
     256 SHA256:uw98R35Uf+fYEQ/UnJD9Br4NXUFPv7JAUln5uHlgSeY root@serverhostname (ECDSA)
@@ -150,14 +150,14 @@ keys must be manually replicated to the secondary node.
     ```bash
     # This will print the fingerprint for private keys:
     for file in /etc/ssh/ssh_host_*_key; do ssh-keygen -lf $file; done
- 
+
     # This will print the fingerprint for public keys:
     for file in /etc/ssh/ssh_host_*_key.pub; do ssh-keygen -lf $file; done
     ```
-    
+
     NOTE: **Note**:
     The output for private keys and public keys command should generate the same fingerprint.
- 
+
 1. Restart sshd on your **secondary** node:
 
     ```bash
@@ -205,21 +205,14 @@ that the secondary can act on those notifications immediately.
 Make sure the secondary instance is running and accessible.
 You can login to the secondary node with the same credentials as used in the primary.
 
-### Step 4. Enabling hashed storage (from GitLab 10.0)
+### Step 4. Enabling Hashed Storage
 
-CAUTION: **Warning**:
-Hashed storage is in **Beta**. It is not considered production-ready. See
-[Hashed Storage] for more detail, and for the latest updates, check
-infrastructure issue [gitlab-com/infrastructure#2821].
-
-Using hashed storage significantly improves Geo replication - project and group
+Using Hashed Storage significantly improves Geo replication. Project and group
 renames no longer require synchronization between nodes.
 
-1. Visit the **primary** node's **Admin Area > Settings**
-   (`/admin/application_settings`) in your browser
-1. In the `Repository Storages` section, check `Create new projects using hashed storage paths`:
-
-    ![](img/hashed_storage.png)
+1. Visit the **primary** node's **Admin Area > Settings > Repository**
+   (`/admin/application_settings/repository`) in your browser.
+1. In the **Repository storage** section, check **Use hashed storage paths for newly created and renamed projects**.
 
 ### Step 5. (Optional) Configuring the secondary to trust the primary
 
