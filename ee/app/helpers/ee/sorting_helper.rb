@@ -47,7 +47,7 @@ module EE
       sort_icon = sort.end_with?('desc') ? 'sort-highest' : 'sort-lowest'
 
       link_to sprite_icon(sort_icon, size: 16),
-              page_filter_path(sort: opposite_sorting_param, label: true),
+              page_filter_path(sort: opposite_sorting_param),
               class: "btn btn-default has-tooltip qa-reverse-sort btn-sort-direction",
               title: _("Sort direction")
     end
