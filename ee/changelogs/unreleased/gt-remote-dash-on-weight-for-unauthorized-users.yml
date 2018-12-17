@@ -1,0 +1,5 @@
+---
+title: Remove dash on issue weight for unauthorized users
+merge_request: 8882
+author: George Tsiolis
+type: fixed
