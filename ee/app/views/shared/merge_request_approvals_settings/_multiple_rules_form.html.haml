@@ -1,0 +1,6 @@
+.form-group
+  = form.label :approver_ids, class: 'label-bold' do
+    = _("Approvers")
+  #js-mr-approvals-settings{ data: { 'project_id': @project.id } }
+    .text-center.prepend-top-default
+      = sprite_icon('spinner', size: 24, css_class: 'gl-spinner')
