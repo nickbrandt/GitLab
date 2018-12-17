@@ -126,7 +126,7 @@ describe 'admin Geo Projects', :js, :geo do
     let(:sync_status) { :synced }
     let(:expected_registries) { [synced_registry] }
     let(:unexpected_registries) { [sync_pending_registry, sync_failed_registry, never_synced_registry] }
-    let(:labels) { ['Status', 'Last successful sync', 'Last repository check run'] }
+    let(:labels) { ['Status', 'Last successful sync', 'Last time verified', 'Last repository check run'] }
 
     it_behaves_like 'shows tab specific projects and correct labels'
   end

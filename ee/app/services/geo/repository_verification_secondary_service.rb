@@ -73,6 +73,7 @@ module Geo
       registry.update!(
         "#{type}_verification_checksum_sha" => checksum,
         "#{type}_checksum_mismatch" => mismatch,
+        "last_#{type}_verification_ran_at" => Time.now,
         "last_#{type}_verification_failure" => failure,
         "#{type}_verification_retry_count" => verification_retry_count,
         "resync_#{type}" => reverify,
