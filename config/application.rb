@@ -7,12 +7,6 @@ Bundler.require(:default, Rails.env)
 require 'elasticsearch/rails/instrumentation'
 
 module Gitlab
-  # This method is used for smooth upgrading from the current Rails 4.x to Rails 5.0.
-  # https://gitlab.com/gitlab-org/gitlab-ce/issues/14286
-  def self.rails5?
-    true
-  end
-
   class Application < Rails::Application
     require_dependency Rails.root.join('lib/gitlab/redis/wrapper')
     require_dependency Rails.root.join('lib/gitlab/redis/cache')
