@@ -4,7 +4,6 @@ class Projects::GroupLinksController < Projects::ApplicationController
   layout 'project_settings'
   before_action :authorize_admin_project!
   before_action :authorize_admin_project_member!, only: [:update]
-  before_action :authorize_group_share!, only: [:create]
 
   def index
     redirect_to namespace_project_settings_members_path
@@ -45,10 +44,6 @@ class Projects::GroupLinksController < Projects::ApplicationController
 
   protected
 
-  def authorize_group_share!
-    access_denied! unless project.allowed_to_share_with_group?
-  end
-
   def group_link_params
     params.require(:group_link).permit(:group_access, :expires_at)
   end
@@ -57,3 +52,5 @@ class Projects::GroupLinksController < Projects::ApplicationController
     params.permit(:link_group_access, :expires_at)
   end
 end
+
+Projects::GroupLinksController.prepend(::EE::Projects::GroupLinksController)
