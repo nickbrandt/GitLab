@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'Packages' do
@@ -21,8 +23,6 @@ describe 'Packages' do
     let!(:package) { create(:maven_package, project: project) }
 
     before do
-      package
-
       visit_project_packages
     end
 

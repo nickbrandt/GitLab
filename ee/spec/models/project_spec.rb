@@ -25,6 +25,8 @@ describe Project do
     it { is_expected.to have_many(:audit_events).dependent(false) }
     it { is_expected.to have_many(:protected_environments) }
     it { is_expected.to have_many(:approver_groups).dependent(:destroy) }
+    it { is_expected.to have_many(:packages).class_name('Packages::Package') }
+    it { is_expected.to have_many(:package_files).class_name('Packages::PackageFile') }
   end
 
   describe 'validations' do
