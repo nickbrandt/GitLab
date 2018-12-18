@@ -479,6 +479,12 @@ msgstr ""
 msgid "Add additional text to appear in all email communications. %{character_limit} character limit"
 msgstr ""
 
+msgid "Add approver(s)"
+msgstr ""
+
+msgid "Add approvers"
+msgstr ""
+
 msgid "Add comment now"
 msgstr ""
 
@@ -692,6 +698,9 @@ msgid "An error occurred adding a new draft."
 msgstr ""
 
 msgid "An error occurred creating the new branch."
+msgstr ""
+
+msgid "An error occurred fetching the approval rules."
 msgstr ""
 
 msgid "An error occurred previewing the blob"
@@ -9066,6 +9075,9 @@ msgid "The value lying at the midpoint of a series of observed values. E.g., bet
 msgstr ""
 
 msgid "There are no approvers"
+msgstr ""
+
+msgid "There are no approvers explicitly added for this project. Members who are of Developer role or higher and code owners (if any) are eligible to approve."
 msgstr ""
 
 msgid "There are no archived projects yet"
