@@ -45,7 +45,7 @@ module Gitlab
     end
     # rubocop: enable CodeReuse/ActiveRecord
 
-    # Returns a relation that includes the ancestors_base set of groups
+    # Returns a relation that includes the ancestors_base set of objects
     # and all their ancestors (recursively).
     #
     # Passing an `upto` will stop the recursion once the specified parent_id is

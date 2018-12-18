@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EpicLinks::ListService do
+describe EpicLinks::ListService, :postgresql do
   let(:user) { create :user }
   let(:group) { create(:group, :public) }
   let(:parent_epic) { create(:epic, group: group) }
@@ -51,7 +51,7 @@ describe EpicLinks::ListService do
         end
       end
 
-      context 'with nested groups', :nested_groups do
+      context 'with nested groups' do
         let(:subgroup1) { create(:group, :private, parent: group) }
         let(:subgroup2) { create(:group, :private, parent: group) }
         let!(:epic_subgroup1) { create :epic, group: subgroup1, parent: parent_epic }

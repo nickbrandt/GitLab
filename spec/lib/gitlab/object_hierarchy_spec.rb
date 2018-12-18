@@ -119,7 +119,7 @@ describe Gitlab::ObjectHierarchy, :postgresql do
     end
   end
 
-  describe '#all_groups' do
+  describe '#all_objects' do
     let(:relation) do
       described_class.new(Group.where(id: child1.id)).all_objects
     end

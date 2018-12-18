@@ -186,7 +186,7 @@ module EE
         project_creation_levels << nil
       end
 
-      developer_groups_hierarchy = ::Gitlab::GroupHierarchy.new(developer_groups).base_and_descendants
+      developer_groups_hierarchy = ::Gitlab::ObjectHierarchy.new(developer_groups).base_and_descendants
       ::Group.where(id: developer_groups_hierarchy.select(:id),
                     project_creation_level: project_creation_levels)
     end

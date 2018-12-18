@@ -12,6 +12,7 @@ module EE
       include Referable
       include Awardable
       include LabelEventable
+      include Descendant
 
       enum state: { opened: 1, closed: 2 }
 
@@ -228,8 +229,7 @@ module EE
     end
 
     def hierarchy
-      ::Gitlab::GroupHierarchy
-        .new(self.class.where(id: id))
+      ::Gitlab::ObjectHierarchy.new(self.class.where(id: id))
     end
 
     # we don't support project epics for epics yet, planned in the future #4019

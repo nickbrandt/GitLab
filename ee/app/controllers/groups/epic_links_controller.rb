@@ -4,6 +4,7 @@ class Groups::EpicLinksController < Groups::EpicsController
   include EpicRelations
 
   before_action :check_feature_flag!
+  before_action :check_nested_support!
 
   before_action do
     push_frontend_feature_flag(:epic_links)
@@ -31,5 +32,9 @@ class Groups::EpicLinksController < Groups::EpicsController
 
   def check_feature_flag!
     render_404 unless Feature.enabled?(:epic_links, group)
+  end
+
+  def check_nested_support!
+    render_404 unless Epic.supports_nested_objects?
   end
 end
