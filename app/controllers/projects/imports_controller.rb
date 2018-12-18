@@ -2,7 +2,6 @@
 
 class Projects::ImportsController < Projects::ApplicationController
   include ContinueParams
-  include SafeMirrorParams
 
   # Authorize
   before_action :authorize_admin_project!
@@ -14,7 +13,7 @@ class Projects::ImportsController < Projects::ApplicationController
   end
 
   def create
-    if @project.update(safe_import_params)
+    if @project.update(import_params)
       @project.import_state.reload.schedule
     end
 
@@ -67,13 +66,13 @@ class Projects::ImportsController < Projects::ApplicationController
     end
   end
 
-  def import_params
-    params.require(:project).permit(:import_url, :mirror, :mirror_user_id)
+  def import_params_attributes
+    [:import_url]
   end
 
-  def safe_import_params
-    return import_params if valid_mirror_user?(import_params)
-
-    import_params.merge(mirror_user_id: current_user.id)
+  def import_params
+    params.require(:project).permit(import_params_attributes)
   end
 end
+
+Projects::ImportsController.prepend(::EE::Projects::ImportsController)
