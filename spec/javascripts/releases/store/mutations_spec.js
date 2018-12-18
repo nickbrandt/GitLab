@@ -10,14 +10,6 @@ describe('Releases Store Mutations', () => {
     stateCopy = state();
   });
 
-  describe('SET_ENDPOINT', () => {
-    it('should set endpoint', () => {
-      mutations[types.SET_ENDPOINT](stateCopy, 'endpoint.json');
-
-      expect(stateCopy.endpoint).toEqual('endpoint.json');
-    });
-  });
-
   describe('REQUEST_RELEASES', () => {
     it('sets isLoading to true', () => {
       mutations[types.REQUEST_RELEASES](stateCopy);

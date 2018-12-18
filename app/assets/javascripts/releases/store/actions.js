@@ -1,14 +1,7 @@
 import * as types from './mutation_types';
-import axios from '~/lib/utils/axios_utils';
 import createFlash from '~/flash';
 import { __ } from '~/locale';
-
-/**
- * Commits a mutation to store the main endpoint.
- *
- * @param {String} endpoint
- */
-export const setEndpoint = ({ commit }, endpoint) => commit(types.SET_ENDPOINT, endpoint);
+import api from '~/api';
 
 /**
  * Commits a mutation to update the state while the main endpoint is being requested.
@@ -20,14 +13,19 @@ export const requestReleases = ({ commit }) => commit(types.REQUEST_RELEASES);
  * Will dispatch requestNamespace action before starting the request.
  * Will dispatch receiveNamespaceSuccess if the request is successfull
  * Will dispatch receiveNamesapceError if the request returns an error
+ *
+ * @param {String} projectId
  */
-export const fetchReleases = ({ state, dispatch }) => {
+export const fetchReleases = ({ dispatch }, projectId) => {
   dispatch('requestReleases');
 
-  axios
-    .get(state.endpoint)
+  api
+    .releases(projectId)
     .then(({ data }) => dispatch('receiveReleasesSuccess', data))
-    .catch(() => dispatch('receiveReleasesError'));
+    .catch(error => {
+      console.log(error);
+      dispatch('receiveReleasesError');
+    });
 };
 
 export const receiveReleasesSuccess = ({ commit }, data) =>

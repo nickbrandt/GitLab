@@ -2,15 +2,6 @@ import * as types from './mutation_types';
 
 export default {
   /**
-   * Sets the main endpoint
-   * @param {Object} state
-   * @param {String} endpoint
-   */
-  [types.SET_ENDPOINT](state, endpoint) {
-    state.endpoint = endpoint;
-  },
-
-  /**
    * Sets isLoading to true while the request is being made.
    * @param {Object} state
    */

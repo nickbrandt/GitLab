@@ -1,8 +1,7 @@
 import Vue from 'vue';
-import MockAdapter from 'axios-mock-adapter';
-import axios from '~/lib/utils/axios_utils';
 import app from '~/releases/components/app.vue';
 import createStore from '~/releases/store';
+import api from '~/api';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import { resetStore } from '../store/helpers';
 import { releases } from '../mock_data';
@@ -11,28 +10,25 @@ describe('Releases App ', () => {
   const Component = Vue.extend(app);
   let store;
   let vm;
-  let mock;
 
   const props = {
-    endpoint: 'endpoint.json',
+    projectId: 'gitlab-ce',
     documentationLink: 'help/releases',
     illustrationPath: 'illustration/path',
   };
 
   beforeEach(() => {
-    mock = new MockAdapter(axios);
     store = createStore();
   });
 
   afterEach(() => {
     resetStore(store);
     vm.$destroy();
-    mock.restore();
   });
 
   describe('while loading', () => {
     beforeEach(() => {
-      mock.onGet(props.endpoint).replyOnce(200, [], {});
+      spyOn(api, 'releases').and.returnValue(Promise.resolve({ data: [] }));
       vm = mountComponentWithStore(Component, { props, store });
     });
 
@@ -49,7 +45,7 @@ describe('Releases App ', () => {
 
   describe('with successful request', () => {
     beforeEach(() => {
-      mock.onGet(props.endpoint).reply(200, releases);
+      spyOn(api, 'releases').and.returnValue(Promise.resolve({ data: releases }));
       vm = mountComponentWithStore(Component, { props, store });
     });
 
@@ -66,7 +62,7 @@ describe('Releases App ', () => {
 
   describe('with empty request', () => {
     beforeEach(() => {
-      mock.onGet(props.endpoint).reply(200, []);
+      spyOn(api, 'releases').and.returnValue(Promise.resolve({ data: [] }));
       vm = mountComponentWithStore(Component, { props, store });
     });
 

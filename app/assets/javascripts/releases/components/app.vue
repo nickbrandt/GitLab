@@ -11,7 +11,7 @@ export default {
     ReleaseBlock,
   },
   props: {
-    endpoint: {
+    projectId: {
       type: String,
       required: true,
     },
@@ -27,28 +27,23 @@ export default {
   computed: {
     ...mapState(['isLoading', 'releases', 'hasError']),
     shouldRenderEmptyState() {
-      return !this.releases.length && !this.hasError;
+      return !this.releases.length && !this.hasError && !this.isLoading;
     },
     shouldRenderSuccessState() {
       return this.releases.length && !this.isLoading && !this.hasError;
     },
   },
   created() {
-    this.setEndpoint(this.endpoint);
-    this.fetchReleases();
+    this.fetchReleases(this.projectId);
   },
   methods: {
-    ...mapActions(['setEndpoint', 'fetchReleases']),
+    ...mapActions(['fetchReleases']),
   },
 };
 </script>
 <template>
   <div class="prepend-top-default">
-    <gl-loading-icon
-      v-if="isLoading"
-      :size="2"
-      class="js-loading qa-loading-animation prepend-top-20"
-    />
+    <gl-loading-icon v-if="isLoading" :size="2" class="js-loading prepend-top-20" />
 
     <gl-empty-state
       v-else-if="shouldRenderEmptyState"
@@ -68,15 +63,7 @@ export default {
       <release-block
         v-for="(release, index) in releases"
         :key="release.tag_name"
-        :name="release.name"
-        :tag="release.tag_name"
-        :commit="release.commit"
-        :description="release.description_html"
-        :author="release.commit.author"
-        :created-at="release.created_at"
-        :assets-count="release.assets.count"
-        :sources="release.assets.sources"
-        :links="release.assets.links"
+        :release="release"
         :class="{ 'linked-card': releases.length > 1 && index !== releases.length - 1 }"
       />
     </div>
