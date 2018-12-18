@@ -10,6 +10,8 @@ class ApprovalMergeRequestRule < ApplicationRecord
 
   has_and_belongs_to_many :approvals # This is only populated after merge request is merged
   has_many :approved_approvers, through: :approvals, source: :user
+  has_one :approval_merge_request_rule_source
+  has_one :approval_project_rule, through: :approval_merge_request_rule_source
 
   def project
     merge_request.target_project

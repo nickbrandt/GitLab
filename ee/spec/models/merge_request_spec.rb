@@ -49,15 +49,14 @@ describe MergeRequest do
     let!(:approval2) { create(:approval, merge_request: subject, user: member3) }
     let!(:approval3) { create(:approval, merge_request: subject, user: group1_member) }
     let!(:approval4) { create(:approval, merge_request: subject, user: group2_member) }
+    let!(:project_rule) { create(:approval_project_rule, project: project, name: 'foo', approvals_required: 12) }
 
     before do
       group1.add_guest(group1_member)
       group2.add_guest(group2_member)
 
-      rule = create(:approval_project_rule, project: project, name: 'foo', approvals_required: 12)
-
-      rule.users = [member1, member2]
-      rule.groups << group1
+      project_rule.users = [member1, member2]
+      project_rule.groups << group1
     end
 
     shared_examples 'skipping when unmerged' do
