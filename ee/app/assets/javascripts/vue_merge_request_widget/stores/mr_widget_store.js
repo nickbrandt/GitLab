@@ -27,11 +27,11 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.licenseManagement = data.license_management;
   }
 
-  setData(data) {
+  setData(data, isRebased) {
     this.initGeo(data);
     this.initApprovals(data);
 
-    super.setData(data);
+    super.setData(data, isRebased);
   }
 
   initGeo(data) {

@@ -11,7 +11,7 @@ module EE
       WEIGHT_ANY = 'Any'.freeze
       WEIGHT_NONE = 'None'.freeze
 
-      prepend EE::RelativePositioning
+      prepend EE::RelativePositioning # rubocop: disable Cop/InjectEnterpriseEditionModule
       include Elastic::IssuesSearch
 
       scope :order_weight_desc, -> { reorder ::Gitlab::Database.nulls_last_order('weight', 'DESC') }

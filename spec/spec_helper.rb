@@ -117,7 +117,7 @@ RSpec.configure do |config|
     TestEnv.clean_test_path
   end
 
-  config.before(:example) do
+  config.before do
     # Enable all features by default for testing
     allow(Feature).to receive(:enabled?) { true }
 
@@ -138,11 +138,11 @@ RSpec.configure do |config|
     RequestStore.clear!
   end
 
-  config.after(:example) do
+  config.after do
     Fog.unmock! if Fog.mock?
   end
 
-  config.after(:example) do
+  config.after do
     Gitlab::CurrentSettings.clear_in_memory_application_settings!
   end
 
@@ -235,10 +235,6 @@ RSpec.configure do |config|
 
   config.around(:each, :mysql) do |example|
     example.run if Gitlab::Database.mysql?
-  end
-
-  config.around(:each, :rails5) do |example|
-    example.run if Gitlab.rails5?
   end
 
   # This makes sure the `ApplicationController#can?` method is stubbed with the

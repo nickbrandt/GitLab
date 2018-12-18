@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class MergeRequestWidgetEntity < IssuableEntity
-  prepend ::EE::MergeRequestWidgetEntity
+  prepend ::EE::MergeRequestWidgetEntity # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   expose :state
   expose :in_progress_merge_commit_sha
@@ -239,6 +239,8 @@ class MergeRequestWidgetEntity < IssuableEntity
       test_reports_project_merge_request_path(merge_request.project, merge_request, format: :json)
     end
   end
+
+  expose :supports_suggestion?, as: :can_receive_suggestion
 
   private
 

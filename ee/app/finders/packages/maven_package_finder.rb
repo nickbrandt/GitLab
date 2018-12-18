@@ -1,34 +1,58 @@
 # frozen_string_literal: true
 class Packages::MavenPackageFinder
-  attr_reader :path, :project
+  attr_reader :path, :current_user, :project, :group
 
-  def initialize(path, project = nil)
+  def initialize(path, current_user, project: nil, group: nil)
     @path = path
+    @current_user = current_user
     @project = project
+    @group = group
   end
 
   def execute
-    packages.last
+    packages_with_path.last
   end
 
   def execute!
-    packages.last!
+    packages_with_path.last!
   end
 
   private
 
-  def scope
+  def base
     if project
-      project.packages
+      packages_for_a_single_project
+    elsif group
+      packages_for_multiple_projects
     else
-      ::Packages::Package.all
+      packages
     end
   end
 
-  # rubocop: disable CodeReuse/ActiveRecord
-  def packages
-    scope.joins(:maven_metadatum)
-      .where(packages_maven_metadata: { path: path })
+  def packages_with_path
+    base.only_maven_packages_with_path(path)
   end
-  # rubocop: enable CodeReuse/ActiveRecord
+
+  # Produces a query that returns all packages.
+  def packages
+    ::Packages::Package.all
+  end
+
+  # Produces a query that retrieves packages from a single project.
+  def packages_for_a_single_project
+    project.packages
+  end
+
+  # Produces a query that retrieves packages from multiple projects that
+  # the current user can view within a group.
+  def packages_for_multiple_projects
+    ::Packages::Package.for_projects(projects_visible_to_current_user)
+  end
+
+  # Returns the projects that the current user can view within a group.
+  def projects_visible_to_current_user
+    ::Project
+      .in_namespace(group.self_and_descendants.select(:id))
+      .public_or_visible_to_user(current_user)
+  end
 end

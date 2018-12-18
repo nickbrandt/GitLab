@@ -61,12 +61,12 @@ describe Geo::PruneEventLogService do
   context 'with event_log_min_id' do
     let(:min_id) { events[1].id }
 
-    it 'prunes events up to the min id' do
-      expect { service.execute }.to change { Geo::EventLog.count }.by(-2)
+    it 'prunes events up to, but not including, the min id' do
+      expect { service.execute }.to change { Geo::EventLog.count }.by(-1)
     end
 
     it 'prunes all associated events' do
-      expect { service.execute }.to change { Geo::RepositoryUpdatedEvent.count }.by(-2)
+      expect { service.execute }.to change { Geo::RepositoryUpdatedEvent.count }.by(-1)
     end
   end
 

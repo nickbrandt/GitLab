@@ -15,7 +15,7 @@ describe Gitlab::Database::LoadBalancing::ConnectionProxy do
     let(:override_proxy) { ActiveRecord::Base.connection.class }
 
     # We can't use :Gitlab::Utils::Override because this method is dynamically prepended
-    it 'method signatures match', :rails5 do
+    it 'method signatures match' do
       expect(proxy.method(:select_all).parameters).to eq(override_proxy.instance_method(:select_all).parameters)
     end
 

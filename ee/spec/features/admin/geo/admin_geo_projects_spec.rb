@@ -15,10 +15,8 @@ describe 'admin Geo Projects', :js, :geo do
   end
 
   describe 'visiting geo projects initial page' do
-    let(:page_url) { admin_geo_projects_path }
-
     before do
-      visit(page_url)
+      visit(admin_geo_projects_path)
       wait_for_requests
     end
 
@@ -48,7 +46,7 @@ describe 'admin Geo Projects', :js, :geo do
     end
   end
 
-  describe 'visiting specific tab in geo projects page' do
+  describe 'clicking on a specific tab in geo projects page' do
     let(:page_url) { admin_geo_projects_path }
 
     before do
@@ -97,5 +95,66 @@ describe 'admin Geo Projects', :js, :geo do
         end
       end
     end
+  end
+
+  shared_examples 'shows tab specific projects and correct labels' do
+    before do
+      visit(admin_geo_projects_path(sync_status: sync_status))
+      wait_for_requests
+    end
+
+    it 'shows tab specific projects' do
+      page.within(find('#content-body', match: :first)) do
+        expected_registries.each do |registry|
+          expect(page).to have_content(registry.project.full_name)
+        end
+
+        unexpected_registries.each do |registry|
+          expect(page).not_to have_content(registry.project.full_name)
+        end
+      end
+
+      page.within(find('.project-card', match: :first)) do
+        labels.each do |label|
+          expect(page).to have_content(label)
+        end
+      end
+    end
+  end
+
+  describe 'visiting geo synced projects page' do
+    let(:sync_status) { :synced }
+    let(:expected_registries) { [synced_registry] }
+    let(:unexpected_registries) { [sync_pending_registry, sync_failed_registry, never_synced_registry] }
+    let(:labels) { ['Status', 'Last successful sync', 'Last time verified', 'Last repository check run'] }
+
+    it_behaves_like 'shows tab specific projects and correct labels'
+  end
+
+  describe 'visiting geo pending synced projects page' do
+    let(:sync_status) { :pending }
+    let(:expected_registries) { [sync_pending_registry] }
+    let(:unexpected_registries) { [synced_registry, sync_failed_registry, never_synced_registry] }
+    let(:labels) { ['Status', 'Next sync scheduled at', 'Last sync attempt'] }
+
+    it_behaves_like 'shows tab specific projects and correct labels'
+  end
+
+  describe 'visiting geo never synced projects page' do
+    let(:sync_status) { :never }
+    let(:labels) { ['Status', 'Next sync scheduled at', 'Last sync attempt'] }
+    let(:expected_registries) { [never_synced_registry] }
+    let(:unexpected_registries) { [synced_registry, sync_pending_registry, sync_failed_registry] }
+
+    it_behaves_like 'shows tab specific projects and correct labels'
+  end
+
+  describe 'visiting geo failed sync projects page' do
+    let(:sync_status) { :failed }
+    let(:expected_registries) { [sync_failed_registry] }
+    let(:unexpected_registries) { [synced_registry, sync_pending_registry, never_synced_registry] }
+    let(:labels) { ['Status', 'Next sync scheduled at', 'Last sync attempt'] }
+
+    it_behaves_like 'shows tab specific projects and correct labels'
   end
 end

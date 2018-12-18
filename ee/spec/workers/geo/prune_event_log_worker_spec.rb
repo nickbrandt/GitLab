@@ -44,7 +44,7 @@ describe Geo::PruneEventLogWorker, :geo do
         create_list(:geo_event_log, 2, :updated_event)
         create(:geo_node_status, :healthy, cursor_last_event_id: Geo::EventLog.last.id, geo_node_id: secondary.id)
 
-        expect { worker.perform }.to change { Geo::RepositoryUpdatedEvent.count }.by(-2)
+        expect { worker.perform }.to change { Geo::RepositoryUpdatedEvent.count }.by(-1)
       end
 
       it 'delegates pruning to Geo::PruneEventLogService' do
@@ -118,7 +118,7 @@ describe Geo::PruneEventLogWorker, :geo do
           create(:geo_node_status, :healthy, cursor_last_event_id: events.last.id, geo_node_id: secondary2.id)
           expect(Geo::PruneEventLogService).to receive(:new).with(events[3].id).and_call_original
 
-          expect { worker.perform }.to change { Geo::EventLog.count }.by(-4)
+          expect { worker.perform }.to change { Geo::EventLog.count }.by(-3)
         end
       end
     end

@@ -4,7 +4,8 @@
 #
 # A note of this type can be resolvable.
 class DiscussionNote < Note
-  prepend EE::DiscussionNote # This prepend must stay here because the `validates` below depends on it.
+  # This prepend must stay here because the `validates` below depends on it.
+  prepend EE::DiscussionNote # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   # Names of all implementers of `Noteable` that support discussions.
   def self.noteable_types

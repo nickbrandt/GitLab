@@ -2,6 +2,8 @@
 
 module EE
   module ServiceParams
+    extend ::Gitlab::Utils::Override
+
     ALLOWED_PARAMS_EE = [
       :jenkins_url,
       :multiproject_enabled,
@@ -11,6 +13,7 @@ module EE
       :static_context
     ].freeze
 
+    override :allowed_service_params
     def allowed_service_params
       super + ALLOWED_PARAMS_EE
     end

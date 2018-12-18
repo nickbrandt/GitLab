@@ -6,8 +6,9 @@ Interactive web terminals give the user access to a terminal in GitLab for
 running one-off commands for their CI pipeline.
 
 NOTE: **Note:**
-GitLab.com does not support interactive web terminal at the moment. Please
-follow [this issue](https://gitlab.com/gitlab-org/gitlab-ce/issues/52611) for
+GitLab.com does not support interactive web terminal at the moment – neither
+using shared GitLab.com runners nor your own runners. Please follow
+[this issue](https://gitlab.com/gitlab-org/gitlab-ce/issues/52611) for
 progress. 
 
 ## Configuration
@@ -50,7 +51,7 @@ close the terminal window.
 
 ![finished job with terminal open](img/finished_job_with_terminal_open.png)
 
-## Interactive Terminals for the Web IDE **[ULTIMATE]**
+## Interactive Web Terminals for the Web IDE **[ULTIMATE ONLY]**
 
 Read the Web IDE docs to learn how to run [Interactive Terminals through the Web IDE](../../user/project/web_ide/index.md).
 

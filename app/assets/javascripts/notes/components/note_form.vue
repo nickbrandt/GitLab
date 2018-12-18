@@ -1,12 +1,11 @@
 <script>
+import { mergeUrlParams } from '~/lib/utils/url_utility';
 import { mapGetters, mapActions } from 'vuex';
 import eventHub from '../event_hub';
 import issueWarning from '../../vue_shared/components/issue/issue_warning.vue';
 import markdownField from '../../vue_shared/components/markdown/field.vue';
 import issuableStateMixin from '../mixins/issuable_state';
 import resolvable from '../mixins/resolvable';
-
-// eslint-disable-next-line import/order
 import noteFormMixin from 'ee/batch_comments/mixins/note_form';
 
 export default {
@@ -56,6 +55,21 @@ export default {
       required: false,
       default: false,
     },
+    line: {
+      type: Object,
+      required: false,
+      default: null,
+    },
+    note: {
+      type: Object,
+      required: false,
+      default: null,
+    },
+    helpPagePath: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   data() {
     return {
@@ -82,7 +96,8 @@ export default {
       return '#';
     },
     markdownPreviewPath() {
-      return this.getNoteableDataByProp('preview_note_path');
+      const notable = this.getNoteableDataByProp('preview_note_path');
+      return mergeUrlParams({ preview_suggestions: true }, notable);
     },
     markdownDocsPath() {
       return this.getNotesDataByProp('markdownDocsPath');
@@ -95,6 +110,18 @@ export default {
     },
     isDisabled() {
       return !this.updatedNoteBody.length || this.isSubmitting;
+    },
+    discussionNote() {
+      const discussionNote = this.discussion.id
+        ? this.getDiscussionLastNote(this.discussion)
+        : this.note;
+      return discussionNote || {};
+    },
+    canSuggest() {
+      return (
+        this.getNoteableData.can_receive_suggestion &&
+        (this.line && this.line.can_receive_suggestion)
+      );
     },
   },
   watch: {
@@ -180,7 +207,11 @@ export default {
         :markdown-docs-path="markdownDocsPath"
         :markdown-version="markdownVersion"
         :quick-actions-docs-path="quickActionsDocsPath"
+        :line="line"
+        :note="discussionNote"
+        :can-suggest="canSuggest"
         :add-spacing-classes="false"
+        :help-page-path="helpPagePath"
       >
         <textarea
           id="note_note"
@@ -199,7 +230,7 @@ export default {
         ></textarea>
       </markdown-field>
       <div class="note-form-actions clearfix">
-        <p v-if="(discussion && discussion.id) || isDraft">
+        <p v-if="showResolveDiscussionToggle">
           <label>
             <template v-if="discussionResolved">
               <input

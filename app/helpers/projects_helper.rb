@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProjectsHelper
-  prepend ::EE::ProjectsHelper
+  prepend ::EE::ProjectsHelper # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   def link_to_project(project)
     link_to namespace_project_path(namespace_id: project.namespace, id: project), title: h(project.name) do
@@ -515,6 +515,20 @@ module ProjectsHelper
     else
       "list-label"
     end
+  end
+
+  def explore_projects_tab?
+    current_page?(explore_projects_path) ||
+      current_page?(trending_explore_projects_path) ||
+      current_page?(starred_explore_projects_path)
+  end
+
+  def show_merge_request_count?(merge_requests, compact_mode)
+    merge_requests && !compact_mode && Feature.enabled?(:project_list_show_mr_count, default_enabled: true)
+  end
+
+  def show_issue_count?(issues, compact_mode)
+    issues && !compact_mode && Feature.enabled?(:project_list_show_issue_count, default_enabled: true)
   end
 
   def sidebar_projects_paths

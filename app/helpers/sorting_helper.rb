@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module SortingHelper
-  prepend ::EE::SortingHelper
+  prepend ::EE::SortingHelper # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   def sort_options_hash
     {
@@ -166,7 +166,7 @@ module SortingHelper
     reverse_sort = issuable_reverse_sort_order_hash[sort_value]
 
     if reverse_sort
-      reverse_url = page_filter_path(sort: reverse_sort, label: true)
+      reverse_url = page_filter_path(sort: reverse_sort)
     else
       reverse_url = '#'
       link_class += ' disabled'

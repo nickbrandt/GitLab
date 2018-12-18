@@ -2,7 +2,7 @@
 
 module Emails
   module Notes
-    prepend Emails::EE::Notes
+    prepend Emails::EE::Notes # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     def note_commit_email(recipient_id, note_id)
       setup_note_mail(note_id, recipient_id)

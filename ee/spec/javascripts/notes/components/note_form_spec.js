@@ -31,6 +31,12 @@ describe('issue_note_form component', () => {
     vm.$destroy();
   });
 
+  describe('without batch comments', () => {
+    it('does not show resolve checkbox', () => {
+      expect(vm.$el.querySelector('.qa-resolve-review-discussion')).toBe(null);
+    });
+  });
+
   describe('with batch comments', () => {
     beforeEach(done => {
       store
@@ -38,6 +44,10 @@ describe('issue_note_form component', () => {
         .then(vm.$nextTick)
         .then(done)
         .catch(done.fail);
+    });
+
+    it('shows resolve checkbox', () => {
+      expect(vm.$el.querySelector('.qa-resolve-review-discussion')).not.toBe(null);
     });
 
     it('hides actions for commits', done => {

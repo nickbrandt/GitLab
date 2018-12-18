@@ -25,7 +25,7 @@ class MergeRequest < ActiveRecord::Base
                 :ref_fetched,
                 :deleted_at
 
-  prepend ::EE::MergeRequest
+  prepend ::EE::MergeRequest # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   belongs_to :target_project, class_name: "Project"
   belongs_to :source_project, class_name: "Project"
@@ -363,6 +363,11 @@ class MergeRequest < ActiveRecord::Base
     else
       (commit_shas & shas).present?
     end
+  end
+
+  def supports_suggestion?
+    # Should be `true` when removing the FF.
+    Suggestion.feature_enabled?
   end
 
   # Calls `MergeWorker` to proceed with the merge process and

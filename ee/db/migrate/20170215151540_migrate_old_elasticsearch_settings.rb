@@ -1,5 +1,4 @@
 class MigrateOldElasticsearchSettings < ActiveRecord::Migration[4.2]
-  include Gitlab::Database::ArelMethods
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false
@@ -24,7 +23,7 @@ class MigrateOldElasticsearchSettings < ActiveRecord::Migration[4.2]
       end
 
       updater =
-        arel_update_manager
+        Arel::UpdateManager.new
           .table(settings)
           .set(settings[:elasticsearch_url] => urls.join(','))
           .where(settings[:id].eq(id))
