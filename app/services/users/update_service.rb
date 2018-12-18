@@ -15,7 +15,7 @@ module Users
 
       user_exists = @user.persisted?
 
-      assign_attributes(&block)
+      assign_attributes
 
       if @user.save(validate: validate) && update_status
         notify_success(user_exists)
@@ -47,9 +47,11 @@ module Users
       success
     end
 
-    def assign_attributes(&block)
-      if @user.user_synced_attributes_metadata
-        params.except!(*@user.user_synced_attributes_metadata.read_only_attributes)
+    def assign_attributes
+      if (metadata = @user.user_synced_attributes_metadata)
+        read_only = metadata.read_only_attributes
+
+        params.reject! { |key, _| read_only.include?(key.to_sym) }
       end
 
       @user.assign_attributes(params) if params.any?
