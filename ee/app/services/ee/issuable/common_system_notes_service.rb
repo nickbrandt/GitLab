@@ -7,10 +7,11 @@ module EE
       attr_reader :issuable
 
       override :execute
-      def execute(_issuable, _old_labels)
+      def execute(_issuable, old_labels: [], is_update: true)
         super
+
         handle_weight_change_note
-        handle_date_change_note
+        handle_date_change_note if is_update
       end
 
       private
