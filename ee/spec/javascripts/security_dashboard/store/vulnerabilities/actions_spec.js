@@ -682,7 +682,7 @@ describe('revert vulnerability dismissal', () => {
   });
 });
 
-describe('vulnerabiliites history actions', () => {
+describe('vulnerabilities history actions', () => {
   const data = mockDataVulnerabilitiesHistory;
   const params = { filters: { severity: ['critical'] } };
   const filteredData = mockDataVulnerabilitiesHistory.critical;

@@ -43,6 +43,7 @@ export default {
   },
   computed: {
     ...mapState('vulnerabilities', ['modal']),
+    ...mapGetters('filters', ['activeFilters']),
   },
   created() {
     this.setVulnerabilitiesEndpoint(this.vulnerabilitiesEndpoint);
