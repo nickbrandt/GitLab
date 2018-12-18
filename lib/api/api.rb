@@ -139,6 +139,7 @@ module API
     mount ::API::Pipelines
     mount ::API::PipelineSchedules
     mount ::API::ProjectApprovals
+    mount ::API::ProjectClusters
     mount ::API::ProjectExport
     mount ::API::ProjectImport
     mount ::API::ProjectHooks
