@@ -279,7 +279,7 @@ module ProjectsHelper
     nav_tabs = [:home]
 
     if !project.empty_repo? && can?(current_user, :download_code, project)
-      nav_tabs << [:files, :commits, :network, :graphs, :forks]
+      nav_tabs << [:files, :commits, :network, :graphs, :forks, :releases]
     end
 
     if project.repo_exists? && can?(current_user, :read_merge_request, project)
@@ -535,6 +535,7 @@ module ProjectsHelper
     %w[
       projects#show
       projects#activity
+      releases#index
       cycle_analytics#show
     ]
   end
@@ -566,7 +567,6 @@ module ProjectsHelper
       projects/repositories
       tags
       branches
-      releases
       graphs
       network
     ]
