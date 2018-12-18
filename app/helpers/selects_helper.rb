@@ -70,6 +70,7 @@ module SelectsHelper
 
     opts[:class] = klass_opts.join(' ')
     value = opts[:selected] || ''
+
     hidden_field_tag(id, value, opts)
   end
 
