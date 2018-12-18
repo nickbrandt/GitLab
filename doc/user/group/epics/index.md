@@ -93,10 +93,23 @@ link in the issue sidebar.
 
 ## Promoting an issue to an epic
 
-A user who has permissions to close an issue and create an epic in the parent group
-can promote an issue to an epic.
-The epic is created in the group the issue project belongs to (direct parent group).
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/7730) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.6.
+
+If you have [permissions](../../permissions.md) to close an issue and create an
+epic in the parent group, you can promote an issue to an epic with the `/promote`
+[quick action](../../project/quick_actions.md#quick-actions-for-epics-ultimate).
 Only issues from projects that are in groups can be promoted.
+
+Once the quick action is applied, the epic will be created in the group the
+issue of the project belongs to (direct parent group). A notification of that
+epic creation will be sent to the subscribers of the original issue.
+
+The following issue metadata will be copied to the epic:
+
+- Title, description, activity/comment thread
+- Upvotes/downvotes
+- Participants
+- Group labels that the issue already has
 
 ## Searching for an epic from epics list page
 
@@ -121,9 +134,9 @@ You can also sort epics list by:
 - **Created date**
 - **Last updated**
 - **Start date**
-- **Due date**  
+- **Due date**
 
-Each option contains a button that can toggle the order between **ascending** and **descending**. The sort option and order will be persisted to be used wherever epics are browsed including the [roadmap](../roadmap/index.md).  
+Each option contains a button that can toggle the order between **ascending** and **descending**. The sort option and order will be persisted to be used wherever epics are browsed including the [roadmap](../roadmap/index.md).
 
 ![epics sort](img/epics_sort.png)
 
