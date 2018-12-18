@@ -13,6 +13,7 @@ merge_requests:
 - draft_notes
 ci_pipelines:
 - source_pipeline
+- source_bridge
 - sourced_pipelines
 - triggered_by_pipeline
 - triggered_pipelines
