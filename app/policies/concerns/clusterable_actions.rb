@@ -3,6 +3,7 @@
 module ClusterableActions
   private
 
+  # Overridden on EE module
   def multiple_clusters_available?
     false
   end
