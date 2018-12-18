@@ -22,10 +22,7 @@ export const fetchReleases = ({ dispatch }, projectId) => {
   api
     .releases(projectId)
     .then(({ data }) => dispatch('receiveReleasesSuccess', data))
-    .catch(error => {
-      console.log(error);
-      dispatch('receiveReleasesError');
-    });
+    .catch(() => dispatch('receiveReleasesError'));
 };
 
 export const receiveReleasesSuccess = ({ commit }, data) =>
