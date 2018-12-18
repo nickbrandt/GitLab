@@ -83,6 +83,28 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
 
       it_behaves_like 'sync approval member'
 
+      context 'when project rule is present' do
+        let!(:project_rule) { create(:approval_project_rule, project: target.target_project) }
+
+        it "sets MR rule's source to project rule" do
+          create_member_in(create(:user), :old_schema)
+
+          described_class.new.perform(target_type, target.id)
+
+          expect(target.approval_rules.regular.first.approval_project_rule).to eq(project_rule)
+        end
+      end
+
+      context 'when project rule is absent' do
+        it "has MR rule's source as nil" do
+          create_member_in(create(:user), :old_schema)
+
+          described_class.new.perform(target_type, target.id)
+
+          expect(target.approval_rules.regular.first.approval_project_rule).to eq(nil)
+        end
+      end
+
       context 'when approver is no longer overwritten' do
         before do
           create_member_in(create(:user), :new_schema)

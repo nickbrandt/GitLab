@@ -29,6 +29,8 @@ module Gitlab
         has_and_belongs_to_many :groups, class_name: 'Group', join_table: :approval_merge_request_rules_groups
         has_and_belongs_to_many :approvals # This is only populated after merge request is merged
         has_many :approved_approvers, through: :approvals, source: :user
+        has_one :approval_merge_request_rule_source
+        has_one :approval_project_rule, through: :approval_merge_request_rule_source
 
         def project
           merge_request.target_project
@@ -61,6 +63,12 @@ module Gitlab
 
           self.approvals = merge_request.approvals.where(user_id: approvers.map(&:id))
         end
+      end
+
+      class ApprovalMergeRequestRuleSource < ApplicationRecord
+        self.table_name = 'approval_merge_request_rule_sources'
+        belongs_to :approval_merge_request_rule
+        belongs_to :approval_project_rule
       end
 
       class ApprovalProjectRule < ActiveRecord::Base
@@ -158,7 +166,10 @@ module Gitlab
 
       def handle_merge_request
         ActiveRecord::Base.transaction do
-          sync_rule
+          if rule = sync_rule
+            rule.approval_project_rule = target.target_project.approval_rules.regular.first
+          end
+
           target.finalize_approvals if target.merged?
         end
       end
@@ -171,7 +182,6 @@ module Gitlab
         schedule_to_migrate_merge_requests(target)
       end
 
-      # Sync users and groups on rule
       def sync_rule
         unless approvers_exists?
           target.approval_rules.regular.delete_all
@@ -179,9 +189,9 @@ module Gitlab
         end
 
         rule = find_or_create_rule
-
         rule.user_ids = target.approvers.pluck(:user_id)
         rule.group_ids = target.approver_groups.pluck(:group_id)
+        rule
       end
 
       def schedule_to_migrate_merge_requests(project)
@@ -204,7 +214,7 @@ module Gitlab
       end
 
       def find_or_create_rule
-        rule = target.approval_rules.find_or_initialize_by(name: 'Default')
+        rule = target.approval_rules.regular.find_or_initialize_by(name: 'Default')
 
         unless rule.persisted?
           rule.approvals_required = target.approvals_before_merge || 0
