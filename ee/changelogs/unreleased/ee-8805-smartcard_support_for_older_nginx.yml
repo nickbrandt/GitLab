@@ -1,0 +1,6 @@
+---
+title: Support older NGINX version forwarding the client certificate for smartcard
+  auth
+merge_request: 8784
+author:
+type: fixed

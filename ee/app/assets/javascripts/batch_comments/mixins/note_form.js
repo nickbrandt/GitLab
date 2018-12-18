@@ -16,6 +16,12 @@ export default {
     showBatchCommentsActions() {
       return this.withBatchComments && this.noteId === '' && !this.discussion.for_commit;
     },
+    showResolveDiscussionToggle() {
+      return (
+        ((this.discussion && this.discussion.id && this.discussion.resolvable) || this.isDraft) &&
+        this.withBatchComments
+      );
+    },
   },
   methods: {
     shouldBeResolved(resolveStatus) {

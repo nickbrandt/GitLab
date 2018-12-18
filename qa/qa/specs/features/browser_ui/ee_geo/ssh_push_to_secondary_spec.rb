@@ -66,10 +66,7 @@ module QA
               end
 
               # Grab the SSH URI for the secondary and store as 'location'
-              location = Page::Project::Show.act do
-                choose_repository_clone_ssh
-                repository_location
-              end
+              location = Page::Project::Show.act { repository_clone_ssh_location }
 
               # Perform a git push over SSH at the secondary
               push = Resource::Repository::Push.fabricate! do |push|
@@ -158,10 +155,7 @@ module QA
               end
 
               # Grab the SSH URI for the secondary and store as 'location'
-              location = Page::Project::Show.act do
-                choose_repository_clone_ssh
-                repository_location
-              end
+              location = Page::Project::Show.act { repository_clone_ssh_location }
 
               # Perform a git push over SSH at the secondary
               push = Resource::Repository::Push.fabricate! do |push|
