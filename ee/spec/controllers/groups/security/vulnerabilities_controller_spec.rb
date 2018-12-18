@@ -230,19 +230,6 @@ describe Groups::Security::VulnerabilitiesController do
       end
     end
 
-    context 'when group security dashboard history feature flag is disabled' do
-      before do
-        stub_licensed_features(security_dashboard: true)
-        stub_feature_flags(group_security_dashboard_history: false)
-        group.add_developer(user)
-      end
-
-      it 'returns 404' do
-        subject
-        expect(response).to have_gitlab_http_status(404)
-      end
-    end
-
     context 'when security dashboard feature is enabled' do
       before do
         stub_licensed_features(security_dashboard: true)
