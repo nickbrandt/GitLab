@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe EpicLinks::CreateService do
+describe EpicLinks::CreateService, :nested_groups do
   describe '#execute' do
     let(:group) { create(:group) }
     let(:user) { create(:user) }
@@ -67,7 +67,7 @@ describe EpicLinks::CreateService do
           include_examples 'returns success'
         end
 
-        context 'when an epic from a subgroup is given', :nested_groups do
+        context 'when an epic from a subgroup is given' do
           let(:subgroup) { create(:group, parent: group) }
 
           before do
@@ -151,7 +151,7 @@ describe EpicLinks::CreateService do
           end
         end
 
-        context 'when adding an wolud would exceed level 5 in hierarchy' do
+        context 'when adding an epic would would exceed level 5 in hierarchy' do
           context 'when adding to already deep structure' do
             before do
               epic1 = create(:epic, group: group)

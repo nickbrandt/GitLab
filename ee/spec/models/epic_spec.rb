@@ -79,7 +79,7 @@ describe Epic do
     end
   end
 
-  describe '#ancestors' do
+  describe '#ancestors', :nested_groups do
     let(:group) { create(:group) }
     let(:epic1) { create(:epic, group: group) }
     let(:epic2) { create(:epic, group: group, parent: epic1) }
@@ -94,7 +94,7 @@ describe Epic do
     end
   end
 
-  describe '#descendants' do
+  describe '#descendants', :nested_groups do
     let(:group) { create(:group) }
     let(:epic1) { create(:epic, group: group) }
     let(:epic2) { create(:epic, group: group, parent: epic1) }

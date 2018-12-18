@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EpicLinks
   class CreateService < IssuableLinks::CreateService
     def execute

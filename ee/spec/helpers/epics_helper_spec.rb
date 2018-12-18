@@ -50,7 +50,7 @@ describe EpicsHelper do
       expect(meta_data['parent']).to eq({
         'id' => parent_epic.id,
         'title' => parent_epic.title,
-        'url' => "/groups/#{group.full_path}/-/epics/#{parent_epic.id}"
+        'url' => "/groups/#{group.full_path}/-/epics/#{parent_epic.iid}"
       })
       expect(meta_data['start_date']).to eq('2000-01-01')
       expect(meta_data['start_date_sourcing_milestone_title']).to eq(milestone1.title)
