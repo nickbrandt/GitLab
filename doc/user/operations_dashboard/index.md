@@ -23,8 +23,9 @@ you sign in. To make it the default:
 ## Adding a project to the dashboard
 
 NOTE: **Note:**
-For GitLab.com, projects must belong to a group with a [Gold](https://about.gitlab.com/pricing/)
-subscription to be added to the Operations Dashboard.
+For GitLab.com, the Operations Dashboard is available for free for public projects.
+If your project is private, the group it belongs to must have a
+[Gold](https://about.gitlab.com/pricing/) plan.
 
 To add a project to the dashboard:
 
