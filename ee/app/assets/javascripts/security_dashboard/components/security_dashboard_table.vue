@@ -29,6 +29,7 @@ export default {
       'pageInfo',
       'vulnerabilities',
     ]),
+    ...mapGetters('filters', ['activeFilters']),
     ...mapGetters('vulnerabilities', ['dashboardListError']),
     showEmptyState() {
       return (
@@ -48,7 +49,7 @@ export default {
   methods: {
     ...mapActions('vulnerabilities', ['fetchVulnerabilities', 'openModal']),
     fetchPage(page) {
-      this.fetchVulnerabilities({ page });
+      this.fetchVulnerabilities({ ...this.activeFilters, page });
     },
   },
 };

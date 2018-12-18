@@ -1,10 +1,10 @@
 <script>
 import { mapState } from 'vuex';
-import GlFilter from './filter.vue';
+import DashboardFilter from './filter.vue';
 
 export default {
   components: {
-    GlFilter,
+    DashboardFilter,
   },
   props: {
     dashboardDocumentation: {
@@ -21,17 +21,14 @@ export default {
 <template>
   <div class="dashboard-filters border-bottom bg-light">
     <div class="row mx-0 p-2">
-      <gl-filter
+      <dashboard-filter
         v-for="filter in filters"
         :key="filter.id"
-        class="col-sm p-2 js-filter"
+        class="col-sm-6 col-md-4 col-lg-2 p-2 js-filter"
         :filter-id="filter.id"
         :dashboard-documentation="dashboardDocumentation"
         @change="$emit('change');"
       />
-      <div class="col-sm p-2 d-md-block d-none"></div>
-      <div class="col-sm p-2 d-md-block d-none"></div>
-      <div class="col-sm p-2 d-md-block d-none"></div>
     </div>
   </div>
 </template>
