@@ -20,7 +20,7 @@ module EE
       end
 
       def schedule_downstream_pipeline!
-        CreateCrossProjectPipelineWorker.perform_async(self.id)
+        ::Ci::CreateCrossProjectPipelineWorker.perform_async(self.id)
       end
 
       def target_user
