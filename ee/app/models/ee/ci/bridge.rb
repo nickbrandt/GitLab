@@ -28,11 +28,11 @@ module EE
       end
 
       def target_project_name
-        options.dig(:trigger, :project)
+        options&.dig(:trigger, :project)
       end
 
       def target_ref
-        options.dig(:trigger, :branch)
+        options&.dig(:trigger, :branch)
       end
     end
   end
