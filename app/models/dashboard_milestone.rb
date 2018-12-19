@@ -9,7 +9,7 @@ class DashboardMilestone < GlobalMilestone
     @project_name = milestone.project.full_name
   end
 
-  def dashboard_milestone?
+  def project_milestone?
     true
   end
 end
