@@ -69,6 +69,16 @@ describe API::Epics do
   describe 'GET /groups/:id/epics' do
     let(:url) { "/groups/#{group.path}/epics" }
 
+    def expect_paginated_array_of_items(expected)
+      expect(response).to have_gitlab_http_status(200)
+      expect(response).to include_pagination_headers
+      expect(json_response).to be_an Array
+
+      items = json_response.map { |i| i['id'] }
+
+      expect(items).to eq(expected)
+    end
+
     it_behaves_like 'error requests'
 
     context 'when the request is correct' do
@@ -112,73 +122,102 @@ describe API::Epics do
         stub_licensed_features(epics: true)
       end
 
-      def expect_array_response(expected)
-        items = json_response.map { |i| i['id'] }
-
-        expect(items).to eq(expected)
-      end
-
       it 'returns epics authored by the given author id' do
         get api(url, user), params: { author_id: user2.id }
 
-        expect_array_response([epic2.id])
+        expect_paginated_array_of_items([epic2.id])
       end
 
       it 'returns epics matching given search string for title' do
         get api(url, user), params: { search: epic2.title }
 
-        expect_array_response([epic2.id])
+        expect_paginated_array_of_items([epic2.id])
       end
 
       it 'returns epics matching given search string for description' do
         get api(url, user), params: { search: epic2.description }
 
-        expect_array_response([epic2.id])
+        expect_paginated_array_of_items([epic2.id])
       end
 
       it 'returns epics matching given status' do
         get api(url, user), params: { state: :opened }
 
-        expect_array_response([epic2.id])
+        expect_paginated_array_of_items([epic2.id])
       end
 
       it 'returns all epics when state set to all' do
         get api(url, user), params: { state: :all }
 
-        expect_array_response([epic2.id, epic.id])
+        expect_paginated_array_of_items([epic2.id, epic.id])
       end
 
       it 'sorts by created_at descending by default' do
         get api(url, user)
 
-        expect_array_response([epic2.id, epic.id])
+        expect_paginated_array_of_items([epic2.id, epic.id])
       end
 
       it 'sorts ascending when requested' do
         get api(url, user), params: { sort: :asc }
 
-        expect_array_response([epic.id, epic2.id])
+        expect_paginated_array_of_items([epic.id, epic2.id])
       end
 
       it 'sorts by updated_at descending when requested' do
         get api(url, user), params: { order_by: :updated_at }
 
-        expect_array_response([epic.id, epic2.id])
+        expect_paginated_array_of_items([epic.id, epic2.id])
       end
 
       it 'sorts by updated_at ascending when requested' do
         get api(url, user), params: { order_by: :updated_at, sort: :asc }
 
-        expect_array_response([epic2.id, epic.id])
+        expect_paginated_array_of_items([epic2.id, epic.id])
       end
 
       it 'returns an array of labeled epics' do
         get api(url, user), params: { labels: label.title }
 
-        expect_array_response([epic2.id])
+        expect_paginated_array_of_items([epic2.id])
       end
 
       it_behaves_like 'can admin epics'
+    end
+
+    context 'with pagination params' do
+      let(:page) { 1 }
+      let(:per_page) { 2 }
+      let!(:epic1) { create(:epic, group: group, created_at: 3.days.ago) }
+      let!(:epic2) { create(:epic, group: group, created_at: 2.days.ago) }
+      let!(:epic3) { create(:epic, group: group, created_at: 1.day.ago) }
+
+      before do
+        stub_licensed_features(epics: true)
+      end
+
+      shared_examples 'paginated API endpoint' do
+        it 'returns the correct page' do
+          get api(url, user), params: { page: page, per_page: per_page }
+
+          expect(response.headers['X-Page']).to eq(page.to_s)
+          expect_paginated_array_of_items(expected)
+        end
+      end
+
+      context 'when viewing the first page' do
+        let(:expected) { [epic3.id, epic2.id] }
+        let(:page) { 1 }
+
+        it_behaves_like 'paginated API endpoint'
+      end
+
+      context 'viewing the second page' do
+        let(:expected) { [epic1.id] }
+        let(:page) { 2 }
+
+        it_behaves_like 'paginated API endpoint'
+      end
     end
   end
 

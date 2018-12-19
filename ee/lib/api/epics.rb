@@ -2,6 +2,8 @@
 
 module API
   class Epics < Grape::API
+    include PaginationParams
+
     before do
       authenticate!
       authorize_epics_feature!
@@ -64,9 +66,12 @@ module API
                          desc: 'Return opened, closed, or all epics'
         optional :author_id, type: Integer, desc: 'Return epics which are authored by the user with the given ID'
         optional :labels, type: String, desc: 'Comma-separated list of label names'
+        use :pagination
       end
       get ':id/(-/)epics' do
-        present find_epics(group_id: user_group.id), with: EE::API::Entities::Epic, user: current_user
+        epics = find_epics(group_id: user_group.id)
+
+        present paginate(epics), with: EE::API::Entities::Epic, user: current_user
       end
 
       desc 'Get details of an epic' do
