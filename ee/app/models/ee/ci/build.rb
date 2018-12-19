@@ -17,9 +17,18 @@ module EE
       prepended do
         after_save :stick_build_if_status_changed
 
+        has_many :sourced_pipelines,
+          class_name: ::Ci::Sources::Pipeline,
+          foreign_key: :source_job_id
+
         scope :with_security_reports, -> do
           with_existing_job_artifacts(::Ci::JobArtifact.security_reports)
             .eager_load_job_artifacts
+        end
+
+        scope :with_license_management_reports, -> do
+          with_existing_job_artifacts(::Ci::JobArtifact.license_management_reports)
+              .eager_load_job_artifacts
         end
       end
 
@@ -54,12 +63,20 @@ module EE
             begin
               next unless project.feature_available?(LICENSED_PARSER_FEATURES.fetch(file_type))
 
-              ::Gitlab::Ci::Parsers::Security.fabricate!(file_type).parse!(blob, security_report)
+              ::Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, security_report)
             rescue => e
               security_report.error = e
             end
           end
         end
+      end
+
+      def collect_license_management_reports!(license_management_report)
+        each_report(::Ci::JobArtifact::LICENSE_MANAGEMENT_REPORT_FILE_TYPES) do |file_type, blob|
+          ::Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, license_management_report)
+        end
+
+        license_management_report
       end
 
       private

@@ -30,8 +30,10 @@ describe Projects::BoardsController do
     end
 
     def list_boards(format: :html)
-      get :index, namespace_id: project.namespace,
-                  project_id: project,
+      get :index, params: {
+                    namespace_id: project.namespace,
+                    project_id: project
+                  },
                   format: format
     end
   end
@@ -116,9 +118,11 @@ describe Projects::BoardsController do
     end
 
     def create_board(board_params)
-      post :create, namespace_id: project.namespace.to_param,
-                    project_id: project.to_param,
-                    board: board_params,
+      post :create, params: {
+                      namespace_id: project.namespace.to_param,
+                      project_id: project.to_param,
+                      board: board_params
+                    },
                     format: :json
     end
   end
@@ -189,10 +193,12 @@ describe Projects::BoardsController do
     end
 
     def update_board(board, update_params)
-      patch :update, namespace_id: project.namespace.to_param,
-                     project_id: project.to_param,
-                     id: board.to_param,
-                     board: update_params,
+      patch :update, params: {
+                       namespace_id: project.namespace.to_param,
+                       project_id: project.to_param,
+                       id: board.to_param,
+                       board: update_params
+                     },
                      format: :json
     end
   end
@@ -235,9 +241,11 @@ describe Projects::BoardsController do
     end
 
     def remove_board(board:)
-      delete :destroy, namespace_id: project.namespace.to_param,
-                       project_id: project.to_param,
-                       id: board.to_param,
+      delete :destroy, params: {
+                         namespace_id: project.namespace.to_param,
+                         project_id: project.to_param,
+                         id: board.to_param
+                       },
                        format: :html
     end
   end

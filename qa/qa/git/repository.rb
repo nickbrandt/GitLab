@@ -41,12 +41,6 @@ module QA
 
       def use_default_credentials
         self.username, self.password = default_credentials
-
-        # Write out .netrc as we need it for:
-        #
-        # git & git-lfs over HTTP
-        # git-lfs over SSH
-        add_credentials_to_netrc if add_credentials?
       end
 
       def clone(opts = '')
@@ -146,6 +140,22 @@ module QA
         output[/git< version (\d+)/, 1] || 'unknown'
       end
 
+      def try_add_credentials_to_netrc
+        return unless add_credentials?
+        return if netrc_already_contains_content?
+
+        # Despite libcurl supporting a custom .netrc location through the
+        # CURLOPT_NETRC_FILE environment variable, git does not support it :(
+        # Info: https://curl.haxx.se/libcurl/c/CURLOPT_NETRC_FILE.html
+        #
+        # This will create a .netrc in the correct working directory, which is
+        # a temporary directory created in .perform()
+        #
+        FileUtils.mkdir_p(tmp_home_dir)
+        File.open(netrc_file_path, 'a') { |file| file.puts(netrc_content) }
+        File.chmod(0600, netrc_file_path)
+      end
+
       private
 
       attr_reader :uri, :username, :password, :known_hosts_file,
@@ -159,6 +169,7 @@ module QA
       end
 
       def add_credentials?
+        return false if !username || !password
         return true unless ssh_key_set?
         return true if ssh_key_set? && use_lfs?
 
@@ -214,21 +225,6 @@ module QA
       def netrc_already_contains_content?
         File.exist?(netrc_file_path) &&
           File.readlines(netrc_file_path).grep(/^#{netrc_content}$/).any?
-      end
-
-      def add_credentials_to_netrc
-        # Despite libcurl supporting a custom .netrc location through the
-        # CURLOPT_NETRC_FILE environment variable, git does not support it :(
-        # Info: https://curl.haxx.se/libcurl/c/CURLOPT_NETRC_FILE.html
-        #
-        # This will create a .netrc in the correct working directory, which is
-        # a temporary directory created in .perform()
-        #
-        return if netrc_already_contains_content?
-
-        FileUtils.mkdir_p(tmp_home_dir)
-        File.open(netrc_file_path, 'a') { |file| file.puts(netrc_content) }
-        File.chmod(0600, netrc_file_path)
       end
     end
   end

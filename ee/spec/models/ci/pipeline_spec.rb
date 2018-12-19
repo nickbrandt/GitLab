@@ -36,7 +36,7 @@ describe Ci::Pipeline do
     end
 
     it "returns pipeline with security reports" do
-      expect(described_class.with_legacy_security_reports).to eq([pipeline_1, pipeline_2, pipeline_3, pipeline_4])
+      expect(described_class.with_legacy_security_reports).to contain_exactly(pipeline_1, pipeline_2, pipeline_3, pipeline_4)
     end
   end
 
@@ -313,6 +313,83 @@ describe Ci::Pipeline do
             pipeline.update!(status_event: transition)
           end
         end
+      end
+    end
+  end
+
+  describe '#has_license_management_reports?' do
+    subject { pipeline.has_license_management_reports? }
+
+    context 'when pipeline has builds with license_management reports' do
+      before do
+        create(:ee_ci_build, :license_management_report, pipeline: pipeline, project: project)
+      end
+
+      context 'when pipeline status is running' do
+        let(:pipeline) { create(:ci_pipeline, :running, project: project) }
+
+        it { is_expected.to be_falsey }
+      end
+
+      context 'when pipeline status is success' do
+        let(:pipeline) { create(:ci_pipeline, :success, project: project) }
+
+        it { is_expected.to be_truthy }
+      end
+    end
+
+    context 'when pipeline does not have builds with license_management reports' do
+      before do
+        create(:ci_build, :artifacts, pipeline: pipeline, project: project)
+      end
+
+      let(:pipeline) { create(:ci_pipeline, :success, project: project) }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context 'when retried build has license management reports' do
+      before do
+        create(:ee_ci_build, :retried, :license_management_report, pipeline: pipeline, project: project)
+      end
+
+      let(:pipeline) { create(:ci_pipeline, :success, project: project) }
+
+      it { is_expected.to be_falsey }
+    end
+  end
+
+  describe '#license_management_reports' do
+    subject { pipeline.license_management_report }
+
+    context 'when pipeline has multiple builds with license management reports' do
+      let!(:build_1) { create(:ci_build, :success, name: 'license_management', pipeline: pipeline, project: project) }
+      let!(:build_2) { create(:ci_build, :success, name: 'license_management2', pipeline: pipeline, project: project) }
+
+      before do
+        create(:ee_ci_job_artifact, :license_management_report, job: build_1, project: project)
+        create(:ee_ci_job_artifact, :license_management_report_2, job: build_2, project: project)
+      end
+
+      it 'returns a license management report with collected data' do
+        expect(subject.licenses.count).to be(5)
+        expect(subject.licenses.any? { |license| license.name == 'WTFPL' } ).to be_truthy
+        expect(subject.licenses.any? { |license| license.name == 'MIT' } ).to be_truthy
+      end
+
+      context 'when builds are retried' do
+        let!(:build_1) { create(:ci_build, :retried, :success, name: 'license_management', pipeline: pipeline, project: project) }
+        let!(:build_2) { create(:ci_build, :retried, :success, name: 'license_management2', pipeline: pipeline, project: project) }
+
+        it 'does not take retried builds into account' do
+          expect(subject.licenses.count).to be(0)
+        end
+      end
+    end
+
+    context 'when pipeline does not have any builds with license management reports' do
+      it 'returns an empty license management report' do
+        expect(subject.licenses.count).to be(0)
       end
     end
   end

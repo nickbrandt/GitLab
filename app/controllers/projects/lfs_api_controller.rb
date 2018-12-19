@@ -1,12 +1,7 @@
 # frozen_string_literal: true
 
 class Projects::LfsApiController < Projects::GitHttpClientController
-  include ApplicationSettingsHelper
-  include ApplicationHelper
-  include GitlabRoutingHelper
   include LfsRequest
-
-  prepend ::EE::Projects::LfsApiController
 
   LFS_TRANSFER_CONTENT_TYPE = 'application/octet-stream'.freeze
 
@@ -128,3 +123,5 @@ class Projects::LfsApiController < Projects::GitHttpClientController
     _('You cannot write to this read-only GitLab instance.')
   end
 end
+
+Projects::LfsApiController.prepend(::EE::Projects::LfsApiController)

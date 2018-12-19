@@ -55,10 +55,12 @@ class EpicsFinder < IssuableFinder
   private
 
   def count_key(value)
-    if Gitlab.rails5?
-      Array(value).last.to_sym
+    last_value = Array(value).last
+
+    if last_value.is_a?(Integer)
+      Epic.states.invert[last_value].to_sym
     else
-      Epic.states.invert[Array(value).last].to_sym
+      last_value.to_sym
     end
   end
 

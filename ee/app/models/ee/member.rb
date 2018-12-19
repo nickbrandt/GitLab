@@ -3,8 +3,7 @@
 module EE
   module Member
     extend ActiveSupport::Concern
-
-    attr_accessor :skip_notification
+    extend ::Gitlab::Utils::Override
 
     class_methods do
       extend ::Gitlab::Utils::Override
@@ -14,9 +13,18 @@ module EE
         super
 
         member.attributes = {
-          skip_notification: ldap,
           ldap: ldap
         }
+      end
+    end
+
+    override :notification_service
+    def notification_service
+      if ldap
+        # LDAP users shouldn't receive notifications about membership changes
+        ::EE::NullNotificationService.new
+      else
+        super
       end
     end
   end

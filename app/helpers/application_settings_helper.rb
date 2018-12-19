@@ -139,8 +139,8 @@ module ApplicationSettingsHelper
       :enabled_git_access_protocol,
       :enforce_terms,
       :gitaly_timeout_default,
-      :gitaly_timeout_fast,
       :gitaly_timeout_medium,
+      :gitaly_timeout_fast,
       :gravatar_enabled,
       :hashed_storage_enabled,
       :help_page_hide_commercial_content,
@@ -168,8 +168,8 @@ module ApplicationSettingsHelper
       :metrics_timeout,
       :mirror_available,
       :pages_domain_verification_enabled,
-      :password_authentication_enabled_for_git,
       :password_authentication_enabled_for_web,
+      :password_authentication_enabled_for_git,
       :performance_bar_allowed_group_path,
       :performance_bar_enabled,
       :plantuml_enabled,
@@ -227,7 +227,7 @@ module ApplicationSettingsHelper
   end
 end
 
-ApplicationSettingsHelper.prepend(EE::ApplicationSettingsHelper)
+ApplicationSettingsHelper.prepend(EE::ApplicationSettingsHelper) # rubocop: disable Cop/InjectEnterpriseEditionModule
 
 # The methods in `EE::ApplicationSettingsHelper` should be available as both
 # instance and class methods.

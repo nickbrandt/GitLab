@@ -15,19 +15,19 @@ describe API::Search do
 
   shared_examples 'elasticsearch disabled' do
     it 'returns 400 error for wiki_blobs scope' do
-      get api(endpoint, user), scope: 'wiki_blobs', search: 'awesome'
+      get api(endpoint, user), params: { scope: 'wiki_blobs', search: 'awesome' }
 
       expect(response).to have_gitlab_http_status(400)
     end
 
     it 'returns 400 error for blobs scope' do
-      get api(endpoint, user), scope: 'blobs', search: 'monitors'
+      get api(endpoint, user), params: { scope: 'blobs', search: 'monitors' }
 
       expect(response).to have_gitlab_http_status(400)
     end
 
     it 'returns 400 error for commits scope' do
-      get api(endpoint, user), scope: 'commits', search: 'folder'
+      get api(endpoint, user), params: { scope: 'commits', search: 'folder' }
 
       expect(response).to have_gitlab_http_status(400)
     end
@@ -52,7 +52,7 @@ describe API::Search do
         project.wiki.index_blobs
         Gitlab::Elastic::Helper.refresh_index
 
-        get api(endpoint, user), scope: 'wiki_blobs', search: 'awesome'
+        get api(endpoint, user), params: { scope: 'wiki_blobs', search: 'awesome' }
       end
 
       it_behaves_like 'response is correct', schema: 'public_api/v4/blobs'
@@ -63,7 +63,7 @@ describe API::Search do
         repo_project.repository.index_commits
         Gitlab::Elastic::Helper.refresh_index
 
-        get api(endpoint, user), scope: 'commits', search: 'folder'
+        get api(endpoint, user), params: { scope: 'commits', search: 'folder' }
       end
 
       it_behaves_like 'response is correct', schema: 'public_api/v4/commits_details', size: 2
@@ -74,14 +74,14 @@ describe API::Search do
         repo_project.repository.index_blobs
         Gitlab::Elastic::Helper.refresh_index
 
-        get api(endpoint, user), scope: 'blobs', search: 'monitors'
+        get api(endpoint, user), params: { scope: 'blobs', search: 'monitors' }
       end
 
       it_behaves_like 'response is correct', schema: 'public_api/v4/blobs'
 
       context 'filters' do
         it 'by filename' do
-          get api("/projects/#{repo_project.id}/search", user), scope: 'blobs', search: 'mon filename:PROCESS.md'
+          get api("/projects/#{repo_project.id}/search", user), params: { scope: 'blobs', search: 'mon filename:PROCESS.md' }
 
           expect(response).to have_gitlab_http_status(200)
           expect(json_response.size).to eq(1)
@@ -89,7 +89,7 @@ describe API::Search do
         end
 
         it 'by path' do
-          get api("/projects/#{repo_project.id}/search", user), scope: 'blobs', search: 'mon path:markdown'
+          get api("/projects/#{repo_project.id}/search", user), params: { scope: 'blobs', search: 'mon path:markdown' }
 
           expect(response).to have_gitlab_http_status(200)
           expect(json_response.size).to eq(1)
@@ -99,7 +99,7 @@ describe API::Search do
         end
 
         it 'by extension' do
-          get api("/projects/#{repo_project.id}/search", user), scope: 'blobs', search: 'mon extension:md'
+          get api("/projects/#{repo_project.id}/search", user), params: { scope: 'blobs', search: 'mon extension:md' }
 
           expect(response).to have_gitlab_http_status(200)
           expect(json_response.size).to eq(3)

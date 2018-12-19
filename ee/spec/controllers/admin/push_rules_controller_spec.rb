@@ -19,7 +19,7 @@ describe Admin::PushRulesController do
     it 'updates sample push rule' do
       expect_any_instance_of(PushRule).to receive(:update).with(ActionController::Parameters.new(params).permit!)
 
-      patch :update, push_rule: params
+      patch :update, params: { push_rule: params }
 
       expect(response).to redirect_to(admin_push_rule_path)
     end
@@ -30,7 +30,7 @@ describe Admin::PushRulesController do
       end
 
       it 'returns 404' do
-        patch :update, push_rule: params
+        patch :update, params: { push_rule: params }
 
         expect(response).to have_gitlab_http_status(404)
       end

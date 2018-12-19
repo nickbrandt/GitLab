@@ -11,7 +11,7 @@ describe Projects::Settings::IntegrationsController do
 
   shared_examples 'endpoint with some disabled services' do
     it 'has some disabled services' do
-      get :show, namespace_id: project.namespace, project_id: project
+      get :show, params: { namespace_id: project.namespace, project_id: project }
 
       expect(active_services).not_to include(*disabled_services)
     end
@@ -19,7 +19,7 @@ describe Projects::Settings::IntegrationsController do
 
   shared_examples 'endpoint without disabled services' do
     it 'does not have disabled services' do
-      get :show, namespace_id: project.namespace, project_id: project
+      get :show, params: { namespace_id: project.namespace, project_id: project }
 
       expect(active_services).to include(*disabled_services)
     end
@@ -30,7 +30,7 @@ describe Projects::Settings::IntegrationsController do
     let(:disabled_services) { %w(JenkinsService JenkinsDeprecatedService) }
 
     it 'enables SlackSlashCommandsService and disables GitlabSlackApplication' do
-      get :show, namespace_id: project.namespace, project_id: project
+      get :show, params: { namespace_id: project.namespace, project_id: project }
 
       expect(active_services).to include('SlackSlashCommandsService')
       expect(active_services).not_to include('GitlabSlackApplicationService')
@@ -40,7 +40,7 @@ describe Projects::Settings::IntegrationsController do
       stub_application_setting(slack_app_enabled: true)
       allow(::Gitlab).to receive(:com?).and_return(true)
 
-      get :show, namespace_id: project.namespace, project_id: project
+      get :show, params: { namespace_id: project.namespace, project_id: project }
 
       expect(active_services).to include('GitlabSlackApplicationService')
       expect(active_services).not_to include('SlackSlashCommandsService')

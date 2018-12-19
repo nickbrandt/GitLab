@@ -3,6 +3,7 @@
 module EE
   module Environment
     extend ActiveSupport::Concern
+    extend ::Gitlab::Utils::Override
     include ::Gitlab::Utils::StrongMemoize
 
     prepended do
@@ -33,6 +34,20 @@ module EE
 
     def protected_deployable_by_user?(user)
       project.protected_environment_accessible_to?(name, user)
+    end
+
+    override :has_terminals?
+    def has_terminals?
+      deployment_platform.present? && available? && last_deployment.present?
+    end
+
+    override :terminals
+    def terminals
+      deployment_platform.terminals(self) if has_terminals?
+    end
+
+    def rollout_status
+      deployment_platform.rollout_status(self) if has_terminals?
     end
   end
 end

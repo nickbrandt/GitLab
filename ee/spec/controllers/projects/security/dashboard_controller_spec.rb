@@ -16,7 +16,7 @@ describe Projects::Security::DashboardController do
 
     def show_security_dashboard(current_user = user)
       sign_in(current_user)
-      get :show, namespace_id: project.namespace, project_id: project
+      get :show, params: { namespace_id: project.namespace, project_id: project }
     end
 
     context 'when security dashboard feature is enabled' do

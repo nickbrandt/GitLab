@@ -66,7 +66,7 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
       end
 
       def request_job(token = runner.token, **params)
-        post api('/jobs/request'), params.merge(token: token)
+        post api('/jobs/request'), params: params.merge(token: token)
       end
     end
   end

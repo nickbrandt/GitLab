@@ -17,6 +17,15 @@ module EE
         has_many :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::OccurrencePipeline'
         has_many :vulnerabilities, source: :occurrence, through: :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::Occurrence'
 
+        has_one :source_pipeline, class_name: ::Ci::Sources::Pipeline
+        has_many :sourced_pipelines, class_name: ::Ci::Sources::Pipeline, foreign_key: :source_pipeline_id
+
+        has_one :triggered_by_pipeline, through: :source_pipeline, source: :source_pipeline
+        has_many :triggered_pipelines, through: :sourced_pipelines, source: :pipeline
+
+        has_many :auto_canceled_pipelines, class_name: 'Ci::Pipeline', foreign_key: 'auto_canceled_by_id'
+        has_many :auto_canceled_jobs, class_name: 'CommitStatus', foreign_key: 'auto_canceled_by_id'
+
         # Legacy way to fetch security reports based on job name. This has been replaced by the reports feature.
         scope :with_legacy_security_reports, -> do
           joins(:artifacts).where(ci_builds: { name: %w[sast dependency_scanning sast:container container_scanning dast] })
@@ -129,6 +138,18 @@ module EE
         ::Gitlab::Ci::Reports::Security::Reports.new.tap do |security_reports|
           builds.latest.with_security_reports.each do |build|
             build.collect_security_reports!(security_reports)
+          end
+        end
+      end
+
+      def has_license_management_reports?
+        complete? && builds.latest.with_license_management_reports.any?
+      end
+
+      def license_management_report
+        ::Gitlab::Ci::Reports::LicenseManagement::Report.new.tap do |license_management_report|
+          builds.latest.with_license_management_reports.each do |build|
+            build.collect_license_management_reports!(license_management_report)
           end
         end
       end

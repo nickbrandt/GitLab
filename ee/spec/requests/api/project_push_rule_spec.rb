@@ -39,12 +39,7 @@ describe API::ProjectPushRule, 'ProjectPushRule', api: true  do
     context "authorized user" do
       it "adds push rule to project" do
         post api("/projects/#{project.id}/push_rule", user),
-          deny_delete_tag: true,  member_check: true, prevent_secrets: true,
-          commit_message_regex: 'JIRA\-\d+',
-          branch_name_regex: '(feature|hotfix)\/*',
-          author_email_regex: '[a-zA-Z0-9]+@gitlab.com',
-          file_name_regex: '[a-zA-Z0-9]+.key',
-          max_file_size: 5
+          params: { deny_delete_tag: true, member_check: true, prevent_secrets: true, commit_message_regex: 'JIRA\-\d+', branch_name_regex: '(feature|hotfix)\/*', author_email_regex: '[a-zA-Z0-9]+@gitlab.com', file_name_regex: '[a-zA-Z0-9]+.key', max_file_size: 5 }
 
         expect(response).to have_gitlab_http_status(201)
         expect(json_response['project_id']).to eq(project.id)
@@ -61,7 +56,7 @@ describe API::ProjectPushRule, 'ProjectPushRule', api: true  do
 
     it 'adds push rule to project with no file size' do
       post api("/projects/#{project.id}/push_rule", user),
-        commit_message_regex: 'JIRA\-\d+'
+        params: { commit_message_regex: 'JIRA\-\d+' }
 
       expect(response).to have_gitlab_http_status(201)
       expect(json_response['project_id']).to eq(project.id)
@@ -77,7 +72,7 @@ describe API::ProjectPushRule, 'ProjectPushRule', api: true  do
 
     context "unauthorized user" do
       it "does not add push rule to project" do
-        post api("/projects/#{project.id}/push_rule", user3), deny_delete_tag: true
+        post api("/projects/#{project.id}/push_rule", user3), params: { deny_delete_tag: true }
 
         expect(response).to have_gitlab_http_status(403)
       end
@@ -91,7 +86,7 @@ describe API::ProjectPushRule, 'ProjectPushRule', api: true  do
 
     context "with existing push rule" do
       it "does not add push rule to project" do
-        post api("/projects/#{project.id}/push_rule", user), deny_delete_tag: true
+        post api("/projects/#{project.id}/push_rule", user), params: { deny_delete_tag: true }
 
         expect(response).to have_gitlab_http_status(422)
       end
@@ -105,7 +100,7 @@ describe API::ProjectPushRule, 'ProjectPushRule', api: true  do
 
     it "updates an existing project push rule" do
       put api("/projects/#{project.id}/push_rule", user),
-        deny_delete_tag: false, commit_message_regex: 'Fixes \d+\..*'
+        params: { deny_delete_tag: false, commit_message_regex: 'Fixes \d+\..*' }
 
       expect(response).to have_gitlab_http_status(200)
       expect(json_response['deny_delete_tag']).to eq(false)
@@ -122,13 +117,13 @@ describe API::ProjectPushRule, 'ProjectPushRule', api: true  do
   describe "PUT /projects/:id/push_rule" do
     it "gets error on non existing project push rule" do
       put api("/projects/#{project.id}/push_rule", user),
-        deny_delete_tag: false, commit_message_regex: 'Fixes \d+\..*'
+        params: { deny_delete_tag: false, commit_message_regex: 'Fixes \d+\..*' }
 
       expect(response).to have_gitlab_http_status(404)
     end
 
     it "does not update push rule for unauthorized user" do
-      post api("/projects/#{project.id}/push_rule", user3), deny_delete_tag: true
+      post api("/projects/#{project.id}/push_rule", user3), params: { deny_delete_tag: true }
 
       expect(response).to have_gitlab_http_status(403)
     end

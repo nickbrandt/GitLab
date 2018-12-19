@@ -19,10 +19,12 @@ describe Projects::ApproverGroupsController do
 
       def destroy_merge_request_approver_group
         delete :destroy,
-               namespace_id: project.namespace.to_param,
-               project_id: project.to_param,
-               merge_request_id: merge_request.to_param,
-               id: approver_group.id
+               params: {
+                 namespace_id: project.namespace.to_param,
+                 project_id: project.to_param,
+                 merge_request_id: merge_request.to_param,
+                 id: approver_group.id
+               }
       end
 
       context 'when the user cannot update approvers because they do not have access' do
@@ -73,9 +75,11 @@ describe Projects::ApproverGroupsController do
 
       def destroy_project_approver_group
         delete :destroy,
-               namespace_id: project.namespace.to_param,
-               project_id: project.to_param,
-               id: approver_group.id
+               params: {
+                 namespace_id: project.namespace.to_param,
+                 project_id: project.to_param,
+                 id: approver_group.id
+               }
       end
 
       context 'when the user cannot update approvers because they do not have access' do

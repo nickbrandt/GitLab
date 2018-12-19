@@ -32,7 +32,7 @@ describe Projects::Settings::SlacksController do
       it 'calls service and redirects with no alerts if result is successful' do
         stub_service(status: :success)
 
-        get :slack_auth, namespace_id: project.namespace, project_id: project
+        get :slack_auth, params: { namespace_id: project.namespace, project_id: project }
 
         expect(response).to have_gitlab_http_status(302)
         expect(response).to redirect_to(redirect_url(project))
@@ -42,7 +42,7 @@ describe Projects::Settings::SlacksController do
       it 'calls service and redirects with the alert if there is error' do
         stub_service(status: :error, message: 'error')
 
-        get :slack_auth, namespace_id: project.namespace, project_id: project
+        get :slack_auth, params: { namespace_id: project.namespace, project_id: project }
 
         expect(response).to have_gitlab_http_status(302)
         expect(response).to redirect_to(redirect_url(project))
@@ -52,7 +52,7 @@ describe Projects::Settings::SlacksController do
 
     context 'when no CSRF token is provided' do
       it 'returns 403' do
-        get :slack_auth, namespace_id: project.namespace, project_id: project
+        get :slack_auth, params: { namespace_id: project.namespace, project_id: project }
 
         expect(response).to have_gitlab_http_status(403)
       end

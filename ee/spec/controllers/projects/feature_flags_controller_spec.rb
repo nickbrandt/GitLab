@@ -17,7 +17,7 @@ describe Projects::FeatureFlagsController do
   describe 'GET index' do
     render_views
 
-    subject { get(:index, view_params) }
+    subject { get(:index, params: view_params) }
 
     context 'when there is no feature flags' do
       before do
@@ -63,7 +63,7 @@ describe Projects::FeatureFlagsController do
   describe 'GET new' do
     render_views
 
-    subject { get(:new, view_params) }
+    subject { get(:new, params: view_params) }
 
     it 'renders the form' do
       subject
@@ -77,7 +77,7 @@ describe Projects::FeatureFlagsController do
   describe 'POST create' do
     render_views
 
-    subject { post(:create, params) }
+    subject { post(:create, params: params) }
 
     context 'when creating a new feature flag' do
       let(:params) do
@@ -112,7 +112,7 @@ describe Projects::FeatureFlagsController do
 
     render_views
 
-    subject { post(:create, params) }
+    subject { post(:create, params: params) }
 
     context 'when updating an existing feature flag' do
       let(:params) do

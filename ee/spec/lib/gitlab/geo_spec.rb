@@ -1,15 +1,15 @@
 require 'spec_helper'
 
-describe Gitlab::Geo, :geo do
+describe Gitlab::Geo, :geo, :request_store do
   include ::EE::GeoHelpers
 
   set(:primary_node)   { create(:geo_node, :primary) }
   set(:secondary_node) { create(:geo_node) }
 
   shared_examples 'a Geo cached value' do |method, key|
-    it 'includes Rails.version in the cache key', :request_store do
-      expect(Rails.cache).to receive(:fetch)
-        .with("geo:#{key}:#{Rails.version}", expires_in: 15.seconds)
+    it 'includes Rails.version in the cache key' do
+      expect(Rails.cache).to receive(:write)
+        .with("geo:#{key}:#{Rails.version}", an_instance_of(String), expires_in: 15.seconds)
 
       described_class.public_send(method)
     end
@@ -32,6 +32,10 @@ describe Gitlab::Geo, :geo do
   end
 
   describe '.secondary_nodes' do
+    it 'returns a list of Geo secondary nodes' do
+      expect(described_class.secondary_nodes).to match_array(secondary_node)
+    end
+
     it_behaves_like 'a Geo cached value', :secondary_nodes, :secondary_nodes
   end
 
@@ -114,6 +118,7 @@ describe Gitlab::Geo, :geo do
   describe '.oauth_authentication' do
     before do
       stub_secondary_node
+      stub_current_geo_node(secondary_node)
     end
 
     it_behaves_like 'a Geo cached value', :oauth_authentication, :oauth_application

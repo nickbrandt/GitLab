@@ -19,7 +19,6 @@ class ProjectGroupLink < ActiveRecord::Base
   validates :group_access, inclusion: { in: Gitlab::Access.values }, presence: true
   validate :different_group
 
-  before_destroy :delete_branch_protection
   after_commit :refresh_group_members_authorized_projects
 
   def self.access_options
@@ -49,14 +48,9 @@ class ProjectGroupLink < ActiveRecord::Base
     end
   end
 
-  def delete_branch_protection
-    if group.present? && project.present?
-      project.protected_branches.merge_access_by_group(group).destroy_all # rubocop: disable DestroyAll
-      project.protected_branches.push_access_by_group(group).destroy_all # rubocop: disable DestroyAll
-    end
-  end
-
   def refresh_group_members_authorized_projects
     group.refresh_members_authorized_projects
   end
 end
+
+ProjectGroupLink.prepend(EE::ProjectGroupLink)

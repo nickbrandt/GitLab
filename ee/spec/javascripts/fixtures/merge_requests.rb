@@ -36,9 +36,11 @@ describe Projects::MergeRequestsController, '(JavaScript fixtures)', type: :cont
 
   it 'merge_requests_ee/merge_request_edit.html.raw' do |example|
     get :edit,
-      id: merge_request.id,
-      namespace_id: project.namespace.to_param,
-      project_id: project,
+      params: {
+        id: merge_request.id,
+        namespace_id: project.namespace.to_param,
+        project_id: project
+      },
       format: :html
 
     expect(merge_request.all_approvers_including_groups.size).to eq(1)

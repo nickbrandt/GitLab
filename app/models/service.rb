@@ -210,11 +210,7 @@ class Service < ActiveRecord::Base
       class_eval %{
         def #{arg}?
           # '!!' is used because nil or empty string is converted to nil
-          if Gitlab.rails5?
-            !!ActiveRecord::Type::Boolean.new.cast(#{arg})
-          else
-            !!ActiveRecord::Type::Boolean.new.type_cast_from_database(#{arg})
-          end
+          !!ActiveRecord::Type::Boolean.new.cast(#{arg})
         end
       }
     end
@@ -271,18 +267,14 @@ class Service < ActiveRecord::Base
       prometheus
       pushover
       redmine
-      slack
       slack_slash_commands
+      slack
       teamcity
       microsoft_teams
     ]
 
     if Rails.env.development?
       service_names += %w[mock_ci mock_deployment mock_monitoring]
-    end
-
-    if Gitlab.com? || Rails.env.development?
-      service_names.push('gitlab_slack_application')
     end
 
     service_names.sort_by(&:downcase)

@@ -8,7 +8,6 @@ class Snippet < ActiveRecord::Base
   include Participable
   include Referable
   include Sortable
-  include Elastic::SnippetsSearch
   include Awardable
   include Mentionable
   include Spammable
@@ -217,3 +216,5 @@ class Snippet < ActiveRecord::Base
     end
   end
 end
+
+Snippet.prepend(EE::Snippet)

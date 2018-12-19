@@ -1,8 +1,6 @@
-# coding: utf-8
 # frozen_string_literal: true
 
 require 'securerandom'
-require 'forwardable'
 
 class Repository
   REF_MERGE_REQUEST = 'merge-requests'.freeze
@@ -20,8 +18,6 @@ class Repository
   ].freeze
 
   include Gitlab::RepositoryCacheAdapter
-
-  include Elastic::RepositoriesSearch
 
   attr_accessor :full_path, :disk_path, :project, :is_wiki
 

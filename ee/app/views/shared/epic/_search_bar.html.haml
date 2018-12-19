@@ -21,7 +21,7 @@
             = _('Weeks')
       .filter-dropdown-container.append-right-default
         = render 'shared/epic/state_dropdown'
-    = form_tag page_filter_path(without: [:author_id, :search]), method: :get, class: 'flex-fill filter-form js-filter-form' do
+    = form_tag page_filter_path, method: :get, class: 'flex-fill filter-form js-filter-form' do
       - if params[:search].present?
         = hidden_field_tag :search, params[:search]
       .epics-other-filters.filtered-search-wrapper

@@ -12,7 +12,6 @@ module API
     before do
       require_packages_enabled!
       authenticate_non_get!
-      authorize_packages_feature!
     end
 
     helpers do
@@ -52,12 +51,97 @@ module API
           conflict!
         end
       end
+
+      def find_project_by_path(path)
+        project_path = path.rpartition('/').first
+        Project.find_by_full_path(project_path)
+      end
+    end
+
+    desc 'Download the maven package file at instance level' do
+      detail 'This feature was introduced in GitLab 11.6'
+    end
+    params do
+      requires :path, type: String, desc: 'Package path'
+      requires :file_name, type: String, desc: 'Package file name'
+    end
+    route_setting :authentication, job_token_allowed: true
+    get 'packages/maven/*path/:file_name', requirements: MAVEN_ENDPOINT_REQUIREMENTS do
+      file_name, format = extract_format(params[:file_name])
+
+      # To avoid name collision we require project path and project package be the same.
+      # For packages that have different name from the project we should use
+      # the endpoint that includes project id
+      project = find_project_by_path(params[:path])
+
+      authorize!(:read_package, project)
+
+      package = ::Packages::MavenPackageFinder
+        .new(params[:path], current_user, project: project).execute!
+
+      forbidden! unless package.project.feature_available?(:packages)
+
+      package_file = ::Packages::PackageFileFinder
+        .new(package, file_name).execute!
+
+      case format
+      when 'md5'
+        package_file.file_md5
+      when 'sha1'
+        package_file.file_sha1
+      when nil
+        present_carrierwave_file!(package_file.file)
+      end
+    end
+
+    desc 'Download the maven package file at a group level' do
+      detail 'This feature was introduced in GitLab 11.7'
+    end
+    params do
+      requires :id, type: String, desc: 'The ID of a group'
+    end
+    resource :groups, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
+      params do
+        requires :path, type: String, desc: 'Package path'
+        requires :file_name, type: String, desc: 'Package file name'
+      end
+      route_setting :authentication, job_token_allowed: true
+      get ':id/-/packages/maven/*path/:file_name', requirements: MAVEN_ENDPOINT_REQUIREMENTS do
+        file_name, format = extract_format(params[:file_name])
+
+        group = find_group(params[:id])
+
+        not_found!('Group') unless can?(current_user, :read_group, group)
+
+        package = ::Packages::MavenPackageFinder
+          .new(params[:path], current_user, group: group).execute!
+
+        forbidden! unless package.project.feature_available?(:packages)
+
+        authorize!(:read_package, package.project)
+
+        package_file = ::Packages::PackageFileFinder
+          .new(package, file_name).execute!
+
+        case format
+        when 'md5'
+          package_file.file_md5
+        when 'sha1'
+          package_file.file_sha1
+        when nil
+          present_carrierwave_file!(package_file.file)
+        end
+      end
     end
 
     params do
       requires :id, type: String, desc: 'The ID of a project'
     end
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
+      before do
+        authorize_packages_feature!
+      end
+
       desc 'Download the maven package file' do
         detail 'This feature was introduced in GitLab 11.3'
       end
@@ -72,7 +156,7 @@ module API
         file_name, format = extract_format(params[:file_name])
 
         package = ::Packages::MavenPackageFinder
-          .new(user_project, params[:path]).execute!
+          .new(params[:path], current_user, project: user_project).execute!
 
         package_file = ::Packages::PackageFileFinder
           .new(package, file_name).execute!

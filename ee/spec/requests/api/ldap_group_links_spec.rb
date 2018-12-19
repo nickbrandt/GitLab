@@ -31,7 +31,7 @@ describe API::LdapGroupLinks, api: true  do
       it "does not allow less priviledged user to add LDAP group link" do
         expect do
           post api("/groups/#{group_with_ldap_links.id}/ldap_group_links", user),
-          cn: 'ldap-group4', group_access: GroupMember::GUEST, provider: 'ldap3'
+          params: { cn: 'ldap-group4', group_access: GroupMember::GUEST, provider: 'ldap3' }
         end.not_to change { group_with_ldap_links.ldap_group_links.count }
 
         expect(response.status).to eq(403)
@@ -42,7 +42,7 @@ describe API::LdapGroupLinks, api: true  do
       it "returns ok and add ldap group link" do
         expect do
           post api("/groups/#{group_with_ldap_links.id}/ldap_group_links", owner),
-          cn: 'ldap-group3', group_access: GroupMember::GUEST, provider: 'ldap3'
+          params: { cn: 'ldap-group3', group_access: GroupMember::GUEST, provider: 'ldap3' }
         end.to change { group_with_ldap_links.ldap_group_links.count }.by(1)
 
         expect(response.status).to eq(201)
@@ -55,7 +55,7 @@ describe API::LdapGroupLinks, api: true  do
       xit "returns ok and add ldap group link even if no provider specified" do
         expect do
           post api("/groups/#{group_with_ldap_links.id}/ldap_group_links", owner),
-          cn: 'ldap-group3', group_access: GroupMember::GUEST
+          params: { cn: 'ldap-group3', group_access: GroupMember::GUEST }
         end.to change { group_with_ldap_links.ldap_group_links.count }.by(1)
 
         expect(response.status).to eq(201)
@@ -65,22 +65,22 @@ describe API::LdapGroupLinks, api: true  do
       end
 
       it "returns error if LDAP group link already exists" do
-        post api("//groups/#{group_with_ldap_links.id}/ldap_group_links", owner), provider: 'ldap1', cn: 'ldap-group1', group_access: GroupMember::GUEST
+        post api("//groups/#{group_with_ldap_links.id}/ldap_group_links", owner), params: { provider: 'ldap1', cn: 'ldap-group1', group_access: GroupMember::GUEST }
         expect(response.status).to eq(409)
       end
 
       it "returns a 400 error when cn is not given" do
-        post api("//groups/#{group_with_ldap_links.id}/ldap_group_links", owner), group_access: GroupMember::GUEST
+        post api("//groups/#{group_with_ldap_links.id}/ldap_group_links", owner), params: { group_access: GroupMember::GUEST }
         expect(response.status).to eq(400)
       end
 
       it "returns a 400 error when group access is not given" do
-        post api("//groups/#{group_with_ldap_links.id}/ldap_group_links", owner), cn: 'ldap-group3'
+        post api("//groups/#{group_with_ldap_links.id}/ldap_group_links", owner), params: { cn: 'ldap-group3' }
         expect(response.status).to eq(400)
       end
 
       it "returns a 422 error when group access is not known" do
-        post api("//groups/#{group_with_ldap_links.id}/ldap_group_links", owner), cn: 'ldap-group3', group_access: 11, provider: 'ldap1'
+        post api("//groups/#{group_with_ldap_links.id}/ldap_group_links", owner), params: { cn: 'ldap-group3', group_access: 11, provider: 'ldap1' }
 
         expect(response.status).to eq(400)
         expect(json_response['error']).to eq('group_access does not have a valid value')

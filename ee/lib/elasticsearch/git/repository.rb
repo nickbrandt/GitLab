@@ -331,7 +331,7 @@ module Elasticsearch
           @repository_id
         end
 
-        unless defined?(path_to_repo)
+        unless method_defined?(:path_to_repo)
           def path_to_repo
             @path_to_repo.presence || raise(NotImplementedError, 'Please, define "path_to_repo" method, or set "path_to_repo" via "repository_for_indexing" method')
           end

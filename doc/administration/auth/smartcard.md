@@ -25,84 +25,100 @@ Certificate:
         Subject: CN=Gitlab User, emailAddress=gitlab-user@example.com
 ```
 
-## Configure NGINX to request a client side certificate
-
-In NGINX configuration, an **additional** server context must be defined with
-the same configuration except:
-
-- The additional NGINX server context must be configured to run on a different
-  port:
-
-  ```
-  listen *:3444 ssl;
-  ```
-
-- The additional NGINX server context must be configured to require the client
-  side certificate:
-
-  ```
-  ssl_verify_depth 2;
-  ssl_client_certificate /etc/ssl/certs/CA.pem;
-  ssl_verify_client on;
-  ```
-
-- The additional NGINX server context must be configured to forward the client
-  side certificate:
-
-  ```
-  proxy_set_header    X-SSL-Client-Certificate    $ssl_client_escaped_cert;
-  ```
-
-For example, the following is an example server context in an NGINX
-configuration file (eg. in `/etc/nginx/sites-available/gitlab-ssl`):
-
-```
-server {
-    listen *:3444 ssl;
-
-    # certificate for configuring SSL
-    ssl_certificate /path/to/example.com.crt;
-    ssl_certificate_key /path/to/example.com.key;
-
-    ssl_verify_depth 2;
-    # CA certificate for client side certificate verification
-    ssl_client_certificate /etc/ssl/certs/CA.pem;
-    ssl_verify_client on;
-
-    location / {
-        proxy_set_header    Host                        $http_host;
-        proxy_set_header    X-Real-IP                   $remote_addr;
-        proxy_set_header    X-Forwarded-For             $proxy_add_x_forwarded_for;
-        proxy_set_header    X-Forwarded-Proto           $scheme;
-        proxy_set_header    Upgrade                     $http_upgrade;
-        proxy_set_header    Connection                  $connection_upgrade;
-
-        proxy_set_header    X-SSL-Client-Certificate    $ssl_client_escaped_cert;
-
-        proxy_read_timeout 300;
-
-        proxy_pass http://gitlab-workhorse;
-    }
-}
-```
-
 ## Configure GitLab for smartcard authentication
+
+**For Omnibus installations**
+
+1. Edit `/etc/gitlab/gitlab.rb`:
+
+    ```ruby
+    gitlab_rails['smartcard_enabled'] = true
+    gitlab_rails['smartcard_ca_file'] = "/etc/ssl/certs/CA.pem"
+    gitlab_rails['smartcard_client_certificate_required_port'] = 3444
+    ```
+
+1. Save the file and [reconfigure](../restart_gitlab.md#omnibus-gitlab-reconfigure)
+   GitLab for the changes to take effect.
+
+---
 
 **For installations from source**
 
+1. Configure NGINX to request a client side certificate
+
+   In NGINX configuration, an **additional** server context must be defined with
+   the same configuration except:
+
+   - The additional NGINX server context must be configured to run on a different
+     port:
+
+     ```
+     listen *:3444 ssl;
+     ```
+
+   - The additional NGINX server context must be configured to require the client
+     side certificate:
+
+     ```
+     ssl_verify_depth 2;
+     ssl_client_certificate /etc/ssl/certs/CA.pem;
+     ssl_verify_client on;
+     ```
+
+   - The additional NGINX server context must be configured to forward the client
+     side certificate:
+
+     ```
+     proxy_set_header    X-SSL-Client-Certificate    $ssl_client_escaped_cert;
+     ```
+
+   For example, the following is an example server context in an NGINX
+   configuration file (eg. in `/etc/nginx/sites-available/gitlab-ssl`):
+
+   ```
+   server {
+       listen *:3444 ssl;
+
+       # certificate for configuring SSL
+       ssl_certificate /path/to/example.com.crt;
+       ssl_certificate_key /path/to/example.com.key;
+
+       ssl_verify_depth 2;
+       # CA certificate for client side certificate verification
+       ssl_client_certificate /etc/ssl/certs/CA.pem;
+       ssl_verify_client on;
+
+       location / {
+           proxy_set_header    Host                        $http_host;
+           proxy_set_header    X-Real-IP                   $remote_addr;
+           proxy_set_header    X-Forwarded-For             $proxy_add_x_forwarded_for;
+           proxy_set_header    X-Forwarded-Proto           $scheme;
+           proxy_set_header    Upgrade                     $http_upgrade;
+           proxy_set_header    Connection                  $connection_upgrade;
+
+           proxy_set_header    X-SSL-Client-Certificate    $ssl_client_escaped_cert;
+
+           proxy_read_timeout 300;
+
+           proxy_pass http://gitlab-workhorse;
+       }
+   }
+   ```
+
 1. Edit `config/gitlab.yml`:
 
-  ```yaml
-  ## Smartcard authentication settings
-  smartcard:
-    # Allow smartcard authentication
-    enabled: true
+   ```yaml
+   ## Smartcard authentication settings
+   smartcard:
+     # Allow smartcard authentication
+     enabled: true
 
-    # Path to a file containing a CA certificate
-    ca_file: '/etc/ssl/certs/CA.pem'
+     # Path to a file containing a CA certificate
+     ca_file: '/etc/ssl/certs/CA.pem'
 
-    # Port where the client side certificate is requested by NGINX
-    client_certificate_required_port: 3444
-  ```
+     # Port where the client side certificate is requested by NGINX
+     client_certificate_required_port: 3444
+   ```
 
-1. Save the file and restart GitLab for the changes to take effect.
+1. Save the file and [restart](../restart_gitlab.md#installations-from-source)
+   GitLab for the changes to take effect.

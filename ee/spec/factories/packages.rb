@@ -3,10 +3,14 @@ FactoryBot.define do
   factory :package, class: Packages::Package do
     project
     name 'my/company/app/my-app'
-    version '1-0-SNAPSHOT'
+    version '1.0-SNAPSHOT'
 
     factory :maven_package do
       maven_metadatum
+
+      after :build do |package|
+        package.maven_metadatum.path = "#{package.name}/#{package.version}"
+      end
 
       after :create do |package|
         create :package_file, :xml, package: package

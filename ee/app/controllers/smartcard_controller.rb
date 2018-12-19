@@ -8,7 +8,7 @@ class SmartcardController < ApplicationController
   before_action :check_certificate_headers
 
   def auth
-    certificate = Gitlab::Auth::Smartcard::Certificate.new(CGI.unescape(certificate_header))
+    certificate = Gitlab::Auth::Smartcard::Certificate.new(certificate_header)
 
     user = certificate.find_or_create_user
     unless user
@@ -40,7 +40,17 @@ class SmartcardController < ApplicationController
   end
 
   def certificate_header
-    request.headers['HTTP_X_SSL_CLIENT_CERTIFICATE']
+    header = request.headers['HTTP_X_SSL_CLIENT_CERTIFICATE']
+    return unless header
+
+    unescaped_header = CGI.unescape(header)
+    if unescaped_header.include?("\n")
+      # NGINX forwarding the $ssl_client_escaped_cert variable
+      unescaped_header
+    else
+      # older version of NGINX forwarding the now deprecated $ssl_client_cert variable
+      header.gsub(/ (?!CERTIFICATE)/, "\n")
+    end
   end
 
   def after_sign_in_path_for(resource)

@@ -32,9 +32,11 @@ describe Projects::VariablesController do
 
     subject do
       patch :update,
-        namespace_id: project.namespace.to_param,
-        project_id: project,
-        variables_attributes: variables_attributes,
+        params: {
+          namespace_id: project.namespace.to_param,
+          project_id: project,
+          variables_attributes: variables_attributes
+        },
         format: :json
     end
 

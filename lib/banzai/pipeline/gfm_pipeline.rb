@@ -31,6 +31,7 @@ module Banzai
           Filter::TableOfContentsFilter,
           Filter::AutolinkFilter,
           Filter::ExternalLinkFilter,
+          Filter::SuggestionFilter,
 
           *reference_filters,
 

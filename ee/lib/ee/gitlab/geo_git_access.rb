@@ -2,7 +2,7 @@ module EE
   module Gitlab
     module GeoGitAccess
       include ::Gitlab::ConfigHelper
-      include ::EE::GitlabRoutingHelper
+      include ::EE::GitlabRoutingHelper # rubocop: disable Cop/InjectEnterpriseEditionModule
       include GrapePathHelpers::NamedRouteMatcher
       extend ::Gitlab::Utils::Override
 

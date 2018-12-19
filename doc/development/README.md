@@ -55,7 +55,6 @@ description: 'Learn how to contribute to GitLab.'
 - [Guidelines for reusing abstractions](reusing_abstractions.md)
 - [DeclarativePolicy framework](policies.md)
 - [Geo development](geo.md)
-- [Switching to Rails 5](switching_to_rails5.md)
 
 ## Performance guides
 

@@ -52,7 +52,7 @@ module ProtectedRefAccess
 end
 
 ProtectedRefAccess.include(EE::ProtectedRefAccess::Scopes)
-ProtectedRefAccess.prepend(EE::ProtectedRefAccess)
+ProtectedRefAccess.prepend(EE::ProtectedRefAccess) # rubocop: disable Cop/InjectEnterpriseEditionModule
 
 # When using `prepend` (or `include` for that matter), the `ClassMethods`
 # constants are not merged. This means that `class_methods` in

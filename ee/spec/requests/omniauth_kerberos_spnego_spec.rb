@@ -24,7 +24,7 @@ describe 'OmniAuth Kerberos SPNEGO' do
       expect_any_instance_of(controller_class).to receive(:spnego_credentials!)
         .with('fake spnego token')
 
-      get path, {}, spnego_header
+      get path, params: {}, headers: spnego_header
     end
   end
 
@@ -35,13 +35,13 @@ describe 'OmniAuth Kerberos SPNEGO' do
     end
 
     it 'redirects to the omniauth callback' do
-      get path, {}, spnego_header
+      get path, params: {}, headers: spnego_header
 
       expect(response).to redirect_to('/users/auth/kerberos_spnego/callback')
     end
 
     it 'stores the users principal name in the session' do
-      get path, {}, spnego_header
+      get path, params: {}, headers: spnego_header
 
       expect(session[:kerberos_spnego_principal_name]).to eq('janedoe@EXAMPLE.COM')
     end
@@ -50,7 +50,7 @@ describe 'OmniAuth Kerberos SPNEGO' do
       allow_any_instance_of(controller_class).to receive(:spnego_response_token)
         .and_return("it's the final token")
 
-      get path, {}, spnego_header
+      get path, params: {}, headers: spnego_header
 
       expect(response.header['Www-Authenticate']).to eq(
         "Negotiate #{Base64.strict_encode64("it's the final token")}"

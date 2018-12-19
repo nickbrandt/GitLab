@@ -12,9 +12,6 @@ class ApplicationController < ActionController::Base
   include EnforcesTwoFactorAuthentication
   include WithPerformanceBar
   include SessionlessAuthentication
-  # this can be removed after switching to rails 5
-  # https://gitlab.com/gitlab-org/gitlab-ce/issues/51908
-  include InvalidUTF8ErrorHandler unless Gitlab.rails5?
 
   before_action :authenticate_user!
   before_action :enforce_terms!, if: :should_enforce_terms?
@@ -154,14 +151,10 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def verify_namespace_plan_check_enabled
-    render_404 unless Gitlab::CurrentSettings.should_check_namespace_plan?
-  end
-
   def log_exception(exception)
     Gitlab::Sentry.track_acceptable_exception(exception)
 
-    backtrace_cleaner = Gitlab.rails5? ? request.env["action_dispatch.backtrace_cleaner"] : env
+    backtrace_cleaner = request.env["action_dispatch.backtrace_cleaner"]
     application_trace = ActionDispatch::ExceptionWrapper.new(backtrace_cleaner, exception).application_trace
     application_trace.map! { |t| "  #{t}\n" }
     logger.error "\n#{exception.class.name} (#{exception.message}):\n#{application_trace.join}"
@@ -172,11 +165,7 @@ class ApplicationController < ActionController::Base
   end
 
   def after_sign_out_path_for(resource)
-    if Gitlab::Geo.secondary?
-      Gitlab::Geo.primary_node.oauth_logout_url(@geo_logout_state)
-    else
-      Gitlab::CurrentSettings.after_sign_out_path.presence || new_user_session_path
-    end
+    Gitlab::CurrentSettings.after_sign_out_path.presence || new_user_session_path
   end
 
   def can?(object, action, subject = :global)
@@ -500,3 +489,5 @@ class ApplicationController < ActionController::Base
     Gitlab::Sentry.context(current_user)
   end
 end
+
+ApplicationController.prepend(EE::ApplicationController)

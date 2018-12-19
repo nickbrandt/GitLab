@@ -58,6 +58,11 @@ export default {
       type: Object,
       required: true,
     },
+    line: {
+      type: Object,
+      required: false,
+      default: null,
+    },
     renderDiffFile: {
       type: Boolean,
       required: false,
@@ -72,6 +77,11 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+    helpPagePath: {
+      type: String,
+      required: false,
+      default: '',
     },
   },
   data() {
@@ -203,6 +213,13 @@ export default {
         },
         false,
       );
+    },
+    diffLine() {
+      if (this.discussion.diff_discussion && this.discussion.truncated_diff_lines) {
+        return this.discussion.truncated_diff_lines.slice(-1)[0];
+      }
+
+      return this.line;
     },
   },
   watch: {
@@ -367,8 +384,18 @@ Please check your network connection and try again.`;
                   <component
                     :is="componentName(initialDiscussion)"
                     :note="componentData(initialDiscussion)"
+                    :line="line"
+                    :help-page-path="helpPagePath"
                     @handleDeleteNote="deleteNoteHandler"
                   >
+                    <note-edited-text
+                      v-if="discussion.resolved"
+                      slot="discussion-resolved-text"
+                      :edited-at="discussion.resolved_at"
+                      :edited-by="discussion.resolved_by"
+                      :action-text="resolvedText"
+                      class-name="discussion-headline-light js-discussion-headline discussion-resolved-text"
+                    />
                     <slot slot="avatar-badge" name="avatar-badge"></slot>
                   </component>
                   <toggle-replies-widget
@@ -383,6 +410,8 @@ Please check your network connection and try again.`;
                       v-for="note in replies"
                       :key="note.id"
                       :note="componentData(note)"
+                      :help-page-path="helpPagePath"
+                      :line="line"
                       @handleDeleteNote="deleteNoteHandler"
                     />
                   </template>
@@ -393,6 +422,8 @@ Please check your network connection and try again.`;
                     v-for="(note, index) in discussion.notes"
                     :key="note.id"
                     :note="componentData(note)"
+                    :help-page-path="helpPagePath"
+                    :line="diffLine"
                     @handleDeleteNote="deleteNoteHandler"
                   >
                     <slot v-if="index === 0" slot="avatar-badge" name="avatar-badge"></slot>
@@ -405,7 +436,7 @@ Please check your network connection and try again.`;
                 :draft="draftForDiscussion(discussion.reply_id)"
               />
               <div
-                v-else-if="!isRepliesCollapsed"
+                v-else-if="!isRepliesCollapsed || !hasReplies"
                 :class="{ 'is-replying': isReplying }"
                 class="discussion-reply-holder"
               >
@@ -462,6 +493,7 @@ Please check your network connection and try again.`;
                   ref="noteForm"
                   :discussion="discussion"
                   :is-editing="false"
+                  :line="diffLine"
                   save-button-title="Comment"
                   @handleFormUpdateAddToReview="addReplyToReview"
                   @handleFormUpdate="saveReply"

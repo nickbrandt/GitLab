@@ -9,7 +9,7 @@ describe Admin::UsersController do
   end
 
   describe 'POST #reset_runner_minutes' do
-    subject { post :reset_runners_minutes, id: user }
+    subject { post :reset_runners_minutes, params: { id: user } }
 
     before do
       allow_any_instance_of(ClearNamespaceSharedRunnersMinutesService)

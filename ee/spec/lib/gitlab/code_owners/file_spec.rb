@@ -17,15 +17,15 @@ describe Gitlab::CodeOwners::File do
   describe '#parsed_data' do
     it 'parses all the required lines' do
       expected_patterns = [
-        '*', '**#file_with_pound.rb', '*.rb', '**CODEOWNERS', '**LICENSE', 'docs/',
-        'docs/*', 'config/', '**lib/', '**path with spaces/'
+        '/**/*', '/**/#file_with_pound.rb', '/**/*.rb', '/**/CODEOWNERS', '/**/LICENSE', '/docs/**/*',
+        '/docs/*', '/config/**/*', '/**/lib/**/*', '/**/path with spaces/**/*'
       ]
       expect(file.parsed_data.keys)
         .to contain_exactly(*expected_patterns)
     end
 
     it 'allows usernames and emails' do
-      expect(file.parsed_data['**LICENSE']).to include('legal', 'janedoe@gitlab.com')
+      expect(file.parsed_data['/**/LICENSE']).to include('legal', 'janedoe@gitlab.com')
     end
 
     context 'when there are entries that do not look like user references' do
@@ -34,7 +34,7 @@ describe Gitlab::CodeOwners::File do
       end
 
       it 'ignores the entries' do
-        expect(file.parsed_data['**a-path/']).to include('username', 'email@gitlab.org')
+        expect(file.parsed_data['/**/a-path/**/*']).to include('username', 'email@gitlab.org')
       end
     end
   end
@@ -158,6 +158,41 @@ describe Gitlab::CodeOwners::File do
 
         expect(owners).to include('user-1', 'user-2', 'email@gitlab.org')
         expect(owners).not_to include('username', 'and-email@lookalikes.com')
+      end
+    end
+
+    context 'a glob on the root directory' do
+      let(:file_content) do
+        '/* @user-1 @user-2'
+      end
+
+      it 'matches files in the root directory' do
+        owners = file.owners_for_path('README.md')
+
+        expect(owners).to include('user-1', 'user-2')
+      end
+
+      it 'does not match nested files' do
+        owners = file.owners_for_path('nested/path/README.md')
+
+        expect(owners).to be_nil
+      end
+    end
+
+    context 'partial matches' do
+      let(:file_content) do
+        'foo/* @user-1 @user-2'
+      end
+
+      it 'does not match a file in a folder that looks the same' do
+        owners = file.owners_for_path('fufoo/bar')
+
+        expect(owners).to be_nil
+      end
+
+      it 'matches the file in any folder' do
+        expect(file.owners_for_path('baz/foo/bar')).to include('user-1', 'user-2')
+        expect(file.owners_for_path('/foo/bar')).to include('user-1', 'user-2')
       end
     end
   end

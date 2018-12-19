@@ -12,8 +12,6 @@ module Ci
     include AtomicInternalId
     include EnumWithNil
 
-    prepend ::EE::Ci::Pipeline
-
     belongs_to :project, inverse_of: :all_pipelines
     belongs_to :user
     belongs_to :auto_canceled_by, class_name: 'Ci::Pipeline'
@@ -23,15 +21,6 @@ module Ci
     has_internal_id :iid, scope: :project, presence: false, init: ->(s) do
       s&.project&.all_pipelines&.maximum(:iid) || s&.project&.all_pipelines&.count
     end
-
-    has_one :source_pipeline, class_name: Ci::Sources::Pipeline
-    has_many :sourced_pipelines, class_name: Ci::Sources::Pipeline, foreign_key: :source_pipeline_id
-
-    has_one :triggered_by_pipeline, through: :source_pipeline, source: :source_pipeline
-    has_many :triggered_pipelines, through: :sourced_pipelines, source: :pipeline
-
-    has_many :auto_canceled_pipelines, class_name: 'Ci::Pipeline', foreign_key: 'auto_canceled_by_id'
-    has_many :auto_canceled_jobs, class_name: 'CommitStatus', foreign_key: 'auto_canceled_by_id'
 
     has_many :stages, -> { order(position: :asc) }, inverse_of: :pipeline
     has_many :statuses, class_name: 'CommitStatus', foreign_key: :commit_id, inverse_of: :pipeline
@@ -67,11 +56,7 @@ module Ci
     validates :tag, inclusion: { in: [false], if: :merge_request? }
     validates :status, presence: { unless: :importing? }
     validate :valid_commit_sha, unless: :importing?
-
-    # Replace validator below with
-    # `validates :source, presence: { unless: :importing? }, on: :create`
-    # when removing Gitlab.rails5? code.
-    validate :valid_source, unless: :importing?, on: :create
+    validates :source, exclusion: { in: %w(unknown), unless: :importing? }, on: :create
 
     after_create :keep_around_commits, unless: :importing?
 
@@ -79,12 +64,7 @@ module Ci
     # this `Hash` with new values.
     enum_with_nil source: ::Ci::PipelineEnums.sources
 
-    enum_with_nil config_source: {
-      unknown_source: nil,
-      repository_source: 1,
-      auto_devops_source: 2,
-      webide_source: 3 ## EE-specific
-    }
+    enum_with_nil config_source: ::Ci::PipelineEnums.config_sources
 
     # We use `Ci::PipelineEnums.failure_reasons` here so that EE can more easily
     # extend this `Hash` with new values.
@@ -754,11 +734,7 @@ module Ci
 
       project.repository.keep_around(self.sha, self.before_sha)
     end
-
-    def valid_source
-      if source.nil? || source == "unknown"
-        errors.add(:source, "invalid source")
-      end
-    end
   end
 end
+
+Ci::Pipeline.prepend(EE::Ci::Pipeline)

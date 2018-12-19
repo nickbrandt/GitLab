@@ -45,7 +45,7 @@ describe Boards::ListsController do
     def read_board_list(user:, board:)
       sign_in(user)
 
-      get :index, board_id: board.to_param, format: :json
+      get :index, params: { board_id: board.to_param }, format: :json
     end
   end
 
@@ -99,8 +99,10 @@ describe Boards::ListsController do
     def create_board_list(user:, board:, label_id:)
       sign_in(user)
 
-      post :create, board_id: board.to_param,
-                    list: { label_id: label_id },
+      post :create, params: {
+                      board_id: board.to_param,
+                      list: { label_id: label_id }
+                    },
                     format: :json
     end
   end
@@ -156,11 +158,7 @@ describe Boards::ListsController do
         format: :json
       }
 
-      if Gitlab.rails5?
-        patch :update, params: params, as: :json
-      else
-        patch :update, params
-      end
+      patch :update, params: params, as: :json
     end
   end
 
@@ -198,8 +196,10 @@ describe Boards::ListsController do
     def remove_board_list(user:, board:, list:)
       sign_in(user)
 
-      delete :destroy, board_id: board.to_param,
-                       id: list.to_param,
+      delete :destroy, params: {
+                         board_id: board.to_param,
+                         id: list.to_param
+                       },
                        format: :json
     end
   end

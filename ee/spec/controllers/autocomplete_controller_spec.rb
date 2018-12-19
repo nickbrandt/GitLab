@@ -16,7 +16,7 @@ describe AutocompleteController do
 
       describe "GET #users that can push to protected branches" do
         before do
-          get(:users, project_id: project.id, push_code_to_protected_branches: 'true')
+          get(:users, params: { project_id: project.id, push_code_to_protected_branches: 'true' })
         end
 
         it 'returns authorized users', :aggregate_failures do
@@ -31,7 +31,7 @@ describe AutocompleteController do
 
         before do
           project.add_reporter(reporter_user)
-          get(:users, project_id: project.id, push_code: 'true')
+          get(:users, params: { project_id: project.id, push_code: 'true' })
         end
 
         it 'returns authorized users', :aggregate_failures do
@@ -43,7 +43,7 @@ describe AutocompleteController do
 
       describe "GET #users that can push to protected branches, including the current user" do
         before do
-          get(:users, project_id: project.id, push_code_to_protected_branches: true, current_user: true)
+          get(:users, params: { project_id: project.id, push_code_to_protected_branches: true, current_user: true })
         end
 
         it 'returns authorized users', :aggregate_failures do
@@ -67,7 +67,7 @@ describe AutocompleteController do
     context "while fetching all groups belonging to a project" do
       before do
         sign_in(user)
-        get(:project_groups, project_id: project.id)
+        get(:project_groups, params: { project_id: project.id })
       end
 
       it 'returns a single group', :aggregate_failures do
@@ -80,7 +80,7 @@ describe AutocompleteController do
     context "while fetching all groups belonging to a project the current user cannot access" do
       before do
         sign_in(user2)
-        get(:project_groups, project_id: project.id)
+        get(:project_groups, params: { project_id: project.id })
       end
 
       it { expect(response).to be_not_found }
@@ -89,7 +89,7 @@ describe AutocompleteController do
     context "while fetching all groups belonging to an invalid project ID" do
       before do
         sign_in(user)
-        get(:project_groups, project_id: 'invalid')
+        get(:project_groups, params: { project_id: 'invalid' })
       end
 
       it { expect(response).to be_not_found }

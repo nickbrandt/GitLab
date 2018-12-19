@@ -30,7 +30,7 @@ describe ProjectsController do
       end
 
       it 'has mirror enabled in new project' do
-        post :create, project: params
+        post :create, params: { project: params }
 
         created_project = Project.find_by_path('foo')
         expect(created_project.reload.mirror).to be true
@@ -44,7 +44,7 @@ describe ProjectsController do
       end
 
       it 'has mirror disabled in new project' do
-        post :create, project: params
+        post :create, params: { project: params }
 
         created_project = Project.find_by_path('foo')
         expect(created_project.reload.mirror).to be false
@@ -77,7 +77,7 @@ describe ProjectsController do
           end
 
           it 'creates the project from project template' do
-            post :create, project: templates_params
+            post :create, params: { project: templates_params }
 
             created_project = Project.find_by_path('foo')
             expect(flash[:notice]).to eq "Project 'foo' was successfully created."
@@ -92,7 +92,7 @@ describe ProjectsController do
         end
 
         it 'creates the project from project template' do
-          post :create, project: templates_params
+          post :create, params: { project: templates_params }
 
           created_project = Project.find_by_path('foo')
           expect(flash[:notice]).to eq "Project 'foo' was successfully created."
@@ -109,9 +109,11 @@ describe ProjectsController do
       }
 
       put :update,
-          namespace_id: project.namespace,
-          id: project,
-          project: params
+          params: {
+            namespace_id: project.namespace,
+            id: project,
+            project: params
+          }
       project.reload
 
       expect(response).to have_gitlab_http_status(302)
@@ -130,9 +132,11 @@ describe ProjectsController do
       }
 
       put :update,
-          namespace_id: project.namespace,
-          id: project,
-          project: params
+          params: {
+            namespace_id: project.namespace,
+            id: project,
+            project: params
+          }
       project.reload
 
       expect(response).to have_gitlab_http_status(302)
@@ -147,9 +151,11 @@ describe ProjectsController do
       }
 
       put :update,
-          namespace_id: project.namespace,
-          id: project,
-          project: params
+          params: {
+            namespace_id: project.namespace,
+            id: project,
+            project: params
+          }
       project.reload
 
       expect(response).to have_gitlab_http_status(302)
@@ -167,9 +173,11 @@ describe ProjectsController do
       }
 
       put :update,
-          namespace_id: project.namespace,
-          id: project,
-          project: params
+          params: {
+            namespace_id: project.namespace,
+            id: project,
+            project: params
+          }
       project.reload
 
       expect(response).to have_gitlab_http_status(302)
@@ -195,9 +203,11 @@ describe ProjectsController do
           expect_any_instance_of(EE::ProjectImportState).to receive(:force_import_job!).once
 
           put :update,
-            namespace_id: project.namespace,
-            id: project,
-            project: params
+            params: {
+              namespace_id: project.namespace,
+              id: project,
+              project: params
+            }
           project.reload
 
           expect(project.mirror).to eq(true)
@@ -216,9 +226,11 @@ describe ProjectsController do
           params.each do |param, _value|
             expect do
               put :update,
-                namespace_id: project.namespace,
-                id: project,
-                project: params
+                params: {
+                  namespace_id: project.namespace,
+                  id: project,
+                  project: params
+                }
               project.reload
             end.not_to change(project, param)
           end
@@ -229,9 +241,11 @@ describe ProjectsController do
     it_behaves_like 'unauthorized when external service denies access' do
       subject do
         put :update,
-            namespace_id: project.namespace,
-            id: project,
-            project: { description: 'Hello world' }
+            params: {
+              namespace_id: project.namespace,
+              id: project,
+              project: { description: 'Hello world' }
+            }
         project.reload
       end
 

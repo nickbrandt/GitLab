@@ -225,4 +225,38 @@ describe Ci::Build do
       end
     end
   end
+
+  describe '#collect_license_management_reports!' do
+    subject { job.collect_license_management_reports!(license_management_report) }
+
+    let(:license_management_report) { Gitlab::Ci::Reports::LicenseManagement::Report.new }
+
+    it { expect(license_management_report.licenses.count).to eq(0) }
+
+    context 'when build has a license management report' do
+      context 'when there is a license management report' do
+        before do
+          create(:ee_ci_job_artifact, :license_management_report, job: job, project: job.project)
+        end
+
+        it 'parses blobs and add the results to the report' do
+          expect { subject }.not_to raise_error
+
+          expect(license_management_report.licenses.count).to eq(4)
+          expect(license_management_report.licenses[0].name).to eq('MIT')
+          expect(license_management_report.licenses[0].dependencies.count).to eq(52)
+        end
+      end
+
+      context 'when there is a corrupted license management report' do
+        before do
+          create(:ee_ci_job_artifact, :corrupted_license_management_report, job: job, project: job.project)
+        end
+
+        it 'raises an error' do
+          expect { subject }.to raise_error(Gitlab::Ci::Parsers::LicenseManagement::LicenseManagement::LicenseManagementParserError)
+        end
+      end
+    end
+  end
 end

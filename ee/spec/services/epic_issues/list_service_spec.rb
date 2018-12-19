@@ -7,9 +7,12 @@ describe EpicIssues::ListService do
   let(:other_project) { create(:project_empty_repo, group: group) }
   let(:epic) { create(:epic, group: group) }
 
-  let(:issue1) { create :issue, project: project, weight: 1 }
-  let(:issue2) { create :issue, project: project }
-  let(:issue3) { create :issue, project: other_project }
+  # Reloading issues here is needed because when storing datetime on postgres
+  # nanoseconds precision is ignored when fetching records but not when inserting,
+  # which makes the expectations fails for created_at field.
+  let!(:issue1) { create(:issue, project: project, weight: 1).reload }
+  let!(:issue2) { create(:issue, project: project).reload }
+  let!(:issue3) { create(:issue, project: other_project).reload }
 
   let!(:epic_issue1) { create(:epic_issue, issue: issue1, epic: epic, relative_position: 2) }
   let!(:epic_issue2) { create(:epic_issue, issue: issue2, epic: epic, relative_position: 1) }
@@ -81,7 +84,7 @@ describe EpicIssues::ListService do
               relation_path: "/groups/#{group.full_path}/-/epics/#{epic.iid}/issues/#{epic_issue2.id}",
               epic_issue_id: epic_issue2.id,
               due_date: nil,
-              created_at: issue2.created_at.to_s,
+              created_at: issue2.created_at,
               closed_at: issue2.closed_at
             },
             {
@@ -97,7 +100,7 @@ describe EpicIssues::ListService do
               relation_path: "/groups/#{group.full_path}/-/epics/#{epic.iid}/issues/#{epic_issue1.id}",
               epic_issue_id: epic_issue1.id,
               due_date: nil,
-              created_at: issue1.created_at.to_s,
+              created_at: issue1.created_at,
               closed_at: issue1.closed_at
             },
             {
@@ -113,7 +116,7 @@ describe EpicIssues::ListService do
               relation_path: "/groups/#{group.full_path}/-/epics/#{epic.iid}/issues/#{epic_issue3.id}",
               epic_issue_id: epic_issue3.id,
               due_date: nil,
-              created_at: issue3.created_at.to_s,
+              created_at: issue3.created_at,
               closed_at: issue3.closed_at
             }
           ]
@@ -142,7 +145,7 @@ describe EpicIssues::ListService do
               relation_path: nil,
               epic_issue_id: epic_issue2.id,
               due_date: nil,
-              created_at: issue2.created_at.to_s,
+              created_at: issue2.created_at,
               closed_at: issue2.closed_at
             },
             {
@@ -158,7 +161,7 @@ describe EpicIssues::ListService do
               relation_path: nil,
               epic_issue_id: epic_issue1.id,
               due_date: nil,
-              created_at: issue1.created_at.to_s,
+              created_at: issue1.created_at,
               closed_at: issue1.closed_at
             }
           ]

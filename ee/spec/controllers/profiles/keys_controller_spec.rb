@@ -11,7 +11,7 @@ describe Profiles::KeysController do
 
       key = build(:key)
 
-      expect { post :create, key: key.attributes }.to change { SecurityEvent.count }.by(1)
+      expect { post :create, params: { key: key.attributes } }.to change { SecurityEvent.count }.by(1)
     end
   end
 end

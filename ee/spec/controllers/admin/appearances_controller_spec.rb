@@ -23,7 +23,7 @@ describe Admin::AppearancesController do
       it 'creates appearance with footer and header message' do
         stub_licensed_features(system_header_footer: true)
 
-        post :create, appearance: create_params
+        post :create, params: { appearance: create_params }
 
         expect(Appearance.current).to have_attributes(
           header_message: header_message,
@@ -36,7 +36,7 @@ describe Admin::AppearancesController do
       it 'does not create appearance with footer and header message' do
         stub_licensed_features(system_header_footer: false)
 
-        post :create, appearance: create_params
+        post :create, params: { appearance: create_params }
 
         expect(Appearance.current).to have_attributes(
           header_message: nil,
@@ -64,7 +64,7 @@ describe Admin::AppearancesController do
       it 'updates appearance with footer and header message' do
         stub_licensed_features(system_header_footer: true)
 
-        put :update, appearance: update_params
+        put :update, params: { appearance: update_params }
 
         expect(Appearance.current).to have_attributes(
           header_message: header_message,
@@ -77,7 +77,7 @@ describe Admin::AppearancesController do
       it 'does not update appearance with footer and header message' do
         stub_licensed_features(system_header_footer: false)
 
-        post :create, appearance: update_params
+        post :create, params: { appearance: update_params }
 
         expect(Appearance.current).to have_attributes(
           header_message: nil,

@@ -43,7 +43,7 @@ describe Projects::ManagedLicensesController do
     subject do
       allow(controller).to receive(:current_user).and_return(user)
 
-      get :index, namespace_id: project.namespace.to_param, project_id: project, format: :json
+      get :index, params: { namespace_id: project.namespace.to_param, project_id: project }, format: :json
     end
 
     context 'with license management not available' do
@@ -101,9 +101,11 @@ describe Projects::ManagedLicensesController do
       allow(controller).to receive(:current_user).and_return(user)
 
       get :show,
-        namespace_id: project.namespace.to_param,
-        project_id: project,
-        id: software_license_policy.id,
+        params: {
+          namespace_id: project.namespace.to_param,
+          project_id: project,
+          id: software_license_policy.id
+        },
         format: :json
     end
 
@@ -152,9 +154,11 @@ describe Projects::ManagedLicensesController do
       allow(controller).to receive(:current_user).and_return(user)
 
       get :show,
-          namespace_id: project.namespace.to_param,
-          project_id: project,
-          id: CGI.escape(software_license_policy.name),
+          params: {
+            namespace_id: project.namespace.to_param,
+            project_id: project,
+            id: CGI.escape(software_license_policy.name)
+          },
           format: :json
     end
 
@@ -188,9 +192,11 @@ describe Projects::ManagedLicensesController do
       allow(controller).to receive(:current_user).and_return(user)
 
       post :create,
-        namespace_id: project.namespace.to_param,
-        project_id: project,
-        managed_license: to_create_software_license_policy_attributes,
+        params: {
+          namespace_id: project.namespace.to_param,
+          project_id: project,
+          managed_license: to_create_software_license_policy_attributes
+        },
         format: :json
     end
 
@@ -297,10 +303,12 @@ describe Projects::ManagedLicensesController do
       allow(controller).to receive(:current_user).and_return(user)
 
       patch :update,
-        namespace_id: project.namespace.to_param,
-        project_id: project,
-        id: software_license_policy.id,
-        managed_license: modified_software_license_policy_attributes,
+        params: {
+          namespace_id: project.namespace.to_param,
+          project_id: project,
+          id: software_license_policy.id,
+          managed_license: modified_software_license_policy_attributes
+        },
         format: :json
     end
 
@@ -401,9 +409,11 @@ describe Projects::ManagedLicensesController do
       allow(controller).to receive(:current_user).and_return(user)
 
       delete :destroy,
-        namespace_id: project.namespace.to_param,
-        project_id: project,
-        id: id_to_destroy,
+        params: {
+          namespace_id: project.namespace.to_param,
+          project_id: project,
+          id: id_to_destroy
+        },
         format: :json
     end
 

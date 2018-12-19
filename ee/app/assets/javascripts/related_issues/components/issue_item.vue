@@ -103,6 +103,7 @@ export default {
             v-if="weight"
             :weight="weight"
             class="item-weight d-flex align-items-center"
+            tag-name="span"
           />
         </div>
         <issue-assignees

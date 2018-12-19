@@ -126,6 +126,8 @@ module IssuableCollections
     sort_param = params[:sort]
     sort_param ||= user_preference[issuable_sorting_field]
 
+    return sort_param if Gitlab::Database.read_only?
+
     if user_preference[issuable_sorting_field] != sort_param
       user_preference.update_attribute(issuable_sorting_field, sort_param)
     end
@@ -198,5 +200,3 @@ module IssuableCollections
                                 end
   end
 end
-
-IssuableCollections.prepend(EE::IssuableCollections)

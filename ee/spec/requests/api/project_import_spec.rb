@@ -24,10 +24,12 @@ describe API::ProjectImport do
 
       Sidekiq::Testing.inline! do
         post api('/projects/import', user),
-             path: 'test-import',
-             file: fixture_file_upload(file),
-             namespace: namespace.id,
-             override_params: override_params
+             params: {
+               path: 'test-import',
+               file: fixture_file_upload(file),
+               namespace: namespace.id,
+               override_params: override_params
+             }
       end
       import_project = Project.find(json_response['id'])
 

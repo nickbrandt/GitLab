@@ -5,7 +5,7 @@ module Gitlab
     module Parsers
       module Security
         class Common
-          SecurityReportParserError = Class.new(StandardError)
+          SecurityReportParserError = Class.new(Gitlab::Ci::Parsers::ParserError)
 
           def parse!(json_data, report)
             vulnerabilities = JSON.parse!(json_data)
@@ -15,7 +15,8 @@ module Gitlab
             end
           rescue JSON::ParserError
             raise SecurityReportParserError, 'JSON parsing failed'
-          rescue
+          rescue => e
+            Gitlab::Sentry.track_exception(e)
             raise SecurityReportParserError, "#{report.type} security report parsing failed"
           end
 

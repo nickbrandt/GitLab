@@ -28,7 +28,7 @@ describe API::License, api: true  do
 
   describe 'POST /license' do
     it 'adds a new license if admin is logged in' do
-      post api('/license', admin), license: gl_license.export
+      post api('/license', admin), params: { license: gl_license.export }
 
       expect(response.status).to eq 201
       expect(json_response['user_limit']).to eq 0
@@ -39,13 +39,13 @@ describe API::License, api: true  do
     end
 
     it 'denies access if not admin' do
-      post api('/license', user), license: license
+      post api('/license', user), params: { license: license }
 
       expect(response.status).to eq 403
     end
 
     it 'returns 400 if the license cannot be saved' do
-      post api('/license', admin), license: 'foo'
+      post api('/license', admin), params: { license: 'foo' }
 
       expect(response.status).to eq(400)
     end

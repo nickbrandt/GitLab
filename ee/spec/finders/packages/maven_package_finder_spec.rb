@@ -2,20 +2,56 @@
 require 'spec_helper'
 
 describe Packages::MavenPackageFinder do
-  let(:project) { create(:project) }
+  let(:user)    { create(:user) }
+  let(:group)   { create(:group) }
+  let(:project) { create(:project, namespace: group) }
   let(:package) { create(:maven_package, project: project) }
 
-  describe '#execute!' do
-    it 'returns a package' do
-      finder = described_class.new(project, package.maven_metadatum.path)
+  before do
+    group.add_developer(user)
+  end
 
-      expect(finder.execute!).to eq(package)
+  describe '#execute!' do
+    context 'within the project' do
+      it 'returns a package' do
+        finder = described_class.new(package.maven_metadatum.path, user, project: project)
+
+        expect(finder.execute!).to eq(package)
+      end
+
+      it 'raises an error' do
+        finder = described_class.new('com/example/my-app/1.0-SNAPSHOT', user, project: project)
+
+        expect { finder.execute! }.to raise_error(ActiveRecord::RecordNotFound)
+      end
     end
 
-    it 'raises an error' do
-      finder = described_class.new(project, 'com/example/my-app/1.0-SNAPSHOT')
+    context 'across all projects' do
+      it 'returns a package' do
+        finder = described_class.new(package.maven_metadatum.path, user)
 
-      expect { finder.execute! }.to raise_error(ActiveRecord::RecordNotFound)
+        expect(finder.execute!).to eq(package)
+      end
+
+      it 'raises an error' do
+        finder = described_class.new('com/example/my-app/1.0-SNAPSHOT', user)
+
+        expect { finder.execute! }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+
+    context 'within a group' do
+      it 'returns a package' do
+        finder = described_class.new(package.maven_metadatum.path, user, group: group)
+
+        expect(finder.execute!).to eq(package)
+      end
+
+      it 'raises an error' do
+        finder = described_class.new('com/example/my-app/1.0-SNAPSHOT', user, group: group)
+
+        expect { finder.execute! }.to raise_error(ActiveRecord::RecordNotFound)
+      end
     end
   end
 end

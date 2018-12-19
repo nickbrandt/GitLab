@@ -15,15 +15,15 @@ module Gitlab
     ).freeze
 
     def self.current_node
-      self.cache_value(:current_node) { GeoNode.current_node }
+      self.cache_value(:current_node, as: GeoNode) { GeoNode.current_node }
     end
 
     def self.primary_node
-      self.cache_value(:primary_node) { GeoNode.primary_node }
+      self.cache_value(:primary_node, as: GeoNode) { GeoNode.primary_node }
     end
 
     def self.secondary_nodes
-      self.cache_value(:secondary_nodes) { GeoNode.secondary_nodes }
+      self.cache_value(:secondary_nodes, as: GeoNode) { GeoNode.secondary_nodes }
     end
 
     def self.connected?
@@ -31,7 +31,7 @@ module Gitlab
     end
 
     def self.enabled?
-      cache_value(:node_enabled) { GeoNode.exists? }
+      self.cache_value(:node_enabled) { GeoNode.exists? }
     end
 
     def self.primary?
@@ -79,29 +79,29 @@ module Gitlab
       end
     end
 
-    def self.cache_key_for(key)
-      "geo:#{key}:#{Rails.version}"
+    def self.cache
+      @cache ||= Gitlab::JsonCache.new(namespace: :geo)
     end
 
-    def self.cache_value(raw_key, &block)
-      return yield unless Gitlab::SafeRequestStore.active?
+    def self.request_store_cache
+      @request_store_cache ||= Gitlab::JsonCache.new(namespace: :geo, backend: Gitlab::SafeRequestStore)
+    end
 
-      key = cache_key_for(raw_key)
+    def self.cache_value(key, as: nil, &block)
+      return yield unless request_store_cache.active?
 
-      Gitlab::SafeRequestStore.fetch(key) do
+      request_store_cache.fetch(key, as: as) do
         # We need a short expire time as we can't manually expire on a secondary node
-        Rails.cache.fetch(key, expires_in: 15.seconds) { yield }
+        cache.fetch(key, as: as, expires_in: 15.seconds) { yield }
       end
     end
 
     def self.expire_cache!
-      return true unless Gitlab::SafeRequestStore.active?
+      return true unless request_store_cache.active?
 
-      CACHE_KEYS.each do |raw_key|
-        key = cache_key_for(raw_key)
-
-        Rails.cache.delete(key)
-        Gitlab::SafeRequestStore.delete(key)
+      CACHE_KEYS.each do |key|
+        cache.expire(key)
+        request_store_cache.expire(key)
       end
 
       true

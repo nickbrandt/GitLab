@@ -53,9 +53,7 @@ module QA
           push.files = files
           push.commit_message = 'Add CODEOWNERS and test files'
         end
-        Page::Project::Show.perform do |project_page|
-          project_page.wait_for_push
-        end
+        @project.visit!
 
         # Check the files and code owners
         Page::Project::Show.perform do |project_page|

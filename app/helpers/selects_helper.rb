@@ -25,18 +25,9 @@ module SelectsHelper
     hidden_field_tag(id, value, html)
   end
 
-  def ldap_server_select_options
-    options_from_collection_for_select(
-      Gitlab::Auth::LDAP::Config.available_servers,
-      'provider_name',
-      'label'
-    )
-  end
-
   def groups_select_tag(id, opts = {})
     classes = Array.wrap(opts[:class])
     classes << 'ajax-groups-select'
-    classes << 'multiselect' if opts[:multiple]
 
     # EE requires this line to be present, but there is no easy way of injecting
     # this into EE without causing merge conflicts. Given this line is very
@@ -79,16 +70,8 @@ module SelectsHelper
 
     opts[:class] = klass_opts.join(' ')
     value = opts[:selected] || ''
+
     hidden_field_tag(id, value, opts)
-  end
-
-  def admin_email_select_tag(id, opts = {})
-    css_class = ["ajax-admin-email-select"]
-    css_class << "multiselect" if opts[:multiple]
-    css_class << opts[:class] if opts[:class]
-    value = opts[:selected] || ''
-
-    hidden_field_tag(id, value, class: css_class.join(' '))
   end
 
   private
@@ -106,3 +89,5 @@ module SelectsHelper
     }
   end
 end
+
+SelectsHelper.prepend(EE::SelectsHelper)

@@ -14,7 +14,7 @@ describe Projects::TracingsController do
       end
 
       it 'renders OK' do
-        get :show, namespace_id: project.namespace, project_id: project
+        get :show, params: { namespace_id: project.namespace, project_id: project }
 
         expect(response).to have_gitlab_http_status(200)
         expect(response).to render_template(:show)
@@ -30,7 +30,7 @@ describe Projects::TracingsController do
         end
 
         it 'returns 404' do
-          get :show, namespace_id: project.namespace, project_id: project
+          get :show, params: { namespace_id: project.namespace, project_id: project }
 
           expect(response).to have_gitlab_http_status(:not_found)
         end

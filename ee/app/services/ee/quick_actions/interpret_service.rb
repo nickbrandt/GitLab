@@ -10,7 +10,7 @@ module EE
       prepended do
         desc 'Change assignee(s)'
         explanation do
-          'Change assignee(s)'
+          'Change assignee(s).'
         end
         params '@user1 @user2'
         condition do
@@ -78,7 +78,7 @@ module EE
         end
 
         desc 'Approve a merge request'
-        explanation 'Approve the current merge request'
+        explanation 'Approve the current merge request.'
         condition do
           issuable.is_a?(MergeRequest) && issuable.persisted? && issuable.can_approve?(current_user)
         end
@@ -89,7 +89,7 @@ module EE
         end
 
         desc 'Promote issue to an epic'
-        explanation 'Promote issue to an epic'
+        explanation 'Promote issue to an epic.'
         warning 'may expose confidential information'
         condition do
           issuable.is_a?(Issue) &&

@@ -41,7 +41,7 @@ module Geo
 
     def prune!(relation, limit)
       unless delete_all?
-        relation = relation.up_to_event(event_log_min_id)
+        relation = relation.up_to_event(event_log_min_id - 1)
       end
 
       deleted = relation.delete_with_limit(limit)

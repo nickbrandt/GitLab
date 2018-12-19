@@ -20,19 +20,19 @@ describe Groups::EpicsController do
     end
 
     describe 'GET #index' do
-      subject { get :index, group_id: group }
+      subject { get :index, params: { group_id: group } }
 
       it_behaves_like '404 status'
     end
 
     describe 'GET #show' do
-      subject { get :show, group_id: group, id: epic.to_param }
+      subject { get :show, params: { group_id: group, id: epic.to_param } }
 
       it_behaves_like '404 status'
     end
 
     describe 'PUT #update' do
-      subject { put :update, group_id: group, id: epic.to_param }
+      subject { put :update, params: { group_id: group, id: epic.to_param } }
 
       it_behaves_like '404 status'
     end
@@ -52,7 +52,7 @@ describe Groups::EpicsController do
       end
 
       it "returns index" do
-        get :index, group_id: group
+        get :index, params: { group_id: group }
 
         expect(response).to have_gitlab_http_status(200)
       end
@@ -62,7 +62,7 @@ describe Groups::EpicsController do
           group.update!(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
           sign_out(user)
 
-          get :index, group_id: group, sort: 'start_date_asc'
+          get :index, params: { group_id: group, sort: 'start_date_asc' }
 
           expect(cookies['epic_sort']).to eq('start_date_asc')
           expect(response).to have_gitlab_http_status(200)
@@ -72,7 +72,7 @@ describe Groups::EpicsController do
       context 'when there is a logged in user' do
         context 'when epics_sort is nil' do
           it 'stores sorting param in user preferences' do
-            get :index, group_id: group, sort: 'start_date_asc'
+            get :index, params: { group_id: group, sort: 'start_date_asc' }
 
             expect(user.user_preference.epics_sort).to eq('start_date_asc')
             expect(response).to have_gitlab_http_status(200)
@@ -83,7 +83,7 @@ describe Groups::EpicsController do
           it 'update epics_sort with current value' do
             user.user_preference.update(epics_sort: 'created_desc')
 
-            get :index, group_id: group, sort: 'start_date_asc'
+            get :index, params: { group_id: group, sort: 'start_date_asc' }
 
             expect(user.reload.user_preference.epics_sort).to eq('start_date_asc')
             expect(response).to have_gitlab_http_status(200)
@@ -99,20 +99,20 @@ describe Groups::EpicsController do
         end
 
         it 'redirects to last_page if page number is larger than number of pages' do
-          get :index, group_id: group, page: (last_page + 1).to_param
+          get :index, params: { group_id: group, page: (last_page + 1).to_param }
 
           expect(response).to redirect_to(group_epics_path(page: last_page, state: controller.params[:state], scope: controller.params[:scope]))
         end
 
         it 'renders the specified page' do
-          get :index, group_id: group, page: last_page.to_param
+          get :index, params: { group_id: group, page: last_page.to_param }
 
           expect(assigns(:epics).current_page).to eq(last_page)
           expect(response).to have_gitlab_http_status(200)
         end
 
         it_behaves_like 'disabled when using an external authorization service' do
-          subject { get :index, group_id: group }
+          subject { get :index, params: { group_id: group } }
         end
       end
 
@@ -122,7 +122,7 @@ describe Groups::EpicsController do
         end
 
         def list_epics
-          get :index, group_id: group, format: :json
+          get :index, params: { group_id: group }, format: :json
         end
 
         it 'returns a list of epics' do
@@ -153,7 +153,7 @@ describe Groups::EpicsController do
           let!(:labeled_epic) { create(:labeled_epic, group: group, labels: [label]) }
 
           it 'returns all epics with given label' do
-            get :index, group_id: group, label_name: label.title, format: :json
+            get :index, params: { group_id: group, label_name: label.title }, format: :json
 
             expect(json_response.size).to eq(1)
             expect(json_response.first['id']).to eq(labeled_epic.id)
@@ -174,7 +174,7 @@ describe Groups::EpicsController do
           let(:issue) { create(:issue, project: project, description: "Project Issue") }
 
           it 'the link to the issue is included' do
-            get :discussions, group_id: group, id: epic.to_param
+            get :discussions, params: { group_id: group, id: epic.to_param }
 
             expect(response).to have_gitlab_http_status(200)
             expect(json_response.size).to eq(1)
@@ -201,7 +201,7 @@ describe Groups::EpicsController do
 
     describe 'GET #show' do
       def show_epic(format = :html)
-        get :show, group_id: group, id: epic.to_param, format: format
+        get :show, params: { group_id: group, id: epic.to_param }, format: format
       end
 
       context 'when format is HTML' do
@@ -316,12 +316,12 @@ describe Groups::EpicsController do
       end
 
       def update_epic(epic, params)
-        put :update, group_id: epic.group.to_param, id: epic.to_param, epic: params, format: :json
+        put :update, params: { group_id: epic.group.to_param, id: epic.to_param, epic: params }, format: :json
       end
     end
 
     describe 'GET #realtime_changes' do
-      subject { get :realtime_changes, group_id: group, id: epic.to_param }
+      subject { get :realtime_changes, params: { group_id: group, id: epic.to_param } }
 
       it 'returns epic' do
         group.add_developer(user)
@@ -348,7 +348,7 @@ describe Groups::EpicsController do
 
     describe '#create' do
       subject do
-        post :create, group_id: group, epic: { title: 'new epic', description: 'some descripition', label_ids: [label.id] }
+        post :create, params: { group_id: group, epic: { title: 'new epic', description: 'some descripition', label_ids: [label.id] } }
       end
 
       context 'when user has permissions to create an epic' do
@@ -382,7 +382,7 @@ describe Groups::EpicsController do
 
         context 'when required parameter is missing' do
           before do
-            post :create, group_id: group, epic: { description: 'some descripition' }
+            post :create, params: { group_id: group, epic: { description: 'some descripition' } }
           end
 
           it 'returns 422 response' do
@@ -412,14 +412,14 @@ describe Groups::EpicsController do
 
       it "rejects a developer to destroy an epic" do
         group.add_developer(user)
-        delete :destroy, group_id: group, id: epic.to_param
+        delete :destroy, params: { group_id: group, id: epic.to_param }
 
         expect(response).to have_gitlab_http_status(404)
       end
 
       it "deletes the epic" do
         group.add_owner(user)
-        delete :destroy, group_id: group, id: epic.to_param
+        delete :destroy, params: { group_id: group, id: epic.to_param }
 
         expect(response).to have_gitlab_http_status(302)
         expect(controller).to set_flash[:notice].to(/The epic was successfully deleted\./)

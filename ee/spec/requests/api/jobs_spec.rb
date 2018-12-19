@@ -41,7 +41,7 @@ describe API::Jobs do
       let(:job) { create(:ci_build, :artifacts, pipeline: pipeline, user: api_user) }
 
       before do
-        get api("/projects/#{project.id}/jobs/#{job.id}/artifacts"), job_token: job.token
+        get api("/projects/#{project.id}/jobs/#{job.id}/artifacts"), params: { job_token: job.token }
       end
 
       context 'user is developer' do

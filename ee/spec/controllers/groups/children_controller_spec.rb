@@ -14,7 +14,7 @@ describe Groups::ChildrenController do
   it 'works when external authorization service is enabled' do
     enable_external_authorization_service_check
 
-    get :index, group_id: group, format: :json
+    get :index, params: { group_id: group }, format: :json
 
     expect(response).to have_gitlab_http_status(200)
   end
