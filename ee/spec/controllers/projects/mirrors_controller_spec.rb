@@ -122,7 +122,7 @@ describe Projects::MirrorsController do
 
       expect_any_instance_of(EE::ProjectImportState).to receive(:force_import_job!)
 
-      put :update_now, { namespace_id: project.namespace.to_param, project_id: project.to_param }
+      put :update_now, params: { namespace_id: project.namespace.to_param, project_id: project.to_param }
     end
   end
 
@@ -218,6 +218,6 @@ describe Projects::MirrorsController do
     attrs = extra_attrs.merge(namespace_id: project.namespace.to_param, project_id: project.to_param)
     attrs[:project] = options
 
-    put :update, attrs
+    put :update, params: attrs
   end
 end

@@ -70,7 +70,7 @@ describe API::Unleash do
     describe "GET #{features_endpoint}" do
       let(:features_url) { features_endpoint.sub(':project_id', project_id) }
 
-      subject { get api("/feature_flags/unleash/#{project_id}/features"), params, headers }
+      subject { get api("/feature_flags/unleash/#{project_id}/features"), params: params, headers: headers }
 
       it_behaves_like 'authenticated request'
 
@@ -100,13 +100,13 @@ describe API::Unleash do
   end
 
   describe 'POST /feature_flags/unleash/:project_id/client/register' do
-    subject { post api("/feature_flags/unleash/#{project_id}/client/register"), params, headers }
+    subject { post api("/feature_flags/unleash/#{project_id}/client/register"), params: params, headers: headers }
 
     it_behaves_like 'authenticated request'
   end
 
   describe 'POST /feature_flags/unleash/:project_id/client/metrics' do
-    subject { post api("/feature_flags/unleash/#{project_id}/client/metrics"), params, headers }
+    subject { post api("/feature_flags/unleash/#{project_id}/client/metrics"), params: params, headers: headers }
 
     it_behaves_like 'authenticated request'
   end

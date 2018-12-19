@@ -16,7 +16,7 @@ describe Groups::HooksController do
 
     describe 'GET #index' do
       it 'is successfull' do
-        get :index, group_id: group.to_param
+        get :index, params: { group_id: group.to_param }
 
         expect(response).to have_gitlab_http_status(200)
       end
@@ -39,7 +39,7 @@ describe Groups::HooksController do
           wiki_page_events: true
         }
 
-        post :create, group_id: group.to_param, hook: hook_params
+        post :create, params: { group_id: group.to_param, hook: hook_params }
 
         expect(response).to have_gitlab_http_status(302)
         expect(group.hooks.size).to eq(1)
@@ -55,7 +55,7 @@ describe Groups::HooksController do
 
     describe 'GET #index' do
       it 'renders a 404' do
-        get :index, group_id: group.to_param
+        get :index, params: { group_id: group.to_param }
 
         expect(response).to have_gitlab_http_status(404)
       end

@@ -16,7 +16,7 @@ describe Projects::ServiceDeskController do
 
   describe 'GET service desk properties' do
     it 'returns service_desk JSON data' do
-      get :show, namespace_id: project.namespace.to_param, project_id: project, format: :json
+      get :show, params: { namespace_id: project.namespace.to_param, project_id: project }, format: :json
 
       body = JSON.parse(response.body)
 
@@ -32,7 +32,7 @@ describe Projects::ServiceDeskController do
         project.add_guest(guest)
         sign_in(guest)
 
-        get :show, namespace_id: project.namespace.to_param, project_id: project, format: :json
+        get :show, params: { namespace_id: project.namespace.to_param, project_id: project }, format: :json
 
         expect(response.status).to eq(404)
       end
@@ -43,7 +43,7 @@ describe Projects::ServiceDeskController do
     it 'toggles services desk incoming email' do
       project.update!(service_desk_enabled: false)
 
-      put :update, namespace_id: project.namespace.to_param, project_id: project, service_desk_enabled: true, format: :json
+      put :update, params: { namespace_id: project.namespace.to_param, project_id: project, service_desk_enabled: true }, format: :json
 
       body = JSON.parse(response.body)
 
@@ -57,7 +57,7 @@ describe Projects::ServiceDeskController do
 
       it 'renders 404' do
         sign_in(other_user)
-        put :update, namespace_id: project.namespace.to_param, project_id: project, service_desk_enabled: true, format: :json
+        put :update, params: { namespace_id: project.namespace.to_param, project_id: project, service_desk_enabled: true }, format: :json
 
         expect(response.status).to eq(404)
       end

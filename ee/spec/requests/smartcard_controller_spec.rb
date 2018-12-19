@@ -10,7 +10,7 @@ describe SmartcardController, type: :request  do
   let(:openssl_certificate) { instance_double(OpenSSL::X509::Certificate, subject: subject_dn, issuer: issuer_dn) }
   let(:audit_event_service) { instance_double(AuditEventService) }
 
-  subject { post '/-/smartcard/auth', {}, certificate_headers }
+  subject { post '/-/smartcard/auth', params: {}, headers: certificate_headers }
 
   describe '#auth' do
     context 'with smartcard_auth enabled' do

@@ -14,7 +14,7 @@ describe Groups::AvatarsController do
   it 'works when external authorization service is enabled' do
     enable_external_authorization_service_check
 
-    delete :destroy, group_id: group
+    delete :destroy, params: { group_id: group }
 
     expect(response).to have_gitlab_http_status(302)
   end

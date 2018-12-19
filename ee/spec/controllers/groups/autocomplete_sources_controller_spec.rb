@@ -15,13 +15,13 @@ describe Groups::AutocompleteSourcesController do
 
   context '#epics' do
     it 'returns 200 status' do
-      get :epics, group_id: group
+      get :epics, params: { group_id: group }
 
       expect(response).to have_gitlab_http_status(200)
     end
 
     it 'returns the correct response' do
-      get :epics, group_id: group
+      get :epics, params: { group_id: group }
 
       expect(json_response).to be_an(Array)
       expect(json_response.first).to include(
@@ -39,7 +39,7 @@ describe Groups::AutocompleteSourcesController do
       create(:milestone, group: sub_group)
       group_milestone = create(:milestone, group: group)
 
-      get :milestones, group_id: group
+      get :milestones, params: { group_id: group }
 
       expect(response).to have_gitlab_http_status(200)
       expect(json_response.count).to eq(1)
@@ -52,13 +52,13 @@ describe Groups::AutocompleteSourcesController do
 
   context '#commands' do
     it 'returns 200 status' do
-      get :commands, group_id: group, type: 'Epic', type_id: epic.iid
+      get :commands, params: { group_id: group, type: 'Epic', type_id: epic.iid }
 
       expect(response).to have_gitlab_http_status(200)
     end
 
     it 'returns the correct response' do
-      get :commands, group_id: group, type: 'Epic', type_id: epic.iid
+      get :commands, params: { group_id: group, type: 'Epic', type_id: epic.iid }
 
       expect(json_response).to be_an(Array)
       expect(json_response).to include(

@@ -9,7 +9,7 @@ shared_examples_for 'multiple and scoped issue boards' do |route_definition|
 
     describe "POST #{route_definition}" do
       it 'creates a board' do
-        post api(root_url, user), name: "new board"
+        post api(root_url, user), params: { name: "new board" }
 
         expect(response).to have_gitlab_http_status(201)
 
@@ -21,7 +21,7 @@ shared_examples_for 'multiple and scoped issue boards' do |route_definition|
       let(:url) { "#{root_url}/#{board.id}" }
 
       it 'updates a board' do
-        put api(url, user), name: 'new name', weight: 4, labels: 'foo, bar'
+        put api(url, user), params: { name: 'new name', weight: 4, labels: 'foo, bar' }
 
         expect(response).to have_gitlab_http_status(200)
 

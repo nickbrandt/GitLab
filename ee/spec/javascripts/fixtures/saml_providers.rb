@@ -23,7 +23,7 @@ describe Groups::SamlProvidersController, '(JavaScript fixtures)', type: :contro
   it 'groups/saml_providers/show.html.raw' do |example|
     create(:saml_provider, group: group)
 
-    get :show, group_id: group
+    get :show, params: { group_id: group }
 
     expect(response).to be_success
     expect(response).to render_template 'groups/saml_providers/show'

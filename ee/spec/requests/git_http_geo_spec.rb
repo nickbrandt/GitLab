@@ -81,7 +81,7 @@ describe "Git HTTP requests (Geo)" do
     describe 'GET info_refs' do
       context 'git pull' do
         def make_request
-          get "/#{project.full_path}.git/info/refs", { service: 'git-upload-pack' }, env
+          get "/#{project.full_path}.git/info/refs", params: { service: 'git-upload-pack' }, headers: env
         end
 
         it_behaves_like 'Geo request'
@@ -97,7 +97,7 @@ describe "Git HTTP requests (Geo)" do
 
       context 'git push' do
         def make_request
-          get url, { service: 'git-receive-pack' }, env
+          get url, params: { service: 'git-receive-pack' }, headers: env
         end
 
         let(:url) { "/#{project.full_path}.git/info/refs" }
@@ -117,7 +117,7 @@ describe "Git HTTP requests (Geo)" do
 
     describe 'POST git_upload_pack' do
       def make_request
-        post "/#{project.full_path}.git/git-upload-pack", {}, env
+        post "/#{project.full_path}.git/git-upload-pack", params: {}, headers: env
       end
 
       it_behaves_like 'Geo request'
@@ -135,7 +135,7 @@ describe "Git HTTP requests (Geo)" do
       context 'API' do
         describe 'POST batch' do
           def make_request
-            post url, args, env
+            post url, params: args, headers: env
           end
 
           let(:args) { {} }
@@ -238,7 +238,7 @@ describe "Git HTTP requests (Geo)" do
         with_them do
           describe "POST #{description}" do
             def make_request
-              post url, args, env
+              post url, params: args, headers: env
             end
 
             let(:url) { "/#{project.full_path}.git/#{path}" }
@@ -264,7 +264,7 @@ describe "Git HTTP requests (Geo)" do
 
     describe 'POST git_receive_pack' do
       def make_request
-        post url, {}, env
+        post url, params: {}, headers: env
       end
 
       let(:url) { "/#{project.full_path}.git/git-receive-pack" }

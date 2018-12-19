@@ -18,7 +18,7 @@ describe Groups::Settings::CiCdController do
 
     describe 'GET #show' do
       it 'renders show with 200 status code' do
-        get :show, group_id: group
+        get :show, params: { group_id: group }
 
         expect(response).to have_gitlab_http_status(200)
       end

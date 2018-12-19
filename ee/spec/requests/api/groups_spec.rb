@@ -10,7 +10,7 @@ describe API::Groups do
       group.add_owner(user)
     end
 
-    subject(:do_it) { put api("/groups/#{group.id}", user), file_template_project_id: project.id }
+    subject(:do_it) { put api("/groups/#{group.id}", user), params: { file_template_project_id: project.id } }
 
     it 'does not update file_template_project_id if unlicensed' do
       stub_licensed_features(custom_file_templates_for_namespace: false)

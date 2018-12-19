@@ -96,7 +96,7 @@ describe Projects::WebIdeTerminalsController do
 
   describe 'GET show' do
     before do
-      get(:show, namespace_id: project.namespace.to_param, project_id: project, id: job.id)
+      get(:show, params: { namespace_id: project.namespace.to_param, project_id: project, id: job.id })
     end
 
     it_behaves_like 'terminal access rights'
@@ -110,9 +110,11 @@ describe Projects::WebIdeTerminalsController do
       allow_any_instance_of(::Ci::WebIdeConfigService)
         .to receive(:execute).and_return(result)
 
-      post :check_config, namespace_id: project.namespace.to_param,
-                          project_id: project.to_param,
-                          branch: 'master'
+      post :check_config, params: {
+                            namespace_id: project.namespace.to_param,
+                            project_id: project.to_param,
+                            branch: 'master'
+                          }
     end
 
     it_behaves_like 'terminal access rights'
@@ -131,9 +133,11 @@ describe Projects::WebIdeTerminalsController do
     let(:branch) { 'master' }
 
     subject do
-      post :create, namespace_id: project.namespace.to_param,
-                    project_id: project.to_param,
-                    branch: branch
+      post :create, params: {
+                      namespace_id: project.namespace.to_param,
+                      project_id: project.to_param,
+                      branch: branch
+                    }
     end
 
     context 'access rights' do
@@ -179,9 +183,11 @@ describe Projects::WebIdeTerminalsController do
     let(:job) { create(:ci_build, :running, pipeline: pipeline, user: user, project: project) }
 
     before do
-      post(:cancel, namespace_id: project.namespace.to_param,
-                    project_id: project.to_param,
-                    id: job.id)
+      post(:cancel, params: {
+                      namespace_id: project.namespace.to_param,
+                      project_id: project.to_param,
+                      id: job.id
+                    })
     end
 
     it_behaves_like 'terminal access rights'
@@ -200,9 +206,11 @@ describe Projects::WebIdeTerminalsController do
     let(:job) { create(:ci_build, :failed, pipeline: pipeline, user: user, project: project) }
 
     before do
-      post(:retry, namespace_id: project.namespace.to_param,
-                   project_id: project.to_param,
-                   id: job.id)
+      post(:retry, params: {
+                     namespace_id: project.namespace.to_param,
+                     project_id: project.to_param,
+                     id: job.id
+                   })
     end
 
     it_behaves_like 'terminal access rights'

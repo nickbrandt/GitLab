@@ -13,7 +13,7 @@ describe Admin::ProjectsController, :geo do
   end
 
   describe 'GET /projects/:id' do
-    subject { get :show, namespace_id: project.namespace.path, id: project.path }
+    subject { get :show, params: { namespace_id: project.namespace.path, id: project.path } }
 
     render_views
 

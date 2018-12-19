@@ -15,7 +15,7 @@ describe Boards::MilestonesController do
       end
 
       it 'returns a list of all milestones of board parent' do
-        get :index, board_id: board.to_param, format: :json
+        get :index, params: { board_id: board.to_param }, format: :json
 
         parsed_response = JSON.parse(response.body)
 
@@ -33,7 +33,7 @@ describe Boards::MilestonesController do
 
       shared_examples 'unauthorized board milestone listing' do
         it 'returns a forbidden 403 response' do
-          get :index, board_id: board.to_param, format: :json
+          get :index, params: { board_id: board.to_param }, format: :json
 
           expect(response).to have_gitlab_http_status(403)
         end

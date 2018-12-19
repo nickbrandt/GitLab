@@ -30,7 +30,7 @@ describe Groups::EpicIssuesController do
   describe 'GET #index' do
     let!(:epic_issue) { create(:epic_issue, epic: epic, issue: issue) }
 
-    subject { get :index, group_id: group, epic_id: epic.to_param }
+    subject { get :index, params: { group_id: group, epic_id: epic.to_param } }
 
     it_behaves_like 'unlicensed epics action'
 
@@ -55,7 +55,7 @@ describe Groups::EpicIssuesController do
     subject do
       reference = [issue.to_reference(full: true)]
 
-      post :create, group_id: group, epic_id: epic.to_param, issuable_references: reference
+      post :create, params: { group_id: group, epic_id: epic.to_param, issuable_references: reference }
     end
 
     it_behaves_like 'unlicensed epics action'
@@ -96,7 +96,7 @@ describe Groups::EpicIssuesController do
   describe 'DELETE #destroy' do
     let!(:epic_issue) { create(:epic_issue, epic: epic, issue: issue) }
 
-    subject { delete :destroy, group_id: group, epic_id: epic.to_param, id: epic_issue.id }
+    subject { delete :destroy, params: { group_id: group, epic_id: epic.to_param, id: epic_issue.id } }
 
     it_behaves_like 'unlicensed epics action'
 
@@ -131,7 +131,7 @@ describe Groups::EpicIssuesController do
 
       context 'when the epic from the association does not equal epic from the path' do
         subject do
-          delete :destroy, group_id: group, epic_id: another_epic.to_param, id: epic_issue.id
+          delete :destroy, params: { group_id: group, epic_id: another_epic.to_param, id: epic_issue.id }
         end
 
         let(:another_epic) { create(:epic, group: group) }
@@ -153,7 +153,7 @@ describe Groups::EpicIssuesController do
 
       context 'when the epic_issue record does not exists' do
         it 'returns status 404' do
-          delete :destroy, group_id: group, epic_id: epic.to_param, id: 9999
+          delete :destroy, params: { group_id: group, epic_id: epic.to_param, id: 9999 }
 
           expect(response.status).to eq(403)
         end
@@ -167,7 +167,7 @@ describe Groups::EpicIssuesController do
     let!(:epic_issue2) { create(:epic_issue, epic: epic, issue: issue2, relative_position: 2) }
 
     subject do
-      put :update, group_id: group, epic_id: epic.to_param, id: epic_issue1.id, epic: { move_before_id: epic_issue2.id }
+      put :update, params: { group_id: group, epic_id: epic.to_param, id: epic_issue1.id, epic: { move_before_id: epic_issue2.id } }
     end
 
     it_behaves_like 'unlicensed epics action'
@@ -199,7 +199,7 @@ describe Groups::EpicIssuesController do
 
       context 'when the epic from the association does not equal epic from the path' do
         subject do
-          put :update, group_id: group, epic_id: another_epic.to_param, id: epic_issue1.id, epic: { after_move_id: epic_issue1.id }
+          put :update, params: { group_id: group, epic_id: another_epic.to_param, id: epic_issue1.id, epic: { after_move_id: epic_issue1.id } }
         end
 
         let(:another_epic) { create(:epic, group: group) }
@@ -217,7 +217,7 @@ describe Groups::EpicIssuesController do
 
       context 'when the epic_issue record does not exists' do
         it 'returns status 404' do
-          delete :destroy, group_id: group, epic_id: epic.to_param, id: 9999
+          delete :destroy, params: { group_id: group, epic_id: epic.to_param, id: 9999 }
 
           expect(response.status).to eq(403)
         end

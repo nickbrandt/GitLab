@@ -47,7 +47,7 @@ describe Admin::Geo::ProjectsController, :geo do
       end
 
       context 'with sync_status=pending' do
-        subject { get :index, sync_status: 'pending' }
+        subject { get :index, params: { sync_status: 'pending' } }
 
         it 'renders pending template' do
           expect(subject).to have_gitlab_http_status(200)
@@ -57,7 +57,7 @@ describe Admin::Geo::ProjectsController, :geo do
       end
 
       context 'with sync_status=failed' do
-        subject { get :index, sync_status: 'failed' }
+        subject { get :index, params: { sync_status: 'failed' } }
 
         it 'renders failed template' do
           expect(subject).to have_gitlab_http_status(200)
@@ -67,7 +67,7 @@ describe Admin::Geo::ProjectsController, :geo do
       end
 
       context 'with sync_status=never' do
-        subject { get :index, sync_status: 'never' }
+        subject { get :index, params: { sync_status: 'never' } }
 
         it 'renders failed template' do
           expect(subject).to have_gitlab_http_status(200)
@@ -77,7 +77,7 @@ describe Admin::Geo::ProjectsController, :geo do
       end
 
       context 'with sync_status=synced' do
-        subject { get :index, sync_status: 'synced' }
+        subject { get :index, params: { sync_status: 'synced' } }
 
         it 'renders synced template' do
           expect(subject).to have_gitlab_http_status(200)
@@ -89,7 +89,7 @@ describe Admin::Geo::ProjectsController, :geo do
   end
 
   describe '#destroy' do
-    subject { delete :destroy, id: synced_registry }
+    subject { delete :destroy, params: { id: synced_registry } }
 
     it_behaves_like 'license required'
 
@@ -119,7 +119,7 @@ describe Admin::Geo::ProjectsController, :geo do
   end
 
   describe '#recheck' do
-    subject { post :recheck, id: synced_registry }
+    subject { post :recheck, params: { id: synced_registry } }
 
     it_behaves_like 'license required'
 
@@ -137,7 +137,7 @@ describe Admin::Geo::ProjectsController, :geo do
   end
 
   describe '#resync' do
-    subject { post :resync, id: synced_registry }
+    subject { post :resync, params: { id: synced_registry } }
 
     it_behaves_like 'license required'
 
@@ -205,7 +205,7 @@ describe Admin::Geo::ProjectsController, :geo do
   end
 
   describe '#force_redownload' do
-    subject { post :force_redownload, id: synced_registry }
+    subject { post :force_redownload, params: { id: synced_registry } }
 
     it_behaves_like 'license required'
 

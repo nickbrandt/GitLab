@@ -17,9 +17,11 @@ describe Projects::ImportsController do
         new_user = create(:user)
         project.add_maintainer(new_user)
 
-        post :create, namespace_id: project.namespace.to_param,
-                      project_id: project,
-                      project: { mirror: true, mirror_user_id: new_user.id, import_url: 'http://local.dev' },
+        post :create, params: {
+                        namespace_id: project.namespace.to_param,
+                        project_id: project,
+                        project: { mirror: true, mirror_user_id: new_user.id, import_url: 'http://local.dev' }
+                      },
                       format: :json
 
         expect(project.reload.mirror).to eq(true)

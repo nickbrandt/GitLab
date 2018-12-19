@@ -8,13 +8,13 @@ describe UsersController do
   end
 
   describe 'GET #snippets' do
-    subject { get :snippets, username: user.username }
+    subject { get :snippets, params: { username: user.username } }
 
     it_behaves_like 'disabled when using an external authorization service'
   end
 
   describe 'GET #calendar_activities' do
-    subject { get :calendar_activities, username: user.username }
+    subject { get :calendar_activities, params: { username: user.username } }
 
     it_behaves_like 'disabled when using an external authorization service'
   end

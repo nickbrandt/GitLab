@@ -29,7 +29,7 @@ describe API::MergeRequests do
           milestone_id: milestone.id
       }
       defaults = defaults.merge(args)
-      post api("/projects/#{project.id}/merge_requests", user), defaults
+      post api("/projects/#{project.id}/merge_requests", user), params: defaults
     end
     context 'between branches projects' do
       it "returns merge_request" do

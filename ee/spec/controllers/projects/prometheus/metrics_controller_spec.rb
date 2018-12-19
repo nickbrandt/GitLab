@@ -25,7 +25,7 @@ describe Projects::Prometheus::MetricsController do
       let(:validation_result) { { valid: true } }
 
       it 'validation data is returned' do
-        post :validate_query, project_params(format: :json, query: query)
+        post :validate_query, params: project_params(format: :json, query: query)
 
         expect(json_response).to eq('valid' => true)
       end
@@ -35,7 +35,7 @@ describe Projects::Prometheus::MetricsController do
       let(:validation_result) { {} }
 
       it 'validation data is returned' do
-        post :validate_query, project_params(format: :json, query: query)
+        post :validate_query, params: project_params(format: :json, query: query)
 
         expect(response).to have_gitlab_http_status(204)
       end
@@ -47,7 +47,7 @@ describe Projects::Prometheus::MetricsController do
       let!(:prometheus_metric) { create(:prometheus_metric, project: project) }
 
       it 'returns a list of metrics' do
-        get :index, project_params(format: :json)
+        get :index, params: project_params(format: :json)
 
         expect(response).to have_gitlab_http_status(200)
         expect(response).to match_response_schema('prometheus/metrics', dir: 'ee')
@@ -56,7 +56,7 @@ describe Projects::Prometheus::MetricsController do
 
     context 'without custom metrics ' do
       it 'returns an empty json' do
-        get :index, project_params(format: :json)
+        get :index, params: project_params(format: :json)
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response).to eq({})
@@ -69,7 +69,7 @@ describe Projects::Prometheus::MetricsController do
       let(:valid_metric) { { prometheus_metric: { title: 'title', query: 'query', group: 'business', y_label: 'label', unit: 'u', legend: 'legend' } } }
 
       it 'shows a success flash message' do
-        post :create, project_params(valid_metric)
+        post :create, params: project_params(valid_metric)
 
         expect(flash[:notice]).to include('Metric was successfully added.')
 
@@ -81,7 +81,7 @@ describe Projects::Prometheus::MetricsController do
       let(:invalid_metric) { { prometheus_metric: { title: 'title' } } }
 
       it 'renders new metric page' do
-        post :create, project_params(invalid_metric)
+        post :create, params: project_params(invalid_metric)
 
         expect(response).to have_gitlab_http_status(200)
         expect(response).to render_template('new')
@@ -94,7 +94,7 @@ describe Projects::Prometheus::MetricsController do
       let!(:metric) { create(:prometheus_metric, project: project) }
 
       it 'destroys the metric' do
-        delete :destroy, project_params(id: metric.id)
+        delete :destroy, params: project_params(id: metric.id)
 
         expect(response).to redirect_to(edit_project_service_path(project, PrometheusService))
         expect(PrometheusMetric.find_by(id: metric.id)).to be_nil
@@ -105,7 +105,7 @@ describe Projects::Prometheus::MetricsController do
       let!(:metric) { create(:prometheus_metric, project: project) }
 
       it 'destroys the metric' do
-        delete :destroy, project_params(id: metric.id, format: :json)
+        delete :destroy, params: project_params(id: metric.id, format: :json)
 
         expect(response).to have_gitlab_http_status(200)
         expect(PrometheusMetric.find_by(id: metric.id)).to be_nil

@@ -18,9 +18,11 @@ describe Projects::ProtectedEnvironmentsController do
 
     subject do
       post :create,
-        namespace_id: project.namespace.to_param,
-        project_id: project.to_param,
-        protected_environment: params
+        params: {
+          namespace_id: project.namespace.to_param,
+          project_id: project.to_param,
+          protected_environment: params
+        }
     end
 
     context 'with valid access and params' do
@@ -97,10 +99,12 @@ describe Projects::ProtectedEnvironmentsController do
 
     subject do
       put :update,
-        namespace_id: project.namespace.to_param,
-        project_id: project.to_param,
-        id: protected_environment.id,
-        protected_environment: params
+        params: {
+          namespace_id: project.namespace.to_param,
+          project_id: project.to_param,
+          id: protected_environment.id,
+          protected_environment: params
+        }
     end
 
     context 'when the user is authorized' do
@@ -141,9 +145,11 @@ describe Projects::ProtectedEnvironmentsController do
 
     subject do
       delete :destroy,
-        namespace_id: project.namespace.to_param,
-        project_id: project.to_param,
-        id: protected_environment.id
+        params: {
+          namespace_id: project.namespace.to_param,
+          project_id: project.to_param,
+          id: protected_environment.id
+        }
     end
 
     context 'when the user is authorized' do
