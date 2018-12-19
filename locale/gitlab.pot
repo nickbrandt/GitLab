@@ -635,6 +635,9 @@ msgstr ""
 msgid "An error has occurred"
 msgstr ""
 
+msgid "An error occured while fetching the releases. Please try again."
+msgstr ""
+
 msgid "An error occured while fetching this downstream pipeline. Please try again"
 msgstr ""
 
@@ -645,9 +648,6 @@ msgid "An error occurred adding a draft to the discussion."
 msgstr ""
 
 msgid "An error occurred adding a new draft."
-msgstr ""
-
-msgid "An error occured while fetching the releases. Please try again."
 msgstr ""
 
 msgid "An error occurred creating the new branch."
@@ -3858,12 +3858,6 @@ msgstr ""
 msgid "Geo Nodes"
 msgstr ""
 
-msgid "Getting started with releases"
-msgstr ""
-
-msgid "Git"
-msgstr ""
-
 msgid "Geo allows you to replicate your GitLab instance to other geographical locations."
 msgstr ""
 
@@ -4189,6 +4183,9 @@ msgid "Geo|secondary"
 msgstr ""
 
 msgid "Get a free instance review"
+msgstr ""
+
+msgid "Getting started with releases"
 msgstr ""
 
 msgid "Git"
