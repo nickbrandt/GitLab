@@ -7,7 +7,7 @@ describe Gitlab::JsonCache do
   let(:namespace) { 'geo' }
   let(:key) { 'foo' }
   let(:expanded_key) { "#{namespace}:#{key}:#{Rails.version}" }
-  let(:node) { create(:geo_node) }
+  let(:broadcast_message) { create(:broadcast_message) }
 
   subject(:cache) { described_class.new(namespace: namespace, backend: backend) }
 
@@ -110,15 +110,15 @@ describe Gitlab::JsonCache do
       it 'parses the cached value' do
         allow(backend).to receive(:read)
           .with(expanded_key)
-          .and_return(node.to_json)
+          .and_return(broadcast_message.to_json)
 
-        expect(cache.read(key, GeoNode)).to eq(node)
+        expect(cache.read(key, BroadcastMessage)).to eq(broadcast_message)
       end
 
       it 'returns nil when klass is nil' do
         allow(backend).to receive(:read)
           .with(expanded_key)
-          .and_return(node.to_json)
+          .and_return(broadcast_message.to_json)
 
         expect(cache.read(key)).to be_nil
       end
@@ -128,7 +128,7 @@ describe Gitlab::JsonCache do
           .with(expanded_key)
           .and_return('{')
 
-        expect(cache.read(key, GeoNode)).to be_nil
+        expect(cache.read(key, BroadcastMessage)).to be_nil
       end
 
       it 'gracefully handles an empty hash' do
@@ -136,15 +136,15 @@ describe Gitlab::JsonCache do
           .with(expanded_key)
           .and_return('{}')
 
-        expect(cache.read(key, GeoNode)).to be_a(GeoNode)
+        expect(cache.read(key, BroadcastMessage)).to be_a(BroadcastMessage)
       end
 
       it 'gracefully handles unknown attributes' do
         allow(backend).to receive(:read)
           .with(expanded_key)
-          .and_return(node.attributes.merge(unknown_attribute: 1).to_json)
+          .and_return(broadcast_message.attributes.merge(unknown_attribute: 1).to_json)
 
-        expect(cache.read(key, GeoNode)).to be_nil
+        expect(cache.read(key, BroadcastMessage)).to be_nil
       end
     end
 
@@ -152,15 +152,15 @@ describe Gitlab::JsonCache do
       it 'parses the cached value' do
         allow(backend).to receive(:read)
           .with(expanded_key)
-          .and_return([node].to_json)
+          .and_return([broadcast_message].to_json)
 
-        expect(cache.read(key, GeoNode)).to eq([node])
+        expect(cache.read(key, BroadcastMessage)).to eq([broadcast_message])
       end
 
       it 'returns an empty array when klass is nil' do
         allow(backend).to receive(:read)
           .with(expanded_key)
-          .and_return([node].to_json)
+          .and_return([broadcast_message].to_json)
 
         expect(cache.read(key)).to eq([])
       end
@@ -170,7 +170,7 @@ describe Gitlab::JsonCache do
           .with(expanded_key)
           .and_return('[')
 
-        expect(cache.read(key, GeoNode)).to be_nil
+        expect(cache.read(key, BroadcastMessage)).to be_nil
       end
 
       it 'gracefully handles an empty array' do
@@ -178,15 +178,15 @@ describe Gitlab::JsonCache do
           .with(expanded_key)
           .and_return('[]')
 
-        expect(cache.read(key, GeoNode)).to eq([])
+        expect(cache.read(key, BroadcastMessage)).to eq([])
       end
 
       it 'gracefully handles unknown attributes' do
         allow(backend).to receive(:read)
           .with(expanded_key)
-          .and_return([{ unknown_attribute: 1 }, node.attributes].to_json)
+          .and_return([{ unknown_attribute: 1 }, broadcast_message.attributes].to_json)
 
-        expect(cache.read(key, GeoNode)).to eq([node])
+        expect(cache.read(key, BroadcastMessage)).to eq([broadcast_message])
       end
     end
   end
@@ -199,10 +199,10 @@ describe Gitlab::JsonCache do
     end
 
     it 'writes a string containing a JSON representation of the value to the cache' do
-      cache.write(key, node)
+      cache.write(key, broadcast_message)
 
       expect(backend).to have_received(:write)
-        .with(expanded_key, node.to_json, nil)
+        .with(expanded_key, broadcast_message.to_json, nil)
     end
 
     it 'passes options the underlying cache implementation' do
@@ -288,13 +288,13 @@ describe Gitlab::JsonCache do
     context 'when the given key exists in the cache' do
       context 'when the cached value is a hash' do
         before do
-          backend.write(expanded_key, node.to_json)
+          backend.write(expanded_key, broadcast_message.to_json)
         end
 
         it 'parses the cached value' do
-          result = cache.fetch(key, as: GeoNode) { 'block result' }
+          result = cache.fetch(key, as: BroadcastMessage) { 'block result' }
 
-          expect(result).to eq(node)
+          expect(result).to eq(broadcast_message)
         end
 
         it "returns the result of the block when 'as' option is nil" do
@@ -312,13 +312,13 @@ describe Gitlab::JsonCache do
 
       context 'when the cached value is a array' do
         before do
-          backend.write(expanded_key, [node].to_json)
+          backend.write(expanded_key, [broadcast_message].to_json)
         end
 
         it 'parses the cached value' do
-          result = cache.fetch(key, as: GeoNode) { 'block result' }
+          result = cache.fetch(key, as: BroadcastMessage) { 'block result' }
 
-          expect(result).to eq([node])
+          expect(result).to eq([broadcast_message])
         end
 
         it "returns an empty array when 'as' option is nil" do
