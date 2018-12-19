@@ -2,7 +2,7 @@
 # Group Milestones are milestones that can be shared among many projects within the same group
 class GroupMilestone < GlobalMilestone
   include ::EE::GroupMilestone
-  attr_accessor :group, :milestones
+  attr_reader :group, :milestones
 
   def self.build_collection(group, projects, params)
     params =
