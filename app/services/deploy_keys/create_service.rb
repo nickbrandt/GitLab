@@ -2,8 +2,10 @@
 
 module DeployKeys
   class CreateService < Keys::BaseService
-    def execute
+    def execute(project: nil)
       DeployKey.create(params.merge(user: user))
     end
   end
 end
+
+DeployKeys::CreateService.prepend(::EE::DeployKeys::CreateService)
