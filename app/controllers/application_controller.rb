@@ -151,10 +151,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def verify_namespace_plan_check_enabled
-    render_404 unless Gitlab::CurrentSettings.should_check_namespace_plan?
-  end
-
   def log_exception(exception)
     Gitlab::Sentry.track_acceptable_exception(exception)
 
@@ -169,11 +165,7 @@ class ApplicationController < ActionController::Base
   end
 
   def after_sign_out_path_for(resource)
-    if Gitlab::Geo.secondary?
-      Gitlab::Geo.primary_node.oauth_logout_url(@geo_logout_state)
-    else
-      Gitlab::CurrentSettings.after_sign_out_path.presence || new_user_session_path
-    end
+    Gitlab::CurrentSettings.after_sign_out_path.presence || new_user_session_path
   end
 
   def can?(object, action, subject = :global)
@@ -497,3 +489,5 @@ class ApplicationController < ActionController::Base
     Gitlab::Sentry.context(current_user)
   end
 end
+
+ApplicationController.prepend(EE::ApplicationController)
