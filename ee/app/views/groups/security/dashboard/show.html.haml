@@ -1,9 +1,12 @@
 - breadcrumb_title _("Security Dashboard")
 - page_title  _("Security Dashboard")
+-# TODO: Use a more sensible way of getting this endpoint
+- group_projects_path = "/api/v4/groups/#{@group.id}/projects"
 
 #js-group-security-dashboard{ data: { vulnerabilities_endpoint: group_security_vulnerabilities_path(@group),
   vulnerabilities_summary_endpoint: summary_group_security_vulnerabilities_path(@group),
   vulnerabilities_history_endpoint: history_group_security_vulnerabilities_path(@group),
+  projects_endpoint: group_projects_path,
   vulnerability_feedback_help_path: help_page_path("user/project/merge_requests/index", anchor: "interacting-with-security-reports-ultimate"),
   empty_state_svg_path: image_path('illustrations/security-dashboard-empty-state.svg'),
   dashboard_documentation: help_page_path('user/group/security_dashboard/index') } }

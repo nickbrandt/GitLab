@@ -24,6 +24,10 @@ export default {
       type: String,
       required: true,
     },
+    projectsEndpoint: {
+      type: String,
+      required: true,
+    },
     vulnerabilitiesEndpoint: {
       type: String,
       required: true,
@@ -43,13 +47,16 @@ export default {
   },
   computed: {
     ...mapState('vulnerabilities', ['modal']),
+    ...mapState('projects', ['projects']),
     ...mapGetters('filters', ['activeFilters']),
   },
   created() {
+    this.setProjectsEndpoint(this.projectsEndpoint);
     this.setVulnerabilitiesEndpoint(this.vulnerabilitiesEndpoint);
     this.setVulnerabilitiesCountEndpoint(this.vulnerabilitiesCountEndpoint);
     this.setVulnerabilitiesHistoryEndpoint(this.vulnerabilitiesHistoryEndpoint);
     this.fetchVulnerabilitiesCount();
+    this.fetchProjects();
   },
   methods: {
     ...mapActions('vulnerabilities', [
@@ -63,6 +70,7 @@ export default {
       'setVulnerabilitiesEndpoint',
       'setVulnerabilitiesHistoryEndpoint',
     ]),
+    ...mapActions('projects', ['setProjectsEndpoint', 'fetchProjects']),
     filterChange() {
       this.fetchVulnerabilities(this.activeFilters);
       this.fetchVulnerabilitiesCount(this.activeFilters);

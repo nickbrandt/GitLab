@@ -40,4 +40,22 @@ describe('filters module mutations', () => {
       });
     });
   });
+
+  describe('SET_FILTER_OPTIONS', () => {
+    let state;
+    let firstFilter;
+    const options = [{ id: 0, name: 'c' }, { id: 3, name: 'c' }];
+
+    beforeEach(() => {
+      state = createState();
+      [firstFilter] = state.filters;
+      const filterId = firstFilter.id;
+
+      mutations[types.SET_FILTER_OPTIONS](state, { filterId, options });
+    });
+
+    it('should add all the options to the type filter', () => {
+      expect(firstFilter.options).toEqual(options);
+    });
+  });
 });

@@ -58,16 +58,14 @@ describe('filters module getters', () => {
   });
 
   describe('getSelectedOptionIds', () => {
-    it('should return "one" as the selcted project ID', () => {
+    it('should return "one" as the selcted dummy ID', () => {
       const state = createState();
-      const projectFilter = {
-        id: 'project',
+      const dummyFilter = {
+        id: 'dummy',
         options: [{ id: 'one', selected: true }, { id: 'anotherone', selected: false }],
       };
-      state.filters.push(projectFilter);
-      const selectedOptionIds = getters.getSelectedOptionIds(state, mockedGetters(state))(
-        'project',
-      );
+      state.filters.push(dummyFilter);
+      const selectedOptionIds = getters.getSelectedOptionIds(state, mockedGetters(state))('dummy');
 
       expect(selectedOptionIds).toHaveLength(1);
       expect(selectedOptionIds[0]).toEqual('one');
@@ -109,16 +107,16 @@ describe('filters module getters', () => {
       expect(activeFilters.severity).toHaveLength(0);
     });
 
-    it('should return multiple project filters"', () => {
+    it('should return multiple dummy filters"', () => {
       const state = createState();
-      const projectFilter = {
-        id: 'project',
+      const dummyFilter = {
+        id: 'dummy',
         options: [{ id: 'one', selected: true }, { id: 'anotherone', selected: true }],
       };
-      state.filters.push(projectFilter);
+      state.filters.push(dummyFilter);
       const activeFilters = getters.activeFilters(state, mockedGetters(state));
 
-      expect(activeFilters.project).toHaveLength(2);
+      expect(activeFilters.dummy).toHaveLength(2);
     });
   });
 });

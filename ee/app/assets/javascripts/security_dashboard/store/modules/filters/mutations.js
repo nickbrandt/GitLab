@@ -41,4 +41,8 @@ export default {
       activeFilter.options = activeOptions;
     }
   },
+  [types.SET_FILTER_OPTIONS](state, payload) {
+    const { filterId, options } = payload;
+    state.filters.find(filter => filter.id === filterId).options = options;
+  },
 };
