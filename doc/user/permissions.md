@@ -78,8 +78,9 @@ The following table depicts the various user permission levels in a project.
 | View approved/blacklisted licenses **[ULTIMATE]** |         |            | ✓           | ✓        | ✓      |
 | Use security dashboard **[ULTIMATE]** |         |            | ✓           | ✓        | ✓      |
 | Dismiss vulnerability **[ULTIMATE]**  |         |            | ✓           | ✓        | ✓      |
+| Apply code change suggestions         |         |            | ✓           | ✓        | ✓      |
 | Use environment terminals             |         |            |             | ✓        | ✓      |
-| Run Web IDE's Interactive Terminals **[ULTIMATE]** | |       |             | ✓        | ✓      |
+| Run Web IDE's Interactive Web Terminals **[ULTIMATE ONLY]** | |            |          | ✓      | ✓      |
 | Add new team members                  |         |            |             | ✓        | ✓      |
 | Push to protected branches            |         |            |             | ✓        | ✓      |
 | Enable/disable branch protection      |         |            |             | ✓        | ✓      |
