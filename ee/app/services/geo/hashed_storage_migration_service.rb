@@ -26,7 +26,7 @@ module Geo
       project.expire_caches_before_rename(old_disk_path)
 
       if migrating_from_legacy_storage? && !move_repository
-        log_error("Repository could not be migrated to Hashed Storage", project_id: project.id, source: old_disk_path, target: new_disk_path)
+        log_error("Repository could not be migrated to Hashed Storage: move_repository failed", project_id: project.id, source: old_disk_path, target: new_disk_path)
         raise RepositoryCannotBeRenamed, "Repository #{old_disk_path} could not be renamed to #{new_disk_path}"
       end
 
