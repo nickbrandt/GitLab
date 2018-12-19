@@ -52,5 +52,3 @@ module Clusters
     end
   end
 end
-
-Clusters::Applications::BaseHelmService.prepend(EE::Clusters::Applications::BaseHelmService)
