@@ -137,7 +137,7 @@ describe 'Referencing Epics', :js do
 
           find('div#notes li.note div.note-text a').click
 
-          page.within('div#notes li.note .system-note-message') do
+          page.within('div#notes li.note.system-note .system-note-message') do
             expect(page).to have_content('mentioned in epic')
             expect(page.find('a')).to have_content(epic.to_reference(full: true))
           end
