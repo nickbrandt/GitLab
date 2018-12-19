@@ -31,6 +31,15 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           post :check_config
         end
       end
+
+      scope '-' do
+        resources :packages, only: [:index, :show, :destroy], module: :packages
+        resources :package_files, only: [], module: :packages do
+          member do
+            get :download
+          end
+        end
+      end
     end
   end
 end
