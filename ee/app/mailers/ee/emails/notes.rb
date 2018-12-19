@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-module Emails
-  module EE
+module EE
+  module Emails
     module Notes
-      extend ::Gitlab::Utils::Override
-
       def note_epic_email(recipient_id, note_id)
         setup_note_mail(note_id, recipient_id)
 

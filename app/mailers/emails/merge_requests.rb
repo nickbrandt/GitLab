@@ -2,8 +2,6 @@
 
 module Emails
   module MergeRequests
-    prepend Emails::EE::MergeRequests # rubocop: disable Cop/InjectEnterpriseEditionModule
-
     def new_merge_request_email(recipient_id, merge_request_id, reason = nil)
       setup_merge_request_mail(merge_request_id, recipient_id, present: true)
 
@@ -115,3 +113,5 @@ module Emails
     end
   end
 end
+
+Emails::MergeRequests.prepend(EE::Emails::MergeRequests)
