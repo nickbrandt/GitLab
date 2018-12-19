@@ -13,12 +13,18 @@ export default {
       type: Number,
       required: true,
     },
+    tagName: {
+      type: String,
+      required: false,
+      default: 'a',
+    },
   },
 };
 </script>
 
 <template>
-  <a
+  <component
+    :is="tagName"
     ref="itemWeight"
     class="board-card-info card-number board-card-weight"
     tabindex="1"
@@ -33,5 +39,5 @@ export default {
       class="js-item-weight"
       >{{ __('Weight') }}<br /><span class="text-tertiary">{{ weight }}</span>
     </gl-tooltip>
-  </a>
+  </component>
 </template>
