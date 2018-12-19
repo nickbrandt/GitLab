@@ -81,10 +81,10 @@ $item-weight-max-width: 48px;
       .item-milestone,
       .item-weight {
         cursor: help;
-        text-decoration: none;
       }
 
       .item-milestone {
+        text-decoration: none;
         max-width: $item-milestone-max-width;
       }
 
