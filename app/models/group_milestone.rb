@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 # Group Milestones are milestones that can be shared among many projects within the same group
 class GroupMilestone < GlobalMilestone
-  include ::EE::GroupMilestone
+  include ::EE::GroupMilestone # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   attr_accessor :group
 

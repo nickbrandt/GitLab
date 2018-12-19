@@ -32,5 +32,5 @@ class Ldap::OmniauthCallbacksController < OmniauthCallbacksController
   end
 end
 
-Ldap::OmniauthCallbacksController.prepend(EE::OmniauthCallbacksController)
+Ldap::OmniauthCallbacksController.prepend(EE::OmniauthCallbacksController) # rubocop: disable Cop/InjectEnterpriseEditionModule
 Ldap::OmniauthCallbacksController.prepend(EE::Ldap::OmniauthCallbacksController)

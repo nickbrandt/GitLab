@@ -25,7 +25,7 @@ class MergeRequest < ActiveRecord::Base
                 :ref_fetched,
                 :deleted_at
 
-  prepend ::EE::MergeRequest
+  prepend ::EE::MergeRequest # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   belongs_to :target_project, class_name: "Project"
   belongs_to :source_project, class_name: "Project"
@@ -50,8 +50,8 @@ class MergeRequest < ActiveRecord::Base
   # is the inverse of MergeRequest#merge_request_diff, which means it may not be
   # the latest diff, because we could have loaded any diff from this particular
   # MR. If we haven't already loaded a diff, then it's fine to load the latest.
-  def merge_request_diff(*args)
-    fallback = latest_merge_request_diff if args.empty? && !association(:merge_request_diff).loaded?
+  def merge_request_diff
+    fallback = latest_merge_request_diff unless association(:merge_request_diff).loaded?
 
     fallback || super
   end
@@ -365,6 +365,10 @@ class MergeRequest < ActiveRecord::Base
     end
   end
 
+  def supports_suggestion?
+    true
+  end
+
   # Calls `MergeWorker` to proceed with the merge process and
   # updates `merge_jid` with the MergeWorker#jid.
   # This helps tracking enqueued and ongoing merge jobs.
@@ -615,10 +619,6 @@ class MergeRequest < ActiveRecord::Base
       merge_request_diffs.create
       reload_merge_request_diff
     end
-  end
-
-  def reload_merge_request_diff
-    merge_request_diff(true)
   end
 
   def viewable_diffs

@@ -11,7 +11,7 @@ describe Groups::LabelsController do
   end
 
   describe 'GET #index' do
-    subject { get :index, group_id: group.to_param }
+    subject { get :index, params: { group_id: group.to_param } }
 
     it_behaves_like 'disabled when using an external authorization service'
   end

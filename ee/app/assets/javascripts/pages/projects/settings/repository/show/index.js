@@ -13,6 +13,7 @@ import CEProtectedBranchEditList from '~/protected_branches/protected_branch_edi
 import CEProtectedTagCreate from '~/protected_tags/protected_tag_create';
 import CEProtectedTagEditList from '~/protected_tags/protected_tag_edit_list';
 import DueDateSelectors from '~/due_date_select';
+import fileUpload from '~/lib/utils/file_upload';
 import EEMirrorRepos from './ee_mirror_repos';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -40,4 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (pushPullContainer) new EEMirrorRepos(pushPullContainer).init();
 
   new DueDateSelectors();
+
+  fileUpload('.js-choose-file', '.js-object-map-input');
 });

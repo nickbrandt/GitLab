@@ -14,7 +14,7 @@ describe Projects::IssuesController do
     end
 
     it_behaves_like 'unauthorized when external service denies access' do
-      subject { get :index, namespace_id: project.namespace, project_id: project }
+      subject { get :index, params: { namespace_id: project.namespace, project_id: project } }
     end
   end
 
@@ -33,7 +33,7 @@ describe Projects::IssuesController do
     end
 
     def request_csv
-      post :export_csv, namespace_id: project.namespace.to_param, project_id: project.to_param
+      post :export_csv, params: { namespace_id: project.namespace.to_param, project_id: project.to_param }
     end
 
     context 'unlicensed' do
@@ -198,7 +198,7 @@ describe Projects::IssuesController do
 
   describe 'GET service_desk' do
     def get_service_desk(extra_params = {})
-      get :service_desk, extra_params.merge(namespace_id: project.namespace, project_id: project)
+      get :service_desk, params: extra_params.merge(namespace_id: project.namespace, project_id: project)
     end
 
     context 'when Service Desk is available on the project' do
@@ -265,7 +265,7 @@ describe Projects::IssuesController do
           end
 
           it 'displays related notes' do
-            get :discussions, namespace_id: project.namespace, project_id: project, id: issue.iid
+            get :discussions, params: { namespace_id: project.namespace, project_id: project, id: issue.iid }
 
             discussions = json_response
             notes = discussions.flat_map {|d| d['notes']}
@@ -283,7 +283,7 @@ describe Projects::IssuesController do
           end
 
           it 'redacts note related to a confidential issue' do
-            get :discussions, namespace_id: project.namespace, project_id: project, id: issue.iid
+            get :discussions, params: { namespace_id: project.namespace, project_id: project, id: issue.iid }
 
             discussions = json_response
             notes = discussions.flat_map {|d| d['notes']}

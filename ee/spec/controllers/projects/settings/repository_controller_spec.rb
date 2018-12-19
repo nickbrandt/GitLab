@@ -14,7 +14,7 @@ describe Projects::Settings::RepositoryController do
       subject(:push_rule) { assigns(:push_rule) }
 
       it 'is created' do
-        get :show, namespace_id: project.namespace, project_id: project
+        get :show, params: { namespace_id: project.namespace, project_id: project }
 
         is_expected.to be_persisted
       end
@@ -25,7 +25,7 @@ describe Projects::Settings::RepositoryController do
         end
 
         it 'is not created' do
-          get :show, namespace_id: project.namespace, project_id: project
+          get :show, params: { namespace_id: project.namespace, project_id: project }
 
           is_expected.to be_nil
         end

@@ -21,6 +21,11 @@ export default {
       type: Array,
       required: true,
     },
+    helpPagePath: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   computed: {
     ...mapGetters('diffs', ['commitId']),
@@ -54,6 +59,7 @@ export default {
             :line="line"
             :diff-file-hash="diffFile.file_hash"
             :line-index="index"
+            :help-page-path="helpPagePath"
           />
           <parallel-draft-comment-row
             v-if="shouldRenderParallelDraftRow(diffFile.file_hash, line)"

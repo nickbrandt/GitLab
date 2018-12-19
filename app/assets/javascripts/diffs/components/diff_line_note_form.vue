@@ -95,6 +95,7 @@ export default {
       ref="noteForm"
       :is-editing="true"
       :line-code="line.line_code"
+      :line="line"
       save-button-title="Comment"
       class="diff-comment-form"
       @handleFormUpdateAddToReview="addToReview"

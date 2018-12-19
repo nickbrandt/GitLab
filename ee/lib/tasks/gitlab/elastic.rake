@@ -4,9 +4,9 @@ namespace :gitlab do
     task :index do
       Rake::Task["gitlab:elastic:create_empty_index"].invoke
       Rake::Task["gitlab:elastic:clear_index_status"].invoke
-      Rake::Task["gitlab:elastic:index_repositories"].invoke
       Rake::Task["gitlab:elastic:index_wikis"].invoke
       Rake::Task["gitlab:elastic:index_database"].invoke
+      Rake::Task["gitlab:elastic:index_repositories"].invoke
     end
 
     desc "GitLab | Elasticsearch | Index project repositories in the background"

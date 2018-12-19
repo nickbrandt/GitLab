@@ -5,7 +5,8 @@ module PrometheusAdapter
 
   included do
     include ReactiveCaching
-    prepend EE::PrometheusAdapter # We can't prepend outside of this model due to the use of `included`, so this must stay here.
+    # We can't prepend outside of this model due to the use of `included`, so this must stay here.
+    prepend EE::PrometheusAdapter # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     self.reactive_cache_key = ->(adapter) { [adapter.class.model_name.singular, adapter.id] }
     self.reactive_cache_lease_timeout = 30.seconds

@@ -118,6 +118,7 @@ describe Gitlab::UsageData do
         releases
         remote_mirrors
         snippets
+        suggestions
         todos
         uploads
         web_hooks

@@ -33,7 +33,7 @@ describe API::Projects do
       end
 
       it 'creates new project with pull mirroring set up' do
-        post api('/projects', user), mirror_params
+        post api('/projects', user), params: mirror_params
 
         expect(response).to have_gitlab_http_status(201)
         expect(Project.first).to have_attributes(
@@ -47,7 +47,7 @@ describe API::Projects do
       it 'creates project without mirror settings when repository mirroring feature is disabled' do
         stub_licensed_features(repository_mirrors: false)
 
-        expect { post api('/projects', user), mirror_params }
+        expect { post api('/projects', user), params: mirror_params }
           .to change { Project.count }.by(1)
 
         expect(response).to have_gitlab_http_status(201)
@@ -65,7 +65,7 @@ describe API::Projects do
         end
 
         it 'ignores the mirroring options' do
-          post api('/projects', user), mirror_params
+          post api('/projects', user), params: mirror_params
 
           expect(response).to have_gitlab_http_status(201)
           expect(Project.first.mirror?).to be false
@@ -74,7 +74,7 @@ describe API::Projects do
         it 'creates project with mirror settings' do
           admin = create(:admin)
 
-          post api('/projects', admin), mirror_params
+          post api('/projects', admin), params: mirror_params
 
           expect(response).to have_gitlab_http_status(201)
           expect(Project.first).to have_attributes(
@@ -97,7 +97,7 @@ describe API::Projects do
       end
 
       it 'updates the classification label' do
-        put(api("/projects/#{project.id}", user), external_authorization_classification_label: 'new label')
+        put(api("/projects/#{project.id}", user), params: { external_authorization_classification_label: 'new label' })
 
         expect(response).to have_gitlab_http_status(200)
 
@@ -113,7 +113,7 @@ describe API::Projects do
         it 'returns 200 but does not change repository_storage' do
           expect do
             Sidekiq::Testing.fake! do
-              put(api("/projects/#{new_project.id}", user), repository_storage: unknown_storage, issues_enabled: false)
+              put(api("/projects/#{new_project.id}", user), params: { repository_storage: unknown_storage, issues_enabled: false })
             end
           end.not_to change(ProjectUpdateRepositoryStorageWorker.jobs, :size)
 
@@ -127,7 +127,7 @@ describe API::Projects do
         let(:admin) { create(:admin) }
 
         it 'returns 500 when repository storage is unknown' do
-          put(api("/projects/#{new_project.id}", admin), repository_storage: unknown_storage)
+          put(api("/projects/#{new_project.id}", admin), params: { repository_storage: unknown_storage })
 
           expect(response).to have_gitlab_http_status(500)
           expect(json_response['message']).to match('ArgumentError')
@@ -138,7 +138,7 @@ describe API::Projects do
 
           expect do
             Sidekiq::Testing.fake! do
-              put(api("/projects/#{new_project.id}", admin), repository_storage: 'extra')
+              put(api("/projects/#{new_project.id}", admin), params: { repository_storage: 'extra' })
             end
           end.to change(ProjectUpdateRepositoryStorageWorker.jobs, :size).by(1)
 
@@ -166,7 +166,7 @@ describe API::Projects do
         end
 
         it 'does not update mirror related attributes' do
-          put(api("/projects/#{project.id}", user), mirror_params)
+          put(api("/projects/#{project.id}", user), params: mirror_params)
 
           expect(response).to have_gitlab_http_status(200)
           expect(project.reload.mirror).to be false
@@ -179,7 +179,7 @@ describe API::Projects do
 
           expect_any_instance_of(EE::ProjectImportState).to receive(:force_import_job!).once
 
-          put(api("/projects/#{project.id}", admin), mirror_params)
+          put(api("/projects/#{project.id}", admin), params: mirror_params)
 
           expect(response).to have_gitlab_http_status(200)
           expect(project.reload).to have_attributes(
@@ -196,7 +196,7 @@ describe API::Projects do
       it 'updates mirror related attributes' do
         expect_any_instance_of(EE::ProjectImportState).to receive(:force_import_job!).once
 
-        put(api("/projects/#{project.id}", user), mirror_params)
+        put(api("/projects/#{project.id}", user), params: mirror_params)
 
         expect(response).to have_gitlab_http_status(200)
         expect(project.reload).to have_attributes(
@@ -212,7 +212,7 @@ describe API::Projects do
       it 'updates project without mirror attributes when the project is unable to set up repository mirroring' do
         stub_licensed_features(repository_mirrors: false)
 
-        put(api("/projects/#{project.id}", user), mirror_params)
+        put(api("/projects/#{project.id}", user), params: mirror_params)
 
         expect(response).to have_gitlab_http_status(200)
         expect(project.reload.mirror).to be false
@@ -223,7 +223,7 @@ describe API::Projects do
         project.add_developer(invalid_mirror_user)
         mirror_params[:mirror_user_id] = invalid_mirror_user.id
 
-        put(api("/projects/#{project.id}", user), mirror_params)
+        put(api("/projects/#{project.id}", user), params: mirror_params)
 
         expect(response).to have_gitlab_http_status(400)
         expect(json_response["message"]["mirror_user_id"].first).to eq("is invalid")
@@ -233,7 +233,7 @@ describe API::Projects do
         developer = create(:user)
         project.add_developer(developer)
 
-        put(api("/projects/#{project.id}", developer), mirror_params)
+        put(api("/projects/#{project.id}", developer), params: mirror_params)
 
         expect(response).to have_gitlab_http_status(:forbidden)
       end
@@ -250,7 +250,7 @@ describe API::Projects do
         end
 
         it 'disables project packages feature' do
-          put(api("/projects/#{project.id}", user), packages_enabled: false)
+          put(api("/projects/#{project.id}", user), params: { packages_enabled: false })
 
           expect(response).to have_gitlab_http_status(200)
           expect(project.reload.packages_enabled).to be false
@@ -264,7 +264,7 @@ describe API::Projects do
         end
 
         it 'disables project packages feature but does not return packages_enabled attribute' do
-          put(api("/projects/#{project.id}", user), packages_enabled: false)
+          put(api("/projects/#{project.id}", user), params: { packages_enabled: false })
 
           expect(response).to have_gitlab_http_status(200)
           expect(project.reload.packages_enabled).to be false
@@ -282,7 +282,7 @@ describe API::Projects do
         create(:repository_state, :repository_failed, project: project)
         create(:repository_state, :wiki_failed, project: project1)
 
-        get api('/projects', user), repository_checksum_failed: true
+        get api('/projects', user), params: { repository_checksum_failed: true }
 
         expect(response).to have_gitlab_http_status(200)
         expect(response).to include_pagination_headers
@@ -295,7 +295,7 @@ describe API::Projects do
         create(:repository_state, :wiki_failed, project: project)
         create(:repository_state, :repository_failed, project: project1)
 
-        get api('/projects', user), wiki_checksum_failed: true
+        get api('/projects', user), params: { wiki_checksum_failed: true }
 
         expect(response).to have_gitlab_http_status(200)
         expect(response).to include_pagination_headers

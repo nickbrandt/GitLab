@@ -19,32 +19,19 @@ describe Gitlab::Database::LoadBalancing::LoadBalancer do
   end
 
   def wrapped_exception(wrapper, original)
-    if Gitlab.rails5?
-      begin
-        raise_and_wrap(wrapper, original.new)
-      rescue wrapper => error
-        error
-      end
-    else
-      wrapper.new('boop', original.new)
-    end
+    raise_and_wrap(wrapper, original.new)
+  rescue wrapper => error
+    error
   end
 
   def twice_wrapped_exception(top, middle, original)
-    if Gitlab.rails5?
-      begin
-        begin
-          raise_and_wrap(middle, original.new)
-        rescue middle => middle_error
-          raise_and_wrap(top, middle_error)
-        end
-      rescue top => top_error
-        top_error
-      end
-    else
-      middle_error = middle.new('boop', original.new)
-      top.new('boop', middle_error)
+    begin
+      raise_and_wrap(middle, original.new)
+    rescue middle => middle_error
+      raise_and_wrap(top, middle_error)
     end
+  rescue top => top_error
+    top_error
   end
 
   describe '#read' do

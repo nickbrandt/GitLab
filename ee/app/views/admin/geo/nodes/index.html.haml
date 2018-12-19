@@ -7,13 +7,7 @@
 %hr.page-title-separator
 
 %p.page-subtitle.light
-  With #{link_to 'GitLab Geo', help_page_path('gitlab-geo/README'), class: 'vlink'} you can install a special
-  read-only and replicated instance anywhere.
-  Before you add nodes, follow the
-  #{link_to 'Setup instructions', help_page_path('gitlab-geo/README', anchor: 'setup-instructions'), class: 'vlink' }
-  in the
-  %strong exact order
-  they appear.
+  = s_('GeoNodes|With %{geo} you can install a special read-only and replicated instance anywhere. Before you add nodes, follow the %{instructions} in the exact order they appear.').html_safe % { geo: link_to('GitLab Geo', help_page_path('administration/geo/replication/index.md'), target: '_blank'), instructions: link_to('setup instructions', help_page_path('administration/geo/replication/index.md', anchor: 'setup-instructions'), target: '_blank') }
 
 - unless Gitlab::Database.pg_stat_wal_receiver_supported?
   = content_for :flash_message do

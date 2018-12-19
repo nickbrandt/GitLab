@@ -1,11 +1,12 @@
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import $ from 'jquery';
 import noteEditedText from './note_edited_text.vue';
 import noteAwardsList from './note_awards_list.vue';
 import noteAttachment from './note_attachment.vue';
 import noteForm from './note_form.vue';
 import autosave from '../mixins/autosave';
+import Suggestions from '~/vue_shared/components/markdown/suggestions.vue';
 
 export default {
   components: {
@@ -13,12 +14,18 @@ export default {
     noteAwardsList,
     noteAttachment,
     noteForm,
+    Suggestions,
   },
   mixins: [autosave],
   props: {
     note: {
       type: Object,
       required: true,
+    },
+    line: {
+      type: Object,
+      required: false,
+      default: null,
     },
     canEdit: {
       type: Boolean,
@@ -29,11 +36,22 @@ export default {
       required: false,
       default: false,
     },
+    helpPagePath: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   computed: {
     ...mapGetters(['getDiscussion']),
     noteBody() {
       return this.note.note;
+    },
+    hasSuggestion() {
+      return this.note.suggestions && this.note.suggestions.length;
+    },
+    lineType() {
+      return this.line ? this.line.type : null;
     },
     discussion() {
       if (!this.note.isDraft) return {};
@@ -60,6 +78,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['submitSuggestion']),
     renderGFM() {
       $(this.$refs['note-body']).renderGFM();
     },
@@ -69,19 +88,35 @@ export default {
     formCancelHandler(shouldConfirm, isDirty) {
       this.$emit('cancelForm', shouldConfirm, isDirty);
     },
+    applySuggestion({ suggestionId, flashContainer, callback }) {
+      const { discussion_id: discussionId, id: noteId } = this.note;
+
+      this.submitSuggestion({ discussionId, noteId, suggestionId, flashContainer, callback });
+    },
   },
 };
 </script>
 
 <template>
   <div ref="note-body" :class="{ 'js-task-list-container': canEdit }" class="note-body">
-    <div class="note-text md" v-html="note.note_html"></div>
+    <suggestions
+      v-if="hasSuggestion && !isEditing"
+      :suggestions="note.suggestions"
+      :note-html="note.note_html"
+      :line-type="lineType"
+      :help-page-path="helpPagePath"
+      @apply="applySuggestion"
+    />
+    <div v-else class="note-text md" v-html="note.note_html"></div>
     <note-form
       v-if="isEditing"
       ref="noteForm"
       :is-editing="isEditing"
       :note-body="noteBody"
       :note-id="note.id"
+      :line="line"
+      :note="note"
+      :help-page-path="helpPagePath"
       :markdown-version="note.cached_markdown_version"
       :discussion="discussion"
       :resolve-discussion="note.resolve_discussion"

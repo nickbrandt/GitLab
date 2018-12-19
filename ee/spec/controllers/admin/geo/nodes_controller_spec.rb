@@ -60,7 +60,7 @@ describe Admin::Geo::NodesController, :postgresql do
     let(:geo_node_attributes) { { url: 'http://example.com' } }
 
     def go
-      post :create, geo_node: geo_node_attributes
+      post :create, params: { geo_node: geo_node_attributes }
     end
 
     context 'without add-on license' do
@@ -91,7 +91,7 @@ describe Admin::Geo::NodesController, :postgresql do
     let(:geo_node) { create(:geo_node) }
 
     def go
-      post :update, id: geo_node, geo_node: geo_node_attributes
+      post :update, params: { id: geo_node, geo_node: geo_node_attributes }
     end
 
     context 'without add-on license' do

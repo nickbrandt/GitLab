@@ -11,4 +11,14 @@ class Packages::Package < ActiveRecord::Base
   validates :name,
     presence: true,
     format: { with: Gitlab::Regex.package_name_regex }
+
+  def self.for_projects(projects)
+    return none unless projects.any?
+
+    where(project_id: projects)
+  end
+
+  def self.only_maven_packages_with_path(path)
+    joins(:maven_metadatum).where(packages_maven_metadata: { path: path })
+  end
 end

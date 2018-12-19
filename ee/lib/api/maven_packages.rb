@@ -76,7 +76,8 @@ module API
 
       authorize!(:read_package, project)
 
-      package = ::Packages::MavenPackageFinder.new(params[:path], project).execute!
+      package = ::Packages::MavenPackageFinder
+        .new(params[:path], current_user, project: project).execute!
 
       forbidden! unless package.project.feature_available?(:packages)
 
@@ -90,6 +91,46 @@ module API
         package_file.file_sha1
       when nil
         present_carrierwave_file!(package_file.file)
+      end
+    end
+
+    desc 'Download the maven package file at a group level' do
+      detail 'This feature was introduced in GitLab 11.7'
+    end
+    params do
+      requires :id, type: String, desc: 'The ID of a group'
+    end
+    resource :groups, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
+      params do
+        requires :path, type: String, desc: 'Package path'
+        requires :file_name, type: String, desc: 'Package file name'
+      end
+      route_setting :authentication, job_token_allowed: true
+      get ':id/-/packages/maven/*path/:file_name', requirements: MAVEN_ENDPOINT_REQUIREMENTS do
+        file_name, format = extract_format(params[:file_name])
+
+        group = find_group(params[:id])
+
+        not_found!('Group') unless can?(current_user, :read_group, group)
+
+        package = ::Packages::MavenPackageFinder
+          .new(params[:path], current_user, group: group).execute!
+
+        forbidden! unless package.project.feature_available?(:packages)
+
+        authorize!(:read_package, package.project)
+
+        package_file = ::Packages::PackageFileFinder
+          .new(package, file_name).execute!
+
+        case format
+        when 'md5'
+          package_file.file_md5
+        when 'sha1'
+          package_file.file_sha1
+        when nil
+          present_carrierwave_file!(package_file.file)
+        end
       end
     end
 
@@ -115,7 +156,7 @@ module API
         file_name, format = extract_format(params[:file_name])
 
         package = ::Packages::MavenPackageFinder
-          .new(params[:path], user_project).execute!
+          .new(params[:path], current_user, project: user_project).execute!
 
         package_file = ::Packages::PackageFileFinder
           .new(package, file_name).execute!

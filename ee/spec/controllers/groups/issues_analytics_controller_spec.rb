@@ -16,7 +16,7 @@ describe Groups::IssuesAnalyticsController do
   describe 'GET #show' do
     context 'when issues analytics is not available for license' do
       it 'renders 404' do
-        get :show, group_id: group.to_param
+        get :show, params: { group_id: group.to_param }
 
         expect(response).to have_gitlab_http_status(404)
       end
@@ -30,7 +30,7 @@ describe Groups::IssuesAnalyticsController do
       end
 
       it 'renders 404' do
-        get :show, group_id: group.to_param
+        get :show, params: { group_id: group.to_param }
 
         expect(response).to have_gitlab_http_status(404)
       end
@@ -43,7 +43,7 @@ describe Groups::IssuesAnalyticsController do
 
       context 'as HTML' do
         it 'renders show template' do
-          get :show, group_id: group.to_param, months_back: 2
+          get :show, params: { group_id: group.to_param, months_back: 2 }
 
           expect(response).to render_template(:show)
         end
@@ -56,7 +56,7 @@ describe Groups::IssuesAnalyticsController do
         it 'renders chart data as JSON' do
           expected_result = { issue1.created_at.strftime(IssuablesAnalytics::DATE_FORMAT) => 2 }
 
-          get :show, group_id: group.to_param, format: :json
+          get :show, params: { group_id: group.to_param }, format: :json
 
           expect(JSON.parse(response.body)).to include(expected_result)
         end
@@ -72,7 +72,7 @@ describe Groups::IssuesAnalyticsController do
           it 'does not count issues which user cannot view' do
             expected_result = { issue1.created_at.strftime(IssuablesAnalytics::DATE_FORMAT) => 1 }
 
-            get :show, group_id: group.to_param, format: :json
+            get :show, params: { group_id: group.to_param }, format: :json
 
             expect(JSON.parse(response.body)).to include(expected_result)
           end

@@ -19,13 +19,13 @@ describe Projects::Prometheus::AlertsController do
       it 'renders forbidden when unlicensed' do
         stub_licensed_features(prometheus_alerts: false)
 
-        get :index, project_params
+        get :index, params: project_params
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
 
       it 'returns an empty response' do
-        get :index, project_params
+        get :index, params: project_params
 
         expect(response).to have_gitlab_http_status(200)
         expect(JSON.parse(response.body)).to be_empty
@@ -38,7 +38,7 @@ describe Projects::Prometheus::AlertsController do
       end
 
       it 'contains prometheus alerts' do
-        get :index, project_params
+        get :index, params: project_params
 
         expect(response).to have_gitlab_http_status(200)
         expect(JSON.parse(response.body).count).to eq(3)
@@ -49,7 +49,7 @@ describe Projects::Prometheus::AlertsController do
   describe 'GET #show' do
     context 'when alert does not exist' do
       it 'renders 404' do
-        get :show, project_params(id: PrometheusAlert.all.maximum(:prometheus_metric_id).to_i + 1)
+        get :show, params: project_params(id: PrometheusAlert.all.maximum(:prometheus_metric_id).to_i + 1)
 
         expect(response).to have_gitlab_http_status(404)
       end
@@ -61,7 +61,7 @@ describe Projects::Prometheus::AlertsController do
       it 'renders forbidden when unlicensed' do
         stub_licensed_features(prometheus_alerts: false)
 
-        get :show, project_params(id: alert.prometheus_metric_id)
+        get :show, params: project_params(id: alert.prometheus_metric_id)
 
         expect(response).to have_gitlab_http_status(:not_found)
       end
@@ -76,7 +76,7 @@ describe Projects::Prometheus::AlertsController do
           "alert_path" => Gitlab::Routing.url_helpers.project_prometheus_alert_path(project, alert.prometheus_metric_id, environment_id: alert.environment.id, format: :json)
         }
 
-        get :show, project_params(id: alert.prometheus_metric_id)
+        get :show, params: project_params(id: alert.prometheus_metric_id)
 
         expect(response).to have_gitlab_http_status(200)
         expect(JSON.parse(response.body)).to include(alert_params)
@@ -95,7 +95,7 @@ describe Projects::Prometheus::AlertsController do
     it 'sends a notification for firing alerts only' do
       expect(notify_service).to receive(:execute).and_return(true)
 
-      post :notify, project_params(payload), as: :json
+      post :notify, params: project_params(payload), session: { as: :json }
 
       expect(response).to have_gitlab_http_status(200)
     end
@@ -103,7 +103,7 @@ describe Projects::Prometheus::AlertsController do
     it 'renders unprocessable entity if notification fails' do
       expect(notify_service).to receive(:execute).and_return(false)
 
-      post :notify, project_params, as: :json
+      post :notify, params: project_params, session: { as: :json }
 
       expect(response).to have_gitlab_http_status(422)
     end
@@ -113,7 +113,7 @@ describe Projects::Prometheus::AlertsController do
     it 'renders forbidden when unlicensed' do
       stub_licensed_features(prometheus_alerts: false)
 
-      post :create, project_params(
+      post :create, params: project_params(
         operator: ">",
         threshold: "1",
         environment_id: environment.id,
@@ -134,7 +134,7 @@ describe Projects::Prometheus::AlertsController do
 
       allow(::Clusters::Applications::ScheduleUpdateService).to receive(:new).and_return(schedule_update_service)
 
-      post :create, project_params(
+      post :create, params: project_params(
         operator: ">",
         threshold: "1",
         environment_id: environment.id,
@@ -150,7 +150,7 @@ describe Projects::Prometheus::AlertsController do
       let(:environment) { create(:environment) }
 
       it 'returns 204 status' do
-        post :create, project_params(
+        post :create, params: project_params(
           operator: ">",
           threshold: "1",
           environment_id: environment.id,
@@ -173,7 +173,7 @@ describe Projects::Prometheus::AlertsController do
     it 'renders forbidden when unlicensed' do
       stub_licensed_features(prometheus_alerts: false)
 
-      put :update, project_params(id: alert.prometheus_metric_id, operator: "<")
+      put :update, params: project_params(id: alert.prometheus_metric_id, operator: "<")
 
       expect(response).to have_gitlab_http_status(:not_found)
     end
@@ -189,7 +189,7 @@ describe Projects::Prometheus::AlertsController do
       }
 
       expect do
-        put :update, project_params(id: alert.prometheus_metric_id, operator: "<")
+        put :update, params: project_params(id: alert.prometheus_metric_id, operator: "<")
       end.to change { alert.reload.operator }.to("lt")
 
       expect(schedule_update_service).to have_received(:execute)
@@ -209,14 +209,14 @@ describe Projects::Prometheus::AlertsController do
     it 'renders forbidden when unlicensed' do
       stub_licensed_features(prometheus_alerts: false)
 
-      delete :destroy, project_params(id: alert.prometheus_metric_id)
+      delete :destroy, params: project_params(id: alert.prometheus_metric_id)
 
       expect(response).to have_gitlab_http_status(:not_found)
     end
 
     it 'destroys the specified prometheus alert' do
       expect do
-        delete :destroy, project_params(id: alert.prometheus_metric_id)
+        delete :destroy, params: project_params(id: alert.prometheus_metric_id)
       end.to change { PrometheusAlert.count }.from(1).to(0)
 
       expect(schedule_update_service).to have_received(:execute)

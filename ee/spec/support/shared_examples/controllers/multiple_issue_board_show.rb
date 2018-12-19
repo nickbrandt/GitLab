@@ -44,6 +44,6 @@ shared_examples 'multiple issue boards show' do
       params.merge!(namespace_id: parent.namespace, project_id: parent)
     end
 
-    get :show, params
+    get :show, params: params
   end
 end

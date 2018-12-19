@@ -19,15 +19,9 @@ describe Gitlab::Database::LoadBalancing::Host, :postgresql do
   end
 
   def wrapped_exception(wrapper, original)
-    if Gitlab.rails5?
-      begin
-        raise_and_wrap(wrapper, original.new)
-      rescue wrapper => error
-        error
-      end
-    else
-      wrapper.new('boom', original.new)
-    end
+    raise_and_wrap(wrapper, original.new)
+  rescue wrapper => error
+    error
   end
 
   describe '#connection' do
@@ -323,8 +317,7 @@ describe Gitlab::Database::LoadBalancing::Host, :postgresql do
       expect(host.caught_up?('foo')).to eq(true)
     end
 
-    # TODO: remove rails5-only tag after removing rails4 tests
-    it 'returns true when a host has caught up', :rails5 do
+    it 'returns true when a host has caught up' do
       allow(host).to receive(:connection).and_return(connection)
       expect(connection).to receive(:select_all).and_return([{ 'result' => true }])
 
@@ -338,8 +331,7 @@ describe Gitlab::Database::LoadBalancing::Host, :postgresql do
       expect(host.caught_up?('foo')).to eq(false)
     end
 
-    # TODO: remove rails5-only tag after removing rails4 tests
-    it 'returns false when a host has not caught up', :rails5 do
+    it 'returns false when a host has not caught up' do
       allow(host).to receive(:connection).and_return(connection)
       expect(connection).to receive(:select_all).and_return([{ 'result' => false }])
 

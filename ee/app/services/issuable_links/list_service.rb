@@ -48,7 +48,7 @@ module IssuableLinks
         path: issuable_path(object),
         relation_path: relation_path(object),
         due_date: object.due_date,
-        created_at: object.created_at&.to_s,
+        created_at: object.created_at,
         closed_at: object.closed_at
       }
     end

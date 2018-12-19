@@ -49,6 +49,7 @@ describe Geo::RepositoryVerificationSecondaryService, :geo do
       expect(registry).to have_attributes(
         "#{type}_verification_checksum_sha" => '62fc1ec4ce60',
         "#{type}_checksum_mismatch" => false,
+        "last_#{type}_verification_ran_at" => be_within(1.minute).of(Time.now),
         "last_#{type}_verification_failure" => nil,
         "#{type}_verification_retry_count" => nil,
         "resync_#{type}" => false,
@@ -67,6 +68,7 @@ describe Geo::RepositoryVerificationSecondaryService, :geo do
       expect(registry).to have_attributes(
         "#{type}_verification_checksum_sha" => '0000000000000000000000000000000000000000',
         "#{type}_checksum_mismatch" => false,
+        "last_#{type}_verification_ran_at" => be_within(1.minute).of(Time.now),
         "last_#{type}_verification_failure" => nil,
         "#{type}_verification_retry_count" => nil,
         "resync_#{type}" => false,
@@ -86,6 +88,7 @@ describe Geo::RepositoryVerificationSecondaryService, :geo do
         expect(registry).to have_attributes(
           "#{type}_verification_checksum_sha" => nil,
           "#{type}_checksum_mismatch" => true,
+          "last_#{type}_verification_ran_at" => be_within(1.minute).of(Time.now),
           "last_#{type}_verification_failure" => "#{type.to_s.capitalize} checksum mismatch",
           "#{type}_verification_retry_count" => 1,
           "resync_#{type}" => true,
@@ -118,6 +121,7 @@ describe Geo::RepositoryVerificationSecondaryService, :geo do
         expect(registry).to have_attributes(
           "#{type}_verification_checksum_sha" => nil,
           "#{type}_checksum_mismatch" => false,
+          "last_#{type}_verification_ran_at" => be_within(1.minute).of(Time.now),
           "last_#{type}_verification_failure" => "Error calculating #{type} checksum",
           "#{type}_verification_retry_count" => 1,
           "resync_#{type}" => true,

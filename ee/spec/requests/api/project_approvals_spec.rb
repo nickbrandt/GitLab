@@ -51,13 +51,13 @@ describe API::ProjectApprovals do
 
       context 'when the request is correct' do
         it 'returns 201 status' do
-          post api(url, current_user), approvals_before_merge: 3
+          post api(url, current_user), params: { approvals_before_merge: 3 }
 
           expect(response).to have_gitlab_http_status(201)
         end
 
         it 'matches the response schema' do
-          post api(url, current_user), approvals_before_merge: 3
+          post api(url, current_user), params: { approvals_before_merge: 3 }
 
           expect(response).to match_response_schema('public_api/v4/project_approvers', dir: 'ee')
         end
@@ -74,7 +74,7 @@ describe API::ProjectApprovals do
             disable_overriding_approvers_per_merge_request: false
           }
 
-          post api(url, current_user), settings
+          post api(url, current_user), params: settings
 
           expect(JSON.parse(response.body).symbolize_keys).to include(settings)
         end
@@ -83,7 +83,7 @@ describe API::ProjectApprovals do
           private_group = create(:group, :private)
           project.approver_groups.create(group: private_group)
 
-          post api(url, current_user), approvals_before_merge: 3
+          post api(url, current_user), params: { approvals_before_merge: 3 }
 
           expect(response).to match_response_schema('public_api/v4/project_approvers', dir: 'ee')
           expect(json_response["approver_groups"].size).to eq(visible_approver_groups_count)
@@ -107,7 +107,7 @@ describe API::ProjectApprovals do
 
     context 'as a user without access' do
       it 'returns 403' do
-        post api(url, user2), approvals_before_merge: 4
+        post api(url, user2), params: { approvals_before_merge: 4 }
 
         expect(response).to have_gitlab_http_status(403)
       end
@@ -122,7 +122,7 @@ describe API::ProjectApprovals do
         project.approvers.create(user: approver)
 
         expect do
-          put api(url, current_user), { approver_ids: [], approver_group_ids: [] }.to_json, { CONTENT_TYPE: 'application/json' }
+          put api(url, current_user), params: { approver_ids: [], approver_group_ids: [] }.to_json, headers: { CONTENT_TYPE: 'application/json' }
         end.to change { project.approvers.count }.from(1).to(0)
 
         expect(response).to have_gitlab_http_status(200)
@@ -135,7 +135,7 @@ describe API::ProjectApprovals do
           project.approvers.create(user: approver)
 
           expect do
-            put api(url, current_user), approver_ids: '', approver_group_ids: ''
+            put api(url, current_user), params: { approver_ids: '', approver_group_ids: '' }
           end.to change { project.approvers.count }.from(1).to(0)
 
           expect(response).to have_gitlab_http_status(200)
@@ -148,7 +148,7 @@ describe API::ProjectApprovals do
         project.approvers.create(user: approver)
 
         expect do
-          put api(url, current_user), approver_ids: [approver.id], approver_group_ids: [group.id]
+          put api(url, current_user), params: { approver_ids: [approver.id], approver_group_ids: [group.id] }
         end.to change { project.approvers.count }.by(0).and change { project.approver_groups.count }.from(0).to(1)
 
         expect(project.approvers.count).to eq(1)
@@ -165,7 +165,7 @@ describe API::ProjectApprovals do
         project.approvers.create(user: approver)
 
         expect do
-          put api(url, current_user), approver_ids: [approver.id], approver_group_ids: [private_group.id]
+          put api(url, current_user), params: { approver_ids: [approver.id], approver_group_ids: [private_group.id] }
         end.to change { project.approver_groups.count }.from(0).to(1)
 
         expect(response).to match_response_schema('public_api/v4/project_approvers', dir: 'ee')
@@ -192,7 +192,7 @@ describe API::ProjectApprovals do
         project.approvers.create(user: approver)
 
         expect do
-          put api(url, user2), { approver_ids: [], approver_group_ids: [] }.to_json, { CONTENT_TYPE: 'application/json' }
+          put api(url, user2), params: { approver_ids: [], approver_group_ids: [] }.to_json, headers: { CONTENT_TYPE: 'application/json' }
         end.not_to change { project.approvers.count }
 
         expect(response).to have_gitlab_http_status(403)

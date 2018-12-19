@@ -19,7 +19,7 @@ describe Projects::Settings::OperationsController do
         end
 
         it 'returns 404' do
-          get :show, namespace_id: project.namespace, project_id: project
+          get :show, params: { namespace_id: project.namespace, project_id: project }
 
           expect(response).to have_gitlab_http_status(:not_found)
         end
@@ -34,7 +34,7 @@ describe Projects::Settings::OperationsController do
       end
 
       it 'renders ok' do
-        get :show, namespace_id: project.namespace, project_id: project
+        get :show, params: { namespace_id: project.namespace, project_id: project }
 
         expect(response).to have_gitlab_http_status(200)
         expect(response).to render_template(:show)
@@ -45,7 +45,7 @@ describe Projects::Settings::OperationsController do
       it 'redirects for private project' do
         project = create(:project, project_visibility)
 
-        get :show, namespace_id: project.namespace, project_id: project
+        get :show, params: { namespace_id: project.namespace, project_id: project }
 
         expect(response).to redirect_to(new_user_session_path)
       end
@@ -230,7 +230,7 @@ describe Projects::Settings::OperationsController do
     end
 
     def update_project(project, params)
-      patch :update, project_params(project, params)
+      patch :update, params: project_params(project, params)
 
       project.reload
     end

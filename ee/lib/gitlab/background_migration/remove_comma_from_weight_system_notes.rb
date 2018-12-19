@@ -3,8 +3,6 @@
 module Gitlab
   module BackgroundMigration
     class RemoveCommaFromWeightSystemNotes
-      include ::Gitlab::Database::ArelMethods
-
       def perform(note_ids)
         notes_table = Arel::Table.new(:notes)
 
@@ -13,7 +11,7 @@ module Gitlab
           [notes_table[:note_html], nil]
         ]
 
-        update = arel_update_manager
+        update = Arel::UpdateManager.new
                    .table(notes_table)
                    .set(update_values)
                    .where(notes_table[:id].in(note_ids))

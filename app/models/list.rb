@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class List < ActiveRecord::Base
-  prepend ::EE::List
+  prepend ::EE::List # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   belongs_to :board
   belongs_to :label

@@ -67,7 +67,7 @@ describe EE::API::Helpers do
       expect_any_instance_of(::Gitlab::Geo::JwtRequestDecoder).to receive(:decode) { raise ::Gitlab::Geo::InvalidDecryptionKeyError }
 
       header 'Authorization', 'test'
-      get 'protected', current_user: 'test'
+      get 'protected', params: { current_user: 'test' }
 
       expect(JSON.parse(last_response.body)).to eq({ 'message' => 'Gitlab::Geo::InvalidDecryptionKeyError' })
     end
@@ -76,7 +76,7 @@ describe EE::API::Helpers do
       allow_any_instance_of(::Gitlab::Geo::JwtRequestDecoder).to receive(:decode) { raise ::Gitlab::Geo::InvalidSignatureTimeError }
 
       header 'Authorization', 'test'
-      get 'protected', current_user: 'test'
+      get 'protected', params: { current_user: 'test' }
 
       expect(JSON.parse(last_response.body)).to eq({ 'message' => 'Gitlab::Geo::InvalidSignatureTimeError' })
     end

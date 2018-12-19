@@ -16,7 +16,7 @@ describe Groups::Security::VulnerabilitiesController do
   end
 
   describe 'GET index.json' do
-    subject { get :index, group_id: group, format: :json }
+    subject { get :index, params: { group_id: group }, format: :json }
 
     context 'when security dashboard feature is disabled' do
       before do
@@ -77,7 +77,7 @@ describe Groups::Security::VulnerabilitiesController do
           end
 
           it "returns a list of vulnerabilities" do
-            get :index, group_id: group, page: 3, format: :json
+            get :index, params: { group_id: group, page: 3 }, format: :json
 
             expect(response).to have_gitlab_http_status(200)
             expect(json_response).to be_an(Array)
@@ -99,7 +99,7 @@ describe Groups::Security::VulnerabilitiesController do
           private
 
           def get_summary
-            get :index, group_id: group, format: :json
+            get :index, params: { group_id: group }, format: :json
           end
         end
 
@@ -148,7 +148,7 @@ describe Groups::Security::VulnerabilitiesController do
   end
 
   describe 'GET summary.json' do
-    subject { get :summary, group_id: group, format: :json }
+    subject { get :summary, params: { group_id: group }, format: :json }
 
     context 'when security dashboard feature is disabled' do
       before do
@@ -216,7 +216,7 @@ describe Groups::Security::VulnerabilitiesController do
   end
 
   describe 'GET history.json' do
-    subject { get :history,  group_id: group, format: :json }
+    subject { get :history,  params: { group_id: group }, format: :json }
 
     context 'when security dashboard feature is disabled' do
       before do
@@ -226,19 +226,6 @@ describe Groups::Security::VulnerabilitiesController do
       it 'returns 404' do
         subject
 
-        expect(response).to have_gitlab_http_status(404)
-      end
-    end
-
-    context 'when group security dashboard history feature flag is disabled' do
-      before do
-        stub_licensed_features(security_dashboard: true)
-        stub_feature_flags(group_security_dashboard_history: false)
-        group.add_developer(user)
-      end
-
-      it 'returns 404' do
-        subject
         expect(response).to have_gitlab_http_status(404)
       end
     end

@@ -22,7 +22,7 @@ describe Oauth::GeoAuthController do
     it 'redirects to root_url when state is invalid' do
       allow_any_instance_of(Gitlab::Geo::Oauth::LoginState).to receive(:valid?).and_return(false)
 
-      get :auth, state: login_state
+      get :auth, params: { state: login_state }
 
       expect(response).to redirect_to(root_url)
     end
@@ -30,7 +30,7 @@ describe Oauth::GeoAuthController do
     it "redirects to primary node's oauth endpoint" do
       oauth_endpoint = Gitlab::Geo::Oauth::Session.new.authorize_url(redirect_uri: oauth_geo_callback_url, state: login_state)
 
-      get :auth, state: login_state
+      get :auth, params: { state: login_state }
 
       expect(response).to redirect_to(oauth_endpoint)
     end
@@ -50,19 +50,19 @@ describe Oauth::GeoAuthController do
       it 'redirects to login screen if state is invalid' do
         allow_any_instance_of(Gitlab::Geo::Oauth::LoginState).to receive(:valid?).and_return(false)
 
-        get :callback, state: login_state
+        get :callback, params: { state: login_state }
 
         expect(response).to redirect_to(new_user_session_path)
       end
 
       it 'redirects to redirect_url if state is valid' do
-        get :callback, state: login_state
+        get :callback, params: { state: login_state }
 
         expect(response).to redirect_to(secondary_node.url)
       end
 
       it 'does not display a flash message if state is valid' do
-        get :callback, state: login_state
+        get :callback, params: { state: login_state }
 
         expect(controller).to set_flash[:alert].to(nil)
       end
@@ -80,7 +80,7 @@ describe Oauth::GeoAuthController do
       it 'handles invalid credentials error' do
         oauth_endpoint = Gitlab::Geo::Oauth::Session.new.authorize_url(redirect_uri: oauth_geo_callback_url, state: login_state)
 
-        get :callback, state: login_state
+        get :callback, params: { state: login_state }
 
         expect(response).to redirect_to(oauth_endpoint)
       end
@@ -95,7 +95,7 @@ describe Oauth::GeoAuthController do
       end
 
       it 'handles non-existent remote user error' do
-        get :callback, state: login_state
+        get :callback, params: { state: login_state }
 
         expect(response.code).to eq '200'
         expect(response.body).to include('Your account may have been deleted')
@@ -111,7 +111,7 @@ describe Oauth::GeoAuthController do
       end
 
       it 'handles non-existent local user error' do
-        get :callback, state: login_state
+        get :callback, params: { state: login_state }
 
         expect(response.code).to eq '200'
         expect(response.body).to include('Your account may have been deleted')
@@ -130,7 +130,7 @@ describe Oauth::GeoAuthController do
 
     context 'when access_token is valid' do
       it 'logs out and redirects to the root_url' do
-        get :logout, state: logout_state
+        get :logout, params: { state: logout_state }
 
         expect(assigns(:current_user)).to be_nil
         expect(response).to redirect_to root_url
@@ -143,7 +143,7 @@ describe Oauth::GeoAuthController do
           .to receive(:by_token)
           .and_return(double(resource_owner_id: user.id, expired?: true))
 
-        get :logout, state: logout_state
+        get :logout, params: { state: logout_state }
 
         expect(response.body).to include("There is a problem with the OAuth access_token: Token has expired")
       end

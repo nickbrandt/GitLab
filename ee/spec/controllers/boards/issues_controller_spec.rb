@@ -97,7 +97,7 @@ describe Boards::IssuesController do
       end
 
       it 'returns a 403 for group boards' do
-        get :index, board_id: board
+        get :index, params: { board_id: board }
 
         expect(response).to have_gitlab_http_status(403)
       end
@@ -118,7 +118,7 @@ describe Boards::IssuesController do
         list_id: list.try(:to_param)
       }
 
-      get :index, params.compact
+      get :index, params: params.compact
     end
   end
 
@@ -184,9 +184,11 @@ describe Boards::IssuesController do
     def create_issue(user:, board:, list:, title:)
       sign_in(user)
 
-      post :create, board_id: board.to_param,
-                    list_id: list.to_param,
-                    issue: { title: title, project_id: project_1.id },
+      post :create, params: {
+                      board_id: board.to_param,
+                      list_id: list.to_param,
+                      issue: { title: title, project_id: project_1.id }
+                    },
                     format: :json
     end
   end
@@ -245,10 +247,12 @@ describe Boards::IssuesController do
     def move(user:, board:, issue:, from_list_id:, to_list_id:)
       sign_in(user)
 
-      patch :update, board_id: board.to_param,
-                     id: issue.id,
-                     from_list_id: from_list_id,
-                     to_list_id: to_list_id,
+      patch :update, params: {
+                       board_id: board.to_param,
+                       id: issue.id,
+                       from_list_id: from_list_id,
+                       to_list_id: to_list_id
+                     },
                      format: :json
     end
   end

@@ -113,6 +113,6 @@ describe Projects::PathLocksController, type: :request do
   end
 
   def toggle_lock(path)
-    post toggle_project_path_locks_path(project), path: path
+    post toggle_project_path_locks_path(project), params: { path: path }
   end
 end

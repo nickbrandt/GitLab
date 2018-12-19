@@ -126,6 +126,16 @@ describe 'group epic roadmap', :js do
           expect(page).to have_content(epic_with_bug.title)
         end
       end
+
+      it 'keeps label filter when filtering by state' do
+        state_dropdown.find('.dropdown-toggle').click
+        state_dropdown.find('a', text: 'Open epics').click
+
+        page.within('.roadmap-container .epics-list-section') do
+          expect(page).to have_selector('.epics-list-item .epic-title', count: 1)
+          expect(page).to have_content(epic_with_bug.title)
+        end
+      end
     end
   end
 

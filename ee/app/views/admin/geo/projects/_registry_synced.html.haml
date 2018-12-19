@@ -17,6 +17,14 @@
         .project-status-title.text-muted
           = s_('Geo|Last time verified')
         .project-status-content
+          - if project_registry.last_repository_verification_ran_at
+            = time_ago_with_tooltip(project_registry.last_repository_verification_ran_at, placement: 'bottom')
+          - else
+            = s_('Geo|Never')
+      .col-sm.project-status-container
+        .project-status-title.text-muted
+          = s_('Geo|Last repository check run')
+        .project-status-content
           - if project_registry.last_repository_check_at
             = time_ago_with_tooltip(project_registry.last_repository_check_at, placement: 'bottom')
           - else

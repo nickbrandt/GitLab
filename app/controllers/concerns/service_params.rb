@@ -2,6 +2,7 @@
 
 module ServiceParams
   extend ActiveSupport::Concern
+
   ALLOWED_PARAMS_CE = [
     :active,
     :add_pusher,

@@ -24,7 +24,7 @@ describe Projects::MergeRequests::DraftsController do
     let!(:draft_note) { create(:draft_note, merge_request: merge_request, author: user) }
 
     it 'list merge request draft notes for current user' do
-      get :index, params
+      get :index, params: params
 
       expect(json_response.first['merge_request_id']).to eq(merge_request.id)
       expect(json_response.first['author']['id']).to eq(user.id)
@@ -40,7 +40,7 @@ describe Projects::MergeRequests::DraftsController do
         }.merge(draft_overrides)
       }.merge(overrides))
 
-      post :create, post_params
+      post :create, params: post_params
     end
 
     context 'without permissions' do
@@ -147,7 +147,7 @@ describe Projects::MergeRequests::DraftsController do
         }.merge(overrides)
       })
 
-      put :update, put_params
+      put :update, params: put_params
     end
 
     context 'without permissions' do
@@ -186,7 +186,7 @@ describe Projects::MergeRequests::DraftsController do
       it 'does not allow publishing draft note belonging to someone else' do
         draft = create(:draft_note, merge_request: merge_request, author: user)
 
-        expect { post :publish, params.merge(id: draft.id) }.to change { Note.count }.by(0)
+        expect { post :publish, params: params.merge(id: draft.id) }.to change { Note.count }.by(0)
           .and change { DraftNote.count }.by(0)
 
         expect(response).to have_gitlab_http_status(404)
@@ -202,7 +202,7 @@ describe Projects::MergeRequests::DraftsController do
           allow(service).to receive(:execute).and_return({ message: error_message, status: :error })
         end
 
-        post :publish, params
+        post :publish, params: params
 
         expect(response).to have_gitlab_http_status(:error)
         expect(json_response["message"]).to include(error_message)
@@ -222,7 +222,7 @@ describe Projects::MergeRequests::DraftsController do
 
       draft = create(:draft_note_on_text_diff, merge_request: merge_request, author: user, position: position)
 
-      expect { post :publish, params }.to change { Note.count }.by(1)
+      expect { post :publish, params: params }.to change { Note.count }.by(1)
         .and change { DraftNote.count }.by(-1)
 
       note = merge_request.notes.reload.last
@@ -232,7 +232,7 @@ describe Projects::MergeRequests::DraftsController do
     end
 
     it 'does nothing if there are no draft notes' do
-      expect { post :publish, params }.to change { Note.count }.by(0).and change { DraftNote.count }.by(0)
+      expect { post :publish, params: params }.to change { Note.count }.by(0).and change { DraftNote.count }.by(0)
     end
 
     it 'publishes a draft note with quick actions and applies them' do
@@ -240,7 +240,7 @@ describe Projects::MergeRequests::DraftsController do
 
       expect(merge_request.assignee_id).to be_nil
 
-      expect { post :publish, params }.to change { Note.count }.by(1)
+      expect { post :publish, params: params }.to change { Note.count }.by(1)
         .and change { DraftNote.count }.by(-1)
 
       expect(response).to have_gitlab_http_status(200)
@@ -259,7 +259,7 @@ describe Projects::MergeRequests::DraftsController do
       diff_note = create(:diff_note_on_merge_request, noteable: merge_request, project: project)
       diff_draft_reply = create(:draft_note, draft_params.merge(discussion_id: diff_note.discussion_id))
 
-      expect { post :publish, params }.to change { Note.count }.by(6)
+      expect { post :publish, params: params }.to change { Note.count }.by(6)
         .and change { DraftNote.count }.by(-6)
 
       expect(response).to have_gitlab_http_status(200)
@@ -276,7 +276,7 @@ describe Projects::MergeRequests::DraftsController do
 
       drafts = create_list(:draft_note, 4, draft_params)
 
-      expect { post :publish, params.merge(id: drafts.first.id) }.to change { Note.count }.by(1)
+      expect { post :publish, params: params.merge(id: drafts.first.id) }.to change { Note.count }.by(1)
         .and change { DraftNote.count }.by(-1)
     end
 
@@ -295,7 +295,7 @@ describe Projects::MergeRequests::DraftsController do
       it 'resolves a discussion if the draft note resolves it' do
         draft_reply = create_reply(note.discussion_id, resolves: true)
 
-        post :publish, params
+        post :publish, params: params
 
         discussion = note.discussion
 
@@ -310,7 +310,7 @@ describe Projects::MergeRequests::DraftsController do
 
         draft_reply = create_reply(note.discussion_id, resolves: false)
 
-        post :publish, params
+        post :publish, params: params
 
         discussion = note.discussion
 
@@ -336,7 +336,7 @@ describe Projects::MergeRequests::DraftsController do
       it 'does not allow destroying a draft note belonging to someone else' do
         draft = create(:draft_note, merge_request: merge_request, author: user)
 
-        expect { post :destroy, params.merge(id: draft.id) }
+        expect { post :destroy, params: params.merge(id: draft.id) }
           .not_to change { DraftNote.count }
 
         expect(response).to have_gitlab_http_status(404)
@@ -346,7 +346,7 @@ describe Projects::MergeRequests::DraftsController do
     it 'destroys the draft note when ID is given' do
       draft = create_draft
 
-      expect { delete :destroy, params.merge(id: draft.id) }.to change { DraftNote.count }.by(-1)
+      expect { delete :destroy, params: params.merge(id: draft.id) }.to change { DraftNote.count }.by(-1)
       expect(response).to have_gitlab_http_status(200)
     end
 
@@ -358,7 +358,7 @@ describe Projects::MergeRequests::DraftsController do
       it 'does not allow editing draft note belonging to someone else' do
         draft = create_draft
 
-        expect { delete :destroy, params.merge(id: draft.id) }.to change { DraftNote.count }.by(0)
+        expect { delete :destroy, params: params.merge(id: draft.id) }.to change { DraftNote.count }.by(0)
         expect(response).to have_gitlab_http_status(404)
       end
     end
@@ -368,7 +368,7 @@ describe Projects::MergeRequests::DraftsController do
     it 'deletes all DraftNotes belonging to a user in a Merge Request' do
       create_list(:draft_note, 6, merge_request: merge_request, author: user)
 
-      expect { delete :discard, params }.to change { DraftNote.count }.by(-6)
+      expect { delete :discard, params: params }.to change { DraftNote.count }.by(-6)
       expect(response).to have_gitlab_http_status(200)
     end
 
@@ -381,7 +381,7 @@ describe Projects::MergeRequests::DraftsController do
       it 'does not destroys a draft note belonging to someone else' do
         create(:draft_note, merge_request: merge_request, author: user)
 
-        expect { post :discard, params }
+        expect { post :discard, params: params }
           .not_to change { DraftNote.count }
 
         expect(response).to have_gitlab_http_status(200)
@@ -394,7 +394,7 @@ describe Projects::MergeRequests::DraftsController do
       it 'does not return existing drafts' do
         create_list(:draft_note, 4, merge_request: merge_request, author: user)
 
-        get :index, params
+        get :index, params: params
 
         expect(json_response).to eq([])
       end
@@ -403,7 +403,7 @@ describe Projects::MergeRequests::DraftsController do
     context 'POST #create' do
       it 'errors out' do
         expect do
-          post :create, params.merge(draft_note: { note: 'comment' })
+          post :create, params: params.merge(draft_note: { note: 'comment' })
         end.to change { DraftNote.count }.by(0)
 
         expect(response).to have_gitlab_http_status(403)
@@ -415,7 +415,7 @@ describe Projects::MergeRequests::DraftsController do
         draft = create(:draft_note, merge_request: merge_request, author: user)
 
         expect do
-          put :update, params.merge(id: draft.id, draft_note: { note: 'comment' })
+          put :update, params: params.merge(id: draft.id, draft_note: { note: 'comment' })
         end.to change { DraftNote.count }.by(0)
 
         expect(response).to have_gitlab_http_status(403)
@@ -426,7 +426,7 @@ describe Projects::MergeRequests::DraftsController do
       it 'errors out' do
         draft = create(:draft_note, merge_request: merge_request, author: user)
 
-        expect { delete :destroy, params.merge(id: draft.id) }.to change { DraftNote.count }.by(0)
+        expect { delete :destroy, params: params.merge(id: draft.id) }.to change { DraftNote.count }.by(0)
         expect(response).to have_gitlab_http_status(403)
       end
     end
@@ -439,7 +439,7 @@ describe Projects::MergeRequests::DraftsController do
       context 'POST #publish' do
         it 'errors out' do
           expect do
-            post :publish, params
+            post :publish, params: params
           end.to change { DraftNote.count }.by(0).and change { Note.count }.by(0)
 
           expect(response).to have_gitlab_http_status(403)
@@ -450,7 +450,7 @@ describe Projects::MergeRequests::DraftsController do
       context 'DELETE #discard' do
         it 'errors out' do
           expect do
-            delete :discard, params
+            delete :discard, params: params
           end.to change { DraftNote.count }.by(0)
 
           expect(response).to have_gitlab_http_status(403)

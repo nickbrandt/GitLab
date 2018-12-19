@@ -20,7 +20,7 @@ describe Groups::VariablesController do
       let!(:variable) { create(:ci_group_variable, group: group) }
 
       it 'is successful' do
-        get :show, group_id: group, format: :json
+        get :show, params: { group_id: group }, format: :json
 
         expect(response).to have_gitlab_http_status(200)
       end
@@ -32,8 +32,10 @@ describe Groups::VariablesController do
 
       it 'is successful' do
         patch :update,
-              group_id: group,
-              variables_attributes: [{ id: variable.id, key: 'hello' }],
+              params: {
+                group_id: group,
+                variables_attributes: [{ id: variable.id, key: 'hello' }]
+              },
               format: :json
 
         expect(response).to have_gitlab_http_status(200)

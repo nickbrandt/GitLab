@@ -14,7 +14,7 @@ describe API::Variables do
 
       it 'creates variable with a specific environment scope' do
         expect do
-          post api("/projects/#{project.id}/variables", user), key: 'TEST_VARIABLE_2', value: 'VALUE_2', environment_scope: 'review/*'
+          post api("/projects/#{project.id}/variables", user), params: { key: 'TEST_VARIABLE_2', value: 'VALUE_2', environment_scope: 'review/*' }
         end.to change { project.variables(true).count }.by(1)
 
         expect(response).to have_gitlab_http_status(201)
@@ -27,7 +27,7 @@ describe API::Variables do
         variable = create(:ci_variable, project: project)
 
         expect do
-          post api("/projects/#{project.id}/variables", user), key: variable.key, value: 'VALUE_2', environment_scope: 'review/*'
+          post api("/projects/#{project.id}/variables", user), params: { key: variable.key, value: 'VALUE_2', environment_scope: 'review/*' }
         end.to change { project.variables(true).count }.by(1)
 
         expect(response).to have_gitlab_http_status(201)
