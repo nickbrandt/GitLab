@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module API
   class LdapGroupLinks < Grape::API
     before { authenticate! }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module API
   class GeoNodes < Grape::API
     include PaginationParams

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # LDAP User EE mixin
 #
 # This module is intended to encapsulate EE-specific User methods

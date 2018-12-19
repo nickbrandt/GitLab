@@ -1,0 +1,5 @@
+---
+title: Enable some frozen string in ee/lib
+merge_request:
+author: gfyoung
+type: performance
