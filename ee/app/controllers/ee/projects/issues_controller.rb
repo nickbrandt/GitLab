@@ -4,6 +4,7 @@ module EE
   module Projects
     module IssuesController
       extend ActiveSupport::Concern
+      extend ::Gitlab::Utils::Override
 
       prepended do
         before_action :authenticate_user!, only: [:export_csv]
@@ -12,18 +13,14 @@ module EE
         before_action :whitelist_query_limiting_ee, only: [:update]
       end
 
-      class_methods do
-        extend ::Gitlab::Utils::Override
+      override :issue_except_actions
+      def issue_except_actions
+        super + %i[export_csv service_desk]
+      end
 
-        override :issue_except_actions
-        def issue_except_actions
-          super + %i[export_csv service_desk]
-        end
-
-        override :set_issuables_index_only_actions
-        def set_issuables_index_only_actions
-          super + %i[service_desk]
-        end
+      override :set_issuables_index_only_actions
+      def set_issuables_index_only_actions
+        super + %i[service_desk]
       end
 
       def service_desk

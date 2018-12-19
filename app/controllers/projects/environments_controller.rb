@@ -15,8 +15,6 @@ class Projects::EnvironmentsController < Projects::ApplicationController
     push_frontend_feature_flag(:area_chart, project)
   end
 
-  prepend ::EE::Projects::EnvironmentsController # rubocop: disable Cop/InjectEnterpriseEditionModule
-
   def index
     @environments = project.environments
       .with_state(params[:scope] || :available)
@@ -192,3 +190,5 @@ class Projects::EnvironmentsController < Projects::ApplicationController
     access_denied! unless can?(current_user, :stop_environment, environment)
   end
 end
+
+Projects::EnvironmentsController.prepend(EE::Projects::EnvironmentsController)

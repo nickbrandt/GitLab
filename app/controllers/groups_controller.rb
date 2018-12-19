@@ -6,6 +6,7 @@ class GroupsController < Groups::ApplicationController
   include MergeRequestsAction
   include ParamsBackwardCompatibility
   include PreviewMarkdown
+
   respond_to :html
 
   prepend_before_action(only: [:show, :issues]) { authenticate_sessionless_user!(:rss) }
