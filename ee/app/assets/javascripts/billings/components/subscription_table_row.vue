@@ -56,7 +56,11 @@ export default {
       </span>
     </div>
     <template v-for="(col, i) in columns">
-      <div :key="`subscription-col-${i}`" class="grid-cell" :class="[col.hidden ? 'no-value' : '']">
+      <div
+        :key="`subscription-col-${i}`"
+        class="grid-cell"
+        :class="[col.hideContent ? 'no-value' : '']"
+      >
         <span class="property-label"> {{ col.label }} </span>
         <popover v-if="col.popover" :options="getPopoverOptions(col)" />
         <p

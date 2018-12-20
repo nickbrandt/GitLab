@@ -2,8 +2,8 @@ import Vue from 'vue';
 import component from 'ee/billings/components/subscription_table.vue';
 import createStore from 'ee/billings/stores';
 import * as types from 'ee/billings/stores/modules/subscription/mutation_types';
-import mockDataSubscription from 'ee/billings/stores/modules/subscription/mock_data_subscription.json';
 import { createComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
+import mockDataSubscription from '../mock_data';
 import { resetStore } from '../helpers';
 
 describe('Subscription Table', () => {
@@ -41,14 +41,17 @@ describe('Subscription Table', () => {
 
     beforeEach(done => {
       vm.$store.state.subscription.namespaceId = namespaceId;
-      vm.$store.commit(`subscription/${types.RECEIVE_SUBSCRIPTION_SUCCESS}`, mockDataSubscription);
+      vm.$store.commit(
+        `subscription/${types.RECEIVE_SUBSCRIPTION_SUCCESS}`,
+        mockDataSubscription.gold,
+      );
       vm.$store.state.subscription.isLoading = false;
       vm.$nextTick(done);
     });
 
-    it('should render the card title "GitLab.com Gold subscription"', () => {
+    it('should render the card title "GitLab.com Gold"', () => {
       expect(vm.$el.querySelector('.js-subscription-header strong').textContent.trim()).toBe(
-        'GitLab.com Gold subscription',
+        'GitLab.com Gold',
       );
     });
 
