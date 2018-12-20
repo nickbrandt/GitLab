@@ -22,6 +22,8 @@ describe Gitlab::UsageData do
       create(:package, project: projects[0])
       create(:package, project: projects[0])
       create(:package, project: projects[1])
+
+      create(:project_tracing_setting, project: projects[0])
     end
 
     subject { described_class.data }
@@ -64,6 +66,7 @@ describe Gitlab::UsageData do
         sast_jobs
         projects_with_prometheus_alerts
         projects_with_packages
+        projects_with_tracing_enabled
       ))
 
       expect(count_data[:projects_with_prometheus_alerts]).to eq(2)
