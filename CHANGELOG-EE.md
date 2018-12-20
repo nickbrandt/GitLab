@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.5.5 (2018-12-20)
+
+- No changes.
+
 ## 11.5.4 (2018-12-13)
 
 - No changes.
