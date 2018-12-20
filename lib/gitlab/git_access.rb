@@ -15,6 +15,10 @@ module Gitlab
     TimeoutError = Class.new(StandardError)
     ProjectMovedError = Class.new(NotFoundError)
 
+    # Use the magic string '_any' to indicate we do not know what the
+    # changes are. This is also what gitlab-shell does.
+    ANY = '_any'
+
     ERROR_MESSAGES = {
       upload: 'You are not allowed to upload code for this project.',
       download: 'You are not allowed to download code from this project.',
@@ -202,7 +206,7 @@ module Gitlab
 
     def ensure_project_on_push!(cmd, changes)
       return if project || deploy_key?
-      return unless receive_pack?(cmd) && changes == '_any' && authentication_abilities.include?(:push_code)
+      return unless receive_pack?(cmd) && changes == ANY && authentication_abilities.include?(:push_code)
 
       namespace = Namespace.find_by_full_path(namespace_path)
 

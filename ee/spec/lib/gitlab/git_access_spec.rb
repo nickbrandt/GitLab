@@ -258,11 +258,11 @@ describe Gitlab::GitAccess do
 
   private
 
-  def push_changes(changes = '_any')
+  def push_changes(changes = Gitlab::GitAccess::ANY)
     access.check('git-receive-pack', changes)
   end
 
-  def pull_changes(changes = '_any')
+  def pull_changes(changes = Gitlab::GitAccess::ANY)
     access.check('git-upload-pack', changes)
   end
 
