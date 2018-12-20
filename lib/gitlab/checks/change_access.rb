@@ -12,7 +12,7 @@ module Gitlab
       attr_reader(*ATTRIBUTES)
 
       def initialize(
-        change, user_access:, project:, skip_authorization: false,
+        change, user_access:, project:,
         skip_lfs_integrity_check: false, protocol:, logger:
       )
         @oldrev, @newrev, @ref = change.values_at(:oldrev, :newrev, :ref)
@@ -20,7 +20,6 @@ module Gitlab
         @tag_name = Gitlab::Git.tag_name(@ref)
         @user_access = user_access
         @project = project
-        @skip_authorization = skip_authorization
         @skip_lfs_integrity_check = skip_lfs_integrity_check
         @protocol = protocol
 
@@ -29,8 +28,6 @@ module Gitlab
       end
 
       def exec
-        return true if skip_authorization
-
         ref_level_checks
         # Check of commits should happen as the last step
         # given they're expensive in terms of performance
