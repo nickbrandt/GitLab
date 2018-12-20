@@ -195,7 +195,7 @@ export default {
 </script>
 
 <template>
-  <div class="boards-switcher js-boards-selector">
+  <div class="boards-switcher js-boards-selector append-right-10">
     <span class="boards-selector-wrapper js-boards-selector-wrapper">
       <div class="dropdown">
         <button
