@@ -279,16 +279,15 @@ module Gitlab
       end
 
       check_change_access!
+
+      check_push_size!
     end
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def check_change_access!
       # If there are worktrees with a HEAD pointing to a non-existent object,
       # calls to `git rev-list --all` will fail in git 2.15+. This should also
       # clear stale lock files.
       project.repository.clean_stale_repository_files
-
-      push_size_in_bytes = 0
 
       # Iterate over all changes to find if user allowed all of them to be applied
       changes_list.each.with_index do |change, index|
@@ -297,17 +296,8 @@ module Gitlab
         # If user does not have access to make at least one change, cancel all
         # push by allowing the exception to bubble up
         check_single_change_access(change, skip_lfs_integrity_check: !first_change)
-
-        if project.size_limit_enabled?
-          push_size_in_bytes += repository.new_blobs(change[:newrev]).sum(&:size)
-        end
-      end
-
-      if check_size_limit? && project.changes_will_exceed_size_limit?(push_size_in_bytes)
-        raise UnauthorizedError, Gitlab::RepositorySizeError.new(project).new_changes_error
       end
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     def check_single_change_access(change, skip_lfs_integrity_check: false)
       change_access = Checks::ChangeAccess.new(
@@ -323,6 +313,25 @@ module Gitlab
       change_access.exec
     rescue Checks::TimedLogger::TimeoutError
       raise TimeoutError, logger.full_message
+    end
+
+    def check_push_size!
+      return unless check_size_limit?
+
+      # If there are worktrees with a HEAD pointing to a non-existent object,
+      # calls to `git rev-list --all` will fail in git 2.15+. This should also
+      # clear stale lock files.
+      project.repository.clean_stale_repository_files
+
+      # rubocop: disable CodeReuse/ActiveRecord
+      push_size_in_bytes = changes_list.sum do |change|
+        repository.new_blobs(change[:newrev]).sum(&:size)
+      end
+      # rubocop: enable CodeReuse/ActiveRecord
+
+      if project.changes_will_exceed_size_limit?(push_size_in_bytes)
+        raise UnauthorizedError, Gitlab::RepositorySizeError.new(project).new_changes_error
+      end
     end
 
     def deploy_key
@@ -381,9 +390,8 @@ module Gitlab
 
     def check_size_limit?
       strong_memoize(:check_size_limit) do
-        changes_list.any? do |change|
-          change[:newrev] && change[:newrev] != ::Gitlab::Git::BLANK_SHA
-        end
+        project.size_limit_enabled? &&
+          changes_list.any? { |change| !Gitlab::Git.blank_ref?(change[:newrev]) }
       end
     end
 
