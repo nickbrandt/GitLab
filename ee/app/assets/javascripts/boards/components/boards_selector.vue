@@ -247,6 +247,13 @@ export default {
               @scroll.passive="throttledSetScrollFade"
             >
               <li
+                v-show="filteredBoards.length === 0"
+                class="dropdown-item no-pointer-events text-secondary"
+              >
+                {{ s__('IssueBoards|No matching boards found') }}
+              </li>
+
+              <li
                 v-for="otherBoard in filteredBoards"
                 :key="otherBoard.id"
                 class="js-dropdown-item"

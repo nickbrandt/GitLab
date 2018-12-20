@@ -4849,6 +4849,9 @@ msgstr ""
 msgid "IssueBoards|Delete board"
 msgstr ""
 
+msgid "IssueBoards|No matching boards found"
+msgstr ""
+
 msgid "IssueBoards|Some of your boards are hidden, activate a license to see them again."
 msgstr ""
 
