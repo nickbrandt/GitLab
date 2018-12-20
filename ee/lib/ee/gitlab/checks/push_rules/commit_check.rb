@@ -13,7 +13,7 @@ module EE
           LOG_MESSAGE = "Checking if commits follow defined push rules...".freeze
 
           def validate!
-            return unless newrev && oldrev && push_rule
+            return unless push_rule
 
             commit_validation = push_rule.commit_validation?
             # if newrev is blank, the branch was deleted
