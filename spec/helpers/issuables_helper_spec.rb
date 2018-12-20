@@ -197,32 +197,6 @@ describe IssuablesHelper do
       }
       expect(helper.issuable_initial_data(issue)).to eq(expected_data)
     end
-
-    it 'returns the correct data for an epic' do
-      epic = create(:epic, author: user, description: 'epic text')
-      @group = epic.group
-
-      expected_data = {
-        endpoint: "/groups/#{@group.full_path}/-/epics/#{epic.iid}",
-        updateEndpoint: "/groups/#{@group.full_path}/-/epics/#{epic.iid}.json",
-        issueLinksEndpoint: "/groups/#{@group.full_path}/-/epics/#{epic.iid}/issues",
-        canUpdate: true,
-        canDestroy: true,
-        canAdmin: true,
-        issuableRef: "&#{epic.iid}",
-        markdownPreviewPath: "/groups/#{@group.full_path}/preview_markdown",
-        markdownDocsPath: '/help/user/markdown',
-        markdownVersion: CacheMarkdownField::CACHE_COMMONMARK_VERSION,
-        issuableTemplates: nil,
-        groupPath: @group.path,
-        initialTitleHtml: epic.title,
-        initialTitleText: epic.title,
-        initialDescriptionHtml: '<p dir="auto">epic text</p>',
-        initialDescriptionText: 'epic text',
-        initialTaskStatus: '0 of 0 tasks completed'
-      }
-      expect(helper.issuable_initial_data(epic)).to eq(expected_data)
-    end
   end
 
   describe '#selected_labels' do

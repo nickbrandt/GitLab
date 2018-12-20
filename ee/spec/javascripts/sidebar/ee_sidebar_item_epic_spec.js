@@ -16,7 +16,9 @@ describe('sidebarItemEpic', () => {
     });
 
     const SidebarItemEpic = Vue.extend(sidebarItemEpic);
-    vm = mountComponent(SidebarItemEpic, {});
+    vm = mountComponent(SidebarItemEpic, {
+      initialEpic: null,
+    });
   });
 
   afterEach(() => {

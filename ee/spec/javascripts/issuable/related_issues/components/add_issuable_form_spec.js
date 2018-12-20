@@ -1,6 +1,5 @@
 import $ from 'jquery';
 import Vue from 'vue';
-import eventHub from 'ee/related_issues/event_hub';
 import addIssuableForm from 'ee/related_issues/components/add_issuable_form.vue';
 
 const issuable1 = {
@@ -167,21 +166,7 @@ describe('AddIssuableForm', () => {
   });
 
   describe('methods', () => {
-    let addIssuableFormInputSpy;
-    let addIssuableFormBlurSpy;
-    let addIssuableFormSubmitSpy;
-    let addIssuableFormCancelSpy;
-
     beforeEach(() => {
-      addIssuableFormInputSpy = jasmine.createSpy('spy');
-      addIssuableFormBlurSpy = jasmine.createSpy('spy');
-      addIssuableFormSubmitSpy = jasmine.createSpy('spy');
-      addIssuableFormCancelSpy = jasmine.createSpy('spy');
-      eventHub.$on('addIssuableFormInput', addIssuableFormInputSpy);
-      eventHub.$on('addIssuableFormBlur', addIssuableFormBlurSpy);
-      eventHub.$on('addIssuableFormSubmit', addIssuableFormSubmitSpy);
-      eventHub.$on('addIssuableFormCancel', addIssuableFormCancelSpy);
-
       const el = document.createElement('div');
       // We need to append to body to get focus tests working
       document.body.appendChild(el);
@@ -198,13 +183,6 @@ describe('AddIssuableForm', () => {
       }).$mount(el);
     });
 
-    afterEach(() => {
-      eventHub.$off('addIssuableFormInput', addIssuableFormInputSpy);
-      eventHub.$off('addIssuableFormBlur', addIssuableFormBlurSpy);
-      eventHub.$off('addIssuableFormSubmit', addIssuableFormSubmitSpy);
-      eventHub.$off('addIssuableFormCancel', addIssuableFormCancelSpy);
-    });
-
     it('when clicking somewhere on the input wrapper should focus the input', done => {
       vm.onInputWrapperClick();
 
@@ -219,18 +197,19 @@ describe('AddIssuableForm', () => {
     });
 
     it('when filling in the input', () => {
-      expect(addIssuableFormInputSpy).not.toHaveBeenCalled();
-
+      spyOn(vm, '$emit');
       const newInputValue = 'filling in things';
       vm.$refs.input.value = newInputValue;
       vm.onInput();
 
-      expect(addIssuableFormInputSpy).toHaveBeenCalledWith(newInputValue, newInputValue.length);
+      expect(vm.$emit).toHaveBeenCalledWith('addIssuableFormInput', {
+        newValue: newInputValue,
+        caretPos: newInputValue.length,
+      });
     });
 
     it('when blurring the input', done => {
-      expect(addIssuableFormInputSpy).not.toHaveBeenCalled();
-
+      spyOn(vm, '$emit');
       const newInputValue = 'filling in things';
       vm.$refs.input.value = newInputValue;
       vm.onBlur();
@@ -238,7 +217,7 @@ describe('AddIssuableForm', () => {
       setTimeout(() => {
         Vue.nextTick(() => {
           expect(vm.$refs.issuableFormWrapper.classList.contains('focus')).toEqual(false);
-          expect(addIssuableFormBlurSpy).toHaveBeenCalledWith(newInputValue);
+          expect(vm.$emit).toHaveBeenCalledWith('addIssuableFormBlur', newInputValue);
 
           done();
         });
@@ -266,29 +245,25 @@ describe('AddIssuableForm', () => {
       setTimeout(() => {
         Vue.nextTick(() => {
           expect(vm.$refs.input.value).toEqual('');
-          expect(addIssuableFormInputSpy.calls.count()).toEqual(1);
-
           done();
         });
       });
     });
 
     it('when submitting pending issues', () => {
-      expect(addIssuableFormSubmitSpy).not.toHaveBeenCalled();
-
+      spyOn(vm, '$emit');
       const newInputValue = 'filling in things';
       vm.$refs.input.value = newInputValue;
       vm.onFormSubmit();
 
-      expect(addIssuableFormSubmitSpy).toHaveBeenCalledWith(newInputValue);
+      expect(vm.$emit).toHaveBeenCalledWith('addIssuableFormSubmit', newInputValue);
     });
 
     it('when canceling form to collapse', () => {
-      expect(addIssuableFormCancelSpy).not.toHaveBeenCalled();
-
+      spyOn(vm, '$emit');
       vm.onFormCancel();
 
-      expect(addIssuableFormCancelSpy).toHaveBeenCalled();
+      expect(vm.$emit).toHaveBeenCalledWith('addIssuableFormCancel');
     });
   });
 });

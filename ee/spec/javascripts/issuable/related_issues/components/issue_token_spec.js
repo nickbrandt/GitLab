@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import eventHub from 'ee/related_issues/event_hub';
 import issueToken from 'ee/related_issues/components/issue_token.vue';
 
 describe('IssueToken', () => {
@@ -7,6 +6,7 @@ describe('IssueToken', () => {
   const displayReference = 'foo/bar#123';
   const title = 'some title';
   const pathIdSeparator = '#';
+  const eventNamespace = 'pendingIssuable';
   let IssueToken;
   let vm;
 
@@ -25,6 +25,7 @@ describe('IssueToken', () => {
       vm = new IssueToken({
         propsData: {
           idKey,
+          eventNamespace,
           displayReference,
           pathIdSeparator,
         },
@@ -46,6 +47,7 @@ describe('IssueToken', () => {
       vm = new IssueToken({
         propsData: {
           idKey,
+          eventNamespace,
           displayReference,
           pathIdSeparator,
           title,
@@ -65,6 +67,7 @@ describe('IssueToken', () => {
       vm = new IssueToken({
         propsData: {
           idKey,
+          eventNamespace,
           displayReference,
           pathIdSeparator,
           title,
@@ -84,6 +87,7 @@ describe('IssueToken', () => {
         vm = new IssueToken({
           propsData: {
             idKey,
+            eventNamespace,
             displayReference,
             pathIdSeparator,
             state: 'opened',
@@ -101,6 +105,7 @@ describe('IssueToken', () => {
         vm = new IssueToken({
           propsData: {
             idKey,
+            eventNamespace,
             displayReference,
             pathIdSeparator,
             state: 'reopened',
@@ -118,6 +123,7 @@ describe('IssueToken', () => {
         vm = new IssueToken({
           propsData: {
             idKey,
+            eventNamespace,
             displayReference,
             pathIdSeparator,
             state: 'closed',
@@ -137,6 +143,7 @@ describe('IssueToken', () => {
       vm = new IssueToken({
         propsData: {
           idKey,
+          eventNamespace,
           displayReference,
           pathIdSeparator,
           title,
@@ -160,6 +167,7 @@ describe('IssueToken', () => {
         vm = new IssueToken({
           propsData: {
             idKey,
+            eventNamespace,
             displayReference,
             pathIdSeparator,
           },
@@ -176,6 +184,7 @@ describe('IssueToken', () => {
         vm = new IssueToken({
           propsData: {
             idKey,
+            eventNamespace,
             displayReference,
             pathIdSeparator,
             canRemove: true,
@@ -190,29 +199,22 @@ describe('IssueToken', () => {
   });
 
   describe('methods', () => {
-    let removeRequestSpy;
-
     beforeEach(() => {
       vm = new IssueToken({
         propsData: {
           idKey,
+          eventNamespace,
           displayReference,
           pathIdSeparator,
         },
       }).$mount();
-      removeRequestSpy = jasmine.createSpy('spy');
-      eventHub.$on('removeRequest', removeRequestSpy);
-    });
-
-    afterEach(() => {
-      eventHub.$off('removeRequest', removeRequestSpy);
     });
 
     it('when getting checked', () => {
-      expect(removeRequestSpy).not.toHaveBeenCalled();
+      spyOn(vm, '$emit');
       vm.onRemoveRequest();
 
-      expect(removeRequestSpy).toHaveBeenCalled();
+      expect(vm.$emit).toHaveBeenCalledWith('pendingIssuableRemoveRequest', vm.idKey);
     });
   });
 });

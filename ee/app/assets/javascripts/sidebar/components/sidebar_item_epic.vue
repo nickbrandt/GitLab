@@ -13,29 +13,44 @@ export default {
   components: {
     GlLoadingIcon,
   },
+  props: {
+    blockTitle: {
+      type: String,
+      required: false,
+      default: __('Epic'),
+    },
+    initialEpic: {
+      type: Object,
+      required: false,
+      default: () => null,
+    },
+  },
   data() {
     return {
-      store: new Store(),
+      store: !this.initialEpic ? new Store() : {},
     };
   },
   computed: {
     isLoading() {
-      return this.store.isFetching.epic;
+      return this.initialEpic ? false : this.store.isFetching.epic;
+    },
+    epic() {
+      return this.initialEpic || this.store.epic;
     },
     epicIcon() {
       return spriteIcon('epic');
     },
     epicUrl() {
-      return this.store.epic.url;
+      return this.epic.url;
     },
     epicTitle() {
-      return this.store.epic.title;
+      return this.epic.title;
     },
     hasEpic() {
       return this.epicUrl && this.epicTitle;
     },
     collapsedTitle() {
-      return this.hasEpic ? this.epicTitle : 'None';
+      return this.hasEpic ? this.epicTitle : __('None');
     },
     tooltipTitle() {
       if (!this.hasEpic) {
@@ -43,13 +58,13 @@ export default {
       }
       let tooltipTitle = this.epicTitle;
 
-      if (this.store.epic.human_readable_end_date || this.store.epic.human_readable_timestamp) {
+      if (this.epic.human_readable_end_date || this.epic.human_readable_timestamp) {
         tooltipTitle += '<br />';
-        tooltipTitle += this.store.epic.human_readable_end_date
-          ? `${this.store.epic.human_readable_end_date} `
+        tooltipTitle += this.epic.human_readable_end_date
+          ? `${this.epic.human_readable_end_date} `
           : '';
-        tooltipTitle += this.store.epic.human_readable_timestamp
-          ? `(${this.store.epic.human_readable_timestamp})`
+        tooltipTitle += this.epic.human_readable_timestamp
+          ? `(${this.epic.human_readable_timestamp})`
           : '';
       }
 
@@ -71,15 +86,15 @@ export default {
       data-boundary="viewport"
     >
       <div v-html="epicIcon"></div>
-      <span v-if="!isLoading" class="collapse-truncated-title"> {{ collapsedTitle }} </span>
+      <span v-if="!isLoading" class="collapse-truncated-title">{{ collapsedTitle }}</span>
     </div>
     <div class="title hide-collapsed">
-      Epic
+      {{ blockTitle }}
       <gl-loading-icon v-if="isLoading" :inline="true" />
     </div>
     <div v-if="!isLoading" class="value hide-collapsed">
-      <a v-if="hasEpic" :href="epicUrl" class="bold"> {{ epicTitle }} </a>
-      <span v-else class="no-value"> None </span>
+      <a v-if="hasEpic" :href="epicUrl" class="bold">{{ epicTitle }}</a>
+      <span v-else class="no-value">{{ __('None') }}</span>
     </div>
   </div>
 </template>

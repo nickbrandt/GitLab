@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import issueItem from 'ee/related_issues/components/issue_item.vue';
-import eventHub from 'ee/related_issues/event_hub';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import { defaultMilestone, defaultAssignees } from '../mock_data';
 
@@ -18,6 +17,7 @@ describe('issueItem', () => {
     createdAt: '2018-12-01T00:00:00.00Z',
     milestone: defaultMilestone,
     assignees: defaultAssignees,
+    eventNamespace: 'relatedIssue',
   };
 
   beforeEach(() => {
@@ -172,11 +172,10 @@ describe('issueItem', () => {
     });
 
     it('triggers onRemoveRequest when clicked', () => {
-      const spy = jasmine.createSpy('spy');
-      eventHub.$on('removeRequest', spy);
+      spyOn(vm, '$emit');
       removeBtn.click();
 
-      expect(spy).toHaveBeenCalled();
+      expect(vm.$emit).toHaveBeenCalledWith('relatedIssueRemoveRequest', props.idKey);
     });
   });
 });

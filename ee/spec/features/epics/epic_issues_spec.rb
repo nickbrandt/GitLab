@@ -32,7 +32,7 @@ describe 'Epic Issues', :js do
     end
 
     it 'user can see issues from public project but cannot delete the associations' do
-      within('.related-issues-block ul.related-items-list') do
+      within('.js-related-issues-block ul.related-items-list') do
         expect(page).to have_selector('li', count: 1)
         expect(page).to have_content(public_issue.title)
         expect(page).not_to have_selector('button.js-issue-item-remove-button')
@@ -40,11 +40,11 @@ describe 'Epic Issues', :js do
     end
 
     it 'user cannot add new issues to the epic' do
-      expect(page).not_to have_selector('.related-issues-block h3.card-title button')
+      expect(page).not_to have_selector('.js-related-issues-block h3.card-title button')
     end
 
     it 'user cannot reorder issues in epic' do
-      expect(page).not_to have_selector('.js-related-issues-token-list-item.user-can-drag')
+      expect(page).not_to have_selector('.js-related-issues-block .js-related-issues-token-list-item.user-can-drag')
     end
   end
 
@@ -53,13 +53,13 @@ describe 'Epic Issues', :js do
     let(:issue_invalid) { create(:issue) }
 
     def add_issues(references)
-      find('.related-issues-block h3.card-title button').click
-      find('.js-add-issuable-form-input').set(references)
+      find('.js-related-issues-block h3.card-title button').click
+      find('.js-related-issues-block .js-add-issuable-form-input').set(references)
       # When adding long references, for some reason the input gets stuck
       # waiting for more text. Send a keystroke before clicking the button to
       # get out of this mode.
-      find('.js-add-issuable-form-input').send_keys(:tab)
-      find('.js-add-issuable-form-add-button').click
+      find('.js-related-issues-block .js-add-issuable-form-input').send_keys(:tab)
+      find('.js-related-issues-block .js-add-issuable-form-add-button').click
 
       wait_for_requests
     end
@@ -70,7 +70,7 @@ describe 'Epic Issues', :js do
     end
 
     it 'user can see all issues of the group and delete the associations' do
-      within('.related-issues-block ul.related-items-list') do
+      within('.js-related-issues-block ul.related-items-list') do
         expect(page).to have_selector('li', count: 2)
         expect(page).to have_content(public_issue.title)
         expect(page).to have_content(private_issue.title)
@@ -80,7 +80,7 @@ describe 'Epic Issues', :js do
 
       wait_for_requests
 
-      within('.related-issues-block ul.related-items-list') do
+      within('.js-related-issues-block ul.related-items-list') do
         expect(page).to have_selector('li', count: 1)
       end
     end
@@ -100,20 +100,20 @@ describe 'Epic Issues', :js do
       expect(page).not_to have_selector('.content-wrapper .alert-wrapper .flash-text')
       expect(page).not_to have_content('No Issue found for given params')
 
-      within('.related-issues-block ul.related-items-list') do
+      within('.js-related-issues-block ul.related-items-list') do
         expect(page).to have_selector('li', count: 3)
         expect(page).to have_content(issue_to_add.title)
       end
     end
 
     it 'user can reorder issues in epic' do
-      expect(first('.js-related-issues-token-list-item')).to have_content(public_issue.title)
-      expect(page.all('.js-related-issues-token-list-item').last).to have_content(private_issue.title)
+      expect(first('.js-related-issues-block .js-related-issues-token-list-item')).to have_content(public_issue.title)
+      expect(page.all('.js-related-issues-block .js-related-issues-token-list-item').last).to have_content(private_issue.title)
 
-      drag_to(selector: '.related-items-list', to_index: 1)
+      drag_to(selector: '.js-related-issues-block .related-items-list', to_index: 1)
 
-      expect(first('.js-related-issues-token-list-item')).to have_content(private_issue.title)
-      expect(page.all('.js-related-issues-token-list-item').last).to have_content(public_issue.title)
+      expect(first('.js-related-issues-block .js-related-issues-token-list-item')).to have_content(private_issue.title)
+      expect(page.all('.js-related-issues-block .js-related-issues-token-list-item').last).to have_content(public_issue.title)
     end
   end
 end

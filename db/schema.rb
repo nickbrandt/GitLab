@@ -1040,6 +1040,7 @@ ActiveRecord::Schema.define(version: 20181218192239) do
     t.integer "state", limit: 2, default: 1, null: false
     t.integer "closed_by_id"
     t.datetime "closed_at"
+    t.integer "parent_id"
     t.index ["assignee_id"], name: "index_epics_on_assignee_id", using: :btree
     t.index ["author_id"], name: "index_epics_on_author_id", using: :btree
     t.index ["closed_by_id"], name: "index_epics_on_closed_by_id", using: :btree
@@ -1047,6 +1048,7 @@ ActiveRecord::Schema.define(version: 20181218192239) do
     t.index ["group_id"], name: "index_epics_on_group_id", using: :btree
     t.index ["iid"], name: "index_epics_on_iid", using: :btree
     t.index ["milestone_id"], name: "index_milestone", using: :btree
+    t.index ["parent_id"], name: "index_epics_on_parent_id", using: :btree
     t.index ["start_date"], name: "index_epics_on_start_date", using: :btree
   end
 
@@ -3227,6 +3229,7 @@ ActiveRecord::Schema.define(version: 20181218192239) do
   add_foreign_key "epic_issues", "epics", on_delete: :cascade
   add_foreign_key "epic_issues", "issues", on_delete: :cascade
   add_foreign_key "epic_metrics", "epics", on_delete: :cascade
+  add_foreign_key "epics", "epics", column: "parent_id", name: "fk_25b99c1be3", on_delete: :cascade
   add_foreign_key "epics", "milestones", on_delete: :nullify
   add_foreign_key "epics", "namespaces", column: "group_id", name: "fk_f081aa4489", on_delete: :cascade
   add_foreign_key "epics", "users", column: "assignee_id", name: "fk_dccd3f98fc", on_delete: :nullify

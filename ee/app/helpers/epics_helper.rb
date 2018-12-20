@@ -9,6 +9,7 @@ module EpicsHelper
       epic_id: epic.id,
       created: epic.created_at,
       author: epic_author(epic, opts),
+      parent: epic_parent(epic.parent),
       todo_exists: todo.present?,
       todo_path: group_todos_path(group),
       start_date: epic.start_date,
@@ -64,6 +65,16 @@ module EpicsHelper
       url: user_path(epic.author),
       username: "@#{epic.author.username}",
       src: opts[:author_icon]
+    }
+  end
+
+  def epic_parent(epic)
+    return unless epic
+
+    {
+      id: epic.id,
+      title: epic.title,
+      url: epic_path(epic)
     }
   end
 

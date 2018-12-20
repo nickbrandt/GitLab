@@ -1,8 +1,8 @@
+import _ from 'underscore';
 import { formatDate } from '~/lib/utils/datetime_utility';
 import tooltip from '~/vue_shared/directives/tooltip';
 import icon from '~/vue_shared/components/icon.vue';
 import timeagoMixin from '~/vue_shared/mixins/timeago';
-import eventHub from '../event_hub';
 
 const mixins = {
   data() {
@@ -104,6 +104,9 @@ const mixins = {
     hasTitle() {
       return this.title.length > 0;
     },
+    hasMilestone() {
+      return !_.isEmpty(this.milestone);
+    },
     iconName() {
       return this.isOpen ? 'issue-open-m' : 'issue-close';
     },
@@ -139,10 +142,10 @@ const mixins = {
     onRemoveRequest() {
       let namespacePrefix = '';
       if (this.eventNamespace && this.eventNamespace.length > 0) {
-        namespacePrefix = `${this.eventNamespace}-`;
+        namespacePrefix = `${this.eventNamespace}`;
       }
 
-      eventHub.$emit(`${namespacePrefix}removeRequest`, this.idKey);
+      this.$emit(`${namespacePrefix}RemoveRequest`, this.idKey);
 
       this.removeDisabled = true;
     },

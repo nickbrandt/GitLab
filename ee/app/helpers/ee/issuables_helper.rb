@@ -20,6 +20,8 @@ module EE
 
       if parent.is_a?(Group)
         data[:issueLinksEndpoint] = group_epic_issues_path(parent, issuable)
+        data[:epicLinksEndpoint] = group_epic_links_path(parent, issuable)
+        data[:subepicsSupported] = ::Epic.supports_nested_objects?
       end
 
       data

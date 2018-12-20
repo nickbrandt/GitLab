@@ -6186,6 +6186,9 @@ msgstr ""
 msgid "Pagination|« First"
 msgstr ""
 
+msgid "Parent epic"
+msgstr ""
+
 msgid "Part of merge request changes"
 msgstr ""
 
