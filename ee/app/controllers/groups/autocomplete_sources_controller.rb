@@ -7,6 +7,14 @@ class Groups::AutocompleteSourcesController < Groups::ApplicationController
     render json: ::Groups::ParticipantsService.new(@group, current_user).execute(target)
   end
 
+  def issues
+    render json: issuable_serializer.represent(@autocomplete_service.issues, parent_group: @group)
+  end
+
+  def merge_requests
+    render json: issuable_serializer.represent(@autocomplete_service.merge_requests, parent_group: @group)
+  end
+
   def labels
     render json: @autocomplete_service.labels_as_hash(target)
   end
@@ -27,6 +35,10 @@ class Groups::AutocompleteSourcesController < Groups::ApplicationController
 
   def load_autocomplete_service
     @autocomplete_service = ::Groups::AutocompleteService.new(@group, current_user)
+  end
+
+  def issuable_serializer
+    GroupIssuableAutocompleteSerializer.new
   end
 
   # rubocop: disable CodeReuse/ActiveRecord

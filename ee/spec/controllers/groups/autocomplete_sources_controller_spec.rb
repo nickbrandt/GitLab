@@ -25,7 +25,7 @@ describe Groups::AutocompleteSourcesController do
 
       expect(json_response).to be_an(Array)
       expect(json_response.first).to include(
-        'id' => epic.id, 'iid' => epic.iid, 'title' => epic.title
+        'iid' => epic.iid, 'title' => epic.title
       )
     end
   end
@@ -43,9 +43,8 @@ describe Groups::AutocompleteSourcesController do
 
       expect(response).to have_gitlab_http_status(200)
       expect(json_response.count).to eq(1)
-      expect(response).to match_response_schema('public_api/v4/milestones')
       expect(json_response.first).to include(
-        'id' => group_milestone.id, 'iid' => group_milestone.iid, 'title' => group_milestone.title
+        'iid' => group_milestone.iid, 'title' => group_milestone.title
       )
     end
   end
