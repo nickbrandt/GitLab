@@ -9283,9 +9283,6 @@ msgstr ""
 msgid "Trending"
 msgstr ""
 
-msgid "Trigger this manual action"
-msgstr ""
-
 msgid "Trigger pipelines for mirror updates"
 msgstr ""
 
@@ -9293,6 +9290,12 @@ msgid "Trigger pipelines when branches or tags are updated from the upstream rep
 msgstr ""
 
 msgid "Trigger this manual action"
+msgstr ""
+
+msgid "Trigger token:"
+msgstr ""
+
+msgid "Trigger variables:"
 msgstr ""
 
 msgid "Triggers can force a specific branch or tag to get rebuilt with an API call.  These tokens will impersonate their associated user including their access to projects and their project permissions."
@@ -10390,6 +10393,9 @@ msgid "import flow"
 msgstr ""
 
 msgid "importing"
+msgstr ""
+
+msgid "in"
 msgstr ""
 
 msgid "instance completed"
