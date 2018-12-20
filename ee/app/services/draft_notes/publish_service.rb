@@ -27,21 +27,15 @@ module DraftNotes
     def publish_draft_notes
       return if draft_notes.empty?
 
-      if Feature.enabled?(:batch_review_notification, project)
-        review = Review.create!(author: current_user, merge_request: merge_request, project: project)
+      review = Review.create!(author: current_user, merge_request: merge_request, project: project)
 
-        draft_notes.map do |draft_note|
-          draft_note.review = review
-          create_note_from_draft(draft_note)
-        end
-
-        notification_service.async.new_review(review)
-      else
-        draft_notes.each(&method(:create_note_from_draft))
+      draft_notes.map do |draft_note|
+        draft_note.review = review
+        create_note_from_draft(draft_note)
       end
-
       draft_notes.delete_all
 
+      notification_service.async.new_review(review)
       MergeRequests::ResolvedDiscussionNotificationService.new(project, current_user).execute(merge_request)
     end
 
