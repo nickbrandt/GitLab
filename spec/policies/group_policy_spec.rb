@@ -148,7 +148,7 @@ describe GroupPolicy do
     let(:current_user) { owner }
 
     it do
-      allow(Group).to receive(:supports_nested_groups?).and_return(true)
+      allow(Group).to receive(:supports_nested_objects?).and_return(true)
 
       expect_allowed(*guest_permissions)
       expect_allowed(*reporter_permissions)
@@ -162,7 +162,7 @@ describe GroupPolicy do
     let(:current_user) { admin }
 
     it do
-      allow(Group).to receive(:supports_nested_groups?).and_return(true)
+      allow(Group).to receive(:supports_nested_objects?).and_return(true)
 
       expect_allowed(*guest_permissions)
       expect_allowed(*reporter_permissions)
@@ -174,7 +174,7 @@ describe GroupPolicy do
 
   describe 'when nested group support feature is disabled' do
     before do
-      allow(Group).to receive(:supports_nested_groups?).and_return(false)
+      allow(Group).to receive(:supports_nested_objects?).and_return(false)
     end
 
     context 'admin' do
@@ -283,7 +283,7 @@ describe GroupPolicy do
       let(:current_user) { owner }
 
       it do
-        allow(Group).to receive(:supports_nested_groups?).and_return(true)
+        allow(Group).to receive(:supports_nested_objects?).and_return(true)
 
         expect_allowed(*guest_permissions)
         expect_allowed(*reporter_permissions)
