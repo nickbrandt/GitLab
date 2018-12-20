@@ -147,6 +147,10 @@ export default {
     },
     toggleDropdown() {
       this.open = !this.open;
+
+      if (this.open && !this.loading) {
+        this.$nextTick(this.focusSearchInput);
+      }
     },
     loadBoards(toggleDropdown = true) {
       if (toggleDropdown) {
@@ -162,7 +166,10 @@ export default {
             this.boards = json;
           })
           .then(() => this.$nextTick()) // Wait for boards list in DOM
-          .then(this.setScrollFade)
+          .then(() => {
+            this.setScrollFade();
+            this.focusSearchInput();
+          })
           .catch(() => {
             this.loading = false;
           });
@@ -206,6 +213,10 @@ export default {
         this.milstoneList = MilestoneList();
         this.hasMilestoneListMounted = true;
       }
+    },
+    focusSearchInput() {
+      const { searchBox } = this.$refs;
+      searchBox.$el.querySelector('input').focus();
     },
   },
 };
