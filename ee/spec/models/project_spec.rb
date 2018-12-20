@@ -702,7 +702,7 @@ describe Project do
     end
 
     it 'uses project full path as service desk address key' do
-      expect(project.service_desk_address).to eq("test+#{project.full_path}@mail.com")
+      expect(project.service_desk_address).to eq("test+#{project.full_path_slug}-#{project.project_id}-@mail.com")
     end
   end
 
