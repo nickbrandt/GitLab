@@ -65,28 +65,12 @@ describe DraftNotes::PublishService do
       expect(DraftNote.count).to eq(0)
     end
 
-    context 'when batch_review_notification feature is enabled' do
-      it 'sends batch notification' do
-        expect_next_instance_of(NotificationService) do |notification_service|
-          expect(notification_service).to receive_message_chain(:async, :new_review).with(kind_of(Review))
-        end
-
-        publish
+    it 'sends batch notification' do
+      expect_next_instance_of(NotificationService) do |notification_service|
+        expect(notification_service).to receive_message_chain(:async, :new_review).with(kind_of(Review))
       end
-    end
 
-    context 'when batch_review_notification feature is disabled' do
-      it 'send a notification for each note' do
-        stub_feature_flags(batch_review_notification: false)
-
-        2.times do
-          expect_next_instance_of(NotificationService) do |notification_service|
-            expect(notification_service).to receive(:new_note).with(kind_of(Note))
-          end
-        end
-
-        publish
-      end
+      publish
     end
   end
 
