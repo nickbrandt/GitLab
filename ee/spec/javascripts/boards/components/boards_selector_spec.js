@@ -92,6 +92,7 @@ describe('BoardsSelector', () => {
   });
 
   it('shows the scroll fade if isScrolledUp', done => {
+    vm.scrollFadeInitialized = false;
     scrollContainer.scrollTop = 0;
 
     waitForScroll()

@@ -113,6 +113,10 @@ export default {
     },
   },
   watch: {
+    filteredBoards() {
+      this.scrollFadeInitialized = false;
+      this.$nextTick(this.setScrollFade);
+    },
     reload() {
       if (this.reload) {
         this.boards = [];
