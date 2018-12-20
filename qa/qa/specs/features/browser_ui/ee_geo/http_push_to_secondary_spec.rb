@@ -12,7 +12,7 @@ module QA
 
           Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
             # Visit the primary node and login
-            Page::Main::Login.act { sign_in_using_credentials }
+            Page::Main::Login.perform(&:sign_in_using_credentials)
 
             # Create a new Project
             project = Resource::Project.fabricate! do |project|
@@ -40,7 +40,7 @@ module QA
                 expect(banner).to have_secondary_read_only_banner
               end
 
-              Page::Main::Menu.perform { |menu| menu.go_to_projects }
+              Page::Main::Menu.perform(&:go_to_projects)
 
               Page::Dashboard::Projects.perform do |dashboard|
                 dashboard.wait_for_project_replication(project.name)
@@ -48,7 +48,10 @@ module QA
               end
 
               # Grab the HTTP URI for the secondary and store as 'location'
-              location = Page::Project::Show.act { repository_clone_http_location }
+              location = Page::Project::Show.perform do |project_page|
+                project_page.wait_for_repository_replication
+                project_page.repository_clone_http_location
+              end
 
               # Perform a git push over HTTP at the secondary
               push = Resource::Repository::Push.fabricate! do |push|
@@ -88,7 +91,7 @@ module QA
 
           Runtime::Browser.visit(:geo_primary, QA::Page::Main::Login) do
             # Visit the primary node and login
-            Page::Main::Login.act { sign_in_using_credentials }
+            Page::Main::Login.perform(&:sign_in_using_credentials)
 
             # Create a new Project
             project = Resource::Project.fabricate! do |project|
@@ -116,7 +119,7 @@ module QA
                 expect(banner).to have_secondary_read_only_banner
               end
 
-              Page::Main::Menu.perform { |menu| menu.go_to_projects }
+              Page::Main::Menu.perform(&:go_to_projects)
 
               Page::Dashboard::Projects.perform do |dashboard|
                 dashboard.wait_for_project_replication(project.name)
@@ -124,7 +127,10 @@ module QA
               end
 
               # Grab the HTTP URI for the secondary and store as 'location'
-              location = Page::Project::Show.act { repository_clone_http_location }
+              location = Page::Project::Show.perform do |project_page|
+                project_page.wait_for_repository_replication
+                project_page.repository_clone_http_location
+              end
 
               # Perform a git push over HTTP at the secondary
               push = Resource::Repository::Push.fabricate! do |push|
