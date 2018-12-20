@@ -1,0 +1,5 @@
+---
+title: Remove epic field in sidebar for projects without groups
+merge_request: 8919
+author:
+type: fixed
