@@ -1,4 +1,8 @@
 import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
+
+// ee-only
+import { CLUSTER_TYPE } from '~/clusters/constants';
+
 /**
  * Environments Store.
  *
@@ -70,7 +74,11 @@ export default class EnvironmentsStore {
         filtered = Object.assign(filtered, env);
       }
 
-      if (filtered.size === 1 && filtered.rollout_status) {
+      if (
+        filtered.size === 1 &&
+        filtered.rollout_status &&
+        filtered.cluster_type !== CLUSTER_TYPE.GROUP
+      ) {
         filtered = Object.assign({}, filtered, {
           hasDeployBoard: true,
           isDeployBoardVisible:
