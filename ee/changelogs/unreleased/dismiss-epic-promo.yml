@@ -1,0 +1,5 @@
+---
+title: Dismiss epic promotion and persist it across reloads
+merge_request: 8885
+author:
+type: fixed
