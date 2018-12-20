@@ -8406,7 +8406,16 @@ msgstr ""
 msgid "SubscriptionTable|This is the next date when the GitLab.com team is scheduled to get in contact with you to settle any outstanding balances."
 msgstr ""
 
+msgid "SubscriptionTable|This is the number of seats you will be required to purchase if you update to a paid plan."
+msgstr ""
+
 msgid "SubscriptionTable|Trial"
+msgstr ""
+
+msgid "SubscriptionTable|Trial end date"
+msgstr ""
+
+msgid "SubscriptionTable|Trial start date"
 msgstr ""
 
 msgid "SubscriptionTable|Upgrade"
@@ -8416,9 +8425,6 @@ msgid "SubscriptionTable|Usage"
 msgstr ""
 
 msgid "SubscriptionTable|Usage count is performed once a day at 12:00 PM."
-msgstr ""
-
-msgid "SubscriptionTable|subscription"
 msgstr ""
 
 msgid "Suggested change"

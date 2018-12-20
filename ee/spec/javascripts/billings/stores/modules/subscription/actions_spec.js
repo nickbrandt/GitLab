@@ -6,7 +6,7 @@ import state from 'ee/billings/stores/modules/subscription/state';
 import * as types from 'ee/billings/stores/modules/subscription/mutation_types';
 import * as actions from 'ee/billings/stores/modules/subscription/actions';
 
-import mockDataSubscription from './data/mock_data_subscription.json';
+import mockDataSubscription from '../../../mock_data';
 
 describe('subscription actions', () => {
   let mockedState;
@@ -51,7 +51,7 @@ describe('subscription actions', () => {
       beforeEach(() => {
         mock
           .onGet(/\/api\/v4\/namespaces\/\d+\/gitlab_subscription(.*)$/)
-          .replyOnce(200, mockDataSubscription);
+          .replyOnce(200, mockDataSubscription.gold);
       });
 
       it('should dispatch the request and success actions', done => {
@@ -64,7 +64,7 @@ describe('subscription actions', () => {
             { type: 'requestSubscription' },
             {
               type: 'receiveSubscriptionSuccess',
-              payload: mockDataSubscription,
+              payload: mockDataSubscription.gold,
             },
           ],
           done,
@@ -107,12 +107,12 @@ describe('subscription actions', () => {
     it('should commit the success mutation', done => {
       testAction(
         actions.receiveSubscriptionSuccess,
-        mockDataSubscription,
+        mockDataSubscription.gold,
         mockedState,
         [
           {
             type: types.RECEIVE_SUBSCRIPTION_SUCCESS,
-            payload: mockDataSubscription,
+            payload: mockDataSubscription.gold,
           },
         ],
         [],

@@ -37,8 +37,15 @@ describe('Subscription Table Row', () => {
       vm = mountComponent(Component, props);
     });
 
-    it(`should render one header cell and ${columns.length} columns in total`, () => {
+    it(`should render one header cell and ${columns.length} visible columns in total`, () => {
       expect(vm.$el.querySelectorAll('.grid-cell')).toHaveLength(columns.length + 1);
+    });
+
+    it(`should not render a hidden column`, () => {
+      const hiddenColIdx = columns.find(c => !c.display);
+      const hiddenCol = vm.$el.querySelectorAll('.grid-cell:not(.header-cell)')[hiddenColIdx];
+
+      expect(hiddenCol).toBe(undefined);
     });
 
     it('should render a title in the header cell', () => {
