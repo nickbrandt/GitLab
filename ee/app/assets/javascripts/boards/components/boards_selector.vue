@@ -214,11 +214,7 @@ export default {
               class="dropdown-list js-dropdown-list"
               @scroll.passive="throttledSetScrollFade"
             >
-              <li
-                v-for="otherBoard in boards"
-                :key="otherBoard.id"
-                class="dropdown-item js-dropdown-item"
-              >
+              <li v-for="otherBoard in boards" :key="otherBoard.id" class="js-dropdown-item">
                 <a :href="`${boardBaseUrl}/${otherBoard.id}`"> {{ otherBoard.name }} </a>
               </li>
               <li v-if="hasMissingBoards" class="small unclickable">
