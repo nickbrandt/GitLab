@@ -1,5 +1,0 @@
----
-title: Enable some frozen string in ee/app
-merge_request: 8667
-author: gfyoung
-type: performance
