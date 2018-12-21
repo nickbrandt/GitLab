@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.5.5 (2018-12-20)
+
+- No changes.
+
 ## 11.5.3 (2018-12-06)
 
 - No changes.
@@ -274,6 +278,10 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Adds expandable/collapsable section for Snowplow. !7798
 - API: Allow issue weight parameter to be greater than or equal to zero.
 
+
+## 11.3.14 (2018-12-20)
+
+- No changes.
 
 ## 11.3.13 (2018-12-13)
 
