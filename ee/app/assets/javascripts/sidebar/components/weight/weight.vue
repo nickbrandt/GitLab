@@ -183,15 +183,9 @@ export default {
     <div v-if="shouldShowWeight" class="value hide-collapsed js-weight-weight-label">
       <span v-if="!isNoValue">
         <strong class="js-weight-weight-label-value">{{ weight }}</strong>
-        <span
-          v-if="editable"
-        >
-          &nbsp;&dash;&nbsp;
-          <a  
-            class="btn-default-hover-link js-weight-remove-link"
-            href="#"
-            @click="removeWeight"
-          >
+        <span v-if="editable">
+          -
+          <a class="btn-default-hover-link js-weight-remove-link" href="#" @click="removeWeight">
             {{ __('remove weight') }}
           </a>
         </span>
