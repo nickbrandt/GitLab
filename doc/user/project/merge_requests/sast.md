@@ -3,6 +3,11 @@
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/3775)
 in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.3.
 
+NOTE: **4 of the top 6 attacks were application based.**
+Download our whitepaper,
+["A Seismic Shift in Application Security"](https://about.gitlab.com/resources/whitepaper-seismic-shift-application-security/)
+to learn how to protect your organization.
+
 ## Overview
 
 If you are using [GitLab CI/CD](../../../ci/README.md), you can analyze your source code for known
