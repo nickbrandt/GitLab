@@ -179,13 +179,12 @@ module EE
                   FROM epics
                   WHERE parent_id IS NOT NULL
               UNION
-                  SELECT e.id, d.depth+ 1
+                  SELECT e.id, d.depth + 1
                   FROM epics e
                   INNER JOIN descendants d
                   ON e.parent_id = d.id
               )
-              SELECT MAX(depth) as deepest_level
-              FROM descendants
+              SELECT MAX(depth) as deepest_level FROM descendants
             SQL
           )
 
