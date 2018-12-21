@@ -32,7 +32,7 @@ const Api = {
   createBranchPath: '/api/:version/projects/:id/repository/branches',
   geoNodesPath: '/api/:version/geo_nodes',
   subscriptionPath: '/api/:version/namespaces/:id/gitlab_subscription',
-  releasesPath: '/api/:version/project/:id/releases',
+  releasesPath: '/api/:version/projects/:id/releases',
 
   group(groupId, callback) {
     const url = Api.buildUrl(Api.groupPath).replace(':id', groupId);
