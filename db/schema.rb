@@ -212,6 +212,7 @@ ActiveRecord::Schema.define(version: 20181218192239) do
     t.integer "diff_max_patch_bytes", default: 102400, null: false
     t.integer "archive_builds_in_seconds"
     t.string "commit_email_hostname"
+    t.boolean "protected_ci_variables", default: false, null: false
     t.string "runners_registration_token_encrypted"
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id", using: :btree
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id", using: :btree
