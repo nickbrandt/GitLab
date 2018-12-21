@@ -116,9 +116,6 @@ msgstr ""
 msgid "%{authorsName}'s discussion"
 msgstr ""
 
-msgid "%{bio} at %{organization}"
-msgstr ""
-
 msgid "%{commit_author_link} authored %{commit_timeago}"
 msgstr ""
 
