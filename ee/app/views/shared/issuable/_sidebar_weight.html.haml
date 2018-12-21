@@ -1,4 +1,5 @@
-- if local_assigns.fetch(:issuable).supports_weight?
-  .js-sidebar-weight-entry-point
-
-= render 'shared/promotions/promote_issue_weights'
+- if issuable_sidebar[:type] == "issue"
+  - if issuable_sidebar[:features_available][:issue_weights]
+    .js-sidebar-weight-entry-point
+  - else
+    = render 'shared/promotions/promote_issue_weights'

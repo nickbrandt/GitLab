@@ -5,7 +5,7 @@ module EE
     extend ::Gitlab::Utils::Override
 
     override :issuable_sidebar_options
-    def issuable_sidebar_options(issuable, can_edit_issuable)
+    def issuable_sidebar_options(sidebar_data)
       super.merge(
         weightOptions: ::Issue.weight_options,
         weightNoneValue: ::Issue::WEIGHT_NONE

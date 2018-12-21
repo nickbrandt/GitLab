@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
-class IssuableSidebarEntity < Grape::Entity
-  include TimeTrackableEntity
+class IssuableSidebarExtrasEntity < Grape::Entity
   include RequestAwareEntity
-  prepend ::EE::IssuableSidebarEntity # rubocop: disable Cop/InjectEnterpriseEditionModule
+  include TimeTrackableEntity
 
   expose :participants, using: ::API::Entities::UserBasic do |issuable|
     issuable.participants(request.current_user)
