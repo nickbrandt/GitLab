@@ -1,5 +1,0 @@
----
-title: Fix PostReceive failing for project mirrors missing local branch
-merge_request: 8495
-author:
-type: fixed

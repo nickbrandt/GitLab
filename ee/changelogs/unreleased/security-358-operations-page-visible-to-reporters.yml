@@ -1,5 +1,0 @@
----
-title: Prevent reporter roles from viewing the Jaeger tracing settings page
-merge_request:
-author:
-type: security

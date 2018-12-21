@@ -1,5 +1,0 @@
----
-title: Fix gitlab:geo:check rake task
-merge_request: 8714
-author:
-type: fixed
