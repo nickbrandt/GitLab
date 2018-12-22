@@ -1,0 +1,5 @@
+---
+title: 'Geo: Ignore invalid attributes when updating Geo node status'
+merge_request: 8957
+author:
+type: fixed

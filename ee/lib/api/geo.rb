@@ -5,6 +5,14 @@ require 'base64'
 module API
   class Geo < Grape::API
     resource :geo do
+      helpers do
+        def sanitized_node_status_params
+          allowed_attributes = GeoNodeStatus.attribute_names - ['id']
+          valid_attributes = params.keys & allowed_attributes
+          params.slice(*valid_attributes)
+        end
+      end
+
       # Verify the GitLab Geo transfer request is valid
       # All transfers use the Authorization header to pass a JWT
       # payload.
@@ -40,7 +48,7 @@ module API
 
         db_status = GeoNode.find(params[:geo_node_id]).find_or_build_status
 
-        unless db_status.update(params.merge(last_successful_status_check_at: Time.now.utc))
+        unless db_status.update(sanitized_node_status_params.merge(last_successful_status_check_at: Time.now.utc))
           render_validation_error!(db_status)
         end
       end
