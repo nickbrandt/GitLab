@@ -25,6 +25,7 @@ describe Packages::CreateMavenPackageService do
         expect(package).to be_valid
         expect(package.name).to eq(path)
         expect(package.version).to eq(version)
+        expect(package.package_type).to eq('maven')
         expect(package.maven_metadatum).to be_valid
         expect(package.maven_metadatum.path).to eq(path_with_version)
         expect(package.maven_metadatum.app_group).to eq('my.company.app')

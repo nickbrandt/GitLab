@@ -4,6 +4,7 @@ FactoryBot.define do
     project
     name 'my/company/app/my-app'
     version '1.0-SNAPSHOT'
+    package_type 'maven'
 
     factory :maven_package do
       maven_metadatum
