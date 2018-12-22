@@ -1,0 +1,5 @@
+---
+title: Fix border-radius for related issues
+merge_request: 8958
+author: Johann Hubert Sonntagbauer
+type: fixed
