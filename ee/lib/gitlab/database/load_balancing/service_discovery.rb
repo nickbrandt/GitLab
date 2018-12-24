@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'resolv'
+require 'net/dns'
 
 module Gitlab
   module Database
@@ -12,9 +12,11 @@ module Gitlab
       # balancer with said hosts. Requests may continue to use the old hosts
       # until they complete.
       class ServiceDiscovery
-        attr_reader :resolver, :interval, :record, :disconnect_timeout
+        attr_reader :interval, :record, :disconnect_timeout
 
         MAX_SLEEP_ADJUSTMENT = 10
+
+        UnresolvableNameserverError = Class.new(StandardError)
 
         # nameserver - The nameserver to use for DNS lookups.
         # port - The port of the nameserver.
@@ -22,11 +24,13 @@ module Gitlab
         # interval - The time to wait between lookups.
         # disconnect_timeout - The time after which an old host should be
         #                      forcefully disconnected.
-        def initialize(nameserver:, port:, record:, interval: 60, disconnect_timeout: 120)
-          @resolver = Resolv::DNS.new(nameserver_port: [[nameserver, port]])
-          @interval = interval
+        def initialize(nameserver:, port:, record:, interval: 60, disconnect_timeout: 120, use_tcp: false)
+          @nameserver = nameserver
+          @port = port
           @record = record
+          @interval = interval
           @disconnect_timeout = disconnect_timeout
+          @use_tcp = use_tcp
         end
 
         def start
@@ -96,8 +100,7 @@ module Gitlab
         # 1. The time to wait for the next check.
         # 2. An array containing the IP addresses of the DNS record.
         def addresses_from_dns
-          resources =
-            resolver.getresources(record, Resolv::DNS::Resource::IN::A)
+          resources = resolver.search(record, Net::DNS::A).answer
 
           # Addresses are sorted so we can directly compare the old and new
           # addresses, without having to use any additional data structures.
@@ -120,6 +123,28 @@ module Gitlab
 
         def load_balancer
           LoadBalancing.proxy.load_balancer
+        end
+
+        def resolver
+          @resolver ||= Net::DNS::Resolver.new(
+            nameservers: nameserver_ip(@nameserver),
+            port: @port,
+            use_tcp: @use_tcp
+          )
+        end
+
+        private
+
+        def nameserver_ip(nameserver)
+          IPAddr.new(nameserver)
+        rescue IPAddr::InvalidAddressError
+          answer = Net::DNS::Resolver.start(nameserver, Net::DNS::A).answer
+
+          if answer.empty?
+            raise UnresolvableNameserverError, "could not resolve #{nameserver}"
+          end
+
+          answer.first.address
         end
       end
     end

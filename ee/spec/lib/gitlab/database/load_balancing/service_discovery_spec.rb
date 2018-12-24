@@ -6,6 +6,64 @@ describe Gitlab::Database::LoadBalancing::ServiceDiscovery do
   let(:service) do
     described_class.new(nameserver: 'localhost', port: 8600, record: 'foo')
   end
+  let(:localhost_packet) do
+    resource = double(:resource, address: IPAddr.new('127.0.0.1'))
+    double(:packet, answer: [resource])
+  end
+
+  before do
+    allow(Net::DNS::Resolver).to receive(:start)
+      .with('localhost', Net::DNS::A)
+      .and_return(localhost_packet)
+  end
+
+  describe '#initialize' do
+    context 'when nameserver is not an IP' do
+      it 'sets the resolver nameservers to the IP of the nameserver' do
+        allow(Net::DNS::Resolver).to receive(:start)
+          .with('foo.local', Net::DNS::A)
+          .and_return(localhost_packet)
+
+        service = described_class.new(
+          nameserver: 'foo.local',
+          port: 8600,
+          record: 'bar'
+        )
+        expect(service.resolver.nameservers).to eq(['127.0.0.1'])
+      end
+    end
+
+    context 'when nameserver is an IP' do
+      it 'sets the resolver nameservers to the IP of the nameserver' do
+        service = described_class.new(
+          nameserver: '127.0.0.2',
+          port: 8600,
+          record: 'bar'
+        )
+
+        expect(service.resolver.nameservers).to eq(['127.0.0.2'])
+      end
+    end
+
+    context 'when nameserver is unresolvable' do
+      it 'raises an exception' do
+        allow(Net::DNS::Resolver).to receive(:start)
+          .with('non-existent.localhost', Net::DNS::A)
+          .and_return(double(:packet, answer: []))
+
+        expect do
+          described_class.new(
+            nameserver: 'non-existent.localhost',
+            port: 8600,
+            record: 'bar'
+          ).resolver
+        end.to raise_exception(
+          described_class::UnresolvableNameserverError,
+          'could not resolve non-existent.localhost'
+        )
+      end
+    end
+  end
 
   describe '#start' do
     before do
@@ -130,11 +188,12 @@ describe Gitlab::Database::LoadBalancing::ServiceDiscovery do
     it 'returns a TTL and ordered list of IP addresses' do
       res1 = double(:resource, address: '255.255.255.0', ttl: 90)
       res2 = double(:resource, address: '127.0.0.1', ttl: 90)
+      packet = double(:packet, answer: [res1, res2])
 
       allow(service.resolver)
-        .to receive(:getresources)
-        .with('foo', Resolv::DNS::Resource::IN::A)
-        .and_return([res1, res2])
+        .to receive(:search)
+        .with('foo', Net::DNS::A)
+        .and_return(packet)
 
       expect(service.addresses_from_dns)
         .to eq([90, %w[127.0.0.1 255.255.255.0]])

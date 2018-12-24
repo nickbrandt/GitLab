@@ -141,6 +141,7 @@ The following options can be set:
 | `port`               | The port of the nameserver.                                                                       | 8600      |
 | `interval`           | The minimum time in seconds between checking the DNS record.                                      | 60        |
 | `disconnect_timeout` | The time in seconds after which an old connection is closed, after the list of hosts was updated. | 120       |
+| `use_tcp`            | Lookup DNS resources using TCP instead of UDP                                                     | false     |
 
 The `interval` value specifies the _minimum_ time between checks. If the A
 record has a TTL greater than this value, then service discovery will honor said
@@ -150,6 +151,10 @@ discovery will wait at least 90 seconds before checking the A record again.
 When the list of hosts is updated, it might take a while for the old connections
 to be terminated. The `disconnect_timeout` setting can be used to enforce an
 upper limit on the time it will take to terminate all old database connections.
+
+Some nameservers (like [Consul][consul-udp]) can return a truncated list of hosts when
+queried over UDP. To overcome this issue, you can use TCP for querying by setting
+`use_tcp` to `true`.
 
 ### Forking
 
@@ -269,3 +274,4 @@ production:
 [db-req]: ../install/requirements.md#database
 [ee-3526]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/3526
 [ee-5883]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/5883
+[consul-udp]: https://www.consul.io/docs/agent/dns.html#udp-based-dns-queries
