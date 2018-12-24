@@ -5,7 +5,7 @@ module QA
         module Show
           def wait_for_repository_replication(max_wait: Runtime::Geo.max_file_replication_time)
             wait_until_geo_max_replication_time(max_wait: max_wait) do
-              !page.has_text?(/No repository|The repository for this project is empty/)
+              has_no_text?(/No repository|The repository for this project is empty/)
             end
           end
 
