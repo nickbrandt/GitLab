@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module EE
   module StubObjectStorage
     def stub_packages_object_storage(**params)
