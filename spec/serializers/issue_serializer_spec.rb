@@ -37,17 +37,6 @@ describe IssueSerializer do
     end
   end
 
-<<<<<<< HEAD
-  context 'board issue serialization' do
-    let(:serializer) { 'board' }
-
-    it 'matches board issue json schema' do
-      expect(json_entity).to match_schema('entities/issue_board')
-    end
-  end
-
-=======
->>>>>>> upstream/master
   context 'board issue serialization' do
     let(:serializer) { 'board' }
 
