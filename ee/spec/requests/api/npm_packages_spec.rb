@@ -150,24 +150,7 @@ describe API::NpmPackages do
   describe 'PUT /api/v4/projects/:id/packages/npm/:package_name' do
     context 'when params are correct' do
       context 'unscoped package' do
-        let(:params) do
-          {
-            name: 'foo',
-            versions: {
-              '1.0.1' => {
-                dist: {
-                  shasum: 'f572d396fae9206628714fb2ce00f72e94f2258f'
-                }
-              }
-            },
-            '_attachments' => {
-              "foo-1.0.1.tgz" => {
-                'data' => 'aGVsbG8K',
-                'length' => 8
-              }
-            }
-          }
-        end
+        let(:params) { upload_params('foo') }
 
         it 'creates npm package with file' do
           expect { upload_package_with_token('foo', params) }
@@ -179,24 +162,7 @@ describe API::NpmPackages do
       end
 
       context 'scoped package' do
-        let(:params) do
-          {
-            name: '@bar/foo',
-            versions: {
-              '1.0.1' => {
-                dist: {
-                  shasum: 'f572d396fae9206628714fb2ce00f72e94f2258f'
-                }
-              }
-            },
-            '_attachments' => {
-              "@bar/foo-1.0.1.tgz" => {
-                'data' => 'aGVsbG8K',
-                'length' => 8
-              }
-            }
-          }
-        end
+        let(:params) { upload_params('@foo/bar') }
 
         it 'creates npm package with file' do
           expect { upload_package_with_token('@bar%2Ffoo', params) }
@@ -214,6 +180,25 @@ describe API::NpmPackages do
 
     def upload_package_with_token(package_name, params = {})
       upload_package(package_name, params.merge(access_token: token.token))
+    end
+
+    def upload_params(package_name)
+      {
+        name: package_name,
+        versions: {
+          '1.0.1' => {
+            dist: {
+              shasum: 'f572d396fae9206628714fb2ce00f72e94f2258f'
+            }
+          }
+        },
+        '_attachments' => {
+          "#{package_name}-1.0.1.tgz" => {
+            'data' => 'aGVsbG8K',
+            'length' => 8
+          }
+        }
+      }
     end
   end
 
