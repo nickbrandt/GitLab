@@ -37,6 +37,7 @@ describe IssueSerializer do
     end
   end
 
+<<<<<<< HEAD
   context 'board issue serialization' do
     let(:serializer) { 'board' }
 
@@ -45,6 +46,8 @@ describe IssueSerializer do
     end
   end
 
+=======
+>>>>>>> upstream/master
   context 'board issue serialization' do
     let(:serializer) { 'board' }
 
