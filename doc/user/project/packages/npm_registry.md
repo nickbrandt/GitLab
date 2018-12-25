@@ -8,7 +8,7 @@ project can have its own space to store its NPM packages.
 ![GitLab NPM Registry](img/npm_package_view.png)
 
 NOTE: **Note:**
-Only scoped packages are supported. 
+Only [scoped](https://docs.npmjs.com/misc/scope) packages are supported. 
 
 ## Enabling NPM Registry
 
@@ -71,11 +71,13 @@ To do this, you need to add next section to the bottom of `package.json`:
 
 ```json
   "publishConfig": {
-    "registry":"https://gitlab.com/api/v4/projects/YOUR_PROJECT_ID/packages/npm/"
+    "@foo:registry":"https://gitlab.com/api/v4/projects/YOUR_PROJECT_ID/packages/npm/"
   }
 ```
+Replace `YOUR_PROJECT_ID` with a project you want your package uploaded to. 
+And replace `@foo` with your own scope.
 
-Once you added it and have set up the [authorization](#authorizing-with-the-gitlab-npm-registry),
+Once you did it and have set up the [authorization](#authorizing-with-the-gitlab-npm-registry),
 test to upload an NPM package from a project of yours:
 
 ```sh

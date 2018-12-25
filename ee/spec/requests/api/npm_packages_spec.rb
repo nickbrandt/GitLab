@@ -150,22 +150,23 @@ describe API::NpmPackages do
   describe 'PUT /api/v4/projects/:id/packages/npm/:package_name' do
     context 'when params are correct' do
       context 'unscoped package' do
-        let(:params) { upload_params('foo') }
+        let(:package_name) { project.path }
+        let(:params) { upload_params(package_name) }
 
-        it 'creates npm package with file' do
-          expect { upload_package_with_token('foo', params) }
-            .to change { project.packages.count }.by(1)
-            .and change { Packages::PackageFile.count }.by(1)
+        it 'denies the request with 400 error' do
+          expect { upload_package_with_token(package_name, params) }
+            .not_to change { project.packages.count }
 
-          expect(response).to have_gitlab_http_status(200)
+          expect(response).to have_gitlab_http_status(400)
         end
       end
 
       context 'scoped package' do
-        let(:params) { upload_params('@foo/bar') }
+        let(:package_name) { "@#{project.full_path}" }
+        let(:params) { upload_params(package_name) }
 
         it 'creates npm package with file' do
-          expect { upload_package_with_token('@bar%2Ffoo', params) }
+          expect { upload_package_with_token(package_name, params) }
             .to change { project.packages.count }.by(1)
             .and change { Packages::PackageFile.count }.by(1)
 
@@ -175,7 +176,7 @@ describe API::NpmPackages do
     end
 
     def upload_package(package_name, params = {})
-      put api("/projects/#{project.id}/packages/npm/#{package_name}"), params
+      put api("/projects/#{project.id}/packages/npm/#{package_name.sub('/', '%2f')}"), params
     end
 
     def upload_package_with_token(package_name, params = {})

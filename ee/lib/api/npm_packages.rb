@@ -16,6 +16,14 @@ module API
       def find_project_by_package_name(name)
         Project.find_by_full_path(name.sub('@', ''))
       end
+
+      def project_package_name_match?
+        "@#{user_project.full_path}" == params[:package_name]
+      end
+
+      def ensure_project_package_match!
+        bad_request!(:package_name) unless project_package_name_match?
+      end
     end
 
     desc 'NPM registry endpoint at instance level' do
@@ -24,13 +32,10 @@ module API
     params do
       requires :package_name, type: String, desc: 'Package name'
     end
-    route_setting :authentication, job_token_allowed: true
     get 'packages/npm/*package_name', requirements: NPM_ENDPOINT_REQUIREMENTS do
       package_name = params[:package_name]
 
       # To avoid name collision we require project path and project package be the same.
-      # For packages that have different name from the project we should use
-      # the endpoint that includes project id
       project = find_project_by_package_name(package_name)
 
       authorize!(:read_package, project)
@@ -51,6 +56,7 @@ module API
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       before do
         authorize_packages_feature!
+        ensure_project_package_match!
       end
 
       desc 'Download the NPM tarball' do
@@ -60,7 +66,6 @@ module API
         requires :package_name, type: String, desc: 'Package name'
         requires :file_name, type: String, desc: 'Package file name'
       end
-      route_setting :authentication, job_token_allowed: true
       get ':id/packages/npm/*package_name/-/*file_name', format: false do
         authorize_download_package!
 
@@ -79,7 +84,6 @@ module API
       params do
         requires :package_name, type: String, desc: 'Package name'
       end
-      route_setting :authentication, job_token_allowed: true
       put ':id/packages/npm/:package_name', requirements: NPM_ENDPOINT_REQUIREMENTS do
         authorize_create_package!
 
