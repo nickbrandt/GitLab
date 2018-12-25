@@ -12,7 +12,7 @@ describe('issueItem', () => {
     path: `${gl.TEST_HOST}/path`,
     title: 'title',
     confidential: true,
-    dueDate: '2018-12-31',
+    dueDate: '1990-12-31',
     weight: 10,
     createdAt: '2018-12-01T00:00:00.00Z',
     milestone: defaultMilestone,
