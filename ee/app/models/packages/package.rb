@@ -15,6 +15,7 @@ class Packages::Package < ActiveRecord::Base
   enum package_type: { maven: 1, npm: 2 }
 
   scope :with_name, ->(name) { where(name: name) }
+  scope :only_npm, -> { where(package_type: 'npm') }
   scope :preload_files, -> { preload(:package_files) }
 
   def self.for_projects(projects)

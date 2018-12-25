@@ -41,10 +41,8 @@ module API
       authorize!(:read_package, project)
       forbidden! unless project.feature_available?(:packages)
 
-      packages = project.packages
-        .with_name(package_name)
-        .last_of_each_version
-        .preload_files
+      packages = ::Packages::NpmPackagesFinder
+        .new(project, package_name).execute
 
       present NpmPackagePresenter.new(project, package_name, packages),
         with: EE::API::Entities::NpmPackage
@@ -69,7 +67,7 @@ module API
       get ':id/packages/npm/*package_name/-/*file_name', format: false do
         authorize_download_package!
 
-        package = user_project.packages
+        package = user_project.packages.only_npm
           .by_name_and_file_name(params[:package_name], params[:file_name])
 
         package_file = ::Packages::PackageFileFinder
