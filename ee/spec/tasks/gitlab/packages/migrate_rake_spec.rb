@@ -34,11 +34,4 @@ describe 'gitlab:packages namespace rake task' do
       end
     end
   end
-
-  def stub_packages_object_storage(**params)
-    stub_object_storage_uploader(config: Gitlab.config.packages.object_store,
-                                 uploader: ::Packages::PackageFileUploader,
-                                 remote_directory: 'packages',
-                                 **params)
-  end
 end

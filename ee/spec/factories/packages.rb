@@ -61,6 +61,10 @@ FactoryBot.define do
       file_sha1 'f572d396fae9206628714fb2ce00f72e94f2258f'
       file_type 'tgz'
     end
+
+    trait :object_storage do
+      file_store { Packages::PackageFileUploader::Store::REMOTE }
+    end
   end
 
   factory :maven_metadatum, class: Packages::MavenMetadatum do
