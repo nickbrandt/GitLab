@@ -13,8 +13,11 @@ import {
 import {
   oldSastIssues,
   sastIssues,
+  sastIssuesMajor2,
   sastFeedbacks,
+  dependencyScanningIssuesOld,
   dependencyScanningIssues,
+  dependencyScanningIssuesMajor2,
   dependencyScanningFeedbacks,
   dockerReport,
   containerScanningFeedbacks,
@@ -75,6 +78,18 @@ describe('security reports utils', () => {
       expect(parsed.project_fingerprint).toEqual(sha1(sastIssues[0].cve));
     });
 
+    it('should parse the received issues with new JSON format (2.0)', () => {
+      const raw = sastIssues[0];
+      const parsed = parseSastIssues(sastIssuesMajor2, [], 'path')[0];
+
+      expect(parsed.title).toEqual(raw.message);
+      expect(parsed.path).toEqual(raw.location.file);
+      expect(parsed.location.start_line).toEqual(raw.location.start_line);
+      expect(parsed.location.end_line).toEqual(raw.location.end_line);
+      expect(parsed.urlPath).toEqual('path/Gemfile.lock#L5-10');
+      expect(parsed.project_fingerprint).toEqual(sha1(raw.cve));
+    });
+
     it('generate correct path to file when there is no line', () => {
       const parsed = parseSastIssues(sastIssues, [], 'path')[1];
 
@@ -93,35 +108,59 @@ describe('security reports utils', () => {
 
   describe('parseDependencyScanningIssues', () => {
     it('should parse the received issues', () => {
-      const parsed = parseDependencyScanningIssues(dependencyScanningIssues, [], 'path')[0];
+      const parsed = parseDependencyScanningIssues(dependencyScanningIssuesOld, [], 'path')[0];
 
-      expect(parsed.title).toEqual(dependencyScanningIssues[0].message);
-      expect(parsed.path).toEqual(dependencyScanningIssues[0].file);
-      expect(parsed.location.start_line).toEqual(sastIssues[0].location.start_line);
+      expect(parsed.title).toEqual(dependencyScanningIssuesOld[0].message);
+      expect(parsed.path).toEqual(dependencyScanningIssuesOld[0].file);
+      expect(parsed.location.start_line).toEqual(parseInt(dependencyScanningIssuesOld[0].line, 10));
       expect(parsed.location.end_line).toBeUndefined();
       expect(parsed.urlPath).toEqual('path/Gemfile.lock#L5');
-      expect(parsed.project_fingerprint).toEqual(sha1(dependencyScanningIssues[0].cve));
+      expect(parsed.project_fingerprint).toEqual(sha1(dependencyScanningIssuesOld[0].cve));
+    });
+
+    it('should parse the received issues with new JSON format', () => {
+      const raw = dependencyScanningIssues[0];
+      const parsed = parseDependencyScanningIssues(dependencyScanningIssues, [], 'path')[0];
+
+      expect(parsed.title).toEqual(raw.message);
+      expect(parsed.path).toEqual(raw.location.file);
+      expect(parsed.location.start_line).toBeUndefined();
+      expect(parsed.location.end_line).toBeUndefined();
+      expect(parsed.urlPath).toEqual(`path/${raw.location.file}`);
+      expect(parsed.project_fingerprint).toEqual(sha1(raw.cve));
+    });
+
+    it('should parse the received issues with new JSON format (2.0)', () => {
+      const raw = dependencyScanningIssues[0];
+      const parsed = parseDependencyScanningIssues(dependencyScanningIssuesMajor2, [], 'path')[0];
+
+      expect(parsed.title).toEqual(raw.message);
+      expect(parsed.path).toEqual(raw.location.file);
+      expect(parsed.location.start_line).toBeUndefined();
+      expect(parsed.location.end_line).toBeUndefined();
+      expect(parsed.urlPath).toEqual(`path/${raw.location.file}`);
+      expect(parsed.project_fingerprint).toEqual(sha1(raw.cve));
     });
 
     it('generate correct path to file when there is no line', () => {
-      const parsed = parseDependencyScanningIssues(dependencyScanningIssues, [], 'path')[1];
+      const parsed = parseDependencyScanningIssues(dependencyScanningIssuesOld, [], 'path')[1];
 
       expect(parsed.urlPath).toEqual('path/Gemfile.lock');
     });
 
     it('uses message to generate sha1 when cve is undefined', () => {
-      const issuesWithoutCve = dependencyScanningIssues.map(issue => ({
+      const issuesWithoutCve = dependencyScanningIssuesOld.map(issue => ({
         ...issue,
         cve: undefined,
       }));
       const parsed = parseDependencyScanningIssues(issuesWithoutCve, [], 'path')[0];
 
-      expect(parsed.project_fingerprint).toEqual(sha1(dependencyScanningIssues[0].message));
+      expect(parsed.project_fingerprint).toEqual(sha1(dependencyScanningIssuesOld[0].message));
     });
 
     it('includes vulnerability feedbacks', () => {
       const parsed = parseDependencyScanningIssues(
-        dependencyScanningIssues,
+        dependencyScanningIssuesOld,
         dependencyScanningFeedbacks,
         'path',
       )[0];

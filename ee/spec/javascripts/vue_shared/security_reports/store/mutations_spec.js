@@ -7,7 +7,7 @@ import {
   parsedSastIssuesHead,
   parsedSastBaseStore,
   parsedSastIssuesStore,
-  dependencyScanningIssues,
+  dependencyScanningIssuesOld,
   dependencyScanningIssuesBase,
   parsedDependencyScanningIssuesHead,
   parsedDependencyScanningBaseStore,
@@ -303,7 +303,7 @@ describe('security reports mutations', () => {
         mutations[types.SET_BASE_BLOB_PATH](stateCopy, 'path');
         mutations[types.SET_HEAD_BLOB_PATH](stateCopy, 'path');
         mutations[types.RECEIVE_DEPENDENCY_SCANNING_REPORTS](stateCopy, {
-          head: dependencyScanningIssues,
+          head: dependencyScanningIssuesOld,
           base: dependencyScanningIssuesBase,
         });
 
@@ -321,7 +321,7 @@ describe('security reports mutations', () => {
       it('should set new issues', () => {
         mutations[types.SET_HEAD_BLOB_PATH](stateCopy, 'path');
         mutations[types.RECEIVE_DEPENDENCY_SCANNING_REPORTS](stateCopy, {
-          head: dependencyScanningIssues,
+          head: dependencyScanningIssuesOld,
         });
 
         expect(stateCopy.dependencyScanning.isLoading).toEqual(false);

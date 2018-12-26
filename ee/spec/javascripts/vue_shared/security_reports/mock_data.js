@@ -113,6 +113,11 @@ export const sastIssues = [
   },
 ];
 
+export const sastIssuesMajor2 = {
+  version: '2.0',
+  vulnerabilities: sastIssues,
+};
+
 export const oldSastIssues = [
   {
     tool: 'bundler_audit',
@@ -359,7 +364,7 @@ export const parsedSastBaseStore = [
   },
 ];
 
-export const dependencyScanningIssues = [
+export const dependencyScanningIssuesOld = [
   {
     tool: 'bundler_audit',
     message: 'Arbitrary file existence disclosure in Action Pack',
@@ -388,6 +393,111 @@ export const dependencyScanningIssues = [
       'upgrade to >= 5.0.0.beta1.1, >= 4.2.5.1, ~> 4.2.5, >= 4.1.14.1, ~> 4.1.14, ~> 3.2.22.1',
   },
 ];
+
+export const dependencyScanningIssues = [
+  {
+    category: 'dependency_scanning',
+    message: 'ruby-ffi DDL loading issue on Windows OS',
+    cve: 'sast-sample-rails/Gemfile.lock:ffi:cve:CVE-2018-1000201',
+    severity: 'High',
+    solution: 'upgrade to \u003e= 1.9.24',
+    scanner: {
+      id: 'bundler_audit',
+      name: 'bundler-audit',
+    },
+    location: {
+      file: 'sast-sample-rails/Gemfile.lock',
+      dependency: {
+        package: {
+          name: 'ffi',
+        },
+        version: '1.9.18',
+      },
+    },
+    identifiers: [
+      {
+        type: 'cve',
+        name: 'CVE-2018-1000201',
+        value: 'CVE-2018-1000201',
+        url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-1000201',
+      },
+    ],
+    links: [
+      {
+        url: 'https://github.com/ffi/ffi/releases/tag/1.9.24',
+      },
+    ],
+  },
+  {
+    category: 'dependency_scanning',
+    message: 'XSS vulnerability in rails-html-sanitizer',
+    cve: 'sast-sample-rails/Gemfile.lock:rails-html-sanitizer:cve:CVE-2018-3741',
+    severity: 'Unknown',
+    solution: 'upgrade to \u003e= 1.0.4',
+    scanner: {
+      id: 'bundler_audit',
+      name: 'bundler-audit',
+    },
+    location: {
+      file: 'sast-sample-rails/Gemfile.lock',
+      dependency: {
+        package: {
+          name: 'rails-html-sanitizer',
+        },
+        version: '1.0.3',
+      },
+    },
+    identifiers: [
+      {
+        type: 'cve',
+        name: 'CVE-2018-3741',
+        value: 'CVE-2018-3741',
+        url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-3741',
+      },
+    ],
+    links: [
+      {
+        url: 'https://groups.google.com/d/msg/rubyonrails-security/tP7W3kLc5u4/uDy2Br7xBgAJ',
+      },
+    ],
+  },
+  {
+    category: 'dependency_scanning',
+    message: 'Vulnerability in ansi2html',
+    cve: ':ansi2html:npm:51',
+    severity: 'High',
+    scanner: {
+      id: 'retire.js',
+      name: 'Retire.js',
+    },
+    location: {
+      dependency: {
+        package: {
+          name: 'ansi2html',
+        },
+        version: '0.0.1',
+      },
+    },
+    identifiers: [
+      {
+        type: 'npm',
+        name: 'NPM-51',
+        value: '51',
+        url: 'https://www.npmjs.com/advisories/51',
+      },
+    ],
+    links: [
+      {
+        url: 'https://nodesecurity.io/advisories/51',
+      },
+    ],
+  },
+];
+
+export const dependencyScanningIssuesMajor2 = {
+  version: '2.0',
+  vulnerabilities: dependencyScanningIssues,
+};
 
 export const dependencyScanningIssuesBase = [
   {
