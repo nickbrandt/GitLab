@@ -1,5 +1,0 @@
----
-title: Used the iid instead of the id for linked issues on the Group Security Dashboard
-merge_request: 8357
-author:
-type: fixed

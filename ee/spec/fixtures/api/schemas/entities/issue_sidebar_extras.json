@@ -1,0 +1,22 @@
+{
+  "allOf": [
+    { "$ref": "../../../../../../spec/fixtures/api/schemas/entities/issue_sidebar_extras.json" },
+    {
+      "properties": {
+        "epic": {
+          "type": ["object", "null"],
+          "properties": {
+            "id": { "type": "integer" },
+            "title": { "type": "string" },
+            "url": { "type": "string" }
+          }
+        },
+        "weight": { "type": ["integer", "null"] }
+      },
+      "required": [
+        "epic",
+        "weight"
+      ]
+    }
+  ]
+}

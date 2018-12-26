@@ -1,5 +1,0 @@
----
-title: Fix project deploy key creation and deletion as admin
-merge_request: 8432
-author:
-type: fixed

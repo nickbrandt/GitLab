@@ -1,5 +1,0 @@
----
-title: Make sidekiq-cluster play well with Sidekiq 5.2.2+
-merge_request: 8522
-author:
-type: other

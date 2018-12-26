@@ -1,5 +1,0 @@
----
-title: Show navigation line separator when instance etrics is disabled
-merge_request: 8379
-author: George Tsiolis
-type: fixed

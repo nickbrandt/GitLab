@@ -113,6 +113,7 @@ $item-weight-max-width: 48px;
       order: 1;
       margin-top: $gl-padding-4;
       font-size: $gl-font-size-xs;
+      white-space: nowrap;
 
       .path-id-text {
         font-weight: $gl-font-weight-bold;
@@ -338,6 +339,7 @@ $item-weight-max-width: 48px;
 
           .avatar-counter {
             height: $gl-padding-24;
+            min-width: $gl-padding-24;
             line-height: $gl-padding-24;
             border-radius: $gl-padding-24;
           }

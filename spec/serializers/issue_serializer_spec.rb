@@ -9,6 +9,10 @@ describe IssueSerializer do
       .with_indifferent_access
   end
 
+  before do
+    create(:epic_issue, issue: resource)
+  end
+
   context 'non-sidebar issue serialization' do
     let(:serializer) { nil }
 
@@ -20,20 +24,16 @@ describe IssueSerializer do
   context 'sidebar issue serialization' do
     let(:serializer) { 'sidebar' }
 
-    before do
-      create(:epic_issue, issue: resource)
-    end
-
-    it 'matches sidebar issue json schema' do
-      expect(json_entity).to match_schema('entities/issue_sidebar', strict: true)
+    it 'matches issue_sidebar json schema' do
+      expect(json_entity).to match_schema('entities/issue_sidebar')
     end
   end
 
-  context 'board issue serialization' do
-    let(:serializer) { 'board' }
+  context 'sidebar extras issue serialization' do
+    let(:serializer) { 'sidebar_extras' }
 
-    it 'matches board issue json schema' do
-      expect(json_entity).to match_schema('entities/issue_board')
+    it 'matches issue_sidebar_extras json schema' do
+      expect(json_entity).to match_schema('entities/issue_sidebar_extras')
     end
   end
 

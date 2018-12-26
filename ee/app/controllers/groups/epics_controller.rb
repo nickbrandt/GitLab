@@ -18,8 +18,6 @@ class Groups::EpicsController < Groups::ApplicationController
   before_action :authorize_update_issuable!, only: :update
   before_action :authorize_create_epic!, only: [:create]
 
-  skip_before_action :labels
-
   def index
     @epics = @issuables
 

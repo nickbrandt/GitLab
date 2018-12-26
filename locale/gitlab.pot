@@ -116,9 +116,6 @@ msgstr ""
 msgid "%{authorsName}'s discussion"
 msgstr ""
 
-msgid "%{bio} at %{organization}"
-msgstr ""
-
 msgid "%{commit_author_link} authored %{commit_timeago}"
 msgstr ""
 
@@ -5439,9 +5436,6 @@ msgid "MergeRequests|View file @ %{commitId}"
 msgstr ""
 
 msgid "MergeRequests|View replaced file @ %{commitId}"
-msgstr ""
-
-msgid "MergeRequests|commented on commit %{linkStart}%{commitId}%{linkEnd}"
 msgstr ""
 
 msgid "MergeRequests|started a discussion"

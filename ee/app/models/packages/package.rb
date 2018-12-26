@@ -12,6 +12,8 @@ class Packages::Package < ActiveRecord::Base
     presence: true,
     format: { with: Gitlab::Regex.package_name_regex }
 
+  enum package_type: { maven: 1 }
+
   def self.for_projects(projects)
     return none unless projects.any?
 

@@ -1,6 +1,0 @@
----
-title: 'Geo: Moving registry deletion into the job that deletes the files and project
-  record'
-merge_request: 8480
-author:
-type: fixed

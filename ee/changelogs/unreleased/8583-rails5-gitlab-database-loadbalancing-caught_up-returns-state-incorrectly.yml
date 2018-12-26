@@ -1,5 +1,0 @@
----
-title: 'Raisl 5: Fix Gitlab::Database::LoadBalancing#caught_up? check'
-merge_request: 8595
-author:
-type: fixed

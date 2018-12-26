@@ -1,5 +1,5 @@
-- if issuable.supports_epic?
-  - if issuable.project.group.feature_available?(:epics)
+- if issuable_sidebar[:supports_epic]
+  - if issuable_sidebar[:features_available][:epics]
     .block.epic
       #js-vue-sidebar-item-epic
         .title.hide-collapsed
