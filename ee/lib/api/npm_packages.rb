@@ -67,7 +67,7 @@ module API
       get ':id/packages/npm/*package_name/-/*file_name', format: false do
         authorize_download_package!
 
-        package = user_project.packages.only_npm
+        package = user_project.packages.npm
           .by_name_and_file_name(params[:package_name], params[:file_name])
 
         package_file = ::Packages::PackageFileFinder

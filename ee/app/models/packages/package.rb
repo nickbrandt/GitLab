@@ -15,7 +15,6 @@ class Packages::Package < ActiveRecord::Base
   enum package_type: { maven: 1, npm: 2 }
 
   scope :with_name, ->(name) { where(name: name) }
-  scope :only_npm, -> { where(package_type: 'npm') }
   scope :preload_files, -> { preload(:package_files) }
 
   def self.for_projects(projects)
@@ -29,7 +28,7 @@ class Packages::Package < ActiveRecord::Base
   end
 
   def self.by_name_and_file_name(name, file_name)
-    where(name: name)
+    with_name(name)
       .joins(:package_files)
       .where(packages_package_files: { file_name: file_name }).last!
   end

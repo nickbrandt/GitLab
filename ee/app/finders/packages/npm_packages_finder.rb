@@ -15,7 +15,7 @@ class Packages::NpmPackagesFinder
 
   def packages
     project.packages
-      .only_npm
+      .npm
       .with_name(package_name)
       .last_of_each_version
       .preload_files

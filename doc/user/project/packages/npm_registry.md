@@ -3,7 +3,7 @@
 > Introduced in [GitLab Premium](https://about.gitlab.com/pricing/) 11.7.
 
 With the GitLab NPM Registry, every
-project can have its own space to store its NPM packages.
+project can have its own space to store NPM packages.
 
 ![GitLab NPM Registry](img/npm_package_view.png)
 
@@ -40,7 +40,7 @@ Note that **only packages that have the same path as the project** are supported
 ## Authenticating to the GitLab NPM Registry
 
 If a project is private or you want to upload NPM package to GitLab,
-credentials will need to be provided for authorization. Support is available for
+credentials will need to be provided for authentication. Support is available for
 [oauth tokens](#authenticating-with-an-oauth-token) only.
 
 ### Authenticating with an oauth token
