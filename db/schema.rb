@@ -233,7 +233,7 @@ ActiveRecord::Schema.define(version: 20190103140724) do
     t.integer "approvals_required", limit: 2, default: 0, null: false
     t.boolean "code_owner", default: false, null: false
     t.string "name", null: false
-    t.index ["merge_request_id"], name: "index_approval_merge_request_rules_on_merge_request_id", using: :btree
+    t.index ["merge_request_id", "code_owner"], name: "index_approval_merge_request_rules_1", using: :btree
   end
 
   create_table "approval_merge_request_rules_approvals", id: :bigserial, force: :cascade do |t|
