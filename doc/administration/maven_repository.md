@@ -16,4 +16,4 @@ Once enabled, newly created projects will have the Packages feature enabled by
 default. Existing projects will need to
 [explicitly enabled it](../user/project/packages/maven_repository.md#enabling-the-packages-repository).
 
-To enable the Maven repository you need to enable [Packages feature](./packages.md)
+To enable the Maven repository you need to enable [Packages feature](packages.md)

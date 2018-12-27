@@ -2,8 +2,8 @@
 
 Package feature provides a support for next products:
 
-* [Maven Repository](./maven_repository)
-* [NPM Registry](./npm_registry)
+* [Maven Repository](maven_repository.md)
+* [NPM Registry](npm_registry.md)
 
 ## Enabling the Packages feature
 
