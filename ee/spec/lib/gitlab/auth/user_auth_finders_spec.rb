@@ -17,7 +17,7 @@ describe Gitlab::Auth::UserAuthFinders do
   end
 
   describe '#find_user_from_job_token' do
-    let(:job) { create(:ci_build, user: user) }
+    let(:job) { create(:ci_build, :running, user: user) }
 
     shared_examples 'find user from job token' do
       context 'when route is allowed to be authenticated' do
