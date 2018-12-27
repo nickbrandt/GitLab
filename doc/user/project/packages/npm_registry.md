@@ -14,7 +14,7 @@ Only [scoped](https://docs.npmjs.com/misc/scope) packages are supported.
 
 NOTE: **Note:**
 This option is available only if your GitLab administrator has
-[enabled Packages feature](../../../administration/maven_repository.md).
+[enabled Packages feature](../../../administration/npm_registry.md).
 
 In order to use the GitLab NPM Registry, you must enable the Packages feature.
 To enable (or disable) it:
