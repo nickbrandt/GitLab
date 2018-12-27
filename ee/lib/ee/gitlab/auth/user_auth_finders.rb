@@ -13,7 +13,7 @@ module EE
           token = (params[JOB_TOKEN_PARAM] || env[JOB_TOKEN_HEADER]).to_s
           return unless token.present?
 
-          job = ::Ci::Build.find_by_token(token)
+          job = ::Ci::Build.find_running_by_token(token)
           raise ::Gitlab::Auth::UnauthorizedError unless job
 
           @job_token_authentication = true # rubocop:disable Gitlab/ModuleWithInstanceVariables

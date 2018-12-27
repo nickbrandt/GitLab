@@ -8,7 +8,7 @@ describe API::MavenPackages do
   let(:jwt_token) { JWT.encode({ 'iss' => 'gitlab-workhorse' }, Gitlab::Workhorse.secret, 'HS256') }
   let(:headers) { { 'GitLab-Workhorse' => '1.0', Gitlab::Workhorse::INTERNAL_API_REQUEST_HEADER => jwt_token } }
   let(:headers_with_token) { headers.merge('Private-Token' => personal_access_token.token) }
-  let(:job) { create(:ci_build, user: user) }
+  let(:job) { create(:ci_build, :running, user: user) }
 
   before do
     project.add_developer(user)

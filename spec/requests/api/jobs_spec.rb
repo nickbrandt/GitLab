@@ -544,7 +544,7 @@ describe API::Jobs do
         end
 
         context 'when artifacts are stored remotely' do
-          let(:job) { create(:ci_build, pipeline: pipeline, user: api_user) }
+          let(:job) { create(:ci_build, :running, pipeline: pipeline, user: api_user) }
           let!(:artifact) { create(:ci_job_artifact, :archive, :remote_store, job: job) }
 
           before do
@@ -583,29 +583,6 @@ describe API::Jobs do
         end
 
         it_behaves_like 'a valid file'
-      end
-
-      context 'when using job_token to authenticate' do
-        before do
-          pipeline.reload
-          pipeline.update(ref: 'master',
-                          sha: project.commit('master').sha)
-
-          get api("/projects/#{project.id}/jobs/artifacts/master/download"), job: job.name, job_token: job.token
-        end
-
-        context 'when user is reporter' do
-          it_behaves_like 'a valid file'
-        end
-
-        context 'when user is admin, but not member' do
-          let(:api_user) { create(:admin) }
-          let(:job) { create(:ci_build, :artifacts, pipeline: pipeline, user: api_user) }
-
-          it 'does not allow to see that artfiact is present' do
-            expect(response).to have_gitlab_http_status(404)
-          end
-        end
       end
     end
   end

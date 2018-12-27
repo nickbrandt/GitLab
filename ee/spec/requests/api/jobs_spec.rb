@@ -6,12 +6,14 @@ describe API::Jobs do
   end
 
   set(:pipeline) do
-    create(:ci_empty_pipeline, project: project,
-                               sha: project.commit.id,
-                               ref: project.default_branch)
+    create(:ci_pipeline, :success,
+      project: project,
+      sha: project.commit('master').sha,
+      ref: 'master')
   end
 
   let!(:job) { create(:ci_build, :success, pipeline: pipeline) }
+  let!(:running_job) { create(:ci_build, :running, pipeline: pipeline, user: api_user) }
 
   let(:user) { create(:user) }
   let(:api_user) { user }
@@ -21,6 +23,7 @@ describe API::Jobs do
   before do
     stub_licensed_features(cross_project_pipelines: cross_project_pipeline_enabled)
     project.add_developer(user)
+    stub_artifacts_object_storage
   end
 
   describe 'GET /projects/:id/jobs/:job_id/artifacts' do
@@ -38,10 +41,10 @@ describe API::Jobs do
     end
 
     context 'authorized by job_token' do
-      let(:job) { create(:ci_build, :artifacts, pipeline: pipeline, user: api_user) }
+      let(:job) { create(:ci_build, :artifacts, pipeline: pipeline) }
 
       before do
-        get api("/projects/#{project.id}/jobs/#{job.id}/artifacts"), job_token: job.token
+        get api("/projects/#{project.id}/jobs/#{job.id}/artifacts"), job_token: running_job.token
       end
 
       context 'user is developer' do
@@ -64,6 +67,52 @@ describe API::Jobs do
         let(:cross_project_pipeline_enabled) { false }
 
         it 'disallows access to the artifacts' do
+          expect(response).to have_gitlab_http_status(404)
+        end
+      end
+    end
+  end
+
+  describe 'GET /projects/:id/artifacts/:ref_name/download?job=name' do
+    let(:job) { create(:ci_build, :success, pipeline: pipeline) }
+    let!(:artifact) { create(:ci_job_artifact, :archive, job: job) }
+
+    shared_examples 'a valid file' do
+      context 'when artifacts are stored locally' do
+        let(:download_headers) do
+          { 'Content-Transfer-Encoding' => 'binary',
+            'Content-Disposition' =>
+              "attachment; filename=#{artifact.filename}" }
+        end
+
+        it { expect(response).to have_http_status(:ok) }
+        it { expect(response.headers.to_h).to include(download_headers) }
+      end
+
+      context 'when artifacts are stored remotely' do
+        let(:artifact) { create(:ci_job_artifact, :archive, :remote_store, job: job) }
+
+        it 'returns location redirect' do
+          expect(response).to have_http_status(:found)
+        end
+      end
+    end
+
+    context 'when using job_token to authenticate' do
+      let(:running_job) { create(:ci_build, :running, pipeline: pipeline, user: api_user) }
+
+      before do
+        get api("/projects/#{project.id}/jobs/artifacts/master/download"), job: job.name, job_token: running_job.token
+      end
+
+      context 'when user is reporter' do
+        it_behaves_like 'a valid file'
+      end
+
+      context 'when user is admin, but not member' do
+        let(:api_user) { create(:admin) }
+
+        it 'does not allow to see that artfiact is present' do
           expect(response).to have_gitlab_http_status(404)
         end
       end
