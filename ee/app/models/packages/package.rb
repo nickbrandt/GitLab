@@ -34,11 +34,6 @@ class Packages::Package < ActiveRecord::Base
   end
 
   def self.last_of_each_version
-    ids = self
-      .select('MAX(id) AS id')
-      .group(:version)
-      .map(&:id)
-
-    where(id: ids)
+    where(id: all.select('MAX(id) AS id').group(:version))
   end
 end
