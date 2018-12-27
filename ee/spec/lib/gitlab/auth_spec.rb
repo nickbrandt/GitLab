@@ -30,7 +30,7 @@ describe Gitlab::Auth do
       let!(:build) { create(:ci_build, :running, user: user) }
 
       it 'executes query using primary database' do
-        expect(Ci::Build).to receive(:find_by_token).with(build.token).and_wrap_original do |m, *args|
+        expect(Ci::Build).to receive(:find_running_by_token).with(build.token).and_wrap_original do |m, *args|
           expect(::Gitlab::Database::LoadBalancing::Session.current.use_primary?).to eq(true)
           m.call(*args)
         end
