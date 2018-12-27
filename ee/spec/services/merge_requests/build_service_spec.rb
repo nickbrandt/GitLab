@@ -5,7 +5,7 @@ describe MergeRequests::BuildService do
   let(:target_project) { project }
   let(:user) { create(:user) }
   let(:description) { nil }
-  let(:source_branch) { 'feature-branch' }
+  let(:source_branch) { 'feature' }
   let(:target_branch) { 'master' }
   let(:merge_request) { service.execute }
   let(:compare) { double(:compare, commits: commits) }
