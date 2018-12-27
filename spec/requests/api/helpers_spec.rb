@@ -212,7 +212,7 @@ describe API::Helpers do
     end
 
     describe "when authenticating using a job token" do
-      let(:job) { create(:ci_build, user: user) }
+      let(:job) { create(:ci_build, :running, user: user) }
 
       context 'when route is allowed to be authenticated' do
         let(:route_authentication_setting) { { job_token_allowed: true } }
