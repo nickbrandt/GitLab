@@ -14,10 +14,10 @@ describe('filters module mutations', () => {
       [typeFilter] = state.filters;
       [allOption, sastOption] = typeFilter.options;
 
-      const filterId = typeFilter.id;
-      const optionId = sastOption.id;
-
-      mutations[types.SET_FILTER](state, { filterId, optionId });
+      mutations[types.SET_FILTER](state, {
+        filterId: typeFilter.id,
+        optionId: sastOption.id,
+      });
     });
 
     it('should make SAST the selected option', () => {

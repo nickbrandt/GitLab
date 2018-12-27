@@ -6,10 +6,15 @@ describe('filters module getters', () => {
     const getFilter = filterId => getters.getFilter(state)(filterId);
     const getSelectedOptions = filterId =>
       getters.getSelectedOptions(state, { getFilter })(filterId);
+    const getSelectedOptionIds = filterId =>
+      getters.getSelectedOptionIds(state, { getSelectedOptions })(filterId);
+    const getFilterIds = getters.getFilterIds(state);
 
     return {
       getFilter,
       getSelectedOptions,
+      getSelectedOptionIds,
+      getFilterIds,
     };
   };
 
@@ -29,6 +34,16 @@ describe('filters module getters', () => {
 
       expect(selectedOptions).toHaveLength(1);
       expect(selectedOptions[0].name).toEqual('SAST');
+    });
+  });
+
+  describe('getSelectedOptionIds', () => {
+    it('should return "sast" as the selcted option ID', () => {
+      const state = createState();
+      const selectedOptionIds = getters.getSelectedOptionIds(state, mockedGetters(state))('type');
+
+      expect(selectedOptionIds).toHaveLength(1);
+      expect(selectedOptionIds[0]).toEqual('sast');
     });
   });
 

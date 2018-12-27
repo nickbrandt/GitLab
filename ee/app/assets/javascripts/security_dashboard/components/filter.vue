@@ -1,14 +1,14 @@
 <script>
-import { mapGetters, mapMutations } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
-import Help from './help.vue';
+import ReportTypePopover from './report_type_popover.vue';
 
 export default {
   components: {
     GlDropdown,
     GlDropdownItem,
-    Help,
+    ReportTypePopover,
     Icon,
   },
   props: {
@@ -27,16 +27,17 @@ export default {
       return this.getFilter(this.filterId);
     },
     selectedOptionText() {
-      const selectedOption = this.getSelectedOptions(this.filterId)[0];
+      const [selectedOption] = this.getSelectedOptions(this.filterId);
       return (selectedOption && selectedOption.name) || '-';
     },
   },
   methods: {
-    ...mapMutations('filters', ['SET_FILTER']),
+    ...mapActions('filters', ['setFilter']),
     clickFilter(option) {
-      const { filterId } = this;
-      const optionId = option.id;
-      this.SET_FILTER({ filterId, optionId });
+      this.setFilter({
+        filterId: this.filterId,
+        optionId: option.id,
+      });
       this.$emit('change');
     },
   },
@@ -46,7 +47,10 @@ export default {
 <template>
   <div class="dashboard-filter">
     <strong class="js-name">{{ filter.name }}</strong>
-    <help v-if="filterId === 'type'" :dashboard-documentation="dashboardDocumentation" />
+    <report-type-popover
+      v-if="filterId === 'type'"
+      :dashboard-documentation="dashboardDocumentation"
+    />
     <gl-dropdown :text="selectedOptionText" class="d-block mt-1">
       <gl-dropdown-item
         v-for="option in filter.options"
