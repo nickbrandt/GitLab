@@ -14,6 +14,10 @@ class ProjectMember < Member
   default_scope { where(source_type: SOURCE_TYPE) }
 
   scope :in_project, ->(project) { where(source_id: project.id) }
+  scope :in_namespaces, ->(groups) do
+    joins('INNER JOIN projects ON projects.id = members.source_id')
+      .where('projects.namespace_id in (?)', groups.select(:id))
+  end
 
   before_destroy :delete_member_branch_protection
 
