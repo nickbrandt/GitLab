@@ -9,8 +9,8 @@ module QA
 
         # Create one user to be the assigned approver and another user who will
         # not be an approver
-        approver = Resource::User.fabricate!
-        non_approver = Resource::User.fabricate!
+        approver = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_1, Runtime::Env.gitlab_qa_password_1)
+        non_approver = Resource::User.fabricate_or_use(Runtime::Env.gitlab_qa_username_2, Runtime::Env.gitlab_qa_password_2)
 
         # Create a project and assign the users to it
         project = Resource::Project.fabricate! do |project|
