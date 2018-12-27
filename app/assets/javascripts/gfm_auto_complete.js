@@ -249,7 +249,7 @@ class GfmAutoComplete {
       displayTpl(value) {
         let tmpl = GfmAutoComplete.Loading.template;
         if (value.title != null) {
-          tmpl = GfmAutoComplete.Milestones.template;
+          tmpl = GfmAutoComplete.Milestones.templateFunction(value.title);
         }
         return tmpl;
       },
@@ -316,7 +316,7 @@ class GfmAutoComplete {
       searchKey: 'search',
       data: GfmAutoComplete.defaultLoadingData,
       displayTpl(value) {
-        let tmpl = GfmAutoComplete.Labels.template;
+        let tmpl = GfmAutoComplete.Labels.templateFunction(value.color, value.title);
         if (GfmAutoComplete.isLoading(value)) {
           tmpl = GfmAutoComplete.Loading.template;
         }
@@ -566,8 +566,11 @@ GfmAutoComplete.Members = {
   },
 };
 GfmAutoComplete.Labels = {
-  // eslint-disable-next-line no-template-curly-in-string
-  template: '<li><span class="dropdown-label-box" style="background: ${color}"></span> ${title}</li>',
+  templateFunction(color, title) {
+    return `<li><span class="dropdown-label-box" style="background: ${_.escape(
+      color,
+    )}"></span> ${_.escape(title)}</li>`;
+  },
 };
 // Issues, MergeRequests and Snippets
 GfmAutoComplete.Issues = {
@@ -577,8 +580,9 @@ GfmAutoComplete.Issues = {
 };
 // Milestones
 GfmAutoComplete.Milestones = {
-  // eslint-disable-next-line no-template-curly-in-string
-  template: '<li>${title}</li>',
+  templateFunction(title) {
+    return `<li>${_.escape(title)}</li>`;
+  },
 };
 GfmAutoComplete.Loading = {
   template: '<li style="pointer-events: none;"><i class="fa fa-spinner fa-spin"></i> Loading...</li>',
