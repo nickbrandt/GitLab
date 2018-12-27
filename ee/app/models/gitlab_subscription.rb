@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GitlabSubscription < ActiveRecord::Base
   belongs_to :namespace
   belongs_to :hosted_plan, class_name: 'Plan'
