@@ -443,7 +443,7 @@ describe Epic do
     end
   end
 
-  describe '.deepest_relationship_level' do
+  describe '.deepest_relationship_level', :postgresql do
     it 'returns the deepest relationship level between epics' do
       group_1 = create(:group)
       group_2 = create(:group)

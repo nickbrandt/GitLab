@@ -54,7 +54,6 @@ describe Gitlab::UsageData do
       expect(count_data.keys).to include(*%i(
         projects_mirrored_with_pipelines_enabled
         epics
-        epics_deepest_relationship_level
         geo_nodes
         ldap_group_links
         ldap_keys

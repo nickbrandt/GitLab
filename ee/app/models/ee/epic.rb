@@ -169,7 +169,7 @@ module EE
       # epic2 - parent: epic1
       # Returns: 2
       def deepest_relationship_level
-        return nil unless ::Gitlab::Database.postgresql?
+        return unless ::Gitlab::Database.postgresql?
 
         result =
           ActiveRecord::Base.connection.execute(
