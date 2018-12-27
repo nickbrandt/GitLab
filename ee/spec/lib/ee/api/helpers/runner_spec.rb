@@ -1,21 +1,25 @@
 require 'spec_helper'
 
 describe EE::API::Helpers::Runner do
-  let(:helper) { Class.new { include API::Helpers::Runner }.new }
+  let(:helper_class) do
+    Class.new do
+      include API::Helpers::Runner
+    end
+  end
+
+  let(:helper) { helper_class.new }
 
   before do
     allow(helper).to receive(:env).and_return({})
+    allow(helper).to receive(:not_found!).and_raise('not found')
   end
 
   describe '#authenticate_job' do
-    let(:build) { create(:ci_build) }
-
-    before do
-      allow(helper).to receive(:validate_job!)
-    end
+    let(:build) { create(:ci_build, :running) }
 
     it 'handles sticking of a build when a build ID is specified' do
-      allow(helper).to receive(:params).and_return(id: build.id)
+      allow(helper).to receive(:params).and_return(
+        id: build.id, token: build.token)
 
       expect(Gitlab::Database::LoadBalancing::RackMiddleware)
         .to receive(:stick_or_unstick)
@@ -30,11 +34,12 @@ describe EE::API::Helpers::Runner do
       expect(Gitlab::Database::LoadBalancing::RackMiddleware)
         .not_to receive(:stick_or_unstick)
 
-      helper.authenticate_job!
+      expect { helper.authenticate_job! }.to raise_error /not found/
     end
 
     it 'returns the build if one could be found' do
-      allow(helper).to receive(:params).and_return(id: build.id)
+      allow(helper).to receive(:params).and_return(
+        id: build.id, token: build.token)
 
       expect(helper.authenticate_job!).to eq(build)
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Clusters
   module Applications
     class PrometheusUpdateService < BaseHelmService
@@ -11,8 +13,7 @@ module Clusters
       def execute
         app.make_updating!
 
-        response = helm_api.get_config_map(config_map_name)
-        config = extract_config(response)
+        config = load_config(app)
 
         data =
           if has_alerts?
@@ -93,14 +94,25 @@ module Clusters
         [
           {
             "name" => "gitlab",
-            "webhook_configs" => [
-              {
-                "url" => notify_url,
-                "send_resolved" => true
-              }
-            ]
+            "webhook_configs" => [alert_manager_webhook_config]
           }
         ]
+      end
+
+      def alert_manager_webhook_config
+        {
+          "url" => notify_url,
+          "send_resolved" => true,
+          "http_config" => {
+            "bearer_token" => alert_manager_token
+          }
+        }
+      end
+
+      def alert_manager_token
+        app.generate_alert_manager_token!
+
+        app.alert_manager_token
       end
 
       def alert_manager_route_params
@@ -120,8 +132,8 @@ module Clusters
         )
       end
 
-      def extract_config(response)
-        YAML.safe_load(response.data[:'values.yaml'])
+      def load_config(app)
+        YAML.safe_load(app.values)
       end
 
       def has_alerts?

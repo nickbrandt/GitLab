@@ -841,7 +841,11 @@ ActiveRecord::Schema.define(version: 20181123042307) do
     t.datetime_with_timezone "created_at", null: false
     t.datetime_with_timezone "updated_at", null: false
     t.datetime_with_timezone "last_update_started_at"
+    t.string "encrypted_alert_manager_token"
+    t.string "encrypted_alert_manager_token_iv"
   end
+
+  add_index "clusters_applications_prometheus", ["cluster_id"], name: "index_clusters_applications_prometheus_on_cluster_id", unique: true, using: :btree
 
   create_table "clusters_applications_runners", force: :cascade do |t|
     t.integer "cluster_id", null: false
