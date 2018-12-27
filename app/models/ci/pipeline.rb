@@ -11,6 +11,7 @@ module Ci
     include Gitlab::Utils::StrongMemoize
     include AtomicInternalId
     include EnumWithNil
+    include HasRef
 
     prepend ::EE::Ci::Pipeline
 
@@ -387,10 +388,6 @@ module Ci
       @commit ||= Commit.lazy(project, sha)
     end
 
-    def branch?
-      !tag?
-    end
-
     def stuck?
       pending_builds.any?(&:stuck?)
     end
@@ -590,7 +587,7 @@ module Ci
     end
 
     def protected_ref?
-      strong_memoize(:protected_ref) { project.protected_for?(ref) }
+      strong_memoize(:protected_ref) { project.protected_for?(git_ref) }
     end
 
     def legacy_trigger
@@ -707,16 +704,6 @@ module Ci
     def push_details
       strong_memoize(:push_details) do
         Gitlab::Git::Push.new(project, before_sha, sha, git_ref)
-      end
-    end
-
-    def git_ref
-      if branch?
-        Gitlab::Git::BRANCH_REF_PREFIX + ref.to_s
-      elsif tag?
-        Gitlab::Git::TAG_REF_PREFIX + ref.to_s
-      else
-        raise ArgumentError, 'Invalid pipeline type!'
       end
     end
 
