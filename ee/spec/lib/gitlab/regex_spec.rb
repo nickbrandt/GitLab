@@ -27,7 +27,9 @@ describe Gitlab::Regex do
     it { is_expected.to match('foo') }
     it { is_expected.to match('foo/bar') }
     it { is_expected.to match('@foo/bar') }
+    it { is_expected.to match('com/mycompany/app/my-app') }
     it { is_expected.not_to match('$foo/bar') }
+    it { is_expected.not_to match('@foo/@/bar') }
     it { is_expected.not_to match('my package name') }
     it { is_expected.not_to match('!!()()') }
   end
