@@ -80,5 +80,6 @@ module VisibleApprovable
 
     clear_memoization(:approvers_left)
     clear_memoization(:all_approvers_including_groups)
+    clear_memoization(:approval_state)
   end
 end
