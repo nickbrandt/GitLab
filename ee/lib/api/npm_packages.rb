@@ -81,6 +81,7 @@ module API
       end
       params do
         requires :package_name, type: String, desc: 'Package name'
+        requires :versions, type: Hash, desc: 'Package version info'
       end
       put ':id/packages/npm/:package_name', requirements: NPM_ENDPOINT_REQUIREMENTS do
         authorize_create_package!

@@ -16,6 +16,7 @@ class Packages::Package < ActiveRecord::Base
 
   scope :with_name, ->(name) { where(name: name) }
   scope :preload_files, -> { preload(:package_files) }
+  scope :last_of_each_version, -> { where(id: all.select('MAX(id) AS id').group(:version)) }
 
   def self.for_projects(projects)
     return none unless projects.any?
@@ -31,9 +32,5 @@ class Packages::Package < ActiveRecord::Base
     with_name(name)
       .joins(:package_files)
       .where(packages_package_files: { file_name: file_name }).last!
-  end
-
-  def self.last_of_each_version
-    where(id: all.select('MAX(id) AS id').group(:version))
   end
 end

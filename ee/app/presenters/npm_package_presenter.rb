@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class NpmPackagePresenter
+  include API::Helpers::RelatedResourcesHelpers
+
   attr_reader :project, :name, :packages
 
   def initialize(project, name, packages)
@@ -37,8 +39,8 @@ class NpmPackagePresenter
   end
 
   def tarball_url(package, package_file)
-    "#{Gitlab.config.gitlab.url}/api/v4/projects/" \
-      "#{package.project_id}/packages/npm/#{package.name}" \
+    expose_url "#{api_v4_projects_path(id: package.project_id)}" \
+      "/packages/npm/#{package.name}" \
       "/-/#{package_file.file_name}"
   end
 end
