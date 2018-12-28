@@ -89,14 +89,14 @@ module EE
         # clear stale lock files.
         project.repository.clean_stale_repository_files
 
-        # rubocop: disable CodeReuse/ActiveRecord
-        push_size_in_bytes = changes_list.sum do |change|
-          repository.new_blobs(change[:newrev]).sum(&:size)
-        end
-        # rubocop: enable CodeReuse/ActiveRecord
+        push_size_in_bytes = 0
 
-        if project.changes_will_exceed_size_limit?(push_size_in_bytes)
-          raise ::Gitlab::GitAccess::UnauthorizedError, ::Gitlab::RepositorySizeError.new(project).new_changes_error
+        changes_list.each do |change|
+          push_size_in_bytes += repository.new_blobs(change[:newrev]).sum(&:size) # rubocop: disable CodeReuse/ActiveRecord
+
+          if project.changes_will_exceed_size_limit?(push_size_in_bytes)
+            raise ::Gitlab::GitAccess::UnauthorizedError, ::Gitlab::RepositorySizeError.new(project).new_changes_error
+          end
         end
       end
 
