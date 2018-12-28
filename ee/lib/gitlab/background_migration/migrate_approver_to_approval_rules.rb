@@ -102,6 +102,10 @@ module Gitlab
           state == 'merged'
         end
 
+        def sync_code_owners_with_approvers
+          ::MergeRequest.find(id).sync_code_owners_with_approvers
+        end
+
         def finalize_approvals
           return unless merged?
 
@@ -169,6 +173,8 @@ module Gitlab
           if rule = sync_rule
             rule.approval_project_rule = target.target_project.approval_rules.regular.first
           end
+
+          target.sync_code_owners_with_approvers
 
           target.finalize_approvals if target.merged?
         end

@@ -120,6 +120,56 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
           expect(target.approval_rules.exists?(approval_rule.id)).to eq(false)
         end
       end
+
+      context '#sync_code_owners_with_approvers' do
+        let(:owners) { create_list(:user, 2) }
+
+        before do
+          allow(::Gitlab::CodeOwners).to receive(:for_merge_request).and_return(owners)
+        end
+
+        context 'when merge request is merged' do
+          let(:target) { create(:merged_merge_request) }
+
+          it 'does nothing' do
+            expect do
+              described_class.new.perform(target_type, target.id)
+            end.not_to change { target.approval_rules.count }
+          end
+        end
+
+        context 'when code owner rule does not exist' do
+          it 'creates rule' do
+            expect do
+              described_class.new.perform(target_type, target.id)
+            end.to change { target.approval_rules.code_owner.count }.by(1)
+
+            expect(target.approval_rules.code_owner.first.users).to contain_exactly(*owners)
+          end
+        end
+
+        context 'when code owner rule exists' do
+          let!(:code_owner_rule) { create(:approval_merge_request_rule, merge_request: target, code_owner: true, users: [create(:user)]) }
+
+          it 'reuses and updates existing rule' do
+            expect do
+              described_class.new.perform(target_type, target.id)
+            end.not_to change { target.approval_rules.count }
+
+            expect(code_owner_rule.reload.users).to contain_exactly(*owners)
+          end
+
+          context 'when there is no code owner' do
+            let(:owners) { [] }
+
+            it 'removes rule' do
+              described_class.new.perform(target_type, target.id)
+
+              expect(target.approval_rules.exists?(code_owner_rule.id)).to eq(false)
+            end
+          end
+        end
+      end
     end
 
     context 'project' do

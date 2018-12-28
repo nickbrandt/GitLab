@@ -83,11 +83,19 @@ module EE
     end
 
     def sync_code_owners_with_approvers
-      ActiveRecord::Base.transaction do
-        rule = approval_rules.code_owner.first
-        rule ||= approval_rules.code_owner.create!(name: ApprovalMergeRequestRule::DEFAULT_NAME_FOR_CODE_OWNER)
+      return if merged?
 
-        rule.users = code_owners
+      owners = code_owners
+
+      if owners.present?
+        ActiveRecord::Base.transaction do
+          rule = approval_rules.code_owner.first
+          rule ||= approval_rules.code_owner.create!(name: ApprovalMergeRequestRule::DEFAULT_NAME_FOR_CODE_OWNER)
+
+          rule.users = code_owners
+        end
+      else
+        approval_rules.code_owner.delete_all
       end
     end
   end
