@@ -86,3 +86,9 @@ npm publish
 
 You can then navigate to your project's **Packages** page and see the uploaded
 packages or even delete them.
+
+## Uploading a package with the same version twice
+
+If you upload a package with a same name and version twice, GitLab will show 
+both packages in UI. But API will expose only one package per version for `npm install`
+and it will be the most recent one.
