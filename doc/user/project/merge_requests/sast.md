@@ -18,11 +18,10 @@ request widget area.
 
 ## Use cases
 
-- Your application is using an external (open source) library, locked to a
-  specific version (e.g., via `Gemfile.lock`) and the version is known to be
-  vulnerable.
 - Your code has a potentially dangerous attribute in a class, or unsafe code
   that can lead to unintended code execution.
+- Your application is vulnerable to cross-site scripting (XSS) attacks that can
+  be leveraged to unauthorized access to session data
 
 ## Supported languages and frameworks
 
