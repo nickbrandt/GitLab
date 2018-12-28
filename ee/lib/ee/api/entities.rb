@@ -494,6 +494,11 @@ module EE
           expose :trial_ends_on
         end
       end
+
+      class NpmPackage < Grape::Entity
+        expose :name
+        expose :versions
+      end
     end
   end
 end

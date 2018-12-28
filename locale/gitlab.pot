@@ -5363,9 +5363,6 @@ msgstr ""
 msgid "Maven Metadata"
 msgstr ""
 
-msgid "Maven package"
-msgstr ""
-
 msgid "Max access level"
 msgstr ""
 

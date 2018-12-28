@@ -128,7 +128,8 @@ created in snippets, wikis, and repos.
 - [Default labels](../user/admin_area/labels.html): Create labels that will be automatically added to every new project.
 - [Restrict the use of public or internal projects](../public_access/public_access.md#restricting-the-use-of-public-or-internal-projects): Restrict the use of visibility levels for users when they create a project or a snippet.
 - [Custom project templates](../user/admin_area/custom_project_templates.md): Configure a set of projects to be used as custom templates when creating a new project. **[PREMIUM ONLY]**
-- [Maven Repository](maven_repository.md): Enable Maven Repository within GitLab.
+- [Maven Repository](maven_repository.md): Enable Maven Repository within GitLab. **[PREMIUM ONLY]**
+- [NPM Registry](npm_registry.md): Enable NPM Registry within GitLab. **[PREMIUM ONLY]**
 
 ### Repository settings
 

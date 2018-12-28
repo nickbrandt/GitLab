@@ -19,6 +19,16 @@ FactoryBot.define do
         create :package_file, :pom, package: package
       end
     end
+
+    factory :npm_package do
+      name 'foo'
+      version '1.0.0'
+      package_type 'npm'
+
+      after :create do |package|
+        create :package_file, :npm, package: package
+      end
+    end
   end
 
   factory :package_file, class: Packages::PackageFile do
@@ -43,6 +53,17 @@ FactoryBot.define do
       file_name 'maven-metadata.xml'
       file_sha1 '42b1bdc80de64953b6876f5a8c644f20204011b0'
       file_type 'xml'
+    end
+
+    trait(:npm) do
+      file { fixture_file_upload('ee/spec/fixtures/npm/foo-1.0.1.tgz') }
+      file_name 'foo-1.0.1.tgz'
+      file_sha1 'be93151dc23ac34a82752444556fe79b32c7a1ad'
+      file_type 'tgz'
+    end
+
+    trait :object_storage do
+      file_store { Packages::PackageFileUploader::Store::REMOTE }
     end
   end
 

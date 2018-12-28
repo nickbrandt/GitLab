@@ -21,6 +21,7 @@ module EE
         mount ::API::ProjectMirror
         mount ::API::ProjectPushRule
         mount ::API::MavenPackages
+        mount ::API::NpmPackages
       end
     end
   end
