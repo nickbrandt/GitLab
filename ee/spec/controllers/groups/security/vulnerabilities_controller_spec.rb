@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Groups::Security::VulnerabilitiesController do
@@ -103,7 +105,7 @@ describe Groups::Security::VulnerabilitiesController do
           end
         end
 
-        context 'whith multiple report types' do
+        context 'with multiple report types' do
           before do
             projects.each do |project|
               create_vulnerabilities(2, project_guest, { report_type: :sast })
@@ -111,16 +113,31 @@ describe Groups::Security::VulnerabilitiesController do
             end
           end
 
-          # FIXME: we only support SAST in group dashboard until https://gitlab.com/gitlab-org/gitlab-ee/issues/6240
-          # and https://gitlab.com/gitlab-org/gitlab-ee/issues/8481
-          it "returns a list of vulnerabilities but only for SAST report type" do
+          it "returns a list of vulnerabilities for all report types without filter" do
             subject
+
+            expect(response).to have_gitlab_http_status(200)
+            expect(json_response).to be_an(Array)
+            expect(json_response.length).to eq 3
+            expect(json_response.map { |v| v['report_type'] }.uniq).to contain_exactly('sast', 'dependency_scanning')
+            expect(response).to match_response_schema('vulnerabilities/occurrence_list', dir: 'ee')
+          end
+
+          it "returns a list of vulnerabilities for sast only if filter is enabled" do
+            get :index, params: { group_id: group, report_type: ['sast'] }, format: :json
 
             expect(response).to have_gitlab_http_status(200)
             expect(json_response).to be_an(Array)
             expect(json_response.length).to eq 2
             expect(json_response.map { |v| v['report_type'] }.uniq).to contain_exactly('sast')
             expect(response).to match_response_schema('vulnerabilities/occurrence_list', dir: 'ee')
+          end
+
+          it "returns a list of vulnerabilities of all types with multi filter" do
+            get :index, params: { group_id: group, report_type: %w[sast dependency_scanning] }, format: :json
+
+            expect(json_response.length).to eq 3
+            expect(json_response.map { |v| v['report_type'] }.uniq).to contain_exactly('sast', 'dependency_scanning')
           end
         end
 
