@@ -1,7 +1,7 @@
 import createFlash from '~/flash';
 import { __ } from '~/locale';
+import Api from 'ee/api';
 import * as types from './mutation_types';
-import service from '../services/approvals_service_stub';
 import { mapApprovalRuleRequest, mapApprovalRulesResponse } from '../mappers';
 
 export const setSettings = ({ commit }, settings) => {
@@ -26,10 +26,11 @@ export const fetchRules = ({ state, dispatch }) => {
     return Promise.resolve();
   }
 
+  const { projectId } = state.settings;
+
   dispatch('requestRules');
 
-  return service
-    .getProjectApprovalRules()
+  return Api.getProjectApprovalRules(projectId)
     .then(response => dispatch('receiveRulesSuccess', mapApprovalRulesResponse(response.data)))
     .catch(() => dispatch('receiveRulesError'));
 };
@@ -43,17 +44,21 @@ export const postRuleError = () => {
   createFlash(__('An error occurred while updating approvers'));
 };
 
-export const postRule = ({ dispatch }, rule) =>
-  service
-    .postProjectApprovalRule(mapApprovalRuleRequest(rule))
-    .then(() => dispatch('postRuleSuccess'))
-    .catch(() => dispatch('postRuleError'));
+export const postRule = ({ state, dispatch }, rule) => {
+  const { projectId } = state.settings;
 
-export const putRule = ({ dispatch }, { id, ...newRule }) =>
-  service
-    .putProjectApprovalRule(id, mapApprovalRuleRequest(newRule))
+  return Api.postProjectApprovalRule(projectId, mapApprovalRuleRequest(rule))
     .then(() => dispatch('postRuleSuccess'))
     .catch(() => dispatch('postRuleError'));
+};
+
+export const putRule = ({ state, dispatch }, { id, ...newRule }) => {
+  const { projectId } = state.settings;
+
+  return Api.putProjectApprovalRule(projectId, id, mapApprovalRuleRequest(newRule))
+    .then(() => dispatch('postRuleSuccess'))
+    .catch(() => dispatch('postRuleError'));
+};
 
 export const deleteRuleSuccess = ({ dispatch }) => {
   dispatch('deleteModal/close');
@@ -64,8 +69,10 @@ export const deleteRuleError = () => {
   createFlash(__('An error occurred while deleting the approvers group'));
 };
 
-export const deleteRule = ({ dispatch }, id) =>
-  service
-    .deleteProjectApprovalRule(id)
+export const deleteRule = ({ state, dispatch }, id) => {
+  const { projectId } = state.settings;
+
+  return Api.deleteProjectApprovalRule(projectId, id)
     .then(() => dispatch('deleteRuleSuccess'))
     .catch(() => dispatch('deleteRuleError'));
+};
