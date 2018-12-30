@@ -1,9 +1,10 @@
+import Api from 'ee/api';
 import testAction from 'spec/helpers/vuex_action_helper';
 import * as types from 'ee/approvals/stores/mutation_types';
 import actionsModule, * as actions from 'ee/approvals/stores/actions';
-import service from 'ee/approvals/services/approvals_service_stub';
 import { mapApprovalRuleRequest, mapApprovalRulesResponse } from 'ee/approvals/mappers';
 
+const TEST_PROJECT_ID = 9;
 const TEST_RULE_ID = 7;
 const TEST_RULE_REQUEST = {
   name: 'Lorem',
@@ -21,14 +22,18 @@ const TEST_RULE_RESPONSE = {
 };
 
 describe('EE approvals store actions', () => {
+  let state;
   let flashSpy;
 
   beforeEach(() => {
+    state = {
+      settings: { projectId: TEST_PROJECT_ID },
+    };
     flashSpy = spyOnDependency(actionsModule, 'createFlash');
-    spyOn(service, 'getProjectApprovalRules');
-    spyOn(service, 'postProjectApprovalRule');
-    spyOn(service, 'putProjectApprovalRule');
-    spyOn(service, 'deleteProjectApprovalRule');
+    spyOn(Api, 'getProjectApprovalRules');
+    spyOn(Api, 'postProjectApprovalRule');
+    spyOn(Api, 'putProjectApprovalRule');
+    spyOn(Api, 'deleteProjectApprovalRule');
   });
 
   describe('setSettings', () => {
@@ -94,28 +99,32 @@ describe('EE approvals store actions', () => {
       const response = {
         data: { rules: [TEST_RULE_RESPONSE] },
       };
-      service.getProjectApprovalRules.and.returnValue(Promise.resolve(response));
+      Api.getProjectApprovalRules.and.returnValue(Promise.resolve(response));
 
       testAction(
         actions.fetchRules,
         null,
-        {},
+        state,
         [],
         [
           { type: 'requestRules' },
           { type: 'receiveRulesSuccess', payload: mapApprovalRulesResponse(response.data) },
         ],
-        done,
+        () => {
+          expect(Api.getProjectApprovalRules).toHaveBeenCalledWith(TEST_PROJECT_ID);
+
+          done();
+        },
       );
     });
 
     it('dispatches request/receive on error', done => {
-      service.getProjectApprovalRules.and.returnValue(Promise.reject());
+      Api.getProjectApprovalRules.and.returnValue(Promise.reject());
 
       testAction(
         actions.fetchRules,
         null,
-        {},
+        state,
         [],
         [{ type: 'requestRules' }, { type: 'receiveRulesError' }],
         done,
@@ -148,53 +157,73 @@ describe('EE approvals store actions', () => {
 
   describe('postRule', () => {
     it('dispatches success on success', done => {
-      service.postProjectApprovalRule.and.callFake(data => {
-        expect(data).toEqual(mapApprovalRuleRequest(TEST_RULE_REQUEST));
-        return Promise.resolve();
-      });
+      Api.postProjectApprovalRule.and.returnValue(Promise.resolve());
 
-      testAction(actions.postRule, TEST_RULE_REQUEST, {}, [], [{ type: 'postRuleSuccess' }], done);
+      testAction(
+        actions.postRule,
+        TEST_RULE_REQUEST,
+        state,
+        [],
+        [{ type: 'postRuleSuccess' }],
+        () => {
+          expect(Api.postProjectApprovalRule).toHaveBeenCalledWith(
+            TEST_PROJECT_ID,
+            mapApprovalRuleRequest(TEST_RULE_REQUEST),
+          );
+          done();
+        },
+      );
     });
 
     it('dispatches error on error', done => {
-      service.postProjectApprovalRule.and.callFake(data => {
-        expect(data).toEqual(mapApprovalRuleRequest(TEST_RULE_REQUEST));
-        return Promise.reject();
-      });
+      Api.postProjectApprovalRule.and.returnValue(Promise.reject());
 
-      testAction(actions.postRule, TEST_RULE_REQUEST, {}, [], [{ type: 'postRuleError' }], done);
+      testAction(
+        actions.postRule,
+        TEST_RULE_REQUEST,
+        state,
+        [],
+        [{ type: 'postRuleError' }],
+        () => {
+          expect(Api.postProjectApprovalRule).toHaveBeenCalledWith(
+            TEST_PROJECT_ID,
+            mapApprovalRuleRequest(TEST_RULE_REQUEST),
+          );
+
+          done();
+        },
+      );
     });
   });
 
   describe('putRule', () => {
     it('dispatches success on success', done => {
-      service.putProjectApprovalRule.and.callFake((id, data) => {
-        expect(id).toBe(TEST_RULE_ID);
-        expect(data).toEqual(mapApprovalRuleRequest(TEST_RULE_REQUEST));
-        return Promise.resolve();
-      });
+      Api.putProjectApprovalRule.and.returnValue(Promise.resolve());
 
       testAction(
         actions.putRule,
         { id: TEST_RULE_ID, ...TEST_RULE_REQUEST },
-        {},
+        state,
         [],
         [{ type: 'postRuleSuccess' }],
-        done,
+        () => {
+          expect(Api.putProjectApprovalRule).toHaveBeenCalledWith(
+            TEST_PROJECT_ID,
+            TEST_RULE_ID,
+            mapApprovalRuleRequest(TEST_RULE_REQUEST),
+          );
+          done();
+        },
       );
     });
 
     it('dispatches error on error', done => {
-      service.putProjectApprovalRule.and.callFake((id, data) => {
-        expect(id).toBe(TEST_RULE_ID);
-        expect(data).toEqual(mapApprovalRuleRequest(TEST_RULE_REQUEST));
-        return Promise.reject();
-      });
+      Api.putProjectApprovalRule.and.returnValue(Promise.reject());
 
       testAction(
         actions.putRule,
         { id: TEST_RULE_ID, ...TEST_RULE_REQUEST },
-        {},
+        state,
         [],
         [{ type: 'postRuleError' }],
         done,
@@ -227,21 +256,26 @@ describe('EE approvals store actions', () => {
 
   describe('deleteRule', () => {
     it('dispatches success on success', done => {
-      service.deleteProjectApprovalRule.and.callFake(id => {
-        expect(id).toBe(TEST_RULE_ID);
-        return Promise.resolve();
-      });
+      Api.deleteProjectApprovalRule.and.returnValue(Promise.resolve());
 
-      testAction(actions.deleteRule, TEST_RULE_ID, {}, [], [{ type: 'deleteRuleSuccess' }], done);
+      testAction(
+        actions.deleteRule,
+        TEST_RULE_ID,
+        state,
+        [],
+        [{ type: 'deleteRuleSuccess' }],
+        () => {
+          expect(Api.deleteProjectApprovalRule).toHaveBeenCalledWith(TEST_PROJECT_ID, TEST_RULE_ID);
+
+          done();
+        },
+      );
     });
 
     it('dispatches error on error', done => {
-      service.deleteProjectApprovalRule.and.callFake(id => {
-        expect(id).toBe(TEST_RULE_ID);
-        return Promise.reject();
-      });
+      Api.deleteProjectApprovalRule.and.returnValue(Promise.reject());
 
-      testAction(actions.deleteRule, TEST_RULE_ID, {}, [], [{ type: 'deleteRuleError' }], done);
+      testAction(actions.deleteRule, TEST_RULE_ID, state, [], [{ type: 'deleteRuleError' }], done);
     });
   });
 });
