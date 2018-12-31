@@ -106,7 +106,7 @@ module EE
         }).merge(service_desk_counts).merge(security_products_usage)
 
         # MySql does not support recursive queries so we can't retrieve epics relationship depth
-        if ::Gitlab::Database.postgresql?
+        if ::Group.supports_nested_objects?
           usage_data[:counts] = usage_data[:counts].merge(epics_deepest_relationship_level)
         end
 
