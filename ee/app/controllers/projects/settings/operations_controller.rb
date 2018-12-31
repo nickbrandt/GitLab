@@ -7,7 +7,6 @@ module Projects
       before_action :authorize_update_environment!
 
       def show
-        @tracing_settings ||= ProjectTracingSetting.for_project(@project)
       end
 
       def update
@@ -24,6 +23,12 @@ module Projects
       end
 
       private
+
+      helper_method :tracing_setting
+
+      def tracing_setting
+        @tracing_setting ||= project.tracing_setting || project.build_tracing_setting
+      end
 
       def render_result(result)
         respond_to do |format|

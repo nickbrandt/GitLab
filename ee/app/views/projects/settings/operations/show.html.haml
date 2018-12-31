@@ -2,7 +2,8 @@
 - page_title _("Operations Settings")
 - page_title _("Operations")
 
-- has_jaeger_url = @project.tracing_external_url.present?
+- setting = tracing_setting
+- has_jaeger_url = setting.external_url.present?
 
 %section
   %h4
@@ -18,8 +19,8 @@
         %span
           = _('Tracing')
     = _("To open Jaeger and easily view tracing from GitLab, link the %{link} page to your server").html_safe % { link: tracing_link }
-  = form_for @tracing_settings, as: :tracing_settings, url: project_settings_operations_path(@project) do |f|
-    = form_errors(@tracing_settings)
+  = form_for setting, as: :tracing_settings, url: project_settings_operations_path(@project) do |f|
+    = form_errors(setting)
     .form-group
       = f.label :external_url, _('Jaeger URL'), class: 'label-bold'
       = f.url_field :external_url, class: 'form-control', placeholder: 'e.g. https://jaeger.mycompany.com'
