@@ -149,6 +149,7 @@ module API
     mount ::API::ProjectTemplates
     mount ::API::ProtectedBranches
     mount ::API::ProtectedTags
+    mount ::API::Releases
     mount ::API::Repositories
     mount ::API::Runner
     mount ::API::Runners
