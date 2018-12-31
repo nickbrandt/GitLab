@@ -517,8 +517,8 @@ module EE
       return false unless ::Feature.enabled?(feature, user, default_enabled: true)
 
       available_features = strong_memoize(:licensed_feature_available) do
-        Hash.new do |h, feature|
-          h[feature] = load_licensed_feature_available(feature)
+        Hash.new do |h, f|
+          h[f] = load_licensed_feature_available(f)
         end
       end
 
