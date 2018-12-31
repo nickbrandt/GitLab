@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # handles service desk issue creation emails with these formats:
-#   incoming+gitlab-org-gitlab-ce-20-@incoming.gitlab.com
+#   incoming+gitlab-org-gitlab-ce-20-issue-@incoming.gitlab.com
 #   incoming+gitlab-org/gitlab-ce@incoming.gitlab.com (legacy)
 module Gitlab
   module Email
@@ -10,14 +10,15 @@ module Gitlab
         class ServiceDeskHandler < BaseHandler
           include ReplyProcessing
 
-          HANDLER_REGEX        = /\A.+-(?<project_id>.+)-\z/.freeze
+          HANDLER_REGEX        = /\A#{::Gitlab::Email::Handler::BaseHandler::HANDLER_ACTION_BASE_REGEX}-issue-\z/.freeze
           HANDLER_REGEX_LEGACY = /\A(?<project_path>[^\+]*)\z/.freeze
 
           def initialize(mail, mail_key)
             super(mail, mail_key)
 
-            if matched = HANDLER_REGEX.match(mail_key.to_s)
-              @project_id = matched[:project_id]
+            if !mail_key&.include?('/') && (matched = HANDLER_REGEX.match(mail_key.to_s))
+              @project_slug = matched[:project_slug]
+              @project_id   = matched[:project_id]&.to_i
             elsif matched = HANDLER_REGEX_LEGACY.match(mail_key.to_s)
               @project_path = matched[:project_path]
             end
@@ -42,20 +43,12 @@ module Gitlab
 
           attr_reader :project_id, :project_path
 
-          # rubocop: disable CodeReuse/ActiveRecord
           def project
-            return @project if instance_variable_defined?(:@project)
+            super
 
-            found_project = Project.where(service_desk_enabled: true)
-            found_project = if project_id
-                              found_project.find_by_id(project_id)
-                            else
-                              found_project.find_by_full_path(project_path)
-                            end
-
-            @project = found_project&.service_desk_enabled? ? found_project : nil
+            @project = nil unless @project&.service_desk_enabled?
+            @project
           end
-          # rubocop: enable CodeReuse/ActiveRecord
 
           def create_issue!
             # NB: the support bot is specifically forbidden

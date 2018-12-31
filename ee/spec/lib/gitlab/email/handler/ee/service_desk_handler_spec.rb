@@ -55,7 +55,7 @@ describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
       let(:mail) { Mail::Message.new(email_raw) }
 
       it "matches the new format" do
-        handler = described_class.new(mail, "h5bp-html5-boilerplate-#{project.project_id}-")
+        handler = described_class.new(mail, "h5bp-html5-boilerplate-#{project.project_id}-issue-")
 
         expect(handler.instance_variable_get(:@project_id).to_i).to eq project.project_id
         expect(handler.can_handle?).to be_truthy

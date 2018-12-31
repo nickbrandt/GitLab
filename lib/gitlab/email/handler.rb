@@ -5,8 +5,6 @@ module Gitlab
     module Handler
       prepend ::EE::Gitlab::Email::Handler
 
-      HANDLER_ACTION_BASE_REGEX = /(?<project_slug>.+)-(?<project_id>\d+)-(?<incoming_email_token>.+)/.freeze
-
       def self.handlers
         @handlers ||= load_handlers
       end
