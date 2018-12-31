@@ -19,7 +19,7 @@
         %span
           = _('Tracing')
     = _("To open Jaeger and easily view tracing from GitLab, link the %{link} page to your server").html_safe % { link: tracing_link }
-  = form_for setting, as: :tracing_settings, url: project_settings_operations_path(@project) do |f|
+  = form_for setting, as: :tracing_settings, url: project_settings_operations_path(@project), method: :patch do |f|
     = form_errors(setting)
     .form-group
       = f.label :external_url, _('Jaeger URL'), class: 'label-bold'

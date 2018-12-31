@@ -15,13 +15,6 @@ module Projects
         render_result(result)
       end
 
-      def create
-        result = EE::TracingSettingService.new(project, current_user, operations_params).execute
-        @tracing_setting = project.tracing_setting
-
-        render_result(result)
-      end
-
       private
 
       helper_method :tracing_setting
