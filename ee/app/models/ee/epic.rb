@@ -127,36 +127,6 @@ module EE
         ::Group
       end
 
-      def update_start_and_due_dates(epics)
-        groups = epics.includes(:issues).group_by do |epic|
-          milestone_ids = epic.issues.map(&:milestone_id)
-          milestone_ids.compact!
-          milestone_ids.uniq!
-          milestone_ids
-        end
-
-        groups.each do |milestone_ids, epics|
-          next if milestone_ids.empty?
-
-          results = Epics::DateSourcingMilestonesFinder.new(epics.first.id)
-
-          self.where(id: epics.map(&:id)).update_all(
-            [
-              %{
-                start_date = CASE WHEN start_date_is_fixed = true THEN start_date ELSE ? END,
-                start_date_sourcing_milestone_id = ?,
-                end_date = CASE WHEN due_date_is_fixed = true THEN end_date ELSE ? END,
-                due_date_sourcing_milestone_id = ?
-              },
-              results.start_date,
-              results.start_date_sourcing_milestone_id,
-              results.due_date,
-              results.due_date_sourcing_milestone_id
-            ]
-          )
-        end
-      end
-
       # Return the deepest relation level for an epic.
       # Example 1:
       # epic1 - parent: nil
@@ -195,6 +165,48 @@ module EE
         # So we sum 1 to the result to take into account first parent.
         deepest_level + 1
       end
+
+      def update_start_and_due_dates(epics)
+        # In MySQL, we cannot use a subquery that references the table being updated
+        epics = epics.pluck(:id) if ::Gitlab::Database.mysql? && epics.is_a?(ActiveRecord::Relation)
+
+        self.where(id: epics).update_all(
+          [
+            %{
+              start_date = CASE WHEN start_date_is_fixed = true THEN start_date_fixed ELSE (?) END,
+              start_date_sourcing_milestone_id = (?),
+              end_date = CASE WHEN due_date_is_fixed = true THEN due_date_fixed ELSE (?) END,
+              due_date_sourcing_milestone_id = (?)
+            },
+            start_date_milestone_query.select(:start_date),
+            start_date_milestone_query.select(:id),
+            due_date_milestone_query.select(:due_date),
+            due_date_milestone_query.select(:id)
+          ]
+        )
+      end
+
+      private
+
+      def start_date_milestone_query
+        source_milestones_query
+          .where.not(start_date: nil)
+          .order(:start_date, :id)
+          .limit(1)
+      end
+
+      def due_date_milestone_query
+        source_milestones_query
+          .where.not(due_date: nil)
+          .order(due_date: :desc, id: :desc)
+          .limit(1)
+      end
+
+      def source_milestones_query
+        ::Milestone
+          .joins(issues: :epic_issue)
+          .where('epic_issues.epic_id = epics.id')
+      end
     end
 
     def assignees
@@ -227,14 +239,7 @@ module EE
     alias_attribute(:due_date, :end_date)
 
     def update_start_and_due_dates
-      results = Epics::DateSourcingMilestonesFinder.new(id)
-
-      self.start_date = start_date_is_fixed? ? start_date_fixed : results.start_date
-      self.start_date_sourcing_milestone_id = results.start_date_sourcing_milestone_id
-      self.due_date = due_date_is_fixed? ? due_date_fixed : results.due_date
-      self.due_date_sourcing_milestone_id = results.due_date_sourcing_milestone_id
-
-      save if changed?
+      self.class.update_start_and_due_dates([self])
     end
 
     def start_date_from_milestones

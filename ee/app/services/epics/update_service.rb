@@ -16,7 +16,10 @@ module Epics
 
       update(epic)
 
-      epic.update_start_and_due_dates if have_epic_dates_changed?(epic)
+      if have_epic_dates_changed?(epic)
+        epic.update_start_and_due_dates
+        epic.reload
+      end
 
       epic
     end
