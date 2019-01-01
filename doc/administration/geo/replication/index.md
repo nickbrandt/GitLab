@@ -74,16 +74,30 @@ The following diagram illustrates the underlying architecture of Geo.
 
 In this diagram:
 
-- There is one **primary** node and one **secondary** node.
-- The **secondary** node clones repositories via Git over HTTPS. Attachments, LFS objects, and other files are downloaded via HTTPS using the GitLab API to authenticate, with a special endpoint protected by JWT.
-- Writes to the database and Git repositories can only be performed on the **primary** node. The **secondary** node receives database updates via PostgreSQL streaming replication.
+- There is the **primary** node and the details of one **secondary** node.
+- Writes to the database can only be performed on the **primary** node. A **secondary** node receives database 
+  updates via PostgreSQL streaming replication.
+- If present, the [LDAP server](#ldap) should be configured to replicate for [Disaster Recovery](../disaster_recovery/index.md) scenarios.
+- A **secondary** node performs different type of synchronizations against the **primary** node, using a special 
+  authorization protected by JWT:
+   - Repositories are cloned/updated via Git over HTTPS. 
+   - Attachments, LFS objects, and other files are downloaded via HTTPS using a private API endpoint.
 
-Note that the **secondary** node needs two different PostgreSQL databases:
+From the perspective of a user performing Git operations:
+
+- The **primary** node behaves as a full read-write GitLab instance.
+- **Secondary** nodes are read-only but proxy Git push operations to the **primary** node. This makes **secondary** nodes appear to support push operations themselves.
+
+To simplify the diagram, some necessary components are omitted. Note that:
+- Git over SSH requires [`gitlab-shell`](https://gitlab.com/gitlab-org/gitlab-shell) and OpenSSH.
+- Git over HTTPS required [`gitlab-workhorse`](https://gitlab.com/gitlab-org/gitlab-workhorse).
+
+Note that a **secondary** node needs two different PostgreSQL databases:
 
 - A read-only database instance that streams data from the main GitLab database.
 - [Another database instance](#geo-tracking-database) used internally by the **secondary** node to record what data has been replicated.
 
-In the secondary nodes, there is an additional daemon: [Geo Log Cursor](#geo-log-cursor).
+In secondary nodes, there is an additional daemon: [Geo Log Cursor](#geo-log-cursor).
 
 ## Requirements for running Geo
 
