@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.6.1 (2018-12-28)
+
+### Security (1 change)
+
+- Add a shared secret to prevent abuse of the alert endpoint.
+
+
 ## 11.6.0 (2018-12-22)
 
 ### Security (7 changes)
