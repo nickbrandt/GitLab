@@ -1,84 +1,59 @@
 require 'rails_helper'
 
 describe 'Jira referenced paths', type: :request do
+  using RSpec::Parameterized::TableSyntax
+
+  let(:user) { create(:user) }
+
   let(:group) { create(:group, name: 'group') }
   let(:sub_group) { create(:group, name: 'subgroup', parent: group) }
 
-  let(:group_project) { create(:project, name: 'group_project', namespace: group) }
-  let(:sub_group_project) { create(:project, name: 'sub_group_project', namespace: sub_group) }
+  let!(:group_project) { create(:project, name: 'group_project', namespace: group) }
+  let!(:sub_group_project) { create(:project, name: 'sub_group_project', namespace: sub_group) }
 
   before do
+    group.add_owner(user)
+
     login_as user
   end
 
-  describe 'redirects to projects#show' do
-    context 'without nested group' do
-      let(:user) { group_project.creator }
+  def redirects_to_canonical_path(jira_path, redirect_path)
+    get(jira_path)
 
-      it 'redirects to project' do
-        get('/-/jira/group/group_project')
+    expect(response).to redirect_to(redirect_path)
+  end
 
-        expect(response).to redirect_to('/group/group_project')
-      end
+  context 'with encoded subgroup path' do
+    where(:jira_path, :redirect_path) do
+      '/group/group@sub_group@sub_group_project'                | '/group/sub_group/sub_group_project'
+      '/group@sub_group/group@sub_group@sub_group_project'      | '/group/sub_group/sub_group_project'
+      '/group/group@sub_group@sub_group_project/commit/1234567' | '/group/sub_group/sub_group_project/commit/1234567'
+      '/group/group@sub_group@sub_group_project/tree/1234567'   | '/group/sub_group/sub_group_project/tree/1234567'
     end
 
-    context 'with nested group' do
-      let(:user) { sub_group_project.creator }
-
-      it 'redirects to project for root group' do
-        get('/-/jira/group/group@sub_group@sub_group_project')
-
-        expect(response).to redirect_to('/group/sub_group/sub_group_project')
+    with_them do
+      context 'with legacy prefix' do
+        it 'redirects to canonical path' do
+          redirects_to_canonical_path "/-/jira#{jira_path}", redirect_path
+        end
       end
 
-      it 'redirects to project for nested group' do
-        get('/-/jira/group@sub_group/group@sub_group@sub_group_project')
-
-        expect(response).to redirect_to('/group/sub_group/sub_group_project')
+      it 'redirects to canonical path' do
+        redirects_to_canonical_path jira_path, redirect_path
       end
     end
   end
 
-  describe 'redirects to projects/commit#show' do
-    context 'without nested group' do
-      let(:user) { group_project.creator }
-
-      it 'redirects to commits' do
-        get('/-/jira/group/group_project/commit/1234567')
-
-        expect(response).to redirect_to('/group/group_project/commit/1234567')
-      end
+  context 'regular paths with legacy prefix' do
+    where(:jira_path, :redirect_path) do
+      '/-/jira/group/group_project'                | '/group/group_project'
+      '/-/jira/group/group_project/commit/1234567' | '/group/group_project/commit/1234567'
+      '/-/jira/group/group_project/tree/1234567'   | '/group/group_project/tree/1234567'
     end
 
-    context 'with nested group' do
-      let(:user) { sub_group_project.creator }
-
-      it 'redirects to commits' do
-        get('/-/jira/group/group@sub_group@sub_group_project/commit/1234567')
-
-        expect(response).to redirect_to('/group/sub_group/sub_group_project/commit/1234567')
-      end
-    end
-  end
-
-  describe 'redirects to projects/tree#show' do
-    context 'without nested group' do
-      let(:user) { group_project.creator }
-
-      it 'redirects to tree' do
-        get('/-/jira/group/group_project/tree/1234567')
-
-        expect(response).to redirect_to('/group/group_project/tree/1234567')
-      end
-    end
-
-    context 'with nested group' do
-      let(:user) { sub_group_project.creator }
-
-      it 'redirects to tree' do
-        get('/-/jira/group/group@sub_group@sub_group_project/tree/1234567')
-
-        expect(response).to redirect_to('/group/sub_group/sub_group_project/tree/1234567')
+    with_them do
+      it 'redirects to canonical path' do
+        redirects_to_canonical_path jira_path, redirect_path
       end
     end
   end
