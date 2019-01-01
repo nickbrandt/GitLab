@@ -9355,9 +9355,6 @@ msgstr ""
 msgid "Unable to load the diff. %{button_try_again}"
 msgstr ""
 
-msgid "Unable to save your changes"
-msgstr ""
-
 msgid "Unable to sign you in to the group with SAML due to \"%{reason}\""
 msgstr ""
 

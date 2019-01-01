@@ -111,6 +111,8 @@ module EE
       default_value_for :packages_enabled, true
 
       delegate :store_security_reports_available?, to: :namespace
+
+      accepts_nested_attributes_for :tracing_setting, update_only: true, allow_destroy: true
     end
 
     class_methods do

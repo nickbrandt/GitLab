@@ -16,12 +16,11 @@ describe 'projects/settings/operations/show' do
   describe 'Operations > Tracing' do
     context 'with project.tracing_external_url' do
       let(:tracing_url) { 'https://tracing.url' }
-      let(:tracing_settings) { create(:project_tracing_setting, project: project, external_url: tracing_url) }
+      let(:tracing_setting) { create(:project_tracing_setting, project: project, external_url: tracing_url) }
 
       before do
         allow(view).to receive(:can?).and_return(true)
-
-        assign(:tracing_settings, tracing_settings)
+        allow(view).to receive(:tracing_setting).and_return(tracing_setting)
       end
 
       it 'links to project.tracing_external_url' do
@@ -35,27 +34,26 @@ describe 'projects/settings/operations/show' do
         let(:cleaned_url) { "https://replaceme.com/'>" }
 
         before do
-          tracing_settings.update_column(:external_url, malicious_tracing_url)
+          tracing_setting.update_column(:external_url, malicious_tracing_url)
         end
 
         it 'sanitizes external_url' do
           render
 
-          expect(tracing_settings.external_url).to eq(malicious_tracing_url)
+          expect(tracing_setting.external_url).to eq(malicious_tracing_url)
           expect(rendered).to have_link('Tracing', href: cleaned_url)
         end
       end
     end
 
     context 'without project.tracing_external_url' do
-      let(:tracing_settings) { build(:project_tracing_setting, project: project) }
+      let(:tracing_setting) { build(:project_tracing_setting, project: project) }
 
       before do
         allow(view).to receive(:can?).and_return(true)
+        allow(view).to receive(:tracing_setting).and_return(tracing_setting)
 
-        tracing_settings.external_url = nil
-
-        assign(:tracing_settings, tracing_settings)
+        tracing_setting.external_url = nil
       end
 
       it 'links to Tracing page' do

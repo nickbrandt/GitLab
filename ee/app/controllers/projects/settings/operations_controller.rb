@@ -10,9 +10,14 @@ module Projects
       end
 
       def update
-        result = EE::TracingSettingService.new(project, current_user, operations_params).execute
+        result = ::Projects::Operations::UpdateService.new(project, current_user, update_params).execute
 
-        render_result(result)
+        if result[:status] == :success
+          flash[:notice] = _('Your changes have been saved')
+          redirect_to project_settings_operations_path(@project)
+        else
+          render 'show'
+        end
       end
 
       private
@@ -23,22 +28,8 @@ module Projects
         @tracing_setting ||= project.tracing_setting || project.build_tracing_setting
       end
 
-      def render_result(result)
-        respond_to do |format|
-          format.html do
-            if result[:status] == :success
-              flash[:notice] = _('Your changes have been saved')
-            else
-              flash[:alert] = _('Unable to save your changes')
-            end
-
-            redirect_to project_settings_operations_path(@project)
-          end
-        end
-      end
-
-      def operations_params
-        params.require(:tracing_settings).permit(:external_url)
+      def update_params
+        params.require(:project).permit(tracing_setting_attributes: [:external_url])
       end
 
       def check_license
