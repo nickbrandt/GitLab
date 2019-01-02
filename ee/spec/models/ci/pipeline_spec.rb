@@ -457,7 +457,7 @@ describe Ci::Pipeline do
         end
 
         describe '#source_bridge' do
-          it 'has does not have a bridge source' do
+          it 'does not have a bridge source' do
             expect(pipeline.source_bridge).to be_nil
           end
         end
