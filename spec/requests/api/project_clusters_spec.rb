@@ -114,7 +114,7 @@ describe API::ProjectClusters do
       end
 
       it 'returns GCP provider information' do
-        gcp_provider = json_response['gcp_provider']
+        gcp_provider = json_response['provider_gcp']
 
         expect(gcp_provider['cluster_id']).to eq(cluster.id)
         expect(gcp_provider['status_name']).to eq('created')
@@ -132,11 +132,11 @@ describe API::ProjectClusters do
         end
 
         it 'should not include GCP provider info' do
-          expect(json_response['gcp_provider']).not_to be_present
+          expect(json_response['provider_gcp']).not_to be_present
         end
       end
 
-      context 'for non existing cluster' do
+      context 'with non-existing cluster' do
         let(:cluster_id) { 123 }
 
         it 'returns 404' do
@@ -168,24 +168,32 @@ describe API::ProjectClusters do
     end
   end
 
-  describe 'POST /projects/:id/add_cluster' do
+  describe 'POST /projects/:id/clusters/user' do
     include_context 'kubernetes calls stubbed'
 
     let(:api_url) { 'https://kubernetes.example.com' }
     let(:namespace) { project.path }
+    let(:authorization_type) { 'rbac' }
 
-    let(:base_params) do
+    let(:platform_kubernetes_attributes) do
       {
-        name: 'test-cluster',
         api_url: api_url,
         token: 'sample-token',
-        namespace: namespace
+        namespace: namespace,
+        authorization_type: authorization_type
+      }
+    end
+
+    let(:cluster_params) do
+      {
+        name: 'test-cluster',
+        platform_kubernetes_attributes: platform_kubernetes_attributes
       }
     end
 
     context 'non-authorized user' do
       it 'should respond with 404' do
-        post api("/projects/#{project.id}/add_cluster", non_member), params: base_params
+        post api("/projects/#{project.id}/clusters/user", non_member), params: cluster_params
 
         expect(response).to have_gitlab_http_status(404)
       end
@@ -193,12 +201,10 @@ describe API::ProjectClusters do
 
     context 'authorized user' do
       before do
-        post api("/projects/#{project.id}/add_cluster", current_user), params: cluster_params
+        post api("/projects/#{project.id}/clusters/user", current_user), params: cluster_params
       end
 
       context 'with valid params' do
-        let(:cluster_params) { base_params }
-
         it 'should respond with 201' do
           expect(response).to have_gitlab_http_status(201)
         end
@@ -218,18 +224,34 @@ describe API::ProjectClusters do
         end
       end
 
-      context 'when user disables RBAC' do
-        let(:cluster_params) { base_params.merge(rbac_enabled: false) }
+      context 'when user does not indicate authorization type' do
+        let(:platform_kubernetes_attributes) do
+          {
+            api_url: api_url,
+            token: 'sample-token',
+            namespace: namespace
+          }
+        end
+
+        it 'defaults to RBAC' do
+          cluster_result = Clusters::Cluster.find(json_response['id'])
+
+          expect(cluster_result.platform_kubernetes.rbac?).to be_truthy
+        end
+      end
+
+      context 'when user sets authorization type as ABAC' do
+        let(:authorization_type) { 'abac' }
 
         it 'should create an ABAC cluster' do
-          cluster_result = Clusters::Cluster.find(json_response["id"])
+          cluster_result = Clusters::Cluster.find(json_response['id'])
 
           expect(cluster_result.platform.abac?).to be_truthy
         end
       end
 
       context 'with invalid params' do
-        let(:cluster_params) { base_params.merge(name: '') }
+        let(:namespace) { 'invalid_namespace' }
 
         it 'should respond with 400' do
           expect(response).to have_gitlab_http_status(400)
@@ -240,8 +262,7 @@ describe API::ProjectClusters do
         end
 
         it 'should return validation errors' do
-          expect(json_response['message']).to be_present
-          expect(json_response['message']['name'].first).to eq(" has to be present")
+          expect(json_response['message']['platform_kubernetes.namespace'].first).to be_present
         end
       end
     end
@@ -252,8 +273,13 @@ describe API::ProjectClusters do
 
     let(:api_url) { 'https://kubernetes.example.com' }
     let(:namespace) { 'new-namespace' }
-    let(:base_params) { { namespace: namespace } }
-    let(:update_params) { base_params }
+    let(:platform_kubernetes_attributes) { { namespace: namespace } }
+
+    let(:update_params) do
+      {
+        platform_kubernetes_attributes: platform_kubernetes_attributes
+      }
+    end
 
     let!(:kubernetes_namespace) do
       create(:cluster_kubernetes_namespace,
@@ -281,11 +307,11 @@ describe API::ProjectClusters do
         cluster.reload
       end
 
-      it 'should respond with 200' do
-        expect(response).to have_gitlab_http_status(200)
-      end
-
       context 'with valid params' do
+        it 'should respond with 200' do
+          expect(response).to have_gitlab_http_status(200)
+        end
+
         it 'should update cluster attributes' do
           expect(cluster.platform_kubernetes.namespace).to eq('new-namespace')
           expect(cluster.kubernetes_namespace.namespace).to eq('new-namespace')
@@ -295,33 +321,44 @@ describe API::ProjectClusters do
       context 'with invalid params' do
         let(:namespace) { 'invalid_namespace' }
 
+        it 'should respond with 400' do
+          expect(response).to have_gitlab_http_status(400)
+        end
+
         it 'should not update cluster attributes' do
           expect(cluster.platform_kubernetes.namespace).not_to eq('invalid_namespace')
           expect(cluster.kubernetes_namespace.namespace).not_to eq('invalid_namespace')
         end
 
         it 'should return validation errors' do
-          expect(json_response['message']).to be_present
           expect(json_response['message']['platform_kubernetes.namespace'].first).to match('can contain only lowercase letters')
         end
       end
 
       context 'with a GCP cluster' do
-        let(:update_params) do
-          base_params.merge(
-            name: 'new-name',
-            api_url: 'https://new-api-url.com',
-            token: 'new-sample-token'
-          )
+        context 'when user tries to change GCP specific fields' do
+          let(:platform_kubernetes_attributes) do
+            {
+              api_url: 'https://new-api-url.com',
+              token: 'new-sample-token'
+            }
+          end
+
+          it 'should respond with 400' do
+            expect(response).to have_gitlab_http_status(400)
+          end
+
+          it 'should return validation error' do
+            expect(json_response['message']['platform_kubernetes.base'].first).to eq('Cannot modify managed Kubernetes cluster')
+          end
         end
 
-        it 'should ignore platform kubernetes specific attributes' do
-          platform_kubernetes = cluster.platform_kubernetes
+        context 'when user tries to change namespace' do
+          let(:namespace) { 'new-namespace' }
 
-          expect(cluster.name).not_to eq('new-name')
-          expect(platform_kubernetes.namespace).to eq('new-namespace')
-          expect(platform_kubernetes.api_url).not_to eq('https://new-api-url.com')
-          expect(platform_kubernetes.token).not_to eq('new-sample-token')
+          it 'should respond with 200' do
+            expect(response).to have_gitlab_http_status(200)
+          end
         end
       end
 
@@ -333,15 +370,26 @@ describe API::ProjectClusters do
                  projects: [project])
         end
 
-        let(:update_params) do
-          base_params.merge(
-            name: 'new-name',
-            api_url: 'https://new-api-url.com',
+        let(:platform_kubernetes_attributes) do
+          {
+            api_url: api_url,
+            namespace: 'new-namespace',
             token: 'new-sample-token'
-          )
+          }
         end
 
-        it 'should not ignore platform kubernetes specific attributes' do
+        let(:update_params) do
+          {
+            name: 'new-name',
+            platform_kubernetes_attributes: platform_kubernetes_attributes
+          }
+        end
+
+        it 'should respond with 200' do
+          expect(response).to have_gitlab_http_status(200)
+        end
+
+        it 'should update platform kubernetes attributes' do
           platform_kubernetes = cluster.platform_kubernetes
 
           expect(cluster.name).to eq('new-name')
@@ -354,7 +402,7 @@ describe API::ProjectClusters do
       context 'with a cluster that does not belong to user' do
         let(:cluster) { create(:cluster, :project, :provided_by_user) }
 
-        it 'should respond with 400' do
+        it 'should respond with 404' do
           expect(response).to have_gitlab_http_status(404)
         end
       end

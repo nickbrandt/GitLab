@@ -6,14 +6,13 @@ module API
 
     before { authenticate! }
 
+    # EE::API::ProjectClusters will
+    # override these methods
     helpers do
-      params :optional_add_params_ee do
-        # EE::API::ProjectClusters would override this
+      params :create_params_ee do
       end
 
-      # EE::API::ProjectClusters would override this
-      def environment_scope
-        '*'
+      params :update_params_ee do
       end
     end
 
@@ -55,25 +54,27 @@ module API
       end
       params do
         requires :name, type: String, desc: 'Cluster name'
-        requires :api_url, type: String, desc: 'URL to access the Kubernetes API'
-        requires :token, type: String, desc: 'Token to authenticate against Kubernetes'
-        optional :ca_cert, type: String, desc: 'TLS certificate (needed if API is using a self-signed TLS certificate)'
-        optional :namespace, type: String, desc: 'Unique namespace related to Project'
-        optional :rbac_enabled, type: Boolean, default: true, desc: 'Enable RBAC authorization type, defaults to true'
-        use :optional_add_params_ee
+        optional :enabled, type: Boolean, default: true, desc: 'Determines if cluster is active or not, defaults to true'
+        requires :platform_kubernetes_attributes, type: Hash, desc: %q(Platform Kubernetes data) do
+          requires :api_url, type: String, allow_blank: false, desc: 'URL to access the Kubernetes API'
+          requires :token, type: String, desc: 'Token to authenticate against Kubernetes'
+          optional :ca_cert, type: String, desc: 'TLS certificate (needed if API is using a self-signed TLS certificate)'
+          optional :namespace, type: String, desc: 'Unique namespace related to Project'
+          optional :authorization_type, type: String, values: Clusters::Platforms::Kubernetes.authorization_types.keys, default: 'rbac', desc: 'Cluster authorization type, defaults to RBAC'
+        end
+        use :create_params_ee
       end
-      post ':id/add_cluster' do
+      post ':id/clusters/user' do
         authorize! :create_cluster, user_project
 
-        new_cluster = ::Clusters::CreateService
-          .new(current_user, create_cluster_params)
-          .execute(access_token: token_in_session)
-          .present(current_user: current_user)
+        user_cluster = ::Clusters::CreateService
+          .new(current_user, create_cluster_user_params)
+          .execute
 
-        if new_cluster.persisted?
-          present new_cluster, with: Entities::ClusterProject
+        if user_cluster.persisted?
+          present user_cluster, with: Entities::ClusterProject
         else
-          render_validation_error!(new_cluster)
+          render_validation_error!(user_cluster)
         end
       end
 
@@ -84,10 +85,13 @@ module API
       params do
         requires :cluster_id, type: Integer, desc: 'The cluster ID'
         optional :name, type: String, desc: 'Cluster name'
-        optional :api_url, type: String, desc: 'URL to access the Kubernetes API'
-        optional :token, type: String, desc: 'Token to authenticate against Kubernetes'
-        optional :ca_cert, type: String, desc: 'TLS certificate (needed if API is using a self-signed TLS certificate)'
-        optional :namespace, type: String, desc: 'Unique namespace related to Project'
+        optional :platform_kubernetes_attributes, type: Hash, desc: %q(Platform Kubernetes data) do
+          optional :api_url, type: String, desc: 'URL to access the Kubernetes API'
+          optional :token, type: String, desc: 'Token to authenticate against Kubernetes'
+          optional :ca_cert, type: String, desc: 'TLS certificate (needed if API is using a self-signed TLS certificate)'
+          optional :namespace, type: String, desc: 'Unique namespace related to Project'
+        end
+        use :update_params_ee
       end
       put ':id/clusters/:cluster_id' do
         authorize! :update_cluster, cluster
@@ -124,57 +128,16 @@ module API
         @cluster ||= clusters_for_current_user.find(params[:cluster_id])
       end
 
-      def token_in_session
-        session[GoogleApi::CloudPlatform::Client.session_key_for_token]
-      end
-
-      def create_cluster_params
-        {
-          name: declared_params[:name],
-          enabled: true,
-          environment_scope: environment_scope,
+      def create_cluster_user_params
+        declared_params.merge({
           provider_type: :user,
           platform_type: :kubernetes,
-          cluster_type: :project,
-          clusterable: user_project,
-          platform_kubernetes_attributes: create_platform_kubernetes_params
-        }
-      end
-
-      def create_platform_kubernetes_params
-        kubernetes_params = { authorization_type: kubernetes_authorization_type }
-        permitted_params = platform_kubernetes_params + [:authorization_type]
-
-        kubernetes_params.merge(declared_params.slice(*permitted_params))
+          clusterable: user_project
+        })
       end
 
       def update_cluster_params
-        {
-          platform_kubernetes_attributes: update_platform_kubernetes_params
-        }.merge(cluster.managed? ? {} : { name: declared_params[:name] })
-      end
-
-      def update_platform_kubernetes_params
-        permitted_params = if cluster.managed?
-                             [:namespace]
-                           else
-                             platform_kubernetes_params
-                           end
-
-        declared_params.slice(*permitted_params)
-      end
-
-      def platform_kubernetes_params
-        [:api_url, :token, :ca_cert, :namespace]
-      end
-
-      def kubernetes_authorization_type
-        rbac_enabled = declared_params.fetch(:rbac_enabled, true)
-        rbac_enabled ? authorization_types[:rbac] : authorization_types[:abac]
-      end
-
-      def authorization_types
-        Clusters::Platforms::Kubernetes.authorization_types
+        declared_params(include_missing: false).without(:cluster_id)
       end
     end
   end

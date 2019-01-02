@@ -1592,7 +1592,7 @@ module API
       expose :provider_type, :platform_type, :environment_scope, :cluster_type
       expose :user, using: Entities::UserBasic
       expose :platform_kubernetes, using: Entities::Platform::Kubernetes
-      expose :provider, as: :gcp_provider, using: Entities::Provider::Gcp, if: ->(cluster, _) { cluster.gcp? }
+      expose :provider_gcp, using: Entities::Provider::Gcp
     end
 
     class ClusterProject < Cluster
