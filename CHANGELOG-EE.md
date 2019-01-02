@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.6.2 (2019-01-02)
+
+### Fixed (1 change)
+
+- Fix issue ID wrapping and avatar counter shrinking in Related Issues list. !8854
+
+
 ## 11.6.1 (2018-12-28)
 
 ### Security (1 change)
