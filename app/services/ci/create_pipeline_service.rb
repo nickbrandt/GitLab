@@ -35,6 +35,7 @@ module Ci
         variables_attributes: params[:variables_attributes],
         project: project,
         current_user: current_user,
+        push_options: params[:push_options],
 
         # EE specific
         allow_mirror_update: mirror_update,
