@@ -5830,6 +5830,9 @@ msgstr ""
 msgid "No Label"
 msgstr ""
 
+msgid "No activities found"
+msgstr ""
+
 msgid "No assignee"
 msgstr ""
 
@@ -8160,7 +8163,7 @@ msgstr ""
 msgid "SortOptions|Less weight"
 msgstr ""
 
-msgid "SortOptions|Milestone"
+msgid "SortOptions|Milestone due date"
 msgstr ""
 
 msgid "SortOptions|Milestone due later"
