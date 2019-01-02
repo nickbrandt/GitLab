@@ -87,8 +87,8 @@ module EE
       return false unless ::Feature.enabled?(feature, default_enabled: true)
 
       available_features = strong_memoize(:feature_available) do
-        Hash.new do |h, feature|
-          h[feature] = load_feature_available(feature)
+        Hash.new do |h, f|
+          h[f] = load_feature_available(f)
         end
       end
 
@@ -99,8 +99,8 @@ module EE
       return true if ::License::ANY_PLAN_FEATURES.include?(feature)
 
       available_features = strong_memoize(:features_available_in_plan) do
-        Hash.new do |h, feature|
-          h[feature] = (plans.map(&:name) & self.class.plans_with_feature(feature)).any?
+        Hash.new do |h, f|
+          h[f] = (plans.map(&:name) & self.class.plans_with_feature(f)).any?
         end
       end
 
