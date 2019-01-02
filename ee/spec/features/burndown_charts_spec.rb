@@ -83,7 +83,6 @@ describe 'Burndown charts' do
 
       visit dashboard_milestone_path(milestone.safe_title, title: milestone.title)
 
-      expect(page).to have_content('manage issues from multiple projects in the same milestone.')
       expect(page).not_to have_css('.burndown-chart')
       expect(page).not_to have_content('Improve milestones with Burndown Charts')
     end
