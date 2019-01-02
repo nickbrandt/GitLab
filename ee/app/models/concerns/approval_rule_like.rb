@@ -2,7 +2,6 @@
 
 module ApprovalRuleLike
   extend ActiveSupport::Concern
-  include Gitlab::Utils::StrongMemoize
 
   DEFAULT_NAME = 'Default'
 
@@ -17,14 +16,7 @@ module ApprovalRuleLike
   # Users who are eligible to approve, including specified group members.
   # @return [Array<User>]
   def approvers
-    strong_memoize(:approvers) do
-      User.from_union(
-        [
-          users,
-          User.joins(:group_members).where(members: { source_id: groups })
-        ]
-      )
-    end
+    @approvers ||= User.from_union([users, group_users])
   end
 
   def add_member(member)
