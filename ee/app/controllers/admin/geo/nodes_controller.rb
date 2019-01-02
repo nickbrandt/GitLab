@@ -12,7 +12,11 @@ class Admin::Geo::NodesController < Admin::ApplicationController
     @node = GeoNode.new
 
     unless Gitlab::Geo.license_allows?
-      flash_now(:alert, 'You need a different license to enable Geo replication')
+      flash.now[:alert] = _('You need a different license to enable Geo replication.')
+    end
+
+    unless Gitlab::Database.pg_stat_wal_receiver_supported?
+      flash.now[:warning] = _('Please upgrade PostgreSQL to version 9.6 or greater. The status of the replication cannot be determined reliably with the current version.')
     end
   end
   # rubocop: enable CodeReuse/ActiveRecord
@@ -66,9 +70,5 @@ class Admin::Geo::NodesController < Admin::ApplicationController
 
   def load_node
     @node = GeoNode.find(params[:id])
-  end
-
-  def flash_now(type, message)
-    flash.now[type] = flash.now[type].blank? ? message : "#{flash.now[type]}<BR>#{message}".html_safe
   end
 end
