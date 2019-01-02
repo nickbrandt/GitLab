@@ -3866,6 +3866,9 @@ msgstr ""
 msgid "For internal projects, any logged in user can view pipelines and access job details (output logs and artifacts)"
 msgstr ""
 
+msgid "For more info, read the documentation."
+msgstr ""
+
 msgid "For more information, go to the "
 msgstr ""
 
@@ -6551,7 +6554,13 @@ msgstr ""
 msgid "Please convert them to Git on Google Code, and go through the %{link_to_import_flow} again."
 msgstr ""
 
+msgid "Please enable and migrate to hashed storage to avoid security issues and ensure data integrity. %{migrate_link}"
+msgstr ""
+
 msgid "Please fill in a descriptive name for your group."
+msgstr ""
+
+msgid "Please migrate all existing projects to hashed storage to avoid security issues and ensure data integrity. %{migrate_link}"
 msgstr ""
 
 msgid "Please note that this application is not provided by GitLab and you should verify its authenticity before allowing access."
