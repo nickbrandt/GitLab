@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Kubernetes
     # Calculates the rollout status for a set of kubernetes deployments.

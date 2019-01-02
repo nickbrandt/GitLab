@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module SidekiqCluster
     # The signals that should terminate both the master and workers.

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Create a separate process, which does not load the Rails environment, to index
 # each repository. This prevents memory leaks in the indexer from affecting the
 # rest of the application.

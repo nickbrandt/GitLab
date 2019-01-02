@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Elastic
     # Always prefer to use the full class namespace when specifying a

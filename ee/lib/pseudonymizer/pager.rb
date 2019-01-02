@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Pseudonymizer
   class Pager
     PAGE_SIZE = ENV.fetch('PSEUDONYMIZER_BATCH', 100_000)

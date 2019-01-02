@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # The database stores locked paths as following:
 # 'app/models/user.rb' or 'app/models'
 # To determine that 'app/models/user.rb' is locked we need to generate

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Geo
     class HealthCheck
@@ -20,9 +22,13 @@ module Gitlab
         return 'The Geo database is not configured to use Foreign Data Wrapper.' unless Gitlab::Geo::Fdw.enabled?
 
         unless Gitlab::Geo::Fdw.fdw_up_to_date?
-          return "The Geo database has an outdated FDW remote schema.".tap do |output|
-            output << " It contains #{Gitlab::Geo::Fdw.count_tables} of #{Gitlab::Geo::Fdw.gitlab_tables.count} expected tables." unless Gitlab::Geo::Fdw.count_tables_match?
+          output = "The Geo database has an outdated FDW remote schema."
+
+          unless Gitlab::Geo::Fdw.count_tables_match?
+            output = "#{output} It contains #{Gitlab::Geo::Fdw.count_tables} of #{Gitlab::Geo::Fdw.gitlab_tables.count} expected tables."
           end
+
+          return output
         end
 
         ''

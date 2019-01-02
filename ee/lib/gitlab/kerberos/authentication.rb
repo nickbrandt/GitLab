@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This calls helps to authenticate to Kerberos by providing username and password
 module Gitlab
   module Kerberos

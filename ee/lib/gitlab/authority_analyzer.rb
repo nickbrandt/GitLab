@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   class AuthorityAnalyzer
     COMMITS_TO_CONSIDER = 25
