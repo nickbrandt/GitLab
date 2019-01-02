@@ -1,3 +1,5 @@
+import { s__ } from '~/locale';
+
 export const SEVERITIES = {
   critical: 'Critical',
   high: 'High',
@@ -10,5 +12,5 @@ export const SEVERITIES = {
 };
 
 export const REPORT_TYPES = {
-  sast: 'SAST',
+  sast: s__('ciReport|SAST'),
 };
