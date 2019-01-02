@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module Gitlab
     module Auth
@@ -18,7 +20,7 @@ module EE
               # does not normalize them as of version 0.3.0, so add the default
               # realm ourselves if appropriate
               if provider == 'kerberos' && ee_uid.present?
-                ee_uid += "@#{kerberos_default_realm}" unless ee_uid.include?('@')
+                ee_uid = "#{ee_uid}@#{kerberos_default_realm}" unless ee_uid.include?('@')
               end
 
               ee_uid

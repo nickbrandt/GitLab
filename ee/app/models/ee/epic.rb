@@ -12,6 +12,7 @@ module EE
       include Referable
       include Awardable
       include LabelEventable
+      include Descendant
 
       enum state: { opened: 1, closed: 2 }
 
@@ -33,6 +34,8 @@ module EE
       belongs_to :group
       belongs_to :start_date_sourcing_milestone, class_name: 'Milestone'
       belongs_to :due_date_sourcing_milestone, class_name: 'Milestone'
+      belongs_to :parent, class_name: "Epic"
+      has_many :children, class_name: "Epic", foreign_key: :parent_id
 
       has_internal_id :iid, scope: :group, init: ->(s) { s&.group&.epics&.maximum(:iid) }
 
@@ -213,6 +216,20 @@ module EE
 
     def cross_reference?(from)
       from && from != group
+    end
+
+    def ancestors
+      return self.class.none unless parent_id
+
+      hierarchy.ancestors
+    end
+
+    def descendants
+      hierarchy.descendants
+    end
+
+    def hierarchy
+      ::Gitlab::ObjectHierarchy.new(self.class.where(id: id))
     end
 
     # we don't support project epics for epics yet, planned in the future #4019

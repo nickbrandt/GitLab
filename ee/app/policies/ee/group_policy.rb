@@ -82,3 +82,5 @@ module EE
     end
   end
 end
+
+EE::GroupPolicy.include(EE::ClusterableActions)

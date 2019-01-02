@@ -14,23 +14,9 @@ module API
       authenticate_non_get!
     end
 
+    helpers ::API::Helpers::PackagesHelpers
+
     helpers do
-      def require_packages_enabled!
-        not_found! unless Gitlab.config.packages.enabled
-      end
-
-      def authorize_packages_feature!
-        forbidden! unless user_project.feature_available?(:packages)
-      end
-
-      def authorize_download_package!
-        authorize!(:read_package, user_project)
-      end
-
-      def authorize_create_package!
-        authorize!(:create_package, user_project)
-      end
-
       def extract_format(file_name)
         name, _, format = file_name.rpartition('.')
 

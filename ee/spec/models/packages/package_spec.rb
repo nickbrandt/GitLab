@@ -16,4 +16,32 @@ RSpec.describe Packages::Package, type: :model do
       it { is_expected.not_to allow_value("my(dom$$$ain)com.my-app").for(:name) }
     end
   end
+
+  describe '.by_name_and_file_name' do
+    let!(:package) { create(:npm_package) }
+    let!(:package_file) { package.package_files.first }
+
+    subject { described_class }
+
+    it 'finds a package with correct arguiments' do
+      expect(subject.by_name_and_file_name(package.name, package_file.file_name)).to eq(package)
+    end
+
+    it 'will raise error if not found' do
+      expect { subject.by_name_and_file_name('foo', 'foo-5.5.5.tgz') }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+
+  describe '.last_of_each_version' do
+    let!(:package1) { create(:npm_package, version: '1.0.0') }
+    let!(:package2) { create(:npm_package, version: '1.0.1') }
+    let!(:package3) { create(:npm_package, version: '1.0.1') }
+
+    subject { described_class.last_of_each_version }
+
+    it 'includes only latest package per version' do
+      is_expected.to include(package1, package3)
+      is_expected.not_to include(package2)
+    end
+  end
 end

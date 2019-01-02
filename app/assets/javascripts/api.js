@@ -32,6 +32,7 @@ const Api = {
   createBranchPath: '/api/:version/projects/:id/repository/branches',
   geoNodesPath: '/api/:version/geo_nodes',
   subscriptionPath: '/api/:version/namespaces/:id/gitlab_subscription',
+  releasesPath: '/api/:version/projects/:id/releases',
 
   group(groupId, callback) {
     const url = Api.buildUrl(Api.groupPath).replace(':id', groupId);
@@ -348,6 +349,12 @@ const Api = {
 
   userSubscription(namespaceId) {
     const url = Api.buildUrl(this.subscriptionPath).replace(':id', encodeURIComponent(namespaceId));
+
+    return axios.get(url);
+  },
+
+  releases(id) {
+    const url = Api.buildUrl(this.releasesPath).replace(':id', encodeURIComponent(id));
 
     return axios.get(url);
   },

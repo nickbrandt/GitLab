@@ -1,10 +1,11 @@
 # frozen_string_literal: true
+
 class Groups::Security::VulnerabilitiesController < Groups::Security::ApplicationController
   HISTORY_RANGE = 3.months
 
   def index
-    @vulnerabilities = group.latest_vulnerabilities
-      .sast # FIXME: workaround until https://gitlab.com/gitlab-org/gitlab-ee/issues/6240
+    @vulnerabilities = ::Security::VulnerabilitiesFinder.new(group: group, params: finder_params)
+      .execute
       .ordered
       .page(params[:page])
 
@@ -32,5 +33,12 @@ class Groups::Security::VulnerabilitiesController < Groups::Security::Applicatio
         render json: Vulnerabilities::HistorySerializer.new.represent(group.all_vulnerabilities.count_by_day_and_severity(HISTORY_RANGE))
       end
     end
+  end
+
+  private
+
+  def finder_params
+    params.permit(report_type: [], project_id: [], severity: [])
+      .merge(hide_dismissed: Gitlab::Utils.to_boolean(params[:hide_dismissed]))
   end
 end

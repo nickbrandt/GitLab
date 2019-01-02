@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module API
     module Entities
@@ -491,6 +493,11 @@ module EE
           expose :end_date, as: :subscription_end_date
           expose :trial_ends_on
         end
+      end
+
+      class NpmPackage < Grape::Entity
+        expose :name
+        expose :versions
       end
     end
   end

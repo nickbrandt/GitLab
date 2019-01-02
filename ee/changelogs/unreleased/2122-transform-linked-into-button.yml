@@ -1,5 +1,0 @@
----
-title: Renders upstream and downstream pipelines in the main pipeline graph
-merge_request: 8607
-author:
-type: fixed

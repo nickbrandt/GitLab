@@ -935,7 +935,7 @@ after it has been restored to service.
     you switch it to a standby node, repmgr will report that there are two masters.
     If there are any clients that are still attempting to write to the old master,
     this will cause a split, and the old master will need to be resynced from
-    scratch by performing a `standby setup NEW_MASTER`.
+    scratch by performing a `gitlab-ctl repmgr standby setup NEW_MASTER`.
 
 ### Alternate configurations
 

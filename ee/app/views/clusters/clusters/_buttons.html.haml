@@ -1,6 +1,0 @@
-.nav-controls
-  - if clusterable.feature_available?(:multiple_clusters)
-    = link_to s_("ClusterIntegration|Add Kubernetes cluster"), clusterable.new_path, class: "btn btn-success btn-add-cluster has-tooltip js-add-cluster"
-  - else
-    %span.btn.btn-add-cluster.disabled.js-add-cluster
-      = s_("ClusterIntegration|Add Kubernetes cluster")

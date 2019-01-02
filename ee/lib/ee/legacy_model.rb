@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module LegacyModel
     def table_name_prefix

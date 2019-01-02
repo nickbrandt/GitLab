@@ -1,5 +1,0 @@
----
-title: Handle null start or due dates for dates sourcing milestone in Epics
-merge_request: 8689
-author:
-type: fixed

@@ -1,5 +1,0 @@
----
-title: Sanitize tracing external_urls before saving to DB and when displaying the URL to prevent XSS issues
-merge_request:
-author:
-type: security

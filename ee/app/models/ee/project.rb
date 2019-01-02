@@ -54,6 +54,7 @@ module EE
       has_many :software_license_policies, inverse_of: :project, class_name: 'SoftwareLicensePolicy'
       accepts_nested_attributes_for :software_license_policies, allow_destroy: true
       has_many :packages, class_name: 'Packages::Package'
+      has_many :package_files, through: :packages, class_name: 'Packages::PackageFile'
 
       has_many :sourced_pipelines, class_name: 'Ci::Sources::Pipeline', foreign_key: :source_project_id
 

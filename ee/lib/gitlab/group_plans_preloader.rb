@@ -58,7 +58,7 @@ module Gitlab
     # Returns an ActiveRecord::Relation that includes the given groups, and all
     # their (recursive) ancestors.
     def groups_and_ancestors_for(groups)
-      Gitlab::GroupHierarchy
+      Gitlab::ObjectHierarchy
         .new(groups)
         .base_and_ancestors
         .select(:id, :parent_id, :plan_id)

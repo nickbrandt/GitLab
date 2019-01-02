@@ -6,7 +6,7 @@ module EE
       extend ::Gitlab::Utils::Override
 
       override :sign_in_and_redirect
-      def sign_in_and_redirect(user)
+      def sign_in_and_redirect(user, *args)
         # The counter gets incremented in `sign_in_and_redirect`
         show_ldap_sync_flash if user.sign_in_count == 0
 

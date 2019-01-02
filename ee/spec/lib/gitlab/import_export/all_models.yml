@@ -70,6 +70,7 @@ project:
 - software_license_policies
 - project_registry
 - packages
+- package_files
 - tracing_setting
 - webide_pipelines
 - reviews

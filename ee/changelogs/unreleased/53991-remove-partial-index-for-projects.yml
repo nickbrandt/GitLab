@@ -1,5 +1,0 @@
----
-title: Remove partial index for projects on mirror and mirror_last_update_at
-merge_request: 8585
-author:
-type: performance

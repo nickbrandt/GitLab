@@ -2,10 +2,26 @@
 
 module EE
   module ProjectsController
+    extend ActiveSupport::Concern
     extend ::Gitlab::Utils::Override
 
+    override :project_params_attributes
     def project_params_attributes
       super + project_params_ee
+    end
+
+    override :custom_import_params
+    def custom_import_params
+      custom_params = super
+      ci_cd_param   = params.dig(:project, :ci_cd_only) || params[:ci_cd_only]
+
+      custom_params[:ci_cd_only] = ci_cd_param if ci_cd_param == 'true'
+      custom_params
+    end
+
+    override :active_new_project_tab
+    def active_new_project_tab
+      project_params[:ci_cd_only] == 'true' ? 'ci_cd_only' : super
     end
 
     private
@@ -42,20 +58,6 @@ module EE
         mirror_trigger_builds
         mirror_user_id
       ]
-    end
-
-    override :custom_import_params
-    def custom_import_params
-      custom_params = super
-      ci_cd_param   = params.dig(:project, :ci_cd_only) || params[:ci_cd_only]
-
-      custom_params[:ci_cd_only] = ci_cd_param if ci_cd_param == 'true'
-      custom_params
-    end
-
-    override :active_new_project_tab
-    def active_new_project_tab
-      project_params[:ci_cd_only] == 'true' ? 'ci_cd_only' : super
     end
 
     def allow_mirror_params?

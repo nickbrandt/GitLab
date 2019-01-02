@@ -188,7 +188,7 @@ describe Namespace do
           end
         end
 
-        if Group.supports_nested_groups?
+        if Group.supports_nested_objects?
           context 'when license is applied to parent group' do
             let(:child_group) { create :group, parent: group }
 

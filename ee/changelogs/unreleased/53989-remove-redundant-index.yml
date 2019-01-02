@@ -1,5 +1,0 @@
----
-title: Remove redundant indices for is_sample on push_rules and next_execution_timestamp on project_mirror_data
-merge_request: 8695
-author:
-type: performance

@@ -1,5 +1,0 @@
----
-title: 'Geo: Fix push to secondary over SSH for LFS'
-merge_request: 8044
-author:
-type: fixed

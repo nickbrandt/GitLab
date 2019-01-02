@@ -137,48 +137,10 @@ describe Project do
     end
 
     describe 'ci_pipelines association' do
-      context 'when feature flag pipeline_ci_sources_only is enabled' do
-        it 'returns only pipelines from ci_sources' do
-          stub_feature_flags(pipeline_ci_sources_only: true)
+      it 'returns only pipelines from ci_sources' do
+        expect(Ci::Pipeline).to receive(:ci_sources).and_call_original
 
-          expect(Ci::Pipeline).to receive(:ci_sources).and_call_original
-
-          subject.ci_pipelines
-        end
-      end
-
-      context 'when feature flag pipeline_ci_sources_only is disabled' do
-        it 'returns all pipelines' do
-          stub_feature_flags(pipeline_ci_sources_only: false)
-
-          expect(Ci::Pipeline).not_to receive(:ci_sources).and_call_original
-          expect(Ci::Pipeline).to receive(:all).and_call_original.at_least(:once)
-
-          subject.ci_pipelines
-        end
-      end
-    end
-
-    describe 'ci_pipelines association' do
-      context 'when feature flag pipeline_ci_sources_only is enabled' do
-        it 'returns only pipelines from ci_sources' do
-          stub_feature_flags(pipeline_ci_sources_only: true)
-
-          expect(Ci::Pipeline).to receive(:ci_sources).and_call_original
-
-          subject.ci_pipelines
-        end
-      end
-
-      context 'when feature flag pipeline_ci_sources_only is disabled' do
-        it 'returns all pipelines' do
-          stub_feature_flags(pipeline_ci_sources_only: false)
-
-          expect(Ci::Pipeline).not_to receive(:ci_sources).and_call_original
-          expect(Ci::Pipeline).to receive(:all).and_call_original.at_least(:once)
-
-          subject.ci_pipelines
-        end
+        subject.ci_pipelines
       end
     end
   end
@@ -361,6 +323,13 @@ describe Project do
 
         expect(project).to be_invalid
         expect(project.errors[:import_url].first).to include('Requests to localhost are not allowed')
+      end
+
+      it 'does not allow import_url pointing to the local network' do
+        project = build(:project, import_url: 'https://192.168.1.1')
+
+        expect(project).to be_invalid
+        expect(project.errors[:import_url].first).to include('Requests to the local network are not allowed')
       end
 
       it "does not allow import_url with invalid ports for new projects" do
@@ -1817,26 +1786,54 @@ describe Project do
   end
 
   describe '#track_project_repository' do
-    let(:project) { create(:project, :repository) }
+    shared_examples 'tracks storage location' do
+      context 'when a project repository entry does not exist' do
+        it 'creates a new entry' do
+          expect { project.track_project_repository }.to change(project, :project_repository)
+        end
 
-    it 'creates a project_repository' do
-      project.track_project_repository
+        it 'tracks the project storage location' do
+          project.track_project_repository
 
-      expect(project.reload.project_repository).to be_present
-      expect(project.project_repository.disk_path).to eq(project.disk_path)
-      expect(project.project_repository.shard_name).to eq(project.repository_storage)
+          expect(project.project_repository).to have_attributes(
+            disk_path: project.disk_path,
+            shard_name: project.repository_storage
+          )
+        end
+      end
+
+      context 'when a tracking entry exists' do
+        let!(:project_repository) { create(:project_repository, project: project) }
+        let!(:shard) { create(:shard, name: 'foo') }
+
+        it 'does not create a new entry in the database' do
+          expect { project.track_project_repository }.not_to change(project, :project_repository)
+        end
+
+        it 'updates the project storage location' do
+          allow(project).to receive(:disk_path).and_return('fancy/new/path')
+          allow(project).to receive(:repository_storage).and_return('foo')
+
+          project.track_project_repository
+
+          expect(project.project_repository).to have_attributes(
+            disk_path: 'fancy/new/path',
+            shard_name: 'foo'
+          )
+        end
+      end
     end
 
-    it 'updates the project_repository' do
-      project.track_project_repository
+    context 'with projects on legacy storage' do
+      let(:project) { create(:project, :repository, :legacy_storage) }
 
-      allow(project).to receive(:disk_path).and_return('@fancy/new/path')
+      it_behaves_like 'tracks storage location'
+    end
 
-      expect do
-        project.track_project_repository
-      end.not_to change(ProjectRepository, :count)
+    context 'with projects on hashed storage' do
+      let(:project) { create(:project, :repository) }
 
-      expect(project.reload.project_repository.disk_path).to eq(project.disk_path)
+      it_behaves_like 'tracks storage location'
     end
   end
 
@@ -2824,6 +2821,10 @@ describe Project do
     end
 
     context 'when the ref is not protected' do
+      before do
+        allow(project).to receive(:protected_for?).with('ref').and_return(false)
+      end
+
       it 'contains only the CI variables' do
         is_expected.to contain_exactly(ci_variable)
       end
@@ -2863,42 +2864,139 @@ describe Project do
   end
 
   describe '#protected_for?' do
-    let(:project) { create(:project) }
+    let(:project) { create(:project, :repository) }
 
-    subject { project.protected_for?('ref') }
+    subject { project.protected_for?(ref) }
 
-    context 'when the ref is not protected' do
+    shared_examples 'ref is not protected' do
       before do
         stub_application_setting(
           default_branch_protection: Gitlab::Access::PROTECTION_NONE)
       end
 
       it 'returns false' do
-        is_expected.to be_falsey
+        is_expected.to be false
       end
     end
 
-    context 'when the ref is a protected branch' do
+    shared_examples 'ref is protected branch' do
       before do
-        allow(project).to receive(:repository).and_call_original
-        allow(project).to receive_message_chain(:repository, :branch_exists?).and_return(true)
-        create(:protected_branch, name: 'ref', project: project)
+        create(:protected_branch, name: 'master', project: project)
       end
 
       it 'returns true' do
-        is_expected.to be_truthy
+        is_expected.to be true
       end
     end
 
-    context 'when the ref is a protected tag' do
+    shared_examples 'ref is protected tag' do
       before do
-        allow(project).to receive_message_chain(:repository, :branch_exists?).and_return(false)
-        allow(project).to receive_message_chain(:repository, :tag_exists?).and_return(true)
-        create(:protected_tag, name: 'ref', project: project)
+        create(:protected_tag, name: 'v1.0.0', project: project)
       end
 
       it 'returns true' do
-        is_expected.to be_truthy
+        is_expected.to be true
+      end
+    end
+
+    context 'when ref is nil' do
+      let(:ref) { nil }
+
+      it 'returns false' do
+        is_expected.to be false
+      end
+    end
+
+    context 'when ref is ref name' do
+      context 'when ref is ambiguous' do
+        let(:ref) { 'ref' }
+
+        before do
+          project.repository.add_branch(project.creator, 'ref', 'master')
+          project.repository.add_tag(project.creator, 'ref', 'master')
+        end
+
+        it 'raises an error' do
+          expect { subject }.to raise_error(Repository::AmbiguousRefError)
+        end
+      end
+
+      context 'when the ref is not protected' do
+        let(:ref) { 'master' }
+
+        it_behaves_like 'ref is not protected'
+      end
+
+      context 'when the ref is a protected branch' do
+        let(:ref) { 'master' }
+
+        it_behaves_like 'ref is protected branch'
+      end
+
+      context 'when the ref is a protected tag' do
+        let(:ref) { 'v1.0.0' }
+
+        it_behaves_like 'ref is protected tag'
+      end
+
+      context 'when ref does not exist' do
+        let(:ref) { 'something' }
+
+        it 'returns false' do
+          is_expected.to be false
+        end
+      end
+    end
+
+    context 'when ref is full ref' do
+      context 'when the ref is not protected' do
+        let(:ref) { 'refs/heads/master' }
+
+        it_behaves_like 'ref is not protected'
+      end
+
+      context 'when the ref is a protected branch' do
+        let(:ref) { 'refs/heads/master' }
+
+        it_behaves_like 'ref is protected branch'
+      end
+
+      context 'when the ref is a protected tag' do
+        let(:ref) { 'refs/tags/v1.0.0' }
+
+        it_behaves_like 'ref is protected tag'
+      end
+
+      context 'when branch ref name is a full tag ref' do
+        let(:ref) { 'refs/tags/something' }
+
+        before do
+          project.repository.add_branch(project.creator, ref, 'master')
+        end
+
+        context 'when ref is not protected' do
+          it 'returns false' do
+            is_expected.to be false
+          end
+        end
+
+        context 'when ref is a protected branch' do
+          before do
+            create(:protected_branch, name: 'refs/tags/something', project: project)
+          end
+
+          it 'returns true' do
+            is_expected.to be true
+          end
+        end
+      end
+
+      context 'when ref does not exist' do
+        let(:ref) { 'refs/heads/something' }
+
+        it 'returns false' do
+          is_expected.to be false
+        end
       end
     end
   end
@@ -3128,7 +3226,7 @@ describe Project do
 
     it 'shows full error updating an invalid MR' do
       error_message = 'Failed to replace merge_requests because one or more of the new records could not be saved.'\
-                      ' Validate fork Source project is not a fork of the target project'
+        ' Validate fork Source project is not a fork of the target project'
 
       expect { project.append_or_update_attribute(:merge_requests, [create(:merge_request)]) }
         .to raise_error(ActiveRecord::RecordNotSaved, error_message)
@@ -3994,7 +4092,7 @@ describe Project do
       expect(project.badges.count).to eq 3
     end
 
-    if Group.supports_nested_groups?
+    if Group.supports_nested_objects?
       context 'with nested_groups' do
         let(:parent_group) { create(:group) }
 

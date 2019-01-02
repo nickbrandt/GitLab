@@ -169,6 +169,21 @@ describe EpicsFinder do
             expect(epics(params)).to contain_exactly(epic3)
           end
         end
+
+        context 'by parent' do
+          before do
+            epic2.update(parent: epic1)
+            epic3.update(parent: epic2)
+          end
+
+          it 'returns direct children of the parent' do
+            params = {
+              parent_id: epic1.id
+            }
+
+            expect(epics(params)).to contain_exactly(epic2)
+          end
+        end
       end
     end
   end

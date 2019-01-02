@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Elasticsearch
   module Git
     module Repository
@@ -125,7 +127,7 @@ module Elasticsearch
 
         # Index text-like files which size less 1.mb
         def can_index_blob?(blob)
-          blob.text? && (blob.size && blob.size.to_i < 1048576)
+          blob.text_in_repo? && (blob.size && blob.size.to_i < 1048576)
         end
 
         # Indexing all commits in repository

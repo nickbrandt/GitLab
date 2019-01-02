@@ -1,5 +1,0 @@
----
-title: 'Rails 5: Fix the check whether the database is in read-only mode'
-merge_request: 8594
-author:
-type: fixed

@@ -7,7 +7,9 @@ describe Epic do
     it { is_expected.to belong_to(:author).class_name('User') }
     it { is_expected.to belong_to(:assignee).class_name('User') }
     it { is_expected.to belong_to(:group) }
+    it { is_expected.to belong_to(:parent) }
     it { is_expected.to have_many(:epic_issues) }
+    it { is_expected.to have_many(:children) }
   end
 
   describe 'validations' do
@@ -74,6 +76,36 @@ describe Epic do
 
     it 'orders by created_at DESC' do
       expect(epics(:created_desc)).to eq([epic4, epic3, epic1, epic2])
+    end
+  end
+
+  describe '#ancestors', :nested_groups do
+    let(:group) { create(:group) }
+    let(:epic1) { create(:epic, group: group) }
+    let(:epic2) { create(:epic, group: group, parent: epic1) }
+    let(:epic3) { create(:epic, group: group, parent: epic2) }
+
+    it 'returns all ancestors for an epic' do
+      expect(epic3.ancestors).to match_array([epic1, epic2])
+    end
+
+    it 'returns an empty array if an epic does not have any parent' do
+      expect(epic1.ancestors).to be_empty
+    end
+  end
+
+  describe '#descendants', :nested_groups do
+    let(:group) { create(:group) }
+    let(:epic1) { create(:epic, group: group) }
+    let(:epic2) { create(:epic, group: group, parent: epic1) }
+    let(:epic3) { create(:epic, group: group, parent: epic2) }
+
+    it 'returns all ancestors for an epic' do
+      expect(epic1.descendants).to match_array([epic2, epic3])
+    end
+
+    it 'returns an empty array if an epic does not have any descendants' do
+      expect(epic3.descendants).to be_empty
     end
   end
 

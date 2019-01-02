@@ -264,7 +264,7 @@ describe 'Promotions', :js do
         find('.js-epics-sidebar-callout .js-close-callout').click
         visit project_issue_path(project, issue)
 
-        expect(page).not_to have_selector('.promotion-issue-sidebar-message')
+        expect(page).not_to have_selector('.js-epics-sidebar-callout')
       end
 
       it 'should close dialog when clicking on X, but not dismiss it' do

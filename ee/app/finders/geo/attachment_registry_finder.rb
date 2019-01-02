@@ -108,10 +108,10 @@ module Geo
     def group_uploads
       namespace_ids =
         if current_node.selective_sync_by_namespaces?
-          Gitlab::GroupHierarchy.new(current_node.namespaces).base_and_descendants.select(:id)
+          Gitlab::ObjectHierarchy.new(current_node.namespaces).base_and_descendants.select(:id)
         elsif current_node.selective_sync_by_shards?
           leaf_groups = Namespace.where(id: current_node.projects.select(:namespace_id))
-          Gitlab::GroupHierarchy.new(leaf_groups).base_and_ancestors.select(:id)
+          Gitlab::ObjectHierarchy.new(leaf_groups).base_and_ancestors.select(:id)
         else
           Namespace.none
         end

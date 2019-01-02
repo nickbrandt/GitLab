@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'Packages' do
@@ -7,6 +9,31 @@ describe 'Packages' do
   before do
     sign_in(user)
     project.add_master(user)
+    stub_licensed_features(packages: true)
+  end
+
+  context 'packages feature is not available because of license' do
+    before do
+      stub_licensed_features(packages: false)
+    end
+
+    it 'gives 404' do
+      visit_project_packages
+
+      expect(status_code).to eq(404)
+    end
+  end
+
+  context 'packages feature is disabled by config' do
+    before do
+      allow(Gitlab.config.packages).to receive(:enabled).and_return(false)
+    end
+
+    it 'gives 404' do
+      visit_project_packages
+
+      expect(status_code).to eq(404)
+    end
   end
 
   context 'when there are no packages' do
@@ -21,8 +48,6 @@ describe 'Packages' do
     let!(:package) { create(:maven_package, project: project) }
 
     before do
-      package
-
       visit_project_packages
     end
 

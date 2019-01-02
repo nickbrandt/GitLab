@@ -2,7 +2,6 @@
 import $ from 'jquery';
 import GfmAutoComplete from '~/gfm_auto_complete';
 import { GlLoadingIcon } from '@gitlab/ui';
-import eventHub from '../event_hub';
 import issueToken from './issue_token.vue';
 
 export default {
@@ -60,7 +59,6 @@ export default {
 
   mounted() {
     const $input = $(this.$refs.input);
-
     if (this.allowAutoComplete) {
       this.gfmAutoComplete = new GfmAutoComplete(this.autoCompleteSources);
       this.gfmAutoComplete.setup($input, {
@@ -83,7 +81,10 @@ export default {
   methods: {
     onInput() {
       const { value } = this.$refs.input;
-      eventHub.$emit('addIssuableFormInput', value, $(this.$refs.input).caret('pos'));
+      this.$emit('addIssuableFormInput', {
+        newValue: value,
+        caretPos: $(this.$refs.input).caret('pos'),
+      });
     },
     onFocus() {
       this.isInputFocused = true;
@@ -94,7 +95,7 @@ export default {
       // Avoid tokenizing partial input when clicking an autocomplete item
       if (!this.isAutoCompleteOpen) {
         const { value } = this.$refs.input;
-        eventHub.$emit('addIssuableFormBlur', value);
+        this.$emit('addIssuableFormBlur', value);
       }
     },
     onAutoCompleteToggled(isOpen) {
@@ -103,12 +104,15 @@ export default {
     onInputWrapperClick() {
       this.$refs.input.focus();
     },
+    onPendingIssuableRemoveRequest(params) {
+      this.$emit('pendingIssuableRemoveRequest', params);
+    },
     onFormSubmit() {
       const { value } = this.$refs.input;
-      eventHub.$emit('addIssuableFormSubmit', value);
+      this.$emit('addIssuableFormSubmit', value);
     },
     onFormCancel() {
-      eventHub.$emit('addIssuableFormCancel');
+      this.$emit('addIssuableFormCancel');
     },
   },
 };
@@ -141,6 +145,7 @@ export default {
             :is-condensed="true"
             :path-id-separator="pathIdSeparator"
             event-namespace="pendingIssuable"
+            @pendingIssuableRemoveRequest="onPendingIssuableRemoveRequest"
           />
         </li>
         <li class="add-issuable-form-input-list-item">

@@ -8,13 +8,15 @@ class Groups::EpicsController < Groups::ApplicationController
   include RendersNotes
   include EpicsActions
 
+  before_action do
+    push_frontend_feature_flag(:epic_links)
+  end
+
   before_action :check_epics_available!
   before_action :epic, except: [:index, :create]
   before_action :set_issuables_index, only: :index
   before_action :authorize_update_issuable!, only: :update
   before_action :authorize_create_epic!, only: [:create]
-
-  skip_before_action :labels
 
   def index
     @epics = @issuables

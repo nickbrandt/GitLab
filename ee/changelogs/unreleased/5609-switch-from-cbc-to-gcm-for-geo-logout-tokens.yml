@@ -1,5 +1,0 @@
----
-title: Switch from CBC to GCM for Geo logout tokens
-merge_request: 8518
-author:
-type: security

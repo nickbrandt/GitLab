@@ -1,4 +1,6 @@
 module StubObjectStorage
+  prepend EE::StubObjectStorage
+
   def stub_object_storage_uploader(
         config:,
         uploader:,

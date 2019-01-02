@@ -3,17 +3,16 @@
 require 'spec_helper'
 
 describe Projects::Prometheus::Alerts::NotifyService do
-  let(:user) { create(:user) }
-  let(:project) { create(:project) }
-  let(:service) { described_class.new(project, user, payload) }
+  set(:user) { create(:user) }
+  set(:project) { create(:project) }
 
-  context 'with valid payload' do
-    let(:alert_firing) { create(:prometheus_alert, project: project) }
-    let(:alert_resolved) { create(:prometheus_alert, project: project) }
+  let(:service) { described_class.new(project, user, payload) }
+  let(:token_input) { 'token' }
+  let(:subject) { service.execute(token_input) }
+
+  shared_examples 'notifies alerts' do
     let(:notification_service) { spy }
     let(:create_events_service) { spy }
-    let(:payload) { payload_for(firing: [alert_firing], resolved: [alert_resolved]) }
-    let(:payload_alert_firing) { payload['alerts'].first }
 
     before do
       allow(NotificationService).to receive(:new).and_return(notification_service)
@@ -26,27 +25,138 @@ describe Projects::Prometheus::Alerts::NotifyService do
         .to receive_message_chain(:async, :prometheus_alerts_fired)
         .with(project, [payload_alert_firing])
 
-      expect(service.execute).to eq(true)
+      expect(subject).to eq(true)
     end
 
     it 'persists events' do
       expect(create_events_service).to receive(:execute)
 
-      expect(service.execute).to eq(true)
+      expect(subject).to eq(true)
+    end
+  end
+
+  shared_examples 'no notifications' do
+    let(:notification_service) { spy }
+    let(:create_events_service) { spy }
+
+    it 'does not notify' do
+      expect(notification_service).not_to receive(:async)
+      expect(create_events_service).not_to receive(:execute)
+
+      expect(subject).to eq(false)
+    end
+  end
+
+  context 'with valid payload' do
+    let(:alert_firing) { create(:prometheus_alert, project: project) }
+    let(:alert_resolved) { create(:prometheus_alert, project: project) }
+    let(:payload) { payload_for(firing: [alert_firing], resolved: [alert_resolved]) }
+    let(:payload_alert_firing) { payload['alerts'].first }
+    let(:token) { 'token' }
+
+    context 'with project specific cluster' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:cluster_enabled, :status, :configured_token, :token_input, :result) do
+        true  | :installed | token | token | :success
+        true  | :installed | nil   | nil   | :success
+        true  | :updated   | token | token | :success
+        true  | :updating  | token | token | :failure
+        true  | :installed | token | 'x'   | :failure
+        true  | :installed | nil   | token | :failure
+        true  | :installed | token | nil   | :failure
+        true  | nil        | token | token | :failure
+        false | :installed | token | token | :failure
+      end
+
+      with_them do
+        let(:alert_manager_token) { token_input }
+
+        before do
+          cluster = create(:cluster, :provided_by_user,
+                           projects: [project],
+                           enabled: cluster_enabled)
+
+          if status
+            create(:clusters_applications_prometheus, status,
+                   cluster: cluster,
+                   alert_manager_token: configured_token)
+          end
+        end
+
+        case result = params[:result]
+        when :success
+          it_behaves_like 'notifies alerts'
+        when :failure
+          it_behaves_like 'no notifications'
+        else
+          raise "invalid result: #{result.inspect}"
+        end
+      end
+    end
+
+    context 'with environment specific clusters' do
+      let(:prd_cluster) do
+        create(:cluster, :provided_by_user, projects: [project], enabled: true, environment_scope: '*')
+      end
+      let(:stg_cluster) do
+        create(:cluster, :provided_by_user, projects: [project], enabled: true, environment_scope: 'stg/*')
+      end
+
+      let(:stg_environment) do
+        create(:environment, project: project, name: 'stg/1')
+      end
+
+      let(:alert_firing) do
+        create(:prometheus_alert, project: project, environment: stg_environment)
+      end
+
+      before do
+        stub_licensed_features(multiple_clusters: true)
+
+        create(:clusters_applications_prometheus, :installed,
+               cluster: prd_cluster, alert_manager_token: token)
+        create(:clusters_applications_prometheus, :installed,
+               cluster: stg_cluster, alert_manager_token: nil)
+      end
+
+      context 'without token' do
+        let(:token_input) { nil }
+
+        it_behaves_like 'notifies alerts'
+      end
+
+      context 'with token' do
+        it_behaves_like 'no notifications'
+      end
+    end
+
+    context 'without project specific cluster' do
+      let!(:cluster) { create(:cluster, enabled: true) }
+
+      it_behaves_like 'no notifications'
+    end
+
+    context 'with manual prometheus installation' do
+      before do
+        create(:prometheus_service, project: project)
+      end
+
+      it_behaves_like 'notifies alerts'
     end
   end
 
   context 'with invalid payload' do
-    let(:payload) { {} }
+    context 'without version' do
+      let(:payload) { {} }
 
-    it 'returns false without `version`' do
-      expect(service.execute).to eq(false)
+      it_behaves_like 'no notifications'
     end
 
-    it 'returns false if `version` is not 4' do
-      payload['version'] = '5'
+    context 'when version is not "4"' do
+      let(:payload) { { 'version' => '5' } }
 
-      expect(service.execute).to eq(false)
+      it_behaves_like 'no notifications'
     end
   end
 

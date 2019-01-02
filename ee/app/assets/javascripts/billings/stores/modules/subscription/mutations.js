@@ -1,6 +1,6 @@
 import Vue from 'vue';
+import { TABLE_TYPE_DEFAULT, TABLE_TYPE_FREE, TABLE_TYPE_TRIAL } from '../../../constants';
 import * as types from './mutation_types';
-import { USAGE_ROW_INDEX, BILLING_ROW_INDEX } from '../../../constants';
 import { convertObjectPropsToCamelCase } from '~/lib/utils/common_utils';
 
 export default {
@@ -16,22 +16,22 @@ export default {
   [types.RECEIVE_SUBSCRIPTION_SUCCESS](state, payload) {
     const data = convertObjectPropsToCamelCase(payload, { deep: true });
     const { plan, usage, billing } = data;
+    let tableKey = TABLE_TYPE_DEFAULT;
 
     state.plan = plan;
 
-    /*
-     * Update column values for billing and usage row.
-     * We iterate over the rows within the state
-     * and update only the column's value property in the state
-     * with the data we received from the API for the given column
-     */
-    [USAGE_ROW_INDEX, BILLING_ROW_INDEX].forEach(rowIdx => {
-      const currentRow = state.rows[rowIdx];
-      currentRow.columns.forEach(currentCol => {
-        if (rowIdx === USAGE_ROW_INDEX) {
-          Vue.set(currentCol, 'value', usage[currentCol.id]);
-        } else if (rowIdx === BILLING_ROW_INDEX) {
-          Vue.set(currentCol, 'value', billing[currentCol.id]);
+    if (state.plan.code === null) {
+      tableKey = TABLE_TYPE_FREE;
+    } else if (state.plan.trial) {
+      tableKey = TABLE_TYPE_TRIAL;
+    }
+
+    state.tables[tableKey].rows.forEach(row => {
+      row.columns.forEach(col => {
+        if (Object.prototype.hasOwnProperty.call(usage, col.id)) {
+          Vue.set(col, 'value', usage[col.id]);
+        } else if (Object.prototype.hasOwnProperty.call(billing, col.id)) {
+          Vue.set(col, 'value', billing[col.id]);
         }
       });
     });

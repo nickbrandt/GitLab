@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import initEETrialBanner from 'ee/ee_trial_banner';
+import trackNavbarEvents from 'ee/event_tracking/navbar';
 
 $(() => {
   /**
@@ -9,4 +10,6 @@ $(() => {
 
   // EE specific calls
   initEETrialBanner();
+
+  trackNavbarEvents();
 });

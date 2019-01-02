@@ -24,9 +24,10 @@ module Projects
       end
 
       def notify
+        token = extract_alert_manager_token(request)
         notify = Projects::Prometheus::Alerts::NotifyService.new(project, current_user, params)
 
-        if notify.execute
+        if notify.execute(token)
           head :ok
         else
           head :unprocessable_entity
@@ -95,6 +96,10 @@ module Projects
 
       def application
         @application ||= alert.environment.cluster_prometheus_adapter
+      end
+
+      def extract_alert_manager_token(request)
+        Doorkeeper::OAuth::Token.from_bearer_authorization(request)
       end
     end
   end

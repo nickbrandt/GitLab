@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # These endpoints partially mimic Github API behavior in order to successfully
 # integrate with Jira Development Panel.
 # Endpoints returning an empty list were temporarily added to avoid 404's

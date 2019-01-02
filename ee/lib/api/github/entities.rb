@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Simplified version of Github API entities.
 # It's mainly used to mimic Github API and integrate with Jira Development Panel.
 #

@@ -187,7 +187,7 @@ class GeoNode < ActiveRecord::Base
     return Project.all unless selective_sync?
 
     if selective_sync_by_namespaces?
-      query = Gitlab::GroupHierarchy.new(namespaces).base_and_descendants
+      query = Gitlab::ObjectHierarchy.new(namespaces).base_and_descendants
       Project.where(namespace_id: query.select(:id))
     elsif selective_sync_by_shards?
       Project.where(repository_storage: selective_sync_shards)

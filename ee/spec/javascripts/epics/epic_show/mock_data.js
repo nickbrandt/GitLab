@@ -40,6 +40,7 @@ export const contentProps = {
   markdownPreviewPath: '',
   markdownDocsPath: '',
   issueLinksEndpoint: '/',
+  epicLinksEndpoint: '/',
   groupPath: '',
   namespace: 'gitlab-org',
   labelsPath: '',
@@ -71,6 +72,15 @@ export const contentProps = {
   subscribed: true,
   todoExists: false,
   state: 'opened',
+  parent: {
+    id: 12,
+    startDateIsFixed: true,
+    startDate: '2018-12-01',
+    dueDateIsFixed: true,
+    dueDateFixed: '2019-12-31',
+    title: 'Sample Parent Epic',
+    url: `${gl.TEST_HOST}/groups/gitlab-org/-/epics/12`,
+  },
 };
 
 export const headerProps = {

@@ -1,5 +1,120 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.6.1 (2018-12-28)
+
+### Security (1 change)
+
+- Add a shared secret to prevent abuse of the alert endpoint.
+
+
+## 11.6.0 (2018-12-22)
+
+### Security (7 changes)
+
+- Switch from CBC to GCM for Geo logout tokens. !8518
+- Prevent reporter roles from viewing the Jaeger tracing settings page.
+- Sanitize tracing external_urls before saving to DB and when displaying the URL to prevent XSS issues.
+- Fix IDOR at /drafts/publish.
+- Authorize users when listing board users and milestones.
+- Resolve: Guest can set weight of a new issue.
+- Fixes XSS with merge request approvers selection.
+
+### Fixed (27 changes, 2 of them are from the community)
+
+- Ensure that avatars in approvals have correct tooltip. !6269
+- Geo: Fix push to secondary over SSH for LFS. !8044
+- Don't show packages tab and settings for starter license. !8270
+- Makes the vulnerability name on the Group Security Dashboard a button for better A11y. !8341
+- Used the iid instead of the id for linked issues on the Group Security Dashboard. !8357
+- Show navigation line separator when instance etrics is disabled. !8379 (George Tsiolis)
+- Fix project deploy key creation and deletion as admin. !8432
+- Changes initial state for disabled prometheus integrations. !8434
+- Fix a typo in Admin: intergration -> integration. !8444 (Vincent AUBERT)
+- Geo: Moving registry deletion into the job that deletes the files and project record. !8480
+- Parameterize alerting rules with variables. !8481
+- Fix PostReceive failing for project mirrors missing local branch. !8495
+- Rails 5: Fix the check whether the database is in read-only mode. !8594
+- Raisl 5: Fix Gitlab::Database::LoadBalancing#caught_up? check. !8595
+- Renders upstream and downstream pipelines in the main pipeline graph. !8607
+- Fix issue board api with special milestones. !8653
+- fix pod dropdown not switching pod logs. !8660
+- Geo - Respect the next retry time when re-verifying failed repositories. !8661
+- Update elasticsearch system check to check for new supported versions. !8683
+- Handle null start or due dates for dates sourcing milestone in Epics. !8689
+- Fixed license managment path in MR widget for fork cases. !8700
+- Fix gitlab:geo:check rake task. !8714
+- Fix ability to choose shards for selective sync. !8717
+- Add Rails.version to the Geo cache keys. !8775
+- Support older NGINX version forwarding the client certificate for smartcard auth. !8784
+- Remove duplicated smartcard login button. !8793
+- Disable password autocomplete in mirror form fill.
+
+### Deprecated (1 change)
+
+- Deprecate non-hashed repository storage for Geo installations. !8739
+
+### Changed (17 changes, 1 of them is from the community)
+
+- Adds Group SAML metadata endpoint. !5782
+- Group SAML SSO page warns when linking account. !8295
+- Change the delete custom metric alert. !8430
+- Replace weight icon. !8448 (George Tsiolis)
+- Switch snowplows stateStorageStrategy to cookie. !8461
+- Move merge request approval settings. !8493
+- Geo: Constantly reverify repositories. !8550
+- Add file and line numbers to issues created from SAST vulnerabilities. !8578
+- Redesign MR header sections and approvals (EE). !8593
+- Add packages_enabled attribute to Projects API. !8604
+- Run geo check task from gitlab check. !8616
+- Change issue create weight dropdown to an input. !8648
+- Add epics state filtering in roadmap view. !8658
+- Users can unlink Group SAML from accounts page. !8682
+- Update casing in Built-in on project templates tab. !8688
+- Epic issue list and related issue list re-design.
+- Add sort direction button with sort dropdown for Epics and Roadmap.
+
+### Performance (5 changes, 3 of them are from the community)
+
+- Remove partial index for projects on mirror and mirror_last_update_at. !8585
+- Enable some frozen string in ee/app. !8667 (gfyoung)
+- Remove redundant indices for is_sample on push_rules and next_execution_timestamp on project_mirror_data. !8695
+- Enable some frozen string in ee/app. (gfyoung)
+- Enable some frozen string in ee/app. (gfyoung)
+
+### Added (10 changes)
+
+- Add support for Group-level project templates. !6878
+- Added web terminals to Web IDE. !7386
+- Promote an Issue to an Epic using quick action. !8051
+- Smartcard authentication. !8120
+- Adds Security dashboard empty state. !8443
+- Add vulnerability history at group level. !8603
+- Adds group security dashboard metrics chart. !8631
+- Add milestones autocomplete for epics. !8632
+- Parse and store dependency scanning reports in database. !8642
+- Adds EE store to handle upstream & downstream pipelines.
+
+### Other (13 changes, 4 of them are from the community)
+
+- Add subscription table to GitLab.com billing areas. !7885
+- UX improvements for the group security dashboard. !8217
+- Restyles the dismissed vulnerabilities. !8401
+- Adds PHILOSOPHY.md and references GitLab Product Handbook. !8515
+- Make sidekiq-cluster play well with Sidekiq 5.2.2+. !8522
+- Rails5: Passing a class as a value in an Active Record query is deprecated. !8540 (Jasper Maes)
+- render :nothing option is deprecated, Use head method to respond with empty response body. !8560 (Jasper Maes)
+- Add help page link for licence management in CI/CD settings. !8561 (George Tsiolis)
+- Re-orders the Group Security Dashboard. !8624
+- Move EE only differences for finders. !8629 (George Tsiolis)
+- Add count of projects with at least one package to a usage ping data. !8641
+- Added recommendations for handling deleted documents in Elasticsearch.
+- Use new information-o icon for Security Dashboard.
+
+
+## 11.5.5 (2018-12-20)
+
+- No changes.
+
 ## 11.5.3 (2018-12-06)
 
 - No changes.
@@ -274,6 +389,10 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Adds expandable/collapsable section for Snowplow. !7798
 - API: Allow issue weight parameter to be greater than or equal to zero.
 
+
+## 11.3.14 (2018-12-20)
+
+- No changes.
 
 ## 11.3.13 (2018-12-13)
 

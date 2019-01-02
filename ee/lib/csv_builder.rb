@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Generates CSV when given a collection and a mapping.
 #
 # Example:

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Delay
   # Progressive backoff. It's copied from Sidekiq as is
   def delay(retry_count = 0)

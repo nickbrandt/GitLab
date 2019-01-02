@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module API
   class Ldap < Grape::API
     # Admin users by default should be able to access these API endpoints.

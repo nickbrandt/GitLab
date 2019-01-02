@@ -1,0 +1,5 @@
+---
+title: Fix issue ID wrapping and avatar counter shrinking in Related Issues list
+merge_request: 8854
+author:
+type: fixed

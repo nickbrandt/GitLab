@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import eventHub from 'ee/related_issues/event_hub';
 import relatedIssuesBlock from 'ee/related_issues/components/related_issues_block.vue';
 
 import { issuable1, issuable2, issuable3, issuable4, issuable5 } from '../mock_data';
@@ -20,7 +19,11 @@ describe('RelatedIssuesBlock', () => {
 
   describe('with defaults', () => {
     beforeEach(() => {
-      vm = new RelatedIssuesBlock().$mount();
+      vm = new RelatedIssuesBlock({
+        propsData: {
+          pathIdSeparator: '#',
+        },
+      }).$mount();
     });
 
     it('unable to add new related issues', () => {
@@ -40,6 +43,7 @@ describe('RelatedIssuesBlock', () => {
     beforeEach(() => {
       vm = new RelatedIssuesBlock({
         propsData: {
+          pathIdSeparator: '#',
           isFetching: true,
         },
       }).$mount();
@@ -58,6 +62,7 @@ describe('RelatedIssuesBlock', () => {
     beforeEach(() => {
       vm = new RelatedIssuesBlock({
         propsData: {
+          pathIdSeparator: '#',
           canAdmin: true,
         },
       }).$mount();
@@ -72,6 +77,7 @@ describe('RelatedIssuesBlock', () => {
     beforeEach(() => {
       vm = new RelatedIssuesBlock({
         propsData: {
+          pathIdSeparator: '#',
           isFormVisible: true,
         },
       }).$mount();
@@ -86,6 +92,7 @@ describe('RelatedIssuesBlock', () => {
     beforeEach(() => {
       vm = new RelatedIssuesBlock({
         propsData: {
+          pathIdSeparator: '#',
           relatedIssues: [issuable1, issuable2],
         },
       }).$mount();
@@ -97,20 +104,13 @@ describe('RelatedIssuesBlock', () => {
   });
 
   describe('methods', () => {
-    let toggleAddRelatedIssuesFormSpy;
-
     beforeEach(() => {
       vm = new RelatedIssuesBlock({
         propsData: {
+          pathIdSeparator: '#',
           relatedIssues: [issuable1, issuable2, issuable3, issuable4, issuable5],
         },
       }).$mount();
-      toggleAddRelatedIssuesFormSpy = jasmine.createSpy('spy');
-      eventHub.$on('toggleAddRelatedIssuesForm', toggleAddRelatedIssuesFormSpy);
-    });
-
-    afterEach(() => {
-      eventHub.$off('toggleAddRelatedIssuesForm', toggleAddRelatedIssuesFormSpy);
     });
 
     it('reorder item correctly when an item is moved to the top', () => {
@@ -139,13 +139,6 @@ describe('RelatedIssuesBlock', () => {
 
       expect(beforeAfterIds.beforeId).toBe(3);
       expect(beforeAfterIds.afterId).toBe(5);
-    });
-
-    it('when expanding add related issue form', () => {
-      expect(toggleAddRelatedIssuesFormSpy).not.toHaveBeenCalled();
-      vm.toggleAddRelatedIssuesForm();
-
-      expect(toggleAddRelatedIssuesFormSpy).toHaveBeenCalled();
     });
   });
 });

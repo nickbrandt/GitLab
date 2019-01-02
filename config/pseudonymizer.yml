@@ -257,28 +257,6 @@ tables:
     - expires_at
     - ldap
     - override
-  notes:
-    whitelist:
-    - id
-    - note
-    - noteable_type
-    - author_id
-    - created_at
-    - updated_at
-    - project_id
-    - line_code
-    - commit_id
-    - noteable_id
-    - system
-    - updated_by_id
-    - type
-    - position
-    - original_position
-    - resolved_at
-    - resolved_by_id
-    - discussion_id
-    - change_position
-    - resolved_by_push
   notification_settings:
     whitelist:
     - id

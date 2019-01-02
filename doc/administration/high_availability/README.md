@@ -123,7 +123,7 @@ number of enqueued Sidekiq jobs, etc. If this happens you should consider
 moving to a hybrid or fully distributed architecture depending on what is causing
 the contention.
 
-- 2 PostgreSQL nodes
+- 3 PostgreSQL nodes
 - 2 Redis nodes
 - 3 Consul/Sentinel nodes
 - 2 or more GitLab application nodes (Unicorn, Workhorse, Sidekiq, PGBouncer)
@@ -138,7 +138,7 @@ resource usage of one component does not interfere with others. In larger
 environments this is a good architecture to consider if you foresee or do have
 contention due to certain workloads.
 
-- 2 PostgreSQL nodes
+- 3 PostgreSQL nodes
 - 2 Redis nodes
 - 3 Consul/Sentinel nodes
 - 2 or more Sidekiq nodes
@@ -153,7 +153,7 @@ This architecture scales to hundreds of thousands of users and projects and is
 the basis of the GitLab.com architecture. While this scales well it also comes
 with the added complexity of many more nodes to configure, manage and monitor.
 
-- 2 PostgreSQL nodes
+- 3 PostgreSQL nodes
 - 4 or more Redis nodes (2 separate clusters for persistent and cache data)
 - 3 Consul nodes
 - 3 Sentinel nodes

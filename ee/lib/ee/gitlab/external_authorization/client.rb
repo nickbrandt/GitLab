@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Excon.defaults[:ssl_verify_peer] = false
 
 module EE

@@ -1,5 +1,0 @@
----
-title: Update elasticsearch system check to check for new supported versions
-merge_request: 8683
-author:
-type: fixed

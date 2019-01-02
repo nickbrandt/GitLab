@@ -1,5 +1,0 @@
----
-title: Fixes XSS with merge request approvers selection
-merge_request:
-author:
-type: security

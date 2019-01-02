@@ -13,9 +13,7 @@ module Clusters
       def execute
         app.make_updating!
 
-        values = helm_api
-          .get_config_map(config_map_name)
-          .yield_self { |response| extract_config(response) }
+        values = load_config(app)
           .yield_self { |config| update_config(config) }
           .yield_self { |config| config.to_yaml }
 
@@ -30,12 +28,8 @@ module Clusters
 
       private
 
-      def config_map_name
-        ::Gitlab::Kubernetes::ConfigMap.new(app.name, app.files).config_map_name
-      end
-
-      def extract_config(response)
-        YAML.safe_load(response.data[:'values.yaml'])
+      def load_config(app)
+        YAML.safe_load(app.values)
       end
 
       def update_config(config)

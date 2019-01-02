@@ -62,7 +62,7 @@ function fileUrl(location, pathPrefix) {
  * @param {Object} issue
  * @returns {Object}
  */
-function adaptDeprecatedFormat(issue) {
+function adaptDeprecatedIssueFormat(issue) {
   // Skip issue with new format (old format does not have a location property)
   if (issue.location) {
     return issue;
@@ -91,17 +91,34 @@ function adaptDeprecatedFormat(issue) {
 }
 
 /**
+ *
+ * Wraps old report formats (plain array of vulnerabilities).
+ *
+ * @param {Array|Object} report
+ * @returns {Object}
+ */
+function adaptDeprecatedReportFormat(report) {
+  if (Array.isArray(report)) {
+    return {
+      vulnerabilities: report,
+    };
+  }
+
+  return report;
+}
+
+/**
  * Parses SAST results into a common format to allow to use the same Vue component.
  *
- * @param {Array} issues
+ * @param {Array|Object} report
  * @param {Array} feedback
  * @param {String} path
  * @returns {Array}
  */
-export const parseSastIssues = (issues = [], feedback = [], path = '') =>
-  issues.map(issue => {
+export const parseSastIssues = (report = [], feedback = [], path = '') =>
+  adaptDeprecatedReportFormat(report).vulnerabilities.map(issue => {
     const parsed = {
-      ...adaptDeprecatedFormat(issue),
+      ...adaptDeprecatedIssueFormat(issue),
       category: 'sast',
       project_fingerprint: sha1(issue.cve),
       title: issue.message,
@@ -118,15 +135,15 @@ export const parseSastIssues = (issues = [], feedback = [], path = '') =>
 /**
  * Parses Dependency Scanning results into a common format to allow to use the same Vue component.
  *
- * @param {Array} issues
+ * @param {Array|Object} report
  * @param {Array} feedback
  * @param {String} path
  * @returns {Array}
  */
-export const parseDependencyScanningIssues = (issues = [], feedback = [], path = '') =>
-  issues.map(issue => {
+export const parseDependencyScanningIssues = (report = [], feedback = [], path = '') =>
+  adaptDeprecatedReportFormat(report).vulnerabilities.map(issue => {
     const parsed = {
-      ...adaptDeprecatedFormat(issue),
+      ...adaptDeprecatedIssueFormat(issue),
       category: 'dependency_scanning',
       project_fingerprint: sha1(issue.cve || issue.message),
       title: issue.message,

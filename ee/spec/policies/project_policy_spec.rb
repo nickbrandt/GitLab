@@ -697,4 +697,15 @@ describe ProjectPolicy do
       it { is_expected.to be_disallowed(:create_web_ide_terminal) }
     end
   end
+
+  it_behaves_like 'ee clusterable policies' do
+    let(:clusterable) { create(:project, :repository) }
+
+    let(:cluster) do
+      create(:cluster,
+             :provided_by_gcp,
+             :project,
+             projects: [clusterable])
+    end
+  end
 end

@@ -89,6 +89,7 @@ website with GitLab Pages
   your code blocks, overriding GitLab's default choice of language
 - [Badges](badges.md): Badges for the project overview
 - [Maven packages](packages/maven_repository.md): Your private Maven repository in GitLab **[PREMIUM]**
+- [NPM packages](packages/npm_registry.md): Your private NPM package registry in GitLab **[PREMIUM]**
 - [Code owners](code_owners.md): Specify code owners for certain files **[STARTER]**
 - [License Management](merge_requests/license_management.md): Approve and blacklist licenses for projects **[ULTIMATE]**
 

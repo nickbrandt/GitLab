@@ -1,5 +1,0 @@
----
-title: Deprecate non-hashed repository storage for Geo installations
-merge_request: 8739
-author:
-type: deprecated

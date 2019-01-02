@@ -1,5 +1,0 @@
----
-title: Switch snowplows stateStorageStrategy to cookie
-merge_request: 8461
-author:
-type: changed

@@ -4,7 +4,6 @@ import tooltip from '~/vue_shared/directives/tooltip';
 import Icon from '~/vue_shared/components/icon.vue';
 import sortableConfig from 'ee/sortable/sortable_config';
 import { GlLoadingIcon } from '@gitlab/ui';
-import eventHub from '../event_hub';
 import issueItem from './issue_item.vue';
 import addIssuableForm from './add_issuable_form.vue';
 
@@ -62,8 +61,7 @@ export default {
     },
     pathIdSeparator: {
       type: String,
-      required: false,
-      default: '#',
+      required: true,
     },
     helpPath: {
       type: String,
@@ -110,9 +108,6 @@ export default {
     }
   },
   methods: {
-    toggleAddRelatedIssuesForm() {
-      eventHub.$emit('toggleAddRelatedIssuesForm');
-    },
     getBeforeAfterId(itemEl) {
       const prevItemEl = itemEl.previousElementSibling;
       const nextItemEl = itemEl.nextElementSibling;
@@ -172,7 +167,7 @@ export default {
               class="js-issue-count-badge-add-button issue-count-badge-add-button btn btn-sm btn-default qa-add-issues-button"
               aria-label="Add an issue"
               data-placement="top"
-              @click="toggleAddRelatedIssuesForm"
+              @click="$emit('toggleAddRelatedIssuesForm', $event);"
             >
               <i class="fa fa-plus" aria-hidden="true"></i>
             </button>
@@ -192,6 +187,11 @@ export default {
           :pending-references="pendingReferences"
           :auto-complete-sources="autoCompleteSources"
           :path-id-separator="pathIdSeparator"
+          @pendingIssuableRemoveRequest="$emit('pendingIssuableRemoveRequest', $event);"
+          @addIssuableFormInput="$emit('addIssuableFormInput', $event);"
+          @addIssuableFormBlur="$emit('addIssuableFormBlur', $event);"
+          @addIssuableFormSubmit="$emit('addIssuableFormSubmit', $event);"
+          @addIssuableFormCancel="$emit('addIssuableFormCancel', $event);"
         />
       </div>
       <div
@@ -238,6 +238,7 @@ export default {
               :can-reorder="canReorder"
               :path-id-separator="pathIdSeparator"
               event-namespace="relatedIssue"
+              @relatedIssueRemoveRequest="$emit('relatedIssueRemoveRequest', $event);"
             />
           </li>
         </ul>

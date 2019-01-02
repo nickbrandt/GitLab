@@ -3,14 +3,19 @@
 module EE
   module LfsRequest
     extend ActiveSupport::Concern
+    extend ::Gitlab::Utils::Override
     include ::Gitlab::Utils::StrongMemoize
 
+    private
+
+    override :lfs_forbidden!
     def lfs_forbidden!
-      if project.above_size_limit? || objects_exceed_repo_limit?
-        render_size_error
-      else
-        super
-      end
+      limit_exceeded? ? render_size_error : super
+    end
+
+    override :limit_exceeded?
+    def limit_exceeded?
+      project.above_size_limit? || objects_exceed_repo_limit?
     end
 
     def render_size_error

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module API
   class License < Grape::API
     before { authenticated_as_admin! }

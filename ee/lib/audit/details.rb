@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Audit
   class Details
     ACTIONS = %i[add remove failed_login change custom_message].freeze
@@ -39,10 +41,12 @@ module Audit
     end
 
     def text_for_change(value)
-      "Changed #{value}".tap do |changed_string|
-        changed_string << " from #{@details[:from]}" if @details[:from]
-        changed_string << " to #{@details[:to]}" if @details[:to]
-      end
+      changed = ["Changed #{value}"]
+
+      changed << "from #{@details[:from]}" if @details[:from]
+      changed << "to #{@details[:to]}" if @details[:to]
+
+      changed.join(' ')
     end
   end
 end

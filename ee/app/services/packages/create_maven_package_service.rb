@@ -8,6 +8,7 @@ module Packages
       project.packages.create!(
         name: params[:name],
         version: params[:version],
+        package_type: :maven,
         maven_metadatum_attributes: {
           path: params[:path],
           app_group: app_group,

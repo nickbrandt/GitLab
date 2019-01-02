@@ -3,7 +3,12 @@ import _ from 'underscore';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import { GlLoadingIcon } from '@gitlab/ui';
 import SubscriptionTableRow from './subscription_table_row.vue';
-import { CUSTOMER_PORTAL_URL } from '../constants';
+import {
+  CUSTOMER_PORTAL_URL,
+  TABLE_TYPE_DEFAULT,
+  TABLE_TYPE_FREE,
+  TABLE_TYPE_TRIAL,
+} from '../constants';
 import { s__, sprintf } from '~/locale';
 
 export default {
@@ -13,12 +18,12 @@ export default {
     GlLoadingIcon,
   },
   computed: {
-    ...mapState('subscription', ['isLoading', 'hasError', 'plan', 'rows', 'endpoint']),
+    ...mapState('subscription', ['isLoading', 'hasError', 'plan', 'tables', 'endpoint']),
     ...mapGetters('subscription', ['isFreePlan']),
     subscriptionHeader() {
-      let suffix = this.isFreePlan ? '' : s__('SubscriptionTable|subscription');
+      let suffix = '';
       if (!this.isFreePlan && this.plan.trial) {
-        suffix += ` - ${s__('SubscriptionTable|Trial')}`;
+        suffix = `${s__('SubscriptionTable|Trial')}`;
       }
       return sprintf(s__('SubscriptionTable|GitLab.com %{planName} %{suffix}'), {
         planName: this.isFreePlan ? s__('SubscriptionTable|Free') : _.escape(this.plan.name),
@@ -27,6 +32,17 @@ export default {
     },
     actionButtonText() {
       return this.isFreePlan ? s__('SubscriptionTable|Upgrade') : s__('SubscriptionTable|Manage');
+    },
+    visibleRows() {
+      let tableKey = TABLE_TYPE_DEFAULT;
+
+      if (this.plan.code === null) {
+        tableKey = TABLE_TYPE_FREE;
+      } else if (this.plan.trial) {
+        tableKey = TABLE_TYPE_TRIAL;
+      }
+
+      return this.tables[tableKey].rows;
     },
   },
   mounted() {
@@ -60,7 +76,7 @@ export default {
       </div>
       <div class="card-body flex-grid d-flex flex-column flex-sm-row flex-md-row flex-lg-column">
         <subscription-table-row
-          v-for="(row, i) in rows"
+          v-for="(row, i) in visibleRows"
           :key="`subscription-rows-${i}`"
           :header="row.header"
           :columns="row.columns"

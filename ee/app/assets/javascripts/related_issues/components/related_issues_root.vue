@@ -25,7 +25,6 @@ Your caret can stop touching a `rawReference` can happen in a variety of ways:
 */
 import _ from 'underscore';
 import Flash from '~/flash';
-import eventHub from '../event_hub';
 import RelatedIssuesBlock from './related_issues_block.vue';
 import RelatedIssuesStore from '../stores/related_issues_store';
 import RelatedIssuesService from '../services/related_issues_service';
@@ -67,6 +66,16 @@ export default {
       required: false,
       default: true,
     },
+    pathIdSeparator: {
+      type: String,
+      required: false,
+      default: '#',
+    },
+    cssClass: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   data() {
     this.store = new RelatedIssuesStore();
@@ -86,25 +95,8 @@ export default {
     },
   },
   created() {
-    eventHub.$on('relatedIssue-removeRequest', this.onRelatedIssueRemoveRequest);
-    eventHub.$on('toggleAddRelatedIssuesForm', this.onToggleAddRelatedIssuesForm);
-    eventHub.$on('pendingIssuable-removeRequest', this.onPendingIssueRemoveRequest);
-    eventHub.$on('addIssuableFormSubmit', this.onPendingFormSubmit);
-    eventHub.$on('addIssuableFormCancel', this.onPendingFormCancel);
-    eventHub.$on('addIssuableFormInput', this.onInput);
-    eventHub.$on('addIssuableFormBlur', this.onBlur);
-
     this.service = new RelatedIssuesService(this.endpoint);
     this.fetchRelatedIssues();
-  },
-  beforeDestroy() {
-    eventHub.$off('relatedIssue-removeRequest', this.onRelatedIssueRemoveRequest);
-    eventHub.$off('toggleAddRelatedIssuesForm', this.onToggleAddRelatedIssuesForm);
-    eventHub.$off('pendingIssuable-removeRequest', this.onPendingIssueRemoveRequest);
-    eventHub.$off('addIssuableFormSubmit', this.onPendingFormSubmit);
-    eventHub.$off('addIssuableFormCancel', this.onPendingFormCancel);
-    eventHub.$off('addIssuableFormInput', this.onInput);
-    eventHub.$off('addIssuableFormBlur', this.onBlur);
   },
   methods: {
     onRelatedIssueRemoveRequest(idToRemove) {
@@ -198,7 +190,7 @@ export default {
           });
       }
     },
-    onInput(newValue, caretPos) {
+    onInput({ newValue, caretPos }) {
       const rawReferences = newValue.split(/\s/);
 
       let touchedReference;
@@ -235,6 +227,7 @@ export default {
 
 <template>
   <related-issues-block
+    :class="cssClass"
     :help-path="helpPath"
     :is-fetching="isFetching"
     :is-submitting="isSubmitting"
@@ -246,7 +239,14 @@ export default {
     :input-value="inputValue"
     :auto-complete-sources="autoCompleteSources"
     :title="title"
-    path-id-separator="#"
+    :path-id-separator="pathIdSeparator"
     @saveReorder="saveIssueOrder"
+    @toggleAddRelatedIssuesForm="onToggleAddRelatedIssuesForm"
+    @addIssuableFormInput="onInput"
+    @addIssuableFormBlur="onBlur"
+    @addIssuableFormSubmit="onPendingFormSubmit"
+    @addIssuableFormCancel="onPendingFormCancel"
+    @pendingIssuableRemoveRequest="onPendingIssueRemoveRequest"
+    @relatedIssueRemoveRequest="onRelatedIssueRemoveRequest"
   />
 </template>

@@ -2,8 +2,6 @@
 
 module Emails
   module MergeRequests
-    prepend Emails::EE::MergeRequests # rubocop: disable Cop/InjectEnterpriseEditionModule
-
     def new_merge_request_email(recipient_id, merge_request_id, reason = nil)
       setup_merge_request_mail(merge_request_id, recipient_id, present: true)
 
@@ -53,7 +51,9 @@ module Emails
 
       @milestone = milestone
       @milestone_url = milestone_url(@milestone)
-      mail_answer_thread(@merge_request, merge_request_thread_options(updated_by_user_id, recipient_id, reason))
+      mail_answer_thread(@merge_request, merge_request_thread_options(updated_by_user_id, recipient_id, reason).merge({
+        template_name: 'changed_milestone_email'
+      }))
     end
 
     def closed_merge_request_email(recipient_id, merge_request_id, updated_by_user_id, reason = nil)
@@ -115,3 +115,5 @@ module Emails
     end
   end
 end
+
+Emails::MergeRequests.prepend(EE::Emails::MergeRequests)

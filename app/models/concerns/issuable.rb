@@ -373,7 +373,5 @@ module Issuable
   end
 end
 
-# We have to prepend into Issuable::ClassMethods, as otherwise the methods
-# defined in EE::Issuable will available on Issuable, and not
-# Issuable::ClassMethods (= what in turn is exposed to classes).
-Issuable::ClassMethods.prepend(EE::Issuable)
+Issuable.prepend(EE::Issuable) # rubocop: disable Cop/InjectEnterpriseEditionModule
+Issuable::ClassMethods.prepend(EE::Issuable::ClassMethods)

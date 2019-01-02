@@ -67,7 +67,7 @@
       %tr
         %td
           = icon('file-o fw')
-          = package_file.file.identifier
+          = link_to package_file.file.identifier, download_project_package_file_path(@project, package_file)
         %td
           = number_to_human_size(package_file.size, precision: 2)
         %td

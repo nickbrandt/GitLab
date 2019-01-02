@@ -1,0 +1,5 @@
+---
+title: Fix JIRA Development Panel links with subgroups
+merge_request: 8908
+author:
+type: fixed

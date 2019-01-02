@@ -69,6 +69,11 @@ module KubernetesHelpers
       .to_return(status: [status, "Internal Server Error"])
   end
 
+  def stub_kubeclient_get_service_account(api_url, name, namespace: 'default')
+    WebMock.stub_request(:get, api_url + "/api/v1/namespaces/#{namespace}/serviceaccounts/#{name}")
+      .to_return(kube_response({}))
+  end
+
   def stub_kubeclient_get_service_account_error(api_url, name, namespace: 'default', status: 404)
     WebMock.stub_request(:get, api_url + "/api/v1/namespaces/#{namespace}/serviceaccounts/#{name}")
       .to_return(status: [status, "Internal Server Error"])
@@ -82,6 +87,11 @@ module KubernetesHelpers
   def stub_kubeclient_create_service_account_error(api_url, namespace: 'default')
     WebMock.stub_request(:post, api_url + "/api/v1/namespaces/#{namespace}/serviceaccounts")
       .to_return(status: [500, "Internal Server Error"])
+  end
+
+  def stub_kubeclient_put_service_account(api_url, name, namespace: 'default')
+    WebMock.stub_request(:put, api_url + "/api/v1/namespaces/#{namespace}/serviceaccounts/#{name}")
+      .to_return(kube_response({}))
   end
 
   def stub_kubeclient_create_secret(api_url, namespace: 'default')
@@ -104,6 +114,11 @@ module KubernetesHelpers
       .to_return(kube_response({}))
   end
 
+  def stub_kubeclient_get_role_binding(api_url, name, namespace: 'default')
+    WebMock.stub_request(:get, api_url + "/apis/rbac.authorization.k8s.io/v1/namespaces/#{namespace}/rolebindings/#{name}")
+      .to_return(kube_response({}))
+  end
+
   def stub_kubeclient_get_role_binding_error(api_url, name, namespace: 'default', status: 404)
     WebMock.stub_request(:get, api_url + "/apis/rbac.authorization.k8s.io/v1/namespaces/#{namespace}/rolebindings/#{name}")
       .to_return(status: [status, "Internal Server Error"])
@@ -111,6 +126,11 @@ module KubernetesHelpers
 
   def stub_kubeclient_create_role_binding(api_url, namespace: 'default')
     WebMock.stub_request(:post, api_url + "/apis/rbac.authorization.k8s.io/v1/namespaces/#{namespace}/rolebindings")
+      .to_return(kube_response({}))
+  end
+
+  def stub_kubeclient_put_role_binding(api_url, name, namespace: 'default')
+    WebMock.stub_request(:put, api_url + "/apis/rbac.authorization.k8s.io/v1/namespaces/#{namespace}/rolebindings/#{name}")
       .to_return(kube_response({}))
   end
 

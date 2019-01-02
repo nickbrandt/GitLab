@@ -3,12 +3,13 @@
 module EpicsHelper
   def epic_show_app_data(epic, opts)
     group = epic.group
-    todo = issuable_todo(epic)
+    todo = epic_pending_todo(epic)
 
     epic_meta = {
       epic_id: epic.id,
       created: epic.created_at,
       author: epic_author(epic, opts),
+      parent: epic_parent(epic.parent),
       todo_exists: todo.present?,
       todo_path: group_todos_path(group),
       start_date: epic.start_date,
@@ -58,12 +59,26 @@ module EpicsHelper
     }
   end
 
+  def epic_pending_todo(epic)
+    current_user.pending_todo_for(epic) if current_user
+  end
+
   def epic_author(epic, opts)
     {
       name: epic.author.name,
       url: user_path(epic.author),
       username: "@#{epic.author.username}",
       src: opts[:author_icon]
+    }
+  end
+
+  def epic_parent(epic)
+    return unless epic
+
+    {
+      id: epic.id,
+      title: epic.title,
+      url: epic_path(epic)
     }
   end
 

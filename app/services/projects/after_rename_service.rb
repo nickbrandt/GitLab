@@ -83,6 +83,7 @@ module Projects
     def update_repository_configuration
       project.reload_repository!
       project.write_repository_config
+      project.track_project_repository
     end
 
     def rename_transferred_documents

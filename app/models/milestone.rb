@@ -214,7 +214,7 @@ class Milestone < ActiveRecord::Base
   end
 
   def reference_link_text(from = nil)
-    self.title
+    self.class.reference_prefix + self.title
   end
 
   def milestoneish_ids

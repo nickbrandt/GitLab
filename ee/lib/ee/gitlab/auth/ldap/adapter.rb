@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # LDAP connection adapter EE mixin
 #
 # This module is intended to encapsulate EE-specific adapter methods

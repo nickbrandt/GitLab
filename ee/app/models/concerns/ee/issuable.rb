@@ -4,15 +4,21 @@ module EE
   module Issuable
     extend ActiveSupport::Concern
 
-    def labels_hash
-      issue_labels = Hash.new { |h, k| h[k] = [] }
+    class_methods do
+      def labels_hash
+        issue_labels = Hash.new { |h, k| h[k] = [] }
 
-      relation = unscoped.where(id: self.select(:id)).eager_load(:labels)
-      relation.pluck(:id, 'labels.title').each do |issue_id, label|
-        issue_labels[issue_id] << label
+        relation = unscoped.where(id: self.select(:id)).eager_load(:labels)
+        relation.pluck(:id, 'labels.title').each do |issue_id, label|
+          issue_labels[issue_id] << label
+        end
+
+        issue_labels
       end
+    end
 
-      issue_labels
+    def supports_epic?
+      is_a?(Issue) && project.group
     end
   end
 end

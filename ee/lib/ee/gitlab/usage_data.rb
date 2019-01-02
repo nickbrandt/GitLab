@@ -101,7 +101,8 @@ module EE
           projects_reporting_ci_cd_back_to_github: count(::GithubService.without_defaults.active),
           projects_mirrored_with_pipelines_enabled: projects_mirrored_with_pipelines_enabled,
           projects_with_prometheus_alerts: count(PrometheusAlert.distinct_projects),
-          projects_with_packages: count(::Packages::Package.select('distinct project_id'))
+          projects_with_packages: count(::Packages::Package.select('distinct project_id')),
+          projects_with_tracing_enabled: count(ProjectTracingSetting)
         }).merge(service_desk_counts).merge(security_products_usage)
 
         usage_data

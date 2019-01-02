@@ -149,6 +149,7 @@ module API
     mount ::API::ProjectTemplates
     mount ::API::ProtectedBranches
     mount ::API::ProtectedTags
+    mount ::API::Releases
     mount ::API::Repositories
     mount ::API::Runner
     mount ::API::Runners
@@ -170,26 +171,10 @@ module API
     mount ::API::Version
     mount ::API::Wikis
 
-    ## EE-specific API V4 endpoints START
-    mount ::EE::API::Boards
-    mount ::EE::API::GroupBoards
-
-    mount ::API::Unleash
-    mount ::API::EpicIssues
-    mount ::API::Epics
-    mount ::API::Geo
-    mount ::API::GeoNodes
-    mount ::API::IssueLinks
-    mount ::API::Ldap
-    mount ::API::LdapGroupLinks
-    mount ::API::License
-    mount ::API::ProjectMirror
-    mount ::API::ProjectPushRule
-    mount ::API::MavenPackages
-    ## EE-specific API V4 endpoints END
-
     route :any, '*path' do
       error!('404 Not Found', 404)
     end
   end
 end
+
+API::API.prepend(::EE::API::Endpoints)

@@ -128,6 +128,7 @@ describe Burndown do
     context 'when nested group milestone', :nested_groups do
       it_behaves_like 'burndown for milestone' do
         let(:milestone) { nested_group_milestone }
+        let(:project) { nested_group_project }
         let(:issue_params) do
           {
             milestone: milestone,
@@ -144,6 +145,7 @@ describe Burndown do
     context 'when non-nested group milestone' do
       it_behaves_like 'burndown for milestone' do
         let(:milestone) { group_milestone }
+        let(:project) { group_project }
         let(:issue_params) do
           {
             milestone: milestone,
@@ -160,6 +162,8 @@ describe Burndown do
 
   # Creates, closes and reopens issues only for odd days numbers
   def build_sample(milestone, issue_params)
+    project.add_master(user)
+
     milestone.start_date.upto(milestone.due_date) do |date|
       day = date.day
       next if day.even?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Clusters::Applications::PrometheusUpdateService do
@@ -7,7 +9,6 @@ describe Clusters::Applications::PrometheusUpdateService do
     let(:cluster) { create(:cluster, :provided_by_user, :with_installed_helm, projects: [project]) }
     let(:application) { create(:clusters_applications_prometheus, :installed, cluster: cluster) }
     let(:values_yaml) { application.values }
-    let!(:get_command_values) { OpenStruct.new(data: OpenStruct.new('values.yaml': values_yaml)) }
     let!(:upgrade_command) { application.upgrade_command('') }
     let(:helm_client) { instance_double(::Gitlab::Kubernetes::Helm::Api) }
 
@@ -20,11 +21,6 @@ describe Clusters::Applications::PrometheusUpdateService do
 
     context 'when there are no errors' do
       before do
-        expect(helm_client)
-          .to receive(:get_config_map)
-          .with('values-content-configuration-prometheus')
-          .and_return(get_command_values)
-
         expect(helm_client).to receive(:update).with(upgrade_command)
 
         allow(::ClusterWaitForAppUpdateWorker)
@@ -64,10 +60,12 @@ describe Clusters::Applications::PrometheusUpdateService do
     end
 
     context 'when k8s cluster communication fails' do
-      it 'make the application update errored' do
+      before do
         error = ::Kubeclient::HttpError.new(500, 'system failure', nil)
-        allow(helm_client).to receive(:get_config_map).and_raise(error)
+        allow(helm_client).to receive(:update).and_raise(error)
+      end
 
+      it 'make the application update errored' do
         service.execute
 
         expect(application).to be_update_errored
@@ -78,10 +76,12 @@ describe Clusters::Applications::PrometheusUpdateService do
     context 'when application cannot be persisted' do
       let(:application) { build(:clusters_applications_prometheus, :installed) }
 
-      it 'make the application update errored' do
-        allow(application).to receive(:make_updating!).once.and_raise(ActiveRecord::RecordInvalid)
+      before do
+        allow(application).to receive(:make_updating!).once
+          .and_raise(ActiveRecord::RecordInvalid.new(application))
+      end
 
-        expect(helm_client).not_to receive(:get_config_map)
+      it 'make the application update errored' do
         expect(helm_client).not_to receive(:update)
 
         service.execute

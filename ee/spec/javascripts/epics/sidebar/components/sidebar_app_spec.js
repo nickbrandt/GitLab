@@ -19,6 +19,7 @@ describe('epicSidebar', () => {
     labelsWebUrl,
     epicsWebUrl,
     labels,
+    parent,
     participants,
     subscribed,
     toggleSubscriptionPath,
@@ -55,6 +56,7 @@ describe('epicSidebar', () => {
     startDateSourcingMilestoneDates,
     dueDateSourcingMilestoneTitle,
     dueDateSourcingMilestoneDates,
+    parent,
     toggleSubscriptionPath,
     labelsPath,
     labelsWebUrl,
@@ -113,6 +115,47 @@ describe('epicSidebar', () => {
     expect(
       endDatePicker.querySelector('.value-type-fixed .value-content').innerText.trim(),
     ).toEqual('Jan 1, 2018');
+  });
+
+  describe('parent epic', () => {
+    it('should render parent epic information in sidebar when `parent` is present', () => {
+      const parentEpicEl = vm.$el.querySelector('.block.parent-epic');
+
+      expect(parentEpicEl).not.toBeNull();
+      expect(parentEpicEl.querySelector('.collapse-truncated-title').innerText.trim()).toBe(
+        parent.title,
+      );
+
+      expect(parentEpicEl.querySelector('.value a').innerText.trim()).toBe(parent.title);
+    });
+
+    it('should render parent epic as `none` when `parent` is empty', done => {
+      vm.parent = {};
+
+      Vue.nextTick()
+        .then(() => {
+          const parentEpicEl = vm.$el.querySelector('.block.parent-epic');
+
+          expect(parentEpicEl.querySelector('.collapse-truncated-title').innerText.trim()).toBe(
+            'None',
+          );
+
+          expect(parentEpicEl.querySelector('.value .no-value').innerText.trim()).toBe('None');
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+
+    it('should render parent epic information icon when sidebar is collapsed', () => {
+      const parentEpicElCollapsed = vm.$el.querySelector(
+        '.block.parent-epic .sidebar-collapsed-icon',
+      );
+
+      expect(parentEpicElCollapsed).not.toBeNull();
+      expect(parentEpicElCollapsed.querySelector('svg use').getAttribute('xlink:href')).toContain(
+        'epic',
+      );
+    });
   });
 
   describe('computed prop', () => {
