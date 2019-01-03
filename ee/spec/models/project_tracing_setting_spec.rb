@@ -4,7 +4,8 @@ require 'spec_helper'
 
 describe ProjectTracingSetting do
   describe '#external_url' do
-    let(:project) { build(:project) }
+    set(:project) { create(:project) }
+
     let(:tracing_setting) { project.build_tracing_setting }
 
     it 'accepts a valid url' do

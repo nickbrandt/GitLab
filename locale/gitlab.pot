@@ -6138,9 +6138,6 @@ msgstr ""
 msgid "Operations Dashboard"
 msgstr ""
 
-msgid "Operations Settings"
-msgstr ""
-
 msgid "OperationsDashboard|Add a project to the dashboard"
 msgstr ""
 
@@ -9353,9 +9350,6 @@ msgid "Type"
 msgstr ""
 
 msgid "Unable to load the diff. %{button_try_again}"
-msgstr ""
-
-msgid "Unable to save your changes"
 msgstr ""
 
 msgid "Unable to sign you in to the group with SAML due to \"%{reason}\""
