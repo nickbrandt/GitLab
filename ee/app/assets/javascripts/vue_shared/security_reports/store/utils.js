@@ -12,6 +12,32 @@ export const findIssueIndex = (issues, issue) =>
   issues.findIndex(el => el.project_fingerprint === issue.project_fingerprint);
 
 /**
+ *
+ * Returns whether a vulnerability has a match in an array of fixes
+ *
+ * @param fixes {Array} Array of fixes (vulnerability identifiers) of a remediation
+ * @param vulnerability {Object} Vulnerability
+ * @returns {boolean}
+ */
+const hasMatchingFix = (fixes, vulnerability) =>
+  Array.isArray(fixes) ? fixes.some(fix => _.isMatch(vulnerability, fix)) : false;
+
+/**
+ *
+ * Returns the first remediation that fixes the given vulnerability or null
+ *
+ * @param {Array} remediations
+ * @param {Object} vulnerability
+ * @returns {Object|null}
+ */
+export const findMatchingRemediation = (remediations, vulnerability) => {
+  if (!Array.isArray(remediations)) {
+    return null;
+  }
+  return remediations.find(rem => hasMatchingFix(rem.fixes, vulnerability)) || null;
+};
+
+/**
  * Returns given vulnerability enriched with the corresponding
  * feedback (`dismissal` or `issue` type)
  * @param {Object} vulnerability
@@ -101,6 +127,7 @@ function adaptDeprecatedReportFormat(report) {
   if (Array.isArray(report)) {
     return {
       vulnerabilities: report,
+      remediations: [],
     };
   }
 
@@ -140,14 +167,21 @@ export const parseSastIssues = (report = [], feedback = [], path = '') =>
  * @param {String} path
  * @returns {Array}
  */
-export const parseDependencyScanningIssues = (report = [], feedback = [], path = '') =>
-  adaptDeprecatedReportFormat(report).vulnerabilities.map(issue => {
+export const parseDependencyScanningIssues = (report = [], feedback = [], path = '') => {
+  const { vulnerabilities, remediations } = adaptDeprecatedReportFormat(report);
+  return vulnerabilities.map(issue => {
     const parsed = {
       ...adaptDeprecatedIssueFormat(issue),
       category: 'dependency_scanning',
       project_fingerprint: sha1(issue.cve || issue.message),
       title: issue.message,
     };
+
+    const remediation = findMatchingRemediation(remediations, parsed);
+
+    if (remediation) {
+      parsed.remediation = remediation;
+    }
 
     return {
       ...parsed,
@@ -156,6 +190,7 @@ export const parseDependencyScanningIssues = (report = [], feedback = [], path =
       ...enrichVulnerabilityWithfeedback(parsed, feedback),
     };
   });
+};
 
 /**
  * Parses Container Scanning results into a common format to allow to use the same Vue component.
@@ -164,7 +199,6 @@ export const parseDependencyScanningIssues = (report = [], feedback = [], path =
  *
  * @param {Array} issues
  * @param {Array} feedback
- * @param {String} path
  * @returns {Array}
  */
 export const parseSastContainer = (issues = [], feedback = []) =>
