@@ -58,7 +58,7 @@ module Ci
 
     def target_project
       strong_memoize(:target_project) do
-        Project.find_by_full_path(@bridge.target_project_name)
+        Project.find_by_full_path(@bridge.target_project_path)
       end
     end
   end

@@ -27,7 +27,7 @@ module EE
         self.user
       end
 
-      def target_project_name
+      def target_project_path
         options&.dig(:trigger, :project)
       end
 

@@ -32,10 +32,10 @@ describe Ci::Bridge do
     end
   end
 
-  describe '#target_project_name' do
+  describe '#target_project_path' do
     context 'when trigger is defined' do
       it 'returns a full path of a project' do
-        expect(bridge.target_project_name).to eq 'my/project'
+        expect(bridge.target_project_path).to eq 'my/project'
       end
     end
 
@@ -43,7 +43,7 @@ describe Ci::Bridge do
       let(:options) { { trigger: {}  } }
 
       it 'returns nil' do
-        expect(bridge.target_project_name).to be_nil
+        expect(bridge.target_project_path).to be_nil
       end
     end
   end
