@@ -1285,62 +1285,6 @@ If the rebase operation fails, the response will include the following:
 }
 ```
 
-## Rebase a merge request
-
-Automatically rebase the `source_branch` of the merge request against its
-`target_branch`.
-
-If you don't have permissions to push to the merge request's source branch -
-you'll get a `403 Forbidden` response.
-
-```
-PUT /projects/:id/merge_requests/:merge_request_iid/rebase
-```
-
-| Attribute           | Type    | Required | Description                          |
-| ---------           | ----    | -------- | -----------                          |
-| `id`                | integer/string | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user                  |
-| `merge_request_iid` | integer | yes      | The internal ID of the merge request |
-
-```bash
-curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/76/merge_requests/1/rebase
-```
-
-This is an asynchronous request. The API will return an empty `202 Accepted`
-response if the request is enqueued successfully.
-
-You can poll the [Get single MR](#get-single-mr) endpoint with the
-`include_rebase_in_progress` parameter to check the status of the
-asynchronous request.
-
-If the rebase operation is ongoing, the response will include the following:
-
-```json
-{
-  "rebase_in_progress": true
-  "merge_error": null
-}
-```
-
-Once the rebase operation has completed successfully, the response will include
-the following:
-
-```json
-{
-  "rebase_in_progress": false,
-  "merge_error": null,
-}
-```
-
-If the rebase operation fails, the response will include the following:
-
-```json
-{
-  "rebase_in_progress": false,
-  "merge_error": "Rebase failed. Please rebase locally",
-}
-```
-
 ## Comments on merge requests
 
 Comments are done via the [notes](notes.md) resource.
