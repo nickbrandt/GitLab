@@ -53,7 +53,10 @@ export default {
 
 <template>
   <div class="ci-table">
-    <div class="gl-responsive-table-row table-row-header vulnerabilities-row-header" role="row">
+    <div
+      class="gl-responsive-table-row table-row-header vulnerabilities-row-header px-2"
+      role="row"
+    >
       <div class="table-section section-10" role="rowheader">{{ s__('Reports|Severity') }}</div>
       <div class="table-section section-60" role="rowheader">
         {{ s__('Reports|Vulnerability') }}
@@ -104,8 +107,6 @@ export default {
 <style>
 .vulnerabilities-row-header {
   background-color: #fafafa;
-  font-size: 1rem;
-  padding-left: 0.4em;
-  padding-right: 0.4em;
+  font-size: 14px;
 }
 </style>

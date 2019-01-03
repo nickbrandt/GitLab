@@ -57,7 +57,7 @@ export default {
 </script>
 
 <template>
-  <div class="gl-responsive-table-row vulnerabilities-row" :class="{ dismissed: isDismissed }">
+  <div class="gl-responsive-table-row vulnerabilities-row p-2" :class="{ dismissed: isDismissed }">
     <div class="table-section section-10">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Severity') }}</div>
       <div class="table-mobile-content"><severity-badge :severity="severity" /></div>
@@ -110,10 +110,6 @@ export default {
 
 <style scoped>
 @media (min-width: 768px) {
-  .vulnerabilities-row {
-    padding: 0.6em 0.4em;
-  }
-
   .vulnerabilities-row:hover,
   .vulnerabilities-row:focus {
     background: #f6fafd;
