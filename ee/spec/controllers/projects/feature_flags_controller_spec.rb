@@ -60,6 +60,77 @@ describe Projects::FeatureFlagsController do
     end
   end
 
+  describe 'GET #index json' do
+    subject { get(:index, params: view_params, format: :json) }
+
+    let!(:feature_flag_active) do
+      create(:operations_feature_flag, project: project, active: true)
+    end
+
+    let!(:feature_flag_inactive) do
+      create(:operations_feature_flag, project: project, active: false)
+    end
+
+    it 'returns all feature flags as json response' do
+      subject
+
+      expect(json_response.count).to eq(2)
+      expect(json_response.first['name']).to eq(feature_flag_active.name)
+      expect(json_response.second['name']).to eq(feature_flag_inactive.name)
+    end
+
+    it 'returns edit path and destroy path' do
+      subject
+
+      expect(json_response.first['edit_path']).not_to be_nil
+      expect(json_response.first['destroy_path']).not_to be_nil
+    end
+
+    it 'matches json schema' do
+      subject
+
+      expect(response).to match_response_schema('feature_flags', dir: 'ee')
+    end
+
+    context 'when scope is specified' do
+      let(:view_params) do
+        { namespace_id: project.namespace, project_id: project, scope: scope }
+      end
+
+      context 'when scope is all' do
+        let(:scope) { 'all' }
+
+        it 'returns all feature flags' do
+          subject
+
+          expect(json_response.count).to eq(2)
+        end
+      end
+
+      context 'when scope is enabled' do
+        let(:scope) { 'enabled' }
+
+        it 'returns enabled feature flags' do
+          subject
+
+          expect(json_response.count).to eq(1)
+          expect(json_response.first['active']).to be_truthy
+        end
+      end
+
+      context 'when scope is disabled' do
+        let(:scope) { 'disabled' }
+
+        it 'returns disabled feature flags' do
+          subject
+
+          expect(json_response.count).to eq(1)
+          expect(json_response.first['active']).to be_falsy
+        end
+      end
+    end
+  end
+
   describe 'GET new' do
     render_views
 

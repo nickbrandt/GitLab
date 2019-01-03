@@ -1,0 +1,4 @@
+{
+  "type": "array",
+  "items": { "$ref": "feature_flag.json" }
+}

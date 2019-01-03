@@ -18,6 +18,8 @@ module Operations
     validates :description, allow_blank: true, length: 0..255
 
     scope :ordered, -> { order(:name) }
+    scope :enabled, -> { where(active: true) }
+    scope :disabled, -> { where(active: false) }
 
     def strategies
       [
