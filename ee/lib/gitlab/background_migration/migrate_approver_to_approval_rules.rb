@@ -56,13 +56,6 @@ module Gitlab
             scope
           end
         end
-
-        def sync_approvals
-          # Before being merged, approvals are dynamically calculated instead of being persisted in the db.
-          return unless merge_request.merged?
-
-          self.approvals = merge_request.approvals.where(user_id: approvers.map(&:id))
-        end
       end
 
       class ApprovalMergeRequestRuleSource < ApplicationRecord
@@ -104,24 +97,6 @@ module Gitlab
 
         def sync_code_owners_with_approvers
           ::MergeRequest.find(id).sync_code_owners_with_approvers
-        end
-
-        def finalize_approvals
-          return unless merged?
-
-          copy_project_approval_rules unless approval_rules.regular.exists?
-
-          approval_rules.reload.each(&:sync_approvals)
-        end
-
-        private
-
-        def copy_project_approval_rules
-          target_project.approval_rules.each do |project_rule|
-            rule = approval_rules.create!(project_rule.attributes.slice('approvals_required', 'name'))
-            rule.users = project_rule.users
-            rule.groups = project_rule.groups
-          end
         end
       end
 
@@ -175,8 +150,6 @@ module Gitlab
           end
 
           target.sync_code_owners_with_approvers
-
-          target.finalize_approvals if target.merged?
         end
       end
 
