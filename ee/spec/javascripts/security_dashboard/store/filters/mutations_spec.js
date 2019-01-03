@@ -7,12 +7,11 @@ describe('filters module mutations', () => {
     let state;
     let typeFilter;
     let sastOption;
-    let allOption;
 
     beforeEach(() => {
       state = createState();
       [typeFilter] = state.filters;
-      [allOption, sastOption] = typeFilter.options;
+      [, sastOption] = typeFilter.options;
 
       mutations[types.SET_FILTER](state, {
         filterId: typeFilter.id,
@@ -21,11 +20,11 @@ describe('filters module mutations', () => {
     });
 
     it('should make SAST the selected option', () => {
-      expect(sastOption.selected).toEqual(true);
+      expect(state.filters[0].options[1].selected).toEqual(true);
     });
 
     it('should remove ALL as the selected option', () => {
-      expect(allOption.selected).toEqual(false);
+      expect(state.filters[0].options[0].selected).toEqual(false);
     });
   });
 });

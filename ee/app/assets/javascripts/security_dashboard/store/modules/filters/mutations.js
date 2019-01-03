@@ -5,8 +5,12 @@ export default {
     const { filterId, optionId } = payload;
     const activeFilter = state.filters.find(filter => filter.id === filterId);
     if (activeFilter) {
-      activeFilter.options.find(option => option.selected).selected = false;
-      activeFilter.options.find(option => option.id === optionId).selected = true;
+      activeFilter.options = [
+        ...activeFilter.options.map(option => ({
+          ...option,
+          selected: option.id === optionId,
+        })),
+      ];
     }
   },
 };
