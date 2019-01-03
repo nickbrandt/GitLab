@@ -9703,9 +9703,6 @@ msgstr ""
 msgid "Vulnerability|Severity"
 msgstr ""
 
-msgid "Vulnerability|Solution"
-msgstr ""
-
 msgid "Want to see the data? Please ask an administrator for access."
 msgstr ""
 
@@ -10231,6 +10228,12 @@ msgid "ciReport|Dismiss vulnerability"
 msgstr ""
 
 msgid "ciReport|Dismissed by"
+msgstr ""
+
+msgid "ciReport|Download and apply the patch to fix this vulnerability."
+msgstr ""
+
+msgid "ciReport|Download patch"
 msgstr ""
 
 msgid "ciReport|Dynamic Application Security Testing (DAST) detects known vulnerabilities in your web application."

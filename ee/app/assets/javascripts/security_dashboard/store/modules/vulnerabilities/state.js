@@ -27,7 +27,6 @@ export default () => ({
       severity: { text: s__('Vulnerability|Severity') },
       confidence: { text: s__('Vulnerability|Confidence') },
       className: { text: s__('Vulnerability|Class') },
-      solution: { text: s__('Vulnerability|Solution') },
       links: { text: s__('Vulnerability|Links') },
       instances: { text: s__('Vulnerability|Instances') },
     },
