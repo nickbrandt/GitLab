@@ -197,5 +197,38 @@ describe Notes::QuickActionsService do
         end
       end
     end
+
+    describe '/label' do
+      let(:project) { nil }
+      let!(:bug) { create(:group_label, title: 'bug', group: group)}
+      let!(:feature) { create(:group_label, title: 'feature', group: group)}
+      let(:note_text) { "/unlabel ~bug" }
+      let(:note) { create(:note, noteable: epic, note: note_text) }
+
+      before do
+        group.add_developer(user)
+        epic.labels = [bug, feature]
+      end
+
+      context 'when epics are not enabled' do
+        it 'does not remove any label' do
+          expect { execute(note) }.not_to change { epic.reload.labels }
+        end
+      end
+
+      context 'when epics are enabled' do
+        before do
+          stub_licensed_features(epics: true)
+        end
+
+        it 'removes a requested label from the epic' do
+          expect { execute(note) }.to change { epic.reload.labels.map(&:title) }.to(['feature'])
+        end
+
+        it 'leaves the note empty' do
+          expect(execute(note)).to eq('')
+        end
+      end
+    end
   end
 end

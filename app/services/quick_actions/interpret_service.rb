@@ -210,8 +210,6 @@ module QuickActions
     end
     params '~label1 ~"label 2"'
     condition do
-      parent = project || issuable_group
-
       parent &&
         current_user.can?(:"admin_#{issuable.to_ability_name}", parent) &&
         find_labels.any?
@@ -241,7 +239,7 @@ module QuickActions
       issuable.is_a?(Issuable) &&
         issuable.persisted? &&
         issuable.labels.any? &&
-        current_user.can?(:"admin_#{issuable.to_ability_name}", project)
+        current_user.can?(:"admin_#{issuable.to_ability_name}", parent)
     end
     command :unlabel do |labels_param = nil|
       if labels_param.present?
@@ -668,6 +666,10 @@ module QuickActions
 
     def find_milestones(project, params = {})
       MilestonesFinder.new(params.merge(project_ids: [project.id], group_ids: [project.group&.id])).execute
+    end
+
+    def parent
+      project || issuable_group
     end
 
     def issuable_group
