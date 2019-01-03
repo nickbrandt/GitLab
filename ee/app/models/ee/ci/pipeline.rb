@@ -5,6 +5,8 @@ module EE
     module Pipeline
       extend ActiveSupport::Concern
 
+      BridgeStatusError = Class.new(StandardError)
+
       EE_FAILURE_REASONS = {
         activity_limit_exceeded: 20,
         size_limit_exceeded: 21
@@ -17,10 +19,12 @@ module EE
         has_many :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::OccurrencePipeline'
         has_many :vulnerabilities, source: :occurrence, through: :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::Occurrence'
 
-        has_one :source_pipeline, class_name: ::Ci::Sources::Pipeline
+        has_one :source_pipeline, class_name: ::Ci::Sources::Pipeline, inverse_of: :pipeline
         has_many :sourced_pipelines, class_name: ::Ci::Sources::Pipeline, foreign_key: :source_pipeline_id
 
         has_one :triggered_by_pipeline, through: :source_pipeline, source: :source_pipeline
+        has_one :source_job, through: :source_pipeline, source: :source_job
+        has_one :source_bridge, through: :source_pipeline, source: :source_bridge
         has_many :triggered_pipelines, through: :sourced_pipelines, source: :pipeline
 
         has_many :auto_canceled_pipelines, class_name: 'Ci::Pipeline', foreign_key: 'auto_canceled_by_id'
@@ -95,7 +99,24 @@ module EE
               StoreSecurityReportsWorker.perform_async(pipeline.id)
             end
           end
+
+          after_transition created: :pending do |pipeline|
+            next unless pipeline.bridge_triggered?
+
+            pipeline.update_bridge_status!
+          end
         end
+      end
+
+      def bridge_triggered?
+        source_bridge.present?
+      end
+
+      def update_bridge_status!
+        raise ArgumentError unless bridge_triggered?
+        raise BridgeStatusError unless source_bridge.active?
+
+        source_bridge.success!
       end
 
       def any_report_artifact_for_type(file_type)

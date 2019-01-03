@@ -42,6 +42,7 @@
 - geo:geo_scheduler_secondary_scheduler
 
 - pipeline_default:store_security_reports
+- pipeline_default:ci_create_cross_project_pipeline
 
 - admin_emails
 - chat_notification

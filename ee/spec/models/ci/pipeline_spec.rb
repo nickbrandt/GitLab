@@ -393,4 +393,82 @@ describe Ci::Pipeline do
       end
     end
   end
+
+  describe 'upstream status interactions' do
+    context 'when a pipeline has an upstream status' do
+      context 'when an upstream status is a bridge' do
+        let(:bridge) { create(:ci_bridge, status: :pending) }
+
+        before do
+          create(:ci_sources_pipeline, pipeline: pipeline, source_job: bridge)
+        end
+
+        describe '#bridge_triggered?' do
+          it 'is a pipeline triggered by a bridge' do
+            expect(pipeline).to be_bridge_triggered
+          end
+        end
+
+        describe '#source_job' do
+          it 'has a correct source job' do
+            expect(pipeline.source_job).to eq bridge
+          end
+        end
+
+        describe '#source_bridge' do
+          it 'has a correct bridge source' do
+            expect(pipeline.source_bridge).to eq bridge
+          end
+        end
+
+        describe '#update_bridge_status!' do
+          it 'can update bridge status if it is running' do
+            pipeline.update_bridge_status!
+
+            expect(bridge.reload).to be_success
+          end
+
+          it 'can not update bridge status if is not active' do
+            bridge.success!
+
+            expect { pipeline.update_bridge_status! }
+              .to raise_error EE::Ci::Pipeline::BridgeStatusError
+          end
+        end
+      end
+
+      context 'when an upstream status is a build' do
+        let(:build) { create(:ci_build) }
+
+        before do
+          create(:ci_sources_pipeline, pipeline: pipeline, source_job: build)
+        end
+
+        describe '#bridge_triggered?' do
+          it 'is a pipeline that has not been triggered by a bridge' do
+            expect(pipeline).not_to be_bridge_triggered
+          end
+        end
+
+        describe '#source_job' do
+          it 'has a correct source job' do
+            expect(pipeline.source_job).to eq build
+          end
+        end
+
+        describe '#source_bridge' do
+          it 'does not have a bridge source' do
+            expect(pipeline.source_bridge).to be_nil
+          end
+        end
+
+        describe '#update_bridge_status!' do
+          it 'can not update upstream job status' do
+            expect { pipeline.update_bridge_status! }
+              .to raise_error ArgumentError
+          end
+        end
+      end
+    end
+  end
 end
