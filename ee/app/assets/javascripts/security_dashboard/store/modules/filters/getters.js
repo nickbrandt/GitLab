@@ -6,6 +6,14 @@ export const getSelectedOptions = (state, getters) => filterId =>
 export const getSelectedOptionIds = (state, getters) => filterId =>
   getters.getSelectedOptions(filterId).map(option => option.id);
 
+export const getSelectedOptionNames = (state, getters) => filterId => {
+  const selectedOptions = getters.getSelectedOptions(filterId);
+  const [firstOption] = selectedOptions.map(option => option.name);
+  return selectedOptions.length > 1
+    ? `${firstOption} +${selectedOptions.length - 1} more`
+    : `${firstOption}`;
+};
+
 export const getFilterIds = state => state.filters.map(filter => filter.id);
 
 /**
