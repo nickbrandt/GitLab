@@ -26,7 +26,7 @@ describe Geo::NodeStatusPostService, :geo do
       allow(Gitlab::HTTP).to receive(:post).and_raise(OpenSSL::SSL::SSLError.new(message))
       expect(subject).to receive(:log_error).with('Failed to post status data to primary', kind_of(OpenSSL::SSL::SSLError))
 
-      expect(subject.execute(secondary)).to be_falsey
+      expect(subject.execute(secondary.find_or_build_status)).to be_falsey
     end
 
     it 'handles connection refused' do
@@ -34,7 +34,7 @@ describe Geo::NodeStatusPostService, :geo do
 
       expect(subject).to receive(:log_error).with('Failed to post status data to primary', kind_of(Errno::ECONNREFUSED))
 
-      expect(subject.execute(secondary)).to be_falsey
+      expect(subject.execute(secondary.find_or_build_status)).to be_falsey
     end
 
     it 'returns meaningful error message when primary uses incorrect db key' do
@@ -45,7 +45,7 @@ describe Geo::NodeStatusPostService, :geo do
         kind_of(OpenSSL::Cipher::CipherError)
       )
 
-      expect(subject.execute(secondary)).to be_falsey
+      expect(subject.execute(secondary.find_or_build_status)).to be_falsey
     end
 
     it 'gracefully handles case when primary is deleted' do
@@ -55,7 +55,24 @@ describe Geo::NodeStatusPostService, :geo do
         'Failed to look up Geo primary node in the database'
       )
 
-      expect(subject.execute(secondary)).to be_falsey
+      expect(subject.execute(secondary.find_or_build_status)).to be_falsey
+    end
+
+    it 'does not include id in the payload' do
+      stub_current_geo_node(primary)
+
+      expect(Gitlab::HTTP).to receive(:post)
+                                .with(
+                                  primary.status_url,
+                                  hash_including(body: hash_not_including('id')))
+                                .and_return(double(success?: true))
+
+      subject.execute(GeoNodeStatus.new({
+        geo_node_id: secondary.id,
+        status_message: nil,
+        db_replication_lag_seconds: 0,
+        repositories_count: 10
+      }))
     end
 
     it 'sends geo_node_id in the request' do

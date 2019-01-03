@@ -223,10 +223,9 @@ describe API::Geo do
         geo_node_id: secondary_node.id,
         status_message: nil,
         db_replication_lag_seconds: 0,
-        repositories_count: 10,
+        projects_count: 10,
         repositories_synced_count: 1,
         repositories_failed_count: 2,
-        wikis_count: 10,
         wikis_synced_count: 2,
         wikis_failed_count: 3,
         lfs_objects_count: 100,
@@ -281,7 +280,21 @@ describe API::Geo do
         expect { request }.to change { GeoNodeStatus.count }.by(1)
 
         expect(response).to have_gitlab_http_status(201)
-        expect(secondary_node.reload.status.repositories_count).to eq(10)
+        expect(secondary_node.reload.status.projects_count).to eq(10)
+      end
+
+      it 'ignores invalid attributes upon update' do
+        GeoNodeStatus.create(data)
+        data.merge!(
+          {
+            'id' => nil,
+            'test' => 'something'
+          }
+        )
+
+        post api('/geo/status'), params: data, headers: geo_base_request.headers
+
+        expect(response).to have_gitlab_http_status(201)
       end
 
       it_behaves_like 'with terms enforced'
