@@ -1,0 +1,5 @@
+---
+title: Prevent commit authors from self approvaling merge requests
+merge_request: 9007
+author:
+type: changed

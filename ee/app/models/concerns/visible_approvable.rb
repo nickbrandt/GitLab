@@ -37,8 +37,8 @@ module VisibleApprovable
       approvers_relation = target_project.approvers
     end
 
-    if author && !authors_can_approve?
-      approvers_relation = approvers_relation.where.not(user_id: author.id)
+    if authors.any? && !authors_can_approve?
+      approvers_relation = approvers_relation.where.not(user_id: authors.select(:id))
     end
 
     results = code_owners.concat(approvers_relation.includes(:user).map(&:user))
@@ -65,7 +65,12 @@ module VisibleApprovable
 
   def approvers_from_groups
     group_approvers = overall_approver_groups.flat_map(&:users)
-    group_approvers.delete(author) unless authors_can_approve?
+
+    unless authors_can_approve?
+      author_approver_ids = authors.where(id: group_approvers.map(&:id)).pluck(:id)
+      group_approvers.reject! { |user| author_approver_ids.include?(user.id) }
+    end
+
     group_approvers
   end
 
