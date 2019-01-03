@@ -40,8 +40,6 @@ module EE
 
       override :check_change_access!
       def check_change_access!
-        return if changes.blank?
-
         check_size_before_push!
 
         check_if_license_blocks_changes!
