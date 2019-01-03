@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "required" : [
+    "id",
+    "name"
+  ],
+  "properties" : {
+    "id": { "type": "integer" },
+    "created_at": { "type": "date" },
+    "updated_at": { "type": "date" },
+    "name": { "type": "string" },
+    "active": { "type": "boolean" },
+    "description": { "type": ["string", "null"] },
+    "edit_path": { "type": ["string", "null"] },
+    "destroy_path": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

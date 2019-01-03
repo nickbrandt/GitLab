@@ -10,9 +10,23 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
   before_action :feature_flag, only: [:edit, :update, :destroy]
 
   def index
-    @feature_flags = project.operations_feature_flags
-      .ordered
-      .page(params[:page]).per(30)
+    @feature_flags = FeatureFlagsFinder
+      .new(project, current_user, scope: params[:scope])
+      .execute
+      .page(params[:page])
+      .per(30)
+
+    respond_to do |format|
+      format.html
+      format.json do
+        Gitlab::PollingInterval.set_header(response, interval: 10_000)
+
+        render json: FeatureFlagSerializer
+          .new(project: @project, current_user: @current_user)
+          .with_pagination(request, response)
+          .represent(@feature_flags)
+      end
+    end
   end
 
   def new
