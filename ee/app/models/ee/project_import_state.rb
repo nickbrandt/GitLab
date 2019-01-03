@@ -59,7 +59,9 @@ module EE
             state.reset_retry_count
             state.set_next_execution_timestamp
           end
+        end
 
+        after_transition started: :finished do |state, _|
           if ::Gitlab::CurrentSettings.current_application_settings.elasticsearch_indexing?
             state.run_after_commit do
               last_indexed_commit = state.project.index_status&.last_commit
