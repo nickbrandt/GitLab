@@ -19,13 +19,13 @@ Handling incoming emails requires an [IMAP]-enabled email account. GitLab
 requires one of the following three strategies:
 
 - Email sub-addressing
-- Dedicated email address
 - Catch-all mailbox
+- Dedicated email address
 
 Let's walk through each of these options.
 
 **If your provider or server supports email sub-addressing, we recommend using it.
-Most features (other than reply by email) only work with sub-addressing.**
+A dedicated email address only supports reply by email.**
 
 [IMAP]: https://en.wikipedia.org/wiki/Internet_Message_Access_Protocol
 
@@ -39,19 +39,19 @@ Gmail, Google Apps, Yahoo! Mail, Outlook.com and iCloud, as well as the
 
 [Postfix mail server]: reply_by_email_postfix_setup.md
 
-### Dedicated email address
-
-This solution is really simple to set up: you just have to create an email
-address dedicated to receive your users' replies to GitLab notifications.
-
 ### Catch-all mailbox
 
 A [catch-all mailbox](https://en.wikipedia.org/wiki/Catch-all) for a domain will
 "catch all" the emails addressed to the domain that do not exist in the mail
 server.
 
-GitLab can be set up to allow users to comment on issues and merge requests by
-replying to notification emails.
+As of GitLab 11.7, catch-all mailboxes support the same features as
+email sub-addressing.
+
+### Dedicated email address
+
+This solution is really simple to set up: you just have to create an email
+address dedicated to receive your users' replies to GitLab notifications.
 
 ## Set it up
 
@@ -162,14 +162,16 @@ for a real-world example of this exploit.
     gitlab_rails['incoming_email_idle_timeout'] = 60
     ```
 
-    Configuration for Microsoft Exchange mail server w/ IMAP enabled, assumes
-    mailbox incoming@exchange.example.com
+    Configuration for Microsoft Exchange mail server w/ IMAP enabled, assumes the
+    catch-all mailbox incoming@exchange.example.com
 
     ```ruby
     gitlab_rails['incoming_email_enabled'] = true
 
-    # The email address replies are sent to - Exchange does not support sub-addressing so %{key} is not used here
-    gitlab_rails['incoming_email_address'] = "incoming@exchange.example.com"
+    # The email address including the `%{key}` placeholder that will be replaced to reference the item being replied to.
+    # The placeholder can be omitted but if present, it must appear in the "user" part of the address (before the `@`).
+    # Exchange does not support sub-addressing, so a catch-all mailbox must be used.
+    gitlab_rails['incoming_email_address'] = "incoming-%{key}@exchange.example.com"
 
     # Email account username
     # Typically this is the userPrincipalName (UPN)
@@ -281,15 +283,17 @@ for a real-world example of this exploit.
       idle_timeout: 60
     ```
 
-    Configuration for Microsoft Exchange mail server w/ IMAP enabled, assumes
-    mailbox incoming@exchange.example.com
+    Configuration for Microsoft Exchange mail server w/ IMAP enabled, assumes the
+    catch-all mailbox incoming@exchange.example.com
 
     ```yaml
     incoming_email:
       enabled: true
 
-      # The email address replies are sent to - Exchange does not support sub-addressing so %{key} is not used here
-      address: "incoming@exchange.example.com"
+      # The email address including the `%{key}` placeholder that will be replaced to reference the item being replied to.
+      # The placeholder can be omitted but if present, it must appear in the "user" part of the address (before the `@`).
+      # Exchange does not support sub-addressing, so a catch-all mailbox must be used.
+      address: "incoming-%{key}@exchange.example.com"
 
       # Email account username
       # Typically this is the userPrincipalName (UPN)
