@@ -3,7 +3,7 @@
 module Gitlab
   module BackgroundMigration
     # A Project/MergeRequest level migration, aiming to convert existing data
-    # (from approvers, approver_groups and approvals tables)
+    # (from approvers, approver_groups tables)
     # to new rule based schema.
     class MigrateApproverToApprovalRules
       include Gitlab::Utils::StrongMemoize
@@ -16,7 +16,7 @@ module Gitlab
         self.table_name = 'approver_groups'
       end
 
-      class ApprovalMergeRequestRule < ApplicationRecord
+      class ApprovalMergeRequestRule < ActiveRecord::Base
         self.table_name = 'approval_merge_request_rules'
 
         include Gitlab::Utils::StrongMemoize
@@ -27,38 +27,15 @@ module Gitlab
 
         has_and_belongs_to_many :users
         has_and_belongs_to_many :groups, class_name: 'Group', join_table: :approval_merge_request_rules_groups
-        has_and_belongs_to_many :approvals # This is only populated after merge request is merged
-        has_many :approved_approvers, through: :approvals, source: :user
         has_one :approval_merge_request_rule_source
         has_one :approval_project_rule, through: :approval_merge_request_rule_source
 
         def project
           merge_request.target_project
         end
-
-        # Users who are eligible to approve, including specified group members.
-        # Excludes the author if 'self-approval' isn't explicitly
-        # enabled on project settings.
-        # @return [Array<User>]
-        def approvers
-          strong_memoize(:approvers) do
-            scope = User.from_union(
-              [
-                users,
-                User.joins(:group_members).where(members: { source_id: groups })
-              ]
-            )
-
-            if merge_request.author && !project.merge_requests_author_approval?
-              scope = scope.where.not(id: merge_request.author)
-            end
-
-            scope
-          end
-        end
       end
 
-      class ApprovalMergeRequestRuleSource < ApplicationRecord
+      class ApprovalMergeRequestRuleSource < ActiveRecord::Base
         self.table_name = 'approval_merge_request_rule_sources'
         belongs_to :approval_merge_request_rule
         belongs_to :approval_project_rule
@@ -79,9 +56,7 @@ module Gitlab
         include ::EachBatch
 
         belongs_to :target_project, class_name: "Project"
-        belongs_to :author, class_name: "User"
         has_many :approval_rules, class_name: 'ApprovalMergeRequestRule'
-        has_many :approvals
 
         def approvers
           Approver.where(target_type: 'MergeRequest', target_id: id)
@@ -89,10 +64,6 @@ module Gitlab
 
         def approver_groups
           ApproverGroup.where(target_type: 'MergeRequest', target_id: id)
-        end
-
-        def merged?
-          state == 'merged'
         end
 
         def sync_code_owners_with_approvers
@@ -116,11 +87,7 @@ module Gitlab
       end
 
       class User < ActiveRecord::Base
-        include FromUnion
-
         self.table_name = 'users'
-
-        has_many :group_members, -> { where(requested_at: nil) }, source: 'GroupMember'
       end
 
       ALLOWED_TARGET_TYPES = %w{MergeRequest Project}.freeze

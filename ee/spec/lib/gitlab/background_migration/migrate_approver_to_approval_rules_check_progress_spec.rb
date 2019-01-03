@@ -17,7 +17,7 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRulesCheckProgres
     it 'enables feature' do
       allow(Gitlab::BackgroundMigration).to receive(:exists?).with('MigrateApproverToApprovalRulesInBatch').and_return(false)
 
-      expect(Feature).to receive(:enable).and_return(:approval_rule)
+      expect(Feature).to receive(:enable).with(:approval_rule)
 
       described_class.new.perform
     end
