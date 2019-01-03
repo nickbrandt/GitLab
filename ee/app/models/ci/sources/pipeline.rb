@@ -6,7 +6,7 @@ module Ci
       self.table_name = "ci_sources_pipelines"
 
       belongs_to :project, class_name: Project
-      belongs_to :pipeline, class_name: Ci::Pipeline
+      belongs_to :pipeline, class_name: Ci::Pipeline, inverse_of: :source_pipeline
 
       belongs_to :source_project, class_name: Project, foreign_key: :source_project_id
       belongs_to :source_job, class_name: CommitStatus, foreign_key: :source_job_id

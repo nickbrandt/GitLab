@@ -19,7 +19,7 @@ module EE
         has_many :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::OccurrencePipeline'
         has_many :vulnerabilities, source: :occurrence, through: :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::Occurrence'
 
-        has_one :source_pipeline, class_name: ::Ci::Sources::Pipeline
+        has_one :source_pipeline, class_name: ::Ci::Sources::Pipeline, inverse_of: :pipeline
         has_many :sourced_pipelines, class_name: ::Ci::Sources::Pipeline, foreign_key: :source_pipeline_id
 
         has_one :triggered_by_pipeline, through: :source_pipeline, source: :source_pipeline

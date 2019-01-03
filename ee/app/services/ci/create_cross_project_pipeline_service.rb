@@ -19,15 +19,7 @@ module Ci
         return bridge.drop!(:insufficient_bridge_permissions)
       end
 
-      create_pipeline do |pipeline|
-        source = bridge.sourced_pipelines.build(
-          source_pipeline: bridge.pipeline,
-          source_project: bridge.project,
-          project: target_project,
-          pipeline: pipeline)
-
-        pipeline.source_pipeline = source
-      end
+      create_pipeline!
     end
 
     private
@@ -42,11 +34,15 @@ module Ci
         can?(target_user, :create_pipeline, target_project)
     end
 
-    def create_pipeline
+    def create_pipeline!
       ::Ci::CreatePipelineService
         .new(target_project, target_user, ref: target_ref)
         .execute(:pipeline, ignore_skip_ci: true) do |pipeline|
-          yield pipeline
+          @bridge.sourced_pipelines.build(
+            source_pipeline: @bridge.pipeline,
+            source_project: @bridge.project,
+            project: target_project,
+            pipeline: pipeline)
         end
     end
 
