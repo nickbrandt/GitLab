@@ -14,7 +14,7 @@ and the open core [GitLab Enterprise Edition (EE)](https://gitlab.com/gitlab-org
 available through [different subscriptions](https://about.gitlab.com/pricing/).
 
 You can [install GitLab CE or GitLab EE](https://about.gitlab.com/installation/ce-or-ee/),
-but the features you'll have access to depend on the subscription you choose
+however the features you'll have access to depend on the subscription you choose
 (Core, Starter, Premium, or Ultimate). GitLab Community Edition installations
 only have access to Core features.
 
@@ -34,7 +34,7 @@ Learn how to install, configure, update, and maintain your GitLab instance.
   - [Omnibus support for log forwarding](https://docs.gitlab.com/omnibus/settings/logs.html#udp-log-shipping-gitlab-enterprise-edition-only) **[STARTER ONLY]**
 - [High Availability](high_availability/README.md): Configure multiple servers for scaling or high availability.
   - [High Availability on AWS](../university/high-availability/aws/README.md): Set up GitLab HA on Amazon AWS.
-- [Geo](geo/replication/index.md): Replicate your GitLab instance to other geographical locations as a read-only fully operational version. **[PREMIUM ONLY]**
+- [Geo](geo/replication/index.md): Replicate your GitLab instance to other geographic locations as a read-only fully operational version. **[PREMIUM ONLY]**
 - [Disaster Recovery](geo/disaster_recovery/index.md): Quickly fail-over to a different site with minimal effort in a disaster situation. **[PREMIUM ONLY]**
 - [Pivotal Tile](../install/pivotal/index.md): Deploy GitLab as a pre-configured appliance using Ops Manager (BOSH) for Pivotal Cloud Foundry. **[PREMIUM ONLY]**
 
@@ -46,9 +46,8 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 - [Usage statistics, version check, and usage ping](../user/admin_area/settings/usage_statistics.md): Enable or disable information about your instance to be sent to GitLab, Inc.
 - [Polling](polling.md): Configure how often the GitLab UI polls for updates.
 - [GitLab Pages configuration](pages/index.md): Enable and configure GitLab Pages.
-- [GitLab Pages configuration for GitLab source installations](pages/source.md): Enable and configure GitLab Pages on
+- [GitLab Pages configuration for GitLab source installations](pages/source.md): Enable and configure GitLab Pages on [source installations](../install/installation.md#installation-from-source).
 - [Uploads configuration](uploads.md): Configure GitLab uploads storage.
-[source installations](../install/installation.md#installation-from-source).
 - [Environment variables](environment_variables.md): Supported environment variables that can be used to override their defaults values in order to configure GitLab.
 - [Plugins](plugins.md): With custom plugins, GitLab administrators can introduce custom integrations without modifying GitLab's source code.
 - [Enforcing Terms of Service](../user/admin_area/settings/terms.md)
@@ -66,7 +65,7 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 - [Branded login page](../customization/branded_login_page.md): Customize the login page with your own logo, title, and description.
 - [Welcome message](../customization/welcome_message.md): Add a custom welcome message to the sign-in page.
 - ["New Project" page](../customization/new_project_page.md): Customize the text to be displayed on the page that opens whenever your users create a new project.
-- **(Premium)** [Additional email text](../user/admin_area/settings/email.md): Set a custom message that appears at the bottom of every email.
+- [Additional custom email text](../user/admin_area/settings/email.md#custom-additional-text): Add additional custom text to emails sent from GitLab. **[PREMIUM ONLY]**
 
 ### Maintaining GitLab
 
@@ -91,7 +90,7 @@ Learn how to install, configure, update, and maintain your GitLab instance.
 
 - [Mattermost](https://docs.gitlab.com/omnibus/gitlab-mattermost/): Integrate with [Mattermost](https://about.mattermost.com/), an open source, private cloud workplace for web messaging.
 - [PlantUML](integration/plantuml.md): Create simple diagrams in AsciiDoc and Markdown documents
-created in snippets, wikis, and repos.
+  created in snippets, wikis, and repos.
 - [Web terminals](integration/terminal.md): Provide terminal access to your applications deployed to Kubernetes from within GitLab's CI/CD [environments](../ci/environments.md#web-terminals).
 
 ## User settings and permissions
@@ -113,7 +112,6 @@ created in snippets, wikis, and repos.
   basic Postfix mail server with IMAP authentication on Ubuntu for incoming
   emails.
 - [Abuse reports](../user/admin_area/abuse_reports.md): View and resolve abuse reports from your users.
-- **(Premium)** [Additional custom email text](../user/admin_area/settings/email.md): Set a custom message that appears at the bottom of the every email.
 
 [reply by email]: reply_by_email.md
 [issues by email]: ../user/project/issues/create_new_issue.md#new-issue-via-email
