@@ -1,5 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.6.3 (2019-01-04)
+
+### Fixed (1 change)
+
+- Fix instance project templates no longer working. !9019
+
+
 ## 11.6.2 (2019-01-02)
 
 ### Fixed (1 change)
