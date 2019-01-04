@@ -48,7 +48,7 @@ export default {
   <div class="dashboard-filter">
     <strong class="js-name">{{ filter.name }}</strong>
     <report-type-popover
-      v-if="filterId === 'type'"
+      v-if="filterId === 'report_type'"
       :dashboard-documentation="dashboardDocumentation"
     />
     <gl-dropdown :text="selectedOptionText" class="d-block mt-1">

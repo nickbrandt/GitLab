@@ -19,13 +19,17 @@ export default () => ({
     },
     {
       name: 'Report type',
-      id: 'type',
+      id: 'report_type',
       options: [
         {
-          name: REPORT_TYPES.sast,
-          id: 'sast',
+          name: 'All',
+          id: 'all',
           selected: true,
         },
+        ...Object.entries(REPORT_TYPES).map(type => {
+          const [id, name] = type;
+          return { id, name };
+        }),
       ],
     },
   ],
