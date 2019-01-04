@@ -69,9 +69,10 @@ describe Projects::CreateFromTemplateService do
       end
     end
 
-    context 'creates project from custom template' do
+    shared_examples 'creates project from custom template' do |subgroup_id|
       # If we move the project inside a let block it throws a SEGFAULT error
       before do
+        project_params[:group_with_project_templates_id] = subgroup_id
         @project = subject.execute
       end
 
@@ -90,6 +91,9 @@ describe Projects::CreateFromTemplateService do
         end
       end
     end
+
+    it_behaves_like 'creates project from custom template', nil
+    it_behaves_like 'creates project from custom template', ''
 
     describe 'creating project from a Group project template', :postgresql do
       let(:project_name) { project_template.name }

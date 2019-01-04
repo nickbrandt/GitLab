@@ -28,9 +28,13 @@ module EE
 
       def template_project
         strong_memoize(:template_project) do
-          current_user.available_custom_project_templates(search: template_name, subgroup_id: params[:group_with_project_templates_id])
+          current_user.available_custom_project_templates(search: template_name, subgroup_id: subgroup_id)
                       .first
         end
+      end
+
+      def subgroup_id
+        params[:group_with_project_templates_id].presence
       end
     end
   end
