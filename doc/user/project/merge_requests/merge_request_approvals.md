@@ -157,7 +157,7 @@ new commits are pushed to the source branch of the merge request:
 
 1. Navigate to your project's **Settings > General** and expand
    **Merge request approvals**
-1. Tick the "Can override approvers and approvals required per merge request"
+1. Tick the "Remove all approvals in a merge request when new commits are pushed to its source branch"
    checkbox
 
     ![Approvals remove on push](img/approvals_remove_on_push.png)
