@@ -15,6 +15,10 @@ module Gitlab
     TimeoutError = Class.new(StandardError)
     ProjectMovedError = Class.new(NotFoundError)
 
+    # Use the magic string '_any' to indicate we do not know what the
+    # changes are. This is also what gitlab-shell does.
+    ANY = '_any'
+
     ERROR_MESSAGES = {
       upload: 'You are not allowed to upload code for this project.',
       download: 'You are not allowed to download code from this project.',
@@ -27,7 +31,8 @@ module Gitlab
       upload_pack_disabled_over_http: 'Pulling over HTTP is not allowed.',
       receive_pack_disabled_over_http: 'Pushing over HTTP is not allowed.',
       read_only: 'The repository is temporarily read-only. Please try again later.',
-      cannot_push_to_read_only: "You can't push code to a read-only GitLab instance."
+      cannot_push_to_read_only: "You can't push code to a read-only GitLab instance.",
+      push_code: 'You are not allowed to push code to this project.'
     }.freeze
 
     INTERNAL_TIMEOUT = 50.seconds.freeze
@@ -202,7 +207,7 @@ module Gitlab
 
     def ensure_project_on_push!(cmd, changes)
       return if project || deploy_key?
-      return unless receive_pack?(cmd) && changes == '_any' && authentication_abilities.include?(:push_code)
+      return unless receive_pack?(cmd) && changes == ANY && authentication_abilities.include?(:push_code)
 
       namespace = Namespace.find_by_full_path(namespace_path)
 
@@ -263,54 +268,42 @@ module Gitlab
         raise UnauthorizedError, ERROR_MESSAGES[:upload]
       end
 
-      return if changes.blank? # Allow access this is needed for EE.
-
-      if check_size_limit? && project.above_size_limit?
-        raise UnauthorizedError, Gitlab::RepositorySizeError.new(project).push_error
-      end
-
-      if ::License.block_changes?
-        message = ::LicenseHelper.license_message(signed_in: true, is_admin: (user && user.admin?))
-        raise UnauthorizedError, strip_tags(message)
-      end
-
       check_change_access!
     end
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def check_change_access!
-      # If there are worktrees with a HEAD pointing to a non-existent object,
-      # calls to `git rev-list --all` will fail in git 2.15+. This should also
-      # clear stale lock files.
-      project.repository.clean_stale_repository_files
+      # Deploy keys with write access can push anything
+      return if deploy_key?
 
-      push_size_in_bytes = 0
+      if changes == ANY
+        can_push = user_access.can_do_action?(:push_code) ||
+          project.any_branch_allows_collaboration?(user_access.user)
 
-      # Iterate over all changes to find if user allowed all of them to be applied
-      changes_list.each.with_index do |change, index|
-        first_change = index == 0
+        unless can_push
+          raise GitAccess::UnauthorizedError, ERROR_MESSAGES[:push_code]
+        end
+      else
+        # If there are worktrees with a HEAD pointing to a non-existent object,
+        # calls to `git rev-list --all` will fail in git 2.15+. This should also
+        # clear stale lock files.
+        project.repository.clean_stale_repository_files
 
-        # If user does not have access to make at least one change, cancel all
-        # push by allowing the exception to bubble up
-        check_single_change_access(change, skip_lfs_integrity_check: !first_change)
+        # Iterate over all changes to find if user allowed all of them to be applied
+        changes_list.each.with_index do |change, index|
+          first_change = index == 0
 
-        if project.size_limit_enabled?
-          push_size_in_bytes += repository.new_blobs(change[:newrev]).sum(&:size)
+          # If user does not have access to make at least one change, cancel all
+          # push by allowing the exception to bubble up
+          check_single_change_access(change, skip_lfs_integrity_check: !first_change)
         end
       end
-
-      if check_size_limit? && project.changes_will_exceed_size_limit?(push_size_in_bytes)
-        raise UnauthorizedError, Gitlab::RepositorySizeError.new(project).new_changes_error
-      end
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     def check_single_change_access(change, skip_lfs_integrity_check: false)
       change_access = Checks::ChangeAccess.new(
         change,
         user_access: user_access,
         project: project,
-        skip_authorization: deploy_key?,
         skip_lfs_integrity_check: skip_lfs_integrity_check,
         protocol: protocol,
         logger: logger
@@ -375,16 +368,8 @@ module Gitlab
 
     protected
 
-    def check_size_limit?
-      strong_memoize(:check_size_limit) do
-        changes_list.any? do |change|
-          change[:newrev] && change[:newrev] != ::Gitlab::Git::BLANK_SHA
-        end
-      end
-    end
-
     def changes_list
-      @changes_list ||= Gitlab::ChangesList.new(changes)
+      @changes_list ||= Gitlab::ChangesList.new(changes == ANY ? [] : changes)
     end
 
     def user

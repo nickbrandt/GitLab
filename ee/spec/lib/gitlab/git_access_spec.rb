@@ -253,7 +253,7 @@ describe Gitlab::GitAccess do
     let(:actor) { :geo }
 
     it { expect { pull_changes }.not_to raise_error }
-    it { expect { push_changes }.to raise_unauthorized(Gitlab::GitAccess::ERROR_MESSAGES[:push_code]) }
+    it { expect { push_changes }.to raise_unauthorized(Gitlab::GitAccess::ERROR_MESSAGES[:upload]) }
   end
 
   private
