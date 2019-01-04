@@ -62,7 +62,6 @@ module Vulnerabilities
 
     scope :report_type, -> (type) { where(report_type: self.report_types[type]) }
     scope :ordered, -> { order("severity desc", :id) }
-    scope :counted_by_report_and_severity, -> { group(:report_type, :severity).count }
 
     scope :by_report_types, -> (values) { where(report_type: values) }
     scope :by_projects, -> (values) { where(project_id: values) }
@@ -83,6 +82,10 @@ module Vulnerabilities
         .where(['vulnerability_occurrence_pipelines.created_at >= ?', Date.today - period])
         .group(:day, :severity)
         .order('day')
+    end
+
+    def self.counted_by_severity
+      group(:severity).count
     end
 
     def feedback(feedback_type:)

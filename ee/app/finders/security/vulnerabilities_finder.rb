@@ -21,8 +21,8 @@ module Security
       @params = params
     end
 
-    def execute
-      collection = group.latest_vulnerabilities
+    def execute(scope = :latest)
+      collection = init_collection(scope)
       collection = by_report_type(collection)
       collection = by_project(collection)
       collection = by_severity(collection)
@@ -51,6 +51,10 @@ module Security
       items.by_severities(
         Vulnerabilities::Occurrence::LEVELS.values_at(
           *params[:severity]).compact)
+    end
+
+    def init_collection(scope)
+      scope == :all ? group.all_vulnerabilities : group.latest_vulnerabilities
     end
   end
 end
