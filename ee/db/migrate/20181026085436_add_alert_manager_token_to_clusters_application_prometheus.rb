@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AddAlertManagerTokenToClustersApplicationPrometheus < ActiveRecord::Migration
+class AddAlertManagerTokenToClustersApplicationPrometheus < ActiveRecord::Migration[5.0]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false

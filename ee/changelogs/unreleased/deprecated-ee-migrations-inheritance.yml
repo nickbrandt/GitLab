@@ -1,0 +1,6 @@
+---
+title: ActiveRecord::Migration -> ActiveRecord::Migration[5.0] for AddAlertManagerTokenToClustersApplicationPrometheus
+  and EnqueuePrometheusUpdates
+merge_request: 9049
+author: Jasper Maes
+type: other
