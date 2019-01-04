@@ -6,9 +6,10 @@ from source, follow the
 [Geo database replication (source)](database_source.md) guide.
 
 NOTE: **Note:**
-If your GitLab installation uses external PostgreSQL, the Omnibus roles
-will not be able to perform all necessary configuration steps. Refer to the
-section on [External PostgreSQL][external postgresql] for additional instructions.
+If your GitLab installation uses external (not managed by Omnibus) PostgreSQL
+instances, the Omnibus roles will not be able to perform all necessary
+configuration steps. In this case, refer to
+[additional instructions](external_database.md).
 
 NOTE: **Note:**
 The stages of the setup process must be completed in the documented order.
@@ -20,7 +21,6 @@ have to change some values according to your database setup, how big it is, etc.
 
 You are encouraged to first read through all the steps before executing them
 in your testing/production environment.
-
 
 ## PostgreSQL replication
 
@@ -49,11 +49,10 @@ The following guide assumes that:
   secondary's IP will be `5.6.7.8`. Note that the primary and secondary servers
   **must** be able to communicate over these addresses. More on this in the
   guide below.
-  
-CAUTION: **Warning:**
-Geo works with streaming replication. Logical replication is not supported at this time. 
-There is an [issue where support is being discussed](https://gitlab.com/gitlab-org/gitlab-ee/issues/7420).
 
+CAUTION: **Warning:**
+Geo works with streaming replication. Logical replication is not supported at this time.
+There is an [issue where support is being discussed](https://gitlab.com/gitlab-org/gitlab-ee/issues/7420).
 
 ### Step 1. Configure the primary server
 
@@ -117,7 +116,7 @@ There is an [issue where support is being discussed](https://gitlab.com/gitlab-o
     For security reasons, PostgreSQL does not listen on any network interfaces
     by default. However, Geo requires the secondary to be able to
     connect to the primary's database. For this reason, we need the address of
-    each node. Note: For external PostgreSQL instances, see [additional instructions][external postgresql].
+    each node. Note: For external PostgreSQL instances, see [additional instructions](external_database.md).
 
     If you are using a cloud provider, you can lookup the addresses for each
     Geo node through your cloud provider's management console.
@@ -291,7 +290,6 @@ There is an [issue where support is being discussed](https://gitlab.com/gitlab-o
     editor server.crt
     ```
 
-
 1. Set up PostgreSQL TLS verification on the secondary
 
     Install the `server.crt` file:
@@ -318,7 +316,7 @@ There is an [issue where support is being discussed](https://gitlab.com/gitlab-o
     Ensure that the contents of `~gitlab-psql/data/server.crt` on the primary
     match the contents of `~gitlab-psql/.postgresql/root.crt` on the secondary.
 
-1. Configure PostreSQL to enable FDW support
+1. Configure PostgreSQL to enable FDW support
 
     This step is similar to how we configured the primary instance.
     We need to enable this, to enable FDW support, even if using a single node.
@@ -353,7 +351,7 @@ There is an [issue where support is being discussed](https://gitlab.com/gitlab-o
     geo_secondary['db_fdw'] = true
     ```
 
-    For external PostgreSQL instances, [see additional instructions][external postgresql].
+    For external PostgreSQL instances, see [additional instructions](external_database.md).
     If you bring a former **primary** node back online to serve as a **secondary** node, then you also need to remove `roles ['geo_primary_role']` or `geo_primary_role['enable'] = true`.
 
 1. Reconfigure GitLab for the changes to take effect:
@@ -430,137 +428,6 @@ data before running `pg_basebackup`.
 
 The replication process is now complete.
 
-### External PostgreSQL instances
-
-For installations using external PostgreSQL instances, the `geo_primary_role`
-and `geo_secondary_role` includes configuration changes that must be applied
-manually.
-
-The `geo_primary_role` makes configuration changes to `pg_hba.conf` and
-`postgresql.conf` on the primary:
-
-```
-##
-## Geo Primary
-## - pg_hba.conf
-##
-host    replication gitlab_replicator <trusted secondary IP>/32     md5
-```
-
-```
-##
-## Geo Primary Role
-## - postgresql.conf
-##
-sql_replication_user = gitlab_replicator
-wal_level = hot_standby
-max_wal_senders = 10
-wal_keep_segments = 50
-max_replication_slots = 1 # number of secondary instances
-hot_standby = on
-```
-
-The `geo_secondary_role` makes configuration changes to `postgresql.conf` and
-enables the Geo Log Cursor (`geo_logcursor`) and secondary tracking database
-on the secondary. The PostgreSQL settings for this database it adds to
-the default settings:
-
-```
-##
-## Geo Secondary Role
-## - postgresql.conf
-##
-wal_level = hot_standby
-max_wal_senders = 10
-wal_keep_segments = 10
-hot_standby = on
-```
-
-#### Tracking Database for the Secondary nodes
-
-NOTE: **Note**:
-You only need to follow the steps below if you are not using the managed
-PostgreSQL from a Omnibus GitLab package.
-
-Geo secondary nodes use a tracking database to keep track of replication
-status and recover automatically from some replication issues.
-
-This is a separate PostgreSQL installation that can be configured to use
-FDW to connect with the secondary database for improved performance.
-
-To enable an external PostgreSQL instance as tracking database, follow
-the instructions below:
-
-1. Edit `/etc/gitlab/gitlab.rb` with the connection params and credentials
-
-    ```ruby
-    # note this is shared between both databases,
-    # make sure you define the same password in both
-    gitlab_rails['db_password'] = 'mypassword'
-
-    geo_secondary['db_host'] = '2.3.4.5' # change to the correct public IP
-    geo_secondary['db_port'] = 5431      # change to the correct port
-    geo_secondary['db_fdw'] = true       # enable FDW
-    geo_postgresql['enable'] = false     # don't use internal managed instance
-    ```
-
-1. Reconfigure GitLab for the changes to take effect:
-
-    ```bash
-    gitlab-ctl reconfigure
-    ```
-
-1. Run the tracking database migrations:
-
-    ```bash
-    gitlab-rake geo:db:migrate
-    ```
-
-1. Configure the [PostgreSQL FDW][FDW] connection and credentials:
-
-    Save the script below in a file, ex. `/tmp/geo_fdw.sh` and modify the connection
-    params to match your environment. Execute it to set up the FDW connection.
-
-    ```bash
-    #!/bin/bash
-
-    # Secondary Database connection params:
-    DB_HOST="5.6.7.8" # change to the public IP or VPC private IP
-    DB_NAME="gitlabhq_production"
-    DB_USER="gitlab"
-    DB_PORT="5432"
-
-    # Tracking Database connection params:
-    GEO_DB_HOST="2.3.4.5" # change to the public IP or VPC private IP
-    GEO_DB_NAME="gitlabhq_geo_production"
-    GEO_DB_USER="gitlab_geo"
-    GEO_DB_PORT="5432"
-
-    query_exec () {
-      gitlab-psql -h $GEO_DB_HOST -d $GEO_DB_NAME -p $GEO_DB_PORT -c "${1}"
-    }
-
-    query_exec "CREATE EXTENSION postgres_fdw;"
-    query_exec "CREATE SERVER gitlab_secondary FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host '${DB_HOST}', dbname '${DB_NAME}', port '${DB_PORT}');"
-    query_exec "CREATE USER MAPPING FOR ${GEO_DB_USER} SERVER gitlab_secondary OPTIONS (user '${DB_USER}');"
-    query_exec "CREATE SCHEMA gitlab_secondary;"
-    query_exec "GRANT USAGE ON FOREIGN SERVER gitlab_secondary TO ${GEO_DB_USER};"
-    ```
-
-    NOTE: **Note:** The script template above uses `gitlab-psql` as it's intended to be executed from the Geo machine,
-    but you can change it to `psql` and run it from any machine that has access to the database.
-
-1. Restart GitLab
-
-    ```bash
-    gitlab-ctl restart
-    ```
-2. Populate the FDW tables
-
-    ```bash
-    gitlab-rake geo:db:refresh_foreign_tables
-    ```
-
 ## PGBouncer support (optional)
 
 [PGBouncer](http://pgbouncer.github.io/) may be used with GitLab Geo to pool
@@ -575,14 +442,14 @@ it will need a separate read-only user to make [PostgreSQL FDW queries][FDW]
 work:
 
 1. On the primary Geo database, enter the PostgreSQL on the console as an
-admin user. If you are using an Omnibus-managed database, log onto the primary
-node that is running the PostgreSQL database:
+    admin user. If you are using an Omnibus-managed database, log onto the primary
+    node that is running the PostgreSQL database:
 
     ```bash
      sudo -u gitlab-psql /opt/gitlab/embedded/bin/psql -h /var/opt/gitlab/postgresql gitlabhq_production
     ```
 
-2. Then create the read-only user:
+1. Then create the read-only user:
 
     ```sql
     -- NOTE: Use the password defined earlier
@@ -598,13 +465,13 @@ node that is running the PostgreSQL database:
     ALTER DEFAULT PRIVILEGES FOR USER gitlab IN SCHEMA public GRANT SELECT ON SEQUENCES TO gitlab_geo_fdw;
     ```
 
-3. On the Geo secondary nodes, change `/etc/gitlab/gitlab.rb`:
+1. On the Geo secondary nodes, change `/etc/gitlab/gitlab.rb`:
 
     ```
     geo_postgresql['fdw_external_user'] = 'gitlab_geo_fdw'
     ```
 
-4. Save the file and reconfigure GitLab for the changes to be applied:
+1. Save the file and reconfigure GitLab for the changes to be applied:
 
     ```bash
     gitlab-ctl reconfigure
@@ -621,8 +488,6 @@ Read the [troubleshooting document](troubleshooting.md).
 [replication-slots-article]: https://medium.com/@tk512/replication-slots-in-postgresql-b4b03d277c75
 [pgback]: http://www.postgresql.org/docs/9.2/static/app-pgbasebackup.html
 [replication user]:https://wiki.postgresql.org/wiki/Streaming_Replication
-[external postgresql]: #external-postgresql-instances
-[tracking]: database_source.md#enable-tracking-database-on-the-secondary-server
 [FDW]: https://www.postgresql.org/docs/9.6/static/postgres-fdw.html
 [toc]: index.md#using-omnibus-gitlab
 [rake-maintenance]: ../../raketasks/maintenance.md

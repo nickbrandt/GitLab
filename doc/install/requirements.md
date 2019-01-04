@@ -141,7 +141,17 @@ On some systems you may need to install an additional package (e.g.
 
 #### Additional requirements for GitLab Geo
 
-If you are using [GitLab Geo](https://docs.gitlab.com/ee/development/geo.html), the [tracking database](https://docs.gitlab.com/ee/development/geo.html#geo-tracking-database) also requires the `postgres_fdw` extension.
+If you are using [GitLab Geo](https://docs.gitlab.com/ee/development/geo.html):
+
+- We strongly recommend running Omnibus-managed instances as they are actively
+  developed and tested. We aim to be compatible with most external (not managed
+  by Omnibus) databases (for example, AWS RDS) but we do not guarantee
+  compatibility.
+- The
+  [tracking database](https://docs.gitlab.com/ee/development/geo.html#geo-tracking-database)
+  requires the
+  [postgres_fdw](https://www.postgresql.org/docs/9.6/static/postgres-fdw.html)
+  extension.
 
 ```
 CREATE EXTENSION postgres_fdw;
