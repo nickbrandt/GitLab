@@ -13,6 +13,8 @@ import mockDataVulnerabilitiesHistory from './data/mock_data_vulnerabilities_his
 
 describe('vulnerabiliites count actions', () => {
   const data = mockDataVulnerabilitiesCount;
+  const params = { filters: { type: ['sast'] } };
+  const filteredData = mockDataVulnerabilitiesCount.sast;
 
   describe('setVulnerabilitiesCountEndpoint', () => {
     it('should commit the correct mutuation', done => {
@@ -50,7 +52,11 @@ describe('vulnerabiliites count actions', () => {
 
     describe('on success', () => {
       beforeEach(() => {
-        mock.onGet(state.vulnerabilitiesCountEndpoint).replyOnce(200, data);
+        mock
+          .onGet(state.vulnerabilitiesCountEndpoint, { params })
+          .replyOnce(200, filteredData)
+          .onGet(state.vulnerabilitiesCountEndpoint)
+          .replyOnce(200, data);
       });
 
       it('should dispatch the request and success actions', done => {
@@ -64,6 +70,23 @@ describe('vulnerabiliites count actions', () => {
             {
               type: 'receiveVulnerabilitiesCountSuccess',
               payload: { data },
+            },
+          ],
+          done,
+        );
+      });
+
+      it('should send the passed filters to the endpoint', done => {
+        testAction(
+          actions.fetchVulnerabilitiesCount,
+          params,
+          state,
+          [],
+          [
+            { type: 'requestVulnerabilitiesCount' },
+            {
+              type: 'receiveVulnerabilitiesCountSuccess',
+              payload: { data: filteredData },
             },
           ],
           done,
@@ -137,6 +160,8 @@ describe('vulnerabiliites count actions', () => {
 
 describe('vulnerabilities actions', () => {
   const data = mockDataVulnerabilities;
+  const params = { filters: { severity: ['critical'] } };
+  const filteredData = mockDataVulnerabilities.filter(vuln => vuln.severity === 'critical');
   const pageInfo = {
     page: 1,
     nextPage: 2,
@@ -169,7 +194,11 @@ describe('vulnerabilities actions', () => {
 
     describe('on success', () => {
       beforeEach(() => {
-        mock.onGet(state.vulnerabilitiesEndpoint).replyOnce(200, data, headers);
+        mock
+          .onGet(state.vulnerabilitiesEndpoint, { params })
+          .replyOnce(200, filteredData, headers)
+          .onGet(state.vulnerabilitiesEndpoint)
+          .replyOnce(200, data, headers);
       });
 
       it('should dispatch the request and success actions', done => {
@@ -183,6 +212,23 @@ describe('vulnerabilities actions', () => {
             {
               type: 'receiveVulnerabilitiesSuccess',
               payload: { data, headers },
+            },
+          ],
+          done,
+        );
+      });
+
+      it('should pass through the filters', done => {
+        testAction(
+          actions.fetchVulnerabilities,
+          params,
+          state,
+          [],
+          [
+            { type: 'requestVulnerabilities' },
+            {
+              type: 'receiveVulnerabilitiesSuccess',
+              payload: { data: filteredData, headers },
             },
           ],
           done,
@@ -636,8 +682,10 @@ describe('revert vulnerability dismissal', () => {
   });
 });
 
-describe('vulnerabiliites timeline actions', () => {
+describe('vulnerabilities history actions', () => {
   const data = mockDataVulnerabilitiesHistory;
+  const params = { filters: { severity: ['critical'] } };
+  const filteredData = mockDataVulnerabilitiesHistory.critical;
 
   describe('setVulnerabilitiesHistoryEndpoint', () => {
     it('should commit the correct mutuation', done => {
@@ -675,7 +723,11 @@ describe('vulnerabiliites timeline actions', () => {
 
     describe('on success', () => {
       beforeEach(() => {
-        mock.onGet(state.vulnerabilitiesHistoryEndpoint).replyOnce(200, data);
+        mock
+          .onGet(state.vulnerabilitiesHistoryEndpoint, { params })
+          .replyOnce(200, filteredData)
+          .onGet(state.vulnerabilitiesHistoryEndpoint)
+          .replyOnce(200, data);
       });
 
       it('should dispatch the request and success actions', done => {
@@ -689,6 +741,23 @@ describe('vulnerabiliites timeline actions', () => {
             {
               type: 'receiveVulnerabilitiesHistorySuccess',
               payload: { data },
+            },
+          ],
+          done,
+        );
+      });
+
+      it('return the filtered results', done => {
+        testAction(
+          actions.fetchVulnerabilitiesHistory,
+          params,
+          state,
+          [],
+          [
+            { type: 'requestVulnerabilitiesHistory' },
+            {
+              type: 'receiveVulnerabilitiesHistorySuccess',
+              payload: { data: filteredData },
             },
           ],
           done,

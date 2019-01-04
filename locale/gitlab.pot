@@ -7534,9 +7534,6 @@ msgstr ""
 msgid "SAML for %{group_name}"
 msgstr ""
 
-msgid "SAST"
-msgstr ""
-
 msgid "SHA1 fingerprint of the SAML token signing certificate. Get this from your identity provider, where it can also be called \"Thumbprint\"."
 msgstr ""
 
