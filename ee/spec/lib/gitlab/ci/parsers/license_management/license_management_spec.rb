@@ -9,7 +9,7 @@ describe Gitlab::Ci::Parsers::LicenseManagement::LicenseManagement do
     let(:report) { Gitlab::Ci::Reports::LicenseManagement::Report.new }
 
     context 'when data is a JSON license management report' do
-      let(:data) { File.read(Rails.root.join('ee/spec/fixtures/license_management/report.json')) }
+      let(:data) { File.read(Rails.root.join('spec/fixtures/security-reports/master/gl-license-management-report.json')) }
 
       it 'parses without error' do
         expect { subject }.not_to raise_error

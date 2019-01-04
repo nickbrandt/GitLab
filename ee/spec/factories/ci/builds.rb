@@ -29,15 +29,9 @@ FactoryBot.define do
     end
   end
 
-  trait :license_management_report do
+  trait :license_management_feature_branch do
     after(:build) do |build|
-      build.job_artifacts << create(:ee_ci_job_artifact, :license_management_report, job: build)
-    end
-  end
-
-  trait :license_management_report_2 do
-    after(:build) do |build|
-      build.job_artifacts << create(:ee_ci_job_artifact, :license_management_report_2, job: build)
+      build.job_artifacts << create(:ee_ci_job_artifact, :license_management_feature_branch, job: build)
     end
   end
 
