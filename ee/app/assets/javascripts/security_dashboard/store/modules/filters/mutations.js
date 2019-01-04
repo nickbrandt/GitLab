@@ -25,6 +25,11 @@ export default {
         });
       }
 
+      // This prevents us from selecting nothing at all
+      if (!activeOptions.find(option => option.selected)) {
+        activeOptions[0].selected = true;
+      }
+
       activeFilter.options = activeOptions;
     }
   },
