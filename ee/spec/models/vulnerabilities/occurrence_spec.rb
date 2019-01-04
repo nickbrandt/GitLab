@@ -195,4 +195,16 @@ describe Vulnerabilities::Occurrence do
       end
     end
   end
+
+  describe '.count_by_severity' do
+    let!(:high_vulnerabilities) { create_list(:vulnerabilities_occurrence, 3, severity: :high) }
+    let!(:medium_vulnerabilities) { create_list(:vulnerabilities_occurrence, 2, severity: :medium) }
+    let!(:low_vulnerabilities) { create_list(:vulnerabilities_occurrence, 1, severity: :low) }
+
+    subject { described_class.counted_by_severity }
+
+    it 'returns counts' do
+      is_expected.to eq({ 4 => 1, 5 => 2, 6 => 3 })
+    end
+  end
 end
