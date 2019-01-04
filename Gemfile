@@ -446,3 +446,6 @@ gem 'flipper-active_support_cache_store', '~> 0.13.0'
 # Structured logging
 gem 'lograge', '~> 0.5'
 gem 'grape_logging', '~> 1.7'
+
+# DNS Lookup
+gem 'net-dns', '~> 0.9.0'
