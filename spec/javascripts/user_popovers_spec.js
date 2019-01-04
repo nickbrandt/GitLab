@@ -30,8 +30,8 @@ describe('User Popovers', () => {
   });
 
   it('Should Show+Hide Popover on mouseenter and mouseleave', done => {
-    const targetLink = document.querySelector(selector)
-    const { userId } = target.dataset;
+    const targetLink = document.querySelector(selector);
+    const { userId } = targetLink.dataset;
     triggerEvent('mouseenter', targetLink);
 
     setTimeout(() => {
@@ -53,8 +53,8 @@ describe('User Popovers', () => {
   });
 
   it('Should Not show a popover on short mouse over', done => {
-    const targetLink = document.querySelector(selector)
-    const { userId } = target.dataset;
+    const targetLink = document.querySelector(selector);
+    const { userId } = targetLink.dataset;
     triggerEvent('mouseenter', targetLink);
 
     setTimeout(() => {
