@@ -53,7 +53,6 @@ module Gitlab
 
       class MergeRequest < ActiveRecord::Base
         self.table_name = 'merge_requests'
-        include ::EachBatch
 
         belongs_to :target_project, class_name: "Project"
         has_many :approval_rules, class_name: 'ApprovalMergeRequestRule'
@@ -74,7 +73,6 @@ module Gitlab
       class Project < ActiveRecord::Base
         self.table_name = 'projects'
 
-        has_many :merge_requests, foreign_key: 'target_project_id', inverse_of: :target_project
         has_many :approval_rules, class_name: 'ApprovalProjectRule'
 
         def approvers
@@ -124,8 +122,6 @@ module Gitlab
         ActiveRecord::Base.transaction do
           sync_rule
         end
-
-        schedule_to_migrate_merge_requests(target)
       end
 
       def sync_rule
@@ -138,14 +134,6 @@ module Gitlab
         rule.user_ids = target.approvers.pluck(:user_id)
         rule.group_ids = target.approver_groups.pluck(:group_id)
         rule
-      end
-
-      def schedule_to_migrate_merge_requests(project)
-        jobs = []
-        project.merge_requests.each_batch do |scope, _|
-          jobs << ['MigrateApproverToApprovalRulesInBatch', ['MergeRequest', scope.pluck(:id)]]
-        end
-        BackgroundMigrationWorker.bulk_perform_async(jobs)
       end
 
       def target

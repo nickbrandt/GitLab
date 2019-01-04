@@ -178,16 +178,6 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
       let(:approval_rule) { create(:approval_project_rule, project: target) }
 
       it_behaves_like 'sync approval member'
-
-      context 'when project contains some merge requests' do
-        let!(:merge_request) { create(:merge_request, source_project: target, target_project: target) }
-
-        it 'schedules migrations for all its merge requests' do
-          expect(BackgroundMigrationWorker).to receive(:bulk_perform_async).with([['MigrateApproverToApprovalRulesInBatch', ["MergeRequest", [merge_request.id]]]])
-
-          described_class.new.perform(target.class.name, target.id)
-        end
-      end
     end
   end
 end
