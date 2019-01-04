@@ -29,6 +29,7 @@ export default {
       'pageInfo',
       'vulnerabilities',
     ]),
+    ...mapGetters('filters', ['activeFilters']),
     ...mapGetters('vulnerabilities', ['dashboardListError']),
     showEmptyState() {
       return (
@@ -47,6 +48,9 @@ export default {
   },
   methods: {
     ...mapActions('vulnerabilities', ['fetchVulnerabilities', 'openModal']),
+    fetchPage(page) {
+      this.fetchVulnerabilities({ ...this.activeFilters, page });
+    },
   },
 };
 </script>
@@ -93,7 +97,7 @@ export default {
 
       <pagination
         v-if="showPagination"
-        :change="fetchVulnerabilities"
+        :change="fetchPage"
         :page-info="pageInfo"
         class="justify-content-center prepend-top-default"
       />

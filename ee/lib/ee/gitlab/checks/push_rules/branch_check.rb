@@ -9,7 +9,7 @@ module EE
           LOG_MESSAGE = "Checking if branch follows the naming patterns defined by the project...".freeze
 
           def validate!
-            return unless newrev && oldrev && push_rule
+            return unless push_rule
 
             logger.log_timed(LOG_MESSAGE) do
               unless branch_name_allowed_by_push_rule?

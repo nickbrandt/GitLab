@@ -12,7 +12,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       resource :tracing, only: [:show]
 
       namespace :settings do
-        resource :operations, only: [:show, :update, :create]
+        resource :operations, only: [:show, :update]
       end
 
       resources :autocomplete_sources, only: [] do

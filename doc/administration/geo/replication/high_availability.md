@@ -104,17 +104,33 @@ NOTE: **Note:** The following documentation assumes the database will be run on
 only a single machine, rather than as a PostgreSQL cluster.
 
 Configure the [**secondary** database](database.md) as a read-only replica of
-the **primary** database. Be sure to follow the
-[External PostgreSQL instances](database.md#external-postgresql-instances)
-section.
+the **primary** database.
+
+If using an external PostgreSQL instance, refer also to
+[Geo with external PostgreSQL instances](external_database.md).
 
 ### Step 3: Configure the tracking database on the **secondary** node
 
 NOTE: **Note:** This documentation assumes the tracking database will be run on
 only a single machine, rather than as a PostgreSQL cluster.
 
-Configure the
-[tracking database](database.md#tracking-database-for-the-secondary-nodes).
+Configure the tracking database.
+
+1. Edit `/etc/gitlab/gitlab.rb` in the tracking database machine, and add the
+    following:
+
+    ```ruby
+    ##
+    ## Enable the Geo secondary tracking database
+    ##
+    geo_postgresql['enable'] = true
+    geo_postgresql['ha'] = true
+    ```
+
+After making these changes [Reconfigure GitLab][gitlab-reconfigure] so the changes take effect.
+
+If using an external PostgreSQL instance, refer also to
+[Geo with external PostgreSQL instances](external_database.md).
 
 ### Step 4: Configure the frontend application servers on the **secondary** node
 

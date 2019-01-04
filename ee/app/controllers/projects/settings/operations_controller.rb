@@ -7,40 +7,29 @@ module Projects
       before_action :authorize_update_environment!
 
       def show
-        @tracing_settings ||= ProjectTracingSetting.for_project(@project)
       end
 
       def update
-        result = EE::TracingSettingService.new(project, current_user, operations_params).execute
+        result = ::Projects::Operations::UpdateService.new(project, current_user, update_params).execute
 
-        render_result(result)
-      end
-
-      def create
-        result = EE::TracingSettingService.new(project, current_user, operations_params).execute
-        @tracing_setting = project.tracing_setting
-
-        render_result(result)
+        if result[:status] == :success
+          flash[:notice] = _('Your changes have been saved')
+          redirect_to project_settings_operations_path(@project)
+        else
+          render 'show'
+        end
       end
 
       private
 
-      def render_result(result)
-        respond_to do |format|
-          format.html do
-            if result[:status] == :success
-              flash[:notice] = _('Your changes have been saved')
-            else
-              flash[:alert] = _('Unable to save your changes')
-            end
+      helper_method :tracing_setting
 
-            redirect_to project_settings_operations_path(@project)
-          end
-        end
+      def tracing_setting
+        @tracing_setting ||= project.tracing_setting || project.build_tracing_setting
       end
 
-      def operations_params
-        params.require(:tracing_settings).permit(:external_url)
+      def update_params
+        params.require(:project).permit(tracing_setting_attributes: [:external_url])
       end
 
       def check_license

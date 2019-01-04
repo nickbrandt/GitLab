@@ -1,6 +1,7 @@
 import sha1 from 'sha1';
 import {
   findIssueIndex,
+  findMatchingRemediation,
   parseSastIssues,
   parseDependencyScanningIssues,
   parseSastContainer,
@@ -52,6 +53,50 @@ describe('security reports utils', () => {
       };
 
       expect(findIssueIndex(issuesList, issue)).toEqual(-1);
+    });
+  });
+
+  describe('findMatchingRemediation', () => {
+    const remediation1 = {
+      fixes: [
+        {
+          cve: '123',
+        },
+        {
+          foobar: 'baz',
+        },
+      ],
+      summary: 'Update to x.y.z',
+    };
+
+    const remediation2 = { ...remediation1, summary: 'Remediation2' };
+
+    const impossibleRemediation = {
+      fixes: [],
+      summary: 'Impossible',
+    };
+
+    const remediations = [impossibleRemediation, remediation1, remediation2];
+
+    it('returns null for empty vulnerability', () => {
+      expect(findMatchingRemediation(remediations, {})).toBeNull();
+      expect(findMatchingRemediation(remediations, null)).toBeNull();
+      expect(findMatchingRemediation(remediations, undefined)).toBeNull();
+    });
+
+    it('returns null for empty remediations', () => {
+      expect(findMatchingRemediation([], { cve: '123' })).toBeNull();
+      expect(findMatchingRemediation(null, { cve: '123' })).toBeNull();
+      expect(findMatchingRemediation(undefined, { cve: '123' })).toBeNull();
+    });
+
+    it('returns null for vulnerabilities without remediation', () => {
+      expect(findMatchingRemediation(remediations, { cve: 'NOT_FOUND' })).toBeNull();
+    });
+
+    it('returns first matching remediation for a vulnerability', () => {
+      expect(findMatchingRemediation(remediations, { cve: '123' })).toEqual(remediation1);
+      expect(findMatchingRemediation(remediations, { foobar: 'baz' })).toEqual(remediation1);
     });
   });
 
@@ -140,6 +185,7 @@ describe('security reports utils', () => {
       expect(parsed.location.end_line).toBeUndefined();
       expect(parsed.urlPath).toEqual(`path/${raw.location.file}`);
       expect(parsed.project_fingerprint).toEqual(sha1(raw.cve));
+      expect(parsed.remediation).toEqual(dependencyScanningIssuesMajor2.remediations[0]);
     });
 
     it('generate correct path to file when there is no line', () => {

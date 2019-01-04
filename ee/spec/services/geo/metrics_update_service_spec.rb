@@ -124,6 +124,16 @@ describe Geo::MetricsUpdateService, :geo, :prometheus do
       it 'updates the GeoNodeStatus entry' do
         expect { subject.execute }.to change { GeoNodeStatus.count }.by(1)
       end
+
+      it 'updates metrics when secondary nodes are cached', :request_store do
+        allow(subject).to receive(:update_prometheus_metrics).and_call_original
+        expect(subject).to receive(:update_prometheus_metrics).with(secondary, anything).twice
+        expect(subject).to receive(:update_prometheus_metrics).with(another_secondary, anything).twice
+
+        2.times do
+          subject.execute
+        end
+      end
     end
 
     context 'when node is a secondary' do

@@ -232,7 +232,8 @@ describe Gitlab::Database::LoadBalancing do
           port: 8600,
           record: nil,
           interval: 60,
-          disconnect_timeout: 120
+          disconnect_timeout: 120,
+          use_tcp: false
         )
       end
     end
@@ -248,7 +249,8 @@ describe Gitlab::Database::LoadBalancing do
           port: 8600,
           record: 'foo',
           interval: 60,
-          disconnect_timeout: 120
+          disconnect_timeout: 120,
+          use_tcp: false
         )
       end
     end

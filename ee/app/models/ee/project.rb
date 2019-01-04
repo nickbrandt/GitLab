@@ -111,6 +111,8 @@ module EE
       default_value_for :packages_enabled, true
 
       delegate :store_security_reports_available?, to: :namespace
+
+      accepts_nested_attributes_for :tracing_setting, update_only: true, allow_destroy: true
     end
 
     class_methods do
@@ -213,7 +215,7 @@ module EE
       config = ::Gitlab.config.incoming_email
       wildcard = ::Gitlab::IncomingEmail::WILDCARD_PLACEHOLDER
 
-      config.address&.gsub(wildcard, full_path)
+      config.address&.gsub(wildcard, "#{full_path_slug}-#{id}-issue-")
     end
 
     override :add_import_job

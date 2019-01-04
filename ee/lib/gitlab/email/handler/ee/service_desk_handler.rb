@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# handles service desk issue creation emails with these formats:
+#   incoming+gitlab-org-gitlab-ce-20-issue-@incoming.gitlab.com
+#   incoming+gitlab-org/gitlab-ce@incoming.gitlab.com (legacy)
 module Gitlab
   module Email
     module Handler
@@ -7,8 +10,22 @@ module Gitlab
         class ServiceDeskHandler < BaseHandler
           include ReplyProcessing
 
+          HANDLER_REGEX        = /\A#{HANDLER_ACTION_BASE_REGEX}-issue-\z/.freeze
+          HANDLER_REGEX_LEGACY = /\A(?<project_path>[^\+]*)\z/.freeze
+
+          def initialize(mail, mail_key)
+            super(mail, mail_key)
+
+            if !mail_key&.include?('/') && (matched = HANDLER_REGEX.match(mail_key.to_s))
+              @project_slug = matched[:project_slug]
+              @project_id   = matched[:project_id]&.to_i
+            elsif matched = HANDLER_REGEX_LEGACY.match(mail_key.to_s)
+              @project_path = matched[:project_path]
+            end
+          end
+
           def can_handle?
-            ::EE::Gitlab::ServiceDesk.enabled? && service_desk_key.present?
+            ::EE::Gitlab::ServiceDesk.enabled? && (project_id || can_handle_legacy_format?)
           end
 
           def execute
@@ -24,23 +41,14 @@ module Gitlab
 
           private
 
-          def service_desk_key
-            return unless mail_key && mail_key.include?('/') && !mail_key.include?('+')
+          attr_reader :project_id, :project_path
 
-            mail_key
-          end
-
-          # rubocop: disable CodeReuse/ActiveRecord
           def project
-            return @project if instance_variable_defined?(:@project)
+            super
 
-            found_project =
-              Project.where(service_desk_enabled: true)
-                .find_by_full_path(service_desk_key)
-
-            @project = found_project&.service_desk_enabled? ? found_project : nil
+            @project = nil unless @project&.service_desk_enabled?
+            @project
           end
-          # rubocop: enable CodeReuse/ActiveRecord
 
           def create_issue!
             # NB: the support bot is specifically forbidden
@@ -70,6 +78,10 @@ module Gitlab
             from = "(from #{from_address})" if from_address
 
             "Service Desk #{from}: #{mail.subject}"
+          end
+
+          def can_handle_legacy_format?
+            project_path && project_path.include?('/') && !mail_key.include?('+')
           end
         end
       end

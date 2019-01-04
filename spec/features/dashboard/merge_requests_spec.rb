@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'Dashboard Merge Requests' do
@@ -6,6 +8,7 @@ describe 'Dashboard Merge Requests' do
   include ProjectForksHelper
 
   let(:current_user) { create :user }
+  let(:user) { current_user }
   let(:project) { create(:project) }
 
   let(:public_project) { create(:project, :public, :repository) }

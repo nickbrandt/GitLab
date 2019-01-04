@@ -9,7 +9,7 @@ describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
     stub_config_setting(host: 'localhost')
   end
 
-  let(:email_raw) { fixture_file('emails/service_desk.eml', dir: 'ee') }
+  let(:email_raw) { email_fixture('emails/service_desk.eml', dir: 'ee') }
   let(:namespace) { create(:namespace, name: "email") }
 
   context 'service desk is enabled for the project' do
@@ -23,20 +23,56 @@ describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
       allow(::EE::Gitlab::ServiceDesk).to receive(:enabled?).with(project: project).and_return(true)
     end
 
-    it 'sends thank you the email and creates issue' do
-      setup_attachment
+    context 'when everything is fine' do
+      shared_examples 'a new issue request' do
+        it 'sends thank you the email and creates issue' do
+          setup_attachment
 
-      expect(Notify).to receive(:service_desk_thank_you_email).with(kind_of(Integer))
+          expect(Notify).to receive(:service_desk_thank_you_email).with(kind_of(Integer))
 
-      expect { receiver.execute }.to change { Issue.count }.by(1)
+          expect { receiver.execute }.to change { Issue.count }.by(1)
 
-      new_issue = Issue.last
+          new_issue = Issue.last
 
-      expect(new_issue.author).to eql(User.support_bot)
-      expect(new_issue.confidential?).to be true
-      expect(new_issue.all_references.all).to be_empty
-      expect(new_issue.title).to eq("Service Desk (from jake@adventuretime.ooo): The message subject! @all")
-      expect(new_issue.description).to eq("Service desk stuff!\n\n```\na = b\n```\n\n![image](uploads/image.png)")
+          expect(new_issue.author).to eql(User.support_bot)
+          expect(new_issue.confidential?).to be true
+          expect(new_issue.all_references.all).to be_empty
+          expect(new_issue.title).to eq("Service Desk (from jake@adventuretime.ooo): The message subject! @all")
+          expect(new_issue.description).to eq("Service desk stuff!\n\n```\na = b\n```\n\n![image](uploads/image.png)")
+        end
+      end
+
+      it_behaves_like 'a new issue request'
+
+      context "creates a new issue with legacy email address" do
+        let(:email_raw) { fixture_file('emails/service_desk_legacy.eml', dir: 'ee') }
+
+        it_behaves_like 'a new issue request'
+      end
+    end
+
+    context 'when email key' do
+      let(:mail) { Mail::Message.new(email_raw) }
+
+      it "matches the new format" do
+        handler = described_class.new(mail, "h5bp-html5-boilerplate-#{project.project_id}-issue-")
+
+        expect(handler.instance_variable_get(:@project_id).to_i).to eq project.project_id
+        expect(handler.can_handle?).to be_truthy
+      end
+
+      it "matches the legacy format" do
+        handler = described_class.new(mail, "h5bp/html5-boilerplate")
+
+        expect(handler.instance_variable_get(:@project_path)).to eq 'h5bp/html5-boilerplate'
+        expect(handler.can_handle?).to be_truthy
+      end
+
+      it "doesn't match either format" do
+        handler = described_class.new(mail, "h5bp-html5-boilerplate-invalid")
+
+        expect(handler.can_handle?).to be_falsey
+      end
     end
 
     context 'when there is no from address' do
@@ -53,7 +89,7 @@ describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
     end
 
     context 'when there is a sender address and a from address' do
-      let(:email_raw) { fixture_file('emails/service_desk_sender_and_from.eml', dir: 'ee') }
+      let(:email_raw) { email_fixture('emails/service_desk_sender_and_from.eml', dir: 'ee') }
 
       it 'prefers the from address' do
         setup_attachment
@@ -85,7 +121,7 @@ describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
     end
 
     context 'when the email is forwarded through an alias' do
-      let(:email_raw) { fixture_file('emails/service_desk_forwarded.eml', dir: 'ee') }
+      let(:email_raw) { email_fixture('emails/service_desk_forwarded.eml', dir: 'ee') }
 
       it 'sends thank you the email and creates issue' do
         setup_attachment
@@ -115,5 +151,9 @@ describe Gitlab::Email::Handler::EE::ServiceDeskHandler do
     it "doesn't create an issue" do
       expect { receiver.execute rescue nil }.not_to change { Issue.count }
     end
+  end
+
+  def email_fixture(path, dir:)
+    fixture_file(path, dir: dir).gsub('project_id', project.project_id.to_s)
   end
 end

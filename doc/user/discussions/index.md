@@ -343,6 +343,10 @@ merge request with all the comments associated to it.
 
 Replying to this email will, consequentially, create a new comment on the associated merge request.
 
+The review email is currently hidden behind the `batch_review_notification` feature flag,
+and can be enabled by contacting your GitLab instance administrator and having them
+run `Feature.enable(:batch_review_notification)` using the `gitlab-rails console`.
+
 ## Filtering notes
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/26723) in GitLab 11.5. 

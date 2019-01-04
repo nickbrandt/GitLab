@@ -62,7 +62,8 @@ module Gitlab
           port: conf['port'] || 8600,
           record: conf['record'],
           interval: conf['interval'] || 60,
-          disconnect_timeout: conf['disconnect_timeout'] || 120
+          disconnect_timeout: conf['disconnect_timeout'] || 120,
+          use_tcp: conf['use_tcp'] || false
         }
       end
 

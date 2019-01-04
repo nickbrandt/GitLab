@@ -6,7 +6,7 @@ module EE
       module PushRules
         class TagCheck < ::Gitlab::Checks::BaseChecker
           def validate!
-            return unless newrev && oldrev && push_rule
+            return unless push_rule
 
             logger.log_timed("Checking if you are allowed to delete a tag...") do
               if tag_deletion_denied_by_push_rule?
