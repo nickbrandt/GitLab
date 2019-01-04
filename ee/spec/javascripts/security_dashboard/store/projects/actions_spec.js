@@ -41,7 +41,7 @@ describe('projects actions', () => {
             { type: 'requestProjects' },
             {
               type: 'receiveProjectsSuccess',
-              payload: { data },
+              payload: { projects: data },
             },
           ],
           done,
@@ -73,7 +73,7 @@ describe('projects actions', () => {
 
       testAction(
         actions.receiveProjectsSuccess,
-        { data },
+        { projects: data },
         state,
         [
           {

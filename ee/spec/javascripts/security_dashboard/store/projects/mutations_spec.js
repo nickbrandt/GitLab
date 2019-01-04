@@ -27,11 +27,11 @@ describe('projects module mutations', () => {
     });
 
     it('should set `isLoadingProjects` to `true`', () => {
-      expect(state.isLoadingProjects).toBeTruthy();
+      expect(state.isLoadingProjects).toBe(true);
     });
 
     it('should set `errorLoadingProjects` to `false`', () => {
-      expect(state.errorLoadingProjects).toBeFalsy();
+      expect(state.errorLoadingProjects).toBe(false);
     });
   });
 
@@ -48,7 +48,7 @@ describe('projects module mutations', () => {
     });
 
     it('should set `isLoadingProjects` to `false`', () => {
-      expect(state.isLoadingProjects).toBeFalsy();
+      expect(state.isLoadingProjects).toBe(false);
     });
 
     it('should set `pageInfo`', () => {
@@ -66,7 +66,7 @@ describe('projects module mutations', () => {
 
       mutations[types.RECEIVE_PROJECTS_ERROR](state);
 
-      expect(state.isLoadingProjects).toBeFalsy();
+      expect(state.isLoadingProjects).toBe(false);
     });
   });
 });

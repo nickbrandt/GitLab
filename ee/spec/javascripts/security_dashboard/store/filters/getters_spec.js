@@ -17,10 +17,14 @@ describe('filters module getters', () => {
       getFilterIds,
     };
   };
+  let state;
+
+  beforeEach(() => {
+    state = createState();
+  });
 
   describe('getFilter', () => {
     it('should return the type filter information', () => {
-      const state = createState();
       const typeFilter = getters.getFilter(state)('report_type');
 
       expect(typeFilter.name).toEqual('Report type');
@@ -30,7 +34,6 @@ describe('filters module getters', () => {
   describe('getSelectedOptions', () => {
     describe('with one selected option', () => {
       it('should return "All" as the selected option', () => {
-        const state = createState();
         const selectedOptions = getters.getSelectedOptions(state, mockedGetters(state))(
           'report_type',
         );
@@ -42,7 +45,7 @@ describe('filters module getters', () => {
 
     describe('with multiple selected options', () => {
       it('should return both "High" and "Critical" ', () => {
-        const state = {
+        state = {
           filters: [
             {
               id: 'severity',
@@ -59,7 +62,6 @@ describe('filters module getters', () => {
 
   describe('getSelectedOptionIds', () => {
     it('should return "one" as the selcted dummy ID', () => {
-      const state = createState();
       const dummyFilter = {
         id: 'dummy',
         options: [{ id: 'one', selected: true }, { id: 'anotherone', selected: false }],
@@ -74,7 +76,6 @@ describe('filters module getters', () => {
 
   describe('getSelectedOptionNames', () => {
     it('should return "All" as the selected option', () => {
-      const state = createState();
       const selectedOptionNames = getters.getSelectedOptionNames(state, mockedGetters(state))(
         'severity',
       );
@@ -83,7 +84,7 @@ describe('filters module getters', () => {
     });
 
     it('should return the correct message when multiple filters are selected', () => {
-      const state = {
+      state = {
         filters: [
           {
             id: 'severity',
@@ -101,14 +102,12 @@ describe('filters module getters', () => {
 
   describe('activeFilters', () => {
     it('should return no severity filters', () => {
-      const state = createState();
       const activeFilters = getters.activeFilters(state, mockedGetters(state));
 
       expect(activeFilters.severity).toHaveLength(0);
     });
 
     it('should return multiple dummy filters"', () => {
-      const state = createState();
       const dummyFilter = {
         id: 'dummy',
         options: [{ id: 'one', selected: true }, { id: 'anotherone', selected: true }],

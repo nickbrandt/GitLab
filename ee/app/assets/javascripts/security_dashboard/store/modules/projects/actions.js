@@ -12,9 +12,8 @@ export const fetchProjects = ({ state, dispatch }) => {
     method: 'GET',
     url: state.projectsEndpoint,
   })
-    .then(response => {
-      const { data } = response;
-      dispatch('receiveProjectsSuccess', { data });
+    .then(({ data }) => {
+      dispatch('receiveProjectsSuccess', { projects: data });
     })
     .catch(() => {
       dispatch('receiveProjectsError');
@@ -25,9 +24,7 @@ export const requestProjects = ({ commit }) => {
   commit(types.REQUEST_PROJECTS);
 };
 
-export const receiveProjectsSuccess = ({ commit }, { data }) => {
-  const projects = data;
-
+export const receiveProjectsSuccess = ({ commit }, { projects }) => {
   commit(types.RECEIVE_PROJECTS_SUCCESS, { projects });
 };
 
