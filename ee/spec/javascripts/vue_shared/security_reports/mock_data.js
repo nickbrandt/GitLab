@@ -497,6 +497,12 @@ export const dependencyScanningIssues = [
 export const dependencyScanningIssuesMajor2 = {
   version: '2.0',
   vulnerabilities: dependencyScanningIssues,
+  remediations: [
+    {
+      fixes: [{ cve: dependencyScanningIssues[0].cve }],
+      summary: 'Fixes the first dependency Scanning issue',
+    },
+  ],
 };
 
 export const dependencyScanningIssuesBase = [
