@@ -56,9 +56,9 @@ describe Groups::GroupMembersController do
 
       it 'creates an audit event' do
         expect do
-          post :create, group_id: group,
-                        user_ids: group_user.id,
-                        access_level: Gitlab::Access::GUEST
+          post :create, params: { group_id: group,
+                                  user_ids: group_user.id,
+                                  access_level: Gitlab::Access::GUEST }
         end.to change(AuditEvent, :count).by(1)
       end
 
@@ -184,7 +184,7 @@ describe Groups::GroupMembersController do
         end
 
         it 'creates an audit event' do
-          expect { delete :leave, group_id: group }.to change(AuditEvent, :count).by(1)
+          expect { delete :leave, params: { group_id: group } }.to change(AuditEvent, :count).by(1)
         end
       end
 
@@ -200,7 +200,7 @@ describe Groups::GroupMembersController do
         end
 
         it 'does not create an audit event' do
-          expect { delete :leave, group_id: group }.not_to change(AuditEvent, :count)
+          expect { delete :leave, params: { group_id: group } }.not_to change(AuditEvent, :count)
         end
       end
 
@@ -219,7 +219,7 @@ describe Groups::GroupMembersController do
         end
 
         it 'creates an audit event' do
-          expect { delete :leave, group_id: group }.to change(AuditEvent, :count).by(1)
+          expect { delete :leave, params: { group_id: group } }.to change(AuditEvent, :count).by(1)
         end
       end
     end

@@ -116,7 +116,7 @@ describe GroupsController do
       sign_in(user)
 
       expect do
-        post :create, group: { name: 'new_group', path: "new_group" }
+        post :create, params: { group: { name: 'new_group', path: "new_group" } }
       end.to change { Group.count }.by(1)
 
       expect(response).to have_gitlab_http_status(302)
@@ -127,7 +127,7 @@ describe GroupsController do
         sign_in(create(:admin))
 
         expect do
-          post :create, group: { name: 'new_group', path: "new_group" }
+          post :create, params: { group: { name: 'new_group', path: "new_group" } }
         end.to change { Group.count }.by(1)
 
         expect(response).to have_gitlab_http_status(302)
@@ -137,7 +137,7 @@ describe GroupsController do
         sign_in(create(:user, :auditor, can_create_group: true))
 
         expect do
-          post :create, group: { name: 'new_group', path: "new_group" }
+          post :create, params: { group: { name: 'new_group', path: "new_group" } }
         end.to change { Group.count }.by(1)
 
         expect(response).to have_gitlab_http_status(302)
@@ -352,7 +352,7 @@ describe GroupsController do
     end
 
     it 'updates the project_creation_level successfully' do
-      post :update, id: group.to_param, group: { project_creation_level: ::EE::Gitlab::Access::MAINTAINER_PROJECT_ACCESS }
+      post :update, params: { id: group.to_param, group: { project_creation_level: ::EE::Gitlab::Access::MAINTAINER_PROJECT_ACCESS } }
 
       expect(response).to have_gitlab_http_status(302)
       expect(group.reload.project_creation_level).to eq(::EE::Gitlab::Access::MAINTAINER_PROJECT_ACCESS)

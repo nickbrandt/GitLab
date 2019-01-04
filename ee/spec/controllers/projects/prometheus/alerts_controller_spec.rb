@@ -115,7 +115,7 @@ describe Projects::Prometheus::AlertsController do
 
           expect(notify_service).to receive(:execute).with('some token')
 
-          post :notify, project_params, as: :json
+          post :notify, params: project_params, as: :json
         end
 
         it 'pass nil if cannot extract a non-bearer token' do
@@ -123,7 +123,7 @@ describe Projects::Prometheus::AlertsController do
 
           expect(notify_service).to receive(:execute).with(nil)
 
-          post :notify, project_params, as: :json
+          post :notify, params: project_params, as: :json
         end
       end
 
@@ -131,7 +131,7 @@ describe Projects::Prometheus::AlertsController do
         it 'passes nil' do
           expect(notify_service) .to receive(:execute).with(nil)
 
-          post :notify, project_params, as: :json
+          post :notify, params: project_params, as: :json
         end
       end
     end

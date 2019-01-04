@@ -105,7 +105,7 @@ describe Projects::IssuesController do
     end
 
     def perform(method, action, opts = {})
-      send(method, action, opts.merge(namespace_id: project.namespace.to_param, project_id: project.to_param))
+      send(method, action, params: opts.merge(namespace_id: project.namespace.to_param, project_id: project.to_param))
     end
 
     context 'licensed' do
