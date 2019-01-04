@@ -3066,6 +3066,9 @@ msgstr ""
 msgid "Dismiss Merge Request promotion"
 msgstr ""
 
+msgid "Dismiss trial promotion"
+msgstr ""
+
 msgid "Do you want to customize how Google Code email addresses and usernames are imported into GitLab?"
 msgstr ""
 
@@ -3826,6 +3829,9 @@ msgid "Format"
 msgstr ""
 
 msgid "Found errors in your .gitlab-ci.yml:"
+msgstr ""
+
+msgid "Free Trial of GitLab.com Gold"
 msgstr ""
 
 msgid "From %{provider_title}"
@@ -5852,6 +5858,9 @@ msgid "No container images stored for this project. Add one by following the ins
 msgstr ""
 
 msgid "No contributions were found"
+msgstr ""
+
+msgid "No credit card required."
 msgstr ""
 
 msgid "No due date"
@@ -8310,6 +8319,9 @@ msgstr ""
 msgid "Start the Runner!"
 msgstr ""
 
+msgid "Start your trial"
+msgstr ""
+
 msgid "Started"
 msgstr ""
 
@@ -9332,6 +9344,9 @@ msgid "Try again"
 msgstr ""
 
 msgid "Try again?"
+msgstr ""
+
+msgid "Try all GitLab has to offer for 30 days."
 msgstr ""
 
 msgid "Trying to communicate with your device. Plug it in (if you haven't already) and press the button on the device now."

@@ -34,7 +34,7 @@
     }
 
     .svg-container {
-      margin-right: 15px;
+      margin-right: $gl-padding;
     }
   }
 
@@ -75,6 +75,24 @@
 
     .user-callout-copy {
       margin: 0;
+    }
+  }
+
+  &.thin-callout {
+    .bordered-box {
+      padding: $gl-padding;
+      padding-left: 40px;
+
+      .close {
+        position: relative;
+        top: 0;
+        right: 0;
+      }
+    }
+
+    .svg-container .svg {
+      max-width: 39px;
+      max-height: 39px;
     }
   }
 }
