@@ -98,30 +98,28 @@ module Gitlab
 
         raise "Incorrect target_type #{target_type}" unless ALLOWED_TARGET_TYPES.include?(@target_type)
 
-        case target
-        when MergeRequest
-          handle_merge_request
-        when Project
-          handle_project
+        ActiveRecord::Base.transaction do
+          case target
+          when MergeRequest
+            handle_merge_request
+          when Project
+            handle_project
+          end
         end
       end
 
       private
 
       def handle_merge_request
-        ActiveRecord::Base.transaction do
-          if rule = sync_rule
-            rule.approval_project_rule = target.target_project.approval_rules.regular.first
-          end
-
-          target.sync_code_owners_with_approvers
+        if rule = sync_rule
+          rule.approval_project_rule = target.target_project.approval_rules.regular.first
         end
+
+        target.sync_code_owners_with_approvers
       end
 
       def handle_project
-        ActiveRecord::Base.transaction do
-          sync_rule
-        end
+        sync_rule
       end
 
       def sync_rule
