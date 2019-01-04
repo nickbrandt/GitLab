@@ -66,7 +66,9 @@ module Gitlab
         end
 
         def sync_code_owners_with_approvers
-          ::MergeRequest.find(id).sync_code_owners_with_approvers
+          Gitlab::GitalyClient.allow_n_plus_1_calls do
+            ::MergeRequest.find(id).sync_code_owners_with_approvers
+          end
         end
       end
 
