@@ -25,7 +25,7 @@ export default {
       triggers="click"
       :title="
         s__(
-          'Security Reports|At this time, the sucurity dashboard only supports SAST and dependency scanning.',
+          'Security Reports|At this time, the security dashboard only supports SAST and dependency scanning.',
         )
       "
     >
