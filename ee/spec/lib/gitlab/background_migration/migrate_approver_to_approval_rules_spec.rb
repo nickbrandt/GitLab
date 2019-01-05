@@ -180,4 +180,17 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
       it_behaves_like 'sync approval member'
     end
   end
+
+  context 'when target is deleted' do
+    let(:target) { create(:project) }
+    let(:target_type) { 'Project' }
+
+    it "does not err" do
+      target.destroy
+
+      expect do
+        described_class.new.perform(target_type, target.id)
+      end.not_to raise_error
+    end
+  end
 end
