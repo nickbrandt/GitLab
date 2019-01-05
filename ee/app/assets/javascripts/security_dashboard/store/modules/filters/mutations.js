@@ -11,17 +11,25 @@ export default {
       if (optionId === 'all') {
         activeOptions = activeFilter.options.map(option => ({
           ...option,
-          selected: option.id === 'all',
+          selected: option.id === optionId,
         }));
       } else {
         activeOptions = activeFilter.options.map(option => {
-          const selected =
-            option.id === optionId ? !option.selected : option.selected && option.id !== 'all';
+          if (option.id === 'all') {
+            return {
+              ...option,
+              selected: false,
+            };
+          }
 
-          return {
-            ...option,
-            selected,
-          };
+          if (option.id === optionId) {
+            return {
+              ...option,
+              selected: !option.selected,
+            };
+          }
+
+          return option;
         });
       }
 

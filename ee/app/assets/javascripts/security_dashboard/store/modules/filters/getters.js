@@ -1,3 +1,5 @@
+import { sprintf, __ } from '~/locale';
+
 export const getFilter = state => filterId => state.filters.find(filter => filter.id === filterId);
 
 export const getSelectedOptions = (state, getters) => filterId =>
@@ -9,9 +11,14 @@ export const getSelectedOptionIds = (state, getters) => filterId =>
 export const getSelectedOptionNames = (state, getters) => filterId => {
   const selectedOptions = getters.getSelectedOptions(filterId);
   const [firstOption] = selectedOptions.map(option => option.name);
-  return selectedOptions.length > 1
-    ? `${firstOption} +${selectedOptions.length - 1} more`
-    : `${firstOption}`;
+  const extraOptionCount = selectedOptions.length - 1;
+
+  return extraOptionCount
+    ? sprintf(__('%{firstOption} +%{extraOptionCount} more'), {
+        firstOption,
+        extraOptionCount,
+      })
+    : firstOption;
 };
 
 export const getFilterIds = state => state.filters.map(filter => filter.id);

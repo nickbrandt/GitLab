@@ -29,7 +29,7 @@ describe('filters module getters', () => {
 
   describe('getSelectedOptions', () => {
     describe('with one selected option', () => {
-      it('should return "all" as the selcted option', () => {
+      it('should return "All" as the selected option', () => {
         const state = createState();
         const selectedOptions = getters.getSelectedOptions(state, mockedGetters(state))(
           'report_type',
