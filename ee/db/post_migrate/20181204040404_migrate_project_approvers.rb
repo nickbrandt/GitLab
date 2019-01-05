@@ -13,8 +13,15 @@ class MigrateProjectApprovers < ActiveRecord::Migration[5.0]
 
   def up
     jobs = []
-    Project.each_batch(of: BATCH_SIZE) do |scope, _|
-      jobs << ['MigrateApproverToApprovalRulesInBatch', ['Project', scope.pluck(:id)]]
+    Project.each_batch(of: BATCH_SIZE) do |scope|
+      project_ids = scope.pluck(:id)
+
+      if jobs.length >= BACKGROUND_MIGRATION_JOB_BUFFER_SIZE
+        BackgroundMigrationWorker.bulk_perform_async(jobs)
+        jobs.clear
+      end
+
+      jobs << ['MigrateApproverToApprovalRulesInBatch', ['Project', project_ids]]
     end
     BackgroundMigrationWorker.bulk_perform_async(jobs)
 
