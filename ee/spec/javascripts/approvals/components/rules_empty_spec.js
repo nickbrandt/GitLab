@@ -1,6 +1,6 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import { GlButton } from '@gitlab/ui';
-import ApprovalRulesEmpty from 'ee/approvals/components/approval_rules_empty.vue';
+import RulesEmpty from 'ee/approvals/components/rules_empty.vue';
 
 const localVue = createLocalVue();
 
@@ -8,7 +8,7 @@ describe('EE ApprovalsSettingsEmpty', () => {
   let wrapper;
 
   const factory = options => {
-    wrapper = shallowMount(localVue.extend(ApprovalRulesEmpty), {
+    wrapper = shallowMount(localVue.extend(RulesEmpty), {
       localVue,
       ...options,
     });
@@ -21,7 +21,7 @@ describe('EE ApprovalsSettingsEmpty', () => {
   it('shows message', () => {
     factory();
 
-    expect(wrapper.text()).toContain(ApprovalRulesEmpty.message);
+    expect(wrapper.text()).toContain(RulesEmpty.message);
   });
 
   it('shows button', () => {
