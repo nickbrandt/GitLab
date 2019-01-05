@@ -236,11 +236,11 @@ ActiveRecord::Schema.define(version: 20190103140724) do
     t.index ["merge_request_id", "code_owner"], name: "index_approval_merge_request_rules_1", using: :btree
   end
 
-  create_table "approval_merge_request_rules_approvals", id: :bigserial, force: :cascade do |t|
+  create_table "approval_merge_request_rules_approved_approvers", id: :bigserial, force: :cascade do |t|
     t.bigint "approval_merge_request_rule_id", null: false
-    t.integer "approval_id", null: false
-    t.index ["approval_id"], name: "index_approval_merge_request_rules_approvals_2", using: :btree
-    t.index ["approval_merge_request_rule_id", "approval_id"], name: "index_approval_merge_request_rules_approvals_1", unique: true, using: :btree
+    t.integer "user_id", null: false
+    t.index ["approval_merge_request_rule_id", "user_id"], name: "index_approval_merge_request_rules_approved_approvers_1", unique: true, using: :btree
+    t.index ["user_id"], name: "index_approval_merge_request_rules_approved_approvers_2", using: :btree
   end
 
   create_table "approval_merge_request_rules_groups", id: :bigserial, force: :cascade do |t|
@@ -3227,8 +3227,8 @@ ActiveRecord::Schema.define(version: 20190103140724) do
   add_foreign_key "approval_merge_request_rule_sources", "approval_merge_request_rules", on_delete: :cascade
   add_foreign_key "approval_merge_request_rule_sources", "approval_project_rules", on_delete: :cascade
   add_foreign_key "approval_merge_request_rules", "merge_requests", on_delete: :cascade
-  add_foreign_key "approval_merge_request_rules_approvals", "approval_merge_request_rules", on_delete: :cascade
-  add_foreign_key "approval_merge_request_rules_approvals", "approvals", on_delete: :cascade
+  add_foreign_key "approval_merge_request_rules_approved_approvers", "approval_merge_request_rules", on_delete: :cascade
+  add_foreign_key "approval_merge_request_rules_approved_approvers", "users", on_delete: :cascade
   add_foreign_key "approval_merge_request_rules_groups", "approval_merge_request_rules", on_delete: :cascade
   add_foreign_key "approval_merge_request_rules_groups", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "approval_merge_request_rules_users", "approval_merge_request_rules", on_delete: :cascade

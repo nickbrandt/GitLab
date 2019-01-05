@@ -30,7 +30,7 @@ RSpec.describe ApprovalMergeRequestRule, type: :model do
     end
   end
 
-  describe '#sync_approvals' do
+  describe '#sync_approved_approvers' do
     let(:member1) { create(:user) }
     let(:member2) { create(:user) }
     let(:member3) { create(:user) }
@@ -44,9 +44,9 @@ RSpec.describe ApprovalMergeRequestRule, type: :model do
 
     context 'when not merged' do
       it 'does nothing' do
-        subject.sync_approvals
+        subject.sync_approved_approvers
 
-        expect(subject.approvals).to be_empty
+        expect(subject.approved_approvers).to be_empty
       end
     end
 
@@ -54,9 +54,9 @@ RSpec.describe ApprovalMergeRequestRule, type: :model do
       let(:merge_request) { create(:merged_merge_request) }
 
       it 'updates mapping' do
-        subject.sync_approvals
+        subject.sync_approved_approvers
 
-        expect(subject.approvals.reload).to contain_exactly(approval1, approval2)
+        expect(subject.approved_approvers.reload).to contain_exactly(member1, member2)
       end
     end
   end

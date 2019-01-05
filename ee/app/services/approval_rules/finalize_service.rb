@@ -17,7 +17,7 @@ module ApprovalRules
         copy_project_approval_rules
       end
 
-      merge_request.approval_rules.each(&:sync_approvals)
+      merge_request.approval_rules.each(&:sync_approved_approvers)
     end
 
     private

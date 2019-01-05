@@ -8,8 +8,8 @@ class ApprovalMergeRequestRule < ApplicationRecord
 
   belongs_to :merge_request
 
-  has_and_belongs_to_many :approvals # This is only populated after merge request is merged
-  has_many :approved_approvers, through: :approvals, source: :user
+  # approved_approvers is only populated after MR is merged
+  has_and_belongs_to_many :approved_approvers, class_name: 'User', join_table: :approval_merge_request_rules_approved_approvers
   has_one :approval_merge_request_rule_source
   has_one :approval_project_rule, through: :approval_merge_request_rule_source
 
@@ -31,10 +31,10 @@ class ApprovalMergeRequestRule < ApplicationRecord
     scope
   end
 
-  def sync_approvals
-    # Before being merged, approvals are dynamically calculated instead of being persisted.
+  def sync_approved_approvers
+    # Before being merged, approved_approvers are dynamically calculated in ApprovalWrappedRule instead of being persisted.
     return unless merge_request.merged?
 
-    self.approvals = merge_request.approvals.where(user_id: approvers.map(&:id))
+    self.approved_approver_ids = merge_request.approvals.map(&:user_id) & approvers.map(&:id)
   end
 end

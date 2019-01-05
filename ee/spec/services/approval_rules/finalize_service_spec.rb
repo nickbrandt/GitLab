@@ -35,11 +35,6 @@ describe ApprovalRules::FinalizeService do
         expect do
           subject.execute
         end.not_to change { ApprovalMergeRequestRule.count }
-
-        expect(approval1.approval_rules).to be_empty
-        expect(approval2.approval_rules).to be_empty
-        expect(approval3.approval_rules).to be_empty
-        expect(approval4.approval_rules).to be_empty
       end
     end
 
@@ -64,10 +59,8 @@ describe ApprovalRules::FinalizeService do
           expect(rule.approvals_required).to eq(12)
           expect(rule.users).to contain_exactly(member1, member2, group1_member)
           expect(rule.groups).to contain_exactly(group1)
-          expect(approval1.approval_rules).to contain_exactly(rule)
-          expect(approval2.approval_rules).to be_empty
-          expect(approval3.approval_rules).to contain_exactly(rule)
-          expect(approval4.approval_rules).to be_empty
+
+          expect(rule.approved_approvers).to contain_exactly(member1, group1_member)
         end
       end
     end
@@ -97,10 +90,8 @@ describe ApprovalRules::FinalizeService do
           expect(rule.approvals_required).to eq(32)
           expect(rule.users).to contain_exactly(member2, member3, group2_member)
           expect(rule.groups).to contain_exactly(group2)
-          expect(approval1.approval_rules).to be_empty
-          expect(approval2.approval_rules).to contain_exactly(rule)
-          expect(approval3.approval_rules).to be_empty
-          expect(approval4.approval_rules).to contain_exactly(rule)
+
+          expect(rule.approved_approvers).to contain_exactly(member3, group2_member)
         end
       end
     end
