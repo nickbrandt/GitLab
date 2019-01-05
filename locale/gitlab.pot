@@ -49,6 +49,11 @@ msgid_plural "%d additions"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d approval required from %{name}"
+msgid_plural "%d approvals required from %{name}"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d changed file"
 msgid_plural "%d changed files"
 msgstr[0] ""
@@ -905,6 +910,31 @@ msgid "Applied"
 msgstr ""
 
 msgid "Apply suggestion"
+msgstr ""
+
+msgid "ApprovalRuleForm|No. approvals required"
+msgstr ""
+
+msgid "ApprovalRuleRemove|%d member"
+msgid_plural "ApprovalRuleRemove|%d members"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "ApprovalRuleRemove|Approvals from this member are not revoked."
+msgid_plural "ApprovalRuleRemove|Approvals from these members are not revoked."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "ApprovalRuleRemove|You are about to remove the %{name} approver group which has %{nMembers}."
+msgstr ""
+
+msgid "ApprovalRule|Members"
+msgstr ""
+
+msgid "ApprovalRule|Name"
+msgstr ""
+
+msgid "ApprovalRule|e.g. QA, Security, etc."
 msgstr ""
 
 msgid "Approvals required"
@@ -6710,6 +6740,9 @@ msgstr ""
 msgid "Please enable and migrate to hashed storage to avoid security issues and ensure data integrity. %{migrate_link}"
 msgstr ""
 
+msgid "Please enter a non-negative number"
+msgstr ""
+
 msgid "Please fill in a descriptive name for your group."
 msgstr ""
 
@@ -6717,6 +6750,12 @@ msgid "Please migrate all existing projects to hashed storage to avoid security 
 msgstr ""
 
 msgid "Please note that this application is not provided by GitLab and you should verify its authenticity before allowing access."
+msgstr ""
+
+msgid "Please provide a name"
+msgstr ""
+
+msgid "Please select and add a member"
 msgstr ""
 
 msgid "Please select at least one filter to see results"
@@ -7540,6 +7579,12 @@ msgstr ""
 msgid "Remove approver"
 msgstr ""
 
+msgid "Remove approvers"
+msgstr ""
+
+msgid "Remove approvers?"
+msgstr ""
+
 msgid "Remove avatar"
 msgstr ""
 
@@ -7927,6 +7972,9 @@ msgid "Search projects"
 msgstr ""
 
 msgid "Search users"
+msgstr ""
+
+msgid "Search users or groups"
 msgstr ""
 
 msgid "Search your projects"
@@ -9816,6 +9864,9 @@ msgstr ""
 msgid "Update"
 msgstr ""
 
+msgid "Update approvers"
+msgstr ""
+
 msgid "Update now"
 msgstr ""
 
@@ -10402,6 +10453,9 @@ msgid "You don't have any deployments right now."
 msgstr ""
 
 msgid "You have no permissions"
+msgstr ""
+
+msgid "You have not added any approvers. Start by adding users or groups."
 msgstr ""
 
 msgid "You have reached your project limit"
