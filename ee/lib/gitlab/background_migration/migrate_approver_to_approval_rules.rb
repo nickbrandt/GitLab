@@ -148,7 +148,7 @@ module Gitlab
       end
 
       def find_or_create_rule
-        rule = target.approval_rules.regular.find_or_initialize_by(name: 'Default')
+        rule = target.approval_rules.regular.find_or_initialize_by(name: ApprovalRuleLike::DEFAULT_NAME)
 
         unless rule.persisted?
           rule.approvals_required = target.approvals_before_merge || 0
