@@ -19,8 +19,6 @@ module Gitlab
       class ApprovalMergeRequestRule < ActiveRecord::Base
         self.table_name = 'approval_merge_request_rules'
 
-        include Gitlab::Utils::StrongMemoize
-
         belongs_to :merge_request
         scope :code_owner, -> { where(code_owner: true) }
         scope :regular, -> { where(code_owner: false) } # Non code owner rule
@@ -57,15 +55,17 @@ module Gitlab
         belongs_to :target_project, class_name: "Project"
         has_many :approval_rules, class_name: 'ApprovalMergeRequestRule'
 
-        def approvers
-          Approver.where(target_type: 'MergeRequest', target_id: id)
+        def approver_ids
+          @approver_ids ||= Approver.where(target_type: 'MergeRequest', target_id: id).pluck(:user_id)
         end
 
-        def approver_groups
-          ApproverGroup.where(target_type: 'MergeRequest', target_id: id)
+        def approver_group_ids
+          @approver_group_ids ||= ApproverGroup.where(target_type: 'MergeRequest', target_id: id).pluck(:group_id)
         end
 
         def sync_code_owners_with_approvers
+          return if state == 'merged' || state == 'closed'
+
           Gitlab::GitalyClient.allow_n_plus_1_calls do
             ::MergeRequest.find(id).sync_code_owners_with_approvers
           end
@@ -77,12 +77,12 @@ module Gitlab
 
         has_many :approval_rules, class_name: 'ApprovalProjectRule'
 
-        def approvers
-          Approver.where(target_type: 'Project', target_id: id)
+        def approver_ids
+          @approver_ids ||= Approver.where(target_type: 'Project', target_id: id).pluck(:user_id)
         end
 
-        def approver_groups
-          ApproverGroup.where(target_type: 'Project', target_id: id)
+        def approver_group_ids
+          @approver_group_ids ||= ApproverGroup.where(target_type: 'Project', target_id: id).pluck(:group_id)
         end
       end
 
@@ -131,8 +131,8 @@ module Gitlab
         end
 
         rule = find_or_create_rule
-        rule.user_ids = target.approvers.pluck(:user_id)
-        rule.group_ids = target.approver_groups.pluck(:group_id)
+        rule.user_ids = target.approver_ids
+        rule.group_ids = target.approver_group_ids
         rule
       end
 
@@ -159,7 +159,7 @@ module Gitlab
       end
 
       def approvers_exists?
-        target.approvers.to_a.any? || target.approver_groups.to_a.any?
+        target.approver_ids.any? || target.approver_group_ids.any?
       end
     end
   end
