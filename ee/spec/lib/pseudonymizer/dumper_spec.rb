@@ -18,24 +18,13 @@ describe Pseudonymizer::Dumper do
     FileUtils.rm_rf(base_dir)
   end
 
-  describe 'Pseudo tables' do
-    it 'outputs project tables to csv' do
-      column_names = %w(id name path description)
-      pseudo.config[:tables] = {
-        projects: {
-          whitelist: column_names,
-          pseudo: %w(id)
-        }
-      }
+  describe '#tables_to_csv' do
+    let(:column_names) { %w(id name path description) }
 
-      expect(pseudo.output_dir).to eq(base_dir)
-
-      # grab the first table it outputs. There would only be 1.
-      project_table_file = pseudo.tables_to_csv[0]
-      expect(project_table_file).to end_with("projects.csv.gz")
-
+    def decode_project_csv(project_table_file)
       columns = []
       project_data = []
+
       Zlib::GzipReader.open(project_table_file) do |gz|
         csv = CSV.new(gz, headers: true)
         # csv.shift # read the header row
@@ -43,26 +32,70 @@ describe Pseudonymizer::Dumper do
         columns = csv.headers
       end
 
-      # check if CSV columns are correct
-      expect(columns).to include(*column_names)
-
-      # is it pseudonymous
-      # sha 256 is 64 chars in length
-      expect(project_data["id"].length).to eq(64)
+      [columns, project_data]
     end
 
-    it "warns when pseudonymized fields are extraneous" do
-      column_names = %w(id name path description)
-      pseudo.config[:tables] = {
-        projects: {
-          whitelist: column_names,
-          pseudo: %w(id extraneous)
+    context 'with nil pseudo fields' do
+      before do
+        pseudo.config[:tables] = {
+          projects: {
+            whitelist: column_names,
+            pseudo: nil
+          }
         }
-      }
+      end
 
-      expect(Rails.logger).to receive(:warn).with(/extraneous/)
+      it 'outputs valid values' do
+        project_table_file = pseudo.tables_to_csv[0]
+        columns, project_data = decode_project_csv(project_table_file)
 
-      pseudo.tables_to_csv
+        # check if CSV columns are correct
+        expect(columns).to include(*column_names)
+
+        column_names.each do |column|
+          expect(project_data[column].to_s).to eq(project[column].to_s)
+        end
+      end
+    end
+
+    context 'with pseudo fields' do
+      it 'outputs project tables to csv' do
+        pseudo.config[:tables] = {
+          projects: {
+            whitelist: column_names,
+            pseudo: %w(id)
+          }
+        }
+
+        expect(pseudo.output_dir).to eq(base_dir)
+
+        # grab the first table it outputs. There would only be 1.
+        project_table_file = pseudo.tables_to_csv[0]
+        expect(project_table_file).to end_with("projects.csv.gz")
+
+        columns, project_data = decode_project_csv(project_table_file)
+
+        # check if CSV columns are correct
+        expect(columns).to include(*column_names)
+
+        # is it pseudonymous
+        # sha 256 is 64 chars in length
+        expect(project_data["id"].length).to eq(64)
+      end
+
+      it "warns when pseudonymized fields are extraneous" do
+        column_names = %w(id name path description)
+        pseudo.config[:tables] = {
+          projects: {
+            whitelist: column_names,
+            pseudo: %w(id extraneous)
+          }
+        }
+
+        expect(Rails.logger).to receive(:warn).with(/extraneous/)
+
+        pseudo.tables_to_csv
+      end
     end
   end
 
