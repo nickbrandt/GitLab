@@ -22,19 +22,20 @@ module Projects
 
       private
 
-      helper_method :tracing_setting
-
-      def tracing_setting
-        @tracing_setting ||= project.tracing_setting || project.build_tracing_setting
+      def update_params
+        params.require(:project).permit(permitted_project_params)
       end
 
-      def update_params
-        params.require(:project).permit(tracing_setting_attributes: [:external_url])
+      # overridden in EE
+      def permitted_project_params
+        {}
       end
 
       def check_license
-        render_404 unless @project.feature_available?(:tracing, current_user)
+        render_404 unless helpers.settings_operations_available?
       end
     end
   end
 end
+
+Projects::Settings::OperationsController.prepend(::EE::Projects::Settings::OperationsController)

@@ -545,6 +545,10 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
       ## EE-specific
       resources :managed_licenses, only: [:index, :show, :new, :create, :edit, :update, :destroy]
       ## EE-specific
+
+      namespace :settings do
+        resource :operations, only: [:show, :update]
+      end
     end
 
     resources(:projects,

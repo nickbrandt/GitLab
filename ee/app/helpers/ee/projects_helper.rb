@@ -202,5 +202,11 @@ module EE
         }
       end
     end
+
+    def settings_operations_available?
+      return true if super
+
+      @project.feature_available?(:tracing, current_user) && can?(current_user, :read_environment, @project)
+    end
   end
 end
