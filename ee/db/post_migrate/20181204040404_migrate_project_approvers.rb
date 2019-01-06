@@ -4,7 +4,7 @@ class MigrateProjectApprovers < ActiveRecord::Migration[5.0]
   include Gitlab::Database::MigrationHelpers
 
   DOWNTIME = false
-  BATCH_SIZE = 1000
+  BATCH_SIZE = 3000
 
   class MergeRequest < ActiveRecord::Base
     include ::EachBatch
@@ -24,7 +24,7 @@ class MigrateProjectApprovers < ActiveRecord::Migration[5.0]
       Gitlab::BackgroundMigration::MigrateApproverToApprovalRules.new.perform('Project', project_id)
     end
 
-    bulk_queue_background_migration_jobs_by_range(MergeRequest, 'MigrateApproverToApprovalRulesInBatch')
+    bulk_queue_background_migration_jobs_by_range(MergeRequest, 'MigrateApproverToApprovalRulesInBatch', batch_size: BATCH_SIZE)
 
     check_time = Gitlab::BackgroundMigration::MigrateApproverToApprovalRulesCheckProgress::RESCHEDULE_DELAY
     BackgroundMigrationWorker.bulk_perform_in(check_time, [['MigrateApproverToApprovalRulesCheckProgress']])
