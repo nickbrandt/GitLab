@@ -333,15 +333,30 @@ This feature is currently [Alpha](https://about.gitlab.com/handbook/product/#alp
 Each security vulnerability in the report is actionable. Clicking on an entry,
 a detailed information will pop up with two different possible options:
 
-- **Dismiss vulnerability** - Dismissing a vulnerability will place a
-  <s>strikethrough</s> styling on it.
+- **Dismiss vulnerability** - Dismissing a vulnerability will place a <s>strikethrough</s> styling on it.
 - **Create issue** - The new issue will have the title and description
   pre-populated with the information of the vulnerability report.
+- **Solution** - For some vulnerabilities ([Dependency Scanning](dependency_scanning.md) and [Container Scanning](container_scanning.md)) will provide a solution on how to fix the vulnerability.
 
 ![Interacting with security reports](img/interactive_reports.png)
 
 You can also revert your dismissal or see the linked issue after the action has
 been taken.
+
+### Solutions for Dependency Scanning **[ULTIMATE]**
+
+> Introduced in [GitLab Ultimate][products] 11.7.
+
+CAUTION: **Warning:** Automatic Patch creation is only available for a subset of [Dependency Scanning](dependency_scanning.md). At the only Node.JS projects managed with yarn are supported.
+
+Some Vulnerabilities can be fixed by applying a patch provided by us. To apply the fix:
+
+1. Download and review the patch file `remediation.patch`
+2. Ensure your local project has the same commit checked out that was used to generate the patch
+3. Run `git apply remediation.patch`
+4. Verify and commit the changes to your branch
+
+![Solutions for dependency scanning](img/vulnerability_solution.png)
 
 ## Live preview with Review Apps
 
