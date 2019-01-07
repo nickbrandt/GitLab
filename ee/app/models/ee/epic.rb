@@ -156,6 +156,45 @@ module EE
           )
         end
       end
+
+      # Return the deepest relation level for an epic.
+      # Example 1:
+      # epic1 - parent: nil
+      # epic2 - parent: epic1
+      # epic3 - parent: epic 2
+      # Returns: 3
+      # ------------
+      # Example 2:
+      # epic1 - parent: nil
+      # epic2 - parent: epic1
+      # Returns: 2
+      def deepest_relationship_level
+        return unless ::Group.supports_nested_objects?
+
+        result =
+          ActiveRecord::Base.connection.execute(
+            <<-SQL
+              WITH RECURSIVE descendants AS (
+                  SELECT id, 1 depth
+                  FROM epics
+                  WHERE parent_id IS NOT NULL
+              UNION
+                  SELECT e.id, d.depth + 1
+                  FROM epics e
+                  INNER JOIN descendants d
+                  ON e.parent_id = d.id
+              )
+              SELECT MAX(depth) as deepest_level FROM descendants
+            SQL
+          )
+
+        deepest_level = result.first["deepest_level"] || 0
+
+        # For performance reason epics without a parent_id are being
+        # ignored in the query.
+        # So we sum 1 to the result to take into account first parent.
+        deepest_level + 1
+      end
     end
 
     def assignees
