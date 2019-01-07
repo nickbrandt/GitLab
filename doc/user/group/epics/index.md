@@ -23,6 +23,10 @@ you can change its title, description, start date, and due date.
 
 ![epic view](img/epic_view.png)
 
+## Relationship in Epics
+
+### With Issues
+
 An epic contains a list of issues, and an issue can be associated with at most
 one epic. You can add issues associated with the epic by clicking the
 plus icon (<kbd>+</kbd>) under the epic description, pasting the link of the
@@ -31,9 +35,19 @@ group or any of the epic's subgroups are eligible to be added. To remove an
 issue from an epic, simply click on the <kbd>x</kbd> button in the epic's
 issue list.
 
-When you add an issue to an epic that's already associated with another epic,
-the issue is automatically removed from the previous epic. In other words, an
-issue can be associated with at most one epic.
+### With Epics
+
+An epic can have multiple child epics while the maximum depth is 5. You can add epics associated with the epic by clicking the
+plus icon (<kbd>+</kbd>) under the epic description, pasting the link of the
+issue, and clicking **Add**. Any epic belonging to a group or subgroup of the epic's
+group are eligible to be added. To remove a child epic from a parent epic,
+simply click on the <kbd>x</kbd> button in the epic's epic list.
+
+### Conflicts
+
+When you add an issue or an epic to an epic that's already associated with another epic,
+the issue or the epic is automatically removed from the previous epic. In other words, an
+issue or epic can be associated with at most one epic.
 
 ## Start date and due date
 
