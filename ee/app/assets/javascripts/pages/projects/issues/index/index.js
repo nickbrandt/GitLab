@@ -1,4 +1,6 @@
 import '~/pages/projects/issues/index/index';
-import initExportCSVModal from './export_csv_modal';
+import Stats from 'ee/stats';
 
-document.addEventListener('DOMContentLoaded', initExportCSVModal);
+document.addEventListener('DOMContentLoaded', () => {
+  Stats.bindTrackableContainer('.issues-export-modal');
+});
