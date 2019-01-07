@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { createStore } from '~/mr_notes/stores';
 import issueNoteForm from '~/notes/components/note_form.vue';
+import { keyboardDownEvent } from 'spec/issue_show/helpers';
 import { noteableDataMock, discussionMock, notesDataMock } from 'spec/notes/mock_data';
 
 describe('issue_note_form component', () => {
@@ -35,6 +36,24 @@ describe('issue_note_form component', () => {
     it('does not show resolve checkbox', () => {
       expect(vm.$el.querySelector('.qa-resolve-review-discussion')).toBe(null);
     });
+
+    describe('on enter', () => {
+      it('should add comment when cmd+enter is pressed', () => {
+        spyOn(vm, 'handleUpdate').and.callThrough();
+        vm.$el.querySelector('textarea').value = 'Foo';
+        vm.$el.querySelector('textarea').dispatchEvent(keyboardDownEvent(13, true));
+
+        expect(vm.handleUpdate).toHaveBeenCalled();
+      });
+
+      it('should add comment when ctrl+enter is pressed', () => {
+        spyOn(vm, 'handleUpdate').and.callThrough();
+        vm.$el.querySelector('textarea').value = 'Foo';
+        vm.$el.querySelector('textarea').dispatchEvent(keyboardDownEvent(13, false, true));
+
+        expect(vm.handleUpdate).toHaveBeenCalled();
+      });
+    });
   });
 
   describe('with batch comments', () => {
@@ -59,6 +78,24 @@ describe('issue_note_form component', () => {
         );
 
         done();
+      });
+    });
+
+    describe('on enter', () => {
+      it('should start review or add to review when cmd+enter is pressed', () => {
+        spyOn(vm, 'handleAddToReview').and.callThrough();
+        vm.$el.querySelector('textarea').value = 'Foo';
+        vm.$el.querySelector('textarea').dispatchEvent(keyboardDownEvent(13, true));
+
+        expect(vm.handleAddToReview).toHaveBeenCalled();
+      });
+
+      it('should start review or add to review when ctrl+enter is pressed', () => {
+        spyOn(vm, 'handleAddToReview').and.callThrough();
+        vm.$el.querySelector('textarea').value = 'Foo';
+        vm.$el.querySelector('textarea').dispatchEvent(keyboardDownEvent(13, false, true));
+
+        expect(vm.handleAddToReview).toHaveBeenCalled();
       });
     });
   });
