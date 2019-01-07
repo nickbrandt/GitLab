@@ -16,6 +16,7 @@ export default () => {
         props: {
           dashboardDocumentation: el.dataset.dashboardDocumentation,
           emptyStateSvgPath: el.dataset.emptyStateSvgPath,
+          projectsEndpoint: el.dataset.projectsEndpoint,
           vulnerabilityFeedbackHelpPath: el.dataset.vulnerabilityFeedbackHelpPath,
           vulnerabilitiesEndpoint: el.dataset.vulnerabilitiesEndpoint,
           vulnerabilitiesCountEndpoint: el.dataset.vulnerabilitiesSummaryEndpoint,

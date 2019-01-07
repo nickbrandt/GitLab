@@ -25,4 +25,25 @@ describe('filters actions', () => {
       );
     });
   });
+
+  describe('setFilterOptions', () => {
+    it('should commit the SET_FILTER_OPTIONS mutuation', done => {
+      const state = createState();
+      const payload = { filterId: 'project', options: [] };
+
+      testAction(
+        actions.setFilterOptions,
+        payload,
+        state,
+        [
+          {
+            type: types.SET_FILTER_OPTIONS,
+            payload,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
 });
