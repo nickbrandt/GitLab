@@ -347,7 +347,7 @@ been taken.
 
 > Introduced in [GitLab Ultimate][products] 11.7.
 
-CAUTION: **Warning:** Automatic Patch creation is only available for a subset of [Dependency Scanning](dependency_scanning.md). At the only Node.JS projects managed with yarn are supported.
+CAUTION: **Warning:** Automatic Patch creation is only available for a subset of [Dependency Scanning](dependency_scanning.md). At the moment only Node.JS projects managed with yarn are supported.
 
 Some Vulnerabilities can be fixed by applying a patch provided by us. To apply the fix:
 
