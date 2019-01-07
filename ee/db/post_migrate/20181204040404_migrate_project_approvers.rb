@@ -36,9 +36,14 @@ class MigrateProjectApprovers < ActiveRecord::Migration[5.0]
   private
 
   def get_project_ids
-    project_ids = Approver.where('target_type = ?', 'Project').pluck(:target_id)
-    project_ids += ApproverGroup.where('target_type = ?', 'Project').pluck(:target_id)
-    project_ids.uniq!
-    project_ids
+    results = ActiveRecord::Base.connection.exec_query <<~SQL
+      SELECT DISTINCT target_id FROM (
+        SELECT target_id FROM approvers WHERE target_type='Project'
+        UNION
+        SELECT target_id FROM approver_groups WHERE target_type='Project'
+      ) t
+    SQL
+
+    results.rows.flatten
   end
 end
