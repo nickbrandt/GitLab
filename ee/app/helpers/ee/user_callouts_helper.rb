@@ -44,20 +44,20 @@ module EE
     def show_enable_hashed_storage_warning?
       return if user_dismissed?(GEO_ENABLE_HASHED_STORAGE)
 
-      hashed_storage_disabled?
+      !hashed_storage_enabled?
     end
 
     def show_migrate_hashed_storage_warning?
       return if user_dismissed?(GEO_MIGRATE_HASHED_STORAGE)
-      return if hashed_storage_disabled?
+      return unless hashed_storage_enabled?
 
       any_project_not_in_hashed_storage?
     end
 
     private
 
-    def hashed_storage_disabled?
-      !::Gitlab::CurrentSettings.current_application_settings.hashed_storage_enabled
+    def hashed_storage_enabled?
+      ::Gitlab::CurrentSettings.current_application_settings.hashed_storage_enabled
     end
 
     def any_project_not_in_hashed_storage?
