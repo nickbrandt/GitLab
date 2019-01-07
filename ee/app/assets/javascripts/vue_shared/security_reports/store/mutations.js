@@ -293,7 +293,6 @@ export default {
 
     Vue.set(state.modal.data.severity, 'value', issue.severity);
     Vue.set(state.modal.data.confidence, 'value', issue.confidence);
-    Vue.set(state.modal.data.solution, 'value', issue.solution);
 
     if (issue.links && issue.links.length > 0) {
       Vue.set(state.modal.data.links, 'value', issue.links);

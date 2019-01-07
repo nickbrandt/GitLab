@@ -236,10 +236,6 @@ describe('vulnerabilities module mutations', () => {
         expect(state.modal.data.className.value).toEqual(vulnerability.location.class);
       });
 
-      it('should set the modal solution', () => {
-        expect(state.modal.data.solution.value).toEqual(vulnerability.solution);
-      });
-
       it('should set the modal links', () => {
         expect(state.modal.data.links.value).toEqual(vulnerability.links);
       });

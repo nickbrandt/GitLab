@@ -5,9 +5,11 @@ import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import ExpandButton from '~/vue_shared/components/expand_button.vue';
 import SafeLink from 'ee/vue_shared/components/safe_link.vue';
+import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
 
 export default {
   components: {
+    SolutionCard,
     SafeLink,
     Modal,
     LoadingButton,
@@ -48,6 +50,15 @@ export default {
         this.modal.vulnerability.dismissalFeedback.pipeline &&
         this.modal.vulnerability.dismissalFeedback.author
       );
+    },
+    solution() {
+      return this.modal.vulnerability && this.modal.vulnerability.solution;
+    },
+    remediation() {
+      return this.modal.vulnerability && this.modal.vulnerability.remediation;
+    },
+    renderSolutionCard() {
+      return this.solution || this.remediation;
     },
     /**
      * The slot for the footer should be rendered if any of the conditions is true.
@@ -93,88 +104,95 @@ export default {
     class="modal-security-report-dast"
   >
     <slot>
-      <div
-        v-for="(field, key, index) in modal.data"
-        v-if="field.value"
-        :key="index"
-        class="row prepend-top-10 append-bottom-10"
-      >
-        <label class="col-sm-3 text-right font-weight-bold"> {{ field.text }}: </label>
-        <div class="col-sm-9 text-secondary">
-          <div v-if="hasInstances(field, key)" class="info-well">
-            <ul class="report-block-list">
-              <li v-for="(instance, i) in field.value" :key="i" class="report-block-list-issue">
-                <div class="report-block-list-icon append-right-5 failed">
-                  <icon :size="32" name="status_failed_borderless" />
-                </div>
-                <div class="report-block-list-issue-description prepend-top-5 append-bottom-5">
-                  <div class="report-block-list-issue-description-text">{{ instance.method }}</div>
-                  <div class="report-block-list-issue-description-link">
-                    <safe-link
-                      :href="instance.uri"
-                      target="_blank"
-                      rel="noopener noreferrer nofollow"
-                      class="break-link"
-                    >
-                      {{ instance.uri }}
-                    </safe-link>
+      <div class="border-white mb-0 px-3">
+        <div
+          v-for="(field, key, index) in modal.data"
+          v-if="field.value"
+          :key="index"
+          class="d-flex my-2"
+        >
+          <label class="col-2 text-right font-weight-bold pl-0">{{ field.text }}:</label>
+          <div class="col-10 pl-0 text-secondary">
+            <div v-if="hasInstances(field, key)" class="info-well">
+              <ul class="report-block-list">
+                <li v-for="(instance, i) in field.value" :key="i" class="report-block-list-issue">
+                  <div class="report-block-list-icon append-right-5 failed">
+                    <icon :size="32" name="status_failed_borderless" />
                   </div>
-                  <expand-button v-if="instance.evidence">
-                    <pre
-                      slot="expanded"
-                      class="block report-block-dast-code prepend-top-10 report-block-issue-code"
-                    >
+                  <div class="report-block-list-issue-description prepend-top-5 append-bottom-5">
+                    <div class="report-block-list-issue-description-text">
+                      {{ instance.method }}
+                    </div>
+                    <div class="report-block-list-issue-description-link">
+                      <safe-link
+                        :href="instance.uri"
+                        target="_blank"
+                        rel="noopener noreferrer nofollow"
+                        class="break-link"
+                      >
+                        {{ instance.uri }}
+                      </safe-link>
+                    </div>
+                    <expand-button v-if="instance.evidence">
+                      <pre
+                        slot="expanded"
+                        class="block report-block-dast-code prepend-top-10 report-block-issue-code"
+                      >
                       {{ instance.evidence }}</pre
-                    >
-                  </expand-button>
-                </div>
-              </li>
-            </ul>
+                      >
+                    </expand-button>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <template v-else-if="hasIdentifiers(field, key)">
+              <span v-for="(identifier, i) in field.value" :key="i">
+                <safe-link
+                  v-if="identifier.url"
+                  :class="`js-link-${key}`"
+                  :href="identifier.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {{ identifier.name }}
+                </safe-link>
+                <span v-else> {{ identifier.name }} </span>
+                <span v-if="isLastValue(i, field.value)">,&nbsp;</span>
+              </span>
+            </template>
+            <template v-else-if="hasLinks(field, key)">
+              <span v-for="(link, i) in field.value" :key="i">
+                <safe-link
+                  :class="`js-link-${key}`"
+                  :href="link.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {{ link.value || link.url }}
+                </safe-link>
+                <span v-if="isLastValue(i, field.value)">,&nbsp;</span>
+              </span>
+            </template>
+            <template v-else>
+              <safe-link
+                v-if="field.isLink"
+                :class="`js-link-${key}`"
+                :href="field.url"
+                target="_blank"
+              >
+                {{ field.value }}
+              </safe-link>
+              <span v-else> {{ field.value }} </span>
+            </template>
           </div>
-          <template v-else-if="hasIdentifiers(field, key)">
-            <span v-for="(identifier, i) in field.value" :key="i">
-              <safe-link
-                v-if="identifier.url"
-                :class="`js-link-${key}`"
-                :href="identifier.url"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {{ identifier.name }}
-              </safe-link>
-              <span v-else> {{ identifier.name }} </span>
-              <span v-if="isLastValue(i, field.value)">,&nbsp;</span>
-            </span>
-          </template>
-          <template v-else-if="hasLinks(field, key)">
-            <span v-for="(link, i) in field.value" :key="i">
-              <safe-link
-                :class="`js-link-${key}`"
-                :href="link.url"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {{ link.value || link.url }}
-              </safe-link>
-              <span v-if="isLastValue(i, field.value)">,&nbsp;</span>
-            </span>
-          </template>
-          <template v-else>
-            <safe-link
-              v-if="field.isLink"
-              :class="`js-link-${key}`"
-              :href="field.url"
-              target="_blank"
-            >
-              {{ field.value }}
-            </safe-link>
-            <span v-else> {{ field.value }} </span>
-          </template>
         </div>
       </div>
 
-      <div class="row prepend-top-20 append-bottom-10">
-        <div class="col-sm-9 offset-sm-3 text-secondary">
+      <solution-card v-if="renderSolutionCard" :solution="solution" :remediation="remediation" />
+      <hr v-else />
+
+      <div class="prepend-top-20 append-bottom-10">
+        <div class="col-sm-12 text-secondary">
           <template v-if="hasDismissedBy">
             {{ s__('ciReport|Dismissed by') }}
             <a :href="modal.vulnerability.dismissalFeedback.author.web_url" class="pipeline-id">

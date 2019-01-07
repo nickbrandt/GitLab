@@ -116,11 +116,6 @@ export default () => ({
         text: s__('ciReport|Confidence'),
         isLink: false,
       },
-      solution: {
-        value: null,
-        text: s__('ciReport|Solution'),
-        isLink: false,
-      },
       links: {
         value: [],
         text: s__('ciReport|Links'),
