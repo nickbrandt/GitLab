@@ -209,7 +209,7 @@ describe API::Services do
     end
 
     it 'returns status 200' do
-      post api('/slack/trigger'), token: 'token', text: 'help'
+      post api('/slack/trigger'), params: { token: 'token', text: 'help' }
 
       expect(response).to have_gitlab_http_status(200)
       expect(json_response['response_type']).to eq("ephemeral")

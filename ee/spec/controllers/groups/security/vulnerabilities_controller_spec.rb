@@ -231,7 +231,7 @@ describe Groups::Security::VulnerabilitiesController do
 
         context 'with enabled filters' do
           it 'returns counts for filtered vulnerabilities' do
-            get :summary, group_id: group, report_type: %w[sast dast], severity: %[high low], format: :json
+            get :summary, params: { group_id: group, report_type: %w[sast dast], severity: %[high low] }, format: :json
 
             expect(response).to have_gitlab_http_status(200)
             expect(json_response).to be_an(Hash)
