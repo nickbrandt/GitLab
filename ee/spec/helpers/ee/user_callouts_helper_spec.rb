@@ -79,36 +79,31 @@ describe EE::UserCalloutsHelper do
     subject { helper.show_enable_hashed_storage_warning? }
     let(:user) { create(:user) }
 
-    before do
-      expect(helper).to receive(:current_user).and_return(user)
-    end
+    context 'when hashed storage is disabled' do
+      before do
+        stub_application_setting(hashed_storage_enabled: false)
+        expect(helper).to receive(:current_user).and_return(user)
+      end
 
-    context 'when the enable warning has not been dismissed' do
-      context 'when hashed storage is disabled' do
-        before do
-          stub_application_setting(hashed_storage_enabled: false)
-        end
-
+      context 'when the enable warning has not been dismissed' do
         it { is_expected.to be_truthy }
       end
 
-      context 'when hashed storage is enabled' do
+      context 'when the enable warning was dismissed' do
         before do
-          stub_application_setting(hashed_storage_enabled: true)
+          create(:user_callout, user: user, feature_name: described_class::GEO_ENABLE_HASHED_STORAGE)
         end
 
         it { is_expected.to be_falsy }
       end
     end
 
-    context 'when the enable warning was dismissed' do
-      it 'does not render the enable warning' do
-        create(:user_callout, user: user, feature_name: described_class::GEO_ENABLE_HASHED_STORAGE)
-
-        expect(helper).not_to receive(:render_flash_user_callout)
-
-        helper.render_enable_hashed_storage_warning
+    context 'when hashed storage is enabled' do
+      before do
+        stub_application_setting(hashed_storage_enabled: true)
       end
+
+      it { is_expected.to be_falsy }
     end
   end
 
@@ -116,24 +111,21 @@ describe EE::UserCalloutsHelper do
     subject { helper.show_migrate_hashed_storage_warning? }
     let(:user) { create(:user) }
 
-    before do
-      expect(helper).to receive(:current_user).and_return(user)
-    end
-
-    context 'when the migrate warning has not been dismissed' do
-      context 'when hashed storage is disabled' do
-        before do
-          expect(helper).to receive(:hashed_storage_enabled?).and_return(false)
-        end
-
-        it { is_expected.to be_falsy }
+    context 'when hashed storage is disabled' do
+      before do
+        stub_application_setting(hashed_storage_enabled: false)
       end
 
-      context 'when hashed storage is enabled' do
-        before do
-          expect(helper).to receive(:hashed_storage_enabled?).and_return(true)
-        end
+      it { is_expected.to be_falsy }
+    end
 
+    context 'when hashed storage is enabled' do
+      before do
+        stub_application_setting(hashed_storage_enabled: true)
+        expect(helper).to receive(:current_user).and_return(user)
+      end
+
+      context 'when the enable warning has not been dismissed' do
         context 'when there is a project in non-hashed-storage' do
           before do
             create(:project, :legacy_storage)
@@ -146,14 +138,13 @@ describe EE::UserCalloutsHelper do
           it { is_expected.to be_falsy }
         end
       end
-    end
 
-    context 'when the migrate warning was dismissed' do
-      it 'does not render the migrate warning' do
-        create(:user_callout, user: user, feature_name: described_class::GEO_ENABLE_HASHED_STORAGE)
-        expect(helper).not_to receive(:render_flash_user_callout)
+      context 'when the enable warning was dismissed' do
+        before do
+          create(:user_callout, user: user, feature_name: described_class::GEO_MIGRATE_HASHED_STORAGE)
+        end
 
-        helper.render_migrate_hashed_storage_warning
+        it { is_expected.to be_falsy }
       end
     end
   end

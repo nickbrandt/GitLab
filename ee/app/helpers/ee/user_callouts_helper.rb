@@ -42,14 +42,14 @@ module EE
     end
 
     def show_enable_hashed_storage_warning?
-      return if user_dismissed?(GEO_ENABLE_HASHED_STORAGE)
+      return if hashed_storage_enabled?
 
-      !hashed_storage_enabled?
+      !user_dismissed?(GEO_ENABLE_HASHED_STORAGE)
     end
 
     def show_migrate_hashed_storage_warning?
-      return if user_dismissed?(GEO_MIGRATE_HASHED_STORAGE)
       return unless hashed_storage_enabled?
+      return if user_dismissed?(GEO_MIGRATE_HASHED_STORAGE)
 
       any_project_not_in_hashed_storage?
     end
