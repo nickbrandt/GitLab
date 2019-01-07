@@ -92,6 +92,7 @@ describe('BoardsSelector', () => {
   });
 
   it('shows the scroll fade if isScrolledUp', done => {
+    vm.scrollFadeInitialized = false;
     scrollContainer.scrollTop = 0;
 
     waitForScroll()
@@ -111,5 +112,50 @@ describe('BoardsSelector', () => {
       })
       .then(done)
       .catch(done.fail);
+  });
+
+  describe('filtering', () => {
+    const fillSearchBox = filterTerm => {
+      const { searchBox } = vm.$refs;
+      const searchBoxInput = searchBox.$el.querySelector('input');
+      searchBoxInput.value = filterTerm;
+      searchBoxInput.dispatchEvent(new Event('input'));
+    };
+
+    it('shows all boards without filtering', () => {
+      const dropdownItemCount = vm.$el.querySelectorAll('.js-dropdown-item');
+
+      expect(dropdownItemCount.length).toBe(boards.length);
+    });
+
+    it('shows only matching boards when filtering', done => {
+      const filterTerm = 'board1';
+      const expectedCount = boards.filter(board => board.name.includes(filterTerm)).length;
+
+      fillSearchBox(filterTerm);
+
+      vm.$nextTick()
+        .then(() => {
+          const dropdownItems = vm.$el.querySelectorAll('.js-dropdown-item');
+
+          expect(dropdownItems.length).toBe(expectedCount);
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+
+    it('shows message if there are no matching boards', done => {
+      fillSearchBox('does not exist');
+
+      vm.$nextTick()
+        .then(() => {
+          const dropdownItems = vm.$el.querySelectorAll('.js-dropdown-item');
+
+          expect(dropdownItems.length).toBe(0);
+          expect(vm.$el).toContainText('No matching boards found');
+        })
+        .then(done)
+        .catch(done.fail);
+    });
   });
 });
