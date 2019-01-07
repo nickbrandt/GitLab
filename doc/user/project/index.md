@@ -81,17 +81,20 @@ website with GitLab Pages
 
 **Other features:**
 
-- [Wiki](wiki/index.md): Document your GitLab project in an integrated Wiki
-- [Snippets](../snippets.md): Store, share and collaborate on code snippets
-- [Cycle Analytics](cycle_analytics.md): Review your development lifecycle
-- [Security Dashboard](security_dashboard.md): Security Dashboard
-- [Syntax highlighting](highlighting.md): An alternative to customize
-  your code blocks, overriding GitLab's default choice of language
-- [Badges](badges.md): Badges for the project overview
-- [Maven packages](packages/maven_repository.md): Your private Maven repository in GitLab **[PREMIUM]**
-- [NPM packages](packages/npm_registry.md): Your private NPM package registry in GitLab **[PREMIUM]**
-- [Code owners](code_owners.md): Specify code owners for certain files **[STARTER]**
-- [License Management](merge_requests/license_management.md): Approve and blacklist licenses for projects **[ULTIMATE]**
+- [Wiki](wiki/index.md): document your GitLab project in an integrated Wiki.
+- [Snippets](../snippets.md): store, share and collaborate on code snippets.
+- [Cycle Analytics](cycle_analytics.md): review your development lifecycle.
+- [Security Dashboard](security_dashboard.md): Security Dashboard.
+- [Syntax highlighting](highlighting.md): an alternative to customize
+  your code blocks, overriding GitLab's default choice of language.
+- [Badges](badges.md): badges for the project overview.
+- [Releases](releases/index.md): a way to track deliverables in your project as snapshot in time of
+the source, build output, and other metadata or artifacts
+associated with a released version of your code.
+- [Maven packages](packages/maven_repository.md): your private Maven repository in GitLab. **[PREMIUM]**
+- [NPM packages](packages/npm_registry.md): your private NPM package registry in GitLab. **[PREMIUM]**
+- [Code owners](code_owners.md): specify code owners for certain files **[STARTER]**
+- [License Management](merge_requests/license_management.md): approve and blacklist licenses for projects. **[ULTIMATE]**
 
 ### Project's integrations
 
