@@ -669,26 +669,24 @@ module QuickActions
     end
 
     def parent
-      project || issuable_group
+      project || group
     end
 
-    def issuable_group
-      strong_memoize(:issuable_group) do
+    def group
+      strong_memoize(:group) do
         issuable.group if issuable.respond_to?(:group)
       end
     end
 
-    def find_labels(label_references = nil)
-      labels_params = { include_ancestor_groups: true }
-      labels_params[:project_id] = project.id if project
-      labels_params[:group_id] = issuable_group.id if issuable_group
-      labels_params[:name] = label_references.split if label_references
+    def find_labels(labels_params = nil)
+      finder_params = { include_ancestor_groups: true }
+      finder_params[:project_id] = project.id if project
+      finder_params[:group_id] = group.id if group
+      finder_params[:name] = labels_params.split if labels_params
 
-      result = LabelsFinder.new(current_user, labels_params).execute
+      result = LabelsFinder.new(current_user, finder_params).execute
 
-      return result unless label_references
-
-      extract_references(label_references, :label) | result
+      extract_references(labels_params, :label) | result
     end
 
     def find_label_references(labels_param)
@@ -719,9 +717,11 @@ module QuickActions
 
     # rubocop: disable CodeReuse/ActiveRecord
     def extract_references(arg, type)
+      return [] unless arg
+
       ext = Gitlab::ReferenceExtractor.new(project, current_user)
 
-      ext.analyze(arg, author: current_user, group: issuable_group)
+      ext.analyze(arg, author: current_user, group: group)
 
       ext.references(type)
     end

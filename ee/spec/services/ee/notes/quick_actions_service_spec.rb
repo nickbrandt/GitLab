@@ -198,7 +198,7 @@ describe Notes::QuickActionsService do
       end
     end
 
-    describe '/label' do
+    describe '/unlabel' do
       let(:project) { nil }
       let!(:bug) { create(:group_label, title: 'bug', group: group)}
       let!(:feature) { create(:group_label, title: 'feature', group: group)}
