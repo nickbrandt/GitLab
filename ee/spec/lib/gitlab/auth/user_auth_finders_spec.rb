@@ -9,7 +9,7 @@ describe Gitlab::Auth::UserAuthFinders do
       'rack.input' => ''
     }
   end
-  let(:request) { Rack::Request.new(env)}
+  let(:request) { ActionDispatch::Request.new(env)}
   let(:params) { request.params }
 
   def set_param(key, value)

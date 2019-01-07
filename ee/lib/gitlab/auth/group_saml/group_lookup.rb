@@ -38,7 +38,7 @@ module Gitlab
         end
 
         def params
-          @params ||= Rack::Request.new(env).params
+          @params ||= ActionDispatch::Request.new(env).params
         end
 
         def path_from_params
