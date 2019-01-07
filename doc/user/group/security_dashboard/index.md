@@ -13,7 +13,7 @@ projects in a group and its subgroups.
 ## Overview
 
 To use the Group Security Dashboard, you need a group that has at least one
-project with [Static Application Security Testing](../../project/merge_requests/sast.md)
+project with [Static Application Security Testing](../../project/merge_requests/sast.md) or [dependency scanning](../../project/merge_requests/dependency_scanning.md)
 enabled.
 
 The Dashboard is a good place to get an overview of the security vulnerabilities in your projects.
@@ -30,14 +30,14 @@ each one separately.
 
 ## Supported features
 
-The group security dashboard supports [SAST](../../project/merge_requests/sast.md) reports.
+The group security dashboard supports [SAST](../../project/merge_requests/sast.md), and [dependency scanning](../../project/merge_requests/dependency_scanning.md) reports.
 
 ## Requirements
 
 To use the group security dashboard:
 
 1. At least one project inside a group must be configured with
-   [Static Application Security Testing](../../project/merge_requests/sast.md).
+   [Static Application Security Testing](../../project/merge_requests/sast.md), or [dependency scanning](../../project/merge_requests/dependency_scanning.md).
 2. The configured jobs must use the [new `reports` syntax](../../../ci/yaml/README.md#artifactsreports) (see an [example job](../../../ci/examples/sast.md)).
 3. [GitLab Runner](https://docs.gitlab.com/runner/) 11.5 or above must be used to execute the jobs.
 
@@ -55,7 +55,9 @@ are created even if no code change happens.
 First, navigate to the Security Dashboard found under your group's
 **Overview > Security Dashboard**.
 
-Once you're on the dashboard, on the top you should see an overview of all the
+Once you're on the dashboard, on the top you should see a series of filters for,
+severity, report type, and project. Selecting one or more of these will filter
+the results in the sectons below. The first section is an overview of all the
 vulnerabilities, grouped by severity. Underneath these overviews is a timeline
 chart that shows how many open vulnerabilities you had at various points in time.
 You can hover over the chart to get more details about the open vulnerabilities
