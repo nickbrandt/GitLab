@@ -86,8 +86,10 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
       context 'when project rule is present' do
         let!(:project_rule) { create(:approval_project_rule, project: target.target_project) }
 
-        it "sets MR rule's source to project rule" do
-          create_member_in(create(:user), :old_schema)
+        it "sets MR rule's source to project rule without duplication" do
+          user = create(:user)
+          create_member_in(user, :old_schema)
+          create_member_in(user, :old_schema)
 
           described_class.new.perform(target_type, target.id)
 

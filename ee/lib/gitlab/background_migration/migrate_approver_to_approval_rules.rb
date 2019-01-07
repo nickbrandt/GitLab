@@ -56,11 +56,11 @@ module Gitlab
         has_many :approval_rules, class_name: 'ApprovalMergeRequestRule'
 
         def approver_ids
-          @approver_ids ||= Approver.where(target_type: 'MergeRequest', target_id: id).pluck(:user_id)
+          @approver_ids ||= Approver.where(target_type: 'MergeRequest', target_id: id).pluck('distinct user_id')
         end
 
         def approver_group_ids
-          @approver_group_ids ||= ApproverGroup.where(target_type: 'MergeRequest', target_id: id).pluck(:group_id)
+          @approver_group_ids ||= ApproverGroup.where(target_type: 'MergeRequest', target_id: id).pluck('distinct group_id')
         end
 
         def sync_code_owners_with_approvers
@@ -78,11 +78,11 @@ module Gitlab
         has_many :approval_rules, class_name: 'ApprovalProjectRule'
 
         def approver_ids
-          @approver_ids ||= Approver.where(target_type: 'Project', target_id: id).pluck(:user_id)
+          @approver_ids ||= Approver.where(target_type: 'Project', target_id: id).pluck('distinct user_id')
         end
 
         def approver_group_ids
-          @approver_group_ids ||= ApproverGroup.where(target_type: 'Project', target_id: id).pluck(:group_id)
+          @approver_group_ids ||= ApproverGroup.where(target_type: 'Project', target_id: id).pluck('distinct group_id')
         end
       end
 
