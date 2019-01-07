@@ -162,6 +162,15 @@ side.
 
 Learn more about [importing issues from CSV](csv_import.md)
 
+### Import Issues from CSV
+
+From the project-level issues list, you can find the import button near the "Edit issues" button in the upper-right
+side.
+
+![Import CSV button](img/import_csv_button.png)
+
+Learn more about [importing issues from CSV](csv_import.md)
+
 ### External Issue Tracker
 
 Alternatively to GitLab's built-in Issue Tracker, you can also use an [external
