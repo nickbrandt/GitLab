@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require 'spec_helper'
 
-RSpec.describe ApprovalRuleLike, type: :model do
-  let(:member1) { create(:user) }
-  let(:member2) { create(:user) }
-  let(:member3) { create(:user) }
+describe ApprovalRuleLike do
+  let(:user1) { create(:user) }
+  let(:user2) { create(:user) }
+  let(:user3) { create(:user) }
   let(:group1) { create(:group) }
   let(:group2) { create(:group) }
 
@@ -15,16 +15,17 @@ RSpec.describe ApprovalRuleLike, type: :model do
     describe '#add_member' do
       it 'adds as a member of the rule' do
         expect do
-          subject.add_member(member1)
-        end.to change { subject.users.count }.by(1)
+          subject.add_member(user1)
+          subject.add_member(group1)
+        end.to change { subject.users.count }.by(1).and change { subject.groups.count }.by(1)
       end
 
       it 'does nothing if already a member' do
-        subject.add_member(member1)
+        subject.add_member(user1)
 
         expect do
-          subject.add_member(member1)
-        end.not_to change { subject.users.count }
+          subject.add_member(user1)
+        end.not_to change { subject.users.count + subject.groups.count }
       end
     end
 
@@ -45,31 +46,31 @@ RSpec.describe ApprovalRuleLike, type: :model do
     end
 
     describe '#approvers' do
-      let(:group1_member1) { create(:user) }
-      let(:group2_member1) { create(:user) }
+      let(:group1_user) { create(:user) }
+      let(:group2_user) { create(:user) }
 
       before do
-        subject.users << member1
-        subject.users << member2
+        subject.users << user1
+        subject.users << user2
         subject.groups << group1
         subject.groups << group2
 
-        group1.add_guest(group1_member1)
-        group2.add_guest(group2_member1)
+        group1.add_guest(group1_user)
+        group2.add_guest(group2_user)
       end
 
       it 'contains users as direct members and group members' do
-        expect(subject.approvers).to contain_exactly(member1, member2, group1_member1, group2_member1)
+        expect(subject.approvers).to contain_exactly(user1, user2, group1_user, group2_user)
       end
 
       context 'when user is both a direct member and a group member' do
         before do
-          group1.add_guest(member1)
-          group2.add_guest(member2)
+          group1.add_guest(user1)
+          group2.add_guest(user2)
         end
 
         it 'contains only unique users' do
-          expect(subject.approvers).to contain_exactly(member1, member2, group1_member1, group2_member1)
+          expect(subject.approvers).to contain_exactly(user1, user2, group1_user, group2_user)
         end
       end
     end

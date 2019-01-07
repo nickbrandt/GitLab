@@ -1,31 +1,40 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require 'spec_helper'
 
-RSpec.describe ApprovalMergeRequestRule, type: :model do
+describe ApprovalMergeRequestRule do
   let(:merge_request) { create(:merge_request) }
 
   subject { create(:approval_merge_request_rule, merge_request: merge_request) }
 
   describe '#project' do
     it 'returns project of MergeRequest' do
+      expect(subject.project).to be_present
       expect(subject.project).to eq(merge_request.project)
     end
   end
 
   describe '#approvers' do
-    context 'when project setting includes author' do
-      before do
-        merge_request.target_project.update(merge_requests_author_approval: true)
-
-        create(:group) do |group|
-          group.add_guest(merge_request.author)
-          subject.groups << group
-        end
+    before do
+      create(:group) do |group|
+        group.add_guest(merge_request.author)
+        subject.groups << group
       end
+    end
 
+    context 'when project merge_requests_author_approval is true' do
       it 'contains author' do
+        merge_request.project.update(merge_requests_author_approval: true)
+
         expect(subject.approvers).to contain_exactly(merge_request.author)
+      end
+    end
+
+    context 'when project merge_requests_author_approval is false' do
+      it 'contains author' do
+        merge_request.project.update(merge_requests_author_approval: false)
+
+        expect(subject.approvers).to be_empty
       end
     end
   end
@@ -46,14 +55,14 @@ RSpec.describe ApprovalMergeRequestRule, type: :model do
       it 'does nothing' do
         subject.sync_approved_approvers
 
-        expect(subject.approved_approvers).to be_empty
+        expect(subject.approved_approvers.reload).to be_empty
       end
     end
 
     context 'when merged' do
       let(:merge_request) { create(:merged_merge_request) }
 
-      it 'updates mapping' do
+      it 'records approved approvers as approved_approvers association' do
         subject.sync_approved_approvers
 
         expect(subject.approved_approvers.reload).to contain_exactly(member1, member2)
