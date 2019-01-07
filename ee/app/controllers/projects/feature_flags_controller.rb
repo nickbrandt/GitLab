@@ -21,10 +21,7 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
       format.json do
         Gitlab::PollingInterval.set_header(response, interval: 10_000)
 
-        render json: FeatureFlagSerializer
-          .new(project: @project, current_user: @current_user)
-          .with_pagination(request, response)
-          .represent(@feature_flags)
+        render json: { feature_flags: feature_flags_json }.merge(summary_json)
       end
     end
   end
@@ -76,5 +73,18 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
   def update_params
     params.require(:operations_feature_flag)
           .permit(:name, :description, :active)
+  end
+
+  def feature_flags_json
+    FeatureFlagSerializer
+      .new(project: @project, current_user: @current_user)
+      .with_pagination(request, response)
+      .represent(@feature_flags)
+  end
+
+  def summary_json
+    FeatureFlagSummarySerializer
+      .new(project: @project, current_user: @current_user)
+      .represent(@project)
   end
 end
