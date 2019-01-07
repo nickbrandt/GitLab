@@ -10,7 +10,7 @@ vulnerabilities using Dependency Scanning.
 
 You can take advantage of Dependency Scanning by either [including the CI job](../../../ci/examples/dependency_scanning.md) in
 your existing `.gitlab-ci.yml` file or by implicitly using
-[Auto Dependency Scanning](../../../topics/autodevops/index.md#auto-dependency-scanning)
+[Auto Dependency Scanning](../../../topics/autodevops/index.md#auto-dependency-scanning-ultimate)
 that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
 
 Going a step further, GitLab can show the vulnerability list right in the merge

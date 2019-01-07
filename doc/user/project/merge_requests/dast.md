@@ -16,7 +16,7 @@ for known vulnerabilities using Dynamic Application Security Testing (DAST).
 
 You can take advantage of DAST by either [including the CI job](../../../ci/examples/dast.md) in
 your existing `.gitlab-ci.yml` file or by implicitly using
-[Auto DAST](../../../topics/autodevops/index.md#auto-dast)
+[Auto DAST](../../../topics/autodevops/index.md#auto-dast-ultimate)
 that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
 
 Going a step further, GitLab can show the vulnerability list right in the merge
