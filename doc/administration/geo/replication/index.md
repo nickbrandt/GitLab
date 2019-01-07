@@ -235,6 +235,10 @@ For more information on Geo security, see [Geo security review](security_review.
 
 For more information on tuning Geo, see [Tuning Geo](tuning.md).
 
+## Remove Geo node
+
+For more information on removing a Geo node, see [Removing **secondary** Geo nodes](remove_geo_node.md).
+
 ## Current limitations
 
 CAUTION: **Caution:**
