@@ -18,6 +18,13 @@ Since start date and due date can be dynamically sourced from related issue mile
 
 `end_date` has been deprecated in favor of `due_date`.
 
+## Epics pagination
+
+By default, `GET` requests return 20 results at a time because the API results
+are paginated.
+
+Read more on [pagination](README.md#pagination).
+
 ## List epics for a group
 
 Gets all epics of the requested group and its subgroups.
