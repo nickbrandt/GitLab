@@ -130,9 +130,8 @@ module Gitlab
           return
         end
 
-        rule = find_or_create_rule
-        rule.user_ids = target.approver_ids
-        rule.group_ids = target.approver_group_ids
+        rule = first_or_initialize
+        rule.update(user_ids: target.approver_ids, group_ids: target.approver_group_ids)
         rule
       end
 
@@ -147,10 +146,11 @@ module Gitlab
         end
       end
 
-      def find_or_create_rule
-        rule = target.approval_rules.regular.find_or_initialize_by(name: ApprovalRuleLike::DEFAULT_NAME)
+      def first_or_initialize
+        rule = target.approval_rules.regular.first_or_initialize
 
         unless rule.persisted?
+          rule.name ||= ApprovalRuleLike::DEFAULT_NAME
           rule.approvals_required = target.approvals_before_merge || 0
           rule.save!
         end
