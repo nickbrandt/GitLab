@@ -10,7 +10,7 @@ GET /geo_nodes
 ```
 
 ```bash
-curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/geo_nodes
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/geo_nodes
 ```
 
 Example response:
@@ -49,7 +49,7 @@ GET /geo_nodes/:id
 ```
 
 ```bash
-curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/geo_nodes/1
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/geo_nodes/1
 ```
 
 Example response:
@@ -148,7 +148,7 @@ GET /geo_nodes/status
 ```
 
 ```bash
-curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/geo_nodes/status
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/geo_nodes/status
 ```
 
 Example response:
@@ -294,7 +294,7 @@ GET /geo_nodes/:id/status
 ```
 
 ```bash
-curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/geo_nodes/2/status
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/geo_nodes/2/status
 ```
 
 Example response:
@@ -365,7 +365,7 @@ GET /geo_nodes/current/failures
 This endpoint uses [Pagination](README.md#pagination).
 
 ```bash
-curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/geo_nodes/current/failures
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/geo_nodes/current/failures
 ```
 
 Example response:
