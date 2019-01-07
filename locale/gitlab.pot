@@ -10865,6 +10865,12 @@ msgstr ""
 msgid "register"
 msgstr ""
 
+msgid "quick actions"
+msgstr ""
+
+msgid "register"
+msgstr ""
+
 msgid "remaining"
 msgstr ""
 
