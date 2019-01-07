@@ -10783,6 +10783,9 @@ msgstr[1] ""
 msgid "should be higher than %{access} inherited membership from group %{group_name}"
 msgstr ""
 
+msgid "show less"
+msgstr ""
+
 msgid "source"
 msgstr ""
 
