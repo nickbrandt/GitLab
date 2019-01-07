@@ -67,6 +67,18 @@ describe('ServiceDeskSetting', () => {
         expect(button).not.toBe(null);
         expect(button.dataset.clipboardText).toBe(incomingEmail);
       });
+
+      it('renders a help question icon which links to gitlab docs', () => {
+        const link = vm.$el.querySelector('.card-body a');
+
+        expect(link).not.toBeNull();
+
+        expect(link.href).toContain('docs.gitlab.com');
+
+        const icon = link.querySelector('i.fa-question-circle');
+
+        expect(icon).not.toBeNull();
+      });
     });
   });
 

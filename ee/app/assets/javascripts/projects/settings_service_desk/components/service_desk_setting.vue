@@ -59,6 +59,16 @@ export default {
             :text="incomingEmail"
             css-class="btn btn-clipboard btn-transparent"
           />
+          <a
+            href="https://docs.gitlab.com/ee/development/emails.html#email-namespace"
+            target="_blank"
+            rel="noopener"
+          >
+            <i
+              class="fa fa-question-circle"
+              :aria-label="__('Learn more about incoming email addresses')"
+            ></i>
+          </a>
         </template>
         <template v-else>
           <i class="fa fa-spinner fa-spin" aria-hidden="true"> </i>

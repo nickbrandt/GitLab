@@ -5103,6 +5103,9 @@ msgstr ""
 msgid "Learn more about group-level project templates"
 msgstr ""
 
+msgid "Learn more about incoming email addresses"
+msgstr ""
+
 msgid "Learn more about protected branches"
 msgstr ""
 
