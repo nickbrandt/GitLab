@@ -4,11 +4,13 @@ require 'spec_helper'
 
 describe 'projects/settings/operations/show' do
   let(:project) { create(:project, :repository) }
+  let(:error_tracking_setting) { create(:project_error_tracking_setting, project: project) }
 
   before do
     assign(:project, project)
     assign(:repository, project.repository)
     allow(view).to receive(:current_ref).and_return('master')
+    allow(view).to receive(:error_tracking_setting).and_return(error_tracking_setting)
 
     stub_licensed_features(tracing: true)
   end
