@@ -152,3 +152,113 @@ describe API::Members do
     let(:source) { group }
   end
 end
+
+describe "API::Members with LDAP link" do
+  let(:owner) { create(:user, username: 'owner_user') }
+  let(:developer) { create(:user) }
+  let(:ldap_developer) { create(:user) }
+  let(:ldap_developer2) { create(:user) }
+
+  let(:group) { create(:group_with_ldap_group_link, :public) }
+
+  let!(:owner_member) { create(:group_member, :owner, group: group, user: owner) }
+  let!(:ldap_member) { create(:group_member, :developer, group: group, user: ldap_developer, ldap: true) }
+  let!(:overridden_member) { create(:group_member, :developer, group: group, user: ldap_developer2, ldap: true, override: true) }
+  let!(:regular_member) { create(:group_member, :developer, group: group, user: developer, ldap: false) }
+
+  before do
+    # We need to actually activate the LDAP config otherwise `Group#ldap_synced?` will always be false!
+    allow(Gitlab.config.ldap).to receive_messages(enabled: true)
+  end
+
+  describe 'GET /groups/:id/members/:user_id has no override attribute' do
+    context 'project in a group' do
+      it 'succeeds not getting override on a non-LDAP user' do
+        get api("/groups/#{group.id}/members/#{developer.id}", owner)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response['id']).to eq(developer.id)
+        expect(json_response['access_level']).to eq(Member::DEVELOPER)
+        expect(json_response['override']).to eq(nil)
+      end
+    end
+  end
+
+  describe 'GET /groups/:id/members/:user_id has an override attribute' do
+    context 'project in a group' do
+      it 'succeeds getting override on an LDAP user' do
+        get api("/groups/#{group.id}/members/#{ldap_developer.id}", owner)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response['id']).to eq(ldap_developer.id)
+        expect(json_response['override']).to eq(false)
+        expect(json_response['access_level']).to eq(Member::DEVELOPER)
+      end
+    end
+  end
+
+  describe 'POST /groups/:id/members/:user_id/override with LDAP links' do
+    context 'project in a group' do
+      it 'succeeds when override is set on an LDAP user' do
+        post api("/groups/#{group.id}/members/#{ldap_developer.id}/override", owner)
+        expect(response).to have_gitlab_http_status(201)
+        expect(json_response['id']).to eq(ldap_developer.id)
+        expect(json_response['override']).to eq(true)
+        expect(json_response['access_level']).to eq(Member::DEVELOPER)
+      end
+
+      it 'succeeds when access_level is modified after override has been set' do
+        post api("/groups/#{group.id}/members/#{ldap_developer.id}/override", owner)
+        expect(response).to have_gitlab_http_status(201)
+
+        put api("/groups/#{group.id}/members/#{ldap_developer.id}", owner),
+          params: { access_level: Member::MAINTAINER }
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response['id']).to eq(ldap_developer.id)
+        expect(json_response['override']).to eq(true)
+        expect(json_response['access_level']).to eq(Member::MAINTAINER)
+      end
+    end
+  end
+
+  describe 'DELETE /groups/:id/members/:user_id/override with LDAP links' do
+    context 'project in a group' do
+      it 'succeeds when override is set on an LDAP user' do
+        delete api("/groups/#{group.id}/members/#{ldap_developer2.id}/override", owner)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response['id']).to eq(ldap_developer2.id)
+        expect(json_response['override']).to eq(false)
+      end
+    end
+  end
+
+  shared_examples 'POST /:source_type/:id/members/:user_id/override' do |source_type|
+    context "with :source_type == #{source_type.pluralize}" do
+      it 'returns 403  when override is set for a non-ldap user' do
+        post api("/#{source_type.pluralize}/#{source.id}/members/#{developer.id}/override", owner)
+
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+  end
+
+  shared_examples 'DELETE /:source_type/:id/members/:user_id/override' do |source_type|
+    context "with :source_type == #{source_type.pluralize}" do
+      it 'returns 403  when override is set for a non-ldap user' do
+        delete api("/#{source_type.pluralize}/#{source.id}/members/#{developer.id}/override", owner)
+
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+  end
+
+  it_behaves_like 'POST /:source_type/:id/members/:user_id/override', 'group' do
+    let(:source) { group }
+  end
+
+  it_behaves_like 'DELETE /:source_type/:id/members/:user_id/override', 'group' do
+    let(:source) { group }
+  end
+end

@@ -282,6 +282,76 @@ Example response:
 }
 ```
 
+### Override LDAP permissions for a member from a group
+
+Allows access level to be overriden for a LDAP group member
+
+>**Note:** This API endpoint is only available on 11.x Starter and above.
+
+```
+POST /groups/:id/members/:user_id/override
+```
+
+| Attribute | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id`      | integer/string | yes | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user |
+| `user_id` | integer | yes   | The user ID of the member |
+
+```bash
+curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/groups/:id/members/:user_id/override
+```
+
+Example response:
+
+```json
+{
+  "id": 1,
+  "username": "raymond_smith",
+  "name": "Raymond Smith",
+  "state": "active",
+  "avatar_url": "https://www.gravatar.com/avatar/c2525a7f58ae3776070e44c106c48e15?s=80&d=identicon",
+  "web_url": "http://192.168.1.8:3000/root",
+  "expires_at": "2012-10-22T14:13:35Z",
+  "access_level": 40,
+  "override": true
+}
+```
+
+### Un-override LDAP permissions for a member from a group
+
+Resets access level for a LDAP group member back to be level determined by the LDAP group
+
+>**Note:** This API endpoint is only available on 11.x Starter and above.
+
+```
+DELETE /groups/:id/members/:user_id/override
+```
+
+| Attribute | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id`      | integer/string | yes | The ID or [URL-encoded path of the group](README.md#namespaced-path-encoding) owned by the authenticated user |
+| `user_id` | integer | yes   | The user ID of the member |
+
+```bash
+curl --request PUT --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/groups/:id/members/:user_id/override
+```
+
+Example response:
+
+```json
+{
+  "id": 1,
+  "username": "raymond_smith",
+  "name": "Raymond Smith",
+  "state": "active",
+  "avatar_url": "https://www.gravatar.com/avatar/c2525a7f58ae3776070e44c106c48e15?s=80&d=identicon",
+  "web_url": "http://192.168.1.8:3000/root",
+  "expires_at": "2012-10-22T14:13:35Z",
+  "access_level": 40,
+  "override": false
+}
+```
+
 ## Remove a member from a group or project
 
 Removes a user from a group or project.
