@@ -61,7 +61,13 @@ module Sentry
     end
 
     def issue_url(id)
-      "#{issues_api_url}#{id}/"
+      issues_url = @url + "/issues/#{id}"
+      issues_url = ErrorTracking::ProjectErrorTrackingSetting.extract_sentry_external_url(issues_url)
+
+      uri = URI(issues_url)
+      uri.path.squeeze!('/')
+
+      uri.to_s
     end
 
     def map_to_error(issue)

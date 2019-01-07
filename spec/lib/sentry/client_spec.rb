@@ -55,7 +55,7 @@ describe Sentry::Client do
 
       context 'external_url' do
         it 'is constructed correctly' do
-          expect(subject[0].external_url).to eq('https://sentrytest.gitlab.com/api/0/projects/sentry-org/sentry-project/issues/11/')
+          expect(subject[0].external_url).to eq('https://sentrytest.gitlab.com/sentry-org/sentry-project/issues/11')
         end
       end
     end

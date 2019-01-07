@@ -2,15 +2,22 @@
 
 module ErrorTracking
   class ListIssuesService < ::BaseService
-    DEFAULT_ISSUE_STATUS = 'unresolved'.freeze
+    DEFAULT_ISSUE_STATUS = 'unresolved'
     DEFAULT_LIMIT = 20
 
     def execute
-      return error('not enabled') unless valid?
-      return error('access denied') unless can?(current_user, :read_sentry_issue, project)
+      return error('not enabled') unless enabled?
+      return error('access denied') unless can_read?
 
-      issues = sentry_client.list_issues(issue_status: issue_status, limit: limit)
-      success(issues: issues)
+      result = project_error_tracking_setting
+        .list_sentry_issues(issue_status: issue_status, limit: limit)
+
+      # our results are not yet ready
+      unless result
+        return error('not ready', :no_content)
+      end
+
+      success(issues: result[:issues])
     end
 
     def external_url
@@ -31,12 +38,12 @@ module ErrorTracking
       params[:limit] || DEFAULT_LIMIT
     end
 
-    def valid?
+    def enabled?
       project_error_tracking_setting&.enabled?
     end
 
-    def sentry_client
-      project_error_tracking_setting&.sentry_client
+    def can_read?
+      can?(current_user, :read_sentry_issue, project)
     end
   end
 end

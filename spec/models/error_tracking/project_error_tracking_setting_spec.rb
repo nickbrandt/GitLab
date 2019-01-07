@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe ErrorTracking::ProjectErrorTrackingSetting do
+  include ReactiveCachingHelpers
+
   set(:project) { create(:project) }
 
   subject { create(:project_error_tracking_setting, project: project) }
@@ -48,16 +50,60 @@ describe ErrorTracking::ProjectErrorTrackingSetting do
   describe '#sentry_external_url' do
     let(:sentry_url) { 'https://sentrytest.gitlab.com/api/0/projects/sentry-org/sentry-project' }
 
-    it 'returns the correct url' do
+    before do
       subject.api_url = sentry_url
+    end
 
-      expect(subject.sentry_external_url).to eq('https://sentrytest.gitlab.com/sentry-org/sentry-project')
+    it 'returns the correct url' do
+      expect(subject.class).to receive(:extract_sentry_external_url).with(sentry_url).and_call_original
+
+      result = subject.sentry_external_url
+
+      expect(result).to eq('https://sentrytest.gitlab.com/sentry-org/sentry-project')
     end
   end
 
   describe '#sentry_client' do
     it 'returns sentry client' do
       expect(subject.sentry_client).to be_a(Sentry::Client)
+    end
+  end
+
+  describe '#list_sentry_issues' do
+    let(:issues) { [:list, :of, :issues] }
+
+    let(:opts) do
+      { issue_status: 'unresolved', limit: 10 }
+    end
+
+    let(:result) do
+      subject.list_sentry_issues(**opts)
+    end
+
+    context 'when cached' do
+      let(:sentry_client) { spy(:sentry_client) }
+
+      before do
+        stub_reactive_cache(subject, issues, opts)
+        synchronous_reactive_cache(subject)
+
+        expect(subject).to receive(:sentry_client).and_return(sentry_client)
+      end
+
+      it 'returns cached issues' do
+        expect(sentry_client).to receive(:list_issues).with(opts)
+          .and_return(issues)
+
+        expect(result).to eq(issues: issues)
+      end
+    end
+
+    context 'when not cached' do
+      it 'returns nil' do
+        expect(subject).not_to receive(:sentry_client)
+
+        expect(result).to be_nil
+      end
     end
   end
 end

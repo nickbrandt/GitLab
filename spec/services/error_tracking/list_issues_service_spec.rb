@@ -8,7 +8,7 @@ describe ErrorTracking::ListIssuesService do
 
   let(:sentry_url) { 'https://sentrytest.gitlab.com/api/0/projects/sentry-org/sentry-project' }
   let(:token) { 'test-token' }
-  let(:client) { Sentry::Client.new(sentry_url, token) }
+  let(:result) { subject.execute }
 
   let(:error_tracking_setting) do
     create(:project_error_tracking_setting, api_url: sentry_url, token: token, project: project)
@@ -24,16 +24,29 @@ describe ErrorTracking::ListIssuesService do
 
   describe '#execute' do
     context 'with authorized user' do
-      before do
-        expect(error_tracking_setting).to receive(:sentry_client).and_return(client)
+      context 'when list_sentry_issues returns issues' do
+        let(:issues) { [:list, :of, :issues] }
+
+        before do
+          expect(error_tracking_setting)
+            .to receive(:list_sentry_issues).and_return(issues: issues)
+        end
+
+        it 'returns the issues' do
+          expect(result).to eq(status: :success, issues: issues)
+        end
       end
 
-      it 'calls sentry client' do
-        expect(client).to receive(:list_issues).and_return([])
+      context 'when list_sentry_issues returns nil' do
+        before do
+          expect(error_tracking_setting)
+            .to receive(:list_sentry_issues).and_return(nil)
+        end
 
-        result = subject.execute
-
-        expect(result).to include(status: :success)
+        it 'result is not ready' do
+          expect(result).to eq(
+            status: :error, http_status: :no_content, message: 'not ready')
+        end
       end
     end
 
