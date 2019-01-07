@@ -28,14 +28,32 @@ describe('filters module getters', () => {
   });
 
   describe('getSelectedOptions', () => {
-    it('should return "All" as the selcted option', () => {
-      const state = createState();
-      const selectedOptions = getters.getSelectedOptions(state, mockedGetters(state))(
-        'report_type',
-      );
+    describe('with one selected option', () => {
+      it('should return "All" as the selected option', () => {
+        const state = createState();
+        const selectedOptions = getters.getSelectedOptions(state, mockedGetters(state))(
+          'report_type',
+        );
 
-      expect(selectedOptions).toHaveLength(1);
-      expect(selectedOptions[0].name).toEqual('All');
+        expect(selectedOptions).toHaveLength(1);
+        expect(selectedOptions[0].name).toEqual('All');
+      });
+    });
+
+    describe('with multiple selected options', () => {
+      it('should return both "High" and "Critical" ', () => {
+        const state = {
+          filters: [
+            {
+              id: 'severity',
+              options: [{ id: 'critical', selected: true }, { id: 'high', selected: true }],
+            },
+          ],
+        };
+        const selectedOptions = getters.getSelectedOptions(state, mockedGetters(state))('severity');
+
+        expect(selectedOptions).toHaveLength(2);
+      });
     });
   });
 
@@ -53,6 +71,33 @@ describe('filters module getters', () => {
 
       expect(selectedOptionIds).toHaveLength(1);
       expect(selectedOptionIds[0]).toEqual('one');
+    });
+  });
+
+  describe('getSelectedOptionNames', () => {
+    it('should return "All" as the selected option', () => {
+      const state = createState();
+      const selectedOptionNames = getters.getSelectedOptionNames(state, mockedGetters(state))(
+        'severity',
+      );
+
+      expect(selectedOptionNames).toEqual('All');
+    });
+
+    it('should return the correct message when multiple filters are selected', () => {
+      const state = {
+        filters: [
+          {
+            id: 'severity',
+            options: [{ name: 'Critical', selected: true }, { name: 'High', selected: true }],
+          },
+        ],
+      };
+      const selectedOptionNames = getters.getSelectedOptionNames(state, mockedGetters(state))(
+        'severity',
+      );
+
+      expect(selectedOptionNames).toEqual('Critical +1 more');
     });
   });
 
