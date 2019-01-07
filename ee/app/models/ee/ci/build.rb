@@ -11,7 +11,8 @@ module EE
 
       LICENSED_PARSER_FEATURES = {
         sast: :sast,
-        dependency_scanning: :dependency_scanning
+        dependency_scanning: :dependency_scanning,
+        container_scanning: :container_scanning
       }.with_indifferent_access.freeze
 
       prepended do
