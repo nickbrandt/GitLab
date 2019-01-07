@@ -81,7 +81,7 @@ describe API::NpmPackages do
     end
 
     def get_package(package, params = {})
-      get api("/packages/npm/#{package.name}"), params
+      get api("/packages/npm/#{package.name}"), params: params
     end
 
     def get_package_with_token(package, params = {})
@@ -139,7 +139,7 @@ describe API::NpmPackages do
 
     def get_file(package_file, params = {})
       get api("/projects/#{project.id}/packages/npm/" \
-              "#{package_file.package.name}/-/#{package_file.file_name}"), params
+              "#{package_file.package.name}/-/#{package_file.file_name}"), params: params
     end
 
     def get_file_with_token(package_file, params = {})
@@ -176,7 +176,7 @@ describe API::NpmPackages do
     end
 
     def upload_package(package_name, params = {})
-      put api("/projects/#{project.id}/packages/npm/#{package_name.sub('/', '%2f')}"), params
+      put api("/projects/#{project.id}/packages/npm/#{package_name.sub('/', '%2f')}"), params: params
     end
 
     def upload_package_with_token(package_name, params = {})

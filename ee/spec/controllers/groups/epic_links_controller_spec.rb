@@ -45,7 +45,7 @@ describe Groups::EpicLinksController, :postgresql do
       epic1.update(parent: parent_epic)
     end
 
-    subject { get :index, group_id: group, epic_id: parent_epic.to_param }
+    subject { get :index, params: { group_id: group, epic_id: parent_epic.to_param } }
 
     it_behaves_like 'unlicensed epics action'
     it_behaves_like 'feature flag disabled'
@@ -72,7 +72,7 @@ describe Groups::EpicLinksController, :postgresql do
     subject do
       reference = [epic1.to_reference(full: true)]
 
-      post :create, group_id: group, epic_id: parent_epic.to_param, issuable_references: reference
+      post :create, params: { group_id: group, epic_id: parent_epic.to_param, issuable_references: reference }
     end
 
     it_behaves_like 'unlicensed epics action'
@@ -121,7 +121,7 @@ describe Groups::EpicLinksController, :postgresql do
       epic1.update(parent: parent_epic)
     end
 
-    subject { delete :destroy, group_id: group, epic_id: parent_epic.to_param, id: epic1.id }
+    subject { delete :destroy, params: { group_id: group, epic_id: parent_epic.to_param, id: epic1.id } }
 
     it_behaves_like 'unlicensed epics action'
     it_behaves_like 'feature flag disabled'
@@ -162,7 +162,7 @@ describe Groups::EpicLinksController, :postgresql do
 
       context 'when the epic does not have any parent' do
         it 'returns status 404' do
-          delete :destroy, group_id: group, epic_id: parent_epic.to_param, id: epic2.id
+          delete :destroy, params: { group_id: group, epic_id: parent_epic.to_param, id: epic2.id }
 
           expect(response.status).to eq(403)
         end

@@ -21,29 +21,38 @@ describe('filters module getters', () => {
   describe('getFilter', () => {
     it('should return the type filter information', () => {
       const state = createState();
-      const typeFilter = getters.getFilter(state)('type');
+      const typeFilter = getters.getFilter(state)('report_type');
 
       expect(typeFilter.name).toEqual('Report type');
     });
   });
 
   describe('getSelectedOptions', () => {
-    it('should return "SAST" as the selcted option', () => {
+    it('should return "All" as the selcted option', () => {
       const state = createState();
-      const selectedOptions = getters.getSelectedOptions(state, mockedGetters(state))('type');
+      const selectedOptions = getters.getSelectedOptions(state, mockedGetters(state))(
+        'report_type',
+      );
 
       expect(selectedOptions).toHaveLength(1);
-      expect(selectedOptions[0].name).toEqual('SAST');
+      expect(selectedOptions[0].name).toEqual('All');
     });
   });
 
   describe('getSelectedOptionIds', () => {
-    it('should return "sast" as the selcted option ID', () => {
+    it('should return "one" as the selcted project ID', () => {
       const state = createState();
-      const selectedOptionIds = getters.getSelectedOptionIds(state, mockedGetters(state))('type');
+      const projectFilter = {
+        id: 'project',
+        options: [{ id: 'one', selected: true }, { id: 'anotherone', selected: false }],
+      };
+      state.filters.push(projectFilter);
+      const selectedOptionIds = getters.getSelectedOptionIds(state, mockedGetters(state))(
+        'project',
+      );
 
       expect(selectedOptionIds).toHaveLength(1);
-      expect(selectedOptionIds[0]).toEqual('sast');
+      expect(selectedOptionIds[0]).toEqual('one');
     });
   });
 
@@ -53,14 +62,6 @@ describe('filters module getters', () => {
       const activeFilters = getters.activeFilters(state, mockedGetters(state));
 
       expect(activeFilters.severity).toHaveLength(0);
-    });
-
-    it('should return the SAST type filter', () => {
-      const state = createState();
-      const activeFilters = getters.activeFilters(state, mockedGetters(state));
-
-      expect(activeFilters.type).toHaveLength(1);
-      expect(activeFilters.type[0]).toEqual('sast');
     });
 
     it('should return multiple project filters"', () => {

@@ -23,7 +23,11 @@ export default {
       target="reports-info"
       placement="right"
       triggers="click"
-      :title="s__('Security Reports|At this time, the security dashboard only supports SAST.')"
+      :title="
+        s__(
+          'Security Reports|At this time, the security dashboard only supports SAST and dependency scanning.',
+        )
+      "
     >
       <a
         v-if="dashboardDocumentation"

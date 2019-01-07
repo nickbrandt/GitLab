@@ -443,6 +443,27 @@ describe Epic do
     end
   end
 
+  describe '.deepest_relationship_level', :postgresql do
+    it 'returns the deepest relationship level between epics' do
+      group_1 = create(:group)
+      group_2 = create(:group)
+
+      # No relationship
+      create(:epic, group: group_1)
+
+      # Two levels relationship
+      group_1_epic_1 = create(:epic, group: group_1)
+      create(:epic, group: group_1, parent: group_1_epic_1)
+
+      # Three levels relationship
+      group_2_epic_1 = create(:epic, group: group_2)
+      group_2_epic_2 = create(:epic, group: group_2, parent: group_2_epic_1)
+      create(:epic, group: group_2, parent: group_2_epic_2)
+
+      expect(described_class.deepest_relationship_level).to eq(3)
+    end
+  end
+
   describe '#issues_readable_by' do
     let(:user) { create(:user) }
     let(:group) { create(:group, :private) }
