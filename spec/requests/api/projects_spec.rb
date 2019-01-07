@@ -1632,7 +1632,7 @@ describe API::Projects do
       it 'updates approvals_before_merge' do
         project_param = { approvals_before_merge: 3 }
 
-        put api("/projects/#{project.id}", user), project_param
+        put api("/projects/#{project.id}", user), params: project_param
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response['approvals_before_merge']).to eq(3)

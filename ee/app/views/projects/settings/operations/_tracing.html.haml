@@ -1,3 +1,6 @@
+- return unless @project.feature_available?(:tracing, current_user)
+
+- setting = tracing_setting
 - has_jaeger_url = setting.external_url.present?
 
 %section

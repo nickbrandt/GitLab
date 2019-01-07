@@ -36,9 +36,9 @@ describe('Filter component', () => {
     });
   });
 
-  describe('type', () => {
+  describe('Report type', () => {
     beforeEach(() => {
-      props = { filterId: 'type', dashboardDocumentation: '' };
+      props = { filterId: 'report_type', dashboardDocumentation: '' };
       vm = mountComponentWithStore(Component, { store, props });
     });
 

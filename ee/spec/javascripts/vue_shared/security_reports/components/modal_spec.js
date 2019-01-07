@@ -149,8 +149,6 @@ describe('Security Reports modal', () => {
           vulnerabilityFeedbackHelpPath: 'feedbacksHelpPath',
         };
         props.modal.title = 'Arbitrary file existence disclosure in Action Pack';
-        props.modal.data.solution.value =
-          'upgrade to ~> 3.2.21, ~> 4.0.11.1, ~> 4.0.12, ~> 4.1.7.1, >= 4.1.8';
         props.modal.data.file.value = 'Gemfile.lock';
         props.modal.data.file.url = `${TEST_HOST}/path/Gemfile.lock`;
         vm = mountComponent(Component, props);
@@ -158,9 +156,6 @@ describe('Security Reports modal', () => {
 
       it('renders keys in `data`', () => {
         expect(vm.$el.textContent).toContain('Arbitrary file existence disclosure in Action Pack');
-        expect(vm.$el.textContent).toContain(
-          'upgrade to ~> 3.2.21, ~> 4.0.11.1, ~> 4.0.12, ~> 4.1.7.1, >= 4.1.8',
-        );
       });
 
       it('renders link fields with link', () => {
@@ -206,6 +201,51 @@ describe('Security Reports modal', () => {
 
     it('does not display the footer', () => {
       expect(vm.$el.classList.contains('modal-hide-footer')).toBeTruthy();
+    });
+  });
+
+  describe('Solution Card', () => {
+    it('is rendered if the vulnerability has a solution', () => {
+      const props = {
+        modal: createState().modal,
+      };
+
+      const solution = 'Upgrade to XYZ';
+      props.modal.vulnerability.solution = solution;
+      vm = mountComponent(Component, props);
+
+      const solutionCard = vm.$el.querySelector('.js-solution-card');
+
+      expect(solutionCard).not.toBeNull();
+      expect(solutionCard.textContent).toContain(solution);
+      expect(vm.$el.querySelector('hr')).toBeNull();
+    });
+
+    it('is rendered if the vulnerability has a remediation', () => {
+      const props = {
+        modal: createState().modal,
+      };
+      const summary = 'Upgrade to 123';
+      props.modal.vulnerability.remediation = { summary };
+      vm = mountComponent(Component, props);
+
+      const solutionCard = vm.$el.querySelector('.js-solution-card');
+
+      expect(solutionCard).not.toBeNull();
+      expect(solutionCard.textContent).toContain(summary);
+      expect(vm.$el.querySelector('hr')).toBeNull();
+    });
+
+    it('is not rendered if the vulnerability has neither a remediation nor a solution but renders a HR instead.', () => {
+      const props = {
+        modal: createState().modal,
+      };
+      vm = mountComponent(Component, props);
+
+      const solutionCard = vm.$el.querySelector('.js-solution-card');
+
+      expect(solutionCard).toBeNull();
+      expect(vm.$el.querySelector('hr')).not.toBeNull();
     });
   });
 

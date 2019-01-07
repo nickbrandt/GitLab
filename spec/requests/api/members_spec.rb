@@ -302,7 +302,7 @@ describe API::Members do
         project.group.add_owner(maintainer)
 
         post api("/projects/#{project.id}/members", maintainer),
-             user_id: developer.id, access_level: Member::MAINTAINER
+             params: { user_id: developer.id, access_level: Member::MAINTAINER }
 
         expect(response.status).to eq 405
       end

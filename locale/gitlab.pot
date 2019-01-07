@@ -128,6 +128,9 @@ msgstr ""
 msgid "%{count} %{alerts}"
 msgstr ""
 
+msgid "%{count} more"
+msgstr ""
+
 msgid "%{count} more assignees"
 msgstr ""
 
@@ -2211,6 +2214,9 @@ msgid "ClusterIntegration|With a Kubernetes cluster associated to this project, 
 msgstr ""
 
 msgid "ClusterIntegration|You must first install Helm Tiller before installing the applications below"
+msgstr ""
+
+msgid "ClusterIntegration|You must have an RBAC-enabled cluster to install Knative."
 msgstr ""
 
 msgid "ClusterIntegration|Your account must have %{link_to_kubernetes_engine}"
@@ -7678,7 +7684,7 @@ msgstr ""
 msgid "Security Dashboard|Issue Created"
 msgstr ""
 
-msgid "Security Reports|At this time, the security dashboard only supports SAST."
+msgid "Security Reports|At this time, the security dashboard only supports SAST and dependency scanning."
 msgstr ""
 
 msgid "Security Reports|Create issue"
@@ -8928,6 +8934,9 @@ msgstr ""
 msgid "This pipeline is run in a merge request context"
 msgstr ""
 
+msgid "This pipeline makes use of a predefined CI/CD configuration enabled by %{strongStart}Auto DevOps.%{strongEnd}"
+msgstr ""
+
 msgid "This pipeline makes use of a predefined CI/CD configuration enabled by <b>Auto DevOps.</b>"
 msgstr ""
 
@@ -9700,10 +9709,10 @@ msgstr ""
 msgid "Vulnerability|Project"
 msgstr ""
 
-msgid "Vulnerability|Severity"
+msgid "Vulnerability|Report Type"
 msgstr ""
 
-msgid "Vulnerability|Solution"
+msgid "Vulnerability|Severity"
 msgstr ""
 
 msgid "Want to see the data? Please ask an administrator for access."
@@ -10218,6 +10227,9 @@ msgstr ""
 msgid "ciReport|DAST"
 msgstr ""
 
+msgid "ciReport|Dependency Scanning"
+msgstr ""
+
 msgid "ciReport|Dependency Scanning detects known vulnerabilities in your source code's dependencies."
 msgstr ""
 
@@ -10231,6 +10243,12 @@ msgid "ciReport|Dismiss vulnerability"
 msgstr ""
 
 msgid "ciReport|Dismissed by"
+msgstr ""
+
+msgid "ciReport|Download and apply the patch to fix this vulnerability."
+msgstr ""
+
+msgid "ciReport|Download patch"
 msgstr ""
 
 msgid "ciReport|Dynamic Application Security Testing (DAST) detects known vulnerabilities in your web application."
@@ -10398,6 +10416,9 @@ msgstr[1] ""
 msgid "enabled"
 msgstr ""
 
+msgid "error"
+msgstr ""
+
 msgid "error code:"
 msgstr ""
 
@@ -10461,6 +10482,9 @@ msgid "it is stored in LFS"
 msgstr ""
 
 msgid "it is too large"
+msgstr ""
+
+msgid "latest"
 msgstr ""
 
 msgid "latest deployment"
@@ -10774,6 +10798,9 @@ msgstr[1] ""
 msgid "should be higher than %{access} inherited membership from group %{group_name}"
 msgstr ""
 
+msgid "show less"
+msgstr ""
+
 msgid "source"
 msgstr ""
 
@@ -10784,6 +10811,9 @@ msgid "spendCommand|%{slash_command} will update the sum of the time spent."
 msgstr ""
 
 msgid "started"
+msgstr ""
+
+msgid "stuck"
 msgstr ""
 
 msgid "this document"
@@ -10817,3 +10847,6 @@ msgid "within %d minute "
 msgid_plural "within %d minutes "
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "yaml invalid"
+msgstr ""

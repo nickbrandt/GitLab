@@ -167,7 +167,7 @@ describe Ci::Build do
         it 'parses blobs and add the results to the report' do
           subject
 
-          expect(security_reports.get_report('sast').occurrences.size).to eq(3)
+          expect(security_reports.get_report('sast').occurrences.size).to eq(33)
         end
       end
 
@@ -180,7 +180,7 @@ describe Ci::Build do
         it 'parses blobs and add the results to the reports' do
           subject
 
-          expect(security_reports.get_report('sast').occurrences.size).to eq(3)
+          expect(security_reports.get_report('sast').occurrences.size).to eq(33)
           expect(security_reports.get_report('dependency_scanning').occurrences.size).to eq(4)
         end
       end
@@ -236,7 +236,7 @@ describe Ci::Build do
     context 'when build has a license management report' do
       context 'when there is a license management report' do
         before do
-          create(:ee_ci_job_artifact, :license_management_report, job: job, project: job.project)
+          create(:ee_ci_job_artifact, :license_management, job: job, project: job.project)
         end
 
         it 'parses blobs and add the results to the report' do

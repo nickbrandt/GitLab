@@ -13,4 +13,5 @@ export const SEVERITIES = {
 
 export const REPORT_TYPES = {
   sast: s__('ciReport|SAST'),
+  dependency_scanning: s__('ciReport|Dependency Scanning'),
 };

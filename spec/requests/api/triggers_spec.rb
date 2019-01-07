@@ -135,7 +135,7 @@ describe API::Triggers do
       let(:params) { { ref: 'refs/heads/other-branch' } }
 
       subject do
-        post api("/projects/#{project.id}/ref/master/trigger/pipeline?token=#{other_job.token}"), params
+        post api("/projects/#{project.id}/ref/master/trigger/pipeline?token=#{other_job.token}"), params: params
       end
 
       context 'without user' do

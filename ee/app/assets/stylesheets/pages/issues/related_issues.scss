@@ -2,6 +2,10 @@ $token-spacing-bottom: 0.5em;
 
 .related-issues-block {
   margin-top: 3 * $gl-vert-padding;
+
+  .card-slim {
+    overflow: auto;
+  }
 }
 
 .related-issues-header-help-icon {

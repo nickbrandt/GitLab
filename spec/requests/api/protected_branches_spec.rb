@@ -195,7 +195,7 @@ describe API::ProtectedBranches do
       end
 
       it 'protects a single branch and only admins can unprotect' do
-        post post_endpoint, name: branch_name, unprotect_access_level: Gitlab::Access::ADMIN
+        post post_endpoint, params: { name: branch_name, unprotect_access_level: Gitlab::Access::ADMIN }
 
         expect(response).to have_gitlab_http_status(201)
         expect(json_response['name']).to eq(branch_name)
@@ -225,7 +225,7 @@ describe API::ProtectedBranches do
         it 'can protect a branch while allowing an individual user to push' do
           push_user = project_member
 
-          post post_endpoint, name: branch_name, allowed_to_push: [{ user_id: push_user.id }]
+          post post_endpoint, params: { name: branch_name, allowed_to_push: [{ user_id: push_user.id }] }
 
           expect_protection_to_be_successful
           expect(json_response['push_access_levels'][0]['user_id']).to eq(push_user.id)
@@ -234,7 +234,7 @@ describe API::ProtectedBranches do
         it 'can protect a branch while allowing an individual user to merge' do
           merge_user = project_member
 
-          post post_endpoint, name: branch_name, allowed_to_merge: [{ user_id: merge_user.id }]
+          post post_endpoint, params: { name: branch_name, allowed_to_merge: [{ user_id: merge_user.id }] }
 
           expect_protection_to_be_successful
           expect(json_response['merge_access_levels'][0]['user_id']).to eq(merge_user.id)
@@ -243,7 +243,7 @@ describe API::ProtectedBranches do
         it 'can protect a branch while allowing an individual user to unprotect' do
           unprotect_user = project_member
 
-          post post_endpoint, name: branch_name, allowed_to_unprotect: [{ user_id: unprotect_user.id }]
+          post post_endpoint, params: { name: branch_name, allowed_to_unprotect: [{ user_id: unprotect_user.id }] }
 
           expect_protection_to_be_successful
           expect(json_response['unprotect_access_levels'][0]['user_id']).to eq(unprotect_user.id)
@@ -252,7 +252,7 @@ describe API::ProtectedBranches do
         it 'can protect a branch while allowing a group to push' do
           push_group = invited_group
 
-          post post_endpoint, name: branch_name, allowed_to_push: [{ group_id: push_group.id }]
+          post post_endpoint, params: { name: branch_name, allowed_to_push: [{ group_id: push_group.id }] }
 
           expect_protection_to_be_successful
           expect(json_response['push_access_levels'][0]['group_id']).to eq(push_group.id)
@@ -261,7 +261,7 @@ describe API::ProtectedBranches do
         it 'can protect a branch while allowing a group to merge' do
           merge_group = invited_group
 
-          post post_endpoint, name: branch_name, allowed_to_merge: [{ group_id: merge_group.id }]
+          post post_endpoint, params: { name: branch_name, allowed_to_merge: [{ group_id: merge_group.id }] }
 
           expect_protection_to_be_successful
           expect(json_response['merge_access_levels'][0]['group_id']).to eq(merge_group.id)
@@ -270,7 +270,7 @@ describe API::ProtectedBranches do
         it 'can protect a branch while allowing a group to unprotect' do
           unprotect_group = invited_group
 
-          post post_endpoint, name: branch_name, allowed_to_unprotect: [{ group_id: unprotect_group.id }]
+          post post_endpoint, params: { name: branch_name, allowed_to_unprotect: [{ group_id: unprotect_group.id }] }
 
           expect_protection_to_be_successful
           expect(json_response['unprotect_access_levels'][0]['group_id']).to eq(unprotect_group.id)
@@ -279,7 +279,7 @@ describe API::ProtectedBranches do
         it "fails if users don't all have access to the project" do
           push_user = create(:user)
 
-          post post_endpoint, name: branch_name, allowed_to_merge: [{ user_id: push_user.id }]
+          post post_endpoint, params: { name: branch_name, allowed_to_merge: [{ user_id: push_user.id }] }
 
           expect(response).to have_gitlab_http_status(422)
           expect(json_response['message'][0]).to match(/Cannot add users or groups/)
@@ -288,7 +288,7 @@ describe API::ProtectedBranches do
         it "fails if groups aren't all invited to the project" do
           merge_group = create(:group)
 
-          post post_endpoint, name: branch_name, allowed_to_merge: [{ group_id: merge_group.id }]
+          post post_endpoint, params: { name: branch_name, allowed_to_merge: [{ group_id: merge_group.id }] }
 
           expect(response).to have_gitlab_http_status(422)
           expect(json_response['message'][0]).to match(/Cannot add users or groups/)
@@ -297,7 +297,7 @@ describe API::ProtectedBranches do
         it 'avoids creating default access levels unless necessary' do
           push_user = project_member
 
-          post post_endpoint, name: branch_name, allowed_to_push: [{ user_id: push_user.id }]
+          post post_endpoint, params: { name: branch_name, allowed_to_push: [{ user_id: push_user.id }] }
 
           expect(response).to have_gitlab_http_status(201)
           expect(json_response['push_access_levels'].count).to eq(1)

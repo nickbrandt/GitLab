@@ -18,7 +18,7 @@ describe Security::StoreReportService, '#execute' do
     using RSpec::Parameterized::TableSyntax
 
     where(:case_name, :report_type, :scanners, :identifiers, :occurrences, :occurrence_identifiers, :occurrence_pipelines) do
-      'with SAST report'                | :sast                | 3 | 4 | 3 | 5 | 3
+      'with SAST report'                | :sast                | 3 | 14 | 33 | 35 | 33
       'with Dependency Scanning report' | :dependency_scanning | 2 | 7 | 4 | 7 | 4
     end
 
@@ -46,8 +46,8 @@ describe Security::StoreReportService, '#execute' do
   end
 
   context 'with existing data from previous pipeline' do
-    let(:scanner) { create(:vulnerabilities_scanner, project: project, external_id: 'find_sec_bugs', name: 'existing_name') }
-    let(:identifier) { create(:vulnerabilities_identifier, project: project, fingerprint: 'f5724386167705667ae25a1390c0a516020690ba') }
+    let(:scanner) { create(:vulnerabilities_scanner, project: project, external_id: 'bandit', name: 'Bandit') }
+    let(:identifier) { create(:vulnerabilities_identifier, project: project, fingerprint: 'e6dd15eda2137be0034977a85b300a94a4f243a3') }
     let!(:new_artifact) { create(:ee_ci_job_artifact, :sast, job: new_build) }
     let(:new_build) { create(:ci_build, pipeline: new_pipeline) }
     let(:new_pipeline) { create(:ci_pipeline, project: project) }
@@ -61,7 +61,7 @@ describe Security::StoreReportService, '#execute' do
         primary_identifier: identifier,
         scanner: scanner,
         project: project,
-        location_fingerprint: '6b6bb283d43cc510d7d1e73e2882b3652cb34bd5')
+        location_fingerprint: 'd869ba3f0b3347eb2749135a437dc07c8ae0f420')
     end
 
     subject { described_class.new(new_pipeline, new_report).execute }
@@ -71,15 +71,15 @@ describe Security::StoreReportService, '#execute' do
     end
 
     it 'inserts only new identifiers and reuse existing ones' do
-      expect { subject }.to change { Vulnerabilities::Identifier.count }.by(3)
+      expect { subject }.to change { Vulnerabilities::Identifier.count }.by(13)
     end
 
     it 'inserts only new occurrences and reuse existing ones' do
-      expect { subject }.to change { Vulnerabilities::Occurrence.count }.by(2)
+      expect { subject }.to change { Vulnerabilities::Occurrence.count }.by(32)
     end
 
     it 'inserts all occurrence pipelines (join model) for this new pipeline' do
-      expect { subject }.to change { Vulnerabilities::OccurrencePipeline.where(pipeline: new_pipeline).count }.by(3)
+      expect { subject }.to change { Vulnerabilities::OccurrencePipeline.where(pipeline: new_pipeline).count }.by(33)
     end
   end
 

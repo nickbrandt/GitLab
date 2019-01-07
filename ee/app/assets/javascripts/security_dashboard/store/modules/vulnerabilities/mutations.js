@@ -77,8 +77,8 @@ export default {
       vulnerability.location && vulnerability.location.class,
     );
     Vue.set(state.modal.data.severity, 'value', vulnerability.severity);
+    Vue.set(state.modal.data.reportType, 'value', vulnerability.report_type);
     Vue.set(state.modal.data.confidence, 'value', vulnerability.confidence);
-    Vue.set(state.modal.data.solution, 'value', vulnerability.solution);
     Vue.set(state.modal, 'vulnerability', vulnerability);
     Vue.set(state.modal.vulnerability, 'hasIssue', Boolean(vulnerability.issue_feedback));
     Vue.set(state.modal.vulnerability, 'isDismissed', Boolean(vulnerability.dismissal_feedback));

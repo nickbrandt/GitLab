@@ -105,7 +105,16 @@ module EE
           projects_with_tracing_enabled: count(ProjectTracingSetting)
         }).merge(service_desk_counts).merge(security_products_usage)
 
+        # MySql does not support recursive queries so we can't retrieve epics relationship depth
+        if ::Group.supports_nested_objects?
+          usage_data[:counts] = usage_data[:counts].merge(epics_deepest_relationship_level)
+        end
+
         usage_data
+      end
+
+      def epics_deepest_relationship_level
+        { epics_deepest_relationship_level: ::Epic.deepest_relationship_level }
       end
     end
   end

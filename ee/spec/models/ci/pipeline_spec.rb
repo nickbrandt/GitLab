@@ -239,7 +239,7 @@ describe Ci::Pipeline do
 
       it 'returns security reports with collected data grouped as expected' do
         expect(subject.reports.keys).to contain_exactly('sast', 'dependency_scanning')
-        expect(subject.get_report('sast').occurrences.size).to eq(6)
+        expect(subject.get_report('sast').occurrences.size).to eq(66)
         expect(subject.get_report('dependency_scanning').occurrences.size).to eq(4)
       end
 
@@ -247,7 +247,7 @@ describe Ci::Pipeline do
         let(:build_sast_1) { create(:ci_build, :retried, name: 'sast_1', pipeline: pipeline, project: project) }
 
         it 'does not take retried builds into account' do
-          expect(subject.get_report('sast').occurrences.size).to eq(3)
+          expect(subject.get_report('sast').occurrences.size).to eq(33)
           expect(subject.get_report('dependency_scanning').occurrences.size).to eq(4)
         end
       end
@@ -322,7 +322,7 @@ describe Ci::Pipeline do
 
     context 'when pipeline has builds with license_management reports' do
       before do
-        create(:ee_ci_build, :license_management_report, pipeline: pipeline, project: project)
+        create(:ee_ci_build, :license_management, pipeline: pipeline, project: project)
       end
 
       context 'when pipeline status is running' do
@@ -350,7 +350,7 @@ describe Ci::Pipeline do
 
     context 'when retried build has license management reports' do
       before do
-        create(:ee_ci_build, :retried, :license_management_report, pipeline: pipeline, project: project)
+        create(:ee_ci_build, :retried, :license_management, pipeline: pipeline, project: project)
       end
 
       let(:pipeline) { create(:ci_pipeline, :success, project: project) }
@@ -367,14 +367,13 @@ describe Ci::Pipeline do
       let!(:build_2) { create(:ci_build, :success, name: 'license_management2', pipeline: pipeline, project: project) }
 
       before do
-        create(:ee_ci_job_artifact, :license_management_report, job: build_1, project: project)
-        create(:ee_ci_job_artifact, :license_management_report_2, job: build_2, project: project)
+        create(:ee_ci_job_artifact, :license_management, job: build_1, project: project)
+        create(:ee_ci_job_artifact, :license_management_feature_branch, job: build_2, project: project)
       end
 
       it 'returns a license management report with collected data' do
-        expect(subject.licenses.count).to be(5)
-        expect(subject.licenses.any? { |license| license.name == 'WTFPL' } ).to be_truthy
-        expect(subject.licenses.any? { |license| license.name == 'MIT' } ).to be_truthy
+        expect(subject.licenses.count).to eq(5)
+        expect(subject.licenses.map(&:name)).to include('WTFPL', 'MIT')
       end
 
       context 'when builds are retried' do
@@ -382,14 +381,14 @@ describe Ci::Pipeline do
         let!(:build_2) { create(:ci_build, :retried, :success, name: 'license_management2', pipeline: pipeline, project: project) }
 
         it 'does not take retried builds into account' do
-          expect(subject.licenses.count).to be(0)
+          expect(subject.licenses).to be_empty
         end
       end
     end
 
     context 'when pipeline does not have any builds with license management reports' do
       it 'returns an empty license management report' do
-        expect(subject.licenses.count).to be(0)
+        expect(subject.licenses).to be_empty
       end
     end
   end

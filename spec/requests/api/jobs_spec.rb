@@ -611,7 +611,7 @@ describe API::Jobs do
           pipeline.update(ref: 'master',
                           sha: project.commit('master').sha)
 
-          get api("/projects/#{project.id}/jobs/artifacts/master/download"), job: job.name, job_token: job.token
+          get api("/projects/#{project.id}/jobs/artifacts/master/download"), params: { job: job.name, job_token: job.token }
         end
 
         context 'when user is reporter' do

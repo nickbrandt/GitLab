@@ -456,7 +456,7 @@ describe API::Groups do
       # EE
       it 'returns 403 for updating shared_runners_minutes_limit' do
         expect do
-          put api("/groups/#{group1.id}", user1), shared_runners_minutes_limit: 133
+          put api("/groups/#{group1.id}", user1), params: { shared_runners_minutes_limit: 133 }
         end.not_to change { group1.shared_runners_minutes_limit }
 
         expect(response).to have_gitlab_http_status(403)
@@ -466,7 +466,7 @@ describe API::Groups do
         group1.update(shared_runners_minutes_limit: 133)
 
         expect do
-          put api("/groups/#{group1.id}", user1), shared_runners_minutes_limit: 133
+          put api("/groups/#{group1.id}", user1), params: { shared_runners_minutes_limit: 133 }
         end.not_to change { group1.shared_runners_minutes_limit }
 
         expect(response).to have_gitlab_http_status(200)
@@ -484,7 +484,7 @@ describe API::Groups do
       # EE
       it 'updates the group for shared_runners_minutes_limit' do
         expect do
-          put api("/groups/#{group1.id}", admin), shared_runners_minutes_limit: 133
+          put api("/groups/#{group1.id}", admin), params: { shared_runners_minutes_limit: 133 }
         end.to change { group1.reload.shared_runners_minutes_limit }
           .from(nil).to(133)
 
@@ -888,7 +888,7 @@ describe API::Groups do
 
       it "creates an ldap_group_link if ldap_cn and ldap_access are supplied" do
         group_attributes = attributes_for(:group, ldap_cn: 'ldap-group', ldap_access: Gitlab::Access::DEVELOPER)
-        expect { post api("/groups", admin), group_attributes }.to change { LdapGroupLink.count }.by(1)
+        expect { post api("/groups", admin), params: group_attributes }.to change { LdapGroupLink.count }.by(1)
       end
 
       # EE
@@ -898,7 +898,7 @@ describe API::Groups do
             group = attributes_for(:group, { shared_runners_minutes_limit: 133 })
 
             expect do
-              post api("/groups", user3), group
+              post api("/groups", user3), params: group
             end.not_to change { Group.count }
 
             expect(response).to have_gitlab_http_status(403)
@@ -910,7 +910,7 @@ describe API::Groups do
             group = attributes_for(:group, { shared_runners_minutes_limit: 133 })
 
             expect do
-              post api("/groups", admin), group
+              post api("/groups", admin), params: group
             end.to change { Group.count }.by(1)
 
             created_group = Group.find(json_response['id'])

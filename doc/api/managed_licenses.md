@@ -13,7 +13,7 @@ GET /projects/:id/managed_licenses
 | `id`      | integer/string    | yes      | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user |
 
 ```bash
-curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" https://gitlab.example.com/api/v4/projects/1/managed_licenses
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/1/managed_licenses
 ```
 
 Example response:
@@ -47,7 +47,7 @@ GET /projects/:id/managed_licenses/:managed_license_id
 | `managed_license_id`      | integer/string    | yes      | The ID or URL-encoded name of the license belonging to the project |
 
 ```bash
-curl --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/projects/1/managed_licenses/6"
+curl --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/managed_licenses/6"
 ```
 
 Example response:
@@ -75,7 +75,7 @@ POST /projects/:id/managed_licenses
 | `approval_status`       | string  | yes      | The approval status. "approved" or "blacklisted" |
 
 ```bash
-curl --data "name=MIT&approval_status=blacklisted" --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/projects/1/managed_licenses"
+curl --data "name=MIT&approval_status=blacklisted" --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/managed_licenses"
 ```
 
 Example response:
@@ -102,7 +102,7 @@ DELETE /projects/:id/managed_licenses/:managed_license_id
 | `managed_license_id`      | integer/string    | yes      | The ID or URL-encoded name of the license belonging to the project |
 
 ```bash
-curl --request DELETE --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/projects/1/managed_licenses/4"
+curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/managed_licenses/4"
 ```
 
 When successful, it replies with an HTTP 204 response. 
@@ -122,7 +122,7 @@ PATCH /projects/:id/managed_licenses/:managed_license_id
 | `approval_status`       | string  | yes      | The approval status. "approved" or "blacklisted" |
 
 ```bash
-curl --request PATCH --data "approval_status=blacklisted" --header "PRIVATE-TOKEN: 9koXpg98eAheJpvBs5tK" "https://gitlab.example.com/api/v4/projects/1/managed_licenses/6"
+curl --request PATCH --data "approval_status=blacklisted" --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects/1/managed_licenses/6"
 ```
 
 Example response:

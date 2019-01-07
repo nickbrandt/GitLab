@@ -8,7 +8,17 @@ FactoryBot.define do
 
       after(:build) do |artifact, evaluator|
         artifact.file = fixture_file_upload(
-          Rails.root.join('ee/spec/fixtures/reports/security/sast.json'), 'application/json')
+          Rails.root.join('spec/fixtures/security-reports/master/gl-sast-report.json'), 'text/plain')
+      end
+    end
+
+    trait :sast_deprecated do
+      file_type :sast
+      file_format :raw
+
+      after(:build) do |artifact, evaluator|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('spec/fixtures/security-reports/deprecated/gl-sast-report.json'), 'text/plain')
       end
     end
 
@@ -18,27 +28,27 @@ FactoryBot.define do
 
       after(:build) do |artifact, evaluator|
         artifact.file = fixture_file_upload(
-          Rails.root.join('ee/spec/fixtures/reports/security/sast_with_corrupted_data.json'), 'application/json')
+          Rails.root.join('spec/fixtures/trace/sample_trace'), 'application/json')
       end
     end
 
-    trait :license_management_report do
+    trait :license_management do
       file_type :license_management
       file_format :raw
 
       after(:build) do |artifact, evaluator|
         artifact.file = fixture_file_upload(
-          Rails.root.join('ee/spec/fixtures/license_management/report.json'), 'application/json')
+          Rails.root.join('spec/fixtures/security-reports/master/gl-license-management-report.json'), 'application/json')
       end
     end
 
-    trait :license_management_report_2 do
+    trait :license_management_feature_branch do
       file_type :license_management
       file_format :raw
 
       after(:build) do |artifact, evaluator|
         artifact.file = fixture_file_upload(
-          Rails.root.join('ee/spec/fixtures/license_management/report2.json'), 'application/json')
+          Rails.root.join('spec/fixtures/security-reports/feature-branch/gl-license-management-report.json'), 'application/json')
       end
     end
 
@@ -48,7 +58,7 @@ FactoryBot.define do
 
       after(:build) do |artifact, evaluator|
         artifact.file = fixture_file_upload(
-          Rails.root.join('ee/spec/fixtures/license_management/report_with_corrupted_data.json'), 'application/json')
+          Rails.root.join('spec/fixtures/trace/sample_trace'), 'application/json')
       end
     end
 
@@ -79,6 +89,16 @@ FactoryBot.define do
       after(:build) do |artifact, _|
         artifact.file = fixture_file_upload(
           Rails.root.join('spec/fixtures/security-reports/master/gl-dependency-scanning-report.json'), 'text/plain')
+      end
+    end
+
+    trait :dependency_scanning_deprecated do
+      file_format :raw
+      file_type :dependency_scanning
+
+      after(:build) do |artifact, _|
+        artifact.file = fixture_file_upload(
+          Rails.root.join('spec/fixtures/security-reports/deprecated/gl-dependency-scanning-report.json'), 'text/plain')
       end
     end
 

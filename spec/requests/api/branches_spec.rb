@@ -419,7 +419,7 @@ describe API::Branches do
 
           it "updates 'developers_can_push' without removing the 'no_one' access level" do
             put api("/projects/#{project.id}/repository/branches/#{protected_branch.name}/protect", user),
-                developers_can_push: true, developers_can_merge: true
+                params: { developers_can_push: true, developers_can_merge: true }
 
             expect(response).to have_gitlab_http_status(200)
             expect(json_response['name']).to eq(protected_branch.name)
