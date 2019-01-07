@@ -123,7 +123,7 @@ describe EE::UserCalloutsHelper do
     context 'when the migrate warning has not been dismissed' do
       context 'when hashed storage is disabled' do
         before do
-          expect(helper).to receive(:hashed_storage_disabled?).and_return(true)
+          expect(helper).to receive(:hashed_storage_enabled?).and_return(false)
         end
 
         it { is_expected.to be_falsy }
@@ -131,7 +131,7 @@ describe EE::UserCalloutsHelper do
 
       context 'when hashed storage is enabled' do
         before do
-          expect(helper).to receive(:hashed_storage_disabled?).and_return(false)
+          expect(helper).to receive(:hashed_storage_enabled?).and_return(true)
         end
 
         context 'when there is a project in non-hashed-storage' do

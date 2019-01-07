@@ -30,7 +30,7 @@ module EE
 
       message = enable_hashed_storage_warning_message
 
-      render_flash_user_callout(:warning, message.html_safe, GEO_ENABLE_HASHED_STORAGE)
+      render_flash_user_callout(:warning, message, GEO_ENABLE_HASHED_STORAGE)
     end
 
     def render_migrate_hashed_storage_warning
@@ -38,7 +38,7 @@ module EE
 
       message = migrate_hashed_storage_warning_message
 
-      render_flash_user_callout(:warning, message.html_safe, GEO_MIGRATE_HASHED_STORAGE)
+      render_flash_user_callout(:warning, message, GEO_MIGRATE_HASHED_STORAGE)
     end
 
     def show_enable_hashed_storage_warning?
@@ -78,7 +78,8 @@ module EE
 
     def add_migrate_to_hashed_storage_link(message)
       migrate_link = link_to(_('For more info, read the documentation.'), 'https://docs.gitlab.com/ee/administration/repository_storage_types.html#how-to-migrate-to-hashed-storage', target: '_blank')
-      message % { migrate_link: migrate_link }
+      linked_message = message % { migrate_link: migrate_link }
+      linked_message.html_safe
     end
   end
 end
