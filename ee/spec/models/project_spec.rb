@@ -1520,11 +1520,16 @@ describe Project do
         .to('feature')
     end
 
-    it 'does not update the default branch when HEAD does not change' do
+    it 'always updates the default branch even when HEAD does not change' do
       stub_find_remote_root_ref(project, ref: 'master')
 
-      expect { project.update_root_ref('origin') }
-        .not_to change { project.default_branch }
+      expect(project).to receive(:change_head).with('master').and_call_original
+
+      project.update_root_ref('origin')
+
+      # For good measure, expunge the root ref cache and reload.
+      project.repository.expire_all_method_caches
+      expect(project.reload.default_branch).to eq('master')
     end
 
     it 'does not update the default branch when HEAD does not exist' do
