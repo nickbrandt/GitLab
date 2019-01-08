@@ -13,6 +13,6 @@ class EpicBaseEntity < Grape::Entity
     epic.end_date&.to_s(:medium)
   end
   expose :human_readable_timestamp, if: -> (epic, _) { epic.end_date.present? || epic.start_date.present? } do |epic|
-    remaining_days_in_words(epic)
+    remaining_days_in_words(epic.end_date, epic.start_date)
   end
 end

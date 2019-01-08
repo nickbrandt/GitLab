@@ -10,7 +10,8 @@ describe IssueSerializer do
   end
 
   before do
-    create(:epic_issue, issue: resource)
+    epic = create(:epic, :use_fixed_dates)
+    create(:epic_issue, issue: resource, epic: epic)
   end
 
   context 'sidebar issue serialization' do
