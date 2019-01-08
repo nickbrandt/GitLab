@@ -4,6 +4,8 @@ class Approver < ActiveRecord::Base
   belongs_to :target, polymorphic: true  # rubocop:disable Cop/PolymorphicAssociations
   belongs_to :user
 
+  include ApproverMigrateHook
+
   validates :user, presence: true
 
   def find_by_user_id(user_id)

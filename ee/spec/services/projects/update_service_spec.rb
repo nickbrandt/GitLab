@@ -215,6 +215,16 @@ describe Projects::UpdateService, '#execute' do
     end
   end
 
+  context 'with approval_rules' do
+    it "updates approval_rules' approvals_required" do
+      rule = create(:approval_project_rule, project: project)
+
+      update_project(project, user, approvals_before_merge: 42)
+
+      expect(rule.reload.approvals_required).to eq(42)
+    end
+  end
+
   def update_project(project, user, opts)
     Projects::UpdateService.new(project, user, opts).execute
   end

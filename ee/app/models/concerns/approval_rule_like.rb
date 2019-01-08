@@ -8,7 +8,7 @@ module ApprovalRuleLike
   included do
     has_and_belongs_to_many :users
     has_and_belongs_to_many :groups, class_name: 'Group', join_table: "#{self.table_name}_groups"
-    has_many :group_users, through: :groups, source: :users
+    has_many :group_users, -> { distinct }, through: :groups, source: :users
 
     validates :name, presence: true
   end
