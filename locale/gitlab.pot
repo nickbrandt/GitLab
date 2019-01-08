@@ -3446,6 +3446,9 @@ msgstr ""
 msgid "Error Reporting and Logging"
 msgstr ""
 
+msgid "Error Tracking"
+msgstr ""
+
 msgid "Error creating epic"
 msgstr ""
 
@@ -10902,12 +10905,6 @@ msgid "project"
 msgid_plural "projects"
 msgstr[0] ""
 msgstr[1] ""
-
-msgid "quick actions"
-msgstr ""
-
-msgid "register"
-msgstr ""
 
 msgid "quick actions"
 msgstr ""
