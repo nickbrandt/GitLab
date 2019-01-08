@@ -19,7 +19,7 @@ describe Gitlab::Auth::GroupSaml::GroupLookup do
     let(:path_info) { '/users/auth/group_saml' }
 
     it 'can detect group_path from rack.input body params' do
-      subject( 'REQUEST_METHOD' => 'POST', 'rack.input' => StringIO.new(query_string) )
+      subject( 'REQUEST_METHOD' => 'POST', 'rack.input' => StringIO.new(query_string), 'CONTENT_TYPE' => 'multipart/form-data' )
 
       expect(subject.path).to eq 'the-group'
     end
