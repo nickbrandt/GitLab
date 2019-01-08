@@ -61,21 +61,28 @@ you can skip the step 1 below; you only need to enable it per project.
      you will see an option to set up Service Desk:
 
      ![Activate Service Desk option](img/service_desk_disabled.png)
+
 4.   Checking that box will enable Service Desk for the project, and show a
      unique email address to email issues to the project. These issues will be
      [confidential], so they will only be visible to project members.
 
-     **Warning**: as the screenshot below shows, this email address can be used
-     by anyone to create an issue on this project, whether or not they have
-     access to your GitLab instance. We recommend **putting this behind an
-     alias** so that it can be changed if needed, and
-     **[enabling Akismet][akismet]** on your GitLab instance to add spam
-     checking to this service.
+     **Warning**: this email address can be used by anyone to create an issue on
+     this project, whether or not they have access to your GitLab instance.
+     We recommend **putting this behind an alias** so that it can be changed if
+     needed, and **[enabling Akismet][akismet]** on your GitLab instance to add spam
+     checking to this service.  Unblocked email spam would result in many spam
+     issues being created, and may disrupt your GitLab service.
 
      ![Service Desk enabled](img/service_desk_enabled.png)
+
+     _In GitLab 11.7, we updated the format of the generated email address.
+     However the older format is still supported, allowing existing aliases
+     or contacts to continue working._
+
+
 5.   Service Desk is now enabled for this project! You should be able to access it from your project's navigation **Issue submenu**:
 
-      ![Service Desk Navigation Item](img/service_desk_nav_item.png)
+     ![Service Desk Navigation Item](img/service_desk_nav_item.png)
 
 ## Using Service Desk
 
