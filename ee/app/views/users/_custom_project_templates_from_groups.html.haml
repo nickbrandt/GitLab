@@ -20,7 +20,7 @@
                 = group.projects.count
 
         - group.projects.each do |project|
-          .template-option.align-items-center
+          .template-option.align-items-center.qa-template-option-row
             .avatar-container.s40
               = project_icon(project, alt: project.name, class: 'btn-template-icon avatar s40 avatar-tile', lazy: false)
             .description.prepend-left-5
@@ -34,7 +34,7 @@
                 = _('Preview')
               %label.btn.btn-success.custom-template-button.choose-template.append-bottom-0{ for: project.name }
                 %input{ type: "radio",  autocomplete: "off", name: "project[template_name]", id: project.name, value: project.name, data: { subgroup_id: project.namespace_id } }
-                %span
+                %span.qa-use-template-button
                   = _('Use template')
 
     = paginate groups_with_project_templates, params: {controller: 'users', action: 'available_templates', username: current_user.username}, theme: 'gitlab', remote: true

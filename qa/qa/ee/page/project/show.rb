@@ -18,6 +18,12 @@ module QA
           def wait_until_geo_max_replication_time(max_wait: Runtime::Geo.max_file_replication_time)
             wait(max: max_wait) { yield }
           end
+
+          def wait_for_import_success
+            wait(reload: false) do
+              has_text?('The project was successfully imported.')
+            end
+          end
         end
       end
     end
