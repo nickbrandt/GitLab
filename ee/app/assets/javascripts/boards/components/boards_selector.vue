@@ -1,7 +1,7 @@
 <script>
 import $ from 'jquery';
 import { throttle } from 'underscore';
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlLoadingIcon, GlSearchBox } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import boardsStore from '~/boards/stores/boards_store';
 import BoardForm from './board_form.vue';
@@ -14,6 +14,7 @@ export default {
     Icon,
     BoardForm,
     GlLoadingIcon,
+    GlSearchBox,
   },
   props: {
     currentBoard: {
@@ -79,11 +80,17 @@ export default {
       contentClientHeight: 0,
       maxPosition: 0,
       store: boardsStore,
+      filterTerm: '',
     };
   },
   computed: {
     currentPage() {
       return this.state.currentPage;
+    },
+    filteredBoards() {
+      return this.boards.filter(board =>
+        board.name.toLowerCase().includes(this.filterTerm.toLowerCase()),
+      );
     },
     reload: {
       get() {
@@ -106,6 +113,10 @@ export default {
     },
   },
   watch: {
+    filteredBoards() {
+      this.scrollFadeInitialized = false;
+      this.$nextTick(this.setScrollFade);
+    },
     reload() {
       if (this.reload) {
         this.boards = [];
@@ -123,6 +134,12 @@ export default {
     $('#js-add-list').on('hide.bs.dropdown', this.handleDropdownHide);
     $('.js-new-board-list-tabs').on('click', this.handleDropdownTabClick);
   },
+  mounted() {
+    // prevent dropdown from closing when search box is clicked
+    $(this.$el)
+      .find('.dropdown-header')
+      .on('click', event => event.stopPropagation());
+  },
   methods: {
     showPage(page) {
       this.state.reload = false;
@@ -130,6 +147,10 @@ export default {
     },
     toggleDropdown() {
       this.open = !this.open;
+
+      if (this.open && !this.loading) {
+        this.$nextTick(this.focusSearchInput);
+      }
     },
     loadBoards(toggleDropdown = true) {
       if (toggleDropdown) {
@@ -145,7 +166,10 @@ export default {
             this.boards = json;
           })
           .then(() => this.$nextTick()) // Wait for boards list in DOM
-          .then(this.setScrollFade)
+          .then(() => {
+            this.setScrollFade();
+            this.focusSearchInput();
+          })
           .catch(() => {
             this.loading = false;
           });
@@ -190,6 +214,10 @@ export default {
         this.hasMilestoneListMounted = true;
       }
     },
+    focusSearchInput() {
+      const { searchBox } = this.$refs;
+      searchBox.$el.querySelector('input').focus();
+    },
   },
 };
 </script>
@@ -207,6 +235,10 @@ export default {
           {{ board.name }} <icon name="chevron-down" />
         </button>
         <div class="dropdown-menu" :class="{ 'is-loading': loading }">
+          <div class="dropdown-header position-relative">
+            <gl-search-box v-if="!loading" ref="searchBox" v-model="filterTerm" />
+          </div>
+
           <div class="dropdown-content-faded-mask js-scroll-fade" :class="scrollFadeClass">
             <ul
               v-if="!loading"
@@ -214,7 +246,18 @@ export default {
               class="dropdown-list js-dropdown-list"
               @scroll.passive="throttledSetScrollFade"
             >
-              <li v-for="otherBoard in boards" :key="otherBoard.id" class="js-dropdown-item">
+              <li
+                v-show="filteredBoards.length === 0"
+                class="dropdown-item no-pointer-events text-secondary"
+              >
+                {{ s__('IssueBoards|No matching boards found') }}
+              </li>
+
+              <li
+                v-for="otherBoard in filteredBoards"
+                :key="otherBoard.id"
+                class="js-dropdown-item"
+              >
                 <a :href="`${boardBaseUrl}/${otherBoard.id}`"> {{ otherBoard.name }} </a>
               </li>
               <li v-if="hasMissingBoards" class="small unclickable">

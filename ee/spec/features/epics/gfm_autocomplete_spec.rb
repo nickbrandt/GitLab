@@ -15,6 +15,32 @@ describe 'GFM autocomplete', :js do
     wait_for_requests
   end
 
+  context 'issuables' do
+    let(:project) { create(:project, :repository, namespace: group) }
+
+    context 'issues' do
+      it 'shows issues of group' do
+        issue_1 = create(:issue, project: project)
+        issue_2 = create(:issue, project: project)
+
+        type(find('#note-body'), '#')
+
+        expect_resources(shown: [issue_1, issue_2])
+      end
+    end
+
+    context 'merge requests' do
+      it 'shows merge requests of group' do
+        mr_1 = create(:merge_request, source_project: project)
+        mr_2 = create(:merge_request, source_project: project, source_branch: 'other-branch')
+
+        type(find('#note-body'), '!')
+
+        expect_resources(shown: [mr_1, mr_2])
+      end
+    end
+  end
+
   context 'epics' do
     let!(:epic2) { create(:epic, group: group, title: 'make tea') }
 

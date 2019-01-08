@@ -22,13 +22,12 @@ export default {
     },
   },
   computed: {
-    ...mapGetters('filters', ['getFilter', 'getSelectedOptions']),
+    ...mapGetters('filters', ['getFilter', 'getSelectedOptions', 'getSelectedOptionNames']),
     filter() {
       return this.getFilter(this.filterId);
     },
     selectedOptionText() {
-      const [selectedOption] = this.getSelectedOptions(this.filterId);
-      return (selectedOption && selectedOption.name) || '-';
+      return this.getSelectedOptionNames(this.filterId) || '-';
     },
   },
   methods: {

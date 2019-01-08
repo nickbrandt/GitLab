@@ -1,5 +1,6 @@
 <script>
 import { GlPopover } from '@gitlab/ui';
+import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
@@ -13,6 +14,7 @@ export default {
       required: true,
     },
   },
+  linkTitle: s__('Security Reports|Security dashboard documentation'),
 };
 </script>
 
@@ -33,12 +35,10 @@ export default {
         v-if="dashboardDocumentation"
         target="_blank"
         rel="noopener noreferrer"
-        :title="s__('Security Reports|Security dashboard documentation')"
+        :title="$options.linkTitle"
         :href="dashboardDocumentation"
       >
-        <span class="vertical-align-middle">{{
-          s__('Security Reports|Security dashboard documentation')
-        }}</span>
+        <span class="vertical-align-middle">{{ $options.linkTitle }}</span>
         <icon name="external-link" :size="16" class="vertical-align-middle" />
       </a>
     </gl-popover>

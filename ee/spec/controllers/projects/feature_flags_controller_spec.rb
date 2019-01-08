@@ -74,16 +74,24 @@ describe Projects::FeatureFlagsController do
     it 'returns all feature flags as json response' do
       subject
 
-      expect(json_response.count).to eq(2)
-      expect(json_response.first['name']).to eq(feature_flag_active.name)
-      expect(json_response.second['name']).to eq(feature_flag_inactive.name)
+      expect(json_response['feature_flags'].count).to eq(2)
+      expect(json_response['feature_flags'].first['name']).to eq(feature_flag_active.name)
+      expect(json_response['feature_flags'].second['name']).to eq(feature_flag_inactive.name)
     end
 
     it 'returns edit path and destroy path' do
       subject
 
-      expect(json_response.first['edit_path']).not_to be_nil
-      expect(json_response.first['destroy_path']).not_to be_nil
+      expect(json_response['feature_flags'].first['edit_path']).not_to be_nil
+      expect(json_response['feature_flags'].first['destroy_path']).not_to be_nil
+    end
+
+    it 'returns the summary of feature flags' do
+      subject
+
+      expect(json_response['count']['all']).to eq(2)
+      expect(json_response['count']['enabled']).to eq(1)
+      expect(json_response['count']['disabled']).to eq(1)
     end
 
     it 'matches json schema' do
@@ -103,7 +111,7 @@ describe Projects::FeatureFlagsController do
         it 'returns all feature flags' do
           subject
 
-          expect(json_response.count).to eq(2)
+          expect(json_response['feature_flags'].count).to eq(2)
         end
       end
 
@@ -113,8 +121,8 @@ describe Projects::FeatureFlagsController do
         it 'returns enabled feature flags' do
           subject
 
-          expect(json_response.count).to eq(1)
-          expect(json_response.first['active']).to be_truthy
+          expect(json_response['feature_flags'].count).to eq(1)
+          expect(json_response['feature_flags'].first['active']).to be_truthy
         end
       end
 
@@ -124,8 +132,8 @@ describe Projects::FeatureFlagsController do
         it 'returns disabled feature flags' do
           subject
 
-          expect(json_response.count).to eq(1)
-          expect(json_response.first['active']).to be_falsy
+          expect(json_response['feature_flags'].count).to eq(1)
+          expect(json_response['feature_flags'].first['active']).to be_falsy
         end
       end
     end

@@ -9,7 +9,7 @@ describe Security::StoreReportService, '#execute' do
   let(:report) { pipeline.security_reports.get_report(report_type.to_s) }
 
   before do
-    stub_licensed_features(sast: true, dependency_scanning: true)
+    stub_licensed_features(sast: true, dependency_scanning: true, container_scanning: true)
   end
 
   subject { described_class.new(pipeline, report).execute }
@@ -19,7 +19,8 @@ describe Security::StoreReportService, '#execute' do
 
     where(:case_name, :report_type, :scanners, :identifiers, :occurrences, :occurrence_identifiers, :occurrence_pipelines) do
       'with SAST report'                | :sast                | 3 | 14 | 33 | 35 | 33
-      'with Dependency Scanning report' | :dependency_scanning | 2 | 7 | 4 | 7 | 4
+      'with Dependency Scanning report' | :dependency_scanning | 2 | 7  | 4  | 7  | 4
+      'with Container Scanning report'  | :container_scanning  | 1 | 8  | 8  | 8  | 8
     end
 
     with_them do

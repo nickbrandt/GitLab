@@ -10,7 +10,7 @@ using License Management.
 
 You can take advantage of License Management by either [including the CI job](../../../ci/examples/license_management.md) in
 your existing `.gitlab-ci.yml` file or by implicitly using
-[Auto License Management](../../../topics/autodevops/index.md#auto-license-management)
+[Auto License Management](../../../topics/autodevops/index.md#auto-license-management-ultimate)
 that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
 
 In addition, you can [manually approve or blacklist](#manual-license-management) licenses in the project's settings.

@@ -219,6 +219,67 @@ ActiveRecord::Schema.define(version: 20190103140724) do
     t.index ["usage_stats_set_by_user_id"], name: "index_application_settings_on_usage_stats_set_by_user_id", using: :btree
   end
 
+  create_table "approval_merge_request_rule_sources", id: :bigserial, force: :cascade do |t|
+    t.bigint "approval_merge_request_rule_id", null: false
+    t.bigint "approval_project_rule_id", null: false
+    t.index ["approval_merge_request_rule_id"], name: "index_approval_merge_request_rule_sources_1", unique: true, using: :btree
+    t.index ["approval_project_rule_id"], name: "index_approval_merge_request_rule_sources_2", using: :btree
+  end
+
+  create_table "approval_merge_request_rules", id: :bigserial, force: :cascade do |t|
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.integer "merge_request_id", null: false
+    t.integer "approvals_required", limit: 2, default: 0, null: false
+    t.boolean "code_owner", default: false, null: false
+    t.string "name", null: false
+    t.index ["merge_request_id", "code_owner"], name: "index_approval_merge_request_rules_1", using: :btree
+  end
+
+  create_table "approval_merge_request_rules_approved_approvers", id: :bigserial, force: :cascade do |t|
+    t.bigint "approval_merge_request_rule_id", null: false
+    t.integer "user_id", null: false
+    t.index ["approval_merge_request_rule_id", "user_id"], name: "index_approval_merge_request_rules_approved_approvers_1", unique: true, using: :btree
+    t.index ["user_id"], name: "index_approval_merge_request_rules_approved_approvers_2", using: :btree
+  end
+
+  create_table "approval_merge_request_rules_groups", id: :bigserial, force: :cascade do |t|
+    t.bigint "approval_merge_request_rule_id", null: false
+    t.integer "group_id", null: false
+    t.index ["approval_merge_request_rule_id", "group_id"], name: "index_approval_merge_request_rules_groups_1", unique: true, using: :btree
+    t.index ["group_id"], name: "index_approval_merge_request_rules_groups_2", using: :btree
+  end
+
+  create_table "approval_merge_request_rules_users", id: :bigserial, force: :cascade do |t|
+    t.bigint "approval_merge_request_rule_id", null: false
+    t.integer "user_id", null: false
+    t.index ["approval_merge_request_rule_id", "user_id"], name: "index_approval_merge_request_rules_users_1", unique: true, using: :btree
+    t.index ["user_id"], name: "index_approval_merge_request_rules_users_2", using: :btree
+  end
+
+  create_table "approval_project_rules", id: :bigserial, force: :cascade do |t|
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.integer "project_id", null: false
+    t.integer "approvals_required", limit: 2, default: 0, null: false
+    t.string "name", null: false
+    t.index ["project_id"], name: "index_approval_project_rules_on_project_id", using: :btree
+  end
+
+  create_table "approval_project_rules_groups", id: :bigserial, force: :cascade do |t|
+    t.bigint "approval_project_rule_id", null: false
+    t.integer "group_id", null: false
+    t.index ["approval_project_rule_id", "group_id"], name: "index_approval_project_rules_groups_1", unique: true, using: :btree
+    t.index ["group_id"], name: "index_approval_project_rules_groups_2", using: :btree
+  end
+
+  create_table "approval_project_rules_users", id: :bigserial, force: :cascade do |t|
+    t.bigint "approval_project_rule_id", null: false
+    t.integer "user_id", null: false
+    t.index ["approval_project_rule_id", "user_id"], name: "index_approval_project_rules_users_1", unique: true, using: :btree
+    t.index ["user_id"], name: "index_approval_project_rules_users_2", using: :btree
+  end
+
   create_table "approvals", force: :cascade do |t|
     t.integer "merge_request_id", null: false
     t.integer "user_id", null: false
@@ -2138,6 +2199,13 @@ ActiveRecord::Schema.define(version: 20190103140724) do
     t.index ["project_id", "deploy_token_id"], name: "index_project_deploy_tokens_on_project_id_and_deploy_token_id", unique: true, using: :btree
   end
 
+  create_table "project_error_tracking_settings", primary_key: "project_id", id: :integer, force: :cascade do |t|
+    t.boolean "enabled", default: true, null: false
+    t.string "api_url", null: false
+    t.string "encrypted_token"
+    t.string "encrypted_token_iv"
+  end
+
   create_table "project_features", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "merge_requests_access_level"
@@ -3163,6 +3231,20 @@ ActiveRecord::Schema.define(version: 20190103140724) do
   add_foreign_key "application_settings", "namespaces", column: "custom_project_templates_group_id", on_delete: :nullify
   add_foreign_key "application_settings", "projects", column: "file_template_project_id", name: "fk_ec757bd087", on_delete: :nullify
   add_foreign_key "application_settings", "users", column: "usage_stats_set_by_user_id", name: "fk_964370041d", on_delete: :nullify
+  add_foreign_key "approval_merge_request_rule_sources", "approval_merge_request_rules", on_delete: :cascade
+  add_foreign_key "approval_merge_request_rule_sources", "approval_project_rules", on_delete: :cascade
+  add_foreign_key "approval_merge_request_rules", "merge_requests", on_delete: :cascade
+  add_foreign_key "approval_merge_request_rules_approved_approvers", "approval_merge_request_rules", on_delete: :cascade
+  add_foreign_key "approval_merge_request_rules_approved_approvers", "users", on_delete: :cascade
+  add_foreign_key "approval_merge_request_rules_groups", "approval_merge_request_rules", on_delete: :cascade
+  add_foreign_key "approval_merge_request_rules_groups", "namespaces", column: "group_id", on_delete: :cascade
+  add_foreign_key "approval_merge_request_rules_users", "approval_merge_request_rules", on_delete: :cascade
+  add_foreign_key "approval_merge_request_rules_users", "users", on_delete: :cascade
+  add_foreign_key "approval_project_rules", "projects", on_delete: :cascade
+  add_foreign_key "approval_project_rules_groups", "approval_project_rules", on_delete: :cascade
+  add_foreign_key "approval_project_rules_groups", "namespaces", column: "group_id", on_delete: :cascade
+  add_foreign_key "approval_project_rules_users", "approval_project_rules", on_delete: :cascade
+  add_foreign_key "approval_project_rules_users", "users", on_delete: :cascade
   add_foreign_key "approvals", "merge_requests", name: "fk_310d714958", on_delete: :cascade
   add_foreign_key "approver_groups", "namespaces", column: "group_id", on_delete: :cascade
   add_foreign_key "badges", "namespaces", column: "group_id", on_delete: :cascade
@@ -3364,6 +3446,7 @@ ActiveRecord::Schema.define(version: 20190103140724) do
   add_foreign_key "project_custom_attributes", "projects", on_delete: :cascade
   add_foreign_key "project_deploy_tokens", "deploy_tokens", on_delete: :cascade
   add_foreign_key "project_deploy_tokens", "projects", on_delete: :cascade
+  add_foreign_key "project_error_tracking_settings", "projects", on_delete: :cascade
   add_foreign_key "project_features", "projects", name: "fk_18513d9b92", on_delete: :cascade
   add_foreign_key "project_group_links", "projects", name: "fk_daa8cee94c", on_delete: :cascade
   add_foreign_key "project_import_data", "projects", name: "fk_ffb9ee3a10", on_delete: :cascade

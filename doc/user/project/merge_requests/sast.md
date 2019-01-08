@@ -15,7 +15,7 @@ vulnerabilities using Static Application Security Testing (SAST).
 
 You can take advantage of SAST by either [including the CI job](../../../ci/examples/sast.md) in
 your existing `.gitlab-ci.yml` file or by implicitly using
-[Auto SAST](../../../topics/autodevops/index.md#auto-sast)
+[Auto SAST](../../../topics/autodevops/index.md#auto-sast-ultimate)
 that is provided by [Auto DevOps](../../../topics/autodevops/index.md).
 
 Going a step further, GitLab can show the vulnerability list right in the merge

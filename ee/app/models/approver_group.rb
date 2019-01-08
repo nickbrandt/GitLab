@@ -13,4 +13,8 @@ class ApproverGroup < ActiveRecord::Base
 
     approver_groups.joins(:group).merge(public_or_visible_groups)
   end
+
+  def member
+    group
+  end
 end

@@ -9,7 +9,7 @@ const setupAutoCompleteEpics = ($input, defaultCallbacks) => {
     displayTpl(value) {
       let tmpl = GfmAutoComplete.Loading.template;
       if (value.title != null) {
-        tmpl = GfmAutoComplete.Issues.templateFunction(value.id, value.title);
+        tmpl = GfmAutoComplete.Issues.templateFunction(value);
       }
       return tmpl;
     },

@@ -44,6 +44,7 @@ module EE
       has_many :reviews, inverse_of: :project
       has_many :approvers, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
       has_many :approver_groups, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
+      has_many :approval_rules, class_name: 'ApprovalProjectRule'
       has_many :audit_events, as: :entity
       has_many :path_locks
       has_many :vulnerability_feedback, class_name: 'Vulnerabilities::Feedback'

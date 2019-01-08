@@ -11,6 +11,7 @@ module EE
             super.merge({
                 license_management: ::Gitlab::Ci::Parsers::LicenseManagement::LicenseManagement,
                 dependency_scanning: ::Gitlab::Ci::Parsers::Security::DependencyScanning,
+                container_scanning: ::Gitlab::Ci::Parsers::Security::ContainerScanning,
                 sast: ::Gitlab::Ci::Parsers::Security::Sast
             })
           end

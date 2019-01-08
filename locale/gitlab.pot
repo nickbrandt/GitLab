@@ -83,6 +83,11 @@ msgid_plural "%d issues"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "%d issue selected"
+msgid_plural "%d issues selected"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d layer"
 msgid_plural "%d layers"
 msgstr[0] ""
@@ -148,6 +153,9 @@ msgid "%{filePath} deleted"
 msgstr ""
 
 msgid "%{firstLabel} +%{labelCount} more"
+msgstr ""
+
+msgid "%{firstOption} +%{extraOptionCount} more"
 msgstr ""
 
 msgid "%{group_docs_link_start}Groups%{group_docs_link_end} allow you to manage and collaborate across multiple projects. Members of a group have access to all of its projects."
@@ -445,6 +453,9 @@ msgid "Add Kubernetes cluster"
 msgstr ""
 
 msgid "Add README"
+msgstr ""
+
+msgid "Add a general comment to this %{noteable_name}."
 msgstr ""
 
 msgid "Add a homepage to your wiki that contains information about your project and GitLab will display it here instead of this message."
@@ -896,6 +907,9 @@ msgstr ""
 msgid "Are you sure you want to remove group %{name}?"
 msgstr ""
 
+msgid "Are you sure you want to remove the attachment?"
+msgstr ""
+
 msgid "Are you sure you want to remove this identity?"
 msgstr ""
 
@@ -968,6 +982,9 @@ msgstr ""
 msgid "Assignee(s)"
 msgstr ""
 
+msgid "Attach a file"
+msgstr ""
+
 msgid "Attach a file by drag &amp; drop or %{upload_link}"
 msgstr ""
 
@@ -978,6 +995,9 @@ msgid "Aug"
 msgstr ""
 
 msgid "August"
+msgstr ""
+
+msgid "Auth Token"
 msgstr ""
 
 msgid "Authentication Log"
@@ -2264,6 +2284,12 @@ msgstr ""
 msgid "Comment"
 msgstr ""
 
+msgid "Comment & close %{noteable_name}"
+msgstr ""
+
+msgid "Comment & reopen %{noteable_name}"
+msgstr ""
+
 msgid "Comment & resolve discussion"
 msgstr ""
 
@@ -2839,6 +2865,9 @@ msgstr ""
 msgid "Delete list"
 msgstr ""
 
+msgid "Delete this attachment"
+msgstr ""
+
 msgid "Deleted"
 msgstr ""
 
@@ -3063,6 +3092,12 @@ msgstr ""
 msgid "Discover projects, groups and snippets. Share your projects with others"
 msgstr ""
 
+msgid "Discuss a specific suggestion or question"
+msgstr ""
+
+msgid "Discuss a specific suggestion or question that needs to be resolved"
+msgstr ""
+
 msgid "Dismiss"
 msgstr ""
 
@@ -3165,6 +3200,9 @@ msgstr ""
 msgid "Edit identity for %{user_name}"
 msgstr ""
 
+msgid "Edit issues"
+msgstr ""
+
 msgid "Elasticsearch"
 msgstr ""
 
@@ -3259,6 +3297,9 @@ msgid "Enter the merge request description"
 msgstr ""
 
 msgid "Enter the merge request title"
+msgstr ""
+
+msgid "Enter your Sentry API URL"
 msgstr ""
 
 msgid "Environment variables"
@@ -3405,6 +3446,9 @@ msgstr ""
 msgid "Error Reporting and Logging"
 msgstr ""
 
+msgid "Error Tracking"
+msgstr ""
+
 msgid "Error creating epic"
 msgstr ""
 
@@ -3544,6 +3588,12 @@ msgid "Explore projects"
 msgstr ""
 
 msgid "Explore public groups"
+msgstr ""
+
+msgid "Export as CSV"
+msgstr ""
+
+msgid "Export issues"
 msgstr ""
 
 msgid "External Classification Policy Authorization"
@@ -3714,6 +3764,9 @@ msgstr ""
 msgid "File templates"
 msgstr ""
 
+msgid "File upload error."
+msgstr ""
+
 msgid "Files"
 msgstr ""
 
@@ -3738,6 +3791,9 @@ msgstr ""
 msgid "Filter..."
 msgstr ""
 
+msgid "Find and manage Auth Tokens in your Sentry account settings page."
+msgstr ""
+
 msgid "Find by path"
 msgstr ""
 
@@ -3751,6 +3807,9 @@ msgid "Find the newly extracted <code>Takeout/Google Code Project Hosting/Google
 msgstr ""
 
 msgid "Fingerprints"
+msgstr ""
+
+msgid "Finish editing this message first!"
 msgstr ""
 
 msgid "Finish review"
@@ -4673,6 +4732,9 @@ msgstr ""
 msgid "Import"
 msgstr ""
 
+msgid "Import CSV"
+msgstr ""
+
 msgid "Import Projects from Gitea"
 msgstr ""
 
@@ -4689,6 +4751,9 @@ msgid "Import an exported GitLab project"
 msgstr ""
 
 msgid "Import in progress"
+msgstr ""
+
+msgid "Import issues"
 msgstr ""
 
 msgid "Import multiple repositories by uploading a manifest file."
@@ -4849,6 +4914,9 @@ msgstr ""
 msgid "IssueBoards|Delete board"
 msgstr ""
 
+msgid "IssueBoards|No matching boards found"
+msgstr ""
+
 msgid "IssueBoards|Some of your boards are hidden, activate a license to see them again."
 msgstr ""
 
@@ -4883,6 +4951,9 @@ msgid "IssuesAnalytics|There are no issues for the projects in your group"
 msgstr ""
 
 msgid "IssuesAnalytics|To widen your search, change or remove filters in the filter bar above"
+msgstr ""
+
+msgid "It must have a header row and at least two columns: the first column is the issue title and the second column is the issue description. The separator is automatically detected."
 msgstr ""
 
 msgid "It's you"
@@ -5337,6 +5408,9 @@ msgid "March"
 msgstr ""
 
 msgid "Mark todo as done"
+msgstr ""
+
+msgid "Markdown"
 msgstr ""
 
 msgid "Markdown enabled"
@@ -6120,6 +6194,9 @@ msgstr ""
 msgid "Open Documentation"
 msgstr ""
 
+msgid "Open comment type dropdown"
+msgstr ""
+
 msgid "Open in Xcode"
 msgstr ""
 
@@ -6451,6 +6528,9 @@ msgid "PlantUML"
 msgstr ""
 
 msgid "Play"
+msgstr ""
+
+msgid "Please %{link_to_register} or %{link_to_sign_in} to comment"
 msgstr ""
 
 msgid "Please accept the Terms of Service before continuing."
@@ -7567,6 +7647,9 @@ msgstr ""
 msgid "Save changes before testing"
 msgstr ""
 
+msgid "Save comment"
+msgstr ""
+
 msgid "Save pipeline schedule"
 msgstr ""
 
@@ -7805,6 +7888,9 @@ msgid "Send report"
 msgstr ""
 
 msgid "Send usage data"
+msgstr ""
+
+msgid "Sentry API URL"
 msgstr ""
 
 msgid "Sep"
@@ -8319,6 +8405,15 @@ msgstr ""
 msgid "Start date"
 msgstr ""
 
+msgid "Start discussion"
+msgstr ""
+
+msgid "Start discussion & close %{noteable_name}"
+msgstr ""
+
+msgid "Start discussion & reopen %{noteable_name}"
+msgstr ""
+
 msgid "Start the Runner!"
 msgstr ""
 
@@ -8398,6 +8493,12 @@ msgid "Subscribe at group level"
 msgstr ""
 
 msgid "Subscribe at project level"
+msgstr ""
+
+msgid "Subscribe to RSS feed"
+msgstr ""
+
+msgid "Subscribe to calendar"
 msgstr ""
 
 msgid "Subscribed"
@@ -8622,6 +8723,9 @@ msgstr ""
 msgid "The Advanced Global Search in GitLab is a powerful search service that saves you time. Instead of creating duplicate code and wasting time, you can now search for code within other teams that can help your own project."
 msgstr ""
 
+msgid "The CSV export will be created in the background. Once finished, it will be sent to <strong>%{email}</strong> in an attachment."
+msgstr ""
+
 msgid "The Git LFS objects will <strong>not</strong> be synced."
 msgstr ""
 
@@ -8658,7 +8762,7 @@ msgstr ""
 msgid "The issue stage shows the time it takes from creating an issue to assigning the issue to a milestone, or add the issue to a list on your Issue Board. Begin creating issues to see data for this stage."
 msgstr ""
 
-msgid "The maximum file size allowed is %{max_attachment_size}mb"
+msgid "The maximum file size allowed is %{size}."
 msgstr ""
 
 msgid "The maximum file size allowed is 200KB."
@@ -8797,6 +8901,9 @@ msgid "They can be managed using the %{link}."
 msgstr ""
 
 msgid "Third party offers"
+msgstr ""
+
+msgid "This %{issuable} is locked. Only <strong>project members</strong> can comment."
 msgstr ""
 
 msgid "This %{viewer} could not be displayed because %{reason}. You can %{options} instead."
@@ -9217,6 +9324,9 @@ msgstr ""
 msgid "To import an SVN repository, check out %{svn_link}."
 msgstr ""
 
+msgid "To link Sentry to GitLab, enter your Sentry URL and Auth Token."
+msgstr ""
+
 msgid "To move or copy an entire GitLab project from another GitLab installation to this one, navigate to the original project's settings page, generate an export file, and upload it here."
 msgstr ""
 
@@ -9269,6 +9379,9 @@ msgid "Toggle comments for this file"
 msgstr ""
 
 msgid "Toggle commit description"
+msgstr ""
+
+msgid "Toggle commit list"
 msgstr ""
 
 msgid "Toggle discussion"
@@ -9470,6 +9583,9 @@ msgid "Upgrade your plan to improve Issue boards."
 msgstr ""
 
 msgid "Upload <code>GoogleCodeProjectHosting.json</code> here:"
+msgstr ""
+
+msgid "Upload CSV file"
 msgstr ""
 
 msgid "Upload New File"
@@ -9910,6 +10026,9 @@ msgstr ""
 msgid "Withdraw Access Request"
 msgstr ""
 
+msgid "Write a comment or drag your files here…"
+msgstr ""
+
 msgid "Yes"
 msgstr ""
 
@@ -10117,6 +10236,12 @@ msgstr ""
 msgid "Your groups"
 msgstr ""
 
+msgid "Your issues are being imported. Once finished, you'll get a confirmation email."
+msgstr ""
+
+msgid "Your issues will be imported in the background. Once finished, you'll get a confirmation email."
+msgstr ""
+
 msgid "Your name"
 msgstr ""
 
@@ -10133,6 +10258,9 @@ msgid "among other things"
 msgstr ""
 
 msgid "assign yourself"
+msgstr ""
+
+msgid "attach a new file"
 msgstr ""
 
 msgid "branch name"
@@ -10438,6 +10566,9 @@ msgid "help"
 msgstr ""
 
 msgid "here"
+msgstr ""
+
+msgid "http://<sentry-host>/api/0/projects/{organization_slug}/{project_slug}/issues/"
 msgstr ""
 
 msgid "https://your-bitbucket-server"
@@ -10775,6 +10906,12 @@ msgid_plural "projects"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "quick actions"
+msgstr ""
+
+msgid "register"
+msgstr ""
+
 msgid "remaining"
 msgstr ""
 
@@ -10799,6 +10936,9 @@ msgid "should be higher than %{access} inherited membership from group %{group_n
 msgstr ""
 
 msgid "show less"
+msgstr ""
+
+msgid "sign in"
 msgstr ""
 
 msgid "source"

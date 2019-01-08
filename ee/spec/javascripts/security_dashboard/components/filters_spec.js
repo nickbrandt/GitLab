@@ -18,8 +18,8 @@ describe('Filter component', () => {
       vm.$destroy();
     });
 
-    it('should display both filters', () => {
-      expect(vm.$el.querySelectorAll('.js-filter').length).toEqual(2);
+    it('should display all filters', () => {
+      expect(vm.$el.querySelectorAll('.js-filter').length).toEqual(3);
     });
   });
 });

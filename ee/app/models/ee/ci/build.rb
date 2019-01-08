@@ -11,7 +11,8 @@ module EE
 
       LICENSED_PARSER_FEATURES = {
         sast: :sast,
-        dependency_scanning: :dependency_scanning
+        dependency_scanning: :dependency_scanning,
+        container_scanning: :container_scanning
       }.with_indifferent_access.freeze
 
       prepended do
@@ -58,6 +59,9 @@ module EE
         each_report(::Ci::JobArtifact::SECURITY_REPORT_FILE_TYPES) do |file_type, blob|
           next if file_type == "dependency_scanning" &&
               ::Feature.disabled?(:parse_dependency_scanning_reports, default_enabled: true)
+
+          next if file_type == "container_scanning" &&
+              ::Feature.disabled?(:parse_container_scanning_reports, default_enabled: true)
 
           security_reports.get_report(file_type).tap do |security_report|
             begin
