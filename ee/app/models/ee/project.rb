@@ -476,7 +476,7 @@ module EE
     # Update the default branch querying the remote to determine its HEAD
     def update_root_ref(remote_name)
       root_ref = repository.find_remote_root_ref(remote_name)
-      change_head(root_ref) if root_ref.present? && root_ref != default_branch
+      change_head(root_ref) if root_ref.present?
     end
 
     def feature_flags_client_token

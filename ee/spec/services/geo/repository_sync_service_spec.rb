@@ -253,8 +253,8 @@ describe Geo::RepositorySyncService do
                 .and_return(project.default_branch)
             end
 
-            it 'does not sync gitattributes to info/attributes' do
-              expect(repository).not_to receive(:copy_gitattributes)
+            it 'syncs gitattributes to info/attributes' do
+              expect(repository).to receive(:copy_gitattributes)
 
               subject.execute
             end
@@ -265,7 +265,7 @@ describe Geo::RepositorySyncService do
                 .twice
                 .and_call_original
 
-              expect(project).not_to receive(:change_head)
+              expect(project).to receive(:change_head).with('master').once
 
               subject.execute
             end
