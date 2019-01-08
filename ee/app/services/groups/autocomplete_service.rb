@@ -34,12 +34,13 @@ module Groups
       end
     end
 
+    # rubocop: disable CodeReuse/ActiveRecord
     def milestones
-      group_ids =
-        ParentGroupsFinder.new(current_user, group).execute.map(&:id)
+      group_ids = group.self_and_ancestors.public_or_visible_to_user(current_user).pluck(:id)
 
       MilestonesFinder.new(group_ids: group_ids).execute.select(:iid, :title)
     end
+    # rubocop: enable CodeReuse/ActiveRecord
 
     def labels_as_hash(target)
       super(target, group_id: group.id, only_group_labels: true)
