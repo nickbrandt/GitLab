@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This file is required by `bin/elastic_repo_indexer` as well as from within
 # Rails, so needs to explicitly require its dependencies
 require 'elasticsearch'

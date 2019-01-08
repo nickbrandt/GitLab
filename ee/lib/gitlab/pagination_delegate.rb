@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   class PaginationDelegate
     DEFAULT_PER_PAGE = Kaminari.config.default_per_page

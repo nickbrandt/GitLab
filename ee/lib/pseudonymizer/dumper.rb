@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Pseudonymizer
   class Dumper
     attr_accessor :config, :output_dir

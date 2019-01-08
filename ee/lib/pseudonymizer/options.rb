@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Pseudonymizer
   class Options
     attr_reader :config

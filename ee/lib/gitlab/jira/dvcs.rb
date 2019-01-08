@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gitlab
   module Jira
     module Dvcs
