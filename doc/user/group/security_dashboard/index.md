@@ -43,8 +43,8 @@ To use the group security dashboard:
 
 ## Keeping the dashboard up to date
 
-Vulnerabilities are spotted during CI/CD pipelines, so having up to date results
-depend on how often security jobs are run.
+Vulnerabilities are spotted during CI/CD pipelines, so having up-to-date results
+depends on how often security jobs are run.
 
 In order to have the latest results displayed in the dashboard, you can
 [schedule a daily pipeline](../../project/pipelines/schedules.md), so reports
