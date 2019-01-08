@@ -15,7 +15,11 @@ class TriggeredPipelineEntity < Grape::Entity
 
   expose :details do
     expose :detailed_status, as: :status, with: DetailedStatusEntity
+    expose :ordered_stages, as: :stages, using: StageEntity, if: -> (_, opts) { expand?(opts) }
   end
+
+  expose :triggered_by_pipeline, as: :triggered_by, with: TriggeredPipelineEntity, if: -> (_, opts) { expand_for_path?(opts, :triggered_by) }
+  expose :triggered_pipelines, as: :triggered, using: TriggeredPipelineEntity, if: -> (_, opts) { expand_for_path?(opts, :triggered) }
 
   expose :project, using: ProjectEntity
 
@@ -25,5 +29,13 @@ class TriggeredPipelineEntity < Grape::Entity
 
   def detailed_status
     pipeline.detailed_status(request.current_user)
+  end
+
+  def expand?(opts)
+    opts[:expanded].to_a.include?(pipeline.id)
+  end
+
+  def expand_for_path?(opts, path)
+    opts[:attr_path].last == path && expand?(opts)
   end
 end
