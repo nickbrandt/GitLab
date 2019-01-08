@@ -226,6 +226,9 @@ msgstr ""
 msgid "%{user_name} profile page"
 msgstr ""
 
+msgid "(external source)"
+msgstr ""
+
 msgid "+ %{count} more"
 msgstr ""
 
