@@ -23,12 +23,12 @@ module QA
           show_page.start_discussion("I'm starting a new discussion")
           expect(show_page).to have_content("I'm starting a new discussion")
 
-          show_page.reply_to_discussion("Could you please check this?")
+          show_page.type_reply_to_discussion("Could you please check this?")
           show_page.comment_now
           expect(show_page).to have_content("Could you please check this?")
           expect(show_page).to have_content("0/1 discussion resolved")
 
-          show_page.reply_to_discussion("Could you also check that?")
+          show_page.type_reply_to_discussion("Could you also check that?")
           show_page.resolve_review_discussion
           show_page.start_review
           expect(show_page).to have_content("Could you also check that?")
@@ -40,7 +40,7 @@ module QA
           show_page.comment_now
           expect(show_page).to have_content("Can you check this line of code?")
 
-          show_page.reply_to_discussion("And this syntax as well?")
+          show_page.type_reply_to_discussion("And this syntax as well?")
           show_page.resolve_review_discussion
           show_page.start_review
           expect(show_page).to have_content("And this syntax as well?")
@@ -49,7 +49,7 @@ module QA
           show_page.submit_pending_reviews
           expect(show_page).to have_content("2/2 discussions resolved")
 
-          show_page.reply_to_discussion("Unresolving this discussion")
+          show_page.type_reply_to_discussion("Unresolving this discussion")
           show_page.unresolve_review_discussion
           show_page.comment_now
           expect(show_page).to have_content("1/2 discussions resolved")
@@ -58,7 +58,7 @@ module QA
         Page::MergeRequest::Show.perform do |show_page|
           show_page.go_to_discussions_tab
 
-          show_page.reply_to_discussion("Planning to discard this comment")
+          show_page.type_reply_to_discussion("Planning to discard this comment")
           show_page.start_review
 
           expect(show_page).to have_content("Finish review 1")
