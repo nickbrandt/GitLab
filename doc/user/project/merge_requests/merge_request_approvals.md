@@ -52,8 +52,9 @@ A group can also be added as an approver. [In the future](https://gitlab.com/git
 group approvers will be restricted.
 
 If a user is added as an individual approver and is also part of a group approver,
-then that user is just counted once. The merge request author does not count as
-an eligible approver, unless [self-approval] is explicitly enabled on the project settings.
+then that user is just counted once. The merge request author and users that have committed
+to the merge request do not count as eligible approvers,
+unless [self-approval] is explicitly enabled on the project settings.
 
 ### Implicit approvers
 

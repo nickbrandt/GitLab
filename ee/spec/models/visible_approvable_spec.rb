@@ -20,10 +20,10 @@ describe VisibleApprovable do
 
     subject { resource.approvers_left }
 
-    it 'only queries once' do
-      expect(User).to receive(:where).and_call_original.once
+    it 'avoids N+1 queries' do
+      control = ActiveRecord::QueryRecorder.new { subject }
 
-      3.times { subject }
+      expect { subject }.not_to exceed_query_limit(control)
     end
 
     it 'returns all approvers left' do
@@ -66,6 +66,25 @@ describe VisibleApprovable do
         project.update(merge_requests_author_approval: true)
 
         is_expected.to include(author_approver.user)
+      end
+    end
+
+    context 'when committer is approver' do
+      let(:user) { create(:user, email: resource.commits.first.committer_email) }
+      let!(:committer_approver) { create(:approver, target: project, user: user) }
+
+      before do
+        project.add_developer(user)
+      end
+
+      it 'excludes committer if committers cannot approve' do
+        is_expected.not_to include(committer_approver.user)
+      end
+
+      it 'includes committer if committers are able to approve' do
+        project.update(merge_requests_author_approval: true)
+
+        is_expected.to include(committer_approver.user)
       end
     end
 
