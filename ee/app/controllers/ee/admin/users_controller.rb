@@ -20,7 +20,11 @@ module EE
       def allowed_user_params
         super + [
           :note,
-          namespace_attributes: [:id, :shared_runners_minutes_limit, :plan_id]
+          namespace_attributes: [
+            :id,
+            :shared_runners_minutes_limit,
+            gitlab_subscription_attributes: [:hosted_plan_id]
+          ]
         ]
       end
     end

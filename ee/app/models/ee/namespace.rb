@@ -33,6 +33,8 @@ module EE
       has_one :namespace_statistics
       has_one :gitlab_subscription, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
 
+      accepts_nested_attributes_for :gitlab_subscription
+
       scope :with_plan, -> { where.not(plan_id: nil) }
 
       delegate :shared_runners_minutes, :shared_runners_seconds, :shared_runners_seconds_last_reset,
