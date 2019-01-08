@@ -95,7 +95,7 @@ func TestPreAuthorizeRedirect(t *testing.T) {
 
 func TestPreAuthorizeJWT(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		token, err := jwt.Parse(r.Header.Get(api.RequestHeader), func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.Parse(r.Header.Get(secret.RequestHeader), func(token *jwt.Token) (interface{}, error) {
 			// Don't forget to validate the alg is what you expect:
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
