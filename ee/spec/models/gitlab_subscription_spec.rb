@@ -1,6 +1,12 @@
 require 'spec_helper'
 
 describe GitlabSubscription do
+  describe 'default values' do
+    it do
+      expect(subject.start_date).to eq(Date.today)
+    end
+  end
+
   describe 'validations' do
     it { is_expected.to validate_presence_of(:seats) }
     it { is_expected.to validate_presence_of(:start_date) }

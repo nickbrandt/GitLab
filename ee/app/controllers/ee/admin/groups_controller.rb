@@ -21,7 +21,7 @@ module EE
         super + [
           :repository_size_limit,
           :shared_runners_minutes_limit,
-          :plan_id
+          gitlab_subscription_attributes: [:hosted_plan_id]
         ].tap do |params_ee|
           params_ee << :project_creation_level if @group&.feature_available?(:project_creation_level)
         end
