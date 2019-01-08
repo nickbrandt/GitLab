@@ -41,7 +41,6 @@ describe Sentry::Client do
         :count        | :count
         :message      | [:metadata, :value]
         :culprit      | :culprit
-        :external_url | :permalink
         :short_id     | :shortId
         :status       | :status
         :frequency    | [:stats, '24h']
@@ -52,6 +51,12 @@ describe Sentry::Client do
 
       with_them do
         it { expect(subject[0].public_send(error_object)).to eq(sample_response[0].dig(*sentry_response)) }
+      end
+
+      context 'external_url' do
+        it 'is constructed correctly' do
+          expect(subject[0].external_url).to eq('https://sentrytest.gitlab.com/api/0/projects/sentry-org/sentry-project/issues/11/')
+        end
       end
     end
 

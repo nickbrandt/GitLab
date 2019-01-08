@@ -69,7 +69,12 @@ module Sentry
       end
     end
 
+    def issue_url(id)
+      "#{issues_api_url}#{id}/"
+    end
+
     def map_to_error(issue)
+      id = issue.fetch('id')
       project = issue.fetch('project')
 
       count = issue.fetch('count', nil)
@@ -77,8 +82,10 @@ module Sentry
       frequency = issue.dig('stats', '24h')
       message = issue.dig('metadata', 'value')
 
+      external_url = issue_url(id)
+
       Gitlab::ErrorTracking::Error.new(
-        id: issue.fetch('id'),
+        id: id,
         first_seen: issue.fetch('firstSeen', nil),
         last_seen: issue.fetch('lastSeen', nil),
         title: issue.fetch('title', nil),
@@ -87,7 +94,7 @@ module Sentry
         count: count,
         message: message,
         culprit: issue.fetch('culprit', nil),
-        external_url: issue.fetch('permalink', nil),
+        external_url: external_url,
         short_id: issue.fetch('shortId', nil),
         status: issue.fetch('status', nil),
         frequency: frequency,
