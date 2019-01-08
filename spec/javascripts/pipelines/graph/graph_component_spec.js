@@ -122,7 +122,7 @@ describe('graph component', () => {
               isLoading: false,
               pipeline: graphJSON,
               triggeredByPipelines: [
-                Object.assign({}, linkedPipelineJSON.triggered_by, { isCollapsed: false }),
+                Object.assign({}, linkedPipelineJSON.triggered_by, { isExpanded: true }),
               ],
               triggeredPipelines: linkedPipelineJSON.triggered,
               triggeredBy: linkedPipelineJSON.triggered_by,
@@ -151,7 +151,7 @@ describe('graph component', () => {
               pipeline: graphJSON,
               triggeredByPipelines: [linkedPipelineJSON.triggered_by],
               triggeredPipelines: [
-                Object.assign({}, linkedPipelineJSON.triggered[0], { isCollapsed: false }),
+                Object.assign({}, linkedPipelineJSON.triggered[0], { isExpanded: true }),
               ],
               triggered: linkedPipelineJSON.triggered[0],
             });
