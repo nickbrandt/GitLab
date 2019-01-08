@@ -27,15 +27,6 @@ module Sentry
       }
     end
 
-    def request_params
-      {
-        headers: {
-          'Authorization' => "Bearer #{@token}"
-        },
-        follow_redirects: false
-      }
-    end
-
     def get_issues(issue_status:, limit:)
       resp = Gitlab::HTTP.get(
         issues_api_url,
