@@ -11,7 +11,7 @@ See the documentation below for details on how to configure these services.
 
 - [Akismet](akismet.md) Configure Akismet to stop spam
 - [Auth0 OmniAuth](auth0.md) Enable the Auth0 OmniAuth provider
-- [Bitbucket](bitbucket.md) Import projects from Bitbucket.org and login to your GitLab instance with your
+- [Bitbucket](bitbucket.md) Import projects from Bitbucket.org and login to your GitLab instance with your Bitbucket.org account
 - [CAS](cas.md) Configure GitLab to sign in using CAS
 - [External issue tracker](external-issue-tracker.md) Redmine, JIRA, etc.
 - [Gmail actions buttons](gmail_action_buttons_for_gitlab.md) Adds GitLab actions to messages
@@ -26,7 +26,6 @@ See the documentation below for details on how to configure these services.
 - [reCAPTCHA](recaptcha.md) Configure GitLab to use Google reCAPTCHA for new users
 - [SAML](saml.md) Configure GitLab as a SAML 2.0 Service Provider
 - [Trello](trello_power_up.md) Integrate Trello with GitLab
-Bitbucket.org account
 
 > GitLab Enterprise Edition contains [advanced Jenkins support][jenkins].
 
