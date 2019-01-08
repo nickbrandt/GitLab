@@ -86,7 +86,7 @@ module Pseudonymizer
       type_results = type_results.map do |c|
         data_type = c.sql_type
 
-        if table_config[:pseudo].include?(c.name)
+        if table_config[:pseudo]&.include?(c.name)
           data_type = "character varying"
         end
 
