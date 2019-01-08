@@ -1,0 +1,5 @@
+---
+title: Check hosts file for nameserver IP
+merge_request: 9071
+author:
+type: fixed
