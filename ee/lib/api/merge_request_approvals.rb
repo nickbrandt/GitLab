@@ -77,6 +77,8 @@ module API
           requires :approver_group_ids, type: Array[String], coerce_with: ARRAY_COERCION_LAMBDA, desc: 'Array of Group IDs to set as approvers.'
         end
         put 'approvers' do
+          Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ee/issues/8883')
+
           merge_request = find_merge_request_with_access(params[:merge_request_iid], :update_approvers)
 
           merge_request = ::MergeRequests::UpdateService.new(user_project, current_user, declared(params, include_parent_namespaces: false).merge(remove_old_approvers: true)).execute(merge_request)
