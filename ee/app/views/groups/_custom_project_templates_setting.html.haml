@@ -1,7 +1,7 @@
 - return unless ::Gitlab::CurrentSettings.custom_project_templates_enabled?
 - expanded = Rails.env.test?
 
-%section.settings.no-animate{ class: ('expanded' if expanded) }
+%section.settings.no-animate.qa-custom-project-templates{ class: ('expanded' if expanded) }
   .settings-header
     %h4
       = s_('GroupSettings|Custom project templates')
@@ -19,6 +19,6 @@
         .form-group
           = f.label :custom_project_templates_group_id, class: 'label-bold' do
             = _('Custom project templates')
-          = groups_select_tag('group[custom_project_templates_group_id]', data: { parent_id: @group.id }, selected: @group.custom_project_templates_group_id, class: 'input-clamp allowClear', multiple: false)
+          = groups_select_tag('group[custom_project_templates_group_id]', data: { parent_id: @group.id }, selected: @group.custom_project_templates_group_id, class: 'input-clamp allowClear qa-custom-project-template-select', multiple: false)
 
-      = f.submit _('Save changes'), class: 'btn btn-success'
+      = f.submit _('Save changes'), class: 'btn btn-success qa-save-changes-button'

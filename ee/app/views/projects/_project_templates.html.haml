@@ -13,9 +13,9 @@
           = _('Instance')
           %span.badge.badge-pill= project_template_count
       %li.custom-group-project-templates-tab
-        %a.nav-link.js-custom-group-project-templates-nav-link{ href: "#custom-group-project-templates", data: { toggle: 'tab'} }
+        %a.nav-link.js-custom-group-project-templates-nav-link.qa-group-templates-tab{ href: "#custom-group-project-templates", data: { toggle: 'tab'} }
           = _('Group')
-          %span.badge.badge-pill
+          %span.badge.badge-pill.qa-group-template-tab-badge
             = group_project_templates_count(group_id)
 
   .tab-content

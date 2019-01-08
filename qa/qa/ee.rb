@@ -22,6 +22,7 @@ module QA
         module Settings
           autoload :SamlSSO, 'qa/ee/page/group/settings/saml_sso'
           autoload :LDAPSync, 'qa/ee/page/group/settings/ldap_sync'
+          autoload :General, 'qa/ee/page/group/settings/general'
         end
       end
 
@@ -50,6 +51,7 @@ module QA
       end
 
       module Project
+        autoload :New, 'qa/ee/page/project/new'
         autoload :Show, 'qa/ee/page/project/show'
 
         module Issue
