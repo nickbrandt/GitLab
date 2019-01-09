@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'net/dns'
+require 'resolv'
 
 module Gitlab
   module Database
@@ -15,8 +16,6 @@ module Gitlab
         attr_reader :interval, :record, :disconnect_timeout
 
         MAX_SLEEP_ADJUSTMENT = 10
-
-        UnresolvableNameserverError = Class.new(StandardError)
 
         # nameserver - The nameserver to use for DNS lookups.
         # port - The port of the nameserver.
@@ -127,24 +126,10 @@ module Gitlab
 
         def resolver
           @resolver ||= Net::DNS::Resolver.new(
-            nameservers: nameserver_ip(@nameserver),
+            nameservers: Resolver.new(@nameserver).resolve,
             port: @port,
             use_tcp: @use_tcp
           )
-        end
-
-        private
-
-        def nameserver_ip(nameserver)
-          IPAddr.new(nameserver)
-        rescue IPAddr::InvalidAddressError
-          answer = Net::DNS::Resolver.start(nameserver, Net::DNS::A).answer
-
-          if answer.empty?
-            raise UnresolvableNameserverError, "could not resolve #{nameserver}"
-          end
-
-          answer.first.address
         end
       end
     end
