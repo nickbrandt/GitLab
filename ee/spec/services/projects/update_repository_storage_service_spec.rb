@@ -59,12 +59,12 @@ describe Projects::UpdateRepositoryStorageService do
 
         relative_path = project.repository.raw.relative_path
         allow(Gitlab::Git::Repository).to receive(:new)
-          .with('test_second_storage', relative_path, "project-#{project.id}")
+          .with('test_second_storage', relative_path, "project-#{project.id}", project.full_path)
           .and_return(repository_double)
 
         wiki_relative_path = project.wiki.repository.raw.relative_path
         allow(Gitlab::Git::Repository).to receive(:new)
-          .with('test_second_storage', wiki_relative_path, "wiki-#{project.id}")
+          .with('test_second_storage', wiki_relative_path, "wiki-#{project.id}", project.wiki.full_path)
           .and_return(wiki_repository_double)
       end
 

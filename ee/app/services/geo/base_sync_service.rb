@@ -79,7 +79,7 @@ module Geo
       log_info("Attempting to fetch repository via git")
 
       # `git fetch` needs an empty bare repository to fetch into
-      unless gitlab_shell.create_repository(project.repository_storage, disk_path_temp)
+      unless gitlab_shell.create_repository(project.repository_storage, disk_path_temp, project.full_path)
         raise Gitlab::Shell::Error, 'Can not create a temporary repository'
       end
 

@@ -1893,7 +1893,7 @@ describe Project do
     context 'using a regular repository' do
       it 'creates the repository' do
         expect(shell).to receive(:create_repository)
-          .with(project.repository_storage, project.disk_path)
+          .with(project.repository_storage, project.disk_path, project.full_path)
           .and_return(true)
 
         expect(project.repository).to receive(:after_create)
@@ -1903,7 +1903,7 @@ describe Project do
 
       it 'adds an error if the repository could not be created' do
         expect(shell).to receive(:create_repository)
-          .with(project.repository_storage, project.disk_path)
+          .with(project.repository_storage, project.disk_path, project.full_path)
           .and_return(false)
 
         expect(project.repository).not_to receive(:after_create)
@@ -1936,7 +1936,7 @@ describe Project do
         .and_return(false)
 
       allow(shell).to receive(:create_repository)
-        .with(project.repository_storage, project.disk_path)
+        .with(project.repository_storage, project.disk_path, project.full_path)
         .and_return(true)
 
       expect(project).to receive(:create_repository).with(force: true)
@@ -1960,7 +1960,7 @@ describe Project do
         .and_return(false)
 
       expect(shell).to receive(:create_repository)
-        .with(project.repository_storage, project.disk_path)
+        .with(project.repository_storage, project.disk_path, project.full_path)
         .and_return(true)
 
       project.ensure_repository
