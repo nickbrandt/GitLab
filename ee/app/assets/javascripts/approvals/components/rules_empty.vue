@@ -17,7 +17,7 @@ export default {
 </script>
 
 <template>
-  <callout category="info">
+  <callout class="m-0" category="info">
     <div>{{ $options.message }}</div>
     <div class="prepend-top-default">
       <gl-button class="btn-info btn-inverted" @click="$emit('click');">{{
