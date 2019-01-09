@@ -73,16 +73,16 @@ describe('EE Pipeline store', () => {
         expect(store.triggeredPipelines[0].isLoading).toEqual(true);
       });
 
-      it('sets isCollapsed to false for the requested pipeline', () => {
-        expect(store.triggeredPipelines[0].isCollapsed).toEqual(false);
+      it('sets isExpanded to true for the requested pipeline', () => {
+        expect(store.triggeredPipelines[0].isExpanded).toEqual(true);
       });
 
       it('sets isLoading to false for the other pipelines', () => {
         expect(store.triggeredPipelines[1].isLoading).toEqual(false);
       });
 
-      it('sets isCollapsed to true for the other pipelines', () => {
-        expect(store.triggeredPipelines[1].isCollapsed).toEqual(true);
+      it('sets isExpanded to false for the other pipelines', () => {
+        expect(store.triggeredPipelines[1].isExpanded).toEqual(false);
       });
     });
 
@@ -104,7 +104,7 @@ describe('EE Pipeline store', () => {
         store.receiveTriggeredPipelineError(receivedPipeline);
 
         expect(store.triggeredPipelines[0].isLoading).toEqual(false);
-        expect(store.triggeredPipelines[0].isCollapsed).toEqual(true);
+        expect(store.triggeredPipelines[0].isExpanded).toEqual(false);
 
         expect(store.triggered).toEqual({});
       });
@@ -121,8 +121,8 @@ describe('EE Pipeline store', () => {
         expect(store.triggeredByPipelines[0].isLoading).toEqual(true);
       });
 
-      it('sets isCollapsed to false for the requested pipeline', () => {
-        expect(store.triggeredByPipelines[0].isCollapsed).toEqual(false);
+      it('sets isExpanded to true for the requested pipeline', () => {
+        expect(store.triggeredByPipelines[0].isExpanded).toEqual(true);
       });
     });
 
@@ -144,7 +144,7 @@ describe('EE Pipeline store', () => {
         store.receiveTriggeredByPipelineError(receivedPipeline);
 
         expect(store.triggeredByPipelines[0].isLoading).toEqual(false);
-        expect(store.triggeredByPipelines[0].isCollapsed).toEqual(true);
+        expect(store.triggeredByPipelines[0].isExpanded).toEqual(false);
 
         expect(store.triggeredBy).toEqual({});
       });
@@ -162,8 +162,8 @@ describe('EE Pipeline store', () => {
         expect(parsed.isLoading).toEqual(false);
       });
 
-      it('adds isCollapsed key set to true', () => {
-        expect(parsed.isCollapsed).toEqual(true);
+      it('adds isExpanded key set to false', () => {
+        expect(parsed.isExpanded).toEqual(false);
       });
     });
 
@@ -188,10 +188,10 @@ describe('EE Pipeline store', () => {
         expect(store.triggeredPipelines[1].isLoading).isLoading(true);
       });
 
-      it('sets clicked pipeline isCollapsed to false', () => {
+      it('sets clicked pipeline isExpanded to true', () => {
         store.updateStoreOnRequest('triggeredPipelines', store.triggeredPipelines[1]);
 
-        expect(store.triggeredPipelines[1].isCollapsed).isLoading(false);
+        expect(store.triggeredPipelines[1].isExpanded).isLoading(true);
       });
     });
 
@@ -225,12 +225,12 @@ describe('EE Pipeline store', () => {
         const clickedPipeline = store.triggeredPipelines[1];
 
         // open it first
-        clickedPipeline.isCollapsed = false;
+        clickedPipeline.isExpanded = true;
         store.triggered = clickedPipeline;
 
         store.closePipeline('triggeredPipelines', clickedPipeline, 'triggered');
 
-        expect(store.triggeredPipelines[1].isCollapsed).toEqual(false);
+        expect(store.triggeredPipelines[1].isExpanded).toEqual(true);
         expect(store.triggered).toEqual({});
       });
     });

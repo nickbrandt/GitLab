@@ -22,9 +22,9 @@ export default class PipelineStore extends CePipelineStore {
   }
 
   /**
-   * For the triggered pipelines, parses them to add `isLoading` and `isCollapsed` keys
+   * For the triggered pipelines, parses them to add `isLoading` and `isExpanded` keys
    *
-   * For the triggered_by pipeline, parsed the object to add `isLoading` and `isCollapsed` keys
+   * For the triggered_by pipeline, parsed the object to add `isLoading` and `isExpanded` keys
    * and saves it as an array
    *
    * @param {Object} pipeline
@@ -40,7 +40,7 @@ export default class PipelineStore extends CePipelineStore {
         );
 
         return Object.assign({}, triggered, {
-          isCollapsed: oldPipeline ? oldPipeline.isCollapsed : true,
+          isExpanded: oldPipeline ? oldPipeline.isExpanded : false,
           isLoading: oldPipeline ? oldPipeline.isLoading : false,
         });
       });
@@ -49,9 +49,9 @@ export default class PipelineStore extends CePipelineStore {
     if (pipeline.triggered_by) {
       this.state.triggeredByPipelines = [
         Object.assign({}, pipeline.triggered_by, {
-          isCollapsed: this.state.triggeredByPipelines.length
-            ? this.state.triggeredByPipelines[0].isCollapsed
-            : true,
+          isExpanded: this.state.triggeredByPipelines.length
+            ? this.state.triggeredByPipelines[0].isExpanded
+            : false,
           isLoading: this.state.triggeredByPipelines.length
             ? this.state.triggeredByPipelines[0].isLoading
             : false,
@@ -67,7 +67,7 @@ export default class PipelineStore extends CePipelineStore {
   /**
    * Called when the user clicks on a pipeline that was triggered by the main one.
    *
-   * Resets isCollapsed and isLoading props for all triggered (downstream) pipelines
+   * Resets isExpanded and isLoading props for all triggered (downstream) pipelines
    * Sets isLoading to true for the requested one.
    *
    * @param {Object} pipeline
@@ -89,7 +89,7 @@ export default class PipelineStore extends CePipelineStore {
     this.updatePipeline(
       pipelinesKeys.triggeredPipelines,
       pipeline,
-      { isLoading: false, isCollapsed: false },
+      { isLoading: false, isExpanded: true },
       pipelinesKeys.triggered,
       response,
     );
@@ -106,7 +106,7 @@ export default class PipelineStore extends CePipelineStore {
     this.updatePipeline(
       pipelinesKeys.triggeredPipelines,
       pipeline,
-      { isLoading: false, isCollapsed: true },
+      { isLoading: false, isExpanded: false },
       pipelinesKeys.triggered,
       {},
     );
@@ -120,7 +120,7 @@ export default class PipelineStore extends CePipelineStore {
    * Called when the user clicks on the pipeline that triggered the main one.
    *
    * Handle the request for the upstream pipeline
-   * Updates the given pipeline with isLoading: true and iscollapsed: false
+   * Updates the given pipeline with isLoading: true and isExpanded: true
    *
    * @param {Object} pipeline
    */
@@ -138,7 +138,7 @@ export default class PipelineStore extends CePipelineStore {
     this.updatePipeline(
       pipelinesKeys.triggeredByPipelines,
       pipeline,
-      { isLoading: false, isCollapsed: false },
+      { isLoading: false, isExpanded: true },
       pipelinesKeys.triggeredBy,
       response,
     );
@@ -152,7 +152,7 @@ export default class PipelineStore extends CePipelineStore {
     this.updatePipeline(
       pipelinesKeys.triggeredByPipelines,
       pipeline,
-      { isLoading: false, isCollapsed: true },
+      { isLoading: false, isExpanded: false },
       pipelinesKeys.triggeredBy,
       {},
     );
@@ -173,7 +173,7 @@ export default class PipelineStore extends CePipelineStore {
    */
   static parsePipeline(pipeline) {
     return Object.assign({}, pipeline, {
-      isCollapsed: true,
+      isExpanded: false,
       isLoading: false,
     });
   }
@@ -190,7 +190,7 @@ export default class PipelineStore extends CePipelineStore {
 
   /**
    * Updates the pipelines to reflect which one was requested.
-   * It sets isLoading to true and isCollapsed to false
+   * It sets isLoading to true and isExpanded to false
    *
    * @param {String} storeKey which property to update: `triggeredPipelines|triggeredByPipelines`
    * @param {Object} pipeline the requested pipeline
@@ -198,7 +198,7 @@ export default class PipelineStore extends CePipelineStore {
   updateStoreOnRequest(storeKey, pipeline) {
     this.state[storeKey] = this.state[storeKey].map(triggered => {
       if (triggered.id === pipeline.id) {
-        return Object.assign({}, triggered, { isLoading: true, isCollapsed: false });
+        return Object.assign({}, triggered, { isLoading: true, isExpanded: true });
       }
       // reset the others, in case another was one opened
       return PipelineStore.parsePipeline(triggered);
@@ -238,7 +238,7 @@ export default class PipelineStore extends CePipelineStore {
       pipeline,
       {
         isLoading: false,
-        isCollapsed: true,
+        isExpanded: false,
       },
       visiblePipelineKey,
       {},

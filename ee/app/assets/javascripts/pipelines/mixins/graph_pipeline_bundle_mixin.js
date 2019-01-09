@@ -14,7 +14,7 @@ export default {
      * @param {Object} pipeline The clicked pipeline
      */
     clickPipeline(method, storeKey, resetStoreKey, pipeline, pollKey) {
-      if (pipeline.isCollapsed) {
+      if (!pipeline.isExpanded) {
         this.mediator[method](pipeline);
       } else {
         this.mediator.resetPipeline(storeKey, pipeline, resetStoreKey, pollKey);
