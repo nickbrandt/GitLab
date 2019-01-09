@@ -8,13 +8,63 @@ describe 'admin Geo Nodes', :js do
     sign_in(create(:admin))
   end
 
-  it 'show all public Geo Nodes and create new node link' do
-    visit admin_geo_nodes_path
-    wait_for_requests
+  describe 'index' do
+    it 'show all public Geo Nodes and create new node link' do
+      visit admin_geo_nodes_path
+      wait_for_requests
 
-    expect(page).to have_link('New node', href: new_admin_geo_node_path)
-    page.within(find('.geo-node-item', match: :first)) do
-      expect(page).to have_content(geo_node.url)
+      expect(page).to have_link('New node', href: new_admin_geo_node_path)
+      page.within(find('.geo-node-item', match: :first)) do
+        expect(page).to have_content(geo_node.url)
+      end
+    end
+
+    context 'hashed storage warnings' do
+      let(:enable_warning) { 'Please enable and migrate to hashed storage' }
+      let(:migrate_warning) { 'Please migrate all existing projects' }
+      let(:user_callout_close_button) { '.user-callout .js-close' }
+
+      context 'without hashed storage enabled' do
+        before do
+          stub_application_setting(hashed_storage_enabled: false)
+        end
+
+        it 'shows a dismissable warning to enable hashed storage' do
+          visit admin_geo_nodes_path
+
+          expect(page).to have_content enable_warning
+          expect(page).to have_selector user_callout_close_button
+        end
+      end
+
+      context 'with hashed storage enabled' do
+        before do
+          stub_application_setting(hashed_storage_enabled: true)
+        end
+
+        context 'with all projects in hashed storage' do
+          let!(:project) { create(:project) }
+
+          it 'does not show any hashed storage warning' do
+            visit admin_geo_nodes_path
+
+            expect(page).not_to have_content enable_warning
+            expect(page).not_to have_content migrate_warning
+            expect(page).not_to have_selector user_callout_close_button
+          end
+        end
+
+        context 'with at least one project in legacy storage' do
+          let!(:project) { create(:project, :legacy_storage) }
+
+          it 'shows a dismissable warning to migrate to hashed storage' do
+            visit admin_geo_nodes_path
+
+            expect(page).to have_content migrate_warning
+            expect(page).to have_selector user_callout_close_button
+          end
+        end
+      end
     end
   end
 

@@ -1,0 +1,5 @@
+---
+title: 'Geo: Show hashed storage warnings on geo nodes page'
+merge_request: 8433
+author:
+type: deprecated
