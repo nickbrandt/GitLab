@@ -6,6 +6,7 @@ import EEGraphMixin from 'ee/pipelines/mixins/graph_component_mixin';
 import StageColumnComponent from '~/pipelines/components/graph/stage_column_component.vue';
 
 export default {
+  name: 'PipelineGraph',
   components: {
     LinkedPipelinesColumn,
     StageColumnComponent,
@@ -62,21 +63,6 @@ export default {
     <div class="pipeline-visualization pipeline-graph pipeline-tab-content">
       <div class="text-center"><gl-loading-icon v-if="isLoading" :size="3" /></div>
 
-      <ul v-if="shouldRenderTriggeredByPipeline" class="d-inline-block upstream-pipeline align-top">
-        <stage-column-component
-          v-for="(stage, indexUpstream) in triggeredByGraph"
-          :key="stage.name"
-          :class="{
-            'has-only-one-job': hasOnlyOneJob(stage),
-          }"
-          :title="capitalizeStageName(stage.name)"
-          :groups="stage.groups"
-          :stage-connector-class="stageConnectorClass(indexUpstream, stage)"
-          :is-first-column="isFirstColumn(indexUpstream)"
-          @refreshPipelineGraph="refreshTriggeredByPipelineGraph"
-        />
-      </ul>
-
       <linked-pipelines-column
         v-if="hasTriggeredBy"
         :linked-pipelines="triggeredByPipelines"
@@ -116,25 +102,6 @@ export default {
         graph-position="right"
         @linkedPipelineClick="handleClickedDownstream"
       />
-
-      <ul
-        v-if="shouldRenderTriggeredPipeline"
-        class="d-inline-block downstream-pipeline position-relative align-top"
-        :style="{ 'margin-top': marginTop }"
-      >
-        <stage-column-component
-          v-for="(stage, indexDownstream) in triggeredGraph"
-          :key="stage.name"
-          :class="{
-            'has-only-one-job': hasOnlyOneJob(stage),
-          }"
-          :title="capitalizeStageName(stage.name)"
-          :groups="stage.groups"
-          :stage-connector-class="stageConnectorClass(indexDownstream, stage)"
-          :is-first-column="isFirstColumn(indexDownstream)"
-          @refreshPipelineGraph="refreshTriggeredPipelineGraph"
-        />
-      </ul>
     </div>
   </div>
 </template>

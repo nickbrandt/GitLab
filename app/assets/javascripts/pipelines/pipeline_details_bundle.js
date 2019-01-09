@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Flash from '~/flash';
 import Translate from '~/vue_shared/translate';
 import { __ } from '~/locale';
-import PipelinesMediator from 'ee/pipelines/pipeline_details_mediator';
+import PipelinesMediator from './pipeline_details_mediator';
 import pipelineGraph from 'ee/pipelines/components/graph/graph_component.vue';
 import pipelineHeader from './components/header_component.vue';
 import eventHub from './event_hub';
@@ -53,10 +53,10 @@ export default () => {
         on: {
           refreshPipelineGraph: this.requestRefreshPipelineGraph,
           // EE-only start
-          refreshTriggeredPipelineGraph: this.mediator.refreshTriggeredByPipelineGraph,
-          refreshTriggeredByPipelineGraph: this.mediator.refreshTriggeredByPipelineGraph,
-          onClickTriggeredBy: pipeline => this.clickTriggeredBy(pipeline),
-          onClickTriggered: pipeline => this.clickTriggered(pipeline),
+          // refreshTriggeredPipelineGraph: this.mediator.refreshTriggeredByPipelineGraph,
+          // refreshTriggeredByPipelineGraph: this.mediator.refreshTriggeredByPipelineGraph,
+          onClickTriggeredBy: pipeline => this.clickTriggeredByPipeline(pipeline),
+          onClickTriggered: pipeline => this.clickTriggeredPipeline(pipeline),
           // EE-only end
         },
       });

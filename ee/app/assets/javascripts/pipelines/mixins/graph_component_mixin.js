@@ -1,51 +1,21 @@
-import _ from 'underscore';
-
 export default {
-  props: {
-    triggered: {
-      type: Object,
-      required: false,
-      default: () => ({}),
-    },
-    triggeredBy: {
-      type: Object,
-      required: false,
-      default: () => ({}),
-    },
-    triggeredByPipelines: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
-    triggeredPipelines: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
-  },
   data() {
     return {
       triggeredTopIndex: 1,
     };
   },
   computed: {
-    triggeredGraph() {
-      return this.triggered && this.triggered.details && this.triggered.details.stages;
+    hasTriggeredBy() {
+      return this.pipeline.triggered_by && this.pipeline.triggered_by != null;
     },
-    triggeredByGraph() {
-      return this.triggeredBy && this.triggeredBy.details && this.triggeredBy.details.stages;
+    triggeredByPipelines() {
+      return this.pipeline.triggered_by;
     },
     hasTriggered() {
-      return this.triggeredPipelines.length > 0;
+      return this.pipeline.triggered && this.pipeline.triggered.length > 0;
     },
-    hasTriggeredBy() {
-      return this.triggeredByPipelines.length > 0;
-    },
-    shouldRenderTriggeredPipeline() {
-      return !this.isLoading && !_.isEmpty(this.triggered);
-    },
-    shouldRenderTriggeredByPipeline() {
-      return !this.isLoading && !_.isEmpty(this.triggeredBy);
+    triggeredPipelines() {
+      return this.pipeline.triggered;
     },
     /**
      * Calculates the margin top of the clicked downstream pipeline by
@@ -56,6 +26,7 @@ export default {
     },
   },
   methods: {
+    // TODO FILIPA: REMOVE THIS
     refreshTriggeredPipelineGraph() {
       this.$emit('refreshTriggeredPipelineGraph');
     },

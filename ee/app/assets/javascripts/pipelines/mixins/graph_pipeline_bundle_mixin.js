@@ -1,4 +1,4 @@
-import pipelinesKeys from 'ee/pipelines/constants';
+import keys from '../constants';
 
 export default {
   methods: {
@@ -13,30 +13,19 @@ export default {
      * @param {String} resetStoreKey Store key for the visible pipeline that will need to be reset
      * @param {Object} pipeline The clicked pipeline
      */
-    clickPipeline(method, storeKey, resetStoreKey, pipeline, pollKey) {
+    clickPipeline(pipeline, method) {
+      debugger;
       if (!pipeline.isExpanded) {
-        this.mediator[method](pipeline);
+        this.mediator.store[method](pipeline);
       } else {
-        this.mediator.resetPipeline(storeKey, pipeline, resetStoreKey, pollKey);
+        this.mediator.store.closePipeline(pipeline);
       }
     },
-    clickTriggered(triggered) {
-      this.clickPipeline(
-        'fetchTriggeredPipeline',
-        pipelinesKeys.triggeredPipelines,
-        pipelinesKeys.triggered,
-        triggered,
-        'pollTriggered',
-      );
+    clickTriggeredByPipeline(pipeline) {
+      this.clickPipeline(pipeline, 'openTriggeredByPipeline');
     },
-    clickTriggeredBy(triggeredBy) {
-      this.clickPipeline(
-        'fetchTriggeredByPipeline',
-        pipelinesKeys.triggeredByPipelines,
-        pipelinesKeys.triggeredBy,
-        triggeredBy,
-        'pollTriggeredBy',
-      );
+    clickTriggeredPipeline(pipeline) {
+      this.clickPipeline(pipeline, 'openTriggeredPipeline');
     },
   },
 };

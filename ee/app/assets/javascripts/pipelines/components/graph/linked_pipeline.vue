@@ -12,22 +12,9 @@ export default {
     GlButton,
   },
   props: {
-    pipelineId: {
-      type: Number,
-      required: true,
-    },
-    pipelineStatus: {
+    pipeline: {
       type: Object,
       required: true,
-    },
-    projectName: {
-      type: String,
-      required: true,
-    },
-    isLoading: {
-      type: Boolean,
-      required: false,
-      default: false,
     },
   },
   computed: {
@@ -35,7 +22,13 @@ export default {
       return `${this.projectName} - ${this.pipelineStatus.label}`;
     },
     buttonId() {
-      return `js-linked-pipeline-${this.pipelineId}`;
+      return `js-linked-pipeline-${this.pipeline.id}`;
+    },
+    pipelineStatus() {
+      return this.pipeline.details.status;
+    },
+    projectName() {
+      return this.pipeline.project.name;
     },
   },
   methods: {
@@ -57,10 +50,10 @@ export default {
       class="js-linked-pipeline-content linked-pipeline-content"
       @click="onClickLinkedPipeline"
     >
-      <gl-loading-icon v-if="isLoading" class="js-linked-pipeline-loading d-inline" />
+      <gl-loading-icon v-if="pipeline.isLoading" class="js-linked-pipeline-loading d-inline" />
       <ci-status v-else :status="pipelineStatus" class="js-linked-pipeline-status" />
 
-      <span class="str-truncated align-bottom"> {{ projectName }} &#8226; #{{ pipelineId }} </span>
+      <span class="str-truncated align-bottom"> {{ projectName }} &#8226; #{{ pipeline.id }} </span>
     </gl-button>
   </li>
 </template>
