@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class GitlabSubscription < ActiveRecord::Base
+  default_value_for :start_date, Date.today
+
   belongs_to :namespace
   belongs_to :hosted_plan, class_name: 'Plan'
 
