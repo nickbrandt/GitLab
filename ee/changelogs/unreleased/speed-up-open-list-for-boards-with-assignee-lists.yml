@@ -1,0 +1,5 @@
+---
+title: Fix timeout loading Open list when board contains assignee lists
+merge_request:
+author:
+type: performance
