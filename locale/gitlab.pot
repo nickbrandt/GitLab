@@ -575,7 +575,28 @@ msgstr ""
 msgid "AdminSettings|When creating a new environment variable it will be protected by default."
 msgstr ""
 
+msgid "AdminUsers|2FA Disabled"
+msgstr ""
+
+msgid "AdminUsers|2FA Enabled"
+msgstr ""
+
+msgid "AdminUsers|Active"
+msgstr ""
+
+msgid "AdminUsers|Admin"
+msgstr ""
+
+msgid "AdminUsers|Admins"
+msgstr ""
+
 msgid "AdminUsers|Block user"
+msgstr ""
+
+msgid "AdminUsers|Blocked"
+msgstr ""
+
+msgid "AdminUsers|Cannot unblock LDAP blocked users"
 msgstr ""
 
 msgid "AdminUsers|Delete User %{username} and contributions?"
@@ -590,10 +611,40 @@ msgstr ""
 msgid "AdminUsers|Delete user and contributions"
 msgstr ""
 
+msgid "AdminUsers|External"
+msgstr ""
+
+msgid "AdminUsers|It's you!"
+msgstr ""
+
+msgid "AdminUsers|New user"
+msgstr ""
+
+msgid "AdminUsers|No users found"
+msgstr ""
+
+msgid "AdminUsers|Search by name, email or username"
+msgstr ""
+
+msgid "AdminUsers|Search users"
+msgstr ""
+
+msgid "AdminUsers|Send email to users"
+msgstr ""
+
+msgid "AdminUsers|Sort by"
+msgstr ""
+
 msgid "AdminUsers|To confirm, type %{projectName}"
 msgstr ""
 
 msgid "AdminUsers|To confirm, type %{username}"
+msgstr ""
+
+msgid "AdminUsers|User will be blocked"
+msgstr ""
+
+msgid "AdminUsers|Without projects"
 msgstr ""
 
 msgid "Advanced permissions, Large File Storage and Two-Factor authentication settings."
@@ -913,6 +964,9 @@ msgstr ""
 msgid "Archived projects"
 msgstr ""
 
+msgid "Are you sure"
+msgstr ""
+
 msgid "Are you sure you want to delete this pipeline schedule?"
 msgstr ""
 
@@ -1138,6 +1192,9 @@ msgstr ""
 msgid "Avatar for %{assigneeName}"
 msgstr ""
 
+msgid "Avatar for %{name}"
+msgstr ""
+
 msgid "Avatar will be removed. Are you sure?"
 msgstr ""
 
@@ -1319,6 +1376,9 @@ msgid "Bitbucket Server Import"
 msgstr ""
 
 msgid "Bitbucket import"
+msgstr ""
+
+msgid "Block"
 msgstr ""
 
 msgid "Blocked"
@@ -5336,6 +5396,9 @@ msgstr[1] ""
 msgid "Last Pipeline"
 msgstr ""
 
+msgid "Last activity"
+msgstr ""
+
 msgid "Last commit"
 msgstr ""
 
@@ -8678,6 +8741,9 @@ msgstr ""
 msgid "SortOptions|Oldest joined"
 msgstr ""
 
+msgid "SortOptions|Oldest last activity"
+msgstr ""
+
 msgid "SortOptions|Oldest sign in"
 msgstr ""
 
@@ -8688,6 +8754,9 @@ msgid "SortOptions|Popularity"
 msgstr ""
 
 msgid "SortOptions|Priority"
+msgstr ""
+
+msgid "SortOptions|Recent last activity"
 msgstr ""
 
 msgid "SortOptions|Recent sign in"
@@ -9916,6 +9985,9 @@ msgid "Unable to sign you in to the group with SAML due to \"%{reason}\""
 msgstr ""
 
 msgid "Unable to update this epic at this time."
+msgstr ""
+
+msgid "Unblock"
 msgstr ""
 
 msgid "Undo"
