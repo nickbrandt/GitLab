@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop: disable CodeReuse/ActiveRecord
 
 module EESpecificCheck
   WHITELIST = [
@@ -31,9 +32,9 @@ module EESpecificCheck
 
     ce_fetch_head = fetch_remote_ce_branch
     ee_fetch_head = head_commit_sha
-    ce_fetch_base = run_git_command("merge-base canonical-ce/master #{ce_fetch_head}")
-    ee_fetch_base = run_git_command("merge-base canonical-ee/master HEAD")
-    ce_merge_base = run_git_command("merge-base #{ce_fetch_head} #{ee_fetch_head}")
+    ce_fetch_base = find_merge_base('canonical-ce/master', ce_fetch_head)
+    ee_fetch_base = find_merge_base('canonical-ee/master', 'HEAD')
+    ce_merge_base = find_merge_base(ce_fetch_head, ee_fetch_head)
 
     ce_updated_head =
       find_ce_compare_head(ce_fetch_head, ce_fetch_base, ce_merge_base)
@@ -58,6 +59,28 @@ module EESpecificCheck
     run_git_command("fetch #{remote_to_fetch} #{branch_to_fetch} --quiet --depth=9999")
 
     "#{remote_to_fetch}/#{branch_to_fetch}"
+  end
+
+  def find_merge_base(left, right)
+    merge_base = run_git_command("merge-base #{left} #{right}")
+
+    return merge_base unless merge_base.empty?
+
+    say <<~MESSAGE
+      💥 Unfortunately we cannot find the merge-base for #{left} and #{right},
+      💥 and we'll try to fix that in:
+          https://gitlab.com/gitlab-org/gitlab-ee/issues/9120
+
+      💥 Before that, please run this job locally as a workaround:
+
+          ./scripts/ee-specific-lines-check
+
+      💥 And paste the result as a discussion to show it to the maintainer.
+      💥 If you have any questions, please ping @godfat to investigate and
+      💥 clarify.
+    MESSAGE
+
+    exit(253)
   end
 
   def find_ce_compare_head(ce_fetch_head, ce_fetch_base, ce_merge_base)
@@ -319,16 +342,13 @@ if $0 == __FILE__
     end
 
     describe '.run_git_command' do
-      # rubocop: disable CodeReuse/ActiveRecord
       it 'returns the single output when there is a single command' do
         output = subject.run_git_command('status')
 
         expect(output).to be_kind_of(String)
         expect(subject).to have_received(:warn).with(/git status/)
       end
-      # rubocop: enable CodeReuse/ActiveRecord
 
-      # rubocop: disable CodeReuse/ActiveRecord
       it 'returns an array of output for more commands' do
         output = subject.run_git_command('status', 'help')
 
@@ -336,7 +356,38 @@ if $0 == __FILE__
         expect(subject).to have_received(:warn).with(/git status/)
         expect(subject).to have_received(:warn).with(/git help/)
       end
-      # rubocop: enable CodeReuse/ActiveRecord
+    end
+
+    describe '.find_merge_base' do
+      context 'when it cannot find the merge base' do
+        before do
+          allow(subject).to receive(:say)
+          allow(subject).to receive(:exit)
+
+          expect(subject).to receive(:run_git_command).and_return('')
+        end
+
+        it 'calls exit(253) to fail the job and ask run it locally' do
+          subject.find_merge_base('master', 'HEAD')
+
+          expect(subject).to have_received(:say)
+            .with(Regexp.union('./scripts/ee-specific-lines-check'))
+          expect(subject).to have_received(:exit)
+            .with(253)
+        end
+      end
+
+      context 'when it found the merge base' do
+        before do
+          expect(subject).to receive(:run_git_command).and_return('deadbeef')
+        end
+
+        it 'returns the found merge base' do
+          output = subject.find_merge_base('master', 'HEAD')
+
+          expect(output).to eq('deadbeef')
+        end
+      end
     end
 
     describe '.matching_ce_refs' do
