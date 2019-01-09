@@ -4,7 +4,6 @@ import { GlLoadingIcon, GlButton } from '@gitlab/ui';
 import ModalRuleCreate from './modal_rule_create.vue';
 import ModalRuleRemove from './modal_rule_remove.vue';
 import RulesEmpty from './rules_empty.vue';
-import Rules from './rules.vue';
 
 const CREATE_MODAL_ID = 'approvals-settings-create-modal';
 const REMOVE_MODAL_ID = 'approvals-settings-remove-modal';
@@ -13,7 +12,6 @@ export default {
   components: {
     ModalRuleCreate,
     ModalRuleRemove,
-    Rules,
     RulesEmpty,
     GlButton,
     GlLoadingIcon,
@@ -30,7 +28,6 @@ export default {
   methods: {
     ...mapActions(['fetchRules']),
     ...mapActions({ openCreateModal: 'createModal/open' }),
-    ...mapActions({ openDeleteModal: 'deleteModal/open' }),
   },
   CREATE_MODAL_ID,
   REMOVE_MODAL_ID,
@@ -44,12 +41,7 @@ export default {
       <rules-empty v-else @click="openCreateModal(null);" />
     </template>
     <template v-else>
-      <rules
-        class="m-0"
-        :rules="rules"
-        @edit="openCreateModal($event);"
-        @remove="openDeleteModal($event);"
-      />
+      <slot name="rules" v-bind:rules="rules"> </slot>
       <div class="border-top border-bottom py-3 px-2">
         <gl-loading-icon v-if="isLoading" />
         <div class="d-flex">
