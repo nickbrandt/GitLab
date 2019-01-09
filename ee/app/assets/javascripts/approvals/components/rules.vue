@@ -38,7 +38,7 @@ export default {
       <tr class="d-none d-sm-table-row">
         <th>{{ s__('ApprovalRule|Name') }}</th>
         <th class="w-50">{{ s__('ApprovalRule|Members') }}</th>
-        <th>{{ s__('ApprovalRuleForm|No. approvals required') }}</th>
+        <th>{{ s__('ApprovalRule|No. approvals required') }}</th>
         <th></th>
       </tr>
     </thead>

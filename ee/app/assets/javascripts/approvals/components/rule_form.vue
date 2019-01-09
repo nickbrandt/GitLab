@@ -131,7 +131,7 @@ export default {
       <div class="form-group col-sm-6">
         <label class="label-wrapper">
           <span class="form-label label-bold">{{
-            s__('ApprovalRuleForm|No. approvals required')
+            s__('ApprovalRule|No. approvals required')
           }}</span>
           <input
             v-model.number="approvalsRequired"

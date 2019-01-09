@@ -912,7 +912,7 @@ msgstr ""
 msgid "Apply suggestion"
 msgstr ""
 
-msgid "ApprovalRuleForm|No. approvals required"
+msgid "ApprovalRule|No. approvals required"
 msgstr ""
 
 msgid "ApprovalRuleRemove|%d member"
