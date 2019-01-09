@@ -38,6 +38,13 @@ this adds `gitlab-elasticsearch-indexer` to `$GOPATH/bin`, please make sure that
 
 **note:** `make` will not recompile the executable unless you do `make clean` beforehand
 
+## Helpful rake tasks
+
+- `gitlab:elastic:test:index_size`: Tells you how much space the current index is using, as well as how many documents are in the index.
+- `gitlab:elastic:test:index_size_change`: Outputs index size, reindexes, and outputs index size again. Useful when testing improvements to indexing size.
+
+Additionally, if you need large repos or multiple forks for testing, please consider [following these instructions](https://docs.gitlab.com/ee/development/rake_tasks.html#extra-project-seed-options)
+
 ## How does it work?
 
 The ElasticSearch integration depends on an external indexer. We ship a [ruby indexer](https://gitlab.com/gitlab-org/gitlab-ee/blob/master/bin/elastic_repo_indexer) by default but are also working on an [indexer written in Go](https://gitlab.com/gitlab-org/gitlab-elasticsearch-indexer). The user must trigger the initial indexing via a rake task, but after this is done GitLab itself will trigger reindexing when required via `after_` callbacks on create, update, and destroy that are inherited from [/ee/app/models/concerns/elastic/application_search.rb](https://gitlab.com/gitlab-org/gitlab-ee/blob/master/ee/app/models/concerns/elastic/application_search.rb).

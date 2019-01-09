@@ -49,6 +49,10 @@ module Gitlab
       def self.refresh_index
         Project.__elasticsearch__.refresh_index!
       end
+
+      def self.index_size
+        Project.__elasticsearch__.client.indices.stats['indices'][Project.__elasticsearch__.index_name]['total']
+      end
     end
   end
 end
