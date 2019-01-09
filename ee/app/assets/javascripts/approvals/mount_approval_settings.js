@@ -5,7 +5,7 @@ import Settings from './components/settings.vue';
 
 Vue.use(Vuex);
 
-export default function mountApprovalsSettings(el) {
+export default function mountApprovalSettings(el) {
   if (!el) {
     return null;
   }
