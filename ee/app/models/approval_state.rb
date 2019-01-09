@@ -10,7 +10,7 @@ class ApprovalState
 
   attr_reader :merge_request, :project
 
-  def_delegators :@merge_request, :merge_status, :approved_by_users
+  def_delegators :@merge_request, :merge_status, :approved_by_users, :approvals
   alias_method :approved_approvers, :approved_by_users
 
   def initialize(merge_request)
@@ -48,12 +48,19 @@ class ApprovalState
     !approved?
   end
 
+  def overall_approvals_required
+    @overall_approvals_required ||= project.approvals_before_merge
+  end
+
   def approved?
     strong_memoize(:approved) do
-      wrapped_approval_rules.all?(&:approved?)
+      (overall_approvals_required == 0 || approvals.size >= overall_approvals_required) && wrapped_approval_rules.all?(&:approved?)
     end
   end
-  alias_method :any_approver_allowed?, :approved?
+
+  def any_approver_allowed?
+    approved? || overall_approvals_required > approvers.size
+  end
 
   # Number of approvals remaining (excluding existing approvals) before the MR is
   # considered approved.
