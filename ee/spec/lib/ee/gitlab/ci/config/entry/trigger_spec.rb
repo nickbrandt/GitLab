@@ -4,7 +4,7 @@ require_dependency 'active_model'
 describe EE::Gitlab::Ci::Config::Entry::Trigger do
   subject { described_class.new(config) }
 
-  context 'when trigger config is just a string' do
+  context 'when trigger config is a non-empty string' do
     let(:config) { 'some/project' }
 
     describe '#valid?' do
@@ -14,6 +14,21 @@ describe EE::Gitlab::Ci::Config::Entry::Trigger do
     describe '#value' do
       it 'is returns a trigger configuration hash' do
         expect(subject.value).to eq(project: 'some/project')
+      end
+    end
+  end
+
+  context 'when trigger config an empty string' do
+    let(:config) { '' }
+
+    describe '#valid?' do
+      it { is_expected.not_to be_valid }
+    end
+
+    describe '#errors' do
+      it 'is returns an error about an empty config' do
+        expect(subject.errors.first)
+          .to match /config can't be blank/
       end
     end
   end

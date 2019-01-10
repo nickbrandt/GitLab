@@ -15,6 +15,8 @@ module EE
             class SimpleTrigger < ::Gitlab::Config::Entry::Node
               include ::Gitlab::Config::Entry::Validatable
 
+              validations { validates :config, presence: true }
+
               def value
                 { project: @config }
               end
