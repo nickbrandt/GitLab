@@ -30,7 +30,7 @@ Implementing Geo provides the following benefits:
 
 - Reduce from minutes to seconds the time taken for your distributed developers to clone and fetch large repositories and projects.
 - Enable all of your developers to contribute ideas and work in parallel, no matter where they are.
-- Balance the load between your **primary** and **secondary** nodes, or offload your automated tests to the **secondary** node.
+- Balance the load between your **primary** and **secondary** nodes, or offload your automated tests to a **secondary** node.
 
 In addition, it:
 
@@ -42,8 +42,8 @@ In addition, it:
 
 Geo provides:
 
-- Read-only **secondary** nodes: Maintain one **primary** GitLab node while still enabling a read-only **secondary** node for each of your distributed teams.
-- Authentication system hooks: The **secondary** node receives all authentication data (like user accounts and logins) from the **primary** instance.
+- Read-only **secondary** nodes: Maintain one **primary** GitLab node while still enabling read-only **secondary** nodes for each of your distributed teams.
+- Authentication system hooks: **Secondary** nodes receives all authentication data (like user accounts and logins) from the **primary** instance.
 - An intuitive UI: **Secondary** nodes utilize the same web interface your team has grown accustomed to. In addition, there are visual notifications that block write operations and make it clear that a user is on a **secondary** node.
 
 ## How it works
@@ -75,12 +75,12 @@ The following diagram illustrates the underlying architecture of Geo.
 In this diagram:
 
 - There is the **primary** node and the details of one **secondary** node.
-- Writes to the database can only be performed on the **primary** node. A **secondary** node receives database 
+- Writes to the database can only be performed on the **primary** node. A **secondary** node receives database
   updates via PostgreSQL streaming replication.
 - If present, the [LDAP server](#ldap) should be configured to replicate for [Disaster Recovery](../disaster_recovery/index.md) scenarios.
-- A **secondary** node performs different type of synchronizations against the **primary** node, using a special 
+- A **secondary** node performs different type of synchronizations against the **primary** node, using a special
   authorization protected by JWT:
-   - Repositories are cloned/updated via Git over HTTPS. 
+   - Repositories are cloned/updated via Git over HTTPS.
    - Attachments, LFS objects, and other files are downloaded via HTTPS using a private API endpoint.
 
 From the perspective of a user performing Git operations:
@@ -89,6 +89,7 @@ From the perspective of a user performing Git operations:
 - **Secondary** nodes are read-only but proxy Git push operations to the **primary** node. This makes **secondary** nodes appear to support push operations themselves.
 
 To simplify the diagram, some necessary components are omitted. Note that:
+
 - Git over SSH requires [`gitlab-shell`](https://gitlab.com/gitlab-org/gitlab-shell) and OpenSSH.
 - Git over HTTPS required [`gitlab-workhorse`](https://gitlab.com/gitlab-org/gitlab-workhorse).
 
@@ -97,7 +98,7 @@ Note that a **secondary** node needs two different PostgreSQL databases:
 - A read-only database instance that streams data from the main GitLab database.
 - [Another database instance](#geo-tracking-database) used internally by the **secondary** node to record what data has been replicated.
 
-In secondary nodes, there is an additional daemon: [Geo Log Cursor](#geo-log-cursor).
+In **secondary** nodes, there is an additional daemon: [Geo Log Cursor](#geo-log-cursor).
 
 ## Requirements for running Geo
 
@@ -115,12 +116,12 @@ The following are required to run Geo:
 
 The following table lists basic ports that must be open between the **primary** and **secondary** nodes for Geo.
 
-| Primary server | Server secondary | Protocol        |
-| -------------- | ---------------- | --------------- |
-| 80             | 80               | HTTP            |
-| 443            | 443              | TCP or HTTPS    |
-| 22             | 22               | TCP             |
-| 5432           |                  | PostgreSQL      |
+| **Primary** node | **Secondary** node | Protocol     |
+|:-----------------|:-------------------|:-------------|
+| 80               | 80                 | HTTP         |
+| 443              | 443                | TCP or HTTPS |
+| 22               | 22                 | TCP          |
+| 5432             |                    | PostgreSQL   |
 
 See the full list of ports used by GitLab in [Package defaults](https://docs.gitlab.com/omnibus/package-information/defaults.html)
 
@@ -134,9 +135,12 @@ If you wish to terminate SSL at the GitLab application server instead, use TCP p
 
 ### LDAP
 
-We recommend that if you use LDAP on your **primary** node, you also set up a secondary LDAP server for the **secondary** node. Otherwise, users will not be able to perform Git operations over HTTP(s) on the **secondary** node using HTTP Basic Authentication. However, Git via SSH and personal access tokens will still work.
+We recommend that if you use LDAP on your **primary** node, you also set up secondary LDAP servers on each **secondary** node. Otherwise, users will not be able to perform Git operations over HTTP(s) on the **secondary** node using HTTP Basic Authentication. However, Git via SSH and personal access tokens will still work.
 
-Check with your LDAP provider for instructions on how to set up replication. For example, OpenLDAP provides [these instructions](https://www.openldap.org/doc/admin24/replication.html).
+NOTE: **Note:**
+It is possible for all **secondary** nodes to share an LDAP server, but additional latency can be an issue. Also, consider what LDAP server will be available in a [disaster recovery](../disaster_recovery/index.md) scenario if a **secondary** node is promoted to be a **primary** node.
+
+Check for instructions on how to set up replication in your LDAP service. Instructions will be different depending on the software or service used. For example, OpenLDAP provides [these instructions](https://www.openldap.org/doc/admin24/replication.html).
 
 ### Geo Tracking Database
 
@@ -153,7 +157,7 @@ The tracking database requires the `postgres_fdw` extension.
 
 This daemon:
 
-- Reads a log of events replicated by the **primary** node to the secondary database instance.
+- Reads a log of events replicated by the **primary** node to the **secondary** database instance.
 - Updates the Geo Tracking Database instance with changes that need to be executed.
 
 When something is marked to be updated in the tracking database instance, asynchronous jobs running on the **secondary** node will execute the required operations and update the state.

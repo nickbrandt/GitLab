@@ -6,37 +6,38 @@ Please consider [migrating to GitLab Omnibus install](https://docs.gitlab.com/om
 using the Omnibus GitLab packages, follow the
 [**Omnibus Geo nodes configuration**][configuration] guide.
 
-## Configuring a new secondary node
+## Configuring a new **secondary** node
 
 NOTE: **Note:**
-This is the final step in setting up a secondary Geo node. Stages of the setup
+This is the final step in setting up a **secondary** node. Stages of the setup
 process must be completed in the documented order. Before attempting the steps
 in this stage, [complete all prior stages][setup-geo-source].
 
-The basic steps of configuring a secondary node are to replicate required
-configurations between the primary and the secondaries; to configure a tracking
-database on each secondary; and to start GitLab on the secondary node.
+The basic steps of configuring a **secondary** node are to:
+
+- Replicate required configurations between the **primary** and **secondary** nodes.
+- Configure a tracking database on each **secondary** node.
+- Start GitLab on the **secondary** node.
 
 You are encouraged to first read through all the steps before executing them
 in your testing/production environment.
 
+NOTE: **Note:**
+**Do not** set up any custom authentication on **secondary** nodes, this will be handled by the **primary** node.
 
-NOTE: **Notes:**
-- **Do not** setup any custom authentication in the secondary nodes, this will be
-  handled by the primary node.
-- **Do not** add anything in the secondaries Geo nodes admin area
-  (**Admin Area > Geo**). This is handled solely by the primary node.
+NOTE: **Note:**
+**Do not** add anything in the **secondary** node's admin area (**Admin Area > Geo**). This is handled solely by the **primary** node.
 
 ### Step 1. Manually replicate secret GitLab values
 
 GitLab stores a number of secret values in the `/home/git/gitlab/config/secrets.yml`
-file which *must* match between the primary and secondary nodes. Until there is
+file which *must* match between the **primary** and **secondary** nodes. Until there is
 a means of automatically replicating these between nodes (see [gitlab-org/gitlab-ee#3789]), they must
-be manually replicated to the secondary.
+be manually replicated to **secondary** nodes.
 
 1. SSH into the **primary** node, and execute the command below:
 
-    ```bash
+    ```sh
     sudo cat /home/git/gitlab/config/secrets.yml
     ```
 
@@ -44,20 +45,20 @@ be manually replicated to the secondary.
 
 1. SSH into the **secondary** node and login as the `git` user:
 
-    ```bash
+    ```sh
     sudo -i -u git
     ```
 
 1. Make a backup of any existing secrets:
 
-    ```bash
+    ```sh
     mv /home/git/gitlab/config/secrets.yml /home/git/gitlab/config/secrets.yml.`date +%F`
     ```
 
-1. Copy `/home/git/gitlab/config/secrets.yml` from the primary to the secondary, or
+1. Copy `/home/git/gitlab/config/secrets.yml` from the **primary** node to the **secondary** node, or
    copy-and-paste the file contents between nodes:
 
-    ```bash
+    ```sh
     sudo editor /home/git/gitlab/config/secrets.yml
 
     # paste the output of the `cat` command you ran on the primary
@@ -66,65 +67,65 @@ be manually replicated to the secondary.
 
 1. Ensure the file permissions are correct:
 
-    ```bash
+    ```sh
     chown git:git /home/git/gitlab/config/secrets.yml
     chmod 0600 /home/git/gitlab/config/secrets.yml
     ```
 
 1. Restart GitLab
 
-    ```bash
+    ```sh
     service gitlab restart
     ```
 
-Once restarted, the secondary will automatically start replicating missing data
-from the primary in a process known as backfill. Meanwhile, the primary node
-will start to notify the secondary of any changes, so that the secondary can
+Once restarted, the **secondary** node will automatically start replicating missing data
+from the **primary** node in a process known as backfill. Meanwhile, the **primary** node
+will start to notify the **secondary** node of any changes, so that the **secondary** node can
 act on those notifications immediately.
 
-Make sure the secondary instance is running and accessible. You can login to
-the secondary node with the same credentials as used in the primary.
+Make sure the **secondary** node is running and accessible. You can login to
+the **secondary** node with the same credentials as used for the **primary** node.
 
-### Step 2. Manually replicate primary SSH host keys
+### Step 2. Manually replicate the **primary** node's SSH host keys
 
-Read [Manually replicate primary SSH host keys][configuration-replicate-ssh]
+Read [Manually replicate the **primary** node's SSH host keys][configuration-replicate-ssh]
 
-### Step 3. Add the secondary GitLab node
+### Step 3. Add the **secondary** GitLab node
 
 1. Navigate to the **primary** node's **Admin Area > Geo**
-   (`/admin/geo_nodes`) in your browser.
-1. Add the secondary node by providing its full URL. **Do NOT** check the box
-   'This is a primary node'.
+   (`/admin/geo/nodes`) in your browser.
+1. Add the **secondary** node by providing its full URL. **Do NOT** check the
+   **This is a primary node** checkbox.
 1. Optionally, choose which namespaces should be replicated by the
-   secondary node. Leave blank to replicate all. Read more in
+   **secondary** node. Leave blank to replicate all. Read more in
    [selective synchronization](#selective-synchronization).
 1. Click the **Add node** button.
 1. SSH into your GitLab **secondary** server and restart the services:
 
-    ```bash
+    ```sh
     service gitlab restart
     ```
 
     Check if there are any common issue with your Geo setup by running:
 
-    ```bash
+    ```sh
     bundle exec rake gitlab:geo:check
     ```
 
 1. SSH into your GitLab **primary** server and login as root to verify the
-   secondary is reachable or there are any common issue with your Geo setup:
+   **secondary** node is reachable or there are any common issue with your Geo setup:
 
-    ```bash
+    ```sh
     bundle exec rake gitlab:geo:check
     ```
 
-Once reconfigured, the secondary will automatically start
-replicating missing data from the primary in a process known as backfill.
-Meanwhile, the primary node will start to notify the secondary of any changes, so
-that the secondary can act on those notifications immediately.
+Once reconfigured, the **secondary** node will automatically start
+replicating missing data from the **primary** node in a process known as backfill.
+Meanwhile, the **primary** node will start to notify the **secondary** node of any changes, so
+that the **secondary** node can act on those notifications immediately.
 
-Make sure the secondary instance is running and accessible.
-You can login to the secondary node with the same credentials as used in the primary.
+Make sure the **secondary** node is running and accessible.
+You can log in to the **secondary** node with the same credentials as used for the **primary** node.
 
 ### Step 4. Enabling Hashed Storage
 
@@ -132,15 +133,15 @@ Read [Enabling Hashed Storage](configuration.md##step-4-enabling-hashed-storage)
 
 ### Step 5. (Optional) Configuring the secondary to trust the primary
 
-You can safely skip this step if your primary uses a CA-issued HTTPS certificate.
+You can safely skip this step if your **primary** node uses a CA-issued HTTPS certificate.
 
-If your primary is using a self-signed certificate for *HTTPS* support, you will
-need to add that certificate to the secondary's trust store. Retrieve the
-certificate from the primary and follow your distribution's instructions for
-adding it to the secondary's trust store. In Debian/Ubuntu, for example, with a
+If your **primary** node is using a self-signed certificate for *HTTPS* support, you will
+need to add that certificate to the **secondary** node's trust store. Retrieve the
+certificate from the **primary** node and follow your distribution's instructions for
+adding it to the **secondary** node's trust store. In Debian/Ubuntu, for example, with a
 certificate file of `primary.geo.example.com.crt`, you would follow these steps:
 
-```
+```sh
 sudo -i
 cp primary.geo.example.com.crt /usr/local/share/ca-certificates
 update-ca-certificates
@@ -150,7 +151,7 @@ update-ca-certificates
 
 Geo synchronizes repositories over HTTP/HTTPS, and therefore requires this clone
 method to be enabled. Navigate to **Admin Area > Settings**
-(`/admin/application_settings`) on the primary node, and set
+(`/admin/application_settings`) on the **primary** node, and set
 `Enabled Git access protocols` to `Both SSH and HTTP(S)` or `Only HTTP(S)`.
 
 ### Step 7. Verify proper functioning of the secondary node
