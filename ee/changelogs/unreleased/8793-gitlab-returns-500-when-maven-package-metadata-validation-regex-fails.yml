@@ -1,0 +1,5 @@
+---
+title: Return 400 error instead of 500 when upload maven package with invalid version
+merge_request: 9125
+author:
+type: fixed
