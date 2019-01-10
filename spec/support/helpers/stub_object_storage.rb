@@ -1,3 +1,5 @@
+require_relative '../../../ee/spec/support/helpers/ee/stub_object_storage'
+
 module StubObjectStorage
   prepend EE::StubObjectStorage
 
