@@ -4,7 +4,7 @@
 - has_jaeger_url = setting.external_url.present?
 
 %section.settings.expanded.border-0.no-animate
-  .settings-header{ :class => ("border-top" unless not Feature.enabled?(:error_tracking, @project)) }
+  .settings-header{ :class => "border-top" }
     %h4
       = _("Jaeger tracing")
     %p
