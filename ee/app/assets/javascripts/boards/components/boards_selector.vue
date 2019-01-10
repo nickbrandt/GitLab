@@ -1,7 +1,7 @@
 <script>
 import $ from 'jquery';
 import { throttle } from 'underscore';
-import { GlLoadingIcon, GlSearchBox } from '@gitlab/ui';
+import { GlLoadingIcon, GlSearchBox, GlDropdown } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import boardsStore from '~/boards/stores/boards_store';
 import BoardForm from './board_form.vue';
@@ -15,6 +15,7 @@ export default {
     BoardForm,
     GlLoadingIcon,
     GlSearchBox,
+    GlDropdown,
   },
   props: {
     currentBoard: {
@@ -68,7 +69,6 @@ export default {
   },
   data() {
     return {
-      open: false,
       loading: true,
       hasScrollFade: false,
       hasAssigneesListMounted: false,
@@ -134,46 +134,30 @@ export default {
     $('#js-add-list').on('hide.bs.dropdown', this.handleDropdownHide);
     $('.js-new-board-list-tabs').on('click', this.handleDropdownTabClick);
   },
-  mounted() {
-    // prevent dropdown from closing when search box is clicked
-    $(this.$el)
-      .find('.dropdown-header')
-      .on('click', event => event.stopPropagation());
-  },
   methods: {
     showPage(page) {
       this.state.reload = false;
       this.state.currentPage = page;
     },
-    toggleDropdown() {
-      this.open = !this.open;
-
-      if (this.open && !this.loading) {
-        this.$nextTick(this.focusSearchInput);
-      }
-    },
     loadBoards(toggleDropdown = true) {
-      if (toggleDropdown) {
-        this.toggleDropdown();
+      if (toggleDropdown && this.boards.length > 0) {
+        return;
       }
 
-      if (this.open && !this.boards.length) {
-        gl.boardService
-          .allBoards()
-          .then(res => res.data)
-          .then(json => {
-            this.loading = false;
-            this.boards = json;
-          })
-          .then(() => this.$nextTick()) // Wait for boards list in DOM
-          .then(() => {
-            this.setScrollFade();
-            this.focusSearchInput();
-          })
-          .catch(() => {
-            this.loading = false;
-          });
-      }
+      gl.boardService
+        .allBoards()
+        .then(res => res.data)
+        .then(json => {
+          this.loading = false;
+          this.boards = json;
+        })
+        .then(() => this.$nextTick()) // Wait for boards list in DOM
+        .then(() => {
+          this.setScrollFade();
+        })
+        .catch(() => {
+          this.loading = false;
+        });
     },
     isScrolledUp() {
       const { content } = this.$refs;
@@ -214,10 +198,6 @@ export default {
         this.hasMilestoneListMounted = true;
       }
     },
-    focusSearchInput() {
-      const { searchBox } = this.$refs;
-      searchBox.$el.querySelector('input').focus();
-    },
   },
 };
 </script>
@@ -225,69 +205,59 @@ export default {
 <template>
   <div class="boards-switcher js-boards-selector append-right-10">
     <span class="boards-selector-wrapper js-boards-selector-wrapper">
-      <div class="dropdown">
-        <button
-          class="dropdown-menu-toggle js-dropdown-toggle"
-          type="button"
-          data-toggle="dropdown"
-          @click="loadBoards"
-        >
-          {{ board.name }} <icon name="chevron-down" />
-        </button>
-        <div class="dropdown-menu" :class="{ 'is-loading': loading }">
-          <div class="dropdown-header position-relative">
-            <gl-search-box v-if="!loading" ref="searchBox" v-model="filterTerm" />
-          </div>
-
-          <div class="dropdown-content-faded-mask js-scroll-fade" :class="scrollFadeClass">
-            <ul
-              v-if="!loading"
-              ref="content"
-              class="dropdown-list js-dropdown-list"
-              @scroll.passive="throttledSetScrollFade"
-            >
-              <li
-                v-show="filteredBoards.length === 0"
-                class="dropdown-item no-pointer-events text-secondary"
-              >
-                {{ s__('IssueBoards|No matching boards found') }}
-              </li>
-
-              <li
-                v-for="otherBoard in filteredBoards"
-                :key="otherBoard.id"
-                class="js-dropdown-item"
-              >
-                <a :href="`${boardBaseUrl}/${otherBoard.id}`"> {{ otherBoard.name }} </a>
-              </li>
-              <li v-if="hasMissingBoards" class="small unclickable">
-                {{
-                  s__(
-                    'IssueBoards|Some of your boards are hidden, activate a license to see them again.',
-                  )
-                }}
-              </li>
-            </ul>
-          </div>
-
-          <gl-loading-icon v-if="loading" class="dropdown-loading" />
-
-          <div v-if="canAdminBoard" class="dropdown-footer">
-            <ul class="dropdown-footer-list">
-              <li v-if="multipleIssueBoardsAvailable">
-                <button type="button" @click.prevent="showPage('new')">
-                  {{ s__('IssueBoards|Create new board') }}
-                </button>
-              </li>
-              <li v-if="showDelete">
-                <button type="button" class="text-danger" @click.prevent="showPage('delete')">
-                  {{ s__('IssueBoards|Delete board') }}
-                </button>
-              </li>
-            </ul>
-          </div>
+      <gl-dropdown
+        toggle-class="dropdown-menu-toggle js-dropdown-toggle"
+        :text="board.name"
+        @show="loadBoards"
+      >
+        <div class="dropdown-header position-relative">
+          <gl-search-box v-if="!loading" ref="searchBox" v-model="filterTerm" />
         </div>
-      </div>
+
+        <div class="dropdown-content-faded-mask js-scroll-fade" :class="scrollFadeClass">
+          <ul
+            v-if="!loading"
+            ref="content"
+            class="dropdown-list js-dropdown-list"
+            @scroll.passive="throttledSetScrollFade"
+          >
+            <li
+              v-show="filteredBoards.length === 0"
+              class="dropdown-item no-pointer-events text-secondary"
+            >
+              {{ s__('IssueBoards|No matching boards found') }}
+            </li>
+
+            <li v-for="otherBoard in filteredBoards" :key="otherBoard.id" class="js-dropdown-item">
+              <a :href="`${boardBaseUrl}/${otherBoard.id}`"> {{ otherBoard.name }} </a>
+            </li>
+            <li v-if="hasMissingBoards" class="small unclickable">
+              {{
+                s__(
+                  'IssueBoards|Some of your boards are hidden, activate a license to see them again.',
+                )
+              }}
+            </li>
+          </ul>
+        </div>
+
+        <gl-loading-icon v-if="loading" class="dropdown-loading" />
+
+        <div v-if="canAdminBoard" class="dropdown-footer">
+          <ul class="dropdown-footer-list">
+            <li v-if="multipleIssueBoardsAvailable">
+              <button type="button" @click.prevent="showPage('new')">
+                {{ s__('IssueBoards|Create new board') }}
+              </button>
+            </li>
+            <li v-if="showDelete">
+              <button type="button" class="text-danger" @click.prevent="showPage('delete')">
+                {{ s__('IssueBoards|Delete board') }}
+              </button>
+            </li>
+          </ul>
+        </div>
+      </gl-dropdown>
 
       <board-form
         v-if="currentPage"
