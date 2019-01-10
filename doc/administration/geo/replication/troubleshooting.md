@@ -1,6 +1,6 @@
 # Geo Troubleshooting
 
->**Note:**
+NOTE: **Note:**
 This list is an attempt to document all the moving parts that can go wrong.
 We are working into getting all this steps verified automatically in a
 rake task in the future.
@@ -9,10 +9,10 @@ Setting up Geo requires careful attention to details and sometimes it's easy to
 miss a step. Here is a list of questions you should ask to try to detect
 what you need to fix (all commands and path locations are for Omnibus installs):
 
-#### First check the health of the secondary
+## First check the health of the **secondary** node
 
-Visit the primary node's **Admin Area > Geo** (`/admin/geo_nodes`) in
-your browser. We perform the following health checks on each secondary node
+Visit the **primary** node's **Admin Area > Geo** (`/admin/geo/nodes`) in
+your browser. We perform the following health checks on each **secondary** node
 to help identify if something is wrong:
 
 - Is the node running?
@@ -23,30 +23,30 @@ to help identify if something is wrong:
 
 ![Geo health check](img/geo_node_healthcheck.png)
 
-There is also an option to check the status of the secondary node by running a special rake task:
+There is also an option to check the status of the **secondary** node by running a special rake task:
 
-```
+```sh
 sudo gitlab-rake geo:status
 ```
 
-#### Is Postgres replication working?
+## Is Postgres replication working?
 
-#### Are my nodes pointing to the correct database instance?
+### Are my nodes pointing to the correct database instance?
 
-You should make sure your primary Geo node points to the instance with
+You should make sure your **primary** Geo node points to the instance with
 writing permissions.
 
-Any secondary nodes should point only to read-only instances.
+Any **secondary** nodes should point only to read-only instances.
 
-#### Can Geo detect my current node correctly?
+### Can Geo detect my current node correctly?
 
-Geo uses the defined node from the `Admin ➔ Geo` screen, and tries to match
+Geo uses the defined node from the **Admin Area > Geo** screen, and tries to match
 it with the value defined in the `/etc/gitlab/gitlab.rb` configuration file.
 The relevant line looks like: `external_url "http://gitlab.example.com"`.
 
 To check if the node on the current machine is correctly detected type:
 
-```bash
+```sh
 sudo gitlab-rails runner "puts Gitlab::Geo.current_node.inspect"
 ```
 
@@ -57,53 +57,52 @@ and expect something like:
 ```
 
 By running the command above, `primary` should be `true` when executed in
-the primary node, and `false` on any secondary.
+the **primary** node, and `false` on any **secondary** node.
 
-#### How do I fix the message, "ERROR:  replication slots can only be used if max_replication_slots > 0"?
+## How do I fix the message, "ERROR:  replication slots can only be used if max_replication_slots > 0"?
 
 This means that the `max_replication_slots` PostgreSQL variable needs to
-be set on the primary database. In GitLab 9.4, we have made this setting
-default to 1. You may need to increase this value if you have more Geo
-secondary nodes. Be sure to restart PostgreSQL for this to take
+be set on the **primary** database. In GitLab 9.4, we have made this setting
+default to 1. You may need to increase this value if you have more
+**secondary** nodes. Be sure to restart PostgreSQL for this to take
 effect. See the [PostgreSQL replication
 setup][database-pg-replication] guide for more details.
 
-#### How do I fix the message, "FATAL:  could not start WAL streaming: ERROR:  replication slot "geo_secondary_my_domain_com" does not exist"?
+## How do I fix the message, "FATAL:  could not start WAL streaming: ERROR:  replication slot "geo_secondary_my_domain_com" does not exist"?
 
 This occurs when PostgreSQL does not have a replication slot for the
-secondary by that name. You may want to rerun the [replication
-process](database.md) on the secondary.
+**secondary** node by that name. You may want to rerun the [replication
+process](database.md) on the **secondary** node .
 
-#### How do I fix the message, "Command exceeded allowed execution time" when setting up replication?
+## How do I fix the message, "Command exceeded allowed execution time" when setting up replication?
 
-This may happen while [initiating the replication process][database-start-replication] on the Geo secondary,
+This may happen while [initiating the replication process][database-start-replication] on the **secondary** node,
 and indicates that your initial dataset is too large to be replicated in the default timeout (30 minutes).
 
 Re-run `gitlab-ctl replicate-geo-database`, but include a larger value for
 `--backup-timeout`:
 
-```bash
+```sh
 sudo gitlab-ctl replicate-geo-database --host=primary.geo.example.com --slot-name=secondary_geo_example_com --backup-timeout=21600
 ```
 
 This will give the initial replication up to six hours to complete, rather than
 the default thirty minutes. Adjust as required for your installation.
 
-#### How do I fix the message, "PANIC: could not write to file 'pg_xlog/xlogtemp.123': No space left on device"
+## How do I fix the message, "PANIC: could not write to file 'pg_xlog/xlogtemp.123': No space left on device"
 
-Determine if you have any unused replication slots in the primary database.  This can cause large amounts of
+Determine if you have any unused replication slots in the **primary** database. This can cause large amounts of
 log data to build up in `pg_xlog`. Removing the unused slots can reduce the amount of space used in the `pg_xlog`.
 
 1. Start a PostgreSQL console session:
 
-    ```bash
+    ```sh
     sudo gitlab-psql gitlabhq_production
     ```
 
-    > Note that using `gitlab-rails dbconsole` will not work, because managing replication slots requires
-      superuser permissions.
+    > Note that using `gitlab-rails dbconsole` will not work, because managing replication slots requires superuser permissions.
 
-2. View your replication slots with
+1. View your replication slots with:
 
     ```sql
     SELECT * FROM pg_replication_slots;
@@ -111,8 +110,8 @@ log data to build up in `pg_xlog`. Removing the unused slots can reduce the amou
 
 Slots where `active` is `f` are not active.
 
-- When this slot should be active, because you have a secondary configured using that slot,
-  log in to that secondary and check the PostgreSQL logs why the replication is not running.
+- When this slot should be active, because you have a **secondary** node configured using that slot,
+  log in to that **secondary** node and check the PostgreSQL logs why the replication is not running.
 
 - If you are no longer using the slot (e.g. you no longer have Geo enabled), you can remove it with in the
   PostgreSQL console session:
@@ -121,13 +120,13 @@ Slots where `active` is `f` are not active.
     SELECT pg_drop_replication_slot('name_of_extra_slot');
     ```
 
-#### Very large repositories never successfully synchronize on the secondary
+## Very large repositories never successfully synchronize on the **secondary** node
 
 GitLab places a timeout on all repository clones, including project imports
 and Geo synchronization operations. If a fresh `git clone` of a repository
 on the primary takes more than a few minutes, you may be affected by this.
 To increase the timeout, add the following line to `/etc/gitlab/gitlab.rb`
-on the secondary:
+on the **secondary** node:
 
 ```ruby
 gitlab_rails['gitlab_shell_git_timeout'] = 10800
@@ -135,16 +134,16 @@ gitlab_rails['gitlab_shell_git_timeout'] = 10800
 
 Then reconfigure GitLab:
 
-```bash
+```sh
 sudo gitlab-ctl reconfigure
 ```
 
 This will increase the timeout to three hours (10800 seconds). Choose a time
 long enough to accommodate a full clone of your largest repositories.
 
-#### How to reset Geo secondary replication
+## How to reset Geo **secondary** node replication
 
-If you get a secondary node in a broken state and want to reset the replication state,
+If you get a **secondary** node in a broken state and want to reset the replication state,
 to start again from scratch, there are a few steps that can help you:
 
 1. Stop Sidekiq and the Geo LogCursor
@@ -155,7 +154,7 @@ to start again from scratch, there are a few steps that can help you:
     You need to send a **SIGTSTP** kill signal for the first phase and them a **SIGTERM**
     when all jobs have finished. Otherwise just use the `gitlab-ctl stop` commands.
 
-    ```bash
+    ```sh
     gitlab-ctl status sidekiq
     # run: sidekiq: (pid 10180) <- this is the PID you will use
     kill -TSTP 10180 # change to the correct PID
@@ -166,13 +165,13 @@ to start again from scratch, there are a few steps that can help you:
 
     You can watch sidekiq logs to know when sidekiq jobs processing have finished:
 
-    ```bash
+    ```sh
     gitlab-ctl tail sidekiq
     ```
 
 1. Rename repository storage folders and create new ones
 
-    ```bash
+    ```sh
     mv /var/opt/gitlab/git-data/repositories /var/opt/gitlab/git-data/repositories.old
     mkdir -p /var/opt/gitlab/git-data/repositories
     chown git:git /var/opt/gitlab/git-data/repositories
@@ -185,7 +184,7 @@ to start again from scratch, there are a few steps that can help you:
 1. _(Optional)_ Rename other data folders and create new ones
 
     CAUTION: **Caution**:
-    You may still have files on the secondary that have been removed from primary but
+    You may still have files on the **secondary** node that have been removed from **primary** node but
     removal have not been reflected. If you skip this step, they will never be removed
     from this Geo node.
 
@@ -197,7 +196,7 @@ to start again from scratch, there are a few steps that can help you:
 
     To rename all of them:
 
-    ```bash
+    ```sh
     gitlab-ctl stop
 
     mv /var/opt/gitlab/gitlab-rails/shared /var/opt/gitlab/gitlab-rails/shared.old
@@ -210,19 +209,19 @@ to start again from scratch, there are a few steps that can help you:
     Reconfigure in order to recreate the folders and make sure permissions and ownership
     are correctly
 
-    ```bash
+    ```sh
     gitlab-ctl reconfigure
     ```
 
 1. Reset the Tracking Database
 
-    ```bash
+    ```sh
     gitlab-rake geo:db:reset
     ```
 
 1. Restart previously stopped services
 
-    ```bash
+    ```sh
     gitlab-ctl start
     ```
 

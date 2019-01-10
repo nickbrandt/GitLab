@@ -6,22 +6,22 @@ failover to migrate your GitLab instance between regions without extended
 downtime.
 
 As replication between Geo nodes is asynchronous, a planned failover requires
-a maintenance window in which updates to the **primary node** are blocked. The
+a maintenance window in which updates to the **primary** node are blocked. The
 length of this window is determined by your replication capacity - once the
-secondary is completely in sync with the primary, the failover can occur without
+**secondary** node is completely synchronized with the **primary** node, the failover can occur without
 data loss.
 
 This document assumes you already have a fully configured, working Geo setup.
 Please read it and the [Disaster Recovery][disaster-recovery] failover
-documentation in full before proceeding.  Planned failover is a major operation,
+documentation in full before proceeding. Planned failover is a major operation,
 and if performed incorrectly, there is a high risk of data loss. Consider
 rehearsing the procedure until you are comfortable with the necessary steps and
-have a high degree of confidence in being able to perfom them accurately.
+have a high degree of confidence in being able to perform them accurately.
 
 ## Not all data is automatically replicated
 
 If you are using any GitLab features that Geo [doesn't support][limitations],
-you must make separate provisions to ensure that the secondary node has an
+you must make separate provisions to ensure that the **secondary** node has an
 up-to-date copy of any data associated with that feature. This may extend the
 required scheduled maintenance period significantly.
 
@@ -29,7 +29,7 @@ A common strategy for keeping this period as short as possible for data stored
 in files is to use `rsync` to transfer the data. An initial `rsync` can be
 performed ahead of the maintenance window; subsequent `rsync`s (including a
 final transfer inside the maintenance window) will then transfer only the
-*changes* between primary and secondary.
+*changes* between the **primary** node and the **secondary** nodes.
 
 Repository-centric strategies for using `rsync` effectively can be found in the
 [moving repositories][moving-repositories] documentation; these strategies can
@@ -50,8 +50,8 @@ means you can decouple the replication of this data from the failover of the
 GitLab service.
 
 If you're already using object storage, simply verify that your **secondary**
-has access to the same data as the **primary** - they must either they share the
-same object storage configuration, or the **secondary** should be configured to
+node has access to the same data as the **primary** node - they must either they share the
+same object storage configuration, or the **secondary** node should be configured to
 access a [geographically-replicated][os-repl] copy provided by the object store
 itself.
 
@@ -60,21 +60,21 @@ If you have a large GitLab installation or cannot tolerate downtime, consider
 Doing so reduces both the length of the maintenance window, and the risk of data
 loss as a result of a poorly executed planned failover.
 
-### Review the configuration of the secondary
+### Review the configuration of each **secondary** node
 
-Database settings are automatically replicated to the secondary, but the
+Database settings are automatically replicated to the **secondary**  node, but the
 `/etc/gitlab/gitlab.rb` file must be set up manually, and differs between
 nodes. If features such as Mattermost, OAuth or LDAP integration are enabled
-on the primary but not the secondary, they will be lost during failover.
+on the **primary** node but not the **secondary** node, they will be lost during failover.
 
-Review the `/etc/gitlab/gitlab.rb` file for both nodes and ensure the secondary
-supports everything the primary does **before** scheduling a planned failover.
+Review the `/etc/gitlab/gitlab.rb` file for both nodes and ensure the **secondary** node
+supports everything the **primary** node does **before** scheduling a planned failover.
 
 ### Run system checks
 
-Run the following on both primary and secondary nodes:
+Run the following on both **primary** and **secondary** nodes:
 
-```
+```sh
 gitlab-rake gitlab:check
 gitlab-rake gitlab:geo:check
 ```
@@ -88,12 +88,12 @@ The SSH host keys and `/etc/gitlab/gitlab-secrets.json` files should be
 identical on all nodes. Check this by running the following on all nodes and
 comparing the output:
 
-```
+```sh
 sudo sha256sum /etc/ssh/ssh_host* /etc/gitlab/gitlab-secrets.json
 ```
 
-If any files differ, replace the content on the **secondary** with the
-content on the **primary**.
+If any files differ, replace the content on the **secondary** node with the
+content from the **primary** node.
 
 ### Ensure Geo replication is up-to-date
 
@@ -117,7 +117,7 @@ You can use the [Geo status API][geo-status-api] to review failed objects and
 the reasons for failure.
 
 A common cause of replication failures is the data being missing on the
-**primary** - you can resolve these failures by restoring the data from backup,
+**primary** node - you can resolve these failures by restoring the data from backup,
 or removing references to the missing data.
 
 ### Verify the integrity of replicated data
@@ -131,23 +131,23 @@ message. You can check under **Admin Area > Geo** to estimate how long it
 will take to finish syncing. An example message would be:
 
 > A scheduled maintenance will take place at XX:XX UTC. We expect it to take
-  less than 1 hour.
+> less than 1 hour.
 
-## Prevent updates to the **primary**
+## Prevent updates to the **primary** node
 
 Until a [read-only mode][ce-19739] is implemented, updates must be prevented
 from happening manually. Note that your **secondary** node still needs read-only
-access to the primary for the duration of the maintenance window.
+access to the **primary** node during the maintenance window.
 
 1. At the scheduled time, using your cloud provider or your node's firewall, block
-   all HTTP, HTTPS and SSH traffic to/from the primary, **except** for your IP and
-   the secondary's IP.
+   all HTTP, HTTPS and SSH traffic to/from the **primary** node, **except** for your IP and
+   the **secondary** node's IP.
 
-    For instance, if your secondary originates all its traffic from `5.6.7.8` and
+    For instance, if your **secondary** node originates all its traffic from `5.6.7.8` and
     your IP is `100.0.0.1`, you might run the following commands on the server(s)
-    making up your primary node:
+    making up your **primary** node:
 
-    ```
+    ```sh
     sudo iptables -A INPUT -p tcp -s 5.6.7.8 --destination-port 22 -j ACCEPT
     sudo iptables -A INPUT -p tcp -s 100.0.0.1 --destination-port 22 -j ACCEPT
     sudo iptables -A INPUT --destination-port 22 -j REJECT
@@ -162,14 +162,14 @@ access to the primary for the duration of the maintenance window.
     ```
 
     From this point, users will be unable to view their data or make changes on the
-    **primary** node. They will also be unable to log in to the **secondary** node,
-    but existing sessions will work for the remainder of the maintenance period, and
+    **primary** node. They will also be unable to log in to the **secondary** node.
+    However, existing sessions will work for the remainder of the maintenance period, and
     public data will be accessible throughout.
 
-1. Verify the primary is blocked to HTTP traffic by visiting it in browser via
+1. Verify the **primary** node is blocked to HTTP traffic by visiting it in browser via
    another IP. The server should refuse connection.
 
-1. Verify the primary is blocked to Git over SSH traffic by attempting to pull an
+1. Verify the **primary** node is blocked to Git over SSH traffic by attempting to pull an
    existing Git repository with an SSH remote URL. The server should refuse
    connection.
 
@@ -186,13 +186,13 @@ access to the primary for the duration of the maintenance window.
 1. On the **primary** node, navigate to **Admin Area > Monitoring > Background Jobs > Queues**
    and wait for all queues except those with `geo` in the name to drop to 0.
    These queues contain work that has been submitted by your users; failing over
-   before it is completed will cause the work to be lost!
+   before it is completed will cause the work to be lost.
 1. On the **primary** node, navigate to **Admin Area > Geo** and wait for the
    following conditions to be true of the **secondary** node you are failing over to:
-    * All replication meters to each 100% replicated, 0% failures
-    * All verification meters reach 100% verified, 0% failures
-    * Database replication lag is 0ms
-    * The Geo log cursor is up to date (0 events behind)
+    - All replication meters to each 100% replicated, 0% failures.
+    - All verification meters reach 100% verified, 0% failures.
+    - Database replication lag is 0ms.
+    - The Geo log cursor is up to date (0 events behind).
 
 1. On the **secondary** node, navigate to **Admin Area > Monitoring > Background Jobs > Queues**
    and wait for all the `geo` queues to drop to 0 queued and 0 running jobs.
@@ -200,18 +200,17 @@ access to the primary for the duration of the maintenance window.
    to verify the integrity of CI artifacts, LFS objects and uploads in file
    storage.
 
-At this point, your secondary will contain an up-to-date copy of everything the
-primary has, meaning nothing will be lost when you fail over.
+At this point, your **secondary** node will contain an up-to-date copy of everything the
+**primary** node has, meaning nothing will be lost when you fail over.
 
-## Promote the secondary
+## Promote the **secondary** node
 
 Finally, follow the [Disaster Recovery docs][disaster-recovery] to promote the
-secondary to a primary. This process will cause a brief outage on the secondary,
-and users may need to log in again.
+**secondary** node to a **primary** node. This process will cause a brief outage on the **secondary** node, and users may need to log in again.
 
-Once it is completed, the maintenance window is over! Your new primary will now
+Once it is completed, the maintenance window is over! Your new **primary** node will now
 begin to diverge from the old one. If problems do arise at this point, failing
-back to the old primary [is possible][bring-primary-back], but likely to result
+back to the old **primary** node [is possible][bring-primary-back], but likely to result
 in the loss of any data uploaded to the new primary in the meantime.
 
 Don't forget to remove the broadcast message after failover is complete.

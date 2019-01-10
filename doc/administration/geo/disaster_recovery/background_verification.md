@@ -4,18 +4,18 @@ NOTE: **Note:**
 Automatic background verification of repositories and wikis was added in
 GitLab EE 10.6 but is enabled by default only on GitLab EE 11.1. You can
 disable or enable this feature manually by following
-[these instructions][feature-flag].
+[these instructions](#disabling-or-enabling-the-automatic-background-verification).
 
-Automatic backgorund verification ensures that the transferred data matches a
-calculated checksum, proving that the content on the **secondary** matches that
-on the **primary**. Following a planned failover, any corrupted data may be
-**lost**, depending on the extent of the corruption.
+Automatic background verification ensures that the transferred data matches a
+calculated checksum. If the checksum of the data on the **primary** node matches checksum of the
+data on the **secondary** node, the data transferred successfully. Following a planned failover,
+any corrupted data may be **lost**, depending on the extent of the corruption.
 
-If verification fails on the **primary**, this indicates that Geo is
+If verification fails on the **primary** node, this indicates that Geo is
 successfully replicating a corrupted object; restore it from backup or remove it
-it from the primary to resolve the issue.
+it from the **primary** node to resolve the issue.
 
-If verification succeeds on the **primary** but fails on the **secondary**,
+If verification succeeds on the **primary** node but fails on the **secondary** node,
 this indicates that the object was corrupted during the replication process.
 Geo actively try to correct verification failures marking the repository to
 be resynced with a backoff period. If you want to reset the verification for
@@ -65,7 +65,7 @@ in grey, and failures in red.
 ![Verification status](img/verification-status-primary.png)
 
 Navigate to the **Admin Area > Geo** dashboard on the **secondary** node and expand
-the **Verification information** tab for that node to view automatic verifcation
+the **Verification information** tab for that node to view automatic verification
 status for repositories and wikis. As with checksumming, successes are shown in
 green, pending work in grey, and failures in red.
 
@@ -73,7 +73,7 @@ green, pending work in grey, and failures in red.
 
 ## Using checksums to compare Geo nodes
 
-To check the health of Geo secondary nodes, we use a checksum over the list of
+To check the health of Geo **secondary** nodes, we use a checksum over the list of
 Git references and their values. The checksum includes `HEAD`, `heads`, `tags`,
 `notes`, and GitLab-specific references to ensure true consistency. If two nodes
 have the same checksum, then they definitely hold the same references. We compute
@@ -129,33 +129,33 @@ be resynced with a backoff period. If you want to reset them manually, this
 rake task marks projects where verification has failed or the checksum mismatch
 to be resynced without the backoff period:
 
-#### For repositories:
+For repositories:
 
-**Omnibus Installation**
+- Omnibus Installation
 
-```
-sudo gitlab-rake geo:verification:repository:reset
-```
+    ```sh
+    sudo gitlab-rake geo:verification:repository:reset
+    ```
 
-**Source Installation**
+- Source Installation
 
-```bash
-sudo -u git -H bundle exec rake geo:verification:repository:reset RAILS_ENV=production
-```
+    ```sh
+    sudo -u git -H bundle exec rake geo:verification:repository:reset RAILS_ENV=production
+    ```
 
-#### For wikis:
+For wikis:
 
-**Omnibus Installation**
+- Omnibus Installation
 
-```
-sudo gitlab-rake geo:verification:wiki:reset
-```
+    ```sh
+    sudo gitlab-rake geo:verification:wiki:reset
+    ```
 
-**Source Installation**
+- Source Installation
 
-```bash
-sudo -u git -H bundle exec rake geo:verification:wiki:reset RAILS_ENV=production
-```
+    ```sh
+    sudo -u git -H bundle exec rake geo:verification:wiki:reset RAILS_ENV=production
+    ```
 
 ## Current limitations
 
@@ -167,7 +167,6 @@ on both nodes, and comparing the output between them.
 Data in object storage is **not verified**, as the object store is responsible
 for ensuring the integrity of the data.
 
-[feature-flag]: background_verification.md#enabling-or-disabling-the-automatic-background-verification
 [reset-verification]: background_verification.md#reset-verification-for-projects-where-verification-has-failed
 [foreground-verification]: ../../raketasks/check.md
 [ee-5064]: https://gitlab.com/gitlab-org/gitlab-ee/issues/5064

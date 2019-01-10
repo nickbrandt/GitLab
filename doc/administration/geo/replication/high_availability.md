@@ -10,7 +10,7 @@ described, it is possible to adapt these instructions to your needs.
 
 _[diagram source - gitlab employees only][diagram-source]_
 
-The topology above assumes that the primary and secondary Geo clusters
+The topology above assumes that the **primary** and **secondary** Geo clusters
 are located in two separate locations, on their own virtual network
 with private IP addresses. The network is configured such that all machines within
 one geographic location can communicate with each other using their private IP addresses.
@@ -20,14 +20,14 @@ network topology of your deployment.
 The only external way to access the two Geo deployments is by HTTPS at
 `gitlab.us.example.com` and `gitlab.eu.example.com` in the example above.
 
-> **Note:** The primary and secondary Geo deployments must be able to
-  communicate to each other over HTTPS.
+NOTE: **Note:**
+The **primary** and **secondary** Geo deployments must be able to communicate to each other over HTTPS.
 
 ## Redis and PostgreSQL High Availability
 
-The primary and secondary Redis and PostgreSQL should be configured
+The **primary** and **secondary** Redis and PostgreSQL should be configured
 for high availability. Because of the additional complexity involved
-in setting up this configuration for PostgreSQL and Redis
+in setting up this configuration for PostgreSQL and Redis,
 it is not covered by this Geo HA documentation.
 
 For more information about setting up a highly available PostgreSQL cluster and Redis cluster using the omnibus package see the high availability documentation for
@@ -35,7 +35,7 @@ For more information about setting up a highly available PostgreSQL cluster and 
 [Redis](../../high_availability/redis.md), respectively.
 
 NOTE: **Note:**
-It is possible to use cloud hosted services for PostgreSQL and Redis but this is beyond the scope of this document.
+It is possible to use cloud hosted services for PostgreSQL and Redis, but this is beyond the scope of this document.
 
 ## Prerequisites: A working GitLab HA cluster
 
@@ -189,7 +189,6 @@ following modifications:
     registry['uid'] = 9002
     registry['gid'] = 9002
     ```
-
 NOTE: **Note:**
 If you had set up PostgreSQL cluster using the omnibus package and you had set
 up `postgresql['sql_user_password'] = 'md5 digest of secret'` setting, keep in
