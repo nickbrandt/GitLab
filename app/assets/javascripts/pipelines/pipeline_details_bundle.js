@@ -43,20 +43,17 @@ export default () => {
         props: {
           isLoading: this.mediator.state.isLoading,
           pipeline: this.mediator.store.state.pipeline,
-          // EE-only start
-          triggeredPipelines: this.mediator.store.state.triggeredPipelines,
-          triggered: this.mediator.store.state.triggered,
-          triggeredByPipelines: this.mediator.store.state.triggeredByPipelines,
-          triggeredBy: this.mediator.store.state.triggeredBy,
-          // EE-only end
+          mediator: this.mediator,
         },
         on: {
           refreshPipelineGraph: this.requestRefreshPipelineGraph,
           // EE-only start
           // refreshTriggeredPipelineGraph: this.mediator.refreshTriggeredByPipelineGraph,
           // refreshTriggeredByPipelineGraph: this.mediator.refreshTriggeredByPipelineGraph,
-          onClickTriggeredBy: pipeline => this.clickTriggeredByPipeline(pipeline),
-          onClickTriggered: pipeline => this.clickTriggeredPipeline(pipeline),
+          onClickTriggeredBy: (parentPipeline, pipeline) =>
+            this.clickTriggeredByPipeline(parentPipeline, pipeline),
+          onClickTriggered: (parentPipeline, pipeline) =>
+            this.clickTriggeredPipeline(parentPipeline, pipeline),
           // EE-only end
         },
       });

@@ -1,5 +1,3 @@
-import keys from '../constants';
-
 export default {
   methods: {
     /**
@@ -13,19 +11,28 @@ export default {
      * @param {String} resetStoreKey Store key for the visible pipeline that will need to be reset
      * @param {Object} pipeline The clicked pipeline
      */
-    clickPipeline(pipeline, method) {
-      debugger;
+    clickPipeline(parentPipeline, pipeline, openMethod, closeMethod) {
       if (!pipeline.isExpanded) {
-        this.mediator.store[method](pipeline);
+        this.mediator.store[openMethod](parentPipeline, pipeline);
       } else {
-        this.mediator.store.closePipeline(pipeline);
+        this.mediator.store[closeMethod](pipeline);
       }
     },
-    clickTriggeredByPipeline(pipeline) {
-      this.clickPipeline(pipeline, 'openTriggeredByPipeline');
+    clickTriggeredByPipeline(parentPipeline, pipeline) {
+      this.clickPipeline(
+        parentPipeline,
+        pipeline,
+        'openTriggeredByPipeline',
+        'closeTriggeredByPipeline',
+      );
     },
-    clickTriggeredPipeline(pipeline) {
-      this.clickPipeline(pipeline, 'openTriggeredPipeline');
+    clickTriggeredPipeline(parentPipeline, pipeline) {
+      this.clickPipeline(
+        parentPipeline,
+        pipeline,
+        'openTriggeredPipeline',
+        'closeTriggeredPipeline',
+      );
     },
   },
 };
