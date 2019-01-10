@@ -60,8 +60,12 @@ module EE
         def without_assignees_from_lists(issues)
           return issues if all_assignee_lists.empty?
 
-          issues
-            .where.not(id: issues.joins(:assignees).where(users: { id: all_assignee_lists.select(:user_id) }))
+          matching_assignee = ::IssueAssignee
+                                .where(user_id: all_assignee_lists.reorder(nil).select(:user_id))
+                                .where("issue_id = issues.id")
+                                .select(1)
+
+          issues.where('NOT EXISTS (?)', matching_assignee)
         end
         # rubocop: enable CodeReuse/ActiveRecord
 
