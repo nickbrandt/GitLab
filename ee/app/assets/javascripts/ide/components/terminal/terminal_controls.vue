@@ -21,7 +21,7 @@ export default {
 </script>
 <template>
   <div class="controllers">
-    <scroll-button :disabled="!canScrollUp" direction="up" @click="$emit('scroll-up');" />
-    <scroll-button :disabled="!canScrollDown" direction="down" @click="$emit('scroll-down');" />
+    <scroll-button :disabled="!canScrollUp" direction="up" @click="$emit('scroll-up')" />
+    <scroll-button :disabled="!canScrollDown" direction="down" @click="$emit('scroll-down')" />
   </div>
 </template>

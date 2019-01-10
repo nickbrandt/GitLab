@@ -93,7 +93,7 @@ export default {
         v-if="canBlacklist"
         class="btn btn-remove btn-inverted js-modal-secondary-action"
         data-dismiss="modal"
-        @click="blacklistLicense(currentLicenseInModal);"
+        @click="blacklistLicense(currentLicenseInModal)"
       >
         {{ s__('LicenseManagement|Blacklist license') }}
       </button>
@@ -102,7 +102,7 @@ export default {
         type="button"
         class="btn btn-success js-modal-primary-action"
         data-dismiss="modal"
-        @click="approveLicense(currentLicenseInModal);"
+        @click="approveLicense(currentLicenseInModal)"
       >
         {{ s__('LicenseManagement|Approve license') }}
       </button>

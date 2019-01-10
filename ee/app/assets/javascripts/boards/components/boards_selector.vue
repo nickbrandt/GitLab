@@ -275,12 +275,12 @@ export default {
           <div v-if="canAdminBoard" class="dropdown-footer">
             <ul class="dropdown-footer-list">
               <li v-if="multipleIssueBoardsAvailable">
-                <button type="button" @click.prevent="showPage('new');">
+                <button type="button" @click.prevent="showPage('new')">
                   {{ s__('IssueBoards|Create new board') }}
                 </button>
               </li>
               <li v-if="showDelete">
-                <button type="button" class="text-danger" @click.prevent="showPage('delete');">
+                <button type="button" class="text-danger" @click.prevent="showPage('delete')">
                   {{ s__('IssueBoards|Delete board') }}
                 </button>
               </li>

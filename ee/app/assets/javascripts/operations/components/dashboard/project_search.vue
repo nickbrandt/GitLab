@@ -68,7 +68,7 @@ export default {
         :key="project.id"
         type="button"
         class="js-search-result dropdown-item btn-link d-flex align-items-center cgray py-2 px-4"
-        @mousedown="addProjectToken(project);"
+        @mousedown="addProjectToken(project)"
       >
         <project-avatar :project="project" :size="20" class="flex-shrink-0 mr-3" />
         <div class="flex-grow-1">

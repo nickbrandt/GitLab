@@ -186,7 +186,7 @@ export default {
         :title="label.description"
         class="badge color-label append-right-4 prepend-top-4"
         type="button"
-        @click="filterByLabel(label);"
+        @click="filterByLabel(label)"
       >
         {{ label.title }}
       </button>
@@ -214,7 +214,7 @@ export default {
           /><issue-card-weight
             v-if="issue.weight"
             :weight="issue.weight"
-            @click="filterByWeight(issue.weight);"
+            @click="filterByWeight(issue.weight)"
           />
         </span>
       </div>

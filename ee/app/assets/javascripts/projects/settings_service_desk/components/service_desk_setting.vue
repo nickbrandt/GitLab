@@ -42,7 +42,7 @@ export default {
           ref="enabled-checkbox"
           :checked="isEnabled"
           type="checkbox"
-          @change="onCheckboxToggle($event);"
+          @change="onCheckboxToggle($event)"
         />
         <span class="descr"> Activate Service Desk </span>
       </label>

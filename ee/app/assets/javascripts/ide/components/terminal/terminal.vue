@@ -101,8 +101,8 @@ export default {
         class="ml-auto"
         :can-scroll-up="canScrollUp"
         :can-scroll-down="canScrollDown"
-        @scroll-up="glterminal.scrollToTop();"
-        @scroll-down="glterminal.scrollToBottom();"
+        @scroll-up="glterminal.scrollToTop()"
+        @scroll-down="glterminal.scrollToBottom()"
       />
     </div>
     <div class="terminal-wrapper d-flex flex-fill min-height-0">
