@@ -3,7 +3,7 @@ import Flash from '~/flash';
 import Translate from '~/vue_shared/translate';
 import { __ } from '~/locale';
 import PipelinesMediator from 'ee/pipelines/pipeline_details_mediator';
-import pipelineGraph from './components/graph/graph_component.vue';
+import pipelineGraph from 'ee/pipelines/components/graph/graph_component.vue';
 import pipelineHeader from './components/header_component.vue';
 import eventHub from './event_hub';
 import GraphEEMixin from 'ee/pipelines/mixins/graph_pipeline_bundle_mixin'; // eslint-disable-line import/order
