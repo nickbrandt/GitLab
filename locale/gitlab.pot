@@ -9360,6 +9360,12 @@ msgstr ""
 msgid "To import an SVN repository, check out %{svn_link}."
 msgstr ""
 
+msgid "To keep this project going, create a new issue"
+msgstr ""
+
+msgid "To keep this project going, create a new merge request"
+msgstr ""
+
 msgid "To link Sentry to GitLab, enter your Sentry URL and Auth Token."
 msgstr ""
 
