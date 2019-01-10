@@ -74,6 +74,24 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
           expect(approval_rule.groups).to contain_exactly(group2)
         end
       end
+
+      context 'when approver has user_id which no longer exists' do
+        before do
+          create_member_in(user1, :old_schema)
+          create_member_in(group1, :old_schema)
+        end
+
+        it 'should skip that user' do
+          User.where(id: user1).delete_all
+          Group.where(id: group1).delete_all
+
+          described_class.new.perform(target_type, target.id)
+
+          approval_rule = target.approval_rules.first
+
+          expect(approval_rule.users).to be_empty
+        end
+      end
     end
 
     context 'merge request' do

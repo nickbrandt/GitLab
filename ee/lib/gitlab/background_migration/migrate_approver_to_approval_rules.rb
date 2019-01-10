@@ -132,7 +132,9 @@ module Gitlab
         end
 
         rule = first_or_initialize
-        rule.update(user_ids: target.approver_ids, group_ids: target.approver_group_ids)
+        user_ids = User.where(id: target.approver_ids).pluck(:id)
+        group_ids = Group.where(id: target.approver_group_ids).pluck(:id)
+        rule.update(user_ids: user_ids, group_ids: group_ids)
         rule
       end
 
