@@ -5,7 +5,7 @@ export default function configureModerator(store) {
     switch (type) {
       case `projects/${projectsMutationTypes.RECEIVE_PROJECTS_SUCCESS}`:
         return store.dispatch('filters/setFilterOptions', {
-          filterId: 'project',
+          filterId: 'project_id',
           options: [
             {
               name: 'All',
