@@ -50,8 +50,7 @@ export default {
       class="js-linked-pipeline-content linked-pipeline-content"
       @click="onClickLinkedPipeline"
     >
-      <gl-loading-icon v-if="pipeline.isLoading" class="js-linked-pipeline-loading d-inline" />
-      <ci-status v-else :status="pipelineStatus" class="js-linked-pipeline-status" />
+      <ci-status :status="pipelineStatus" class="js-linked-pipeline-status" />
 
       <span class="str-truncated align-bottom"> {{ projectName }} &#8226; #{{ pipeline.id }} </span>
     </gl-button>

@@ -13,31 +13,12 @@ describe('Linked pipeline', () => {
     vm.$destroy();
   });
 
-  describe('while is loading', () => {
+  describe('rendered output', () => {
     const props = {
       pipelineId: mockPipeline.id,
       pipelinePath: mockPipeline.path,
       pipelineStatus: mockPipeline.details.status,
       projectName: mockPipeline.project.name,
-      isLoading: true,
-    };
-
-    beforeEach(() => {
-      vm = mountComponent(Component, props);
-    });
-
-    it('renders loading icon', () => {
-      expect(vm.$el.querySelector('.js-linked-pipeline-loading')).not.toBeNull();
-    });
-  });
-
-  describe('when it is not loading', () => {
-    const props = {
-      pipelineId: mockPipeline.id,
-      pipelinePath: mockPipeline.path,
-      pipelineStatus: mockPipeline.details.status,
-      projectName: mockPipeline.project.name,
-      isLoading: false,
     };
 
     beforeEach(() => {

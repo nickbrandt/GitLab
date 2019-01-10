@@ -37,7 +37,7 @@ export default {
         :key="pipeline.id"
         :class="{
           'flat-connector-before': index === 0 && graphPosition === 'right',
-          active: pipeline.isExpanded || pipeline.isLoading,
+          active: pipeline.isExpanded,
           'left-connector': pipeline.isExpanded && graphPosition === 'left',
         }"
         :pipeline-id="pipeline.id"
