@@ -217,6 +217,7 @@ export default {
     <span class="boards-selector-wrapper js-boards-selector-wrapper">
       <gl-dropdown
         toggle-class="dropdown-menu-toggle js-dropdown-toggle"
+        menu-class="flex-column"
         :text="board.name"
         @show="loadBoards"
       >
@@ -230,37 +231,41 @@ export default {
           <gl-search-box v-if="!loading" ref="searchBox" v-model="filterTerm" />
         </gl-dropdown-header>
 
-        <div class="dropdown-content-faded-mask js-scroll-fade" :class="scrollFadeClass">
-          <div
-            v-if="!loading"
-            ref="content"
-            class="dropdown-list js-dropdown-list"
-            @scroll.passive="throttledSetScrollFade"
+        <div
+          v-if="!loading"
+          ref="content"
+          class="dropdown-content flex-fill"
+          @scroll.passive="throttledSetScrollFade"
+        >
+          <gl-dropdown-item
+            v-show="filteredBoards.length === 0"
+            class="no-pointer-events text-secondary"
           >
-            <gl-dropdown-item
-              v-show="filteredBoards.length === 0"
-              class="no-pointer-events text-secondary"
-            >
-              {{ s__('IssueBoards|No matching boards found') }}
-            </gl-dropdown-item>
+            {{ s__('IssueBoards|No matching boards found') }}
+          </gl-dropdown-item>
 
-            <gl-dropdown-item
-              v-for="otherBoard in filteredBoards"
-              :key="otherBoard.id"
-              class="js-dropdown-item"
-              :href="`${boardBaseUrl}/${otherBoard.id}`"
-            >
-              {{ otherBoard.name }}
-            </gl-dropdown-item>
-            <gl-dropdown-item v-if="hasMissingBoards" class="small unclickable">
-              {{
-                s__(
-                  'IssueBoards|Some of your boards are hidden, activate a license to see them again.',
-                )
-              }}
-            </gl-dropdown-item>
-          </div>
+          <gl-dropdown-item
+            v-for="otherBoard in filteredBoards"
+            :key="otherBoard.id"
+            class="js-dropdown-item"
+            :href="`${boardBaseUrl}/${otherBoard.id}`"
+          >
+            {{ otherBoard.name }}
+          </gl-dropdown-item>
+          <gl-dropdown-item v-if="hasMissingBoards" class="small unclickable">
+            {{
+              s__(
+                'IssueBoards|Some of your boards are hidden, activate a license to see them again.',
+              )
+            }}
+          </gl-dropdown-item>
         </div>
+
+        <div
+          v-show="filteredBoards.length > 0"
+          class="dropdown-content-faded-mask"
+          :class="scrollFadeClass"
+        ></div>
 
         <gl-loading-icon v-if="loading" class="dropdown-loading" />
 
