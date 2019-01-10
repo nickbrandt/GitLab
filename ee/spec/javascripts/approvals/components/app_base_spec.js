@@ -1,40 +1,52 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import { GlLoadingIcon, GlButton } from '@gitlab/ui';
+import RulesEmpty from 'ee/approvals/components/rules_empty.vue';
+import App from 'ee/approvals/components/app_base.vue';
 import ModalRuleCreate from 'ee/approvals/components/modal_rule_create.vue';
 import ModalRuleRemove from 'ee/approvals/components/modal_rule_remove.vue';
-import Rules from 'ee/approvals/components/rules.vue';
-import RulesEmpty from 'ee/approvals/components/rules_empty.vue';
-import Settings from 'ee/approvals/components/settings.vue';
+import * as getters from 'ee/approvals/stores/getters';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-describe('EE ApprovalsSettingsForm', () => {
+const TEST_RULES_CLASS = 'js-fake-rules';
+const TEST_RULES_SEL = `.${TEST_RULES_CLASS}`;
+
+describe('EE Approvals App', () => {
   let state;
   let actions;
   let wrapper;
+  let slots;
 
   const factory = () => {
     const store = new Vuex.Store({
       state,
       actions,
+      getters,
     });
 
-    wrapper = shallowMount(localVue.extend(Settings), {
+    wrapper = shallowMount(localVue.extend(App), {
       localVue,
       store,
+      slots,
       sync: false,
     });
   };
 
   beforeEach(() => {
-    state = {};
+    state = {
+      settings: { canEdit: true },
+      isLoading: true,
+    };
+
+    slots = {
+      rules: `<div class="${TEST_RULES_CLASS}">These are the rules!</div>`,
+    };
 
     actions = {
       fetchRules: jasmine.createSpy('fetchRules'),
       'createModal/open': jasmine.createSpy('createModal/open'),
-      'deleteModal/open': jasmine.createSpy('deleteModal/open'),
     };
   });
 
@@ -67,6 +79,7 @@ describe('EE ApprovalsSettingsForm', () => {
   describe('if empty', () => {
     beforeEach(() => {
       state.rules = [];
+      state.isLoading = false;
     });
 
     it('shows RulesEmpty', () => {
@@ -78,7 +91,7 @@ describe('EE ApprovalsSettingsForm', () => {
     it('does not show Rules', () => {
       factory();
 
-      expect(wrapper.find(Rules).exists()).toBe(false);
+      expect(wrapper.find(`.${TEST_RULES_CLASS}`).exists()).toBe(false);
     });
 
     it('opens create modal if clicked', () => {
@@ -119,30 +132,9 @@ describe('EE ApprovalsSettingsForm', () => {
     it('shows rules', () => {
       factory();
 
-      const rules = wrapper.find(Rules);
+      const rules = wrapper.find(TEST_RULES_SEL);
 
       expect(rules.exists()).toBe(true);
-      expect(rules.props('rules')).toEqual(state.rules);
-    });
-
-    it('opens create modal when edit is clicked', () => {
-      factory();
-
-      const rule = state.rules[0];
-      const rules = wrapper.find(Rules);
-      rules.vm.$emit('edit', rule);
-
-      expect(actions['createModal/open']).toHaveBeenCalledWith(jasmine.anything(), rule, undefined);
-    });
-
-    it('opens delete modal when remove is clicked', () => {
-      factory();
-
-      const { id } = state.rules[0];
-      const rules = wrapper.find(Rules);
-      rules.vm.$emit('remove', id);
-
-      expect(actions['deleteModal/open']).toHaveBeenCalledWith(jasmine.anything(), id, undefined);
     });
 
     it('renders add button', () => {
@@ -167,7 +159,7 @@ describe('EE ApprovalsSettingsForm', () => {
       state.isLoading = true;
       factory();
 
-      expect(wrapper.find(Rules).exists()).toBe(true);
+      expect(wrapper.find(TEST_RULES_SEL).exists()).toBe(true);
       expect(wrapper.find(GlLoadingIcon).exists()).toBe(true);
     });
   });

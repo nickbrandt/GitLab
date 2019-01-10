@@ -33,8 +33,14 @@ export default {
       </td>
       <td>
         <input
+          :name="`merge_request[approval_rules_attributes][][approval_project_rule_id]`"
+          :value="rule.id"
+          :disabled="!settings.canEdit"
+          type="hidden"
+        />
+        <input
           :value="rule.approvalsRequired"
-          :name="`merge_request[approval_rules][${rule.id}][approvals_required]`"
+          :name="`merge_request[approval_rules_attributes][][approvals_required]`"
           :disabled="!settings.canEdit"
           class="form-control mw-6em"
           type="number"

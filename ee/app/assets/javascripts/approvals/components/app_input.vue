@@ -11,5 +11,5 @@ export default {
 </script>
 
 <template>
-  <app> <rules-input slot="rules" slot-scope="{ rules }" :rules="rules" /> </app>
+  <app> <rules-input slot="rules" /> </app>
 </template>

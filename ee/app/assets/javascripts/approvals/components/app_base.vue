@@ -1,5 +1,5 @@
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions, mapGetters } from 'vuex';
 import { GlLoadingIcon, GlButton } from '@gitlab/ui';
 import ModalRuleCreate from './modal_rule_create.vue';
 import ModalRuleRemove from './modal_rule_remove.vue';
@@ -17,10 +17,8 @@ export default {
     GlLoadingIcon,
   },
   computed: {
-    ...mapState(['isLoading', 'rules']),
-    isEmpty() {
-      return !this.rules || !this.rules.length;
-    },
+    ...mapState(['isLoading', 'settings']),
+    ...mapGetters(['isEmpty']),
   },
   created() {
     this.fetchRules();
@@ -41,8 +39,8 @@ export default {
       <rules-empty v-else @click="openCreateModal(null);" />
     </template>
     <template v-else>
-      <slot name="rules" v-bind:rules="rules"> </slot>
-      <div class="border-top border-bottom py-3 px-2">
+      <div class="border-bottom"><slot name="rules"></slot></div>
+      <div v-if="settings.canEdit" class="border-bottom py-3 px-2">
         <gl-loading-icon v-if="isLoading" />
         <div class="d-flex">
           <gl-button class="ml-auto btn-info btn-inverted" @click="openCreateModal(null);">{{

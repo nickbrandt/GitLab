@@ -11,7 +11,9 @@ export default function mountApprovalSettings(el) {
   }
 
   const store = createStore();
-  store.dispatch('setSettings', el.dataset);
+  store.dispatch('setSettings', {
+    ...el.dataset,
+  });
 
   return new Vue({
     el,

@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import { parseBoolean } from '~/lib/utils/common_utils';
 import createStore from './stores';
 import AppInput from './components/app_input.vue';
 
@@ -11,7 +12,10 @@ export default function mountApprovalInput(el) {
   }
 
   const store = createStore();
-  store.dispatch('setSettings', el.dataset);
+  store.dispatch('setSettings', {
+    ...el.dataset,
+    canEdit: parseBoolean(el.dataset.canEdit),
+  });
 
   return new Vue({
     el,

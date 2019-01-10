@@ -1,4 +1,5 @@
 <script>
+import { mapState } from 'vuex';
 import { GlButton } from '@gitlab/ui';
 import { __ } from '~/locale';
 import Callout from '~/vue_shared/components/callout.vue';
@@ -12,6 +13,9 @@ export default {
     Callout,
     GlButton,
   },
+  computed: {
+    ...mapState(['settings']),
+  },
   message,
 };
 </script>
@@ -19,7 +23,7 @@ export default {
 <template>
   <callout class="m-0" category="info">
     <div>{{ $options.message }}</div>
-    <div class="prepend-top-default">
+    <div v-if="settings.canEdit" class="prepend-top-default">
       <gl-button class="btn-info btn-inverted" @click="$emit('click');">{{
         __('Add approvers')
       }}</gl-button>
