@@ -39,7 +39,7 @@ module Gitlab
           def to_resource
             strong_memoize(:stage) do
               ::Ci::Stage.new(attributes).tap do |stage|
-                seeds.each { |seed| stage.builds << seed.to_resource }
+                seeds.each { |seed| stage.statuses << seed.to_resource }
               end
             end
           end
