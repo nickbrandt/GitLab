@@ -405,12 +405,12 @@
 			"versionExact": "v0.120.0"
 		},
 		{
-			"checksumSHA1": "uvp/juXL0uZrtdQqcgXm4+COCO8=",
+			"checksumSHA1": "aL94A408/lEOF/XC4KDHvZnwnbk=",
 			"path": "gitlab.com/gitlab-org/gitaly/client",
-			"revision": "75643882c8c5e1abb46fe29b5c4ddac3cc0dffeb",
-			"revisionTime": "2018-10-04T18:41:07Z",
-			"version": "v0.124.0",
-			"versionExact": "v0.124.0"
+			"revision": "ef786ff72690836cc3ec1214b11bd10748271c5b",
+			"revisionTime": "2019-01-14T13:41:50Z",
+			"version": "v1.13.0",
+			"versionExact": "v1.13.0"
 		},
 		{
 			"checksumSHA1": "mifcYH0qXpoPkX5KzXoM3mterWQ=",
