@@ -16,7 +16,8 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
-	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+
+	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
@@ -29,7 +30,7 @@ type archiveParams struct {
 	ArchivePrefix    string
 	CommitId         string
 	GitalyServer     gitaly.Server
-	GitalyRepository pb.Repository
+	GitalyRepository gitalypb.Repository
 	DisableCache     bool
 }
 
@@ -128,13 +129,13 @@ func (a *archive) Inject(w http.ResponseWriter, r *http.Request, sendData string
 	}
 }
 
-func handleArchiveWithGitaly(r *http.Request, params archiveParams, format pb.GetArchiveRequest_Format) (io.Reader, error) {
+func handleArchiveWithGitaly(r *http.Request, params archiveParams, format gitalypb.GetArchiveRequest_Format) (io.Reader, error) {
 	c, err := gitaly.NewRepositoryClient(params.GitalyServer)
 	if err != nil {
 		return nil, err
 	}
 
-	request := &pb.GetArchiveRequest{
+	request := &gitalypb.GetArchiveRequest{
 		Repository: &params.GitalyRepository,
 		CommitId:   params.CommitId,
 		Prefix:     params.ArchivePrefix,
@@ -144,10 +145,10 @@ func handleArchiveWithGitaly(r *http.Request, params archiveParams, format pb.Ge
 	return c.ArchiveReader(r.Context(), request)
 }
 
-func setArchiveHeaders(w http.ResponseWriter, format pb.GetArchiveRequest_Format, archiveFilename string) {
+func setArchiveHeaders(w http.ResponseWriter, format gitalypb.GetArchiveRequest_Format, archiveFilename string) {
 	w.Header().Del("Content-Length")
 	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, archiveFilename))
-	if format == pb.GetArchiveRequest_ZIP {
+	if format == gitalypb.GetArchiveRequest_ZIP {
 		w.Header().Set("Content-Type", "application/zip")
 	} else {
 		w.Header().Set("Content-Type", "application/octet-stream")
@@ -181,20 +182,20 @@ var (
 	patternTarBz2 = regexp.MustCompile(`\.(tar\.bz2|tbz|tbz2|tb2|bz2)$`)
 )
 
-func parseBasename(basename string) (pb.GetArchiveRequest_Format, bool) {
-	var format pb.GetArchiveRequest_Format
+func parseBasename(basename string) (gitalypb.GetArchiveRequest_Format, bool) {
+	var format gitalypb.GetArchiveRequest_Format
 
 	switch {
 	case (basename == "archive"):
-		format = pb.GetArchiveRequest_TAR_GZ
+		format = gitalypb.GetArchiveRequest_TAR_GZ
 	case patternZip.MatchString(basename):
-		format = pb.GetArchiveRequest_ZIP
+		format = gitalypb.GetArchiveRequest_ZIP
 	case patternTar.MatchString(basename):
-		format = pb.GetArchiveRequest_TAR
+		format = gitalypb.GetArchiveRequest_TAR
 	case patternTarGz.MatchString(basename):
-		format = pb.GetArchiveRequest_TAR_GZ
+		format = gitalypb.GetArchiveRequest_TAR_GZ
 	case patternTarBz2.MatchString(basename):
-		format = pb.GetArchiveRequest_TAR_BZ2
+		format = gitalypb.GetArchiveRequest_TAR_BZ2
 	default:
 		return format, false
 	}

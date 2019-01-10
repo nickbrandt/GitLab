@@ -1,10 +1,8 @@
 package gitaly
 
-import (
-	pb "gitlab.com/gitlab-org/gitaly-proto/go"
-)
+import "gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
 
 // NamespaceClient encapsulates NamespaceService calls
 type NamespaceClient struct {
-	pb.NamespaceServiceClient
+	gitalypb.NamespaceServiceClient
 }

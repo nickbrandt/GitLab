@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"io"
 
-	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
 	"gitlab.com/gitlab-org/gitaly/streamio"
 )
 
 type SmartHTTPClient struct {
-	pb.SmartHTTPServiceClient
+	gitalypb.SmartHTTPServiceClient
 }
 
-func (client *SmartHTTPClient) InfoRefsResponseReader(ctx context.Context, repo *pb.Repository, rpc string, gitConfigOptions []string, gitProtocol string) (io.Reader, error) {
-	rpcRequest := &pb.InfoRefsRequest{
+func (client *SmartHTTPClient) InfoRefsResponseReader(ctx context.Context, repo *gitalypb.Repository, rpc string, gitConfigOptions []string, gitProtocol string) (io.Reader, error) {
+	rpcRequest := &gitalypb.InfoRefsRequest{
 		Repository:       repo,
 		GitConfigOptions: gitConfigOptions,
 		GitProtocol:      gitProtocol,
@@ -33,7 +33,7 @@ func (client *SmartHTTPClient) InfoRefsResponseReader(ctx context.Context, repo 
 }
 
 type infoRefsClient interface {
-	Recv() (*pb.InfoRefsResponse, error)
+	Recv() (*gitalypb.InfoRefsResponse, error)
 }
 
 func infoRefsReader(stream infoRefsClient) io.Reader {
@@ -43,13 +43,13 @@ func infoRefsReader(stream infoRefsClient) io.Reader {
 	})
 }
 
-func (client *SmartHTTPClient) ReceivePack(ctx context.Context, repo *pb.Repository, glId string, glUsername string, glRepository string, gitConfigOptions []string, clientRequest io.Reader, clientResponse io.Writer, gitProtocol string) error {
+func (client *SmartHTTPClient) ReceivePack(ctx context.Context, repo *gitalypb.Repository, glId string, glUsername string, glRepository string, gitConfigOptions []string, clientRequest io.Reader, clientResponse io.Writer, gitProtocol string) error {
 	stream, err := client.PostReceivePack(ctx)
 	if err != nil {
 		return err
 	}
 
-	rpcRequest := &pb.PostReceivePackRequest{
+	rpcRequest := &gitalypb.PostReceivePackRequest{
 		Repository:       repo,
 		GlId:             glId,
 		GlUsername:       glUsername,
@@ -76,7 +76,7 @@ func (client *SmartHTTPClient) ReceivePack(ctx context.Context, repo *pb.Reposit
 
 	go func() {
 		sw := streamio.NewWriter(func(data []byte) error {
-			return stream.Send(&pb.PostReceivePackRequest{Data: data})
+			return stream.Send(&gitalypb.PostReceivePackRequest{Data: data})
 		})
 		_, err := io.Copy(sw, clientRequest)
 		stream.CloseSend()
@@ -92,13 +92,13 @@ func (client *SmartHTTPClient) ReceivePack(ctx context.Context, repo *pb.Reposit
 	return nil
 }
 
-func (client *SmartHTTPClient) UploadPack(ctx context.Context, repo *pb.Repository, clientRequest io.Reader, clientResponse io.Writer, gitConfigOptions []string, gitProtocol string) error {
+func (client *SmartHTTPClient) UploadPack(ctx context.Context, repo *gitalypb.Repository, clientRequest io.Reader, clientResponse io.Writer, gitConfigOptions []string, gitProtocol string) error {
 	stream, err := client.PostUploadPack(ctx)
 	if err != nil {
 		return err
 	}
 
-	rpcRequest := &pb.PostUploadPackRequest{
+	rpcRequest := &gitalypb.PostUploadPackRequest{
 		Repository:       repo,
 		GitConfigOptions: gitConfigOptions,
 		GitProtocol:      gitProtocol,
@@ -122,7 +122,7 @@ func (client *SmartHTTPClient) UploadPack(ctx context.Context, repo *pb.Reposito
 
 	go func() {
 		sw := streamio.NewWriter(func(data []byte) error {
-			return stream.Send(&pb.PostUploadPackRequest{Data: data})
+			return stream.Send(&gitalypb.PostUploadPackRequest{Data: data})
 		})
 		_, err := io.Copy(sw, clientRequest)
 		stream.CloseSend()

@@ -5,18 +5,18 @@ import (
 	"fmt"
 	"io"
 
-	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
 	"gitlab.com/gitlab-org/gitaly/streamio"
 )
 
 // RepositoryClient encapsulates RepositoryService calls
 type RepositoryClient struct {
-	pb.RepositoryServiceClient
+	gitalypb.RepositoryServiceClient
 }
 
 // ArchiveReader performs a GetArchive Gitaly request and returns an io.Reader
 // for the response
-func (client *RepositoryClient) ArchiveReader(ctx context.Context, request *pb.GetArchiveRequest) (io.Reader, error) {
+func (client *RepositoryClient) ArchiveReader(ctx context.Context, request *gitalypb.GetArchiveRequest) (io.Reader, error) {
 	c, err := client.GetArchive(ctx, request)
 	if err != nil {
 		return nil, fmt.Errorf("RepositoryService::GetArchive: %v", err)
@@ -31,7 +31,7 @@ func (client *RepositoryClient) ArchiveReader(ctx context.Context, request *pb.G
 
 // SnapshotReader performs a GetSnapshot Gitaly request and returns an io.Reader
 // for the response
-func (client *RepositoryClient) SnapshotReader(ctx context.Context, request *pb.GetSnapshotRequest) (io.Reader, error) {
+func (client *RepositoryClient) SnapshotReader(ctx context.Context, request *gitalypb.GetSnapshotRequest) (io.Reader, error) {
 	c, err := client.GetSnapshot(ctx, request)
 	if err != nil {
 		return nil, fmt.Errorf("RepositoryService::GetSnapshot: %v", err)

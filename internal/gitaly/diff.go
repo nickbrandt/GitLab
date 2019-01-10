@@ -6,15 +6,15 @@ import (
 	"io"
 	"net/http"
 
-	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
 	"gitlab.com/gitlab-org/gitaly/streamio"
 )
 
 type DiffClient struct {
-	pb.DiffServiceClient
+	gitalypb.DiffServiceClient
 }
 
-func (client *DiffClient) SendRawDiff(ctx context.Context, w http.ResponseWriter, request *pb.RawDiffRequest) error {
+func (client *DiffClient) SendRawDiff(ctx context.Context, w http.ResponseWriter, request *gitalypb.RawDiffRequest) error {
 	c, err := client.RawDiff(ctx, request)
 	if err != nil {
 		return fmt.Errorf("rpc failed: %v", err)
@@ -34,7 +34,7 @@ func (client *DiffClient) SendRawDiff(ctx context.Context, w http.ResponseWriter
 	return nil
 }
 
-func (client *DiffClient) SendRawPatch(ctx context.Context, w http.ResponseWriter, request *pb.RawPatchRequest) error {
+func (client *DiffClient) SendRawPatch(ctx context.Context, w http.ResponseWriter, request *gitalypb.RawPatchRequest) error {
 	c, err := client.RawPatch(ctx, request)
 	if err != nil {
 		return fmt.Errorf("rpc failed: %v", err)

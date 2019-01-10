@@ -11,7 +11,7 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	log "github.com/sirupsen/logrus"
-	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -49,7 +49,7 @@ func NewGitalyServer(finalMessageCode codes.Code) *GitalyTestServer {
 	return &GitalyTestServer{finalMessageCode: finalMessageCode}
 }
 
-func (s *GitalyTestServer) InfoRefsUploadPack(in *pb.InfoRefsRequest, stream pb.SmartHTTPService_InfoRefsUploadPackServer) error {
+func (s *GitalyTestServer) InfoRefsUploadPack(in *gitalypb.InfoRefsRequest, stream gitalypb.SmartHTTPService_InfoRefsUploadPackServer) error {
 	s.WaitGroup.Add(1)
 	defer s.WaitGroup.Done()
 
@@ -74,7 +74,7 @@ func (s *GitalyTestServer) InfoRefsUploadPack(in *pb.InfoRefsRequest, stream pb.
 	return s.sendInfoRefs(stream, data)
 }
 
-func (s *GitalyTestServer) InfoRefsReceivePack(in *pb.InfoRefsRequest, stream pb.SmartHTTPService_InfoRefsReceivePackServer) error {
+func (s *GitalyTestServer) InfoRefsReceivePack(in *gitalypb.InfoRefsRequest, stream gitalypb.SmartHTTPService_InfoRefsReceivePackServer) error {
 	s.WaitGroup.Add(1)
 	defer s.WaitGroup.Done()
 
@@ -104,12 +104,12 @@ func marshalJSON(msg proto.Message) (string, error) {
 }
 
 type infoRefsSender interface {
-	Send(*pb.InfoRefsResponse) error
+	Send(*gitalypb.InfoRefsResponse) error
 }
 
 func (s *GitalyTestServer) sendInfoRefs(stream infoRefsSender, data []byte) error {
 	nSends, err := sendBytes(data, 100, func(p []byte) error {
-		return stream.Send(&pb.InfoRefsResponse{Data: p})
+		return stream.Send(&gitalypb.InfoRefsResponse{Data: p})
 	})
 	if err != nil {
 		return err
@@ -121,7 +121,7 @@ func (s *GitalyTestServer) sendInfoRefs(stream infoRefsSender, data []byte) erro
 	return s.finalError()
 }
 
-func (s *GitalyTestServer) PostReceivePack(stream pb.SmartHTTPService_PostReceivePackServer) error {
+func (s *GitalyTestServer) PostReceivePack(stream gitalypb.SmartHTTPService_PostReceivePackServer) error {
 	s.WaitGroup.Add(1)
 	defer s.WaitGroup.Done()
 
@@ -157,7 +157,7 @@ func (s *GitalyTestServer) PostReceivePack(stream pb.SmartHTTPService_PostReceiv
 	}
 
 	nSends, _ := sendBytes(data, 100, func(p []byte) error {
-		return stream.Send(&pb.PostReceivePackResponse{Data: p})
+		return stream.Send(&gitalypb.PostReceivePackResponse{Data: p})
 	})
 
 	if nSends <= 1 {
@@ -167,7 +167,7 @@ func (s *GitalyTestServer) PostReceivePack(stream pb.SmartHTTPService_PostReceiv
 	return s.finalError()
 }
 
-func (s *GitalyTestServer) PostUploadPack(stream pb.SmartHTTPService_PostUploadPackServer) error {
+func (s *GitalyTestServer) PostUploadPack(stream gitalypb.SmartHTTPService_PostUploadPackServer) error {
 	s.WaitGroup.Add(1)
 	defer s.WaitGroup.Done()
 
@@ -203,7 +203,7 @@ func (s *GitalyTestServer) PostUploadPack(stream pb.SmartHTTPService_PostUploadP
 	}
 
 	nSends, _ := sendBytes(data, 100, func(p []byte) error {
-		return stream.Send(&pb.PostUploadPackResponse{Data: p})
+		return stream.Send(&gitalypb.PostUploadPackResponse{Data: p})
 	})
 
 	if nSends <= 1 {
@@ -213,11 +213,11 @@ func (s *GitalyTestServer) PostUploadPack(stream pb.SmartHTTPService_PostUploadP
 	return s.finalError()
 }
 
-func (s *GitalyTestServer) CommitIsAncestor(ctx context.Context, in *pb.CommitIsAncestorRequest) (*pb.CommitIsAncestorResponse, error) {
+func (s *GitalyTestServer) CommitIsAncestor(ctx context.Context, in *gitalypb.CommitIsAncestorRequest) (*gitalypb.CommitIsAncestorResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) GetBlob(in *pb.GetBlobRequest, stream pb.BlobService_GetBlobServer) error {
+func (s *GitalyTestServer) GetBlob(in *gitalypb.GetBlobRequest, stream gitalypb.BlobService_GetBlobServer) error {
 	s.WaitGroup.Add(1)
 	defer s.WaitGroup.Done()
 
@@ -225,7 +225,7 @@ func (s *GitalyTestServer) GetBlob(in *pb.GetBlobRequest, stream pb.BlobService_
 		return err
 	}
 
-	response := &pb.GetBlobResponse{
+	response := &gitalypb.GetBlobResponse{
 		Oid:  in.GetOid(),
 		Size: int64(len(GitalyGetBlobResponseMock)),
 	}
@@ -237,7 +237,7 @@ func (s *GitalyTestServer) GetBlob(in *pb.GetBlobRequest, stream pb.BlobService_
 		}
 
 		// Use a new response so we don't send other fields (Size, ...) over and over
-		response = &pb.GetBlobResponse{}
+		response = &gitalypb.GetBlobResponse{}
 
 		return nil
 	})
@@ -251,7 +251,7 @@ func (s *GitalyTestServer) GetBlob(in *pb.GetBlobRequest, stream pb.BlobService_
 	return s.finalError()
 }
 
-func (s *GitalyTestServer) GetArchive(in *pb.GetArchiveRequest, stream pb.RepositoryService_GetArchiveServer) error {
+func (s *GitalyTestServer) GetArchive(in *gitalypb.GetArchiveRequest, stream gitalypb.RepositoryService_GetArchiveServer) error {
 	s.WaitGroup.Add(1)
 	defer s.WaitGroup.Done()
 
@@ -260,7 +260,7 @@ func (s *GitalyTestServer) GetArchive(in *pb.GetArchiveRequest, stream pb.Reposi
 	}
 
 	nSends, err := sendBytes([]byte(GitalyGetArchiveResponseMock), 100, func(p []byte) error {
-		return stream.Send(&pb.GetArchiveResponse{Data: p})
+		return stream.Send(&gitalypb.GetArchiveResponse{Data: p})
 	})
 	if err != nil {
 		return err
@@ -272,9 +272,9 @@ func (s *GitalyTestServer) GetArchive(in *pb.GetArchiveRequest, stream pb.Reposi
 	return s.finalError()
 }
 
-func (s *GitalyTestServer) RawDiff(in *pb.RawDiffRequest, stream pb.DiffService_RawDiffServer) error {
+func (s *GitalyTestServer) RawDiff(in *gitalypb.RawDiffRequest, stream gitalypb.DiffService_RawDiffServer) error {
 	nSends, err := sendBytes([]byte(GitalyGetDiffResponseMock), 100, func(p []byte) error {
-		return stream.Send(&pb.RawDiffResponse{
+		return stream.Send(&gitalypb.RawDiffResponse{
 			Data: p,
 		})
 	})
@@ -288,7 +288,7 @@ func (s *GitalyTestServer) RawDiff(in *pb.RawDiffRequest, stream pb.DiffService_
 	return s.finalError()
 }
 
-func (s *GitalyTestServer) RawPatch(in *pb.RawPatchRequest, stream pb.DiffService_RawPatchServer) error {
+func (s *GitalyTestServer) RawPatch(in *gitalypb.RawPatchRequest, stream gitalypb.DiffService_RawPatchServer) error {
 	s.WaitGroup.Add(1)
 	defer s.WaitGroup.Done()
 
@@ -297,7 +297,7 @@ func (s *GitalyTestServer) RawPatch(in *pb.RawPatchRequest, stream pb.DiffServic
 	}
 
 	nSends, err := sendBytes([]byte(GitalyGetPatchResponseMock), 100, func(p []byte) error {
-		return stream.Send(&pb.RawPatchResponse{
+		return stream.Send(&gitalypb.RawPatchResponse{
 			Data: p,
 		})
 	})
@@ -311,7 +311,7 @@ func (s *GitalyTestServer) RawPatch(in *pb.RawPatchRequest, stream pb.DiffServic
 	return s.finalError()
 }
 
-func (s *GitalyTestServer) GetSnapshot(in *pb.GetSnapshotRequest, stream pb.RepositoryService_GetSnapshotServer) error {
+func (s *GitalyTestServer) GetSnapshot(in *gitalypb.GetSnapshotRequest, stream gitalypb.RepositoryService_GetSnapshotServer) error {
 	s.WaitGroup.Add(1)
 	defer s.WaitGroup.Done()
 
@@ -320,7 +320,7 @@ func (s *GitalyTestServer) GetSnapshot(in *pb.GetSnapshotRequest, stream pb.Repo
 	}
 
 	nSends, err := sendBytes([]byte(GitalyGetSnapshotResponseMock), 100, func(p []byte) error {
-		return stream.Send(&pb.GetSnapshotResponse{Data: p})
+		return stream.Send(&gitalypb.GetSnapshotResponse{Data: p})
 	})
 	if err != nil {
 		return err
@@ -358,7 +358,7 @@ func (s *GitalyTestServer) finalError() error {
 	return nil
 }
 
-func validateRepository(repo *pb.Repository) error {
+func validateRepository(repo *gitalypb.Repository) error {
 	if len(repo.GetStorageName()) == 0 {
 		return fmt.Errorf("missing storage_name: %v", repo)
 	}

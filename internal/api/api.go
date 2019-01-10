@@ -11,7 +11,8 @@ import (
 	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
-	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+
+	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
@@ -130,7 +131,7 @@ type Response struct {
 	// GitalyServer specifies an address and authentication token for a gitaly server we should connect to.
 	GitalyServer gitaly.Server
 	// Repository object for making gRPC requests to Gitaly.
-	Repository pb.Repository
+	Repository gitalypb.Repository
 	// For git-http, does the requestor have the right to view all refs?
 	ShowAllRefs bool
 }

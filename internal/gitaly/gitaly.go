@@ -5,7 +5,7 @@ import (
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
 	gitalyauth "gitlab.com/gitlab-org/gitaly/auth"
 	gitalyclient "gitlab.com/gitlab-org/gitaly/client"
 	"google.golang.org/grpc"
@@ -32,7 +32,7 @@ func NewSmartHTTPClient(server Server) (*SmartHTTPClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	grpcClient := pb.NewSmartHTTPServiceClient(conn)
+	grpcClient := gitalypb.NewSmartHTTPServiceClient(conn)
 	return &SmartHTTPClient{grpcClient}, nil
 }
 
@@ -41,7 +41,7 @@ func NewBlobClient(server Server) (*BlobClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	grpcClient := pb.NewBlobServiceClient(conn)
+	grpcClient := gitalypb.NewBlobServiceClient(conn)
 	return &BlobClient{grpcClient}, nil
 }
 
@@ -50,7 +50,7 @@ func NewRepositoryClient(server Server) (*RepositoryClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	grpcClient := pb.NewRepositoryServiceClient(conn)
+	grpcClient := gitalypb.NewRepositoryServiceClient(conn)
 	return &RepositoryClient{grpcClient}, nil
 }
 
@@ -60,7 +60,7 @@ func NewNamespaceClient(server Server) (*NamespaceClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	grpcClient := pb.NewNamespaceServiceClient(conn)
+	grpcClient := gitalypb.NewNamespaceServiceClient(conn)
 	return &NamespaceClient{grpcClient}, nil
 }
 
@@ -69,7 +69,7 @@ func NewDiffClient(server Server) (*DiffClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	grpcClient := pb.NewDiffServiceClient(conn)
+	grpcClient := gitalypb.NewDiffServiceClient(conn)
 	return &DiffClient{grpcClient}, nil
 }
 

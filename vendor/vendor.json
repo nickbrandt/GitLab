@@ -389,12 +389,12 @@
 			"versionExact": "v1.2.2"
 		},
 		{
-			"checksumSHA1": "+GRNcdfnAibgtDObICxZIFk7i9Q=",
-			"path": "gitlab.com/gitlab-org/gitaly-proto/go",
-			"revision": "b26cda22da41c708d18be78c519a38810acfdc80",
-			"revisionTime": "2018-07-31T12:04:23Z",
-			"version": "v0.111.0",
-			"versionExact": "v0.111.0"
+			"checksumSHA1": "vGq4vcEP5tPA3UN7kNtpAvbDXVA=",
+			"path": "gitlab.com/gitlab-org/gitaly-proto/go/gitalypb",
+			"revision": "d9a75fddb25992464bc2ea7d94adbbc74d547685",
+			"revisionTime": "2018-11-23T12:56:34Z",
+			"version": "v0.124.0",
+			"versionExact": "v0.124.0"
 		},
 		{
 			"checksumSHA1": "SbYAalNU5azT8lJGerDI4I/Nw84=",
@@ -405,12 +405,12 @@
 			"versionExact": "v0.120.0"
 		},
 		{
-			"checksumSHA1": "s53Qjro9ZHX0DV2tCYQXLO2FHqI=",
+			"checksumSHA1": "uvp/juXL0uZrtdQqcgXm4+COCO8=",
 			"path": "gitlab.com/gitlab-org/gitaly/client",
-			"revision": "95a198aef54c42fd8e84c62acc63f0cd620864b3",
-			"revisionTime": "2018-01-18T11:33:00Z",
-			"version": "v0.71.0",
-			"versionExact": "v0.71.0"
+			"revision": "75643882c8c5e1abb46fe29b5c4ddac3cc0dffeb",
+			"revisionTime": "2018-10-04T18:41:07Z",
+			"version": "v0.124.0",
+			"versionExact": "v0.124.0"
 		},
 		{
 			"checksumSHA1": "mifcYH0qXpoPkX5KzXoM3mterWQ=",

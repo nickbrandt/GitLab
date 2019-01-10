@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 )
@@ -13,17 +13,17 @@ import (
 func TestParseBasename(t *testing.T) {
 	for _, testCase := range []struct {
 		in  string
-		out pb.GetArchiveRequest_Format
+		out gitalypb.GetArchiveRequest_Format
 	}{
-		{"archive", pb.GetArchiveRequest_TAR_GZ},
-		{"master.tar.gz", pb.GetArchiveRequest_TAR_GZ},
-		{"foo-master.tgz", pb.GetArchiveRequest_TAR_GZ},
-		{"foo-v1.2.1.gz", pb.GetArchiveRequest_TAR_GZ},
-		{"foo.tar.bz2", pb.GetArchiveRequest_TAR_BZ2},
-		{"archive.tbz", pb.GetArchiveRequest_TAR_BZ2},
-		{"archive.tbz2", pb.GetArchiveRequest_TAR_BZ2},
-		{"archive.tb2", pb.GetArchiveRequest_TAR_BZ2},
-		{"archive.bz2", pb.GetArchiveRequest_TAR_BZ2},
+		{"archive", gitalypb.GetArchiveRequest_TAR_GZ},
+		{"master.tar.gz", gitalypb.GetArchiveRequest_TAR_GZ},
+		{"foo-master.tgz", gitalypb.GetArchiveRequest_TAR_GZ},
+		{"foo-v1.2.1.gz", gitalypb.GetArchiveRequest_TAR_GZ},
+		{"foo.tar.bz2", gitalypb.GetArchiveRequest_TAR_BZ2},
+		{"archive.tbz", gitalypb.GetArchiveRequest_TAR_BZ2},
+		{"archive.tbz2", gitalypb.GetArchiveRequest_TAR_BZ2},
+		{"archive.tb2", gitalypb.GetArchiveRequest_TAR_BZ2},
+		{"archive.bz2", gitalypb.GetArchiveRequest_TAR_BZ2},
 	} {
 		basename := testCase.in
 		out, ok := parseBasename(basename)
@@ -53,13 +53,13 @@ func TestFinalizeArchive(t *testing.T) {
 
 func TestSetArchiveHeaders(t *testing.T) {
 	for _, testCase := range []struct {
-		in  pb.GetArchiveRequest_Format
+		in  gitalypb.GetArchiveRequest_Format
 		out string
 	}{
-		{pb.GetArchiveRequest_ZIP, "application/zip"},
-		{pb.GetArchiveRequest_TAR, "application/octet-stream"},
-		{pb.GetArchiveRequest_TAR_GZ, "application/octet-stream"},
-		{pb.GetArchiveRequest_TAR_BZ2, "application/octet-stream"},
+		{gitalypb.GetArchiveRequest_ZIP, "application/zip"},
+		{gitalypb.GetArchiveRequest_TAR, "application/octet-stream"},
+		{gitalypb.GetArchiveRequest_TAR_GZ, "application/octet-stream"},
+		{gitalypb.GetArchiveRequest_TAR_BZ2, "application/octet-stream"},
 	} {
 		w := httptest.NewRecorder()
 
