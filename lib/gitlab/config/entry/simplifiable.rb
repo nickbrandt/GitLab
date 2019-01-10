@@ -37,6 +37,9 @@ module Gitlab
             self::UnknownStrategy
           end
         end
+
+        def self.default
+        end
       end
     end
   end

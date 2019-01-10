@@ -63,9 +63,6 @@ module Gitlab
               ["#{location} has to be either an array of conditions or a hash"]
             end
           end
-
-          def self.default
-          end
         end
       end
     end
