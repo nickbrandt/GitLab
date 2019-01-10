@@ -6596,6 +6596,9 @@ msgstr ""
 msgid "Please try again"
 msgstr ""
 
+msgid "Please upgrade PostgreSQL to version 9.6 or greater. The status of the replication cannot be determined reliably with the current version."
+msgstr ""
+
 msgid "Please use this form to report users to GitLab who create spam issues, comments or behave inappropriately."
 msgstr ""
 
@@ -10192,6 +10195,9 @@ msgid "You must have maintainer access to force delete a lock"
 msgstr ""
 
 msgid "You need a different license to enable FileLocks feature"
+msgstr ""
+
+msgid "You need a different license to enable Geo replication."
 msgstr ""
 
 msgid "You need git-lfs version %{min_git_lfs_version} (or greater) to continue. Please visit https://git-lfs.github.com"

@@ -22,6 +22,22 @@ describe Admin::Geo::NodesController, :postgresql do
   describe '#index' do
     render_views
 
+    shared_examples 'no flash message' do |flash_type|
+      it 'does not display a flash message' do
+        go
+
+        expect(flash).not_to include(flash_type)
+      end
+    end
+
+    shared_examples 'with flash message' do |flash_type, message|
+      it 'displays a flash message' do
+        go
+
+        expect(flash[flash_type]).to match(message)
+      end
+    end
+
     def go
       get :index
     end
@@ -31,11 +47,7 @@ describe Admin::Geo::NodesController, :postgresql do
         allow(Gitlab::Geo).to receive(:license_allows?).and_return(true)
       end
 
-      it 'does not display a flash message' do
-        go
-
-        expect(flash).not_to include(:alert)
-      end
+      it_behaves_like 'no flash message', :alert
     end
 
     context 'without add-on license available' do
@@ -43,16 +55,28 @@ describe Admin::Geo::NodesController, :postgresql do
         allow(Gitlab::Geo).to receive(:license_allows?).and_return(false)
       end
 
-      it 'displays a flash message' do
-        go
-
-        expect(flash[:alert]).to include('You need a different license to enable Geo replication')
-      end
+      it_behaves_like 'with flash message', :alert, 'You need a different license to enable Geo replication'
 
       it 'does not redirects to the license page' do
         go
         expect(response).not_to redirect_to(admin_license_path)
       end
+    end
+
+    context 'with Postgres 9.6 or greater' do
+      before do
+        allow(Gitlab::Database).to receive(:pg_stat_wal_receiver_supported?).and_return(true)
+      end
+
+      it_behaves_like 'no flash message', :warning
+    end
+
+    context 'without Postgres 9.6 or greater' do
+      before do
+        allow(Gitlab::Database).to receive(:pg_stat_wal_receiver_supported?).and_return(false)
+      end
+
+      it_behaves_like 'with flash message', :warning, 'Please upgrade PostgreSQL to version 9.6 or greater.'
     end
   end
 
