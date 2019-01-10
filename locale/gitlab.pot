@@ -9372,7 +9372,7 @@ msgstr ""
 msgid "To open Jaeger and easily view tracing from GitLab, link the %{link} page to your server"
 msgstr ""
 
-msgid "To preserve performance only <strong>%{display_size} of ${real_size}</strong> files are displayed."
+msgid "To preserve performance only <strong>%{display_size} of %{real_size}</strong> files are displayed."
 msgstr ""
 
 msgid "To set up SAML authentication for your group through an identity provider like Azure, Okta, Onelogin, Ping Identity, or your custom SAML 2.0 provider:"
