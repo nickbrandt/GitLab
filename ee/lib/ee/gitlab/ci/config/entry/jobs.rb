@@ -20,8 +20,10 @@ module EE
             end
 
             def bridge?(name)
-              config.fetch(name).key?(:trigger) &&
-                cross_project_triggers_enabled?
+              config.fetch(name).yield_self do |value|
+                value.is_a?(Hash) && value.key?(:trigger) &&
+                  cross_project_triggers_enabled?
+              end
             end
 
             def cross_project_triggers_enabled?
