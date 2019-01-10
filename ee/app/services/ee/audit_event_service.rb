@@ -181,12 +181,8 @@ module EE
     end
 
     def add_security_event_admin_details!
-      # TODO: Entities such as projects and groups have a full path that
-      # we can log. However, objects such as CI pipelines do not have
-      # this. We could delegate this to the project path in the future, but
-      # for now, just set it to empty.
       @details.merge!(ip_address: ip_address,
-                      entity_path: @entity.try(:full_path))
+                      entity_path: @entity.full_path)
     end
 
     def custom_project_link_group_attributes(group_link)

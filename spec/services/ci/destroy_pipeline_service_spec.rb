@@ -22,13 +22,8 @@ describe ::Ci::DestroyPipelineService do
         stub_licensed_features(extended_audit_events: true, admin_audit_log: true)
       end
 
-      it 'logs an audit event' do
-        expect { subject }.to change { SecurityEvent.count }.by(1)
-
-        event = SecurityEvent.first
-        expect(event.entity_type).to eq('Ci::Pipeline')
-        expect(event.entity_id).to eq(pipeline.id)
-        expect(event.details[:custom_message]).to eq('Destroyed pipeline')
+      it 'does not log an audit event' do
+        expect { subject }.not_to change { SecurityEvent.count }
       end
     end
 
