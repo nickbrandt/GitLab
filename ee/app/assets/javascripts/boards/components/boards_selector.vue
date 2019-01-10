@@ -228,7 +228,7 @@ export default {
         </div>
 
         <gl-dropdown-header class="mt-0">
-          <gl-search-box v-if="!loading" ref="searchBox" v-model="filterTerm" />
+          <gl-search-box ref="searchBox" v-model="filterTerm" />
         </gl-dropdown-header>
 
         <div
