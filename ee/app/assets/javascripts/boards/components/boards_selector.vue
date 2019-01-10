@@ -1,7 +1,13 @@
 <script>
 import $ from 'jquery';
 import { throttle } from 'underscore';
-import { GlLoadingIcon, GlSearchBox, GlDropdown } from '@gitlab/ui';
+import {
+  GlLoadingIcon,
+  GlSearchBox,
+  GlDropdown,
+  GlDropdownDivider,
+  GlDropdownItem,
+} from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
 import boardsStore from '~/boards/stores/boards_store';
 import BoardForm from './board_form.vue';
@@ -16,6 +22,8 @@ export default {
     GlLoadingIcon,
     GlSearchBox,
     GlDropdown,
+    GlDropdownDivider,
+    GlDropdownItem,
   },
   props: {
     currentBoard: {
@@ -215,47 +223,53 @@ export default {
         </div>
 
         <div class="dropdown-content-faded-mask js-scroll-fade" :class="scrollFadeClass">
-          <ul
+          <div
             v-if="!loading"
             ref="content"
             class="dropdown-list js-dropdown-list"
             @scroll.passive="throttledSetScrollFade"
           >
-            <li
+            <gl-dropdown-item
               v-show="filteredBoards.length === 0"
-              class="dropdown-item no-pointer-events text-secondary"
+              class="no-pointer-events text-secondary"
             >
               {{ s__('IssueBoards|No matching boards found') }}
-            </li>
+            </gl-dropdown-item>
 
-            <li v-for="otherBoard in filteredBoards" :key="otherBoard.id" class="js-dropdown-item">
-              <a :href="`${boardBaseUrl}/${otherBoard.id}`"> {{ otherBoard.name }} </a>
-            </li>
-            <li v-if="hasMissingBoards" class="small unclickable">
+            <gl-dropdown-item
+              v-for="otherBoard in filteredBoards"
+              :key="otherBoard.id"
+              class="js-dropdown-item"
+              :href="`${boardBaseUrl}/${otherBoard.id}`"
+            >
+              {{ otherBoard.name }}
+            </gl-dropdown-item>
+            <gl-dropdown-item v-if="hasMissingBoards" class="small unclickable">
               {{
                 s__(
                   'IssueBoards|Some of your boards are hidden, activate a license to see them again.',
                 )
               }}
-            </li>
-          </ul>
+            </gl-dropdown-item>
+          </div>
         </div>
 
         <gl-loading-icon v-if="loading" class="dropdown-loading" />
 
-        <div v-if="canAdminBoard" class="dropdown-footer">
-          <ul class="dropdown-footer-list">
-            <li v-if="multipleIssueBoardsAvailable">
-              <button type="button" @click.prevent="showPage('new')">
-                {{ s__('IssueBoards|Create new board') }}
-              </button>
-            </li>
-            <li v-if="showDelete">
-              <button type="button" class="text-danger" @click.prevent="showPage('delete')">
-                {{ s__('IssueBoards|Delete board') }}
-              </button>
-            </li>
-          </ul>
+        <div v-if="canAdminBoard">
+          <gl-dropdown-divider />
+
+          <gl-dropdown-item v-if="multipleIssueBoardsAvailable" @click.prevent="showPage('new')">
+            {{ s__('IssueBoards|Create new board') }}
+          </gl-dropdown-item>
+
+          <gl-dropdown-item
+            v-if="showDelete"
+            class="text-danger"
+            @click.prevent="showPage('delete')"
+          >
+            {{ s__('IssueBoards|Delete board') }}
+          </gl-dropdown-item>
         </div>
       </gl-dropdown>
 
