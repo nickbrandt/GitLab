@@ -2035,6 +2035,15 @@ ActiveRecord::Schema.define(version: 20190115054216) do
     t.index ["access_grant_id"], name: "index_oauth_openid_requests_on_access_grant_id", using: :btree
   end
 
+  create_table "operations_feature_flag_scopes", id: :bigserial, force: :cascade do |t|
+    t.bigint "feature_flag_id", null: false
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.boolean "active", null: false
+    t.string "environment_scope", default: "*", null: false
+    t.index ["feature_flag_id", "environment_scope"], name: "index_feature_flag_scopes_on_flag_id_and_environment_scope", unique: true, using: :btree
+  end
+
   create_table "operations_feature_flags", id: :bigserial, force: :cascade do |t|
     t.integer "project_id", null: false
     t.boolean "active", null: false
@@ -3430,6 +3439,7 @@ ActiveRecord::Schema.define(version: 20190115054216) do
   add_foreign_key "notes", "reviews", name: "fk_2e82291620", on_delete: :nullify
   add_foreign_key "notification_settings", "users", name: "fk_0c95e91db7", on_delete: :cascade
   add_foreign_key "oauth_openid_requests", "oauth_access_grants", column: "access_grant_id", name: "fk_oauth_openid_requests_oauth_access_grants_access_grant_id"
+  add_foreign_key "operations_feature_flag_scopes", "operations_feature_flags", column: "feature_flag_id", on_delete: :cascade
   add_foreign_key "operations_feature_flags", "projects", on_delete: :cascade
   add_foreign_key "operations_feature_flags_clients", "projects", on_delete: :cascade
   add_foreign_key "packages_maven_metadata", "packages_packages", column: "package_id", name: "fk_be88aed360", on_delete: :cascade
