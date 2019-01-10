@@ -5,7 +5,8 @@ import (
 	"net/http"
 
 	"github.com/golang/protobuf/jsonpb"
-	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+
+	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
@@ -27,7 +28,7 @@ func (p *patch) Inject(w http.ResponseWriter, r *http.Request, sendData string) 
 		return
 	}
 
-	request := &pb.RawPatchRequest{}
+	request := &gitalypb.RawPatchRequest{}
 	if err := jsonpb.UnmarshalString(params.RawPatchRequest, request); err != nil {
 		helper.Fail500(w, r, fmt.Errorf("diff.RawPatch: %v", err))
 		return

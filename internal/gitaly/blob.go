@@ -7,15 +7,15 @@ import (
 	"net/http"
 	"strconv"
 
-	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
 	"gitlab.com/gitlab-org/gitaly/streamio"
 )
 
 type BlobClient struct {
-	pb.BlobServiceClient
+	gitalypb.BlobServiceClient
 }
 
-func (client *BlobClient) SendBlob(ctx context.Context, w http.ResponseWriter, request *pb.GetBlobRequest) error {
+func (client *BlobClient) SendBlob(ctx context.Context, w http.ResponseWriter, request *gitalypb.GetBlobRequest) error {
 	c, err := client.GetBlob(ctx, request)
 	if err != nil {
 		return fmt.Errorf("rpc failed: %v", err)

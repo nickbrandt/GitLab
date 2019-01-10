@@ -10,13 +10,13 @@ import (
 	"google.golang.org/grpc"
 )
 
-// ReceivePack proxies an SSH git-receive-pack (git push) session to Gitaly
-func ReceivePack(ctx context.Context, conn *grpc.ClientConn, stdin io.Reader, stdout, stderr io.Writer, req *gitalypb.SSHReceivePackRequest) (int32, error) {
+// UploadArchive proxies an SSH git-upload-archive (git archive --remote) session to Gitaly
+func UploadArchive(ctx context.Context, conn *grpc.ClientConn, stdin io.Reader, stdout, stderr io.Writer, req *gitalypb.SSHUploadArchiveRequest) (int32, error) {
 	ctx2, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	ssh := gitalypb.NewSSHServiceClient(conn)
-	stream, err := ssh.SSHReceivePack(ctx2)
+	stream, err := ssh.SSHUploadArchive(ctx2)
 	if err != nil {
 		return 0, err
 	}
@@ -26,7 +26,7 @@ func ReceivePack(ctx context.Context, conn *grpc.ClientConn, stdin io.Reader, st
 	}
 
 	inWriter := streamio.NewWriter(func(p []byte) error {
-		return stream.Send(&gitalypb.SSHReceivePackRequest{Stdin: p})
+		return stream.Send(&gitalypb.SSHUploadArchiveRequest{Stdin: p})
 	})
 
 	return streamHandler(func() (stdoutStderrResponse, error) {

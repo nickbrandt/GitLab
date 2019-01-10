@@ -19,7 +19,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+
+	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
@@ -525,7 +526,7 @@ func gitOkBody(t *testing.T) *api.Response {
 	return &api.Response{
 		GL_ID:       "user-123",
 		GL_USERNAME: "username",
-		Repository: pb.Repository{
+		Repository: gitalypb.Repository{
 			StorageName:  "default",
 			RelativePath: "foo/bar.git",
 		},

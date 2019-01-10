@@ -15,7 +15,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
@@ -62,7 +62,7 @@ func ensureGitalyRepository(t *testing.T, apiResponse *api.Response) error {
 	}
 
 	// Remove the repository if it already exists, for consistency
-	rmNsReq := &pb.RemoveNamespaceRequest{
+	rmNsReq := &gitalypb.RemoveNamespaceRequest{
 		StorageName: apiResponse.Repository.StorageName,
 		Name:        apiResponse.Repository.RelativePath,
 	}
@@ -71,7 +71,7 @@ func ensureGitalyRepository(t *testing.T, apiResponse *api.Response) error {
 		return err
 	}
 
-	createReq := &pb.CreateRepositoryFromURLRequest{
+	createReq := &gitalypb.CreateRepositoryFromURLRequest{
 		Repository: &apiResponse.Repository,
 		Url:        "https://gitlab.com/gitlab-org/gitlab-test.git",
 	}
@@ -237,7 +237,7 @@ func TestAllowedGetGitDiff(t *testing.T) {
 	rightCommit := "e395f646b1499e8e0279445fc99a0596a65fab7e"
 	expectedBody := "diff --git a/README.md b/README.md"
 
-	msg := serializedMessage("RawDiffRequest", &pb.RawDiffRequest{
+	msg := serializedMessage("RawDiffRequest", &gitalypb.RawDiffRequest{
 		Repository:    &apiResponse.Repository,
 		LeftCommitId:  leftCommit,
 		RightCommitId: rightCommit,
@@ -262,7 +262,7 @@ func TestAllowedGetGitFormatPatch(t *testing.T) {
 
 	leftCommit := "8a0f2ee90d940bfb0ba1e14e8214b0649056e4ab"
 	rightCommit := "e395f646b1499e8e0279445fc99a0596a65fab7e"
-	msg := serializedMessage("RawPatchRequest", &pb.RawPatchRequest{
+	msg := serializedMessage("RawPatchRequest", &gitalypb.RawPatchRequest{
 		Repository:    &apiResponse.Repository,
 		LeftCommitId:  leftCommit,
 		RightCommitId: rightCommit,

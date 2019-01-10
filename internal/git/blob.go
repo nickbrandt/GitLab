@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
@@ -14,7 +14,7 @@ import (
 type blob struct{ senddata.Prefix }
 type blobParams struct {
 	GitalyServer   gitaly.Server
-	GetBlobRequest pb.GetBlobRequest
+	GetBlobRequest gitalypb.GetBlobRequest
 }
 
 var SendBlob = &blob{"git-blob:"}

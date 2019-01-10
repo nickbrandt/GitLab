@@ -1,170 +1,170 @@
 package testhelper
 
 import (
-	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
 	"golang.org/x/net/context"
 )
 
-func (s *GitalyTestServer) RepositoryExists(context.Context, *pb.RepositoryExistsRequest) (*pb.RepositoryExistsResponse, error) {
+func (s *GitalyTestServer) RepositoryExists(context.Context, *gitalypb.RepositoryExistsRequest) (*gitalypb.RepositoryExistsResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) RepackIncremental(context.Context, *pb.RepackIncrementalRequest) (*pb.RepackIncrementalResponse, error) {
+func (s *GitalyTestServer) RepackIncremental(context.Context, *gitalypb.RepackIncrementalRequest) (*gitalypb.RepackIncrementalResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) RepackFull(context.Context, *pb.RepackFullRequest) (*pb.RepackFullResponse, error) {
+func (s *GitalyTestServer) RepackFull(context.Context, *gitalypb.RepackFullRequest) (*gitalypb.RepackFullResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) GarbageCollect(context.Context, *pb.GarbageCollectRequest) (*pb.GarbageCollectResponse, error) {
+func (s *GitalyTestServer) GarbageCollect(context.Context, *gitalypb.GarbageCollectRequest) (*gitalypb.GarbageCollectResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) RepositorySize(context.Context, *pb.RepositorySizeRequest) (*pb.RepositorySizeResponse, error) {
+func (s *GitalyTestServer) RepositorySize(context.Context, *gitalypb.RepositorySizeRequest) (*gitalypb.RepositorySizeResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) ApplyGitattributes(context.Context, *pb.ApplyGitattributesRequest) (*pb.ApplyGitattributesResponse, error) {
+func (s *GitalyTestServer) ApplyGitattributes(context.Context, *gitalypb.ApplyGitattributesRequest) (*gitalypb.ApplyGitattributesResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) FetchRemote(context.Context, *pb.FetchRemoteRequest) (*pb.FetchRemoteResponse, error) {
+func (s *GitalyTestServer) FetchRemote(context.Context, *gitalypb.FetchRemoteRequest) (*gitalypb.FetchRemoteResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) FetchSourceBranch(context.Context, *pb.FetchSourceBranchRequest) (*pb.FetchSourceBranchResponse, error) {
+func (s *GitalyTestServer) FetchSourceBranch(context.Context, *gitalypb.FetchSourceBranchRequest) (*gitalypb.FetchSourceBranchResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) CreateRepository(context.Context, *pb.CreateRepositoryRequest) (*pb.CreateRepositoryResponse, error) {
+func (s *GitalyTestServer) CreateRepository(context.Context, *gitalypb.CreateRepositoryRequest) (*gitalypb.CreateRepositoryResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) Exists(context.Context, *pb.RepositoryExistsRequest) (*pb.RepositoryExistsResponse, error) {
+func (s *GitalyTestServer) Exists(context.Context, *gitalypb.RepositoryExistsRequest) (*gitalypb.RepositoryExistsResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) HasLocalBranches(ctx context.Context, in *pb.HasLocalBranchesRequest) (*pb.HasLocalBranchesResponse, error) {
+func (s *GitalyTestServer) HasLocalBranches(ctx context.Context, in *gitalypb.HasLocalBranchesRequest) (*gitalypb.HasLocalBranchesResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) CommitDelta(in *pb.CommitDeltaRequest, stream pb.DiffService_CommitDeltaServer) error {
+func (s *GitalyTestServer) CommitDelta(in *gitalypb.CommitDeltaRequest, stream gitalypb.DiffService_CommitDeltaServer) error {
 	return nil
 }
 
-func (s *GitalyTestServer) CommitDiff(in *pb.CommitDiffRequest, stream pb.DiffService_CommitDiffServer) error {
+func (s *GitalyTestServer) CommitDiff(in *gitalypb.CommitDiffRequest, stream gitalypb.DiffService_CommitDiffServer) error {
 	return nil
 }
 
-func (s *GitalyTestServer) CommitPatch(in *pb.CommitPatchRequest, stream pb.DiffService_CommitPatchServer) error {
+func (s *GitalyTestServer) CommitPatch(in *gitalypb.CommitPatchRequest, stream gitalypb.DiffService_CommitPatchServer) error {
 	return nil
 }
 
-func (s *GitalyTestServer) GetBlobs(in *pb.GetBlobsRequest, stream pb.BlobService_GetBlobsServer) error {
+func (s *GitalyTestServer) GetBlobs(in *gitalypb.GetBlobsRequest, stream gitalypb.BlobService_GetBlobsServer) error {
 	return nil
 }
 
-func (s *GitalyTestServer) GetAllLFSPointers(*pb.GetAllLFSPointersRequest, pb.BlobService_GetAllLFSPointersServer) error {
+func (s *GitalyTestServer) GetAllLFSPointers(*gitalypb.GetAllLFSPointersRequest, gitalypb.BlobService_GetAllLFSPointersServer) error {
 	return nil
 }
 
-func (s *GitalyTestServer) GetLFSPointers(*pb.GetLFSPointersRequest, pb.BlobService_GetLFSPointersServer) error {
+func (s *GitalyTestServer) GetLFSPointers(*gitalypb.GetLFSPointersRequest, gitalypb.BlobService_GetLFSPointersServer) error {
 	return nil
 }
 
-func (s *GitalyTestServer) GetNewLFSPointers(*pb.GetNewLFSPointersRequest, pb.BlobService_GetNewLFSPointersServer) error {
+func (s *GitalyTestServer) GetNewLFSPointers(*gitalypb.GetNewLFSPointersRequest, gitalypb.BlobService_GetNewLFSPointersServer) error {
 	return nil
 }
 
-func (s *GitalyTestServer) CreateFork(context.Context, *pb.CreateForkRequest) (*pb.CreateForkResponse, error) {
+func (s *GitalyTestServer) CreateFork(context.Context, *gitalypb.CreateForkRequest) (*gitalypb.CreateForkResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) CalculateChecksum(context.Context, *pb.CalculateChecksumRequest) (*pb.CalculateChecksumResponse, error) {
+func (s *GitalyTestServer) CalculateChecksum(context.Context, *gitalypb.CalculateChecksumRequest) (*gitalypb.CalculateChecksumResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) CreateBundle(*pb.CreateBundleRequest, pb.RepositoryService_CreateBundleServer) error {
+func (s *GitalyTestServer) CreateBundle(*gitalypb.CreateBundleRequest, gitalypb.RepositoryService_CreateBundleServer) error {
 	return nil
 }
 
-func (s *GitalyTestServer) CreateRepositoryFromBundle(pb.RepositoryService_CreateRepositoryFromBundleServer) error {
+func (s *GitalyTestServer) CreateRepositoryFromBundle(gitalypb.RepositoryService_CreateRepositoryFromBundleServer) error {
 	return nil
 }
 
-func (s *GitalyTestServer) CreateRepositoryFromURL(context.Context, *pb.CreateRepositoryFromURLRequest) (*pb.CreateRepositoryFromURLResponse, error) {
+func (s *GitalyTestServer) CreateRepositoryFromURL(context.Context, *gitalypb.CreateRepositoryFromURLRequest) (*gitalypb.CreateRepositoryFromURLResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) FindLicense(context.Context, *pb.FindLicenseRequest) (*pb.FindLicenseResponse, error) {
+func (s *GitalyTestServer) FindLicense(context.Context, *gitalypb.FindLicenseRequest) (*gitalypb.FindLicenseResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) FindMergeBase(context.Context, *pb.FindMergeBaseRequest) (*pb.FindMergeBaseResponse, error) {
+func (s *GitalyTestServer) FindMergeBase(context.Context, *gitalypb.FindMergeBaseRequest) (*gitalypb.FindMergeBaseResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) Fsck(context.Context, *pb.FsckRequest) (*pb.FsckResponse, error) {
+func (s *GitalyTestServer) Fsck(context.Context, *gitalypb.FsckRequest) (*gitalypb.FsckResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) GetInfoAttributes(*pb.GetInfoAttributesRequest, pb.RepositoryService_GetInfoAttributesServer) error {
+func (s *GitalyTestServer) GetInfoAttributes(*gitalypb.GetInfoAttributesRequest, gitalypb.RepositoryService_GetInfoAttributesServer) error {
 	return nil
 }
 
-func (s *GitalyTestServer) IsRebaseInProgress(context.Context, *pb.IsRebaseInProgressRequest) (*pb.IsRebaseInProgressResponse, error) {
+func (s *GitalyTestServer) IsRebaseInProgress(context.Context, *gitalypb.IsRebaseInProgressRequest) (*gitalypb.IsRebaseInProgressResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) IsSquashInProgress(context.Context, *pb.IsSquashInProgressRequest) (*pb.IsSquashInProgressResponse, error) {
+func (s *GitalyTestServer) IsSquashInProgress(context.Context, *gitalypb.IsSquashInProgressRequest) (*gitalypb.IsSquashInProgressResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) WriteConfig(context.Context, *pb.WriteConfigRequest) (*pb.WriteConfigResponse, error) {
+func (s *GitalyTestServer) WriteConfig(context.Context, *gitalypb.WriteConfigRequest) (*gitalypb.WriteConfigResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) WriteRef(context.Context, *pb.WriteRefRequest) (*pb.WriteRefResponse, error) {
+func (s *GitalyTestServer) WriteRef(context.Context, *gitalypb.WriteRefRequest) (*gitalypb.WriteRefResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) Cleanup(context.Context, *pb.CleanupRequest) (*pb.CleanupResponse, error) {
+func (s *GitalyTestServer) Cleanup(context.Context, *gitalypb.CleanupRequest) (*gitalypb.CleanupResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) CreateRepositoryFromSnapshot(context.Context, *pb.CreateRepositoryFromSnapshotRequest) (*pb.CreateRepositoryFromSnapshotResponse, error) {
+func (s *GitalyTestServer) CreateRepositoryFromSnapshot(context.Context, *gitalypb.CreateRepositoryFromSnapshotRequest) (*gitalypb.CreateRepositoryFromSnapshotResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) BackupCustomHooks(*pb.BackupCustomHooksRequest, pb.RepositoryService_BackupCustomHooksServer) error {
+func (s *GitalyTestServer) BackupCustomHooks(*gitalypb.BackupCustomHooksRequest, gitalypb.RepositoryService_BackupCustomHooksServer) error {
 	return nil
 }
 
-func (s *GitalyTestServer) DeleteConfig(context.Context, *pb.DeleteConfigRequest) (*pb.DeleteConfigResponse, error) {
+func (s *GitalyTestServer) DeleteConfig(context.Context, *gitalypb.DeleteConfigRequest) (*gitalypb.DeleteConfigResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) GetRawChanges(*pb.GetRawChangesRequest, pb.RepositoryService_GetRawChangesServer) error {
+func (s *GitalyTestServer) GetRawChanges(*gitalypb.GetRawChangesRequest, gitalypb.RepositoryService_GetRawChangesServer) error {
 	return nil
 }
 
-func (s *GitalyTestServer) RestoreCustomHooks(pb.RepositoryService_RestoreCustomHooksServer) error {
+func (s *GitalyTestServer) RestoreCustomHooks(gitalypb.RepositoryService_RestoreCustomHooksServer) error {
 	return nil
 }
 
-func (s *GitalyTestServer) SearchFilesByContent(*pb.SearchFilesByContentRequest, pb.RepositoryService_SearchFilesByContentServer) error {
+func (s *GitalyTestServer) SearchFilesByContent(*gitalypb.SearchFilesByContentRequest, gitalypb.RepositoryService_SearchFilesByContentServer) error {
 	return nil
 }
 
-func (s *GitalyTestServer) SearchFilesByName(*pb.SearchFilesByNameRequest, pb.RepositoryService_SearchFilesByNameServer) error {
+func (s *GitalyTestServer) SearchFilesByName(*gitalypb.SearchFilesByNameRequest, gitalypb.RepositoryService_SearchFilesByNameServer) error {
 	return nil
 }
 
-func (s *GitalyTestServer) SetConfig(context.Context, *pb.SetConfigRequest) (*pb.SetConfigResponse, error) {
+func (s *GitalyTestServer) SetConfig(context.Context, *gitalypb.SetConfigRequest) (*gitalypb.SetConfigResponse, error) {
 	return nil, nil
 }
 
-func (s *GitalyTestServer) DiffStats(*pb.DiffStatsRequest, pb.DiffService_DiffStatsServer) error {
+func (s *GitalyTestServer) DiffStats(*gitalypb.DiffStatsRequest, gitalypb.DiffService_DiffStatsServer) error {
 	return nil
 }

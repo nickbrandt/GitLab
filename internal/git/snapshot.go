@@ -6,7 +6,8 @@ import (
 	"net/http"
 
 	"github.com/golang/protobuf/jsonpb"
-	pb "gitlab.com/gitlab-org/gitaly-proto/go"
+
+	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
@@ -34,7 +35,7 @@ func (s *snapshot) Inject(w http.ResponseWriter, r *http.Request, sendData strin
 		return
 	}
 
-	request := &pb.GetSnapshotRequest{}
+	request := &gitalypb.GetSnapshotRequest{}
 	if err := jsonpb.UnmarshalString(params.GetSnapshotRequest, request); err != nil {
 		helper.Fail500(w, r, fmt.Errorf("SendSnapshot: unmarshal GetSnapshotRequest: %v", err))
 		return

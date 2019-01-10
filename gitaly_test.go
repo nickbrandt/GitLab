@@ -19,9 +19,10 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	pb "gitlab.com/gitlab-org/gitaly-proto/go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+
+	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/git"
@@ -91,7 +92,7 @@ func TestGetInfoRefsProxiedToGitalySuccessfully(t *testing.T) {
 			bodySplit := strings.SplitN(body, "\000", 3)
 			require.Len(t, bodySplit, 3)
 
-			gitalyRequest := &pb.InfoRefsRequest{}
+			gitalyRequest := &gitalypb.InfoRefsRequest{}
 			require.NoError(t, jsonpb.UnmarshalString(bodySplit[0], gitalyRequest))
 
 			require.Equal(t, gitProtocol, gitalyRequest.GitProtocol)
@@ -172,7 +173,7 @@ func TestPostReceivePackProxiedToGitalySuccessfully(t *testing.T) {
 	split := strings.SplitN(body, "\000", 2)
 	require.Len(t, split, 2)
 
-	gitalyRequest := &pb.PostReceivePackRequest{}
+	gitalyRequest := &gitalypb.PostReceivePackRequest{}
 	require.NoError(t, jsonpb.UnmarshalString(split[0], gitalyRequest))
 
 	assert.Equal(t, apiResponse.Repository.StorageName, gitalyRequest.Repository.StorageName)
@@ -268,7 +269,7 @@ func TestPostUploadPackProxiedToGitalySuccessfully(t *testing.T) {
 			bodySplit := strings.SplitN(body, "\000", 2)
 			require.Len(t, bodySplit, 2)
 
-			gitalyRequest := &pb.PostUploadPackRequest{}
+			gitalyRequest := &gitalypb.PostUploadPackRequest{}
 			require.NoError(t, jsonpb.UnmarshalString(bodySplit[0], gitalyRequest))
 
 			require.Equal(t, apiResponse.Repository.StorageName, gitalyRequest.Repository.StorageName)
@@ -583,8 +584,8 @@ func TestGetSnapshotProxiedToGitalyInterruptedStream(t *testing.T) {
 	}
 }
 
-func buildGetSnapshotParams(gitalyAddress string, repo *pb.Repository) string {
-	msg := serializedMessage("GetSnapshotRequest", &pb.GetSnapshotRequest{Repository: repo})
+func buildGetSnapshotParams(gitalyAddress string, repo *gitalypb.Repository) string {
+	msg := serializedMessage("GetSnapshotRequest", &gitalypb.GetSnapshotRequest{Repository: repo})
 	return buildGitalyRPCParams(gitalyAddress, msg)
 }
 
@@ -617,8 +618,8 @@ func buildGitalyRPCParams(gitalyAddress string, rpcArgs ...rpcArg) string {
 	return string(b)
 }
 
-func buildPbRepo(storageName, relativePath string) *pb.Repository {
-	return &pb.Repository{
+func buildPbRepo(storageName, relativePath string) *gitalypb.Repository {
+	return &gitalypb.Repository{
 		StorageName:  storageName,
 		RelativePath: relativePath,
 	}
@@ -649,10 +650,10 @@ func startGitalyServer(t *testing.T, finalMessageCode codes.Code) (*combinedServ
 	require.NoError(t, err)
 
 	gitalyServer := testhelper.NewGitalyServer(finalMessageCode)
-	pb.RegisterSmartHTTPServiceServer(server, gitalyServer)
-	pb.RegisterBlobServiceServer(server, gitalyServer)
-	pb.RegisterRepositoryServiceServer(server, gitalyServer)
-	pb.RegisterDiffServiceServer(server, gitalyServer)
+	gitalypb.RegisterSmartHTTPServiceServer(server, gitalyServer)
+	gitalypb.RegisterBlobServiceServer(server, gitalyServer)
+	gitalypb.RegisterRepositoryServiceServer(server, gitalyServer)
+	gitalypb.RegisterDiffServiceServer(server, gitalyServer)
 
 	go server.Serve(listener)
 
