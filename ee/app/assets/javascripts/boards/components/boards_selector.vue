@@ -6,6 +6,7 @@ import {
   GlSearchBox,
   GlDropdown,
   GlDropdownDivider,
+  GlDropdownHeader,
   GlDropdownItem,
 } from '@gitlab/ui';
 import Icon from '~/vue_shared/components/icon.vue';
@@ -23,6 +24,7 @@ export default {
     GlSearchBox,
     GlDropdown,
     GlDropdownDivider,
+    GlDropdownHeader,
     GlDropdownItem,
   },
   props: {
@@ -218,9 +220,9 @@ export default {
         :text="board.name"
         @show="loadBoards"
       >
-        <div class="dropdown-header position-relative">
+        <gl-dropdown-header>
           <gl-search-box v-if="!loading" ref="searchBox" v-model="filterTerm" />
-        </div>
+        </gl-dropdown-header>
 
         <div class="dropdown-content-faded-mask js-scroll-fade" :class="scrollFadeClass">
           <div
