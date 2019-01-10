@@ -1,4 +1,5 @@
 <script>
+import _ from 'underscore';
 import { mapActions } from 'vuex';
 import { GlButton, GlSkeletonLoading } from '@gitlab/ui';
 import SeverityBadge from 'ee/vue_shared/security_reports/components/severity_badge.vue';
@@ -44,10 +45,12 @@ export default {
       return Boolean(this.vulnerability.issue_feedback);
     },
     canDismissVulnerability() {
-      return Boolean(this.vulnerability.vulnerability_feedback_url);
+      const path = this.vulnerability.vulnerability_feedback_dismissal_path;
+      return _.isString(path) && !_.isEmpty(path);
     },
     canCreateIssue() {
-      return this.canDismissVulnerability && !this.hasIssue;
+      const path = this.vulnerability.vulnerability_feedback_issue_path;
+      return _.isString(path) && !_.isEmpty(path) && !this.hasIssue;
     },
   },
   methods: {

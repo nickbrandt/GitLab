@@ -1,4 +1,5 @@
 <script>
+import _ from 'underscore';
 import { mapActions, mapState, mapGetters } from 'vuex';
 import IssueModal from 'ee/vue_shared/security_reports/components/modal.vue';
 import Filters from './filters.vue';
@@ -49,6 +50,14 @@ export default {
     ...mapState('vulnerabilities', ['modal']),
     ...mapState('projects', ['projects']),
     ...mapGetters('filters', ['activeFilters']),
+    canCreateIssuePermission() {
+      const path = this.modal.vulnerability.vulnerability_feedback_issue_path;
+      return _.isString(path) && !_.isEmpty(path);
+    },
+    canCreateFeedbackPermission() {
+      const path = this.modal.vulnerability.vulnerability_feedback_dismissal_path;
+      return _.isString(path) && !_.isEmpty(path);
+    },
   },
   created() {
     this.setProjectsEndpoint(this.projectsEndpoint);
@@ -94,8 +103,8 @@ export default {
     <issue-modal
       :modal="modal"
       :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
-      :can-create-issue-permission="true"
-      :can-create-feedback-permission="true"
+      :can-create-issue-permission="canCreateIssuePermission"
+      :can-create-feedback-permission="canCreateFeedbackPermission"
       @createNewIssue="createIssue({ vulnerability: modal.vulnerability })"
       @dismissIssue="dismissVulnerability({ vulnerability: modal.vulnerability })"
       @revertDismissIssue="revertDismissal({ vulnerability: modal.vulnerability })"

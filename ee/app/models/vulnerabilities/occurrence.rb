@@ -68,7 +68,7 @@ module Vulnerabilities
     scope :by_severities, -> (values) { where(severity: values) }
 
     scope :all_preloaded, -> do
-      preload(:scanner, :identifiers, :project)
+      preload(:scanner, :identifiers, project: [:namespace, :project_feature])
     end
 
     def self.for_pipelines(pipelines)

@@ -32,7 +32,8 @@
     },
     "dismissal_feedback": null,
     "issue_feedback": null,
-    "vulnerability_feedback_url": "https://example.com/vulnerability_feedback",
+    "vulnerability_feedback_issue_path": "https://example.com/vulnerability_feedback",
+    "vulnerability_feedback_dismissal_path": "https://example.com/vulnerability_feedback",
     "description": "The cipher does not provide data integrity update 1",
     "solution": "GCM mode introduces an HMAC into the resulting encrypted data, providing integrity of the result.",
     "location": {
@@ -94,7 +95,8 @@
     },
     "dismissal_feedback": null,
     "issue_feedback": null,
-    "vulnerability_feedback_url": "https://example.com/vulnerability_feedback",
+    "vulnerability_feedback_issue_path": "https://example.com/vulnerability_feedback",
+    "vulnerability_feedback_dismissal_path": "https://example.com/vulnerability_feedback",
     "description": "The cipher does not provide data integrity update 1",
     "solution": "GCM mode introduces an HMAC into the resulting encrypted data, providing integrity of the result.",
     "location": {
@@ -166,7 +168,8 @@
       "project_fingerprint": "4e5b6966dd100170b4b1ad599c7058cce91b57b4"
     },
     "issue_feedback": null,
-    "vulnerability_feedback_url": "https://example.com/vulnerability_feedback",
+    "vulnerability_feedback_issue_path": "https://example.com/vulnerability_feedback",
+    "vulnerability_feedback_dismissal_path": "https://example.com/vulnerability_feedback",
     "description": "The cipher does not provide data integrity update 1",
     "solution": "GCM mode introduces an HMAC into the resulting encrypted data, providing integrity of the result.",
     "location": {
@@ -239,7 +242,8 @@
       "branch": "master",
       "project_fingerprint": "4e5b6966dd100170b4b1ad599c7058cce91b57b4"
     },
-    "vulnerability_feedback_url": "https://example.com/vulnerability_feedback",
+    "vulnerability_feedback_issue_path": "https://example.com/vulnerability_feedback",
+    "vulnerability_feedback_dismissal_path": "https://example.com/vulnerability_feedback",
     "description": "The cipher does not provide data integrity update 1",
     "solution": "GCM mode introduces an HMAC into the resulting encrypted data, providing integrity of the result.",
     "location": {
@@ -334,7 +338,8 @@
       "branch": "master",
       "project_fingerprint": "4e5b6966dd100170b4b1ad599c7058cce91b57b4"
     },
-    "vulnerability_feedback_url": "https://example.com/vulnerability_feedback",
+    "vulnerability_feedback_issue_path": "https://example.com/vulnerability_feedback",
+    "vulnerability_feedback_dismissal_path": "https://example.com/vulnerability_feedback",
     "description": "The cipher does not provide data integrity update 1",
     "solution": "GCM mode introduces an HMAC into the resulting encrypted data, providing integrity of the result.",
     "location": {
@@ -384,7 +389,8 @@
     },
     "dismissal_feedback": null,
     "issue_feedback": null,
-    "vulnerability_feedback_url": "https://example.com/vulnerability_feedback",
+    "vulnerability_feedback_issue_path": "https://example.com/vulnerability_feedback",
+    "vulnerability_feedback_dismissal_path": "https://example.com/vulnerability_feedback",
     "description": "The cipher does not provide data integrity update 1",
     "solution": "GCM mode introduces an HMAC into the resulting encrypted data, providing integrity of the result.",
     "location": {

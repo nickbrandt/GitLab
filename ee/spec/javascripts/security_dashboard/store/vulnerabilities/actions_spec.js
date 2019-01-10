@@ -363,7 +363,7 @@ describe('issue creation', () => {
 
     describe('on success', () => {
       beforeEach(() => {
-        mock.onPost(vulnerability.vulnerability_feedback_url).replyOnce(200, { data });
+        mock.onPost(vulnerability.vulnerability_feedback_issue_path).replyOnce(200, { data });
       });
 
       it('should dispatch the request and success actions', done => {
@@ -386,7 +386,7 @@ describe('issue creation', () => {
 
     describe('on error', () => {
       beforeEach(() => {
-        mock.onPost(vulnerability.vulnerability_feedback_url).replyOnce(404, {});
+        mock.onPost(vulnerability.vulnerability_feedback_issue_path).replyOnce(404, {});
       });
 
       it('should dispatch the request and error actions', done => {
@@ -475,7 +475,7 @@ describe('vulnerability dismissal', () => {
 
     describe('on success', () => {
       beforeEach(() => {
-        mock.onPost(vulnerability.vulnerability_feedback_url).replyOnce(200, data);
+        mock.onPost(vulnerability.vulnerability_feedback_dismissal_path).replyOnce(200, data);
       });
 
       it('should dispatch the request and success actions', done => {
@@ -498,7 +498,7 @@ describe('vulnerability dismissal', () => {
 
     describe('on error', () => {
       beforeEach(() => {
-        mock.onPost(vulnerability.vulnerability_feedback_url).replyOnce(404, {});
+        mock.onPost(vulnerability.vulnerability_feedback_dismissal_path).replyOnce(404, {});
       });
 
       it('should dispatch the request and error actions', done => {
@@ -574,7 +574,7 @@ describe('vulnerability dismissal', () => {
 describe('revert vulnerability dismissal', () => {
   describe('revertDismissal', () => {
     const vulnerability = mockDataVulnerabilities[2];
-    const url = `${vulnerability.vulnerability_feedback_url}/${
+    const url = `${vulnerability.vulnerability_feedback_dismissal_path}/${
       vulnerability.dismissal_feedback.id
     }`;
     let mock;
