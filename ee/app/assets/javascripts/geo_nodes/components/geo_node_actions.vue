@@ -66,7 +66,7 @@ export default {
   <div class="geo-node-actions">
     <div v-if="isSecondaryNode" class="node-action-container">
       <a :href="node.geoProjectsUrl" class="btn btn-sm btn-node-action" target="_blank">
-        <icon name="external-link" /> {{ __('Open projects') }}
+        <icon v-if="!node.current" name="external-link" /> {{ __('Open projects') }}
       </a>
     </div>
     <template v-if="nodeActionsAllowed">
