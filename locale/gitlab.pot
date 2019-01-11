@@ -3248,6 +3248,9 @@ msgstr ""
 msgid "Enable classification control using an external service"
 msgstr ""
 
+msgid "Enable error tracking"
+msgstr ""
+
 msgid "Enable for this project"
 msgstr ""
 
@@ -3530,6 +3533,9 @@ msgstr ""
 msgid "EventFilterBy|Filter by team"
 msgstr ""
 
+msgid "Events"
+msgstr ""
+
 msgid "Every %{action} attempt has failed: %{job_error_message}. Please try again."
 msgstr ""
 
@@ -3642,6 +3648,9 @@ msgid "Failed to deploy to"
 msgstr ""
 
 msgid "Failed to load emoji list."
+msgstr ""
+
+msgid "Failed to load errors from Sentry"
 msgstr ""
 
 msgid "Failed to remove issue from board, please try again."
@@ -4293,6 +4302,9 @@ msgid "Geo|secondary"
 msgstr ""
 
 msgid "Get a free instance review"
+msgstr ""
+
+msgid "Get started with error tracking"
 msgstr ""
 
 msgid "Getting started with releases"
@@ -5153,6 +5165,9 @@ msgstr ""
 msgid "Last reply by"
 msgstr ""
 
+msgid "Last seen"
+msgstr ""
+
 msgid "Last update"
 msgstr ""
 
@@ -5776,6 +5791,9 @@ msgstr ""
 msgid "Modal|Close"
 msgstr ""
 
+msgid "Monitor your errors by integrating with Sentry"
+msgstr ""
+
 msgid "Monitoring"
 msgstr ""
 
@@ -5964,7 +5982,13 @@ msgstr ""
 msgid "No credit card required."
 msgstr ""
 
+msgid "No details available"
+msgstr ""
+
 msgid "No due date"
+msgstr ""
+
+msgid "No errors to display"
 msgstr ""
 
 msgid "No estimate or time spent"
@@ -6216,6 +6240,9 @@ msgid "Open Documentation"
 msgstr ""
 
 msgid "Open comment type dropdown"
+msgstr ""
+
+msgid "Open errors"
 msgstr ""
 
 msgid "Open in Xcode"
