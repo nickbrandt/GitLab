@@ -251,10 +251,7 @@ Parameters:
 | `platform_kubernetes_attributes[token]` | String | no | The token to authenticate against Kubernetes |
 | `platform_kubernetes_attributes[ca_cert]` | String | no | TLS certificate (needed if API is using a self-signed TLS certificate |
 | `platform_kubernetes_attributes[namespace]` | String | no | The unique namespace related to the project |
-<<<<<<< HEAD
 | `environment_scope` | String | no | The associated environment to the cluster |
-=======
->>>>>>> ce/11-7-stable-prepare-rc5
 
 NOTE: **Note:**
 `name`, `api_url`, `ca_cert` and `token` can only be updated if the cluster was added
