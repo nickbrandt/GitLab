@@ -3,12 +3,15 @@ require 'spec_helper'
 describe Projects::FeatureFlagsController do
   include Gitlab::Routing
 
-  set(:user) { create(:user) }
   set(:project) { create(:project) }
+  let(:user) { developer }
+  let(:developer) { create(:user) }
+  let(:reporter) { create(:user) }
   let(:feature_enabled) { true }
 
   before do
-    project.add_developer(user)
+    project.add_developer(developer)
+    project.add_reporter(reporter)
 
     sign_in(user)
     stub_licensed_features(feature_flags: feature_enabled)
@@ -151,6 +154,63 @@ describe Projects::FeatureFlagsController do
     end
   end
 
+  describe 'GET #show.json' do
+    subject { get(:show, params: params, format: :json) }
+
+    let!(:feature_flag) do
+      create(:operations_feature_flag, project: project)
+    end
+
+    let(:params) do
+      {
+        namespace_id: project.namespace,
+        project_id: project,
+        id: feature_flag.id
+      }
+    end
+
+    it 'returns all feature flags as json response' do
+      subject
+
+      expect(json_response['name']).to eq(feature_flag.name)
+      expect(json_response['active']).to eq(feature_flag.active)
+    end
+
+    it 'matches json schema' do
+      subject
+
+      expect(response).to match_response_schema('feature_flag', dir: 'ee')
+    end
+
+    context 'when feature flag is not found' do
+      let!(:feature_flag) { }
+
+      let(:params) do
+        {
+          namespace_id: project.namespace,
+          project_id: project,
+          id: 1
+        }
+      end
+
+      it 'returns 404' do
+        subject
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+
+    context 'when user is reporter' do
+      let(:user) { reporter }
+
+      it 'returns 404' do
+        subject
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+  end
+
   describe 'POST create' do
     render_views
 
@@ -180,6 +240,68 @@ describe Projects::FeatureFlagsController do
 
         expect(response).to render_template('new')
         expect(response).to render_template('_errors')
+      end
+    end
+  end
+
+  describe 'POST create.json' do
+    subject { post(:create, params: params, format: :json) }
+
+    let(:params) do
+      {
+        namespace_id: project.namespace,
+        project_id: project,
+        operations_feature_flag: {
+          name: 'my_feature_flag',
+          active: true
+        }
+      }
+    end
+
+    it 'returns 200' do
+      subject
+
+      expect(response).to have_gitlab_http_status(200)
+    end
+
+    it 'creates a new feature flag' do
+      subject
+
+      expect(json_response['name']).to eq('my_feature_flag')
+      expect(json_response['active']).to be_truthy
+    end
+
+    it 'matches json schema' do
+      subject
+
+      expect(response).to match_response_schema('feature_flag', dir: 'ee')
+    end
+
+    context 'when the same named feature flag has already existed' do
+      before do
+        create(:operations_feature_flag, name: 'my_feature_flag', project: project)
+      end
+
+      it 'returns 400' do
+        subject
+
+        expect(response).to have_gitlab_http_status(400)
+      end
+
+      it 'returns an error message' do
+        subject
+
+        expect(json_response['message']).to include('Name has already been taken')
+      end
+    end
+
+    context 'when user is reporter' do
+      let(:user) { reporter }
+
+      it 'returns 404' do
+        subject
+
+        expect(response).to have_gitlab_http_status(404)
       end
     end
   end
@@ -218,6 +340,114 @@ describe Projects::FeatureFlagsController do
 
         expect(response).to render_template('new')
         expect(response).to render_template('_errors')
+      end
+    end
+  end
+
+  describe 'DELETE destroy.json' do
+    subject { delete(:destroy, params: params, format: :json) }
+
+    let!(:feature_flag) { create(:operations_feature_flag, project: project) }
+
+    let(:params) do
+      {
+        namespace_id: project.namespace,
+        project_id: project,
+        id: feature_flag.id
+      }
+    end
+
+    it 'returns 200' do
+      subject
+
+      expect(response).to have_gitlab_http_status(200)
+    end
+
+    it 'deletes one feature flag' do
+      expect { subject }.to change { Operations::FeatureFlag.count }.by(-1)
+    end
+
+    it 'matches json schema' do
+      subject
+
+      expect(response).to match_response_schema('feature_flag', dir: 'ee')
+    end
+
+    context 'when user is reporter' do
+      let(:user) { reporter }
+
+      it 'returns 404' do
+        subject
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+  end
+
+  describe 'PUT update json' do
+    subject { put(:update, params: params, format: :json) }
+
+    let!(:feature_flag) do
+      create(:operations_feature_flag,
+        name: 'ci_live_trace',
+        active: true,
+        project: project)
+    end
+
+    let(:params) do
+      {
+        namespace_id: project.namespace,
+        project_id: project,
+        id: feature_flag.id,
+        operations_feature_flag: {
+          name: 'ci_new_live_trace'
+        }
+      }
+    end
+
+    it 'returns 200' do
+      subject
+
+      expect(response).to have_gitlab_http_status(200)
+    end
+
+    it 'updates the name of the feature flag name' do
+      subject
+
+      expect(json_response['name']).to eq('ci_new_live_trace')
+    end
+
+    it 'matches json schema' do
+      subject
+
+      expect(response).to match_response_schema('feature_flag', dir: 'ee')
+    end
+
+    context 'when updates active' do
+      let(:params) do
+        {
+          namespace_id: project.namespace,
+          project_id: project,
+          id: feature_flag.id,
+          operations_feature_flag: {
+            active: false
+          }
+        }
+      end
+
+      it 'updates active from true to false' do
+        expect { subject }
+          .to change { feature_flag.reload.active }.from(true).to(false)
+      end
+    end
+
+    context 'when user is reporter' do
+      let(:user) { reporter }
+
+      it 'returns 404' do
+        subject
+
+        expect(response).to have_gitlab_http_status(404)
       end
     end
   end
