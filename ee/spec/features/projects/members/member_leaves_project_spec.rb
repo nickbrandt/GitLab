@@ -6,6 +6,7 @@ describe 'Projects > Members > Member leaves project' do
 
   before do
     project.add_developer(user)
+    project.add_developer(other_user)
     sign_in(user)
     visit project_path(project)
   end

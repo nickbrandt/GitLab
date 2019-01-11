@@ -27,6 +27,9 @@ module EE
         validates :group, :user,
                   absence: true,
                   unless: :protected_refs_for_users_required_and_available
+
+        validate :validate_group_membership, if: :protected_refs_for_users_required_and_available
+        validate :validate_user_membership, if: :protected_refs_for_users_required_and_available
       end
     end
 
@@ -80,6 +83,22 @@ module EE
     # if the feature is available
     def protected_refs_for_users_required_and_available
       type != :role && project.feature_available?(:protected_refs_for_users)
+    end
+
+    def validate_group_membership
+      return unless group
+
+      unless project.project_group_links.where(group: group).exists?
+        self.errors.add(:group, 'does not have access to the project')
+      end
+    end
+
+    def validate_user_membership
+      return unless user
+
+      unless project.members.where(user: user).exists?
+        self.errors.add(:user, 'is not a member of the project')
+      end
     end
   end
 end
