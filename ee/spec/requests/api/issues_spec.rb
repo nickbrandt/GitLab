@@ -38,31 +38,26 @@ describe API::Issues, :mailer do
       end
 
       describe "filtering by weight" do
-        before do
-          create(:issue, author: user2, project: project, weight: 1)
-          create(:issue, author: user2, project: project, weight: 3)
-        end
-
-        let!(:issue2) { create(:issue, author: user2, project: project, weight: 5) }
+        let!(:issue1) { create(:issue, author: user2, project: project, weight: 1, created_at: 3.days.ago) }
+        let!(:issue2) { create(:issue, author: user2, project: project, weight: 5, created_at: 2.days.ago) }
+        let!(:issue3) { create(:issue, author: user2, project: project, weight: 3, created_at: 1.day.ago) }
 
         it 'returns issues with specific weight' do
           get api('/issues', user), params: { weight: 5, scope: 'all' }
 
-          expect_paginated_array_response(size: 1)
-          expect(json_response.first['id']).to eq(issue2.id)
+          expect_paginated_array_response(issue2.id)
         end
 
         it 'returns issues with no weight' do
           get api('/issues', user), params: { weight: 'None', scope: 'all' }
 
-          expect_paginated_array_response(size: 1)
-          expect(json_response.first['id']).to eq(issue.id)
+          expect_paginated_array_response(issue.id)
         end
 
         it 'returns issues with any weight' do
           get api('/issues', user), params: { weight: 'Any', scope: 'all' }
 
-          expect_paginated_array_response(size: 3)
+          expect_paginated_array_response([issue3.id, issue2.id, issue1.id])
         end
       end
     end
@@ -130,12 +125,5 @@ describe API::Issues, :mailer do
         expect(issue.reload.read_attribute(:weight)).to be_nil
       end
     end
-  end
-
-  def expect_paginated_array_response(size: nil)
-    expect(response).to have_gitlab_http_status(200)
-    expect(response).to include_pagination_headers
-    expect(json_response).to be_an Array
-    expect(json_response.length).to eq(size) if size
   end
 end
