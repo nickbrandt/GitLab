@@ -4,13 +4,20 @@ GitLab CI/CD can be used with **GitHub.com** and **GitHub Enterprise** by
 creating a [CI/CD project][cicd-projects] to connect your GitHub repository to
 GitLab.
 
-> Note: to use **GitHub Enterprise** with **GitLab.com** you should use the
-> manual method.
+NOTE: **Note:**
+To use **GitHub Enterprise** with **GitLab.com** you should use the
+manual method.
 
 ## Connect with GitHub integration
 
 If the [GitHub integration][github-integration] has been enabled by your GitLab
 administrator:
+
+NOTE: **Note:**
+Due to a 10-token limitation on the [GitHub OAuth Implemenation](https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/#creating-multiple-tokens-for-oauth-apps),
+if you import more than 10 times, your oldest imported project's token will be 
+revoked. See issue [#9147](https://gitlab.com/gitlab-org/gitlab-ee/issues/9147)
+for more information.
 
 1. In GitLab create a **CI/CD for external repo** project and select
    **GitHub**.
@@ -30,7 +37,7 @@ on GitHub to notify GitLab of new commits.
 
 ## Connect with Personal Access Token
 
-> Note: Personal Access Tokens can only be used to connect GitHub.com
+NOTE: **Note:** Personal access tokens can only be used to connect GitHub.com
 repositories to GitLab.
 
 If you are not using the [GitHub integration][github-integration], you can
