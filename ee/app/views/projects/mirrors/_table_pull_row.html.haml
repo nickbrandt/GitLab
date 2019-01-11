@@ -3,7 +3,7 @@
 - import_state = @project.import_state
 
 %tr
-  %td= @project.username_only_import_url
+  %td.mirror-url= @project.safe_import_url
   %td= _('Pull')
   %td= import_state.last_update_at.present? ? time_ago_with_tooltip(import_state.last_update_at) : _('Never')
   %td
