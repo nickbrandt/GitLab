@@ -290,7 +290,7 @@ export default {
         <issues-list
           v-if="sastContainer.newIssues.length || sastContainer.resolvedIssues.length"
           :unresolved-issues="sastContainer.newIssues"
-          :neutral-issues="sastContainer.resolvedIssues"
+          :resolved-issues="sastContainer.resolvedIssues"
           :component="$options.componentNames.SastContainerIssueBody"
           class="report-block-group-list"
         />
