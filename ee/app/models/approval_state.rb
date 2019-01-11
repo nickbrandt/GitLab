@@ -20,15 +20,12 @@ class ApprovalState
 
   # Excludes the author if 'self-approval' isn't explicitly enabled on project settings.
   def self.filter_author(users, merge_request)
-    return users unless merge_request.author_id
     return users if merge_request.target_project.merge_requests_author_approval?
 
     if users.is_a?(ActiveRecord::Relation) && !users.loaded?
-      users.where.not(id: merge_request.author_id)
+      users.where.not(id: merge_request.authors)
     else
-      users.dup
-      users.delete(merge_request.author)
-      users
+      users - merge_request.authors
     end
   end
 
@@ -106,7 +103,7 @@ class ApprovalState
     # That is, they're included/excluded from that list accordingly.
     return true if unactioned_approvers.include?(user)
     # We can safely unauthorize authors if it reaches this guard clause.
-    return false if user == merge_request.author
+    return false if merge_request.authors.include?(user)
     return false unless user.can?(:update_merge_request, merge_request)
 
     any_approver_allowed? && merge_request.approvals.where(user: user).empty?

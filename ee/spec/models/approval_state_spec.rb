@@ -27,15 +27,17 @@ describe ApprovalState do
 
   shared_examples 'filtering author' do
     before do
+      allow(merge_request).to receive(:authors).and_return([merge_request.author, create(:user, username: 'commiter')])
+
       project.update(merge_requests_author_approval: merge_requests_author_approval)
-      create_rule(users: [merge_request.author])
+      create_rule(users: merge_request.authors)
     end
 
     context 'when self approval is disabled' do
       let(:merge_requests_author_approval) { false }
 
-      it 'excludes author' do
-        expect(results).not_to include(merge_request.author)
+      it 'excludes authors' do
+        expect(results).not_to include(*merge_request.authors)
       end
     end
 
@@ -43,7 +45,7 @@ describe ApprovalState do
       let(:merge_requests_author_approval) { true }
 
       it 'includes author' do
-        expect(results).to include(merge_request.author)
+        expect(results).to include(*merge_request.authors)
       end
     end
   end
