@@ -9,6 +9,10 @@ module API
     content_type :sha1, 'text/plain'
     content_type :binary, 'application/octet-stream'
 
+    rescue_from ActiveRecord::RecordInvalid do |e|
+      render_api_error!(e.message, 400)
+    end
+
     before do
       require_packages_enabled!
       authenticate_non_get!

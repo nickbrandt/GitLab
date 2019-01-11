@@ -10,6 +10,7 @@ describe API::MavenPackages do
   let(:headers) { { 'GitLab-Workhorse' => '1.0', Gitlab::Workhorse::INTERNAL_API_REQUEST_HEADER => jwt_token } }
   let(:headers_with_token) { headers.merge('Private-Token' => personal_access_token.token) }
   let(:job) { create(:ci_build, user: user) }
+  let(:version) { '1.0-SNAPSHOT' }
 
   before do
     project.add_developer(user)
@@ -345,7 +346,7 @@ describe API::MavenPackages do
     end
 
     def authorize_upload(params = {}, request_headers = headers)
-      put api("/projects/#{project.id}/packages/maven/com/example/my-app/1.0-SNAPSHOT/maven-metadata.xml/authorize"), params: params, headers: request_headers
+      put api("/projects/#{project.id}/packages/maven/com/example/my-app/#{version}/maven-metadata.xml/authorize"), params: params, headers: request_headers
     end
 
     def authorize_upload_with_token(params = {}, request_headers = headers_with_token)
@@ -405,10 +406,21 @@ describe API::MavenPackages do
 
         expect(response).to have_gitlab_http_status(200)
       end
+
+      context 'version is not correct' do
+        let(:version) { '$%123' }
+
+        it 'rejects request' do
+          expect { upload_file_with_token(params) }.not_to change { project.packages.count }
+
+          expect(response).to have_gitlab_http_status(400)
+          expect(json_response['message']).to include('Validation failed')
+        end
+      end
     end
 
     def upload_file(params = {}, request_headers = headers)
-      put api("/projects/#{project.id}/packages/maven/com/example/my-app/1.0-SNAPSHOT/maven-metadata.xml"), params: params, headers: request_headers
+      put api("/projects/#{project.id}/packages/maven/com/example/my-app/#{version}/maven-metadata.xml"), params: params, headers: request_headers
     end
 
     def upload_file_with_token(params = {}, request_headers = headers_with_token)
