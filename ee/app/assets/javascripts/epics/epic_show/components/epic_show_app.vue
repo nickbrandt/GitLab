@@ -213,7 +213,7 @@ export default {
     return {
       // Epics specific configuration
       issuableRef: '',
-      hasRelatedEpicsFeature: this.subepicsSupported && gon.features && gon.features.epicLinks,
+      hasRelatedEpicsFeature: this.subepicsSupported,
       projectPath: this.groupPath,
       parentEpic: this.parent ? this.parent : {},
       projectNamespace: '',

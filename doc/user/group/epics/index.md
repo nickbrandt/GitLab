@@ -23,17 +23,38 @@ you can change its title, description, start date, and due date.
 
 ![epic view](img/epic_view.png)
 
-An epic contains a list of issues, and an issue can be associated with at most
-one epic. You can add issues associated with the epic by clicking the
-plus icon (<kbd>+</kbd>) under the epic description, pasting the link of the
-issue, and clicking **Add**. Any issue belonging to a project in the epic's
-group or any of the epic's subgroups are eligible to be added. To remove an
-issue from an epic, simply click on the <kbd>x</kbd> button in the epic's
-issue list.
+## Adding an issue to an epic
 
-When you add an issue to an epic that's already associated with another epic,
-the issue is automatically removed from the previous epic. In other words, an
-issue can be associated with at most one epic.
+An epic contains a list of issues and an issue can be associated with at most
+one epic. When on an epic, you can add its associated issues:
+
+1. Click the plus icon (<kbd>+</kbd>) under the epic description.
+1. Paste the link of the issue (you can hit <kbd>Spacebar</kbd> to add more than
+   one issues at a time).
+1. Click **Add**.
+
+Any issue belonging to a project in the epic's group or any of the epic's
+subgroups are eligible to be added. To remove an issue from an epic, click
+on the <kbd>x</kbd> button in the epic's issue list.
+
+NOTE: **Note:**
+When you add an issue or an epic to an epic that's already associated with another epic,
+the issue or the epic is automatically removed from the previous epic.
+
+## Child epics
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/8333) in GitLab Ultimate 11.7.
+
+Much like adding issues to an epic, an epic can have multiple child epics with
+the maximum depth being 5. To add a child epic:
+
+1. Click the plus icon (<kbd>+</kbd>) under the epic description.
+1. Paste the link of the epic.
+1. Click **Add**.
+
+Any epic that belongs to a group or subgroup of the parent epic's group is
+eligible to be added. To remove a child epic from a parent epic,
+click on the <kbd>x</kbd> button in the parent epic's epic list.
 
 ## Start date and due date
 
@@ -49,7 +70,7 @@ for the due date, GitLab will set it to be the latest due date across all
 milestones that are currently assigned to those issues.
 
 These are dynamic dates in that if milestones are re-assigned to the issues, if the
-milestone dates change, or if issues are added or removed from the epic, then the
+milestone dates change, or if issues are added or removed from the epic, then
 the re-calculation will happen immediately to set a new dynamic date.
 
 ## Reordering issues in an epic
