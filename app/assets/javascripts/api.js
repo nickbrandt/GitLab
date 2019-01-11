@@ -30,7 +30,6 @@ const Api = {
   commitPipelinesPath: '/:project_id/commit/:sha/pipelines',
   branchSinglePath: '/api/:version/projects/:id/repository/branches/:branch',
   createBranchPath: '/api/:version/projects/:id/repository/branches',
-  projectRemoteMirrorPath: '/api/:version/projects/:project_id/remote_mirrors/:remote_mirror_id',
   geoNodesPath: '/api/:version/geo_nodes',
   subscriptionPath: '/api/:version/namespaces/:id/gitlab_subscription',
   releasesPath: '/api/:version/projects/:id/releases',
@@ -358,14 +357,6 @@ const Api = {
     const url = Api.buildUrl(this.releasesPath).replace(':id', encodeURIComponent(id));
 
     return axios.get(url);
-  },
-
-  deleteProjectRemoteMirror(projectId, remoteMirrorId) {
-    const url = Api.buildUrl(this.projectRemoteMirrorPath)
-      .replace(':project_id', encodeURIComponent(projectId))
-      .replace(':remote_mirror_id', remoteMirrorId);
-
-    return axios.delete(url).then(({ data }) => data);
   },
 
   buildUrl(url) {

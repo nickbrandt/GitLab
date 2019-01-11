@@ -89,9 +89,18 @@ export default class EEMirrorRepos extends MirrorRepos {
 
   deleteMirror(event) {
     const $target = $(event.currentTarget);
+    const isPullMirror = $target.hasClass('js-delete-pull-mirror');
+    let payload;
 
-    return super.deleteMirror(event).then(() => {
-      const isPullMirror = $target.hasClass('js-delete-pull-mirror');
+    if (isPullMirror) {
+      payload = {
+        project: {
+          mirror: false,
+        },
+      };
+    }
+
+    return super.deleteMirror(event, payload).then(() => {
       if (isPullMirror) this.$mirrorDirectionSelect.removeAttr('disabled');
     });
   }
