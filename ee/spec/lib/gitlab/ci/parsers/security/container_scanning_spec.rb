@@ -32,7 +32,9 @@ describe Gitlab::Ci::Parsers::Security::ContainerScanning do
     end
 
     it "generates expected location fingerprint" do
-      expect(report.occurrences.first[:location_fingerprint]).to eq('cb750fa5a7a31c527d5c15388a432c4ba3338457')
+      expected = Digest::SHA1.hexdigest('debian:9:glibc')
+
+      expect(report.occurrences.first[:location_fingerprint]).to eq(expected)
     end
 
     it "generates expected metadata_version" do
@@ -55,6 +57,15 @@ describe Gitlab::Ci::Parsers::Security::ContainerScanning do
             'url' => 'https://security-tracker.debian.org/tracker/CVE-2017-18269'
           }
         ],
+        'location' => {
+          'operating_system' => 'debian:9',
+          'dependency' => {
+            'package' => {
+              'name' => 'glibc'
+            },
+            'version' => '2.24-11+deb9u3'
+          }
+        },
         'links' => [{ 'url' => 'https://security-tracker.debian.org/tracker/CVE-2017-18269' }],
         'description' => 'SSE2-optimized memmove implementation problem.',
         'priority' => 'Unknown',

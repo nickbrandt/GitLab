@@ -125,6 +125,10 @@ namespace if needed.
 
 ## Operations settings
 
+### Error Tracking
+
+Configure Error Tracking to discover and view [Sentry errors within GitLab](../operations/error_tracking.md).
+
 ### Jaeger tracing
 
 Add the URL of a Jaeger server to allow your users to [easily access the Jaeger UI from within GitLab](../operations/tracing.md).
