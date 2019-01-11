@@ -2,8 +2,8 @@ import Vue from 'vue';
 import Flash from '~/flash';
 import Translate from '~/vue_shared/translate';
 import { __ } from '~/locale';
-import PipelinesMediator from './pipeline_details_mediator';
 import pipelineGraph from 'ee/pipelines/components/graph/graph_component.vue';
+import PipelinesMediator from './pipeline_details_mediator';
 import pipelineHeader from './components/header_component.vue';
 import eventHub from './event_hub';
 import GraphEEMixin from 'ee/pipelines/mixins/graph_pipeline_bundle_mixin'; // eslint-disable-line import/order
@@ -29,15 +29,6 @@ export default () => {
         mediator,
       };
     },
-    methods: {
-      requestRefreshPipelineGraph() {
-        // When an action is clicked
-        // (wether in the dropdown or in the main nodes, we refresh the big graph)
-        this.mediator
-          .refreshPipeline()
-          .catch(() => Flash(__('An error occurred while making the request.')));
-      },
-    },
     render(createElement) {
       return createElement('pipeline-graph', {
         props: {
@@ -47,14 +38,10 @@ export default () => {
         },
         on: {
           refreshPipelineGraph: this.requestRefreshPipelineGraph,
-          // EE-only start
-          // refreshTriggeredPipelineGraph: this.mediator.refreshTriggeredByPipelineGraph,
-          // refreshTriggeredByPipelineGraph: this.mediator.refreshTriggeredByPipelineGraph,
           onClickTriggeredBy: (parentPipeline, pipeline) =>
             this.clickTriggeredByPipeline(parentPipeline, pipeline),
           onClickTriggered: (parentPipeline, pipeline) =>
             this.clickTriggeredPipeline(parentPipeline, pipeline),
-          // EE-only end
         },
       });
     },

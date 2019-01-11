@@ -607,7 +607,7 @@
                 "action": {
                   "icon": "retry",
                   "title": "Retry",
-                  "path": "/gitlab-com/gitlab-docs/-/jobs/114984694/retry",
+                  "path": "/h5bp/html5-boilerplate/-/jobs/528/retry",
                   "method": "post",
                   "button_title": "Retry this job"
                 }
@@ -641,7 +641,7 @@
                     "action": {
                       "icon": "retry",
                       "title": "Retry",
-                      "path": "/gitlab-com/gitlab-docs/-/jobs/114984694/retry",
+                      "path": "/h5bp/html5-boilerplate/-/jobs/528/retry",
                       "method": "post",
                       "button_title": "Retry this job"
                     }
@@ -810,7 +810,7 @@
     },
     "project": {
       "id": 1794617,
-      "name": "Filipa Rocks",
+      "name": "Test",
       "full_path": "/gitlab-com/gitlab-docs",
       "full_name": "GitLab.com / GitLab Docs"
     },
@@ -1557,7 +1557,7 @@
                   "action": {
                     "icon": "retry",
                     "title": "Retry",
-                    "path": "/gitlab-com/gitlab-docs/-/jobs/114984694/retry",
+                    "path": "/h5bp/html5-boilerplate/-/jobs/528/retry",
                     "method": "post",
                     "button_title": "Retry this job"
                   }
@@ -1591,7 +1591,7 @@
                       "action": {
                         "icon": "retry",
                         "title": "Retry",
-                        "path": "/gitlab-com/gitlab-docs/-/jobs/114984694/retry",
+                        "path": "/h5bp/html5-boilerplate/-/jobs/528/retry",
                         "method": "post",
                         "button_title": "Retry this job"
                       }

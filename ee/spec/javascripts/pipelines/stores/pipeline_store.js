@@ -1,153 +1,133 @@
 import PipelineStore from 'ee/pipelines/stores/pipeline_store';
-import pipelineWithTriggered from './pipeline_with_triggered.json';
-import pipelineWithTriggeredBy from './pipeline_with_triggered_by.json';
-import pipelineWithBoth from './pipeline_with_triggered_triggered_by.json';
-import pipeline from './pipeline.json';
+import LinkedPipelines from '../linked_pipelines_mock.json';
 
 describe('EE Pipeline store', () => {
   let store;
+  let data;
 
   beforeEach(() => {
     store = new PipelineStore();
+    data = Object.assign({}, LinkedPipelines);
   });
 
   describe('storePipeline', () => {
-    describe('triggeredPipelines ', () => {
-      describe('with triggered pipelines', () => {
-        it('saves parsed pipelines', () => {
-          store.storePipeline(pipelineWithTriggered);
-
-          expect(store.triggeredPipelines.length).toEqual(pipelineWithTriggered.triggered.length);
-          expect(store.triggeredPipelines[0]).toEqual(
-            Object.assign({}, pipelineWithTriggered.triggered[0], {
-              isLoading: false,
-              isCollpased: true,
-            }),
-          );
-        });
-      });
-
-      describe('without triggered pipelines', () => {
-        it('triggeredPipelines should be an empty array', () => {
-          store.storePipeline({ triggered: [] });
-
-          expect(store.triggeredPipelines).toEqual([]);
-        });
-      });
-    });
-
-    describe('triggeredByPipelines', () => {
-      describe('with triggered_by pipeline', () => {
-        store.storePipeline(pipelineWithTriggeredBy);
-
-        expect(store.pipelineWithTriggeredBy.length).toEqual(1);
-        expect(store.triggeredByPipelines[0]).toEqual(
-          Object.assign({}, pipelineWithTriggeredBy.triggered_by, {
-            isLoading: false,
-            isCollpased: true,
-          }),
-        );
-      });
-
-      describe('without triggered_by pipeline', () => {
-        it('triggeredByPipelines should be an empty array', () => {
-          store.storePipeline({ triggered_by: null });
-
-          expect(store.triggeredByPipelines).toEqual([]);
-        });
-      });
-    });
-  });
-
-  describe('downstream', () => {
     beforeAll(() => {
-      store.storePipeline(pipelineWithBoth);
+      store.storePipeline(data);
     });
 
-    describe('requestTriggeredPipeline', () => {
-      beforeEach(() => {
-        store.requestTriggeredPipeline(store.triggeredPipelines[0]);
+    describe('triggered_by', () => {
+      it('sets triggered_by as an array', () => {
+        expect(store.state.pipeline.triggered_by.length).toEqual(1);
       });
 
-      it('sets isLoading to true for the requested pipeline', () => {
-        expect(store.triggeredPipelines[0].isLoading).toEqual(true);
+      it('adds isExpanding key set to false', () => {
+        expect(store.state.pipeline.triggered_by[0].isExpanded).toEqual(false);
       });
 
-      it('sets isExpanded to true for the requested pipeline', () => {
-        expect(store.triggeredPipelines[0].isExpanded).toEqual(true);
-      });
-
-      it('sets isLoading to false for the other pipelines', () => {
-        expect(store.triggeredPipelines[1].isLoading).toEqual(false);
-      });
-
-      it('sets isExpanded to false for the other pipelines', () => {
-        expect(store.triggeredPipelines[1].isExpanded).toEqual(false);
+      it('parses nested triggered_by', () => {
+        expect(store.state.pipeline.triggered_by[0].triggered_by.length).toEqual(1);
+        expect(store.state.pipeline.triggered_by[0].triggered_by[0].isExpanded).toEqual(false);
       });
     });
 
-    describe('receiveTriggeredPipelineSuccess', () => {
-      it('updates the given pipeline and sets it as the visible one', () => {
-        const receivedPipeline = store.triggeredPipelines[0];
-
-        store.receiveTriggeredPipelineSuccess(receivedPipeline);
-
-        expect(store.triggeredPipelines[0].isLoading).toEqual(false);
-        expect(store.triggered).toEqual(receivedPipeline);
+    describe('triggered', () => {
+      it('adds isExpanding key set to false for each triggered pipeline', () => {
+        store.state.pipeline.triggered.forEach(pipeline => {
+          expect(pipeline.isExpanded).toEqual(false);
+        });
       });
-    });
 
-    describe('receiveTriggeredPipelineError', () => {
-      it('resets the given pipeline and resets it as the visible one', () => {
-        const receivedPipeline = store.triggeredPipelines[0];
-
-        store.receiveTriggeredPipelineError(receivedPipeline);
-
-        expect(store.triggeredPipelines[0].isLoading).toEqual(false);
-        expect(store.triggeredPipelines[0].isExpanded).toEqual(false);
-
-        expect(store.triggered).toEqual({});
+      it('parses nested triggered pipelines', () => {
+        store.state.pipeline.triggered[1].triggered.forEach(pipeline => {
+          expect(pipeline.isExpanded).toEqual(false);
+        });
       });
     });
   });
 
-  describe('upstream', () => {
-    describe('requestTriggeredByPipeline', () => {
-      beforeEach(() => {
-        store.requestTriggeredByPipeline(store.triggeredByPipelines[0]);
-      });
-
-      it('sets isLoading to true for the requested pipeline', () => {
-        expect(store.triggeredByPipelines[0].isLoading).toEqual(true);
-      });
-
-      it('sets isExpanded to true for the requested pipeline', () => {
-        expect(store.triggeredByPipelines[0].isExpanded).toEqual(true);
-      });
+  describe('resetTriggeredByPipeline', () => {
+    beforeEach(() => {
+      store.storePipeline(data);
     });
 
-    describe('receiveTriggeredByPipelineSuccess', () => {
-      it('updates the given pipeline and sets it as the visible one', () => {
-        const receivedPipeline = store.triggeredByPipelines[0];
+    it('closes the pipeline & nested ones', () => {
+      store.state.pipeline.triggered_by[0].isExpanded = true;
+      store.state.pipeline.triggered_by[0].triggered_by[0].isExpanded = true;
 
-        store.receiveTriggeredByPipelineSuccess(receivedPipeline);
+      store.resetTriggeredByPipeline(store.state.pipeline, store.state.pipeline.triggered_by[0]);
 
-        expect(store.triggeredByPipelines[0].isLoading).toEqual(false);
-        expect(store.triggeredBy).toEqual(receivedPipeline);
-      });
+      expect(store.state.pipeline.triggered_by[0].isExpanded).toEqual(false);
+      expect(store.state.pipeline.triggered_by[0].triggered_by[0].isExpanded).toEqual(false);
+    });
+  });
+
+  describe('openTriggeredByPipeline', () => {
+    beforeEach(() => {
+      store.storePipeline(data);
     });
 
-    describe('receiveTriggeredByPipelineError', () => {
-      it('resets the given pipeline and resets it as the visible one', () => {
-        const receivedPipeline = store.triggeredByPipelines[0];
+    it('opens the given pipeline', () => {
+      store.openTriggeredByPipeline(store.state.pipeline, store.state.pipeline.triggered_by[0]);
 
-        store.receiveTriggeredByPipelineError(receivedPipeline);
+      expect(store.state.pipeline.triggered_by[0].isExpanded).toEqual(true);
+    });
+  });
 
-        expect(store.triggeredByPipelines[0].isLoading).toEqual(false);
-        expect(store.triggeredByPipelines[0].isExpanded).toEqual(false);
+  describe('closeTriggeredByPipeline', () => {
+    beforeEach(() => {
+      store.storePipeline(data);
+    });
 
-        expect(store.triggeredBy).toEqual({});
-      });
+    it('closes the given pipeline', () => {
+      // open it first
+      store.openTriggeredByPipeline(store.state.pipeline, store.state.pipeline.triggered_by[0]);
+
+      store.closeTriggeredByPipeline(store.state.pipeline, store.state.pipeline.triggered_by[0]);
+
+      expect(store.state.pipeline.triggered_by[0].isExpanded).toEqual(false);
+    });
+  });
+
+  describe('resetTriggeredPipelines', () => {
+    beforeEach(() => {
+      store.storePipeline(data);
+    });
+
+    it('closes the pipeline & nested ones', () => {
+      store.state.pipeline.triggered[0].isExpanded = true;
+      store.state.pipeline.triggered[0].triggered[0].isExpanded = true;
+
+      store.resetTriggeredPipeline(store.state.pipeline, store.state.pipeline.triggered[0]);
+
+      expect(store.state.pipeline.triggered[0].isExpanded).toEqual(false);
+      expect(store.state.pipeline.triggered[0].triggered[0].isExpanded).toEqual(false);
+    });
+  });
+
+  describe('openTriggeredPipeline', () => {
+    beforeEach(() => {
+      store.storePipeline(data);
+    });
+
+    it('opens the given pipeline', () => {
+      store.openTriggeredPipeline(store.state.pipeline, store.state.pipeline.triggered[0]);
+
+      expect(store.state.pipeline.triggered[0].isExpanded).toEqual(true);
+    });
+  });
+
+  describe('closeTriggeredPipeline', () => {
+    beforeEach(() => {
+      store.storePipeline(data);
+    });
+
+    it('closes the given pipeline', () => {
+      // open it first
+      store.openTriggeredPipeline(store.state.pipeline, store.state.pipeline.triggered[0]);
+
+      store.closeTriggeredPipeline(store.state.pipeline, store.state.pipeline.triggered[0]);
+
+      expect(store.state.pipeline.triggered[0].isExpanded).toEqual(false);
     });
   });
 });

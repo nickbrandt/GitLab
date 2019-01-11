@@ -1,19 +1,19 @@
 <script>
 import _ from 'underscore';
 import { GlLoadingIcon } from '@gitlab/ui';
-import LinkedPipelinesColumn from 'ee/pipelines/components/graph/linked_pipelines_column.vue';
-import EEGraphMixin from 'ee/pipelines/mixins/graph_component_mixin';
 import StageColumnComponent from '~/pipelines/components/graph/stage_column_component.vue';
-import GraphEEMixin from 'ee/pipelines/mixins/graph_pipeline_bundle_mixin'; // eslint-disable-line import/order
+import GraphMixin from '~/pipelines/mixins/graph_component_mixin';
+import LinkedPipelinesColumn from 'ee/pipelines/components/graph/linked_pipelines_column.vue';
+import GraphEEMixin from 'ee/pipelines/mixins/graph_pipeline_bundle_mixin';
 
 export default {
   name: 'PipelineGraph',
   components: {
-    LinkedPipelinesColumn,
     StageColumnComponent,
     GlLoadingIcon,
+    LinkedPipelinesColumn,
   },
-  mixins: [EEGraphMixin, GraphEEMixin],
+  mixins: [GraphMixin, GraphEEMixin],
   props: {
     isLoading: {
       type: Boolean,
@@ -37,35 +37,57 @@ export default {
       default: 'main',
     },
   },
+  upstream: 'upstream',
+  downstream: 'downstream',
+  data() {
+    return {
+      triggeredTopIndex: 1,
+    };
+  },
   computed: {
-    graph() {
-      return this.pipeline.details && this.pipeline.details.stages;
+    hasTriggeredBy() {
+      return (
+        this.type !== this.$options.downstream &&
+        this.pipeline.triggered_by &&
+        this.pipeline.triggered_by != null
+      );
+    },
+    triggeredByPipelines() {
+      return this.pipeline.triggered_by;
+    },
+    hasTriggered() {
+      return (
+        this.type !== this.$options.upstream &&
+        this.pipeline.triggered &&
+        this.pipeline.triggered.length > 0
+      );
+    },
+    triggeredPipelines() {
+      return this.pipeline.triggered;
+    },
+    expandedTriggeredBy() {
+      return (
+        this.pipeline.triggered_by &&
+        _.isArray(this.pipeline.triggered_by) &&
+        this.pipeline.triggered_by.find(el => el.isExpanded)
+      );
+    },
+    expandedTriggered() {
+      return this.pipeline.triggered && this.pipeline.triggered.find(el => el.isExpanded);
+    },
+
+    /**
+     * Calculates the margin top of the clicked downstream pipeline by
+     * adding the height of each linked pipeline and the margin
+     */
+    marginTop() {
+      return `${this.triggeredTopIndex * 52}px`;
     },
   },
   methods: {
-    // todo filipa: move this into a ce mixin
-    capitalizeStageName(name) {
-      const escapedName = _.escape(name);
-      return escapedName.charAt(0).toUpperCase() + escapedName.slice(1);
-    },
-    isFirstColumn(index) {
-      return index === 0;
-    },
-    stageConnectorClass(index, stage) {
-      let className;
-
-      // If it's the first stage column and only has one job
-      if (index === 0 && stage.groups.length === 1) {
-        className = 'no-margin';
-      } else if (index > 0) {
-        // If it is not the first column
-        className = 'left-margin';
-      }
-
-      return className;
-    },
-    refreshPipelineGraph() {
-      this.$emit('refreshPipelineGraph');
+    handleClickedDownstream(pipeline, clickedIndex) {
+      this.triggeredTopIndex = clickedIndex;
+      this.$emit('onClickTriggered', this.pipeline, pipeline);
     },
     hasOnlyOneJob(stage) {
       return stage.groups.length === 1;
@@ -79,19 +101,21 @@ export default {
       class="pipeline-visualization pipeline-graph"
       :class="{ 'pipeline-tab-content': !isLinkedPipeline }"
     >
-      <div class="text-center" v-if="isLoading"><gl-loading-icon :size="3" /></div>
+      <div v-if="isLoading" class="m-auto"><gl-loading-icon :size="3" /></div>
 
       <pipeline-graph
+        v-if="type !== $options.downstream && expandedTriggeredBy"
         type="upstream"
         class="d-inline-block upstream-pipeline"
-        v-if="expandedTriggeredBy && type !== 'downstream'"
+        :class="`js-upstream-pipeline-${expandedTriggeredBy.id}`"
         :is-loading="false"
         :pipeline="expandedTriggeredBy"
         :is-linked-pipeline="true"
         :mediator="mediator"
         @onClickTriggeredBy="
-          (parentPipeline, pipeline) => this.clickTriggeredByPipeline(parentPipeline, pipeline)
+          (parentPipeline, pipeline) => clickTriggeredByPipeline(parentPipeline, pipeline)
         "
+        @refreshPipelineGraph="requestRefreshPipelineGraph"
       />
 
       <linked-pipelines-column
@@ -99,7 +123,9 @@ export default {
         :linked-pipelines="triggeredByPipelines"
         :column-title="__('Upstream')"
         graph-position="left"
-        @linkedPipelineClick="pipeline => $emit('onClickTriggeredBy', this.pipeline, pipeline)"
+        @linkedPipelineClick="
+          linkedPipeline => $emit('onClickTriggeredBy', pipeline, linkedPipeline)
+        "
       />
 
       <ul
@@ -135,17 +161,19 @@ export default {
       />
 
       <pipeline-graph
+        v-if="type !== $options.upstream && expandedTriggered"
         type="downstream"
         class="d-inline-block"
-        v-if="expandedTriggered && type !== 'upstream'"
+        :class="`js-downstream-pipeline-${expandedTriggered.id}`"
         :is-loading="false"
         :pipeline="expandedTriggered"
         :is-linked-pipeline="true"
         :style="{ 'margin-top': marginTop }"
-        @onClickTriggered="
-          (parentPipeline, pipeline) => this.clickTriggeredPipeline(parentPipeline, pipeline)
-        "
         :mediator="mediator"
+        @onClickTriggered="
+          (parentPipeline, pipeline) => clickTriggeredPipeline(parentPipeline, pipeline)
+        "
+        @refreshPipelineGraph="requestRefreshPipelineGraph"
       />
     </div>
   </div>

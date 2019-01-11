@@ -1,3 +1,6 @@
+import flash from '~/flash';
+import { __ } from '~/locale';
+
 export default {
   methods: {
     /**
@@ -33,6 +36,13 @@ export default {
         'openTriggeredPipeline',
         'closeTriggeredPipeline',
       );
+    },
+    requestRefreshPipelineGraph() {
+      // When an action is clicked
+      // (wether in the dropdown or in the main nodes, we refresh the big graph)
+      this.mediator
+        .refreshPipeline()
+        .catch(() => flash(__('An error occurred while making the request.')));
     },
   },
 };
