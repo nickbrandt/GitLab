@@ -59,6 +59,40 @@ describe GroupsController do
     end
   end
 
+  context 'with sso enforcement enabled' do
+    let(:group) { create(:group, :private) }
+    let!(:saml_provider) { create(:saml_provider, group: group, enforced_sso: true) }
+    let(:identity) { create(:group_saml_identity, saml_provider: saml_provider) }
+    let(:guest_user) { identity.user }
+
+    before do
+      group.add_guest(guest_user)
+      sign_in(guest_user)
+    end
+
+    context 'without SAML session' do
+      it 'prevents access to group resources' do
+        get :show, params: { id: group }
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
+
+    context 'with active SAML session' do
+      before do
+        Gitlab::Session.with_session(@request.session) do
+          Gitlab::Auth::GroupSaml::SsoEnforcer.new(saml_provider).update_session
+        end
+      end
+
+      it 'allows access to group resources' do
+        get :show, params: { id: group }
+
+        expect(response).to have_gitlab_http_status(200)
+      end
+    end
+  end
+
   describe '"group overview content" preference behaviour' do
     describe 'GET #show' do
       subject { get :show, params: { id: group.to_param }, format: format }
@@ -132,7 +166,6 @@ describe GroupsController do
         end
       end
     end
-
     describe 'GET #details' do
       subject { get :details, params: { id: group.to_param } }
 
