@@ -138,7 +138,7 @@ module Gitlab
           when ActiveRecord::StatementInvalid, ActionView::Template::Error
             # After connecting to the DB Rails will wrap query errors using this
             # class.
-            connection_error?(error.original_exception)
+            connection_error?(error.cause)
           when *CONNECTION_ERRORS
             true
           else
@@ -151,8 +151,8 @@ module Gitlab
         end
 
         def serialization_failure?(error)
-          if error.respond_to?(:original_exception)
-            serialization_failure?(error.original_exception)
+          if error.cause
+            serialization_failure?(error.cause)
           else
             error.is_a?(PG::TRSerializationFailure)
           end
