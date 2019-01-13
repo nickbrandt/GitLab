@@ -144,6 +144,9 @@ export default {
       return {
         ...base,
         approvalsPath: store.approvalsPath,
+        apiApprovalsPath: store.apiApprovalsPath,
+        apiApprovePath: store.apiApprovePath,
+        apiUnapprovePath: store.apiUnapprovePath,
       };
     },
     fetchCodeQuality() {
