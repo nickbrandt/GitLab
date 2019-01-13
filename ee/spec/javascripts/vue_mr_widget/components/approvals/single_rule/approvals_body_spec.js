@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import ApprovalsBody from 'ee/vue_merge_request_widget/components/approvals/approvals_body.vue';
+import ApprovalsBody from 'ee/vue_merge_request_widget/components/approvals/single_rule/approvals_body.vue';
 
 describe('Approvals Body Component', () => {
   let vm;

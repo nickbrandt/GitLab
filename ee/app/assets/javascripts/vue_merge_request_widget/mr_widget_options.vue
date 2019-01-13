@@ -7,7 +7,7 @@ import MrWidgetLicenses from 'ee/vue_shared/license_management/mr_widget_license
 
 import { n__, s__, __, sprintf } from '~/locale';
 import CEWidgetOptions from '~/vue_merge_request_widget/mr_widget_options.vue';
-import MrWidgetApprovals from './components/approvals/mr_widget_approvals.vue';
+import MrWidgetApprovals from './components/approvals';
 import MrWidgetGeoSecondaryNode from './components/states/mr_widget_secondary_geo_node.vue';
 
 export default {
