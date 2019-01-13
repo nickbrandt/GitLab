@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import ApprovalsFooter from 'ee/vue_merge_request_widget/components/approvals/approvals_footer.vue';
+import ApprovalsFooter from 'ee/vue_merge_request_widget/components/approvals/single_rule/approvals_footer.vue';
 import { TEST_HOST } from 'spec/test_constants';
 
 describe('Approvals Footer Component', () => {
