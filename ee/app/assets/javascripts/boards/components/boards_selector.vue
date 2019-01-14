@@ -217,7 +217,7 @@ export default {
     <span class="boards-selector-wrapper js-boards-selector-wrapper">
       <gl-dropdown
         toggle-class="dropdown-menu-toggle js-dropdown-toggle"
-        menu-class="flex-column"
+        menu-class="flex-column dropdown-extended-height"
         :text="board.name"
         @show="loadBoards"
       >
