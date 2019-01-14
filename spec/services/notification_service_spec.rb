@@ -1308,6 +1308,7 @@ describe NotificationService, :mailer do
         let(:project_approvers) { create_list(:user, 3) }
 
         before do
+          stub_feature_flags(approval_rule: false)
           merge_request.target_project.update(approvals_before_merge: 1)
           project_approvers.each { |approver| create(:approver, user: approver, target: merge_request.target_project) }
         end

@@ -14,6 +14,7 @@ describe 'User approves a merge request', :js do
 
   context 'when user can approve' do
     before do
+      stub_feature_flags(approval_rule: false) # TODO check in !9001 when feature enabled
       visit(merge_request_path(merge_request))
     end
 
@@ -30,6 +31,7 @@ describe 'User approves a merge request', :js do
 
   context 'when a merge request is approved additionally' do
     before do
+      stub_feature_flags(approval_rule: false) # TODO check in !9001 when feature enabled
       project.add_developer(user2)
       project.add_developer(user3)
     end
@@ -73,6 +75,7 @@ describe 'User approves a merge request', :js do
 
   context 'when user cannot approve' do
     before do
+      stub_feature_flags(approval_rule: false) # TODO check in !9001 when feature enabled
       merge_request.approvers.create(user_id: user2.id)
 
       visit(merge_request_path(merge_request))

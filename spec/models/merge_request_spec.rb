@@ -2442,6 +2442,8 @@ describe MergeRequest do
     let(:stranger) { create(:user) }
 
     before do
+      stub_feature_flags(approval_rule: false)
+
       project.add_developer(author)
       project.add_developer(approver)
       project.add_developer(approver_2)

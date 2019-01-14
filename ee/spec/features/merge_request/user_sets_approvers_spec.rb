@@ -53,6 +53,7 @@ describe 'Merge request > User sets approvers', :js do
       let(:other_user) { create(:user) }
 
       before do
+        stub_feature_flags(approval_rule: false) # TODO check in !9001 when feature enabled
         project.add_developer(user)
         project.add_developer(other_user)
 
@@ -108,6 +109,7 @@ describe 'Merge request > User sets approvers', :js do
       let(:merge_request) { create(:merge_request, source_project: project) }
 
       before do
+        stub_feature_flags(approval_rule: false) # TODO check in !9001 when feature enabled
         project.add_developer(user)
 
         sign_in(user)

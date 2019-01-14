@@ -9,6 +9,8 @@ describe API::MergeRequestApprovals do
 
   before do
     project.update_attribute(:approvals_before_merge, 2)
+
+    stub_feature_flags(approval_rule: false)
   end
 
   describe 'GET :id/merge_requests/:merge_request_iid/approvals' do

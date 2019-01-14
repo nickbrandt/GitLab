@@ -8,6 +8,10 @@ describe MergeRequests::RemoveApprovalService do
 
     subject(:service) { described_class.new(project, user) }
 
+    before do
+      stub_feature_flags(approval_rule: false)
+    end
+
     def execute!
       service.execute(merge_request)
     end
