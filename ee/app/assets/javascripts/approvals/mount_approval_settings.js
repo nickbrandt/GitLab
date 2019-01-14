@@ -10,8 +10,7 @@ export default function mountApprovalSettings(el) {
     return null;
   }
 
-  const store = createStore();
-  store.dispatch('setSettings', {
+  const store = createStore({
     ...el.dataset,
   });
 

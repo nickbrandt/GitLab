@@ -4,17 +4,6 @@ import Api from 'ee/api';
 import * as types from './mutation_types';
 import { mapApprovalRuleRequest, mapApprovalRulesResponse } from '../mappers';
 
-const DEFAULT_SETTINGS = {
-  canEdit: true,
-};
-
-export const setSettings = ({ commit }, settings) => {
-  commit(types.SET_SETTINGS, {
-    ...DEFAULT_SETTINGS,
-    ...settings,
-  });
-};
-
 export const requestRules = ({ commit }) => {
   commit(types.SET_LOADING, true);
 };

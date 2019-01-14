@@ -9,16 +9,6 @@ describe('EE approvals store mutations', () => {
     state = createState();
   });
 
-  describe(types.SET_SETTINGS, () => {
-    it('sets the settings', () => {
-      const newSettings = { projectId: 7 };
-
-      mutations[types.SET_SETTINGS](state, newSettings);
-
-      expect(state.settings).toEqual(newSettings);
-    });
-  });
-
   describe(types.SET_LOADING, () => {
     it('sets isLoading', () => {
       state.isLoading = false;

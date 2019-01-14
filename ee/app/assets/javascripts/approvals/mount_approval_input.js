@@ -11,8 +11,7 @@ export default function mountApprovalInput(el) {
     return null;
   }
 
-  const store = createStore();
-  store.dispatch('setSettings', {
+  const store = createStore({
     ...el.dataset,
     canEdit: parseBoolean(el.dataset.canEdit),
   });

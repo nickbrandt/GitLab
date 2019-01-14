@@ -36,21 +36,6 @@ describe('EE approvals store actions', () => {
     spyOn(Api, 'deleteProjectApprovalRule');
   });
 
-  describe('setSettings', () => {
-    it('sets the settings', done => {
-      const settings = { projectId: 7 };
-
-      testAction(
-        actions.setSettings,
-        settings,
-        {},
-        [{ type: types.SET_SETTINGS, payload: settings }],
-        [],
-        done,
-      );
-    });
-  });
-
   describe('requestRules', () => {
     it('sets loading', done => {
       testAction(
