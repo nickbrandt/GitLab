@@ -223,6 +223,17 @@ describe('Grouped security reports app', () => {
         });
       }, 0);
     });
+
+    it('has the success icon for fixed vulnerabilities', done => {
+      setTimeout(() => {
+        const icon = vm.$el.querySelector(
+          '.js-sast-container~.js-plain-element .ic-status_success_borderless',
+        );
+
+        expect(icon).not.toBeNull();
+        done();
+      }, 0);
+    });
   });
 
   describe('with the pipelinePath prop', () => {
