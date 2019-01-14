@@ -4,8 +4,6 @@ module Gitlab
   module Ci
     module Pipeline
       module Seed
-        ## TODO this should become Seed::Job now
-        #
         class Build < Seed::Base
           include Gitlab::Utils::StrongMemoize
 
@@ -14,9 +12,6 @@ module Gitlab
           def initialize(pipeline, attributes)
             @pipeline = pipeline
             @attributes = attributes
-
-            # TODO we should extract that
-            @type = attributes.dig(:options, :trigger) ? ::Ci::Bridge : ::Ci::Build
 
             @only = Gitlab::Ci::Build::Policy
               .fabricate(attributes.delete(:only))
@@ -40,11 +35,21 @@ module Gitlab
               tag: @pipeline.tag,
               trigger_request: @pipeline.legacy_trigger,
               protected: @pipeline.protected_ref?
-            ).compact
+            )
+          end
+
+          def bridge?
+            @attributes.to_h.dig(:options, :trigger).present?
           end
 
           def to_resource
-            strong_memoize(:resource) { @type.new(attributes) }
+            strong_memoize(:resource) do
+              if bridge?
+                ::Ci::Bridge.new(attributes)
+              else
+                ::Ci::Build.new(attributes)
+              end
+            end
           end
         end
       end
