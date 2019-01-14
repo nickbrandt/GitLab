@@ -1,0 +1,6 @@
+---
+title: Add keyboard navigation to issue board switcher and remove duplicate scroll
+  bar
+merge_request: 8591
+author:
+type: fixed
