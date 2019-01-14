@@ -15,6 +15,8 @@ class ApprovalMergeRequestRule < ApplicationRecord
   has_one :approval_merge_request_rule_source
   has_one :approval_project_rule, through: :approval_merge_request_rule_source
 
+  validate :validate_approvals_required
+
   def project
     merge_request.target_project
   end
@@ -44,4 +46,15 @@ class ApprovalMergeRequestRule < ApplicationRecord
     !code_owner?
   end
   alias_method :regular?, :regular
+
+  private
+
+  def validate_approvals_required
+    return unless approval_project_rule
+    return unless approvals_required_changed?
+
+    if approvals_required < approval_project_rule.approvals_required
+      errors.add(:approvals_required, :greater_than_or_equal_to, count: approval_project_rule.approvals_required)
+    end
+  end
 end
