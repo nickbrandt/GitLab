@@ -18,7 +18,11 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
     describe '#value' do
       it 'is returns a bridge job configuration' do
         expect(subject.value).to eq(name: :my_trigger,
-                                    trigger: { project: 'some/project' })
+                                    trigger: { project: 'some/project' },
+                                    ignore: false,
+                                    stage: 'test',
+                                    only: { refs: %w[branches tags] },
+                                    except: {})
       end
     end
   end
@@ -36,7 +40,11 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
       it 'is returns a bridge job configuration hash' do
         expect(subject.value).to eq(name: :my_trigger,
                                     trigger: { project: 'some/project',
-                                               branch: 'feature' })
+                                               branch: 'feature' },
+                                    ignore: false,
+                                    stage: 'test',
+                                    only: { refs: %w[branches tags] },
+                                    except: {})
       end
     end
   end

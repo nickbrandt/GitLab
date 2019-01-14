@@ -60,7 +60,11 @@ describe Gitlab::Ci::Config::Entry::Jobs do
         expect(subject.value).to eq(
           my_trigger: {
             name: :my_trigger,
-            trigger: { project: 'my/project' }
+            trigger: { project: 'my/project' },
+            stage: 'test',
+            only: { refs: %w[branches tags] },
+            except: {},
+            ignore: false
           },
           regular_job: {
             script: %w[something],

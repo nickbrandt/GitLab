@@ -44,8 +44,8 @@ module EE
             entry :except, ::Gitlab::Ci::Config::Entry::Policy,
               description: 'Refs policy this job will be executed for.'
 
-            helpers *ALLOWED_KEYS
-            attributes *ALLOWED_KEYS
+            helpers(*ALLOWED_KEYS)
+            attributes(*ALLOWED_KEYS)
 
             def name
               @metadata[:name]
