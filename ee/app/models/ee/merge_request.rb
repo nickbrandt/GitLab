@@ -22,6 +22,7 @@ module EE
       has_many :draft_notes
 
       validate :validate_approvals_before_merge, unless: :importing?
+      validate :validate_approval_rule_source
 
       delegate :sha, to: :head_pipeline, prefix: :head_pipeline, allow_nil: true
       delegate :sha, to: :base_pipeline, prefix: :base_pipeline, allow_nil: true
@@ -54,6 +55,21 @@ module EE
         errors.add :validate_approvals_before_merge,
                    'Number of approvals must be at least that of approvals on the target project'
       end
+    end
+
+    def validate_approval_rule_source
+      return unless approval_rules.any?
+
+      local_project_rule_ids = approval_rules.map { |rule| rule.approval_merge_request_rule_source&.approval_project_rule_id }
+      local_project_rule_ids.compact!
+
+      invalid = if new_record?
+                  local_project_rule_ids.to_set != project.approval_rule_ids.to_set
+                else
+                  (local_project_rule_ids - project.approval_rule_ids).present?
+                end
+
+      errors.add(:approval_rules, :invalid_sourcing_to_project_rules) if invalid
     end
 
     def participant_approvers

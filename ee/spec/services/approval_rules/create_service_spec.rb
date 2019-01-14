@@ -88,5 +88,41 @@ describe ApprovalRules::CreateService do
     let(:target) { create(:merge_request, source_project: project, target_project: project) }
 
     it_behaves_like "creatable"
+
+    context 'when project rule id is present' do
+      let(:project_rule) { create(:approval_project_rule, project: project) }
+
+      it 'associates with project rule' do
+        result = described_class.new(target, user, {
+          name: 'foo',
+          approvals_required: 1,
+          approval_project_rule_id: project_rule.id
+        }).execute
+
+        expect(result[:status]).to eq(:success)
+
+        rule = result[:rule]
+
+        expect(rule.approval_project_rule).to eq(project_rule)
+      end
+    end
+
+    context "when project rule id is not the same as MR's project" do
+      let(:project_rule) { create(:approval_project_rule) }
+
+      it 'ignores assignment' do
+        result = described_class.new(target, user, {
+          name: 'foo',
+          approvals_required: 1,
+          approval_project_rule_id: project_rule.id
+        }).execute
+
+        expect(result[:status]).to eq(:success)
+
+        rule = result[:rule]
+
+        expect(rule.approval_project_rule).to eq(nil)
+      end
+    end
   end
 end

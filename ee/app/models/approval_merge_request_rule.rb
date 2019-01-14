@@ -21,6 +21,11 @@ class ApprovalMergeRequestRule < ApplicationRecord
     merge_request.target_project
   end
 
+  def approval_project_rule_id=(approval_project_rule_id)
+    self.approval_merge_request_rule_source ||= build_approval_merge_request_rule_source
+    self.approval_merge_request_rule_source.approval_project_rule_id = approval_project_rule_id
+  end
+
   # Users who are eligible to approve, including specified group members.
   # Excludes the author if 'self-approval' isn't explicitly
   # enabled on project settings.
