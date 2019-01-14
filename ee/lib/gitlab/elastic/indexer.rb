@@ -89,7 +89,7 @@ module Gitlab
         sha = head_commit.try(:sha)
         sha ||= Gitlab::Git::BLANK_SHA
         index_status.update(last_commit: sha, indexed_at: Time.now)
-        project.index_status(true)
+        project.reload_index_status
       end
       # rubocop: enable CodeReuse/ActiveRecord
     end

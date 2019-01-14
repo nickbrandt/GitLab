@@ -240,7 +240,7 @@ describe Project do
   describe '#push_rule' do
     let(:project) { create(:project, push_rule: create(:push_rule)) }
 
-    subject(:push_rule) { project.push_rule(true) }
+    subject(:push_rule) { project.reload_push_rule }
 
     it { is_expected.not_to be_nil }
 

@@ -54,7 +54,7 @@ describe 'Project mirror', :js do
   describe 'configuration' do
     # Start from a project with no mirroring set up
     let(:project) { create(:project, :repository, creator: user) }
-    let(:import_data) { project.import_data(true) }
+    let(:import_data) { project.reload_import_data }
 
     before do
       project.add_maintainer(user)
