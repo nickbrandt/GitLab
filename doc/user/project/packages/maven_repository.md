@@ -1,23 +1,25 @@
 # GitLab Maven Repository **[PREMIUM]**
 
-> Introduced in [GitLab Premium](https://about.gitlab.com/pricing/) 11.3.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/5811) in
+  [GitLab Premium](https://about.gitlab.com/pricing/) 11.3.
 
 With the GitLab [Maven](https://maven.apache.org) Repository, every
 project can have its own space to store its Maven artifacts.
 
 ![GitLab Maven Repository](img/maven_package_view.png)
 
-## Enabling Maven Repository
+## Enabling the Maven Repository
 
 NOTE: **Note:**
 This option is available only if your GitLab administrator has
-[enabled Maven Repository](../../../administration/maven_repository.md).
+[enabled support for the Maven repository](../../../administration/packages.md).
 
-In order to use the GitLab Maven Repository, you must enable the
-Repository. To enable (or disable) it:
+After the Packages feature is enabled, the Maven Repository will be available for
+all new projects by default. To enable it for existing projects, or if you want
+to disable it:
 
 1. Navigate to your project's **Settings > General > Permissions**.
-1. Find the "Packages" feature and enable it.
+1. Find the Packages feature and enable or disable it.
 1. Click on **Save changes** for the changes to take effect.
 
 You should then be able to see the **Packages** section on the left sidebar.
