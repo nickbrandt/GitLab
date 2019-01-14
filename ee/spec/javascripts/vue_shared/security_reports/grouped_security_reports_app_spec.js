@@ -12,8 +12,6 @@ import {
   dockerBaseReport,
   dast,
   dastBase,
-  sastHeadAllIssues,
-  sastBaseAllIssues,
 } from './mock_data';
 
 describe('Grouped security reports app', () => {
@@ -224,42 +222,6 @@ describe('Grouped security reports app', () => {
           done();
         });
       }, 0);
-    });
-  });
-
-  describe('with all issues for sast and dependency scanning', () => {
-    beforeEach(() => {
-      mock.onGet('sast_head.json').reply(200, sastHeadAllIssues);
-      mock.onGet('sast_base.json').reply(200, sastBaseAllIssues);
-      mock.onGet('dast_head.json').reply(200, dast);
-      mock.onGet('dast_base.json').reply(200, dastBase);
-      mock.onGet('sast_container_head.json').reply(200, dockerReport);
-      mock.onGet('sast_container_base.json').reply(200, dockerBaseReport);
-      mock.onGet('dss_head.json').reply(200, sastHeadAllIssues);
-      mock.onGet('dss_base.json').reply(200, sastBaseAllIssues);
-      mock.onGet('vulnerability_feedback_path.json').reply(200, []);
-
-      vm = mountComponent(Component, {
-        headBlobPath: 'path',
-        baseBlobPath: 'path',
-        sastHeadPath: 'sast_head.json',
-        sastBasePath: 'sast_base.json',
-        dastHeadPath: 'dast_head.json',
-        dastBasePath: 'dast_base.json',
-        sastContainerHeadPath: 'sast_container_head.json',
-        sastContainerBasePath: 'sast_container_base.json',
-        dependencyScanningHeadPath: 'dss_head.json',
-        dependencyScanningBasePath: 'dss_base.json',
-        sastHelpPath: 'path',
-        sastContainerHelpPath: 'path',
-        dastHelpPath: 'path',
-        dependencyScanningHelpPath: 'path',
-        vulnerabilityFeedbackPath: 'vulnerability_feedback_path.json',
-        vulnerabilityFeedbackHelpPath: 'path',
-        pipelineId: 123,
-        canCreateIssue: true,
-        canCreateFeedback: true,
-      });
     });
   });
 
