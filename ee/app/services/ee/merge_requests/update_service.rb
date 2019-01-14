@@ -50,7 +50,8 @@ module EE
         return if merge_request.merged?
         return unless merge_request.previous_changes.include?(:approvals_before_merge)
 
-        merge_request.approval_rules.regular.update_all(approvals_required: merge_request.approvals_before_merge)
+        approvals_required = merge_request.approvals_before_merge || merge_request.target_project.approvals_before_merge
+        merge_request.approval_rules.regular.update_all(approvals_required: approvals_required)
       end
     end
   end
