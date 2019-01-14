@@ -1,13 +1,13 @@
 import $ from 'jquery';
 
-const snowPlowEnabled = () => typeof window.snowplow === 'function';
+const snowplowEnabled = () => typeof window.snowplow === 'function';
 
 const trackEvent = (
   category,
   eventName,
   additionalData = { label: '', property: '', value: '' },
 ) => {
-  if (!snowPlowEnabled()) {
+  if (!snowplowEnabled()) {
     return;
   }
 
@@ -33,7 +33,7 @@ const isBsDropdown = element => {
 };
 
 const bindTrackableContainer = (container = '', category = document.body.dataset.page) => {
-  if (!snowPlowEnabled()) {
+  if (!snowplowEnabled()) {
     return;
   }
 
@@ -92,6 +92,7 @@ const bindTrackableContainer = (container = '', category = document.body.dataset
 };
 
 export default {
+  snowplowEnabled,
   trackEvent,
   bindTrackableContainer,
 };
