@@ -183,7 +183,7 @@ describe('Grouped security reports app', () => {
 
         // Renders the summary text
         expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
-          'Security scanning detected 6 new, and 2 fixed vulnerabilities',
+          'Security scanning detected 6 new, and 3 fixed vulnerabilities',
         );
 
         // Renders the expand button
@@ -198,8 +198,11 @@ describe('Grouped security reports app', () => {
         expect(trimText(vm.$el.textContent)).toContain(
           'Dependency scanning detected 2 new, and 1 fixed vulnerabilities',
         );
+
         // Renders container scanning result
-        expect(vm.$el.textContent).toContain('Container scanning detected 1 new vulnerability');
+        expect(vm.$el.textContent).toContain(
+          'Container scanning detected 1 new, and 1 fixed vulnerabilities',
+        );
 
         // Renders DAST result
         expect(vm.$el.textContent).toContain('DAST detected 1 new vulnerability');

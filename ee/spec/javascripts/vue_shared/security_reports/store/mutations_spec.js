@@ -12,6 +12,7 @@ import {
   parsedDependencyScanningIssuesHead,
   parsedDependencyScanningBaseStore,
   parsedDependencyScanningIssuesStore,
+  parsedSastContainerBaseStore,
   dockerReport,
   dockerBaseReport,
   dockerNewIssues,
@@ -184,8 +185,8 @@ describe('security reports mutations', () => {
 
         expect(stateCopy.sastContainer.isLoading).toEqual(false);
         expect(stateCopy.sastContainer.newIssues).toEqual(dockerNewIssues);
-        expect(stateCopy.sastContainer.resolvedIssues).toEqual([]);
-        expect(stateCopy.summaryCounts).toEqual({ added: 1, fixed: 0, existing: 0 });
+        expect(stateCopy.sastContainer.resolvedIssues).toEqual(parsedSastContainerBaseStore);
+        expect(stateCopy.summaryCounts).toEqual({ added: 1, fixed: 1, existing: 0 });
       });
     });
 
