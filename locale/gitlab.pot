@@ -5180,7 +5180,7 @@ msgstr ""
 msgid "Latest pipeline for this branch"
 msgstr ""
 
-msgid "Learn how to %{no_packages_link_start}publish and share your Maven packages%{no_packages_link_end} with GitLab. Additional package types will be supported in future releases."
+msgid "Learn how to %{no_packages_link_start}publish and share your packages%{no_packages_link_end} with GitLab."
 msgstr ""
 
 msgid "Learn more"
