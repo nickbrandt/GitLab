@@ -6,6 +6,7 @@ import sortableConfig from 'ee/sortable/sortable_config';
 import { GlLoadingIcon } from '@gitlab/ui';
 import issueItem from './issue_item.vue';
 import addIssuableForm from './add_issuable_form.vue';
+import { issuableIconMap } from '../constants';
 
 export default {
   name: 'RelatedIssuesBlock',
@@ -99,6 +100,9 @@ export default {
     hasHelpPath() {
       return this.helpPath.length > 0;
     },
+    issuableTypeIcon() {
+      return issuableIconMap[this.issuableType];
+    },
   },
   mounted() {
     if (this.canReorder) {
@@ -161,7 +165,7 @@ export default {
               class="js-related-issues-header-issue-count related-issues-header-issue-count issue-count-badge mx-1"
             >
               <span class="issue-count-badge-count">
-                <icon name="issues" class="mr-1 text-secondary" /> {{ badgeLabel }}
+                <icon :name="issuableTypeIcon" class="mr-1 text-secondary" /> {{ badgeLabel }}
               </span>
             </div>
             <button

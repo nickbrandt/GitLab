@@ -147,4 +147,30 @@ describe('RelatedIssuesBlock', () => {
       expect(beforeAfterIds.afterId).toBe(5);
     });
   });
+
+  describe('renders correct icon when', () => {
+    [
+      {
+        icon: 'issues',
+        issuableType: 'issue',
+      },
+      {
+        icon: 'epic',
+        issuableType: 'epic',
+      },
+    ].forEach(({ issuableType, icon }) => {
+      it(`issuableType=${issuableType} is passed`, () => {
+        vm = new RelatedIssuesBlock({
+          propsData: {
+            pathIdSeparator: '#',
+            issuableType,
+          },
+        }).$mount();
+
+        const el = vm.$el.querySelector(`.issue-count-badge-count .ic-${icon}`);
+
+        expect(el).not.toBeNull();
+      });
+    });
+  });
 });
