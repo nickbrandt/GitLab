@@ -49,7 +49,6 @@ export default {
       return {
         name: this.invalidName,
         approvalsRequired: this.invalidApprovalsRequired,
-        approvers: this.invalidApprovers,
       };
     },
     invalidName() {
@@ -59,9 +58,6 @@ export default {
       return !_.isNumber(this.approvalsRequired) || this.approvalsRequired < 0
         ? __('Please enter a non-negative number')
         : '';
-    },
-    invalidApprovers() {
-      return !this.approvers.length ? __('Please select and add a member') : '';
     },
     isValid() {
       return Object.keys(this.validation).every(key => !this.validation[key]);
@@ -154,9 +150,7 @@ export default {
             :project-id="projectId"
             :skip-user-ids="userIds"
             :skip-group-ids="groupIds"
-            :is-invalid="!!validation.approvers"
           />
-          <div class="invalid-feedback">{{ validation.approvers }}</div>
         </div>
         <gl-button variant="success" class="btn-inverted prepend-left-8" @click="addSelection">
           {{ __('Add') }}

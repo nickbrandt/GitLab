@@ -75,11 +75,7 @@ describe('Approvals RuleForm', () => {
     });
 
     it('at first, shows no validation', () => {
-      const inputs = [
-        findNameInput(wrapper),
-        findApprovalsRequiredInput(wrapper),
-        findApproversSelect(wrapper),
-      ];
+      const inputs = [findNameInput(wrapper), findApprovalsRequiredInput(wrapper)];
       const invalidInputs = inputs.filter(x => !x.isValid());
       const feedbacks = inputs.map(x => x.feedback());
 
@@ -111,16 +107,6 @@ describe('Approvals RuleForm', () => {
 
       expect(isValid()).toBe(false);
       expect(feedback()).toEqual('Please enter a non-negative number');
-    });
-
-    it('on submit, shows approvers validation', () => {
-      const { isValid, feedback } = findApproversSelect(wrapper);
-      wrapper.vm.approvers = [];
-
-      wrapper.vm.submit();
-
-      expect(isValid()).toBe(false);
-      expect(feedback()).toEqual('Please select and add a member');
     });
 
     it('on submit with data, posts rule', () => {
