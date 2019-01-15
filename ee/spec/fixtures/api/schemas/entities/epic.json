@@ -6,7 +6,7 @@
     "author_id": { "type": "integer" },
     "group_id": { "type": ["integer", "null"] },
     "title": { "type": "string" },
-    "lock_version": { "type": ["string", "null"] },
+    "lock_version": { "type": ["integer", "null"] },
     "description": { "type": ["string" , "null"] },
     "confidential": { "type": "boolean" },
     "milestone_id": { "type": ["string", "null"] },

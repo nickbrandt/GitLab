@@ -21,7 +21,7 @@ module EE
         delegate :service_specification, to: :runner_session, allow_nil: true
 
         has_many :sourced_pipelines,
-          class_name: ::Ci::Sources::Pipeline,
+          class_name: "::Ci::Sources::Pipeline",
           foreign_key: :source_job_id
       end
 
