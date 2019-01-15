@@ -160,7 +160,7 @@ export default {
         v-if="editable"
         class="float-right js-weight-edit-link"
         href="#"
-        @click="showEditField(!shouldShowEditField);"
+        @click="showEditField(!shouldShowEditField)"
       >
         {{ __('Edit') }}
       </a>

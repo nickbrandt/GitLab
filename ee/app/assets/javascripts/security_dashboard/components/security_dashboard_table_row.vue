@@ -71,7 +71,7 @@ export default {
           <gl-button
             class="btn js-vulnerability-info"
             variant="blank"
-            @click="openModal({ vulnerability });"
+            @click="openModal({ vulnerability })"
             >{{ vulnerability.name }}</gl-button
           >
           <span v-show="isDismissed" class="prepend-left-8 vertical-align-middle">DISMISSED</span>

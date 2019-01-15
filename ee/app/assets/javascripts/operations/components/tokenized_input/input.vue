@@ -40,7 +40,7 @@ export default {
       </div>
       <div
         class="js-token-remove tokenized-input-token-remove d-flex align-items-center text-secondary py-0 px-1 rounded-right"
-        @click="removeProjectTokenAt(index);"
+        @click="removeProjectTokenAt(index)"
       >
         <icon name="close" />
       </div>

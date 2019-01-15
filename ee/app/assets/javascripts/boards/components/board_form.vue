@@ -226,7 +226,7 @@ export default {
         <div v-if="scopedIssueBoardFeatureEnabled">
           <div v-if="canAdminBoard" class="media append-bottom-10">
             <label class="form-section-title label-bold media-body"> Board scope </label>
-            <button v-if="collapseScope" type="button" class="btn" @click="expanded = !expanded;">
+            <button v-if="collapseScope" type="button" class="btn" @click="expanded = !expanded">
               {{ expandButtonText }}
             </button>
           </div>

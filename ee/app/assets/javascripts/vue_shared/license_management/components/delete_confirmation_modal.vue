@@ -31,7 +31,7 @@ export default {
     :footer-primary-button-text="s__('LicenseManagement|Remove license')"
     footer-primary-button-variant="danger"
     @cancel="resetLicenseInModal"
-    @submit="deleteLicense(currentLicenseInModal);"
+    @submit="deleteLicense(currentLicenseInModal)"
   >
     <span v-if="currentLicenseInModal" v-html="confirmationText"></span>
   </gl-modal>

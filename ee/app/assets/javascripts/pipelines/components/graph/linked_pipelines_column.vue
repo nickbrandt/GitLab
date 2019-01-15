@@ -45,7 +45,7 @@ export default {
         :pipeline-status="pipeline.details.status"
         :pipeline-path="pipeline.path"
         :is-loading="pipeline.isLoading"
-        @pipelineClicked="$emit('linkedPipelineClick', pipeline, index);"
+        @pipelineClicked="$emit('linkedPipelineClick', pipeline, index)"
       />
     </ul>
   </div>

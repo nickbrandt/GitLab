@@ -100,7 +100,7 @@ export default {
         :label="actionButtonText"
         :loading="epicStatusChangeInProgress"
         :container-class="actionButtonClass"
-        @click="toggleEpicStatus(isEpicOpen);"
+        @click="toggleEpicStatus(isEpicOpen)"
       />
     </div>
   </div>

@@ -96,9 +96,9 @@ export default {
       :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
       :can-create-issue-permission="true"
       :can-create-feedback-permission="true"
-      @createNewIssue="createIssue({ vulnerability: modal.vulnerability });"
-      @dismissIssue="dismissVulnerability({ vulnerability: modal.vulnerability });"
-      @revertDismissIssue="revertDismissal({ vulnerability: modal.vulnerability });"
+      @createNewIssue="createIssue({ vulnerability: modal.vulnerability })"
+      @dismissIssue="dismissVulnerability({ vulnerability: modal.vulnerability })"
+      @revertDismissIssue="revertDismissal({ vulnerability: modal.vulnerability })"
     />
   </div>
 </template>

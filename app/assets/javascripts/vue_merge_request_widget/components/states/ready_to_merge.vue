@@ -245,7 +245,7 @@ export default {
             :class="mergeButtonClass"
             type="button"
             class="qa-merge-button"
-            @click="handleMergeButtonClick();"
+            @click="handleMergeButtonClick()"
           >
             <i v-if="isMakingRequest" class="fa fa-spinner fa-spin" aria-hidden="true"></i>
             {{ mergeButtonText }}
@@ -269,7 +269,7 @@ export default {
               <a
                 class="merge_when_pipeline_succeeds qa-merge-when-pipeline-succeeds-option"
                 href="#"
-                @click.prevent="handleMergeButtonClick(true);"
+                @click.prevent="handleMergeButtonClick(true)"
               >
                 <span class="media">
                   <span class="merge-opt-icon" aria-hidden="true" v-html="successSvg"></span>
@@ -281,7 +281,7 @@ export default {
               <a
                 class="accept-merge-request qa-merge-immediately-option"
                 href="#"
-                @click.prevent="handleMergeButtonClick(false, true);"
+                @click.prevent="handleMergeButtonClick(false, true)"
               >
                 <span class="media">
                   <span class="merge-opt-icon" aria-hidden="true" v-html="warningSvg"></span>

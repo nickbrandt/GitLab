@@ -171,7 +171,7 @@ export default {
               class="js-issue-count-badge-add-button issue-count-badge-add-button btn btn-sm btn-default qa-add-issues-button"
               aria-label="Add an issue"
               data-placement="top"
-              @click="$emit('toggleAddRelatedIssuesForm', $event);"
+              @click="$emit('toggleAddRelatedIssuesForm', $event)"
             >
               <i class="fa fa-plus" aria-hidden="true"></i>
             </button>
@@ -192,11 +192,11 @@ export default {
           :pending-references="pendingReferences"
           :auto-complete-sources="autoCompleteSources"
           :path-id-separator="pathIdSeparator"
-          @pendingIssuableRemoveRequest="$emit('pendingIssuableRemoveRequest', $event);"
-          @addIssuableFormInput="$emit('addIssuableFormInput', $event);"
-          @addIssuableFormBlur="$emit('addIssuableFormBlur', $event);"
-          @addIssuableFormSubmit="$emit('addIssuableFormSubmit', $event);"
-          @addIssuableFormCancel="$emit('addIssuableFormCancel', $event);"
+          @pendingIssuableRemoveRequest="$emit('pendingIssuableRemoveRequest', $event)"
+          @addIssuableFormInput="$emit('addIssuableFormInput', $event)"
+          @addIssuableFormBlur="$emit('addIssuableFormBlur', $event)"
+          @addIssuableFormSubmit="$emit('addIssuableFormSubmit', $event)"
+          @addIssuableFormCancel="$emit('addIssuableFormCancel', $event)"
         />
       </div>
       <div
@@ -243,7 +243,7 @@ export default {
               :can-reorder="canReorder"
               :path-id-separator="pathIdSeparator"
               event-namespace="relatedIssue"
-              @relatedIssueRemoveRequest="$emit('relatedIssueRemoveRequest', $event);"
+              @relatedIssueRemoveRequest="$emit('relatedIssueRemoveRequest', $event)"
             />
           </li>
         </ul>

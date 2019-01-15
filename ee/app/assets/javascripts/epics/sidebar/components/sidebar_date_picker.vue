@@ -219,7 +219,7 @@ export default {
           :name="fieldName"
           :checked="selectedDateIsFixed"
           type="radio"
-          @click="toggleDateType(true);"
+          @click="toggleDateType(true)"
         />
         <span v-show="!editing" class="prepend-left-5">{{ __('Fixed:') }}</span>
         <date-picker
@@ -244,7 +244,7 @@ export default {
               <button
                 type="button"
                 class="btn-blank btn-link btn-default-hover-link"
-                @click="newDateSelected(null);"
+                @click="newDateSelected(null)"
               >
                 {{ __('remove') }}
               </button>
@@ -266,7 +266,7 @@ export default {
           :name="fieldName"
           :checked="!selectedDateIsFixed"
           type="radio"
-          @click="toggleDateType(false);"
+          @click="toggleDateType(false)"
         />
         <span class="prepend-left-5">{{ __('From milestones:') }}</span>
         <span class="value-content">{{ dateFromMilestonesWords }}</span>
