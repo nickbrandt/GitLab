@@ -10,6 +10,7 @@ module EE
       override :execute
       def execute
         should_remove_old_approvers = params.delete(:remove_old_approvers)
+        should_clear_import_data_credentials = params.delete(:clear_import_data_credentials)
         wiki_was_enabled = project.wiki_enabled?
 
         limit = params.delete(:repository_size_limit)
@@ -18,6 +19,10 @@ module EE
           project.errors.add(:mirror_user_id, 'is invalid')
           return project
         end
+
+        # Existing import data may have SSH or HTTP credentials. Often we won't want
+        # to merge both credentials, so clear them out if requested.
+        project.import_data&.clear_credentials if should_clear_import_data_credentials
 
         result = super do
           # Repository size limit comes as MB from the view
