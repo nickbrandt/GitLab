@@ -73,12 +73,14 @@ describe MergeRequests::RefreshService do
         end
       end
 
-      context 'when code owners enabled' do
+      context 'when code owners enabled, with approval_rule disabled' do
         let(:old_owners) { [] }
         let(:new_owners) { [] }
         let(:relevant_merge_requests) { [merge_request, another_merge_request] }
 
         before do
+          stub_feature_flags(approval_rule: false)
+
           relevant_merge_requests.each do |merge_request|
             expect(::Gitlab::CodeOwners).to receive(:for_merge_request).with(merge_request).and_return(new_owners)
             expect(::Gitlab::CodeOwners).to receive(:for_merge_request).with(merge_request, merge_request_diff: anything).and_wrap_original do |m, *args|
@@ -132,6 +134,36 @@ describe MergeRequests::RefreshService do
               rule = merge_request.approval_rules.code_owner.first
               expect(rule.users).to eq(new_owners)
             end
+          end
+        end
+      end
+
+      context 'when code owners enabled, with approval_rule enabled' do
+        let(:relevant_merge_requests) { [merge_request, another_merge_request] }
+        let(:new_owners) { [owner] }
+
+        before do
+          stub_feature_flags(approval_rule: true)
+
+          relevant_merge_requests.each do |merge_request|
+            expect(::Gitlab::CodeOwners).to receive(:for_merge_request).with(merge_request).and_return(new_owners)
+          end
+
+          [forked_merge_request].each do |merge_request|
+            expect(::Gitlab::CodeOwners).not_to receive(:for_merge_request)
+          end
+        end
+
+        it 'triggers syncing of code owners' do
+          relevant_merge_requests.each do |merge_request|
+            expect(merge_request.approval_rules.code_owner.exists?).to eq(false)
+          end
+
+          subject
+
+          relevant_merge_requests.each do |merge_request|
+            code_owner_rule = merge_request.approval_rules.code_owner.first
+            expect(code_owner_rule.users).to eq(new_owners)
           end
         end
       end

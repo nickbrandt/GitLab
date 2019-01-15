@@ -226,16 +226,67 @@ module EE
         expose :title
       end
 
+      class ApprovalRule < Grape::Entity
+        def initialize(object, options = {})
+          presenter = ::ApprovalRulePresenter.new(object, current_user: options[:current_user])
+          super(presenter, options)
+        end
+
+        expose :id, :name
+        expose :approvers, using: ::API::Entities::UserBasic
+        expose :approvals_required
+        expose :users, using: ::API::Entities::UserBasic
+        expose :groups, using: ::API::Entities::Group
+      end
+
+      class MergeRequestApprovalRule < ApprovalRule
+        expose :approved_approvers, as: :approved_by, using: ::API::Entities::UserBasic
+        expose :code_owner
+      end
+
+      # Decorates ApprovalState
+      class MergeRequestApprovalRules < Grape::Entity
+        expose :wrapped_approval_rules, as: :rules, using: MergeRequestApprovalRule
+      end
+
+      # Decorates Project
+      class ProjectApprovalRules < Grape::Entity
+        expose :approval_rules, as: :rules, using: ApprovalRule
+      end
+
+      # @deprecated
+      class Approver < Grape::Entity
+        expose :user, using: ::API::Entities::UserBasic
+      end
+
+      # @deprecated
+      class ApproverGroup < Grape::Entity
+        expose :group, using: ::API::Entities::Group
+      end
+
+      class ApprovalSettings < Grape::Entity
+        expose :approvers, using: EE::API::Entities::Approver
+        expose :approver_groups, using: EE::API::Entities::ApproverGroup
+        expose :approvals_before_merge
+        expose :reset_approvals_on_push
+        expose :disable_overriding_approvers_per_merge_request
+      end
+
       class Approvals < Grape::Entity
         expose :user, using: ::API::Entities::UserBasic
       end
 
+      # @deprecated, replaced with ApprovalState
       class MergeRequestApprovals < ::API::Entities::ProjectEntity
         expose :merge_status
         expose :approvals_required
         expose :approvals_left
         expose :approvals, as: :approved_by, using: EE::API::Entities::Approvals
         expose :approvers_left, as: :suggested_approvers, using: ::API::Entities::UserBasic
+        # @deprecated
+        expose :approvers, using: EE::API::Entities::Approver
+        # @deprecated
+        expose :approver_groups, using: EE::API::Entities::ApproverGroup
 
         expose :user_has_approved do |merge_request, options|
           merge_request.has_approved?(options[:current_user])
@@ -243,6 +294,63 @@ module EE
 
         expose :user_can_approve do |merge_request, options|
           merge_request.can_approve?(options[:current_user])
+        end
+      end
+
+      class ApprovalState < Grape::Entity
+        expose :merge_request, merge: true, using: ::API::Entities::ProjectEntity
+        expose(:merge_status) { |approval_state| approval_state.merge_request.merge_status }
+
+        expose :approved?, as: :approved
+
+        # @deprecated, reads from first regular rule instead
+        expose :approvals_required do |approval_state|
+          approval_state.first_regular_rule&.approvals_required
+        end
+
+        expose :approvals_left
+
+        expose :approved_by, using: EE::API::Entities::Approvals do |approval_state|
+          approval_state.merge_request.approvals
+        end
+
+        expose :suggested_approvers, using: ::API::Entities::UserBasic do |approval_state, options|
+          # TODO order by relevance
+          approval_state.unactioned_approvers
+        end
+
+        # @deprecated, reads from first regular rule instead
+        expose :approvers do |approval_state|
+          if rule = approval_state.first_regular_rule
+            rule.users.map do |user|
+              { user: ::API::Entities::UserBasic.represent(user) }
+            end
+          else
+            []
+          end
+        end
+        # @deprecated, reads from first regular rule instead
+        expose :approver_groups do |approval_state|
+          if rule = approval_state.first_regular_rule
+            presenter = ::ApprovalRulePresenter.new(rule, current_user: options[:current_user])
+            presenter.groups.map do |group|
+              { group: ::API::Entities::Group.represent(group) }
+            end
+          else
+            []
+          end
+        end
+
+        expose :user_has_approved do |approval_state, options|
+          approval_state.has_approved?(options[:current_user])
+        end
+
+        expose :user_can_approve do |approval_state, options|
+          approval_state.can_approve?(options[:current_user])
+        end
+
+        expose :approval_rules_left do |approval_state, options|
+          approval_state.approval_rules_left.map(&:name)
         end
       end
 

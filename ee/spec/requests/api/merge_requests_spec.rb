@@ -18,6 +18,32 @@ describe API::MergeRequests do
     project.add_reporter(user)
   end
 
+  describe 'PUT /projects/:id/merge_requests' do
+    context 'when updating existing approval rules' do
+      def update_merge_request(params)
+        put api("/projects/#{project.id}/merge_requests/#{merge_request.iid}", user), params: params
+      end
+
+      let!(:rule) { create(:approval_merge_request_rule, merge_request: merge_request, approvals_required: 1) }
+
+      it 'is successful' do
+        update_merge_request(
+          title: "New title",
+          approval_rules_attributes: [
+            { id: rule.id, approvals_required: 2 }
+          ]
+        )
+
+        expect(response).to have_gitlab_http_status(200)
+
+        merge_request.reload
+
+        expect(merge_request.approval_rules.size).to eq(1)
+        expect(merge_request.approval_rules.first.approvals_required).to eq(2)
+      end
+    end
+  end
+
   describe "POST /projects/:id/merge_requests" do
     def create_merge_request(args)
       defaults = {

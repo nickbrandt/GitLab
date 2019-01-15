@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "properties": {
+    "rules": {
+      "type": "array",
+      "items": { "$ref": "project_approval_rule.json" }
+    }
+  },
+  "additionalProperties": false
+}

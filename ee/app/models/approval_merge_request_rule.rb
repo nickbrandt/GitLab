@@ -15,8 +15,14 @@ class ApprovalMergeRequestRule < ApplicationRecord
   has_one :approval_merge_request_rule_source
   has_one :approval_project_rule, through: :approval_merge_request_rule_source
 
+  validate :validate_approvals_required
+
   def project
     merge_request.target_project
+  end
+
+  def approval_project_rule_id=(approval_project_rule_id)
+    self.approval_project_rule = merge_request.project.approval_rules.find_by(id: approval_project_rule_id)
   end
 
   # Users who are eligible to approve, including specified group members.
@@ -38,5 +44,15 @@ class ApprovalMergeRequestRule < ApplicationRecord
     return unless merge_request.merged?
 
     self.approved_approver_ids = merge_request.approvals.map(&:user_id) & approvers.map(&:id)
+  end
+
+  private
+
+  def validate_approvals_required
+    return unless approval_project_rule
+
+    if approvals_required < approval_project_rule.approvals_required
+      errors.add(:approvals_required, :greater_than_or_equal_to, count: approval_project_rule.approvals_required)
+    end
   end
 end

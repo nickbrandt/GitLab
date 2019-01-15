@@ -100,6 +100,7 @@ describe Projects::MergeRequestsController do
   let(:viewer)        { user }
 
   before do
+    stub_feature_flags(approval_rule: false)
     sign_in(viewer)
   end
 

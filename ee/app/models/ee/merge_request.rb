@@ -6,6 +6,8 @@ module EE
     extend ::Gitlab::Utils::Override
 
     include ::Approvable
+    prepend ApprovableForRule
+    prepend VisibleApprovableForRule
     include ::Gitlab::Utils::StrongMemoize
 
     prepended do
@@ -26,6 +28,8 @@ module EE
       delegate :merge_requests_author_approval?, to: :target_project, allow_nil: true
 
       participant :participant_approvers
+
+      accepts_nested_attributes_for :approval_rules
     end
 
     override :mergeable?
@@ -56,11 +60,15 @@ module EE
       strong_memoize(:participant_approvers) do
         next [] unless approval_needed?
 
-        approvers = []
-        approvers.concat(overall_approvers(exclude_code_owners: true))
-        approvers.concat(approvers_from_groups)
+        if ::Feature.enabled_approval_rule?
+          approval_state.filtered_approvers(code_owner: false, unactioned: true)
+        else
+          approvers = []
+          approvers.concat(overall_approvers(exclude_code_owners: true))
+          approvers.concat(approvers_from_groups)
 
-        ::User.where(id: approvers.map(&:id)).where.not(id: approved_by_users.select(:id))
+          ::User.where(id: approvers.map(&:id)).where.not(id: approved_by_users.select(:id))
+        end
       end
     end
 

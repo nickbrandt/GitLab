@@ -5,6 +5,10 @@ describe VisibleApprovable do
   let!(:project) { create(:project, :repository) }
   let!(:user) { project.creator }
 
+  before do
+    stub_feature_flags(approval_rule: false)
+  end
+
   describe '#requires_approve' do
     subject { resource.requires_approve? }
 

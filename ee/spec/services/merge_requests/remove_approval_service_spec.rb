@@ -8,14 +8,19 @@ describe MergeRequests::RemoveApprovalService do
 
     subject(:service) { described_class.new(project, user) }
 
+    before do
+      stub_feature_flags(approval_rule: false)
+    end
+
     def execute!
       service.execute(merge_request)
     end
 
     context 'with a user who has approved' do
+      let(:project) { create(:project, approvals_before_merge: 2) }
+
       before do
         project.add_developer(create(:user))
-        merge_request.update!(approvals_before_merge: 2)
         merge_request.approvals.create(user: user)
       end
 

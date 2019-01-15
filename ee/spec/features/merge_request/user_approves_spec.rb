@@ -61,6 +61,7 @@ describe 'Merge request > User approves', :js do
 
     context 'when CI is running but no approval given' do
       before do
+        stub_feature_flags approval_rule: false # TODO check in !9001 when feature enabled
         create :approver_group, group: group, target: merge_request
         pipeline = create(:ci_empty_pipeline, project: project, sha: merge_request.diff_head_sha, ref: merge_request.source_branch)
         merge_request.update(head_pipeline: pipeline)

@@ -29,6 +29,11 @@ module EE
         log_geo_event(key)
       end
 
+      # TODO: remove after #1979 is closed
+      def enabled_approval_rule?
+        enabled?(:approval_rule) && enabled?(:approval_rule_manual)
+      end
+
       private
 
       def log_geo_event(key)
