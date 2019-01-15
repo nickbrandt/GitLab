@@ -15,3 +15,5 @@ export const show = ({ commit }) => {
 export const hide = ({ commit }) => {
   commit(types.HIDE);
 };
+
+export default () => {};
