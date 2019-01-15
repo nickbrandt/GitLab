@@ -12,7 +12,7 @@ export default {
   name: 'ReadyToMerge',
   components: {
     statusIcon,
-    'squash-before-merge': SquashBeforeMerge,
+    SquashBeforeMerge,
   },
   props: {
     mr: { type: Object, required: true },
@@ -28,6 +28,7 @@ export default {
       isMakingRequest: false,
       isMergingImmediately: false,
       commitMessage: this.mr.commitMessage,
+      squashBeforeMerge: this.mr.squash,
       successSvg,
       warningSvg,
     };
@@ -114,12 +115,6 @@ export default {
       return this.mr.approvalsRequired ? !this.mr.isApproved : false;
     },
   },
-  created() {
-    eventHub.$on('MRWidgetUpdateSquash', this.handleUpdateSquash);
-  },
-  beforeDestroy() {
-    eventHub.$off('MRWidgetUpdateSquash', this.handleUpdateSquash);
-  },
   methods: {
     shouldShowMergeControls() {
       return this.mr.isMergeAllowed || this.shouldShowMergeWhenPipelineSucceedsText;
@@ -147,7 +142,7 @@ export default {
         commit_message: this.commitMessage,
         merge_when_pipeline_succeeds: this.setToMergeWhenPipelineSucceeds,
         should_remove_source_branch: this.removeSourceBranch === true,
-        squash: this.mr.squash,
+        squash: this.squashBeforeMerge,
       };
 
       this.isMakingRequest = true;
@@ -169,9 +164,6 @@ export default {
           this.isMakingRequest = false;
           new Flash('Something went wrong. Please try again.'); // eslint-disable-line
         });
-    },
-    handleUpdateSquash(val) {
-      this.mr.squash = val;
     },
     initiateMergePolling() {
       simplePoll((continuePolling, stopPolling) => {
@@ -315,8 +307,9 @@ export default {
             <!-- Placeholder for EE extension of this component -->
             <squash-before-merge
               v-if="shouldShowSquashBeforeMerge"
-              :mr="mr"
-              :is-merge-button-disabled="isMergeButtonDisabled"
+              v-model="squashBeforeMerge"
+              :help-path="mr.squashBeforeMergeHelpPath"
+              :is-disabled="isMergeButtonDisabled"
             />
 
             <span v-if="mr.ffOnlyEnabled" class="js-fast-forward-message">

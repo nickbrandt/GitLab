@@ -12,10 +12,6 @@
 %p.page-subtitle.light
   = s_('GeoNodes|With %{geo} you can install a special read-only and replicated instance anywhere. Before you add nodes, follow the %{instructions} in the exact order they appear.').html_safe % { geo: link_to('GitLab Geo', help_page_path('administration/geo/replication/index.md'), target: '_blank'), instructions: link_to('setup instructions', help_page_path('administration/geo/replication/index.md', anchor: 'setup-instructions'), target: '_blank') }
 
-- unless Gitlab::Database.pg_stat_wal_receiver_supported?
-  = content_for :flash_message do
-    .alert.alert-warning WARNING: Please upgrade PostgreSQL to version 9.6 or greater. The status of the replication cannot be determined reliably with the current version.
-
 - if @nodes.any?
   #js-geo-nodes{ data: node_vue_list_properties }
 - else

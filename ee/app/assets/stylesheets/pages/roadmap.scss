@@ -141,11 +141,11 @@ $column-right-gradient: linear-gradient(
 
     .item-label,
     .item-sublabel .sublabel-value {
-      color: $theme-gray-600;
+      color: $gray-600;
       font-weight: 400;
 
       &.label-dark {
-        color: $theme-gray-900;
+        color: $gray-900;
       }
 
       &.label-bold {
@@ -209,7 +209,7 @@ $column-right-gradient: linear-gradient(
     &:hover {
       .epic-details-cell,
       .epic-timeline-cell {
-        background-color: $theme-gray-100;
+        background-color: $gray-100;
       }
     }
 
@@ -258,7 +258,7 @@ $column-right-gradient: linear-gradient(
 
         .epic-url {
           display: table-cell;
-          color: $theme-gray-900;
+          color: $gray-900;
           font-weight: 600;
           white-space: nowrap;
           overflow: hidden;
@@ -267,7 +267,7 @@ $column-right-gradient: linear-gradient(
       }
 
       .epic-group-timeframe {
-        color: $theme-gray-700;
+        color: $gray-700;
         width: 100%;
         white-space: nowrap;
         overflow: hidden;

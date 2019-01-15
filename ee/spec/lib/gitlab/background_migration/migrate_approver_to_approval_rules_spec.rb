@@ -44,13 +44,26 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
           end.to change { approval_rule.users.count }.by(1)
             .and change { approval_rule.groups.count }.by(1)
 
-          approval_rule = target.approval_rules.first
-
-          expect(approval_rule.approvals_required).to eq(0)
-          expect(approval_rule.name).to eq('Default')
+          expect(target.approval_rules.regular.first).to eq(approval_rule)
 
           expect(approval_rule.users).to contain_exactly(user1)
           expect(approval_rule.groups).to contain_exactly(group1)
+        end
+
+        context 'when rule is not created yet' do
+          let(:approval_rule) { nil }
+
+          it 'creates rule in new schema' do
+            described_class.new.perform(target_type, target.id)
+
+            approval_rule = target.approval_rules.regular.first
+
+            expect(approval_rule.approvals_required).to eq(2)
+            expect(approval_rule.name).to eq('Default')
+
+            expect(approval_rule.users).to contain_exactly(user1)
+            expect(approval_rule.groups).to contain_exactly(group1)
+          end
         end
       end
 
@@ -74,10 +87,31 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
           expect(approval_rule.groups).to contain_exactly(group2)
         end
       end
+
+      context 'when approver has user_id which no longer exists' do
+        before do
+          create_member_in(user1, :old_schema)
+          create_member_in(user2, :old_schema)
+          create_member_in(group1, :old_schema)
+          create_member_in(group2, :old_schema)
+        end
+
+        it 'ignores broken reference when assigning' do
+          User.where(id: user1).delete_all
+          Group.where(id: group1).delete_all
+
+          described_class.new.perform(target_type, target.id)
+
+          approval_rule = target.approval_rules.first
+
+          expect(approval_rule.users).to contain_exactly(user2)
+          expect(approval_rule.groups).to contain_exactly(group2)
+        end
+      end
     end
 
     context 'merge request' do
-      let(:target) { create(:merge_request) }
+      let(:target) { create(:merge_request, approvals_before_merge: 2) }
       let(:target_type) { 'MergeRequest' }
       let(:approval_rule) { create(:approval_merge_request_rule, merge_request: target) }
 
@@ -104,6 +138,18 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
           described_class.new.perform(target_type, target.id)
 
           expect(target.approval_rules.regular.first.approval_project_rule).to eq(nil)
+        end
+      end
+
+      context 'when approvals_before_merge is nil' do
+        it "updates with project's approvals_required" do
+          target.target_project.update(approvals_before_merge: 3)
+          target.update(approvals_before_merge: nil)
+          create_member_in(create(:user), :old_schema)
+
+          described_class.new.perform(target_type, target.id)
+
+          expect(target.approval_rules.regular.first.approvals_required).to eq(3)
         end
       end
 
@@ -175,7 +221,7 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
     end
 
     context 'project' do
-      let(:target) { create(:project) }
+      let(:target) { create(:project, approvals_before_merge: 2) }
       let(:target_type) { 'Project' }
       let(:approval_rule) { create(:approval_project_rule, project: target) }
 

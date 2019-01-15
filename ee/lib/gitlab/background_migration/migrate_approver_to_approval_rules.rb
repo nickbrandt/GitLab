@@ -10,10 +10,12 @@ module Gitlab
 
       class Approver < ActiveRecord::Base
         self.table_name = 'approvers'
+        belongs_to :user
       end
 
       class ApproverGroup < ActiveRecord::Base
         self.table_name = 'approver_groups'
+        belongs_to :group
       end
 
       class ApprovalMergeRequestRule < ActiveRecord::Base
@@ -55,12 +57,16 @@ module Gitlab
         belongs_to :target_project, class_name: "Project"
         has_many :approval_rules, class_name: 'ApprovalMergeRequestRule'
 
+        def approvals_required
+          approvals_before_merge || target_project.approvals_before_merge
+        end
+
         def approver_ids
-          @approver_ids ||= Approver.where(target_type: 'MergeRequest', target_id: id).pluck('distinct user_id')
+          @approver_ids ||= Approver.where(target_type: 'MergeRequest', target_id: id).joins(:user).pluck('distinct user_id')
         end
 
         def approver_group_ids
-          @approver_group_ids ||= ApproverGroup.where(target_type: 'MergeRequest', target_id: id).pluck('distinct group_id')
+          @approver_group_ids ||= ApproverGroup.where(target_type: 'MergeRequest', target_id: id).joins(:group).pluck('distinct group_id')
         end
 
         def sync_code_owners_with_approvers
@@ -78,11 +84,15 @@ module Gitlab
         has_many :approval_rules, class_name: 'ApprovalProjectRule'
 
         def approver_ids
-          @approver_ids ||= Approver.where(target_type: 'Project', target_id: id).pluck('distinct user_id')
+          @approver_ids ||= Approver.where(target_type: 'Project', target_id: id).joins(:user).pluck('distinct user_id')
         end
 
         def approver_group_ids
-          @approver_group_ids ||= ApproverGroup.where(target_type: 'Project', target_id: id).pluck('distinct group_id')
+          @approver_group_ids ||= ApproverGroup.where(target_type: 'Project', target_id: id).joins(:group).pluck('distinct group_id')
+        end
+
+        def approvals_required
+          approvals_before_merge
         end
       end
 
@@ -152,7 +162,7 @@ module Gitlab
 
         unless rule.persisted?
           rule.name ||= ApprovalRuleLike::DEFAULT_NAME
-          rule.approvals_required = target.approvals_before_merge || 0
+          rule.approvals_required = target.approvals_required
           rule.save!
         end
 

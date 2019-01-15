@@ -19,7 +19,7 @@ describe Projects::PushRulesController do
       do_update
 
       expect(response).to have_gitlab_http_status(302)
-      expect(project.push_rule(true).prevent_secrets).to be_truthy
+      expect(project.reload_push_rule.prevent_secrets).to be_truthy
     end
 
     context 'push rules unlicensed' do
@@ -42,7 +42,7 @@ describe Projects::PushRulesController do
           it 'updates the setting' do
             patch :update, params: { namespace_id: project.namespace, project_id: project, id: 1, push_rule: { rule_attr => true } }
 
-            expect(project.push_rule(true).public_send(rule_attr)).to be_truthy
+            expect(project.reload_push_rule.public_send(rule_attr)).to be_truthy
           end
         end
 
@@ -55,7 +55,7 @@ describe Projects::PushRulesController do
             it 'updates the setting' do
               patch :update, params: { namespace_id: project.namespace, project_id: project, id: 1, push_rule: { rule_attr => true } }
 
-              expect(project.push_rule(true).public_send(rule_attr)).to be_truthy
+              expect(project.reload_push_rule.public_send(rule_attr)).to be_truthy
             end
           end
 
@@ -67,7 +67,7 @@ describe Projects::PushRulesController do
             it 'does not update the setting' do
               patch :update, params: { namespace_id: project.namespace, project_id: project, id: 1, push_rule: { rule_attr => false } }
 
-              expect(project.push_rule(true).public_send(rule_attr)).to be_truthy
+              expect(project.reload_push_rule.public_send(rule_attr)).to be_truthy
             end
           end
         end
@@ -80,7 +80,7 @@ describe Projects::PushRulesController do
           it 'does not update the setting' do
             patch :update, params: { namespace_id: project.namespace, project_id: project, id: 1, push_rule: { rule_attr => true } }
 
-            expect(project.push_rule(true).public_send(rule_attr)).to be_falsy
+            expect(project.reload_push_rule.public_send(rule_attr)).to be_falsy
           end
         end
       end

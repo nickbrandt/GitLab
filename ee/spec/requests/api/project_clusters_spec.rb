@@ -56,12 +56,10 @@ describe API::ProjectClusters do
       }
     end
 
-    before do
-      post api("/projects/#{project.id}/clusters/user", current_user), params: cluster_params
-    end
-
     context 'when user sets specific environment scope' do
       it 'should create a cluster with that specific environment' do
+        post api("/projects/#{project.id}/clusters/user", current_user), params: cluster_params
+
         expect(json_response['environment_scope']).to eq('production/*')
       end
     end
@@ -75,7 +73,28 @@ describe API::ProjectClusters do
       end
 
       it 'should set default environment' do
+        post api("/projects/#{project.id}/clusters/user", current_user), params: cluster_params
+
         expect(json_response['environment_scope']).to eq('*')
+      end
+    end
+
+    context 'when license has multiple clusters feature' do
+      before do
+        stub_licensed_features(multiple_clusters: true)
+
+        create(:cluster, :provided_by_gcp, :project,
+               projects: [project])
+
+        post api("/projects/#{project.id}/clusters/user", current_user), params: cluster_params
+      end
+
+      it 'should respond with 201' do
+        expect(response).to have_gitlab_http_status(201)
+      end
+
+      it 'should allow to associate multiple cluster to project' do
+        expect(project.reload.clusters.count).to eq(2)
       end
     end
   end

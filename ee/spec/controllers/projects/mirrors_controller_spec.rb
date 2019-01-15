@@ -159,7 +159,7 @@ describe Projects::MirrorsController do
         do_put(project, { import_data_attributes: { password: 'update' } }, format: :json)
 
         expect(response).to have_gitlab_http_status(200)
-        expect(project.import_data(true).id).to eq(import_data_id)
+        expect(project.reload_import_data.id).to eq(import_data_id)
       end
 
       it 'sets ssh_known_hosts_verified_at and verified_by when the update sets known hosts' do
@@ -167,7 +167,7 @@ describe Projects::MirrorsController do
 
         expect(response).to have_gitlab_http_status(200)
 
-        import_data = project.import_data(true)
+        import_data = project.reload_import_data
         expect(import_data.ssh_known_hosts_verified_at).to be_within(1.minute).of(Time.now)
         expect(import_data.ssh_known_hosts_verified_by).to eq(project.owner)
       end
@@ -179,7 +179,7 @@ describe Projects::MirrorsController do
 
         expect(response).to have_gitlab_http_status(200)
 
-        import_data = project.import_data(true)
+        import_data = project.reload_import_data
         expect(import_data.ssh_known_hosts_verified_at).to be_nil
         expect(import_data.ssh_known_hosts_verified_by).to be_nil
       end

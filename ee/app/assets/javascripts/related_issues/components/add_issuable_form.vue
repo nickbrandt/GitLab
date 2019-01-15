@@ -3,6 +3,7 @@ import $ from 'jquery';
 import GfmAutoComplete from '~/gfm_auto_complete';
 import { GlLoadingIcon } from '@gitlab/ui';
 import issueToken from './issue_token.vue';
+import { autoCompleteTextMap, inputPlaceholderTextMap } from '../constants';
 
 export default {
   name: 'AddIssuableForm',
@@ -34,6 +35,11 @@ export default {
       type: String,
       required: true,
     },
+    issuableType: {
+      type: String,
+      required: false,
+      default: 'issue',
+    },
   },
 
   data() {
@@ -45,7 +51,9 @@ export default {
 
   computed: {
     inputPlaceholder() {
-      return `Paste issue link${this.allowAutoComplete ? ' or <#issue id>' : ''}`;
+      const { issuableType, allowAutoComplete } = this;
+      const allowAutoCompleteText = autoCompleteTextMap[allowAutoComplete][issuableType];
+      return `${inputPlaceholderTextMap[issuableType]}${allowAutoCompleteText}`;
     },
     isSubmitButtonDisabled() {
       return (

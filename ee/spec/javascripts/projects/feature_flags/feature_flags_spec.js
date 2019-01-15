@@ -30,6 +30,35 @@ describe('Feature Flags', () => {
     mock.restore();
   });
 
+  describe('loading state', () => {
+    it('renders a loading icon', done => {
+      mock.onGet(mockData.endpoint).reply(200, {
+        feature_flags: [],
+        count: {
+          all: 0,
+          enabled: 0,
+          disabled: 0,
+        },
+      });
+
+      component = mountComponentWithStore(FeatureFlagsComponent, {
+        store,
+        props: mockData,
+      });
+
+      const loadingElement = component.$el.querySelector('.js-loading-state');
+
+      expect(loadingElement).not.toBeNull();
+      expect(loadingElement.querySelector('i').getAttribute('aria-label')).toEqual(
+        'Loading Feature Flags',
+      );
+
+      setTimeout(() => {
+        done();
+      }, 0);
+    });
+  });
+
   describe('successful request', () => {
     describe('without feature flags', () => {
       beforeEach(done => {

@@ -63,6 +63,10 @@ module Gitlab
               ["#{location} has to be either an array of conditions or a hash"]
             end
           end
+
+          def value
+            default.to_h.deep_merge(subject.value.to_h)
+          end
         end
       end
     end
