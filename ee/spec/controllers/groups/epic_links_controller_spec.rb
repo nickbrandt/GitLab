@@ -26,20 +26,6 @@ describe Groups::EpicLinksController, :postgresql do
     end
   end
 
-  shared_examples 'feature flag disabled' do
-    before do
-      stub_licensed_features(epics: true)
-      stub_feature_flags(epic_links: false)
-      group.add_developer(user)
-
-      subject
-    end
-
-    it 'returns 400 status' do
-      expect(response).to have_gitlab_http_status(404)
-    end
-  end
-
   describe 'GET #index' do
     before do
       epic1.update(parent: parent_epic)
@@ -48,12 +34,10 @@ describe Groups::EpicLinksController, :postgresql do
     subject { get :index, params: { group_id: group, epic_id: parent_epic.to_param } }
 
     it_behaves_like 'unlicensed epics action'
-    it_behaves_like 'feature flag disabled'
 
-    context 'when epic_links feature is enabled' do
+    context 'when epics are enabled' do
       before do
         stub_licensed_features(epics: true)
-        stub_feature_flags(epic_linkcs: true)
         group.add_developer(user)
 
         subject
@@ -76,12 +60,10 @@ describe Groups::EpicLinksController, :postgresql do
     end
 
     it_behaves_like 'unlicensed epics action'
-    it_behaves_like 'feature flag disabled'
 
-    context 'when epic_links feature is enabled' do
+    context 'when epics are enabled' do
       before do
         stub_licensed_features(epics: true)
-        stub_feature_flags(epic_linkcs: true)
       end
 
       context 'when user has permissions to create requested association' do
@@ -124,12 +106,10 @@ describe Groups::EpicLinksController, :postgresql do
     subject { delete :destroy, params: { group_id: group, epic_id: parent_epic.to_param, id: epic1.id } }
 
     it_behaves_like 'unlicensed epics action'
-    it_behaves_like 'feature flag disabled'
 
-    context 'when epic_links feature is enabled' do
+    context 'when epics are enabled' do
       before do
         stub_licensed_features(epics: true)
-        stub_feature_flags(epic_linkcs: true)
       end
 
       context 'when user has permissions to update the parent epic' do

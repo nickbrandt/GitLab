@@ -3,12 +3,7 @@
 class Groups::EpicLinksController < Groups::EpicsController
   include EpicRelations
 
-  before_action :check_feature_flag!
   before_action :check_nested_support!
-
-  before_action do
-    push_frontend_feature_flag(:epic_links)
-  end
 
   def destroy
     result = ::Epics::UpdateService.new(group, current_user, { parent: nil }).execute(child_epic)
@@ -28,10 +23,6 @@ class Groups::EpicLinksController < Groups::EpicsController
 
   def child_epic
     @child_epic ||= Epic.find(params[:id])
-  end
-
-  def check_feature_flag!
-    render_404 unless Feature.enabled?(:epic_links, group)
   end
 
   def check_nested_support!

@@ -321,7 +321,7 @@ export default {
           v-if="packagesAvailable"
           :help-path="packagesHelpPath"
           label="Packages"
-          help-text="Every project can have its own space to store its Maven packages"
+          help-text="Every project can have its own space to store its packages"
         >
           <project-feature-toggle
             v-model="packagesEnabled"

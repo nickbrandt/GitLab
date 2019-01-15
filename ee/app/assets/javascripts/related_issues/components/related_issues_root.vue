@@ -28,6 +28,11 @@ import Flash from '~/flash';
 import RelatedIssuesBlock from './related_issues_block.vue';
 import RelatedIssuesStore from '../stores/related_issues_store';
 import RelatedIssuesService from '../services/related_issues_service';
+import {
+  relatedIssuesRemoveErrorMap,
+  pathIndeterminateErrorMap,
+  addRelatedIssueErrorMap,
+} from '../constants';
 
 const SPACE_FACTOR = 1;
 
@@ -60,6 +65,11 @@ export default {
       type: String,
       required: false,
       default: 'Related issues',
+    },
+    issuableType: {
+      type: String,
+      required: false,
+      default: 'issue',
     },
     allowAutoComplete: {
       type: Boolean,
@@ -110,11 +120,11 @@ export default {
           })
           .catch(res => {
             if (res && res.status !== 404) {
-              Flash('An error occurred while removing issues.');
+              Flash(relatedIssuesRemoveErrorMap[this.issuableType]);
             }
           });
       } else {
-        Flash('We could not determine the path to remove the issue');
+        Flash(pathIndeterminateErrorMap[this.issuableType]);
       }
     },
     onToggleAddRelatedIssuesForm() {
@@ -142,7 +152,7 @@ export default {
           })
           .catch(res => {
             this.isSubmitting = false;
-            let errorMessage = "We can't find an issue that matches what you are looking for.";
+            let errorMessage = addRelatedIssueErrorMap[this.issuableType];
             if (res.data && res.data.message) {
               errorMessage = res.data.message;
             }
@@ -239,6 +249,7 @@ export default {
     :input-value="inputValue"
     :auto-complete-sources="autoCompleteSources"
     :title="title"
+    :issuable-type="issuableType"
     :path-id-separator="pathIdSeparator"
     @saveReorder="saveIssueOrder"
     @toggleAddRelatedIssuesForm="onToggleAddRelatedIssuesForm"

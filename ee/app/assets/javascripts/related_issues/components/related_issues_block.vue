@@ -78,6 +78,10 @@ export default {
       required: false,
       default: 'Related issues',
     },
+    issuableType: {
+      type: String,
+      required: true,
+    },
   },
   computed: {
     hasRelatedIssues() {
@@ -183,6 +187,7 @@ export default {
       >
         <add-issuable-form
           :is-submitting="isSubmitting"
+          :issuable-type="issuableType"
           :input-value="inputValue"
           :pending-references="pendingReferences"
           :auto-complete-sources="autoCompleteSources"

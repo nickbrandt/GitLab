@@ -22,6 +22,7 @@ describe('RelatedIssuesBlock', () => {
       vm = new RelatedIssuesBlock({
         propsData: {
           pathIdSeparator: '#',
+          issuableType: 'issue',
         },
       }).$mount();
     });
@@ -45,6 +46,7 @@ describe('RelatedIssuesBlock', () => {
         propsData: {
           pathIdSeparator: '#',
           isFetching: true,
+          issuableType: 'issue',
         },
       }).$mount();
     });
@@ -64,6 +66,7 @@ describe('RelatedIssuesBlock', () => {
         propsData: {
           pathIdSeparator: '#',
           canAdmin: true,
+          issuableType: 'issue',
         },
       }).$mount();
     });
@@ -79,6 +82,7 @@ describe('RelatedIssuesBlock', () => {
         propsData: {
           pathIdSeparator: '#',
           isFormVisible: true,
+          issuableType: 'issue',
         },
       }).$mount();
     });
@@ -94,6 +98,7 @@ describe('RelatedIssuesBlock', () => {
         propsData: {
           pathIdSeparator: '#',
           relatedIssues: [issuable1, issuable2],
+          issuableType: 'issue',
         },
       }).$mount();
     });
@@ -109,6 +114,7 @@ describe('RelatedIssuesBlock', () => {
         propsData: {
           pathIdSeparator: '#',
           relatedIssues: [issuable1, issuable2, issuable3, issuable4, issuable5],
+          issuableType: 'issue',
         },
       }).$mount();
     });

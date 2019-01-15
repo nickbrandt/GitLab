@@ -56,5 +56,28 @@ describe MergeRequests::UpdateService, :mailer do
         end.not_to change { ActionMailer::Base.deliveries.count }
       end
     end
+
+    context 'when approvals_before_merge changes' do
+      using RSpec::Parameterized::TableSyntax
+
+      where(:project_value, :mr_before_value, :mr_after_value, :result) do
+        3 | 4   | 5   | 5
+        3 | 4   | nil | 3
+        3 | nil | 5   | 5
+      end
+
+      with_them do
+        let(:project) { create(:project, :repository, approvals_before_merge: project_value) }
+
+        it "updates approval_rules' approvals_required" do
+          merge_request.update(approvals_before_merge: mr_before_value)
+          rule = create(:approval_merge_request_rule, merge_request: merge_request)
+
+          update_merge_request(approvals_before_merge: mr_after_value)
+
+          expect(rule.reload.approvals_required).to eq(result)
+        end
+      end
+    end
   end
 end
