@@ -19,8 +19,6 @@ describe MergeRequests::UpdateService, :mailer do
   end
 
   before do
-    stub_feature_flags(approval_rule: false)
-
     project.add_maintainer(user)
     project.add_developer(user2)
     project.add_developer(user3)
@@ -260,35 +258,6 @@ describe MergeRequests::UpdateService, :mailer do
 
         it { expect(@merge_request.state).to eq('opened') }
       end
-
-      context 'when not approved' do
-        before do
-          merge_request.update(approvals_before_merge: 1)
-
-          perform_enqueued_jobs do
-            service.execute(merge_request)
-            @merge_request = MergeRequest.find(merge_request.id)
-          end
-        end
-
-        it { expect(@merge_request).to be_valid }
-        it { expect(@merge_request.state).to eq('opened') }
-      end
-
-      context 'when approved' do
-        before do
-          merge_request.update(approvals_before_merge: 1)
-          merge_request.approvals.create(user: user)
-
-          perform_enqueued_jobs do
-            service.execute(merge_request)
-            @merge_request = MergeRequest.find(merge_request.id)
-          end
-        end
-
-        it { expect(@merge_request).to be_valid }
-        it { expect(@merge_request.state).to eq('merged') }
-      end
     end
 
     context 'todos' do
@@ -485,58 +454,6 @@ describe MergeRequests::UpdateService, :mailer do
       end
     end
 
-    context 'when the approvers change' do
-      let(:existing_approver) { create(:user) }
-      let(:removed_approver) { create(:user) }
-      let(:new_approver) { create(:user) }
-
-      before do
-        perform_enqueued_jobs do
-          update_merge_request(approver_ids: [existing_approver, removed_approver].map(&:id).join(','))
-        end
-
-        Todo.where(action: Todo::APPROVAL_REQUIRED).destroy_all # rubocop: disable DestroyAll
-        ActionMailer::Base.deliveries.clear
-      end
-
-      context 'when an approver is added and an approver is removed' do
-        before do
-          perform_enqueued_jobs do
-            update_merge_request(approver_ids: [new_approver, existing_approver].map(&:id).join(','))
-          end
-        end
-
-        it 'adds todos for and sends emails to the new approvers' do
-          expect(Todo.where(user: new_approver, action: Todo::APPROVAL_REQUIRED)).not_to be_empty
-          should_email(new_approver)
-        end
-
-        it 'does not add todos for or send emails to the existing approvers' do
-          expect(Todo.where(user: existing_approver, action: Todo::APPROVAL_REQUIRED)).to be_empty
-          should_not_email(existing_approver)
-        end
-
-        it 'does not add todos for or send emails to the removed approvers' do
-          expect(Todo.where(user: removed_approver, action: Todo::APPROVAL_REQUIRED)).to be_empty
-          should_not_email(removed_approver)
-        end
-      end
-
-      context 'when the approvers are set to the same values' do
-        it 'does not create any todos' do
-          expect do
-            update_merge_request(approver_ids: [existing_approver, removed_approver].map(&:id).join(','))
-          end.not_to change { Todo.count }
-        end
-
-        it 'does not send any emails' do
-          expect do
-            update_merge_request(approver_ids: [existing_approver, removed_approver].map(&:id).join(','))
-          end.not_to change { ActionMailer::Base.deliveries.count }
-        end
-      end
-    end
-
     context 'updating mentions' do
       let(:mentionable) { merge_request }
       include_examples 'updating mentions', described_class
@@ -619,17 +536,6 @@ describe MergeRequests::UpdateService, :mailer do
 
         issue_ids = MergeRequestsClosingIssues.where(merge_request: merge_request).pluck(:issue_id)
         expect(issue_ids).to be_empty
-      end
-    end
-
-    context 'updating target_branch' do
-      it 'resets approvals when target_branch is changed' do
-        merge_request.target_project.update(reset_approvals_on_push: true)
-        merge_request.approvals.create(user_id: user2.id)
-
-        update_merge_request(target_branch: 'video')
-
-        expect(merge_request.reload.approvals).to be_empty
       end
     end
 
