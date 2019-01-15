@@ -7,6 +7,10 @@ module Approvable
   # such as approver_groups and target_project in presenters
   include ::VisibleApprovable
 
+  def approval_state
+    @approval_state ||= ApprovalState.new(self)
+  end
+
   def approval_needed?
     approvals_required&.nonzero?
   end

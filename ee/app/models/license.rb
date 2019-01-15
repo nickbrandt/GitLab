@@ -55,6 +55,7 @@ class License < ActiveRecord::Base
     ldap_group_sync_filter
     multiple_clusters
     multiple_group_issue_boards
+    multiple_approval_rules
     merge_request_performance_metrics
     object_storage
     group_saml
