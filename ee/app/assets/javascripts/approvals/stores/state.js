@@ -1,5 +1,10 @@
-export default () => ({
-  settings: {},
-  isLoading: false,
-  rules: [],
+export const DEFAULT_SETTINGS = {
+  canEdit: true,
+};
+
+export default (settings = {}) => ({
+  settings: {
+    ...DEFAULT_SETTINGS,
+    ...settings,
+  },
 });
