@@ -1,0 +1,5 @@
+---
+title: Clear our import data credentials when adding new mirrors
+merge_request: 24339
+author:
+type: fixed
