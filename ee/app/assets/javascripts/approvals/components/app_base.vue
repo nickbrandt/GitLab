@@ -52,6 +52,7 @@ export default {
         </div>
       </div>
     </template>
+    <slot name="footer"></slot>
     <modal-rule-create :modal-id="$options.CREATE_MODAL_ID" />
     <modal-rule-remove :modal-id="$options.REMOVE_MODAL_ID" />
   </div>

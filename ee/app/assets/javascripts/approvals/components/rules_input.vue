@@ -1,5 +1,5 @@
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
 import RulesBase from './rules_base.vue';
 import RuleControls from './rule_controls.vue';
@@ -12,6 +12,9 @@ export default {
   },
   computed: {
     ...mapState(['settings']),
+  },
+  methods: {
+    ...mapActions(['putRule']),
   },
 };
 </script>
@@ -33,18 +36,12 @@ export default {
       </td>
       <td>
         <input
-          :name="`merge_request[approval_rules_attributes][][approval_project_rule_id]`"
-          :value="rule.id"
-          :disabled="!settings.canEdit"
-          type="hidden"
-        />
-        <input
           :value="rule.approvalsRequired"
-          :name="`merge_request[approval_rules_attributes][][approvals_required]`"
           :disabled="!settings.canEdit"
           class="form-control mw-6em"
           type="number"
           min="0"
+          @input="putRule({ id: rule.id, approvalsRequired: $event.target.value });"
         />
       </td>
       <td class="text-nowrap px-2 w-0"><rule-controls v-if="settings.canEdit" :rule="rule" /></td>

@@ -35,11 +35,17 @@ export default {
     approversByType() {
       return _.groupBy(this.approvers, x => x.type);
     },
+    users() {
+      return this.approversByType[TYPE_USER] || [];
+    },
+    groups() {
+      return this.approversByType[TYPE_GROUP] || [];
+    },
     userIds() {
-      return (this.approversByType[TYPE_USER] || []).map(x => x.id);
+      return this.users.map(x => x.id);
     },
     groupIds() {
-      return (this.approversByType[TYPE_GROUP] || []).map(x => x.id);
+      return this.groups.map(x => x.id);
     },
     validation() {
       if (!this.showValidation) {
@@ -80,6 +86,8 @@ export default {
         approvalsRequired: this.approvalsRequired,
         users: this.userIds,
         groups: this.groupIds,
+        userRecords: this.users,
+        groupRecords: this.groups,
       };
 
       this.showValidation = true;
