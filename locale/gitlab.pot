@@ -8315,6 +8315,9 @@ msgstr ""
 msgid "Snippet Contents"
 msgstr ""
 
+msgid "Snippet Contents"
+msgstr ""
+
 msgid "Snippets"
 msgstr ""
 
@@ -10048,6 +10051,9 @@ msgid "We could not determine the path to remove the epic"
 msgstr ""
 
 msgid "We could not determine the path to remove the issue"
+msgstr ""
+
+msgid "We couldn't find any results matching"
 msgstr ""
 
 msgid "We couldn't find any results matching"
