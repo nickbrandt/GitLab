@@ -25,6 +25,7 @@ export default {
     },
     isLinkedPipeline: {
       type: Boolean,
+      required: false,
       default: false,
     },
     mediator: {
@@ -48,8 +49,8 @@ export default {
     hasTriggeredBy() {
       return (
         this.type !== this.$options.downstream &&
-        this.pipeline.triggered_by &&
-        this.pipeline.triggered_by != null
+        this.triggeredByPipelines &&
+        this.pipeline.triggered_by !== null
       );
     },
     triggeredByPipelines() {
@@ -58,7 +59,7 @@ export default {
     hasTriggered() {
       return (
         this.type !== this.$options.upstream &&
-        this.pipeline.triggered &&
+        this.triggeredPipelines &&
         this.pipeline.triggered.length > 0
       );
     },

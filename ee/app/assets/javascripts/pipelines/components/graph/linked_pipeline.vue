@@ -28,7 +28,7 @@ export default {
       return this.pipeline.details.status;
     },
     projectName() {
-      return this.pipeline.project && this.pipeline.project.name;
+      return this.pipeline.project.name;
     },
   },
   methods: {
