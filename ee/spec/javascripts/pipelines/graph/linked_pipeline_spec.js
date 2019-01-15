@@ -59,7 +59,6 @@ describe('Linked pipeline', () => {
     });
 
     it('should render an svg within the status container', () => {
-      console.log(vm.$el);
       const pipelineStatusElement = vm.$el.querySelector('.js-linked-pipeline-status');
 
       expect(pipelineStatusElement.querySelector('svg')).not.toBeNull();
