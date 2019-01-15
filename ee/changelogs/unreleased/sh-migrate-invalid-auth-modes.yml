@@ -1,0 +1,5 @@
+---
+title: Fix mirrors that have invalid SSH public auth mode set
+merge_request: 9135
+author:
+type: fixed
