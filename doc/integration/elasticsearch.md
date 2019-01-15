@@ -160,6 +160,9 @@ Enable Elasticsearch search.
 
 ### Indexing large instances
 
+NOTE: **Note**:
+After indexing the repositories asynchronously, you MUST index the database to be able to search.
+
 Configure Elasticsearch's host and port in **Admin > Settings**. Then create empty indexes using one of the following commands:
 
 ```sh
