@@ -22,7 +22,12 @@ class ApprovalMergeRequestRule < ApplicationRecord
   end
 
   def approval_project_rule_id=(approval_project_rule_id)
-    self.approval_project_rule = merge_request.project.approval_rules.find_by(id: approval_project_rule_id)
+    self.approval_merge_request_rule_source ||= self.build_approval_merge_request_rule_source
+    self.approval_merge_request_rule_source.approval_project_rule_id = approval_project_rule_id
+  end
+
+  def approval_project_rule
+    self.approval_merge_request_rule_source.approval_project_rule if self.approval_merge_request_rule_source
   end
 
   # Users who are eligible to approve, including specified group members.

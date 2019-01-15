@@ -14,7 +14,7 @@ module EE
 
         def merge_request_params_attributes
           attrs = super.push(
-            { approval_rules_attributes: [:id, :name, :user_ids, :group_ids, :approvals_required, :approval_project_rule_id, :_destroy] },
+            { approval_rules_attributes: [:id, :name, { user_ids: [] }, { group_ids: [] }, :approvals_required, :approval_project_rule_id, :_destroy] },
             :approvals_before_merge,
             :approver_group_ids,
             :approver_ids
