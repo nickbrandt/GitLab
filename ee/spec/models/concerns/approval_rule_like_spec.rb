@@ -87,4 +87,16 @@ describe ApprovalRuleLike do
 
     it_behaves_like 'approval rule like'
   end
+
+  context '.group_users' do
+    subject { create(:approval_project_rule) }
+
+    it 'returns distinct users' do
+      group1.add_guest(user1)
+      group2.add_guest(user1)
+      subject.groups = [group1, group2]
+
+      expect(subject.group_users).to eq([user1])
+    end
+  end
 end

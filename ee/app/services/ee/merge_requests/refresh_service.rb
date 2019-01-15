@@ -53,6 +53,8 @@ module EE
           new_code_owners = merge_request.code_owners - previous_code_owners
 
           create_approvers(merge_request, new_code_owners)
+
+          merge_request.sync_code_owners_with_approvers
         end
 
         results

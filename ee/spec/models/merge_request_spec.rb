@@ -70,6 +70,54 @@ describe MergeRequest do
     end
   end
 
+  describe '#sync_code_owners_with_approvers' do
+    let(:owners) { create_list(:user, 2) }
+
+    before do
+      allow(subject).to receive(:code_owners).and_return(owners)
+    end
+
+    it 'does nothing when merge request is merged' do
+      allow(subject).to receive(:merged?).and_return(true)
+
+      expect do
+        subject.sync_code_owners_with_approvers
+      end.not_to change { subject.approval_rules.count }
+    end
+
+    context 'when code owner rule does not exist' do
+      it 'creates rule' do
+        expect do
+          subject.sync_code_owners_with_approvers
+        end.to change { subject.approval_rules.code_owner.count }.by(1)
+
+        expect(subject.approval_rules.code_owner.first.users).to contain_exactly(*owners)
+      end
+    end
+
+    context 'when code owner rule exists' do
+      let!(:code_owner_rule) { subject.approval_rules.code_owner.create!(name: 'Code Owner', users: [create(:user)]) }
+
+      it 'reuses and updates existing rule' do
+        expect do
+          subject.sync_code_owners_with_approvers
+        end.not_to change { subject.approval_rules.count }
+
+        expect(code_owner_rule.reload.users).to contain_exactly(*owners)
+      end
+
+      context 'when there is no code owner' do
+        let(:owners) { [] }
+
+        it 'removes rule' do
+          subject.sync_code_owners_with_approvers
+
+          expect(subject.approval_rules.exists?(code_owner_rule.id)).to eq(false)
+        end
+      end
+    end
+  end
+
   describe '#base_pipeline' do
     let!(:pipeline) { create(:ci_empty_pipeline, project: subject.project, sha: subject.diff_base_sha) }
 

@@ -3,6 +3,8 @@
 class ApprovalMergeRequestRule < ApplicationRecord
   include ApprovalRuleLike
 
+  DEFAULT_NAME_FOR_CODE_OWNER = 'Code Owner'
+
   scope :regular, -> { where(code_owner: false) }
   scope :code_owner, -> { where(code_owner: true) } # special code owner rules, updated internally when code changes
 

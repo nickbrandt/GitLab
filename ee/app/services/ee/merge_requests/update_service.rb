@@ -25,6 +25,8 @@ module EE
           cleanup_approvers(merge_request, reload: true)
         end
 
+        sync_approval_rules(merge_request)
+
         merge_request
       end
 
@@ -41,6 +43,15 @@ module EE
         target_project = merge_request.target_project
 
         merge_request.approvals.delete_all if target_project.reset_approvals_on_push
+      end
+
+      # TODO remove after #1979 is closed
+      def sync_approval_rules(merge_request)
+        return if merge_request.merged?
+        return unless merge_request.previous_changes.include?(:approvals_before_merge)
+
+        approvals_required = merge_request.approvals_before_merge || merge_request.target_project.approvals_before_merge
+        merge_request.approval_rules.regular.update_all(approvals_required: approvals_required)
       end
     end
   end

@@ -35,6 +35,12 @@ msgstr[1] ""
 msgid " or "
 msgstr ""
 
+msgid " or <#epic id>"
+msgstr ""
+
+msgid " or <#issue id>"
+msgstr ""
+
 msgid "\"%{query}\" in projects"
 msgstr ""
 
@@ -755,6 +761,12 @@ msgid "An error occurred while making the request."
 msgstr ""
 
 msgid "An error occurred while removing approver"
+msgstr ""
+
+msgid "An error occurred while removing epics."
+msgstr ""
+
+msgid "An error occurred while removing issues."
 msgstr ""
 
 msgid "An error occurred while rendering KaTeX"
@@ -5168,7 +5180,7 @@ msgstr ""
 msgid "Latest pipeline for this branch"
 msgstr ""
 
-msgid "Learn how to %{no_packages_link_start}publish and share your Maven packages%{no_packages_link_end} with GitLab. Additional package types will be supported in future releases."
+msgid "Learn how to %{no_packages_link_start}publish and share your packages%{no_packages_link_end} with GitLab."
 msgstr ""
 
 msgid "Learn more"
@@ -6321,6 +6333,12 @@ msgid "Part of merge request changes"
 msgstr ""
 
 msgid "Password"
+msgstr ""
+
+msgid "Paste epic link"
+msgstr ""
+
+msgid "Paste issue link"
 msgstr ""
 
 msgid "Paste your public SSH key, which is usually contained in the file '~/.ssh/id_rsa.pub' and begins with 'ssh-rsa'. Don't use your private SSH key."
@@ -9852,6 +9870,18 @@ msgstr ""
 msgid "Want to see the data? Please ask an administrator for access."
 msgstr ""
 
+msgid "We can't find an epic that matches what you are looking for."
+msgstr ""
+
+msgid "We can't find an issue that matches what you are looking for."
+msgstr ""
+
+msgid "We could not determine the path to remove the epic"
+msgstr ""
+
+msgid "We could not determine the path to remove the issue"
+msgstr ""
+
 msgid "We detected potential spam in the %{humanized_resource_name}. Please solve the reCAPTCHA to proceed."
 msgstr ""
 
@@ -10562,6 +10592,9 @@ msgstr[1] ""
 msgid "enabled"
 msgstr ""
 
+msgid "epic"
+msgstr ""
+
 msgid "error"
 msgstr ""
 
@@ -10586,7 +10619,7 @@ msgstr ""
 msgid "here"
 msgstr ""
 
-msgid "http://<sentry-host>/api/0/projects/{organization_slug}/{project_slug}/issues/"
+msgid "http://<sentry-host>/api/0/projects/{organization_slug}/{project_slug}/"
 msgstr ""
 
 msgid "https://your-bitbucket-server"
@@ -10619,6 +10652,9 @@ msgid "is not a valid X509 certificate."
 msgstr ""
 
 msgid "is out of the hierarchy of the Group owning the template"
+msgstr ""
+
+msgid "issue"
 msgstr ""
 
 msgid "issue boards"

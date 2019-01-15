@@ -213,7 +213,7 @@ export default {
     return {
       // Epics specific configuration
       issuableRef: '',
-      hasRelatedEpicsFeature: this.subepicsSupported && gon.features && gon.features.epicLinks,
+      hasRelatedEpicsFeature: this.subepicsSupported,
       projectPath: this.groupPath,
       parentEpic: this.parent ? this.parent : {},
       projectNamespace: '',
@@ -328,6 +328,7 @@ export default {
         :allow-auto-complete="false"
         :path-id-separator="$options.epicsPathIdSeparator"
         :title="__('Epics')"
+        :issuable-type="__('epic')"
         css-class="js-related-epics-block"
       />
       <related-issues-root
@@ -336,6 +337,7 @@ export default {
         :can-reorder="canAdmin"
         :allow-auto-complete="false"
         :title="__('Issues')"
+        :issuable-type="__('issue')"
         css-class="js-related-issues-block"
         path-id-separator="#"
       />

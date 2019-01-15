@@ -37,6 +37,8 @@ module EE
 
           sync_wiki_on_enable if !wiki_was_enabled && project.wiki_enabled?
           project.import_state.force_import_job! if params[:mirror].present? && project.mirror?
+
+          sync_approval_rules
         end
 
         result
@@ -66,6 +68,13 @@ module EE
 
       def sync_wiki_on_enable
         ::Geo::RepositoryUpdatedService.new(project.wiki.repository).execute
+      end
+
+      # TODO remove after #1979 is closed
+      def sync_approval_rules
+        return unless project.previous_changes.include?(:approvals_before_merge)
+
+        project.approval_rules.update_all(approvals_required: project.approvals_before_merge)
       end
     end
   end
