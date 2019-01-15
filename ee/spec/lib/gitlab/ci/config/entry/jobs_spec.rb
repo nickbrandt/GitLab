@@ -63,7 +63,6 @@ describe Gitlab::Ci::Config::Entry::Jobs do
             trigger: { project: 'my/project' },
             stage: 'test',
             only: { refs: %w[branches tags] },
-            except: {},
             ignore: false
           },
           regular_job: {
@@ -71,7 +70,6 @@ describe Gitlab::Ci::Config::Entry::Jobs do
             name: :regular_job,
             stage: 'test',
             only: { refs: %w[branches tags] },
-            except: {},
             ignore: false
           })
       end
