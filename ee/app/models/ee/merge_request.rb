@@ -57,11 +57,16 @@ module EE
       strong_memoize(:participant_approvers) do
         next [] unless approval_needed?
 
-        approvers = []
-        approvers.concat(overall_approvers(exclude_code_owners: true))
-        approvers.concat(approvers_from_groups)
+        if ::Feature.enabled?(:approval_rule)
+          approval_state.filtered_approvers(code_owner: false, unactioned: true)
+        else
+          approvers = [
+            *overall_approvers(exclude_code_owners: true),
+            *approvers_from_groups
+          ]
 
-        ::User.where(id: approvers.map(&:id)).where.not(id: approved_by_users.select(:id))
+          ::User.where(id: approvers.map(&:id)).where.not(id: approved_by_users.select(:id))
+        end
       end
     end
 
