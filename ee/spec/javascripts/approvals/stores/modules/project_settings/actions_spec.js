@@ -1,7 +1,7 @@
 import Api from 'ee/api';
 import testAction from 'spec/helpers/vuex_action_helper';
-import * as types from 'ee/approvals/stores/mutation_types';
-import actionsModule, * as actions from 'ee/approvals/stores/actions';
+import * as types from 'ee/approvals/stores/modules/base/mutation_types';
+import actionsModule, * as actions from 'ee/approvals/stores/modules/project_settings/actions';
 import { mapApprovalRuleRequest, mapApprovalRulesResponse } from 'ee/approvals/mappers';
 
 const TEST_PROJECT_ID = 9;
@@ -21,7 +21,7 @@ const TEST_RULE_RESPONSE = {
   users: [{ id: 7 }, { id: 8 }],
 };
 
-describe('EE approvals store actions', () => {
+describe('EE approvals project settings module actions', () => {
   let state;
   let flashSpy;
 
@@ -34,21 +34,6 @@ describe('EE approvals store actions', () => {
     spyOn(Api, 'postProjectApprovalRule');
     spyOn(Api, 'putProjectApprovalRule');
     spyOn(Api, 'deleteProjectApprovalRule');
-  });
-
-  describe('setSettings', () => {
-    it('sets the settings', done => {
-      const settings = { projectId: 7 };
-
-      testAction(
-        actions.setSettings,
-        settings,
-        {},
-        [{ type: types.SET_SETTINGS, payload: settings }],
-        [],
-        done,
-      );
-    });
   });
 
   describe('requestRules', () => {
@@ -91,10 +76,6 @@ describe('EE approvals store actions', () => {
   });
 
   describe('fetchRules', () => {
-    it('does nothing if loading', done => {
-      testAction(actions.fetchRules, null, { isLoading: true }, [], [], done);
-    });
-
     it('dispatches request/receive', done => {
       const response = {
         data: { rules: [TEST_RULE_RESPONSE] },
