@@ -4,6 +4,7 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
   respond_to :html
 
   before_action :authorize_read_feature_flag!
+  before_action :authorize_create_feature_flag!, only: [:new, :create]
   before_action :authorize_update_feature_flag!, only: [:edit, :update]
   before_action :authorize_destroy_feature_flag!, only: [:destroy]
 
@@ -30,13 +31,29 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
     @feature_flag = project.operations_feature_flags.new
   end
 
+  def show
+    respond_to do |format|
+      format.json do
+        Gitlab::PollingInterval.set_header(response, interval: 10_000)
+
+        render_success_json
+      end
+    end
+  end
+
   def create
     @feature_flag = project.operations_feature_flags.create(create_params)
 
     if @feature_flag.persisted?
-      redirect_to project_feature_flags_path(@project), status: 302, notice: 'Feature flag was successfully created.'
+      respond_to do |format|
+        format.html { redirect_to_index(notice: 'Feature flag was successfully created.') }
+        format.json { render_success_json }
+      end
     else
-      render :new
+      respond_to do |format|
+        format.html { render :new }
+        format.json { render_error_json }
+      end
     end
   end
 
@@ -45,17 +62,29 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
 
   def update
     if feature_flag.update(update_params)
-      redirect_to project_feature_flags_path(@project), status: 302, notice: 'Feature flag was successfully updated.'
+      respond_to do |format|
+        format.html { redirect_to_index(notice: 'Feature flag was successfully updated.') }
+        format.json { render_success_json }
+      end
     else
-      render :edit
+      respond_to do |format|
+        format.html { render :edit }
+        format.json { render_error_json }
+      end
     end
   end
 
   def destroy
     if feature_flag.destroy
-      redirect_to project_feature_flags_path(@project), status: 302, notice: 'Feature flag was successfully removed.'
+      respond_to do |format|
+        format.html { redirect_to_index(notice: 'Feature flag was successfully removed.') }
+        format.json { render_success_json }
+      end
     else
-      redirect_to project_feature_flags_path(@project), status: 302, alert: 'Feature flag was not removed.'
+      respond_to do |format|
+        format.html { redirect_to_index(alert: 'Feature flag was not removed.') }
+        format.json { render_error_json }
+      end
     end
   end
 
@@ -75,6 +104,12 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
           .permit(:name, :description, :active)
   end
 
+  def feature_flag_json
+    FeatureFlagSerializer
+      .new(project: @project, current_user: @current_user)
+      .represent(feature_flag)
+  end
+
   def feature_flags_json
     FeatureFlagSerializer
       .new(project: @project, current_user: @current_user)
@@ -86,5 +121,18 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
     FeatureFlagSummarySerializer
       .new(project: @project, current_user: @current_user)
       .represent(@project)
+  end
+
+  def redirect_to_index(**args)
+    redirect_to project_feature_flags_path(@project), status: :found, **args
+  end
+
+  def render_success_json
+    render json: feature_flag_json, status: :ok
+  end
+
+  def render_error_json
+    render json: { message: feature_flag.errors.full_messages },
+           status: :bad_request
   end
 end
