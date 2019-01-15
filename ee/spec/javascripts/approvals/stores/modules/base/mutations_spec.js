@@ -1,8 +1,8 @@
 import createState from 'ee/approvals/stores/state';
-import * as types from 'ee/approvals/stores/mutation_types';
-import mutations from 'ee/approvals/stores/mutations';
+import * as types from 'ee/approvals/stores/modules/base/mutation_types';
+import mutations from 'ee/approvals/stores/modules/base/mutations';
 
-describe('EE approvals store mutations', () => {
+describe('EE approvals base module mutations', () => {
   let state;
 
   beforeEach(() => {

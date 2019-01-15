@@ -3,7 +3,9 @@ import { mapState } from 'vuex';
 
 export default {
   computed: {
-    ...mapState(['rules']),
+    ...mapState({
+      rules: state => state.rules.rules,
+    }),
   },
 };
 </script>

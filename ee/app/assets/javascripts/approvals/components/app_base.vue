@@ -17,7 +17,10 @@ export default {
     GlLoadingIcon,
   },
   computed: {
-    ...mapState(['isLoading', 'settings']),
+    ...mapState({
+      settings: 'settings',
+      isLoading: state => state.rules.isLoading,
+    }),
     ...mapGetters(['isEmpty']),
   },
   created() {

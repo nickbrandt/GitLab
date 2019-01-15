@@ -5,7 +5,8 @@ import RulesEmpty from 'ee/approvals/components/rules_empty.vue';
 import App from 'ee/approvals/components/app_base.vue';
 import ModalRuleCreate from 'ee/approvals/components/modal_rule_create.vue';
 import ModalRuleRemove from 'ee/approvals/components/modal_rule_remove.vue';
-import * as getters from 'ee/approvals/stores/getters';
+import { createStoreOptions } from 'ee/approvals/stores';
+import settingsModule from 'ee/approvals/stores/modules/settings';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
@@ -14,48 +15,35 @@ const TEST_RULES_CLASS = 'js-fake-rules';
 const TEST_RULES_SEL = `.${TEST_RULES_CLASS}`;
 
 describe('EE Approvals App', () => {
-  let state;
-  let actions;
+  let store;
   let wrapper;
   let slots;
 
   const factory = () => {
-    const store = new Vuex.Store({
-      state,
-      actions,
-      getters,
-    });
-
     wrapper = shallowMount(localVue.extend(App), {
       localVue,
-      store,
       slots,
+      store: new Vuex.Store(store),
       sync: false,
     });
   };
 
   beforeEach(() => {
-    state = {
-      settings: { canEdit: true },
-      isLoading: true,
-    };
-
     slots = {
       rules: `<div class="${TEST_RULES_CLASS}">These are the rules!</div>`,
     };
 
-    actions = {
-      fetchRules: jasmine.createSpy('fetchRules'),
-      'createModal/open': jasmine.createSpy('createModal/open'),
-    };
+    store = createStoreOptions(settingsModule(), { canEdit: true });
+    store.modules.rules.actions.fetchRules = jasmine.createSpy('fetchRules');
+    store.modules.createModal.actions.open = jasmine.createSpy('createModal/open');
   });
 
   it('dispatches fetchRules action on created', () => {
-    expect(actions.fetchRules).not.toHaveBeenCalled();
+    expect(store.modules.rules.actions.fetchRules).not.toHaveBeenCalled();
 
     factory();
 
-    expect(actions.fetchRules).toHaveBeenCalledTimes(1);
+    expect(store.modules.rules.actions.fetchRules).toHaveBeenCalledTimes(1);
   });
 
   it('renders create modal', () => {
@@ -78,8 +66,10 @@ describe('EE Approvals App', () => {
 
   describe('if empty', () => {
     beforeEach(() => {
-      state.rules = [];
-      state.isLoading = false;
+      store.modules.rules.state = {
+        rules: [],
+        isLoading: false,
+      };
     });
 
     it('shows RulesEmpty', () => {
@@ -100,18 +90,22 @@ describe('EE Approvals App', () => {
       const empty = wrapper.find(RulesEmpty);
       empty.vm.$emit('click');
 
-      expect(actions['createModal/open']).toHaveBeenCalledWith(jasmine.anything(), null, undefined);
+      expect(store.modules.createModal.actions.open).toHaveBeenCalledWith(
+        jasmine.anything(),
+        null,
+        undefined,
+      );
     });
 
     it('shows loading icon if loading', () => {
-      state.isLoading = true;
+      store.modules.rules.state.isLoading = true;
       factory();
 
       expect(wrapper.find(GlLoadingIcon).exists()).toBe(true);
     });
 
     it('does not show loading icon if not loading', () => {
-      state.isLoading = false;
+      store.modules.rules.state.isLoading = false;
       factory();
 
       expect(wrapper.find(GlLoadingIcon).exists()).toBe(false);
@@ -120,7 +114,7 @@ describe('EE Approvals App', () => {
 
   describe('if not empty', () => {
     beforeEach(() => {
-      state.rules = [{ id: 1 }];
+      store.modules.rules.state.rules = [{ id: 1 }];
     });
 
     it('does not show RulesEmpty', () => {
@@ -152,11 +146,15 @@ describe('EE Approvals App', () => {
       const button = wrapper.find(GlButton);
       button.vm.$emit('click');
 
-      expect(actions['createModal/open']).toHaveBeenCalledWith(jasmine.anything(), null, undefined);
+      expect(store.modules.createModal.actions.open).toHaveBeenCalledWith(
+        jasmine.anything(),
+        null,
+        undefined,
+      );
     });
 
     it('shows loading icon and rules if loading', () => {
-      state.isLoading = true;
+      store.modules.rules.state.isLoading = true;
       factory();
 
       expect(wrapper.find(TEST_RULES_SEL).exists()).toBe(true);

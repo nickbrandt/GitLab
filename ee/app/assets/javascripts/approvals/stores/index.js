@@ -1,18 +1,15 @@
 import Vuex from 'vuex';
 import modalModule from '~/vuex_shared/modules/modal';
 import state from './state';
-import mutations from './mutations';
-import * as actions from './actions';
-import * as getters from './getters';
 
-export default (settings = {}) =>
-  new Vuex.Store({
-    state: state(settings),
-    mutations,
-    actions,
-    getters,
-    modules: {
-      createModal: modalModule(),
-      deleteModal: modalModule(),
-    },
-  });
+export const createStoreOptions = (rulesModule, settings) => ({
+  state: state(settings),
+  modules: {
+    rules: rulesModule,
+    createModal: modalModule(),
+    deleteModal: modalModule(),
+  },
+});
+
+export default (rulesModule, settings = {}) =>
+  new Vuex.Store(createStoreOptions(rulesModule, settings));

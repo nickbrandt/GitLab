@@ -50,7 +50,7 @@ describe('Approvals Rules', () => {
 
   beforeEach(() => {
     state = {
-      rules: TEST_RULES,
+      rules: { rules: TEST_RULES },
     };
   });
 

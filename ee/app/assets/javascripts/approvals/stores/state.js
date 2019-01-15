@@ -7,6 +7,4 @@ export default (settings = {}) => ({
     ...DEFAULT_SETTINGS,
     ...settings,
   },
-  isLoading: false,
-  rules: [],
 });
