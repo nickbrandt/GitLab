@@ -142,9 +142,9 @@ export default {
 
     <gl-loading-icon
       v-if="isLoading"
-      :label="s__('Pipelines|Loading Pipelines')"
+      :label="s__('FeatureFlags|Loading Feature Flags')"
       :size="3"
-      class="prepend-top-20"
+      class="js-loading-state prepend-top-20"
     />
 
     <template v-else-if="shouldRenderErrorState">
