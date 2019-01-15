@@ -124,21 +124,24 @@ describe('Approvals RuleForm', () => {
     });
 
     it('on submit with data, posts rule', () => {
+      const users = [1, 2];
+      const groups = [2, 3];
+      const userRecords = users.map(id => ({ id, type: TYPE_USER }));
+      const groupRecords = groups.map(id => ({ id, type: TYPE_GROUP }));
       const expected = {
         name: 'Lorem',
         approvalsRequired: 2,
-        users: [1, 2],
-        groups: [2, 3],
+        users,
+        groups,
+        userRecords,
+        groupRecords,
       };
       const name = findNameInput(wrapper);
       const approvalsRequired = findApprovalsRequiredInput(wrapper);
 
-      const groups = expected.groups.map(id => ({ id, type: TYPE_GROUP }));
-      const users = expected.users.map(id => ({ id, type: TYPE_USER }));
-
       name.node.setValue(expected.name);
       approvalsRequired.node.setValue(expected.approvalsRequired);
-      wrapper.vm.approvers = groups.concat(users);
+      wrapper.vm.approvers = groupRecords.concat(userRecords);
 
       wrapper.vm.submit();
 
@@ -174,10 +177,17 @@ describe('Approvals RuleForm', () => {
     });
 
     it('on submit, puts rule', () => {
+      const userRecords = TEST_RULE.users.map(x => ({ ...x, type: TYPE_USER }));
+      const groupRecords = TEST_RULE.groups.map(x => ({ ...x, type: TYPE_GROUP }));
+      const users = userRecords.map(x => x.id);
+      const groups = groupRecords.map(x => x.id);
+
       const expected = {
         ...TEST_RULE,
-        users: TEST_RULE.users.map(x => x.id),
-        groups: TEST_RULE.groups.map(x => x.id),
+        users,
+        groups,
+        userRecords,
+        groupRecords,
       };
 
       wrapper.vm.submit();

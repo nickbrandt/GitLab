@@ -24,6 +24,7 @@ describe('Approvals ApproversListItem', () => {
     wrapper = shallowMount(localVue.extend(ApproversListItem), {
       ...options,
       localVue,
+      sync: false,
     });
   };
 

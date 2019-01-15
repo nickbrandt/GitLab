@@ -1,27 +1,29 @@
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions, mapGetters } from 'vuex';
 import { GlLoadingIcon, GlButton } from '@gitlab/ui';
 import ModalRuleCreate from './modal_rule_create.vue';
 import ModalRuleRemove from './modal_rule_remove.vue';
 import RulesEmpty from './rules_empty.vue';
-import Rules from './rules.vue';
-
-const CREATE_MODAL_ID = 'approvals-settings-create-modal';
-const REMOVE_MODAL_ID = 'approvals-settings-remove-modal';
 
 export default {
   components: {
     ModalRuleCreate,
     ModalRuleRemove,
-    Rules,
     RulesEmpty,
     GlButton,
     GlLoadingIcon,
   },
   computed: {
-    ...mapState(['isLoading', 'rules']),
-    isEmpty() {
-      return !this.rules || !this.rules.length;
+    ...mapState({
+      settings: 'settings',
+      isLoading: state => state.approvals.isLoading,
+    }),
+    ...mapGetters(['isEmpty']),
+    createModalId() {
+      return `${this.settings.prefix}-approvals-create-modal`;
+    },
+    removeModalId() {
+      return `${this.settings.prefix}-approvals-remove-modal`;
     },
   },
   created() {
@@ -30,10 +32,7 @@ export default {
   methods: {
     ...mapActions(['fetchRules']),
     ...mapActions({ openCreateModal: 'createModal/open' }),
-    ...mapActions({ openDeleteModal: 'deleteModal/open' }),
   },
-  CREATE_MODAL_ID,
-  REMOVE_MODAL_ID,
 };
 </script>
 
@@ -44,13 +43,8 @@ export default {
       <rules-empty v-else @click="openCreateModal(null);" />
     </template>
     <template v-else>
-      <rules
-        class="m-0"
-        :rules="rules"
-        @edit="openCreateModal($event);"
-        @remove="openDeleteModal($event);"
-      />
-      <div class="border-top border-bottom py-3 px-2">
+      <div class="border-bottom"><slot name="rules"></slot></div>
+      <div v-if="settings.canEdit" class="border-bottom py-3 px-2">
         <gl-loading-icon v-if="isLoading" />
         <div class="d-flex">
           <gl-button class="ml-auto btn-info btn-inverted" @click="openCreateModal(null);">{{
@@ -59,7 +53,8 @@ export default {
         </div>
       </div>
     </template>
-    <modal-rule-create :modal-id="$options.CREATE_MODAL_ID" />
-    <modal-rule-remove :modal-id="$options.REMOVE_MODAL_ID" />
+    <slot name="footer"></slot>
+    <modal-rule-create :modal-id="createModalId" />
+    <modal-rule-remove :modal-id="removeModalId" />
   </div>
 </template>

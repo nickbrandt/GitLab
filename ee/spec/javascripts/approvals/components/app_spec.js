@@ -1,49 +1,50 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import { GlLoadingIcon, GlButton } from '@gitlab/ui';
+import RulesEmpty from 'ee/approvals/components/rules_empty.vue';
+import App from 'ee/approvals/components/app.vue';
 import ModalRuleCreate from 'ee/approvals/components/modal_rule_create.vue';
 import ModalRuleRemove from 'ee/approvals/components/modal_rule_remove.vue';
-import Rules from 'ee/approvals/components/rules.vue';
-import RulesEmpty from 'ee/approvals/components/rules_empty.vue';
-import Settings from 'ee/approvals/components/settings.vue';
+import { createStoreOptions } from 'ee/approvals/stores';
+import settingsModule from 'ee/approvals/stores/modules/project_settings';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-describe('EE ApprovalsSettingsForm', () => {
-  let state;
-  let actions;
+const TEST_RULES_CLASS = 'js-fake-rules';
+const TEST_RULES_SEL = `.${TEST_RULES_CLASS}`;
+const APP_PREFIX = 'lorem-ipsum';
+
+describe('EE Approvals App', () => {
+  let store;
   let wrapper;
+  let slots;
 
   const factory = () => {
-    const store = new Vuex.Store({
-      state,
-      actions,
-    });
-
-    wrapper = shallowMount(localVue.extend(Settings), {
+    wrapper = shallowMount(localVue.extend(App), {
       localVue,
-      store,
+      slots,
+      store: new Vuex.Store(store),
       sync: false,
     });
   };
 
   beforeEach(() => {
-    state = {};
-
-    actions = {
-      fetchRules: jasmine.createSpy('fetchRules'),
-      'createModal/open': jasmine.createSpy('createModal/open'),
-      'deleteModal/open': jasmine.createSpy('deleteModal/open'),
+    slots = {
+      rules: `<div class="${TEST_RULES_CLASS}">These are the rules!</div>`,
     };
+
+    store = createStoreOptions(settingsModule(), { canEdit: true, prefix: APP_PREFIX });
+    store.modules.approvals.actions.fetchRules = jasmine.createSpy('fetchRules');
+    store.modules.createModal.actions.open = jasmine.createSpy('createModal/open');
   });
 
   it('dispatches fetchRules action on created', () => {
-    expect(actions.fetchRules).not.toHaveBeenCalled();
+    expect(store.modules.approvals.actions.fetchRules).not.toHaveBeenCalled();
 
     factory();
 
-    expect(actions.fetchRules).toHaveBeenCalledTimes(1);
+    expect(store.modules.approvals.actions.fetchRules).toHaveBeenCalledTimes(1);
   });
 
   it('renders create modal', () => {
@@ -52,7 +53,7 @@ describe('EE ApprovalsSettingsForm', () => {
     const modal = wrapper.find(ModalRuleCreate);
 
     expect(modal.exists()).toBe(true);
-    expect(modal.props('modalId')).toBe(wrapper.vm.$options.CREATE_MODAL_ID);
+    expect(modal.props('modalId')).toBe(`${APP_PREFIX}-approvals-create-modal`);
   });
 
   it('renders delete modal', () => {
@@ -61,12 +62,15 @@ describe('EE ApprovalsSettingsForm', () => {
     const modal = wrapper.find(ModalRuleRemove);
 
     expect(modal.exists()).toBe(true);
-    expect(modal.props('modalId')).toBe(wrapper.vm.$options.REMOVE_MODAL_ID);
+    expect(modal.props('modalId')).toBe(`${APP_PREFIX}-approvals-remove-modal`);
   });
 
   describe('if empty', () => {
     beforeEach(() => {
-      state.rules = [];
+      store.modules.approvals.state = {
+        rules: [],
+        isLoading: false,
+      };
     });
 
     it('shows RulesEmpty', () => {
@@ -78,7 +82,7 @@ describe('EE ApprovalsSettingsForm', () => {
     it('does not show Rules', () => {
       factory();
 
-      expect(wrapper.find(Rules).exists()).toBe(false);
+      expect(wrapper.find(`.${TEST_RULES_CLASS}`).exists()).toBe(false);
     });
 
     it('opens create modal if clicked', () => {
@@ -87,18 +91,22 @@ describe('EE ApprovalsSettingsForm', () => {
       const empty = wrapper.find(RulesEmpty);
       empty.vm.$emit('click');
 
-      expect(actions['createModal/open']).toHaveBeenCalledWith(jasmine.anything(), null, undefined);
+      expect(store.modules.createModal.actions.open).toHaveBeenCalledWith(
+        jasmine.anything(),
+        null,
+        undefined,
+      );
     });
 
     it('shows loading icon if loading', () => {
-      state.isLoading = true;
+      store.modules.approvals.state.isLoading = true;
       factory();
 
       expect(wrapper.find(GlLoadingIcon).exists()).toBe(true);
     });
 
     it('does not show loading icon if not loading', () => {
-      state.isLoading = false;
+      store.modules.approvals.state.isLoading = false;
       factory();
 
       expect(wrapper.find(GlLoadingIcon).exists()).toBe(false);
@@ -107,7 +115,7 @@ describe('EE ApprovalsSettingsForm', () => {
 
   describe('if not empty', () => {
     beforeEach(() => {
-      state.rules = [{ id: 1 }];
+      store.modules.approvals.state.rules = [{ id: 1 }];
     });
 
     it('does not show RulesEmpty', () => {
@@ -119,30 +127,9 @@ describe('EE ApprovalsSettingsForm', () => {
     it('shows rules', () => {
       factory();
 
-      const rules = wrapper.find(Rules);
+      const rules = wrapper.find(TEST_RULES_SEL);
 
       expect(rules.exists()).toBe(true);
-      expect(rules.props('rules')).toEqual(state.rules);
-    });
-
-    it('opens create modal when edit is clicked', () => {
-      factory();
-
-      const rule = state.rules[0];
-      const rules = wrapper.find(Rules);
-      rules.vm.$emit('edit', rule);
-
-      expect(actions['createModal/open']).toHaveBeenCalledWith(jasmine.anything(), rule, undefined);
-    });
-
-    it('opens delete modal when remove is clicked', () => {
-      factory();
-
-      const { id } = state.rules[0];
-      const rules = wrapper.find(Rules);
-      rules.vm.$emit('remove', id);
-
-      expect(actions['deleteModal/open']).toHaveBeenCalledWith(jasmine.anything(), id, undefined);
     });
 
     it('renders add button', () => {
@@ -160,14 +147,18 @@ describe('EE ApprovalsSettingsForm', () => {
       const button = wrapper.find(GlButton);
       button.vm.$emit('click');
 
-      expect(actions['createModal/open']).toHaveBeenCalledWith(jasmine.anything(), null, undefined);
+      expect(store.modules.createModal.actions.open).toHaveBeenCalledWith(
+        jasmine.anything(),
+        null,
+        undefined,
+      );
     });
 
     it('shows loading icon and rules if loading', () => {
-      state.isLoading = true;
+      store.modules.approvals.state.isLoading = true;
       factory();
 
-      expect(wrapper.find(Rules).exists()).toBe(true);
+      expect(wrapper.find(TEST_RULES_SEL).exists()).toBe(true);
       expect(wrapper.find(GlLoadingIcon).exists()).toBe(true);
     });
   });
