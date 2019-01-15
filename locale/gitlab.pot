@@ -2290,6 +2290,9 @@ msgstr ""
 msgid "ClusterIntegration|sign up"
 msgstr ""
 
+msgid "Code"
+msgstr ""
+
 msgid "Code owners"
 msgstr ""
 
@@ -2331,7 +2334,13 @@ msgid_plural "Commits"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Commit %{commit_id}"
+msgstr ""
+
 msgid "Commit Message"
+msgstr ""
+
+msgid "Commit deleted"
 msgstr ""
 
 msgid "Commit duration in minutes for last 30 commits"
@@ -3849,6 +3858,12 @@ msgid "Filter by commit message"
 msgstr ""
 
 msgid "Filter by two-factor authentication"
+msgstr ""
+
+msgid "Filter results by group"
+msgstr ""
+
+msgid "Filter results by project"
 msgstr ""
 
 msgid "Filter..."
@@ -7025,6 +7040,9 @@ msgstr ""
 msgid "Project slug"
 msgstr ""
 
+msgid "Project:"
+msgstr ""
+
 msgid "ProjectActivityRSS|Subscribe"
 msgstr ""
 
@@ -7833,6 +7851,9 @@ msgstr ""
 msgid "Search for projects, issues, etc."
 msgstr ""
 
+msgid "Search groups"
+msgstr ""
+
 msgid "Search merge requests"
 msgstr ""
 
@@ -8289,6 +8310,9 @@ msgid "Smartcard"
 msgstr ""
 
 msgid "Smartcard authentication failed: client certificate header is missing."
+msgstr ""
+
+msgid "Snippet Contents"
 msgstr ""
 
 msgid "Snippets"
@@ -9447,6 +9471,9 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
+msgid "Titles and Filenames"
+msgstr ""
+
 msgid "To GitLab"
 msgstr ""
 
@@ -10021,6 +10048,9 @@ msgid "We could not determine the path to remove the epic"
 msgstr ""
 
 msgid "We could not determine the path to remove the issue"
+msgstr ""
+
+msgid "We couldn't find any results matching"
 msgstr ""
 
 msgid "We detected potential spam in the %{humanized_resource_name}. Please solve the reCAPTCHA to proceed."
@@ -10694,6 +10724,9 @@ msgstr ""
 msgid "command line instructions"
 msgstr ""
 
+msgid "commented on %{link_to_project}"
+msgstr ""
+
 msgid "confidentiality|You are going to turn off the confidentiality. This means <strong>everyone</strong> will be able to see and leave a comment on this issue."
 msgstr ""
 
@@ -10779,6 +10812,12 @@ msgid "import flow"
 msgstr ""
 
 msgid "importing"
+msgstr ""
+
+msgid "in group %{link_to_group}"
+msgstr ""
+
+msgid "in project %{link_to_project}"
 msgstr ""
 
 msgid "instance completed"
@@ -11100,6 +11139,9 @@ msgid "password"
 msgstr ""
 
 msgid "personal access token"
+msgstr ""
+
+msgid "private"
 msgstr ""
 
 msgid "private key does not match certificate."
