@@ -30,3 +30,13 @@ export const addRelatedIssueErrorMap = {
   issue: __("We can't find an issue that matches what you are looking for."),
   epic: __("We can't find an epic that matches what you are looking for."),
 };
+
+/**
+ * These are used to map issuableType to the correct icon.
+ * Since these are never used for any display purposes, don't wrap
+ * them inside i18n functions.
+ */
+export const issuableIconMap = {
+  issue: 'issues',
+  epic: 'epic',
+};
