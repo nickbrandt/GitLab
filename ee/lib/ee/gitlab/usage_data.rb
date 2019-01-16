@@ -106,7 +106,6 @@ module EE
         end
 
         def operations_dashboard_usage
-
           users_with_ops_dashboard_as_default = count(::User.active.where(dashboard: 'operations'))
           users_with_projects_added = count(UsersOpsDashboardProject.select('distinct user_id'))
 
