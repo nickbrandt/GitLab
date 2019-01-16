@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 
+# rubocop:disable RSpec/FactoriesInMigrationSpecs
 describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
   def create_skip_sync(*args)
     build(*args) do |record|
@@ -242,3 +243,4 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
     end
   end
 end
+# rubocop:enable RSpec/FactoriesInMigrationSpecs

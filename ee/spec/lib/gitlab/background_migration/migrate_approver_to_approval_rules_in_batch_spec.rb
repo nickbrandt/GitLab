@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 
+# rubocop:disable RSpec/FactoriesInMigrationSpecs
 describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRulesInBatch do
   context 'when there is no more MigrateApproverToApprovalRules jobs' do
     let(:job) { double(:job) }
@@ -18,3 +19,4 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRulesInBatch do
     end
   end
 end
+# rubocop:enable RSpec/FactoriesInMigrationSpecs
