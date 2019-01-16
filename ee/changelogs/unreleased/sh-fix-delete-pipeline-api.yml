@@ -1,0 +1,5 @@
+---
+title: Fix Error 500 when deleting a pipeline via the API
+merge_request: 9104
+author:
+type: fixed
