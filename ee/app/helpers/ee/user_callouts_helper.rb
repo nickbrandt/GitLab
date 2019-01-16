@@ -5,6 +5,7 @@ module EE
     GOLD_TRIAL = 'gold_trial'
     GEO_ENABLE_HASHED_STORAGE = 'geo_enable_hashed_storage'
     GEO_MIGRATE_HASHED_STORAGE = 'geo_migrate_hashed_storage'
+    CANARY_DEPLOYMENT = 'canary_deployment'
 
     def show_gold_trial?(user = current_user)
       return false unless user
@@ -12,6 +13,13 @@ module EE
       return false unless show_gold_trial_suitable_env?
 
       users_namespaces_clean?(user)
+    end
+
+    def show_canary_deployment_callout?(project)
+      !user_dismissed?(CANARY_DEPLOYMENT) &&
+        show_promotions? &&
+        # use :canary_deployments if we create a feature flag for it in the future
+        !project.feature_available?(:deploy_board)
     end
 
     def show_gold_trial_suitable_env?

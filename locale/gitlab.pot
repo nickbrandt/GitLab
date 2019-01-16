@@ -1567,6 +1567,9 @@ msgstr ""
 msgid "Can't find HEAD commit for this branch"
 msgstr ""
 
+msgid "Canary Deployments is a popular CI strategy, where a small portion of the fleet is updated to the new version of your application."
+msgstr ""
+
 msgid "Cancel"
 msgstr ""
 
@@ -2476,6 +2479,9 @@ msgid "Connect your external repositories, and CI/CD pipelines will run for new 
 msgstr ""
 
 msgid "Connecting..."
+msgstr ""
+
+msgid "Contact sales to upgrade"
 msgstr ""
 
 msgid "Container Registry"
@@ -9802,6 +9808,9 @@ msgid "Update your group name, description, avatar, and visibility."
 msgstr ""
 
 msgid "Updating"
+msgstr ""
+
+msgid "Upgrade plan to unlock Canary Deployments feature"
 msgstr ""
 
 msgid "Upgrade your plan to activate Advanced Global Search."

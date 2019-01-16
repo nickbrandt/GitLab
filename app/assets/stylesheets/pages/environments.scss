@@ -721,3 +721,59 @@
     margin-left: $gl-padding-8;
   }
 }
+
+// ee-only start
+.canary-deployment-callout {
+  border-bottom: 1px solid $border-white-normal;
+  display: flex;
+
+  @include media-breakpoint-down(sm) {
+    display: none;
+  }
+
+  &-lock {
+    height: 82px;
+    width: 92px;
+  }
+
+  &-message {
+    max-width: 600px;
+    color: $gray-700;
+  }
+
+  &-close {
+    color: $gray-700;
+    cursor: pointer;
+  }
+
+  &-button {
+    border-color: $blue-500;
+    color: $blue-500;
+
+    &:not(:disabled):not(.disabled):active {
+      background-color: $blue-200;
+      border: 2px solid $blue-600;
+      color: $blue-700;
+      height: 34px;
+      padding: 5px 9px;
+    }
+
+    &:focus {
+      background-color: $blue-100;
+      border: 2px solid $blue-500;
+      box-shadow: 0 0 4px 1px $blue-200;
+      color: $blue-600;
+      height: 34px;
+      padding: 5px 9px;
+    }
+
+    &:hover {
+      background-color: $blue-100;
+      border: 2px solid $blue-500;
+      color: $blue-600;
+      height: 34px;
+      padding: 5px 9px;
+    }
+  }
+}
+// ee-only end

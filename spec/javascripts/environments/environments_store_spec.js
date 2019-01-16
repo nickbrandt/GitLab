@@ -245,4 +245,20 @@ describe('Store', () => {
       expect(store.getOpenFolders()[0]).toEqual(store.state.environments[1]);
     });
   });
+
+  // ee-only start
+  describe('canaryCallout', () => {
+    it('should add banner underneath the second environment', () => {
+      store.storeEnvironments(serverData);
+
+      expect(store.state.environments[1].showCanaryCallout).toEqual(true);
+    });
+
+    it('should add banner underneath first environment when only one environment', () => {
+      store.storeEnvironments(serverData.slice(0, 1));
+
+      expect(store.state.environments[0].showCanaryCallout).toEqual(true);
+    });
+  });
+  // ee-only end
 });
