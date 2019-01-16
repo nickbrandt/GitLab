@@ -1,5 +1,6 @@
 require 'spec_helper'
 
+# rubocop:disable RSpec/FactoriesInMigrationSpecs
 describe Gitlab::BackgroundMigration::UpdateAuthorizedKeysFileSince do
   let(:background_migration) { described_class.new }
 
@@ -90,3 +91,4 @@ describe Gitlab::BackgroundMigration::UpdateAuthorizedKeysFileSince do
     end
   end
 end
+# rubocop:enable RSpec/FactoriesInMigrationSpecs
