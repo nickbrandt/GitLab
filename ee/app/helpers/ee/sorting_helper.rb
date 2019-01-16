@@ -41,6 +41,29 @@ module EE
       }
     end
 
+    override :issuable_reverse_sort_order_hash
+    def issuable_reverse_sort_order_hash
+      {
+        sort_value_weight => sort_value_more_weight
+      }.merge(super)
+    end
+
+    override :issuable_sort_option_overrides
+    def issuable_sort_option_overrides
+      {
+        sort_value_more_weight => sort_value_weight
+      }.merge(super)
+    end
+
+    override :issuable_sort_icon_suffix
+    def issuable_sort_icon_suffix(sort_value)
+      if sort_value == sort_value_weight
+        'lowest'
+      else
+        super
+      end
+    end
+
     # Creates a button with the opposite ordering for the current field in UI.
     def sort_order_button(sort)
       opposite_sorting_param = epics_ordering_options_hash[sort] || epics_ordering_options_hash.key(sort)

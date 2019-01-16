@@ -1,0 +1,2 @@
+- allow_weight_sort = viewing_issues && (@project || @group)&.feature_available?(:issue_weights)
+= sortable_item(sort_title_weight, page_filter_path(sort: sort_value_weight, label: true), sort_title) if allow_weight_sort
