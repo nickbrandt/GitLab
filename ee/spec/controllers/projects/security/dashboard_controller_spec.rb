@@ -89,7 +89,7 @@ describe Projects::Security::DashboardController do
         show_security_dashboard guest
 
         expect(response).to have_gitlab_http_status(404)
-        expect(response).to render_template('errors/access_denied')
+        expect(response).to render_template('errors/not_found')
       end
     end
   end
