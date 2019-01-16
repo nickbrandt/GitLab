@@ -579,7 +579,7 @@ describe('ee merge request widget options', () => {
               vm.$el.querySelector('.js-sast-container .report-block-list-issue-description')
                 .textContent,
             ),
-          ).toEqual('Container scanning detected 1 new vulnerability');
+          ).toEqual('Container scanning detected 1 new, and 1 fixed vulnerabilities');
           done();
         }, 0);
       });
