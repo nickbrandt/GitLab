@@ -67,11 +67,11 @@ export default {
             <icon class="float-right" name="chevron-down" /> {{ dropdownText }}
           </button>
           <div class="dropdown-menu dropdown-menu-right">
-            <button class="dropdown-item" type="button" @click="approveLicense(license);">
+            <button class="dropdown-item" type="button" @click="approveLicense(license)">
               <icon :class="approveIconClass" name="mobile-issue-close" />
               {{ $options[$options.LICENSE_APPROVAL_STATUS.APPROVED] }}
             </button>
-            <button class="dropdown-item" type="button" @click="blacklistLicense(license);">
+            <button class="dropdown-item" type="button" @click="blacklistLicense(license)">
               <icon :class="blacklistIconClass" name="mobile-issue-close" />
               {{ $options[$options.LICENSE_APPROVAL_STATUS.BLACKLISTED] }}
             </button>
@@ -82,7 +82,7 @@ export default {
           type="button"
           data-toggle="modal"
           data-target="#modal-license-delete-confirmation"
-          @click="setLicenseInModal(license);"
+          @click="setLicenseInModal(license)"
         >
           <icon name="remove" />
         </button>

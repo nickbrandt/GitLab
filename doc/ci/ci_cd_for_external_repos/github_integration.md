@@ -14,7 +14,7 @@ If the [GitHub integration][github-integration] has been enabled by your GitLab
 administrator:
 
 NOTE: **Note:**
-Due to a 10-token limitation on the [GitHub OAuth Implemenation](https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/#creating-multiple-tokens-for-oauth-apps),
+Due to a 10-token limitation on the [GitHub OAuth Implementation](https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/#creating-multiple-tokens-for-oauth-apps),
 if you import more than 10 times, your oldest imported project's token will be 
 revoked. See issue [#9147](https://gitlab.com/gitlab-org/gitlab-ee/issues/9147)
 for more information.

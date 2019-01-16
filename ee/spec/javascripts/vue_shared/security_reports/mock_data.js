@@ -673,6 +673,27 @@ export const parsedDependencyScanningBaseStore = [
   },
 ];
 
+export const parsedSastContainerBaseStore = [
+  {
+    category: 'container_scanning',
+    description: 'debian:8 is affected by CVE-2014-8130.',
+    identifiers: [
+      {
+        name: 'CVE-2014-8130',
+        type: 'CVE',
+        url: 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-8130',
+        value: 'CVE-2014-8130',
+      },
+    ],
+    namespace: 'debian:8',
+    path: 'debian:8',
+    project_fingerprint: '20a19f706d82cec1c04d1c9a8858e89b142d602f',
+    severity: 'Negligible',
+    title: 'CVE-2014-8130',
+    vulnerability: 'CVE-2014-8130',
+  },
+];
+
 export const allIssuesParsed = [
   {
     title: 'Possible Information Leak Vulnerability in Action View',
@@ -710,7 +731,7 @@ export const dockerReport = {
 };
 
 export const dockerBaseReport = {
-  unapproved: ['CVE-2017-12944'],
+  unapproved: ['CVE-2017-12944', 'CVE-2014-8130'],
   vulnerabilities: [
     {
       vulnerability: 'CVE-2017-12944',

@@ -1,42 +1,47 @@
-# GitLab JIRA development panel integration **[PREMIUM]**
+# GitLab Jira development panel integration **[PREMIUM]**
 
 > [Introduced][ee-2381] in [GitLab Premium][eep] 10.0.
 
-As an extension to our [existing JIRA][existing-jira] project integration, you're now able to integrate
-GitLab projects with [JIRA Development Panel][jira-development-panel]. Both can be used
-simultaneously. This works with self-hosted GitLab or GitLab.com integrated with self-hosted JIRA
-or cloud JIRA.
+Complementary to our [existing Jira][existing-jira] project integration, you're now able to integrate
+GitLab projects with [Jira Development Panel][jira-development-panel]. Both can be used
+simultaneously. This works with self-hosted GitLab or GitLab.com integrated with self-hosted Jira
+or cloud Jira.
 
-By doing this you can easily access related GitLab merge requests, branches, and commits directly from a JIRA issue.
+By doing this you can easily access related GitLab merge requests, branches, and commits directly from a Jira issue.
 
-This integration connects all GitLab projects within a top-level group or a personal namespace to projects in the JIRA instance.
+This integration connects all GitLab projects within a top-level group or a personal namespace to projects in the Jira instance.
 A top-level GitLab group is one that does not have any parent group itself. All the projects of that top-level group,
 as well as projects of the top-level group's subgroups nesting down, are connected. Alternatively, you can specify
-a GitLab personal namespace in the JIRA configuration, which will then connect the projects in that personal namespace to JIRA.
+a GitLab personal namespace in the Jira configuration, which will then connect the projects in that personal namespace to Jira.
 
-(Note this is different from the [existing JIRA][existing-jira] project integration, where the mapping
-is one GitLab project to the entire JIRA instance.) 
+NOTE: **Note**:
+Note this is different from the [existing Jira][existing-jira] project integration, where the mapping
+is one GitLab project to the entire Jira instance.
 
 We recommend that a GitLab group admin
-or instance admin (in the case of self-hosted GitLab) set up the integration with respect to their
-account, in order to maximize the integrated GitLab projects used by your team.
+or instance admin (in the case of self-hosted GitLab) set up the integration,
+in order to simplify administration (subject to [limitations](#limitations)).
+
+TIP: **Tip:**
+Create and use a single-purpose "jira" user in GitLab, so that removing
+regular users won't impact your integration.
 
 ## Requirements
 
 ### Self-hosted GitLab
 
-If you are using self-hosted GitLab, make sure your GitLab instance is accessible by JIRA.
+If you are using self-hosted GitLab, make sure your GitLab instance is accessible by Jira.
 
-- If you are connecting to JIRA Cloud, make sure your instance is accessible via the internet.
-- If you are using JIRA Server, make sure your instance is accessible however your network is set up.
+- If you are connecting to Jira Cloud, make sure your instance is accessible via the internet.
+- If you are using Jira Server, make sure your instance is accessible however your network is set up.
 
 ### GitLab.com
 
-There are no special requirements if you are using GitLab.com 
+There are no special requirements if you are using GitLab.com.
 
 ## GitLab Configuration
 
-1. In GitLab, create a new application in order to allow JIRA to connect with your GitLab account
+1. In GitLab, create a new application in order to allow Jira to connect with your GitLab account
 
     While logged-in, go to `Settings -> Applications`. (Click your profile avatar at
     the top right, choose `Settings`, and then navigate to `Applications` from the left
@@ -47,23 +52,23 @@ There are no special requirements if you are using GitLab.com
     For the `Redirect URI` field, enter `https://<your-gitlab-instance-domain>/login/oauth/callback`,
     replacing `<your-gitlab-instance-domain>` appropriately. So for example, if you are using GitLab.com,
     this would be `https://gitlab.com/login/oauth/callback`.
-    
-    NOTE: **Note**: 
+
+    NOTE: **Note**:
     If using a GitLab version earlier than 11.3 the `Redirect URI` value should be `https://<your-gitlab-instance-domain>/-/jira/login/oauth/callback`.
 
     ![GitLab Application setup](img/jira_dev_panel_gl_setup_1.png)
     - Check `api` in the Scopes section.
 
 2. Click `Save application`. You will see the generated 'Application Id' and 'Secret' values.
-Copy these values that you will use on the JIRA configuration side.
+    Copy these values that you will use on the Jira configuration side.
 
-## JIRA Configuration
+## Jira Configuration
 
-1. In JIRA, from the gear menu at the top right, go to `Applications`. Navigate to `DVCS accounts`
-from the left navigation menu. Click `Link GitHub account` to start creating a new integration.
-(We are pretending to be GitHub in this integration until there is further platform support from JIRA.)
+1. In Jira, from the gear menu at the top right, go to `Applications`. Navigate to `DVCS accounts`
+    from the left navigation menu. Click `Link GitHub account` to start creating a new integration.
+    (We are pretending to be GitHub in this integration until there is further platform support from Jira.)
 
-    ![JIRA DVCS from Dashboard](img/jira_dev_panel_jira_setup_1.png)
+    ![Jira DVCS from Dashboard](img/jira_dev_panel_jira_setup_1.png)
 
 2. Complete the form
 
@@ -77,7 +82,7 @@ from the left navigation menu. Click `Link GitHub account` to start creating a n
     For the `Host URL` field, enter `https://<your-gitlab-instance-domain>/`,
     replacing `<your-gitlab-instance-domain>` appropriately. So for example, if you are using GitLab.com,
     this would be `https://gitlab.com/`.
-    
+
     NOTE: **Note**:
     If using a GitLab version earlier than 11.3 the `Host URL` value should be `https://<your-gitlab-instance-domain>/-/jira`
 
@@ -89,7 +94,7 @@ from the left navigation menu. Click `Link GitHub account` to start creating a n
 
 3. Click `Add` to complete and create the integration.
 
-    JIRA takes up to a few minutes to know about (import behind the scenes) all the commits and branches
+    Jira takes up to a few minutes to know about (import behind the scenes) all the commits and branches
     for all the projects in the GitLab group you specified in the previous step. These are refreshed
     every 60 minutes.
 
@@ -98,28 +103,34 @@ from the left navigation menu. Click `Link GitHub account` to start creating a n
     > to refresh the data manually, you can do this from the `Applications -> DVCS
     > accounts` screen where you initially set up the integration:
     >
-    > ![Refresh GitLab information in JIRA](img/jira_dev_panel_manual_refresh.png)
+    > ![Refresh GitLab information in Jira](img/jira_dev_panel_manual_refresh.png)
 
 To connect additional GitLab projects from other GitLab top-level groups (or personal namespaces), repeat the above
-steps with additional JIRA DVCS accounts.
+steps with additional Jira DVCS accounts.
 
 You may now refer any Jira issue by its ID in branch names, commit messages and  merge request names on GitLab's side,
-and you will be able to see the linked `branches`, `commits`, and `merge requests` when entering a JIRA issue
+and you will be able to see the linked `branches`, `commits`, and `merge requests` when entering a Jira issue
 (inside the Jira issue, merge requests will be called "pull requests").
 
-
-![Branch, Commit and Pull Requests links on JIRA issue](img/jira_dev_panel_jira_setup_3.png)
+![Branch, Commit and Pull Requests links on Jira issue](img/jira_dev_panel_jira_setup_3.png)
 
 Click the links to see your GitLab repository data.
 
-![GitLab commits details on a JIRA issue](img/jira_dev_panel_jira_setup_4.png)
+![GitLab commits details on a Jira issue](img/jira_dev_panel_jira_setup_4.png)
 
-![GitLab merge requests details on a JIRA issue](img/jira_dev_panel_jira_setup_5.png)
-
+![GitLab merge requests details on a Jira issue](img/jira_dev_panel_jira_setup_5.png)
 
 ## Limitations
 
 - This integration is currently not supported on GitLab instances under a [relative url][relative-url] (e.g. `http://example.com/gitlab`).
+- The GitLab user that you use to configure this integration must be a member of all
+    projects you wish to link to Jira. We're investigating removing this limitation in in [a feature proposal](https://gitlab.com/gitlab-org/gitlab-ee/issues/8902).
+
+## Changelog
+
+### 11.1
+
+- [Support GitLab subgroups in Jira development panel](https://gitlab.com/gitlab-org/gitlab-ee/issues/3561)
 
 [existing-jira]: ../user/project/integrations/jira.md
 [jira-development-panel]: https://confluence.atlassian.com/adminjiraserver070/integrating-with-development-tools-776637096.html#Integratingwithdevelopmenttools-Developmentpanelonissues

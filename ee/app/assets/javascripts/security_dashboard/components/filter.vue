@@ -54,7 +54,7 @@ export default {
       <gl-dropdown-item
         v-for="option in filter.options"
         :key="option.id"
-        @click="clickFilter(option);"
+        @click="clickFilter(option)"
       >
         <icon
           v-if="option.selected"

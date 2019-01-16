@@ -89,7 +89,7 @@ export default {
         v-for="vulnerability in vulnerabilities"
         :key="vulnerability.id"
         :vulnerability="vulnerability"
-        @openModal="openModal({ vulnerability });"
+        @openModal="openModal({ vulnerability })"
       />
 
       <empty-state

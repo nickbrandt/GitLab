@@ -74,7 +74,7 @@ export default {
         'is-last': isLast,
       },
     ]"
-    @click="scrollToDraft(draft);"
+    @click="scrollToDraft(draft)"
   >
     <span class="review-preview-item-header">
       <icon class="append-right-8 flex-shrink-0" :name="iconName" />

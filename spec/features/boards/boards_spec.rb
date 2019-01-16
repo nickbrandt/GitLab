@@ -99,7 +99,7 @@ describe 'Issue Boards', :js do
       expect(find('.board:nth-child(4)')).to have_selector('.board-card')
     end
 
-    it 'shows description tooltip on list title' do
+    it 'shows description tooltip on list title', :quarantine do
       page.within('.board:nth-child(2)') do
         expect(find('.board-title span.has-tooltip')[:title]).to eq('Test')
       end
@@ -413,7 +413,7 @@ describe 'Issue Boards', :js do
         wait_for_empty_boards((2..4))
       end
 
-      it 'filters by label with space after reload' do
+      it 'filters by label with space after reload', :quarantine do
         set_filter("label", "\"#{accepting.title}")
         click_filter_link(accepting.title)
         submit_filter
@@ -479,7 +479,7 @@ describe 'Issue Boards', :js do
         end
       end
 
-      it 'filters by multiple labels' do
+      it 'filters by multiple labels', :quarantine do
         set_filter("label", testing.title)
         click_filter_link(testing.title)
 

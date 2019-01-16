@@ -245,7 +245,7 @@ export default {
           :disabled="modal.isCreatingNewIssue"
           :label="__('Create issue')"
           container-class="js-create-issue-btn btn btn-success btn-inverted"
-          @click="$emit('createNewIssue');"
+          @click="$emit('createNewIssue')"
         />
       </template>
     </div>

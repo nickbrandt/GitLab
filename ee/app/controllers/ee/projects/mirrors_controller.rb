@@ -82,9 +82,19 @@ module EE
         params = mirror_params
 
         import_data = params[:import_data_attributes]
+
         if import_data.present?
           # Prevent Rails from destroying the existing import data
           import_data[:id] ||= project.import_data&.id
+
+          # Since we reuse the existing import data row, we'll need to
+          # clear out the credentials each time to ensure we don't
+          # erroneously mix and match SSH and HTTPS credentials. We assume
+          # this is safe to do because we only support creation of new
+          # mirrors and do not support updating them until
+          # https://gitlab.com/gitlab-org/gitlab-ee/issues/7320 is
+          # supported.
+          params[:clear_import_data_credentials] = true
 
           # If the known hosts data is being set, store details about who and when
           if import_data[:ssh_known_hosts].present?

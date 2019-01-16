@@ -31,7 +31,7 @@ export default {
         :message="allCheck.message"
         :help-path="paths.webTerminalHelpPath"
         :illustration-path="paths.webTerminalSvgPath"
-        @start="start();"
+        @start="start()"
       />
     </div>
     <template v-else>

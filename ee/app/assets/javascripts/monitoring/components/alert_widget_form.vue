@@ -104,7 +104,7 @@ export default {
         :disabled="disabled"
         type="button"
         class="btn btn-default"
-        @click="operator = operators.greaterThan;"
+        @click="operator = operators.greaterThan"
       >
         {{ operators.greaterThan }}
       </button>
@@ -113,7 +113,7 @@ export default {
         :disabled="disabled"
         type="button"
         class="btn btn-default"
-        @click="operator = operators.equalTo;"
+        @click="operator = operators.equalTo"
       >
         {{ operators.equalTo }}
       </button>
@@ -122,7 +122,7 @@ export default {
         :disabled="disabled"
         type="button"
         class="btn btn-default"
-        @click="operator = operators.lessThan;"
+        @click="operator = operators.lessThan"
       >
         {{ operators.lessThan }}
       </button>

@@ -12,8 +12,6 @@ import {
   dockerBaseReport,
   dast,
   dastBase,
-  sastHeadAllIssues,
-  sastBaseAllIssues,
 } from './mock_data';
 
 describe('Grouped security reports app', () => {
@@ -183,7 +181,7 @@ describe('Grouped security reports app', () => {
 
         // Renders the summary text
         expect(vm.$el.querySelector('.js-code-text').textContent.trim()).toEqual(
-          'Security scanning detected 6 new, and 2 fixed vulnerabilities',
+          'Security scanning detected 6 new, and 3 fixed vulnerabilities',
         );
 
         // Renders the expand button
@@ -198,8 +196,11 @@ describe('Grouped security reports app', () => {
         expect(trimText(vm.$el.textContent)).toContain(
           'Dependency scanning detected 2 new, and 1 fixed vulnerabilities',
         );
+
         // Renders container scanning result
-        expect(vm.$el.textContent).toContain('Container scanning detected 1 new vulnerability');
+        expect(vm.$el.textContent).toContain(
+          'Container scanning detected 1 new, and 1 fixed vulnerabilities',
+        );
 
         // Renders DAST result
         expect(vm.$el.textContent).toContain('DAST detected 1 new vulnerability');
@@ -222,41 +223,16 @@ describe('Grouped security reports app', () => {
         });
       }, 0);
     });
-  });
 
-  describe('with all issues for sast and dependency scanning', () => {
-    beforeEach(() => {
-      mock.onGet('sast_head.json').reply(200, sastHeadAllIssues);
-      mock.onGet('sast_base.json').reply(200, sastBaseAllIssues);
-      mock.onGet('dast_head.json').reply(200, dast);
-      mock.onGet('dast_base.json').reply(200, dastBase);
-      mock.onGet('sast_container_head.json').reply(200, dockerReport);
-      mock.onGet('sast_container_base.json').reply(200, dockerBaseReport);
-      mock.onGet('dss_head.json').reply(200, sastHeadAllIssues);
-      mock.onGet('dss_base.json').reply(200, sastBaseAllIssues);
-      mock.onGet('vulnerability_feedback_path.json').reply(200, []);
+    it('has the success icon for fixed vulnerabilities', done => {
+      setTimeout(() => {
+        const icon = vm.$el.querySelector(
+          '.js-sast-container~.js-plain-element .ic-status_success_borderless',
+        );
 
-      vm = mountComponent(Component, {
-        headBlobPath: 'path',
-        baseBlobPath: 'path',
-        sastHeadPath: 'sast_head.json',
-        sastBasePath: 'sast_base.json',
-        dastHeadPath: 'dast_head.json',
-        dastBasePath: 'dast_base.json',
-        sastContainerHeadPath: 'sast_container_head.json',
-        sastContainerBasePath: 'sast_container_base.json',
-        dependencyScanningHeadPath: 'dss_head.json',
-        dependencyScanningBasePath: 'dss_base.json',
-        sastHelpPath: 'path',
-        sastContainerHelpPath: 'path',
-        dastHelpPath: 'path',
-        dependencyScanningHelpPath: 'path',
-        vulnerabilityFeedbackPath: 'vulnerability_feedback_path.json',
-        vulnerabilityFeedbackHelpPath: 'path',
-        pipelineId: 123,
-        canCreateIssue: true,
-        canCreateFeedback: true,
-      });
+        expect(icon).not.toBeNull();
+        done();
+      }, 0);
     });
   });
 

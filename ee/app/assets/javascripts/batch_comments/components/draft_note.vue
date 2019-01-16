@@ -69,7 +69,7 @@ export default {
         @updateSuccess="handleNotEditing"
         @handleDeleteNote="deleteDraft"
         @handleUpdateNote="update"
-        @toggleResolveStatus="toggleResolveDiscussion(draft.id);"
+        @toggleResolveStatus="toggleResolveDiscussion(draft.id)"
       >
         <strong slot="note-header-info" class="badge draft-pending-label append-right-4">
           {{ __('Pending') }}

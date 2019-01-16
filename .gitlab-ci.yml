@@ -620,6 +620,22 @@ rspec-mysql:
   <<: *rspec-metadata-mysql
   parallel: 50
 
+.rspec-quarantine: &rspec-quarantine
+  script:
+    - export CACHE_CLASSES=true
+    - scripts/gitaly-test-spawn
+    - bin/rspec --color --format documentation --tag quarantine spec/
+
+rspec-pg-quarantine:
+  <<: *rspec-metadata-pg
+  <<: *rspec-quarantine
+  allow_failure: true
+
+rspec-mysql-quarantine:
+  <<: *rspec-metadata-mysql
+  <<: *rspec-quarantine
+  allow_failure: true
+
 # EE jobs START
 rspec-pg-ee:
   <<: *rspec-ee-pg
@@ -631,6 +647,23 @@ rspec-mysql-ee:
 
 rspec-pg geo: *rspec-metadata-pg-geo-9-6
 rspec-pg-10 geo: *rspec-metadata-pg-geo-10-2
+
+
+.rspec-quarantine-ee: &rspec-quarantine-ee
+  script:
+    - export CACHE_CLASSES=true
+    - scripts/gitaly-test-spawn
+    - bin/rspec --color --format documentation --tag quarantine ee/spec/
+
+rspec-pg-quarantine-ee:
+  <<: *rspec-metadata-pg
+  <<: *rspec-quarantine-ee
+  allow_failure: true
+
+rspec-mysql-quarantine-ee:
+  <<: *rspec-metadata-mysql
+  <<: *rspec-quarantine-ee
+  allow_failure: true
 # EE jobs END
 
 static-analysis:
