@@ -5,7 +5,7 @@ module QA
     module Project
       module Settings
         class MirroringRepositories < Page::Base
-          prepend EE::Page::Project::Settings::MirroringRepositories
+          prepend EE::Page::Project::Settings::MirroringRepositories # rubocop: disable Cop/InjectEnterpriseEditionModule
 
           view 'app/views/projects/mirrors/_authentication_method.html.haml' do
             element :authentication_method

@@ -2,7 +2,7 @@
 
 module Projects
   class AutocompleteService < BaseService
-    prepend EE::Projects::AutocompleteService
+    prepend EE::Projects::AutocompleteService # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     include LabelsAsHash
     def issues

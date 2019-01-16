@@ -2,7 +2,7 @@
 
 module Notes
   class BuildService < ::BaseService
-    prepend ::EE::Notes::BuildService
+    prepend ::EE::Notes::BuildService # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     def execute
       should_resolve = false

@@ -2,7 +2,7 @@
 
 module MergeRequests
   class UpdateService < MergeRequests::BaseService
-    prepend ::EE::MergeRequests::UpdateService
+    prepend ::EE::MergeRequests::UpdateService # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     def execute(merge_request)
       # We don't allow change of source/target projects and source branch

@@ -43,7 +43,7 @@ class Rack::Attack
   end
 
   class Request
-    prepend ::EE::Gitlab::Rack::Attack::Request
+    prepend ::EE::Gitlab::Rack::Attack::Request # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     def unauthenticated?
       !authenticated_user_id([:api, :rss, :ics])

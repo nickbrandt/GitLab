@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Projects::MergeRequests::ApplicationController < Projects::ApplicationController
-  prepend ::EE::Projects::MergeRequests::ApplicationController
+  prepend ::EE::Projects::MergeRequests::ApplicationController # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   before_action :check_merge_requests_available!
   before_action :merge_request

@@ -2,7 +2,7 @@
 
 module Applications
   class CreateService
-    prepend ::EE::Applications::CreateService
+    prepend ::EE::Applications::CreateService # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     # rubocop: disable CodeReuse/ActiveRecord
     def initialize(current_user, params)

@@ -137,7 +137,7 @@ module ObjectStorage
     included do |base|
       base.include(ObjectStorage)
 
-      include ::EE::ObjectStorage::Concern
+      include ::EE::ObjectStorage::Concern # rubocop: disable Cop/InjectEnterpriseEditionModule
 
       after :migrate, :delete_migrated_file
     end

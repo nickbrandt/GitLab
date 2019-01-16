@@ -4,7 +4,7 @@ module QA
   module Page
     module Admin
       class Menu < Page::Base
-        prepend EE::Page::Admin::Menu
+        prepend EE::Page::Admin::Menu # rubocop: disable Cop/InjectEnterpriseEditionModule
 
         view 'app/views/layouts/nav/sidebar/_admin.html.haml' do
           element :admin_sidebar

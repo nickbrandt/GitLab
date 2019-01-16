@@ -3,7 +3,7 @@
 module API
   module Helpers
     module NotesHelpers
-      prepend EE::API::Helpers::NotesHelpers
+      prepend EE::API::Helpers::NotesHelpers # rubocop: disable Cop/InjectEnterpriseEditionModule
 
       def update_note(noteable, note_id)
         note = noteable.notes.find(params[:note_id])

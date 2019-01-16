@@ -242,7 +242,7 @@ module NotificationRecipientService
     end
 
     class Default < Base
-      prepend ::EE::NotificationRecipientBuilders::Default
+      prepend ::EE::NotificationRecipientBuilders::Default # rubocop: disable Cop/InjectEnterpriseEditionModule
 
       MENTION_TYPE_ACTIONS = [:new_issue, :new_merge_request].freeze
 

@@ -29,7 +29,7 @@ module API
       ]
     end
 
-    prepend EE::API::MergeRequests
+    prepend EE::API::MergeRequests # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     helpers do
       # rubocop: disable CodeReuse/ActiveRecord

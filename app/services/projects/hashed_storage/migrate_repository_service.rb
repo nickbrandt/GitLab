@@ -7,7 +7,7 @@ module Projects
     class MigrateRepositoryService < BaseService
       include Gitlab::ShellAdapter
 
-      prepend ::EE::Projects::HashedStorage::MigrateRepositoryService
+      prepend ::EE::Projects::HashedStorage::MigrateRepositoryService # rubocop: disable Cop/InjectEnterpriseEditionModule
 
       attr_reader :old_disk_path, :new_disk_path, :old_wiki_disk_path, :old_storage_version, :logger, :move_wiki
 

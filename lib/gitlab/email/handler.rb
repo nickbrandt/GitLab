@@ -3,7 +3,7 @@
 module Gitlab
   module Email
     module Handler
-      prepend ::EE::Gitlab::Email::Handler
+      prepend ::EE::Gitlab::Email::Handler # rubocop: disable Cop/InjectEnterpriseEditionModule
 
       def self.handlers
         @handlers ||= load_handlers

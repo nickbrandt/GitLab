@@ -2,7 +2,7 @@
 
 module Users
   class DestroyService
-    prepend ::EE::Users::DestroyService
+    prepend ::EE::Users::DestroyService # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     DestroyError = Class.new(StandardError)
 

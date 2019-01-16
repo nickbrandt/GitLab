@@ -3,7 +3,7 @@
 module Issues
   class BuildService < Issues::BaseService
     include ResolveDiscussions
-    prepend ::EE::Issues::BuildService
+    prepend ::EE::Issues::BuildService # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     def execute
       filter_resolve_discussion_params

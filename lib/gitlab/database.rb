@@ -12,7 +12,7 @@ module Gitlab
     MAX_TIMESTAMP_VALUE = Time.at((1 << 31) - 1).freeze
 
     class << self
-      prepend EE::Gitlab::Database
+      prepend EE::Gitlab::Database # rubocop: disable Cop/InjectEnterpriseEditionModule
     end
 
     def self.config
