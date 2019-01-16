@@ -60,6 +60,15 @@ describe JenkinsService do
 
         it { is_expected.to validate_presence_of :username }
       end
+
+      context 'when password is blank' do
+        it 'does not validate the username' do
+          expect(subject).not_to validate_presence_of :username
+
+          subject.password = ''
+          subject.save
+        end
+      end
     end
 
     context 'when the service is inactive' do
