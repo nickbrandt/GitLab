@@ -12,6 +12,8 @@ import (
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upload/exif"
 )
 
 var (
@@ -113,12 +115,30 @@ func (rew *rewriter) handleFilePart(ctx context.Context, name string, p *multipa
 	opts := filestore.GetOpts(rew.preauth)
 	opts.TempFilePrefix = filename
 
-	fh, err := filestore.SaveFileFromReader(ctx, p, -1, opts)
-	if err != nil {
-		if err == filestore.ErrEntityTooLarge {
-			return err
+	var inputReader io.Reader
+	if exif.IsExifFile(filename) {
+		log.WithFields(ctx, log.Fields{
+			"filename": filename,
+		}).Print("running exiftool to remove any metadata")
+
+		cleaner, err := exif.NewCleaner(ctx, p)
+		if err != nil {
+			return fmt.Errorf("failed to start EXIF metadata cleaner: %v", err)
 		}
-		return fmt.Errorf("persisting multipart file: %v", err)
+
+		inputReader = cleaner
+	} else {
+		inputReader = p
+	}
+
+	fh, err := filestore.SaveFileFromReader(ctx, inputReader, -1, opts)
+	if err != nil {
+		switch err {
+		case filestore.ErrEntityTooLarge, exif.ErrRemovingExif:
+			return err
+		default:
+			return fmt.Errorf("persisting multipart file: %v", err)
+		}
 	}
 
 	for key, value := range fh.GitLabFinalizeFields(name) {

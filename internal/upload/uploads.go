@@ -11,6 +11,7 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/filestore"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upload/exif"
 )
 
 // These methods are allowed to have thread-unsafe implementations.
@@ -40,6 +41,8 @@ func HandleFileUploads(w http.ResponseWriter, r *http.Request, h http.Handler, p
 			h.ServeHTTP(w, r)
 		case filestore.ErrEntityTooLarge:
 			helper.RequestEntityTooLarge(w, r, err)
+		case exif.ErrRemovingExif:
+			helper.CaptureAndFail(w, r, err, "Failed to process image", http.StatusUnprocessableEntity)
 		default:
 			helper.Fail500(w, r, fmt.Errorf("handleFileUploads: extract files from multipart: %v", err))
 		}

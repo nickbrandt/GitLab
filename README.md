@@ -168,6 +168,25 @@ make install PREFIX=/foo
 On some operating systems, such as FreeBSD, you may have to use
 `gmake` instead of `make`.
 
+## Dependencies
+
+### Exiftool
+
+Workhorse uses [exiftool](https://www.sno.phy.queensu.ca/~phil/exiftool/) for
+removing EXIF data (which may contain sensitive information) from uploaded
+images. If you installed GitLab:
+
+-   Using the Omnibus package, you're all set.
+-   From source, make sure `exiftool` is installed:
+
+    ```sh
+    # Debian/Ubuntu
+    sudo apt-get install libimage-exiftool-perl
+
+    # RHEL/CentOS
+    sudo yum install perl-Image-ExifTool
+    ```
+
 ## Error tracking
 
 GitLab-Workhorse supports remote error tracking with
