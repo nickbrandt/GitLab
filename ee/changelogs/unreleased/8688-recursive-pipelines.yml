@@ -1,5 +1,5 @@
 ---
 title: Recursively expands upstream and downstream pipelines
-merge_request:
+merge_request: 9073
 author:
 type: changed
