@@ -12,6 +12,7 @@ export const mapApprovalRuleResponse = res => ({
   approvers: res.approvers,
   users: res.users,
   groups: res.groups,
+  isCodeOwner: res.code_owner,
 });
 
 export const mapApprovalRulesResponse = req => ({
