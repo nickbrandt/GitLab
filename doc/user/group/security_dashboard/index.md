@@ -55,8 +55,13 @@ are created even if no code change happens.
 First, navigate to the Security Dashboard found under your group's
 **Overview > Security Dashboard**.
 
-+Once you're on the dashboard, at the top you should see a series of filters for
-severity, report type, and project. Selecting one or more of these will filter
+Once you're on the dashboard, at the top you should see a series of filters for:
+
+- Severity
+- Report type
+- Project
+
+Selecting one or more of these will filter
 the results in the sectons below. The first section is an overview of all the
 vulnerabilities, grouped by severity. Underneath these overviews is a timeline
 chart that shows how many open vulnerabilities you had at various points in time.
