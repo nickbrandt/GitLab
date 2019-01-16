@@ -21,8 +21,7 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
                                     trigger: { project: 'some/project' },
                                     ignore: false,
                                     stage: 'test',
-                                    only: { refs: %w[branches tags] },
-                                    except: {})
+                                    only: { refs: %w[branches tags] })
       end
     end
   end
@@ -43,8 +42,7 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
                                                branch: 'feature' },
                                     ignore: false,
                                     stage: 'test',
-                                    only: { refs: %w[branches tags] },
-                                    except: {})
+                                    only: { refs: %w[branches tags] })
       end
     end
   end
