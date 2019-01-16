@@ -96,6 +96,10 @@ module QA
         run("git merge #{branch}")
       end
 
+      def merge(branch)
+        run("git merge #{branch}")
+      end
+
       def commits
         run('git log --oneline').to_s.split("\n")
       end
