@@ -5,7 +5,7 @@ module Gitlab
     APPROXIMATE_COUNT_MODELS = [Label, MergeRequest, Note, Todo].freeze
 
     class << self
-      prepend EE::Gitlab::UsageData
+      prepend EE::Gitlab::UsageData # rubocop: disable Cop/InjectEnterpriseEditionModule
 
       def data(force_refresh: false)
         Rails.cache.fetch('usage_data', force: force_refresh, expires_in: 2.weeks) { uncached_data }

@@ -2,7 +2,7 @@
 
 module Boards
   class ListsController < Boards::ApplicationController
-    prepend ::EE::Boards::ListsController
+    prepend ::EE::Boards::ListsController # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     include BoardsResponses
 

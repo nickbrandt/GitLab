@@ -2,7 +2,7 @@
 
 module Gitlab
   class TreeSummary
-    prepend ::EE::Gitlab::TreeSummary
+    prepend ::EE::Gitlab::TreeSummary # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     include ::Gitlab::Utils::StrongMemoize
 

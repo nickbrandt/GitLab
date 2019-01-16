@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Admin::DashboardController < Admin::ApplicationController
-  prepend ::EE::Admin::DashboardController
+  prepend ::EE::Admin::DashboardController # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   include CountHelper
 

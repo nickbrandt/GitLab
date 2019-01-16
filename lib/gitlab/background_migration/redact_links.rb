@@ -6,7 +6,7 @@ require_relative 'redact_links/redactable'
 module Gitlab
   module BackgroundMigration
     class RedactLinks
-      prepend EE::Gitlab::BackgroundMigration::RedactLinks
+      prepend EE::Gitlab::BackgroundMigration::RedactLinks # rubocop: disable Cop/InjectEnterpriseEditionModule
 
       class Note < ActiveRecord::Base
         include EachBatch

@@ -2,7 +2,7 @@
 
 module Projects
   class CreateFromTemplateService < BaseService
-    prepend ::EE::Projects::CreateFromTemplateService
+    prepend ::EE::Projects::CreateFromTemplateService # rubocop: disable Cop/InjectEnterpriseEditionModule
     include Gitlab::Utils::StrongMemoize
 
     def initialize(user, params)

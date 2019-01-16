@@ -2,7 +2,7 @@
 
 class Projects::GitHttpController < Projects::GitHttpClientController
   include WorkhorseRequest
-  prepend ::EE::Projects::GitHttpController
+  prepend ::EE::Projects::GitHttpController # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   before_action :access_check
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Projects::AutocompleteSourcesController < Projects::ApplicationController
-  prepend EE::Projects::AutocompleteSourcesController
+  prepend EE::Projects::AutocompleteSourcesController # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   def members
     render json: ::Projects::ParticipantsService.new(@project, current_user).execute(target)

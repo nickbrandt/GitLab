@@ -2,7 +2,7 @@
 
 module Groups
   class CreateService < Groups::BaseService
-    prepend ::EE::Groups::CreateService
+    prepend ::EE::Groups::CreateService # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     def initialize(user, params = {})
       @current_user, @params = user, params.dup

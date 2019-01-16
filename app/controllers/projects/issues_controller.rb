@@ -9,7 +9,7 @@ class Projects::IssuesController < Projects::ApplicationController
   include IssuesCalendar
   include SpammableActions
 
-  prepend ::EE::Projects::IssuesController
+  prepend ::EE::Projects::IssuesController # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   def self.issue_except_actions
     %i[index calendar new create bulk_update import_csv]

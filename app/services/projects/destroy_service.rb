@@ -3,7 +3,7 @@
 module Projects
   class DestroyService < BaseService
     include Gitlab::ShellAdapter
-    prepend ::EE::Projects::DestroyService
+    prepend ::EE::Projects::DestroyService # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     DestroyError = Class.new(StandardError)
 

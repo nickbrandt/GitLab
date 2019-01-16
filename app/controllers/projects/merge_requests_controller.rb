@@ -8,7 +8,7 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   include ToggleAwardEmoji
   include IssuableCollections
 
-  prepend ::EE::Projects::MergeRequestsController
+  prepend ::EE::Projects::MergeRequestsController # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   skip_before_action :merge_request, only: [:index, :bulk_update]
   before_action :whitelist_query_limiting, only: [:assign_related_issues, :update]

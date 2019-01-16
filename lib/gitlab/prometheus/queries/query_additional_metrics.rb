@@ -4,7 +4,7 @@ module Gitlab
   module Prometheus
     module Queries
       module QueryAdditionalMetrics
-        prepend EE::Gitlab::Prometheus::Queries::QueryAdditionalMetrics
+        prepend EE::Gitlab::Prometheus::Queries::QueryAdditionalMetrics # rubocop: disable Cop/InjectEnterpriseEditionModule
 
         def query_metrics(project, environment, query_context)
           matched_metrics(project).map(&query_group(query_context))

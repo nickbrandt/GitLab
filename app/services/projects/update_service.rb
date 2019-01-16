@@ -4,7 +4,7 @@ module Projects
   class UpdateService < BaseService
     include UpdateVisibilityLevel
 
-    prepend ::EE::Projects::UpdateService
+    prepend ::EE::Projects::UpdateService # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     ValidationError = Class.new(StandardError)
 

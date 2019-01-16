@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Projects::PipelinesController < Projects::ApplicationController
-  prepend ::EE::Projects::PipelinesController
+  prepend ::EE::Projects::PipelinesController # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   before_action :whitelist_query_limiting, only: [:create, :retry]
   before_action :pipeline, except: [:index, :new, :create, :charts]

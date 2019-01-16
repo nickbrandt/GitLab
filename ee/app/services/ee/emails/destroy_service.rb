@@ -3,7 +3,7 @@
 module EE
   module Emails
     module DestroyService
-      include ::EE::Emails::BaseService
+      include ::EE::Emails::BaseService # rubocop: disable Cop/InjectEnterpriseEditionModule
 
       def execute(*args, &blk)
         super.tap do

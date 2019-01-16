@@ -15,7 +15,7 @@ class Projects::EnvironmentsController < Projects::ApplicationController
     push_frontend_feature_flag(:area_chart, project)
   end
 
-  prepend ::EE::Projects::EnvironmentsController
+  prepend ::EE::Projects::EnvironmentsController # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   def index
     @environments = project.environments

@@ -5,7 +5,7 @@
 # The latter will under the hood just import an archive supplied by GitLab.
 module Projects
   class GitlabProjectsImportService
-    prepend ::EE::Projects::GitlabProjectsImportService
+    prepend ::EE::Projects::GitlabProjectsImportService # rubocop: disable Cop/InjectEnterpriseEditionModule
     include Gitlab::Utils::StrongMemoize
     include Gitlab::TemplateHelper
 

@@ -6,7 +6,7 @@ module Projects
       before_action :authorize_admin_pipeline!
       before_action :define_variables
 
-      prepend ::EE::Projects::Settings::CiCdController
+      prepend ::EE::Projects::Settings::CiCdController # rubocop: disable Cop/InjectEnterpriseEditionModule
 
       def show
       end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Projects::VariablesController < Projects::ApplicationController
-  prepend ::EE::Projects::VariablesController
+  prepend ::EE::Projects::VariablesController # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   before_action :authorize_admin_build!
 

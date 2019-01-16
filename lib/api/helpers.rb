@@ -2,7 +2,7 @@
 
 module API
   module Helpers
-    prepend EE::API::Helpers
+    prepend EE::API::Helpers # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     include Gitlab::Utils
     include Gitlab::Utils::StrongMemoize

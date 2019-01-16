@@ -2,7 +2,7 @@
 
 module Issues
   class MoveService < Issuable::Clone::BaseService
-    prepend ::EE::Issues::MoveService
+    prepend ::EE::Issues::MoveService # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     MoveError = Class.new(StandardError)
 

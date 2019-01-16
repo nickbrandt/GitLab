@@ -3,7 +3,7 @@
 module Banzai
   module Pipeline
     class PostProcessPipeline < BasePipeline
-      prepend EE::Banzai::Pipeline::PostProcessPipeline
+      prepend EE::Banzai::Pipeline::PostProcessPipeline # rubocop: disable Cop/InjectEnterpriseEditionModule
 
       def self.filters
         @filters ||= FilterArray[

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Import::GithubController < Import::BaseController
-  prepend ::EE::Import::GithubController
+  prepend ::EE::Import::GithubController # rubocop: disable Cop/InjectEnterpriseEditionModule
 
   before_action :verify_import_enabled
   before_action :provider_auth, only: [:status, :jobs, :create]
