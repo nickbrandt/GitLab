@@ -1,6 +1,26 @@
 import axios from '~/lib/utils/axios_utils';
 import * as types from './mutation_types';
 
+const getAllProjects = (url, page = '1', projects = []) =>
+  axios({
+    method: 'GET',
+    url,
+    params: {
+      per_page: 100,
+      page,
+      include_subgroups: true,
+      order_by: 'path',
+      sort: 'asc',
+    },
+  }).then(({ headers, data }) => {
+    const result = projects.concat(data);
+    const nextPage = headers && headers['x-next-page'];
+    if (nextPage) {
+      return getAllProjects(url, nextPage, result);
+    }
+    return result;
+  });
+
 export const setProjectsEndpoint = ({ commit }, endpoint) => {
   commit(types.SET_PROJECTS_ENDPOINT, endpoint);
 };
@@ -8,12 +28,9 @@ export const setProjectsEndpoint = ({ commit }, endpoint) => {
 export const fetchProjects = ({ state, dispatch }) => {
   dispatch('requestProjects');
 
-  axios({
-    method: 'GET',
-    url: state.projectsEndpoint,
-  })
-    .then(({ data }) => {
-      dispatch('receiveProjectsSuccess', { projects: data });
+  getAllProjects(state.projectsEndpoint)
+    .then(projects => {
+      dispatch('receiveProjectsSuccess', { projects });
     })
     .catch(() => {
       dispatch('receiveProjectsError');
