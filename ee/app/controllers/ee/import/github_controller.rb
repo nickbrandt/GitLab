@@ -5,9 +5,9 @@ module EE
     module GithubController
       extend ::Gitlab::Utils::Override
 
-      override :extra_project_attrs
-      def extra_project_attrs
-        super.merge(ci_cd_only: params[:ci_cd_only])
+      override :permitted_import_params
+      def permitted_import_params
+        super.push(:ci_cd_only)
       end
 
       override :extra_import_params
