@@ -44,6 +44,28 @@ export default {
       type: String,
       required: true,
     },
+    // ee-only start
+    canaryDeploymentFeatureId: {
+      type: String,
+      required: true,
+    },
+    showCanaryDeploymentCallout: {
+      type: Boolean,
+      required: true,
+    },
+    userCalloutsPath: {
+      type: String,
+      required: true,
+    },
+    lockPromotionSvgPath: {
+      type: String,
+      required: true,
+    },
+    helpCanaryDeploymentsPath: {
+      type: String,
+      required: true,
+    },
+    // ee-only end
   },
 
   created() {
@@ -118,6 +140,11 @@ export default {
       :pagination="state.paginationInformation"
       :can-create-deployment="canCreateDeployment"
       :can-read-environment="canReadEnvironment"
+      :canary-deployment-feature-id="canaryDeploymentFeatureId"
+      :show-canary-deployment-callout="showCanaryDeploymentCallout"
+      :user-callouts-path="userCalloutsPath"
+      :lock-promotion-svg-path="lockPromotionSvgPath"
+      :help-canary-deployments-path="helpCanaryDeploymentsPath"
       @onChangePage="onChangePage"
     >
       <empty-state

@@ -14,6 +14,13 @@ describe('Environment', () => {
     cssContainerClass: 'container',
     newEnvironmentPath: 'environments/new',
     helpPagePath: 'help',
+    // ee-only start
+    canaryDeploymentFeatureId: 'canary_deployment',
+    showCanaryDeploymentCallout: true,
+    userCalloutsPath: '/callouts',
+    lockPromotionSvgPath: '/assets/illustrations/lock-promotion.svg',
+    helpCanaryDeploymentsPath: 'help/canary-deployments',
+    // ee-only end
   };
 
   let EnvironmentsComponent;
@@ -124,6 +131,70 @@ describe('Environment', () => {
         });
       });
     });
+
+    // ee-only start
+    describe('canary callout', () => {
+      it('should render banner underneath second environment', done => {
+        mock.onGet(mockData.endpoint).reply(
+          200,
+          {
+            environments: [environment, environment],
+            stopped_count: 1,
+            available_count: 0,
+          },
+          {
+            'X-nExt-pAge': '2',
+            'x-page': '1',
+            'X-Per-Page': '1',
+            'X-Prev-Page': '',
+            'X-TOTAL': '37',
+            'X-Total-Pages': '2',
+          },
+        );
+
+        component = mountComponent(EnvironmentsComponent, mockData);
+
+        setTimeout(() => {
+          expect(
+            component.$el
+              .querySelector('.canary-deployment-callout')
+              .getAttribute('data-js-canary-promo-key'),
+          ).toBe('1');
+          done();
+        }, 0);
+      });
+
+      it('should render banner underneath first environment', done => {
+        mock.onGet(mockData.endpoint).reply(
+          200,
+          {
+            environments: [environment],
+            stopped_count: 1,
+            available_count: 0,
+          },
+          {
+            'X-nExt-pAge': '2',
+            'x-page': '1',
+            'X-Per-Page': '1',
+            'X-Prev-Page': '',
+            'X-TOTAL': '37',
+            'X-Total-Pages': '2',
+          },
+        );
+
+        component = mountComponent(EnvironmentsComponent, mockData);
+
+        setTimeout(() => {
+          expect(
+            component.$el
+              .querySelector('.canary-deployment-callout')
+              .getAttribute('data-js-canary-promo-key'),
+          ).toBe('0');
+          done();
+        }, 0);
+      });
+    });
+    // ee-only end
   });
 
   describe('unsuccessfull request', () => {
