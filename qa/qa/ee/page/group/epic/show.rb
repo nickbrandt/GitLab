@@ -8,7 +8,7 @@ module QA
           class Show < QA::Page::Base
             include QA::Page::Component::Issuable::Common
 
-            view 'ee/app/assets/javascripts/related_issues/components/related_issues_block.vue' do
+            view 'ee/app/assets/javascripts/related_issues/constants.js' do
               element :add_issues_button
             end
 

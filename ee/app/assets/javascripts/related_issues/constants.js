@@ -40,3 +40,13 @@ export const issuableIconMap = {
   issue: 'issues',
   epic: 'epic',
 };
+
+/**
+ * These are used to map issuableType to the correct QA class.
+ * Since these are never used for any display purposes, don't wrap
+ * them inside i18n functions.
+ */
+export const issuableQaClassMap = {
+  issue: 'qa-add-issues-button',
+  epic: 'qa-add-epics-button',
+};
