@@ -12,6 +12,8 @@ describe('Feature Flags', () => {
     csrfToken: 'testToken',
     errorStateSvgPath: '/assets/illustrations/feature_flag.svg',
     featureFlagsHelpPagePath: '/help/feature-flags',
+    canUserConfigure: true,
+    newFeatureFlagPath: 'feature-flags/new',
   };
 
   let store;
@@ -28,6 +30,43 @@ describe('Feature Flags', () => {
   afterEach(() => {
     component.$destroy();
     mock.restore();
+  });
+
+  describe('without permissions', () => {
+    const props = {
+      endpoint: 'feature_flags.json',
+      csrfToken: 'testToken',
+      errorStateSvgPath: '/assets/illustrations/feature_flag.svg',
+      featureFlagsHelpPagePath: '/help/feature-flags',
+      canUserConfigure: false,
+    };
+
+    beforeEach(done => {
+      mock.onGet(mockData.endpoint).reply(200, {
+        feature_flags: [],
+        count: {
+          all: 0,
+          enabled: 0,
+          disabled: 0,
+        },
+      });
+      component = mountComponentWithStore(FeatureFlagsComponent, {
+        store,
+        props,
+      });
+
+      setTimeout(() => {
+        done();
+      }, 0);
+    });
+
+    it('does not render configure button', () => {
+      expect(component.$el.querySelector('.js-ff-configure')).toBeNull();
+    });
+
+    it('does not render new feature flag button', () => {
+      expect(component.$el.querySelector('.js-ff-new')).toBeNull();
+    });
   });
 
   describe('loading state', () => {
@@ -84,6 +123,14 @@ describe('Feature Flags', () => {
       it('should render the empty state', () => {
         expect(component.$el.querySelectorAll('.js-feature-flags-empty-state')).not.toBeNull();
       });
+
+      it('renders configure button', () => {
+        expect(component.$el.querySelector('.js-ff-configure')).not.toBeNull();
+      });
+
+      it('renders new feature flag button', () => {
+        expect(component.$el.querySelector('.js-ff-new')).not.toBeNull();
+      });
     });
 
     describe('with paginated feature flags', () => {
@@ -129,6 +176,14 @@ describe('Feature Flags', () => {
         expect(component.$el.querySelector('.feature-flag-description').textContent.trim()).toEqual(
           featureFlag.description,
         );
+      });
+
+      it('renders configure button', () => {
+        expect(component.$el.querySelector('.js-ff-configure')).not.toBeNull();
+      });
+
+      it('renders new feature flag button', () => {
+        expect(component.$el.querySelector('.js-ff-new')).not.toBeNull();
       });
 
       describe('pagination', () => {
@@ -184,6 +239,14 @@ describe('Feature Flags', () => {
       expect(component.$el.querySelector('.empty-state').textContent.trim()).toContain(
         'There was an error fetching the feature flags. Try again in a few moments or contact your support team.',
       );
+    });
+
+    it('renders configure button', () => {
+      expect(component.$el.querySelector('.js-ff-configure')).not.toBeNull();
+    });
+
+    it('renders new feature flag button', () => {
+      expect(component.$el.querySelector('.js-ff-new')).not.toBeNull();
     });
   });
 });

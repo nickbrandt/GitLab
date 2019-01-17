@@ -1,6 +1,7 @@
 <script>
-import { GlEmptyState, GlLoadingIcon } from '@gitlab/ui';
 import { mapState, mapActions } from 'vuex';
+import _ from 'underscore';
+import { GlEmptyState, GlLoadingIcon, GlButton } from '@gitlab/ui';
 import FeatureFlagsTable from './feature_flags_table.vue';
 import store from '../store';
 import { __ } from '~/locale';
@@ -20,6 +21,7 @@ export default {
     TablePagination,
     GlEmptyState,
     GlLoadingIcon,
+    GlButton,
   },
   props: {
     endpoint: {
@@ -37,6 +39,15 @@ export default {
     featureFlagsHelpPagePath: {
       type: String,
       required: true,
+    },
+    canUserConfigure: {
+      type: Boolean,
+      required: true,
+    },
+    newFeatureFlagPath: {
+      type: String,
+      required: false,
+      default: '',
     },
   },
   data() {
@@ -97,6 +108,9 @@ export default {
         },
       ];
     },
+    hasNewPath() {
+      return !_.isEmpty(this.newFeatureFlagPath);
+    },
   },
   created() {
     this.setFeatureFlagsEndpoint(this.endpoint);
@@ -136,6 +150,29 @@ export default {
 </script>
 <template>
   <div>
+    <h3 class="page-title with-button">
+      {{ s__('FeatureFlags|Feature Flags') }}
+      <div class="pull-right">
+        <button
+          v-if="canUserConfigure"
+          type="button"
+          class="js-ff-configure append-right-8 btn-inverted btn btn-primary"
+          data-toggle="modal"
+          data-target="#configure-feature-flags-modal"
+        >
+          {{ s__('FeatureFlags|Configure') }}
+        </button>
+
+        <gl-button
+          v-if="hasNewPath"
+          :href="newFeatureFlagPath"
+          variant="success"
+          class="js-ff-new"
+          >{{ s__('FeatureFlags|New Feature Flag') }}</gl-button
+        >
+      </div>
+    </h3>
+
     <div v-if="shouldRenderTabs" class="top-area scrolling-tabs-container inner-page-scroll-tabs">
       <navigation-tabs :tabs="tabs" scope="featureflags" @onChangeTab="onChangeTab" />
     </div>
@@ -147,32 +184,32 @@ export default {
       class="js-loading-state prepend-top-20"
     />
 
-    <template v-else-if="shouldRenderErrorState">
-      <gl-empty-state
-        :title="s__(`FeatureFlags|There was an error fetching the feature flags.`)"
-        :description="s__(`FeatureFlags|Try again in a few moments or contact your support team.`)"
-        :svg-path="errorStateSvgPath"
-      />
-    </template>
+    <gl-empty-state
+      v-else-if="shouldRenderErrorState"
+      :title="s__(`FeatureFlags|There was an error fetching the feature flags.`)"
+      :description="s__(`FeatureFlags|Try again in a few moments or contact your support team.`)"
+      :svg-path="errorStateSvgPath"
+    />
 
-    <template v-else-if="shouldShowEmptyState">
-      <gl-empty-state
-        class="js-feature-flags-empty-state"
-        :title="s__(`FeatureFlags|Get started with feature flags`)"
-        :description="
-          s__(
-            `FeatureFlags|Feature flags allow you to configure your code into different flavors by dynamically toggling certain functionality.`,
-          )
-        "
-        :svg-path="errorStateSvgPath"
-        :primary-button-link="featureFlagsHelpPagePath"
-        :primary-button-text="s__(`FeatureFlags|More Information`)"
-      />
-    </template>
+    <gl-empty-state
+      v-else-if="shouldShowEmptyState"
+      class="js-feature-flags-empty-state"
+      :title="s__(`FeatureFlags|Get started with feature flags`)"
+      :description="
+        s__(
+          `FeatureFlags|Feature flags allow you to configure your code into different flavors by dynamically toggling certain functionality.`,
+        )
+      "
+      :svg-path="errorStateSvgPath"
+      :primary-button-link="featureFlagsHelpPagePath"
+      :primary-button-text="s__(`FeatureFlags|More Information`)"
+    />
 
-    <template v-else-if="shouldRenderTable">
-      <feature-flags-table :csrf-token="csrfToken" :feature-flags="featureFlags" />
-    </template>
+    <feature-flags-table
+      v-else-if="shouldRenderTable"
+      :csrf-token="csrfToken"
+      :feature-flags="featureFlags"
+    />
 
     <table-pagination v-if="shouldRenderPagination" :change="onChangePage" :page-info="pageInfo" />
   </div>

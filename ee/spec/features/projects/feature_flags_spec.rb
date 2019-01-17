@@ -86,14 +86,6 @@ describe 'Feature Flags', :js do
     end
 
     it_behaves_like 'correct edit behavior'
-
-    context 'when operations_feature_flag_index_tab feature flag is disabled' do
-      before do
-        stub_feature_flags(operations_feature_flag_index_tab: false)
-      end
-
-      it_behaves_like 'correct edit behavior'
-    end
   end
 
   context 'when deleting a feature flag' do
@@ -136,14 +128,6 @@ describe 'Feature Flags', :js do
     end
 
     it_behaves_like 'correct delete behavior'
-
-    context 'when operations_feature_flag_index_tab feature flag is disabled' do
-      before do
-        stub_feature_flags(operations_feature_flag_index_tab: false)
-      end
-
-      it_behaves_like 'correct delete behavior'
-    end
   end
 
   context 'when user sees empty index page' do
@@ -160,14 +144,6 @@ describe 'Feature Flags', :js do
     end
 
     it_behaves_like 'correct empty index behavior'
-
-    context 'when operations_feature_flag_index_tab feature flag is disabled' do
-      before do
-        stub_feature_flags(operations_feature_flag_index_tab: false)
-      end
-
-      it_behaves_like 'correct empty index behavior'
-    end
   end
 
   context 'when user sees index page' do
@@ -182,6 +158,8 @@ describe 'Feature Flags', :js do
       it 'shows all feature flags' do
         expect(page).to have_content(feature_flag_enabled.name)
         expect(page).to have_content(feature_flag_disabled.name)
+        expect(page).to have_link('New Feature Flag')
+        expect(page).to have_button('Configure')
       end
     end
 
@@ -222,12 +200,7 @@ describe 'Feature Flags', :js do
   end
 
   def delete_feature_flag(name, confirm = true)
-    delete_button =
-      if Feature.enabled?(:operations_feature_flag_index_tab)
-        find('.gl-responsive-table-row', text: name).find('.js-feature-flag-delete-button')
-      else
-        find('.gl-responsive-table-row', text: name).find('.btn-danger[title="Delete"]')
-      end
+    delete_button = find('.gl-responsive-table-row', text: name).find('.js-feature-flag-delete-button')
 
     delete_button.click
 
@@ -243,12 +216,7 @@ describe 'Feature Flags', :js do
   def edit_feature_flag(old_name, new_name, new_description, new_status)
     visit(project_feature_flags_path(project))
 
-    edit_button =
-      if Feature.enabled?(:operations_feature_flag_index_tab)
-        find('.gl-responsive-table-row', text: old_name).find('.js-feature-flag-edit-button')
-      else
-        find('.gl-responsive-table-row', text: old_name).find('.btn-default[title="Edit"]')
-      end
+    edit_button = find('.gl-responsive-table-row', text: old_name).find('.js-feature-flag-edit-button')
 
     edit_button.click
 

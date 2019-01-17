@@ -20,6 +20,8 @@ export default () =>
           errorStateSvgPath: this.dataset.errorStateSvgPath,
           featureFlagsHelpPagePath: this.dataset.featureFlagsHelpPagePath,
           csrfToken: csrf.token,
+          canUserConfigure: this.dataset.canUserAdminFeatureFlag,
+          newFeatureFlagPath: this.dataset.newFeatureFlagPath,
         },
       });
     },
