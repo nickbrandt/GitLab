@@ -9,11 +9,11 @@ Use it to find and fix vulnerabilities affecting the [default branch](./reposito
 
 ## How it works?
 
-To benefit from the Security Dashboard you must first configure the [Security Reports](merge_requests/index.md#security-reports).
+To benefit from the Security Dashboard you must first configure the [Security Reports](merge_requests/index.md#security-reports-ultimate).
 
 The Security Dashboard will then list security vulnerabilities from the latest pipeline run on the default branch (e.g., `master`).
 
-You will also be able to interact with the reports [the same way you can on a merge request](merge_requests/index.md#interacting-with-security-reports).
+You will also be able to interact with the reports [the same way you can on a merge request](merge_requests/index.md#interacting-with-security-reports-ultimate).
 
 ## Keeping the Security Dashboard updated
 

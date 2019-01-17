@@ -343,7 +343,7 @@ a detailed information will pop up with two different possible options:
 
 - **Dismiss vulnerability** - Dismissing a vulnerability will place a <s>strikethrough</s> styling on it.
 - **Create issue** - The new issue will have the title and description
-  pre-populated with the information from the vulnerability report.
+  pre-populated with the information from the vulnerability report and is created as [confidential](../issues/confidential_issues.md) by default.
 - **Solution** - For some vulnerabilities ([Dependency Scanning](dependency_scanning.md) and [Container Scanning](container_scanning.md))
   a solution is provided for how to fix the vulnerability.
 
