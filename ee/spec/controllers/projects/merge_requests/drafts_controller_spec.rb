@@ -18,6 +18,7 @@ describe Projects::MergeRequests::DraftsController do
   before do
     sign_in(user)
     stub_licensed_features(batch_comments: true)
+    stub_commonmark_sourcepos_disabled
   end
 
   describe 'GET #index' do
@@ -77,7 +78,7 @@ describe Projects::MergeRequests::DraftsController do
       expect(json_response['position']).to be_present
       expect(json_response['file_hash']).to be_present
       expect(json_response['line_code']).to match(/\w+_\d+_\d+/)
-      expect(json_response['note_html']).to eq('<p data-sourcepos="1:1-1:29" dir="auto">This is a unpublished comment</p>')
+      expect(json_response['note_html']).to eq('<p dir="auto">This is a unpublished comment</p>')
     end
 
     it 'creates a draft note with quick actions' do

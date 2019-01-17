@@ -4,6 +4,10 @@ require 'spec_helper'
 
 describe IssuablesHelper do
   describe '#issuable_initial_data' do
+    before do
+      stub_commonmark_sourcepos_disabled
+    end
+
     it 'returns the correct data for an epic' do
       user = create(:user)
       epic = create(:epic, author: user, description: 'epic text')
@@ -28,7 +32,7 @@ describe IssuablesHelper do
         groupPath: @group.path,
         initialTitleHtml: epic.title,
         initialTitleText: epic.title,
-        initialDescriptionHtml: '<p data-sourcepos="1:1-1:9" dir="auto">epic text</p>',
+        initialDescriptionHtml: '<p dir="auto">epic text</p>',
         initialDescriptionText: 'epic text',
         initialTaskStatus: '0 of 0 tasks completed',
         subepicsSupported: Gitlab::Database.postgresql?

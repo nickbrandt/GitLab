@@ -17,7 +17,7 @@ module Banzai
 
       def self.transform_context(context)
         super(context).merge(
-            no_sourcepos: true
+          no_sourcepos: true
         )
       end
     end
