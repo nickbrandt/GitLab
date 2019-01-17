@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe Burndown do
   set(:user) { create(:user) }
+  set(:non_member) { create(:user) }
   let(:start_date) { "2017-03-01" }
   let(:due_date) { "2017-03-03" }
 
@@ -16,13 +17,13 @@ describe Burndown do
       end
     end
 
-    subject { described_class.new(milestone).to_json }
+    subject { described_class.new(milestone, user).to_json }
 
     it "generates an array with date, issue count and weight" do
       expect(subject).to eq([
-        ["2017-03-01", 3, 6],
-        ["2017-03-02", 4, 8],
-        ["2017-03-03", 2, 4]
+        ["2017-03-01", 4, 8],
+        ["2017-03-02", 5, 10],
+        ["2017-03-03", 3, 6]
       ].to_json)
     end
 
@@ -45,7 +46,7 @@ describe Burndown do
     end
 
     it "sets attribute accurate to true" do
-      burndown = described_class.new(milestone)
+      burndown = described_class.new(milestone, user)
 
       expect(burndown).to be_accurate
     end
@@ -57,14 +58,14 @@ describe Burndown do
 
       it "considers closed_at as milestone start date" do
         expect(subject).to eq([
-          ["2017-03-01", 3, 6],
-          ["2017-03-02", 3, 6],
-          ["2017-03-03", 3, 6]
+          ["2017-03-01", 4, 8],
+          ["2017-03-02", 4, 8],
+          ["2017-03-03", 4, 8]
         ].to_json)
       end
 
       it "sets attribute empty to true" do
-        burndown = described_class.new(milestone)
+        burndown = described_class.new(milestone, user)
 
         expect(burndown).to be_empty
       end
@@ -76,7 +77,7 @@ describe Burndown do
       end
 
       it "sets attribute accurate to false" do
-        burndown = described_class.new(milestone)
+        burndown = described_class.new(milestone, user)
 
         expect(burndown).not_to be_accurate
       end
@@ -92,10 +93,24 @@ describe Burndown do
         create(:issue, milestone: milestone, project: project, created_at: creation_date, weight: 3)
 
         expect(subject).to eq([
-          ['2017-03-01', 3, 6],
-          ['2017-03-02', 6, 13],
-          ['2017-03-03', 4, 9]
+          ['2017-03-01', 4, 8],
+          ['2017-03-02', 7, 15],
+          ['2017-03-03', 5, 11]
         ].to_json)
+      end
+    end
+
+    context 'when issues belong to a public project' do
+      it 'does not include confidential issues for users who are not project members' do
+        project.update(visibility_level: Gitlab::VisibilityLevel::PUBLIC)
+
+        expected_result = [
+            ["2017-03-01", 3, 6],
+            ["2017-03-02", 4, 8],
+            ["2017-03-03", 2, 4]
+        ].to_json
+
+        expect(described_class.new(milestone, non_member).to_json).to eq(expected_result)
       end
     end
   end
@@ -126,6 +141,10 @@ describe Burndown do
     let(:nested_group_milestone) { create(:milestone, group: nested_group, start_date: start_date, due_date: due_date) }
 
     context 'when nested group milestone', :nested_groups do
+      before do
+        group.add_developer(user)
+      end
+
       it_behaves_like 'burndown for milestone' do
         let(:milestone) { nested_group_milestone }
         let(:project) { nested_group_project }
@@ -194,6 +213,9 @@ describe Burndown do
         issue_closed_twice = reopened_issues.last
         close_issue(issue_closed_twice)
         reopen_issue(issue_closed_twice)
+
+        # create one confidential issue
+        create(:issue, :confidential, issue_params) if Date.today == milestone.start_date
       end
     end
   end

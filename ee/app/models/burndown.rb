@@ -17,12 +17,13 @@ class Burndown
     end
   end
 
-  attr_reader :start_date, :due_date, :end_date, :accurate, :legacy_data, :milestone
+  attr_reader :start_date, :due_date, :end_date, :accurate, :legacy_data, :milestone, :current_user
   alias_method :accurate?, :accurate
   alias_method :empty?, :legacy_data
 
-  def initialize(milestone)
+  def initialize(milestone, current_user)
     @milestone = milestone
+    @current_user = current_user
     @start_date = @milestone.start_date
     @due_date = @milestone.due_date
     @end_date = @milestone.due_date
@@ -89,10 +90,10 @@ class Burndown
     strong_memoize(:opened_issues_grouped_by_date) do
       issues =
         @milestone
-          .issues
-          .where('created_at <= ?', end_date)
+          .issues_visible_to_user(current_user)
+          .where('issues.created_at <= ?', end_date)
           .reorder(nil)
-          .order(:created_at).to_a
+          .order('issues.created_at').to_a
 
       issues.group_by do |issue|
         issue.created_at.to_date
@@ -124,9 +125,8 @@ class Burndown
         # `issues.closed_at` can't be used once it's nullified if the issue is
         # reopened.
         internal_clause =
-          ::Issue
+          @milestone.issues_visible_to_user(current_user)
             .joins("LEFT OUTER JOIN events e ON issues.id = e.target_id AND e.target_type = 'Issue' AND e.action = #{Event::CLOSED}")
-            .where(milestone: @milestone)
             .where("state = 'closed' OR (state = 'opened' AND e.action = #{Event::CLOSED})") # rubocop:disable GitlabSecurity/SqlInjection
 
         rel =
