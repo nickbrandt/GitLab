@@ -13,6 +13,7 @@ export default {
   },
   [types.RECEIVE_FEATURE_FLAGS_SUCCESS](state, response) {
     state.isLoading = false;
+    state.hasError = false;
     state.featureFlags = response.data.feature_flags;
     state.count = response.data.count;
 
