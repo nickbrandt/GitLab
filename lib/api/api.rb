@@ -117,6 +117,7 @@ module API
     mount ::API::GroupMilestones
     mount ::API::Groups
     mount ::API::GroupVariables
+    mount ::API::ImportGithub
     mount ::API::Internal
     mount ::API::Issues
     mount ::API::JobArtifacts
