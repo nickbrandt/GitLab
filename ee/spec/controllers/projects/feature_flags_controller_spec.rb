@@ -27,10 +27,8 @@ describe Projects::FeatureFlagsController do
         subject
       end
 
-      it 'shows an empty state with buttons' do
+      it 'renders page' do
         expect(response).to be_ok
-        expect(response).to render_template('_configure_feature_flags_button')
-        expect(response).to render_template('_new_feature_flag_button')
       end
     end
 
@@ -41,10 +39,8 @@ describe Projects::FeatureFlagsController do
         subject
       end
 
-      it 'shows an list of feature flags with buttons' do
-        expect(response).to be_ok
-        expect(response).to render_template('_configure_feature_flags_button')
-        expect(response).to render_template('_new_feature_flag_button')
+      it 'renders page' do
+        expect(response).to have_gitlab_http_status(:ok)
       end
     end
 
