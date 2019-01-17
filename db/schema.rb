@@ -2983,6 +2983,8 @@ ActiveRecord::Schema.define(version: 20190124200344) do
     t.string "epics_sort"
     t.integer "roadmap_epics_state"
     t.integer "epic_notes_filter", limit: 2, default: 0, null: false
+    t.string "issues_sort"
+    t.string "merge_requests_sort"
     t.index ["user_id"], name: "index_user_preferences_on_user_id", unique: true, using: :btree
   end
 
