@@ -1,0 +1,5 @@
+---
+title: Hide packages without version from UI
+merge_request: 9151
+author:
+type: fixed
