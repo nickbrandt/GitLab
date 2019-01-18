@@ -10,16 +10,9 @@ class StuckImportJobsWorker
     import_state_without_jid_count = mark_import_states_without_jid_as_failed!
     import_state_with_jid_count = mark_import_states_with_jid_as_failed!
 
-    values = {
-      projects_without_jid_count: import_state_without_jid_count,
-      projects_with_jid_count: import_state_with_jid_count
-    }
-
-    Gitlab::Metrics.add_event_with_values(:stuck_import_jobs, values)
-
-    stuck_import_jobs_worker_runs_counter.increment
-    import_state_without_jid_metric.set({}, import_state_without_jid_count)
-    import_state_with_jid_metric.set({}, import_state_with_jid_count)
+    Gitlab::Metrics.add_event(:stuck_import_jobs,
+                             projects_without_jid_count: import_state_without_jid_count,
+                             projects_with_jid_count: import_state_with_jid_count)
   end
 
   private
@@ -71,18 +64,5 @@ class StuckImportJobsWorker
 
   def error_message
     _("Import timed out. Import took longer than %{import_jobs_expiration} seconds") % { import_jobs_expiration: IMPORT_JOBS_EXPIRATION }
-  end
-
-  def stuck_import_jobs_worker_runs_counter
-    @stuck_import_jobs_worker_runs_counter ||= Gitlab::Metrics.counter(:gitlab_stuck_import_jobs_worker_runs_total,
-                                                                       'Stuck import jobs worker runs count')
-  end
-
-  def import_state_without_jid_metric
-    @import_state_without_jid_metric ||= Gitlab::Metrics.gauge(:gitlab_projects_without_jid, 'Projects without Job ids')
-  end
-
-  def import_state_with_jid_metric
-    @import_state_with_jid_metric ||= Gitlab::Metrics.gauge(:gitlab_projects_with_jid, 'Projects with Job ids')
   end
 end
