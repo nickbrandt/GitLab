@@ -5,7 +5,7 @@ import Translate from '~/vue_shared/translate';
 import { parseBoolean } from '~/lib/utils/common_utils';
 import { visitUrl, mergeUrlParams } from '~/lib/utils/url_utility';
 
-import { PRESET_TYPES } from './constants';
+import { PRESET_TYPES, EPIC_DETAILS_CELL_WIDTH } from './constants';
 
 import { getTimeframeForPreset, getEpicsPathForPreset } from './utils/roadmap_utils';
 
@@ -48,23 +48,38 @@ export default () => {
           ? dataset.presetType
           : PRESET_TYPES.MONTHS;
       const filterQueryString = window.location.search.substring(1);
-      const timeframe = getTimeframeForPreset(presetType);
-      const epicsPath = getEpicsPathForPreset({
+      const timeframe = getTimeframeForPreset(
+        presetType,
+        window.innerWidth - el.offsetLeft - EPIC_DETAILS_CELL_WIDTH,
+      );
+      const initialEpicsPath = getEpicsPathForPreset({
         basePath: dataset.epicsPath,
+        epicsState: dataset.epicsState,
         filterQueryString,
         presetType,
         timeframe,
-        state: dataset.epicsState,
       });
 
-      const store = new RoadmapStore(parseInt(dataset.groupId, 0), timeframe, presetType);
-      const service = new RoadmapService(epicsPath);
+      const store = new RoadmapStore({
+        groupId: parseInt(dataset.groupId, 0),
+        sortedBy: dataset.sortedBy,
+        timeframe,
+        presetType,
+      });
+
+      const service = new RoadmapService({
+        initialEpicsPath,
+        filterQueryString,
+        basePath: dataset.epicsPath,
+        epicsState: dataset.epicsState,
+      });
 
       return {
         store,
         service,
         presetType,
         hasFiltersApplied,
+        epicsState: dataset.epicsState,
         newEpicEndpoint: dataset.newEpicEndpoint,
         emptyStateIllustrationPath: dataset.emptyStateIllustration,
       };
@@ -76,6 +91,7 @@ export default () => {
           service: this.service,
           presetType: this.presetType,
           hasFiltersApplied: this.hasFiltersApplied,
+          epicsState: this.epicsState,
           newEpicEndpoint: this.newEpicEndpoint,
           emptyStateIllustrationPath: this.emptyStateIllustrationPath,
         },

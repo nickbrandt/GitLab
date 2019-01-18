@@ -29,10 +29,12 @@ export default {
   mounted() {
     eventHub.$on('epicsListRendered', this.handleEpicsListRender);
     eventHub.$on('epicsListScrolled', this.handleEpicsListScroll);
+    eventHub.$on('refreshTimeline', this.handleEpicsListRender);
   },
   beforeDestroy() {
     eventHub.$off('epicsListRendered', this.handleEpicsListRender);
     eventHub.$off('epicsListScrolled', this.handleEpicsListScroll);
+    eventHub.$off('refreshTimeline', this.handleEpicsListRender);
   },
   methods: {
     /**
@@ -40,7 +42,7 @@ export default {
      * and renders vertical line over the area where
      * today falls in current timeline
      */
-    handleEpicsListRender({ height }) {
+    handleEpicsListRender({ height, todayBarReady }) {
       let left = 0;
 
       // Get total days of current timeframe Item and then
@@ -68,7 +70,7 @@ export default {
         height: `${height + 20}px`,
         left: `${left}%`,
       };
-      this.todayBarReady = true;
+      this.todayBarReady = todayBarReady === undefined ? true : todayBarReady;
     },
     handleEpicsListScroll() {
       const indicatorX = this.$el.getBoundingClientRect().x;

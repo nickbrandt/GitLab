@@ -1,9 +1,3 @@
-import {
-  getTimeframeForQuartersView,
-  getTimeframeForMonthsView,
-  getTimeframeForWeeksView,
-} from 'ee/roadmap/utils/roadmap_utils';
-
 export const mockScrollBarSize = 15;
 
 export const mockGroupId = 2;
@@ -12,15 +6,85 @@ export const mockShellWidth = 2000;
 
 export const mockItemWidth = 180;
 
+export const mockSortedBy = 'start_date_asc';
+
+export const basePath = '/groups/gitlab-org/-/epics.json';
+
 export const epicsPath = '/groups/gitlab-org/-/epics.json?start_date=2017-11-1&end_date=2018-4-30';
 
 export const mockNewEpicEndpoint = '/groups/gitlab-org/-/epics';
 
 export const mockSvgPath = '/foo/bar.svg';
 
-export const mockTimeframeQuarters = getTimeframeForQuartersView(new Date(2018, 0, 1));
-export const mockTimeframeMonths = getTimeframeForMonthsView(new Date(2018, 0, 1));
-export const mockTimeframeWeeks = getTimeframeForWeeksView(new Date(2018, 0, 1));
+export const mockTimeframeInitialDate = new Date(2018, 0, 1);
+
+export const mockTimeframeQuartersPrepend = [
+  {
+    year: 2016,
+    quarterSequence: 4,
+    range: [new Date(2016, 9, 1), new Date(2016, 10, 1), new Date(2016, 11, 31)],
+  },
+  {
+    year: 2017,
+    quarterSequence: 1,
+    range: [new Date(2017, 0, 1), new Date(2017, 1, 1), new Date(2017, 2, 31)],
+  },
+  {
+    year: 2017,
+    quarterSequence: 2,
+    range: [new Date(2017, 3, 1), new Date(2017, 4, 1), new Date(2017, 5, 30)],
+  },
+];
+export const mockTimeframeQuartersAppend = [
+  {
+    year: 2019,
+    quarterSequence: 2,
+    range: [new Date(2019, 3, 1), new Date(2019, 4, 1), new Date(2019, 5, 30)],
+  },
+  {
+    year: 2019,
+    quarterSequence: 3,
+    range: [new Date(2019, 6, 1), new Date(2019, 7, 1), new Date(2019, 8, 30)],
+  },
+  {
+    year: 2019,
+    quarterSequence: 4,
+    range: [new Date(2019, 9, 1), new Date(2019, 10, 1), new Date(2019, 11, 31)],
+  },
+];
+
+export const mockTimeframeMonthsPrepend = [
+  new Date(2017, 4, 1),
+  new Date(2017, 5, 1),
+  new Date(2017, 6, 1),
+  new Date(2017, 7, 1),
+  new Date(2017, 8, 1),
+  new Date(2017, 9, 1),
+];
+export const mockTimeframeMonthsAppend = [
+  new Date(2018, 6, 1),
+  new Date(2018, 7, 1),
+  new Date(2018, 8, 1),
+  new Date(2018, 9, 1),
+  new Date(2018, 10, 30),
+];
+
+export const mockTimeframeWeeksPrepend = [
+  new Date(2017, 10, 5),
+  new Date(2017, 10, 12),
+  new Date(2017, 10, 19),
+  new Date(2017, 10, 26),
+  new Date(2017, 11, 3),
+  new Date(2017, 11, 10),
+];
+export const mockTimeframeWeeksAppend = [
+  new Date(2018, 0, 28),
+  new Date(2018, 1, 4),
+  new Date(2018, 1, 11),
+  new Date(2018, 1, 18),
+  new Date(2018, 1, 25),
+  new Date(2018, 2, 4),
+];
 
 export const mockEpic = {
   id: 1,
@@ -186,5 +250,24 @@ export const rawEpics = [
     start_date: '2018-12-26',
     end_date: '2018-03-10',
     web_url: '/groups/gitlab-org/marketing/-/epics/22',
+  },
+];
+
+export const mockUnsortedEpics = [
+  {
+    startDate: new Date(2017, 2, 12),
+    endDate: new Date(2017, 7, 20),
+  },
+  {
+    startDate: new Date(2015, 5, 8),
+    endDate: new Date(2016, 3, 1),
+  },
+  {
+    startDate: new Date(2019, 4, 12),
+    endDate: new Date(2019, 7, 30),
+  },
+  {
+    startDate: new Date(2014, 3, 17),
+    endDate: new Date(2015, 7, 15),
   },
 ];

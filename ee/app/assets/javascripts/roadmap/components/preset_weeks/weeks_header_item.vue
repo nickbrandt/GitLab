@@ -29,12 +29,8 @@ export default {
     const currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
 
-    const lastDayOfCurrentWeek = new Date(this.timeframeItem.getTime());
-    lastDayOfCurrentWeek.setDate(lastDayOfCurrentWeek.getDate() + 7);
-
     return {
       currentDate,
-      lastDayOfCurrentWeek,
     };
   },
   computed: {
@@ -43,19 +39,35 @@ export default {
         width: `${this.itemWidth}px`,
       };
     },
+    lastDayOfCurrentWeek() {
+      const lastDayOfCurrentWeek = new Date(this.timeframeItem.getTime());
+      lastDayOfCurrentWeek.setDate(lastDayOfCurrentWeek.getDate() + 7);
+
+      return lastDayOfCurrentWeek;
+    },
     timelineHeaderLabel() {
-      if (this.timeframeIndex === 0) {
+      const timeframeItemMonth = this.timeframeItem.getMonth();
+      const timeframeItemDate = this.timeframeItem.getDate();
+
+      if (this.timeframeIndex === 0 || (timeframeItemMonth === 0 && timeframeItemDate <= 7)) {
         return `${this.timeframeItem.getFullYear()} ${monthInWords(
           this.timeframeItem,
           true,
-        )} ${this.timeframeItem.getDate()}`;
+        )} ${timeframeItemDate}`;
       }
-      return `${monthInWords(this.timeframeItem, true)} ${this.timeframeItem.getDate()}`;
+
+      return `${monthInWords(this.timeframeItem, true)} ${timeframeItemDate}`;
     },
     timelineHeaderClass() {
-      if (this.currentDate >= this.timeframeItem && this.currentDate <= this.lastDayOfCurrentWeek) {
+      const currentDateTime = this.currentDate.getTime();
+      const lastDayOfCurrentWeekTime = this.lastDayOfCurrentWeek.getTime();
+
+      if (
+        currentDateTime >= this.timeframeItem.getTime() &&
+        currentDateTime <= lastDayOfCurrentWeekTime
+      ) {
         return 'label-dark label-bold';
-      } else if (this.currentDate < this.lastDayOfCurrentWeek) {
+      } else if (currentDateTime < lastDayOfCurrentWeekTime) {
         return 'label-dark';
       }
       return '';

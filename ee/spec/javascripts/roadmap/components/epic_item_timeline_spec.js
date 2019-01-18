@@ -1,15 +1,15 @@
 import Vue from 'vue';
 
 import epicItemTimelineComponent from 'ee/roadmap/components/epic_item_timeline.vue';
-import {
-  TIMELINE_END_OFFSET_FULL,
-  TIMELINE_END_OFFSET_HALF,
-  TIMELINE_CELL_MIN_WIDTH,
-  PRESET_TYPES,
-} from 'ee/roadmap/constants';
+import eventHub from 'ee/roadmap/event_hub';
+import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
+
+import { TIMELINE_CELL_MIN_WIDTH, PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeMonths, mockEpic, mockShellWidth, mockItemWidth } from '../mock_data';
+import { mockTimeframeInitialDate, mockEpic, mockShellWidth, mockItemWidth } from '../mock_data';
+
+const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
 const createComponent = ({
   presetType = PRESET_TYPES.MONTHS,
@@ -62,7 +62,7 @@ describe('EpicItemTimelineComponent', () => {
       it('returns proportionate width based on timeframe length and shellWidth', () => {
         vm = createComponent({});
 
-        expect(vm.getCellWidth()).toBe(240);
+        expect(vm.getCellWidth()).toBe(210);
       });
 
       it('returns minimum fixed width when proportionate width available lower than minimum fixed width defined', () => {
@@ -74,46 +74,6 @@ describe('EpicItemTimelineComponent', () => {
       });
     });
 
-    describe('getTimelineBarEndOffset', () => {
-      it('returns full offset value when both Epic startDate and endDate is out of range', () => {
-        vm = createComponent({
-          epic: Object.assign({}, mockEpic, {
-            startDateOutOfRange: true,
-            endDateOutOfRange: true,
-          }),
-        });
-
-        expect(vm.getTimelineBarEndOffset()).toBe(TIMELINE_END_OFFSET_FULL);
-      });
-
-      it('returns full offset value when Epic startDate is undefined and endDate is out of range', () => {
-        vm = createComponent({
-          epic: Object.assign({}, mockEpic, {
-            startDateUndefined: true,
-            endDateOutOfRange: true,
-          }),
-        });
-
-        expect(vm.getTimelineBarEndOffset()).toBe(TIMELINE_END_OFFSET_FULL);
-      });
-
-      it('returns half offset value when Epic endDate is out of range', () => {
-        vm = createComponent({
-          epic: Object.assign({}, mockEpic, {
-            endDateOutOfRange: true,
-          }),
-        });
-
-        expect(vm.getTimelineBarEndOffset()).toBe(TIMELINE_END_OFFSET_HALF);
-      });
-
-      it('returns 0 when both Epic startDate and endDate is defined and within range', () => {
-        vm = createComponent({});
-
-        expect(vm.getTimelineBarEndOffset()).toBe(0);
-      });
-    });
-
     describe('renderTimelineBar', () => {
       it('sets `timelineBarStyles` & `timelineBarReady` when timeframeItem has Epic.startDate', () => {
         vm = createComponent({
@@ -122,7 +82,7 @@ describe('EpicItemTimelineComponent', () => {
         });
         vm.renderTimelineBar();
 
-        expect(vm.timelineBarStyles).toBe('width: 1216px; left: 0;');
+        expect(vm.timelineBarStyles).toBe('width: 1274px; left: 0;');
         expect(vm.timelineBarReady).toBe(true);
       });
 
@@ -136,6 +96,26 @@ describe('EpicItemTimelineComponent', () => {
         expect(vm.timelineBarStyles).toBe('');
         expect(vm.timelineBarReady).toBe(false);
       });
+    });
+  });
+
+  describe('mounted', () => {
+    it('binds `refreshTimeline` event listener on eventHub', () => {
+      spyOn(eventHub, '$on');
+      const vmX = createComponent({});
+
+      expect(eventHub.$on).toHaveBeenCalledWith('refreshTimeline', jasmine.any(Function));
+      vmX.$destroy();
+    });
+  });
+
+  describe('beforeDestroy', () => {
+    it('unbinds `refreshTimeline` event listener on eventHub', () => {
+      spyOn(eventHub, '$off');
+      const vmX = createComponent({});
+      vmX.$destroy();
+
+      expect(eventHub.$off).toHaveBeenCalledWith('refreshTimeline', jasmine.any(Function));
     });
   });
 
@@ -172,7 +152,7 @@ describe('EpicItemTimelineComponent', () => {
 
       vm.renderTimelineBar();
       vm.$nextTick(() => {
-        expect(timelineBarEl.getAttribute('style')).toBe('width: 608.571px; left: 0px;');
+        expect(timelineBarEl.getAttribute('style')).toBe('width: 742.5px; left: 0px;');
         done();
       });
     });
@@ -193,23 +173,6 @@ describe('EpicItemTimelineComponent', () => {
       });
     });
 
-    it('renders timeline bar with `start-date-outside` class when Epic startDate is out of range of timeframe', done => {
-      vm = createComponent({
-        epic: Object.assign({}, mockEpic, {
-          startDateOutOfRange: true,
-          startDate: mockTimeframeMonths[0],
-          originalStartDate: new Date(2017, 0, 1),
-        }),
-      });
-      const timelineBarEl = vm.$el.querySelector('.timeline-bar-wrapper .timeline-bar');
-
-      vm.renderTimelineBar();
-      vm.$nextTick(() => {
-        expect(timelineBarEl.classList.contains('start-date-outside')).toBe(true);
-        done();
-      });
-    });
-
     it('renders timeline bar with `end-date-undefined` class when Epic endDate is undefined', done => {
       vm = createComponent({
         epic: Object.assign({}, mockEpic, {
@@ -223,24 +186,6 @@ describe('EpicItemTimelineComponent', () => {
       vm.renderTimelineBar();
       vm.$nextTick(() => {
         expect(timelineBarEl.classList.contains('end-date-undefined')).toBe(true);
-        done();
-      });
-    });
-
-    it('renders timeline bar with `end-date-outside` class when Epic endDate is out of range of timeframe', done => {
-      vm = createComponent({
-        epic: Object.assign({}, mockEpic, {
-          startDate: mockTimeframeMonths[0],
-          endDateOutOfRange: true,
-          endDate: mockTimeframeMonths[mockTimeframeMonths.length - 1],
-          originalEndDate: new Date(2018, 11, 1),
-        }),
-      });
-      const timelineBarEl = vm.$el.querySelector('.timeline-bar-wrapper .timeline-bar');
-
-      vm.renderTimelineBar();
-      vm.$nextTick(() => {
-        expect(timelineBarEl.classList.contains('end-date-outside')).toBe(true);
         done();
       });
     });

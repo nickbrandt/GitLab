@@ -6,25 +6,42 @@ import axios from '~/lib/utils/axios_utils';
 import appComponent from 'ee/roadmap/components/app.vue';
 import RoadmapStore from 'ee/roadmap/store/roadmap_store';
 import RoadmapService from 'ee/roadmap/service/roadmap_service';
+import eventHub from 'ee/roadmap/event_hub';
 
-import { PRESET_TYPES } from 'ee/roadmap/constants';
+import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
+
+import { PRESET_TYPES, EXTEND_AS } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import {
-  mockTimeframeMonths,
+  mockTimeframeInitialDate,
   mockGroupId,
+  basePath,
   epicsPath,
   mockNewEpicEndpoint,
   rawEpics,
   mockSvgPath,
+  mockSortedBy,
 } from '../mock_data';
+
+const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
 const createComponent = () => {
   const Component = Vue.extend(appComponent);
   const timeframe = mockTimeframeMonths;
 
-  const store = new RoadmapStore(mockGroupId, timeframe);
-  const service = new RoadmapService(epicsPath);
+  const store = new RoadmapStore({
+    groupId: mockGroupId,
+    presetType: PRESET_TYPES.MONTHS,
+    sortedBy: mockSortedBy,
+    timeframe,
+  });
+
+  const service = new RoadmapService({
+    initialEpicsPath: epicsPath,
+    epicsState: 'all',
+    basePath,
+  });
 
   return mountComponent(Component, {
     store,
@@ -171,6 +188,193 @@ describe('AppComponent', () => {
           );
           done();
         }, 0);
+      });
+    });
+
+    describe('fetchEpicsForTimeframe', () => {
+      const roadmapTimelineEl = {
+        offsetTop: 0,
+      };
+      let mock;
+
+      beforeEach(() => {
+        mock = new MockAdapter(axios);
+        document.body.innerHTML += '<div class="flash-container"></div>';
+      });
+
+      afterEach(() => {
+        mock.restore();
+        document.querySelector('.flash-container').remove();
+      });
+
+      it('calls service.fetchEpicsForTimeframe and adds response to the store on success', done => {
+        mock.onGet(vm.service.epicsPath).reply(200, rawEpics);
+
+        spyOn(vm.service, 'getEpicsForTimeframe').and.callThrough();
+        spyOn(vm.store, 'addEpics');
+        spyOn(vm, '$nextTick').and.stub();
+
+        vm.fetchEpicsForTimeframe({
+          timeframe: mockTimeframeMonths,
+          extendType: EXTEND_AS.APPEND,
+          roadmapTimelineEl,
+        });
+
+        expect(vm.hasError).toBe(false);
+        expect(vm.service.getEpicsForTimeframe).toHaveBeenCalledWith(
+          PRESET_TYPES.MONTHS,
+          mockTimeframeMonths,
+        );
+        setTimeout(() => {
+          expect(vm.store.addEpics).toHaveBeenCalledWith(rawEpics);
+          done();
+        }, 0);
+      });
+
+      it('calls service.fetchEpicsForTimeframe and sets `hasError` to true and shows flash message when request failed', done => {
+        mock.onGet(vm.service.fetchEpicsForTimeframe).reply(500, {});
+
+        vm.fetchEpicsForTimeframe({
+          timeframe: mockTimeframeMonths,
+          extendType: EXTEND_AS.APPEND,
+          roadmapTimelineEl,
+        });
+
+        expect(vm.hasError).toBe(false);
+        setTimeout(() => {
+          expect(vm.hasError).toBe(true);
+          expect(document.querySelector('.flash-text').innerText.trim()).toBe(
+            'Something went wrong while fetching epics',
+          );
+          done();
+        }, 0);
+      });
+    });
+
+    describe('processExtendedTimeline', () => {
+      it('updates timeline by extending timeframe from the start when called with extendType as `prepend`', done => {
+        vm.store.setEpics(rawEpics);
+        vm.isLoading = false;
+
+        Vue.nextTick()
+          .then(() => {
+            const roadmapTimelineEl = vm.$el.querySelector('.roadmap-timeline-section');
+
+            spyOn(eventHub, '$emit');
+            spyOn(roadmapTimelineEl.parentElement, 'scrollBy');
+
+            vm.processExtendedTimeline({
+              extendType: EXTEND_AS.PREPEND,
+              roadmapTimelineEl,
+              itemsCount: 0,
+            });
+
+            expect(eventHub.$emit).toHaveBeenCalledWith('refreshTimeline', jasmine.any(Object));
+            expect(roadmapTimelineEl.parentElement.scrollBy).toHaveBeenCalled();
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+
+      it('updates timeline by extending timeframe from the end when called with extendType as `append`', done => {
+        vm.store.setEpics(rawEpics);
+        vm.isLoading = false;
+
+        Vue.nextTick()
+          .then(() => {
+            const roadmapTimelineEl = vm.$el.querySelector('.roadmap-timeline-section');
+
+            spyOn(eventHub, '$emit');
+
+            vm.processExtendedTimeline({
+              extendType: EXTEND_AS.PREPEND,
+              roadmapTimelineEl,
+              itemsCount: 0,
+            });
+
+            expect(eventHub.$emit).toHaveBeenCalledWith('refreshTimeline', jasmine.any(Object));
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+    });
+
+    describe('handleScrollToExtend', () => {
+      beforeEach(() => {
+        vm.store.setEpics(rawEpics);
+        vm.isLoading = false;
+      });
+
+      it('updates the store and refreshes roadmap with extended timeline when called with `extendType` param as `prepend`', done => {
+        spyOn(vm.store, 'extendTimeframe');
+        spyOn(vm, 'processExtendedTimeline');
+        spyOn(vm, 'fetchEpicsForTimeframe');
+
+        const extendType = EXTEND_AS.PREPEND;
+        const roadmapTimelineEl = vm.$el.querySelector('.roadmap-timeline-section');
+
+        vm.handleScrollToExtend(roadmapTimelineEl, extendType);
+
+        expect(vm.store.extendTimeframe).toHaveBeenCalledWith(extendType);
+
+        vm.$nextTick()
+          .then(() => {
+            expect(vm.processExtendedTimeline).toHaveBeenCalledWith(
+              jasmine.objectContaining({
+                itemsCount: 0,
+                extendType,
+                roadmapTimelineEl,
+              }),
+            );
+
+            expect(vm.fetchEpicsForTimeframe).toHaveBeenCalledWith(
+              jasmine.objectContaining({
+                // During tests, we don't extend timeframe
+                // as we spied on `vm.store.extendTimeframe` above
+                timeframe: undefined,
+                roadmapTimelineEl,
+                extendType,
+              }),
+            );
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+
+      it('updates the store and refreshes roadmap with extended timeline when called with `extendType` param as `append`', done => {
+        spyOn(vm.store, 'extendTimeframe');
+        spyOn(vm, 'processExtendedTimeline');
+        spyOn(vm, 'fetchEpicsForTimeframe');
+
+        const extendType = EXTEND_AS.APPEND;
+        const roadmapTimelineEl = vm.$el.querySelector('.roadmap-timeline-section');
+
+        vm.handleScrollToExtend(roadmapTimelineEl, extendType);
+
+        expect(vm.store.extendTimeframe).toHaveBeenCalledWith(extendType);
+
+        vm.$nextTick()
+          .then(() => {
+            expect(vm.processExtendedTimeline).toHaveBeenCalledWith(
+              jasmine.objectContaining({
+                itemsCount: 0,
+                extendType,
+                roadmapTimelineEl,
+              }),
+            );
+
+            expect(vm.fetchEpicsForTimeframe).toHaveBeenCalledWith(
+              jasmine.objectContaining({
+                // During tests, we don't extend timeframe
+                // as we spied on `vm.store.extendTimeframe` above
+                timeframe: undefined,
+                roadmapTimelineEl,
+                extendType,
+              }),
+            );
+          })
+          .then(done)
+          .catch(done.fail);
       });
     });
   });

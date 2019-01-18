@@ -1,6 +1,7 @@
 - type = local_assigns.fetch(:type)
 - hide_sort_dropdown = local_assigns.fetch(:hide_sort_dropdown, false)
 - show_roadmap_presets = local_assigns.fetch(:show_roadmap_presets, false)
+- hide_extra_sort_options = local_assigns.fetch(:hide_extra_sort_options, false)
 - preset_layout = roadmap_layout
 - is_quarters = preset_layout == "QUARTERS"
 - is_months = preset_layout == "MONTHS"
@@ -82,4 +83,4 @@
             = icon('times')
         - unless hide_sort_dropdown
           .filter-dropdown-container
-            = render 'shared/epic/sort_dropdown'
+            = render 'shared/epic/sort_dropdown', hide_extra_sort_options: hide_extra_sort_options

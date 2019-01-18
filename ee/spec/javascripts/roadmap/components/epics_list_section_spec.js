@@ -3,11 +3,26 @@ import Vue from 'vue';
 import epicsListSectionComponent from 'ee/roadmap/components/epics_list_section.vue';
 import RoadmapStore from 'ee/roadmap/store/roadmap_store';
 import eventHub from 'ee/roadmap/event_hub';
+import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { rawEpics, mockTimeframeMonths, mockGroupId, mockShellWidth } from '../mock_data';
+import {
+  rawEpics,
+  mockTimeframeInitialDate,
+  mockGroupId,
+  mockShellWidth,
+  mockSortedBy,
+} from '../mock_data';
 
-const store = new RoadmapStore(mockGroupId, mockTimeframeMonths, PRESET_TYPES.MONTHS);
+const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
+
+const store = new RoadmapStore({
+  groupId: mockGroupId,
+  presetType: PRESET_TYPES.MONTHS,
+  sortedBy: mockSortedBy,
+  timeframe: mockTimeframeMonths,
+});
+
 store.setEpics(rawEpics);
 const mockEpics = store.getEpics();
 
@@ -63,7 +78,7 @@ describe('EpicsListSectionComponent', () => {
 
     describe('emptyRowCellStyles', () => {
       it('returns computed style object based on sectionItemWidth prop value', () => {
-        expect(vm.emptyRowCellStyles.width).toBe('240px');
+        expect(vm.emptyRowCellStyles.width).toBe('210px');
       });
     });
 
@@ -127,15 +142,6 @@ describe('EpicsListSectionComponent', () => {
           window.innerHeight = initialHeight; // reset to prevent any side effects
           done();
         });
-      });
-    });
-
-    describe('scrollToTodayIndicator', () => {
-      it('scrolls table body to put timeline today indicator in focus', () => {
-        spyOn(vm.$el, 'scrollTo');
-        vm.scrollToTodayIndicator();
-
-        expect(vm.$el.scrollTo).toHaveBeenCalledWith(jasmine.any(Number), 0);
       });
     });
   });

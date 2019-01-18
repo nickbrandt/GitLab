@@ -1,10 +1,14 @@
 import Vue from 'vue';
 
 import EpicItemTimelineComponent from 'ee/roadmap/components/epic_item_timeline.vue';
+import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
+
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeMonths, mockEpic, mockShellWidth, mockItemWidth } from '../mock_data';
+import { mockTimeframeInitialDate, mockEpic, mockShellWidth, mockItemWidth } from '../mock_data';
+
+const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
 const createComponent = ({
   presetType = PRESET_TYPES.MONTHS,
@@ -114,17 +118,6 @@ describe('MonthsPresetMixin', () => {
         expect(vm.getTimelineBarStartOffsetForMonths()).toBe('left: 0;');
       });
 
-      it('returns `right: 8px;` when Epic startDate is in last timeframe month and endDate is out of range', () => {
-        vm = createComponent({
-          epic: Object.assign({}, mockEpic, {
-            startDate: mockTimeframeMonths[mockTimeframeMonths.length - 1],
-            endDateOutOfRange: true,
-          }),
-        });
-
-        expect(vm.getTimelineBarStartOffsetForMonths()).toBe('right: 8px;');
-      });
-
       it('returns proportional `left` value based on Epic startDate and days in the month', () => {
         vm = createComponent({
           epic: Object.assign({}, mockEpic, {
@@ -132,7 +125,7 @@ describe('MonthsPresetMixin', () => {
           }),
         });
 
-        expect(vm.getTimelineBarStartOffsetForMonths()).toContain('left: 48');
+        expect(vm.getTimelineBarStartOffsetForMonths()).toContain('left: 50%');
       });
     });
 
@@ -147,7 +140,7 @@ describe('MonthsPresetMixin', () => {
           }),
         });
 
-        expect(Math.floor(vm.getTimelineBarWidthForMonths())).toBe(492);
+        expect(Math.floor(vm.getTimelineBarWidthForMonths())).toBe(637);
       });
     });
   });

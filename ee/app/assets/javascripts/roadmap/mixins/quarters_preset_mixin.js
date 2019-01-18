@@ -1,7 +1,5 @@
 import { totalDaysInQuarter, dayInQuarter } from '~/lib/utils/datetime_utility';
 
-import { TIMELINE_END_OFFSET_HALF } from '../constants';
-
 export default {
   methods: {
     /**
@@ -11,7 +9,10 @@ export default {
       const quarterStart = this.timeframeItem.range[0];
       const quarterEnd = this.timeframeItem.range[2];
 
-      return this.epic.startDate >= quarterStart && this.epic.startDate <= quarterEnd;
+      return (
+        this.epic.startDate.getTime() >= quarterStart.getTime() &&
+        this.epic.startDate.getTime() <= quarterEnd.getTime()
+      );
     },
     /**
      * Check if current epic ends within current quarter (timeline cell)
@@ -19,7 +20,7 @@ export default {
     isTimeframeUnderEndDateForQuarter(timeframeItem, epicEndDate) {
       const quarterEnd = timeframeItem.range[2];
 
-      return epicEndDate <= quarterEnd;
+      return epicEndDate.getTime() <= quarterEnd.getTime();
     },
     /**
      * Return timeline bar width for current quarter (timeline cell) based on
@@ -57,14 +58,6 @@ export default {
         return 'left: 0;';
       }
 
-      const lastTimeframeItem = this.timeframe[this.timeframe.length - 1].range[2];
-      if (
-        this.epic.startDate >= this.timeframe[this.timeframe.length - 1].range[0] &&
-        this.epic.startDate <= lastTimeframeItem
-      ) {
-        return `right: ${TIMELINE_END_OFFSET_HALF}px;`;
-      }
-
       return `left: ${(startDay / daysInQuarter) * 100}%;`;
     },
     /**
@@ -95,7 +88,6 @@ export default {
 
       const indexOfCurrentQuarter = this.timeframe.indexOf(this.timeframeItem);
       const cellWidth = this.getCellWidth();
-      const offsetEnd = this.getTimelineBarEndOffset();
       const epicStartDate = this.epic.startDate;
       const epicEndDate = this.epic.endDate;
 
@@ -140,7 +132,7 @@ export default {
         }
       }
 
-      return timelineBarWidth - offsetEnd;
+      return timelineBarWidth;
     },
   },
 };

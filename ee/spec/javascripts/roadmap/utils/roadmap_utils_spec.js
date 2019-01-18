@@ -1,11 +1,31 @@
 import {
   getTimeframeForQuartersView,
+  extendTimeframeForQuartersView,
   getTimeframeForMonthsView,
+  extendTimeframeForMonthsView,
   getTimeframeForWeeksView,
+  extendTimeframeForWeeksView,
+  extendTimeframeForAvailableWidth,
   getEpicsPathForPreset,
+  sortEpics,
 } from 'ee/roadmap/utils/roadmap_utils';
 
 import { PRESET_TYPES } from 'ee/roadmap/constants';
+
+import {
+  mockTimeframeInitialDate,
+  mockTimeframeQuartersPrepend,
+  mockTimeframeQuartersAppend,
+  mockTimeframeMonthsPrepend,
+  mockTimeframeMonthsAppend,
+  mockTimeframeWeeksPrepend,
+  mockTimeframeWeeksAppend,
+  mockUnsortedEpics,
+} from '../mock_data';
+
+const mockTimeframeQuarters = getTimeframeForQuartersView(mockTimeframeInitialDate);
+const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
+const mockTimeframeWeeks = getTimeframeForWeeksView(mockTimeframeInitialDate);
 
 describe('getTimeframeForQuartersView', () => {
   let timeframe;
@@ -14,8 +34,8 @@ describe('getTimeframeForQuartersView', () => {
     timeframe = getTimeframeForQuartersView(new Date(2018, 0, 1));
   });
 
-  it('returns timeframe with total of 6 quarters', () => {
-    expect(timeframe.length).toBe(6);
+  it('returns timeframe with total of 7 quarters', () => {
+    expect(timeframe.length).toBe(7);
   });
 
   it('each timeframe item has `quarterSequence`, `year` and `range` present', () => {
@@ -26,15 +46,15 @@ describe('getTimeframeForQuartersView', () => {
     expect(Array.isArray(timeframeItem.range)).toBe(true);
   });
 
-  it('first timeframe item refers to quarter prior to current quarter', () => {
+  it('first timeframe item refers to 2 quarters prior to current quarter', () => {
     const timeframeItem = timeframe[0];
     const expectedQuarter = {
-      0: { month: 9, date: 1 }, // 1 Oct 2017
-      1: { month: 10, date: 1 }, // 1 Nov 2017
-      2: { month: 11, date: 31 }, // 31 Dec 2017
+      0: { month: 6, date: 1 }, // 1 Jul 2017
+      1: { month: 7, date: 1 }, // 1 Aug 2017
+      2: { month: 8, date: 30 }, // 30 Sep 2017
     };
 
-    expect(timeframeItem.quarterSequence).toEqual(4);
+    expect(timeframeItem.quarterSequence).toEqual(3);
     expect(timeframeItem.year).toEqual(2017);
     timeframeItem.range.forEach((month, index) => {
       expect(month.getFullYear()).toBe(2017);
@@ -61,6 +81,44 @@ describe('getTimeframeForQuartersView', () => {
   });
 });
 
+describe('extendTimeframeForQuartersView', () => {
+  it('returns extended timeframe into the past from current timeframe startDate', () => {
+    const initialDate = mockTimeframeQuarters[0].range[0];
+
+    const extendedTimeframe = extendTimeframeForQuartersView(initialDate, -9);
+
+    expect(extendedTimeframe.length).toBe(mockTimeframeQuartersPrepend.length);
+    extendedTimeframe.forEach((timeframeItem, index) => {
+      expect(timeframeItem.year).toBe(mockTimeframeQuartersPrepend[index].year);
+      expect(timeframeItem.quarterSequence).toBe(
+        mockTimeframeQuartersPrepend[index].quarterSequence,
+      );
+
+      timeframeItem.range.forEach((rangeItem, j) => {
+        expect(rangeItem.getTime()).toBe(mockTimeframeQuartersPrepend[index].range[j].getTime());
+      });
+    });
+  });
+
+  it('returns extended timeframe into the future from current timeframe endDate', () => {
+    const initialDate = mockTimeframeQuarters[mockTimeframeQuarters.length - 1].range[2];
+
+    const extendedTimeframe = extendTimeframeForQuartersView(initialDate, 9);
+
+    expect(extendedTimeframe.length).toBe(mockTimeframeQuartersAppend.length);
+    extendedTimeframe.forEach((timeframeItem, index) => {
+      expect(timeframeItem.year).toBe(mockTimeframeQuartersAppend[index].year);
+      expect(timeframeItem.quarterSequence).toBe(
+        mockTimeframeQuartersAppend[index].quarterSequence,
+      );
+
+      timeframeItem.range.forEach((rangeItem, j) => {
+        expect(rangeItem.getTime()).toBe(mockTimeframeQuartersAppend[index].range[j].getTime());
+      });
+    });
+  });
+});
+
 describe('getTimeframeForMonthsView', () => {
   let timeframe;
 
@@ -68,15 +126,15 @@ describe('getTimeframeForMonthsView', () => {
     timeframe = getTimeframeForMonthsView(new Date(2018, 0, 1));
   });
 
-  it('returns timeframe with total of 7 months', () => {
-    expect(timeframe.length).toBe(7);
+  it('returns timeframe with total of 8 months', () => {
+    expect(timeframe.length).toBe(8);
   });
 
-  it('first timeframe item refers to month prior to current month', () => {
+  it('first timeframe item refers to 2 months prior to current month', () => {
     const timeframeItem = timeframe[0];
     const expectedMonth = {
       year: 2017,
-      month: 11,
+      month: 10,
       date: 1,
     };
 
@@ -99,6 +157,28 @@ describe('getTimeframeForMonthsView', () => {
   });
 });
 
+describe('extendTimeframeForMonthsView', () => {
+  it('returns extended timeframe into the past from current timeframe startDate', () => {
+    const initialDate = mockTimeframeMonths[0];
+    const extendedTimeframe = extendTimeframeForMonthsView(initialDate, -6);
+
+    expect(extendedTimeframe.length).toBe(mockTimeframeMonthsPrepend.length);
+    extendedTimeframe.forEach((timeframeItem, index) => {
+      expect(timeframeItem.getTime()).toBe(mockTimeframeMonthsPrepend[index].getTime());
+    });
+  });
+
+  it('returns extended timeframe into the future from current timeframe endDate', () => {
+    const initialDate = mockTimeframeMonths[mockTimeframeMonths.length - 1];
+    const extendedTimeframe = extendTimeframeForMonthsView(initialDate, 7);
+
+    expect(extendedTimeframe.length).toBe(mockTimeframeMonthsAppend.length);
+    extendedTimeframe.forEach((timeframeItem, index) => {
+      expect(timeframeItem.getTime()).toBe(mockTimeframeMonthsAppend[index].getTime());
+    });
+  });
+});
+
 describe('getTimeframeForWeeksView', () => {
   let timeframe;
 
@@ -106,16 +186,16 @@ describe('getTimeframeForWeeksView', () => {
     timeframe = getTimeframeForWeeksView(new Date(2018, 0, 1));
   });
 
-  it('returns timeframe with total of 6 weeks', () => {
-    expect(timeframe.length).toBe(6);
+  it('returns timeframe with total of 7 weeks', () => {
+    expect(timeframe.length).toBe(7);
   });
 
-  it('first timeframe item refers to week prior to current week', () => {
+  it('first timeframe item refers to 2 weeks prior to current week', () => {
     const timeframeItem = timeframe[0];
     const expectedMonth = {
       year: 2017,
       month: 11,
-      date: 24,
+      date: 17,
     };
 
     expect(timeframeItem.getFullYear()).toBe(expectedMonth.year);
@@ -137,6 +217,67 @@ describe('getTimeframeForWeeksView', () => {
   });
 });
 
+describe('extendTimeframeForWeeksView', () => {
+  it('returns extended timeframe into the past from current timeframe startDate', () => {
+    const extendedTimeframe = extendTimeframeForWeeksView(mockTimeframeWeeks[0], -6); // initialDate: 17 Dec 2017
+
+    expect(extendedTimeframe.length).toBe(mockTimeframeWeeksPrepend.length);
+    extendedTimeframe.forEach((timeframeItem, index) => {
+      expect(timeframeItem.getTime()).toBe(mockTimeframeWeeksPrepend[index].getTime());
+    });
+  });
+
+  it('returns extended timeframe into the future from current timeframe endDate', () => {
+    const extendedTimeframe = extendTimeframeForWeeksView(
+      mockTimeframeWeeks[mockTimeframeWeeks.length - 1], // initialDate: 28 Jan 2018
+      6,
+    );
+
+    expect(extendedTimeframe.length).toBe(mockTimeframeWeeksAppend.length);
+    extendedTimeframe.forEach((timeframeItem, index) => {
+      expect(timeframeItem.getTime()).toBe(mockTimeframeWeeksAppend[index].getTime());
+    });
+  });
+});
+
+describe('extendTimeframeForAvailableWidth', () => {
+  let timeframe;
+  let timeframeStart;
+  let timeframeEnd;
+
+  beforeEach(() => {
+    timeframe = mockTimeframeMonths.slice();
+    [timeframeStart] = timeframe;
+    timeframeEnd = timeframe[timeframe.length - 1];
+  });
+
+  it('should not extend `timeframe` when availableTimeframeWidth is small enough to force horizontal scrollbar to show up', () => {
+    extendTimeframeForAvailableWidth({
+      availableTimeframeWidth: 100,
+      presetType: PRESET_TYPES.MONTHS,
+      timeframe,
+      timeframeStart,
+      timeframeEnd,
+    });
+
+    expect(timeframe.length).toBe(mockTimeframeMonths.length);
+  });
+
+  it('should extend `timeframe` when availableTimeframeWidth is large enough that it can fit more timeframe items to show up horizontal scrollbar', () => {
+    extendTimeframeForAvailableWidth({
+      availableTimeframeWidth: 2000,
+      presetType: PRESET_TYPES.MONTHS,
+      timeframe,
+      timeframeStart,
+      timeframeEnd,
+    });
+
+    expect(timeframe.length).toBe(16);
+    expect(timeframe[0].getTime()).toBe(1498867200000); // 1 July 2017
+    expect(timeframe[timeframe.length - 1].getTime()).toBe(1540944000000); // 31 Oct 2018
+  });
+});
+
 describe('getEpicsPathForPreset', () => {
   const basePath = '/groups/gitlab-org/-/epics.json';
   const filterQueryString = 'scope=all&utf8=✓&state=opened&label_name[]=Bug';
@@ -149,7 +290,7 @@ describe('getEpicsPathForPreset', () => {
       presetType: PRESET_TYPES.QUARTERS,
     });
 
-    expect(epicsPath).toBe(`${basePath}?state=all&start_date=2017-10-1&end_date=2019-3-31`);
+    expect(epicsPath).toBe(`${basePath}?state=all&start_date=2017-7-1&end_date=2019-3-31`);
   });
 
   it('returns epics path string based on provided basePath and timeframe for Months', () => {
@@ -160,7 +301,7 @@ describe('getEpicsPathForPreset', () => {
       presetType: PRESET_TYPES.MONTHS,
     });
 
-    expect(epicsPath).toBe(`${basePath}?state=all&start_date=2017-12-1&end_date=2018-6-30`);
+    expect(epicsPath).toBe(`${basePath}?state=all&start_date=2017-11-1&end_date=2018-6-30`);
   });
 
   it('returns epics path string based on provided basePath and timeframe for Weeks', () => {
@@ -171,7 +312,7 @@ describe('getEpicsPathForPreset', () => {
       presetType: PRESET_TYPES.WEEKS,
     });
 
-    expect(epicsPath).toBe(`${basePath}?state=all&start_date=2017-12-24&end_date=2018-2-3`);
+    expect(epicsPath).toBe(`${basePath}?state=all&start_date=2017-12-17&end_date=2018-2-3`);
   });
 
   it('returns epics path string while preserving filterQueryString', () => {
@@ -184,7 +325,94 @@ describe('getEpicsPathForPreset', () => {
     });
 
     expect(epicsPath).toBe(
-      `${basePath}?state=all&start_date=2017-12-1&end_date=2018-6-30&scope=all&utf8=✓&state=opened&label_name[]=Bug`,
+      `${basePath}?state=all&start_date=2017-11-1&end_date=2018-6-30&scope=all&utf8=✓&state=opened&label_name[]=Bug`,
     );
+  });
+
+  it('returns epics path string containing epicsState', () => {
+    const epicsState = 'opened';
+    const timeframe = getTimeframeForMonthsView(new Date(2018, 0, 1));
+    const epicsPath = getEpicsPathForPreset({
+      presetType: PRESET_TYPES.MONTHS,
+      basePath,
+      timeframe,
+      epicsState,
+    });
+
+    expect(epicsPath).toContain(`state=${epicsState}`);
+  });
+});
+
+describe('sortEpics', () => {
+  it('sorts epics list by startDate in ascending order when `sortedBy` param is `start_date_asc`', () => {
+    const epics = mockUnsortedEpics.slice();
+    const sortedOrder = [
+      new Date(2014, 3, 17),
+      new Date(2015, 5, 8),
+      new Date(2017, 2, 12),
+      new Date(2019, 4, 12),
+    ];
+
+    sortEpics(epics, 'start_date_asc');
+
+    expect(epics.length).toBe(mockUnsortedEpics.length);
+
+    epics.forEach((epic, index) => {
+      expect(epic.startDate.getTime()).toBe(sortedOrder[index].getTime());
+    });
+  });
+
+  it('sorts epics list by startDate in descending order when `sortedBy` param is `start_date_desc`', () => {
+    const epics = mockUnsortedEpics.slice();
+    const sortedOrder = [
+      new Date(2019, 4, 12),
+      new Date(2017, 2, 12),
+      new Date(2015, 5, 8),
+      new Date(2014, 3, 17),
+    ];
+
+    sortEpics(epics, 'start_date_desc');
+
+    expect(epics.length).toBe(mockUnsortedEpics.length);
+
+    epics.forEach((epic, index) => {
+      expect(epic.startDate.getTime()).toBe(sortedOrder[index].getTime());
+    });
+  });
+
+  it('sorts epics list by endDate in ascending order when `sortedBy` param is `end_date_asc`', () => {
+    const epics = mockUnsortedEpics.slice();
+    const sortedOrder = [
+      new Date(2015, 7, 15),
+      new Date(2016, 3, 1),
+      new Date(2017, 7, 20),
+      new Date(2019, 7, 30),
+    ];
+
+    sortEpics(epics, 'end_date_asc');
+
+    expect(epics.length).toBe(mockUnsortedEpics.length);
+
+    epics.forEach((epic, index) => {
+      expect(epic.endDate.getTime()).toBe(sortedOrder[index].getTime());
+    });
+  });
+
+  it('sorts epics list by endDate in descending order when `sortedBy` param is `end_date_desc`', () => {
+    const epics = mockUnsortedEpics.slice();
+    const sortedOrder = [
+      new Date(2019, 7, 30),
+      new Date(2017, 7, 20),
+      new Date(2016, 3, 1),
+      new Date(2015, 7, 15),
+    ];
+
+    sortEpics(epics, 'end_date_desc');
+
+    expect(epics.length).toBe(mockUnsortedEpics.length);
+
+    epics.forEach((epic, index) => {
+      expect(epic.endDate.getTime()).toBe(sortedOrder[index].getTime());
+    });
   });
 });

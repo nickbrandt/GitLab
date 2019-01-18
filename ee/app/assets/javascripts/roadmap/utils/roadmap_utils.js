@@ -1,15 +1,23 @@
-import { getTimeframeWindowFrom, totalDaysInMonth } from '~/lib/utils/datetime_utility';
+import { newDate, getTimeframeWindowFrom, totalDaysInMonth } from '~/lib/utils/datetime_utility';
 
-import { PRESET_TYPES, PRESET_DEFAULTS } from '../constants';
+import { PRESET_TYPES, PRESET_DEFAULTS, EXTEND_AS, TIMELINE_CELL_MIN_WIDTH } from '../constants';
+
+const monthsForQuarters = {
+  1: [0, 1, 2],
+  2: [3, 4, 5],
+  3: [6, 7, 8],
+  4: [9, 10, 11],
+};
 
 /**
  * This method returns array of Objects representing Quarters based on provided initialDate
  *
  * For eg; If initialDate is 15th Jan 2018
  *         Then as per Roadmap specs, we need to show
- *         1 quarter before current quarter AND
+ *         2 quarters before current quarters
+ *         current quarter AND
  *         4 quarters after current quarter
- *         thus, total of 6 quarters.
+ *         thus, total of 7 quarters (21 Months).
  *
  * So returned array from this method will be;
  *        [
@@ -47,37 +55,32 @@ import { PRESET_TYPES, PRESET_DEFAULTS } from '../constants';
  *
  * @param {Date} initialDate
  */
-export const getTimeframeForQuartersView = (initialDate = new Date()) => {
-  const startDate = initialDate;
+export const getTimeframeForQuartersView = (initialDate = new Date(), timeframe = []) => {
+  const startDate = newDate(initialDate);
   startDate.setHours(0, 0, 0, 0);
 
-  const monthsForQuarters = {
-    1: [0, 1, 2],
-    2: [3, 4, 5],
-    3: [6, 7, 8],
-    4: [9, 10, 11],
-  };
+  if (!timeframe.length) {
+    // Get current quarter for current month
+    const currentQuarter = Math.floor((startDate.getMonth() + 3) / 3);
+    // Get index of current month in current quarter
+    // It could be 0, 1, 2 (i.e. first, second or third)
+    const currentMonthInCurrentQuarter = monthsForQuarters[currentQuarter].indexOf(
+      startDate.getMonth(),
+    );
 
-  // Get current quarter for current month
-  const currentQuarter = Math.floor((startDate.getMonth() + 3) / 3);
-  // Get index of current month in current quarter
-  // It could be 0, 1, 2 (i.e. first, second or third)
-  const currentMonthInCurrentQuarter = monthsForQuarters[currentQuarter].indexOf(
-    startDate.getMonth(),
-  );
+    // To move start back to first month of 2 quarters prior by
+    // adding quarter size (3 + 3) to month order will give us
+    // exact number of months we need to go back in time
+    const startMonth = currentMonthInCurrentQuarter + 6;
+    // Move startDate to first month of previous quarter
+    startDate.setMonth(startDate.getMonth() - startMonth);
 
-  // To move start back to first month of previous quarter
-  // Adding quarter size (3) to month order will give us
-  // exact number of months we need to go back in time
-  const startMonth = currentMonthInCurrentQuarter + 3;
+    // Get timeframe for the length we determined for this preset
+    // start from the startDate
+    timeframe.push(...getTimeframeWindowFrom(startDate, PRESET_DEFAULTS.QUARTERS.TIMEFRAME_LENGTH));
+  }
+
   const quartersTimeframe = [];
-  // Move startDate to first month of previous quarter
-  startDate.setMonth(startDate.getMonth() - startMonth);
-
-  // Get timeframe for the length we determined for this preset
-  // start from the startDate
-  const timeframe = getTimeframeWindowFrom(startDate, PRESET_DEFAULTS.QUARTERS.TIMEFRAME_LENGTH);
-
   // Iterate over the timeframe and break it down
   // in chunks of quarters
   for (let i = 0; i < timeframe.length; i += 3) {
@@ -100,31 +103,14 @@ export const getTimeframeForQuartersView = (initialDate = new Date()) => {
   return quartersTimeframe;
 };
 
-/**
- * This method returns array of Dates respresenting Months based on provided initialDate
- *
- * For eg; If initialDate is 15th Jan 2018
- *         Then as per Roadmap specs, we need to show
- *         1 month before current month AND
- *         5 months after current month
- *         thus, total of 7 months.
- *
- * So returned array from this method will be;
- *        [
- *          1 Dec 2017, 1 Jan 2018, 1 Feb 2018, 1 Mar 2018,
- *          1 Apr 2018, 1 May 2018, 30 Jun 2018
- *        ]
- *
- * @param {Date} initialDate
- */
-export const getTimeframeForMonthsView = (initialDate = new Date()) => {
-  const startDate = initialDate;
-  startDate.setHours(0, 0, 0, 0);
+export const extendTimeframeForQuartersView = (initialDate = new Date(), length) => {
+  const startDate = newDate(initialDate);
+  startDate.setDate(1);
 
-  // Move startDate to a month prior to current month
-  startDate.setMonth(startDate.getMonth() - 1);
+  startDate.setMonth(startDate.getMonth() + (length > 0 ? 1 : -1));
+  const timeframe = getTimeframeWindowFrom(startDate, length);
 
-  return getTimeframeWindowFrom(startDate, PRESET_DEFAULTS.MONTHS.TIMEFRAME_LENGTH);
+  return getTimeframeForQuartersView(startDate, length > 0 ? timeframe : timeframe.reverse());
 };
 
 /**
@@ -132,51 +118,231 @@ export const getTimeframeForMonthsView = (initialDate = new Date()) => {
  *
  * For eg; If initialDate is 15th Jan 2018
  *         Then as per Roadmap specs, we need to show
- *         1 week before current week AND
+ *         2 months before current month,
+ *         current month AND
+ *         5 months after current month
+ *         thus, total of 8 months.
+ *
+ * So returned array from this method will be;
+ *        [
+ *          1 Nov 2017, 1 Dec 2017, 1 Jan 2018, 1 Feb 2018,
+ *          1 Mar 2018, 1 Apr 2018, 1 May 2018, 30 Jun 2018
+ *        ]
+ *
+ * @param {Date} initialDate
+ */
+export const getTimeframeForMonthsView = (initialDate = new Date()) => {
+  const startDate = newDate(initialDate);
+
+  // Move startDate to a month prior to current month
+  startDate.setMonth(startDate.getMonth() - 2);
+
+  return getTimeframeWindowFrom(startDate, PRESET_DEFAULTS.MONTHS.TIMEFRAME_LENGTH);
+};
+
+export const extendTimeframeForMonthsView = (initialDate = new Date(), length) => {
+  const startDate = newDate(initialDate);
+
+  // When length is positive (which means extension is of type APPEND)
+  // Set initial date as first day of the month.
+  if (length > 0) {
+    startDate.setDate(1);
+  }
+
+  const timeframe = getTimeframeWindowFrom(startDate, length - 1).slice(1);
+
+  return length > 0 ? timeframe : timeframe.reverse();
+};
+
+/**
+ * This method returns array of Dates respresenting Months based on provided initialDate
+ *
+ * For eg; If initialDate is 15th Jan 2018
+ *         Then as per Roadmap specs, we need to show
+ *         2 weeks before current week,
+ *         current week AND
  *         4 weeks after current week
- *         thus, total of 6 weeks.
+ *         thus, total of 7 weeks.
  *         Note that week starts on Sunday
  *
  * So returned array from this method will be;
  *        [
- *          7 Jan 2018, 14 Jan 2018, 21 Jan 2018,
+ *          31 Dec 2017, 7 Jan 2018, 14 Jan 2018, 21 Jan 2018,
  *          28 Jan 2018, 4 Mar 2018, 11 Mar 2018
  *        ]
  *
  * @param {Date} initialDate
  */
 export const getTimeframeForWeeksView = (initialDate = new Date()) => {
-  const startDate = initialDate;
+  const startDate = newDate(initialDate);
   startDate.setHours(0, 0, 0, 0);
 
   const dayOfWeek = startDate.getDay();
-  const daysToFirstDayOfPrevWeek = dayOfWeek + 7;
+  const daysToFirstDayOfPrevWeek = dayOfWeek + 14;
   const timeframe = [];
 
-  // Move startDate to first day (Sunday) of previous week
+  // Move startDate to first day (Sunday) of 2 weeks prior
   startDate.setDate(startDate.getDate() - daysToFirstDayOfPrevWeek);
 
   // Iterate for the length of this preset
   for (let i = 0; i < PRESET_DEFAULTS.WEEKS.TIMEFRAME_LENGTH; i += 1) {
     // Push date to timeframe only when day is
-    // first day (Sunday) of the week1
-    if (startDate.getDay() === 0) {
-      timeframe.push(new Date(startDate.getTime()));
-    }
-    // Move date one day further
-    startDate.setDate(startDate.getDate() + 1);
+    // first day (Sunday) of the week
+    timeframe.push(newDate(startDate));
+
+    // Move date next Sunday
+    startDate.setDate(startDate.getDate() + 7);
   }
 
   return timeframe;
 };
 
-export const getTimeframeForPreset = (presetType = PRESET_TYPES.MONTHS) => {
-  if (presetType === PRESET_TYPES.QUARTERS) {
-    return getTimeframeForQuartersView();
-  } else if (presetType === PRESET_TYPES.MONTHS) {
-    return getTimeframeForMonthsView();
+export const extendTimeframeForWeeksView = (initialDate = new Date(), length) => {
+  const startDate = newDate(initialDate);
+
+  if (length < 0) {
+    startDate.setDate(startDate.getDate() + (length + 1) * 7);
+  } else {
+    startDate.setDate(startDate.getDate() + 7);
   }
-  return getTimeframeForWeeksView();
+
+  const timeframe = getTimeframeForWeeksView(startDate, length + 1);
+  return timeframe.slice(1);
+};
+
+export const extendTimeframeForPreset = ({
+  presetType = PRESET_TYPES.MONTHS,
+  extendAs = EXTEND_AS.PREPEND,
+  extendByLength = 0,
+  initialDate,
+}) => {
+  if (presetType === PRESET_TYPES.QUARTERS) {
+    const length = extendByLength || PRESET_DEFAULTS.QUARTERS.TIMEFRAME_LENGTH;
+
+    return extendTimeframeForQuartersView(
+      initialDate,
+      extendAs === EXTEND_AS.PREPEND ? -length : length,
+    );
+  } else if (presetType === PRESET_TYPES.MONTHS) {
+    const length = extendByLength || PRESET_DEFAULTS.MONTHS.TIMEFRAME_LENGTH;
+
+    return extendTimeframeForMonthsView(
+      initialDate,
+      extendAs === EXTEND_AS.PREPEND ? -length : length,
+    );
+  }
+
+  const length = extendByLength || PRESET_DEFAULTS.WEEKS.TIMEFRAME_LENGTH;
+
+  return extendTimeframeForWeeksView(
+    initialDate,
+    extendAs === EXTEND_AS.PREPEND ? -length : length,
+  );
+};
+
+export const extendTimeframeForAvailableWidth = ({
+  timeframe,
+  timeframeStart,
+  timeframeEnd,
+  availableTimeframeWidth,
+  presetType,
+}) => {
+  let timeframeLength = timeframe.length;
+
+  // Estimate how many more timeframe columns are needed
+  // to fill in extra screen space so that timeline becomes
+  // horizontally scrollable.
+  while (availableTimeframeWidth / timeframeLength > TIMELINE_CELL_MIN_WIDTH) {
+    timeframeLength += 1;
+  }
+  // We double the increaseLengthBy to make sure there's enough room
+  // to perform horizontal scroll without triggering timeframe extension
+  // on initial page load.
+  const increaseLengthBy = (timeframeLength - timeframe.length) * 2;
+
+  // If there are timeframe items to be added
+  // to make timeline scrollable, do as follows.
+  if (increaseLengthBy > 0) {
+    // Split length in 2 parts and get
+    // count for both prepend and append.
+    const prependBy = Math.floor(increaseLengthBy / 2);
+    const appendBy = Math.ceil(increaseLengthBy / 2);
+
+    if (prependBy) {
+      // Prepend the timeline with
+      // the count as given by prependBy
+      timeframe.unshift(
+        ...extendTimeframeForPreset({
+          extendAs: EXTEND_AS.PREPEND,
+          initialDate: timeframeStart,
+          // In case of presetType `quarters`, length would represent
+          // number of months for total quarters, hence we do `* 3`.
+          extendByLength: presetType === PRESET_TYPES.QUARTERS ? prependBy * 3 : prependBy,
+          presetType,
+        }),
+      );
+    }
+
+    if (appendBy) {
+      // Append the timeline with
+      // the count as given by appendBy
+      timeframe.push(
+        ...extendTimeframeForPreset({
+          extendAs: EXTEND_AS.APPEND,
+          initialDate: timeframeEnd,
+          // In case of presetType `quarters`, length would represent
+          // number of months for total quarters, hence we do `* 3`.
+          //
+          // For other preset types, we add `2` to appendBy to compensate for
+          // last item of original timeframe (month or week)
+          extendByLength: presetType === PRESET_TYPES.QUARTERS ? appendBy * 3 : appendBy + 2,
+          presetType,
+        }),
+      );
+    }
+  }
+};
+
+export const getTimeframeForPreset = (
+  presetType = PRESET_TYPES.MONTHS,
+  availableTimeframeWidth = 0,
+) => {
+  let timeframe;
+  let timeframeStart;
+  let timeframeEnd;
+
+  // Get timeframe based on presetType and
+  // extract timeframeStart and timeframeEnd
+  // date objects
+  if (presetType === PRESET_TYPES.QUARTERS) {
+    timeframe = getTimeframeForQuartersView();
+    [timeframeStart] = timeframe[0].range;
+    // eslint-disable-next-line prefer-destructuring
+    timeframeEnd = timeframe[timeframe.length - 1].range[2];
+  } else if (presetType === PRESET_TYPES.MONTHS) {
+    timeframe = getTimeframeForMonthsView();
+    [timeframeStart] = timeframe;
+    timeframeEnd = timeframe[timeframe.length - 1];
+  } else {
+    timeframe = getTimeframeForWeeksView();
+    timeframeStart = newDate(timeframe[0]);
+    timeframeEnd = newDate(timeframe[timeframe.length - 1]);
+    timeframeStart.setDate(timeframeStart.getDate() - 7); // Move date back by a week
+    timeframeEnd.setDate(timeframeEnd.getDate() + 7); // Move date ahead by a week
+  }
+
+  // Extend timeframe on initial load to ensure
+  // timeline is horizontally scrollable in all
+  // screen sizes.
+  extendTimeframeForAvailableWidth({
+    timeframe,
+    timeframeStart,
+    timeframeEnd,
+    availableTimeframeWidth,
+    presetType,
+  });
+
+  return timeframe;
 };
 
 export const getEpicsPathForPreset = ({
@@ -184,7 +350,7 @@ export const getEpicsPathForPreset = ({
   filterQueryString = '',
   presetType = '',
   timeframe = [],
-  state = 'all',
+  epicsState = 'all',
 }) => {
   let start;
   let end;
@@ -208,17 +374,57 @@ export const getEpicsPathForPreset = ({
     end = lastTimeframe;
   } else if (presetType === PRESET_TYPES.WEEKS) {
     start = firstTimeframe;
-    end = new Date(lastTimeframe.getTime());
+    end = newDate(lastTimeframe);
     end.setDate(end.getDate() + 6);
   }
 
   const startDate = `${start.getFullYear()}-${start.getMonth() + 1}-${start.getDate()}`;
   const endDate = `${end.getFullYear()}-${end.getMonth() + 1}-${end.getDate()}`;
-  epicsPath += `?state=${state}&start_date=${startDate}&end_date=${endDate}`;
+  epicsPath += `?state=${epicsState}&start_date=${startDate}&end_date=${endDate}`;
 
   if (filterQueryString) {
     epicsPath += `&${filterQueryString}`;
   }
 
   return epicsPath;
+};
+
+export const sortEpics = (epics, sortedBy) => {
+  const sortByStartDate = sortedBy.indexOf('start_date') > -1;
+  const sortOrderAsc = sortedBy.indexOf('asc') > -1;
+
+  epics.sort((a, b) => {
+    let aDate;
+    let bDate;
+
+    if (sortByStartDate) {
+      aDate = a.startDate;
+      if (a.startDateOutOfRange) {
+        aDate = a.originalStartDate;
+      }
+
+      bDate = b.startDate;
+      if (b.startDateOutOfRange) {
+        bDate = b.originalStartDate;
+      }
+    } else {
+      aDate = a.endDate;
+      if (a.endDateOutOfRange) {
+        aDate = a.originalEndDate;
+      }
+
+      bDate = b.endDate;
+      if (b.endDateOutOfRange) {
+        bDate = b.originalEndDate;
+      }
+    }
+
+    // Sort in ascending or descending order
+    if (aDate.getTime() < bDate.getTime()) {
+      return sortOrderAsc ? -1 : 1;
+    } else if (aDate.getTime() > bDate.getTime()) {
+      return sortOrderAsc ? 1 : -1;
+    }
+    return 0;
+  });
 };

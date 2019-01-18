@@ -18,28 +18,26 @@ export default {
       required: true,
     },
   },
-  data() {
-    const timeframeItem = new Date(this.timeframeItem.getTime());
-    const headerSubItems = new Array(7)
-      .fill()
-      .map(
-        (val, i) =>
-          new Date(
-            timeframeItem.getFullYear(),
-            timeframeItem.getMonth(),
-            timeframeItem.getDate() + i,
-          ),
-      );
-
-    return {
-      headerSubItems,
-    };
-  },
   computed: {
+    headerSubItems() {
+      const timeframeItem = new Date(this.timeframeItem.getTime());
+      const headerSubItems = new Array(7)
+        .fill()
+        .map(
+          (val, i) =>
+            new Date(
+              timeframeItem.getFullYear(),
+              timeframeItem.getMonth(),
+              timeframeItem.getDate() + i,
+            ),
+        );
+
+      return headerSubItems;
+    },
     hasToday() {
       return (
-        this.currentDate >= this.headerSubItems[0] &&
-        this.currentDate <= this.headerSubItems[this.headerSubItems.length - 1]
+        this.currentDate.getTime() >= this.headerSubItems[0].getTime() &&
+        this.currentDate.getTime() <= this.headerSubItems[this.headerSubItems.length - 1].getTime()
       );
     },
   },

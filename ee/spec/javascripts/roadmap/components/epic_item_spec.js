@@ -1,17 +1,23 @@
 import Vue from 'vue';
 
+import _ from 'underscore';
+
 import epicItemComponent from 'ee/roadmap/components/epic_item.vue';
+
+import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 import {
-  mockTimeframeMonths,
+  mockTimeframeInitialDate,
   mockEpic,
   mockGroupId,
   mockShellWidth,
   mockItemWidth,
 } from '../mock_data';
+
+const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
 const createComponent = ({
   presetType = PRESET_TYPES.MONTHS,
@@ -42,6 +48,25 @@ describe('EpicItemComponent', () => {
 
   afterEach(() => {
     vm.$destroy();
+  });
+
+  describe('methods', () => {
+    describe('removeHighlight', () => {
+      it('should call _.delay after 3 seconds with a callback function which would set `epic.newEpic` to false when it is true already', done => {
+        spyOn(_, 'delay');
+
+        vm.epic.newEpic = true;
+
+        vm.removeHighlight();
+
+        vm.$nextTick()
+          .then(() => {
+            expect(_.delay).toHaveBeenCalledWith(jasmine.any(Function), 3000);
+          })
+          .then(done)
+          .catch(done.fail);
+      });
+    });
   });
 
   describe('template', () => {

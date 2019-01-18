@@ -20,13 +20,13 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      quarterBeginDate: this.timeframeItem.range[0],
-      quarterEndDate: this.timeframeItem.range[2],
-    };
-  },
   computed: {
+    quarterBeginDate() {
+      return this.timeframeItem.range[0];
+    },
+    quarterEndDate() {
+      return this.timeframeItem.range[2];
+    },
     headerSubItems() {
       return this.timeframeItem.range;
     },

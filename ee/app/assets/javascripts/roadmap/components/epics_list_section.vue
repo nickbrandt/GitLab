@@ -3,6 +3,8 @@ import eventHub from '../event_hub';
 
 import SectionMixin from '../mixins/section_mixin';
 
+import { TIMELINE_CELL_MIN_WIDTH } from '../constants';
+
 import epicItem from './epic_item.vue';
 
 export default {
@@ -72,12 +74,18 @@ export default {
   },
   mounted() {
     eventHub.$on('epicsListScrolled', this.handleEpicsListScroll);
+    eventHub.$on('refreshTimeline', () => {
+      this.initEmptyRow(false);
+    });
     this.$nextTick(() => {
       this.initMounted();
     });
   },
   beforeDestroy() {
     eventHub.$off('epicsListScrolled', this.handleEpicsListScroll);
+    eventHub.$off('refreshTimeline', () => {
+      this.initEmptyRow(false);
+    });
   },
   methods: {
     initMounted() {
@@ -104,7 +112,7 @@ export default {
      * based on height of available list items and sets it to component
      * props.
      */
-    initEmptyRow() {
+    initEmptyRow(showEmptyRow = false) {
       const children = this.$children;
       let approxChildrenHeight = children[0].$el.clientHeight * this.epics.length;
 
@@ -122,18 +130,16 @@ export default {
         this.emptyRowHeight = this.shellHeight - approxChildrenHeight;
         this.showEmptyRow = true;
       } else {
+        this.showEmptyRow = showEmptyRow;
         this.showBottomShadow = true;
       }
     },
     /**
-     * `clientWidth` is full width of list section, and we need to
-     * scroll up to 60% of the view where today indicator is present.
-     *
-     * Reason for 60% is that "today" always falls in the middle of timeframe range.
+     * Scroll timeframe to the right of the timeline
+     * by half the column size
      */
     scrollToTodayIndicator() {
-      const uptoTodayIndicator = Math.ceil((this.$el.clientWidth * 60) / 100);
-      this.$el.scrollTo(uptoTodayIndicator, 0);
+      this.$el.parentElement.scrollBy(TIMELINE_CELL_MIN_WIDTH / 2, 0);
     },
     handleEpicsListScroll({ scrollTop, clientHeight, scrollHeight }) {
       this.showBottomShadow = Math.ceil(scrollTop) + clientHeight < scrollHeight;
