@@ -1,0 +1,5 @@
+---
+title: Remove duplicate "Operations Dashboard" header/breadcrumb
+merge_request: 9152
+author: Nathan Friend
+type: fixed
