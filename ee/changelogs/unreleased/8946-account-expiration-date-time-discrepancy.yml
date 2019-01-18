@@ -1,0 +1,5 @@
+---
+title: Create UTC date in subscription table
+merge_request: 9166
+author:
+type: fixed
