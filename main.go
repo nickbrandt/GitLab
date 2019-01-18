@@ -26,6 +26,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"gitlab.com/gitlab-org/labkit/correlation"
+	"gitlab.com/gitlab-org/labkit/tracing"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/log"
@@ -80,6 +81,8 @@ func main() {
 
 	startLogging(logConfig)
 	logger := log.NoContext()
+
+	tracing.Initialize(tracing.WithServiceName("gitlab-workhorse"))
 
 	backendURL, err := parseAuthBackend(*authBackend)
 	if err != nil {

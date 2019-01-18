@@ -204,6 +204,26 @@ the first priority during development.
 
 It is OK if a feature is only covered by integration tests.
 
+## Distributed Tracing
+
+Workhorse supports distributed tracing through [LabKit](https://gitlab.com/gitlab-org/labkit/) using [OpenTracing APIs](https://opentracing.io).
+
+By default, no tracing implementation is linked into the binary, but different OpenTracing providers can be linked in using [build tags](https://golang.org/pkg/go/build/#hdr-Build_Constraints)/[build constraints](https://golang.org/pkg/go/build/#hdr-Build_Constraints). This can be done by setting the `BUILD_TAGS` make variable.
+
+For more details of the supported providers, see LabKit, but as an example, for Jaeger tracing support, include the tags: `BUILD_TAGS="tracer_static tracer_static_jaeger"`.
+
+```shell
+make BUILD_TAGS="tracer_static tracer_static_jaeger"
+```
+
+Once Workhorse is compiled with an opentracing provider, the tracing configuration is configured via the `GITLAB_TRACING` environment variable.
+
+For example:
+
+```shell
+GITLAB_TRACING=opentracing://jaeger ./gitlab-workhorse
+```
+
 ## License
 
 This code is distributed under the MIT license, see the LICENSE file.

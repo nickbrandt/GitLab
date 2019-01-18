@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"gitlab.com/gitlab-org/labkit/correlation"
+	"gitlab.com/gitlab-org/labkit/tracing"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/badgateway"
 )
@@ -47,7 +48,11 @@ func NewBackendRoundTripper(backend *url.URL, socket string, proxyHeadersTimeout
 		panic("backend is nil and socket is empty")
 	}
 
-	return correlation.NewInstrumentedRoundTripper(badgateway.NewRoundTripper(developmentMode, transport))
+	return tracing.NewRoundTripper(
+		correlation.NewInstrumentedRoundTripper(
+			badgateway.NewRoundTripper(developmentMode, transport),
+		),
+	)
 }
 
 // NewTestBackendRoundTripper sets up a RoundTripper for testing purposes
