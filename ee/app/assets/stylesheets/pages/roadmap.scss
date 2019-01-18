@@ -20,6 +20,36 @@ $column-right-gradient: linear-gradient(
   $roadmap-gradient-gray 100%
 );
 
+@keyframes colorTransitionDetailsCell {
+  from {
+    background-color: $blue-100;
+  }
+
+  to {
+    background-color: $white-light;
+  }
+}
+
+@keyframes fadeInDetails {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeinTimelineBar {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 0.75;
+  }
+}
+
 @mixin roadmap-scroll-mixin {
   height: $grid-size;
   width: $details-cell-width;
@@ -229,6 +259,12 @@ $column-right-gradient: linear-gradient(
       }
     }
 
+    &.newly-added-epic {
+      .epic-details-cell {
+        animation: colorTransitionDetailsCell 3s;
+      }
+    }
+
     .epic-details-cell,
     .epic-timeline-cell {
       box-sizing: border-box;
@@ -249,6 +285,11 @@ $column-right-gradient: linear-gradient(
 
       &::after {
         height: $item-height;
+      }
+
+      .epic-title,
+      .epic-group-timeframe {
+        animation: fadeInDetails 1s;
       }
 
       .epic-title {
@@ -294,23 +335,10 @@ $column-right-gradient: linear-gradient(
         background-color: $blue-500;
         border-radius: $border-radius-default;
         opacity: 0.75;
+        animation: fadeinTimelineBar 1s;
 
         &:hover {
           opacity: 1;
-        }
-
-        &.start-date-outside::before,
-        &.end-date-outside::after {
-          content: "";
-          position: absolute;
-          top: 0;
-          height: 100%;
-        }
-
-        &.start-date-outside::before,
-        &.end-date-outside::after {
-          border-top: 12px solid transparent;
-          border-bottom: 12px solid transparent;
         }
 
         &.start-date-undefined {
@@ -329,31 +357,6 @@ $column-right-gradient: linear-gradient(
             $blue-200 50%,
             $roadmap-gradient-gray 100%
           );
-        }
-
-        &.start-date-outside {
-          border-top-left-radius: 0;
-          border-bottom-left-radius: 0;
-
-          &::before {
-            left: -$grid-size;
-            border-right: $grid-size solid $blue-500;
-          }
-        }
-
-        &.end-date-outside {
-          border-top-right-radius: 0;
-          border-bottom-right-radius: 0;
-
-          &::after {
-            right: -$grid-size;
-            border-left: $grid-size solid $blue-500;
-          }
-        }
-
-        &.start-date-outside,
-        &.start-date-undefined.end-date-outside {
-          left: $grid-size;
         }
       }
 

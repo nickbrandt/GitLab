@@ -6,6 +6,9 @@ import { s__ } from '~/locale';
 import { GlLoadingIcon } from '@gitlab/ui';
 import epicsListEmpty from './epics_list_empty.vue';
 import roadmapShell from './roadmap_shell.vue';
+import eventHub from '../event_hub';
+
+import { EXTEND_AS } from '../constants';
 
 export default {
   components: {
@@ -96,6 +99,28 @@ export default {
           Flash(s__('GroupRoadmap|Something went wrong while fetching epics'));
         });
     },
+    fetchEpicsForTimeframe({ timeframe, roadmapTimelineEl, extendType }) {
+      this.hasError = false;
+      this.service
+        .getEpicsForTimeframe(this.presetType, timeframe)
+        .then(res => res.data)
+        .then(epics => {
+          if (epics.length) {
+            this.store.addEpics(epics);
+            this.$nextTick(() => {
+              // Re-render timeline bars with updated timeline
+              eventHub.$emit('refreshTimeline', {
+                height: window.innerHeight - roadmapTimelineEl.offsetTop,
+                todayBarReady: extendType === EXTEND_AS.PREPEND,
+              });
+            });
+          }
+        })
+        .catch(() => {
+          this.hasError = true;
+          Flash(s__('GroupRoadmap|Something went wrong while fetching epics'));
+        });
+    },
     /**
      * Roadmap view works with absolute sizing and positioning
      * of following child components of RoadmapShell;
@@ -117,6 +142,49 @@ export default {
         this.isLoading = false;
       }, 200)();
     },
+    /**
+     * Once timeline is expanded (either with prepend or append)
+     * We need performing following actions;
+     *
+     * 1. Reset start and end edges of the timeline for
+     *    infinite scrolling to continue further.
+     * 2. Re-render timeline bars to account for
+     *    updated timeframe.
+     * 3. In case of prepending timeframe,
+     *    reset scroll-position (due to DOM prepend).
+     */
+    processExtendedTimeline({ extendType = EXTEND_AS.PREPEND, roadmapTimelineEl, itemsCount = 0 }) {
+      // Re-render timeline bars with updated timeline
+      eventHub.$emit('refreshTimeline', {
+        height: window.innerHeight - roadmapTimelineEl.offsetTop,
+        todayBarReady: extendType === EXTEND_AS.PREPEND,
+      });
+
+      if (extendType === EXTEND_AS.PREPEND) {
+        // When DOM is prepended with elements
+        // we compensate the scrolling for added elements' width
+        roadmapTimelineEl.parentElement.scrollBy(
+          roadmapTimelineEl.querySelector('.timeline-header-item').clientWidth * itemsCount,
+          0,
+        );
+      }
+    },
+    handleScrollToExtend(roadmapTimelineEl, extendType = EXTEND_AS.PREPEND) {
+      const timeframe = this.store.extendTimeframe(extendType);
+      this.$nextTick(() => {
+        this.processExtendedTimeline({
+          itemsCount: timeframe ? timeframe.length : 0,
+          extendType,
+          roadmapTimelineEl,
+        });
+
+        this.fetchEpicsForTimeframe({
+          timeframe,
+          roadmapTimelineEl,
+          extendType,
+        });
+      });
+    },
   },
 };
 </script>
@@ -135,6 +203,8 @@ export default {
       :epics="epics"
       :timeframe="timeframe"
       :current-group-id="currentGroupId"
+      @onScrollToStart="handleScrollToExtend"
+      @onScrollToEnd="handleScrollToExtend"
     />
     <epics-list-empty
       v-if="isEpicsListEmpty"

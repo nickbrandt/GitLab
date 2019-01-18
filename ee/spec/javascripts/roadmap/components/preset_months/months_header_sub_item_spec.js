@@ -1,9 +1,12 @@
 import Vue from 'vue';
 
 import MonthsHeaderSubItemComponent from 'ee/roadmap/components/preset_months/months_header_sub_item.vue';
+import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeMonths } from 'ee_spec/roadmap/mock_data';
+import { mockTimeframeInitialDate } from 'ee_spec/roadmap/mock_data';
+
+const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
 const createComponent = ({
   currentDate = mockTimeframeMonths[0],

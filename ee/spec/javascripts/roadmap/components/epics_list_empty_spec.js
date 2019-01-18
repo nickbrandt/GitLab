@@ -2,16 +2,20 @@ import Vue from 'vue';
 
 import epicsListEmptyComponent from 'ee/roadmap/components/epics_list_empty.vue';
 
+import {
+  getTimeframeForQuartersView,
+  getTimeframeForWeeksView,
+  getTimeframeForMonthsView,
+} from 'ee/roadmap/utils/roadmap_utils';
+
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import {
-  mockTimeframeQuarters,
-  mockTimeframeMonths,
-  mockTimeframeWeeks,
-  mockSvgPath,
-  mockNewEpicEndpoint,
-} from '../mock_data';
+import { mockTimeframeInitialDate, mockSvgPath, mockNewEpicEndpoint } from '../mock_data';
+
+const mockTimeframeQuarters = getTimeframeForQuartersView(mockTimeframeInitialDate);
+const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
+const mockTimeframeWeeks = getTimeframeForWeeksView(mockTimeframeInitialDate);
 
 const createComponent = ({
   hasFiltersApplied = false,
@@ -71,7 +75,7 @@ describe('EpicsListEmptyComponent', () => {
           Vue.nextTick()
             .then(() => {
               expect(vm.subMessage).toBe(
-                'To view the roadmap, add a start or due date to one of your epics in this group or its subgroups. In the quarters view, only epics in the past quarter, current quarter, and next 4 quarters are shown &ndash; from Oct 1, 2017 to Mar 31, 2019.',
+                'To view the roadmap, add a start or due date to one of your epics in this group or its subgroups; from Jul 1, 2017 to Mar 31, 2019.',
               );
             })
             .then(done)
@@ -83,7 +87,7 @@ describe('EpicsListEmptyComponent', () => {
           Vue.nextTick()
             .then(() => {
               expect(vm.subMessage).toBe(
-                'To widen your search, change or remove filters. In the quarters view, only epics in the past quarter, current quarter, and next 4 quarters are shown &ndash; from Oct 1, 2017 to Mar 31, 2019.',
+                'To widen your search, change or remove filters; from Jul 1, 2017 to Mar 31, 2019.',
               );
             })
             .then(done)
@@ -100,7 +104,7 @@ describe('EpicsListEmptyComponent', () => {
           Vue.nextTick()
             .then(() => {
               expect(vm.subMessage).toBe(
-                'To view the roadmap, add a start or due date to one of your epics in this group or its subgroups. In the months view, only epics in the past month, current month, and next 5 months are shown &ndash; from Dec 1, 2017 to Jun 30, 2018.',
+                'To view the roadmap, add a start or due date to one of your epics in this group or its subgroups; from Nov 1, 2017 to Jun 30, 2018.',
               );
             })
             .then(done)
@@ -112,7 +116,7 @@ describe('EpicsListEmptyComponent', () => {
           Vue.nextTick()
             .then(() => {
               expect(vm.subMessage).toBe(
-                'To widen your search, change or remove filters. In the months view, only epics in the past month, current month, and next 5 months are shown &ndash; from Dec 1, 2017 to Jun 30, 2018.',
+                'To widen your search, change or remove filters; from Nov 1, 2017 to Jun 30, 2018.',
               );
             })
             .then(done)
@@ -134,7 +138,7 @@ describe('EpicsListEmptyComponent', () => {
           Vue.nextTick()
             .then(() => {
               expect(vm.subMessage).toBe(
-                'To view the roadmap, add a start or due date to one of your epics in this group or its subgroups. In the weeks view, only epics in the past week, current week, and next 4 weeks are shown &ndash; from Dec 24, 2017 to Feb 9, 2018.',
+                'To view the roadmap, add a start or due date to one of your epics in this group or its subgroups; from Dec 17, 2017 to Feb 9, 2018.',
               );
             })
             .then(done)
@@ -146,7 +150,7 @@ describe('EpicsListEmptyComponent', () => {
           Vue.nextTick()
             .then(() => {
               expect(vm.subMessage).toBe(
-                'To widen your search, change or remove filters. In the weeks view, only epics in the past week, current week, and next 4 weeks are shown &ndash; from Dec 24, 2017 to Feb 15, 2018.',
+                'To widen your search, change or remove filters; from Dec 17, 2017 to Feb 15, 2018.',
               );
             })
             .then(done)
@@ -157,7 +161,7 @@ describe('EpicsListEmptyComponent', () => {
 
     describe('timeframeRange', () => {
       it('returns correct timeframe startDate and endDate in words', () => {
-        expect(vm.timeframeRange.startDate).toBe('Dec 1, 2017');
+        expect(vm.timeframeRange.startDate).toBe('Nov 1, 2017');
         expect(vm.timeframeRange.endDate).toBe('Jun 30, 2018');
       });
     });

@@ -1,10 +1,14 @@
 import Vue from 'vue';
 
 import EpicItemTimelineComponent from 'ee/roadmap/components/epic_item_timeline.vue';
+import { getTimeframeForQuartersView } from 'ee/roadmap/utils/roadmap_utils';
+
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeQuarters, mockEpic, mockShellWidth, mockItemWidth } from '../mock_data';
+import { mockTimeframeInitialDate, mockEpic, mockShellWidth, mockItemWidth } from '../mock_data';
+
+const mockTimeframeQuarters = getTimeframeForQuartersView(mockTimeframeInitialDate);
 
 const createComponent = ({
   presetType = PRESET_TYPES.QUARTERS,
@@ -114,17 +118,6 @@ describe('QuartersPresetMixin', () => {
         expect(vm.getTimelineBarStartOffsetForQuarters()).toBe('left: 0;');
       });
 
-      it('returns `right: 8px;` when Epic startDate is in last timeframe month and endDate is out of range', () => {
-        vm = createComponent({
-          epic: Object.assign({}, mockEpic, {
-            startDate: mockTimeframeQuarters[mockTimeframeQuarters.length - 1].range[1],
-            endDateOutOfRange: true,
-          }),
-        });
-
-        expect(vm.getTimelineBarStartOffsetForQuarters()).toBe('right: 8px;');
-      });
-
       it('returns proportional `left` value based on Epic startDate and days in the quarter', () => {
         vm = createComponent({
           epic: Object.assign({}, mockEpic, {
@@ -147,7 +140,7 @@ describe('QuartersPresetMixin', () => {
           }),
         });
 
-        expect(Math.floor(vm.getTimelineBarWidthForQuarters())).toBe(282);
+        expect(Math.floor(vm.getTimelineBarWidthForQuarters())).toBe(240);
       });
     });
   });

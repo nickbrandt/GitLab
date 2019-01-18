@@ -2,7 +2,7 @@
 import { s__, sprintf } from '~/locale';
 import { dateInWords } from '~/lib/utils/datetime_utility';
 
-import { PRESET_TYPES, PRESET_DEFAULTS } from '../constants';
+import { PRESET_TYPES, emptyStateDefault, emptyStateWithFilters } from '../constants';
 
 import NewEpic from '../../epics/new_epic/components/new_epic.vue';
 
@@ -82,12 +82,12 @@ export default {
     },
     subMessage() {
       if (this.hasFiltersApplied) {
-        return sprintf(PRESET_DEFAULTS[this.presetType].emptyStateWithFilters, {
+        return sprintf(emptyStateWithFilters, {
           startDate: this.timeframeRange.startDate,
           endDate: this.timeframeRange.endDate,
         });
       }
-      return sprintf(PRESET_DEFAULTS[this.presetType].emptyStateDefault, {
+      return sprintf(emptyStateDefault, {
         startDate: this.timeframeRange.startDate,
         endDate: this.timeframeRange.endDate,
       });

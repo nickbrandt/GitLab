@@ -1,9 +1,12 @@
 import Vue from 'vue';
 
 import QuartersHeaderSubItemComponent from 'ee/roadmap/components/preset_quarters/quarters_header_sub_item.vue';
+import { getTimeframeForQuartersView } from 'ee/roadmap/utils/roadmap_utils';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeQuarters } from 'ee_spec/roadmap/mock_data';
+import { mockTimeframeInitialDate } from 'ee_spec/roadmap/mock_data';
+
+const mockTimeframeQuarters = getTimeframeForQuartersView(mockTimeframeInitialDate);
 
 const createComponent = ({
   currentDate = mockTimeframeQuarters[0].range[1],
@@ -25,6 +28,22 @@ describe('QuartersHeaderSubItemComponent', () => {
   });
 
   describe('computed', () => {
+    describe('quarterBeginDate', () => {
+      it('returns first month from the `timeframeItem.range`', () => {
+        vm = createComponent({});
+
+        expect(vm.quarterBeginDate).toBe(mockTimeframeQuarters[0].range[0]);
+      });
+    });
+
+    describe('quarterEndDate', () => {
+      it('returns first month from the `timeframeItem.range`', () => {
+        vm = createComponent({});
+
+        expect(vm.quarterEndDate).toBe(mockTimeframeQuarters[0].range[2]);
+      });
+    });
+
     describe('headerSubItems', () => {
       it('returns array of dates containing Months from timeframeItem', () => {
         vm = createComponent({});
@@ -46,7 +65,7 @@ describe('QuartersHeaderSubItemComponent', () => {
       it('returns false when current quarter month is different from timeframe quarter', () => {
         vm = createComponent({
           currentDate: new Date(2017, 10, 1), // Nov 1, 2017
-          timeframeItem: mockTimeframeQuarters[1], // 2018 Apr May Jun
+          timeframeItem: mockTimeframeQuarters[0], // 2018 Apr May Jun
         });
 
         expect(vm.hasToday).toBe(false);

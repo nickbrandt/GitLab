@@ -1,9 +1,12 @@
 import Vue from 'vue';
 
 import WeeksHeaderSubItemComponent from 'ee/roadmap/components/preset_weeks/weeks_header_sub_item.vue';
+import { getTimeframeForWeeksView } from 'ee/roadmap/utils/roadmap_utils';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeWeeks } from 'ee_spec/roadmap/mock_data';
+import { mockTimeframeInitialDate } from 'ee_spec/roadmap/mock_data';
+
+const mockTimeframeWeeks = getTimeframeForWeeksView(mockTimeframeInitialDate);
 
 const createComponent = ({
   currentDate = mockTimeframeWeeks[0],
@@ -24,19 +27,19 @@ describe('MonthsHeaderSubItemComponent', () => {
     vm.$destroy();
   });
 
-  describe('data', () => {
-    it('sets prop `headerSubItems` with array of dates containing days of week from timeframeItem', () => {
-      vm = createComponent({});
+  describe('computed', () => {
+    describe('headerSubItems', () => {
+      it('returns `headerSubItems` array of dates containing days of week from timeframeItem', () => {
+        vm = createComponent({});
 
-      expect(Array.isArray(vm.headerSubItems)).toBe(true);
-      expect(vm.headerSubItems.length).toBe(7);
-      vm.headerSubItems.forEach(subItem => {
-        expect(subItem instanceof Date).toBe(true);
+        expect(Array.isArray(vm.headerSubItems)).toBe(true);
+        expect(vm.headerSubItems.length).toBe(7);
+        vm.headerSubItems.forEach(subItem => {
+          expect(subItem instanceof Date).toBe(true);
+        });
       });
     });
-  });
 
-  describe('computed', () => {
     describe('hasToday', () => {
       it('returns true when current week is same as timeframe week', () => {
         vm = createComponent({});

@@ -4538,22 +4538,10 @@ msgstr ""
 msgid "GroupRoadmap|The roadmap shows the progress of your epics along a timeline"
 msgstr ""
 
-msgid "GroupRoadmap|To view the roadmap, add a start or due date to one of your epics in this group or its subgroups. In the months view, only epics in the past month, current month, and next 5 months are shown &ndash; from %{startDate} to %{endDate}."
+msgid "GroupRoadmap|To view the roadmap, add a start or due date to one of your epics in this group or its subgroups; from %{startDate} to %{endDate}."
 msgstr ""
 
-msgid "GroupRoadmap|To view the roadmap, add a start or due date to one of your epics in this group or its subgroups. In the quarters view, only epics in the past quarter, current quarter, and next 4 quarters are shown &ndash; from %{startDate} to %{endDate}."
-msgstr ""
-
-msgid "GroupRoadmap|To view the roadmap, add a start or due date to one of your epics in this group or its subgroups. In the weeks view, only epics in the past week, current week, and next 4 weeks are shown &ndash; from %{startDate} to %{endDate}."
-msgstr ""
-
-msgid "GroupRoadmap|To widen your search, change or remove filters. In the months view, only epics in the past month, current month, and next 5 months are shown &ndash; from %{startDate} to %{endDate}."
-msgstr ""
-
-msgid "GroupRoadmap|To widen your search, change or remove filters. In the quarters view, only epics in the past quarter, current quarter, and next 4 quarters are shown &ndash; from %{startDate} to %{endDate}."
-msgstr ""
-
-msgid "GroupRoadmap|To widen your search, change or remove filters. In the weeks view, only epics in the past week, current week, and next 4 weeks are shown &ndash; from %{startDate} to %{endDate}."
+msgid "GroupRoadmap|To widen your search, change or remove filters; from %{startDate} to %{endDate}."
 msgstr ""
 
 msgid "GroupRoadmap|Until %{dateWord}"

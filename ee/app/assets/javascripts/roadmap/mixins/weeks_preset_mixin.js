@@ -1,4 +1,4 @@
-import { TIMELINE_END_OFFSET_HALF } from '../constants';
+import { newDate } from '~/lib/utils/datetime_utility';
 
 export default {
   methods: {
@@ -7,16 +7,19 @@ export default {
      */
     hasStartDateForWeek() {
       const firstDayOfWeek = this.timeframeItem;
-      const lastDayOfWeek = new Date(this.timeframeItem.getTime());
+      const lastDayOfWeek = newDate(this.timeframeItem);
       lastDayOfWeek.setDate(lastDayOfWeek.getDate() + 6);
 
-      return this.epic.startDate >= firstDayOfWeek && this.epic.startDate <= lastDayOfWeek;
+      return (
+        this.epic.startDate.getTime() >= firstDayOfWeek.getTime() &&
+        this.epic.startDate.getTime() <= lastDayOfWeek.getTime()
+      );
     },
     /**
      * Return last date of the week from provided timeframeItem
      */
     getLastDayOfWeek(timeframeItem) {
-      const lastDayOfWeek = new Date(timeframeItem.getTime());
+      const lastDayOfWeek = newDate(timeframeItem);
       lastDayOfWeek.setDate(lastDayOfWeek.getDate() + 6);
       return lastDayOfWeek;
     },
@@ -25,7 +28,7 @@ export default {
      */
     isTimeframeUnderEndDateForWeek(timeframeItem, epicEndDate) {
       const lastDayOfWeek = this.getLastDayOfWeek(timeframeItem);
-      return epicEndDate <= lastDayOfWeek;
+      return epicEndDate.getTime() <= lastDayOfWeek.getTime();
     },
     /**
      * Return timeline bar width for current week (timeline cell) based on
@@ -36,14 +39,6 @@ export default {
       const barWidth = day === 7 ? cellWidth : dayWidth * day;
 
       return Math.min(cellWidth, barWidth);
-    },
-    /**
-     * Gets timelinebar end offset based width of single day
-     * and TIMELINE_END_OFFSET_HALF
-     */
-    getTimelineBarEndOffsetHalfForWeek() {
-      const dayWidth = this.getCellWidth() / 7;
-      return TIMELINE_END_OFFSET_HALF + dayWidth * 0.5;
     },
     /**
      * In case startDate for any epic is undefined or is out of range
@@ -71,15 +66,6 @@ export default {
         return '';
       } else if (startDate === firstDayOfWeek) {
         return 'left: 0;';
-      }
-
-      const lastTimeframeItem = new Date(this.timeframe[this.timeframe.length - 1].getTime());
-      lastTimeframeItem.setDate(lastTimeframeItem.getDate() + 6);
-      if (
-        this.epic.startDate >= this.timeframe[this.timeframe.length - 1] &&
-        this.epic.startDate <= lastTimeframeItem
-      ) {
-        return `right: ${TIMELINE_END_OFFSET_HALF}px;`;
       }
 
       return `left: ${startDate * dayWidth - dayWidth / 2}px;`;
@@ -111,7 +97,6 @@ export default {
 
       const indexOfCurrentWeek = this.timeframe.indexOf(this.timeframeItem);
       const cellWidth = this.getCellWidth();
-      const offsetEnd = this.getTimelineBarEndOffset();
       const epicStartDate = this.epic.startDate;
       const epicEndDate = this.epic.endDate;
 
@@ -135,7 +120,7 @@ export default {
         }
       }
 
-      return timelineBarWidth - offsetEnd;
+      return timelineBarWidth;
     },
   },
 };
