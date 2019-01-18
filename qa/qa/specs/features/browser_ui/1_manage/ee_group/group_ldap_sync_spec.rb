@@ -6,7 +6,24 @@ module QA
       include Support::Api
 
       before(:all) do
-        create_admin_personal_access_token
+        # Create the sandbox group as the LDAP user. Without this the admin user
+        # would own the sandbox group and then in subsequent tests the LDAP user
+        # would not have enough permission to push etc.
+        Resource::Sandbox.fabricate_via_api!
+
+        # Create an admin personal access token and use it for the remaining API calls
+        @original_personal_access_token = Runtime::Env.personal_access_token
+        Runtime::Browser.visit(:gitlab, Page::Main::Login)
+        Page::Main::Login.perform(&:sign_in_using_admin_credentials)
+        Runtime::Env.personal_access_token = Resource::PersonalAccessToken.fabricate!.access_token
+        Page::Main::Menu.perform(&:sign_out)
+      end
+
+      after(:all) do
+        # Restore the original personal access token so that subsequent tests
+        # don't perform API calls as an admin user while logged in as a non-root
+        # LDAP user
+        Runtime::Env.personal_access_token = @original_personal_access_token
       end
 
       context 'using group cn method' do
@@ -124,13 +141,6 @@ module QA
         api_client = Runtime::API::Client.new(:gitlab)
         response = get Runtime::API::Request.new(api_client, "/users?username=#{user}").url
         post Runtime::API::Request.new(api_client, group.api_members_path).url, { user_id: parse_body(response).first[:id], access_level: '50' }
-      end
-
-      def create_admin_personal_access_token
-        Runtime::Browser.visit(:gitlab, Page::Main::Login)
-        Page::Main::Login.perform(&:sign_in_using_admin_credentials)
-        Runtime::Env.personal_access_token = Resource::PersonalAccessToken.fabricate!.access_token
-        Page::Main::Menu.perform(&:sign_out)
       end
 
       def create_group_and_add_user_via_api(user_name, group_name)
