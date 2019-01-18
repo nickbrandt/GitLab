@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Projects::MergeRequests::DiffsController < Projects::MergeRequests::ApplicationController
-  prepend ::EE::Projects::MergeRequests::DiffsController # rubocop: disable Cop/InjectEnterpriseEditionModule
-
   include DiffForPath
   include DiffHelper
   include RendersNotes
@@ -120,3 +118,5 @@ class Projects::MergeRequests::DiffsController < Projects::MergeRequests::Applic
     @notes
   end
 end
+
+Projects::MergeRequests::DiffsController.prepend(EE::Projects::MergeRequests::DiffsController)

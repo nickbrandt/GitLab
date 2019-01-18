@@ -6,8 +6,6 @@ module Projects
       before_action :authorize_admin_project!
       before_action :remote_mirror, only: [:show]
 
-      prepend ::EE::Projects::Settings::RepositoryController # rubocop: disable Cop/InjectEnterpriseEditionModule
-
       def show
         render_show
       end
@@ -106,3 +104,5 @@ module Projects
     end
   end
 end
+
+Projects::Settings::RepositoryController.prepend(EE::Projects::Settings::RepositoryController)

@@ -29,7 +29,7 @@ module EE
       # git-lfs: https://github.com/git-lfs/git-lfs/blob/master/docs/api
       #
       prepended do
-        before_action do
+        prepend_before_action do
           redirect_to(primary_full_url) if redirect?
         end
       end

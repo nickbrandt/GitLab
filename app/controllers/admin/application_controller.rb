@@ -4,8 +4,6 @@
 #
 # Automatically sets the layout and ensures an administrator is logged in
 class Admin::ApplicationController < ApplicationController
-  prepend EE::Admin::ApplicationController # rubocop: disable Cop/InjectEnterpriseEditionModule
-
   before_action :authenticate_admin!
   layout 'admin'
 
@@ -13,3 +11,5 @@ class Admin::ApplicationController < ApplicationController
     render_404 unless current_user.admin?
   end
 end
+
+Admin::ApplicationController.prepend(EE::Admin::ApplicationController)

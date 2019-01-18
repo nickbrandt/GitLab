@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Projects::VariablesController < Projects::ApplicationController
-  prepend ::EE::Projects::VariablesController # rubocop: disable Cop/InjectEnterpriseEditionModule
-
   before_action :authorize_admin_build!
 
   def show
@@ -43,3 +41,5 @@ class Projects::VariablesController < Projects::ApplicationController
     %i[id key secret_value protected _destroy]
   end
 end
+
+Projects::VariablesController.prepend(EE::Projects::VariablesController)

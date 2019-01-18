@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Admin::DashboardController < Admin::ApplicationController
-  prepend ::EE::Admin::DashboardController # rubocop: disable Cop/InjectEnterpriseEditionModule
-
   include CountHelper
 
   COUNTED_ITEMS = [Project, User, Group, ForkNetworkMember, ForkNetwork, Issue,
@@ -17,3 +15,5 @@ class Admin::DashboardController < Admin::ApplicationController
   end
   # rubocop: enable CodeReuse/ActiveRecord
 end
+
+Admin::DashboardController.prepend(EE::Admin::DashboardController)

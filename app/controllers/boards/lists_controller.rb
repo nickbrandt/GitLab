@@ -2,8 +2,6 @@
 
 module Boards
   class ListsController < Boards::ApplicationController
-    prepend ::EE::Boards::ListsController # rubocop: disable Cop/InjectEnterpriseEditionModule
-
     include BoardsResponses
 
     before_action :authorize_admin_list, only: [:create, :update, :destroy, :generate]
@@ -85,3 +83,5 @@ module Boards
     end
   end
 end
+
+Boards::ListsController.prepend(EE::Boards::ListsController)
