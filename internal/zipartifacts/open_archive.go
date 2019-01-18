@@ -14,6 +14,7 @@ import (
 	"github.com/jfbus/httprs"
 
 	"gitlab.com/gitlab-org/labkit/correlation"
+	"gitlab.com/gitlab-org/labkit/tracing"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
 )
@@ -25,7 +26,7 @@ var ErrNotAZip = errors.New("not a zip")
 var ErrArchiveNotFound = errors.New("archive not found")
 
 var httpClient = &http.Client{
-	Transport: correlation.NewInstrumentedRoundTripper(&http.Transport{
+	Transport: tracing.NewRoundTripper(correlation.NewInstrumentedRoundTripper(&http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 		DialContext: (&net.Dialer{
 			Timeout:   30 * time.Second,
@@ -35,7 +36,7 @@ var httpClient = &http.Client{
 		TLSHandshakeTimeout:   10 * time.Second,
 		ExpectContinueTimeout: 10 * time.Second,
 		ResponseHeaderTimeout: 30 * time.Second,
-	}),
+	})),
 }
 
 // OpenArchive will open a zip.Reader from a local path or a remote object store URL

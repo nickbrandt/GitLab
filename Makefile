@@ -48,15 +48,15 @@ $(TARGET_SETUP):
 
 gitlab-zip-cat:	$(TARGET_SETUP) $(shell find cmd/gitlab-zip-cat/ -name '*.go')
 	$(call message,Building $@)
-	$(GOBUILD) -o $(BUILD_DIR)/$@ $(PKG)/cmd/$@
+	$(GOBUILD) -tags "$(BUILD_TAGS)" -o $(BUILD_DIR)/$@ $(PKG)/cmd/$@
 
 gitlab-zip-metadata:	$(TARGET_SETUP) $(shell find cmd/gitlab-zip-metadata/ -name '*.go')
 	$(call message,Building $@)
-	$(GOBUILD) -o $(BUILD_DIR)/$@ $(PKG)/cmd/$@
+	$(GOBUILD) -tags "$(BUILD_TAGS)" -o $(BUILD_DIR)/$@ $(PKG)/cmd/$@
 
 gitlab-workhorse:	$(TARGET_SETUP) $(shell find . -name '*.go' | grep -v '^\./_')
 	$(call message,Building $@)
-	$(GOBUILD) -o $(BUILD_DIR)/$@ $(PKG)
+	$(GOBUILD) -tags "$(BUILD_TAGS)" -o $(BUILD_DIR)/$@ $(PKG)
 
 .PHONY:	install
 install:	gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata
@@ -67,13 +67,13 @@ install:	gitlab-workhorse gitlab-zip-cat gitlab-zip-metadata
 .PHONY:	test
 test: $(TARGET_SETUP) prepare-tests
 	$(call message,$@)
-	@go test $(LOCAL_PACKAGES)
+	@go test -tags "$(BUILD_TAGS)" $(LOCAL_PACKAGES)
 	@echo SUCCESS
 
 .PHONY:	coverage
 coverage:	$(TARGET_SETUP) prepare-tests
 	$(call message,$@)
-	@go test -cover -coverprofile=test.coverage $(LOCAL_PACKAGES)
+	@go test -tags "$(BUILD_TAGS)" -cover -coverprofile=test.coverage $(LOCAL_PACKAGES)
 	go tool cover -html=test.coverage -o coverage.html
 	rm -f test.coverage
 

@@ -7,6 +7,8 @@ import (
 
 	"github.com/gorilla/websocket"
 
+	"gitlab.com/gitlab-org/labkit/tracing"
+
 	apipkg "gitlab.com/gitlab-org/gitlab-workhorse/internal/api"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/artifacts"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/builds"
@@ -78,6 +80,10 @@ func route(method, regexpStr string, handler http.Handler, opts ...func(*routeOp
 
 	handler = denyWebsocket(handler)                      // Disallow websockets
 	handler = instrumentRoute(handler, method, regexpStr) // Add prometheus metrics
+	if options.tracing {
+		// Add distributed tracing
+		handler = tracing.Handler(handler)
+	}
 
 	return routeEntry{
 		method:   method,

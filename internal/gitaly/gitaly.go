@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc"
 
 	grpccorrelation "gitlab.com/gitlab-org/labkit/correlation/grpc"
+	grpctracing "gitlab.com/gitlab-org/labkit/tracing/grpc"
 )
 
 type Server struct {
@@ -113,6 +114,7 @@ func newConnection(server Server) (*grpc.ClientConn, error) {
 		grpc.WithPerRPCCredentials(gitalyauth.RPCCredentialsV2(server.Token)),
 		grpc.WithStreamInterceptor(
 			grpc_middleware.ChainStreamClient(
+				grpctracing.StreamClientTracingInterceptor(),
 				grpc_prometheus.StreamClientInterceptor,
 				grpccorrelation.StreamClientCorrelationInterceptor(),
 			),
@@ -120,6 +122,7 @@ func newConnection(server Server) (*grpc.ClientConn, error) {
 
 		grpc.WithUnaryInterceptor(
 			grpc_middleware.ChainUnaryClient(
+				grpctracing.UnaryClientTracingInterceptor(),
 				grpc_prometheus.UnaryClientInterceptor,
 				grpccorrelation.UnaryClientCorrelationInterceptor(),
 			),
