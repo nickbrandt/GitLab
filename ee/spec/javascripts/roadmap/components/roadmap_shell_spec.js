@@ -7,7 +7,7 @@ import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockEpic, mockTimeframeInitialDate, mockGroupId, mockScrollBarSize } from '../mock_data';
+import { mockEpic, mockTimeframeInitialDate, mockGroupId } from '../mock_data';
 
 const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
@@ -45,6 +45,7 @@ describe('RoadmapShellComponent', () => {
       expect(vm.shellWidth).toBe(0);
       expect(vm.shellHeight).toBe(0);
       expect(vm.noScroll).toBe(false);
+      expect(vm.timeframeStartOffset).toBe(0);
     });
   });
 
@@ -59,7 +60,7 @@ describe('RoadmapShellComponent', () => {
         document.querySelector('.roadmap-container').remove();
       });
 
-      it('returns style object based on shellWidth and current Window width with Scollbar size offset', done => {
+      it('returns style object based on shellWidth and shellHeight', done => {
         const vmWithParentEl = createComponent({}, document.getElementById('roadmap-shell'));
         Vue.nextTick(() => {
           const stylesObj = vmWithParentEl.containerStyles;
@@ -75,30 +76,16 @@ describe('RoadmapShellComponent', () => {
   });
 
   describe('methods', () => {
-    describe('getWidthOffset', () => {
-      it('returns 0 when noScroll prop is true', () => {
-        vm.noScroll = true;
+    beforeEach(() => {
+      document.body.innerHTML +=
+        '<div class="roadmap-container"><div id="roadmap-shell"></div></div>';
+    });
 
-        expect(vm.getWidthOffset()).toBe(0);
-      });
-
-      it('returns value of SCROLL_BAR_SIZE when noScroll prop is false', () => {
-        vm.noScroll = false;
-
-        expect(vm.getWidthOffset()).toBe(mockScrollBarSize);
-      });
+    afterEach(() => {
+      document.querySelector('.roadmap-container').remove();
     });
 
     describe('handleScroll', () => {
-      beforeEach(() => {
-        document.body.innerHTML +=
-          '<div class="roadmap-container"><div id="roadmap-shell"></div></div>';
-      });
-
-      afterEach(() => {
-        document.querySelector('.roadmap-container').remove();
-      });
-
       it('emits `epicsListScrolled` event via eventHub', done => {
         const vmWithParentEl = createComponent({}, document.getElementById('roadmap-shell'));
         spyOn(eventHub, '$emit');
@@ -121,6 +108,17 @@ describe('RoadmapShellComponent', () => {
   describe('template', () => {
     it('renders component container element with class `roadmap-shell`', () => {
       expect(vm.$el.classList.contains('roadmap-shell')).toBe(true);
+    });
+
+    it('renders skeleton loader element when Epics list is empty', done => {
+      vm.epics = [];
+
+      vm.$nextTick()
+        .then(() => {
+          expect(vm.$el.querySelector('.js-skeleton-loader')).not.toBeNull();
+        })
+        .then(done)
+        .catch(done.fail);
     });
 
     it('adds `prevent-vertical-scroll` class on component container element', done => {

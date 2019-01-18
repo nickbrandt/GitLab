@@ -204,7 +204,7 @@ export const getTimeframeForWeeksView = (initialDate = new Date(), length) => {
     timeframe.push(newDate(startDate));
 
     // Move date next Sunday
-    startDate.setDate(startDate.getDate() + 7);
+    startDate.setDate(startDate.getDate() + DAYS_IN_WEEK);
   }
 
   return timeframe;
@@ -216,12 +216,10 @@ export const extendTimeframeForWeeksView = (initialDate = new Date(), length) =>
   if (length < 0) {
     // When length is negative, we need to go
     // back as many weeks in time as value of length
-    startDate.setDate(startDate.getDate() + (length + 1) * 7);
-  } else {
-    startDate.setDate(startDate.getDate());
+    startDate.setDate(startDate.getDate() + length * DAYS_IN_WEEK);
   }
 
-  return getTimeframeForWeeksView(startDate, Math.abs(length) + 1);
+  return getTimeframeForWeeksView(startDate, Math.abs(length));
 };
 
 export const extendTimeframeForPreset = ({
@@ -348,8 +346,8 @@ export const getTimeframeForPreset = (
     timeframe = getTimeframeForWeeksView();
     timeframeStart = newDate(timeframe[0]);
     timeframeEnd = newDate(timeframe[timeframe.length - 1]);
-    timeframeStart.setDate(timeframeStart.getDate() - 7); // Move date back by a week
-    timeframeEnd.setDate(timeframeEnd.getDate() + 7); // Move date ahead by a week
+    timeframeStart.setDate(timeframeStart.getDate());
+    timeframeEnd.setDate(timeframeEnd.getDate() + DAYS_IN_WEEK); // Move date ahead by a week
   }
 
   // Extend timeframe on initial load to ensure
@@ -413,30 +411,40 @@ export const getEpicsPathForPreset = ({
 export const sortEpics = (epics, sortedBy) => {
   const sortByStartDate = sortedBy.indexOf('start_date') > -1;
   const sortOrderAsc = sortedBy.indexOf('asc') > -1;
+  const pastDate = new Date(new Date().getFullYear() - 100, 0, 1);
+  const futureDate = new Date(new Date().getFullYear() + 100, 0, 1);
 
   epics.sort((a, b) => {
     let aDate;
     let bDate;
 
     if (sortByStartDate) {
-      aDate = a.startDate;
-      if (a.startDateOutOfRange) {
-        aDate = a.originalStartDate;
+      if (a.startDateUndefined) {
+        // Set proxy date to be far in the past
+        // to ensure sort order is correct.
+        aDate = pastDate;
+      } else {
+        aDate = a.startDateOutOfRange ? a.originalStartDate : a.startDate;
       }
 
-      bDate = b.startDate;
-      if (b.startDateOutOfRange) {
-        bDate = b.originalStartDate;
+      if (b.startDateUndefined) {
+        aDate = pastDate;
+      } else {
+        bDate = b.startDateOutOfRange ? b.originalStartDate : b.startDate;
       }
     } else {
-      aDate = a.endDate;
-      if (a.endDateOutOfRange) {
-        aDate = a.originalEndDate;
+      if (a.endDateUndefined) {
+        // Set proxy date to be far into the future
+        // to ensure sort order is correct.
+        aDate = futureDate;
+      } else {
+        aDate = a.endDateOutOfRange ? a.originalEndDate : a.endDate;
       }
 
-      bDate = b.endDate;
-      if (b.endDateOutOfRange) {
-        bDate = b.originalEndDate;
+      if (b.endDateUndefined) {
+        bDate = futureDate;
+      } else {
+        bDate = b.endDateOutOfRange ? b.originalEndDate : b.endDate;
       }
     }
 

@@ -49,16 +49,23 @@ describe('TimelineTodayIndicatorComponent', () => {
 
   describe('methods', () => {
     describe('handleEpicsListRender', () => {
-      it('sets `todayBarStyles` and `todayBarReady` props based on provided height param, timeframeItem and currentDate props', () => {
+      it('sets `todayBarStyles` and `todayBarReady` props', () => {
         vm = createComponent({});
-        vm.handleEpicsListRender({
-          height: 100,
-        });
+        vm.handleEpicsListRender({});
         const stylesObj = vm.todayBarStyles;
 
-        expect(stylesObj.height).toBe('120px');
+        expect(stylesObj.height).toBe('600px');
         expect(stylesObj.left).toBe('50%');
         expect(vm.todayBarReady).toBe(true);
+      });
+
+      it('sets `todayBarReady` prop based on value of provided `todayBarReady` param', () => {
+        vm = createComponent({});
+        vm.handleEpicsListRender({
+          todayBarReady: false,
+        });
+
+        expect(vm.todayBarReady).toBe(false);
       });
     });
   });
@@ -90,9 +97,7 @@ describe('TimelineTodayIndicatorComponent', () => {
   describe('template', () => {
     it('renders component container element with class `today-bar`', done => {
       vm = createComponent({});
-      vm.handleEpicsListRender({
-        height: 100,
-      });
+      vm.handleEpicsListRender({});
       vm.$nextTick(() => {
         expect(vm.$el.classList.contains('today-bar')).toBe(true);
         done();

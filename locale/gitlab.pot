@@ -4529,9 +4529,6 @@ msgstr ""
 msgid "GroupRoadmap|From %{dateWord}"
 msgstr ""
 
-msgid "GroupRoadmap|Loading roadmap"
-msgstr ""
-
 msgid "GroupRoadmap|Something went wrong while fetching epics"
 msgstr ""
 
