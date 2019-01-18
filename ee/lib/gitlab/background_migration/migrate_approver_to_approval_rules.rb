@@ -162,7 +162,7 @@ module Gitlab
 
         unless rule.persisted?
           rule.name ||= ApprovalRuleLike::DEFAULT_NAME
-          rule.approvals_required = target.approvals_required
+          rule.approvals_required = [target.approvals_required, ApprovalRuleLike::APPROVALS_REQUIRED_MAX].min
           rule.save!
         end
 
