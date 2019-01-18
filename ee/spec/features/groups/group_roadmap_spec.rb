@@ -55,9 +55,7 @@ describe 'group epic roadmap', :js do
           expect(page).to have_css('.filter-dropdown-container')
           find('.dropdown-toggle').click
           page.within('.dropdown-menu') do
-            expect(page).to have_selector('li a', count: 4)
-            expect(page).to have_content('Created date')
-            expect(page).to have_content('Last updated')
+            expect(page).to have_selector('li a', count: 2)
             expect(page).to have_content('Start date')
             expect(page).to have_content('Due date')
           end
