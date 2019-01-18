@@ -61,7 +61,7 @@ module EE
               ::Feature.disabled?(:parse_dependency_scanning_reports, default_enabled: true)
 
           next if file_type == "container_scanning" &&
-              ::Feature.disabled?(:parse_container_scanning_reports, default_enabled: true)
+              ::Feature.disabled?(:parse_container_scanning_reports, default_enabled: false)
 
           security_reports.get_report(file_type).tap do |security_report|
             begin

@@ -74,6 +74,25 @@ describe ApprovalRuleLike do
         end
       end
     end
+
+    describe 'validation' do
+      context 'when value is too big' do
+        it 'is invalid' do
+          subject.approvals_required = described_class::APPROVALS_REQUIRED_MAX + 1
+
+          expect(subject).to be_invalid
+          expect(subject.errors.key?(:approvals_required)).to eq(true)
+        end
+      end
+
+      context 'when value is within limit' do
+        it 'is valid' do
+          subject.approvals_required = described_class::APPROVALS_REQUIRED_MAX
+
+          expect(subject).to be_valid
+        end
+      end
+    end
   end
 
   context 'MergeRequest' do
