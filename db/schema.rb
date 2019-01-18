@@ -2972,6 +2972,7 @@ ActiveRecord::Schema.define(version: 20190115054216) do
     t.datetime_with_timezone "updated_at", null: false
     t.string "epics_sort"
     t.integer "roadmap_epics_state"
+    t.integer "epic_notes_filter", limit: 2, default: 0, null: false
     t.index ["user_id"], name: "index_user_preferences_on_user_id", unique: true, using: :btree
   end
 
