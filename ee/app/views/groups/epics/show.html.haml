@@ -18,8 +18,10 @@
 
 .content-block.emoji-block
   .row
-    .col-sm-8.js-noteable-awards
+    .col-sm-6.col-md-8.js-noteable-awards
       = render 'award_emoji/awards_block', awardable: @epic, inline: true
+    .col-sm-6.col-md-4.d-flex.justify-content-sm-end.align-items-md-top.mt-2.mt-sm-1
+      #js-vue-discussion-filter{ data: { default_filter: current_user&.notes_filter_for(@epic), notes_filters: UserPreference.notes_filters.to_json } }
 
 %section.issuable-discussion
   = render 'discussion'
