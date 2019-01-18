@@ -109,4 +109,10 @@
     $search-box-height: 50px;
     max-height: calc(#{$dropdown-max-height} - #{$search-box-height});
   }
+
+  // the following is a workaround until we have it fixed in gitlab-ui
+  // see https://gitlab.com/gitlab-org/gitlab-ui/issues/156
+  .sticky-top {
+    top: 0;
+  }
 }
