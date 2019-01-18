@@ -4,6 +4,7 @@ module ApprovalRuleLike
   extend ActiveSupport::Concern
 
   DEFAULT_NAME = 'Default'
+  APPROVALS_REQUIRED_MAX = 100
 
   included do
     has_and_belongs_to_many :users
@@ -11,6 +12,7 @@ module ApprovalRuleLike
     has_many :group_users, -> { distinct }, through: :groups, source: :users
 
     validates :name, presence: true
+    validates :approvals_required, numericality: { less_than_or_equal_to: APPROVALS_REQUIRED_MAX }
   end
 
   # Users who are eligible to approve, including specified group members.
