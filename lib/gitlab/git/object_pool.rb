@@ -37,7 +37,7 @@ module Gitlab
 
       # Allows for reusing other RPCs by 'tricking' Gitaly to think its a repository
       def repository
-        @repository ||= Gitlab::Git::Repository.new(storage, relative_path, GL_REPOSITORY)
+        @repository ||= Gitlab::Git::Repository.new(storage, relative_path, GL_REPOSITORY, gl_project_name)
       end
 
       private
