@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Projects::PathLocksController, type: :controller do
+describe Projects::PathLocksController do
   let(:project) { create(:project, :repository, :public) }
   let(:user)    { project.owner }
   let(:file_path) { 'files/lfs/lfs_object.iso' }
@@ -22,7 +22,7 @@ describe Projects::PathLocksController, type: :controller do
       let(:project) { create(:project, :repository, :public, :repository_private) }
       let(:user) { create(:user) }
 
-      it 'renders a 404' do
+      it 'does not allow access' do
         get :index, params: { namespace_id: project.namespace, project_id: project }
 
         expect(response).to have_gitlab_http_status(404)
