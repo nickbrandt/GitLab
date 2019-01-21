@@ -1,0 +1,11 @@
+$label-blue: #428bca;
+
+.badge-active {
+  color: $white-light;
+  background-color: $label-blue;
+}
+
+.badge-inactive {
+  color: $white-light;
+  background-color: $gray-500;
+}

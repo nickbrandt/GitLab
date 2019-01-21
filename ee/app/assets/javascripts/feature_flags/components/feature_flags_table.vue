@@ -1,5 +1,6 @@
 <script>
 import { GlButton, GlLink, GlTooltipDirective } from '@gitlab/ui';
+import { sprintf, s__ } from '~/locale';
 import DeleteFeatureFlag from './delete_feature_flag.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 
@@ -23,6 +24,13 @@ export default {
       required: true,
     },
   },
+  methods: {
+    scopeTooltipText(scope) {
+      return !scope.active
+        ? sprintf(s__('Inactive flag for %{scope}'), { scope: scope.environment_scope })
+        : '';
+    },
+  },
 };
 </script>
 <template>
@@ -31,8 +39,11 @@ export default {
       <div class="table-section section-10" role="columnheader">
         {{ s__('FeatureFlags|Status') }}
       </div>
+      <div class="table-section section-20" role="columnheader">
+        {{ s__('FeatureFlags|Feature Flag') }}
+      </div>
       <div class="table-section section-50" role="columnheader">
-        {{ s__('FeatureFlags|Feature flag') }}
+        {{ s__('FeatureFlags|Environment Specs') }}
       </div>
     </div>
 
@@ -41,16 +52,14 @@ export default {
         <div class="table-section section-10" role="gridcell">
           <div class="table-mobile-header" role="rowheader">{{ s__('FeatureFlags|Status') }}</div>
           <div class="table-mobile-content js-feature-flag-status">
-            <template v-if="featureFlag.active">
-              <span class="badge badge-success">{{ s__('FeatureFlags|Active') }}</span>
-            </template>
-            <template v-else>
-              <span class="badge badge-danger">{{ s__('FeatureFlags|Inactive') }}</span>
-            </template>
+            <span v-if="featureFlag.active" class="badge badge-success">{{
+              s__('FeatureFlags|Active')
+            }}</span>
+            <span v-else class="badge badge-danger">{{ s__('FeatureFlags|Inactive') }}</span>
           </div>
         </div>
 
-        <div class="table-section section-50" role="gridcell">
+        <div class="table-section section-20" role="gridcell">
           <div class="table-mobile-header" role="rowheader">
             {{ s__('FeatureFlags|Feature Flag') }}
           </div>
@@ -62,7 +71,25 @@ export default {
           </div>
         </div>
 
-        <div class="table-section section-40 table-button-footer" role="gridcell">
+        <div class="table-section section-50" role="gridcell">
+          <div class="table-mobile-header" role="rowheader">
+            {{ s__('FeatureFlags|Environment Specs') }}
+          </div>
+          <div
+            class="table-mobile-content d-flex flex-wrap justify-content-end js-feature-flag-environments"
+          >
+            <span
+              v-for="scope in featureFlag.scopes"
+              :key="scope.id"
+              v-gl-tooltip.hover="scopeTooltipText(scope)"
+              class="badge append-right-8 prepend-top-2"
+              :class="{ 'badge-active': scope.active, 'badge-inactive': !scope.active }"
+              >{{ scope.environment_scope }}</span
+            >
+          </div>
+        </div>
+
+        <div class="table-section section-20 table-button-footer" role="gridcell">
           <div class="table-action-buttons btn-group">
             <template v-if="featureFlag.edit_path">
               <gl-button

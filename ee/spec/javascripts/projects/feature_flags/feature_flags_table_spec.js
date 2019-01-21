@@ -43,6 +43,30 @@ describe('Feature Flag table', () => {
     );
   });
 
+  it('should render a environments specs column', () => {
+    const envColumn = vm.$el.querySelector('.js-feature-flag-environments');
+
+    expect(envColumn).not.toBeNull();
+    expect(envColumn.textContent.trim()).toContain(featureFlag.scopes[0].environment_scope);
+    expect(envColumn.textContent.trim()).toContain(featureFlag.scopes[1].environment_scope);
+  });
+
+  it('should render a environments specs badge with inactive class', () => {
+    const envColumn = vm.$el.querySelector('.js-feature-flag-environments');
+
+    expect(envColumn.querySelector('.badge-inactive').textContent.trim()).toContain(
+      featureFlag.scopes[1].environment_scope,
+    );
+  });
+
+  it('should render a environments specs badge with active class', () => {
+    const envColumn = vm.$el.querySelector('.js-feature-flag-environments');
+
+    expect(envColumn.querySelector('.badge-active').textContent.trim()).toContain(
+      featureFlag.scopes[0].environment_scope,
+    );
+  });
+
   it('Should render an actions column', () => {
     expect(vm.$el.querySelector('.table-action-buttons')).not.toBeNull();
     expect(vm.$el.querySelector('.js-feature-flag-delete-button')).not.toBeNull();
