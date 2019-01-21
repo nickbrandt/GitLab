@@ -94,6 +94,29 @@ describe 'SAML provider settings' do
 
         expect(login_url).to end_with "/groups/#{group.full_path}/-/saml/sso"
       end
+
+      context 'enforced sso enabled' do
+        it 'updates the flag' do
+          stub_feature_flags(enforced_sso: true)
+
+          visit group_saml_providers_path(group)
+
+          find('input#saml_provider_enforced_sso').click
+
+          expect(page).to have_selector('#saml_provider_enforced_sso')
+          expect { submit }.to change { saml_provider.reload.enforced_sso }.to(true)
+        end
+      end
+
+      context 'enforced sso disabled' do
+        it 'does not update the flag' do
+          stub_feature_flags(enforced_sso: false)
+
+          visit group_saml_providers_path(group)
+
+          expect(page).not_to have_selector('#saml_provider_enforced_sso')
+        end
+      end
     end
 
     describe 'test button' do

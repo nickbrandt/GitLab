@@ -2702,6 +2702,7 @@ ActiveRecord::Schema.define(version: 20190131122559) do
     t.boolean "enabled", null: false
     t.string "certificate_fingerprint", null: false
     t.string "sso_url", null: false
+    t.boolean "enforced_sso", default: false, null: false
     t.index ["group_id"], name: "index_saml_providers_on_group_id", using: :btree
   end
 
