@@ -1,5 +1,5 @@
 <script>
-import { mapState, mapActions } from 'vuex';
+import { createNamespacedHelpers } from 'vuex';
 import _ from 'underscore';
 import { GlEmptyState, GlLoadingIcon, GlButton } from '@gitlab/ui';
 import FeatureFlagsTable from './feature_flags_table.vue';
@@ -12,6 +12,8 @@ import {
   historyPushState,
   buildUrlWithCurrentLocation,
 } from '~/lib/utils/common_utils';
+
+const { mapState, mapActions } = createNamespacedHelpers('index');
 
 export default {
   store,

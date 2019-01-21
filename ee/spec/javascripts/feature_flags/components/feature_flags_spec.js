@@ -2,13 +2,13 @@ import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import featureFlagsComponent from 'ee/feature_flags/components/feature_flags.vue';
-import { createStore } from 'ee/feature_flags/store';
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { featureFlag } from './mock_data';
+import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import { TEST_HOST } from 'spec/test_constants';
+import { getRequestData } from '../mock_data';
 
 describe('Feature Flags', () => {
   const mockData = {
-    endpoint: 'feature_flags.json',
+    endpoint: `${TEST_HOST}/endpoint.json`,
     csrfToken: 'testToken',
     errorStateSvgPath: '/assets/illustrations/feature_flag.svg',
     featureFlagsHelpPagePath: '/help/feature-flags',
@@ -16,7 +16,6 @@ describe('Feature Flags', () => {
     newFeatureFlagPath: 'feature-flags/new',
   };
 
-  let store;
   let FeatureFlagsComponent;
   let component;
   let mock;
@@ -28,13 +27,13 @@ describe('Feature Flags', () => {
   });
 
   afterEach(() => {
-    component.$destroy();
     mock.restore();
+    component.$destroy();
   });
 
   describe('without permissions', () => {
     const props = {
-      endpoint: 'feature_flags.json',
+      endpoint: `${TEST_HOST}/endpoint.json`,
       csrfToken: 'testToken',
       errorStateSvgPath: '/assets/illustrations/feature_flag.svg',
       featureFlagsHelpPagePath: '/help/feature-flags',
@@ -42,18 +41,11 @@ describe('Feature Flags', () => {
     };
 
     beforeEach(done => {
-      mock.onGet(mockData.endpoint).reply(200, {
-        feature_flags: [],
-        count: {
-          all: 0,
-          enabled: 0,
-          disabled: 0,
-        },
-      });
-      component = mountComponentWithStore(FeatureFlagsComponent, {
-        store,
-        props,
-      });
+      mock
+        .onGet(`${TEST_HOST}/endpoint.json`, { params: { scope: 'all', page: '1' } })
+        .reply(200, getRequestData, {});
+
+      component = mountComponent(FeatureFlagsComponent, props);
 
       setTimeout(() => {
         done();
@@ -71,19 +63,11 @@ describe('Feature Flags', () => {
 
   describe('loading state', () => {
     it('renders a loading icon', done => {
-      mock.onGet(mockData.endpoint).reply(200, {
-        feature_flags: [],
-        count: {
-          all: 0,
-          enabled: 0,
-          disabled: 0,
-        },
-      });
+      mock
+        .onGet(`${TEST_HOST}/endpoint.json`, { params: { scope: 'all', page: '1' } })
+        .replyOnce(200, getRequestData, {});
 
-      component = mountComponentWithStore(FeatureFlagsComponent, {
-        store,
-        props: mockData,
-      });
+      component = mountComponent(FeatureFlagsComponent, mockData);
 
       const loadingElement = component.$el.querySelector('.js-loading-state');
 
@@ -101,19 +85,20 @@ describe('Feature Flags', () => {
   describe('successful request', () => {
     describe('without feature flags', () => {
       beforeEach(done => {
-        mock.onGet(mockData.endpoint).reply(200, {
-          feature_flags: [],
-          count: {
-            all: 0,
-            enabled: 0,
-            disabled: 0,
+        mock.onGet(mockData.endpoint, { params: { scope: 'all', page: '1' } }).replyOnce(
+          200,
+          {
+            feature_flags: [],
+            count: {
+              all: 0,
+              enabled: 0,
+              disabled: 0,
+            },
           },
-        });
+          {},
+        );
 
-        component = mountComponentWithStore(FeatureFlagsComponent, {
-          store,
-          props: mockData,
-        });
+        component = mountComponent(FeatureFlagsComponent, mockData);
 
         setTimeout(() => {
           done();
@@ -135,33 +120,18 @@ describe('Feature Flags', () => {
 
     describe('with paginated feature flags', () => {
       beforeEach(done => {
-        mock.onGet(mockData.endpoint).reply(
-          200,
-          {
-            feature_flags: [featureFlag],
-            count: {
-              all: 37,
-              enabled: 5,
-              disabled: 32,
-            },
-          },
-          {
-            'X-nExt-pAge': '2',
+        mock
+          .onGet(mockData.endpoint, { params: { scope: 'all', page: '1' } })
+          .replyOnce(200, getRequestData, {
+            'x-next-page': '2',
             'x-page': '1',
-            'X-Per-Page': '1',
+            'X-Per-Page': '2',
             'X-Prev-Page': '',
             'X-TOTAL': '37',
-            'X-Total-Pages': '2',
-          },
-        );
+            'X-Total-Pages': '5',
+          });
 
-        store = createStore();
-
-        component = mountComponentWithStore(FeatureFlagsComponent, {
-          store,
-          props: mockData,
-        });
-
+        component = mountComponent(FeatureFlagsComponent, mockData);
         setTimeout(() => {
           done();
         }, 0);
@@ -170,11 +140,11 @@ describe('Feature Flags', () => {
       it('should render a table with feature flags', () => {
         expect(component.$el.querySelectorAll('.js-feature-flag-table')).not.toBeNull();
         expect(component.$el.querySelector('.feature-flag-name').textContent.trim()).toEqual(
-          featureFlag.name,
+          getRequestData.feature_flags[0].name,
         );
 
         expect(component.$el.querySelector('.feature-flag-description').textContent.trim()).toEqual(
-          featureFlag.description,
+          getRequestData.feature_flags[0].description,
         );
       });
 
@@ -188,7 +158,7 @@ describe('Feature Flags', () => {
 
       describe('pagination', () => {
         it('should render pagination', () => {
-          expect(component.$el.querySelectorAll('.gl-pagination li').length).toEqual(5);
+          expect(component.$el.querySelectorAll('.gl-pagination')).not.toBeNull();
         });
 
         it('should make an API request when page is clicked', done => {
@@ -198,7 +168,7 @@ describe('Feature Flags', () => {
 
             expect(component.updateFeatureFlagOptions).toHaveBeenCalledWith({
               scope: 'all',
-              page: '2',
+              page: '4',
             });
             done();
           }, 0);
@@ -222,13 +192,9 @@ describe('Feature Flags', () => {
 
   describe('unsuccessful request', () => {
     beforeEach(done => {
-      mock.onGet(mockData.endpoint).reply(500, {});
+      mock.onGet(mockData.endpoint, { params: { scope: 'all', page: '1' } }).replyOnce(500, {});
 
-      store = createStore();
-      component = mountComponentWithStore(FeatureFlagsComponent, {
-        store,
-        props: mockData,
-      });
+      component = mountComponent(FeatureFlagsComponent, mockData);
 
       setTimeout(() => {
         done();
