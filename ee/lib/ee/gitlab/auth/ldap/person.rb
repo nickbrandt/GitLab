@@ -21,6 +21,11 @@ module EE
               nil
             end
 
+            def find_by_certificate_issuer_and_serial(issuer_dn, serial, adapter)
+              certificate_assertion = "{ serialNumber #{serial}, issuer \"#{issuer_dn}\" }"
+              adapter.user_by_certificate_assertion(certificate_assertion)
+            end
+
             def find_by_kerberos_principal(principal, adapter)
               uid, domain = principal.split('@', 2)
               return nil unless uid && domain

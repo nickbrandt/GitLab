@@ -9,7 +9,17 @@ class SmartcardController < ApplicationController
 
   def auth
     certificate = Gitlab::Auth::Smartcard::Certificate.new(certificate_header)
+    sign_in_with(certificate)
+  end
 
+  def ldap_auth
+    certificate = Gitlab::Auth::Smartcard::LDAPCertificate.new(params[:provider], certificate_header)
+    sign_in_with(certificate)
+  end
+
+  private
+
+  def sign_in_with(certificate)
     user = certificate.find_or_create_user
     unless user
       flash[:alert] = _('Failed to signing using smartcard authentication')
@@ -18,11 +28,9 @@ class SmartcardController < ApplicationController
       return
     end
 
-    log_audit_event(user, with: 'smartcard')
+    log_audit_event(user, with: certificate.auth_method)
     sign_in_and_redirect(user)
   end
-
-  protected
 
   def check_feature_availability
     render_404 unless ::Gitlab::Auth::Smartcard.enabled?

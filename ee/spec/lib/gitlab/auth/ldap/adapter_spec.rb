@@ -39,4 +39,40 @@ describe Gitlab::Auth::LDAP::Adapter do
       expect(results.first.member_dns).to match_array(%w(uid=john uid=mary))
     end
   end
+
+  describe '#user_by_certificate_assertion' do
+    let(:certificate_assertion) { 'certificate_assertion' }
+
+    subject { adapter.user_by_certificate_assertion(certificate_assertion) }
+
+    context 'return value' do
+      let(:entry) { ldap_user_entry('john') }
+
+      before do
+        allow(adapter).to receive(:ldap_search).and_return([entry])
+      end
+
+      it 'returns a person object' do
+        expect(subject).to be_a(::EE::Gitlab::Auth::LDAP::Person)
+      end
+
+      it 'returns correct attributes' do
+        result = subject
+
+        expect(result.uid).to eq('john')
+        expect(result.dn).to eq('uid=john,ou=users,dc=example,dc=com')
+      end
+    end
+
+    it 'searches with the proper options' do
+      expect(adapter).to receive(:ldap_search).with(
+        { attributes: array_including('dn', 'cn', 'mail', 'uid', 'userid'),
+          base: 'dc=example,dc=com',
+          filter: Net::LDAP::Filter.ex(
+            'userCertificate:certificateExactMatch', certificate_assertion) }
+      ).and_return({})
+
+      subject
+    end
+  end
 end

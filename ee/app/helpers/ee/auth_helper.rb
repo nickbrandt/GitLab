@@ -50,6 +50,27 @@ module EE
       ::Gitlab::Auth::Smartcard.enabled?
     end
 
+    def smartcard_enabled_for_ldap?(provider_name, required: false)
+      return false unless smartcard_enabled?
+
+      server = ::Gitlab::Auth::LDAP::Config.servers.find do |server|
+        server['provider_name'] == provider_name
+      end
+
+      return false unless server
+
+      truthy_values = ['required']
+      truthy_values << 'optional' unless required
+
+      truthy_values.include? server['smartcard_auth']
+    end
+
+    def smartcard_login_button_classes(provider_name)
+      css_classes = %w[btn btn-success]
+      css_classes << 'btn-inverted' unless smartcard_enabled_for_ldap?(provider_name, required: true)
+      css_classes.join(' ')
+    end
+
     def group_saml_enabled?
       auth_providers.include?(:group_saml)
     end

@@ -8363,10 +8363,16 @@ msgstr ""
 msgid "Sign in to \"%{group_name}\""
 msgstr ""
 
+msgid "Sign in using smart card"
+msgstr ""
+
 msgid "Sign in via 2FA code"
 msgstr ""
 
 msgid "Sign in with Single Sign-On"
+msgstr ""
+
+msgid "Sign in with smart card"
 msgstr ""
 
 msgid "Sign out"
@@ -9931,6 +9937,9 @@ msgid "Use the following registration token during setup:"
 msgstr ""
 
 msgid "Use your global notification setting"
+msgstr ""
+
+msgid "Use your smart card to authenticate with the LDAP server."
 msgstr ""
 
 msgid "Used by members to sign in to your group in GitLab"
