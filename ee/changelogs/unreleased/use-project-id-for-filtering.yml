@@ -1,5 +1,0 @@
----
-title: Uses project_id instead of project on the group security dashboard
-merge_request: 9109
-author:
-type: fixed

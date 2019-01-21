@@ -1,5 +1,0 @@
----
-title: Fix data migration failure if approvals_before_merge is set to too high
-merge_request: 9217
-author:
-type: fixed

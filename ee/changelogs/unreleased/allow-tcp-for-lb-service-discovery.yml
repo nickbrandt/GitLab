@@ -1,5 +1,0 @@
----
-title: Allow using TCP for DB load balancing DNS lookups
-merge_request: 8961
-author:
-type: added

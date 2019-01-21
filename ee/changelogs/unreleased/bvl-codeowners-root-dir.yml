@@ -1,5 +1,0 @@
----
-title: Allow matching only the repo-root for CODEOWNERS
-merge_request: 8708
-author:
-type: fixed

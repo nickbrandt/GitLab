@@ -1,5 +1,91 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.7.0 (2019-01-22)
+
+### Security (1 change)
+
+- Add a shared secret to prevent abuse of the alert endpoint.
+
+### Fixed (27 changes, 2 of them are from the community)
+
+- Defaults to feature flags link for Operations entry. !8622
+- Fix error on explore page when logged out due to gold trial callout. !8674
+- Prevents the empty state from showing when the dashboard errors. !8703
+- Allow matching only the repo-root for CODEOWNERS. !8708
+- Fix adding labels to epics using quick actions. !8772
+- Geo: Keep the minimum cursor last event. !8832
+- Reinstate sorting issuable by weight. !8834
+- Geo - Show the proper label for the last repository check run on Geo projects page. !8844
+- Resolve Reorder gitlab:elastic:index rake tasks to ensure wikis and database are completed even if projects error out. !8852
+- Remove dash on issue weight for unauthorized users. !8882 (George Tsiolis)
+- Dismiss epic promotion and persist it across reloads. !8885
+- Fix JIRA Development Panel links with subgroups. !8908
+- Remove epic field in sidebar for projects without groups. !8919
+- Remove duplicate padding from issue board switcher. !8928
+- Resolve Ctrl+Enter immediately adds MR comment. !8932
+- Geo: Ignore invalid attributes when updating Geo node status. !8957
+- Fix border-radius for related issues. !8958 (Johann Hubert Sonntagbauer)
+- Fix Security Dashboard Header font size. !9011
+- Fix title and description for issue created from a vulnerability. !9022
+- Pseudonymizer: Gracefully handle empty pseudo entries. !9044
+- Fix permission check when creating an issue from a vulnerability. !9055
+- Docfix - broken doc links for Secure/Autodevops features. !9058
+- Fix Error 500 when deleting a pipeline via the API. !9104
+- Uses project_id instead of project on the group security dashboard. !9109
+- Recursively get all of a groups projects. !9205
+- Fix data migration failure if approvals_before_merge is set to too high. !9217
+- Don't remove milestones when moving issues to board backlog from non-milestone list.
+
+### Changed (5 changes, 1 of them is from the community)
+
+- Update Geo nodes empty state. !8576 (George Tsiolis)
+- Add search field to issue board switcher. !8862
+- Allow downloading package files from UI. !8888
+- Changes to the data model for counts on the Group Security Dashboard. !9035
+- Fix packages UI mentioned only Maven packages support. !9132
+
+### Performance (2 changes, 1 of them is from the community)
+
+- Fix timeout loading Open list when board contains assignee lists.
+- Enable some frozen string in ee/lib. (gfyoung)
+
+### Added (17 changes)
+
+- Add an instance-level endpoint for downloading maven packages. !8274
+- Add NPM registry support to GitLab packages. !8673
+- Store container scanning CI jobs results into the database. !8797
+- Add a group-level endpoint for downloading maven packages. !8798
+- Add Filtering vulnerabilities in the Group Security Dashboard. !8817
+- Allow to filter Feature Flags. !8821
+- Geo - Show last verification time on Geo projects page. !8845
+- Adds basic filtering to the Group Security Dashboard frontend. !8886
+- Autocomplete issues and MRs in epics. !8936
+- Adds project filtering to the GSD. !8944
+- Allow using TCP for DB load balancing DNS lookups. !8961
+- Add filtering for summary and history on security dashboard. !8972
+- Add solution card to the vulnerability modal. !9030
+- Allows the Group Security Dashboard to select multiple filters. !9031
+- Added Snowplow tracking to issues export. !9045
+- Add support for relationship between epics. !9051
+- Added pagination to epics API endpoint.
+
+### Other (13 changes, 3 of them are from the community)
+
+- Promote starting a GitLab.com Gold trial on the dashboard. !6947
+- Adds event tracking to navbar. !7787
+- Update tracing settings to match error tracking settings. !8786
+- Adapt subscriptions page for free plans and trials. !8838
+- Support for new SAST and dependency scanning report format. !8869
+- Remove deprecated ActionDispatch::ParamsParser. !8897 (Jasper Maes)
+- Fix deprecation: Comparing equality between ActionController::Parameters and a Hash is deprecated. !8914 (Jasper Maes)
+- Removes Notes from GitLab Pseudonymizer config. !8923
+- Add count of projects with tracing enabled to usage ping data. !8940
+- Adds dependency scanning to the report type filters on GSD. !9034
+- Fix deprecation: Using positional arguments in specs for EE spes in spec/. !9040 (Jasper Maes)
+- Pass issuable-type in AddIssuableForm. !9111
+- Gather deepest epic relationship data.
+
+
 ## 11.6.5 (2019-01-17)
 
 ### Fixed (1 change)

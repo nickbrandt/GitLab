@@ -1,5 +1,0 @@
----
-title: Prevents the empty state from showing when the dashboard errors
-merge_request: 8703
-author:
-type: fixed
