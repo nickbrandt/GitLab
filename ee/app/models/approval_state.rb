@@ -51,7 +51,7 @@ class ApprovalState
   end
 
   def overall_approvals_required
-    @overall_approvals_required ||= [project.approvals_before_merge, merge_request.approvals_before_merge].max
+    @overall_approvals_required ||= [project.approvals_before_merge, merge_request.approvals_before_merge || 0].max
   end
 
   def approved?

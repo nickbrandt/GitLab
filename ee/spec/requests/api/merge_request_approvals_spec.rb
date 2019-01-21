@@ -484,7 +484,7 @@ describe "API::MergeRequestApprovals with approval_rule enabled" do
     end
   end
 
-  describe 'GET :id/merge_requests/:merge_request_iid/approval_rules' do
+  describe 'GET :id/merge_requests/:merge_request_iid/approval_settings' do
     let!(:rule) { create(:approval_merge_request_rule, merge_request: merge_request, approvals_required: 2, name: 'foo') }
 
     it 'retrieves the approval rules details' do
@@ -492,7 +492,7 @@ describe "API::MergeRequestApprovals with approval_rule enabled" do
       merge_request.approvals.create(user: approver)
       rule.users << approver
 
-      get api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approval_rules", user)
+      get api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approval_settings", user)
 
       expect(response).to have_gitlab_http_status(200)
       expect(json_response['rules'].size).to eq(1)
@@ -509,7 +509,7 @@ describe "API::MergeRequestApprovals with approval_rule enabled" do
       private_group = create :group, :private
       rule.groups << private_group
 
-      get api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approval_rules", user)
+      get api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approval_settings", user)
 
       expect(response).to have_gitlab_http_status(200)
       expect(json_response['rules'].size).to eq(1)

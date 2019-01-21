@@ -53,7 +53,7 @@ module API
           success: ::EE::API::Entities::MergeRequestApprovalRules,
           hidden: true
         }
-        get 'approval_rules' do
+        get 'approval_settings' do
           merge_request = find_merge_request_with_access(params[:merge_request_iid])
 
           present merge_request.approval_state, with: ::EE::API::Entities::MergeRequestApprovalRules, current_user: current_user
