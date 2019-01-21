@@ -12,6 +12,8 @@ export const SCROLL_BAR_SIZE = 15;
 
 export const EPIC_HIGHLIGHT_REMOVE_AFTER = 3000;
 
+export const DAYS_IN_WEEK = 7;
+
 export const PRESET_TYPES = {
   QUARTERS: 'QUARTERS',
   MONTHS: 'MONTHS',
