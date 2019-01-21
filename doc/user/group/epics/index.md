@@ -41,7 +41,7 @@ NOTE: **Note:**
 When you add an issue or an epic to an epic that's already associated with another epic,
 the issue or the epic is automatically removed from the previous epic.
 
-## Child epics
+## Multi-level child epics
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/8333) in GitLab Ultimate 11.7.
 
