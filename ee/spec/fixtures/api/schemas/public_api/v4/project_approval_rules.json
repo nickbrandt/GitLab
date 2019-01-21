@@ -4,7 +4,8 @@
     "rules": {
       "type": "array",
       "items": { "$ref": "project_approval_rule.json" }
-    }
+    },
+    "fallback_approvals_required": { "type": "integer" }
   },
   "additionalProperties": false
 }

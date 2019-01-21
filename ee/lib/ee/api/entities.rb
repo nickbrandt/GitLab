@@ -269,6 +269,7 @@ module EE
       # Decorates Project
       class ProjectApprovalRules < Grape::Entity
         expose :approval_rules, as: :rules, using: ApprovalRule
+        expose :approvals_before_merge, as: :fallback_approvals_required
       end
 
       # @deprecated

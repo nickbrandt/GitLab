@@ -10,9 +10,11 @@ describe API::ProjectApprovalRules do
   set(:project)  { create(:project, :public, :repository, creator: user, namespace: user.namespace, only_allow_merge_if_pipeline_succeeds: false) }
   set(:approver) { create(:user) }
 
-  let(:url) { "/projects/#{project.id}/approval_rules" }
+  let(:url) { "/projects/#{project.id}/approval_settings/rules" }
 
-  describe 'GET /projects/:id/approval_rules' do
+  describe 'GET /projects/:id/approval_settings' do
+    let(:url) { "/projects/#{project.id}/approval_settings" }
+
     context 'when the request is correct' do
       let!(:rule) do
         rule = create(:approval_project_rule, name: 'security', project: project, approvals_required: 7)
@@ -72,7 +74,43 @@ describe API::ProjectApprovalRules do
     end
   end
 
-  describe 'POST /projects/:id/approval_rules' do
+  describe 'PUT /projects/:id/approval_settings' do
+    let(:url) { "/projects/#{project.id}/approval_settings" }
+
+    shared_examples_for 'a user with access' do
+      context 'when sending json data' do
+        it 'updates approvals_before_merge' do
+          expect do
+            put api(url, current_user), params: { fallback_approvals_required: 1 }.to_json, headers: { CONTENT_TYPE: 'application/json' }
+          end.to change { project.reload.approvals_before_merge }.from(0).to(1)
+
+          expect(response).to have_gitlab_http_status(200)
+        end
+      end
+    end
+
+    context 'as a project admin' do
+      it_behaves_like 'a user with access' do
+        let(:current_user) { user }
+      end
+    end
+
+    context 'as a global admin' do
+      it_behaves_like 'a user with access' do
+        let(:current_user) { admin }
+      end
+    end
+
+    context 'as a random user' do
+      it 'returns 403' do
+        put api(url, user2), { fallback_approvals_required: 1 }.to_json, { CONTENT_TYPE: 'application/json' }
+
+        expect(response).to have_gitlab_http_status(403)
+      end
+    end
+  end
+
+  describe 'POST /projects/:id/approval_settings/rules' do
     let(:current_user) { user }
     let(:params) do
       {
@@ -119,9 +157,9 @@ describe API::ProjectApprovalRules do
     end
   end
 
-  describe 'PUT /projects/:id/approval_rules/:approval_rule_id' do
+  describe 'PUT /projects/:id/approval_settings/:approval_rule_id' do
     let!(:approval_rule) { create(:approval_project_rule, project: project) }
-    let(:url) { "/projects/#{project.id}/approval_rules/#{approval_rule.id}" }
+    let(:url) { "/projects/#{project.id}/approval_settings/rules/#{approval_rule.id}" }
 
     shared_examples_for 'a user with access' do
       before do
@@ -185,9 +223,9 @@ describe API::ProjectApprovalRules do
     end
   end
 
-  describe 'DELETE /projects/:id/approval_rules/:approval_rule_id' do
+  describe 'DELETE /projects/:id/approval_settings/rules/:approval_rule_id' do
     let!(:approval_rule) { create(:approval_project_rule, project: project) }
-    let(:url) { "/projects/#{project.id}/approval_rules/#{approval_rule.id}" }
+    let(:url) { "/projects/#{project.id}/approval_settings/rules/#{approval_rule.id}" }
 
     it 'destroys' do
       delete api(url, user)
@@ -198,7 +236,7 @@ describe API::ProjectApprovalRules do
 
     context 'when approval rule not found' do
       let!(:approval_rule_2) { create(:approval_project_rule) }
-      let(:url) { "/projects/#{project.id}/approval_rules/#{approval_rule_2.id}" }
+      let(:url) { "/projects/#{project.id}/approval_settings/#{approval_rule_2.id}" }
 
       it 'returns not found' do
         delete api(url, user)
