@@ -2,6 +2,12 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 8.1.0
+
+- Upgrade the gitaly client to v1.13.0 (includes TLS support) !351
+- Update gitaly-proto to 0.124.0 !331
+- Add distributed tracing with LabKit !325
+
 v 8.0.0
 
 - Remove local git archive support !304
