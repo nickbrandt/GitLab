@@ -11,5 +11,3 @@
 /vendor/
 karma.config.js
 webpack.config.js
-
-ee/app/assets/javascripts/shared/snowplow/sp.js
