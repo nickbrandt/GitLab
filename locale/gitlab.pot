@@ -3764,13 +3764,13 @@ msgstr ""
 msgid "FeatureFlags|Edit Feature Flag"
 msgstr ""
 
+msgid "FeatureFlags|Environment Specs"
+msgstr ""
+
 msgid "FeatureFlags|Feature Flag"
 msgstr ""
 
 msgid "FeatureFlags|Feature Flags"
-msgstr ""
-
-msgid "FeatureFlags|Feature flag"
 msgstr ""
 
 msgid "FeatureFlags|Feature flag %{name} will be removed. Are you sure?"
@@ -4901,6 +4901,9 @@ msgid "In order to enable instance-level analytics, please ask an admin to enabl
 msgstr ""
 
 msgid "In the next step, you'll be able to select the projects you want to import."
+msgstr ""
+
+msgid "Inactive flag for %{scope}"
 msgstr ""
 
 msgid "Include a Terms of Service agreement and Privacy Policy that all users must accept."
