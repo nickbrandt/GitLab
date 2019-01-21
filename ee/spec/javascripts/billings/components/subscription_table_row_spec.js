@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { dateInWords } from '~/lib/utils/datetime_utility';
 import component from 'ee/billings/components/subscription_table_row.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
@@ -75,6 +76,29 @@ describe('Subscription Table Row', () => {
       const currentCol = vm.$el.querySelectorAll('.grid-cell:not(.header-cell)')[1];
 
       expect(currentCol.querySelector('.btn-help')).not.toBe(null);
+    });
+
+    describe('date column', () => {
+      const dateColumn = {
+        id: 'c',
+        label: 'Column C',
+        value: '2018-01-31',
+        isDate: true,
+      };
+
+      beforeEach(() => {
+        props = { header, columns: [dateColumn] };
+        vm = mountComponent(Component, props);
+      });
+
+      it('should render the date in UTC', () => {
+        const currentCol = vm.$el.querySelectorAll('.grid-cell:not(.header-cell)')[0];
+        const d = dateColumn.value.split('-');
+        const outputDate = dateInWords(new Date(d[0], d[1] - 1, d[2]));
+
+        expect(currentCol.querySelector('.property-label').textContent).toContain(dateColumn.label);
+        expect(currentCol.querySelector('.property-value').textContent).toContain(outputDate);
+      });
     });
   });
 });
