@@ -183,7 +183,7 @@ describe('getTimeframeForWeeksView', () => {
   let timeframe;
 
   beforeEach(() => {
-    timeframe = getTimeframeForWeeksView(new Date(2018, 0, 1));
+    timeframe = getTimeframeForWeeksView(mockTimeframeInitialDate);
   });
 
   it('returns timeframe with total of 7 weeks', () => {
@@ -214,6 +214,24 @@ describe('getTimeframeForWeeksView', () => {
     expect(timeframeItem.getFullYear()).toBe(expectedMonth.year);
     expect(timeframeItem.getMonth()).toBe(expectedMonth.month);
     expect(timeframeItem.getDate()).toBe(expectedMonth.date);
+  });
+
+  it('returns timeframe starting on a specific date when provided with additional `length` param', () => {
+    const initialDate = new Date(2018, 0, 7);
+
+    timeframe = getTimeframeForWeeksView(initialDate, 5);
+    const expectedTimeframe = [
+      initialDate,
+      new Date(2018, 0, 14),
+      new Date(2018, 0, 21),
+      new Date(2018, 0, 28),
+      new Date(2018, 1, 4),
+    ];
+
+    expect(timeframe.length).toBe(5);
+    expectedTimeframe.forEach((timeframeItem, index) => {
+      expect(timeframeItem.getTime()).toBe(expectedTimeframe[index].getTime());
+    });
   });
 });
 
@@ -272,9 +290,9 @@ describe('extendTimeframeForAvailableWidth', () => {
       timeframeEnd,
     });
 
-    expect(timeframe.length).toBe(16);
-    expect(timeframe[0].getTime()).toBe(1498867200000); // 1 July 2017
-    expect(timeframe[timeframe.length - 1].getTime()).toBe(1540944000000); // 31 Oct 2018
+    expect(timeframe.length).toBe(12);
+    expect(timeframe[0].getTime()).toBe(1504224000000); // 1 Sep 2017
+    expect(timeframe[timeframe.length - 1].getTime()).toBe(1535673600000); // 31 Aug 2018
   });
 });
 

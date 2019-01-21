@@ -70,12 +70,13 @@ export const mockTimeframeMonthsAppend = [
 ];
 
 export const mockTimeframeWeeksPrepend = [
-  new Date(2017, 10, 5),
   new Date(2017, 10, 12),
   new Date(2017, 10, 19),
   new Date(2017, 10, 26),
   new Date(2017, 11, 3),
   new Date(2017, 11, 10),
+  new Date(2017, 11, 17),
+  new Date(2017, 11, 24),
 ];
 export const mockTimeframeWeeksAppend = [
   new Date(2018, 0, 28),
@@ -84,6 +85,7 @@ export const mockTimeframeWeeksAppend = [
   new Date(2018, 1, 18),
   new Date(2018, 1, 25),
   new Date(2018, 2, 4),
+  new Date(2018, 2, 11),
 ];
 
 export const mockEpic = {

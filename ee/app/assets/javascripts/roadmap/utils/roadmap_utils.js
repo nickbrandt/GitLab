@@ -1,6 +1,12 @@
 import { newDate, getTimeframeWindowFrom, totalDaysInMonth } from '~/lib/utils/datetime_utility';
 
-import { PRESET_TYPES, PRESET_DEFAULTS, EXTEND_AS, TIMELINE_CELL_MIN_WIDTH } from '../constants';
+import {
+  PRESET_TYPES,
+  PRESET_DEFAULTS,
+  EXTEND_AS,
+  TIMELINE_CELL_MIN_WIDTH,
+  DAYS_IN_WEEK,
+} from '../constants';
 
 const monthsForQuarters = {
   1: [0, 1, 2],
@@ -173,19 +179,26 @@ export const extendTimeframeForMonthsView = (initialDate = new Date(), length) =
  *
  * @param {Date} initialDate
  */
-export const getTimeframeForWeeksView = (initialDate = new Date()) => {
+export const getTimeframeForWeeksView = (initialDate = new Date(), length) => {
+  const timeframe = [];
   const startDate = newDate(initialDate);
   startDate.setHours(0, 0, 0, 0);
 
-  const dayOfWeek = startDate.getDay();
-  const daysToFirstDayOfPrevWeek = dayOfWeek + 14;
-  const timeframe = [];
+  // When length is not provided
+  // We need to provide standard
+  // timeframe as per feature specs (see block comment above)
+  if (!length) {
+    const dayOfWeek = startDate.getDay();
+    const daysToFirstDayOfPrevWeek = dayOfWeek + DAYS_IN_WEEK * 2;
 
-  // Move startDate to first day (Sunday) of 2 weeks prior
-  startDate.setDate(startDate.getDate() - daysToFirstDayOfPrevWeek);
+    // Move startDate to first day (Sunday) of 2 weeks prior
+    startDate.setDate(startDate.getDate() - daysToFirstDayOfPrevWeek);
+  }
+
+  const rangeLength = length || PRESET_DEFAULTS.WEEKS.TIMEFRAME_LENGTH;
 
   // Iterate for the length of this preset
-  for (let i = 0; i < PRESET_DEFAULTS.WEEKS.TIMEFRAME_LENGTH; i += 1) {
+  for (let i = 0; i < rangeLength; i += 1) {
     // Push date to timeframe only when day is
     // first day (Sunday) of the week
     timeframe.push(newDate(startDate));
@@ -201,13 +214,14 @@ export const extendTimeframeForWeeksView = (initialDate = new Date(), length) =>
   const startDate = newDate(initialDate);
 
   if (length < 0) {
+    // When length is negative, we need to go
+    // back as many weeks in time as value of length
     startDate.setDate(startDate.getDate() + (length + 1) * 7);
   } else {
-    startDate.setDate(startDate.getDate() + 7);
+    startDate.setDate(startDate.getDate());
   }
 
-  const timeframe = getTimeframeForWeeksView(startDate, length + 1);
-  return timeframe.slice(1);
+  return getTimeframeForWeeksView(startDate, Math.abs(length) + 1);
 };
 
 export const extendTimeframeForPreset = ({
@@ -258,7 +272,14 @@ export const extendTimeframeForAvailableWidth = ({
   // We double the increaseLengthBy to make sure there's enough room
   // to perform horizontal scroll without triggering timeframe extension
   // on initial page load.
-  const increaseLengthBy = (timeframeLength - timeframe.length) * 2;
+  let increaseLengthBy = timeframeLength - timeframe.length;
+
+  // Handle a case where window size is leading to
+  // increaseLength between 1 & 3 which is not big
+  // enough for extendTimeframeFor*****View methods
+  if (increaseLengthBy > 0 && increaseLengthBy <= 3) {
+    increaseLengthBy += 4; // Equalize by adding 2 columns on each end
+  }
 
   // If there are timeframe items to be added
   // to make timeline scrollable, do as follows.
