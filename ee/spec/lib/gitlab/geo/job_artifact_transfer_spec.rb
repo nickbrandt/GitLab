@@ -18,7 +18,10 @@ describe Gitlab::Geo::JobArtifactTransfer, :geo do
     end
 
     it 'sets request_data with file_id and file_type' do
-      expect(described_class.new(job_artifact).request_data).to eq(id: job_artifact.id)
+      expect(described_class.new(job_artifact).request_data).to eq(
+        id: job_artifact.id,
+        file_id: job_artifact.id,
+        file_type: :job_artifact)
     end
   end
 end

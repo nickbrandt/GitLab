@@ -265,6 +265,13 @@ questions from [owasp.org](https://www.owasp.org).
 ### What session management requirements have been defined?
 
 - Geo JWTs are defined to last for only two minutes before needing to be regenerated.
+- Geo JWTs are generated for one of the following specific scopes:
+  - Geo API access.
+  - Git access.
+  - LFS and File ID.
+  - Upload and File ID.
+  - Job Artifact and File ID.
+- Geo JWTs scopes are not enforced, but will be in a future version (currently scheduled for GitLab 11.9).
 
 ### What access requirements have been defined for URI and Service calls?
 

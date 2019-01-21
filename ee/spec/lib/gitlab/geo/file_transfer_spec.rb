@@ -15,7 +15,9 @@ describe Gitlab::Geo::FileTransfer do
         expect(Pathname.new(subject.filename).absolute?).to be_truthy
         expect(subject.request_data).to eq({ id: upload.model_id,
                                              type: 'User',
-                                             checksum: upload.checksum })
+                                             checksum: upload.checksum,
+                                             file_id: upload.id,
+                                             file_type: :file })
       end
     end
   end

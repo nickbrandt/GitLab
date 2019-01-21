@@ -14,6 +14,8 @@ module Gitlab
       oauth_application
     ).freeze
 
+    API_SCOPE = 'geo_api'
+
     def self.current_node
       self.cache_value(:current_node, as: GeoNode) { GeoNode.current_node }
     end
