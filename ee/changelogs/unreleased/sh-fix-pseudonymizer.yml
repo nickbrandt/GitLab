@@ -1,5 +1,0 @@
----
-title: 'Pseudonymizer: Gracefully handle empty pseudo entries'
-merge_request: 9044
-author:
-type: fixed

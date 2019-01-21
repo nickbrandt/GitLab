@@ -1,5 +1,0 @@
----
-title: Fix error on explore page when logged out due to gold trial callout
-merge_request: 8674
-author:
-type: fixed
