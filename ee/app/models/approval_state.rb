@@ -43,16 +43,24 @@ class ApprovalState
   def approval_needed?
     return false unless project.feature_available?(:merge_request_approvers)
 
-    overall_approvals_required > 0 || wrapped_approval_rules.any? { |rule| rule.approvals_required > 0 }
+    if regular_rules.empty?
+      overall_approvals_required > 0
+    else
+      wrapped_approval_rules.any? { |rule| rule.approvals_required > 0 }
+    end
   end
 
   def overall_approvals_required
-    @overall_approvals_required ||= project.approvals_before_merge
+    @overall_approvals_required ||= [project.approvals_before_merge, merge_request.approvals_before_merge].max
   end
 
   def approved?
     strong_memoize(:approved) do
-      (overall_approvals_required == 0 || approvals.size >= overall_approvals_required) && wrapped_approval_rules.all?(&:approved?)
+      if regular_rules.empty?
+        approvals.size >= overall_approvals_required
+      else
+        wrapped_approval_rules.all?(&:approved?)
+      end
     end
   end
 
@@ -64,7 +72,11 @@ class ApprovalState
   # considered approved.
   def approvals_left
     strong_memoize(:approvals_left) do
-      wrapped_approval_rules.sum(&:approvals_left)
+      if regular_rules.empty?
+        [overall_approvals_required - approved_approvers.size, 0].max
+      else
+        wrapped_approval_rules.sum(&:approvals_left)
+      end
     end
   end
 

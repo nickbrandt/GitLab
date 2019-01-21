@@ -170,8 +170,8 @@ describe ApprovalState do
               project.update(approvals_before_merge: 3)
             end
 
-            it 'returns false' do
-              expect(subject.approved?).to eq(false)
+            it 'returns true as overall approvals_required is ignored' do
+              expect(subject.approved?).to eq(true)
             end
           end
         end
@@ -714,8 +714,8 @@ describe ApprovalState do
               project.update(approvals_before_merge: 3)
             end
 
-            it 'returns false' do
-              expect(subject.approved?).to eq(false)
+            it 'returns true as overall approvals_required is ignored' do
+              expect(subject.approved?).to eq(true)
             end
           end
         end
