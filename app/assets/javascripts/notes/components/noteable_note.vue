@@ -218,6 +218,7 @@ export default {
     <div class="timeline-content">
       <div class="note-header">
         <note-header v-once :author="author" :created-at="note.created_at" :note-id="note.id">
+          <slot slot="note-header-info" name="note-header-info"></slot>
           <span v-if="commit">
             {{ s__('MergeRequests|commented on commit ')
             }}<a class="commit-sha monospace" :href="commit.url">{{ truncatedHash }}</a>
