@@ -7,7 +7,7 @@ module Vulnerabilities
 
     self.table_name = "vulnerability_occurrences"
 
-    paginates_per 10
+    paginates_per 20
 
     # Used for both severity and confidence
     LEVELS = {

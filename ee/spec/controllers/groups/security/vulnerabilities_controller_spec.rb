@@ -79,7 +79,7 @@ describe Groups::Security::VulnerabilitiesController do
           end
 
           it "returns a list of vulnerabilities" do
-            get :index, params: { group_id: group, page: 3 }, format: :json
+            get :index, params: { group_id: group, page: 2 }, format: :json
 
             expect(response).to have_gitlab_http_status(200)
             expect(json_response).to be_an(Array)
