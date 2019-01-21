@@ -73,7 +73,7 @@ describe 'layouts/_head' do
 
     it 'add a snowplow script tag with asset host' do
       render
-      expect(rendered).to match('http://test.host/assets/shared/snowplow/')
+      expect(rendered).to match('http://test.host/assets/snowplow/')
       expect(rendered).to match('window.snowplow')
       expect(rendered).to match('www.snow.plow')
     end
