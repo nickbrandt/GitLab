@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Projects::MergeRequests::ApplicationController < Projects::ApplicationController
-  prepend ::EE::Projects::MergeRequests::ApplicationController
-
   before_action :check_merge_requests_available!
   before_action :merge_request
   before_action :authorize_read_merge_request!
@@ -46,3 +44,5 @@ class Projects::MergeRequests::ApplicationController < Projects::ApplicationCont
     @statuses_count = @pipeline.present? ? @pipeline.statuses.relevant.count : 0
   end
 end
+
+Projects::MergeRequests::ApplicationController.prepend(EE::Projects::MergeRequests::ApplicationController)

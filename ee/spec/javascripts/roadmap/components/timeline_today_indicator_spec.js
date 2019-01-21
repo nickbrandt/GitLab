@@ -2,10 +2,14 @@ import Vue from 'vue';
 
 import timelineTodayIndicatorComponent from 'ee/roadmap/components/timeline_today_indicator.vue';
 import eventHub from 'ee/roadmap/event_hub';
+import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
+
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeMonths } from '../mock_data';
+import { mockTimeframeInitialDate } from '../mock_data';
+
+const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
 const mockCurrentDate = new Date(
   mockTimeframeMonths[0].getFullYear(),
@@ -53,29 +57,33 @@ describe('TimelineTodayIndicatorComponent', () => {
         const stylesObj = vm.todayBarStyles;
 
         expect(stylesObj.height).toBe('120px');
-        expect(stylesObj.left).toBe('48%');
+        expect(stylesObj.left).toBe('50%');
         expect(vm.todayBarReady).toBe(true);
       });
     });
   });
 
   describe('mounted', () => {
-    it('binds `epicsListRendered` event listener via eventHub', () => {
+    it('binds `epicsListRendered`, `epicsListScrolled` and `refreshTimeline` event listeners via eventHub', () => {
       spyOn(eventHub, '$on');
       const vmX = createComponent({});
 
       expect(eventHub.$on).toHaveBeenCalledWith('epicsListRendered', jasmine.any(Function));
+      expect(eventHub.$on).toHaveBeenCalledWith('epicsListScrolled', jasmine.any(Function));
+      expect(eventHub.$on).toHaveBeenCalledWith('refreshTimeline', jasmine.any(Function));
       vmX.$destroy();
     });
   });
 
   describe('beforeDestroy', () => {
-    it('unbinds `epicsListRendered` event listener via eventHub', () => {
+    it('unbinds `epicsListRendered`, `epicsListScrolled` and `refreshTimeline` event listeners via eventHub', () => {
       spyOn(eventHub, '$off');
       const vmX = createComponent({});
       vmX.$destroy();
 
       expect(eventHub.$off).toHaveBeenCalledWith('epicsListRendered', jasmine.any(Function));
+      expect(eventHub.$off).toHaveBeenCalledWith('epicsListScrolled', jasmine.any(Function));
+      expect(eventHub.$off).toHaveBeenCalledWith('refreshTimeline', jasmine.any(Function));
     });
   });
 

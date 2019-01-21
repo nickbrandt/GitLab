@@ -4,7 +4,7 @@
 # class return an instance of `GitlabAccessStatus`
 module Gitlab
   class GitAccess
-    prepend ::EE::Gitlab::GitAccess
+    prepend ::EE::Gitlab::GitAccess # rubocop: disable Cop/InjectEnterpriseEditionModule
     include ActionView::Helpers::SanitizeHelper
     include PathLocksHelper
     include Gitlab::Utils::StrongMemoize

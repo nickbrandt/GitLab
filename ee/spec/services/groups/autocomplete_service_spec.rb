@@ -122,9 +122,6 @@ describe Groups::AutocompleteService do
       let(:public_subgroup) { create(:group, :public, parent: public_group) }
 
       before do
-        public_subgroup.add_guest(user)
-        public_group.add_guest(user)
-
         group_milestone.update(group: public_group)
         subgroup_milestone.update(group: public_subgroup)
       end

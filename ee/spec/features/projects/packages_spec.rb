@@ -56,6 +56,14 @@ describe 'Packages' do
       expect(page).to have_content(package.version)
     end
 
+    it 'hides a package without a version from the list' do
+      package.update!(version: nil)
+
+      visit_project_packages
+
+      expect(page).not_to have_content(package.name)
+    end
+
     it 'shows a single package' do
       click_on package.name
 

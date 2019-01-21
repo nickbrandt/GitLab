@@ -1567,6 +1567,9 @@ msgstr ""
 msgid "Can't find HEAD commit for this branch"
 msgstr ""
 
+msgid "Canary Deployments is a popular CI strategy, where a small portion of the fleet is updated to the new version of your application."
+msgstr ""
+
 msgid "Cancel"
 msgstr ""
 
@@ -1850,6 +1853,9 @@ msgid "Closed"
 msgstr ""
 
 msgid "Closed issues"
+msgstr ""
+
+msgid "ClusterIntegration| is the default environment scope for this cluster. This means that all jobs, regardless of their environment, will use this cluster. %{environment_scope_start}More information%{environment_scope_end}"
 msgstr ""
 
 msgid "ClusterIntegration|%{appList} was successfully installed on your Kubernetes cluster"
@@ -2476,6 +2482,9 @@ msgid "Connect your external repositories, and CI/CD pipelines will run for new 
 msgstr ""
 
 msgid "Connecting..."
+msgstr ""
+
+msgid "Contact sales to upgrade"
 msgstr ""
 
 msgid "Container Registry"
@@ -3740,9 +3749,6 @@ msgstr ""
 msgid "FeatureFlags|Create feature flag"
 msgstr ""
 
-msgid "FeatureFlags|Delete %{feature_flag_name}?"
-msgstr ""
-
 msgid "FeatureFlags|Delete %{name}?"
 msgstr ""
 
@@ -3758,13 +3764,13 @@ msgstr ""
 msgid "FeatureFlags|Edit Feature Flag"
 msgstr ""
 
+msgid "FeatureFlags|Environment Specs"
+msgstr ""
+
 msgid "FeatureFlags|Feature Flag"
 msgstr ""
 
-msgid "FeatureFlags|Feature flag"
-msgstr ""
-
-msgid "FeatureFlags|Feature flag %{feature_flag_name} will be removed. Are you sure?"
+msgid "FeatureFlags|Feature Flags"
 msgstr ""
 
 msgid "FeatureFlags|Feature flag %{name} will be removed. Are you sure?"
@@ -4535,22 +4541,10 @@ msgstr ""
 msgid "GroupRoadmap|The roadmap shows the progress of your epics along a timeline"
 msgstr ""
 
-msgid "GroupRoadmap|To view the roadmap, add a start or due date to one of your epics in this group or its subgroups. In the months view, only epics in the past month, current month, and next 5 months are shown &ndash; from %{startDate} to %{endDate}."
+msgid "GroupRoadmap|To view the roadmap, add a start or due date to one of your epics in this group or its subgroups; from %{startDate} to %{endDate}."
 msgstr ""
 
-msgid "GroupRoadmap|To view the roadmap, add a start or due date to one of your epics in this group or its subgroups. In the quarters view, only epics in the past quarter, current quarter, and next 4 quarters are shown &ndash; from %{startDate} to %{endDate}."
-msgstr ""
-
-msgid "GroupRoadmap|To view the roadmap, add a start or due date to one of your epics in this group or its subgroups. In the weeks view, only epics in the past week, current week, and next 4 weeks are shown &ndash; from %{startDate} to %{endDate}."
-msgstr ""
-
-msgid "GroupRoadmap|To widen your search, change or remove filters. In the months view, only epics in the past month, current month, and next 5 months are shown &ndash; from %{startDate} to %{endDate}."
-msgstr ""
-
-msgid "GroupRoadmap|To widen your search, change or remove filters. In the quarters view, only epics in the past quarter, current quarter, and next 4 quarters are shown &ndash; from %{startDate} to %{endDate}."
-msgstr ""
-
-msgid "GroupRoadmap|To widen your search, change or remove filters. In the weeks view, only epics in the past week, current week, and next 4 weeks are shown &ndash; from %{startDate} to %{endDate}."
+msgid "GroupRoadmap|To widen your search, change or remove filters; from %{startDate} to %{endDate}."
 msgstr ""
 
 msgid "GroupRoadmap|Until %{dateWord}"
@@ -4907,6 +4901,9 @@ msgid "In order to enable instance-level analytics, please ask an admin to enabl
 msgstr ""
 
 msgid "In the next step, you'll be able to select the projects you want to import."
+msgstr ""
+
+msgid "Inactive flag for %{scope}"
 msgstr ""
 
 msgid "Include a Terms of Service agreement and Privacy Policy that all users must accept."
@@ -6483,6 +6480,9 @@ msgid "Permissions, LFS, 2FA"
 msgstr ""
 
 msgid "Personal Access Token"
+msgstr ""
+
+msgid "Personal project creation is not allowed. Please contact your administrator with questions"
 msgstr ""
 
 msgid "Pick a name"
@@ -9804,6 +9804,9 @@ msgstr ""
 msgid "Updating"
 msgstr ""
 
+msgid "Upgrade plan to unlock Canary Deployments feature"
+msgstr ""
+
 msgid "Upgrade your plan to activate Advanced Global Search."
 msgstr ""
 
@@ -10504,6 +10507,9 @@ msgid "Your issues will be imported in the background. Once finished, you'll get
 msgstr ""
 
 msgid "Your name"
+msgstr ""
+
+msgid "Your project limit is %{limit} projects! Please contact your administrator to increase it"
 msgstr ""
 
 msgid "Your projects"

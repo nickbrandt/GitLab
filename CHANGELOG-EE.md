@@ -1,5 +1,16 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.6.5 (2019-01-17)
+
+### Fixed (1 change)
+
+- Fix Error 500 when deleting a pipeline via the API. !9104
+
+
+## 11.6.4 (2019-01-15)
+
+- No changes.
+
 ## 11.6.3 (2019-01-04)
 
 ### Fixed (1 change)

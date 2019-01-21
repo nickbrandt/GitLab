@@ -1,11 +1,13 @@
 import Vue from 'vue';
 
 import WeeksHeaderItemComponent from 'ee/roadmap/components/preset_weeks/weeks_header_item.vue';
+import { getTimeframeForWeeksView } from 'ee/roadmap/utils/roadmap_utils';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeWeeks, mockShellWidth, mockItemWidth } from 'ee_spec/roadmap/mock_data';
+import { mockTimeframeInitialDate, mockShellWidth, mockItemWidth } from 'ee_spec/roadmap/mock_data';
 
 const mockTimeframeIndex = 0;
+const mockTimeframeWeeks = getTimeframeForWeeksView(mockTimeframeInitialDate);
 
 const createComponent = ({
   timeframeIndex = mockTimeframeIndex,
@@ -38,9 +40,6 @@ describe('WeeksHeaderItemComponent', () => {
       const currentDate = new Date();
 
       expect(vm.currentDate.getDate()).toBe(currentDate.getDate());
-      expect(vm.lastDayOfCurrentWeek.getDate()).toBe(
-        mockTimeframeWeeks[mockTimeframeIndex].getDate() + 7,
-      );
     });
   });
 
@@ -53,20 +52,37 @@ describe('WeeksHeaderItemComponent', () => {
       });
     });
 
+    describe('lastDayOfCurrentWeek', () => {
+      it('returns date object representing last day of the week as set in `timeframeItem`', () => {
+        expect(vm.lastDayOfCurrentWeek.getDate()).toBe(
+          mockTimeframeWeeks[mockTimeframeIndex].getDate() + 7,
+        );
+      });
+    });
+
     describe('timelineHeaderLabel', () => {
-      it('returns string containing Year, Month and Date for current timeline header item', () => {
+      it('returns string containing Year, Month and Date for first timeframe item of the entire timeframe', () => {
         vm = createComponent({});
 
-        expect(vm.timelineHeaderLabel).toBe('2017 Dec 24');
+        expect(vm.timelineHeaderLabel).toBe('2017 Dec 17');
       });
 
-      it('returns string containing only Month and Date for current timeline header item when previous header contained Year', () => {
+      it('returns string containing Year, Month and Date for timeframe item when it is first week of the year', () => {
+        vm = createComponent({
+          timeframeIndex: 3,
+          timeframeItem: new Date(2019, 0, 6),
+        });
+
+        expect(vm.timelineHeaderLabel).toBe('2019 Jan 6');
+      });
+
+      it('returns string containing only Month and Date timeframe item when it is somewhere in the middle of timeframe', () => {
         vm = createComponent({
           timeframeIndex: mockTimeframeIndex + 1,
           timeframeItem: mockTimeframeWeeks[mockTimeframeIndex + 1],
         });
 
-        expect(vm.timelineHeaderLabel).toBe('Dec 31');
+        expect(vm.timelineHeaderLabel).toBe('Dec 24');
       });
     });
 
@@ -112,7 +128,7 @@ describe('WeeksHeaderItemComponent', () => {
       const itemLabelEl = vm.$el.querySelector('.item-label');
 
       expect(itemLabelEl).not.toBeNull();
-      expect(itemLabelEl.innerText.trim()).toBe('2017 Dec 24');
+      expect(itemLabelEl.innerText.trim()).toBe('2017 Dec 17');
     });
   });
 });

@@ -1,10 +1,12 @@
 import Vue from 'vue';
 
 import MonthsHeaderItemComponent from 'ee/roadmap/components/preset_months/months_header_item.vue';
+import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeMonths, mockShellWidth, mockItemWidth } from 'ee_spec/roadmap/mock_data';
+import { mockTimeframeInitialDate, mockShellWidth, mockItemWidth } from 'ee_spec/roadmap/mock_data';
 
+const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 const mockTimeframeIndex = 0;
 
 const createComponent = ({
@@ -56,7 +58,7 @@ describe('MonthsHeaderItemComponent', () => {
       it('returns string containing Year and Month for current timeline header item', () => {
         vm = createComponent({});
 
-        expect(vm.timelineHeaderLabel).toBe('2017 Dec');
+        expect(vm.timelineHeaderLabel).toBe('2017 Nov');
       });
 
       it('returns string containing only Month for current timeline header item when previous header contained Year', () => {
@@ -65,7 +67,7 @@ describe('MonthsHeaderItemComponent', () => {
           timeframeItem: mockTimeframeMonths[mockTimeframeIndex + 1],
         });
 
-        expect(vm.timelineHeaderLabel).toBe('2018 Jan');
+        expect(vm.timelineHeaderLabel).toBe('Dec');
       });
     });
 
@@ -117,7 +119,7 @@ describe('MonthsHeaderItemComponent', () => {
       const itemLabelEl = vm.$el.querySelector('.item-label');
 
       expect(itemLabelEl).not.toBeNull();
-      expect(itemLabelEl.innerText.trim()).toBe('2017 Dec');
+      expect(itemLabelEl.innerText.trim()).toBe('2017 Nov');
     });
   });
 });

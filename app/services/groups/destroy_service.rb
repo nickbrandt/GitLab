@@ -2,7 +2,7 @@
 
 module Groups
   class DestroyService < Groups::BaseService
-    prepend ::EE::Groups::DestroyService
+    prepend ::EE::Groups::DestroyService # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     DestroyError = Class.new(StandardError)
 

@@ -11,7 +11,7 @@ export default {
     Icon,
   },
   directives: {
-    GlModal: GlModalDirective,
+    GlModalDirective,
     GlTooltip: GlTooltipDirective,
   },
   props: {
@@ -64,7 +64,7 @@ export default {
   <div class="d-inline-block">
     <gl-button
       v-gl-tooltip.hover.bottom="__('Delete')"
-      v-gl-modal="modalId"
+      v-gl-modal-directive="modalId"
       class="js-feature-flag-delete-button"
       variant="danger"
     >

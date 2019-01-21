@@ -27,6 +27,12 @@
   pointer-events: none;
 }
 
+.dropdown-projects {
+  .dropdown-content {
+    max-height: 200px;
+  }
+}
+
 .dropdown-menu-issues-board-new {
   width: 320px;
 
@@ -204,6 +210,7 @@
   background: $gray-light;
   border: 1px solid $border-color;
   border-radius: $border-radius-default;
+  flex: 1;
 }
 
 .board-header {
@@ -266,9 +273,11 @@
 
 .board-blank-state,
 .board-promotion-state {
-  height: calc(100% - 49px);
   padding: $gl-padding;
   background-color: $white-light;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .board-promotion-state {
@@ -297,9 +306,9 @@
 }
 
 .board-list-component {
-  height: calc(100% - 49px);
-  overflow: hidden;
   position: relative;
+  flex: 1;
+  min-height: 0; // firefox fix
 }
 
 .board-list {

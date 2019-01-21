@@ -3,7 +3,7 @@
 module Groups
   class UpdateService < Groups::BaseService
     include UpdateVisibilityLevel
-    prepend ::EE::Groups::UpdateService
+    prepend ::EE::Groups::UpdateService # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     def execute
       reject_parent_id!

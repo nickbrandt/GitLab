@@ -5,7 +5,6 @@
 class Projects::GitHttpClientController < Projects::ApplicationController
   include ActionController::HttpAuthentication::Basic
   include KerberosSpnegoHelper
-  prepend ::EE::Projects::GitHttpClientController
 
   attr_reader :authentication_result, :redirected_path
 
@@ -110,3 +109,5 @@ class Projects::GitHttpClientController < Projects::ApplicationController
     authentication_result.ci?(project)
   end
 end
+
+Projects::GitHttpClientController.prepend(EE::Projects::GitHttpClientController)

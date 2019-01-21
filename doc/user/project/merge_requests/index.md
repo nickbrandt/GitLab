@@ -101,6 +101,15 @@ request widget will show the "Removes source branch" text.
 
 ![Remove source branch status](img/remove_source_branch_status.png)
 
+## Allow collaboration on merge requests across forks
+
+When a user opens a merge request from a fork, they are given the option to allow
+upstream maintainers to collaborate with them on the source branch. This allows
+the maintainers of the upstream project to make small fixes or rebase branches
+before merging, reducing the back and forth of accepting community contributions.
+
+[Learn more about allowing upstream members to push to forks.](allow_collaboration.md)
+
 ## Authorization for merge requests
 
 There are two main ways to have a merge request flow with GitLab:
@@ -343,7 +352,7 @@ a detailed information will pop up with two different possible options:
 
 - **Dismiss vulnerability** - Dismissing a vulnerability will place a <s>strikethrough</s> styling on it.
 - **Create issue** - The new issue will have the title and description
-  pre-populated with the information from the vulnerability report.
+  pre-populated with the information from the vulnerability report and is created as [confidential](../issues/confidential_issues.md) by default.
 - **Solution** - For some vulnerabilities ([Dependency Scanning](dependency_scanning.md) and [Container Scanning](container_scanning.md))
   a solution is provided for how to fix the vulnerability.
 

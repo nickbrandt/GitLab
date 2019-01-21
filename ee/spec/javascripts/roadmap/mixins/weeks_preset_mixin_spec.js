@@ -1,10 +1,14 @@
 import Vue from 'vue';
 
 import EpicItemTimelineComponent from 'ee/roadmap/components/epic_item_timeline.vue';
+import { getTimeframeForWeeksView } from 'ee/roadmap/utils/roadmap_utils';
+
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockTimeframeWeeks, mockEpic, mockShellWidth, mockItemWidth } from '../mock_data';
+import { mockTimeframeInitialDate, mockEpic, mockShellWidth, mockItemWidth } from '../mock_data';
+
+const mockTimeframeWeeks = getTimeframeForWeeksView(mockTimeframeInitialDate);
 
 const createComponent = ({
   presetType = PRESET_TYPES.WEEKS,
@@ -59,7 +63,7 @@ describe('WeeksPresetMixin', () => {
         vm = createComponent({});
         const lastDayOfWeek = vm.getLastDayOfWeek(mockTimeframeWeeks[0]);
 
-        expect(lastDayOfWeek.getDate()).toBe(30);
+        expect(lastDayOfWeek.getDate()).toBe(23);
         expect(lastDayOfWeek.getMonth()).toBe(11);
         expect(lastDayOfWeek.getFullYear()).toBe(2017);
       });
@@ -95,14 +99,6 @@ describe('WeeksPresetMixin', () => {
       });
     });
 
-    describe('getTimelineBarEndOffsetHalfForWeek', () => {
-      it('returns timeline bar end offset for Weeks view', () => {
-        vm = createComponent({});
-
-        expect(vm.getTimelineBarEndOffsetHalfForWeek()).toBe(28);
-      });
-    });
-
     describe('getTimelineBarStartOffsetForWeeks', () => {
       it('returns empty string when Epic startDate is out of range', () => {
         vm = createComponent({
@@ -133,19 +129,6 @@ describe('WeeksPresetMixin', () => {
         expect(vm.getTimelineBarStartOffsetForWeeks()).toBe('left: 0;');
       });
 
-      it('returns `right: 8px;` when Epic startDate is in last timeframe month and endDate is out of range', () => {
-        const startDate = new Date(mockTimeframeWeeks[mockTimeframeWeeks.length - 1].getTime());
-        startDate.setDate(startDate.getDate() + 1);
-        vm = createComponent({
-          epic: Object.assign({}, mockEpic, {
-            startDate,
-            endDateOutOfRange: true,
-          }),
-        });
-
-        expect(vm.getTimelineBarStartOffsetForWeeks()).toBe('right: 8px;');
-      });
-
       it('returns proportional `left` value based on Epic startDate and days in the month', () => {
         vm = createComponent({
           epic: Object.assign({}, mockEpic, {
@@ -153,7 +136,7 @@ describe('WeeksPresetMixin', () => {
           }),
         });
 
-        expect(vm.getTimelineBarStartOffsetForWeeks()).toContain('left: 60');
+        expect(vm.getTimelineBarStartOffsetForWeeks()).toContain('left: 51');
       });
     });
 
@@ -168,7 +151,7 @@ describe('WeeksPresetMixin', () => {
           }),
         });
 
-        expect(Math.floor(vm.getTimelineBarWidthForWeeks())).toBe(1600);
+        expect(Math.floor(vm.getTimelineBarWidthForWeeks())).toBe(1611);
       });
     });
   });

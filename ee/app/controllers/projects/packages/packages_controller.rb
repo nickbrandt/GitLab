@@ -8,7 +8,7 @@ module Projects
       before_action :authorize_destroy_package!, only: [:destroy]
 
       def index
-        @packages = project.packages.all.page(params[:page])
+        @packages = project.packages.has_version.page(params[:page])
       end
 
       def show

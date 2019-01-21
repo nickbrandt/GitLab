@@ -1030,19 +1030,6 @@ describe Projects::IssuesController do
     let(:project) { create(:project, :public) }
     let(:file) { fixture_file_upload('spec/fixtures/csv_comma.csv') }
 
-    context 'feature disabled' do
-      it 'returns 404' do
-        sign_in(user)
-        project.add_maintainer(user)
-
-        stub_feature_flags(issues_import_csv: false)
-
-        import_csv
-
-        expect(response).to have_gitlab_http_status :not_found
-      end
-    end
-
     context 'unauthorized' do
       it 'returns 404 for guests' do
         sign_out(:user)
@@ -1131,6 +1118,7 @@ describe Projects::IssuesController do
 
       context 'when user is setting notes filters' do
         let(:issuable) { issue }
+        let(:issuable_parent) { project }
         let!(:discussion_note) { create(:discussion_note_on_issue, :system, noteable: issuable, project: project) }
 
         it_behaves_like 'issuable notes filter'

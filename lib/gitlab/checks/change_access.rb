@@ -3,7 +3,7 @@
 module Gitlab
   module Checks
     class ChangeAccess
-      prepend EE::Gitlab::Checks::ChangeAccess
+      prepend EE::Gitlab::Checks::ChangeAccess # rubocop: disable Cop/InjectEnterpriseEditionModule
 
       ATTRIBUTES = %i[user_access project skip_authorization
                       skip_lfs_integrity_check protocol oldrev newrev ref

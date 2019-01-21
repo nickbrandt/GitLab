@@ -2,7 +2,6 @@ import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
 
 // ee-only
 import { CLUSTER_TYPE } from '~/clusters/constants';
-
 /**
  * Environments Store.
  *
@@ -95,6 +94,19 @@ export default class EnvironmentsStore {
     });
 
     this.state.environments = filteredEnvironments;
+
+    // ee-only start
+    /**
+     * Add the canary callout banner underneath the second environment listed.
+     *
+     * If there is only one environment, then add to it underneath the first.
+     */
+    if (this.state.environments.length >= 2) {
+      this.state.environments[1].showCanaryCallout = true;
+    } else if (this.state.environments.length === 1) {
+      this.state.environments[0].showCanaryCallout = true;
+    }
+    // ee-only end
 
     return filteredEnvironments;
   }
@@ -222,7 +234,9 @@ export default class EnvironmentsStore {
       let updated = Object.assign({}, env);
 
       if (env.id === environmentID) {
-        updated = Object.assign({}, updated, { isDeployBoardVisible: !env.isDeployBoardVisible });
+        updated = Object.assign({}, updated, {
+          isDeployBoardVisible: !env.isDeployBoardVisible,
+        });
       }
       return updated;
     });

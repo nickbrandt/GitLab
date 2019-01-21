@@ -7,7 +7,7 @@ module Projects
     class MigrateAttachmentsService < BaseService
       attr_reader :logger, :old_disk_path, :new_disk_path
 
-      prepend ::EE::Projects::HashedStorage::MigrateAttachmentsService
+      prepend ::EE::Projects::HashedStorage::MigrateAttachmentsService # rubocop: disable Cop/InjectEnterpriseEditionModule
 
       def initialize(project, old_disk_path, logger: nil)
         @project = project

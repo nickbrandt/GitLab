@@ -5,23 +5,9 @@ module Gitlab
     module Parsers
       module Security
         class ContainerScanning < Common
-          extend ::Gitlab::Utils::Override
+          include Security::Concerns::DeprecatedSyntax
 
           DEPRECATED_REPORT_VERSION = "1.3".freeze
-
-          override :parse_report
-          def parse_report(json_data)
-            report = super
-
-            if report.is_a?(Array)
-              report = {
-                  "version" => DEPRECATED_REPORT_VERSION,
-                  "vulnerabilities" => report
-              }
-            end
-
-            report
-          end
 
           def parse!(json_data, report)
             vulnerabilities = format_report(JSON.parse!(json_data))

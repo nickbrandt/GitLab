@@ -8,8 +8,6 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
   include ToggleAwardEmoji
   include IssuableCollections
 
-  prepend ::EE::Projects::MergeRequestsController
-
   skip_before_action :merge_request, only: [:index, :bulk_update]
   before_action :whitelist_query_limiting, only: [:assign_related_issues, :update]
   before_action :authorize_update_issuable!, only: [:close, :edit, :update, :remove_wip, :sort]
@@ -349,3 +347,5 @@ class Projects::MergeRequestsController < Projects::MergeRequests::ApplicationCo
     Gitlab::QueryLimiting.whitelist('https://gitlab.com/gitlab-org/gitlab-ce/issues/42438')
   end
 end
+
+Projects::MergeRequestsController.prepend(EE::Projects::MergeRequestsController)

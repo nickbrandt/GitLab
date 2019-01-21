@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Projects::PipelinesController < Projects::ApplicationController
-  prepend ::EE::Projects::PipelinesController
-
   before_action :whitelist_query_limiting, only: [:create, :retry]
   before_action :pipeline, except: [:index, :new, :create, :charts]
   before_action :authorize_read_pipeline!
@@ -188,3 +186,5 @@ class Projects::PipelinesController < Projects::ApplicationController
     view_context.limited_counter_with_delimiter(finder.execute)
   end
 end
+
+Projects::PipelinesController.prepend(EE::Projects::PipelinesController)

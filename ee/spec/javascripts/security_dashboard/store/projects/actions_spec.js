@@ -49,6 +49,33 @@ describe('projects actions', () => {
       });
     });
 
+    describe('calls the API multiple times if there is a next page', () => {
+      beforeEach(() => {
+        mock
+          .onGet(state.projectsEndpoint, { page: '1' })
+          .replyOnce(200, [1], { 'x-next-page': '2' });
+
+        mock.onGet(state.projectsEndpoint, { page: '2' }).replyOnce(200, [2]);
+      });
+
+      it('should dispatch the request and success actions', done => {
+        testAction(
+          actions.fetchProjects,
+          {},
+          state,
+          [],
+          [
+            { type: 'requestProjects' },
+            {
+              type: 'receiveProjectsSuccess',
+              payload: { projects: [1, 2] },
+            },
+          ],
+          done,
+        );
+      });
+    });
+
     describe('on error', () => {
       beforeEach(() => {
         mock.onGet(state.projectsEndpoint).replyOnce(404, {});

@@ -2,7 +2,7 @@
 
 module Gitlab
   class OmniauthInitializer
-    prepend ::EE::Gitlab::OmniauthInitializer
+    prepend ::EE::Gitlab::OmniauthInitializer # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     def initialize(devise_config)
       @devise_config = devise_config

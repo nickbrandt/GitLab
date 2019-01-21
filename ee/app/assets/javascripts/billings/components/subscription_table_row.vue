@@ -33,7 +33,10 @@ export default {
     },
     getDisplayValue(col) {
       if (col.isDate && col.value) {
-        return dateInWords(new Date(col.value));
+        const [year, month, day] = col.value.split('-');
+
+        // create UTC date (prevent date from being converted to local timezone)
+        return dateInWords(new Date(year, month - 1, day));
       }
 
       // let's display '-' instead of 0 for the 'Free' plan

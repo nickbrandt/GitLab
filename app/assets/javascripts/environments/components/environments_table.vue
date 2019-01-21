@@ -3,15 +3,21 @@
  * Render environments table.
  */
 import { GlLoadingIcon } from '@gitlab/ui';
-import environmentItem from './environment_item.vue';
+import environmentItem from './environment_item.vue'; // eslint-disable-line import/order
 
-import deployBoard from 'ee/environments/components/deploy_board_component.vue'; // eslint-disable-line import/order
+// ee-only start
+import deployBoard from 'ee/environments/components/deploy_board_component.vue';
+import CanaryDeploymentCallout from 'ee/environments/components/canary_deployment_callout.vue';
+// ee-only end
 
 export default {
   components: {
     environmentItem,
     deployBoard,
     GlLoadingIcon,
+    // ee-only start
+    CanaryDeploymentCallout,
+    // ee-only end
   },
 
   props: {
@@ -32,6 +38,33 @@ export default {
       required: false,
       default: false,
     },
+
+    // ee-only start
+    canaryDeploymentFeatureId: {
+      type: String,
+      required: true,
+    },
+
+    showCanaryDeploymentCallout: {
+      type: Boolean,
+      required: true,
+    },
+
+    userCalloutsPath: {
+      type: String,
+      required: true,
+    },
+
+    lockPromotionSvgPath: {
+      type: String,
+      required: true,
+    },
+
+    helpCanaryDeploymentsPath: {
+      type: String,
+      required: true,
+    },
+    // ee-only end
   },
   methods: {
     folderUrl(model) {
@@ -40,6 +73,11 @@ export default {
     shouldRenderFolderContent(env) {
       return env.isFolder && env.isOpen && env.children && env.children.length > 0;
     },
+    // ee-only start
+    shouldShowCanaryCallout(env) {
+      return env.showCanaryCallout && this.showCanaryDeploymentCallout;
+    },
+    // ee-only end
   },
 };
 </script>
@@ -109,6 +147,17 @@ export default {
             </div>
           </div>
         </template>
+      </template>
+
+      <template v-if="shouldShowCanaryCallout(model)">
+        <canary-deployment-callout
+          :key="`canary-promo-${i}`"
+          :canary-deployment-feature-id="canaryDeploymentFeatureId"
+          :user-callouts-path="userCalloutsPath"
+          :lock-promotion-svg-path="lockPromotionSvgPath"
+          :help-canary-deployments-path="helpCanaryDeploymentsPath"
+          :data-js-canary-promo-key="i"
+        />
       </template>
     </template>
   </div>

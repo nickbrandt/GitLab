@@ -7,7 +7,7 @@
 #
 module Gitlab
   module Access
-    extend ::EE::Gitlab::Access
+    extend ::EE::Gitlab::Access # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     AccessDeniedError = Class.new(StandardError)
 

@@ -46,7 +46,7 @@ describe Projects::UpdateRepositoryStorageService do
       end
     end
 
-    context 'with wiki', :disable_gitaly do
+    context 'with wiki' do
       let(:project) { create(:project, :repository, repository_read_only: true, wiki_enabled: true) }
       let(:repository_double) { double(:repository) }
       let(:wiki_repository_double) { double(:repository) }
@@ -103,6 +103,19 @@ describe Projects::UpdateRepositoryStorageService do
           expect(project).not_to be_repository_read_only
           expect(project.repository_storage).to eq('default')
         end
+      end
+    end
+
+    context 'when a object pool was joined' do
+      let(:project) { create(:project, :repository, wiki_enabled: false, repository_read_only: true) }
+      let(:pool) { create(:pool_repository, :ready, source_project: project) }
+
+      it 'leaves the pool' do
+        allow_any_instance_of(Gitlab::Git::Repository).to receive(:fetch_repository_as_mirror).and_return(true)
+
+        subject.execute('test_second_storage')
+
+        expect(project.reload_pool_repository).to be_nil
       end
     end
   end

@@ -2,11 +2,14 @@ import Vue from 'vue';
 
 import roadmapTimelineSectionComponent from 'ee/roadmap/components/roadmap_timeline_section.vue';
 import eventHub from 'ee/roadmap/event_hub';
+import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockEpic, mockTimeframeMonths, mockShellWidth } from '../mock_data';
+import { mockEpic, mockTimeframeInitialDate, mockShellWidth } from '../mock_data';
+
+const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
 const createComponent = ({
   presetType = PRESET_TYPES.MONTHS,

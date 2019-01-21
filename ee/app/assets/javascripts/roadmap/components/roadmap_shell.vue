@@ -1,6 +1,7 @@
 <script>
 import bp from '~/breakpoints';
-import { SCROLL_BAR_SIZE, EPIC_ITEM_HEIGHT, SHELL_MIN_WIDTH } from '../constants';
+import { isInViewport } from '~/lib/utils/common_utils';
+import { SCROLL_BAR_SIZE, EPIC_ITEM_HEIGHT, SHELL_MIN_WIDTH, EXTEND_AS } from '../constants';
 import eventHub from '../event_hub';
 
 import epicsListSection from './epics_list_section.vue';
@@ -34,6 +35,7 @@ export default {
       shellWidth: 0,
       shellHeight: 0,
       noScroll: false,
+      timeframeStartOffset: 0,
     };
   },
   computed: {
@@ -61,6 +63,11 @@ export default {
         this.shellHeight = window.innerHeight - this.$el.offsetTop;
         this.noScroll = this.shellHeight > EPIC_ITEM_HEIGHT * (this.epics.length + 1);
         this.shellWidth = this.$el.parentElement.clientWidth + this.getWidthOffset();
+
+        this.timeframeStartOffset = this.$refs.roadmapTimeline.$el
+          .querySelector('.timeline-header-item')
+          .querySelector('.item-sublabel .sublabel-value:first-child')
+          .getBoundingClientRect().left;
       }
     });
   },
@@ -70,6 +77,22 @@ export default {
     },
     handleScroll() {
       const { scrollTop, scrollLeft, clientHeight, scrollHeight } = this.$el;
+      const timelineEdgeStartEl = this.$refs.roadmapTimeline.$el
+        .querySelector('.timeline-header-item')
+        .querySelector('.item-sublabel .sublabel-value:first-child');
+      const timelineEdgeEndEl = this.$refs.roadmapTimeline.$el
+        .querySelector('.timeline-header-item:last-child')
+        .querySelector('.item-sublabel .sublabel-value:last-child');
+
+      // If timeline was scrolled to start
+      if (isInViewport(timelineEdgeStartEl, { left: this.timeframeStartOffset })) {
+        this.$emit('onScrollToStart', this.$refs.roadmapTimeline.$el, EXTEND_AS.PREPEND);
+      } else if (isInViewport(timelineEdgeEndEl)) {
+        // If timeline was scrolled to end
+        this.$emit('onScrollToEnd', this.$refs.roadmapTimeline.$el, EXTEND_AS.APPEND);
+      }
+
+      this.noScroll = this.shellHeight > EPIC_ITEM_HEIGHT * (this.epics.length + 1);
       eventHub.$emit('epicsListScrolled', { scrollTop, scrollLeft, clientHeight, scrollHeight });
     },
   },
@@ -84,6 +107,7 @@ export default {
     @scroll="handleScroll"
   >
     <roadmap-timeline-section
+      ref="roadmapTimeline"
       :preset-type="presetType"
       :epics="epics"
       :timeframe="timeframe"

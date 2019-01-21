@@ -29,8 +29,6 @@ export default {
 
     return {
       currentDate,
-      quarterBeginDate: this.timeframeItem.range[0],
-      quarterEndDate: this.timeframeItem.range[2],
     };
   },
   computed: {
@@ -38,6 +36,12 @@ export default {
       return {
         width: `${this.itemWidth}px`,
       };
+    },
+    quarterBeginDate() {
+      return this.timeframeItem.range[0];
+    },
+    quarterEndDate() {
+      return this.timeframeItem.range[2];
     },
     timelineHeaderLabel() {
       const { quarterSequence } = this.timeframeItem;

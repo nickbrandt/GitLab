@@ -1,11 +1,19 @@
 import Vue from 'vue';
 
 import roadmapTimelineSectionComponent from 'ee/roadmap/components/roadmap_timeline_section.vue';
+import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockEpic, mockTimeframeMonths, mockShellWidth, mockScrollBarSize } from '../mock_data';
+import {
+  mockEpic,
+  mockTimeframeInitialDate,
+  mockShellWidth,
+  mockScrollBarSize,
+} from '../mock_data';
+
+const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
 const createComponent = ({
   presetType = PRESET_TYPES.MONTHS,
@@ -52,7 +60,7 @@ describe('SectionMixin', () => {
 
     describe('sectionItemWidth', () => {
       it('returns calculated item width based on sectionShellWidth and timeframe size', () => {
-        expect(vm.sectionItemWidth).toBe(240);
+        expect(vm.sectionItemWidth).toBe(210);
       });
     });
 

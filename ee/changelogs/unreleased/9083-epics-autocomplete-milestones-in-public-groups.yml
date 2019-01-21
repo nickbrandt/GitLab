@@ -1,0 +1,5 @@
+---
+title: Fix public group milestones not shown in epics autocomplete
+merge_request: 9068
+author:
+type: fixed

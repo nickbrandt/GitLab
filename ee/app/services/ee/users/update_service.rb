@@ -3,7 +3,7 @@
 module EE
   module Users
     module UpdateService
-      include EE::Audit::Changes
+      include EE::Audit::Changes # rubocop: disable Cop/InjectEnterpriseEditionModule
 
       private
 

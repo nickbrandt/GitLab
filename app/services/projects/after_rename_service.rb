@@ -12,7 +12,7 @@ module Projects
   #
   #     Projects::AfterRenameService.new(project).execute
   class AfterRenameService
-    prepend ::EE::Projects::AfterRenameService
+    prepend ::EE::Projects::AfterRenameService # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     attr_reader :project, :full_path_before, :full_path_after, :path_before
 

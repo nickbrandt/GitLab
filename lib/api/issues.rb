@@ -17,7 +17,7 @@ module API
       end
     end
 
-    prepend EE::API::Issues
+    prepend EE::API::Issues # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     helpers do
       # rubocop: disable CodeReuse/ActiveRecord

@@ -93,6 +93,7 @@ describe 'Dashboard Projects' do
       visit dashboard_projects_path
 
       expect(page).to have_content(project.name)
+      expect(find('.nav-links li:nth-child(1) .badge-pill')).to have_content(1)
     end
 
     it 'shows personal projects on personal projects tab', :js do
@@ -123,6 +124,8 @@ describe 'Dashboard Projects' do
 
       expect(page).not_to have_content(project.name)
       expect(page).to have_content(project2.name)
+      expect(find('.nav-links li:nth-child(1) .badge-pill')).to have_content(1)
+      expect(find('.nav-links li:nth-child(2) .badge-pill')).to have_content(1)
     end
   end
 

@@ -166,10 +166,13 @@ describe Groups::EpicsController do
       before do
         sign_in(user)
         group.add_developer(user)
-        SystemNoteService.epic_issue(epic, issue, user, :added)
       end
 
       context 'when issue note is returned' do
+        before do
+          SystemNoteService.epic_issue(epic, issue, user, :added)
+        end
+
         shared_examples 'issue link presence' do
           let(:issue) { create(:issue, project: project, description: "Project Issue") }
 
@@ -196,6 +199,15 @@ describe Groups::EpicsController do
             let(:project) {create(:project, namespace: group)}
           end
         end
+      end
+
+      context 'setting notes filter' do
+        let(:issuable) { epic }
+        let(:issuable_parent) { group }
+        let!(:discussion_note) { create(:note, :system, noteable: issuable) }
+        let!(:discussion_comment) { create(:note, noteable: issuable) }
+
+        it_behaves_like 'issuable notes filter'
       end
     end
 

@@ -2,7 +2,7 @@
 
 module Users
   class BuildService < BaseService
-    prepend ::EE::Users::BuildService
+    prepend ::EE::Users::BuildService # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     delegate :user_default_internal_regex_enabled?,
              :user_default_internal_regex_instance,

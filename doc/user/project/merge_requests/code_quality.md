@@ -30,7 +30,7 @@ For instance, consider the following workflow:
 ## How it works
 
 First of all, you need to define a job in your `.gitlab-ci.yml` file that generates the
-[Code Quality report artifact](../../../ci/yaml/README.md#artifactsreportscodequality).
+[Code Quality report artifact](../../../ci/yaml/README.md#artifactsreportscodequality-starter).
 
 The Code Quality report artifact is a subset of the
 [Code Climate spec](https://github.com/codeclimate/spec/blob/master/SPEC.md#data-types).

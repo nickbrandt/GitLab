@@ -2,7 +2,6 @@
 
 class Projects::GitHttpController < Projects::GitHttpClientController
   include WorkhorseRequest
-  prepend ::EE::Projects::GitHttpController
 
   before_action :access_check
 
@@ -97,3 +96,5 @@ class Projects::GitHttpController < Projects::GitHttpClientController
     Users::ActivityService.new(user, 'pull').execute
   end
 end
+
+Projects::GitHttpController.prepend(EE::Projects::GitHttpController)

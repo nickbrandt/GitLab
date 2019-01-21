@@ -2,11 +2,14 @@ import Vue from 'vue';
 
 import roadmapShellComponent from 'ee/roadmap/components/roadmap_shell.vue';
 import eventHub from 'ee/roadmap/event_hub';
+import { getTimeframeForMonthsView } from 'ee/roadmap/utils/roadmap_utils';
 
 import { PRESET_TYPES } from 'ee/roadmap/constants';
 
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { mockEpic, mockTimeframeMonths, mockGroupId, mockScrollBarSize } from '../mock_data';
+import { mockEpic, mockTimeframeInitialDate, mockGroupId, mockScrollBarSize } from '../mock_data';
+
+const mockTimeframeMonths = getTimeframeForMonthsView(mockTimeframeInitialDate);
 
 const createComponent = (
   { epics = [mockEpic], timeframe = mockTimeframeMonths, currentGroupId = mockGroupId },
@@ -88,14 +91,29 @@ describe('RoadmapShellComponent', () => {
 
     describe('handleScroll', () => {
       beforeEach(() => {
-        spyOn(eventHub, '$emit');
+        document.body.innerHTML +=
+          '<div class="roadmap-container"><div id="roadmap-shell"></div></div>';
       });
 
-      it('emits `epicsListScrolled` event via eventHub', () => {
-        vm.noScroll = false;
-        vm.handleScroll();
+      afterEach(() => {
+        document.querySelector('.roadmap-container').remove();
+      });
 
-        expect(eventHub.$emit).toHaveBeenCalledWith('epicsListScrolled', jasmine.any(Object));
+      it('emits `epicsListScrolled` event via eventHub', done => {
+        const vmWithParentEl = createComponent({}, document.getElementById('roadmap-shell'));
+        spyOn(eventHub, '$emit');
+
+        Vue.nextTick()
+          .then(() => {
+            vmWithParentEl.noScroll = false;
+            vmWithParentEl.handleScroll();
+
+            expect(eventHub.$emit).toHaveBeenCalledWith('epicsListScrolled', jasmine.any(Object));
+
+            vmWithParentEl.$destroy();
+          })
+          .then(done)
+          .catch(done.fail);
       });
     });
   });

@@ -15,6 +15,7 @@ class Packages::Package < ActiveRecord::Base
   enum package_type: { maven: 1, npm: 2 }
 
   scope :with_name, ->(name) { where(name: name) }
+  scope :has_version, -> { where.not(version: nil) }
   scope :preload_files, -> { preload(:package_files) }
   scope :last_of_each_version, -> { where(id: all.select('MAX(id) AS id').group(:version)) }
 

@@ -1,7 +1,5 @@
 import { totalDaysInMonth } from '~/lib/utils/datetime_utility';
 
-import { TIMELINE_END_OFFSET_HALF } from '../constants';
-
 export default {
   methods: {
     /**
@@ -17,10 +15,10 @@ export default {
      * Check if current epic ends within current month (timeline cell)
      */
     isTimeframeUnderEndDateForMonth(timeframeItem, epicEndDate) {
-      return (
-        timeframeItem.getYear() <= epicEndDate.getYear() &&
-        timeframeItem.getMonth() === epicEndDate.getMonth()
-      );
+      if (epicEndDate.getFullYear() <= timeframeItem.getFullYear()) {
+        return epicEndDate.getMonth() === timeframeItem.getMonth();
+      }
+      return epicEndDate.getTime() < timeframeItem.getTime();
     },
     /**
      * Return timeline bar width for current month (timeline cell) based on
@@ -61,16 +59,6 @@ export default {
         return 'left: 0;';
       }
 
-      // If Epic end date is out of range
-      const lastTimeframeItem = this.timeframe[this.timeframe.length - 1];
-      // Check if Epic start date falls within last month of the timeframe
-      if (
-        this.epic.startDate.getMonth() === lastTimeframeItem.getMonth() &&
-        this.epic.startDate.getFullYear() === lastTimeframeItem.getFullYear()
-      ) {
-        // Compensate for triangle size
-        return `right: ${TIMELINE_END_OFFSET_HALF}px;`;
-      }
       // Calculate proportional offset based on startDate and total days in
       // current month.
       return `left: ${(startDate / daysInMonth) * 100}%;`;
@@ -99,7 +87,6 @@ export default {
 
       const indexOfCurrentMonth = this.timeframe.indexOf(this.timeframeItem);
       const cellWidth = this.getCellWidth();
-      const offsetEnd = this.getTimelineBarEndOffset();
       const epicStartDate = this.epic.startDate;
       const epicEndDate = this.epic.endDate;
 
@@ -149,8 +136,7 @@ export default {
         }
       }
 
-      // Reduce any offset from total width and round it off.
-      return timelineBarWidth - offsetEnd;
+      return timelineBarWidth;
     },
   },
 };

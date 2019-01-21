@@ -22,13 +22,6 @@ export default () =>
           csrfToken: csrf.token,
           canUserConfigure: this.dataset.canUserAdminFeatureFlag,
           newFeatureFlagPath: this.dataset.newFeatureFlagPath,
-          configureModalData: {
-            clientLibrariesHelpPath: this.dataset.clientLibrariesHelpPath,
-            featureFlagsHelpPagePath: this.dataset.featureFlagsHelpPagePath,
-            apiUrl: this.dataset.apiUrl,
-            instanceId: this.dataset.instanceId,
-            applicationName: this.dataset.applicationName,
-          },
         },
       });
     },

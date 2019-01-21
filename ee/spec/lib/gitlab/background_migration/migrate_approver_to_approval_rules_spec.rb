@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 
+# rubocop:disable RSpec/FactoriesInMigrationSpecs
 describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
   def create_skip_sync(*args)
     build(*args) do |record|
@@ -153,6 +154,18 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
         end
       end
 
+      context 'when approvals_before_merge is too big' do
+        it "caps at allowed maximum" do
+          target.target_project.update(approvals_before_merge: ::ApprovalRuleLike::APPROVALS_REQUIRED_MAX + 1)
+          target.update(approvals_before_merge: nil)
+          create_member_in(create(:user), :old_schema)
+
+          described_class.new.perform(target_type, target.id)
+
+          expect(target.approval_rules.regular.first.approvals_required).to eq(::ApprovalRuleLike::APPROVALS_REQUIRED_MAX)
+        end
+      end
+
       context 'when approver is no longer overwritten' do
         before do
           create_member_in(create(:user), :new_schema)
@@ -242,3 +255,4 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
     end
   end
 end
+# rubocop:enable RSpec/FactoriesInMigrationSpecs

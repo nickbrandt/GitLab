@@ -16,6 +16,13 @@ describe('Environments Folder View', () => {
     canCreateDeployment: true,
     canReadEnvironment: true,
     cssContainerClass: 'container',
+    // ee-only start
+    canaryDeploymentFeatureId: 'canary_deployment',
+    showCanaryDeploymentCallout: true,
+    userCalloutsPath: '/callouts',
+    lockPromotionSvgPath: '/assets/illustrations/lock-promotion.svg',
+    helpCanaryDeploymentsPath: 'help/canary-deployments',
+    // ee-only end
   };
 
   beforeEach(() => {

@@ -9,7 +9,7 @@ module Banzai
   # so we can avoid N+1 queries problem
 
   class IssuableExtractor
-    prepend EE::Banzai::IssuableExtractor
+    prepend EE::Banzai::IssuableExtractor # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     attr_reader :context
 

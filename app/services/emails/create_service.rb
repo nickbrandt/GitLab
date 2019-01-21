@@ -2,7 +2,7 @@
 
 module Emails
   class CreateService < ::Emails::BaseService
-    prepend ::EE::Emails::CreateService
+    prepend ::EE::Emails::CreateService # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     def execute(extra_params = {})
       skip_confirmation = @params.delete(:skip_confirmation)

@@ -16,7 +16,7 @@ module API
       end
     end
 
-    prepend EE::API::ProjectClusters
+    prepend EE::API::ProjectClusters # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     params do
       requires :id, type: String, desc: 'The ID of the project'

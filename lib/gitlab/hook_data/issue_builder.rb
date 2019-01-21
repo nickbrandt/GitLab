@@ -3,7 +3,7 @@
 module Gitlab
   module HookData
     class IssueBuilder < BaseBuilder
-      prepend ::EE::Gitlab::HookData::IssueBuilder
+      prepend ::EE::Gitlab::HookData::IssueBuilder # rubocop: disable Cop/InjectEnterpriseEditionModule
 
       SAFE_HOOK_RELATIONS = %i[
         assignees

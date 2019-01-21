@@ -32,7 +32,7 @@ module API
       end
     end
 
-    prepend EE::API::Projects
+    prepend EE::API::Projects # rubocop: disable Cop/InjectEnterpriseEditionModule
 
     def self.update_params_at_least_one_of
       [

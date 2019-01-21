@@ -6,7 +6,7 @@ import sortableConfig from 'ee/sortable/sortable_config';
 import { GlLoadingIcon } from '@gitlab/ui';
 import issueItem from './issue_item.vue';
 import addIssuableForm from './add_issuable_form.vue';
-import { issuableIconMap } from '../constants';
+import { issuableIconMap, issuableQaClassMap } from '../constants';
 
 export default {
   name: 'RelatedIssuesBlock',
@@ -103,6 +103,9 @@ export default {
     issuableTypeIcon() {
       return issuableIconMap[this.issuableType];
     },
+    qaClass() {
+      return issuableQaClassMap[this.issuableType];
+    },
   },
   mounted() {
     if (this.canReorder) {
@@ -172,7 +175,8 @@ export default {
               v-if="canAdmin"
               ref="issueCountBadgeAddButton"
               type="button"
-              class="js-issue-count-badge-add-button issue-count-badge-add-button btn btn-sm btn-default qa-add-issues-button"
+              :class="qaClass"
+              class="js-issue-count-badge-add-button issue-count-badge-add-button btn btn-sm btn-default"
               aria-label="Add an issue"
               data-placement="top"
               @click="$emit('toggleAddRelatedIssuesForm', $event)"
