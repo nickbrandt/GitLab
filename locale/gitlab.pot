@@ -2631,9 +2631,6 @@ msgstr ""
 msgid "Copy link"
 msgstr ""
 
-msgid "Copy name to clipboard"
-msgstr ""
-
 msgid "Copy reference to clipboard"
 msgstr ""
 
@@ -3735,9 +3732,6 @@ msgid "FeatureFlags|API URL"
 msgstr ""
 
 msgid "FeatureFlags|Active"
-msgstr ""
-
-msgid "FeatureFlags|Application name"
 msgstr ""
 
 msgid "FeatureFlags|Configure"
