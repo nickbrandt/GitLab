@@ -13,7 +13,24 @@ module Operations
       message: "(%{value}) has already been taken"
     }
 
+    validates :environment_scope,
+      if: :default_scope?, on: :update,
+      inclusion: { in: %w(*), message: 'cannot be changed from default scope' }
+
+    before_destroy :prevent_destroy_default_scope, if: :default_scope?
+
+    scope :ordered, -> { order(:id) }
     scope :enabled, -> { where(active: true) }
     scope :disabled, -> { where(active: false) }
+
+    private
+
+    def default_scope?
+      environment_scope_was == '*'
+    end
+
+    def prevent_destroy_default_scope
+      raise ActiveRecord::ReadOnlyRecord, "default scope cannot be destroyed"
+    end
   end
 end

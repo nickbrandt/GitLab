@@ -16,6 +16,46 @@ describe Operations::FeatureFlag do
     it { is_expected.to validate_uniqueness_of(:name).scoped_to(:project_id) }
   end
 
+  describe '.enabled' do
+    subject { described_class.enabled }
+
+    context 'when the feature flag has an active scope' do
+      let!(:feature_flag) { create(:operations_feature_flag, active: true) }
+
+      it 'returns the flag' do
+        is_expected.to eq([feature_flag])
+      end
+    end
+
+    context 'when the feature flag does not have an active scope' do
+      let!(:feature_flag) { create(:operations_feature_flag, active: false) }
+
+      it 'does not return the flag' do
+        is_expected.to be_empty
+      end
+    end
+  end
+
+  describe '.disabled' do
+    subject { described_class.disabled }
+
+    context 'when the feature flag has an active scope' do
+      let!(:feature_flag) { create(:operations_feature_flag, active: true) }
+
+      it 'does not return the flag' do
+        is_expected.to be_empty
+      end
+    end
+
+    context 'when the feature flag does not have an active scope' do
+      let!(:feature_flag) { create(:operations_feature_flag, active: false) }
+
+      it 'returns the flag' do
+        is_expected.to eq([feature_flag])
+      end
+    end
+  end
+
   describe '.for_environment' do
     subject { described_class.for_environment(environment_name) }
 
@@ -25,8 +65,7 @@ describe Operations::FeatureFlag do
 
     context 'when feature flag is off on production' do
       before do
-        feature_flag = create(:operations_feature_flag)
-        create_scope(feature_flag, '*', true)
+        feature_flag = create(:operations_feature_flag, active: true)
         create_scope(feature_flag, 'production', false)
       end
 
@@ -49,8 +88,7 @@ describe Operations::FeatureFlag do
 
     context 'when feature flag is default disabled but enabled for review apps' do
       before do
-        feature_flag = create(:operations_feature_flag)
-        create_scope(feature_flag, '*', false)
+        feature_flag = create(:operations_feature_flag, active: false)
         create_scope(feature_flag, 'review/*', true)
       end
 
@@ -72,13 +110,11 @@ describe Operations::FeatureFlag do
     end
 
     context 'when there are two flags' do
-      let!(:feature_flag_1) { create(:operations_feature_flag) }
-      let!(:feature_flag_2) { create(:operations_feature_flag) }
+      let!(:feature_flag_1) { create(:operations_feature_flag, active: true) }
+      let!(:feature_flag_2) { create(:operations_feature_flag, active: true) }
 
       before do
-        create_scope(feature_flag_1, '*', true)
         create_scope(feature_flag_1, 'production', false)
-        create_scope(feature_flag_2, '*', true)
       end
 
       context 'when environment is production' do
@@ -87,6 +123,41 @@ describe Operations::FeatureFlag do
         it 'returns multiple actual active values' do
           expect(subject.ordered.map(&:active)).to eq([false, true])
         end
+      end
+    end
+  end
+
+  describe '.for_list' do
+    subject { described_class.for_list }
+
+    before do
+      stub_feature_flags(feature_flags_environment_scope: true)
+    end
+
+    context 'when all scopes are active' do
+      let!(:feature_flag) { create(:operations_feature_flag, active: true) }
+      let!(:scope) { create_scope(feature_flag, 'production', true) }
+
+      it 'returns virtual active value' do
+        expect(subject.first.active).to be_truthy
+      end
+    end
+
+    context 'when all scopes are inactive' do
+      let!(:feature_flag) { create(:operations_feature_flag, active: false) }
+      let!(:scope) { create_scope(feature_flag, 'production', false) }
+
+      it 'returns virtual active value' do
+        expect(subject.first.active).to be_falsy
+      end
+    end
+
+    context 'when one scopes is active' do
+      let!(:feature_flag) { create(:operations_feature_flag, active: false) }
+      let!(:scope) { create_scope(feature_flag, 'production', true) }
+
+      it 'returns virtual active value' do
+        expect(subject.first.active).to be_truthy
       end
     end
   end
