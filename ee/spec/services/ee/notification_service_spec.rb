@@ -509,4 +509,126 @@ describe EE::NotificationService, :mailer do
     # Make the watcher a subscriber to detect dupes
     issuable.subscriptions.create(user: @watcher_and_subscriber, subscribed: true)
   end
+
+  describe 'Merge Requests' do
+    let(:notification) { NotificationService.new }
+    let(:assignee) { create(:user) }
+    let(:group) { create(:group) }
+    let(:project) { create(:project, :public, :repository, namespace: group) }
+    let(:another_project) { create(:project, :public, namespace: group) }
+    let(:merge_request) { create :merge_request, source_project: project, assignee: create(:user), description: 'cc @participant' }
+
+    around do |example|
+      perform_enqueued_jobs do
+        example.run
+      end
+    end
+
+    before do
+      stub_feature_flags(approval_rule: false)
+
+      project.add_maintainer(merge_request.author)
+      project.add_maintainer(merge_request.assignee)
+      build_team(merge_request.target_project)
+      add_users_with_subscription(merge_request.target_project, merge_request)
+      update_custom_notification(:new_merge_request, @u_guest_custom, resource: project)
+      update_custom_notification(:new_merge_request, @u_custom_global)
+      reset_delivered_emails!
+    end
+
+    describe '#new_merge_request' do
+      context 'when the target project has approvers set' do
+        let(:project_approvers) { create_list(:user, 3) }
+
+        before do
+          merge_request.target_project.update(approvals_before_merge: 1)
+          project_approvers.each { |approver| create(:approver, user: approver, target: merge_request.target_project) }
+        end
+
+        it 'emails the approvers' do
+          notification.new_merge_request(merge_request, @u_disabled)
+
+          project_approvers.each { |approver| should_email(approver) }
+        end
+
+        it 'does not email the approvers when approval is not necessary' do
+          merge_request.target_project.update(approvals_before_merge: 0)
+          notification.new_merge_request(merge_request, @u_disabled)
+
+          project_approvers.each { |approver| should_not_email(approver) }
+        end
+
+        context 'when the merge request has approvers set' do
+          let(:mr_approvers) { create_list(:user, 3) }
+
+          before do
+            mr_approvers.each { |approver| create(:approver, user: approver, target: merge_request) }
+          end
+
+          it 'emails the MR approvers' do
+            notification.new_merge_request(merge_request, @u_disabled)
+
+            mr_approvers.each { |approver| should_email(approver) }
+          end
+
+          it 'does not email approvers set on the project who are not approvers of this MR' do
+            notification.new_merge_request(merge_request, @u_disabled)
+
+            project_approvers.each { |approver| should_not_email(approver) }
+          end
+        end
+      end
+    end
+
+    def build_team(project)
+      @u_watcher               = create_global_setting_for(create(:user), :watch)
+      @u_participating         = create_global_setting_for(create(:user), :participating)
+      @u_participant_mentioned = create_global_setting_for(create(:user, username: 'participant'), :participating)
+      @u_disabled              = create_global_setting_for(create(:user), :disabled)
+      @u_mentioned             = create_global_setting_for(create(:user, username: 'mention'), :mention)
+      @u_committer             = create(:user, username: 'committer')
+      @u_not_mentioned         = create_global_setting_for(create(:user, username: 'regular'), :participating)
+      @u_outsider_mentioned    = create(:user, username: 'outsider')
+      @u_custom_global         = create_global_setting_for(create(:user, username: 'custom_global'), :custom)
+
+      # User to be participant by default
+      # This user does not contain any record in notification settings table
+      # It should be treated with a :participating notification_level
+      @u_lazy_participant      = create(:user, username: 'lazy-participant')
+
+      @u_guest_watcher = create_user_with_notification(:watch, 'guest_watching')
+      @u_guest_custom = create_user_with_notification(:custom, 'guest_custom')
+
+      project.add_maintainer(@u_watcher)
+      project.add_maintainer(@u_participating)
+      project.add_maintainer(@u_participant_mentioned)
+      project.add_maintainer(@u_disabled)
+      project.add_maintainer(@u_mentioned)
+      project.add_maintainer(@u_committer)
+      project.add_maintainer(@u_not_mentioned)
+      project.add_maintainer(@u_lazy_participant)
+      project.add_maintainer(@u_custom_global)
+    end
+
+    def add_users_with_subscription(project, issuable)
+      @subscriber = create :user
+      @unsubscriber = create :user
+      @unsubscribed_mentioned = create :user, username: 'unsubscribed_mentioned'
+      @subscribed_participant = create_global_setting_for(create(:user, username: 'subscribed_participant'), :participating)
+      @watcher_and_subscriber = create_global_setting_for(create(:user), :watch)
+
+      project.add_maintainer(@subscribed_participant)
+      project.add_maintainer(@subscriber)
+      project.add_maintainer(@unsubscriber)
+      project.add_maintainer(@watcher_and_subscriber)
+      project.add_maintainer(@unsubscribed_mentioned)
+
+      issuable.subscriptions.create(user: @unsubscribed_mentioned, project: project, subscribed: false)
+      issuable.subscriptions.create(user: @subscriber, project: project, subscribed: true)
+      issuable.subscriptions.create(user: @subscribed_participant, project: project, subscribed: true)
+      issuable.subscriptions.create(user: @unsubscriber, project: project, subscribed: false)
+      # Make the watcher a subscriber to detect dupes
+      issuable.subscriptions.create(user: @watcher_and_subscriber, project: project, subscribed: true)
+    end
+  end
 end
