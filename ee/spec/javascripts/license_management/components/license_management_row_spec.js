@@ -156,7 +156,7 @@ describe('LicenseManagementRow', () => {
     });
 
     it('renders computed property dropdownText into dropdown toggle', () => {
-      const dropdownEl = vm.$el.querySelector('.dropdown [data-toggle="dropdown"]');
+      const dropdownEl = vm.$el.querySelector('.dropdown-toggle');
 
       expect(dropdownEl.innerText.trim()).toBe(vm.dropdownText);
     });
