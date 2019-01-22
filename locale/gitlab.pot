@@ -4697,6 +4697,9 @@ msgstr ""
 msgid "Here is the public SSH key that needs to be added to the remote server. For more information, please refer to the documentation."
 msgstr ""
 
+msgid "Hide file browser"
+msgstr ""
+
 msgid "Hide host keys manual input"
 msgstr ""
 
@@ -8268,6 +8271,9 @@ msgstr ""
 msgid "Show complete raw log"
 msgstr ""
 
+msgid "Show file browser"
+msgstr ""
+
 msgid "Show latest version"
 msgstr ""
 
@@ -9622,9 +9628,6 @@ msgid "Toggle commit list"
 msgstr ""
 
 msgid "Toggle discussion"
-msgstr ""
-
-msgid "Toggle file browser"
 msgstr ""
 
 msgid "Toggle navigation"
