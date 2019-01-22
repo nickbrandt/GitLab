@@ -2,14 +2,12 @@
 
 module EE
   module BuildFinishedWorker
-    # rubocop: disable CodeReuse/ActiveRecord
-    def perform(build_id)
+    def process_build(build)
+      UpdateBuildMinutesService.new(build.project, nil).execute(build)
+
       super
 
-      ::Ci::Build.find_by(id: build_id).try do |build|
-        ChatNotificationWorker.perform_async(build_id) if build.pipeline.chat?
-      end
+      ChatNotificationWorker.perform_async(build.id) if build.pipeline.chat?
     end
-    # rubocop: enable CodeReuse/ActiveRecord
   end
 end

@@ -11,23 +11,9 @@ class ExpirePipelineCacheWorker
     pipeline = Ci::Pipeline.find_by(id: pipeline_id)
     return unless pipeline
 
-    project = pipeline.project
     store = Gitlab::EtagCaching::Store.new
 
-    store.touch(project_pipelines_path(project))
-    store.touch(project_pipeline_path(project, pipeline))
-    store.touch(commit_pipelines_path(project, pipeline.commit)) unless pipeline.commit.nil?
-    store.touch(new_merge_request_pipelines_path(project))
-    each_pipelines_merge_request_path(project, pipeline) do |path|
-      store.touch(path)
-    end
-
-    triggered_by = pipeline.triggered_by_pipeline
-    store.touch(project_pipeline_path(triggered_by.project, triggered_by)) if triggered_by
-
-    pipeline.triggered_pipelines.each do |triggered|
-      store.touch(project_pipeline_path(triggered.project, triggered))
-    end
+    update_etag_cache(pipeline, store)
 
     Gitlab::Cache::Ci::ProjectPipelineStatus.update_for_pipeline(pipeline)
   end
@@ -58,4 +44,25 @@ class ExpirePipelineCacheWorker
       yield(path)
     end
   end
+
+  # Updates ETag caches of a pipeline.
+  #
+  # This logic resides in a separate method so that EE can more easily extend
+  # it.
+  #
+  # @param [Ci::Pipeline] pipeline
+  # @param [Gitlab::EtagCaching::Store] store
+  def update_etag_cache(pipeline, store)
+    project = pipeline.project
+
+    store.touch(project_pipelines_path(project))
+    store.touch(project_pipeline_path(project, pipeline))
+    store.touch(commit_pipelines_path(project, pipeline.commit)) unless pipeline.commit.nil?
+    store.touch(new_merge_request_pipelines_path(project))
+    each_pipelines_merge_request_path(project, pipeline) do |path|
+      store.touch(path)
+    end
+  end
 end
+
+ExpirePipelineCacheWorker.prepend(EE::ExpirePipelineCacheWorker)
