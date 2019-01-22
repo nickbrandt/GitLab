@@ -510,7 +510,7 @@ describe EE::NotificationService, :mailer do
     issuable.subscriptions.create(user: @watcher_and_subscriber, subscribed: true)
   end
 
-  describe 'Merge Requests' do
+  context 'Merge Requests' do
     let(:notification) { NotificationService.new }
     let(:assignee) { create(:user) }
     let(:group) { create(:group) }
@@ -599,15 +599,9 @@ describe EE::NotificationService, :mailer do
       @u_guest_watcher = create_user_with_notification(:watch, 'guest_watching')
       @u_guest_custom = create_user_with_notification(:custom, 'guest_custom')
 
-      project.add_maintainer(@u_watcher)
-      project.add_maintainer(@u_participating)
-      project.add_maintainer(@u_participant_mentioned)
-      project.add_maintainer(@u_disabled)
-      project.add_maintainer(@u_mentioned)
-      project.add_maintainer(@u_committer)
-      project.add_maintainer(@u_not_mentioned)
-      project.add_maintainer(@u_lazy_participant)
-      project.add_maintainer(@u_custom_global)
+      [@u_watcher, @u_participating, @u_participant_mentioned, @u_disabled, @u_mentioned, @u_committer, @u_not_mentioned, @u_lazy_participant, @u_custom_global].each do |user|
+        project.add_maintainer(user)
+      end
     end
 
     def add_users_with_subscription(project, issuable)
@@ -617,11 +611,9 @@ describe EE::NotificationService, :mailer do
       @subscribed_participant = create_global_setting_for(create(:user, username: 'subscribed_participant'), :participating)
       @watcher_and_subscriber = create_global_setting_for(create(:user), :watch)
 
-      project.add_maintainer(@subscribed_participant)
-      project.add_maintainer(@subscriber)
-      project.add_maintainer(@unsubscriber)
-      project.add_maintainer(@watcher_and_subscriber)
-      project.add_maintainer(@unsubscribed_mentioned)
+      [@subscribed_participant, @subscriber, @unsubscriber, @watcher_and_subscriber, @unsubscribed_mentioned].each do |user|
+        project.add_maintainer(user)
+      end
 
       issuable.subscriptions.create(user: @unsubscribed_mentioned, project: project, subscribed: false)
       issuable.subscriptions.create(user: @subscriber, project: project, subscribed: true)
