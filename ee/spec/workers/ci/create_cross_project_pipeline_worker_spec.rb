@@ -4,7 +4,7 @@ describe Ci::CreateCrossProjectPipelineWorker do
   set(:user) { create(:user) }
   set(:project) { create(:project) }
   set(:pipeline) { create(:ci_pipeline, project: project) }
-  set(:bridge) { create(:ci_bridge, user: user, pipeline: pipeline) }
+  let(:bridge) { create(:ci_bridge, user: user, pipeline: pipeline) }
 
   let(:service) { double('pipeline creation service') }
 
@@ -27,7 +27,7 @@ describe Ci::CreateCrossProjectPipelineWorker do
         expect(Ci::CreateCrossProjectPipelineService)
           .not_to receive(:new)
 
-        described_class.new.perform(123)
+        described_class.new.perform(1234)
       end
     end
   end
