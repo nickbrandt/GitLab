@@ -1,5 +1,6 @@
 <script>
 import { mapActions } from 'vuex';
+import { GlDropdown, GlDropdownItem } from '@gitlab/ui';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import IssueStatusIcon from '~/reports/components/issue_status_icon.vue';
@@ -13,6 +14,8 @@ const invisibleClass = 'invisible';
 export default {
   name: 'LicenseManagementRow',
   components: {
+    GlDropdown,
+    GlDropdownItem,
     Icon,
     IssueStatusIcon,
   },
@@ -56,27 +59,20 @@ export default {
     <span class="js-license-name">{{ license.name }}</span>
     <div class="float-right">
       <div class="d-flex">
-        <div class="dropdown">
-          <button
-            class="btn btn-secondary dropdown-toggle"
-            type="button"
-            data-toggle="dropdown"
-            aria-haspopup="true"
-            aria-expanded="false"
-          >
-            <icon class="float-right" name="chevron-down" /> {{ dropdownText }}
-          </button>
-          <div class="dropdown-menu dropdown-menu-right">
-            <button class="dropdown-item" type="button" @click="approveLicense(license)">
-              <icon :class="approveIconClass" name="mobile-issue-close" />
-              {{ $options[$options.LICENSE_APPROVAL_STATUS.APPROVED] }}
-            </button>
-            <button class="dropdown-item" type="button" @click="blacklistLicense(license)">
-              <icon :class="blacklistIconClass" name="mobile-issue-close" />
-              {{ $options[$options.LICENSE_APPROVAL_STATUS.BLACKLISTED] }}
-            </button>
-          </div>
-        </div>
+        <gl-dropdown
+          :text="dropdownText"
+          toggle-class="d-flex justify-content-between align-items-center"
+          right
+        >
+          <gl-dropdown-item @click="approveLicense(license)">
+            <icon :class="approveIconClass" name="mobile-issue-close" />
+            {{ $options[$options.LICENSE_APPROVAL_STATUS.APPROVED] }}
+          </gl-dropdown-item>
+          <gl-dropdown-item @click="blacklistLicense(license)">
+            <icon :class="blacklistIconClass" name="mobile-issue-close" />
+            {{ $options[$options.LICENSE_APPROVAL_STATUS.BLACKLISTED] }}
+          </gl-dropdown-item>
+        </gl-dropdown>
         <button
           class="btn btn-blank js-remove-button"
           type="button"
