@@ -52,7 +52,7 @@ module Geo
     end
 
     def headers
-      Gitlab::Geo::BaseRequest.new.headers
+      Gitlab::Geo::BaseRequest.new(scope: ::Gitlab::Geo::API_SCOPE).headers
     end
 
     def timeout

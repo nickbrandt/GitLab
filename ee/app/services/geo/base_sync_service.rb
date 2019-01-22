@@ -103,8 +103,12 @@ module Geo
 
     # Build a JWT header for authentication
     def jwt_authentication_header
-      authorization = ::Gitlab::Geo::RepoSyncRequest.new.authorization
+      authorization = ::Gitlab::Geo::RepoSyncRequest.new(scope: gl_repository).authorization
       { "http.#{remote_url}.extraHeader" => "Authorization: #{authorization}" }
+    end
+
+    def gl_repository
+      "#{type}-#{project.id}"
     end
 
     def remote_url
@@ -126,7 +130,7 @@ module Geo
 
       temp_repo.create_from_snapshot(
         ::Gitlab::Geo.primary_node.snapshot_url(temp_repo),
-        ::Gitlab::Geo::RepoSyncRequest.new.authorization
+        ::Gitlab::Geo::RepoSyncRequest.new(scope: ::Gitlab::Geo::API_SCOPE).authorization
       )
     rescue => err
       log_error('Snapshot attempt failed', err)

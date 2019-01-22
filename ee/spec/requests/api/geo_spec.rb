@@ -13,6 +13,10 @@ describe API::Geo do
     { 'X-Gitlab-Token' => secondary_node.system_hook.token }
   end
 
+  let(:not_found_req_header) do
+    Gitlab::Geo::TransferRequest.new(transfer.request_data.merge(file_id: 100000)).headers
+  end
+
   shared_examples 'with terms enforced' do
     before do
       enforce_terms
@@ -62,7 +66,7 @@ describe API::Geo do
 
       context 'attachment does not exist' do
         it 'responds with 404' do
-          get api("/geo/transfers/attachment/100000"), headers: req_header
+          get api("/geo/transfers/attachment/100000"), headers: not_found_req_header
 
           expect(response).to have_gitlab_http_status(404)
         end
@@ -101,7 +105,7 @@ describe API::Geo do
 
       context 'avatar does not exist' do
         it 'responds with 404' do
-          get api("/geo/transfers/avatar/100000"), headers: req_header
+          get api("/geo/transfers/avatar/100000"), headers: not_found_req_header
 
           expect(response).to have_gitlab_http_status(404)
         end
@@ -154,7 +158,7 @@ describe API::Geo do
 
       context 'when the Upload record does not exist' do
         it 'responds with 404' do
-          get api("/geo/transfers/file/100000"), headers: req_header
+          get api("/geo/transfers/file/100000"), headers: not_found_req_header
 
           expect(response).to have_gitlab_http_status(404)
         end
@@ -163,10 +167,8 @@ describe API::Geo do
 
     describe 'GET /geo/transfers/lfs/1' do
       let(:lfs_object) { create(:lfs_object, :with_file) }
-      let(:req_header) do
-        transfer = Gitlab::Geo::LfsTransfer.new(lfs_object)
-        Gitlab::Geo::TransferRequest.new(transfer.request_data).headers
-      end
+      let(:transfer) { Gitlab::Geo::LfsTransfer.new(lfs_object) }
+      let(:req_header) { Gitlab::Geo::TransferRequest.new(transfer.request_data).headers }
 
       before do
         allow_any_instance_of(Gitlab::Geo::TransferRequest).to receive(:requesting_node).and_return(secondary_node)
@@ -207,7 +209,7 @@ describe API::Geo do
 
       context 'LFS object does not exist' do
         it 'responds with 404' do
-          get api("/geo/transfers/lfs/100000"), headers: req_header
+          get api("/geo/transfers/lfs/100000"), headers: not_found_req_header
 
           expect(response).to have_gitlab_http_status(404)
         end
@@ -216,7 +218,7 @@ describe API::Geo do
   end
 
   describe 'POST /geo/status', :postgresql do
-    let(:geo_base_request) { Gitlab::Geo::BaseRequest.new }
+    let(:geo_base_request) { Gitlab::Geo::BaseRequest.new(scope: ::Gitlab::Geo::API_SCOPE) }
 
     let(:data) do
       {
