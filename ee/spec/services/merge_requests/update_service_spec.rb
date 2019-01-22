@@ -124,6 +124,11 @@ describe MergeRequests::UpdateService, :mailer do
 
       before do
         stub_feature_flags(approval_rule: false)
+
+        project.add_developer(existing_approver)
+        project.add_developer(removed_approver)
+        project.add_developer(new_approver)
+
         perform_enqueued_jobs do
           update_merge_request(approver_ids: [existing_approver, removed_approver].map(&:id).join(','))
         end

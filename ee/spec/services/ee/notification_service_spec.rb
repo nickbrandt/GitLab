@@ -543,6 +543,7 @@ describe EE::NotificationService, :mailer do
         before do
           merge_request.target_project.update(approvals_before_merge: 1)
           project_approvers.each { |approver| create(:approver, user: approver, target: merge_request.target_project) }
+          reset_delivered_emails!
         end
 
         it 'emails the approvers' do
@@ -563,6 +564,7 @@ describe EE::NotificationService, :mailer do
 
           before do
             mr_approvers.each { |approver| create(:approver, user: approver, target: merge_request) }
+            reset_delivered_emails!
           end
 
           it 'emails the MR approvers' do
