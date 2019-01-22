@@ -499,6 +499,13 @@ module EE
         expose :name
         expose :versions
       end
+
+      class Package < Grape::Entity
+        expose :id
+        expose :name
+        expose :version
+        expose :package_type
+      end
     end
   end
 end
