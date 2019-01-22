@@ -116,7 +116,7 @@ your Git repository via URL.
       - test
       - ci_status
 
-    unit-tests
+    unit-tests:
       script:
         - echo "Success. Add your tests!"
 
