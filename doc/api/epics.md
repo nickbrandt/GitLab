@@ -79,7 +79,9 @@ Example response:
   "due_date_from_milestones": "2018-07-31",
   "created_at": "2018-07-17T13:36:22.770Z",
   "updated_at": "2018-07-18T12:22:05.239Z",
-  "labels": []
+  "labels": [],
+  "upvotes": 4,
+  "downvotes": 0
   }
 ]
 ```
@@ -129,7 +131,9 @@ Example response:
   "due_date_from_milestones": "2018-07-31",
   "created_at": "2018-07-17T13:36:22.770Z",
   "updated_at": "2018-07-18T12:22:05.239Z",
-  "labels": []
+  "labels": [],
+  "upvotes": 4,
+  "downvotes": 0
 }
 ```
 
@@ -189,7 +193,9 @@ Example response:
   "due_date_from_milestones": "2018-07-31",
   "created_at": "2018-07-17T13:36:22.770Z",
   "updated_at": "2018-07-18T12:22:05.239Z",
-  "labels": []
+  "labels": [],
+  "upvotes": 4,
+  "downvotes": 0
 }
 ```
 
@@ -251,7 +257,9 @@ Example response:
   "due_date_from_milestones": "2018-07-31",
   "created_at": "2018-07-17T13:36:22.770Z",
   "updated_at": "2018-07-18T12:22:05.239Z",
-  "labels": []
+  "labels": [],
+  "upvotes": 4,
+  "downvotes": 0
 }
 ```
 

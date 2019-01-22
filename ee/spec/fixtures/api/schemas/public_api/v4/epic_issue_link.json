@@ -28,6 +28,8 @@
         "due_date_from_milestones": { "type": ["date", "null"] },
         "due_date_is_fixed": { "type": "boolean" },
         "state": { "type": "string" },
+        "upvotes": { "type":  "integer" },
+        "downvotes": { "type":  "integer" },
         "created_at": { "type": ["string", "null"] },
         "updated_at": { "type": ["string", "null"] },
         "labels": {
