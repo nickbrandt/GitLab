@@ -21,11 +21,14 @@ module Gitlab
 
         return 'The Geo database is not configured to use Foreign Data Wrapper.' unless Gitlab::Geo::Fdw.enabled?
 
-        unless Gitlab::Geo::Fdw.fdw_up_to_date?
+        unless Gitlab::Geo::Fdw.foreign_tables_up_to_date?
           output = "The Geo database has an outdated FDW remote schema."
 
-          unless Gitlab::Geo::Fdw.count_tables_match?
-            output = "#{output} It contains #{Gitlab::Geo::Fdw.count_tables} of #{Gitlab::Geo::Fdw.gitlab_tables.count} expected tables."
+          foreign_schema_tables_count = Gitlab::Geo::Fdw.foreign_schema_tables_count
+          gitlab_schema_tables_count = Gitlab::Geo::Fdw.gitlab_schema_tables_count
+
+          unless gitlab_schema_tables_count == foreign_schema_tables_count
+            output = "#{output} It contains #{foreign_schema_tables_count} of #{gitlab_schema_tables_count} expected tables."
           end
 
           return output
