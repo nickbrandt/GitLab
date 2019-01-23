@@ -16,11 +16,11 @@ export default {
     summaryText(rule) {
       return sprintf(
         n__(
-          '%d approval required from %{name}',
-          '%d approvals required from %{name}',
+          '%{count} approval required from %{name}',
+          '%{count} approvals required from %{name}',
           rule.approvalsRequired,
         ),
-        { name: rule.name },
+        { name: rule.name, count: rule.approvalsRequired },
       );
     },
   },
