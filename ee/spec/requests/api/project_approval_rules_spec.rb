@@ -43,7 +43,7 @@ describe API::ProjectApprovalRules do
       end
 
       context 'private group filtering' do
-        set(:private_group) { private_group = create :group, :private }
+        set(:private_group) { create :group, :private }
 
         before do
           rule.groups << private_group
@@ -68,6 +68,42 @@ describe API::ProjectApprovalRules do
 
           expect(rule['groups'].size).to eq(1)
         end
+      end
+    end
+  end
+
+  describe 'PUT /projects/:id/approval_settings' do
+    let(:url) { "/projects/#{project.id}/approval_settings" }
+
+    shared_examples_for 'a user with access' do
+      context 'when sending json data' do
+        it 'updates approvals_before_merge' do
+          expect do
+            put api(url, current_user), params: { fallback_approvals_required: 1 }.to_json, headers: { CONTENT_TYPE: 'application/json' }
+          end.to change { project.reload.approvals_before_merge }.from(0).to(1)
+
+          expect(response).to have_gitlab_http_status(200)
+        end
+      end
+    end
+
+    context 'as a project admin' do
+      it_behaves_like 'a user with access' do
+        let(:current_user) { user }
+      end
+    end
+
+    context 'as a global admin' do
+      it_behaves_like 'a user with access' do
+        let(:current_user) { admin }
+      end
+    end
+
+    context 'as a random user' do
+      it 'returns 403' do
+        put api(url, user2), { fallback_approvals_required: 1 }.to_json, { CONTENT_TYPE: 'application/json' }
+
+        expect(response).to have_gitlab_http_status(403)
       end
     end
   end

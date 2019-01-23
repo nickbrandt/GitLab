@@ -170,8 +170,8 @@ describe ApprovalState do
               project.update(approvals_before_merge: 3)
             end
 
-            it 'returns false' do
-              expect(subject.approved?).to eq(false)
+            it 'returns true as overall approvals_required is ignored' do
+              expect(subject.approved?).to eq(true)
             end
           end
         end
@@ -183,6 +183,38 @@ describe ApprovalState do
 
           it 'returns false' do
             expect(subject.approved?).to eq(false)
+          end
+        end
+      end
+    end
+
+    describe '#any_approver_allowed?' do
+      context 'when approved' do
+        before do
+          allow(subject).to receive(:approved?).and_return(true)
+        end
+
+        it 'returns true' do
+          expect(subject.any_approver_allowed?).to eq(true)
+        end
+      end
+
+      context 'when not approved' do
+        before do
+          allow(subject).to receive(:approved?).and_return(false)
+        end
+
+        it 'returns false' do
+          expect(subject.approved?).to eq(false)
+        end
+
+        context 'when overall_approvals_required cannot be met' do
+          before do
+            project.update(approvals_before_merge: 1)
+          end
+
+          it 'returns false' do
+            expect(subject.any_approver_allowed?).to eq(true)
           end
         end
       end
@@ -682,8 +714,8 @@ describe ApprovalState do
               project.update(approvals_before_merge: 3)
             end
 
-            it 'returns false' do
-              expect(subject.approved?).to eq(false)
+            it 'returns true as overall approvals_required is ignored' do
+              expect(subject.approved?).to eq(true)
             end
           end
         end
@@ -695,6 +727,38 @@ describe ApprovalState do
 
           it 'returns false' do
             expect(subject.approved?).to eq(false)
+          end
+        end
+      end
+    end
+
+    describe '#any_approver_allowed?' do
+      context 'when approved' do
+        before do
+          allow(subject).to receive(:approved?).and_return(true)
+        end
+
+        it 'returns true' do
+          expect(subject.any_approver_allowed?).to eq(true)
+        end
+      end
+
+      context 'when not approved' do
+        before do
+          allow(subject).to receive(:approved?).and_return(false)
+        end
+
+        it 'returns false' do
+          expect(subject.approved?).to eq(false)
+        end
+
+        context 'when overall_approvals_required cannot be met' do
+          before do
+            project.update(approvals_before_merge: 1)
+          end
+
+          it 'returns false' do
+            expect(subject.any_approver_allowed?).to eq(true)
           end
         end
       end

@@ -42,7 +42,7 @@ class ApprovalState
   def approval_needed?
     return false unless project.feature_available?(:merge_request_approvers)
 
-    if wrapped_approval_rules.size == 0
+    if wrapped_approval_rules.empty?
       overall_approvals_required > 0
     else
       wrapped_approval_rules.any? { |rule| rule.approvals_required > 0 }
@@ -55,12 +55,16 @@ class ApprovalState
 
   def approved?
     strong_memoize(:approved) do
-      if wrapped_approval_rules.size == 0
+      if wrapped_approval_rules.empty?
         approvals.size >= overall_approvals_required
       else
         wrapped_approval_rules.all?(&:approved?)
       end
     end
+  end
+
+  def any_approver_allowed?
+    approved? || overall_approvals_required > approvers.size
   end
 
   # Number of approvals remaining (excluding existing approvals) before the MR is
@@ -103,10 +107,14 @@ class ApprovalState
 
   def can_approve?(user)
     return false unless user
+    # The check below considers authors being able to approve the MR.
+    # That is, they're included/excluded from that list accordingly.
+    return true if unactioned_approvers.include?(user)
+    # We can safely unauthorize authors if it reaches this guard clause.
+    return false if merge_request.authors.include?(user)
     return false unless user.can?(:update_merge_request, merge_request)
-    return false if !authors_can_approve? && merge_request.authors.include?(user)
 
-    !has_approved?(user)
+    any_approver_allowed? && merge_request.approvals.where(user: user).empty?
   end
 
   def has_approved?(user)

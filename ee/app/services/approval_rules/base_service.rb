@@ -11,6 +11,7 @@ module ApprovalRules
       rule.attributes = params
 
       if rule.save
+        rule.reload
         success
       else
         error(rule.errors.messages)

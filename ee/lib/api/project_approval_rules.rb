@@ -26,16 +26,19 @@ module API
           success ::API::Entities::Project
         end
         params do
-          requires :fallback_approvals_required, type: Integer, desc: 'The total number of required approvals in case of fallback'
+          requires :fallback_approvals_required, as: :approvals_before_merge, type: Integer, desc: 'The total number of required approvals in case of fallback'
         end
-        post do
+        put do
           authorize! :admin_project, user_project
 
           result = ::Projects::UpdateService.new(user_project, current_user, declared_params).execute
 
           if result[:status] == :success
-            present user_project, with: ::Entities::Project,
+            present(
+              user_project,
+              with: ::API::Entities::Project,
               user_can_admin_project: can?(current_user, :admin_project, user_project)
+            )
           else
             render_validation_error!(user_project)
           end

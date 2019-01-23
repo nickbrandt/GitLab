@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ApprovalMergeRequestRulePolicy < BasePolicy
   delegate { @subject.merge_request }
 
