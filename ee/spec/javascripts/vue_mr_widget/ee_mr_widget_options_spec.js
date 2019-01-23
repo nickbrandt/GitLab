@@ -769,7 +769,7 @@ describe('ee merge request widget options', () => {
       vm.$nextTick(() => {
         const tooltip = vm.$el.querySelector('.fa-question-circle');
 
-        expect(vm.$el.textContent).toContain('Removes source branch');
+        expect(vm.$el.textContent).toContain('Deletes source branch');
         expect(tooltip.getAttribute('data-original-title')).toBe(
           'A user with write access to the source branch selected this option',
         );
@@ -784,7 +784,7 @@ describe('ee merge request widget options', () => {
       vm.mr.state = 'merged';
 
       vm.$nextTick(() => {
-        expect(vm.$el.textContent).toContain('The source branch has been removed');
+        expect(vm.$el.textContent).toContain('The source branch has been deleted');
         expect(vm.$el.textContent).not.toContain('Removes source branch');
 
         done();

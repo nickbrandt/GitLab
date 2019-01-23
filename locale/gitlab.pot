@@ -362,7 +362,7 @@ msgstr ""
 msgid "<strong>%{pushes}</strong> pushes, more than <strong>%{commits}</strong> commits by <strong>%{people}</strong> contributors."
 msgstr ""
 
-msgid "<strong>Removes</strong> source branch"
+msgid "<strong>Deletes</strong> source branch"
 msgstr ""
 
 msgid "A 'Runner' is a process which runs a job. You can set up as many Runners as you need."
@@ -11059,12 +11059,6 @@ msgid "mrWidget|Refresh now"
 msgstr ""
 
 msgid "mrWidget|Refreshing now"
-msgstr ""
-
-msgid "mrWidget|Remove Source Branch"
-msgstr ""
-
-msgid "mrWidget|Remove source branch"
 msgstr ""
 
 msgid "mrWidget|Remove your approval"
