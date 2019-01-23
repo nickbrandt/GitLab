@@ -13,7 +13,8 @@ module EE
             include ::Gitlab::Config::Entry::Configurable
             include ::Gitlab::Config::Entry::Attributable
 
-            ALLOWED_KEYS = %i[trigger stage allow_failure only except].freeze
+            ALLOWED_KEYS = %i[trigger stage allow_failure only except
+                              when extends].freeze
 
             validations do
               validates :config, allowed_keys: ALLOWED_KEYS
@@ -21,6 +22,13 @@ module EE
               validates :trigger, presence: true
               validates :name, presence: true
               validates :name, type: Symbol
+
+              with_options allow_nil: true do
+                validates :when,
+                  inclusion: { in: %w[on_success on_failure always],
+                               message: 'should be on_success, on_failure or always' }
+                validates :extends, type: String
+              end
             end
 
             entry :trigger, ::EE::Gitlab::Ci::Config::Entry::Trigger,
@@ -48,6 +56,8 @@ module EE
                 trigger: trigger_value,
                 ignore: !!allow_failure,
                 stage: stage_value,
+                when: when_value,
+                extends: extends_value,
                 only: only_value,
                 except: except_value }.compact
             end

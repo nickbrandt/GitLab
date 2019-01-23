@@ -47,6 +47,19 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
     end
   end
 
+  context 'when bridge configuration contains all supported keys' do
+    let(:config) do
+      { trigger: { project: 'some/project', branch: 'feature' },
+        when: 'always',
+        extends: '.some-key',
+        stage: 'deploy',
+        only: { variables: %w[$SOMEVARIABLE] },
+        except: { refs: %w[feature] } }
+    end
+
+    it { is_expected.to be_valid }
+  end
+
   context 'when trigger config is nil' do
     let(:config) { { trigger: nil } }
 
