@@ -65,6 +65,7 @@ The following API resources are available:
   - [Project templates](project_templates.md) (see also [Templates API Resources](#templates-api-resources))
 - [Protected branches](protected_branches.md)
 - [Protected tags](protected_tags.md)
+- [Packages](packages.md) **[PREMIUM]**
 - [Repositories](repositories.md)
 - [Repository files](repository_files.md)
 - [Repository submodules](repository_submodules.md)
