@@ -35,7 +35,7 @@ export default {
     <li class="settings-flex-row">
       <div class="px-3 d-flex align-items-center">
         <avatar :project="approver" :size="24" /><span>{{ displayName }}</span>
-        <gl-button variant="none" class="ml-auto" @click="$emit('remove', approver);">
+        <gl-button variant="none" class="ml-auto" @click="$emit('remove', approver)">
           <icon name="remove" :aria-label="__('Remove')" />
         </gl-button>
       </div>

@@ -24,7 +24,7 @@ export default {
   <callout class="m-0" category="info">
     <div>{{ $options.message }}</div>
     <div v-if="settings.canEdit" class="prepend-top-default">
-      <gl-button class="btn-info btn-inverted" @click="$emit('click');">{{
+      <gl-button class="btn-info btn-inverted" @click="$emit('click')">{{
         __('Add approvers')
       }}</gl-button>
     </div>

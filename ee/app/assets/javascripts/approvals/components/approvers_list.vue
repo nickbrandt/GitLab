@@ -29,7 +29,7 @@ export default {
       v-for="(approver, index) in value"
       :key="approver.type + approver.id"
       :approver="approver"
-      @remove="removeApprover(index);"
+      @remove="removeApprover(index)"
     />
   </ul>
 </template>
