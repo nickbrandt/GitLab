@@ -5614,9 +5614,6 @@ msgstr ""
 msgid "Merge requests are a place to propose changes you've made to a project and discuss those changes with others"
 msgstr ""
 
-msgid "MergeRequests|%{commitSha}"
-msgstr ""
-
 msgid "MergeRequests|An error occurred while saving the draft comment."
 msgstr ""
 
@@ -5647,7 +5644,7 @@ msgstr ""
 msgid "MergeRequests|View replaced file @ %{commitId}"
 msgstr ""
 
-msgid "MergeRequests|commented on commit "
+msgid "MergeRequests|commented on commit %{linkStart}%{commitId}%{linkEnd}"
 msgstr ""
 
 msgid "MergeRequests|started a discussion"

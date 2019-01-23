@@ -80,12 +80,27 @@ export default {
     isTarget() {
       return this.targetNoteHash === this.noteAnchorId;
     },
-    truncatedHash() {
+    actionText() {
       if (!this.commit) {
         return '';
       }
 
-      return sprintf(s__('MergeRequests|%{commitSha}'), { commitSha: truncateSha(this.commit.id) });
+      // We need to do this to ensure we have the currect sentence order
+      // when translating this as the sentence order may change from one
+      // language to the next. See:
+      // https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/24427#note_133713771
+      const { id, url } = this.commit;
+      const linkStart = `<a class="commit-sha monospace" href="${escape(url)}">`;
+      const linkEnd = '</a>';
+      return sprintf(
+        s__('MergeRequests|commented on commit %{linkStart}%{commitId}%{linkEnd}'),
+        {
+          commitId: truncateSha(id),
+          linkStart,
+          linkEnd,
+        },
+        false,
+      );
     },
   },
 
@@ -220,10 +235,7 @@ export default {
       <div class="note-header">
         <note-header v-once :author="author" :created-at="note.created_at" :note-id="note.id">
           <slot slot="note-header-info" name="note-header-info"></slot>
-          <span v-if="commit">
-            {{ s__('MergeRequests|commented on commit ')
-            }}<a class="commit-sha monospace" :href="commit.url">{{ truncatedHash }}</a>
-          </span>
+          <span v-if="commit" v-html="actionText"></span>
           <span v-else class="d-none d-sm-inline">&middot;</span>
         </note-header>
         <note-actions
