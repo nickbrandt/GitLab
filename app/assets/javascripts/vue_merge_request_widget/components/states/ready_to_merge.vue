@@ -227,7 +227,7 @@ export default {
           }
         })
         .catch(() => {
-          new Flash('Something went wrong while removing the source branch. Please try again.'); // eslint-disable-line
+          new Flash('Something went wrong while deleting the source branch. Please try again.'); // eslint-disable-line
         });
     },
   },
@@ -301,7 +301,7 @@ export default {
                 class="js-remove-source-branch-checkbox"
                 type="checkbox"
               />
-              Remove source branch
+              Delete source branch
             </label>
 
             <!-- Placeholder for EE extension of this component -->
