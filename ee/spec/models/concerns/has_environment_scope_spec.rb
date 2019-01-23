@@ -19,10 +19,17 @@ describe HasEnvironmentScope do
     let!(:cluster1) { create(:cluster, projects: [project], environment_scope: '*') }
     let!(:cluster2) { create(:cluster, projects: [project], environment_scope: 'product/*') }
     let!(:cluster3) { create(:cluster, projects: [project], environment_scope: 'staging/*') }
-    let(:environment_name) { 'product/*' }
+    let(:environment_name) { 'product/canary-1' }
 
     it 'returns scoped objects' do
       expect(project.clusters.on_environment(environment_name)).to eq([cluster1, cluster2])
+    end
+
+    context 'when relevant_only option is specified' do
+      it 'returns only one relevant object' do
+        expect(project.clusters.on_environment(environment_name, relevant_only: true))
+          .to eq([cluster2])
+      end
     end
   end
 

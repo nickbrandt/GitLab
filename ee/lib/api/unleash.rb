@@ -9,6 +9,7 @@ module API
         params do
           requires :project_id, type: String, desc: 'The ID of a project'
           optional :instance_id, type: String, desc: 'The Instance ID of Unleash Client'
+          optional :app_name, type: String, desc: 'The Application Name of Unleash Client'
         end
         route_param :project_id do
           before do
@@ -23,12 +24,14 @@ module API
 
           desc 'Get a list of features (deprecated, v2 client support)'
           get 'features' do
-            present project, with: ::EE::API::Entities::UnleashFeatures
+            present :version, 1
+            present :features, feature_flags, with: ::EE::API::Entities::UnleashFeature
           end
 
           desc 'Get a list of features'
           get 'client/features' do
-            present project, with: ::EE::API::Entities::UnleashFeatures
+            present :version, 1
+            present :features, feature_flags, with: ::EE::API::Entities::UnleashFeature
           end
 
           post 'client/register' do
@@ -50,7 +53,11 @@ module API
       end
 
       def unleash_instance_id
-        params[:instance_id] || env['HTTP_UNLEASH_INSTANCEID']
+        env['HTTP_UNLEASH_INSTANCEID'] || params[:instance_id]
+      end
+
+      def unleash_app_name
+        env['HTTP_UNLEASH_APPNAME'] || params[:app_name]
       end
 
       def authorize_by_unleash_instance_id!
@@ -60,6 +67,17 @@ module API
 
       def authorize_feature_flags_feature!
         forbidden! unless project.feature_available?(:feature_flags)
+      end
+
+      def feature_flags
+        if Feature.enabled?(:feature_flags_environment_scope, project: project)
+          return [] unless unleash_app_name.present?
+
+          project.operations_feature_flags.for_environment(unleash_app_name)
+                                          .ordered
+        else
+          project.operations_feature_flags.ordered
+        end
       end
     end
   end

@@ -459,21 +459,6 @@ module EE
         expose :strategies
       end
 
-      class UnleashFeatures < Grape::Entity
-        expose :version
-        expose :features, with: UnleashFeature
-
-        private
-
-        def version
-          1
-        end
-
-        def features
-          object.operations_feature_flags.ordered
-        end
-      end
-
       class GitlabSubscription < Grape::Entity
         expose :plan do
           expose :plan_name, as: :code
