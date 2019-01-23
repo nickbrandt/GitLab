@@ -49,11 +49,6 @@ msgid_plural "%d additions"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "%d approval required from %{name}"
-msgid_plural "%d approvals required from %{name}"
-msgstr[0] ""
-msgstr[1] ""
-
 msgid "%d changed file"
 msgid_plural "%d changed files"
 msgstr[0] ""
@@ -143,6 +138,11 @@ msgstr ""
 
 msgid "%{count} %{alerts}"
 msgstr ""
+
+msgid "%{count} approval required from %{name}"
+msgid_plural "%{count} approvals required from %{name}"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%{count} more"
 msgstr ""
@@ -912,9 +912,6 @@ msgstr ""
 msgid "Apply suggestion"
 msgstr ""
 
-msgid "ApprovalRuleForm|No. approvals required"
-msgstr ""
-
 msgid "ApprovalRuleRemove|%d member"
 msgid_plural "ApprovalRuleRemove|%d members"
 msgstr[0] ""
@@ -932,6 +929,9 @@ msgid "ApprovalRule|Members"
 msgstr ""
 
 msgid "ApprovalRule|Name"
+msgstr ""
+
+msgid "ApprovalRule|No. approvals required"
 msgstr ""
 
 msgid "ApprovalRule|e.g. QA, Security, etc."
