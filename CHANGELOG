@@ -2,11 +2,23 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 8.1.1
+
+- Sign LFS upload requests that have been handled by workhorse
+
 v 8.1.0
 
 - Upgrade the gitaly client to v1.13.0 (includes TLS support) !351
 - Update gitaly-proto to 0.124.0 !331
 - Add distributed tracing with LabKit !325
+
+v 8.0.2
+
+- Fixed svg recognition to get the proper content type !353
+
+v 8.0.1
+
+- Sign LFS upload requests that have been handled by workhorse
 
 v 8.0.0
 
@@ -14,6 +26,10 @@ v 8.0.0
 - Remove local git diff handling !345
 - Remove local git format-patch handling !346
 - Remove RepoPath from the API response
+
+v 7.6.1
+
+- Sign LFS upload requests that have been handled by workhorse
 
 v 7.6.0
 
@@ -47,6 +63,10 @@ v 7.2.0
 
 - Update CI matrix to go1.10 + go1.11 and fix ResponseWriter bugs !309
 - Add support for Redis URLs (redis:// and rediss://) in Workhorse !321
+
+v 7.1.4
+
+- Sign LFS upload requests that have been handled by workhorse
 
 v 7.1.3
 
