@@ -7,6 +7,7 @@ import eventHub from '~/vue_merge_request_widget/event_hub';
 import MrWidgetContainer from '~/vue_merge_request_widget/components/mr_widget_container.vue';
 import MrWidgetIcon from '~/vue_merge_request_widget/components/mr_widget_icon.vue';
 import ApprovalsSummary from './approvals_summary.vue';
+import ApprovalsFooter from './approvals_footer.vue';
 import { FETCH_LOADING, FETCH_ERROR, APPROVE_ERROR, UNAPPROVE_ERROR } from '../messages';
 
 export default {
@@ -16,6 +17,7 @@ export default {
     MrWidgetContainer,
     MrWidgetIcon,
     ApprovalsSummary,
+    ApprovalsFooter,
     GlButton,
     GlLoadingIcon,
   },
@@ -142,5 +144,6 @@ export default {
         />
       </template>
     </div>
+    <approvals-footer :mr="mr" :service="service" slot="footer" />
   </mr-widget-container>
 </template>

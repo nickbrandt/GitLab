@@ -2,14 +2,18 @@ import createFlash from '~/flash';
 import { __ } from '~/locale';
 import Api from 'ee/api';
 import * as types from '../base/mutation_types';
-import { mapApprovalRuleRequest, mapApprovalRulesResponse } from '../../../mappers';
+import {
+  mapApprovalRuleRequest,
+  mapApprovalSettingsResponse,
+  mapApprovalFallbackRuleRequest,
+} from '../../../mappers';
 
 export const requestRules = ({ commit }) => {
   commit(types.SET_LOADING, true);
 };
 
-export const receiveRulesSuccess = ({ commit }, { rules }) => {
-  commit(types.SET_RULES, rules);
+export const receiveRulesSuccess = ({ commit }, approvalSettings) => {
+  commit(types.SET_APPROVAL_SETTINGS, approvalSettings);
   commit(types.SET_LOADING, false);
 };
 
@@ -22,8 +26,8 @@ export const fetchRules = ({ rootState, dispatch }) => {
 
   dispatch('requestRules');
 
-  return Api.getProjectApprovalRules(projectId)
-    .then(response => dispatch('receiveRulesSuccess', mapApprovalRulesResponse(response.data)))
+  return Api.getProjectApprovalSettings(projectId)
+    .then(response => dispatch('receiveRulesSuccess', mapApprovalSettingsResponse(response.data)))
     .catch(() => dispatch('receiveRulesError'));
 };
 
@@ -67,6 +71,23 @@ export const deleteRule = ({ rootState, dispatch }, id) => {
   return Api.deleteProjectApprovalRule(projectId, id)
     .then(() => dispatch('deleteRuleSuccess'))
     .catch(() => dispatch('deleteRuleError'));
+};
+
+export const putFallbackRuleSuccess = ({ dispatch }) => {
+  dispatch('createModal/close');
+  dispatch('fetchRules');
+};
+
+export const putFallbackRuleError = () => {
+  createFlash(__('An error occurred while saving the approval settings'));
+};
+
+export const putFallbackRule = ({ rootState, dispatch }, fallback) => {
+  const { projectId } = rootState.settings;
+
+  return Api.putProjectApprovalSettings(projectId, mapApprovalFallbackRuleRequest(fallback))
+    .then(() => dispatch('putFallbackRuleSuccess'))
+    .catch(() => dispatch('putFallbackRuleError'));
 };
 
 export default () => {};

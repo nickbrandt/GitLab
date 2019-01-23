@@ -1,2 +1,2 @@
 export const SET_LOADING = 'SET_LOADING';
-export const SET_RULES = 'SET_RULES';
+export const SET_APPROVAL_SETTINGS = 'SET_APPROVAL_SETTINGS';

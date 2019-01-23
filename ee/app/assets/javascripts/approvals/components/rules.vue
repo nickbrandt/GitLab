@@ -1,11 +1,10 @@
 <script>
-import { mapState } from 'vuex';
-
 export default {
-  computed: {
-    ...mapState({
-      rules: state => state.approvals.rules,
-    }),
+  props: {
+    rules: {
+      type: Array,
+      required: true,
+    },
   },
 };
 </script>

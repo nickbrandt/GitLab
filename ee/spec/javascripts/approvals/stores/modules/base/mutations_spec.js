@@ -19,13 +19,13 @@ describe('EE approvals base module mutations', () => {
     });
   });
 
-  describe(types.SET_RULES, () => {
+  describe(types.SET_APPROVAL_SETTINGS, () => {
     it('sets rules', () => {
       const newRules = [{ id: 1 }, { id: 2 }];
 
       state.rules = [];
 
-      mutations[types.SET_RULES](state, newRules);
+      mutations[types.SET_APPROVAL_SETTINGS](state, newRules);
 
       expect(state.rules).toEqual(newRules);
     });

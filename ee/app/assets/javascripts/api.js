@@ -3,8 +3,27 @@ import axios from '~/lib/utils/axios_utils';
 
 export default {
   ...CEApi,
-  projectApprovalRulesPath: '/api/:version/projects/:id/approval_rules',
-  projectApprovalRulePath: '/api/:version/projects/:id/approval_rules/:ruleid',
+  projectApprovalSettingsPath: '/api/:version/projects/:id/approval_settings',
+  projectApprovalRulesPath: '/api/:version/projects/:id/approval_settings/rules',
+  projectApprovalRulePath: '/api/:version/projects/:id/approval_settings/rules/:ruleid',
+  getProjectApprovalSettings(projectId) {
+    const url = this.buildUrl(this.projectApprovalSettingsPath).replace(
+      ':id',
+      encodeURIComponent(projectId),
+    );
+
+    return axios.get(url);
+  },
+
+  putProjectApprovalSettings(projectId, settings) {
+    const url = this.buildUrl(this.projectApprovalSettingsPath).replace(
+      ':id',
+      encodeURIComponent(projectId),
+    );
+
+    return axios.put(url, settings);
+  },
+
   getProjectApprovalRules(projectId) {
     const url = this.buildUrl(this.projectApprovalRulesPath).replace(
       ':id',

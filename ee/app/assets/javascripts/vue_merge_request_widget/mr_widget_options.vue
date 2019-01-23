@@ -145,6 +145,7 @@ export default {
         ...base,
         approvalsPath: store.approvalsPath,
         apiApprovalsPath: store.apiApprovalsPath,
+        apiApprovalSettingsPath: store.apiApprovalSettingsPath,
         apiApprovePath: store.apiApprovePath,
         apiUnapprovePath: store.apiUnapprovePath,
       };

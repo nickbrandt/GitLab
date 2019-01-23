@@ -12,6 +12,9 @@ export default {
   },
   computed: {
     ...mapState(['settings']),
+    ...mapState({
+      rules: state => state.approvals.rules,
+    }),
   },
   methods: {
     ...mapActions(['putRule']),
@@ -20,7 +23,7 @@ export default {
 </script>
 
 <template>
-  <rules>
+  <rules :rules="rules">
     <template slot="thead">
       <tr>
         <th>{{ s__('ApprovalRule|Name') }}</th>
@@ -41,7 +44,7 @@ export default {
           class="form-control mw-6em"
           type="number"
           min="0"
-          @input="putRule({ id: rule.id, approvalsRequired: $event.target.value });"
+          @input="putRule({ id: rule.id, approvalsRequired: $event.target.value })"
         />
       </td>
       <td class="text-nowrap px-2 w-0"><rule-controls v-if="settings.canEdit" :rule="rule" /></td>

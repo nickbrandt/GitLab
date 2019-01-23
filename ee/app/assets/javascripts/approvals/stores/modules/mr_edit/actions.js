@@ -4,7 +4,7 @@ import { __ } from '~/locale';
 import Api from 'ee/api';
 import axios from '~/lib/utils/axios_utils';
 import * as types from './mutation_types';
-import { mapApprovalRulesResponse } from '../../../mappers';
+import { mapApprovalSettingsResponse } from '../../../mappers';
 
 const fetchGroupMembers = id => Api.groupMembers(id).then(response => response.data);
 
@@ -36,13 +36,16 @@ const seedLocalRule = rule =>
     .then(seedUsers)
     .then(seedGroups);
 
+// If the MR doesn't have custom rules, then we pull `id` out and set it to `sourceId`
+const asSourcedRules = rules => rules.map(({ id, ...rule }) => ({ ...rule, sourceId: id }));
+
 export const requestRules = ({ commit }) => {
   commit(types.SET_LOADING, true);
 };
 
 export const receiveRulesSuccess = ({ commit }, rules) => {
   commit(types.SET_LOADING, false);
-  commit(types.SET_RULES, rules);
+  commit(types.SET_APPROVAL_SETTINGS, rules);
 };
 
 export const receiveRulesError = () => {
@@ -56,26 +59,32 @@ export const fetchRules = ({ rootState, dispatch }) => {
   const async = mrId ? dispatch('fetchMergeRequestRules') : dispatch('fetchProjectRules');
 
   return async
-    .then(rules => dispatch('receiveRulesSuccess', rules))
+    .then(({ rules, hasCustomRules, ...settings }) => ({
+      ...settings,
+      rules: hasCustomRules ? rules : asSourcedRules(rules),
+    }))
+    .then(approvalSettings => dispatch('receiveRulesSuccess', approvalSettings))
     .catch(() => dispatch('receiveRulesError'));
 };
 
 export const fetchProjectRules = ({ rootState }) => {
   const { projectId } = rootState.settings;
 
-  // These will be `new` MR rules so we pull `id` out of the reponse and set it to `sourceId`
-  return Api.getProjectApprovalRules(projectId)
-    .then(response => mapApprovalRulesResponse(response.data))
-    .then(({ rules }) => rules.map(({ id, ...rule }) => ({ ...rule, sourceId: id })));
+  return Api.getProjectApprovalSettings(projectId).then(response =>
+    mapApprovalSettingsResponse(response.data),
+  );
 };
 
 export const fetchMergeRequestRules = ({ rootState }) => {
-  const { mrRulesPath } = rootState.settings;
+  const { approvalSettingsPath } = rootState.settings;
 
   return axios
-    .get(mrRulesPath)
-    .then(response => mapApprovalRulesResponse(response.data))
-    .then(({ rules }) => rules.filter(x => !x.isCodeOwner));
+    .get(approvalSettingsPath)
+    .then(response => mapApprovalSettingsResponse(response.data))
+    .then(data => ({
+      ...data,
+      rules: data.rules.filter(x => !x.isCodeOwner),
+    }));
 };
 
 export const postRule = ({ commit, dispatch }, rule) =>
@@ -103,4 +112,9 @@ export const putRule = ({ commit, dispatch }, rule) =>
 export const deleteRule = ({ commit, dispatch }, id) => {
   commit(types.DELETE_RULE, id);
   dispatch('deleteModal/close');
+};
+
+export const putFallbackRule = ({ commit, dispatch }, fallback) => {
+  commit(types.SET_FALLBACK_RULE, fallback);
+  dispatch('createModal/close');
 };

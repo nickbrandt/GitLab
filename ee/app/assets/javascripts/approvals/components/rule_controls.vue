@@ -23,9 +23,13 @@ export default {
 
 <template>
   <div>
-    <gl-button variant="none" @click="openCreateModal(rule)">
-      <icon name="pencil" :aria-label="__('Edit')" /> </gl-button
-    ><gl-button class="prepend-left-8 btn-inverted" variant="remove" @click="openDeleteModal(rule)">
+    <gl-button variant="none" @click="openCreateModal(rule)"> <span>Edit</span> </gl-button
+    ><gl-button
+      v-if="!rule.isFallback"
+      class="prepend-left-8 btn-inverted"
+      variant="remove"
+      @click="openDeleteModal(rule)"
+    >
       <icon name="remove" :aria-label="__('Remove')" />
     </gl-button>
   </div>

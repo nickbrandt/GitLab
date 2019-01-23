@@ -4,6 +4,7 @@ import { GlLoadingIcon, GlButton } from '@gitlab/ui';
 import ModalRuleCreate from './modal_rule_create.vue';
 import ModalRuleRemove from './modal_rule_remove.vue';
 import RulesEmpty from './rules_empty.vue';
+import FallbackRules from './fallback_rules.vue';
 
 export default {
   components: {
@@ -12,11 +13,13 @@ export default {
     RulesEmpty,
     GlButton,
     GlLoadingIcon,
+    FallbackRules,
   },
   computed: {
     ...mapState({
       settings: 'settings',
       isLoading: state => state.approvals.isLoading,
+      hasLoaded: state => state.approvals.hasLoaded,
     }),
     ...mapGetters(['isEmpty']),
     createModalId() {
@@ -38,12 +41,12 @@ export default {
 
 <template>
   <div>
-    <template v-if="isEmpty">
-      <gl-loading-icon v-if="isLoading" :size="2" />
-      <rules-empty v-else @click="openCreateModal(null)" />
-    </template>
+    <gl-loading-icon v-if="!hasLoaded" :size="2" />
     <template v-else>
-      <div class="border-bottom"><slot name="rules"></slot></div>
+      <div class="border-bottom">
+        <slot v-if="isEmpty" name="fallback"> <fallback-rules /> </slot>
+        <slot v-else name="rules"></slot>
+      </div>
       <div v-if="settings.canEdit" class="border-bottom py-3 px-2">
         <gl-loading-icon v-if="isLoading" />
         <div class="d-flex">
@@ -52,8 +55,8 @@ export default {
           }}</gl-button>
         </div>
       </div>
+      <slot name="footer"></slot>
     </template>
-    <slot name="footer"></slot>
     <modal-rule-create :modal-id="createModalId" />
     <modal-rule-remove :modal-id="removeModalId" />
   </div>

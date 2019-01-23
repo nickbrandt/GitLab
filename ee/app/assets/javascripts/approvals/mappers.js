@@ -5,6 +5,10 @@ export const mapApprovalRuleRequest = req => ({
   groups: req.groups,
 });
 
+export const mapApprovalFallbackRuleRequest = req => ({
+  fallback_approvals_required: req.approvalsRequired,
+});
+
 export const mapApprovalRuleResponse = res => ({
   id: res.id,
   name: res.name,
@@ -15,6 +19,8 @@ export const mapApprovalRuleResponse = res => ({
   isCodeOwner: res.code_owner,
 });
 
-export const mapApprovalRulesResponse = req => ({
-  rules: req.rules.map(mapApprovalRuleResponse),
+export const mapApprovalSettingsResponse = res => ({
+  rules: res.rules.map(mapApprovalRuleResponse),
+  fallbackApprovalsRequired: res.fallback_approvals_required,
+  hasCustomRules: res.approval_rules_overwritten,
 });

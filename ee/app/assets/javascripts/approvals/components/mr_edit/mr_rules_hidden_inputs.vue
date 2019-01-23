@@ -2,19 +2,21 @@
 import { mapState } from 'vuex';
 
 const INPUT_ID = 'merge_request[approval_rules_attributes][][id]';
-const INPUT_SOURCE_ID = 'merge_request[approval_rules_attributes][][approvals_required]';
+const INPUT_SOURCE_ID = 'merge_request[approval_rules_attributes][][approval_project_rule_id]';
 const INPUT_NAME = 'merge_request[approval_rules_attributes][][name]';
 const INPUT_APPROVALS_REQUIRED = 'merge_request[approval_rules_attributes][][approvals_required]';
 const INPUT_USER_IDS = 'merge_request[approval_rules_attributes][][user_ids][]';
 const INPUT_GROUP_IDS = 'merge_request[approval_rules_attributes][][group_ids][]';
 const INPUT_DELETE = 'merge_request[approval_rules_attributes][][_destroy]';
+const INPUT_FALLBACK_APPROVALS_REQUIRED = 'merge_request[approvals_before_merge]';
 
 export default {
   computed: {
     ...mapState(['settings']),
     ...mapState({
-      rules: state => state.rules.rules,
-      rulesToDelete: state => state.rules.rulesToDelete,
+      rules: state => state.approvals.rules,
+      rulesToDelete: state => state.approvals.rulesToDelete,
+      fallbackApprovalsRequired: state => state.approvals.fallbackApprovalsRequired,
     }),
   },
   INPUT_ID,
@@ -24,6 +26,7 @@ export default {
   INPUT_USER_IDS,
   INPUT_GROUP_IDS,
   INPUT_DELETE,
+  INPUT_FALLBACK_APPROVALS_REQUIRED,
 };
 </script>
 
@@ -33,6 +36,12 @@ export default {
       <input :value="id" :name="$options.INPUT_ID" type="hidden" />
       <input :value="1" :name="$options.INPUT_DELETE" type="hidden" />
     </div>
+    <input
+      v-if="!rules.length"
+      :value="fallbackApprovalsRequired"
+      :name="$options.INPUT_FALLBACK_APPROVALS_REQUIRED"
+      type="hidden"
+    />
     <div v-for="rule in rules" :key="rule.id">
       <input v-if="!rule.isNew" :value="rule.id" :name="$options.INPUT_ID" type="hidden" />
       <input

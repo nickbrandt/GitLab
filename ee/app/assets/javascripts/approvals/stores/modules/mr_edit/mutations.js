@@ -10,6 +10,12 @@ const seedNew = rule => ({
 
 export default {
   ...base,
+  [types.SET_APPROVAL_SETTINGS](state, settings) {
+    base[types.SET_APPROVAL_SETTINGS](state, {
+      ...settings,
+      rules: settings.rules.map(x => (x.id ? x : seedNew(x))),
+    });
+  },
   [types.DELETE_RULE](state, id) {
     const idx = _.findIndex(state.rules, x => x.id === id);
 
@@ -40,5 +46,8 @@ export default {
     const rules = _.isArray(rule) ? rule : [rule];
 
     state.rules = state.rules.concat(rules.map(seedNew));
+  },
+  [types.SET_FALLBACK_RULE](state, fallback) {
+    state.fallbackApprovalsRequired = fallback.approvalsRequired;
   },
 };

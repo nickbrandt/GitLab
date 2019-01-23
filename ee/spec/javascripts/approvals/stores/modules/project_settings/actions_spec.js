@@ -2,7 +2,7 @@ import Api from 'ee/api';
 import testAction from 'spec/helpers/vuex_action_helper';
 import * as types from 'ee/approvals/stores/modules/base/mutation_types';
 import actionsModule, * as actions from 'ee/approvals/stores/modules/project_settings/actions';
-import { mapApprovalRuleRequest, mapApprovalRulesResponse } from 'ee/approvals/mappers';
+import { mapApprovalRuleRequest, mapApprovalSettingsResponse } from 'ee/approvals/mappers';
 
 const TEST_PROJECT_ID = 9;
 const TEST_RULE_ID = 7;
@@ -57,7 +57,10 @@ describe('EE approvals project settings module actions', () => {
         actions.receiveRulesSuccess,
         { rules },
         {},
-        [{ type: types.SET_RULES, payload: rules }, { type: types.SET_LOADING, payload: false }],
+        [
+          { type: types.SET_APPROVAL_SETTINGS, payload: rules },
+          { type: types.SET_LOADING, payload: false },
+        ],
         [],
         done,
       );
@@ -89,7 +92,7 @@ describe('EE approvals project settings module actions', () => {
         [],
         [
           { type: 'requestRules' },
-          { type: 'receiveRulesSuccess', payload: mapApprovalRulesResponse(response.data) },
+          { type: 'receiveRulesSuccess', payload: mapApprovalSettingsResponse(response.data) },
         ],
         () => {
           expect(Api.getProjectApprovalRules).toHaveBeenCalledWith(TEST_PROJECT_ID);

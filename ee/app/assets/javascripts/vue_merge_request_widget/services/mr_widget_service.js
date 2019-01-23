@@ -31,12 +31,17 @@ class MrWidgetApprovalRuleService extends MRWidgetService {
     super(mr);
 
     this.apiApprovalsPath = mr.apiApprovalsPath;
+    this.apiApprovalSettingsPath = mr.apiApprovalSettingsPath;
     this.apiApprovePath = mr.apiApprovePath;
     this.apiUnapprovePath = mr.apiUnapprovePath;
   }
 
   fetchApprovals() {
     return axios.get(this.apiApprovalsPath).then(res => res.data);
+  }
+
+  fetchApprovalSettings() {
+    return axios.get(this.apiApprovalSettingsPath).then(res => res.data);
   }
 
   approveMergeRequest() {

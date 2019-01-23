@@ -34,6 +34,10 @@ export default {
         return APPROVED_MESSAGE;
       }
 
+      if (!this.rulesLeft.length) {
+        return n__('Requires approval.', 'Requires %d more approvals.', this.approvalsLeft);
+      }
+
       return sprintf(
         n__(
           'Requires approval from %{names}.',

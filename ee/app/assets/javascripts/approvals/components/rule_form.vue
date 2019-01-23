@@ -27,6 +27,7 @@ export default {
       approvers: [],
       approversToAdd: [],
       showValidation: false,
+      isFallback: false,
       ...this.getInitialData(),
     };
   },
@@ -59,6 +60,10 @@ export default {
       };
     },
     invalidName() {
+      if (this.isFallbackSubmission) {
+        return;
+      }
+
       return !this.name ? __('Please provide a name') : '';
     },
     invalidApprovalsRequired() {
@@ -67,14 +72,21 @@ export default {
         : '';
     },
     invalidApprovers() {
+      if (this.isFallbackSubmission) {
+        return;
+      }
+
       return !this.approvers.length ? __('Please select and add a member') : '';
     },
     isValid() {
       return Object.keys(this.validation).every(key => !this.validation[key]);
     },
+    isFallbackSubmission() {
+      return this.isFallback && !this.name && !this.approvers.length;
+    },
   },
   methods: {
-    ...mapActions(['postRule', 'putRule']),
+    ...mapActions(['putFallbackRule', 'postRule', 'putRule']),
     addSelection() {
       if (!this.approversToAdd.length) {
         return;
@@ -84,6 +96,14 @@ export default {
       this.approversToAdd = [];
     },
     submit() {
+      if (!this.validate()) {
+        return Promise.resolve();
+      }
+
+      if (this.isFallbackSubmission) {
+        return this.submitFallback();
+      }
+
       const id = this.initRule && this.initRule.id;
       const data = {
         name: this.name,
@@ -94,24 +114,38 @@ export default {
         groupRecords: this.groups,
       };
 
-      this.showValidation = true;
-      if (!this.isValid) {
-        return Promise.resolve();
-      }
-
       return id ? this.putRule({ id, ...data }) : this.postRule(data);
+    },
+    submitFallback() {
+      const data = {
+        approvalsRequired: this.approvalsRequired,
+      };
+
+      return this.putFallbackRule(data);
+    },
+    validate() {
+      this.showValidation = true;
+
+      return this.isValid;
     },
     getInitialData() {
       if (!this.initRule) {
         return {};
       }
 
+      if (this.initRule.isFallback) {
+        return {
+          approvalsRequired: this.initRule.approvalsRequired,
+          isFallback: this.initRule.isFallback,
+        };
+      }
+
       const users = this.initRule.users.map(x => ({ ...x, type: TYPE_USER }));
       const groups = this.initRule.groups.map(x => ({ ...x, type: TYPE_GROUP }));
 
       return {
-        name: this.initRule.name,
-        approvalsRequired: this.initRule.approvalsRequired,
+        name: this.initRule.name || '',
+        approvalsRequired: this.initRule.approvalsRequired || 0,
         approvers: groups.concat(users),
       };
     },

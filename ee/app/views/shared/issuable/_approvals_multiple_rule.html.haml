@@ -1,5 +1,5 @@
 #js-mr-approvals-input{ data: { 'project_id': @project.id,
   'can_edit': can?(current_user, :update_approvers, issuable).to_s,
   'mr_id': issuable.iid,
-  'mr_rules_path': issuable.iid && api_v4_projects_merge_requests_approval_rules_path(id: @project.id, merge_request_iid: issuable.iid) } }
+  'approval_settings_path': issuable.iid && api_v4_projects_merge_requests_approval_settings_path(id: @project.id, merge_request_iid: issuable.iid) } }
   = sprite_icon('spinner', size: 24, css_class: 'gl-spinner')
