@@ -32,11 +32,13 @@ module EE
 
         params[:approval_rules_attributes].each do |rule_attributes|
           if rule_attributes.key?(:group_ids)
-            rule_attributes[:group_ids] = rule_attributes[:group_ids] & group_ids
+            provided_group_ids = rule_attributes[:group_ids].map(&:to_i)
+            rule_attributes[:group_ids] = provided_group_ids & group_ids
           end
 
           if rule_attributes.key?(:user_ids)
-            rule_attributes[:user_ids] = rule_attributes[:user_ids] & user_ids
+            provided_user_ids = rule_attributes[:user_ids].map(&:to_i)
+            rule_attributes[:user_ids] = provided_user_ids & user_ids
           end
         end
       end
