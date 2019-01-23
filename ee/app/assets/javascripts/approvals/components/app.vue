@@ -40,14 +40,14 @@ export default {
   <div>
     <template v-if="isEmpty">
       <gl-loading-icon v-if="isLoading" :size="2" />
-      <rules-empty v-else @click="openCreateModal(null);" />
+      <rules-empty v-else @click="openCreateModal(null)" />
     </template>
     <template v-else>
       <div class="border-bottom"><slot name="rules"></slot></div>
       <div v-if="settings.canEdit" class="border-bottom py-3 px-2">
         <gl-loading-icon v-if="isLoading" />
         <div class="d-flex">
-          <gl-button class="ml-auto btn-info btn-inverted" @click="openCreateModal(null);">{{
+          <gl-button class="ml-auto btn-info btn-inverted" @click="openCreateModal(null)">{{
             __('Add approvers')
           }}</gl-button>
         </div>
