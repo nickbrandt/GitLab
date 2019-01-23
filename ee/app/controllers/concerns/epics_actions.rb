@@ -11,7 +11,12 @@ module EpicsActions
   end
 
   def default_sort_order
-    sort_value_recently_created
+    default_sort_value || sort_value_recently_created
+  end
+
+  # Override this if you want your controller to have a different default sort order
+  def default_sort_value
+    nil
   end
 
   def update_cookie_value(value)
