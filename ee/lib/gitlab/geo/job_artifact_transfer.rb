@@ -17,7 +17,11 @@ module Gitlab
       private
 
       def job_artifact_request_data(job_artifact)
-        { id: @file_id }
+        {
+          id: @file_id,
+          file_type: @file_type,
+          file_id: @file_id
+        }
       end
     end
   end

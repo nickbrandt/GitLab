@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Manage', :orchestrated, :ldap_no_tls, :ldap_tls do
+  # https://gitlab.com/gitlab-org/quality/nightly/issues/49
+  context 'Manage', :orchestrated, :ldap_no_tls, :ldap_tls, :quarantine do
     describe 'LDAP admin sync' do
       it 'Syncs admin users' do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)

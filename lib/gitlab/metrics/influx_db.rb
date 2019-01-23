@@ -150,10 +150,6 @@ module Gitlab
           current_transaction&.add_event(*args)
         end
 
-        def add_event_with_values(*args)
-          current_transaction&.add_event_with_values(*args)
-        end
-
         # Returns the prefix to use for the name of a series.
         def series_prefix
           @series_prefix ||= Sidekiq.server? ? 'sidekiq_' : 'rails_'

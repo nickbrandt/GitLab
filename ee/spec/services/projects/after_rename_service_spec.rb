@@ -8,60 +8,35 @@ describe Projects::AfterRenameService do
       set(:primary) { create(:geo_node, :primary) }
       set(:secondary) { create(:geo_node) }
       let(:project) { create(:project, :repository, :legacy_storage) }
-      let(:gitlab_shell) { Gitlab::Shell.new }
+      let!(:path_before_rename) { project.path }
+      let!(:full_path_before_rename) { project.full_path }
+      let(:path_after_rename) { "#{project.path}-renamed" }
 
       it 'logs the Geo::RepositoryRenamedEvent for project backed by hashed storage' do
-        project_hashed_storage = create(:project)
-
-        allow(project_hashed_storage)
-          .to receive(:gitlab_shell)
-          .and_return(gitlab_shell)
-
-        allow(project_hashed_storage)
-          .to receive(:previous_changes)
-          .and_return('path' => ['foo'])
-
-        allow(project_hashed_storage)
-          .to receive(:path_was)
-          .and_return('foo')
-
-        allow(gitlab_shell)
-          .to receive(:mv_repository)
-          .twice.and_return(true)
-
-        expect { described_class.new(project_hashed_storage).execute }
-          .to change(Geo::RepositoryRenamedEvent, :count)
+        expect { service_execute }.to change(Geo::RepositoryRenamedEvent, :count)
       end
 
       it 'logs the Geo::RepositoryRenamedEvent for project backed by legacy storage' do
-        allow(project)
-          .to receive(:gitlab_shell)
-          .and_return(gitlab_shell)
-
-        allow(project)
-          .to receive(:previous_changes)
-          .and_return('path' => ['foo'])
-
-        allow(project)
-          .to receive(:path_was)
-          .and_return('foo')
-
-        allow(gitlab_shell)
-          .to receive(:mv_repository)
-          .twice.and_return(true)
-
         expect(Geo::RepositoryRenamedEventStore)
           .to receive(:new)
           .with(
             project,
-            old_path: 'foo',
-            old_path_with_namespace: "#{project.namespace.full_path}/foo"
+            old_path: path_before_rename,
+            old_path_with_namespace: full_path_before_rename
           )
           .and_call_original
 
-        expect { described_class.new(project).execute }
+        expect { service_execute }
           .to change(Geo::RepositoryRenamedEvent, :count).by(1)
       end
     end
+  end
+
+  def service_execute
+    # AfterRenameService is called by UpdateService after a successful model.update
+    # the initialization will include before and after paths values
+    project.update(path: path_after_rename)
+
+    described_class.new(project, path_before: path_before_rename, full_path_before: full_path_before_rename).execute
   end
 end

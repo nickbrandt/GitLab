@@ -1,6 +1,0 @@
----
-title: Geo - Show the proper label for the last repository check run on Geo projects
-  page
-merge_request: 8844
-author:
-type: fixed

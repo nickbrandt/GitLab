@@ -79,15 +79,6 @@ module Gitlab
         @metrics << Metric.new(EVENT_SERIES, { count: 1 }, tags.merge(event: event_name), :event)
       end
 
-      #
-      # Deprecated
-      def add_event_with_values(event_name, values, tags = {})
-        @metrics << Metric.new(EVENT_SERIES,
-                               { count: 1 }.merge(values),
-                               { event: event_name }.merge(tags),
-                               :event)
-      end
-
       # Returns a MethodCall object for the given name.
       def method_call_for(name, module_name, method_name)
         unless method = @methods[name]

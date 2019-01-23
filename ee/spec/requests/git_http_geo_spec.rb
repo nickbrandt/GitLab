@@ -12,7 +12,7 @@ describe "Git HTTP requests (Geo)" do
   set(:secondary) { create(:geo_node) }
 
   # Ensure the token always comes from the real time of the request
-  let!(:auth_token) { Gitlab::Geo::BaseRequest.new.authorization }
+  let!(:auth_token) { Gitlab::Geo::BaseRequest.new(scope: "repository-#{project.id}").authorization }
   let!(:user) { create(:user) }
   let!(:user_without_any_access) { create(:user) }
   let!(:user_without_push_access) { create(:user) }
