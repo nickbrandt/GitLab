@@ -51,4 +51,15 @@ describe('Epic Store Mutations', () => {
       expect(state.epicStatusChangeInProgress).toBe(false);
     });
   });
+
+  describe('TOGGLE_SIDEBAR', () => {
+    it('Should set `sidebarCollapsed` flag on state with value of provided `sidebarCollapsed` param', () => {
+      const state = {};
+      const sidebarCollapsed = true;
+
+      mutations[types.TOGGLE_SIDEBAR](state, sidebarCollapsed);
+
+      expect(state.sidebarCollapsed).toBe(sidebarCollapsed);
+    });
+  });
 });

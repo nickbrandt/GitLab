@@ -11,6 +11,9 @@ export const mockEpicMeta = convertObjectPropsToCamelCase(meta, {
 });
 
 export const mockEpicData = convertObjectPropsToCamelCase(
-  Object.assign({}, getJSONFixture('epic/mock_data.json'), initial, { endpoint: TEST_HOST }),
+  Object.assign({}, getJSONFixture('epic/mock_data.json'), initial, {
+    endpoint: TEST_HOST,
+    sidebarCollapsed: false,
+  }),
   { deep: true },
 );

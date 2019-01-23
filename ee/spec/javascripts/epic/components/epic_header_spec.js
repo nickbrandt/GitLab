@@ -7,7 +7,7 @@ import { statusType } from 'ee/epic/constants';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import { mockEpicMeta, mockEpicData } from '../mock_data';
 
-describe('EpicBodyComponent', () => {
+describe('EpicHeaderComponent', () => {
   let vm;
   let store;
 

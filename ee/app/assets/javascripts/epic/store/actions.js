@@ -50,5 +50,18 @@ export const toggleEpicStatus = ({ state, dispatch }, isEpicOpen) => {
     });
 };
 
+export const toggleSidebarFlag = ({ commit }, sidebarCollapsed) =>
+  commit(types.TOGGLE_SIDEBAR, sidebarCollapsed);
+export const toggleContainerClassAndCookie = (_, sidebarCollapsed) => {
+  epicUtils.toggleContainerClass('right-sidebar-expanded');
+  epicUtils.toggleContainerClass('right-sidebar-collapsed');
+
+  epicUtils.setCollapsedGutter(sidebarCollapsed);
+};
+export const toggleSidebar = ({ dispatch }, { sidebarCollapsed }) => {
+  dispatch('toggleContainerClassAndCookie', !sidebarCollapsed);
+  dispatch('toggleSidebarFlag', !sidebarCollapsed);
+};
+
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};
