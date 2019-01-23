@@ -155,15 +155,6 @@ Read more about [Related Issues](related_issues.md).
 
 ### Import Issues from CSV
 
-From the project-level issues list, you can find the import button near the "Edit issues" button in the upper-right
-side.
-
-![Import CSV button](img/import_csv_button.png)
-
-Learn more about [importing issues from CSV](csv_import.md)
-
-### Import Issues from CSV
-
 You can import a CSV file containing issue titles and descriptions to create
 a batch of issues simultaneously.
 
