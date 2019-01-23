@@ -46,7 +46,8 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
       service.execute(bridge)
 
       expect(bridge.reload).to be_failed
-      expect(bridge.failure_reason).to eq 'invalid_bridge_trigger'
+      expect(bridge.failure_reason)
+        .to eq 'downstream_bridge_project_not_found'
     end
   end
 
@@ -60,7 +61,8 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
       service.execute(bridge)
 
       expect(bridge.reload).to be_failed
-      expect(bridge.failure_reason).to eq 'invalid_bridge_trigger'
+      expect(bridge.failure_reason)
+        .to eq 'downstream_bridge_project_not_found'
     end
   end
 
