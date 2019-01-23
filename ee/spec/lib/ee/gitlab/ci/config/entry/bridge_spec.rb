@@ -89,7 +89,7 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
     end
   end
 
-  context 'when bridge configuration is not valid' do
+  context 'when bridge config contains build-specific attributes' do
     let(:config) { { script: 'something' } }
 
     describe '#valid?' do
