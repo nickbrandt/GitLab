@@ -5647,6 +5647,9 @@ msgstr ""
 msgid "MergeRequests|View replaced file @ %{commitId}"
 msgstr ""
 
+msgid "MergeRequests|commented on commit %{commitLink}"
+msgstr ""
+
 msgid "MergeRequests|started a discussion"
 msgstr ""
 
