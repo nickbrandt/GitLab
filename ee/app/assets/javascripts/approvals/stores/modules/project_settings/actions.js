@@ -90,4 +90,12 @@ export const putFallbackRule = ({ rootState, dispatch }, fallback) => {
     .catch(() => dispatch('putFallbackRuleError'));
 };
 
+export const requestEditRule = ({ dispatch }, rule) => {
+  dispatch('createModal/open', rule);
+};
+
+export const requestDeleteRule = ({ dispatch }, rule) => {
+  dispatch('deleteModal/open', rule);
+};
+
 export default () => {};

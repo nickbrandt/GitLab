@@ -118,3 +118,13 @@ export const putFallbackRule = ({ commit, dispatch }, fallback) => {
   commit(types.SET_FALLBACK_RULE, fallback);
   dispatch('createModal/close');
 };
+
+export const requestEditRule = ({ dispatch }, rule) => {
+  dispatch('createModal/open', rule);
+};
+
+export const requestDeleteRule = ({ dispatch }, rule) => {
+  dispatch('deleteRule', rule.id);
+};
+
+export default () => {};
