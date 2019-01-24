@@ -336,7 +336,7 @@ group, you can use the following syntax:
 ```
 
 Find more information about this "LDAP_MATCHING_RULE_IN_CHAIN" filter at
-https://msdn.microsoft.com/en-us/library/aa746475(v=vs.85).aspx. Support for
+<https://docs.microsoft.com/en-us/windows/desktop/ADSI/search-filter-syntax>. Support for
 nested members in the user filter should not be confused with
 [group sync nested groups support (EE only)](ldap-ee.md#supported-ldap-group-types-attributes).
 
