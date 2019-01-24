@@ -48,6 +48,7 @@ The following API resources are available:
 - [Namespaces](namespaces.md)
 - [Notes](notes.md) (comments)
 - [Notification settings](notification_settings.md)
+- [Packages](packages.md) **[PREMIUM]**
 - [Pages domains](pages_domains.md)
 - [Pipelines](pipelines.md)
 - [Pipeline schedules](pipeline_schedules.md)
@@ -65,7 +66,6 @@ The following API resources are available:
   - [Project templates](project_templates.md) (see also [Templates API Resources](#templates-api-resources))
 - [Protected branches](protected_branches.md)
 - [Protected tags](protected_tags.md)
-- [Packages](packages.md) **[PREMIUM]**
 - [Repositories](repositories.md)
 - [Repository files](repository_files.md)
 - [Repository submodules](repository_submodules.md)
