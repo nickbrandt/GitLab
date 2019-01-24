@@ -13,6 +13,13 @@ export default {
     Rules,
     RuleControls,
   },
+  props: {
+    hasControls: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+  },
   computed: {
     ...mapState({
       approvalsRequired: state => state.approvals.fallbackApprovalsRequired,
@@ -35,7 +42,7 @@ export default {
       <tr class="d-none d-sm-table-row">
         <th class="w-75 pl-0">{{ s__('ApprovalRule|Members') }}</th>
         <th>{{ s__('ApprovalRule|No. approvals required') }}</th>
-        <th></th>
+        <th v-if="hasControls"></th>
       </tr>
     </template>
     <template slot="tr" slot-scope="{ rule }">
@@ -48,7 +55,9 @@ export default {
           <span>{{ rule.approvalsRequired }}</span>
         </slot>
       </td>
-      <td data-name="controls" class="text-nowrap px-2 w-0"><rule-controls :rule="rule" /></td>
+      <td v-if="hasControls" data-name="controls" class="text-nowrap px-2 w-0">
+        <rule-controls :rule="rule" />
+      </td>
     </template>
   </rules>
 </template>
