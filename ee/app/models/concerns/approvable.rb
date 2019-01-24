@@ -62,7 +62,7 @@ module Approvable
     # they're included/excluded from that list accordingly.
     return true if approvers_left.include?(user)
     # We can safely unauthorize authors if it reaches this guard clause.
-    return false if authors.include?(user)
+    return false if authors.include?(user) && !authors_can_approve?
     return false unless user.can?(:update_merge_request, self)
 
     any_approver_allowed? && approvals.where(user: user).empty?
