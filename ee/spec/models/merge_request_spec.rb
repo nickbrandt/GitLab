@@ -52,7 +52,7 @@ describe MergeRequest do
     let(:stranger) { create(:user) }
 
     before do
-      stub_feature_flags(approval_rule: false)
+      stub_feature_flags(approval_rules: false)
 
       project.add_developer(author)
       project.add_developer(approver)

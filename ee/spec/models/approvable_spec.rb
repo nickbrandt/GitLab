@@ -6,7 +6,7 @@ describe Approvable do
   let(:author) { merge_request.author }
 
   before do
-    stub_feature_flags(approval_rule: false)
+    stub_feature_flags(approval_rules: false)
   end
 
   describe '#approvers_overwritten?' do

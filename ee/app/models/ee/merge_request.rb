@@ -57,7 +57,7 @@ module EE
       strong_memoize(:participant_approvers) do
         next [] unless approval_needed?
 
-        if ::Feature.enabled?(:approval_rule)
+        if ::Feature.enabled?(:approval_rules, project)
           approval_state.filtered_approvers(code_owner: false, unactioned: true)
         else
           approvers = [

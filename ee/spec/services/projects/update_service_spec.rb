@@ -231,7 +231,7 @@ describe Projects::UpdateService, '#execute' do
 
   context 'with approval_rules' do
     it "updates approval_rules' approvals_required" do
-      stub_feature_flags(approval_rule: false)
+      stub_feature_flags(approval_rules: false)
 
       rule = create(:approval_project_rule, project: project)
 

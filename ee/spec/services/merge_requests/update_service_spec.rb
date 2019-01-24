@@ -82,7 +82,7 @@ describe MergeRequests::UpdateService, :mailer do
 
     context 'merge' do
       before do
-        stub_feature_flags(approval_rule: false)
+        stub_feature_flags(approval_rules: false)
       end
 
       let(:opts) { { merge: merge_request.diff_head_sha } }
@@ -123,7 +123,7 @@ describe MergeRequests::UpdateService, :mailer do
       let(:new_approver) { create(:user) }
 
       before do
-        stub_feature_flags(approval_rule: false)
+        stub_feature_flags(approval_rules: false)
 
         project.add_developer(existing_approver)
         project.add_developer(removed_approver)

@@ -15,14 +15,14 @@ module ApprovableForRule
 
   FORWARDABLE_METHODS.each do |method|
     define_method(method) do |*args|
-      return super(*args) if ::Feature.disabled?(:approval_rule)
+      return super(*args) if ::Feature.disabled?(:approval_rules, project)
 
       approval_state.public_send(method, *args) # rubocop:disable GitlabSecurity/PublicSend
     end
   end
 
   def approvers_overwritten?
-    return super if ::Feature.disabled?(:approval_rule)
+    return super if ::Feature.disabled?(:approval_rules, project)
 
     approval_state.approval_rules_overwritten?
   end

@@ -79,7 +79,7 @@ describe MergeRequests::RefreshService do
         let(:relevant_merge_requests) { [merge_request, another_merge_request] }
 
         before do
-          stub_feature_flags(approval_rule: false)
+          stub_feature_flags(approval_rules: false)
 
           relevant_merge_requests.each do |merge_request|
             expect(::Gitlab::CodeOwners).to receive(:for_merge_request).with(merge_request).and_return(new_owners)

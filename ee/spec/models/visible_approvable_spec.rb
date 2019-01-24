@@ -6,7 +6,7 @@ describe VisibleApprovable do
   let!(:user) { project.creator }
 
   before do
-    stub_feature_flags(approval_rule: false)
+    stub_feature_flags(approval_rules: false)
   end
 
   describe '#requires_approve' do

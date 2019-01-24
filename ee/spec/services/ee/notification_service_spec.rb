@@ -525,7 +525,7 @@ describe EE::NotificationService, :mailer do
     end
 
     before do
-      stub_feature_flags(approval_rule: false)
+      stub_feature_flags(approval_rules: false)
 
       project.add_maintainer(merge_request.author)
       project.add_maintainer(merge_request.assignee)
