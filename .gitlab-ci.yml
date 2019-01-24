@@ -444,7 +444,9 @@ retrieve-tests-metadata:
     - branches@gitlab-org/gitlab-ee
   except:
     - master
+    - tags
     - /[\d-]+-stable(-ee)?/
+    - /^security-/
     - /\bce\-to\-ee\b/
     - /(^docs[\/-].*|.*-docs$)/
 
