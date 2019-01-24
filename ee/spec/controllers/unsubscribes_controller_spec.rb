@@ -5,7 +5,7 @@ describe UnsubscribesController do
 
   describe "show" do
     it "responds with success" do
-      get :show, params: { email:  Base64.urlsafe_encode64('me@example.com') }
+      get :show, params: { email: Base64.urlsafe_encode64('me@example.com') }
 
       assert_response :success
     end

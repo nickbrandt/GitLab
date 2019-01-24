@@ -3,7 +3,7 @@ require 'spec_helper'
 describe GeoNodeStatus, :geo do
   include ::EE::GeoHelpers
 
-  let!(:primary)  { create(:geo_node, :primary) }
+  let!(:primary) { create(:geo_node, :primary) }
   let!(:secondary) { create(:geo_node) }
 
   let!(:group)     { create(:group) }
@@ -857,7 +857,7 @@ describe GeoNodeStatus, :geo do
   end
 
   describe '#revision' do
-    it {  expect(status.revision).to eq(Gitlab.revision) }
+    it { expect(status.revision).to eq(Gitlab.revision) }
   end
 
   describe '#[]' do

@@ -11,7 +11,7 @@ describe Gitlab::Elastic::Indexer do
   let(:project)  { create(:project, :repository) }
   let(:from_sha) { Gitlab::Git::BLANK_SHA }
   let(:to_sha)   { project.commit.try(:sha) }
-  let(:indexer)  { described_class.new(project)  }
+  let(:indexer)  { described_class.new(project) }
 
   let(:popen_success) { [[''], 0] }
   let(:popen_failure) { [['error'], 1] }

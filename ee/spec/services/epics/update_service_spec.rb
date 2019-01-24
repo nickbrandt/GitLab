@@ -88,7 +88,7 @@ describe Epics::UpdateService do
       end
 
       context 'adding a label' do
-        let(:label) {  create(:group_label, group: group) }
+        let(:label) { create(:group_label, group: group) }
         let(:user2) { create(:user) }
         let!(:todo1) do
           create(:todo, :mentioned, :pending,

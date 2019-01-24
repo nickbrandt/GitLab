@@ -112,7 +112,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
       expect(response).to match_response_schema('public_api/v4/geo_node_status', dir: 'ee')
     end
 
-    it 'shows the database-held response if current node status exists in the database, but not redis'  do
+    it 'shows the database-held response if current node status exists in the database, but not redis' do
       stub_current_geo_node(secondary)
 
       expect(GeoNodeStatus).to receive(:fast_current_node_status).and_return(nil)

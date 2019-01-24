@@ -1425,7 +1425,7 @@ describe Project do
       let(:secondary_base_host) { 'secondary.geo' }
       let(:secondary_base_url) { "http://#{secondary_base_host}" }
       let(:secondary_node) { create(:geo_node, url: secondary_base_url) }
-      let(:secondary_url) { "#{secondary_base_url}#{project_path}"  }
+      let(:secondary_url) { "#{secondary_base_url}#{project_path}" }
 
       before do
         stub_current_geo_node(secondary_node)

@@ -14,7 +14,7 @@ describe Projects::GitlabProjectsImportService do
   end
 
   describe '#execute' do
-    context 'creates export job'  do
+    context 'creates export job' do
       it 'if project saved and custom template exists' do
         expect(custom_template).to receive(:add_export_job)
 

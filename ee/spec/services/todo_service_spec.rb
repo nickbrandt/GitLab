@@ -20,7 +20,7 @@ describe TodoService do
     let(:description_directly_addressed) { "#{mentions}\n- [ ] Task 1\n- [ ] Task 2" }
 
     let(:group) { create(:group) }
-    let(:epic) { create(:epic, group: group,  author: author, description: description_mentions) }
+    let(:epic) { create(:epic, group: group, author: author, description: description_mentions) }
 
     let(:todos_for) { [] }
     let(:todos_not_for) { [] }

@@ -6,14 +6,14 @@ describe Boards::Issues::ListService, services: true do
     let(:group) { create(:group) }
     let(:project) { create(:project, :empty_repo, namespace: group) }
     let(:project1) { create(:project, :empty_repo, namespace: group) }
-    let(:board)   { create(:board, group: group) }
+    let(:board) { create(:board, group: group) }
 
     let(:m1) { create(:milestone, group: group) }
     let(:m2) { create(:milestone, group: group) }
 
     let(:bug) { create(:group_label, group: group, name: 'Bug') }
     let(:development) { create(:group_label, group: group, name: 'Development') }
-    let(:testing)  { create(:group_label, group: group, name: 'Testing') }
+    let(:testing) { create(:group_label, group: group, name: 'Testing') }
 
     let(:p1) { create(:group_label, title: 'P1', group: group) }
     let(:p2) { create(:group_label, title: 'P2', group: group) }

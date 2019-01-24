@@ -43,7 +43,7 @@ describe Environment do
 
       context 'when the environment is protected' do
         before do
-          create(:protected_environment,  name: environment.name, project: project)
+          create(:protected_environment, name: environment.name, project: project)
         end
 
         it { is_expected.to be_truthy }

@@ -31,7 +31,7 @@ namespace :gitlab do
     end
 
     desc "GitLab | Elasticsearch | Index project repositories"
-    task index_repositories: :environment  do
+    task index_repositories: :environment do
       print "Indexing project repositories..."
 
       Sidekiq::Logging.logger = Logger.new(STDOUT)
@@ -41,7 +41,7 @@ namespace :gitlab do
     end
 
     desc "GitLab | Elasticsearch | Index wiki repositories"
-    task index_wikis: :environment  do
+    task index_wikis: :environment do
       projects = apply_project_filters(Project.with_wiki_enabled)
 
       projects.find_each do |project|

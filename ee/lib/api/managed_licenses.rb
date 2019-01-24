@@ -27,7 +27,7 @@ module API
       requires :id, type: String, desc: 'The ID of a project'
     end
 
-    resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS  do
+    resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc 'Get project software license policies' do
         success Entities::ManagedLicense
       end

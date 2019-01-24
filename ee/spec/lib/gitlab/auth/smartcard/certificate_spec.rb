@@ -109,7 +109,7 @@ describe Gitlab::Auth::Smartcard::Certificate do
 
         context 'avoids conflicting namespaces' do
           let(:subject_dn) { '/CN=Gitlab User/emailAddress=gitlab-user@random-corp.org' }
-          let!(:existing_user) { create(:user, username: 'GitlabUser')  }
+          let!(:existing_user) { create(:user, username: 'GitlabUser') }
 
           it 'creates user with correct usnername' do
             expect { subject }.to change { User.count }.from(1).to(2)

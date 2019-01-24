@@ -430,7 +430,7 @@ describe ProjectPolicy do
   it_behaves_like 'project policies as admin'
 
   context 'EE' do
-    let(:additional_guest_permissions)  { [:read_issue_link] }
+    let(:additional_guest_permissions) { [:read_issue_link] }
     let(:additional_reporter_permissions) { [:admin_issue_link]}
     let(:additional_maintainer_permissions) { [:push_code_to_protected_branches] }
     let(:auditor_permissions) do

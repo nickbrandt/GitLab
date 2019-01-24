@@ -84,7 +84,7 @@ module EE
         }
 
         results = count(::Ci::Build.where(name: types.keys).group(:name), fallback: Hash.new(-1))
-        results.each_with_object({}) { |(key, value), response| response[types[key.to_sym]] = value  }
+        results.each_with_object({}) { |(key, value), response| response[types[key.to_sym]] = value }
       end
       # rubocop: enable CodeReuse/ActiveRecord
 

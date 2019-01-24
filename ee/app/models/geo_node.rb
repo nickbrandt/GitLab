@@ -127,7 +127,7 @@ class GeoNode < ActiveRecord::Base
   end
 
   def url=(value)
-    value += '/'  if value.present? && !value.end_with?('/')
+    value += '/' if value.present? && !value.end_with?('/')
 
     write_attribute(:url, value)
 
@@ -280,7 +280,7 @@ class GeoNode < ActiveRecord::Base
       errors.add(:url, 'scheme must be http or https')
     end
   rescue URI::InvalidURIError
-    errors.add(:url,  'is invalid')
+    errors.add(:url, 'is invalid')
   end
 
   def update_clone_url

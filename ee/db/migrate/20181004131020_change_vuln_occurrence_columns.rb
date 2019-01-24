@@ -7,7 +7,7 @@ class ChangeVulnOccurrenceColumns < ActiveRecord::Migration[4.2]
     drop_table :vulnerability_occurrence_identifiers
     drop_table :vulnerability_occurrences
 
-    create_table :vulnerability_occurrences, id: :bigserial  do |t|
+    create_table :vulnerability_occurrences, id: :bigserial do |t|
       t.timestamps_with_timezone null: false
 
       t.integer :severity, null: false, limit: 2
@@ -59,7 +59,7 @@ class ChangeVulnOccurrenceColumns < ActiveRecord::Migration[4.2]
     drop_table :vulnerability_occurrence_identifiers
     drop_table :vulnerability_occurrences
 
-    create_table :vulnerability_occurrences, id: :bigserial  do |t|
+    create_table :vulnerability_occurrences, id: :bigserial do |t|
       t.timestamps_with_timezone null: false
 
       t.integer :severity, null: false, limit: 2

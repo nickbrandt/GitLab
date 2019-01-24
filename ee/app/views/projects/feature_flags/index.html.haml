@@ -6,4 +6,4 @@
   "error-state-svg-path" => image_path('illustrations/feature_flag.svg'),
   "feature-flags-help-page-path" => help_page_path("user/project/operations/feature_flags"),
   "can-user-admin-feature-flag" => can?(current_user, :admin_feature_flag, @project),
-  "new-feature-flag-path" => can?(current_user, :create_feature_flag, @project) ?  new_project_feature_flag_path(@project): nil } }
+  "new-feature-flag-path" => can?(current_user, :create_feature_flag, @project) ? new_project_feature_flag_path(@project): nil } }

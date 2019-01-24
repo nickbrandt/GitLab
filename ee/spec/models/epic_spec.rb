@@ -584,7 +584,7 @@ describe Epic do
   end
 
   context 'mentioning other objects' do
-    let(:group)   { create(:group) }
+    let(:group) { create(:group) }
     let(:epic) { create(:epic, group: group) }
 
     let(:project) { create(:project, :repository, :public) }

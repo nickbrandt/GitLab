@@ -928,7 +928,7 @@ describe SystemNoteService do
   end
 
   describe '.approve_mr' do
-    let(:noteable)    { create(:merge_request, source_project: project) }
+    let(:noteable) { create(:merge_request, source_project: project) }
     subject { described_class.approve_mr(noteable, author) }
 
     it_behaves_like 'a system note' do
@@ -943,7 +943,7 @@ describe SystemNoteService do
   end
 
   describe '.unapprove_mr' do
-    let(:noteable)    { create(:merge_request, source_project: project) }
+    let(:noteable) { create(:merge_request, source_project: project) }
     subject { described_class.unapprove_mr(noteable, author) }
 
     it_behaves_like 'a system note' do
@@ -1274,7 +1274,7 @@ describe SystemNoteService do
     let(:project) { nil }
 
     context 'issue added to an epic' do
-      subject { described_class.epic_issue(epic, issue, author, :added)  }
+      subject { described_class.epic_issue(epic, issue, author, :added) }
 
       it_behaves_like 'a system note' do
         let(:action) { 'epic_issue_added' }
@@ -1286,7 +1286,7 @@ describe SystemNoteService do
     end
 
     context 'issue removed from an epic' do
-      subject { described_class.epic_issue(epic, issue, author, :removed)  }
+      subject { described_class.epic_issue(epic, issue, author, :removed) }
 
       it_behaves_like 'a system note' do
         let(:action) { 'epic_issue_removed' }
@@ -1307,7 +1307,7 @@ describe SystemNoteService do
 
   describe '.issue_on_epic' do
     context 'issue added to an epic' do
-      subject { described_class.issue_on_epic(issue, epic, author, :added)  }
+      subject { described_class.issue_on_epic(issue, epic, author, :added) }
 
       it_behaves_like 'a system note' do
         let(:action) { 'issue_added_to_epic' }
@@ -1319,7 +1319,7 @@ describe SystemNoteService do
     end
 
     context 'issue removed from an epic' do
-      subject { described_class.issue_on_epic(issue, epic, author, :removed)  }
+      subject { described_class.issue_on_epic(issue, epic, author, :removed) }
 
       it_behaves_like 'a system note' do
         let(:action) { 'issue_removed_from_epic' }
