@@ -246,6 +246,10 @@ module EE
 
       # Decorates ApprovalState
       class MergeRequestApprovalRules < Grape::Entity
+        expose :approval_rules_overwritten do |approval_state|
+          approval_state.approval_rules_overwritten?
+        end
+
         expose :wrapped_approval_rules, as: :rules, using: MergeRequestApprovalRule
         expose :overall_approvals_required, as: :fallback_approvals_required
       end
