@@ -9,7 +9,11 @@ describe Projects::MergeRequestsController, '(JavaScript fixtures)', type: :cont
   let(:namespace) { create(:namespace, name: 'frontend-fixtures' )}
   let(:project) { create(:project, :repository, namespace: namespace, path: 'merge-requests-project') }
   let(:merge_request) { create(:merge_request, source_project: project, target_project: project, author: admin, approvals_before_merge: 2) }
-  let(:suggested_approvers) { create_list(:user, 3) }
+  let(:suggested_approvers) do
+    create_list(:user, 3).tap do |users|
+      users.each { |user| project.add_developer(user) }
+    end
+  end
 
   render_views
 

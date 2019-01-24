@@ -31,17 +31,19 @@ module VisibleApprovable
 
     if approvers_overwritten?
       code_owners ||= [] # already persisted into database, no need to recompute
-      approvers_relation = approvers
+      approvers_relation = approver_users
     else
       code_owners ||= self.code_owners.dup
-      approvers_relation = target_project.approvers
+      approvers_relation = target_project.approver_users
     end
+
+    approvers_relation = project.members_among(approvers_relation)
 
     if author && !authors_can_approve?
-      approvers_relation = approvers_relation.where.not(user_id: author.id)
+      approvers_relation = approvers_relation.where.not(id: author.id)
     end
 
-    results = code_owners.concat(approvers_relation.includes(:user).map(&:user))
+    results = code_owners.concat(approvers_relation)
     results.uniq!
     results
   end

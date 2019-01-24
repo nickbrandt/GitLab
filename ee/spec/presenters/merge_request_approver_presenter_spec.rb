@@ -20,6 +20,9 @@ describe MergeRequestApproverPresenter do
     allow(merge_request).to receive(:modified_paths).and_return(file_paths)
     allow(merge_request).to receive(:approvals_required).and_return(approvals_required)
 
+    project.add_developer(committer_a)
+    project.add_developer(committer_b)
+
     stub_licensed_features(code_owners: enable_code_owner)
   end
 

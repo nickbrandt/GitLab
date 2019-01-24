@@ -489,6 +489,10 @@ describe MergeRequests::UpdateService, :mailer do
       let(:new_approver) { create(:user) }
 
       before do
+        project.add_developer(existing_approver)
+        project.add_developer(removed_approver)
+        project.add_developer(new_approver)
+
         perform_enqueued_jobs do
           update_merge_request(approver_ids: [existing_approver, removed_approver].map(&:id).join(','))
         end

@@ -39,6 +39,7 @@ describe VisibleApprovable do
 
     before do
       allow(resource).to receive(:code_owners).and_return([code_owner])
+      project.add_developer(project_approver.user)
     end
 
     subject { resource.overall_approvers }
@@ -72,8 +73,20 @@ describe VisibleApprovable do
     context 'when approvers are overwritten' do
       let!(:approver) { create(:approver, target: resource) }
 
+      before do
+        project.add_developer(approver.user)
+      end
+
       it 'returns the list of all the merge request user approvers' do
         is_expected.to contain_exactly(approver.user)
+      end
+    end
+
+    context 'when approver is no longer part of project' do
+      it 'excludes non-project members' do
+        project.team.find_member(project_approver.user).destroy!
+
+        is_expected.not_to include(project_approver.user)
       end
     end
   end
@@ -105,6 +118,10 @@ describe VisibleApprovable do
     let!(:approver_group) { create(:approver_group, target: resource, group: group) }
     let!(:approver) { create(:approver, target: resource) }
 
+    before do
+      project.add_developer(approver.user)
+    end
+
     subject { resource.all_approvers_including_groups }
 
     it 'only queries once' do
@@ -134,7 +151,8 @@ describe VisibleApprovable do
 
   describe '#reset_approval_cache!' do
     before do
-      create(:approver, target: resource)
+      approver = create(:approver, target: resource)
+      project.add_developer(approver.user)
     end
 
     subject { resource.reset_approval_cache! }
