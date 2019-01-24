@@ -40,7 +40,7 @@ describe Ci::Bridge do
     end
 
     context 'when trigger does not have project defined' do
-      let(:options) { { trigger: {}  } }
+      let(:options) { { trigger: {} } }
 
       it 'returns nil' do
         expect(bridge.target_project_path).to be_nil

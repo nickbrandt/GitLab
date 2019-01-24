@@ -190,7 +190,7 @@ describe API::EpicIssues do
         context 'when epic_issue association does not include the epic in the url' do
           before do
             other_group = create(:group)
-            other_group_epic = create(:epic, group:  other_group)
+            other_group_epic = create(:epic, group: other_group)
             epic_issue.update_attribute(:epic, other_group_epic)
 
             group.add_developer(user)

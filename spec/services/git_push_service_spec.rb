@@ -15,7 +15,7 @@ describe GitPushService do
   end
 
   describe 'with remote mirrors' do
-    let(:project)  { create(:project, :repository, :remote_mirror) }
+    let(:project) { create(:project, :repository, :remote_mirror) }
 
     subject do
       described_class.new(project, user, oldrev: oldrev, newrev: newrev, ref: ref)
@@ -570,7 +570,7 @@ describe GitPushService do
       end
 
       context "closing an issue" do
-        let(:message)         { "this is some work.\n\ncloses JIRA-1" }
+        let(:message) { "this is some work.\n\ncloses JIRA-1" }
         let(:comment_body) do
           {
             body: "Issue solved with [#{closing_commit.id}|http://#{Gitlab.config.gitlab.host}/#{project.full_path}/commit/#{closing_commit.id}]."

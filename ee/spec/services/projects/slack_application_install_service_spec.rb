@@ -28,7 +28,7 @@ describe Projects::SlackApplicationInstallService do
 
     result = service.execute
 
-    expect(result).to eq(message:  'Slack: something is wrong', status: :error)
+    expect(result).to eq(message: 'Slack: something is wrong', status: :error)
   end
 
   it 'returns success result and creates all the needed records' do

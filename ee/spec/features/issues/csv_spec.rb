@@ -6,7 +6,7 @@ describe 'Issues csv' do
   let(:milestone) { create(:milestone, title: 'v1.0', project: project) }
   let(:idea_label) { create(:label, project: project, title: 'Idea') }
   let(:feature_label) { create(:label, project: project, title: 'Feature', priority: 10) }
-  let!(:issue)  { create(:issue, project: project, author: user) }
+  let!(:issue) { create(:issue, project: project, author: user) }
 
   before do
     sign_in(user)

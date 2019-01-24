@@ -37,7 +37,7 @@ namespace :gitlab do
     end
 
     desc "GitLab | Cleanup | Delete moved repositories"
-    task moved: :gitlab_environment  do
+    task moved: :gitlab_environment do
       warn_user_is_not_gitlab
       remove_flag = ENV['REMOVE']
 

@@ -4,7 +4,7 @@ require Rails.root.join('ee', 'db', 'post_migrate', '20180502130136_migrate_mirr
 describe MigrateMirrorAttributesDataFromProjectsToImportState, :migration do
   let(:namespaces) { table(:namespaces) }
   let(:projects) { table(:projects) }
-  let(:import_state)  { table(:project_mirror_data) }
+  let(:import_state) { table(:project_mirror_data) }
 
   describe '#up' do
     before do

@@ -49,7 +49,7 @@ module EE
 
     url_helper :user_group_saml_omniauth_metadata
     def user_group_saml_omniauth_metadata_path(group)
-      params = { group_path: group.path, token:  group.saml_discovery_token }
+      params = { group_path: group.path, token: group.saml_discovery_token }
       path = '/users/auth/group_saml/metadata'
 
       ActionDispatch::Http::URL.path_for(path: path, params: params)

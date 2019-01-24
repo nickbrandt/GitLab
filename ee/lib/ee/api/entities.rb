@@ -350,7 +350,7 @@ module EE
           number_to_percentage(node.repositories_synced_in_percentage, precision: 2)
         end
 
-        expose :wikis_count  # Deprecated
+        expose :wikis_count # Deprecated
         expose :wikis_failed_count
         expose :wikis_synced_count
         expose :wikis_synced_in_percentage do |node|

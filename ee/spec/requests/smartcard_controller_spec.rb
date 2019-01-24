@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe SmartcardController, type: :request  do
+describe SmartcardController, type: :request do
   let(:subject_dn) { '/O=Random Corp Ltd/CN=gitlab-user/emailAddress=gitlab-user@random-corp.org' }
   let(:issuer_dn) { '/O=Random Corp Ltd/CN=Random Corp' }
   let(:certificate_headers) { { 'X-SSL-CLIENT-CERTIFICATE': 'certificate' } }

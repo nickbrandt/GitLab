@@ -51,7 +51,7 @@ describe ApplicationSetting do
       it { is_expected.to allow_value('').for(:external_auth_client_key) }
 
       context 'when setting a valid client certificate for external authorization' do
-        let(:certificate_data)  { File.read('ee/spec/fixtures/passphrase_x509_certificate.crt') }
+        let(:certificate_data) { File.read('ee/spec/fixtures/passphrase_x509_certificate.crt') }
 
         before do
           setting.external_auth_client_cert = certificate_data

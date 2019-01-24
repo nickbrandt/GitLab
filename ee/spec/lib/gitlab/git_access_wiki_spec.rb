@@ -26,7 +26,7 @@ describe Gitlab::GitAccessWiki do
   context 'when wiki is disabled' do
     let(:user) { :geo }
     let(:project) { create(:project, :private, :wiki_repo, wiki_access_level: ProjectFeature::DISABLED) }
-    let(:authentication_abilities) {  [:download_code] }
+    let(:authentication_abilities) { [:download_code] }
 
     subject { access.check('git-upload-pack', changes) }
 

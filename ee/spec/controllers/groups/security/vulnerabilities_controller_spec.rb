@@ -246,7 +246,7 @@ describe Groups::Security::VulnerabilitiesController do
   end
 
   describe 'GET history.json' do
-    subject { get :history,  params: { group_id: group }, format: :json }
+    subject { get :history, params: { group_id: group }, format: :json }
 
     context 'when security dashboard feature is disabled' do
       before do
@@ -350,7 +350,7 @@ describe Groups::Security::VulnerabilitiesController do
 
         it 'returns filtered history if filters are enabled' do
           travel_to(Time.zone.parse('2019-02-10')) do
-            get :history,  params: { group_id: group, report_type: %w[dependency_scanning sast] }, format: :json
+            get :history, params: { group_id: group, report_type: %w[dependency_scanning sast] }, format: :json
           end
 
           expect(response).to have_gitlab_http_status(200)

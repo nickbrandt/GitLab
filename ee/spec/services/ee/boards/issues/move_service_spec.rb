@@ -27,7 +27,7 @@ describe Boards::Issues::MoveService, services: true do
     end
 
     context 'from label to milestone list' do
-      let(:issue)  { create(:labeled_issue, project: project, labels: [bug, development]) }
+      let(:issue) { create(:labeled_issue, project: project, labels: [bug, development]) }
 
       it 'assigns the milestone and keeps labels' do
         params = { board_id: board1.id, from_list_id: label_list1.id, to_list_id: milestone_list1.id }
@@ -203,7 +203,7 @@ describe Boards::Issues::MoveService, services: true do
 
       let(:bug) { create(:label, project: project, name: 'Bug') }
       let(:development) { create(:label, project: project, name: 'Development') }
-      let(:testing)  { create(:label, project: project, name: 'Testing') }
+      let(:testing) { create(:label, project: project, name: 'Testing') }
       let(:regression) { create(:label, project: project, name: 'Regression') }
 
       before do
@@ -226,7 +226,7 @@ describe Boards::Issues::MoveService, services: true do
 
       let(:bug) { create(:group_label, group: group, name: 'Bug') }
       let(:development) { create(:group_label, group: group, name: 'Development') }
-      let(:testing)  { create(:group_label, group: group, name: 'Testing') }
+      let(:testing) { create(:group_label, group: group, name: 'Testing') }
       let(:regression) { create(:group_label, group: group, name: 'Regression') }
 
       before do

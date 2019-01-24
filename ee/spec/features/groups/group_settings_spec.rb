@@ -3,8 +3,8 @@ require 'spec_helper'
 describe 'Edit group settings' do
   include Select2Helper
 
-  let(:user)  { create(:user) }
-  let(:developer)  { create(:user) }
+  let(:user) { create(:user) }
+  let(:developer) { create(:user) }
   let(:group) { create(:group, path: 'foo') }
 
   before do

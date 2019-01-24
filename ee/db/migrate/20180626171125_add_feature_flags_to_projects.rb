@@ -20,7 +20,7 @@ class AddFeatureFlagsToProjects < ActiveRecord::Migration[4.2]
       t.index [:project_id, :name], unique: true
     end
 
-    create_table :operations_feature_flags_clients, id: :bigserial  do |t|
+    create_table :operations_feature_flags_clients, id: :bigserial do |t|
       t.integer :project_id, null: false
       t.string :token, null: false
 

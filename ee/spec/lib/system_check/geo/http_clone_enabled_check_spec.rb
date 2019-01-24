@@ -9,8 +9,8 @@ describe SystemCheck::Geo::HTTPCloneEnabledCheck do
         ['unknown', false],
         ['ssh', false],
         ['http', true],
-        ['',  true],
-        [nil,  true]
+        ['', true],
+        [nil, true]
       ]
     end
 

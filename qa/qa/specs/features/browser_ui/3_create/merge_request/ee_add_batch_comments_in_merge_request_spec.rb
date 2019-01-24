@@ -3,7 +3,7 @@
 module QA
   context 'Create' do
     describe 'batch comments in merge request' do
-      it 'user submits, discards batch comments'  do
+      it 'user submits, discards batch comments' do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
         Page::Main::Login.perform(&:sign_in_using_credentials)
 

@@ -69,7 +69,7 @@ describe ProjectPolicy do
   end
 
   # Used in EE specs
-  let(:additional_guest_permissions)  { [] }
+  let(:additional_guest_permissions) { [] }
   let(:additional_reporter_permissions) { [] }
   let(:additional_maintainer_permissions) { [] }
 
@@ -236,7 +236,7 @@ describe ProjectPolicy do
         let(:group) { create(:group, :public) }
         let(:project) { create(:project, :public, namespace: group) }
         let(:user_permissions) { [:create_merge_request_in, :create_project, :create_issue, :create_note, :upload_file, :award_emoji] }
-        let(:anonymous_permissions) { guest_permissions - user_permissions  }
+        let(:anonymous_permissions) { guest_permissions - user_permissions }
 
         subject { described_class.new(nil, project) }
 
@@ -430,7 +430,7 @@ describe ProjectPolicy do
   it_behaves_like 'project policies as admin'
 
   context 'EE' do
-    let(:additional_guest_permissions)  { [:read_issue_link] }
+    let(:additional_guest_permissions) { [:read_issue_link] }
     let(:additional_reporter_permissions) { [:admin_issue_link]}
     let(:additional_maintainer_permissions) { [:push_code_to_protected_branches] }
     let(:auditor_permissions) do

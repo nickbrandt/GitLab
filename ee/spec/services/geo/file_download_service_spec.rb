@@ -4,7 +4,7 @@ describe Geo::FileDownloadService do
   include ::EE::GeoHelpers
   include ExclusiveLeaseHelpers
 
-  set(:primary)  { create(:geo_node, :primary) }
+  set(:primary) { create(:geo_node, :primary) }
   set(:secondary) { create(:geo_node) }
 
   before do

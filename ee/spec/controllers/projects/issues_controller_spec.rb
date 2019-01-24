@@ -251,7 +251,7 @@ describe Projects::IssuesController do
   end
 
   describe 'GET #discussions' do
-    let(:issue)   { create(:issue, project: project) }
+    let(:issue) { create(:issue, project: project) }
     let!(:discussion) { create(:discussion_note_on_issue, noteable: issue, project: issue.project) }
 
     context 'with a related system note' do

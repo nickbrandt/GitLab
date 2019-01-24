@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Geo::RepositoryUpdatedEventStore do
   include EE::GeoHelpers
 
-  set(:project)  { create(:project, :repository) }
+  set(:project) { create(:project, :repository) }
   set(:secondary_node) { create(:geo_node) }
 
   let(:blankrev) { Gitlab::Git::BLANK_SHA }

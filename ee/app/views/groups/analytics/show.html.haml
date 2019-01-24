@@ -39,7 +39,7 @@
   - mr_created_count = @events.merge_requests.created.count
   - mr_merged_count = @events.merge_requests.merged.count
   - if mr_created_count > 0 || mr_merged_count > 0
-    = _('<strong>%{created_count}</strong> created, <strong>%{accepted_count}</strong> accepted.').html_safe % { created_count: mr_created_count, accepted_count: mr_merged_count  }
+    = _('<strong>%{created_count}</strong> created, <strong>%{accepted_count}</strong> accepted.').html_safe % { created_count: mr_created_count, accepted_count: mr_merged_count }
   - else
     = _('No merge requests for the selected time period.')
 
