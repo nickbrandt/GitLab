@@ -7,6 +7,7 @@ import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper
 import { mockEpicMeta, mockEpicData } from '../mock_data';
 
 describe('EpicSidebarComponent', () => {
+  const originalUserId = gon.current_user_id;
   let vm;
   let store;
 
@@ -28,6 +29,14 @@ describe('EpicSidebarComponent', () => {
   });
 
   describe('template', () => {
+    beforeAll(() => {
+      gon.current_user_id = 1;
+    });
+
+    afterAll(() => {
+      gon.current_user_id = originalUserId;
+    });
+
     it('renders component container element with classes `right-sidebar-expanded`, `right-sidebar` & `epic-sidebar`', done => {
       store.dispatch('toggleSidebarFlag', false);
 
@@ -43,6 +52,20 @@ describe('EpicSidebarComponent', () => {
 
     it('renders header container element with classes `issuable-sidebar` & `js-issuable-update`', () => {
       expect(vm.$el.querySelector('.issuable-sidebar.js-issuable-update')).not.toBeNull();
+    });
+
+    it('renders Todo toggle button element when sidebar is collapsed and user is signed in', done => {
+      store.dispatch('toggleSidebarFlag', true);
+
+      vm.$nextTick()
+        .then(() => {
+          const todoBlockEl = vm.$el.querySelector('.block.todo');
+
+          expect(todoBlockEl).not.toBeNull();
+          expect(todoBlockEl.querySelector('button.btn-todo')).not.toBeNull();
+        })
+        .then(done)
+        .catch(done.fail);
     });
   });
 });

@@ -8,10 +8,11 @@ import { mockEpicMeta, mockEpicData } from '../../mock_data';
 
 describe('SidebarHeaderComponent', () => {
   let vm;
+  let store;
 
   beforeEach(done => {
     const Component = Vue.extend(SidebarHeader);
-    const store = createStore();
+    store = createStore();
     store.dispatch('setEpicMeta', mockEpicMeta);
     store.dispatch('setEpicData', mockEpicData);
 
@@ -38,6 +39,17 @@ describe('SidebarHeaderComponent', () => {
 
       expect(todoEl).not.toBeNull();
       expect(todoEl.innerText.trim()).toBe('Todo');
+    });
+
+    it('renders Todo toggle button element when sidebar is expanded', done => {
+      vm.sidebarCollapsed = false;
+
+      vm.$nextTick()
+        .then(() => {
+          expect(vm.$el.querySelector('button.btn-todo')).not.toBeNull();
+        })
+        .then(done)
+        .catch(done.fail);
     });
 
     it('renders toggle sidebar button element', () => {

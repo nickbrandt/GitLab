@@ -15,7 +15,7 @@ describe('Epic Store Actions', () => {
   let state;
 
   beforeEach(() => {
-    state = Object.assign({}, defaultState);
+    state = Object.assign({}, defaultState());
   });
 
   describe('setEpicMeta', () => {
@@ -245,6 +245,209 @@ describe('Epic Store Actions', () => {
         ],
         done,
       );
+    });
+  });
+
+  describe('requestEpicTodoToggle', () => {
+    it('should set `state.epicTodoToggleInProgress` flag to `true`', done => {
+      testAction(
+        actions.requestEpicTodoToggle,
+        {},
+        state,
+        [{ type: 'REQUEST_EPIC_TODO_TOGGLE' }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('requestEpicTodoToggleSuccess', () => {
+    it('should set epic state type', done => {
+      testAction(
+        actions.requestEpicTodoToggleSuccess,
+        { todoDeletePath: '/foo/bar' },
+        state,
+        [{ type: 'REQUEST_EPIC_TODO_TOGGLE_SUCCESS', payload: { todoDeletePath: '/foo/bar' } }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('requestEpicTodoToggleFailure', () => {
+    beforeEach(() => {
+      setFixtures('<div class="flash-container"></div>');
+    });
+
+    it('Should set `state.epicTodoToggleInProgress` flag to `false`', done => {
+      testAction(
+        actions.requestEpicTodoToggleFailure,
+        {},
+        state,
+        [{ type: 'REQUEST_EPIC_TODO_TOGGLE_FAILURE', payload: {} }],
+        [],
+        done,
+      );
+    });
+
+    it('Should show flash error with message "There was an error deleting the todo." when `state.todoExists` is `true`', done => {
+      actions.requestEpicTodoToggleFailure(
+        {
+          commit: () => {},
+          state: { todoExists: true },
+        },
+        {},
+      );
+
+      Vue.nextTick()
+        .then(() => {
+          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
+            'There was an error deleting the todo.',
+          );
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+
+    it('Should show flash error with message "There was an error adding a todo." when `state.todoExists` is `false`', done => {
+      actions.requestEpicTodoToggleFailure(
+        {
+          commit: () => {},
+          state: { todoExists: false },
+        },
+        {},
+      );
+
+      Vue.nextTick()
+        .then(() => {
+          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
+            'There was an error adding a todo.',
+          );
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+  });
+
+  describe('triggerTodoToggleEvent', () => {
+    it('Calls `triggerDocumentEvent` with event `todo:toggle` and passes `count` as param', () => {
+      spyOn(epicUtils, 'triggerDocumentEvent').and.returnValue(false);
+
+      const data = { count: 5 };
+      actions.triggerTodoToggleEvent({}, data);
+
+      expect(epicUtils.triggerDocumentEvent).toHaveBeenCalledWith('todo:toggle', data.count);
+    });
+  });
+
+  describe('toggleTodo', () => {
+    let mock;
+
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    describe('when `state.togoExists` is false', () => {
+      it('dispatches requestEpicTodoToggle, triggerTodoToggleEvent and requestEpicTodoToggleSuccess when request is successful', done => {
+        mock.onPost(/(.*)/).replyOnce(200, {
+          count: 5,
+          delete_path: '/foo/bar',
+        });
+
+        testAction(
+          actions.toggleTodo,
+          null,
+          { todoExists: false },
+          [],
+          [
+            {
+              type: 'requestEpicTodoToggle',
+            },
+            {
+              type: 'triggerTodoToggleEvent',
+              payload: { count: 5 },
+            },
+            {
+              type: 'requestEpicTodoToggleSuccess',
+              payload: { todoDeletePath: '/foo/bar' },
+            },
+          ],
+          done,
+        );
+      });
+
+      it('dispatches requestEpicTodoToggle and requestEpicTodoToggleFailure when request fails', done => {
+        mock.onPost(/(.*)/).replyOnce(500, {});
+
+        testAction(
+          actions.toggleTodo,
+          null,
+          { todoExists: false },
+          [],
+          [
+            {
+              type: 'requestEpicTodoToggle',
+            },
+            {
+              type: 'requestEpicTodoToggleFailure',
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('when `state.togoExists` is true', () => {
+      it('dispatches requestEpicTodoToggle, triggerTodoToggleEvent and requestEpicTodoToggleSuccess when request is successful', done => {
+        mock.onDelete(/(.*)/).replyOnce(200, {
+          count: 5,
+        });
+
+        testAction(
+          actions.toggleTodo,
+          null,
+          { todoExists: true },
+          [],
+          [
+            {
+              type: 'requestEpicTodoToggle',
+            },
+            {
+              type: 'triggerTodoToggleEvent',
+              payload: { count: 5 },
+            },
+            {
+              type: 'requestEpicTodoToggleSuccess',
+              payload: { todoDeletePath: undefined },
+            },
+          ],
+          done,
+        );
+      });
+
+      it('dispatches requestEpicTodoToggle and requestEpicTodoToggleFailure when request fails', done => {
+        mock.onDelete(/(.*)/).replyOnce(500, {});
+
+        testAction(
+          actions.toggleTodo,
+          null,
+          { todoExists: true },
+          [],
+          [
+            {
+              type: 'requestEpicTodoToggle',
+            },
+            {
+              type: 'requestEpicTodoToggleFailure',
+            },
+          ],
+          done,
+        );
+      });
     });
   });
 });

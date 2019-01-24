@@ -51,5 +51,6 @@ export default () => ({
   // UI status flags
   epicStatusChangeInProgress: false,
   epicDeleteInProgress: false,
+  epicTodoToggleInProgress: false,
   sidebarCollapsed: false,
 });
