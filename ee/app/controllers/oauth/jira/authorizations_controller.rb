@@ -27,13 +27,18 @@ class Oauth::Jira::AuthorizationsController < ApplicationController
 
   # 3. Rewire and adjust access_token request accordingly.
   def access_token
-    auth_params = params
-                    .slice(:code, :client_id, :client_secret)
-                    .merge(grant_type: 'authorization_code', redirect_uri: oauth_jira_callback_url)
+    # We have to modify request.parameters because Doorkeeper::Server reads params from there
+    request.parameters[:redirect_uri] = oauth_jira_callback_url
 
-    auth_response = Gitlab::HTTP.post(oauth_token_url, body: auth_params, allow_local_requests: true)
+    begin
+      strategy = Doorkeeper::Server.new(self).token_request('authorization_code')
+      auth_response = strategy.authorize.body
+    rescue Doorkeeper::Errors::DoorkeeperError
+      auth_response = {}
+    end
+
     token_type, scope, token = auth_response['token_type'], auth_response['scope'], auth_response['access_token']
 
-    render text: "access_token=#{token}&scope=#{scope}&token_type=#{token_type}"
+    render body: "access_token=#{token}&scope=#{scope}&token_type=#{token_type}"
   end
 end
