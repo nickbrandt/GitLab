@@ -1,0 +1,12 @@
+{
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required" : ["name", "version", "packages_type"],
+    "properties" : {
+      "name": { "type": "string" },
+      "version": { "type": "string" },
+      "packages_type": { "type": "string" }
+    }
+  }
+}

@@ -22,6 +22,7 @@ module EE
         mount ::API::ProjectPushRule
         mount ::API::MavenPackages
         mount ::API::NpmPackages
+        mount ::API::Packages
       end
     end
   end

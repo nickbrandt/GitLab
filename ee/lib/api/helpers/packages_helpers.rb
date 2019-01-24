@@ -14,6 +14,7 @@ module API
       def authorize_download_package!
         authorize!(:read_package, user_project)
       end
+      alias_method :authorize_read_package!, :authorize_download_package!
 
       def authorize_create_package!
         authorize!(:create_package, user_project)

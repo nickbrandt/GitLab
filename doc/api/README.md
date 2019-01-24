@@ -48,6 +48,7 @@ The following API resources are available:
 - [Namespaces](namespaces.md)
 - [Notes](notes.md) (comments)
 - [Notification settings](notification_settings.md)
+- [Packages](packages.md) **[PREMIUM]**
 - [Pages domains](pages_domains.md)
 - [Pipelines](pipelines.md)
 - [Pipeline schedules](pipeline_schedules.md)
