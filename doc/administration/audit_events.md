@@ -2,7 +2,7 @@
 last_updated: 2017-12-13
 ---
 
-# Audit Events **[STARTER ONLY]**
+# Audit Events **[STARTER]**
 
 GitLab Enterprise Edition offers a way to view the changes made within the
 GitLab server as a help to system administrators.
