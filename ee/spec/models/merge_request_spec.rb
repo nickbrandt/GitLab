@@ -10,6 +10,7 @@ describe MergeRequest do
   describe 'associations' do
     it { is_expected.to have_many(:approvals).dependent(:delete_all) }
     it { is_expected.to have_many(:approvers).dependent(:delete_all) }
+    it { is_expected.to have_many(:approver_users).through(:approvers) }
     it { is_expected.to have_many(:approver_groups).dependent(:delete_all) }
     it { is_expected.to have_many(:approved_by_users) }
   end

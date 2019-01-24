@@ -17,6 +17,7 @@ describe "User creates a merge request", :js do
 
   before do
     project.add_maintainer(user)
+    project.add_maintainer(user2)
     project.add_maintainer(approver)
     sign_in(user)
 

@@ -33,6 +33,7 @@ module EE
       has_one :tracing_setting, class_name: 'ProjectTracingSetting'
 
       has_many :approvers, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
+      has_many :approver_users, through: :approvers, source: :user
       has_many :approver_groups, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
       has_many :audit_events, as: :entity
       has_many :path_locks

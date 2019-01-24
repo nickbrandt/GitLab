@@ -22,6 +22,8 @@ describe Project do
     it { is_expected.to have_many(:source_pipelines) }
     it { is_expected.to have_many(:audit_events).dependent(false) }
     it { is_expected.to have_many(:protected_environments) }
+    it { is_expected.to have_many(:approvers).dependent(:destroy) }
+    it { is_expected.to have_many(:approver_users).through(:approvers) }
     it { is_expected.to have_many(:approver_groups).dependent(:destroy) }
   end
 
