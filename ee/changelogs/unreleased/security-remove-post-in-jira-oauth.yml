@@ -1,0 +1,5 @@
+---
+title: Remove HTTP POST in JIRA OAuth access_token endpoint
+merge_request:
+author:
+type: security
