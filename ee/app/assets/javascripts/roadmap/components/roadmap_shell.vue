@@ -1,7 +1,8 @@
 <script>
-import bp from '~/breakpoints';
+import { GlSkeletonLoading } from '@gitlab/ui';
+
 import { isInViewport } from '~/lib/utils/common_utils';
-import { SCROLL_BAR_SIZE, EPIC_ITEM_HEIGHT, SHELL_MIN_WIDTH, EXTEND_AS } from '../constants';
+import { SCROLL_BAR_SIZE, EPIC_ITEM_HEIGHT, EXTEND_AS } from '../constants';
 import eventHub from '../event_hub';
 
 import epicsListSection from './epics_list_section.vue';
@@ -9,6 +10,7 @@ import roadmapTimelineSection from './roadmap_timeline_section.vue';
 
 export default {
   components: {
+    GlSkeletonLoading,
     epicsListSection,
     roadmapTimelineSection,
   },
@@ -40,18 +42,29 @@ export default {
   },
   computed: {
     containerStyles() {
-      const width =
-        bp.windowWidth() > SHELL_MIN_WIDTH
-          ? this.shellWidth + this.getWidthOffset()
-          : this.shellWidth;
-
       return {
-        width: `${width}px`,
+        width: `${this.shellWidth}px`,
         height: `${this.shellHeight}px`,
       };
     },
   },
+  watch: {
+    /**
+     * Watcher to monitor whether epics list is long enough
+     * to allow vertical list scrolling.
+     *
+     * In case of scrollable list, we don't want vertical scrollbar
+     * to be visible, so we mask the scrollbar by increasing shell
+     * width past the scrollbar size.
+     */
+    noScroll(value) {
+      if (this.$el.parentElement) {
+        this.shellWidth = this.getShellWidth(value);
+      }
+    },
+  },
   mounted() {
+    eventHub.$on('refreshTimeline', this.handleEpicsListRendered);
     this.$nextTick(() => {
       // Client width at the time of component mount will not
       // provide accurate size of viewport until child contents are
@@ -62,18 +75,28 @@ export default {
       if (this.$el.parentElement) {
         this.shellHeight = window.innerHeight - this.$el.offsetTop;
         this.noScroll = this.shellHeight > EPIC_ITEM_HEIGHT * (this.epics.length + 1);
-        this.shellWidth = this.$el.parentElement.clientWidth + this.getWidthOffset();
+        this.shellWidth = this.getShellWidth(this.noScroll);
 
-        this.timeframeStartOffset = this.$refs.roadmapTimeline.$el
-          .querySelector('.timeline-header-item')
-          .querySelector('.item-sublabel .sublabel-value:first-child')
-          .getBoundingClientRect().left;
+        // We're guarding this as in tests, `roadmapTimeline`
+        // is not ready when this line is executed.
+        if (this.$refs.roadmapTimeline) {
+          this.timeframeStartOffset = this.$refs.roadmapTimeline.$el
+            .querySelector('.timeline-header-item')
+            .querySelector('.item-sublabel .sublabel-value:first-child')
+            .getBoundingClientRect().left;
+        }
       }
     });
   },
+  beforeDestroy() {
+    eventHub.$off('refreshTimeline', this.handleEpicsListRendered);
+  },
   methods: {
-    getWidthOffset() {
-      return this.noScroll ? 0 : SCROLL_BAR_SIZE;
+    getShellWidth(noScroll) {
+      return this.$el.parentElement.clientWidth + (noScroll ? 0 : SCROLL_BAR_SIZE);
+    },
+    handleEpicsListRendered() {
+      this.noScroll = this.shellHeight > EPIC_ITEM_HEIGHT * (this.epics.length + 1);
     },
     handleScroll() {
       const { scrollTop, scrollLeft, clientHeight, scrollHeight } = this.$el;
@@ -92,7 +115,6 @@ export default {
         this.$emit('onScrollToEnd', this.$refs.roadmapTimeline.$el, EXTEND_AS.APPEND);
       }
 
-      this.noScroll = this.shellHeight > EPIC_ITEM_HEIGHT * (this.epics.length + 1);
       eventHub.$emit('epicsListScrolled', { scrollTop, scrollLeft, clientHeight, scrollHeight });
     },
   },
@@ -114,6 +136,11 @@ export default {
       :shell-width="shellWidth"
       :list-scrollable="!noScroll"
     />
+    <div v-if="!epics.length" class="skeleton-loader js-skeleton-loader">
+      <div v-for="n in 10" :key="n" class="mt-2">
+        <gl-skeleton-loading :lines="2" />
+      </div>
+    </div>
     <epics-list-section
       :preset-type="presetType"
       :epics="epics"

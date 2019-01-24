@@ -66,7 +66,7 @@ describe('AppComponent', () => {
 
   describe('data', () => {
     it('returns default data props', () => {
-      expect(vm.isLoading).toBe(true);
+      expect(vm.isLoading).toBe(false);
       expect(vm.isEpicsListEmpty).toBe(false);
       expect(vm.hasError).toBe(false);
       expect(vm.handleResizeThrottled).toBeDefined();
@@ -150,6 +150,7 @@ describe('AppComponent', () => {
       it('calls service.getEpics and sets response to the store on success', done => {
         mock.onGet(vm.service.epicsPath).reply(200, rawEpics);
         spyOn(vm.store, 'setEpics');
+        spyOn(eventHub, '$emit');
 
         vm.fetchEpics();
 
@@ -157,7 +158,19 @@ describe('AppComponent', () => {
         setTimeout(() => {
           expect(vm.isLoading).toBe(false);
           expect(vm.store.setEpics).toHaveBeenCalledWith(rawEpics);
-          done();
+
+          vm.$nextTick()
+            .then(() => {
+              expect(eventHub.$emit).toHaveBeenCalledWith(
+                'refreshTimeline',
+                jasmine.objectContaining({
+                  todayBarReady: true,
+                  initialRender: true,
+                }),
+              );
+            })
+            .then(done)
+            .catch(done.fail);
         }, 0);
       });
 
@@ -210,13 +223,15 @@ describe('AppComponent', () => {
       it('calls service.fetchEpicsForTimeframe and adds response to the store on success', done => {
         mock.onGet(vm.service.epicsPath).reply(200, rawEpics);
 
+        const extendType = EXTEND_AS.APPEND;
+
         spyOn(vm.service, 'getEpicsForTimeframe').and.callThrough();
         spyOn(vm.store, 'addEpics');
-        spyOn(vm, '$nextTick').and.stub();
+        spyOn(vm, 'processExtendedTimeline');
 
         vm.fetchEpicsForTimeframe({
           timeframe: mockTimeframeMonths,
-          extendType: EXTEND_AS.APPEND,
+          extendType,
           roadmapTimelineEl,
         });
 
@@ -227,7 +242,18 @@ describe('AppComponent', () => {
         );
         setTimeout(() => {
           expect(vm.store.addEpics).toHaveBeenCalledWith(rawEpics);
-          done();
+          vm.$nextTick()
+            .then(() => {
+              expect(vm.processExtendedTimeline).toHaveBeenCalledWith(
+                jasmine.objectContaining({
+                  itemsCount: 8,
+                  extendType,
+                  roadmapTimelineEl,
+                }),
+              );
+            })
+            .then(done)
+            .catch(done.fail);
         }, 0);
       });
 
@@ -307,7 +333,6 @@ describe('AppComponent', () => {
 
       it('updates the store and refreshes roadmap with extended timeline when called with `extendType` param as `prepend`', done => {
         spyOn(vm.store, 'extendTimeframe');
-        spyOn(vm, 'processExtendedTimeline');
         spyOn(vm, 'fetchEpicsForTimeframe');
 
         const extendType = EXTEND_AS.PREPEND;
@@ -319,14 +344,6 @@ describe('AppComponent', () => {
 
         vm.$nextTick()
           .then(() => {
-            expect(vm.processExtendedTimeline).toHaveBeenCalledWith(
-              jasmine.objectContaining({
-                itemsCount: 0,
-                extendType,
-                roadmapTimelineEl,
-              }),
-            );
-
             expect(vm.fetchEpicsForTimeframe).toHaveBeenCalledWith(
               jasmine.objectContaining({
                 // During tests, we don't extend timeframe
@@ -343,7 +360,6 @@ describe('AppComponent', () => {
 
       it('updates the store and refreshes roadmap with extended timeline when called with `extendType` param as `append`', done => {
         spyOn(vm.store, 'extendTimeframe');
-        spyOn(vm, 'processExtendedTimeline');
         spyOn(vm, 'fetchEpicsForTimeframe');
 
         const extendType = EXTEND_AS.APPEND;
@@ -355,14 +371,6 @@ describe('AppComponent', () => {
 
         vm.$nextTick()
           .then(() => {
-            expect(vm.processExtendedTimeline).toHaveBeenCalledWith(
-              jasmine.objectContaining({
-                itemsCount: 0,
-                extendType,
-                roadmapTimelineEl,
-              }),
-            );
-
             expect(vm.fetchEpicsForTimeframe).toHaveBeenCalledWith(
               jasmine.objectContaining({
                 // During tests, we don't extend timeframe

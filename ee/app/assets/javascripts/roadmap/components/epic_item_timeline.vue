@@ -57,7 +57,7 @@ export default {
     },
   },
   watch: {
-    shellWidth: function shellWidth() {
+    shellWidth() {
       // Render timeline bar only when shellWidth is updated.
       this.renderTimelineBar();
     },

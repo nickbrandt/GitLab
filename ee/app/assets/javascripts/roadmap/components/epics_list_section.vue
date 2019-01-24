@@ -3,7 +3,7 @@ import eventHub from '../event_hub';
 
 import SectionMixin from '../mixins/section_mixin';
 
-import { TIMELINE_CELL_MIN_WIDTH } from '../constants';
+import { TIMELINE_CELL_MIN_WIDTH, EPIC_ITEM_HEIGHT } from '../constants';
 
 import epicItem from './epic_item.vue';
 
@@ -74,18 +74,14 @@ export default {
   },
   mounted() {
     eventHub.$on('epicsListScrolled', this.handleEpicsListScroll);
-    eventHub.$on('refreshTimeline', () => {
-      this.initEmptyRow(false);
-    });
+    eventHub.$on('refreshTimeline', this.handleTimelineRefresh);
     this.$nextTick(() => {
       this.initMounted();
     });
   },
   beforeDestroy() {
     eventHub.$off('epicsListScrolled', this.handleEpicsListScroll);
-    eventHub.$off('refreshTimeline', () => {
-      this.initEmptyRow(false);
-    });
+    eventHub.$off('refreshTimeline', this.handleTimelineRefresh);
   },
   methods: {
     initMounted() {
@@ -112,7 +108,7 @@ export default {
      * based on height of available list items and sets it to component
      * props.
      */
-    initEmptyRow(showEmptyRow = false) {
+    initEmptyRow() {
       const children = this.$children;
       let approxChildrenHeight = children[0].$el.clientHeight * this.epics.length;
 
@@ -130,7 +126,6 @@ export default {
         this.emptyRowHeight = this.shellHeight - approxChildrenHeight;
         this.showEmptyRow = true;
       } else {
-        this.showEmptyRow = showEmptyRow;
         this.showBottomShadow = true;
       }
     },
@@ -140,6 +135,28 @@ export default {
      */
     scrollToTodayIndicator() {
       this.$el.parentElement.scrollBy(TIMELINE_CELL_MIN_WIDTH / 2, 0);
+    },
+    /**
+     * Method to update list section when refreshTimeline event
+     * is emitted on eventHub
+     *
+     * This method ensures that empty row is toggled
+     * based on whether list has enough epics to make
+     * list vertically scrollable.
+     */
+    handleTimelineRefresh({ initialRender = false }) {
+      // Initialize emptyRow only once.
+      if (initialRender) {
+        this.initEmptyRow();
+      }
+
+      // Check if container height is less than total height of all Epic
+      // items combined (AKA list is scrollable).
+      const isListVertScrollable =
+        this.$el.parentElement.offsetHeight < EPIC_ITEM_HEIGHT * (this.epics.length + 1);
+
+      // Toggle empty row.
+      this.showEmptyRow = !isListVertScrollable;
     },
     handleEpicsListScroll({ scrollTop, clientHeight, scrollHeight }) {
       this.showBottomShadow = Math.ceil(scrollTop) + clientHeight < scrollHeight;

@@ -3,7 +3,6 @@ import _ from 'underscore';
 import Flash from '~/flash';
 import { s__ } from '~/locale';
 
-import { GlLoadingIcon } from '@gitlab/ui';
 import epicsListEmpty from './epics_list_empty.vue';
 import roadmapShell from './roadmap_shell.vue';
 import eventHub from '../event_hub';
@@ -14,7 +13,6 @@ export default {
   components: {
     epicsListEmpty,
     roadmapShell,
-    GlLoadingIcon,
   },
   props: {
     store: {
@@ -44,7 +42,7 @@ export default {
   },
   data() {
     return {
-      isLoading: true,
+      isLoading: false,
       isEpicsListEmpty: false,
       hasError: false,
       handleResizeThrottled: {},
@@ -86,9 +84,16 @@ export default {
         .getEpics()
         .then(res => res.data)
         .then(epics => {
-          this.isLoading = false;
           if (epics.length) {
             this.store.setEpics(epics);
+            this.$nextTick(() => {
+              // Render timeline bars as we're already having timeline
+              // rendered before fetch
+              eventHub.$emit('refreshTimeline', {
+                todayBarReady: true,
+                initialRender: true,
+              });
+            });
           } else {
             this.isEpicsListEmpty = true;
           }
@@ -107,14 +112,15 @@ export default {
         .then(epics => {
           if (epics.length) {
             this.store.addEpics(epics);
-            this.$nextTick(() => {
-              // Re-render timeline bars with updated timeline
-              eventHub.$emit('refreshTimeline', {
-                height: window.innerHeight - roadmapTimelineEl.offsetTop,
-                todayBarReady: extendType === EXTEND_AS.PREPEND,
-              });
-            });
           }
+          this.$nextTick(() => {
+            // Re-render timeline bars with updated timeline
+            this.processExtendedTimeline({
+              itemsCount: timeframe ? timeframe.length : 0,
+              extendType,
+              roadmapTimelineEl,
+            });
+          });
         })
         .catch(() => {
           this.hasError = true;
@@ -156,7 +162,6 @@ export default {
     processExtendedTimeline({ extendType = EXTEND_AS.PREPEND, roadmapTimelineEl, itemsCount = 0 }) {
       // Re-render timeline bars with updated timeline
       eventHub.$emit('refreshTimeline', {
-        height: window.innerHeight - roadmapTimelineEl.offsetTop,
         todayBarReady: extendType === EXTEND_AS.PREPEND,
       });
 
@@ -172,16 +177,10 @@ export default {
     handleScrollToExtend(roadmapTimelineEl, extendType = EXTEND_AS.PREPEND) {
       const timeframe = this.store.extendTimeframe(extendType);
       this.$nextTick(() => {
-        this.processExtendedTimeline({
-          itemsCount: timeframe ? timeframe.length : 0,
-          extendType,
-          roadmapTimelineEl,
-        });
-
         this.fetchEpicsForTimeframe({
           timeframe,
-          roadmapTimelineEl,
           extendType,
+          roadmapTimelineEl,
         });
       });
     },
@@ -191,12 +190,6 @@ export default {
 
 <template>
   <div :class="{ 'overflow-reset': isEpicsListEmpty }" class="roadmap-container">
-    <gl-loading-icon
-      v-if="isLoading"
-      :label="s__('GroupRoadmap|Loading roadmap')"
-      :size="2"
-      class="loading-animation prepend-top-20 append-bottom-20"
-    />
     <roadmap-shell
       v-if="showRoadmap"
       :preset-type="presetType"
