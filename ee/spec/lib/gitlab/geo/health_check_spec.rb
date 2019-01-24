@@ -96,8 +96,9 @@ describe Gitlab::Geo::HealthCheck, :geo do
       allow(described_class).to receive(:database_secondary?) { true }
       allow(described_class).to receive(:streaming_active?) { true }
 
-      allow(Gitlab::Geo::Fdw).to receive(:fdw_up_to_date?) { false }
-      allow(Gitlab::Geo::Fdw).to receive(:count_tables_match?) { true }
+      allow(Gitlab::Geo::Fdw).to receive(:foreign_tables_up_to_date?) { false }
+      allow(Gitlab::Geo::Fdw).to receive(:foreign_schema_tables_count) { 1 }
+      allow(Gitlab::Geo::Fdw).to receive(:gitlab_schema_tables_count) { 1 }
 
       expect(subject.perform_checks).to match(/The Geo database has an outdated FDW remote schema\./)
     end
@@ -106,8 +107,9 @@ describe Gitlab::Geo::HealthCheck, :geo do
       allow(described_class).to receive(:database_secondary?) { true }
       allow(described_class).to receive(:streaming_active?) { true }
 
-      allow(Gitlab::Geo::Fdw).to receive(:fdw_up_to_date?) { false }
-      allow(Gitlab::Geo::Fdw).to receive(:count_tables_match?) { false }
+      allow(Gitlab::Geo::Fdw).to receive(:foreign_tables_up_to_date?) { false }
+      allow(Gitlab::Geo::Fdw).to receive(:foreign_schema_tables_count) { 1 }
+      allow(Gitlab::Geo::Fdw).to receive(:gitlab_schema_tables_count) { 2 }
 
       expect(subject.perform_checks).to match(/The Geo database has an outdated FDW remote schema\. It contains [0-9]+ of [0-9]+ expected tables/)
     end
