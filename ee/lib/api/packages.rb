@@ -7,7 +7,7 @@ module API
     before do
       require_packages_enabled!
       authorize_packages_feature!
-      authorize_download_package!
+      authorize_read_package!
     end
 
     helpers ::API::Helpers::PackagesHelpers
@@ -17,6 +17,7 @@ module API
     end
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc 'Get all project packages' do
+        detail 'This feature was introduced in GitLab 11.8'
         success EE::API::Entities::Package
       end
       params do
