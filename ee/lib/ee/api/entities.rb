@@ -229,6 +229,12 @@ module EE
       end
 
       class MergeRequestApprovals < ::API::Entities::ProjectEntity
+        def initialize(merge_request, options = {})
+          presenter = merge_request.present(current_user: options[:current_user])
+
+          super(presenter, options)
+        end
+
         expose :merge_status
         expose :approvals_required
         expose :approvals_left
