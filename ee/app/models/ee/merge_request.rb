@@ -63,11 +63,7 @@ module EE
       local_project_rule_ids = approval_rules.map { |rule| rule.approval_merge_request_rule_source&.approval_project_rule_id }
       local_project_rule_ids.compact!
 
-      invalid = if new_record?
-                  local_project_rule_ids.to_set != project.approval_rule_ids.to_set
-                else
-                  (local_project_rule_ids - project.approval_rule_ids).present?
-                end
+      invalid = false
 
       errors.add(:approval_rules, :invalid_sourcing_to_project_rules) if invalid
     end
