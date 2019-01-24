@@ -41,7 +41,7 @@ describe 'Dropdown weight', :js do
 
     it 'closes when the search bar is unfocused' do
       filtered_search.set('weight:')
-      find('body').click()
+      find('body').click
 
       expect(page).to have_css(js_dropdown_weight, visible: false)
     end
