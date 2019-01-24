@@ -892,6 +892,9 @@ msgstr ""
 msgid "Apply suggestion"
 msgstr ""
 
+msgid "Approvals"
+msgstr ""
+
 msgid "Approvals required"
 msgstr ""
 
