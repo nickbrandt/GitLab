@@ -834,8 +834,8 @@ describe MergeRequest do
     it "returns correct value" do
       user = create(:user)
       user1 = create(:user)
-      merge_request.approvers.create(user_id: user.id)
-      merge_request.approvers.create(user_id: user1.id)
+      create(:approver, target: merge_request, user: user)
+      create(:approver, target: merge_request, user: user1)
       merge_request.approvals.create(user_id: user1.id)
 
       expect(merge_request.approvers_left).to eq [user]
@@ -848,9 +848,9 @@ describe MergeRequest do
       group = create(:group)
 
       group.add_developer(user2)
-      merge_request.approver_groups.create(group: group)
-      merge_request.approvers.create(user_id: user.id)
-      merge_request.approvers.create(user_id: user1.id)
+      create(:approver_group, target: merge_request, group: group)
+      create(:approver, target: merge_request, user: user)
+      create(:approver, target: merge_request, user: user1)
       merge_request.approvals.create(user_id: user1.id)
 
       expect(merge_request.approvers_left).to match_array [user, user2]

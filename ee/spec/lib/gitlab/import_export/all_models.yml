@@ -8,6 +8,7 @@ merge_requests:
 - reviews
 - approvals
 - approvers
+- approver_users
 - approver_groups
 - approved_by_users
 - draft_notes
@@ -49,6 +50,7 @@ project:
 - jenkins_deprecated_service
 - index_status
 - approvers
+- approver_users
 - pages_domains
 - audit_events
 - path_locks
