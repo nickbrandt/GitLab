@@ -177,15 +177,15 @@ If you add a dependency in GitLab (such as an operating system package) please
 consider updating the following and note the applicability of each in your
 merge request:
 
-1. Note the addition in the release blog post (create one if it doesn't exist yet) https://gitlab.com/gitlab-com/www-gitlab-com/merge_requests/
-1. Upgrade guide, for example https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/update/7.5-to-7.6.md
-1. Installation guide https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/install/installation.md#1-packages-dependencies
-1. GitLab Development Kit https://gitlab.com/gitlab-org/gitlab-development-kit
-1. Test suite https://gitlab.com/gitlab-org/gitlab-ce/blob/master/scripts/prepare_build.sh
-1. Omnibus package creator https://gitlab.com/gitlab-org/omnibus-gitlab
+1. Note the addition in the release blog post (create one if it doesn't exist yet) <https://gitlab.com/gitlab-com/www-gitlab-com/merge_requests/>
+1. Upgrade guide, for example <https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/update/7.5-to-7.6.md>
+1. Installation guide <https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/install/installation.md#1-packages-dependencies>
+1. GitLab Development Kit <https://gitlab.com/gitlab-org/gitlab-development-kit>
+1. Test suite <https://gitlab.com/gitlab-org/gitlab-ce/blob/master/scripts/prepare_build.sh>
+1. Omnibus package creator <https://gitlab.com/gitlab-org/omnibus-gitlab>
 
 [definition-of-done]: http://guide.agilealliance.org/guide/definition-of-done.html
-[testing]: ../testing_guide/index.md  
+[testing]: ../testing_guide/index.md
 
 ---
 
