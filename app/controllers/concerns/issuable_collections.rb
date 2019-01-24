@@ -200,3 +200,5 @@ module IssuableCollections
                                 end
   end
 end
+
+IssuableCollections.prepend(EE::IssuableCollections)

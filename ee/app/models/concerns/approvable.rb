@@ -19,6 +19,10 @@ module Approvable
     approvals_left < 1
   end
 
+  def approvals_given
+    approvals.size
+  end
+
   # Number of approvals remaining (excluding existing approvals) before the MR is
   # considered approved. If there are fewer potential approvers than approvals left,
   # users should either reduce the number of approvers on projects and/or merge
