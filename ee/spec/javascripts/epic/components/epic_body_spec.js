@@ -51,11 +51,27 @@ describe('EpicBodyComponent', () => {
       expect(vm.$el.querySelector('.description')).not.toBeNull();
     });
 
+    it('renders related epics list elements', () => {
+      const relatedEpicsEl = vm.$el.querySelector('.js-related-epics-block');
+
+      expect(relatedEpicsEl).not.toBeNull();
+      expect(relatedEpicsEl.querySelector('.card-title').innerText.trim()).toContain('Epics');
+      expect(relatedEpicsEl.querySelector('.js-related-issues-header-issue-count')).not.toBeNull();
+      expect(relatedEpicsEl.querySelector('button.js-issue-count-badge-add-button')).not.toBeNull();
+      expect(relatedEpicsEl.querySelector('.related-items-list')).not.toBeNull();
+    });
+
     it('renders related issues list elements', () => {
-      expect(vm.$el.querySelector('.related-issues-block')).not.toBeNull();
-      expect(vm.$el.querySelector('.js-related-issues-header-issue-count')).not.toBeNull();
-      expect(vm.$el.querySelector('.related-issues-token-body')).not.toBeNull();
-      expect(vm.$el.querySelector('.related-items-list')).not.toBeNull();
+      const relatedIssuesEl = vm.$el.querySelector('.js-related-issues-block');
+
+      expect(relatedIssuesEl).not.toBeNull();
+      expect(relatedIssuesEl.querySelector('.card-title').innerText.trim()).toContain('Issues');
+      expect(relatedIssuesEl.querySelector('.js-related-issues-header-issue-count')).not.toBeNull();
+      expect(
+        relatedIssuesEl.querySelector('button.js-issue-count-badge-add-button'),
+      ).not.toBeNull();
+
+      expect(relatedIssuesEl.querySelector('.related-items-list')).not.toBeNull();
     });
   });
 });

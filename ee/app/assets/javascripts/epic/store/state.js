@@ -3,6 +3,7 @@ export default {
   endpoint: '',
   updateEndpoint: '',
 
+  epicLinksEndpoint: '',
   issueLinksEndpoint: '',
   groupPath: '',
   markdownPreviewPath: '',
@@ -20,6 +21,7 @@ export default {
   canUpdate: false,
   canDestroy: false,
   canAdmin: false,
+  subepicsSupported: false,
 
   // Epic Information
   epicId: 0,
