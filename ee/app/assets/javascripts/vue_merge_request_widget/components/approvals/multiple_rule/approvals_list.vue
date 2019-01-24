@@ -1,9 +1,14 @@
 <script>
 import { GlLoadingIcon } from '@gitlab/ui';
+import { sprintf, __ } from '~/locale';
+import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
+import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
   components: {
     GlLoadingIcon,
+    UserAvatarList,
+    Icon,
   },
   props: {
     mr: {
@@ -34,6 +39,21 @@ export default {
       })
       .catch(() => {});
   },
+  methods: {
+    pendingApprovalsText(rule) {
+      if (!rule.approvals_required) {
+        return __('Optional');
+      }
+
+      return sprintf(__('%{part} of %{total}'), {
+        part: rule.approved_by.length,
+        total: rule.approvals_required,
+      });
+    },
+    isApproved(rule) {
+      return rule.approvals_required > 0 && rule.approvals_required <= rule.approved_by.length;
+    },
+  },
 };
 </script>
 
@@ -45,13 +65,23 @@ export default {
         <tr>
           <th></th>
           <th>{{ s__('MRApprovals|Approvers') }}</th>
-          <th></th>
+          <th class="mw-50"></th>
           <th>{{ s__('MRApprovals|Pending approvals') }}</th>
           <th>{{ s__('MRApprovals|Approved by') }}</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for=""
+        <tr v-for="rule in mr.approvalRules" :key="rule.id">
+          <td>
+            <template v-if="isApproved(rule)">
+              <icon name="check-circle" class="text-success" />
+            </template>
+          </td>
+          <td>{{ rule.name }}</td>
+          <td><user-avatar-list :items="rule.approvers" :img-size="24" /></td>
+          <td class="text-nowrap">{{ pendingApprovalsText(rule) }}</td>
+          <td><user-avatar-list :items="rule.approved_by" :img-size="24" /></td>
+        </tr>
       </tbody>
     </table>
   </div>

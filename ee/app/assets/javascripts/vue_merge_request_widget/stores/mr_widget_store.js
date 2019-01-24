@@ -42,6 +42,7 @@ export default class MergeRequestStore extends CEMergeRequestStore {
   initApprovals(data) {
     this.isApproved = this.isApproved || false;
     this.approvals = this.approvals || null;
+    this.approvalRules = this.approvalRules || [];
     this.approvalsPath = data.approvals_path || this.approvalsPath;
     this.approvalsRequired = data.approvalsRequired || Boolean(this.approvalsPath);
     this.apiApprovalsPath = data.api_approvals_path || this.apiApprovalsPath;
@@ -53,6 +54,7 @@ export default class MergeRequestStore extends CEMergeRequestStore {
   setApprovals(data) {
     this.approvals = data;
     this.approvalsLeft = !!data.approvals_left;
+    this.approvalRules = data.approval_rules || this.approvalRules;
     this.isApproved = !this.approvalsLeft || false;
     this.preventMerge = this.approvalsRequired && this.approvalsLeft;
   }
