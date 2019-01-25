@@ -58,6 +58,7 @@ module EE
     end
 
     def validate_approval_rule_source
+      return if ::Feature.disabled?(:approval_rules, project)
       return unless approval_rules.any?
 
       local_project_rule_ids = approval_rules.map { |rule| rule.approval_merge_request_rule_source&.approval_project_rule_id }
