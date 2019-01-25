@@ -140,6 +140,12 @@ of your project.
 If you have a self-hosted GitLab installation, replace `gitlab.com` with your
 domain name.
 
+NOTE: **Note:**
+For retrieving artifacts, you can use either the
+[URL encoded](../../../api/README.md#namespaced-path-encoding) path of the project
+(e.g., `group%2Fproject`) or the project's ID (e.g., `42`). However, only the
+project's ID can be used for uploading.
+
 ### Group level Maven endpoint
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/8798) in GitLab Premium 11.7.
@@ -186,6 +192,12 @@ which can be found on the home page of your project.
 
 If you have a self-hosted GitLab installation, replace `gitlab.com` with your
 domain name.
+
+NOTE: **Note:**
+For retrieving artifacts, you can use either the
+[URL encoded](../../../api/README.md#namespaced-path-encoding) path of the project
+(e.g., `group%2Fproject`) or the project's ID (e.g., `42`). However, only the
+project's ID can be used for uploading.
 
 ### Instance level Maven endpoint
 
@@ -236,6 +248,12 @@ of your project.
 
 If you have a self-hosted GitLab installation, replace `gitlab.com` with your
 domain name.
+
+NOTE: **Note:**
+For retrieving artifacts, you can use either the
+[URL encoded](../../../api/README.md#namespaced-path-encoding) path of the project
+(e.g., `group%2Fproject`) or the project's ID (e.g., `42`). However, only the
+project's ID can be used for uploading.
 
 ## Uploading packages
 
