@@ -643,6 +643,9 @@ msgstr ""
 msgid "Allow users to request access if visibility is public or internal."
 msgstr ""
 
+msgid "Allowed to fail"
+msgstr ""
+
 msgid "Allows you to add and manage Kubernetes clusters."
 msgstr ""
 
@@ -1504,6 +1507,9 @@ msgstr ""
 msgid "CI / CD Settings"
 msgstr ""
 
+msgid "CI Lint"
+msgstr ""
+
 msgid "CI will run using the credentials assigned above."
 msgstr ""
 
@@ -1631,6 +1637,9 @@ msgid "Chat"
 msgstr ""
 
 msgid "Check the %{docs_link_start}documentation%{docs_link_end}."
+msgstr ""
+
+msgid "Check your .gitlab-ci.yml"
 msgstr ""
 
 msgid "Checking %{text} availability…"
@@ -1796,6 +1805,9 @@ msgid "CiVariable|Validation failed"
 msgstr ""
 
 msgid "ClassificationLabelUnavailable|is unavailable: %{reason}"
+msgstr ""
+
+msgid "Clear"
 msgstr ""
 
 msgid "Clear search"
@@ -2544,6 +2556,9 @@ msgstr ""
 msgid "ContainerRegistry|You can also use a %{deploy_token} for read-only access to the registry images."
 msgstr ""
 
+msgid "Contents of .gitlab-ci.yml"
+msgstr ""
+
 msgid "Continue"
 msgstr ""
 
@@ -3176,6 +3191,9 @@ msgstr ""
 msgid "Download"
 msgstr ""
 
+msgid "Download artifacts"
+msgstr ""
+
 msgid "Download asset"
 msgstr ""
 
@@ -3363,6 +3381,9 @@ msgid "Environment variables are applied to environments via the runner. They ca
 msgstr ""
 
 msgid "Environment variables are configured by your administrator to be %{link_start}protected%{link_end} by default"
+msgstr ""
+
+msgid "Environment:"
 msgstr ""
 
 msgid "Environments"
@@ -3563,6 +3584,9 @@ msgstr ""
 msgid "Error while loading the merge request. Please try again."
 msgstr ""
 
+msgid "Error:"
+msgstr ""
+
 msgid "Errors"
 msgstr ""
 
@@ -3606,6 +3630,9 @@ msgid "Everyone"
 msgstr ""
 
 msgid "Everyone can contribute"
+msgstr ""
+
+msgid "Except policy:"
 msgstr ""
 
 msgid "Existing Git repository"
@@ -5088,6 +5115,12 @@ msgstr ""
 msgid "Job has been erased"
 msgstr ""
 
+msgid "Job is stuck. Check runners."
+msgstr ""
+
+msgid "Job was retried"
+msgstr ""
+
 msgid "Jobs"
 msgstr ""
 
@@ -6317,6 +6350,9 @@ msgstr ""
 msgid "Only mirror protected branches"
 msgstr ""
 
+msgid "Only policy:"
+msgstr ""
+
 msgid "Only proceed if you trust %{idp_url} to control your GitLab account sign in."
 msgstr ""
 
@@ -6438,6 +6474,9 @@ msgid "Pagination|Prev"
 msgstr ""
 
 msgid "Pagination|« First"
+msgstr ""
+
+msgid "Parameter"
 msgstr ""
 
 msgid "Parent epic"
@@ -8669,6 +8708,9 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
+msgid "Status:"
+msgstr ""
+
 msgid "Stop Terminal"
 msgstr ""
 
@@ -8829,6 +8871,9 @@ msgid "System metrics (Kubernetes)"
 msgstr ""
 
 msgid "Tag"
+msgstr ""
+
+msgid "Tag list:"
 msgstr ""
 
 msgid "Tags"
@@ -9954,6 +9999,15 @@ msgstr ""
 msgid "Users requesting access to"
 msgstr ""
 
+msgid "Validate"
+msgstr ""
+
+msgid "Validate your GitLab CI configuration file"
+msgstr ""
+
+msgid "Value"
+msgstr ""
+
 msgid "Various container registry settings."
 msgstr ""
 
@@ -10147,6 +10201,9 @@ msgid "When enabled, users cannot use GitLab until the terms have been accepted.
 msgstr ""
 
 msgid "When leaving the URL blank, classification labels can still be specified without disabling cross project features or performing external authorization checks."
+msgstr ""
+
+msgid "When:"
 msgstr ""
 
 msgid "Who can see this group?"
@@ -10531,6 +10588,9 @@ msgid "a deleted user"
 msgstr ""
 
 msgid "ago"
+msgstr ""
+
+msgid "allowed to fail"
 msgstr ""
 
 msgid "among other things"
@@ -10921,6 +10981,9 @@ msgstr ""
 msgid "locked by %{path_lock_user_name} %{created_at}"
 msgstr ""
 
+msgid "manual"
+msgstr ""
+
 msgid "merge request"
 msgid_plural "merge requests"
 msgstr[0] ""
@@ -11170,6 +11233,9 @@ msgstr ""
 msgid "new merge request"
 msgstr ""
 
+msgid "none"
+msgstr ""
+
 msgid "notification emails"
 msgstr ""
 
@@ -11253,6 +11319,12 @@ msgstr ""
 msgid "stuck"
 msgstr ""
 
+msgid "syntax is correct"
+msgstr ""
+
+msgid "syntax is incorrect"
+msgstr ""
+
 msgid "this document"
 msgstr ""
 
@@ -11260,6 +11332,9 @@ msgid "to help your contributors communicate effectively!"
 msgstr ""
 
 msgid "toggle collapse"
+msgstr ""
+
+msgid "triggered"
 msgstr ""
 
 msgid "updated"
