@@ -118,6 +118,7 @@ describe 'Merge request > Batch comments', :js do
 
     context 'in parallel diff' do
       before do
+        find('.js-show-diff-settings').click
         click_button 'Side-by-side'
       end
 
