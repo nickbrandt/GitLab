@@ -46,7 +46,8 @@ class ProjectSnippetPolicy < BasePolicy
     enable :admin_project_snippet
   end
 
-  # EE Extensions
+  rule { ~can?(:read_project_snippet) }.prevent :create_note
 
+  # EE Extensions
   rule { auditor }.enable :read_project_snippet
 end

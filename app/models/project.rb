@@ -375,8 +375,10 @@ class Project < ActiveRecord::Base
 
   # "enabled" here means "not disabled". It includes private features!
   scope :with_feature_enabled, ->(feature) {
-    access_level_attribute = ProjectFeature.access_level_attribute(feature)
-    with_project_feature.where(project_features: { access_level_attribute => [nil, ProjectFeature::PRIVATE, ProjectFeature::ENABLED, ProjectFeature::PUBLIC] })
+    access_level_attribute = ProjectFeature.arel_table[ProjectFeature.access_level_attribute(feature)]
+    enabled_feature = access_level_attribute.gt(ProjectFeature::DISABLED).or(access_level_attribute.eq(nil))
+
+    with_project_feature.where(enabled_feature)
   }
 
   # Picks a feature where the level is exactly that given.
@@ -463,7 +465,8 @@ class Project < ActiveRecord::Base
   # logged in users to more efficiently get private projects with the given
   # feature.
   def self.with_feature_available_for_user(feature, user)
-    visible = [nil, ProjectFeature::ENABLED, ProjectFeature::PUBLIC]
+    visible = [ProjectFeature::ENABLED, ProjectFeature::PUBLIC]
+    min_access_level = ProjectFeature.required_minimum_access_level(feature)
 
     if user&.admin?
       with_feature_enabled(feature)
@@ -471,10 +474,15 @@ class Project < ActiveRecord::Base
       column = ProjectFeature.quoted_access_level_column(feature)
 
       with_project_feature
-        .where("#{column} IN (?) OR (#{column} = ? AND EXISTS (?))",
-              visible,
-              ProjectFeature::PRIVATE,
-              user.authorizations_for_projects)
+        .where(
+          "(projects.visibility_level > :private AND (#{column} IS NULL OR #{column} >= (:public_visible) OR (#{column} = :private_visible AND EXISTS(:authorizations))))"\
+          " OR (projects.visibility_level = :private AND (#{column} IS NULL OR #{column} >= :private_visible) AND EXISTS(:authorizations))",
+          {
+            private: Gitlab::VisibilityLevel::PRIVATE,
+            public_visible: ProjectFeature::ENABLED,
+            private_visible: ProjectFeature::PRIVATE,
+            authorizations: user.authorizations_for_projects(min_access_level: min_access_level)
+          })
     else
       with_feature_access_level(feature, visible)
     end
@@ -528,6 +536,7 @@ class Project < ActiveRecord::Base
 
     def reference_pattern
       %r{
+        (?<!#{Gitlab::PathRegex::PATH_START_CHAR})
         ((?<namespace>#{Gitlab::PathRegex::FULL_NAMESPACE_FORMAT_REGEX})\/)?
         (?<project>#{Gitlab::PathRegex::PROJECT_PATH_FORMAT_REGEX})
       }x
@@ -564,6 +573,14 @@ class Project < ActiveRecord::Base
 
     def group_ids
       joins(:namespace).where(namespaces: { type: 'Group' }).select(:namespace_id)
+    end
+  end
+
+  def all_pipelines
+    if builds_enabled?
+      super
+    else
+      super.external
     end
   end
 
