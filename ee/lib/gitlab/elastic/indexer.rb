@@ -6,6 +6,8 @@
 module Gitlab
   module Elastic
     class Indexer
+      include Gitlab::Utils::StrongMemoize
+
       EXPERIMENTAL_INDEXER = 'gitlab-elasticsearch-indexer'.freeze
 
       Error = Class.new(StandardError)
@@ -25,6 +27,12 @@ module Gitlab
           'ELASTIC_CONNECTION_INFO' => Gitlab::CurrentSettings.elasticsearch_config.to_json,
           'RAILS_ENV'               => Rails.env
         }
+
+        if use_experimental_indexer?
+          @vars['GITALY_CONNECTION_INFO'] = {
+            storage: project.repository_storage
+          }.merge(Gitlab::GitalyClient.connection_data(project.repository_storage)).to_json
+        end
       end
 
       def run(from_sha = nil, to_sha = nil)
@@ -50,22 +58,36 @@ module Gitlab
       end
 
       def path_to_indexer
-        if Gitlab::CurrentSettings.elasticsearch_experimental_indexer? && self.class.experimental_indexer_present?
+        if use_experimental_indexer?
           EXPERIMENTAL_INDEXER
         else
           Rails.root.join('bin', 'elastic_repo_indexer').to_s
         end
       end
 
-      def run_indexer!(from_sha, to_sha)
-        command = ::Gitlab::GitalyClient::StorageSettings.allow_disk_access do
-          [path_to_indexer, project.id.to_s, repository.path_to_repo]
+      def use_experimental_indexer?
+        strong_memoize(:use_experimental_indexer) do
+          Gitlab::CurrentSettings.elasticsearch_experimental_indexer? && self.class.experimental_indexer_present?
         end
+      end
+
+      def run_indexer!(from_sha, to_sha)
+        command = [path_to_indexer, project.id.to_s, repository_path]
+
         vars = @vars.merge('FROM_SHA' => from_sha, 'TO_SHA' => to_sha)
 
         output, status = Gitlab::Popen.popen(command, nil, vars)
 
         raise Error, output unless status&.zero?
+      end
+
+      def repository_path
+        # Go indexer needs relative path while ruby indexer needs absolute one
+        if use_experimental_indexer?
+          "#{repository.disk_path}.git"
+        else
+          ::Gitlab::GitalyClient::StorageSettings.allow_disk_access { repository.path_to_repo }
+        end
       end
 
       # rubocop: disable CodeReuse/ActiveRecord
