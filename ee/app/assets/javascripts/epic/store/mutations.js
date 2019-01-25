@@ -19,4 +19,8 @@ export default {
   [types.REQUEST_EPIC_STATUS_CHANGE_FAILURE](state) {
     state.epicStatusChangeInProgress = false;
   },
+
+  [types.TOGGLE_SIDEBAR](state, isSidebarCollapsed) {
+    state.sidebarCollapsed = isSidebarCollapsed;
+  },
 };

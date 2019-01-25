@@ -1,4 +1,4 @@
-export default {
+export default () => ({
   // API Paths to Send/Receive Data
   endpoint: '',
   updateEndpoint: '',
@@ -51,4 +51,5 @@ export default {
   // UI status flags
   epicStatusChangeInProgress: false,
   epicDeleteInProgress: false,
-};
+  sidebarCollapsed: false,
+});

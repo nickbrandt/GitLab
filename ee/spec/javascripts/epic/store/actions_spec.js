@@ -185,4 +185,66 @@ describe('Epic Store Actions', () => {
       });
     });
   });
+
+  describe('toggleSidebarFlag', () => {
+    it('should call `TOGGLE_SIDEBAR` mutation with param `sidebarCollapsed`', done => {
+      const sidebarCollapsed = true;
+
+      testAction(
+        actions.toggleSidebarFlag,
+        sidebarCollapsed,
+        state,
+        [{ type: 'TOGGLE_SIDEBAR', payload: sidebarCollapsed }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('toggleContainerClassAndCookie', () => {
+    const sidebarCollapsed = true;
+
+    beforeEach(() => {
+      spyOn(epicUtils, 'toggleContainerClass').and.stub();
+      spyOn(epicUtils, 'setCollapsedGutter').and.stub();
+    });
+
+    it('should call `epicUtils.toggleContainerClass` with classes `right-sidebar-expanded` & `right-sidebar-collapsed`', () => {
+      actions.toggleContainerClassAndCookie({}, sidebarCollapsed);
+
+      expect(epicUtils.toggleContainerClass).toHaveBeenCalledTimes(2);
+      expect(epicUtils.toggleContainerClass).toHaveBeenCalledWith('right-sidebar-expanded');
+      expect(epicUtils.toggleContainerClass).toHaveBeenCalledWith('right-sidebar-collapsed');
+    });
+
+    it('should call `epicUtils.setCollapsedGutter` with param `isSidebarCollapsed`', () => {
+      actions.toggleContainerClassAndCookie({}, sidebarCollapsed);
+
+      expect(epicUtils.setCollapsedGutter).toHaveBeenCalledWith(sidebarCollapsed);
+    });
+  });
+
+  describe('toggleSidebar', () => {
+    it('dispatches toggleContainerClassAndCookie and toggleSidebarFlag actions with opposite value of `isSidebarCollapsed` param', done => {
+      const sidebarCollapsed = true;
+
+      testAction(
+        actions.toggleSidebar,
+        { sidebarCollapsed },
+        state,
+        [],
+        [
+          {
+            type: 'toggleContainerClassAndCookie',
+            payload: !sidebarCollapsed,
+          },
+          {
+            type: 'toggleSidebarFlag',
+            payload: !sidebarCollapsed,
+          },
+        ],
+        done,
+      );
+    });
+  });
 });

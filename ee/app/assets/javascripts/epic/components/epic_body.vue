@@ -4,11 +4,14 @@ import { mapState } from 'vuex';
 import IssuableBody from '~/issue_show/components/app.vue';
 import RelatedItems from 'ee/related_issues/components/related_issues_root.vue';
 
+import EpicSidebar from './epic_sidebar.vue';
+
 export default {
   epicsPathIdSeparator: '&',
   components: {
     IssuableBody,
     RelatedItems,
+    EpicSidebar,
   },
   computed: {
     ...mapState([
@@ -76,5 +79,6 @@ export default {
       css-class="js-related-issues-block"
       path-id-separator="#"
     />
+    <epic-sidebar />
   </div>
 </template>
