@@ -1,4 +1,4 @@
-<%= "Merge request #{merge_request_url(@merge_request)} was reviewed by #{@author_name}" %>
+<%= "Merge request #{merge_request_url(@merge_request)} was reviewed by #{sanitize_name(@author_name)}" %>
 
 --
 <% @notes.each_with_index do |note, index| %>
