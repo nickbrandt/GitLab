@@ -13,6 +13,38 @@ describe MergeRequestPresenter do
     end
   end
 
+  describe '#api_approvals_path' do
+    subject { described_class.new(resource, current_user: user).api_approvals_path }
+
+    it 'returns path' do
+      is_expected.to eq("/api/v4/projects/#{resource.project.id}/merge_requests/#{resource.iid}/approvals")
+    end
+  end
+
+  describe '#api_approval_settings_path' do
+    subject { described_class.new(resource, current_user: user).api_approval_settings_path }
+
+    it 'returns path' do
+      is_expected.to eq("/api/v4/projects/#{resource.project.id}/merge_requests/#{resource.iid}/approval_settings")
+    end
+  end
+
+  describe '#api_approve_path' do
+    subject { described_class.new(resource, current_user: user).api_approve_path }
+
+    it 'returns path' do
+      is_expected.to eq("/api/v4/projects/#{resource.project.id}/merge_requests/#{resource.iid}/approve")
+    end
+  end
+
+  describe '#api_unapprove_path' do
+    subject { described_class.new(resource, current_user: user).api_unapprove_path }
+
+    it 'returns path' do
+      is_expected.to eq("/api/v4/projects/#{resource.project.id}/merge_requests/#{resource.iid}/unapprove")
+    end
+  end
+
   describe '#approvers_left' do
     let!(:private_group) { create(:group_with_members, :private) }
     let!(:public_group) { create(:group_with_members) }
