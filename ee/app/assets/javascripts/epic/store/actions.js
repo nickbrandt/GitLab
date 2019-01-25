@@ -1,10 +1,10 @@
 import flash from '~/flash';
-import { __ } from '~/locale';
+import { __, s__, sprintf } from '~/locale';
 
 import axios from '~/lib/utils/axios_utils';
 
 import epicUtils from '../utils/epic_utils';
-import { statusType, statusEvent } from '../constants';
+import { statusType, statusEvent, dateTypes } from '../constants';
 
 import * as types from './mutation_types';
 
@@ -102,6 +102,51 @@ export const toggleTodo = ({ state, dispatch }) => {
     })
     .catch(() => {
       dispatch('requestEpicTodoToggleFailure');
+    });
+};
+
+/**
+ * Methods to handle Epic start and due date manipulations from sidebar
+ */
+export const toggleStartDateType = ({ commit }, data) =>
+  commit(types.TOGGLE_EPIC_START_DATE_TYPE, data);
+export const toggleDueDateType = ({ commit }, data) =>
+  commit(types.TOGGLE_EPIC_DUE_DATE_TYPE, data);
+export const requestEpicDateSave = ({ commit }, data) => commit(types.REQUEST_EPIC_DATE_SAVE, data);
+export const requestEpicDateSaveSuccess = ({ commit }, data) =>
+  commit(types.REQUEST_EPIC_DATE_SAVE_SUCCESS, data);
+export const requestEpicDateSaveFailure = ({ commit }, data) => {
+  commit(types.REQUEST_EPIC_DATE_SAVE_FAILURE, data);
+  flash(
+    sprintf(s__('Epics|An error occurred while saving the %{epicDateType} date'), {
+      epicDateType: dateTypes.start === data.dateType ? s__('Epics|start') : s__('Epics|due'),
+    }),
+  );
+};
+export const saveDate = ({ state, dispatch }, { dateType, dateTypeIsFixed, newDate }) => {
+  const requestBody = {
+    [dateType === dateTypes.start ? 'start_date_is_fixed' : 'due_date_is_fixed']: dateTypeIsFixed,
+  };
+
+  if (dateTypeIsFixed) {
+    requestBody[dateType === dateTypes.start ? 'start_date_fixed' : 'due_date_fixed'] = newDate;
+  }
+
+  dispatch('requestEpicDateSave', { dateType });
+  axios
+    .put(state.endpoint, requestBody)
+    .then(() => {
+      dispatch('requestEpicDateSaveSuccess', {
+        dateType,
+        dateTypeIsFixed,
+        newDate,
+      });
+    })
+    .catch(() => {
+      dispatch('requestEpicDateSaveFailure', {
+        dateType,
+        dateTypeIsFixed: !dateTypeIsFixed,
+      });
     });
 };
 

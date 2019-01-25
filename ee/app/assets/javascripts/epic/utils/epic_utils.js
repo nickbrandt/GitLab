@@ -1,7 +1,12 @@
 import $ from 'jquery';
 import Cookies from 'js-cookie';
 
+import { __, s__, sprintf } from '~/locale';
+
 import { parseBoolean } from '~/lib/utils/common_utils';
+import { dateInWords, parsePikadayDate } from '~/lib/utils/datetime_utility';
+
+import { dateTypes } from '../constants';
 
 const triggerDocumentEvent = (eventName, eventParam) => {
   $(document).trigger(eventName, eventParam);
@@ -23,6 +28,62 @@ const getCollapsedGutter = () => parseBoolean(Cookies.get('collapsed_gutter'));
 
 const setCollapsedGutter = value => Cookies.set('collapsed_gutter', value);
 
+const getDateValidity = (startDateTime, dueDateTime) => {
+  // If both dates are defined
+  // only then compare, return true otherwise
+  if (startDateTime && dueDateTime) {
+    return startDateTime.getTime() < dueDateTime.getTime();
+  }
+  return true;
+};
+
+const getDateFromMilestonesTooltip = ({
+  dateType = dateTypes.start,
+  startDateSourcingMilestoneTitle,
+  startDateSourcingMilestoneDates,
+  startDateTimeFromMilestones,
+  dueDateSourcingMilestoneTitle,
+  dueDateSourcingMilestoneDates,
+  dueDateTimeFromMilestones,
+}) => {
+  const dateSourcingMilestoneTitle =
+    dateType === dateTypes.start ? startDateSourcingMilestoneTitle : dueDateSourcingMilestoneTitle;
+  const sourcingMilestoneDates =
+    dateType === dateTypes.start ? startDateSourcingMilestoneDates : dueDateSourcingMilestoneDates;
+
+  if (startDateTimeFromMilestones && dueDateTimeFromMilestones) {
+    const { startDate, dueDate } = sourcingMilestoneDates;
+    let startDateInWords = __('No start date');
+    let dueDateInWords = __('No due date');
+
+    if (startDate && dueDate) {
+      const startDateObj = parsePikadayDate(startDate);
+      const dueDateObj = parsePikadayDate(dueDate);
+      startDateInWords = dateInWords(
+        startDateObj,
+        true,
+        startDateObj.getFullYear() === dueDateObj.getFullYear(),
+      );
+      dueDateInWords = dateInWords(dueDateObj, true);
+    } else if (startDate && !dueDate) {
+      startDateInWords = dateInWords(parsePikadayDate(startDate), true);
+    } else {
+      dueDateInWords = dateInWords(parsePikadayDate(dueDate), true);
+    }
+
+    return `${dateSourcingMilestoneTitle}<br/><span class="text-tertiary">${startDateInWords} – ${dueDateInWords}</span>`;
+  }
+
+  return sprintf(
+    s__(
+      "Epics|To schedule your epic's %{epicDateType} date based on milestones, assign a milestone with a %{epicDateType} date to any issue in the epic.",
+    ),
+    {
+      epicDateType: dateTypes.start === dateType ? s__('Epics|start') : s__('Epics|due'),
+    },
+  );
+};
+
 // This is for mocking methods from this
 // file within tests using `spyOnDependency`
 // which requires first param to always
@@ -34,6 +95,8 @@ const epicUtils = {
   toggleContainerClass,
   getCollapsedGutter,
   setCollapsedGutter,
+  getDateValidity,
+  getDateFromMilestonesTooltip,
 };
 
 export default epicUtils;

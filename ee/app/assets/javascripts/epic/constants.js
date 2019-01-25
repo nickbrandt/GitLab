@@ -7,3 +7,8 @@ export const statusEvent = {
   close: 'close',
   reopen: 'reopen',
 };
+
+export const dateTypes = {
+  start: 'start',
+  due: 'due',
+};

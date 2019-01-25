@@ -4,7 +4,7 @@ import MockAdapter from 'axios-mock-adapter';
 import defaultState from 'ee/epic/store/state';
 import * as actions from 'ee/epic/store/actions';
 import epicUtils from 'ee/epic/utils/epic_utils';
-import { statusType } from 'ee/epic/constants';
+import { statusType, dateTypes } from 'ee/epic/constants';
 
 import axios from '~/lib/utils/axios_utils';
 import testAction from 'spec/helpers/vuex_action_helper';
@@ -448,6 +448,293 @@ describe('Epic Store Actions', () => {
           done,
         );
       });
+    });
+  });
+
+  describe('toggleStartDateType', () => {
+    it('should set `state.startDateIsFixed` flag to `true`', done => {
+      const dateTypeIsFixed = true;
+
+      testAction(
+        actions.toggleStartDateType,
+        { dateTypeIsFixed },
+        state,
+        [{ type: 'TOGGLE_EPIC_START_DATE_TYPE', payload: { dateTypeIsFixed } }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('toggleDueDateType', () => {
+    it('should set `state.dueDateIsFixed` flag to `true`', done => {
+      const dateTypeIsFixed = true;
+
+      testAction(
+        actions.toggleDueDateType,
+        { dateTypeIsFixed },
+        state,
+        [{ type: 'TOGGLE_EPIC_DUE_DATE_TYPE', payload: { dateTypeIsFixed } }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('requestEpicDateSave', () => {
+    it('should set `state.epicStartDateSaveInProgress` flag to `true` when called with `dateType` as `start`', done => {
+      const dateType = dateTypes.start;
+
+      testAction(
+        actions.requestEpicDateSave,
+        { dateType },
+        state,
+        [{ type: 'REQUEST_EPIC_DATE_SAVE', payload: { dateType } }],
+        [],
+        done,
+      );
+    });
+
+    it('should set `state.epicDueDateSaveInProgress` flag to `true` when called with `dateType` as `due`', done => {
+      const dateType = dateTypes.due;
+
+      testAction(
+        actions.requestEpicDateSave,
+        { dateType },
+        state,
+        [{ type: 'REQUEST_EPIC_DATE_SAVE', payload: { dateType } }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('requestEpicDateSaveSuccess', () => {
+    it('should set `state.epicStartDateSaveInProgress` flag to `false` and set values of `startDateIsFixed` & `startDate` with params `dateTypeIsFixed` & `newDate` when called with `dateType` as `start`', done => {
+      const data = {
+        dateType: dateTypes.start,
+        dateTypeIsFixed: true,
+        mewDate: '2018-1-1',
+      };
+
+      testAction(
+        actions.requestEpicDateSaveSuccess,
+        data,
+        state,
+        [{ type: 'REQUEST_EPIC_DATE_SAVE_SUCCESS', payload: { ...data } }],
+        [],
+        done,
+      );
+    });
+
+    it('should set `state.epicDueDateSaveInProgress` flag to `false` and set values of `dueDateIsFixed` & `dueDate` with params `dateTypeIsFixed` & `newDate` when called with `dateType` as `due`', done => {
+      const data = {
+        dateType: dateTypes.due,
+        dateTypeIsFixed: true,
+        mewDate: '2018-1-1',
+      };
+
+      testAction(
+        actions.requestEpicDateSaveSuccess,
+        data,
+        state,
+        [{ type: 'REQUEST_EPIC_DATE_SAVE_SUCCESS', payload: { ...data } }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('requestEpicDateSaveFailure', () => {
+    beforeEach(() => {
+      setFixtures('<div class="flash-container"></div>');
+    });
+
+    it('should set `state.epicStartDateSaveInProgress` flag to `false` and set value of `startDateIsFixed` to that of param `dateTypeIsFixed` when called with `dateType` as `start`', done => {
+      const data = {
+        dateType: dateTypes.start,
+        dateTypeIsFixed: true,
+      };
+
+      testAction(
+        actions.requestEpicDateSaveFailure,
+        data,
+        state,
+        [
+          {
+            type: 'REQUEST_EPIC_DATE_SAVE_FAILURE',
+            payload: { ...data },
+          },
+        ],
+        [],
+        done,
+      );
+    });
+
+    it('should set `state.epicDueDateSaveInProgress` flag to `false` and set value of `dueDateIsFixed` to that of param `dateTypeIsFixed` when called with `dateType` as `due`', done => {
+      const data = {
+        dateType: dateTypes.due,
+        dateTypeIsFixed: true,
+      };
+
+      testAction(
+        actions.requestEpicDateSaveFailure,
+        data,
+        state,
+        [
+          {
+            type: 'REQUEST_EPIC_DATE_SAVE_FAILURE',
+            payload: { ...data },
+          },
+        ],
+        [],
+        done,
+      );
+    });
+
+    it('should show flash error with message "An error occurred while saving the start date" when called with `dateType` as `start`', done => {
+      actions.requestEpicDateSaveFailure(
+        {
+          commit: () => {},
+        },
+        { dateType: dateTypes.start },
+      );
+
+      Vue.nextTick()
+        .then(() => {
+          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
+            'An error occurred while saving the start date',
+          );
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+
+    it('should show flash error with message "An error occurred while saving the due date" when called with `dateType` as `due`', done => {
+      actions.requestEpicDateSaveFailure(
+        {
+          commit: () => {},
+        },
+        { dateType: dateTypes.due },
+      );
+
+      Vue.nextTick()
+        .then(() => {
+          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
+            'An error occurred while saving the due date',
+          );
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+  });
+
+  describe('saveDate', () => {
+    let mock;
+    const data = {
+      dateType: dateTypes.start,
+      dateTypeIsFixed: true,
+      newDate: '2018-1-1',
+    };
+
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    it('dispatches requestEpicDateSave and requestEpicDateSaveSuccess when request is successful', done => {
+      mock.onPut(/(.*)/).replyOnce(200, {});
+
+      testAction(
+        actions.saveDate,
+        { ...data },
+        state,
+        [],
+        [
+          {
+            type: 'requestEpicDateSave',
+            payload: { dateType: data.dateType },
+          },
+          {
+            type: 'requestEpicDateSaveSuccess',
+            payload: { ...data },
+          },
+        ],
+        done,
+      );
+    });
+
+    it('dispatches requestEpicDateSave and requestEpicDateSaveFailure when request fails', done => {
+      mock.onPut(/(.*)/).replyOnce(500, {});
+
+      testAction(
+        actions.saveDate,
+        { ...data },
+        state,
+        [],
+        [
+          {
+            type: 'requestEpicDateSave',
+            payload: { dateType: data.dateType },
+          },
+          {
+            type: 'requestEpicDateSaveFailure',
+            payload: { dateType: data.dateType, dateTypeIsFixed: !data.dateTypeIsFixed },
+          },
+        ],
+        done,
+      );
+    });
+
+    it('calls `axios.put` with request body containing start date related payload when called with `dateType` as `start`', () => {
+      spyOn(axios, 'put').and.callFake(() => new Promise(() => {}));
+
+      actions.saveDate(
+        {
+          state: { endpoint: '/foo/bar' },
+          dispatch: () => {},
+        },
+        {
+          dateType: dateTypes.start,
+          newDate: '2018-1-1',
+          dateTypeIsFixed: true,
+        },
+      );
+
+      expect(axios.put).toHaveBeenCalledWith(
+        '/foo/bar',
+        jasmine.objectContaining({
+          start_date_is_fixed: true,
+          start_date_fixed: '2018-1-1',
+        }),
+      );
+    });
+
+    it('calls `axios.put` with request body containing due date related payload when called with `dateType` as `due`', () => {
+      spyOn(axios, 'put').and.callFake(() => new Promise(() => {}));
+
+      actions.saveDate(
+        {
+          state: { endpoint: '/foo/bar' },
+          dispatch: () => {},
+        },
+        {
+          dateType: dateTypes.due,
+          newDate: '2018-1-1',
+          dateTypeIsFixed: true,
+        },
+      );
+
+      expect(axios.put).toHaveBeenCalledWith(
+        '/foo/bar',
+        jasmine.objectContaining({
+          due_date_is_fixed: true,
+          due_date_fixed: '2018-1-1',
+        }),
+      );
     });
   });
 });

@@ -3497,6 +3497,9 @@ msgstr ""
 msgid "Epics|An error occurred while saving %{epicDateType} date"
 msgstr ""
 
+msgid "Epics|An error occurred while saving the %{epicDateType} date"
+msgstr ""
+
 msgid "Epics|How can I solve this?"
 msgstr ""
 
