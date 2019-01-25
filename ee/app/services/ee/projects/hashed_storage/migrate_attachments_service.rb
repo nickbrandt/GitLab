@@ -9,6 +9,8 @@ module EE
         override :execute
         def execute
           super do
+            break true if skipped?
+
             ::Geo::HashedStorageAttachmentsEventStore.new(
               project,
               old_attachments_path: old_disk_path,
