@@ -23,6 +23,7 @@ module EE
         mount ::API::MavenPackages
         mount ::API::NpmPackages
         mount ::API::Packages
+        mount ::API::PackageFiles
       end
     end
   end
