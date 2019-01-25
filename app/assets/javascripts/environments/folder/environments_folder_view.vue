@@ -23,10 +23,6 @@ export default {
       type: String,
       required: true,
     },
-    canCreateDeployment: {
-      type: Boolean,
-      required: true,
-    },
     canReadEnvironment: {
       type: Boolean,
       required: true,
@@ -77,7 +73,6 @@ export default {
       :is-loading="isLoading"
       :environments="state.environments"
       :pagination="state.paginationInformation"
-      :can-create-deployment="canCreateDeployment"
       :can-read-environment="canReadEnvironment"
       :canary-deployment-feature-id="canaryDeploymentFeatureId"
       :show-canary-deployment-callout="showCanaryDeploymentCallout"
