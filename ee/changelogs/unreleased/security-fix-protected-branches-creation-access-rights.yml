@@ -1,0 +1,5 @@
+---
+title: Check access rights when creating/updating ProtectedRefs
+merge_request:
+author:
+type: security
