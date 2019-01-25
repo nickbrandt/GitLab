@@ -11,21 +11,22 @@ entry.
 
 ## 11.5.6 (2018-12-28)
 
-### Security (16 changes)
+### Security (17 changes)
 
 - Escape label and milestone titles to prevent XSS in GFM autocomplete. !2741
-- Prevent leaking protected variables for ambiguous refs.
+- Validate LFS hrefs before downloading them.
 - Ensure that build token is only used when running.
 - Add subresources removal to member destroy service.
 - Prevent a path traversal attack on global file templates.
 - Allow changing group CI/CD settings only for owners.
 - Authorize before reading job information via API.
+- Prevent leaking protected variables for ambiguous refs.
 - Escape html entities in LabelReferenceFilter when no label found.
-- Validate LFS hrefs before downloading them.
 - Prevent private snippets from being embeddable.
 - Issuable no longer is visible to users when project can't be viewed.
 - Don't expose cross project repositories through diffs when creating merge reqeusts.
 - Fix SSRF with import_url and remote mirror url.
+- Fix persistent symlink in project import.
 - Set URL rel attribute for broken URLs.
 - Project guests no longer are able to see refs page.
 - Delete confidential todos for user when downgraded to Guest.
@@ -176,6 +177,7 @@ entry.
 - Fix a race condition intermittently breaking GitLab startup. !23028
 - Adds margin after a deleted branch name in the activity feed. !23038
 - Ignore environment validation failure. !23100
+- Fixes broken borders for reports section in MR widget.
 - Adds CI favicon back to jobs page.
 - Redirect to the pipeline builds page when a build is canceled. (Eva Kadlecova)
 - Fixed diff stats not showing when performance bar is enabled.
@@ -184,13 +186,12 @@ entry.
 - Fix bug causing not all emails to show up in commit email selectbox.
 - Remove duplicate escape in job sidebar.
 - Fixing styling issues on the scheduled pipelines page.
-- Fixes broken test in master.
 - Renders stuck block when runners are stuck.
 - Removes extra border from test reports in the merge request widget.
-- Fixes broken borders for reports section in MR widget.
 - Only render link to branch when branch still exists in pipeline page.
 - Fixed source project not filtering in merge request creation compare form.
 - Do not reload self on hooks when creating deployment.
+- Fixes broken test in master.
 
 ### Changed (38 changes, 12 of them are from the community)
 
@@ -359,9 +360,8 @@ entry.
 
 ## 11.4.5 (2018-11-04)
 
-### Fixed (5 changes, 1 of them is from the community)
+### Fixed (4 changes, 1 of them is from the community)
 
-- Fix stuck job warning message. !8060
 - fix link to enable usage ping from convdev index. !22545 (Anand Capur)
 - Update gitlab-ui dependency to 1.8.0-hotfix.1 to fix IE11 bug.
 - Remove duplicate escape in job sidebar.
@@ -661,7 +661,6 @@ entry.
 - Fix loading issue on some merge request discussion. !21982
 - Fix project deletion when there is a export available. !22276
 
-- No changes.
 
 ## 11.3.3 (2018-10-04)
 
