@@ -3623,6 +3623,9 @@ msgstr ""
 msgid "External URL"
 msgstr ""
 
+msgid "External Wiki"
+msgstr ""
+
 msgid "External authentication"
 msgstr ""
 
