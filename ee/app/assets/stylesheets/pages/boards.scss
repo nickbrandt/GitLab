@@ -104,10 +104,10 @@
 }
 
 .boards-switcher {
-  .dropdown-content-faded-mask .dropdown-list {
-    // the following is no longer necessary after https://gitlab.com/gitlab-org/gitlab-ee/issues/8855
-    $search-box-height: 50px;
-    max-height: calc(#{$dropdown-max-height} - #{$search-box-height});
+  .dropdown-menu.show {
+    // we cannot use d-flex from Bootstrap because of !important
+    // see https://gitlab.com/gitlab-org/gitlab-ui/issues/38
+    display: flex;
   }
 
   // the following is a workaround until we have it fixed in gitlab-ui
