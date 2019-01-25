@@ -1,6 +1,6 @@
 - if @project.mirror
   %tr
-    %td= @project.username_only_import_url
+    %td.mirror-url= @project.safe_import_url
     %td= _('Pull')
     %td= @project.mirror_last_update_at.present? ? time_ago_with_tooltip(@project.mirror_last_update_at) : _('Never')
     %td
