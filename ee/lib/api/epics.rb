@@ -9,6 +9,8 @@ module API
       authorize_epics_feature!
     end
 
+    helpers ::Gitlab::IssuableMetadata
+
     helpers do
       def authorize_epics_feature!
         forbidden! unless user_group.feature_available?(:epics)
@@ -69,9 +71,9 @@ module API
         use :pagination
       end
       get ':id/(-/)epics' do
-        epics = find_epics(group_id: user_group.id)
+        epics = paginate(find_epics(group_id: user_group.id))
 
-        present paginate(epics), with: EE::API::Entities::Epic, user: current_user
+        present epics, with: EE::API::Entities::Epic, user: current_user, epics_metadata: issuable_meta_data(epics, 'Epic')
       end
 
       desc 'Get details of an epic' do

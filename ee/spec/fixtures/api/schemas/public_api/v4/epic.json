@@ -24,6 +24,8 @@
         "type": "string"
       }
     },
+    "upvotes": { "type":  "integer" },
+    "downvotes": { "type":  "integer" },
     "start_date": { "type": ["date", "null"] },
     "start_date_fixed": { "type": ["date", "null"] },
     "start_date_from_milestones": { "type": ["date", "null"] },
