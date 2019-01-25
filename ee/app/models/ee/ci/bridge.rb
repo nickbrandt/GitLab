@@ -6,7 +6,11 @@ module EE
       extend ActiveSupport::Concern
 
       prepended do
-        serialize :options # rubocop:disable Cop/ActiveRecordSerialize
+        # rubocop:disable Cop/ActiveRecordSerialize
+        serialize :options
+        serialize :yaml_variables, ::Gitlab::Serializer::Ci::Variables
+        # rubocop:enable Cop/ActiveRecordSerialize
+
         has_many :sourced_pipelines, class_name: ::Ci::Sources::Pipeline,
                                      foreign_key: :source_job_id
 
@@ -33,6 +37,10 @@ module EE
 
       def target_ref
         options&.dig(:trigger, :branch)
+      end
+
+      def downstream_variables
+        yaml_variables.map { |hash| hash.except(:public) }
       end
     end
   end
