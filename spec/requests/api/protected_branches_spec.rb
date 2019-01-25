@@ -74,6 +74,9 @@ describe API::ProtectedBranches do
         let(:unprotect_group) { create(:group) }
 
         before do
+          project.add_developer(push_user)
+          project.project_group_links.create(group: merge_group)
+          project.project_group_links.create(group: unprotect_group)
           protected_branch.push_access_levels.create!(user: push_user)
           protected_branch.merge_access_levels.create!(group: merge_group)
           protected_branch.unprotect_access_levels.create!(group: unprotect_group)
@@ -282,7 +285,7 @@ describe API::ProtectedBranches do
           post post_endpoint, name: branch_name, allowed_to_merge: [{ user_id: push_user.id }]
 
           expect(response).to have_gitlab_http_status(422)
-          expect(json_response['message'][0]).to match(/Cannot add users or groups/)
+          expect(json_response['message'][0]).to match(/is not a member of the project/)
         end
 
         it "fails if groups aren't all invited to the project" do
@@ -291,7 +294,7 @@ describe API::ProtectedBranches do
           post post_endpoint, name: branch_name, allowed_to_merge: [{ group_id: merge_group.id }]
 
           expect(response).to have_gitlab_http_status(422)
-          expect(json_response['message'][0]).to match(/Cannot add users or groups/)
+          expect(json_response['message'][0]).to match(/does not have access to the project/)
         end
 
         it 'avoids creating default access levels unless necessary' do
