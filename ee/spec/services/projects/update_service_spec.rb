@@ -251,6 +251,18 @@ describe Projects::UpdateService, '#execute' do
         expect(rule.reload.approvals_required).to eq(0)
       end
     end
+
+    context 'when approval_rule feature is enabled' do
+      it "does not update approval_rules' approvals_required" do
+        stub_feature_flags(approval_rule: true)
+
+        rule = create(:approval_project_rule, project: project)
+
+        expect do
+          update_project(project, user, approvals_before_merge: 42)
+        end.not_to change { rule.reload.approvals_required }
+      end
+    end
   end
 
   def update_project(project, user, opts)

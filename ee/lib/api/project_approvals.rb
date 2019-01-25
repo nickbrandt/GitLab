@@ -14,15 +14,15 @@ module API
       segment ':id/approvals' do
         desc 'Get all project approvers and related configuration' do
           detail 'This feature was introduced in 10.6'
-          success ::API::Entities::ApprovalSettings
+          success EE::API::Entities::ApprovalSettings
         end
         get '/' do
-          present user_project.present(current_user: current_user), with: ::API::Entities::ApprovalSettings
+          present user_project.present(current_user: current_user), with: EE::API::Entities::ApprovalSettings
         end
 
         desc 'Change approval-related configuration' do
           detail 'This feature was introduced in 10.6'
-          success ::API::Entities::ApprovalSettings
+          success EE::API::Entities::ApprovalSettings
         end
         params do
           optional :approvals_before_merge, type: Integer, desc: 'The amount of approvals required before an MR can be merged'
@@ -36,7 +36,7 @@ module API
           result = ::Projects::UpdateService.new(user_project, current_user, project_params).execute
 
           if result[:status] == :success
-            present user_project.present(current_user: current_user), with: ::API::Entities::ApprovalSettings
+            present user_project.present(current_user: current_user), with: EE::API::Entities::ApprovalSettings
           else
             render_validation_error!(user_project)
           end
@@ -45,7 +45,7 @@ module API
 
       desc 'Update approvers and approver groups' do
         detail 'This feature was introduced in 10.6'
-        success ::API::Entities::ApprovalSettings
+        success EE::API::Entities::ApprovalSettings
       end
       params do
         requires :approver_ids, type: Array[String], coerce_with: ARRAY_COERCION_LAMBDA, desc: 'Array of User IDs to set as approvers.'
@@ -55,7 +55,7 @@ module API
         result = ::Projects::UpdateService.new(user_project, current_user, declared(params, include_parent_namespaces: false).merge(remove_old_approvers: true)).execute
 
         if result[:status] == :success
-          present user_project.present(current_user: current_user), with: ::API::Entities::ApprovalSettings
+          present user_project.present(current_user: current_user), with: EE::API::Entities::ApprovalSettings
         else
           render_validation_error!(user_project)
         end

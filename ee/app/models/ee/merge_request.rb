@@ -28,6 +28,8 @@ module EE
       delegate :merge_requests_author_approval?, to: :target_project, allow_nil: true
 
       participant :participant_approvers
+
+      accepts_nested_attributes_for :approval_rules, allow_destroy: true
     end
 
     override :mergeable?
