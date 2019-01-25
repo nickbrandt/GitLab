@@ -2,6 +2,8 @@
 
 module EpicIssues
   class ListService < IssuableLinks::ListService
+    extend ::Gitlab::Utils::Override
+
     private
 
     def child_issuables
@@ -10,22 +12,9 @@ module EpicIssues
       issuable.issues_readable_by(current_user, preload: preload_for_collection)
     end
 
-    def relation_path(issue)
-      if can_admin_issue_link?(issue)
-        group_epic_issue_path(issuable.group, issuable.iid, issue.epic_issue_id)
-      end
-    end
-
-    def can_admin_issue_link?(issue)
-      Ability.allowed?(current_user, :admin_epic_issue, issue) && Ability.allowed?(current_user, :admin_epic, issuable)
-    end
-
-    def reference(issue)
-      issue.to_reference(full: true)
-    end
-
-    def to_hash(issue)
-      super.merge(epic_issue_id: issue.epic_issue_id)
+    override :serializer
+    def serializer
+      LinkedEpicIssueSerializer
     end
   end
 end
