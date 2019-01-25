@@ -1,5 +1,5 @@
 %p
-  Epic was #{@status} by #{@updated_by.name}
+  Epic was #{@status} by #{sanitize_name(@updated_by.name)}
 
 %p
   Epic
