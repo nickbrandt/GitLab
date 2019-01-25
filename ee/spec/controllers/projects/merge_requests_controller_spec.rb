@@ -41,7 +41,7 @@ shared_examples 'approvals' do
   describe 'approvals' do
     let!(:approval) { create(:approval, merge_request: merge_request, user: approver.user) }
 
-    before do
+    def get_approvals
       get :approvals,
           params: {
             namespace_id: project.namespace.to_param,
@@ -52,6 +52,8 @@ shared_examples 'approvals' do
     end
 
     it 'shows approval information' do
+      get_approvals
+
       approvals = json_response
 
       expect(response).to be_success
@@ -62,6 +64,23 @@ shared_examples 'approvals' do
       expect(approvals['user_can_approve']).to be true
       expect(approvals['suggested_approvers'].size).to eq 1
       expect(approvals['suggested_approvers'][0]['username']).to eq user.username
+    end
+
+    context 'with unauthorized group' do
+      let(:private_group) { create(:group_with_members, :private) }
+
+      before do
+        create(:approver_group, target: merge_request, group: private_group)
+      end
+
+      it 'does not expose approvers from a private group the current user has no access to' do
+        get_approvals
+
+        approvals = json_response
+
+        expect(response).to be_success
+        expect(approvals['suggested_approvers'].size).to eq(0)
+      end
     end
   end
 
