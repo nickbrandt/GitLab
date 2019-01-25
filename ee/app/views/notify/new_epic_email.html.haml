@@ -4,7 +4,7 @@
 
 - if @epic.assignee
   %p
-    Assignee: #{@epic.assignee.name}
+    Assignee: #{sanitize_name(@epic.assignee.name)}
 
 - if @epic.description
   %div
