@@ -11,7 +11,8 @@ module EE
       def failure_reasons
         super.merge(protected_environment_failure: 1_000,
                     insufficient_bridge_permissions: 1_001,
-                    invalid_bridge_trigger: 1_002)
+                    downstream_bridge_project_not_found: 1_002,
+                    invalid_bridge_trigger: 1_003)
       end
     end
   end
