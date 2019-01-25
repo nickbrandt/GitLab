@@ -4,13 +4,15 @@ import { mapState, mapGetters, mapActions } from 'vuex';
 import epicUtils from '../utils/epic_utils';
 
 import SidebarHeader from './sidebar_items/sidebar_header.vue';
+import SidebarTodo from './sidebar_items/sidebar_todo.vue';
 
 export default {
   components: {
     SidebarHeader,
+    SidebarTodo,
   },
   computed: {
-    ...mapState(['epicId', 'sidebarCollapsed']),
+    ...mapState(['sidebarCollapsed']),
     ...mapGetters(['isUserSignedIn']),
   },
   mounted() {
@@ -33,6 +35,10 @@ export default {
   >
     <div class="issuable-sidebar js-issuable-update">
       <sidebar-header :sidebar-collapsed="sidebarCollapsed" />
+      <sidebar-todo
+        v-show="sidebarCollapsed && isUserSignedIn"
+        :sidebar-collapsed="sidebarCollapsed"
+      />
     </div>
   </aside>
 </template>

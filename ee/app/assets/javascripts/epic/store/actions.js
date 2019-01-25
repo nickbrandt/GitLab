@@ -63,5 +63,47 @@ export const toggleSidebar = ({ dispatch }, { sidebarCollapsed }) => {
   dispatch('toggleSidebarFlag', !sidebarCollapsed);
 };
 
+/**
+ * Methods to handle toggling Todo from sidebar
+ */
+export const requestEpicTodoToggle = ({ commit }) => commit(types.REQUEST_EPIC_TODO_TOGGLE);
+export const requestEpicTodoToggleSuccess = ({ commit }, data) =>
+  commit(types.REQUEST_EPIC_TODO_TOGGLE_SUCCESS, data);
+export const requestEpicTodoToggleFailure = ({ commit, state }, data) => {
+  commit(types.REQUEST_EPIC_TODO_TOGGLE_FAILURE, data);
+
+  if (state.todoExists) {
+    flash(__('There was an error deleting the todo.'));
+  } else {
+    flash(__('There was an error adding a todo.'));
+  }
+};
+export const triggerTodoToggleEvent = (_, { count }) => {
+  epicUtils.triggerDocumentEvent('todo:toggle', count);
+};
+export const toggleTodo = ({ state, dispatch }) => {
+  let reqPromise;
+
+  dispatch('requestEpicTodoToggle');
+
+  if (!state.todoExists) {
+    reqPromise = axios.post(state.todoPath, {
+      issuable_id: state.epicId,
+      issuable_type: 'epic',
+    });
+  } else {
+    reqPromise = axios.delete(state.todoDeletePath);
+  }
+
+  reqPromise
+    .then(({ data }) => {
+      dispatch('triggerTodoToggleEvent', { count: data.count });
+      dispatch('requestEpicTodoToggleSuccess', { todoDeletePath: data.delete_path });
+    })
+    .catch(() => {
+      dispatch('requestEpicTodoToggleFailure');
+    });
+};
+
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};
