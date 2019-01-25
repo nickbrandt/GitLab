@@ -82,7 +82,6 @@ describe MergeRequestPresenter do
     let!(:approver) { create(:approver, target: resource) }
 
     before do
-      stub_feature_flags approval_rule: true
       resource.approvals.create!(user: approver.user)
     end
 
@@ -148,10 +147,6 @@ describe MergeRequestPresenter do
     let!(:public_approver_group) { create(:approver_group, target: resource, group: public_group) }
     let!(:private_approver_group) { create(:approver_group, target: resource, group: private_group) }
     let!(:approver) { create(:approver, target: resource) }
-
-    before do
-      stub_feature_flags approval_rule: true
-    end
 
     subject { described_class.new(resource, current_user: user).all_approvers_including_groups }
 

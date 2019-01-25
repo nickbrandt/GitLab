@@ -399,10 +399,6 @@ describe "API::MergeRequestApprovals with approval_rule enabled" do
   set(:approver) { create :user }
   set(:group) { create :group }
 
-  before do
-    stub_feature_flags(approval_rule: true)
-  end
-
   describe 'GET :id/merge_requests/:merge_request_iid/approvals' do
     let!(:rule) { create(:approval_merge_request_rule, merge_request: merge_request, approvals_required: 2, name: 'foo') }
 

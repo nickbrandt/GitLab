@@ -143,8 +143,6 @@ describe MergeRequests::RefreshService do
         let(:new_owners) { [owner] }
 
         before do
-          stub_feature_flags(approval_rule: true)
-
           relevant_merge_requests.each do |merge_request|
             expect(::Gitlab::CodeOwners).to receive(:for_merge_request).with(merge_request).and_return(new_owners)
           end

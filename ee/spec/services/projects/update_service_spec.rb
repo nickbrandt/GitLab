@@ -254,8 +254,6 @@ describe Projects::UpdateService, '#execute' do
 
     context 'when approval_rule feature is enabled' do
       it "does not update approval_rules' approvals_required" do
-        stub_feature_flags(approval_rule: true)
-
         rule = create(:approval_project_rule, project: project)
 
         expect do
