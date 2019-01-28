@@ -7,6 +7,7 @@ import SidebarHeader from './sidebar_items/sidebar_header.vue';
 import SidebarTodo from './sidebar_items/sidebar_todo.vue';
 import SidebarDatePicker from './sidebar_items/sidebar_date_picker.vue';
 import SidebarDatePickerCollapsed from '~/vue_shared/components/sidebar/collapsed_grouped_date_picker.vue';
+import SidebarLabels from './sidebar_items/sidebar_labels.vue';
 
 import { dateTypes } from '../constants';
 
@@ -17,6 +18,7 @@ export default {
     SidebarTodo,
     SidebarDatePicker,
     SidebarDatePickerCollapsed,
+    SidebarLabels,
   },
   computed: {
     ...mapState([
@@ -172,6 +174,7 @@ export default {
         :max-date="dueDateForCollapsedSidebar"
         @toggleCollapse="toggleSidebar({ sidebarCollapsed })"
       />
+      <sidebar-labels :can-update="canUpdate" :sidebar-collapsed="sidebarCollapsed" />
     </div>
   </aside>
 </template>

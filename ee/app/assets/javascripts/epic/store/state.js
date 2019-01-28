@@ -25,6 +25,7 @@ export default () => ({
 
   // Epic Information
   epicId: 0,
+  namespace: '#',
   state: '',
   created: '',
   author: null,

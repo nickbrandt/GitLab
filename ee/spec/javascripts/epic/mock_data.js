@@ -34,3 +34,13 @@ export const mockDatePickerProps = {
   isDateInvalid: false,
   dateInvalidTooltip: 'Selected date is invalid',
 };
+
+export const mockLabels = [
+  {
+    id: 26,
+    title: 'Foo Label',
+    description: 'Foobar',
+    color: '#BADA55',
+    text_color: '#FFFFFF',
+  },
+];

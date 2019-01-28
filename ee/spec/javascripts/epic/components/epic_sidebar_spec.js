@@ -198,5 +198,9 @@ describe('EpicSidebarComponent', () => {
         .then(done)
         .catch(done.fail);
     });
+
+    it('renders labels select element', () => {
+      expect(vm.$el.querySelector('.js-labels-block')).not.toBeNull();
+    });
   });
 });
