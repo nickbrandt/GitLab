@@ -86,7 +86,7 @@ module QA
 
           click_element :mr_rebase_button
 
-          success = wait(reload: false) do
+          success = wait do
             has_text?('Fast-forward merge without a merge commit')
           end
 
@@ -119,7 +119,7 @@ module QA
 
           merge_immediately
 
-          success = wait(reload: false) do
+          success = wait do
             has_text?('The changes were merged into')
           end
 
