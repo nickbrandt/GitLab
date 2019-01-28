@@ -5695,6 +5695,9 @@ msgstr ""
 msgid "MergeRequests|Discussion will be unresolved"
 msgstr ""
 
+msgid "MergeRequests|Jump to next unresolved discussion"
+msgstr ""
+
 msgid "MergeRequests|Resolve this discussion in a new issue"
 msgstr ""
 
