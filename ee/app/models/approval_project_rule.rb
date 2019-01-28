@@ -9,6 +9,11 @@ class ApprovalProjectRule < ApplicationRecord
   scope :regular, -> { all }
   scope :code_owner, -> { none }
 
+  def regular
+    true
+  end
+  alias_method :regular?, :regular
+
   def code_owner
     false
   end

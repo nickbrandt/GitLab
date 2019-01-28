@@ -21,6 +21,13 @@ describe ApprovalProjectRule do
     end
   end
 
+  describe '#regular' do
+    it 'returns true' do
+      expect(subject.regular).to eq(true)
+      expect(subject.regular?).to eq(true)
+    end
+  end
+
   describe '#code_owner' do
     it 'returns false' do
       expect(subject.code_owner).to eq(false)
