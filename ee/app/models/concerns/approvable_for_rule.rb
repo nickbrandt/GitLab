@@ -16,7 +16,7 @@ module ApprovableForRule
 
   FORWARDABLE_METHODS.each do |method|
     define_method(method) do |*args|
-      return super(*args) if ::Feature.disabled?(:approval_rules, project)
+      return super(*args) if approval_rules_disabled?
 
       approval_state.public_send(method, *args) # rubocop:disable GitlabSecurity/PublicSend
     end
