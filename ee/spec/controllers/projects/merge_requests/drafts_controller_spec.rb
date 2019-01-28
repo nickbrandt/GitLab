@@ -18,6 +18,7 @@ describe Projects::MergeRequests::DraftsController do
   before do
     sign_in(user)
     stub_licensed_features(batch_comments: true)
+    stub_commonmark_sourcepos_disabled
   end
 
   describe 'GET #index' do
