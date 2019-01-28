@@ -6,6 +6,8 @@ module EE
       extend ActiveSupport::Concern
 
       prepended do
+        include ::Ci::Metadatable
+
         # rubocop:disable Cop/ActiveRecordSerialize
         serialize :options
         serialize :yaml_variables, ::Gitlab::Serializer::Ci::Variables
