@@ -5,6 +5,7 @@ module QA
     module Project
       module Issue
         class Show < Page::Base
+          prepend QA::EE::Page::Project::Issue::Show
           include Page::Component::Issuable::Common
           include Page::Component::Note
 
