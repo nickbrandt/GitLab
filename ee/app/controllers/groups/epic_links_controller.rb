@@ -5,6 +5,12 @@ class Groups::EpicLinksController < Groups::EpicsController
 
   before_action :check_nested_support!
 
+  def update
+    result = EpicLinks::UpdateService.new(child_epic, current_user, params[:epic]).execute
+
+    render json: { message: result[:message] }, status: result[:http_status]
+  end
+
   def destroy
     result = ::Epics::UpdateService.new(group, current_user, { parent: nil }).execute(child_epic)
 

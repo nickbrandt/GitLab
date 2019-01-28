@@ -18,6 +18,14 @@ describe EpicLinks::CreateService, :postgresql do
         expect(epic.reload.children).to include(epic_to_add)
       end
 
+      it 'moves the new child epic to the top and moves the existing ones down' do
+        existing_child_epic = create(:epic, group: group, parent: epic)
+
+        subject
+
+        expect(epic_to_add.reload.relative_position).to be < existing_child_epic.reload.relative_position
+      end
+
       it 'returns success status' do
         expect(subject).to eq(status: :success)
       end
