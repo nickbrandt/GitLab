@@ -55,5 +55,7 @@ export const isDateInvalid = (state, getters) => {
   );
 };
 
+export const parentEpic = state => (state.parent ? state.parent : {});
+
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

@@ -7,7 +7,7 @@ import epicUtils from 'ee/epic/utils/epic_utils';
 import { dateTypes } from 'ee/epic/constants';
 
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { mockEpicMeta, mockEpicData } from '../mock_data';
+import { mockEpicMeta, mockEpicData, mockParentEpic } from '../mock_data';
 
 describe('EpicSidebarComponent', () => {
   const originalUserId = gon.current_user_id;
@@ -19,6 +19,7 @@ describe('EpicSidebarComponent', () => {
     store = createStore();
     store.dispatch('setEpicMeta', mockEpicMeta);
     store.dispatch('setEpicData', mockEpicData);
+    store.state.parent = mockParentEpic;
 
     vm = mountComponentWithStore(Component, {
       store,
@@ -201,6 +202,24 @@ describe('EpicSidebarComponent', () => {
 
     it('renders labels select element', () => {
       expect(vm.$el.querySelector('.js-labels-block')).not.toBeNull();
+    });
+
+    it('renders parent epic link element', done => {
+      store.dispatch('toggleSidebarFlag', false);
+
+      vm.$nextTick()
+        .then(() => {
+          const parentEpicEl = vm.$el.querySelector('.block.parent-epic');
+
+          expect(parentEpicEl).not.toBeNull();
+          expect(parentEpicEl.querySelector('.title').innerText.trim()).toBe('Parent epic');
+          expect(parentEpicEl.querySelector('.value').innerText.trim()).toBe(mockParentEpic.title);
+          expect(parentEpicEl.querySelector('.value a').getAttribute('href')).toBe(
+            mockParentEpic.url,
+          );
+        })
+        .then(done)
+        .catch(done.fail);
     });
   });
 });

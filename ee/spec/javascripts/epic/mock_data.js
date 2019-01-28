@@ -44,3 +44,9 @@ export const mockLabels = [
     text_color: '#FFFFFF',
   },
 ];
+
+export const mockParentEpic = {
+  id: 1,
+  title: 'Sample Parent Epic',
+  url: '/groups/gitlab-org/-/epics/6',
+};

@@ -259,4 +259,24 @@ describe('Epic Store Getters', () => {
       ).toBe(false);
     });
   });
+
+  describe('parentEpic', () => {
+    it('returns `parent` from state when parent is not null', () => {
+      const parent = getters.parentEpic({
+        parent: {
+          id: 1,
+        },
+      });
+
+      expect(parent.id).toBe(1);
+    });
+
+    it('returns empty object when `parent` within state is null', () => {
+      const parent = getters.parentEpic({
+        parent: null,
+      });
+
+      expect(parent).not.toBeNull();
+    });
+  });
 });
