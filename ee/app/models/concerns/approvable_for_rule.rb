@@ -11,6 +11,7 @@ module ApprovableForRule
     has_approved?
     any_approver_allowed?
     authors_can_approve?
+    approvers_overwritten?
   }.freeze
 
   FORWARDABLE_METHODS.each do |method|
@@ -19,11 +20,5 @@ module ApprovableForRule
 
       approval_state.public_send(method, *args) # rubocop:disable GitlabSecurity/PublicSend
     end
-  end
-
-  def approvers_overwritten?
-    return super if ::Feature.disabled?(:approval_rules, project)
-
-    approval_state.approval_rules_overwritten?
   end
 end

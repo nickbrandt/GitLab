@@ -38,6 +38,7 @@ class ApprovalState
   def approval_rules_overwritten?
     merge_request.approval_rules.regular.exists?
   end
+  alias_method :approvers_overwritten?, :approval_rules_overwritten?
 
   def approval_needed?
     return false unless project.feature_available?(:merge_request_approvers)
