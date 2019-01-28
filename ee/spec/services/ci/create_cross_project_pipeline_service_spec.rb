@@ -151,7 +151,7 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
         pipeline = service.execute(bridge)
 
         expect(pipeline.variables.first)
-          .to have_attributes(key: 'BRIDGE', value:'var')
+          .to have_attributes(key: 'BRIDGE', value: 'var')
       end
     end
   end
