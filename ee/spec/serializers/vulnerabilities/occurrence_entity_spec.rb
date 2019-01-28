@@ -61,8 +61,9 @@ describe Vulnerabilities::OccurrenceEntity do
         project.add_guest(user)
       end
 
-      it 'does not contain vulnerability feedback URL' do
-        expect(subject).not_to include(:vulnerability_feedback_url)
+      it 'does not contain vulnerability feedback paths' do
+        expect(subject).not_to include(:vulnerability_feedback_issue_path)
+        expect(subject).not_to include(:vulnerability_feedback_dismissal_path)
       end
     end
 
@@ -71,8 +72,24 @@ describe Vulnerabilities::OccurrenceEntity do
         project.add_developer(user)
       end
 
-      it 'contains vulnerability feedback URL' do
-        expect(subject).to include(:vulnerability_feedback_url)
+      it 'contains vulnerability feedback dismissal path' do
+        expect(subject).to include(:vulnerability_feedback_dismissal_path)
+      end
+
+      it 'contains vulnerability feedback issue path' do
+        expect(subject).to include(:vulnerability_feedback_issue_path)
+      end
+
+      context 'when disallowed to create issue' do
+        let(:project) { create(:project, issues_access_level: ProjectFeature::DISABLED) }
+
+        it 'does not contain vulnerability feedback issue path' do
+          expect(subject).not_to include(:vulnerability_feedback_issue_path)
+        end
+
+        it 'contains vulnerability feedback dismissal path' do
+          expect(subject).to include(:vulnerability_feedback_dismissal_path)
+        end
       end
     end
   end
