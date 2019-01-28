@@ -3,6 +3,7 @@
 class Projects::FeatureFlagsController < Projects::ApplicationController
   respond_to :html
 
+  before_action :push_feature_flag_to_frontend!
   before_action :authorize_read_feature_flag!
   before_action :authorize_create_feature_flag!, only: [:new, :create]
   before_action :authorize_update_feature_flag!, only: [:edit, :update]
@@ -91,17 +92,19 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
   protected
 
   def feature_flag
-    @feature_flag ||= project.operations_feature_flags.find(params[:id])
+    @feature_flag ||= project.operations_feature_flags.for_list.find(params[:id])
   end
 
   def create_params
     params.require(:operations_feature_flag)
-          .permit(:name, :description, :active)
+          .permit(:name, :description, :active,
+                  scopes_attributes: [:environment_scope, :active])
   end
 
   def update_params
     params.require(:operations_feature_flag)
-          .permit(:name, :description, :active)
+          .permit(:name, :description, :active,
+                  scopes_attributes: [:id, :environment_scope, :active, :_destroy])
   end
 
   def feature_flag_json
@@ -134,5 +137,9 @@ class Projects::FeatureFlagsController < Projects::ApplicationController
   def render_error_json
     render json: { message: feature_flag.errors.full_messages },
            status: :bad_request
+  end
+
+  def push_feature_flag_to_frontend!
+    push_frontend_feature_flag(:feature_flags_environment_scope, project)
   end
 end

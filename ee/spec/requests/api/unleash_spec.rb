@@ -74,18 +74,16 @@ describe API::Unleash do
     let(:headers) { base_headers.merge({ "UNLEASH-APPNAME" => "test" }) }
 
     let!(:feature_flag_1) do
-      create(:operations_feature_flag, project: project)
+      create(:operations_feature_flag, project: project, active: true)
     end
 
     let!(:feature_flag_2) do
-      create(:operations_feature_flag, project: project)
+      create(:operations_feature_flag, project: project, active: false)
     end
 
     before do
       stub_feature_flags(feature_flags_environment_scope: true)
-      create_scope(feature_flag_1, '*', true)
       create_scope(feature_flag_1, 'production', false)
-      create_scope(feature_flag_2, '*', false)
       create_scope(feature_flag_2, 'review/*', true)
     end
 

@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe FeatureFlagsFinder do
+  include FeatureFlagHelpers
+
   let(:finder) { described_class.new(project, user, params) }
   let(:project) { create(:project) }
   let(:user) { developer }
@@ -52,6 +54,27 @@ describe FeatureFlagsFinder do
 
         it 'returns inactive feature flag' do
           is_expected.to eq([feature_flag_2])
+        end
+      end
+    end
+
+    context 'when it is presented for list' do
+      let!(:feature_flag_1) { create(:operations_feature_flag, project: project, active: false) }
+      let!(:feature_flag_2) { create(:operations_feature_flag, project: project, active: false) }
+
+      context 'when there is an active scope' do
+        before do
+          create_scope(feature_flag_1, 'review/*', true)
+        end
+
+        it 'presents a virtual active value' do
+          expect(subject.map(&:active)).to eq([true, false])
+        end
+      end
+
+      context 'when there are no active scopes' do
+        it 'presents a virtual active value' do
+          expect(subject.map(&:active)).to eq([false, false])
         end
       end
     end

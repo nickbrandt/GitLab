@@ -18,6 +18,10 @@ class FeatureFlagEntity < Grape::Entity
     project_feature_flag_path(feature_flag.project, feature_flag)
   end
 
+  expose :scopes, with: FeatureFlagScopeEntity do |feature_flag|
+    feature_flag.scopes.sort_by(&:id)
+  end
+
   private
 
   def can_update?(feature_flag)
