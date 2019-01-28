@@ -156,6 +156,10 @@ module QA
         click_link text
       end
 
+      def click_body
+        find('body').click
+      end
+
       def self.path
         raise NotImplementedError
       end
