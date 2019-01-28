@@ -1,3 +1,5 @@
+import { dateTypes } from '../constants';
+
 import * as types from './mutation_types';
 
 export default {
@@ -34,5 +36,41 @@ export default {
   },
   [types.REQUEST_EPIC_TODO_TOGGLE_FAILURE](state) {
     state.epicTodoToggleInProgress = false;
+  },
+
+  [types.TOGGLE_EPIC_START_DATE_TYPE](state, { dateTypeIsFixed }) {
+    state.startDateIsFixed = dateTypeIsFixed;
+  },
+
+  [types.TOGGLE_EPIC_DUE_DATE_TYPE](state, { dateTypeIsFixed }) {
+    state.dueDateIsFixed = dateTypeIsFixed;
+  },
+
+  [types.REQUEST_EPIC_DATE_SAVE](state, { dateType }) {
+    if (dateType === dateTypes.start) {
+      state.epicStartDateSaveInProgress = true;
+    } else {
+      state.epicDueDateSaveInProgress = true;
+    }
+  },
+  [types.REQUEST_EPIC_DATE_SAVE_SUCCESS](state, { dateType, dateTypeIsFixed, newDate }) {
+    if (dateType === dateTypes.start) {
+      state.epicStartDateSaveInProgress = false;
+      state.startDateIsFixed = dateTypeIsFixed;
+      state.startDate = newDate;
+    } else {
+      state.epicDueDateSaveInProgress = false;
+      state.dueDateIsFixed = dateTypeIsFixed;
+      state.dueDate = newDate;
+    }
+  },
+  [types.REQUEST_EPIC_DATE_SAVE_FAILURE](state, { dateType, dateTypeIsFixed }) {
+    if (dateType === dateTypes.start) {
+      state.epicStartDateSaveInProgress = false;
+      state.startDateIsFixed = dateTypeIsFixed;
+    } else {
+      state.epicDueDateSaveInProgress = false;
+      state.dueDateIsFixed = dateTypeIsFixed;
+    }
   },
 };

@@ -17,3 +17,20 @@ export const mockEpicData = convertObjectPropsToCamelCase(
   }),
   { deep: true },
 );
+
+export const mockDatePickerProps = {
+  blockClass: 'epic-date',
+  sidebarCollapsed: false,
+  showToggleSidebar: false,
+  dateSaveInProgress: false,
+  canUpdate: true,
+  label: 'Date',
+  datePickerLabel: 'Fixed date',
+  selectedDate: null,
+  selectedDateIsFixed: true,
+  dateFromMilestones: null,
+  dateFixed: null,
+  dateFromMilestonesTooltip: 'Select an issue with milestone to set date',
+  isDateInvalid: false,
+  dateInvalidTooltip: 'Selected date is invalid',
+};

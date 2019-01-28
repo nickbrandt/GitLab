@@ -35,11 +35,19 @@ export default () => ({
 
   todoExists: false,
   startDateSourcingMilestoneTitle: '',
+  startDateSourcingMilestoneDates: {
+    startDate: '',
+    dueDate: '',
+  },
   startDateIsFixed: false,
   startDateFixed: '',
   startDateFromMilestones: '',
   startDate: '',
   dueDateSourcingMilestoneTitle: '',
+  dueDateSourcingMilestoneDates: {
+    startDate: '',
+    dueDate: '',
+  },
   dueDateIsFixed: '',
   dueDateFixed: '',
   dueDateFromMilestones: '',
@@ -52,5 +60,7 @@ export default () => ({
   epicStatusChangeInProgress: false,
   epicDeleteInProgress: false,
   epicTodoToggleInProgress: false,
+  epicStartDateSaveInProgress: false,
+  epicDueDateSaveInProgress: false,
   sidebarCollapsed: false,
 });
