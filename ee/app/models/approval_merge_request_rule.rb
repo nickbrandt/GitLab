@@ -39,4 +39,9 @@ class ApprovalMergeRequestRule < ApplicationRecord
 
     self.approved_approver_ids = merge_request.approvals.map(&:user_id) & approvers.map(&:id)
   end
+
+  def regular
+    !code_owner?
+  end
+  alias_method :regular?, :regular
 end

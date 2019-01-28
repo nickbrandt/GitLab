@@ -47,6 +47,7 @@ module EE
 
       # TODO remove after #1979 is closed
       def sync_approval_rules(merge_request)
+        return if ::Feature.enabled?(:approval_rules, merge_request.target_project)
         return if merge_request.merged?
         return unless merge_request.previous_changes.include?(:approvals_before_merge)
 

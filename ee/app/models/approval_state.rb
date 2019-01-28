@@ -36,8 +36,9 @@ class ApprovalState
   end
 
   def approval_rules_overwritten?
-    merge_request.approval_rules.regular.exists?
+    merge_request.approval_rules.any?(&:regular?)
   end
+  alias_method :approvers_overwritten?, :approval_rules_overwritten?
 
   def approval_needed?
     return false unless project.feature_available?(:merge_request_approvers)
@@ -134,10 +135,10 @@ class ApprovalState
   def regular_rules
     strong_memoize(:regular_rules) do
       rule_source = approval_rules_overwritten? ? merge_request : project
-      rules = rule_source.approval_rules.regular
+      rules = rule_source.approval_rules.select(&:regular?)
 
       unless project.feature_available?(:multiple_approval_rules)
-        rules = rules.order(id: :asc).limit(1)
+        rules = rules[0, 1]
       end
 
       wrap_rules(rules)
@@ -146,7 +147,7 @@ class ApprovalState
 
   def code_owner_rules
     strong_memoize(:code_owner_rules) do
-      wrap_rules(merge_request.approval_rules.code_owner)
+      wrap_rules(merge_request.approval_rules.select(&:code_owner?))
     end
   end
 

@@ -9,7 +9,7 @@ module EE
     def preload_for_collection
       @preload_for_collection ||= case collection_type
                                   when 'MergeRequest'
-                                    super.push(:approvals)
+                                    super.push(:approvals, :approval_rules)
                                   else
                                     super
                                   end

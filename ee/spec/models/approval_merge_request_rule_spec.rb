@@ -14,6 +14,22 @@ describe ApprovalMergeRequestRule do
     end
   end
 
+  describe '#regular' do
+    it 'returns true for regular records' do
+      subject = create(:approval_merge_request_rule, merge_request: merge_request)
+
+      expect(subject.regular).to eq(true)
+      expect(subject.regular?).to eq(true)
+    end
+
+    it 'returns false for code owner records' do
+      subject = create(:approval_merge_request_rule, merge_request: merge_request, code_owner: true)
+
+      expect(subject.regular).to eq(false)
+      expect(subject.regular?).to eq(false)
+    end
+  end
+
   describe '#approvers' do
     before do
       create(:group) do |group|

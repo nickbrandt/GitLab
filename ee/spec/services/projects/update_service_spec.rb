@@ -230,12 +230,26 @@ describe Projects::UpdateService, '#execute' do
   end
 
   context 'with approval_rules' do
-    it "updates approval_rules' approvals_required" do
-      rule = create(:approval_project_rule, project: project)
+    context 'when approval_rules is disabled' do
+      it "updates approval_rules' approvals_required" do
+        stub_feature_flags(approval_rules: false)
 
-      update_project(project, user, approvals_before_merge: 42)
+        rule = create(:approval_project_rule, project: project)
 
-      expect(rule.reload.approvals_required).to eq(42)
+        update_project(project, user, approvals_before_merge: 42)
+
+        expect(rule.reload.approvals_required).to eq(42)
+      end
+    end
+
+    context 'when approval_rules is enabled' do
+      it 'does not update' do
+        rule = create(:approval_project_rule, project: project)
+
+        update_project(project, user, approvals_before_merge: 42)
+
+        expect(rule.reload.approvals_required).to eq(0)
+      end
     end
   end
 
