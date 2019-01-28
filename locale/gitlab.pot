@@ -578,6 +578,9 @@ msgstr ""
 msgid "Add users to group"
 msgstr ""
 
+msgid "Added at"
+msgstr ""
+
 msgid "Adding new applications is disabled in your GitLab instance. Please contact your GitLab administrator to get the permission"
 msgstr ""
 
@@ -761,6 +764,9 @@ msgid "Allow rendering of PlantUML diagrams in Asciidoc documents."
 msgstr ""
 
 msgid "Allow requests to the local network from hooks and services."
+msgstr ""
+
+msgid "Allow this key to push to repository as well? (Default only allows pull access.)"
 msgstr ""
 
 msgid "Allow users to request access"
@@ -3562,6 +3568,9 @@ msgstr ""
 msgid "Edit %{name}"
 msgstr ""
 
+msgid "Edit Deploy Key"
+msgstr ""
+
 msgid "Edit Label"
 msgstr ""
 
@@ -3596,6 +3605,9 @@ msgid "Edit identity for %{user_name}"
 msgstr ""
 
 msgid "Edit issues"
+msgstr ""
+
+msgid "Edit public deploy key"
 msgstr ""
 
 msgid "Elasticsearch"
@@ -4387,6 +4399,9 @@ msgid "Find the downloaded ZIP file and decompress it."
 msgstr ""
 
 msgid "Find the newly extracted <code>Takeout/Google Code Project Hosting/GoogleCodeProjectHosting.json</code> file."
+msgstr ""
+
+msgid "Fingerprint"
 msgstr ""
 
 msgid "Fingerprints"
@@ -6607,6 +6622,9 @@ msgstr ""
 msgid "New branch unavailable"
 msgstr ""
 
+msgid "New deploy key"
+msgstr ""
+
 msgid "New directory"
 msgstr ""
 
@@ -7096,6 +7114,9 @@ msgid "Password"
 msgstr ""
 
 msgid "Past due"
+msgstr ""
+
+msgid "Paste a machine public key here. Read more about how to generate it %{link_start}here%{link_end}"
 msgstr ""
 
 msgid "Paste epic link"
@@ -7869,6 +7890,9 @@ msgstr ""
 msgid "Projects that belong to a group are prefixed with the group namespace. Existing projects may be moved into a group."
 msgstr ""
 
+msgid "Projects with write access"
+msgstr ""
+
 msgid "ProjectsDropdown|Frequently visited"
 msgstr ""
 
@@ -8083,6 +8107,9 @@ msgid "Public - The group and any public projects can be viewed without any auth
 msgstr ""
 
 msgid "Public - The project can be accessed without any authentication."
+msgstr ""
+
+msgid "Public deploy keys (%{deploy_keys_count})"
 msgstr ""
 
 msgid "Public pipelines"
@@ -11273,6 +11300,9 @@ msgstr ""
 msgid "Write a comment or drag your files here…"
 msgstr ""
 
+msgid "Write access allowed"
+msgstr ""
+
 msgid "Write milestone description..."
 msgstr ""
 
@@ -11517,6 +11547,9 @@ msgid "Your projects"
 msgstr ""
 
 msgid "a deleted user"
+msgstr ""
+
+msgid "added %{created_at_timeago}"
 msgstr ""
 
 msgid "ago"
