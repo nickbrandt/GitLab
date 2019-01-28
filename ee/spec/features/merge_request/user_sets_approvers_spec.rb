@@ -53,7 +53,7 @@ describe 'Merge request > User sets approvers', :js do
       let(:other_user) { create(:user) }
 
       before do
-        stub_feature_flags(approval_rules: false) # TODO check in !9001 when feature enabled
+        stub_feature_flags(approval_rules: false) # TODO https://gitlab.com/gitlab-org/gitlab-ee/issues/9430
         project.add_developer(user)
         project.add_developer(other_user)
 
@@ -109,7 +109,7 @@ describe 'Merge request > User sets approvers', :js do
       let(:merge_request) { create(:merge_request, source_project: project) }
 
       before do
-        stub_feature_flags(approval_rules: false) # TODO check in !9001 when feature enabled
+        stub_feature_flags(approval_rules: false) # TODO https://gitlab.com/gitlab-org/gitlab-ee/issues/9430
         project.add_developer(user)
 
         sign_in(user)
