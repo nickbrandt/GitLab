@@ -150,5 +150,34 @@ export const saveDate = ({ state, dispatch }, { dateType, dateTypeIsFixed, newDa
     });
 };
 
+/**
+ * Methods to handle Epic subscription (AKA Notifications) toggle from sidebar
+ */
+export const requestEpicSubscriptionToggle = ({ commit }) =>
+  commit(types.REQUEST_EPIC_SUBSCRIPTION_TOGGLE);
+export const requestEpicSubscriptionToggleSuccess = ({ commit }, data) =>
+  commit(types.REQUEST_EPIC_SUBSCRIPTION_TOGGLE_SUCCESS, data);
+export const requestEpicSubscriptionToggleFailure = ({ commit, state }) => {
+  commit(types.REQUEST_EPIC_SUBSCRIPTION_TOGGLE_FAILURE);
+  if (state.subscribed) {
+    flash(__('An error occurred while unsubscribing to notifications.'));
+  } else {
+    flash(__('An error occurred while subscribing to notifications.'));
+  }
+};
+export const toggleEpicSubscription = ({ state, dispatch }) => {
+  dispatch('requestEpicSubscriptionToggle');
+  axios
+    .post(state.toggleSubscriptionPath)
+    .then(() => {
+      dispatch('requestEpicSubscriptionToggleSuccess', {
+        subscribed: !state.subscribed,
+      });
+    })
+    .catch(() => {
+      dispatch('requestEpicSubscriptionToggleFailure');
+    });
+};
+
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

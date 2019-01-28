@@ -10,6 +10,8 @@ import SidebarTodo from './sidebar_items/sidebar_todo.vue';
 import SidebarDatePicker from './sidebar_items/sidebar_date_picker.vue';
 import SidebarDatePickerCollapsed from '~/vue_shared/components/sidebar/collapsed_grouped_date_picker.vue';
 import SidebarLabels from './sidebar_items/sidebar_labels.vue';
+import SidebarParticipants from '~/sidebar/components/participants/participants.vue';
+import SidebarSubscription from './sidebar_items/sidebar_subscription.vue';
 
 import { dateTypes } from '../constants';
 
@@ -22,11 +24,14 @@ export default {
     SidebarDatePickerCollapsed,
     SidebarLabels,
     SidebarParentEpic,
+    SidebarParticipants,
+    SidebarSubscription,
   },
   computed: {
     ...mapState([
       'canUpdate',
       'sidebarCollapsed',
+      'participants',
       'startDateSourcingMilestoneTitle',
       'startDateSourcingMilestoneDates',
       'startDateIsFixed',
@@ -182,6 +187,13 @@ export default {
       <div class="block parent-epic">
         <sidebar-parent-epic :block-title="__('Parent epic')" :initial-epic="parentEpic" />
       </div>
+      <div class="block participants">
+        <sidebar-participants
+          :participants="participants"
+          @toggleSidebar="toggleSidebar({ sidebarCollapsed })"
+        />
+      </div>
+      <sidebar-subscription :sidebar-collapsed="sidebarCollapsed" />
     </div>
   </aside>
 </template>

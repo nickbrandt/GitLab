@@ -221,5 +221,13 @@ describe('EpicSidebarComponent', () => {
         .then(done)
         .catch(done.fail);
     });
+
+    it('renders participants list element', () => {
+      expect(vm.$el.querySelector('.block.participants')).not.toBeNull();
+    });
+
+    it('renders subscription toggle element', () => {
+      expect(vm.$el.querySelector('.block.subscription')).not.toBeNull();
+    });
   });
 });

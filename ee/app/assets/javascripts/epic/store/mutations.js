@@ -73,4 +73,15 @@ export default {
       state.dueDateIsFixed = dateTypeIsFixed;
     }
   },
+
+  [types.REQUEST_EPIC_SUBSCRIPTION_TOGGLE](state) {
+    state.epicSubscriptionToggleInProgress = true;
+  },
+  [types.REQUEST_EPIC_SUBSCRIPTION_TOGGLE_SUCCESS](state, { subscribed }) {
+    state.epicSubscriptionToggleInProgress = false;
+    state.subscribed = subscribed;
+  },
+  [types.REQUEST_EPIC_SUBSCRIPTION_TOGGLE_FAILURE](state) {
+    state.epicSubscriptionToggleInProgress = false;
+  },
 };

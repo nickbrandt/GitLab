@@ -235,4 +235,44 @@ describe('Epic Store Mutations', () => {
       expect(state.dueDateIsFixed).toBe(dueDateIsFixed);
     });
   });
+
+  describe('REQUEST_EPIC_SUBSCRIPTION_TOGGLE', () => {
+    it('Should set `epicSubscriptionToggleInProgress` flag on state as `true`', () => {
+      const state = {
+        epicSubscriptionToggleInProgress: false,
+      };
+
+      mutations[types.REQUEST_EPIC_SUBSCRIPTION_TOGGLE](state);
+
+      expect(state.epicSubscriptionToggleInProgress).toBe(true);
+    });
+  });
+
+  describe('REQUEST_EPIC_SUBSCRIPTION_TOGGLE_SUCCESS', () => {
+    it('Should set `epicSubscriptionToggleInProgress` flag on state as `false` and set value of provided `subscribed` param on state', () => {
+      const state = {
+        epicSubscriptionToggleInProgress: true,
+        subscribed: false,
+      };
+
+      mutations[types.REQUEST_EPIC_SUBSCRIPTION_TOGGLE_SUCCESS](state, {
+        subscribed: true,
+      });
+
+      expect(state.epicSubscriptionToggleInProgress).toBe(false);
+      expect(state.subscribed).toBe(true);
+    });
+  });
+
+  describe('REQUEST_EPIC_SUBSCRIPTION_TOGGLE_FAILURE', () => {
+    it('Should set `epicSubscriptionToggleInProgress` flag on state as `false`', () => {
+      const state = {
+        epicSubscriptionToggleInProgress: true,
+      };
+
+      mutations[types.REQUEST_EPIC_SUBSCRIPTION_TOGGLE_FAILURE](state);
+
+      expect(state.epicSubscriptionToggleInProgress).toBe(false);
+    });
+  });
 });
