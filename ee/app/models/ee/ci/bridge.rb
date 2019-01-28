@@ -40,7 +40,7 @@ module EE
       end
 
       def downstream_variables
-        yaml_variables.map { |hash| hash.except(:public) }
+        yaml_variables.to_a.map { |hash| hash.except(:public) }
       end
     end
   end
