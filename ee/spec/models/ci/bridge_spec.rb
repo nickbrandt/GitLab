@@ -5,7 +5,9 @@ describe Ci::Bridge do
   set(:pipeline) { create(:ci_pipeline, project: project) }
 
   let(:bridge) do
-    create(:ci_bridge, status: :created, options: options, pipeline: pipeline)
+    create(:ci_bridge, :variables, status: :created,
+                                   options: options,
+                                   pipeline: pipeline)
   end
 
   let(:options) do
@@ -61,6 +63,20 @@ describe Ci::Bridge do
       it 'returns nil' do
         expect(bridge.target_ref).to be_nil
       end
+    end
+  end
+
+  describe '#yaml_variables' do
+    it 'returns YAML variables' do
+      expect(bridge.yaml_variables)
+        .to include(key: 'BRIDGE', value: 'cross', public: true)
+    end
+  end
+
+  describe '#downstream_variables' do
+    it 'returns variables that are going to be passed downstream' do
+      expect(bridge.downstream_variables)
+        .to include(key: 'BRIDGE', value: 'cross')
     end
   end
 end
