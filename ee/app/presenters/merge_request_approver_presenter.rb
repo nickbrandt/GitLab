@@ -40,7 +40,9 @@ class MergeRequestApproverPresenter < Gitlab::View::Presenter::Simple
   private
 
   def users
-    @users ||= users_from_git_log_authors
+    strong_memoize(:users) do
+      merge_request.project.members_among(users_from_git_log_authors)
+    end
   end
 
   def code_owner_enabled?
