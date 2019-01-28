@@ -16,11 +16,11 @@ describe Ci::ProcessPipelineService, '#execute' do
 
   describe 'cross-project pipelines' do
     before do
-      create_processable(:ci_build, name: 'test', stage: 'test')
-      create_processable(:ci_bridge, name: 'cross',
-                                     stage: 'build',
-                                     downstream: downstream)
-      create_processable(:ci_build, name: 'deploy', stage: 'deploy')
+      create_processable(:build, name: 'test', stage: 'test')
+      create_processable(:bridge, :variables,  name: 'cross',
+                                               stage: 'build',
+                                               downstream: downstream)
+      create_processable(:build, name: 'deploy', stage: 'deploy')
 
       stub_ci_pipeline_to_return_yaml_file
     end
@@ -36,6 +36,9 @@ describe Ci::ProcessPipelineService, '#execute' do
 
       expect(downstream.ci_pipelines).to be_one
       expect(downstream.ci_pipelines.first).to be_pending
+      expect(downstream.builds).not_to be_empty
+      expect(downstream.builds.first.variables)
+        .to include(key: 'BRIDGE', value: 'cross', public: false)
     end
   end
 
@@ -51,15 +54,14 @@ describe Ci::ProcessPipelineService, '#execute' do
     pipeline.builds.find_by(name: name).public_send(status)
   end
 
-  def create_processable(type, name:, **opts)
+  def create_processable(type, *traits, **opts)
     stages = %w[test build deploy]
     index = stages.index(opts.fetch(:stage, 'test'))
 
-    create(type, status: :created,
-                 name: name,
-                 pipeline: pipeline,
-                 stage_idx: index,
-                 user: user,
-                 **opts)
+    create("ci_#{type}", *traits, status: :created,
+                                  pipeline: pipeline,
+                                  stage_idx: index,
+                                  user: user,
+                                  **opts)
   end
 end
