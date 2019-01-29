@@ -5,6 +5,7 @@ class RepositoryImportWorker
   include ExceptionBacktrace
   include ProjectStartImport
   include ProjectImportOptions
+
   def perform(project_id)
     @project = Project.find(project_id)
 
