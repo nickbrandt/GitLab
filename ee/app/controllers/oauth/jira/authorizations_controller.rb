@@ -36,6 +36,6 @@ class Oauth::Jira::AuthorizationsController < ApplicationController
     auth_response = Gitlab::HTTP.post(oauth_token_url, body: auth_params, allow_local_requests: true)
     token_type, scope, token = auth_response['token_type'], auth_response['scope'], auth_response['access_token']
 
-    render text: "access_token=#{token}&scope=#{scope}&token_type=#{token_type}"
+    render plain: "access_token=#{token}&scope=#{scope}&token_type=#{token_type}"
   end
 end
