@@ -12,7 +12,7 @@ describe Geo::RepositoryVerification::Secondary::ShardWorker, :postgresql, :clea
 
   before do
     stub_current_geo_node(secondary)
-    allow(Gitlab::Geo::Fdw).to receive(:enabled?).and_return(false)
+    stub_fdw_disabled
   end
 
   describe '#perform' do
@@ -56,6 +56,17 @@ describe Geo::RepositoryVerification::Secondary::ShardWorker, :postgresql, :clea
       missing_wiki_verification = create(:geo_project_registry, :synced, :repository_verified, project: project)
 
       expect(secondary_singleworker).to receive(:perform_async).with(missing_wiki_verification.id)
+
+      subject.perform(shard_name)
+    end
+
+    it 'does not schedule jobs for projects on other shards' do
+      project_other_shard = create(:project)
+      project_other_shard.update_column(:repository_storage, 'other')
+      create(:repository_state, :repository_verified, :wiki_verified, project: project_other_shard)
+      registry_other_shard = create(:geo_project_registry, :synced, :wiki_verified, project: project_other_shard)
+
+      expect(secondary_singleworker).not_to receive(:perform_async).with(registry_other_shard.id)
 
       subject.perform(shard_name)
     end
