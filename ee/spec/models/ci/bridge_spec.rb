@@ -79,4 +79,20 @@ describe Ci::Bridge do
         .to include(key: 'BRIDGE', value: 'cross')
     end
   end
+
+  describe 'metadata support' do
+    it 'reads YAML variables from metadata' do
+      expect(bridge.yaml_variables).not_to be_empty
+      expect(bridge.metadata).to be_a Ci::BuildMetadata
+      expect(bridge.read_attribute(:yaml_variables)).to be_nil
+      expect(bridge.metadata.config_variables).to be bridge.yaml_variables
+    end
+
+    it 'reads options from metadata' do
+      expect(bridge.options).not_to be_empty
+      expect(bridge.metadata).to be_a Ci::BuildMetadata
+      expect(bridge.read_attribute(:options)).to be_nil
+      expect(bridge.metadata.config_options).to be bridge.options
+    end
+  end
 end
