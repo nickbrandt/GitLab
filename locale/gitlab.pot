@@ -8103,9 +8103,6 @@ msgstr ""
 msgid "Security Reports|No Vulnerabilities"
 msgstr ""
 
-msgid "Security Reports|Revert dismissal"
-msgstr ""
-
 msgid "Security Reports|Security dashboard documentation"
 msgstr ""
 
@@ -8119,6 +8116,9 @@ msgid "Security Reports|There was an error reverting the dismissal."
 msgstr ""
 
 msgid "Security Reports|There was an error reverting this dismissal."
+msgstr ""
+
+msgid "Security Reports|Undo dismiss"
 msgstr ""
 
 msgid "Security Reports|We've found no vulnerabilities for your group"
