@@ -1,5 +1,0 @@
----
-title: Avoid leaking unauthorized approver group members
-merge_request: 766
-author:
-type: security
