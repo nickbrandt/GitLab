@@ -49,6 +49,7 @@ module QA
         issue.visit!
 
         Page::Project::Issue::Show.perform do |show_page|
+          show_page.wait_for_related_issues_to_load
           show_page.select_all_activities_filter
           show_page.comment("/epic #{epic.web_url}")
           show_page.comment("/remove_epic")
