@@ -34,7 +34,7 @@ With Multi-Project Pipelines, you can visualize the entire pipeline, including a
 
 ## How it works
 
-### Creating cross-project pipeline thorugh API
+### Creating cross-project pipeline through API
 
 When you use the [`CI_JOB_TOKEN` to trigger pipelines](triggers/README.md#ci-job-token), GitLab
 recognizes the source of the job token, and thus internally ties these pipelines
@@ -50,7 +50,7 @@ outbound connections for upstream and downstream pipeline dependencies.
 #### Triggering a downstream pipeline using a bridge job
 
 Before GitLab 11.8 it was necessary to implement a pipeline job that was
-responsible for making the API requiest [to trigger a pipeline](triggers/README.md#ci-job-token)
+responsible for making the API request [to trigger a pipeline](triggers/README.md#ci-job-token)
 in a different project.
 
 In GitLab 11.8 we introduced a new CI/CD configuration syntax to make this task
@@ -135,3 +135,20 @@ staging:
 `ENVIRONMENT` variable is going to be passed to every job defined in a
 downstream pipeline. It is going to be available as an environment variable
 when GitLab Runner picks a job.
+
+#### Limitations
+
+Because bridge jobs are a little different than regular jobs, it is not
+possible to use exactly the same configuration syntax here, as one would
+normally do when defining a regular job that is going to be picked by a runner.
+
+Some features, are not implemented yet, like support for environments.
+
+Available configuration keywords are:
+
+- `trigger` (to define a downstream pipeline trigger)
+- `stage`
+- `allow_failure`
+- `only` and `except`
+- `when`
+- `extends`
