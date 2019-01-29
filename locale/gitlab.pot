@@ -1879,6 +1879,9 @@ msgstr ""
 msgid "Closed"
 msgstr ""
 
+msgid "Closed (moved)"
+msgstr ""
+
 msgid "Closed issues"
 msgstr ""
 
