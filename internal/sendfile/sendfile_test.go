@@ -77,11 +77,10 @@ func TestAllowExistentContentHeaders(t *testing.T) {
 func TestSuccessOverrideContentHeadersFeatureEnabled(t *testing.T) {
 	fixturePath := "../../testdata/forgedfile.png"
 
-	httpHeaders := map[string]string{
-		headers.ContentTypeHeader:        "image/png",
-		headers.ContentDispositionHeader: "inline",
-		"Range": "bytes=1-2",
-	}
+	httpHeaders := make(map[string]string)
+	httpHeaders[headers.ContentTypeHeader] = "image/png"
+	httpHeaders[headers.ContentDispositionHeader] = "inline"
+	httpHeaders["Range"] = "bytes=1-2"
 
 	resp := makeRequest(t, fixturePath, httpHeaders)
 	require.Equal(t, "image/png", resp.Header.Get(headers.ContentTypeHeader))
