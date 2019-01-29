@@ -6,8 +6,6 @@ module EE
       UpdateBuildMinutesService.new(build.project, nil).execute(build)
 
       super
-
-      ChatNotificationWorker.perform_async(build.id) if build.pipeline.chat?
     end
   end
 end

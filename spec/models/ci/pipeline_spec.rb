@@ -26,6 +26,7 @@ describe Ci::Pipeline, :mailer do
   it { is_expected.to have_many(:sourced_pipelines) }
   it { is_expected.to have_one(:triggered_by_pipeline) }
   it { is_expected.to have_many(:triggered_pipelines) }
+  it { is_expected.to have_one(:chat_data) }
 
   it { is_expected.to validate_presence_of(:sha) }
   it { is_expected.to validate_presence_of(:status) }

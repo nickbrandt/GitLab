@@ -8,8 +8,7 @@ module EE
       override :extra_options
       def extra_options(mirror_update: false)
         {
-          allow_mirror_update: mirror_update,
-          chat_data: params[:chat_data]
+          allow_mirror_update: mirror_update
         }
       end
     end

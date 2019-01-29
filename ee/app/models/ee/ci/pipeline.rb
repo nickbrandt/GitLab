@@ -13,8 +13,6 @@ module EE
       }.freeze
 
       prepended do
-        has_one :chat_data, class_name: 'Ci::PipelineChatData'
-
         has_many :job_artifacts, through: :builds
         has_many :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::OccurrencePipeline'
         has_many :vulnerabilities, source: :occurrence, through: :vulnerabilities_occurrence_pipelines, class_name: 'Vulnerabilities::Occurrence'

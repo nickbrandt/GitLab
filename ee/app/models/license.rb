@@ -87,7 +87,6 @@ class License < ActiveRecord::Base
     cluster_health
     dast
     epics
-    chatops
     pod_logs
     pseudonymizer
     prometheus_alerts
@@ -384,7 +383,6 @@ class License < ActiveRecord::Base
 
   def reset_current
     self.class.reset_current
-    Gitlab::Chat.flush_available_cache
   end
 
   def reset_license
