@@ -54,6 +54,7 @@ export default () => ({
   dueDateFromMilestones: '',
   dueDate: '',
   labels: [],
+  parent: null,
   participants: [],
   subscribed: false,
 

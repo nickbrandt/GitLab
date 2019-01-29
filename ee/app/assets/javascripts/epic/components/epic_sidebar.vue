@@ -1,6 +1,8 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
 
+import SidebarParentEpic from 'ee/sidebar/components/sidebar_item_epic.vue';
+
 import epicUtils from '../utils/epic_utils';
 
 import SidebarHeader from './sidebar_items/sidebar_header.vue';
@@ -19,6 +21,7 @@ export default {
     SidebarDatePicker,
     SidebarDatePickerCollapsed,
     SidebarLabels,
+    SidebarParentEpic,
   },
   computed: {
     ...mapState([
@@ -48,6 +51,7 @@ export default {
       'dueDateTimeFromMilestones',
       'dueDateTime',
       'dueDateForCollapsedSidebar',
+      'parentEpic',
     ]),
   },
   mounted() {
@@ -175,6 +179,9 @@ export default {
         @toggleCollapse="toggleSidebar({ sidebarCollapsed })"
       />
       <sidebar-labels :can-update="canUpdate" :sidebar-collapsed="sidebarCollapsed" />
+      <div class="block parent-epic">
+        <sidebar-parent-epic :block-title="__('Parent epic')" :initial-epic="parentEpic" />
+      </div>
     </div>
   </aside>
 </template>
