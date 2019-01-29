@@ -2,6 +2,13 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
+## 11.6.7 (2019-01-29)
+
+### Fixed (1 change)
+
+- Fix uninitialized constant with GitLab Pages.
+
+
 ## 11.6.6 (2019-01-28)
 
 - Unreleased due to quality assurance failure.
