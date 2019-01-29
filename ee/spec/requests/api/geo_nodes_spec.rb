@@ -223,6 +223,18 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
       expect(response).to match_response_schema('public_api/v4/geo_node', dir: 'ee')
       expect(json_response).to include(params)
     end
+
+    it 'can update primary' do
+      params = {
+        url: 'https://updated.example.com/'
+      }.stringify_keys
+
+      put api("/geo_nodes/#{primary.id}", admin), params: params
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(response).to match_response_schema('public_api/v4/geo_node', dir: 'ee')
+      expect(json_response).to include(params)
+    end
   end
 
   describe 'DELETE /geo_nodes/:id' do

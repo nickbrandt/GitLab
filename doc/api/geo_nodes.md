@@ -70,7 +70,7 @@ Example response:
 
 ## Edit a Geo node
 
-Updates an existing Geo secondary node. The primary node cannot be edited.
+Updates settings of an existing Geo node.
 
 _This can only be run against a primary Geo node._
 
@@ -92,8 +92,8 @@ Example response:
 ```json
 {
   "id": 1,
-  "url": "https://primary.example.com/",
-  "primary": true,
+  "url": "https://secondary.example.com/",
+  "primary": false,
   "enabled": true,
   "current": true,
   "files_max_capacity": 10,
