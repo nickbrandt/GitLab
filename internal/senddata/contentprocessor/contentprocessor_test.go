@@ -74,6 +74,12 @@ func TestSetProperContentTypeAndDisposition(t *testing.T) {
 			body:               testhelper.LoadFile(t, "testdata/image.svg"),
 		},
 		{
+			desc:               "Partial SVG type",
+			contentType:        "image/svg+xml",
+			contentDisposition: "attachment",
+			body:               "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 330 82\"><title>SVG logo combined with the W3C logo, set horizontally</title><desc>The logo combines three entities displayed horizontall</desc><metadata>",
+		},
+		{
 			desc:               "Application type",
 			contentType:        "application/pdf",
 			contentDisposition: "attachment",
