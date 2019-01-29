@@ -1,0 +1,5 @@
+---
+title: Fix locked file visibility issue for private repositories
+merge_request:
+author:
+type: security

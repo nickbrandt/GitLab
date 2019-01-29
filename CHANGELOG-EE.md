@@ -1,17 +1,5 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
-## 11.6.6 (2019-01-28)
-
-### Security (6 changes)
-
-- Avoid leaking unauthorized approver group members. !766
-- Sanitize user full name to clean up any URL to prevent mail clients from auto-linking URLs. !792
-- Check access rights when creating/updating ProtectedRefs.
-- Fix locked file visibility issue for private repositories.
-- Filter out non-project member approvers.
-- Remove HTTP POST in JIRA OAuth access_token endpoint.
-
-
 ## 11.6.5 (2019-01-17)
 
 ### Fixed (1 change)
