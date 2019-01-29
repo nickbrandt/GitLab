@@ -135,7 +135,7 @@ class ApprovalState
   def regular_rules
     strong_memoize(:regular_rules) do
       rule_source = approval_rules_overwritten? ? merge_request : project
-      rules = rule_source.approval_rules.select(&:regular?)
+      rules = rule_source.approval_rules.select(&:regular?).sort_by(&:id)
 
       unless project.feature_available?(:multiple_approval_rules)
         rules = rules[0, 1]
