@@ -107,6 +107,9 @@ Example response:
 
 Removes the Geo node.
 
+NOTE: **Note:**
+Only a Geo primary node will accept this request.
+
 ```
 DELETE /geo_nodes/:id
 ```
