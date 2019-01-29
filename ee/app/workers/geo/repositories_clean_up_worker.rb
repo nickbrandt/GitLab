@@ -32,7 +32,7 @@ module Geo
     private
 
     def clean_up_repositories(project)
-      job_id = ::GeoRepositoryDestroyWorker.perform_async(project.id, project.name, project.disk_path, project.repository.storage)
+      job_id = ::Geo::RepositoryCleanupWorker.perform_async(project.id, project.name, project.disk_path, project.repository.storage)
 
       if job_id
         log_info('Repository clean up scheduled', project_id: project.id, shard: project.repository.storage, disk_path: project.disk_path, job_id: job_id)
