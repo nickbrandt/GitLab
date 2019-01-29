@@ -44,8 +44,6 @@ module Ci
             project: target_project,
             pipeline: pipeline)
 
-          # TODO we should use metadata with bridge jobs too.
-          #
           pipeline.variables.build(@bridge.downstream_variables)
         end
     end
