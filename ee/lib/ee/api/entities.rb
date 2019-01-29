@@ -268,7 +268,7 @@ module EE
         end
 
         expose :wrapped_approval_rules, as: :rules, using: MergeRequestApprovalRule
-        expose :overall_approvals_required, as: :fallback_approvals_required
+        expose :fallback_approvals_required
       end
 
       # Decorates Project
@@ -332,10 +332,7 @@ module EE
 
         expose :approved?, as: :approved
 
-        # @deprecated, reads from first regular rule instead
-        expose :approvals_required do |approval_state|
-          approval_state.first_regular_rule&.approvals_required
-        end
+        expose :approvals_required
 
         expose :approvals_left
 

@@ -44,20 +44,20 @@ class ApprovalState
     return false unless project.feature_available?(:merge_request_approvers)
 
     if regular_rules.empty?
-      overall_approvals_required > 0
+      fallback_approvals_required > 0
     else
       wrapped_approval_rules.any? { |rule| rule.approvals_required > 0 }
     end
   end
 
-  def overall_approvals_required
-    @overall_approvals_required ||= [project.approvals_before_merge, merge_request.approvals_before_merge || 0].max
+  def fallback_approvals_required
+    @fallback_approvals_required ||= [project.approvals_before_merge, merge_request.approvals_before_merge || 0].max
   end
 
   def approved?
     strong_memoize(:approved) do
       if regular_rules.empty?
-        approvals.size >= overall_approvals_required
+        approvals.size >= fallback_approvals_required
       else
         wrapped_approval_rules.all?(&:approved?)
       end
@@ -65,7 +65,17 @@ class ApprovalState
   end
 
   def any_approver_allowed?
-    approved? || overall_approvals_required > approvers.size
+    approved?
+  end
+
+  def approvals_required
+    strong_memoize(:approvals_required) do
+      if regular_rules.empty?
+        [project.approvals_before_merge, merge_request.approvals_before_merge || 0].max
+      else
+        wrapped_approval_rules.sum(&:approvals_required)
+      end
+    end
   end
 
   # Number of approvals remaining (excluding existing approvals) before the MR is
@@ -73,7 +83,7 @@ class ApprovalState
   def approvals_left
     strong_memoize(:approvals_left) do
       if regular_rules.empty?
-        [overall_approvals_required - approved_approvers.size, 0].max
+        [fallback_approvals_required - approved_approvers.size, 0].max
       else
         wrapped_approval_rules.sum(&:approvals_left)
       end

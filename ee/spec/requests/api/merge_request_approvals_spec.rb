@@ -522,7 +522,6 @@ describe "API::MergeRequestApprovals with approval_rule enabled" do
       context 'when disable_overriding_approvers_per_merge_request is false on the project' do
         before do
           project.update(disable_overriding_approvers_per_merge_request: false)
-          create(:approval_merge_request_rule, merge_request: merge_request)
         end
 
         it 'allows you to override approvals required' do
