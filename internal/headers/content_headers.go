@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"regexp"
 
-	svg "github.com/h2non/go-is-svg"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/utils/svg"
 )
 
 var (

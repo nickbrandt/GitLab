@@ -204,12 +204,6 @@
 			"versionExact": "v1.2.0"
 		},
 		{
-			"checksumSHA1": "v52fmR2hxX7o6emMN/dflEqys64=",
-			"path": "github.com/h2non/go-is-svg",
-			"revision": "35e8c4b0612ce1ab2a228e25a323b22482db6788",
-			"revisionTime": "2016-09-27T21:24:52Z"
-		},
-		{
 			"checksumSHA1": "mb0MqzDyYEQMgh8+qwVm1RV4cxc=",
 			"path": "github.com/jfbus/httprs",
 			"revision": "7861a11508467e8d1575182d6456065e6402d8fc",

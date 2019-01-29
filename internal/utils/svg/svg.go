@@ -1,4 +1,10 @@
-package issvg
+// Copyright (c) 2016 Tomas Aparicio. All rights reserved.
+//
+// Use of this source code is governed by a MIT License
+// license that can be found in the LICENSE file or at
+// https://github.com/h2non/go-is-svg/blob/master/LICENSE.
+
+package svg
 
 import (
 	"regexp"
@@ -6,8 +12,8 @@ import (
 )
 
 var (
-	htmlCommentRegex = regexp.MustCompile("(?i)<!--([\\s\\S]*?)-->")
-	svgRegex         = regexp.MustCompile(`(?i)^\s*(?:<\?xml[^>]*>\s*)?(?:<!doctype svg[^>]*>\s*)?<svg[^>]*>[^*]*<\/svg>\s*$`)
+	htmlCommentRegex = regexp.MustCompile(`(?i)<!--([\s\S]*?)-->`)
+	svgRegex         = regexp.MustCompile(`(?i)^\s*(?:<\?xml[^>]*>\s*)?(?:<!doctype svg[^>]*>\s*)?<svg[^>]*>`)
 )
 
 // isBinary checks if the given buffer is a binary file.
