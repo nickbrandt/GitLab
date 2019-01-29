@@ -337,4 +337,4 @@ shows how to create a new package each time the `master` branch is updated:
 The next time the `deploy` job runs, it will copy `ci_settings.xml` to the
 user's home location (in this case the user is `root` since it runs in a
 Docker container), and Maven will utilize the configured CI
-[environment variables](../../../ci/variables/README.md#predefined-variables-environment-variables).
+[environment variables](../../../ci/variables/README.md#predefined-environment-variables).

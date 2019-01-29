@@ -10,7 +10,7 @@ your Git repository via URL.
     ![Create project](img/external_repository.png)
 
     GitLab will import the repository and enable [Pull Mirroring][pull-mirroring].
-    
+
 1. In GitLab create a
    [Personal Access Token](../../user/profile/personal_access_tokens.md)
    with `api` scope. This will be used to authenticate requests from the web
@@ -39,7 +39,7 @@ your Git repository via URL.
 
     ![Bitbucket Cloud webhook](img/bitbucket_app_password.png)
 
-1. In GitLab from **Settings > CI/CD > Variables** add variables to allow
+1. In GitLab from **Settings > CI/CD > Environment variables** add variables to allow
    communication with Bitbucket via the Bitbucket API.
 
     `BITBUCKET_ACCESS_TOKEN`: the Bitbucket app password created above
