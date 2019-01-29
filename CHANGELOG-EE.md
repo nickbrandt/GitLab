@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.7.1 (2019-01-28)
+
+- Unreleased due to quality assurance failure.
+
 ## 11.7.0 (2019-01-22)
 
 ### Security (1 change)
