@@ -2,6 +2,7 @@
 
 class ProtectedBranch < ActiveRecord::Base
   include ProtectedRef
+
   protected_ref_access_levels :merge, :push
 
   def self.protected_ref_accessible_to?(ref, user, project:, action:, protected_refs: nil)

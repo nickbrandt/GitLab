@@ -2,6 +2,7 @@
 
 class ProtectedTag < ActiveRecord::Base
   include ProtectedRef
+
   validates :name, uniqueness: { scope: :project_id }
 
   protected_ref_access_levels :create
