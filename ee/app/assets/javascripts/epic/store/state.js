@@ -58,6 +58,9 @@ export default () => ({
   participants: [],
   subscribed: false,
 
+  // Create Epic Props
+  newEpicTitle: '',
+
   // UI status flags
   epicStatusChangeInProgress: false,
   epicDeleteInProgress: false,
@@ -65,5 +68,6 @@ export default () => ({
   epicStartDateSaveInProgress: false,
   epicDueDateSaveInProgress: false,
   epicSubscriptionToggleInProgress: false,
+  epicCreateInProgress: false,
   sidebarCollapsed: false,
 });

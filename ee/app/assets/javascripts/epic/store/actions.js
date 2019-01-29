@@ -2,6 +2,7 @@ import flash from '~/flash';
 import { __, s__, sprintf } from '~/locale';
 
 import axios from '~/lib/utils/axios_utils';
+import { visitUrl } from '~/lib/utils/url_utility';
 
 import epicUtils from '../utils/epic_utils';
 import { statusType, statusEvent, dateTypes } from '../constants';
@@ -176,6 +177,30 @@ export const toggleEpicSubscription = ({ state, dispatch }) => {
     })
     .catch(() => {
       dispatch('requestEpicSubscriptionToggleFailure');
+    });
+};
+
+/**
+ * Methods to handle Epic create from Epics index page
+ */
+export const setEpicCreateTitle = ({ commit }, data) => commit(types.SET_EPIC_CREATE_TITLE, data);
+export const requestEpicCreate = ({ commit }) => commit(types.REQUEST_EPIC_CREATE);
+export const requestEpicCreateSuccess = (_, webUrl) => visitUrl(webUrl);
+export const requestEpicCreateFailure = ({ commit }) => {
+  commit(types.REQUEST_EPIC_CREATE_FAILURE);
+  flash(s__('Error creating epic'));
+};
+export const createEpic = ({ state, dispatch }) => {
+  dispatch('requestEpicCreate');
+  axios
+    .post(state.endpoint, {
+      title: state.newEpicTitle,
+    })
+    .then(({ data }) => {
+      dispatch('requestEpicCreateSuccess', data.web_url);
+    })
+    .catch(() => {
+      dispatch('requestEpicCreateFailure');
     });
 };
 

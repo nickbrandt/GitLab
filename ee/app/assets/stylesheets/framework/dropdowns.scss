@@ -1,4 +1,5 @@
-.new-epic-dropdown {
+.new-epic-dropdown,
+.epic-create-dropdown {
   .dropdown-menu {
     padding-left: $gl-padding-top;
     padding-right: $gl-padding-top;
@@ -13,10 +14,13 @@
   }
 }
 
-.empty-state .new-epic-dropdown {
-  display: inline-flex;
+.empty-state {
+  .new-epic-dropdown,
+  .epic-create-dropdown {
+    display: inline-flex;
 
-  .btn-success {
-    margin: 0;
+    .btn-success {
+      margin: 0;
+    }
   }
 }

@@ -84,4 +84,14 @@ export default {
   [types.REQUEST_EPIC_SUBSCRIPTION_TOGGLE_FAILURE](state) {
     state.epicSubscriptionToggleInProgress = false;
   },
+
+  [types.SET_EPIC_CREATE_TITLE](state, { newEpicTitle }) {
+    state.newEpicTitle = newEpicTitle;
+  },
+  [types.REQUEST_EPIC_CREATE](state) {
+    state.epicCreateInProgress = true;
+  },
+  [types.REQUEST_EPIC_CREATE_FAILURE](state) {
+    state.epicCreateInProgress = false;
+  },
 };
