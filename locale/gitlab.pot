@@ -10290,9 +10290,6 @@ msgstr ""
 msgid "Weight %{weight}"
 msgstr ""
 
-msgid "What's new?"
-msgstr ""
-
 msgid "When a runner is locked, it cannot be assigned to other projects"
 msgstr ""
 
