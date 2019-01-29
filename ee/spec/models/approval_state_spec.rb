@@ -207,16 +207,6 @@ describe ApprovalState do
         it 'returns false' do
           expect(subject.approved?).to eq(false)
         end
-
-        context 'when overall_approvals_required cannot be met' do
-          before do
-            project.update(approvals_before_merge: 1)
-          end
-
-          it 'returns false' do
-            expect(subject.any_approver_allowed?).to eq(true)
-          end
-        end
       end
     end
 
@@ -750,16 +740,6 @@ describe ApprovalState do
 
         it 'returns false' do
           expect(subject.approved?).to eq(false)
-        end
-
-        context 'when overall_approvals_required cannot be met' do
-          before do
-            project.update(approvals_before_merge: 1)
-          end
-
-          it 'returns false' do
-            expect(subject.any_approver_allowed?).to eq(true)
-          end
         end
       end
     end
