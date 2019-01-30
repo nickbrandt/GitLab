@@ -13,6 +13,11 @@ module API
       NAMESPACE_ENDPOINT_REQUIREMENTS = { namespace: NO_SLASH_URL_PART_REGEX }.freeze
       PROJECT_ENDPOINT_REQUIREMENTS = NAMESPACE_ENDPOINT_REQUIREMENTS.merge(project: NO_SLASH_URL_PART_REGEX).freeze
 
+      # Used to differentiate JIRA cloud requests from JIRA server requests
+      # JIRA cloud user agent format: JIRA DVCS Connector Vertigo/version
+      # JIRA server user agent format: JIRA DVCS Connector/version
+      JIRA_DVCS_CLOUD_USER_AGENT = 'JIRA DVCS Connector Vertigo'.freeze
+
       include PaginationParams
 
       before do
@@ -28,6 +33,18 @@ module API
 
         def authorize_jira_user_agent!(request)
           not_found! unless Gitlab::Jira::Middleware.jira_dvcs_connector?(request.env)
+        end
+
+        def update_project_feature_usage_for(project)
+          # Prevent errors on GitLab Geo not allowing
+          # UPDATE statements to happen in GET requests.
+          return if Gitlab::Database.read_only?
+
+          project.log_jira_dvcs_integration_usage(cloud: jira_cloud?)
+        end
+
+        def jira_cloud?
+          request.env['HTTP_USER_AGENT'].include?(JIRA_DVCS_CLOUD_USER_AGENT)
         end
 
         def find_project_with_access(params)
@@ -161,6 +178,8 @@ module API
         end
         get ':namespace/:project/branches', requirements: PROJECT_ENDPOINT_REQUIREMENTS do
           user_project = find_project_with_access(params)
+
+          update_project_feature_usage_for(user_project)
 
           branches = ::Kaminari.paginate_array(user_project.repository.branches.sort_by(&:name))
 

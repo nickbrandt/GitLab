@@ -67,6 +67,8 @@ describe Gitlab::UsageData do
         projects_with_prometheus_alerts
         projects_with_packages
         projects_with_tracing_enabled
+        projects_jira_dvcs_cloud_active
+        projects_jira_dvcs_server_active
       ))
 
       expect(count_data[:projects_with_prometheus_alerts]).to eq(2)
