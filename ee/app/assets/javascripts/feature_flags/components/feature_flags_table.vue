@@ -1,17 +1,18 @@
 <script>
-import { GlButton, GlLink, GlTooltipDirective } from '@gitlab/ui';
+import _ from 'underscore';
+import { GlButton, GlLink, GlTooltipDirective, GlModalDirective, GlModal } from '@gitlab/ui';
 import { sprintf, s__ } from '~/locale';
-import DeleteFeatureFlag from './delete_feature_flag.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
   components: {
-    DeleteFeatureFlag,
     GlButton,
     GlLink,
     Icon,
+    GlModal,
   },
   directives: {
+    GlModalDirective,
     GlTooltip: GlTooltipDirective,
   },
   props: {
@@ -24,11 +25,52 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      deleteFeatureFlagUrl: null,
+      deleteFeatureFlagName: null,
+    };
+  },
+  computed: {
+    modalTitle() {
+      return sprintf(
+        s__('FeatureFlags|Delete %{name}?'),
+        {
+          name: _.escape(this.deleteFeatureFlagName),
+        },
+        false,
+      );
+    },
+    deleteModalMessage() {
+      return sprintf(
+        s__('FeatureFlags|Feature flag %{name} will be removed. Are you sure?'),
+        {
+          name: _.escape(this.deleteFeatureFlagName),
+        },
+        false,
+      );
+    },
+    modalId() {
+      return 'delete-feature-flag';
+    },
+  },
   methods: {
     scopeTooltipText(scope) {
       return !scope.active
-        ? sprintf(s__('Inactive flag for %{scope}'), { scope: scope.environment_scope })
+        ? sprintf(s__('FeatureFlags|Inactive flag for %{scope}'), {
+            scope: scope.environment_scope,
+          })
         : '';
+    },
+    scopeName(name) {
+      return name === '*' ? s__('FeatureFlags|* (All environments)') : name;
+    },
+    setDeleteModalData(featureFlag) {
+      this.deleteFeatureFlagUrl = featureFlag.destroy_path;
+      this.deleteFeatureFlagName = featureFlag.name;
+    },
+    onSubmit() {
+      this.$refs.form.submit();
     },
   },
 };
@@ -52,9 +94,9 @@ export default {
         <div class="table-section section-10" role="gridcell">
           <div class="table-mobile-header" role="rowheader">{{ s__('FeatureFlags|Status') }}</div>
           <div class="table-mobile-content js-feature-flag-status">
-            <span v-if="featureFlag.active" class="badge badge-success">{{
-              s__('FeatureFlags|Active')
-            }}</span>
+            <span v-if="featureFlag.active" class="badge badge-success">
+              {{ s__('FeatureFlags|Active') }}
+            </span>
             <span v-else class="badge badge-danger">{{ s__('FeatureFlags|Inactive') }}</span>
           </div>
         </div>
@@ -84,7 +126,7 @@ export default {
               v-gl-tooltip.hover="scopeTooltipText(scope)"
               class="badge append-right-8 prepend-top-2"
               :class="{ 'badge-active': scope.active, 'badge-inactive': !scope.active }"
-              >{{ scope.environment_scope }}</span
+              >{{ scopeName(scope.environment_scope) }}</span
             >
           </div>
         </div>
@@ -95,23 +137,41 @@ export default {
               <gl-button
                 v-gl-tooltip.hover.bottom="__('Edit')"
                 class="js-feature-flag-edit-button"
-                :href="featureFlag.edit_path"
                 variant="outline-primary"
+                :href="featureFlag.edit_path"
               >
                 <icon name="pencil" :size="16" />
               </gl-button>
             </template>
             <template v-if="featureFlag.destroy_path">
-              <delete-feature-flag
-                :delete-feature-flag-url="featureFlag.destroy_path"
-                :feature-flag-name="featureFlag.name"
-                :modal-id="`delete-feature-flag-${featureFlag.id}`"
-                :csrf-token="csrfToken"
-              />
+              <gl-button
+                v-gl-tooltip.hover.bottom="__('Delete')"
+                v-gl-modal-directive="modalId"
+                class="js-feature-flag-delete-button"
+                variant="danger"
+                @click="setDeleteModalData(featureFlag)"
+              >
+                <icon name="remove" :size="16" />
+              </gl-button>
             </template>
           </div>
         </div>
       </div>
     </template>
+
+    <gl-modal
+      :title="modalTitle"
+      :ok-title="s__('FeatureFlags|Delete feature flag')"
+      :modal-id="modalId"
+      title-tag="h4"
+      ok-variant="danger"
+      @ok="onSubmit"
+    >
+      {{ deleteModalMessage }}
+      <form ref="form" :action="deleteFeatureFlagUrl" method="post" class="js-requires-input">
+        <input ref="method" type="hidden" name="_method" value="delete" />
+        <input :value="csrfToken" type="hidden" name="authenticity_token" />
+      </form>
+    </gl-modal>
   </div>
 </template>

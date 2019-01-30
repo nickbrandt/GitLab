@@ -32,7 +32,7 @@ describe('Feature Flag table', () => {
     const status = featureFlag.active ? 'Active' : 'Inactive';
 
     expect(vm.$el.querySelector('.js-feature-flag-status')).not.toBeNull();
-    expect(vm.$el.querySelector('.js-feature-flag-status').textContent).toEqual(status);
+    expect(vm.$el.querySelector('.js-feature-flag-status').textContent.trim()).toEqual(status);
   });
 
   it('Should render a feature flag column', () => {
