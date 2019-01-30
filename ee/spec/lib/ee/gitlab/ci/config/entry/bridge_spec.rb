@@ -54,7 +54,8 @@ describe EE::Gitlab::Ci::Config::Entry::Bridge do
         extends: '.some-key',
         stage: 'deploy',
         only: { variables: %w[$SOMEVARIABLE] },
-        except: { refs: %w[feature] } }
+        except: { refs: %w[feature] },
+        variables: { VARIABLE: '123' } }
     end
 
     it { is_expected.to be_valid }

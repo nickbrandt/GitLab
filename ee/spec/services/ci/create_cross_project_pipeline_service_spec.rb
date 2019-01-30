@@ -141,5 +141,18 @@ describe Ci::CreateCrossProjectPipelineService, '#execute' do
         expect(bridge.failure_reason).to eq 'invalid_bridge_trigger'
       end
     end
+
+    context 'when bridge job has YAML variables defined' do
+      before do
+        bridge.yaml_variables = [{ key: 'BRIDGE', value: 'var', public: true }]
+      end
+
+      it 'passes bridge variables to downstream pipeline' do
+        pipeline = service.execute(bridge)
+
+        expect(pipeline.variables.first)
+          .to have_attributes(key: 'BRIDGE', value: 'var')
+      end
+    end
   end
 end

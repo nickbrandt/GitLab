@@ -14,7 +14,7 @@ module EE
             include ::Gitlab::Config::Entry::Attributable
 
             ALLOWED_KEYS = %i[trigger stage allow_failure only except
-                              when extends].freeze
+                              when extends variables].freeze
 
             validations do
               validates :config, allowed_keys: ALLOWED_KEYS
@@ -44,6 +44,9 @@ module EE
             entry :except, ::Gitlab::Ci::Config::Entry::Policy,
               description: 'Refs policy this job will be executed for.'
 
+            entry :variables, ::Gitlab::Ci::Config::Entry::Variables,
+              description: 'Environment variables available for this job.'
+
             helpers(*ALLOWED_KEYS)
             attributes(*ALLOWED_KEYS)
 
@@ -58,6 +61,7 @@ module EE
                 stage: stage_value,
                 when: when_value,
                 extends: extends_value,
+                variables: (variables_value if variables_defined?),
                 only: only_value,
                 except: except_value }.compact
             end

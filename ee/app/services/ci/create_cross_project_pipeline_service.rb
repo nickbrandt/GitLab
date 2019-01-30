@@ -43,6 +43,8 @@ module Ci
             source_project: @bridge.project,
             project: target_project,
             pipeline: pipeline)
+
+          pipeline.variables.build(@bridge.downstream_variables)
         end
     end
 
