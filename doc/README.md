@@ -256,6 +256,7 @@ The following documentation relates to the DevOps **Package** stage:
 | Package Topics                                                  | Description                                            |
 |:----------------------------------------------------------------|:-------------------------------------------------------|
 | [GitLab Container Registry](user/project/container_registry.md) | Learn how to use GitLab's built-in Container Registry. |
+| [GitLab Packages](administration/packages.md) **[PREMIUM]**     | Use GitLab as an NPM registry or Maven repository.     |
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#overview">
