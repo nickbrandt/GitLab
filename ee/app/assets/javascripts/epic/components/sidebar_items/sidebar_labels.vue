@@ -40,6 +40,18 @@ export default {
       };
     },
   },
+  mounted() {
+    document.addEventListener(
+      'toggleSidebarRevealLabelsDropdown',
+      this.toggleSidebarRevealLabelsDropdown,
+    );
+  },
+  beforeDestroy() {
+    document.removeEventListener(
+      'toggleSidebarRevealLabelsDropdown',
+      this.toggleSidebarRevealLabelsDropdown,
+    );
+  },
   methods: {
     ...mapActions(['toggleSidebar']),
     toggleSidebarRevealLabelsDropdown() {
