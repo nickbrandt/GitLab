@@ -3,7 +3,7 @@
 module EE
   module Projects
     module PipelinesController
-      extend ActiveSupport::Concern
+      extend ::Gitlab::Utils::Override
 
       def security
         if pipeline.expose_security_dashboard?
@@ -19,6 +19,11 @@ module EE
         else
           redirect_to pipeline_path(pipeline)
         end
+      end
+
+      override :show_represent_params
+      def show_represent_params
+        super.merge(expanded: params[:expanded].to_a)
       end
     end
   end
