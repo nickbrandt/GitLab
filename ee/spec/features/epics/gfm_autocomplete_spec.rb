@@ -67,30 +67,45 @@ describe 'GFM autocomplete', :js do
     end
   end
 
-  # This context has just one example in each contexts in order to improve spec performance.
   context 'labels' do
     let!(:backend)          { create(:group_label, group: group, title: 'backend') }
     let!(:bug)              { create(:group_label, group: group, title: 'bug') }
     let!(:feature_proposal) { create(:group_label, group: group, title: 'feature proposal') }
 
     context 'when no labels are assigned' do
-      it 'shows labels' do
+      it 'shows all labels for ~' do
         note = find('#note-body')
 
-        # It should show all the labels on "~".
         type(note, '~')
-        expect_resources(shown: [backend, bug, feature_proposal])
+        wait_for_requests
 
-        # It should show all the labels on "/label ~".
+        expect_resources(shown: [backend, bug, feature_proposal])
+      end
+
+      it 'shows all labels for /label ~' do
+        note = find('#note-body')
+
         type(note, '/label ~')
-        expect_resources(shown: [backend, bug, feature_proposal])
+        wait_for_requests
 
-        # It should show all the labels on "/relabel ~".
+        expect_resources(shown: [backend, bug, feature_proposal])
+      end
+
+      it 'shows all labels for /relabel ~' do
+        note = find('#note-body')
+
         type(note, '/relabel ~')
-        expect_resources(shown: [backend, bug, feature_proposal])
+        wait_for_requests
 
-        # It should show no labels on "/unlabel ~".
+        expect_resources(shown: [backend, bug, feature_proposal])
+      end
+
+      it 'shows no labels for /unlabel ~' do
+        note = find('#note-body')
+
         type(note, '/unlabel ~')
+        wait_for_requests
+
         expect_resources(not_shown: [backend, bug, feature_proposal])
       end
     end
@@ -100,23 +115,39 @@ describe 'GFM autocomplete', :js do
         epic.labels << [backend]
       end
 
-      skip 'shows labels' do
+      it 'shows all labels for ~' do
         note = find('#note-body')
 
-        # It should show all the labels on "~".
         type(note, '~')
-        expect_resources(shown: [backend, bug, feature_proposal])
+        wait_for_requests
 
-        # It should show only unset labels on "/label ~".
+        expect_resources(shown: [backend, bug, feature_proposal])
+      end
+
+      it 'shows only unset labels for /label ~' do
+        note = find('#note-body')
+
         type(note, '/label ~')
+        wait_for_requests
+
         expect_resources(shown: [bug, feature_proposal], not_shown: [backend])
+      end
 
-        # It should show all the labels on "/relabel ~".
+      it 'shows all labels for /relabel ~' do
+        note = find('#note-body')
+
         type(note, '/relabel ~')
-        expect_resources(shown: [backend, bug, feature_proposal])
+        wait_for_requests
 
-        # It should show only set labels on "/unlabel ~".
+        expect_resources(shown: [backend, bug, feature_proposal])
+      end
+
+      it 'shows only set labels for /unlabel ~' do
+        note = find('#note-body')
+
         type(note, '/unlabel ~')
+        wait_for_requests
+
         expect_resources(shown: [backend], not_shown: [bug, feature_proposal])
       end
     end
@@ -126,23 +157,39 @@ describe 'GFM autocomplete', :js do
         epic.labels << [backend, bug, feature_proposal]
       end
 
-      skip 'shows labels' do
+      it 'shows all labels for ~' do
         note = find('#note-body')
 
-        # It should show all the labels on "~".
         type(note, '~')
-        expect_resources(shown: [backend, bug, feature_proposal])
+        wait_for_requests
 
-        # It should show no labels on "/label ~".
+        expect_resources(shown: [backend, bug, feature_proposal])
+      end
+
+      it 'shows no labels for /label ~' do
+        note = find('#note-body')
+
         type(note, '/label ~')
+        wait_for_requests
+
         expect_resources(not_shown: [backend, bug, feature_proposal])
+      end
 
-        # It should show all the labels on "/relabel ~".
+      it 'shows all labels for /relabel ~' do
+        note = find('#note-body')
+
         type(note, '/relabel ~')
-        expect_resources(shown: [backend, bug, feature_proposal])
+        wait_for_requests
 
-        # It should show all the labels on "/unlabel ~".
+        expect_resources(shown: [backend, bug, feature_proposal])
+      end
+
+      it 'shows all labels for /unlabel ~' do
+        note = find('#note-body')
+
         type(note, '/unlabel ~')
+        wait_for_requests
+
         expect_resources(shown: [backend, bug, feature_proposal])
       end
     end
