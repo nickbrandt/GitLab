@@ -233,6 +233,10 @@ export const fetchVulnerabilitiesHistory = ({ state, dispatch }, params = {}) =>
     });
 };
 
+export const setVulnerabilitiesHistoryDayRange = ({ commit }, days) => {
+  commit(types.SET_VULNERABILITIES_HISTORY_DAY_RANGE, days);
+};
+
 export const requestVulnerabilitiesHistory = ({ commit }) => {
   commit(types.REQUEST_VULNERABILITIES_HISTORY);
 };
