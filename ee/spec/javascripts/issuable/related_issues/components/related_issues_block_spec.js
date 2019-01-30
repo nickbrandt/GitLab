@@ -173,4 +173,72 @@ describe('RelatedIssuesBlock', () => {
       });
     });
   });
+
+  describe('issuableOrderingId returns correct issuable order id when', () => {
+    it('issuableType is epic', () => {
+      vm = new RelatedIssuesBlock({
+        propsData: {
+          pathIdSeparator: '#',
+          issuableType: 'issue',
+        },
+      }).$mount();
+
+      const orderId = vm.issuableOrderingId(issuable1);
+
+      expect(orderId).toBe(issuable1.epic_issue_id);
+    });
+
+    it('issuableType is issue', () => {
+      vm = new RelatedIssuesBlock({
+        propsData: {
+          pathIdSeparator: '#',
+          issuableType: 'epic',
+        },
+      }).$mount();
+
+      const orderId = vm.issuableOrderingId(issuable1);
+
+      expect(orderId).toBe(issuable1.id);
+    });
+  });
+
+  describe('renders correct ordering id when', () => {
+    let relatedIssues;
+
+    beforeAll(() => {
+      relatedIssues = [issuable1, issuable2, issuable3, issuable4, issuable5];
+    });
+
+    it('issuableType is epic', () => {
+      vm = new RelatedIssuesBlock({
+        propsData: {
+          pathIdSeparator: '#',
+          issuableType: 'epic',
+          relatedIssues,
+        },
+      }).$mount();
+
+      const listItems = vm.$el.querySelectorAll('.list-item');
+
+      Array.from(listItems).forEach((item, index) => {
+        expect(Number(item.dataset.orderingId)).toBe(relatedIssues[index].id);
+      });
+    });
+
+    it('issuableType is issue', () => {
+      vm = new RelatedIssuesBlock({
+        propsData: {
+          pathIdSeparator: '#',
+          issuableType: 'issue',
+          relatedIssues,
+        },
+      }).$mount();
+
+      const listItems = vm.$el.querySelectorAll('.list-item');
+
+      Array.from(listItems).forEach((item, index) => {
+        expect(Number(item.dataset.orderingId)).toBe(relatedIssues[index].epic_issue_id);
+      });
+    });
+  });
 });
