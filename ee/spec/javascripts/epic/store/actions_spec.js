@@ -851,4 +851,120 @@ describe('Epic Store Actions', () => {
       });
     });
   });
+
+  describe('setEpicCreateTitle', () => {
+    it('should set `state.newEpicTitle` value to the value of `newEpicTitle` param', done => {
+      const data = {
+        newEpicTitle: 'foobar',
+      };
+
+      testAction(
+        actions.setEpicCreateTitle,
+        data,
+        { newEpicTitle: '' },
+        [{ type: 'SET_EPIC_CREATE_TITLE', payload: { ...data } }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('requestEpicCreate', () => {
+    it('should set `state.epicCreateInProgress` flag to `true`', done => {
+      testAction(
+        actions.requestEpicCreate,
+        {},
+        { epicCreateInProgress: false },
+        [{ type: 'REQUEST_EPIC_CREATE' }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('requestEpicCreateFailure', () => {
+    beforeEach(() => {
+      setFixtures('<div class="flash-container"></div>');
+    });
+
+    it('should set `state.epicCreateInProgress` flag to `false`', done => {
+      testAction(
+        actions.requestEpicCreateFailure,
+        {},
+        { epicCreateInProgress: true },
+        [{ type: 'REQUEST_EPIC_CREATE_FAILURE' }],
+        [],
+        done,
+      );
+    });
+
+    it('should show flash error with message "Error creating epic."', () => {
+      actions.requestEpicCreateFailure({
+        commit: () => {},
+      });
+
+      expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
+        'Error creating epic',
+      );
+    });
+  });
+
+  describe('createEpic', () => {
+    let mock;
+    const stateCreateEpic = {
+      newEpicTitle: 'foobar',
+    };
+
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    describe('success', () => {
+      it('dispatches requestEpicCreate when request is complete', done => {
+        mock.onPost(/(.*)/).replyOnce(200, {});
+
+        testAction(
+          actions.createEpic,
+          { ...stateCreateEpic },
+          stateCreateEpic,
+          [],
+          [
+            {
+              type: 'requestEpicCreate',
+            },
+            {
+              type: 'requestEpicCreateSuccess',
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('failure', () => {
+      it('dispatches requestEpicCreate and requestEpicCreateFailure when request fails', done => {
+        mock.onPost(/(.*)/).replyOnce(500, {});
+
+        testAction(
+          actions.createEpic,
+          { ...stateCreateEpic },
+          stateCreateEpic,
+          [],
+          [
+            {
+              type: 'requestEpicCreate',
+            },
+            {
+              type: 'requestEpicCreateFailure',
+            },
+          ],
+          done,
+        );
+      });
+    });
+  });
 });

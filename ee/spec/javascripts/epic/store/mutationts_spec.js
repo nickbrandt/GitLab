@@ -275,4 +275,42 @@ describe('Epic Store Mutations', () => {
       expect(state.epicSubscriptionToggleInProgress).toBe(false);
     });
   });
+
+  describe('SET_EPIC_CREATE_TITLE', () => {
+    it('Should set `newEpicTitle` prop on state as with the value of provided `newEpicTitle` param', () => {
+      const state = {
+        newEpicTitle: '',
+      };
+
+      mutations[types.SET_EPIC_CREATE_TITLE](state, {
+        newEpicTitle: 'foobar',
+      });
+
+      expect(state.newEpicTitle).toBe('foobar');
+    });
+  });
+
+  describe('REQUEST_EPIC_CREATE', () => {
+    it('Should set `epicCreateInProgress` flag on state as `true`', () => {
+      const state = {
+        epicCreateInProgress: false,
+      };
+
+      mutations[types.REQUEST_EPIC_CREATE](state);
+
+      expect(state.epicCreateInProgress).toBe(true);
+    });
+  });
+
+  describe('REQUEST_EPIC_CREATE_FAILURE', () => {
+    it('Should set `epicCreateInProgress` flag on state as `false`', () => {
+      const state = {
+        epicCreateInProgress: true,
+      };
+
+      mutations[types.REQUEST_EPIC_CREATE_FAILURE](state);
+
+      expect(state.epicCreateInProgress).toBe(false);
+    });
+  });
 });
