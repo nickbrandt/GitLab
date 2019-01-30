@@ -158,6 +158,12 @@ describe Projects::Prometheus::Alerts::NotifyService do
 
       it_behaves_like 'no notifications'
     end
+
+    context 'with missing alerts' do
+      let(:payload) { { 'version' => '4' } }
+
+      it_behaves_like 'no notifications'
+    end
   end
 
   private

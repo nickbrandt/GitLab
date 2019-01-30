@@ -63,7 +63,7 @@ module Projects
         end
 
         def gitlab_alert_id
-          alerts.first.dig('labels', 'gitlab_alert_id')
+          alerts&.first&.dig('labels', 'gitlab_alert_id')
         end
 
         def compare_token(expected, actual)
