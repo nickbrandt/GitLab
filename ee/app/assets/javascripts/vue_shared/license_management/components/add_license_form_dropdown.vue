@@ -17,18 +17,22 @@ export default {
     },
   },
   mounted() {
-    $(this.$refs.dropdownInput)
-      .val(this.value)
-      .select2({
-        allowClear: true,
-        placeholder: this.placeholder,
-        createSearchChoice: term => ({ id: term, text: term }),
-        createSearchChoicePosition: 'bottom',
-        data: KNOWN_LICENSES.map(license => ({ id: license, text: license })),
+    import(/* webpackChunkName: 'select2' */ 'select2/select2')
+      .then(() => {
+        $(this.$refs.dropdownInput)
+          .val(this.value)
+          .select2({
+            allowClear: true,
+            placeholder: this.placeholder,
+            createSearchChoice: term => ({ id: term, text: term }),
+            createSearchChoicePosition: 'bottom',
+            data: KNOWN_LICENSES.map(license => ({ id: license, text: license })),
+          })
+          .on('change', e => {
+            this.$emit('input', e.target.value);
+          });
       })
-      .on('change', e => {
-        this.$emit('input', e.target.value);
-      });
+      .catch(() => {});
   },
   beforeDestroy() {
     $(this.$refs.dropdownInput).select2('destroy');
