@@ -16,6 +16,42 @@ describe Operations::FeatureFlag do
     it { is_expected.to validate_uniqueness_of(:name).scoped_to(:project_id) }
   end
 
+  describe 'Scope creation' do
+    subject { described_class.new(**params) }
+
+    let(:project) { create(:project) }
+
+    let(:params) do
+      { name: 'test', project: project, scopes_attributes: scopes_attributes }
+    end
+
+    let(:scopes_attributes) do
+      [{ environment_scope: '*', active: false },
+       { environment_scope: 'review/*', active: true }]
+    end
+
+    it { is_expected.to be_valid }
+
+    context 'when the first scope is not wildcard' do
+      let(:scopes_attributes) do
+        [{ environment_scope: 'review/*', active: true },
+         { environment_scope: '*', active: false }]
+      end
+
+      it { is_expected.not_to be_valid }
+    end
+
+    context 'when scope is empty' do
+      let(:scopes_attributes) { [] }
+
+      it 'creates a default scope' do
+        subject.save
+
+        expect(subject.scopes.first.environment_scope).to eq('*')
+      end
+    end
+  end
+
   describe '.enabled' do
     subject { described_class.enabled }
 
