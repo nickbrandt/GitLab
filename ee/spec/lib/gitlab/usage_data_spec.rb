@@ -3,7 +3,8 @@
 require 'spec_helper'
 
 describe Gitlab::UsageData do
-  let(:projects) { create_list(:project, 3) }
+  let(:group) { create(:group) }
+  let(:projects) { create_list(:project, 3, group: group) }
   let!(:board) { create(:board, project: projects[0]) }
 
   describe '#data' do
@@ -24,6 +25,9 @@ describe Gitlab::UsageData do
       create(:package, project: projects[1])
 
       create(:project_tracing_setting, project: projects[0])
+
+      # should be all different creators according to the spec/factories/projects.rb
+      projects.each { |p| p.creator.update!(group_view: :security_dashboard) }
     end
 
     subject { described_class.data }
@@ -89,6 +93,13 @@ describe Gitlab::UsageData do
       expect(count_data[:dependency_scanning_jobs]).to eq(1)
       expect(count_data[:license_management_jobs]).to eq(1)
       expect(count_data[:sast_jobs]).to eq(1)
+    end
+
+    it 'gathers security-related preferences usage data' do
+      expect(subject[:counts]).to include(
+        preference_group_overview_details: User.count - 3,
+        preference_group_overview_security_dashboard: 3
+      )
     end
   end
 
