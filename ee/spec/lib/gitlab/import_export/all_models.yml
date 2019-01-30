@@ -51,6 +51,7 @@ project:
 - jenkins_service
 - jenkins_deprecated_service
 - index_status
+- feature_usage
 - approval_rules
 - approvers
 - pages_domains

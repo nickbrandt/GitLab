@@ -113,6 +113,14 @@ module EE
         usage_data
       end
 
+      override :jira_usage
+      def jira_usage
+        super.merge(
+          projects_jira_dvcs_cloud_active: count(ProjectFeatureUsage.with_jira_dvcs_integration_enabled),
+          projects_jira_dvcs_server_active: count(ProjectFeatureUsage.with_jira_dvcs_integration_enabled(cloud: false))
+        )
+      end
+
       def epics_deepest_relationship_level
         { epics_deepest_relationship_level: ::Epic.deepest_relationship_level }
       end

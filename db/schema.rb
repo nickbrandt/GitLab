@@ -2215,6 +2215,14 @@ ActiveRecord::Schema.define(version: 20190124200344) do
     t.string "encrypted_token_iv"
   end
 
+  create_table "project_feature_usages", primary_key: "project_id", id: :integer, force: :cascade do |t|
+    t.datetime "jira_dvcs_cloud_last_sync_at"
+    t.datetime "jira_dvcs_server_last_sync_at"
+    t.index ["jira_dvcs_cloud_last_sync_at", "project_id"], name: "idx_proj_feat_usg_on_jira_dvcs_cloud_last_sync_at_and_proj_id", where: "(jira_dvcs_cloud_last_sync_at IS NOT NULL)", using: :btree
+    t.index ["jira_dvcs_server_last_sync_at", "project_id"], name: "idx_proj_feat_usg_on_jira_dvcs_server_last_sync_at_and_proj_id", where: "(jira_dvcs_server_last_sync_at IS NOT NULL)", using: :btree
+    t.index ["project_id"], name: "index_project_feature_usages_on_project_id", using: :btree
+  end
+
   create_table "project_features", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "merge_requests_access_level"
@@ -3462,6 +3470,7 @@ ActiveRecord::Schema.define(version: 20190124200344) do
   add_foreign_key "project_deploy_tokens", "deploy_tokens", on_delete: :cascade
   add_foreign_key "project_deploy_tokens", "projects", on_delete: :cascade
   add_foreign_key "project_error_tracking_settings", "projects", on_delete: :cascade
+  add_foreign_key "project_feature_usages", "projects", on_delete: :cascade
   add_foreign_key "project_features", "projects", name: "fk_18513d9b92", on_delete: :cascade
   add_foreign_key "project_group_links", "projects", name: "fk_daa8cee94c", on_delete: :cascade
   add_foreign_key "project_import_data", "projects", name: "fk_ffb9ee3a10", on_delete: :cascade
