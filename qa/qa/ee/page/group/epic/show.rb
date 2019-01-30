@@ -21,7 +21,7 @@ module QA
               element :remove_issue_button
             end
 
-            view 'ee/app/assets/javascripts/epics/epic_show/components/epic_header.vue' do
+            view 'ee/app/assets/javascripts/epic/components/epic_header.vue' do
               element :close_reopen_epic_button
             end
 

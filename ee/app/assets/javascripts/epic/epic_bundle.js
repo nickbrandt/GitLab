@@ -11,6 +11,11 @@ import EpicCreateApp from './components/epic_create.vue';
 
 export default (epicCreate = false) => {
   const el = document.getElementById(epicCreate ? 'epic-create-root' : 'epic-app-root');
+
+  if (!el) {
+    return false;
+  }
+
   const store = createStore();
 
   if (epicCreate) {

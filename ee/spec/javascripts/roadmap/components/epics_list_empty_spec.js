@@ -174,18 +174,15 @@ describe('EpicsListEmptyComponent', () => {
       );
     });
 
-    it('renders new epic button element', () => {
-      const newEpicBtnEl = vm.$el.querySelector('.new-epic-dropdown');
-
-      expect(newEpicBtnEl).not.toBeNull();
-      expect(newEpicBtnEl.querySelector('button.btn-success').innerText.trim()).toBe('New epic');
+    it('renders mount point for new epic button to boot via Epic app', () => {
+      expect(vm.$el.querySelector('#epic-create-root')).not.toBeNull();
     });
 
     it('does not render new epic button element when `hasFiltersApplied` prop is true', done => {
       vm.hasFiltersApplied = true;
       Vue.nextTick()
         .then(() => {
-          expect(vm.$el.querySelector('.new-epic-dropdown')).toBeNull();
+          expect(vm.$el.querySelector('.epic-create-dropdown')).toBeNull();
         })
         .then(done)
         .catch(done.fail);

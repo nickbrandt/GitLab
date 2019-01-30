@@ -4,12 +4,9 @@ import { dateInWords } from '~/lib/utils/datetime_utility';
 
 import { PRESET_TYPES, emptyStateDefault, emptyStateWithFilters } from '../constants';
 
-import NewEpic from '../../epics/new_epic/components/new_epic.vue';
+import initEpicCreate from '../../epic/epic_bundle';
 
 export default {
-  components: {
-    NewEpic,
-  },
   props: {
     presetType: {
       type: String,
@@ -93,6 +90,15 @@ export default {
       });
     },
   },
+  mounted() {
+    // If filters are not applied and yet user
+    // is seeing empty state, we need to show
+    // `New epic` button, so boot-up Epic app
+    // in create mode.
+    if (!this.hasFiltersApplied) {
+      initEpicCreate(true);
+    }
+  },
 };
 </script>
 
@@ -106,7 +112,11 @@ export default {
         <h4>{{ message }}</h4>
         <p v-html="subMessage"></p>
         <div class="text-center">
-          <new-epic v-if="!hasFiltersApplied" :endpoint="newEpicEndpoint" />
+          <div
+            v-if="!hasFiltersApplied"
+            id="epic-create-root"
+            :data-endpoint="newEpicEndpoint"
+          ></div>
           <a :title="__('List')" :href="newEpicEndpoint" class="btn btn-default">
             <span>{{ s__('View epics list') }}</span>
           </a>

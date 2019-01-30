@@ -11,10 +11,7 @@
 
 - page_card_attributes @epic.card_attributes
 
-- if cookies[:load_new_epic_app] == 'true'
-  #epic-app-root{ data: epic_show_app_data(@epic, author_icon: avatar_icon_for_user(@epic.author), initial: issuable_initial_data(@epic)) }
-- else
-  #epic-show-app{ data: epic_show_app_data(@epic, author_icon: avatar_icon_for_user(@epic.author), initial: issuable_initial_data(@epic)) }
+#epic-app-root{ data: epic_show_app_data(@epic, author_icon: avatar_icon_for_user(@epic.author), initial: issuable_initial_data(@epic)) }
 
 .content-block.emoji-block
   .row
