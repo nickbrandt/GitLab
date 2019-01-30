@@ -23,7 +23,7 @@ module EE
 
       override :show_represent_params
       def show_represent_params
-        super.merge(expanded: params[:expanded].to_a)
+        super.merge(expanded: params[:expanded].to_a.map(&:to_i))
       end
     end
   end
