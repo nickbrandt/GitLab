@@ -1,5 +1,6 @@
 <script>
 import $ from 'jquery';
+import select2 from 'select2/select2';
 import { KNOWN_LICENSES } from '../constants';
 
 export default {
@@ -17,22 +18,18 @@ export default {
     },
   },
   mounted() {
-    import(/* webpackChunkName: 'select2' */ 'select2/select2')
-      .then(() => {
-        $(this.$refs.dropdownInput)
-          .val(this.value)
-          .select2({
-            allowClear: true,
-            placeholder: this.placeholder,
-            createSearchChoice: term => ({ id: term, text: term }),
-            createSearchChoicePosition: 'bottom',
-            data: KNOWN_LICENSES.map(license => ({ id: license, text: license })),
-          })
-          .on('change', e => {
-            this.$emit('input', e.target.value);
-          });
+    $(this.$refs.dropdownInput)
+      .val(this.value)
+      .select2({
+        allowClear: true,
+        placeholder: this.placeholder,
+        createSearchChoice: term => ({ id: term, text: term }),
+        createSearchChoicePosition: 'bottom',
+        data: KNOWN_LICENSES.map(license => ({ id: license, text: license })),
       })
-      .catch(() => {});
+      .on('change', e => {
+        this.$emit('input', e.target.value);
+      });
   },
   beforeDestroy() {
     $(this.$refs.dropdownInput).select2('destroy');
