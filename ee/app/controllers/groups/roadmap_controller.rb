@@ -20,7 +20,15 @@ module Groups
     private
 
     def issuable_sorting_field
-      :epics_sort
+      :roadmaps_sort
+    end
+
+    def default_sort_value
+      sort_value_start_date_soon
+    end
+
+    def remember_sorting_key
+      @remember_sorting_key ||= "roadmap_sort"
     end
 
     def persist_roadmap_layout
