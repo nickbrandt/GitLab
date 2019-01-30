@@ -223,11 +223,19 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
   end
 
   def repository_sync_due?(scheduled_time)
-    never_synced_repository? || repository_sync_needed?(scheduled_time)
+    return true if last_repository_synced_at.nil?
+    return false unless resync_repository?
+    return false if repository_retry_at && scheduled_time < repository_retry_at
+
+    scheduled_time > last_repository_synced_at
   end
 
   def wiki_sync_due?(scheduled_time)
-    never_synced_wiki? || wiki_sync_needed?(scheduled_time)
+    return true if last_wiki_synced_at.nil?
+    return false unless resync_wiki?
+    return false if wiki_retry_at && scheduled_time < wiki_retry_at
+
+    scheduled_time > last_wiki_synced_at
   end
 
   # Returns whether repository is pending verification check
@@ -363,28 +371,6 @@ class Geo::ProjectRegistry < Geo::BaseRegistry
 
   def fetches_since_gc_redis_key
     "projects/#{project_id}/fetches_since_gc"
-  end
-
-  def never_synced_repository?
-    last_repository_synced_at.nil?
-  end
-
-  def never_synced_wiki?
-    last_wiki_synced_at.nil?
-  end
-
-  def repository_sync_needed?(timestamp)
-    return false unless resync_repository?
-    return false if repository_retry_at && timestamp < repository_retry_at
-
-    last_repository_synced_at && timestamp > last_repository_synced_at
-  end
-
-  def wiki_sync_needed?(timestamp)
-    return false unless resync_wiki?
-    return false if wiki_retry_at && timestamp < wiki_retry_at
-
-    last_wiki_synced_at && timestamp > last_wiki_synced_at
   end
 
   # How many times have we retried syncing it?

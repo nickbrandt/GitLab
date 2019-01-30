@@ -1,0 +1,5 @@
+---
+title: 'Geo: Handle repository and wiki sync separately in Geo::ProjectSyncWorker'
+merge_request: 9360
+author:
+type: changed
