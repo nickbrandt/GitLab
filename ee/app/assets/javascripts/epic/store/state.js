@@ -64,5 +64,6 @@ export default () => ({
   epicTodoToggleInProgress: false,
   epicStartDateSaveInProgress: false,
   epicDueDateSaveInProgress: false,
+  epicSubscriptionToggleInProgress: false,
   sidebarCollapsed: false,
 });

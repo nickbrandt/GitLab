@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import MockAdapter from 'axios-mock-adapter';
 
 import defaultState from 'ee/epic/store/state';
@@ -86,17 +85,12 @@ describe('Epic Store Actions', () => {
       );
     });
 
-    it('should show flash error', done => {
+    it('should show flash error', () => {
       actions.requestEpicStatusChangeFailure({ commit: () => {} });
 
-      Vue.nextTick()
-        .then(() => {
-          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
-            'Unable to update this epic at this time.',
-          );
-        })
-        .then(done)
-        .catch(done.fail);
+      expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
+        'Unable to update this epic at this time.',
+      );
     });
   });
 
@@ -290,7 +284,7 @@ describe('Epic Store Actions', () => {
       );
     });
 
-    it('Should show flash error with message "There was an error deleting the todo." when `state.todoExists` is `true`', done => {
+    it('Should show flash error with message "There was an error deleting the todo." when `state.todoExists` is `true`', () => {
       actions.requestEpicTodoToggleFailure(
         {
           commit: () => {},
@@ -299,17 +293,12 @@ describe('Epic Store Actions', () => {
         {},
       );
 
-      Vue.nextTick()
-        .then(() => {
-          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
-            'There was an error deleting the todo.',
-          );
-        })
-        .then(done)
-        .catch(done.fail);
+      expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
+        'There was an error deleting the todo.',
+      );
     });
 
-    it('Should show flash error with message "There was an error adding a todo." when `state.todoExists` is `false`', done => {
+    it('Should show flash error with message "There was an error adding a todo." when `state.todoExists` is `false`', () => {
       actions.requestEpicTodoToggleFailure(
         {
           commit: () => {},
@@ -318,14 +307,9 @@ describe('Epic Store Actions', () => {
         {},
       );
 
-      Vue.nextTick()
-        .then(() => {
-          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
-            'There was an error adding a todo.',
-          );
-        })
-        .then(done)
-        .catch(done.fail);
+      expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
+        'There was an error adding a todo.',
+      );
     });
   });
 
@@ -592,7 +576,7 @@ describe('Epic Store Actions', () => {
       );
     });
 
-    it('should show flash error with message "An error occurred while saving the start date" when called with `dateType` as `start`', done => {
+    it('should show flash error with message "An error occurred while saving the start date" when called with `dateType` as `start`', () => {
       actions.requestEpicDateSaveFailure(
         {
           commit: () => {},
@@ -600,17 +584,12 @@ describe('Epic Store Actions', () => {
         { dateType: dateTypes.start },
       );
 
-      Vue.nextTick()
-        .then(() => {
-          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
-            'An error occurred while saving the start date',
-          );
-        })
-        .then(done)
-        .catch(done.fail);
+      expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
+        'An error occurred while saving the start date',
+      );
     });
 
-    it('should show flash error with message "An error occurred while saving the due date" when called with `dateType` as `due`', done => {
+    it('should show flash error with message "An error occurred while saving the due date" when called with `dateType` as `due`', () => {
       actions.requestEpicDateSaveFailure(
         {
           commit: () => {},
@@ -618,14 +597,9 @@ describe('Epic Store Actions', () => {
         { dateType: dateTypes.due },
       );
 
-      Vue.nextTick()
-        .then(() => {
-          expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
-            'An error occurred while saving the due date',
-          );
-        })
-        .then(done)
-        .catch(done.fail);
+      expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
+        'An error occurred while saving the due date',
+      );
     });
   });
 
@@ -735,6 +709,146 @@ describe('Epic Store Actions', () => {
           due_date_fixed: '2018-1-1',
         }),
       );
+    });
+  });
+
+  describe('requestEpicSubscriptionToggle', () => {
+    it('should set `state.epicSubscriptionToggleInProgress` flag to `true`', done => {
+      testAction(
+        actions.requestEpicSubscriptionToggle,
+        {},
+        state,
+        [{ type: 'REQUEST_EPIC_SUBSCRIPTION_TOGGLE' }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('requestEpicSubscriptionToggleSuccess', () => {
+    it('should set `state.requestEpicSubscriptionToggleSuccess` flag to `false` and passes opposite of the value of `subscribed` as param', done => {
+      const stateSubscribed = {
+        subscribed: false,
+      };
+
+      testAction(
+        actions.requestEpicSubscriptionToggleSuccess,
+        { subscribed: !stateSubscribed.subscribed },
+        stateSubscribed,
+        [
+          {
+            type: 'REQUEST_EPIC_SUBSCRIPTION_TOGGLE_SUCCESS',
+            payload: { subscribed: !stateSubscribed.subscribed },
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('requestEpicSubscriptionToggleFailure', () => {
+    beforeEach(() => {
+      setFixtures('<div class="flash-container"></div>');
+    });
+
+    it('should set `state.requestEpicSubscriptionToggleFailure` flag to `false`', done => {
+      testAction(
+        actions.requestEpicSubscriptionToggleFailure,
+        {},
+        state,
+        [{ type: 'REQUEST_EPIC_SUBSCRIPTION_TOGGLE_FAILURE' }],
+        [],
+        done,
+      );
+    });
+
+    it('should show flash error with message "An error occurred while subscribing to notifications." when `state.subscribed` is `false`', () => {
+      actions.requestEpicSubscriptionToggleFailure(
+        {
+          commit: () => {},
+          state: { subscribed: false },
+        },
+        {},
+      );
+
+      expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
+        'An error occurred while subscribing to notifications.',
+      );
+    });
+
+    it('should show flash error with message "An error occurred while unsubscribing to notifications." when `state.subscribed` is `true`', () => {
+      actions.requestEpicSubscriptionToggleFailure(
+        {
+          commit: () => {},
+          state: { subscribed: true },
+        },
+        {},
+      );
+
+      expect(document.querySelector('.flash-container .flash-text').innerText.trim()).toBe(
+        'An error occurred while unsubscribing to notifications.',
+      );
+    });
+  });
+
+  describe('toggleEpicSubscription', () => {
+    let mock;
+    const stateSubscribed = {
+      subscribed: false,
+    };
+
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    describe('success', () => {
+      it('dispatches requestEpicSubscriptionToggle and requestEpicSubscriptionToggleSuccess with param `subscribed` when request is complete', done => {
+        mock.onPost(/(.*)/).replyOnce(200, {});
+
+        testAction(
+          actions.toggleEpicSubscription,
+          { subscribed: !stateSubscribed.subscribed },
+          stateSubscribed,
+          [],
+          [
+            {
+              type: 'requestEpicSubscriptionToggle',
+            },
+            {
+              type: 'requestEpicSubscriptionToggleSuccess',
+              payload: { subscribed: !stateSubscribed.subscribed },
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('failure', () => {
+      it('dispatches requestEpicSubscriptionToggle and requestEpicSubscriptionToggleFailure when request fails', done => {
+        mock.onPost(/(.*)/).replyOnce(500, {});
+
+        testAction(
+          actions.toggleEpicSubscription,
+          { subscribed: !stateSubscribed.subscribed },
+          stateSubscribed,
+          [],
+          [
+            {
+              type: 'requestEpicSubscriptionToggle',
+            },
+            {
+              type: 'requestEpicSubscriptionToggleFailure',
+            },
+          ],
+          done,
+        );
+      });
     });
   });
 });
