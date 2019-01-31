@@ -76,10 +76,14 @@ export default class EEMirrorRepos extends MirrorRepos {
   }
 
   initSelect2() {
-    $('.js-mirror-user', this.$form).select2({
-      width: 'resolve',
-      dropdownAutoWidth: true,
-    });
+    import(/* webpackChunkName: 'select2' */ 'select2/select2')
+      .then(() => {
+        $('.js-mirror-user', this.$form).select2({
+          width: 'resolve',
+          dropdownAutoWidth: true,
+        });
+      })
+      .catch(() => {});
   }
 
   registerUpdateListeners() {

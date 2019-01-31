@@ -32,29 +32,33 @@ export default function geoNodeForm() {
     onSelectiveSyncTypeChange(e, $syncByNamespaces, $syncByShards),
   );
 
-  $select2Dropdown.select2({
-    placeholder: s__('Geo|Select groups to replicate.'),
-    multiple: true,
-    initSelection($el, callback) {
-      callback($el.data('selected'));
-    },
-    ajax: {
-      url: Api.buildUrl(Api.groupsPath),
-      dataType: 'JSON',
-      quietMillis: 250,
-      data(search) {
-        return {
-          search,
-        };
-      },
-      results(data) {
-        return {
-          results: data.map(group => ({
-            id: group.id,
-            text: group.full_name,
-          })),
-        };
-      },
-    },
-  });
+  import(/* webpackChunkName: 'select2' */ 'select2/select2')
+    .then(() => {
+      $select2Dropdown.select2({
+        placeholder: s__('Geo|Select groups to replicate.'),
+        multiple: true,
+        initSelection($el, callback) {
+          callback($el.data('selected'));
+        },
+        ajax: {
+          url: Api.buildUrl(Api.groupsPath),
+          dataType: 'JSON',
+          quietMillis: 250,
+          data(search) {
+            return {
+              search,
+            };
+          },
+          results(data) {
+            return {
+              results: data.map(group => ({
+                id: group.id,
+                text: group.full_name,
+              })),
+            };
+          },
+        },
+      });
+    })
+    .catch(() => {});
 }
