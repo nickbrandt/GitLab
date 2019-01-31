@@ -41,3 +41,58 @@ Example response:
 ```
 
 By default, the `GET` request will return 20 results, since the API is [paginated](README.md#pagination).
+
+## List package files
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/9305) in GitLab 11.8.
+
+Get a list of package files of a single package. 
+
+```
+GET /projects/:id/packages/:package_id/package_files
+```
+
+| Attribute | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id`      | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user. |
+| `package_id`      | integer | yes | The ID of a package. |
+
+```bash
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/1/packages/4/package_files
+```
+
+Example response:
+
+```json
+[
+  {
+    "id": 25,
+    "package_id": 4,
+    "created_at": "2018-11-07T15:25:52.199Z",
+    "file_name": "my-app-1.5-20181107.152550-1.jar",
+    "size": 2421,
+    "file_md5": "58e6a45a629910c6ff99145a688971ac",
+    "file_sha1": "ebd193463d3915d7e22219f52740056dfd26cbfe"
+  },
+  {
+    "id": 26,
+    "package_id": 4,
+    "created_at": "2018-11-07T15:25:56.776Z",
+    "file_name": "my-app-1.5-20181107.152550-1.pom",
+    "size": 1122,
+    "file_md5": "d90f11d851e17c5513586b4a7e98f1b2",
+    "file_sha1": "9608d068fe88aff85781811a42f32d97feb440b5"
+  },
+  {
+    "id": 27,
+    "package_id": 4,
+    "created_at": "2018-11-07T15:26:00.556Z",
+    "file_name": "maven-metadata.xml",
+    "size": 767,
+    "file_md5": "6dfd0cce1203145a927fef5e3a1c650c",
+    "file_sha1": "d25932de56052d320a8ac156f745ece73f6a8cd2"
+  }
+]
+```
+
+By default, the `GET` request will return 20 results, since the API is [paginated](README.md#pagination).
