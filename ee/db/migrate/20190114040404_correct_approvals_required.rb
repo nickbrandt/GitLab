@@ -15,22 +15,21 @@ class CorrectApprovalsRequired < ActiveRecord::Migration[5.0]
 
   class ApprovalProjectRule < ActiveRecord::Base
     self.table_name = 'approval_project_rules'
+
+    has_many :approval_merge_request_rule_source
+    has_many :approval_merge_request_rules, through: :approval_merge_request_rule_source
   end
 
   def up
-    project_rule_ids = ApprovalMergeRequestRule
-      .joins(:approval_project_rule)
+    ApprovalProjectRule
+      .joins(:approval_merge_request_rules)
       .where('approval_merge_request_rules.approvals_required = 0 AND approval_project_rules.approvals_required > 0')
-      .pluck('approval_project_rules.id')
-
-    ApprovalProjectRule.where(id: project_rule_ids).find_each do |project_rule|
-      # rubocop:disable GitlabSecurity/SqlInjection
+      .find_each do |project_rule|
       # Pluck as MySQL prohibits subquery that references the table being updated
       mr_rule_ids = ApprovalMergeRequestRule
         .joins(:approval_merge_request_rule_source)
         .where("approval_merge_request_rules.approvals_required = 0 AND approval_merge_request_rule_sources.approval_project_rule_id = #{project_rule.id}")
         .pluck('approval_merge_request_rules.id')
-      # rubocop:enable GitlabSecurity/SqlInjection
 
       ApprovalMergeRequestRule.where(id: mr_rule_ids).update_all(approvals_required: project_rule.approvals_required)
     end
