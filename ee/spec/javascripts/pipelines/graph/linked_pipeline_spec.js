@@ -13,31 +13,9 @@ describe('Linked pipeline', () => {
     vm.$destroy();
   });
 
-  describe('while is loading', () => {
+  describe('rendered output', () => {
     const props = {
-      pipelineId: mockPipeline.id,
-      pipelinePath: mockPipeline.path,
-      pipelineStatus: mockPipeline.details.status,
-      projectName: mockPipeline.project.name,
-      isLoading: true,
-    };
-
-    beforeEach(() => {
-      vm = mountComponent(Component, props);
-    });
-
-    it('renders loading icon', () => {
-      expect(vm.$el.querySelector('.js-linked-pipeline-loading')).not.toBeNull();
-    });
-  });
-
-  describe('when it is not loading', () => {
-    const props = {
-      pipelineId: mockPipeline.id,
-      pipelinePath: mockPipeline.path,
-      pipelineStatus: mockPipeline.details.status,
-      projectName: mockPipeline.project.name,
-      isLoading: false,
+      pipeline: mockPipeline,
     };
 
     beforeEach(() => {
@@ -55,7 +33,7 @@ describe('Linked pipeline', () => {
     });
 
     it('should render the project name', () => {
-      expect(vm.$el.innerText).toContain(props.projectName);
+      expect(vm.$el.innerText).toContain(props.pipeline.project.name);
     });
 
     it('should render an svg within the status container', () => {
@@ -74,7 +52,7 @@ describe('Linked pipeline', () => {
     });
 
     it('should render the pipeline id', () => {
-      expect(vm.$el.innerText).toContain(`#${props.pipelineId}`);
+      expect(vm.$el.innerText).toContain(`#${props.pipeline.id}`);
     });
 
     it('should correctly compute the tooltip text', () => {
@@ -93,11 +71,7 @@ describe('Linked pipeline', () => {
 
   describe('on click', () => {
     const props = {
-      pipelineId: mockPipeline.id,
-      pipelinePath: mockPipeline.path,
-      pipelineStatus: mockPipeline.details.status,
-      projectName: mockPipeline.project.name,
-      isLoading: false,
+      pipeline: mockPipeline,
     };
 
     beforeEach(() => {
@@ -115,10 +89,10 @@ describe('Linked pipeline', () => {
       spyOn(vm.$root, '$emit');
       vm.$el.querySelector('button').click();
 
-      expect(vm.$root.$emit).toHaveBeenCalledWith(
+      expect(vm.$root.$emit.calls.argsFor(0)).toEqual([
         'bv::hide::tooltip',
-        `js-linked-pipeline-${props.pipelineId}`,
-      );
+        'js-linked-pipeline-132',
+      ]);
     });
   });
 });

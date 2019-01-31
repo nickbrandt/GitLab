@@ -685,12 +685,6 @@ msgstr ""
 msgid "An error occured while fetching the releases. Please try again."
 msgstr ""
 
-msgid "An error occured while fetching this downstream pipeline. Please try again"
-msgstr ""
-
-msgid "An error occured while fetching this upstream pipeline. Please try again"
-msgstr ""
-
 msgid "An error occurred adding a draft to the discussion."
 msgstr ""
 

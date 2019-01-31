@@ -1,17 +1,19 @@
 <script>
 import _ from 'underscore';
 import { GlLoadingIcon } from '@gitlab/ui';
-import LinkedPipelinesColumn from 'ee/pipelines/components/graph/linked_pipelines_column.vue';
-import EEGraphMixin from 'ee/pipelines/mixins/graph_component_mixin';
 import StageColumnComponent from '~/pipelines/components/graph/stage_column_component.vue';
+import GraphMixin from '~/pipelines/mixins/graph_component_mixin';
+import LinkedPipelinesColumn from 'ee/pipelines/components/graph/linked_pipelines_column.vue';
+import GraphEEMixin from 'ee/pipelines/mixins/graph_pipeline_bundle_mixin';
 
 export default {
+  name: 'PipelineGraph',
   components: {
-    LinkedPipelinesColumn,
     StageColumnComponent,
     GlLoadingIcon,
+    LinkedPipelinesColumn,
   },
-  mixins: [EEGraphMixin],
+  mixins: [GraphMixin, GraphEEMixin],
   props: {
     isLoading: {
       type: Boolean,
@@ -21,35 +23,72 @@ export default {
       type: Object,
       required: true,
     },
+    isLinkedPipeline: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    mediator: {
+      type: Object,
+      required: true,
+    },
+    type: {
+      type: String,
+      required: false,
+      default: 'main',
+    },
+  },
+  upstream: 'upstream',
+  downstream: 'downstream',
+  data() {
+    return {
+      triggeredTopIndex: 1,
+    };
   },
   computed: {
-    graph() {
-      return this.pipeline.details && this.pipeline.details.stages;
+    hasTriggeredBy() {
+      return (
+        this.type !== this.$options.downstream &&
+        this.triggeredByPipelines &&
+        this.pipeline.triggered_by !== null
+      );
+    },
+    triggeredByPipelines() {
+      return this.pipeline.triggered_by;
+    },
+    hasTriggered() {
+      return (
+        this.type !== this.$options.upstream &&
+        this.triggeredPipelines &&
+        this.pipeline.triggered.length > 0
+      );
+    },
+    triggeredPipelines() {
+      return this.pipeline.triggered;
+    },
+    expandedTriggeredBy() {
+      return (
+        this.pipeline.triggered_by &&
+        _.isArray(this.pipeline.triggered_by) &&
+        this.pipeline.triggered_by.find(el => el.isExpanded)
+      );
+    },
+    expandedTriggered() {
+      return this.pipeline.triggered && this.pipeline.triggered.find(el => el.isExpanded);
+    },
+
+    /**
+     * Calculates the margin top of the clicked downstream pipeline by
+     * adding the height of each linked pipeline and the margin
+     */
+    marginTop() {
+      return `${this.triggeredTopIndex * 52}px`;
     },
   },
   methods: {
-    capitalizeStageName(name) {
-      const escapedName = _.escape(name);
-      return escapedName.charAt(0).toUpperCase() + escapedName.slice(1);
-    },
-    isFirstColumn(index) {
-      return index === 0;
-    },
-    stageConnectorClass(index, stage) {
-      let className;
-
-      // If it's the first stage column and only has one job
-      if (index === 0 && stage.groups.length === 1) {
-        className = 'no-margin';
-      } else if (index > 0) {
-        // If it is not the first column
-        className = 'left-margin';
-      }
-
-      return className;
-    },
-    refreshPipelineGraph() {
-      this.$emit('refreshPipelineGraph');
+    handleClickedDownstream(pipeline, clickedIndex) {
+      this.triggeredTopIndex = clickedIndex;
+      this.$emit('onClickTriggered', this.pipeline, pipeline);
     },
     hasOnlyOneJob(stage) {
       return stage.groups.length === 1;
@@ -59,30 +98,35 @@ export default {
 </script>
 <template>
   <div class="build-content middle-block js-pipeline-graph">
-    <div class="pipeline-visualization pipeline-graph pipeline-tab-content">
-      <div class="text-center"><gl-loading-icon v-if="isLoading" :size="3" /></div>
+    <div
+      class="pipeline-visualization pipeline-graph"
+      :class="{ 'pipeline-tab-content': !isLinkedPipeline }"
+    >
+      <div v-if="isLoading" class="m-auto"><gl-loading-icon :size="3" /></div>
 
-      <ul v-if="shouldRenderTriggeredByPipeline" class="d-inline-block upstream-pipeline align-top">
-        <stage-column-component
-          v-for="(stage, indexUpstream) in triggeredByGraph"
-          :key="stage.name"
-          :class="{
-            'has-only-one-job': hasOnlyOneJob(stage),
-          }"
-          :title="capitalizeStageName(stage.name)"
-          :groups="stage.groups"
-          :stage-connector-class="stageConnectorClass(indexUpstream, stage)"
-          :is-first-column="isFirstColumn(indexUpstream)"
-          @refreshPipelineGraph="refreshTriggeredByPipelineGraph"
-        />
-      </ul>
+      <pipeline-graph
+        v-if="type !== $options.downstream && expandedTriggeredBy"
+        type="upstream"
+        class="d-inline-block upstream-pipeline"
+        :class="`js-upstream-pipeline-${expandedTriggeredBy.id}`"
+        :is-loading="false"
+        :pipeline="expandedTriggeredBy"
+        :is-linked-pipeline="true"
+        :mediator="mediator"
+        @onClickTriggeredBy="
+          (parentPipeline, pipeline) => clickTriggeredByPipeline(parentPipeline, pipeline)
+        "
+        @refreshPipelineGraph="requestRefreshPipelineGraph"
+      />
 
       <linked-pipelines-column
         v-if="hasTriggeredBy"
         :linked-pipelines="triggeredByPipelines"
         :column-title="__('Upstream')"
         graph-position="left"
-        @linkedPipelineClick="pipeline => $emit('onClickTriggeredBy', pipeline)"
+        @linkedPipelineClick="
+          linkedPipeline => $emit('onClickTriggeredBy', pipeline, linkedPipeline)
+        "
       />
 
       <ul
@@ -117,24 +161,21 @@ export default {
         @linkedPipelineClick="handleClickedDownstream"
       />
 
-      <ul
-        v-if="shouldRenderTriggeredPipeline"
-        class="d-inline-block downstream-pipeline position-relative align-top"
+      <pipeline-graph
+        v-if="type !== $options.upstream && expandedTriggered"
+        type="downstream"
+        class="d-inline-block"
+        :class="`js-downstream-pipeline-${expandedTriggered.id}`"
+        :is-loading="false"
+        :pipeline="expandedTriggered"
+        :is-linked-pipeline="true"
         :style="{ 'margin-top': marginTop }"
-      >
-        <stage-column-component
-          v-for="(stage, indexDownstream) in triggeredGraph"
-          :key="stage.name"
-          :class="{
-            'has-only-one-job': hasOnlyOneJob(stage),
-          }"
-          :title="capitalizeStageName(stage.name)"
-          :groups="stage.groups"
-          :stage-connector-class="stageConnectorClass(indexDownstream, stage)"
-          :is-first-column="isFirstColumn(indexDownstream)"
-          @refreshPipelineGraph="refreshTriggeredPipelineGraph"
-        />
-      </ul>
+        :mediator="mediator"
+        @onClickTriggered="
+          (parentPipeline, pipeline) => clickTriggeredPipeline(parentPipeline, pipeline)
+        "
+        @refreshPipelineGraph="requestRefreshPipelineGraph"
+      />
     </div>
   </div>
 </template>

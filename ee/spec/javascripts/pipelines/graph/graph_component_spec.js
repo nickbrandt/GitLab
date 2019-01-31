@@ -1,16 +1,17 @@
 import Vue from 'vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import PipelineStore from 'ee/pipelines/stores/pipeline_store';
 import graphComponent from 'ee/pipelines/components/graph/graph_component.vue';
-import pipelineJSON from 'spec/pipelines/graph/mock_data';
-import linkedPipelineJSON from 'ee_spec/pipelines/graph/linked_pipelines_mock_data';
-
-const graphJSON = Object.assign(pipelineJSON, {
-  triggered: linkedPipelineJSON.triggered,
-  triggered_by: linkedPipelineJSON.triggered_by,
-});
+import linkedPipelineJSON from 'ee_spec/pipelines/linked_pipelines_mock.json';
+import PipelinesMediator from '~/pipelines/pipeline_details_mediator';
+import graphJSON from 'spec/pipelines/graph/mock_data';
 
 describe('graph component', () => {
   const GraphComponent = Vue.extend(graphComponent);
+  const store = new PipelineStore();
+  store.storePipeline(linkedPipelineJSON);
+  const mediator = new PipelinesMediator({ endpoint: '' });
+
   let component;
 
   afterEach(() => {
@@ -22,6 +23,7 @@ describe('graph component', () => {
       component = mountComponent(GraphComponent, {
         isLoading: true,
         pipeline: {},
+        mediator,
       });
 
       expect(component.$el.querySelector('.loading-icon')).toBeDefined();
@@ -32,9 +34,8 @@ describe('graph component', () => {
     beforeEach(() => {
       component = mountComponent(GraphComponent, {
         isLoading: false,
-        pipeline: graphJSON,
-        triggeredByPipelines: [linkedPipelineJSON.triggered_by],
-        triggeredPipelines: linkedPipelineJSON.triggered,
+        pipeline: store.state.pipeline,
+        mediator,
       });
     });
 
@@ -95,6 +96,14 @@ describe('graph component', () => {
     });
 
     describe('linked pipelines components', () => {
+      beforeEach(() => {
+        component = mountComponent(GraphComponent, {
+          isLoading: false,
+          pipeline: store.state.pipeline,
+          mediator,
+        });
+      });
+
       it('should render an upstream pipelines column', () => {
         expect(component.$el.querySelector('.linked-pipelines-column')).not.toBeNull();
         expect(component.$el.innerHTML).toContain('Upstream');
@@ -106,57 +115,63 @@ describe('graph component', () => {
       });
 
       describe('triggered by', () => {
-        it('should emit `onClickTriggeredBy` when triggered by linked pipeline is clicked', () => {
-          spyOn(component, '$emit');
-          component.$el.querySelector('#js-linked-pipeline-129').click();
+        describe('on click', () => {
+          it('should emit `onClickTriggeredBy` when triggered by linked pipeline is clicked', () => {
+            spyOn(component, '$emit');
 
-          expect(component.$emit).toHaveBeenCalledWith(
-            'onClickTriggeredBy',
-            linkedPipelineJSON.triggered_by,
-          );
+            component.$el.querySelector('#js-linked-pipeline-12').click();
+
+            expect(component.$emit).toHaveBeenCalledWith(
+              'onClickTriggeredBy',
+              component.pipeline,
+              component.pipeline.triggered_by[0],
+            );
+          });
         });
 
-        describe('with expanded triggered by pipeline', () => {
-          it('should render expanded upstream pipeline', () => {
+        describe('with expanded pipeline', () => {
+          it('should render expanded pipeline', () => {
+            // expand the pipeline
+            store.state.pipeline.triggered_by[0].isExpanded = true;
+
             component = mountComponent(GraphComponent, {
               isLoading: false,
-              pipeline: graphJSON,
-              triggeredByPipelines: [
-                Object.assign({}, linkedPipelineJSON.triggered_by, { isExpanded: true }),
-              ],
-              triggeredPipelines: linkedPipelineJSON.triggered,
-              triggeredBy: linkedPipelineJSON.triggered_by,
+              pipeline: store.state.pipeline,
+              mediator,
             });
 
-            expect(component.$el.querySelector('.upstream-pipeline')).not.toBeNull();
+            expect(component.$el.querySelector('.js-upstream-pipeline-12')).not.toBeNull();
           });
         });
       });
 
-      describe('triggered ', () => {
-        it('should emit `onClickTriggered` when triggered linked pipeline is clicked', () => {
-          spyOn(component, '$emit');
-          component.$el.querySelector('#js-linked-pipeline-132').click();
+      describe('triggered', () => {
+        describe('on click', () => {
+          it('should emit `onClickTriggered`', () => {
+            spyOn(component, '$emit');
 
-          expect(component.$emit).toHaveBeenCalledWith(
-            'onClickTriggered',
-            linkedPipelineJSON.triggered[0],
-          );
+            component.$el.querySelector('#js-linked-pipeline-34993051').click();
+
+            expect(component.$emit).toHaveBeenCalledWith(
+              'onClickTriggered',
+              component.pipeline,
+              component.pipeline.triggered[0],
+            );
+          });
         });
 
-        describe('with expanded triggered pipeline', () => {
-          it('should render expanded downstream pipeline', () => {
+        describe('with expanded pipeline', () => {
+          it('should render expanded pipeline', () => {
+            // expand the pipeline
+            store.state.pipeline.triggered[0].isExpanded = true;
+
             component = mountComponent(GraphComponent, {
               isLoading: false,
-              pipeline: graphJSON,
-              triggeredByPipelines: [linkedPipelineJSON.triggered_by],
-              triggeredPipelines: [
-                Object.assign({}, linkedPipelineJSON.triggered[0], { isExpanded: true }),
-              ],
-              triggered: linkedPipelineJSON.triggered[0],
+              pipeline: store.state.pipeline,
+              mediator,
             });
 
-            expect(component.$el.querySelector('.downstream-pipeline')).not.toBeNull();
+            expect(component.$el.querySelector('.js-downstream-pipeline-34993051')).not.toBeNull();
           });
         });
       });
@@ -165,10 +180,11 @@ describe('graph component', () => {
 
   describe('when linked pipelines are not present', () => {
     beforeEach(() => {
-      const pipeline = Object.assign(graphJSON, { triggered: null, triggered_by: null });
+      const pipeline = Object.assign(linkedPipelineJSON, { triggered: null, triggered_by: null });
       component = mountComponent(GraphComponent, {
         isLoading: false,
         pipeline,
+        mediator,
       });
     });
 
@@ -200,6 +216,7 @@ describe('graph component', () => {
       component = mountComponent(GraphComponent, {
         isLoading: false,
         pipeline: graphJSON,
+        mediator,
       });
 
       expect(
