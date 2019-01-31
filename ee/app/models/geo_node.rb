@@ -21,6 +21,7 @@ class GeoNode < ActiveRecord::Base
   validate :check_url_is_valid
 
   validates :primary, uniqueness: { message: 'node already exists' }, if: :primary
+  validates :enabled, if: :primary, acceptance: { message: 'Geo primary node cannot be disabled' }
 
   validates :access_key, presence: true
   validates :encrypted_secret_access_key, presence: true
