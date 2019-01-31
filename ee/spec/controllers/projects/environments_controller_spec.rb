@@ -41,7 +41,7 @@ describe Projects::EnvironmentsController do
         before do
           stub_licensed_features(deploy_board: true)
 
-          get :index, params: environment_params(format: :json, scope: :available)
+          get :index, params: environment_params(format: :json, nested: true, scope: :available)
         end
 
         it 'responds with matching schema' do
@@ -63,7 +63,7 @@ describe Projects::EnvironmentsController do
         before do
           stub_licensed_features(deploy_board: false)
 
-          get :index, params: environment_params(format: :json)
+          get :index, params: environment_params(format: :json, nested: true)
         end
 
         it 'does not return the rollout_status_path attribute' do
