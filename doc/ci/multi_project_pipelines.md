@@ -78,7 +78,7 @@ downstream project (`my/deployment` in this case). If a downstream project can
 not be found, or a user does not have access rights to create pipeline there,
 the `staging` job is going to be marked as _failed_.
 
-NOTE: **Note:**
+Caution: **Caution:**
 `staging` will succeed as soon as a downstream pipeline gets created.
 GitLab does not support status attribution yet, however adding first-class
 `trigger` configuration syntax is a ground work for implementing
