@@ -1,5 +1,6 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
+import { GlButton } from '@gitlab/ui';
 
 import { __ } from '~/locale';
 
@@ -18,6 +19,7 @@ export default {
   },
   components: {
     Icon,
+    GlButton,
     LoadingButton,
     UserAvatarLink,
     TimeagoTooltip,
@@ -104,14 +106,15 @@ export default {
         @click="toggleEpicStatus(isEpicOpen)"
       />
     </div>
-    <button
+    <gl-button
       :aria-label="__('Toggle sidebar')"
-      class="btn btn-default float-right d-block d-sm-none
+      variant="secondary"
+      class="float-right d-block d-sm-none
 gutter-toggle issuable-gutter-toggle js-sidebar-toggle"
       type="button"
       @click="toggleSidebar({ sidebarCollapsed })"
     >
       <i class="fa fa-angle-double-left"></i>
-    </button>
+    </gl-button>
   </div>
 </template>
