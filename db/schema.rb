@@ -214,6 +214,7 @@ ActiveRecord::Schema.define(version: 20190131122559) do
     t.string "commit_email_hostname"
     t.boolean "protected_ci_variables", default: false, null: false
     t.string "runners_registration_token_encrypted"
+    t.integer "local_markdown_version", default: 0, null: false
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id", using: :btree
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id", using: :btree
     t.index ["usage_stats_set_by_user_id"], name: "index_application_settings_on_usage_stats_set_by_user_id", using: :btree
