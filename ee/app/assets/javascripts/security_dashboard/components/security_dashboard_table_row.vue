@@ -66,21 +66,21 @@ export default {
       <div class="table-mobile-content"><severity-badge :severity="severity" /></div>
     </div>
 
-    <div class="table-section section-60">
+    <div class="table-section flex-grow-1">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Vulnerability') }}</div>
-      <div class="table-mobile-content">
+      <div class="table-mobile-content vulnerability-info">
         <gl-skeleton-loading v-if="isLoading" class="mt-2 js-skeleton-loader" :lines="2" />
-        <div v-else>
+        <template v-else>
           <gl-button
-            class="btn js-vulnerability-info"
+            class="vulnerability-title d-inline"
             variant="blank"
             @click="openModal({ vulnerability })"
             >{{ vulnerability.name }}</gl-button
           >
-          <span v-show="isDismissed" class="prepend-left-8 vertical-align-middle">DISMISSED</span>
+          <span v-show="isDismissed" class="vertical-align-middle">DISMISSED</span>
           <vulnerability-issue-link
             v-if="hasIssue"
-            class="prepend-left-8"
+            class="text-nowrap"
             :issue="vulnerability.issue_feedback"
             :project-name="vulnerability.project.name"
           />
@@ -88,18 +88,18 @@ export default {
           <span v-if="projectFullName" class="vulnerability-namespace">
             {{ projectFullName }}
           </span>
-        </div>
+        </template>
       </div>
     </div>
 
-    <div class="table-section section-10">
+    <div class="table-section section-10 ml-md-2">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Confidence') }}</div>
       <div class="table-mobile-content text-capitalize">{{ confidence }}</div>
     </div>
 
     <div class="table-section section-20">
       <div class="table-mobile-header" role="rowheader">{{ s__('Reports|Actions') }}</div>
-      <div class="table-mobile-content action-buttons">
+      <div class="table-mobile-content action-buttons d-flex justify-content-end">
         <vulnerability-action-buttons
           :vulnerability="vulnerability"
           :can-create-issue="canCreateIssue"
@@ -113,6 +113,10 @@ export default {
 
 <style scoped>
 @media (min-width: 768px) {
+  .vulnerabilities-row:last-child {
+    border-bottom: 1px solid transparent;
+  }
+
   .vulnerabilities-row:hover,
   .vulnerabilities-row:focus {
     background: #f6fafd;
@@ -123,8 +127,6 @@ export default {
 
   .vulnerabilities-row .action-buttons {
     opacity: 0;
-    padding-right: 1em;
-    text-align: right;
   }
 
   .vulnerabilities-row:hover .action-buttons,
@@ -133,8 +135,14 @@ export default {
   }
 }
 
-.vulnerabilities-row .table-section {
+.vulnerability-info {
   white-space: normal;
+}
+
+.vulnerability-title {
+  text-align: inherit;
+  white-space: normal;
+  line-height: inherit;
 }
 
 .vulnerability-namespace {
