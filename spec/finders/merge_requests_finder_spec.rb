@@ -74,8 +74,9 @@ describe MergeRequestsFinder do
       expect(merge_requests.size).to eq(2)
     end
 
-    it 'filters by group' do
-      params = { group_id: group.id }
+    context 'filtering by group' do
+      it 'includes all merge requests when user has access' do
+        params = { group_id: group.id }
 
         merge_requests = described_class.new(user, params).execute
 
