@@ -29,6 +29,7 @@ describe IssuablesHelper do
         markdownDocsPath: '/help/user/markdown',
         markdownVersion: CacheMarkdownField::CACHE_COMMONMARK_VERSION,
         issuableTemplates: nil,
+        lockVersion: epic.lock_version,
         groupPath: @group.path,
         initialTitleHtml: epic.title,
         initialTitleText: epic.title,
