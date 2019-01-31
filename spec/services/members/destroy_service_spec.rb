@@ -51,11 +51,15 @@ describe Members::DestroyService do
 
       expect(member_user.assigned_open_merge_requests_count).to be(1)
       expect(member_user.assigned_open_issues_count).to be(1)
+      expect(member_user.todos_pending_count).to be(1)
+      expect(member_user.todos_done_count).to be(1)
 
       described_class.new(current_user).execute(member, opts)
 
       expect(member_user.assigned_open_merge_requests_count).to be(0)
       expect(member_user.assigned_open_issues_count).to be(0)
+      expect(member_user.todos_pending_count).to be(0)
+      expect(member_user.todos_done_count).to be(0)
     end
   end
 
