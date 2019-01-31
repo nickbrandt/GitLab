@@ -1,5 +1,29 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.7.2 (2019-01-29)
+
+### Security (6 changes)
+
+- Avoid leaking unauthorized approver group members. !766
+- Sanitize user full name to clean up any URL to prevent mail clients from auto-linking URLs. !791
+- Check access rights when creating/updating ProtectedRefs.
+- Fix locked file visibility issue for private repositories.
+- Filter out non-project member approvers.
+- Remove HTTP POST in JIRA OAuth access_token endpoint.
+
+
+## 11.7.1 (2019-01-28)
+
+### Security (6 changes)
+
+- Avoid leaking unauthorized approver group members. !766
+- Sanitize user full name to clean up any URL to prevent mail clients from auto-linking URLs. !791
+- Check access rights when creating/updating ProtectedRefs.
+- Fix locked file visibility issue for private repositories.
+- Filter out non-project member approvers.
+- Remove HTTP POST in JIRA OAuth access_token endpoint.
+
+
 ## 11.7.0 (2019-01-22)
 
 ### Security (1 change)
@@ -85,6 +109,10 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Pass issuable-type in AddIssuableForm. !9111
 - Gather deepest epic relationship data.
 
+
+## 11.6.8 (2019-01-30)
+
+- No changes.
 
 ## 11.6.5 (2019-01-17)
 
@@ -220,6 +248,18 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Add count of projects with at least one package to a usage ping data. !8641
 - Added recommendations for handling deleted documents in Elasticsearch.
 - Use new information-o icon for Security Dashboard.
+
+
+## 11.5.8 (2019-01-28)
+
+### Security (6 changes)
+
+- Avoid leaking unauthorized approver group members. !766
+- Sanitize user full name to clean up any URL to prevent mail clients from auto-linking URLs. !793
+- Check access rights when creating/updating ProtectedRefs.
+- Fix locked file visibility issue for private repositories.
+- Filter out non-project member approvers.
+- Remove HTTP POST in JIRA OAuth access_token endpoint.
 
 
 ## 11.5.5 (2018-12-20)

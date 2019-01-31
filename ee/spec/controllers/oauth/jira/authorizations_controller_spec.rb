@@ -30,15 +30,9 @@ describe Oauth::Jira::AuthorizationsController do
   end
 
   describe 'POST access_token' do
-    it 'send post call to oauth_token_url with correct params' do
-      expected_auth_params = { 'code' => 'code-123',
-                               'client_id' => 'client-123',
-                               'client_secret' => 'secret-123',
-                               'grant_type' => 'authorization_code',
-                               'redirect_uri' => 'http://test.host/login/oauth/callback' }
-
-      expect(Gitlab::HTTP).to receive(:post).with(oauth_token_url, allow_local_requests: true, body: ActionController::Parameters.new(expected_auth_params)) do
-        { 'access_token' => 'fake-123', 'scope' => 'foo', 'token_type' => 'bar' }
+    it 'returns oauth params in a format JIRA expects' do
+      expect_any_instance_of(Doorkeeper::Request::AuthorizationCode).to receive(:authorize) do
+        double(body: { 'access_token' => 'fake-123', 'scope' => 'foo', 'token_type' => 'bar' })
       end
 
       post :access_token, params: { code: 'code-123', client_id: 'client-123', client_secret: 'secret-123' }

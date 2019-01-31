@@ -9,6 +9,7 @@ merge_requests:
 - approval_rules
 - approvals
 - approvers
+- approver_users
 - approver_groups
 - approved_by_users
 - draft_notes
@@ -54,6 +55,7 @@ project:
 - feature_usage
 - approval_rules
 - approvers
+- approver_users
 - pages_domains
 - audit_events
 - path_locks

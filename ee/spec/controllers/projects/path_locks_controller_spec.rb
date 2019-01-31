@@ -1,18 +1,33 @@
 require 'rails_helper'
 
-describe Projects::PathLocksController, type: :request do
-  let(:project) { create(:project, :repository) }
+describe Projects::PathLocksController do
+  let(:project) { create(:project, :repository, :public) }
   let(:user)    { project.owner }
-  let(:viewer)  { user }
   let(:file_path) { 'files/lfs/lfs_object.iso' }
-  let(:blob_object) { project.repository.blob_at_branch('lfs', file_path) }
-  let!(:lfs_object) { create(:lfs_object, oid: blob_object.lfs_oid) }
-  let!(:lfs_objects_project) { create(:lfs_objects_project, project: project, lfs_object: lfs_object) }
 
   before do
-    login_as(viewer)
+    sign_in(user)
 
     allow_any_instance_of(Repository).to receive(:root_ref).and_return('lfs')
+  end
+
+  describe 'GET #index' do
+    it 'displays the lock paths' do
+      get :index, params: { namespace_id: project.namespace, project_id: project }
+
+      expect(response).to have_gitlab_http_status(200)
+    end
+
+    context 'when the user does not have access' do
+      let(:project) { create(:project, :repository, :public, :repository_private) }
+      let(:user) { create(:user) }
+
+      it 'does not allow access' do
+        get :index, params: { namespace_id: project.namespace, project_id: project }
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
   end
 
   describe 'POST #toggle' do
@@ -110,9 +125,20 @@ describe Projects::PathLocksController, type: :request do
         expect(response).to have_gitlab_http_status(200)
       end
     end
+
+    context 'when the user does not have access' do
+      let(:project) { create(:project, :repository, :public, :repository_private) }
+      let(:user) { create(:user) }
+
+      it 'does not allow access' do
+        toggle_lock(file_path)
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+    end
   end
 
   def toggle_lock(path)
-    post toggle_project_path_locks_path(project), params: { path: path }
+    post :toggle, params: { namespace_id: project.namespace, project_id: project, path: path }
   end
 end

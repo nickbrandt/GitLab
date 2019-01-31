@@ -2,8 +2,6 @@
 
 module Notes
   class BuildService < ::BaseService
-    prepend ::EE::Notes::BuildService # rubocop: disable Cop/InjectEnterpriseEditionModule
-
     def execute
       should_resolve = false
       in_reply_to_discussion_id = params.delete(:in_reply_to_discussion_id)
