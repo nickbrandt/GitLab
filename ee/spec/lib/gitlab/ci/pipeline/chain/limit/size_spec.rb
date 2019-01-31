@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe EE::Gitlab::Ci::Pipeline::Chain::Limit::Size do
+describe ::Gitlab::Ci::Pipeline::Chain::Limit::Size do
   set(:namespace) { create(:namespace) }
   set(:project) { create(:project, :repository, namespace: namespace) }
   set(:user) { create(:user) }
