@@ -77,6 +77,7 @@ A job is defined by a list of parameters that define the job behavior.
 | [coverage](#coverage)                            | no       | Define code coverage settings for a given job |
 | [retry](#retry)                                  | no       | Define when and how many times a job can be auto-retried in case of a failure |
 | [parallel](#parallel)                            | no       | Defines how many instances of a job should be run in parallel |
+| [trigger](#trigger)                              | no       | Defines a downstream pipeline trigger |
 
 ## `image` and `services`
 
@@ -1528,6 +1529,44 @@ A simple example:
 test:
   script: rspec
   parallel: 5
+```
+
+## `trigger`
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/8997) in GitLab 11.8.
+
+`trigger` allows you to define downstream pipeline trigger. When a job created
+from `trigger` definition is started by GitLab, a downstream pipeline gets
+created.
+
+Learm more about that from documentation about [multi-project pipelines](../multi_project_pipelines.html#creating-cross-project-pipeline-from-gitlab-ci-yml).
+
+Example:
+
+### Simple `trigger` syntax
+
+```yaml
+rspec:
+  stage: test
+  script: bundle exec rspec
+
+staging:
+  stage: deploy
+  trigger: my/deployment
+```
+
+### Complex `trigger` syntax
+
+```yaml
+rspec:
+  stage: test
+  script: bundle exec rspec
+
+staging:
+  stage: deploy
+  trigger:
+    project: my/deployment
+    branch: stable
 ```
 
 ## `include`
