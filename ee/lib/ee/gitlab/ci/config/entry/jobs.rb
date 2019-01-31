@@ -25,7 +25,7 @@ module EE
             end
 
             def cross_project_triggers_enabled?
-              ::Feature.enabled?(:cross_project_pipeline_triggers, default_enabled: false)
+              ::Feature.enabled?(:cross_project_pipeline_triggers, default_enabled: true)
             end
           end
         end
