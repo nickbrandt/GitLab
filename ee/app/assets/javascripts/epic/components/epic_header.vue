@@ -24,6 +24,7 @@ export default {
   },
   computed: {
     ...mapState([
+      'sidebarCollapsed',
       'epicDeleteInProgress',
       'epicStatusChangeInProgress',
       'author',
@@ -64,7 +65,7 @@ export default {
     });
   },
   methods: {
-    ...mapActions(['requestEpicStatusChangeSuccess', 'toggleEpicStatus']),
+    ...mapActions(['toggleSidebar', 'requestEpicStatusChangeSuccess', 'toggleEpicStatus']),
   },
 };
 </script>
@@ -103,5 +104,14 @@ export default {
         @click="toggleEpicStatus(isEpicOpen)"
       />
     </div>
+    <button
+      :aria-label="__('Toggle sidebar')"
+      class="btn btn-default float-right d-block d-sm-none
+gutter-toggle issuable-gutter-toggle js-sidebar-toggle"
+      type="button"
+      @click="toggleSidebar({ sidebarCollapsed })"
+    >
+      <i class="fa fa-angle-double-left"></i>
+    </button>
   </div>
 </template>

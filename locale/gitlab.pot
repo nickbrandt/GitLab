@@ -3518,9 +3518,6 @@ msgstr ""
 msgid "Epic"
 msgstr ""
 
-msgid "Epic will be removed! Are you sure?"
-msgstr ""
-
 msgid "Epics"
 msgstr ""
 
@@ -3528,9 +3525,6 @@ msgid "Epics Roadmap"
 msgstr ""
 
 msgid "Epics let you manage your portfolio of projects more efficiently and with less effort"
-msgstr ""
-
-msgid "Epics|An error occurred while saving %{epicDateType} date"
 msgstr ""
 
 msgid "Epics|An error occurred while saving the %{epicDateType} date"
@@ -11431,9 +11425,6 @@ msgid "this document"
 msgstr ""
 
 msgid "to help your contributors communicate effectively!"
-msgstr ""
-
-msgid "toggle collapse"
 msgstr ""
 
 msgid "triggered"
