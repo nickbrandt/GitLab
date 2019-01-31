@@ -3,8 +3,11 @@
 require 'spec_helper'
 
 describe Gitlab::UsageData do
-  let(:group) { create(:group) }
-  let(:projects) { create_list(:project, 3, group: group) }
+  before do
+    projects.last.creator.block
+  end
+
+  let(:projects) { Array.new(3) { create(:project, creator: create(:user, group_view: :security_dashboard)) } }
   let!(:board) { create(:board, project: projects[0]) }
 
   describe '#data' do
@@ -25,9 +28,6 @@ describe Gitlab::UsageData do
       create(:package, project: projects[1])
 
       create(:project_tracing_setting, project: projects[0])
-
-      # should be all different creators according to the spec/factories/projects.rb
-      projects.each { |p| p.creator.update!(group_view: :security_dashboard) }
     end
 
     subject { described_class.data }
@@ -96,9 +96,9 @@ describe Gitlab::UsageData do
     end
 
     it 'gathers security-related preferences usage data' do
-      expect(subject[:counts]).to include(
-        preference_group_overview_details: User.count - 3,
-        preference_group_overview_security_dashboard: 3
+      expect(subject[:counts][:user_preferences]).to include(
+        group_overview_details: User.active.count - 2, # we have exactly 2 active users with security dashboard set
+        group_overview_security_dashboard: 2
       )
     end
   end

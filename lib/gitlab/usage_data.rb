@@ -95,7 +95,7 @@ module Gitlab
           }
           .merge(services_usage)
           .merge(approximate_counts)
-          .merge(preferences_usage)
+          .merge(user_preferences: user_preferences_usage)
         }
       end
       # rubocop: enable CodeReuse/ActiveRecord
@@ -164,8 +164,8 @@ module Gitlab
         }
       end
 
-      def preferences_usage
-        {}
+      def user_preferences_usage
+        {} # augmented in EE
       end
 
       def count(relation, fallback: -1)
