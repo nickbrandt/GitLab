@@ -10,7 +10,7 @@ describe Geo::RepositoriesCleanUpWorker do
       stub_exclusive_lease
     end
 
-    context 'when node has namespace restrictions' do
+    context 'when node has selective sync enabled' do
       let(:synced_group) { create(:group) }
       let(:geo_node) { create(:geo_node, selective_sync_type: 'namespaces', namespaces: [synced_group]) }
 
@@ -54,16 +54,31 @@ describe Geo::RepositoriesCleanUpWorker do
         end
       end
 
-      it 'does not perform GeoRepositoryDestroyWorker when repository does not exist' do
-        create(:project)
+      context 'when the project repository does not exist on disk' do
+        let(:project) { create(:project) }
 
-        expect(GeoRepositoryDestroyWorker).not_to receive(:perform_async)
+        it 'performs GeoRepositoryDestroyWorker' do
+          expect(GeoRepositoryDestroyWorker).to receive(:perform_async)
+            .with(project.id, anything, anything, anything)
+            .once
+            .and_return(1)
 
-        subject.perform(geo_node.id)
+          subject.perform(geo_node.id)
+        end
+
+        it 'does not leave orphaned entries in the project_registry table' do
+          create(:geo_project_registry, :sync_failed, project: project)
+
+          Sidekiq::Testing.inline! do
+            subject.perform(geo_node.id)
+          end
+
+          expect(Geo::ProjectRegistry.where(project_id: project)).to be_empty
+        end
       end
     end
 
-    it 'does not perform GeoRepositoryDestroyWorker when does not node have namespace restrictions' do
+    it 'does not perform GeoRepositoryDestroyWorker when node does not selective sync enabled' do
       expect(GeoRepositoryDestroyWorker).not_to receive(:perform_async)
 
       subject.perform(geo_node.id)
