@@ -776,9 +776,12 @@ describe Gitlab::GitAccess do
         it "has the correct permissions for #{role}s" do
           if role == :admin
             user.update_attribute(:admin, true)
+            project.add_guest(user)
           else
             project.add_role(user, role)
           end
+
+          protected_branch.save
 
           aggregate_failures do
             matrix.each do |action, allowed|
@@ -1034,9 +1037,7 @@ describe Gitlab::GitAccess do
       end
 
       context "when no one is allowed to push to the #{protected_branch_name} protected branch" do
-        before do
-          create(:protected_branch, :no_one_can_push, name: protected_branch_name, project: project)
-        end
+        let(:protected_branch) { build(:protected_branch, :no_one_can_push, name: protected_branch_name, project: project) }
 
         run_permission_checks(permissions_matrix.deep_merge(developer: { push_protected_branch: false, push_all: false, merge_into_protected_branch: false },
                                                             maintainer: { push_protected_branch: false, push_all: false, merge_into_protected_branch: false },
