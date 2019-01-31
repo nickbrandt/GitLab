@@ -76,7 +76,7 @@ Parameters:
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
 | `id` | integer | yes | The ID of the project owned by the authenticated user |
-| `cluster_id` | integer | yes | The ID of the cluster |
+| `cluster_id` | integer | yes | The ID of the cluster |
 
 Example request:
 
@@ -157,8 +157,8 @@ Parameters:
 | --------- | ---- | -------- | ----------- |
 | `id` | integer | yes | The ID of the project owned by the authenticated user |
 | `name` | String | yes | The name of the cluster |
-| `enabled` | Boolean | no | Determines if cluster is active or not, defaults to true |
-| `platform_kubernetes_attributes[api_url]` | String | yes | The URL to access the Kubernetes API |
+| `enabled` | Boolean | no | Determines if cluster is active or not, defaults to true |
+| `platform_kubernetes_attributes[api_url]` | String | yes | The URL to access the Kubernetes API |
 | `platform_kubernetes_attributes[token]` | String | yes | The token to authenticate against Kubernetes |
 | `platform_kubernetes_attributes[ca_cert]` | String | no | TLS certificate (needed if API is using a self-signed TLS certificate |
 | `platform_kubernetes_attributes[namespace]` | String | no | The unique namespace related to the project |
