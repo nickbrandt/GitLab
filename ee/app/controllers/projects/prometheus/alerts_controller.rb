@@ -25,7 +25,8 @@ module Projects
 
       def notify
         token = extract_alert_manager_token(request)
-        notify = Projects::Prometheus::Alerts::NotifyService.new(project, current_user, params)
+        notify = Projects::Prometheus::Alerts::NotifyService
+          .new(project, current_user, params.permit!)
 
         if notify.execute(token)
           head :ok
