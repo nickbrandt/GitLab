@@ -7,6 +7,83 @@ describe ApprovalMergeRequestRule do
 
   subject { create(:approval_merge_request_rule, merge_request: merge_request) }
 
+  describe 'validations' do
+    it 'is valid' do
+      expect(build(:approval_merge_request_rule)).to be_valid
+    end
+
+    it 'is invalid when the name is missing' do
+      expect(build(:approval_merge_request_rule, name: nil)).not_to be_valid
+    end
+
+    context 'code owner rules' do
+      it 'is valid' do
+        expect(build(:code_owner_rule)).to be_valid
+      end
+
+      it 'is invalid when reusing the same name within the same merge request' do
+        existing = create(:code_owner_rule, name: '*.rb', merge_request: merge_request)
+
+        new = build(:code_owner_rule, merge_request: existing.merge_request, name: '*.rb')
+
+        expect(new).not_to be_valid
+        expect { new.save!(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
+      end
+
+      it 'allows a regular rule with the same name as the codeowner rule' do
+        create(:code_owner_rule, name: '*.rb', merge_request: merge_request)
+
+        new = build(:approval_merge_request_rule, name: '*.rb', merge_request: merge_request)
+
+        expect(new).to be_valid
+        expect { new.save! }.not_to raise_error
+      end
+    end
+  end
+
+  context 'scopes'  do
+    set(:rb_rule) { create(:code_owner_rule, name: '*.rb') }
+    set(:js_rule) { create(:code_owner_rule, name: '*.js') }
+    set(:css_rule) { create(:code_owner_rule, name: '*.css') }
+    set(:approval_rule) { create(:approval_merge_request_rule) }
+
+    describe '.not_matching_pattern' do
+      it 'returns the correct rules' do
+        expect(described_class.not_matching_pattern(['*.rb', '*.js']))
+          .to contain_exactly(css_rule)
+      end
+    end
+
+    describe '.matching_pattern' do
+      it 'returns the correct rules' do
+        expect(described_class.matching_pattern(['*.rb', '*.js']))
+          .to contain_exactly(rb_rule, js_rule)
+      end
+    end
+  end
+
+  describe '.find_or_create_code_owner_rule' do
+    set(:merge_request) { create(:merge_request) }
+    set(:existing_code_owner_rule) { create(:code_owner_rule, name: '*.rb', merge_request: merge_request) }
+
+    it 'finds an existing rule' do
+      expect(described_class.find_or_create_code_owner_rule(merge_request, '*.rb'))
+        .to eq(existing_code_owner_rule)
+    end
+
+    it 'creates a new rule if it does not exist' do
+      expect { described_class.find_or_create_code_owner_rule(merge_request, '*.js') }
+        .to change { merge_request.approval_rules.count }.by(1)
+    end
+
+    it 'retries when a record was created between the find and the create' do
+      expect(described_class).to receive(:find_or_create_by).and_raise(ActiveRecord::RecordNotUnique)
+      allow(described_class).to receive(:find_or_create_by).and_call_original
+
+      expect(described_class.find_or_create_code_owner_rule(merge_request, '*.js')).not_to be_nil
+    end
+  end
+
   describe '#project' do
     it 'returns project of MergeRequest' do
       expect(subject.project).to be_present

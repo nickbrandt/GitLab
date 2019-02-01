@@ -7,6 +7,10 @@ class ApprovalMergeRequestRule < ApplicationRecord
 
   scope :regular, -> { where(code_owner: false) }
   scope :code_owner, -> { where(code_owner: true) } # special code owner rules, updated internally when code changes
+  scope :not_matching_pattern, -> (pattern) { code_owner.where.not(name: pattern) }
+  scope :matching_pattern, -> (pattern) { code_owner.where(name: pattern) }
+
+  validates :name, uniqueness: { scope: [:merge_request, :code_owner] }
 
   belongs_to :merge_request
 
@@ -17,6 +21,13 @@ class ApprovalMergeRequestRule < ApplicationRecord
   alias_method :source_rule, :approval_project_rule
 
   validate :validate_approvals_required
+
+  def self.find_or_create_code_owner_rule(merge_request, pattern)
+    merge_request.approval_rules.safe_find_or_create_by(
+      code_owner: true,
+      name: pattern
+    )
+  end
 
   def project
     merge_request.target_project

@@ -210,7 +210,7 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
         end
 
         context 'when code owner rule exists' do
-          let!(:code_owner_rule) { create(:approval_merge_request_rule, merge_request: target, code_owner: true, users: [create(:user)]) }
+          let!(:code_owner_rule) { create(:code_owner_rule, merge_request: target, users: [create(:user)]) }
 
           it 'reuses and updates existing rule' do
             expect do
