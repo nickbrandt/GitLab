@@ -33,6 +33,7 @@ export default () => ({
   initialTitleText: '',
   initialDescriptionHtml: '',
   initialDescriptionText: '',
+  lockVersion: 0,
 
   todoExists: false,
   startDateSourcingMilestoneTitle: '',

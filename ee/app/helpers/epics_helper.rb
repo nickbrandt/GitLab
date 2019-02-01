@@ -30,6 +30,7 @@ module EpicsHelper
         start_date: epic.due_date_sourcing_milestone&.start_date,
         due_date: epic.due_date_sourcing_milestone&.due_date
       },
+      lock_version: epic.lock_version,
       end_date: epic.end_date,
       state: epic.state,
       namespace: group.path,
