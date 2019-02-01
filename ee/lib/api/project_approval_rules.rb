@@ -12,7 +12,7 @@ module API
     resource :projects, requirements: ::API::API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       segment ':id/approval_settings' do
         desc 'Get all project approval rules' do
-          detail 'This feature was introduced in 11.6'
+          detail 'This feature was introduced in 11.8'
           success EE::API::Entities::ProjectApprovalRules
         end
         get do
@@ -46,7 +46,7 @@ module API
 
         segment 'rules' do
           desc 'Create new approval rule' do
-            detail 'This feature was introduced in 11.6'
+            detail 'This feature was introduced in 11.8'
             success EE::API::Entities::ApprovalRule
           end
           params do
@@ -69,7 +69,7 @@ module API
 
           segment ':approval_rule_id' do
             desc 'Update approval rule' do
-              detail 'This feature was introduced in 11.6'
+              detail 'This feature was introduced in 11.8'
               success EE::API::Entities::ApprovalRule
             end
             params do
@@ -95,7 +95,7 @@ module API
             end
 
             desc 'Delete an approval rule' do
-              detail 'This feature was introduced in 11.6'
+              detail 'This feature was introduced in 11.8'
             end
             params do
               requires :approval_rule_id, type: Integer, desc: 'The ID of an approval_rule'
