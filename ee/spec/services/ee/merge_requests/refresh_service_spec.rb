@@ -148,7 +148,7 @@ describe MergeRequests::RefreshService do
           end
 
           [forked_merge_request].each do |merge_request|
-            expect(::Gitlab::CodeOwners).not_to receive(:for_merge_request)
+            expect(::Gitlab::CodeOwners).not_to receive(:for_merge_request).with(merge_request)
           end
         end
 

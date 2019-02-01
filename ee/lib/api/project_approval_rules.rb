@@ -83,7 +83,6 @@ module API
               authorize! :admin_project, user_project
 
               params = declared_params(include_missing: false)
-              puts params.inspect
               approval_rule = user_project.approval_rules.find(params.delete(:approval_rule_id))
               result = ::ApprovalRules::UpdateService.new(approval_rule, current_user, params).execute
 
