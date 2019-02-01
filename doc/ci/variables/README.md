@@ -265,6 +265,8 @@ Wildcards (`*`) can be used along with the environment name, therefore if the
 environment scope is `review/*` then any jobs with environment names starting
 with `review/` would have that particular variable.
 
+Read more about [Environment scopes](../environments.md#environment-specs-scopes-premium)
+
 ### Manually-specified variables
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ce/issues/44059) in GitLab 10.8.
