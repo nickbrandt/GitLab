@@ -254,5 +254,17 @@ describe Gitlab::BackgroundMigration::MigrateApproverToApprovalRules do
       end.not_to raise_error
     end
   end
+
+  context 'when project has no repository' do
+    let(:project_without_repository) { create(:project) }
+    let(:target) { create(:merge_request, target_project: project_without_repository, source_project: project_without_repository) }
+    let(:target_type) { 'MergeRequest' }
+
+    it "does not err" do
+      expect do
+        described_class.new.perform(target_type, target.id)
+      end.not_to raise_error
+    end
+  end
 end
 # rubocop:enable RSpec/FactoriesInMigrationSpecs
