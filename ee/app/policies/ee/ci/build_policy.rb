@@ -38,7 +38,7 @@ module EE
           # as evaluating `build.expanded_environment_name` is expensive.
           return true unless build.project.protected_environments_feature_available?
 
-          build.project.protected_environment_accessible_to?(build.expanded_environment_name, user)
+          build.project.protected_environment_accessible_to?(build.persisted_environment&.name, user)
         end
       end
     end
