@@ -204,11 +204,16 @@ describe Epic do
   end
 
   describe '#update_start_and_due_dates' do
+    def update_and_reload_subject
+      subject.update_start_and_due_dates
+      subject.reload
+    end
+
     context 'fixed date is set' do
       subject { create(:epic, :use_fixed_dates, start_date: nil, end_date: nil) }
 
       it 'updates to fixed date' do
-        subject.update_start_and_due_dates
+        update_and_reload_subject
 
         expect(subject.start_date).to eq(subject.start_date_fixed)
         expect(subject.due_date).to eq(subject.due_date_fixed)
@@ -243,7 +248,7 @@ describe Epic do
 
         context 'complete start and due dates' do
           it 'updates to milestone dates' do
-            subject.update_start_and_due_dates
+            update_and_reload_subject
 
             expect(subject.start_date).to eq(milestone1.start_date)
             expect(subject.due_date).to eq(milestone2.due_date)
@@ -267,7 +272,7 @@ describe Epic do
           end
 
           it 'updates to milestone dates' do
-            subject.update_start_and_due_dates
+            update_and_reload_subject
 
             expect(subject.start_date).to eq(milestone1.start_date)
             expect(subject.due_date).to eq(nil)
@@ -291,7 +296,7 @@ describe Epic do
           end
 
           it 'updates to milestone dates' do
-            subject.update_start_and_due_dates
+            update_and_reload_subject
 
             expect(subject.start_date).to eq(nil)
             expect(subject.due_date).to eq(nil)
@@ -305,7 +310,7 @@ describe Epic do
         end
 
         it 'updates to milestone dates' do
-          subject.update_start_and_due_dates
+          update_and_reload_subject
 
           expect(subject.start_date).to eq(nil)
           expect(subject.start_date_sourcing_milestone_id).to eq(nil)
@@ -322,7 +327,7 @@ describe Epic do
 
         context 'complete start and due dates' do
           it 'updates to milestone dates' do
-            subject.update_start_and_due_dates
+            update_and_reload_subject
 
             expect(subject.start_date).to eq(milestone1.start_date)
             expect(subject.due_date).to eq(milestone1.due_date)
@@ -339,7 +344,7 @@ describe Epic do
           end
 
           it 'updates to milestone dates' do
-            subject.update_start_and_due_dates
+            update_and_reload_subject
 
             expect(subject.start_date).to eq(milestone1.start_date)
             expect(subject.due_date).to eq(nil)
@@ -356,7 +361,7 @@ describe Epic do
           end
 
           it 'updates to milestone dates' do
-            subject.update_start_and_due_dates
+            update_and_reload_subject
 
             expect(subject.start_date).to eq(nil)
             expect(subject.due_date).to eq(nil)
