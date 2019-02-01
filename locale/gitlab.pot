@@ -5821,9 +5821,6 @@ msgstr ""
 msgid "Metrics|New metric"
 msgstr ""
 
-msgid "Metrics|No data to display"
-msgstr ""
-
 msgid "Metrics|No deployed environments"
 msgstr ""
 
@@ -7335,9 +7332,6 @@ msgid "PrometheusAlerts|Operator"
 msgstr ""
 
 msgid "PrometheusAlerts|Threshold"
-msgstr ""
-
-msgid "PrometheusDashboard|Time"
 msgstr ""
 
 msgid "PrometheusService|%{exporters} with %{metrics} were found"
