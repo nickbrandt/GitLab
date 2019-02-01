@@ -9,6 +9,15 @@ class DashboardOperationsProjectEntity < Grape::Entity
     remove_operations_project_path(project_id: dashboard_project.project.id)
   end
 
+  expose :last_pipeline, if: -> (*) { last_pipeline } do |dashboard_project, options|
+    new_request = EntityRequest.new(
+      current_user: request.current_user,
+      project: dashboard_project.project
+    )
+
+    PipelineEntity.represent(last_pipeline, options.merge(request: new_request))
+  end
+
   expose :last_deployment, if: -> (*) { last_deployment? } do |dashboard_project, options|
     new_request = EntityRequest.new(
       current_user: request.current_user,
@@ -31,6 +40,10 @@ class DashboardOperationsProjectEntity < Grape::Entity
   private
 
   alias_method :dashboard_project, :object
+
+  def last_pipeline
+    dashboard_project.project.commit.last_pipeline
+  end
 
   def last_deployment?
     dashboard_project.last_deployment
