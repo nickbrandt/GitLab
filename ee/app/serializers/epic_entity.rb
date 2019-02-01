@@ -17,6 +17,7 @@ class EpicEntity < IssuableEntity
   expose :due_date_is_fixed?, as: :due_date_is_fixed
   expose :due_date_fixed, :due_date_from_milestones
   expose :state
+  expose :lock_version
 
   expose :web_url do |epic|
     group_epic_path(epic.group, epic)
