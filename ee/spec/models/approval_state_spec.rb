@@ -189,23 +189,35 @@ describe ApprovalState do
     end
 
     describe '#any_approver_allowed?' do
-      context 'when approved' do
-        before do
-          allow(subject).to receive(:approved?).and_return(true)
-        end
-
+      context 'when no rules' do
         it 'returns true' do
           expect(subject.any_approver_allowed?).to eq(true)
         end
       end
 
-      context 'when not approved' do
+      context 'when with rules' do
         before do
-          allow(subject).to receive(:approved?).and_return(false)
+          create_rule(approvals_required: 1, users: [approver1])
         end
 
-        it 'returns false' do
-          expect(subject.approved?).to eq(false)
+        context 'when approved' do
+          before do
+            allow(subject).to receive(:approved?).and_return(true)
+          end
+
+          it 'returns true' do
+            expect(subject.any_approver_allowed?).to eq(true)
+          end
+        end
+
+        context 'when not approved' do
+          before do
+            allow(subject).to receive(:approved?).and_return(false)
+          end
+
+          it 'returns false' do
+            expect(subject.approved?).to eq(false)
+          end
         end
       end
     end

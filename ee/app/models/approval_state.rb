@@ -65,7 +65,7 @@ class ApprovalState
   end
 
   def any_approver_allowed?
-    approved?
+    regular_rules.empty? || approved?
   end
 
   def approvals_required
