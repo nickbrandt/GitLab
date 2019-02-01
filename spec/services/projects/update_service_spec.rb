@@ -439,13 +439,13 @@ describe Projects::UpdateService, '#execute' do
       FileUtils.rm_rf('tmp/tests/storage_b')
     end
 
-    it 'calls the change repository storage method if the storage changed', :disable_gitaly do
+    it 'calls the change repository storage method if the storage changed' do
       expect(project).to receive(:change_repository_storage).with('b')
 
       update_project(project, admin_user, opts).inspect
     end
 
-    it "doesn't call the change repository storage for non-admin users", :disable_gitaly do
+    it "doesn't call the change repository storage for non-admin users" do
       expect(project).not_to receive(:change_repository_storage)
 
       update_project(project, user, opts).inspect
