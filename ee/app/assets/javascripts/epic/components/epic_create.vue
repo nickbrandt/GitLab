@@ -1,11 +1,13 @@
 <script>
 import { mapState, mapActions } from 'vuex';
+import { GlButton } from '@gitlab/ui';
 
 import { __ } from '~/locale';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 
 export default {
   components: {
+    GlButton,
     LoadingButton,
   },
   props: {
@@ -45,14 +47,14 @@ export default {
 
 <template>
   <div class="dropdown epic-create-dropdown">
-    <button
-      class="btn btn-success qa-new-epic-button"
-      type="button"
+    <gl-button
+      variant="success"
+      class="qa-new-epic-button"
       data-toggle="dropdown"
       @click="focusInput"
     >
       {{ __('New epic') }}
-    </button>
+    </gl-button>
     <div :class="{ 'dropdown-menu-right': alignRight }" class="dropdown-menu">
       <input
         ref="epicTitleInput"

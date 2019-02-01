@@ -1,6 +1,6 @@
 <script>
 import _ from 'underscore';
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlLoadingIcon, GlButton } from '@gitlab/ui';
 
 import { __, s__ } from '~/locale';
 import { dateInWords } from '~/lib/utils/datetime_utility';
@@ -26,6 +26,7 @@ export default {
     CollapsedCalendarIcon,
     ToggleSidebar,
     GlLoadingIcon,
+    GlButton,
   },
   props: {
     sidebarCollapsed: {
@@ -200,14 +201,14 @@ export default {
           css-classes="help-icon append-right-5"
           tab-index="0"
         />
-        <button
+        <gl-button
           v-show="canUpdate && !editing"
-          type="button"
-          class="btn-blank btn-link btn-primary-hover-link btn-sidebar-action"
+          variant="link"
+          class="btn-sidebar-action"
           @click="toggleDatePicker"
         >
           {{ __('Edit') }}
-        </button>
+        </gl-button>
         <toggle-sidebar
           v-if="showToggleSidebar"
           :collapsed="sidebarCollapsed"
@@ -246,14 +247,14 @@ export default {
               tab-index="0"
             />
             <span v-if="selectedAndEditable" class="no-value">
-              -
-              <button
-                type="button"
-                class="btn-blank btn-link btn-default-hover-link"
+              &nbsp;&ndash;
+              <gl-button
+                variant="link"
+                class="btn-sidebar-date-remove"
                 @click="newDateSelected(null)"
               >
                 {{ __('remove') }}
-              </button>
+              </gl-button>
             </span>
           </template>
           <span v-else class="no-value"> {{ __('None') }} </span>
