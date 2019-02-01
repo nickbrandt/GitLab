@@ -2,8 +2,6 @@
 
 module Groups
   class CreateService < Groups::BaseService
-    prepend ::EE::Groups::CreateService # rubocop: disable Cop/InjectEnterpriseEditionModule
-
     def initialize(user, params = {})
       @current_user, @params = user, params.dup
       @chat_team = @params.delete(:create_chat_team)
@@ -12,9 +10,7 @@ module Groups
     def execute
       @group = Group.new(params)
 
-      # Repository size limit comes as MB from the view
-      limit = params.delete(:repository_size_limit)
-      @group.repository_size_limit = Gitlab::Utils.try_megabytes_to_bytes(limit) if limit
+      after_build_hook(@group, params)
 
       unless can_use_visibility_level? && can_create_group?
         return @group
@@ -35,6 +31,10 @@ module Groups
     end
 
     private
+
+    def after_build_hook(group, params)
+      # overriden in EE
+    end
 
     def create_chat_team?
       Gitlab.config.mattermost.enabled && @chat_team && group.chat_team.nil?
@@ -69,3 +69,5 @@ module Groups
     end
   end
 end
+
+Groups::CreateService.prepend(EE::Groups::CreateService)
