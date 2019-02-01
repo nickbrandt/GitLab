@@ -3,6 +3,7 @@
 module API
   class ProjectApprovalRules < ::Grape::API
     before { authenticate! }
+    before { not_found! unless ::Feature.enabled?(:approval_rules, user_project) }
 
     ARRAY_COERCION_LAMBDA = ->(val) { val.empty? ? [] : Array.wrap(val) }
 
