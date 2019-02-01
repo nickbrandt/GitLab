@@ -66,7 +66,7 @@ module EE
       # pass service name to acquire_credentials explicitly to support the special meaning of nil
       gss_service_name =
         if ::Gitlab.config.kerberos.service_principal_name.present?
-          gss.import_name(Gitlab.config.kerberos.service_principal_name)
+          gss.import_name(::Gitlab.config.kerberos.service_principal_name)
         else
           nil # accept any valid service principal name from keytab
         end
