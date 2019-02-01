@@ -3794,6 +3794,9 @@ msgstr ""
 msgid "Feature Flags"
 msgstr ""
 
+msgid "FeatureFlags|* (All environments)"
+msgstr ""
+
 msgid "FeatureFlags|API URL"
 msgstr ""
 
@@ -3843,6 +3846,9 @@ msgid "FeatureFlags|Get started with feature flags"
 msgstr ""
 
 msgid "FeatureFlags|Inactive"
+msgstr ""
+
+msgid "FeatureFlags|Inactive flag for %{scope}"
 msgstr ""
 
 msgid "FeatureFlags|Install a %{docs_link_start}compatible client library%{docs_link_end} and specify the API URL, application name, and instance ID during the configuration setup."
@@ -4964,9 +4970,6 @@ msgid "In order to enable instance-level analytics, please ask an admin to enabl
 msgstr ""
 
 msgid "In the next step, you'll be able to select the projects you want to import."
-msgstr ""
-
-msgid "Inactive flag for %{scope}"
 msgstr ""
 
 msgid "Include a Terms of Service agreement and Privacy Policy that all users must accept."
