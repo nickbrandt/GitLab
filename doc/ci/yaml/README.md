@@ -1533,13 +1533,13 @@ test:
 
 ## `trigger`
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/8997) in GitLab 11.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/8997) in in [GitLab Premium](https://about.gitlab.com/pricing/) 11.8.
 
 `trigger` allows you to define downstream pipeline trigger. When a job created
 from `trigger` definition is started by GitLab, a downstream pipeline gets
 created.
 
-Learm more about that from documentation about [multi-project pipelines](../multi_project_pipelines.html#creating-cross-project-pipeline-from-gitlab-ci-yml).
+Learm more about [multi-project pipelines](../multi_project_pipelines.html#creating-cross-project-pipelines-from-gitlab-ci-yml).
 
 Example:
 
@@ -2353,7 +2353,9 @@ You can see that the hidden keys are conveniently used as templates.
 ## Triggers
 
 Triggers can be used to force a rebuild of a specific branch, tag or commit,
-with an API call.
+with an API call when a pipeline gets created using a trigger token.
+
+Not to be confused with [`trigger`](#trigger).
 
 [Read more in the triggers documentation.](../triggers/README.md)
 

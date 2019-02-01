@@ -41,18 +41,18 @@ together, allowing you to visualize their relationships on pipeline graphs.
 These relationships are displayed in the pipeline graph by showing inbound and
 outbound connections for upstream and downstream pipeline dependencies.
 
-## Creating cross-project pipeline from .gitlab-ci.yml
+## Creating cross-project pipelines from .gitlab-ci.yml
 
-> Introduced in GitLab 11.8
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/8997) in in [GitLab Premium](https://about.gitlab.com/pricing/) 11.8.
 
 ### Triggering a downstream pipeline using a bridge job
 
-Before GitLab 11.8 it was necessary to implement a pipeline job that was
+Before GitLab 11.8, it was necessary to implement a pipeline job that was
 responsible for making the API request [to trigger a pipeline](triggers/README.md#creating-cross-project-pipeline-through-API)
 in a different project.
 
 In GitLab 11.8, GitLab provides a new CI/CD configuration syntax to make this
-task easier, and avoid needing GitLab Runner for triggering a cross-project
+task easier, and avoid needing GitLab Runner for triggering cross-project
 pipelines.
 
 ```yaml
@@ -67,11 +67,11 @@ staging:
   trigger: my/deployment
 ```
 
-In the example above, as soon as `rspec` job succeeds in stage `test`,
-`staging` "bridge" job is going to be started. Initial status of this job is
-going to be `pending`. GitLab will create a downstream pipeline in the
-`my/deployment` project and as soon as the pipeline gets created, the `staging`
-job will succeed. `my/deployment` is a full path to that project.
+In the example above, as soon as `rspec` job succeeds in the `test` stage,
+the `staging` "bridge" job is going to be started. The initial status of this
+job will be `pending`. GitLab will create a downstream pipeline in the
+`my/deployment` project and, as soon as the pipeline gets created, the
+`staging` job will succeed. `my/deployment` is a full path to that project.
 
 The user that created the upstream pipeline needs to have access rights to the
 downstream project (`my/deployment` in this case). If a downstream project can
@@ -81,7 +81,7 @@ the `staging` job is going to be marked as _failed_.
 Caution: **Caution:**
 `staging` will succeed as soon as a downstream pipeline gets created.
 GitLab does not support status attribution yet, however adding first-class
-`trigger` configuration syntax is a ground work for implementing
+`trigger` configuration syntax is ground work for implementing
 [status attribution](https://gitlab.com/gitlab-org/gitlab-ce/issues/39640).
 
 NOTE: **Note:**
@@ -108,7 +108,7 @@ staging:
 ```
 
 Use a `project` keyword to specify full path to a downstream project. Use
-`branch` keyword to specify a branch name.
+a `branch` keyword to specify a branch name.
 
 GitLab will use a commit that is currently on the HEAD of the branch when
 creating a downstream pipeline.
