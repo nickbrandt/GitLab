@@ -92,7 +92,7 @@ describe Projects::Prometheus::AlertsController do
       allow(Projects::Prometheus::Alerts::NotifyService).to receive(:new).and_return(notify_service)
     end
 
-    it 'sends a notification for firing alerts only' do
+    it 'renders ok if notification succeeds' do
       expect(notify_service).to receive(:execute).and_return(true)
 
       post :notify, params: project_params(payload), session: { as: :json }
