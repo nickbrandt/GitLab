@@ -18,7 +18,7 @@ class ConsumeRemainingMigrateApproverToApprovalRulesInBatchJobs < ActiveRecord::
   # Without it a search for the next bad MR can timeout if that MR's id is really high.
   BOUND_SIZE = 1000000
   BASE_QUERY = <<~SQL
-    SELECT merge_requests.id FROM merge_requests
+    SELECT DISTINCT merge_requests.id FROM merge_requests
     LEFT JOIN approval_merge_request_rules
     ON merge_requests.id = approval_merge_request_rules.merge_request_id AND approval_merge_request_rules.code_owner IS FALSE
     LEFT JOIN approvers
@@ -27,6 +27,10 @@ class ConsumeRemainingMigrateApproverToApprovalRulesInBatchJobs < ActiveRecord::
     ON merge_requests.id = approver_groups.target_id AND approver_groups.target_type = 'MergeRequest'
     WHERE (approval_merge_request_rules.id IS NULL) AND (approvers.id IS NOT NULL OR approver_groups.id IS NOT NULL)
   SQL
+
+  class MergeRequest < ActiveRecord::Base
+    self.table_name = 'merge_requests'
+  end
 
   disable_ddl_transaction!
 
@@ -44,7 +48,7 @@ class ConsumeRemainingMigrateApproverToApprovalRulesInBatchJobs < ActiveRecord::
   def process_unmigrated
     bad_ids = []
 
-    max_id = ActiveRecord::Base.connection.exec_query("SELECT id FROM merge_requests ORDER BY id desc LIMIT 1").rows.dig(0, 0)
+    max_id = MergeRequest.maximum(:id)
 
     return if max_id.nil?
 
