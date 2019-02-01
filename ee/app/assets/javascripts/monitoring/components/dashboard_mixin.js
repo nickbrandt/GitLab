@@ -1,10 +1,8 @@
 import AlertWidget from './alert_widget.vue';
-import ThresholdLines from './threshold_lines.vue';
 
 export default {
   components: {
     AlertWidget,
-    ThresholdLines,
   },
   props: {
     alertsEndpoint: {
