@@ -31,8 +31,9 @@ module QA
           element :register_tab
         end
 
-        view 'app/views/devise/shared/_omniauth_box.html.haml' do
+        view 'app/helpers/auth_helper.rb' do
           element :saml_login_button
+          element :github_login_button
         end
 
         view 'app/views/layouts/devise.html.haml' do
@@ -149,12 +150,17 @@ module QA
           click_element :standard_tab
         end
 
-        private
+        def sign_in_with_github
+          set_initial_password_if_present
+          click_element :github_login_button
+        end
 
         def sign_in_with_saml
           set_initial_password_if_present
           click_element :saml_login_button
         end
+
+        private
 
         def sign_in_using_gitlab_credentials(user)
           switch_to_sign_in_tab if has_sign_in_tab?
