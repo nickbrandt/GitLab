@@ -8,8 +8,7 @@ module Projects
           return false unless valid_version?
           return false unless valid_alert_manager_token?(token)
 
-          notification_service.async.prometheus_alerts_fired(project, firings) if firings.any?
-
+          send_alert_email(project, firings) if firings.any?
           persist_events(project, current_user, params)
 
           true
@@ -81,6 +80,12 @@ module Projects
           return unless expected && actual
 
           ActiveSupport::SecurityUtils.variable_size_secure_compare(expected, actual)
+        end
+
+        def send_alert_email(projects, firing_alerts)
+          notification_service
+            .async
+            .prometheus_alerts_fired(project, firings)
         end
 
         def persist_events(project, current_user, params)
