@@ -144,4 +144,4 @@ your Git repository via URL.
 GitLab is now configured to mirror changes from Bitbucket, run CI/CD pipelines
 configured in `.gitlab-ci.yml` and push the status to Bitbucket.
 
-[pull-mirroring]: ../../workflow/repository_mirroring.md#pulling-from-a-remote-repository
+[pull-mirroring]: ../../workflow/repository_mirroring.md#pulling-from-a-remote-repository-starter
