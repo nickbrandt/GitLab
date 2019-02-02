@@ -10,7 +10,7 @@ describe 'Project settings > [EE] Merge Requests', :js do
   let(:non_member) { create(:user) }
 
   before do
-    stub_feature_flags(approval_rule: false)
+    stub_feature_flags(approval_rules: false)
 
     sign_in(user)
     project.add_maintainer(user)

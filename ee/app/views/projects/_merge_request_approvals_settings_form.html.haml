@@ -1,6 +1,6 @@
 - can_override_approvers = project.can_override_approvers?
 
-- if Feature.enabled?(:approval_rule, project)
+- if Feature.enabled?(:approval_rules, project)
   = render 'shared/merge_request_approvals_settings/multiple_rules_form', form: form, project: project
 - else
   = render 'shared/merge_request_approvals_settings/single_rule_form', form: form, project: project
