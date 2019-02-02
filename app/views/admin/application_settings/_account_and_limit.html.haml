@@ -49,6 +49,7 @@
         = f.label :user_show_add_ssh_key_message, class: 'form-check-label' do
           Inform users without uploaded SSH keys that they can't push over SSH until one is added
 
+<<<<<<< HEAD
     - if ::Gitlab.dev_env_or_com?
       .form-group
         = f.label :check_namespace_plan, 'Check feature availability on namespace plan', class: 'label-bold'
@@ -58,4 +59,6 @@
             Enabling this will only make licensed EE features available to projects if the project namespace's plan
             includes the feature or if the project is public.
 
+=======
+>>>>>>> upstream/master
   = f.submit 'Save changes', class: 'btn btn-success qa-save-changes-button'
