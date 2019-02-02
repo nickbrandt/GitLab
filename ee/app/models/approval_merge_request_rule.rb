@@ -14,6 +14,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
   has_and_belongs_to_many :approved_approvers, class_name: 'User', join_table: :approval_merge_request_rules_approved_approvers
   has_one :approval_merge_request_rule_source
   has_one :approval_project_rule, through: :approval_merge_request_rule_source
+  alias_method :source_rule, :approval_project_rule
 
   validate :validate_approvals_required
 

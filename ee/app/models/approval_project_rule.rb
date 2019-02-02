@@ -18,4 +18,8 @@ class ApprovalProjectRule < ApplicationRecord
     false
   end
   alias_method :code_owner?, :code_owner
+
+  def source_rule
+    nil
+  end
 end

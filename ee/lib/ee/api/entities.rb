@@ -257,8 +257,13 @@ module EE
       end
 
       class MergeRequestApprovalRule < ApprovalRule
+        class SourceRule < Grape::Entity
+          expose :approvals_required
+        end
+
         expose :approved_approvers, as: :approved_by, using: ::API::Entities::UserBasic
         expose :code_owner
+        expose :source_rule, using: SourceRule
       end
 
       # Decorates ApprovalState

@@ -499,6 +499,28 @@ describe "API::MergeRequestApprovals with approval_rule enabled" do
       expect(rule_response['name']).to eq('foo')
       expect(rule_response['approvers'][0]['username']).to eq(approver.username)
       expect(rule_response['approved_by'][0]['username']).to eq(approver.username)
+      expect(rule_response['source_rule']).to eq(nil)
+    end
+
+    context 'when source rule is present' do
+      let!(:source_rule) { create(:approval_project_rule, project: project, approvals_required: 1, name: 'zoo') }
+      let!(:rule) { create(:approval_merge_request_rule, merge_request: merge_request, approvals_required: 2, name: 'foo') }
+
+      it 'returns source rule details' do
+        project.add_developer(approver)
+        merge_request.approvals.create(user: approver)
+        rule.users << approver
+        rule.create_approval_merge_request_rule_source!(approval_project_rule: source_rule)
+
+        get api("/projects/#{project.id}/merge_requests/#{merge_request.iid}/approval_settings", user)
+
+        expect(response).to have_gitlab_http_status(200)
+        expect(json_response['rules'].size).to eq(1)
+
+        rule_response = json_response['rules'].first
+
+        expect(rule_response['source_rule']['approvals_required']).to eq(source_rule.approvals_required)
+      end
     end
 
     it 'excludes private groups' do
