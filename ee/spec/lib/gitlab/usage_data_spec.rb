@@ -4,9 +4,10 @@ require 'spec_helper'
 
 describe Gitlab::UsageData do
   before do
-    projects.last.creator.block
+    projects.last.creator.block # to get at least one non-active User
   end
 
+  # using Array.new to create a different creator User for each of the projects
   let(:projects) { Array.new(3) { create(:project, creator: create(:user, group_view: :security_dashboard)) } }
   let!(:board) { create(:board, project: projects[0]) }
 
@@ -28,6 +29,10 @@ describe Gitlab::UsageData do
       create(:package, project: projects[1])
 
       create(:project_tracing_setting, project: projects[0])
+
+      # for group_view testing
+      create(:user) # user with group_view = NULL (should be counted as having default value 'details')
+      create(:user, group_view: :details)
     end
 
     subject { described_class.data }

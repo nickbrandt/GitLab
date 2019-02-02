@@ -21,6 +21,7 @@ ActiveSupport::Inflector.inflections do |inflect|
     job_artifact_registry
     vulnerability_feedback
     vulnerabilities_feedback
+    group_view
   )
   inflect.acronym 'EE'
 end
