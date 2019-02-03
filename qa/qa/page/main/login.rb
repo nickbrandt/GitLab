@@ -153,7 +153,6 @@ module QA
         def sign_in_with_github
           set_initial_password_if_present
           click_element :github_login_button
-<<<<<<< HEAD
         end
 
         def sign_in_with_saml
@@ -163,25 +162,6 @@ module QA
 
         private
 
-=======
-        end
-
-        def sign_in_with_saml
-          set_initial_password_if_present
-          click_element :saml_login_button
-        end
-
-        private
-
-        def sign_in_using_ldap_credentials
-          switch_to_ldap_tab
-
-          fill_element :username_field, Runtime::User.ldap_username
-          fill_element :password_field, Runtime::User.ldap_password
-          click_element :sign_in_button
-        end
-
->>>>>>> upstream/master
         def sign_in_using_gitlab_credentials(user)
           switch_to_sign_in_tab if has_sign_in_tab?
           switch_to_standard_tab if has_standard_tab?
