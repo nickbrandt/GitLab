@@ -5809,7 +5809,6 @@ msgstr ""
 msgid "Metrics|Learn about environments"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "Metrics|Legend label (optional)"
 msgstr ""
 
@@ -5822,8 +5821,6 @@ msgstr ""
 msgid "Metrics|New metric"
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "Metrics|No deployed environments"
 msgstr ""
 
@@ -7307,7 +7304,6 @@ msgstr ""
 msgid "ProjectsDropdown|This feature requires browser localStorage support"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "PrometheusAlerts|Add alert"
 msgstr ""
 
@@ -7338,8 +7334,6 @@ msgstr ""
 msgid "PrometheusAlerts|Threshold"
 msgstr ""
 
-=======
->>>>>>> upstream/master
 msgid "PrometheusService|%{exporters} with %{metrics} were found"
 msgstr ""
 
