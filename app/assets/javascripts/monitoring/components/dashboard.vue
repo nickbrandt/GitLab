@@ -221,7 +221,6 @@ export default {
         :graph-data="graphData"
         :alert-data="getGraphAlerts(graphData.id)"
         group-id="monitor-area-chart"
-<<<<<<< HEAD
       >
         <!-- EE content -->
         <alert-widget
@@ -234,9 +233,6 @@ export default {
           @setAlerts="setAlerts"
         />
       </monitor-area-chart>
-=======
-      />
->>>>>>> upstream/master
     </graph-group>
   </div>
   <empty-state
