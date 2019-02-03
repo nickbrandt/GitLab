@@ -1533,7 +1533,7 @@ test:
 
 ## `trigger`
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/8997) in in [GitLab Premium](https://about.gitlab.com/pricing/) 11.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/8997) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.8.
 
 `trigger` allows you to define downstream pipeline trigger. When a job created
 from `trigger` definition is started by GitLab, a downstream pipeline gets
@@ -2066,8 +2066,8 @@ variables:
 ```
 
 NOTE: **Note:** `GIT_STRATEGY` is not supported for
-[Kubernetes executor](https://docs.gitlab.com/runner/executors/kubernetes.html), 
-but may be in the future. See the [support Git strategy with Kubernetes executor feature proposal](https://gitlab.com/gitlab-org/gitlab-runner/issues/3847) 
+[Kubernetes executor](https://docs.gitlab.com/runner/executors/kubernetes.html),
+but may be in the future. See the [support Git strategy with Kubernetes executor feature proposal](https://gitlab.com/gitlab-org/gitlab-runner/issues/3847)
 for updates.
 
 ### Git submodule strategy

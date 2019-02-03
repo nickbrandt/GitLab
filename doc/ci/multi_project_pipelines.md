@@ -43,7 +43,7 @@ outbound connections for upstream and downstream pipeline dependencies.
 
 ## Creating cross-project pipelines from .gitlab-ci.yml
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/8997) in in [GitLab Premium](https://about.gitlab.com/pricing/) 11.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/8997) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.8.
 
 ### Triggering a downstream pipeline using a bridge job
 
