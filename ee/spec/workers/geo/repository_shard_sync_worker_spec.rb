@@ -221,6 +221,7 @@ describe Geo::RepositoryShardSyncWorker, :geo, :delete, :clean_gitlab_redis_cach
         allow_any_instance_of(Project).to receive(:ensure_repository).and_raise(Gitlab::Shell::Error.new('foo'))
         allow_any_instance_of(Geo::ProjectRegistry).to receive(:wiki_sync_due?).and_return(false)
         allow_any_instance_of(Geo::RepositorySyncService).to receive(:expire_repository_caches)
+        allow_any_instance_of(Geo::ProjectHousekeepingService).to receive(:do_housekeeping)
       end
 
       it 'tries to sync every project' do

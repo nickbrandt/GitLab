@@ -19,7 +19,7 @@ describe Geo::RepositorySyncService do
   end
 
   it_behaves_like 'geo base sync execution'
-  it_behaves_like 'geo base sync fetch and repack'
+  it_behaves_like 'geo base sync fetch'
   it_behaves_like 'reschedules sync due to race condition instead of waiting for backfill'
 
   describe '#execute' do
@@ -36,6 +36,9 @@ describe Geo::RepositorySyncService do
         .to receive(:find_remote_root_ref)
         .with('geo')
         .and_return('master')
+
+      allow_any_instance_of(Geo::ProjectHousekeepingService).to receive(:execute)
+        .and_return(nil)
     end
 
     it 'fetches project repository with JWT credentials' do
@@ -415,14 +418,6 @@ describe Geo::RepositorySyncService do
     end
   end
 
-  describe '#schedule_repack' do
-    it 'schedule GitGarbageCollectWorker for full repack' do
-      Sidekiq::Testing.fake! do
-        expect { subject.send(:schedule_repack) }.to change { GitGarbageCollectWorker.jobs.count }.by(1)
-      end
-    end
-  end
-
   context 'repository housekeeping' do
     let(:registry) { Geo::ProjectRegistry.find_or_initialize_by(project_id: project.id) }
 
@@ -432,6 +427,40 @@ describe Geo::RepositorySyncService do
 
     it 'initiate housekeeping at end of execution' do
       expect_any_instance_of(Geo::ProjectHousekeepingService).to receive(:execute)
+
+      subject.execute
+    end
+  end
+
+  context 'when the repository is redownloaded' do
+    before do
+      allow(subject).to receive(:redownload?).and_return(true)
+      allow(subject).to receive(:redownload_repository).and_return(nil)
+    end
+
+    it "indicates the repository is new" do
+      expect(Geo::ProjectHousekeepingService).to receive(:new).with(project, new_repository: true).and_call_original
+
+      subject.execute
+    end
+  end
+
+  context 'when repository did not exist' do
+    before do
+      allow(repository).to receive(:exists?).and_return(false)
+      allow(subject).to receive(:fetch_geo_mirror).and_return(nil)
+    end
+
+    it "indicates the repository is new" do
+      expect(Geo::ProjectHousekeepingService).to receive(:new).with(project, new_repository: true).and_call_original
+
+      subject.execute
+    end
+  end
+
+  context 'when repository already existed' do
+    it "indicates the repository is not new" do
+      expect(Geo::ProjectHousekeepingService).to receive(:new).with(project, new_repository: false).and_call_original
 
       subject.execute
     end
