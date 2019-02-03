@@ -378,6 +378,10 @@ module EE
         expose :approval_rules_left do |approval_state, options|
           approval_state.approval_rules_left.map(&:name)
         end
+
+        expose :has_approval_rules do |approval_state|
+          approval_state.has_approval_rules?
+        end
       end
 
       class LdapGroup < Grape::Entity

@@ -35,6 +35,10 @@ class ApprovalState
     end
   end
 
+  def has_approval_rules?
+    !wrapped_approval_rules.empty?
+  end
+
   def approval_rules_overwritten?
     merge_request.approval_rules.any?(&:regular?)
   end
