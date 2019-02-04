@@ -18,6 +18,7 @@ describe Projects::Prometheus::Alerts::NotifyService do
       expect(NotificationService)
         .to receive(:new)
         .and_return(notification_service)
+
       expect(notification_service)
         .to receive_message_chain(:async, :prometheus_alerts_fired)
 
@@ -28,6 +29,7 @@ describe Projects::Prometheus::Alerts::NotifyService do
       expect(Projects::Prometheus::Alerts::CreateEventsService)
         .to receive(:new)
         .and_return(create_events_service)
+
       expect(create_events_service)
         .to receive(:execute)
 
