@@ -235,6 +235,16 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
       expect(response).to match_response_schema('public_api/v4/geo_node', dir: 'ee')
       expect(json_response).to include(params)
     end
+
+    it 'cannot disable a primary' do
+      params = {
+        enabled: false
+      }.stringify_keys
+
+      put api("/geo_nodes/#{primary.id}", admin), params: params
+
+      expect(response).to have_gitlab_http_status(400)
+    end
   end
 
   describe 'DELETE /geo_nodes/:id' do
