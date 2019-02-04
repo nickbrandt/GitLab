@@ -393,7 +393,8 @@ describe Projects::FeatureFlagsController do
           operations_feature_flag: {
             name: 'my_feature_flag',
             active: true,
-            scopes_attributes: [{ environment_scope: 'production', active: false }]
+            scopes_attributes: [{ environment_scope: '*', active: true },
+                                { environment_scope: 'production', active: false }]
           }
         })
       end
@@ -402,6 +403,34 @@ describe Projects::FeatureFlagsController do
         expect { subject }.to change { Operations::FeatureFlagScope.count }.by(2)
 
         expect(response).to have_gitlab_http_status(200)
+      end
+
+      it 'creates feature flag scopes in a correct order' do
+        subject
+
+        expect(json_response['scopes'].first['environment_scope']).to eq('*')
+        expect(json_response['scopes'].second['environment_scope']).to eq('production')
+      end
+
+      context 'when default scope is not placed first' do
+        let(:params) do
+          view_params.merge({
+            operations_feature_flag: {
+              name: 'my_feature_flag',
+              active: true,
+              scopes_attributes: [{ environment_scope: 'production', active: false },
+                                  { environment_scope: '*', active: true }]
+            }
+          })
+        end
+
+        it 'returns 400' do
+          subject
+
+          expect(response).to have_gitlab_http_status(400)
+          expect(json_response['message'])
+            .to include('Default scope has to be the first element')
+        end
       end
     end
   end
