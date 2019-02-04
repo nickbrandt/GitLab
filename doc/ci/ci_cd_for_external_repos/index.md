@@ -1,5 +1,8 @@
 # GitLab CI/CD for external repositories **[PREMIUM]**
 
+NOTE: **Note:**
+To [promote its release](https://about.gitlab.com/2018/03/22/gitlab-10-6-released/#gitlab-cicd-for-external-repos), GitLab.com users are receiving this feature for free until March 2019.
+
 >[Introduced][ee-4642] in [GitLab Premium][eep] 10.6.
 
 GitLab CI/CD can be used with GitHub or any other Git server.
