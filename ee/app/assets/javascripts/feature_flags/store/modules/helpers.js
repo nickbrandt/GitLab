@@ -1,12 +1,13 @@
 // eslint-disable-next-line import/prefer-default-export
 export const parseFeatureFlagsParams = params => ({
-  operations_feature_flags: {
+  operations_feature_flag: {
     name: params.name,
     description: params.description,
-    active: true,
-    scopes_attributes: params.scopes.map(scope => ({
-      environment_scope: scope.name,
-      active: scope.active,
-    })),
+    // removes uniqueId key used in creation form
+    scopes_attributes: params.scopes.map(scope => {
+      const scopeCopy = Object.assign({}, scope);
+      delete scopeCopy.uniqueId;
+      return scopeCopy;
+    }),
   },
 });

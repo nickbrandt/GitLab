@@ -16,7 +16,9 @@ export default {
 
     state.name = response.name;
     state.description = response.description;
-    state.scopes = state.scopes;
+
+    // When there aren't scopes BE sends `null`
+    state.scopes = response.scopes || [];
   },
   [types.RECEIVE_FEATURE_FLAG_ERROR](state) {
     state.isLoading = false;
@@ -31,6 +33,6 @@ export default {
   },
   [types.RECEIVE_UPDATE_FEATURE_FLAG_ERROR](state, error) {
     state.isSendingRequest = false;
-    state.error = error.message;
+    state.error = error.message || [];
   },
 };

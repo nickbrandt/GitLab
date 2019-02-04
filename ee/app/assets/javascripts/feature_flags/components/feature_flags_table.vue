@@ -118,7 +118,7 @@ export default {
             {{ s__('FeatureFlags|Environment Specs') }}
           </div>
           <div
-            class="table-mobile-content d-flex flex-wrap justify-content-end js-feature-flag-environments"
+            class="table-mobile-content d-flex flex-wrap justify-content-end justify-content-md-start js-feature-flag-environments"
           >
             <span
               v-for="scope in featureFlag.scopes"
