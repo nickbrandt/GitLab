@@ -22,12 +22,15 @@ module EE
       has_many :draft_notes
 
       validate :validate_approvals_before_merge, unless: :importing?
+      validate :validate_approval_rule_source
 
       delegate :sha, to: :head_pipeline, prefix: :head_pipeline, allow_nil: true
       delegate :sha, to: :base_pipeline, prefix: :base_pipeline, allow_nil: true
       delegate :merge_requests_author_approval?, to: :target_project, allow_nil: true
 
       participant :participant_approvers
+
+      accepts_nested_attributes_for :approval_rules, allow_destroy: true
     end
 
     override :mergeable?
@@ -52,6 +55,22 @@ module EE
         errors.add :validate_approvals_before_merge,
                    'Number of approvals must be at least that of approvals on the target project'
       end
+    end
+
+    def validate_approval_rule_source
+      return if ::Feature.disabled?(:approval_rules, project)
+      return unless approval_rules.any?
+
+      local_project_rule_ids = approval_rules.map { |rule| rule.approval_merge_request_rule_source&.approval_project_rule_id }
+      local_project_rule_ids.compact!
+
+      invalid = if new_record?
+                  local_project_rule_ids.to_set != project.approval_rule_ids.to_set
+                else
+                  (local_project_rule_ids - project.approval_rule_ids).present?
+                end
+
+      errors.add(:approval_rules, :invalid_sourcing_to_project_rules) if invalid
     end
 
     def participant_approvers
@@ -99,7 +118,7 @@ module EE
           rule = approval_rules.code_owner.first
           rule ||= approval_rules.code_owner.create!(name: ApprovalMergeRequestRule::DEFAULT_NAME_FOR_CODE_OWNER)
 
-          rule.users = code_owners.uniq
+          rule.users = owners.uniq
         end
       else
         approval_rules.code_owner.delete_all

@@ -20,6 +20,7 @@ module EE
             optional :mirror_overwrites_diverged_branches, type: Grape::API::Boolean, desc: 'Pull mirror overwrites diverged branches'
             optional :import_url, type: String, desc: 'URL from which the project is imported'
             optional :packages_enabled, type: Grape::API::Boolean, desc: 'Enable project packages feature'
+            optional :fallback_approvals_required, type: Integer, desc: 'Overall approvals required when no rule is present'
           end
 
           def apply_filters(projects)

@@ -13,6 +13,38 @@ describe MergeRequestPresenter do
     end
   end
 
+  describe '#api_approvals_path' do
+    subject { described_class.new(resource, current_user: user).api_approvals_path }
+
+    it 'returns path' do
+      is_expected.to eq("/api/v4/projects/#{resource.project.id}/merge_requests/#{resource.iid}/approvals")
+    end
+  end
+
+  describe '#api_approval_settings_path' do
+    subject { described_class.new(resource, current_user: user).api_approval_settings_path }
+
+    it 'returns path' do
+      is_expected.to eq("/api/v4/projects/#{resource.project.id}/merge_requests/#{resource.iid}/approval_settings")
+    end
+  end
+
+  describe '#api_approve_path' do
+    subject { described_class.new(resource, current_user: user).api_approve_path }
+
+    it 'returns path' do
+      is_expected.to eq("/api/v4/projects/#{resource.project.id}/merge_requests/#{resource.iid}/approve")
+    end
+  end
+
+  describe '#api_unapprove_path' do
+    subject { described_class.new(resource, current_user: user).api_unapprove_path }
+
+    it 'returns path' do
+      is_expected.to eq("/api/v4/projects/#{resource.project.id}/merge_requests/#{resource.iid}/unapprove")
+    end
+  end
+
   describe '#approvers_left' do
     let!(:private_group) { create(:group_with_members, :private) }
     let!(:public_group) { create(:group_with_members) }
@@ -39,6 +71,26 @@ describe MergeRequestPresenter do
 
         is_expected.to match_array(approvers)
       end
+    end
+  end
+
+  describe '#approvers_left with approval_rule enabled' do
+    let!(:private_group) { create(:group_with_members, :private) }
+    let!(:public_group) { create(:group_with_members) }
+    let!(:public_approver_group) { create(:approver_group, target: resource, group: public_group) }
+    let!(:private_approver_group) { create(:approver_group, target: resource, group: private_group) }
+    let!(:approver) { create(:approver, target: resource) }
+
+    before do
+      resource.approvals.create!(user: approver.user)
+    end
+
+    subject { described_class.new(resource, current_user: user).approvers_left }
+
+    it 'contains all approvers' do
+      approvers = public_approver_group.users + private_approver_group.users - [user]
+
+      is_expected.to match_array(approvers)
     end
   end
 
@@ -86,6 +138,22 @@ describe MergeRequestPresenter do
 
         is_expected.to match_array(approvers)
       end
+    end
+  end
+
+  describe '#all_approvers_including_groups with approval_rule enabled' do
+    let!(:private_group) { create(:group_with_members, :private) }
+    let!(:public_group) { create(:group_with_members) }
+    let!(:public_approver_group) { create(:approver_group, target: resource, group: public_group) }
+    let!(:private_approver_group) { create(:approver_group, target: resource, group: private_group) }
+    let!(:approver) { create(:approver, target: resource) }
+
+    subject { described_class.new(resource, current_user: user).all_approvers_including_groups }
+
+    it do
+      approvers = [public_approver_group.users, private_approver_group.users, approver.user].flatten - [user]
+
+      is_expected.to match_array(approvers)
     end
   end
 end

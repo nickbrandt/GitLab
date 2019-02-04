@@ -9,6 +9,7 @@ module EE
         mount ::EE::API::Boards
         mount ::EE::API::GroupBoards
 
+        mount ::API::ProjectApprovalRules
         mount ::API::Unleash
         mount ::API::EpicIssues
         mount ::API::Epics
