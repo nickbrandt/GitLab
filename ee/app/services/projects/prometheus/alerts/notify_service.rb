@@ -34,10 +34,21 @@ module Projects
         end
 
         def valid_alert_manager_token?(token)
-          # We don't support token authorization for manual installations.
-          prometheus = project.find_or_initialize_service('prometheus')
-          return true if prometheus.manual_configuration?
+          valid_for_manual?(token) || valid_for_managed?(token)
+        end
 
+        def valid_for_manual?(token)
+          prometheus = project.find_or_initialize_service('prometheus')
+          return false unless prometheus.manual_configuration?
+
+          if setting = project.alerting_setting
+            compare_token(token, setting.token)
+          else
+            token.nil?
+          end
+        end
+
+        def valid_for_managed?(token)
           prometheus_application = available_prometheus_application(project)
           return false unless prometheus_application
 
