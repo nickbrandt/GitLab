@@ -676,9 +676,6 @@ msgstr ""
 msgid "An empty GitLab User field will add the FogBugz user's full name (e.g. \"By John Smith\") in the description of all issues and comments. It will also associate and/or assign these issues and comments with the project creator."
 msgstr ""
 
-msgid "An error accured whilst committing your changes."
-msgstr ""
-
 msgid "An error has occurred"
 msgstr ""
 
@@ -809,6 +806,9 @@ msgid "An error occurred while updating the comment"
 msgstr ""
 
 msgid "An error occurred while validating username"
+msgstr ""
+
+msgid "An error occurred whilst committing your changes."
 msgstr ""
 
 msgid "An error occurred whilst fetching the job trace."
@@ -7089,6 +7089,9 @@ msgid "Profiles|Username change failed - %{message}"
 msgstr ""
 
 msgid "Profiles|Username successfully changed"
+msgstr ""
+
+msgid "Profiles|Using emojis in names seems fun, but please try to set a status message instead"
 msgstr ""
 
 msgid "Profiles|What's your status?"
