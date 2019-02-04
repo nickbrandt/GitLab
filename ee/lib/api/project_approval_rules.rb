@@ -22,29 +22,6 @@ module API
           present user_project, with: EE::API::Entities::ProjectApprovalRules, current_user: current_user
         end
 
-        desc 'Update fallback approvals required' do
-          detail 'Private API subject to change'
-          success ::API::Entities::Project
-        end
-        params do
-          requires :fallback_approvals_required, as: :approvals_before_merge, type: Integer, desc: 'The total number of required approvals in case of fallback'
-        end
-        put do
-          authorize! :admin_project, user_project
-
-          result = ::Projects::UpdateService.new(user_project, current_user, declared_params).execute
-
-          if result[:status] == :success
-            present(
-              user_project,
-              with: ::API::Entities::Project,
-              user_can_admin_project: can?(current_user, :admin_project, user_project)
-            )
-          else
-            render_validation_error!(user_project)
-          end
-        end
-
         segment 'rules' do
           desc 'Create new approval rule' do
             detail 'Private API subject to change'
