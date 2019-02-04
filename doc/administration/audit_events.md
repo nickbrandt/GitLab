@@ -1,18 +1,17 @@
 ---
-last_updated: 2017-12-13
+last_updated: 2019-02-04
 ---
 
-# Audit Events **[STARTER]**
+# Audit Events
 
-GitLab Enterprise Edition offers a way to view the changes made within the
-GitLab server as a help to system administrators.
+GitLab offers a way to view the changes made within the GitLab server for owners and administrators on a [paid plan][ee].
 
 GitLab system administrators can also take advantage of the logs located on the
 filesystem, see [the logs system documentation](logs.md) for more details.
 
 ## Overview
 
-**Audit Events** is a tool for GitLab Enterprise Edition administrators to be
+**Audit Events** is a tool for GitLab owners and administrators to be
 able to track important events such as who performed certain actions and the
 time they happened. These actions could be, for example, change a user
 permission level, who added a new user, or who removed a user.
@@ -20,20 +19,20 @@ permission level, who added a new user, or who removed a user.
 ## Use-cases
 
 - Check who was the person who changed the permission level of a particular
-  user for a project in your GitLab EE instance.
+  user for a project in GitLab.
 - Use it to track which users have access to a certain group of projects
-  in your GitLab instance, and who gave them that permission level.
+  in  GitLab, and who gave them that permission level.
 
 ## List of events
 
 There are two kinds of events logged:
 
 - Events scoped to the group or project, used by group / project managers
-  to loop up who made what change
-- Events scoped to the whole GitLab instance, used by your Compliance team to
-  perform formal audits
+  to look up who made what change.
+- Instance events scoped to the whole GitLab instance, used by your Compliance team to
+  perform formal audits.
 
-### Group events
+### Group events **[STARTER]**
 
 NOTE: **Note:**
 You need Owner [permissions] to view the group Audit Events page.
@@ -60,7 +59,7 @@ From there, you can see the following actions:
 - 2FA enforcement/grace period changed
 - Roles allowed to create project changed
 
-### Project events
+### Project events **[STARTER]**
 
 NOTE: **Note:**
 You need Maintainer [permissions] or higher to view the project Audit Events page.

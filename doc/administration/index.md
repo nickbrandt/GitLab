@@ -104,7 +104,9 @@ Learn how to install, configure, update, and maintain your GitLab instance.
   - [Kerberos authentication](../integration/kerberos.md) **[STARTER ONLY]**
 - [Email users](../tools/email.md): Email GitLab users from within GitLab. **[STARTER ONLY]**
 - [User Cohorts](../user/admin_area/user_cohorts.md): Display the monthly cohorts of new users and their activities over time.
-- [Audit logs and events](audit_events.md): View the changes made within the GitLab server. **[STARTER ONLY]**
+- [Audit logs and events](audit_events.md): View the changes made within the GitLab server for:
+  - Groups and projects. **[STARTER]**
+  - Instances. **[PREMIUM ONLY]**
 - [Auditor users](auditor_users.md): Users with read-only access to all projects, groups, and other resources on the GitLab instance. **[PREMIUM ONLY]**
 - [Incoming email](incoming_email.md): Configure incoming emails to allow
   users to [reply by email], create [issues by email] and
