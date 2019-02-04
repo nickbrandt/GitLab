@@ -3,7 +3,7 @@
 require 'spec_helper'
 require Rails.root.join('ee', 'db', 'post_migrate', '20180618193715_schedule_prune_orphaned_geo_events.rb')
 
-describe SchedulePruneOrphanedGeoEvents, :migration do
+describe SchedulePruneOrphanedGeoEvents, :migration, schema: 20180615152524 do
   describe '#up' do
     it 'delegates work to Gitlab::BackgroundMigration::PruneOrphanedGeoEvents', :postgresql do
       expect(BackgroundMigrationWorker).to receive(:perform_async).with('PruneOrphanedGeoEvents')
