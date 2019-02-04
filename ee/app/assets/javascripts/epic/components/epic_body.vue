@@ -30,6 +30,7 @@ export default {
       'initialTitleText',
       'initialDescriptionHtml',
       'initialDescriptionText',
+      'lockVersion',
     ]),
   },
 };
@@ -49,6 +50,7 @@ export default {
         :show-delete-button="canDestroy"
         :initial-title-html="initialTitleHtml"
         :initial-title-text="initialTitleText"
+        :lock-version="lockVersion"
         :initial-description-html="initialDescriptionHtml"
         :initial-description-text="initialDescriptionText"
         :show-inline-edit-button="true"
