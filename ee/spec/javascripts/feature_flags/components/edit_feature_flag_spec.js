@@ -26,6 +26,7 @@ describe('Edit feature flag form', () => {
       propsData: {
         endpoint: `${TEST_HOST}/feature_flags.json'`,
         path: '/feature_flags',
+        environmentsEndpoint: 'environments.json',
       },
       store,
       sync: false,

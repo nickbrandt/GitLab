@@ -1888,6 +1888,9 @@ msgstr ""
 msgid "Clear"
 msgstr ""
 
+msgid "Clear input"
+msgstr ""
+
 msgid "Clear search"
 msgstr ""
 
@@ -6333,6 +6336,9 @@ msgstr ""
 msgid "No license. All rights reserved"
 msgstr ""
 
+msgid "No matching results"
+msgstr ""
+
 msgid "No merge requests for the selected time period."
 msgstr ""
 
@@ -8151,6 +8157,9 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
+msgid "Search an environment spec"
+msgstr ""
+
 msgid "Search branches"
 msgstr ""
 
@@ -8637,6 +8646,9 @@ msgid "Something went wrong on our end."
 msgstr ""
 
 msgid "Something went wrong on our end. Please try again!"
+msgstr ""
+
+msgid "Something went wrong on our end. Please try again."
 msgstr ""
 
 msgid "Something went wrong trying to change the confidentiality of this issue"

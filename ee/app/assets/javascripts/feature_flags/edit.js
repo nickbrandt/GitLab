@@ -14,6 +14,7 @@ export default () => {
         props: {
           endpoint: el.dataset.endpoint,
           path: el.dataset.featureFlagsPath,
+          environmentsEndpoint: el.dataset.environmentsEndpoint,
         },
       });
     },
