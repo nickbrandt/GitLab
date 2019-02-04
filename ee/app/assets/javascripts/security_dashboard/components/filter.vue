@@ -26,6 +26,9 @@ export default {
     filter() {
       return this.getFilter(this.filterId);
     },
+    selection() {
+      return this.getFilter(this.filterId).selection;
+    },
     selectedOptionText() {
       return this.getSelectedOptionNames(this.filterId) || '-';
     },
@@ -38,6 +41,9 @@ export default {
         optionId: option.id,
       });
       this.$emit('change');
+    },
+    isSelected(option) {
+      return this.selection.has(option.id);
     },
   },
 };
@@ -57,11 +63,11 @@ export default {
         @click="clickFilter(option)"
       >
         <icon
-          v-if="option.selected"
+          v-if="isSelected(option)"
           class="vertical-align-middle js-check"
           name="mobile-issue-close"
         />
-        <span class="vertical-align-middle" :class="{ 'prepend-left-20': !option.selected }">{{
+        <span class="vertical-align-middle" :class="{ 'prepend-left-20': !isSelected(option) }">{{
           option.name
         }}</span>
       </gl-dropdown-item>

@@ -6,39 +6,24 @@ export default {
     const activeFilter = state.filters.find(filter => filter.id === filterId);
 
     if (activeFilter) {
-      let activeOptions;
+      let selection = new Set(activeFilter.selection);
 
       if (optionId === 'all') {
-        activeOptions = activeFilter.options.map(option => ({
-          ...option,
-          selected: option.id === optionId,
-        }));
+        selection = new Set(['all']);
       } else {
-        activeOptions = activeFilter.options.map(option => {
-          if (option.id === 'all') {
-            return {
-              ...option,
-              selected: false,
-            };
-          }
-
-          if (option.id === optionId) {
-            return {
-              ...option,
-              selected: !option.selected,
-            };
-          }
-
-          return option;
-        });
+        selection.delete('all');
+        if (selection.has(optionId)) {
+          selection.delete(optionId);
+        } else {
+          selection.add(optionId);
+        }
       }
 
       // This prevents us from selecting nothing at all
-      if (!activeOptions.find(option => option.selected)) {
-        activeOptions[0].selected = true;
+      if (selection.size === 0) {
+        selection = new Set(['all']);
       }
-
-      activeFilter.options = activeOptions;
+      activeFilter.selection = selection;
     }
   },
   [types.SET_FILTER_OPTIONS](state, payload) {

@@ -7,14 +7,17 @@ import vulnerabilities from './modules/vulnerabilities/index';
 
 Vue.use(Vuex);
 
-const store = new Vuex.Store({
-  modules: {
-    filters,
-    projects,
-    vulnerabilities,
-  },
-});
+export default () => {
+  const store = new Vuex.Store({
+    modules: {
+      filters,
+      projects,
+      vulnerabilities,
+    },
+  });
 
-configureModerator(store);
 
-export default () => store;
+  configureModerator(store);
+
+  return store;
+};

@@ -9,13 +9,13 @@ export default () => ({
         {
           name: 'All',
           id: 'all',
-          selected: true,
         },
         ...Object.entries(SEVERITIES).map(severity => {
           const [id, name] = severity;
           return { id, name };
         }),
       ],
+      selection: new Set(['all']),
     },
     {
       name: 'Report type',
@@ -24,13 +24,13 @@ export default () => ({
         {
           name: 'All',
           id: 'all',
-          selected: true,
         },
         ...Object.entries(REPORT_TYPES).map(type => {
           const [id, name] = type;
           return { id, name };
         }),
       ],
+      selection: new Set(['all']),
     },
     {
       name: 'Project',
@@ -39,9 +39,9 @@ export default () => ({
         {
           name: 'All',
           id: 'all',
-          selected: true,
         },
       ],
+      selection: new Set(['all']),
     },
   ],
 });
