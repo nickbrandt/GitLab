@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"regexp"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -84,34 +86,34 @@ func uploadTestServer(t *testing.T, extraTests func(r *http.Request)) *httptest.
 	})
 }
 
+func parseJWT(token *jwt.Token) (interface{}, error) {
+	// Don't forget to validate the alg is what you expect:
+	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+	}
+
+	testhelper.ConfigureSecret()
+	secretBytes, err := secret.Bytes()
+	if err != nil {
+		return nil, fmt.Errorf("read secret from file: %v", err)
+	}
+
+	return secretBytes, nil
+}
+
 func TestAcceleratedUpload(t *testing.T) {
 	reqBody, contentType, err := multipartBodyWithFile()
 	if err != nil {
 		t.Fatal(err)
 	}
 	ts := uploadTestServer(t, func(r *http.Request) {
-		jwtToken, err := jwt.Parse(r.Header.Get(upload.RewrittenFieldsHeader), func(token *jwt.Token) (interface{}, error) {
-			// Don't forget to validate the alg is what you expect:
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-			}
-			testhelper.ConfigureSecret()
-			secretBytes, err := secret.Bytes()
-			if err != nil {
-				return nil, fmt.Errorf("read secret from file: %v", err)
-			}
-
-			return secretBytes, nil
-		})
-		if err != nil {
-			t.Fatal(err)
-		}
+		jwtToken, err := jwt.Parse(r.Header.Get(upload.RewrittenFieldsHeader), parseJWT)
+		require.NoError(t, err)
 
 		rewrittenFields := jwtToken.Claims.(jwt.MapClaims)["rewritten_fields"].(map[string]interface{})
 		if len(rewrittenFields) != 1 || len(rewrittenFields["file"].(string)) == 0 {
 			t.Fatalf("Unexpected rewritten_fields value: %v", rewrittenFields)
 		}
-
 	})
 
 	defer ts.Close()
@@ -190,4 +192,70 @@ func TestBlockingRewrittenFieldsHeader(t *testing.T) {
 		}
 
 	}
+}
+
+func TestLfsUpload(t *testing.T) {
+	reqBody := "test data"
+	rspBody := "test success"
+	oid := "916f0027a575074ce72a331777c3478d6513f786a591bd892da1a577bf2335f9"
+	resource := fmt.Sprintf("/%s/gitlab-lfs/objects/%s/%d", testRepo, oid, len(reqBody))
+
+	lfsApiResponse := fmt.Sprintf(
+		`{"TempPath":%q, "LfsOid":%q, "LfsSize": %d}`,
+		scratchDir, oid, len(reqBody),
+	)
+
+	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, r.Method, "PUT")
+		switch r.RequestURI {
+		case resource + "/authorize":
+			// Expect the authorization call to be signed
+			_, err := jwt.Parse(r.Header.Get(secret.RequestHeader), parseJWT)
+			require.NoError(t, err)
+
+			// Instruct workhorse to accept the upload
+			w.Header().Set("Content-Type", api.ResponseContentType)
+			_, err = fmt.Fprint(w, lfsApiResponse)
+			require.NoError(t, err)
+
+		case resource:
+			// Expect the finalization call to be signed
+			_, err := jwt.Parse(r.Header.Get(secret.RequestHeader), parseJWT)
+			require.NoError(t, err)
+
+			// Expect the request to point to a file on disk containing the data
+			require.NoError(t, r.ParseForm())
+			require.Equal(t, oid, r.Form.Get("file.sha256"), "Invalid SHA256 populated")
+			require.Equal(t, strconv.Itoa(len(reqBody)), r.Form.Get("file.size"), "Invalid size populated")
+
+			tempfile, err := ioutil.ReadFile(r.Form.Get("file.path"))
+			require.NoError(t, err)
+			require.Equal(t, reqBody, string(tempfile), "Temporary file has the wrong body")
+
+			fmt.Fprint(w, rspBody)
+		default:
+			t.Fatalf("Unexpected request to upstream! %v %q", r.Method, r.RequestURI)
+		}
+	})
+	defer ts.Close()
+
+	ws := startWorkhorseServer(ts.URL)
+	defer ws.Close()
+
+	req, err := http.NewRequest("PUT", ws.URL+resource, strings.NewReader(reqBody))
+	require.NoError(t, err)
+
+	req.Header.Set("Content-Type", "application/octet-stream")
+	req.ContentLength = int64(len(reqBody))
+
+	resp, err := http.DefaultClient.Do(req)
+	require.NoError(t, err)
+
+	defer resp.Body.Close()
+	rspData, err := ioutil.ReadAll(resp.Body)
+	require.NoError(t, err)
+
+	// Expect the (eventual) response to be proxied through, untouched
+	require.Equal(t, 200, resp.StatusCode)
+	require.Equal(t, rspBody, string(rspData))
 }

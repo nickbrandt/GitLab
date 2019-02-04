@@ -23,9 +23,6 @@ const (
 	// Custom content type for API responses, to catch routing / programming mistakes
 	ResponseContentType = "application/vnd.gitlab-workhorse+json"
 
-	// This header carries the JWT token for gitlab-rails
-	RequestHeader = "Gitlab-Workhorse-Api-Request"
-
 	failureResponseLimit = 32768
 )
 
@@ -194,17 +191,6 @@ func (api *API) newRequest(r *http.Request, suffix string) (*http.Request, error
 	// This allows the Host header received by the backend to be consistent with other
 	// requests not going through gitlab-workhorse.
 	authReq.Host = r.Host
-	// Set a custom header for the request. This can be used in some
-	// configurations (Passenger) to solve auth request routing problems.
-	authReq.Header.Set("Gitlab-Workhorse", api.Version)
-
-	helper.SetForwardedFor(&authReq.Header, r)
-
-	tokenString, err := secret.JWTTokenString(secret.DefaultClaims)
-	if err != nil {
-		return nil, fmt.Errorf("newRequest: sign JWT: %v", err)
-	}
-	authReq.Header.Set(RequestHeader, tokenString)
 
 	return authReq, nil
 }
@@ -280,7 +266,9 @@ func (api *API) PreAuthorizeHandler(next HandleFunc, suffix string) http.Handler
 }
 
 func (api *API) doRequestWithoutRedirects(authReq *http.Request) (*http.Response, error) {
-	return api.Client.Transport.RoundTrip(authReq)
+	signingTripper := secret.NewRoundTripper(api.Client.Transport, api.Version)
+
+	return signingTripper.RoundTrip(authReq)
 }
 
 func copyAuthHeader(httpResponse *http.Response, w http.ResponseWriter) {

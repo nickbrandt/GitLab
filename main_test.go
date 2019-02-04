@@ -26,6 +26,7 @@ import (
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/config"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/helper"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/testhelper"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/upstream"
 )
@@ -403,7 +404,7 @@ func TestApiContentTypeBlock(t *testing.T) {
 func TestAPIFalsePositivesAreProxied(t *testing.T) {
 	goodResponse := []byte(`<html></html>`)
 	ts := testhelper.TestServerWithHandler(regexp.MustCompile(`.`), func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get(api.RequestHeader) != "" && r.Method != "GET" {
+		if r.Header.Get(secret.RequestHeader) != "" && r.Method != "GET" {
 			w.WriteHeader(500)
 			w.Write([]byte("non-GET request went through PreAuthorize handler"))
 		} else {

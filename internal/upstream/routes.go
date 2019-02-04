@@ -2,6 +2,7 @@ package upstream
 
 import (
 	"net/http"
+	"net/url"
 	"path"
 	"regexp"
 
@@ -19,6 +20,7 @@ import (
 	proxypkg "gitlab.com/gitlab-org/gitlab-workhorse/internal/proxy"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/queueing"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/redis"
+	"gitlab.com/gitlab-org/gitlab-workhorse/internal/secret"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/senddata"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/sendfile"
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/sendurl"
@@ -129,6 +131,21 @@ func (ro *routeEntry) isMatch(cleanedPath string, req *http.Request) bool {
 	return ok
 }
 
+func buildProxy(backend *url.URL, version string, rt http.RoundTripper) http.Handler {
+	proxier := proxypkg.NewProxy(backend, version, rt)
+
+	return senddata.SendData(
+		sendfile.SendFile(apipkg.Block(proxier)),
+		git.SendArchive,
+		git.SendBlob,
+		git.SendDiff,
+		git.SendPatch,
+		git.SendSnapshot,
+		artifacts.SendEntry,
+		sendurl.SendURL,
+	)
+}
+
 // Routing table
 // We match against URI not containing the relativeUrlRoot:
 // see upstream.ServeHTTP
@@ -139,23 +156,12 @@ func (u *upstream) configureRoutes() {
 		u.Version,
 		u.RoundTripper,
 	)
+
 	static := &staticpages.Static{DocumentRoot: u.DocumentRoot}
-	proxy := senddata.SendData(
-		sendfile.SendFile(
-			apipkg.Block(
-				proxypkg.NewProxy(
-					u.Backend,
-					u.Version,
-					u.RoundTripper,
-				))),
-		git.SendArchive,
-		git.SendBlob,
-		git.SendDiff,
-		git.SendPatch,
-		git.SendSnapshot,
-		artifacts.SendEntry,
-		sendurl.SendURL,
-	)
+	proxy := buildProxy(u.Backend, u.Version, u.RoundTripper)
+
+	signingTripper := secret.NewRoundTripper(u.RoundTripper, u.Version)
+	signingProxy := buildProxy(u.Backend, u.Version, signingTripper)
 
 	uploadPath := path.Join(u.DocumentRoot, "uploads/tmp")
 	uploadAccelerateProxy := upload.Accelerate(&upload.SkipRailsAuthorizer{TempPath: uploadPath}, proxy)
@@ -167,7 +173,7 @@ func (u *upstream) configureRoutes() {
 		route("GET", gitProjectPattern+`info/refs\z`, git.GetInfoRefsHandler(api)),
 		route("POST", gitProjectPattern+`git-upload-pack\z`, contentEncodingHandler(git.UploadPack(api)), withMatcher(isContentType("application/x-git-upload-pack-request"))),
 		route("POST", gitProjectPattern+`git-receive-pack\z`, contentEncodingHandler(git.ReceivePack(api)), withMatcher(isContentType("application/x-git-receive-pack-request"))),
-		route("PUT", gitProjectPattern+`gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`, lfs.PutStore(api, proxy), withMatcher(isContentType("application/octet-stream"))),
+		route("PUT", gitProjectPattern+`gitlab-lfs/objects/([0-9a-f]{64})/([0-9]+)\z`, lfs.PutStore(api, signingProxy), withMatcher(isContentType("application/octet-stream"))),
 
 		// CI Artifacts
 		route("POST", apiPattern+`v4/jobs/[0-9]+/artifacts\z`, contentEncodingHandler(artifacts.UploadArtifacts(api, proxy))),
