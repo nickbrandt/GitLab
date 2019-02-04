@@ -64,14 +64,18 @@ export default {
     this.setVulnerabilitiesEndpoint(this.vulnerabilitiesEndpoint);
     this.setVulnerabilitiesCountEndpoint(this.vulnerabilitiesCountEndpoint);
     this.setVulnerabilitiesHistoryEndpoint(this.vulnerabilitiesHistoryEndpoint);
-    this.fetchVulnerabilitiesCount();
+    this.fetchVulnerabilities(this.activeFilters);
+    this.fetchVulnerabilitiesCount(this.activeFilters);
+    this.fetchVulnerabilitiesHistory(this.activeFilters);
     this.fetchProjects();
   },
   methods: {
     ...mapActions('vulnerabilities', [
       'createIssue',
       'dismissVulnerability',
+      'fetchVulnerabilities',
       'fetchVulnerabilitiesCount',
+      'fetchVulnerabilitiesHistory',
       'revertDismissal',
       'setVulnerabilitiesCountEndpoint',
       'setVulnerabilitiesEndpoint',

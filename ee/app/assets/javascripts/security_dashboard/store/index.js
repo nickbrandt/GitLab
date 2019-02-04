@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import router from './router';
 import configureModerator from './moderator';
 import filters from './modules/filters/index';
 import projects from './modules/projects/index';
@@ -15,6 +16,8 @@ export default () => {
       vulnerabilities,
     },
   });
+
+  store.$router = router;
 
   configureModerator(store);
 

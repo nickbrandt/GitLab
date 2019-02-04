@@ -47,6 +47,46 @@ describe('filters module mutations', () => {
     });
   });
 
+  describe('SET_ALL_FILTERS', () => {
+    it('should set options if they are a single string', () => {
+      mutations[types.SET_ALL_FILTERS](state, { [severityFilter.id]: criticalOption.id });
+
+      const expected = new Set([criticalOption.id]);
+
+      expect(state.filters[0].selection).toEqual(expected);
+    });
+
+    it('should set options if they are given as an array', () => {
+      mutations[types.SET_ALL_FILTERS](state, {
+        [severityFilter.id]: [criticalOption.id, highOption.id],
+      });
+
+      const expected = new Set([criticalOption.id, highOption.id]);
+
+      expect(state.filters[0].selection).toEqual(expected);
+    });
+
+    it('should set options to `all` if no payload is given', () => {
+      mutations[types.SET_ALL_FILTERS](state);
+
+      const expected = new Set(['all']);
+
+      state.filters.forEach(filter => {
+        expect(filter.selection).toEqual(expected);
+      });
+    });
+
+    it('should set options to `all` if payload contains an empty array', () => {
+      mutations[types.SET_ALL_FILTERS](state, {
+        [severityFilter.id]: [],
+      });
+
+      const expected = new Set(['all']);
+
+      expect(state.filters[0].selection).toEqual(expected);
+    });
+  });
+
   describe('SET_FILTER_OPTIONS', () => {
     const options = [{ id: 0, name: 'c' }, { id: 3, name: 'c' }];
 

@@ -1,6 +1,23 @@
 import * as types from './mutation_types';
 
 export default {
+  [types.SET_ALL_FILTERS](state, payload = {}) {
+    state.filters = state.filters.map(filter => {
+      // If the payload is empty, we fall back to an empty selection
+      const selectedOptions = (payload && payload[filter.id]) || [];
+
+      const selection = Array.isArray(selectedOptions)
+        ? new Set(selectedOptions)
+        : new Set([selectedOptions]);
+
+      // This prevents us from selecting nothing at all
+      if (selection.size === 0) {
+        selection.add('all');
+      }
+
+      return { ...filter, selection };
+    });
+  },
   [types.SET_FILTER](state, payload) {
     const { filterId, optionId } = payload;
     const activeFilter = state.filters.find(filter => filter.id === filterId);
@@ -21,7 +38,7 @@ export default {
 
       // This prevents us from selecting nothing at all
       if (selection.size === 0) {
-        selection = new Set(['all']);
+        selection.add('all');
       }
       activeFilter.selection = selection;
     }

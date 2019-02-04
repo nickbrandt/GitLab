@@ -43,9 +43,6 @@ export default {
       return this.pageInfo && this.pageInfo.total;
     },
   },
-  created() {
-    this.fetchVulnerabilities(this.activeFilters);
-  },
   methods: {
     ...mapActions('vulnerabilities', ['fetchVulnerabilities', 'openModal']),
     fetchPage(page) {
