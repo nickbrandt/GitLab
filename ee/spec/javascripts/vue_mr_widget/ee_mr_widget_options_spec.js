@@ -846,4 +846,18 @@ describe('ee merge request widget options', () => {
       expect(ciWidget).toContainHtml(sourceBranchLink);
     });
   });
+
+  describe('data', () => {
+    it('passes approvals_path to service', () => {
+      const approvalsPath = `${TEST_HOST}/approvals/path`;
+      vm = mountComponent(Component, {
+        mrData: {
+          ...mockData,
+          approvals_path: approvalsPath,
+        },
+      });
+
+      expect(vm.service.approvalsPath).toEqual(approvalsPath);
+    });
+  });
 });

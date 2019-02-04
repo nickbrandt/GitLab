@@ -138,6 +138,14 @@ export default {
     }
   },
   methods: {
+    getServiceEndpoints(store) {
+      const base = CEWidgetOptions.methods.getServiceEndpoints(store);
+
+      return {
+        ...base,
+        approvalsPath: store.approvalsPath,
+      };
+    },
     fetchCodeQuality() {
       const { head_path, base_path } = this.mr.codeclimate;
 
