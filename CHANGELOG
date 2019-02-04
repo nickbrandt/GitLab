@@ -2,6 +2,11 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 8.2.0
+
+- Sign LFS upload requests that have been handled by workhorse
+- Fixed svg recognition to get the proper content type !353
+
 v 8.1.1
 
 - Sign LFS upload requests that have been handled by workhorse
