@@ -14,18 +14,26 @@ export default {
       required: true,
     },
   },
+  computed: {
+    isRemoveable() {
+      return !this.rule.isFallback;
+    },
+  },
   methods: {
-    ...mapActions({ openCreateModal: 'createModal/open' }),
-    ...mapActions({ openDeleteModal: 'deleteModal/open' }),
+    ...mapActions(['requestEditRule', 'requestDeleteRule']),
   },
 };
 </script>
 
 <template>
   <div>
-    <gl-button variant="none" @click="openCreateModal(rule)">
-      <icon name="pencil" :aria-label="__('Edit')" /> </gl-button
-    ><gl-button class="prepend-left-8 btn-inverted" variant="remove" @click="openDeleteModal(rule)">
+    <gl-button variant="none" @click="requestEditRule(rule)"> <span>Edit</span> </gl-button
+    ><gl-button
+      v-if="isRemoveable"
+      class="prepend-left-8 btn-inverted"
+      variant="remove"
+      @click="requestDeleteRule(rule)"
+    >
       <icon name="remove" :aria-label="__('Remove')" />
     </gl-button>
   </div>

@@ -1,6 +1,6 @@
 import { createLocalVue, mount } from '@vue/test-utils';
 import $ from 'jquery';
-import Api from 'ee/api';
+import Api from '~/api';
 import ApproversSelect from 'ee/approvals/components/approvers_select.vue';
 import { TYPE_USER, TYPE_GROUP } from 'ee/approvals/constants';
 import { TEST_HOST } from 'spec/test_constants';

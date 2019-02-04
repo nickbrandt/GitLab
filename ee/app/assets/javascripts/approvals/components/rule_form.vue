@@ -2,7 +2,7 @@
 import { mapState, mapActions } from 'vuex';
 import _ from 'underscore';
 import { GlButton } from '@gitlab/ui';
-import { __ } from '~/locale';
+import { sprintf, __ } from '~/locale';
 import ApproversList from './approvers_list.vue';
 import ApproversSelect from './approvers_select.vue';
 import { TYPE_USER, TYPE_GROUP } from '../constants';
@@ -24,9 +24,11 @@ export default {
     return {
       name: '',
       approvalsRequired: 1,
+      minApprovalsRequired: 0,
       approvers: [],
       approversToAdd: [],
       showValidation: false,
+      isFallback: false,
       ...this.getInitialData(),
     };
   },
@@ -59,22 +61,46 @@ export default {
       };
     },
     invalidName() {
+      if (this.isFallbackSubmission) {
+        return;
+      }
+
       return !this.name ? __('Please provide a name') : '';
     },
     invalidApprovalsRequired() {
-      return !_.isNumber(this.approvalsRequired) || this.approvalsRequired < 0
-        ? __('Please enter a non-negative number')
-        : '';
+      if (!_.isNumber(this.approvalsRequired)) {
+        return __('Please enter a valid number');
+      }
+
+      if (this.approvalsRequired < this.minApprovalsRequired) {
+        return this.minApprovalsRequired === 0
+          ? __('Please enter a non-negative number')
+          : sprintf(
+              __('Please enter a number greater than %{number} (from the project settings)'),
+              {
+                number: this.minApprovalsRequired,
+              },
+            );
+      }
+
+      return '';
     },
     invalidApprovers() {
+      if (this.isFallbackSubmission) {
+        return;
+      }
+
       return !this.approvers.length ? __('Please select and add a member') : '';
     },
     isValid() {
       return Object.keys(this.validation).every(key => !this.validation[key]);
     },
+    isFallbackSubmission() {
+      return this.isFallback && !this.name && !this.approvers.length;
+    },
   },
   methods: {
-    ...mapActions(['postRule', 'putRule']),
+    ...mapActions(['putFallbackRule', 'postRule', 'putRule']),
     addSelection() {
       if (!this.approversToAdd.length) {
         return;
@@ -84,6 +110,14 @@ export default {
       this.approversToAdd = [];
     },
     submit() {
+      if (!this.validate()) {
+        return Promise.resolve();
+      }
+
+      if (this.isFallbackSubmission) {
+        return this.submitFallback();
+      }
+
       const id = this.initRule && this.initRule.id;
       const data = {
         name: this.name,
@@ -94,24 +128,39 @@ export default {
         groupRecords: this.groups,
       };
 
-      this.showValidation = true;
-      if (!this.isValid) {
-        return Promise.resolve();
-      }
-
       return id ? this.putRule({ id, ...data }) : this.postRule(data);
+    },
+    submitFallback() {
+      const data = {
+        approvalsRequired: this.approvalsRequired,
+      };
+
+      return this.putFallbackRule(data);
+    },
+    validate() {
+      this.showValidation = true;
+
+      return this.isValid;
     },
     getInitialData() {
       if (!this.initRule) {
         return {};
       }
 
+      if (this.initRule.isFallback) {
+        return {
+          approvalsRequired: this.initRule.approvalsRequired,
+          isFallback: this.initRule.isFallback,
+        };
+      }
+
       const users = this.initRule.users.map(x => ({ ...x, type: TYPE_USER }));
       const groups = this.initRule.groups.map(x => ({ ...x, type: TYPE_GROUP }));
 
       return {
-        name: this.initRule.name,
-        approvalsRequired: this.initRule.approvalsRequired,
+        name: this.initRule.name || '',
+        approvalsRequired: this.initRule.approvalsRequired || 0,
+        minApprovalsRequired: this.initRule.minApprovalsRequired || 0,
         approvers: groups.concat(users),
       };
     },
@@ -147,7 +196,7 @@ export default {
             class="form-control mw-6em"
             name="approvals_required"
             type="number"
-            min="0"
+            :min="minApprovalsRequired"
           />
           <span class="invalid-feedback">{{ validation.approvalsRequired }}</span>
         </label>
@@ -171,6 +220,6 @@ export default {
         </gl-button>
       </div>
     </div>
-    <div class="bordered-box overflow-auto h-13em"><approvers-list v-model="approvers" /></div>
+    <div class="bordered-box overflow-auto h-12em"><approvers-list v-model="approvers" /></div>
   </form>
 </template>

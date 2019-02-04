@@ -1,4 +1,5 @@
 import CEMergeRequestStore from '~/vue_merge_request_widget/stores/mr_widget_store';
+import { __ } from '~/locale';
 import { filterByKey } from 'ee/vue_shared/security_reports/store/utils';
 
 export default class MergeRequestStore extends CEMergeRequestStore {
@@ -42,8 +43,13 @@ export default class MergeRequestStore extends CEMergeRequestStore {
   initApprovals(data) {
     this.isApproved = this.isApproved || false;
     this.approvals = this.approvals || null;
+    this.approvalRules = this.approvalRules || [];
     this.approvalsPath = data.approvals_path || this.approvalsPath;
     this.approvalsRequired = data.approvalsRequired || Boolean(this.approvalsPath);
+    this.apiApprovalsPath = data.api_approvals_path || this.apiApprovalsPath;
+    this.apiApprovalSettingsPath = data.api_approval_settings_path || this.apiApprovalSettingsPath;
+    this.apiApprovePath = data.api_approve_path || this.apiApprovePath;
+    this.apiUnapprovePath = data.api_unapprove_path || this.apiUnapprovePath;
   }
 
   setApprovals(data) {
@@ -51,6 +57,25 @@ export default class MergeRequestStore extends CEMergeRequestStore {
     this.approvalsLeft = !!data.approvals_left;
     this.isApproved = !this.approvalsLeft || false;
     this.preventMerge = this.approvalsRequired && this.approvalsLeft;
+  }
+
+  setApprovalRules(data) {
+    this.approvalRules = this.selectRules(data);
+  }
+
+  selectRules(data) {
+    return [...(data.use_fallback ? [this.buildFallbackRule(data)] : []), ...data.rules];
+  }
+
+  buildFallbackRule(data) {
+    return {
+      name: __('All Members'),
+      fallback: true,
+      approvers: [],
+      approvals_left: this.approvalsLeft,
+      approvals_required: data.fallback_approvals_required,
+      approved_by: this.approvals.approved_by.map(x => x.user),
+    };
   }
 
   initCodeclimate(data) {

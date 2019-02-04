@@ -1,4 +1,5 @@
 <script>
+import { mapState } from 'vuex';
 import { n__, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
@@ -11,6 +12,11 @@ export default {
     UserAvatarList,
     Rules,
     RuleControls,
+  },
+  computed: {
+    ...mapState({
+      rules: state => state.approvals.rules,
+    }),
   },
   methods: {
     summaryText(rule) {
@@ -28,7 +34,7 @@ export default {
 </script>
 
 <template>
-  <rules>
+  <rules :rules="rules">
     <template slot="thead">
       <tr class="d-none d-sm-table-row">
         <th>{{ s__('ApprovalRule|Name') }}</th>

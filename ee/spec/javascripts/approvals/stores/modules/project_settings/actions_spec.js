@@ -1,8 +1,9 @@
-import Api from 'ee/api';
+import MockAdapter from 'axios-mock-adapter';
+import axios from '~/lib/utils/axios_utils';
 import testAction from 'spec/helpers/vuex_action_helper';
 import * as types from 'ee/approvals/stores/modules/base/mutation_types';
 import actionsModule, * as actions from 'ee/approvals/stores/modules/project_settings/actions';
-import { mapApprovalRuleRequest, mapApprovalRulesResponse } from 'ee/approvals/mappers';
+import { mapApprovalRuleRequest, mapApprovalSettingsResponse } from 'ee/approvals/mappers';
 
 const TEST_PROJECT_ID = 9;
 const TEST_RULE_ID = 7;
@@ -20,20 +21,28 @@ const TEST_RULE_RESPONSE = {
   groups: [{ id: 4 }],
   users: [{ id: 7 }, { id: 8 }],
 };
+const TEST_SETTINGS_PATH = 'projects/9/approval_settings';
+const TEST_RULES_PATH = 'projects/9/approval_settings/rules';
 
 describe('EE approvals project settings module actions', () => {
   let state;
   let flashSpy;
+  let mock;
 
   beforeEach(() => {
     state = {
-      settings: { projectId: TEST_PROJECT_ID },
+      settings: {
+        projectId: TEST_PROJECT_ID,
+        settingsPath: TEST_SETTINGS_PATH,
+        rulesPath: TEST_RULES_PATH,
+      },
     };
     flashSpy = spyOnDependency(actionsModule, 'createFlash');
-    spyOn(Api, 'getProjectApprovalRules');
-    spyOn(Api, 'postProjectApprovalRule');
-    spyOn(Api, 'putProjectApprovalRule');
-    spyOn(Api, 'deleteProjectApprovalRule');
+    mock = new MockAdapter(axios);
+  });
+
+  afterEach(() => {
+    mock.restore();
   });
 
   describe('requestRules', () => {
@@ -51,13 +60,16 @@ describe('EE approvals project settings module actions', () => {
 
   describe('receiveRulesSuccess', () => {
     it('sets rules', done => {
-      const rules = [{ id: 1 }];
+      const settings = { rules: [{ id: 1 }] };
 
       testAction(
         actions.receiveRulesSuccess,
-        { rules },
+        settings,
         {},
-        [{ type: types.SET_RULES, payload: rules }, { type: types.SET_LOADING, payload: false }],
+        [
+          { type: types.SET_APPROVAL_SETTINGS, payload: settings },
+          { type: types.SET_LOADING, payload: false },
+        ],
         [],
         done,
       );
@@ -77,10 +89,8 @@ describe('EE approvals project settings module actions', () => {
 
   describe('fetchRules', () => {
     it('dispatches request/receive', done => {
-      const response = {
-        data: { rules: [TEST_RULE_RESPONSE] },
-      };
-      Api.getProjectApprovalRules.and.returnValue(Promise.resolve(response));
+      const data = { rules: [TEST_RULE_RESPONSE] };
+      mock.onGet(TEST_SETTINGS_PATH).replyOnce(200, data);
 
       testAction(
         actions.fetchRules,
@@ -89,10 +99,10 @@ describe('EE approvals project settings module actions', () => {
         [],
         [
           { type: 'requestRules' },
-          { type: 'receiveRulesSuccess', payload: mapApprovalRulesResponse(response.data) },
+          { type: 'receiveRulesSuccess', payload: mapApprovalSettingsResponse(data) },
         ],
         () => {
-          expect(Api.getProjectApprovalRules).toHaveBeenCalledWith(TEST_PROJECT_ID);
+          expect(mock.history.get.map(x => x.url)).toEqual([TEST_SETTINGS_PATH]);
 
           done();
         },
@@ -100,7 +110,7 @@ describe('EE approvals project settings module actions', () => {
     });
 
     it('dispatches request/receive on error', done => {
-      Api.getProjectApprovalRules.and.returnValue(Promise.reject());
+      mock.onGet(TEST_SETTINGS_PATH).replyOnce(500);
 
       testAction(
         actions.fetchRules,
@@ -138,7 +148,7 @@ describe('EE approvals project settings module actions', () => {
 
   describe('postRule', () => {
     it('dispatches success on success', done => {
-      Api.postProjectApprovalRule.and.returnValue(Promise.resolve());
+      mock.onPost(TEST_RULES_PATH).replyOnce(200);
 
       testAction(
         actions.postRule,
@@ -147,39 +157,28 @@ describe('EE approvals project settings module actions', () => {
         [],
         [{ type: 'postRuleSuccess' }],
         () => {
-          expect(Api.postProjectApprovalRule).toHaveBeenCalledWith(
-            TEST_PROJECT_ID,
-            mapApprovalRuleRequest(TEST_RULE_REQUEST),
-          );
+          expect(mock.history.post).toEqual([
+            jasmine.objectContaining({
+              url: TEST_RULES_PATH,
+              data: JSON.stringify(mapApprovalRuleRequest(TEST_RULE_REQUEST)),
+            }),
+          ]);
+
           done();
         },
       );
     });
 
     it('dispatches error on error', done => {
-      Api.postProjectApprovalRule.and.returnValue(Promise.reject());
+      mock.onPost(TEST_RULES_PATH).replyOnce(500);
 
-      testAction(
-        actions.postRule,
-        TEST_RULE_REQUEST,
-        state,
-        [],
-        [{ type: 'postRuleError' }],
-        () => {
-          expect(Api.postProjectApprovalRule).toHaveBeenCalledWith(
-            TEST_PROJECT_ID,
-            mapApprovalRuleRequest(TEST_RULE_REQUEST),
-          );
-
-          done();
-        },
-      );
+      testAction(actions.postRule, TEST_RULE_REQUEST, state, [], [{ type: 'postRuleError' }], done);
     });
   });
 
   describe('putRule', () => {
     it('dispatches success on success', done => {
-      Api.putProjectApprovalRule.and.returnValue(Promise.resolve());
+      mock.onPut(`${TEST_RULES_PATH}/${TEST_RULE_ID}`).replyOnce(200);
 
       testAction(
         actions.putRule,
@@ -188,18 +187,20 @@ describe('EE approvals project settings module actions', () => {
         [],
         [{ type: 'postRuleSuccess' }],
         () => {
-          expect(Api.putProjectApprovalRule).toHaveBeenCalledWith(
-            TEST_PROJECT_ID,
-            TEST_RULE_ID,
-            mapApprovalRuleRequest(TEST_RULE_REQUEST),
-          );
+          expect(mock.history.put).toEqual([
+            jasmine.objectContaining({
+              url: `${TEST_RULES_PATH}/${TEST_RULE_ID}`,
+              data: JSON.stringify(mapApprovalRuleRequest(TEST_RULE_REQUEST)),
+            }),
+          ]);
+
           done();
         },
       );
     });
 
     it('dispatches error on error', done => {
-      Api.putProjectApprovalRule.and.returnValue(Promise.reject());
+      mock.onPut(`${TEST_RULES_PATH}/${TEST_RULE_ID}`).replyOnce(500);
 
       testAction(
         actions.putRule,
@@ -237,7 +238,7 @@ describe('EE approvals project settings module actions', () => {
 
   describe('deleteRule', () => {
     it('dispatches success on success', done => {
-      Api.deleteProjectApprovalRule.and.returnValue(Promise.resolve());
+      mock.onDelete(`${TEST_RULES_PATH}/${TEST_RULE_ID}`).replyOnce(200);
 
       testAction(
         actions.deleteRule,
@@ -246,7 +247,11 @@ describe('EE approvals project settings module actions', () => {
         [],
         [{ type: 'deleteRuleSuccess' }],
         () => {
-          expect(Api.deleteProjectApprovalRule).toHaveBeenCalledWith(TEST_PROJECT_ID, TEST_RULE_ID);
+          expect(mock.history.delete).toEqual([
+            jasmine.objectContaining({
+              url: `${TEST_RULES_PATH}/${TEST_RULE_ID}`,
+            }),
+          ]);
 
           done();
         },
@@ -254,7 +259,7 @@ describe('EE approvals project settings module actions', () => {
     });
 
     it('dispatches error on error', done => {
-      Api.deleteProjectApprovalRule.and.returnValue(Promise.reject());
+      mock.onDelete(`${TEST_RULES_PATH}/${TEST_RULE_ID}`).replyOnce(500);
 
       testAction(actions.deleteRule, TEST_RULE_ID, state, [], [{ type: 'deleteRuleError' }], done);
     });
