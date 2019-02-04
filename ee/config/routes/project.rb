@@ -36,6 +36,14 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
           end
         end
       end
+
+      namespace :settings do
+        resource :operations, only: [:show, :update] do
+          member do
+            post :reset_alerting_token
+          end
+        end
+      end
     end
   end
 end

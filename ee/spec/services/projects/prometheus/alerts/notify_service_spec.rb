@@ -70,8 +70,6 @@ describe Projects::Prometheus::Alerts::NotifyService do
       end
 
       with_them do
-        let(:alert_manager_token) { token_input }
-
         before do
           cluster = create(:cluster, :provided_by_user,
                            projects: [project],
@@ -138,11 +136,38 @@ describe Projects::Prometheus::Alerts::NotifyService do
     end
 
     context 'with manual prometheus installation' do
-      before do
-        create(:prometheus_service, project: project)
+      using RSpec::Parameterized::TableSyntax
+
+      where(:alerting_setting, :configured_token, :token_input, :result) do
+        true  | token | token | :success
+        true  | token | 'x'   | :failure
+        true  | token | nil   | :failure
+        false | nil   | nil   | :success
+        false | nil   | token | :failure
       end
 
-      it_behaves_like 'notifies alerts'
+      with_them do
+        let(:alert_manager_token) { token_input }
+
+        before do
+          create(:prometheus_service, project: project)
+
+          if alerting_setting
+            create(:project_alerting_setting,
+                   project: project,
+                   token: configured_token)
+          end
+        end
+
+        case result = params[:result]
+        when :success
+          it_behaves_like 'notifies alerts'
+        when :failure
+          it_behaves_like 'no notifications'
+        else
+          raise "invalid result: #{result.inspect}"
+        end
+      end
     end
   end
 

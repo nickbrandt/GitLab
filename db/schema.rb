@@ -2166,6 +2166,11 @@ ActiveRecord::Schema.define(version: 20190124200344) do
     t.index ["name"], name: "index_programming_languages_on_name", unique: true, using: :btree
   end
 
+  create_table "project_alerting_settings", primary_key: "project_id", id: :integer, force: :cascade do |t|
+    t.string "encrypted_token", null: false
+    t.string "encrypted_token_iv", null: false
+  end
+
   create_table "project_authorizations", id: false, force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "project_id", null: false
@@ -3462,6 +3467,7 @@ ActiveRecord::Schema.define(version: 20190124200344) do
   add_foreign_key "personal_access_tokens", "users"
   add_foreign_key "pool_repositories", "projects", column: "source_project_id", on_delete: :nullify
   add_foreign_key "pool_repositories", "shards", on_delete: :restrict
+  add_foreign_key "project_alerting_settings", "projects", on_delete: :cascade
   add_foreign_key "project_authorizations", "projects", on_delete: :cascade
   add_foreign_key "project_authorizations", "users", on_delete: :cascade
   add_foreign_key "project_auto_devops", "projects", on_delete: :cascade

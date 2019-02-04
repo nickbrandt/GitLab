@@ -40,6 +40,7 @@ module EE
       has_one :github_service
       has_one :gitlab_slack_application_service
       has_one :tracing_setting, class_name: 'ProjectTracingSetting'
+      has_one :alerting_setting, inverse_of: :project, class_name: 'Alerting::ProjectAlertingSetting'
       has_one :feature_usage, class_name: 'ProjectFeatureUsage'
 
       has_many :reviews, inverse_of: :project
@@ -118,6 +119,7 @@ module EE
       delegate :store_security_reports_available?, to: :namespace
 
       accepts_nested_attributes_for :tracing_setting, update_only: true, allow_destroy: true
+      accepts_nested_attributes_for :alerting_setting, update_only: true
     end
 
     class_methods do

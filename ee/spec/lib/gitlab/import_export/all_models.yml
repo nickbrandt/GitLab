@@ -77,6 +77,7 @@ project:
 - packages
 - package_files
 - tracing_setting
+- alerting_setting
 - webide_pipelines
 - reviews
 prometheus_metrics:
