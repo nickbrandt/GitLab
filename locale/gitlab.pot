@@ -8954,7 +8954,7 @@ msgstr ""
 msgid "System Info"
 msgstr ""
 
-msgid "System header and footer:"
+msgid "System header and footer"
 msgstr ""
 
 msgid "System metrics (Custom)"
