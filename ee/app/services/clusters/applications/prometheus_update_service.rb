@@ -34,7 +34,7 @@ module Clusters
 
       def update_config(config)
         PrometheusConfigService
-          .new(project, cluster)
+          .new(project, cluster, app)
           .execute(config)
       end
     end
