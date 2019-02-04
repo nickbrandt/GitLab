@@ -20,26 +20,21 @@ module EE
              subject: subject('Mirror user changed'))
       end
 
-      # rubocop: disable CodeReuse/ActiveRecord
       def prometheus_alert_fired_email(project_id, user_id, alert_params)
-        alert_metric_id = alert_params["labels"]["gitlab_alert_id"]
+        alert_metric_id = alert_params.dig('labels', 'gitlab_alert_id')
 
-        @project = ::Project.find_by(id: project_id)
-        return unless @project
+        @project = ::Project.find(project_id)
+        user = ::User.find(user_id)
 
-        @alert = @project.prometheus_alerts.find_by(prometheus_metric: alert_metric_id)
+        @alert = @project.prometheus_alerts.for_metric(alert_metric_id).first
         return unless @alert
 
         @environment = @alert.environment
-
-        user = ::User.find_by(id: user_id)
-        return unless user
 
         subject_text = "Alert: #{@environment.name} - #{@alert.title} #{@alert.computed_operator} #{@alert.threshold} for 5 minutes"
 
         mail(to: user.notification_email, subject: subject(subject_text))
       end
-      # rubocop: enable CodeReuse/ActiveRecord
     end
   end
 end
