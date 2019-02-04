@@ -39,6 +39,10 @@ class ApprovalState
     !wrapped_approval_rules.empty?
   end
 
+  def use_fallback?
+    regular_rules.empty?
+  end
+
   def approval_rules_overwritten?
     merge_request.approval_rules.any?(&:regular?)
   end
@@ -48,7 +52,7 @@ class ApprovalState
     return false unless project.feature_available?(:merge_request_approvers)
 
     result = wrapped_approval_rules.any? { |rule| rule.approvals_required > 0 }
-    result ||= fallback_approvals_required > 0 if regular_rules.empty?
+    result ||= fallback_approvals_required > 0 if use_fallback?
     result
   end
 
@@ -59,7 +63,7 @@ class ApprovalState
   def approved?
     strong_memoize(:approved) do
       result = wrapped_approval_rules.all?(&:approved?)
-      result &&= approvals.size >= fallback_approvals_required if regular_rules.empty?
+      result &&= approvals.size >= fallback_approvals_required if use_fallback?
       result
     end
   end
@@ -71,7 +75,7 @@ class ApprovalState
   def approvals_required
     strong_memoize(:approvals_required) do
       result = wrapped_approval_rules.sum(&:approvals_required)
-      result = [result, fallback_approvals_required].max if regular_rules.empty?
+      result = [result, fallback_approvals_required].max if use_fallback?
       result
     end
   end
@@ -81,7 +85,7 @@ class ApprovalState
   def approvals_left
     strong_memoize(:approvals_left) do
       result = wrapped_approval_rules.sum(&:approvals_left)
-      result = [result, fallback_approvals_required - approved_approvers.size].max if regular_rules.empty?
+      result = [result, fallback_approvals_required - approved_approvers.size].max if use_fallback?
       result
     end
   end

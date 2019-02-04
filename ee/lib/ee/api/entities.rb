@@ -274,6 +274,9 @@ module EE
 
         expose :wrapped_approval_rules, as: :rules, using: MergeRequestApprovalRule
         expose :fallback_approvals_required
+        expose :use_fallback do |approval_state|
+          approval_state.use_fallback?
+        end
       end
 
       # Decorates Project
