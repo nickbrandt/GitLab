@@ -32,7 +32,7 @@ export const updateFeatureFlag = ({ state, dispatch }, params) => {
   dispatch('requestUpdateFeatureFlag');
 
   axios
-    .put(state.endpoint, { params: parseFeatureFlagsParams(params) })
+    .put(state.endpoint, parseFeatureFlagsParams(params))
     .then(() => {
       dispatch('receiveUpdateFeatureFlagSuccess');
       visitUrl(state.path);

@@ -63,13 +63,10 @@ describe('Feature flags New Module Actions', () => {
       it('dispatches requestCreateFeatureFlag and receiveCreateFeatureFlagSuccess ', done => {
         mock
           .onPost(`${TEST_HOST}/endpoint.json`, {
-            params: {
-              operations_feature_flags: {
-                name: 'feature_flag',
-                description: 'feature flag',
-                active: true,
-                scopes_attributes: [{ environment_scope: '*', active: true }],
-              },
+            operations_feature_flag: {
+              name: 'feature_flag',
+              description: 'feature flag',
+              scopes_attributes: [{ environment_scope: '*', active: true }],
             },
           })
           .replyOnce(200);
@@ -79,7 +76,7 @@ describe('Feature flags New Module Actions', () => {
           {
             name: 'feature_flag',
             description: 'feature flag',
-            scopes: [{ name: '*', active: true }],
+            scopes: [{ environment_scope: '*', active: true }],
           },
           mockedState,
           [],
@@ -100,13 +97,10 @@ describe('Feature flags New Module Actions', () => {
       it('dispatches requestCreateFeatureFlag and receiveCreateFeatureFlagError ', done => {
         mock
           .onPost(`${TEST_HOST}/endpoint.json`, {
-            params: {
-              operations_feature_flags: {
-                name: 'feature_flag',
-                description: 'feature flag',
-                active: true,
-                scopes_attributes: [{ environment_scope: '*', active: true }],
-              },
+            operations_feature_flag: {
+              name: 'feature_flag',
+              description: 'feature flag',
+              scopes_attributes: [{ environment_scope: '*', active: true }],
             },
           })
           .replyOnce(500, { message: [] });
@@ -116,7 +110,7 @@ describe('Feature flags New Module Actions', () => {
           {
             name: 'feature_flag',
             description: 'feature flag',
-            scopes: [{ name: '*', active: true }],
+            scopes: [{ environment_scope: '*', active: true }],
           },
           mockedState,
           [],

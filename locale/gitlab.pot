@@ -3266,6 +3266,9 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
+msgid "Edit %{name}"
+msgstr ""
+
 msgid "Edit Label"
 msgstr ""
 
@@ -3800,6 +3803,9 @@ msgstr ""
 msgid "Feature Flags"
 msgstr ""
 
+msgid "FeatureFlags|* (All Environments)"
+msgstr ""
+
 msgid "FeatureFlags|* (All environments)"
 msgstr ""
 
@@ -3833,10 +3839,16 @@ msgstr ""
 msgid "FeatureFlags|Edit Feature Flag"
 msgstr ""
 
+msgid "FeatureFlags|Environment Spec"
+msgstr ""
+
 msgid "FeatureFlags|Environment Specs"
 msgstr ""
 
 msgid "FeatureFlags|Feature Flag"
+msgstr ""
+
+msgid "FeatureFlags|Feature Flag behavior is built up by creating a set of rules to define the status of target environments. A default wildcare rule %{codeStart}*%{codeEnd} for %{boldStart}All Environments%{boldEnd} is set, and you are able to add as many rules as you need by choosing environment specs below. You can toggle the behavior for each of your rules to set them %{boldStart}Active%{boldEnd} or %{boldStart}Inactive%{boldEnd}."
 msgstr ""
 
 msgid "FeatureFlags|Feature Flags"
@@ -3885,6 +3897,9 @@ msgid "FeatureFlags|Save changes"
 msgstr ""
 
 msgid "FeatureFlags|Status"
+msgstr ""
+
+msgid "FeatureFlags|Target environments"
 msgstr ""
 
 msgid "FeatureFlags|There was an error fetching the feature flags."

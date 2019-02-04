@@ -30,7 +30,7 @@ export const createFeatureFlag = ({ state, dispatch }, params) => {
   dispatch('requestCreateFeatureFlag');
 
   axios
-    .post(state.endpoint, { params: parseFeatureFlagsParams(params) })
+    .post(state.endpoint, parseFeatureFlagsParams(params))
     .then(() => {
       dispatch('receiveCreateFeatureFlagSuccess');
       visitUrl(state.path);

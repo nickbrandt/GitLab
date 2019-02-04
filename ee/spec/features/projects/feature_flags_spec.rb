@@ -15,6 +15,7 @@ describe 'Feature Flags', :js do
 
   before do
     stub_licensed_features(feature_flags: true)
+    stub_feature_flags(feature_flags_environment_scope: false)
     sign_in(user)
   end
 

@@ -200,8 +200,6 @@ describe Projects::FeatureFlagsController do
       subject
 
       expect(response).to be_ok
-      expect(response).to render_template('new')
-      expect(response).to render_template('_form')
     end
   end
 
@@ -316,21 +314,6 @@ describe Projects::FeatureFlagsController do
         subject
 
         expect(response).to redirect_to(project_feature_flags_path(project))
-      end
-    end
-
-    context 'when a feature flag already exists' do
-      let!(:feature_flag) { create(:operations_feature_flag, project: project, name: 'my_feature_flag') }
-
-      let(:params) do
-        view_params.merge(operations_feature_flag: { name: 'my_feature_flag', active: true })
-      end
-
-      it 'shows an error' do
-        subject
-
-        expect(response).to render_template('new')
-        expect(response).to render_template('_errors')
       end
     end
   end

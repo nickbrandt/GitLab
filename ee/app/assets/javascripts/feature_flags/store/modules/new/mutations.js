@@ -16,6 +16,6 @@ export default {
   },
   [types.RECEIVE_CREATE_FEATURE_FLAG_ERROR](state, error) {
     state.isSendingRequest = false;
-    state.error = error.message;
+    state.error = error.message || [];
   },
 };
