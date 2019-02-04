@@ -74,7 +74,7 @@ describe 'User sees feature flag list', :js do
     end
 
     it 'shows empty page' do
-      expect(page).to have_text 'Get started with feature flags'
+      expect(page).to have_text 'Get started with Feature Flags'
       expect(page).to have_selector('.btn-success', text: 'New Feature Flag')
       expect(page).to have_selector('.btn-primary.btn-inverted', text: 'Configure')
     end
