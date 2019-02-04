@@ -3,9 +3,10 @@
 module Clusters
   module Applications
     class PrometheusConfigService
-      def initialize(project, cluster)
+      def initialize(project, cluster, app)
         @project = project
         @cluster = cluster
+        @app = app
       end
 
       def execute(config)
@@ -18,7 +19,7 @@ module Clusters
 
       private
 
-      attr_reader :project, :cluster
+      attr_reader :project, :cluster, :app
 
       def reset_alert_manager(config)
         config = set_alert_manager_enabled(config, false)
@@ -80,11 +81,20 @@ module Clusters
             'webhook_configs' => [
               {
                 'url' => notify_url,
-                'send_resolved' => true
+                'send_resolved' => true,
+                'http_config' => {
+                  'bearer_token' => alert_manager_token
+                }
               }
             ]
           }
         ]
+      end
+
+      def alert_manager_token
+        app.generate_alert_manager_token!
+
+        app.alert_manager_token
       end
 
       def alert_manager_route_params
@@ -97,11 +107,8 @@ module Clusters
       end
 
       def notify_url
-        ::Gitlab::Routing.url_helpers.notify_namespace_project_prometheus_alerts_url(
-          namespace_id: project.namespace.path,
-          project_id: project.path,
-          format: :json
-        )
+        ::Gitlab::Routing.url_helpers
+          .notify_project_prometheus_alerts_url(project, format: :json)
       end
 
       def has_alerts?

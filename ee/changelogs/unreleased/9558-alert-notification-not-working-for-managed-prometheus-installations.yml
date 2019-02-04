@@ -1,0 +1,5 @@
+---
+title: Fix alert notifications for managed Prometheus
+merge_request: 9402
+author:
+type: fixed

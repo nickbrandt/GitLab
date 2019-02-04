@@ -3,11 +3,17 @@
 require 'spec_helper'
 
 describe Clusters::Applications::PrometheusConfigService do
+  include Gitlab::Routing.url_helpers
+
   set(:project) { create(:project) }
   set(:production) { create(:environment, project: project) }
   set(:cluster) { create(:cluster, :provided_by_user, projects: [project]) }
 
-  subject { described_class.new(project, cluster).execute(input) }
+  let(:application) do
+    create(:clusters_applications_prometheus, :installed, cluster: cluster)
+  end
+
+  subject { described_class.new(project, cluster, application).execute(input) }
 
   describe '#execute' do
     let(:input) do
@@ -37,7 +43,7 @@ describe Clusters::Applications::PrometheusConfigService do
           let(:webhook_config) { receiver.dig('webhook_configs', 0) }
 
           let(:notify_url) do
-            "http://localhost/#{project.namespace.name}/#{project.name}/prometheus/alerts/notify.json"
+            notify_project_prometheus_alerts_url(project, format: :json)
           end
 
           it 'sets receiver' do
@@ -47,7 +53,10 @@ describe Clusters::Applications::PrometheusConfigService do
           it 'sets webhook_config' do
             expect(webhook_config).to eq(
               'url' => notify_url,
-              'send_resolved' => true
+              'send_resolved' => true,
+              'http_config' => {
+                'bearer_token' => application.alert_manager_token
+              }
             )
           end
         end
