@@ -49,6 +49,10 @@ module EE
       end
     end
 
+    def smartcard_config_port
+      ::Gitlab.config.smartcard.client_certificate_required_port
+    end
+
     def page_class
       class_names = super
       class_names += system_message_class

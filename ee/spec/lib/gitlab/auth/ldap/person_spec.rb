@@ -36,6 +36,18 @@ describe Gitlab::Auth::LDAP::Person do
     end
   end
 
+  describe '.find_by_certificate_issuer_and_serial' do
+    it 'searches by certificate assertion' do
+      adapter = ldap_adapter
+      serial = 'serial'
+      issuer_dn = 'issuer_dn'
+
+      expect(adapter).to receive(:user_by_certificate_assertion).with("{ serialNumber #{serial}, issuer \"#{issuer_dn}\" }")
+
+      described_class.find_by_certificate_issuer_and_serial(issuer_dn, serial, adapter)
+    end
+  end
+
   describe '.find_by_kerberos_principal' do
     let(:adapter) { ldap_adapter }
     let(:username) { 'foo' }

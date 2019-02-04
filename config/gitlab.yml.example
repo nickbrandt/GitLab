@@ -458,6 +458,10 @@ production: &base
         # A value of 0 means there is no timeout.
         timeout: 10
 
+        # Enable smartcard authentication against the LDAP server. Valid values
+        # are "false", "optional", and "required".
+        smartcard_auth: false
+
         # This setting specifies if LDAP server is Active Directory LDAP server.
         # For non AD servers it skips the AD specific queries.
         # If your LDAP server is not AD, set this to false.
