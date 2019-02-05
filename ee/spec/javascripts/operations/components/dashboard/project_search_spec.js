@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import store from 'ee/operations/store/index';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 import ProjectSearch from 'ee/operations/components/dashboard/project_search.vue';
 import TokenizedInput from 'ee/operations/components/tokenized_input/input.vue';
 import { mockText, mockProjectData } from '../../mock_data';
@@ -10,7 +9,6 @@ import { getChildInstances, mouseEvent, clearState } from '../../helpers';
 describe('project search component', () => {
   const ProjectSearchComponent = Vue.extend(ProjectSearch);
   const TokenizedInputComponent = Vue.extend(TokenizedInput);
-  const ProjectAvatarComponent = Vue.extend(ProjectAvatar);
 
   const mockProjects = mockProjectData(1);
   const [mockOneProject] = mockProjects;
@@ -157,7 +155,7 @@ describe('project search component', () => {
       beforeEach(() => {
         store.state.projectSearchResults = mockProjects;
         vm = mount();
-        avatars = getChildInstances(vm, ProjectAvatarComponent);
+        avatars = vm.$el.querySelectorAll('.project-avatar');
       });
 
       it('renders project avatar component', () => {
@@ -166,8 +164,10 @@ describe('project search component', () => {
 
       it('binds project to project', () => {
         const [avatar] = avatars;
+        const identicon = avatar.querySelector('.identicon');
+        const [identiconLetter] = mockOneProject.name;
 
-        expect(avatar.project).toEqual(mockOneProject);
+        expect(identicon.textContent.trim()).toEqual(identiconLetter.toUpperCase());
       });
     });
   });
