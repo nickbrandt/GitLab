@@ -11,6 +11,7 @@ module EE
 
         mount ::API::Unleash
         mount ::API::EpicIssues
+        mount ::API::EpicLinks
         mount ::API::Epics
         mount ::API::Geo
         mount ::API::GeoNodes

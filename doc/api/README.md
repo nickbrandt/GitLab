@@ -23,6 +23,7 @@ The following API resources are available:
 - [Discussions](discussions.md) (threaded comments)
 - [Environments](environments.md)
 - [Epic issues](epic_issues.md) **[ULTIMATE]**
+- [Epic links](epic_links.md) **[ULTIMATE]**
 - [Epics](epics.md) **[ULTIMATE]**
 - [Events](events.md)
 - [Feature flags](features.md)

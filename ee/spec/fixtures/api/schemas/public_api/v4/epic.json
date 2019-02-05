@@ -4,6 +4,7 @@
     "id": { "type": "integer" },
     "iid": { "type": "integer" },
     "group_id": { "type": "integer" },
+    "parent_id": { "type": ["integer", "null"] },
     "title": { "type": "string" },
     "description": { "type": ["string", "null"] },
     "author": {
