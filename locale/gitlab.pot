@@ -4223,7 +4223,10 @@ msgstr ""
 msgid "GeoNodes|Out of sync"
 msgstr ""
 
-msgid "GeoNodes|Removing a node stops the sync process. Are you sure?"
+msgid "GeoNodes|Removing a primary node stops the sync process for all nodes. Syncing cannot be resumed without losing some data on all secondaries. In this case we would recommend setting up all nodes from scratch. Are you sure?"
+msgstr ""
+
+msgid "GeoNodes|Removing a secondary node stops the sync process. It is not currently possible to add back the same node without losing some data. We only recommend setting up a new secondary node in this case. Are you sure?"
 msgstr ""
 
 msgid "GeoNodes|Replication slot WAL"

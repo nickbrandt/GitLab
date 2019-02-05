@@ -80,16 +80,33 @@ describe('GeoNodeActionsComponent', () => {
       });
     });
 
-    describe('onRemoveNode', () => {
+    describe('onRemovePrimaryNode', () => {
       it('emits showNodeActionModal with actionType `remove`, node reference, modalKind, modalMessage and modalActionLabel', () => {
         spyOn(eventHub, '$emit');
-        vm.onRemoveNode();
+        vm.onRemovePrimaryNode();
 
         expect(eventHub.$emit).toHaveBeenCalledWith('showNodeActionModal', {
           actionType: NODE_ACTIONS.REMOVE,
           node: vm.node,
           modalKind: 'danger',
-          modalMessage: 'Removing a node stops the sync process. Are you sure?',
+          modalMessage:
+            'Removing a primary node stops the sync process for all nodes. Syncing cannot be resumed without losing some data on all secondaries. In this case we would recommend setting up all nodes from scratch. Are you sure?',
+          modalActionLabel: 'Remove',
+        });
+      });
+    });
+
+    describe('onRemoveSecondaryNode', () => {
+      it('emits showNodeActionModal with actionType `remove`, node reference, modalKind, modalMessage and modalActionLabel', () => {
+        spyOn(eventHub, '$emit');
+        vm.onRemoveSecondaryNode();
+
+        expect(eventHub.$emit).toHaveBeenCalledWith('showNodeActionModal', {
+          actionType: NODE_ACTIONS.REMOVE,
+          node: vm.node,
+          modalKind: 'danger',
+          modalMessage:
+            'Removing a secondary node stops the sync process. It is not currently possible to add back the same node without losing some data. We only recommend setting up a new secondary node in this case. Are you sure?',
           modalActionLabel: 'Remove',
         });
       });

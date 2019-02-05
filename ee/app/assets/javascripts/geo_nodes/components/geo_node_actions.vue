@@ -46,12 +46,25 @@ export default {
         modalActionLabel: this.nodeToggleLabel,
       });
     },
-    onRemoveNode() {
+    onRemoveSecondaryNode() {
       eventHub.$emit('showNodeActionModal', {
         actionType: NODE_ACTIONS.REMOVE,
         node: this.node,
         modalKind: 'danger',
-        modalMessage: s__('GeoNodes|Removing a node stops the sync process. Are you sure?'),
+        modalMessage: s__(
+          'GeoNodes|Removing a secondary node stops the sync process. It is not currently possible to add back the same node without losing some data. We only recommend setting up a new secondary node in this case. Are you sure?',
+        ),
+        modalActionLabel: __('Remove'),
+      });
+    },
+    onRemovePrimaryNode() {
+      eventHub.$emit('showNodeActionModal', {
+        actionType: NODE_ACTIONS.REMOVE,
+        node: this.node,
+        modalKind: 'danger',
+        modalMessage: s__(
+          'GeoNodes|Removing a primary node stops the sync process for all nodes. Syncing cannot be resumed without losing some data on all secondaries. In this case we would recommend setting up all nodes from scratch. Are you sure?',
+        ),
         modalActionLabel: __('Remove'),
       });
     },
@@ -92,7 +105,20 @@ export default {
         <a :href="node.editPath" class="btn btn-sm btn-node-action"> {{ __('Edit') }} </a>
       </div>
       <div class="node-action-container">
-        <button type="button" class="btn btn-sm btn-node-action btn-danger" @click="onRemoveNode">
+        <button
+          v-if="isSecondaryNode"
+          type="button"
+          class="btn btn-sm btn-node-action btn-danger"
+          @click="onRemoveSecondaryNode"
+        >
+          {{ __('Remove') }}
+        </button>
+        <button
+          v-else
+          type="button"
+          class="btn btn-sm btn-node-action btn-danger"
+          @click="onRemovePrimaryNode"
+        >
           {{ __('Remove') }}
         </button>
       </div>
