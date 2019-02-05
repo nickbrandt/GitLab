@@ -109,10 +109,4 @@
     // see https://gitlab.com/gitlab-org/gitlab-ui/issues/38
     display: flex;
   }
-
-  // the following is a workaround until we have it fixed in gitlab-ui
-  // see https://gitlab.com/gitlab-org/gitlab-ui/issues/156
-  .sticky-top {
-    top: 0;
-  }
 }
