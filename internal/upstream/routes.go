@@ -168,6 +168,13 @@ func (u *upstream) configureRoutes() {
 	ciAPIProxyQueue := queueing.QueueRequests("ci_api_job_requests", uploadAccelerateProxy, u.APILimit, u.APIQueueLimit, u.APIQueueTimeout)
 	ciAPILongPolling := builds.RegisterHandler(ciAPIProxyQueue, redis.WatchKey, u.APICILongPollingDuration)
 
+	// Serve static files or forward the requests
+	defaultUpstream := static.ServeExisting(
+		u.URLPrefix,
+		staticpages.CacheDisabled,
+		static.DeployPage(static.ErrorPagesUnless(u.DevelopmentMode, uploadAccelerateProxy)),
+	)
+
 	u.Routes = []routeEntry{
 		// Git Clone
 		route("GET", gitProjectPattern+`info/refs\z`, git.GetInfoRefsHandler(api)),
@@ -214,15 +221,10 @@ func (u *upstream) configureRoutes() {
 		// through static.ServeExisting.
 		route("", `^/uploads/`, static.ErrorPagesUnless(u.DevelopmentMode, proxy)),
 
-		// Serve static files or forward the requests
-		route(
-			"", "",
-			static.ServeExisting(
-				u.URLPrefix,
-				staticpages.CacheDisabled,
-				static.DeployPage(static.ErrorPagesUnless(u.DevelopmentMode, uploadAccelerateProxy)),
-			),
-		),
+		// This route lets us filter out health checks from our metrics.
+		route("", "^/-/", defaultUpstream),
+
+		route("", "", defaultUpstream),
 	}
 }
 
