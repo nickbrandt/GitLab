@@ -17,6 +17,13 @@ module EE
 
       private
 
+      override :before_assignment_hook
+      def before_assignment_hook(group, params)
+        # Repository size limit comes as MB from the view
+        limit = params.delete(:repository_size_limit)
+        group.repository_size_limit = ::Gitlab::Utils.try_megabytes_to_bytes(limit) if limit
+      end
+
       def changes_file_template_project_id?
         return false unless params.key?(:file_template_project_id)
 
