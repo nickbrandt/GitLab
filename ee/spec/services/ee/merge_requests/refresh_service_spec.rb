@@ -140,28 +140,44 @@ describe MergeRequests::RefreshService do
 
       context 'when code owners enabled, with approval_rule enabled' do
         let(:relevant_merge_requests) { [merge_request, another_merge_request] }
-        let(:new_owners) { [owner] }
 
-        before do
+        it 'refreshes the code owner rules for all relevant merge requests' do
+          fake_refresh_service = instance_double(::MergeRequests::SyncCodeOwnerApprovalRules)
+
           relevant_merge_requests.each do |merge_request|
-            expect(::Gitlab::CodeOwners).to receive(:for_merge_request).with(merge_request).and_return(new_owners)
-          end
-
-          [forked_merge_request].each do |merge_request|
-            expect(::Gitlab::CodeOwners).not_to receive(:for_merge_request).with(merge_request)
-          end
-        end
-
-        it 'triggers syncing of code owners' do
-          relevant_merge_requests.each do |merge_request|
-            expect(merge_request.approval_rules.code_owner.exists?).to eq(false)
+            expect(::MergeRequests::SyncCodeOwnerApprovalRules)
+              .to receive(:new).with(merge_request).and_return(fake_refresh_service)
+            expect(fake_refresh_service).to receive(:execute)
           end
 
           subject
+        end
 
-          relevant_merge_requests.each do |merge_request|
-            code_owner_rule = merge_request.approval_rules.code_owner.first
-            expect(code_owner_rule.users).to eq(new_owners)
+        context 'when multiple code owner rules are disabled' do
+          let(:new_owners) { [owner] }
+
+          before do
+            stub_feature_flags(multiple_code_owner_rules: false)
+            relevant_merge_requests.each do |merge_request|
+              expect(::Gitlab::CodeOwners).to receive(:for_merge_request).with(merge_request).and_return(new_owners)
+            end
+
+            [forked_merge_request].each do |merge_request|
+              expect(::Gitlab::CodeOwners).not_to receive(:for_merge_request).with(merge_request)
+            end
+          end
+
+          it 'triggers syncing of code owners' do
+            relevant_merge_requests.each do |merge_request|
+              expect(merge_request.approval_rules.code_owner.exists?).to eq(false)
+            end
+
+            subject
+
+            relevant_merge_requests.each do |merge_request|
+              code_owner_rule = merge_request.approval_rules.code_owner.first
+              expect(code_owner_rule.users).to eq(new_owners)
+            end
           end
         end
       end

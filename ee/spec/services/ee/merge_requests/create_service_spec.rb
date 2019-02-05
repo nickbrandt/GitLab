@@ -25,18 +25,31 @@ describe MergeRequests::CreateService do
 
   describe '#execute' do
     context 'code owners' do
-      let!(:owners) { create_list(:user, 2) }
+      it 'refreshes code owners for the merge request' do
+        fake_refresh_service = instance_double(::MergeRequests::SyncCodeOwnerApprovalRules)
 
-      before do
-        allow(::Gitlab::CodeOwners).to receive(:for_merge_request).and_return(owners)
+        expect(::MergeRequests::SyncCodeOwnerApprovalRules)
+          .to receive(:new).with(kind_of(MergeRequest)).and_return(fake_refresh_service)
+        expect(fake_refresh_service).to receive(:execute)
+
+        service.execute
       end
 
-      it 'syncs code owner to approval rule' do
-        merge_request = service.execute
+      context 'when multiple code owner rules is disabled' do
+        let!(:owners) { create_list(:user, 2) }
 
-        rule = merge_request.approval_rules.code_owner.first
+        before do
+          stub_feature_flags(multiple_code_owner_rules: false)
+          allow(::Gitlab::CodeOwners).to receive(:for_merge_request).and_return(owners)
+        end
 
-        expect(rule.users).to contain_exactly(*owners)
+        it 'syncs code owner to approval rule' do
+          merge_request = service.execute
+
+          rule = merge_request.approval_rules.code_owner.first
+
+          expect(rule.users).to contain_exactly(*owners)
+        end
       end
     end
   end

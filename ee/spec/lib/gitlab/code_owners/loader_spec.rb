@@ -6,7 +6,7 @@ describe Gitlab::CodeOwners::Loader do
   include FakeBlobHelpers
   set(:group) { create(:group) }
   set(:project) { create(:project, namespace: group) }
-  subject(:loader) { described_class.new(project, 'with-codeowners', path) }
+  subject(:loader) { described_class.new(project, 'with-codeowners', paths) }
 
   let!(:owner_1) { create(:user, username: 'owner-1') }
   let!(:email_owner) { create(:user, username: 'owner-2') }
@@ -21,89 +21,54 @@ describe Gitlab::CodeOwners::Loader do
     CODEOWNERS
   end
   let(:codeowner_blob) { fake_blob(path: 'CODEOWNERS', data: codeowner_content) }
-  let(:path) { 'docs/CODEOWNERS' }
+  let(:paths) { 'docs/CODEOWNERS' }
 
   before do
+    project.add_developer(owner_1)
+    project.add_developer(email_owner)
+    project.add_developer(documentation_owner)
+    project.add_developer(test_owner)
+
     create(:email, user: email_owner, email: 'owner2@gitlab.org')
 
     allow(project.repository).to receive(:code_owners_blob).and_return(codeowner_blob)
   end
 
-  describe '#non_members' do
-    before do
-      project.add_developer(owner_1)
-      project.add_developer(email_owner)
-      project.add_developer(test_owner)
+  describe '#entries' do
+    let(:expected_entry) { Gitlab::CodeOwners::Entry.new('docs/CODEOWNERS', '@owner-1 owner2@gitlab.org @owner-3 @documentation-owner') }
+    let(:first_entry) { loader.entries.first }
+
+    it 'returns entries for the matched line' do
+      expect(loader.entries).to contain_exactly(expected_entry)
     end
 
-    it 'returns all existing users that are not members of the project' do
-      expect(loader.non_members).to contain_exactly(owner_3, documentation_owner)
+    it 'loads all users that are members of the project into the entry' do
+      expect(first_entry.users).to contain_exactly(owner_1, email_owner, documentation_owner)
     end
 
-    it 'does not return users that are members of the project' do
-      expect(loader.non_members).not_to include(owner_1, email_owner)
+    it 'does not load non members of the project into the entry' do
+      expect(first_entry.users).not_to include(owner_3)
     end
 
-    it 'excludes group members of the project' do
-      group.add_developer(documentation_owner)
-
-      expect(loader.non_members).to include(owner_3)
-    end
-  end
-
-  describe '#members' do
-    before do
-      project.add_developer(owner_1)
-      project.add_developer(email_owner)
-      project.add_developer(documentation_owner)
-      project.add_developer(test_owner)
-    end
-
-    it 'returns all existing users that are members of the project' do
-      expect(loader.members).to contain_exactly(owner_1, email_owner, documentation_owner)
-    end
-
-    it 'does not return users that are not members of the project' do
-      expect(loader.members).not_to include(owner_3)
-    end
-
-    it 'includes group members of the project' do
+    it 'loads group members of the project into the entry' do
       group.add_developer(owner_3)
 
-      expect(loader.members).to include(owner_3)
-    end
-  end
-
-  describe '#raw_users' do
-    context 'with a CODEOWNERS file' do
-      context 'for a path with code owners' do
-        it 'returns all owners' do
-          expect(loader.raw_users).to contain_exactly(owner_1, owner_3, email_owner, documentation_owner)
-        end
-      end
-
-      context 'for multiple paths with code owners' do
-        let(:path) { ['docs/test.rb', 'spec/spec_helper.rb', 'docs/foo.rb'] }
-
-        it 'returns all owners for all paths' do
-          expect(loader.raw_users).to contain_exactly(documentation_owner, test_owner)
-        end
-      end
-
-      context 'for another path' do
-        let(:path) { 'no-codeowner' }
-
-        it 'returns no users' do
-          expect(loader.raw_users).to be_empty
-        end
-      end
+      expect(first_entry.users).to include(owner_3)
     end
 
-    context 'when there is no codeowners file' do
-      let(:codeowner_blob) { nil }
+    context 'for multiple paths' do
+      let(:paths) { ['docs/CODEOWNERS', 'spec/loader_spec.rb', 'spec/entry_spec.rb'] }
 
-      it 'returns no users without failing' do
-        expect(loader.raw_users).to be_empty
+      it 'loads 2 entries' do
+        other_entry = Gitlab::CodeOwners::Entry.new('spec/*', '@test-owner')
+
+        expect(loader.entries).to contain_exactly(expected_entry, other_entry)
+      end
+
+      it 'only performs 2 query for users' do
+        # One query for users, one for the emails to later divide them across the
+        # entries
+        expect { loader.entries }.not_to exceed_query_limit(2)
       end
     end
 
@@ -111,7 +76,7 @@ describe Gitlab::CodeOwners::Loader do
       it 'only calls out to the repository once' do
         expect(project.repository).to receive(:code_owners_blob).once
 
-        2.times { loader.raw_users }
+        2.times { loader.entries }
       end
 
       it 'only processes the file once' do
@@ -119,8 +84,14 @@ describe Gitlab::CodeOwners::Loader do
 
         expect(code_owners_file).to receive(:get_parsed_data).once.and_call_original
 
-        2.times { loader.raw_users }
+        2.times { loader.entries }
       end
+    end
+  end
+
+  describe '#members' do
+    it 'returns users mentioned for the passed path' do
+      expect(loader.members).to contain_exactly(owner_1, email_owner, documentation_owner)
     end
   end
 

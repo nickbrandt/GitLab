@@ -9,7 +9,7 @@ module EE
       def after_create(issuable)
         super
 
-        issuable.sync_code_owners_with_approvers
+        ::MergeRequests::SyncCodeOwnerApprovalRules.new(issuable).execute
       end
     end
   end

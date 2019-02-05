@@ -43,7 +43,9 @@ module EE
         if ::Feature.enabled?(:approval_rules, project)
           results = yield
 
-          merge_requests_for_source_branch.each(&:sync_code_owners_with_approvers)
+          merge_requests_for_source_branch.each do |merge_request|
+            ::MergeRequests::SyncCodeOwnerApprovalRules.new(merge_request).execute
+          end
         else
           previous_diffs = fetch_latest_merge_request_diffs
 

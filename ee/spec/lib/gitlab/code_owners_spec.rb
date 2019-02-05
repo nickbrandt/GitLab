@@ -44,6 +44,46 @@ describe Gitlab::CodeOwners do
     end
   end
 
+  describe '.entries_for_merge_request' do
+    let(:codeowner_lookup_ref) { merge_request.target_branch }
+    let(:merge_request) do
+      build(
+        :merge_request,
+        source_project: project,
+        source_branch: 'feature',
+        target_project: project,
+        target_branch: 'with-codeowners'
+      )
+    end
+
+    context 'when the feature is available' do
+      before do
+        stub_licensed_features(code_owners: true)
+      end
+
+      it 'returns owners for merge request' do
+        expect(merge_request).to receive(:modified_paths).with(past_merge_request_diff: nil).and_return(['docs/CODEOWNERS'])
+
+        entry = described_class.entries_for_merge_request(merge_request).first
+
+        expect(entry.pattern).to eq('docs/CODEOWNERS')
+        expect(entry.users).to eq([code_owner])
+      end
+
+      context 'when merge_request_diff is specified' do
+        let(:merge_request_diff) { double(:merge_request_diff) }
+
+        it 'returns owners at the specified ref' do
+          expect(merge_request).to receive(:modified_paths).with(past_merge_request_diff: merge_request_diff).and_return(['docs/CODEOWNERS'])
+
+          entry = described_class.entries_for_merge_request(merge_request, merge_request_diff: merge_request_diff).first
+
+          expect(entry.users).to eq([code_owner])
+        end
+      end
+    end
+  end
+
   describe '.for_merge_request' do
     let(:codeowner_lookup_ref) { merge_request.target_branch }
     let(:merge_request) do

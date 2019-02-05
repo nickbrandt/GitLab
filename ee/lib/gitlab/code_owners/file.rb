@@ -15,14 +15,14 @@ module Gitlab
         parsed_data.empty?
       end
 
-      def owners_for_path(path)
+      def entry_for_path(path)
         path = "/#{path}" unless path.start_with?('/')
 
         matching_pattern = parsed_data.keys.reverse.detect do |pattern|
           path_matches?(pattern, path)
         end
 
-        parsed_data[matching_pattern]
+        parsed_data[matching_pattern].dup if matching_pattern
       end
 
       private
@@ -45,9 +45,9 @@ module Gitlab
 
           pattern, _separator, owners = line.partition(/(?<!\\)\s+/)
 
-          pattern = normalize_pattern(pattern)
+          normalized_pattern = normalize_pattern(pattern)
 
-          parsed[pattern] = owners
+          parsed[normalized_pattern] = Entry.new(pattern, owners)
         end
 
         parsed
