@@ -1,5 +1,13 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.7.5 (2019-02-05)
+
+### Fixed (2 changes)
+
+- Fix Kerberos authentication. !9390
+- Fix background migration error when project repository is missing. !9392
+
+
 ## 11.7.4 (2019-02-04)
 
 - No changes.
