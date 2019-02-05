@@ -31,7 +31,7 @@ repository.
 If a project is private or you want to upload Maven artifacts to GitLab,
 credentials will need to be provided for authorization. Support is available for
 [personal access tokens](#authenticating-with-a-personal-access-token) and
-[CI job tokens](##authenticating-with-a-ci-job-token).
+[CI job tokens](#authenticating-with-a-ci-job-token).
 
 ### Authenticating with a personal access token
 
@@ -86,7 +86,7 @@ To authenticate with a CI job token, add a corresponding section to your
 ```
 
 You can read more on
-[how to create Maven packages using GitLab CI/CD](#creating-maven-packages-with-gitlab-ci-cd).
+[how to create Maven packages using GitLab CI/CD](#creating-maven-packages-with-gitlab-cicd).
 
 ## Configuring your project to use the GitLab Maven repository URL
 
@@ -132,7 +132,7 @@ would look like:
 ```
 
 The `id` must be the same with what you
-[defined in `settings.xml`](#authorizing-with-the-maven-repository).
+[defined in `settings.xml`](#authenticating-to-the-gitlab-maven-repository).
 
 Replace `PROJECT_ID` with your project ID which can be found on the home page
 of your project.
@@ -185,7 +185,7 @@ the `distributionManagement` section:
 ```
 
 The `id` must be the same with what you
-[defined in `settings.xml`](#authorizing-with-the-maven-repository).
+[defined in `settings.xml`](#authenticating-to-the-gitlab-maven-repository).
 
 Replace `my-group` with your group name and `PROJECT_ID` with your project ID
 which can be found on the home page of your project.
@@ -241,7 +241,7 @@ the `distributionManagement` section:
 ```
 
 The `id` must be the same with what you
-[defined in `settings.xml`](#authorizing-with-the-maven-repository).
+[defined in `settings.xml`](#authenticating-to-the-gitlab-maven-repository).
 
 Replace `PROJECT_ID` with your project ID which can be found on the home page
 of your project.
@@ -257,7 +257,7 @@ project's ID can be used for uploading.
 
 ## Uploading packages
 
-Once you have set up the [authorization](#authorizing-with-the-gitlab-maven-repository)
+Once you have set up the [authentication](#authenticating-to-the-gitlab-maven-repository)
 and [configuration](#configuring-your-project-to-use-the-gitlab-maven-repository-url),
 test to upload a Maven artifact from a project of yours:
 
