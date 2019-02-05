@@ -3860,13 +3860,13 @@ msgstr ""
 msgid "FeatureFlags|Feature Flags"
 msgstr ""
 
+msgid "FeatureFlags|Feature Flags allow you to configure your code into different flavors by dynamically toggling certain functionality."
+msgstr ""
+
 msgid "FeatureFlags|Feature flag %{name} will be removed. Are you sure?"
 msgstr ""
 
-msgid "FeatureFlags|Feature flags allow you to configure your code into different flavors by dynamically toggling certain functionality."
-msgstr ""
-
-msgid "FeatureFlags|Get started with feature flags"
+msgid "FeatureFlags|Get started with Feature Flags"
 msgstr ""
 
 msgid "FeatureFlags|Inactive"
@@ -3906,6 +3906,12 @@ msgid "FeatureFlags|Status"
 msgstr ""
 
 msgid "FeatureFlags|Target environments"
+msgstr ""
+
+msgid "FeatureFlags|There are no active Feature Flags"
+msgstr ""
+
+msgid "FeatureFlags|There are no inactive Feature Flags"
 msgstr ""
 
 msgid "FeatureFlags|There was an error fetching the feature flags."
