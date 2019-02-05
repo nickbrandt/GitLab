@@ -27,6 +27,15 @@ describe GeoNode, type: :model do
     it { is_expected.to validate_numericality_of(:files_max_capacity).is_greater_than_or_equal_to(0) }
     it { is_expected.to validate_numericality_of(:verification_max_capacity).is_greater_than_or_equal_to(0) }
     it { is_expected.to validate_numericality_of(:minimum_reverification_interval).is_greater_than_or_equal_to(1) }
+
+    context 'primary node' do
+      it 'cannot be disabled' do
+        primary_node.enabled = false
+
+        expect(primary_node).not_to be_valid
+        expect(primary_node.errors).to include(:enabled)
+      end
+    end
   end
 
   context 'default values' do
