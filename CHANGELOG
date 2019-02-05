@@ -4,6 +4,8 @@ Formerly known as 'gitlab-git-http-server'.
 
 v 8.3.0
 
+- Count ^/-/ requests separately in prometheus !355
+- Statically link jaeger into Workhorse by default !359
 - Support encoded Content-Disposition fields !360
 
 v 8.2.0
