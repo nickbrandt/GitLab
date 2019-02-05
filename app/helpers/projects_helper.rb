@@ -287,7 +287,7 @@ module ProjectsHelper
 
   # overridden in EE
   def settings_operations_available?
-    Feature.enabled?(:error_tracking, @project) && can?(current_user, :read_environment, @project)
+    can?(current_user, :read_environment, @project)
   end
 
   private
@@ -330,7 +330,7 @@ module ProjectsHelper
   def external_nav_tabs(project)
     [].tap do |tabs|
       tabs << :external_issue_tracker if project.external_issue_tracker
-      tabs << :external_wiki if project.has_external_wiki?
+      tabs << :external_wiki if project.external_wiki
     end
   end
 
