@@ -21,7 +21,7 @@ func TestFailSetContentTypeAndDisposition(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	resp := makeRequest(t, h, testCaseBody)
+	resp := makeRequest(t, h, testCaseBody, "")
 
 	require.Equal(t, "", resp.Header.Get(headers.ContentDispositionHeader))
 	require.Equal(t, "", resp.Header.Get(headers.ContentTypeHeader))
@@ -30,7 +30,7 @@ func TestFailSetContentTypeAndDisposition(t *testing.T) {
 func TestSuccessSetContentTypeAndDispositionFeatureEnabled(t *testing.T) {
 	testCaseBody := "Hello world!"
 
-	resp := makeRequest(t, nil, testCaseBody)
+	resp := makeRequest(t, nil, testCaseBody, "")
 
 	require.Equal(t, "inline", resp.Header.Get(headers.ContentDispositionHeader))
 	require.Equal(t, "text/plain; charset=utf-8", resp.Header.Get(headers.ContentTypeHeader))
@@ -145,11 +145,17 @@ func TestSetProperContentTypeAndDisposition(t *testing.T) {
 			contentDisposition: "attachment",
 			body:               testhelper.LoadFile(t, "testdata/file.sketch"),
 		},
+		{
+			desc:               "PDF file with non-ASCII characters in filename",
+			contentType:        "application/pdf",
+			contentDisposition: `attachment; filename="file-ä.pdf"; filename*=UTF-8''file-%c3.pdf`,
+			body:               testhelper.LoadFile(t, "testdata/file-ä.pdf"),
+		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			resp := makeRequest(t, nil, tc.body)
+			resp := makeRequest(t, nil, tc.body, tc.contentDisposition)
 
 			require.Equal(t, tc.contentType, resp.Header.Get(headers.ContentTypeHeader))
 			require.Equal(t, tc.contentDisposition, resp.Header.Get(headers.ContentDispositionHeader))
@@ -174,7 +180,7 @@ func TestFailOverrideContentType(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	resp := makeRequest(t, h, testCase.body)
+	resp := makeRequest(t, h, testCase.body, "")
 
 	require.Equal(t, testCase.contentType, resp.Header.Get(headers.ContentTypeHeader))
 }
@@ -190,7 +196,7 @@ func TestSuccessOverrideContentDispositionFromInlineToAttachment(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	resp := makeRequest(t, h, testCaseBody)
+	resp := makeRequest(t, h, testCaseBody, "")
 
 	require.Equal(t, "attachment", resp.Header.Get(headers.ContentDispositionHeader))
 }
@@ -206,7 +212,7 @@ func TestFailOverrideContentDispositionFromAttachmentToInline(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	resp := makeRequest(t, h, testCaseBody)
+	resp := makeRequest(t, h, testCaseBody, "")
 
 	require.Equal(t, "attachment", resp.Header.Get(headers.ContentDispositionHeader))
 }
@@ -240,11 +246,12 @@ func TestWriteHeadersCalledOnce(t *testing.T) {
 	require.Equal(t, 400, rw.status)
 }
 
-func makeRequest(t *testing.T, handler http.HandlerFunc, body string) *http.Response {
+func makeRequest(t *testing.T, handler http.HandlerFunc, body string, disposition string) *http.Response {
 	if handler == nil {
 		handler = http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 			// We are pretending to be upstream
 			w.Header().Set(headers.GitlabWorkhorseDetectContentTypeHeader, "true")
+			w.Header().Set(headers.ContentDispositionHeader, disposition)
 			_, err := io.WriteString(w, body)
 			require.NoError(t, err)
 		})

@@ -1,7 +1,6 @@
 package headers
 
 import (
-	"mime"
 	"net/http"
 	"regexp"
 
@@ -17,6 +16,7 @@ var (
 	VideoTypeRegex = regexp.MustCompile(`^video/*`)
 
 	AttachmentRegex = regexp.MustCompile(`^attachment`)
+	InlineRegex     = regexp.MustCompile(`^inline`)
 )
 
 // Mime types that can't be inlined. Usually subtypes of main types
@@ -54,61 +54,52 @@ func safeContentType(data []byte) string {
 }
 
 func safeContentDisposition(contentType string, contentDisposition string) string {
-	existingDisposition, file := extractContentDispositionFile(contentDisposition)
-
 	// If the existing disposition is attachment we return that. This allow us
 	// to force a download from GitLab (ie: RawController)
-	if AttachmentRegex.MatchString(existingDisposition) {
-		return attachmentDisposition(file)
+	if AttachmentRegex.MatchString(contentDisposition) {
+		return contentDisposition
 	}
 
 	// Checks for mime types that are forbidden to be inline
 	for _, element := range forbiddenInlineTypes {
 		if isType(contentType, element) {
-			return attachmentDisposition(file)
+			return attachmentDisposition(contentDisposition)
 		}
 	}
 
 	// Checks for mime types allowed to be inline
 	for _, element := range allowedInlineTypes {
 		if isType(contentType, element) {
-			return inlineDisposition(file)
+			return inlineDisposition(contentDisposition)
 		}
 	}
 
 	// Anything else is set to attachment
-	return attachmentDisposition(file)
+	return attachmentDisposition(contentDisposition)
 }
 
-func extractContentDispositionFile(disposition string) (string, string) {
-	if disposition == "" {
-		return "", ""
+func attachmentDisposition(contentDisposition string) string {
+	if contentDisposition == "" {
+		return "attachment"
 	}
 
-	existingDisposition, params, err := mime.ParseMediaType(disposition)
-	if err != nil {
-		return "", ""
+	if InlineRegex.MatchString(contentDisposition) {
+		return InlineRegex.ReplaceAllString(contentDisposition, "attachment")
 	}
 
-	return existingDisposition, params["filename"]
+	return contentDisposition
 }
 
-func attachmentDisposition(file string) string {
-	return disposition("attachment", file)
-}
-
-func inlineDisposition(file string) string {
-	return disposition("inline", file)
-}
-
-func disposition(disposition string, file string) string {
-	params := map[string]string{}
-
-	if file != "" {
-		params["filename"] = file
+func inlineDisposition(contentDisposition string) string {
+	if contentDisposition == "" {
+		return "inline"
 	}
 
-	return mime.FormatMediaType(disposition, params)
+	if AttachmentRegex.MatchString(contentDisposition) {
+		return AttachmentRegex.ReplaceAllString(contentDisposition, "inline")
+	}
+
+	return contentDisposition
 }
 
 func isType(contentType string, mimeType *regexp.Regexp) bool {

@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 8.3.0
+
+- Support encoded Content-Disposition fields !360
+
 v 8.2.0
 
 - Sign LFS upload requests that have been handled by workhorse
