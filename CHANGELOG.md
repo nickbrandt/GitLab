@@ -15,6 +15,17 @@ entry.
 
 ## 11.7.2 (2019-01-29)
 
+### Security (1 change)
+
+- Use sanitized user status message for user popover.
+
+
+## 11.7.3 (2019-01-30)
+
+- No changes.
+
+## 11.7.2 (2019-01-29)
+
 ### Fixed (1 change)
 
 - Fix uninitialized constant with GitLab Pages.
