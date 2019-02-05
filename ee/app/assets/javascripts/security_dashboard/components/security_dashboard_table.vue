@@ -62,10 +62,13 @@ export default {
       role="row"
     >
       <div class="table-section section-10" role="rowheader">{{ s__('Reports|Severity') }}</div>
-      <div class="table-section section-60" role="rowheader">
+      <div class="table-section flex-grow-1" role="rowheader">
         {{ s__('Reports|Vulnerability') }}
       </div>
-      <div class="table-section section-30" role="rowheader">{{ s__('Reports|Confidence') }}</div>
+      <div class="table-section section-10 ml-md-2" role="rowheader">
+        {{ s__('Reports|Confidence') }}
+      </div>
+      <div class="table-section section-20" role="rowheader"></div>
     </div>
 
     <div class="flash-container">
@@ -80,11 +83,11 @@ export default {
       </div>
     </div>
 
-    <div v-if="isLoadingVulnerabilities">
+    <template v-if="isLoadingVulnerabilities">
       <security-dashboard-table-row v-for="n in 10" :key="n" :is-loading="true" />
-    </div>
+    </template>
 
-    <div v-else>
+    <template v-else>
       <security-dashboard-table-row
         v-for="vulnerability in vulnerabilities"
         :key="vulnerability.id"
@@ -104,7 +107,7 @@ export default {
         :page-info="pageInfo"
         class="justify-content-center prepend-top-default"
       />
-    </div>
+    </template>
   </div>
 </template>
 
@@ -112,5 +115,10 @@ export default {
 .vulnerabilities-row-header {
   background-color: #fafafa;
   font-size: 14px;
+}
+
+.vulnerabilities-row .table-section,
+.vulnerabilities-row-header .table-section {
+  min-width: 120px;
 }
 </style>
