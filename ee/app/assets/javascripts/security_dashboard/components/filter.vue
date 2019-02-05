@@ -40,7 +40,6 @@ export default {
         filterId: this.filterId,
         optionId: option.id,
       });
-      this.$emit('change');
     },
     isSelected(option) {
       return this.selection.has(option.id);

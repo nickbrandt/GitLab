@@ -44,7 +44,7 @@ export default {
     },
   },
   created() {
-    this.fetchVulnerabilities();
+    this.fetchVulnerabilities(this.activeFilters);
   },
   methods: {
     ...mapActions('vulnerabilities', ['fetchVulnerabilities', 'openModal']),

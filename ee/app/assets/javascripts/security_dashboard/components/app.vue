@@ -71,27 +71,20 @@ export default {
     ...mapActions('vulnerabilities', [
       'createIssue',
       'dismissVulnerability',
-      'fetchVulnerabilities',
       'fetchVulnerabilitiesCount',
-      'fetchVulnerabilitiesHistory',
       'revertDismissal',
       'setVulnerabilitiesCountEndpoint',
       'setVulnerabilitiesEndpoint',
       'setVulnerabilitiesHistoryEndpoint',
     ]),
     ...mapActions('projects', ['setProjectsEndpoint', 'fetchProjects']),
-    filterChange() {
-      this.fetchVulnerabilities(this.activeFilters);
-      this.fetchVulnerabilitiesCount(this.activeFilters);
-      this.fetchVulnerabilitiesHistory(this.activeFilters);
-    },
   },
 };
 </script>
 
 <template>
   <div>
-    <filters :dashboard-documentation="dashboardDocumentation" @change="filterChange" />
+    <filters :dashboard-documentation="dashboardDocumentation" />
     <vulnerability-count-list />
     <h4 class="my-4">{{ __('Vulnerability Chart') }}</h4>
     <vulnerability-chart />

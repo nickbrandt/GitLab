@@ -1,3 +1,4 @@
+import * as filtersMutationTypes from './modules/filters/mutation_types';
 import * as projectsMutationTypes from './modules/projects/mutation_types';
 
 export default function configureModerator(store) {
@@ -18,6 +19,13 @@ export default function configureModerator(store) {
           ],
         });
         break;
+      case `filters/${filtersMutationTypes.SET_FILTER}`: {
+        const activeFilters = store.getters['filters/activeFilters'];
+        store.dispatch('vulnerabilities/fetchVulnerabilities', activeFilters);
+        store.dispatch('vulnerabilities/fetchVulnerabilitiesCount', activeFilters);
+        store.dispatch('vulnerabilities/fetchVulnerabilitiesHistory', activeFilters);
+        break;
+      }
       default:
     }
   });

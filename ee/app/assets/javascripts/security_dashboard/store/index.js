@@ -16,7 +16,6 @@ export default () => {
     },
   });
 
-
   configureModerator(store);
 
   return store;
