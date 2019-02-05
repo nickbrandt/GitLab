@@ -1,5 +1,0 @@
----
-title: Fix background migration error when project repository is missing
-merge_request: 9392
-author:
-type: fixed
