@@ -68,7 +68,8 @@ module EE
             :repository_storage,
             :external_authorization_classification_label,
             :import_url,
-            :packages_enabled
+            :packages_enabled,
+            :fallback_approvals_required
           ]
         end
       end
