@@ -13,8 +13,7 @@ describe Gitlab::Geo::JwtRequestDecoder do
     end
 
     it 'fails to decode when node is disabled' do
-      primary_node.enabled = false
-      primary_node.save
+      primary_node.update_attribute(:enabled, false)
 
       expect(subject.decode).to be_nil
     end

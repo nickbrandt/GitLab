@@ -6,9 +6,13 @@ module EE
       module Pipeline
         module Chain
           module Limit
-            class Activity < ::Gitlab::Ci::Pipeline::Chain::Base
+            module Activity
+              extend ::Gitlab::Utils::Override
               include ::Gitlab::Ci::Pipeline::Chain::Helpers
               include ::Gitlab::OptimisticLocking
+
+              attr_reader :limit
+              private :limit
 
               def initialize(*)
                 super
@@ -17,16 +21,18 @@ module EE
                   .new(project.namespace, pipeline.project)
               end
 
+              override :perform!
               def perform!
-                return unless @limit.exceeded?
+                return unless limit.exceeded?
 
-                retry_optimistic_lock(@pipeline) do
-                  @pipeline.drop!(:activity_limit_exceeded)
+                retry_optimistic_lock(pipeline) do
+                  pipeline.drop!(:activity_limit_exceeded)
                 end
               end
 
+              override :break?
               def break?
-                @limit.exceeded?
+                limit.exceeded?
               end
             end
           end

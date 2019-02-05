@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module EpicsHelper
+  # rubocop: disable Metrics/AbcSize
   def epic_show_app_data(epic, opts)
     group = epic.group
     todo = epic_pending_todo(epic)
@@ -30,6 +31,7 @@ module EpicsHelper
         start_date: epic.due_date_sourcing_milestone&.start_date,
         due_date: epic.due_date_sourcing_milestone&.due_date
       },
+      lock_version: epic.lock_version,
       end_date: epic.end_date,
       state: epic.state,
       namespace: group.path,
@@ -58,6 +60,7 @@ module EpicsHelper
       epics_web_url: group_epics_path(group)
     }
   end
+  # rubocop: enable Metrics/AbcSize
 
   def epic_pending_todo(epic)
     current_user.pending_todo_for(epic) if current_user

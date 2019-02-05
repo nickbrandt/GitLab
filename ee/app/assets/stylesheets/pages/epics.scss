@@ -11,6 +11,15 @@
       color: $gl-text-color-secondary;
     }
 
+    .btn-sidebar-action {
+      line-height: $gl-font-size;
+    }
+
+    .btn-sidebar-date-remove {
+      height: $gl-font-size;
+      line-height: $gl-btn-horz-padding;
+    }
+
     .date-warning-icon {
       color: $orange-500;
       margin-top: -1px;

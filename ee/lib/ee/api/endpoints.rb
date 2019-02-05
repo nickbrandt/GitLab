@@ -9,8 +9,10 @@ module EE
         mount ::EE::API::Boards
         mount ::EE::API::GroupBoards
 
+        mount ::API::ProjectApprovalRules
         mount ::API::Unleash
         mount ::API::EpicIssues
+        mount ::API::EpicLinks
         mount ::API::Epics
         mount ::API::Geo
         mount ::API::GeoNodes
@@ -22,6 +24,8 @@ module EE
         mount ::API::ProjectPushRule
         mount ::API::MavenPackages
         mount ::API::NpmPackages
+        mount ::API::Packages
+        mount ::API::PackageFiles
       end
     end
   end

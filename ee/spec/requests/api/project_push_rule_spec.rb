@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe API::ProjectPushRule, 'ProjectPushRule', api: true  do
+describe API::ProjectPushRule, 'ProjectPushRule', api: true do
   include ApiHelpers
   let(:user) { create(:user) }
   let(:user3) { create(:user) }

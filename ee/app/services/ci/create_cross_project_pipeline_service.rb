@@ -8,7 +8,7 @@ module Ci
       @bridge = bridge
 
       unless target_project_exists?
-        return bridge.drop!(:invalid_bridge_trigger)
+        return bridge.drop!(:downstream_bridge_project_not_found)
       end
 
       if target_project == project
@@ -43,6 +43,8 @@ module Ci
             source_project: @bridge.project,
             project: target_project,
             pipeline: pipeline)
+
+          pipeline.variables.build(@bridge.downstream_variables)
         end
     end
 

@@ -9,6 +9,7 @@ module API
     NO_SLASH_URL_PART_REGEX = %r{[^/]+}
     NAMESPACE_OR_PROJECT_REQUIREMENTS = { id: NO_SLASH_URL_PART_REGEX }.freeze
     COMMIT_ENDPOINT_REQUIREMENTS = NAMESPACE_OR_PROJECT_REQUIREMENTS.merge(sha: NO_SLASH_URL_PART_REGEX).freeze
+    USER_REQUIREMENTS = { user_id: NO_SLASH_URL_PART_REGEX }.freeze
 
     insert_before Grape::Middleware::Error,
                   GrapeLogging::Middleware::RequestLogger,
@@ -107,6 +108,7 @@ module API
     mount ::API::CircuitBreakers
     mount ::API::Commits
     mount ::API::CommitStatuses
+    mount ::API::ContainerRegistry
     mount ::API::DeployKeys
     mount ::API::Deployments
     mount ::API::Environments

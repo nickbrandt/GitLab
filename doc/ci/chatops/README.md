@@ -10,7 +10,7 @@ GitLab ChatOps provides a method to interact with CI/CD jobs through chat servic
 
 ## How it works
 
-GitLab ChatOps is built upon two existing features, [GitLab CI/CD](../README.md) and [Slack Slash Commmands](../../user/project/integrations/slack_slash_commands.md). 
+GitLab ChatOps is built upon two existing features, [GitLab CI/CD](../README.md) and [Slack Slash Commmands](../../user/project/integrations/slack_slash_commands.md).
 
 A new `run` action has been added to the [slash commands](../../integration/slash_commands.md), which takes two arguments: a `<job name>` to execute and the `<job arguments>`. When executed, ChatOps will look up the specified job name and attempt to match it to a corresponding job in [.gitlab-ci.yml](../yaml/README.md). If a matching job is found on `master`, a pipeline containing just that job is scheduled. Two additional [CI/CD variables](../variables/README.html#predefined-variables-environment-variables) are passed to the job: `CHAT_INPUT` contains any additional arguments, and `CHAT_CHANNEL` is set to the name of channel the action was triggered in.
 
@@ -22,9 +22,9 @@ After the job has finished, its output is sent back to Slack provided it has com
 
 Since ChatOps is built upon GitLab CI/CD, the job has all the same features and functions available. There a few best practices to consider however when creating ChatOps jobs:
 
-* It is strongly recommended to set `only: [chat]` so the job does not run as part of the standard CI pipeline. 
-* If the job is set to `when: manual`, the pipeline will be created however the job will wait to be started. 
-* It is important to keep in mind that there is very limited support for access control. If the user who triggered the slash command is a developer in the project, the job will run. The job itself can utilize existing [CI/CD variables](../variables/README.html#predefined-variables-environment-variables) like `GITLAB_USER_ID` to perform additional rights validation, however these variables can be [overridden](https://docs.gitlab.com/ce/ci/variables/README.html#priority-of-variables).
+* It is strongly recommended to set `only: [chat]` so the job does not run as part of the standard CI pipeline.
+* If the job is set to `when: manual`, the pipeline will be created however the job will wait to be started.
+* It is important to keep in mind that there is very limited support for access control. If the user who triggered the slash command is a developer in the project, the job will run. The job itself can utilize existing [CI/CD variables](../variables/README.html#predefined-environment-variables) like `GITLAB_USER_ID` to perform additional rights validation, however these variables can be [overridden](https://docs.gitlab.com/ce/ci/variables/README.html#priority-of-variables).
 
 ### Controlling the ChatOps reply
 
@@ -53,7 +53,7 @@ ls:
 
 ## GitLab ChatOps icon
 
-Say Hi to our ChatOps bot.  
+Say Hi to our ChatOps bot.
 You can find and download the official GitLab ChatOps icon here.
 
 ![GitLab ChatOps bot icon](img/gitlab-chatops-icon-small.png)

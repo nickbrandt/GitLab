@@ -1,30 +1,15 @@
+import Vue from 'vue';
+import _ from 'underscore';
 import CePipelineStore from '~/pipelines/stores/pipeline_store';
-import pipelinesKeys from '../constants';
 
 /**
  * Extends CE store with the logic to handle the upstream/downstream pipelines
  */
 export default class PipelineStore extends CePipelineStore {
-  constructor() {
-    super();
-
-    // Stores the dowsntream collapsed pipelines
-    // with basic info sent in the main request
-    this.state.triggeredPipelines = [];
-    // Stores the upstream collapsed pipelines
-    // with basic info sent in the main request
-    this.state.triggeredByPipelines = [];
-
-    // Visible downstream pipeline
-    this.state.triggered = {};
-    // Visible upstream pipeline
-    this.state.triggeredBy = {};
-  }
-
   /**
-   * For the triggered pipelines, parses them to add `isLoading` and `isExpanded` keys
+   * For the triggered pipelines adds the `isExpanded` key
    *
-   * For the triggered_by pipeline, parsed the object to add `isLoading` and `isExpanded` keys
+   * For the triggered_by pipeline adds the `isExpanded` key
    * and saves it as an array
    *
    * @param {Object} pipeline
@@ -32,216 +17,138 @@ export default class PipelineStore extends CePipelineStore {
   storePipeline(pipeline = {}) {
     super.storePipeline(pipeline);
 
-    if (pipeline.triggered && pipeline.triggered.length) {
-      this.state.triggeredPipelines = pipeline.triggered.map(triggered => {
-        // because we are polling we need to make sure we do not hijack user's clicks.
-        const oldPipeline = this.state.triggeredPipelines.find(
-          oldValue => oldValue.id === triggered.id,
-        );
+    if (pipeline.triggered_by) {
+      this.state.pipeline.triggered_by = [pipeline.triggered_by];
 
-        return Object.assign({}, triggered, {
-          isExpanded: oldPipeline ? oldPipeline.isExpanded : false,
-          isLoading: oldPipeline ? oldPipeline.isLoading : false,
-        });
-      });
+      this.parseTriggeredByPipelines(this.state.pipeline.triggered_by[0]);
     }
+
+    if (pipeline.triggered && pipeline.triggered.length) {
+      this.state.pipeline.triggered.forEach(el => this.parseTriggeredPipelines(el));
+    }
+  }
+
+  /**
+   * Recursiverly parses the triggered by pipelines.
+   *
+   * Sets triggered_by as an array, there is always only 1 triggered_by pipeline.
+   * Adds key `isExpanding`
+   * Keeps old isExpading value due to polling
+   *
+   * @param {Array} parentPipeline
+   * @param {Object} pipeline
+   */
+  parseTriggeredByPipelines(pipeline) {
+    // keep old value in case it's opened because we're polling
+    Vue.set(pipeline, 'isExpanded', pipeline.isExpanded || false);
 
     if (pipeline.triggered_by) {
-      this.state.triggeredByPipelines = [
-        Object.assign({}, pipeline.triggered_by, {
-          isExpanded: this.state.triggeredByPipelines.length
-            ? this.state.triggeredByPipelines[0].isExpanded
-            : false,
-          isLoading: this.state.triggeredByPipelines.length
-            ? this.state.triggeredByPipelines[0].isLoading
-            : false,
-        }),
-      ];
+      if (!_.isArray(pipeline.triggered_by)) {
+        Object.assign(pipeline, { triggered_by: [pipeline.triggered_by] });
+      }
+      this.parseTriggeredByPipelines(pipeline.triggered_by[0]);
     }
   }
 
-  //
-  // Downstream pipeline's methods
-  //
+  /**
+   * Recursively parses the triggered pipelines
+   * @param {Array} parentPipeline
+   * @param {Object} pipeline
+   */
+  parseTriggeredPipelines(pipeline) {
+    // keep old value in case it's opened because we're polling
+    Vue.set(pipeline, 'isExpanded', pipeline.isExpanded || false);
+
+    if (pipeline.triggered && pipeline.triggered.length > 0) {
+      pipeline.triggered.forEach(el => this.parseTriggeredPipelines(el));
+    }
+  }
 
   /**
-   * Called when the user clicks on a pipeline that was triggered by the main one.
-   *
-   * Resets isExpanded and isLoading props for all triggered (downstream) pipelines
-   * Sets isLoading to true for the requested one.
+   * Recursively resets all triggered by pipelines
    *
    * @param {Object} pipeline
    */
-  requestTriggeredPipeline(pipeline) {
-    this.updateStoreOnRequest(pipelinesKeys.triggeredPipelines, pipeline);
+  resetTriggeredByPipeline(parentPipeline, pipeline) {
+    parentPipeline.triggered_by.forEach(el => PipelineStore.closePipeline(el));
+
+    if (pipeline.triggered_by && pipeline.triggered_by) {
+      this.resetTriggeredByPipeline(pipeline, pipeline.triggered_by);
+    }
   }
 
   /**
-   * Called when we receive success callback for the downstream pipeline requested.
-   *
-   * Updates loading state for the request pipeline
-   * Updates the visible pipeline with the response
-   *
+   * Opens the clicked pipeline and closes all other ones.
    * @param {Object} pipeline
-   * @param {Object} response
    */
-  receiveTriggeredPipelineSuccess(pipeline, response) {
-    this.updatePipeline(
-      pipelinesKeys.triggeredPipelines,
-      pipeline,
-      { isLoading: false, isExpanded: true },
-      pipelinesKeys.triggered,
-      response,
-    );
+  openTriggeredByPipeline(parentPipeline, pipeline) {
+    // first we need to reset all triggeredBy pipelines
+    this.resetTriggeredByPipeline(parentPipeline, pipeline);
+
+    PipelineStore.openPipeline(pipeline);
   }
 
   /**
-   * Called when we receive an error callback for the downstream pipeline requested
-   * Resets the loading state + collpased state
-   * Resets triggered pipeline
+   * On click, will close the given pipeline and all nested triggered by pipelines
    *
    * @param {Object} pipeline
    */
-  receiveTriggeredPipelineError(pipeline) {
-    this.updatePipeline(
-      pipelinesKeys.triggeredPipelines,
-      pipeline,
-      { isLoading: false, isExpanded: false },
-      pipelinesKeys.triggered,
-      {},
-    );
+  closeTriggeredByPipeline(pipeline) {
+    PipelineStore.closePipeline(pipeline);
+
+    if (pipeline.triggered_by && pipeline.triggered_by.length) {
+      pipeline.triggered_by.forEach(triggeredBy => this.closeTriggeredByPipeline(triggeredBy));
+    }
   }
 
-  //
-  // Upstream pipeline's methods
-  //
-
   /**
-   * Called when the user clicks on the pipeline that triggered the main one.
-   *
-   * Handle the request for the upstream pipeline
-   * Updates the given pipeline with isLoading: true and isExpanded: true
+   * Recursively closes all triggered pipelines for the given one.
    *
    * @param {Object} pipeline
    */
-  requestTriggeredByPipeline(pipeline) {
-    this.updateStoreOnRequest(pipelinesKeys.triggeredByPipelines, pipeline);
+  resetTriggeredPipelines(parentPipeline, pipeline) {
+    parentPipeline.triggered.forEach(el => this.closePipeline(el));
+
+    if (pipeline.triggered && pipeline.triggered.length) {
+      pipeline.triggered.forEach(el => this.resetTriggeredPipelines(pipeline, el));
+    }
   }
 
   /**
-   * Success callback for the upstream pipeline received
+   * Opens the clicked triggered pipeline and closes all other ones.
    *
    * @param {Object} pipeline
-   * @param {Object} response
    */
-  receiveTriggeredByPipelineSuccess(pipeline, response) {
-    this.updatePipeline(
-      pipelinesKeys.triggeredByPipelines,
-      pipeline,
-      { isLoading: false, isExpanded: true },
-      pipelinesKeys.triggeredBy,
-      response,
-    );
+  openTriggeredPipeline(parentPipeline, pipeline) {
+    this.resetTriggeredPipelines(parentPipeline, pipeline);
+    PipelineStore.openPipeline(pipeline);
   }
 
   /**
-   * Error callback for the upstream callback
+   * On click, will close the given pipeline and all the nested triggered ones
    * @param {Object} pipeline
    */
-  receiveTriggeredByPipelineError(pipeline) {
-    this.updatePipeline(
-      pipelinesKeys.triggeredByPipelines,
-      pipeline,
-      { isLoading: false, isExpanded: false },
-      pipelinesKeys.triggeredBy,
-      {},
-    );
+  closeTriggeredPipeline(pipeline) {
+    PipelineStore.closePipeline(pipeline);
+
+    if (pipeline.triggered && pipeline.triggered.length) {
+      pipeline.triggered.forEach(triggered => this.closeTriggeredPipeline(triggered));
+    }
   }
 
-  //
-  // Common utils between upstream & dowsntream pipelines
-  //
-
   /**
-   * Adds isLoading and isCollpased keys to the given pipeline
-   *
-   * Used to know when to render the spinning icon
-   * and the blue background when the pipeline is expanded.
-   *
+   * Utility function, Closes the given pipeline
    * @param {Object} pipeline
-   * @returns {Object}
    */
-  static parsePipeline(pipeline) {
-    return Object.assign({}, pipeline, {
-      isExpanded: false,
-      isLoading: false,
-    });
+  static closePipeline(pipeline) {
+    Vue.set(pipeline, 'isExpanded', false);
   }
 
   /**
-   * Returns the index of the upstream/downstream that matches the given ID
-   *
+   * Utility function, Opens the given pipeline
    * @param {Object} pipeline
-   * @returns {Number}
    */
-  getPipelineIndex(storeKey, pipelineId) {
-    return this.state[storeKey].findIndex(triggered => triggered.id === pipelineId);
-  }
-
-  /**
-   * Updates the pipelines to reflect which one was requested.
-   * It sets isLoading to true and isExpanded to false
-   *
-   * @param {String} storeKey which property to update: `triggeredPipelines|triggeredByPipelines`
-   * @param {Object} pipeline the requested pipeline
-   */
-  updateStoreOnRequest(storeKey, pipeline) {
-    this.state[storeKey] = this.state[storeKey].map(triggered => {
-      if (triggered.id === pipeline.id) {
-        return Object.assign({}, triggered, { isLoading: true, isExpanded: true });
-      }
-      // reset the others, in case another was one opened
-      return PipelineStore.parsePipeline(triggered);
-    });
-  }
-
-  /**
-   * Updates a single pipeline with the new props and the visible pipeline
-   * Used for success and error callbacks for both upstream and downstream requests.
-   *
-   * @param {String} storeKey Which array needs to be updated: `triggeredPipelines|triggeredByPipelines`
-   * @param {Object} pipeline Which pipeline should be updated
-   * @param {Object} props The new properties to be updated for the given pipeline
-   * @param {String} visiblePipelineKey Which visible pipeline needs to be updated: `triggered|triggeredBy`
-   * @param {Object} visiblePipeline The new visible pipeline value
-   */
-  updatePipeline(storeKey, pipeline, props, visiblePipelineKey, visiblePipeline = {}) {
-    this.state[storeKey].splice(
-      this.getPipelineIndex(storeKey, pipeline.id),
-      1,
-      Object.assign({}, pipeline, props),
-    );
-
-    this.state[visiblePipelineKey] = visiblePipeline;
-  }
-
-  /**
-   * When the user clicks on a non collapsed pipeline we need to close it
-   *
-   * @param {String} storeKey  Which array needs to be updated: `triggeredPipelines|triggeredByPipelines`
-   * @param {Object} pipeline Which pipeline should be updated
-   * @param {String} visiblePipelineKey Which visible pipeline needs to be updated: `triggered|triggeredBy`
-   */
-  closePipeline(storeKey, pipeline, visiblePipelineKey) {
-    this.updatePipeline(
-      storeKey,
-      pipeline,
-      {
-        isLoading: false,
-        isExpanded: false,
-      },
-      visiblePipelineKey,
-      {},
-    );
+  static openPipeline(pipeline) {
+    Vue.set(pipeline, 'isExpanded', true);
   }
 }

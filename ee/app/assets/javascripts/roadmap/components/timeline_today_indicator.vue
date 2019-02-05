@@ -1,7 +1,7 @@
 <script>
 import { totalDaysInMonth, dayInQuarter, totalDaysInQuarter } from '~/lib/utils/datetime_utility';
 
-import { EPIC_DETAILS_CELL_WIDTH, PRESET_TYPES } from '../constants';
+import { EPIC_DETAILS_CELL_WIDTH, PRESET_TYPES, DAYS_IN_WEEK } from '../constants';
 
 import eventHub from '../event_hub';
 
@@ -42,8 +42,9 @@ export default {
      * and renders vertical line over the area where
      * today falls in current timeline
      */
-    handleEpicsListRender({ height, todayBarReady }) {
+    handleEpicsListRender({ todayBarReady }) {
       let left = 0;
+      let height = 0;
 
       // Get total days of current timeframe Item and then
       // get size in % from current date and days in range
@@ -59,15 +60,21 @@ export default {
           (this.currentDate.getDate() / totalDaysInMonth(this.timeframeItem)) * 100,
         );
       } else if (this.presetType === PRESET_TYPES.WEEKS) {
-        left = Math.floor(((this.currentDate.getDay() + 1) / 7) * 100 - 7);
+        left = Math.floor(((this.currentDate.getDay() + 1) / DAYS_IN_WEEK) * 100 - DAYS_IN_WEEK);
       }
 
-      // We add 20 to height to ensure that
-      // today indicator goes past the bottom
-      // edge of the browser even when
-      // scrollbar is present
+      // On initial load, container element height is 0
+      if (this.$root.$el.clientHeight === 0) {
+        height = window.innerHeight - this.$root.$el.offsetTop;
+      } else {
+        // When list is scrollable both vertically and horizontally
+        // We set height using top-level parent container height & position of
+        // today indicator element container.
+        height = this.$root.$el.clientHeight - this.$el.parentElement.offsetTop;
+      }
+
       this.todayBarStyles = {
-        height: `${height + 20}px`,
+        height: `${height}px`,
         left: `${left}%`,
       };
       this.todayBarReady = todayBarReady === undefined ? true : todayBarReady;

@@ -278,7 +278,7 @@ describe Groups::EpicsController do
         group.add_developer(user)
       end
 
-      context 'with correct basic params'  do
+      context 'with correct basic params' do
         it 'returns status 200' do
           update_epic(epic, params)
 

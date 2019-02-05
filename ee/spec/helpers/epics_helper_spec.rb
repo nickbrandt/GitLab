@@ -39,7 +39,7 @@ describe EpicsHelper do
         start_date_sourcing_milestone_title start_date_sourcing_milestone_dates
         due_date due_date_is_fixed due_date_fixed due_date_from_milestones due_date_sourcing_milestone_title
         due_date_sourcing_milestone_dates end_date state namespace labels_path toggle_subscription_path
-        labels_web_url epics_web_url
+        labels_web_url epics_web_url lock_version
       ])
       expect(meta_data['author']).to eq({
         'name' => user.name,
@@ -90,7 +90,7 @@ describe EpicsHelper do
           start_date_sourcing_milestone_title start_date_sourcing_milestone_dates
           due_date due_date_is_fixed due_date_fixed due_date_from_milestones due_date_sourcing_milestone_title
           due_date_sourcing_milestone_dates end_date state namespace labels_path toggle_subscription_path
-          labels_web_url epics_web_url
+          labels_web_url epics_web_url lock_version
         ])
         expect(meta_data['start_date']).to eq('2000-01-01')
         expect(meta_data['start_date_sourcing_milestone_title']).to eq(milestone1.title)

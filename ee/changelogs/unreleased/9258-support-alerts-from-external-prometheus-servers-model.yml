@@ -1,0 +1,5 @@
+---
+title: Support alerts from external Prometheus servers
+merge_request: 9334
+author:
+type: added

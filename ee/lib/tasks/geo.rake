@@ -58,7 +58,7 @@ namespace :geo do
     desc 'Refresh Foreign Tables definition in Geo Secondary node'
     task refresh_foreign_tables: [:environment] do
       if Gitlab::Geo::GeoTasks.foreign_server_configured?
-        print "\nRefreshing foreign tables for FDW: #{Gitlab::Geo::Fdw::FDW_SCHEMA} ... "
+        print "\nRefreshing foreign tables for FDW: #{Gitlab::Geo::Fdw::FOREIGN_SCHEMA} ... "
         Gitlab::Geo::GeoTasks.refresh_foreign_tables!
         puts 'Done!'
       else

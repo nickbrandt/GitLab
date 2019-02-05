@@ -11,7 +11,7 @@ describe Gitlab::Elastic::Indexer do
   let(:project)  { create(:project, :repository) }
   let(:from_sha) { Gitlab::Git::BLANK_SHA }
   let(:to_sha)   { project.commit.try(:sha) }
-  let(:indexer)  { described_class.new(project)  }
+  let(:indexer)  { described_class.new(project) }
 
   let(:popen_success) { [[''], 0] }
   let(:popen_failure) { [['error'], 1] }
@@ -103,6 +103,35 @@ describe Gitlab::Elastic::Indexer do
       expect_popen.with(['gitlab-elasticsearch-indexer', anything, anything], anything, anything).and_return(popen_success)
 
       indexer.run
+    end
+
+    context 'Gitaly support' do
+      let(:project) { create(:project, :repository) }
+
+      it 'passes Gitaly parameters when it is enabled' do
+        expect(described_class).to receive(:experimental_indexer_present?).and_return(true)
+        gitaly_connection_data = {
+          storage: project.repository_storage
+        }.merge(Gitlab::GitalyClient.connection_data(project.repository_storage))
+
+        expect_popen.with(
+          [
+            'gitlab-elasticsearch-indexer',
+            project.id.to_s,
+            "#{project.repository.disk_path}.git"
+          ],
+          nil,
+          hash_including(
+            'GITALY_CONNECTION_INFO'  => gitaly_connection_data.to_json,
+            'ELASTIC_CONNECTION_INFO' => Gitlab::CurrentSettings.elasticsearch_config.to_json,
+            'RAILS_ENV'               => Rails.env,
+            'FROM_SHA'                => from_sha,
+            'TO_SHA'                  => to_sha
+          )
+        ).and_return(popen_success)
+
+        indexer.run(from_sha, to_sha)
+      end
     end
   end
 

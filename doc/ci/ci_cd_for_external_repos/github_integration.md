@@ -81,7 +81,7 @@ your repository.
     `repo` so that GitLab can access your project and update commit statuses
 
 1. In GitLab create a **CI/CD project** using the Git URL option and the HTTPS
-   URL for your GitHub repository. If your project if private, use the personal
+   URL for your GitHub repository. If your project is private, use the personal
    access token you just created for authentication.
 
     GitLab will automatically configure polling-based pull mirroring.
@@ -114,5 +114,5 @@ your repository.
 [cicd-projects]: ../../user/project/ci_cd_for_external_repo.md
 [github-integration]: ../../integration/github.md
 [github-project-integration]: ../../user/project/integrations/github.md
-[pull-mirroring]: ../../workflow/repository_mirroring.md#pulling-from-a-remote-repository
+[pull-mirroring]: ../../workflow/repository_mirroring.md#pulling-from-a-remote-repository-starter
 [pull-mirroring-trigger]: ../../api/projects.md#start-the-pull-mirroring-process-for-a-project

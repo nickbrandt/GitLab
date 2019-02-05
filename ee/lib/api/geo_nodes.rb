@@ -138,7 +138,7 @@ module API
         #
         # Example request:
         #   PUT /geo_nodes/:id
-        desc 'Edit an existing Geo secondary node' do
+        desc 'Update an existing Geo node' do
           success EE::API::Entities::GeoNode
         end
         params do
@@ -153,9 +153,7 @@ module API
 
           update_params = declared_params(include_missing: false)
 
-          if geo_node.primary?
-            forbidden!('Primary node cannot be edited')
-          elsif geo_node.update(update_params)
+          if geo_node.update(update_params)
             present geo_node, with: EE::API::Entities::GeoNode
           else
             render_validation_error!(geo_node)

@@ -16,12 +16,14 @@ The following API resources are available:
 - [Broadcast messages](broadcast_messages.md)
 - [Code snippets](snippets.md)
 - [Commits](commits.md)
+- [Container Registry](container_registry.md)
 - [Custom attributes](custom_attributes.md)
 - [Deploy keys](deploy_keys.md), and [deploy keys for multiple projects](deploy_key_multiple_projects.md)
 - [Deployments](deployments.md)
 - [Discussions](discussions.md) (threaded comments)
 - [Environments](environments.md)
 - [Epic issues](epic_issues.md) **[ULTIMATE]**
+- [Epic links](epic_links.md) **[ULTIMATE]**
 - [Epics](epics.md) **[ULTIMATE]**
 - [Events](events.md)
 - [Feature flags](features.md)
@@ -48,6 +50,7 @@ The following API resources are available:
 - [Namespaces](namespaces.md)
 - [Notes](notes.md) (comments)
 - [Notification settings](notification_settings.md)
+- [Packages](packages.md) **[PREMIUM]**
 - [Pages domains](pages_domains.md)
 - [Pipelines](pipelines.md)
 - [Pipeline schedules](pipeline_schedules.md)
@@ -445,6 +448,14 @@ Additional pagination headers are also sent back.
 | `X-Next-Page`   | The index of the next page |
 | `X-Prev-Page`   | The index of the previous page |
 
+CAUTION: **Caution:**
+For performance reasons since
+[GitLab 11.8](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/23931)
+and **behind the `api_kaminari_count_with_limit`
+[feature flag](../development/feature_flags.md)**, if the number of resources is
+more than 10,000, the `X-Total` and `X-Total-Pages` headers as well as the
+`rel="last"` `Link` are not present in the response headers.
+
 ## Namespaced path encoding
 
 If using namespaced API calls, make sure that the `NAMESPACE/PROJECT_NAME` is
@@ -603,7 +614,7 @@ Content-Type: application/json
 ## Encoding `+` in ISO 8601 dates
 
 If you need to include a `+` in a query parameter, you may need to use `%2B` instead due
-a [W3 recommendation](http://www.w3.org/Addressing/URL/4_URI_Recommentations.html) that
+to a [W3 recommendation](http://www.w3.org/Addressing/URL/4_URI_Recommentations.html) that
 causes a `+` to be interpreted as a space. For example, in an ISO 8601 date, you may want to pass
 a time in Mountain Standard Time, such as:
 

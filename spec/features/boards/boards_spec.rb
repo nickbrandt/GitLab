@@ -7,8 +7,8 @@ describe 'Issue Boards', :js do
   let(:group) { create(:group, :nested) }
   let(:project) { create(:project, :public, namespace: group) }
   let(:milestone) { create(:milestone, title: "v2.2", project: project) }
-  let!(:board)  { create(:board, project: project) }
-  let!(:board_with_milestone)  { create(:board, project: project, milestone: milestone) }
+  let!(:board) { create(:board, project: project) }
+  let!(:board_with_milestone) { create(:board, project: project, milestone: milestone) }
   let(:user)    { create(:user) }
   let!(:user2)  { create(:user) }
 
@@ -70,7 +70,7 @@ describe 'Issue Boards', :js do
     let(:bug)         { create(:label, project: project, name: 'Bug') }
     let!(:backlog)    { create(:label, project: project, name: 'Backlog') }
     let!(:closed)       { create(:label, project: project, name: 'Closed') }
-    let!(:accepting)  { create(:label, project: project, name: 'Accepting Merge Requests') }
+    let!(:accepting) { create(:label, project: project, name: 'Accepting Merge Requests') }
     let!(:a_plus) { create(:label, project: project, name: 'A+') }
 
     let!(:list1) { create(:list, board: board, label: planning, position: 0) }

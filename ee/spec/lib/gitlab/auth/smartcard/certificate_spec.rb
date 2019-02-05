@@ -109,7 +109,7 @@ describe Gitlab::Auth::Smartcard::Certificate do
 
         context 'avoids conflicting namespaces' do
           let(:subject_dn) { '/CN=Gitlab User/emailAddress=gitlab-user@random-corp.org' }
-          let!(:existing_user) { create(:user, username: 'GitlabUser')  }
+          let!(:existing_user) { create(:user, username: 'GitlabUser') }
 
           it 'creates user with correct usnername' do
             expect { subject }.to change { User.count }.from(1).to(2)
@@ -119,57 +119,8 @@ describe Gitlab::Auth::Smartcard::Certificate do
       end
     end
 
-    context 'invalid certificate' do
-      before do
-        allow(openssl_certificate_store).to receive(:verify).and_return(false)
-      end
-
-      it 'returns nil' do
-        expect(subject).to be_nil
-      end
-    end
-
-    context 'incorrect certificate' do
-      before do
-        allow(OpenSSL::X509::Certificate).to receive(:new).and_call_original
-      end
-
-      it 'returns nil' do
-        expect(subject).to be_nil
-      end
-    end
+    it_behaves_like 'a valid certificate is required'
   end
 
-  describe '.store' do
-    before do
-      allow(Gitlab.config.smartcard).to receive(:ca_file).and_return('ca_file')
-      allow(described_class).to receive(:store).and_call_original
-      allow(OpenSSL::X509::Certificate).to receive(:new).and_call_original
-      clear_store
-    end
-    after do
-      clear_store
-    end
-
-    subject { described_class.store }
-
-    context 'file does not exist' do
-      it 'raises error' do
-        expect { subject }.to raise_error(Gitlab::Auth::Smartcard::Certificate::InvalidCAFilePath)
-      end
-    end
-
-    context 'smartcard.ca_file is not a valid certificate' do
-      it 'raises error' do
-        expect(File).to receive(:read).with('ca_file').and_return('invalid certificate')
-        expect { subject }.to raise_error(Gitlab::Auth::Smartcard::Certificate::InvalidCertificate)
-      end
-    end
-  end
-
-  def clear_store
-    described_class.remove_instance_variable(:@store)
-  rescue NameError
-    # raised if @store was not set; ignore
-  end
+  it_behaves_like 'a certificate store'
 end

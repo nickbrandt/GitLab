@@ -49,23 +49,23 @@ describe 'epics list', :js do
       page.within('.content-wrapper .content') do
         expect(find('.top-area')).to have_content('All 3')
 
-        page.within(".issuable-list") do
-          page.within("li:nth-child(1)") do
+        page.within('.issuable-list') do
+          page.within('li:nth-child(1)') do
             expect(page).to have_content(epic3.title)
           end
 
-          page.within("li:nth-child(2)") do
+          page.within('li:nth-child(2)') do
             expect(page).to have_content(epic2.title)
           end
 
-          page.within("li:nth-child(3)") do
+          page.within('li:nth-child(3)') do
             expect(page).to have_content(epic1.title)
           end
         end
       end
     end
 
-    it 'sorts by the selected value and stores the selection for epic list & roadmap' do
+    it 'sorts by the selected value and stores the selection for epic list' do
       page.within('.epics-other-filters') do
         click_button 'Created date'
         sort_options = find('ul.dropdown-menu-sort li').all('a').collect(&:text)
@@ -75,24 +75,24 @@ describe 'epics list', :js do
         expect(sort_options[2]).to eq('Start date')
         expect(sort_options[3]).to eq('Due date')
 
-        click_link 'Start date'
+        click_link 'Last updated'
       end
 
-      expect(page).to have_button('Start date')
+      expect(page).to have_button('Last updated')
 
       page.within('.content-wrapper .content') do
         expect(find('.top-area')).to have_content('All 3')
 
-        page.within(".issuable-list") do
-          page.within("li:nth-child(1)") do
+        page.within('.issuable-list') do
+          page.within('li:nth-child(1)') do
             expect(page).to have_content(epic3.title)
           end
 
-          page.within("li:nth-child(2)") do
+          page.within('li:nth-child(2)') do
             expect(page).to have_content(epic2.title)
           end
 
-          page.within("li:nth-child(3)") do
+          page.within('li:nth-child(3)') do
             expect(page).to have_content(epic1.title)
           end
         end
@@ -100,11 +100,43 @@ describe 'epics list', :js do
 
       visit group_epics_path(group)
 
-      expect(page).to have_button('Start date')
+      expect(page).to have_button('Last updated')
+    end
+
+    it 'sorts by the selected value and stores the selection for roadmap' do
+      visit group_roadmap_path(group)
+
+      page.within('.epics-other-filters') do
+        click_button 'Start date'
+        sort_options = find('ul.dropdown-menu-sort li').all('a').collect(&:text)
+
+        expect(sort_options[0]).to eq('Start date')
+        expect(sort_options[1]).to eq('Due date')
+
+        click_link 'Due date'
+      end
+
+      expect(page).to have_button('Due date')
+
+      page.within('.content-wrapper .content') do
+        page.within('.epics-list-section') do
+          page.within('div.epics-list-item:nth-child(1)') do
+            expect(page).to have_content(epic1.title)
+          end
+
+          page.within('div.epics-list-item:nth-child(2)') do
+            expect(page).to have_content(epic3.title)
+          end
+
+          page.within('div.epics-list-item:nth-child(3)') do
+            expect(page).to have_content(epic2.title)
+          end
+        end
+      end
 
       visit group_roadmap_path(group)
 
-      expect(page).to have_button('Start date')
+      expect(page).to have_button('Due date')
     end
 
     it 'renders the epic detail correctly after clicking the link' do

@@ -46,7 +46,7 @@ FactoryBot.define do
     trait :repository_sync_failed do
       sync_failed
 
-      last_wiki_successful_sync_at  { 5.days.ago }
+      last_wiki_successful_sync_at { 5.days.ago }
       resync_wiki false
       wiki_retry_count nil
     end

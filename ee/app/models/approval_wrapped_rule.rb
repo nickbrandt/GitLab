@@ -8,7 +8,7 @@ class ApprovalWrappedRule
   attr_reader :merge_request
   attr_reader :approval_rule
 
-  def_delegators :@approval_rule, :id, :name, :users, :groups, :approvals_required, :code_owner
+  def_delegators :@approval_rule, :id, :name, :users, :groups, :approvals_required, :code_owner, :source_rule
 
   def initialize(merge_request, approval_rule)
     @merge_request = merge_request

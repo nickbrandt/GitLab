@@ -40,6 +40,8 @@ module EE
       has_one :github_service
       has_one :gitlab_slack_application_service
       has_one :tracing_setting, class_name: 'ProjectTracingSetting'
+      has_one :alerting_setting, inverse_of: :project, class_name: 'Alerting::ProjectAlertingSetting'
+      has_one :feature_usage, class_name: 'ProjectFeatureUsage'
 
       has_many :reviews, inverse_of: :project
       has_many :approvers, as: :target, dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
@@ -100,6 +102,8 @@ module EE
         :ever_updated_successfully?, :hard_failed?,
         to: :import_state, prefix: :mirror, allow_nil: true
 
+      delegate :log_jira_dvcs_integration_usage, :jira_dvcs_server_last_sync_at, :jira_dvcs_cloud_last_sync_at, to: :feature_usage
+
       validates :repository_size_limit,
         numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
 
@@ -115,6 +119,9 @@ module EE
       delegate :store_security_reports_available?, to: :namespace
 
       accepts_nested_attributes_for :tracing_setting, update_only: true, allow_destroy: true
+      accepts_nested_attributes_for :alerting_setting, update_only: true
+
+      alias_attribute :fallback_approvals_required, :approvals_before_merge
     end
 
     class_methods do
@@ -503,6 +510,10 @@ module EE
       return super if operation == GIT_LFS_DOWNLOAD_OPERATION # download always comes from secondary
 
       geo_primary_http_url_to_repo(self)
+    end
+
+    def feature_usage
+      super.presence || build_feature_usage
     end
 
     private

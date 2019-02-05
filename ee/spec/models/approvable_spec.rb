@@ -5,6 +5,10 @@ describe Approvable do
   let(:project) { merge_request.project }
   let(:author) { merge_request.author }
 
+  before do
+    stub_feature_flags(approval_rules: false)
+  end
+
   describe '#approvers_overwritten?' do
     subject { merge_request.approvers_overwritten? }
 

@@ -59,7 +59,7 @@ class DraftNote < ActiveRecord::Base
   end
 
   def type
-    return 'DiffNote' if  on_diff?
+    return 'DiffNote' if on_diff?
     return 'DiscussionNote' if discussion_id.present?
 
     'Note'

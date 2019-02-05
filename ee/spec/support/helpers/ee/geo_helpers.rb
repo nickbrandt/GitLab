@@ -13,5 +13,9 @@ module EE
       allow(::Gitlab::Geo).to receive(:primary?).and_return(false)
       allow(::Gitlab::Geo).to receive(:secondary?).and_return(true)
     end
+
+    def stub_fdw_disabled
+      allow(::Gitlab::Geo::Fdw).to receive(:enabled?).and_return(false)
+    end
   end
 end

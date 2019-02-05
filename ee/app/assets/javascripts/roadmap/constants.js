@@ -6,8 +6,6 @@ export const EPIC_ITEM_HEIGHT = 50;
 
 export const TIMELINE_CELL_MIN_WIDTH = 180;
 
-export const SHELL_MIN_WIDTH = 1620;
-
 export const SCROLL_BAR_SIZE = 15;
 
 export const EPIC_HIGHLIGHT_REMOVE_AFTER = 3000;

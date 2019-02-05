@@ -1,0 +1,6 @@
+---
+title: Shows the approval given/required counts and its status for each MR when
+  viewing the Merge Requests page
+merge_request: 9142
+author: Glavin Wiechert, Andy Steele
+type: added

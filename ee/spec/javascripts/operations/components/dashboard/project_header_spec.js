@@ -1,30 +1,34 @@
-import Vue from 'vue';
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import ProjectHeader from 'ee/operations/components/dashboard/project_header.vue';
 import ProjectAvatar from '~/vue_shared/components/project_avatar/default.vue';
 import { removeWhitespace } from 'spec/helpers/vue_component_helper';
-import { getChildInstances } from '../../helpers';
 import { mockOneProject, mockText } from '../../mock_data';
 
-describe('project header component', () => {
-  const ProjectHeaderComponent = Vue.extend(ProjectHeader);
-  const ProjectAvatarComponent = Vue.extend(ProjectAvatar);
-  let vm;
+const localVue = createLocalVue();
 
-  beforeEach(() => {
-    vm = mountComponentWithStore(ProjectHeaderComponent, {
-      props: {
+describe('project header component', () => {
+  let wrapper;
+
+  const factory = () => {
+    wrapper = shallowMount(localVue.extend(ProjectHeader), {
+      propsData: {
         project: mockOneProject,
       },
+      localVue,
+      sync: false,
     });
+  };
+
+  beforeEach(() => {
+    factory();
   });
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
   });
 
   it('renders project name with namespace', () => {
-    const name = vm.$el.querySelector('.js-name-with-namespace').innerText;
+    const name = wrapper.find('.js-name-with-namespace').text();
 
     expect(removeWhitespace(name).trim()).toBe(mockOneProject.name_with_namespace);
   });
@@ -32,35 +36,37 @@ describe('project header component', () => {
   it('links project name to project', () => {
     const path = mockOneProject.web_url;
 
-    expect(vm.$el.querySelector('.js-project-link').href).toBe(path);
+    expect(wrapper.find('.js-project-link').attributes('href')).toBe(path);
   });
 
   describe('wrapped components', () => {
     describe('project avatar', () => {
       it('renders', () => {
-        expect(getChildInstances(vm, ProjectAvatarComponent).length).toBe(1);
+        expect(wrapper.findAll(ProjectAvatar).length).toBe(1);
       });
 
       it('binds project', () => {
-        const [avatar] = getChildInstances(vm, ProjectAvatarComponent);
-
-        expect(avatar.project).toEqual(vm.project);
+        expect(wrapper.find(ProjectAvatar).props('project')).toEqual(mockOneProject);
       });
     });
   });
 
   describe('dropdown menu', () => {
     it('renders removal button', () => {
-      expect(vm.$el.querySelector('.js-remove-button').innerText.trim()).toBe(
-        mockText.REMOVE_PROJECT,
-      );
+      expect(
+        wrapper
+          .find('.js-remove-button')
+          .text()
+          .trim(),
+      ).toBe(mockText.REMOVE_PROJECT);
     });
 
     it('emits project removal link on click', () => {
-      const spy = spyOn(vm, '$emit');
-      vm.$el.querySelector('.js-remove-button').click();
+      wrapper.find('.js-remove-button').trigger('click');
 
-      expect(spy).toHaveBeenCalledWith('remove', mockOneProject.remove_path);
+      expect(wrapper.emittedByOrder()).toEqual([
+        { name: 'remove', args: [mockOneProject.remove_path] },
+      ]);
     });
   });
 });

@@ -1,0 +1,5 @@
+---
+title: Optimize slow pipelines.js response
+merge_request: 9387
+author:
+type: performance

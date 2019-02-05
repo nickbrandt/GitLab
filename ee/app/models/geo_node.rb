@@ -21,6 +21,7 @@ class GeoNode < ActiveRecord::Base
   validate :check_url_is_valid
 
   validates :primary, uniqueness: { message: 'node already exists' }, if: :primary
+  validates :enabled, if: :primary, acceptance: { message: 'Geo primary node cannot be disabled' }
 
   validates :access_key, presence: true
   validates :encrypted_secret_access_key, presence: true
@@ -127,7 +128,7 @@ class GeoNode < ActiveRecord::Base
   end
 
   def url=(value)
-    value += '/'  if value.present? && !value.end_with?('/')
+    value += '/' if value.present? && !value.end_with?('/')
 
     write_attribute(:url, value)
 
@@ -280,7 +281,7 @@ class GeoNode < ActiveRecord::Base
       errors.add(:url, 'scheme must be http or https')
     end
   rescue URI::InvalidURIError
-    errors.add(:url,  'is invalid')
+    errors.add(:url, 'is invalid')
   end
 
   def update_clone_url

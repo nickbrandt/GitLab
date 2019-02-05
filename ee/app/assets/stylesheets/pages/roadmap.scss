@@ -1,6 +1,7 @@
 $header-item-height: 60px;
 $item-height: 50px;
 $details-cell-width: 320px;
+$timeline-cell-width: 180px;
 $border-style: 1px solid $border-gray-normal;
 $roadmap-gradient-dark-gray: rgba(0, 0, 0, 0.15);
 $roadmap-gradient-gray: rgba(255, 255, 255, 0.001);
@@ -118,7 +119,23 @@ $column-right-gradient: linear-gradient(
 }
 
 .roadmap-shell {
+  position: relative;
   overflow-x: auto;
+
+  .skeleton-loader {
+    position: absolute;
+    top: $header-item-height;
+    left: $timeline-cell-width / 2;
+    width: $details-cell-width;
+    height: 100%;
+    padding-top: $gl-padding-top;
+    padding-left: $gl-padding;
+    z-index: 4;
+
+    &::after {
+      height: 100%;
+    }
+  }
 
   &.prevent-vertical-scroll {
     overflow-y: hidden;
@@ -126,7 +143,8 @@ $column-right-gradient: linear-gradient(
 }
 
 .roadmap-timeline-section .timeline-header-blank::after,
-.epics-list-section .epic-details-cell::after {
+.epics-list-section .epic-details-cell::after,
+.skeleton-loader::after {
   content: "";
   position: absolute;
   top: 0;

@@ -119,6 +119,7 @@ describe Projects::MergeRequestsController do
   let(:viewer)        { user }
 
   before do
+    stub_feature_flags(approval_rules: false)
     sign_in(viewer)
   end
 
@@ -161,6 +162,22 @@ describe Projects::MergeRequestsController do
           update_merge_request(approvals_before_merge: 2)
 
           expect(merge_request.reload.approvals_before_merge).to eq(2)
+        end
+
+        it 'creates rules' do
+          users = create_list(:user, 3)
+          users.each { |user| project.add_developer(user) }
+
+          update_merge_request(approval_rules_attributes: [
+            { name: 'foo', user_ids: users.map(&:id), approvals_required: 3 }
+          ])
+
+          expect(merge_request.reload.approval_rules.size).to eq(1)
+
+          rule = merge_request.reload.approval_rules.first
+
+          expect(rule.name).to eq('foo')
+          expect(rule.approvals_required).to eq(3)
         end
       end
 

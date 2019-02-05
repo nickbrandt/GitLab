@@ -879,136 +879,6 @@ describe MergeRequest do
     end
   end
 
-  describe "#approvers_left" do
-    let(:merge_request) {create :merge_request}
-
-    it "returns correct value" do
-      user = create(:user)
-      user1 = create(:user)
-      create(:approver, target: merge_request, user: user)
-      create(:approver, target: merge_request, user: user1)
-      merge_request.approvals.create(user_id: user1.id)
-
-      expect(merge_request.approvers_left).to eq [user]
-    end
-
-    it "returns correct value when there is a group approver" do
-      user = create(:user)
-      user1 = create(:user)
-      user2 = create(:user)
-      group = create(:group)
-
-      group.add_developer(user2)
-      create(:approver_group, target: merge_request, group: group)
-      create(:approver, target: merge_request, user: user)
-      create(:approver, target: merge_request, user: user1)
-      merge_request.approvals.create(user_id: user1.id)
-
-      expect(merge_request.approvers_left).to match_array [user, user2]
-    end
-
-    it "returns correct value when there is only a group approver" do
-      user = create(:user)
-      group = create(:group)
-      group.add_developer(user)
-
-      merge_request.approver_groups.create(group: group)
-
-      expect(merge_request.approvers_left).to eq [user]
-    end
-  end
-
-  describe "#overall_approver_groups" do
-    it 'returns a merge request group approver' do
-      project = create :project
-      create :approver_group, target: project
-
-      merge_request = create :merge_request, target_project: project, source_project: project
-      approver_group2 = create :approver_group, target: merge_request
-
-      expect(merge_request.overall_approver_groups).to eq([approver_group2])
-    end
-
-    it 'returns a project group approver' do
-      project = create :project
-      approver_group1 = create :approver_group, target: project
-
-      merge_request = create :merge_request, target_project: project, source_project: project
-
-      expect(merge_request.overall_approver_groups).to eq([approver_group1])
-    end
-
-    it 'returns a merge request approver if there is no project group approver' do
-      project = create :project
-
-      merge_request = create :merge_request, target_project: project, source_project: project
-      approver_group1 = create :approver_group, target: merge_request
-
-      expect(merge_request.overall_approver_groups).to eq([approver_group1])
-    end
-  end
-
-  describe '#all_approvers_including_groups' do
-    it 'returns correct set of users' do
-      user = create :user
-      user1 = create :user
-      user2 = create :user
-      create :user
-
-      project = create :project
-      group = create :group
-      group.add_maintainer user
-      create :approver_group, target: project, group: group
-
-      merge_request = create :merge_request, target_project: project, source_project: project
-      group1 = create :group
-      group1.add_maintainer user1
-      create :approver_group, target: merge_request, group: group1
-
-      create(:approver, user: user2, target: merge_request)
-
-      expect(merge_request.all_approvers_including_groups).to match_array([user1, user2])
-    end
-  end
-
-  describe '#approver_group_ids=' do
-    it 'create approver_groups' do
-      group = create :group
-      group1 = create :group
-
-      merge_request = create :merge_request
-
-      merge_request.approver_group_ids = "#{group.id}, #{group1.id}"
-      merge_request.save!
-
-      expect(merge_request.approver_groups.map(&:group)).to match_array([group, group1])
-    end
-  end
-
-  describe "#approvals_required" do
-    let(:merge_request) { build(:merge_request) }
-
-    before do
-      merge_request.target_project.update(approvals_before_merge: 3)
-    end
-
-    context "when the MR has approvals_before_merge set" do
-      before do
-        merge_request.update(approvals_before_merge: 1)
-      end
-
-      it "uses the approvals_before_merge from the MR" do
-        expect(merge_request.approvals_required).to eq(1)
-      end
-    end
-
-    context "when the MR doesn't have approvals_before_merge set" do
-      it "takes approvals_before_merge from the target project" do
-        expect(merge_request.approvals_required).to eq(3)
-      end
-    end
-  end
-
   describe '#can_remove_source_branch?' do
     set(:user) { create(:user) }
     set(:merge_request) { create(:merge_request, :simple) }
@@ -1163,7 +1033,7 @@ describe MergeRequest do
   end
 
   describe '#diverged_commits_count' do
-    let(:project)      { create(:project, :repository) }
+    let(:project) { create(:project, :repository) }
     let(:forked_project) { fork_project(project, nil, repository: true) }
 
     context 'when the target branch does not exist anymore' do
@@ -2054,26 +1924,6 @@ describe MergeRequest do
 
       expect(subject.mergeable?).to be_truthy
     end
-
-    context 'when using approvals' do
-      let(:user) { create(:user) }
-      before do
-        allow(subject).to receive(:mergeable_state?).and_return(true)
-
-        subject.target_project.update(approvals_before_merge: 1)
-        project.add_developer(user)
-      end
-
-      it 'return false if not approved' do
-        expect(subject.mergeable?).to be_falsey
-      end
-
-      it 'return true if approved' do
-        subject.approvals.create(user: user)
-
-        expect(subject.mergeable?).to be_truthy
-      end
-    end
   end
 
   describe '#mergeable_state?' do
@@ -2406,248 +2256,6 @@ describe MergeRequest do
     end
   end
 
-  describe 'approvals' do
-    shared_examples_for 'authors self-approval authorization' do
-      context 'when authors are authorized to approve their own MRs' do
-        before do
-          project.update!(merge_requests_author_approval: true)
-        end
-
-        it 'allows the author to approve the MR if within the approvers list' do
-          expect(merge_request.can_approve?(author)).to be_truthy
-        end
-
-        it 'does not allow the author to approve the MR if not within the approvers list' do
-          merge_request.approvers.delete_all
-
-          expect(merge_request.can_approve?(author)).to be_falsey
-        end
-      end
-
-      context 'when authors are not authorized to approve their own MRs' do
-        it 'does not allow the author to approve the MR' do
-          expect(merge_request.can_approve?(author)).to be_falsey
-        end
-      end
-    end
-
-    let(:project) { create(:project, :repository) }
-    let(:merge_request) { create(:merge_request, source_project: project, author: author) }
-    let(:author) { create(:user) }
-    let(:approver) { create(:user) }
-    let(:approver_2) { create(:user) }
-    let(:developer) { create(:user) }
-    let(:other_developer) { create(:user) }
-    let(:reporter) { create(:user) }
-    let(:stranger) { create(:user) }
-
-    before do
-      project.add_developer(author)
-      project.add_developer(approver)
-      project.add_developer(approver_2)
-      project.add_developer(developer)
-      project.add_developer(other_developer)
-      project.add_reporter(reporter)
-    end
-
-    context 'when there is one approver required' do
-      before do
-        project.update(approvals_before_merge: 1)
-      end
-
-      context 'when that approver is the MR author' do
-        before do
-          create(:approver, user: author, target: merge_request)
-        end
-
-        it_behaves_like 'authors self-approval authorization'
-
-        it 'requires one approval' do
-          expect(merge_request.approvals_left).to eq(1)
-        end
-
-        it 'allows any other project member with write access to approve the MR' do
-          expect(merge_request.can_approve?(developer)).to be_truthy
-
-          expect(merge_request.can_approve?(reporter)).to be_falsey
-          expect(merge_request.can_approve?(stranger)).to be_falsey
-        end
-
-        it 'does not allow a logged-out user to approve the MR' do
-          expect(merge_request.can_approve?(nil)).to be_falsey
-        end
-      end
-
-      context 'when that approver is not the MR author' do
-        before do
-          create(:approver, user: approver, target: merge_request)
-        end
-
-        it 'requires one approval' do
-          expect(merge_request.approvals_left).to eq(1)
-        end
-
-        it 'only allows the approver to approve the MR' do
-          expect(merge_request.can_approve?(approver)).to be_truthy
-
-          expect(merge_request.can_approve?(author)).to be_falsey
-          expect(merge_request.can_approve?(developer)).to be_falsey
-          expect(merge_request.can_approve?(reporter)).to be_falsey
-          expect(merge_request.can_approve?(stranger)).to be_falsey
-          expect(merge_request.can_approve?(nil)).to be_falsey
-        end
-      end
-    end
-
-    context 'when there are multiple approvers required' do
-      before do
-        project.update(approvals_before_merge: 3)
-      end
-
-      context 'when one of those approvers is the MR author' do
-        before do
-          create(:approver, user: author, target: merge_request)
-          create(:approver, user: approver, target: merge_request)
-          create(:approver, user: approver_2, target: merge_request)
-        end
-
-        it_behaves_like 'authors self-approval authorization'
-
-        it 'requires the original number of approvals' do
-          expect(merge_request.approvals_left).to eq(3)
-        end
-
-        it 'allows any other other approver to approve the MR' do
-          expect(merge_request.can_approve?(approver)).to be_truthy
-        end
-
-        it 'does not allow a logged-out user to approve the MR' do
-          expect(merge_request.can_approve?(nil)).to be_falsey
-        end
-
-        context 'when self-approval is disabled and all of the valid approvers have approved the MR' do
-          before do
-            create(:approval, user: approver, merge_request: merge_request)
-            create(:approval, user: approver_2, merge_request: merge_request)
-          end
-
-          it 'requires the original number of approvals' do
-            expect(merge_request.approvals_left).to eq(1)
-          end
-
-          it 'does not allow the author to approve the MR' do
-            expect(merge_request.can_approve?(author)).to be_falsey
-          end
-
-          it 'does not allow the approvers to approve the MR again' do
-            expect(merge_request.can_approve?(approver)).to be_falsey
-            expect(merge_request.can_approve?(approver_2)).to be_falsey
-          end
-
-          it 'allows any other project member with write access to approve the MR' do
-            expect(merge_request.can_approve?(developer)).to be_truthy
-
-            expect(merge_request.can_approve?(reporter)).to be_falsey
-            expect(merge_request.can_approve?(stranger)).to be_falsey
-            expect(merge_request.can_approve?(nil)).to be_falsey
-          end
-        end
-
-        context 'when self-approval is enabled and all of the valid approvers have approved the MR' do
-          before do
-            project.update!(merge_requests_author_approval: true)
-            create(:approval, user: author, merge_request: merge_request)
-            create(:approval, user: approver_2, merge_request: merge_request)
-          end
-
-          it 'requires the original number of approvals' do
-            expect(merge_request.approvals_left).to eq(1)
-          end
-
-          it 'does not allow the approvers to approve the MR again' do
-            expect(merge_request.can_approve?(author)).to be_falsey
-            expect(merge_request.can_approve?(approver_2)).to be_falsey
-          end
-
-          it 'allows any other project member with write access to approve the MR' do
-            expect(merge_request.can_approve?(reporter)).to be_falsey
-            expect(merge_request.can_approve?(stranger)).to be_falsey
-            expect(merge_request.can_approve?(nil)).to be_falsey
-          end
-        end
-
-        context 'when more than the number of approvers have approved the MR' do
-          before do
-            create(:approval, user: approver, merge_request: merge_request)
-            create(:approval, user: approver_2, merge_request: merge_request)
-            create(:approval, user: developer, merge_request: merge_request)
-          end
-
-          it 'marks the MR as approved' do
-            expect(merge_request).to be_approved
-          end
-
-          it 'clamps the approvals left at zero' do
-            expect(merge_request.approvals_left).to eq(0)
-          end
-        end
-      end
-
-      context 'when the approvers do not contain the MR author' do
-        before do
-          create(:approver, user: developer, target: merge_request)
-          create(:approver, user: approver, target: merge_request)
-          create(:approver, user: approver_2, target: merge_request)
-        end
-
-        it 'requires the original number of approvals' do
-          expect(merge_request.approvals_left).to eq(3)
-        end
-
-        it 'only allows the approvers to approve the MR' do
-          expect(merge_request.can_approve?(developer)).to be_truthy
-          expect(merge_request.can_approve?(approver)).to be_truthy
-          expect(merge_request.can_approve?(approver_2)).to be_truthy
-
-          expect(merge_request.can_approve?(author)).to be_falsey
-          expect(merge_request.can_approve?(reporter)).to be_falsey
-          expect(merge_request.can_approve?(stranger)).to be_falsey
-          expect(merge_request.can_approve?(nil)).to be_falsey
-        end
-
-        context 'when only 1 approval approved' do
-          it 'only allows the approvers to approve the MR' do
-            create(:approval, user: approver, merge_request: merge_request)
-
-            expect(merge_request.can_approve?(developer)).to be_truthy
-            expect(merge_request.can_approve?(approver)).to be_falsey
-            expect(merge_request.can_approve?(approver_2)).to be_truthy
-
-            expect(merge_request.can_approve?(author)).to be_falsey
-            expect(merge_request.can_approve?(reporter)).to be_falsey
-            expect(merge_request.can_approve?(other_developer)).to be_falsey
-            expect(merge_request.can_approve?(stranger)).to be_falsey
-            expect(merge_request.can_approve?(nil)).to be_falsey
-          end
-        end
-
-        context 'when all approvals received' do
-          it 'allows anyone with write access except for author to approve the MR' do
-            create(:approval, user: approver, merge_request: merge_request)
-            create(:approval, user: approver_2, merge_request: merge_request)
-            create(:approval, user: developer, merge_request: merge_request)
-
-            expect(merge_request.can_approve?(author)).to be_falsey
-            expect(merge_request.can_approve?(reporter)).to be_falsey
-            expect(merge_request.can_approve?(other_developer)).to be_truthy
-            expect(merge_request.can_approve?(stranger)).to be_falsey
-            expect(merge_request.can_approve?(nil)).to be_falsey
-          end
-        end
-      end
-    end
-  end
-
   describe '#branch_merge_base_commit' do
     context 'source and target branch exist' do
       it { expect(subject.branch_merge_base_commit.sha).to eq('ae73cb07c9eeaf35924a10f713b364d32b2dd34f') }
@@ -2691,9 +2299,9 @@ describe MergeRequest do
   end
 
   describe "#source_project_missing?" do
-    let(:project)      { create(:project) }
+    let(:project) { create(:project) }
     let(:forked_project) { fork_project(project) }
-    let(:user)         { create(:user) }
+    let(:user) { create(:user) }
     let(:unlink_project) { Projects::UnlinkForkService.new(forked_project, user) }
 
     context "when the fork exists" do
@@ -2763,9 +2371,9 @@ describe MergeRequest do
   end
 
   describe "#closed_without_fork?" do
-    let(:project)      { create(:project) }
+    let(:project) { create(:project) }
     let(:forked_project) { fork_project(project) }
-    let(:user)         { create(:user) }
+    let(:user) { create(:user) }
     let(:unlink_project) { Projects::UnlinkForkService.new(forked_project, user) }
 
     context "when the merge request is closed" do
@@ -2887,7 +2495,7 @@ describe MergeRequest do
         expect(merge_request.mergeable_with_quick_action?(user, last_diff_sha: mr_sha)).to be_falsey
       end
 
-      context 'closed MR'  do
+      context 'closed MR' do
         before do
           merge_request.update_attribute(:state, :closed)
         end
@@ -2897,7 +2505,7 @@ describe MergeRequest do
         end
       end
 
-      context 'MR with WIP'  do
+      context 'MR with WIP' do
         before do
           merge_request.update_attribute(:title, 'WIP: some MR')
         end
@@ -2907,19 +2515,19 @@ describe MergeRequest do
         end
       end
 
-      context 'sha differs from the MR diff_head_sha'  do
+      context 'sha differs from the MR diff_head_sha' do
         it 'is not mergeable' do
           expect(merge_request.mergeable_with_quick_action?(developer, last_diff_sha: 'some other sha')).to be_falsey
         end
       end
 
-      context 'sha is not provided'  do
+      context 'sha is not provided' do
         it 'is not mergeable' do
           expect(merge_request.mergeable_with_quick_action?(developer)).to be_falsey
         end
       end
 
-      context 'with pipeline ok'  do
+      context 'with pipeline ok' do
         before do
           create_pipeline(:success)
         end
@@ -2929,7 +2537,7 @@ describe MergeRequest do
         end
       end
 
-      context 'with failing pipeline'  do
+      context 'with failing pipeline' do
         before do
           create_pipeline(:failed)
         end
@@ -2939,28 +2547,12 @@ describe MergeRequest do
         end
       end
 
-      context 'with running pipeline'  do
+      context 'with running pipeline' do
         before do
           create_pipeline(:running)
         end
 
         it 'is mergeable' do
-          expect(merge_request.mergeable_with_quick_action?(developer, last_diff_sha: mr_sha)).to be_truthy
-        end
-      end
-
-      context 'with approvals' do
-        before do
-          merge_request.target_project.update(approvals_before_merge: 1)
-        end
-
-        it 'is not mergeable when not approved' do
-          expect(merge_request.mergeable_with_quick_action?(developer, last_diff_sha: mr_sha)).to be_falsey
-        end
-
-        it 'is mergeable when approved' do
-          merge_request.approvals.create(user: user)
-
           expect(merge_request.mergeable_with_quick_action?(developer, last_diff_sha: mr_sha)).to be_truthy
         end
       end

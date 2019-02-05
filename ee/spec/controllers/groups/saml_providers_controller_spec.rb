@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Groups::SamlProvidersController do
   let(:saml_provider) { create(:saml_provider, group: group) }
-  let(:group) { create(:group, :private) }
+  let(:group) { create(:group, :private, parent_id: nil) }
   let(:user) { create(:user) }
 
   before do
@@ -92,6 +92,30 @@ describe Groups::SamlProvidersController do
           subject
 
           expect(response).to have_http_status(404)
+        end
+      end
+    end
+
+    describe 'PUT #update' do
+      subject { put :update, params: { group_id: group, saml_provider: { enforced_sso: 'true' } } }
+
+      before do
+        group.add_owner(user)
+      end
+
+      context 'enforced sso enabled' do
+        it 'updates the flag' do
+          stub_feature_flags(enforced_sso: true)
+
+          expect { subject }.to change { saml_provider.reload.enforced_sso }.to(true)
+        end
+      end
+
+      context 'enforced sso disabled' do
+        it 'does not update the flag' do
+          stub_feature_flags(enforced_sso: false)
+
+          expect { subject }.not_to change { saml_provider.reload.enforced_sso }.from(false)
         end
       end
     end

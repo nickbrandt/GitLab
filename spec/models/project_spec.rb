@@ -439,6 +439,30 @@ describe Project do
     end
   end
 
+  describe '#all_pipelines' do
+    let(:project) { create(:project) }
+
+    before do
+      create(:ci_pipeline, project: project, ref: 'master', source: :web)
+      create(:ci_pipeline, project: project, ref: 'master', source: :external)
+    end
+
+    it 'has all pipelines' do
+      expect(project.all_pipelines.size).to eq(2)
+    end
+
+    context 'when builds are disabled' do
+      before do
+        project.project_feature.update_attribute(:builds_access_level, ProjectFeature::DISABLED)
+      end
+
+      it 'should return .external pipelines' do
+        expect(project.all_pipelines).to all(have_attributes(source: 'external'))
+        expect(project.all_pipelines.size).to eq(1)
+      end
+    end
+  end
+
   describe 'project token' do
     it 'sets an random token if none provided' do
       project = FactoryBot.create(:project, runners_token: '')
@@ -3355,6 +3379,66 @@ describe Project do
     end
   end
 
+  describe '.with_feature_available_for_user' do
+    let!(:user) { create(:user) }
+    let!(:feature) { MergeRequest }
+    let!(:project) { create(:project, :public, :merge_requests_enabled) }
+
+    subject { described_class.with_feature_available_for_user(feature, user) }
+
+    context 'when user has access to project' do
+      subject { described_class.with_feature_available_for_user(feature, user) }
+
+      before do
+        project.add_guest(user)
+      end
+
+      context 'when public project' do
+        context 'when feature is public' do
+          it 'returns project' do
+            is_expected.to include(project)
+          end
+        end
+
+        context 'when feature is private' do
+          let!(:project) { create(:project, :public, :merge_requests_private) }
+
+          it 'returns project when user has access to the feature' do
+            project.add_maintainer(user)
+
+            is_expected.to include(project)
+          end
+
+          it 'does not return project when user does not have the minimum access level required' do
+            is_expected.not_to include(project)
+          end
+        end
+      end
+
+      context 'when private project' do
+        let!(:project) { create(:project) }
+
+        it 'returns project when user has access to the feature' do
+          project.add_maintainer(user)
+
+          is_expected.to include(project)
+        end
+
+        it 'does not return project when user does not have the minimum access level required' do
+          is_expected.not_to include(project)
+        end
+      end
+    end
+
+    context 'when user does not have access to project' do
+      let!(:project) { create(:project) }
+
+      it 'does not return project when user cant access project' do
+        is_expected.not_to include(project)
+      end
+    end
+  end
+
   describe '#pages_available?' do
     let(:project) { create(:project, group: group) }
 
@@ -3505,7 +3589,7 @@ describe Project do
   end
 
   context 'legacy storage' do
-    let(:project) { create(:project, :repository, :legacy_storage) }
+    set(:project) { create(:project, :repository, :legacy_storage) }
     let(:gitlab_shell) { Gitlab::Shell.new }
     let(:project_storage) { project.send(:storage) }
 
@@ -3560,13 +3644,14 @@ describe Project do
     end
 
     describe '#migrate_to_hashed_storage!' do
+      let(:project) { create(:project, :empty_repo, :legacy_storage) }
+
       it 'returns true' do
         expect(project.migrate_to_hashed_storage!).to be_truthy
       end
 
-      it 'does not validate project visibility' do
-        expect(project).not_to receive(:visibility_level_allowed_as_fork)
-        expect(project).not_to receive(:visibility_level_allowed_by_group)
+      it 'does not run validation' do
+        expect(project).not_to receive(:valid?)
 
         project.migrate_to_hashed_storage!
       end
@@ -3596,7 +3681,7 @@ describe Project do
   end
 
   context 'hashed storage' do
-    let(:project) { create(:project, :repository, skip_disk_validation: true) }
+    set(:project) { create(:project, :repository, skip_disk_validation: true) }
     let(:gitlab_shell) { Gitlab::Shell.new }
     let(:hash) { Digest::SHA2.hexdigest(project.id.to_s) }
     let(:hashed_prefix) { File.join('@hashed', hash[0..1], hash[2..3]) }
@@ -3653,6 +3738,8 @@ describe Project do
     end
 
     describe '#migrate_to_hashed_storage!' do
+      let(:project) { create(:project, :repository, skip_disk_validation: true) }
+
       it 'returns nil' do
         expect(project.migrate_to_hashed_storage!).to be_nil
       end
@@ -3662,10 +3749,12 @@ describe Project do
       end
 
       context 'when partially migrated' do
-        it 'returns true' do
+        it 'enqueues a job' do
           project = create(:project, storage_version: 1, skip_disk_validation: true)
 
-          expect(project.migrate_to_hashed_storage!).to be_truthy
+          Sidekiq::Testing.fake! do
+            expect { project.migrate_to_hashed_storage! }.to change(ProjectMigrateHashedStorageWorker.jobs, :size).by(1)
+          end
         end
       end
     end
@@ -4043,6 +4132,7 @@ describe Project do
       expect(import_state).to receive(:remove_jid)
       expect(project).to receive(:after_create_default_branch)
       expect(project).to receive(:refresh_markdown_cache!)
+      expect(InternalId).to receive(:flush_records!).with(project: project)
 
       project.after_import
     end
@@ -4207,7 +4297,7 @@ describe Project do
 
   describe '#badges' do
     let(:project_group) { create(:group) }
-    let(:project) {  create(:project, path: 'avatar', namespace: project_group) }
+    let(:project) { create(:project, path: 'avatar', namespace: project_group) }
 
     before do
       create_list(:project_badge, 2, project: project)

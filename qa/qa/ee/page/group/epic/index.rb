@@ -6,7 +6,7 @@ module QA
       module Group
         module Epic
           class Index < QA::Page::Base
-            view 'ee/app/assets/javascripts/epics/new_epic/components/new_epic.vue' do
+            view 'ee/app/assets/javascripts/epic/components/epic_create.vue' do
               element :new_epic_button
               element :epic_title
               element :create_epic_button

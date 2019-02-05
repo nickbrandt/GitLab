@@ -17,6 +17,8 @@ class FeatureFlagsFinder
 
     items = feature_flags
     items = by_scope(items)
+    items = for_list(items)
+
     items.ordered
   end
 
@@ -28,6 +30,14 @@ class FeatureFlagsFinder
       items.enabled
     when 'disabled'
       items.disabled
+    else
+      items
+    end
+  end
+
+  def for_list(items)
+    if Feature.enabled?(:feature_flags_environment_scope, project)
+      items.for_list
     else
       items
     end

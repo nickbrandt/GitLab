@@ -3,7 +3,7 @@
 require 'spec_helper'
 require Rails.root.join('ee', 'db', 'post_migrate', '20180417102933_drop_repository_storage_events_for_geo_events.rb')
 
-describe DropRepositoryStorageEventsForGeoEvents, :migration do
+describe DropRepositoryStorageEventsForGeoEvents, :migration, schema: 20180416112831 do
   describe '#up' do
     before do
       schema_migrate_up!

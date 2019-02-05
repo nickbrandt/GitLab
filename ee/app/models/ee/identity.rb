@@ -20,6 +20,10 @@ module EE
     end
 
     class_methods do
+      def find_by_extern_uid(provider, extern_uid)
+        with_extern_uid(provider, extern_uid).take
+      end
+
       def preload_saml_group
         preload(saml_provider: { group: :route })
       end

@@ -10,6 +10,10 @@ describe API::ProjectApprovals do
 
   let(:url) { "/projects/#{project.id}/approvals" }
 
+  before do
+    stub_feature_flags(approval_rules: false)
+  end
+
   describe 'GET /projects/:id/approvers' do
     context 'when the request is correct' do
       before do

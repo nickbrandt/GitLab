@@ -8,8 +8,7 @@ module Projects
           return false unless valid_version?
           return false unless valid_alert_manager_token?(token)
 
-          notification_service.async.prometheus_alerts_fired(project, firings) if firings.any?
-
+          send_alert_email(project, firings) if firings.any?
           persist_events(project, current_user, params)
 
           true
@@ -34,10 +33,21 @@ module Projects
         end
 
         def valid_alert_manager_token?(token)
-          # We don't support token authorization for manual installations.
-          prometheus = project.find_or_initialize_service('prometheus')
-          return true if prometheus.manual_configuration?
+          valid_for_manual?(token) || valid_for_managed?(token)
+        end
 
+        def valid_for_manual?(token)
+          prometheus = project.find_or_initialize_service('prometheus')
+          return false unless prometheus.manual_configuration?
+
+          if setting = project.alerting_setting
+            compare_token(token, setting.token)
+          else
+            token.nil?
+          end
+        end
+
+        def valid_for_managed?(token)
           prometheus_application = available_prometheus_application(project)
           return false unless prometheus_application
 
@@ -63,13 +73,19 @@ module Projects
         end
 
         def gitlab_alert_id
-          alerts.first.dig('labels', 'gitlab_alert_id')
+          alerts&.first&.dig('labels', 'gitlab_alert_id')
         end
 
         def compare_token(expected, actual)
           return unless expected && actual
 
           ActiveSupport::SecurityUtils.variable_size_secure_compare(expected, actual)
+        end
+
+        def send_alert_email(projects, firing_alerts)
+          notification_service
+            .async
+            .prometheus_alerts_fired(project, firings)
         end
 
         def persist_events(project, current_user, params)

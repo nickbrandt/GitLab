@@ -4,7 +4,7 @@ import _ from 'underscore';
 import { GlEmptyState, GlLoadingIcon, GlButton } from '@gitlab/ui';
 import FeatureFlagsTable from './feature_flags_table.vue';
 import store from '../store';
-import { __ } from '~/locale';
+import { __, s__ } from '~/locale';
 import NavigationTabs from '~/vue_shared/components/navigation_tabs.vue';
 import TablePagination from '~/vue_shared/components/table_pagination.vue';
 import {
@@ -113,6 +113,14 @@ export default {
     hasNewPath() {
       return !_.isEmpty(this.newFeatureFlagPath);
     },
+    emptyStateTitle() {
+      if (this.scope === this.$options.scopes.disabled) {
+        return s__(`FeatureFlags|There are no inactive Feature Flags`);
+      } else if (this.scope === this.$options.scopes.enabled) {
+        return s__(`FeatureFlags|There are no active Feature Flags`);
+      }
+      return s__(`FeatureFlags|Get started with Feature Flags`);
+    },
   },
   created() {
     this.setFeatureFlagsEndpoint(this.endpoint);
@@ -196,10 +204,10 @@ export default {
     <gl-empty-state
       v-else-if="shouldShowEmptyState"
       class="js-feature-flags-empty-state"
-      :title="s__(`FeatureFlags|Get started with feature flags`)"
+      :title="emptyStateTitle"
       :description="
         s__(
-          `FeatureFlags|Feature flags allow you to configure your code into different flavors by dynamically toggling certain functionality.`,
+          `FeatureFlags|Feature Flags allow you to configure your code into different flavors by dynamically toggling certain functionality.`,
         )
       "
       :svg-path="errorStateSvgPath"

@@ -60,6 +60,7 @@ gem 'u2f', '~> 0.2.1'
 
 # GitLab Pages
 gem 'validates_hostname', '~> 1.0.6'
+gem 'rubyzip', '~> 1.2.2', require: 'zip'
 
 # Browser detection
 gem 'browser', '~> 2.5'
@@ -122,10 +123,9 @@ gem 'faraday_middleware-aws-signers-v4'
 
 # Markdown and HTML processing
 gem 'html-pipeline', '~> 2.8'
-gem 'deckar01-task_list', '2.0.1'
+gem 'deckar01-task_list', '2.2.0'
 gem 'gitlab-markup', '~> 1.6.5'
 gem 'github-markup', '~> 1.7.0', require: 'github/markup'
-gem 'redcarpet', '~> 3.4'
 gem 'commonmarker', '~> 0.17'
 gem 'RedCloth', '~> 4.3.2'
 gem 'rdoc', '~> 6.0'
@@ -234,7 +234,7 @@ gem 'asana', '~> 0.8.1'
 gem 'ruby-fogbugz', '~> 0.2.1'
 
 # Kubernetes integration
-gem 'kubeclient', '~> 4.0.0'
+gem 'kubeclient', '~> 4.2.2'
 
 # Sanitize user input
 gem 'sanitize', '~> 4.6'

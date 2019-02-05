@@ -7,7 +7,7 @@ import { statusType } from 'ee/epic/constants';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
 import { mockEpicMeta, mockEpicData } from '../mock_data';
 
-describe('EpicBodyComponent', () => {
+describe('EpicHeaderComponent', () => {
   let vm;
   let store;
 
@@ -123,6 +123,16 @@ describe('EpicBodyComponent', () => {
       expect(actionsEl.querySelector('.js-loading-button-label').innerText.trim()).toBe(
         'Close epic',
       );
+    });
+
+    it('renders toggle sidebar button element', () => {
+      const toggleButtonEl = vm.$el.querySelector('button.js-sidebar-toggle');
+
+      expect(toggleButtonEl).not.toBeNull();
+      expect(toggleButtonEl.getAttribute('aria-label')).toBe('Toggle sidebar');
+      expect(toggleButtonEl.classList.contains('d-block')).toBe(true);
+      expect(toggleButtonEl.classList.contains('d-sm-none')).toBe(true);
+      expect(toggleButtonEl.classList.contains('gutter-toggle')).toBe(true);
     });
   });
 });

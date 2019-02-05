@@ -2,17 +2,22 @@
 import { mapState } from 'vuex';
 
 import IssuableBody from '~/issue_show/components/app.vue';
-import RelatedIssues from 'ee/related_issues/components/related_issues_root.vue';
+import RelatedItems from 'ee/related_issues/components/related_issues_root.vue';
+
+import EpicSidebar from './epic_sidebar.vue';
 
 export default {
+  epicsPathIdSeparator: '&',
   components: {
     IssuableBody,
-    RelatedIssues,
+    RelatedItems,
+    EpicSidebar,
   },
   computed: {
     ...mapState([
       'endpoint',
       'updateEndpoint',
+      'epicLinksEndpoint',
       'issueLinksEndpoint',
       'groupPath',
       'markdownPreviewPath',
@@ -20,10 +25,12 @@ export default {
       'canUpdate',
       'canDestroy',
       'canAdmin',
+      'subepicsSupported',
       'initialTitleHtml',
       'initialTitleText',
       'initialDescriptionHtml',
       'initialDescriptionText',
+      'lockVersion',
     ]),
   },
 };
@@ -43,6 +50,7 @@ export default {
         :show-delete-button="canDestroy"
         :initial-title-html="initialTitleHtml"
         :initial-title-text="initialTitleText"
+        :lock-version="lockVersion"
         :initial-description-html="initialDescriptionHtml"
         :initial-description-text="initialDescriptionText"
         :show-inline-edit-button="true"
@@ -52,12 +60,27 @@ export default {
         issuable-type="epic"
       />
     </div>
-    <related-issues
+    <related-items
+      v-if="subepicsSupported"
+      :endpoint="epicLinksEndpoint"
+      :can-admin="canAdmin"
+      :can-reorder="canAdmin"
+      :allow-auto-complete="false"
+      :path-id-separator="$options.epicsPathIdSeparator"
+      :title="__('Epics')"
+      :issuable-type="__('epic')"
+      css-class="js-related-epics-block"
+    />
+    <related-items
       :endpoint="issueLinksEndpoint"
       :can-admin="canAdmin"
       :can-reorder="canAdmin"
       :allow-auto-complete="false"
-      title="Issues"
+      :title="__('Issues')"
+      :issuable-type="__('issue')"
+      css-class="js-related-issues-block"
+      path-id-separator="#"
     />
+    <epic-sidebar />
   </div>
 </template>

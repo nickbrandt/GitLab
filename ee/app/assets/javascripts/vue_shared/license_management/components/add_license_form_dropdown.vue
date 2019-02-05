@@ -1,5 +1,7 @@
 <script>
+/* eslint-disable no-unused-vars */
 import $ from 'jquery';
+import select2 from 'select2/select2';
 import { KNOWN_LICENSES } from '../constants';
 
 export default {

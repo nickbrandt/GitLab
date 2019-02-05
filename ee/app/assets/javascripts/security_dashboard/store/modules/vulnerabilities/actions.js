@@ -84,7 +84,7 @@ export const openModal = ({ commit }, payload = {}) => {
 export const createIssue = ({ dispatch }, { vulnerability, flashError }) => {
   dispatch('requestCreateIssue');
   axios
-    .post(vulnerability.vulnerability_feedback_url, {
+    .post(vulnerability.vulnerability_feedback_issue_path, {
       vulnerability_feedback: {
         feedback_type: 'issue',
         category: vulnerability.report_type,
@@ -127,7 +127,7 @@ export const dismissVulnerability = ({ dispatch }, { vulnerability, flashError }
   dispatch('requestDismissVulnerability');
 
   axios
-    .post(vulnerability.vulnerability_feedback_url, {
+    .post(vulnerability.vulnerability_feedback_dismissal_path, {
       vulnerability_feedback: {
         feedback_type: 'dismissal',
         category: vulnerability.report_type,
@@ -167,9 +167,9 @@ export const receiveDismissVulnerabilityError = ({ commit }, { flashError }) => 
 };
 
 export const revertDismissal = ({ dispatch }, { vulnerability, flashError }) => {
-  const { vulnerability_feedback_url, dismissal_feedback } = vulnerability;
+  const { vulnerability_feedback_dismissal_path, dismissal_feedback } = vulnerability;
   // eslint-disable-next-line camelcase
-  const url = `${vulnerability_feedback_url}/${dismissal_feedback.id}`;
+  const url = `${vulnerability_feedback_dismissal_path}/${dismissal_feedback.id}`;
 
   dispatch('requestRevertDismissal');
 

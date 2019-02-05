@@ -1,0 +1,6 @@
+---
+title: Geo - Respect shard restriction while loading new resources to verify on the
+  Geo secondary node
+merge_request: 9343
+author:
+type: fixed

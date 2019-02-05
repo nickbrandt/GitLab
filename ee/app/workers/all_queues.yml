@@ -32,6 +32,7 @@
 - geo:geo_project_sync
 - geo:geo_rename_repository
 - geo:geo_repositories_clean_up
+- geo:geo_repository_cleanup
 - geo:geo_repository_destroy
 - geo:geo_repository_shard_sync
 - geo:geo_repository_verification_primary_shard

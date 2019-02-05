@@ -1,0 +1,5 @@
+- unless smartcard_enabled_for_ldap?(server['provider_name'], required: true)
+  = render_ce('devise/sessions/new_ldap', server: server)
+  %hr
+
+= render 'devise/sessions/new_smartcard_ldap', server: server

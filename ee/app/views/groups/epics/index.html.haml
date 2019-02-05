@@ -4,7 +4,7 @@
   = render 'shared/issuable/epic_nav', type: :epics
   .nav-controls
     - if can?(current_user, :create_epic, @group)
-      #new-epic-app{ data: { endpoint: request.url, 'align-right' => true } }
+      #epic-create-root{ data: { endpoint: request.url, 'align-right' => true } }
 
 = render 'shared/epic/search_bar', type: :epics
 

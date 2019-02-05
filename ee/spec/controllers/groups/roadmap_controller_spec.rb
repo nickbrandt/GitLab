@@ -38,28 +38,36 @@ describe Groups::RoadmapController do
 
           get :show, params: { group_id: group, sort: 'start_date_asc' }
 
-          expect(cookies['epic_sort']).to eq('start_date_asc')
+          expect(cookies['roadmap_sort']).to eq('start_date_asc')
           expect(response).to have_gitlab_http_status(200)
         end
       end
 
       context 'when there is a user logged in' do
-        context 'when epics_sort is nil' do
-          it 'stores epics sorting param in user preference' do
+        context 'when roadmaps_sort is nil' do
+          it 'stores roadmaps sorting param in user preference' do
             get :show, params: { group_id: group, sort: 'start_date_asc' }
 
             expect(response).to have_gitlab_http_status(200)
-            expect(user.reload.user_preference.epics_sort).to eq('start_date_asc')
+            expect(user.reload.user_preference.roadmaps_sort).to eq('start_date_asc')
+          end
+
+          it 'defaults to sort_value_start_date_soon' do
+            user.user_preference.update(roadmaps_sort: nil)
+
+            get :show, params: { group_id: group }
+
+            expect(assigns(:sort)).to eq('start_date_asc')
           end
         end
 
-        context 'when epics_sort is present' do
-          it 'update epics_sort with current value' do
-            user.user_preference.update(epics_sort: 'created_desc')
+        context 'when roadmaps_sort is present' do
+          it 'update roadmaps_sort with current value' do
+            user.user_preference.update(roadmaps_sort: 'created_desc')
 
             get :show, params: { group_id: group, sort: 'start_date_asc' }
 
-            expect(user.reload.user_preference.epics_sort).to eq('start_date_asc')
+            expect(user.reload.user_preference.roadmaps_sort).to eq('start_date_asc')
             expect(response).to have_gitlab_http_status(200)
           end
         end

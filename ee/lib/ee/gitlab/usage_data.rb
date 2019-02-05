@@ -84,7 +84,7 @@ module EE
         }
 
         results = count(::Ci::Build.where(name: types.keys).group(:name), fallback: Hash.new(-1))
-        results.each_with_object({}) { |(key, value), response| response[types[key.to_sym]] = value  }
+        results.each_with_object({}) { |(key, value), response| response[types[key.to_sym]] = value }
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
@@ -111,6 +111,14 @@ module EE
         end
 
         usage_data
+      end
+
+      override :jira_usage
+      def jira_usage
+        super.merge(
+          projects_jira_dvcs_cloud_active: count(ProjectFeatureUsage.with_jira_dvcs_integration_enabled),
+          projects_jira_dvcs_server_active: count(ProjectFeatureUsage.with_jira_dvcs_integration_enabled(cloud: false))
+        )
       end
 
       def epics_deepest_relationship_level

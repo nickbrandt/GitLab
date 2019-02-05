@@ -7,7 +7,7 @@ describe 'Promotions', :js do
   let(:group) { create(:group) }
   let(:project) { create(:project, :repository, namespace: group) }
   let(:milestone) { create(:milestone, project: project, start_date: Date.today, due_date: 7.days.from_now) }
-  let!(:issue)  { create(:issue, project: project, author: user) }
+  let!(:issue) { create(:issue, project: project, author: user) }
   let(:otherproject) { create(:project, :repository, namespace: otherdeveloper.namespace) }
 
   describe 'if you have a license' do

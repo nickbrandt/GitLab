@@ -1,0 +1,5 @@
+---
+title: Geo - Make sure project does not meet selective sync rule before deleting it
+merge_request: 9345
+author:
+type: fixed

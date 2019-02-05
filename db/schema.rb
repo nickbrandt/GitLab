@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190115054216) do
+ActiveRecord::Schema.define(version: 20190131122559) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -2166,6 +2166,11 @@ ActiveRecord::Schema.define(version: 20190115054216) do
     t.index ["name"], name: "index_programming_languages_on_name", unique: true, using: :btree
   end
 
+  create_table "project_alerting_settings", primary_key: "project_id", id: :integer, force: :cascade do |t|
+    t.string "encrypted_token", null: false
+    t.string "encrypted_token_iv", null: false
+  end
+
   create_table "project_authorizations", id: false, force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "project_id", null: false
@@ -2209,10 +2214,20 @@ ActiveRecord::Schema.define(version: 20190115054216) do
   end
 
   create_table "project_error_tracking_settings", primary_key: "project_id", id: :integer, force: :cascade do |t|
-    t.boolean "enabled", default: true, null: false
-    t.string "api_url", null: false
+    t.boolean "enabled", default: false, null: false
+    t.string "api_url"
     t.string "encrypted_token"
     t.string "encrypted_token_iv"
+    t.string "project_name"
+    t.string "organization_name"
+  end
+
+  create_table "project_feature_usages", primary_key: "project_id", id: :integer, force: :cascade do |t|
+    t.datetime "jira_dvcs_cloud_last_sync_at"
+    t.datetime "jira_dvcs_server_last_sync_at"
+    t.index ["jira_dvcs_cloud_last_sync_at", "project_id"], name: "idx_proj_feat_usg_on_jira_dvcs_cloud_last_sync_at_and_proj_id", where: "(jira_dvcs_cloud_last_sync_at IS NOT NULL)", using: :btree
+    t.index ["jira_dvcs_server_last_sync_at", "project_id"], name: "idx_proj_feat_usg_on_jira_dvcs_server_last_sync_at_and_proj_id", where: "(jira_dvcs_server_last_sync_at IS NOT NULL)", using: :btree
+    t.index ["project_id"], name: "index_project_feature_usages_on_project_id", using: :btree
   end
 
   create_table "project_features", force: :cascade do |t|
@@ -2687,6 +2702,7 @@ ActiveRecord::Schema.define(version: 20190115054216) do
     t.boolean "enabled", null: false
     t.string "certificate_fingerprint", null: false
     t.string "sso_url", null: false
+    t.boolean "enforced_sso", default: false, null: false
     t.index ["group_id"], name: "index_saml_providers_on_group_id", using: :btree
   end
 
@@ -2983,6 +2999,9 @@ ActiveRecord::Schema.define(version: 20190115054216) do
     t.string "epics_sort"
     t.integer "roadmap_epics_state"
     t.integer "epic_notes_filter", limit: 2, default: 0, null: false
+    t.string "issues_sort"
+    t.string "merge_requests_sort"
+    t.string "roadmaps_sort"
     t.index ["user_id"], name: "index_user_preferences_on_user_id", unique: true, using: :btree
   end
 
@@ -3451,6 +3470,7 @@ ActiveRecord::Schema.define(version: 20190115054216) do
   add_foreign_key "personal_access_tokens", "users"
   add_foreign_key "pool_repositories", "projects", column: "source_project_id", on_delete: :nullify
   add_foreign_key "pool_repositories", "shards", on_delete: :restrict
+  add_foreign_key "project_alerting_settings", "projects", on_delete: :cascade
   add_foreign_key "project_authorizations", "projects", on_delete: :cascade
   add_foreign_key "project_authorizations", "users", on_delete: :cascade
   add_foreign_key "project_auto_devops", "projects", on_delete: :cascade
@@ -3459,6 +3479,7 @@ ActiveRecord::Schema.define(version: 20190115054216) do
   add_foreign_key "project_deploy_tokens", "deploy_tokens", on_delete: :cascade
   add_foreign_key "project_deploy_tokens", "projects", on_delete: :cascade
   add_foreign_key "project_error_tracking_settings", "projects", on_delete: :cascade
+  add_foreign_key "project_feature_usages", "projects", on_delete: :cascade
   add_foreign_key "project_features", "projects", name: "fk_18513d9b92", on_delete: :cascade
   add_foreign_key "project_group_links", "projects", name: "fk_daa8cee94c", on_delete: :cascade
   add_foreign_key "project_import_data", "projects", name: "fk_ffb9ee3a10", on_delete: :cascade

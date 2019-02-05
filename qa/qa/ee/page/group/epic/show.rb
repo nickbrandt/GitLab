@@ -21,14 +21,14 @@ module QA
               element :remove_issue_button
             end
 
-            view 'ee/app/assets/javascripts/epics/epic_show/components/epic_header.vue' do
+            view 'ee/app/assets/javascripts/epic/components/epic_header.vue' do
               element :close_reopen_epic_button
             end
 
             def add_issue_to_epic(issue_url)
               click_element :add_issues_button
               fill_element :add_issue_input, issue_url
-              click_element :add_issue_button
+              click_body
               click_element :add_issue_button
             end
 

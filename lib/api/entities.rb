@@ -190,7 +190,7 @@ module API
       expose :custom_attributes, using: 'API::Entities::CustomAttribute', if: :with_custom_attributes
 
       # rubocop: disable CodeReuse/ActiveRecord
-      def self.preload_relation(projects_relation, options =  {})
+      def self.preload_relation(projects_relation, options = {})
         # Preloading tags, should be done with using only `:tags`,
         # as `:tags` are defined as: `has_many :tags, through: :taggings`
         # N+1 is solved then by using `subject.tags.map(&:name)`
@@ -274,7 +274,7 @@ module API
       expose :statistics, using: 'API::Entities::ProjectStatistics', if: :statistics
 
       # rubocop: disable CodeReuse/ActiveRecord
-      def self.preload_relation(projects_relation, options =  {})
+      def self.preload_relation(projects_relation, options = {})
         # Preloading tags, should be done with using only `:tags`,
         # as `:tags` are defined as: `has_many :tags, through: :taggings`
         # N+1 is solved then by using `subject.tags.map(&:name)`
@@ -738,32 +738,6 @@ module API
     class MergeRequestChanges < MergeRequest
       expose :diffs, as: :changes, using: Entities::Diff do |compare, _|
         compare.raw_diffs(limits: false).to_a
-      end
-    end
-
-    class Approver < Grape::Entity
-      expose :user, using: Entities::UserBasic
-    end
-
-    class ApproverGroup < Grape::Entity
-      expose :group, using: Entities::Group
-    end
-
-    class MergeRequestApprovals < ProjectEntity
-      expose :merge_status
-      expose :approvals_required
-      expose :approvals_left
-      expose :approvals, as: :approved_by, using: Entities::Approver
-      expose :approvers_left, as: :suggested_approvers, using: Entities::UserBasic
-      expose :approvers, using: Entities::Approver
-      expose :approver_groups, using: Entities::ApproverGroup
-
-      expose :user_has_approved do |merge_request, options|
-        merge_request.has_approved?(options[:current_user])
-      end
-
-      expose :user_can_approve do |merge_request, options|
-        merge_request.can_approve?(options[:current_user])
       end
     end
 
@@ -1558,14 +1532,6 @@ module API
 
       klass.descendants.each { |descendant| descendant.prepend(with) }
       klass.prepend(with)
-    end
-
-    class ApprovalSettings < Grape::Entity
-      expose :approvers, using: Entities::Approver
-      expose :approver_groups, using: Entities::ApproverGroup
-      expose :approvals_before_merge
-      expose :reset_approvals_on_push
-      expose :disable_overriding_approvers_per_merge_request
     end
 
     class ManagedLicense < Grape::Entity

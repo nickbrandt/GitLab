@@ -54,13 +54,13 @@ export default {
 
 <template>
   <div class="operations-dashboard">
-    <nav class="breadcrumbs container-fluid container-limited">
-      <div class="breadcrumbs-container">
-        <h2 class="js-dashboard-title breadcrumbs-sub-title">{{ __('Operations Dashboard') }}</h2>
+    <div
+      class="page-title-holder flex-fill d-flex flex-column flex-md-row align-items-md-end align-items-stretch"
+    >
+      <div class="flex-fill append-right-20">
+        <h1 class="js-dashboard-title page-title text-nowrap">{{ __('Operations Dashboard') }}</h1>
       </div>
-    </nav>
-    <div class="container-fluid container-limited prepend-top-default">
-      <div class="d-flex align-items-center">
+      <div class="d-flex flex-fill align-items-end append-bottom-default">
         <project-search class="flex-grow-1" />
         <button
           :class="{ disabled: addIsDisabled }"
@@ -71,6 +71,8 @@ export default {
           {{ __('Add projects') }}
         </button>
       </div>
+    </div>
+    <div class="prepend-top-default">
       <div v-if="projects.length" class="row m-0 prepend-top-default">
         <div
           v-for="project in projects"

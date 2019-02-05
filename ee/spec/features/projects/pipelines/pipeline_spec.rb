@@ -47,7 +47,7 @@ describe 'Pipeline', :js do
   end
 
   describe 'GET /:project/pipelines/:id/licenses' do
-    let(:pipeline) {  create(:ci_pipeline, project: project, ref: 'master', sha: project.commit.id) }
+    let(:pipeline) { create(:ci_pipeline, project: project, ref: 'master', sha: project.commit.id) }
 
     before do
       stub_licensed_features(license_management: true)

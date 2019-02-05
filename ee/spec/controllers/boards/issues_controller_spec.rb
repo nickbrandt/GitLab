@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Boards::IssuesController do
   include ExternalAuthorizationServiceHelpers
 
-  let(:group) { create(:group) }
+  let(:group) { create(:group, :private) }
   let(:project_1) { create(:project, namespace: group) }
   let(:project_2) { create(:project, namespace: group) }
   let(:board) { create(:board, group: group) }
@@ -79,8 +79,7 @@ describe Boards::IssuesController do
 
     context 'with unauthorized user' do
       before do
-        allow(Ability).to receive(:allowed?).and_call_original
-        allow(Ability).to receive(:allowed?).with(user, :read_group, group).and_return(false)
+        group.group_member(user).destroy
       end
 
       it 'returns a forbidden 403 response' do

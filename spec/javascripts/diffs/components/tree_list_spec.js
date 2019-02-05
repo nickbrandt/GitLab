@@ -83,17 +83,6 @@ describe('Diffs tree list component', () => {
       expect(vm.$el.querySelectorAll('.file-row')[1].textContent).toContain('app');
     });
 
-    it('filters tree list to blobs matching search', done => {
-      vm.search = 'app/index';
-
-      vm.$nextTick(() => {
-        expect(vm.$el.querySelectorAll('.file-row').length).toBe(1);
-        expect(vm.$el.querySelectorAll('.file-row')[0].textContent).toContain('index.js');
-
-        done();
-      });
-    });
-
     it('calls toggleTreeOpen when clicking folder', () => {
       spyOn(vm.$store, 'dispatch').and.stub();
 
@@ -111,7 +100,7 @@ describe('Diffs tree list component', () => {
     });
 
     it('renders as file list when renderTreeList is false', done => {
-      vm.renderTreeList = false;
+      vm.$store.state.diffs.renderTreeList = false;
 
       vm.$nextTick(() => {
         expect(vm.$el.querySelectorAll('.file-row').length).toBe(1);
@@ -121,71 +110,13 @@ describe('Diffs tree list component', () => {
     });
 
     it('renders file paths when renderTreeList is false', done => {
-      vm.renderTreeList = false;
+      vm.$store.state.diffs.renderTreeList = false;
 
       vm.$nextTick(() => {
         expect(vm.$el.querySelector('.file-row').textContent).toContain('index.js');
 
         done();
       });
-    });
-
-    it('hides render buttons when input is focused', done => {
-      const focusEvent = new Event('focus');
-
-      vm.$el.querySelector('.form-control').dispatchEvent(focusEvent);
-
-      vm.$nextTick(() => {
-        expect(vm.$el.querySelector('.tree-list-view-toggle').style.display).toBe('none');
-
-        done();
-      });
-    });
-
-    it('shows render buttons when input is blurred', done => {
-      const blurEvent = new Event('blur');
-      vm.focusSearch = true;
-
-      vm.$nextTick()
-        .then(() => {
-          vm.$el.querySelector('.form-control').dispatchEvent(blurEvent);
-        })
-        .then(vm.$nextTick)
-        .then(() => {
-          expect(vm.$el.querySelector('.tree-list-view-toggle').style.display).not.toBe('none');
-        })
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
-  describe('clearSearch', () => {
-    it('resets search', () => {
-      vm.search = 'test';
-
-      vm.$el.querySelector('.tree-list-clear-icon').click();
-
-      expect(vm.search).toBe('');
-    });
-  });
-
-  describe('toggleRenderTreeList', () => {
-    it('updates renderTreeList', () => {
-      expect(vm.renderTreeList).toBe(true);
-
-      vm.toggleRenderTreeList(false);
-
-      expect(vm.renderTreeList).toBe(false);
-    });
-  });
-
-  describe('toggleFocusSearch', () => {
-    it('updates focusSearch', () => {
-      expect(vm.focusSearch).toBe(false);
-
-      vm.toggleFocusSearch(true);
-
-      expect(vm.focusSearch).toBe(true);
     });
   });
 });

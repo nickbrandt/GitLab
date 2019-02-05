@@ -1,0 +1,17 @@
+- if smartcard_enabled_for_ldap?(server['provider_name'])
+  %div{ id: "#{server['provider_name']}_smartcard" }
+    %span
+      %strong
+        = sprite_icon('smart-card', size: 16, css_class: 'vertical-align-middle' )
+        %span.vertical-align-middle
+          = _('Sign in using smart card')
+    %p
+      = _('Use your smart card to authenticate with the LDAP server.')
+
+    .login-body
+      = form_tag(smartcard_ldap_auth_url(provider: server['provider_name'],
+                                         port: smartcard_config_port),
+                 html: { 'aria-live' => 'assertive'}) do
+        .submit-container
+          = submit_tag(_('Sign in with smart card'),
+                       class: smartcard_login_button_classes(server['provider_name']))

@@ -16,6 +16,7 @@ describe Project do
 
     it { is_expected.to have_one(:import_state).class_name('ProjectImportState') }
     it { is_expected.to have_one(:repository_state).class_name('ProjectRepositoryState').inverse_of(:project) }
+    it { is_expected.to have_one(:alerting_setting).class_name('Alerting::ProjectAlertingSetting') }
 
     it { is_expected.to have_many(:reviews).inverse_of(:project) }
     it { is_expected.to have_many(:path_locks) }
@@ -1427,7 +1428,7 @@ describe Project do
       let(:secondary_base_host) { 'secondary.geo' }
       let(:secondary_base_url) { "http://#{secondary_base_host}" }
       let(:secondary_node) { create(:geo_node, url: secondary_base_url) }
-      let(:secondary_url) { "#{secondary_base_url}#{project_path}"  }
+      let(:secondary_url) { "#{secondary_base_url}#{project_path}" }
 
       before do
         stub_current_geo_node(secondary_node)

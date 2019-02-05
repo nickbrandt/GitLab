@@ -112,7 +112,7 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
       expect(response).to match_response_schema('public_api/v4/geo_node_status', dir: 'ee')
     end
 
-    it 'shows the database-held response if current node status exists in the database, but not redis'  do
+    it 'shows the database-held response if current node status exists in the database, but not redis' do
       stub_current_geo_node(secondary)
 
       expect(GeoNodeStatus).to receive(:fast_current_node_status).and_return(nil)
@@ -222,6 +222,28 @@ describe API::GeoNodes, :geo, :prometheus, api: true do
       expect(response).to have_gitlab_http_status(200)
       expect(response).to match_response_schema('public_api/v4/geo_node', dir: 'ee')
       expect(json_response).to include(params)
+    end
+
+    it 'can update primary' do
+      params = {
+        url: 'https://updated.example.com/'
+      }.stringify_keys
+
+      put api("/geo_nodes/#{primary.id}", admin), params: params
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(response).to match_response_schema('public_api/v4/geo_node', dir: 'ee')
+      expect(json_response).to include(params)
+    end
+
+    it 'cannot disable a primary' do
+      params = {
+        enabled: false
+      }.stringify_keys
+
+      put api("/geo_nodes/#{primary.id}", admin), params: params
+
+      expect(response).to have_gitlab_http_status(400)
     end
   end
 

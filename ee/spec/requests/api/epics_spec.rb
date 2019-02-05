@@ -142,6 +142,20 @@ describe API::Epics do
         expect_paginated_array_response([epic2.id, epic.id])
       end
 
+      it 'has upvote/downvote information' do
+        epic.create_award_emoji('thumbsup', user)
+        epic2.create_award_emoji('thumbsdown', user)
+
+        get api(url, user)
+
+        expect(response).to have_gitlab_http_status(200)
+
+        expect(json_response).to contain_exactly(
+          a_hash_including('upvotes' => 1, 'downvotes' => 0),
+          a_hash_including('upvotes' => 0, 'downvotes' => 1)
+        )
+      end
+
       it 'sorts by created_at descending by default' do
         get api(url, user)
 

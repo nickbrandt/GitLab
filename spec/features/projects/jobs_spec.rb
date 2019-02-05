@@ -103,7 +103,7 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
       end
 
       it 'shows commit`s data', :js do
-        requests = inspect_requests() do
+        requests = inspect_requests do
           visit project_job_path(project, job)
         end
 
@@ -214,13 +214,13 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
       end
 
       it 'downloads the zip file when user clicks the download button' do
-        requests = inspect_requests() do
+        requests = inspect_requests do
           click_link 'Download'
         end
 
         artifact_request = requests.find { |req| req.url.match(%r{artifacts/download}) }
 
-        expect(artifact_request.response_headers["Content-Disposition"]).to eq(%Q{attachment; filename="#{job.artifacts_file.filename}"})
+        expect(artifact_request.response_headers["Content-Disposition"]).to eq(%Q{attachment; filename*=UTF-8''#{job.artifacts_file.filename}; filename="#{job.artifacts_file.filename}"})
         expect(artifact_request.response_headers['Content-Transfer-Encoding']).to eq("binary")
         expect(artifact_request.response_headers['Content-Type']).to eq("image/gif")
         expect(artifact_request.body).to eq(job.artifacts_file.file.read.b)
@@ -824,7 +824,7 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
       before do
         job.run!
         visit project_job_path(project, job)
-        find('.js-cancel-job').click()
+        find('.js-cancel-job').click
       end
 
       it 'loads the page and shows all needed controls' do
@@ -884,7 +884,7 @@ describe 'Jobs', :clean_gitlab_redis_shared_state do
       end
 
       it do
-        requests = inspect_requests() do
+        requests = inspect_requests do
           visit download_project_job_artifacts_path(project, job2)
         end
 

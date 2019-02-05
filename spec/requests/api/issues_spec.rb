@@ -212,6 +212,18 @@ describe API::Issues do
         expect_paginated_array_response(issue.id)
       end
 
+      it 'returns issues matching given search string for title and scoped in title' do
+        get api("/issues", user), params: { search: issue.title, in: 'title' }
+
+        expect_paginated_array_response(issue.id)
+      end
+
+      it 'returns an empty array if no issue matches given search string for title and scoped in description' do
+        get api("/issues", user), params: { search: issue.title, in: 'description' }
+
+        expect_paginated_array_response([])
+      end
+
       it 'returns issues matching given search string for description' do
         get api("/issues", user), params: { search: issue.description }
 
@@ -997,7 +1009,7 @@ describe API::Issues do
     end
 
     context 'user does not have permissions to create issue' do
-      let(:not_member)  { create(:user) }
+      let(:not_member) { create(:user) }
 
       before do
         project.project_feature.update(issues_access_level: ProjectFeature::PRIVATE)

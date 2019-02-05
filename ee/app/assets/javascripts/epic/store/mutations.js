@@ -1,3 +1,5 @@
+import { dateTypes } from '../constants';
+
 import * as types from './mutation_types';
 
 export default {
@@ -18,5 +20,78 @@ export default {
   },
   [types.REQUEST_EPIC_STATUS_CHANGE_FAILURE](state) {
     state.epicStatusChangeInProgress = false;
+  },
+
+  [types.TOGGLE_SIDEBAR](state, isSidebarCollapsed) {
+    state.sidebarCollapsed = isSidebarCollapsed;
+  },
+
+  [types.REQUEST_EPIC_TODO_TOGGLE](state) {
+    state.epicTodoToggleInProgress = true;
+  },
+  [types.REQUEST_EPIC_TODO_TOGGLE_SUCCESS](state, { todoDeletePath }) {
+    state.todoDeletePath = todoDeletePath;
+    state.todoExists = !state.todoExists;
+    state.epicTodoToggleInProgress = false;
+  },
+  [types.REQUEST_EPIC_TODO_TOGGLE_FAILURE](state) {
+    state.epicTodoToggleInProgress = false;
+  },
+
+  [types.TOGGLE_EPIC_START_DATE_TYPE](state, { dateTypeIsFixed }) {
+    state.startDateIsFixed = dateTypeIsFixed;
+  },
+
+  [types.TOGGLE_EPIC_DUE_DATE_TYPE](state, { dateTypeIsFixed }) {
+    state.dueDateIsFixed = dateTypeIsFixed;
+  },
+
+  [types.REQUEST_EPIC_DATE_SAVE](state, { dateType }) {
+    if (dateType === dateTypes.start) {
+      state.epicStartDateSaveInProgress = true;
+    } else {
+      state.epicDueDateSaveInProgress = true;
+    }
+  },
+  [types.REQUEST_EPIC_DATE_SAVE_SUCCESS](state, { dateType, dateTypeIsFixed, newDate }) {
+    if (dateType === dateTypes.start) {
+      state.epicStartDateSaveInProgress = false;
+      state.startDateIsFixed = dateTypeIsFixed;
+      state.startDate = newDate;
+    } else {
+      state.epicDueDateSaveInProgress = false;
+      state.dueDateIsFixed = dateTypeIsFixed;
+      state.dueDate = newDate;
+    }
+  },
+  [types.REQUEST_EPIC_DATE_SAVE_FAILURE](state, { dateType, dateTypeIsFixed }) {
+    if (dateType === dateTypes.start) {
+      state.epicStartDateSaveInProgress = false;
+      state.startDateIsFixed = dateTypeIsFixed;
+    } else {
+      state.epicDueDateSaveInProgress = false;
+      state.dueDateIsFixed = dateTypeIsFixed;
+    }
+  },
+
+  [types.REQUEST_EPIC_SUBSCRIPTION_TOGGLE](state) {
+    state.epicSubscriptionToggleInProgress = true;
+  },
+  [types.REQUEST_EPIC_SUBSCRIPTION_TOGGLE_SUCCESS](state, { subscribed }) {
+    state.epicSubscriptionToggleInProgress = false;
+    state.subscribed = subscribed;
+  },
+  [types.REQUEST_EPIC_SUBSCRIPTION_TOGGLE_FAILURE](state) {
+    state.epicSubscriptionToggleInProgress = false;
+  },
+
+  [types.SET_EPIC_CREATE_TITLE](state, { newEpicTitle }) {
+    state.newEpicTitle = newEpicTitle;
+  },
+  [types.REQUEST_EPIC_CREATE](state) {
+    state.epicCreateInProgress = true;
+  },
+  [types.REQUEST_EPIC_CREATE_FAILURE](state) {
+    state.epicCreateInProgress = false;
   },
 };

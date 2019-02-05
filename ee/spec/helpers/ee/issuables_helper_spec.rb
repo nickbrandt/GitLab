@@ -4,6 +4,10 @@ require 'spec_helper'
 
 describe IssuablesHelper do
   describe '#issuable_initial_data' do
+    before do
+      stub_commonmark_sourcepos_disabled
+    end
+
     it 'returns the correct data for an epic' do
       user = create(:user)
       epic = create(:epic, author: user, description: 'epic text')
@@ -23,8 +27,8 @@ describe IssuablesHelper do
         issuableRef: "&#{epic.iid}",
         markdownPreviewPath: "/groups/#{@group.full_path}/preview_markdown",
         markdownDocsPath: '/help/user/markdown',
-        markdownVersion: CacheMarkdownField::CACHE_COMMONMARK_VERSION,
         issuableTemplates: nil,
+        lockVersion: epic.lock_version,
         groupPath: @group.path,
         initialTitleHtml: epic.title,
         initialTitleText: epic.title,

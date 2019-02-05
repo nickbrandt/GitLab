@@ -27,7 +27,7 @@ describe API::Jobs do
     shared_examples 'downloads artifact' do
       let(:download_headers) do
         { 'Content-Transfer-Encoding' => 'binary',
-          'Content-Disposition' => 'attachment; filename=ci_build_artifacts.zip' }
+          'Content-Disposition' => 'attachment; filename="ci_build_artifacts.zip"; filename*=UTF-8\'\'ci_build_artifacts.zip' }
       end
 
       it 'returns specific job artifacts' do

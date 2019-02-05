@@ -15,6 +15,7 @@ describe 'Feature Flags', :js do
 
   before do
     stub_licensed_features(feature_flags: true)
+    stub_feature_flags(feature_flags_environment_scope: false)
     sign_in(user)
   end
 
@@ -137,7 +138,7 @@ describe 'Feature Flags', :js do
 
     shared_examples_for 'correct empty index behavior' do
       it 'shows empty state' do
-        expect(page).to have_content('Get started with feature flags')
+        expect(page).to have_content('Get started with Feature Flags')
         expect(page).to have_link('New Feature Flag')
         expect(page).to have_button('Configure')
       end
@@ -233,7 +234,7 @@ describe 'Feature Flags', :js do
   end
 
   def expect_empty_state
-    expect(page).to have_text 'Get started with feature flags'
+    expect(page).to have_selector('.js-feature-flags-empty-state')
     expect(page).to have_selector('.btn-success', text: 'New Feature Flag')
     expect(page).to have_selector('.btn-primary.btn-inverted', text: 'Configure')
   end

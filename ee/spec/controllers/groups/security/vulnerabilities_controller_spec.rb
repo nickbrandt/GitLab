@@ -88,19 +88,19 @@ describe Groups::Security::VulnerabilitiesController do
         end
 
         context 'with vulnerability feedback' do
-          it "avoids N+1 queries" do
+          it "avoids N+1 queries", :with_request_store do
             create_vulnerabilities(2, project_dev, with_feedback: true)
 
-            control_count = ActiveRecord::QueryRecorder.new { get_summary }
+            control_count = ActiveRecord::QueryRecorder.new { get_index }
 
             create_vulnerabilities(2, project_guest, with_feedback: true)
 
-            expect { get_summary }.not_to exceed_all_query_limit(control_count)
+            expect { get_index }.not_to exceed_all_query_limit(control_count)
           end
 
           private
 
-          def get_summary
+          def get_index
             get :index, params: { group_id: group }, format: :json
           end
         end
@@ -246,7 +246,7 @@ describe Groups::Security::VulnerabilitiesController do
   end
 
   describe 'GET history.json' do
-    subject { get :history,  params: { group_id: group }, format: :json }
+    subject { get :history, params: { group_id: group }, format: :json }
 
     context 'when security dashboard feature is disabled' do
       before do
@@ -350,7 +350,7 @@ describe Groups::Security::VulnerabilitiesController do
 
         it 'returns filtered history if filters are enabled' do
           travel_to(Time.zone.parse('2019-02-10')) do
-            get :history,  params: { group_id: group, report_type: %w[dependency_scanning sast] }, format: :json
+            get :history, params: { group_id: group, report_type: %w[dependency_scanning sast] }, format: :json
           end
 
           expect(response).to have_gitlab_http_status(200)

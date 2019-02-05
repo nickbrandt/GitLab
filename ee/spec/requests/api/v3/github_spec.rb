@@ -6,7 +6,6 @@ describe API::V3::Github do
   let!(:project2) { create(:project, :repository, creator: user) }
 
   before do
-    allow(Gitlab::Jira::Middleware).to receive(:jira_dvcs_connector?) { true }
     project.add_maintainer(user)
     project2.add_maintainer(user)
   end
@@ -15,7 +14,7 @@ describe API::V3::Github do
     it 'returns an empty array' do
       group = create(:group)
 
-      get v3_api("/orgs/#{group.path}/repos", user)
+      jira_get v3_api("/orgs/#{group.path}/repos", user)
 
       expect(response).to have_gitlab_http_status(200)
       expect(json_response).to eq([])
@@ -24,7 +23,7 @@ describe API::V3::Github do
     it 'returns 200 when namespace path include a dot' do
       group = create(:group, path: 'foo.bar')
 
-      get v3_api("/orgs/#{group.path}/repos", user)
+      jira_get v3_api("/orgs/#{group.path}/repos", user)
 
       expect(response).to have_gitlab_http_status(200)
     end
@@ -32,7 +31,7 @@ describe API::V3::Github do
 
   describe 'GET /user/repos' do
     it 'returns an empty array' do
-      get v3_api('/user/repos', user)
+      jira_get v3_api('/user/repos', user)
 
       expect(response).to have_gitlab_http_status(200)
       expect(json_response).to eq([])
@@ -42,7 +41,7 @@ describe API::V3::Github do
   shared_examples_for 'Jira-specific mimicked GitHub endpoints' do
     describe 'GET /repos/.../events' do
       it 'returns an empty array' do
-        get v3_api("/repos/#{path}/events", user)
+        jira_get v3_api("/repos/#{path}/events", user)
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response).to eq([])
@@ -61,7 +60,7 @@ describe API::V3::Github do
         it 'returns an array of notes' do
           stub_licensed_features(jira_dev_panel_integration: true)
 
-          get v3_api("/repos/#{path}/issues/#{merge_request.id}/comments", user)
+          jira_get v3_api("/repos/#{path}/issues/#{merge_request.id}/comments", user)
 
           expect(response).to have_gitlab_http_status(200)
           expect(json_response).to be_an(Array)
@@ -85,7 +84,7 @@ describe API::V3::Github do
         it 'returns 404' do
           stub_licensed_features(jira_dev_panel_integration: true)
 
-          get v3_api("/repos/#{path}/issues/#{merge_request.id}/comments", user)
+          jira_get v3_api("/repos/#{path}/issues/#{merge_request.id}/comments", user)
 
           expect(response).to have_gitlab_http_status(404)
         end
@@ -94,7 +93,7 @@ describe API::V3::Github do
 
     describe 'GET /.../pulls/:id/commits' do
       it 'returns an empty array' do
-        get v3_api("/repos/#{path}/pulls/xpto/commits", user)
+        jira_get v3_api("/repos/#{path}/pulls/xpto/commits", user)
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response).to eq([])
@@ -103,7 +102,7 @@ describe API::V3::Github do
 
     describe 'GET /.../pulls/:id/comments' do
       it 'returns an empty array' do
-        get v3_api("/repos/#{path}/pulls/xpto/comments", user)
+        jira_get v3_api("/repos/#{path}/pulls/xpto/comments", user)
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response).to eq([])
@@ -138,7 +137,7 @@ describe API::V3::Github do
       it 'returns an array of merge requests with github format' do
         stub_licensed_features(jira_dev_panel_integration: true)
 
-        get v3_api('/repos/-/jira/pulls', user)
+        jira_get v3_api('/repos/-/jira/pulls', user)
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response).to be_an(Array)
@@ -151,7 +150,7 @@ describe API::V3::Github do
       it 'returns an array of merge requests for the proper project in github format' do
         stub_licensed_features(jira_dev_panel_integration: true)
 
-        get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls", user)
+        jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/pulls", user)
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response).to be_an(Array)
@@ -165,7 +164,7 @@ describe API::V3::Github do
     let(:group) { create(:group, name: 'foo') }
 
     def expect_project_under_namespace(projects, namespace, user)
-      get v3_api("/users/#{namespace.path}/repos", user)
+      jira_get v3_api("/users/#{namespace.path}/repos", user)
 
       expect(response).to have_gitlab_http_status(200)
       expect(response).to include_pagination_headers
@@ -239,7 +238,7 @@ describe API::V3::Github do
 
     context 'unauthenticated' do
       it 'returns 401' do
-        get v3_api("/users/foo/repos", nil)
+        jira_get v3_api("/users/foo/repos", nil)
 
         expect(response).to have_gitlab_http_status(401)
       end
@@ -262,7 +261,7 @@ describe API::V3::Github do
       it 'responds with not found status' do
         stub_licensed_features(jira_dev_panel_integration: true)
 
-        get v3_api("/users/noo/repos", user)
+        jira_get v3_api("/users/noo/repos", user)
 
         expect(response).to have_gitlab_http_status(404)
       end
@@ -275,8 +274,30 @@ describe API::V3::Github do
         stub_licensed_features(jira_dev_panel_integration: true)
       end
 
+      context 'updating project feature usage' do
+        it 'counts JIRA cloud integration as enabled' do
+          user_agent = 'JIRA DVCS Connector Vertigo/4.42.0'
+
+          Timecop.freeze do
+            jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", user), user_agent
+
+            expect(project.reload.jira_dvcs_cloud_last_sync_at).to be_like_time(Time.now)
+          end
+        end
+
+        it 'counts JIRA server integration as enabled' do
+          user_agent = 'JIRA DVCS Connector/3.2.4'
+
+          Timecop.freeze do
+            jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", user), user_agent
+
+            expect(project.reload.jira_dvcs_server_last_sync_at).to be_like_time(Time.now)
+          end
+        end
+      end
+
       it 'returns an array of project branches with github format' do
-        get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", user)
+        jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", user)
 
         expect(response).to have_gitlab_http_status(200)
         expect(response).to include_pagination_headers
@@ -288,7 +309,7 @@ describe API::V3::Github do
       it 'returns 200 when project path include a dot' do
         project.update!(path: 'foo.bar')
 
-        get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", user)
+        jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", user)
 
         expect(response).to have_gitlab_http_status(200)
       end
@@ -298,7 +319,7 @@ describe API::V3::Github do
         project = create(:project, :repository, group: group)
         project.add_reporter(user)
 
-        get v3_api("/repos/#{group.path}/#{project.path}/branches", user)
+        jira_get v3_api("/repos/#{group.path}/#{project.path}/branches", user)
 
         expect(response).to have_gitlab_http_status(200)
       end
@@ -308,7 +329,7 @@ describe API::V3::Github do
       it 'returns 401' do
         stub_licensed_features(jira_dev_panel_integration: true)
 
-        get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", nil)
+        jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", nil)
 
         expect(response).to have_gitlab_http_status(401)
       end
@@ -320,7 +341,7 @@ describe API::V3::Github do
         unauthorized_user = create(:user)
         project.add_reporter(unauthorized_user)
 
-        get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", unauthorized_user)
+        jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/branches", unauthorized_user)
 
         expect(response).to have_gitlab_http_status(404)
       end
@@ -337,7 +358,7 @@ describe API::V3::Github do
       end
 
       it 'returns commit with github format' do
-        get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}", user)
+        jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}", user)
 
         expect(response).to have_gitlab_http_status(200)
         expect(response).to match_response_schema('entities/github/commit', dir: 'ee')
@@ -346,7 +367,7 @@ describe API::V3::Github do
       it 'returns 200 when project path include a dot' do
         project.update!(path: 'foo.bar')
 
-        get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}", user)
+        jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}", user)
 
         expect(response).to have_gitlab_http_status(200)
       end
@@ -356,7 +377,7 @@ describe API::V3::Github do
         project = create(:project, :repository, group: group)
         project.add_reporter(user)
 
-        get v3_api("/repos/#{group.path}/#{project.path}/commits/#{commit_id}", user)
+        jira_get v3_api("/repos/#{group.path}/#{project.path}/commits/#{commit_id}", user)
 
         expect(response).to have_gitlab_http_status(200)
       end
@@ -364,7 +385,7 @@ describe API::V3::Github do
 
     context 'unauthenticated' do
       it 'returns 401' do
-        get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}", nil)
+        jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}", nil)
 
         expect(response).to have_gitlab_http_status(401)
       end
@@ -375,7 +396,7 @@ describe API::V3::Github do
         unauthorized_user = create(:user)
         project.add_guest(unauthorized_user)
 
-        get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}",
+        jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}",
                    unauthorized_user)
 
         expect(response).to have_gitlab_http_status(404)
@@ -386,12 +407,16 @@ describe API::V3::Github do
         unauthorized_user = create(:user)
         project.add_reporter(unauthorized_user)
 
-        get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}",
+        jira_get v3_api("/repos/#{project.namespace.path}/#{project.path}/commits/#{commit_id}",
                    unauthorized_user)
 
         expect(response).to have_gitlab_http_status(404)
       end
     end
+  end
+
+  def jira_get(path, user_agent = 'JIRA DVCS Connector/3.2.4')
+    get path, headers: { 'User-Agent' => user_agent }
   end
 
   def v3_api(path, user = nil, personal_access_token: nil, oauth_access_token: nil)

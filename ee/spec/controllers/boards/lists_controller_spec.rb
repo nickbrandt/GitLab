@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Boards::ListsController do
-  let(:group) { create(:group) }
+  let(:group) { create(:group, :private) }
   let(:board)   { create(:board, group: group) }
   let(:user)    { create(:user) }
   let(:guest)   { create(:user) }
@@ -32,7 +32,7 @@ describe Boards::ListsController do
 
     context 'with unauthorized user' do
       before do
-        allow(Ability).to receive(:allowed?).with(user, :read_group, group).and_return(false)
+        group.group_member(user).destroy
       end
 
       it 'returns a forbidden 403 response' do

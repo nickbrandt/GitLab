@@ -10,7 +10,7 @@ describe API::MergeRequests do
   let!(:project)    { create(:project, :public, :repository, creator: user, namespace: user.namespace, only_allow_merge_if_pipeline_succeeds: false) }
   let(:milestone)   { create(:milestone, title: '1.0.0', project: project) }
   let(:pipeline)    { create(:ci_empty_pipeline) }
-  let(:milestone1)   { create(:milestone, title: '0.9', project: project) }
+  let(:milestone1) { create(:milestone, title: '0.9', project: project) }
   let!(:merge_request) { create(:merge_request, :simple, milestone: milestone1, author: user, assignee: user, source_project: project, target_project: project, title: "Test", created_at: base_time) }
   let!(:merge_request_closed) { create(:merge_request, state: "closed", milestone: milestone1, author: user, assignee: user, source_project: project, target_project: project, title: "Closed test", created_at: base_time + 1.second) }
   let!(:merge_request_merged) { create(:merge_request, state: "merged", author: user, assignee: user, source_project: project, target_project: project, title: "Merged test", created_at: base_time + 2.seconds, merge_commit_sha: '9999999999999999999999999999999999999999') }
@@ -258,6 +258,18 @@ describe API::MergeRequests do
           get api("/merge_requests", user), params: { search: merge_request.title }
 
           expect_response_ordered_exactly(merge_request)
+        end
+
+        it 'returns merge requests matching given search string for title and scoped in title' do
+          get api("/merge_requests", user), params: { search: merge_request.title, in: 'title' }
+
+          expect_response_ordered_exactly(merge_request)
+        end
+
+        it 'returns an empty array if no merge reques matches given search string for description and scoped in title' do
+          get api("/merge_requests", user), params: { search: merge_request.description, in: 'title' }
+
+          expect_response_contain_exactly
         end
 
         it 'returns merge requests for project matching given search string for description' do
@@ -698,7 +710,7 @@ describe API::MergeRequests do
       let!(:user2) { create(:user) }
       let(:project) { create(:project, :public, :repository) }
       let!(:forked_project) { fork_project(project, user2, repository: true) }
-      let!(:unrelated_project) { create(:project,  namespace: create(:user).namespace, creator_id: user2.id) }
+      let!(:unrelated_project) { create(:project, namespace: create(:user).namespace, creator_id: user2.id) }
 
       before do
         forked_project.add_reporter(user2)

@@ -52,6 +52,11 @@ GitLab provides solutions for [all the stages of the DevOps lifecycle](https://a
 
 ![DevOps Stages](img/devops-stages.png)
 
+GitLab is like a top-of-the-line kitchen for making software. As the executive
+chef, you decide what software you want serve. Using your recipe, GitLab handles
+all the prep work, cooking, and delivery, so you can turn around orders faster
+than ever.
+
 The following sections provide links to documentation for each DevOps stage:
 
 | DevOps Stage            | Documentation for                                           |
@@ -251,6 +256,7 @@ The following documentation relates to the DevOps **Package** stage:
 | Package Topics                                                  | Description                                            |
 |:----------------------------------------------------------------|:-------------------------------------------------------|
 | [GitLab Container Registry](user/project/container_registry.md) | Learn how to use GitLab's built-in Container Registry. |
+| [GitLab Packages](administration/packages.md) **[PREMIUM]**     | Use GitLab as an NPM registry or Maven repository.     |
 
 <div align="right">
   <a type="button" class="btn btn-default" href="#overview">

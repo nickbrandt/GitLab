@@ -13,6 +13,13 @@ module EE
         old_approvers = merge_request.overall_approvers(exclude_code_owners: true)
 
         merge_request = super(merge_request)
+        sync_approval_rules(merge_request)
+
+        if should_remove_old_approvers && merge_request.valid?
+          cleanup_approvers(merge_request, reload: true)
+        end
+
+        merge_request.reset_approval_cache!
 
         new_approvers = merge_request.overall_approvers(exclude_code_owners: true) - old_approvers
 
@@ -20,12 +27,6 @@ module EE
           todo_service.add_merge_request_approvers(merge_request, new_approvers)
           notification_service.add_merge_request_approvers(merge_request, new_approvers, current_user)
         end
-
-        if should_remove_old_approvers && merge_request.valid?
-          cleanup_approvers(merge_request, reload: true)
-        end
-
-        sync_approval_rules(merge_request)
 
         merge_request
       end
@@ -47,6 +48,7 @@ module EE
 
       # TODO remove after #1979 is closed
       def sync_approval_rules(merge_request)
+        return if ::Feature.enabled?(:approval_rules, merge_request.target_project)
         return if merge_request.merged?
         return unless merge_request.previous_changes.include?(:approvals_before_merge)
 

@@ -214,7 +214,7 @@ export default {
         }"
         class="related-issues-token-body"
       >
-        <div v-if="isFetching" class="related-issues-loading-icon">
+        <div v-if="isFetching" class="related-issues-loading-icon qa-related-issues-loading-icon">
           <gl-loading-icon
             ref="loadingIcon"
             label="Fetching related issues"

@@ -102,12 +102,16 @@ module.exports = {
       vue$: 'vue/dist/vue.esm.js',
       spec: path.join(ROOT_PATH, 'spec/javascripts'),
 
-      // EE-only
+      // EE-only start
       ee: path.join(ROOT_PATH, 'ee/app/assets/javascripts'),
       ee_empty_states: path.join(ROOT_PATH, 'ee/app/views/shared/empty_states'),
       ee_icons: path.join(ROOT_PATH, 'ee/app/views/shared/icons'),
       ee_images: path.join(ROOT_PATH, 'ee/app/assets/images'),
       ee_spec: path.join(ROOT_PATH, 'ee/spec/javascripts'),
+      // EE-only end
+
+      // the following resolves files which are different between CE and EE
+      ee_else_ce: path.join(ROOT_PATH, 'ee/app/assets/javascripts'),
     },
   },
 

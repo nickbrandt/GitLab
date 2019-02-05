@@ -106,7 +106,7 @@ describe('Feature Flags', () => {
       });
 
       it('should render the empty state', () => {
-        expect(component.$el.querySelectorAll('.js-feature-flags-empty-state')).not.toBeNull();
+        expect(component.$el.querySelector('.js-feature-flags-empty-state')).not.toBeNull();
       });
 
       it('renders configure button', () => {
@@ -115,6 +115,40 @@ describe('Feature Flags', () => {
 
       it('renders new feature flag button', () => {
         expect(component.$el.querySelector('.js-ff-new')).not.toBeNull();
+      });
+
+      describe('in all tab', () => {
+        it('renders generic title', () => {
+          expect(
+            component.$el.querySelector('.js-feature-flags-empty-state h4').textContent.trim(),
+          ).toEqual('Get started with Feature Flags');
+        });
+      });
+
+      describe('in disabled tab', () => {
+        it('renders disabled title', done => {
+          component.scope = 'disabled';
+
+          Vue.nextTick(() => {
+            expect(
+              component.$el.querySelector('.js-feature-flags-empty-state h4').textContent.trim(),
+            ).toEqual('There are no inactive Feature Flags');
+            done();
+          });
+        });
+      });
+
+      describe('in enabled tab', () => {
+        it('renders enabled title', done => {
+          component.scope = 'enabled';
+
+          Vue.nextTick(() => {
+            expect(
+              component.$el.querySelector('.js-feature-flags-empty-state h4').textContent.trim(),
+            ).toEqual('There are no active Feature Flags');
+            done();
+          });
+        });
       });
     });
 

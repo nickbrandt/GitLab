@@ -79,7 +79,7 @@ describe('Security Dashboard Table Row', () => {
       it('should fire the openModal action when clicked', () => {
         spyOn(vm.$store, 'dispatch');
 
-        vm.$el.querySelector('.js-vulnerability-info').click();
+        vm.$el.querySelector('.vulnerability-title').click();
 
         expect(vm.$store.dispatch).toHaveBeenCalledWith('vulnerabilities/openModal', {
           vulnerability,

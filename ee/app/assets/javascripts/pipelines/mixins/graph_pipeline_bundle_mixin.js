@@ -1,4 +1,5 @@
-import pipelinesKeys from 'ee/pipelines/constants';
+import flash from '~/flash';
+import { __ } from '~/locale';
 
 export default {
   methods: {
@@ -13,30 +14,35 @@ export default {
      * @param {String} resetStoreKey Store key for the visible pipeline that will need to be reset
      * @param {Object} pipeline The clicked pipeline
      */
-    clickPipeline(method, storeKey, resetStoreKey, pipeline, pollKey) {
+    clickPipeline(parentPipeline, pipeline, openMethod, closeMethod) {
       if (!pipeline.isExpanded) {
-        this.mediator[method](pipeline);
+        this.mediator.store[openMethod](parentPipeline, pipeline);
       } else {
-        this.mediator.resetPipeline(storeKey, pipeline, resetStoreKey, pollKey);
+        this.mediator.store[closeMethod](pipeline);
       }
     },
-    clickTriggered(triggered) {
+    clickTriggeredByPipeline(parentPipeline, pipeline) {
       this.clickPipeline(
-        'fetchTriggeredPipeline',
-        pipelinesKeys.triggeredPipelines,
-        pipelinesKeys.triggered,
-        triggered,
-        'pollTriggered',
+        parentPipeline,
+        pipeline,
+        'openTriggeredByPipeline',
+        'closeTriggeredByPipeline',
       );
     },
-    clickTriggeredBy(triggeredBy) {
+    clickTriggeredPipeline(parentPipeline, pipeline) {
       this.clickPipeline(
-        'fetchTriggeredByPipeline',
-        pipelinesKeys.triggeredByPipelines,
-        pipelinesKeys.triggeredBy,
-        triggeredBy,
-        'pollTriggeredBy',
+        parentPipeline,
+        pipeline,
+        'openTriggeredPipeline',
+        'closeTriggeredPipeline',
       );
+    },
+    requestRefreshPipelineGraph() {
+      // When an action is clicked
+      // (wether in the dropdown or in the main nodes, we refresh the big graph)
+      this.mediator
+        .refreshPipeline()
+        .catch(() => flash(__('An error occurred while making the request.')));
     },
   },
 };

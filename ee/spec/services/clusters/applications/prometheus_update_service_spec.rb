@@ -42,7 +42,7 @@ describe Clusters::Applications::PrometheusUpdateService do
 
         expect(Clusters::Applications::PrometheusConfigService)
           .to receive(:new)
-          .with(project, cluster)
+          .with(project, cluster, application)
           .and_return(prometheus_config_service)
 
         expect(prometheus_config_service)

@@ -10,10 +10,10 @@ Vue.use(Vuex);
 
 const createStore = () =>
   new Vuex.Store({
+    state: state(),
     actions,
     getters,
     mutations,
-    state,
   });
 
 export default createStore;

@@ -1,0 +1,5 @@
+---
+title: Refactored Epic app in Vuex for better performance and maintenance
+merge_request: 9361
+author:
+type: performance

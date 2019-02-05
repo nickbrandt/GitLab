@@ -35,7 +35,8 @@ module Geo
 
         # rubocop: disable CodeReuse/ActiveRecord
         def load_pending_resources
-          finder.find_registries_to_verify(batch_size: db_retrieve_batch_size).pluck(:id)
+          finder.find_registries_to_verify(shard_name: shard_name, batch_size: db_retrieve_batch_size)
+                .pluck(:id)
         end
         # rubocop: enable CodeReuse/ActiveRecord
 
@@ -46,7 +47,7 @@ module Geo
         end
 
         def finder
-          @finder ||= Geo::ProjectRegistryFinder.new
+          @finder ||= Geo::ProjectRegistryFinder.new(current_node: current_node)
         end
       end
     end

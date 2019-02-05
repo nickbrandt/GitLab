@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe EpicsFinder do
-  let(:user) { create(:user)  }
-  let(:search_user) { create(:user)  }
+  let(:user) { create(:user) }
+  let(:search_user) { create(:user) }
   let(:group) { create(:group, :private) }
   let(:another_group) { create(:group) }
   let!(:epic1) { create(:epic, :opened, group: group, title: 'This is awesome epic', created_at: 1.week.ago) }

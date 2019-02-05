@@ -77,7 +77,7 @@ describe 'Projects > Audit Events', :js do
       visit project_deploy_keys_path(project)
 
       accept_confirm do
-        find('.ic-remove').click()
+        find('.ic-remove').click
       end
 
       wait_for_all_requests

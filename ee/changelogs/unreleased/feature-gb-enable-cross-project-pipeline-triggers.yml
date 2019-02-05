@@ -1,0 +1,5 @@
+---
+title: Cross-project pipelines support in .gitlab-ci.yml
+merge_request: 9374
+author:
+type: added

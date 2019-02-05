@@ -2,22 +2,21 @@
 // ee-only
 import DashboardMixin from 'ee/monitoring/components/dashboard_mixin';
 
-import _ from 'underscore';
 import { s__ } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 import Flash from '../../flash';
 import MonitoringService from '../services/monitoring_service';
 import MonitorAreaChart from './charts/area.vue';
 import GraphGroup from './graph_group.vue';
-import Graph from './graph.vue';
 import EmptyState from './empty_state.vue';
 import MonitoringStore from '../stores/monitoring_store';
-import eventHub from '../event_hub';
+
+const sidebarAnimationDuration = 150;
+let sidebarMutationObserver;
 
 export default {
   components: {
     MonitorAreaChart,
-    Graph,
     GraphGroup,
     EmptyState,
     Icon,
@@ -32,20 +31,10 @@ export default {
       required: false,
       default: true,
     },
-    showLegend: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
     showPanels: {
       type: Boolean,
       required: false,
       default: true,
-    },
-    forceSmallGraph: {
-      type: Boolean,
-      required: false,
-      default: false,
     },
     documentationPath: {
       type: String,
@@ -111,17 +100,8 @@ export default {
       store: new MonitoringStore(),
       state: 'gettingStarted',
       showEmptyState: true,
-      hoverData: {},
       elWidth: 0,
     };
-  },
-  computed: {
-    graphComponent() {
-      return gon.features && gon.features.areaChart ? MonitorAreaChart : Graph;
-    },
-    forceRedraw() {
-      return this.elWidth;
-    },
   },
   created() {
     this.service = new MonitoringService({
@@ -129,20 +109,13 @@ export default {
       deploymentEndpoint: this.deploymentEndpoint,
       environmentsEndpoint: this.environmentsEndpoint,
     });
-    this.mutationObserverConfig = {
-      attributes: true,
-      childList: false,
-      subtree: false,
-    };
-    eventHub.$on('hoverChanged', this.hoverChanged);
   },
   beforeDestroy() {
-    eventHub.$off('hoverChanged', this.hoverChanged);
-    window.removeEventListener('resize', this.resizeThrottled, false);
-    this.sidebarMutationObserver.disconnect();
+    if (sidebarMutationObserver) {
+      sidebarMutationObserver.disconnect();
+    }
   },
   mounted() {
-    this.resizeThrottled = _.debounce(this.resize, 100);
     this.servicePromises = [
       this.service
         .getGraphsData()
@@ -167,12 +140,12 @@ export default {
         );
       }
       this.getGraphsData();
-      window.addEventListener('resize', this.resizeThrottled, false);
-
-      const sidebarEl = document.querySelector('.nav-sidebar');
-      // The sidebar listener
-      this.sidebarMutationObserver = new MutationObserver(this.resizeThrottled);
-      this.sidebarMutationObserver.observe(sidebarEl, this.mutationObserverConfig);
+      sidebarMutationObserver = new MutationObserver(this.onSidebarMutation);
+      sidebarMutationObserver.observe(document.querySelector('.layout-page'), {
+        attributes: true,
+        childList: false,
+        subtree: false,
+      });
     }
   },
   methods: {
@@ -190,23 +163,21 @@ export default {
 
           this.showEmptyState = false;
         })
-        .then(this.resize)
         .catch(() => {
           this.state = 'unableToConnect';
         });
     },
-    resize() {
-      this.elWidth = this.$el.clientWidth;
-    },
-    hoverChanged(data) {
-      this.hoverData = data;
+    onSidebarMutation() {
+      setTimeout(() => {
+        this.elWidth = this.$el.clientWidth;
+      }, sidebarAnimationDuration);
     },
   },
 };
 </script>
 
 <template>
-  <div v-if="!showEmptyState" :key="forceRedraw" class="prometheus-graphs prepend-top-default">
+  <div v-if="!showEmptyState" class="prometheus-graphs prepend-top-default">
     <div v-if="showEnvironmentDropdown" class="environments d-flex align-items-center">
       {{ s__('Metrics|Environment') }}
       <div class="dropdown prepend-left-10">
@@ -218,13 +189,13 @@ export default {
           class="dropdown-menu dropdown-menu-selectable dropdown-menu-drop-up"
         >
           <ul>
-            <li v-for="environment in store.environmentsData" :key="environment.latest.id">
+            <li v-for="environment in store.environmentsData" :key="environment.id">
               <a
-                :href="environment.latest.metrics_path"
-                :class="{ 'is-active': environment.latest.name == currentEnvironmentName }"
+                :href="environment.metrics_path"
+                :class="{ 'is-active': environment.name == currentEnvironmentName }"
                 class="dropdown-item"
               >
-                {{ environment.latest.name }}
+                {{ environment.name }}
               </a>
             </li>
           </ul>
@@ -237,30 +208,16 @@ export default {
       :name="groupData.group"
       :show-panels="showPanels"
     >
-      <component
-        :is="graphComponent"
+      <monitor-area-chart
         v-for="(graphData, graphIndex) in groupData.metrics"
         :key="graphIndex"
         :graph-data="graphData"
-        :hover-data="hoverData"
         :deployment-data="store.deploymentData"
-        :project-path="projectPath"
-        :tags-path="tagsPath"
-        :show-legend="showLegend"
-        :small-graph="forceSmallGraph"
         :alert-data="getGraphAlerts(graphData.id)"
+        :container-width="elWidth"
         group-id="monitor-area-chart"
       >
         <!-- EE content -->
-        <template slot="additionalSvgContent" scope="{ graphDrawData }">
-          <threshold-lines
-            v-for="(alert, alertName) in alertData[graphData.id]"
-            :key="alertName"
-            :operator="alert.operator"
-            :threshold="alert.threshold"
-            :graph-draw-data="graphDrawData"
-          />
-        </template>
         <alert-widget
           v-if="alertsEndpoint && graphData.id"
           :alerts-endpoint="alertsEndpoint"
@@ -270,7 +227,7 @@ export default {
           :alert-data="alertData[graphData.id]"
           @setAlerts="setAlerts"
         />
-      </component>
+      </monitor-area-chart>
     </graph-group>
   </div>
   <empty-state

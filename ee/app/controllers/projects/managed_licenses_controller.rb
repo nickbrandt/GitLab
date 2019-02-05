@@ -29,7 +29,7 @@ class Projects::ManagedLicensesController < Projects::ApplicationController
     result = SoftwareLicensePolicies::CreateService.new(
       @project,
       current_user,
-      software_license_policies_params
+      software_license_policies_params.to_h
     ).execute
 
     if result[:status] == :success
@@ -52,7 +52,7 @@ class Projects::ManagedLicensesController < Projects::ApplicationController
     result = SoftwareLicensePolicies::UpdateService.new(
       @project,
       current_user,
-      software_license_policies_params
+      software_license_policies_params.to_h
     ).execute(@software_license_policy)
 
     if result[:status] == :success

@@ -25,7 +25,7 @@ module SystemCheck
       end
 
       def check?
-        Gitlab::Geo::Fdw.fdw_up_to_date?
+        Gitlab::Geo::Fdw.foreign_tables_up_to_date?
       end
 
       def show_error

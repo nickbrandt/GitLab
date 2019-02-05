@@ -7,7 +7,7 @@ Settings.ldap['enabled'] = false if Settings.ldap['enabled'].nil?
 Settings.ldap['sync_time'] = 3600 if Settings.ldap['sync_time'].nil?
 Settings.ldap['schedule_sync_daily'] = 1 if Settings.ldap['schedule_sync_daily'].nil?
 Settings.ldap['schedule_sync_hour'] = 1 if Settings.ldap['schedule_sync_hour'].nil?
-Settings.ldap['schedule_sync_minute'] = 30  if Settings.ldap['schedule_sync_minute'].nil?
+Settings.ldap['schedule_sync_minute'] = 30 if Settings.ldap['schedule_sync_minute'].nil?
 
 # backwards compatibility, we only have one host
 if Settings.ldap['enabled'] || Rails.env.test?
@@ -27,6 +27,7 @@ if Settings.ldap['enabled'] || Rails.env.test?
     server['timeout'] ||= 10.seconds
     server['block_auto_created_users'] = false if server['block_auto_created_users'].nil?
     server['allow_username_or_email_login'] = false if server['allow_username_or_email_login'].nil?
+    server['smartcard_auth'] = false unless %w[optional required].include?(server['smartcard_auth'])
     server['active_directory'] = true if server['active_directory'].nil?
     server['attributes'] = {} if server['attributes'].nil?
     server['lowercase_usernames'] = false if server['lowercase_usernames'].nil?
@@ -52,6 +53,7 @@ end
 
 Settings['smartcard'] ||= Settingslogic.new({})
 Settings.smartcard['enabled'] = false if Settings.smartcard['enabled'].nil?
+Settings.smartcard['client_certificate_required_port'] = 3444 if Settings.smartcard['client_certificate_required_port'].nil?
 
 Settings['omniauth'] ||= Settingslogic.new({})
 Settings.omniauth['enabled'] = true if Settings.omniauth['enabled'].nil?

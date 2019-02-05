@@ -42,17 +42,3 @@
                   placement: "left",
                   container: '#configure-feature-flags-modal',
                   class: "input-group-text btn btn-default")
-
-          .form-group
-            = label_tag :application_name, s_('FeatureFlags|Application name'), class: 'label-bold'
-            .input-group
-              = text_field_tag :application_name,
-                "production",
-                readonly: true,
-                class: "form-control js-select-on-focus"
-              %span.input-group-append
-                = clipboard_button(target: '#application_name',
-                  title: _("Copy name to clipboard"),
-                  placement: "left",
-                  container: '#configure-feature-flags-modal',
-                  class: "input-group-text btn btn-default")
