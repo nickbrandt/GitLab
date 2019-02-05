@@ -127,33 +127,7 @@ describe ApprovalState do
     end
 
     describe '#approved?' do
-      context 'when no rules' do
-        before do
-          project.update(approvals_before_merge: 1)
-        end
-
-        context 'when overall_approvals_required is not met' do
-          it 'returns false' do
-            expect(subject.wrapped_approval_rules.size).to eq(0)
-            expect(subject.approved?).to eq(false)
-          end
-        end
-
-        context 'when overall_approvals_required is met' do
-          it 'returns true' do
-            create(:approval, merge_request: merge_request)
-
-            expect(subject.wrapped_approval_rules.size).to eq(0)
-            expect(subject.approved?).to eq(true)
-          end
-        end
-      end
-
-      context 'when rules are present' do
-        before do
-          2.times { create_rule(users: [create(:user)]) }
-        end
-
+      shared_examples_for 'when rules are present' do
         context 'when all rules are approved' do
           before do
             subject.wrapped_approval_rules.each do |rule|
@@ -163,16 +137,6 @@ describe ApprovalState do
 
           it 'returns true' do
             expect(subject.approved?).to eq(true)
-          end
-
-          context 'when overall_approvals_required is not met' do
-            before do
-              project.update(approvals_before_merge: 3)
-            end
-
-            it 'returns false' do
-              expect(subject.approved?).to eq(false)
-            end
           end
         end
 
@@ -186,35 +150,83 @@ describe ApprovalState do
           end
         end
       end
+
+      shared_examples_for 'checking fallback_approvals_required' do
+        before do
+          project.update(approvals_before_merge: 1)
+
+          subject.wrapped_approval_rules.each do |rule|
+            allow(rule).to receive(:approved?).and_return(true)
+          end
+        end
+
+        context 'when it is not met' do
+          it 'returns false' do
+            expect(subject.approved?).to eq(false)
+          end
+        end
+
+        context 'when it is met' do
+          it 'returns true' do
+            create(:approval, merge_request: merge_request)
+
+            expect(subject.approved?).to eq(true)
+          end
+        end
+      end
+
+      context 'when no rules' do
+        it_behaves_like 'checking fallback_approvals_required'
+      end
+
+      context 'when only code owner rules present' do
+        before do
+          2.times { create_rule(users: [create(:user)], code_owner: true) }
+        end
+
+        it_behaves_like 'when rules are present'
+        it_behaves_like 'checking fallback_approvals_required'
+      end
+
+      context 'when regular rules present' do
+        before do
+          project.update(approvals_before_merge: 999)
+          2.times { create_rule(users: [create(:user)]) }
+        end
+
+        it_behaves_like 'when rules are present'
+      end
     end
 
     describe '#any_approver_allowed?' do
-      context 'when approved' do
-        before do
-          allow(subject).to receive(:approved?).and_return(true)
-        end
-
+      context 'when no rules' do
         it 'returns true' do
           expect(subject.any_approver_allowed?).to eq(true)
         end
       end
 
-      context 'when not approved' do
+      context 'when with rules' do
         before do
-          allow(subject).to receive(:approved?).and_return(false)
+          create_rule(approvals_required: 1, users: [approver1])
         end
 
-        it 'returns false' do
-          expect(subject.approved?).to eq(false)
-        end
-
-        context 'when overall_approvals_required cannot be met' do
+        context 'when approved' do
           before do
-            project.update(approvals_before_merge: 1)
+            allow(subject).to receive(:approved?).and_return(true)
+          end
+
+          it 'returns true' do
+            expect(subject.any_approver_allowed?).to eq(true)
+          end
+        end
+
+        context 'when not approved' do
+          before do
+            allow(subject).to receive(:approved?).and_return(false)
           end
 
           it 'returns false' do
-            expect(subject.any_approver_allowed?).to eq(true)
+            expect(subject.approved?).to eq(false)
           end
         end
       end
@@ -671,33 +683,7 @@ describe ApprovalState do
     end
 
     describe '#approved?' do
-      context 'when no rules' do
-        before do
-          project.update(approvals_before_merge: 1)
-        end
-
-        context 'when overall_approvals_required is not met' do
-          it 'returns false' do
-            expect(subject.wrapped_approval_rules.size).to eq(0)
-            expect(subject.approved?).to eq(false)
-          end
-        end
-
-        context 'when overall_approvals_required is met' do
-          it 'returns true' do
-            create(:approval, merge_request: merge_request)
-
-            expect(subject.wrapped_approval_rules.size).to eq(0)
-            expect(subject.approved?).to eq(true)
-          end
-        end
-      end
-
-      context 'when rules are present' do
-        before do
-          2.times { create_rule(users: [create(:user)]) }
-        end
-
+      shared_examples_for 'when rules are present' do
         context 'when all rules are approved' do
           before do
             subject.wrapped_approval_rules.each do |rule|
@@ -707,16 +693,6 @@ describe ApprovalState do
 
           it 'returns true' do
             expect(subject.approved?).to eq(true)
-          end
-
-          context 'when overall_approvals_required is not met' do
-            before do
-              project.update(approvals_before_merge: 3)
-            end
-
-            it 'returns false' do
-              expect(subject.approved?).to eq(false)
-            end
           end
         end
 
@@ -729,6 +705,52 @@ describe ApprovalState do
             expect(subject.approved?).to eq(false)
           end
         end
+      end
+
+      shared_examples_for 'checking fallback_approvals_required' do
+        before do
+          project.update(approvals_before_merge: 1)
+
+          subject.wrapped_approval_rules.each do |rule|
+            allow(rule).to receive(:approved?).and_return(true)
+          end
+        end
+
+        context 'when it is not met' do
+          it 'returns false' do
+            expect(subject.approved?).to eq(false)
+          end
+        end
+
+        context 'when it is met' do
+          it 'returns true' do
+            create(:approval, merge_request: merge_request)
+
+            expect(subject.approved?).to eq(true)
+          end
+        end
+      end
+
+      context 'when no rules' do
+        it_behaves_like 'checking fallback_approvals_required'
+      end
+
+      context 'when only code owner rules present' do
+        before do
+          2.times { create_rule(users: [create(:user)], code_owner: true) }
+        end
+
+        it_behaves_like 'when rules are present'
+        it_behaves_like 'checking fallback_approvals_required'
+      end
+
+      context 'when regular rules present' do
+        before do
+          project.update(approvals_before_merge: 999)
+          2.times { create_rule(users: [create(:user)]) }
+        end
+
+        it_behaves_like 'when rules are present'
       end
     end
 
@@ -750,16 +772,6 @@ describe ApprovalState do
 
         it 'returns false' do
           expect(subject.approved?).to eq(false)
-        end
-
-        context 'when overall_approvals_required cannot be met' do
-          before do
-            project.update(approvals_before_merge: 1)
-          end
-
-          it 'returns false' do
-            expect(subject.any_approver_allowed?).to eq(true)
-          end
         end
       end
     end

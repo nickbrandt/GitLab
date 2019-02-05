@@ -17,6 +17,88 @@ describe MergeRequest do
     it { is_expected.to have_many(:approved_by_users) }
   end
 
+  describe 'approval_rules' do
+    context 'when project contains approval_rules' do
+      let!(:project_rule1) {  project.approval_rules.create(name: 'p1') }
+      let!(:project_rule2) {  project.approval_rules.create(name: 'p2') }
+
+      context "when creating" do
+        subject(:merge_request) { build(:merge_request, source_project: project, target_project: project) }
+
+        context "when MR has no rule" do
+          it 'is valid as project rule will be active' do
+            expect(merge_request).to be_valid
+          end
+        end
+
+        context "when MR rules exists but do not reference all project rules" do
+          it 'is invalid' do
+            merge_request.approval_rules.build(name: 'mr1', approval_project_rule_id: project_rule1.id)
+
+            expect(merge_request).to be_invalid
+            expect(merge_request.errors.added?(:approval_rules, :invalid_sourcing_to_project_rules)).to eq(true)
+          end
+        end
+
+        context "when MR rules exists but reference rules other than the project's" do
+          let(:other_project_rule) { create(:approval_project_rule) }
+
+          it 'is invalid' do
+            merge_request.approval_rules.build(name: 'mr1', approval_project_rule_id: project_rule1.id)
+            merge_request.approval_rules.build(name: 'mr2', approval_project_rule_id: project_rule2.id)
+            merge_request.approval_rules.build(name: 'mr3', approval_project_rule_id: other_project_rule.id)
+
+            expect(merge_request).to be_invalid
+            expect(merge_request.errors.added?(:approval_rules, :invalid_sourcing_to_project_rules)).to eq(true)
+          end
+        end
+
+        context "when MR's rules exists and reference all project's rules" do
+          it 'is valid' do
+            merge_request.approval_rules.build(name: 'mr1', approval_project_rule_id: project_rule1.id)
+            merge_request.approval_rules.build(name: 'mr2', approval_project_rule_id: project_rule2.id)
+
+            expect(merge_request).to be_valid
+          end
+        end
+      end
+
+      context "when updating" do
+        subject!(:merge_request) do
+          merge_request = build(:merge_request, source_project: project, target_project: project)
+          merge_request.approval_rules.build(name: 'mr1', approval_project_rule_id: project_rule1.id)
+          merge_request.approval_rules.build(name: 'mr2', approval_project_rule_id: project_rule2.id)
+          merge_request.save!
+          merge_request
+        end
+
+        context "when MR rules reference rules other than the project's" do
+          let(:other_project_rule) { create(:approval_project_rule) }
+
+          it 'is invalid' do
+            merge_request.approval_rules.build(name: 'mr3', approval_project_rule_id: other_project_rule.id)
+
+            expect(merge_request).to be_invalid
+            expect(merge_request.errors.added?(:approval_rules, :invalid_sourcing_to_project_rules)).to eq(true)
+          end
+        end
+
+        context 'when project later added a new rule' do
+          before do
+            project.approval_rules.create(name: 'p3')
+          end
+
+          it 'can still be saved' do
+            subject.reload
+            subject.title = 'foobar'
+
+            expect(subject.save).to eq(true)
+          end
+        end
+      end
+    end
+  end
+
   describe 'approvals' do
     shared_examples_for 'authors self-approval authorization' do
       context 'when authors are authorized to approve their own MRs' do

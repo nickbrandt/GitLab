@@ -129,6 +129,10 @@
     "approvals_before_merge": { "type": ["integer", "null"] },
     "approved": { "type": "boolean" },
     "approvals_path": { "type": ["string", "null"] },
+    "api_approvals_path": { "type": ["string", "null"] },
+    "api_approval_settings_path": { "type": ["string", "null"] },
+    "api_approve_path": { "type": ["string", "null"] },
+    "api_unapprove_path": { "type": ["string", "null"] },
     "codeclimate": {
       "head_path": { "type": "string" },
       "base_path": { "type": "string" }

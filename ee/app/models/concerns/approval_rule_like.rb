@@ -12,7 +12,7 @@ module ApprovalRuleLike
     has_many :group_users, -> { distinct }, through: :groups, source: :users
 
     validates :name, presence: true
-    validates :approvals_required, numericality: { less_than_or_equal_to: APPROVALS_REQUIRED_MAX }
+    validates :approvals_required, numericality: { less_than_or_equal_to: APPROVALS_REQUIRED_MAX, greater_than_or_equal_to: 0 }
   end
 
   # Users who are eligible to approve, including specified group members.
