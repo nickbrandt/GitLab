@@ -3395,6 +3395,12 @@ msgstr ""
 msgid "Ends at (UTC)"
 msgstr ""
 
+msgid "Enforce SSO-only authentication for this group"
+msgstr ""
+
+msgid "Enforced SSO"
+msgstr ""
+
 msgid "Enter in your Bitbucket Server URL and personal access token below"
 msgstr ""
 
