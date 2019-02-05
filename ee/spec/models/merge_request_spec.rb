@@ -348,7 +348,7 @@ describe MergeRequest do
     let(:code_owners) { create_list(:user, 2) }
 
     let!(:regular_rule) { create(:approval_merge_request_rule, merge_request: merge_request, users: approvers) }
-    let!(:code_owner_rule) { create(:approval_merge_request_rule, merge_request: merge_request, users: code_owners, code_owner: true) }
+    let!(:code_owner_rule) { create(:code_owner_rule, merge_request: merge_request, users: code_owners) }
 
     let!(:approval) { create(:approval, merge_request: merge_request, user: approvers.last) }
 

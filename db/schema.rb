@@ -233,6 +233,7 @@ ActiveRecord::Schema.define(version: 20190131122559) do
     t.integer "approvals_required", limit: 2, default: 0, null: false
     t.boolean "code_owner", default: false, null: false
     t.string "name", null: false
+    t.index ["merge_request_id", "code_owner", "name"], name: "approval_rule_name_index_for_code_owners", unique: true, where: "(code_owner = true)", using: :btree
     t.index ["merge_request_id", "code_owner"], name: "index_approval_merge_request_rules_1", using: :btree
   end
 

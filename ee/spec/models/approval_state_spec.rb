@@ -4,10 +4,10 @@ require 'spec_helper'
 
 describe ApprovalState do
   def create_rule(additional_params = {})
-    create(
-      :approval_merge_request_rule,
-      additional_params.merge(merge_request: merge_request)
-    )
+    params = additional_params.merge(merge_request: merge_request)
+    factory = params.delete(:code_owner) ? :code_owner_rule : :approval_merge_request_rule
+
+    create(factory, params)
   end
 
   let(:merge_request) { create(:merge_request) }
