@@ -515,7 +515,7 @@ describe Geo::ProjectRegistryFinder, :geo do
       it 'delegates to the correct method' do
         expect(subject).to receive("#{method_prefix}_find_registries_to_verify".to_sym).and_call_original
 
-        subject.find_registries_to_verify(batch_size: 10)
+        subject.find_registries_to_verify(shard_name: 'default', batch_size: 10)
       end
 
       it 'does not return registries that are verified on primary and secondary' do
@@ -527,7 +527,7 @@ describe Geo::ProjectRegistryFinder, :geo do
         create(:geo_project_registry, :repository_verified, project: repository_verified)
         create(:geo_project_registry, :wiki_verified, project: wiki_verified)
 
-        expect(subject.find_registries_to_verify(batch_size: 100)).to be_empty
+        expect(subject.find_registries_to_verify(shard_name: 'default', batch_size: 100)).to be_empty
       end
 
       it 'does not return registries that were unverified/outdated on primary' do
@@ -541,7 +541,7 @@ describe Geo::ProjectRegistryFinder, :geo do
         create(:geo_project_registry, :repository_verified, :wiki_verified, project: repository_outdated_primary)
         create(:geo_project_registry, :repository_verified, :wiki_verified, project: wiki_outdated_primary)
 
-        expect(subject.find_registries_to_verify(batch_size: 100)).to be_empty
+        expect(subject.find_registries_to_verify(shard_name: 'default', batch_size: 100)).to be_empty
       end
 
       it 'returns registries that were unverified/outdated on secondary' do
@@ -556,7 +556,7 @@ describe Geo::ProjectRegistryFinder, :geo do
         registry_repository_outdated_secondary = create(:geo_project_registry, :synced, :repository_verification_outdated, :wiki_verified, project: repository_outdated_secondary)
         registry_wiki_outdated_secondary       = create(:geo_project_registry, :synced, :repository_verified, :wiki_verification_outdated, project: wiki_outdated_secondary)
 
-        expect(subject.find_registries_to_verify(batch_size: 100))
+        expect(subject.find_registries_to_verify(shard_name: 'default', batch_size: 100))
           .to match_array([
             registry_unverified_secondary,
             registry_outdated_secondary,
@@ -570,7 +570,7 @@ describe Geo::ProjectRegistryFinder, :geo do
 
         create(:geo_project_registry, project: verification_failed_primary)
 
-        expect(subject.find_registries_to_verify(batch_size: 100)).to be_empty
+        expect(subject.find_registries_to_verify(shard_name: 'default', batch_size: 100)).to be_empty
       end
 
       it 'returns registries where one failed and one verified on the primary' do
@@ -582,7 +582,7 @@ describe Geo::ProjectRegistryFinder, :geo do
         registry_repository_failed_primary = create(:geo_project_registry, :synced, project: repository_failed_primary)
         registry_wiki_failed_primary       = create(:geo_project_registry, :synced, project: wiki_failed_primary)
 
-        expect(subject.find_registries_to_verify(batch_size: 100))
+        expect(subject.find_registries_to_verify(shard_name: 'default', batch_size: 100))
           .to match_array([
             registry_repository_failed_primary,
             registry_wiki_failed_primary
@@ -599,35 +599,35 @@ describe Geo::ProjectRegistryFinder, :geo do
         create(:geo_project_registry, :repository_verification_failed, project: repository_failed_secondary)
         create(:geo_project_registry, :wiki_verification_failed, project: wiki_failed_secondary)
 
-        expect(subject.find_registries_to_verify(batch_size: 100)).to be_empty
+        expect(subject.find_registries_to_verify(shard_name: 'default', batch_size: 100)).to be_empty
       end
 
       it 'does not return registries when the repo needs to be resynced' do
         project_verified = create(:repository_state, :repository_verified).project
         create(:geo_project_registry, :repository_sync_failed, project: project_verified)
 
-        expect(subject.find_registries_to_verify(batch_size: 100)).to be_empty
+        expect(subject.find_registries_to_verify(shard_name: 'default', batch_size: 100)).to be_empty
       end
 
       it 'does not return registries when the wiki needs to be resynced' do
         project_verified = create(:repository_state, :wiki_verified).project
         create(:geo_project_registry, :wiki_sync_failed, project: project_verified)
 
-        expect(subject.find_registries_to_verify(batch_size: 100)).to be_empty
+        expect(subject.find_registries_to_verify(shard_name: 'default', batch_size: 100)).to be_empty
       end
 
       it 'does not return registries when the repository is missing on primary' do
         project_verified = create(:repository_state, :repository_verified).project
         create(:geo_project_registry, :synced, project: project_verified, repository_missing_on_primary: true)
 
-        expect(subject.find_registries_to_verify(batch_size: 100)).to be_empty
+        expect(subject.find_registries_to_verify(shard_name: 'default', batch_size: 100)).to be_empty
       end
 
       it 'does not return registries when the wiki is missing on primary' do
         project_verified = create(:repository_state, :wiki_verified).project
         create(:geo_project_registry, :synced, project: project_verified, wiki_missing_on_primary: true)
 
-        expect(subject.find_registries_to_verify(batch_size: 100)).to be_empty
+        expect(subject.find_registries_to_verify(shard_name: 'default', batch_size: 100)).to be_empty
       end
     end
   end

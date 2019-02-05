@@ -107,11 +107,11 @@ module Geo
     end
 
     # Find all registries that need a repository or wiki verification
-    def find_registries_to_verify(batch_size:)
+    def find_registries_to_verify(shard_name:, batch_size:)
       if use_legacy_queries?
-        legacy_find_registries_to_verify(batch_size: batch_size)
+        legacy_find_registries_to_verify(shard_name: shard_name, batch_size: batch_size)
       else
-        fdw_find_registries_to_verify(batch_size: batch_size)
+        fdw_find_registries_to_verify(shard_name: shard_name, batch_size: batch_size)
       end
     end
 
@@ -191,7 +191,7 @@ module Geo
     # @return [ActiveRecord::Relation<Geo::Fdw::Project>]
     # rubocop: disable CodeReuse/ActiveRecord
     def fdw_find_unsynced_projects
-      Geo::Fdw::Project.joins("LEFT OUTER JOIN project_registry ON project_registry.project_id = #{fdw_project_table}.id")
+      Geo::Fdw::Project.joins("LEFT OUTER JOIN project_registry ON project_registry.project_id = #{fdw_project_table.name}.id")
         .where(project_registry: { project_id: nil })
     end
     # rubocop: enable CodeReuse/ActiveRecord
@@ -204,7 +204,7 @@ module Geo
     # @return [ActiveRecord::Relation<Geo::Fdw::Project>]
     # rubocop: disable CodeReuse/ActiveRecord
     def fdw_find_projects_updated_recently
-      Geo::Fdw::Project.joins("INNER JOIN project_registry ON project_registry.project_id = #{fdw_project_table}.id")
+      Geo::Fdw::Project.joins("INNER JOIN project_registry ON project_registry.project_id = #{fdw_project_table.name}.id")
           .merge(Geo::ProjectRegistry.dirty)
           .merge(Geo::ProjectRegistry.retry_due)
     end
@@ -213,17 +213,20 @@ module Geo
     # Find all registries that repository or wiki need verification
     # @return [ActiveRecord::Relation<Geo::ProjectRegistry>] list of registries that need verification
     # rubocop: disable CodeReuse/ActiveRecord
-    def fdw_find_registries_to_verify(batch_size:)
+    def fdw_find_registries_to_verify(shard_name:, batch_size:)
       repo_condition =
         local_repo_condition
           .and(fdw_repository_state_table[:repository_verification_checksum].not_eq(nil))
+
       wiki_condition =
         local_wiki_condition
           .and(fdw_repository_state_table[:wiki_verification_checksum].not_eq(nil))
 
       Geo::ProjectRegistry
+        .joins(fdw_inner_join_projects)
         .joins(fdw_inner_join_repository_state)
         .where(repo_condition.or(wiki_condition))
+        .where(fdw_project_table[:repository_storage].eq(shard_name))
         .limit(batch_size)
     end
     # rubocop: enable CodeReuse/ActiveRecord
@@ -231,6 +234,13 @@ module Geo
     # @return [ActiveRecord::Relation<Geo::ProjectRegistry>]
     def fdw_find_verified_wikis
       Geo::ProjectRegistry.verified_wikis
+    end
+
+    def fdw_inner_join_projects
+      local_registry_table
+        .join(fdw_project_table, Arel::Nodes::InnerJoin)
+        .on(local_registry_table[:project_id].eq(fdw_project_table[:id]))
+        .join_sources
     end
 
     def fdw_inner_join_repository_state
@@ -361,7 +371,7 @@ module Geo
 
     # @return [ActiveRecord::Relation<Geo::ProjectRegistry>] list of registries that need verification
     # rubocop: disable CodeReuse/ActiveRecord
-    def legacy_find_registries_to_verify(batch_size:)
+    def legacy_find_registries_to_verify(shard_name:, batch_size:)
       registries = Geo::ProjectRegistry
         .where(local_repo_condition.or(local_wiki_condition))
         .pluck(:project_id, local_repo_condition.to_sql, local_wiki_condition.to_sql)
@@ -383,6 +393,8 @@ module Geo
         SQL_REPO
 
       project_ids = joined_relation
+        .joins(:project)
+        .where(projects: { repository_storage: shard_name })
         .where(
           legacy_repository_state_table[:repository_verification_checksum].not_eq(nil)
             .and(project_registry_sync_table[:want_to_sync_repo].eq(true))
@@ -400,7 +412,7 @@ module Geo
     end
 
     def fdw_project_table
-      Geo::Fdw::Project.table_name
+      Geo::Fdw::Project.arel_table
     end
 
     def fdw_repository_state_table
