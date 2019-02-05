@@ -23,11 +23,18 @@ module EpicLinks
         return [] unless can?(current_user, :admin_epic, issuable.group)
 
         epics.select do |epic|
-          issuable_group_descendants.include?(epic.group) &&
-            !previous_related_issuables.include?(epic) &&
-            !level_depth_exceeded?(epic)
+          linkable_epic?(epic)
         end
       end
+    end
+
+    def linkable_epic?(epic)
+      return false if epic == issuable
+      return false if previous_related_issuables.include?(epic)
+      return false if level_depth_exceeded?(epic)
+      return false if issuable.has_ancestor?(epic)
+
+      issuable_group_descendants.include?(epic.group)
     end
 
     def references(extractor)
