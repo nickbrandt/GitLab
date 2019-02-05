@@ -5,7 +5,10 @@ module EE
     module Ci
       module Pipeline
         module Chain
-          class RemoveUnwantedChatJobs < ::Gitlab::Ci::Pipeline::Chain::Base
+          module RemoveUnwantedChatJobs
+            extend ::Gitlab::Utils::Override
+
+            override :perform!
             def perform!
               return unless pipeline.config_processor && pipeline.chat?
 
@@ -14,10 +17,6 @@ module EE
               pipeline.config_processor.jobs.select! do |name, _|
                 name.to_s == command.chat_data[:command].to_s
               end
-            end
-
-            def break?
-              false
             end
           end
         end

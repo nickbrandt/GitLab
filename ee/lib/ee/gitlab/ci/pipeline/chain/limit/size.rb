@@ -6,8 +6,12 @@ module EE
       module Pipeline
         module Chain
           module Limit
-            class Size < ::Gitlab::Ci::Pipeline::Chain::Base
+            module Size
+              extend ::Gitlab::Utils::Override
               include ::Gitlab::Ci::Pipeline::Chain::Helpers
+
+              attr_reader :limit
+              private :limit
 
               def initialize(*)
                 super
@@ -16,18 +20,20 @@ module EE
                   .new(project.namespace, pipeline)
               end
 
+              override :perform!
               def perform!
-                return unless @limit.exceeded?
+                return unless limit.exceeded?
 
-                if @command.save_incompleted
-                  @pipeline.drop!(:size_limit_exceeded)
+                if command.save_incompleted
+                  pipeline.drop!(:size_limit_exceeded)
                 end
 
-                error(@limit.message)
+                error(limit.message)
               end
 
+              override :break?
               def break?
-                @limit.exceeded?
+                limit.exceeded?
               end
             end
           end
