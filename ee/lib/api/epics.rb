@@ -9,46 +9,8 @@ module API
       authorize_epics_feature!
     end
 
+    helpers ::API::Helpers::EpicsHelpers
     helpers ::Gitlab::IssuableMetadata
-
-    helpers do
-      def authorize_epics_feature!
-        forbidden! unless user_group.feature_available?(:epics)
-      end
-
-      def authorize_can_read!
-        authorize!(:read_epic, epic)
-      end
-
-      def authorize_can_admin!
-        authorize!(:admin_epic, epic)
-      end
-
-      def authorize_can_create!
-        authorize!(:admin_epic, user_group)
-      end
-
-      def authorize_can_destroy!
-        authorize!(:destroy_epic, epic)
-      end
-
-      # rubocop: disable CodeReuse/ActiveRecord
-      def epic
-        @epic ||= user_group.epics.find_by(iid: params[:epic_iid])
-      end
-      # rubocop: enable CodeReuse/ActiveRecord
-
-      # rubocop: disable CodeReuse/ActiveRecord
-      def find_epics(args = {})
-        args = declared_params.merge(args)
-        args[:label_name] = args.delete(:labels)
-
-        epics = EpicsFinder.new(current_user, args).execute.preload(:labels)
-
-        epics.reorder(args[:order_by] => args[:sort])
-      end
-      # rubocop: enable CodeReuse/ActiveRecord
-    end
 
     params do
       requires :id, type: String, desc: 'The ID of a group'
@@ -71,7 +33,7 @@ module API
         use :pagination
       end
       get ':id/(-/)epics' do
-        epics = paginate(find_epics(group_id: user_group.id))
+        epics = paginate(find_epics(finder_params: { group_id: user_group.id }))
 
         present epics, with: EE::API::Entities::Epic, user: current_user, epics_metadata: issuable_meta_data(epics, 'Epic')
       end

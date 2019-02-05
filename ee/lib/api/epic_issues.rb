@@ -7,25 +7,9 @@ module API
       authorize_epics_feature!
     end
 
+    helpers ::API::Helpers::EpicsHelpers
+
     helpers do
-      def authorize_epics_feature!
-        forbidden! unless user_group.feature_available?(:epics)
-      end
-
-      def authorize_can_read!
-        authorize!(:read_epic, epic)
-      end
-
-      def authorize_can_admin!
-        authorize!(:admin_epic, epic)
-      end
-
-      # rubocop: disable CodeReuse/ActiveRecord
-      def epic
-        @epic ||= user_group.epics.find_by(iid: params[:epic_iid])
-      end
-      # rubocop: enable CodeReuse/ActiveRecord
-
       def link
         @link ||= epic.epic_issues.find(params[:epic_issue_id])
       end

@@ -186,6 +186,7 @@ module EE
         expose :id
         expose :iid
         expose :group_id
+        expose :parent_id
         expose :title
         expose :description
         expose :author, using: ::API::Entities::UserBasic
