@@ -55,7 +55,7 @@ A. Consider you are a software developer working in a team:
 1. You avoid using dependencies whose license is not compatible with your project with [License Management reports](license_management.md) **[ULTIMATE]**
 1. You request the [approval](#merge-request-approvals) from your manager
 1. Your manager pushes a commit with their final review, [approves the merge request](merge_request_approvals.md), and set it to [merge when pipeline succeeds](#merge-when-pipeline-succeeds) (Merge Request Approvals are available in GitLab Starter)
-1. Your changes get deployed to production with [manual actions](../../../ci/yaml/README.md#manual-actions) for GitLab CI/CD
+1. Your changes get deployed to production with [manual actions](../../../ci/yaml/README.md#whenmanual) for GitLab CI/CD
 1. Your implementations were successfully shipped to your customer
 
 B. Consider you're a web developer writing a webpage for your company's website:
