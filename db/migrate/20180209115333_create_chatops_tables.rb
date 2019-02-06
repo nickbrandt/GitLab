@@ -1,10 +1,8 @@
-# See http://doc.gitlab.com/ce/development/migration_style_guide.html
-# for more information on how to write migrations for GitLab.
+# frozen_string_literal: true
 
 class CreateChatopsTables < ActiveRecord::Migration[4.2]
   include Gitlab::Database::MigrationHelpers
 
-  # Set this constant to true if this migration requires downtime.
   DOWNTIME = false
 
   def change
@@ -16,6 +14,8 @@ class CreateChatopsTables < ActiveRecord::Migration[4.2]
       # A pipeline can only contain one row in this table, hence this index is
       # unique.
       t.index :pipeline_id, unique: true
+
+      t.index :chat_name_id
     end
 
     # rubocop:disable Migration/AddConcurrentForeignKey
