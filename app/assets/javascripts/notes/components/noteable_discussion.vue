@@ -408,6 +408,7 @@ Please check your network connection and try again.`;
                     :line="line"
                     :commit="commit"
                     :help-page-path="helpPagePath"
+                    :show-reply-button="canReply"
                     @handleDeleteNote="deleteNoteHandler"
                   >
                     <note-edited-text
