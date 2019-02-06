@@ -3106,6 +3106,7 @@ ActiveRecord::Schema.define(version: 20190131122559) do
     t.integer "roadmap_layout", limit: 2
     t.boolean "include_private_contributions"
     t.string "commit_email"
+    t.integer "group_view"
     t.index ["accepted_term_id"], name: "index_users_on_accepted_term_id", using: :btree
     t.index ["admin"], name: "index_users_on_admin", using: :btree
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree

@@ -3,13 +3,13 @@
 require 'spec_helper'
 
 describe PreferencesHelper do
+  before do
+    allow(helper).to receive(:current_user).and_return(user)
+  end
+
+  let(:user) { build(:user) }
+
   describe '#dashboard_choices' do
-    let(:user) { build(:user) }
-
-    before do
-      allow(helper).to receive(:current_user).and_return(user)
-    end
-
     context 'when allowed to read operations dashboard' do
       before do
         allow(helper).to receive(:can?).with(user, :read_operations_dashboard) { true }
@@ -28,6 +28,22 @@ describe PreferencesHelper do
       it 'does not contain operations dashboard' do
         expect(helper.dashboard_choices).not_to include(['Operations Dashboard', 'operations'])
       end
+    end
+  end
+
+  describe '#group_view_choices' do
+    subject { helper.group_view_choices }
+
+    context 'when security dashboard feature is enabled' do
+      before do
+        stub_licensed_features(security_dashboard: true)
+      end
+
+      it { is_expected.to include(['Security dashboard', :security_dashboard]) }
+    end
+
+    context 'when security dashboard feature is disabled' do
+      it { is_expected.not_to include(['Security dashboard', :security_dashboard]) }
     end
   end
 end

@@ -10,5 +10,17 @@ module EE
 
       super
     end
+
+    def group_view_choices
+      choices = [
+        [_('Details (default)'), :details]
+      ]
+
+      if License.feature_available?(:security_dashboard)
+        choices << [_('Security dashboard'), :security_dashboard]
+      end
+
+      choices
+    end
   end
 end

@@ -1,6 +1,16 @@
 require 'spec_helper'
 
 describe EE::User do
+  describe 'user creation' do
+    describe 'with defaults' do
+      let(:user) { User.new }
+
+      it "applies defaults to user" do
+        expect(user.group_view).to eq('details')
+      end
+    end
+  end
+
   describe 'associations' do
     subject { build(:user) }
 
