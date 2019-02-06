@@ -10,6 +10,7 @@ describe ConsumeRemainingMigrateApproverToApprovalRulesInBatchJobs, :migration d
   let(:merge_requests) { table(:merge_requests) }
   let(:approvers) { table(:approvers) }
   let(:approver_groups) { table(:approver_groups) }
+  let(:approval_rules) { table(:approval_merge_request_rules) }
   let(:migrator) { double(:migrator) }
 
   describe '#up' do
@@ -31,12 +32,22 @@ describe ConsumeRemainingMigrateApproverToApprovalRulesInBatchJobs, :migration d
         else
           approver_groups.create!(id: id, target_id: id, target_type: 'MergeRequest', group_id: 12)
         end
+
+        # add some approval rules to simulate approvers that were already migrated
+        # to rules
+        if (id % 5) == 0
+          approval_rules.create!(merge_request_id: id, code_owner: false, name: "test-rule-#{id}")
+        end
       end
     end
 
     it "migrates unmigrated merge requests" do
       (1..101).each do |id|
-        expect(migrator).to receive(:perform).with('MergeRequest', id)
+        if (id % 5) != 0
+          expect(migrator).to receive(:perform).with('MergeRequest', id)
+        else
+          expect(migrator).not_to receive(:perform).with('MergeRequest', id)
+        end
       end
 
       migrate!
