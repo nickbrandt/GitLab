@@ -96,7 +96,7 @@ module EE
     def validate_user_membership
       return unless user
 
-      unless project.members.where(user: user).exists?
+      unless project.team.member?(user)
         self.errors.add(:user, 'is not a member of the project')
       end
     end
