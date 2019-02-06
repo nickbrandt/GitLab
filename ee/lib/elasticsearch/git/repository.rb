@@ -74,7 +74,7 @@ module Elasticsearch
         end
 
         def delete_blob(blob)
-          return unless blob.text?
+          return unless blob.text_in_repo?
 
           {
             delete: {
@@ -246,7 +246,6 @@ module Elasticsearch
           result = []
 
           target_sha = repository_for_indexing.head.target.oid
-
           if repository_for_indexing.bare?
             tree = repository_for_indexing.lookup(target_sha).tree
             result.push(recurse_blobs_index_hash(tree))
@@ -254,7 +253,7 @@ module Elasticsearch
             repository_for_indexing.index.each do |blob|
               b = LiteBlob.new(repository_for_indexing, blob)
 
-              if b.text?
+              if b.text_in_repo?
                 result.push(
                   {
                     id: "#{target_sha}_#{b.path}",
@@ -277,7 +276,7 @@ module Elasticsearch
             blob[:path] = path + blob[:name]
             b = LiteBlob.new(repository_for_indexing, blob)
 
-            if b.text?
+            if b.text_in_repo?
               result.push(
                 {
                   id: "#{repository_for_indexing.head.target.oid}_#{path}#{blob[:name]}",

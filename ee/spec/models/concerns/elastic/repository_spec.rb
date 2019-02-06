@@ -32,6 +32,21 @@ describe Repository, :elastic do
     expect(project.repository.search('def | popen extension:md')[:blobs][:total_count]).to eq(1)
   end
 
+  it 'can delete blobs' do
+    project = create :project, :repository
+    blob = project.repository.blob_at('b83d6e391c22777fca1ed3012fce84f633d7fed0', 'files/ruby/popen.rb')
+
+    expect(project.repository.delete_blob(blob)[:delete]).not_to be_empty
+  end
+
+  it 'can return the index as a json' do
+    project = create :project, :repository
+    index = project.repository.as_indexed_json
+
+    expect(index[:blobs]).not_to be_empty
+    expect(index[:commits]).not_to be_empty
+  end
+
   def search_and_check!(on, query, type:, per: 1000)
     results = on.search(query, type: type, per: per)["#{type}s".to_sym][:results]
 

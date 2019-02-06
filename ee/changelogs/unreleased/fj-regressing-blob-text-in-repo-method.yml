@@ -1,0 +1,5 @@
+---
+title: Replacing old blob methods in ElasticSerach module
+merge_request: 9418
+author:
+type: fixed
