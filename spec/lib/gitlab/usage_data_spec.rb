@@ -125,6 +125,7 @@ describe Gitlab::UsageData do
         todos
         uploads
         web_hooks
+        user_preferences
       ))
     end
 

@@ -101,7 +101,7 @@ describe Gitlab::UsageData do
     end
 
     it 'gathers security-related preferences usage data' do
-      expect(subject[:counts][:user_preferences]).to include(
+      expect(subject[:counts][:user_preferences]).to eq(
         group_overview_details: User.active.count - 2, # we have exactly 2 active users with security dashboard set
         group_overview_security_dashboard: 2
       )
