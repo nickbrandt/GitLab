@@ -607,6 +607,9 @@ msgid_plural "Alerts"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Alerts"
+msgstr ""
+
 msgid "All"
 msgstr ""
 
@@ -1049,6 +1052,9 @@ msgid "Author"
 msgstr ""
 
 msgid "Authorization code:"
+msgstr ""
+
+msgid "Authorization key"
 msgstr ""
 
 msgid "Authorization was granted by entering your username and password in the application."
@@ -3800,6 +3806,9 @@ msgstr ""
 msgid "Failed to remove the pipeline schedule"
 msgstr ""
 
+msgid "Failed to reset key. Please try again."
+msgstr ""
+
 msgid "Failed to signing using smartcard authentication"
 msgstr ""
 
@@ -4146,6 +4155,9 @@ msgid "General pipelines"
 msgstr ""
 
 msgid "Generate a default set of labels"
+msgstr ""
+
+msgid "Generate key"
 msgstr ""
 
 msgid "Geo"
@@ -7607,6 +7619,9 @@ msgstr ""
 msgid "Real-time features"
 msgstr ""
 
+msgid "Receive alerts from manually configured Prometheus servers."
+msgstr ""
+
 msgid "Recent searches"
 msgstr ""
 
@@ -7825,10 +7840,22 @@ msgstr ""
 msgid "Resend invite"
 msgstr ""
 
+msgid "Reset authorization key"
+msgstr ""
+
+msgid "Reset authorization key?"
+msgstr ""
+
 msgid "Reset health check access token"
 msgstr ""
 
+msgid "Reset key"
+msgstr ""
+
 msgid "Reset runners registration token"
+msgstr ""
+
+msgid "Resetting the authorization key will invalidate the previous key. Existing alert configurations will need to be updated with the new key."
 msgstr ""
 
 msgid "Resolve all discussions in new issue"
@@ -9765,6 +9792,9 @@ msgstr ""
 msgid "To preserve performance only <strong>%{display_size} of %{real_size}</strong> files are displayed."
 msgstr ""
 
+msgid "To receive alerts from manually configured Prometheus services, add the following URL and Authorization key to your Prometheus webhook config file. Learn more about %{linkStart}configuring Prometheus%{linkEnd} to send alerts to GitLab."
+msgstr ""
+
 msgid "To set up SAML authentication for your group through an identity provider like Azure, Okta, Onelogin, Ping Identity, or your custom SAML 2.0 provider:"
 msgstr ""
 
@@ -9907,6 +9937,9 @@ msgid "Two-factor authentication"
 msgstr ""
 
 msgid "Type"
+msgstr ""
+
+msgid "URL"
 msgstr ""
 
 msgid "Unable to load the diff. %{button_try_again}"
