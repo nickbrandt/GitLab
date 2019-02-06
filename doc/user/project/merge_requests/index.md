@@ -33,16 +33,16 @@ With GitLab merge requests, you can:
 
 With **[GitLab Enterprise Edition][ee]**, you can also:
 
-- Prepare a full review and submit it once it's ready with [Merge Request Reviews](../../discussions/index.md#merge-request-reviews) **[PREMIUM]**
+- Prepare a full review and submit it once it's ready with [Merge Request Reviews](../../discussions/index.md#merge-request-reviews-premium) **[PREMIUM]**
 - View the deployment process across projects with [Multi-Project Pipelines](../../../ci/multi_project_pipelines.md#multi-project-pipeline-graphs) **[PREMIUM]**
 - Request [approvals](merge_request_approvals.md) from your managers **[STARTER]**
 - Analyze the impact of your changes with [Code Quality reports](code_quality.md) **[STARTER]**
-- Manage the licenses of your dependencies with [License Management](#license-management) **[ULTIMATE]**
+- Manage the licenses of your dependencies with [License Management](#license-management-ultimate) **[ULTIMATE]**
 - Analyze your source code for vulnerabilities with [Static Application Security Testing](sast.md) **[ULTIMATE]**
 - Analyze your running web applications for vulnerabilities with [Dynamic Application Security Testing](dast.md) **[ULTIMATE]**
 - Analyze your dependencies for vulnerabilities with [Dependency Scanning](dependency_scanning.md) **[ULTIMATE]**
 - Analyze your Docker images for vulnerabilities with [Container Scanning](container_scanning.md) **[ULTIMATE]**
-- Determine the performance impact of changes with [Browser Performance Testing](#browser-performance-testing) **[PREMIUM]**
+- Determine the performance impact of changes with [Browser Performance Testing](#browser-performance-testing-premium) **[PREMIUM]**
 
 ## Use cases
 
@@ -53,7 +53,7 @@ A. Consider you are a software developer working in a team:
 1. You work on the implementation optimizing code with [Code Quality reports](code_quality.md) **[STARTER]**
 1. You verify your changes with [JUnit test reports](../../../ci/junit_test_reports.md) in GitLab CI/CD
 1. You avoid using dependencies whose license is not compatible with your project with [License Management reports](license_management.md) **[ULTIMATE]**
-1. You request the [approval](#merge-request-approvals) from your manager
+1. You request the [approval](#merge-request-approvals-starter) from your manager
 1. Your manager pushes a commit with their final review, [approves the merge request](merge_request_approvals.md), and set it to [merge when pipeline succeeds](#merge-when-pipeline-succeeds) (Merge Request Approvals are available in GitLab Starter)
 1. Your changes get deployed to production with [manual actions](../../../ci/yaml/README.md#manual-actions) for GitLab CI/CD
 1. Your implementations were successfully shipped to your customer
@@ -174,7 +174,7 @@ Start a review in order to create multiple comments on a diff and publish them o
 Starting a review allows you to get all your thoughts in order and ensure you haven't missed anything
 before submitting all your comments.
 
-[Learn more about Merge Request Reviews](../../discussions/index.md#merge-request-reviews)
+[Learn more about Merge Request Reviews](../../discussions/index.md#merge-request-reviews-premium)
 
 ## Squash and merge
 
