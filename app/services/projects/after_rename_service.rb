@@ -12,8 +12,6 @@ module Projects
   #
   #     Projects::AfterRenameService.new(project).execute
   class AfterRenameService
-    prepend ::EE::Projects::AfterRenameService # rubocop: disable Cop/InjectEnterpriseEditionModule
-
     # @return [String] The Project being renamed.
     attr_reader :project
 
@@ -141,3 +139,5 @@ module Projects
     end
   end
 end
+
+Projects::AfterRenameService.prepend(EE::Projects::AfterRenameService)

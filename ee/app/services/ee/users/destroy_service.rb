@@ -12,9 +12,8 @@ module EE
         end
       end
 
-      # rubocop: disable CodeReuse/ActiveRecord
       def mirror_cleanup(user)
-        user_mirrors = ::Project.where(mirror_user: user)
+        user_mirrors = ::Project.where(mirror_user: user) # rubocop: disable CodeReuse/ActiveRecord
 
         user_mirrors.find_each do |mirror|
           new_mirror_user = first_mirror_owner(user, mirror)
@@ -23,7 +22,6 @@ module EE
           ::NotificationService.new.project_mirror_user_changed(new_mirror_user, user.name, mirror)
         end
       end
-      # rubocop: enable CodeReuse/ActiveRecord
 
       private
 

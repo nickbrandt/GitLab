@@ -3,8 +3,6 @@
 module Boards
   module Issues
     class CreateService < Boards::BaseService
-      prepend ::EE::Boards::Issues::CreateService # rubocop: disable Cop/InjectEnterpriseEditionModule
-
       attr_accessor :project
 
       def initialize(parent, project, user, params = {})
@@ -37,3 +35,5 @@ module Boards
     end
   end
 end
+
+Boards::Issues::CreateService.prepend(EE::Boards::Issues::CreateService)

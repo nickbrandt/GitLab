@@ -17,15 +17,7 @@ module Search
 
       @projects = super.inside_path(group.full_path)
     end
-
-    # rubocop: disable CodeReuse/ActiveRecord
-    def elastic_projects
-      @elastic_projects ||= projects.pluck(:id)
-    end
-    # rubocop: enable CodeReuse/ActiveRecord
-
-    def elastic_global
-      false
-    end
   end
 end
+
+Search::GroupService.prepend(EE::Search::GroupService)

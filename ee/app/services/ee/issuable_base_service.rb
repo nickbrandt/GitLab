@@ -2,10 +2,12 @@
 
 module EE
   module IssuableBaseService
+    extend ::Gitlab::Utils::Override
     include ::Gitlab::Utils::StrongMemoize
 
     private
 
+    override :filter_params
     def filter_params(issuable)
       # This security check is repeated here to avoid multiple backports,
       # this should be refactored to be reused from the base class.

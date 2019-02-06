@@ -8,9 +8,9 @@ module EE
     # could be incorrect for 2 weeks.
     override :cache_options
     def cache_options
-      value = super
-      value[:expires_in] = 20.minutes if ::Gitlab::Geo.secondary?
-      value
+      super.tap do |options|
+        options[:expires_in] = 20.minutes if ::Gitlab::Geo.secondary?
+      end
     end
   end
 end

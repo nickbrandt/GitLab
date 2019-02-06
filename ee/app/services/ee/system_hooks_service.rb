@@ -2,14 +2,22 @@
 
 module EE
   module SystemHooksService
-    # override
+    extend ::Gitlab::Utils::Override
 
     private
 
+    override :group_member_data
+    def group_member_data(model)
+      super.tap do |data|
+        data[:group_plan] = model.group.plan&.name
+      end
+    end
+
+    override :user_data
     def user_data(model)
-      data = super
-      data.merge!(email_opted_in_data(model)) if ::Gitlab.com?
-      data
+      super.tap do |data|
+        data.merge!(email_opted_in_data(model)) if ::Gitlab.com?
+      end
     end
 
     def email_opted_in_data(model)

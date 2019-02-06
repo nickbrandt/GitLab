@@ -2,8 +2,6 @@
 
 module Users
   class BuildService < BaseService
-    prepend ::EE::Users::BuildService # rubocop: disable Cop/InjectEnterpriseEditionModule
-
     delegate :user_default_internal_regex_enabled?,
              :user_default_internal_regex_instance,
              to: :'Gitlab::CurrentSettings.current_application_settings'
@@ -123,3 +121,5 @@ module Users
     end
   end
 end
+
+Users::BuildService.prepend(EE::Users::BuildService)

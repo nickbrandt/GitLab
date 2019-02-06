@@ -3,6 +3,9 @@
 module EE
   module Issues
     module MoveService
+      extend ::Gitlab::Utils::Override
+
+      override :update_old_entity
       def update_old_entity
         rewrite_epic_issue
         super

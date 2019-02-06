@@ -16,6 +16,7 @@ module EE
 
       private
 
+      override :signup_params
       def signup_params
         super + email_opted_in_params
       end

@@ -8,17 +8,18 @@ module EE
 
         override :issue_params
         def issue_params
-          assignee_ids = Array(list.user_id || board.assignee&.id)
-          milestone_id = list.milestone_id || board.milestone_id
+          super.tap do |options|
+            assignee_ids = Array(list.user_id || board.assignee&.id)
+            milestone_id = list.milestone_id || board.milestone_id
 
-          {
-            label_ids: [list.label_id, *board.label_ids],
-            weight: board.weight,
-            milestone_id: milestone_id,
-            # This can be removed when boards have multiple assignee support.
-            # See https://gitlab.com/gitlab-org/gitlab-ee/issues/3786
-            assignee_ids: assignee_ids
-          }
+            options[:label_ids].concat(board.label_ids)
+            options.merge!(
+              weight: board.weight,
+              milestone_id: milestone_id,
+              # This can be removed when boards have multiple assignee support.
+              # See https://gitlab.com/gitlab-org/gitlab-ee/issues/3786
+              assignee_ids: assignee_ids)
+          end
         end
       end
     end

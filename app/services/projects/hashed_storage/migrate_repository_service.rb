@@ -3,8 +3,6 @@
 module Projects
   module HashedStorage
     class MigrateRepositoryService < BaseRepositoryService
-      prepend ::EE::Projects::HashedStorage::MigrateRepositoryService # rubocop: disable Cop/InjectEnterpriseEditionModule
-
       def execute
         try_to_set_repository_read_only!
 
@@ -52,3 +50,5 @@ module Projects
     end
   end
 end
+
+Projects::HashedStorage::MigrateRepositoryService.prepend(EE::Projects::HashedStorage::MigrateRepositoryService)

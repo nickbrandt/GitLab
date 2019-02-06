@@ -2,8 +2,6 @@
 
 module Emails
   class DestroyService < ::Emails::BaseService
-    prepend ::EE::Emails::DestroyService # rubocop: disable Cop/InjectEnterpriseEditionModule
-
     def execute(email)
       email.destroy && update_secondary_emails!
     end
@@ -19,3 +17,5 @@ module Emails
     end
   end
 end
+
+Emails::DestroyService.prepend(EE::Emails::DestroyService)

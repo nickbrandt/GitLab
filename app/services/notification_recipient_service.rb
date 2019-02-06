@@ -242,8 +242,6 @@ module NotificationRecipientService
     end
 
     class Default < Base
-      prepend ::EE::NotificationRecipientBuilders::Default # rubocop: disable Cop/InjectEnterpriseEditionModule
-
       MENTION_TYPE_ACTIONS = [:new_issue, :new_merge_request].freeze
 
       attr_reader :target
@@ -251,6 +249,7 @@ module NotificationRecipientService
       attr_reader :action
       attr_reader :previous_assignee
       attr_reader :skip_current_user
+
       def initialize(target, current_user, action:, custom_action: nil, previous_assignee: nil, skip_current_user: true)
         @target = target
         @current_user = current_user
@@ -260,15 +259,13 @@ module NotificationRecipientService
         @skip_current_user = skip_current_user
       end
 
+      def add_watchers
+        add_project_watchers
+      end
+
       def build!
         add_participants(current_user)
-
-        if project
-          add_project_watchers
-        else # for group level targets
-          add_group_watchers
-        end
-
+        add_watchers
         add_custom_notifications
 
         # Re-assign is considered as a mention of the new assignee
@@ -414,4 +411,5 @@ module NotificationRecipientService
   end
 end
 
+NotificationRecipientService::Builder::Default.prepend(EE::NotificationRecipientBuilders::Default) # rubocop: disable Cop/InjectEnterpriseEditionModule
 NotificationRecipientService.prepend(EE::NotificationRecipientService)

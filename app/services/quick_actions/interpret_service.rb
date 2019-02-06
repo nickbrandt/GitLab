@@ -4,6 +4,7 @@ module QuickActions
   class InterpretService < BaseService
     include Gitlab::Utils::StrongMemoize
     include Gitlab::QuickActions::Dsl
+
     attr_reader :issuable
 
     SHRUG = '¯\\＿(ツ)＿/¯'.freeze

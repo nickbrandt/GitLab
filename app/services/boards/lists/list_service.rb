@@ -3,8 +3,6 @@
 module Boards
   module Lists
     class ListService < Boards::BaseService
-      prepend ::EE::Boards::Lists::ListService # rubocop: disable Cop/InjectEnterpriseEditionModule
-
       def execute(board)
         board.lists.create(list_type: :backlog) unless board.lists.backlog.exists?
 
@@ -13,3 +11,5 @@ module Boards
     end
   end
 end
+
+Boards::Lists::ListService.prepend(EE::Boards::Lists::ListService)

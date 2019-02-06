@@ -3,8 +3,6 @@
 # Base class for services that count a single resource such as the number of
 # issues for a project.
 class BaseCountService
-  prepend ::EE::BaseCountService # rubocop: disable Cop/InjectEnterpriseEditionModule
-
   def relation_for_count
     raise(
       NotImplementedError,
@@ -50,3 +48,5 @@ class BaseCountService
     Rails.cache.write(key, block_given? ? yield : uncached_count, raw: raw?)
   end
 end
+
+BaseCountService.prepend(EE::BaseCountService)

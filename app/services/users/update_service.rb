@@ -3,6 +3,7 @@
 module Users
   class UpdateService < BaseService
     include NewUserNotifier
+
     def initialize(current_user, params = {})
       @current_user = current_user
       @user = params.delete(:user)

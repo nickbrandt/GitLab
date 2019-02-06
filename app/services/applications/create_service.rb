@@ -2,18 +2,18 @@
 
 module Applications
   class CreateService
-    prepend ::EE::Applications::CreateService # rubocop: disable Cop/InjectEnterpriseEditionModule
+    attr_reader :current_user, :params
 
-    # rubocop: disable CodeReuse/ActiveRecord
     def initialize(current_user, params)
       @current_user = current_user
-      @params = params.except(:ip_address)
+      @params = params.except(:ip_address) # rubocop: disable CodeReuse/ActiveRecord
     end
-    # rubocop: enable CodeReuse/ActiveRecord
 
     # EE would override and use `request` arg
     def execute(request)
-      Doorkeeper::Application.create(@params)
+      Doorkeeper::Application.create(params)
     end
   end
 end
+
+Applications::CreateService.prepend(EE::Applications::CreateService)

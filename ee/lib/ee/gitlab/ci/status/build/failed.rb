@@ -15,11 +15,13 @@ module EE
                 downstream_bridge_project_not_found: 'downstream project could not be found',
                 insufficient_bridge_permissions: 'no permissions to trigger downstream pipeline'
               ).freeze
-
               EE::Gitlab::Ci::Status::Build::Failed.private_constant :EE_REASONS
             end
 
             class_methods do
+              extend ::Gitlab::Utils::Override
+
+              override :reasons
               def reasons
                 EE_REASONS
               end

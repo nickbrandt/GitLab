@@ -2,8 +2,6 @@
 
 module Groups
   class DestroyService < Groups::BaseService
-    prepend ::EE::Groups::DestroyService # rubocop: disable Cop/InjectEnterpriseEditionModule
-
     DestroyError = Class.new(StandardError)
 
     def async_execute
@@ -36,3 +34,5 @@ module Groups
     # rubocop: enable CodeReuse/ActiveRecord
   end
 end
+
+Groups::DestroyService.prepend(EE::Groups::DestroyService)

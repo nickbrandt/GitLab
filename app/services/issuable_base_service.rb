@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class IssuableBaseService < BaseService
-  prepend ::EE::IssuableBaseService # rubocop: disable Cop/InjectEnterpriseEditionModule
-
   private
 
   attr_accessor :params, :skip_milestone_email
@@ -390,3 +388,5 @@ class IssuableBaseService < BaseService
     project
   end
 end
+
+IssuableBaseService.prepend(EE::IssuableBaseService)

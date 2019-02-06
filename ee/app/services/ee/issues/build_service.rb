@@ -3,6 +3,8 @@
 module EE
   module Issues
     module BuildService
+      extend ::Gitlab::Utils::Override
+
       def issue_params_from_template
         return {} unless project.feature_available?(:issuable_default_templates)
 
@@ -13,8 +15,9 @@ module EE
       # They take precedence over eachother like this
       # passed params > discussion params > template params
       # The template params are filled in here, and might be overwritten by super
-      def issue_params
-        @issue_params ||= issue_params_from_template.merge(super)
+      override :build_issue_params
+      def build_issue_params
+        issue_params_from_template.merge(super)
       end
     end
   end

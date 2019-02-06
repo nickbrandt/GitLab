@@ -51,8 +51,6 @@ module Issuable
       end
 
       def group
-        return new_entity.group if new_entity.respond_to?(:group) && new_entity.group
-
         if new_entity.project&.group && current_user.can?(:read_group, new_entity.project.group)
           new_entity.project.group
         end
@@ -60,3 +58,11 @@ module Issuable
     end
   end
 end
+
+# In the case we are eager-loading, `ee/app/services/ee/issuable/clone/base_service.rb`
+# is loaded first, and explicitely requires this file to avoid a
+# "TypeError: superclass must be a Class (Module given)" error.
+# That also means that we cannot perform the prepending in this file otherwise
+# we'd get a circular dependency error, thus we perform the prepending in
+# `ee/app/services/ee/issuable/clone/base_service.rb` in that case.
+Issuable::Clone::BaseService.prepend(EE::Issuable::Clone::BaseService) unless Rails.configuration.eager_load
