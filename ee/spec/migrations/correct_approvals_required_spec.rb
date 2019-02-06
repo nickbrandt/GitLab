@@ -26,7 +26,7 @@ describe CorrectApprovalsRequired, :migration do
 
       # When approvals_required is not 0
       approval_project_rules.create!(id: 2, project_id: 101, approvals_required: 3, name: 'Rule2')
-      approval_merge_request_rules.create!(id: 2, merge_request_id: 1, approvals_required: 5, name: 'Default')
+      approval_merge_request_rules.create!(id: 2, merge_request_id: 1, approvals_required: 5, name: 'Merge request rule 2')
       approval_merge_request_rule_sources.create!(id: 2, approval_merge_request_rule_id: 2, approval_project_rule_id: 2)
 
       # When MR rule does not have project rule
