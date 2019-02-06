@@ -12,6 +12,7 @@ module EE
     include AuditorUserHelper
 
     DEFAULT_ROADMAP_LAYOUT = 'months'.freeze
+    DEFAULT_GROUP_VIEW = 'details'.freeze
 
     prepended do
       EMAIL_OPT_IN_SOURCE_ID_GITLAB_COM = 1
@@ -61,6 +62,10 @@ module EE
       accepts_nested_attributes_for :namespace
 
       enum roadmap_layout: { weeks: 1, months: 4, quarters: 12 }
+
+      # User's Group preference
+      # Note: When adding an option, it's value MUST equal to the last value + 1.
+      enum group_view: { details: 1, security_dashboard: 2 }, _prefix: true
     end
 
     class_methods do
@@ -152,6 +157,10 @@ module EE
 
     def roadmap_layout
       super || DEFAULT_ROADMAP_LAYOUT
+    end
+
+    def group_view
+      super || DEFAULT_GROUP_VIEW
     end
 
     override :several_namespaces?
