@@ -67,19 +67,19 @@ class ConsumeRemainingMigrateApproverToApprovalRulesInBatchJobs < ActiveRecord::
 
     loop do
       # search for next wrong MR
-      lower_bound = exec_query("#{BASE_QUERY} AND merge_requests.id BETWEEN #{lower_bound} AND #{upper_bound} ORDER BY merge_requests.id ASC LIMIT 1").rows.dig(0, 0)
+      lower_bound = exec_query("#{BASE_QUERY} AND merge_requests.id BETWEEN #{lower_bound} AND #{upper_bound} ORDER BY merge_requests.id ASC LIMIT 1").dig(0, 0)
 
       return bad_ids if lower_bound.nil?
 
       end_id = lower_bound + JOIN_SIZE
 
-      bad_ids.concat exec_query("#{BASE_QUERY} AND merge_requests.id BETWEEN #{lower_bound} AND #{end_id} ORDER BY merge_requests.id ASC").rows.flatten
+      bad_ids.concat exec_query("#{BASE_QUERY} AND merge_requests.id BETWEEN #{lower_bound} AND #{end_id} ORDER BY merge_requests.id ASC").flatten
 
       lower_bound = end_id + 1
     end
   end
 
   def exec_query(query)
-    ActiveRecord::Base.connection.exec_query(query)
+    ActiveRecord::Base.connection.exec_query(query).rows
   end
 end
