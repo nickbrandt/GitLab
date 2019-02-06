@@ -254,6 +254,7 @@ This list of limitations only reflects the latest version of GitLab. If you are 
 - Real-time updates of issues/merge requests (for example, via long polling) doesn't work on the **secondary** node.
 - [Selective synchronization](configuration.md#selective-synchronization) applies only to files and repositories. Other datasets are replicated to the **secondary** node in full, making it inappropriate for use as an access control mechanism.
 - Object pools for forked project deduplication work only on the **primary** node, and are duplicated on the **secondary** node.
+- [External merge request diffs](../../merge_request_diffs.md) will not be replicated if they are on-disk, and viewing merge requests will fail. However, external MR diffs in object storage **are** supported. The default configuration (in-database) does work.
 
 ### Limitations on replication
 
