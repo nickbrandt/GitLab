@@ -79,7 +79,6 @@ describe EE::ProtectedRefAccess do
         end
 
         it 'allows users with access through group' do
-          new_project = create(:project, group: group)
           new_user = create(:user)
 
           group.add_developer(new_user)
