@@ -16,7 +16,7 @@ module EE
 
           state_machine :status do
             after_transition any => :updating do |application|
-              application.update(last_update_started_at: Time.now, version: application.class.const_get(:VERSION))
+              application.update(last_update_started_at: Time.now)
             end
           end
         end

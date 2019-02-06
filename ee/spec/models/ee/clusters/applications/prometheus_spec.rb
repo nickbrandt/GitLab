@@ -14,16 +14,6 @@ describe Clusters::Applications::Prometheus do
         expect { subject.make_updating }.to change { subject.reload.last_update_started_at }.to be_within(1.second).of(Time.now)
       end
     end
-
-    context 'application install previously errored with older version' do
-      subject { create(:clusters_applications_prometheus, :installed, cluster: cluster, version: '6.7.2') }
-
-      it 'updates the application version' do
-        subject.make_updating
-
-        expect(subject.reload.version).to eq('6.7.3')
-      end
-    end
   end
 
   context '#updated_since?' do
