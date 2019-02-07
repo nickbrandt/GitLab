@@ -11,7 +11,7 @@ import mockDataVulnerabilities from './data/mock_data_vulnerabilities.json';
 import mockDataVulnerabilitiesCount from './data/mock_data_vulnerabilities_count.json';
 import mockDataVulnerabilitiesHistory from './data/mock_data_vulnerabilities_history.json';
 
-describe('vulnerabiliites count actions', () => {
+describe('vulnerabilities count actions', () => {
   const data = mockDataVulnerabilitiesCount;
   const params = { filters: { type: ['sast'] } };
   const filteredData = mockDataVulnerabilitiesCount.sast;
@@ -37,7 +37,7 @@ describe('vulnerabiliites count actions', () => {
     });
   });
 
-  describe('fetchVulnerabilitesCount', () => {
+  describe('fetchVulnerabilitiesCount', () => {
     let mock;
     const state = initialState;
 
@@ -112,7 +112,7 @@ describe('vulnerabiliites count actions', () => {
     });
   });
 
-  describe('requestVulnerabilitesCount', () => {
+  describe('requestVulnerabilitiesCount', () => {
     it('should commit the request mutation', done => {
       const state = initialState;
 
@@ -127,7 +127,7 @@ describe('vulnerabiliites count actions', () => {
     });
   });
 
-  describe('receiveVulnerabilitesCountSuccess', () => {
+  describe('receiveVulnerabilitiesCountSuccess', () => {
     it('should commit the success mutation', done => {
       const state = initialState;
 
@@ -142,7 +142,7 @@ describe('vulnerabiliites count actions', () => {
     });
   });
 
-  describe('receivetVulnerabilitesCountError', () => {
+  describe('receiveVulnerabilitiesCountError', () => {
     it('should commit the error mutation', done => {
       const state = initialState;
 
@@ -708,12 +708,12 @@ describe('vulnerabilities history actions', () => {
     });
   });
 
-  describe('fetchVulnerabilitesTimeline', () => {
+  describe('fetchVulnerabilitiesTimeline', () => {
     let mock;
     const state = initialState;
 
     beforeEach(() => {
-      state.vulnerabilitiesCountEndpoint = `${TEST_HOST}/vulnerabilitIES_HISTORY.json`;
+      state.vulnerabilitiesHistoryEndpoint = `${TEST_HOST}/vulnerabilitIES_HISTORY.json`;
       mock = new MockAdapter(axios);
     });
 
@@ -786,7 +786,7 @@ describe('vulnerabilities history actions', () => {
     });
   });
 
-  describe('requestVulnerabilitesTimeline', () => {
+  describe('requestVulnerabilitiesTimeline', () => {
     it('should commit the request mutation', done => {
       const state = initialState;
 
@@ -801,7 +801,7 @@ describe('vulnerabilities history actions', () => {
     });
   });
 
-  describe('receiveVulnerabilitesTimelineSuccess', () => {
+  describe('receiveVulnerabilitiesTimelineSuccess', () => {
     it('should commit the success mutation', done => {
       const state = initialState;
 
@@ -816,7 +816,7 @@ describe('vulnerabilities history actions', () => {
     });
   });
 
-  describe('receivetVulnerabilitesTimelineError', () => {
+  describe('receiveVulnerabilitiesTimelineError', () => {
     it('should commit the error mutation', done => {
       const state = initialState;
 

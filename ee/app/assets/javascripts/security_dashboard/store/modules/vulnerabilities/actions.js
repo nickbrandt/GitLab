@@ -14,6 +14,9 @@ export const setVulnerabilitiesCountEndpoint = ({ commit }, endpoint) => {
 };
 
 export const fetchVulnerabilitiesCount = ({ state, dispatch }, params = {}) => {
+  if (!state.vulnerabilitiesCountEndpoint) {
+    return;
+  }
   dispatch('requestVulnerabilitiesCount');
 
   axios({
@@ -43,6 +46,9 @@ export const receiveVulnerabilitiesCountError = ({ commit }) => {
 };
 
 export const fetchVulnerabilities = ({ state, dispatch }, params = {}) => {
+  if (!state.vulnerabilitiesEndpoint) {
+    return;
+  }
   dispatch('requestVulnerabilities');
 
   axios({
@@ -208,6 +214,9 @@ export const setVulnerabilitiesHistoryEndpoint = ({ commit }, endpoint) => {
 };
 
 export const fetchVulnerabilitiesHistory = ({ state, dispatch }, params = {}) => {
+  if (!state.vulnerabilitiesHistoryEndpoint) {
+    return;
+  }
   dispatch('requestVulnerabilitiesHistory');
 
   axios({

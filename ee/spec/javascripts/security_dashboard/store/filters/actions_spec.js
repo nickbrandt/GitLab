@@ -46,4 +46,25 @@ describe('filters actions', () => {
       );
     });
   });
+
+  describe('setAllFilters', () => {
+    it('should commit the SET_ALL_FILTERS mutuation', done => {
+      const state = createState();
+      const payload = { project_id: ['12', '15'] };
+
+      testAction(
+        actions.setAllFilters,
+        payload,
+        state,
+        [
+          {
+            type: types.SET_ALL_FILTERS,
+            payload,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
 });
