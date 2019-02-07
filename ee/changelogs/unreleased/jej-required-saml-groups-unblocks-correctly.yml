@@ -1,0 +1,5 @@
+---
+title: Avoid SAML required_groups indiscriminately unblocking users on login
+merge_request: 9489
+author:
+type: fixed
