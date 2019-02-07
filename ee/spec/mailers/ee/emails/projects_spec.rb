@@ -29,11 +29,15 @@ describe EE::Emails::Projects do
         }
       end
 
-      let(:environment) { alert.environment }
+      let(:title) do
+        "#{alert.title} #{alert.computed_operator} #{alert.threshold}"
+      end
 
       let(:metrics_url) do
         metrics_project_environment_url(project, environment)
       end
+
+      let(:environment) { alert.environment }
 
       let!(:alert) { create(:prometheus_alert, project: project) }
 
@@ -42,19 +46,15 @@ describe EE::Emails::Projects do
       it_behaves_like 'a user cannot unsubscribe through footer link'
 
       it 'has expected subject' do
-        aggregate_failures do
-          is_expected.to have_subject(/Alert:/)
-          is_expected.to have_subject(/#{environment.name}/)
-
-          title = "#{alert.title} #{alert.computed_operator} #{alert.threshold}"
-          is_expected.to have_subject(/#{title}/)
-        end
+        is_expected.to have_subject(/Alert: #{environment.name} #{title}/)
       end
 
       it 'has expected content' do
         is_expected.to have_body_text('An alert has been triggered')
         is_expected.to have_body_text(project.full_path)
+        is_expected.to have_body_text('Environment:')
         is_expected.to have_body_text(environment.name)
+        is_expected.to have_body_text('Metric:')
         is_expected.to have_body_text(alert.full_query)
         is_expected.to have_body_text(metrics_url)
       end
