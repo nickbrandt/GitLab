@@ -24,8 +24,9 @@ module EE
         end
 
         # If the number of approvals is not greater than the project default, set to
-        # nil, so that we fall back to the project default. If it's not set, we can
-        # let the normal update logic handle this.
+        # the project default, so that we fall back to the project default. And
+        # still allow overriding rules defined at the project level but not allow
+        # a number of approvals lower than what the project defined.
         def clamp_approvals_before_merge(mr_params)
           return mr_params unless mr_params[:approvals_before_merge]
 
@@ -39,8 +40,8 @@ module EE
                              project
                            end
 
-          if mr_params[:approvals_before_merge].to_i <= target_project.approvals_before_merge
-            mr_params[:approvals_before_merge] = nil
+          if mr_params[:approvals_before_merge].to_i < target_project.min_fallback_approvals
+            mr_params[:approvals_before_merge] = target_project.min_fallback_approvals
           end
 
           mr_params

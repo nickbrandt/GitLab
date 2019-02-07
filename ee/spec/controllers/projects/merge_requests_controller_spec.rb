@@ -164,6 +164,12 @@ describe Projects::MergeRequestsController do
           expect(merge_request.reload.approvals_before_merge).to eq(2)
         end
 
+        it 'does not allow approvels before merge lower than the project setting' do
+          update_merge_request(approvals_before_merge: 0)
+
+          expect(merge_request.reload.approvals_before_merge).to eq(1)
+        end
+
         it 'creates rules' do
           users = create_list(:user, 3)
           users.each { |user| project.add_developer(user) }
@@ -221,8 +227,8 @@ describe Projects::MergeRequestsController do
             update_merge_request(approvals_before_merge: 1)
           end
 
-          it 'sets the param to nil' do
-            expect(merge_request.approvals_before_merge).to eq(nil)
+          it 'sets the param to the sames as the project' do
+            expect(merge_request.reload.approvals_before_merge).to eq(2)
           end
 
           it 'updates the merge request' do
@@ -236,8 +242,8 @@ describe Projects::MergeRequestsController do
             update_merge_request(approvals_before_merge: 2)
           end
 
-          it 'sets the param to nil' do
-            expect(merge_request.reload.approvals_before_merge).to eq(nil)
+          it 'sets the param to the same as the project' do
+            expect(merge_request.reload.approvals_before_merge).to eq(2)
           end
 
           it 'updates the merge request' do
@@ -287,8 +293,8 @@ describe Projects::MergeRequestsController do
             update_merge_request(approvals_before_merge: 1)
           end
 
-          it 'sets the param to nil' do
-            expect(merge_request.reload.approvals_before_merge).to eq(nil)
+          it 'sets the param to the same as the target project' do
+            expect(merge_request.reload.approvals_before_merge).to eq(2)
           end
 
           it 'updates the merge request' do
@@ -302,8 +308,8 @@ describe Projects::MergeRequestsController do
             update_merge_request(approvals_before_merge: 2)
           end
 
-          it 'sets the param to nil' do
-            expect(merge_request.reload.approvals_before_merge).to eq(nil)
+          it 'sets the param to the same as the target project' do
+            expect(merge_request.reload.approvals_before_merge).to eq(2)
           end
 
           it 'updates the merge request' do

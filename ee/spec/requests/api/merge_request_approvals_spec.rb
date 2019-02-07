@@ -434,7 +434,10 @@ describe "API::MergeRequestApprovals with approval_rule enabled" do
       expect(response).to have_gitlab_http_status(200)
       expect(json_response['approvals_required']).to eq 2
       expect(json_response['approvals_left']).to eq 2
-      expect(json_response['approval_rules_left']).to eq(['foo'])
+
+      short_approval = { "id" => rule.id, "name" => rule.name, "rule_type" => rule.rule_type.to_s }
+      expect(json_response['approval_rules_left']).to eq([short_approval])
+
       expect(json_response['approved_by']).to be_empty
       expect(json_response['user_can_approve']).to be true
       expect(json_response['user_has_approved']).to be false
