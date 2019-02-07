@@ -47,10 +47,10 @@ example on [Dependencies license management with GitLab CI/CD](../../../ci/examp
 
 GitLab then checks this report, compares the licenses between the source and target
 branches, and shows the information right on the merge request.
-Blacklisted licenses will be clearly visible, as well as new licenses which
-need a decision from you.
+Blacklisted licenses will be clearly visible with an `x` red icon next to them
+as well as new licenses which need a decision from you.
 
->**Note:**
+NOTE: **Note:**
 If the license management report doesn't have anything to compare to, no information
 will be displayed in the merge request area. That is the case when you add the
 `license_management` job in your `.gitlab-ci.yml` for the first time.
@@ -64,24 +64,22 @@ the choice to approve it or blacklist it.
 
 ![License approval decision](img/license_management_decision.png)
 
-From the project's settings:
-
-- The list of licenses and their status can be managed.
-- Licenses can be [manually approved or blacklisted](#manual-license-management).
-
-![License Management Settings](img/license_management_settings.png)
-
 ### Manual license management
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/5940)
 in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.4.
 
-Licenses can be manually approved or blacklisted in a project's settings.
+From the project's settings:
+
+- The list of licenses and their status can be managed.
+- Licenses can be manually approved or blacklisted.
 
 To approve or blacklist a license:
 
-1. Navigate to the project's **Settings > CI/CD**.
-1. Expand the **License Management** section and click the **Add a license** button.
+1. Either use the **Manage licenses** button in the merge request widget, or
+   navigate to the project's **Settings > CI/CD** and expand the
+   **License Management** section.
+1. Click the **Add a license** button.
 1. In the **License name** dropdown, either:
     - Select one of the available licenses. You can search for licenses in the field
    at the top of the list.
@@ -89,6 +87,8 @@ To approve or blacklist a license:
     added as a license name to the list.
 1. Select the **Approve** or **Blacklist** radio button to approve or blacklist respectively
    the selected license.
+
+   ![License Management Settings](img/license_management_settings.png)
 
 ## License Management report under pipelines
 
