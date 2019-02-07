@@ -1,14 +1,16 @@
 %p
-  An alert has been triggered in #{@project.full_path}.
+  An alert has been triggered in #{@alert.project_full_path}.
+
+- if env_name = @alert.environment_name
+  %p
+    Environment: #{env_name}
+
+- if metric_query = @alert.metric_query
+  %p
+    Metric:
+
+    %pre
+      = metric_query
 
 %p
-  Environment: #{@environment.name}
-
-%p
-  Metric:
-
-  %pre
-    = @alert.full_query
-
-%p
-  = link_to("View #{@environment.name} performance dashboard.", metrics_project_environment_url(@environment.project, @environment))
+  = link_to('View performance dashboard.', @alert.performance_dashboard_link)
