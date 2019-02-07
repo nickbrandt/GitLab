@@ -92,7 +92,10 @@ module Gitlab
             todos: count(Todo),
             uploads: count(Upload),
             web_hooks: count(WebHook)
-          }.merge(services_usage).merge(approximate_counts)
+          }
+          .merge(services_usage)
+          .merge(approximate_counts)
+          .merge(preferences_usage)
         }
       end
       # rubocop: enable CodeReuse/ActiveRecord
@@ -159,6 +162,10 @@ module Gitlab
           projects_jira_cloud_active: services['cloud'] || 0,
           projects_jira_active: services['server'] == -1 ? -1 : services.values.sum
         }
+      end
+
+      def preferences_usage
+        {}
       end
 
       def count(relation, fallback: -1)

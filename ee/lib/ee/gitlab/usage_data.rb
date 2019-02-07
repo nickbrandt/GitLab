@@ -88,6 +88,16 @@ module EE
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
+      # Note: when adding a preference, check if it's mapped to an attribute of a User model. If so, name
+      # the base key part after a corresponding User model attribute, use its possible values as suffix values.
+      override :preferences_usage
+      def preferences_usage
+        super.merge(
+          preference_group_overview_details: count(::User.group_view_details),
+          preference_group_overview_security_dashboard: count(::User.group_view_security_dashboard)
+        )
+      end
+
       override :system_usage_data
       def system_usage_data
         usage_data = super
