@@ -28,6 +28,12 @@ describe Gitlab::Alerting::Alert do
         expect(alert.environment).to eq(gitlab_alert.environment)
       end
 
+      it 'prefers gitlab_alert\'s title over annotated title' do
+        payload['annontations'] = { 'title' => 'other title' }
+
+        expect(alert.title).to eq(gitlab_alert.title)
+      end
+
       it 'is valid' do
         expect(alert).to be_valid
       end
