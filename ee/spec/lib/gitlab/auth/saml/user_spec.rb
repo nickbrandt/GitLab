@@ -119,6 +119,13 @@ describe Gitlab::Auth::Saml::User do
             expect(saml_user.find_user).to be_active
           end
 
+          it 'does not unblock manually blocked members' do
+            stub_saml_required_group_config(%w(Developers))
+            saml_user.save.block!
+
+            expect(saml_user.find_user).not_to be_active
+          end
+
           it 'does not allow non-members' do
             stub_saml_required_group_config(%w(ArchitectureAstronauts))
 
