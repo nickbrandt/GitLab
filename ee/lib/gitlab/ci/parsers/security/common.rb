@@ -89,6 +89,10 @@ module Gitlab
           def generate_identifier_fingerprint(identifier)
             Digest::SHA1.hexdigest("#{identifier['type']}:#{identifier['value']}")
           end
+
+          def generate_location_fingerprint(location)
+            raise NotImplementedError
+          end
         end
       end
     end
