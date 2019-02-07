@@ -140,11 +140,8 @@ describe 'Project mirror', :js do
         click_without_sidekiq 'Regenerate key'
         find('.js-regenerate-public-ssh-key-confirm-modal .js-confirm').click
 
-        expect(page).to have_selector(".fa-spinner")
-
         wait_for_requests
 
-        expect(page).not_to have_selector(".fa-spinner")
         expect(page).not_to have_content(first_key)
         expect(page).to have_content(import_data.reload.ssh_public_key)
       end
@@ -164,11 +161,8 @@ describe 'Project mirror', :js do
           select('Pull', from: 'Mirror direction')
           click_on 'Detect host keys'
 
-          expect(page).to have_selector(".fa-spinner")
-
           wait_for_requests
 
-          expect(page).not_to have_selector(".fa-spinner")
           expect(page).to have_content(key.fingerprint)
 
           click_on 'Input host keys manually'
@@ -187,11 +181,7 @@ describe 'Project mirror', :js do
           select('Pull', from: 'Mirror direction')
           click_on 'Detect host keys'
 
-          expect(page).to have_selector(".fa-spinner")
-
           wait_for_requests
-
-          expect(page).not_to have_selector(".fa-spinner")
         end
 
         # Appears in the flash
