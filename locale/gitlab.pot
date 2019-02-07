@@ -2898,6 +2898,9 @@ msgstr ""
 msgid "Customize how Google Code email addresses and usernames are imported into GitLab. In the next step, you'll be able to select the projects you want to import."
 msgstr ""
 
+msgid "Customize language and region related settings."
+msgstr ""
+
 msgid "Customize your merge request approval settings."
 msgstr ""
 
@@ -2968,6 +2971,12 @@ msgid "Default Branch"
 msgstr ""
 
 msgid "Default classification label"
+msgstr ""
+
+msgid "Default first day of the week"
+msgstr ""
+
+msgid "Default first day of the week in calendars and date pickers."
 msgstr ""
 
 msgid "Default: Directly import the Google Code email address or username"
@@ -4085,6 +4094,9 @@ msgid "Finish review"
 msgstr ""
 
 msgid "Finished"
+msgstr ""
+
+msgid "First day of the week"
 msgstr ""
 
 msgid "FirstPushedBy|First"
@@ -5634,6 +5646,9 @@ msgstr ""
 msgid "Loading…"
 msgstr ""
 
+msgid "Localization"
+msgstr ""
+
 msgid "Lock"
 msgstr ""
 
@@ -6091,6 +6106,9 @@ msgid "Modal|Cancel"
 msgstr ""
 
 msgid "Modal|Close"
+msgstr ""
+
+msgid "Monday"
 msgstr ""
 
 msgid "Monitor your errors by integrating with Sentry"
@@ -9079,6 +9097,9 @@ msgstr ""
 msgid "Suggested change"
 msgstr ""
 
+msgid "Sunday"
+msgstr ""
+
 msgid "Support for custom certificates is disabled. Ask your system's administrator to enable it."
 msgstr ""
 
@@ -9092,6 +9113,9 @@ msgid "System Hooks"
 msgstr ""
 
 msgid "System Info"
+msgstr ""
+
+msgid "System default (%{default})"
 msgstr ""
 
 msgid "System header and footer"
@@ -10308,6 +10332,9 @@ msgid "Various container registry settings."
 msgstr ""
 
 msgid "Various email settings."
+msgstr ""
+
+msgid "Various localization settings."
 msgstr ""
 
 msgid "Various settings that affect GitLab performance."
