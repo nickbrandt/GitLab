@@ -42,11 +42,19 @@ module Geo
       [1, capacity_per_shard.to_i].max
     end
 
+    # rubocop: disable CodeReuse/ActiveRecord
     def schedule_job(project_id)
-      job_id = Geo::ProjectSyncWorker.perform_async(project_id, Time.now)
+      registry = Geo::ProjectRegistry.find_or_initialize_by(project_id: project_id)
+
+      job_id = Geo::ProjectSyncWorker.perform_async(
+        project_id,
+        sync_repository: registry.repository_sync_due?(Time.now),
+        sync_wiki: registry.wiki_sync_due?(Time.now)
+      )
 
       { project_id: project_id, job_id: job_id } if job_id
     end
+    # rubocop: enable CodeReuse/ActiveRecord
 
     def scheduled_project_ids
       scheduled_jobs.map { |data| data[:project_id] }

@@ -158,7 +158,11 @@ module Geo
     def reschedule_sync
       log_info("Reschedule #{type} sync because a RepositoryUpdateEvent was processed during the sync")
 
-      ::Geo::ProjectSyncWorker.perform_async(project.id, Time.now)
+      ::Geo::ProjectSyncWorker.perform_async(
+        project.id,
+        sync_repository: type.repository?,
+        sync_wiki: type.wiki?
+      )
     end
 
     def fail_registry!(message, error, attrs = {})
@@ -170,7 +174,7 @@ module Geo
     end
 
     def type
-      self.class.type
+      @type ||= self.class.type.to_s.inquiry
     end
 
     def update_delay_in_seconds

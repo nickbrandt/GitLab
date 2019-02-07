@@ -11,7 +11,11 @@ module Gitlab
             registry.repository_updated!(event.source, scheduled_at)
 
             job_id = enqueue_job_if_shard_healthy(event) do
-              ::Geo::ProjectSyncWorker.perform_async(event.project_id, scheduled_at)
+              ::Geo::ProjectSyncWorker.perform_async(
+                event.project_id,
+                sync_repository: event.repository?,
+                sync_wiki: event.wiki?
+              )
             end
 
             log_event(job_id)

@@ -21,7 +21,7 @@ describe Gitlab::Geo::LogCursor::Events::RepositoryUpdatedEvent, :postgresql, :c
     allow(Gitlab::ShardHealthCache).to receive(:healthy_shard?).with('broken').and_return(false)
   end
 
-  RSpec.shared_examples 'RepositoryUpdatedEvent' do
+  shared_examples 'RepositoryUpdatedEvent' do
     it 'creates a new project registry if it does not exist' do
       expect { subject.process }.to change(Geo::ProjectRegistry, :count).by(1)
     end
@@ -108,9 +108,37 @@ describe Gitlab::Geo::LogCursor::Events::RepositoryUpdatedEvent, :postgresql, :c
       it_behaves_like 'RepositoryUpdatedEvent'
 
       it 'schedules a Geo::ProjectSyncWorker' do
-        expect(Geo::ProjectSyncWorker).to receive(:perform_async).with(project.id, now).once
+        expect(Geo::ProjectSyncWorker).to receive(:perform_async).with(project.id, sync_repository: true, sync_wiki: false).once
 
-        Timecop.freeze(now) { subject.process }
+        subject.process
+      end
+
+      context 'enqueues the job with the proper args' do
+        let!(:registry) { create(:geo_project_registry, :synced, project: repository_updated_event.project) }
+
+        before do
+          repository_updated_event.update!(source: event_source)
+        end
+
+        context 'enqueues wiki sync' do
+          let(:event_source) { Geo::RepositoryUpdatedEvent::WIKI }
+
+          it 'passes correct options' do
+            expect(Geo::ProjectSyncWorker).to receive(:perform_async).with(project.id, { sync_repository: false, sync_wiki: true })
+
+            subject.process
+          end
+        end
+
+        context 'enqueues repository sync' do
+          let(:event_source) { Geo::RepositoryUpdatedEvent::REPOSITORY }
+
+          it 'passes correct options' do
+            expect(Geo::ProjectSyncWorker).to receive(:perform_async).with(project.id, { sync_repository: true, sync_wiki: false })
+
+            subject.process
+          end
+        end
       end
     end
 
@@ -120,9 +148,9 @@ describe Gitlab::Geo::LogCursor::Events::RepositoryUpdatedEvent, :postgresql, :c
       it_behaves_like 'RepositoryUpdatedEvent'
 
       it 'does not schedule a Geo::ProjectSyncWorker job' do
-        expect(Geo::ProjectSyncWorker).not_to receive(:perform_async).with(project.id, now)
+        expect(Geo::ProjectSyncWorker).not_to receive(:perform_async).with(project.id, anything)
 
-        Timecop.freeze(now) { subject.process }
+        subject.process
       end
     end
   end
