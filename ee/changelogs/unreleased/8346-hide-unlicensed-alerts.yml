@@ -1,0 +1,5 @@
+---
+title: Don't show Alert widget for non-licensed users
+merge_request: 9224
+author:
+type: fixed
