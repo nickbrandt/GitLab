@@ -3,7 +3,7 @@
 - page_title s_('FeatureFlags|Edit Feature Flag')
 
 - if Feature.enabled?(:feature_flags_environment_scope, @project)
-  #js-edit-feature-flag{ data: { endpoint: project_feature_flag_path(@project, @feature_flag), feature_flags_path: project_feature_flags_path(@project) } }
+  #js-edit-feature-flag{ data: { endpoint: project_feature_flag_path(@project, @feature_flag), feature_flags_path: project_feature_flags_path(@project), environments_endpoint: search_project_environments_path(@project, format: :json)} }
 - else
   %h3.page-title
     = s_('FeatureFlags|Edit %{feature_flag_name}') % { feature_flag_name: @feature_flag.name }

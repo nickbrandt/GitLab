@@ -1,12 +1,14 @@
 import { createLocalVue, mount } from '@vue/test-utils';
 import Form from 'ee/feature_flags/components/form.vue';
 import ToggleButton from '~/vue_shared/components/toggle_button.vue';
+import EnvironmentsDropdown from 'ee/feature_flags/components/environments_dropdown.vue';
 
 describe('feature flag form', () => {
   let wrapper;
   const requiredProps = {
     cancelPath: 'feature_flags',
     submitText: 'Create',
+    environmentsEndpoint: '/environments.json',
   };
 
   const factory = (props = {}) => {
@@ -58,20 +60,6 @@ describe('feature flag form', () => {
       });
 
       describe('status toggle', () => {
-        describe('with filled text input', () => {
-          it('should add a new scope with the text value and the status and reset the form', () => {
-            wrapper.find('.js-new-scope-name').setValue('production');
-
-            wrapper.find(ToggleButton).vm.$emit('change', true);
-
-            expect(wrapper.vm.formScopes).toEqual([
-              { active: true, environment_scope: 'production' },
-            ]);
-
-            expect(wrapper.vm.newScope).toEqual('');
-          });
-        });
-
         describe('without filled text input', () => {
           it('should add a new scope with the text value empty and the status', () => {
             wrapper.find(ToggleButton).vm.$emit('change', true);
@@ -203,7 +191,11 @@ describe('feature flag form', () => {
       it('should emit handleSubmit with the updated data', () => {
         wrapper.find('#feature-flag-name').setValue('feature_flag_2');
 
-        wrapper.find('.js-new-scope-name').setValue('review');
+        wrapper
+          .find('.js-new-scope-name')
+          .find(EnvironmentsDropdown)
+          .vm.$emit('selectEnvironment', 'review');
+
         wrapper
           .find('.js-add-new-scope')
           .find(ToggleButton)
@@ -222,6 +214,10 @@ describe('feature flag form', () => {
               },
               {
                 environment_scope: 'review',
+                active: false,
+              },
+              {
+                environment_scope: '',
                 active: true,
               },
             ],
