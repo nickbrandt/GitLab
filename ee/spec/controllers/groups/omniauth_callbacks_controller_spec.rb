@@ -18,6 +18,10 @@ describe Groups::OmniauthCallbacksController do
     Identity.where(user: user, extern_uid: uid, provider: provider)
   end
 
+  def create_linked_user
+    create(:omniauth_user, extern_uid: uid, provider: provider, saml_provider: saml_provider)
+  end
+
   context "when request hasn't been validated by omniauth middleware" do
     it "prevents authentication" do
       sign_in(user)
@@ -34,43 +38,45 @@ describe Groups::OmniauthCallbacksController do
       stub_omniauth_provider(provider, context: request)
     end
 
+    shared_examples "and identity already linked" do
+      let!(:user) { create_linked_user }
+
+      it "redirects to RelayState" do
+        post provider, params: { group_id: group, RelayState: '/explore' }
+
+        expect(response).to redirect_to('/explore')
+      end
+
+      it "displays a flash message verifying group sign in" do
+        post provider, params: { group_id: group }
+
+        expect(flash[:notice]).to match(/Signed in with SAML/i)
+      end
+
+      it 'uses existing linked identity' do
+        expect { post provider, params: { group_id: group } }.not_to change(linked_accounts, :count)
+      end
+
+      it 'skips authenticity token based forgery protection' do
+        with_forgery_protection do
+          post provider, params: { group_id: group }
+
+          expect(response).not_to be_client_error
+          expect(response).not_to be_server_error
+        end
+      end
+    end
+
     context "when signed in" do
       before do
         sign_in(user)
       end
 
-      context "and identity already linked" do
-        let(:user) { create(:omniauth_user, extern_uid: uid, provider: provider, saml_provider: saml_provider) }
-
-        it "redirects to RelayState" do
-          post provider, params: { group_id: group, RelayState: '/explore' }
-
-          expect(response).to redirect_to('/explore')
-        end
-
-        it "displays a flash message verifying group sign in" do
-          post provider, params: { group_id: group }
-
-          expect(flash[:notice]).to start_with "Signed in with SAML"
-        end
-
-        it 'uses existing linked identity' do
-          expect { post provider, params: { group_id: group } }.not_to change(linked_accounts, :count)
-        end
-
-        it 'skips authenticity token based forgery protection' do
-          with_forgery_protection do
-            post provider, params: { group_id: group }
-
-            expect(response).not_to be_client_error
-            expect(response).not_to be_server_error
-          end
-        end
-      end
+      it_behaves_like "and identity already linked"
 
       context 'oauth already linked to another account' do
         before do
-          create(:omniauth_user, extern_uid: uid, provider: provider, saml_provider: saml_provider)
+          create_linked_user
         end
 
         it 'displays warning to user' do
@@ -102,17 +108,35 @@ describe Groups::OmniauthCallbacksController do
     end
 
     context "when not signed in" do
-      it "redirects to sign in page" do
-        post provider, params: { group_id: group }
+      context "and identity hasn't been linked" do
+        it "redirects to sign in page" do
+          post provider, params: { group_id: group }
 
-        expect(response).to redirect_to(new_user_session_path)
+          expect(response).to redirect_to(new_user_session_path)
+        end
+
+        it "informs users that they need to sign in to the GitLab instance first" do
+          post provider, params: { group_id: group }
+
+          expect(flash[:notice]).to start_with("Login to a GitLab account to link with your SAML identity")
+        end
       end
 
-      it "informs users that they need to sign in to the GitLab instance first" do
-        post provider, params: { group_id: group }
+      context 'identity linked but sign in flow disabled' do
+        before do
+          create_linked_user
+          stub_feature_flags(group_saml_allows_sign_in_to_gitlab: false)
+        end
 
-        expect(flash[:notice]).to start_with("You must be signed in")
+        it 'prevents sign in' do
+          post provider, params: { group_id: group }
+
+          expect(flash[:notice]).to start_with('You must be signed in')
+          expect(response).to redirect_to('/users/sign_in')
+        end
       end
+
+      it_behaves_like "and identity already linked"
     end
   end
 
