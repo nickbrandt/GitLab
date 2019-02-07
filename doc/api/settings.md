@@ -57,6 +57,7 @@ Example response:
    "dsa_key_restriction": 0,
    "ecdsa_key_restriction": 0,
    "ed25519_key_restriction": 0,
+   "first_day_of_week": 0,
    "enforce_terms": true,
    "terms": "Hello world!",
    "performance_bar_allowed_group_id": 42,
@@ -119,6 +120,7 @@ Example response:
   "dsa_key_restriction": 0,
   "ecdsa_key_restriction": 0,
   "ed25519_key_restriction": 0,
+  "first_day_of_week": 0,
   "enforce_terms": true,
   "terms": "Hello world!",
   "performance_bar_allowed_group_id": 42,
@@ -184,6 +186,7 @@ are listed in the descriptions of the relevant settings.
 | `external_authorization_service_timeout` | float            | required by: `external_authorization_service_enabled` | **(Premium)** The timeout after which an authorization request is aborted, in seconds. When a request times out, access is denied to the user. (min: 0.001, max: 10, step: 0.001) |
 | `external_authorization_service_url`     | string           | required by: `external_authorization_service_enabled` | **(Premium)** URL to which authorization requests will be directed |
 | `file_template_project_id`               | integer          | no                                   | **(Premium)** The ID of a project to load custom file templates from |
+| `first_day_of_week`                      | integer          | no                                   | Start day of the week for calendar views and date pickers. Valid values are `0` (default) for Sunday and `1` for Monday. |
 | `geo_status_timeout`                     | integer          | no                                   | **(Premium)** The amount of seconds after which a request to get a secondary node status will time out. |
 | `gitaly_timeout_default`                 | integer          | no                                   | Default Gitaly timeout, in seconds. This timeout is not enforced for git fetch/push operations or Sidekiq jobs. Set to `0` to disable timeouts. |
 | `gitaly_timeout_fast`                    | integer          | no                                   | Gitaly fast operation timeout, in seconds. Some Gitaly operations are expected to be fast. If they exceed this threshold, there may be a problem with a storage shard and 'failing fast' can help maintain the stability of the GitLab instance. Set to `0` to disable timeouts. |
