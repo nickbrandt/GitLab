@@ -15,7 +15,7 @@ module Geo
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
-    def perform(project_id, scheduled_time)
+    def perform(project_id, options = {})
       registry = Geo::ProjectRegistry.find_or_initialize_by(project_id: project_id)
       project = registry.project
 
@@ -30,9 +30,37 @@ module Geo
         return
       end
 
-      Geo::RepositorySyncService.new(project).execute if registry.repository_sync_due?(scheduled_time)
-      Geo::WikiSyncService.new(project).execute if registry.wiki_sync_due?(scheduled_time)
+      options = extract_options(registry, options)
+
+      sync_repository(registry, options)
+      sync_wiki(registry, options)
     end
     # rubocop: enable CodeReuse/ActiveRecord
+
+    def sync_repository(registry, options)
+      return unless options[:sync_repository] && registry.resync_repository?
+
+      Geo::RepositorySyncService.new(registry.project).execute
+    end
+
+    def sync_wiki(registry, options)
+      return unless options[:sync_wiki] && registry.resync_wiki?
+
+      Geo::WikiSyncService.new(registry.project).execute
+    end
+
+    def extract_options(registry, options)
+      options.is_a?(Hash) ? options.symbolize_keys : backward_options(registry, options)
+    end
+
+    # Before GitLab 11.8 we used to pass the scheduled time instead of an options hash,
+    # this method makes the job arguments backward compatible and
+    # can be removed in any version after GitLab 12.0.
+    def backward_options(registry, schedule_time)
+      {
+        sync_repository: registry.repository_sync_due?(schedule_time),
+        sync_wiki: registry.wiki_sync_due?(schedule_time)
+      }
+    end
   end
 end

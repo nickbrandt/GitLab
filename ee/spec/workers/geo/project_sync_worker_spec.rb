@@ -21,11 +21,20 @@ RSpec.describe Geo::ProjectSyncWorker do
         .with(instance_of(Project)).once.and_return(wiki_sync_service)
     end
 
+    context 'backward compatibility' do
+      it 'performs sync for the given project when time is passed' do
+        subject.perform(project.id, Time.now)
+
+        expect(repository_sync_service).to have_received(:execute)
+        expect(wiki_sync_service).to have_received(:execute)
+      end
+    end
+
     context 'when project could not be found' do
       it 'logs an error and returns' do
         expect(subject).to receive(:log_error).with("Couldn't find project, skipping syncing", project_id: 999)
 
-        expect { subject.perform(999, Time.now) }.not_to raise_error
+        expect { subject.perform(999) }.not_to raise_error
       end
     end
 
@@ -35,21 +44,23 @@ RSpec.describe Geo::ProjectSyncWorker do
         expect(repository_sync_service).not_to receive(:execute)
         expect(wiki_sync_service).not_to receive(:execute)
 
-        subject.perform(project_with_broken_storage.id, Time.now)
+        subject.perform(project_with_broken_storage.id)
       end
     end
 
     context 'when project repositories has never been synced' do
       it 'performs Geo::RepositorySyncService for the given project' do
-        subject.perform(project.id, Time.now)
+        subject.perform(project.id, sync_repository: true)
 
         expect(repository_sync_service).to have_received(:execute).once
+        expect(wiki_sync_service).not_to have_received(:execute)
       end
 
       it 'performs Geo::WikiSyncService for the given project' do
-        subject.perform(project.id, Time.now)
+        subject.perform(project.id, sync_wiki: true)
 
         expect(wiki_sync_service).to have_received(:execute).once
+        expect(repository_sync_service).not_to have_received(:execute)
       end
     end
 
@@ -57,13 +68,13 @@ RSpec.describe Geo::ProjectSyncWorker do
       let!(:registry) { create(:geo_project_registry, :synced, project: project) }
 
       it 'does not perform Geo::RepositorySyncService for the given project' do
-        subject.perform(project.id, Time.now)
+        subject.perform(project.id, sync_repository: true)
 
         expect(repository_sync_service).not_to have_received(:execute)
       end
 
       it 'does not perform Geo::WikiSyncService for the given project' do
-        subject.perform(project.id, Time.now)
+        subject.perform(project.id, sync_wiki: true)
 
         expect(wiki_sync_service).not_to have_received(:execute)
       end
@@ -73,71 +84,15 @@ RSpec.describe Geo::ProjectSyncWorker do
       let!(:registry) { create(:geo_project_registry, :sync_failed, project: project) }
 
       it 'performs Geo::RepositorySyncService for the given project' do
-        subject.perform(project.id, Time.now)
+        subject.perform(project.id, sync_repository: true)
 
         expect(repository_sync_service).to have_received(:execute).once
       end
 
       it 'performs Geo::WikiSyncService for the given project' do
-        subject.perform(project.id, Time.now)
+        subject.perform(project.id, sync_wiki: true)
 
         expect(wiki_sync_service).to have_received(:execute).once
-      end
-    end
-
-    context 'when project repository is dirty' do
-      let!(:registry) do
-        create(:geo_project_registry, :synced, :repository_dirty, project: project)
-      end
-
-      it 'performs Geo::RepositorySyncService for the given project' do
-        subject.perform(project.id, Time.now)
-
-        expect(repository_sync_service).to have_received(:execute).once
-      end
-
-      it 'does not perform Geo::WikiSyncService for the given project' do
-        subject.perform(project.id, Time.now)
-
-        expect(wiki_sync_service).not_to have_received(:execute)
-      end
-    end
-
-    context 'when wiki is dirty' do
-      let!(:registry) do
-        create(:geo_project_registry, :synced, :wiki_dirty, project: project)
-      end
-
-      it 'does not perform Geo::RepositorySyncService for the given project' do
-        subject.perform(project.id, Time.now)
-
-        expect(repository_sync_service).not_to have_received(:execute)
-      end
-
-      it 'performs Geo::WikiSyncService for the given project' do
-        subject.perform(project.id, Time.now)
-
-        expect(wiki_sync_service).to have_received(:execute)
-      end
-    end
-
-    context 'when project repository was synced after the time the job was scheduled in' do
-      it 'does not perform Geo::RepositorySyncService for the given project' do
-        create(:geo_project_registry, :synced, :repository_dirty, project: project, last_repository_synced_at: Time.now)
-
-        subject.perform(project.id, Time.now - 5.minutes)
-
-        expect(repository_sync_service).not_to have_received(:execute)
-      end
-    end
-
-    context 'when wiki repository was synced after the time the job was scheduled in' do
-      it 'does not perform Geo::RepositorySyncService for the given project' do
-        create(:geo_project_registry, :synced, :wiki_dirty, project: project, last_wiki_synced_at: Time.now)
-
-        subject.perform(project.id, Time.now - 5.minutes)
-
-        expect(wiki_sync_service).not_to have_received(:execute)
       end
     end
   end

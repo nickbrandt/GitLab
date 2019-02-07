@@ -122,7 +122,7 @@ describe Geo::RepositoryShardSyncWorker, :geo, :delete, :clean_gitlab_redis_cach
 
       it 'does not perform Geo::ProjectSyncWorker for projects that do not belong to selected namespaces to replicate' do
         expect(Geo::ProjectSyncWorker).to receive(:perform_async)
-          .with(unsynced_project_in_restricted_group.id, within(1.minute).of(Time.now))
+          .with(unsynced_project_in_restricted_group.id, sync_repository: true, sync_wiki: true)
           .once
           .and_return(spy)
 
@@ -134,7 +134,7 @@ describe Geo::RepositoryShardSyncWorker, :geo, :delete, :clean_gitlab_redis_cach
         create(:geo_project_registry, :synced, :repository_dirty, project: unsynced_project)
 
         expect(Geo::ProjectSyncWorker).to receive(:perform_async)
-          .with(unsynced_project_in_restricted_group.id, within(1.minute).of(Time.now))
+          .with(unsynced_project_in_restricted_group.id, sync_repository: true, sync_wiki: false)
           .once
           .and_return(spy)
 
@@ -178,6 +178,32 @@ describe Geo::RepositoryShardSyncWorker, :geo, :delete, :clean_gitlab_redis_cach
 
         3.times do
           Sidekiq::Testing.inline! { subject.perform(shard_name) }
+        end
+      end
+    end
+
+    context 'projects that require resync' do
+      context 'when project repository is dirty' do
+        it 'syncs repository only' do
+          create(:geo_project_registry, :synced, :repository_dirty, project: unsynced_project)
+          create(:geo_project_registry, :synced, :repository_dirty, project: unsynced_project_in_restricted_group)
+
+          expect(Geo::ProjectSyncWorker).to receive(:perform_async).with(unsynced_project.id, sync_repository: true, sync_wiki: false)
+          expect(Geo::ProjectSyncWorker).to receive(:perform_async).with(unsynced_project_in_restricted_group.id, sync_repository: true, sync_wiki: false)
+
+          subject.perform(shard_name)
+        end
+      end
+
+      context 'when project wiki is dirty' do
+        it 'syncs wiki only' do
+          create(:geo_project_registry, :synced, :wiki_dirty, project: unsynced_project)
+          create(:geo_project_registry, :synced, :wiki_dirty, project: unsynced_project_in_restricted_group)
+
+          expect(Geo::ProjectSyncWorker).to receive(:perform_async).with(unsynced_project.id, sync_repository: false, sync_wiki: true)
+          expect(Geo::ProjectSyncWorker).to receive(:perform_async).with(unsynced_project_in_restricted_group.id, sync_repository: false, sync_wiki: true)
+
+          subject.perform(shard_name)
         end
       end
     end
