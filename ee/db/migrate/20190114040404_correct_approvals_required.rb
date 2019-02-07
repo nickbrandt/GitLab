@@ -16,14 +16,15 @@ class CorrectApprovalsRequired < ActiveRecord::Migration[5.0]
   class ApprovalProjectRule < ActiveRecord::Base
     self.table_name = 'approval_project_rules'
 
-    has_many :approval_merge_request_rule_source
-    has_many :approval_merge_request_rules, through: :approval_merge_request_rule_source
+    has_many :approval_merge_request_rule_sources
+    has_many :approval_merge_request_rules, through: :approval_merge_request_rule_sources
   end
 
   def up
     ApprovalProjectRule
       .joins(:approval_merge_request_rules)
       .where('approval_merge_request_rules.approvals_required = 0 AND approval_project_rules.approvals_required > 0')
+      .distinct
       .find_each do |project_rule|
       # Pluck as MySQL prohibits subquery that references the table being updated
       mr_rule_ids = ApprovalMergeRequestRule
