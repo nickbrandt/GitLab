@@ -72,7 +72,7 @@ RSpec.shared_examples "protected tags > access control > EE" do
     expect(access_levels).to be_empty
   end
 
-  it "prepends selected users that can create" do
+  it "prepends selected users that can create", :quarantine do
     users = create_list(:user, 21)
     users.each { |user| project.add_developer(user) }
 
