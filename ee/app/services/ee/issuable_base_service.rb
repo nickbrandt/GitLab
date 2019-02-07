@@ -2,6 +2,8 @@
 
 module EE
   module IssuableBaseService
+    include ::Gitlab::Utils::StrongMemoize
+
     private
 
     def filter_params(issuable)
@@ -14,6 +16,12 @@ module EE
       end
 
       super
+    end
+
+    def update_task_event?
+      strong_memoize(:update_task_event) do
+        params.key?(:update_task)
+      end
     end
   end
 end
