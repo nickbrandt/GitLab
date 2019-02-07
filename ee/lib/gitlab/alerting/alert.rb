@@ -15,12 +15,24 @@ module Gitlab
         end
       end
 
+      def title
+        strong_memoize(:title) do
+          parse_title_from_payload
+        end
+      end
+
+      def description
+        strong_memoize(:description) do
+          parse_description_from_payload
+        end
+      end
+
       def environment
         gitlab_alert&.environment
       end
 
       def valid?
-        project && gitlab_alert
+        project && title
       end
 
       def present
@@ -34,6 +46,16 @@ module Gitlab
         return unless metric_id
 
         project.prometheus_alerts.for_metric(metric_id).first
+      end
+
+      def parse_title_from_payload
+        gitlab_alert&.title ||
+          payload&.dig('annotations', 'title') ||
+          payload&.dig('annotations', 'summary')
+      end
+
+      def parse_description_from_payload
+        payload&.dig('annotations', 'description')
       end
     end
   end

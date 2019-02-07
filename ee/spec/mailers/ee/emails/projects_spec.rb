@@ -46,7 +46,7 @@ describe EE::Emails::Projects do
       it_behaves_like 'a user cannot unsubscribe through footer link'
 
       it 'has expected subject' do
-        is_expected.to have_subject(/Alert: #{environment.name} #{title}/)
+        is_expected.to have_subject("#{project.name} | Alert: #{environment.name} #{title} for 5 minutes")
       end
 
       it 'has expected content' do
@@ -76,6 +76,52 @@ describe EE::Emails::Projects do
       end
 
       it_behaves_like 'no email'
+    end
+
+    context 'with an external alert' do
+      let(:title) { 'alert title' }
+
+      let(:metrics_url) do
+        metrics_project_environments_url(project)
+      end
+
+      let(:alert_params) do
+        {
+          'annotations' => {
+            'title' => title
+          }
+        }
+      end
+
+      it_behaves_like 'an email sent from GitLab'
+      it_behaves_like 'it should not have Gmail Actions links'
+      it_behaves_like 'a user cannot unsubscribe through footer link'
+
+      it 'has expected subject' do
+        is_expected.to have_subject("#{project.name} | Alert: #{title}")
+      end
+
+      it 'has expected content' do
+        is_expected.to have_body_text('An alert has been triggered')
+        is_expected.to have_body_text(project.full_path)
+        is_expected.not_to have_body_text('Description:')
+        is_expected.not_to have_body_text('Environment:')
+        is_expected.not_to have_body_text('Metric:')
+        is_expected.to have_body_text(metrics_url)
+      end
+
+      context 'with annotated description' do
+        let(:description) { 'description' }
+
+        before do
+          alert_params['annotations']['description'] = description
+        end
+
+        it 'shows the description' do
+          is_expected.to have_body_text('Description:')
+          is_expected.to have_body_text(description)
+        end
+      end
     end
   end
 end

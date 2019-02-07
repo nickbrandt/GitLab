@@ -1,5 +1,9 @@
 An alert has been triggered in <%= @alert.project_full_path %>.
 
+<% if description = @alert.description %>
+Description: <%= description %>
+<% end %>
+
 <% if env_name = @alert.environment_name %>
 Environment: <%= env_name %>
 <% end %>

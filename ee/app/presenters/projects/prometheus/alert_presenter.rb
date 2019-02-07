@@ -4,7 +4,7 @@ module Projects
   module Prometheus
     class AlertPresenter < Gitlab::View::Presenter::Delegated
       def email_subject
-        [environment_name, query_title].compact.join(' ')
+        [environment_name, alert_title].compact.join(' ')
       end
 
       def project_full_path
@@ -28,6 +28,10 @@ module Projects
       end
 
       private
+
+      def alert_title
+        query_title || title
+      end
 
       def query_title
         return unless gitlab_alert
