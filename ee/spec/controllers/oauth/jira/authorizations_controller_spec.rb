@@ -32,7 +32,7 @@ describe Oauth::Jira::AuthorizationsController do
   describe 'POST access_token' do
     it 'returns oauth params in a format JIRA expects' do
       expect_any_instance_of(Doorkeeper::Request::AuthorizationCode).to receive(:authorize) do
-        double(body: { 'access_token' => 'fake-123', 'scope' => 'foo', 'token_type' => 'bar' })
+        double(status: :ok, body: { 'access_token' => 'fake-123', 'scope' => 'foo', 'token_type' => 'bar' })
       end
 
       post :access_token, params: { code: 'code-123', client_id: 'client-123', client_secret: 'secret-123' }
