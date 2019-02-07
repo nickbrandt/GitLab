@@ -8,7 +8,7 @@ module EE
 
     override :execute_related_hooks
     def execute_related_hooks
-      if ::Gitlab::CurrentSettings.elasticsearch_indexing? && default_branch?
+      if ::Gitlab::CurrentSettings.elasticsearch_indexing? && default_branch? && should_index_commits?
         ::ElasticCommitIndexerWorker.perform_async(project.id, params[:oldrev], params[:newrev])
       end
 
@@ -16,6 +16,10 @@ module EE
     end
 
     private
+
+    def should_index_commits?
+      ::Gitlab::Redis::SharedState.with { |redis| !redis.sismember(:elastic_projects_indexing, project.id) }
+    end
 
     override :pipeline_options
     def pipeline_options

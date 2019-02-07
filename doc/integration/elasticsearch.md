@@ -366,6 +366,12 @@ Here are some common pitfalls and how to overcome them:
 
     You will need to re-run all the rake tasks to re-index the database, repositories, and wikis.
 
+- **No new data is added to the Elasticsearch index when I push code**
+
+    When performing the initial indexing of blobs, we lock all projects until the project finishes indexing. It could
+    happen that an error during the process causes one or multiple projects to remain locked. In order to unlock them,
+    run the `gitlab:elastic:clear_locked_projects` rake task.
+
 - **"Can't specify parent if no parent field has been configured"**
 
     If you enabled Elasticsearch before GitLab 8.12 and have not rebuilt indexes you will get
