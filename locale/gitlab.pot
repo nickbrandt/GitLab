@@ -1531,6 +1531,9 @@ msgstr ""
 msgid "Built-in"
 msgstr ""
 
+msgid "Business"
+msgstr ""
+
 msgid "Business metrics (Custom)"
 msgstr ""
 
@@ -5952,9 +5955,6 @@ msgstr ""
 msgid "Metrics for environment"
 msgstr ""
 
-msgid "Metrics|Business"
-msgstr ""
-
 msgid "Metrics|Check out the CI/CD documentation on deploying to an environment"
 msgstr ""
 
@@ -5976,7 +5976,7 @@ msgstr ""
 msgid "Metrics|For grouping similar metrics"
 msgstr ""
 
-msgid "Metrics|Label of the chart's vertical axis. Usually the type of the unit being charted. The horizontal axis (X-axis) always represents time."
+msgid "Metrics|Label of the y-axis (usually the unit). The x-axis always represents time."
 msgstr ""
 
 msgid "Metrics|Learn about environments"
@@ -5988,22 +5988,16 @@ msgstr ""
 msgid "Metrics|Must be a valid PromQL query."
 msgstr ""
 
-msgid "Metrics|Name"
-msgstr ""
-
 msgid "Metrics|New metric"
 msgstr ""
 
 msgid "Metrics|No deployed environments"
 msgstr ""
 
+msgid "Metrics|PromQL query is valid"
+msgstr ""
+
 msgid "Metrics|Prometheus Query Documentation"
-msgstr ""
-
-msgid "Metrics|Query"
-msgstr ""
-
-msgid "Metrics|Response"
 msgstr ""
 
 msgid "Metrics|System"
@@ -6018,10 +6012,10 @@ msgstr ""
 msgid "Metrics|There was an error getting environments information."
 msgstr ""
 
-msgid "Metrics|There was an error while retrieving metrics"
+msgid "Metrics|There was an error trying to validate your query"
 msgstr ""
 
-msgid "Metrics|Type"
+msgid "Metrics|There was an error while retrieving metrics"
 msgstr ""
 
 msgid "Metrics|Unexpected deployment data response from prometheus endpoint"
@@ -6045,19 +6039,7 @@ msgstr ""
 msgid "Metrics|You're about to permanently delete this metric. This cannot be undone."
 msgstr ""
 
-msgid "Metrics|e.g. HTTP requests"
-msgstr ""
-
-msgid "Metrics|e.g. Requests/second"
-msgstr ""
-
 msgid "Metrics|e.g. Throughput"
-msgstr ""
-
-msgid "Metrics|e.g. rate(http_requests_total[5m])"
-msgstr ""
-
-msgid "Metrics|e.g. req/sec"
 msgstr ""
 
 msgid "Milestone"
@@ -7717,6 +7699,9 @@ msgstr ""
 msgid "Quarters"
 msgstr ""
 
+msgid "Query"
+msgstr ""
+
 msgid "Quick actions can be used in the issues description and comment boxes."
 msgstr ""
 
@@ -7984,6 +7969,9 @@ msgid "Resolve discussion"
 msgstr ""
 
 msgid "Resolved"
+msgstr ""
+
+msgid "Response"
 msgstr ""
 
 msgid "Response metrics (AWS ELB)"
