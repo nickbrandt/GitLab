@@ -64,11 +64,6 @@ msgid_plural "%d commits behind"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "%d deleted"
-msgid_plural "%d deletions"
-msgstr[0] ""
-msgstr[1] ""
-
 msgid "%d exporter"
 msgid_plural "%d exporters"
 msgstr[0] ""
@@ -4012,6 +4007,11 @@ msgstr ""
 
 msgid "Fields on this page are now uneditable, you can configure"
 msgstr ""
+
+msgid "File"
+msgid_plural "Files"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "File added"
 msgstr ""
