@@ -53,7 +53,7 @@ Once a feature flag is created, the list of existing feature flags will be prese
 with ability to edit or remove them.
 
 To make a feature flag active or inactive, click the pencil icon to edit it,
-and toggle the status for each scope.
+and toggle the status for each [spec](#define-environment-specs).
 
 ![Feature flags list](img/feature_flags_list.png)
 
