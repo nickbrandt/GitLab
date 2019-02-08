@@ -1,64 +1,61 @@
-import Vue from 'vue';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import DraftNote from 'ee/batch_comments/components/draft_note.vue';
-import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
+import NoteableNote from '~/notes/components/noteable_note.vue';
 import { createStore } from '~/mr_notes/stores';
 import '~/behaviors/markdown/render_gfm';
 import { createDraft } from '../mock_data';
 
 describe('Batch comments draft note component', () => {
-  let vm;
-  let Component;
+  let wrapper;
   let draft;
-
-  beforeAll(() => {
-    Component = Vue.extend(DraftNote);
-  });
 
   beforeEach(() => {
     const store = createStore();
 
     draft = createDraft();
 
-    vm = mountComponentWithStore(Component, { store, props: { draft } });
+    const localVue = createLocalVue();
+    wrapper = shallowMount(DraftNote, {
+      store,
+      propsData: { draft },
+      sync: false,
+      localVue,
+    });
 
-    spyOn(vm.$store, 'dispatch').and.stub();
+    spyOn(wrapper.vm.$store, 'dispatch').and.stub();
   });
 
   afterEach(() => {
-    vm.$destroy();
+    wrapper.destroy();
   });
 
   it('renders template', () => {
-    expect(vm.$el.querySelector('.draft-pending-label')).not.toBe(null);
-    expect(vm.$el.querySelector('.draft-notes').textContent).toContain('Test');
-  });
+    expect(wrapper.find('.draft-pending-label').exists()).toBe(true);
 
-  describe('in discussion', () => {
-    beforeEach(done => {
-      vm.draft.discussion_id = '123';
+    const note = wrapper.find(NoteableNote);
 
-      vm.$nextTick(done);
-    });
-
-    it('renders resolution status', () => {
-      expect(vm.$el.querySelector('.line-resolve-btn')).not.toBe(null);
-    });
+    expect(note.exists()).toBe(true);
+    expect(note.props().note).toEqual(draft);
   });
 
   describe('add comment now', () => {
     it('dispatches publishSingleDraft when clicking', () => {
-      vm.$el.querySelectorAll('.btn-inverted')[1].click();
+      const publishNowButton = wrapper.find({ ref: 'publishNowButton' });
+      publishNowButton.vm.$emit('click');
 
-      expect(vm.$store.dispatch).toHaveBeenCalledWith('batchComments/publishSingleDraft', 1);
+      expect(wrapper.vm.$store.dispatch).toHaveBeenCalledWith(
+        'batchComments/publishSingleDraft',
+        1,
+      );
     });
 
     it('sets as loading when draft is publishing', done => {
-      vm.$store.state.batchComments.currentlyPublishingDrafts.push(1);
+      wrapper.vm.$store.state.batchComments.currentlyPublishingDrafts.push(1);
 
-      vm.$nextTick(() => {
-        expect(vm.$el.querySelectorAll('.btn-inverted')[1].getAttribute('disabled')).toBe(
-          'disabled',
-        );
+      wrapper.vm.$nextTick(() => {
+        const publishNowButton = wrapper.find({ ref: 'publishNowButton' });
+
+        expect(publishNowButton.props().loading).toBe(true);
 
         done();
       });
@@ -67,18 +64,25 @@ describe('Batch comments draft note component', () => {
 
   describe('update', () => {
     it('dispatches updateDraft', done => {
-      vm.$el.querySelector('.js-note-edit').click();
+      const note = wrapper.find(NoteableNote);
 
-      vm.$nextTick()
+      note.vm.$emit('handleEdit');
+
+      wrapper.vm
+        .$nextTick()
         .then(() => {
-          vm.$el.querySelector('.js-vue-issue-save').click();
-
-          expect(vm.$store.dispatch).toHaveBeenCalledWith('batchComments/updateDraft', {
+          const formData = {
             note: draft,
             noteText: 'a',
             resolveDiscussion: false,
-            callback: jasmine.any(Function),
-          });
+          };
+
+          note.vm.$emit('handleUpdateNote', formData);
+
+          expect(wrapper.vm.$store.dispatch).toHaveBeenCalledWith(
+            'batchComments/updateDraft',
+            formData,
+          );
         })
         .then(done)
         .catch(done.fail);
@@ -89,19 +93,30 @@ describe('Batch comments draft note component', () => {
     it('dispatches deleteDraft', () => {
       spyOn(window, 'confirm').and.callFake(() => true);
 
-      vm.$el.querySelector('.js-note-delete').click();
+      const note = wrapper.find(NoteableNote);
 
-      expect(vm.$store.dispatch).toHaveBeenCalledWith('batchComments/deleteDraft', draft);
+      note.vm.$emit('handleDeleteNote', draft);
+
+      expect(wrapper.vm.$store.dispatch).toHaveBeenCalledWith('batchComments/deleteDraft', draft);
     });
   });
 
   describe('quick actions', () => {
     it('renders referenced commands', done => {
-      vm.draft.references.commands = 'test command';
+      wrapper.setProps({
+        draft: {
+          ...draft,
+          references: {
+            commands: 'test command',
+          },
+        },
+      });
 
-      vm.$nextTick(() => {
-        expect(vm.$el.querySelector('.referenced-commands')).not.toBe(null);
-        expect(vm.$el.querySelector('.referenced-commands').textContent).toContain('test command');
+      wrapper.vm.$nextTick(() => {
+        const referencedCommands = wrapper.find('.referenced-commands');
+
+        expect(referencedCommands.exists()).toBe(true);
+        expect(referencedCommands.text()).toContain('test command');
 
         done();
       });

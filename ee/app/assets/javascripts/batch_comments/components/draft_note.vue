@@ -91,6 +91,7 @@ export default {
           class="btn btn-success btn-inverted append-right-8"
         />
         <loading-button
+          ref="publishNowButton"
           :loading="isPublishingDraft(draft.id) || isPublishing"
           :label="__('Add comment now')"
           container-class="btn btn-inverted"
