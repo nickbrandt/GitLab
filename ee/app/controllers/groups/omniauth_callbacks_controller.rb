@@ -7,9 +7,9 @@ class Groups::OmniauthCallbacksController < OmniauthCallbacksController
 
   def group_saml
     @unauthenticated_group = Group.find_by_full_path(params[:group_id])
-    saml_provider = @unauthenticated_group.saml_provider
+    @saml_provider = @unauthenticated_group.saml_provider
 
-    identity_linker = Gitlab::Auth::GroupSaml::IdentityLinker.new(current_user, oauth, saml_provider)
+    identity_linker = Gitlab::Auth::GroupSaml::IdentityLinker.new(current_user, oauth, @saml_provider)
 
     omniauth_flow(Gitlab::Auth::GroupSaml, identity_linker: identity_linker)
   end
@@ -25,7 +25,7 @@ class Groups::OmniauthCallbacksController < OmniauthCallbacksController
 
   override :redirect_identity_exists
   def redirect_identity_exists
-    flash[:notice] = "Signed in with SAML for #{@unauthenticated_group.name}"
+    flash[:notice] = "Already signed in with SAML for #{@unauthenticated_group.name}"
 
     redirect_to after_sign_in_path_for(current_user)
   end
@@ -37,9 +37,21 @@ class Groups::OmniauthCallbacksController < OmniauthCallbacksController
     redirect_to after_sign_in_path_for(current_user)
   end
 
+  override :sign_in_and_redirect
+  def sign_in_and_redirect(user, *args)
+    flash[:notice] = "Signed in with SAML for #{@unauthenticated_group.name}"
+
+    super
+  end
+
   override :after_sign_in_path_for
   def after_sign_in_path_for(resource)
     saml_redirect_path || super
+  end
+
+  override :build_auth_user
+  def build_auth_user(auth_user_class)
+    Gitlab::Auth::GroupSaml::User.new(oauth, @saml_provider)
   end
 
   override :sign_in_user_flow
@@ -47,9 +59,35 @@ class Groups::OmniauthCallbacksController < OmniauthCallbacksController
     # User has successfully authenticated with the SAML provider for the group
     # but is not signed in to the GitLab instance.
 
-    flash[:notice] = "You must be signed in to use SAML with this group"
+    if sign_in_to_gitlab_enabled?
+      super
+    else
+      flash[:notice] = "You must be signed in to use SAML with this group"
 
-    redirect_to new_user_session_path
+      redirect_to new_user_session_path
+    end
+  end
+
+  def sign_in_to_gitlab_enabled?
+    ::Feature.enabled?(:group_saml_allows_sign_in_to_gitlab, @unauthenticated_group)
+  end
+
+  override :fail_login
+  def fail_login(user)
+    if user
+      super
+    else
+      redirect_to_login_or_register
+    end
+  end
+
+  def redirect_to_login_or_register
+    notice = "Login to a GitLab account to link with your SAML identity"
+
+    after_gitlab_sign_in = sso_group_saml_providers_path(@unauthenticated_group)
+
+    store_location_for(:redirect, after_gitlab_sign_in)
+    redirect_to new_user_session_path, notice: notice
   end
 
   def saml_redirect_path

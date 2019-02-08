@@ -79,7 +79,7 @@ module Geo
       log_info("Attempting to fetch repository via git")
 
       # `git fetch` needs an empty bare repository to fetch into
-      unless gitlab_shell.create_repository(project.repository_storage, disk_path_temp)
+      unless gitlab_shell.create_repository(project.repository_storage, disk_path_temp, project.full_path)
         raise Gitlab::Shell::Error, 'Can not create a temporary repository'
       end
 
@@ -158,7 +158,11 @@ module Geo
     def reschedule_sync
       log_info("Reschedule #{type} sync because a RepositoryUpdateEvent was processed during the sync")
 
-      ::Geo::ProjectSyncWorker.perform_async(project.id, Time.now)
+      ::Geo::ProjectSyncWorker.perform_async(
+        project.id,
+        sync_repository: type.repository?,
+        sync_wiki: type.wiki?
+      )
     end
 
     def fail_registry!(message, error, attrs = {})
@@ -170,7 +174,7 @@ module Geo
     end
 
     def type
-      self.class.type
+      @type ||= self.class.type.to_s.inquiry
     end
 
     def update_delay_in_seconds

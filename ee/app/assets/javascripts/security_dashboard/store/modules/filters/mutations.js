@@ -1,44 +1,46 @@
 import * as types from './mutation_types';
 
 export default {
+  [types.SET_ALL_FILTERS](state, payload = {}) {
+    state.filters = state.filters.map(filter => {
+      // If the payload is empty, we fall back to an empty selection
+      const selectedOptions = (payload && payload[filter.id]) || [];
+
+      const selection = Array.isArray(selectedOptions)
+        ? new Set(selectedOptions)
+        : new Set([selectedOptions]);
+
+      // This prevents us from selecting nothing at all
+      if (selection.size === 0) {
+        selection.add('all');
+      }
+
+      return { ...filter, selection };
+    });
+  },
   [types.SET_FILTER](state, payload) {
     const { filterId, optionId } = payload;
     const activeFilter = state.filters.find(filter => filter.id === filterId);
 
     if (activeFilter) {
-      let activeOptions;
+      let selection = new Set(activeFilter.selection);
 
       if (optionId === 'all') {
-        activeOptions = activeFilter.options.map(option => ({
-          ...option,
-          selected: option.id === optionId,
-        }));
+        selection = new Set(['all']);
       } else {
-        activeOptions = activeFilter.options.map(option => {
-          if (option.id === 'all') {
-            return {
-              ...option,
-              selected: false,
-            };
-          }
-
-          if (option.id === optionId) {
-            return {
-              ...option,
-              selected: !option.selected,
-            };
-          }
-
-          return option;
-        });
+        selection.delete('all');
+        if (selection.has(optionId)) {
+          selection.delete(optionId);
+        } else {
+          selection.add(optionId);
+        }
       }
 
       // This prevents us from selecting nothing at all
-      if (!activeOptions.find(option => option.selected)) {
-        activeOptions[0].selected = true;
+      if (selection.size === 0) {
+        selection.add('all');
       }
-
-      activeFilter.options = activeOptions;
+      activeFilter.selection = selection;
     }
   },
   [types.SET_FILTER_OPTIONS](state, payload) {

@@ -3,17 +3,19 @@ import * as types from 'ee/security_dashboard/store/modules/filters/mutation_typ
 import mutations from 'ee/security_dashboard/store/modules/filters/mutations';
 
 describe('filters module mutations', () => {
+  let state;
+  let severityFilter;
+  let criticalOption;
+  let highOption;
+
+  beforeEach(() => {
+    state = createState();
+    [severityFilter] = state.filters;
+    [, criticalOption, highOption] = severityFilter.options;
+  });
+
   describe('SET_FILTER', () => {
-    let state;
-    let severityFilter;
-    let criticalOption;
-    let highOption;
-
     beforeEach(() => {
-      state = createState();
-      [severityFilter] = state.filters;
-      [, criticalOption, highOption] = severityFilter.options;
-
       mutations[types.SET_FILTER](state, {
         filterId: severityFilter.id,
         optionId: criticalOption.id,
@@ -21,11 +23,16 @@ describe('filters module mutations', () => {
     });
 
     it('should make critical the selected option', () => {
-      expect(state.filters[0].options[1].selected).toEqual(true);
+      expect(state.filters[0].selection).toEqual(new Set(['critical']));
     });
 
-    it('should remove ALL as the selected option', () => {
-      expect(state.filters[0].options[0].selected).toEqual(false);
+    it('should set to `all` if no option is selected', () => {
+      mutations[types.SET_FILTER](state, {
+        filterId: severityFilter.id,
+        optionId: criticalOption.id,
+      });
+
+      expect(state.filters[0].selection).toEqual(new Set(['all']));
     });
 
     describe('on subsequent changes', () => {
@@ -35,27 +42,62 @@ describe('filters module mutations', () => {
           optionId: highOption.id,
         });
 
-        expect(state.filters[0].options[1].selected).toEqual(true);
-        expect(state.filters[0].options[2].selected).toEqual(true);
+        expect(state.filters[0].selection).toEqual(new Set(['high', 'critical']));
       });
     });
   });
 
+  describe('SET_ALL_FILTERS', () => {
+    it('should set options if they are a single string', () => {
+      mutations[types.SET_ALL_FILTERS](state, { [severityFilter.id]: criticalOption.id });
+
+      const expected = new Set([criticalOption.id]);
+
+      expect(state.filters[0].selection).toEqual(expected);
+    });
+
+    it('should set options if they are given as an array', () => {
+      mutations[types.SET_ALL_FILTERS](state, {
+        [severityFilter.id]: [criticalOption.id, highOption.id],
+      });
+
+      const expected = new Set([criticalOption.id, highOption.id]);
+
+      expect(state.filters[0].selection).toEqual(expected);
+    });
+
+    it('should set options to `all` if no payload is given', () => {
+      mutations[types.SET_ALL_FILTERS](state);
+
+      const expected = new Set(['all']);
+
+      state.filters.forEach(filter => {
+        expect(filter.selection).toEqual(expected);
+      });
+    });
+
+    it('should set options to `all` if payload contains an empty array', () => {
+      mutations[types.SET_ALL_FILTERS](state, {
+        [severityFilter.id]: [],
+      });
+
+      const expected = new Set(['all']);
+
+      expect(state.filters[0].selection).toEqual(expected);
+    });
+  });
+
   describe('SET_FILTER_OPTIONS', () => {
-    let state;
-    let firstFilter;
     const options = [{ id: 0, name: 'c' }, { id: 3, name: 'c' }];
 
     beforeEach(() => {
-      state = createState();
-      [firstFilter] = state.filters;
-      const filterId = firstFilter.id;
+      const filterId = severityFilter.id;
 
       mutations[types.SET_FILTER_OPTIONS](state, { filterId, options });
     });
 
     it('should add all the options to the type filter', () => {
-      expect(firstFilter.options).toEqual(options);
+      expect(severityFilter.options).toEqual(options);
     });
   });
 });

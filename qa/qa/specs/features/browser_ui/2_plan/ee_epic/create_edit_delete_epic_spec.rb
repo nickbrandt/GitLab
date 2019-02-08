@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Plan' do
+  # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/19
+  context 'Plan', :quarantine do
     describe 'Epics Creation' do
       before(:all) do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)

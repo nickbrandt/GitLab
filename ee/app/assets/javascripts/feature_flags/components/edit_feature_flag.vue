@@ -22,6 +22,10 @@ export default {
       type: String,
       required: true,
     },
+    environmentsEndpoint: {
+      type: String,
+      required: true,
+    },
   },
   computed: {
     ...mapState(['error', 'name', 'description', 'scopes', 'isLoading', 'hasError']),
@@ -55,6 +59,7 @@ export default {
         :scopes="scopes"
         :cancel-path="path"
         :submit-text="__('Save changes')"
+        :environments-endpoint="environmentsEndpoint"
         @handleSubmit="data => updateFeatureFlag(data)"
       />
     </template>

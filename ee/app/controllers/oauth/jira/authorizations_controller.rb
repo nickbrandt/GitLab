@@ -32,15 +32,17 @@ class Oauth::Jira::AuthorizationsController < ApplicationController
     # We have to modify request.parameters because Doorkeeper::Server reads params from there
     request.parameters[:redirect_uri] = oauth_jira_callback_url
 
-    begin
-      strategy = Doorkeeper::Server.new(self).token_request('authorization_code')
-      auth_response = strategy.authorize.body
-    rescue Doorkeeper::Errors::DoorkeeperError
-      auth_response = {}
+    strategy = Doorkeeper::Server.new(self).token_request('authorization_code')
+    response = strategy.authorize
+
+    if response.status == :ok
+      access_token, scope, token_type = response.body.values_at('access_token', 'scope', 'token_type')
+
+      render body: "access_token=#{access_token}&scope=#{scope}&token_type=#{token_type}"
+    else
+      render status: response.status, body: response.body
     end
-
-    token_type, scope, token = auth_response['token_type'], auth_response['scope'], auth_response['access_token']
-
-    render body: "access_token=#{token}&scope=#{scope}&token_type=#{token_type}"
+  rescue Doorkeeper::Errors::DoorkeeperError => e
+    render status: :unauthorized, body: e.type
   end
 end

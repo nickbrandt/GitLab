@@ -26,7 +26,6 @@ describe('Environment item', () => {
       component = new EnvironmentItem({
         propsData: {
           model: mockItem,
-          canCreateDeployment: false,
           canReadEnvironment: true,
           toggleDeployBoard: () => {},
           store: {},
@@ -121,7 +120,6 @@ describe('Environment item', () => {
       component = new EnvironmentItem({
         propsData: {
           model: environment,
-          canCreateDeployment: true,
           canReadEnvironment: true,
           toggleDeployBoard: () => {},
           store: {},

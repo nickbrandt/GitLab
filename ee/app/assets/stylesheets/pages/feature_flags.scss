@@ -9,3 +9,19 @@ $label-blue: #428bca;
   color: $white-light;
   background-color: $gray-500;
 }
+
+.seach-icon-input,
+.clear-search-input {
+  position: absolute;
+  z-index: 10;
+  fill: $gl-gray-400;
+}
+
+.seach-icon-input {
+  left: 4px;
+  top: 10px;
+}
+
+.clear-search-input {
+  top: 1px;
+}

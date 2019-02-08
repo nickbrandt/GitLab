@@ -11,6 +11,19 @@ describe Epics::UpdateService do
       group.add_master(user)
     end
 
+    def find_note(starting_with)
+      epic.notes.find do |note|
+        note && note.note.start_with?(starting_with)
+      end
+    end
+
+    def find_notes(action)
+      epic
+        .notes
+        .joins(:system_note_metadata)
+        .where(system_note_metadata: { action: action })
+    end
+
     def update_epic(opts)
       described_class.new(group, user, opts).execute(epic)
     end
@@ -119,6 +132,55 @@ describe Epics::UpdateService do
 
         it 'does not mark todos as done for other users' do
           expect(todo2.reload.state).to eq('pending')
+        end
+      end
+    end
+
+    context 'when Epic has tasks' do
+      before do
+        update_epic({ description: "- [ ] Task 1\n- [ ] Task 2" })
+      end
+
+      it { expect(epic.tasks?).to eq(true) }
+
+      it_behaves_like 'updating a single task' do
+        def update_issuable(opts)
+          described_class.new(group, user, opts).execute(epic)
+        end
+      end
+
+      context 'when tasks are marked as completed' do
+        before do
+          update_epic({ description: "- [x] Task 1\n- [X] Task 2" })
+        end
+
+        it 'creates system note about task status change' do
+          note1 = find_note('marked the task **Task 1** as completed')
+          note2 = find_note('marked the task **Task 2** as completed')
+
+          expect(note1).not_to be_nil
+          expect(note2).not_to be_nil
+
+          description_notes = find_notes('description')
+          expect(description_notes.length).to eq(1)
+        end
+      end
+
+      context 'when tasks are marked as incomplete' do
+        before do
+          update_epic({ description: "- [x] Task 1\n- [X] Task 2" })
+          update_epic({ description: "- [ ] Task 1\n- [ ] Task 2" })
+        end
+
+        it 'creates system note about task status change' do
+          note1 = find_note('marked the task **Task 1** as incomplete')
+          note2 = find_note('marked the task **Task 2** as incomplete')
+
+          expect(note1).not_to be_nil
+          expect(note2).not_to be_nil
+
+          description_notes = find_notes('description')
+          expect(description_notes.length).to eq(1)
         end
       end
     end

@@ -11,7 +11,6 @@ module EE
       WEIGHT_ANY = 'Any'.freeze
       WEIGHT_NONE = 'None'.freeze
 
-      prepend EE::RelativePositioning # rubocop: disable Cop/InjectEnterpriseEditionModule
       include Elastic::IssuesSearch
 
       scope :order_weight_desc, -> { reorder ::Gitlab::Database.nulls_last_order('weight', 'DESC') }
@@ -92,6 +91,21 @@ module EE
       Ability.issues_readable_by_user(related_issues,
                                       current_user,
                                       filters: { read_cross_project: cross_project_filter })
+    end
+
+    # Issue position on boards list should be relative to all group projects
+    def parent_ids
+      return super unless has_group_boards?
+
+      board_group.projects.select(:id)
+    end
+
+    def has_group_boards?
+      board_group && board_group.boards.any?
+    end
+
+    def board_group
+      @group ||= project.group
     end
 
     class_methods do

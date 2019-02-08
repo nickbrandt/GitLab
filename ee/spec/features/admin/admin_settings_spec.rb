@@ -9,15 +9,29 @@ describe 'Admin updates EE-only settings' do
     allow(License).to receive(:feature_available?).and_return(true)
   end
 
-  it 'Modify GitLab Geo settings' do
-    visit geo_admin_application_settings_path
-    page.within('.as-geo') do
-      fill_in 'Connection timeout', with: 15
-      click_button 'Save changes'
+  context 'Geo settings' do
+    context 'when the license has Geo feature' do
+      it 'allows users to change Geo settings' do
+        visit geo_admin_application_settings_path
+        page.within('.as-geo') do
+          fill_in 'Connection timeout', with: 15
+          click_button 'Save changes'
+        end
+
+        expect(Gitlab::CurrentSettings.geo_status_timeout).to eq(15)
+        expect(page).to have_content "Application settings saved successfully"
+      end
     end
 
-    expect(Gitlab::CurrentSettings.geo_status_timeout).to eq(15)
-    expect(page).to have_content "Application settings saved successfully"
+    context 'when the license does not have Geo feature' do
+      it 'shows empty page' do
+        allow(License).to receive(:feature_available?).and_return(false)
+
+        visit geo_admin_application_settings_path
+
+        expect(page).to have_content "Discover GitLab Geo"
+      end
+    end
   end
 
   it 'Enable external authentication' do

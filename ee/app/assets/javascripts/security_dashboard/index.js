@@ -1,13 +1,17 @@
 import Vue from 'vue';
 import GroupSecurityDashboardApp from './components/app.vue';
-import store from './store';
+import createStore from './store';
+import router from './store/router';
 
 export default () => {
   const el = document.getElementById('js-group-security-dashboard');
 
+  const store = createStore();
+
   return new Vue({
     el,
     store,
+    router,
     components: {
       GroupSecurityDashboardApp,
     },

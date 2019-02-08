@@ -12,7 +12,7 @@ module Gitlab
             registry.repository_created!(event)
 
             enqueue_job_if_shard_healthy(event) do
-              ::Geo::ProjectSyncWorker.perform_async(event.project_id, Time.now)
+              ::Geo::ProjectSyncWorker.perform_async(event.project_id, sync_repository: true, sync_wiki: true)
             end
           end
 

@@ -6,15 +6,10 @@ describe('filters module getters', () => {
     const getFilter = filterId => getters.getFilter(state)(filterId);
     const getSelectedOptions = filterId =>
       getters.getSelectedOptions(state, { getFilter })(filterId);
-    const getSelectedOptionIds = filterId =>
-      getters.getSelectedOptionIds(state, { getSelectedOptions })(filterId);
-    const getFilterIds = getters.getFilterIds(state);
 
     return {
       getFilter,
       getSelectedOptions,
-      getSelectedOptionIds,
-      getFilterIds,
     };
   };
   let state;
@@ -49,7 +44,8 @@ describe('filters module getters', () => {
           filters: [
             {
               id: 'severity',
-              options: [{ id: 'critical', selected: true }, { id: 'high', selected: true }],
+              options: [{ id: 'critical' }, { id: 'high' }],
+              selection: new Set(['critical', 'high']),
             },
           ],
         };
@@ -57,20 +53,6 @@ describe('filters module getters', () => {
 
         expect(selectedOptions).toHaveLength(2);
       });
-    });
-  });
-
-  describe('getSelectedOptionIds', () => {
-    it('should return "one" as the selcted dummy ID', () => {
-      const dummyFilter = {
-        id: 'dummy',
-        options: [{ id: 'one', selected: true }, { id: 'anotherone', selected: false }],
-      };
-      state.filters.push(dummyFilter);
-      const selectedOptionIds = getters.getSelectedOptionIds(state, mockedGetters(state))('dummy');
-
-      expect(selectedOptionIds).toHaveLength(1);
-      expect(selectedOptionIds[0]).toEqual('one');
     });
   });
 
@@ -88,7 +70,8 @@ describe('filters module getters', () => {
         filters: [
           {
             id: 'severity',
-            options: [{ name: 'Critical', selected: true }, { name: 'High', selected: true }],
+            options: [{ name: 'Critical', id: 1 }, { name: 'High', id: 2 }],
+            selection: new Set([1, 2]),
           },
         ],
       };
@@ -110,7 +93,8 @@ describe('filters module getters', () => {
     it('should return multiple dummy filters"', () => {
       const dummyFilter = {
         id: 'dummy',
-        options: [{ id: 'one', selected: true }, { id: 'anotherone', selected: true }],
+        options: [{ id: 'one' }, { id: 'two' }],
+        selection: new Set(['one', 'two']),
       };
       state.filters.push(dummyFilter);
       const activeFilters = getters.activeFilters(state, mockedGetters(state));

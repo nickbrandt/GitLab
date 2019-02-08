@@ -23,6 +23,7 @@ describe('New feature flag form', () => {
       propsData: {
         endpoint: 'feature_flags.json',
         path: '/feature_flags',
+        environmentsEndpoint: 'environments.json',
       },
       store,
       sync: false,

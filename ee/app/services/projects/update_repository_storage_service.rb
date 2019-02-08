@@ -32,12 +32,14 @@ module Projects
       return false unless wait_for_pushes(wiki)
 
       repository = (wiki ? project.wiki.repository : project.repository).raw
+      full_path = wiki ? project.wiki.full_path : project.full_path
 
       # Initialize a git repository on the target path
-      gitlab_shell.create_repository(new_storage_key, repository.relative_path)
+      gitlab_shell.create_repository(new_storage_key, repository.relative_path, full_path)
       new_repository = Gitlab::Git::Repository.new(new_storage_key,
                                                    repository.relative_path,
-                                                   repository.gl_repository)
+                                                   repository.gl_repository,
+                                                   full_path)
 
       new_repository.fetch_repository_as_mirror(repository)
     end

@@ -1,7 +1,15 @@
-An alert has been triggered in <%= @project.full_path %>.
+An alert has been triggered in <%= @alert.project_full_path %>.
 
-Environment: <%= @environment.name %>
+<% if description = @alert.description %>
+Description: <%= description %>
+<% end %>
 
-Metric: <%= @alert.full_query %>
+<% if env_name = @alert.environment_name %>
+Environment: <%= env_name %>
+<% end %>
 
-You can view the <%= @environment.name %> performance dashboard at <%= metrics_project_environment_url(@environment.project, @environment) %>.
+<% if metric_query = @alert.metric_query %>
+Metric: <%= metric_query %>
+<% end %>
+
+View the performance dashboard at <%= @alert.performance_dashboard_link %>

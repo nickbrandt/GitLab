@@ -20,19 +20,16 @@ module EE
              subject: subject('Mirror user changed'))
       end
 
-      def prometheus_alert_fired_email(project_id, user_id, alert_params)
-        alert_metric_id = alert_params.dig('labels', 'gitlab_alert_id')
-
+      def prometheus_alert_fired_email(project_id, user_id, alert_payload)
         @project = ::Project.find(project_id)
         user = ::User.find(user_id)
 
-        @alert = @project.prometheus_alerts.for_metric(alert_metric_id).first
-        return unless @alert
+        @alert = ::Gitlab::Alerting::Alert
+          .new(project: @project, payload: alert_payload)
+          .present
+        return unless @alert.valid?
 
-        @environment = @alert.environment
-
-        subject_text = "Alert: #{@environment.name} - #{@alert.title} #{@alert.computed_operator} #{@alert.threshold} for 5 minutes"
-
+        subject_text = "Alert: #{@alert.email_subject}"
         mail(to: user.notification_email, subject: subject(subject_text))
       end
     end

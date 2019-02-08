@@ -14,6 +14,10 @@ export const setFilterOptions = ({ commit }, payload) => {
   commit(types.SET_FILTER_OPTIONS, payload);
 };
 
+export const setAllFilters = ({ commit }, payload) => {
+  commit(types.SET_ALL_FILTERS, payload);
+};
+
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 // This is no longer needed after gitlab-ce#52179 is merged
 export default () => {};
