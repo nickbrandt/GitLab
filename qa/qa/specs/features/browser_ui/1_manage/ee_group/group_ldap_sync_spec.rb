@@ -167,7 +167,7 @@ module QA
       def verify_users_synced(expected_users)
         EE::Page::Group::Members.perform do |page|
           page.click_sync_now
-          users_synchronised = page.with_retry(reload: true) do
+          users_synchronised = page.retry_until(reload: true) do
             expected_users.map { |user| page.has_content?(user) }.all?
           end
           expect(users_synchronised).to be_truthy
