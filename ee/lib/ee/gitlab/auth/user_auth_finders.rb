@@ -22,6 +22,29 @@ module EE
 
           job.user
         end
+
+        def find_oauth_access_token
+          return if scim_request?
+
+          super
+        end
+
+        def find_user_from_scim_token
+          return unless scim_request?
+
+          token = Doorkeeper::OAuth::Token.from_request(current_request, *Doorkeeper.configuration.access_token_methods)
+          return unless token
+
+          # TODO Use `ScimOauthAccessToken`
+          scim_token = PersonalAccessToken.find_by_token(token)
+          raise ::Gitlab::Auth::UnauthorizedError unless scim_token
+
+          scim_token.user
+        end
+
+        def scim_request?
+          current_request.path.starts_with?("/api/scim/")
+        end
       end
     end
   end

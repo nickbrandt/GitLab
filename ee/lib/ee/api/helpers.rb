@@ -130,6 +130,14 @@ module EE
       def geo_token
         ::Gitlab::Geo.current_node.system_hook.token
       end
+
+      def authorize_manage_saml!(group)
+        unauthorized! unless can?(current_user, :admin_group_saml, group)
+      end
+
+      def check_group_saml_configured
+        forbidden!('Group SAML not enabled.') unless ::Gitlab::Auth::GroupSaml::Config.enabled?
+      end
     end
   end
 end
