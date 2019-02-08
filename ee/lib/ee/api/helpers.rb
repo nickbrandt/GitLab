@@ -4,6 +4,7 @@ module EE
   module API
     module Helpers
       extend ::Gitlab::Utils::Override
+      include ::Gitlab::Utils::StrongMemoize
 
       def require_node_to_be_enabled!
         forbidden! 'Geo node is disabled.' unless ::Gitlab::Geo.current_node&.enabled?
@@ -14,15 +15,9 @@ module EE
       end
 
       def authenticate_by_gitlab_geo_node_token!
-        auth_header = headers['Authorization']
-
-        begin
-          unless auth_header && ::Gitlab::Geo::JwtRequestDecoder.new(auth_header).decode
-            unauthorized!
-          end
-        rescue ::Gitlab::Geo::InvalidDecryptionKeyError, ::Gitlab::Geo::InvalidSignatureTimeError => e
-          render_api_error!(e.to_s, 401)
-        end
+        unauthorized! unless authorization_header_valid?
+      rescue ::Gitlab::Geo::InvalidDecryptionKeyError, ::Gitlab::Geo::InvalidSignatureTimeError => e
+        render_api_error!(e.to_s, 401)
       end
 
       override :current_user
@@ -37,6 +32,14 @@ module EE
 
           user
         end
+      end
+
+      def authorization_header_valid?
+        auth_header = headers['Authorization']
+        return unless auth_header
+
+        scope = ::Gitlab::Geo::JwtRequestDecoder.new(auth_header).decode.try { |x| x[:scope] }
+        scope == ::Gitlab::Geo::API_SCOPE
       end
 
       def check_project_feature_available!(feature)
