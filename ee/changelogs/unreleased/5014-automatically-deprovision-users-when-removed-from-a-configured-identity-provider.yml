@@ -1,0 +1,6 @@
+---
+title: Resolve Automatically deprovision users when removed from a configured identity
+  provider
+merge_request: 9388
+author:
+type: added
