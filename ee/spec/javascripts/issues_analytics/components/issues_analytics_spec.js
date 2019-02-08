@@ -12,15 +12,20 @@ describe('Issues Analytics component', () => {
   const mockTooltipData = {
     y: 1,
     x: 1,
-    text: 'Jul 2018:1',
+    title: ['Jul 2018'],
+    opacity: 1,
+    body: [
+      {
+        lines: ['1'],
+      },
+    ],
     caretHeight: 1,
     caretPadding: 1,
-    chart: {
-      canvas: {
-        offsetLeft: 1,
-        offsetTop: 1,
-      },
-    },
+  };
+
+  const mockCanvas = {
+    offsetLeft: 1,
+    offsetTop: 1,
   };
 
   beforeEach(() => {
@@ -68,10 +73,11 @@ describe('Issues Analytics component', () => {
   });
 
   it('renders chart tooltip with the correct details', done => {
-    const [popoverTitle, popoverContent] = mockTooltipData.text.split(':');
+    const [popoverTitle] = mockTooltipData.title;
+    const [popoverContent] = mockTooltipData.body[0].lines;
 
     vm.$store.state.issueAnalytics.chartData = mockChartData;
-    vm.generateCustomTooltip(mockTooltipData);
+    vm.generateCustomTooltip(mockTooltipData, mockCanvas);
 
     vm.$nextTick(() => {
       expect(vm.showPopover).toBe(true);
