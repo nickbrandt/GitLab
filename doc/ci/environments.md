@@ -598,7 +598,7 @@ fetch line:
 fetch = +refs/environments/*:refs/remotes/origin/environments/*
 ```
 
-## Environment specs (scopes) **[PREMIUM]**
+## Scoping environments with specs **[PREMIUM]**
 
 Some GitLab [Enterprise Edition](https://about.gitlab.com/pricing/) features can behave differently for each [Environment](#introduction-to-environments-and-deployments).
 For example, you can [create a secret variable to be injected only into a production environment](variables/README.md#limiting-environment-scopes-of-variables-premium).
