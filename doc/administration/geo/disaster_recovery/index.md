@@ -214,11 +214,12 @@ To bring a new **secondary** node online, follow the [Geo setup instructions][se
 
 Every **secondary** has a special tracking database that is used to save the status of the synchronization of all the items from the **primary**.
 Because the **secondary** is already promoted, that data in the tracking database is no longer required.
+
 The data can be removed with the following command:
 
-    ```sh
-    sudo rm -rf /var/opt/gitlab/geo-postgresql
-    ```
+```sh
+sudo rm -rf /var/opt/gitlab/geo-postgresql
+```
 
 ## Promoting secondary Geo replica in multi-secondary configurations
 
