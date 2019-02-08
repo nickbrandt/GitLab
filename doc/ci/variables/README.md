@@ -265,7 +265,7 @@ Wildcards (`*`) can be used along with the environment name, therefore if the
 environment scope is `review/*` then any jobs with environment names starting
 with `review/` would have that particular variable.
 
-Read more about [Environment scopes](../environments.md#environment-specs-scopes-premium)
+To learn more about about scoping environments, see [Scoping environments with specs](../environments.md#scoping-environments-with-specs-premium).
 
 ### Manually-specified variables
 
