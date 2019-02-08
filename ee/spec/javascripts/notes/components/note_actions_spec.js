@@ -28,6 +28,7 @@ describe('noteActions', () => {
       canEdit: true,
       canAwardEmoji: true,
       canReportAsAbuse: true,
+      canResolve: true,
       noteId: '539',
       noteUrl: `${TEST_HOST}/group/project/merge_requests/1#note_1`,
       reportAbusePath: `${TEST_HOST}/abuse_reports/new?ref_url=http%3A%2F%2Flocalhost%3A3000%2Fgitlab-org%2Fgitlab-ce%2Fissues%2F7%23note_539&user_id=26`,
@@ -48,7 +49,12 @@ describe('noteActions', () => {
     });
 
     it('should render the right resolve button title', () => {
-      expect(wrapper.vm.resolveButtonTitle).toEqual('Discussion stays unresolved');
+      const resolveButton = wrapper.find({ ref: 'resolveButton' });
+
+      expect(resolveButton.exists()).toBe(true);
+      expect(resolveButton.attributes('data-original-title')).toEqual(
+        'Discussion stays unresolved',
+      );
     });
   });
 });
