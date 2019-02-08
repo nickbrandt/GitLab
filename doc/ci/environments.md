@@ -605,7 +605,13 @@ For example, you can [create a secret variable to be injected only into a produc
 In most cases, these features use the _environment specs_ mechanism, which offers
 an efficient way to implement scoping within each environment group.
 
-Let's say there are three environments: `production`, `staging`, `review/feature-1` and `review/feature-2`.
+Let's say there are four environments:
+
+- `production`
+- `staging`
+- `review/feature-1`
+- `review/feature-2`
+
 Each environment can be matched with the following environment spec:
 
 | Environment Spec  | `production` | `staging` | `review/feature-1` | `review/feature-2` |
