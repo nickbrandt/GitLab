@@ -152,7 +152,12 @@ func main() {
 		}
 	}
 
-	up := wrapRaven(correlation.InjectCorrelationID(upstream.NewUpstream(cfg)))
+	up := wrapRaven(
+		correlation.InjectCorrelationID(
+			upstream.NewUpstream(cfg),
+			correlation.WithSetResponseHeader(),
+		),
+	)
 
 	logger.Fatal(http.Serve(listener, up))
 }
