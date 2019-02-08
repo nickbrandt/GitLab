@@ -112,7 +112,7 @@ the "More info" modal.
 
 You can also dismiss vulnerabilities by clicking the "Dismiss vulnerability" button.
 This will dismiss the vulnerability and re-render it to reflect its dismissed state.
-If you wish to undo this dismissal, you can click the "Revert dismissal" button.
+If you wish to undo this dismissal, you can click the "Undo dismiss" button.
 
 You can get the same behaviour if you dismiss a vulnerability from within the
 "More info" modal.
