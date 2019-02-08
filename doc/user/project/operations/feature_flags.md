@@ -64,7 +64,7 @@ and toggle the status for each scope.
 In general, an application is deployed to multiple environments, such as
 production, staging and [review apps](../../../ci/review_apps/index.md).
 You may not want to enable a feature flag on production until QA team has
-confirmed that the feature is working correctly on the other testing environments.
+first confirmed that the feature is working correctly on testing environments.
 
 To define statuses for each environment:
 
