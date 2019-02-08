@@ -35,6 +35,8 @@ class ConsumeRemainingMigrateApproverToApprovalRulesInBatchJobs < ActiveRecord::
   disable_ddl_transaction!
 
   def up
+    ApplicationSetting.reset_column_information
+
     Gitlab::BackgroundMigration.steal('MigrateApproverToApprovalRulesInBatch', retry_dead_jobs: true)
 
     process_unmigrated
