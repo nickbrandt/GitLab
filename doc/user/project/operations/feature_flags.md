@@ -97,7 +97,7 @@ To get the access credentials that your application will need to talk to GitLab:
     - **Instance ID**: Unique token that authorizes the retrieval of the feature flags.
     - **Application name**: The name of the running environment. For instance,
        if the application runs for production server, application name would be
-      `production` or such. This value is used for
+      `production` or similar. This value is used for
       [the environment spec evaluation](#define-environment-specs).
 
 NOTE: **Note:**
