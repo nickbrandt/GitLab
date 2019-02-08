@@ -11189,9 +11189,6 @@ msgstr ""
 msgid "ciReport|Performance metrics"
 msgstr ""
 
-msgid "ciReport|Revert dismissal"
-msgstr ""
-
 msgid "ciReport|SAST"
 msgstr ""
 
@@ -11229,6 +11226,9 @@ msgid "ciReport|There was an error loading dependency scanning report"
 msgstr ""
 
 msgid "ciReport|There was an error reverting the dismissal. Please try again."
+msgstr ""
+
+msgid "ciReport|Undo dismiss"
 msgstr ""
 
 msgid "ciReport|Upgrade %{name} from %{version} to %{fixed}."

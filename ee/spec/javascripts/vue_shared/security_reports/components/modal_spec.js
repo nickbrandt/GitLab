@@ -33,13 +33,11 @@ describe('Security Reports modal', () => {
         expect(vm.$el.textContent.trim()).toContain('#123');
       });
 
-      it('renders button to revert dismissal', () => {
-        expect(vm.$el.querySelector('.js-dismiss-btn').textContent.trim()).toEqual(
-          'Revert dismissal',
-        );
+      it('renders button to undo dismiss', () => {
+        expect(vm.$el.querySelector('.js-dismiss-btn').textContent.trim()).toEqual('Undo dismiss');
       });
 
-      it('emits revertDismissIssue when revert dismissal button is clicked', () => {
+      it('emits revertDismissIssue when undo dismiss button is clicked', () => {
         spyOn(vm, '$emit');
 
         const button = vm.$el.querySelector('.js-dismiss-btn');
