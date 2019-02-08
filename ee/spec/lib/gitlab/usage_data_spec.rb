@@ -100,11 +100,16 @@ describe Gitlab::UsageData do
       expect(count_data[:sast_jobs]).to eq(1)
     end
 
-    it 'gathers security-related preferences usage data' do
+    it 'gathers group overview preferences usage data' do
       expect(subject[:counts][:user_preferences]).to eq(
         group_overview_details: User.active.count - 2, # we have exactly 2 active users with security dashboard set
         group_overview_security_dashboard: 2
       )
+    end
+
+    it 'does not gather group overview preferences usage data when the feature is disabled' do
+      stub_feature_flags(group_overview_security_dashboard: false)
+      expect(subject[:counts].keys).not_to include(:user_preferences)
     end
   end
 
