@@ -70,7 +70,7 @@ To handle these situations, you can enable a feature flag on a particular enviro
 with [Environment specs](../../../ci/environments.md#environment-specs-scopes-premium).
 You can define multiple specs per flag so that you can control your feature flag more granularly.
 
-To define statuses for each environment:
+To define specs for each environment:
 
 1. Navigate to your project's **Operations > Feature Flags**.
 1. Click on the **New Feature Flag** button or edit an existing flag.
