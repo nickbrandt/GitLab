@@ -600,7 +600,7 @@ fetch = +refs/environments/*:refs/remotes/origin/environments/*
 
 ## Environment specs (scopes) **[PREMIUM]**
 
-Some of EEP features can define a different behavior for each [Environments](#introduction-to-environments-and-deployments),
+Some GitLab [Enterprise Edition](https://about.gitlab.com/pricing/) features can behave differently for each [Environment](#introduction-to-environments-and-deployments).
 For example, you can [create a secret variable to be injected only into a production environment](variables/README.md#limiting-environment-scopes-of-variables-premium).
 In most cases, these features use the _environment specs_ mechanism, which offers
 an efficient way to implement scoping within each environment group.
