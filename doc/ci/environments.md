@@ -617,7 +617,7 @@ Each environment can be matched with the following environment spec.
 |  review/feature-1 |              |           | Matched            |                    |
 
 As you can see, you can use specific matching for selecting a particular environment,
-also use wildcard matching (`*`) for selecting a particular environment group,
+and also use wildcard matching (`*`) for selecting a particular environment group,
 such as [Review apps](review_apps/index.md) (`review/*`).
 
 NOTE: **Note:**
