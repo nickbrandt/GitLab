@@ -603,7 +603,7 @@ fetch = +refs/environments/*:refs/remotes/origin/environments/*
 Some of EEP features can define a different behavior for each [Environments](#introduction-to-environments-and-deployments),
 for instance, [you can create a secret variable to be injected to production environment only](variables/README.md#limiting-environment-scopes-of-variables-premium).
 In most cases, these features use the _environment specs_ mechanism, which offers
-an efficient way to talk about scoping each environment group.
+an efficient way to implement scoping within each environment group.
 
 Let's say there are three environments: `production`, `staging`, `review/feature-1` and `review/feature-2`.
 Each environment can be matched with the following environment spec:
