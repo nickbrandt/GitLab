@@ -66,6 +66,10 @@ production, staging and [review apps](../../../ci/review_apps/index.md).
 For example, you may not want to enable a feature flag on production until your QA team has
 first confirmed that the feature is working correctly on testing environments.
 
+To handle these situations, you can enable a feature flag on a particular environment
+with [Environment specs](../../../ci/environments.md#environment-specs-scopes-premium).
+You can define multiple specs per flag so that you can control your feature flag more granularly.
+
 To define statuses for each environment:
 
 1. Navigate to your project's **Operations > Feature Flags**.
