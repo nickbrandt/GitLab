@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Manage', :orchestrated, :group_saml do
+  # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/73
+  context 'Manage', :orchestrated, :group_saml, :quarantine do
     describe 'Group SAML SSO' do
       before do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
