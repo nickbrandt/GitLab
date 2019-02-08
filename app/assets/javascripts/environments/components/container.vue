@@ -22,10 +22,6 @@ export default {
       type: Object,
       required: true,
     },
-    canCreateDeployment: {
-      type: Boolean,
-      required: true,
-    },
     canReadEnvironment: {
       type: Boolean,
       required: true,
@@ -75,7 +71,6 @@ export default {
     <div v-if="!isLoading && environments.length > 0" class="table-holder">
       <environment-table
         :environments="environments"
-        :can-create-deployment="canCreateDeployment"
         :can-read-environment="canReadEnvironment"
         :canary-deployment-feature-id="canaryDeploymentFeatureId"
         :show-canary-deployment-callout="showCanaryDeploymentCallout"
