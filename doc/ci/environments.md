@@ -620,7 +620,8 @@ As you can see, you can use specific matching for selecting a particular environ
 also use wildcard matching (`*`) for selecting a particular environment group,
 such as [Review apps](review_apps/index.md) (`review/*`).
 
-Please note that the most _specific_ spec takes precedence over the other wildcard matching.
+NOTE: **Note:**
+The most _specific_ spec takes precedence over the other wildcard matching.
 In this case, `review/feature-1` spec takes precedence over `review/*` and `*` specs.
 
 ## Limitations
