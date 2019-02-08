@@ -27,7 +27,6 @@ export default {
       drawChart: true,
       chartOptions: {
         ...CHART_OPTNS,
-        customTooltips: this.generateCustomTooltip,
       },
       showPopover: false,
       popoverTitle: '',
@@ -105,8 +104,11 @@ export default {
       // Render chart when DOM has been updated
       this.$nextTick(() => {
         const ctx = this.$refs.issuesChart.getContext('2d');
-        new Chart(ctx).Bar(
-          {
+
+        this.drawChart = false;
+        return new Chart(ctx, {
+          type: 'bar',
+          data: {
             labels: chartLabels,
             datasets: [
               {
@@ -115,42 +117,48 @@ export default {
               },
             ],
           },
-          chartOptions,
-        );
-
-        this.drawChart = false;
+          options: {
+            ...chartOptions,
+            tooltips: {
+              enabled: false,
+              custom: tooltip => this.generateCustomTooltip(tooltip, ctx.canvas),
+            },
+          },
+        });
       });
     },
-    generateCustomTooltip(tooltip) {
-      if (!tooltip) {
+    generateCustomTooltip(tooltip, canvas) {
+      if (!tooltip.opacity) {
         this.showPopover = false;
         return;
       }
 
+      // Find Y Location on page
       let top; // Find Y Location on page
       if (tooltip.yAlign === 'above') {
-        top = tooltip.y - tooltip.caretHeight - tooltip.caretPadding;
+        top = tooltip.y - tooltip.caretSize - tooltip.caretPadding;
       } else {
-        top = tooltip.y + tooltip.caretHeight + tooltip.caretPadding;
+        top = tooltip.y + tooltip.caretSize + tooltip.caretPadding;
       }
 
-      [this.popoverTitle, this.popoverContent] = tooltip.text.split(':');
+      [this.popoverTitle] = tooltip.title;
+      [this.popoverContent] = tooltip.body[0].lines;
       this.showPopover = true;
 
       this.$nextTick(() => {
         const tooltipEl = this.$refs.chartTooltip;
         const tooltipWidth = tooltipEl.getBoundingClientRect().width;
         const tooltipLeftOffest = window.innerWidth - tooltipWidth;
-        const tooltipLeftPosition = tooltip.chart.canvas.offsetLeft + tooltip.x;
+        const tooltipLeftPosition = canvas.offsetLeft + tooltip.caretX;
 
         this.popoverPositionLeft = tooltipLeftPosition < tooltipLeftOffest;
-        tooltipEl.style.top = `${tooltip.chart.canvas.offsetTop + top}px`;
+        tooltipEl.style.top = `${canvas.offsetTop + top}px`;
 
         // Move tooltip to the right if too close to the left
-        if (tooltipLeftPosition > tooltipLeftOffest) {
-          tooltipEl.style.left = `${tooltipLeftPosition - tooltipWidth}px`;
-        } else {
+        if (this.popoverPositionLeft) {
           tooltipEl.style.left = `${tooltipLeftPosition}px`;
+        } else {
+          tooltipEl.style.left = `${tooltipLeftPosition - tooltipWidth}px`;
         }
       });
     },
