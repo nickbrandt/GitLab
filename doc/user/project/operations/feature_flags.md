@@ -79,7 +79,7 @@ To define statuses for each environment:
 
 NOTE: **NOTE**
 We'd highly recommend you to use the [Environment](../../../ci/environments.md)
-feature as well in order to quickly skim which flag is enabled on per environment.
+feature in order to quickly assess which flag is enabled per environment.
 
 ## Integrating with your application
 
