@@ -93,7 +93,7 @@ describe API::ProjectApprovalRules do
 
     context 'when user is without access' do
       it 'returns 403' do
-        post api(url, user2), params
+        post api(url, user2), params: params
 
         expect(response).to have_gitlab_http_status(403)
       end
@@ -101,7 +101,7 @@ describe API::ProjectApprovalRules do
 
     context 'when the request is correct' do
       it 'returns 201 status' do
-        post api(url, current_user), params
+        post api(url, current_user), params: params
 
         expect(response).to have_gitlab_http_status(201)
         expect(response).to match_response_schema('public_api/v4/project_approval_rule', dir: 'ee')
@@ -114,7 +114,7 @@ describe API::ProjectApprovalRules do
         project.disable_overriding_approvers_per_merge_request = true
         project.save
 
-        post api(url, current_user), params
+        post api(url, current_user), params: params
 
         expect(json_response.symbolize_keys).to include(params)
       end
@@ -179,7 +179,7 @@ describe API::ProjectApprovalRules do
         project.approvers.create(user: approver)
 
         expect do
-          put api(url, user2), { users: [], groups: [] }.to_json, { CONTENT_TYPE: 'application/json' }
+          put api(url, user2), params: { users: [], groups: [] }.to_json, headers: { CONTENT_TYPE: 'application/json' }
         end.not_to change { approval_rule.approvers.size }
 
         expect(response).to have_gitlab_http_status(403)
