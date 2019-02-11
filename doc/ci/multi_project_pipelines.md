@@ -41,7 +41,7 @@ together, allowing you to visualize their relationships on pipeline graphs.
 These relationships are displayed in the pipeline graph by showing inbound and
 outbound connections for upstream and downstream pipeline dependencies.
 
-## Creating cross-project pipelines from .gitlab-ci.yml
+## Creating multi-project pipelines from `.gitlab-ci.yml`
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/8997) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.8.
 
