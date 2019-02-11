@@ -1539,11 +1539,12 @@ test:
 from `trigger` definition is started by GitLab, a downstream pipeline gets
 created.
 
-Learm more about [multi-project pipelines](../multi_project_pipelines.html#creating-cross-project-pipelines-from-gitlab-ci-yml).
-
-Example:
+Learm more about [multi-project pipelines](../multi_project_pipelines.md#creating-cross-project-pipelines-from-gitlab-ci-yml).
 
 ### Simple `trigger` syntax
+
+The most simple way to configure a downstream trigger to use `trigger` keyword
+with a full path to a downstream project:
 
 ```yaml
 rspec:
@@ -1556,6 +1557,9 @@ staging:
 ```
 
 ### Complex `trigger` syntax
+
+It is possible to configure a branch name that GitLab will use to create
+a downstream pipeline with:
 
 ```yaml
 rspec:

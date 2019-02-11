@@ -53,7 +53,7 @@ in a different project.
 
 In GitLab 11.8, GitLab provides a new CI/CD configuration syntax to make this
 task easier, and avoid needing GitLab Runner for triggering cross-project
-pipelines.
+pipelines. The following illustrates configuring a bridge job:
 
 ```yaml
 rspec:
@@ -86,14 +86,14 @@ GitLab does not support status attribution yet, however adding first-class
 
 NOTE: **Note:**
 "Bridge" jobs do not support every configuration entry that a user can use
-in the case of regular jobs. "Bridge" jobs will not to be picked by a runner,
+in the case of regular jobs. "Bridge" jobs will not to be picked by a Runner,
 thus there is no point in adding support for `script`, for example. If a user
-tries to used unsupported configuration syntax, YAML validation will fail upon
+tries to use unsupported configuration syntax, YAML validation will fail upon
 pipeline creation.
 
 ### Specifying a downstream pipeline branch
 
-It is possible to specify a branch name that a downstream pipeline will use.
+It is possible to specify a branch name that a downstream pipeline will use:
 
 ```yaml
 rspec:
