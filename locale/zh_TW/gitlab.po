@@ -13,7 +13,7 @@ msgstr ""
 "X-Crowdin-Project: gitlab-ee\n"
 "X-Crowdin-Language: zh-TW\n"
 "X-Crowdin-File: /master/locale/gitlab.pot\n"
-"PO-Revision-Date: 2019-02-11 08:12\n"
+"PO-Revision-Date: 2019-02-11 10:20\n"
 
 msgid " Status"
 msgstr " 狀態"
@@ -193,7 +193,7 @@ msgid "%{unstaged} unstaged and %{staged} staged changes"
 msgstr "%{unstaged} 個未暫存以及 %{staged} 個已暫存變更"
 
 msgid "%{usage_ping_link_start}Learn more%{usage_ping_link_end} about what information is shared with GitLab Inc."
-msgstr "%{usage_ping_link_start}得知更多{usage_ping_link_end}會分享給 GitLab 公司的資料。"
+msgstr "%{usage_ping_link_start}得知更多%{usage_ping_link_end}會分享給 GitLab 公司的資料。"
 
 msgid "%{user_name} profile page"
 msgstr ""
@@ -8085,7 +8085,7 @@ msgid "Runners can be placed on separate users, servers, even on your local mach
 msgstr "執行器可以執行在不同的使用者、伺服器、甚至是您本機的電腦。"
 
 msgid "Runners currently online: %{active_runners_count}"
-msgstr "目前線上的執行器：%{active_執行器s_count}"
+msgstr "目前線上的執行器：%{active_runners_count}"
 
 msgid "Runners page"
 msgstr "執行器頁面"
@@ -11185,7 +11185,7 @@ msgstr "將 %{name} 從 %{version} 升級到 %{fixed}。"
 
 msgid "ciReport|Used by %{packagesString}"
 msgid_plural "ciReport|Used by %{packagesString}, and %{lastPackage}"
-msgstr[0] "由 %{packageString} 和 %{lastPackage} 使用"
+msgstr[0] "由 %{packagesString} 和 %{lastPackage} 使用"
 
 msgid "ciReport|View full report"
 msgstr "檢視完整報告"
