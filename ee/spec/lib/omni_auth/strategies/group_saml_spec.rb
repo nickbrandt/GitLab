@@ -57,6 +57,14 @@ describe OmniAuth::Strategies::GroupSaml, type: :strategy do
         options = last_request.env['omniauth.strategy'].options
         expect(options['idp_cert_fingerprint']).to eq fingerprint
       end
+
+      it 'returns 404 when SAML is disabled for the group' do
+        saml_provider.update!(enabled: false)
+
+        expect do
+          post "/groups/my-group/-/saml/callback", SAMLResponse: saml_response
+        end.to raise_error(ActionController::RoutingError)
+      end
     end
 
     context 'with invalid SAMLResponse' do
