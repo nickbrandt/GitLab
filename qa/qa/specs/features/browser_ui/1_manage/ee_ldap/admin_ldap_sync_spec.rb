@@ -17,7 +17,7 @@ module QA
           expect(menu).to have_personal_area
 
           # The ldap_sync_worker_cron job is set to run every minute
-          admin_synchronised = menu.wait(max: 80, time: 1, reload: true) do
+          admin_synchronised = menu.wait(max: 80, interval: 1, reload: true) do
             menu.has_admin_area_link?
           end
 
