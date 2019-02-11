@@ -13,7 +13,7 @@ msgstr ""
 "X-Crowdin-Project: gitlab-ee\n"
 "X-Crowdin-Language: ja\n"
 "X-Crowdin-File: /master/locale/gitlab.pot\n"
-"PO-Revision-Date: 2019-02-11 10:20\n"
+"PO-Revision-Date: 2019-02-11 11:05\n"
 
 msgid " Status"
 msgstr " ステータス"
@@ -3270,8 +3270,7 @@ msgid "Dismiss trial promotion"
 msgstr ""
 
 msgid "Do you want to customize how Google Code email addresses and usernames are imported into GitLab?"
-msgstr "Google コードのメールアドレスとユーザー名を\n"
-" GitLab にインポートする方法をカスタマイズしますか？"
+msgstr "Google コードのメールアドレスとユーザー名を GitLab にインポートする方法をカスタマイズしますか？"
 
 msgid "Documentation for popular identity providers"
 msgstr "一般的な ID プロバイダのドキュメント"
