@@ -13,7 +13,7 @@ msgstr ""
 "X-Crowdin-Project: gitlab-ee\n"
 "X-Crowdin-Language: ko\n"
 "X-Crowdin-File: /master/locale/gitlab.pot\n"
-"PO-Revision-Date: 2019-02-11 08:07\n"
+"PO-Revision-Date: 2019-02-11 10:21\n"
 
 msgid " Status"
 msgstr " 상태"
@@ -339,8 +339,7 @@ msgid "A project is where you house your files (repository), plan your work (iss
 msgstr "프로젝트는 파일을 저장하고 (저장소), 작업 계획을 세우며 (이슈), 문서를 게시하는 곳 (위키) 입니다, %{among_other_things_link}."
 
 msgid "A regular expression that will be used to find the test coverage output in the job trace. Leave blank to disable"
-msgstr "ジョブトレースでテストカバレッジの結果を見つけるために使用される正規表現です。無効にする場合は空白のままにします。\n"
-"각 작업들의 테스트 커버리지 결과를 알아 보기 위해 사용되는 정규표현식입니다. 무효일 경우 공백입니다."
+msgstr ""
 
 msgid "A user with write access to the source branch selected this option"
 msgstr "소스 브랜치에 대한 쓰기 권한이 있는 사용자가 이 옵션을 선택하였습니다."
