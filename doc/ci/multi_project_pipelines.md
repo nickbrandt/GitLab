@@ -32,7 +32,7 @@ Let's assume you deploy your web app from different projects in GitLab:
 
 With Multi-Project Pipelines, you can visualize the entire pipeline, including all stages of builds and tests for the three projects.
 
-## Triggering cross-project pipeline through API
+## Triggering multi-project pipelines through API
 
 When you use the [`CI_JOB_TOKEN` to trigger pipelines](triggers/README.md#ci-job-token), GitLab
 recognizes the source of the job token, and thus internally ties these pipelines
