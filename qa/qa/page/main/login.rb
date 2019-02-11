@@ -79,9 +79,9 @@ module QA
         end
 
         def sign_in_using_ldap_credentials(user)
-          # Don't try to log-in if we're already logged-in
-          return if Page::Main::Menu.perform do |page|
-            page.has_personal_area?(wait: 0)
+          # Log out if already logged in
+          Page::Main::Menu.perform do |menu|
+            menu.sign_out if menu.has_personal_area?(wait: 0)
           end
 
           using_wait_time 0 do
