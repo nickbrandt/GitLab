@@ -225,5 +225,160 @@ to start again from scratch, there are a few steps that can help you:
     gitlab-ctl start
     ```
 
+## How do I fix a "Foreign Data Wrapper (FDW) is not configured" error?
+
+When setting up Geo, you might see this warning in the `gitlab-rake
+gitlab:geo:check` output:
+
+```
+GitLab Geo tracking database Foreign Data Wrapper schema is up-to-date? ... foreign data wrapper is not configured
+```
+
+There are a few key points to remember:
+
+1. The FDW settings are configured on the Geo **tracking** database.
+1. The configured foreign server enables a login to the Geo
+**secondary**, read-only database.
+
+By default, the Geo secondary and tracking database are running on the
+same host on different ports. That is, 5432 and 5431 respectively.
+
+### Checking configuration
+
+NOTE: **Note:**
+The following steps are for Omnibus installs only. Using Geo with source-based installs [is deprecated](index.md#using-gitlab-installed-from-source-deprecated).
+
+To check the configuration:
+
+1. Enter the database console:
+
+    ```sh
+    gitlab-geo-psql
+    ```
+
+1. Check whether any tables are present. If everything is working, you
+should see something like this:
+
+    ```sql
+    gitlabhq_geo_production=# SELECT * from information_schema.foreign_tables;
+      foreign_table_catalog  | foreign_table_schema |               foreign_table_name                | foreign_server_catalog  | foreign_server_n
+    ame
+    -------------------------+----------------------+-------------------------------------------------+-------------------------+-----------------
+    ----
+     gitlabhq_geo_production | gitlab_secondary     | abuse_reports                                   | gitlabhq_geo_production | gitlab_secondary
+     gitlabhq_geo_production | gitlab_secondary     | appearances                                     | gitlabhq_geo_production | gitlab_secondary
+     gitlabhq_geo_production | gitlab_secondary     | application_setting_terms                       | gitlabhq_geo_production | gitlab_secondary
+     gitlabhq_geo_production | gitlab_secondary     | application_settings                            | gitlabhq_geo_production | gitlab_secondary
+    <snip>
+    ```
+
+    However, if the query returns with `0 rows`, then continue onto the next steps.
+
+1. Check that the foreign server mapping is correct via `\des+`. The
+   results should look something like this:
+
+    ```sql
+    gitlabhq_geo_production=# \des+
+    List of foreign servers
+    -[ RECORD 1 ]--------+------------------------------------------------------------
+    Name                 | gitlab_secondary
+    Owner                | gitlab-psql
+    Foreign-data wrapper | postgres_fdw
+    Access privileges    | "gitlab-psql"=U/"gitlab-psql"                              +
+                         | gitlab_geo=U/"gitlab-psql"
+    Type                 |
+    Version              |
+    FDW Options          | (host '0.0.0.0', port '5432', dbname 'gitlabhq_production')
+    Description          |
+    ```
+
+    NOTE: **Note:** Pay particular attention to the host and port under
+    FDW options. That configuration should point to the Geo secondary
+    database.
+
+    If you need to experiment with changing the host or password, the
+    following queries demonstrate how:
+
+    ```sql
+    ALTER SERVER gitlab_secondary OPTIONS (SET host 'my-new-host');
+    ALTER SERVER gitlab_secondary OPTIONS (SET port 5432);
+    ```
+
+    If you change the host and/or port, you will also have to adjust the
+    following settings in `/etc/gitlab/gitlab.rb` and run `gitlab-ctl
+    reconfigure`:
+
+    - `gitlab_rails['db_host']`
+    - `gitlab_rails['db_port']`
+
+1. Check that the user mapping is configured properly via `\deu+`:
+
+    ```sql
+    gitlabhq_geo_production=# \deu+
+                                                 List of user mappings
+          Server      | User name  |                                  FDW Options
+    ------------------+------------+--------------------------------------------------------------------------------
+     gitlab_secondary | gitlab_geo | ("user" 'gitlab', password 'YOUR-PASSWORD-HERE')
+    (1 row)
+    ```
+
+    Make sure the password is correct. You can test that logins work by running `psql`:
+
+    ```sh
+    # Connect to the tracking database as the `gitlab_geo` user
+    sudo -u git /opt/gitlab/embedded/bin/psql -h /var/opt/gitlab/geo-postgresql -p 5431 -U gitlab_geo -W -d gitlabhq_geo_production
+    ```
+
+    If you need to correct the password, the following query shows how:
+
+    ```sql
+    ALTER USER MAPPING FOR gitlab_geo SERVER gitlab_secondary OPTIONS (SET password 'my-new-password');
+    ```
+
+    If you change the user or password, you will also have to adjust the
+    following settings in `/etc/gitlab/gitlab.rb` and run `gitlab-ctl
+    reconfigure`:
+
+    - `gitlab_rails['db_username']`
+    - `gitlab_rails['db_password']`
+
+    If you are using [PgBouncer in front of the secondary
+    database](database.md#pgbouncer-support-optional), be sure to update
+    the following settings:
+
+    - `geo_postgresql['fdw_external_user']`
+    - `geo_postgresql['fdw_external_password']`
+
+### Manual reload of FDW schema
+
+If you're still unable to get FDW working, you may want to try a manual
+reload of the FDW schema. To manually reload the FDW schema:
+
+1. On the node running the Geo tracking database, enter the PostgreSQL console via
+   the `gitlab_geo` user:
+
+    ```sh
+    sudo -u git /opt/gitlab/embedded/bin/psql -h /var/opt/gitlab/geo-postgresql -p 5431 -U gitlab_geo -W -d gitlabhq_geo_production
+    ```
+
+    Be sure to adjust the port and hostname for your configuration. You
+    may be asked to enter a password.
+
+1. Reload the schema via:
+
+    ```sql
+    DROP SCHEMA IF EXISTS gitlab_secondary CASCADE;
+    CREATE SCHEMA gitlab_secondary;
+    GRANT USAGE ON FOREIGN SERVER gitlab_secondary TO gitlab_geo;
+    IMPORT FOREIGN SCHEMA public FROM SERVER gitlab_secondary INTO gitlab_secondary;
+    ```
+
+1. Test that queries work:
+
+    ```sql
+    SELECT * from information_schema.foreign_tables;
+    SELECT * FROM gitlab_secondary.projects limit 1;
+    ```
+
 [database-start-replication]: database.md#step-3-initiate-the-replication-process
 [database-pg-replication]: database.md#postgresql-replication
