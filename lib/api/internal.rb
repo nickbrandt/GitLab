@@ -117,7 +117,7 @@ module API
           raise ActiveRecord::RecordNotFound.new("No key_id or user_id passed!")
         end
 
-        Gitlab::LfsToken.new(actor).for_gitlab_shell(project.lfs_http_url_to_repo(params[:operation]))
+        Gitlab::LfsToken.new(actor).authentication_payload(project.lfs_http_url_to_repo(params[:operation]))
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
