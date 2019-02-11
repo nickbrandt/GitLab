@@ -13,7 +13,7 @@ msgstr ""
 "X-Crowdin-Project: gitlab-ee\n"
 "X-Crowdin-Language: ja\n"
 "X-Crowdin-File: /master/locale/gitlab.pot\n"
-"PO-Revision-Date: 2019-02-11 08:11\n"
+"PO-Revision-Date: 2019-02-11 10:20\n"
 
 msgid " Status"
 msgstr " ステータス"
@@ -2564,8 +2564,7 @@ msgid "Connect repositories from GitHub"
 msgstr "GitHubからリポジトリに接続"
 
 msgid "Connect your external repositories, and CI/CD pipelines will run for new commits. A GitLab project will be created with only CI/CD features enabled."
-msgstr "外部リポジトリに接続して、新しいコミットがあると\n"
-" CI/CD パイプラインを実行します。CI/CD の機能が有効であるときのみ、GitLab プロジェクトは作成されます。"
+msgstr "外部リポジトリに接続して、新しいコミットがあるとCI/CDパイプラインを実行します。CI/CDの機能が有効であるときのみ、GitLabプロジェクトは作成されます。"
 
 msgid "Connecting..."
 msgstr "接続しています..."
