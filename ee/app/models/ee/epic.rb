@@ -89,6 +89,10 @@ module EE
         end
       end
 
+      def reference_valid?(reference)
+        reference.to_i > 0 && reference.to_i <= ::Gitlab::Database::MAX_INT_VALUE
+      end
+
       def link_reference_pattern
         %r{
           (?<url>
