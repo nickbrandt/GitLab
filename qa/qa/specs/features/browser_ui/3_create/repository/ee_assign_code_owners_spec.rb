@@ -34,10 +34,6 @@ module QA
           push.commit_message = 'Add CODEOWNERS and test files'
         end
 
-        Page::Project::Show.perform do |project_page|
-          project_page.wait_for_push
-        end
-
         # Push a new CODEOWNERS file and create a merge request
         Resource::MergeRequest.fabricate! do |merge_request|
           merge_request.title = 'This is a merge request'

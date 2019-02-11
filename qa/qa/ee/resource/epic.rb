@@ -19,7 +19,7 @@ module QA
             page.click_new_epic
             page.set_title(@title)
             page.create_new_epic
-            page.wait(time: 1) do
+            page.wait(interval: 1) do
               page.has_text?(@title)
             end
           end
