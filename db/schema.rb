@@ -3118,6 +3118,7 @@ ActiveRecord::Schema.define(version: 20190204115450) do
     t.index ["email"], name: "index_users_on_email_trigram", using: :gin, opclasses: {"email"=>"gin_trgm_ops"}
     t.index ["feed_token"], name: "index_users_on_feed_token", using: :btree
     t.index ["ghost"], name: "index_users_on_ghost", using: :btree
+    t.index ["group_view"], name: "index_users_on_group_view", using: :btree
     t.index ["incoming_email_token"], name: "index_users_on_incoming_email_token", using: :btree
     t.index ["name"], name: "index_users_on_name", using: :btree
     t.index ["name"], name: "index_users_on_name_trigram", using: :gin, opclasses: {"name"=>"gin_trgm_ops"}
