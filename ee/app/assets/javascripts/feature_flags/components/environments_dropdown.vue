@@ -186,7 +186,7 @@ export default {
       </gl-button>
 
       <div
-        v-show="showSuggestions"
+        v-if="showSuggestions"
         class="dropdown-menu d-block dropdown-menu-selectable dropdown-menu-full-width"
       >
         <div class="dropdown-content">
