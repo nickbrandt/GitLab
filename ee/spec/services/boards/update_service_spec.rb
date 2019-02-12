@@ -17,7 +17,7 @@ describe Boards::UpdateService, services: true do
   end
 
   describe '#execute' do
-    let(:project) { create(:project) }
+    let(:project) { create(:project, group: group) }
     let(:group) { create(:group) }
     let!(:board)  { create(:board, group: group, name: 'Backend') }
 
@@ -44,10 +44,11 @@ describe Boards::UpdateService, services: true do
     it 'updates the configuration params when scoped issue board is enabled' do
       stub_licensed_features(scoped_issue_board: true)
       assignee = create(:user)
-      milestone = create(:milestone, project: project)
-      label = create(:label, project: project)
+      milestone = create(:milestone, group: group)
+      label = create(:group_label, group: board.group)
+      user = create(:user)
 
-      service = described_class.new(project, double,
+      service = described_class.new(group, user,
                                     milestone_id: milestone.id,
                                     assignee_id: assignee.id,
                                     label_ids: [label.id])
@@ -211,6 +212,18 @@ describe Boards::UpdateService, services: true do
 
           it "allows using ancestor group's label" do
             expect_label_assigned(user, board, %w{group_label project_label new_label}, %w{group_label project_label})
+          end
+        end
+
+        context 'when label_ids param is provided' do
+          it 'updates using only labels accessible by the project board' do
+            other_project_label = create(:label, title: 'other_project_label')
+            other_group_label = create(:group_label, title: 'other_group_label')
+            label_ids = [group_label.id, label.id, other_project_label.id, other_group_label.id]
+
+            described_class.new(board.parent, user, label_ids: label_ids).execute(board)
+
+            expect(board.reload.labels).to contain_exactly(group_label, label)
           end
         end
       end
