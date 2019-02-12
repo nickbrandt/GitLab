@@ -68,7 +68,7 @@ staging:
 ```
 
 In the example above, as soon as `rspec` job succeeds in the `test` stage,
-the `staging` "bridge" job is going to be started. The initial status of this
+the `staging` bridge job is going to be started. The initial status of this
 job will be `pending`. GitLab will create a downstream pipeline in the
 `my/deployment` project and, as soon as the pipeline gets created, the
 `staging` job will succeed. `my/deployment` is a full path to that project.
@@ -85,8 +85,8 @@ GitLab does not support status attribution yet, however adding first-class
 [status attribution](https://gitlab.com/gitlab-org/gitlab-ce/issues/39640).
 
 NOTE: **Note:**
-"Bridge" jobs do not support every configuration entry that a user can use
-in the case of regular jobs. "Bridge" jobs will not to be picked by a Runner,
+Bridge jobs do not support every configuration entry that a user can use
+in the case of regular jobs. Bridge jobs will not to be picked by a Runner,
 thus there is no point in adding support for `script`, for example. If a user
 tries to use unsupported configuration syntax, YAML validation will fail upon
 pipeline creation.
@@ -136,13 +136,13 @@ pipeline. It will be available as an environment variable when GitLab Runner pic
 
 ### Limitations
 
-Because "bridge" jobs are a little different to regular jobs, it is not
+Because bridge jobs are a little different to regular jobs, it is not
 possible to use exactly the same configuration syntax here, as one would
 normally do when defining a regular job that will be picked by a runner.
 
 Some features are not implemented yet. For example, support for environments.
 
-[Configuration keywords](yaml/README.md) available for "bridge" jobs are:
+[Configuration keywords](yaml/README.md) available for bridge jobs are:
 
 - `trigger` (to define a downstream pipeline trigger)
 - `stage`
