@@ -66,6 +66,7 @@ module EE
       # User's Group preference
       # Note: When adding an option, it's value MUST equal to the last value + 1.
       enum group_view: { details: 1, security_dashboard: 2 }, _prefix: true
+      scope :group_view_details, -> { where('group_view = ? OR group_view IS NULL', group_view[:details]) }
     end
 
     class_methods do
