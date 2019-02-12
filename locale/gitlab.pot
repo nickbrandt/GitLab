@@ -6181,9 +6181,6 @@ msgstr ""
 msgid "Metrics|Prometheus Query Documentation"
 msgstr ""
 
-msgid "Metrics|System"
-msgstr ""
-
 msgid "Metrics|There was an error fetching the environments data, please try again"
 msgstr ""
 
@@ -9394,6 +9391,9 @@ msgid "Switch branch/tag"
 msgstr ""
 
 msgid "Sync information"
+msgstr ""
+
+msgid "System"
 msgstr ""
 
 msgid "System Hooks"
