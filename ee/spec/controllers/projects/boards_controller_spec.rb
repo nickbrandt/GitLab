@@ -131,7 +131,7 @@ describe Projects::BoardsController do
     let(:board) { create(:board, project: project, name: 'Backend') }
     let(:user) { create(:user) }
     let(:milestone) { create(:milestone, project: project) }
-    let(:label) { create(:label) }
+    let(:label) { create(:label, project: project) }
 
     let(:update_params) do
       { name: 'Frontend',
