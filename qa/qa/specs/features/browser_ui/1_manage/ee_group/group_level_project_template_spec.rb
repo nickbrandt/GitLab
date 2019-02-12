@@ -2,7 +2,8 @@
 require 'securerandom'
 
 module QA
-  context 'Manage' do
+  # Failure issue: https://gitlab.com/gitlab-org/quality/nightly/issues/72
+  context 'Manage', :quarantine do
     describe 'Group level project template' do
       let(:files) do
         [
