@@ -82,7 +82,6 @@ describe API::Unleash do
     end
 
     before do
-      stub_feature_flags(feature_flags_environment_scope: true)
       create_scope(feature_flag_1, 'production', false)
       create_scope(feature_flag_2, 'review/*', true)
     end
@@ -91,6 +90,24 @@ describe API::Unleash do
       recorded = ActiveRecord::QueryRecorder.new { subject }
 
       expect(recorded.count).to be_within(8).of(10)
+    end
+
+    it 'calls for_environment method' do
+      expect(Operations::FeatureFlag).to receive(:for_environment)
+
+      subject
+    end
+
+    context 'when the feature is disabled on the project' do
+      before do
+        stub_feature_flags(feature_flags_environment_scope: { enabled: false, thing: project })
+      end
+
+      it 'does not call for_environment method' do
+        expect(Operations::FeatureFlag).not_to receive(:for_environment)
+
+        subject
+      end
     end
 
     context 'when app name is staging' do
