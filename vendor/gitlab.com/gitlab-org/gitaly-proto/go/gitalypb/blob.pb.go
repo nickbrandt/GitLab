@@ -6,11 +6,13 @@ Package gitalypb is a generated protocol buffer package.
 
 It is generated from these files:
 	blob.proto
+	cleanup.proto
 	commit.proto
 	conflicts.proto
 	diff.proto
 	namespace.proto
 	notifications.proto
+	objectpool.proto
 	operations.proto
 	ref.proto
 	remote.proto
@@ -35,6 +37,8 @@ It has these top-level messages:
 	GetNewLFSPointersResponse
 	GetAllLFSPointersRequest
 	GetAllLFSPointersResponse
+	ApplyBfgObjectMapRequest
+	ApplyBfgObjectMapResponse
 	CommitStatsRequest
 	CommitStatsResponse
 	CommitIsAncestorRequest
@@ -45,6 +49,8 @@ It has these top-level messages:
 	CommitsBetweenResponse
 	CountCommitsRequest
 	CountCommitsResponse
+	CountDivergingCommitsRequest
+	CountDivergingCommitsResponse
 	TreeEntry
 	GetTreeEntriesRequest
 	GetTreeEntriesResponse
@@ -107,6 +113,17 @@ It has these top-level messages:
 	RenameNamespaceResponse
 	PostReceiveRequest
 	PostReceiveResponse
+	ObjectPool
+	CreateObjectPoolRequest
+	CreateObjectPoolResponse
+	DeleteObjectPoolRequest
+	DeleteObjectPoolResponse
+	LinkRepositoryToObjectPoolRequest
+	LinkRepositoryToObjectPoolResponse
+	UnlinkRepositoryFromObjectPoolRequest
+	UnlinkRepositoryFromObjectPoolResponse
+	ReduplicateRepositoryRequest
+	ReduplicateRepositoryResponse
 	UserCreateBranchRequest
 	UserCreateBranchResponse
 	UserUpdateBranchRequest
@@ -119,6 +136,8 @@ It has these top-level messages:
 	UserCreateTagResponse
 	UserMergeBranchRequest
 	UserMergeBranchResponse
+	UserMergeToRefRequest
+	UserMergeToRefResponse
 	OperationBranchUpdate
 	UserFFBranchRequest
 	UserFFBranchResponse
@@ -189,6 +208,8 @@ It has these top-level messages:
 	FindRemoteRepositoryResponse
 	FindRemoteRootRefRequest
 	FindRemoteRootRefResponse
+	ListRemotesRequest
+	ListRemotesResponse
 	RepositoryExistsRequest
 	RepositoryExistsResponse
 	RepackIncrementalRequest
