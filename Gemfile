@@ -212,9 +212,6 @@ gem 'connection_pool', '~> 2.0'
 # Discord integration
 gem 'discordrb-webhooks-blackst0ne', '~> 3.3', require: false
 
-# HipChat integration
-gem 'hipchat', '~> 1.5.0'
-
 # JIRA integration
 gem 'jira-ruby', '~> 1.4'
 
@@ -428,7 +425,7 @@ gem 'net-ntp'
 
 # SSH host key support
 gem 'net-ssh', '~> 5.0'
-gem 'sshkey', '~> 1.9.0'
+gem 'sshkey', '~> 2.0'
 
 # Required for ED25519 SSH host key support
 group :ed25519 do

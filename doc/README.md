@@ -364,7 +364,7 @@ The following documentation relates to the DevOps **Secure** stage:
 There are two ways to use GitLab:
 
 - [GitLab self-managed](#gitlab-self-managed): Install, administer, and maintain your own GitLab instance.
-- [GitLab.com](#gitlab-com): GitLab's SaaS offering. You don't need to install anything to use GitLab.com,
+- [GitLab.com](#gitlabcom): GitLab's SaaS offering. You don't need to install anything to use GitLab.com,
   you only need to [sign up](https://gitlab.com/users/sign_in) and start using GitLab straight away.
 
 The following sections outline tiers and features within GitLab self-managed and GitLab.com.

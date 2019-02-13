@@ -12,7 +12,8 @@ module EE
       LICENSED_PARSER_FEATURES = {
         sast: :sast,
         dependency_scanning: :dependency_scanning,
-        container_scanning: :container_scanning
+        container_scanning: :container_scanning,
+        dast: :dast
       }.with_indifferent_access.freeze
 
       prepended do
@@ -62,6 +63,9 @@ module EE
 
           next if file_type == "container_scanning" &&
               ::Feature.disabled?(:parse_container_scanning_reports, default_enabled: false)
+
+          next if file_type == "dast" &&
+              ::Feature.disabled?(:parse_dast_reports, default_enabled: false)
 
           security_reports.get_report(file_type).tap do |security_report|
             begin

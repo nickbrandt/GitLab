@@ -10,6 +10,11 @@ export default {
       required: false,
       default: null,
     },
+    prometheusAlertsAvailable: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {

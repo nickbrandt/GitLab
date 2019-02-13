@@ -73,7 +73,8 @@ class Groups::EpicsController < Groups::ApplicationController
       :due_date_fixed,
       :due_date_is_fixed,
       :state_event,
-      label_ids: []
+      label_ids: [],
+      update_task: [:index, :checked, :line_number, :line_source]
     ]
   end
 

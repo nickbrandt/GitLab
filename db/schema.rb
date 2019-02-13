@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190131122559) do
+ActiveRecord::Schema.define(version: 20190204115450) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -214,6 +214,8 @@ ActiveRecord::Schema.define(version: 20190131122559) do
     t.string "commit_email_hostname"
     t.boolean "protected_ci_variables", default: false, null: false
     t.string "runners_registration_token_encrypted"
+    t.integer "local_markdown_version", default: 0, null: false
+    t.integer "first_day_of_week", default: 0, null: false
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id", using: :btree
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id", using: :btree
     t.index ["usage_stats_set_by_user_id"], name: "index_application_settings_on_usage_stats_set_by_user_id", using: :btree
@@ -2750,6 +2752,7 @@ ActiveRecord::Schema.define(version: 20190131122559) do
     t.boolean "confidential_note_events", default: true
     t.index ["project_id"], name: "index_services_on_project_id", using: :btree
     t.index ["template"], name: "index_services_on_template", using: :btree
+    t.index ["type"], name: "index_services_on_type", using: :btree
   end
 
   create_table "shards", force: :cascade do |t|
@@ -3008,6 +3011,7 @@ ActiveRecord::Schema.define(version: 20190131122559) do
     t.string "issues_sort"
     t.string "merge_requests_sort"
     t.string "roadmaps_sort"
+    t.integer "first_day_of_week"
     t.index ["user_id"], name: "index_user_preferences_on_user_id", unique: true, using: :btree
   end
 
@@ -3115,6 +3119,7 @@ ActiveRecord::Schema.define(version: 20190131122559) do
     t.index ["email"], name: "index_users_on_email_trigram", using: :gin, opclasses: {"email"=>"gin_trgm_ops"}
     t.index ["feed_token"], name: "index_users_on_feed_token", using: :btree
     t.index ["ghost"], name: "index_users_on_ghost", using: :btree
+    t.index ["group_view"], name: "index_users_on_group_view", using: :btree
     t.index ["incoming_email_token"], name: "index_users_on_incoming_email_token", using: :btree
     t.index ["name"], name: "index_users_on_name", using: :btree
     t.index ["name"], name: "index_users_on_name_trigram", using: :gin, opclasses: {"name"=>"gin_trgm_ops"}

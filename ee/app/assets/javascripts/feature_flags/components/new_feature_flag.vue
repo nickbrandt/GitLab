@@ -19,6 +19,10 @@ export default {
       type: String,
       required: true,
     },
+    environmentsEndpoint: {
+      type: String,
+      required: true,
+    },
   },
   computed: {
     ...mapState(['error']),
@@ -52,6 +56,7 @@ export default {
       :cancel-path="path"
       :submit-text="s__('FeatureFlags|Create feature flag')"
       :scopes="scopes"
+      :environments-endpoint="environmentsEndpoint"
       @handleSubmit="data => createFeatureFlag(data)"
     />
   </div>

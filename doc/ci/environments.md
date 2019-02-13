@@ -598,6 +598,38 @@ fetch line:
 fetch = +refs/environments/*:refs/remotes/origin/environments/*
 ```
 
+## Scoping environments with specs **[PREMIUM]**
+
+Some GitLab [Enterprise Edition](https://about.gitlab.com/pricing/) features can behave differently for each [Environment](#introduction-to-environments-and-deployments).
+For example, you can [create a secret variable to be injected only into a production environment](variables/README.md#limiting-environment-scopes-of-variables-premium).
+In most cases, these features use the _environment specs_ mechanism, which offers
+an efficient way to implement scoping within each environment group.
+
+Let's say there are four environments:
+
+- `production`
+- `staging`
+- `review/feature-1`
+- `review/feature-2`
+
+Each environment can be matched with the following environment spec:
+
+| Environment Spec  | `production` | `staging` | `review/feature-1` | `review/feature-2` |
+| ----------------  | ----------   | -------   | ----------------   | ----------------   |
+|  *                | Matched      | Matched   | Matched            | Matched            |
+|  production       | Matched      |           |                    |                    |
+|  staging          |              | Matched   |                    |                    |
+|  review/*         |              |           | Matched            | Matched            |
+|  review/feature-1 |              |           | Matched            |                    |
+
+As you can see, you can use specific matching for selecting a particular environment,
+and also use wildcard matching (`*`) for selecting a particular environment group,
+such as [Review apps](review_apps/index.md) (`review/*`).
+
+NOTE: **Note:**
+The most _specific_ spec takes precedence over the other wildcard matching.
+In this case, `review/feature-1` spec takes precedence over `review/*` and `*` specs.
+
 ## Limitations
 
 1. You are limited to use only the [CI predefined variables][variables] in the

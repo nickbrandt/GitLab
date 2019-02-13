@@ -9,8 +9,10 @@ module EE
 
       override :execute
       def execute(merge_request)
-        should_remove_old_approvers = params.delete(:remove_old_approvers)
-        old_approvers = merge_request.overall_approvers(exclude_code_owners: true)
+        unless update_task_event?
+          should_remove_old_approvers = params.delete(:remove_old_approvers)
+          old_approvers = merge_request.overall_approvers(exclude_code_owners: true)
+        end
 
         merge_request = super(merge_request)
         sync_approval_rules(merge_request)
@@ -20,6 +22,8 @@ module EE
         end
 
         merge_request.reset_approval_cache!
+
+        return merge_request if update_task_event?
 
         new_approvers = merge_request.overall_approvers(exclude_code_owners: true) - old_approvers
 

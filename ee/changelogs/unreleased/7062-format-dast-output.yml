@@ -1,0 +1,5 @@
+---
+title: Store DAST scan results in the database
+merge_request: 9192
+author:
+type: added

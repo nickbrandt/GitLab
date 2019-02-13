@@ -32,12 +32,12 @@ describe Projects::Prometheus::MetricsController do
     end
 
     context 'validation information is not ready' do
-      let(:validation_result) { {} }
+      let(:validation_result) { nil }
 
       it 'validation data is returned' do
         post :validate_query, params: project_params(format: :json, query: query)
 
-        expect(response).to have_gitlab_http_status(204)
+        expect(response).to have_gitlab_http_status(202)
       end
     end
   end

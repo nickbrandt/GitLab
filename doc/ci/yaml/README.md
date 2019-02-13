@@ -77,6 +77,7 @@ A job is defined by a list of parameters that define the job behavior.
 | [coverage](#coverage)                            | no       | Define code coverage settings for a given job |
 | [retry](#retry)                                  | no       | Define when and how many times a job can be auto-retried in case of a failure |
 | [parallel](#parallel)                            | no       | Defines how many instances of a job should be run in parallel |
+| [trigger](#trigger)                              | no       | Defines a downstream pipeline trigger |
 
 ## `image` and `services`
 
@@ -204,6 +205,7 @@ job:
     - bundle exec rspec
 ```
 
+CAUTION: **Be careful with commands containing special characters:**
 Sometimes, `script` commands will need to be wrapped in single or double quotes.
 For example, commands that contain a colon (`:`) need to be wrapped in quotes so
 that the YAML parser knows to interpret the whole thing as a string rather than
@@ -423,10 +425,28 @@ connected with merge requests yet, and because GitLab is creating pipelines
 before an user can create a merge request we don't know a target branch at
 this point.
 
-Without a target branch, it is not possible to know what the common ancestor is,
-thus we always create a job in that case. This feature works best for stable
-branches like `master` because in that case GitLab uses the previous commit
-that is present in a branch to compare against the latest SHA that was pushed.
+#### Using `changes` with `merge_requests`
+
+With [pipelines for merge requests](../merge_request_pipelines/index.md),
+make it possible to define if a job should be created base on files modified
+in a merge request.
+
+For example:
+
+```
+docker build service one:
+  script: docker build -t my-service-one-image:$CI_COMMIT_REF_SLUG .
+  only:
+    refs:
+      - merge_requests
+    changes:
+      - Dockerfile
+      - service-one/**/*
+```
+
+In the scenario above, if you create or update a merge request that changes
+either files in `service-one` folder or `Dockerfile`, GitLab creates and triggers
+the `docker build service one` job.
 
 ## `tags`
 
@@ -776,7 +796,7 @@ In the above example we set up the `review_app` job to deploy to the `review`
 environment, and we also defined a new `stop_review_app` job under `on_stop`.
 Once the `review_app` job is successfully finished, it will trigger the
 `stop_review_app` job based on what is defined under `when`. In this case we
-set it up to `manual` so it will need a [manual action](#manual-actions) via
+set it up to `manual` so it will need a [manual action](#whenmanual) via
 GitLab's web interface in order to run.
 
 The `stop_review_app` job is **required** to have the following keywords defined:
@@ -1528,6 +1548,48 @@ A simple example:
 test:
   script: rspec
   parallel: 5
+```
+
+## `trigger`
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/8997) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.8.
+
+`trigger` allows you to define downstream pipeline trigger. When a job created
+from `trigger` definition is started by GitLab, a downstream pipeline gets
+created.
+
+Learn more about [multi-project pipelines](../multi_project_pipelines.md#creating-cross-project-pipelines-from-gitlab-ci-yml).
+
+### Simple `trigger` syntax
+
+The most simple way to configure a downstream trigger to use `trigger` keyword
+with a full path to a downstream project:
+
+```yaml
+rspec:
+  stage: test
+  script: bundle exec rspec
+
+staging:
+  stage: deploy
+  trigger: my/deployment
+```
+
+### Complex `trigger` syntax
+
+It is possible to configure a branch name that GitLab will use to create
+a downstream pipeline with:
+
+```yaml
+rspec:
+  stage: test
+  script: bundle exec rspec
+
+staging:
+  stage: deploy
+  trigger:
+    project: my/deployment
+    branch: stable
 ```
 
 ## `include`
@@ -2314,7 +2376,9 @@ You can see that the hidden keys are conveniently used as templates.
 ## Triggers
 
 Triggers can be used to force a rebuild of a specific branch, tag or commit,
-with an API call.
+with an API call when a pipeline gets created using a trigger token.
+
+Not to be confused with [`trigger`](#trigger).
 
 [Read more in the triggers documentation.](../triggers/README.md)
 

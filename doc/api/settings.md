@@ -57,12 +57,14 @@ Example response:
    "dsa_key_restriction": 0,
    "ecdsa_key_restriction": 0,
    "ed25519_key_restriction": 0,
+   "first_day_of_week": 0,
    "enforce_terms": true,
    "terms": "Hello world!",
    "performance_bar_allowed_group_id": 42,
    "instance_statistics_visibility_private": false,
-   "user_show_add_ssh_key_message": true
-   "file_template_project_id": 1
+   "user_show_add_ssh_key_message": true,
+   "file_template_project_id": 1,
+   "local_markdown_version": 0
 }
 ```
 
@@ -118,12 +120,14 @@ Example response:
   "dsa_key_restriction": 0,
   "ecdsa_key_restriction": 0,
   "ed25519_key_restriction": 0,
+  "first_day_of_week": 0,
   "enforce_terms": true,
   "terms": "Hello world!",
   "performance_bar_allowed_group_id": 42,
   "instance_statistics_visibility_private": false,
-  "user_show_add_ssh_key_message": true
-  "file_template_project_id": 1
+  "user_show_add_ssh_key_message": true,
+  "file_template_project_id": 1,
+  "local_markdown_version": 0
 }
 ```
 
@@ -182,6 +186,7 @@ are listed in the descriptions of the relevant settings.
 | `external_authorization_service_timeout` | float            | required by: `external_authorization_service_enabled` | **(Premium)** The timeout after which an authorization request is aborted, in seconds. When a request times out, access is denied to the user. (min: 0.001, max: 10, step: 0.001) |
 | `external_authorization_service_url`     | string           | required by: `external_authorization_service_enabled` | **(Premium)** URL to which authorization requests will be directed |
 | `file_template_project_id`               | integer          | no                                   | **(Premium)** The ID of a project to load custom file templates from |
+| `first_day_of_week`                      | integer          | no                                   | Start day of the week for calendar views and date pickers. Valid values are `0` (default) for Sunday and `1` for Monday. |
 | `geo_status_timeout`                     | integer          | no                                   | **(Premium)** The amount of seconds after which a request to get a secondary node status will time out. |
 | `gitaly_timeout_default`                 | integer          | no                                   | Default Gitaly timeout, in seconds. This timeout is not enforced for git fetch/push operations or Sidekiq jobs. Set to `0` to disable timeouts. |
 | `gitaly_timeout_fast`                    | integer          | no                                   | Gitaly fast operation timeout, in seconds. Some Gitaly operations are expected to be fast. If they exceed this threshold, there may be a problem with a storage shard and 'failing fast' can help maintain the stability of the GitLab instance. Set to `0` to disable timeouts. |
@@ -272,3 +277,4 @@ are listed in the descriptions of the relevant settings.
 | `user_oauth_applications`                | boolean          | no                                   | Allow users to register any application to use GitLab as an OAuth provider. |
 | `user_show_add_ssh_key_message`          | boolean          | no                                   | When set to `false` disable the "You won't be able to pull or push project code via SSH" warning shown to users with no uploaded SSH key. |
 | `version_check_enabled`                  | boolean          | no                                   | Let GitLab inform you when an update is available. |
+| `local_markdown_version`                 | integer          | no                                   | Increase this value when any cached markdown should be invalidated. |

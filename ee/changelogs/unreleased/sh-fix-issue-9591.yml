@@ -1,0 +1,5 @@
+---
+title: Fix bug where users could not be added in protected branch rules
+merge_request: 9474
+author:
+type: fixed

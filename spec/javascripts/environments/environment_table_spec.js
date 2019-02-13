@@ -27,7 +27,6 @@ describe('Environment table', () => {
 
     vm = mountComponent(Component, {
       environments: [mockItem],
-      canCreateDeployment: false,
       canReadEnvironment: true,
       // ee-only start
       canaryDeploymentFeatureId: 'canary_deployment',
@@ -95,7 +94,6 @@ describe('Environment table', () => {
 
     vm = mountComponent(Component, {
       environments: [mockItem],
-      canCreateDeployment: false,
       canReadEnvironment: true,
       // ee-only start
       canaryDeploymentFeatureId: 'canary_deployment',

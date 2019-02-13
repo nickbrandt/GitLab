@@ -60,7 +60,7 @@ Example:
 ]
 ```
 
-Note: **Note:**
+NOTE: **Note:**
 Although the Code Climate spec supports more properties, those are ignored by GitLab.
 
 For more information on how the Code Quality job should look like, check the
@@ -69,12 +69,12 @@ example on [analyzing a project's code quality](../../../ci/examples/code_qualit
 GitLab then checks this report, compares the metrics between the source and target
 branches, and shows the information right on the merge request.
 
-Caution: **Caution:**
+CAUTION: **Caution:**
 If multiple jobs in a pipeline generate a code quality artifact, only the artifact from
 the last created job (the job with the largest job ID) is used. To avoid confusion,
 configure only one job to generate a code quality artifact.
 
-Note: **Note:**
+NOTE: **Note:**
 If the Code Quality report doesn't have anything to compare to, no information
 will be displayed in the merge request area. That is the case when you add the
 Code Quality job in your `.gitlab-ci.yml` for the very first time.

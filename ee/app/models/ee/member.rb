@@ -27,5 +27,11 @@ module EE
         super
       end
     end
+
+    def sso_enforcement
+      unless ::Gitlab::Auth::GroupSaml::MembershipEnforcer.new(group).can_add_user?(user)
+        errors.add(:user, 'is not linked to a SAML account')
+      end
+    end
   end
 end

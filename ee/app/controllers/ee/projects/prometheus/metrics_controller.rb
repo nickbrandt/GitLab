@@ -9,10 +9,10 @@ module EE
             format.json do
               result = prometheus_adapter.query(:validate, params[:query])
 
-              if result.any?
+              if result
                 render json: result
               else
-                head :no_content
+                head :accepted
               end
             end
           end

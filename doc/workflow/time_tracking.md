@@ -1,6 +1,6 @@
 # Time Tracking
 
-> Introduced in GitLab 8.14 in beta.
+> Introduced in GitLab 8.14.
 
 Time Tracking allows you to track estimates and time spent on issues and merge
 requests within GitLab.
@@ -45,7 +45,7 @@ Every time you enter a new time estimate, any previous time estimates will be
 overridden by this new value. There should only be one valid estimate in an
 issue or a merge request.
 
-To remove an estimation entirely, use `/remove_estimate `.
+To remove an estimation entirely, use `/remove_estimate`.
 
 ### Time spent
 
@@ -75,7 +75,6 @@ Default conversion rates are 1mo = 4w, 1w = 5d and 1d = 8h.
 
 Other interesting links:
 
-- [Time Tracking landing page on about.gitlab.com][landing]
+- [Time Tracking landing page on about.gitlab.com](https://about.gitlab.com/features/time-tracking)
 
-[landing]: https://about.gitlab.com/features/time-tracking
 [quick actions]: ../user/project/quick_actions.md

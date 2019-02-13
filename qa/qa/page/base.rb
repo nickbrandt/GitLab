@@ -18,22 +18,13 @@ module QA
         page.refresh
       end
 
-      def wait(max: 60, time: 0.1, reload: true)
-        start = Time.now
-
-        while Time.now - start < max
-          result = yield
-          return result if result
-
-          sleep(time)
-
-          refresh if reload
+      def wait(max: 60, interval: 0.1, reload: true)
+        QA::Support::Waiter.wait(max: max, interval: interval) do
+          yield || (reload && refresh && false)
         end
-
-        false
       end
 
-      def with_retry(max_attempts: 3, reload: false)
+      def retry_until(max_attempts: 3, reload: false)
         attempts = 0
 
         while attempts < max_attempts
@@ -46,6 +37,21 @@ module QA
         end
 
         false
+      end
+
+      def retry_on_exception(max_attempts: 3, reload: false, sleep_interval: 0.0)
+        attempts = 0
+
+        begin
+          yield
+        rescue StandardError
+          sleep sleep_interval
+          refresh if reload
+          attempts += 1
+
+          retry if attempts < max_attempts
+          raise
+        end
       end
 
       def scroll_to(selector, text: nil)
@@ -73,7 +79,7 @@ module QA
           xhr.send();
         JS
 
-        return false unless wait(time: 0.5, max: 60, reload: false) do
+        return false unless wait(interval: 0.5, max: 60, reload: false) do
           page.evaluate_script('xhr.readyState == XMLHttpRequest.DONE')
         end
 

@@ -201,6 +201,13 @@
       display: none;
     }
   }
+
+  &:not(.is-collapsed) {
+    .board-list-component {
+      display: flex;
+      flex-direction: column;
+    }
+  }
 }
 
 .board-inner {

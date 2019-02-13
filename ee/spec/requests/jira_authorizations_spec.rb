@@ -10,10 +10,13 @@ describe 'JIRA authorization requests' do
   end
 
   describe 'POST access_token' do
+    let(:client_id) { application.uid }
+    let(:client_secret) { application.secret }
+
     it 'should return values similar to a POST to /oauth/token' do
       post_data = {
-        client_id: application.uid,
-        client_secret: application.secret
+        client_id: client_id,
+        client_secret: client_secret
       }
 
       post '/oauth/token', params: post_data.merge({
@@ -30,6 +33,40 @@ describe 'JIRA authorization requests' do
 
       access_token, scope, token_type = oauth_response.values_at('access_token', 'scope', 'token_type')
       expect(jira_response).to eq("access_token=#{access_token}&scope=#{scope}&token_type=#{token_type}")
+    end
+
+    context 'when authorization fails' do
+      before do
+        post '/login/oauth/access_token', params: {
+          client_id: client_id,
+          client_secret: client_secret,
+          code: try(:code) || generate_access_grant.token
+        }
+      end
+
+      shared_examples 'an unauthorized request' do
+        it 'returns 401' do
+          expect(response.status).to eq(401)
+        end
+      end
+
+      context 'when client_id is invalid' do
+        let(:client_id) { "invalid_id" }
+
+        it_behaves_like 'an unauthorized request'
+      end
+
+      context 'when client_secret is invalid' do
+        let(:client_secret) { "invalid_secret" }
+
+        it_behaves_like 'an unauthorized request'
+      end
+
+      context 'when code is invalid' do
+        let(:code) { "invalid_code" }
+
+        it_behaves_like 'an unauthorized request'
+      end
     end
   end
 end

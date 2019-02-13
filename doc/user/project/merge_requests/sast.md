@@ -39,6 +39,7 @@ The following languages and frameworks are supported.
 | Ruby on Rails         | [brakeman](https://brakemanscanner.org)                                                |
 | Groovy (Gradle & Grail) | [find-sec-bugs](https://find-sec-bugs.github.io/)                                      |
 | Java (Maven & Gradle) | [find-sec-bugs](https://find-sec-bugs.github.io/)                                      |
+| JavaScript            | [ESLint security plugin](https://github.com/nodesecurity/eslint-plugin-security)       |
 | Scala (sbt)           | [find-sec-bugs](https://find-sec-bugs.github.io/)                                      |
 | Go                    | [Gosec](https://github.com/securego/gosec)                                             |
 | PHP                   | [phpcs-security-audit](https://github.com/FloeDesignTechnologies/phpcs-security-audit) |

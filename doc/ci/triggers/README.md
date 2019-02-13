@@ -48,9 +48,8 @@ Read more about the [pipelines trigger API][trigapi].
 
 #### When a pipeline depends on the artifacts of another pipeline **[PREMIUM]**
 
-> **Note**:
-The use of `CI_JOB_TOKEN` in the artifacts download API was [introduced][ee-2346]
-in [GitLab Premium][ee] 9.5.
+> The use of `CI_JOB_TOKEN` in the artifacts download API was [introduced][ee-2346]
+  in [GitLab Premium][ee] 9.5.
 
 With the introduction of dependencies between different projects, one of
 them may need to access artifacts created by a previous one. This process
@@ -59,9 +58,11 @@ must be granted for authorized accesses, and it can be done using the
 
 ```yaml
 build_submodule:
+  image: debian
   stage: test
   script:
-  - curl --header "JOB-TOKEN: $CI_JOB_TOKEN" "https://gitlab.example.com/api/v4/projects/1/jobs/artifacts/master/download?job=test"
+  - apt update && apt install -y unzip
+  - curl --location --output artifacts.zip "https://gitlab.example.com/api/v4/projects/1/jobs/artifacts/master/download?job=test&job_token=$CI_JOB_TOKEN"
   - unzip artifacts.zip
   only:
   - tags
@@ -71,7 +72,7 @@ This allows you to use that for multi-project pipelines and download artifacts
 from any project to which you have access as this follows the same principles
 with the [permission model][permissions].
 
-Read more about the [jobs API].
+Read more about the [jobs API](../../api/jobs.md#download-the-artifacts-archive).
 
 ## Adding a new trigger
 
@@ -285,4 +286,3 @@ removed with one of the future versions of GitLab. You are advised to
 [registry]: ../../user/project/container_registry.md
 [permissions]: ../../user/permissions.md#job-permissions
 [trigapi]: ../../api/pipeline_triggers.md
-[jobs api]: ../../api/jobs.md

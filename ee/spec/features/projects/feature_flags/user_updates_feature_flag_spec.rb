@@ -63,7 +63,10 @@ describe 'User updates feature flag', :js do
   context 'when user adds a new scope' do
     before do
       within_scope_row(3) do
-        within_environment_spec { find('.js-new-scope-name').set('production') }
+        within_environment_spec do
+          find('.js-env-input').set('production')
+          find('.js-create-button').click
+        end
       end
 
       click_button 'Save changes'

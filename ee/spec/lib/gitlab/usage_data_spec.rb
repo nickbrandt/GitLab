@@ -3,7 +3,12 @@
 require 'spec_helper'
 
 describe Gitlab::UsageData do
-  let(:projects) { create_list(:project, 3) }
+  before do
+    projects.last.creator.block # to get at least one non-active User
+  end
+
+  # using Array.new to create a different creator User for each of the projects
+  let(:projects) { Array.new(3) { create(:project, creator: create(:user, group_view: :security_dashboard)) } }
   let!(:board) { create(:board, project: projects[0]) }
 
   describe '#data' do
@@ -25,6 +30,10 @@ describe Gitlab::UsageData do
 
       create(:project_tracing_setting, project: projects[0])
       create(:operations_feature_flag, project: projects[0])
+
+      # for group_view testing
+      create(:user) # user with group_view = NULL (should be counted as having default value 'details')
+      create(:user, group_view: :details)
     end
 
     subject { described_class.data }
@@ -92,6 +101,18 @@ describe Gitlab::UsageData do
       expect(count_data[:dependency_scanning_jobs]).to eq(1)
       expect(count_data[:license_management_jobs]).to eq(1)
       expect(count_data[:sast_jobs]).to eq(1)
+    end
+
+    it 'gathers group overview preferences usage data' do
+      expect(subject[:counts][:user_preferences]).to eq(
+        group_overview_details: User.active.count - 2, # we have exactly 2 active users with security dashboard set
+        group_overview_security_dashboard: 2
+      )
+    end
+
+    it 'does not gather group overview preferences usage data when the feature is disabled' do
+      stub_feature_flags(group_overview_security_dashboard: false)
+      expect(subject[:counts].keys).not_to include(:user_preferences)
     end
   end
 

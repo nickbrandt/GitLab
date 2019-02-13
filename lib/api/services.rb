@@ -368,46 +368,9 @@ module API
           name: :webhook,
           type: String,
           desc: 'The Hangouts Chat webhook. e.g. https://chat.googleapis.com/v1/spaces…'
-        }
-      ],
-      'hipchat' => [
-        {
-          required: true,
-          name: :token,
-          type: String,
-          desc: 'The room token'
         },
-        {
-          required: false,
-          name: :room,
-          type: String,
-          desc: 'The room name or ID'
-        },
-        {
-          required: false,
-          name: :color,
-          type: String,
-          desc: 'The room color'
-        },
-        {
-          required: false,
-          name: :notify,
-          type: Boolean,
-          desc: 'Enable notifications'
-        },
-        {
-          required: false,
-          name: :api_version,
-          type: String,
-          desc: 'Leave blank for default (v2)'
-        },
-        {
-          required: false,
-          name: :server,
-          type: String,
-          desc: 'Leave blank for default. https://hipchat.example.com'
-        }
-      ],
+        CHAT_NOTIFICATION_EVENTS
+      ].flatten,
       'irker' => [
         {
           required: true,
@@ -752,7 +715,6 @@ module API
       FlowdockService,
       GithubService,
       HangoutsChatService,
-      HipchatService,
       IrkerService,
       JiraService,
       KubernetesService,

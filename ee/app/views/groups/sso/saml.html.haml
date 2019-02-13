@@ -3,14 +3,14 @@
 = render 'devise/shared/tab_single', tab_title: _('SAML SSO')
 .login-box
   .login-body
-    - if @group_saml_identity
+    - if @group_saml_identity || !user_signed_in?
       %h4= _('Sign in to "%{group_name}"') % { group_name: @group_name }
     - else
       %h4= _('Allow "%{group_name}" to sign you in') % { group_name: @group_name }
 
     %p= _('The "%{group_path}" group allows you to sign in with your Single Sign-On Account') % { group_path: @group_path }
 
-    - if @group_saml_identity
+    - if @group_saml_identity || !user_signed_in?
       %p= _("This will redirect you to an external sign in page.")
 
       = saml_link _('Sign in with Single Sign-On'), @group_path, html_class: 'btn btn-success btn-block qa-saml-sso-signin-button'
