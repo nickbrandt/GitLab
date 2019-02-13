@@ -1,6 +1,5 @@
-
 %section.settings.no-animate.expanded.cluster-health-graphs#cluster-health
-  %h4= s_('ClusterIntegration|Kubernetes cluster health')
+  %h4= s_('ClusterIntegration|Cluster health')
 
   - if @cluster&.application_prometheus_available?
     #prometheus-graphs{ data: { "settings-path": edit_project_service_path(@project, 'prometheus'),
@@ -15,8 +14,4 @@
       "tags-path": project_tags_path(@project) } }
 
   - else
-    .settings-content
-      %p= s_("ClusterIntegration|In order to show the health of the cluster, we'll need to provision your cluster with Prometheus to collect the required data.")
-
-      %a.btn.btn-default{ href: '#cluster-applications' }
-        = s_('ClusterIntegration|Install Prometheus')
+    %p.settings-message.text-center= s_("ClusterIntegration|In order to view the health of your cluster, you must first install Prometheus below.")
