@@ -8,11 +8,8 @@ class AddRelativePositionToEpics < ActiveRecord::Migration[5.0]
 
   DOWNTIME = false
 
-  disable_ddl_transaction!
-
   def up
-    default_position = Gitlab::Database::MAX_INT_VALUE / 2
-    add_column_with_default(:epics, :relative_position, :integer, default: default_position, allow_null: false)
+    add_column :epics, :relative_position, :integer
   end
 
   def down

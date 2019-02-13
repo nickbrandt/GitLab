@@ -19,7 +19,7 @@ describe EpicLinks::CreateService, :postgresql do
       end
 
       it 'moves the new child epic to the top and moves the existing ones down' do
-        existing_child_epic = create(:epic, group: group, parent: epic)
+        existing_child_epic = create(:epic, group: group, parent: epic, relative_position: 1000)
 
         subject
 
