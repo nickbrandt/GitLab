@@ -2,6 +2,10 @@
 
 Formerly known as 'gitlab-git-http-server'.
 
+v 8.3.1
+
+- Update gitaly-proto to 1.10.0 !363
+
 v 8.3.0
 
 - Count ^/-/ requests separately in prometheus !355
