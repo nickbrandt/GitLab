@@ -272,6 +272,10 @@ module EE
       hierarchy.descendants
     end
 
+    def has_ancestor?(epic)
+      ancestors.exists?(epic)
+    end
+
     def hierarchy
       ::Gitlab::ObjectHierarchy.new(self.class.where(id: id))
     end

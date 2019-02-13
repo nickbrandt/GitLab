@@ -1,0 +1,5 @@
+---
+title: Add checks to prevent cycling hierarchy in epics structure
+merge_request: 9438
+author:
+type: fixed
