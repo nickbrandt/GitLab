@@ -9,16 +9,16 @@ class DashboardOperationsProjectEntity < Grape::Entity
     remove_operations_project_path(project_id: dashboard_project.project.id)
   end
 
-  expose :last_pipeline, if: -> (*) { last_pipeline } do |dashboard_project, options|
-    PipelineEntity.represent(last_pipeline, options.merge(request: new_request))
+  expose :last_pipeline, if: -> (*) { last_pipeline } do |_, options|
+    pipeline_entity_for(last_pipeline, options)
   end
 
-  expose :upstream_pipeline, if: -> (*) { upstream_pipeline } do |dashboard_project, options|
-    PipelineEntity.represent(upstream_pipeline, options.merge(request: new_request))
+  expose :upstream_pipeline, if: -> (*) { upstream_pipeline } do |_, options|
+    pipeline_entity_for(upstream_pipeline, options)
   end
 
-  expose :downstream_pipelines, if: -> (*) { downstream_pipelines } do |dashboard_project, options|
-    PipelineEntity.represent(downstream_pipelines, options.merge(request: new_request))
+  expose :downstream_pipelines, if: -> (*) { downstream_pipelines } do |_, options|
+    pipeline_entity_for(downstream_pipelines, options)
   end
 
   expose :last_deployment, if: -> (*) { last_deployment? } do |dashboard_project, options|
@@ -56,6 +56,10 @@ class DashboardOperationsProjectEntity < Grape::Entity
 
   def downstream_pipelines
     last_pipeline&.sourced_pipelines&.map(&:source_pipeline)
+  end
+
+  def pipeline_entity_for(objects, options)
+    PipelineEntity.represent(objects, options.merge(request: new_request))
   end
 
   def last_deployment?
