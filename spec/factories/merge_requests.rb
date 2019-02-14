@@ -68,12 +68,6 @@ FactoryBot.define do
       target_branch "master"
     end
 
-    trait :with_approver do
-      after :create do |merge_request|
-        create :approver, target: merge_request
-      end
-    end
-
     trait :rebased do
       source_branch "markdown"
       target_branch "improve/awesome"
@@ -141,7 +135,6 @@ FactoryBot.define do
     factory :reopened_merge_request, traits: [:opened]
     factory :invalid_merge_request, traits: [:invalid]
     factory :merge_request_with_diffs, traits: [:with_diffs]
-    factory :merge_request_with_approver, traits: [:with_approver]
     factory :merge_request_with_diff_notes do
       after(:create) do |mr|
         create(:diff_note_on_merge_request, noteable: mr, project: mr.source_project)
