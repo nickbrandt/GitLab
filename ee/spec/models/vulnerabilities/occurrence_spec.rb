@@ -84,7 +84,7 @@ describe Vulnerabilities::Occurrence do
 
   describe '.count_by_day_and_severity' do
     let(:project) { create(:project) }
-    let(:date_1) { Time.zone.parse('2018-11-10') }
+    let(:date_1) { Time.zone.parse('2018-11-11') }
     let(:date_2) { Time.zone.parse('2018-11-12') }
 
     before do
@@ -111,18 +111,41 @@ describe Vulnerabilities::Occurrence do
 
     subject do
       travel_to(Time.zone.parse('2018-11-15')) do
-        described_class.count_by_day_and_severity(3.days)
+        described_class.count_by_day_and_severity(range)
       end
     end
 
-    it 'returns expected counts for occurrences within given period' do
-      first, second = subject
-      expect(first.day).to eq(date_2)
-      expect(first.severity).to eq('low')
-      expect(first.count).to eq(3)
-      expect(second.day).to eq(date_2)
-      expect(second.severity).to eq('medium')
-      expect(second.count).to eq(1)
+    context 'within 3-day period' do
+      let(:range) { 3.days }
+
+      it 'returns expected counts for occurrences' do
+        first, second = subject
+
+        expect(first.day).to eq(date_2)
+        expect(first.severity).to eq('low')
+        expect(first.count).to eq(3)
+        expect(second.day).to eq(date_2)
+        expect(second.severity).to eq('medium')
+        expect(second.count).to eq(1)
+      end
+    end
+
+    context 'within 4-day period' do
+      let(:range) { 4.days }
+
+      it 'returns expected counts for occurrences' do
+        first, second, third = subject
+
+        expect(first.day).to eq(date_1)
+        expect(first.severity).to eq('high')
+        expect(first.count).to eq(2)
+        expect(second.day).to eq(date_2)
+        expect(second.severity).to eq('low')
+        expect(second.count).to eq(3)
+        expect(third.day).to eq(date_2)
+        expect(third.severity).to eq('medium')
+        expect(third.count).to eq(1)
+      end
     end
   end
 
