@@ -10,6 +10,13 @@ describe ApprovalState do
     create(factory, params)
   end
 
+  def approve_rules(rules)
+    rules_to_approve = rules.select { |rule| rule.approvals_required > 0 }
+    rules_to_approve.each do |rule|
+      create(:approval, merge_request: merge_request, user: rule.users.first)
+    end
+  end
+
   let(:merge_request) { create(:merge_request) }
   let(:project) { merge_request.target_project }
   let(:approver1) { create(:user) }
@@ -50,6 +57,43 @@ describe ApprovalState do
     end
   end
 
+  context '#approval_rules_overwritten?' do
+    context 'when approval rule on the merge request does not exist' do
+      it 'returns false' do
+        expect(subject.approval_rules_overwritten?).to eq(false)
+      end
+    end
+
+    context 'when approval rule on the merge request exists' do
+      before do
+        create(:approval_merge_request_rule, merge_request: merge_request)
+      end
+
+      it 'returns true' do
+        expect(subject.approval_rules_overwritten?).to eq(true)
+      end
+    end
+
+    context 'when `approvals_before_merge` is set on a merge request' do
+      before do
+        merge_request.update!(approvals_before_merge: 7)
+      end
+
+      it 'returns true' do
+        expect(subject.approval_rules_overwritten?).to eq(true)
+      end
+
+      context 'when overriding approvals is not allowed' do
+        before do
+          project.update!(disable_overriding_approvers_per_merge_request: true)
+        end
+        it 'returns true' do
+          expect(subject.approval_rules_overwritten?).to eq(false)
+        end
+      end
+    end
+  end
+
   context 'when multiple rules are allowed' do
     before do
       stub_licensed_features(multiple_approval_rules: true)
@@ -63,24 +107,6 @@ describe ApprovalState do
       it 'returns all rules in wrapper' do
         expect(subject.wrapped_approval_rules).to all(be_an(ApprovalWrappedRule))
         expect(subject.wrapped_approval_rules.size).to eq(2)
-      end
-    end
-
-    describe '#approval_rules_overwritten?' do
-      context 'when approval rule on the merge request does not exist' do
-        it 'returns false' do
-          expect(subject.approval_rules_overwritten?).to eq(false)
-        end
-      end
-
-      context 'when approval rule on the merge request exists' do
-        before do
-          create(:approval_merge_request_rule, merge_request: merge_request)
-        end
-
-        it 'returns true' do
-          expect(subject.approval_rules_overwritten?).to eq(true)
-        end
       end
     end
 
@@ -130,9 +156,7 @@ describe ApprovalState do
       shared_examples_for 'when rules are present' do
         context 'when all rules are approved' do
           before do
-            subject.wrapped_approval_rules.each do |rule|
-              create(:approval, merge_request: merge_request, user: rule.users.first)
-            end
+            approve_rules(subject.wrapped_approval_rules)
           end
 
           it 'returns true' do
@@ -154,10 +178,6 @@ describe ApprovalState do
       shared_examples_for 'checking fallback_approvals_required' do
         before do
           project.update(approvals_before_merge: 1)
-
-          subject.wrapped_approval_rules.each do |rule|
-            allow(rule).to receive(:approved?).and_return(true)
-          end
         end
 
         context 'when it is not met' do
@@ -622,21 +642,21 @@ describe ApprovalState do
       end
     end
 
-    describe '#approval_rules_overwritten?' do
-      context 'when approval rule does not exist' do
-        it 'returns false' do
-          expect(subject.approval_rules_overwritten?).to eq(false)
-        end
+    describe '#has_non_fallback_rules?' do
+      it 'returns true when there are rules' do
+        create_rules
+
+        expect(subject.has_non_fallback_rules?).to be(true)
       end
 
-      context 'when approval rule exists' do
-        before do
-          create(:approval_merge_request_rule, merge_request: merge_request)
-        end
+      it 'returns false if there are no rules' do
+        expect(subject.has_non_fallback_rules?).to be(false)
+      end
 
-        it 'returns true' do
-          expect(subject.approval_rules_overwritten?).to eq(true)
-        end
+      it 'returns false if there are only fallback rules' do
+        project.update!(approvals_before_merge: 1)
+
+        expect(subject.has_non_fallback_rules?).to be(false)
       end
     end
 
@@ -686,9 +706,7 @@ describe ApprovalState do
       shared_examples_for 'when rules are present' do
         context 'when all rules are approved' do
           before do
-            subject.wrapped_approval_rules.each do |rule|
-              create(:approval, merge_request: merge_request, user: rule.users.first)
-            end
+            approve_rules(subject.wrapped_approval_rules)
           end
 
           it 'returns true' do
@@ -710,10 +728,6 @@ describe ApprovalState do
       shared_examples_for 'checking fallback_approvals_required' do
         before do
           project.update(approvals_before_merge: 1)
-
-          subject.wrapped_approval_rules.each do |rule|
-            allow(rule).to receive(:approved?).and_return(true)
-          end
         end
 
         context 'when it is not met' do
@@ -737,7 +751,8 @@ describe ApprovalState do
 
       context 'when only code owner rules present' do
         before do
-          2.times { create_rule(users: [create(:user)], code_owner: true) }
+          # setting approvals required to 0 since we don't want to block on them now
+          2.times { create_rule(users: [create(:user)], code_owner: true, approvals_required: 0) }
         end
 
         it_behaves_like 'when rules are present'
@@ -751,6 +766,40 @@ describe ApprovalState do
         end
 
         it_behaves_like 'when rules are present'
+      end
+
+      context 'when a single project rule is present' do
+        before do
+          create(:approval_project_rule, users: [create(:user)], project: project)
+        end
+
+        it_behaves_like 'when rules are present'
+
+        context 'when the project rule is overridden by a fallback but the project does not allow overriding' do
+          before do
+            merge_request.update!(approvals_before_merge: 1)
+            project.update!(disable_overriding_approvers_per_merge_request: true)
+          end
+
+          it_behaves_like 'when rules are present'
+        end
+
+        context 'when the project rule is overridden by a fallback' do
+          before do
+            merge_request.update!(approvals_before_merge: 1)
+          end
+
+          it_behaves_like 'checking fallback_approvals_required'
+        end
+      end
+
+      context 'when a single project rule is present that is overridden in the merge request' do
+        before do
+          create(:approval_project_rule, users: [create(:user)], project: project)
+          merge_request.update!(approvals_before_merge: 1)
+        end
+
+        it_behaves_like 'checking fallback_approvals_required'
       end
     end
 

@@ -8,10 +8,9 @@ describe ApprovalRulePresenter do
     set(:public_group) { create(:group) }
     set(:private_group) { create(:group, :private) }
     let(:groups) { [public_group, private_group] }
+    subject { described_class.new(rule, current_user: user) }
 
     shared_examples 'filtering private group' do
-      subject { described_class.new(rule, current_user: user) }
-
       context 'when user has no access to private group' do
         it 'excludes private group' do
           expect(subject.groups).to contain_exactly(public_group)
@@ -40,6 +39,14 @@ describe ApprovalRulePresenter do
       end
 
       it_behaves_like 'filtering private group'
+    end
+
+    context 'fallback rule' do
+      let(:rule) { ApprovalMergeRequestFallback.new(create(:merge_request)) }
+
+      it 'contains no groups without raising an error' do
+        expect(subject.groups).to be_empty
+      end
     end
   end
 end

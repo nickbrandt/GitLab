@@ -31,6 +31,8 @@ describe Projects::MergeRequestsController, '(JavaScript fixtures)', type: :cont
     approver_group = create(:approver_group, target: project)
     approver_group.group.add_owner(create(:owner))
 
+    stub_feature_flags(approval_rules: false)
+
     sign_in(admin)
   end
 

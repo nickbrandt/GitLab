@@ -118,4 +118,12 @@ describe ApprovalRuleLike do
       expect(subject.group_users).to eq([user1])
     end
   end
+
+  context '#rule_type' do
+    it 'returns the correct type' do
+      expect(build(:code_owner_rule).rule_type).to eq(:code_owner)
+      expect(build(:approval_merge_request_rule).rule_type).to eq(:regular)
+      expect(build(:approval_project_rule).rule_type).to eq(:regular)
+    end
+  end
 end
