@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Epics
-  class IssuePromoteService < Issuable::Clone::BaseService
+  class IssuePromoteService < ::Issuable::Clone::BaseService
     PromoteError = Class.new(StandardError)
 
     def execute(issue)

@@ -8,3 +8,5 @@ module MirrorHelper
     }
   end
 end
+
+MirrorHelper.prepend(EE::MirrorHelper)

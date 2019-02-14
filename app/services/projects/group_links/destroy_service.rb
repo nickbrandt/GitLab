@@ -3,8 +3,6 @@
 module Projects
   module GroupLinks
     class DestroyService < BaseService
-      prepend ::EE::Projects::GroupLinks::DestroyService # rubocop: disable Cop/InjectEnterpriseEditionModule
-
       def execute(group_link)
         return false unless group_link
 
@@ -13,3 +11,5 @@ module Projects
     end
   end
 end
+
+Projects::GroupLinks::DestroyService.prepend(EE::Projects::GroupLinks::DestroyService)

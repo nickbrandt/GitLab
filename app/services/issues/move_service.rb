@@ -2,8 +2,6 @@
 
 module Issues
   class MoveService < Issuable::Clone::BaseService
-    prepend ::EE::Issues::MoveService # rubocop: disable Cop/InjectEnterpriseEditionModule
-
     MoveError = Class.new(StandardError)
 
     def execute(issue, target_project)
@@ -66,3 +64,5 @@ module Issues
     end
   end
 end
+
+Issues::MoveService.prepend(EE::Issues::MoveService)

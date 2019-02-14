@@ -5,12 +5,16 @@ module Notes
     UPDATE_SERVICES = {
       'Issue' => Issues::UpdateService,
       'MergeRequest' => MergeRequests::UpdateService,
-      'Commit' => Commits::TagService,
-      'Epic' => Epics::UpdateService
+      'Commit' => Commits::TagService
     }.freeze
+    private_constant :UPDATE_SERVICES
+
+    def self.update_services
+      UPDATE_SERVICES
+    end
 
     def self.noteable_update_service(note)
-      UPDATE_SERVICES[note.noteable_type]
+      update_services[note.noteable_type]
     end
 
     def self.supported?(note)
@@ -36,3 +40,5 @@ module Notes
     end
   end
 end
+
+Notes::QuickActionsService.prepend(EE::Notes::QuickActionsService)

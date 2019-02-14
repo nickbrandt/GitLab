@@ -9,17 +9,10 @@ module Search
     end
 
     def execute
-      if Gitlab::CurrentSettings.elasticsearch_search?
-        Gitlab::Elastic::ProjectSearchResults.new(current_user,
-                                                  params[:search],
-                                                  project.id,
-                                                  params[:repository_ref])
-      else
-        Gitlab::ProjectSearchResults.new(current_user,
-                                         project,
-                                         params[:search],
-                                         params[:repository_ref])
-      end
+      Gitlab::ProjectSearchResults.new(current_user,
+                                       project,
+                                       params[:search],
+                                       params[:repository_ref])
     end
 
     def scope
@@ -27,3 +20,5 @@ module Search
     end
   end
 end
+
+Search::ProjectService.prepend(EE::Search::ProjectService)

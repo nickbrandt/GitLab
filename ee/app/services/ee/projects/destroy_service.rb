@@ -7,16 +7,14 @@ module EE
 
       override :execute
       def execute
-        succeeded = super
-
-        # It's possible that some error occurred, but at the end of the day
-        # if the project is destroyed from the database, we should log events
-        # and clean up where we can.
-        if project&.destroyed?
-          mirror_cleanup(project)
+        super.tap do
+          # It's possible that some error occurred, but at the end of the day
+          # if the project is destroyed from the database, we should log events
+          # and clean up where we can.
+          if project&.destroyed?
+            mirror_cleanup(project)
+          end
         end
-
-        succeeded
       end
 
       override :log_destroy_event

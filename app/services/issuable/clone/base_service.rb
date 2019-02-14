@@ -51,8 +51,6 @@ module Issuable
       end
 
       def group
-        return new_entity.group if new_entity.respond_to?(:group) && new_entity.group
-
         if new_entity.project&.group && current_user.can?(:read_group, new_entity.project.group)
           new_entity.project.group
         end
@@ -60,3 +58,5 @@ module Issuable
     end
   end
 end
+
+Issuable::Clone::BaseService.prepend(EE::Issuable::Clone::BaseService)

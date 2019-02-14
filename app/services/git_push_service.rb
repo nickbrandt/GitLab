@@ -55,10 +55,6 @@ class GitPushService < BaseService
       update_gitattributes if default_branch?
     end
 
-    if Gitlab::CurrentSettings.elasticsearch_indexing? && default_branch?
-      ElasticCommitIndexerWorker.perform_async(@project.id, params[:oldrev], params[:newrev])
-    end
-
     execute_related_hooks
     perform_housekeeping
 
@@ -143,10 +139,8 @@ class GitPushService < BaseService
     UpdateMergeRequestsWorker
       .perform_async(project.id, current_user.id, params[:oldrev], params[:newrev], params[:ref])
 
-    mirror_update = project.mirror? && project.repository.up_to_date_with_upstream?(branch_name)
-
     EventCreateService.new.push(project, current_user, build_push_data)
-    Ci::CreatePipelineService.new(project, current_user, build_push_data).execute(:push, mirror_update: mirror_update)
+    Ci::CreatePipelineService.new(project, current_user, build_push_data).execute(:push, pipeline_options)
 
     project.execute_hooks(build_push_data.dup, :push_hooks)
     project.execute_services(build_push_data.dup, :push_hooks)
@@ -237,4 +231,12 @@ class GitPushService < BaseService
   def last_pushed_commits
     @last_pushed_commits ||= @push_commits.last(PROCESS_COMMIT_LIMIT)
   end
+
+  private
+
+  def pipeline_options
+    {} # to be overriden in EE
+  end
 end
+
+GitPushService.prepend(EE::GitPushService)

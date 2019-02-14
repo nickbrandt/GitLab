@@ -2,8 +2,6 @@
 
 module Projects
   class CreateService < BaseService
-    prepend ::EE::Projects::CreateService # rubocop: disable Cop/InjectEnterpriseEditionModule
-
     def initialize(user, params)
       @current_user, @params = user, params.dup
       @skip_wiki = @params.delete(:skip_wiki)
@@ -198,3 +196,5 @@ module Projects
     end
   end
 end
+
+Projects::CreateService.prepend(EE::Projects::CreateService)

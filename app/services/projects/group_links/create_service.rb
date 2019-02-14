@@ -3,8 +3,6 @@
 module Projects
   module GroupLinks
     class CreateService < BaseService
-      prepend ::EE::Projects::GroupLinks::CreateService # rubocop: disable Cop/InjectEnterpriseEditionModule
-
       def execute(group)
         return false unless group
 
@@ -17,3 +15,5 @@ module Projects
     end
   end
 end
+
+Projects::GroupLinks::CreateService.prepend(EE::Projects::GroupLinks::CreateService)

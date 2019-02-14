@@ -13,8 +13,6 @@ module Projects
     include Gitlab::ShellAdapter
     TransferError = Class.new(StandardError)
 
-    prepend ::EE::Projects::TransferService # rubocop: disable Cop/InjectEnterpriseEditionModule
-
     def execute(new_namespace)
       @new_namespace = new_namespace
 
@@ -172,3 +170,5 @@ module Projects
     end
   end
 end
+
+Projects::TransferService.prepend(EE::Projects::TransferService)

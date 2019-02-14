@@ -18,5 +18,3 @@ module EE
     end
   end
 end
-
-ExpirePipelineCacheWorker.prepend(EE::ExpirePipelineCacheWorker)

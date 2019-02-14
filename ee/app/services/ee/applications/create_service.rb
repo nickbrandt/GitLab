@@ -2,8 +2,10 @@
 
 module EE
   module Applications
-    # rubocop:disable Gitlab/ModuleWithInstanceVariables
     module CreateService
+      extend ::Gitlab::Utils::Override
+
+      override :execute
       def execute(request)
         super.tap do |application|
           audit_event_service(request.remote_ip).for_user(application.name).security_event
@@ -11,8 +13,8 @@ module EE
       end
 
       def audit_event_service(ip_address)
-        ::AuditEventService.new(@current_user,
-                                @current_user,
+        ::AuditEventService.new(current_user,
+                                current_user,
                                 action: :custom,
                                 custom_message: 'OAuth access granted',
                                 ip_address: ip_address)

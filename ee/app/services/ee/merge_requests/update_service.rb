@@ -35,14 +35,14 @@ module EE
         merge_request
       end
 
+      private
+
       override :create_branch_change_note
       def create_branch_change_note(merge_request, branch_type, old_branch, new_branch)
         super
 
         reset_approvals(merge_request)
       end
-
-      private
 
       def reset_approvals(merge_request)
         target_project = merge_request.target_project
