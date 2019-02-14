@@ -137,10 +137,6 @@ FactoryBot.define do
       system true
     end
 
-    trait :with_review do
-      review
-    end
-
     trait :downvote do
       note "thumbsdown"
     end

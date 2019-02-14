@@ -6,6 +6,10 @@ FactoryBot.modify do
       noteable { create(:epic) }
       project nil
     end
+
+    trait :with_review do
+      review
+    end
   end
 end
 
