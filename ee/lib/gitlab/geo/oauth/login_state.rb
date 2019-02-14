@@ -12,7 +12,7 @@ module Gitlab
         end
 
         def initialize(return_to:, salt: nil, hmac: nil)
-          @return_to = return_to
+          @return_to = Gitlab::ReturnToLocation.new(return_to).full_path
           @salt = salt
           @hmac = hmac
         end
