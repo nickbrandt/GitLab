@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.modify do
   factory :group do
     project_creation_level ::EE::Gitlab::Access::MAINTAINER_PROJECT_ACCESS
