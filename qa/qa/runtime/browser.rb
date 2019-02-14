@@ -9,6 +9,8 @@ module QA
     class Browser
       include QA::Scenario::Actable
 
+      NotRespondingError = Class.new(RuntimeError)
+
       def initialize
         self.class.configure!
       end
