@@ -12,7 +12,6 @@
     "updated_at": { "type": "string" },
     "start_date": { "type": ["date", "null"] },
     "due_date": { "type": ["date", "null"] },
-    "percentage_complete": { "type": "integer" },
     "web_url": { "type": "string" }
   },
   "additionalProperties": false
