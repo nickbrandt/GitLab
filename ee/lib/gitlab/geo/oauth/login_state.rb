@@ -20,7 +20,7 @@ module Gitlab
         def valid?
           return false unless salt.present? && hmac.present?
 
-          hmac == generate_hmac
+          ActiveSupport::SecurityUtils.secure_compare(hmac, generate_hmac)
         end
 
         def encode
