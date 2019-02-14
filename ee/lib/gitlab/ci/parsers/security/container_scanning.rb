@@ -26,9 +26,13 @@ module Gitlab
           # Transforms the Clair JSON report into the expected format
           def format_report(data)
             vulnerabilities = data['vulnerabilities']
+            unapproved = data['unapproved']
             results = []
 
             vulnerabilities.each do |vulnerability|
+              # We only report unapproved vulnerabilities
+              next unless unapproved.include?(vulnerability['vulnerability'])
+
               results.append(format_vulnerability(vulnerability))
             end
 

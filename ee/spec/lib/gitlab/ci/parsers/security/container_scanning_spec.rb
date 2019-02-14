@@ -25,7 +25,7 @@ describe Gitlab::Ci::Parsers::Security::ContainerScanning do
       end
     end
 
-    it "parses all identifiers and occurrences" do
+    it "parses all identifiers and occurrences for unapproved vulnerabilities" do
       expect(report.occurrences.length).to eq(8)
       expect(report.identifiers.length).to eq(8)
       expect(report.scanners.length).to eq(1)
