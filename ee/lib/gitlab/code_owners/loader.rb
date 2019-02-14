@@ -7,22 +7,14 @@ module Gitlab
         @project, @ref, @paths = project, ref, Array(paths)
       end
 
+      def entries
+        return [] if empty_code_owners?
+
+        @entries ||= load_entries
+      end
+
       def members
-        @_members ||= @project.members_among(raw_users)
-      end
-
-      def non_members
-        @_non_members ||= raw_users.where_not_in(@project.authorized_users)
-      end
-
-      def raw_users
-        return User.none if empty_code_owners?
-
-        @_raw_users ||= begin
-          owner_lines = @paths.map { |path| code_owners_file.owners_for_path(path) }
-
-          Gitlab::UserExtractor.new(owner_lines).users
-        end
+        @members ||= entries.map(&:users).flatten.uniq
       end
 
       def empty_code_owners?
@@ -30,6 +22,24 @@ module Gitlab
       end
 
       private
+
+      def load_entries
+        entries = @paths.map { |path| code_owners_file.entry_for_path(path) }.compact.uniq
+        members = all_members_for_entries(entries)
+
+        entries.each do |entry|
+          entry.add_matching_users_from(members)
+        end
+
+        entries
+      end
+
+      def all_members_for_entries(entries)
+        owner_lines = entries.map(&:owner_line)
+        all_users = Gitlab::UserExtractor.new(owner_lines).users.with_emails
+
+        @project.members_among(all_users)
+      end
 
       def code_owners_file
         if RequestStore.active?
