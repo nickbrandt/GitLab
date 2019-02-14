@@ -32,9 +32,6 @@ FactoryBot.define do
       group_runners_enabled nil
       import_status nil
       import_jid nil
-      last_update_at nil
-      last_successful_update_at nil
-      retry_count 0
     end
 
     after(:create) do |project, evaluator|
@@ -73,9 +70,6 @@ FactoryBot.define do
       if evaluator.import_status
         import_state = project.import_state || project.build_import_state
         import_state.status = evaluator.import_status
-        import_state.last_update_at = evaluator.last_update_at
-        import_state.last_successful_update_at = evaluator.last_successful_update_at
-        import_state.retry_count = evaluator.retry_count
         import_state.jid = evaluator.import_jid
         import_state.save
       end
@@ -93,55 +87,20 @@ FactoryBot.define do
       visibility_level Gitlab::VisibilityLevel::PRIVATE
     end
 
-    trait :import_none do
-      import_status :none
-    end
-
     trait :import_scheduled do
       import_status :scheduled
-
-      after(:create) do |project, _|
-        project.import_state&.update_attributes(last_update_scheduled_at: Time.now)
-      end
     end
 
     trait :import_started do
       import_status :started
-
-      after(:create) do |project, _|
-        project.import_state&.update_attributes(last_update_started_at: Time.now)
-      end
     end
 
     trait :import_finished do
-      timestamp = Time.now
-
       import_status :finished
-      last_update_at timestamp
-      last_successful_update_at timestamp
     end
 
     trait :import_failed do
       import_status :failed
-      last_update_at { Time.now }
-    end
-
-    trait :import_hard_failed do
-      import_status :failed
-      last_update_at { Time.now - 1.minute }
-      retry_count { Gitlab::Mirror::MAX_RETRY + 1 }
-    end
-
-    trait :disabled_mirror do
-      mirror false
-      import_url { generate(:url) }
-      mirror_user_id { creator_id }
-    end
-
-    trait :mirror do
-      mirror true
-      import_url { generate(:url) }
-      mirror_user_id { creator_id }
     end
 
     trait :archived do
@@ -247,7 +206,6 @@ FactoryBot.define do
         url "http://foo.com"
         enabled true
       end
-
       after(:create) do |project, evaluator|
         project.remote_mirrors.create!(url: evaluator.url, enabled: evaluator.enabled)
       end
@@ -285,10 +243,6 @@ FactoryBot.define do
           bare_repo: TestEnv.factory_repo_path_bare,
           refs: TestEnv::BRANCH_SHA)
       end
-    end
-
-    trait :random_last_repository_updated_at do
-      last_repository_updated_at { rand(1.year).seconds.ago }
     end
 
     trait(:wiki_enabled)            { wiki_access_level ProjectFeature::ENABLED }
