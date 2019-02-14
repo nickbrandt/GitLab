@@ -4,8 +4,8 @@ require 'spec_helper'
 
 describe Gitlab::Geo::Oauth::LoginState do
   let(:salt) { 'b9653b6aa2ff6b54' }
-  let(:hmac) { '908844004aa6ba7237be5cd394499a79e64c054e9b8021bd9b43ff7dc508320b' }
-  let(:oauth_return_to) { 'http://fake-secondary.com:3000/project/test' }
+  let(:hmac) { 'd75afcc6faa0fd5133c4512080c42ae579e9d9691bd1731475c287f394a35208' }
+  let(:return_to) { 'http://fake-secondary.com:3000/project/test?foo=bar#zoo' }
 
   before do
     allow(Gitlab::Application.secrets).to receive(:secret_key_base)
@@ -22,7 +22,7 @@ describe Gitlab::Geo::Oauth::LoginState do
     end
 
     it 'returns a valid instance when state is valid' do
-      expect(described_class.from_state("#{salt}:#{hmac}:#{oauth_return_to}")).to be_valid
+      expect(described_class.from_state("#{salt}:#{hmac}:#{return_to}")).to be_valid
     end
   end
 
@@ -40,31 +40,31 @@ describe Gitlab::Geo::Oauth::LoginState do
     end
 
     it 'returns false when hmac is nil' do
-      subject = described_class.new(return_to: oauth_return_to, salt: salt, hmac: nil)
+      subject = described_class.new(return_to: return_to, salt: salt, hmac: nil)
 
       expect(subject.valid?).to eq false
     end
 
     it 'returns false when hmac is empty' do
-      subject = described_class.new(return_to: oauth_return_to, salt: salt, hmac: '')
+      subject = described_class.new(return_to: return_to, salt: salt, hmac: '')
 
       expect(subject.valid?).to eq false
     end
 
     it 'returns false when salt not match' do
-      subject = described_class.new(return_to: oauth_return_to, salt: 'salt', hmac: hmac)
+      subject = described_class.new(return_to: return_to, salt: 'salt', hmac: hmac)
 
       expect(subject.valid?).to eq(false)
     end
 
     it 'returns false when hmac does not match' do
-      subject = described_class.new(return_to: oauth_return_to, salt: salt, hmac: 'hmac')
+      subject = described_class.new(return_to: return_to, salt: salt, hmac: 'hmac')
 
       expect(subject.valid?).to eq(false)
     end
 
     it 'returns true when hmac matches' do
-      subject = described_class.new(return_to: oauth_return_to, salt: salt, hmac: hmac)
+      subject = described_class.new(return_to: return_to, salt: salt, hmac: hmac)
 
       expect(subject.valid?).to eq(true)
     end
@@ -78,13 +78,33 @@ describe Gitlab::Geo::Oauth::LoginState do
     end
 
     it 'returns a string with salt, hmac, and return_to colon separated' do
-      subject = described_class.new(return_to: oauth_return_to)
+      subject = described_class.new(return_to: return_to)
 
       salt, hmac, return_to = subject.encode.split(':', 3)
 
       expect(salt).not_to be_blank
       expect(hmac).not_to be_blank
-      expect(return_to).to eq oauth_return_to
+      expect(return_to).to eq return_to
+    end
+  end
+
+  describe '#return_to' do
+    it 'returns nil when return_to is nil' do
+      subject = described_class.new(return_to: nil)
+
+      expect(subject.return_to).to be_nil
+    end
+
+    it 'returns an empty string when return_to is empty' do
+      subject = described_class.new(return_to: '')
+
+      expect(subject.return_to).to eq('')
+    end
+
+    it 'returns the full path of the return_to URL' do
+      subject = described_class.new(return_to: return_to)
+
+      expect(subject.return_to).to eq('/project/test?foo=bar#zoo')
     end
   end
 end
