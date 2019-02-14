@@ -632,6 +632,7 @@ rspec-mysql:
   parallel: 50
 
 .rspec-quarantine: &rspec-quarantine
+  retry: 0
   script:
     - export CACHE_CLASSES=true
     - scripts/gitaly-test-spawn
@@ -661,6 +662,7 @@ rspec-pg-10 geo: *rspec-metadata-pg-geo-10-2
 
 
 .rspec-quarantine-ee: &rspec-quarantine-ee
+  retry: 0
   script:
     - export CACHE_CLASSES=true
     - scripts/gitaly-test-spawn
