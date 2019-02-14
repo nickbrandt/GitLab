@@ -38,8 +38,8 @@ describe Projects::MergeRequests::CreationsController do
           create_merge_request(approvals_before_merge: 1)
         end
 
-        it 'sets the param to nil' do
-          expect(created_merge_request.approvals_before_merge).to eq(nil)
+        it 'sets the param to the project value' do
+          expect(created_merge_request.reload.approvals_before_merge).to eq(2)
         end
 
         it 'creates the merge request' do
@@ -53,8 +53,8 @@ describe Projects::MergeRequests::CreationsController do
           create_merge_request(approvals_before_merge: 2)
         end
 
-        it 'sets the param to nil' do
-          expect(created_merge_request.approvals_before_merge).to eq(nil)
+        it 'sets the param to the correct value' do
+          expect(created_merge_request.reload.approvals_before_merge).to eq(2)
         end
 
         it 'creates the merge request' do
@@ -88,7 +88,7 @@ describe Projects::MergeRequests::CreationsController do
         end
 
         it 'uses the default from the target project' do
-          expect(created_merge_request.approvals_before_merge).to eq(nil)
+          expect(created_merge_request.reload.approvals_before_merge).to eq(4)
         end
 
         it 'creates the merge request' do

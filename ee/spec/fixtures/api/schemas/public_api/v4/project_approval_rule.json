@@ -4,6 +4,7 @@
     "id": { "type": "integer" },
     "name": { "type": "string" },
     "approvals_required": { "type": "integer" },
+    "rule_type": { "type": "tring" },
     "approvers": {
       "type": "array",
       "items": {

@@ -243,13 +243,16 @@ module EE
         expose :title
       end
 
-      class ApprovalRule < Grape::Entity
+      class ApprovalRuleShort < Grape::Entity
+        expose :id, :name, :rule_type
+      end
+
+      class ApprovalRule < ApprovalRuleShort
         def initialize(object, options = {})
           presenter = ::ApprovalRulePresenter.new(object, current_user: options[:current_user])
           super(presenter, options)
         end
 
-        expose :id, :name
         expose :approvers, using: ::API::Entities::UserBasic
         expose :approvals_required
         expose :users, using: ::API::Entities::UserBasic
@@ -273,16 +276,12 @@ module EE
         end
 
         expose :wrapped_approval_rules, as: :rules, using: MergeRequestApprovalRule
-        expose :fallback_approvals_required
-        expose :use_fallback do |approval_state|
-          approval_state.use_fallback?
-        end
       end
 
       # Decorates Project
       class ProjectApprovalRules < Grape::Entity
-        expose :approval_rules, as: :rules, using: ApprovalRule
-        expose :approvals_before_merge, as: :fallback_approvals_required
+        expose :visible_regular_approval_rules, as: :rules, using: ApprovalRule
+        expose :min_fallback_approvals, as: :fallback_approvals_required
       end
 
       # @deprecated
@@ -383,12 +382,14 @@ module EE
           approval_state.can_approve?(options[:current_user])
         end
 
-        expose :approval_rules_left do |approval_state, options|
-          approval_state.approval_rules_left.map(&:name)
-        end
+        expose :approval_rules_left, using: ApprovalRuleShort
 
         expose :has_approval_rules do |approval_state|
-          approval_state.has_approval_rules?
+          approval_state.has_non_fallback_rules?
+        end
+
+        expose :multiple_approval_rules_available do |approval_state|
+          approval_state.project.multiple_approval_rules_available?
         end
       end
 

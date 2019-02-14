@@ -38,4 +38,8 @@ module ApprovalRuleLike
       groups.delete(member)
     end
   end
+
+  def rule_type
+    @rule_type ||= code_owner? ? :code_owner : :regular
+  end
 end
