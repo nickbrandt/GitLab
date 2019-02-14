@@ -62,10 +62,4 @@ FactoryBot.define do
       project_key: 'jira-key'
     )
   end
-
-  factory :gitlab_slack_application_service do
-    project
-    active true
-    type 'GitlabSlackApplicationService'
-  end
 end
