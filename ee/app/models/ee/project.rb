@@ -213,6 +213,10 @@ module EE
       feature_available?(:multiple_project_issue_boards)
     end
 
+    def multiple_approval_rules_available?
+      feature_available?(:multiple_approval_rules)
+    end
+
     def service_desk_enabled
       ::EE::Gitlab::ServiceDesk.enabled?(project: self) && super
     end
@@ -284,6 +288,25 @@ module EE
       return 0 unless feature_available?(:merge_request_approvers)
 
       super
+    end
+
+    def visible_regular_approval_rules
+      return approval_rules.none unless ::Feature.enabled?(:approval_rules, self)
+
+      strong_memoize(:visible_regular_approval_rules) do
+        regular_rules = approval_rules.regular.order(:id)
+
+        next regular_rules.take(1) unless multiple_approval_rules_available?
+
+        regular_rules
+      end
+    end
+
+    def min_fallback_approvals
+      strong_memoize(:min_fallback_approvals) do
+        visible_regular_approval_rules.map(&:approvals_required).max ||
+          approvals_before_merge.to_i
+      end
     end
 
     def reset_approvals_on_push
