@@ -32,10 +32,13 @@ module Gitlab
         attr_reader :hmac
 
         def generate_hmac
-          digest = OpenSSL::Digest::SHA256.new
-          key = Gitlab::Application.secrets.secret_key_base + salt
+          OpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA256.new, key, return_to.to_s)
+        end
 
-          OpenSSL::HMAC.hexdigest(digest, key, return_to.to_s)
+        def key
+          ActiveSupport::KeyGenerator
+            .new(Gitlab::Application.secrets.secret_key_base)
+            .generate_key(salt)
         end
 
         def salt
