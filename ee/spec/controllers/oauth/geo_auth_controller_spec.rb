@@ -58,7 +58,7 @@ describe Oauth::GeoAuthController do
       it 'redirects to redirect_url if state is valid' do
         get :callback, params: { state: login_state }
 
-        expect(response).to redirect_to(secondary_node.url)
+        expect(response).to redirect_to('/')
       end
 
       it 'does not display a flash message if state is valid' do
