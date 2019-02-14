@@ -29,6 +29,7 @@ describe Gitlab::UsageData do
       create(:package, project: projects[1])
 
       create(:project_tracing_setting, project: projects[0])
+      create(:operations_feature_flag, project: projects[0])
 
       # for group_view testing
       create(:user) # user with group_view = NULL (should be counted as having default value 'details')
@@ -78,10 +79,12 @@ describe Gitlab::UsageData do
         projects_with_tracing_enabled
         projects_jira_dvcs_cloud_active
         projects_jira_dvcs_server_active
+        feature_flags
       ))
 
       expect(count_data[:projects_with_prometheus_alerts]).to eq(2)
       expect(count_data[:projects_with_packages]).to eq(2)
+      expect(count_data[:feature_flags]).to eq(1)
     end
 
     it 'gathers deepest epic relationship level', :postgresql do

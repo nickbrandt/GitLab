@@ -108,6 +108,7 @@ module EE
 
         usage_data[:counts] = usage_data[:counts].merge({
           epics: count(::Epic),
+          feature_flags: count(Operations::FeatureFlag),
           geo_nodes: count(::GeoNode),
           ldap_group_links: count(::LdapGroupLink),
           ldap_keys: count(::LDAPKey),
