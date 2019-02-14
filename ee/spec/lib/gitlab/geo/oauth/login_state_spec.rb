@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 describe Gitlab::Geo::Oauth::LoginState do
-  let(:salt) { '100d8cbd1750a2bb' }
-  let(:hmac) { '62fdcface89baab582f33de6672f10499974c28b5cc269795c4830b8b3ab06be' }
+  let(:salt) { 'b9653b6aa2ff6b54' }
+  let(:hmac) { '908844004aa6ba7237be5cd394499a79e64c054e9b8021bd9b43ff7dc508320b' }
   let(:oauth_return_to) { 'http://fake-secondary.com:3000/project/test' }
 
   before do
