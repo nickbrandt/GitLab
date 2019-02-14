@@ -79,7 +79,7 @@ module Vulnerabilities
     def self.count_by_day_and_severity(period)
       joins(:occurrence_pipelines)
         .select('CAST(vulnerability_occurrence_pipelines.created_at AS DATE) AS day', :severity, 'COUNT(distinct vulnerability_occurrences.id) as count')
-        .where(['vulnerability_occurrence_pipelines.created_at >= ?', Date.today - period])
+        .where(['vulnerability_occurrence_pipelines.created_at >= ?', Time.zone.now.beginning_of_day - period])
         .group(:day, :severity)
         .order('day')
     end
