@@ -1750,9 +1750,6 @@ msgstr ""
 msgid "Choose which repositories you want to connect and run CI/CD pipelines."
 msgstr ""
 
-msgid "Choose which repositories you want to import."
-msgstr ""
-
 msgid "Choose which shards you wish to synchronize to this secondary node."
 msgstr ""
 
@@ -2587,6 +2584,9 @@ msgid "Configure the %{link} integration."
 msgstr ""
 
 msgid "Configure the way a user creates a new account."
+msgstr ""
+
+msgid "Connect"
 msgstr ""
 
 msgid "Connect all repositories"
@@ -4228,6 +4228,9 @@ msgstr ""
 msgid "Free Trial of GitLab.com Gold"
 msgstr ""
 
+msgid "From %{providerTitle}"
+msgstr ""
+
 msgid "From Bitbucket"
 msgstr ""
 
@@ -4699,6 +4702,9 @@ msgstr ""
 msgid "Go to %{link_to_google_takeout}."
 msgstr ""
 
+msgid "Go to project"
+msgstr ""
+
 msgid "Google Code import"
 msgstr ""
 
@@ -5125,6 +5131,18 @@ msgid "Import timed out. Import took longer than %{import_jobs_expiration} secon
 msgstr ""
 
 msgid "ImportButtons|Connect repositories from"
+msgstr ""
+
+msgid "ImportProjects|Importing the project failed"
+msgstr ""
+
+msgid "ImportProjects|Requesting your %{provider} repositories failed"
+msgstr ""
+
+msgid "ImportProjects|Select the projects you want to import"
+msgstr ""
+
+msgid "ImportProjects|Updating the imported projects failed"
 msgstr ""
 
 msgid "Improve Issue boards with GitLab Enterprise Edition."
@@ -6338,6 +6356,9 @@ msgstr ""
 msgid "No"
 msgstr ""
 
+msgid "No %{providerTitle} repositories available to import"
+msgstr ""
+
 msgid "No Label"
 msgstr ""
 
@@ -6468,6 +6489,9 @@ msgid "Not enough data"
 msgstr ""
 
 msgid "Not now"
+msgstr ""
+
+msgid "Not started"
 msgstr ""
 
 msgid "Note that the master branch is automatically protected. %{link_to_protected_branches}"
@@ -8141,6 +8165,9 @@ msgstr ""
 msgid "Running"
 msgstr ""
 
+msgid "Running…"
+msgstr ""
+
 msgid "SAML SSO"
 msgstr ""
 
@@ -8202,6 +8229,9 @@ msgid "Scheduled"
 msgstr ""
 
 msgid "Schedules"
+msgstr ""
+
+msgid "Scheduling"
 msgstr ""
 
 msgid "Scheduling Pipelines"
