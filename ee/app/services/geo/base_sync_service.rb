@@ -103,12 +103,11 @@ module Geo
 
     # Build a JWT header for authentication
     def jwt_authentication_header
-      authorization = ::Gitlab::Geo::RepoSyncRequest.new(scope: gl_repository).authorization
-      { "http.#{remote_url}.extraHeader" => "Authorization: #{authorization}" }
-    end
+      authorization = ::Gitlab::Geo::RepoSyncRequest.new(
+        scope: ::Gitlab::Geo::JwtRequestDecoder.build_repository_scope(type, project.id)
+      ).authorization
 
-    def gl_repository
-      "#{type}-#{project.id}"
+      { "http.#{remote_url}.extraHeader" => "Authorization: #{authorization}" }
     end
 
     def remote_url

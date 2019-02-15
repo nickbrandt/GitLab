@@ -80,5 +80,14 @@ describe EE::API::Helpers do
 
       expect(JSON.parse(last_response.body)).to eq({ 'message' => 'Gitlab::Geo::InvalidSignatureTimeError' })
     end
+
+    it 'returns unauthorized response when scope is not valid' do
+      allow_any_instance_of(::Gitlab::Geo::JwtRequestDecoder).to receive(:decode).and_return(scope: 'invalid_scope')
+
+      header 'Authorization', 'test'
+      get 'protected', params: { current_user: 'test' }
+
+      expect(JSON.parse(last_response.body)).to eq({ 'message' => '401 Unauthorized' })
+    end
   end
 end
