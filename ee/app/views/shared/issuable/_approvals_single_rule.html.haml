@@ -1,0 +1,66 @@
+- issuable = local_assigns.fetch(:issuable)
+- presenter = local_assigns.fetch(:presenter)
+- form = local_assigns.fetch(:form)
+
+- can_update_approvers = can?(current_user, :update_approvers, issuable)
+
+- if can_update_approvers
+  - skip_users = [*presenter.all_approvers_including_groups, *(issuable.authors unless presenter.authors_can_approve?)].compact
+
+  = users_select_tag("merge_request[approver_ids]",
+    multiple: true,
+    class: 'input-large',
+    email_user: true,
+    skip_users: skip_users,
+    project: issuable.target_project)
+
+  .form-text.text-muted
+    = _('This merge request must be approved by these users. You can override the project settings by setting your own list of approvers.')
+
+  - skip_groups = presenter.overall_approver_groups.pluck(:group_id) # rubocop: disable CodeReuse/ActiveRecord
+  = groups_select_tag('merge_request[approver_group_ids]', multiple: true, data: { skip_groups: skip_groups, all_available: true, project: issuable.target_project }, class: 'input-large')
+  .form-text.text-muted
+    = _('This merge request must be approved by members of these groups. You can override the project settings by setting your own list of approvers.')
+
+.card.prepend-top-10
+  .card-header
+    = _('Approvers')
+  %ul.content-list.approver-list.qa-approver-list
+    - if presenter.all_approvers_including_groups.empty?
+      %li.no-approvers= _('There are no approvers')
+    - else
+      - unsaved_approvers = !presenter.approvers_overwritten?
+      - item_classes = unsaved_approvers ? ['unsaved-approvers'] : []
+      - presenter.overall_approvers.each do |approver|
+        %li{ id: dom_id(approver), class: item_classes + ['approver'] }
+          = link_to approver.name, approver, class: 'qa-approver'
+          - if can_update_approvers
+            .float-right
+              - if unsaved_approvers
+                %button{ class: 'btn-sm btn btn-remove', title: _('Remove approver'), data: { confirm: _("Are you sure you want to remove approver %{name}") % { name: approver.name } } }
+                  = icon("sign-out")
+                  = _('Remove')
+              - else
+                = link_to project_merge_request_approver_via_user_id_path(@project, issuable, user_id: approver.id), data: { confirm: _("Are you sure you want to remove approver %{name}") % { name: approver.name } }, method: :delete, class: "btn-sm btn btn-remove", title: _('Remove approver') do
+                  = icon("sign-out")
+                  = _('Remove')
+      - presenter.overall_approver_groups.each do |approver_group|
+        %li{ id: dom_id(approver_group.group), class: item_classes + ['approver-group'] }
+          = _('Group:')
+          = link_to approver_group.group.name, approver_group.group
+          - if can_update_approvers
+            .float-right
+              - if unsaved_approvers
+                %button{ class: "btn-sm btn btn-remove", title: _('Remove group'), data: { confirm: _("Are you sure you want to remove group %{name}") % { name: approver_group.group.name } } }
+                  = icon("sign-out")
+                  = _('Remove')
+              - else
+                = link_to project_merge_request_approver_group_path(@project, issuable, approver_group), data: { confirm: _("Are you sure you want to remove group %{name}") % { name: approver_group.group.name } }, method: :delete, class: "btn-sm btn btn-remove", title: _('Remove group') do
+                  = icon("sign-out")
+                  = _('Remove')
+
+.col-sm-12
+  .form-group.row
+    = form.label :approvals_before_merge, class: 'label-bold' do
+      = _('Approvals required')
+    = form.number_field :approvals_before_merge, class: 'form-control', value: issuable.approvals_required, readonly: !can_update_approvers

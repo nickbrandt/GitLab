@@ -39,6 +39,7 @@ describe('ee merge request widget options', () => {
   }
 
   beforeEach(() => {
+    gon.features = { approvalRules: false };
     delete mrWidgetOptions.extends.el; // Prevent component mounting
 
     Component = Vue.extend(mrWidgetOptions);
@@ -46,6 +47,7 @@ describe('ee merge request widget options', () => {
   });
 
   afterEach(() => {
+    gon.features = null;
     vm.$destroy();
     mock.restore();
 

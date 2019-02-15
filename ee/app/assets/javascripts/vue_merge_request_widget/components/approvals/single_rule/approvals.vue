@@ -1,13 +1,13 @@
 <script>
-import Flash from '~/flash';
+import createFlash from '~/flash';
 import MrWidgetContainer from '~/vue_merge_request_widget/components/mr_widget_container.vue';
 import MrWidgetIcon from '~/vue_merge_request_widget/components/mr_widget_icon.vue';
-import { s__ } from '~/locale';
 import ApprovalsBody from './approvals_body.vue';
 import ApprovalsFooter from './approvals_footer.vue';
+import { FETCH_LOADING, FETCH_ERROR } from '../messages';
 
 export default {
-  name: 'MRWidgetApprovals',
+  name: 'MRWidgetSingleRuleApprovals',
   components: {
     ApprovalsBody,
     ApprovalsFooter,
@@ -46,18 +46,15 @@ export default {
     },
   },
   created() {
-    const flashErrorMessage = s__(
-      'mrWidget|An error occurred while retrieving approval data for this merge request.',
-    );
-
     this.service
       .fetchApprovals()
       .then(data => {
         this.mr.setApprovals(data);
         this.fetchingApprovals = false;
       })
-      .catch(() => new Flash(flashErrorMessage));
+      .catch(() => createFlash(FETCH_ERROR));
   },
+  FETCH_LOADING,
 };
 </script>
 <template>
@@ -65,7 +62,7 @@ export default {
     <div v-if="mr.approvalsRequired" class="media media-section js-mr-approvals align-items-center">
       <mr-widget-icon name="approval" />
       <div v-show="fetchingApprovals" class="mr-approvals-loading-state media-body">
-        <span class="approvals-loading-text"> {{ __('Checking approval status') }} </span>
+        <span class="approvals-loading-text"> {{ $options.FETCH_LOADING }} </span>
       </div>
       <div v-if="!fetchingApprovals" class="approvals-components media-body">
         <approvals-body

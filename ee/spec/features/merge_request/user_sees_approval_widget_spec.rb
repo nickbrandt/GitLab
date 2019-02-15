@@ -5,6 +5,10 @@ describe 'Merge request > User sees approval widget', :js do
   let(:user) { project.creator }
   let(:merge_request) { create(:merge_request, source_project: project) }
 
+  before do
+    stub_feature_flags(approval_rules: false)
+  end
+
   context 'when merge when discussions resolved is active' do
     let(:project) do
       create(:project, :repository,

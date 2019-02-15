@@ -6,6 +6,10 @@ describe 'Merge request > User sets approvers', :js do
   let(:user) { create(:user) }
   let(:project) { create(:project, :public, :repository, approvals_before_merge: 1) }
 
+  before do
+    stub_feature_flags(approval_rules: false)
+  end
+
   context 'when editing an MR with a different author' do
     let(:author) { create(:user) }
     let(:merge_request) { create(:merge_request, author: author, source_project: project) }
