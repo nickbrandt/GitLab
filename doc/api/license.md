@@ -1,4 +1,4 @@
-# License
+# License **[CORE ONLY]**
 
 In order to interact with license endpoints, you need to authenticate yourself
 as an admin.

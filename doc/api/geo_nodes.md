@@ -1,4 +1,4 @@
-# Geo Nodes API
+# Geo Nodes API **[PREMIUM ONLY]**
 
 In order to interact with Geo node endpoints, you need to authenticate yourself
 as an admin.

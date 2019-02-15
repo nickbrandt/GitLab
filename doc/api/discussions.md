@@ -414,7 +414,7 @@ Parameters:
 curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/5/snippets/11/discussions/636
 ```
 
-## Epics
+## Epics **[ULTIMATE]**
 
 ### List group epic discussions
 
