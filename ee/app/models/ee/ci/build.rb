@@ -81,6 +81,10 @@ module EE
 
       def collect_license_management_reports!(license_management_report)
         each_report(::Ci::JobArtifact::LICENSE_MANAGEMENT_REPORT_FILE_TYPES) do |file_type, blob|
+          next if ::Feature.disabled?(:parse_license_management_reports, default_enabled: true)
+
+          next unless project.feature_available?(:license_management)
+
           ::Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, license_management_report)
         end
 

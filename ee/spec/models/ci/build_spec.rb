@@ -265,6 +265,10 @@ describe Ci::Build do
 
     let(:license_management_report) { Gitlab::Ci::Reports::LicenseManagement::Report.new }
 
+    before do
+      stub_licensed_features(license_management: true)
+    end
+
     it { expect(license_management_report.licenses.count).to eq(0) }
 
     context 'when build has a license management report' do
@@ -289,6 +293,32 @@ describe Ci::Build do
 
         it 'raises an error' do
           expect { subject }.to raise_error(Gitlab::Ci::Parsers::LicenseManagement::LicenseManagement::LicenseManagementParserError)
+        end
+      end
+
+      context 'when Feature flag is disabled for License Management reports parsing' do
+        before do
+          stub_feature_flags(parse_license_management_reports: false)
+          create(:ee_ci_job_artifact, :license_management, job: job, project: job.project)
+        end
+
+        it 'does NOT parse license management report' do
+          subject
+
+          expect(license_management_report.licenses.count).to eq(0)
+        end
+      end
+
+      context 'when the license management feature is disabled' do
+        before do
+          stub_licensed_features(license_management: false)
+          create(:ee_ci_job_artifact, :license_management, job: job, project: job.project)
+        end
+
+        it 'does NOT parse license management report' do
+          subject
+
+          expect(license_management_report.licenses.count).to eq(0)
         end
       end
     end

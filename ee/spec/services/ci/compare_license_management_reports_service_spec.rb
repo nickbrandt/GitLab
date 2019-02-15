@@ -6,6 +6,10 @@ describe Ci::CompareLicenseManagementReportsService do
   let(:service) { described_class.new(project) }
   let(:project) { create(:project, :repository) }
 
+  before do
+    stub_licensed_features(license_management: true)
+  end
+
   describe '#execute' do
     subject { service.execute(base_pipeline, head_pipeline) }
 
