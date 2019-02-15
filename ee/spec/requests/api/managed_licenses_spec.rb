@@ -48,11 +48,12 @@ describe API::ManagedLicenses do
       end
     end
 
-    context 'authorized user with proper permissions' do
+    context 'with an authorized user with proper permissions' do
       it 'returns project managed licenses' do
         get api("/projects/#{project.id}/managed_licenses", dev_user)
 
         expect(response).to have_gitlab_http_status(200)
+        expect(response).to match_response_schema('managed_licenses', dir: 'ee')
         expect(json_response).to be_a(Array)
         expect(json_response.first['id']).to eq(software_license_policy.id)
         expect(json_response.first['name']).to eq(software_license_policy.name)
@@ -60,11 +61,12 @@ describe API::ManagedLicenses do
       end
     end
 
-    context 'authorized user without read permissions' do
+    context 'with authorized user without read permissions' do
       it 'returns project managed licenses to users with read permissions' do
         get api("/projects/#{project.id}/managed_licenses", reporter_user)
 
         expect(response).to have_gitlab_http_status(200)
+        expect(response).to match_response_schema('managed_licenses', dir: 'ee')
         expect(json_response).to be_a(Array)
         expect(json_response.first['id']).to eq(software_license_policy.id)
         expect(json_response.first['name']).to eq(software_license_policy.name)
@@ -87,6 +89,7 @@ describe API::ManagedLicenses do
         get api("/projects/#{project.id}/managed_licenses/#{software_license_policy.id}", dev_user)
 
         expect(response).to have_gitlab_http_status(200)
+        expect(response).to match_response_schema('software_license_policy', dir: 'ee')
         expect(json_response['id']).to eq(software_license_policy.id)
         expect(json_response['name']).to eq(software_license_policy.name)
         expect(json_response['approval_status']).to eq(software_license_policy.approval_status)
@@ -97,6 +100,7 @@ describe API::ManagedLicenses do
         get api("/projects/#{project.id}/managed_licenses/#{escaped_name}", dev_user)
 
         expect(response).to have_gitlab_http_status(200)
+        expect(response).to match_response_schema('software_license_policy', dir: 'ee')
         expect(json_response['id']).to eq(software_license_policy.id)
         expect(json_response['name']).to eq(software_license_policy.name)
         expect(json_response['approval_status']).to eq(software_license_policy.approval_status)
@@ -114,6 +118,7 @@ describe API::ManagedLicenses do
         get api("/projects/#{project.id}/managed_licenses/#{software_license_policy.id}", reporter_user)
 
         expect(response).to have_gitlab_http_status(200)
+        expect(response).to match_response_schema('software_license_policy', dir: 'ee')
         expect(json_response['id']).to eq(software_license_policy.id)
         expect(json_response['name']).to eq(software_license_policy.name)
         expect(json_response['approval_status']).to eq(software_license_policy.approval_status)
@@ -141,6 +146,7 @@ describe API::ManagedLicenses do
         end.to change {project.software_license_policies.count}.by(1)
 
         expect(response).to have_gitlab_http_status(201)
+        expect(response).to match_response_schema('software_license_policy', dir: 'ee')
         expect(json_response).to have_key('id')
         expect(json_response['name']).to eq('NEW_LICENSE_NAME')
         expect(json_response['approval_status']).to eq('approved')
@@ -209,6 +215,7 @@ describe API::ManagedLicenses do
         updated_software_license_policy = project.software_license_policies.reload.first
 
         expect(response).to have_gitlab_http_status(200)
+        expect(response).to match_response_schema('software_license_policy', dir: 'ee')
 
         # Check that response is equal to the updated object
         expect(json_response['id']).to eq(initial_id)
