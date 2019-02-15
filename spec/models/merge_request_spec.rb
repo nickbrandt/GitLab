@@ -435,7 +435,6 @@ describe MergeRequest do
       it 'does not cache issues from external trackers' do
         issue  = ExternalIssue.new('JIRA-123', subject.project)
         commit = double('commit1', safe_message: "Fixes #{issue.to_reference}")
-
         allow(subject).to receive(:commits).and_return([commit])
 
         expect { subject.cache_merge_request_closes_issues!(subject.author) }.not_to raise_error
@@ -2588,26 +2587,6 @@ describe MergeRequest do
           expect(merge_request.mergeable_with_quick_action?(developer, last_diff_sha: mr_sha)).to be_truthy
         end
       end
-    end
-  end
-
-  describe '#base_pipeline' do
-    let(:pipeline_arguments) do
-      {
-        project: project,
-        ref: merge_request.target_branch,
-        sha: merge_request.diff_base_sha
-      }
-    end
-
-    let(:project)       { create(:project, :public, :repository) }
-    let(:merge_request) { create(:merge_request, source_project: project) }
-
-    let!(:first_pipeline) { create(:ci_pipeline_without_jobs, pipeline_arguments) }
-    let!(:last_pipeline) { create(:ci_pipeline_without_jobs, pipeline_arguments) }
-
-    it 'returns latest pipeline' do
-      expect(merge_request.base_pipeline).to eq(last_pipeline)
     end
   end
 
