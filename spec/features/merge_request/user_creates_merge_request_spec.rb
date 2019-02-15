@@ -16,6 +16,8 @@ describe "User creates a merge request", :js do
   let(:user2) { create(:user) }
 
   before do
+    stub_feature_flags(approval_rules: false)
+
     project.add_maintainer(user)
     project.add_maintainer(user2)
     project.add_maintainer(approver)
