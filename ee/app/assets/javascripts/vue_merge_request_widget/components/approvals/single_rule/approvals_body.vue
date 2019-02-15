@@ -5,6 +5,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 import MrWidgetAuthor from '~/vue_merge_request_widget/components/mr_widget_author.vue';
 import tooltip from '~/vue_shared/directives/tooltip';
 import eventHub from '~/vue_merge_request_widget/event_hub';
+import { APPROVE_ERROR } from '../messages';
 
 export default {
   name: 'ApprovalsBody',
@@ -128,7 +129,7 @@ export default {
         })
         .catch(() => {
           this.approving = false;
-          Flash(s__('mrWidget|An error occurred while submitting your approval.'));
+          Flash(APPROVE_ERROR);
         });
     },
   },

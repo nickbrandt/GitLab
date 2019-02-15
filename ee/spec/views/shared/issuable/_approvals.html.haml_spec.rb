@@ -9,6 +9,8 @@ describe 'shared/issuable/_approvals.html.haml' do
   let(:form) { double('form') }
 
   before do
+    stub_feature_flags(approval_rules: false)
+
     allow(view).to receive(:can?).and_return(true)
     allow(view).to receive(:current_user).and_return(user)
     allow(form).to receive(:label)

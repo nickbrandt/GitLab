@@ -5,6 +5,7 @@ import UserAvatarLink from '~/vue_shared/components/user_avatar/user_avatar_link
 
 import { s__ } from '~/locale';
 import eventHub from '~/vue_merge_request_widget/event_hub';
+import { UNAPPROVE_ERROR } from '../messages';
 
 export default {
   name: 'ApprovalsFooter',
@@ -76,7 +77,7 @@ export default {
         })
         .catch(() => {
           this.unapproving = false;
-          Flash(s__('mrWidget|An error occurred while removing your approval.'));
+          Flash(UNAPPROVE_ERROR);
         });
     },
   },

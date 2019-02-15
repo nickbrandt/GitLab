@@ -22,6 +22,8 @@ describe Projects::MergeRequestsController, '(JavaScript fixtures)', type: :cont
   end
 
   before do
+    stub_feature_flags(approval_rules: false)
+
     # Ensure some approver suggestions are displayed
     service = double(:service)
     expect(::Gitlab::AuthorityAnalyzer).to receive(:new).and_return(service)

@@ -127,10 +127,24 @@ msgstr ""
 msgid "%{count} %{alerts}"
 msgstr ""
 
+msgid "%{count} approval required from %{name}"
+msgid_plural "%{count} approvals required from %{name}"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "%{count} approvals from %{name}"
+msgstr ""
+
 msgid "%{count} more"
 msgstr ""
 
 msgid "%{count} more assignees"
+msgstr ""
+
+msgid "%{count} of %{required} approvals from %{name}"
+msgstr ""
+
+msgid "%{count} of %{total}"
 msgstr ""
 
 msgid "%{count} participant"
@@ -464,6 +478,12 @@ msgstr ""
 msgid "Add additional text to appear in all email communications. %{character_limit} character limit"
 msgstr ""
 
+msgid "Add approver(s)"
+msgstr ""
+
+msgid "Add approvers"
+msgstr ""
+
 msgid "Add comment now"
 msgstr ""
 
@@ -649,6 +669,9 @@ msgstr ""
 msgid "All"
 msgstr ""
 
+msgid "All Members"
+msgstr ""
+
 msgid "All changes are committed"
 msgstr ""
 
@@ -730,6 +753,12 @@ msgstr ""
 msgid "An error occurred creating the new branch."
 msgstr ""
 
+msgid "An error occurred fetching the approval rules."
+msgstr ""
+
+msgid "An error occurred fetching the approvers for the new rule."
+msgstr ""
+
 msgid "An error occurred previewing the blob"
 msgstr ""
 
@@ -740,6 +769,9 @@ msgid "An error occurred when updating the issue weight"
 msgstr ""
 
 msgid "An error occurred while adding approver"
+msgstr ""
+
+msgid "An error occurred while deleting the approvers group"
 msgstr ""
 
 msgid "An error occurred while deleting the comment"
@@ -835,10 +867,16 @@ msgstr ""
 msgid "An error occurred while saving assignees"
 msgstr ""
 
+msgid "An error occurred while saving the approval settings"
+msgstr ""
+
 msgid "An error occurred while subscribing to notifications."
 msgstr ""
 
 msgid "An error occurred while unsubscribing to notifications."
+msgstr ""
+
+msgid "An error occurred while updating approvers"
 msgstr ""
 
 msgid "An error occurred while updating the comment"
@@ -931,6 +969,44 @@ msgstr ""
 msgid "Apply suggestion"
 msgstr ""
 
+msgid "ApprovalRuleRemove|%d member"
+msgid_plural "ApprovalRuleRemove|%d members"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "ApprovalRuleRemove|Approvals from this member are not revoked."
+msgid_plural "ApprovalRuleRemove|Approvals from these members are not revoked."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "ApprovalRuleRemove|You are about to remove the %{name} approver group which has %{nMembers}."
+msgstr ""
+
+msgid "ApprovalRuleSummary|%d member"
+msgid_plural "ApprovalRuleSummary|%d members"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "ApprovalRuleSummary|%{count} approval required from %{membersCount}"
+msgid_plural "ApprovalRuleSummary|%{count} approvals required from %{membersCount}"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "ApprovalRule|All members with Developer role or higher and code owners (if any)"
+msgstr ""
+
+msgid "ApprovalRule|Members"
+msgstr ""
+
+msgid "ApprovalRule|Name"
+msgstr ""
+
+msgid "ApprovalRule|No. approvals required"
+msgstr ""
+
+msgid "ApprovalRule|e.g. QA, Security, etc."
+msgstr ""
+
 msgid "Approvals"
 msgstr ""
 
@@ -973,7 +1049,13 @@ msgstr ""
 msgid "Are you sure you want to remove %{group_name}?"
 msgstr ""
 
+msgid "Are you sure you want to remove approver %{name}"
+msgstr ""
+
 msgid "Are you sure you want to remove approver %{name}?"
+msgstr ""
+
+msgid "Are you sure you want to remove group %{name}"
 msgstr ""
 
 msgid "Are you sure you want to remove group %{name}?"
@@ -2425,6 +2507,9 @@ msgstr ""
 msgid "Collapse"
 msgstr ""
 
+msgid "Collapse approvers"
+msgstr ""
+
 msgid "Collapse sidebar"
 msgstr ""
 
@@ -3810,6 +3895,9 @@ msgid "Expand"
 msgstr ""
 
 msgid "Expand all"
+msgstr ""
+
+msgid "Expand approvers"
 msgstr ""
 
 msgid "Expand sidebar"
@@ -5742,6 +5830,15 @@ msgstr ""
 msgid "Logs"
 msgstr ""
 
+msgid "MRApprovals|Approved by"
+msgstr ""
+
+msgid "MRApprovals|Approvers"
+msgstr ""
+
+msgid "MRApprovals|Pending approvals"
+msgstr ""
+
 msgid "Make everyone on your team more productive regardless of their location. GitLab Geo creates read-only mirrors of your GitLab instance so you can reduce the time it takes to clone and fetch large repos."
 msgstr ""
 
@@ -6688,6 +6785,9 @@ msgstr ""
 msgid "OperationsDashboard|Unable to add %{invalidProjects}. The Operations Dashboard is available for public projects, and private projects in groups with a Gold plan."
 msgstr ""
 
+msgid "Optional"
+msgstr ""
+
 msgid "Optionally, you can %{link_to_customize} how FogBugz email addresses and usernames are imported into GitLab."
 msgstr ""
 
@@ -7018,6 +7118,15 @@ msgstr ""
 msgid "Please enable and migrate to hashed storage to avoid security issues and ensure data integrity. %{migrate_link}"
 msgstr ""
 
+msgid "Please enter a non-negative number"
+msgstr ""
+
+msgid "Please enter a number greater than %{number} (from the project settings)"
+msgstr ""
+
+msgid "Please enter a valid number"
+msgstr ""
+
 msgid "Please fill in a descriptive name for your group."
 msgstr ""
 
@@ -7025,6 +7134,12 @@ msgid "Please migrate all existing projects to hashed storage to avoid security 
 msgstr ""
 
 msgid "Please note that this application is not provided by GitLab and you should verify its authenticity before allowing access."
+msgstr ""
+
+msgid "Please provide a name"
+msgstr ""
+
+msgid "Please select and add a member"
 msgstr ""
 
 msgid "Please select at least one filter to see results"
@@ -7854,6 +7969,12 @@ msgstr ""
 msgid "Remove approver"
 msgstr ""
 
+msgid "Remove approvers"
+msgstr ""
+
+msgid "Remove approvers?"
+msgstr ""
+
 msgid "Remove avatar"
 msgstr ""
 
@@ -7988,6 +8109,16 @@ msgstr ""
 
 msgid "Require all users to accept Terms of Service and Privacy Policy when they access GitLab."
 msgstr ""
+
+msgid "Requires approval from %{names}."
+msgid_plural "Requires %{count} more approvals from %{names}."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Requires approval."
+msgid_plural "Requires %d more approvals."
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Resend invite"
 msgstr ""
@@ -8268,6 +8399,9 @@ msgid "Search projects"
 msgstr ""
 
 msgid "Search users"
+msgstr ""
+
+msgid "Search users or groups"
 msgstr ""
 
 msgid "Search your projects"
@@ -9652,6 +9786,12 @@ msgstr ""
 msgid "This merge request is locked."
 msgstr ""
 
+msgid "This merge request must be approved by members of these groups. You can override the project settings by setting your own list of approvers."
+msgstr ""
+
+msgid "This merge request must be approved by these users. You can override the project settings by setting your own list of approvers."
+msgstr ""
+
 msgid "This option is disabled as you don't have write permissions for the current branch"
 msgstr ""
 
@@ -10211,6 +10351,9 @@ msgstr ""
 msgid "Update"
 msgstr ""
 
+msgid "Update approvers"
+msgstr ""
+
 msgid "Update failed"
 msgstr ""
 
@@ -10446,6 +10589,9 @@ msgid "View details: %{details_url}"
 msgstr ""
 
 msgid "View documentation"
+msgstr ""
+
+msgid "View eligible approvers"
 msgstr ""
 
 msgid "View epics list"
@@ -10863,6 +11009,9 @@ msgid "You don't have any deployments right now."
 msgstr ""
 
 msgid "You have no permissions"
+msgstr ""
+
+msgid "You have not added any approvers. Start by adding users or groups."
 msgstr ""
 
 msgid "You have reached your project limit"
@@ -11450,6 +11599,9 @@ msgstr ""
 msgid "mrWidget|Approve"
 msgstr ""
 
+msgid "mrWidget|Approve additionally"
+msgstr ""
+
 msgid "mrWidget|Approved by"
 msgstr ""
 
@@ -11522,6 +11674,9 @@ msgstr ""
 msgid "mrWidget|Merge request approved"
 msgstr ""
 
+msgid "mrWidget|Merge request approved."
+msgstr ""
+
 msgid "mrWidget|Merge request approved; you can approve additionally"
 msgstr ""
 
@@ -11581,6 +11736,9 @@ msgid "mrWidget|Revert"
 msgstr ""
 
 msgid "mrWidget|Revert this merge request in a new merge request"
+msgstr ""
+
+msgid "mrWidget|Revoke approval"
 msgstr ""
 
 msgid "mrWidget|Set by"
