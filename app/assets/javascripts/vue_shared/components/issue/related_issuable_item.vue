@@ -3,9 +3,9 @@ import { GlTooltipDirective } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import IssueMilestone from '~/vue_shared/components/issue/issue_milestone.vue';
 import IssueAssignees from '~/vue_shared/components/issue/issue_assignees.vue';
+import relatedIssuableMixin from '~/vue_shared/mixins/related_issuable_mixin';
 import IssueDueDate from '~/boards/components/issue_due_date.vue';
 import IssueWeight from 'ee/boards/components/issue_card_weight.vue';
-import relatedIssueMixin from '../mixins/related_issues_mixin';
 
 export default {
   name: 'IssueItem',
@@ -18,7 +18,7 @@ export default {
   directives: {
     GlTooltip: GlTooltipDirective,
   },
-  mixins: [relatedIssueMixin],
+  mixins: [relatedIssuableMixin],
   props: {
     canReorder: {
       type: Boolean,
@@ -124,7 +124,7 @@ export default {
       aria-label="Remove"
       @click="onRemoveRequest"
     >
-      <icon :size="16" class="btn-item-remove-icon" name="close" />
+      <icon :size="16" class="btn-item-remove-icon" name="close"/>
     </button>
   </div>
 </template>

@@ -2,10 +2,10 @@
 import Sortable from 'sortablejs';
 import tooltip from '~/vue_shared/directives/tooltip';
 import Icon from '~/vue_shared/components/icon.vue';
+import RelatedIssuableItem from '~/vue_shared/components/issue/related_issuable_item.vue';
 import sortableConfig from 'ee/sortable/sortable_config';
 import { GlLoadingIcon } from '@gitlab/ui';
-import issueItem from './issue_item.vue';
-import addIssuableForm from './add_issuable_form.vue';
+import AddIssuableForm from './add_issuable_form.vue';
 import { issuableIconMap, issuableQaClassMap } from '../constants';
 
 export default {
@@ -15,8 +15,8 @@ export default {
   },
   components: {
     Icon,
-    addIssuableForm,
-    issueItem,
+    AddIssuableForm,
+    RelatedIssuableItem,
     GlLoadingIcon,
   },
   props: {
@@ -171,7 +171,8 @@ export default {
               class="js-related-issues-header-issue-count related-issues-header-issue-count issue-count-badge mx-1"
             >
               <span class="issue-count-badge-count">
-                <icon :name="issuableTypeIcon" class="mr-1 text-secondary" /> {{ badgeLabel }}
+                <icon :name="issuableTypeIcon" class="mr-1 text-secondary"/>
+                {{ badgeLabel }}
               </span>
             </div>
             <button
@@ -218,11 +219,7 @@ export default {
         class="related-issues-token-body"
       >
         <div v-if="isFetching" class="related-issues-loading-icon qa-related-issues-loading-icon">
-          <gl-loading-icon
-            ref="loadingIcon"
-            label="Fetching related issues"
-            class="prepend-top-5"
-          />
+          <gl-loading-icon ref="loadingIcon" label="Fetching related issues" class="prepend-top-5"/>
         </div>
         <ul ref="list" :class="{ 'content-list': !canReorder }" class="related-items-list">
           <li
@@ -237,7 +234,7 @@ export default {
             :data-ordering-id="issuableOrderingId(issue)"
             class="js-related-issues-token-list-item list-item pt-0 pb-0"
           >
-            <issue-item
+            <related-issuable-item
               :id-key="issue.id"
               :display-reference="issue.reference"
               :confidential="issue.confidential"
