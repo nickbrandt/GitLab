@@ -151,9 +151,6 @@ describe 'New project' do
         click_button 'Connect'
         wait_for_requests
 
-        expect(page).to have_text('Started')
-        wait_for_requests
-
         expect(page).to have_text('Done')
 
         created_project = Project.last
