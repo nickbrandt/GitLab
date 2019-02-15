@@ -6,6 +6,16 @@ describe Gitlab::Checks::DiffCheck do
   include_context 'push rules checks context'
 
   describe '#validate!' do
+    context 'no push rules active' do
+      set(:push_rule) { create(:push_rule) }
+
+      it "does not attempt to check commits" do
+        expect(subject).not_to receive(:process_commits)
+
+        subject.validate!
+      end
+    end
+
     context 'file name rules' do
       # Notice that the commit used creates a file named 'README'
       context 'file name regex check' do

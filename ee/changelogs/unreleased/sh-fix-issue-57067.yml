@@ -1,0 +1,5 @@
+---
+title: Disable commit checks when no push rules are active
+merge_request: 9569
+author:
+type: performance
