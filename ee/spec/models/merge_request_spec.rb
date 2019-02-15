@@ -472,12 +472,6 @@ describe MergeRequest do
     end
   end
 
-  describe '#base_pipeline' do
-    let!(:pipeline) { create(:ci_empty_pipeline, project: subject.project, sha: subject.diff_base_sha) }
-
-    it { expect(subject.base_pipeline).to eq(pipeline) }
-  end
-
   describe '#has_license_management_reports?' do
     subject { merge_request.has_license_management_reports? }
     let(:project) { create(:project, :repository) }
