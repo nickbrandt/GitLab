@@ -3,6 +3,8 @@ import Sortable from 'sortablejs';
 import tooltip from '~/vue_shared/directives/tooltip';
 import Icon from '~/vue_shared/components/icon.vue';
 import RelatedIssuableItem from '~/vue_shared/components/issue/related_issuable_item.vue';
+import IssueWeight from 'ee/boards/components/issue_card_weight.vue';
+import IssueDueDate from '~/boards/components/issue_due_date.vue';
 import sortableConfig from 'ee/sortable/sortable_config';
 import { GlLoadingIcon } from '@gitlab/ui';
 import AddIssuableForm from './add_issuable_form.vue';
@@ -18,6 +20,8 @@ export default {
     AddIssuableForm,
     RelatedIssuableItem,
     GlLoadingIcon,
+    IssueWeight,
+    IssueDueDate,
   },
   props: {
     isFetching: {
@@ -244,7 +248,6 @@ export default {
               :milestone="issue.milestone"
               :due-date="issue.due_date"
               :assignees="issue.assignees"
-              :weight="issue.weight"
               :created-at="issue.created_at"
               :closed-at="issue.closed_at"
               :can-remove="canAdmin"
@@ -252,7 +255,22 @@ export default {
               :path-id-separator="pathIdSeparator"
               event-namespace="relatedIssue"
               @relatedIssueRemoveRequest="$emit('relatedIssueRemoveRequest', $event)"
-            />
+            >
+              <issue-weight
+                v-if="issue.weight"
+                :weight="issue.weight"
+                slot="weight"
+                class="item-weight d-flex align-items-center"
+                tag-name="span"
+              />
+              <issue-due-date
+                v-if="issue.due_date"
+                :date="issue.due_date"
+                slot="dueDate"
+                tooltip-placement="top"
+                css-class="item-due-date d-flex align-items-center"
+              />
+            </related-issuable-item>
           </li>
         </ul>
       </div>
