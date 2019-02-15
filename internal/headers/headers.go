@@ -6,7 +6,9 @@ import (
 )
 
 // Max number of bytes that http.DetectContentType needs to get the content type
-const MaxDetectSize = 512
+// Fixme: Go back to 512 bytes once https://gitlab.com/gitlab-org/gitlab-workhorse/issues/208
+// has been merged
+const MaxDetectSize = 4096
 
 // HTTP Headers
 const (
