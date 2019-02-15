@@ -32,7 +32,7 @@ module QA
                 element :review_preview_toggle
               end
 
-              view 'ee/app/views/shared/issuable/_approvals.html.haml' do
+              view 'ee/app/views/shared/issuable/_approvals_single_rule.html.haml' do
                 element :approver_list
               end
 

@@ -5,6 +5,10 @@ describe 'Merge request > User approves', :js do
   let(:project) { create(:project, :public, :repository, approvals_before_merge: 1) }
   let(:merge_request) { create(:merge_request, source_project: project) }
 
+  before do
+    stub_feature_flags(approval_rules: false)
+  end
+
   context 'Approving by approvers from groups' do
     let(:other_user) { create(:user) }
     let(:group) { create :group }
