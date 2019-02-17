@@ -96,7 +96,7 @@ use of advanced features:
 | [Pipeline schedules](../user/project/pipelines/schedules.md)                     | Trigger pipelines on a schedule.                                                                                             |
 | [Connecting GitLab with a Kubernetes cluster](../user/project/clusters/index.md) | Integrate one or more Kubernetes clusters to your project.                                                                   |
 | [Deploy Boards](../user/project/deploy_boards.md) **[PREMIUM]**                  | Check the current health and status of each CI/CD environment running on Kubernetes.                                         |
-| [ChatOps](chatops/README.md) **[ULTIMATE]**                                      | Trigger CI jobs from chat, with results sent back to the channel.                                                            |
+| [ChatOps](chatops/README.md)                                                     | Trigger CI jobs from chat, with results sent back to the channel.                                                            |
 | [Interactive web terminals](interactive_web_terminal/index.md)                   | Open an interactive web terminal to debug the running jobs.                                                                  |
 
 ### GitLab Pages

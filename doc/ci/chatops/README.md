@@ -1,8 +1,8 @@
-# GitLab ChatOps **[ULTIMATE]**
+# GitLab ChatOps
 
 > **Notes:**
 >
-> * [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/4466) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.6.
+> * [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/4466) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 10.6. [Moved](https://gitlab.com/gitlab-org/gitlab-ce/merge_requests/24780) to [GitLab Core](https://about.gitlab.com/pricing/) in 11.9.
 >
 > * ChatOps is currently in alpha, with some important features missing like access control.
 
