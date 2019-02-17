@@ -45,8 +45,8 @@ The following guide assumes that:
   replicating from), running Omnibus' PostgreSQL (or equivalent version), and
   you have a new **secondary** server set up with the same versions of the OS,
   PostgreSQL, and GitLab on all nodes.
-- The IP of the **primary** server for our examples will be `1.2.3.4`, whereas the
-  **secondary** node's IP will be `5.6.7.8`. Note that the **primary** and **secondary** servers
+- The IP of the **primary** server for our examples is `198.51.100.1`, whereas the
+  **secondary** node's IP is `198.51.100.2`. Note that the **primary** and **secondary** servers
   **must** be able to communicate over these addresses. More on this in the
   guide below.
 
@@ -170,16 +170,16 @@ There is an [issue where support is being discussed](https://gitlab.com/gitlab-o
 
     ##
     ## Primary address
-    ## - replace '1.2.3.4' with the primary public or VPC address
+    ## - replace '198.51.100.1' with the public or VPC address of your Geo primary node
     ##
-    postgresql['listen_address'] = '1.2.3.4'
+    postgresql['listen_address'] = '198.51.100.1'
 
     ##
     # Primary and Secondary addresses
-    # - replace '1.2.3.4' with the primary public or VPC address
-    # - replace '5.6.7.8' with the secondary public or VPC address
+    # - replace '198.51.100.1' with the public or VPC address of your Geo primary node
+    # - replace '198.51.100.2' with the public or VPC address of your Geo secondary node
     ##
-    postgresql['md5_auth_cidr_addresses'] = ['1.2.3.4/32','5.6.7.8/32']
+    postgresql['md5_auth_cidr_addresses'] = ['198.51.100.1/32','198.51.100.2/32']
 
     ##
     ## Replication settings
@@ -199,7 +199,7 @@ There is an [issue where support is being discussed](https://gitlab.com/gitlab-o
 1. Optional: If you want to add another **secondary** node, the relevant setting would look like:
 
     ```ruby
-    postgresql['md5_auth_cidr_addresses'] = ['1.2.3.4/32', '5.6.7.8/32','9.10.11.12/32']
+    postgresql['md5_auth_cidr_addresses'] = ['198.51.100.1/32', '198.51.100.2/32','198.51.100.3/32']
     ```
 
     You may also want to edit the `wal_keep_segments` and `max_wal_senders` to
@@ -274,7 +274,7 @@ There is an [issue where support is being discussed](https://gitlab.com/gitlab-o
 1. [Check TCP connectivity][rake-maintenance] to the **primary** node's PostgreSQL server:
 
     ```sh
-    gitlab-rake gitlab:tcp_check[1.2.3.4,5432]
+    gitlab-rake gitlab:tcp_check[198.51.100.1,5432]
     ```
 
     NOTE: **Note**:
@@ -305,7 +305,7 @@ There is an [issue where support is being discussed](https://gitlab.com/gitlab-o
 1. Test that the `gitlab-psql` user can connect to the **primary** node's database:
 
     ```sh
-    sudo -u gitlab-psql /opt/gitlab/embedded/bin/psql --list -U gitlab_replicator -d "dbname=gitlabhq_production sslmode=verify-ca" -W -h 1.2.3.4
+    sudo -u gitlab-psql /opt/gitlab/embedded/bin/psql --list -U gitlab_replicator -d "dbname=gitlabhq_production sslmode=verify-ca" -W -h 198.51.100.1
     ```
 
     When prompted enter the password you set in the first step for the
@@ -333,10 +333,10 @@ There is an [issue where support is being discussed](https://gitlab.com/gitlab-o
 
     ##
     ## Secondary address
-    ## - replace '5.6.7.8' with the secondary public or VPC address
+    ## - replace '198.51.100.2' with the public or VPC address of your Geo secondary node 
     ##
-    postgresql['listen_address'] = '5.6.7.8'
-    postgresql['md5_auth_cidr_addresses'] = ['5.6.7.8/32']
+    postgresql['listen_address'] = '198.51.100.2'
+    postgresql['md5_auth_cidr_addresses'] = ['198.51.100.2/32']
 
     ##
     ## Database credentials password (defined previously in primary node)
@@ -399,7 +399,7 @@ data before running `pg_basebackup`.
     Using the same slot name between two secondaries will break PostgreSQL replication.
 
     ```sh
-    gitlab-ctl replicate-geo-database --slot-name=secondary_example --host=1.2.3.4
+    gitlab-ctl replicate-geo-database --slot-name=secondary_example --host=198.51.100.1
     ```
 
     When prompted, enter the _plaintext_ password you set up for the `gitlab_replicator`
