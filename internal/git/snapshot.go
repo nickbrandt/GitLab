@@ -5,8 +5,6 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/golang/protobuf/jsonpb"
-
 	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
@@ -36,7 +34,7 @@ func (s *snapshot) Inject(w http.ResponseWriter, r *http.Request, sendData strin
 	}
 
 	request := &gitalypb.GetSnapshotRequest{}
-	if err := jsonpb.UnmarshalString(params.GetSnapshotRequest, request); err != nil {
+	if err := gitaly.UnmarshalJSON(params.GetSnapshotRequest, request); err != nil {
 		helper.Fail500(w, r, fmt.Errorf("SendSnapshot: unmarshal GetSnapshotRequest: %v", err))
 		return
 	}

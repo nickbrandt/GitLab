@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/golang/protobuf/jsonpb"
-
 	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
 
 	"gitlab.com/gitlab-org/gitlab-workhorse/internal/gitaly"
@@ -29,7 +27,7 @@ func (d *diff) Inject(w http.ResponseWriter, r *http.Request, sendData string) {
 	}
 
 	request := &gitalypb.RawDiffRequest{}
-	if err := jsonpb.UnmarshalString(params.RawDiffRequest, request); err != nil {
+	if err := gitaly.UnmarshalJSON(params.RawDiffRequest, request); err != nil {
 		helper.Fail500(w, r, fmt.Errorf("diff.RawDiff: %v", err))
 		return
 	}
