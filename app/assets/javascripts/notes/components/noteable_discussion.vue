@@ -263,6 +263,7 @@ export default {
       'removePlaceholderNotes',
       'toggleResolveNote',
       'expandDiscussion',
+      'removeConvertedDiscussion',
     ]),
     truncateSha,
     componentName(note) {
@@ -300,6 +301,10 @@ export default {
         if (!window.confirm(msg)) {
           return;
         }
+      }
+
+      if (this.convertedDisscussionIds.includes(this.discussion.id)) {
+        this.removeConvertedDiscussion(this.discussion.id);
       }
 
       this.isReplying = false;
