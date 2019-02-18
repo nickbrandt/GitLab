@@ -658,6 +658,9 @@ msgstr ""
 msgid "Advanced settings"
 msgstr ""
 
+msgid "After a successful password update you will be redirected to login screen."
+msgstr ""
+
 msgid "Alert"
 msgid_plural "Alerts"
 msgstr[0] ""
@@ -7176,6 +7179,9 @@ msgid "Please select and add a member"
 msgstr ""
 
 msgid "Please select at least one filter to see results"
+msgstr ""
+
+msgid "Please set a new password before proceeding."
 msgstr ""
 
 msgid "Please solve the reCAPTCHA"
