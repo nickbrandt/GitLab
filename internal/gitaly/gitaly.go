@@ -1,8 +1,11 @@
 package gitaly
 
 import (
+	"strings"
 	"sync"
 
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"gitlab.com/gitlab-org/gitaly-proto/go/gitalypb"
@@ -24,9 +27,12 @@ type connectionsCache struct {
 	connections map[Server]*grpc.ClientConn
 }
 
-var cache = connectionsCache{
-	connections: make(map[Server]*grpc.ClientConn),
-}
+var (
+	jsonUnMarshaler = jsonpb.Unmarshaler{AllowUnknownFields: true}
+	cache           = connectionsCache{
+		connections: make(map[Server]*grpc.ClientConn),
+	}
+)
 
 func NewSmartHTTPClient(server Server) (*SmartHTTPClient, error) {
 	conn, err := getOrCreateConnection(server)
@@ -130,4 +136,8 @@ func newConnection(server Server) (*grpc.ClientConn, error) {
 	)
 
 	return gitalyclient.Dial(server.Address, connOpts)
+}
+
+func UnmarshalJSON(s string, msg proto.Message) error {
+	return jsonUnMarshaler.Unmarshal(strings.NewReader(s), msg)
 }
