@@ -171,7 +171,6 @@ GET /groups/:id/issues?my_reaction_emoji=star
 | `updated_after`     | datetime         | no         | Return issues updated on or after the given time                                                                              |
 | `updated_before`    | datetime         | no         | Return issues updated on or before the given time                                                                             |
 
-
 ```bash
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/groups/4/issues
 ```
@@ -834,7 +833,6 @@ Example response:
 
 **Note**: `assignee` column is deprecated, now we show it as a single-sized array `assignees` to conform to the GitLab EE API.
 
-
 **Note**: The `closed_by` attribute was [introduced in GitLab 10.6][ce-17042]. This value will only be present for issues which were closed after GitLab 10.6 and when the user account that closed the issue still exists.
 
 ## Unsubscribe from an issue
@@ -1002,7 +1000,6 @@ Example response:
 ```
 
 **Note**: `assignee` column is deprecated, now we show it as a single-sized array `assignees` to conform to the GitLab EE API.
-
 
 **Note**: The `closed_by` attribute was [introduced in GitLab 10.6][ce-17042]. This value will only be present for issues which were closed after GitLab 10.6 and when the user account that closed the issue still exists.
 
@@ -1301,7 +1298,6 @@ Example response:
 ]
 ```
 
-
 ## Participants on issues
 
 ```
@@ -1339,7 +1335,6 @@ Example response:
   }
 ]
 ```
-
 
 ## Comments on issues
 
