@@ -129,7 +129,7 @@ You can log in to the **secondary** node with the same credentials as used for t
 
 ### Step 4. Enabling Hashed Storage
 
-Read [Enabling Hashed Storage](configuration.md##step-4-enabling-hashed-storage).
+Read [Enabling Hashed Storage](configuration.md#step-4-enabling-hashed-storage).
 
 ### Step 5. (Optional) Configuring the secondary to trust the primary
 
