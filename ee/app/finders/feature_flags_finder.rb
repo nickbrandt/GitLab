@@ -36,10 +36,6 @@ class FeatureFlagsFinder
   end
 
   def for_list(items)
-    if Feature.enabled?(:feature_flags_environment_scope, project)
-      items.for_list
-    else
-      items
-    end
+    items.for_list
   end
 end
