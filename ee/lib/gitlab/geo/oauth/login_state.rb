@@ -7,32 +7,42 @@ module Gitlab
         attr_reader :return_to
 
         def self.from_state(state)
-          salt, hmac, return_to = state.to_s.split(':', 3)
-          self.new(salt: salt, hmac: hmac, return_to: return_to)
+          salt, token, return_to = state.to_s.split(':', 3)
+          self.new(salt: salt, token: token, return_to: return_to)
         end
 
-        def initialize(return_to:, salt: nil, hmac: nil)
+        def initialize(return_to:, salt: nil, token: nil)
           @return_to = Gitlab::ReturnToLocation.new(return_to).full_path
           @salt = salt
-          @hmac = hmac
-        end
-
-        def valid?
-          return false unless salt.present? && hmac.present?
-
-          ActiveSupport::SecurityUtils.secure_compare(hmac, generate_hmac)
+          @token = token
         end
 
         def encode
-          "#{salt}:#{generate_hmac}:#{return_to}"
+          "#{salt}:#{hmac_token}:#{return_to}"
+        end
+
+        def valid?
+          return false unless salt.present? && token.present?
+
+          decoded_token = JSONWebToken::HMACToken.decode(token, key).first
+          secure_compare(decoded_token.dig('data', 'return_to'))
+        rescue JWT::DecodeError
+          false
         end
 
         private
 
-        attr_reader :hmac
+        attr_reader :token
 
-        def generate_hmac
-          OpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA256.new, key, return_to.to_s)
+        def expiration_time
+          1.minute
+        end
+
+        def hmac_token
+          hmac_token = JSONWebToken::HMACToken.new(key)
+          hmac_token.expire_time = Time.now + expiration_time
+          hmac_token[:data] = { return_to: return_to.to_s }
+          hmac_token.encoded
         end
 
         def key
@@ -43,6 +53,10 @@ module Gitlab
 
         def salt
           @salt ||= SecureRandom.hex(8)
+        end
+
+        def secure_compare(value)
+          ActiveSupport::SecurityUtils.secure_compare(return_to.to_s, value)
         end
       end
     end
