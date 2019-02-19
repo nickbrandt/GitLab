@@ -133,6 +133,15 @@ describe OmniAuth::Strategies::GroupSaml, type: :strategy do
       expect(last_response.status).to eq 404
     end
 
+    it 'suceeds when feature enabled for an individual group' do
+      stub_feature_flags(group_saml_metadata_available: false)
+      allow(Feature).to receive(:enabled?).with(:group_saml_metadata_available, group) { true }
+
+      post '/users/auth/group_saml/metadata', group_path: 'my-group', token: group.saml_discovery_token
+
+      expect(last_response.status).to eq 200
+    end
+
     it 'returns metadata when a valid token is provided' do
       post '/users/auth/group_saml/metadata', group_path: 'my-group', token: group.saml_discovery_token
 
