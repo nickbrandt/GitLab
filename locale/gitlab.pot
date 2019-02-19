@@ -661,6 +661,9 @@ msgstr ""
 msgid "Advanced settings"
 msgstr ""
 
+msgid "After a successful password update you will be redirected to login screen."
+msgstr ""
+
 msgid "Alert"
 msgid_plural "Alerts"
 msgstr[0] ""
@@ -6408,6 +6411,9 @@ msgstr ""
 msgid "New Pages Domain"
 msgstr ""
 
+msgid "New Password"
+msgstr ""
+
 msgid "New Pipeline Schedule"
 msgstr ""
 
@@ -7188,6 +7194,9 @@ msgid "Please select and add a member"
 msgstr ""
 
 msgid "Please select at least one filter to see results"
+msgstr ""
+
+msgid "Please set a new password before proceeding."
 msgstr ""
 
 msgid "Please solve the reCAPTCHA"
@@ -8716,6 +8725,9 @@ msgstr ""
 msgid "Set max session time for web terminal."
 msgstr ""
 
+msgid "Set new password"
+msgstr ""
+
 msgid "Set notification email for abuse reports."
 msgstr ""
 
@@ -8738,6 +8750,9 @@ msgid "Set up assertions/attributes/claims (email, first_name, last_name) and Na
 msgstr ""
 
 msgid "Set up new U2F device"
+msgstr ""
+
+msgid "Set up new password"
 msgstr ""
 
 msgid "Set up your project to automatically push and/or pull changes to/from another repository. Branches, tags, and commits will be synced automatically."
