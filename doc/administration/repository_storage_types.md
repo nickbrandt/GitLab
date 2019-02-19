@@ -87,7 +87,7 @@ The rollback has to be performed in the reverse order. To get into "Legacy" stat
 you need to rollback Attachments first, then Project.
 
 Also note that if Geo is enabled, after the migration was triggered, an event is generated
-to replicate the operation on any Secondary node. That means the on disk changes will also
+to replicate the operation on any **secondary** node. That means the [on disk changes](#project) will
 need to be performed on these nodes as well. Database changes will propagate without issues.
 
 You must make sure the migration event was already processed or otherwise it may migrate
