@@ -68,7 +68,7 @@ cost-effective to deploy several small nodes rather than a single
 larger one.
 
 - 1 PostgreSQL node
-- 1 Redis nodes
+- 1 Redis node
 - 2 or more GitLab application nodes (Unicorn, Workhorse, Sidekiq)
 - 1 NFS/Gitaly storage server
 
@@ -81,7 +81,7 @@ this architecture is required is if Sidekiq queues begin to periodically increas
 in size, indicating that there is contention or not enough resources.
 
 - 1 PostgreSQL node
-- 1 Redis nodes
+- 1 Redis node
 - 2 or more GitLab application nodes (Unicorn, Workhorse)
 - 2 or more Sidekiq nodes
 - 2 or more NFS/Gitaly storage servers
