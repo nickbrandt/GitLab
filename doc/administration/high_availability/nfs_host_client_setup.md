@@ -12,6 +12,9 @@ and Corosync](http://clusterlabs.org/) for highly available NFS in production.
 Below are instructions for setting up an application node(client) in an HA cluster
 to read from and write to a central NFS server(host).
 
+NOTE: **Note:**
+Using EFS may negatively impact performance. Please review the [relevant documentation](nfs.md#avoid-using-awss-elastic-file-system-efs) for additional details.
+
 ## NFS Server Setup
 
 > Follow the instructions below to set up and configure your NFS server.
