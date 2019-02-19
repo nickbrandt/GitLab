@@ -81,7 +81,6 @@ function deferredInitialisation() {
   initUserPopovers();
 
   if (document.querySelector('.search')) initSearchAutocomplete();
-  if (document.querySelector('#js-peek')) initPerformanceBar({ container: '#js-peek' });
 
   addSelectOnFocusBehaviour('.js-select-on-focus');
 
@@ -147,6 +146,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const $window = $(window);
   const $sidebarGutterToggle = $('.js-sidebar-toggle');
   let bootstrapBreakpoint = bp.getBreakpointSize();
+
+  if (document.querySelector('#js-peek')) initPerformanceBar({ container: '#js-peek' });
 
   initLayoutNav();
 
