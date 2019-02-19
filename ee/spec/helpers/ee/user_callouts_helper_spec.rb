@@ -195,7 +195,7 @@ describe EE::UserCalloutsHelper do
 
       it do
         if should_render?
-          expect(helper).to receive(:render).with('shared/gold_trial_callout')
+          expect(helper).to receive(:render).with('shared/gold_trial_callout_content')
         else
           expect(helper).not_to receive(:render)
         end

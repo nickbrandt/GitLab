@@ -48,11 +48,11 @@ module EE
 
     override :render_dashboard_gold_trial
     def render_dashboard_gold_trial(user)
-      return unless user_default_dashboard?(user) &&
-          show_gold_trial?(user, GOLD_TRIAL) &&
+      return unless show_gold_trial?(user, GOLD_TRIAL) &&
+          user_default_dashboard?(user) &&
           has_no_trial_or_gold_plan?(user)
 
-      render 'shared/gold_trial_callout'
+      render 'shared/gold_trial_callout_content'
     end
 
     def render_billings_gold_trial(user, namespace)
