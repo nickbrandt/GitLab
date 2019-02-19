@@ -1,10 +1,10 @@
-FactoryBot.define do
-  factory :protected_tag do
-    name
-    project
+# frozen_string_literal: true
 
+FactoryBot.modify do
+  factory :protected_tag do
     transient do
-      default_access_level true
+      authorize_user_to_create nil
+      authorize_group_to_create nil
     end
 
     trait :developers_can_create do
@@ -38,8 +38,12 @@ FactoryBot.define do
     end
 
     after(:build) do |protected_tag, evaluator|
-      if evaluator.default_access_level
-        protected_tag.create_access_levels.new(access_level: Gitlab::Access::MAINTAINER)
+      if evaluator.authorize_user_to_create
+        protected_tag.create_access_levels.new(user: evaluator.authorize_user_to_create)
+      end
+
+      if evaluator.authorize_group_to_create
+        protected_tag.create_access_levels.new(group: evaluator.authorize_group_to_create)
       end
     end
   end

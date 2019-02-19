@@ -1,7 +1,5 @@
 FactoryBot.define do
   factory :board do
-    sequence(:name) { |n| "board#{n}" }
-
     transient do
       project nil
       group nil

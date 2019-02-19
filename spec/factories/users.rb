@@ -16,10 +16,6 @@ FactoryBot.define do
       admin true
     end
 
-    trait :auditor do
-      auditor true
-    end
-
     trait :blocked do
       after(:build) { |user, _| user.block! }
     end
@@ -74,21 +70,22 @@ FactoryBot.define do
       transient do
         extern_uid '123456'
         provider 'ldapmain'
-        saml_provider nil
       end
 
       after(:create) do |user, evaluator|
-        user.identities << create(
-          :identity,
+        identity_attrs = {
           provider: evaluator.provider,
-          extern_uid: evaluator.extern_uid,
-          saml_provider: evaluator.saml_provider
-        )
+          extern_uid: evaluator.extern_uid
+        }
+
+        if evaluator.respond_to?(:saml_provider)
+          identity_attrs[:saml_provider] = evaluator.saml_provider
+        end
+
+        user.identities << create(:identity, identity_attrs)
       end
     end
 
     factory :admin, traits: [:admin]
-    factory :auditor, traits: [:auditor]
-    factory :external_user, traits: [:external]
   end
 end
