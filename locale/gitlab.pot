@@ -2105,6 +2105,9 @@ msgstr ""
 msgid "ClusterIntegration|Choose which of your environments will use this cluster."
 msgstr ""
 
+msgid "ClusterIntegration|Cluster health"
+msgstr ""
+
 msgid "ClusterIntegration|Clusters are utilized by selecting the nearest ancestor with a matching environment scope. For example, project clusters will override group clusters."
 msgstr ""
 
@@ -2201,7 +2204,7 @@ msgstr ""
 msgid "ClusterIntegration|If you are setting up multiple clusters and are using Auto DevOps, %{help_link_start}read this first%{help_link_end}."
 msgstr ""
 
-msgid "ClusterIntegration|In order to show the health of the cluster, we'll need to provision your cluster with Prometheus to collect the required data."
+msgid "ClusterIntegration|In order to view the health of your cluster, you must first install Prometheus below."
 msgstr ""
 
 msgid "ClusterIntegration|Ingress"
@@ -2214,9 +2217,6 @@ msgid "ClusterIntegration|Ingress gives you a way to route requests to services 
 msgstr ""
 
 msgid "ClusterIntegration|Install"
-msgstr ""
-
-msgid "ClusterIntegration|Install Prometheus"
 msgstr ""
 
 msgid "ClusterIntegration|Installed"
@@ -2262,9 +2262,6 @@ msgid "ClusterIntegration|Kubernetes cluster"
 msgstr ""
 
 msgid "ClusterIntegration|Kubernetes cluster details"
-msgstr ""
-
-msgid "ClusterIntegration|Kubernetes cluster health"
 msgstr ""
 
 msgid "ClusterIntegration|Kubernetes cluster is being created on Google Kubernetes Engine..."
