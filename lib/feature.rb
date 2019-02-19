@@ -113,11 +113,11 @@ class Feature
     end
 
     def gate_specified?
-      %i(user project feature_group).any? { |key| params.key?(key) }
+      %i(user project group feature_group).any? { |key| params.key?(key) }
     end
 
     def targets
-      [feature_group, user, project].compact
+      [feature_group, user, project, group].compact
     end
 
     private
@@ -140,6 +140,12 @@ class Feature
       return unless params.key?(:project)
 
       Project.find_by_full_path(params[:project])
+    end
+
+    def group
+      return unless params.key?(:group)
+
+      Group.find_by_full_path(params[:group])
     end
   end
 end
