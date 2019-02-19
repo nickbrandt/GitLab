@@ -76,7 +76,7 @@ export default {
       'fetchVulnerabilities',
       'fetchVulnerabilitiesCount',
       'fetchVulnerabilitiesHistory',
-      'revertDismissal',
+      'undoDismiss',
       'setVulnerabilitiesCountEndpoint',
       'setVulnerabilitiesEndpoint',
       'setVulnerabilitiesHistoryEndpoint',
@@ -104,7 +104,7 @@ export default {
       :can-create-feedback-permission="canCreateFeedbackPermission"
       @createNewIssue="createIssue({ vulnerability: modal.vulnerability })"
       @dismissIssue="dismissVulnerability({ vulnerability: modal.vulnerability })"
-      @revertDismissIssue="revertDismissal({ vulnerability: modal.vulnerability })"
+      @revertDismissIssue="undoDismiss({ vulnerability: modal.vulnerability })"
     />
   </div>
 </template>

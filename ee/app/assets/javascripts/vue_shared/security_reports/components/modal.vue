@@ -40,7 +40,7 @@ export default {
   computed: {
     revertTitle() {
       return this.modal.vulnerability.isDismissed
-        ? s__('ciReport|Revert dismissal')
+        ? s__('ciReport|Undo dismiss')
         : s__('ciReport|Dismiss vulnerability');
     },
     hasDismissedBy() {
