@@ -15,6 +15,10 @@ include:
 - [Visibility and access controls](visibility_and_access_controls.md)
 - [Custom templates repository](instance_template_repository.md)
 
+NOTE: **Note:**
+You can change the [first day of the week](../../profile/preferences.md) for the entire GitLab instance
+in the **Localization** section of **Admin area > Settings > Preferences**.
+
 ## GitLab.com admin area settings
 
 Most of the settings under the admin area change the behavior of the whole
