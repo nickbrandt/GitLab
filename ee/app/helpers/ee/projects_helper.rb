@@ -118,6 +118,12 @@ module EE
       ::License.feature_available?(:ci_cd_projects) && import_sources_enabled?
     end
 
+    def merge_pipelines_available?
+      return false unless @project.builds_enabled?
+
+      @project.feature_available?(:merge_pipelines)
+    end
+
     def size_limit_message(project)
       show_lfs = project.lfs_enabled? ? 'including files in LFS' : ''
 

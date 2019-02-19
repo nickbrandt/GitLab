@@ -184,6 +184,48 @@ describe ProjectsController do
       expect(project.service_desk_enabled).to eq(true)
     end
 
+    context 'when merge_pipelines_enabled param is specified' do
+      let(:params) { { merge_pipelines_enabled: true } }
+
+      let(:request) do
+        put :update, params: { namespace_id: project.namespace, id: project, project: params }
+      end
+
+      before do
+        stub_licensed_features(merge_pipelines: true)
+      end
+
+      it 'updates the attribute' do
+        request
+
+        expect(project.reload.merge_pipelines_enabled).to be_truthy
+      end
+
+      context 'when feature flag is disabled' do
+        before do
+          stub_feature_flags(merge_pipelines: false)
+        end
+
+        it 'does not update the attribute' do
+          request
+
+          expect(project.reload.merge_pipelines_enabled).to be_falsy
+        end
+      end
+
+      context 'when lisence is not sufficient' do
+        before do
+          stub_licensed_features(merge_pipelines: false)
+        end
+
+        it 'does not update the attribute' do
+          request
+
+          expect(project.reload.merge_pipelines_enabled).to be_falsy
+        end
+      end
+    end
+
     context 'repository mirrors' do
       let(:params) do
         {
