@@ -318,6 +318,10 @@ production: &base
     pages_domain_verification_cron_worker:
       cron: "*/15 * * * *"
 
+    # Periodically migrate diffs from the database to external storage
+    schedule_migrate_external_diffs_worker:
+      cron: "15 * * * *"
+
     ##
     # GitLab EE only jobs:
 
@@ -941,6 +945,10 @@ test:
     enabled: true
   external_diffs:
     enabled: false
+    # Diffs may be `always` external (the default), or they can be made external
+    # after they have become `outdated` (i.e., the MR is closed or a new version
+    # has been pushed).
+    # when: always
     # The location where external diffs are stored (default: shared/external-diffs).
     # storage_path: shared/external-diffs
     object_store:
