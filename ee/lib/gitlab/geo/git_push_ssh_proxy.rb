@@ -110,7 +110,7 @@ module Gitlab
       end
 
       def auth_scope
-        URI.parse(primary_repo).path.gsub(/(^\/|\.git$)/, '')
+        URI.parse(primary_repo).path.gsub(%r{^\/|\.git$}, '')
       end
 
       def get(url, headers)
