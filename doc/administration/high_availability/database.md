@@ -213,7 +213,7 @@ When installing the GitLab package, do not supply `EXTERNAL_URL` value.
 
 On each Consul node perform the following:
 
-1. Make sure you collect [`CONSUL_SERVER_NODES`](#consul_information) before executing the next step.
+1. Make sure you collect [`CONSUL_SERVER_NODES`](#consul-information) before executing the next step.
 
 1. Edit `/etc/gitlab/gitlab.rb` replacing values noted in the `# START user configuration` section:
 
@@ -264,7 +264,7 @@ check the [Troubleshooting section](#troubleshooting) before proceeding.
 
 ### Configuring the Database nodes
 
-1. Make sure you collect [`CONSUL_SERVER_NODES`](#consul_information), [`PGBOUNCER_PASSWORD_HASH`](#pgbouncer_information), [`POSTGRESQL_PASSWORD_HASH`](#postgresql_information), [`Number of db nodes`](#postgresql_information), and [`Network Address`](#network_address) before executing the next step.
+1. Make sure you collect [`CONSUL_SERVER_NODES`](#consul-information), [`PGBOUNCER_PASSWORD_HASH`](#pgbouncer-information), [`POSTGRESQL_PASSWORD_HASH`](#postgresql-information), [`Number of db nodes`](#postgresql-information), and [`Network Address`](#network-information) before executing the next step.
 
 1. On the master database node, edit `/etc/gitlab/gitlab.rb` replacing values noted in the `# START user configuration` section:
 
@@ -449,7 +449,7 @@ Check the [Troubleshooting section](#troubleshooting) before proceeding.
 
 ### Configuring the Pgbouncer node
 
-1. Make sure you collect [`CONSUL_SERVER_NODES`](#consul_information), [`CONSUL_PASSWORD_HASH`](#consul_information), and [`PGBOUNCER_PASSWORD_HASH`](#pgbouncer_information) before executing the next step.
+1. Make sure you collect [`CONSUL_SERVER_NODES`](#consul-information), [`CONSUL_PASSWORD_HASH`](#consul-information), and [`PGBOUNCER_PASSWORD_HASH`](#pgbouncer-information) before executing the next step.
 
 1. Edit `/etc/gitlab/gitlab.rb` replacing values noted in the `# START user configuration` section:
 
@@ -751,8 +751,8 @@ After deploying the configuration follow these steps:
 
 This example uses 3 postgresql servers, and 1 application node.
 
-It differs from the [recommended setup](#example_recommended_setup) by moving the consul servers into the same servers we use for PostgreSQL.
-The trade-off is between reducing server counts, against the increased operational complexity of needing to deal with postgres [failover](#failover_procedure) and [restore](#restore_procedure) procedures in addition to [consul outage recovery](consul.md#outage_recovery) on the same set of machines.
+It differs from the [recommended setup](#example-recommended-setup) by moving the consul servers into the same servers we use for PostgreSQL.
+The trade-off is between reducing server counts, against the increased operational complexity of needing to deal with postgres [failover](#failover-procedure) and [restore](#restore-procedure) procedures in addition to [consul outage recovery](consul.md#outage-recovery) on the same set of machines.
 
 In this example we start with all servers on the same 10.6.0.0/16 private network range, they can connect to each freely other on those addresses.
 
@@ -855,7 +855,7 @@ consul['configuration'] = {
 
 ##### Example minimal setup manual steps
 
-The manual steps for this configuration are the same as for the [example recommended setup](#example_recommended_setup_manual_steps).
+The manual steps for this configuration are the same as for the [example recommended setup](#example-recommended-setup-manual-steps).
 
 ### Failover procedure
 
@@ -1073,7 +1073,7 @@ If you're running into an issue with a component not outlined here, be sure to c
 
 ## Configure using Omnibus
 
-**Note**: We recommend that you follow the instructions here for a full [PostgreSQL cluster](#configure_using_omnibus_for_high_availability).
+**Note**: We recommend that you follow the instructions here for a full [PostgreSQL cluster](#configure-using-omnibus-for-high-availability).
 If you are reading this section due to an old bookmark, you can find that old documentation [in the repository](https://gitlab.com/gitlab-org/gitlab-ce/blob/v10.1.4/doc/administration/high_availability/database.md#configure-using-omnibus).
 
 ---
