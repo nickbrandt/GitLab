@@ -1,0 +1,17 @@
+- if Feature.enabled?(:versioned_designs)
+  %ul.nav-tabs.nav.nav-links{ role: 'tablist' }
+    %li
+      = link_to '#discussion-tab', class: 'active', id: 'discussion', role: 'tab', 'aria-controls': 'js-discussion', 'aria-selected': 'true', data: { toggle: 'tab', target: '#discussion-tab' } do
+        = _('Discussion')
+        %span.badge.badge-pill.js-discussions-count
+    %li
+      = link_to '#designs-tab', id: 'designs', role: 'tab', 'aria-controls': 'js-designs', 'aria-selected': 'false', data: { toggle: 'tab', target: '#designs-tab' } do
+        = _('Designs')
+        %span.badge.badge-pill.js-designs-count
+  .tab-content
+    #discussion-tab.tab-pane.show.active{ role: 'tabpanel', 'aria-labelledby': 'discussion' }
+      = render_ce 'projects/issues/discussion'
+    #designs-tab.tab-pane{ role: 'tabpanel', 'aria-labelledby': 'designs' }
+      = spinner nil, true
+- else
+  = render_ce 'projects/issues/discussion'
