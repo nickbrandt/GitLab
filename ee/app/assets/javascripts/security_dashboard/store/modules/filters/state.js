@@ -1,4 +1,4 @@
-import { SEVERITIES, REPORT_TYPES } from './constants';
+import { SEVERITY_LEVELS, REPORT_TYPES } from './constants';
 
 export default () => ({
   filters: [
@@ -10,7 +10,7 @@ export default () => ({
           name: 'All',
           id: 'all',
         },
-        ...Object.entries(SEVERITIES).map(severity => {
+        ...Object.entries(SEVERITY_LEVELS).map(severity => {
           const [id, name] = severity;
           return { id, name };
         }),

@@ -19,8 +19,8 @@ describe('Filter component', () => {
       vm.$destroy();
     });
 
-    it('should display all 9 severity options', () => {
-      expect(vm.$el.querySelectorAll('.dropdown-item').length).toEqual(9);
+    it('should display all 8 severity options', () => {
+      expect(vm.$el.querySelectorAll('.dropdown-item').length).toEqual(8);
     });
 
     it('should display a check next to only the selected item', () => {

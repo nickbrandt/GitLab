@@ -1,0 +1,6 @@
+---
+title: Splits the severity and confidence constants in the group security dashboard
+  frontend
+merge_request: 9535
+author:
+type: other
