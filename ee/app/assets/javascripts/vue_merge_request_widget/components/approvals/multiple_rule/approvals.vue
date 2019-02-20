@@ -161,6 +161,7 @@ export default {
           {{ action.text }}
         </gl-button>
         <approvals-summary
+          :approved="mr.approvals.approved"
           :approvals-left="mr.approvals.approvals_left"
           :rules-left="mr.approvals.approvalRuleNamesLeft"
           :approvers="approvedBy"

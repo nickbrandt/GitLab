@@ -16,7 +16,7 @@ module EE
 
       def validate_repository_size!
         if project.above_size_limit?
-          raise_error(Gitlab::RepositorySizeError.new(project).commit_error)
+          raise_error(::Gitlab::RepositorySizeError.new(project).commit_error)
         end
       end
     end

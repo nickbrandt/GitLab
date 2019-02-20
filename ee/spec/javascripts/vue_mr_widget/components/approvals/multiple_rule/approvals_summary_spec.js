@@ -17,6 +17,7 @@ describe('EE MRWidget approvals summary', () => {
   const createComponent = (props = {}) => {
     wrapper = shallowMount(localVue.extend(ApprovalsSummary), {
       propsData: {
+        approved: false,
         approvers: testApprovers(),
         approvalsLeft: TEST_APPROVALS_LEFT,
         rulesLeft: testRulesLeft(),
@@ -37,7 +38,7 @@ describe('EE MRWidget approvals summary', () => {
   describe('when approved', () => {
     beforeEach(() => {
       createComponent({
-        approvalsLeft: 0,
+        approved: true,
       });
     });
 

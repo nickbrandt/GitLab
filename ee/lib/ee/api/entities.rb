@@ -267,6 +267,7 @@ module EE
         expose :approved_approvers, as: :approved_by, using: ::API::Entities::UserBasic
         expose :code_owner
         expose :source_rule, using: SourceRule
+        expose :approved?, as: :approved
       end
 
       # Decorates ApprovalState

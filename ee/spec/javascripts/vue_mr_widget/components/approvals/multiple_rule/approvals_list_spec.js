@@ -13,6 +13,7 @@ const testRuleApproved = () => ({
   approvals_required: 2,
   approved_by: [{ id: 1 }, { id: 2 }, { id: 3 }],
   approvers: testApprovers(),
+  approved: true,
 });
 const testRuleUnapproved = () => ({
   id: 2,
@@ -20,6 +21,7 @@ const testRuleUnapproved = () => ({
   approvals_required: 1,
   approved_by: [],
   approvers: testApprovers(),
+  approved: false,
 });
 const testRuleOptional = () => ({
   id: 3,
@@ -27,6 +29,7 @@ const testRuleOptional = () => ({
   approvals_required: 0,
   approved_by: [{ id: 1 }],
   approvers: testApprovers(),
+  approved: false,
 });
 const testRuleFallback = () => ({
   id: 'fallback',
@@ -35,6 +38,7 @@ const testRuleFallback = () => ({
   approvals_required: 3,
   approved_by: [{ id: 1 }, { id: 2 }],
   approvers: [],
+  approved: false,
 });
 const testRules = () => [testRuleApproved(), testRuleUnapproved(), testRuleOptional()];
 
