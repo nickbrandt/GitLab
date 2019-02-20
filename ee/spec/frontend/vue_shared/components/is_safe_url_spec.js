@@ -62,7 +62,7 @@ describe('isSafeUrl', () => {
 
   describe('without URL constructor support', () => {
     beforeEach(() => {
-      spyOn(window, 'URL').and.callFake(() => {
+      jest.spyOn(window, 'URL').mockImplementation(() => {
         throw new Error('No URL support');
       });
     });
