@@ -11,6 +11,7 @@ describe Groups::ParticipantsService do
 
   def user_to_autocompletable(user)
     {
+      type: user.class.name,
       username: user.username,
       name: user.name,
       avatar_url: user.avatar_url
