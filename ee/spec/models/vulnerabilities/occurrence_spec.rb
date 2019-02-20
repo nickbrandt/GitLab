@@ -46,15 +46,15 @@ describe Vulnerabilities::Occurrence do
       using RSpec::Parameterized::TableSyntax
 
       # we use block to delay object creations
-      where(:key, :value_block) do
-        :primary_identifier | -> { create(:vulnerabilities_identifier) }
-        :scanner | -> { create(:vulnerabilities_scanner) }
-        :project | -> { create(:project) }
+      where(:key, :factory_name) do
+        :primary_identifier | :vulnerabilities_identifier
+        :scanner | :vulnerabilities_scanner
+        :project | :project
       end
 
       with_them do
         it "is valid" do
-          expect { new_occurrence.update!({ key => value_block.call }) }.not_to raise_error
+          expect { new_occurrence.update!({ key => create(factory_name) }) }.not_to raise_error
         end
       end
     end
