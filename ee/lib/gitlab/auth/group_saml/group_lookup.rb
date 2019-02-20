@@ -13,7 +13,7 @@ module Gitlab
         end
 
         def group
-          Group.find_by_full_path(path)
+          @group ||= Group.find_by_full_path(path)
         end
 
         def saml_provider
