@@ -59,10 +59,9 @@ describe Geo::PruneEventLogWorker, :geo do
         worker.perform
       end
 
-      context 'no Geo nodes' do
+      context 'no Geo secondary nodes' do
         before do
           secondary.destroy
-          primary.destroy
         end
 
         it 'deletes everything from the Geo event log' do
@@ -71,6 +70,20 @@ describe Geo::PruneEventLogWorker, :geo do
           expect(Geo::PruneEventLogService).to receive(:new).with(:all).and_call_original
 
           worker.perform
+        end
+
+        context 'no Geo primary node' do
+          before do
+            primary.destroy
+          end
+
+          it 'deletes everything from the Geo event log' do
+            create_list(:geo_event_log, 2)
+
+            expect(Geo::PruneEventLogService).to receive(:new).with(:all).and_call_original
+
+            worker.perform
+          end
         end
       end
 
