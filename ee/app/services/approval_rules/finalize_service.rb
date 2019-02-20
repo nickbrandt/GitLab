@@ -18,7 +18,8 @@ module ApprovalRules
           copy_project_approval_rules
         end
 
-        merge_request.approval_rules.each(&:sync_approved_approvers)
+        # TODO: https://gitlab.com/gitlab-org/gitlab-ee/issues/9866
+        merge_request.approval_rules.reload.each(&:sync_approved_approvers)
       end
     end
 

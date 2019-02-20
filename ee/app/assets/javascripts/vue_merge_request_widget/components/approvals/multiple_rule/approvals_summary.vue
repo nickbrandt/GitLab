@@ -9,6 +9,10 @@ export default {
     UserAvatarList,
   },
   props: {
+    approved: {
+      type: Boolean,
+      required: true,
+    },
     approvalsLeft: {
       type: Number,
       required: true,
@@ -25,11 +29,8 @@ export default {
     },
   },
   computed: {
-    isApproved() {
-      return this.approvalsLeft <= 0;
-    },
     message() {
-      if (this.isApproved) {
+      if (this.approved) {
         return APPROVED_MESSAGE;
       }
 
