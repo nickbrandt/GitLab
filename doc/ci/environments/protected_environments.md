@@ -1,4 +1,4 @@
-# Protected Environments
+# Protected Environments **[PREMIUM]**
 
 > [Introduced][6303] in [GitLab Premium][ee] 11.3.
 
