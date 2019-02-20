@@ -55,8 +55,13 @@ export default class MergeRequestStore extends CEMergeRequestStore {
   setApprovals(data) {
     this.approvals = mapApprovalsResponse(data);
     this.approvalsLeft = !!data.approvals_left;
-    this.isApproved = !this.approvalsLeft || false;
-    this.preventMerge = this.approvalsRequired && this.approvalsLeft;
+    if (gon.features.approvalRules) {
+      this.isApproved = data.approved || false;
+      this.preventMerge = !this.isApproved;
+    } else {
+      this.isApproved = !this.approvalsLeft || false;
+      this.preventMerge = this.approvalsRequired && this.approvalsLeft;
+    }
   }
 
   setApprovalRules(data) {
