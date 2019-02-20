@@ -46,7 +46,6 @@
 - pipeline_default:ci_create_cross_project_pipeline
 
 - admin_emails
-- chat_notification
 - create_github_webhook
 - elastic_batch_project_indexer
 - elastic_commit_indexer

@@ -10,7 +10,6 @@ describe Ci::Pipeline do
     create(:ci_empty_pipeline, status: :created, project: project)
   end
 
-  it { is_expected.to have_one(:chat_data) }
   it { is_expected.to have_many(:job_artifacts).through(:builds) }
   it { is_expected.to have_many(:vulnerabilities).through(:vulnerabilities_occurrence_pipelines).class_name('Vulnerabilities::Occurrence') }
   it { is_expected.to have_many(:vulnerabilities_occurrence_pipelines).class_name('Vulnerabilities::OccurrencePipeline') }

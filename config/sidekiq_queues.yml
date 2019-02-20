@@ -86,11 +86,11 @@
   - [delete_stored_files, 1]
   - [remote_mirror_notification, 2]
   - [import_issues_csv, 2]
+  - [chat_notification, 2]
 
   # EE-specific queues
   - [ldap_group_sync, 2]
   - [create_github_webhook, 2]
-  - [chat_notification, 2]
   - [geo, 1]
   - [repository_update_mirror, 1]
   - [new_epic, 2]
