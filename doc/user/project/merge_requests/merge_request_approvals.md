@@ -2,6 +2,28 @@
 
 > Introduced in [GitLab Enterprise Edition 7.12](https://about.gitlab.com/2015/06/22/gitlab-7-12-released/#merge-request-approvers-ee-only).
 
+NOTE: **Note:**
+If you are running a self-managed instance, the new interface shown on
+this page will not be available unless the feature flag
+`approval_rules` is enabled, which can be done from the Rails console by
+instance administrators.
+
+Use these commands to start the Rails console:
+
+```sh
+# Omnibus GitLab
+gitlab-rails console
+
+# Installation from source
+cd /home/git/gitlab
+sudo -u git -H bin/rails console RAILS_ENV=production
+```
+
+Then run `Feature.enable(:approval_rules)` to enable the feature flag.
+
+The documentation for the older interface can be accessed
+[here](/11.7/ee/user/project/merge_requests/merge_request_approvals.html).
+
 ## Overview
 
 Merge request approvals enable enforced code review by requiring specified people to approve a merge request before it can be unblocked for merging.
@@ -27,7 +49,7 @@ To edit the merge request approvals:
    merge requests and click the **Add** button to add them as approvers. Note: selecting
    approvers is optional.
 1. Set the minimum number of required approvals under the **No. approvals required**
-   box. Note: the minimum can be 0. 
+   box. Note: the minimum can be 0.
 1. Click **Update approvers**.
 
     ![Approvals starter project edit](img/approvals_starter_project_edit.png)
@@ -44,7 +66,7 @@ suitable to your workflow:
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/1979) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.8.
 
-For GitLab Ultimate, [multiple approver rules](#multiple-approval-rules-ultimate) can be configured. To configure the merge 
+For GitLab Ultimate, [multiple approver rules](#multiple-approval-rules-ultimate) can be configured. To configure the merge
 request approval rules:
 
 1. Navigate to your project's **Settings > General** and expand **Merge request approvals**.
@@ -69,7 +91,7 @@ all rules that the approver belongs to.
 
 ![Approvals ultimate merge request widget](img/approvals_ultimate_mr_widget.png)
 
-If no approval rules are set, then the overall minimum number of approvals required can be configured. With no approval rules, 
+If no approval rules are set, then the overall minimum number of approvals required can be configured. With no approval rules,
 any [eligible approver](#eligible-approvers) may approve.
 
 ## Eligible approvers
@@ -122,10 +144,10 @@ the following is possible:
     ![Remove approval](img/remove_approval.png)
 
 NOTE: **Note:**
-The merge request author is only allowed to approve their own merge request 
+The merge request author is only allowed to approve their own merge request
 if [self-approval] is enabled on the project settings.
 
-For a given merge request, if the approval restrictions have been satisfied, 
+For a given merge request, if the approval restrictions have been satisfied,
 the merge request is unblocked and can be merged.
 Note, that meeting the required number of approvals is a necessary, but not
 sufficient condition for unblocking a merge request from being merged. There
@@ -138,7 +160,7 @@ or a [failed CI/CD pipeline](merge_when_pipeline_succeeds.md).
 > Introduced in GitLab Enterprise Edition 9.4.
 
 NOTE: **Note:**
-If you are using GitLab Ultimate, things are a little different with [multiple approval rules](#multiple-approval-rules-ultimate). 
+If you are using GitLab Ultimate, things are a little different with [multiple approval rules](#multiple-approval-rules-ultimate).
 Read the differences [in GitLab Ultimate when overriding merge request approvals](#overriding-merge-request-approvals-default-settings-ultimate).
 
 If approvals are [set at the project level](#editing-approvals), the
@@ -192,12 +214,12 @@ Read what happens  when the
 ## Overriding merge request approvals default settings **[ULTIMATE]**
 
 In GitLab Ultimate, when the approval rules are [set at the project level](#editing-approvals-ultimate), and
-**Can override approvers and approvals required per merge request** is checked, there are a few more 
+**Can override approvers and approvals required per merge request** is checked, there are a few more
 restrictions (compared to [GitLab Starter](#overriding-the-merge-request-approvals-default-settings)):
 
 - Approval rules can be added to an MR with no restriction.
 - For project sourced approval rules, editing and removing approvers is not allowed.
-- The approvals required of all approval rules is configurable, but if a rule is backed by a project rule, then it is restricted 
+- The approvals required of all approval rules is configurable, but if a rule is backed by a project rule, then it is restricted
 to the minimum approvals required set in the project's corresponding rule.
 
 ## Resetting approvals on push
