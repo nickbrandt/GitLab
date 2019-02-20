@@ -1,5 +1,9 @@
+<%= text_header_message %>
+
 <%= yield -%>
 
 -- <%# signature marker %>
 <%= _("You're receiving this email because of your account on %{host}.") % { host: Gitlab.config.gitlab.host } %>
 <%# EE-specific start %><%= render 'layouts/mailer/additional_text' %><%# EE-specific end %>
+
+<%= text_footer_message %>
