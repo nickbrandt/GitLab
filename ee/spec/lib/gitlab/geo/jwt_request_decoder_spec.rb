@@ -7,12 +7,6 @@ describe Gitlab::Geo::JwtRequestDecoder do
 
   subject { described_class.new(request.headers['Authorization']) }
 
-  describe ".build_repository_scope" do
-    it 'returns a scope that consolidates repository type and project id' do
-      expect(described_class.build_repository_scope('wiki', 5)).to eq('wiki-5')
-    end
-  end
-
   describe '#decode' do
     it 'decodes correct data' do
       expect(subject.decode).to eq(data)

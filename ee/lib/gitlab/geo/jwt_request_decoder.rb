@@ -12,10 +12,6 @@ module Gitlab
         token_type == ::Gitlab::Geo::BaseRequest::GITLAB_GEO_AUTH_TOKEN_TYPE
       end
 
-      def self.build_repository_scope(repository_type, project_id)
-        [repository_type, project_id].join('-')
-      end
-
       attr_reader :auth_header
 
       def initialize(auth_header)
