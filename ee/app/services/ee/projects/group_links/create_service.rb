@@ -8,7 +8,10 @@ module EE
 
         override :execute
         def execute(group)
-          super.tap { |link| log_audit_event(link) if link && link&.persisted? }
+          result = super
+
+          log_audit_event(result[:link]) if result[:status] == :success
+          result
         end
 
         private
