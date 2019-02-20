@@ -51,7 +51,7 @@ module OmniAuth
       end
 
       def metadata_enabled?
-        Feature.enabled?(:group_saml_metadata_available)
+        Feature.enabled?(:group_saml_metadata_available, group_lookup.group)
       end
 
       def group_lookup
