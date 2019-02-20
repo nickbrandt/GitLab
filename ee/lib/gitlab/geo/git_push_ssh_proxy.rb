@@ -105,8 +105,12 @@ module Gitlab
       def base_headers
         @base_headers ||= {
           'Geo-GL-Id' => gl_id,
-          'Authorization' => Gitlab::Geo::BaseRequest.new.authorization
+          'Authorization' => Gitlab::Geo::BaseRequest.new(scope: auth_scope).authorization
         }
+      end
+
+      def auth_scope
+        URI.parse(primary_repo).path.gsub(%r{^\/|\.git$}, '')
       end
 
       def get(url, headers)

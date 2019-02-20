@@ -69,6 +69,20 @@ describe Gitlab::Geo::GitPushSSHProxy, :geo do
         let(:info_refs_headers) { base_headers.merge('Content-Type' => 'application/x-git-upload-pack-request') }
         let(:info_refs_http_body_full) { "001f# service=git-receive-pack\n0000#{info_refs_body_short}" }
 
+        context 'authorization header is scoped' do
+          it 'passes the scope when .info_refs is called' do
+            expect(Gitlab::Geo::BaseRequest).to receive(:new).with(scope: project.repository.full_path)
+
+            subject.info_refs
+          end
+
+          it 'passes the scope when .push is called' do
+            expect(Gitlab::Geo::BaseRequest).to receive(:new).with(scope: project.repository.full_path)
+
+            subject.push(info_refs_body_short)
+          end
+        end
+
         context 'with a failed response' do
           let(:error_msg) { 'execution expired' }
 

@@ -1,5 +1,5 @@
 ---
-title: Enforce Geo JWT tokens scope
+title: Enforce Geo JWT tokens scope for file uploads and Geo API
 merge_request: 9502
 author:
 type: changed

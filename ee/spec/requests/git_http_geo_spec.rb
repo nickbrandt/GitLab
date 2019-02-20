@@ -21,7 +21,6 @@ describe "Git HTTP requests (Geo)" do
   let!(:key_for_user_without_push_access) { create(:key, user: user_without_push_access) }
 
   let(:env) { valid_geo_env }
-  let(:auth_token_with_invalid_scope) { Gitlab::Geo::BaseRequest.new(scope: "invalid-#{project.id}").authorization }
 
   before do
     project.add_maintainer(user)
@@ -344,50 +343,6 @@ describe "Git HTTP requests (Geo)" do
               expect(json_response['GL_REPOSITORY']).to match(Gitlab::GlRepository.gl_repository(project, false))
             end
           end
-        end
-      end
-    end
-
-    context 'invalid scope' do
-      let(:repository_path) { project.full_path }
-
-      subject do
-        make_request
-        response
-      end
-
-      def make_request
-        get "/#{repository_path}.git/info/refs", params: { service: 'git-upload-pack' }, headers: env
-      end
-
-      shared_examples_for 'unauthorized because of invalid scope' do
-        it { is_expected.to have_gitlab_http_status(:unauthorized) }
-
-        it 'returns correct error' do
-          expect(subject.parsed_body).to eq('Geo JWT authentication failed: Unauthorized scope')
-        end
-      end
-
-      context 'invalid scope of Geo JWT token' do
-        let(:env) { geo_env(auth_token_with_invalid_scope) }
-
-        include_examples 'unauthorized because of invalid scope'
-      end
-
-      context 'Geo JWT token scopes for wiki and repository are not interchangeable' do
-        context 'wiki scope' do
-          let(:auth_token_with_valid_wiki_scope) { Gitlab::Geo::BaseRequest.new(scope: "wiki-#{project.id}").authorization }
-          let(:env) { geo_env(auth_token_with_valid_wiki_scope) }
-
-          include_examples 'unauthorized because of invalid scope'
-        end
-
-        context 'respository scope' do
-          let(:repository_path) { project.wiki.full_path }
-          let(:auth_token_with_valid_repository_scope) { Gitlab::Geo::BaseRequest.new(scope: "repository-#{project.id}").authorization }
-          let(:env) { geo_env(auth_token_with_valid_repository_scope) }
-
-          include_examples 'unauthorized because of invalid scope'
         end
       end
     end
