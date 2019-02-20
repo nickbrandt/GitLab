@@ -36,6 +36,7 @@ describe Projects::GroupLinks::CreateService, '#execute' do
   end
 
   def create_group_link(user, project, group, opts)
+    group.add_developer(user)
     described_class.new(project, user, opts).execute(group)
   end
 end
