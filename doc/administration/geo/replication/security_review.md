@@ -271,6 +271,7 @@ questions from [owasp.org](https://www.owasp.org).
   - LFS and File ID.
   - Upload and File ID.
   - Job Artifact and File ID.
+- Geo JWTs scopes are not enforced for Git Access yet, but will be in a future version (currently scheduled for GitLab 11.10).
 
 ### What access requirements have been defined for URI and Service calls?
 
