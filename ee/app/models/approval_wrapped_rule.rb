@@ -35,7 +35,9 @@ class ApprovalWrappedRule
   # - Additional complexity to add update hooks
   # - DB updating many MRs for one project rule change is inefficient
   def approved_approvers
-    return approval_rule.approved_approvers if merge_request.merged?
+    if merge_request.merged? && merge_request.merge_jid.nil? # merge process completed
+      return approval_rule.approved_approvers
+    end
 
     strong_memoize(:approved_approvers) do
       overall_approver_ids = merge_request.approvals.map(&:user_id)

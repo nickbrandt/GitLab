@@ -25,9 +25,6 @@ export default {
         total: rule.approvals_required,
       });
     },
-    isApproved(rule) {
-      return rule.approvals_required > 0 && rule.approvals_required <= rule.approved_by.length;
-    },
     summaryText(rule) {
       return rule.approvals_required === 0
         ? this.summaryOptionalText(rule)
@@ -63,7 +60,7 @@ export default {
     </thead>
     <tbody>
       <tr v-for="rule in approvalRules" :key="rule.id">
-        <td class="w-0"><approved-icon :is-approved="isApproved(rule)" /></td>
+        <td class="w-0"><approved-icon :is-approved="rule.approved" /></td>
         <td :colspan="rule.fallback ? 2 : 1">
           <div class="d-none d-sm-block js-name">{{ rule.name }}</div>
           <div class="d-flex d-sm-none flex-column js-summary">

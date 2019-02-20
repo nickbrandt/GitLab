@@ -9,7 +9,7 @@ module EE
 
       prepended do
         before_action only: [:show] do
-          push_frontend_feature_flag(:approval_rules)
+          push_frontend_feature_flag(:approval_rules, merge_request.project)
         end
 
         before_action :whitelist_query_limiting_ee_merge, only: [:merge]
@@ -65,7 +65,12 @@ module EE
       def render_approvals_json
         respond_to do |format|
           format.json do
-            entity = EE::API::Entities::MergeRequestApprovals.new(merge_request, current_user: current_user)
+            entity = if ::Feature.enabled?(:approval_rules, merge_request.project)
+                       EE::API::Entities::ApprovalState.new(merge_request.approval_state, current_user: current_user)
+                     else
+                       EE::API::Entities::MergeRequestApprovals.new(merge_request, current_user: current_user)
+                     end
+
             render json: entity
           end
         end
