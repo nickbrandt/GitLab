@@ -120,9 +120,11 @@ To specify a variable in a query, enclose it in curly braces with a leading perc
 
 ### Setting up alerts for Prometheus metrics **[ULTIMATE]**
 
+#### Managed Prometheus instances
+
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/6590) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.2 for [custom metrics](#adding-additional-metrics), and 11.3 for [library metrics](prometheus_library/metrics.md).
 
-Alerts can be configured for [metricss](#adding-additional-metrics) directly in the performance dashboard.
+For managed Prometheus instances using auto configuration, alerts for metrics [can be configured](#adding-additional-metrics-premium) directly in the performance dashboard.
 
 To set an alert, click on the alarm icon in the top right corner of the metric you want to create the alert for. A dropdown
 will appear, with options to set the threshold and operator. Click **Add** to save and activate the alert.
@@ -133,6 +135,27 @@ If the metric exceeds the threshold of the alert for over 5 minutes, an email
 will be sent to all [Maintainers and Owners](../../permissions.md#project-members-permissions) of the project.
 
 To remove the alert, click back on the alert icon for the desired metric, and click **Delete**.
+
+#### External Prometheus instances
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/9258) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.8.
+
+For manually configured Prometheus servers, a notify endpoint is provided to use with Prometheus webhooks. If you have manual configuration enabled, an **Alerts** section is added to **Settings > Integrations > Prometheus**. This contains the *URL* and *Authorization Key*. The **Reset Key** button will invalidate the key and generate a new one.
+
+![Prometheus service configuration of Alerts](img/prometheus_service_alerts.png)
+
+To send GitLab alert notifications, copy the *URL* and *Authorization Key* into the [`webhook_configs`](https://prometheus.io/docs/alerting/configuration/#webhook_config) section of your Prometheus Alertmanager configuration:
+
+```yaml
+receivers:
+  name: gitlab
+  webhook_configs:
+  - http_config:
+      bearer_token: 9e1cbfcd546896a9ea8be557caf13a76
+    send_resolved: true
+    url: http://192.168.178.31:3001/root/manual_prometheus/prometheus/alerts/notify.json
+  ...
+```
 
 ## Determining the performance impact of a merge
 
