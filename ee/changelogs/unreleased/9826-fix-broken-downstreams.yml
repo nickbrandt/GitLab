@@ -1,0 +1,5 @@
+---
+title: Renders inline downstream & upstream pipelines
+merge_request: 9627
+author:
+type: fixed

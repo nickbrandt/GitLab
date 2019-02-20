@@ -6,7 +6,87 @@ describe 'Pipeline', :js do
 
   before do
     sign_in(user)
+
     project.add_developer(user)
+  end
+
+  describe 'GET /:project/pipelines/:id' do
+    let(:pipeline) { create(:ci_pipeline, :with_job, project: project, ref: 'master', sha: project.commit.id, user: user) }
+
+    subject { visit project_pipeline_path(project, pipeline) }
+
+    context 'triggered and triggered by pipelines' do
+      let(:upstream_pipeline) { create(:ci_pipeline, :with_job) }
+      let(:downstream_pipeline) { create(:ci_pipeline, :with_job) }
+
+      before do
+        upstream_pipeline.project.add_developer(user)
+        downstream_pipeline.project.add_developer(user)
+
+        create_link(upstream_pipeline, pipeline)
+        create_link(pipeline, downstream_pipeline)
+      end
+
+      it 'renders upstream pipeline' do
+        subject
+
+        expect(page).to have_content(upstream_pipeline.id)
+        expect(page).to have_content(upstream_pipeline.project.name)
+      end
+
+      context 'expands the upstream pipeline on click' do
+        it 'should expand the upstream on click' do
+          subject
+
+          page.find(".js-pipeline-expand-#{upstream_pipeline.id}").click
+          wait_for_requests
+          expect(page).to have_selector(".js-upstream-pipeline-#{upstream_pipeline.id}")
+        end
+
+        it 'should close the expanded upstream on click' do
+          subject
+
+          # open
+          page.find(".js-pipeline-expand-#{upstream_pipeline.id}").click
+          wait_for_requests
+
+          # close
+          page.find(".js-pipeline-expand-#{upstream_pipeline.id}").click
+
+          expect(page).not_to have_selector(".js-upstream-pipeline-#{upstream_pipeline.id}")
+        end
+      end
+
+      it 'renders downstream pipeline' do
+        subject
+
+        expect(page).to have_content(downstream_pipeline.id)
+        expect(page).to have_content(downstream_pipeline.project.name)
+      end
+
+      context 'expands the downstream pipeline on click' do
+        it 'should expand the downstream on click' do
+          subject
+
+          page.find(".js-pipeline-expand-#{downstream_pipeline.id}").click
+          wait_for_requests
+          expect(page).to have_selector(".js-downstream-pipeline-#{downstream_pipeline.id}")
+        end
+
+        it 'should close the expanded downstream on click' do
+          subject
+
+          # open
+          page.find(".js-pipeline-expand-#{downstream_pipeline.id}").click
+          wait_for_requests
+
+          # close
+          page.find(".js-pipeline-expand-#{downstream_pipeline.id}").click
+
+          expect(page).not_to have_selector(".js-downstream-pipeline-#{downstream_pipeline.id}")
+        end
+      end
+    end
   end
 
   describe 'GET /:project/pipelines/:id/security' do
@@ -82,5 +162,16 @@ describe 'Pipeline', :js do
         expect(page).to have_selector('.pipeline-visualization')
       end
     end
+  end
+
+  private
+
+  def create_link(source_pipeline, pipeline)
+    source_pipeline.sourced_pipelines.create!(
+      source_job: source_pipeline.builds.all.sample,
+      source_project: source_pipeline.project,
+      project: pipeline.project,
+      pipeline: pipeline
+    )
   end
 end
