@@ -25,15 +25,21 @@ class NpmPackagePresenter
     package_versions
   end
 
+  def dist_tags
+    {
+      latest: sorted_versions.last
+    }
+  end
+
   private
 
   def build_package_version(package, package_file)
     {
-      "name": package.name,
-      "version": package.version,
-      "dist": {
-        "shasum": package_file.file_sha1,
-        "tarball": tarball_url(package, package_file)
+      name: package.name,
+      version: package.version,
+      dist: {
+        shasum: package_file.file_sha1,
+        tarball: tarball_url(package, package_file)
       }
     }
   end
@@ -42,5 +48,10 @@ class NpmPackagePresenter
     expose_url "#{api_v4_projects_path(id: package.project_id)}" \
       "/packages/npm/#{package.name}" \
       "/-/#{package_file.file_name}"
+  end
+
+  def sorted_versions
+    versions = packages.map(&:version).compact
+    VersionSorter.sort(versions)
   end
 end

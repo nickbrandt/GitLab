@@ -630,6 +630,7 @@ module EE
       class NpmPackage < Grape::Entity
         expose :name
         expose :versions
+        expose :dist_tags, as: 'dist-tags'
       end
 
       class Package < Grape::Entity
