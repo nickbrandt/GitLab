@@ -47,7 +47,7 @@ class DashboardOperationsProjectEntity < Grape::Entity
   end
 
   def last_pipeline
-    dashboard_project.project.commit&.last_pipeline
+    dashboard_project.project.last_pipeline
   end
 
   def upstream_pipeline
