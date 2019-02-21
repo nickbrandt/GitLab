@@ -66,6 +66,70 @@ module EE
             ::Gitlab::CurrentSettings.current_application_settings
               .allow_group_owners_to_manage_ldap
       end
+
+      override :find_project!
+      def find_project!(id)
+        project = find_project(id)
+
+        # CI job token authentication:
+        # this method grants limited privileged for admin users
+        # admin users can only access project if they are direct member
+        ability = job_token_authentication? ? :build_read_project : :read_project
+
+        if can?(current_user, ability, project)
+          project
+        else
+          not_found!('Project')
+        end
+      end
+
+      override :find_group!
+      def find_group!(id)
+        # CI job token authentication:
+        # currently we do not allow any group access for CI job token
+        if job_token_authentication?
+          not_found!('Group')
+        else
+          super
+        end
+      end
+
+      override :find_project_issue
+      # rubocop: disable CodeReuse/ActiveRecord
+      def find_project_issue(iid, project_id = nil)
+        project = project_id ? find_project!(project_id) : user_project
+
+        ::IssuesFinder.new(current_user, project_id: project.id).find_by!(iid: iid)
+      end
+      # rubocop: enable CodeReuse/ActiveRecord
+
+      private
+
+      def private_token
+        params[::APIGuard::PRIVATE_TOKEN_PARAM] || env[::APIGuard::PRIVATE_TOKEN_HEADER]
+      end
+
+      def job_token_authentication?
+        initial_current_user && @job_token_authentication # rubocop:disable Gitlab/ModuleWithInstanceVariables
+      end
+
+      def warden
+        env['warden']
+      end
+
+      # Check if the request is GET/HEAD, or if CSRF token is valid.
+      def verified_request?
+        ::Gitlab::RequestForgeryProtection.verified?(env)
+      end
+
+      # Check the Rails session for valid authentication details
+      def find_user_from_warden
+        warden.try(:authenticate) if verified_request?
+      end
+
+      def geo_token
+        ::Gitlab::Geo.current_node.system_hook.token
+      end
     end
   end
 end
