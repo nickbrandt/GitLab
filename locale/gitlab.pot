@@ -4056,9 +4056,6 @@ msgstr ""
 msgid "FeatureFlags|Description"
 msgstr ""
 
-msgid "FeatureFlags|Edit %{feature_flag_name}"
-msgstr ""
-
 msgid "FeatureFlags|Edit Feature Flag"
 msgstr ""
 
@@ -4114,9 +4111,6 @@ msgid "FeatureFlags|New"
 msgstr ""
 
 msgid "FeatureFlags|New Feature Flag"
-msgstr ""
-
-msgid "FeatureFlags|Save changes"
 msgstr ""
 
 msgid "FeatureFlags|Status"

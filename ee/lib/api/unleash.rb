@@ -70,14 +70,10 @@ module API
       end
 
       def feature_flags
-        if Feature.enabled?(:feature_flags_environment_scope, project)
-          return [] unless unleash_app_name.present?
+        return [] unless unleash_app_name.present?
 
-          project.operations_feature_flags.for_environment(unleash_app_name)
-                                          .ordered
-        else
-          project.operations_feature_flags.ordered
-        end
+        project.operations_feature_flags.for_environment(unleash_app_name)
+                                        .ordered
       end
     end
   end
