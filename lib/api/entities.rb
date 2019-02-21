@@ -504,7 +504,6 @@ module API
 
     class ProtectedRefAccess < Grape::Entity
       expose :access_level
-
       expose :access_level_description do |protected_ref_access|
         protected_ref_access.humanize
       end
@@ -514,7 +513,6 @@ module API
       expose :name
       expose :push_access_levels, using: Entities::ProtectedRefAccess
       expose :merge_access_levels, using: Entities::ProtectedRefAccess
-      expose :unprotect_access_levels, using: Entities::ProtectedRefAccess
     end
 
     class ProtectedTag < Grape::Entity
@@ -1539,19 +1537,6 @@ module API
       end
     end
 
-    def self.prepend_entity(klass, with: nil)
-      if with.nil?
-        raise ArgumentError, 'You need to pass either the :with or :namespace option!'
-      end
-
-      klass.descendants.each { |descendant| descendant.prepend(with) }
-      klass.prepend(with)
-    end
-
-    class ManagedLicense < Grape::Entity
-      expose :id, :name, :approval_status
-    end
-
     class ResourceLabelEvent < Grape::Entity
       expose :id
       expose :user, using: Entities::UserBasic
@@ -1613,6 +1598,7 @@ module API
   end
 end
 
+API::Entities.prepend(EE::API::Entities::Entities) # rubocop: disable Cop/InjectEnterpriseEditionModule
 API::Entities.prepend_entity(::API::Entities::ApplicationSetting, with: EE::API::Entities::ApplicationSetting)
 API::Entities.prepend_entity(::API::Entities::Board, with: EE::API::Entities::Board)
 API::Entities.prepend_entity(::API::Entities::Group, with: EE::API::Entities::Group)
@@ -1626,3 +1612,4 @@ API::Entities.prepend_entity(::API::Entities::ProtectedRefAccess, with: EE::API:
 API::Entities.prepend_entity(::API::Entities::UserPublic, with: EE::API::Entities::UserPublic)
 API::Entities.prepend_entity(::API::Entities::Variable, with: EE::API::Entities::Variable)
 API::Entities.prepend_entity(::API::Entities::Todo, with: EE::API::Entities::Todo)
+API::Entities.prepend_entity(::API::Entities::ProtectedBranch, with: EE::API::Entities::ProtectedBranch)

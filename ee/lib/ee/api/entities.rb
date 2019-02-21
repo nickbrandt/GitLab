@@ -6,6 +6,21 @@ module EE
       #######################
       # Entities extensions #
       #######################
+      module Entities
+        extend ActiveSupport::Concern
+
+        class_methods do
+          def prepend_entity(klass, with: nil)
+            if with.nil?
+              raise ArgumentError, 'You need to pass either the :with or :namespace option!'
+            end
+
+            klass.descendants.each { |descendant| descendant.prepend(with) }
+            klass.prepend(with)
+          end
+        end
+      end
+
       module UserPublic
         extend ActiveSupport::Concern
 
@@ -60,6 +75,14 @@ module EE
         prepended do
           expose :user_id
           expose :group_id
+        end
+      end
+
+      module ProtectedBranch
+        extend ActiveSupport::Concern
+
+        prepended do
+          expose :unprotect_access_levels, using: ::API::Entities::ProtectedRefAccess
         end
       end
 
@@ -649,6 +672,10 @@ module EE
         expose :id, :package_id, :created_at
         expose :file_name, :size
         expose :file_md5, :file_sha1
+      end
+
+      class ManagedLicense < Grape::Entity
+        expose :id, :name, :approval_status
       end
     end
   end
