@@ -1,5 +1,5 @@
 <script>
-import { GlFormInput, GlButton, GlLink, GlFormGroup } from '@gitlab/ui';
+import { GlFormInput, GlButton, GlLink, GlFormGroup, GlFormRadioGroup } from '@gitlab/ui';
 import _ from 'underscore';
 import { __, s__ } from '~/locale';
 import csrf from '~/lib/utils/csrf';
@@ -15,6 +15,7 @@ export default {
     GlButton,
     GlLink,
     GlFormGroup,
+    GlFormRadioGroup,
     Icon,
   },
   props: {
@@ -50,6 +51,11 @@ export default {
     return {
       validCustomQuery: null,
       errorMessage: '',
+      formGroupOptions: [
+        { text: __('Business'), value: QueryTypes.business },
+        { text: __('Response'), value: QueryTypes.response },
+        { text: __('System'), value: QueryTypes.system },
+      ],
     };
   },
   computed: {
@@ -139,30 +145,13 @@ export default {
         label-for="prometheus_metric_group"
         label-class="label-bold"
       >
-        <input
-          id="group-business"
+        <gl-form-radio-group
+          id="metric-group"
           v-model="formData.group"
-          type="radio"
+          :options="formGroupOptions"
+          :checked="formData.group"
           name="prometheus_metric[group]"
-          :value="$options.QueryTypes.business"
         />
-        <label class="label-bold append-right-10" for="group-business">{{ __('Business') }}</label>
-        <input
-          id="group-response"
-          v-model="formData.group"
-          type="radio"
-          name="prometheus_metric[group]"
-          :value="$options.QueryTypes.response"
-        />
-        <label class="label-bold append-right-10" for="group-response">{{ __('Response') }}</label>
-        <input
-          id="group-system"
-          v-model="formData.group"
-          type="radio"
-          name="prometheus_metric[group]"
-          :value="$options.QueryTypes.system"
-        />
-        <label class="label-bold" for="group-system">{{ s__('Metrics|System') }}</label>
         <span class="form-text text-muted">{{ s__('Metrics|For grouping similar metrics') }}</span>
       </gl-form-group>
       <gl-form-group
