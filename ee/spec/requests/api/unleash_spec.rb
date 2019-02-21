@@ -98,18 +98,6 @@ describe API::Unleash do
       subject
     end
 
-    context 'when the feature is disabled on the project' do
-      before do
-        stub_feature_flags(feature_flags_environment_scope: { enabled: false, thing: project })
-      end
-
-      it 'does not call for_environment method' do
-        expect(Operations::FeatureFlag).not_to receive(:for_environment)
-
-        subject
-      end
-    end
-
     context 'when app name is staging' do
       let(:headers) { base_headers.merge({ "UNLEASH-APPNAME" => "staging" }) }
 
@@ -168,10 +156,6 @@ describe API::Unleash do
         let(:headers) { { "UNLEASH-INSTANCEID" => client.token, "UNLEASH-APPNAME" => "production" }}
         let!(:enable_feature_flag) { create(:operations_feature_flag, project: project, name: 'feature1', active: true) }
         let!(:disabled_feature_flag) { create(:operations_feature_flag, project: project, name: 'feature2', active: false) }
-
-        before do
-          stub_feature_flags(feature_flags_environment_scope: false)
-        end
 
         it 'responds with a list' do
           subject

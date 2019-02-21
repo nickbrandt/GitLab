@@ -3,12 +3,4 @@
 - breadcrumb_title s_('FeatureFlags|New')
 - page_title s_('FeatureFlags|New Feature Flag')
 
-- if Feature.enabled?(:feature_flags_environment_scope, @project)
-  #js-new-feature-flag{ data: { endpoint: project_feature_flags_path(@project, format: :json), feature_flags_path: project_feature_flags_path(@project), environments_endpoint: search_project_environments_path(@project, format: :json) } }
-- else
-  %h3.page-title
-    = s_('FeatureFlags|New Feature Flag')
-  %hr.clearfix
-  %div
-    = form_for [@project, @feature_flag], url: project_feature_flags_path(@project), html: { class: 'fieldset-form' } do |f|
-      = render 'form', { f: f }
+#js-new-feature-flag{ data: { endpoint: project_feature_flags_path(@project, format: :json), feature_flags_path: project_feature_flags_path(@project), environments_endpoint: search_project_environments_path(@project, format: :json) } }

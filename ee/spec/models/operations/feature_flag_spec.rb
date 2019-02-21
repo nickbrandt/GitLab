@@ -95,10 +95,6 @@ describe Operations::FeatureFlag do
   describe '.for_environment' do
     subject { described_class.for_environment(environment_name) }
 
-    before do
-      stub_feature_flags(feature_flags_environment_scope: true)
-    end
-
     context 'when feature flag is off on production' do
       before do
         feature_flag = create(:operations_feature_flag, active: true)
@@ -165,10 +161,6 @@ describe Operations::FeatureFlag do
 
   describe '.for_list' do
     subject { described_class.for_list }
-
-    before do
-      stub_feature_flags(feature_flags_environment_scope: true)
-    end
 
     context 'when all scopes are active' do
       let!(:feature_flag) { create(:operations_feature_flag, active: true) }
