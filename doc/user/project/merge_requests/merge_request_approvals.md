@@ -62,11 +62,11 @@ suitable to your workflow:
   [overridden per merge request](#overriding-the-merge-request-approvals-default-settings)
 - Choose whether [approvals will be reset with new pushed commits](#resetting-approvals-on-push)
 
-## Editing approvals **[ULTIMATE]**
+## Editing approvals **[PREMIUM]**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/1979) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/1979) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.8.
 
-For GitLab Ultimate, [multiple approver rules](#multiple-approval-rules-ultimate) can be configured. To configure the merge
+For GitLab Premium, [multiple approver rules](#multiple-approval-rules-premium) can be configured. To configure the merge
 request approval rules:
 
 1. Navigate to your project's **Settings > General** and expand **Merge request approvals**.
@@ -75,13 +75,13 @@ request approval rules:
 1. Give the approval rule a name that describes the set of approvers selected.
 1. Click **Add approvers** to submit the new rule.
 
-    ![Approvals ultimate project edit](img/approvals_ultimate_project_edit.png)
+    ![Approvals premium project edit](img/approvals_premium_project_edit.png)
 
-## Multiple approval rules **[ULTIMATE]**
+## Multiple approval rules **[PREMIUM]**
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/1979) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.8.
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/1979) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.8.
 
-For GitLab Ultimate, a merge request's overall approval status is determined by a set of rules. Each rule contains:
+For GitLab Premium, a merge request's overall approval status is determined by a set of rules. Each rule contains:
 
 - A set of [eligible approvers](#eligible-approvers).
 - A minimum number of approvals required.
@@ -89,7 +89,7 @@ For GitLab Ultimate, a merge request's overall approval status is determined by 
 When an [eligible approver](#eligible-approvers) approves a merge request, it will reduce the number of approvals left for
 all rules that the approver belongs to.
 
-![Approvals ultimate merge request widget](img/approvals_ultimate_mr_widget.png)
+![Approvals premium merge request widget](img/approvals_premium_mr_widget.png)
 
 If no approval rules are set, then the overall minimum number of approvals required can be configured. With no approval rules,
 any [eligible approver](#eligible-approvers) may approve.
@@ -160,8 +160,8 @@ or a [failed CI/CD pipeline](merge_when_pipeline_succeeds.md).
 > Introduced in GitLab Enterprise Edition 9.4.
 
 NOTE: **Note:**
-If you are using GitLab Ultimate, things are a little different with [multiple approval rules](#multiple-approval-rules-ultimate).
-Read the differences [in GitLab Ultimate when overriding merge request approvals](#overriding-merge-request-approvals-default-settings-ultimate).
+If you are using GitLab Premium, things are a little different with [multiple approval rules](#multiple-approval-rules-premium).
+Read the differences [in GitLab Premium when overriding merge request approvals](#overriding-merge-request-approvals-default-settings-premium).
 
 If approvals are [set at the project level](#editing-approvals), the
 default configuration (number of required approvals and approvers) can be
@@ -211,9 +211,9 @@ If you are contributing to a forked project, things are a little different.
 Read what happens  when the
 [source and target branches are not the same](#merge-requests-with-different-source-branch-and-target-branch-projects).
 
-## Overriding merge request approvals default settings **[ULTIMATE]**
+## Overriding merge request approvals default settings **[PREMIUM]**
 
-In GitLab Ultimate, when the approval rules are [set at the project level](#editing-approvals-ultimate), and
+In GitLab Premium, when the approval rules are [set at the project level](#editing-approvals-premium), and
 **Can override approvers and approvals required per merge request** is checked, there are a few more
 restrictions (compared to [GitLab Starter](#overriding-the-merge-request-approvals-default-settings)):
 
