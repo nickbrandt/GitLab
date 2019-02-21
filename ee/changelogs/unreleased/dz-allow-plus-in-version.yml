@@ -1,0 +1,5 @@
+---
+title: Allow plus symbol in maven package version
+merge_request: 9657
+author:
+type: fixed
