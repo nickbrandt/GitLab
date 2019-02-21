@@ -8,7 +8,7 @@ module MergeRequests
     end
 
     def execute
-      if ::Feature.enabled?(:multiple_code_owner_rules)
+      if ::Feature.enabled?(:multiple_code_owner_rules, default_enabled: true)
         sync_rules
       else
         merge_request.sync_code_owners_with_approvers

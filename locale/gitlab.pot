@@ -1203,6 +1203,9 @@ msgstr ""
 msgid "Assignee(s)"
 msgstr ""
 
+msgid "At least one approval from a code owner is required to change files matching the respective CODEOWNER rules."
+msgstr ""
+
 msgid "Attach a file"
 msgstr ""
 
@@ -2550,7 +2553,16 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
+msgid "Code Owners"
+msgstr ""
+
+msgid "Code owner approval is required"
+msgstr ""
+
 msgid "Code owners"
+msgstr ""
+
+msgid "CodeOwner|Pattern"
 msgstr ""
 
 msgid "Cohorts"
@@ -8247,6 +8259,9 @@ msgid "Require all users in this group to setup Two-factor authentication"
 msgstr ""
 
 msgid "Require all users to accept Terms of Service and Privacy Policy when they access GitLab."
+msgstr ""
+
+msgid "Require approval from code owners"
 msgstr ""
 
 msgid "Requires approval from %{names}."

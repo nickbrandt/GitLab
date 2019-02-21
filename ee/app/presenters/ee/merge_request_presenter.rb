@@ -39,6 +39,10 @@ module EE
       merge_request.target_project.present(current_user: current_user)
     end
 
+    def code_owner_rules_with_users
+      @code_owner_rules ||= merge_request.approval_rules.code_owner.with_users.to_a
+    end
+
     def approver_groups
       ::ApproverGroup.filtered_approver_groups(merge_request.approver_groups, current_user)
     end

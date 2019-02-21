@@ -229,6 +229,10 @@ module EE
       feature_available?(:multiple_approval_rules)
     end
 
+    def code_owner_approval_required_available?
+      feature_available?(:code_owner_approval_required)
+    end
+
     def service_desk_enabled
       ::EE::Gitlab::ServiceDesk.enabled?(project: self) && super
     end
@@ -336,6 +340,10 @@ module EE
       ::Gitlab::Utils.ensure_array_from_string(value).each do |group_id|
         approver_groups.find_or_initialize_by(group_id: group_id, target_id: id)
       end
+    end
+
+    def merge_requests_require_code_owner_approval?
+      super && code_owner_approval_required_available?
     end
 
     def find_path_lock(path, exact_match: false, downstream: false)

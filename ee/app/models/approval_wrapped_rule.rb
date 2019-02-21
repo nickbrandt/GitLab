@@ -5,10 +5,14 @@ class ApprovalWrappedRule
   extend Forwardable
   include Gitlab::Utils::StrongMemoize
 
+  REQUIRED_APPROVALS_PER_CODE_OWNER_RULE = 1
+
   attr_reader :merge_request
   attr_reader :approval_rule
 
-  def_delegators :@approval_rule, :id, :name, :users, :groups, :approvals_required, :code_owner, :source_rule, :rule_type
+  def_delegators(:@approval_rule,
+                 :id, :name, :users, :groups, :code_owner, :code_owner?, :source_rule,
+                 :rule_type)
 
   def initialize(merge_request, approval_rule)
     @merge_request = merge_request
@@ -71,5 +75,23 @@ class ApprovalWrappedRule
 
   def unactioned_approvers
     approvers - approved_approvers
+  end
+
+  def approvals_required
+    if code_owner?
+      code_owner_approvals_required
+    else
+      approval_rule.approvals_required
+    end
+  end
+
+  private
+
+  def code_owner_approvals_required
+    strong_memoize(:code_owner_approvals_required) do
+      next 0 unless project.merge_requests_require_code_owner_approval?
+
+      approvers.any? ? REQUIRED_APPROVALS_PER_CODE_OWNER_RULE : 0
+    end
   end
 end

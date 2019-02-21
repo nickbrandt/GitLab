@@ -59,8 +59,25 @@ describe ApprovalRuleLike do
         group2.add_guest(group2_user)
       end
 
-      it 'contains users as direct members and group members' do
-        expect(subject.approvers).to contain_exactly(user1, user2, group1_user, group2_user)
+      shared_examples 'approvers contains the right users' do
+        it 'contains users as direct members and group members' do
+          expect(subject.approvers).to contain_exactly(user1, user2, group1_user, group2_user)
+        end
+      end
+
+      it_behaves_like 'approvers contains the right users'
+
+      context 'when the user relations are already loaded' do
+        before do
+          subject.users
+          subject.group_users
+        end
+
+        it 'does not perform any queries when all users are loaded already' do
+          expect { subject.approvers }.not_to exceed_query_limit(0)
+        end
+
+        it_behaves_like 'approvers contains the right users'
       end
 
       context 'when user is both a direct member and a group member' do

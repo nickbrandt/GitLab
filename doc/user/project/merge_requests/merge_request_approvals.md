@@ -155,6 +155,23 @@ are other conditions that may block it, such as merge conflicts,
 [pending discussions](../../discussions/index.md#l#only-allow-merge-requests-to-be-merged-if-all-discussions-are-resolved)
 or a [failed CI/CD pipeline](merge_when_pipeline_succeeds.md).
 
+## Code Owners approvals **[PREMIUM]**
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/4418) in [GitLab Premium](https://about.gitlab.com/pricing/) 11.9.
+
+It is possible to require at least one approval for each entry in the
+[`CODEOWNERS` file](../code_owners.md) that matches a file changed in
+the merge request. To enable this feature:
+
+1. Navigate to your project's **Settings > General** and expand
+   **Merge request approvals**.
+1. Tick the **Require approval from code owners** checkbox
+   checkbox.
+1. Click **Save changes**.
+
+When this feature is enabled, all merge requests will need approval
+from one code owner per matched rule before it can be merged.
+
 ## Overriding the merge request approvals default settings
 
 > Introduced in GitLab Enterprise Edition 9.4.

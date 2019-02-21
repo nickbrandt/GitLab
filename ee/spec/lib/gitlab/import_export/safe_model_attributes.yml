@@ -1,4 +1,6 @@
 ---
+Project:
+- merge_requests_require_code_owner_approval
 ProjectTracingSetting:
 - external_url
 Note:
