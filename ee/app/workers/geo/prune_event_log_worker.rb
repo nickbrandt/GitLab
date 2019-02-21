@@ -13,7 +13,7 @@ module Geo
       return if Gitlab::Database.read_only?
       return unless Gitlab::Database.healthy?
 
-      unless ::GeoNode.any?
+      unless ::GeoNode.secondary_nodes.any?
         Geo::PruneEventLogService.new(:all).execute
         return
       end

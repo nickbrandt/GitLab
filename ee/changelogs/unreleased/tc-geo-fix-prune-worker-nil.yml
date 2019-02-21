@@ -1,0 +1,5 @@
+---
+title: Prunes whole Geo event when there's only a primary
+merge_request: 9630
+author:
+type: fixed
