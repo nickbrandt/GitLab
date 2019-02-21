@@ -28,6 +28,21 @@ module API
 
         present paginate(packages), with: EE::API::Entities::Package
       end
+
+      desc 'Remove a package' do
+        detail 'This feature was introduced in GitLab 11.9'
+      end
+      params do
+        requires :package_id, type: Integer, desc: 'The ID of a package'
+      end
+      delete ':id/packages/:package_id' do
+        authorize_destroy_package!
+
+        package = ::Packages::PackageFinder
+          .new(user_project, params[:package_id]).execute
+
+        destroy_conditionally!(package)
+      end
     end
   end
 end

@@ -19,6 +19,10 @@ module API
       def authorize_create_package!
         authorize!(:create_package, user_project)
       end
+
+      def authorize_destroy_package!
+        authorize!(:destroy_package, user_project)
+      end
     end
   end
 end

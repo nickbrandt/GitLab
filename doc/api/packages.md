@@ -15,7 +15,7 @@ GET /projects/:id/packages
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id`      | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user. |
+| `id`      | integer/string | yes | ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
 
 ```bash
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/packages
@@ -54,8 +54,8 @@ GET /projects/:id/packages/:package_id/package_files
 
 | Attribute | Type | Required | Description |
 | --------- | ---- | -------- | ----------- |
-| `id`      | integer/string | yes | The ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) owned by the authenticated user. |
-| `package_id`      | integer | yes | The ID of a package. |
+| `id`      | integer/string | yes | ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
+| `package_id`      | integer | yes | ID of a package. |
 
 ```bash
 curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/1/packages/4/package_files
@@ -96,3 +96,27 @@ Example response:
 ```
 
 By default, the `GET` request will return 20 results, since the API is [paginated](README.md#pagination).
+
+## Delete a project package
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/9623) in GitLab 11.9.
+
+Deletes a project package.
+
+```
+DELETE /projects/:id/packages/:package_id
+```
+
+| Attribute | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id`      | integer/string | yes | ID or [URL-encoded path of the project](README.md#namespaced-path-encoding) |
+| `package_id`      | integer | yes | ID of a package. |
+
+```bash
+curl --request DELETE --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/packages/:package_id
+```
+
+Can return the following status codes:
+
+- `204 No Content`, if the package was deleted successfully.
+- `404 Not Found`, if the package was not found.
