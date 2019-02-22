@@ -1,4 +1,4 @@
-# Geo nodes admin area
+# Geo nodes admin area **[PREMIUM ONLY]**
 
 For more information about setting up GitLab Geo, read the
 [Geo documentation](../../gitlab-geo/README.md).
