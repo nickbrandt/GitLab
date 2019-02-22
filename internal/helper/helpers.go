@@ -253,6 +253,7 @@ var sensitiveExactMatch = []string{
 	"trace",
 	"variables",
 	"content",
+	"sharedSecret",
 }
 
 func isParamSensitive(name []byte) bool {
