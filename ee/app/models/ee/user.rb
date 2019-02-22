@@ -51,6 +51,8 @@ module EE
 
       has_many :smartcard_identities
 
+      belongs_to :managing_group, class_name: 'Group', optional: true, inverse_of: :managed_users
+
       scope :excluding_guests, -> { joins(:members).where('members.access_level > ?', ::Gitlab::Access::GUEST).distinct }
 
       scope :subscribed_for_admin_email, -> { where(admin_email_unsubscribed_at: nil) }
@@ -229,6 +231,10 @@ module EE
       else
         group_saml_identities.where(saml_provider: group.saml_provider).any?
       end
+    end
+
+    def group_managed_account?
+      managing_group.present?
     end
 
     override :ldap_sync_time

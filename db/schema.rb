@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190220150130) do
+ActiveRecord::Schema.define(version: 20190222110418) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -3118,6 +3118,7 @@ ActiveRecord::Schema.define(version: 20190220150130) do
     t.boolean "include_private_contributions"
     t.string "commit_email"
     t.integer "group_view"
+    t.integer "managing_group_id"
     t.index ["accepted_term_id"], name: "index_users_on_accepted_term_id", using: :btree
     t.index ["admin"], name: "index_users_on_admin", using: :btree
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree
@@ -3128,6 +3129,7 @@ ActiveRecord::Schema.define(version: 20190220150130) do
     t.index ["ghost"], name: "index_users_on_ghost", using: :btree
     t.index ["group_view"], name: "index_users_on_group_view", using: :btree
     t.index ["incoming_email_token"], name: "index_users_on_incoming_email_token", using: :btree
+    t.index ["managing_group_id"], name: "index_users_on_managing_group_id", using: :btree
     t.index ["name"], name: "index_users_on_name", using: :btree
     t.index ["name"], name: "index_users_on_name_trigram", using: :gin, opclasses: {"name"=>"gin_trgm_ops"}
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
@@ -3578,6 +3580,7 @@ ActiveRecord::Schema.define(version: 20190220150130) do
   add_foreign_key "user_statuses", "users", on_delete: :cascade
   add_foreign_key "user_synced_attributes_metadata", "users", on_delete: :cascade
   add_foreign_key "users", "application_setting_terms", column: "accepted_term_id", name: "fk_789cd90b35", on_delete: :cascade
+  add_foreign_key "users", "namespaces", column: "managing_group_id", name: "fk_a4b8fefe3e", on_delete: :nullify
   add_foreign_key "users_ops_dashboard_projects", "projects", on_delete: :cascade
   add_foreign_key "users_ops_dashboard_projects", "users", on_delete: :cascade
   add_foreign_key "users_star_projects", "projects", name: "fk_22cd27ddfc", on_delete: :cascade
