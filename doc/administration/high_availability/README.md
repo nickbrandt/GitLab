@@ -37,10 +37,10 @@ complexity.
 
 - Unicorn/Workhorse - Web-requests (UI, API, Git over HTTP)
 - Sidekiq - Asynchronous/Background jobs
-- [PostgreSQL](database.md) - Database
-  - [Consul](consul.md) - Database service discovery and health checks/failover
-  - [PGBouncer](pgbouncer.md) - Database pool manager
-- [Redis](redis.md) - Key/Value store (User sessions, cache, queue for Sidekiq)
+- PostgreSQL - Database
+  - Consul - Database service discovery and health checks/failover
+  - PGBouncer - Database pool manager
+- Redis - Key/Value store (User sessions, cache, queue for Sidekiq)
   - Sentinel - Redis health check/failover manager
 - Gitaly - Provides high-level RPC access to Git repositories
 
@@ -50,11 +50,6 @@ When an organization reaches a certain threshold it will be necessary to scale
 the GitLab instance. Still, true high availability may not be necessary. There
 are options for scaling GitLab instances relatively easily without incurring the
 infrastructure and maintenance costs of full high availability.
-
-GitLab recommends that an organization begin to explore scaling when they have
-around 1,000 active users. At this point increasing CPU cores and memory is
-not recommended as there are some components that may not handle increased
-load well on a single host.
 
 ### Basic Scaling
 
@@ -71,6 +66,17 @@ larger one.
 - 1 Redis node
 - 2 or more GitLab application nodes (Unicorn, Workhorse, Sidekiq)
 - 1 NFS/Gitaly storage server
+
+#### Installation Instructions
+
+Complete the following installation steps in order. A link at the end of each 
+section will bring you back to the Scalable Architecture Examples section so 
+you can continue with the next step.
+
+1. [PostgreSQL](./database.md#postgresql-in-a-scaled-environment)
+1. [Redis](./redis.md#redis-in-a-scaled-environment)
+1. [Gitaly](./gitaly.md) (recommended) or [NFS](./nfs.md)
+1. [GitLab application nodes](./gitlab.md)
 
 ### Full Scaling
 
