@@ -10,15 +10,7 @@ class DashboardOperationsProjectEntity < Grape::Entity
   end
 
   expose :last_pipeline, if: -> (*) { last_pipeline } do |_, options|
-    pipeline_entity_for(last_pipeline, options)
-  end
-
-  expose :upstream_pipeline, if: -> (*) { upstream_pipeline } do |_, options|
-    pipeline_entity_for(upstream_pipeline, options)
-  end
-
-  expose :downstream_pipelines, if: -> (*) { downstream_pipelines } do |_, options|
-    pipeline_entity_for(downstream_pipelines, options)
+    PipelineDetailsEntity.represent(last_pipeline, options.merge(request: new_request))
   end
 
   expose :last_deployment, if: -> (*) { last_deployment? } do |dashboard_project_object, options|
@@ -48,18 +40,6 @@ class DashboardOperationsProjectEntity < Grape::Entity
 
   def last_pipeline
     dashboard_project.project.last_pipeline
-  end
-
-  def upstream_pipeline
-    last_pipeline&.source_pipeline&.source_pipeline
-  end
-
-  def downstream_pipelines
-    last_pipeline&.sourced_pipelines&.map(&:source_pipeline)
-  end
-
-  def pipeline_entity_for(objects, options)
-    PipelineEntity.represent(objects, options.merge(request: new_request))
   end
 
   def last_deployment?

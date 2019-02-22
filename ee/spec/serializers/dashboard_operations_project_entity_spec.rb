@@ -33,8 +33,8 @@ describe DashboardOperationsProjectEntity do
         create(:ci_sources_pipeline, pipeline: pipeline, source_job: bridge)
       end
 
-      it 'has the upstream pipeline field' do
-        expect(subject).to include(:upstream_pipeline)
+      it 'has the triggered_by pipeline field' do
+        expect(subject[:last_pipeline]).to include(:triggered_by)
       end
     end
 
@@ -45,8 +45,8 @@ describe DashboardOperationsProjectEntity do
         create(:ci_sources_pipeline, source_job: build)
       end
 
-      it 'has the downstream pipeline field' do
-        expect(subject).to include(:downstream_pipelines)
+      it 'has the triggered pipeline field' do
+        expect(subject[:last_pipeline]).to include(:triggered)
       end
 
       context 'when there are multiple downstream statuses' do
@@ -55,8 +55,8 @@ describe DashboardOperationsProjectEntity do
         end
 
         it 'has the downstream pipeline field' do
-          expect(subject).to include(:downstream_pipelines)
-          expect(subject[:downstream_pipelines].count).to eq(6)
+          expect(subject[:last_pipeline]).to include(:triggered)
+          expect(subject[:last_pipeline][:triggered].count).to eq(6)
         end
       end
     end
@@ -71,12 +71,12 @@ describe DashboardOperationsProjectEntity do
       end
 
       it 'has the upstream pipeline field' do
-        expect(subject).to include(:upstream_pipeline)
+        expect(subject[:last_pipeline]).to include(:triggered_by)
       end
 
       it 'has the downstream pipeline field' do
-        expect(subject).to include(:downstream_pipelines)
-        expect(subject[:downstream_pipelines].count).to eq(5)
+        expect(subject[:last_pipeline]).to include(:triggered)
+        expect(subject[:last_pipeline][:triggered].count).to eq(5)
       end
     end
   end
