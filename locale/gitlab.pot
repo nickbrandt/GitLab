@@ -5450,6 +5450,9 @@ msgstr ""
 msgid "Insert suggestion"
 msgstr ""
 
+msgid "Insights"
+msgstr ""
+
 msgid "Install GitLab Runner"
 msgstr ""
 
@@ -8730,6 +8733,12 @@ msgid "Select a group to invite"
 msgstr ""
 
 msgid "Select a namespace to fork the project"
+msgstr ""
+
+msgid "Select a project to read Insights configuration file"
+msgstr ""
+
+msgid "Select a repository"
 msgstr ""
 
 msgid "Select a template repository"

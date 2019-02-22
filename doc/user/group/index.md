@@ -201,6 +201,10 @@ Get an overview of the vulnerabilities of all the projects in a group and its su
 
 [Learn more about the Group Security Dashboard.](security_dashboard/index.md)
 
+## Insights **[ULTIMATE]**
+
+Placeholder.
+
 ## Transfer groups to another group
 
 From 10.5 there are two different ways to transfer a group:

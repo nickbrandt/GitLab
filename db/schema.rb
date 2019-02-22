@@ -1489,6 +1489,13 @@ ActiveRecord::Schema.define(version: 20190301081611) do
     t.index ["project_id"], name: "index_index_statuses_on_project_id", unique: true, using: :btree
   end
 
+  create_table "insights", force: :cascade do |t|
+    t.integer "namespace_id", null: false
+    t.integer "project_id", null: false
+    t.index ["namespace_id"], name: "index_insights_on_namespace_id", using: :btree
+    t.index ["project_id"], name: "index_insights_on_project_id", using: :btree
+  end
+
   create_table "internal_ids", id: :bigserial, force: :cascade do |t|
     t.integer "project_id"
     t.integer "usage", null: false
@@ -3439,6 +3446,8 @@ ActiveRecord::Schema.define(version: 20190301081611) do
   add_foreign_key "identities", "saml_providers", name: "fk_aade90f0fc", on_delete: :cascade
   add_foreign_key "import_export_uploads", "projects", on_delete: :cascade
   add_foreign_key "index_statuses", "projects", name: "fk_74b2492545", on_delete: :cascade
+  add_foreign_key "insights", "namespaces"
+  add_foreign_key "insights", "projects"
   add_foreign_key "internal_ids", "namespaces", name: "fk_162941d509", on_delete: :cascade
   add_foreign_key "internal_ids", "projects", on_delete: :cascade
   add_foreign_key "issue_assignees", "issues", name: "fk_b7d881734a", on_delete: :cascade
