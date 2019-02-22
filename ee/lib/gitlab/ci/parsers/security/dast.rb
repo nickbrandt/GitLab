@@ -90,7 +90,7 @@ module Gitlab
           def severity(value)
             case Integer(value)
             when 0
-              'ignore'
+              'info'
             when 1
               'low'
             when 2
@@ -116,7 +116,7 @@ module Gitlab
             when 3
               'high'
             when 4
-              'critical'
+              'confirmed'
             else
               'unknown'
             end

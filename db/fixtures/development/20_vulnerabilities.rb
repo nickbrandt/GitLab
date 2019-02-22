@@ -39,8 +39,8 @@ class Gitlab::Seeder::Vulnerabilities
       uuid: random_uuid,
       name: 'Cipher with no integrity',
       report_type: :sast,
-      severity: random_level,
-      confidence: random_level,
+      severity: random_severity_level,
+      confidence: random_confidence_level,
       project_fingerprint: random_fingerprint,
       location_fingerprint: random_fingerprint,
       primary_identifier: primary_identifier,
@@ -82,8 +82,12 @@ class Gitlab::Seeder::Vulnerabilities
     project.issues.create!(author: author, title: title)
   end
 
-  def random_level
-    ::Vulnerabilities::Occurrence::LEVELS.keys.sample
+  def random_confidence_level
+    ::Vulnerabilities::Occurrence::CONFIDENCE_LEVELS.keys.sample
+  end
+
+  def random_severity_level
+    ::Vulnerabilities::Occurrence::SEVERITY_LEVELS.keys.sample
   end
 
   def metadata(line)

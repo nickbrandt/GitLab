@@ -336,9 +336,8 @@ describe Groups::Security::VulnerabilitiesController do
           expect(json_response).to be_an(Hash)
           expect(json_response).to eq({
             "undefined" => {},
-            "ignore" => {},
+            "info" => {},
             "unknown" => {},
-            "experimental" => {},
             "low" => {},
             "medium" => {},
             "high" => {},

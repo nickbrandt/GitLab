@@ -124,7 +124,7 @@ describe Gitlab::Ci::Parsers::Security::Dast do
     using RSpec::Parameterized::TableSyntax
 
     where(:severity, :expected) do
-      '0'  | 'ignore'
+      '0'  | 'info'
       '1'  | 'low'
       '2'  | 'medium'
       '3'  | 'high'
@@ -147,7 +147,7 @@ describe Gitlab::Ci::Parsers::Security::Dast do
       '1'  | 'low'
       '2'  | 'medium'
       '3'  | 'high'
-      '4'  | 'critical'
+      '4'  | 'confirmed'
       '42' | 'unknown'
       ''   | 'unknown'
     end
