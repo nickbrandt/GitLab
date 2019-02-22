@@ -23,7 +23,7 @@ environments including [Basic Scaling](./README.md#basic-scaling) and
 ### Provide your own Redis instance **[CORE ONLY]**
 
 If you want to use your own deployed Redis instance(s), 
-see [Provide your own Redis instance](#provide-your-own-redis-instance) 
+see [Provide your own Redis instance](#provide-your-own-redis-instance-core-only) 
 for more details. However, you can use the GitLab Omnibus package to easily 
 deploy the bundled Redis.  
 
@@ -91,7 +91,7 @@ environments including [Horizontal](./README.md#horizontal),
 ### Provide your own Redis instance **[CORE ONLY]**
 
 If you want to use your own deployed Redis instance(s), 
-see [Provide your own Redis instance](#provide-your-own-redis-instance) 
+see [Provide your own Redis instance](#provide-your-own-redis-instance-core-only) 
 for more details. However, you can use the GitLab Omnibus package to easily 
 deploy the bundled Redis.  
 
