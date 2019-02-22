@@ -42,6 +42,36 @@ Example response:
 
 By default, the `GET` request will return 20 results, since the API is [paginated](README.md#pagination).
 
+## Get a project package
+
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/9667) in GitLab 11.9.
+
+Get a single project package.
+
+```
+GET /projects/:id/packages/:package_id
+```
+
+| Attribute | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id`      | integer/string | yes | ID or [URL-encoded path of the project](README.md#namespaced-path-encoding). |
+| `package_id`      | integer | yes | ID of a package. |
+
+```bash
+curl --header "PRIVATE-TOKEN: <your_access_token>" https://gitlab.example.com/api/v4/projects/:id/packages/:package_id
+```
+
+Example response:
+
+```json
+{
+  "id": 1,
+  "name": "com/mycompany/my-app",
+  "version": "1.0-SNAPSHOT",
+  "package_type": "maven"
+}
+```
+
 ## List package files
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/9305) in GitLab 11.8.
