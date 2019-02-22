@@ -9,7 +9,7 @@ module Projects
           return false unless valid_alert_manager_token?(token)
 
           send_alert_email(project, firings) if firings.any?
-          persist_events(project, current_user, params)
+          persist_events(project, params)
 
           true
         end
@@ -88,8 +88,8 @@ module Projects
             .prometheus_alerts_fired(project, firings)
         end
 
-        def persist_events(project, current_user, params)
-          CreateEventsService.new(project, current_user, params).execute
+        def persist_events(project, params)
+          CreateEventsService.new(project, nil, params).execute
         end
       end
     end
