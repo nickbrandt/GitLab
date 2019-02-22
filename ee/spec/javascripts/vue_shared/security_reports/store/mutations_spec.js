@@ -506,6 +506,34 @@ describe('security reports mutations', () => {
     });
   });
 
+  describe('REQUEST_CREATE_MERGE_REQUEST', () => {
+    it('sets isCreatingMergeRequest prop to true and resets error', () => {
+      mutations[types.REQUEST_CREATE_MERGE_REQUEST](stateCopy);
+
+      expect(stateCopy.modal.isCreatingMergeRequest).toEqual(true);
+      expect(stateCopy.modal.error).toBeNull();
+    });
+  });
+
+  describe('RECEIVE_CREATE_MERGE_REQUEST_SUCCESS', () => {
+    it('should fire the visitUrl function on the merge request URL', () => {
+      const payload = { merge_request_url: 'fakepath.html' };
+      const visitUrl = spyOnDependency(mutations, 'visitUrl');
+      mutations[types.RECEIVE_CREATE_MERGE_REQUEST_SUCCESS](stateCopy, payload);
+
+      expect(visitUrl).toHaveBeenCalledWith(payload.merge_request_url);
+    });
+  });
+
+  describe('RECEIVE_CREATE_MERGE_REQUEST_ERROR', () => {
+    it('sets isCreatingMergeRequest prop to false and sets error', () => {
+      mutations[types.RECEIVE_CREATE_MERGE_REQUEST_ERROR](stateCopy, 'error');
+
+      expect(stateCopy.modal.isCreatingMergeRequest).toEqual(false);
+      expect(stateCopy.modal.error).toEqual('error');
+    });
+  });
+
   describe('UPDATE_SAST_ISSUE', () => {
     it('updates issue in the new issues list', () => {
       stateCopy.sast.newIssues = parsedSastIssuesHead;

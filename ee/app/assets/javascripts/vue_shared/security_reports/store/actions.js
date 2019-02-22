@@ -331,5 +331,42 @@ export const createNewIssue = ({ state, dispatch }) => {
     );
 };
 
+export const createMergeRequest = ({ state, dispatch }) => {
+  const { vulnerability } = state.modal;
+
+  dispatch('requestCreateMergeRequest');
+
+  axios
+    .post(state.vulnerabilityFeedbackPath, {
+      vulnerability_feedback: {
+        feedback_type: 'merge_request',
+        category: vulnerability.category,
+        project_fingerprint: vulnerability.project_fingerprint,
+        vulnerability_data: vulnerability,
+      },
+    })
+    .then(({ data }) => {
+      dispatch('receiveCreateMergeRequestSuccess', data);
+    })
+    .catch(() => {
+      dispatch(
+        'receiveCreateMergeRequestError',
+        s__('ciReport|There was an error creating the merge request. Please try again.'),
+      );
+    });
+};
+
+export const requestCreateMergeRequest = ({ commit }) => {
+  commit(types.REQUEST_CREATE_MERGE_REQUEST);
+};
+
+export const receiveCreateMergeRequestSuccess = ({ commit }, payload) => {
+  commit(types.RECEIVE_CREATE_MERGE_REQUEST_SUCCESS, payload);
+};
+
+export const receiveCreateMergeRequestError = ({ commit }) => {
+  commit(types.RECEIVE_CREATE_MERGE_REQUEST_ERROR);
+};
+
 // prevent babel-plugin-rewire from generating an invalid default during karma tests
 export default () => {};

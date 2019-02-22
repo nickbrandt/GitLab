@@ -4,19 +4,24 @@ import Modal from '~/vue_shared/components/gl_modal.vue';
 import LoadingButton from '~/vue_shared/components/loading_button.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import ExpandButton from '~/vue_shared/components/expand_button.vue';
+
+import EventItem from 'ee/vue_shared/security_reports/components/event_item.vue';
 import SafeLink from 'ee/vue_shared/components/safe_link.vue';
 import SolutionCard from 'ee/vue_shared/security_reports/components/solution_card.vue';
 import SeverityBadge from './severity_badge.vue';
+import SplitButton from 'ee/vue_shared/security_reports/components/split_button.vue';
 
 export default {
   components: {
-    SolutionCard,
-    SafeLink,
-    Modal,
-    LoadingButton,
+    EventItem,
     ExpandButton,
     Icon,
+    LoadingButton,
+    Modal,
+    SafeLink,
     SeverityBadge,
+    SolutionCard,
+    SplitButton,
   },
   props: {
     modal: {
@@ -40,6 +45,31 @@ export default {
     },
   },
   computed: {
+    actionButtons() {
+      const buttons = [];
+      const issueButton = {
+        name: 'Create issue',
+        tagline: 'Investigate this vulnerability by creating an issue',
+        isLoading: this.modal.isCreatingNewIssue,
+        action: 'createNewIssue',
+      };
+      const MRButton = {
+        name: 'Create merge request',
+        tagline: 'Implement this solution by creating a merge request',
+        isLoading: this.modal.isCreatingMergeRequest,
+        action: 'createMergeRequest',
+      };
+
+      if (!this.modal.vulnerability.hasIssue && this.canCreateIssuePermission) {
+        buttons.push(issueButton);
+      }
+
+      if (!this.modal.vulnerability.hasMergeRequest) {
+        buttons.push(MRButton);
+      }
+
+      return buttons;
+    },
     revertTitle() {
       return this.modal.vulnerability.isDismissed
         ? s__('ciReport|Undo dismiss')
@@ -53,11 +83,18 @@ export default {
         this.modal.vulnerability.dismissalFeedback.author
       );
     },
+    project() {
+      return this.modal.data.project || {};
+    },
     solution() {
       return this.modal.vulnerability && this.modal.vulnerability.solution;
     },
     remediation() {
-      return this.modal.vulnerability && this.modal.vulnerability.remediation;
+      return (
+        this.modal.vulnerability &&
+        this.modal.vulnerability.remediations &&
+        this.modal.vulnerability.remediations[0]
+      );
     },
     renderSolutionCard() {
       return this.solution || this.remediation;
@@ -201,6 +238,34 @@ export default {
       <solution-card v-if="renderSolutionCard" :solution="solution" :remediation="remediation" />
       <hr v-else />
 
+      <ul
+        v-if="modal.vulnerability.hasIssue || modal.vulnerability.hasMergeRequest"
+        class="notes card"
+      >
+        <li v-if="modal.vulnerability.hasIssue" class="note">
+          <event-item
+            type="issue"
+            :project-name="project.value"
+            :project-link="project.url"
+            :author-name="modal.vulnerability.issue_feedback.author.name"
+            :author-username="modal.vulnerability.issue_feedback.author.username"
+            :action-link-text="`#${modal.vulnerability.issue_feedback.issue_iid}`"
+            :action-link-url="modal.vulnerability.issue_feedback.issue_url"
+          />
+        </li>
+        <li v-if="modal.vulnerability.hasMergeRequest" class="note">
+          <event-item
+            type="mergeRequest"
+            :project-name="modal.data.project.value"
+            :project-link="modal.data.project.url"
+            :author-name="modal.vulnerability.merge_request_feedback.author.name"
+            :author-username="modal.vulnerability.merge_request_feedback.author.username"
+            :action-link-text="`!${modal.vulnerability.merge_request_feedback.merge_request_iid}`"
+            :action-link-url="modal.vulnerability.merge_request_feedback.merge_request_url"
+          />
+        </li>
+      </ul>
+
       <div class="prepend-top-20 append-bottom-10">
         <div class="col-sm-12 text-secondary">
           <template v-if="hasDismissedBy">
@@ -240,22 +305,20 @@ export default {
           @click="handleDismissClick"
         />
 
-        <a
-          v-if="modal.vulnerability.hasIssue"
-          :href="modal.vulnerability.issue_feedback && modal.vulnerability.issue_feedback.issue_url"
-          rel="noopener noreferrer nofollow"
-          class="btn btn-success btn-inverted"
-        >
-          {{ __('View issue') }}
-        </a>
+        <split-button
+          v-if="actionButtons.length > 1"
+          :buttons="actionButtons"
+          @createMergeRequest="$emit('createMergeRequest')"
+          @createNewIssue="$emit('createNewIssue')"
+        />
 
         <loading-button
-          v-else-if="!modal.vulnerability.hasIssue && canCreateIssuePermission"
-          :loading="modal.isCreatingNewIssue"
-          :disabled="modal.isCreatingNewIssue"
-          :label="__('Create issue')"
-          container-class="js-create-issue-btn btn btn-success btn-inverted"
-          @click="$emit('createNewIssue')"
+          v-else-if="actionButtons.length > 0"
+          :loading="actionButtons[0].isLoading"
+          :disabled="actionButtons[0].isLoading"
+          :label="actionButtons[0].name"
+          container-class="btn btn-success btn-inverted"
+          @click="$emit(actionButtons[0].action)"
         />
       </template>
     </div>

@@ -219,6 +219,7 @@ export default {
       'dismissIssue',
       'revertDismissIssue',
       'createNewIssue',
+      'createMergeRequest',
     ]),
   },
 };
@@ -320,6 +321,7 @@ export default {
         :can-create-feedback-permission="canCreateFeedbackPermission"
         @createNewIssue="createNewIssue"
         @dismissIssue="dismissIssue"
+        @createMergeRequest="createMergeRequest"
         @revertDismissIssue="revertDismissIssue"
       />
     </div>

@@ -9,6 +9,7 @@ import {
   getUnapprovedVulnerabilities,
   findIssueIndex,
 } from './utils';
+import { visitUrl } from '~/lib/utils/url_utility';
 
 export default {
   [types.SET_HEAD_BLOB_PATH](state, path) {
@@ -409,5 +410,20 @@ export default {
   [types.RECEIVE_CREATE_ISSUE_ERROR](state, error) {
     Vue.set(state.modal, 'error', error);
     Vue.set(state.modal, 'isCreatingNewIssue', false);
+  },
+
+  [types.REQUEST_CREATE_MERGE_REQUEST](state) {
+    state.isCreatingMergeRequest = true;
+    Vue.set(state.modal, 'isCreatingMergeRequest', true);
+    Vue.set(state.modal, 'error', null);
+  },
+  [types.RECEIVE_CREATE_MERGE_REQUEST_SUCCESS](state, payload) {
+    // We don't cancel the loading state here because we're navigating away from the page
+    visitUrl(payload.merge_request_url);
+  },
+  [types.RECEIVE_CREATE_MERGE_REQUEST_ERROR](state, error) {
+    state.isCreatingMergeRequest = false;
+    Vue.set(state.modal, 'isCreatingMergeRequest', false);
+    Vue.set(state.modal, 'error', error);
   },
 };

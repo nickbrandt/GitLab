@@ -77,6 +77,7 @@ export default {
       'fetchVulnerabilitiesCount',
       'fetchVulnerabilitiesHistory',
       'undoDismiss',
+      'createMergeRequest',
       'setVulnerabilitiesCountEndpoint',
       'setVulnerabilitiesEndpoint',
       'setVulnerabilitiesHistoryEndpoint',
@@ -105,6 +106,7 @@ export default {
       @createNewIssue="createIssue({ vulnerability: modal.vulnerability })"
       @dismissIssue="dismissVulnerability({ vulnerability: modal.vulnerability })"
       @revertDismissIssue="undoDismiss({ vulnerability: modal.vulnerability })"
+      @createMergeRequest="createMergeRequest({ vulnerability: modal.vulnerability })"
     />
   </div>
 </template>

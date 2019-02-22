@@ -24,17 +24,17 @@ const hasMatchingFix = (fixes, vulnerability) =>
 
 /**
  *
- * Returns the first remediation that fixes the given vulnerability or null
+ * Returns the remediations that fix the given vulnerability or null
  *
  * @param {Array} remediations
  * @param {Object} vulnerability
- * @returns {Object|null}
+ * @returns {Array|null}
  */
-export const findMatchingRemediation = (remediations, vulnerability) => {
+export const findMatchingRemediations = (remediations, vulnerability) => {
   if (!Array.isArray(remediations)) {
     return null;
   }
-  return remediations.find(rem => hasMatchingFix(rem.fixes, vulnerability)) || null;
+  return remediations.filter(rem => hasMatchingFix(rem.fixes, vulnerability)) || null;
 };
 
 /**
@@ -177,10 +177,10 @@ export const parseDependencyScanningIssues = (report = [], feedback = [], path =
       title: issue.message,
     };
 
-    const remediation = findMatchingRemediation(remediations, parsed);
+    const matchingRemediations = findMatchingRemediations(remediations, parsed);
 
-    if (remediation) {
-      parsed.remediation = remediation;
+    if (remediations) {
+      parsed.remediations = matchingRemediations;
     }
 
     return {
