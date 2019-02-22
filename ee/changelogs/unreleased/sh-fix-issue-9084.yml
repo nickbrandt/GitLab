@@ -1,5 +1,0 @@
----
-title: 'Geo: Always update the default branch on the secondary'
-merge_request: 9064
-author:
-type: fixed

@@ -1,5 +1,0 @@
----
-title: When cleaning up repositories, ensure orphaned entries do not remain in the tracking database
-merge_request: 9344
-author:
-type: fixed

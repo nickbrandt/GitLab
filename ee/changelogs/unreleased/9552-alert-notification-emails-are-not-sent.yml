@@ -1,5 +1,0 @@
----
-title: Fix alert notification emails are not being sent
-merge_request: 9393
-author:
-type: fixed
