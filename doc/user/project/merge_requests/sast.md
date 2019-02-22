@@ -49,7 +49,7 @@ The following languages and frameworks are supported.
 ## How it works
 
 First of all, you need to define a job in your `.gitlab-ci.yml` file that generates the
-[SAST report artifact](../../../ci/yaml/README.md#artifactsreportssast).
+[SAST report artifact](../../../ci/yaml/README.md#artifactsreportssast-ultimate).
 For more information on how the SAST job should look like, check the
 example on [Static Application Security Testing with GitLab CI/CD](../../../ci/examples/sast.md).
 

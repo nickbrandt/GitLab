@@ -37,7 +37,7 @@ For instance, consider the following workflow:
 ## How it works
 
 First of all, you need to define a job in your `.gitlab-ci.yml` file that generates the
-[Performance report artifact](../../../ci/yaml/README.md#artifactsreportsperformance).
+[Performance report artifact](../../../ci/yaml/README.md#artifactsreportsperformance-premium).
 For more information on how the Performance job should look like, check the
 example on [Testing Browser Performance](../../../ci/examples/browser_performance.md).
 

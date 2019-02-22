@@ -30,7 +30,7 @@ applications while you are developing and testing your applications.
 ## How it works
 
 First of all, you need to define a job in your `.gitlab-ci.yml` file that generates the
-[DAST report artifact](../../../ci/yaml/README.md#artifactsreportsdast).
+[DAST report artifact](../../../ci/yaml/README.md#artifactsreportsdast-ultimate).
 For more information on how the DAST job should look like, check the
 example on [Dynamic Application Security Testing with GitLab CI/CD](../../../ci/examples/dast.md).
 

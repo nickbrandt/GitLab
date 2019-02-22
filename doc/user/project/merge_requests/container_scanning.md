@@ -34,7 +34,7 @@ to perform audits for your Docker-based apps.
 ## How it works
 
 First of all, you need to define a job in your `.gitlab-ci.yml` file that generates the
-[Container Scanning report artifact](../../../ci/yaml/README.md#artifactsreportscontainer_scanning).
+[Container Scanning report artifact](../../../ci/yaml/README.md#artifactsreportscontainer_scanning-ultimate).
 For more information on how the Container Scanning job should look like, check the
 example on [Container Scanning with GitLab CI/CD](../../../ci/examples/container_scanning.md).
 

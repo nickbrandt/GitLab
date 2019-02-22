@@ -37,7 +37,7 @@ dependency_scanning:
 
 The above example will create a `dependency_scanning` job in your CI/CD pipeline
 and scan your dependencies for possible vulnerabilities. The report will be saved as a
-[Dependency Scanning report artifact](../../ci/yaml/README.md#artifactsreportsdependency_scanning)
+[Dependency Scanning report artifact](../../ci/yaml/README.md#artifactsreportsdependency_scanning-ultimate)
 that you can later download and analyze.
 Due to implementation limitations we always take the latest Dependency Scanning artifact available.
 
