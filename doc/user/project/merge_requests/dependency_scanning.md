@@ -40,7 +40,7 @@ check [GitLab Dependency Scanning documentation](https://gitlab.com/gitlab-org/s
 ## How it works
 
 First of all, you need to define a job in your `.gitlab-ci.yml` file that generates the
-[Dependency Scanning report artifact](../../../ci/yaml/README.md#artifactsreportsdependency_scanning).
+[Dependency Scanning report artifact](../../../ci/yaml/README.md#artifactsreportsdependency_scanning-ultimate).
 For more information on how the Dependency Scanning job should look like, check the
 example on [Dependency Scanning with GitLab CI/CD](../../../ci/examples/dependency_scanning.md).
 

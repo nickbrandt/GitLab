@@ -37,7 +37,7 @@ sast:
 
 The above example will create a `sast` job in your CI/CD pipeline
 and scan your dependencies for possible vulnerabilities. The report will be saved as a
-[SAST report artifact](../../ci/yaml/README.md#artifactsreportssast)
+[SAST report artifact](../../ci/yaml/README.md#artifactsreportssast-ultimate)
 that you can later download and analyze.
 Due to implementation limitations we always take the latest SAST artifact available.
 

@@ -30,7 +30,7 @@ license_management:
 
 The above example will create a `license_management` job in your CI/CD pipeline
 and scan your dependencies to find their licenses. The report will be saved as a
-[License Management report artifact](../../ci/yaml/README.md#artifactsreportslicense_management)
+[License Management report artifact](../../ci/yaml/README.md#artifactsreportslicense_management-ultimate)
 that you can later download and analyze.
 Due to implementation limitations we always take the latest License Management artifact available.
 
