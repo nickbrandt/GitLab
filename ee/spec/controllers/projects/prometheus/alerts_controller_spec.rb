@@ -88,10 +88,12 @@ describe Projects::Prometheus::AlertsController do
     let(:notify_service) { spy }
 
     before do
+      sign_out(user)
+
       expect(Projects::Prometheus::Alerts::NotifyService)
         .to receive(:new)
+        .with(project, nil, duck_type(:permitted?))
         .and_return(notify_service)
-        .with(project, user, duck_type(:permitted?))
     end
 
     it 'renders ok if notification succeeds' do

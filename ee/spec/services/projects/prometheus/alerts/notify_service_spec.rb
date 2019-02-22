@@ -3,10 +3,9 @@
 require 'spec_helper'
 
 describe Projects::Prometheus::Alerts::NotifyService do
-  set(:user) { create(:user) }
   set(:project) { create(:project) }
 
-  let(:service) { described_class.new(project, user, payload) }
+  let(:service) { described_class.new(project, nil, payload) }
   let(:token_input) { 'token' }
   let(:subject) { service.execute(token_input) }
 

@@ -7,6 +7,10 @@ module Projects
 
       protect_from_forgery except: [:notify]
 
+      skip_before_action :project, only: [:notify]
+
+      prepend_before_action :repository, :project_without_auth, only: [:notify]
+
       before_action :authorize_read_prometheus_alerts!, except: [:notify]
       before_action :authorize_admin_project!, except: [:notify]
       before_action :alert, only: [:update, :show, :destroy]
@@ -101,6 +105,15 @@ module Projects
 
       def extract_alert_manager_token(request)
         Doorkeeper::OAuth::Token.from_bearer_authorization(request)
+      end
+
+      def project_without_auth
+        return @project if @project
+
+        namespace = params[:namespace_id]
+        id = params[:project_id]
+
+        @project = Project.find_by_full_path("#{namespace}/#{id}")
       end
     end
   end
