@@ -1,5 +1,0 @@
----
-title: 'Group security dashboard: Fix overflow for Vulnerabilities with long titles'
-merge_request: 9271
-author:
-type: fixed

@@ -1,5 +1,0 @@
----
-title: Fix access to constant Gitlab::RepositorySizeError
-merge_request: 9579
-author:
-type: fixed

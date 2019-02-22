@@ -1,5 +1,0 @@
----
-title: Fix unleash server side cannot return feature flags
-merge_request: 9532
-author:
-type: fixed

@@ -1,5 +1,0 @@
----
-title: 'Fix deprecation: #original_exception is deprecated. Use #cause instead.'
-merge_request: 9141
-author: Jasper Maes
-type: other
