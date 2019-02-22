@@ -49,7 +49,7 @@ module Security
       return items unless params[:severity].present?
 
       items.by_severities(
-        Vulnerabilities::Occurrence::LEVELS.values_at(
+        Vulnerabilities::Occurrence::SEVERITY_LEVELS.values_at(
           *params[:severity]).compact)
     end
 

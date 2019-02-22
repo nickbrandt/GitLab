@@ -1,0 +1,5 @@
+---
+title: Split severity and confidence values for vulnerabilities
+merge_request: 9495
+author:
+type: changed

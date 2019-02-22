@@ -9,18 +9,6 @@ module Vulnerabilities
 
     paginates_per 20
 
-    # Used for both severity and confidence
-    LEVELS = {
-      undefined: 0,
-      ignore: 1,
-      unknown: 2,
-      experimental: 3,
-      low: 4,
-      medium: 5,
-      high: 6,
-      critical: 7
-    }.with_indifferent_access.freeze
-
     sha_attribute :project_fingerprint
     sha_attribute :location_fingerprint
 
@@ -33,6 +21,28 @@ module Vulnerabilities
     has_many :occurrence_pipelines, class_name: 'Vulnerabilities::OccurrencePipeline'
     has_many :pipelines, through: :occurrence_pipelines, class_name: 'Ci::Pipeline'
 
+    CONFIDENCE_LEVELS = {
+      undefined: 0,
+      ignore: 1,
+      unknown: 2,
+      experimental: 3,
+      low: 4,
+      medium: 5,
+      high: 6,
+      confirmed: 7
+    }.with_indifferent_access.freeze
+
+    SEVERITY_LEVELS = {
+      undefined: 0,
+      info: 1,
+      unknown: 2,
+      # experimental: 3, formerly used by confidence, no longer applicable
+      low: 4,
+      medium: 5,
+      high: 6,
+      critical: 7
+    }.with_indifferent_access.freeze
+
     REPORT_TYPES = {
       sast: 0,
       dependency_scanning: 1,
@@ -40,7 +50,9 @@ module Vulnerabilities
       dast: 3
     }.with_indifferent_access.freeze
 
+    enum confidence: CONFIDENCE_LEVELS, _prefix: :confidence
     enum report_type: REPORT_TYPES
+    enum severity: SEVERITY_LEVELS, _prefix: :severity
 
     validates :scanner, presence: true
     validates :project, presence: true
@@ -54,8 +66,8 @@ module Vulnerabilities
     # validates :location_fingerprint, presence: true, uniqueness: { scope: [:primary_identifier_id, :scanner_id, :ref, :pipeline_id, :project_id] }
     validates :name, presence: true
     validates :report_type, presence: true
-    validates :severity, presence: true, inclusion: { in: LEVELS.keys }
-    validates :confidence, presence: true, inclusion: { in: LEVELS.keys }
+    validates :severity, presence: true
+    validates :confidence, presence: true
 
     validates :metadata_version, presence: true
     validates :raw_metadata, presence: true
@@ -85,7 +97,9 @@ module Vulnerabilities
     end
 
     def self.counted_by_severity
-      group(:severity).count
+      group(:severity).count.each_with_object({}) do |(severity, count), accum|
+        accum[SEVERITY_LEVELS[severity]] = count
+      end
     end
 
     def feedback(feedback_type:)
@@ -122,26 +136,6 @@ module Vulnerabilities
 
     def issue_feedback
       feedback(feedback_type: 'issue')
-    end
-
-    # Override getter and setter for :severity as we can't use enum (it conflicts with :confidence)
-    # To be replaced with enum using _prefix when migrating to rails 5
-    def severity
-      LEVELS.key(read_attribute(:severity))
-    end
-
-    def severity=(severity)
-      write_attribute(:severity, LEVELS[severity])
-    end
-
-    # Override getter and setter for :confidence as we can't use enum (it conflicts with :severity)
-    # To be replaced with enum using _prefix when migrating to rails 5
-    def confidence
-      LEVELS.key(read_attribute(:confidence))
-    end
-
-    def confidence=(confidence)
-      write_attribute(:confidence, LEVELS[confidence])
     end
 
     def metadata

@@ -3,7 +3,9 @@
 require 'spec_helper'
 
 describe Vulnerabilities::Occurrence do
+  it { is_expected.to define_enum_for(:confidence) }
   it { is_expected.to define_enum_for(:report_type) }
+  it { is_expected.to define_enum_for(:severity) }
 
   describe 'associations' do
     it { is_expected.to belong_to(:project) }
@@ -29,9 +31,7 @@ describe Vulnerabilities::Occurrence do
     it { is_expected.to validate_presence_of(:metadata_version) }
     it { is_expected.to validate_presence_of(:raw_metadata) }
     it { is_expected.to validate_presence_of(:severity) }
-    it { is_expected.to validate_inclusion_of(:severity).in_array(described_class::LEVELS.keys) }
     it { is_expected.to validate_presence_of(:confidence) }
-    it { is_expected.to validate_inclusion_of(:confidence).in_array(described_class::LEVELS.keys) }
   end
 
   context 'database uniqueness' do
@@ -219,7 +219,7 @@ describe Vulnerabilities::Occurrence do
     end
   end
 
-  describe '.count_by_severity' do
+  describe '.counted_by_severity' do
     let!(:high_vulnerabilities) { create_list(:vulnerabilities_occurrence, 3, severity: :high) }
     let!(:medium_vulnerabilities) { create_list(:vulnerabilities_occurrence, 2, severity: :medium) }
     let!(:low_vulnerabilities) { create_list(:vulnerabilities_occurrence, 1, severity: :low) }
