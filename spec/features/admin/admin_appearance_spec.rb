@@ -41,26 +41,33 @@ describe 'Admin Appearance' do
 
   context 'Custom system header and footer' do
     before do
-      appearance.update(header_message: "Foo", footer_message: "Bar")
       sign_in(create(:admin))
     end
 
-    it 'shows custom system header and footer when licensed' do
-      stub_licensed_features(system_header_footer: true)
+    context 'when system header and footer messages are empty' do
+      it 'shows custom system header and footer fields' do
+        visit admin_appearances_path
 
-      visit admin_appearances_path
-
-      expect(page).to have_content appearance.header_message
-      expect(page).to have_content appearance.footer_message
+        expect(page).to have_field('appearance_header_message', with: '')
+        expect(page).to have_field('appearance_footer_message', with: '')
+        expect(page).to have_field('appearance_message_background_color')
+        expect(page).to have_field('appearance_message_font_color')
+      end
     end
 
-    it 'does not show custom system header and footer when unlicensed' do
-      stub_licensed_features(system_header_footer: false)
+    context 'when system header and footer messages are not empty' do
+      before do
+        appearance.update(header_message: 'Foo', footer_message: 'Bar')
+      end
 
-      visit admin_appearances_path
+      it 'shows custom system header and footer fields' do
+        visit admin_appearances_path
 
-      expect(page).not_to have_content appearance.header_message
-      expect(page).not_to have_content appearance.footer_message
+        expect(page).to have_field('appearance_header_message', with: appearance.header_message)
+        expect(page).to have_field('appearance_footer_message', with: appearance.footer_message)
+        expect(page).to have_field('appearance_message_background_color')
+        expect(page).to have_field('appearance_message_font_color')
+      end
     end
   end
 
