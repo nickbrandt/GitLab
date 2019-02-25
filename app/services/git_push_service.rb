@@ -235,7 +235,7 @@ class GitPushService < BaseService
   private
 
   def pipeline_options
-    {} # to be overriden in EE
+    {} # to be overridden in EE
   end
 end
 
