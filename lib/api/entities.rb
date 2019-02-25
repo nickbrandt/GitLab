@@ -1387,13 +1387,9 @@ module API
 
       class GitInfo < Grape::Entity
         expose :repo_url, :ref, :sha, :before_sha
-        expose :ref_type do |model|
-          if model.tag
-            'tag'
-          else
-            'branch'
-          end
-        end
+        expose :ref_type
+        expose :refspecs
+        expose :git_depth, as: :depth
       end
 
       class RunnerInfo < Grape::Entity
