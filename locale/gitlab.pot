@@ -6841,6 +6841,9 @@ msgstr ""
 msgid "Operations Dashboard"
 msgstr ""
 
+msgid "Operations Settings"
+msgstr ""
+
 msgid "OperationsDashboard|Add a project to the dashboard"
 msgstr ""
 
