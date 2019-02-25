@@ -2,7 +2,7 @@
 
 module QA
   # Failure issue: https://gitlab.com/gitlab-org/quality/staging/issues/30
-  context 'Verify', :quarantine do
+  context 'Verify' do
     describe 'CI variable support' do
       it 'user adds a CI variable' do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)
