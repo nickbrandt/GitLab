@@ -67,6 +67,14 @@ module API
       end
       # rubocop: enable CodeReuse/ActiveRecord
 
+      def create_group
+        # This is a separate method so that EE can extend its behaviour, without
+        # having to modify this code directly.
+        ::Groups::CreateService
+          .new(current_user, declared_params(include_missing: false))
+          .execute
+      end
+
       def find_group_projects(params)
         group = find_group!(params[:id])
         options = {
@@ -136,25 +144,9 @@ module API
           authorize! :create_group
         end
 
-        ldap_link_attrs = {
-          cn: params.delete(:ldap_cn),
-          group_access: params.delete(:ldap_access)
-        }
-
-        # EE
-        authenticated_as_admin! if params[:shared_runners_minutes_limit]
-
-        group = ::Groups::CreateService.new(current_user, declared_params(include_missing: false)).execute
+        group = create_group
 
         if group.persisted?
-          # NOTE: add backwards compatibility for single ldap link
-          if ldap_link_attrs[:cn].present?
-            group.ldap_group_links.create(
-              cn: ldap_link_attrs[:cn],
-              group_access: ldap_link_attrs[:group_access]
-            )
-          end
-
           present group, with: Entities::GroupDetail, current_user: current_user
         else
           render_api_error!("Failed to save group #{group.errors.messages}", 400)
