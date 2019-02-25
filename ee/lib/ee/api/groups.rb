@@ -52,6 +52,22 @@ module EE
             super
           end
         end
+
+        resource :groups, requirements: ::API::API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
+          desc 'Sync a group with LDAP.'
+          post ":id/ldap_sync" do
+            not_found! unless ::Gitlab::Auth::LDAP::Config.group_sync_enabled?
+
+            group = find_group!(params[:id])
+            authorize! :admin_group, group
+
+            if group.pending_ldap_sync
+              ::LdapGroupSyncWorker.perform_async(group.id)
+            end
+
+            status 202
+          end
+        end
       end
     end
   end

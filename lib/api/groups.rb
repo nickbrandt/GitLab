@@ -290,20 +290,6 @@ module API
           render_api_error!("Failed to transfer project #{project.errors.messages}", 400)
         end
       end
-
-      desc 'Sync a group with LDAP.'
-      post ":id/ldap_sync" do
-        not_found! unless Gitlab::Auth::LDAP::Config.group_sync_enabled?
-
-        group = find_group!(params[:id])
-        authorize! :admin_group, group
-
-        if group.pending_ldap_sync
-          LdapGroupSyncWorker.perform_async(group.id)
-        end
-
-        status 202
-      end
     end
   end
 end
