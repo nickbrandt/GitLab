@@ -47,9 +47,7 @@ class Groups::Epics::NotesController < Groups::ApplicationController
   end
 
   def normalize_create_params
-    params[:note].try do |note|
-      note[:noteable_id] = epic.id
-      note[:noteable_type] = 'Epic'
-    end
+    params[:target_type] = 'Epic'
+    params[:target_id] = epic.id
   end
 end
