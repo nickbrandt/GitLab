@@ -4,6 +4,8 @@ import { FILTERED_SEARCH } from '~/pages/constants';
 import IssuesFilteredSearchTokenKeysEE from 'ee/filtered_search/issues_filtered_search_token_keys';
 
 document.addEventListener('DOMContentLoaded', () => {
+  IssuableFilteredSearchTokenKeys.addExtraTokensForIssues();
+
   initFilteredSearch({
     page: FILTERED_SEARCH.ISSUES,
     isGroupDecendent: true,
