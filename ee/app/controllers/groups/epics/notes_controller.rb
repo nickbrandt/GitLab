@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 class Groups::Epics::NotesController < Groups::ApplicationController
+  extend ::Gitlab::Utils::Override
+
   include NotesActions
   include NotesHelper
   include ToggleAwardEmoji
-
-  before_action :set_target_params, only: [:create]
 
   before_action :epic
   before_action :authorize_create_note!, only: [:create]
@@ -44,8 +44,11 @@ class Groups::Epics::NotesController < Groups::ApplicationController
     EpicNoteSerializer.new(project: nil, noteable: noteable, current_user: current_user)
   end
 
-  def set_target_params
+  override :create_note_params
+  def create_note_params
     params[:target_type] = 'Epic'
     params[:target_id] = epic.id
+
+    super
   end
 end
