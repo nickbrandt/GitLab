@@ -11,7 +11,7 @@ module DraftNotes
     private
 
     def draft_notes
-      @draft_notes ||= merge_request.draft_notes.authored_by(current_user)
+      @draft_notes ||= merge_request.draft_notes.order_id_asc.authored_by(current_user)
     end
 
     def project

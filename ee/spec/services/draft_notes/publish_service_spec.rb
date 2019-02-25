@@ -32,7 +32,8 @@ describe DraftNotes::PublishService do
 
   context 'multiple draft notes' do
     before do
-      create_list(:draft_note, 2, merge_request: merge_request, author: user)
+      create(:draft_note, merge_request: merge_request, author: user, note: 'first note')
+      create(:draft_note, merge_request: merge_request, author: user, note: 'second note')
     end
 
     context 'when review fails to create' do
@@ -63,6 +64,10 @@ describe DraftNotes::PublishService do
     it 'publishes all draft notes for a user in a merge request' do
       expect { publish }.to change { DraftNote.count }.by(-2).and change { Note.count }.by(2).and change { Review.count }.by(1)
       expect(DraftNote.count).to eq(0)
+
+      notes = merge_request.notes.order(id: :asc)
+      expect(notes.first.note).to eq('first note')
+      expect(notes.last.note).to eq('second note')
     end
 
     it 'sends batch notification' do
