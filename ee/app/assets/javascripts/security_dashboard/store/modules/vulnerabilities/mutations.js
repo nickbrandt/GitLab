@@ -2,6 +2,7 @@ import Vue from 'vue';
 import { s__ } from '~/locale';
 import { visitUrl } from '~/lib/utils/url_utility';
 import * as types from './mutation_types';
+import { DAYS } from './constants';
 
 export default {
   [types.SET_VULNERABILITIES_ENDPOINT](state, payload) {
@@ -37,6 +38,18 @@ export default {
   },
   [types.SET_VULNERABILITIES_HISTORY_ENDPOINT](state, payload) {
     state.vulnerabilitiesHistoryEndpoint = payload;
+  },
+  [types.SET_VULNERABILITIES_HISTORY_DAY_RANGE](state, days) {
+    state.vulnerabilitiesHistoryDayRange = days;
+    state.vulnerabilitiesHistoryShowSplitLine = days <= DAYS.THIRTY;
+
+    if (days <= DAYS.THIRTY) {
+      state.vulnerabilitiesHistoryMaxDayInterval = 1;
+    } else if (days > DAYS.THIRTY && days <= DAYS.SIXTY) {
+      state.vulnerabilitiesHistoryMaxDayInterval = 7;
+    } else if (days > DAYS.SIXTY) {
+      state.vulnerabilitiesHistoryMaxDayInterval = 14;
+    }
   },
   [types.REQUEST_VULNERABILITIES_HISTORY](state) {
     state.isLoadingVulnerabilitiesHistory = true;

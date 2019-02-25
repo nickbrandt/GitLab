@@ -268,6 +268,11 @@ msgid_plural "%{count} %{type} modifications"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "1 Day"
+msgid_plural "%d Days"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "1 closed issue"
 msgid_plural "%d closed issues"
 msgstr[0] ""

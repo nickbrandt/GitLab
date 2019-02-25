@@ -2,6 +2,7 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from '~/lib/utils/axios_utils';
 import testAction from 'spec/helpers/vuex_action_helper';
 import { TEST_HOST } from 'spec/test_constants';
+import { DAYS } from 'ee/security_dashboard/store/modules/vulnerabilities/constants';
 
 import initialState from 'ee/security_dashboard/store/modules/vulnerabilities/state';
 import * as types from 'ee/security_dashboard/store/modules/vulnerabilities/mutation_types';
@@ -700,6 +701,26 @@ describe('vulnerabilities history actions', () => {
           {
             type: types.SET_VULNERABILITIES_HISTORY_ENDPOINT,
             payload: endpoint,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('setVulnerabilitiesHistoryDayRange', () => {
+    it('should commit the number of past days to show', done => {
+      const state = initialState;
+      const days = DAYS.THIRTY;
+      testAction(
+        actions.setVulnerabilitiesHistoryDayRange,
+        days,
+        state,
+        [
+          {
+            type: types.SET_VULNERABILITIES_HISTORY_DAY_RANGE,
+            payload: days,
           },
         ],
         [],

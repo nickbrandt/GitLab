@@ -90,9 +90,9 @@ export default {
   <div>
     <filters :dashboard-documentation="dashboardDocumentation" />
     <vulnerability-count-list />
-    <h4 class="my-4">{{ __('Vulnerability Chart') }}</h4>
+
     <vulnerability-chart />
-    <h4 class="my-4">{{ __('Vulnerability List') }}</h4>
+
     <security-dashboard-table
       :dashboard-documentation="dashboardDocumentation"
       :empty-state-svg-path="emptyStateSvgPath"
