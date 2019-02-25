@@ -25,17 +25,17 @@ class ApprovalWrappedRule
 
   # @return [Array<User>] all approvers related to this rule
   #
-  # This is dynamically calculated when MR is open, but is persisted in DB after MR is merged.
+  # This is dynamically calculated unless it is persisted as `approved_approvers`.
   #
   # After merge, the approval state should no longer change.
-  # Persisting instead of recomputing dynamically guarantees this even
-  # if project level rule ever adds/removes approvers after the merge.
+  # We persist this so if project level rule is changed in the future,
+  # return result won't be affected.
   #
-  # For open MRs, it is still dynamically calculated instead of persisted because
+  # For open MRs, it is dynamically calculated because:
   # - Additional complexity to add update hooks
   # - DB updating many MRs for one project rule change is inefficient
   def approved_approvers
-    if merge_request.merged? && merge_request.merge_jid.nil? # merge process completed
+    if merge_request.merged? && approval_rule.is_a?(ApprovalMergeRequestRule) && approval_rule.approved_approvers.present?
       return approval_rule.approved_approvers
     end
 
