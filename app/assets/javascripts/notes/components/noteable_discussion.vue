@@ -27,6 +27,7 @@ import noteable from '../mixins/noteable';
 import resolvable from '../mixins/resolvable';
 import discussionNavigation from '../mixins/discussion_navigation';
 import ReplyPlaceholder from './discussion_reply_placeholder.vue';
+import ResolveWithIssueButton from './discussion_resolve_with_issue_button.vue';
 import jumpToNextDiscussionButton from './discussion_jump_to_next_button.vue';
 import eventHub from '../event_hub';
 
@@ -46,6 +47,7 @@ export default {
     ReplyPlaceholder,
     placeholderNote,
     placeholderSystemNote,
+    ResolveWithIssueButton,
     systemNote,
     DraftNote,
     TimelineEntryItem,
@@ -243,6 +245,9 @@ export default {
         id: this.discussion.commit_id,
         url: this.discussion.discussion_path,
       };
+    },
+    resolveWithIssuePath() {
+      return !this.discussionResolved && this.discussion.resolve_with_issue_path;
     },
   },
   watch: {
@@ -502,16 +507,10 @@ Please check your network connection and try again.`;
                       class="btn-group discussion-actions ml-sm-2"
                       role="group"
                     >
-                      <div v-if="!discussionResolved" class="btn-group" role="group">
-                        <a
-                          v-gl-tooltip
-                          :href="discussion.resolve_with_issue_path"
-                          :title="s__('MergeRequests|Resolve this discussion in a new issue')"
-                          class="new-issue-for-discussion btn btn-default discussion-create-issue-btn"
-                        >
-                          <icon name="issue-new" />
-                        </a>
-                      </div>
+                      <resolve-with-issue-button
+                        v-if="resolveWithIssuePath"
+                        :url="resolveWithIssuePath"
+                      />
                       <jump-to-next-discussion-button
                         v-if="shouldShowJumpToNextDiscussion"
                         @onClick="jumpToNextDiscussion"
