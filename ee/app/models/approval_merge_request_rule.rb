@@ -12,7 +12,7 @@ class ApprovalMergeRequestRule < ApplicationRecord
 
   validates :name, uniqueness: { scope: [:merge_request, :code_owner] }
 
-  belongs_to :merge_request
+  belongs_to :merge_request, inverse_of: :approval_rules
 
   # approved_approvers is only populated after MR is merged
   has_and_belongs_to_many :approved_approvers, class_name: 'User', join_table: :approval_merge_request_rules_approved_approvers

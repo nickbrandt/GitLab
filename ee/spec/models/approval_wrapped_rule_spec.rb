@@ -103,6 +103,37 @@ describe ApprovalWrappedRule do
         expect(subject.approved_approvers).to contain_exactly(approver3)
       end
     end
+
+    context 'when merged but without materialized approved_approvers' do
+      let(:merge_request) { create(:merged_merge_request) }
+
+      before do
+        create(:approval, merge_request: merge_request, user: approver1)
+        create(:approval, merge_request: merge_request, user: approver2)
+
+        rule.users = [approver1, approver3]
+      end
+
+      it 'returns computed approved approvers' do
+        expect(subject.approved_approvers).to contain_exactly(approver1)
+      end
+    end
+
+    context 'when project rule' do
+      let(:rule) { create(:approval_project_rule, project: merge_request.project, approvals_required: approvals_required) }
+      let(:merge_request) { create(:merged_merge_request) }
+
+      before do
+        create(:approval, merge_request: merge_request, user: approver1)
+        create(:approval, merge_request: merge_request, user: approver2)
+
+        rule.users = [approver1, approver3]
+      end
+
+      it 'returns computed approved approvers' do
+        expect(subject.approved_approvers).to contain_exactly(approver1)
+      end
+    end
   end
 
   describe '#unactioned_approvers' do

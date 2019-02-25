@@ -10,9 +10,9 @@ describe MergeRequests::MergeService do
   end
 
   describe '#execute' do
-    context 'project has exceeded size limit' do
-      let(:service) { described_class.new(project, user, commit_message: 'Awesome message') }
+    let(:service) { described_class.new(project, user, commit_message: 'Awesome message') }
 
+    context 'project has exceeded size limit' do
       before do
         allow(project).to receive(:above_size_limit?).and_return(true)
 
@@ -23,6 +23,25 @@ describe MergeRequests::MergeService do
 
       it 'returns the correct error message' do
         expect(merge_request.merge_error).to include('This merge request cannot be merged')
+      end
+    end
+
+    context 'when merge request rule exists' do
+      let(:approver) { create(:user) }
+      let!(:approval_rule) { create :approval_merge_request_rule, merge_request: merge_request, users: [approver] }
+      let!(:approval) { create :approval, merge_request: merge_request, user: approver }
+
+      it 'creates approved_approvers' do
+        allow(service).to receive(:execute_hooks)
+
+        perform_enqueued_jobs do
+          service.execute(merge_request)
+        end
+        merge_request.reload
+        rule = merge_request.approval_rules.first
+
+        expect(merge_request.merged?).to eq(true)
+        expect(rule.approved_approvers).to contain_exactly(approver)
       end
     end
   end
