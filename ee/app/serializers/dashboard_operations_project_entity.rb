@@ -5,24 +5,23 @@ class DashboardOperationsProjectEntity < Grape::Entity
 
   expose :project, merge: true, using: API::Entities::BasicProjectDetails
 
-  expose :remove_path do |dashboard_project|
-    remove_operations_project_path(project_id: dashboard_project.project.id)
+  expose :remove_path do |dashboard_project_object|
+    remove_operations_project_path(project_id: dashboard_project_object.project.id)
   end
 
-  expose :last_deployment, if: -> (*) { last_deployment? } do |dashboard_project, options|
-    new_request = EntityRequest.new(
-      current_user: request.current_user,
-      project: dashboard_project.project
-    )
+  expose :last_pipeline, if: -> (*) { last_pipeline } do |_, options|
+    PipelineDetailsEntity.represent(last_pipeline, options.merge(request: new_request))
+  end
 
-    DeploymentEntity.represent(dashboard_project.last_deployment,
+  expose :last_deployment, if: -> (*) { last_deployment? } do |dashboard_project_object, options|
+    DeploymentEntity.represent(dashboard_project_object.last_deployment,
                                options.merge(request: new_request))
   end
 
   expose :alert_count
-  expose :alert_path, if: -> (*) { last_deployment? } do |dashboard_project|
-    project = dashboard_project.project
-    environment = dashboard_project.last_deployment.environment
+  expose :alert_path, if: -> (*) { last_deployment? } do |dashboard_project_object|
+    project = dashboard_project_object.project
+    environment = dashboard_project_object.last_deployment.environment
 
     metrics_project_environment_path(project, environment)
   end
@@ -31,6 +30,17 @@ class DashboardOperationsProjectEntity < Grape::Entity
   private
 
   alias_method :dashboard_project, :object
+
+  def new_request
+    EntityRequest.new(
+      current_user: request.current_user,
+      project: dashboard_project.project
+    )
+  end
+
+  def last_pipeline
+    dashboard_project.project.last_pipeline
+  end
 
   def last_deployment?
     dashboard_project.last_deployment
