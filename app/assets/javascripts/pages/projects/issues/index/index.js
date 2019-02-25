@@ -9,6 +9,8 @@ import { ISSUABLE_INDEX } from '~/pages/projects/constants';
 import IssuesFilteredSearchTokenKeysEE from 'ee/filtered_search/issues_filtered_search_token_keys';
 
 document.addEventListener('DOMContentLoaded', () => {
+  IssuableFilteredSearchTokenKeys.addExtraTokensForIssues();
+
   initFilteredSearch({
     page: FILTERED_SEARCH.ISSUES,
     filteredSearchTokenKeys: IssuesFilteredSearchTokenKeysEE,
