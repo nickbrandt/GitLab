@@ -16,6 +16,9 @@ module EE
         before_action :check_export_issues_available!, only: [:export_csv]
         before_action :check_service_desk_available!, only: [:service_desk]
         before_action :whitelist_query_limiting_ee, only: [:update]
+        before_action only: :show do
+          push_frontend_feature_flag(:versioned_designs)
+        end
       end
 
       override :issue_except_actions
