@@ -75,6 +75,14 @@ module API
           .execute
       end
 
+      def update_group(group)
+        # This is a separate method so that EE can extend its behaviour, without
+        # having to modify this code directly.
+        ::Groups::UpdateService
+          .new(group, current_user, declared_params(include_missing: false))
+          .execute
+      end
+
       def find_group_projects(params)
         group = find_group!(params[:id])
         options = {
@@ -173,18 +181,7 @@ module API
         group = find_group!(params[:id])
         authorize! :admin_group, group
 
-        # Begin EE-specific block
-        if params[:shared_runners_minutes_limit].present? &&
-            group.shared_runners_minutes_limit.to_i !=
-                params[:shared_runners_minutes_limit].to_i
-          authenticated_as_admin!
-        end
-
-        params.delete(:file_template_project_id) unless
-          group.feature_available?(:custom_file_templates_for_namespace)
-        # End EE-specific block
-
-        if ::Groups::UpdateService.new(group, current_user, declared_params(include_missing: false)).execute
+        if update_group(group)
           present group, with: Entities::GroupDetail, current_user: current_user
         else
           render_validation_error!(group)

@@ -37,6 +37,20 @@ module EE
 
             group
           end
+
+          override :update_group
+          def update_group(group)
+            if params[:shared_runners_minutes_limit].present? &&
+                group.shared_runners_minutes_limit.to_i !=
+                    params[:shared_runners_minutes_limit].to_i
+              authenticated_as_admin!
+            end
+
+            params.delete(:file_template_project_id) unless
+              group.feature_available?(:custom_file_templates_for_namespace)
+
+            super
+          end
         end
       end
     end
