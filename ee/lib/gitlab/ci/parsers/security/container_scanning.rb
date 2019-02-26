@@ -33,22 +33,23 @@ module Gitlab
               # We only report unapproved vulnerabilities
               next unless unapproved.include?(vulnerability['vulnerability'])
 
-              results.append(format_vulnerability(vulnerability))
+              results.append(format_vulnerability(vulnerability, data['image']))
             end
 
             results
           end
 
-          def format_vulnerability(vulnerability)
+          def format_vulnerability(vulnerability, image)
             {
               'category' => 'container_scanning',
-              'message' => name(vulnerability),
-              'description' => vulnerability['description'],
+              'message' => message(vulnerability),
+              'description' => description(vulnerability),
               'cve' => vulnerability['vulnerability'],
               'severity' => translate_severity(vulnerability['severity']),
               'solution' => solution(vulnerability),
               'confidence' => 'Medium',
               'location' => {
+                'image' => image,
                 'operating_system' => vulnerability["namespace"],
                 'dependency' => {
                   'package' => {
@@ -87,15 +88,50 @@ module Gitlab
             end
           end
 
-          def solution(vulnerability)
-            if vulnerability['fixedby'].present?
-              "Upgrade to version #{vulnerability['fixedby']}"
-            end
+          def message(vulnerability)
+            format(
+              vulnerability,
+              %w[vulnerability featurename] =>
+                '%{vulnerability} in %{featurename}',
+              'vulnerability' =>
+                '%{vulnerability}'
+            )
           end
 
-          def name(vulnerability)
-            # Name is package name and the CVE is is affected by.
-            "#{vulnerability['featurename']} - #{vulnerability['vulnerability']}"
+          def description(vulnerability)
+            format(
+              vulnerability,
+              'description' =>
+                '%{description}',
+              %w[featurename featureversion] =>
+                '%{featurename}:%{featureversion} is affected by %{vulnerability}',
+              'featurename' =>
+                '%{featurename} is affected by %{vulnerability}',
+              'namespace' =>
+                '%{namespace} is affected by %{vulnerability}'
+            )
+          end
+
+          def solution(vulnerability)
+            format(
+              vulnerability,
+              %w[fixedby featurename featureversion] =>
+                'Upgrade %{featurename} from %{featureversion} to %{fixedby}',
+              %w[fixedby featurename] =>
+                'Upgrade %{featurename} to %{fixedby}',
+              'fixedby' =>
+                'Upgrade to %{fixedby}'
+            )
+          end
+
+          def format(vulnerability, definitions)
+            definitions.each do |keys, value|
+              if vulnerability.values_at(*Array(keys)).all?(&:present?)
+                return value % vulnerability.with_indifferent_access
+              end
+            end
+
+            nil
           end
 
           def generate_location_fingerprint(location)
