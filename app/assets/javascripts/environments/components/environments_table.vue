@@ -70,6 +70,15 @@ export default {
       );
     },
   },
+  computed: {
+    sortedEnvironments() {
+      return this.sortEnvironments(this.environments).map(env =>
+        this.shouldRenderFolderContent(env)
+          ? { ...env, children: this.sortEnvironments(env.children) }
+          : env,
+      );
+    },
+  },
   methods: {
     folderUrl(model) {
       return `${window.location.pathname}/folders/${model.folderName}`;
