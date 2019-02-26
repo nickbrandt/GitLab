@@ -1,4 +1,4 @@
-import IssuesFilteredSearchTokenKeysEE from 'ee/filtered_search/issues_filtered_search_token_keys';
+import IssuableFilteredSearchTokenKeys from 'ee_else_ce/filtered_search/issuable_filtered_search_token_keys';
 import FilteredSearchContainer from '../filtered_search/container';
 import FilteredSearchManager from '../filtered_search/filtered_search_manager';
 import boardsStore from './stores/boards_store';
@@ -10,7 +10,7 @@ export default class FilteredSearchBoards extends FilteredSearchManager {
       isGroupDecendent: true,
       stateFiltersSelector: '.issues-state-filters',
       isGroup: true,
-      filteredSearchTokenKeys: IssuesFilteredSearchTokenKeysEE,
+      filteredSearchTokenKeys: IssuableFilteredSearchTokenKeys,
     });
 
     this.store = store;
