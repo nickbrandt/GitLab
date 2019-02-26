@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EE
   module StubConfiguration
     def stub_ee_application_setting(messages)
@@ -11,6 +13,16 @@ module EE
 
       # Ensure that we don't use the Markdown cache when stubbing these values
       allow_any_instance_of(EE::ApplicationSetting).to receive(:cached_html_up_to_date?).and_return(false)
+    end
+
+    def stub_application_setting_on_object(object, messages)
+      add_predicates(messages)
+
+      allow(::Gitlab::CurrentSettings.current_application_settings)
+        .to receive_messages(messages)
+      messages.each do |setting, value|
+        allow(object).to receive_message_chain(:current_application_settings, setting) { value }
+      end
     end
   end
 end
