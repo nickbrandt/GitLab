@@ -64,7 +64,7 @@ the choice to approve it or blacklist it.
 
 ![License approval decision](img/license_management_decision.png)
 
-### Manual license management
+### Project policies for license management
 
 > [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/5940)
 in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.4.
