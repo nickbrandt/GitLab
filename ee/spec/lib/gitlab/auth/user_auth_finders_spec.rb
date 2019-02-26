@@ -64,25 +64,4 @@ describe Gitlab::Auth::UserAuthFinders do
       it_behaves_like 'find user from job token'
     end
   end
-
-  describe '#find_user_from_scim_token' do
-    let(:token) { create(:personal_access_token, user: user) }
-
-    before do
-      allow(request).to receive(:path).and_return('/api/scim/')
-      allow(self).to receive(:current_request).and_return(request)
-    end
-
-    it "returns an Unauthorized exception for an invalid token" do
-      env['HTTP_AUTHORIZATION'] = "Bearer invalid"
-
-      expect { find_user_from_scim_token }.to raise_error(Gitlab::Auth::UnauthorizedError)
-    end
-
-    it "return user if token is valid" do
-      env['HTTP_AUTHORIZATION'] = "Bearer #{token.token}"
-
-      expect(find_user_from_scim_token).to eq(user)
-    end
-  end
 end
