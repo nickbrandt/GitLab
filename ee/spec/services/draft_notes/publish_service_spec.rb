@@ -74,6 +74,82 @@ describe DraftNotes::PublishService do
     end
   end
 
+  context 'draft notes with suggestions' do
+    let(:project) { create(:project, :repository) }
+    let(:merge_request) { create(:merge_request, source_project: project, target_project: project) }
+
+    let(:suggestion_note) do
+      <<-MARKDOWN.strip_heredoc
+        ```suggestion
+          foo
+        ```
+      MARKDOWN
+    end
+
+    let!(:draft) { create(:draft_note_on_text_diff, note: suggestion_note, merge_request: merge_request, author: user) }
+
+    it 'creates a suggestion with correct content' do
+      expect { publish(draft: draft) }.to change { Suggestion.count }.by(1)
+        .and change { DiffNote.count }.from(0).to(1)
+
+      suggestion = Suggestion.last
+
+      expect(suggestion.from_line).to eq(14)
+      expect(suggestion.to_line).to eq(14)
+      expect(suggestion.from_content).to eq("    vars = {\n")
+      expect(suggestion.to_content).to eq("  foo\n")
+    end
+
+    context 'when the diff is changed' do
+      let(:file_path) { 'files/ruby/popen.rb' }
+      let(:branch_name) { project.default_branch }
+      let(:commit) { project.repository.commit }
+
+      def update_file(file_path, new_content)
+        params = {
+          file_path: file_path,
+          commit_message: "Update File",
+          file_content: new_content,
+          start_project: project,
+          start_branch: project.default_branch,
+          branch_name: branch_name
+        }
+
+        Files::UpdateService.new(project, user, params).execute
+      end
+
+      before do
+        project.add_developer(user)
+      end
+
+      it 'creates a suggestion based on the latest diff content and positions' do
+        diff_file = merge_request.diffs(paths: [file_path]).diff_files.first
+        raw_data = diff_file.new_blob.data
+
+        # Add a line break to the beginning of the file
+        result = update_file(file_path, raw_data.prepend("\n"))
+        oldrev = merge_request.diff_head_sha
+        newrev = result[:result]
+
+        expect(newrev).to be_present
+
+        # Generates new MR revision at DB level
+        refresh = MergeRequests::RefreshService.new(project, user)
+        refresh.execute(oldrev, newrev, merge_request.source_branch_ref)
+
+        expect { publish(draft: draft) }.to change { Suggestion.count }.by(1)
+          .and change { DiffNote.count }.from(0).to(1)
+
+        suggestion = Suggestion.last
+
+        expect(suggestion.from_line).to eq(15)
+        expect(suggestion.to_line).to eq(15)
+        expect(suggestion.from_content).to eq("    vars = {\n")
+        expect(suggestion.to_content).to eq("  foo\n")
+      end
+    end
+  end
+
   it 'only publishes the draft notes belonging to the current user' do
     other_user = create(:user)
     project.add_maintainer(other_user)
