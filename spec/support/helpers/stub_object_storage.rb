@@ -1,8 +1,4 @@
-require_relative '../../../ee/spec/support/helpers/ee/stub_object_storage'
-
 module StubObjectStorage
-  prepend EE::StubObjectStorage
-
   def stub_object_storage_uploader(
         config:,
         uploader:,
@@ -78,9 +74,6 @@ module StubObjectStorage
         </InitiateMultipartUploadResult>
       EOS
   end
-
-  def stub_object_storage_pseudonymizer
-    stub_object_storage(connection_params: Pseudonymizer::Uploader.object_store_credentials,
-                        remote_directory: Pseudonymizer::Uploader.remote_directory)
-  end
 end
+
+StubObjectStorage.prepend(EE::StubObjectStorage)

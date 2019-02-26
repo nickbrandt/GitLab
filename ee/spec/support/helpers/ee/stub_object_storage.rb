@@ -7,5 +7,10 @@ module EE
                                    remote_directory: 'packages',
                                    **params)
     end
+
+    def stub_object_storage_pseudonymizer
+      stub_object_storage(connection_params: Pseudonymizer::Uploader.object_store_credentials,
+                          remote_directory: Pseudonymizer::Uploader.remote_directory)
+    end
   end
 end
