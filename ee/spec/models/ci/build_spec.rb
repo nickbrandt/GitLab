@@ -75,8 +75,8 @@ describe Ci::Build do
     subject { job.variables }
 
     context 'when environment specific variable is defined' do
-      let(:environment_varialbe) do
-        { key: 'ENV_KEY', value: 'environment', public: false }
+      let(:environment_variable) do
+        { key: 'ENV_KEY', value: 'environment', public: false, masked: false }
       end
 
       before do
@@ -85,7 +85,7 @@ describe Ci::Build do
 
         variable =
           build(:ci_variable,
-                environment_varialbe.slice(:key, :value)
+                environment_variable.slice(:key, :value)
                   .merge(project: project, environment_scope: 'stag*'))
 
         variable.save!
@@ -96,7 +96,7 @@ describe Ci::Build do
           stub_licensed_features(variable_environment_scope: true)
         end
 
-        it { is_expected.to include(environment_varialbe) }
+        it { is_expected.to include(environment_variable) }
       end
 
       context 'when variable environment scope is not available' do
@@ -104,12 +104,12 @@ describe Ci::Build do
           stub_licensed_features(variable_environment_scope: false)
         end
 
-        it { is_expected.not_to include(environment_varialbe) }
+        it { is_expected.not_to include(environment_variable) }
       end
 
       context 'when there is a plan for the group' do
         it 'GITLAB_FEATURES should include the features for that plan' do
-          is_expected.to include({ key: 'GITLAB_FEATURES', value: anything, public: true })
+          is_expected.to include({ key: 'GITLAB_FEATURES', value: anything, public: true, masked: false })
           features_variable = subject.find { |v| v[:key] == 'GITLAB_FEATURES' }
           expect(features_variable[:value]).to include('multiple_ldap_servers')
         end

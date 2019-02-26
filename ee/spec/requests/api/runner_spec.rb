@@ -46,7 +46,7 @@ describe API::Runner, :clean_gitlab_redis_shared_state do
             expect(response).to have_http_status(:created)
             expect(json_response).to include(
               "id" => build.id,
-              "variables" => include("key" => 'KEY', "value" => 'value', "public" => true),
+              "variables" => include("key" => 'KEY', "value" => 'value', "public" => true, "masked" => false),
               "image" => a_hash_including("name" => 'ruby'),
               "services" => all(a_hash_including("name" => 'mysql')),
               "job_info" => a_hash_including("name" => 'terminal', "stage" => 'terminal'))
