@@ -11,6 +11,22 @@ describe GroupSamlIdentityFinder do
 
   subject { described_class.new(user: user) }
 
+  describe ".find_by_group_and_uid" do
+    it "finds identity matching user and group" do
+      expect(described_class.find_by_group_and_uid(group: group, uid: identity.extern_uid)).to eq(identity)
+    end
+
+    it "returns nil when no saml_provider exists" do
+      group.saml_provider.destroy!
+
+      expect(described_class.find_by_group_and_uid(group: group, uid: identity.extern_uid)).to eq(nil)
+    end
+
+    it "returns nil when group is nil" do
+      expect(described_class.find_by_group_and_uid(group: nil, uid: identity.extern_uid)).to eq(nil)
+    end
+  end
+
   describe "#find_linked" do
     it "finds identity matching user and group" do
       expect(subject.find_linked(group: group)).to eq(identity)
