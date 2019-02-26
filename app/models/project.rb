@@ -160,6 +160,7 @@ class Project < ActiveRecord::Base
   has_one :pushover_service
   has_one :jira_service
   has_one :redmine_service
+  has_one :youtrack_service
   has_one :custom_issue_tracker_service
   has_one :bugzilla_service
   has_one :gitlab_issue_tracker_service, inverse_of: :project
@@ -1838,7 +1839,7 @@ class Project < ActiveRecord::Base
   # Set repository as writable again
   def set_repository_writable!
     with_lock do
-      update_column(repository_read_only, false)
+      update_column(:repository_read_only, false)
     end
   end
 
@@ -1923,6 +1924,14 @@ class Project < ActiveRecord::Base
 
   def renamed?
     persisted? && path_changed?
+  end
+
+  def human_merge_method
+    if merge_method == :ff
+      'Fast-forward'
+    else
+      merge_method.to_s.humanize
+    end
   end
 
   def merge_method
