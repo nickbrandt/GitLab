@@ -1,7 +1,12 @@
 import Vue from 'vue';
 import relatedIssuesBlock from 'ee/related_issues/components/related_issues_block.vue';
-
-import { issuable1, issuable2, issuable3, issuable4, issuable5 } from '../mock_data';
+import {
+  issuable1,
+  issuable2,
+  issuable3,
+  issuable4,
+  issuable5,
+} from 'spec/vue_shared/components/issue/related_issuable_mock_data';
 
 describe('RelatedIssuesBlock', () => {
   let RelatedIssuesBlock;

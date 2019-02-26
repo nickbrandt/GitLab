@@ -1,7 +1,7 @@
 import Vue from 'vue';
-import issueItem from 'ee/related_issues/components/issue_item.vue';
+import issueItem from '~/vue_shared/components/issue/related_issuable_item.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
-import { defaultMilestone, defaultAssignees } from '../mock_data';
+import { defaultMilestone, defaultAssignees } from './related_issuable_mock_data';
 
 describe('issueItem', () => {
   let vm;

@@ -2,8 +2,11 @@ import Vue from 'vue';
 import _ from 'underscore';
 import relatedIssuesRoot from 'ee/related_issues/components/related_issues_root.vue';
 import relatedIssuesService from 'ee/related_issues/services/related_issues_service';
-
-import { defaultProps, issuable1, issuable2 } from '../mock_data';
+import {
+  defaultProps,
+  issuable1,
+  issuable2,
+} from 'spec/vue_shared/components/issue/related_issuable_mock_data';
 
 describe('RelatedIssuesRoot', () => {
   let RelatedIssuesRoot;

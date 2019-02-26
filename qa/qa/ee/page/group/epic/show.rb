@@ -17,7 +17,7 @@ module QA
               element :add_issue_button
             end
 
-            view 'ee/app/assets/javascripts/related_issues/components/issue_item.vue' do
+            view 'app/assets/javascripts/vue_shared/components/issue/related_issuable_item.vue' do
               element :remove_issue_button
             end
 

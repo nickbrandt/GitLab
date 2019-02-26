@@ -175,7 +175,7 @@ export default {
               class="js-related-issues-header-issue-count related-issues-header-issue-count issue-count-badge mx-1"
             >
               <span class="issue-count-badge-count">
-                <icon :name="issuableTypeIcon" class="mr-1 text-secondary"/>
+                <icon :name="issuableTypeIcon" class="mr-1 text-secondary" />
                 {{ badgeLabel }}
               </span>
             </div>
@@ -223,7 +223,11 @@ export default {
         class="related-issues-token-body"
       >
         <div v-if="isFetching" class="related-issues-loading-icon qa-related-issues-loading-icon">
-          <gl-loading-icon ref="loadingIcon" label="Fetching related issues" class="prepend-top-5"/>
+          <gl-loading-icon
+            ref="loadingIcon"
+            label="Fetching related issues"
+            class="prepend-top-5"
+          />
         </div>
         <ul ref="list" :class="{ 'content-list': !canReorder }" class="related-items-list">
           <li
@@ -258,15 +262,15 @@ export default {
             >
               <issue-weight
                 v-if="issue.weight"
-                :weight="issue.weight"
                 slot="weight"
+                :weight="issue.weight"
                 class="item-weight d-flex align-items-center"
                 tag-name="span"
               />
               <issue-due-date
                 v-if="issue.due_date"
-                :date="issue.due_date"
                 slot="dueDate"
+                :date="issue.due_date"
                 tooltip-placement="top"
                 css-class="item-due-date d-flex align-items-center"
               />

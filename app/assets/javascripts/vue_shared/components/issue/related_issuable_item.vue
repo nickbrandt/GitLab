@@ -89,8 +89,8 @@ export default {
             :milestone="milestone"
             class="d-flex align-items-center item-milestone"
           />
-          <slot name="dueDate"/>
-          <slot name="weight"/>
+          <slot name="dueDate"></slot>
+          <slot name="weight"></slot>
         </div>
         <issue-assignees
           v-if="assignees.length"
@@ -110,7 +110,7 @@ export default {
       aria-label="Remove"
       @click="onRemoveRequest"
     >
-      <icon :size="16" class="btn-item-remove-icon" name="close"/>
+      <icon :size="16" class="btn-item-remove-icon" name="close" />
     </button>
   </div>
 </template>
