@@ -115,9 +115,13 @@ describe Geo::RepositoryShardSyncWorker, :geo, :delete, :clean_gitlab_redis_cach
       end
     end
 
-    context 'when node has namespace restrictions' do
+    context 'when node has namespace restrictions', :request_store do
       before do
         secondary.update!(selective_sync_type: 'namespaces', namespaces: [restricted_group])
+
+        allow(::Gitlab::Geo).to receive(:current_node).and_call_original
+        Rails.cache.write(:current_node, secondary.to_json)
+        allow(::GeoNode).to receive(:current_node).and_return(secondary)
       end
 
       it 'does not perform Geo::ProjectSyncWorker for projects that do not belong to selected namespaces to replicate' do
