@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-class Admin::Geo::ProjectsController < Admin::ApplicationController
-  before_action :check_license
+class Admin::Geo::ProjectsController < Admin::Geo::ApplicationController
+  before_action :check_license!
   before_action :load_registry, except: [:index]
   before_action :limited_actions_message!
-
-  helper ::EE::GeoHelper
 
   def index
     finder = ::Geo::ProjectRegistryStatusFinder.new
@@ -69,12 +67,6 @@ class Admin::Geo::ProjectsController < Admin::ApplicationController
   end
 
   private
-
-  def check_license
-    unless Gitlab::Geo.license_allows?
-      redirect_to admin_license_path, alert: s_('Geo|You need a different license to use Geo replication')
-    end
-  end
 
   def load_registry
     @registry = ::Geo::ProjectRegistry.find_by_id(params[:id])
