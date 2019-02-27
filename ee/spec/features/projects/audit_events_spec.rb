@@ -114,4 +114,8 @@ describe 'Projects > Audit Events', :js do
       end
     end
   end
+
+  it_behaves_like 'audit event contains custom message' do
+    let(:audit_events_url) { project_audit_events_path(project) }
+  end
 end
