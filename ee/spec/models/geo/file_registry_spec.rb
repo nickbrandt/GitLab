@@ -6,13 +6,13 @@ describe Geo::FileRegistry do
 
   describe '.failed' do
     it 'returns registries in the failed state' do
-      expect(described_class.failed).to contain_exactly(failed)
+      expect(described_class.failed).to match_ids(failed)
     end
   end
 
   describe '.synced' do
     it 'returns registries in the synced state' do
-      expect(described_class.synced).to contain_exactly(synced)
+      expect(described_class.synced).to match_ids(synced)
     end
   end
 
@@ -21,7 +21,7 @@ describe Geo::FileRegistry do
     set(:retry_tomorrow) { create(:geo_file_registry, retry_at: Date.tomorrow) }
 
     it 'returns registries in the synced state' do
-      expect(described_class.retry_due).not_to contain_exactly([retry_tomorrow])
+      expect(described_class.retry_due).to match_ids([failed, synced, retry_yesterday])
     end
   end
 end
