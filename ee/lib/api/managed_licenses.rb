@@ -4,7 +4,7 @@ module API
   class ManagedLicenses < Grape::API
     include PaginationParams
 
-    before { authenticate! }
+    before { authenticate! unless route.settings[:skip_authentication] }
 
     helpers do
       # Make the software license policy specified by id in the request available
@@ -31,6 +31,7 @@ module API
       desc 'Get project software license policies' do
         success Entities::ManagedLicense
       end
+      route_setting :skip_authentication, true
       params do
         use :pagination
       end

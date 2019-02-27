@@ -124,8 +124,8 @@ export default {
       const nextItemEl = itemEl.nextElementSibling;
 
       return {
-        beforeId: prevItemEl && parseInt(prevItemEl.dataset.epicIssueId, 0),
-        afterId: nextItemEl && parseInt(nextItemEl.dataset.epicIssueId, 0),
+        beforeId: prevItemEl && parseInt(prevItemEl.dataset.orderingId, 0),
+        afterId: nextItemEl && parseInt(nextItemEl.dataset.orderingId, 0),
       };
     },
     reordered(event) {
@@ -146,6 +146,9 @@ export default {
     },
     removeDraggingCursor() {
       document.body.classList.remove('is-dragging');
+    },
+    issuableOrderingId({ epic_issue_id: epicIssueId, id }) {
+      return this.issuableType === 'issue' ? epicIssueId : id;
     },
   },
 };
@@ -231,7 +234,7 @@ export default {
               'card-slim': canReorder,
             }"
             :data-key="issue.id"
-            :data-epic-issue-id="issue.epic_issue_id"
+            :data-ordering-id="issuableOrderingId(issue)"
             class="js-related-issues-token-list-item list-item pt-0 pb-0"
           >
             <issue-item

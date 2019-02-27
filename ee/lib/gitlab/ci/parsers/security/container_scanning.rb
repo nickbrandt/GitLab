@@ -67,10 +67,7 @@ module Gitlab
                   'url' => vulnerability['link']
                 }
               ],
-              'links' => [{ 'url' => vulnerability['link'] }],
-              'priority' => 'Unknown',
-              'url' => vulnerability['link'],
-              'tool' => 'clair'
+              'links' => [{ 'url' => vulnerability['link'] }]
             }
           end
 

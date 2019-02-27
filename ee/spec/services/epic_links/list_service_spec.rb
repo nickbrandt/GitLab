@@ -7,8 +7,8 @@ describe EpicLinks::ListService, :postgresql do
   let(:group) { create(:group, :public) }
   let(:parent_epic) { create(:epic, group: group) }
 
-  let!(:epic1) { create :epic, group: group, parent: parent_epic }
-  let!(:epic2) { create :epic, group: group, parent: parent_epic }
+  let!(:epic1) { create :epic, group: group, parent: parent_epic, relative_position: 1 }
+  let!(:epic2) { create :epic, group: group, parent: parent_epic, relative_position: 2 }
 
   def epics_to_results(epics)
     epics.map do |epic|
@@ -47,22 +47,22 @@ describe EpicLinks::ListService, :postgresql do
         it 'returns related issues JSON' do
           expected_result = epics_to_results([epic1, epic2])
 
-          expect(subject).to match_array(expected_result)
+          expect(subject).to eq(expected_result)
         end
       end
 
       context 'with nested groups' do
         let(:subgroup1) { create(:group, :private, parent: group) }
         let(:subgroup2) { create(:group, :private, parent: group) }
-        let!(:epic_subgroup1) { create :epic, group: subgroup1, parent: parent_epic }
-        let!(:epic_subgroup2) { create :epic, group: subgroup2, parent: parent_epic }
+        let!(:epic_subgroup1) { create :epic, group: subgroup1, parent: parent_epic, relative_position: 10 }
+        let!(:epic_subgroup2) { create :epic, group: subgroup2, parent: parent_epic, relative_position: 5 }
 
         it 'returns all child epics for a group member' do
           group.add_developer(user)
 
-          expected_result = epics_to_results([epic1, epic2, epic_subgroup1, epic_subgroup2])
+          expected_result = epics_to_results([epic1, epic2, epic_subgroup2, epic_subgroup1])
 
-          expect(subject).to match_array(expected_result)
+          expect(subject).to eq(expected_result)
         end
 
         it 'returns only some child epics for a subgroup member' do
@@ -70,7 +70,7 @@ describe EpicLinks::ListService, :postgresql do
 
           expected_result = epics_to_results([epic1, epic2, epic_subgroup2])
 
-          expect(subject).to match_array(expected_result)
+          expect(subject).to eq(expected_result)
         end
       end
     end

@@ -14,8 +14,15 @@ module EpicLinks
       affected_epics = [issuable]
       affected_epics << referenced_epic if referenced_epic.parent
 
-      referenced_epic.update(parent: issuable)
+      set_child_epic!(referenced_epic)
+
       affected_epics.each(&:update_start_and_due_dates)
+    end
+
+    def set_child_epic!(child_epic)
+      child_epic.parent = issuable
+      child_epic.move_to_start
+      child_epic.save!
     end
 
     def linkable_issuables(epics)

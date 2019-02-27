@@ -74,12 +74,9 @@ describe Gitlab::Ci::Parsers::Security::ContainerScanning do
         },
         'links' => [{ 'url' => 'https://security-tracker.debian.org/tracker/CVE-2017-18269' }],
         'description' => 'SSE2-optimized memmove implementation problem.',
-        'priority' => 'Unknown',
         'scanner' => { 'id' => 'clair', 'name' => 'Clair' },
         'severity' => 'critical',
-        'solution' => 'Upgrade glibc from 2.24-11+deb9u3 to 2.24-11+deb9u4',
-        'tool' => 'clair',
-        'url' => 'https://security-tracker.debian.org/tracker/CVE-2017-18269'
+        'solution' => 'Upgrade glibc from 2.24-11+deb9u3 to 2.24-11+deb9u4'
       } )
     end
   end

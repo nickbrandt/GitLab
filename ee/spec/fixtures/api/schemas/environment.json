@@ -17,6 +17,9 @@
         "name": {
             "type": "string"
         },
+        "name_without_type": {
+          "type": "string"
+        },
         "state": {
             "type": "string"
         },

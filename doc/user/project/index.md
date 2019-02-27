@@ -8,7 +8,7 @@ Your projects can be [available](../../public_access/public_access.md)
 publicly, internally, or privately, at your choice. GitLab does not limit
 the number of private projects you create.
 
-## Project's features
+## Project features
 
 When you create a project in GitLab, you'll have access to a large number of
 [features](https://about.gitlab.com/features/):
@@ -96,7 +96,7 @@ When you create a project in GitLab, you'll have access to a large number of
 - [Code owners](code_owners.md): specify code owners for certain files **[STARTER]**
 - [License Management](merge_requests/license_management.md): approve and blacklist licenses for projects. **[ULTIMATE]**
 
-### Project's integrations
+### Project integrations
 
 [Integrate your project](integrations/index.md) with Jira, Mattermost,
 Kubernetes, Slack, and a lot more.
@@ -137,7 +137,7 @@ as a CI/CD project.
 
 Read through the documentation on [CI/CD for external repositories](../../ci/ci_cd_for_external_repos/index.md).
 
-## Project's members
+## Project members
 
 Learn how to [add members to your projects](members/index.md).
 
@@ -191,3 +191,23 @@ password <personal_access_token>
 
 To quickly access a project from the GitLab UI using the project ID,
 visit the `/projects/:id` URL in your browser or other tool accessing the project.
+
+## Project APIs
+
+There are numerous [APIs](../../api/README.md) to use with your projects:
+
+- [Badges](../../api/project_badges.md)
+- [Clusters](../../api/project_clusters.md)
+- [Discussions](../../api/discussions.md)
+- [General](../../api/projects.md)
+- [Import/export](../../api/project_import_export.md)
+- [Issue Board](../../api/boards.md)
+- [Labels](../../api/labels.md)
+- [Markdown](../../api/markdown.md)
+- [Merge Requests](../../api/merge_requests.md)
+- [Milestones](../../api/milestones.md)
+- [Services](../../api/services.md)
+- [Snippets](../../api/project_snippets.md)
+- [Templates](../../api/project_templates.md)
+- [Traffic](../../api/project_statistics.md)
+- [Variables](../../api/project_level_variables.md)

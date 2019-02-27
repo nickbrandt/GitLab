@@ -98,6 +98,61 @@ describe Groups::EpicLinksController, :postgresql do
     end
   end
 
+  describe 'PUT #update' do
+    before do
+      epic1.update(parent: parent_epic)
+      epic2.update(parent: parent_epic)
+    end
+
+    let(:move_before_epic) { epic2 }
+
+    subject do
+      put :update, params: { group_id: group, epic_id: parent_epic.to_param, id: epic1.id, epic: { move_before_id: move_before_epic.id } }
+    end
+
+    it_behaves_like 'unlicensed epics action'
+
+    context 'when epics are enabled' do
+      before do
+        stub_licensed_features(epics: true)
+      end
+
+      context 'when user has permissions to reorder epics' do
+        before do
+          group.add_developer(user)
+        end
+
+        it 'returns status 200' do
+          subject
+
+          expect(response).to have_gitlab_http_status(200)
+        end
+
+        it 'updates the epic position' do
+          expect { subject }.to change { epic1.reload.relative_position }
+        end
+
+        context 'when move_before_id is not a sibling epic' do
+          let(:move_before_epic) { create(:epic, group: group) }
+
+          it 'returns status 404' do
+            subject
+
+            expect(response).to have_gitlab_http_status(404)
+          end
+        end
+      end
+
+      context 'when user does not have permissions to reorder epics' do
+        it 'returns status 403' do
+          subject
+
+          expect(response).to have_gitlab_http_status(403)
+        end
+      end
+    end
+  end
+
   describe 'DELETE #destroy' do
     before do
       epic1.update(parent: parent_epic)
