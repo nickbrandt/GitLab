@@ -57,6 +57,7 @@ describe 'Project > Members > Invite group and members', :js do
 
       before do
         project.add_maintainer(maintainer)
+        group_to_share_with.add_developer(maintainer)
         sign_in(maintainer)
       end
 
