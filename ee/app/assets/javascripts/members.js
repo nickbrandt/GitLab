@@ -27,7 +27,7 @@ export default class MembersEE extends Members {
       $toggle.disable();
       $dateInput.disable();
 
-      this.overrideLdap($memberListItem, $link.data('endpoint'), false).catch(() => {
+      MembersEE.overrideLdap($memberListItem, $link.data('endpoint'), false).catch(() => {
         $toggle.enable();
         $dateInput.enable();
       });
