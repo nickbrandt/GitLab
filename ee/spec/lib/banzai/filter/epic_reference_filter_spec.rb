@@ -69,6 +69,12 @@ describe Banzai::Filter::EpicReferenceFilter do
       expect(doc(text).to_s).to eq(ERB::Util.html_escape_once(text))
     end
 
+    it 'ignores out of range epic IDs' do
+      text = "Check &1161452270761535925900804973910297"
+
+      expect(doc(text).to_s).to eq(ERB::Util.html_escape_once(text))
+    end
+
     it 'does not process links containing epic numbers followed by text' do
       href = "#{reference}st"
       link = doc("<a href='#{href}'></a>").css('a').first.attr('href')
