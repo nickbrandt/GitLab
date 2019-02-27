@@ -33,10 +33,10 @@ describe Epic do
   end
 
   describe 'ordering' do
-    let!(:epic1) { create(:epic, start_date: 7.days.ago, end_date: 3.days.ago, updated_at: 3.days.ago, created_at: 7.days.ago) }
-    let!(:epic2) { create(:epic, start_date: 3.days.ago, updated_at: 10.days.ago, created_at: 12.days.ago) }
-    let!(:epic3) { create(:epic, end_date: 5.days.ago, updated_at: 5.days.ago, created_at: 6.days.ago) }
-    let!(:epic4) { create(:epic) }
+    let!(:epic1) { create(:epic, start_date: 7.days.ago, end_date: 3.days.ago, updated_at: 3.days.ago, created_at: 7.days.ago, relative_position: 3) }
+    let!(:epic2) { create(:epic, start_date: 3.days.ago, updated_at: 10.days.ago, created_at: 12.days.ago, relative_position: 1) }
+    let!(:epic3) { create(:epic, end_date: 5.days.ago, updated_at: 5.days.ago, created_at: 6.days.ago, relative_position: 2) }
+    let!(:epic4) { create(:epic, relative_position: 4) }
 
     def epics(order_by)
       described_class.order_by(order_by)
@@ -76,6 +76,10 @@ describe Epic do
 
     it 'orders by created_at DESC' do
       expect(epics(:created_desc)).to eq([epic4, epic3, epic1, epic2])
+    end
+
+    it 'orders by relative_position ASC' do
+      expect(epics(:relative_position)).to eq([epic2, epic3, epic1, epic4])
     end
   end
 

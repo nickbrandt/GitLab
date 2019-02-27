@@ -73,9 +73,9 @@ These are dynamic dates in that if milestones are re-assigned to the issues, if 
 milestone dates change, or if issues are added or removed from the epic, then
 the re-calculation will happen immediately to set a new dynamic date.
 
-## Reordering issues in an epic
+## Reordering issues and child epics
 
-Drag and drop to reorder issues in an epic. New issues added to an epic appear at the top of the list.
+Drag and drop to reorder issues and child epics. New issues and child epics added to an epic appear at the top of the list.
 
 ## Deleting an epic
 
