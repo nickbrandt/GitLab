@@ -168,9 +168,6 @@ msgstr ""
 msgid "%{firstLabel} +%{labelCount} more"
 msgstr ""
 
-msgid "%{firstOption} +%{extraOptionCount} more"
-msgstr ""
-
 msgid "%{group_docs_link_start}Groups%{group_docs_link_end} allow you to manage and collaborate across multiple projects. Members of a group have access to all of its projects."
 msgstr ""
 
@@ -249,6 +246,9 @@ msgid "+ %{count} more"
 msgstr ""
 
 msgid "+ %{moreCount} more"
+msgstr ""
+
+msgid "+%{extraOptionCount} more"
 msgstr ""
 
 msgid ", or "
@@ -11462,6 +11462,9 @@ msgid "ciReport|Code quality"
 msgstr ""
 
 msgid "ciReport|Confidence"
+msgstr ""
+
+msgid "ciReport|Container Scanning"
 msgstr ""
 
 msgid "ciReport|Container scanning"
