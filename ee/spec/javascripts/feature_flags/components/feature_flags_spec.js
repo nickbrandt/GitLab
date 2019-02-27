@@ -198,7 +198,7 @@ describe('Feature Flags', () => {
         it('should make an API request when page is clicked', done => {
           spyOn(component, 'updateFeatureFlagOptions');
           setTimeout(() => {
-            component.$el.querySelector('.gl-pagination li:nth-child(5) a').click();
+            component.$el.querySelector('.gl-pagination li:nth-child(5) .page-link').click();
 
             expect(component.updateFeatureFlagOptions).toHaveBeenCalledWith({
               scope: 'all',
