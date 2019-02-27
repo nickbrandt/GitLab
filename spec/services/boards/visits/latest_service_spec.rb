@@ -25,7 +25,7 @@ describe Boards::Visits::LatestService do
       end
 
       it 'queries for last N visits' do
-        expect(BoardProjectRecentVisit).to receive(:latest).with(user, project, 5).once
+        expect(BoardProjectRecentVisit).to receive(:latest).with(user, project, count: 5).once
 
         described_class.new(project_board.parent, user, count: 5).execute
       end
@@ -50,7 +50,7 @@ describe Boards::Visits::LatestService do
       end
 
       it 'queries for last N visits' do
-        expect(BoardGroupRecentVisit).to receive(:latest).with(user, group, 5).once
+        expect(BoardGroupRecentVisit).to receive(:latest).with(user, group, count: 5).once
 
         described_class.new(group_board.parent, user, count: 5).execute
       end

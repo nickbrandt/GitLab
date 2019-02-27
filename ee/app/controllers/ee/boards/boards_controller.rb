@@ -12,6 +12,13 @@ module EE
         before_action :authorize_admin_board!, only: [:create, :update, :destroy]
       end
 
+      def recent
+        recent_visits = ::Boards::Visits::LatestService.new(parent, current_user, count: 5).execute
+        recent_boards = recent_visits.map(&:board)
+
+        render json: serialize_as_json(recent_boards)
+      end
+
       def create
         board = ::Boards::CreateService.new(parent, current_user, board_params).execute
 

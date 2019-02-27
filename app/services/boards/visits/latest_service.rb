@@ -6,13 +6,7 @@ module Boards
       def execute
         return nil unless current_user
 
-        relation = recent_visit_model
-
-        if params[:count] && params[:count] > 1
-          relation = relation.preload(:board)
-        end
-
-        relation.latest(current_user, parent, params[:count])
+        recent_visit_model.latest(current_user, parent, count: params[:count])
       end
 
       private

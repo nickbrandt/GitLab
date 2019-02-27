@@ -50,21 +50,25 @@ describe BoardGroupRecentVisit do
   end
 
   describe '#latest' do
+    def create_visit(time)
+      create :board_group_recent_visit, group: group, user: user, updated_at: time
+    end
+
     it 'returns the most recent visited' do
-      create :board_group_recent_visit, group: group, user: user, updated_at: 7.days.ago
-      create :board_group_recent_visit, group: group, user: user, updated_at: 5.days.ago
-      recent = create :board_group_recent_visit, group: group, user: user, updated_at: 1.day.ago
+      create_visit(7.days.ago)
+      create_visit(5.days.ago)
+      recent = create_visit(1.day.ago)
 
       expect(described_class.latest(user, group)).to eq recent
     end
 
     it 'returns last 3 visited boards' do
-      create :board_group_recent_visit, group: group, user: user, updated_at: 7.days.ago
-      visit1 = create :board_group_recent_visit, group: group, user: user, updated_at: 3.days.ago
-      visit2 = create :board_group_recent_visit, group: group, user: user, updated_at: 2.days.ago
-      visit3 = create :board_group_recent_visit, group: group, user: user, updated_at: 5.days.ago
+      create_visit(7.days.ago)
+      visit1 = create_visit(3.days.ago)
+      visit2 = create_visit(2.days.ago)
+      visit3 = create_visit(5.days.ago)
 
-      expect(described_class.latest(user, group, 3)).to eq([visit2, visit1, visit3])
+      expect(described_class.latest(user, group, count: 3)).to eq([visit2, visit1, visit3])
     end
   end
 end
