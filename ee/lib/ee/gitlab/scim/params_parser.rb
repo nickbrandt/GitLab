@@ -10,7 +10,7 @@ module EE
         ATTRIBUTE_MAP = {
           id: :extern_uid,
           'name.formatted': :name,
-          'emails[type eq "work".value': :mail,
+          'emails[type eq "work".value': :email,
           active: :active
         }.with_indifferent_access
 
