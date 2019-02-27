@@ -38,7 +38,7 @@ describe Ci::ProcessPipelineService, '#execute' do
       expect(downstream.ci_pipelines.first).to be_pending
       expect(downstream.builds).not_to be_empty
       expect(downstream.builds.first.variables)
-        .to include(key: 'BRIDGE', value: 'cross', public: false)
+        .to include(key: 'BRIDGE', value: 'cross', public: false, masked: false)
     end
   end
 
