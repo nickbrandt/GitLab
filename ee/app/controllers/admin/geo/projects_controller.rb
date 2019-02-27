@@ -6,8 +6,6 @@ class Admin::Geo::ProjectsController < Admin::Geo::ApplicationController
   before_action :limited_actions_message!
 
   def index
-    finder = ::Geo::ProjectRegistryStatusFinder.new
-
     @registries = case params[:sync_status]
                   when 'never'
                     finder.never_synced_projects.page(params[:page])
@@ -74,5 +72,9 @@ class Admin::Geo::ProjectsController < Admin::Geo::ApplicationController
 
   def redirect_back_or_admin_geo_projects(params)
     redirect_back_or_default(default: admin_geo_projects_path, options: params)
+  end
+
+  def finder
+    @finder ||= ::Geo::ProjectRegistryStatusFinder.new
   end
 end
