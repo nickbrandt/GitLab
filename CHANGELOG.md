@@ -2,7 +2,7 @@
 documentation](doc/development/changelog.md) for instructions on adding your own
 entry.
 
-## 11.7.5 (2019-02-05)
+## 11.7.5 (2019-02-06)
 
 ### Fixed (8 changes)
 
@@ -28,6 +28,33 @@ entry.
 - No changes.
 
 ## 11.7.2 (2019-01-29)
+
+### Security (24 changes)
+
+- Make potentially malicious links more visible in the UI and scrub RTLO chars from links. !2770
+- Don't process MR refs for guests in the notes. !2771
+- Sanitize user full name to clean up any URL to prevent mail clients from auto-linking URLs. !2828
+- Fixed XSS content in KaTex links.
+- Disallows unauthorized users from accessing the pipelines section.
+- Verify that LFS upload requests are genuine.
+- Extract GitLab Pages using RubyZip.
+- Prevent awarding emojis to notes whose parent is not visible to user.
+- Prevent unauthorized replies when discussion is locked or confidential.
+- Disable git v2 protocol temporarily.
+- Fix showing ci status for guest users when public pipline are not set.
+- Fix contributed projects info still visible when user enable private profile.
+- Add subresources removal to member destroy service.
+- Add more LFS validations to prevent forgery.
+- Use common error for unauthenticated users when creating issues.
+- Fix slow regex in project reference pattern.
+- Fix private user email being visible in push (and tag push) webhooks.
+- Fix wiki access rights when external wiki is enabled.
+- Group guests are no longer able to see merge requests they don't have access to at group level.
+- Fix path disclosure on project import error.
+- Restrict project import visibility based on its group.
+- Expose CI/CD trigger token only to the trigger owner.
+- Notify only users who can access the project on project move.
+- Alias GitHub and BitBucket OAuth2 callback URLs.
 
 ### Fixed (1 change)
 
@@ -680,6 +707,7 @@ entry.
 - Fix a race condition intermittently breaking GitLab startup. !23028
 - Adds margin after a deleted branch name in the activity feed. !23038
 - Ignore environment validation failure. !23100
+- Fixes broken borders for reports section in MR widget.
 - Adds CI favicon back to jobs page.
 - Redirect to the pipeline builds page when a build is canceled. (Eva Kadlecova)
 - Fixed diff stats not showing when performance bar is enabled.
@@ -688,13 +716,12 @@ entry.
 - Fix bug causing not all emails to show up in commit email selectbox.
 - Remove duplicate escape in job sidebar.
 - Fixing styling issues on the scheduled pipelines page.
-- Fixes broken test in master.
 - Renders stuck block when runners are stuck.
 - Removes extra border from test reports in the merge request widget.
-- Fixes broken borders for reports section in MR widget.
 - Only render link to branch when branch still exists in pipeline page.
 - Fixed source project not filtering in merge request creation compare form.
 - Do not reload self on hooks when creating deployment.
+- Fixes broken test in master.
 
 ### Changed (38 changes, 12 of them are from the community)
 
