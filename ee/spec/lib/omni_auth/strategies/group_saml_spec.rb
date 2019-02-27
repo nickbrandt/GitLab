@@ -118,6 +118,15 @@ describe OmniAuth::Strategies::GroupSaml, type: :strategy do
         post '/users/auth/group_saml'
       end.to raise_error(ActionController::RoutingError)
     end
+
+    it "stores request ID during request phase" do
+      request_id = double
+      allow_any_instance_of(OneLogin::RubySaml::Authrequest).to receive(:uuid).and_return(request_id)
+
+      post '/users/auth/group_saml', group_path: 'my-group'
+
+      expect(session['last_authn_request_id']).to eq(request_id)
+    end
   end
 
   describe 'POST /users/auth/group_saml/metadata' do
