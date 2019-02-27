@@ -15,7 +15,7 @@
     word-wrap: break-word;
 
     &::after {
-      content: " ";
+      content: ' ';
       display: table;
       clear: both;
     }
@@ -173,7 +173,7 @@ ul.content-list {
       }
 
       .no-comments {
-        opacity: .5;
+        opacity: 0.5;
       }
     }
 
@@ -202,8 +202,6 @@ ul.content-list {
 // Content list using flexbox
 .flex-list {
   .flex-row {
-    display: -webkit-flex;
-    display: -ms-flexbox;
     display: flex;
     align-items: center;
     white-space: nowrap;
