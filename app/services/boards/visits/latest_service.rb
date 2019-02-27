@@ -6,11 +6,19 @@ module Boards
       def execute
         return nil unless current_user
 
-        if parent.is_a?(Group)
-          BoardGroupRecentVisit.latest(current_user, parent)
-        else
-          BoardProjectRecentVisit.latest(current_user, parent)
+        relation = recent_visit_model
+
+        if params[:count] && params[:count] > 1
+          relation = relation.preload(:board)
         end
+
+        relation.latest(current_user, parent, params[:count])
+      end
+
+      private
+
+      def recent_visit_model
+        parent.is_a?(Group) ? BoardGroupRecentVisit : BoardProjectRecentVisit
       end
     end
   end
