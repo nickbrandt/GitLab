@@ -3,8 +3,8 @@
 require 'spec_helper'
 
 describe ::EE::Gitlab::Scim::User do
-  let(:user) { create(:user) }
-  let(:identity) { create(:group_saml_identity, user: user) }
+  let(:user) { build(:user) }
+  let(:identity) { build(:group_saml_identity, user: user) }
 
   let(:entity) do
     described_class.new(identity)

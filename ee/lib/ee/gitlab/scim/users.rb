@@ -9,8 +9,7 @@ module EE
         expose :items_per_page, as: :itemsPerPage
         expose :start_index, as: :startIndex
 
-        present_collection true, :Resources
-        expose :resources, as: :Resources, using: ::EE::Gitlab::Scim::User
+        expose :resources, as: :Resources, using: ::EE::Gitlab::Scim::User #, if: ->(identity, _) { identity.present? }
 
         private
 
@@ -23,7 +22,7 @@ module EE
         end
 
         def total_results
-          1
+          resources.count
         end
 
         def items_per_page
@@ -35,9 +34,8 @@ module EE
         end
 
         # We only support a single resource at the moment
-        # Please update `total_results` to `resources.count` once this changes
         def resources
-          [object]
+          object.present? ? [object] : []
         end
       end
     end

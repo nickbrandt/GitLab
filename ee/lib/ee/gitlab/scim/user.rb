@@ -11,13 +11,14 @@ module EE
           identity.user.name
         end
 
-        present_collection true, :email
         expose :email_user, as: :emails, using: '::EE::Gitlab::Scim::Emails'
 
         private
 
+        DEFAULT_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:User'
+
         def schemas
-          ["urn:ietf:params:scim:schemas:core:2.0:User"]
+          [DEFAULT_SCHEMA]
         end
 
         def active
