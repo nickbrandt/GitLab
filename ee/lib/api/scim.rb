@@ -40,7 +40,9 @@ module API
           check_group_saml_configured
         end
 
-        desc 'Returns 200 if authenticated'
+        desc 'Get SAML users' do
+          detail 'This feature was introduced in GitLab 11.9.'
+        end
         get do
           group = find_group(params[:group])
 
@@ -54,6 +56,9 @@ module API
           present identity || {}, with: ::EE::Gitlab::Scim::Users
         end
 
+        desc 'Get a SAML user' do
+          detail 'This feature was introduced in GitLab 11.9.'
+        end
         get ':id' do
           group = find_group(params[:group])
 
@@ -67,6 +72,9 @@ module API
         end
 
         # rubocop: disable CodeReuse/ActiveRecord
+        desc 'Updates a SAML user' do
+          detail 'This feature was introduced in GitLab 11.9.'
+        end
         patch ':id' do
           scim_error!(message: 'Missing ID') unless params[:id]
 
@@ -103,12 +111,13 @@ module API
         end
         # rubocop: enable CodeReuse/ActiveRecord
 
-        desc 'Removes a SAML user'
+        desc 'Removes a SAML user' do
+          detail 'This feature was introduced in GitLab 11.9.'
+        end
         delete ":id" do
           scim_error!(message: 'Missing ID') unless params[:id]
 
           group = find_group(params[:group])
-
           identity = GroupSamlIdentityFinder.find_by_group_and_uid(group: group, uid: params[:id])
 
           scim_not_found!(message: "Resource #{params[:id]} not found") unless identity
