@@ -25,6 +25,34 @@ describe Groups::SsoController do
       expect(assigns[:group_name]).to eq 'our-group'
     end
 
+    it 'allows account unlinking' do
+      create(:group_saml_identity, saml_provider: saml_provider, user: user)
+
+      expect do
+        delete :unlink, params: { group_id: group }
+      end.to change(Identity, :count).by(-1)
+    end
+
+    context 'when SAML is disabled for the group' do
+      before do
+        saml_provider.update!(enabled: false)
+      end
+
+      it 'renders 404' do
+        get :saml, params: { group_id: group }
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+
+      it 'still allows account unlinking' do
+        create(:group_saml_identity, saml_provider: saml_provider, user: user)
+
+        expect do
+          delete :unlink, params: { group_id: group }
+        end.to change(Identity, :count).by(-1)
+      end
+    end
+
     context 'when user is not signed in' do
       it 'acts as route not found' do
         sign_out(user)
