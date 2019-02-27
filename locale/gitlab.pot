@@ -785,6 +785,9 @@ msgstr ""
 msgid "An error occurred fetching the approvers for the new rule."
 msgstr ""
 
+msgid "An error occurred fetching the dropdown data."
+msgstr ""
+
 msgid "An error occurred previewing the blob"
 msgstr ""
 
@@ -6507,6 +6510,9 @@ msgid "No %{providerTitle} repositories available to import"
 msgstr ""
 
 msgid "No Label"
+msgstr ""
+
+msgid "No Tag"
 msgstr ""
 
 msgid "No activities found"
