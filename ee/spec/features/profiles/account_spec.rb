@@ -20,7 +20,9 @@ describe 'Profile > Account' do
 
     def create_linked_identity
       oauth = { 'provider' => 'group_saml', 'uid' => '1' }
-      Gitlab::Auth::GroupSaml::IdentityLinker.new(user, oauth, saml_provider).link
+      identity_linker = Gitlab::Auth::GroupSaml::IdentityLinker.new(user, oauth, saml_provider, double(:session))
+      allow(identity_linker).to receive(:valid_gitlab_initated_request?).and_return(true)
+      identity_linker.link
     end
 
     before do

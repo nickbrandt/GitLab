@@ -34,6 +34,20 @@ module OmniAuth
         end
       end
 
+      # NOTE: This method duplicates code from omniauth-saml
+      #       so that we can access authn_request to store it
+      #       See: https://github.com/omniauth/omniauth-saml/issues/172
+      override :request_phase
+      def request_phase
+        authn_request = OneLogin::RubySaml::Authrequest.new
+
+        store_authn_request_id(authn_request)
+
+        with_settings do |settings|
+          redirect(authn_request.create(settings, additional_params_for_authn_request))
+        end
+      end
+
       def self.invalid_group!(path)
         raise ActionController::RoutingError, path
       end
@@ -50,6 +64,10 @@ module OmniAuth
 
       def metadata_enabled?
         Feature.enabled?(:group_saml_metadata_available)
+      end
+
+      def store_authn_request_id(authn_request)
+        Gitlab::Auth::SamlOriginValidator.new(session).store_origin(authn_request)
       end
 
       def group_lookup
