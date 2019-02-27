@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe API::ManagedLicenses do
   let(:project) do
-    create(:project).tap do |p|
+    create(:project, :public).tap do |p|
       @software_license_policy = create(:software_license_policy, project: p)
     end
   end
@@ -74,11 +74,30 @@ describe API::ManagedLicenses do
       end
     end
 
-    context 'unauthorized user' do
-      it 'does not return project managed licenses' do
+    context 'with unauthorized user' do
+      it 'returns project managed licenses for public project' do
         get api("/projects/#{project.id}/managed_licenses")
 
-        expect(response).to have_gitlab_http_status(401)
+        expect(response).to have_gitlab_http_status(200)
+        expect(response).to match_response_schema('managed_licenses', dir: 'ee')
+      end
+
+      it 'responses with 404 Not Found for not existing project' do
+        get api("/projects/0/managed_licenses")
+
+        expect(response).to have_gitlab_http_status(404)
+      end
+
+      context 'when project is private' do
+        before do
+          project.update!(visibility_level: 'private')
+        end
+
+        it 'responses with 404 Not Found' do
+          get api("/projects/#{project.id}/managed_licenses")
+
+          expect(response).to have_gitlab_http_status(404)
+        end
       end
     end
   end
