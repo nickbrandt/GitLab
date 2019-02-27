@@ -135,6 +135,7 @@ func TestScrubURLParams(t *testing.T) {
 		"?Signature=foo":                                                    "?Signature=[FILTERED]",
 		"?confirmation_password=foo":                                        "?confirmation_password=[FILTERED]",
 		"?pos_secret_number=foo":                                            "?pos_secret_number=[FILTERED]",
+		"?sharedSecret=foo":                                                 "?sharedSecret=[FILTERED]",
 		"?book_key=foo":                                                     "?book_key=[FILTERED]",
 		"?certificate=foo":                                                  "?certificate=[FILTERED]",
 		"?hook=foo":                                                         "?hook=[FILTERED]",
