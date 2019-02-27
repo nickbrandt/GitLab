@@ -249,7 +249,7 @@ entry.
 - Creates mixin to reduce code duplication between CE and EE in graph component.
 
 
-## 11.7.5 (2019-02-05)
+## 11.7.5 (2019-02-06)
 
 ### Fixed (8 changes)
 
@@ -484,13 +484,6 @@ entry.
 - Fix deprecation: returning false in Active Record and Active Model callbacks will not implicitly halt a callback chain. !24134 (Jasper Maes)
 - ActiveRecord::Migration -> ActiveRecord::Migration[5.0] for AddIndexesToCiBuildsAndPipelines. !24167 (Jasper Maes)
 - Update url placeholder for the sentry configuration page. !24338
-
-
-## 11.6.9 (2019-02-04)
-
-### Security (1 change)
-
-- Use sanitized user status message for user popover.
 
 
 ## 11.6.8 (2019-01-30)
@@ -998,6 +991,7 @@ entry.
 - Fix a race condition intermittently breaking GitLab startup. !23028
 - Adds margin after a deleted branch name in the activity feed. !23038
 - Ignore environment validation failure. !23100
+- Fixes broken borders for reports section in MR widget.
 - Adds CI favicon back to jobs page.
 - Redirect to the pipeline builds page when a build is canceled. (Eva Kadlecova)
 - Fixed diff stats not showing when performance bar is enabled.
@@ -1006,13 +1000,12 @@ entry.
 - Fix bug causing not all emails to show up in commit email selectbox.
 - Remove duplicate escape in job sidebar.
 - Fixing styling issues on the scheduled pipelines page.
-- Fixes broken test in master.
 - Renders stuck block when runners are stuck.
 - Removes extra border from test reports in the merge request widget.
-- Fixes broken borders for reports section in MR widget.
 - Only render link to branch when branch still exists in pipeline page.
 - Fixed source project not filtering in merge request creation compare form.
 - Do not reload self on hooks when creating deployment.
+- Fixes broken test in master.
 
 ### Changed (38 changes, 12 of them are from the community)
 
