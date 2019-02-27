@@ -1,10 +1,10 @@
 import Vue from 'vue';
-import issueItem from '~/vue_shared/components/issue/related_issuable_item.vue';
-import mountComponent from 'spec/helpers/vue_mount_component_helper';
+import { mount, createLocalVue } from '@vue/test-utils';
+import RelatedIssuableItem from '~/vue_shared/components/issue/related_issuable_item.vue';
 import { defaultMilestone, defaultAssignees } from './related_issuable_mock_data';
 
-describe('issueItem', () => {
-  let vm;
+describe('RelatedIssuableItem', () => {
+  let wrapper;
   const props = {
     idKey: 1,
     displayReference: 'gitlab-org/gitlab-test#1',
@@ -19,38 +19,50 @@ describe('issueItem', () => {
     assignees: defaultAssignees,
     eventNamespace: 'relatedIssue',
   };
+  const slots = {
+    dueDate: '<div class="js-due-date-slot"></div>',
+    weight: '<div class="js-weight-slot"></div>',
+  };
 
   beforeEach(() => {
-    const IssueItem = Vue.extend(issueItem);
-    vm = mountComponent(IssueItem, props);
+    const localVue = createLocalVue();
+
+    wrapper = mount(localVue.extend(RelatedIssuableItem), {
+      localVue,
+      slots,
+      sync: false,
+      propsData: props,
+    });
+  });
+
+  afterEach(() => {
+    wrapper.destroy();
   });
 
   it('contains issuable-info-container class when canReorder is false', () => {
-    expect(vm.canReorder).toEqual(false);
-    expect(vm.$el.querySelector('.issuable-info-container')).toBeNull();
+    expect(wrapper.props('canReorder')).toBe(false);
+    expect(wrapper.find('.issuable-info-container').exists()).toBe(true);
   });
 
   it('does not render token state', () => {
-    expect(vm.$el.querySelector('.text-secondary svg')).toBeNull();
+    expect(wrapper.find('.text-secondary svg').exists()).toBe(false);
   });
 
   it('does not render remove button', () => {
-    expect(vm.$refs.removeButton).toBeUndefined();
+    expect(wrapper.find({ ref: 'removeButton' }).exists()).toBe(false);
   });
 
   describe('token title', () => {
     it('links to computedPath', () => {
-      expect(vm.$el.querySelector('.item-title a').href).toEqual(props.path);
+      expect(wrapper.find('.item-title a').attributes('href')).toEqual(wrapper.props('path'));
     });
 
     it('renders confidential icon', () => {
-      expect(
-        vm.$el.querySelector('.item-title svg.confidential-icon use').getAttribute('xlink:href'),
-      ).toContain('eye-slash');
+      expect(wrapper.find('.confidential-icon').exists()).toBe(true);
     });
 
     it('renders title', () => {
-      expect(vm.$el.querySelector('.item-title a').innerText.trim()).toEqual(props.title);
+      expect(wrapper.find('.item-title a').text()).toEqual(props.title);
     });
   });
 
@@ -58,19 +70,21 @@ describe('issueItem', () => {
     let tokenState;
 
     beforeEach(done => {
-      vm.state = 'opened';
+      wrapper.setProps({ state: 'opened' });
+
       Vue.nextTick(() => {
-        tokenState = vm.$el.querySelector('.item-meta svg');
+        tokenState = wrapper.find('.issue-token-state-icon-open');
+
         done();
       });
     });
 
     it('renders if hasState', () => {
-      expect(tokenState).toBeDefined();
+      expect(tokenState.exists()).toBe(true);
     });
 
     it('renders state title', () => {
-      const stateTitle = tokenState.getAttribute('data-original-title').trim();
+      const stateTitle = tokenState.attributes('data-original-title');
 
       expect(stateTitle).toContain('<span class="bold">Opened</span>');
       expect(stateTitle).toContain(
@@ -79,19 +93,22 @@ describe('issueItem', () => {
     });
 
     it('renders aria label', () => {
-      expect(tokenState.getAttribute('aria-label')).toEqual('opened');
+      expect(tokenState.attributes('aria-label')).toEqual('opened');
     });
 
     it('renders open icon when open state', () => {
-      expect(tokenState.classList.contains('issue-token-state-icon-open')).toEqual(true);
+      expect(tokenState.classes('issue-token-state-icon-open')).toBe(true);
     });
 
     it('renders close icon when close state', done => {
-      vm.state = 'closed';
-      vm.closedAt = '2018-12-01T00:00:00.00Z';
+      wrapper.setProps({
+        state: 'closed',
+        closedAt: '2018-12-01T00:00:00.00Z',
+      });
 
       Vue.nextTick(() => {
-        expect(tokenState.classList.contains('issue-token-state-icon-closed')).toEqual(true);
+        expect(tokenState.classes('issue-token-state-icon-closed')).toBe(true);
+
         done();
       });
     });
@@ -102,49 +119,40 @@ describe('issueItem', () => {
 
     beforeEach(done => {
       Vue.nextTick(() => {
-        tokenMetadata = vm.$el.querySelector('.item-meta');
+        tokenMetadata = wrapper.find('.item-meta');
+
         done();
       });
     });
 
     it('renders item path and ID', () => {
-      const pathAndID = tokenMetadata.querySelector('.item-path-id').innerText.trim();
+      const pathAndID = tokenMetadata.find('.item-path-id').text();
 
       expect(pathAndID).toContain('gitlab-org/gitlab-test');
       expect(pathAndID).toContain('#1');
     });
 
     it('renders milestone icon and name', () => {
-      const milestoneIconEl = tokenMetadata.querySelector('.item-milestone svg use');
-      const milestoneTitle = tokenMetadata.querySelector('.item-milestone .milestone-title');
+      const milestoneIcon = tokenMetadata.find('.item-milestone svg use');
+      const milestoneTitle = tokenMetadata.find('.item-milestone .milestone-title');
 
-      expect(milestoneIconEl.getAttribute('xlink:href')).toContain('clock');
-      expect(milestoneTitle.innerText.trim()).toContain('Milestone title');
+      expect(milestoneIcon.attributes('href')).toContain('clock');
+      expect(milestoneTitle.text()).toContain('Milestone title');
     });
 
-    it('renders date icon and due date', () => {
-      const dueDateIconEl = tokenMetadata.querySelector('.item-due-date svg use');
-      const dueDateEl = tokenMetadata.querySelector('.item-due-date time');
-
-      expect(dueDateIconEl.getAttribute('xlink:href')).toContain('calendar');
-      expect(dueDateEl.innerText.trim()).toContain('Dec 31');
+    it('renders due date component', () => {
+      expect(tokenMetadata.find('.js-due-date-slot').exists()).toBe(true);
     });
 
-    it('renders weight icon and value', () => {
-      const dueDateIconEl = tokenMetadata.querySelector('.item-weight svg use');
-      const dueDateEl = tokenMetadata.querySelector('.item-weight span');
-
-      expect(dueDateIconEl.getAttribute('xlink:href')).toContain('weight');
-      expect(dueDateEl.innerText.trim()).toContain('10');
+    it('renders weight component', () => {
+      expect(tokenMetadata.find('.js-weight-slot').exists()).toBe(true);
     });
   });
 
   describe('token assignees', () => {
     it('renders assignees avatars', () => {
-      const assigneesEl = vm.$el.querySelector('.item-assignees');
-
-      expect(assigneesEl.querySelectorAll('.user-avatar-link').length).toBe(2);
-      expect(assigneesEl.querySelector('.avatar-counter').innerText.trim()).toContain('+2');
+      expect(wrapper.findAll('.item-assignees .user-avatar-link').length).toBe(2);
+      expect(wrapper.find('.item-assignees .avatar-counter').text()).toContain('+2');
     });
   });
 
@@ -152,30 +160,35 @@ describe('issueItem', () => {
     let removeBtn;
 
     beforeEach(done => {
-      vm.canRemove = true;
+      wrapper.setProps({ canRemove: true });
       Vue.nextTick(() => {
-        removeBtn = vm.$refs.removeButton;
+        removeBtn = wrapper.find({ ref: 'removeButton' });
+
         done();
       });
     });
 
     it('renders if canRemove', () => {
-      expect(removeBtn).toBeDefined();
+      expect(removeBtn.exists()).toBe(true);
     });
 
     it('renders disabled button when removeDisabled', done => {
-      vm.removeDisabled = true;
+      wrapper.vm.removeDisabled = true;
+
       Vue.nextTick(() => {
-        expect(removeBtn.hasAttribute('disabled')).toEqual(true);
+        expect(removeBtn.attributes('disabled')).toEqual('disabled');
+
         done();
       });
     });
 
     it('triggers onRemoveRequest when clicked', () => {
-      spyOn(vm, '$emit');
-      removeBtn.click();
+      removeBtn.trigger('click');
 
-      expect(vm.$emit).toHaveBeenCalledWith('relatedIssueRemoveRequest', props.idKey);
+      const { relatedIssueRemoveRequest } = wrapper.emitted();
+
+      expect(relatedIssueRemoveRequest.length).toBe(1);
+      expect(relatedIssueRemoveRequest[0]).toEqual([props.idKey]);
     });
   });
 });

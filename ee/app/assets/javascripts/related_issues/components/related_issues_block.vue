@@ -250,7 +250,6 @@ export default {
               :path="issue.path"
               :state="issue.state"
               :milestone="issue.milestone"
-              :due-date="issue.due_date"
               :assignees="issue.assignees"
               :created-at="issue.created_at"
               :closed-at="issue.closed_at"
