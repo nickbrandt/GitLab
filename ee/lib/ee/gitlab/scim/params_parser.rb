@@ -21,7 +21,7 @@ module EE
 
         def initialize(params)
           @filter = params[:filter]
-          @operations = params[:operations]
+          @operations = params[:Operations]
         end
 
         def deprovision_user?
