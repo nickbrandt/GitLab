@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import _ from 'underscore';
-import Api from '~/api';
+import Api from 'ee/api';
 import { __ } from '~/locale';
 import Flash from '~/flash';
 import axios from '~/lib/utils/axios_utils';

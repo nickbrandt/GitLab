@@ -349,28 +349,6 @@ describe('Api', () => {
     });
   });
 
-  describe('ldap_groups', () => {
-    it('calls callback on completion', done => {
-      const query = 'query';
-      const provider = 'provider';
-      const callback = jasmine.createSpy();
-      const expectedUrl = `${dummyUrlRoot}/api/${dummyApiVersion}/ldap/${provider}/groups.json`;
-
-      mock.onGet(expectedUrl).reply(200, [
-        {
-          name: 'test',
-        },
-      ]);
-
-      Api.ldap_groups(query, provider, callback)
-        .then(response => {
-          expect(callback).toHaveBeenCalledWith(response);
-        })
-        .then(done)
-        .catch(done.fail);
-    });
-  });
-
   describe('user', () => {
     it('fetches single user', done => {
       const userId = '123456';
