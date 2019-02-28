@@ -6069,6 +6069,9 @@ msgstr ""
 msgid "Merge in progress"
 msgstr ""
 
+msgid "Merge pipelines will try to validate the post-merge result prior to merging"
+msgstr ""
+
 msgid "Merge request"
 msgstr ""
 
@@ -7076,6 +7079,9 @@ msgid "Pipelines for last week"
 msgstr ""
 
 msgid "Pipelines for last year"
+msgstr ""
+
+msgid "Pipelines need to be configured to enable this feature."
 msgstr ""
 
 msgid "Pipelines|Build with confidence"

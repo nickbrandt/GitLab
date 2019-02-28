@@ -45,6 +45,10 @@ module EE
         group_with_project_templates_id
       ]
 
+      if allow_merge_pipelines_params?
+        attrs << %i[merge_pipelines_enabled]
+      end
+
       if allow_mirror_params?
         attrs + mirror_params
       else
@@ -66,6 +70,10 @@ module EE
       else
         ::Gitlab::CurrentSettings.current_application_settings.mirror_available || current_user&.admin?
       end
+    end
+
+    def allow_merge_pipelines_params?
+      project&.feature_available?(:merge_pipelines)
     end
   end
 end
