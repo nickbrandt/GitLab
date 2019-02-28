@@ -21,7 +21,7 @@ class Groups::SamlProvidersController < Groups::ApplicationController
   def update
     @saml_provider = @group.saml_provider
 
-    @saml_provider.update(saml_provider_params)
+    GroupSaml::SamlProvider::UpdateService.new(current_user, @saml_provider, params: saml_provider_params).execute
 
     render :show
   end
