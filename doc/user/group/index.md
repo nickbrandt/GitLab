@@ -46,7 +46,7 @@ For example, consider a user named Alex:
 
 1. Alex creates an account on GitLab.com with the username `alex`;
    their profile will be accessed under `https://gitlab.example.com/alex`
-1. Alex creates a group for their team with the groupname `alex-team`;
+1. Alex creates a group for their team with the group name `alex-team`;
    the group and its projects will be accessed under `https://gitlab.example.com/alex-team`
 1. Alex creates a subgroup of `alex-team` with the subgroup name `marketing`;
    this subgroup and its projects will be accessed under `https://gitlab.example.com/alex-team/marketing`
@@ -271,7 +271,7 @@ working together in a project.
 To inherit the group membership, you share the project between the
 two groups A and B. **Share with group lock** prevents any project within
 the group from being shared with another group. By doing so, you
-guarantee only the right group members have access to that projects.
+guarantee only the right group members have access to those projects.
 
 To enable this feature, navigate to the group settings page. Select
 **Share with group lock** and **Save the group**.
@@ -280,25 +280,26 @@ To enable this feature, navigate to the group settings page. Select
 
 #### Member Lock **[STARTER]**
 
-With **Member Lock** it is possible to lock membership in project to the
-level of members in group.
+With Member lock, it is possible to lock membership in a project to the
+level of members in the group.
 
-Member Lock lets a group owner to lock down any new project membership to all the
+Member lock lets a group owner lock down any new project membership to all the
 projects within the group, allowing tighter control over project membership.
-Learn more about [Member Lock](https://docs.gitlab.com/ee/user/group/index.html#member-lock).
 
 For instance, if you want to lock the group for an [Audit Event](../../administration/audit_events.md),
-you enable Member Lock to guarantee that any membership is added or changed
-during the audition.
+you enable Member lock to guarantee that membership of a project cannot be modified during that audit.
 
-To enable this feature, navigate to group settings page, select **Member lock**
-and **Save group**.
+To enable this feature:
 
-![Checkbox for membership lock](img/membership_lock.png)
+1. Navigate to the group's **Settings > General** page.
+1. Expand the **Permissions, LFS, 2FA** section and select **Member lock**.
+1. Click the **Save changes** button.
+
+![Checkbox for membership lock](img/member_lock.png)
 
 This will disable the option for all users who previously had permissions to
 operate project memberships so no new users can be added. Furthermore, any
-request to add new user to project through API will not be possible.
+request to add a new user to a project through API will not be possible.
 
 #### Group file templates **[PREMIUM]**
 
@@ -343,7 +344,7 @@ Define project templates at a group-level by setting a group as a template sourc
 
 With [GitLab Contribution Analytics](contribution_analytics/index.md)
 you have an overview of the contributions (pushes, merge requests,
-and issues) performed my your group members.
+and issues) performed by your group members.
 
 ## Issues analytics **[PREMIUM]**
 
