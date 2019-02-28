@@ -3614,6 +3614,9 @@ msgstr ""
 msgid "Enforce SSO-only authentication for this group"
 msgstr ""
 
+msgid "Enforce users to have dedicated group managed accounts for this group"
+msgstr ""
+
 msgid "Enforced SSO"
 msgstr ""
 
@@ -4886,6 +4889,9 @@ msgid "Group info:"
 msgstr ""
 
 msgid "Group maintainers can register group runners in the %{link}"
+msgstr ""
+
+msgid "Group managed accounts"
 msgstr ""
 
 msgid "Group name"
