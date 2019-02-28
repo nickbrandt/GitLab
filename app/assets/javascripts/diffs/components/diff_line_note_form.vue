@@ -1,7 +1,7 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
 import { s__ } from '~/locale';
-import batchCommentsDiffLineNoteFormMixin from 'ee/batch_comments/mixins/diff_line_note_form';
+import diffLineNoteFormMixin from 'ee_else_ce/notes/mixins/diff_line_note_form';
 import noteForm from '../../notes/components/note_form.vue';
 import autosave from '../../notes/mixins/autosave';
 import { DIFF_NOTE_TYPE } from '../constants';
@@ -10,7 +10,7 @@ export default {
   components: {
     noteForm,
   },
-  mixins: [autosave, batchCommentsDiffLineNoteFormMixin],
+  mixins: [autosave, diffLineNoteFormMixin],
   props: {
     diffFileHash: {
       type: String,
