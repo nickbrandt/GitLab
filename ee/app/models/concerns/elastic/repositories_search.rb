@@ -57,21 +57,36 @@ module Elastic
 
         # Avoid one SELECT per result by loading all projects into a hash
         project_ids = response.map {|result| result["_source"]["commit"]["rid"] }.uniq
-        projects = Project.where(id: project_ids).index_by(&:id)
+        projects = Project.includes(:route).where(id: project_ids).index_by(&:id)
 
-        # n + 1: https://gitlab.com/gitlab-org/gitlab-ee/issues/3454
-        commits = Gitlab::GitalyClient.allow_n_plus_1_calls do
-          response.map do |result|
-            sha = result["_source"]["commit"]["sha"]
-            project_id = result["_source"]["commit"]["rid"].to_i
-
-            projects[project_id].try(:commit, sha)
-          end
-        end.compact
+        commits = response.map do |result|
+          project_id = result["_source"]["commit"]["rid"].to_i
+          project = projects[project_id]
+          raw_commit = Gitlab::Git::Commit.new(
+            project.repository.raw,
+            prepare_commit(result['_source']['commit']),
+            lazy_load_parents: true
+          )
+          Commit.new(raw_commit, project)
+        end
 
         # Before "map" we had a paginated array so we need to recover it
         offset = per_page * ((page || 1) - 1)
         Kaminari.paginate_array(commits, total_count: response.total_count, limit: per_page, offset: offset)
+      end
+
+      def prepare_commit(raw_commit_hash)
+        {
+          id: raw_commit_hash['sha'],
+          message: raw_commit_hash['message'],
+          parent_ids: nil,
+          author_name: raw_commit_hash['author']['name'],
+          author_email: raw_commit_hash['author']['email'],
+          authored_date: Time.parse(raw_commit_hash['author']['time']).utc,
+          committer_name: raw_commit_hash['committer']['name'],
+          committer_email: raw_commit_hash['committer']['email'],
+          committed_date: Time.parse(raw_commit_hash['committer']['time']).utc
+        }
       end
     end
   end

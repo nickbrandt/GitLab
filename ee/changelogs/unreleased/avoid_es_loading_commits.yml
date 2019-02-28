@@ -1,0 +1,5 @@
+---
+title: Avoid a Gitaly N+1 when loading commits for Elasticsearch search results
+merge_request: 9760
+author:
+type: performance
