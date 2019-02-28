@@ -1,5 +1,0 @@
----
-title: Prevent Group SAML authorizing sign in without prior user approval
-merge_request:
-author:
-type: security
