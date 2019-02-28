@@ -1,5 +1,0 @@
----
-title: Prevent SAML access when disabled by group admin on GitLab.com
-merge_request:
-author:
-type: security
