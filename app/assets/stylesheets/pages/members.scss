@@ -33,7 +33,6 @@
 
   .controls {
     @include media-breakpoint-up(sm) {
-      display: -webkit-flex;
       display: flex;
     }
 
@@ -130,7 +129,6 @@
 }
 
 .members-ldap {
-  -webkit-align-self: center;
   align-self: center;
   height: 100%;
   margin-right: 10px;

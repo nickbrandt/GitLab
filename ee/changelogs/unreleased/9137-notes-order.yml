@@ -1,0 +1,5 @@
+---
+title: Ensure comments from merge request review is displayed in the same order as user commenting order
+merge_request: 9684
+author:
+type: fixed

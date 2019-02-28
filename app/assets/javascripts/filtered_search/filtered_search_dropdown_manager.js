@@ -8,6 +8,7 @@ import DropdownHint from './dropdown_hint';
 import DropdownEmoji from './dropdown_emoji';
 import DropdownNonUser from './dropdown_non_user';
 import DropdownUser from './dropdown_user';
+import DropdownAjaxFilter from './dropdown_ajax_filter';
 import NullDropdown from './null_dropdown';
 import FilteredSearchVisualTokens from './filtered_search_visual_tokens';
 
@@ -112,6 +113,15 @@ export default class FilteredSearchDropdownManager {
         gl: NullDropdown,
         element: this.container.querySelector('#js-dropdown-admin-runner-type'),
       },
+      tag: {
+        reference: null,
+        gl: DropdownAjaxFilter,
+        extraArguments: {
+          endpoint: this.getRunnerTagsEndpoint(),
+          symbol: '~',
+        },
+        element: this.container.querySelector('#js-dropdown-runner-tag'),
+      },
 
       // EE-only start
       weight: {
@@ -158,6 +168,10 @@ export default class FilteredSearchDropdownManager {
     }
 
     return endpoint;
+  }
+
+  getRunnerTagsEndpoint() {
+    return `${this.baseEndpoint}/admin/runners/tag_list.json`;
   }
 
   static addWordToInput(tokenName, tokenValue = '', clicked = false, options = {}) {
