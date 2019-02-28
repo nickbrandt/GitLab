@@ -120,6 +120,8 @@ module Issuable
     end
 
     def milestone_available?
+      return if is_a?(Epic)
+
       project_id == milestone&.project_id || project.ancestors_upto.compact.include?(milestone&.group)
     end
 

@@ -20,7 +20,8 @@ describe Boards::Issues::ListService, services: true do
     let(:p3) { create(:group_label, title: 'P3', group: group) }
 
     let(:user_list) { create(:user_list, board: board, position: 2) }
-    let(:milestone_list) { create(:milestone_list, board: board, position: 3) }
+    let(:milestone) { create(:milestone, group: group) }
+    let(:milestone_list) { create(:milestone_list, board: board, position: 3, milestone: milestone) }
     let(:backlog)   { create(:backlog_list, board: board) }
     let(:list1)     { create(:list, board: board, label: development, position: 0) }
     let(:list2)     { create(:list, board: board, label: testing, position: 1) }
