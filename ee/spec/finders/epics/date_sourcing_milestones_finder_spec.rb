@@ -4,14 +4,16 @@ require 'spec_helper'
 
 describe Epics::DateSourcingMilestonesFinder do
   describe '#execute' do
+    let(:project) { create(:project) }
+
     it 'returns date and id from milestones' do
       epic = create(:epic)
-      milestone1 = create(:milestone, start_date: Date.new(2000, 1, 1), due_date: Date.new(2000, 1, 10))
-      milestone2 = create(:milestone, due_date: Date.new(2000, 1, 30))
-      milestone3 = create(:milestone, start_date: Date.new(2000, 1, 1), due_date: Date.new(2000, 1, 20))
-      create(:issue, epic: epic, milestone: milestone1)
-      create(:issue, epic: epic, milestone: milestone2)
-      create(:issue, epic: epic, milestone: milestone3)
+      milestone1 = create(:milestone, start_date: Date.new(2000, 1, 1), due_date: Date.new(2000, 1, 10), project: project)
+      milestone2 = create(:milestone, due_date: Date.new(2000, 1, 30), project: project)
+      milestone3 = create(:milestone, start_date: Date.new(2000, 1, 1), due_date: Date.new(2000, 1, 20), project: project)
+      create(:issue, epic: epic, milestone: milestone1, project: project)
+      create(:issue, epic: epic, milestone: milestone2, project: project)
+      create(:issue, epic: epic, milestone: milestone3, project: project)
 
       results = described_class.new(epic.id)
 
@@ -25,8 +27,8 @@ describe Epics::DateSourcingMilestonesFinder do
 
     it 'returns date and id from single milestone' do
       epic = create(:epic)
-      milestone1 = create(:milestone, start_date: Date.new(2000, 1, 1), due_date: Date.new(2000, 1, 10))
-      create(:issue, epic: epic, milestone: milestone1)
+      milestone1 = create(:milestone, start_date: Date.new(2000, 1, 1), due_date: Date.new(2000, 1, 10), project: project)
+      create(:issue, epic: epic, milestone: milestone1, project: project)
 
       results = described_class.new(epic.id)
 
@@ -40,8 +42,8 @@ describe Epics::DateSourcingMilestonesFinder do
 
     it 'returns date and id from milestone without date' do
       epic = create(:epic)
-      milestone1 = create(:milestone, start_date: Date.new(2000, 1, 1))
-      create(:issue, epic: epic, milestone: milestone1)
+      milestone1 = create(:milestone, start_date: Date.new(2000, 1, 1), project: project)
+      create(:issue, epic: epic, milestone: milestone1, project: project)
 
       results = described_class.new(epic.id)
 

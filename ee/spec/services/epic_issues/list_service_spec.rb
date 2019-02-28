@@ -55,9 +55,8 @@ describe EpicIssues::ListService do
         control_count = ActiveRecord::QueryRecorder.new { list_service.execute }.count
 
         new_group2 = create(:group, :private)
-        new_project2 = create(:project, namespace: new_group2)
         new_group2.add_developer(user)
-        milestone3 = create(:milestone, project: new_project2)
+        milestone3 = create(:milestone, project: new_project)
         new_issue4 = create(:issue, project: new_project, milestone: milestone3)
         create(:epic_issue, issue: new_issue4, epic: epic, relative_position: 6)
 
