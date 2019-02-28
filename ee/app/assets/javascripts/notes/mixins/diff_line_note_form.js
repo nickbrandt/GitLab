@@ -1,5 +1,5 @@
 import { mapActions, mapGetters, mapState } from 'vuex';
-import { getDraftReplyFormData, getDraftFormData } from '../utils';
+import { getDraftReplyFormData, getDraftFormData } from 'ee/batch_comments/utils';
 import createFlash from '~/flash';
 import { s__ } from '~/locale';
 
