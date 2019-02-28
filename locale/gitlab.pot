@@ -44,6 +44,11 @@ msgstr ""
 msgid "\"%{query}\" in projects"
 msgstr ""
 
+msgid "%d comment"
+msgid_plural "%d comments"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "%d commit"
 msgid_plural "%d commits"
 msgstr[0] ""
@@ -768,6 +773,9 @@ msgid "An empty GitLab User field will add the FogBugz user's full name (e.g. \"
 msgstr ""
 
 msgid "An error has occurred"
+msgstr ""
+
+msgid "An error occured while loading designs. Please try again."
 msgstr ""
 
 msgid "An error occurred adding a draft to the discussion."
@@ -6551,6 +6559,9 @@ msgstr ""
 msgid "No credit card required."
 msgstr ""
 
+msgid "No designs found."
+msgstr ""
+
 msgid "No details available"
 msgstr ""
 
@@ -10522,6 +10533,9 @@ msgid "Update now"
 msgstr ""
 
 msgid "Update your group name, description, avatar, and visibility."
+msgstr ""
+
+msgid "Updated"
 msgstr ""
 
 msgid "Updating"

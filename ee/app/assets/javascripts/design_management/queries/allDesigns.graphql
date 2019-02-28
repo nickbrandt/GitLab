@@ -1,0 +1,9 @@
+query allDesigns {
+  designs @client {
+    id
+    image
+    name
+    updatedAt
+    commentsCount
+  }
+}
