@@ -133,26 +133,26 @@ describe Burndown do
   end
 
   describe 'group milestone burndown' do
-    let(:group) { create(:group) }
-    let(:nested_group) { create(:group, parent: group) }
+    let(:parent_group) { create(:group) }
+    let(:group) { create(:group, parent: parent_group) }
+    let(:parent_group_project) { create(:project, group: parent_group) }
     let(:group_project) { create(:project, group: group) }
-    let(:nested_group_project) { create(:project, group: nested_group) }
-    let(:group_milestone) { create(:milestone, project: nil, group: group, start_date: start_date, due_date: due_date) }
-    let(:nested_group_milestone) { create(:milestone, group: nested_group, start_date: start_date, due_date: due_date) }
+    let(:parent_group_milestone) { create(:milestone, project: nil, group: parent_group, start_date: start_date, due_date: due_date) }
+    let(:group_milestone) { create(:milestone, group: group, start_date: start_date, due_date: due_date) }
 
     context 'when nested group milestone', :nested_groups do
       before do
-        group.add_developer(user)
+        parent_group.add_developer(user)
       end
 
       it_behaves_like 'burndown for milestone' do
-        let(:milestone) { nested_group_milestone }
-        let(:project) { nested_group_project }
+        let(:milestone) { group_milestone }
+        let(:project) { group_project }
         let(:issue_params) do
           {
             milestone: milestone,
             weight: 2,
-            project_id: nested_group_project.id,
+            project_id: group_project.id,
             author: user,
             created_at: milestone.start_date
           }
