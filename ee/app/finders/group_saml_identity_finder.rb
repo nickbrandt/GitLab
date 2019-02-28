@@ -4,7 +4,7 @@ class GroupSamlIdentityFinder
   attr_reader :user
 
   def self.find_by_group_and_uid(group:, uid:)
-    group&.saml_provider&.identities&.find_by_extern_uid(uid)
+    group&.saml_provider&.identities&.find_by(extern_uid: uid)
   end
 
   def initialize(user:)
