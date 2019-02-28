@@ -37,15 +37,6 @@ describe Issuable::Clone::AttributesRewriter do
 
         expect(new_epic.reload.milestone).to be_nil
       end
-
-      it 'copies the milestone when old issue milestone is a group milestone' do
-        milestone = create(:milestone, title: 'milestone', group: group)
-        original_issue.update(milestone: milestone)
-
-        subject.execute
-
-        expect(new_epic.reload.milestone).to eq(milestone)
-      end
     end
   end
 end
