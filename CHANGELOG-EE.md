@@ -227,6 +227,17 @@ Please view this file on the master branch, on stable branches it's out of date.
 - Gather deepest epic relationship data.
 
 
+## 11.6.10 (2019-02-28)
+
+### Security (5 changes)
+
+- Remove the possibility to share a project with a group that a user is not a member of.
+- Prevent Group SAML authorizing sign in without prior user approval.
+- Prevent SAML access when disabled by group admin on GitLab.com.
+- Respect group membership lock when importing a member from another group.
+- Ignore out of range epic IDs.
+
+
 ## 11.6.9 (2019-02-04)
 
 - No changes.
