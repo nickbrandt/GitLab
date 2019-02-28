@@ -27,6 +27,8 @@ module EE
 
       has_many :project_templates, through: :projects, foreign_key: 'custom_project_templates_group_id'
 
+      has_many :managed_users, class_name: 'User', foreign_key: 'managing_group_id', inverse_of: :managing_group
+
       belongs_to :file_template_project, class_name: "Project"
 
       # Use +checked_file_template_project+ instead, which implements important
