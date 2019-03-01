@@ -2472,7 +2472,7 @@ ActiveRecord::Schema.define(version: 20190222110418) do
     t.integer "project_id", null: false
     t.integer "prometheus_metric_id", null: false
     t.index ["environment_id"], name: "index_prometheus_alerts_on_environment_id", using: :btree
-    t.index ["project_id", "prometheus_metric_id"], name: "index_prometheus_alerts_on_project_id_and_prometheus_metric_id", unique: true, using: :btree
+    t.index ["project_id", "prometheus_metric_id", "environment_id"], name: "index_prometheus_alerts_metric_environment", unique: true, using: :btree
     t.index ["prometheus_metric_id"], name: "index_prometheus_alerts_on_prometheus_metric_id", using: :btree
   end
 
