@@ -3,22 +3,18 @@ import { GlTooltipDirective } from '@gitlab/ui';
 import { __, sprintf } from '~/locale';
 import IssueMilestone from '~/vue_shared/components/issue/issue_milestone.vue';
 import IssueAssignees from '~/vue_shared/components/issue/issue_assignees.vue';
-import IssueDueDate from '~/boards/components/issue_due_date.vue';
-import IssueWeight from 'ee/boards/components/issue_card_weight.vue';
-import relatedIssueMixin from '../mixins/related_issues_mixin';
+import relatedIssuableMixin from '~/vue_shared/mixins/related_issuable_mixin';
 
 export default {
   name: 'IssueItem',
   components: {
     IssueMilestone,
-    IssueDueDate,
     IssueAssignees,
-    IssueWeight,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
   },
-  mixins: [relatedIssueMixin],
+  mixins: [relatedIssuableMixin],
   props: {
     canReorder: {
       type: Boolean,
@@ -93,18 +89,8 @@ export default {
             :milestone="milestone"
             class="d-flex align-items-center item-milestone"
           />
-          <issue-due-date
-            v-if="dueDate"
-            :date="dueDate"
-            tooltip-placement="top"
-            css-class="item-due-date d-flex align-items-center"
-          />
-          <issue-weight
-            v-if="weight"
-            :weight="weight"
-            class="item-weight d-flex align-items-center"
-            tag-name="span"
-          />
+          <slot name="dueDate"></slot>
+          <slot name="weight"></slot>
         </div>
         <issue-assignees
           v-if="assignees.length"

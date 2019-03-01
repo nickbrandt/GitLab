@@ -2,10 +2,12 @@
 import Sortable from 'sortablejs';
 import tooltip from '~/vue_shared/directives/tooltip';
 import Icon from '~/vue_shared/components/icon.vue';
+import RelatedIssuableItem from '~/vue_shared/components/issue/related_issuable_item.vue';
+import IssueWeight from 'ee/boards/components/issue_card_weight.vue';
+import IssueDueDate from '~/boards/components/issue_due_date.vue';
 import sortableConfig from 'ee/sortable/sortable_config';
 import { GlLoadingIcon } from '@gitlab/ui';
-import issueItem from './issue_item.vue';
-import addIssuableForm from './add_issuable_form.vue';
+import AddIssuableForm from './add_issuable_form.vue';
 import { issuableIconMap, issuableQaClassMap } from '../constants';
 
 export default {
@@ -15,9 +17,11 @@ export default {
   },
   components: {
     Icon,
-    addIssuableForm,
-    issueItem,
+    AddIssuableForm,
+    RelatedIssuableItem,
     GlLoadingIcon,
+    IssueWeight,
+    IssueDueDate,
   },
   props: {
     isFetching: {
@@ -171,7 +175,8 @@ export default {
               class="js-related-issues-header-issue-count related-issues-header-issue-count issue-count-badge mx-1"
             >
               <span class="issue-count-badge-count">
-                <icon :name="issuableTypeIcon" class="mr-1 text-secondary" /> {{ badgeLabel }}
+                <icon :name="issuableTypeIcon" class="mr-1 text-secondary" />
+                {{ badgeLabel }}
               </span>
             </div>
             <button
@@ -237,7 +242,7 @@ export default {
             :data-ordering-id="issuableOrderingId(issue)"
             class="js-related-issues-token-list-item list-item pt-0 pb-0"
           >
-            <issue-item
+            <related-issuable-item
               :id-key="issue.id"
               :display-reference="issue.reference"
               :confidential="issue.confidential"
@@ -245,9 +250,7 @@ export default {
               :path="issue.path"
               :state="issue.state"
               :milestone="issue.milestone"
-              :due-date="issue.due_date"
               :assignees="issue.assignees"
-              :weight="issue.weight"
               :created-at="issue.created_at"
               :closed-at="issue.closed_at"
               :can-remove="canAdmin"
@@ -255,7 +258,22 @@ export default {
               :path-id-separator="pathIdSeparator"
               event-namespace="relatedIssue"
               @relatedIssueRemoveRequest="$emit('relatedIssueRemoveRequest', $event)"
-            />
+            >
+              <issue-weight
+                v-if="issue.weight"
+                slot="weight"
+                :weight="issue.weight"
+                class="item-weight d-flex align-items-center"
+                tag-name="span"
+              />
+              <issue-due-date
+                v-if="issue.due_date"
+                slot="dueDate"
+                :date="issue.due_date"
+                tooltip-placement="top"
+                css-class="item-due-date d-flex align-items-center"
+              />
+            </related-issuable-item>
           </li>
         </ul>
       </div>

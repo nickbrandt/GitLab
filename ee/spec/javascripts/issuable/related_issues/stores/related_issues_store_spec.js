@@ -1,6 +1,12 @@
 import RelatedIssuesStore from 'ee/related_issues/stores/related_issues_store';
 
-import { issuable1, issuable2, issuable3, issuable4, issuable5 } from '../mock_data';
+import {
+  issuable1,
+  issuable2,
+  issuable3,
+  issuable4,
+  issuable5,
+} from 'spec/vue_shared/components/issue/related_issuable_mock_data';
 
 describe('RelatedIssuesStore', () => {
   let store;
