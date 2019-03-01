@@ -475,8 +475,7 @@ constraints(::Constraints::ProjectUrlConstrainer.new) do
 
       get 'noteable/:target_type/:target_id/notes' => 'notes#index', as: 'noteable_notes'
 
-      # On CE only index and show are needed
-      resources :boards, only: [:index, :show, :create, :update, :destroy]
+      resources :boards, only: [:index, :show], constraints: { id: /\d+/ }
 
       resources :todos, only: [:create]
 
