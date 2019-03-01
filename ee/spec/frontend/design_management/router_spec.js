@@ -4,6 +4,7 @@ import App from 'ee/design_management/components/app.vue';
 import Designs from 'ee/design_management/pages/index.vue';
 import DesignDetail from 'ee/design_management/pages/design/index.vue';
 import router from 'ee/design_management/router';
+import '~/commons/bootstrap';
 
 describe('Design management router', () => {
   let vm;
@@ -13,7 +14,15 @@ describe('Design management router', () => {
 
     localVue.use(VueRouter);
 
-    vm = mount(App, { localVue, router });
+    vm = mount(App, {
+      localVue,
+      router,
+      mocks: {
+        $apollo: {
+          queries: { designs: { loading: true } },
+        },
+      },
+    });
   }
 
   beforeEach(() => {

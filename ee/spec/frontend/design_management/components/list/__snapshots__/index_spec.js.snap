@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Design management list component renders list 1`] = `
+<ol
+  class="list-unstyled row"
+>
+  <li
+    class="col-md-6 col-lg-4"
+  >
+    <design-stub
+      commentscount="2"
+      image="test"
+      name="test"
+      updatedat="01-01-2019"
+    />
+  </li>
+  <li
+    class="col-md-6 col-lg-4"
+  >
+    <design-stub
+      commentscount="2"
+      image="test"
+      name="test"
+      updatedat="01-01-2019"
+    />
+  </li>
+</ol>
+`;
