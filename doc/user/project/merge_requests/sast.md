@@ -32,19 +32,20 @@ request widget area.
 
 The following languages and frameworks are supported.
 
-| Language / framework  | Scan tool                                                                              |
-|-----------------------|----------------------------------------------------------------------------------------|
-| C/C++                 | [Flawfinder](https://www.dwheeler.com/flawfinder/)                                     |
-| Python                | [bandit](https://github.com/PyCQA/bandit)                                              |
-| Ruby on Rails         | [brakeman](https://brakemanscanner.org)                                                |
+| Language / framework    | Scan tool                                                                              |
+|-------------------------|----------------------------------------------------------------------------------------|
+| .NET                    | [Security Code Scan](https://security-code-scan.github.io)                             |
+| C/C++                   | [Flawfinder](https://www.dwheeler.com/flawfinder/)                                     |
+| Go                      | [Gosec](https://github.com/securego/gosec)                                             |
 | Groovy (Gradle & Grail) | [find-sec-bugs](https://find-sec-bugs.github.io/)                                      |
-| Java (Maven & Gradle) | [find-sec-bugs](https://find-sec-bugs.github.io/)                                      |
-| JavaScript            | [ESLint security plugin](https://github.com/nodesecurity/eslint-plugin-security)       |
-| Scala (sbt)           | [find-sec-bugs](https://find-sec-bugs.github.io/)                                      |
-| Go                    | [Gosec](https://github.com/securego/gosec)                                             |
-| PHP                   | [phpcs-security-audit](https://github.com/FloeDesignTechnologies/phpcs-security-audit) |
-| .NET                  | [Security Code Scan](https://security-code-scan.github.io)                             |
-| Node.js               | [NodeJsScan](https://github.com/ajinabraham/NodeJsScan)                                |
+| Java (Maven & Gradle)   | [find-sec-bugs](https://find-sec-bugs.github.io/)                                      |
+| JavaScript              | [ESLint security plugin](https://github.com/nodesecurity/eslint-plugin-security)       |
+| Node.js                 | [NodeJsScan](https://github.com/ajinabraham/NodeJsScan)                                |
+| PHP                     | [phpcs-security-audit](https://github.com/FloeDesignTechnologies/phpcs-security-audit) |
+| Python                  | [bandit](https://github.com/PyCQA/bandit)                                              |
+| Ruby on Rails           | [brakeman](https://brakemanscanner.org)                                                |
+| Scala (sbt)             | [find-sec-bugs](https://find-sec-bugs.github.io/)                                      |
+| Typescript              | [TSLint Config Security](https://github.com/webschik/tslint-config-security/)          |
 
 ## How it works
 
