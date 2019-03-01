@@ -56,7 +56,7 @@ module Gitlab
     #     start([ ['foo'], ['bar', 'baz'] ], :production)
     #
     # This would start two Sidekiq processes: one processing "foo", and one
-    # processing "bar" and "baz".
+    # processing "bar" and "baz". Each one is placed in its own process group.
     #
     # queues - An Array containing Arrays. Each sub Array should specify the
     #          queues to use for a single process.
@@ -92,6 +92,7 @@ module Gitlab
       pid = Process.spawn(
         { 'ENABLE_SIDEKIQ_CLUSTER' => '1' },
         *cmd,
+        pgroup: true,
         err: $stderr,
         out: $stdout
       )

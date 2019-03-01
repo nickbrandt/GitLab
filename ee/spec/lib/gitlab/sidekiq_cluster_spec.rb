@@ -79,6 +79,7 @@ describe Gitlab::SidekiqCluster do
 
   describe '.start_sidekiq' do
     let(:env) { { "ENABLE_SIDEKIQ_CLUSTER" => "1" } }
+    let(:args) { ['bundle', 'exec', 'sidekiq', anything, '-eproduction', *([anything] * 5)] }
 
     it 'starts a Sidekiq process' do
       allow(Process).to receive(:spawn).and_return(1)
@@ -88,12 +89,23 @@ describe Gitlab::SidekiqCluster do
     end
 
     it 'handles duplicate queue names' do
-      allow(Process).to receive(:spawn)
-                    .with(env, "bundle", "exec", "sidekiq", "-c 5", "-eproduction", "-gqueues: foo (2), bar, baz", anything, "-qfoo,2", "-qbar,1", "-qbaz,1", anything)
-                    .and_return(1)
+      allow(Process)
+        .to receive(:spawn)
+        .with(env, *args, anything)
+        .and_return(1)
 
       expect(described_class).to receive(:wait_async).with(1)
       expect(described_class.start_sidekiq(%w(foo foo bar baz), :production)).to eq(1)
+    end
+
+    it 'runs the sidekiq process in a new process group' do
+      expect(Process)
+        .to receive(:spawn)
+        .with(anything, *args, a_hash_including(pgroup: true))
+        .and_return(1)
+
+      allow(described_class).to receive(:wait_async)
+      expect(described_class.start_sidekiq(%w(foo bar baz), :production)).to eq(1)
     end
   end
 
