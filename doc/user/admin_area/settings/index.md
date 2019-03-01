@@ -6,6 +6,7 @@ instance like sign-up restrictions, account limits and quota, metrics, etc.
 Navigate to it by going to **Admin area > Settings**. Some of the settings
 include:
 
+- [Account and limit settings](account_and_limit_settings.md)
 - [Continuous Integration and Deployment](continuous_integration.md)
 - [Email](email.md)
 - [Sign up restrictions](sign_up_restrictions.md)
