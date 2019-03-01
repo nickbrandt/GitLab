@@ -113,7 +113,7 @@ describe('issue_note_form component', () => {
         it('should ender edit mode', () => {
           // TODO: do not spy on vm
           spyOn(wrapper.vm, 'editMyLastNote').and.callThrough();
-          const textarea = wrapper.find('textarea');
+          textarea = wrapper.find('textarea');
           textarea.setValue('Foo');
           textarea.trigger('keydown.up');
 
@@ -123,7 +123,7 @@ describe('issue_note_form component', () => {
 
       describe('enter', () => {
         it('should save note when cmd+enter is pressed', () => {
-          const textarea = wrapper.find('textarea');
+          textarea = wrapper.find('textarea');
           textarea.setValue('Foo');
           textarea.trigger('keydown.enter', { metaKey: true });
 
@@ -133,7 +133,7 @@ describe('issue_note_form component', () => {
         });
 
         it('should save note when ctrl+enter is pressed', () => {
-          const textarea = wrapper.find('textarea');
+          textarea = wrapper.find('textarea');
           textarea.setValue('Foo');
           textarea.trigger('keydown.enter', { ctrlKey: true });
 
