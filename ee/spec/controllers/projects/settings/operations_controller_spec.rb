@@ -118,6 +118,43 @@ describe Projects::Settings::OperationsController do
       end
     end
 
+    context 'format html' do
+      let(:project) { create(:project) }
+      let(:operations_update_service) { spy(:operations_update_service) }
+
+      before do
+        stub_licensed_features(tracing: true)
+
+        project.add_maintainer(user)
+      end
+
+      context 'when update succeeds' do
+        before do
+          stub_operations_update_service_returning(status: :success)
+        end
+
+        it 'shows a notice' do
+          update_project(project, { external_url: 'http://gitlab.com' })
+
+          expect(response).to redirect_to(project_settings_operations_url(project))
+          expect(flash[:notice]).to eq _('Your changes have been saved')
+        end
+      end
+
+      context 'when update fails' do
+        before do
+          stub_operations_update_service_returning(status: :error)
+        end
+
+        it 'renders show page' do
+          update_project(project, { external_url: 'http://gitlab.com' })
+
+          expect(response).to have_gitlab_http_status(:ok)
+          expect(response).to render_template(:show)
+        end
+      end
+    end
+
     context 'with a license' do
       before do
         stub_licensed_features(tracing: true)
@@ -343,5 +380,13 @@ describe Projects::Settings::OperationsController do
         tracing_setting_attributes: params
       }
     }
+  end
+
+  def stub_operations_update_service_returning(return_value = {})
+    expect(::Projects::Operations::UpdateService)
+      .to receive(:new).with(project, user, anything)
+      .and_return(operations_update_service)
+    expect(operations_update_service).to receive(:execute)
+      .and_return(return_value)
   end
 end
