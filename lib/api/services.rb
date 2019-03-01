@@ -160,17 +160,7 @@ module API
         end
       end
     end
-
-    desc "Trigger a global slack command" do
-      detail 'Added in GitLab 9.4'
-    end
-    post 'slack/trigger' do
-      if result = SlashCommands::GlobalSlackHandler.new(params).trigger
-        status result[:status] || 200
-        present result
-      else
-        not_found!
-      end
-    end
   end
 end
+
+API::Services.prepend(EE::API::Services)
