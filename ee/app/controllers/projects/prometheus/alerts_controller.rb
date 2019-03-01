@@ -15,13 +15,11 @@ module Projects
       before_action :authorize_admin_project!, except: [:notify]
       before_action :alert, only: [:update, :show, :destroy]
 
-      # rubocop: disable CodeReuse/ActiveRecord
       def index
-        alerts = project.prometheus_alerts.reorder(id: :asc)
+        alerts = prometheus_alerts.order_by('id_asc')
 
         render json: serialize_as_json(alerts)
       end
-      # rubocop: enable CodeReuse/ActiveRecord
 
       def show
         render json: serialize_as_json(alert)
@@ -40,7 +38,7 @@ module Projects
       end
 
       def create
-        @alert = project.prometheus_alerts.create(alerts_params)
+        @alert = prometheus_alerts.create(alerts_params)
 
         if @alert.persisted?
           schedule_prometheus_update!
@@ -96,7 +94,7 @@ module Projects
       end
 
       def alert
-        @alert ||= project.prometheus_alerts.for_metric(params[:id]).first || render_404
+        @alert ||= prometheus_alerts.for_metric(params[:id]).first || render_404
       end
 
       def application
@@ -114,6 +112,10 @@ module Projects
         id = params[:project_id]
 
         @project = Project.find_by_full_path("#{namespace}/#{id}")
+      end
+
+      def prometheus_alerts
+        project.prometheus_alerts.for_environment(params[:environment_id])
       end
     end
   end
