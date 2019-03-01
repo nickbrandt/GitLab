@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import initNotesApp from 'ee_else_ce/mr_notes/init_notes';
+import initNotesApp from './init_notes';
 import initDiffsApp from '../diffs';
 import discussionCounter from '../notes/components/discussion_counter.vue';
 import initDiscussionFilters from '../notes/discussion_filters';
