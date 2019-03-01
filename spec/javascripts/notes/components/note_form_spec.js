@@ -102,6 +102,13 @@ describe('issue_note_form component', () => {
     });
 
     describe('keyboard events', () => {
+      let textarea;
+
+      beforeEach(() => {
+        textarea = wrapper.find('textarea');
+        textarea.setValue('Foo');
+      });
+
       describe('up', () => {
         it('should ender edit mode', () => {
           // TODO: do not spy on vm
