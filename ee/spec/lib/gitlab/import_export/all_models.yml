@@ -79,6 +79,7 @@ project:
 - alerting_setting
 - webide_pipelines
 - reviews
+- incident_management_setting
 prometheus_metrics:
 - project
 - prometheus_alerts
@@ -99,3 +100,5 @@ reviews:
 - merge_request
 - author
 - notes
+incident_management_setting:
+- project

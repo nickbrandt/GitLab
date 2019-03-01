@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190220150130) do
+ActiveRecord::Schema.define(version: 20190228092516) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -45,6 +45,7 @@ ActiveRecord::Schema.define(version: 20190220150130) do
     t.text "message_background_color"
     t.text "message_font_color"
     t.string "favicon"
+    t.boolean "email_header_and_footer_enabled", default: false, null: false
   end
 
   create_table "application_setting_terms", force: :cascade do |t|
@@ -2283,6 +2284,12 @@ ActiveRecord::Schema.define(version: 20190220150130) do
     t.index ["project_id"], name: "index_project_import_data_on_project_id", using: :btree
   end
 
+  create_table "project_incident_management_settings", primary_key: "project_id", id: :integer, force: :cascade do |t|
+    t.boolean "create_issue", default: false, null: false
+    t.boolean "send_email", default: true, null: false
+    t.text "issue_template_key"
+  end
+
   create_table "project_mirror_data", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "retry_count", default: 0, null: false
@@ -2471,7 +2478,7 @@ ActiveRecord::Schema.define(version: 20190220150130) do
     t.integer "project_id", null: false
     t.integer "prometheus_metric_id", null: false
     t.index ["environment_id"], name: "index_prometheus_alerts_on_environment_id", using: :btree
-    t.index ["project_id", "prometheus_metric_id"], name: "index_prometheus_alerts_on_project_id_and_prometheus_metric_id", unique: true, using: :btree
+    t.index ["project_id", "prometheus_metric_id", "environment_id"], name: "index_prometheus_alerts_metric_environment", unique: true, using: :btree
     t.index ["prometheus_metric_id"], name: "index_prometheus_alerts_on_prometheus_metric_id", using: :btree
   end
 
@@ -3124,6 +3131,7 @@ ActiveRecord::Schema.define(version: 20190220150130) do
     t.boolean "include_private_contributions"
     t.string "commit_email"
     t.integer "group_view"
+    t.integer "managing_group_id"
     t.index ["accepted_term_id"], name: "index_users_on_accepted_term_id", using: :btree
     t.index ["admin"], name: "index_users_on_admin", using: :btree
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree
@@ -3134,6 +3142,7 @@ ActiveRecord::Schema.define(version: 20190220150130) do
     t.index ["ghost"], name: "index_users_on_ghost", using: :btree
     t.index ["group_view"], name: "index_users_on_group_view", using: :btree
     t.index ["incoming_email_token"], name: "index_users_on_incoming_email_token", using: :btree
+    t.index ["managing_group_id"], name: "index_users_on_managing_group_id", using: :btree
     t.index ["name"], name: "index_users_on_name", using: :btree
     t.index ["name"], name: "index_users_on_name_trigram", using: :gin, opclasses: {"name"=>"gin_trgm_ops"}
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
@@ -3509,6 +3518,7 @@ ActiveRecord::Schema.define(version: 20190220150130) do
   add_foreign_key "project_features", "projects", name: "fk_18513d9b92", on_delete: :cascade
   add_foreign_key "project_group_links", "projects", name: "fk_daa8cee94c", on_delete: :cascade
   add_foreign_key "project_import_data", "projects", name: "fk_ffb9ee3a10", on_delete: :cascade
+  add_foreign_key "project_incident_management_settings", "projects", on_delete: :cascade
   add_foreign_key "project_mirror_data", "projects", name: "fk_d1aad367d7", on_delete: :cascade
   add_foreign_key "project_repositories", "projects", on_delete: :cascade
   add_foreign_key "project_repositories", "shards", on_delete: :restrict
@@ -3584,6 +3594,7 @@ ActiveRecord::Schema.define(version: 20190220150130) do
   add_foreign_key "user_statuses", "users", on_delete: :cascade
   add_foreign_key "user_synced_attributes_metadata", "users", on_delete: :cascade
   add_foreign_key "users", "application_setting_terms", column: "accepted_term_id", name: "fk_789cd90b35", on_delete: :cascade
+  add_foreign_key "users", "namespaces", column: "managing_group_id", name: "fk_a4b8fefe3e", on_delete: :nullify
   add_foreign_key "users_ops_dashboard_projects", "projects", on_delete: :cascade
   add_foreign_key "users_ops_dashboard_projects", "users", on_delete: :cascade
   add_foreign_key "users_star_projects", "projects", name: "fk_22cd27ddfc", on_delete: :cascade

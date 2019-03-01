@@ -1,0 +1,5 @@
+---
+title: Allow assigning Prometheus alerts to multiple environments
+merge_request: 7361
+author:
+type: fixed

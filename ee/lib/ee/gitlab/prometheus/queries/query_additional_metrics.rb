@@ -13,7 +13,7 @@ module EE
 
           def query_with_alert(project, environment)
             alerts_map =
-              project.prometheus_alerts.each_with_object({}) do |alert, hsh|
+              environment.prometheus_alerts.each_with_object({}) do |alert, hsh|
                 hsh[alert[:prometheus_metric_id]] = alert.prometheus_metric_id
               end
 

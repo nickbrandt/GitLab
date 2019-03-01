@@ -1,10 +1,10 @@
 require 'spec_helper'
 
 describe EE::User do
+  subject(:user) { User.new }
+
   describe 'user creation' do
     describe 'with defaults' do
-      let(:user) { User.new }
-
       it "applies defaults to user" do
         expect(user.group_view).to eq('details')
       end
@@ -376,6 +376,20 @@ describe EE::User do
           expect { subject.group_sso?(group) }.not_to exceed_query_limit(0)
         end
       end
+    end
+  end
+
+  describe '#group_managed_account?' do
+    context 'when user has managing group linked' do
+      before do
+        subject.managing_group = Group.new
+      end
+
+      it { is_expected.to be_group_managed_account }
+    end
+
+    context 'when user has no linked managing group' do
+      it { is_expected.not_to be_group_managed_account }
     end
   end
 end

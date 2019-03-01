@@ -29,6 +29,20 @@ module API
         present paginate(packages), with: EE::API::Entities::Package
       end
 
+      desc 'Get a single project package' do
+        detail 'This feature was introduced in GitLab 11.9'
+        success EE::API::Entities::Package
+      end
+      params do
+        requires :package_id, type: Integer, desc: 'The ID of a package'
+      end
+      get ':id/packages/:package_id' do
+        package = ::Packages::PackageFinder
+          .new(user_project, params[:package_id]).execute
+
+        present package, with: EE::API::Entities::Package
+      end
+
       desc 'Remove a package' do
         detail 'This feature was introduced in GitLab 11.9'
       end

@@ -52,6 +52,12 @@ describe Groups::BoardsController do
     end
   end
 
+  describe 'GET recent' do
+    let(:parent) { group }
+
+    it_behaves_like 'returns recently visited boards'
+  end
+
   describe 'GET show' do
     context 'for multiple issue boards' do
       let(:parent) { group }

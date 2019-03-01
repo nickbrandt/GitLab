@@ -1,10 +1,10 @@
 <script>
 import { __ } from '~/locale';
-import relatedIssueMixin from '../mixins/related_issues_mixin';
+import relatedIssuableMixin from '~/vue_shared/mixins/related_issuable_mixin';
 
 export default {
   name: 'IssueToken',
-  mixins: [relatedIssueMixin],
+  mixins: [relatedIssuableMixin],
   props: {
     isCondensed: {
       type: Boolean,
@@ -61,7 +61,7 @@ export default {
         }"
         class="js-issue-token-title"
       >
-        <span class="issue-token-title-text"> {{ title }} </span>
+        <span class="issue-token-title-text">{{ title }}</span>
       </component>
       <component
         :is="innerComponentType"
@@ -98,7 +98,7 @@ export default {
       class="js-issue-token-remove-button"
       @click="onRemoveRequest"
     >
-      <i class="fa fa-times" aria-hidden="true"> </i>
+      <i class="fa fa-times" aria-hidden="true"></i>
     </button>
   </div>
 </template>

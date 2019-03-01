@@ -6,8 +6,7 @@ import { truncateSha } from '~/lib/utils/text_utility';
 import { s__, __, sprintf } from '~/locale';
 import systemNote from '~/vue_shared/components/notes/system_note.vue';
 import icon from '~/vue_shared/components/icon.vue';
-import batchCommentsDiffLineNoteFormMixin from 'ee/batch_comments/mixins/diff_line_note_form';
-import DraftNote from 'ee/batch_comments/components/draft_note.vue';
+import diffLineNoteFormMixin from 'ee_else_ce/notes/mixins/diff_line_note_form';
 import TimelineEntryItem from '~/vue_shared/components/notes/timeline_entry_item.vue';
 import Flash from '../../flash';
 import { SYSTEM_NOTE } from '../constants';
@@ -49,19 +48,13 @@ export default {
     placeholderSystemNote,
     ResolveWithIssueButton,
     systemNote,
-    DraftNote,
+    DraftNote: () => import('ee_component/batch_comments/components/draft_note.vue'),
     TimelineEntryItem,
   },
   directives: {
     GlTooltip: GlTooltipDirective,
   },
-  mixins: [
-    autosave,
-    noteable,
-    resolvable,
-    discussionNavigation,
-    batchCommentsDiffLineNoteFormMixin,
-  ],
+  mixins: [autosave, noteable, resolvable, discussionNavigation, diffLineNoteFormMixin],
   props: {
     discussion: {
       type: Object,
@@ -99,7 +92,6 @@ export default {
     return {
       isReplying: false,
       isResolving: false,
-      isUnresolving: false,
       resolveAsThread: true,
       isRepliesCollapsed: Boolean(!isDiffDiscussion && resolved),
     };

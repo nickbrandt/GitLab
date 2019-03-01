@@ -38,6 +38,12 @@ describe Projects::BoardsController do
     end
   end
 
+  describe 'GET recent' do
+    let(:parent) { project }
+
+    it_behaves_like 'returns recently visited boards'
+  end
+
   describe 'GET show' do
     let(:parent) { project }
 

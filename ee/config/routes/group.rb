@@ -67,7 +67,11 @@ constraints(::Constraints::GroupUrlConstrainer.new) do
     end
 
     resources :todos, only: [:create]
-    resources :boards, only: [:create, :update, :destroy]
+    resources :boards, only: [:create, :update, :destroy] do
+      collection do
+        get :recent
+      end
+    end
 
     namespace :security do
       resource :dashboard, only: [:show], controller: :dashboard

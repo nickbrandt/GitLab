@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow-callback, no-var, one-var, object-shorthand, consistent-return, no-unused-vars, func-names */
 
 import $ from 'jquery';
-import Api from '~/api';
+import Api from 'ee/api';
 
 export default function initLDAPGroupsSelect() {
   var groupFormatSelection, ldapGroupResult;
@@ -23,7 +23,7 @@ export default function initLDAPGroupsSelect() {
           query: function(query) {
             var provider;
             provider = $('#ldap_group_link_provider').val();
-            return Api.ldap_groups(query.term, provider, function(groups) {
+            return Api.ldapGroups(query.term, provider, function(groups) {
               var data;
               data = {
                 results: groups,

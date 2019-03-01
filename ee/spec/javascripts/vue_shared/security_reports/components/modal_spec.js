@@ -149,6 +149,7 @@ describe('Security Reports modal', () => {
         props.modal.title = 'Arbitrary file existence disclosure in Action Pack';
         props.modal.data.file.value = 'Gemfile.lock';
         props.modal.data.file.url = `${TEST_HOST}/path/Gemfile.lock`;
+        props.modal.data.severity = { value: 'critical' };
         vm = mountComponent(Component, props);
       });
 
@@ -166,6 +167,12 @@ describe('Security Reports modal', () => {
         expect(
           vm.$el.querySelector('.js-link-vulnerabilityFeedbackHelpPath').getAttribute('href'),
         ).toEqual('feedbacksHelpPath');
+      });
+
+      it('renders severity with a badge', () => {
+        const badge = vm.$el.querySelector('.severity-badge');
+
+        expect(badge.textContent).toContain('critical');
       });
     });
   });

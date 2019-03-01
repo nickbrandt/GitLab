@@ -1,7 +1,7 @@
+import API from 'ee/api';
 import * as types from './mutation_types';
 import createFlash from '~/flash';
 import { __ } from '~/locale';
-import API from '~/api';
 
 /**
  * SUBSCRIPTION TABLE
