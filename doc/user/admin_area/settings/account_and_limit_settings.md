@@ -1,6 +1,6 @@
 # Account and limit settings
 
-## Repository size limit
+## Repository size limit **[STARTER]**
 
 > [Introduced][ee-740] in [GitLab Enterprise Edition 8.12][ee-8.12].
 
@@ -16,20 +16,25 @@ There are numerous cases where you'll need to set up a limit for repository size
 For instance, consider the following workflow:
 
 1. Your team develops apps which demand large files to be stored in
-the application repository
+   the application repository.
 1. Although you have enabled [Git LFS](../../../workflow/lfs/manage_large_binaries_with_git_lfs.html#git-lfs)
-to your project, your storage has grown significantly
+   to your project, your storage has grown significantly.
 1. Before you blow your storage limit up, you set up a limit of 10 GB
-per repository
+   per repository.
 
 ### How it works
 
 Only a GitLab administrator can set those limits. Setting the limit to `0` means
 there are no restrictions.
 
-These settings can be found within each project's settings, in a group's
-settings and in the Application Settings area for the global value
-(`/admin/application_settings`).
+These settings can be found within:
+
+- Each project's settings.
+- A group's settings.
+- The **Size limit per repository (MB)** field in the **Account and limit** section of a GitLab instance's
+  settings by navigating to either:
+  - **Admin Area > Settings > General**.
+  - The path `/admin/application_settings`.
 
 The very first push of a new project cannot be checked for size as of now, so
 the first push will allow you to upload more than the limit dictates, but every
