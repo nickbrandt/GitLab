@@ -54,12 +54,8 @@ module Geo
       end
     end
 
-    def schedule_repack
-      GitGarbageCollectWorker.perform_async(@project.id, :full_repack, lease_key)
-    end
-
     def execute_housekeeping
-      Geo::ProjectHousekeepingService.new(project).execute
+      Geo::ProjectHousekeepingService.new(project, new_repository: new_repository?).execute
     end
   end
 end
