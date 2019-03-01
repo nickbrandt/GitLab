@@ -2773,6 +2773,14 @@ ActiveRecord::Schema.define(version: 20190305162221) do
     t.index ["group_id"], name: "index_saml_providers_on_group_id", using: :btree
   end
 
+  create_table "scim_oauth_access_tokens", force: :cascade do |t|
+    t.datetime_with_timezone "created_at", null: false
+    t.datetime_with_timezone "updated_at", null: false
+    t.integer "group_id", null: false
+    t.string "token", null: false
+    t.index ["group_id", "token"], name: "index_scim_oauth_access_tokens_on_group_id_and_token", unique: true, using: :btree
+  end
+
   create_table "sent_notifications", force: :cascade do |t|
     t.integer "project_id"
     t.integer "noteable_id"
