@@ -14,6 +14,9 @@ import boardsStore from '~/boards/stores/boards_store';
 import BoardForm from './board_form.vue';
 import AssigneeList from './assignees_list_slector';
 import MilestoneList from './milestone_list_selector';
+import httpStatusCodes from '~/lib/utils/http_status';
+
+const MIN_BOARDS_TO_VIEW_RECENT = 10;
 
 export default {
   name: 'BoardsSelector',
@@ -85,6 +88,7 @@ export default {
       hasMilestoneListMounted: false,
       scrollFadeInitialized: false,
       boards: [],
+      recentBoards: [],
       state: boardsStore.state,
       throttledSetScrollFade: throttle(this.setScrollFade, this.throttleDuration),
       contentClientHeight: 0,
@@ -121,6 +125,13 @@ export default {
         'fade-out': !this.hasScrollFade,
       };
     },
+    showRecentSection() {
+      return (
+        this.recentBoards.length &&
+        this.boards.length > MIN_BOARDS_TO_VIEW_RECENT &&
+        !this.filterTerm.length
+      );
+    },
   },
   watch: {
     filteredBoards() {
@@ -130,6 +141,7 @@ export default {
     reload() {
       if (this.reload) {
         this.boards = [];
+        this.recentBoards = [];
         this.loading = true;
         this.reload = false;
 
@@ -154,12 +166,29 @@ export default {
         return;
       }
 
-      gl.boardService
-        .allBoards()
-        .then(res => res.data)
-        .then(json => {
+      const recentBoardsPromise = new Promise((resolve, reject) =>
+        gl.boardService
+          .recentBoards()
+          .then(resolve)
+          .catch(err => {
+            /**
+             *  If user is unauthorized we'd still want to resolve the
+             *  request to display all boards.
+             */
+            if (err.response.status === httpStatusCodes.UNAUTHORIZED) {
+              resolve({ data: [] }); // recent boards are empty
+              return;
+            }
+            reject(err);
+          }),
+      );
+
+      Promise.all([gl.boardService.allBoards(), recentBoardsPromise])
+        .then(([allBoards, recentBoards]) => [allBoards.data, recentBoards.data])
+        .then(([allBoardsJson, recentBoardsJson]) => {
           this.loading = false;
-          this.boards = json;
+          this.boards = allBoardsJson;
+          this.recentBoards = recentBoardsJson;
         })
         .then(() => this.$nextTick()) // Wait for boards list in DOM
         .then(() => {
@@ -243,6 +272,25 @@ export default {
           >
             {{ s__('IssueBoards|No matching boards found') }}
           </gl-dropdown-item>
+
+          <gl-dropdown-header v-if="showRecentSection" class="mt-0">
+            Recent
+          </gl-dropdown-header>
+
+          <template v-if="showRecentSection">
+            <gl-dropdown-item
+              v-for="recentBoard in recentBoards"
+              :key="`recent-${recentBoard.id}`"
+              class="js-dropdown-item"
+              :href="`${boardBaseUrl}/${recentBoard.id}`"
+            >
+              {{ recentBoard.name }}
+            </gl-dropdown-item>
+          </template>
+
+          <gl-dropdown-header v-if="showRecentSection" class="mt-0">
+            All
+          </gl-dropdown-header>
 
           <gl-dropdown-item
             v-for="otherBoard in filteredBoards"

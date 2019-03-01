@@ -8,6 +8,7 @@ module EE
       extend ActiveSupport::Concern
 
       prepended do
+        before_action :authenticate_user!, only: [:recent]
         before_action :authorize_create_board!, only: [:create]
         before_action :authorize_admin_board!, only: [:create, :update, :destroy]
       end
