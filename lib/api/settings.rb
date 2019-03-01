@@ -9,6 +9,11 @@ module API
         @current_setting ||=
           (ApplicationSetting.current_without_cache || ApplicationSetting.create_from_defaults)
       end
+
+      def filter_attributes_using_license(attrs)
+        # This method will be redefined in EE.
+        attrs
+      end
     end
 
     desc 'Get the current application settings' do
@@ -165,7 +170,6 @@ module API
       optional(*optional_attributes)
       at_least_one_of(*optional_attributes)
     end
-    # rubocop: disable CodeReuse/ActiveRecord
     put "application/settings" do
       attrs = declared_params(include_missing: false)
 
@@ -187,23 +191,7 @@ module API
         attrs[:password_authentication_enabled_for_web] = attrs.delete(:password_authentication_enabled)
       end
 
-      ## EE-only START: Remove unlicensed attributes
-      unless ::License.feature_available?(:repository_mirrors)
-        attrs = attrs.except(*::EE::ApplicationSettingsHelper.repository_mirror_attributes)
-      end
-
-      unless ::License.feature_available?(:external_authorization_service)
-        attrs = attrs.except(*::EE::ApplicationSettingsHelper.external_authorization_service_attributes)
-      end
-
-      unless ::License.feature_available?(:email_additional_text)
-        attrs = attrs.except(:email_additional_text)
-      end
-
-      unless ::License.feature_available?(:custom_file_templates)
-        attrs = attrs.except(:file_template_project_id)
-      end
-      ## EE-only END: Remove unlicensed attributes
+      attrs = filter_attributes_using_license(attrs)
 
       if ApplicationSettings::UpdateService.new(current_settings, current_user, attrs).execute
         present current_settings, with: Entities::ApplicationSetting
@@ -211,6 +199,7 @@ module API
         render_validation_error!(current_settings)
       end
     end
-    # rubocop: enable CodeReuse/ActiveRecord
   end
 end
+
+API::Settings.prepend(EE::API::Settings)
