@@ -37,4 +37,4 @@ module BoardsActions
   end
 end
 
-prepend(EE::BoardsActions)
+BoardsActions.prepend(EE::BoardsActions)

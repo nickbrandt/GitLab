@@ -5,13 +5,18 @@ shared_examples 'multiple issue boards show' do
   let!(:board2) { create(:board, parent: parent, name: 'a') }
 
   context 'when multiple issue boards is enabled' do
-    it 'let user view any board from parent' do
-      [board1, board2].each do |board|
-        show(board)
+    it 'lets user view board1' do
+      show(board1)
 
-        expect(response).to have_gitlab_http_status(200)
-        expect(assigns(:board)).to eq(board)
-      end
+      expect(response).to have_gitlab_http_status(200)
+      expect(assigns(:board)).to eq(board1)
+    end
+
+    it 'lets user view board2' do
+      show(board2)
+
+      expect(response).to have_gitlab_http_status(200)
+      expect(assigns(:board)).to eq(board2)
     end
   end
 

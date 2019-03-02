@@ -29,6 +29,10 @@ describe Projects::BoardsController do
       subject { list_boards }
     end
 
+    it_behaves_like 'redirects to last visited board' do
+      let(:parent) { project }
+    end
+
     def list_boards(format: :html)
       get :index, params: {
                     namespace_id: project.namespace,
