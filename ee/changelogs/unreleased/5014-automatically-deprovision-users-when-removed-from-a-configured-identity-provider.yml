@@ -1,6 +1,5 @@
 ---
-title: Resolve Automatically deprovision users when removed from a configured identity
-  provider
+title: Automatically deprovision and update users from a configured identity via SCIM
 merge_request: 9388
 author:
 type: added

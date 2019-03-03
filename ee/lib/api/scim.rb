@@ -37,6 +37,7 @@ module API
 
       resource :Users do
         before do
+          check_group_scim_enabled(find_group(params[:group]))
           check_group_saml_configured
         end
 

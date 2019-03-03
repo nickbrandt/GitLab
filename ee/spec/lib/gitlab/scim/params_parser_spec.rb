@@ -36,7 +36,7 @@ describe EE::Gitlab::Scim::ParamsParser do
       expect(described_class.new(operations: operations).deprovision_user?).to be true
     end
 
-    it 'returns an empty hash for the wrong operations' do
+    it 'returns false when not deprovisioning' do
       operations = [{ "op": "Replace", "path": "active", "value": "True" }]
 
       expect(described_class.new(operations: operations).deprovision_user?).to be false
