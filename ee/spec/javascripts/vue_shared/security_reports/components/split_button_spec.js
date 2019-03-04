@@ -2,7 +2,7 @@ import Vue from 'vue';
 import component from 'ee/vue_shared/security_reports/components/split_button.vue';
 import mountComponent from 'spec/helpers/vue_mount_component_helper';
 
-describe('Event Item', () => {
+describe('Split Button', () => {
   const Component = Vue.extend(component);
   const buttons = [
     {
@@ -42,22 +42,15 @@ describe('Event Item', () => {
     });
 
     it('displays the first button initially', () => {
-      // TODO: Workout what the selector is
-      expect(vm.$el.querySelector(''));
-    });
-
-    it('displays the second button when selected', () => {
-      vm.$el.querySelectorAll('.dropdown-item')[1].click();
-
-      // TODO: Workout what the selector is
-      expect(vm.$el.querySelector(''));
+      expect(vm.$el.querySelector('.btn').textContent.trim()).toBe(buttons[0].name);
     });
 
     it('emits the correct event when the button is pressed', () => {
-      vm.$el.querySelector('the button').click();
+      spyOn(vm, '$emit');
 
-      // TODO: work out how to test the emitted event
-      expect('the event to be emmitted');
+      vm.$el.querySelector('.btn').click();
+
+      expect(vm.$emit).toHaveBeenCalledWith(buttons[0].action);
     });
   });
 

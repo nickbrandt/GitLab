@@ -48,52 +48,50 @@ export default {
     actionButtons() {
       const buttons = [];
       const issueButton = {
-        name: 'Create issue',
-        tagline: 'Investigate this vulnerability by creating an issue',
+        name: s__('ciReport|Create issue'),
+        tagline: s__('ciReport|Investigate this vulnerability by creating an issue'),
         isLoading: this.modal.isCreatingNewIssue,
         action: 'createNewIssue',
       };
       const MRButton = {
-        name: 'Create merge request',
-        tagline: 'Implement this solution by creating a merge request',
+        name: s__('ciReport|Create merge request'),
+        tagline: s__('ciReport|Implement this solution by creating a merge request'),
         isLoading: this.modal.isCreatingMergeRequest,
         action: 'createMergeRequest',
       };
 
-      if (!this.modal.vulnerability.hasIssue && this.canCreateIssuePermission) {
+      if (!this.vulnerability.hasIssue && this.canCreateIssuePermission) {
         buttons.push(issueButton);
       }
 
-      if (!this.modal.vulnerability.hasMergeRequest) {
+      if (!this.vulnerability.hasMergeRequest) {
         buttons.push(MRButton);
       }
 
       return buttons;
     },
     revertTitle() {
-      return this.modal.vulnerability.isDismissed
+      return this.vulnerability.isDismissed
         ? s__('ciReport|Undo dismiss')
         : s__('ciReport|Dismiss vulnerability');
     },
     hasDismissedBy() {
       return (
-        this.modal.vulnerability &&
-        this.modal.vulnerability.dismissalFeedback &&
-        this.modal.vulnerability.dismissalFeedback.pipeline &&
-        this.modal.vulnerability.dismissalFeedback.author
+        this.vulnerability &&
+        this.vulnerability.dismissalFeedback &&
+        this.vulnerability.dismissalFeedback.pipeline &&
+        this.vulnerability.dismissalFeedback.author
       );
     },
     project() {
       return this.modal.data.project || {};
     },
     solution() {
-      return this.modal.vulnerability && this.modal.vulnerability.solution;
+      return this.vulnerability && this.vulnerability.solution;
     },
     remediation() {
       return (
-        this.modal.vulnerability &&
-        this.modal.vulnerability.remediations &&
-        this.modal.vulnerability.remediations[0]
+        this.vulnerability && this.vulnerability.remediations && this.vulnerability.remediations[0]
       );
     },
     renderSolutionCard() {
@@ -108,10 +106,32 @@ export default {
         (this.canCreateFeedbackPermission || this.canCreateIssuePermission)
       );
     },
+    issueFeedback() {
+      return this.vulnerability && this.vulnerability.issue_feedback;
+    },
+    mergeRequestFeedback() {
+      return this.vulnerability && this.vulnerability.merge_request_feedback;
+    },
+    vulnerability() {
+      return this.modal.vulnerability;
+    },
+    valuedFields() {
+      const { data } = this.modal;
+      const result = {};
+
+      for (let key in data) {
+        // debugger;
+        if (data[key].value && data[key].value.length) {
+          result[key] = data[key];
+        }
+      }
+
+      return result;
+    },
   },
   methods: {
     handleDismissClick() {
-      if (this.modal.vulnerability.isDismissed) {
+      if (this.vulnerability.isDismissed) {
         this.$emit('revertDismissIssue');
       } else {
         this.$emit('dismissIssue');
@@ -147,12 +167,7 @@ export default {
   >
     <slot>
       <div class="border-white mb-0 px-3">
-        <div
-          v-for="(field, key, index) in modal.data"
-          v-if="field.value"
-          :key="index"
-          class="d-flex my-2"
-        >
+        <div v-for="(field, key, index) in valuedFields" :key="index" class="d-flex my-2">
           <label class="col-2 text-right font-weight-bold pl-0">{{ field.text }}:</label>
           <div class="col-10 pl-0 text-secondary">
             <div v-if="hasInstances(field, key)" class="info-well">
@@ -238,30 +253,27 @@ export default {
       <solution-card v-if="renderSolutionCard" :solution="solution" :remediation="remediation" />
       <hr v-else />
 
-      <ul
-        v-if="modal.vulnerability.hasIssue || modal.vulnerability.hasMergeRequest"
-        class="notes card"
-      >
-        <li v-if="modal.vulnerability.hasIssue" class="note">
+      <ul v-if="vulnerability.hasIssue || vulnerability.hasMergeRequest" class="notes card">
+        <li v-if="vulnerability.hasIssue" class="note">
           <event-item
             type="issue"
             :project-name="project.value"
             :project-link="project.url"
-            :author-name="modal.vulnerability.issue_feedback.author.name"
-            :author-username="modal.vulnerability.issue_feedback.author.username"
-            :action-link-text="`#${modal.vulnerability.issue_feedback.issue_iid}`"
-            :action-link-url="modal.vulnerability.issue_feedback.issue_url"
+            :author-name="issueFeedback.author.name"
+            :author-username="issueFeedback.author.username"
+            :action-link-text="`#${issueFeedback.issue_iid}`"
+            :action-link-url="issueFeedback.issue_url"
           />
         </li>
-        <li v-if="modal.vulnerability.hasMergeRequest" class="note">
+        <li v-if="vulnerability.hasMergeRequest" class="note">
           <event-item
             type="mergeRequest"
-            :project-name="modal.data.project.value"
-            :project-link="modal.data.project.url"
-            :author-name="modal.vulnerability.merge_request_feedback.author.name"
-            :author-username="modal.vulnerability.merge_request_feedback.author.username"
-            :action-link-text="`!${modal.vulnerability.merge_request_feedback.merge_request_iid}`"
-            :action-link-url="modal.vulnerability.merge_request_feedback.merge_request_url"
+            :project-name="project.value"
+            :project-link="project.url"
+            :author-name="mergeRequestFeedback.author.name"
+            :author-username="mergeRequestFeedback.author.username"
+            :action-link-text="`!${mergeRequestFeedback.merge_request_iid}`"
+            :action-link-url="mergeRequestFeedback.merge_request_url"
           />
         </li>
       </ul>
@@ -270,12 +282,12 @@ export default {
         <div class="col-sm-12 text-secondary">
           <template v-if="hasDismissedBy">
             {{ s__('ciReport|Dismissed by') }}
-            <a :href="modal.vulnerability.dismissalFeedback.author.web_url" class="pipeline-id">
-              @{{ modal.vulnerability.dismissalFeedback.author.username }}
+            <a :href="vulnerability.dismissalFeedback.author.web_url" class="pipeline-id">
+              @{{ vulnerability.dismissalFeedback.author.username }}
             </a>
             {{ s__('ciReport|on pipeline') }}
-            <a :href="modal.vulnerability.dismissalFeedback.pipeline.path" class="pipeline-id"
-              >#{{ modal.vulnerability.dismissalFeedback.pipeline.id }}</a
+            <a :href="vulnerability.dismissalFeedback.pipeline.path" class="pipeline-id"
+              >#{{ vulnerability.dismissalFeedback.pipeline.id }}</a
             >.
           </template>
           <a
@@ -308,6 +320,7 @@ export default {
         <split-button
           v-if="actionButtons.length > 1"
           :buttons="actionButtons"
+          class="js-split-button"
           @createMergeRequest="$emit('createMergeRequest')"
           @createNewIssue="$emit('createNewIssue')"
         />

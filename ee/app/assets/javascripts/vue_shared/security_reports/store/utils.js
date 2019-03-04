@@ -24,17 +24,17 @@ const hasMatchingFix = (fixes, vulnerability) =>
 
 /**
  *
- * Returns the remediations that fix the given vulnerability or null
+ * Returns the remediations that fix the given vulnerability
  *
  * @param {Array} remediations
  * @param {Object} vulnerability
- * @returns {Array|null}
+ * @returns {Array}
  */
 export const findMatchingRemediations = (remediations, vulnerability) => {
   if (!Array.isArray(remediations)) {
-    return null;
+    return [];
   }
-  return remediations.filter(rem => hasMatchingFix(rem.fixes, vulnerability)) || null;
+  return remediations.filter(rem => hasMatchingFix(rem.fixes, vulnerability));
 };
 
 /**
@@ -58,6 +58,12 @@ function enrichVulnerabilityWithfeedback(vulnerability, feedback = []) {
           ...vuln,
           hasIssue: true,
           issue_feedback: fb,
+        };
+      } else if (fb.feedback_type === 'merge_request') {
+        return {
+          ...vuln,
+          hasMergeRequest: true,
+          merge_request_feedback: fb,
         };
       }
       return vuln;

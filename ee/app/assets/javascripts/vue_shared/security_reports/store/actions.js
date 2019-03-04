@@ -333,6 +333,7 @@ export const createNewIssue = ({ state, dispatch }) => {
 
 export const createMergeRequest = ({ state, dispatch }) => {
   const { vulnerability } = state.modal;
+  const { category, project_fingerprint } = vulnerability;
 
   dispatch('requestCreateMergeRequest');
 
@@ -340,8 +341,8 @@ export const createMergeRequest = ({ state, dispatch }) => {
     .post(state.vulnerabilityFeedbackPath, {
       vulnerability_feedback: {
         feedback_type: 'merge_request',
-        category: vulnerability.category,
-        project_fingerprint: vulnerability.project_fingerprint,
+        category,
+        project_fingerprint,
         vulnerability_data: vulnerability,
       },
     })

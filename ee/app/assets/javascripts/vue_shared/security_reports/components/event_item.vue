@@ -1,4 +1,5 @@
 <script>
+import { s__, sprintf } from '~/locale';
 import Icon from '~/vue_shared/components/icon.vue';
 
 export default {
@@ -40,11 +41,11 @@ export default {
   },
   typeMap: {
     issue: {
-      name: 'issue',
+      name: s__('Reports|issue'),
       icon: 'issue-created',
     },
     mergeRequest: {
-      name: 'merge request',
+      name: s__('Reports|merge request'),
       icon: 'merge-request',
     },
   },
@@ -54,6 +55,9 @@ export default {
     },
     iconName() {
       return this.typeData.icon || 'plus';
+    },
+    createdText() {
+      return sprintf(s__('ciReport|Created %{eventType}'), { eventType: this.typeData.name });
     },
   },
 };
@@ -70,12 +74,12 @@ export default {
         <em class="js-username">@{{ authorUsername }}</em>
       </div>
       <div>
-        <span v-if="typeData.name" class="js-created">Created {{ typeData.name }}</span>
+        <span v-if="typeData.name" class="js-created">{{ createdText }}</span>
         <a class="js-action-link" :title="actionLinkText" :href="actionLinkUrl">
           {{ actionLinkText }}
         </a>
         <template v-if="projectName">
-          <span>at </span>
+          <span>{{ __('at') }} </span>
           <a class="js-project-name" :title="projectName" :href="projectLink">{{ projectName }}</a>
         </template>
       </div>

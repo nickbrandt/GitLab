@@ -210,17 +210,23 @@ export const receiveUndoDismissError = ({ commit }, { flashError }) => {
 };
 
 export const createMergeRequest = ({ dispatch }, { vulnerability, flashError }) => {
+  const {
+    report_type,
+    project_fingerprint,
+    vulnerability_feedback_merge_request_path,
+  } = vulnerability;
+
   dispatch('requestCreateMergeRequest');
 
   axios
-    .post(vulnerability.vulnerability_feedback_merge_request_path, {
+    .post(vulnerability_feedback_merge_request_path, {
       vulnerability_feedback: {
         feedback_type: 'merge_request',
-        category: vulnerability.report_type,
-        project_fingerprint: vulnerability.project_fingerprint,
+        category: report_type,
+        project_fingerprint,
         vulnerability_data: {
           ...vulnerability,
-          category: vulnerability.report_type,
+          category: report_type,
         },
       },
     })
