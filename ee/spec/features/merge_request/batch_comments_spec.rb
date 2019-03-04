@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe 'Merge request > Batch comments', :js do
+describe 'Merge request > Batch comments', :js, :quarantine do
   include MergeRequestDiffHelpers
   include RepoHelpers
 
