@@ -3,28 +3,6 @@
 require "spec_helper"
 
 describe EE::UserCalloutsHelper do
-  describe '.show_gold_trial?' do
-    let(:user) { create(:user) }
-
-    before do
-      allow(helper).to receive(:user_dismissed?).with(described_class::GOLD_TRIAL).and_return(false)
-      allow(Gitlab).to receive(:com?).and_return(true)
-      allow(Gitlab::Database).to receive(:read_only?).and_return(false)
-      allow(user).to receive(:any_namespace_with_gold?).and_return(false)
-      allow(user).to receive(:any_namespace_with_trial?).and_return(false)
-    end
-
-    it 'returns true when all conditions are met' do
-      expect(helper.show_gold_trial?(user)).to be(true)
-    end
-
-    it 'returns false when there is no user record' do
-      allow(helper).to receive(:current_user).and_return(nil)
-
-      expect(helper.show_gold_trial?).to be(false)
-    end
-  end
-
   describe '.render_enable_hashed_storage_warning' do
     context 'when we should show the enable warning' do
       it 'renders the enable warning' do
@@ -187,6 +165,81 @@ describe EE::UserCalloutsHelper do
       end
 
       it { is_expected.to be_falsey }
+    end
+  end
+
+  describe '#render_dashboard_gold_trial' do
+    using RSpec::Parameterized::TableSyntax
+
+    set(:namespace) { create(:namespace) }
+    set(:gold_plan) { create(:gold_plan) }
+    let(:user) { namespace.owner }
+
+    where(:show_gold_trial?, :user_default_dashboard?, :has_no_trial_or_gold_plan?, :should_render?) do
+      true  | true  | true  | true
+      true  | true  | false | false
+      true  | false | true  | false
+      false | true  | true  | false
+      true  | false | false | false
+      false | false | true  | false
+      false | true  | false | false
+      false | false | false | false
+    end
+
+    with_them do
+      before do
+        allow(helper).to receive(:show_gold_trial?) { show_gold_trial? }
+        allow(helper).to receive(:user_default_dashboard?) { user_default_dashboard? }
+        namespace.update(plan: gold_plan) unless has_no_trial_or_gold_plan?
+      end
+
+      it do
+        if should_render?
+          expect(helper).to receive(:render).with('shared/gold_trial_callout')
+        else
+          expect(helper).not_to receive(:render)
+        end
+
+        helper.render_dashboard_gold_trial(user)
+      end
+    end
+  end
+
+  describe '#render_billings_gold_trial' do
+    using RSpec::Parameterized::TableSyntax
+
+    set(:namespace) { create(:namespace) }
+    set(:silver_plan) { create(:silver_plan) }
+    set(:gold_plan) { create(:gold_plan) }
+    let(:user) { namespace.owner }
+
+    where(:show_gold_trial?, :gold_plan?, :free_plan?, :should_render?) do
+      true  | false | false | true
+      true  | false | true  | true
+      true  | true  | true  | false
+      true  | true  | false | false
+      false | true  | true  | false
+      false | false | true  | false
+      false | true  | false | false
+      false | false | false | false
+    end
+
+    with_them do
+      before do
+        allow(helper).to receive(:show_gold_trial?) { show_gold_trial? }
+        namespace.update(plan: gold_plan) if gold_plan?
+        namespace.update(plan: silver_plan) if !gold_plan? && !free_plan?
+      end
+
+      it do
+        if should_render?
+          expect(helper).to receive(:render).with('shared/gold_trial_callout', is_dismissable: !free_plan?)
+        else
+          expect(helper).not_to receive(:render)
+        end
+
+        helper.render_billings_gold_trial(user, namespace)
+      end
     end
   end
 end

@@ -2,35 +2,19 @@
 
 module EE
   module UserCalloutsHelper
-    GOLD_TRIAL = 'gold_trial'
+    extend ::Gitlab::Utils::Override
+
     GEO_ENABLE_HASHED_STORAGE = 'geo_enable_hashed_storage'
     GEO_MIGRATE_HASHED_STORAGE = 'geo_migrate_hashed_storage'
     CANARY_DEPLOYMENT = 'canary_deployment'
-
-    def show_gold_trial?(user = current_user)
-      return false unless user
-      return false if user_dismissed?(GOLD_TRIAL)
-      return false unless show_gold_trial_suitable_env?
-
-      users_namespaces_clean?(user)
-    end
+    GOLD_TRIAL = 'gold_trial'
+    GOLD_TRIAL_BILLINGS = 'gold_trial_billings'
 
     def show_canary_deployment_callout?(project)
       !user_dismissed?(CANARY_DEPLOYMENT) &&
         show_promotions? &&
         # use :canary_deployments if we create a feature flag for it in the future
         !project.feature_available?(:deploy_board)
-    end
-
-    def show_gold_trial_suitable_env?
-      (::Gitlab.com? || Rails.env.development?) &&
-        !::Gitlab::Database.read_only?
-    end
-
-    def users_namespaces_clean?(user)
-      return false if user.any_namespace_with_gold?
-
-      !user.any_namespace_with_trial?
     end
 
     def render_enable_hashed_storage_warning
@@ -62,6 +46,22 @@ module EE
       any_project_not_in_hashed_storage?
     end
 
+    override :render_dashboard_gold_trial
+    def render_dashboard_gold_trial(user)
+      return unless user_default_dashboard?(user) &&
+          show_gold_trial?(user, GOLD_TRIAL) &&
+          has_no_trial_or_gold_plan?(user)
+
+      render 'shared/gold_trial_callout'
+    end
+
+    def render_billings_gold_trial(user, namespace)
+      return if namespace.gold_plan?
+      return unless show_gold_trial?(user, GOLD_TRIAL_BILLINGS)
+
+      render 'shared/gold_trial_callout', is_dismissable: !namespace.free_plan?
+    end
+
     private
 
     def hashed_storage_enabled?
@@ -88,6 +88,25 @@ module EE
       migrate_link = link_to(_('For more info, read the documentation.'), 'https://docs.gitlab.com/ee/administration/repository_storage_types.html#how-to-migrate-to-hashed-storage', target: '_blank')
       linked_message = message % { migrate_link: migrate_link }
       linked_message.html_safe
+    end
+
+    def show_gold_trial?(user, callout = GOLD_TRIAL)
+      return false unless user
+      return false unless show_gold_trial_suitable_env?
+      return false if user_dismissed?(callout)
+
+      true
+    end
+
+    def show_gold_trial_suitable_env?
+      (::Gitlab.com? || Rails.env.development?) &&
+        !::Gitlab::Database.read_only?
+    end
+
+    def has_no_trial_or_gold_plan?(user)
+      return false if user.any_namespace_with_gold?
+
+      !user.any_namespace_with_trial?
     end
   end
 end
