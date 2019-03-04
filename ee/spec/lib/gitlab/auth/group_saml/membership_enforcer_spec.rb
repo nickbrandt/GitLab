@@ -7,7 +7,7 @@ describe Gitlab::Auth::GroupSaml::MembershipEnforcer do
   let(:group) { identity.saml_provider.group }
 
   before do
-    allow_any_instance_of(SamlProvider).to receive(:enforced_sso).and_return(true)
+    allow_any_instance_of(SamlProvider).to receive(:enforced_sso?).and_return(true)
   end
 
   it 'allows adding the group member' do

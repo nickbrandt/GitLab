@@ -27,6 +27,14 @@ class SamlProvider < ActiveRecord::Base
     @defaults ||= DefaultOptions.new(group.full_path)
   end
 
+  def enforced_sso?
+    enabled? && super
+  end
+
+  def enforced_group_managed_accounts?
+    enforced_sso? && super
+  end
+
   class DefaultOptions
     include Gitlab::Routing
 

@@ -66,13 +66,12 @@ describe GroupSaml::SamlProvider::UpdateService do
     let(:enforced_group_managed_accounts) { true }
     let(:params) { { enforced_group_managed_accounts: true } }
 
-    it 'does  not clean up group members' do
+    it 'does not clean up group members' do
       service.execute
 
       expect(cleanup_members_service_spy).not_to have_received(:execute)
     end
   end
-
 
   context 'when enforced_group_managed_accounts is disabled' do
     let(:enforced_group_managed_accounts) { true }
