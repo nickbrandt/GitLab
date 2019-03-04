@@ -11,6 +11,11 @@ project can have its own space to store NPM packages.
 NOTE: **Note:**
 Only [scoped](https://docs.npmjs.com/misc/scope) packages are supported.
 
+
+NOTE: **Note:**
+As `@group/subgroup/project` is not a valid NPM package name, publishing a package 
+within a subgroup is not supported yet. 
+
 ## Enabling the NPM Registry
 
 NOTE: **Note:**
