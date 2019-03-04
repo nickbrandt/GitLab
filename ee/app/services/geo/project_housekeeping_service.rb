@@ -11,9 +11,12 @@ module Geo
   class ProjectHousekeepingService < BaseService
     LEASE_TIMEOUT = 24.hours
     attr_reader :project
+    attr_reader :pool_repository
 
-    def initialize(project)
+    def initialize(project, new_repository: false)
       @project = project
+      @pool_repository = project.pool_repository
+      @new_repository = new_repository
     end
 
     def execute
@@ -22,7 +25,7 @@ module Geo
     end
 
     def needed?
-      syncs_since_gc > 0 && period_match? && housekeeping_enabled?
+      new_repository? || (syncs_since_gc > 0 && period_match? && housekeeping_enabled?)
     end
 
     # rubocop: disable CodeReuse/ActiveRecord
@@ -42,6 +45,8 @@ module Geo
     def do_housekeeping
       lease_uuid = try_obtain_lease
       return false unless lease_uuid.present?
+
+      create_object_pool_on_secondary if create_object_pool_on_secondary?
 
       execute_gitlab_shell_gc(lease_uuid)
     end
@@ -75,18 +80,30 @@ module Geo
       registry.syncs_since_gc
     end
 
+    def new_repository?
+      @new_repository
+    end
+
+    def should_repack?
+      syncs_since_gc % full_repack_period == 0
+    end
+
+    def should_gc?
+      syncs_since_gc % gc_period == 0
+    end
+
+    def should_incremental_repack?
+      syncs_since_gc % repack_period == 0
+    end
+
     def task
-      if syncs_since_gc % gc_period == 0
-        :gc
-      elsif syncs_since_gc % full_repack_period == 0
-        :full_repack
-      elsif syncs_since_gc % repack_period == 0
-        :incremental_repack
-      end
+      return :gc                 if new_repository? || should_gc?
+      return :full_repack        if should_repack?
+      return :incremental_repack if should_incremental_repack?
     end
 
     def period_match?
-      task.present?
+      should_incremental_repack? || should_repack? || should_gc?
     end
 
     def housekeeping_enabled?
@@ -103,6 +120,18 @@ module Geo
 
     def repack_period
       Gitlab::CurrentSettings.housekeeping_incremental_repack_period
+    end
+
+    def create_object_pool_on_secondary
+      Geo::CreateObjectPoolService.new(pool_repository).execute
+    end
+
+    def create_object_pool_on_secondary?
+      return unless ::Gitlab::Geo.secondary?
+      return unless project.object_pool_missing?
+      return unless pool_repository.source_project_repository.exists?
+
+      true
     end
   end
 end

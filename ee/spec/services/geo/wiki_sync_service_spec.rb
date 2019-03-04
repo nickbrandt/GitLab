@@ -19,7 +19,7 @@ RSpec.describe Geo::WikiSyncService do
   end
 
   it_behaves_like 'geo base sync execution'
-  it_behaves_like 'geo base sync fetch and repack'
+  it_behaves_like 'geo base sync fetch'
   it_behaves_like 'reschedules sync due to race condition instead of waiting for backfill'
 
   describe '#execute' do

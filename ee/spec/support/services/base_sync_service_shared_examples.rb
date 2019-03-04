@@ -48,7 +48,7 @@ shared_examples 'cleans temporary repositories' do
   end
 end
 
-shared_examples 'geo base sync fetch and repack' do
+shared_examples 'geo base sync fetch' do
   describe '#fetch_repository' do
     let(:fetch_repository) { subject.send(:fetch_repository) }
 
@@ -82,12 +82,6 @@ shared_examples 'geo base sync fetch and repack' do
 
       it 'ensures repository is created' do
         is_expected.to receive(:ensure_repository)
-
-        fetch_repository
-      end
-
-      it 'schedule git repack' do
-        is_expected.to receive(:schedule_repack)
 
         fetch_repository
       end

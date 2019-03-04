@@ -5,6 +5,7 @@ describe Gitlab::Ci::Config::Entry::Jobs do
     described_class.new(
       {
         '.hidden_job'.to_sym => { script: 'something' },
+        '.hidden_bridge'.to_sym => { trigger: 'my/project' },
         regular_job: { script: 'something' },
         my_trigger: { trigger: 'my/project' }
       }
@@ -21,6 +22,11 @@ describe Gitlab::Ci::Config::Entry::Jobs do
     describe '#node_type' do
       it 'correctly identifies hidden jobs' do
         expect(subject.node_type(:'.hidden_job'))
+          .to eq ::Gitlab::Ci::Config::Entry::Hidden
+      end
+
+      it 'correctly identifies hidden bridge jobs' do
+        expect(subject.node_type(:'.hidden_bridge'))
           .to eq ::Gitlab::Ci::Config::Entry::Hidden
       end
 

@@ -56,6 +56,7 @@ describe 'Issue promotion', :js do
 
         epic = Epic.last
 
+        expect(page).to have_content 'Commands applied'
         expect(issue.reload).to be_closed
         expect(epic.title).to eq(issue.title)
         expect(epic.description).to eq(issue.description)

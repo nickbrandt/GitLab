@@ -237,6 +237,26 @@ module EE
         feature_available?(:dast))
     end
 
+    def free_plan?
+      actual_plan_name == FREE_PLAN
+    end
+
+    def early_adopter_plan?
+      actual_plan_name == EARLY_ADOPTER_PLAN
+    end
+
+    def bronze_plan?
+      actual_plan_name == BRONZE_PLAN
+    end
+
+    def silver_plan?
+      actual_plan_name == SILVER_PLAN
+    end
+
+    def gold_plan?
+      actual_plan_name == GOLD_PLAN
+    end
+
     private
 
     def validate_plan_name

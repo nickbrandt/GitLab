@@ -18,11 +18,19 @@ class Vulnerabilities::FeedbackEntity < Grape::Entity
   end
 
   expose :issue_iid, if: -> (feedback, _) { feedback.issue? } do |feedback|
-    feedback.issue&.iid
+    feedback.issue.iid
   end
 
   expose :issue_url, if: -> (feedback, _) { feedback.issue? } do |feedback|
     project_issue_url(feedback.project, feedback.issue)
+  end
+
+  expose :merge_request_iid, if: -> (feedback, _) { feedback.merge_request? } do |feedback|
+    feedback.merge_request.iid
+  end
+
+  expose :merge_request_url, if: -> (feedback, _) { feedback.merge_request? } do |feedback|
+    project_merge_request_url(feedback.project, feedback.merge_request)
   end
 
   expose :category

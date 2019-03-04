@@ -8,7 +8,7 @@ class EpicPolicy < BasePolicy
     enable :read_note
   end
 
-  rule { can?(:update_epic) }.policy do
+  rule { can?(:read_epic) & ~anonymous }.policy do
     enable :create_note
   end
 

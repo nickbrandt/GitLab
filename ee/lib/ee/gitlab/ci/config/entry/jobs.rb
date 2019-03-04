@@ -10,10 +10,12 @@ module EE
 
             override :node_type
             def node_type(name)
-              if bridge?(name)
+              if hidden?(name)
+                ::Gitlab::Ci::Config::Entry::Hidden
+              elsif bridge?(name)
                 ::EE::Gitlab::Ci::Config::Entry::Bridge
               else
-                super
+                ::Gitlab::Ci::Config::Entry::Job
               end
             end
 

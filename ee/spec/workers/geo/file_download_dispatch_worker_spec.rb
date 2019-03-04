@@ -2,14 +2,14 @@ require 'spec_helper'
 
 describe Geo::FileDownloadDispatchWorker, :geo do
   include ::EE::GeoHelpers
+  include ExclusiveLeaseHelpers
 
   let(:primary)   { create(:geo_node, :primary, host: 'primary-geo-node') }
   let(:secondary) { create(:geo_node) }
 
   before do
     stub_current_geo_node(secondary)
-    allow_any_instance_of(Gitlab::ExclusiveLease).to receive(:try_obtain).and_return(true)
-    allow_any_instance_of(Gitlab::ExclusiveLease).to receive(:renew).and_return(true)
+    stub_exclusive_lease(renew: true)
     allow_any_instance_of(described_class).to receive(:over_time?).and_return(false)
     WebMock.stub_request(:get, /primary-geo-node/).to_return(status: 200, body: "", headers: {})
   end
@@ -347,15 +347,18 @@ describe Geo::FileDownloadDispatchWorker, :geo do
       end
     end
 
-    context 'when node has namespace restrictions' do
+    context 'when node has namespace restrictions', :request_store do
       let(:synced_group) { create(:group) }
       let(:project_in_synced_group) { create(:project, group: synced_group) }
       let(:unsynced_project) { create(:project) }
 
       before do
-        allow(ProjectCacheWorker).to receive(:perform_async).and_return(true)
-
         secondary.update!(selective_sync_type: 'namespaces', namespaces: [synced_group])
+
+        allow(ProjectCacheWorker).to receive(:perform_async).and_return(true)
+        allow(::Gitlab::Geo).to receive(:current_node).and_call_original
+        Rails.cache.write(:current_node, secondary.to_json)
+        allow(::GeoNode).to receive(:current_node).and_return(secondary)
       end
 
       it 'does not perform Geo::FileDownloadWorker for LFS object that does not belong to selected namespaces to replicate' do

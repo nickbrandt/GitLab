@@ -1,6 +1,6 @@
 # Service Desk **[PREMIUM]**
 
-> [Introduced][ee-149] in [GitLab Premium 9.1][eep-9.1].
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/issues/149) in [GitLab Premium 9.1](https://about.gitlab.com/2017/04/22/gitlab-9-1-released/#service-desk-eep).
 
 ## Overview
 
@@ -53,8 +53,8 @@ Service Desk is enabled on GitLab.com. If you're a
 [Silver subscriber](https://about.gitlab.com/gitlab-com/),
 you can skip the step 1 below; you only need to enable it per project.
 
-1.   [Set up incoming email][incoming-email] for the GitLab instance. This must
-     support [email sub-addressing][email-sub-addressing].
+1.   [Set up incoming email](../../administration/incoming_email.md#set-it-up) for the GitLab instance. This must
+     support [email sub-addressing](../../administration/incoming_email.md#email-sub-addressing).
 2.   Navigate to your project's **Settings** and scroll down to the **Service Desk**
      section.
 3.   If you have the correct access and an Premium license,
@@ -64,12 +64,12 @@ you can skip the step 1 below; you only need to enable it per project.
 
 4.   Checking that box will enable Service Desk for the project, and show a
      unique email address to email issues to the project. These issues will be
-     [confidential], so they will only be visible to project members.
+     [confidential](issues/confidential_issues.md), so they will only be visible to project members.
 
      **Warning**: this email address can be used by anyone to create an issue on
      this project, whether or not they have access to your GitLab instance.
      We recommend **putting this behind an alias** so that it can be changed if
-     needed, and **[enabling Akismet][akismet]** on your GitLab instance to add spam
+     needed, and **[enabling Akismet](../../integration/akismet.md)** on your GitLab instance to add spam
      checking to this service.  Unblocked email spam would result in many spam
      issues being created, and may disrupt your GitLab service.
 
@@ -122,11 +122,3 @@ you can read and write comments as you normally do:
 
 Behind the scenes, Service Desk works by the special Support Bot user creating issues. This user
 does not count toward the license limit count.
-
-[ee-149]: https://gitlab.com/gitlab-org/gitlab-ee/issues/149 "Service Desk with email"
-[ee]: https://about.gitlab.com/pricing/ "GitLab Enterprise Edition landing page"
-[eep-9.1]: https://about.gitlab.com/2017/04/22/gitlab-9-1-released/#service-desk-eep
-[incoming-email]: ../../administration/incoming_email.md#set-it-up
-[email-sub-addressing]: ../../administration/reply_by_email.md#email-sub-addressing
-[confidential]: ./issues/confidential_issues.md "Confidential issues"
-[akismet]: ../../integration/akismet.md

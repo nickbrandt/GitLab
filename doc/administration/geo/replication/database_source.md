@@ -8,7 +8,7 @@ using the Omnibus GitLab packages, follow the
 
 NOTE: **Note:**
 The stages of the setup process must be completed in the documented order.
-Before attempting the steps in this stage, [complete all prior stages][toc].
+Before attempting the steps in this stage, [complete all prior stages](index.md#using-gitlab-installed-from-source-deprecated).
 
 This document describes the minimal steps you have to take in order to
 replicate your **primary** GitLab database to a **secondary** node's database. You may
@@ -423,7 +423,6 @@ Read the [troubleshooting document](troubleshooting.md).
 [pgback]: http://www.postgresql.org/docs/9.6/static/app-pgbasebackup.html
 [replication user]:https://wiki.postgresql.org/wiki/Streaming_Replication
 [FDW]: https://www.postgresql.org/docs/9.6/static/postgres-fdw.html
-[toc]: index.md#using-gitlab-installed-from-source
 [database]: database.md
 [add-geo-node]: configuration.md#step-3-add-the-secondary-gitlab-node
 [database-replication]: database.md#step-2-configure-the-secondary-server

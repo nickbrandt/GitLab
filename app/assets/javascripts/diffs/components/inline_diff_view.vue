@@ -1,17 +1,17 @@
 <script>
 import { mapGetters } from 'vuex';
+import draftCommentsMixin from 'ee_else_ce/diffs/mixins/draft_comments';
 import inlineDiffTableRow from './inline_diff_table_row.vue';
 import inlineDiffCommentRow from './inline_diff_comment_row.vue';
-
-// eslint-disable-next-line import/order
-import InlineDraftCommentRow from 'ee/batch_comments/components/inline_draft_comment_row.vue';
 
 export default {
   components: {
     inlineDiffCommentRow,
     inlineDiffTableRow,
-    InlineDraftCommentRow,
+    InlineDraftCommentRow: () =>
+      import('ee_component/batch_comments/components/inline_draft_comment_row.vue'),
   },
+  mixins: [draftCommentsMixin],
   props: {
     diffFile: {
       type: Object,
@@ -29,7 +29,6 @@ export default {
   },
   computed: {
     ...mapGetters('diffs', ['commitId']),
-    ...mapGetters('batchComments', ['shouldRenderDraftRow', 'draftForLine']),
     diffLinesLength() {
       return this.diffLines.length;
     },

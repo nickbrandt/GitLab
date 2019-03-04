@@ -1,5 +1,7 @@
 import Vue from 'vue';
-import { createStore } from '~/mr_notes/stores';
+import { createStore } from 'ee/batch_comments/stores';
+import diffsModule from '~/diffs/store/modules';
+import notesModule from '~/notes/stores/modules';
 import issueNoteForm from '~/notes/components/note_form.vue';
 import { keyboardDownEvent } from 'spec/issue_show/helpers';
 import { noteableDataMock, discussionMock, notesDataMock } from 'spec/notes/mock_data';
@@ -13,6 +15,8 @@ describe('issue_note_form component', () => {
     const Component = Vue.extend(issueNoteForm);
 
     store = createStore();
+    store.registerModule('diffs', diffsModule());
+    store.registerModule('notes', notesModule());
     store.dispatch('setNoteableData', noteableDataMock);
     store.dispatch('setNotesData', notesDataMock);
 

@@ -42,10 +42,5 @@ module Geo
       log_info('Expiring caches')
       repository.after_sync
     end
-
-    def schedule_repack
-      # No-op: we currently don't schedule wiki repository to repack
-      # TODO: https://gitlab.com/gitlab-org/gitlab-ce/issues/45523
-    end
   end
 end

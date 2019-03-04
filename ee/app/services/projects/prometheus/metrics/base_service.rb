@@ -29,9 +29,14 @@ module Projects
         end
 
         def alert
-          strong_memoize(:alert) do
-            metric.prometheus_alerts.find_by(project: project) # rubocop: disable CodeReuse/ActiveRecord
-          end
+          strong_memoize(:alert) { find_alert(metric) }
+        end
+
+        def find_alert(metric)
+          Projects::Prometheus::AlertsFinder
+            .new(project: project, metric: metric)
+            .execute
+            .first
         end
 
         def has_alert?

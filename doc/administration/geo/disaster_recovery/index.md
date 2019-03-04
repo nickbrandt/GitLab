@@ -224,7 +224,7 @@ sudo rm -rf /var/opt/gitlab/geo-postgresql
 ## Promoting secondary Geo replica in multi-secondary configurations
 
 If you have more than one **secondary** node and you need to promote one of them, we suggest you follow
-[Promoting **secondary** Geo node in single-secondary configurations](#promoting-secondary-geo-node-in-single-secondary-configurations)
+[Promoting a **secondary** Geo node in single-secondary configurations](#promoting-a-secondary-geo-node-in-single-secondary-configurations)
 and after that you also need two extra steps.
 
 ### Step 1. Prepare the new **primary** node to serve one or more **secondary** nodes

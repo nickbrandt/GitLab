@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import ParallelDraftCommentRow from 'ee/batch_comments/components/parallel_draft_comment_row.vue';
 import { createComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { createStore } from '~/mr_notes/stores';
+import { createStore } from 'ee/batch_comments/stores';
 import '~/behaviors/markdown/render_gfm';
 import { createDraft } from '../mock_data';
 

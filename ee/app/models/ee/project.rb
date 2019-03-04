@@ -198,6 +198,15 @@ module EE
       super && !shared_runners_limit_namespace.shared_runners_minutes_used?
     end
 
+    def link_pool_repository
+      super
+      repository.log_geo_updated_event
+    end
+
+    def object_pool_missing?
+      has_pool_repository? && !pool_repository.object_pool.exists?
+    end
+
     def shared_runners_minutes_limit_enabled?
       !public? && shared_runners_enabled? &&
         shared_runners_limit_namespace.shared_runners_minutes_limit_enabled?

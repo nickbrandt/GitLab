@@ -1,0 +1,5 @@
+---
+title: Fix bridge jobs than can be hidden keys too
+merge_request: 9796
+author:
+type: fixed
