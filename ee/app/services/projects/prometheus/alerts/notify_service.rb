@@ -8,13 +8,27 @@ module Projects
           return false unless valid_version?
           return false unless valid_alert_manager_token?(token)
 
-          send_alert_email(project, firings) if firings.any?
+          send_alert_email if send_email? && firings.any?
           persist_events(project, params)
 
           true
         end
 
         private
+
+        def has_incident_management_license?
+          project.feature_available?(:incident_management)
+        end
+
+        def send_email?
+          return true unless has_incident_management_license?
+
+          setting = project.incident_management_setting
+
+          return true if setting.nil?
+
+          setting.send_email
+        end
 
         def firings
           @firings ||= alerts_by_status('firing')
@@ -89,7 +103,7 @@ module Projects
           ActiveSupport::SecurityUtils.variable_size_secure_compare(expected, actual)
         end
 
-        def send_alert_email(projects, firing_alerts)
+        def send_alert_email
           notification_service
             .async
             .prometheus_alerts_fired(project, firings)

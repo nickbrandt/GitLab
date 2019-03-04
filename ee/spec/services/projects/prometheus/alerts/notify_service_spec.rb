@@ -9,9 +9,8 @@ describe Projects::Prometheus::Alerts::NotifyService do
   let(:token_input) { 'token' }
   let(:subject) { service.execute(token_input) }
 
-  shared_examples 'notifies alerts' do
+  shared_examples 'sends notification email' do
     let(:notification_service) { spy }
-    let(:create_events_service) { spy }
 
     it 'sends a notification for firing alerts only' do
       expect(NotificationService)
@@ -23,6 +22,10 @@ describe Projects::Prometheus::Alerts::NotifyService do
 
       expect(subject).to eq(true)
     end
+  end
+
+  shared_examples 'persists events' do
+    let(:create_events_service) { spy }
 
     it 'persists events' do
       expect(Projects::Prometheus::Alerts::CreateEventsService)
@@ -34,6 +37,11 @@ describe Projects::Prometheus::Alerts::NotifyService do
 
       expect(subject).to eq(true)
     end
+  end
+
+  shared_examples 'notifies alerts' do
+    it_behaves_like 'sends notification email'
+    it_behaves_like 'persists events'
   end
 
   shared_examples 'no notifications' do
@@ -168,6 +176,62 @@ describe Projects::Prometheus::Alerts::NotifyService do
           it_behaves_like 'no notifications'
         else
           raise "invalid result: #{result.inspect}"
+        end
+      end
+    end
+
+    context 'no incident_management license' do
+      before do
+        create(:prometheus_service, project: project)
+
+        create(:project_alerting_setting,
+          project: project,
+          token: token)
+
+        create(:project_incident_management_setting, send_email: false, project: project)
+
+        stub_licensed_features(incident_management: false)
+      end
+
+      include_examples 'notifies alerts'
+    end
+
+    context 'with incident_management license' do
+      before do
+        create(:prometheus_service, project: project)
+
+        create(:project_alerting_setting,
+          project: project,
+          token: token)
+
+        stub_licensed_features(incident_management: true)
+      end
+
+      context 'when incident_management_setting does not exist' do
+        include_examples 'notifies alerts'
+      end
+
+      context 'when incident_management_setting.send_email is true' do
+        before do
+          create(:project_incident_management_setting, send_email: true, project: project)
+        end
+
+        include_examples 'notifies alerts'
+      end
+
+      context 'incident_management_setting.send_email is false' do
+        before do
+          create(:project_incident_management_setting, send_email: false, project: project)
+        end
+
+        it_behaves_like 'persists events'
+
+        it 'does not send notification' do
+          expect(project.feature_available?(:incident_management)).to eq(true)
+          expect(project).to receive(:incident_management_setting).and_call_original
+          expect(NotificationService).not_to receive(:new)
+
+          expect(subject).to eq(true)
         end
       end
     end
