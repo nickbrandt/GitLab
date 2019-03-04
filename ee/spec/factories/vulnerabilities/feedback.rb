@@ -9,6 +9,7 @@ FactoryBot.define do
     project
     author
     issue nil
+    merge_request nil
     association :pipeline, factory: :ci_pipeline
     feedback_type 'dismissal'
     category 'sast'
@@ -21,6 +22,11 @@ FactoryBot.define do
 
     trait :issue do
       feedback_type 'issue'
+    end
+
+    trait :merge_request do
+      feedback_type 'merge_request'
+      merge_request { create(:merge_request, source_project: project) }
     end
 
     trait :sast do

@@ -10,6 +10,7 @@ describe Vulnerabilities::Feedback do
     it { is_expected.to belong_to(:project) }
     it { is_expected.to belong_to(:author).class_name('User') }
     it { is_expected.to belong_to(:issue) }
+    it { is_expected.to belong_to(:merge_request) }
     it { is_expected.to belong_to(:pipeline).class_name('Ci::Pipeline').with_foreign_key('pipeline_id') }
   end
 
