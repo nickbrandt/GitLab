@@ -31,6 +31,8 @@ class ApprovalState
 
   def wrapped_approval_rules
     strong_memoize(:wrapped_approval_rules) do
+      next [] unless project.feature_available?(:merge_request_approvers)
+
       result = use_fallback? ? [fallback_rule] : regular_rules
       result += code_owner_rules
       result
