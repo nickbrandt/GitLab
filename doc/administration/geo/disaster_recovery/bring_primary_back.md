@@ -31,7 +31,7 @@ To bring the former **primary** node up to date:
     > the GitLab instance from scratch and set it up as a **secondary** node by
     > following [Setup instructions][setup-geo]. In this case, you don't need to follow the next step.
     >
-    > **Note 2:** If you [changed the DNS records](index.md#step-4-optional-updating-the-primary-domains-dns-record)
+    > **Note 2:** If you [changed the DNS records](index.md#step-4-optional-updating-the-primary-domain-dns-record)
     > for this node during disaster recovery procedure you may need to [block
     > all the writes to this node](https://gitlab.com/gitlab-org/gitlab-ee/blob/master/doc/gitlab-geo/planned-failover.md#block-primary-traffic)
     > during this procedure.

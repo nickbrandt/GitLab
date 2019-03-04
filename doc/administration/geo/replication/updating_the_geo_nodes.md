@@ -112,11 +112,11 @@ sudo gitlab-ctl reconfigure
 ```
 
 If you do not perform this step, you may find that two-factor authentication
-[is broken following DR](faq.md#i-followed-the-disaster-recovery-instructions-and-now-two-factor-auth-is-broken).
+[is broken following DR](../disaster_recovery/index.html#i-followed-the-disaster-recovery-instructions-and-now-two-factor-auth-is-broken).
 
 To prevent SSH requests to the newly promoted **primary** node from failing
 due to SSH host key mismatch when updating the **primary** node domain's DNS record
-you should perform the step to [Manually replicate **primary** SSH host keys][configuration-replicate-ssh] in each
+you should perform the step to [Manually replicate **primary** SSH host keys](configuration.md#step-2-manually-replicate-the-primary-nodes-ssh-host-keys) in each
 **secondary** node.
 
 ## Upgrading to GitLab 10.4
@@ -131,7 +131,7 @@ In GitLab 10.2, synchronizing secondaries over SSH was deprecated. In 10.3,
 support is removed entirely. All installations will switch to the HTTP/HTTPS
 cloning method instead. Before upgrading, ensure that all your Geo nodes are
 configured to use this method and that it works for your installation. In
-particular, ensure that [Git access over HTTP/HTTPS is enabled][configuration-git-over-http].
+particular, ensure that [Git access over HTTP/HTTPS is enabled](configuration.md#step-6-enable-git-access-over-httphttps).
 
 Synchronizing repositories over the public Internet using HTTP is insecure, so
 you should ensure that you have HTTPS configured before upgrading. Note that
@@ -402,5 +402,3 @@ and it is required since 10.0.
 [Hashed Storage]: ../../repository_storage_types.md
 [hashed-migration]: ../../raketasks/storage.md
 [ssh-fast-lookup]: ../../operations/fast_ssh_key_lookup.md
-[configuration-replicate-ssh]: configuration.md#step-2-manually-replicate-primary-ssh-host-keys
-[configuration-git-over-http]: configuration.md#step-6-enable-git-access-over-http-https

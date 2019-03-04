@@ -39,7 +39,7 @@ immediately block all access.
 
 NOTE: **Note**:
 GitLab Enterprise Edition Starter supports a
-[configurable sync time](ldap-ee.md#adjusting-ldap-user-and-group-sync-schedules),
+[configurable sync time](ldap-ee.md#adjusting-ldap-user-sync-schedule),
 with a default of one hour.
 
 ## Git password authentication
@@ -338,7 +338,7 @@ group, you can use the following syntax:
 Find more information about this "LDAP_MATCHING_RULE_IN_CHAIN" filter at
 <https://docs.microsoft.com/en-us/windows/desktop/ADSI/search-filter-syntax>. Support for
 nested members in the user filter should not be confused with
-[group sync nested groups support (EE only)](ldap-ee.md#supported-ldap-group-types-attributes).
+[group sync nested groups support (EE only)](ldap-ee.md#supported-ldap-group-typesattributes).
 
 Please note that GitLab does not support the custom filter syntax used by
 omniauth-ldap.

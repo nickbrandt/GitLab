@@ -11,7 +11,7 @@ using the Omnibus GitLab packages, follow the
 NOTE: **Note:**
 This is the final step in setting up a **secondary** node. Stages of the setup
 process must be completed in the documented order. Before attempting the steps
-in this stage, [complete all prior stages][setup-geo-source].
+in this stage, [complete all prior stages](index.md#using-gitlab-installed-from-source-deprecated).
 
 The basic steps of configuring a **secondary** node are to:
 
@@ -88,7 +88,7 @@ the **secondary** node with the same credentials as used for the **primary** nod
 
 ### Step 2. Manually replicate the **primary** node's SSH host keys
 
-Read [Manually replicate the **primary** node's SSH host keys][configuration-replicate-ssh]
+Read [Manually replicate the **primary** node's SSH host keys](configuration.md#step-2-manually-replicate-the-primary-nodes-ssh-host-keys)
 
 ### Step 3. Add the **secondary** GitLab node
 
@@ -166,10 +166,8 @@ Read [Selective synchronization][configuration-selective-replication].
 
 Read the [troubleshooting document][troubleshooting].
 
-[setup-geo-source]: index.md#using-gitlab-installed-from-source
 [gitlab-org/gitlab-ee#3789]: https://gitlab.com/gitlab-org/gitlab-ee/issues/3789
 [configuration]: configuration.md
-[configuration-replicate-ssh]: configuration.md#step-2-manually-replicate-primary-ssh-host-keys
 [configuration-selective-replication]: configuration.md#selective-synchronization
 [configuration-verify-node]: configuration.md#step-7-verify-proper-functioning-of-the-secondary-node
 [troubleshooting]: troubleshooting.md
