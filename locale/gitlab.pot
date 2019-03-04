@@ -3811,6 +3811,9 @@ msgstr ""
 msgid "Error Tracking"
 msgstr ""
 
+msgid "Error creating a new path"
+msgstr ""
+
 msgid "Error creating epic"
 msgstr ""
 
@@ -9692,6 +9695,9 @@ msgid "The maximum file size allowed is %{size}."
 msgstr ""
 
 msgid "The maximum file size allowed is 200KB."
+msgstr ""
+
+msgid "The name %{entryName} is already taken in this directory."
 msgstr ""
 
 msgid "The passphrase required to decrypt the private key. This is optional and the value is encrypted at rest."
