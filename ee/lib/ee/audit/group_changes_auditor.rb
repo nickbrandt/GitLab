@@ -33,8 +33,8 @@ module EE
           }
         when :project_creation_level
           {
-            from: ::EE::Gitlab::Access.level_name(old),
-            to: ::EE::Gitlab::Access.level_name(new)
+            from: ::Gitlab::Access.level_name(old),
+            to: ::Gitlab::Access.level_name(new)
           }
         when :plan_id
           {

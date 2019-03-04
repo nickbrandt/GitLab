@@ -7,8 +7,6 @@
 #
 module Gitlab
   module Access
-    extend ::EE::Gitlab::Access # rubocop: disable Cop/InjectEnterpriseEditionModule
-
     AccessDeniedError = Class.new(StandardError)
 
     NO_ACCESS  = 0
@@ -19,7 +17,6 @@ module Gitlab
     # @deprecated
     MASTER     = MAINTAINER
     OWNER      = 50
-    ADMIN      = 60
 
     # Branch protection settings
     PROTECTION_NONE          = 0
@@ -89,3 +86,5 @@ module Gitlab
     end
   end
 end
+
+Gitlab::Access.prepend(EE::Gitlab::Access)
