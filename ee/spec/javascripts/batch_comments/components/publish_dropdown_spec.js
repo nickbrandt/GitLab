@@ -1,11 +1,11 @@
 import Vue from 'vue';
 import PreviewDropdown from 'ee/batch_comments/components/preview_dropdown.vue';
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { createStore } from '~/mr_notes/stores';
+import { createStore } from 'ee/mr_notes/stores';
 import '~/behaviors/markdown/render_gfm';
 import { createDraft } from '../mock_data';
 
-describe('Batch comments draft preview item component', () => {
+describe('Batch comments publish dropdown component', () => {
   let vm;
   let Component;
 
