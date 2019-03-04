@@ -1,0 +1,9 @@
+From <%= head_commit.sha %> <%= head_commit.date.strftime("%a %b %e %H:%M:%S %Y") %>
+From: <%= user.name %> <<%= user.email %>>
+Date: <%= Time.now.strftime("%a, %e %b %Y %H:%M:%S %z") %>
+Subject: Fix Vulnerability - <%= vulnerability.title %>
+
+<%= diff %>
+
+--
+2.19.1
