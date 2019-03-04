@@ -1,9 +1,9 @@
 import Vue from 'vue';
+import store from 'ee_else_ce/mr_notes/stores';
 import initNotesApp from './init_notes';
 import initDiffsApp from '../diffs';
 import discussionCounter from '../notes/components/discussion_counter.vue';
 import initDiscussionFilters from '../notes/discussion_filters';
-import store from './stores';
 import MergeRequest from '../merge_request';
 import { resetServiceWorkersPublicPath } from '../lib/utils/webpack';
 
