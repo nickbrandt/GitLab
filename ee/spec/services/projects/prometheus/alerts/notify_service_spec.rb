@@ -190,7 +190,9 @@ describe Projects::Prometheus::Alerts::NotifyService do
 
         create(:project_incident_management_setting, send_email: false, project: project)
 
-        stub_licensed_features(incident_management: false)
+        allow(project).to receive(:feature_available?).and_call_original
+        allow(project).to receive(:feature_available?)
+          .with(:incident_management).and_return(false)
       end
 
       include_examples 'notifies alerts'
@@ -204,7 +206,9 @@ describe Projects::Prometheus::Alerts::NotifyService do
           project: project,
           token: token)
 
-        stub_licensed_features(incident_management: true)
+        allow(project).to receive(:feature_available?).and_call_original
+        allow(project).to receive(:feature_available?)
+          .with(:incident_management).and_return(true)
       end
 
       context 'when incident_management_setting does not exist' do
