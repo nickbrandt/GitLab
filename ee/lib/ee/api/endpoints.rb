@@ -26,6 +26,16 @@ module EE
         mount ::API::NpmPackages
         mount ::API::Packages
         mount ::API::PackageFiles
+        mount ::API::ManagedLicenses
+        mount ::API::ProjectApprovals
+
+        version 'v3', using: :path do
+          # Although the following endpoints are kept behind V3 namespace,
+          # they're not deprecated neither should be removed when V3 get
+          # removed.  They're needed as a layer to integrate with Jira
+          # Development Panel.
+          mount ::API::V3::Github
+        end
       end
     end
   end

@@ -6,6 +6,12 @@ module EE
       extend ActiveSupport::Concern
 
       prepended do
+        # For reasons unknown, this API must be mounted before we mount
+        # API::MergeRequests. Mounting this API later on (using
+        # EE::API::Endpoints) for example will result in various merge request
+        # approval related tests failing.
+        ::API::API.mount(::API::MergeRequestApprovals)
+
         helpers do
           params :optional_params_ee do
             optional :approvals_before_merge, type: Integer, desc: 'Number of approvals required before this can be merged'

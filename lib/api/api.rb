@@ -29,13 +29,6 @@ module API
     prefix :api
 
     version 'v3', using: :path do
-      ## EE-specific API V3 endpoints START
-      # Although the following endpoints are kept behind V3 namespace, they're not
-      # deprecated neither should be removed when V3 get removed.
-      # They're needed as a layer to integrate with Jira Development Panel.
-      mount ::API::V3::Github
-      ## EE-specific API V3 endpoints END
-
       route :any, '*path' do
         error!('API V3 is no longer supported. Use API V4 instead.', 410)
       end
@@ -128,10 +121,8 @@ module API
     mount ::API::Keys
     mount ::API::Labels
     mount ::API::Lint
-    mount ::API::ManagedLicenses
     mount ::API::Markdown
     mount ::API::Members
-    mount ::API::MergeRequestApprovals
     mount ::API::MergeRequestDiffs
     mount ::API::MergeRequests
     mount ::API::Namespaces
@@ -142,7 +133,6 @@ module API
     mount ::API::PagesDomains
     mount ::API::Pipelines
     mount ::API::PipelineSchedules
-    mount ::API::ProjectApprovals
     mount ::API::ProjectClusters
     mount ::API::ProjectExport
     mount ::API::ProjectImport
