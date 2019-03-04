@@ -26,6 +26,7 @@ class PrometheusAlert < ActiveRecord::Base
   delegate :title, :query, to: :prometheus_metric
 
   scope :for_metric, -> (metric) { where(prometheus_metric: metric) }
+  scope :for_project, -> (project) { where(project_id: project) }
   scope :for_environment, -> (environment) { where(environment_id: environment) }
 
   def self.distinct_projects

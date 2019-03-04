@@ -129,8 +129,11 @@ module Clusters
 
       def alerts(environment)
         variables = Gitlab::Prometheus::QueryVariables.call(environment)
+        alerts = Projects::Prometheus::AlertsFinder
+          .new(environment: environment)
+          .execute
 
-        environment.prometheus_alerts.map do |alert|
+        alerts.map do |alert|
           substitute_query_variables(alert.to_param, variables)
         end
       end

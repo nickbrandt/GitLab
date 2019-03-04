@@ -13,7 +13,7 @@ module EE
 
           def query_with_alert(project, environment)
             alerts_map =
-              environment.prometheus_alerts.each_with_object({}) do |alert, hsh|
+              alerts(project, environment).each_with_object({}) do |alert, hsh|
                 hsh[alert[:prometheus_metric_id]] = alert.prometheus_metric_id
               end
 
@@ -37,6 +37,12 @@ module EE
           end
 
           private
+
+          def alerts(project, environment)
+            ::Projects::Prometheus::AlertsFinder
+              .new(project: project, environment: environment)
+              .execute
+          end
 
           def alert_path(alerts_map, key, project, environment)
             ::Gitlab::Routing.url_helpers.project_prometheus_alert_path(project, alerts_map[key], environment_id: environment.id, format: :json)
