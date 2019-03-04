@@ -113,7 +113,7 @@ If any objects are failing to replicate, this should be investigated before
 scheduling the maintenance window. Following a planned failover, anything that
 failed to replicate will be **lost**.
 
-You can use the [Geo status API][geo-status-api] to review failed objects and
+You can use the [Geo status API](../../../api/geo_nodes.md#retrieve-project-sync-or-verification-failures-that-occurred-on-the-current-node) to review failed objects and
 the reasons for failure.
 
 A common cause of replication failures is the data being missing on the
@@ -223,7 +223,6 @@ Don't forget to remove the broadcast message after failover is complete.
 [ee-5064]: https://gitlab.com/gitlab-org/gitlab-ee/issues/5064
 [foreground-verification]: ../../raketasks/check.md
 [background-verification]: background_verification.md
-[geo-status-api]: ../../../api/geo_nodes.html#retrieve-project-sync-failures-ocurred-on-the-current-node
 [limitations]: ../replication/index.md#current-limitations
 [moving-repositories]: ../../operations/moving_repositories.md
 [os-conf]: ../replication/object_storage.md#configuration
