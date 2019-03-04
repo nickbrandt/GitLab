@@ -118,6 +118,32 @@ describe 'SAML provider settings' do
           expect(page).not_to have_selector('#saml_provider_enforced_sso')
         end
       end
+
+      context 'enforced_group_managed_accounts enabled' do
+        it 'updates the flag' do
+          stub_feature_flags(group_managed_accounts: true)
+
+          visit group_saml_providers_path(group)
+
+          find('input#saml_provider_enforced_group_managed_accounts').click
+
+          expect(page).to have_selector('#saml_provider_enforced_group_managed_accounts')
+          expect do
+            submit
+            saml_provider.reload
+          end.to change { saml_provider.enforced_group_managed_accounts }.to(true)
+        end
+      end
+
+      context 'enforced_group_managed_accounts disabled' do
+        it 'does not update the flag' do
+          stub_feature_flags(group_managed_accounts: false)
+
+          visit group_saml_providers_path(group)
+
+          expect(page).not_to have_selector('#saml_provider_enforced_group_managed_accounts')
+        end
+      end
     end
 
     describe 'test button' do
