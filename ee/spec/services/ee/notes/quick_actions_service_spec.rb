@@ -11,8 +11,8 @@ describe Notes::QuickActionsService do
   let(:service) { described_class.new(project, user) }
 
   def execute(note)
-    content, command_params = service.extract_commands(note)
-    service.execute(command_params, note)
+    content, update_params = service.execute(note)
+    service.apply_updates(update_params, note)
 
     content
   end
