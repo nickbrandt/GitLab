@@ -45,7 +45,10 @@ module Gitlab
         metric_id = payload&.dig('labels', 'gitlab_alert_id')
         return unless metric_id
 
-        project.prometheus_alerts.for_metric(metric_id).first
+        Projects::Prometheus::AlertsFinder
+          .new(project: project, metric: metric_id)
+          .execute
+          .first
       end
 
       def parse_title_from_payload

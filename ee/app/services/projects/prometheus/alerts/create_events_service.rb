@@ -30,7 +30,7 @@ module Projects
           gitlab_alert_id = payload.dig('labels', 'gitlab_alert_id')
           return unless gitlab_alert_id
 
-          alert = project.prometheus_alerts.for_metric(gitlab_alert_id).first
+          alert = find_alert(gitlab_alert_id)
           return unless alert
 
           payload_key = PrometheusAlertEvent.payload_key_for(gitlab_alert_id, started_at)
@@ -48,6 +48,13 @@ module Projects
 
         def alerts
           params['alerts']
+        end
+
+        def find_alert(metric)
+          Projects::Prometheus::AlertsFinder
+            .new(project: project, metric: metric)
+            .execute
+            .first
         end
 
         def validate_date(date)
