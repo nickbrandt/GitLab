@@ -463,7 +463,7 @@ describe('issue creation', () => {
 describe('merge request creation', () => {
   describe('createMergeRequest', () => {
     const vulnerability = mockDataVulnerabilities[0];
-    const data = { merge_request_url: 'fakepath.html' };
+    const data = { merge_request_path: 'fakepath.html' };
     let mock;
 
     beforeEach(() => {

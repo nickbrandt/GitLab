@@ -8,6 +8,8 @@ export const setHeadBlobPath = ({ commit }, blobPath) => commit(types.SET_HEAD_B
 
 export const setBaseBlobPath = ({ commit }, blobPath) => commit(types.SET_BASE_BLOB_PATH, blobPath);
 
+export const setSourceBranch = ({ commit }, branch) => commit(types.SET_SOURCE_BRANCH, branch);
+
 export const setVulnerabilityFeedbackPath = ({ commit }, path) =>
   commit(types.SET_VULNERABILITY_FEEDBACK_PATH, path);
 
@@ -334,6 +336,8 @@ export const createNewIssue = ({ state, dispatch }) => {
 export const createMergeRequest = ({ state, dispatch }) => {
   const { vulnerability } = state.modal;
   const { category, project_fingerprint } = vulnerability;
+
+  vulnerability.target_branch = state.sourceBranch;
 
   dispatch('requestCreateMergeRequest');
 

@@ -12,6 +12,7 @@ export default () => ({
     base: null,
   },
 
+  sourceBranch: null,
   vulnerabilityFeedbackPath: null,
   vulnerabilityFeedbackHelpPath: null,
   pipelineId: null,

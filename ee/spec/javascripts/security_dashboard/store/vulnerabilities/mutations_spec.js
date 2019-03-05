@@ -413,11 +413,11 @@ describe('vulnerabilities module mutations', () => {
   describe('RECEIVE_CREATE_MERGE_REQUEST_SUCCESS', () => {
     it('should fire the visitUrl function on the merge request URL', () => {
       const state = createState();
-      const payload = { merge_request_url: 'fakepath.html' };
+      const payload = { merge_request_path: 'fakepath.html' };
       const visitUrl = spyOnDependency(mutations, 'visitUrl');
       mutations[types.RECEIVE_CREATE_MERGE_REQUEST_SUCCESS](state, payload);
 
-      expect(visitUrl).toHaveBeenCalledWith(payload.merge_request_url);
+      expect(visitUrl).toHaveBeenCalledWith(payload.merge_request_path);
     });
   });
 

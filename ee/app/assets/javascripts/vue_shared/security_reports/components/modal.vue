@@ -64,7 +64,7 @@ export default {
         buttons.push(issueButton);
       }
 
-      if (!this.vulnerability.hasMergeRequest) {
+      if (!this.vulnerability.hasMergeRequest && this.remediation) {
         buttons.push(MRButton);
       }
 
@@ -119,12 +119,11 @@ export default {
       const { data } = this.modal;
       const result = {};
 
-      for (let key in data) {
-        // debugger;
+      Object.keys(data).forEach(key => {
         if (data[key].value && data[key].value.length) {
           result[key] = data[key];
         }
-      }
+      });
 
       return result;
     },
@@ -273,7 +272,7 @@ export default {
             :author-name="mergeRequestFeedback.author.name"
             :author-username="mergeRequestFeedback.author.username"
             :action-link-text="`!${mergeRequestFeedback.merge_request_iid}`"
-            :action-link-url="mergeRequestFeedback.merge_request_url"
+            :action-link-url="mergeRequestFeedback.merge_request_path"
           />
         </li>
       </ul>
@@ -331,6 +330,7 @@ export default {
           :disabled="actionButtons[0].isLoading"
           :label="actionButtons[0].name"
           container-class="btn btn-success btn-inverted"
+          class="js-action-button"
           @click="$emit(actionButtons[0].action)"
         />
       </template>

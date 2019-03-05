@@ -97,6 +97,10 @@ describe('Security Reports modal', () => {
         expect(vm.$el.querySelector('.js-dismiss-btn')).toBe(null);
       });
 
+      it('renders create issue button', () => {
+        expect(vm.$el.querySelector('.js-action-button')).not.toBe(null);
+      });
+
       it('renders the footer', () => {
         expect(vm.$el.classList.contains('modal-hide-footer')).toEqual(false);
       });
@@ -104,7 +108,7 @@ describe('Security Reports modal', () => {
       it('emits createIssue when create issue button is clicked', () => {
         spyOn(vm, '$emit');
 
-        const button = vm.$el.querySelector('.js-split-button').querySelector('.btn-success');
+        const button = vm.$el.querySelector('.js-action-button');
         button.click();
 
         expect(vm.$emit).toHaveBeenCalledWith('createNewIssue');

@@ -20,6 +20,10 @@ export default {
     Vue.set(state.blobPath, 'base', path);
   },
 
+  [types.SET_SOURCE_BRANCH](state, branch) {
+    state.sourceBranch = branch;
+  },
+
   [types.SET_VULNERABILITY_FEEDBACK_PATH](state, path) {
     state.vulnerabilityFeedbackPath = path;
   },
@@ -419,7 +423,7 @@ export default {
   },
   [types.RECEIVE_CREATE_MERGE_REQUEST_SUCCESS](state, payload) {
     // We don't cancel the loading state here because we're navigating away from the page
-    visitUrl(payload.merge_request_url);
+    visitUrl(payload.merge_request_path);
   },
   [types.RECEIVE_CREATE_MERGE_REQUEST_ERROR](state, error) {
     state.isCreatingMergeRequest = false;

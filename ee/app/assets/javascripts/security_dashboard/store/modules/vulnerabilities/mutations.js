@@ -177,7 +177,7 @@ export default {
   },
   [types.RECEIVE_CREATE_MERGE_REQUEST_SUCCESS](state, payload) {
     // We don't cancel the loading state here because we're navigating away from the page
-    visitUrl(payload.merge_request_url);
+    visitUrl(payload.merge_request_path);
   },
   [types.RECEIVE_CREATE_MERGE_REQUEST_ERROR](state) {
     state.isCreatingIssue = false;
