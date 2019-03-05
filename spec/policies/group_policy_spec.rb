@@ -115,13 +115,21 @@ describe GroupPolicy do
       project.add_developer(current_user)
     end
 
+<<<<<<< HEAD
     it { expect_allowed(:read_label, :read_list) }
+=======
+    it { expect_allowed(:read_label) }
+>>>>>>> dev/master
 
     context 'in subgroups', :nested_groups do
       let(:subgroup) { create(:group, :private, parent: group) }
       let(:project) { create(:project, namespace: subgroup) }
 
+<<<<<<< HEAD
       it { expect_allowed(:read_label, :read_list) }
+=======
+      it { expect_allowed(:read_label) }
+>>>>>>> dev/master
     end
   end
 

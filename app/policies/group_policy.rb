@@ -53,7 +53,10 @@ class GroupPolicy < BasePolicy
   rule { admin }.enable :read_group
 
   rule { has_projects }.policy do
+<<<<<<< HEAD
     enable :read_list
+=======
+>>>>>>> dev/master
     enable :read_label
   end
 
