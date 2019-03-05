@@ -2,6 +2,11 @@ namespace :gitlab do
   namespace :elastic do
     desc "GitLab | Elasticsearch | Index eveything at once"
     task :index do
+      # UPDATE_INDEX=true can cause some projects not to be indexed properly if someone were to push a commit to the
+      # project before the rake task could get to it, so we set it to `nil` here to avoid that. It doesn't make sense
+      # to use this configuration during a full re-index anyways.
+      ENV['UPDATE_INDEX'] = nil
+
       Rake::Task["gitlab:elastic:create_empty_index"].invoke
       Rake::Task["gitlab:elastic:clear_index_status"].invoke
       Rake::Task["gitlab:elastic:index_wikis"].invoke
@@ -38,6 +43,13 @@ namespace :gitlab do
       project_id_batches do |start, finish|
         ElasticBatchProjectIndexerWorker.new.perform(start, finish, ENV['UPDATE_INDEX'])
       end
+    end
+
+    desc 'GitLab | Elasticsearch | Unlock repositories for indexing in case something gets stuck'
+    task clear_locked_projects: :environment do
+      Gitlab::Redis::SharedState.with { |redis| redis.del(:elastic_projects_indexing) }
+
+      puts 'Cleared all locked projects. Incremental indexing should work now.'
     end
 
     desc "GitLab | Elasticsearch | Index wiki repositories"
@@ -180,6 +192,7 @@ namespace :gitlab do
 
       relation.all.in_batches(of: batch_size, start: ENV['ID_FROM'], finish: ENV['ID_TO']) do |relation| # rubocop: disable Cop/InBatches
         ids = relation.reorder(:id).pluck(:id)
+        Gitlab::Redis::SharedState.with { |redis| redis.sadd(:elastic_projects_indexing, ids) }
         yield ids[0], ids[-1]
       end
     end
