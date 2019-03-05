@@ -1044,6 +1044,13 @@ ActiveRecord::Schema.define(version: 20190305162221) do
     t.index ["project_id"], name: "index_design_management_designs_on_project_id", using: :btree
   end
 
+  create_table "design_management_versions", id: :bigserial, force: :cascade do |t|
+    t.bigint "design_management_design_id", null: false
+    t.binary "sha", null: false
+    t.index ["design_management_design_id"], name: "index_design_management_versions_on_design_management_design_id", using: :btree
+    t.index ["sha"], name: "index_design_management_versions_on_sha", unique: true, using: :btree
+  end
+
   create_table "draft_notes", id: :bigserial, force: :cascade do |t|
     t.integer "merge_request_id", null: false
     t.integer "author_id", null: false
@@ -3416,6 +3423,7 @@ ActiveRecord::Schema.define(version: 20190305162221) do
   add_foreign_key "deployments", "projects", name: "fk_b9a3851b82", on_delete: :cascade
   add_foreign_key "design_management_designs", "issues", on_delete: :cascade
   add_foreign_key "design_management_designs", "projects", on_delete: :cascade
+  add_foreign_key "design_management_versions", "design_management_designs", on_delete: :cascade
   add_foreign_key "draft_notes", "merge_requests", on_delete: :cascade
   add_foreign_key "draft_notes", "users", column: "author_id", on_delete: :cascade
   add_foreign_key "environments", "projects", name: "fk_d1c8c1da6a", on_delete: :cascade
