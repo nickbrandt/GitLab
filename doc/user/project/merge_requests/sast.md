@@ -35,7 +35,7 @@ The following languages and frameworks are supported.
 | Language / framework    | Scan tool                                                                              |
 |-------------------------|----------------------------------------------------------------------------------------|
 | .NET                    | [Security Code Scan](https://security-code-scan.github.io)                             |
-| Any                     | [Gitleaks](https://github.com/zricethezav/gitleaks), [TruffleHog](https://github.com/dxa4481/truffleHog) and [Diffence](https://github.com/techjacker/diffence) (secret detectors) | 11.9 |
+| Any                     | [Gitleaks](https://github.com/zricethezav/gitleaks), [TruffleHog](https://github.com/dxa4481/truffleHog) and [Diffence](https://github.com/techjacker/diffence) (secret detectors) |
 | C/C++                   | [Flawfinder](https://www.dwheeler.com/flawfinder/)                                     |
 | Go                      | [Gosec](https://github.com/securego/gosec)                                             |
 | Groovy (Gradle & Grail) | [find-sec-bugs](https://find-sec-bugs.github.io/)                                      |
