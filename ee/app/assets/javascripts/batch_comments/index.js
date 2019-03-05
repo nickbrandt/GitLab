@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { mapState, mapActions } from 'vuex';
-import store from '~/mr_notes/stores';
+import store from 'ee_else_ce/mr_notes/stores';
 import ReviewBar from './components/review_bar.vue';
 
 // eslint-disable-next-line import/prefer-default-export
