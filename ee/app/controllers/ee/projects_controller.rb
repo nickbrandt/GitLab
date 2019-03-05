@@ -42,6 +42,7 @@ module EE
         use_custom_template
         packages_enabled
         merge_requests_author_approval
+        merge_requests_require_code_owner_approval
         group_with_project_templates_id
       ]
 

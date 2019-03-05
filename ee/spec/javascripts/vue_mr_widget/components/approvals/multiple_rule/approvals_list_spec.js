@@ -40,6 +40,16 @@ const testRuleFallback = () => ({
   approvers: [],
   approved: false,
 });
+const testRuleCodeOwner = () => ({
+  id: '*.js',
+  name: '',
+  fallback: true,
+  approvals_required: 3,
+  approved_by: [{ id: 1 }, { id: 2 }],
+  approvers: [],
+  approved: false,
+  rule_type: 'code_owner',
+});
 const testRules = () => [testRuleApproved(), testRuleUnapproved(), testRuleOptional()];
 
 describe('EE MRWidget approvals list', () => {
@@ -76,6 +86,28 @@ describe('EE MRWidget approvals list', () => {
 
       expect(rows.length).toEqual(expected.length);
       expect(names).toEqual(expected.map(x => x.name));
+    });
+
+    it('does not render a code owner subtitle', () => {
+      expect(wrapper.find('.js-section-title').exists()).toBe(false);
+    });
+
+    describe('when a code owner rule is included', () => {
+      let rulesWithCodeOwner;
+
+      beforeEach(() => {
+        rulesWithCodeOwner = testRules().concat([testRuleCodeOwner()]);
+        createComponent({
+          approvalRules: rulesWithCodeOwner,
+        });
+      });
+
+      it('renders a code owner subtitle', () => {
+        const rows = findRows();
+
+        expect(wrapper.find('.js-section-title').exists()).toBe(true);
+        expect(rows.length).toEqual(rulesWithCodeOwner.length + 1);
+      });
     });
   });
 
@@ -253,6 +285,31 @@ describe('EE MRWidget approvals list', () => {
 
       expect(lists.length).toEqual(1);
       expect(lists.at(0).props('items')).toEqual(rule.approved_by);
+    });
+  });
+
+  describe('when code owner rule', () => {
+    const rule = testRuleCodeOwner();
+    let row;
+
+    beforeEach(() => {
+      createComponent({
+        approvalRules: [rule],
+      });
+      row = findRows().at(1);
+    });
+
+    it('renders the code owner title row', () => {
+      const titleRow = findRows().at(0);
+
+      expect(titleRow.text()).toEqual('Code Owners');
+    });
+
+    it('renders the name in a monospace font', () => {
+      const codeOwnerRow = findRowElement(row, 'name');
+
+      expect(codeOwnerRow.hasClass('monospace')).toEqual(true);
+      expect(codeOwnerRow.text()).toEqual(rule.name);
     });
   });
 });

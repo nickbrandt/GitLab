@@ -26,3 +26,4 @@
           Tip: add a
           = link_to 'CODEOWNERS', help_page_path('user/project/code_owners'), target: '_blank', tabindex: -1
           to automatically add approvers based on file paths and file types.
+    = render 'projects/merge_requests/code_owner_approval_rules', merge_request: @mr_presenter

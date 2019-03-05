@@ -1,0 +1,23 @@
+- return unless @project.merge_requests_require_code_owner_approval?
+- code_owner_rules = merge_request.code_owner_rules_with_users
+- return unless code_owner_rules.any?
+
+.prepend-top-20
+  %strong= _('Code owner approval is required')
+  %p
+    = _('At least one approval from a code owner is required to change files matching the respective CODEOWNER rules.')
+    = link_to(_('Read more'), help_page_path('user/project/merge_requests/merge_request_approvals', anchor: 'code-owners-approvals-premium'))
+
+  .border-bottom
+    %table.table.m-0
+      %thead.thead-white.text-nowrap
+        %tr.d-none.d-sm-table-row
+          %th.w-25= s_('CodeOwner|Pattern')
+          %th= _('Members')
+      %tbody
+        - code_owner_rules.each do |code_owner_approval_rule|
+          %tr
+            %td.monospace= code_owner_approval_rule.name
+            %td.d-none.d-sm-table-cell
+              - code_owner_approval_rule.approvers.each do |approver|
+                = user_avatar(user: approver)

@@ -13,12 +13,18 @@ module ApprovalRuleLike
 
     validates :name, presence: true
     validates :approvals_required, numericality: { less_than_or_equal_to: APPROVALS_REQUIRED_MAX, greater_than_or_equal_to: 0 }
+
+    scope :with_users, -> { preload(:users, :group_users) }
   end
 
   # Users who are eligible to approve, including specified group members.
   # @return [Array<User>]
   def approvers
-    @approvers ||= User.from_union([users, group_users])
+    @approvers ||= if users.loaded? && group_users.loaded?
+                     users | group_users
+                   else
+                     User.from_union([users, group_users])
+                   end
   end
 
   def add_member(member)

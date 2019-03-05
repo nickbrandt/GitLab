@@ -1,6 +1,8 @@
 <script>
+import _ from 'underscore';
 import { sprintf, __ } from '~/locale';
 import UserAvatarList from '~/vue_shared/components/user_avatar/user_avatar_list.vue';
+import { RULE_TYPE_CODE_OWNER } from 'ee/approvals/constants';
 import ApprovedIcon from './approved_icon.vue';
 
 export default {
@@ -12,6 +14,24 @@ export default {
     approvalRules: {
       type: Array,
       required: true,
+    },
+  },
+  computed: {
+    sections() {
+      return [
+        {
+          id: _.uniqueId(),
+          title: '',
+          rules: this.approvalRules.filter(rule => rule.rule_type !== RULE_TYPE_CODE_OWNER),
+        },
+        {
+          id: _.uniqueId(),
+          title: __('Code Owners'),
+          rules: this.approvalRules
+            .filter(rule => rule.rule_type === RULE_TYPE_CODE_OWNER)
+            .map(rule => ({ ...rule, nameClass: 'monospace' })),
+        },
+      ].filter(x => x.rules.length);
     },
   },
   methods: {
@@ -58,11 +78,17 @@ export default {
         <th>{{ s__('MRApprovals|Approved by') }}</th>
       </tr>
     </thead>
-    <tbody>
-      <tr v-for="rule in approvalRules" :key="rule.id">
+    <tbody v-for="{ id, title, rules } in sections" :key="id" class="border-top-0">
+      <tr v-if="title" class="js-section-title">
+        <td class="w-0"></td>
+        <td colspan="99">
+          <strong>{{ title }}</strong>
+        </td>
+      </tr>
+      <tr v-for="rule in rules" :key="rule.id">
         <td class="w-0"><approved-icon :is-approved="rule.approved" /></td>
         <td :colspan="rule.fallback ? 2 : 1">
-          <div class="d-none d-sm-block js-name">{{ rule.name }}</div>
+          <div class="d-none d-sm-block js-name" :class="rule.nameClass">{{ rule.name }}</div>
           <div class="d-flex d-sm-none flex-column js-summary">
             <span>{{ summaryText(rule) }}</span>
             <user-avatar-list
