@@ -14,7 +14,7 @@ module EE
       end
 
       def recent
-        recent_visits = ::Boards::Visits::LatestService.new(parent, current_user, count: 5).execute
+        recent_visits = ::Boards::Visits::LatestService.new(parent, current_user, count: 4).execute
         recent_boards = recent_visits.map(&:board)
 
         render json: serialize_as_json(recent_boards)
