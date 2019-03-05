@@ -15,5 +15,10 @@ describe 'EE check.rake' do
         run_rake_task('gitlab:geo:check')
       end.to output(/Checking Geo ... Finished/).to_stdout
     end
+    it 'runs the Elasticsearch project_not_indexed' do
+      expect do
+        run_rake_task('gitlab:elastic:projects_not_indexed')
+      end.to output(/All projects are currently indexed/).to_stdout
+    end
   end
 end
