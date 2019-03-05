@@ -1,0 +1,5 @@
+---
+title: Added gitlab:elastic:projects_not_indexed rake task
+merge_request:
+author: Jason Colyer
+type: added
