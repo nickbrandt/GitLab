@@ -1035,6 +1035,15 @@ ActiveRecord::Schema.define(version: 20190305162221) do
     t.index ["project_id", "status"], name: "index_deployments_on_project_id_and_status", using: :btree
   end
 
+  create_table "design_management_designs", id: :bigserial, force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.integer "issue_id", null: false
+    t.string "filename", null: false
+    t.index ["issue_id", "filename"], name: "index_design_management_designs_on_issue_id_and_filename", unique: true, using: :btree
+    t.index ["issue_id"], name: "index_design_management_designs_on_issue_id", unique: true, using: :btree
+    t.index ["project_id"], name: "index_design_management_designs_on_project_id", using: :btree
+  end
+
   create_table "draft_notes", id: :bigserial, force: :cascade do |t|
     t.integer "merge_request_id", null: false
     t.integer "author_id", null: false
@@ -3405,6 +3414,8 @@ ActiveRecord::Schema.define(version: 20190305162221) do
   add_foreign_key "container_repositories", "projects"
   add_foreign_key "deploy_keys_projects", "projects", name: "fk_58a901ca7e", on_delete: :cascade
   add_foreign_key "deployments", "projects", name: "fk_b9a3851b82", on_delete: :cascade
+  add_foreign_key "design_management_designs", "issues", on_delete: :cascade
+  add_foreign_key "design_management_designs", "projects", on_delete: :cascade
   add_foreign_key "draft_notes", "merge_requests", on_delete: :cascade
   add_foreign_key "draft_notes", "users", column: "author_id", on_delete: :cascade
   add_foreign_key "environments", "projects", name: "fk_d1c8c1da6a", on_delete: :cascade
