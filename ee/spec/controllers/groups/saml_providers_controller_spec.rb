@@ -79,6 +79,23 @@ describe Groups::SamlProvidersController do
         expect(response).to render_template 'groups/saml_providers/show'
       end
 
+      it 'has the SCIM token URL' do
+        group.add_owner(user)
+
+        subject
+
+        expect(assigns(:scim_token_url)).to eq('http://test.host/groups/group1/-/scim_oauth')
+      end
+
+      it 'sets scim_token_exists if SCIM token is found' do
+        create(:scim_oauth_access_token, group: group)
+        group.add_owner(user)
+
+        subject
+
+        expect(assigns(:scim_token_exists)).to be true
+      end
+
       context 'not on a top level group', :nested_groups do
         let(:group) { create(:group, :nested) }
 
