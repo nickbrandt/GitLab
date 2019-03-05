@@ -26,7 +26,7 @@ For an overview, check the video demonstration on [Mapping Work Versus Time, Wit
 
 Burndown Charts, in general, are used for tracking and analyzing the completion of
 a milestone. Therefore, their use cases are tied to the
-[use you are giving to your milestone](index.md#use-cases).
+[use you are assigning your milestone to](index.md).
 
 To exemplify, suppose you lead a team of developers in a large company,
 and you follow this workflow:
