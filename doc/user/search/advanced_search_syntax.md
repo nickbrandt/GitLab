@@ -1,9 +1,12 @@
-# Advanced Syntax Search **[STARTER]**
+# Advanced Syntax Search **[STARTER ONLY]**
 
 > **Notes:**
 > - Introduced in [GitLab Enterprise Starter][ee] 9.2
 > - This is the user documentation. To install and configure Elasticsearch,
->   visit the [admin docs](../../integration/elasticsearch.md).
+>   visit the [administrator documentation](../../integration/elasticsearch.md).
+
+NOTE: **Note**
+Advanced Global Search (powered by Elasticsearch) is not yet available on GitLab.com. We are working on adding it. [Follow this epic for the latest updates](https://gitlab.com/groups/gitlab-org/-/epics/153).
 
 Use advanced queries for more targeted search results.
 
