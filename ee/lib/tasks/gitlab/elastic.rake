@@ -135,7 +135,7 @@ namespace :gitlab do
         puts 'Index mapping is already up to date'.color(:yellow)
         exit
       end
-
+      
       ####
 
       project_fields = {
@@ -177,6 +177,21 @@ namespace :gitlab do
       Note.searchable.import_with_parent
 
       puts "Done".color(:green)
+    end
+    
+    desc "GitLab | Elasticsearch | Display which projects are not indexed"
+    task projects_not_indexed: :environment do
+      not_indexed = Array.new
+      Project.all.each do |p|
+        not_indexed.push(p) if p.index_status.nil?
+      end
+      if not_indexed.empty?
+        puts 'All projects are currently indexed'.color(:green)
+      else
+        not_indexed.each do |p|
+          puts "Project '#{p.full_path}' (ID: #{p.id}) isn't indexed.".color(:red)
+        end
+      end
     end
 
     def batch_size
