@@ -23,9 +23,7 @@ module Projects
         def send_email?
           return true unless has_incident_management_license?
 
-          setting = project.incident_management_setting
-
-          return true if setting.nil?
+          setting = project.incident_management_setting || project.build_incident_management_setting
 
           setting.send_email
         end
