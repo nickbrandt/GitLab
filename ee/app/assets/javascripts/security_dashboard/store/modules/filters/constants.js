@@ -22,6 +22,7 @@ export const CONFIDENCE_LEVELS = {
 };
 
 export const REPORT_TYPES = {
-  sast: s__('ciReport|SAST'),
+  container_scanning: s__('ciReport|Container Scanning'),
   dependency_scanning: s__('ciReport|Dependency Scanning'),
+  sast: s__('ciReport|SAST'),
 };

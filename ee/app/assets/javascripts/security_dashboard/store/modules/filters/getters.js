@@ -9,15 +9,15 @@ export const getSelectedOptions = (state, getters) => filterId => {
 
 export const getSelectedOptionNames = (state, getters) => filterId => {
   const selectedOptions = getters.getSelectedOptions(filterId);
-  const [firstOption] = selectedOptions.map(option => option.name);
   const extraOptionCount = selectedOptions.length - 1;
+  const firstOption = selectedOptions.map(option => option.name)[0];
 
-  return extraOptionCount
-    ? sprintf(__('%{firstOption} +%{extraOptionCount} more'), {
-        firstOption,
-        extraOptionCount,
-      })
-    : firstOption;
+  return {
+    firstOption,
+    extraOptionCount: extraOptionCount
+      ? sprintf(__('+%{extraOptionCount} more'), { extraOptionCount })
+      : '',
+  };
 };
 
 /**
