@@ -1,5 +1,5 @@
 - if ::Gitlab::CurrentSettings.custom_project_templates_enabled?
-  %section.settings.as-custom-project-templates.no-animate#js-custom-project-templates-settings{ class: ('expanded' if expanded) }
+  %section.settings.as-custom-project-templates.no-animate#js-custom-project-templates-settings.qa-custom-project-template-section{ class: ('expanded' if expanded) }
     .settings-header
       %h4
         = _('Custom project templates')
@@ -14,6 +14,6 @@
 
         %fieldset
           .form-group
-            = groups_select_tag('application_setting[custom_project_templates_group_id]', selected: @application_setting.custom_project_templates_group_id, class: 'input-clamp allowClear', multiple: false)
+            = groups_select_tag('application_setting[custom_project_templates_group_id]', selected: @application_setting.custom_project_templates_group_id, class: 'input-clamp allowClear qa-custom-project-template-select', multiple: false)
 
-        = f.submit _('Save changes'), class: "btn btn-success"
+        = f.submit _('Save changes'), class: "btn btn-success qa-save-changes-button"

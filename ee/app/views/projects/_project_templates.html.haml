@@ -9,9 +9,9 @@
           = _('Built-in')
           %span.badge.badge-pill= Gitlab::ProjectTemplate.all.count
       %li.custom-instance-project-templates-tab
-        %a.nav-link.js-custom-instance-project-templates-nav-link{ href: "#custom-instance-project-templates", data: { toggle: 'tab'} }
+        %a.nav-link.js-custom-instance-project-templates-nav-link.qa-instance-templates-tab{ href: "#custom-instance-project-templates", data: { toggle: 'tab'} }
           = _('Instance')
-          %span.badge.badge-pill= project_template_count
+          %span.badge.badge-pill.qa-instance-template-tab-badge= project_template_count
       %li.custom-group-project-templates-tab
         %a.nav-link.js-custom-group-project-templates-nav-link.qa-group-templates-tab{ href: "#custom-group-project-templates", data: { toggle: 'tab'} }
           = _('Group')
