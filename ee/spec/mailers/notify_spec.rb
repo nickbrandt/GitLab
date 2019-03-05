@@ -37,10 +37,18 @@ describe Notify do
 
   context 'for a project' do
     context 'for service desk issues' do
+      before do
+        issue.update!(service_desk_reply_to: 'service.desk@example.com')
+      end
+
       describe 'thank you email' do
         subject { described_class.service_desk_thank_you_email(issue.id) }
 
         it_behaves_like 'an unsubscribeable thread'
+
+        it 'has the correct recipient' do
+          is_expected.to deliver_to('service.desk@example.com')
+        end
 
         it 'has the correct subject and body' do
           aggregate_failures do
@@ -56,6 +64,10 @@ describe Notify do
         subject { described_class.service_desk_new_note_email(issue.id, first_note.id) }
 
         it_behaves_like 'an unsubscribeable thread'
+
+        it 'has the correct recipient' do
+          is_expected.to deliver_to('service.desk@example.com')
+        end
 
         it 'has the correct subject and body' do
           aggregate_failures do
