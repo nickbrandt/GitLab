@@ -63,11 +63,32 @@ describe MergeRequestsFinder do
         expect(merge_requests.size).to eq(7)
       end
 
-    it 'ignores sorting by weight' do
-      params = { project_id: project1.id, scope: 'authored', state: 'opened', weight: Issue::WEIGHT_ANY }
-      merge_requests = described_class.new(user, params).execute
-      expect(merge_requests.size).to eq(2)
-    end
+      it 'ignores sorting by weight' do
+        params = { project_id: project1.id, scope: 'authored', state: 'opened', weight: Issue::WEIGHT_ANY }
+        merge_requests = described_class.new(user, params).execute
+        expect(merge_requests.size).to eq(2)
+      end
+
+      it 'filters by project' do
+        params = { project_id: project1.id, scope: 'authored', state: 'opened' }
+        merge_requests = described_class.new(user, params).execute
+        expect(merge_requests.size).to eq(2)
+      end
+
+      it 'filters by commit sha' do
+        merge_requests = described_class.new(
+          user,
+          commit_sha: merge_request5.merge_request_diff.last_commit_sha
+        ).execute
+
+        expect(merge_requests).to contain_exactly(merge_request5)
+      end
+
+      context 'filtering by group' do
+        it 'includes all merge requests when user has access' do
+          params = { group_id: group.id }
+
+          merge_requests = described_class.new(user, params).execute
 
           expect(merge_requests.size).to eq(3)
         end
