@@ -3,7 +3,7 @@
 module EE
   module MilestonesHelper
     def burndown_chart(milestone)
-      Burndown.new(milestone) if milestone.supports_burndown_charts?
+      Burndown.new(milestone, current_user) if milestone.supports_burndown_charts?
     end
 
     def can_generate_chart?(milestone, burndown)

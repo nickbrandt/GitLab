@@ -9,7 +9,7 @@ describe Milestones::UpdateService do
         user = build(:user)
         milestone = create(:milestone, project: project)
         epic = create(:epic)
-        create(:issue, milestone: milestone, epic: epic)
+        create(:issue, milestone: milestone, epic: epic, project: project)
         due_date = 3.days.from_now.to_date
 
         described_class.new(project, user, { due_date: due_date }).execute(milestone)

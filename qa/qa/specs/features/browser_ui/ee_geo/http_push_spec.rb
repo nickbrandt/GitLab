@@ -5,8 +5,7 @@ module QA
     describe 'GitLab HTTP push' do
       let(:file_name) { 'README.md' }
 
-      # https://gitlab.com/gitlab-org/quality/nightly/issues/77
-      context 'regular git commit', :quarantine do
+      context 'regular git commit' do
         it 'is replicated to the secondary' do
           file_content = 'This is a Geo project!  Commit from primary.'
 

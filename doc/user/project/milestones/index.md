@@ -124,7 +124,7 @@ These features are only available for project milestones and not group milestone
 - Issues assigned to the milestone are displayed in three columns: Unstarted issues, ongoing issues, and completed issues.
 - Merge requests assigned to the milestone are displayed in four columns: Work in progress merge requests, waiting for merge, rejected, and closed.
 - Participants and labels that are used in issues and merge requests that have the milestone assigned are displayed.
-- [Burndown chart](#burndown-charts).
+- [Burndown chart](#project-burndown-charts-starter).
 
 ### Project Burndown Charts **[STARTER]**
 

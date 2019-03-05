@@ -1010,6 +1010,28 @@ describe Project do
     end
   end
 
+  describe '#merge_requests_require_code_owner_approval?' do
+    let(:project) { build(:project) }
+
+    where(:feature_available, :feature_enabled, :approval_required) do
+      true  | true  | true
+      false | true  | false
+      true  | false | false
+      true  | nil   | false
+    end
+
+    with_them do
+      before do
+        stub_licensed_features(code_owner_approval_required: feature_available)
+        project.merge_requests_require_code_owner_approval = feature_enabled
+      end
+
+      it 'requires code owner approval when needed' do
+        expect(project.merge_requests_require_code_owner_approval?).to eq(approval_required)
+      end
+    end
+  end
+
   shared_examples 'project with disabled services' do
     it 'has some disabled services' do
       stub_const('License::ANY_PLAN_FEATURES', [])

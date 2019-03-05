@@ -62,7 +62,7 @@ describe('filters module getters', () => {
         'severity',
       );
 
-      expect(selectedOptionNames).toEqual('All');
+      expect(selectedOptionNames).toEqual({ firstOption: 'All', extraOptionCount: '' });
     });
 
     it('should return the correct message when multiple filters are selected', () => {
@@ -79,7 +79,7 @@ describe('filters module getters', () => {
         'severity',
       );
 
-      expect(selectedOptionNames).toEqual('Critical +1 more');
+      expect(selectedOptionNames).toEqual({ firstOption: 'Critical', extraOptionCount: '+1 more' });
     });
   });
 

@@ -1,8 +1,11 @@
-# Advanced Global Search **[STARTER]**
+# Advanced Global Search **[STARTER ONLY]**
 
 > - [Introduced][ee-109] in GitLab [Starter][ee] 8.4.
 > - This is the user documentation. To install and configure Elasticsearch,
->   visit the [admin docs](../../integration/elasticsearch.md).
+>   visit the [administrator documentation](../../integration/elasticsearch.md).
+
+NOTE: **Note**
+Advanced Global Search (powered by Elasticsearch) is not yet available on GitLab.com. We are working on adding it. [Follow this epic for the latest updates](https://gitlab.com/groups/gitlab-org/-/epics/153).
 
 Leverage Elasticsearch for faster, more advanced code search across your entire
 GitLab instance.

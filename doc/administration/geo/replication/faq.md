@@ -23,7 +23,7 @@ When someone pushes a commit to the **primary** node, it generates an event in t
 The **secondary** node sees this event, marks the project in question as dirty, and schedules the project to be resynced.
 
 To ensure that problems with pipelines (for example, syncs failing too many times or jobs being lost) don't permanently stop projects syncing, Geo also periodically checks the tracking database for projects that are marked as dirty. This check happens when
-the number of concurrent syncs falls below `repos_max_capaxity` and there are no new projects waiting to be synced. 
+the number of concurrent syncs falls below `repos_max_capacity` and there are no new projects waiting to be synced. 
 
 Geo also has a checksum feature which runs a SHA256 sum across all the Git references to the SHA values. 
 If the refs don't match between the **primary** node and the **secondary** node, then the **secondary** node will mark that project as dirty and try to resync it. 

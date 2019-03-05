@@ -14,10 +14,10 @@ describe Issues::UpdateService do
 
     context 'refresh epic dates' do
       let(:epic) { create(:epic) }
-      let(:issue) { create(:issue, epic: epic) }
+      let(:issue) { create(:issue, epic: epic, project: project) }
 
       context 'updating milestone' do
-        let(:milestone) { create(:milestone) }
+        let(:milestone) { create(:milestone, project: project) }
 
         it 'calls epic#update_start_and_due_dates' do
           expect(epic).to receive(:update_start_and_due_dates).twice

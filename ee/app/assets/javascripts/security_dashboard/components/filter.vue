@@ -55,7 +55,18 @@ export default {
       v-if="filterId === 'report_type'"
       :dashboard-documentation="dashboardDocumentation"
     />
-    <gl-dropdown :text="selectedOptionText" class="d-block mt-1">
+    <gl-dropdown class="d-block mt-1">
+      <template slot="button-content">
+        <span class="text-truncate">
+          {{ selectedOptionText.firstOption }}
+        </span>
+        <span v-if="selectedOptionText.extraOptionCount" class="flex-grow-1 ml-1">
+          {{ selectedOptionText.extraOptionCount }}
+        </span>
+
+        <i class="fa fa-chevron-down" aria-hidden="true"></i>
+      </template>
+
       <gl-dropdown-item
         v-for="option in filter.options"
         :key="option.id"

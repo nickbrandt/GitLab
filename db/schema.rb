@@ -2433,6 +2433,7 @@ ActiveRecord::Schema.define(version: 20190301081611) do
     t.bigint "pool_repository_id"
     t.string "runners_token_encrypted"
     t.string "bfg_object_map"
+    t.boolean "merge_requests_require_code_owner_approval"
     t.index ["ci_id"], name: "index_projects_on_ci_id", using: :btree
     t.index ["created_at"], name: "index_projects_on_created_at", using: :btree
     t.index ["creator_id"], name: "index_projects_on_creator_id", using: :btree

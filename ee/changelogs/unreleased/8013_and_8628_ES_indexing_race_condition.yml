@@ -1,0 +1,6 @@
+---
+title: Fix repo pushes while initial Elasticsearch indexing not permitting initial
+  indexing to complete
+merge_request: 9478
+author:
+type: fixed

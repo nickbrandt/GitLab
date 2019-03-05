@@ -124,10 +124,27 @@ describe ApprovalMergeRequestRule do
     end
 
     context 'when project merge_requests_author_approval is false' do
-      it 'contains author' do
+      before do
         merge_request.project.update(merge_requests_author_approval: false)
+      end
 
+      it 'does not contain author' do
         expect(subject.approvers).to be_empty
+      end
+
+      context 'when the rules users have already been loaded' do
+        before do
+          subject.users
+          subject.group_users
+        end
+
+        it 'does not cause queries' do
+          expect { subject.approvers }.not_to exceed_query_limit(0)
+        end
+
+        it 'does not contain the author' do
+          expect(subject.approvers).to be_empty
+        end
       end
     end
   end

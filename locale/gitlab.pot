@@ -168,9 +168,6 @@ msgstr ""
 msgid "%{firstLabel} +%{labelCount} more"
 msgstr ""
 
-msgid "%{firstOption} +%{extraOptionCount} more"
-msgstr ""
-
 msgid "%{group_docs_link_start}Groups%{group_docs_link_end} allow you to manage and collaborate across multiple projects. Members of a group have access to all of its projects."
 msgstr ""
 
@@ -249,6 +246,9 @@ msgid "+ %{count} more"
 msgstr ""
 
 msgid "+ %{moreCount} more"
+msgstr ""
+
+msgid "+%{extraOptionCount} more"
 msgstr ""
 
 msgid ", or "
@@ -1203,6 +1203,9 @@ msgstr ""
 msgid "Assignee(s)"
 msgstr ""
 
+msgid "At least one approval from a code owner is required to change files matching the respective CODEOWNER rules."
+msgstr ""
+
 msgid "Attach a file"
 msgstr ""
 
@@ -1774,6 +1777,9 @@ msgid "Cannot be merged automatically"
 msgstr ""
 
 msgid "Cannot modify managed Kubernetes cluster"
+msgstr ""
+
+msgid "Cannot render the image. Maximum character count (%{charLimit}) has been exceeded."
 msgstr ""
 
 msgid "Certificate"
@@ -2550,7 +2556,16 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
+msgid "Code Owners"
+msgstr ""
+
+msgid "Code owner approval is required"
+msgstr ""
+
 msgid "Code owners"
+msgstr ""
+
+msgid "CodeOwner|Pattern"
 msgstr ""
 
 msgid "Cohorts"
@@ -7101,6 +7116,12 @@ msgstr ""
 msgid "PipelineSheduleIntervalPattern|Custom"
 msgstr ""
 
+msgid "PipelineStatusTooltip|Commit: %{ci_status}"
+msgstr ""
+
+msgid "PipelineStatusTooltip|Pipeline: %{ci_status}"
+msgstr ""
+
 msgid "Pipelines"
 msgstr ""
 
@@ -8247,6 +8268,9 @@ msgid "Require all users in this group to setup Two-factor authentication"
 msgstr ""
 
 msgid "Require all users to accept Terms of Service and Privacy Policy when they access GitLab."
+msgstr ""
+
+msgid "Require approval from code owners"
 msgstr ""
 
 msgid "Requires approval from %{names}."
@@ -11468,6 +11492,9 @@ msgid "ciReport|Code quality"
 msgstr ""
 
 msgid "ciReport|Confidence"
+msgstr ""
+
+msgid "ciReport|Container Scanning"
 msgstr ""
 
 msgid "ciReport|Container scanning"

@@ -70,7 +70,7 @@ class License < ActiveRecord::Base
     protected_environments
     custom_project_templates
     packages
-    code_owner_as_approver_suggestion
+    code_owner_approval_required
     feature_flags
     batch_comments
     issues_analytics

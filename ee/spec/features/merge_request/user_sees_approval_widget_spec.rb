@@ -1,12 +1,14 @@
 require 'rails_helper'
 
 describe 'Merge request > User sees approval widget', :js do
-  let(:project) { create(:project, :public, :repository, approvals_before_merge: 1) }
+  let(:project) { create(:project, :public, :repository) }
   let(:user) { project.creator }
   let(:merge_request) { create(:merge_request, source_project: project) }
 
   before do
     stub_feature_flags(approval_rules: false)
+
+    sign_in(user)
   end
 
   context 'when merge when discussions resolved is active' do
@@ -17,14 +19,119 @@ describe 'Merge request > User sees approval widget', :js do
     end
 
     before do
-      sign_in(user)
-
       visit project_merge_request_path(project, merge_request)
     end
 
     it 'does not show checking ability text' do
       expect(find('.js-mr-approvals')).not_to have_text('Checking ability to merge automatically')
       expect(find('.js-mr-approvals')).to have_selector('.approvals-body')
+    end
+  end
+
+  context 'when rules are enabled' do
+    before do
+      stub_feature_flags(approval_rules: true)
+    end
+
+    context 'merge request approvers enabled' do
+      let(:project) { create(:project, :public, :repository, approvals_before_merge: 3) }
+
+      before do
+        stub_licensed_features(merge_request_approvers: true)
+
+        visit project_merge_request_path(project, merge_request)
+      end
+
+      it 'the renders the number of required approvals' do
+        wait_for_requests
+
+        expect(page).to have_content('Requires 3 more approvals.')
+      end
+    end
+
+    context 'multiple approval rules enabled' do
+      let(:members) { create_list(:user, 2) }
+
+      let!(:rule) do
+        create(:approval_merge_request_rule,
+               merge_request: merge_request,
+               users: members,
+               approvals_required: 1)
+      end
+
+      before do
+        stub_licensed_features(multiple_approval_rules: true)
+
+        members.each { |user| project.add_developer(user) }
+      end
+
+      it 'shows the approval rule' do
+        visit project_merge_request_path(project, merge_request)
+
+        wait_for_requests
+        expect(page).to have_content("Requires approval from #{rule.name}")
+
+        click_on 'View eligible approvers'
+        wait_for_requests
+
+        within('.mr-widget-workflow table') do
+          expect(page).to have_content(rule.name)
+        end
+      end
+
+      context 'for code owner rules' do
+        let(:code_owners) { create_list(:user, 2) }
+
+        let!(:code_owner_rule) do
+          create(:code_owner_rule,
+                 merge_request: merge_request,
+                 users: code_owners,
+                 name: '*.js')
+        end
+
+        before do
+          code_owners.each { |user| project.add_developer(user) }
+        end
+
+        it 'shows the code owner rule as optional' do
+          visit project_merge_request_path(project, merge_request)
+
+          wait_for_requests
+          expect(page).to have_content("Requires approval from #{rule.name}.")
+
+          click_on 'View eligible approvers'
+          wait_for_requests
+
+          within('.mr-widget-workflow table .monospace') do
+            code_owner_row = find(:xpath, "//tr[td[contains(.,'#{code_owner_rule.name}')]]")
+
+            expect(code_owner_row).to have_content('Optional')
+          end
+        end
+
+        context 'when code owner approval is required' do
+          before do
+            stub_licensed_features(code_owner_approval_required: true, multiple_approval_rules: true)
+            project.update!(merge_requests_require_code_owner_approval: true)
+          end
+
+          it 'shows the code owner rule as required' do
+            visit project_merge_request_path(project, merge_request)
+            wait_for_requests
+
+            expect(page).to have_content("Requires 2 more approvals from #{rule.name} and Code Owners")
+
+            click_on 'View eligible approvers'
+            wait_for_requests
+
+            within('.mr-widget-workflow table .monospace') do
+              code_owner_row = find(:xpath, "//tr[td[contains(.,'#{code_owner_rule.name}')]]")
+
+              expect(code_owner_row).to have_content('0 of 1')
+            end
+          end
+        end
+      end
     end
   end
 end

@@ -31,7 +31,6 @@ describe Vulnerabilities::OccurrenceEntity do
 
   let!(:issue_feedback) do
     create(:vulnerability_feedback, :sast, :issue,
-           issue: create(:issue, project: project),
            project: project, project_fingerprint: occurrence.project_fingerprint)
   end
 
