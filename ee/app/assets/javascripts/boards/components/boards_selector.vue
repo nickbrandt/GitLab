@@ -288,6 +288,8 @@ export default {
             </gl-dropdown-item>
           </template>
 
+          <gl-dropdown-divider v-if="showRecentSection" />
+
           <gl-dropdown-header v-if="showRecentSection" class="mt-0">
             All
           </gl-dropdown-header>
