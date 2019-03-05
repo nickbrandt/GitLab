@@ -13,7 +13,7 @@ There are two ways to set up Prometheus integration, depending on where your app
 - For deployments on Kubernetes, GitLab can automatically [deploy and manage Prometheus](#managed-prometheus-on-kubernetes).
 - For other deployment targets, simply [specify the Prometheus server](#manual-configuration-of-prometheus).
 
-Once enabled, GitLab will automatically detect metrics from known services in the [metric library](#monitoring-ci-cd-environments). You are also able to [add your own metrics](#adding-additional-metrics) as well.
+Once enabled, GitLab will automatically detect metrics from known services in the [metric library](#monitoring-ci-cd-environments). You are also able to [add your own metrics](#adding-additional-metrics-premium) as well.
 
 ## Enabling Prometheus Integration
 
@@ -122,7 +122,7 @@ To specify a variable in a query, enclose it in curly braces with a leading perc
 
 #### Managed Prometheus instances
 
-> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/6590) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.2 for [custom metrics](#adding-additional-metrics), and 11.3 for [library metrics](prometheus_library/metrics.md).
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/6590) in [GitLab Ultimate](https://about.gitlab.com/pricing/) 11.2 for [custom metrics](#adding-additional-metrics-premium), and 11.3 for [library metrics](prometheus_library/metrics.md).
 
 For managed Prometheus instances using auto configuration, alerts for metrics [can be configured](#adding-additional-metrics-premium) directly in the performance dashboard.
 
@@ -184,7 +184,7 @@ If the "No data found" screen continues to appear, it could be due to:
 - No successful deployments have occurred to this environment.
 - Prometheus does not have performance data for this environment, or the metrics
   are not labeled correctly. To test this, connect to the Prometheus server and
-  [run a query](#gitlab-prometheus-queries), replacing `$CI_ENVIRONMENT_SLUG`
+  [run a query](prometheus_library/kubernetes.html#metrics-supported), replacing `$CI_ENVIRONMENT_SLUG`
   with the name of your environment.
 
 [autodeploy]: ../../../ci/autodeploy/index.md
