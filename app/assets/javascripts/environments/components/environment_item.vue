@@ -571,6 +571,7 @@ export default {
 
         <rollback-component
           v-if="canRetry"
+          :environment="model"
           :is-last-deployment="isLastDeployment"
           :retry-url="retryUrl"
         />
