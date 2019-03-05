@@ -33,6 +33,10 @@ module API
         def scim_error!(message:)
           error!({ with: EE::Gitlab::Scim::Error }.merge(detail: message), 409)
         end
+
+        def email_taken?(email, identity)
+          User.by_any_email(email.downcase).where.not(id: identity.user.id).count > 0
+        end
       end
 
       resource :Users do
@@ -92,8 +96,7 @@ module API
                     elsif parsed_hash[:extern_uid]
                       identity.update(parsed_hash.slice(:extern_uid))
                     else
-                      scim_error!(message: 'Email has already been taken') if parsed_hash[:email] &&
-                          User.by_any_email(parsed_hash[:email].downcase).where.not(id: identity.user.id).count > 0
+                      scim_error!(message: 'Email has already been taken') if email_taken?(parsed_hash[:email], identity)
 
                       result = ::Users::UpdateService.new(identity.user,
                                                           parsed_hash.except(:extern_uid, :provider)

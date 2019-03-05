@@ -12,8 +12,10 @@ module GroupSaml
       end
 
       def execute
-        identity.destroy!
-        remove_group_access
+        Identity.transaction do
+          identity.destroy!
+          remove_group_access
+        end
       end
 
       private
