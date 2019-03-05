@@ -37,14 +37,14 @@ The following languages and frameworks are supported.
 | .NET                    | [Security Code Scan](https://security-code-scan.github.io)                             |
 | C/C++                   | [Flawfinder](https://www.dwheeler.com/flawfinder/)                                     |
 | Go                      | [Gosec](https://github.com/securego/gosec)                                             |
-| Groovy (Gradle & Grail) | [find-sec-bugs](https://find-sec-bugs.github.io/)                                      |
-| Java (Maven & Gradle)   | [find-sec-bugs](https://find-sec-bugs.github.io/)                                      |
+| Groovy (Ant, Gradle, Maven and SBT) | [find-sec-bugs](https://find-sec-bugs.github.io/)                          |
+| Java (Ant, Gradle, Maven and SBT) | [find-sec-bugs](https://find-sec-bugs.github.io/)                            |
 | JavaScript              | [ESLint security plugin](https://github.com/nodesecurity/eslint-plugin-security)       |
 | Node.js                 | [NodeJsScan](https://github.com/ajinabraham/NodeJsScan)                                |
 | PHP                     | [phpcs-security-audit](https://github.com/FloeDesignTechnologies/phpcs-security-audit) |
 | Python                  | [bandit](https://github.com/PyCQA/bandit)                                              |
 | Ruby on Rails           | [brakeman](https://brakemanscanner.org)                                                |
-| Scala (sbt)             | [find-sec-bugs](https://find-sec-bugs.github.io/)                                      |
+| Scala (Ant, Gradle, Maven and SBT) | [find-sec-bugs](https://find-sec-bugs.github.io/)                           |
 | Typescript              | [TSLint Config Security](https://github.com/webschik/tslint-config-security/)          |
 
 ## How it works
