@@ -122,6 +122,9 @@ module EE
       expose :can_push_to_source_branch do |merge_request|
         presenter(merge_request).can_push_to_source_branch?
       end
+      expose :has_approvals_available do |merge_request|
+        merge_request.approval_feature_available?
+      end
       expose :rebase_path do |merge_request|
         presenter(merge_request).rebase_path
       end

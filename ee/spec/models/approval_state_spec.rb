@@ -18,8 +18,7 @@ describe ApprovalState do
   end
 
   def disable_feature
-    allow(subject.project).to receive(:feature_available?).and_call_original
-    allow(subject.project).to receive(:feature_available?).with(:merge_request_approvers).and_return(false)
+    allow(subject).to receive(:approval_feature_available?).and_return(false)
   end
 
   let(:merge_request) { create(:merge_request) }

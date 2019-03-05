@@ -32,7 +32,7 @@ export default {
   },
   computed: {
     shouldRenderApprovals() {
-      return this.mr.approvalsRequired && this.mr.state !== 'nothingToMerge';
+      return this.mr.hasApprovalsAvailable && this.mr.state !== 'nothingToMerge';
     },
     shouldRenderCodeQuality() {
       const { codeclimate } = this.mr;
