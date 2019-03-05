@@ -27,3 +27,18 @@ export const REPORT_TYPES = {
   dependency_scanning: s__('ciReport|Dependency Scanning'),
   sast: s__('ciReport|SAST'),
 };
+
+export const BASE_FILTERS = {
+  severity: {
+    name: 'All severities',
+    id: 'all',
+  },
+  report_type: {
+    name: 'All report types',
+    id: 'all',
+  },
+  project_id: {
+    name: 'All projects',
+    id: 'all',
+  },
+};
