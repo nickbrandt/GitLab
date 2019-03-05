@@ -21,6 +21,7 @@ FactoryBot.define do
 
     trait :issue do
       feedback_type 'issue'
+      issue { create(:issue, project: project) }
     end
 
     trait :sast do
