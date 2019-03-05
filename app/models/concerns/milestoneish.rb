@@ -46,7 +46,6 @@ module Milestoneish
     end
   end
 
-<<<<<<< HEAD
   def merge_requests_visible_to_user(user)
     memoize_per_user(user, :merge_requests_visible_to_user) do
       MergeRequestsFinder.new(user, {})
@@ -54,8 +53,6 @@ module Milestoneish
     end
   end
 
-=======
->>>>>>> dev/master
   def issue_participants_visible_by_user(user)
     User.joins(:issue_assignees)
       .where('issue_assignees.issue_id' => issues_visible_to_user(user).select(:id))

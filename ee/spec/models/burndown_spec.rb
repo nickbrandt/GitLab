@@ -142,11 +142,7 @@ describe Burndown do
 
     context 'when nested group milestone', :nested_groups do
       before do
-<<<<<<< HEAD
-        group.add_developer(user)
-=======
         parent_group.add_developer(user)
->>>>>>> dev/master
       end
 
       it_behaves_like 'burndown for milestone' do
