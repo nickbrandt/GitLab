@@ -1,6 +1,9 @@
 require 'spec_helper'
 
 describe Epic do
+  let(:group) { create(:group) }
+  let(:project) { create(:project, group: group) }
+
   describe 'associations' do
     subject { build(:epic) }
 
@@ -221,29 +224,32 @@ describe Epic do
     end
 
     context 'fixed date is not set' do
-      subject { create(:epic, start_date: nil, end_date: nil) }
+      subject { create(:epic, start_date: nil, end_date: nil, group: group) }
 
       let(:milestone1) do
         create(
           :milestone,
           start_date: Date.new(2000, 1, 1),
-          due_date: Date.new(2000, 1, 10)
+          due_date: Date.new(2000, 1, 10),
+          group: group
         )
       end
       let(:milestone2) do
         create(
           :milestone,
           start_date: Date.new(2000, 1, 3),
-          due_date: Date.new(2000, 1, 20)
+          due_date: Date.new(2000, 1, 20),
+          group: group
         )
       end
 
       context 'multiple milestones' do
         before do
-          epic_issue1 = create(:epic_issue, epic: subject)
-          epic_issue1.issue.update(milestone: milestone1)
-          epic_issue2 = create(:epic_issue, epic: subject)
-          epic_issue2.issue.update(milestone: milestone2)
+          issue1 = create(:issue, project: project, milestone: milestone1)
+          issue2 = create(:issue, project: project, milestone: milestone2)
+
+          create(:epic_issue, epic: subject, issue: issue1)
+          create(:epic_issue, epic: subject, issue: issue2)
         end
 
         context 'complete start and due dates' do
@@ -260,14 +266,16 @@ describe Epic do
             create(
               :milestone,
               start_date: Date.new(2000, 1, 1),
-              due_date: nil
+              due_date: nil,
+              group: group
             )
           end
           let(:milestone2) do
             create(
               :milestone,
               start_date: Date.new(2000, 1, 3),
-              due_date: nil
+              due_date: nil,
+              group: group
             )
           end
 
@@ -284,14 +292,16 @@ describe Epic do
             create(
               :milestone,
               start_date: nil,
-              due_date: nil
+              due_date: nil,
+              group: group
             )
           end
           let(:milestone2) do
             create(
               :milestone,
               start_date: nil,
-              due_date: nil
+              due_date: nil,
+              group: group
             )
           end
 
@@ -322,7 +332,7 @@ describe Epic do
       context 'single milestone' do
         before do
           epic_issue1 = create(:epic_issue, epic: subject)
-          epic_issue1.issue.update(milestone: milestone1)
+          epic_issue1.issue.update(milestone: milestone1, project: project)
         end
 
         context 'complete start and due dates' do
@@ -339,7 +349,8 @@ describe Epic do
             create(
               :milestone,
               start_date: Date.new(2000, 1, 1),
-              due_date: nil
+              due_date: nil,
+              group: group
             )
           end
 
@@ -356,7 +367,8 @@ describe Epic do
             create(
               :milestone,
               start_date: nil,
-              due_date: nil
+              due_date: nil,
+              group: group
             )
           end
 
@@ -373,12 +385,12 @@ describe Epic do
 
   describe '.update_start_and_due_dates' do
     def link_epic_to_milestone(epic, milestone)
-      create(:issue, epic: epic, milestone: milestone)
+      create(:issue, epic: epic, milestone: milestone, project: project)
     end
 
     it 'updates in bulk' do
-      milestone1 = create(:milestone, start_date: Date.new(2000, 1, 1), due_date: Date.new(2000, 1, 10))
-      milestone2 = create(:milestone, due_date: Date.new(2000, 1, 30))
+      milestone1 = create(:milestone, start_date: Date.new(2000, 1, 1), due_date: Date.new(2000, 1, 10), group: group)
+      milestone2 = create(:milestone, due_date: Date.new(2000, 1, 30), group: group)
 
       epics = [
         create(:epic),
@@ -414,8 +426,8 @@ describe Epic do
     end
 
     context 'query count check' do
-      let(:milestone) { create(:milestone, start_date: Date.new(2000, 1, 1), due_date: Date.new(2000, 1, 10)) }
-      let!(:epics) { [create(:epic)] }
+      let(:milestone) { create(:milestone, start_date: Date.new(2000, 1, 1), due_date: Date.new(2000, 1, 10), group: group) }
+      let!(:epics) { [create(:epic, group: group)] }
 
       def setup_control_group
         link_epic_to_milestone(epics[0], milestone)

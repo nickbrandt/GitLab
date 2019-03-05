@@ -64,7 +64,6 @@ describe Epics::IssuePromoteService do
             expect(epic.description).to eq(issue.description)
             expect(epic.author).to eq(user)
             expect(epic.group).to eq(group)
-            expect(epic.milestone).to eq(milestone)
           end
 
           it 'copies group labels assigned to the issue' do
