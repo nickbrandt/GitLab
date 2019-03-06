@@ -223,9 +223,9 @@ describe Geo::RepositoryVerificationPrimaryService do
           wiki_verification_checksum: nil,
           last_wiki_verification_ran_at: be_present,
           last_wiki_verification_failure: 'Something went wrong with wiki',
-          repository_retry_at: be_within(100.seconds).of(Time.now + 7.days),
+          repository_retry_at: be_within(100.seconds).of(1.hour.from_now),
           repository_retry_count: 31,
-          wiki_retry_at: be_within(100.seconds).of(Time.now + 7.days),
+          wiki_retry_at: be_within(100.seconds).of(1.hour.from_now),
           wiki_retry_count: 31
         )
       end

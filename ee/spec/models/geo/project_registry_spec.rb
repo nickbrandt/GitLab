@@ -334,6 +334,17 @@ describe Geo::ProjectRegistry do
         expect(subject.last_repository_synced_at).to be_like_time(Time.now)
       end
 
+      it 'ensures repository_retry_at is capped at one hour' do
+        subject.update(repository_retry_count: 31)
+
+        subject.start_sync!(type)
+
+        expect(subject).to have_attributes(
+          repository_retry_at: be_within(100.seconds).of(1.hour.from_now),
+          repository_retry_count: 32
+        )
+      end
+
       shared_examples_for 'sets repository_retry_at to a future time' do
         it 'sets repository_retry_at to a future time' do
           subject.start_sync!(type)
@@ -388,6 +399,17 @@ describe Geo::ProjectRegistry do
         subject.start_sync!(type)
 
         expect(subject.last_wiki_synced_at).to be_like_time(Time.now)
+      end
+
+      it 'ensures wiki_retry_at is capped at one hour' do
+        subject.update(wiki_retry_count: 31)
+
+        subject.start_sync!(type)
+
+        expect(subject).to have_attributes(
+          wiki_retry_at: be_within(100.seconds).of(1.hour.from_now),
+          wiki_retry_count: 32
+        )
       end
 
       shared_examples_for 'sets wiki_retry_at to a future time' do

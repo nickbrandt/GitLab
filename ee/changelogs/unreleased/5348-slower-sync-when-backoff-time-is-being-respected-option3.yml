@@ -1,0 +1,5 @@
+---
+title: 'Geo: Limit max backoff time by 1 hour, instead of 7 days'
+merge_request: 9893
+author:
+type: changed

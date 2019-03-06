@@ -11,6 +11,45 @@ describe Geo::FileDownloadService do
     stub_current_geo_node(secondary)
   end
 
+  context 'retry time' do
+    before do
+      stub_transfer_result(bytes_downloaded: 0, success: false)
+    end
+
+    shared_examples_for 'a service that sets next retry time capped at some value' do
+      it 'ensures the next retry time is capped properly' do
+        download_service.execute
+
+        expect(registry_entry.reload).to have_attributes(
+          retry_at: be_within(100.seconds).of(1.hour.from_now),
+          retry_count: 32
+        )
+      end
+    end
+
+    context 'with job_artifacts' do
+      let!(:registry_entry) do
+        create(:geo_job_artifact_registry, success: false, retry_count: 31, artifact_id: file.id)
+      end
+
+      let(:file) { create(:ci_job_artifact) }
+      let(:download_service) { described_class.new('job_artifact', file.id) }
+
+      it_behaves_like 'a service that sets next retry time capped at some value'
+    end
+
+    context 'with uploads' do
+      let!(:registry_entry) do
+        create(:geo_file_registry, :avatar, success: false, file_id: file.id, retry_count: 31)
+      end
+
+      let(:file) { create(:upload) }
+      let(:download_service) { described_class.new('avatar', file.id) }
+
+      it_behaves_like 'a service that sets next retry time capped at some value'
+    end
+  end
+
   shared_examples_for 'a service that handles orphaned uploads' do |file_type|
     let(:download_service) { described_class.new(file_type, file.id) }
     let(:registry) { Geo::FileRegistry }
@@ -377,14 +416,14 @@ describe Geo::FileDownloadService do
         expect { described_class.new(:bad, 1).execute }.to raise_error(NameError)
       end
     end
+  end
 
-    def stub_transfer_result(bytes_downloaded:, success: false, primary_missing_file: false)
-      result = double(:transfer_result,
-                      bytes_downloaded: bytes_downloaded,
-                      success: success,
-                      primary_missing_file: primary_missing_file)
-      instance = double("(instance of Gitlab::Geo::Transfer)", download_from_primary: result)
-      allow(Gitlab::Geo::Transfer).to receive(:new).and_return(instance)
-    end
+  def stub_transfer_result(bytes_downloaded:, success: false, primary_missing_file: false)
+    result = double(:transfer_result,
+                    bytes_downloaded: bytes_downloaded,
+                    success: success,
+                    primary_missing_file: primary_missing_file)
+    instance = double("(instance of Gitlab::Geo::Transfer)", download_from_primary: result)
+    allow(Gitlab::Geo::Transfer).to receive(:new).and_return(instance)
   end
 end
