@@ -1,0 +1,6 @@
+- project = project || @project
+- krb5_copy_label = _('Copy KRB5 clone URL')
+
+- if alternative_kerberos_url?
+  %li
+    = dropdown_item_with_description(krb5_copy_label, project.kerberos_url_to_repo, href: project.kerberos_url_to_repo, data: { clone_type: 'krb5' })
