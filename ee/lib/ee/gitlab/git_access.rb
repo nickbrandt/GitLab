@@ -24,7 +24,7 @@ module EE
 
       override :user
       def user
-        return nil if geo?
+        return if geo?
 
         super
       end

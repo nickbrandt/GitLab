@@ -21,7 +21,7 @@ class LogFinder
   private
 
   def conditions
-    return nil unless entity_column
+    return unless entity_column
 
     { entity_type: @params[:event_type] }.tap do |hash|
       hash[:entity_id] = @params[entity_column] if entity_present?
