@@ -59,7 +59,10 @@ export default {
 </script>
 <template>
   <mr-widget-container>
-    <div v-if="mr.approvalsRequired" class="media media-section js-mr-approvals align-items-center">
+    <div
+      v-if="mr.hasApprovalsAvailable"
+      class="media media-section js-mr-approvals align-items-center"
+    >
       <mr-widget-icon name="approval" />
       <div v-show="fetchingApprovals" class="mr-approvals-loading-state media-body">
         <span class="approvals-loading-text"> {{ $options.FETCH_LOADING }} </span>
