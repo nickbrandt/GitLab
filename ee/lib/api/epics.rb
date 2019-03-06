@@ -33,9 +33,10 @@ module API
         use :pagination
       end
       get ':id/(-/)epics' do
-        epics = paginate(find_epics(finder_params: { group_id: user_group.id }))
+        epics = paginate(find_epics(finder_params: { group_id: user_group.id })).with_api_entity_associations
 
-        present epics, with: EE::API::Entities::Epic, user: current_user, epics_metadata: issuable_meta_data(epics, 'Epic')
+        # issuable_metadata is the standard used by the Todo API
+        present epics, with: EE::API::Entities::Epic, user: current_user, issuable_metadata: issuable_meta_data(epics, 'Epic')
       end
 
       desc 'Get details of an epic' do

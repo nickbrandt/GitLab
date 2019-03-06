@@ -205,17 +205,17 @@ module EE
           epic.labels.map(&:title).sort
         end
         expose :upvotes do |epic, options|
-          if options[:epics_metadata]
+          if options[:issuable_metadata]
             # Avoids an N+1 query when metadata is included
-            options[:epics_metadata][epic.id].upvotes
+            options[:issuable_metadata][epic.id].upvotes
           else
             epic.upvotes
           end
         end
         expose :downvotes do |epic, options|
-          if options[:epics_metadata]
+          if options[:issuable_metadata]
             # Avoids an N+1 query when metadata is included
-            options[:epics_metadata][epic.id].downvotes
+            options[:issuable_metadata][epic.id].downvotes
           else
             epic.downvotes
           end

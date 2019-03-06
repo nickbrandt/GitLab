@@ -77,6 +77,8 @@ module EE
         reorder('relative_position ASC', 'id DESC')
       end
 
+      scope :with_api_entity_associations, -> { preload(:author, :labels, :group) }
+
       def etag_caching_enabled?
         true
       end
