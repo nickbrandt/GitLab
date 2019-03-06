@@ -32,7 +32,7 @@ module API
     params do
       requires :package_name, type: String, desc: 'Package name'
     end
-    get 'packages/npm/*package_name', requirements: NPM_ENDPOINT_REQUIREMENTS do
+    get 'packages/npm/*package_name', format: false, requirements: NPM_ENDPOINT_REQUIREMENTS do
       package_name = params[:package_name]
 
       # To avoid name collision we require project path and project package be the same.
