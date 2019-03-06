@@ -19,6 +19,14 @@ module API
         end
       end
 
+      def child_epics
+        EpicsFinder.new(current_user, {
+          parent_id: epic.id,
+          group_id: user_group.id,
+          sort: 'relative_position'
+        }).execute
+      end
+
       params :child_epic_id do
         # Unique ID should be used because epics from other groups can be assigned as child.
         requires :child_epic_id, type: Integer, desc: 'The global ID of the epic that will be assigned as child'
@@ -29,14 +37,13 @@ module API
       requires :id, type: String, desc: 'The ID of a group'
       requires :epic_iid, type: Integer, desc: 'The internal ID of an epic'
     end
+
     resource :groups, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc 'Get related epics' do
         success EE::API::Entities::Epic
       end
       get ':id/(-/)epics/:epic_iid/epics' do
         authorize_can_read!
-
-        child_epics = EpicsFinder.new(current_user, parent_id: epic.id, group_id: user_group.id).execute
 
         present child_epics, with: EE::API::Entities::Epic
       end
@@ -71,6 +78,26 @@ module API
         updated_epic = ::Epics::UpdateService.new(user_group, current_user, { parent: nil }).execute(child_epic)
 
         present updated_epic, with: EE::API::Entities::Epic
+      end
+
+      desc 'Reorder child epics'
+      params do
+        use :child_epic_id
+        optional :move_before_id, type: Integer, desc: 'The id of the epic that should be positioned before the child epic'
+        optional :move_after_id, type: Integer, desc: 'The id of the epic that should be positioned after the child epic'
+      end
+      put ':id/(-/)epics/:epic_iid/epics/:child_epic_id' do
+        authorize_can_admin!
+
+        update_params = params.slice(:move_before_id, :move_after_id)
+
+        result = ::EpicLinks::UpdateService.new(child_epic, current_user, update_params).execute
+
+        if result[:status] == :success
+          present child_epics, with: EE::API::Entities::Epic
+        else
+          render_api_error!(result[:message], result[:http_status])
+        end
       end
     end
   end
