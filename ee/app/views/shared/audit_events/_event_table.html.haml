@@ -16,7 +16,7 @@
             - else
               (removed)
           %td
-            %span= raw human_text(event.details)
+            %span= sanitize(human_text(event.details), tags: %w(strong))
           %td= event.details[:target_details]
           %td= event.created_at
   = paginate events, theme: "gitlab"

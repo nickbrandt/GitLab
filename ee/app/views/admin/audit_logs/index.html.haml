@@ -49,7 +49,7 @@
                 = object_link
               - else
                 #{event.details[:entity_path]} <small>(removed)</small>
-            %td= event.action
+            %td= sanitize(event.action, tags: %w(strong))
             %td= event.target
             %td= event.ip_address
             %td= event.date
