@@ -60,12 +60,12 @@ export default {
         action: 'createMergeRequest',
       };
 
-      if (!this.vulnerability.hasIssue && this.canCreateIssuePermission) {
-        buttons.push(issueButton);
-      }
-
       if (!this.vulnerability.hasMergeRequest && this.remediation) {
         buttons.push(MRButton);
+      }
+
+      if (!this.vulnerability.hasIssue && this.canCreateIssuePermission) {
+        buttons.push(issueButton);
       }
 
       return buttons;
