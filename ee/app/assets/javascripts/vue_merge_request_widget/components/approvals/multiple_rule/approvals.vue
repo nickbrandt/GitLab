@@ -7,6 +7,7 @@ import eventHub from '~/vue_merge_request_widget/event_hub';
 import MrWidgetContainer from '~/vue_merge_request_widget/components/mr_widget_container.vue';
 import MrWidgetIcon from '~/vue_merge_request_widget/components/mr_widget_icon.vue';
 import ApprovalsSummary from './approvals_summary.vue';
+import ApprovalsSummaryOptional from './approvals_summary_optional.vue';
 import ApprovalsFooter from './approvals_footer.vue';
 import { FETCH_LOADING, FETCH_ERROR, APPROVE_ERROR, UNAPPROVE_ERROR } from '../messages';
 
@@ -17,6 +18,7 @@ export default {
     MrWidgetContainer,
     MrWidgetIcon,
     ApprovalsSummary,
+    ApprovalsSummaryOptional,
     ApprovalsFooter,
     GlButton,
     GlLoadingIcon,
@@ -44,7 +46,13 @@ export default {
       return this.mr.approvals && this.mr.approvals.has_approval_rules;
     },
     approvedBy() {
-      return this.mr.approvals.approved_by.map(x => x.user);
+      return this.mr.approvals ? this.mr.approvals.approved_by.map(x => x.user) : [];
+    },
+    approvalsRequired() {
+      return this.mr.approvals ? this.mr.approvals.approvals_required : 0;
+    },
+    isOptional() {
+      return !this.approvedBy.length && !this.approvalsRequired;
     },
     userHasApproved() {
       return this.mr.approvals.user_has_approved;
@@ -59,16 +67,16 @@ export default {
       return this.userHasApproved && !this.userCanApprove && this.mr.state !== 'merged';
     },
     action() {
-      if (this.showApprove && this.mr.approvals.approved) {
+      if (this.showApprove) {
+        const inverted = this.mr.approvals.approved;
+        const text =
+          this.mr.approvals.approved && this.approvedBy.length
+            ? s__('mrWidget|Approve additionally')
+            : s__('mrWidget|Approve');
+
         return {
-          text: s__('mrWidget|Approve additionally'),
-          variant: 'primary',
-          inverted: true,
-          action: () => this.approve(),
-        };
-      } else if (this.showApprove) {
-        return {
-          text: s__('mrWidget|Approve'),
+          text,
+          inverted,
           variant: 'primary',
           action: () => this.approve(),
         };
@@ -82,6 +90,9 @@ export default {
       }
 
       return null;
+    },
+    hasAction() {
+      return !!this.action;
     },
   },
   watch: {
@@ -160,7 +171,13 @@ export default {
           <gl-loading-icon v-if="isApproving" inline />
           {{ action.text }}
         </gl-button>
+        <approvals-summary-optional
+          v-if="isOptional"
+          :can-approve="hasAction"
+          :help-path="mr.approvalsHelpPath"
+        />
         <approvals-summary
+          v-else
           :approved="mr.approvals.approved"
           :approvals-left="mr.approvals.approvals_left"
           :rules-left="mr.approvals.approvalRuleNamesLeft"
