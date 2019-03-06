@@ -217,7 +217,7 @@ describe Projects::Prometheus::Alerts::NotifyService do
       end
 
       context 'incident_management_setting.send_email is false' do
-        let(:incident_mgmt_settings) do
+        before do
           create(:project_incident_management_setting, send_email: false, project: project)
         end
 
@@ -225,8 +225,6 @@ describe Projects::Prometheus::Alerts::NotifyService do
 
         it 'does not send notification' do
           expect(project.feature_available?(:incident_management)).to eq(true)
-          expect(project).to receive(:incident_management_setting).and_return(incident_mgmt_settings)
-          expect(incident_mgmt_settings).to receive(:send_email)
           expect(NotificationService).not_to receive(:new)
 
           expect(subject).to eq(true)
