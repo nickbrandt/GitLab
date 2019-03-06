@@ -20,11 +20,15 @@ module Projects
           project.feature_available?(:incident_management)
         end
 
+        def incident_management_feature_enabled?
+          Feature.enabled?(:incident_management)
+        end
+
         def send_email?
-          return true unless has_incident_management_license?
+          return true unless incident_management_feature_enabled?
+          return false unless has_incident_management_license?
 
           setting = project.incident_management_setting || project.build_incident_management_setting
-
           setting.send_email
         end
 

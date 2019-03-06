@@ -81,6 +81,8 @@ describe Projects::Prometheus::Alerts::NotifyService do
 
       with_them do
         before do
+          stub_feature_flags(incident_management: false)
+
           cluster = create(:cluster, :provided_by_user,
                            projects: [project],
                            enabled: cluster_enabled)
@@ -120,6 +122,8 @@ describe Projects::Prometheus::Alerts::NotifyService do
       end
 
       before do
+        stub_feature_flags(incident_management: false)
+
         stub_licensed_features(multiple_clusters: true)
 
         create(:clusters_applications_prometheus, :installed,
@@ -160,6 +164,8 @@ describe Projects::Prometheus::Alerts::NotifyService do
         let(:alert_manager_token) { token_input }
 
         before do
+          stub_feature_flags(incident_management: false)
+
           create(:prometheus_service, project: project)
 
           if alerting_setting
@@ -180,18 +186,37 @@ describe Projects::Prometheus::Alerts::NotifyService do
       end
     end
 
+    context 'incident_management feature flag disabled' do
+      before do
+        create(:prometheus_service, project: project)
+        create(:project_alerting_setting, project: project, token: token)
+        create(:project_incident_management_setting, send_email: true, project: project)
+
+        stub_feature_flags(incident_management: false)
+      end
+
+      it_behaves_like 'notifies alerts'
+    end
+
     context 'no incident_management license' do
       before do
         create(:prometheus_service, project: project)
         create(:project_alerting_setting, project: project, token: token)
-        create(:project_incident_management_setting, send_email: false, project: project)
+        create(:project_incident_management_setting, send_email: true, project: project)
 
         allow(project).to receive(:feature_available?).and_call_original
         allow(project).to receive(:feature_available?)
           .with(:incident_management).and_return(false)
       end
 
-      it_behaves_like 'notifies alerts'
+      it_behaves_like 'persists events'
+
+      it 'does not send notification' do
+        expect(project.feature_available?(:incident_management)).to eq(false)
+        expect(NotificationService).not_to receive(:new)
+
+        expect(subject).to eq(true)
+      end
     end
 
     context 'with incident_management license' do
