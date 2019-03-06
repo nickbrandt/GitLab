@@ -3,6 +3,11 @@
 class Groups::Security::VulnerabilitiesController < Groups::Security::ApplicationController
   HISTORY_RANGE = 3.months
 
+  # NOTE: we need this scope because DAST vulnerabilities
+  # shouldn't appear in the Group Dashboard in the same as we're starting
+  # to save them in the database
+  DEFAULT_REPORT_SCOPE = [:sast, :dependency_scanning, :container_scanning].freeze
+
   def index
     vulnerabilities = found_vulnerabilities.ordered.page(params[:page])
 
@@ -39,8 +44,10 @@ class Groups::Security::VulnerabilitiesController < Groups::Security::Applicatio
   private
 
   def filter_params
-    params.permit(report_type: [], project_id: [], severity: [])
-      .merge(hide_dismissed: Gitlab::Utils.to_boolean(params[:hide_dismissed]))
+    filter_params = params.permit(report_type: [], project_id: [], severity: [])
+                          .merge(hide_dismissed: Gitlab::Utils.to_boolean(params[:hide_dismissed]))
+    filter_params[:report_type] ||= DEFAULT_REPORT_SCOPE
+    filter_params
   end
 
   def found_vulnerabilities(collection = :latest)
