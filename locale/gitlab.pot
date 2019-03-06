@@ -11978,10 +11978,10 @@ msgstr ""
 msgid "mrWidget|Merged by"
 msgstr ""
 
-msgid "mrWidget|No Approval required"
+msgid "mrWidget|No approval required"
 msgstr ""
 
-msgid "mrWidget|No Approval required; you can still approve"
+msgid "mrWidget|No approval required; you can still approve"
 msgstr ""
 
 msgid "mrWidget|Open in Web IDE"
