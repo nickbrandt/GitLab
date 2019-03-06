@@ -59,8 +59,9 @@ The chart indicates the project's progress throughout that milestone (for issues
 In particular, it shows how many issues were or are still open for a given day in the
 milestone's corresponding period.
 
-Since it only tracks when an issue was last closed (and not its full history), the chart
-assumes that issue was open on days prior to that date. Reopened issues are
+The Burndown Chart tracks when issues were created and when they were last closed—not their full history. For each day, it takes the number of issues still open and issues created that day and subtracts the number of issues closed that day.
+**Issues that were created and assigned a milestone before its start date—and remain open as of the start date—are considered as having been opened on the start date**. Therefore, when the milestone start date is changed the number of opened issues on each day may change.
+Reopened issues are
 considered as open on one day after they were closed.
 
 The Burndown Chart can also be toggled to display the cumulative open issue
