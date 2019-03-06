@@ -9,12 +9,6 @@ describe VisibleApprovable do
     stub_feature_flags(approval_rules: false)
   end
 
-  describe '#requires_approve' do
-    subject { resource.requires_approve? }
-
-    it { is_expected.to be true }
-  end
-
   describe '#approvers_left' do
     let!(:private_group) { create(:group_with_members, :private) }
     let!(:public_group) { create(:group_with_members) }

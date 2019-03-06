@@ -5,11 +5,6 @@
 module VisibleApprovable
   include ::Gitlab::Utils::StrongMemoize
 
-  def requires_approve?
-    # keep until UI changes implemented
-    true
-  end
-
   # Users in the list of approvers who have not already approved this MR.
   #
   def approvers_left
