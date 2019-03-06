@@ -273,9 +273,9 @@ export default {
             {{ s__('IssueBoards|No matching boards found') }}
           </gl-dropdown-item>
 
-          <gl-dropdown-header v-if="showRecentSection" class="mt-0">
+          <h6 v-if="showRecentSection" class="dropdown-bold-header my-0">
             Recent
-          </gl-dropdown-header>
+          </h6>
 
           <template v-if="showRecentSection">
             <gl-dropdown-item
@@ -288,11 +288,11 @@ export default {
             </gl-dropdown-item>
           </template>
 
-          <gl-dropdown-divider v-if="showRecentSection" />
+          <hr v-if="showRecentSection" class="my-1" />
 
-          <gl-dropdown-header v-if="showRecentSection" class="mt-0">
+          <h6 v-if="showRecentSection" class="dropdown-bold-header my-0">
             All
-          </gl-dropdown-header>
+          </h6>
 
           <gl-dropdown-item
             v-for="otherBoard in filteredBoards"

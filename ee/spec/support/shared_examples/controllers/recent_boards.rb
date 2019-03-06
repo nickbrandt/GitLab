@@ -22,7 +22,7 @@ shared_examples 'returns recently visited boards' do
 
     get_recent_boards
 
-    expect(json_response.length).to eq(5)
+    expect(json_response.length).to eq(4)
     expect(json_response.map { |b| b['id'] }).to eq([1, 7, 3, 5].map { |i| boards[i].id })
   end
 

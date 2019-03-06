@@ -141,9 +141,9 @@ describe('BoardsSelector', () => {
     it('shows only when boards are greater than 10', done => {
       vm.$nextTick()
         .then(() => {
-          const headerEls = vm.$el.querySelectorAll('.dropdown-header');
+          const headerEls = vm.$el.querySelectorAll('.dropdown-bold-header');
 
-          const expectedCount = 3; // Search + Recent + All
+          const expectedCount = 2; // Recent + All
 
           expect(expectedCount).toBe(headerEls.length);
         })
@@ -161,8 +161,8 @@ describe('BoardsSelector', () => {
         })
         .then(vm.$nextTick)
         .then(() => {
-          const headerEls = vm.$el.querySelectorAll('.dropdown-header');
-          const expectedCount = 1; // Only Search is present
+          const headerEls = vm.$el.querySelectorAll('.dropdown-bold-header');
+          const expectedCount = 0;
 
           expect(expectedCount).toBe(headerEls.length);
         })
@@ -177,8 +177,8 @@ describe('BoardsSelector', () => {
         })
         .then(vm.$nextTick)
         .then(() => {
-          const headerEls = vm.$el.querySelectorAll('.dropdown-header');
-          const expectedCount = 1; // Only search is present
+          const headerEls = vm.$el.querySelectorAll('.dropdown-bold-header');
+          const expectedCount = 0;
 
           expect(expectedCount).toBe(headerEls.length);
         })
@@ -191,8 +191,8 @@ describe('BoardsSelector', () => {
 
       vm.$nextTick()
         .then(() => {
-          const headerEls = vm.$el.querySelectorAll('.dropdown-header');
-          const expectedCount = 1; // Only search is present
+          const headerEls = vm.$el.querySelectorAll('.dropdown-bold-header');
+          const expectedCount = 0;
 
           expect(expectedCount).toBe(headerEls.length);
         })
