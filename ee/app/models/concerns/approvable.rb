@@ -50,7 +50,7 @@ module Approvable
   end
 
   def approvals_before_merge
-    return nil unless approval_feature_available?
+    return unless approval_feature_available?
 
     super
   end

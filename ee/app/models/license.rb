@@ -252,7 +252,7 @@ class License < ActiveRecord::Base
   end
 
   def license
-    return nil unless self.data
+    return unless self.data
 
     @license ||=
       begin

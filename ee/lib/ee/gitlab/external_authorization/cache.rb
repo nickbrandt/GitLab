@@ -43,14 +43,14 @@ module EE
 
         def reason
           # `nil` if the cached value was an empty string
-          return nil unless @reason.present?
+          return unless @reason.present?
 
           @reason
         end
 
         def refreshed_at
           # Don't try to parse a time if there was no cache
-          return nil unless @refreshed_at.present?
+          return unless @refreshed_at.present?
 
           Time.parse(@refreshed_at)
         end

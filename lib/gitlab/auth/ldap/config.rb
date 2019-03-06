@@ -197,7 +197,7 @@ module Gitlab
 
         def encryption_options
           method = translate_method
-          return nil unless method
+          return unless method
 
           {
             method: method,
@@ -213,7 +213,7 @@ module Gitlab
           return @tls_options if defined?(@tls_options)
 
           method = translate_method
-          return nil unless method
+          return unless method
 
           opts = if options['verify_certificates'] && method != 'plain'
                    # Dup so we don't accidentally overwrite the constant

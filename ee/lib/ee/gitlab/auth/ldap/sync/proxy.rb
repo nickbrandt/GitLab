@@ -121,7 +121,7 @@ module EE
                 ldap_user = ::Gitlab::Auth::LDAP::Person.find_by_uid(uid, adapter)
 
                 # Can't find a matching user
-                return nil unless ldap_user.present?
+                return unless ldap_user.present?
 
                 # Update user identity so we don't have to go through this again
                 update_identity(ldap_user.dn, uid)
