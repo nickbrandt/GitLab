@@ -300,24 +300,6 @@ describe Projects::FeatureFlagsController do
     end
   end
 
-  describe 'POST create' do
-    render_views
-
-    subject { post(:create, params: params) }
-
-    context 'when creating a new feature flag' do
-      let(:params) do
-        view_params.merge(operations_feature_flag: { name: 'my_feature_flag', active: true })
-      end
-
-      it 'creates and redirects to list' do
-        subject
-
-        expect(response).to redirect_to(project_feature_flags_path(project))
-      end
-    end
-  end
-
   describe 'POST create.json' do
     subject { post(:create, params: params, format: :json) }
 
@@ -431,29 +413,6 @@ describe Projects::FeatureFlagsController do
           expect(json_response['message'])
             .to include('Default scope has to be the first element')
         end
-      end
-    end
-  end
-
-  describe 'PUT update' do
-    let!(:feature_flag) { create(:operations_feature_flag, project: project, name: 'my_feature_flag') }
-
-    render_views
-
-    subject { put(:update, params: params) }
-
-    context 'when updating an existing feature flag' do
-      let(:params) do
-        view_params.merge(
-          id: feature_flag.id,
-          operations_feature_flag: { name: 'my_feature_flag_v2', active: true }
-        )
-      end
-
-      it 'updates and redirects to list' do
-        subject
-
-        expect(response).to redirect_to(project_feature_flags_path(project))
       end
     end
   end
