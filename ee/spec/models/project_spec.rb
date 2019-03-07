@@ -194,7 +194,7 @@ describe Project do
 
           it 'returns variables from this service' do
             expect(project.deployment_variables(environment: 'review/name'))
-              .to include(key: 'KUBE_TOKEN', value: 'review-AAA', public: false)
+              .to include(key: 'KUBE_TOKEN', value: 'review-AAA', public: false, masked: true)
           end
         end
 
@@ -203,7 +203,7 @@ describe Project do
 
           it 'returns variables from this service' do
             expect(project.deployment_variables(environment: 'staging/name'))
-              .to include(key: 'KUBE_TOKEN', value: 'default-AAA', public: false)
+              .to include(key: 'KUBE_TOKEN', value: 'default-AAA', public: false, masked: true)
           end
         end
       end
