@@ -1,7 +1,7 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
 
-import SidebarParentEpic from 'ee/sidebar/components/sidebar_item_epic.vue';
+import AncestorsTree from 'ee/sidebar/components/ancestors_tree/ancestors_tree.vue';
 
 import epicUtils from '../utils/epic_utils';
 
@@ -23,7 +23,7 @@ export default {
     SidebarDatePicker,
     SidebarDatePickerCollapsed,
     SidebarLabels,
-    SidebarParentEpic,
+    AncestorsTree,
     SidebarParticipants,
     SidebarSubscription,
   },
@@ -56,7 +56,7 @@ export default {
       'dueDateTimeFromMilestones',
       'dueDateTime',
       'dueDateForCollapsedSidebar',
-      'parentEpic',
+      'ancestors',
     ]),
   },
   mounted() {
@@ -184,8 +184,8 @@ export default {
         @toggleCollapse="toggleSidebar({ sidebarCollapsed })"
       />
       <sidebar-labels :can-update="canUpdate" :sidebar-collapsed="sidebarCollapsed" />
-      <div class="block parent-epic">
-        <sidebar-parent-epic :block-title="__('Parent epic')" :initial-epic="parentEpic" />
+      <div class="block ancestors">
+        <ancestors-tree :ancestors="ancestors" :is-fetching="false" />
       </div>
       <div class="block participants">
         <sidebar-participants

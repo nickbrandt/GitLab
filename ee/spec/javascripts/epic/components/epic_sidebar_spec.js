@@ -7,7 +7,7 @@ import epicUtils from 'ee/epic/utils/epic_utils';
 import { dateTypes } from 'ee/epic/constants';
 
 import { mountComponentWithStore } from 'spec/helpers/vue_mount_component_helper';
-import { mockEpicMeta, mockEpicData, mockParentEpic } from '../mock_data';
+import { mockEpicMeta, mockEpicData, mockAncestors } from '../mock_data';
 
 describe('EpicSidebarComponent', () => {
   const originalUserId = gon.current_user_id;
@@ -19,7 +19,7 @@ describe('EpicSidebarComponent', () => {
     store = createStore();
     store.dispatch('setEpicMeta', mockEpicMeta);
     store.dispatch('setEpicData', mockEpicData);
-    store.state.parent = mockParentEpic;
+    store.state.ancestors = mockAncestors;
 
     vm = mountComponentWithStore(Component, {
       store,
@@ -204,18 +204,27 @@ describe('EpicSidebarComponent', () => {
       expect(vm.$el.querySelector('.js-labels-block')).not.toBeNull();
     });
 
-    it('renders parent epic link element', done => {
+    it('renders ancestors list', done => {
       store.dispatch('toggleSidebarFlag', false);
 
       vm.$nextTick()
         .then(() => {
-          const parentEpicEl = vm.$el.querySelector('.block.parent-epic');
+          const ancestorsEl = vm.$el.querySelector('.block.ancestors');
 
-          expect(parentEpicEl).not.toBeNull();
-          expect(parentEpicEl.querySelector('.title').innerText.trim()).toBe('Parent epic');
-          expect(parentEpicEl.querySelector('.value').innerText.trim()).toBe(mockParentEpic.title);
-          expect(parentEpicEl.querySelector('.value a').getAttribute('href')).toBe(
-            mockParentEpic.url,
+          const reverseAncestors = [...mockAncestors].reverse();
+
+          const getEls = selector => Array.from(ancestorsEl.querySelectorAll(selector));
+
+          expect(ancestorsEl).not.toBeNull();
+
+          expect(getEls('li.vertical-timeline-row').length).toBe(reverseAncestors.length);
+
+          expect(getEls('a').map(el => el.innerText.trim())).toEqual(
+            reverseAncestors.map(a => a.title),
+          );
+
+          expect(getEls('li.vertical-timeline-row a').map(a => a.getAttribute('href'))).toEqual(
+            reverseAncestors.map(a => a.url),
           );
         })
         .then(done)
