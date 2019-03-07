@@ -22,6 +22,7 @@ module EE
                                  !@project.feature_available?(:issue_board_focus_mode)))
 
       data = {
+        recent_boards_endpoint: recent_boards_path,
         board_milestone_title: board.milestone&.name,
         board_milestone_id: board.milestone_id,
         board_assignee_username: board.assignee&.username,
@@ -34,6 +35,10 @@ module EE
       }
 
       super.merge(data)
+    end
+
+    def recent_boards_path
+      parent.is_a?(Group) ? recent_group_boards_path(@group) : recent_project_boards_path(@project)
     end
 
     def current_board_json

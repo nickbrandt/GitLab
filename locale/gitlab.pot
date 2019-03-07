@@ -8118,6 +8118,9 @@ msgstr ""
 msgid "Receive alerts from manually configured Prometheus servers."
 msgstr ""
 
+msgid "Recent"
+msgstr ""
+
 msgid "Recent searches"
 msgstr ""
 
