@@ -20,6 +20,7 @@ module EE
 
       allow(::Gitlab::CurrentSettings.current_application_settings)
         .to receive_messages(messages)
+
       messages.each do |setting, value|
         allow(object).to receive_message_chain(:current_application_settings, setting) { value }
       end
