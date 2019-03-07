@@ -5,9 +5,44 @@ describe API::Todos do
   let(:user) { create(:user) }
   let(:epic) { create(:epic, group: group) }
 
-  subject { post api("/groups/#{group.id}/epics/#{epic.iid}/todo", user) }
+  describe 'GET /todos' do
+    let(:author_1) { create(:user) }
+    let!(:pat) { create(:personal_access_token, user: user) }
+
+    before do
+      group.add_developer(user)
+      group.add_developer(author_1)
+
+      create_todo_for_new_epic
+    end
+
+    def create_todo_for_new_epic
+      new_group = create(:group)
+      label = create(:label)
+      new_epic = create(:labeled_epic, group: new_group, labels: [label])
+      new_group.add_developer(author_1)
+      new_group.add_developer(user)
+      create(:todo, project: nil, group: new_group, author: author_1, user: user, target: new_epic)
+    end
+
+    it 'avoids N+1 queries', :request_store do
+      create_todo_for_new_epic
+
+      get api('/todos', personal_access_token: pat)
+
+      control = ActiveRecord::QueryRecorder.new { get api('/todos', personal_access_token: pat) }
+
+      create_todo_for_new_epic
+
+      expect { get api('/todos', personal_access_token: pat) }.not_to exceed_query_limit(control)
+
+      expect(response.status).to eq(200)
+    end
+  end
 
   describe 'POST :id/epics/:epic_iid/todo' do
+    subject { post api("/groups/#{group.id}/epics/#{epic.iid}/todo", user) }
+
     context 'when epics feature is disabled' do
       it 'returns 403 forbidden error' do
         subject
