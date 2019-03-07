@@ -42,23 +42,29 @@ export default {
     };
   },
   computed: {
+    approvals() {
+      return this.mr.approvals || {};
+    },
     hasFooter() {
-      return this.mr.approvals && this.mr.approvals.has_approval_rules;
+      return !!this.approvals.has_approval_rules;
     },
     approvedBy() {
-      return this.mr.approvals ? this.mr.approvals.approved_by.map(x => x.user) : [];
+      return this.approvals.approved_by ? this.approvals.approved_by.map(x => x.user) : [];
+    },
+    isApproved() {
+      return !!this.approvals.approved;
     },
     approvalsRequired() {
-      return this.mr.approvals ? this.mr.approvals.approvals_required : 0;
+      return this.approvals.approvals_required || 0;
     },
     isOptional() {
       return !this.approvedBy.length && !this.approvalsRequired;
     },
     userHasApproved() {
-      return this.mr.approvals.user_has_approved;
+      return !!this.approvals.user_has_approved;
     },
     userCanApprove() {
-      return this.mr.approvals.user_can_approve;
+      return !!this.approvals.user_can_approve;
     },
     showApprove() {
       return !this.userHasApproved && this.userCanApprove && this.mr.isOpen;
@@ -68,9 +74,9 @@ export default {
     },
     action() {
       if (this.showApprove) {
-        const inverted = this.mr.approvals.approved;
+        const inverted = this.isApproved;
         const text =
-          this.mr.approvals.approved && this.approvedBy.length
+          this.isApproved && this.approvedBy.length > 0
             ? s__('mrWidget|Approve additionally')
             : s__('mrWidget|Approve');
 
@@ -178,9 +184,9 @@ export default {
         />
         <approvals-summary
           v-else
-          :approved="mr.approvals.approved"
-          :approvals-left="mr.approvals.approvals_left"
-          :rules-left="mr.approvals.approvalRuleNamesLeft"
+          :approved="isApproved"
+          :approvals-left="approvals.approvals_left"
+          :rules-left="approvals.approvalRuleNamesLeft"
           :approvers="approvedBy"
         />
       </template>
@@ -189,7 +195,7 @@ export default {
       v-if="hasFooter"
       slot="footer"
       v-model="isExpanded"
-      :suggested-approvers="mr.approvals.suggested_approvers"
+      :suggested-approvers="approvals.suggested_approvers"
       :approval-rules="mr.approvalRules"
       :is-loading-rules="isLoadingRules"
     />
