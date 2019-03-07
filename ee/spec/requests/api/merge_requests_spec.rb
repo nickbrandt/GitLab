@@ -130,4 +130,57 @@ describe API::MergeRequests do
       end
     end
   end
+
+  context 'when authenticated' do
+    def expect_response_contain_exactly(*items)
+      expect(response).to have_gitlab_http_status(200)
+      expect(json_response.length).to eq(items.size)
+      expect(json_response.map { |element| element['id'] }).to contain_exactly(*items.map(&:id))
+    end
+
+    let!(:merge_request_with_approver) do
+      create(:merge_request_with_approver, :simple, author: user, source_project: project, target_project: project, source_branch: 'other-branch')
+    end
+
+    let(:another_user) {}
+
+    context 'request merge requests' do
+      before do
+        get api('/merge_requests', user), params: { approver_ids: approvers_param, scope: :all }
+      end
+
+      context 'with specified approver id' do
+        let(:approvers_param) { [merge_request_with_approver.approvers.first.user_id] }
+
+        it 'returns an array of merge requests which have specified the user as an approver' do
+          expect_response_contain_exactly(merge_request_with_approver)
+        end
+      end
+
+      context 'with specified None as a param' do
+        let(:approvers_param) { 'None' }
+
+        it 'returns an array of merge requests with no approvers' do
+          expect_response_contain_exactly(merge_request)
+        end
+      end
+
+      context 'with specified Any as a param' do
+        let(:approvers_param) { 'Any' }
+
+        it 'returns an array of merge requests with any approver' do
+          expect_response_contain_exactly(merge_request_with_approver)
+        end
+      end
+
+      context 'with any other string as a param' do
+        let(:approvers_param) { 'any-other-string' }
+
+        it 'returns a validation error' do
+          expect(response).to have_gitlab_http_status(400)
+          expect(json_response['error']).to eq("approver_ids should be an array, 'None' or 'Any'")
+        end
+      end
+    end
+  end
 end
