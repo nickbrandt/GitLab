@@ -202,10 +202,9 @@ describe Repository do
     end
 
     it 'returns a valid Insights config file' do
-      project = create(:project, :custom_repo, files: { Gitlab::Insights::CONFIG_FILE_PATH => '- key: monthlyBugsCreated' })
-      insights_config_blob = project.repository.blob_at(project.repository.root_ref, Gitlab::Insights::CONFIG_FILE_PATH)
+      project = create(:project, :custom_repo, files: { Gitlab::Insights::CONFIG_FILE_PATH => "monthlyBugsCreated:\n  title: My chart" })
 
-      expect(project.repository.insights_config_for(project.repository.root_ref)).to eq('- key: monthlyBugsCreated')
+      expect(project.repository.insights_config_for(project.repository.root_ref)).to eq("monthlyBugsCreated:\n  title: My chart")
     end
   end
 end

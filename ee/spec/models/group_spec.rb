@@ -395,8 +395,8 @@ describe Group do
     end
   end
 
-  describe '#insights_available?' do
-    it_behaves_like 'an entity with the Insights feature' do
+  describe '#beta_feature_available?' do
+    it_behaves_like 'an entity with beta feature support' do
       let(:entity) { group }
     end
   end

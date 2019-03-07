@@ -325,6 +325,12 @@ describe Project do
     end
   end
 
+  describe '#beta_feature_available?' do
+    it_behaves_like 'an entity with beta feature support' do
+      let(:entity) { create(:project) }
+    end
+  end
+
   describe '#feature_available?' do
     let(:namespace) { create(:namespace) }
     let(:plan_license) { nil }
@@ -1726,12 +1732,6 @@ describe Project do
 
     it 'returns false when object pool exists' do
       expect(subject.object_pool_missing?).to be false
-    end
-  end
-
-  describe '#insights_available?' do
-    it_behaves_like 'an entity with the Insights feature' do
-      let(:entity) { create(:project) }
     end
   end
 
