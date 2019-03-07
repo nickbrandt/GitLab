@@ -1,5 +1,9 @@
 import Vue from 'vue';
 import ApprovalsBody from 'ee/vue_merge_request_widget/components/approvals/single_rule/approvals_body.vue';
+import {
+  OPTIONAL,
+  OPTIONAL_CAN_APPROVE,
+} from 'ee/vue_merge_request_widget/components/approvals/messages';
 
 describe('Approvals Body Component', () => {
   let vm;
@@ -62,7 +66,7 @@ describe('Approvals Body Component', () => {
       });
 
       it('should display the correct string for 0 approvals required', done => {
-        const correctText = 'No Approval required';
+        const correctText = OPTIONAL;
 
         vm.approvalsOptional = true;
 
@@ -73,7 +77,7 @@ describe('Approvals Body Component', () => {
       });
 
       it('should display the correct string for 0 approvals required and if the user is able to approve', done => {
-        const correctText = 'No Approval required; you can still approve';
+        const correctText = OPTIONAL_CAN_APPROVE;
 
         vm.approvalsOptional = true;
         vm.userCanApprove = true;

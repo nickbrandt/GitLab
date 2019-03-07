@@ -5,7 +5,7 @@ import Icon from '~/vue_shared/components/icon.vue';
 import MrWidgetAuthor from '~/vue_merge_request_widget/components/mr_widget_author.vue';
 import tooltip from '~/vue_shared/directives/tooltip';
 import eventHub from '~/vue_merge_request_widget/event_hub';
-import { APPROVE_ERROR } from '../messages';
+import { APPROVE_ERROR, OPTIONAL_CAN_APPROVE, OPTIONAL } from '../messages';
 
 export default {
   name: 'ApprovalsBody',
@@ -65,10 +65,10 @@ export default {
     approvalsRequiredStringified() {
       if (this.approvalsOptional) {
         if (this.userCanApprove) {
-          return s__('mrWidget|No Approval required; you can still approve');
+          return OPTIONAL_CAN_APPROVE;
         }
 
-        return s__('mrWidget|No Approval required');
+        return OPTIONAL;
       }
 
       if (this.approvalsLeft === 0) {
