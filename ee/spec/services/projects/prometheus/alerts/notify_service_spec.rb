@@ -9,6 +9,11 @@ describe Projects::Prometheus::Alerts::NotifyService do
   let(:token_input) { 'token' }
   let(:subject) { service.execute(token_input) }
 
+  before do
+    # We use `set(:project)` so we make sure to clear caches
+    project.clear_memoization(:licensed_feature_available)
+  end
+
   shared_examples 'sends notification email' do
     let(:notification_service) { spy }
 
@@ -204,9 +209,7 @@ describe Projects::Prometheus::Alerts::NotifyService do
         create(:project_alerting_setting, project: project, token: token)
         create(:project_incident_management_setting, send_email: true, project: project)
 
-        allow(project).to receive(:feature_available?).and_call_original
-        allow(project).to receive(:feature_available?)
-          .with(:incident_management).and_return(false)
+        stub_licensed_features(incident_management: false)
       end
 
       it_behaves_like 'persists events'
@@ -224,9 +227,7 @@ describe Projects::Prometheus::Alerts::NotifyService do
         create(:prometheus_service, project: project)
         create(:project_alerting_setting, project: project, token: token)
 
-        allow(project).to receive(:feature_available?).and_call_original
-        allow(project).to receive(:feature_available?)
-          .with(:incident_management).and_return(true)
+        stub_licensed_features(incident_management: true)
       end
 
       context 'when incident_management_setting does not exist' do
