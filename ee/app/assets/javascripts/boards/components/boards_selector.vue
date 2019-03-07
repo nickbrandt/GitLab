@@ -9,6 +9,7 @@ import {
   GlDropdownHeader,
   GlDropdownItem,
 } from '@gitlab/ui';
+
 import Icon from '~/vue_shared/components/icon.vue';
 import boardsStore from '~/boards/stores/boards_store';
 import BoardForm from './board_form.vue';
@@ -274,7 +275,7 @@ export default {
           </gl-dropdown-item>
 
           <h6 v-if="showRecentSection" class="dropdown-bold-header my-0">
-            Recent
+            {{ __('Recent') }}
           </h6>
 
           <template v-if="showRecentSection">
@@ -291,7 +292,7 @@ export default {
           <hr v-if="showRecentSection" class="my-1" />
 
           <h6 v-if="showRecentSection" class="dropdown-bold-header my-0">
-            All
+            {{ __('All') }}
           </h6>
 
           <gl-dropdown-item

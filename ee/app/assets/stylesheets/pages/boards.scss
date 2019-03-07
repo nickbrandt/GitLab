@@ -106,7 +106,7 @@
 .boards-switcher {
   .boards-selector-wrapper {
     .dropdown-menu.show.dropdown-extended-height {
-      max-height: 445px;
+      max-height: $dropdown-max-height-lg;
     }
   }
 
