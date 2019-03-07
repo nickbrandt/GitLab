@@ -90,4 +90,62 @@ describe SamlProvider do
       expect(settings[:idp_sso_target_url]).to eq saml_provider.sso_url
     end
   end
+
+  describe '#enforced_sso?' do
+    context 'when provider is enabled' do
+      before do
+        subject.enabled = true
+      end
+
+      it 'matches attribute' do
+        subject.enforced_sso = true
+        expect(subject).to be_enforced_sso
+        subject.enforced_sso = false
+        expect(subject).not_to be_enforced_sso
+      end
+    end
+
+    context 'when provider is disabled' do
+      before do
+        subject.enabled = false
+      end
+
+      it 'ignores attribute value' do
+        subject.enforced_sso = true
+        expect(subject).not_to be_enforced_sso
+        subject.enforced_sso = false
+        expect(subject).not_to be_enforced_sso
+      end
+    end
+  end
+
+  describe '#enforced_group_managed_accounts?' do
+    context 'when enforced_sso is enabled' do
+      before do
+        subject.enabled = true
+        subject.enforced_sso = true
+      end
+
+      it 'matches attribute' do
+        subject.enforced_group_managed_accounts = true
+        expect(subject).to be_enforced_group_managed_accounts
+        subject.enforced_group_managed_accounts = false
+        expect(subject).not_to be_enforced_group_managed_accounts
+      end
+    end
+
+    context 'when enforced_sso is disabled' do
+      before do
+        subject.enabled = true
+        subject.enforced_sso = false
+      end
+
+      it 'ignores attribute value' do
+        subject.enforced_group_managed_accounts = true
+        expect(subject).not_to be_enforced_group_managed_accounts
+        subject.enforced_group_managed_accounts = false
+        expect(subject).not_to be_enforced_group_managed_accounts
+      end
+    end
+  end
 end
