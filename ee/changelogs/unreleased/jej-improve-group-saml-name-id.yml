@@ -1,0 +1,5 @@
+---
+title: GroupSAML for GitLab.com prevents blank NameID
+merge_request: 9907
+author:
+type: fixed

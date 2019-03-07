@@ -16,6 +16,12 @@ NOTE: **Note:** SAML SSO for groups is used only as a convenient way to add user
 1. Find the SSO URL from your Identity Provider and enter it on GitLab.
 1. Find and enter the fingerprint for the SAML token signing certificate.
 
+## NameID
+
+GitLab.com uses the SAML NameID to identify users, so it must be present in the SAML response and unique to the user.
+
+The value should be something that will never change for that user, such as a unique ID or username. Email could also be used as the NameID, but only if it can be guaranteed to never change.
+
 ## Assertions
 
 | Field | Supported keys | Notes |
