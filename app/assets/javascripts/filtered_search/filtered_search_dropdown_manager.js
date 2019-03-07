@@ -1,10 +1,15 @@
-import AvailableDropdownMappings from 'ee_else_ce/filtered_search/available_dropdown_mappings';
 import _ from 'underscore';
 import DropLab from '~/droplab/drop_lab';
 import DropdownWeight from 'ee/filtered_search/dropdown_weight';
 import FilteredSearchContainer from './container';
 import FilteredSearchTokenKeys from './filtered_search_token_keys';
 import DropdownUtils from './dropdown_utils';
+import DropdownHint from './dropdown_hint';
+import DropdownEmoji from './dropdown_emoji';
+import DropdownNonUser from './dropdown_non_user';
+import DropdownUser from './dropdown_user';
+import DropdownAjaxFilter from './dropdown_ajax_filter';
+import NullDropdown from './null_dropdown';
 import FilteredSearchVisualTokens from './filtered_search_visual_tokens';
 
 export default class FilteredSearchDropdownManager {
@@ -165,7 +170,8 @@ export default class FilteredSearchDropdownManager {
     return endpoint;
   }
 
-    this.mapping = availableMappings.getAllowedMappings(supportedTokens);
+  getRunnerTagsEndpoint() {
+    return `${this.baseEndpoint}/admin/runners/tag_list.json`;
   }
 
   static addWordToInput(tokenName, tokenValue = '', clicked = false, options = {}) {
