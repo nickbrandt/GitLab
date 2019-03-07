@@ -394,4 +394,10 @@ describe Group do
       end
     end
   end
+
+  describe '#insights_available?' do
+    it_behaves_like 'an entity with the Insights feature' do
+      let(:entity) { group }
+    end
+  end
 end
