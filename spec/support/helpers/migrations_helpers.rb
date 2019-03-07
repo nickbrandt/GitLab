@@ -1,6 +1,4 @@
 module MigrationsHelpers
-  prepend EE::MigrationsHelpers
-
   def active_record_base
     ActiveRecord::Base
   end
@@ -130,3 +128,5 @@ module MigrationsHelpers
     end
   end
 end
+
+MigrationsHelpers.prepend(EE::MigrationsHelpers)

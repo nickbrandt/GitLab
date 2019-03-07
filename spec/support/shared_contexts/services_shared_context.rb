@@ -27,7 +27,7 @@ Service.available_services_names.each do |service|
     end
 
     before do
-      if service == 'github'
+      if service == 'github' && respond_to?(:stub_licensed_features)
         stub_licensed_features(github_project_service_integration: true)
         project.clear_memoization(:disabled_services)
         project.clear_memoization(:licensed_feature_available)
