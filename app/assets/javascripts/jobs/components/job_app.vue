@@ -7,9 +7,6 @@ import { polyfillSticky } from '~/lib/utils/sticky';
 import bp from '~/breakpoints';
 import CiHeader from '~/vue_shared/components/header_ci_component.vue';
 import Callout from '~/vue_shared/components/callout.vue';
-// ee-only start
-import SharedRunner from 'ee/jobs/components/shared_runner_limit_block.vue';
-// ee-only end
 import Icon from '~/vue_shared/components/icon.vue';
 import createStore from '../store';
 import EmptyState from './empty_state.vue';
@@ -31,13 +28,13 @@ export default {
     EmptyState,
     EnvironmentsBlock,
     ErasedBlock,
-    GlLoadingIcon,
     Icon,
     Log,
     LogTopBar,
     StuckBlock,
-    SharedRunner,
     Sidebar,
+    GlLoadingIcon,
+    SharedRunner: () => import('ee_component/jobs/components/shared_runner_limit_block.vue'),
   },
   mixins: [delayedJobMixin],
   props: {
