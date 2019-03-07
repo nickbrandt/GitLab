@@ -75,7 +75,8 @@ class License < ActiveRecord::Base
     batch_comments
     issues_analytics
     merge_pipelines
-  ].freeze
+  ]
+  EEP_FEATURES.freeze
 
   EEU_FEATURES = EEP_FEATURES + %i[
     security_dashboard
@@ -92,8 +93,10 @@ class License < ActiveRecord::Base
     prometheus_alerts
     operations_dashboard
     tracing
+    insights
     web_ide_terminal
-  ].freeze
+  ]
+  EEU_FEATURES.freeze
 
   # List all features available for early adopters,
   # i.e. users that started using GitLab.com before
