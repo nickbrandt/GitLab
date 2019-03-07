@@ -444,7 +444,7 @@ describe('License store actions', () => {
     let endpointMock;
 
     beforeEach(() => {
-      endpointMock = axiosMock.onGet(apiUrlManageLicenses);
+      endpointMock = axiosMock.onGet(apiUrlManageLicenses, { params: { per_page: 100 } });
     });
 
     it('dispatches requestLoadManagedLicenses and receiveLoadManagedLicenses for successful response', done => {

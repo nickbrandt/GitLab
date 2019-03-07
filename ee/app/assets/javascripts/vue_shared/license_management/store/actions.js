@@ -52,7 +52,7 @@ export const loadManagedLicenses = ({ dispatch, state }) => {
   const { apiUrlManageLicenses } = state;
 
   return axios
-    .get(apiUrlManageLicenses)
+    .get(apiUrlManageLicenses, { params: { per_page: 100 } })
     .then(({ data }) => {
       dispatch('receiveLoadManagedLicenses', data);
     })
