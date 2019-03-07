@@ -28,12 +28,9 @@ module Gitlab
         def finder(project = nil)
           Gitlab::Template::Finders::GlobalTemplateFinder.new(self.base_dir, self.extension, self.categories)
         end
-
-        def dropdown_names(context)
-          categories = context == 'autodeploy' ? ['Auto deploy'] : %w(General Pages)
-          super().slice(*categories)
-        end
       end
     end
   end
 end
+
+Gitlab::Template::GitlabCiYmlTemplate.prepend(::EE::Gitlab::Template::GitlabCiYmlTemplate)
