@@ -8,7 +8,7 @@ module Projects
           return false unless valid_version?
           return false unless valid_alert_manager_token?(token)
 
-          send_alert_email if send_email? && firings.any?
+          send_alert_email if send_email?
           persist_events(project, params)
 
           true
@@ -25,11 +25,12 @@ module Projects
         end
 
         def send_email?
-          return true unless incident_management_feature_enabled?
+          return firings.any? unless incident_management_feature_enabled?
           return false unless has_incident_management_license?
 
           setting = project.incident_management_setting || project.build_incident_management_setting
-          setting.send_email
+
+          setting.send_email && firings.any?
         end
 
         def firings
