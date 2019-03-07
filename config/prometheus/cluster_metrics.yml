@@ -12,6 +12,11 @@
     - query_range: 'sum(kube_node_status_capacity_cpu_cores{kubernetes_namespace="gitlab-managed-apps"})'
       label: Capacity
       unit: "cores"
+      appearance:
+        line:
+          type: 'dashed'
+        area:
+          opacity: 0
   - title: "Memory usage"
     y_label: "Memory"
     required_metrics: ['container_memory_usage_bytes']
@@ -23,3 +28,8 @@
     - query_range: 'sum(kube_node_status_capacity_memory_bytes{kubernetes_namespace="gitlab-managed-apps"})/2^30'
       label: Capacity
       unit: "GiB"
+      appearance:
+        line:
+          type: 'dashed'
+        area:
+          opacity: 0
