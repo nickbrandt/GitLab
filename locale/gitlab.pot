@@ -1000,6 +1000,9 @@ msgstr ""
 msgid "Analytics"
 msgstr ""
 
+msgid "Ancestors"
+msgstr ""
+
 msgid "Anonymous"
 msgstr ""
 
@@ -7084,9 +7087,6 @@ msgid "Pagination|« First"
 msgstr ""
 
 msgid "Parameter"
-msgstr ""
-
-msgid "Parent epic"
 msgstr ""
 
 msgid "Part of merge request changes"

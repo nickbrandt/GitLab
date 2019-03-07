@@ -48,6 +48,7 @@ module EE
       alias_attribute :parent_ids, :parent_id
 
       scope :in_parents, -> (parent_ids) { where(parent_id: parent_ids) }
+      scope :inc_group, -> { includes(:group) }
 
       scope :order_start_or_end_date_asc, -> do
         # mysql returns null values first in opposite to postgres which
@@ -280,7 +281,7 @@ module EE
     def ancestors
       return self.class.none unless parent_id
 
-      hierarchy.ancestors
+      hierarchy.ancestors(hierarchy_order: :asc)
     end
 
     def descendants
