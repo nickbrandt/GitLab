@@ -10,6 +10,10 @@ module EE
       end
 
       rule { operations_dashboard_available }.enable :read_operations_dashboard
+      rule { admin }.policy do
+        enable :read_licenses
+        enable :destroy_licenses
+      end
     end
   end
 end
