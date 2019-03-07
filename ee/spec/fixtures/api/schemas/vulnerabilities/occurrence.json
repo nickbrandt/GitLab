@@ -13,6 +13,7 @@
     "name" : { "type": "string" },
     "project_fingerprint": { "type": "string" },
     "vulnerability_feedback_issue_path": { "type": "string" },
+    "vulnerability_feedback_merge_request_path": { "type": "string" },
     "vulnerability_feedback_dismissal_path": { "type": "string" },
     "confidence" : {
       "type": "string",
@@ -43,6 +44,10 @@
       "full_name" : { "type": "string" }
     },
     "issue_feedback" : { "oneOf": [
+      { "type": "null" },
+      { "$ref": "../vulnerability_feedback.json" }
+    ]},
+    "merge_request_feedback" : { "oneOf": [
       { "type": "null" },
       { "$ref": "../vulnerability_feedback.json" }
     ]},
