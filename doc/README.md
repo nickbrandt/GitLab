@@ -369,6 +369,8 @@ There are two ways to use GitLab:
 - [GitLab.com](#gitlabcom): GitLab's SaaS offering. You don't need to install anything to use GitLab.com,
   you only need to [sign up](https://gitlab.com/users/sign_in) and start using GitLab straight away.
 
+For more information on managing your subscription and [customers portal](https://customers.gitlab.com) account, please see [Getting Started with Subscriptions](getting-starting/subscription.md).
+
 The following sections outline tiers and features within GitLab self-managed and GitLab.com.
 
 <div align="right">
@@ -419,6 +421,12 @@ and teams in the following tiers:
 GitLab.com subscriptions grant access
 to the same features available in GitLab self-managed, **except
 [administration](administration/index.md) tools and settings**.
+
+GitLab.com allows you to apply your subscription to a group or your personal user.
+
+When applied to a **group**, the group, all subgroups, and all projects under the selected group on GitLab.com will have the features of the associated plan. It is recommended to go with a group plan when managing projects and users of an organization.
+
+When associated with a **personal userspace** instead, all projects will have features with the subscription applied, but as it is not a group, group features will not be available.
 
 TIP: **Tip:**
 To support the open source community and encourage the development of open source projects, GitLab grants access to **Gold** features for all GitLab.com **public** projects, regardless of the subscription.
