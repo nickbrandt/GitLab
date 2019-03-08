@@ -81,17 +81,11 @@ export default {
       Vue.set(state.sast, 'resolvedIssues', resolvedIssues);
       Vue.set(state.sast, 'allIssues', allIssues);
       Vue.set(state.sast, 'isLoading', false);
-
-      state.summaryCounts.added += newIssues.length;
-      state.summaryCounts.fixed += resolvedIssues.length;
-      state.summaryCounts.existing += allIssues.length;
     } else if (reports.head && !reports.base) {
       const newIssues = parseSastIssues(reports.head, reports.enrichData, state.blobPath.head);
 
       Vue.set(state.sast, 'newIssues', newIssues);
       Vue.set(state.sast, 'isLoading', false);
-
-      state.summaryCounts.added += newIssues.length;
     }
   },
 
@@ -134,9 +128,6 @@ export default {
       Vue.set(state.sastContainer, 'newIssues', newIssues);
       Vue.set(state.sastContainer, 'resolvedIssues', resolvedIssues);
       Vue.set(state.sastContainer, 'isLoading', false);
-
-      state.summaryCounts.added += newIssues.length;
-      state.summaryCounts.fixed += resolvedIssues.length;
     } else if (reports.head && !reports.base) {
       const newIssues = getUnapprovedVulnerabilities(
         parseSastContainer(reports.head.vulnerabilities, reports.enrichData),
@@ -145,8 +136,6 @@ export default {
 
       Vue.set(state.sastContainer, 'newIssues', newIssues);
       Vue.set(state.sastContainer, 'isLoading', false);
-
-      state.summaryCounts.added += newIssues.length;
     }
   },
 
@@ -180,16 +169,11 @@ export default {
       Vue.set(state.dast, 'newIssues', newIssues);
       Vue.set(state.dast, 'resolvedIssues', resolvedIssues);
       Vue.set(state.dast, 'isLoading', false);
-
-      state.summaryCounts.added += newIssues.length;
-      state.summaryCounts.fixed += resolvedIssues.length;
     } else if (reports.head && reports.head.site && !reports.base) {
       const newIssues = parseDastIssues(reports.head.site.alerts, reports.enrichData);
 
       Vue.set(state.dast, 'newIssues', newIssues);
       Vue.set(state.dast, 'isLoading', false);
-
-      state.summaryCounts.added += newIssues.length;
     }
   },
 
@@ -249,10 +233,6 @@ export default {
       Vue.set(state.dependencyScanning, 'resolvedIssues', resolvedIssues);
       Vue.set(state.dependencyScanning, 'allIssues', allIssues);
       Vue.set(state.dependencyScanning, 'isLoading', false);
-
-      state.summaryCounts.added += newIssues.length;
-      state.summaryCounts.fixed += resolvedIssues.length;
-      state.summaryCounts.existing += allIssues.length;
     }
 
     if (reports.head && !reports.base) {
@@ -263,8 +243,6 @@ export default {
       );
       Vue.set(state.dependencyScanning, 'newIssues', newIssues);
       Vue.set(state.dependencyScanning, 'isLoading', false);
-
-      state.summaryCounts.added += newIssues.length;
     }
   },
 

@@ -11558,15 +11558,37 @@ msgstr ""
 msgid "ciReport|%{remainingPackagesCount} more"
 msgstr ""
 
+msgid "ciReport|%{reportType} %{status} detected %{dismissedCount} dismissed vulnerability"
+msgid_plural "ciReport|%{reportType} %{status} detected %{dismissedCount} dismissed vulnerabilities"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "ciReport|%{reportType} %{status} detected %{dismissedCount} dismissed vulnerability for the source branch only"
+msgid_plural "ciReport|%{reportType} %{status} detected %{dismissedCount} dismissed vulnerabilities for the source branch only"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "ciReport|%{reportType} %{status} detected %{fixedCount} fixed vulnerability"
 msgid_plural "ciReport|%{reportType} %{status} detected %{fixedCount} fixed vulnerabilities"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "ciReport|%{reportType} %{status} detected %{fixedCount} fixed, and %{dismissedCount} dismissed vulnerabilities"
+msgstr ""
+
 msgid "ciReport|%{reportType} %{status} detected %{newCount} new vulnerability"
 msgid_plural "ciReport|%{reportType} %{status} detected %{newCount} new vulnerabilities"
 msgstr[0] ""
 msgstr[1] ""
+
+msgid "ciReport|%{reportType} %{status} detected %{newCount} new, %{fixedCount} fixed, and %{dismissedCount} dismissed vulnerabilities"
+msgstr ""
+
+msgid "ciReport|%{reportType} %{status} detected %{newCount} new, and %{dismissedCount} dismissed vulnerabilities"
+msgstr ""
+
+msgid "ciReport|%{reportType} %{status} detected %{newCount} new, and %{dismissedCount} dismissed vulnerabilities for the source branch only"
+msgstr ""
 
 msgid "ciReport|%{reportType} %{status} detected %{newCount} new, and %{fixedCount} fixed vulnerabilities"
 msgstr ""

@@ -124,7 +124,6 @@ describe('security reports mutations', () => {
         expect(stateCopy.sast.isLoading).toEqual(false);
         expect(stateCopy.sast.newIssues).toEqual(parsedSastIssuesHead);
         expect(stateCopy.sast.resolvedIssues).toEqual(parsedSastBaseStore);
-        expect(stateCopy.summaryCounts).toEqual({ added: 2, fixed: 1, existing: 1 });
       });
     });
 
@@ -137,7 +136,6 @@ describe('security reports mutations', () => {
 
         expect(stateCopy.sast.isLoading).toEqual(false);
         expect(stateCopy.sast.newIssues).toEqual(parsedSastIssuesStore);
-        expect(stateCopy.summaryCounts).toEqual({ added: 3, fixed: 0, existing: 0 });
       });
     });
   });
@@ -186,7 +184,6 @@ describe('security reports mutations', () => {
         expect(stateCopy.sastContainer.isLoading).toEqual(false);
         expect(stateCopy.sastContainer.newIssues).toEqual(dockerNewIssues);
         expect(stateCopy.sastContainer.resolvedIssues).toEqual(parsedSastContainerBaseStore);
-        expect(stateCopy.summaryCounts).toEqual({ added: 1, fixed: 1, existing: 0 });
       });
     });
 
@@ -198,7 +195,6 @@ describe('security reports mutations', () => {
 
         expect(stateCopy.sastContainer.isLoading).toEqual(false);
         expect(stateCopy.sastContainer.newIssues).toEqual(dockerOnlyHeadParsed);
-        expect(stateCopy.summaryCounts).toEqual({ added: 2, fixed: 0, existing: 0 });
       });
     });
   });
@@ -248,7 +244,6 @@ describe('security reports mutations', () => {
 
         expect(stateCopy.dast.newIssues).toEqual(parsedDastNewIssues);
         expect(stateCopy.dast.resolvedIssues).toEqual([]);
-        expect(stateCopy.summaryCounts).toEqual({ added: 1, fixed: 0, existing: 0 });
       });
     });
 
@@ -260,7 +255,6 @@ describe('security reports mutations', () => {
 
         expect(stateCopy.dast.isLoading).toEqual(false);
         expect(stateCopy.dast.newIssues).toEqual(parsedDast);
-        expect(stateCopy.summaryCounts).toEqual({ added: 2, fixed: 0, existing: 0 });
       });
     });
   });
@@ -313,8 +307,6 @@ describe('security reports mutations', () => {
         expect(stateCopy.dependencyScanning.resolvedIssues).toEqual(
           parsedDependencyScanningBaseStore,
         );
-
-        expect(stateCopy.summaryCounts).toEqual({ added: 2, fixed: 1, existing: 1 });
       });
     });
 
@@ -327,7 +319,6 @@ describe('security reports mutations', () => {
 
         expect(stateCopy.dependencyScanning.isLoading).toEqual(false);
         expect(stateCopy.dependencyScanning.newIssues).toEqual(parsedDependencyScanningIssuesStore);
-        expect(stateCopy.summaryCounts).toEqual({ added: 3, fixed: 0, existing: 0 });
       });
     });
   });
@@ -566,9 +557,9 @@ describe('security reports mutations', () => {
     });
 
     it('updates issue in the resolved issues list', () => {
-      stateCopy.sast.newIssues = [];
-      stateCopy.sast.resolvedIssues = parsedDependencyScanningIssuesHead;
-      stateCopy.sast.allIssues = [];
+      stateCopy.dependencyScanning.newIssues = [];
+      stateCopy.dependencyScanning.resolvedIssues = parsedDependencyScanningIssuesHead;
+      stateCopy.dependencyScanning.allIssues = [];
       const updatedIssue = {
         ...parsedDependencyScanningIssuesHead[0],
         foo: 'bar',
@@ -576,7 +567,7 @@ describe('security reports mutations', () => {
 
       mutations[types.UPDATE_DEPENDENCY_SCANNING_ISSUE](stateCopy, updatedIssue);
 
-      expect(stateCopy.sast.resolvedIssues[0]).toEqual(updatedIssue);
+      expect(stateCopy.dependencyScanning.resolvedIssues[0]).toEqual(updatedIssue);
     });
 
     it('updates issue in the all issues list', () => {
