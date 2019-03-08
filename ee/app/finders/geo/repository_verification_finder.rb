@@ -73,7 +73,7 @@ module Geo
     end
 
     def count_verification_failed_wikis
-      Project.verification_failed_wikis.count
+      ProjectRepositoryState.verification_failed_wikis.count
     end
 
     private
