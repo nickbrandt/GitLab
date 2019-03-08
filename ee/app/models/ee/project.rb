@@ -86,7 +86,7 @@ module EE
           .where("import_state.retry_count <= ?", ::Gitlab::Mirror::MAX_RETRY)
       end
 
-      scope :with_wiki_enabled,   -> { with_feature_enabled(:wiki) }
+      scope :with_wiki_enabled, -> { with_feature_enabled(:wiki) }
 
       scope :verification_failed_repos, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_repos) }
       scope :verification_failed_wikis, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_wikis) }
