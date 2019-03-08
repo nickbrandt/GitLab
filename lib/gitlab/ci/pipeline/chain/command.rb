@@ -11,10 +11,7 @@ module Gitlab
           :trigger_request, :schedule, :merge_request,
           :ignore_skip_ci, :save_incompleted,
           :seeds_block, :variables_attributes, :push_options,
-          :chat_data,
-
-          # EE specific
-          :allow_mirror_update
+          :chat_data, :allow_mirror_update
         ) do
           include Gitlab::Utils::StrongMemoize
 
