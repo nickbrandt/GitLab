@@ -124,6 +124,7 @@ module EE
 
       accepts_nested_attributes_for :tracing_setting, update_only: true, allow_destroy: true
       accepts_nested_attributes_for :alerting_setting, update_only: true
+      accepts_nested_attributes_for :incident_management_setting, update_only: true
 
       alias_attribute :fallback_approvals_required, :approvals_before_merge
     end
