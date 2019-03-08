@@ -36,8 +36,10 @@ export default () => ({
     },
     vulnerability: {},
     isCreatingNewIssue: false,
+    isCreatingMergeRequest: false,
     isDismissingVulnerability: false,
   },
   isCreatingIssue: false,
+  isCreatingMergeRequest: false,
   isDismissingVulnerability: false,
 });

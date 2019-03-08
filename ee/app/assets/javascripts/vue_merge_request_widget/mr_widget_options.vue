@@ -242,6 +242,7 @@ export default {
       <grouped-security-reports-app
         v-if="shouldRenderSecurityReport"
         :head-blob-path="mr.headBlobPath"
+        :source-branch="mr.sourceBranch"
         :base-blob-path="mr.baseBlobPath"
         :sast-head-path="mr.sast.head_path"
         :sast-base-path="mr.sast.base_path"

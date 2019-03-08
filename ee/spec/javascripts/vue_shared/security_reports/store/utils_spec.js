@@ -1,7 +1,7 @@
 import sha1 from 'sha1';
 import {
   findIssueIndex,
-  findMatchingRemediation,
+  findMatchingRemediations,
   parseSastIssues,
   parseDependencyScanningIssues,
   parseSastContainer,
@@ -57,7 +57,7 @@ describe('security reports utils', () => {
     });
   });
 
-  describe('findMatchingRemediation', () => {
+  describe('findMatchingRemediations', () => {
     const remediation1 = {
       fixes: [
         {
@@ -80,24 +80,31 @@ describe('security reports utils', () => {
     const remediations = [impossibleRemediation, remediation1, remediation2];
 
     it('returns null for empty vulnerability', () => {
-      expect(findMatchingRemediation(remediations, {})).toBeNull();
-      expect(findMatchingRemediation(remediations, null)).toBeNull();
-      expect(findMatchingRemediation(remediations, undefined)).toBeNull();
+      expect(findMatchingRemediations(remediations, {})).toHaveLength(0);
+      expect(findMatchingRemediations(remediations, null)).toHaveLength(0);
+      expect(findMatchingRemediations(remediations, undefined)).toHaveLength(0);
     });
 
-    it('returns null for empty remediations', () => {
-      expect(findMatchingRemediation([], { cve: '123' })).toBeNull();
-      expect(findMatchingRemediation(null, { cve: '123' })).toBeNull();
-      expect(findMatchingRemediation(undefined, { cve: '123' })).toBeNull();
+    it('returns empty arrays for empty remediations', () => {
+      expect(findMatchingRemediations([], { cve: '123' })).toHaveLength(0);
+      expect(findMatchingRemediations(null, { cve: '123' })).toHaveLength(0);
+      expect(findMatchingRemediations(undefined, { cve: '123' })).toHaveLength(0);
     });
 
-    it('returns null for vulnerabilities without remediation', () => {
-      expect(findMatchingRemediation(remediations, { cve: 'NOT_FOUND' })).toBeNull();
+    it('returns an empty array for vulnerabilities without a remediation', () => {
+      expect(findMatchingRemediations(remediations, { cve: 'NOT_FOUND' })).toHaveLength(0);
     });
 
-    it('returns first matching remediation for a vulnerability', () => {
-      expect(findMatchingRemediation(remediations, { cve: '123' })).toEqual(remediation1);
-      expect(findMatchingRemediation(remediations, { foobar: 'baz' })).toEqual(remediation1);
+    it('returns all matching remediations for a vulnerability', () => {
+      expect(findMatchingRemediations(remediations, { cve: '123' })).toEqual([
+        remediation1,
+        remediation2,
+      ]);
+
+      expect(findMatchingRemediations(remediations, { foobar: 'baz' })).toEqual([
+        remediation1,
+        remediation2,
+      ]);
     });
   });
 
@@ -186,7 +193,7 @@ describe('security reports utils', () => {
       expect(parsed.location.end_line).toBeUndefined();
       expect(parsed.urlPath).toEqual(`path/${raw.location.file}`);
       expect(parsed.project_fingerprint).toEqual(sha1(raw.cve));
-      expect(parsed.remediation).toEqual(dependencyScanningIssuesMajor2.remediations[0]);
+      expect(parsed.remediations).toEqual([dependencyScanningIssuesMajor2.remediations[0]]);
     });
 
     it('generate correct path to file when there is no line', () => {

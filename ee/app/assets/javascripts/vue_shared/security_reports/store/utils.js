@@ -24,17 +24,17 @@ const hasMatchingFix = (fixes, vulnerability) =>
 
 /**
  *
- * Returns the first remediation that fixes the given vulnerability or null
+ * Returns the remediations that fix the given vulnerability
  *
  * @param {Array} remediations
  * @param {Object} vulnerability
- * @returns {Object|null}
+ * @returns {Array}
  */
-export const findMatchingRemediation = (remediations, vulnerability) => {
+export const findMatchingRemediations = (remediations, vulnerability) => {
   if (!Array.isArray(remediations)) {
-    return null;
+    return [];
   }
-  return remediations.find(rem => hasMatchingFix(rem.fixes, vulnerability)) || null;
+  return remediations.filter(rem => hasMatchingFix(rem.fixes, vulnerability));
 };
 
 /**
@@ -58,6 +58,12 @@ function enrichVulnerabilityWithfeedback(vulnerability, feedback = []) {
           ...vuln,
           hasIssue: true,
           issue_feedback: fb,
+        };
+      } else if (fb.feedback_type === 'merge_request') {
+        return {
+          ...vuln,
+          hasMergeRequest: true,
+          merge_request_feedback: fb,
         };
       }
       return vuln;
@@ -177,10 +183,10 @@ export const parseDependencyScanningIssues = (report = [], feedback = [], path =
       title: issue.message,
     };
 
-    const remediation = findMatchingRemediation(remediations, parsed);
+    const matchingRemediations = findMatchingRemediations(remediations, parsed);
 
-    if (remediation) {
-      parsed.remediation = remediation;
+    if (remediations) {
+      parsed.remediations = matchingRemediations;
     }
 
     return {

@@ -6,6 +6,7 @@ export default () => ({
     base: null,
   },
 
+  sourceBranch: null,
   vulnerabilityFeedbackPath: null,
   vulnerabilityFeedbackHelpPath: null,
   pipelineId: null,
@@ -126,6 +127,7 @@ export default () => ({
     vulnerability: {
       isDismissed: false,
       hasIssue: false,
+      hasMergeRequest: false,
     },
 
     isCreatingNewIssue: false,

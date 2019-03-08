@@ -43,6 +43,10 @@ import actions, {
   receiveCreateIssue,
   receiveCreateIssueError,
   createNewIssue,
+  requestCreateMergeRequest,
+  receiveCreateMergeRequestSuccess,
+  receiveCreateMergeRequestError,
+  createMergeRequest,
   updateSastIssue,
   updateDependencyScanningIssue,
   updateContainerScanningIssue,
@@ -1541,6 +1545,111 @@ describe('security reports actions', () => {
           {
             type: 'receiveCreateIssueError',
             payload: 'There was an error creating the issue. Please try again.',
+          },
+        ],
+        done,
+      );
+    });
+  });
+
+  describe('requestCreateMergeRequest', () => {
+    it('commits request create merge request', done => {
+      testAction(
+        requestCreateMergeRequest,
+        null,
+        mockedState,
+        [
+          {
+            type: types.REQUEST_CREATE_MERGE_REQUEST,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveCreateMergeRequestSuccess', () => {
+    it('commits receive create merge request', done => {
+      const data = { foo: 'bar' };
+
+      testAction(
+        receiveCreateMergeRequestSuccess,
+        data,
+        mockedState,
+        [
+          {
+            type: types.RECEIVE_CREATE_MERGE_REQUEST_SUCCESS,
+            payload: data,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveCreateMergeRequestError', () => {
+    it('commits receive create merge request error', done => {
+      testAction(
+        receiveCreateMergeRequestError,
+        '',
+        mockedState,
+        [
+          {
+            type: types.RECEIVE_CREATE_MERGE_REQUEST_ERROR,
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('createMergeRequest', () => {
+    beforeEach(() => {
+      spyOnDependency(actions, 'visitUrl');
+    });
+
+    it('with success should dispatch `receiveCreateMergeRequestSuccess`', done => {
+      const data = { merge_request_path: 'fakepath.html' };
+      mock.onPost('create_merge_request_path').reply(200, data);
+      mockedState.vulnerabilityFeedbackPath = 'create_merge_request_path';
+
+      testAction(
+        createMergeRequest,
+        null,
+        mockedState,
+        [],
+        [
+          {
+            type: 'requestCreateMergeRequest',
+          },
+          {
+            type: 'receiveCreateMergeRequestSuccess',
+            payload: data,
+          },
+        ],
+        done,
+      );
+    });
+
+    it('with error should dispatch `receiveCreateMergeRequestError`', done => {
+      mock.onPost('create_merge_request_path').reply(500, {});
+      mockedState.vulnerabilityFeedbackPath = 'create_merge_request_path';
+
+      testAction(
+        createMergeRequest,
+        null,
+        mockedState,
+        [],
+        [
+          {
+            type: 'requestCreateMergeRequest',
+          },
+          {
+            type: 'receiveCreateMergeRequestError',
+            payload: 'There was an error creating the merge request. Please try again.',
           },
         ],
         done,

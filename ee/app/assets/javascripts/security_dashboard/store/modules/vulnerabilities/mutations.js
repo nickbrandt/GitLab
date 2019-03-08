@@ -94,6 +94,11 @@ export default {
     Vue.set(state.modal.data.confidence, 'value', vulnerability.confidence);
     Vue.set(state.modal, 'vulnerability', vulnerability);
     Vue.set(state.modal.vulnerability, 'hasIssue', Boolean(vulnerability.issue_feedback));
+    Vue.set(
+      state.modal.vulnerability,
+      'hasMergeRequest',
+      Boolean(vulnerability.merge_request_feedback),
+    );
     Vue.set(state.modal.vulnerability, 'isDismissed', Boolean(vulnerability.dismissal_feedback));
     Vue.set(state.modal, 'error', null);
 
@@ -163,6 +168,24 @@ export default {
       state.modal,
       'error',
       s__('Security Reports|There was an error reverting the dismissal.'),
+    );
+  },
+  [types.REQUEST_CREATE_MERGE_REQUEST](state) {
+    state.isCreatingMergeRequest = true;
+    Vue.set(state.modal, 'isCreatingMergeRequest', true);
+    Vue.set(state.modal, 'error', null);
+  },
+  [types.RECEIVE_CREATE_MERGE_REQUEST_SUCCESS](state, payload) {
+    // We don't cancel the loading state here because we're navigating away from the page
+    visitUrl(payload.merge_request_path);
+  },
+  [types.RECEIVE_CREATE_MERGE_REQUEST_ERROR](state) {
+    state.isCreatingIssue = false;
+    Vue.set(state.modal, 'isCreatingMergeRequest', false);
+    Vue.set(
+      state.modal,
+      'error',
+      s__('security Reports|There was an error creating the merge request'),
     );
   },
 };
