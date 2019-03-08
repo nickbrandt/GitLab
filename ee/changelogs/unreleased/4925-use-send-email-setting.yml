@@ -1,0 +1,6 @@
+---
+title: Add an incident management settings form and create issues from alertmanager
+  alerts
+merge_request: 9773
+author:
+type: added

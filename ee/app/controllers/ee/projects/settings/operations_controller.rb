@@ -25,7 +25,7 @@ module EE
             end
           end
 
-          helper_method :tracing_setting
+          helper_method :tracing_setting, :incident_management_available?
 
           private
 
@@ -45,11 +45,37 @@ module EE
           def tracing_setting
             @tracing_setting ||= project.tracing_setting || project.build_tracing_setting
           end
+
+          def has_tracing_license?
+            project.feature_available?(:tracing, current_user)
+          end
+
+          def has_incident_management_license?
+            project.feature_available?(:incident_management, current_user)
+          end
+
+          def incident_management_feature_enabled?
+            ::Feature.enabled?(:incident_management)
+          end
+
+          def incident_management_available?
+            incident_management_feature_enabled? && has_incident_management_license?
+          end
         end
 
         override :permitted_project_params
         def permitted_project_params
-          super.merge(tracing_setting_attributes: [:external_url])
+          permitted_params = super
+
+          if has_tracing_license?
+            permitted_params[:tracing_setting_attributes] = [:external_url]
+          end
+
+          if incident_management_available?
+            permitted_params[:incident_management_setting_attributes] = [:create_issue, :send_email, :issue_template_key]
+          end
+
+          permitted_params
         end
 
         override :render_update_response
