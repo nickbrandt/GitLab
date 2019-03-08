@@ -52,7 +52,7 @@ describe Vulnerabilities::OccurrenceEntity do
       expect(subject).to include(:name, :report_type, :severity, :confidence, :project_fingerprint)
       expect(subject).to include(:scanner, :project, :identifiers)
       expect(subject).to include(:dismissal_feedback, :issue_feedback)
-      expect(subject).to include(:description, :solution, :location, :links)
+      expect(subject).to include(:description, :links, :location, :remediations, :solution)
     end
 
     context 'when not allowed to admin vulnerability feedback' do
@@ -62,6 +62,7 @@ describe Vulnerabilities::OccurrenceEntity do
 
       it 'does not contain vulnerability feedback paths' do
         expect(subject).not_to include(:vulnerability_feedback_issue_path)
+        expect(subject).not_to include(:vulnerability_feedback_merge_request_path)
         expect(subject).not_to include(:vulnerability_feedback_dismissal_path)
       end
     end
@@ -79,11 +80,35 @@ describe Vulnerabilities::OccurrenceEntity do
         expect(subject).to include(:vulnerability_feedback_issue_path)
       end
 
+      it 'contains vulnerability feedback merge_request path' do
+        expect(subject).to include(:vulnerability_feedback_merge_request_path)
+      end
+
       context 'when disallowed to create issue' do
         let(:project) { create(:project, issues_access_level: ProjectFeature::DISABLED) }
 
         it 'does not contain vulnerability feedback issue path' do
           expect(subject).not_to include(:vulnerability_feedback_issue_path)
+        end
+
+        it 'contains vulnerability feedback dismissal path' do
+          expect(subject).to include(:vulnerability_feedback_dismissal_path)
+        end
+
+        it 'contains vulnerability feedback merge_request path' do
+          expect(subject).to include(:vulnerability_feedback_merge_request_path)
+        end
+      end
+
+      context 'when disallowed to create merge_request' do
+        let(:project) { create(:project, merge_requests_access_level: ProjectFeature::DISABLED) }
+
+        it 'does not contain vulnerability feedback merge_request path' do
+          expect(subject).not_to include(:vulnerability_feedback_merge_request_path)
+        end
+
+        it 'contains vulnerability feedback issue path' do
+          expect(subject).to include(:vulnerability_feedback_issue_path)
         end
 
         it 'contains vulnerability feedback dismissal path' do

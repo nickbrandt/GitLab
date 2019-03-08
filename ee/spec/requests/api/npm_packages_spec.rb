@@ -35,6 +35,16 @@ describe API::NpmPackages do
 
         expect_a_valid_package_response
       end
+
+      context 'project path with a dot' do
+        let(:project) { create(:project, :public, namespace: group, path: 'foo.bar') }
+
+        it 'returns the package info' do
+          get_package(package)
+
+          expect_a_valid_package_response
+        end
+      end
     end
 
     context 'internal project' do

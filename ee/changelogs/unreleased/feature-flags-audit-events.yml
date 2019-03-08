@@ -1,0 +1,5 @@
+---
+title: Add audit log for managing feature flags
+merge_request: 9487
+author:
+type: added

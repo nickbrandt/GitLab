@@ -239,7 +239,7 @@ module EE
     alias_method :service_desk_enabled?, :service_desk_enabled
 
     def service_desk_address
-      return nil unless service_desk_enabled?
+      return unless service_desk_enabled?
 
       config = ::Gitlab.config.incoming_email
       wildcard = ::Gitlab::IncomingEmail::WILDCARD_PLACEHOLDER
@@ -462,7 +462,7 @@ module EE
     end
 
     def external_authorization_classification_label
-      return nil unless License.feature_available?(:external_authorization_service)
+      return unless License.feature_available?(:external_authorization_service)
 
       super || ::Gitlab::CurrentSettings.current_application_settings
                  .external_authorization_service_default_label
@@ -489,7 +489,7 @@ module EE
     end
 
     def protected_environment_by_name(environment_name)
-      return nil unless protected_environments_feature_available?
+      return unless protected_environments_feature_available?
 
       protected_environments.find_by(name: environment_name)
     end

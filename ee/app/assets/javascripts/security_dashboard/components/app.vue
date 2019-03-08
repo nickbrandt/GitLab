@@ -51,12 +51,15 @@ export default {
     ...mapState('projects', ['projects']),
     ...mapGetters('filters', ['activeFilters']),
     canCreateIssuePermission() {
-      const path = this.modal.vulnerability.vulnerability_feedback_issue_path;
+      const path = this.vulnerability.vulnerability_feedback_issue_path;
       return _.isString(path) && !_.isEmpty(path);
     },
     canCreateFeedbackPermission() {
-      const path = this.modal.vulnerability.vulnerability_feedback_dismissal_path;
+      const path = this.vulnerability.vulnerability_feedback_dismissal_path;
       return _.isString(path) && !_.isEmpty(path);
+    },
+    vulnerability() {
+      return this.modal.vulnerability;
     },
   },
   created() {
@@ -77,6 +80,7 @@ export default {
       'fetchVulnerabilitiesCount',
       'fetchVulnerabilitiesHistory',
       'undoDismiss',
+      'createMergeRequest',
       'setVulnerabilitiesCountEndpoint',
       'setVulnerabilitiesEndpoint',
       'setVulnerabilitiesHistoryEndpoint',
@@ -102,9 +106,10 @@ export default {
       :vulnerability-feedback-help-path="vulnerabilityFeedbackHelpPath"
       :can-create-issue-permission="canCreateIssuePermission"
       :can-create-feedback-permission="canCreateFeedbackPermission"
-      @createNewIssue="createIssue({ vulnerability: modal.vulnerability })"
-      @dismissIssue="dismissVulnerability({ vulnerability: modal.vulnerability })"
-      @revertDismissIssue="undoDismiss({ vulnerability: modal.vulnerability })"
+      @createNewIssue="createIssue({ vulnerability })"
+      @dismissIssue="dismissVulnerability({ vulnerability })"
+      @revertDismissIssue="undoDismiss({ vulnerability })"
+      @createMergeRequest="createMergeRequest({ vulnerability })"
     />
   </div>
 </template>

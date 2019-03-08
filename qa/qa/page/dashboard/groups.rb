@@ -20,6 +20,8 @@ module QA
         end
 
         def go_to_group(name)
+          raise "Group with name #{name} not found!" unless has_group?(name)
+
           click_link name
         end
 

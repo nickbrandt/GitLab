@@ -2878,7 +2878,7 @@ describe Project do
       shared_examples 'same behavior between KubernetesService and Platform::Kubernetes' do
         it 'returns variables from this service' do
           expect(project.deployment_variables).to include(
-            { key: 'KUBE_TOKEN', value: project.deployment_platform.token, public: false }
+            { key: 'KUBE_TOKEN', value: project.deployment_platform.token, public: false, masked: true }
           )
         end
       end
@@ -2903,7 +2903,7 @@ describe Project do
 
         it 'should return token from kubernetes namespace' do
           expect(project.deployment_variables).to include(
-            { key: 'KUBE_TOKEN', value: kubernetes_namespace.service_account_token, public: false }
+            { key: 'KUBE_TOKEN', value: kubernetes_namespace.service_account_token, public: false, masked: true }
           )
         end
       end

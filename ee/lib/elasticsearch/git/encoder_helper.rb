@@ -7,7 +7,7 @@ module Elasticsearch
 
       included do
         def encode!(message)
-          return nil unless message.respond_to? :force_encoding
+          return unless message.respond_to? :force_encoding
 
           # if message is utf-8 encoding, just return it
           message.force_encoding("UTF-8")

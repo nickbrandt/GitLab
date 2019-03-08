@@ -1,0 +1,5 @@
+---
+title: Add Insights config behind the "group_insights" feature flag
+merge_request: 9665
+author:
+type: added

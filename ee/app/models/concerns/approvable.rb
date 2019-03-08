@@ -7,6 +7,16 @@ module Approvable
   # such as approver_groups and target_project in presenters
   include ::VisibleApprovable
 
+  def approval_feature_available?
+    strong_memoize(:approval_feature_available) do
+      if project
+        project.feature_available?(:merge_request_approvers)
+      else
+        false
+      end
+    end
+  end
+
   def approval_state
     @approval_state ||= ApprovalState.new(self)
   end
@@ -40,7 +50,7 @@ module Approvable
   end
 
   def approvals_before_merge
-    return nil unless project&.feature_available?(:merge_request_approvers)
+    return unless approval_feature_available?
 
     super
   end

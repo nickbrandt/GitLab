@@ -8,6 +8,8 @@ export const setHeadBlobPath = ({ commit }, blobPath) => commit(types.SET_HEAD_B
 
 export const setBaseBlobPath = ({ commit }, blobPath) => commit(types.SET_BASE_BLOB_PATH, blobPath);
 
+export const setSourceBranch = ({ commit }, branch) => commit(types.SET_SOURCE_BRANCH, branch);
+
 export const setVulnerabilityFeedbackPath = ({ commit }, path) =>
   commit(types.SET_VULNERABILITY_FEEDBACK_PATH, path);
 
@@ -329,6 +331,46 @@ export const createNewIssue = ({ state, dispatch }) => {
         s__('ciReport|There was an error creating the issue. Please try again.'),
       ),
     );
+};
+
+export const createMergeRequest = ({ state, dispatch }) => {
+  const { vulnerability } = state.modal;
+  const { category, project_fingerprint } = vulnerability;
+
+  vulnerability.target_branch = state.sourceBranch;
+
+  dispatch('requestCreateMergeRequest');
+
+  axios
+    .post(state.vulnerabilityFeedbackPath, {
+      vulnerability_feedback: {
+        feedback_type: 'merge_request',
+        category,
+        project_fingerprint,
+        vulnerability_data: vulnerability,
+      },
+    })
+    .then(({ data }) => {
+      dispatch('receiveCreateMergeRequestSuccess', data);
+    })
+    .catch(() => {
+      dispatch(
+        'receiveCreateMergeRequestError',
+        s__('ciReport|There was an error creating the merge request. Please try again.'),
+      );
+    });
+};
+
+export const requestCreateMergeRequest = ({ commit }) => {
+  commit(types.REQUEST_CREATE_MERGE_REQUEST);
+};
+
+export const receiveCreateMergeRequestSuccess = ({ commit }, payload) => {
+  commit(types.RECEIVE_CREATE_MERGE_REQUEST_SUCCESS, payload);
+};
+
+export const receiveCreateMergeRequestError = ({ commit }) => {
+  commit(types.RECEIVE_CREATE_MERGE_REQUEST_ERROR);
 };
 
 // prevent babel-plugin-rewire from generating an invalid default during karma tests

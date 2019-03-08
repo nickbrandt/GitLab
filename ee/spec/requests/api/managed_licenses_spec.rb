@@ -3,36 +3,17 @@
 require 'spec_helper'
 
 describe API::ManagedLicenses do
-  let(:project) do
-    create(:project, :public).tap do |p|
-      @software_license_policy = create(:software_license_policy, project: p)
-    end
-  end
-
-  let(:maintainer_user) do
-    create(:user).tap do |u|
-      project.add_maintainer(u)
-    end
-  end
-
-  let(:dev_user) do
-    create(:user).tap do |u|
-      project.add_developer(u)
-    end
-  end
-
-  let(:reporter_user) do
-    create(:user).tap do |u|
-      create(:project_member, :reporter, user: u, project: project)
-    end
-  end
-
-  let(:software_license_policy) do
-    @software_license_policy ||= create(:software_license_policy, project: project)
-  end
+  set(:project) { create(:project, :public) }
+  set(:maintainer_user) { create(:user) }
+  set(:dev_user) { create(:user) }
+  set(:reporter_user) { create(:user) }
+  set(:software_license_policy) { create(:software_license_policy, project: project) }
 
   before do
     stub_licensed_features(license_management: true)
+    project.add_maintainer(maintainer_user)
+    project.add_developer(dev_user)
+    project.add_reporter(reporter_user)
   end
 
   describe 'GET /projects/:id/managed_licenses' do

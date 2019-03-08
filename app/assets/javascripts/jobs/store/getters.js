@@ -28,7 +28,6 @@ export const emptyStateIllustration = state =>
 export const emptyStateAction = state =>
   (state.job && state.job.status && state.job.status.action) || null;
 
-// ee-only start
 /**
  * Shared runners limit is only rendered when
  * used quota is bigger or equal than the limit
@@ -39,7 +38,6 @@ export const shouldRenderSharedRunnerLimitWarning = state =>
   !_.isEmpty(state.job.runners) &&
   !_.isEmpty(state.job.runners.quota) &&
   state.job.runners.quota.used >= state.job.runners.quota.limit;
-// ee-only end
 
 export const isScrollingDown = state => isScrolledToBottom() && !state.isTraceComplete;
 

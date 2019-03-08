@@ -1,7 +1,7 @@
 import sha1 from 'sha1';
 import {
   findIssueIndex,
-  findMatchingRemediation,
+  findMatchingRemediations,
   parseSastIssues,
   parseDependencyScanningIssues,
   parseSastContainer,
@@ -10,6 +10,7 @@ import {
   getUnapprovedVulnerabilities,
   groupedTextBuilder,
   statusIcon,
+  countIssues,
 } from 'ee/vue_shared/security_reports/store/utils';
 import {
   oldSastIssues,
@@ -56,7 +57,7 @@ describe('security reports utils', () => {
     });
   });
 
-  describe('findMatchingRemediation', () => {
+  describe('findMatchingRemediations', () => {
     const remediation1 = {
       fixes: [
         {
@@ -79,24 +80,31 @@ describe('security reports utils', () => {
     const remediations = [impossibleRemediation, remediation1, remediation2];
 
     it('returns null for empty vulnerability', () => {
-      expect(findMatchingRemediation(remediations, {})).toBeNull();
-      expect(findMatchingRemediation(remediations, null)).toBeNull();
-      expect(findMatchingRemediation(remediations, undefined)).toBeNull();
+      expect(findMatchingRemediations(remediations, {})).toHaveLength(0);
+      expect(findMatchingRemediations(remediations, null)).toHaveLength(0);
+      expect(findMatchingRemediations(remediations, undefined)).toHaveLength(0);
     });
 
-    it('returns null for empty remediations', () => {
-      expect(findMatchingRemediation([], { cve: '123' })).toBeNull();
-      expect(findMatchingRemediation(null, { cve: '123' })).toBeNull();
-      expect(findMatchingRemediation(undefined, { cve: '123' })).toBeNull();
+    it('returns empty arrays for empty remediations', () => {
+      expect(findMatchingRemediations([], { cve: '123' })).toHaveLength(0);
+      expect(findMatchingRemediations(null, { cve: '123' })).toHaveLength(0);
+      expect(findMatchingRemediations(undefined, { cve: '123' })).toHaveLength(0);
     });
 
-    it('returns null for vulnerabilities without remediation', () => {
-      expect(findMatchingRemediation(remediations, { cve: 'NOT_FOUND' })).toBeNull();
+    it('returns an empty array for vulnerabilities without a remediation', () => {
+      expect(findMatchingRemediations(remediations, { cve: 'NOT_FOUND' })).toHaveLength(0);
     });
 
-    it('returns first matching remediation for a vulnerability', () => {
-      expect(findMatchingRemediation(remediations, { cve: '123' })).toEqual(remediation1);
-      expect(findMatchingRemediation(remediations, { foobar: 'baz' })).toEqual(remediation1);
+    it('returns all matching remediations for a vulnerability', () => {
+      expect(findMatchingRemediations(remediations, { cve: '123' })).toEqual([
+        remediation1,
+        remediation2,
+      ]);
+
+      expect(findMatchingRemediations(remediations, { foobar: 'baz' })).toEqual([
+        remediation1,
+        remediation2,
+      ]);
     });
   });
 
@@ -185,7 +193,7 @@ describe('security reports utils', () => {
       expect(parsed.location.end_line).toBeUndefined();
       expect(parsed.urlPath).toEqual(`path/${raw.location.file}`);
       expect(parsed.project_fingerprint).toEqual(sha1(raw.cve));
-      expect(parsed.remediation).toEqual(dependencyScanningIssuesMajor2.remediations[0]);
+      expect(parsed.remediations).toEqual([dependencyScanningIssuesMajor2.remediations[0]]);
     });
 
     it('generate correct path to file when there is no line', () => {
@@ -292,44 +300,56 @@ describe('security reports utils', () => {
   });
 
   describe('textBuilder', () => {
-    describe('with no issues', () => {
-      it('should return no vulnerabiltities text', () => {
-        expect(groupedTextBuilder('', { head: 'foo', base: 'bar' }, 0, 0, 0)).toEqual(
-          ' detected no vulnerabilities',
-        );
-      });
-    });
+    describe('with only the head', () => {
+      const paths = { head: 'foo' };
 
-    describe('with only `all` issues', () => {
-      it('should return no new vulnerabiltities text', () => {
-        expect(groupedTextBuilder('', { head: 'foo', base: 'bar' }, 0, 0, 1)).toEqual(
-          ' detected no new vulnerabilities',
-        );
-      });
-    });
-
-    describe('with new issues and without base', () => {
       it('should return unable to compare text', () => {
-        expect(groupedTextBuilder('', { head: 'foo' }, 1, 0, 0)).toEqual(
+        expect(groupedTextBuilder({ paths, added: 1 })).toEqual(
           ' detected 1 vulnerability for the source branch only',
         );
       });
 
       it('should return unable to compare text with no vulnerability', () => {
-        expect(groupedTextBuilder('', { head: 'foo' }, 0, 0, 0)).toEqual(
+        expect(groupedTextBuilder({ paths })).toEqual(
           ' detected no vulnerabilities for the source branch only',
+        );
+      });
+
+      it('should return dismissed text', () => {
+        expect(groupedTextBuilder({ paths, dismissed: 2 })).toEqual(
+          ' detected 2 dismissed vulnerabilities for the source branch only',
+        );
+      });
+
+      it('should return new and dismissed text', () => {
+        expect(groupedTextBuilder({ paths, added: 1, dismissed: 2 })).toEqual(
+          ' detected 1 new, and 2 dismissed vulnerabilities for the source branch only',
         );
       });
     });
 
     describe('with base and head', () => {
+      const paths = { head: 'foo', base: 'foo' };
+
+      describe('with no issues', () => {
+        it('should return no vulnerabiltities text', () => {
+          expect(groupedTextBuilder({ paths })).toEqual(' detected no vulnerabilities');
+        });
+      });
+
+      describe('with only `all` issues', () => {
+        it('should return no new vulnerabiltities text', () => {
+          expect(groupedTextBuilder({ paths, existing: 1 })).toEqual(
+            ' detected no new vulnerabilities',
+          );
+        });
+      });
+
       describe('with only new issues', () => {
         it('should return new issues text', () => {
-          expect(groupedTextBuilder('', { head: 'foo', base: 'foo' }, 1, 0, 0)).toEqual(
-            ' detected 1 new vulnerability',
-          );
+          expect(groupedTextBuilder({ paths, added: 1 })).toEqual(' detected 1 new vulnerability');
 
-          expect(groupedTextBuilder('', { head: 'foo', base: 'foo' }, 2, 0, 0)).toEqual(
+          expect(groupedTextBuilder({ paths, added: 2 })).toEqual(
             ' detected 2 new vulnerabilities',
           );
         });
@@ -337,24 +357,50 @@ describe('security reports utils', () => {
 
       describe('with new and resolved issues', () => {
         it('should return new and fixed issues text', () => {
-          expect(
-            groupedTextBuilder('', { head: 'foo', base: 'foo' }, 1, 1, 0).replace(/\n+\s+/m, ' '),
-          ).toEqual(' detected 1 new, and 1 fixed vulnerabilities');
+          expect(groupedTextBuilder({ paths, added: 1, fixed: 1 }).replace(/\n+\s+/m, ' ')).toEqual(
+            ' detected 1 new, and 1 fixed vulnerabilities',
+          );
 
-          expect(
-            groupedTextBuilder('', { head: 'foo', base: 'foo' }, 2, 2, 0).replace(/\n+\s+/m, ' '),
-          ).toEqual(' detected 2 new, and 2 fixed vulnerabilities');
+          expect(groupedTextBuilder({ paths, added: 2, fixed: 2 }).replace(/\n+\s+/m, ' ')).toEqual(
+            ' detected 2 new, and 2 fixed vulnerabilities',
+          );
         });
       });
 
       describe('with only resolved issues', () => {
         it('should return fixed issues text', () => {
-          expect(groupedTextBuilder('', { head: 'foo', base: 'foo' }, 0, 1, 0)).toEqual(
+          expect(groupedTextBuilder({ paths, fixed: 1 })).toEqual(
             ' detected 1 fixed vulnerability',
           );
 
-          expect(groupedTextBuilder('', { head: 'foo', base: 'foo' }, 0, 2, 0)).toEqual(
+          expect(groupedTextBuilder({ paths, fixed: 2 })).toEqual(
             ' detected 2 fixed vulnerabilities',
+          );
+        });
+      });
+
+      describe('with dismissed issues', () => {
+        it('should return dismissed text', () => {
+          expect(groupedTextBuilder({ paths, dismissed: 2 })).toEqual(
+            ' detected 2 dismissed vulnerabilities',
+          );
+        });
+
+        it('should return new and dismissed text', () => {
+          expect(groupedTextBuilder({ paths, added: 1, dismissed: 2 })).toEqual(
+            ' detected 1 new, and 2 dismissed vulnerabilities',
+          );
+        });
+
+        it('should return fixed and dismissed text', () => {
+          expect(groupedTextBuilder({ paths, fixed: 1, dismissed: 2 })).toEqual(
+            ' detected 1 fixed, and 2 dismissed vulnerabilities',
+          );
+        });
+
+        it('should return new, fixed and dismissed text', () => {
+          expect(groupedTextBuilder({ paths, fixed: 1, added: 1, dismissed: 2 })).toEqual(
+            ' detected 1 new, 1 fixed, and 2 dismissed vulnerabilities',
           );
         });
       });
@@ -383,6 +429,69 @@ describe('security reports utils', () => {
     describe('without new or neutal issues', () => {
       it('returns success', () => {
         expect(statusIcon()).toEqual('success');
+      });
+    });
+  });
+
+  describe('countIssues', () => {
+    const allIssues = [{}];
+    const resolvedIssues = [{}];
+    const dismissedIssues = [{ isDismissed: true }];
+    const addedIssues = [{ isDismissed: false }];
+
+    it('returns 0 for all counts if everything is empty', () => {
+      expect(countIssues()).toEqual({
+        added: 0,
+        dismissed: 0,
+        existing: 0,
+        fixed: 0,
+      });
+    });
+
+    it('counts `allIssues` as existing', () => {
+      expect(countIssues({ allIssues })).toEqual({
+        added: 0,
+        dismissed: 0,
+        existing: 1,
+        fixed: 0,
+      });
+    });
+
+    it('counts `resolvedIssues` as fixed', () => {
+      expect(countIssues({ resolvedIssues })).toEqual({
+        added: 0,
+        dismissed: 0,
+        existing: 0,
+        fixed: 1,
+      });
+    });
+
+    it('counts `newIssues` which are dismissed as dismissed', () => {
+      expect(countIssues({ newIssues: dismissedIssues })).toEqual({
+        added: 0,
+        dismissed: 1,
+        existing: 0,
+        fixed: 0,
+      });
+    });
+
+    it('counts `newIssues` which are not dismissed as added', () => {
+      expect(countIssues({ newIssues: addedIssues })).toEqual({
+        added: 1,
+        dismissed: 0,
+        existing: 0,
+        fixed: 0,
+      });
+    });
+
+    it('counts everything', () => {
+      expect(
+        countIssues({ newIssues: [...addedIssues, ...dismissedIssues], resolvedIssues, allIssues }),
+      ).toEqual({
+        added: 1,
+        dismissed: 1,
+        existing: 1,
+        fixed: 1,
       });
     });
   });

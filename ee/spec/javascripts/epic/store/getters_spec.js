@@ -260,23 +260,20 @@ describe('Epic Store Getters', () => {
     });
   });
 
-  describe('parentEpic', () => {
-    it('returns `parent` from state when parent is not null', () => {
-      const parent = getters.parentEpic({
-        parent: {
-          id: 1,
-        },
+  describe('ancestors', () => {
+    it('returns `ancestors` from state when ancestors is not null', () => {
+      const ancestors = getters.ancestors({
+        ancestors: [{ id: 1, title: 'Parent' }],
       });
 
-      expect(parent.id).toBe(1);
+      expect(ancestors.length).toBe(1);
     });
 
-    it('returns empty object when `parent` within state is null', () => {
-      const parent = getters.parentEpic({
-        parent: null,
-      });
+    it('returns empty array when `ancestors` within state is null', () => {
+      const ancestors = getters.ancestors({});
 
-      expect(parent).not.toBeNull();
+      expect(ancestors).not.toBeNull();
+      expect(ancestors.length).toBe(0);
     });
   });
 });

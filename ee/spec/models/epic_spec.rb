@@ -87,13 +87,13 @@ describe Epic do
   end
 
   describe '#ancestors', :nested_groups do
-    let(:group) { create(:group) }
-    let(:epic1) { create(:epic, group: group) }
-    let(:epic2) { create(:epic, group: group, parent: epic1) }
-    let(:epic3) { create(:epic, group: group, parent: epic2) }
+    set(:group) { create(:group) }
+    set(:epic1) { create(:epic, group: group) }
+    set(:epic2) { create(:epic, group: group, parent: epic1) }
+    set(:epic3) { create(:epic, group: group, parent: epic2) }
 
     it 'returns all ancestors for an epic' do
-      expect(epic3.ancestors).to match_array([epic1, epic2])
+      expect(epic3.ancestors).to eq [epic2, epic1]
     end
 
     it 'returns an empty array if an epic does not have any parent' do

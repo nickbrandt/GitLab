@@ -4,7 +4,8 @@ describe API::Epics do
   let(:user) { create(:user) }
   let(:group) { create(:group) }
   let(:project) { create(:project, :public, group: group) }
-  let(:epic) { create(:epic, group: group) }
+  let(:label) { create(:label) }
+  let(:epic) { create(:labeled_epic, group: group, labels: [label]) }
   let(:params) { nil }
 
   shared_examples 'error requests' do
@@ -84,6 +85,22 @@ describe API::Epics do
 
       it 'matches the response schema' do
         expect(response).to match_response_schema('public_api/v4/epics', dir: 'ee')
+      end
+
+      it 'avoids N+1 queries', :request_store do
+        epic
+        # Avoid polluting queries with inserts for personal access token
+        pat = create(:personal_access_token, user: user)
+
+        control = ActiveRecord::QueryRecorder.new(skip_cached: false) do
+          get api(url, personal_access_token: pat)
+        end
+
+        label_2 = create(:label)
+        create_list(:labeled_epic, 2, group: group, labels: [label_2])
+
+        expect { get api(url, personal_access_token: pat) }.not_to exceed_all_query_limit(control)
+        expect(response).to have_gitlab_http_status(200)
       end
     end
 

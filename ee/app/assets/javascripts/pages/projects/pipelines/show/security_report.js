@@ -15,6 +15,7 @@ export default () => {
     const datasetOptions = securityTab.dataset;
     const {
       headBlobPath,
+      sourceBranch,
       sastHeadPath,
       sastHelpPath,
       dependencyScanningHeadPath,
@@ -44,6 +45,7 @@ export default () => {
         return createElement('security-report-app', {
           props: {
             headBlobPath,
+            sourceBranch,
             sastHeadPath,
             sastHelpPath,
             dependencyScanningHeadPath,

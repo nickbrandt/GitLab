@@ -17,6 +17,8 @@ module EE
       has_many :epics
 
       has_one :saml_provider
+      has_one :insight, foreign_key: :namespace_id
+      accepts_nested_attributes_for :insight
 
       has_many :ldap_group_links, foreign_key: 'group_id', dependent: :destroy # rubocop:disable Cop/ActiveRecordDependent
       has_many :hooks, dependent: :destroy, class_name: 'GroupHook' # rubocop:disable Cop/ActiveRecordDependent
@@ -164,7 +166,7 @@ module EE
     def checked_file_template_project(*args, &blk)
       project = file_template_project(*args, &blk)
 
-      return nil unless project && (
+      return unless project && (
           project_ids.include?(project.id) || shared_project_ids.include?(project.id))
 
       # The license check would normally be the cheapest to perform, so would
@@ -172,7 +174,7 @@ module EE
       # no SQL at all, but `feature_available?` will cause an ApplicationSetting
       # to be created if it doesn't already exist! This is mostly a problem in
       # the specs, but best avoided in any case.
-      return nil unless feature_available?(:custom_file_templates_for_namespace)
+      return unless feature_available?(:custom_file_templates_for_namespace)
 
       project
     end

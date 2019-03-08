@@ -66,7 +66,7 @@ describe('Security Reports modal', () => {
         expect(vm.$el.querySelector('.js-create-issue-btn')).toBe(null);
       });
 
-      it('renders create issue button and footer', () => {
+      it('renders the dismiss button', () => {
         expect(vm.$el.querySelector('.js-dismiss-btn')).not.toBe(null);
       });
 
@@ -98,7 +98,7 @@ describe('Security Reports modal', () => {
       });
 
       it('renders create issue button', () => {
-        expect(vm.$el.querySelector('.js-create-issue-btn')).not.toBe(null);
+        expect(vm.$el.querySelector('.js-action-button')).not.toBe(null);
       });
 
       it('renders the footer', () => {
@@ -108,7 +108,7 @@ describe('Security Reports modal', () => {
       it('emits createIssue when create issue button is clicked', () => {
         spyOn(vm, '$emit');
 
-        const button = vm.$el.querySelector('.js-create-issue-btn');
+        const button = vm.$el.querySelector('.js-action-button');
         button.click();
 
         expect(vm.$emit).toHaveBeenCalledWith('createNewIssue');
@@ -231,7 +231,7 @@ describe('Security Reports modal', () => {
         modal: createState().modal,
       };
       const summary = 'Upgrade to 123';
-      props.modal.vulnerability.remediation = { summary };
+      props.modal.vulnerability.remediations = [{ summary }];
       vm = mountComponent(Component, props);
 
       const solutionCard = vm.$el.querySelector('.js-solution-card');

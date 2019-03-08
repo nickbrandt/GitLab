@@ -29,13 +29,14 @@ module API
         optional :state, type: String, values: %w[opened closed all], default: 'all',
                          desc: 'Return opened, closed, or all epics'
         optional :author_id, type: Integer, desc: 'Return epics which are authored by the user with the given ID'
-        optional :labels, type: String, desc: 'Comma-separated list of label names'
+        optional :labels, type: Array[String], coerce_with: Validations::Types::LabelsList.coerce, desc: 'Comma-separated list of label names'
         use :pagination
       end
       get ':id/(-/)epics' do
-        epics = paginate(find_epics(finder_params: { group_id: user_group.id }))
+        epics = paginate(find_epics(finder_params: { group_id: user_group.id })).with_api_entity_associations
 
-        present epics, with: EE::API::Entities::Epic, user: current_user, epics_metadata: issuable_meta_data(epics, 'Epic')
+        # issuable_metadata is the standard used by the Todo API
+        present epics, with: EE::API::Entities::Epic, user: current_user, issuable_metadata: issuable_meta_data(epics, 'Epic')
       end
 
       desc 'Get details of an epic' do
@@ -60,7 +61,7 @@ module API
         optional :start_date_is_fixed, type: Boolean, desc: 'Indicates start date should be sourced from start_date_fixed field not the issue milestones'
         optional :end_date, as: :due_date_fixed, type: String, desc: 'The due date of an epic'
         optional :due_date_is_fixed, type: Boolean, desc: 'Indicates due date should be sourced from due_date_fixed field not the issue milestones'
-        optional :labels, type: String, desc: 'Comma-separated list of label names'
+        optional :labels, type: Array[String], coerce_with: Validations::Types::LabelsList.coerce, desc: 'Comma-separated list of label names'
       end
       post ':id/(-/)epics' do
         authorize_can_create!
@@ -84,7 +85,7 @@ module API
         optional :start_date_is_fixed, type: Boolean, desc: 'Indicates start date should be sourced from start_date_fixed field not the issue milestones'
         optional :end_date, as: :due_date_fixed, type: String, desc: 'The due date of an epic'
         optional :due_date_is_fixed, type: Boolean, desc: 'Indicates due date should be sourced from due_date_fixed field not the issue milestones'
-        optional :labels, type: String, desc: 'Comma-separated list of label names'
+        optional :labels, type: Array[String], coerce_with: Validations::Types::LabelsList.coerce, desc: 'Comma-separated list of label names'
         optional :state_event, type: String, values: %w[reopen close], desc: 'State event for an epic'
         at_least_one_of :title, :description, :start_date_fixed, :start_date_is_fixed, :due_date_fixed, :due_date_is_fixed, :labels, :state_event
       end

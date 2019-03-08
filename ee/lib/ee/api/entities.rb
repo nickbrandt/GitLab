@@ -205,17 +205,17 @@ module EE
           epic.labels.map(&:title).sort
         end
         expose :upvotes do |epic, options|
-          if options[:epics_metadata]
+          if options[:issuable_metadata]
             # Avoids an N+1 query when metadata is included
-            options[:epics_metadata][epic.id].upvotes
+            options[:issuable_metadata][epic.id].upvotes
           else
             epic.upvotes
           end
         end
         expose :downvotes do |epic, options|
-          if options[:epics_metadata]
+          if options[:issuable_metadata]
             # Avoids an N+1 query when metadata is included
-            options[:epics_metadata][epic.id].downvotes
+            options[:issuable_metadata][epic.id].downvotes
           else
             epic.downvotes
           end
@@ -389,6 +389,10 @@ module EE
           approval_state.has_non_fallback_rules?
         end
 
+        expose :merge_request_approvers_available do |approval_state|
+          approval_state.project.feature_available?(:merge_request_approvers)
+        end
+
         expose :multiple_approval_rules_available do |approval_state|
           approval_state.project.multiple_approval_rules_available?
         end
@@ -399,12 +403,27 @@ module EE
       end
 
       class GitlabLicense < Grape::Entity
-        expose :starts_at, :expires_at, :licensee, :add_ons
+        expose :id,
+          :plan,
+          :created_at,
+          :starts_at,
+          :expires_at,
+          :historical_max,
+          :licensee,
+          :add_ons
+
+        expose :expired?, as: :expired
+
+        expose :overage do |license, options|
+          license.expired? ? license.overage_with_historical_max : license.overage(options[:current_active_users_count])
+        end
 
         expose :user_limit do |license, options|
           license.restricted?(:active_user_count) ? license.restrictions[:active_user_count] : 0
         end
+      end
 
+      class GitlabLicenseWithActiveUsers < GitlabLicense
         expose :active_users do |license, options|
           ::User.active.count
         end

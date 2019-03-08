@@ -12,7 +12,7 @@ class Geo::PushUser
   end
 
   def self.new_from_headers(headers)
-    return nil unless needed_headers_provided?(headers)
+    return unless needed_headers_provided?(headers)
 
     new(headers['Geo-GL-Id'])
   end

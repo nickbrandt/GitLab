@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190301081611) do
+ActiveRecord::Schema.define(version: 20190301182457) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -707,6 +707,7 @@ ActiveRecord::Schema.define(version: 20190301081611) do
     t.index ["locked"], name: "index_ci_runners_on_locked", using: :btree
     t.index ["runner_type"], name: "index_ci_runners_on_runner_type", using: :btree
     t.index ["token"], name: "index_ci_runners_on_token", using: :btree
+    t.index ["token_encrypted"], name: "index_ci_runners_on_token_encrypted", using: :btree
   end
 
   create_table "ci_sources_pipelines", force: :cascade do |t|
@@ -871,6 +872,7 @@ ActiveRecord::Schema.define(version: 20190301081611) do
     t.string "cluster_ip"
     t.text "status_reason"
     t.string "external_ip"
+    t.string "external_hostname"
     t.index ["cluster_id"], name: "index_clusters_applications_ingress_on_cluster_id", unique: true, using: :btree
   end
 
@@ -896,6 +898,7 @@ ActiveRecord::Schema.define(version: 20190301081611) do
     t.string "hostname"
     t.text "status_reason"
     t.string "external_ip"
+    t.string "external_hostname"
     t.index ["cluster_id"], name: "index_clusters_applications_knative_on_cluster_id", unique: true, using: :btree
   end
 
@@ -1489,6 +1492,13 @@ ActiveRecord::Schema.define(version: 20190301081611) do
     t.index ["project_id"], name: "index_index_statuses_on_project_id", unique: true, using: :btree
   end
 
+  create_table "insights", force: :cascade do |t|
+    t.integer "namespace_id", null: false
+    t.integer "project_id", null: false
+    t.index ["namespace_id"], name: "index_insights_on_namespace_id", using: :btree
+    t.index ["project_id"], name: "index_insights_on_project_id", using: :btree
+  end
+
   create_table "internal_ids", id: :bigserial, force: :cascade do |t|
     t.integer "project_id"
     t.integer "usage", null: false
@@ -1921,6 +1931,7 @@ ActiveRecord::Schema.define(version: 20190301081611) do
     t.index ["plan_id"], name: "index_namespaces_on_plan_id", using: :btree
     t.index ["require_two_factor_authentication"], name: "index_namespaces_on_require_two_factor_authentication", using: :btree
     t.index ["runners_token"], name: "index_namespaces_on_runners_token", unique: true, using: :btree
+    t.index ["runners_token_encrypted"], name: "index_namespaces_on_runners_token_encrypted", unique: true, using: :btree
     t.index ["trial_ends_on"], name: "index_namespaces_on_trial_ends_on", where: "(trial_ends_on IS NOT NULL)", using: :btree
     t.index ["type"], name: "index_namespaces_on_type", using: :btree
   end
@@ -2455,6 +2466,7 @@ ActiveRecord::Schema.define(version: 20190301081611) do
     t.index ["repository_storage", "created_at"], name: "idx_project_repository_check_partial", where: "(last_repository_check_at IS NULL)", using: :btree
     t.index ["repository_storage"], name: "index_projects_on_repository_storage", using: :btree
     t.index ["runners_token"], name: "index_projects_on_runners_token", using: :btree
+    t.index ["runners_token_encrypted"], name: "index_projects_on_runners_token_encrypted", using: :btree
     t.index ["star_count"], name: "index_projects_on_star_count", using: :btree
     t.index ["visibility_level"], name: "index_projects_on_visibility_level", using: :btree
   end
@@ -3182,8 +3194,10 @@ ActiveRecord::Schema.define(version: 20190301081611) do
     t.integer "pipeline_id"
     t.integer "issue_id"
     t.string "project_fingerprint", limit: 40, null: false
+    t.integer "merge_request_id"
     t.index ["author_id"], name: "index_vulnerability_feedback_on_author_id", using: :btree
     t.index ["issue_id"], name: "index_vulnerability_feedback_on_issue_id", using: :btree
+    t.index ["merge_request_id"], name: "index_vulnerability_feedback_on_merge_request_id", using: :btree
     t.index ["pipeline_id"], name: "index_vulnerability_feedback_on_pipeline_id", using: :btree
     t.index ["project_id", "category", "feedback_type", "project_fingerprint"], name: "vulnerability_feedback_unique_idx", unique: true, using: :btree
   end
@@ -3439,6 +3453,8 @@ ActiveRecord::Schema.define(version: 20190301081611) do
   add_foreign_key "identities", "saml_providers", name: "fk_aade90f0fc", on_delete: :cascade
   add_foreign_key "import_export_uploads", "projects", on_delete: :cascade
   add_foreign_key "index_statuses", "projects", name: "fk_74b2492545", on_delete: :cascade
+  add_foreign_key "insights", "namespaces"
+  add_foreign_key "insights", "projects"
   add_foreign_key "internal_ids", "namespaces", name: "fk_162941d509", on_delete: :cascade
   add_foreign_key "internal_ids", "projects", on_delete: :cascade
   add_foreign_key "issue_assignees", "issues", name: "fk_b7d881734a", on_delete: :cascade
@@ -3601,6 +3617,7 @@ ActiveRecord::Schema.define(version: 20190301081611) do
   add_foreign_key "users_star_projects", "projects", name: "fk_22cd27ddfc", on_delete: :cascade
   add_foreign_key "vulnerability_feedback", "ci_pipelines", column: "pipeline_id", on_delete: :nullify
   add_foreign_key "vulnerability_feedback", "issues", on_delete: :nullify
+  add_foreign_key "vulnerability_feedback", "merge_requests", name: "fk_563ff1912e", on_delete: :nullify
   add_foreign_key "vulnerability_feedback", "projects", on_delete: :cascade
   add_foreign_key "vulnerability_feedback", "users", column: "author_id", on_delete: :cascade
   add_foreign_key "vulnerability_identifiers", "projects", on_delete: :cascade

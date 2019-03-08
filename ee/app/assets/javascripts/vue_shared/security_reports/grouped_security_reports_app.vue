@@ -29,6 +29,11 @@ export default {
       required: false,
       default: null,
     },
+    sourceBranch: {
+      type: String,
+      required: false,
+      default: null,
+    },
     sastHeadPath: {
       type: String,
       required: false,
@@ -150,6 +155,7 @@ export default {
   created() {
     this.setHeadBlobPath(this.headBlobPath);
     this.setBaseBlobPath(this.baseBlobPath);
+    this.setSourceBranch(this.sourceBranch);
 
     this.setVulnerabilityFeedbackPath(this.vulnerabilityFeedbackPath);
     this.setVulnerabilityFeedbackHelpPath(this.vulnerabilityFeedbackHelpPath);
@@ -199,6 +205,7 @@ export default {
       'setAppType',
       'setHeadBlobPath',
       'setBaseBlobPath',
+      'setSourceBranch',
       'setSastHeadPath',
       'setSastBasePath',
       'setSastContainerHeadPath',
@@ -219,6 +226,7 @@ export default {
       'dismissIssue',
       'revertDismissIssue',
       'createNewIssue',
+      'createMergeRequest',
     ]),
   },
 };
@@ -273,7 +281,6 @@ export default {
           v-if="dependencyScanning.newIssues.length || dependencyScanning.resolvedIssues.length"
           :unresolved-issues="dependencyScanning.newIssues"
           :resolved-issues="dependencyScanning.resolvedIssues"
-          :all-issues="dependencyScanning.allIssues"
           :component="$options.componentNames.SastIssueBody"
           class="js-dss-issue-list report-block-group-list"
         />
@@ -320,6 +327,7 @@ export default {
         :can-create-feedback-permission="canCreateFeedbackPermission"
         @createNewIssue="createNewIssue"
         @dismissIssue="dismissIssue"
+        @createMergeRequest="createMergeRequest"
         @revertDismissIssue="revertDismissIssue"
       />
     </div>

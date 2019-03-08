@@ -28,7 +28,7 @@ module EE
 
             def find_by_kerberos_principal(principal, adapter)
               uid, domain = principal.split('@', 2)
-              return nil unless uid && domain
+              return unless uid && domain
 
               # In multi-forest setups, there may be several users with matching
               # uids but differing DNs, so skip adapters configured to connect to
@@ -73,7 +73,7 @@ module EE
           # We assume that the Kerberos username matches the configured uid
           # attribute in LDAP. For Active Directory, this is `sAMAccountName`
           def kerberos_principal
-            return nil unless uid
+            return unless uid
 
             uid + '@' + self.class.domain_from_dn(dn).upcase
           end

@@ -80,6 +80,16 @@ describe GroupsController do
             post :update, params: { id: group.to_param, group: { file_template_project_id: project.id } }
           end.not_to change { group.reload.file_template_project_id }
         end
+
+        it 'does not update insight project_id successfully' do
+          project = create(:project, group: group)
+
+          stub_licensed_features(insights: false)
+
+          post :update, params: { id: group.to_param, group: { insight_attributes: { project_id: project.id } } }
+
+          expect(group.reload.insight).to be_nil
+        end
       end
 
       context 'with license' do
@@ -91,6 +101,16 @@ describe GroupsController do
           expect do
             post :update, params: { id: group.to_param, group: { file_template_project_id: project.id } }
           end.to change { group.reload.file_template_project_id }.to(project.id)
+        end
+
+        it 'updates insight project_id successfully' do
+          project = create(:project, group: group)
+
+          stub_licensed_features(insights: true)
+
+          post :update, params: { id: group.to_param, group: { insight_attributes: { project_id: project.id } } }
+
+          expect(group.reload.insight.project).to eq(project)
         end
       end
     end

@@ -3,6 +3,7 @@ import { GlButton, GlLoadingIcon } from '@gitlab/ui';
 import eventHub from '~/vue_merge_request_widget/event_hub';
 import Approvals from 'ee/vue_merge_request_widget/components/approvals/multiple_rule/approvals.vue';
 import ApprovalsSummary from 'ee/vue_merge_request_widget/components/approvals/multiple_rule/approvals_summary.vue';
+import ApprovalsSummaryOptional from 'ee/vue_merge_request_widget/components/approvals/multiple_rule/approvals_summary_optional.vue';
 import ApprovalsFooter from 'ee/vue_merge_request_widget/components/approvals/multiple_rule/approvals_footer.vue';
 import {
   FETCH_LOADING,
@@ -12,6 +13,7 @@ import {
 } from 'ee/vue_merge_request_widget/components/approvals/messages';
 
 const localVue = createLocalVue();
+const TEST_HELP_PATH = 'help/path';
 const testApprovedBy = () => [1, 7, 10].map(id => ({ id }));
 const testApprovals = () => ({
   has_approval_rules: true,
@@ -64,6 +66,7 @@ describe('EE MRWidget approvals', () => {
         };
   };
   const findSummary = () => wrapper.find(ApprovalsSummary);
+  const findOptionalSummary = () => wrapper.find(ApprovalsSummaryOptional);
   const findFooter = () => wrapper.find(ApprovalsFooter);
 
   beforeEach(() => {
@@ -75,6 +78,7 @@ describe('EE MRWidget approvals', () => {
     });
     mr = {
       ...jasmine.createSpyObj('Store', ['setApprovals', 'setApprovalRules']),
+      approvalsHelpPath: TEST_HELP_PATH,
       approvals: testApprovals(),
       approvalRules: [],
       isOpen: true,
@@ -185,17 +189,39 @@ describe('EE MRWidget approvals', () => {
       });
 
       describe('and MR is approved', () => {
-        beforeEach(done => {
+        beforeEach(() => {
           mr.approvals.approved = true;
-          createComponent();
-          waitForTick(done);
         });
 
-        it('approve additionally action is rendered', () => {
-          expect(findActionData()).toEqual({
-            variant: 'primary',
-            text: 'Approve additionally',
-            inverted: true,
+        describe('with no approvers', () => {
+          beforeEach(done => {
+            mr.approvals.approved_by = [];
+            createComponent();
+            waitForTick(done);
+          });
+
+          it('approve action (with inverted) is rendered', () => {
+            expect(findActionData()).toEqual({
+              variant: 'primary',
+              text: 'Approve',
+              inverted: true,
+            });
+          });
+        });
+
+        describe('with approvers', () => {
+          beforeEach(done => {
+            mr.approvals.approved_by = [{ user: { id: 7 } }];
+            createComponent();
+            waitForTick(done);
+          });
+
+          it('approve additionally action is rendered', () => {
+            expect(findActionData()).toEqual({
+              variant: 'primary',
+              text: 'Approve additionally',
+              inverted: true,
+            });
           });
         });
       });
@@ -315,6 +341,50 @@ describe('EE MRWidget approvals', () => {
     });
   });
 
+  describe('approvals optional summary', () => {
+    describe('when no approvals required and no approvers', () => {
+      beforeEach(() => {
+        mr.approvals.approved_by = [];
+        mr.approvals.approvals_required = 0;
+        mr.approvals.user_has_approved = false;
+      });
+
+      describe('and can approve', () => {
+        beforeEach(done => {
+          mr.approvals.user_can_approve = true;
+
+          createComponent();
+          waitForTick(done);
+        });
+
+        it('is shown', () => {
+          expect(findSummary().exists()).toBe(false);
+          expect(findOptionalSummary().props()).toEqual({
+            canApprove: true,
+            helpPath: TEST_HELP_PATH,
+          });
+        });
+      });
+
+      describe('and cannot approve', () => {
+        beforeEach(done => {
+          mr.approvals.user_can_approve = false;
+
+          createComponent();
+          waitForTick(done);
+        });
+
+        it('is shown', () => {
+          expect(findSummary().exists()).toBe(false);
+          expect(findOptionalSummary().props()).toEqual({
+            canApprove: false,
+            helpPath: TEST_HELP_PATH,
+          });
+        });
+      });
+    });
+  });
+
   describe('approvals summary', () => {
     beforeEach(done => {
       createComponent();
@@ -325,6 +395,7 @@ describe('EE MRWidget approvals', () => {
       const expected = testApprovals();
       const summary = findSummary();
 
+      expect(findOptionalSummary().exists()).toBe(false);
       expect(summary.exists()).toBe(true);
       expect(summary.props()).toEqual(
         jasmine.objectContaining({

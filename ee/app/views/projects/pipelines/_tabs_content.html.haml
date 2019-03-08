@@ -16,6 +16,7 @@
     dast_head_path: dast_endpoint,
     sast_container_head_path: sast_container_endpoint,
     pipeline_id: pipeline.id,
+    source_branch: pipeline.ref,
     vulnerability_feedback_path: project_vulnerability_feedback_index_path(project),
     vulnerability_feedback_help_path: help_page_path("user/project/merge_requests/index", anchor: "interacting-with-security-reports-ultimate"),
     sast_help_path: help_page_path('user/project/merge_requests/sast'),

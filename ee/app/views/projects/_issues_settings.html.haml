@@ -2,12 +2,10 @@
   - expanded = Rails.env.test?
   %section.settings.issues-feature.no-animate#js-issue-settings{ class: [('expanded' if expanded), ('hidden' if @project.project_feature.send(:issues_access_level) == 0)] }
     .settings-header
-      %h4
-        Issue settings
-      %button.btn.js-settings-toggle
-        = expanded ? 'Collapse' : 'Expand'
-      %p
-        Customize your issue restrictions.
+      %h4.settings-title.js-settings-toggle.js-settings-toggle-trigger-only= _('Issue settings')
+      %button.btn.js-settings-toggle= expanded ? _('Collapse') : _('Expand')
+      %p= _('Customize your issue restrictions.')
+
     .settings-content
       = form_for [@project.namespace.becomes(Namespace), @project], remote: true, html: { multipart: true, class: "issue-settings-form" }, authenticity_token: true do |f|
         %input{ type: 'hidden', name: 'update_section', value: 'js-issue-settings' }

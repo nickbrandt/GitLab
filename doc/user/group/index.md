@@ -201,6 +201,10 @@ Get an overview of the vulnerabilities of all the projects in a group and its su
 
 [Learn more about the Group Security Dashboard.](security_dashboard/index.md)
 
+## Insights **[ULTIMATE]**
+
+Placeholder.
+
 ## Transfer groups to another group
 
 From 10.5 there are two different ways to transfer a group:
@@ -214,6 +218,7 @@ Please make sure to understand that:
 - You can only transfer the group to a group you manage.
 - You will need to update your local repositories to point to the new location.
 - If the parent group's visibility is lower than the group current visibility, visibility levels for subgroups and projects will be changed to match the new parent group's visibility.
+- Only explicit group membership is transferred, not the inherited membership. If this would leave the group without an owner, the transferring user is added as owner instead.
 
 ## Group settings
 

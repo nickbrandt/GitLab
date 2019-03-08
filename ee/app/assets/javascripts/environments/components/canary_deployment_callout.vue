@@ -29,8 +29,7 @@ export default {
   },
   mounted() {
     const callout = this.$refs['canary-deployment-callout'];
-
-    if (callout) new PersistentUserCallout(callout); // eslint-disable-line no-new
+    PersistentUserCallout.factory(callout);
   },
 };
 </script>

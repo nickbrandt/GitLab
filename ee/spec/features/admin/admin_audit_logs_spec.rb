@@ -83,9 +83,10 @@ describe 'Admin::AuditLogs', :js do
 
     describe 'project events' do
       let(:project_member) { create(:project_member, user: user) }
+      let(:project) { project_member.project }
 
       before do
-        AuditEventService.new(user, project_member.project, { action: :destroy })
+        AuditEventService.new(user, project, { action: :destroy })
           .for_member(project_member).security_event
 
         visit admin_audit_logs_path
@@ -101,6 +102,10 @@ describe 'Admin::AuditLogs', :js do
         find('#events-table td', match: :first)
 
         expect(page).to have_content('Removed user access')
+      end
+
+      it_behaves_like 'audit event contains custom message' do
+        let(:audit_events_url) { admin_audit_logs_path }
       end
     end
   end

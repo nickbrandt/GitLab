@@ -19,5 +19,5 @@
               = _('Select a template repository')
               = link_to icon('question-circle'), help_page_path('user/group/index.md', anchor: 'group-level-file-templates-premium'), target: '_blank'
           = project_select_tag('group[file_template_project_id]', class: 'project-item-select hidden-filter-value', toggle_class: 'js-project-search js-project-filter js-filter-submit', dropdown_class: 'dropdown-menu-selectable dropdown-menu-project js-filter-submit',
-            placeholder: _('Search projects'), idAttribute: 'id', data: { order_by: 'last_activity_at', idattribute: 'id', simple_filter: true, allow_clear: true}, value: @group.checked_file_template_project_id)
+            placeholder: _('Search projects'), idAttribute: 'id', data: { order_by: 'last_activity_at', idattribute: 'id', simple_filter: true, allow_clear: true }, value: @group.checked_file_template_project_id)
       = f.submit _('Save changes'), class: "btn btn-success"

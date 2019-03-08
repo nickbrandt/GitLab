@@ -59,7 +59,7 @@ module EE
       return if namespace.gold_plan?
       return unless show_gold_trial?(user, GOLD_TRIAL_BILLINGS)
 
-      render 'shared/gold_trial_callout', is_dismissable: !namespace.free_plan?
+      render 'shared/gold_trial_callout_content', is_dismissable: !namespace.free_plan?, callout: GOLD_TRIAL_BILLINGS
     end
 
     private

@@ -26,6 +26,11 @@ export default {
       type: String,
       required: true,
     },
+    sourceBranch: {
+      type: String,
+      required: false,
+      default: null,
+    },
     sastHeadPath: {
       type: String,
       required: false,
@@ -141,6 +146,7 @@ export default {
   created() {
     // update the store with the received props
     this.setHeadBlobPath(this.headBlobPath);
+    this.setSourceBranch(this.sourceBranch);
     this.setVulnerabilityFeedbackPath(this.vulnerabilityFeedbackPath);
     this.setVulnerabilityFeedbackHelpPath(this.vulnerabilityFeedbackHelpPath);
     this.setPipelineId(this.pipelineId);
@@ -183,6 +189,7 @@ export default {
   methods: {
     ...mapActions([
       'setHeadBlobPath',
+      'setSourceBranch',
       'setSastHeadPath',
       'setDependencyScanningHeadPath',
       'setSastContainerHeadPath',
@@ -199,6 +206,7 @@ export default {
       'dismissIssue',
       'revertDismissIssue',
       'createNewIssue',
+      'createMergeRequest',
     ]),
     summaryTextBuilder(reportType, issuesCount = 0) {
       if (issuesCount === 0) {
@@ -282,6 +290,7 @@ export default {
       :can-create-issue-permission="canCreateIssuePermission"
       :can-create-feedback-permission="canCreateFeedbackPermission"
       @createNewIssue="createNewIssue"
+      @createMergeRequest="createMergeRequest"
       @dismissIssue="dismissIssue"
       @revertDismissIssue="revertDismissIssue"
     />

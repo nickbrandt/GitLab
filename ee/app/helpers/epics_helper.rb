@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module EpicsHelper
+  include EntityDateHelper
+
   # rubocop: disable Metrics/AbcSize
   def epic_show_app_data(epic, opts)
     group = epic.group
@@ -10,7 +12,7 @@ module EpicsHelper
       epic_id: epic.id,
       created: epic.created_at,
       author: epic_author(epic, opts),
-      parent: epic_parent(epic.parent),
+      ancestors: epic_ancestors(epic.ancestors.inc_group),
       todo_exists: todo.present?,
       todo_path: group_todos_path(group),
       start_date: epic.start_date,
@@ -75,14 +77,17 @@ module EpicsHelper
     }
   end
 
-  def epic_parent(epic)
-    return unless epic
-
-    {
-      id: epic.id,
-      title: epic.title,
-      url: epic_path(epic)
-    }
+  def epic_ancestors(epics)
+    epics.map do |epic|
+      {
+        id: epic.id,
+        title: epic.title,
+        url: epic_path(epic),
+        state: epic.state,
+        human_readable_end_date: epic.end_date&.to_s(:medium),
+        human_readable_timestamp: remaining_days_in_words(epic.end_date, epic.start_date)
+      }
+    end
   end
 
   def epic_endpoint_query_params(opts)
