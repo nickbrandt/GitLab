@@ -100,19 +100,25 @@ describe 'Billing plan pages', :feature do
   end
 
   context 'users profile billing page' do
-    before do
-      allow_any_instance_of(EE::Namespace).to receive(:plan).and_return(bronze_plan)
+    let(:page_path) { profile_billings_path }
 
-      visit profile_billings_path
-    end
+    it_behaves_like 'billings gold trial callout'
 
-    include_examples 'displays all plans and correct actions'
+    context 'on bronze' do
+      before do
+        allow_any_instance_of(EE::Namespace).to receive(:plan).and_return(bronze_plan)
 
-    it 'displays plan header' do
-      page.within('.billing-plan-header') do
-        expect(page).to have_content("You are currently on the Bronze")
+        visit page_path
+      end
 
-        expect(page).to have_css('.billing-plan-logo svg')
+      include_examples 'displays all plans and correct actions'
+
+      it 'displays plan header' do
+        page.within('.billing-plan-header') do
+          expect(page).to have_content("You are currently on the Bronze")
+
+          expect(page).to have_css('.billing-plan-logo svg')
+        end
       end
     end
   end
@@ -122,26 +128,32 @@ describe 'Billing plan pages', :feature do
     let!(:group_member) { create(:group_member, :owner, group: group, user: user) }
 
     context 'top-most group' do
-      before do
-        expect_any_instance_of(EE::Group).to receive(:plan).at_least(:once).and_return(bronze_plan)
+      let(:page_path) { group_billings_path(group) }
 
-        visit group_billings_path(group)
-      end
+      it_behaves_like 'billings gold trial callout'
 
-      it 'displays plan header' do
-        page.within('.billing-plan-header') do
-          expect(page).to have_content("#{group.name} is currently on the Bronze plan")
+      context 'on bronze' do
+        before do
+          expect_any_instance_of(EE::Group).to receive(:plan).at_least(:once).and_return(bronze_plan)
 
-          expect(page).to have_css('.billing-plan-logo svg')
+          visit page_path
         end
-      end
 
-      it 'does not display the billing plans table' do
-        expect(page).not_to have_css('.billing-plans')
-      end
+        it 'displays plan header' do
+          page.within('.billing-plan-header') do
+            expect(page).to have_content("#{group.name} is currently on the Bronze plan")
 
-      it 'displays subscription table', :js do
-        expect(page).to have_selector('.js-subscription-table')
+            expect(page).to have_css('.billing-plan-logo svg')
+          end
+        end
+
+        it 'does not display the billing plans table' do
+          expect(page).not_to have_css('.billing-plans')
+        end
+
+        it 'displays subscription table', :js do
+          expect(page).to have_selector('.js-subscription-table')
+        end
       end
     end
   end
@@ -155,19 +167,24 @@ describe 'Billing plan pages', :feature do
     let!(:subgroup1_member) { create(:group_member, :owner, group: subgroup1, user: user2) }
     let(:subgroup2) { create(:group, parent: subgroup1) }
     let!(:subgroup2_member) { create(:group_member, :owner, group: subgroup2, user: user3) }
+    let(:page_path) { group_billings_path(subgroup2) }
 
-    before do
-      visit group_billings_path(subgroup2)
-    end
+    it_behaves_like 'billings gold trial callout'
 
-    it 'displays plan header' do
-      page.within('.billing-plan-header') do
-        expect(page).to have_content("#{subgroup2.full_name} is currently on the Bronze plan")
-        expect(page).to have_css('.billing-plan-logo svg')
-        expect(page.find('.btn-success')).to have_content('Manage plan')
+    context 'on bronze' do
+      before do
+        visit page_path
       end
 
-      expect(page).not_to have_css('.billing-plans')
+      it 'displays plan header' do
+        page.within('.billing-plan-header') do
+          expect(page).to have_content("#{subgroup2.full_name} is currently on the Bronze plan")
+          expect(page).to have_css('.billing-plan-logo svg')
+          expect(page.find('.btn-success')).to have_content('Manage plan')
+        end
+
+        expect(page).not_to have_css('.billing-plans')
+      end
     end
   end
 

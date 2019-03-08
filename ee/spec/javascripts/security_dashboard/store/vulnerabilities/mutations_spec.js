@@ -389,6 +389,59 @@ describe('vulnerabilities module mutations', () => {
     });
   });
 
+  describe('REQUEST_CREATE_MERGE_REQUEST', () => {
+    let state;
+
+    beforeEach(() => {
+      state = createState();
+      mutations[types.REQUEST_CREATE_MERGE_REQUEST](state);
+    });
+
+    it('should set isCreatingMergeRequest to true', () => {
+      expect(state.isCreatingMergeRequest).toBe(true);
+    });
+
+    it('should set isCreatingMergeRequest in the modal data to true', () => {
+      expect(state.modal.isCreatingMergeRequest).toBe(true);
+    });
+
+    it('should nullify the error state on the modal', () => {
+      expect(state.modal.error).toBeNull();
+    });
+  });
+
+  describe('RECEIVE_CREATE_MERGE_REQUEST_SUCCESS', () => {
+    it('should fire the visitUrl function on the merge request URL', () => {
+      const state = createState();
+      const payload = { merge_request_path: 'fakepath.html' };
+      const visitUrl = spyOnDependency(mutations, 'visitUrl');
+      mutations[types.RECEIVE_CREATE_MERGE_REQUEST_SUCCESS](state, payload);
+
+      expect(visitUrl).toHaveBeenCalledWith(payload.merge_request_path);
+    });
+  });
+
+  describe('RECEIVE_CREATE_MERGE_REQUEST_ERROR', () => {
+    let state;
+
+    beforeEach(() => {
+      state = createState();
+      mutations[types.RECEIVE_CREATE_MERGE_REQUEST_ERROR](state);
+    });
+
+    it('should set isCreatingMergeRequest to false', () => {
+      expect(state.isCreatingMergeRequest).toBe(false);
+    });
+
+    it('should set isCreatingMergeRequest in the modal data to false', () => {
+      expect(state.modal.isCreatingMergeRequest).toBe(false);
+    });
+
+    it('should set the error state on the modal', () => {
+      expect(state.modal.error).toEqual('There was an error creating the merge request');
+    });
+  });
+
   describe('REQUEST_DISMISS_VULNERABILITY', () => {
     let state;
 

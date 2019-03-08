@@ -25,4 +25,10 @@ describe GlobalPolicy do
       it { is_expected.not_to be_allowed(:read_operations_dashboard) }
     end
   end
+
+  it { is_expected.to be_disallowed(:read_licenses) }
+  it { is_expected.to be_disallowed(:destroy_licenses) }
+
+  it { expect(described_class.new(create(:admin), [user])).to be_allowed(:read_licenses) }
+  it { expect(described_class.new(create(:admin), [user])).to be_allowed(:destroy_licenses) }
 end

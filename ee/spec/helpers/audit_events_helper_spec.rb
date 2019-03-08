@@ -4,7 +4,6 @@ describe AuditEventsHelper do
   describe '#human_text' do
     let(:details) do
       {
-        remove: 'user_access',
         author_name: 'John Doe',
         target_id: 1,
         target_type: 'User',
@@ -12,8 +11,32 @@ describe AuditEventsHelper do
       }
     end
 
-    it 'ignores keys that start with start with author_, or target_' do
-      expect(human_text(details)).to eq 'Remove <strong>user access</strong>    '
+    subject { human_text(details) }
+
+    context 'when message consist of hash keys' do
+      subject { human_text({ remove: 'user_access' }.merge(details))}
+
+      it 'ignores keys that start with start with author_, or target_' do
+        expect(subject).to eq 'Remove <strong>user access</strong>    '
+      end
+    end
+
+    context 'when details contain custom message' do
+      let(:custom_message) { 'Custom message <strong>with tags</strong>' }
+
+      subject { human_text( { custom_message: custom_message }.merge(details)) }
+
+      it 'returns custom message' do
+        expect(subject).to eq(custom_message)
+      end
+
+      context 'when custom message contains "_"' do
+        let(:custom_message) { "message_with_spaces" }
+
+        it 'replace them with spaces' do
+          expect(subject).to eq("message with spaces")
+        end
+      end
     end
   end
 

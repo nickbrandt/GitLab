@@ -112,7 +112,7 @@ export default {
       return enableSquashBeforeMerge && commitsCount > 1;
     },
     isApprovalNeeded() {
-      return this.mr.approvalsRequired ? !this.mr.isApproved : false;
+      return this.mr.hasApprovalsAvailable ? !this.mr.isApproved : false;
     },
     shouldShowMergeControls() {
       return this.mr.isMergeAllowed || this.shouldShowMergeWhenPipelineSucceedsText;
@@ -333,7 +333,7 @@ export default {
         >
           <ul class="border-top content-list commits-list flex-list">
             <commit-edit
-              v-if="squashBeforeMerge"
+              v-if="squashBeforeMerge && shouldShowSquashBeforeMerge"
               v-model="squashCommitMessage"
               :label="__('Squash commit message')"
               input-id="squash-message-edit"

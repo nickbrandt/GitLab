@@ -540,6 +540,7 @@ export const parsedDependencyScanningIssuesStore = [
     urlPath: 'path/Gemfile.lock#L5',
     category: 'dependency_scanning',
     project_fingerprint: 'f55331d66fd4f3bfb4237d48e9c9fa8704bd33c6',
+    remediations: [],
     location: {
       file: 'Gemfile.lock',
       start_line: 5,
@@ -563,6 +564,7 @@ export const parsedDependencyScanningIssuesStore = [
     urlPath: 'path/Gemfile.lock',
     category: 'dependency_scanning',
     project_fingerprint: 'a6b61a2eba59071178d5899b26dd699fb880de1e',
+    remediations: [],
     location: {
       file: 'Gemfile.lock',
       start_line: undefined,
@@ -586,6 +588,7 @@ export const parsedDependencyScanningIssuesStore = [
     urlPath: 'path/Gemfile.lock',
     category: 'dependency_scanning',
     project_fingerprint: '830f85e5fb011408bab365eb809cd97a45b0aa17',
+    remediations: [],
     location: {
       file: 'Gemfile.lock',
       start_line: undefined,
@@ -612,6 +615,7 @@ export const parsedDependencyScanningIssuesHead = [
     urlPath: 'path/Gemfile.lock#L5',
     category: 'dependency_scanning',
     project_fingerprint: 'f55331d66fd4f3bfb4237d48e9c9fa8704bd33c6',
+    remediations: [],
     location: {
       file: 'Gemfile.lock',
       start_line: 5,
@@ -635,6 +639,7 @@ export const parsedDependencyScanningIssuesHead = [
     urlPath: 'path/Gemfile.lock',
     category: 'dependency_scanning',
     project_fingerprint: '830f85e5fb011408bab365eb809cd97a45b0aa17',
+    remediations: [],
     location: {
       file: 'Gemfile.lock',
       start_line: undefined,
@@ -661,6 +666,7 @@ export const parsedDependencyScanningBaseStore = [
     urlPath: 'path/Gemfile.lock',
     category: 'dependency_scanning',
     project_fingerprint: '3f5608c99f0c7442ba59bc6c0c1864d0000f8e1a',
+    remediations: [],
     location: {
       file: 'Gemfile.lock',
       start_line: undefined,

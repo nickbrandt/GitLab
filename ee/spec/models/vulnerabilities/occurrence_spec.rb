@@ -230,4 +230,81 @@ describe Vulnerabilities::Occurrence do
       is_expected.to eq({ 4 => 1, 5 => 2, 6 => 3 })
     end
   end
+
+  describe 'feedback' do
+    set(:project) { create(:project) }
+    let(:occurrence) do
+      create(
+        :vulnerabilities_occurrence,
+        report_type: :dependency_scanning,
+        project: project
+      )
+    end
+
+    describe '#issue_feedback' do
+      let(:issue) { create(:issue, project: project) }
+      let!(:issue_feedback) do
+        create(
+          :vulnerability_feedback,
+          :dependency_scanning,
+          :issue,
+          issue: issue,
+          project: project,
+          project_fingerprint: occurrence.project_fingerprint
+        )
+      end
+
+      it 'returns associated feedback' do
+        feedback = occurrence.issue_feedback
+
+        expect(feedback).to be_present
+        expect(feedback[:project_id]).to eq project.id
+        expect(feedback[:feedback_type]).to eq 'issue'
+        expect(feedback[:issue_id]).to eq issue.id
+      end
+    end
+
+    describe '#dismissal_feedback' do
+      let!(:dismissal_feedback) do
+        create(
+          :vulnerability_feedback,
+          :dependency_scanning,
+          :dismissal,
+          project: project,
+          project_fingerprint: occurrence.project_fingerprint
+        )
+      end
+
+      it 'returns associated feedback' do
+        feedback = occurrence.dismissal_feedback
+
+        expect(feedback).to be_present
+        expect(feedback[:project_id]).to eq project.id
+        expect(feedback[:feedback_type]).to eq 'dismissal'
+      end
+    end
+
+    describe '#merge_request_feedback' do
+      let(:merge_request) { create(:merge_request, source_project: project) }
+      let!(:merge_request_feedback) do
+        create(
+          :vulnerability_feedback,
+          :dependency_scanning,
+          :merge_request,
+          merge_request: merge_request,
+          project: project,
+          project_fingerprint: occurrence.project_fingerprint
+        )
+      end
+
+      it 'returns associated feedback' do
+        feedback = occurrence.merge_request_feedback
+
+        expect(feedback).to be_present
+        expect(feedback[:project_id]).to eq project.id
+        expect(feedback[:feedback_type]).to eq 'merge_request'
+        expect(feedback[:merge_request_id]).to eq merge_request.id
+      end
+    end
+  end
 end

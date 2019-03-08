@@ -4,6 +4,12 @@ module EE
       EE::Gitlab::Auth::LDAP::Sync::Proxy.new(provider, adapter)
     end
 
+    def fake_ldap_sync_proxy(provider)
+      fake_proxy = double(:proxy, adapter: ldap_adapter)
+      allow(::EE::Gitlab::Auth::LDAP::Sync::Proxy).to receive(:open).with(provider).and_yield(fake_proxy)
+      fake_proxy
+    end
+
     # Stub an LDAP group search and provide the return entry. Specify `nil` for
     # `entry` to simulate when an LDAP group is not found
     #

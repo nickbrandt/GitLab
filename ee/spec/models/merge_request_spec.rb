@@ -17,6 +17,13 @@ describe MergeRequest do
     it { is_expected.to have_many(:approved_by_users) }
   end
 
+  it_behaves_like 'an editable mentionable with EE-specific mentions' do
+    subject { create(:merge_request, :simple) }
+
+    let(:backref_text) { "merge request #{subject.to_reference}" }
+    let(:set_mentionable_text) { ->(txt) { subject.description = txt } }
+  end
+
   describe 'approval_rules' do
     context 'when project contains approval_rules' do
       let!(:project_rule1) {  project.approval_rules.create(name: 'p1') }

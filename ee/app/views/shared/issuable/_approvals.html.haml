@@ -3,7 +3,7 @@
 - form = local_assigns.fetch(:form)
 
 - return unless issuable.is_a?(MergeRequest)
-- return unless presenter.requires_approve?
+- return unless issuable.approval_feature_available?
 
 - can_update_approvers = can?(current_user, :update_approvers, issuable)
 

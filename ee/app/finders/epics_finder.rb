@@ -36,7 +36,7 @@ class EpicsFinder < IssuableFinder
   end
 
   def group
-    return nil unless params[:group_id]
+    return unless params[:group_id]
     return @group if defined?(@group)
 
     group = Group.find(params[:group_id])

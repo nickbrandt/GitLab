@@ -45,8 +45,15 @@ export const mockLabels = [
   },
 ];
 
-export const mockParentEpic = {
-  id: 1,
-  title: 'Sample Parent Epic',
-  url: '/groups/gitlab-org/-/epics/6',
-};
+export const mockAncestors = [
+  {
+    id: 1,
+    title: 'Parent epic',
+    url: '/groups/gitlab-org/-/epics/6',
+  },
+  {
+    id: 2,
+    title: 'Parent epic 2',
+    url: '/groups/gitlab-org/-/epics/7',
+  },
+];

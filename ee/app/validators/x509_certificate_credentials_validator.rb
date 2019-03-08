@@ -78,7 +78,7 @@ class X509CertificateCredentialsValidator < ActiveModel::Validator
   end
 
   def pass(record)
-    return nil unless options[:pass]
+    return unless options[:pass]
 
     record.public_send(options[:pass])
   end

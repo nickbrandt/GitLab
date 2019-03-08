@@ -76,11 +76,11 @@ module Gitlab
       end
 
       def next_table(table_name)
-        return nil if EVENT_TABLES.last == table_name
+        return if EVENT_TABLES.last == table_name
 
         index = EVENT_TABLES.index(table_name)
 
-        return nil unless index
+        return unless index
 
         EVENT_TABLES[index + 1]
       end

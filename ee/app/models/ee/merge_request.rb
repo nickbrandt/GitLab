@@ -7,6 +7,7 @@ module EE
 
     include ::Approvable
     include ::Gitlab::Utils::StrongMemoize
+    include FromUnion
     prepend ApprovableForRule
 
     prepended do
@@ -31,6 +32,12 @@ module EE
       participant :participant_approvers
 
       accepts_nested_attributes_for :approval_rules, allow_destroy: true
+    end
+
+    class_methods do
+      def select_from_union(relations)
+        from_union(relations, remove_duplicates: true)
+      end
     end
 
     override :mergeable?

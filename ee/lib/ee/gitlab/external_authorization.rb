@@ -15,8 +15,8 @@ module EE
       end
 
       def self.rejection_reason(user, label)
-        return nil unless enabled?
-        return nil unless user
+        return unless enabled?
+        return unless user
 
         access_for_user_to_label(user, label, nil).reason
       end

@@ -6,6 +6,10 @@ export default class BoardServiceEE extends BoardService {
     return axios.get(this.generateBoardsPath());
   }
 
+  recentBoards() {
+    return axios.get(this.recentBoardsEndpoint);
+  }
+
   createBoard(board) {
     const boardPayload = { ...board };
     boardPayload.label_ids = (board.labels || []).map(b => b.id);

@@ -460,6 +460,120 @@ describe('issue creation', () => {
   });
 });
 
+describe('merge request creation', () => {
+  describe('createMergeRequest', () => {
+    const vulnerability = mockDataVulnerabilities[0];
+    const data = { merge_request_path: 'fakepath.html' };
+    let mock;
+
+    beforeEach(() => {
+      mock = new MockAdapter(axios);
+    });
+
+    afterEach(() => {
+      mock.restore();
+    });
+
+    describe('on success', () => {
+      beforeEach(() => {
+        mock
+          .onPost(vulnerability.vulnerability_feedback_merge_request_path)
+          .replyOnce(200, { data });
+      });
+
+      it('should dispatch the request and success actions', done => {
+        testAction(
+          actions.createMergeRequest,
+          { vulnerability },
+          {},
+          [],
+          [
+            { type: 'requestCreateMergeRequest' },
+            {
+              type: 'receiveCreateMergeRequestSuccess',
+              payload: { data },
+            },
+          ],
+          done,
+        );
+      });
+    });
+
+    describe('on error', () => {
+      beforeEach(() => {
+        mock.onPost(vulnerability.vulnerability_feedback_merge_request_path).replyOnce(404, {});
+      });
+
+      it('should dispatch the request and error actions', done => {
+        const flashError = false;
+
+        testAction(
+          actions.createMergeRequest,
+          { vulnerability, flashError },
+          {},
+          [],
+          [
+            { type: 'requestCreateMergeRequest' },
+            { type: 'receiveCreateMergeRequestError', payload: { flashError } },
+          ],
+          done,
+        );
+      });
+    });
+  });
+
+  describe('receiveCreateMergeRequestSuccess', () => {
+    it('should commit the success mutation', done => {
+      const state = initialState;
+      const data = mockDataVulnerabilities[0];
+
+      testAction(
+        actions.receiveCreateMergeRequestSuccess,
+        { data },
+        state,
+        [
+          {
+            type: types.RECEIVE_CREATE_MERGE_REQUEST_SUCCESS,
+            payload: { data },
+          },
+        ],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('receiveCreateMergeRequestError', () => {
+    it('should commit the error mutation', done => {
+      const state = initialState;
+
+      testAction(
+        actions.receiveCreateMergeRequestError,
+        {},
+        state,
+        [{ type: types.RECEIVE_CREATE_MERGE_REQUEST_ERROR }],
+        [],
+        done,
+      );
+    });
+  });
+
+  describe('requestCreateMergeRequest', () => {
+    it('should commit the request mutation', done => {
+      const state = initialState;
+
+      testAction(
+        actions.requestCreateMergeRequest,
+        {},
+        state,
+        [{ type: types.REQUEST_CREATE_MERGE_REQUEST }],
+        [],
+        done,
+      );
+    });
+  });
+});
+
 describe('vulnerability dismissal', () => {
   describe('dismissVulnerability', () => {
     const vulnerability = mockDataVulnerabilities[0];

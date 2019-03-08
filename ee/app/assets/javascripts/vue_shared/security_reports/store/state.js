@@ -1,17 +1,12 @@
 import { s__ } from '~/locale';
 
 export default () => ({
-  summaryCounts: {
-    added: 0,
-    fixed: 0,
-    existing: 0,
-  },
-
   blobPath: {
     head: null,
     base: null,
   },
 
+  sourceBranch: null,
   vulnerabilityFeedbackPath: null,
   vulnerabilityFeedbackHelpPath: null,
   pipelineId: null,
@@ -132,6 +127,7 @@ export default () => ({
     vulnerability: {
       isDismissed: false,
       hasIssue: false,
+      hasMergeRequest: false,
     },
 
     isCreatingNewIssue: false,

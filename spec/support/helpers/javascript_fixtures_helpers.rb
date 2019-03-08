@@ -2,11 +2,12 @@ require 'action_dispatch/testing/test_request'
 require 'fileutils'
 
 module JavaScriptFixturesHelpers
+  extend ActiveSupport::Concern
   include Gitlab::Popen
 
   FIXTURE_PATHS = %w[spec/javascripts/fixtures ee/spec/javascripts/fixtures].freeze
 
-  def self.included(base)
+  included do |base|
     base.around do |example|
       # pick an arbitrary date from the past, so tests are not time dependent
       Timecop.freeze(Time.utc(2015, 7, 3, 10)) { example.run }

@@ -47,7 +47,7 @@ module EE
           lambda do |diff|
             begin
               if (diff.renamed_file || diff.new_file) && blacklisted_regex = push_rule.filename_blacklisted?(diff.new_path)
-                return nil unless blacklisted_regex.present?
+                return unless blacklisted_regex.present?
 
                 "File name #{diff.new_path} was blacklisted by the pattern #{blacklisted_regex}."
               end

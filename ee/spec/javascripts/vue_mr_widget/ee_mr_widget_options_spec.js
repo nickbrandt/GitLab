@@ -720,7 +720,7 @@ describe('ee merge request widget options', () => {
         vm = mountComponent(Component, {
           mrData: {
             ...mockData,
-            approvalsRequired: false,
+            has_approvals_available: false,
           },
         });
         vm.mr.state = 'readyToMerge';
@@ -732,7 +732,7 @@ describe('ee merge request widget options', () => {
         vm = mountComponent(Component, {
           mrData: {
             ...mockData,
-            approvalsRequired: true,
+            has_approvals_available: true,
           },
         });
         vm.mr.state = 'nothingToMerge';
@@ -744,7 +744,7 @@ describe('ee merge request widget options', () => {
         vm = mountComponent(Component, {
           mrData: {
             ...mockData,
-            approvalsRequired: true,
+            has_approvals_available: true,
           },
         });
         vm.mr.state = 'readyToMerge';

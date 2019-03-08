@@ -75,7 +75,8 @@ class License < ActiveRecord::Base
     batch_comments
     issues_analytics
     merge_pipelines
-  ].freeze
+  ]
+  EEP_FEATURES.freeze
 
   EEU_FEATURES = EEP_FEATURES + %i[
     security_dashboard
@@ -92,8 +93,10 @@ class License < ActiveRecord::Base
     prometheus_alerts
     operations_dashboard
     tracing
+    insights
     web_ide_terminal
-  ].freeze
+  ]
+  EEU_FEATURES.freeze
 
   # List all features available for early adopters,
   # i.e. users that started using GitLab.com before
@@ -188,6 +191,7 @@ class License < ActiveRecord::Base
   after_destroy :reset_current
 
   scope :previous, -> { order(created_at: :desc).offset(1) }
+  scope :recent, -> { reorder(id: :desc) }
 
   class << self
     def features_for_plan(plan)
@@ -252,7 +256,7 @@ class License < ActiveRecord::Base
   end
 
   def license
-    return nil unless self.data
+    return unless self.data
 
     @license ||=
       begin
@@ -372,6 +376,30 @@ class License < ActiveRecord::Base
     (expires_at - Date.today).to_i
   end
 
+  def overage(user_count = nil)
+    return 0 if restricted_user_count.nil?
+
+    user_count ||= current_active_users_count
+
+    [user_count - restricted_user_count, 0].max
+  end
+
+  def overage_with_historical_max
+    overage(historical_max_with_default_period)
+  end
+
+  def historical_max(from = nil, to = nil)
+    from ||= starts_at - 1.year
+    to   ||= starts_at
+
+    HistoricalData.during(from..to).maximum(:active_user_count) || 0
+  end
+
+  def historical_max_with_default_period
+    @historical_max_with_default_period ||=
+      historical_max
+  end
+
   private
 
   def restricted_attr(name, default = nil)
@@ -392,13 +420,6 @@ class License < ActiveRecord::Base
     return if license?
 
     self.errors.add(:base, "The license key is invalid. Make sure it is exactly as you received it from GitLab Inc.")
-  end
-
-  def historical_max(from = nil, to = nil)
-    from ||= starts_at - 1.year
-    to   ||= starts_at
-
-    HistoricalData.during(from..to).maximum(:active_user_count) || 0
   end
 
   def empty_historical_max?
@@ -444,12 +465,12 @@ class License < ActiveRecord::Base
   end
 
   def add_limit_error(current_period: true, user_count:)
-    overage = user_count - restricted_user_count
+    overage_count = overage(user_count)
 
     message =  [current_period ? "This GitLab installation currently has" : "During the year before this license started, this GitLab installation had"]
     message << "#{number_with_delimiter(user_count)} active #{"user".pluralize(user_count)},"
     message << "exceeding this license's limit of #{number_with_delimiter(restricted_user_count)} by"
-    message << "#{number_with_delimiter(overage)} #{"user".pluralize(overage)}."
+    message << "#{number_with_delimiter(overage_count)} #{"user".pluralize(overage_count)}."
     message << "Please upload a license for at least"
     message << "#{number_with_delimiter(user_count)} #{"user".pluralize(user_count)} or contact sales at renewals@gitlab.com"
 

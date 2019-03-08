@@ -103,7 +103,7 @@ module EE
       end
 
       def extract_epic(params)
-        return nil if params.nil?
+        return if params.nil?
 
         extract_references(params, :epic).first
       end

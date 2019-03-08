@@ -209,6 +209,55 @@ export const receiveUndoDismissError = ({ commit }, { flashError }) => {
   }
 };
 
+export const createMergeRequest = ({ dispatch }, { vulnerability, flashError }) => {
+  const {
+    report_type,
+    project_fingerprint,
+    vulnerability_feedback_merge_request_path,
+  } = vulnerability;
+
+  dispatch('requestCreateMergeRequest');
+
+  axios
+    .post(vulnerability_feedback_merge_request_path, {
+      vulnerability_feedback: {
+        feedback_type: 'merge_request',
+        category: report_type,
+        project_fingerprint,
+        vulnerability_data: {
+          ...vulnerability,
+          category: report_type,
+        },
+      },
+    })
+    .then(({ data }) => {
+      dispatch('receiveCreateMergeRequestSuccess', data);
+    })
+    .catch(() => {
+      dispatch('receiveCreateMergeRequestError', { flashError });
+    });
+};
+
+export const requestCreateMergeRequest = ({ commit }) => {
+  commit(types.REQUEST_CREATE_MERGE_REQUEST);
+};
+
+export const receiveCreateMergeRequestSuccess = ({ commit }, payload) => {
+  commit(types.RECEIVE_CREATE_MERGE_REQUEST_SUCCESS, payload);
+};
+
+export const receiveCreateMergeRequestError = ({ commit }, { flashError }) => {
+  commit(types.RECEIVE_CREATE_MERGE_REQUEST_ERROR);
+
+  if (flashError) {
+    createFlash(
+      s__('Security Reports|There was an error creating the merge request.'),
+      'alert',
+      document.querySelector('.ci-table'),
+    );
+  }
+};
+
 export const setVulnerabilitiesHistoryEndpoint = ({ commit }, endpoint) => {
   commit(types.SET_VULNERABILITIES_HISTORY_ENDPOINT, endpoint);
 };

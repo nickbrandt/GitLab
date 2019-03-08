@@ -4,11 +4,7 @@ require 'active_support/dependencies'
 
 require_dependency 'gitlab'
 
-require_dependency Gitlab.root.join('ee/spec/support/helpers/ee/stub_configuration')
-
 module StubConfiguration
-  prepend EE::StubConfiguration
-
   def stub_application_setting(messages)
     add_predicates(messages)
 
@@ -20,16 +16,6 @@ module StubConfiguration
 
     # Ensure that we don't use the Markdown cache when stubbing these values
     allow_any_instance_of(ApplicationSetting).to receive(:cached_html_up_to_date?).and_return(false)
-  end
-
-  def stub_application_setting_on_object(object, messages)
-    add_predicates(messages)
-
-    allow(Gitlab::CurrentSettings.current_application_settings)
-      .to receive_messages(messages)
-    messages.each do |setting, value|
-      allow(object).to receive_message_chain(:current_application_settings, setting) { value }
-    end
   end
 
   def stub_not_protect_default_branch
@@ -130,3 +116,5 @@ module StubConfiguration
     end
   end
 end
+
+StubConfiguration.prepend(EE::StubConfiguration)

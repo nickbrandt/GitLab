@@ -233,7 +233,7 @@ describe EE::UserCalloutsHelper do
 
       it do
         if should_render?
-          expect(helper).to receive(:render).with('shared/gold_trial_callout', is_dismissable: !free_plan?)
+          expect(helper).to receive(:render).with('shared/gold_trial_callout_content', is_dismissable: !free_plan?, callout: UserCalloutsHelper::GOLD_TRIAL_BILLINGS)
         else
           expect(helper).not_to receive(:render)
         end

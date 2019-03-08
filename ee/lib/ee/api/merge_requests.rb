@@ -14,6 +14,11 @@ module EE
               optional :approvals_required, type: Integer, desc: 'Total number of approvals required'
             end
           end
+
+          params :optional_merge_requests_search_params do
+            optional :approver_ids, types: [String, Array], array_none_any: true,
+                                    desc: 'Return merge requests which have specified the users with the given IDs as an individual approver'
+          end
         end
 
         params do

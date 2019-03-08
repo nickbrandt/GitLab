@@ -11,21 +11,25 @@ describe API::EpicLinks do
     it 'returns 403 when epics feature is disabled' do
       group.add_developer(user)
 
-      get api(url, user)
+      subject
 
       expect(response).to have_gitlab_http_status(403)
     end
 
-    it 'returns 401 unauthorized error for non authenticated user' do
-      get api(url)
+    context 'unauthenticated user' do
+      let(:user) { nil }
 
-      expect(response).to have_gitlab_http_status(401)
+      it 'returns 401 unauthorized error' do
+        subject
+
+        expect(response).to have_gitlab_http_status(401)
+      end
     end
 
     it 'returns 404 not found error for a user without permissions to see the group' do
       group.update(visibility_level: Gitlab::VisibilityLevel::PRIVATE)
 
-      get api(url, user)
+      subject
 
       expect(response).to have_gitlab_http_status(404)
     end
@@ -34,6 +38,8 @@ describe API::EpicLinks do
   describe 'GET /groups/:id/epics/:epic_iid/epics' do
     let(:url) { "/groups/#{group.path}/epics/#{epic.iid}/epics" }
 
+    subject { get api(url, user) }
+
     it_behaves_like 'user does not have access'
 
     context 'when epics feature is enabled' do
@@ -41,24 +47,26 @@ describe API::EpicLinks do
         stub_licensed_features(epics: true)
       end
 
-      let!(:child_epic1) { create(:epic, group: group, parent: epic) }
-      let!(:child_epic2) { create(:epic, group: group, parent: epic) }
+      let!(:child_epic1) { create(:epic, group: group, parent: epic, relative_position: 200) }
+      let!(:child_epic2) { create(:epic, group: group, parent: epic, relative_position: 100) }
 
       it 'returns 200 status' do
-        get api(url, user)
+        subject
 
         epics = JSON.parse(response.body)
 
         expect(response).to have_gitlab_http_status(200)
         expect(response).to match_response_schema('public_api/v4/epics', dir: 'ee')
-        expect(epics.map { |epic| epic["id"] }).to match_array([child_epic1.id, child_epic2.id])
+        expect(epics.map { |epic| epic["id"] }).to eq([child_epic2.id, child_epic1.id])
       end
     end
   end
 
   describe 'POST /groups/:id/epics/:epic_iid/epics' do
     let(:child_epic) { create(:epic, group: group) }
-    let(:url) { "/groups/#{group.path}/epics/#{epic.iid}/epics" }
+    let(:url) { "/groups/#{group.path}/epics/#{epic.iid}/epics/#{child_epic.id}" }
+
+    subject { post api(url, user) }
 
     it_behaves_like 'user does not have access'
 
@@ -71,7 +79,7 @@ describe API::EpicLinks do
         it 'returns 403' do
           group.add_guest(user)
 
-          post api("#{url}/#{child_epic.id}", user)
+          subject
 
           expect(response).to have_gitlab_http_status(403)
         end
@@ -81,7 +89,7 @@ describe API::EpicLinks do
         it 'returns 201 status' do
           group.add_developer(user)
 
-          post api("#{url}/#{child_epic.id}", user)
+          subject
 
           expect(response).to have_gitlab_http_status(201)
           expect(response).to match_response_schema('public_api/v4/epic', dir: 'ee')
@@ -96,7 +104,7 @@ describe API::EpicLinks do
         it 'returns 404 status' do
           group.add_developer(user)
 
-          post api(url, user), params: { child_epic_id: child_epic.id }
+          subject
 
           expect(response).to have_gitlab_http_status(404)
         end
@@ -104,9 +112,53 @@ describe API::EpicLinks do
     end
   end
 
+  describe 'PUT /groups/:id/epics/:epic_iid/epics/:child_epic_id' do
+    let!(:child_epic) { create(:epic, group: group, parent: epic, relative_position: 100) }
+    let!(:sibling_1) { create(:epic, group: group, parent: epic, relative_position: 200) }
+    let!(:sibling_2) { create(:epic, group: group, parent: epic, relative_position: 300) }
+
+    let(:url) { "/groups/#{group.path}/epics/#{epic.iid}/epics/#{child_epic.id}" }
+
+    subject { put api(url, user), params: { move_before_id: sibling_1.id, move_after_id: sibling_2.id } }
+
+    it_behaves_like 'user does not have access'
+
+    context 'when epics are enabled' do
+      before do
+        stub_licensed_features(epics: true)
+      end
+
+      context 'when user has permissions to reorder epics' do
+        before do
+          group.add_developer(user)
+        end
+
+        it 'returns status 200' do
+          subject
+
+          expect(response).to have_gitlab_http_status(200)
+          expect(response).to match_response_schema('public_api/v4/epics', dir: 'ee')
+          expect(json_response.map { |epic| epic['id'] }).to eq([sibling_1.id, child_epic.id, sibling_2.id])
+        end
+      end
+
+      context 'when user does not have permissions to reorder epics' do
+        it 'returns status 403' do
+          group.add_guest(user)
+
+          subject
+
+          expect(response).to have_gitlab_http_status(403)
+        end
+      end
+    end
+  end
+
   describe 'DELETE /groups/:id/epics/:epic_iid/epics' do
     let!(:child_epic) { create(:epic, group: group, parent: epic)}
-    let(:url) { "/groups/#{group.path}/epics/#{epic.iid}/epics" }
+    let(:url) { "/groups/#{group.path}/epics/#{epic.iid}/epics/#{child_epic.id}" }
+
+    subject { delete api(url, user) }
 
     it_behaves_like 'user does not have access'
 
@@ -119,7 +171,7 @@ describe API::EpicLinks do
         it 'returns 403' do
           group.add_guest(user)
 
-          delete api("#{url}/#{child_epic.id}", user)
+          subject
 
           expect(response).to have_gitlab_http_status(403)
         end
@@ -129,7 +181,7 @@ describe API::EpicLinks do
         it 'returns 200 status' do
           group.add_developer(user)
 
-          delete api("#{url}/#{child_epic.id}", user)
+          subject
 
           expect(response).to have_gitlab_http_status(200)
           expect(response).to match_response_schema('public_api/v4/epic', dir: 'ee')
