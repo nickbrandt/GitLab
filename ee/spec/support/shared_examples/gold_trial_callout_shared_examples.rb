@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-shared_examples 'gold trial callout' do
+shared_examples 'dashboard gold trial callout' do
   before do
     sign_in(user)
   end
