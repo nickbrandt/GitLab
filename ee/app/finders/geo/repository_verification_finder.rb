@@ -65,7 +65,7 @@ module Geo
     end
 
     def count_verified_wikis
-      Project.verified_wikis.count
+      ProjectRepositoryState.verified_wikis.count
     end
 
     def count_verification_failed_repositories
