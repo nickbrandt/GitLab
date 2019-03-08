@@ -61,7 +61,7 @@ module Geo
     end
 
     def count_verified_repositories
-      Project.verified_repos.count
+      ProjectRepositoryState.verified_repos.count
     end
 
     def count_verified_wikis

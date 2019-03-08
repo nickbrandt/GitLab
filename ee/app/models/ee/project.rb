@@ -88,7 +88,6 @@ module EE
 
       scope :with_wiki_enabled,   -> { with_feature_enabled(:wiki) }
 
-      scope :verified_repos, -> { joins(:repository_state).merge(ProjectRepositoryState.verified_repos) }
       scope :verified_wikis, -> { joins(:repository_state).merge(ProjectRepositoryState.verified_wikis) }
       scope :verification_failed_repos, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_repos) }
       scope :verification_failed_wikis, -> { joins(:repository_state).merge(ProjectRepositoryState.verification_failed_wikis) }
