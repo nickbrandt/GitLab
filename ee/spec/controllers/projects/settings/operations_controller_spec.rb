@@ -10,19 +10,17 @@ describe Projects::Settings::OperationsController do
   end
 
   describe 'GET show' do
-    shared_examples 'user without read access' do |project_visibility|
+    shared_examples 'user without read access' do |project_visibility, project_role|
       let(:project) { create(:project, project_visibility) }
 
-      %w[guest reporter developer].each do |role|
-        before do
-          project.public_send("add_#{role}", user)
-        end
+      before do
+        project.add_role(user, project_role)
+      end
 
-        it 'returns 404' do
-          get :show, params: project_params(project)
+      it 'returns 404' do
+        get :show, params: project_params(project)
 
-          expect(response).to have_gitlab_http_status(:not_found)
-        end
+        expect(response).to have_gitlab_http_status(:not_found)
       end
     end
 
@@ -53,7 +51,7 @@ describe Projects::Settings::OperationsController do
 
     context 'with a license' do
       before do
-        stub_licensed_features(tracing: true)
+        stub_licensed_features(tracing: true, incident_management: true)
       end
 
       context 'with maintainer role' do
@@ -63,9 +61,11 @@ describe Projects::Settings::OperationsController do
       end
 
       context 'without maintainer role' do
-        it_behaves_like 'user without read access', :public
-        it_behaves_like 'user without read access', :private
-        it_behaves_like 'user without read access', :internal
+        %w[guest reporter developer].each do |role|
+          it_behaves_like 'user without read access', :public, role
+          it_behaves_like 'user without read access', :private, role
+          it_behaves_like 'user without read access', :internal, role
+        end
       end
 
       context 'when user not logged in' do
@@ -73,7 +73,7 @@ describe Projects::Settings::OperationsController do
           sign_out(user)
         end
 
-        it_behaves_like 'user without read access', :public
+        it_behaves_like 'user without read access', :public, :maintainer
 
         it_behaves_like 'user needs to login', :private
         it_behaves_like 'user needs to login', :internal
@@ -82,12 +82,12 @@ describe Projects::Settings::OperationsController do
 
     context 'without license' do
       before do
-        stub_licensed_features(tracing: false)
+        stub_licensed_features(tracing: false, incident_management: false)
       end
 
-      it_behaves_like 'user without read access', :public
-      it_behaves_like 'user without read access', :private
-      it_behaves_like 'user without read access', :internal
+      it_behaves_like 'user with read access', :public
+      it_behaves_like 'user with read access', :private
+      it_behaves_like 'user with read access', :internal
     end
   end
 
@@ -96,24 +96,74 @@ describe Projects::Settings::OperationsController do
     let(:private_project) { create(:project, :private) }
     let(:internal_project) { create(:project, :internal) }
 
+    let(:incident_management_settings) do
+      {
+        create_issue: true,
+        send_email: true,
+        issue_template_key: 'some-key'
+      }
+    end
+
     before do
       public_project.add_maintainer(user)
       private_project.add_maintainer(user)
       internal_project.add_maintainer(user)
     end
 
-    shared_examples 'user without write access' do |project_visibility|
+    shared_examples 'user without write access' do |project_visibility, project_role|
       let(:project) { create(:project, project_visibility) }
 
-      %w[guest reporter developer].each do |role|
-        before do
-          project.public_send("add_#{role}", user)
+      before do
+        project.add_role(user, project_role)
+      end
+
+      it 'does not create tracing_setting' do
+        update_project(
+          project,
+          tracing_params: { external_url: 'https://gitlab.com' }
+        )
+
+        expect(project.tracing_setting).to be_nil
+      end
+
+      it 'does not create incident_management_setting' do
+        update_project(
+          project,
+          incident_management_params: incident_management_settings
+        )
+
+        expect(project.incident_management_setting).to be_nil
+      end
+
+      context 'with existing incident_management_setting' do
+        let(:new_incident_management_settings) do
+          {
+            create_issue: false,
+            send_email: false,
+            issue_template_key: 'some-other-template'
+          }
         end
 
-        it 'does not update tracing external_url' do
-          update_project(project, external_url: 'https://gitlab.com')
+        let!(:incident_management_setting) do
+          create(:project_incident_management_setting,
+            project: project,
+            **incident_management_settings)
+        end
 
-          expect(project.tracing_setting).to be_nil
+        it 'does not update incident_management_setting' do
+          update_project(project,
+            incident_management_params: new_incident_management_settings)
+
+          setting = project.incident_management_setting
+          expect(setting.create_issue).to(
+            eq(incident_management_settings[:create_issue])
+          )
+          expect(setting.send_email).to(
+            eq(incident_management_settings[:send_email])
+          )
+          expect(setting.issue_template_key).to(
+            eq(incident_management_settings[:issue_template_key])
+          )
         end
       end
     end
@@ -134,7 +184,7 @@ describe Projects::Settings::OperationsController do
         end
 
         it 'shows a notice' do
-          update_project(project, { external_url: 'http://gitlab.com' })
+          update_project(project, tracing_params: { external_url: 'http://gitlab.com' })
 
           expect(response).to redirect_to(project_settings_operations_url(project))
           expect(flash[:notice]).to eq _('Your changes have been saved')
@@ -147,7 +197,7 @@ describe Projects::Settings::OperationsController do
         end
 
         it 'renders show page' do
-          update_project(project, { external_url: 'http://gitlab.com' })
+          update_project(project, tracing_params: { external_url: 'http://gitlab.com' })
 
           expect(response).to have_gitlab_http_status(:ok)
           expect(response).to render_template(:show)
@@ -157,33 +207,77 @@ describe Projects::Settings::OperationsController do
 
     context 'with a license' do
       before do
-        stub_licensed_features(tracing: true)
+        stub_licensed_features(tracing: true, incident_management: true)
       end
 
-      shared_examples 'user with write access' do |project_visibility, value_to_set, value_to_check|
+      shared_examples 'user with write access' do |project_visibility|
         let(:project) { create(:project, project_visibility) }
+        let(:tracing_url) { 'https://gitlab.com' }
 
         before do
           project.add_maintainer(user)
         end
 
-        it 'updates tracing external_url' do
-          update_project(project, external_url: value_to_set)
+        it 'creates tracing setting' do
+          update_project(
+            project,
+            tracing_params: { external_url: tracing_url }
+          )
 
-          expect(project.tracing_setting.external_url).to eq(value_to_check)
+          expect(project.tracing_setting.external_url).to eq(tracing_url)
+        end
+
+        it 'creates incident management settings' do
+          update_project(
+            project,
+            incident_management_params: incident_management_settings
+          )
+
+          expect(project.incident_management_setting.create_issue).to(
+            eq(incident_management_settings.dig(:create_issue))
+          )
+          expect(project.incident_management_setting.send_email).to(
+            eq(incident_management_settings.dig(:send_email))
+          )
+          expect(project.incident_management_setting.issue_template_key).to(
+            eq(incident_management_settings.dig(:issue_template_key))
+          )
+        end
+
+        it 'creates tracing and incident management settings' do
+          update_project(
+            project,
+            tracing_params: { external_url: tracing_url },
+            incident_management_params: incident_management_settings
+          )
+
+          expect(project.tracing_setting.external_url).to eq(tracing_url)
+          expect(project.incident_management_setting.create_issue).to(
+            eq(incident_management_settings.dig(:create_issue))
+          )
+          expect(project.incident_management_setting.send_email).to(
+            eq(incident_management_settings.dig(:send_email))
+          )
+          expect(project.incident_management_setting.issue_template_key).to(
+            eq(incident_management_settings.dig(:issue_template_key))
+          )
         end
       end
 
       context 'with maintainer role' do
-        it_behaves_like 'user with write access', :public, 'https://gitlab.com', 'https://gitlab.com'
-        it_behaves_like 'user with write access', :private, 'https://gitlab.com', 'https://gitlab.com'
-        it_behaves_like 'user with write access', :internal, 'https://gitlab.com', 'https://gitlab.com'
+        it_behaves_like 'user with write access', :public
+        it_behaves_like 'user with write access', :private
+        it_behaves_like 'user with write access', :internal
       end
 
       context 'with non maintainer roles' do
-        it_behaves_like 'user without write access', :public
-        it_behaves_like 'user without write access', :private
-        it_behaves_like 'user without write access', :internal
+        %w[guest reporter developer].each do |role|
+          context "with #{role} role" do
+            it_behaves_like 'user without write access', :public, role
+            it_behaves_like 'user without write access', :private, role
+            it_behaves_like 'user without write access', :internal, role
+          end
+        end
       end
 
       context 'with anonymous user' do
@@ -191,9 +285,9 @@ describe Projects::Settings::OperationsController do
           sign_out(user)
         end
 
-        it_behaves_like 'user without write access', :public
-        it_behaves_like 'user without write access', :private
-        it_behaves_like 'user without write access', :internal
+        it_behaves_like 'user without write access', :public, :maintainer
+        it_behaves_like 'user without write access', :private, :maintainer
+        it_behaves_like 'user without write access', :internal, :maintainer
       end
 
       context 'with existing tracing_setting' do
@@ -205,26 +299,26 @@ describe Projects::Settings::OperationsController do
         end
 
         it 'unsets external_url with nil' do
-          update_project(project, external_url: nil)
+          update_project(project, tracing_params: { external_url: nil })
 
           expect(project.tracing_setting).to be_nil
         end
 
         it 'unsets external_url with empty string' do
-          update_project(project, external_url: '')
+          update_project(project, tracing_params: { external_url: '' })
 
           expect(project.tracing_setting).to be_nil
         end
 
         it 'fails validation with invalid url' do
           expect do
-            update_project(project, external_url: "invalid")
+            update_project(project, tracing_params: { external_url: "invalid" })
           end.not_to change(project.tracing_setting, :external_url)
         end
 
         it 'does not set external_url if not present in params' do
           expect do
-            update_project(project, some_param: 'some_value')
+            update_project(project, tracing_params: { some_param: 'some_value' })
           end.not_to change(project.tracing_setting, :external_url)
         end
       end
@@ -237,33 +331,85 @@ describe Projects::Settings::OperationsController do
         end
 
         it 'fails validation with invalid url' do
-          update_project(project, external_url: "invalid")
+          update_project(project, tracing_params: { external_url: "invalid" })
 
           expect(project.tracing_setting).to be_nil
         end
 
         it 'does not set external_url if not present in params' do
-          update_project(project, some_param: 'some_value')
+          update_project(project, tracing_params: { some_param: 'some_value' })
 
           expect(project.tracing_setting).to be_nil
+        end
+      end
+
+      context 'with existing incident management setting' do
+        let(:project) { create(:project) }
+
+        let(:new_incident_management_settings) do
+          {
+            create_issue: false,
+            send_email: false,
+            issue_template_key: 'some-other-template'
+          }
+        end
+
+        let!(:incident_management_setting) do
+          create(:project_incident_management_setting,
+            project: project,
+            **incident_management_settings)
+        end
+
+        before do
+          project.add_maintainer(user)
+        end
+
+        it 'updates incident management setting' do
+          update_project(project,
+            incident_management_params: new_incident_management_settings)
+
+          setting = project.incident_management_setting
+          expect(setting.create_issue).to(
+            eq(new_incident_management_settings[:create_issue])
+          )
+          expect(setting.send_email).to(
+            eq(new_incident_management_settings[:send_email])
+          )
+          expect(setting.issue_template_key).to(
+            eq(new_incident_management_settings[:issue_template_key])
+          )
         end
       end
     end
 
     context 'without a license' do
       before do
-        stub_licensed_features(tracing: false)
+        stub_licensed_features(tracing: false, incident_management: false)
       end
 
-      it_behaves_like 'user without write access', :public
-      it_behaves_like 'user without write access', :private
-      it_behaves_like 'user without write access', :internal
+      it_behaves_like 'user without write access', :public, :maintainer
+      it_behaves_like 'user without write access', :private, :maintainer
+      it_behaves_like 'user without write access', :internal, :maintainer
+    end
+
+    context 'with incident_management feature flag disabled' do
+      before do
+        stub_feature_flags(incident_management: false)
+      end
+
+      it_behaves_like 'user without write access', :public, :maintainer
+      it_behaves_like 'user without write access', :private, :maintainer
+      it_behaves_like 'user without write access', :internal, :maintainer
     end
 
     private
 
-    def update_project(project, params)
-      patch :update, params: project_params(project, params)
+    def update_project(project, tracing_params: nil, incident_management_params: nil)
+      patch :update, params: project_params(
+        project,
+        tracing_params: tracing_params,
+        incident_management_params: incident_management_params
+      )
 
       project.reload
     end
@@ -372,12 +518,13 @@ describe Projects::Settings::OperationsController do
 
   private
 
-  def project_params(project, params = {})
+  def project_params(project, tracing_params: nil, incident_management_params: nil)
     {
       namespace_id: project.namespace,
       project_id: project,
       project: {
-        tracing_setting_attributes: params
+        tracing_setting_attributes: tracing_params,
+        incident_management_setting_attributes: incident_management_params
       }
     }
   end
