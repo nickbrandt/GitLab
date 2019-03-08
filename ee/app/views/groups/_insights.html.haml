@@ -1,4 +1,4 @@
-- return unless Feature.enabled?(:group_insights) && @group.feature_available?(:insights)
+- return unless @group.insights_available?
 
 %section.settings.gs-advanced.no-animate#js-templates{ class: ('expanded' if expanded) }
   .settings-header

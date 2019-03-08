@@ -15,7 +15,7 @@ module EE
         :membership_lock,
         :repository_size_limit
       ].tap do |params_ee|
-        params_ee << { insight_attributes: :project_id } if ::Feature.enabled?(:group_insights) && current_group&.feature_available?(:insights)
+        params_ee << { insight_attributes: :project_id } if current_group&.insights_available?
         params_ee << :project_creation_level if current_group&.feature_available?(:project_creation_level)
         params_ee << :file_template_project_id if current_group&.feature_available?(:custom_file_templates_for_namespace)
         params_ee << :custom_project_templates_group_id if License.feature_available?(:custom_project_templates)

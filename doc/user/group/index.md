@@ -203,7 +203,7 @@ Get an overview of the vulnerabilities of all the projects in a group and its su
 
 ## Insights **[ULTIMATE]**
 
-Placeholder.
+> Introduced in [GitLab Ultimate][ee] 11.9 behind the `insights` feature flag.
 
 ## Transfer groups to another group
 

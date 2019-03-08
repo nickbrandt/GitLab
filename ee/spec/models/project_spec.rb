@@ -1718,6 +1718,12 @@ describe Project do
     end
   end
 
+  describe '#insights_available?' do
+    it_behaves_like 'an entity with the Insights feature' do
+      let(:entity) { create(:project) }
+    end
+  end
+
   # Despite stubbing the current node as the primary or secondary, the
   # behaviour for EE::Project#lfs_http_url_to_repo() is to call
   # Project#lfs_http_url_to_repo() which does not have a Geo context.
