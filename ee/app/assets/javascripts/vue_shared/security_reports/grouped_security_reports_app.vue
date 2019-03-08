@@ -273,7 +273,6 @@ export default {
           v-if="dependencyScanning.newIssues.length || dependencyScanning.resolvedIssues.length"
           :unresolved-issues="dependencyScanning.newIssues"
           :resolved-issues="dependencyScanning.resolvedIssues"
-          :all-issues="dependencyScanning.allIssues"
           :component="$options.componentNames.SastIssueBody"
           class="js-dss-issue-list report-block-group-list"
         />
