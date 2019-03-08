@@ -1,0 +1,5 @@
+---
+title: 'Geo: Optimize repository and wiki verification counts'
+merge_request: 9939
+author:
+type: performance
