@@ -1,5 +1,7 @@
 # SAML OmniAuth Provider
 
+> This topic is for SAML on self-managed GitLab instances. For SAML on GitLab.com, see [SAML SSO for GitLab.com Groups](../user/group/saml_sso/index.md).
+
 NOTE: **Note:**
 You need to [enable OmniAuth](omniauth.md) in order to use this.
 
