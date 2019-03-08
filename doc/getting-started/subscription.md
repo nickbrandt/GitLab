@@ -1,4 +1,4 @@
-# Welcome to GitLab!
+# Getting Started with Subscriptions
 
 Thank you for your interest and purchasing a subscription for GitLab.
 
@@ -30,7 +30,7 @@ Please note that this account may have the same email, but is a _separate_ login
 
 ### Change Billing Information
 
-In the customers portal, go to the `My Account` page, then revise the `Account Details` information and click on the `Update Account` button. 
+In the customers portal, go to the `My Account` page, then revise the `Account Details` information and click on the `Update Account` button.
 
 Future purchases will use the information in this section. The email listed in this section is used for the Customers Portal login and for license related email communication.
 
@@ -54,19 +54,11 @@ To change which GitLab.com account is associated with a Customers Portal account
 
 ### Types of Subscription
 
-Please take a look at the [Subscribe to GitLab](https://docs.gitlab.com/ee/README.html#subscribe-to-gitlab) information for the types of subscriptions.
-
-*NOTE:* Let's put the below information in the [subscribe to GitLab.com](https://docs.gitlab.com/ee/README.html#gitlabcom) section and use the above text for this doc.
-
-GitLab.com allows you to apply your subscription to a group or your personal user.
-
-When applied to a **group**, the group, all subgroups, and all projects under the selected group on GitLab.com will have the features of the associated plan. It is recommended to go with a group plan when managing projects and users of an organization.
-
-When associated with a** personal userspace** instead, all projects will have features with the subscription applied, but as it is not a group, group features will not be available.
+Please take a look at the [Subscribe to GitLab](../README.md#subscribe-to-gitlab) information for the types of subscriptions.
 
 ### Self-Managed: Apply Your License File
 
-After purchase, the license file is sent to the email address tied to the Customers portal account, which needs to be [uploaded to the GitLab instance](https://docs.gitlab.com/ee/user/admin_area/license.html#uploading-your-license).
+After purchase, the license file is sent to the email address tied to the Customers portal account, which needs to be [uploaded to the GitLab instance](../user/admin_area/license.md#uploading-your-license).
 
 ### GitLab.com: Associate Your Namespace with Your Subscription
 
@@ -76,7 +68,7 @@ Please note that you need to be a group owner to associate a group to your subsc
 
 ## Need Help?
 
-[GitLab docs](http://docs.gitlab.com) offers a wide range of topics covering the use of GitLab.com along with tutorials, FAQs and guides.
+[GitLab docs](../) offers a wide range of topics covering the use of GitLab.com along with tutorials, FAQs and guides.
 
 We also encourage all users to search our project trackers for known issues and existing feature requests in:
 
