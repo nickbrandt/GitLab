@@ -16,7 +16,9 @@ Starting with GitLab 11.4, Gitaly is a replacement for NFS except
 when the [Elastic Search indexer](https://gitlab.com/gitlab-org/gitlab-elasticsearch-indexer)
 is used.
 
-NOTE **Note:** Gitaly network traffic is unencrypted so we recommend a firewall to
+NOTE: **Note:** While Gitaly can be used as a replacement for NFS, we do not recommend using EFS as it may impact GitLab's performance. Please review the [relevant documentation](nfs.md#avoid-using-awss-elastic-file-system-efs) for more details.
+
+NOTE: **Note:** Gitaly network traffic is unencrypted so we recommend a firewall to
 restrict access to your Gitaly server.
 
 The steps below are the minimum necessary to configure a Gitaly server with
