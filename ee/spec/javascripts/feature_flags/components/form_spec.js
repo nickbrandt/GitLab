@@ -1,7 +1,9 @@
+import _ from 'underscore';
 import { createLocalVue, mount } from '@vue/test-utils';
 import Form from 'ee/feature_flags/components/form.vue';
 import ToggleButton from '~/vue_shared/components/toggle_button.vue';
 import EnvironmentsDropdown from 'ee/feature_flags/components/environments_dropdown.vue';
+import { internalKeyID } from 'ee/feature_flags/store/modules/helpers';
 
 describe('feature flag form', () => {
   let wrapper;
@@ -64,7 +66,10 @@ describe('feature flag form', () => {
           it('should add a new scope with the text value empty and the status', () => {
             wrapper.find(ToggleButton).vm.$emit('change', true);
 
-            expect(wrapper.vm.formScopes).toEqual([{ active: true, environment_scope: '' }]);
+            expect(wrapper.vm.formScopes.length).toEqual(1);
+            expect(wrapper.vm.formScopes[0].active).toEqual(true);
+            expect(wrapper.vm.formScopes[0].environment_scope).toEqual('');
+
             expect(wrapper.vm.newScope).toEqual('');
           });
         });
@@ -83,6 +88,11 @@ describe('feature flag form', () => {
             environment_scope: 'production',
             active: false,
             id: 2,
+          },
+          {
+            environment_scope: 'review',
+            active: true,
+            id: 4,
           },
         ],
       });
@@ -104,6 +114,7 @@ describe('feature flag form', () => {
 
             expect(wrapper.vm.formScopes).toEqual([
               { active: true, environment_scope: 'production', id: 2 },
+              { active: true, environment_scope: 'review', id: 4 },
             ]);
 
             expect(wrapper.vm.newScope).toEqual('');
@@ -124,11 +135,14 @@ describe('feature flag form', () => {
               _destroy: true,
               id: 2,
             },
+            { active: true, environment_scope: 'review', id: 4 },
           ]);
         });
 
         it('should not render deleted scopes', () => {
-          expect(wrapper.vm.filteredScopes).toEqual([]);
+          expect(wrapper.vm.filteredScopes).toEqual([
+            { active: true, environment_scope: 'review', id: 4 },
+          ]);
         });
       });
 
@@ -142,6 +156,7 @@ describe('feature flag form', () => {
               {
                 environment_scope: 'new_scope',
                 active: false,
+                id: _.uniqueId(internalKeyID),
               },
             ],
           });
@@ -203,26 +218,15 @@ describe('feature flag form', () => {
 
         wrapper.vm.handleSubmit();
 
-        expect(wrapper.emitted().handleSubmit[0]).toEqual([
-          {
-            name: 'feature_flag_2',
-            description: 'this is a feature flag',
-            scopes: [
-              {
-                environment_scope: 'production',
-                active: false,
-              },
-              {
-                environment_scope: 'review',
-                active: false,
-              },
-              {
-                environment_scope: '',
-                active: true,
-              },
-            ],
-          },
-        ]);
+        const data = wrapper.emitted().handleSubmit[0][0];
+
+        expect(data.name).toEqual('feature_flag_2');
+        expect(data.description).toEqual('this is a feature flag');
+        expect(data.scopes.length).toEqual(3);
+        expect(data.scopes[0]).toEqual({
+          active: false,
+          environment_scope: 'production',
+        });
       });
     });
   });
