@@ -116,13 +116,13 @@ module.exports = function(config) {
       'spec/javascripts/**/*.js': ['webpack', 'sourcemap'],
       'ee/spec/javascripts/**/*.js': ['webpack', 'sourcemap'],
     },
-    reporters: ['progress'],
+    reporters: ['mocha'],
     webpack: webpackConfig,
     webpackMiddleware: { stats: 'errors-only' },
   };
 
   if (process.env.CI) {
-    karmaConfig.reporters = ['mocha', 'junit'];
+    karmaConfig.reporters.push('junit');
     karmaConfig.junitReporter = {
       outputFile: 'junit_karma.xml',
       useBrowserName: false,
