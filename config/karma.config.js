@@ -27,7 +27,7 @@ webpackConfig.devtool = 'cheap-inline-source-map';
 webpackConfig.plugins.push(
   new webpack.DefinePlugin({
     'process.env.BABEL_ENV': JSON.stringify(process.env.BABEL_ENV || process.env.NODE_ENV || null),
-  })
+  }),
 );
 
 const specFilters = argumentsParser
@@ -38,7 +38,7 @@ const specFilters = argumentsParser
       memo.push(filter, filter.replace(/\/?$/, '/**/*.js'));
       return memo;
     },
-    []
+    [],
   )
   .parse(process.argv).filterSpec;
 
@@ -50,7 +50,7 @@ const createContext = (specFiles, regex, suffix) => {
   }, {});
 
   webpackConfig.plugins.push(
-    new webpack.ContextReplacementPlugin(regex, path.join(ROOT_PATH, suffix), newContext)
+    new webpack.ContextReplacementPlugin(regex, path.join(ROOT_PATH, suffix), newContext),
   );
 };
 
@@ -62,7 +62,7 @@ if (specFilters.length) {
         root: ROOT_PATH,
         matchBase: true,
       })
-      .filter(path => path.endsWith('spec.js'))
+      .filter(path => path.endsWith('spec.js')),
   );
 
   // flatten
