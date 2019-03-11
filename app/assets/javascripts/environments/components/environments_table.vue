@@ -4,62 +4,29 @@
  */
 import { GlLoadingIcon } from '@gitlab/ui';
 import _ from 'underscore';
-import environmentItem from './environment_item.vue'; // eslint-disable-line import/order
-
-// ee-only start
-import deployBoard from 'ee/environments/components/deploy_board_component.vue';
-import CanaryDeploymentCallout from 'ee/environments/components/canary_deployment_callout.vue';
-// ee-only end
+import environmentTableMixin from 'ee_else_ce/environments/mixins/environments_table_mixin';
+import EnvironmentItem from './environment_item.vue';
 
 export default {
   components: {
-    environmentItem,
-    deployBoard,
+    EnvironmentItem,
     GlLoadingIcon,
-    // ee-only start
-    CanaryDeploymentCallout,
-    // ee-only end
+    DeployBoard: () => import('ee_component/environments/components/deploy_board_component.vue'),
+    CanaryDeploymentCallout: () =>
+      import('ee_component/environments/components/canary_deployment_callout.vue'),
   },
-
+  mixins: [environmentTableMixin],
   props: {
     environments: {
       type: Array,
       required: true,
       default: () => [],
     },
-
     canReadEnvironment: {
       type: Boolean,
       required: false,
       default: false,
     },
-
-    // ee-only start
-    canaryDeploymentFeatureId: {
-      type: String,
-      required: true,
-    },
-
-    showCanaryDeploymentCallout: {
-      type: Boolean,
-      required: true,
-    },
-
-    userCalloutsPath: {
-      type: String,
-      required: true,
-    },
-
-    lockPromotionSvgPath: {
-      type: String,
-      required: true,
-    },
-
-    helpCanaryDeploymentsPath: {
-      type: String,
-      required: true,
-    },
-    // ee-only end
   },
   computed: {
     sortedEnvironments() {
@@ -101,11 +68,6 @@ export default {
         .sortBy(env => (env.isFolder ? -1 : 1))
         .value();
     },
-    // ee-only start
-    shouldShowCanaryCallout(env) {
-      return env.showCanaryCallout && this.showCanaryDeploymentCallout;
-    },
-    // ee-only end
   },
 };
 </script>
@@ -137,7 +99,7 @@ export default {
       />
 
       <div
-        v-if="model.hasDeployBoard && model.isDeployBoardVisible"
+        v-if="shouldRenderDeployBoard(model)"
         :key="`deploy-board-row-${i}`"
         class="js-deploy-board-row"
       >
@@ -167,9 +129,9 @@ export default {
 
           <div :key="`sub-div-${i}`">
             <div class="text-center prepend-top-10">
-              <a :href="folderUrl(model)" class="btn btn-default">{{
-                s__('Environments|Show all')
-              }}</a>
+              <a :href="folderUrl(model)" class="btn btn-default">
+                {{ s__('Environments|Show all') }}
+              </a>
             </div>
           </div>
         </template>

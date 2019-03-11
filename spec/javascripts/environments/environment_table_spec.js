@@ -5,21 +5,17 @@ import mountComponent from 'spec/helpers/vue_mount_component_helper';
 describe('Environment table', () => {
   let Component;
   let vm;
-  // ee-only start
-  let eeOnlyProps;
-  // ee-only end
+
+  const eeOnlyProps = {
+    canaryDeploymentFeatureId: 'canary_deployment',
+    showCanaryDeploymentCallout: true,
+    userCalloutsPath: '/callouts',
+    lockPromotionSvgPath: '/assets/illustrations/lock-promotion.svg',
+    helpCanaryDeploymentsPath: 'help/canary-deployments',
+  };
 
   beforeEach(() => {
     Component = Vue.extend(environmentTableComp);
-    // ee-only start
-    eeOnlyProps = {
-      canaryDeploymentFeatureId: 'canary_deployment',
-      showCanaryDeploymentCallout: true,
-      userCalloutsPath: '/callouts',
-      lockPromotionSvgPath: '/assets/illustrations/lock-promotion.svg',
-      helpCanaryDeploymentsPath: 'help/canary-deployments',
-    };
-    // ee-only end
   });
 
   afterEach(() => {
@@ -39,9 +35,7 @@ describe('Environment table', () => {
     vm = mountComponent(Component, {
       environments: [mockItem],
       canReadEnvironment: true,
-      // ee-only start
       ...eeOnlyProps,
-      // ee-only end
     });
 
     expect(vm.$el.getAttribute('class')).toContain('ci-table');
@@ -82,9 +76,7 @@ describe('Environment table', () => {
       vm = mountComponent(Component, {
         environments: mockItems,
         canReadEnvironment: true,
-        // ee-only start
         ...eeOnlyProps,
-        // ee-only end
       });
 
       const [old, newer, older, noDeploy] = mockItems;
@@ -148,9 +140,7 @@ describe('Environment table', () => {
       vm = mountComponent(Component, {
         environments: mockItems,
         canReadEnvironment: true,
-        // ee-only start
         ...eeOnlyProps,
-        // ee-only end
       });
 
       const [prod, review, staging] = mockItems;
@@ -187,9 +177,7 @@ describe('Environment table', () => {
       vm = mountComponent(Component, {
         environments: mockItems,
         canReadEnvironment: true,
-        // ee-only start
         ...eeOnlyProps,
-        // ee-only end
       });
 
       const [old, newer, older] = mockItems;
@@ -216,9 +204,7 @@ describe('Environment table', () => {
       vm = mountComponent(Component, {
         environments: mockItems,
         canReadEnvironment: true,
-        // ee-only start
         ...eeOnlyProps,
-        // ee-only end
       });
 
       const [old, newer, older] = mockItems;
@@ -267,9 +253,7 @@ describe('Environment table', () => {
       vm = mountComponent(Component, {
         environments: mockItems,
         canReadEnvironment: true,
-        // ee-only start
         ...eeOnlyProps,
-        // ee-only end
       });
 
       expect(vm.sortedEnvironments.map(env => env.name)).toEqual([
