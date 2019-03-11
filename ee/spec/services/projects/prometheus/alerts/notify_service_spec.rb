@@ -212,14 +212,7 @@ describe Projects::Prometheus::Alerts::NotifyService do
         stub_licensed_features(incident_management: false)
       end
 
-      it_behaves_like 'persists events'
-
-      it 'does not send notification' do
-        expect(project.feature_available?(:incident_management)).to eq(false)
-        expect(NotificationService).not_to receive(:new)
-
-        expect(subject).to eq(true)
-      end
+      it_behaves_like 'notifies alerts'
     end
 
     context 'with incident_management license' do

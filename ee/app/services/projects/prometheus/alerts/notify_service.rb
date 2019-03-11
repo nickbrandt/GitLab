@@ -25,8 +25,8 @@ module Projects
         end
 
         def send_email?
-          return firings.any? unless incident_management_feature_enabled?
-          return false unless has_incident_management_license?
+          return firings.any? unless incident_management_feature_enabled? &&
+              has_incident_management_license?
 
           setting = project.incident_management_setting || project.build_incident_management_setting
 
