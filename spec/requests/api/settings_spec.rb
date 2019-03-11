@@ -45,6 +45,7 @@ describe API::Settings, 'Settings' do
         put api("/application/settings", admin),
           params: {
             default_projects_limit: 3,
+            default_project_creation: 2,
             password_authentication_enabled_for_web: false,
             repository_storages: ['custom'],
             plantuml_enabled: true,
@@ -71,6 +72,7 @@ describe API::Settings, 'Settings' do
 
         expect(response).to have_gitlab_http_status(200)
         expect(json_response['default_projects_limit']).to eq(3)
+        expect(json_response['default_project_creation']).to eq(Gitlab::Access::DEVELOPER_MAINTAINER_PROJECT_ACCESS)
         expect(json_response['password_authentication_enabled_for_web']).to be_falsey
         expect(json_response['repository_storages']).to eq(['custom'])
         expect(json_response['plantuml_enabled']).to be_truthy

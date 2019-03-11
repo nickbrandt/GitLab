@@ -179,7 +179,6 @@ ActiveRecord::Schema.define(version: 20190403161806) do
     t.integer "gitaly_timeout_medium", default: 30, null: false
     t.integer "gitaly_timeout_fast", default: 10, null: false
     t.boolean "mirror_available", default: true, null: false
-    t.integer "default_project_creation", default: 2, null: false
     t.boolean "password_authentication_enabled_for_web"
     t.boolean "password_authentication_enabled_for_git", default: true, null: false
     t.string "auto_devops_domain"
@@ -218,6 +217,7 @@ ActiveRecord::Schema.define(version: 20190403161806) do
     t.integer "local_markdown_version", default: 0, null: false
     t.integer "first_day_of_week", default: 0, null: false
     t.boolean "elasticsearch_limit_indexing", default: false, null: false
+    t.integer "default_project_creation", default: 2, null: false
     t.index ["custom_project_templates_group_id"], name: "index_application_settings_on_custom_project_templates_group_id", using: :btree
     t.index ["file_template_project_id"], name: "index_application_settings_on_file_template_project_id", using: :btree
     t.index ["usage_stats_set_by_user_id"], name: "index_application_settings_on_usage_stats_set_by_user_id", using: :btree

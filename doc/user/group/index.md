@@ -153,10 +153,7 @@ There are two different ways to add a new project to a group:
 
     ![Select group](img/select_group_dropdown.png)
 
-### Default project creation level **[STARTER]**
-
-> [Introduced][ee-2534] in [GitLab Premium][ee] 10.5.
-> Brought to [GitLab Starter][ee] in 10.7.
+### Default project creation level
 
 Group owners or administrators can set an option that will give users with the
 Developer role the ability to create projects under groups.

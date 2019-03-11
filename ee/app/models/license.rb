@@ -28,7 +28,6 @@ class License < ApplicationRecord
     multiple_issue_assignees
     multiple_project_issue_boards
     push_rules
-    project_creation_level
     protected_refs_for_users
     related_issues
     repository_mirrors

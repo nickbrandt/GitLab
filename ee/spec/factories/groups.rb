@@ -1,11 +1,5 @@
 # frozen_string_literal: true
 
-FactoryBot.modify do
-  factory :group do
-    project_creation_level ::EE::Gitlab::Access::MAINTAINER_PROJECT_ACCESS
-  end
-end
-
 FactoryBot.define do
   factory :group_with_members, parent: :group do
     after(:create) do |group, evaluator|

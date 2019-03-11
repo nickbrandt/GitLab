@@ -167,43 +167,6 @@ module EE
       super || DEFAULT_GROUP_VIEW
     end
 
-    override :several_namespaces?
-    def several_namespaces?
-      union_sql = ::Gitlab::SQL::Union.new(
-        [owned_groups,
-         maintainers_groups,
-         groups_with_developer_maintainer_project_access]).to_sql
-
-      ::Group.from("(#{union_sql}) #{::Group.table_name}").any?
-    end
-
-    override :manageable_groups
-    def manageable_groups(include_groups_with_developer_maintainer_access: false)
-      owned_and_maintainer_group_hierarchy = super()
-
-      if include_groups_with_developer_maintainer_access
-        union_sql = ::Gitlab::SQL::Union.new(
-          [owned_and_maintainer_group_hierarchy,
-           groups_with_developer_maintainer_project_access]).to_sql
-
-        ::Group.from("(#{union_sql}) #{::Group.table_name}")
-      else
-        owned_and_maintainer_group_hierarchy
-      end
-    end
-
-    def groups_with_developer_maintainer_project_access
-      project_creation_levels = [::EE::Gitlab::Access::DEVELOPER_MAINTAINER_PROJECT_ACCESS]
-
-      if ::Gitlab::CurrentSettings.default_project_creation == ::EE::Gitlab::Access::DEVELOPER_MAINTAINER_PROJECT_ACCESS
-        project_creation_levels << nil
-      end
-
-      developer_groups_hierarchy = ::Gitlab::ObjectHierarchy.new(developer_groups).base_and_descendants
-      ::Group.where(id: developer_groups_hierarchy.select(:id),
-                    project_creation_level: project_creation_levels)
-    end
-
     def any_namespace_with_trial?
       ::Namespace
         .from("(#{namespace_union(:trial_ends_on)}) #{::Namespace.table_name}")
