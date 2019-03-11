@@ -32,6 +32,17 @@ describe Project do
     it { is_expected.to have_many(:package_files).class_name('Packages::PackageFile') }
   end
 
+  context 'scopes' do
+    describe '.requiring_code_owner_approval' do
+      it 'only includes the right projects' do
+        create(:project)
+        expected_project = create(:project, merge_requests_require_code_owner_approval: true)
+
+        expect(described_class.requiring_code_owner_approval).to contain_exactly(expected_project)
+      end
+    end
+  end
+
   describe 'validations' do
     let(:project) { build(:project) }
 

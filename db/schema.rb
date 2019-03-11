@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190301182457) do
+ActiveRecord::Schema.define(version: 20190305162221) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -2445,6 +2445,7 @@ ActiveRecord::Schema.define(version: 20190301182457) do
     t.string "runners_token_encrypted"
     t.string "bfg_object_map"
     t.boolean "merge_requests_require_code_owner_approval"
+    t.index ["archived", "pending_delete", "merge_requests_require_code_owner_approval"], name: "projects_requiring_code_owner_approval", where: "((pending_delete = false) AND (archived = false) AND (merge_requests_require_code_owner_approval = true))", using: :btree
     t.index ["ci_id"], name: "index_projects_on_ci_id", using: :btree
     t.index ["created_at"], name: "index_projects_on_created_at", using: :btree
     t.index ["creator_id"], name: "index_projects_on_creator_id", using: :btree

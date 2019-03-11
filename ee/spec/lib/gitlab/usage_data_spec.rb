@@ -192,4 +192,16 @@ describe Gitlab::UsageData do
       end
     end
   end
+
+  describe 'code owner approval required' do
+    before do
+      create(:project, :archived, :requiring_code_owner_approval)
+      create(:project, :requiring_code_owner_approval, pending_delete: true)
+      create(:project, :requiring_code_owner_approval)
+    end
+
+    it 'counts the projects actively requiring code owner approval' do
+      expect(described_class.system_usage_data[:counts][:projects_enforcing_code_owner_approval]).to eq(1)
+    end
+  end
 end
