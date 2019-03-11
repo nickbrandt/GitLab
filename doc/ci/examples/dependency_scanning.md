@@ -63,7 +63,7 @@ be automatically extracted and shown right in the merge request widget.
 
 ## Supported languages and package managers
 
-See [the full list of supported languages and package managers](../../user/project/merge_requests/dependency_scanning.md#supported-languages-and-frameworks).
+See [the full list of supported languages and package managers](../../user/project/merge_requests/dependency_scanning.md#supported-languages-and-dependency-managers).
 
 ## Previous job definitions
 
