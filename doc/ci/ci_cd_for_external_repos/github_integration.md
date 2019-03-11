@@ -1,7 +1,7 @@
 # Using GitLab CI/CD with a GitHub repository **[PREMIUM]**
 
 GitLab CI/CD can be used with **GitHub.com** and **GitHub Enterprise** by
-creating a [CI/CD project][cicd-projects] to connect your GitHub repository to
+creating a [CI/CD project](../../user/project/ci_cd_for_external_repo.md) to connect your GitHub repository to
 GitLab.
 
 NOTE: **Note:**
@@ -10,7 +10,7 @@ manual method.
 
 ## Connect with GitHub integration
 
-If the [GitHub integration][github-integration] has been enabled by your GitLab
+If the [GitHub integration](../../integration/github.md) has been enabled by your GitLab
 administrator:
 
 NOTE: **Note:**
@@ -29,10 +29,10 @@ for more information.
 
     ![Create project](img/github_repo_list.png)
 
-1. In GitHub, add a `.gitlab-ci.yml` to [configure GitLab CI/CD][ci-quickstart].
+1. In GitHub, add a `.gitlab-ci.yml` to [configure GitLab CI/CD](../quick_start/README.md).
 
-GitLab will import the project, enable [Pull Mirroring][pull-mirroring], enable
-[GitHub project integration][github-project-integration], and create a web hook
+GitLab will import the project, enable [Pull Mirroring](../../workflow/repository_mirroring.md#pulling-from-a-remote-repository-starter), enable
+[GitHub project integration](../../user/project/integrations/github.md), and create a web hook
 on GitHub to notify GitLab of new commits.
 
 ## Connect with Personal Access Token
@@ -40,7 +40,7 @@ on GitHub to notify GitLab of new commits.
 NOTE: **Note:** Personal access tokens can only be used to connect GitHub.com
 repositories to GitLab.
 
-If you are not using the [GitHub integration][github-integration], you can
+If you are not using the [GitHub integration](../../integration/github.md), you can
 still perform a one-off authorization with GitHub to grant GitLab access your
 repositories:
 
@@ -60,15 +60,15 @@ repositories:
 1. Paste the token into the **Personal access token** field and click **List
    Repositories**. Click **Connect** to select the repository.
 
-1. In GitHub, add a `.gitlab-ci.yml` to [configure GitLab CI/CD][ci-quickstart].
+1. In GitHub, add a `.gitlab-ci.yml` to [configure GitLab CI/CD](../quick_start/README.md).
 
-GitLab will import the project, enable [Pull Mirroring][pull-mirroring], enable
-[GitHub project integration][github-project-integration], and create a web hook
+GitLab will import the project, enable [Pull Mirroring](../../workflow/repository_mirroring.md#pulling-from-a-remote-repository-starter), enable
+[GitHub project integration](../../user/project/integrations/github.md), and create a web hook
 on GitHub to notify GitLab of new commits.
 
 ## Connect manually
 
-If the [GitHub integration][github-integration] is not enabled, or is enabled
+If the [GitHub integration](../../integration/github.md) is not enabled, or is enabled
 for a different GitHub instance, you GitLab CI/CD can be manually enabled for
 your repository.
 
@@ -86,7 +86,7 @@ your repository.
 
     GitLab will automatically configure polling-based pull mirroring.
 
-1. Still in GitLab, enable the [GitHub project integration][github-project-integration]
+1. Still in GitLab, enable the [GitHub project integration](../../user/project/integrations/github.md)
    from **Settings > Integrations.**
 
     Check the **Active** checkbox to enable the integration, paste your
@@ -99,7 +99,7 @@ your repository.
    new commits.
 
     The web hook URL should be set to the GitLab API to
-    [trigger pull mirroring][pull-mirroring-trigger],
+    [trigger pull mirroring](../../api/projects.md#start-the-pull-mirroring-process-for-a-project-starter),
     using the GitLab personal access token we just created.
 
     ```
@@ -109,10 +109,3 @@ your repository.
     ![Create web hook](img/github_push_webhook.png)
 
 1. In GitHub add a `.gitlab-ci.yml` to configure GitLab CI/CD.
-
-[ci-quickstart]: ../quick_start/README.md
-[cicd-projects]: ../../user/project/ci_cd_for_external_repo.md
-[github-integration]: ../../integration/github.md
-[github-project-integration]: ../../user/project/integrations/github.md
-[pull-mirroring]: ../../workflow/repository_mirroring.md#pulling-from-a-remote-repository-starter
-[pull-mirroring-trigger]: ../../api/projects.md#start-the-pull-mirroring-process-for-a-project

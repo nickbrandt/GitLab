@@ -13,7 +13,7 @@ There are two ways to set up Prometheus integration, depending on where your app
 - For deployments on Kubernetes, GitLab can automatically [deploy and manage Prometheus](#managed-prometheus-on-kubernetes).
 - For other deployment targets, simply [specify the Prometheus server](#manual-configuration-of-prometheus).
 
-Once enabled, GitLab will automatically detect metrics from known services in the [metric library](#monitoring-ci-cd-environments). You are also able to [add your own metrics](#adding-additional-metrics-premium) as well.
+Once enabled, GitLab will automatically detect metrics from known services in the [metric library](#monitoring-cicd-environments). You are also able to [add your own metrics](#adding-additional-metrics-premium) as well.
 
 ## Enabling Prometheus Integration
 

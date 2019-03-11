@@ -34,7 +34,7 @@ With GitLab merge requests, you can:
 With **[GitLab Enterprise Edition][ee]**, you can also:
 
 - Prepare a full review and submit it once it's ready with [Merge Request Reviews](../../discussions/index.md#merge-request-reviews-premium) **[PREMIUM]**
-- View the deployment process across projects with [Multi-Project Pipelines](../../../ci/multi_project_pipelines.md#multi-project-pipeline-graphs) **[PREMIUM]**
+- View the deployment process across projects with [Multi-Project Pipelines](../../../ci/multi_project_pipelines.md) **[PREMIUM]**
 - Request [approvals](merge_request_approvals.md) from your managers **[STARTER]**
 - Analyze the impact of your changes with [Code Quality reports](code_quality.md) **[STARTER]**
 - Manage the licenses of your dependencies with [License Management](#license-management-ultimate) **[ULTIMATE]**
