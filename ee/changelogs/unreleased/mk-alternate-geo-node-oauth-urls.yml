@@ -1,0 +1,5 @@
+---
+title: 'Geo: Allow OAuth login to a secondary node at an alternate URL'
+merge_request: 9544
+author:
+type: added

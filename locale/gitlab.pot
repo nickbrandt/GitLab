@@ -1923,9 +1923,6 @@ msgstr ""
 msgid "Choose what content you want to see on a group’s overview page"
 msgstr ""
 
-msgid "Choose which groups you wish to synchronize to this secondary node."
-msgstr ""
-
 msgid "Choose which repositories you want to connect and run CI/CD pipelines."
 msgstr ""
 
@@ -2888,16 +2885,7 @@ msgstr ""
 msgid "Control the display of third party offers."
 msgstr ""
 
-msgid "Control the maximum concurrency of LFS/attachment backfill for this secondary node"
-msgstr ""
-
 msgid "Control the maximum concurrency of repository backfill for this secondary node"
-msgstr ""
-
-msgid "Control the maximum concurrency of verification operations for this Geo node"
-msgstr ""
-
-msgid "Control the minimum interval in days that a repository should be reverified for this primary node"
 msgstr ""
 
 msgid "ConvDev Index"
@@ -4572,6 +4560,9 @@ msgstr ""
 msgid "GeoNodeSyncStatus|Node is slow, overloaded, or it just recovered after an outage."
 msgstr ""
 
+msgid "GeoNodes|Alternate URL"
+msgstr ""
+
 msgid "GeoNodes|Checksummed"
 msgstr ""
 
@@ -4752,7 +4743,22 @@ msgstr ""
 msgid "Geo|All projects are being scheduled for re-sync"
 msgstr ""
 
+msgid "Geo|Alternate URL"
+msgstr ""
+
 msgid "Geo|Batch operations"
+msgstr ""
+
+msgid "Geo|Choose which groups you wish to synchronize to this secondary node."
+msgstr ""
+
+msgid "Geo|Control the maximum concurrency of LFS/attachment backfill for this secondary node"
+msgstr ""
+
+msgid "Geo|Control the maximum concurrency of verification operations for this Geo node"
+msgstr ""
+
+msgid "Geo|Control the minimum interval in days that a repository should be reverified for this primary node"
 msgstr ""
 
 msgid "Geo|Could not remove tracking entry for an existing project."
@@ -4842,6 +4848,9 @@ msgstr ""
 msgid "Geo|Select groups to replicate."
 msgstr ""
 
+msgid "Geo|Selective synchronization"
+msgstr ""
+
 msgid "Geo|Shards to synchronize"
 msgstr ""
 
@@ -4854,10 +4863,19 @@ msgstr ""
 msgid "Geo|Synchronization failed - %{error}"
 msgstr ""
 
+msgid "Geo|This is a primary node"
+msgstr ""
+
+msgid "Geo|To support OAuth logins to this node at a different domain than URL"
+msgstr ""
+
 msgid "Geo|Tracking entry for project (%{project_id}) was successfully removed."
 msgstr ""
 
 msgid "Geo|Tracking entry will be removed. Are you sure?"
+msgstr ""
+
+msgid "Geo|URL"
 msgstr ""
 
 msgid "Geo|Unknown state"
@@ -8898,9 +8916,6 @@ msgid "Select the custom project template source group."
 msgstr ""
 
 msgid "Selecting a GitLab user will add a link to the GitLab user in the descriptions of issues and comments (e.g. \"By <a href=\"#\">@johnsmith</a>\"). It will also associate and/or assign these issues and comments with the selected user."
-msgstr ""
-
-msgid "Selective synchronization"
 msgstr ""
 
 msgid "Send email"

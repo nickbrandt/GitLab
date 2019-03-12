@@ -144,6 +144,7 @@ module API
         params do
           optional :enabled, type: Boolean, desc: 'Flag indicating if the Geo node is enabled'
           optional :url, type: String, desc: 'The URL to connect to the Geo node'
+          optional :alternate_url, type: String, desc: 'An alternate URL to allow OAuth logins to this secondary node'
           optional :files_max_capacity, type: Integer, desc: 'Control the maximum concurrency of LFS/attachment backfill for this secondary node'
           optional :repos_max_capacity, type: Integer, desc: 'Control the maximum concurrency of repository backfill for this secondary node'
           optional :verification_max_capacity, type: Integer, desc: 'Control the maximum concurrency of repository verification for this node'

@@ -1324,6 +1324,7 @@ ActiveRecord::Schema.define(version: 20190305162221) do
     t.text "selective_sync_shards"
     t.integer "verification_max_capacity", default: 100, null: false
     t.integer "minimum_reverification_interval", default: 7, null: false
+    t.string "alternate_url"
     t.index ["access_key"], name: "index_geo_nodes_on_access_key", using: :btree
     t.index ["primary"], name: "index_geo_nodes_on_primary", using: :btree
     t.index ["url"], name: "index_geo_nodes_on_url", unique: true, using: :btree

@@ -74,7 +74,11 @@ export default {
       :node-details="nodeDetails"
       :node-type-primary="node.primary"
     />
-    <node-details-section-other :node-details="nodeDetails" :node-type-primary="node.primary" />
+    <node-details-section-other
+      :node="node"
+      :node-details="nodeDetails"
+      :node-type-primary="node.primary"
+    />
     <div v-if="hasError || hasVersionMismatch" class="node-health-message-container">
       <p class="node-health-message">{{ errorMessage }}</p>
     </div>
