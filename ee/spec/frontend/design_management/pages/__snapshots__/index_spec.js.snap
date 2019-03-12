@@ -33,7 +33,7 @@ exports[`Design management index page designs renders error 1`] = `
       class="alert alert-danger"
     >
       
-      An error occured while loading designs. Please try again.
+      An error occurred while loading designs. Please try again.
     
     </div>
   </div>
