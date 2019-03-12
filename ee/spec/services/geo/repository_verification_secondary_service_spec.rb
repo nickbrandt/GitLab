@@ -104,7 +104,7 @@ describe Geo::RepositoryVerificationSecondaryService, :geo do
 
         expect(registry).to have_attributes(
           "resync_#{type}" => true,
-          "#{type}_retry_at" => be_within(100.seconds).of(Time.now + 7.days),
+          "#{type}_retry_at" => be_within(100.seconds).of(1.hour.from_now),
           "#{type}_retry_count" => 31
         )
       end
@@ -137,7 +137,7 @@ describe Geo::RepositoryVerificationSecondaryService, :geo do
 
         expect(registry).to have_attributes(
           "resync_#{type}" => true,
-          "#{type}_retry_at" => be_within(100.seconds).of(Time.now + 7.days),
+          "#{type}_retry_at" => be_within(100.seconds).of(1.hour.from_now),
           "#{type}_retry_count" => 31
         )
       end
