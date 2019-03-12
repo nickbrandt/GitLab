@@ -72,6 +72,7 @@ describe('mutations', () => {
       mutations[types.SET_PROJECTS](localState, projects);
 
       expect(localState.projects).toEqual(projects);
+      expect(localState.isLoadingProjects).toEqual(false);
     });
   });
 
@@ -81,6 +82,14 @@ describe('mutations', () => {
       mutations[types.REMOVE_PROJECT_TOKEN_AT](localState, oneProject.id);
 
       expect(localState.projectTokens.length).toBe(0);
+    });
+  });
+
+  describe('REQUEST_PROJECTS', () => {
+    it('sets loading projects to true', () => {
+      mutations[types.REQUEST_PROJECTS](localState);
+
+      expect(localState.isLoadingProjects).toEqual(true);
     });
   });
 });

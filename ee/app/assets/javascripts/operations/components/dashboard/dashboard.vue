@@ -1,14 +1,17 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import { GlLoadingIcon } from '@gitlab/ui';
+import { GlLoadingIcon, GlDashboardSkeleton } from '@gitlab/ui';
 import DashboardProject from './project.vue';
+import NewDashboardProject from './new_project.vue';
 import ProjectSearch from './project_search.vue';
 
 export default {
   components: {
     DashboardProject,
+    NewDashboardProject,
     ProjectSearch,
     GlLoadingIcon,
+    GlDashboardSkeleton,
   },
   props: {
     addPath: {
@@ -32,6 +35,15 @@ export default {
     ...mapState(['projects', 'projectTokens', 'isLoadingProjects']),
     addIsDisabled() {
       return !this.projectTokens.length;
+    },
+    showNewPipelineDashboard() {
+      return gon && gon.features && gon.features.pipelineDashboard;
+    },
+    dashboardClasses() {
+      return {
+        'm-0': !this.showNewPipelineDashboard,
+        'dashboard-cards': this.showNewPipelineDashboard,
+      };
     },
   },
   created() {
@@ -73,14 +85,21 @@ export default {
       </div>
     </div>
     <div class="prepend-top-default">
-      <div v-if="projects.length" class="row m-0 prepend-top-default">
-        <div
-          v-for="project in projects"
-          :key="project.id"
-          class="col-12 col-md-6 odds-md-pad-right evens-md-pad-left"
-        >
-          <dashboard-project :project="project" />
-        </div>
+      <div v-if="projects.length" :class="dashboardClasses" class="row prepend-top-default">
+        <template v-if="showNewPipelineDashboard">
+          <div v-for="project in projects" :key="project.id" class="col-12 col-md-6 col-xl-4 px-2">
+            <new-dashboard-project :project="project" />
+          </div>
+        </template>
+        <template v-else>
+          <div
+            v-for="project in projects"
+            :key="project.id"
+            class="col-12 col-md-6 odds-md-pad-right evens-md-pad-left"
+          >
+            <dashboard-project :project="project" />
+          </div>
+        </template>
       </div>
       <div v-else-if="!isLoadingProjects" class="row prepend-top-20 text-center">
         <div class="col-12 d-flex justify-content-center svg-content">
@@ -106,6 +125,7 @@ export default {
           </a>
         </div>
       </div>
+      <gl-dashboard-skeleton v-else-if="showNewPipelineDashboard" />
       <gl-loading-icon v-else :size="2" class="prepend-top-20" />
     </div>
   </div>
