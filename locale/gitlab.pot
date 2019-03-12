@@ -811,9 +811,6 @@ msgstr ""
 msgid "An error has occurred"
 msgstr ""
 
-msgid "An error occured while loading designs. Please try again."
-msgstr ""
-
 msgid "An error occurred adding a draft to the discussion."
 msgstr ""
 
@@ -899,6 +896,9 @@ msgid "An error occurred while loading chart data"
 msgstr ""
 
 msgid "An error occurred while loading commit signatures"
+msgstr ""
+
+msgid "An error occurred while loading designs. Please try again."
 msgstr ""
 
 msgid "An error occurred while loading diff"

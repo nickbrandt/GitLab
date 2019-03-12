@@ -35,7 +35,7 @@ export default {
     <div class="mt-4">
       <gl-loading-icon v-if="isLoading" :size="2" />
       <div v-else-if="error" class="alert alert-danger">
-        {{ __('An error occured while loading designs. Please try again.') }}
+        {{ __('An error occurred while loading designs. Please try again.') }}
       </div>
       <design-list v-else-if="designs.length" :designs="designs" />
       <div v-else>{{ __('No designs found.') }}</div>
