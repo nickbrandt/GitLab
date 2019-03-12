@@ -1,15 +1,20 @@
 <script>
+import _ from 'underscore';
 import { mapState, mapActions } from 'vuex';
-import { GlLoadingIcon, GlDashboardSkeleton } from '@gitlab/ui';
-import ProjectSearch from 'ee/vue_shared/dashboards/components/project_search.vue';
+import { GlLoadingIcon, GlModal, GlModalDirective, GlButton } from '@gitlab/ui';
+import ProjectSelector from '~/vue_shared/components/project_selector/project_selector.vue';
 import DashboardProject from './project.vue';
 
 export default {
   components: {
     DashboardProject,
-    ProjectSearch,
+    GlModal,
     GlLoadingIcon,
-    GlDashboardSkeleton,
+    GlButton,
+    ProjectSelector,
+  },
+  directives: {
+    'gl-modal': GlModalDirective,
   },
   props: {
     addPath: {
@@ -29,10 +34,23 @@ export default {
       required: true,
     },
   },
+  modalId: 'add-projects-modal',
   computed: {
-    ...mapState(['projects', 'projectTokens', 'isLoadingProjects']),
-    addIsDisabled() {
-      return !this.projectTokens.length;
+    ...mapState([
+      'projects',
+      'projectTokens',
+      'isLoadingProjects',
+      'selectedProjects',
+      'projectSearchResults',
+      'searchCount',
+      'searchQuery',
+      'messages',
+    ]),
+    isSearchingProjects() {
+      return this.searchCount > 0;
+    },
+    okDisabled() {
+      return _.isEmpty(this.selectedProjects);
     },
   },
   created() {
@@ -43,11 +61,33 @@ export default {
     this.fetchProjects();
   },
   methods: {
-    ...mapActions(['addProjectsToDashboard', 'fetchProjects', 'setProjectEndpoints']),
+    ...mapActions([
+      'searchProjects',
+      'addProjectsToDashboard',
+      'fetchProjects',
+      'setProjectEndpoints',
+      'clearSearchResults',
+      'toggleSelectedProject',
+      'setSearchQuery',
+    ]),
     addProjects() {
-      if (!this.addIsDisabled) {
-        this.addProjectsToDashboard();
-      }
+      this.addProjectsToDashboard();
+    },
+    onModalShown() {
+      this.$refs.projectSelector.focusSearchInput();
+    },
+    onModalHidden() {
+      this.clearSearchResults();
+    },
+    onOk() {
+      this.addProjectsToDashboard();
+    },
+    searched(query) {
+      this.setSearchQuery(query);
+      this.searchProjects();
+    },
+    projectClicked(project) {
+      this.toggleSelectedProject(project);
     },
   },
 };
@@ -55,23 +95,41 @@ export default {
 
 <template>
   <div class="operations-dashboard">
-    <div
-      class="page-title-holder flex-fill d-flex flex-column flex-md-row align-items-md-end align-items-stretch"
+    <gl-modal
+      :modal-id="$options.modalId"
+      :title="s__('OperationsDashboard|Add projects')"
+      :ok-title="s__('OperationsDashboard|Add projects')"
+      :ok-disabled="okDisabled"
+      ok-variant="success"
+      @shown="onModalShown"
+      @hidden="onModalHidden"
+      @ok="onOk"
     >
-      <div class="flex-fill append-right-20">
-        <h1 class="js-dashboard-title page-title text-nowrap">{{ __('Operations Dashboard') }}</h1>
-      </div>
-      <div class="d-flex flex-fill align-items-end append-bottom-default">
-        <project-search class="flex-grow-1" />
-        <button
-          :class="{ disabled: addIsDisabled }"
-          type="button"
-          class="js-add-projects-button btn btn-success prepend-left-8"
-          @click="addProjects"
-        >
-          {{ __('Add projects') }}
-        </button>
-      </div>
+      <project-selector
+        ref="projectSelector"
+        :project-search-results="projectSearchResults"
+        :selected-projects="selectedProjects"
+        :show-no-results-message="messages.noResults"
+        :show-loading-indicator="isSearchingProjects"
+        :show-minimum-search-query-message="messages.minimumQuery"
+        :show-search-error-message="messages.searchError"
+        @searched="searched"
+        @projectClicked="projectClicked"
+      />
+    </gl-modal>
+
+    <div class="page-title-holder flex-fill d-flex align-items-center">
+      <h1 class="js-dashboard-title page-title text-nowrap flex-fill">
+        {{ s__('OperationsDashboard|Operations Dashboard') }}
+      </h1>
+      <gl-button
+        v-if="projects.length"
+        v-gl-modal="$options.modalId"
+        type="button"
+        class="js-add-projects-button btn btn-success"
+      >
+        {{ s__('OperationsDashboard|Add projects') }}
+      </gl-button>
     </div>
     <div class="prepend-top-default">
       <div v-if="projects.length" class="row prepend-top-default dashboard-cards">
@@ -92,15 +150,19 @@ export default {
               s__(`OperationsDashboard|The operations dashboard provides a summary of each project's
               operational health, including pipeline and alert statuses.`)
             }}
+            <a :href="emptyDashboardHelpPath" class="js-documentation-link">
+              {{ s__('OperationsDashboard|More information') }}
+            </a>
           </span>
         </div>
         <div class="col-12">
-          <a
-            :href="emptyDashboardHelpPath"
-            class="js-documentation-link btn btn-primary prepend-top-default append-bottom-default"
+          <gl-button
+            v-gl-modal="$options.modalId"
+            type="button"
+            class="js-add-projects-button btn btn-success prepend-top-default append-bottom-default"
           >
-            {{ __('View documentation') }}
-          </a>
+            {{ s__('OperationsDashboard|Add projects') }}
+          </gl-button>
         </div>
       </div>
       <gl-dashboard-skeleton v-else />

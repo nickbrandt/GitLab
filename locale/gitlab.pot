@@ -44,9 +44,6 @@ msgstr ""
 msgid " or <#issue id>"
 msgstr ""
 
-msgid "\"%{query}\" in projects"
-msgstr ""
-
 msgid "%d comment"
 msgid_plural "%d comments"
 msgstr[0] ""
@@ -582,9 +579,6 @@ msgid "Add new application"
 msgstr ""
 
 msgid "Add new directory"
-msgstr ""
-
-msgid "Add projects"
 msgstr ""
 
 msgid "Add reaction"
@@ -3863,6 +3857,9 @@ msgid "Enforce users to have dedicated group managed accounts for this group"
 msgstr ""
 
 msgid "Enforced SSO"
+msgstr ""
+
+msgid "Enter at least three characters to search"
 msgstr ""
 
 msgid "Enter in your Bitbucket Server URL and personal access token below"
@@ -7422,6 +7419,15 @@ msgstr ""
 msgid "OperationsDashboard|Add a project to the dashboard"
 msgstr ""
 
+msgid "OperationsDashboard|Add projects"
+msgstr ""
+
+msgid "OperationsDashboard|More information"
+msgstr ""
+
+msgid "OperationsDashboard|Operations Dashboard"
+msgstr ""
+
 msgid "OperationsDashboard|The operations dashboard provides a summary of each project's operational health, including pipeline and alert statuses."
 msgstr ""
 
@@ -9751,6 +9757,9 @@ msgstr ""
 msgid "Something went wrong, unable to remove project"
 msgstr ""
 
+msgid "Something went wrong, unable to search projects"
+msgstr ""
+
 msgid "Something went wrong. Please try again."
 msgstr ""
 
@@ -11646,9 +11655,6 @@ msgid "View deployment"
 msgstr ""
 
 msgid "View details: %{details_url}"
-msgstr ""
-
-msgid "View documentation"
 msgstr ""
 
 msgid "View eligible approvers"
