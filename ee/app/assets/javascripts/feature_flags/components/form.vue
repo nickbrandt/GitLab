@@ -1,9 +1,11 @@
 <script>
+import _ from 'underscore';
 import { GlButton } from '@gitlab/ui';
 import { s__, sprintf } from '~/locale';
 import ToggleButton from '~/vue_shared/components/toggle_button.vue';
 import Icon from '~/vue_shared/components/icon.vue';
 import EnvironmentsDropdown from './environments_dropdown.vue';
+import { internalKeyID } from '../store/modules/helpers';
 
 export default {
   components: {
@@ -83,7 +85,8 @@ export default {
      * @param {Number} index
      * @param {Boolean} status
      */
-    onUpdateScopeStatus(scope, index, status) {
+    onUpdateScopeStatus(scope, status) {
+      const index = this.formScopes.findIndex(el => el.id === scope.id);
       this.formScopes.splice(index, 1, Object.assign({}, scope, { active: status }));
     },
     /**
@@ -94,7 +97,8 @@ export default {
      * @param {Object} scope
      * @param {Number} index
      */
-    updateScope(name, scope, index) {
+    updateScope(name, scope) {
+      const index = this.formScopes.findIndex(el => el.id === scope.id);
       this.formScopes.splice(index, 1, Object.assign({}, scope, { environment_scope: name }));
     },
     /**
@@ -107,6 +111,7 @@ export default {
       this.formScopes.push({
         active: value,
         environment_scope: this.newScope,
+        id: _.uniqueId(internalKeyID),
       });
 
       this.newScope = '';
@@ -121,13 +126,15 @@ export default {
      * @param {Number} index
      * @param {Object} scope
      */
-    removeScope(index, scope) {
-      if (scope.id) {
-        this.formScopes.splice(index, 1, Object.assign({}, scope, { _destroy: true }));
-      } else {
+    removeScope(scope) {
+      const index = this.formScopes.findIndex(el => el.id === scope.id);
+      if (_.isString(scope.id) && scope.id.indexOf(internalKeyID) !== -1) {
         this.formScopes.splice(index, 1);
+      } else {
+        this.formScopes.splice(index, 1, Object.assign({}, scope, { _destroy: true }));
       }
     },
+
     /**
      * When the user selects a value or creates a new value in the environments
      * dropdown in the creation row, we push a new entry with the selected value.
@@ -135,7 +142,11 @@ export default {
      * @param {String}
      */
     createNewEnvironment(name) {
-      this.formScopes.push({ environment_scope: name, active: false });
+      this.formScopes.push({
+        environment_scope: name,
+        active: false,
+        id: _.uniqueId(internalKeyID),
+      });
       this.newScope = '';
     },
     /**
@@ -225,7 +236,7 @@ export default {
                 <div class="table-mobile-content js-feature-flag-status">
                   <toggle-button
                     :value="scope.active"
-                    @change="status => onUpdateScopeStatus(scope, index, status)"
+                    @change="status => onUpdateScopeStatus(scope, status)"
                   />
                 </div>
               </div>
@@ -238,7 +249,7 @@ export default {
                   <gl-button
                     v-if="!isAllEnvironment(scope.environment_scope)"
                     class="js-delete-scope btn-transparent"
-                    @click="removeScope(index, scope)"
+                    @click="removeScope(scope)"
                   >
                     <icon name="clear" />
                   </gl-button>
