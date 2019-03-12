@@ -17,6 +17,10 @@ describe ApprovalState do
     end
   end
 
+  def disable_feature
+    allow(subject).to receive(:approval_feature_available?).and_return(false)
+  end
+
   let(:merge_request) { create(:merge_request) }
   let(:project) { merge_request.target_project }
   let(:approver1) { create(:user) }
@@ -108,6 +112,14 @@ describe ApprovalState do
         expect(subject.wrapped_approval_rules).to all(be_an(ApprovalWrappedRule))
         expect(subject.wrapped_approval_rules.size).to eq(2)
       end
+
+      context 'when approval feature is unavailable' do
+        it 'returns empty array' do
+          disable_feature
+
+          expect(subject.wrapped_approval_rules).to eq([])
+        end
+      end
     end
 
     describe '#approval_needed?' do
@@ -147,6 +159,14 @@ describe ApprovalState do
 
       context "when overall approvals required is zero, and there is no rule" do
         it 'returns false' do
+          expect(subject.approval_needed?).to eq(false)
+        end
+      end
+
+      context 'when approval feature is unavailable' do
+        it 'returns false' do
+          disable_feature
+
           expect(subject.approval_needed?).to eq(false)
         end
       end
@@ -216,6 +236,15 @@ describe ApprovalState do
 
         it_behaves_like 'when rules are present'
       end
+
+      context 'when approval feature is unavailable' do
+        it 'returns true' do
+          disable_feature
+          create_rule(users: [create(:user)], approvals_required: 1)
+
+          expect(subject.approved?).to eq(true)
+        end
+      end
     end
 
     describe '#any_approver_allowed?' do
@@ -261,6 +290,14 @@ describe ApprovalState do
       it 'sums approvals_left from rules' do
         expect(subject.approvals_left).to eq(12)
       end
+
+      context 'when approval feature is unavailable' do
+        it 'returns 0' do
+          disable_feature
+
+          expect(subject.approvals_left).to eq(0)
+        end
+      end
     end
 
     describe '#approval_rules_left' do
@@ -268,11 +305,20 @@ describe ApprovalState do
         create_rule(approvals_required: 1, users: [create(:user)])
       end
 
-      it 'counts approval_rules left' do
-        create_unapproved_rule
-        create_unapproved_rule
+      before do
+        2.times { create_unapproved_rule }
+      end
 
+      it 'counts approval_rules left' do
         expect(subject.approval_rules_left.size).to eq(2)
+      end
+
+      context 'when approval feature is unavailable' do
+        it 'returns empty array' do
+          disable_feature
+
+          expect(subject.approval_rules_left).to eq([])
+        end
       end
     end
 

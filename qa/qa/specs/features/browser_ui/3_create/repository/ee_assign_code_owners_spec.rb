@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module QA
-  context 'Create' do
+  # https://gitlab.com/gitlab-org/quality/staging/issues/39
+  context 'Create', :quarantine do
     describe 'Codeowners' do
       it 'merge request assigns code owners as approvers' do
         Runtime::Browser.visit(:gitlab, Page::Main::Login)

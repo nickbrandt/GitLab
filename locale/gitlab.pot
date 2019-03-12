@@ -4056,9 +4056,6 @@ msgstr ""
 msgid "FeatureFlags|Description"
 msgstr ""
 
-msgid "FeatureFlags|Edit %{feature_flag_name}"
-msgstr ""
-
 msgid "FeatureFlags|Edit Feature Flag"
 msgstr ""
 
@@ -4114,9 +4111,6 @@ msgid "FeatureFlags|New"
 msgstr ""
 
 msgid "FeatureFlags|New Feature Flag"
-msgstr ""
-
-msgid "FeatureFlags|Save changes"
 msgstr ""
 
 msgid "FeatureFlags|Status"
@@ -11683,10 +11677,10 @@ msgstr ""
 msgid "mrWidget|Merged by"
 msgstr ""
 
-msgid "mrWidget|No Approval required"
+msgid "mrWidget|No approval required"
 msgstr ""
 
-msgid "mrWidget|No Approval required; you can still approve"
+msgid "mrWidget|No approval required; you can still approve"
 msgstr ""
 
 msgid "mrWidget|Open in Web IDE"

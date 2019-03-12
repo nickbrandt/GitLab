@@ -10,7 +10,7 @@ class ApprovalState
 
   attr_reader :merge_request, :project
 
-  def_delegators :@merge_request, :merge_status, :approved_by_users, :approvals
+  def_delegators :@merge_request, :merge_status, :approved_by_users, :approvals, :approval_feature_available?
   alias_method :approved_approvers, :approved_by_users
 
   def initialize(merge_request)
@@ -31,6 +31,8 @@ class ApprovalState
 
   def wrapped_approval_rules
     strong_memoize(:wrapped_approval_rules) do
+      next [] unless approval_feature_available?
+
       result = use_fallback? ? [fallback_rule] : regular_rules
       result += code_owner_rules
       result

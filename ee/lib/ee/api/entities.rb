@@ -389,6 +389,10 @@ module EE
           approval_state.has_non_fallback_rules?
         end
 
+        expose :merge_request_approvers_available do |approval_state|
+          approval_state.project.feature_available?(:merge_request_approvers)
+        end
+
         expose :multiple_approval_rules_available do |approval_state|
           approval_state.project.multiple_approval_rules_available?
         end

@@ -84,7 +84,7 @@ describe GroupPolicy do
     end
 
     it do
-      expect_allowed(:read_group, :read_label)
+      expect_allowed(:read_group, :read_list, :read_label)
     end
 
     context 'in subgroups', :nested_groups do
@@ -92,7 +92,7 @@ describe GroupPolicy do
       let(:project) { create(:project, namespace: subgroup) }
 
       it do
-        expect_allowed(:read_group, :read_label)
+        expect_allowed(:read_group, :read_list, :read_label)
       end
     end
   end

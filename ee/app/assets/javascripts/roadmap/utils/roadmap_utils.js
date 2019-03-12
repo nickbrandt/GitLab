@@ -428,7 +428,7 @@ export const sortEpics = (epics, sortedBy) => {
       }
 
       if (b.startDateUndefined) {
-        aDate = pastDate;
+        bDate = pastDate;
       } else {
         bDate = b.startDateOutOfRange ? b.originalStartDate : b.startDate;
       }

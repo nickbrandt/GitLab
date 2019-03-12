@@ -36,19 +36,11 @@ module Operations
     scope :ordered, -> { order(:name) }
 
     scope :enabled, -> do
-      if Feature.enabled?(:feature_flags_environment_scope)
-        where('EXISTS (?)', join_enabled_scopes)
-      else
-        where(active: true)
-      end
+      where('EXISTS (?)', join_enabled_scopes)
     end
 
     scope :disabled, -> do
-      if Feature.enabled?(:feature_flags_environment_scope)
-        where('NOT EXISTS (?)', join_enabled_scopes)
-      else
-        where(active: false)
-      end
+      where('NOT EXISTS (?)', join_enabled_scopes)
     end
 
     scope :for_environment, -> (environment) do
