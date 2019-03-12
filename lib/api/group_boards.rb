@@ -24,7 +24,7 @@ module API
     resource :groups, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       segment ':id/boards' do
         desc 'Find a group board' do
-          detail 'This feature was introduced in 10.4'
+          detail 'This feature was introduced in 10.6'
           success ::API::Entities::Board
         end
         get '/:board_id' do
@@ -32,7 +32,7 @@ module API
         end
 
         desc 'Get all group boards' do
-          detail 'This feature was introduced in 10.4'
+          detail 'This feature was introduced in 10.6'
           success Entities::Board
         end
         params do
@@ -48,7 +48,7 @@ module API
       end
       segment ':id/boards/:board_id' do
         desc 'Get the lists of a group board' do
-          detail 'Does not include backlog and closed lists. This feature was introduced in 10.4'
+          detail 'Does not include backlog and closed lists. This feature was introduced in 10.6'
           success Entities::List
         end
         params do
@@ -59,7 +59,7 @@ module API
         end
 
         desc 'Get a list of a group board' do
-          detail 'This feature was introduced in 10.4'
+          detail 'This feature was introduced in 10.6'
           success Entities::List
         end
         params do
@@ -70,7 +70,7 @@ module API
         end
 
         desc 'Create a new board list' do
-          detail 'This feature was introduced in 10.4'
+          detail 'This feature was introduced in 10.6'
           success Entities::List
         end
         params do
@@ -85,7 +85,7 @@ module API
         end
 
         desc 'Moves a board list to a new position' do
-          detail 'This feature was introduced in 10.4'
+          detail 'This feature was introduced in 10.6'
           success Entities::List
         end
         params do
@@ -101,7 +101,7 @@ module API
         end
 
         desc 'Delete a board list' do
-          detail 'This feature was introduced in 10.4'
+          detail 'This feature was introduced in 10.6'
           success Entities::List
         end
         params do

@@ -29,7 +29,7 @@ module API
 
     resource :projects, requirements: API::NAMESPACE_OR_PROJECT_REQUIREMENTS do
       desc 'Get project software license policies' do
-        success Entities::ManagedLicense
+        success EE::API::Entities::ManagedLicense
       end
       route_setting :skip_authentication, true
       params do
@@ -39,21 +39,21 @@ module API
         authorize_can_read!
 
         software_license_policies = user_project.software_license_policies
-        present paginate(software_license_policies), with: Entities::ManagedLicense
+        present paginate(software_license_policies), with: EE::API::Entities::ManagedLicense
       end
 
       desc 'Get a specific software license policy from a project' do
-        success Entities::ManagedLicense
+        success EE::API::Entities::ManagedLicense
       end
       get ':id/managed_licenses/:managed_license_id', requirements: { managed_license_id: /.*/ } do
         authorize_can_read!
         break not_found!('SoftwareLicensePolicy') unless software_license_policy
 
-        present software_license_policy, with: Entities::ManagedLicense
+        present software_license_policy, with: EE::API::Entities::ManagedLicense
       end
 
       desc 'Create a new software license policy in a project' do
-        success Entities::ManagedLicense
+        success EE::API::Entities::ManagedLicense
       end
       params do
         requires :name, type: String, desc: 'The name of the license'
@@ -73,14 +73,14 @@ module API
         created_software_license_policy = result[:software_license_policy]
 
         if result[:status] == :success
-          present created_software_license_policy, with: Entities::ManagedLicense
+          present created_software_license_policy, with: EE::API::Entities::ManagedLicense
         else
           render_api_error!(result[:message], result[:http_status])
         end
       end
 
       desc 'Update an existing software license policy from a project' do
-        success Entities::ManagedLicense
+        success EE::API::Entities::ManagedLicense
       end
       params do
         optional :name, type: String, desc: 'The name of the license'
@@ -101,7 +101,7 @@ module API
         ).execute(@software_license_policy)
 
         if result[:status] == :success
-          present @software_license_policy, with: Entities::ManagedLicense
+          present @software_license_policy, with: EE::API::Entities::ManagedLicense
         else
           render_api_error!(result[:message], result[:http_status])
         end
@@ -109,7 +109,7 @@ module API
       # rubocop: enable CodeReuse/ActiveRecord
 
       desc 'Delete an existing software license policy from a project' do
-        success Entities::ManagedLicense
+        success EE::API::Entities::ManagedLicense
       end
       delete ':id/managed_licenses/:managed_license_id', requirements: { managed_license_id: /.*/ } do
         authorize_can_admin!

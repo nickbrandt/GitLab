@@ -1,0 +1,40 @@
+# frozen_string_literal: true
+
+module EE
+  module API
+    module Settings
+      extend ActiveSupport::Concern
+
+      prepended do
+        helpers do
+          extend ::Gitlab::Utils::Override
+
+          override :filter_attributes_using_license
+          # rubocop: disable CodeReuse/ActiveRecord
+          def filter_attributes_using_license(attrs)
+            unless ::License.feature_available?(:repository_mirrors)
+              attrs = attrs.except(*::EE::ApplicationSettingsHelper.repository_mirror_attributes)
+            end
+
+            unless ::License.feature_available?(:external_authorization_service)
+              attrs = attrs.except(
+                *::EE::ApplicationSettingsHelper.external_authorization_service_attributes
+              )
+            end
+
+            unless ::License.feature_available?(:email_additional_text)
+              attrs = attrs.except(:email_additional_text)
+            end
+
+            unless ::License.feature_available?(:custom_file_templates)
+              attrs = attrs.except(:file_template_project_id)
+            end
+
+            attrs
+          end
+          # rubocop: enable CodeReuse/ActiveRecord
+        end
+      end
+    end
+  end
+end
