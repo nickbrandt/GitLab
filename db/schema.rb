@@ -1917,6 +1917,7 @@ ActiveRecord::Schema.define(version: 20190305162221) do
     t.string "saml_discovery_token"
     t.string "runners_token_encrypted"
     t.integer "custom_project_templates_group_id"
+    t.boolean "auto_devops_enabled"
     t.index ["created_at"], name: "index_namespaces_on_created_at", using: :btree
     t.index ["custom_project_templates_group_id", "type"], name: "index_namespaces_on_custom_project_templates_group_id_and_type", where: "(custom_project_templates_group_id IS NOT NULL)", using: :btree
     t.index ["file_template_project_id"], name: "index_namespaces_on_file_template_project_id", using: :btree
