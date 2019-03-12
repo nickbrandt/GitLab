@@ -7,7 +7,7 @@ module QA
             class New < QA::Page::Base
               view 'ee/app/views/admin/geo/nodes/_form.html.haml' do
                 element :node_url_field, 'text_field :url' # rubocop:disable QA/ElementWithPattern
-                element :node_url_placeholder, "label :url, 'URL'" # rubocop:disable QA/ElementWithPattern
+                element :node_url_placeholder, "label :url" # rubocop:disable QA/ElementWithPattern
               end
 
               view 'ee/app/views/admin/geo/nodes/new.html.haml' do

@@ -434,6 +434,7 @@ module EE
 
         expose :id
         expose :url
+        expose :alternate_url
         expose :primary?, as: :primary
         expose :enabled
         expose :current?, as: :current

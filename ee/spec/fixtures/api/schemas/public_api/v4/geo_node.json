@@ -3,6 +3,7 @@
   "required" : [
     "id",
     "url",
+    "alternate_url",
     "primary",
     "enabled",
     "current",
@@ -15,6 +16,7 @@
   "properties" : {
     "id": { "type": "integer" },
     "url": { "type": ["string", "null"] },
+    "alternate_url": { "type": ["string", "null"] },
     "primary": { "type": "boolean" },
     "enabled": { "type": "boolean" },
     "current": { "type": "boolean" },

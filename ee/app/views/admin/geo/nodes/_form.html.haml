@@ -1,70 +1,58 @@
 = form_errors(geo_node)
-.form-group.row
-  .col-sm-2
-    = form.label :url, 'URL', class: 'col-form-label'
-  .col-sm-10
+.form-row.form-group
+  .form-group.col-sm-6
+    = form.label :url, s_('Geo|URL'), class: 'font-weight-bold'
     = form.text_field :url, class: 'form-control'
 
-.form-group.row
-  .offset-sm-2.col-sm-10
+  .form-group.col-sm-6.js-hide-if-geo-primary{ class: ('hidden' unless geo_node.secondary?) }
+    = form.label :alternate_url, s_('Geo|Alternate URL'), class: 'font-weight-bold'
+    = form.text_field :alternate_url, class: 'form-control'
+    .form-text.text-muted= s_('Geo|To support OAuth logins to this node at a different domain than URL')
+
+.form-row.form-group
+  .col-sm-12
     .form-check
       = form.check_box :primary, class: 'form-check-input'
       = form.label :primary, class: 'form-check-label' do
-        %strong This is a primary node
+        %span= s_('Geo|This is a primary node')
 
-.js-hide-if-geo-primary{ class: ('hidden' unless geo_node.secondary?) }
-  .form-group.row
-    .col-sm-2
-      = form.label :selective_sync_type, s_('Selective synchronization'), class: 'col-form-label'
-    .col-sm-10
-      = form.select :selective_sync_type, selective_sync_type_options_for_select(geo_node),
-          {}, { class: "form-control js-geo-node-selective-sync-type" }
+.form-row.form-group.js-hide-if-geo-primary{ class: ('hidden' unless geo_node.secondary?) }
+  .col-sm-4
+    = form.label :selective_sync_type, s_('Geo|Selective synchronization'), class: 'font-weight-bold'
+    = form.select :selective_sync_type, selective_sync_type_options_for_select(geo_node), {}, { class: "form-control js-geo-node-selective-sync-type" }
 
-  .form-group.row.js-sync-by-namespace{ class: ('hidden' unless geo_node.selective_sync_by_namespaces?) }
-    .col-sm-2
-      = form.label :namespace_ids, s_('Geo|Groups to synchronize'), class: 'col-form-label'
-    .col-sm-10
-      = hidden_field_tag "#{form.object_name}[namespace_ids]", geo_node.namespace_ids.join(","), class: 'js-geo-node-namespaces', data: { selected: node_namespaces_options(geo_node.namespaces).to_json }
-      .form-text.text-muted
-        #{ s_("Choose which groups you wish to synchronize to this secondary node.") }
+.form-row.form-group.js-sync-by-namespace{ class: ('hidden' unless geo_node.selective_sync_by_namespaces?) }
+  .col-sm-4
+    = form.label :namespace_ids, s_('Geo|Groups to synchronize'), class: 'font-weight-bold'
+    = hidden_field_tag "#{form.object_name}[namespace_ids]", geo_node.namespace_ids.join(","), class: 'js-geo-node-namespaces', data: { selected: node_namespaces_options(geo_node.namespaces).to_json }
+    .form-text.text-muted= s_('Geo|Choose which groups you wish to synchronize to this secondary node.')
 
-  .form-group.row.js-sync-by-shard{ class: ('hidden' unless geo_node.selective_sync_by_shards?) }
-    .col-sm-2
-      = form.label :selective_sync_shards, s_('Geo|Shards to synchronize'), class: 'col-form-label'
-    .col-sm-10
-      = form.select :selective_sync_shards, repository_storages_options_for_select(geo_node.selective_sync_shards),
-        { include_hidden: false }, multiple: true, class: 'form-control'
-      .form-text.text-muted
-        #{ s_("Choose which shards you wish to synchronize to this secondary node.") }
+.form-row.form-group.js-sync-by-shard{ class: ('hidden' unless geo_node.selective_sync_by_shards?) }
+  .col-sm-4
+    = form.label :selective_sync_shards, s_('Geo|Shards to synchronize'), class: 'font-weight-bold'
+    = form.select :selective_sync_shards, repository_storages_options_for_select(geo_node.selective_sync_shards), { include_hidden: false }, multiple: true, class: 'form-control'
+    .form-text.text-muted= s_('Choose which shards you wish to synchronize to this secondary node.')
 
-.form-group.row.js-hide-if-geo-primary{ class: ('hidden' unless geo_node.secondary?) }
-  .col-sm-2
-    = form.label :repos_max_capacity, s_('Geo|Repository sync capacity'), class: 'col-form-label'
-  .col-sm-10
-    = form.number_field :repos_max_capacity, class: 'form-control', min: 0
-    .form-text.text-muted
-      #{ s_('Control the maximum concurrency of repository backfill for this secondary node') }
+.form-row.form-group.js-hide-if-geo-primary{ class: ('hidden' unless geo_node.secondary?) }
+  .col-sm-8
+    = form.label :repos_max_capacity, s_('Geo|Repository sync capacity'), class: 'font-weight-bold'
+    = form.number_field :repos_max_capacity, class: 'form-control col-sm-2', min: 0
+    .form-text.text-muted= s_('Control the maximum concurrency of repository backfill for this secondary node')
 
-.form-group.row.js-hide-if-geo-primary{ class: ('hidden' unless geo_node.secondary?) }
-  .col-sm-2
-    = form.label :files_max_capacity, s_('Geo|File sync capacity'), class: 'col-form-label'
-  .col-sm-10
-    = form.number_field :files_max_capacity, class: 'form-control', min: 0
-    .form-text.text-muted
-      #{ s_('Control the maximum concurrency of LFS/attachment backfill for this secondary node') }
+.form-row.form-group.js-hide-if-geo-primary{ class: ('hidden' unless geo_node.secondary?) }
+  .col-sm-8
+    = form.label :files_max_capacity, s_('Geo|File sync capacity'), class: 'font-weight-bold'
+    = form.number_field :files_max_capacity, class: 'form-control col-sm-2', min: 0
+    .form-text.text-muted= s_('Geo|Control the maximum concurrency of LFS/attachment backfill for this secondary node')
 
-.form-group.row
-  .col-sm-2
-    = form.label :verification_max_capacity, s_('Geo|Verification capacity'), class: 'col-form-label'
-  .col-sm-10
-    = form.number_field :verification_max_capacity, class: 'form-control', min: 0
-    .form-text.text-muted
-      #{ s_('Control the maximum concurrency of verification operations for this Geo node') }
+.form-row.form-group
+  .col-sm-8
+    = form.label :verification_max_capacity, s_('Geo|Verification capacity'), class: 'font-weight-bold'
+    = form.number_field :verification_max_capacity, class: 'form-control col-sm-2', min: 0
+    .form-text.text-muted= s_('Geo|Control the maximum concurrency of verification operations for this Geo node')
 
-.form-group.row.js-hide-if-geo-secondary{ class: ('hidden' unless geo_node.primary?) }
-  .col-sm-2
-    = form.label :minimum_reverification_interval, s_('Geo|Re-verification interval'), class: 'col-form-label'
-  .col-sm-10
-    = form.number_field :minimum_reverification_interval, class: 'form-control', min: 1
-    .form-text.text-muted
-      #{ s_('Control the minimum interval in days that a repository should be reverified for this primary node') }
+.form-row.form-group.js-hide-if-geo-secondary{ class: ('hidden' unless geo_node.primary?) }
+  .col-sm-8
+    = form.label :minimum_reverification_interval, s_('Geo|Re-verification interval'), class: 'font-weight-bold'
+    = form.number_field :minimum_reverification_interval, class: 'form-control col-sm-2', min: 1
+    .form-text.text-muted= s_('Geo|Control the minimum interval in days that a repository should be reverified for this primary node')

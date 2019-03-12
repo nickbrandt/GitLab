@@ -141,6 +141,7 @@ export default {
         :item-value-stale-tooltip="statusInfoStaleMessage"
         :custom-type="nodeDetailItem.customType"
         :event-type-log-status="nodeDetailItem.eventTypeLogStatus"
+        class="prepend-top-15 prepend-left-10"
       />
     </div>
   </div>

@@ -121,7 +121,7 @@ export default {
 </script>
 
 <template>
-  <div class="node-detail-item prepend-top-15 prepend-left-10">
+  <div class="node-detail-item">
     <div class="node-detail-title">
       <span> {{ itemTitle }} </span>
       <icon
