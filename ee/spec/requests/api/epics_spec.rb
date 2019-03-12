@@ -203,6 +203,108 @@ describe API::Epics do
         expect_paginated_array_response([epic2.id])
       end
 
+      it 'returns an array of labeled epics with labels param as array' do
+        get api(url, user), params: { labels: [label.title] }
+
+        expect_paginated_array_response([epic2.id])
+      end
+
+      it 'returns an array of labeled epics when all labels matches' do
+        label_b = create(:group_label, title: 'foo', group: group)
+        label_c = create(:label, title: 'bar', project: project)
+
+        create(:label_link, label: label_b, target: epic2)
+        create(:label_link, label: label_c, target: epic2)
+
+        get api(url, user), params: { labels: "#{label.title},#{label_b.title},#{label_c.title}" }
+
+        expect_paginated_array_response([epic2.id])
+        expect(json_response.first['labels']).to match_array([label.title, label_b.title, label_c.title])
+      end
+
+      it 'returns an array of labeled epics when all labels matches with labels param as array' do
+        label_b = create(:group_label, title: 'foo', group: group)
+        label_c = create(:label, title: 'bar', project: project)
+
+        create(:label_link, label: label_b, target: epic2)
+        create(:label_link, label: label_c, target: epic2)
+
+        get api(url, user), params: { labels: [label.title, label_b.title, label_c.title] }
+
+        expect_paginated_array_response([epic2.id])
+        expect(json_response.first['labels']).to match_array([label.title, label_b.title, label_c.title])
+      end
+
+      it 'returns an empty array if no epic matches labels' do
+        get api(url, user), params: { labels: 'foo,bar' }
+
+        expect_paginated_array_response([])
+      end
+
+      it 'returns an empty array if no epic matches labels with labels param as array' do
+        get api(url, user), params: { labels: %w(foo bar) }
+
+        expect_paginated_array_response([])
+      end
+
+      it 'returns an array of labeled epics matching given state' do
+        get api(url, user), params: { labels: label.title, state: :opened }
+
+        expect_paginated_array_response(epic2.id)
+        expect(json_response.first['labels']).to eq([label.title])
+        expect(json_response.first['state']).to eq('opened')
+      end
+
+      it 'returns an array of labeled epics matching given state with labels param as array' do
+        get api(url, user), params: { labels: [label.title], state: :opened }
+
+        expect_paginated_array_response(epic2.id)
+        expect(json_response.first['labels']).to eq([label.title])
+        expect(json_response.first['state']).to eq('opened')
+      end
+
+      it 'returns an empty array if no epic matches labels and state filters' do
+        get api(url, user), params: { labels: label.title, state: :closed }
+
+        expect_paginated_array_response([])
+      end
+
+      it 'returns an array of epics with any label' do
+        get api(url, user), params: { labels: IssuesFinder::FILTER_ANY }
+
+        expect_paginated_array_response(epic2.id)
+      end
+
+      it 'returns an array of epics with any label with labels param as array' do
+        get api(url, user), params: { labels: [IssuesFinder::FILTER_ANY] }
+
+        expect_paginated_array_response(epic2.id)
+      end
+
+      it 'returns an array of epics with no label' do
+        get api(url, user), params: { labels: IssuesFinder::FILTER_NONE }
+
+        expect_paginated_array_response(epic.id)
+      end
+
+      it 'returns an array of epics with no label with labels param as array' do
+        get api(url, user), params: { labels: [IssuesFinder::FILTER_NONE] }
+
+        expect_paginated_array_response(epic.id)
+      end
+
+      it 'returns an array of epics with no label when using the legacy No+Label filter' do
+        get api(url, user), params: { labels: 'No Label' }
+
+        expect_paginated_array_response(epic.id)
+      end
+
+      it 'returns an array of epics with no label when using the legacy No+Label filter with labels param as array' do
+        get api(url, user), params: { labels: ['No Label'] }
+
+        expect_paginated_array_response(epic.id)
+      end
+
       it_behaves_like 'can admin epics'
     end
 
@@ -285,12 +387,11 @@ describe API::Epics do
     context 'when epics feature is enabled' do
       before do
         stub_licensed_features(epics: true)
+        group.add_developer(user)
       end
 
       context 'when required parameter is missing' do
         it 'returns 400' do
-          group.add_developer(user)
-
           post api(url, user), params: { description: 'epic description' }
 
           expect(response).to have_gitlab_http_status(400)
@@ -299,8 +400,6 @@ describe API::Epics do
 
       context 'when the request is correct' do
         before do
-          group.add_developer(user)
-
           post api(url, user), params: params
         end
 
@@ -336,6 +435,22 @@ describe API::Epics do
             expect(result.due_date_fixed).to eq(due_date)
           end
         end
+      end
+
+      it 'creates a new epic with labels param as array' do
+        params[:labels] = ['label1', 'label2', 'foo, bar', '&,?']
+
+        post api(url, user), params: params
+
+        expect(response.status).to eq(201)
+        expect(json_response['title']).to include 'new epic'
+        expect(json_response['description']).to include 'epic description'
+        expect(json_response['labels']).to include 'label1'
+        expect(json_response['labels']).to include 'label2'
+        expect(json_response['labels']).to include 'foo'
+        expect(json_response['labels']).to include 'bar'
+        expect(json_response['labels']).to include '&'
+        expect(json_response['labels']).to include '?'
       end
     end
   end
@@ -407,6 +522,22 @@ describe API::Epics do
             expect(result.due_date_fixed).to eq(nil)
             expect(result.due_date_is_fixed).to be_falsey
           end
+        end
+
+        it 'updates the epic with labels param as array' do
+          params[:labels] = ['label1', 'label2', 'foo, bar', '&,?']
+
+          put api(url, user), params: params
+
+          expect(response.status).to eq(200)
+          expect(json_response['title']).to include 'new title'
+          expect(json_response['description']).to include 'new description'
+          expect(json_response['labels']).to include 'label1'
+          expect(json_response['labels']).to include 'label2'
+          expect(json_response['labels']).to include 'foo'
+          expect(json_response['labels']).to include 'bar'
+          expect(json_response['labels']).to include '&'
+          expect(json_response['labels']).to include '?'
         end
 
         context 'when state_event is close' do
