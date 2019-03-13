@@ -67,6 +67,24 @@ describe('Linked pipeline', () => {
       expect(titleAttr).toContain(mockPipeline.project.name);
       expect(titleAttr).toContain(mockPipeline.details.status.label);
     });
+
+    it('does not render the loading icon when isLoading is false', () => {
+      expect(vm.$el.querySelector('.js-linked-pipeline-loading')).toBeNull();
+    });
+  });
+
+  describe('when isLoading is true', () => {
+    const props = {
+      pipeline: { ...mockPipeline, isLoading: true },
+    };
+
+    beforeEach(() => {
+      vm = mountComponent(Component, props);
+    });
+
+    it('renders a loading icon', () => {
+      expect(vm.$el.querySelector('.js-linked-pipeline-loading')).not.toBeNull();
+    });
   });
 
   describe('on click', () => {
