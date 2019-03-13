@@ -6530,6 +6530,9 @@ msgstr ""
 msgid "Modal|Close"
 msgstr ""
 
+msgid "Modify commit message"
+msgstr ""
+
 msgid "Modify commit messages"
 msgstr ""
 
