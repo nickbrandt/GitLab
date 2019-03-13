@@ -16,13 +16,11 @@ module SoftwareLicensePolicies
       name = params.delete(:name)
 
       software_license = SoftwareLicense.transaction do
-        begin
-          SoftwareLicense.transaction(requires_new: true) do
-            SoftwareLicense.find_or_create_by(name: name)
-          end
-        rescue ActiveRecord::RecordNotUnique
-          retry
+        SoftwareLicense.transaction(requires_new: true) do
+          SoftwareLicense.find_or_create_by(name: name)
         end
+      rescue ActiveRecord::RecordNotUnique
+        retry
       end
 
       # Add the software license to params

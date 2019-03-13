@@ -45,15 +45,13 @@ module EE
 
         def file_name_validation
           lambda do |diff|
-            begin
-              if (diff.renamed_file || diff.new_file) && blacklisted_regex = push_rule.filename_blacklisted?(diff.new_path)
-                return unless blacklisted_regex.present?
+            if (diff.renamed_file || diff.new_file) && blacklisted_regex = push_rule.filename_blacklisted?(diff.new_path)
+              return unless blacklisted_regex.present?
 
-                "File name #{diff.new_path} was blacklisted by the pattern #{blacklisted_regex}."
-              end
-            rescue ::PushRule::MatchError => e
-              raise ::Gitlab::GitAccess::UnauthorizedError, e.message
+              "File name #{diff.new_path} was blacklisted by the pattern #{blacklisted_regex}."
             end
+          rescue ::PushRule::MatchError => e
+            raise ::Gitlab::GitAccess::UnauthorizedError, e.message
           end
         end
       end
