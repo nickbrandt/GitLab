@@ -12042,6 +12042,9 @@ msgstr ""
 msgid "mrWidgetCommitsAdded|%{commitCount} and %{mergeCommitCount} will be added to %{targetBranch}."
 msgstr ""
 
+msgid "mrWidgetCommitsAdded|%{commitCount} will be added to %{targetBranch}."
+msgstr ""
+
 msgid "mrWidgetCommitsAdded|1 merge commit"
 msgstr ""
 
