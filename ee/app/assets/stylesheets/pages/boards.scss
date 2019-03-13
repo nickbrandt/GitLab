@@ -104,15 +104,13 @@
 }
 
 .boards-switcher {
-  .boards-selector-wrapper {
-    .dropdown-menu.show.dropdown-extended-height {
-      max-height: $dropdown-max-height-lg;
-    }
-  }
-
-  .dropdown-menu.show {
+  .boards-selector-wrapper > .show.dropdown .dropdown-menu {
     // we cannot use d-flex from Bootstrap because of !important
     // see https://gitlab.com/gitlab-org/gitlab-ui/issues/38
     display: flex;
+
+    &.dropdown-extended-height {
+      max-height: $dropdown-max-height-lg;
+    }
   }
 }
