@@ -1,7 +1,6 @@
 import { parseIntPagination, normalizeHeaders } from '~/lib/utils/common_utils';
+import { setDeployBoard } from 'ee_else_ce/environments/stores/helpers';
 
-// ee-only
-import { CLUSTER_TYPE } from '~/clusters/constants';
 /**
  * Environments Store.
  *
@@ -74,40 +73,11 @@ export default class EnvironmentsStore {
         filtered = Object.assign(filtered, env);
       }
 
-      if (
-        filtered.size === 1 &&
-        filtered.rollout_status &&
-        filtered.cluster_type !== CLUSTER_TYPE.GROUP
-      ) {
-        filtered = Object.assign({}, filtered, {
-          hasDeployBoard: true,
-          isDeployBoardVisible:
-            oldEnvironmentState.isDeployBoardVisible === false
-              ? oldEnvironmentState.isDeployBoardVisible
-              : true,
-          deployBoardData:
-            filtered.rollout_status.status === 'found' ? filtered.rollout_status : {},
-          isLoadingDeployBoard: filtered.rollout_status.status === 'loading',
-          isEmptyDeployBoard: filtered.rollout_status.status === 'not_found',
-        });
-      }
+      filtered = setDeployBoard(oldEnvironmentState, filtered);
       return filtered;
     });
 
     this.state.environments = filteredEnvironments;
-
-    // ee-only start
-    /**
-     * Add the canary callout banner underneath the second environment listed.
-     *
-     * If there is only one environment, then add to it underneath the first.
-     */
-    if (this.state.environments.length >= 2) {
-      this.state.environments[1].showCanaryCallout = true;
-    } else if (this.state.environments.length === 1) {
-      this.state.environments[0].showCanaryCallout = true;
-    }
-    // ee-only end
 
     return filteredEnvironments;
   }
@@ -220,28 +190,5 @@ export default class EnvironmentsStore {
     const { environments } = this.state;
 
     return environments.filter(env => env.isFolder && env.isOpen);
-  }
-
-  /**
-   * Toggles deploy board visibility for the provided environment ID.
-   *
-   * @param  {Object} environment
-   * @return {Array}
-   */
-  toggleDeployBoard(environmentID) {
-    const environments = this.state.environments.slice();
-
-    this.state.environments = environments.map(env => {
-      let updated = Object.assign({}, env);
-
-      if (env.id === environmentID) {
-        updated = Object.assign({}, updated, {
-          isDeployBoardVisible: !env.isDeployBoardVisible,
-        });
-      }
-      return updated;
-    });
-
-    return this.state.environments;
   }
 }
