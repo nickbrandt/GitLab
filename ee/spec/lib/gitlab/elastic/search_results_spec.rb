@@ -441,6 +441,8 @@ describe Gitlab::Elastic::SearchResults do
 
       results = described_class.new(user, 'def', [project_1.id])
       expect(results.blobs_count).to eq 7
+      result_project_ids = results.objects('blobs').map { |r| r.dig('_source', 'project_id') }
+      expect(result_project_ids.uniq).to eq([project_1.id])
 
       results = described_class.new(user, 'def', [project_1.id, project_2.id])
 

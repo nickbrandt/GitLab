@@ -96,6 +96,7 @@ module Elasticsearch
               _id: "#{repository_id}_#{blob.path}",
               routing: es_parent,
               data: {
+                project_id: project_id,
                 blob: {
                   oid: blob.id,
                   rid: repository_id,
@@ -236,6 +237,7 @@ module Elasticsearch
         # Attention: It can be very very very huge hash
         def as_indexed_json(options = {})
           data = {}
+          data[:project_id] = project_id
           data[:blobs] = index_blobs_array
           data[:commits] = index_commits_array
           data
