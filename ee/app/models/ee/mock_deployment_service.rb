@@ -5,11 +5,11 @@ module EE
     def rollout_status(environment)
       case environment.name
       when 'staging'
-        Gitlab::Kubernetes::RolloutStatus.new([], status: :not_found)
+        ::Gitlab::Kubernetes::RolloutStatus.new([], status: :not_found)
       when 'test'
-        Gitlab::Kubernetes::RolloutStatus.new([], status: :loading)
+        ::Gitlab::Kubernetes::RolloutStatus.new([], status: :loading)
       else
-        Gitlab::Kubernetes::RolloutStatus.new(rollout_status_deployments)
+        ::Gitlab::Kubernetes::RolloutStatus.new(rollout_status_deployments)
       end
     end
 
