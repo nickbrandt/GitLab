@@ -49,7 +49,7 @@ gem 'jwt', '~> 2.1.0'
 gem 'gssapi', group: :kerberos
 
 # Spam and anti-bot protection
-gem 'recaptcha', '~> 3.0', require: 'recaptcha/rails'
+gem 'recaptcha', '~> 4.11', require: 'recaptcha/rails'
 gem 'akismet', '~> 2.0'
 
 # Two-factor authentication
