@@ -1,5 +1,0 @@
----
-title: Fix 500 error when visiting merged merge request
-merge_request: 9648
-author:
-type: fixed

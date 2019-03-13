@@ -1,5 +1,0 @@
---- 
-title: Add 'No approvals required' view to approval rules (behind feature flag)
-merge_request: 9899
-author:
-type: fixed
