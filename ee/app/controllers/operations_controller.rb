@@ -3,12 +3,19 @@
 class OperationsController < ApplicationController
   before_action :authorize_read_operations_dashboard!
 
+  before_action do
+    push_frontend_feature_flag(:pipeline_dashboard)
+  end
+
   respond_to :json, only: [:list]
+
+  POLLING_INTERVAL = 120_000
 
   def index
   end
 
   def list
+    Gitlab::PollingInterval.set_header(response, interval: POLLING_INTERVAL)
     projects = load_projects(current_user)
 
     render json: { projects: serialize_as_json(projects) }
