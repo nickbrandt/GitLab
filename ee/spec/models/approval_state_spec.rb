@@ -83,6 +83,13 @@ describe ApprovalState do
     end
   end
 
+  shared_examples_for 'a MR that all members with write access can approve' do
+    it { expect(subject.can_approve?(developer)).to be_truthy }
+    it { expect(subject.can_approve?(reporter)).to be_falsey }
+    it { expect(subject.can_approve?(stranger)).to be_falsey }
+    it { expect(subject.can_approve?(nil)).to be_falsey }
+  end
+
   context '#approval_rules_overwritten?' do
     context 'when approval rule on the merge request does not exist' do
       it 'returns false' do
@@ -461,15 +468,10 @@ describe ApprovalState do
 
           it_behaves_like 'authors self-approval authorization'
 
+          it_behaves_like 'a MR that all members with write access can approve'
+
           it 'requires one approval' do
             expect(subject.approvals_left).to eq(1)
-          end
-
-          it 'allows any other project member with write access to approve the MR' do
-            expect(subject.can_approve?(developer)).to be_truthy
-
-            expect(subject.can_approve?(reporter)).to be_falsey
-            expect(subject.can_approve?(stranger)).to be_falsey
           end
 
           it 'does not allow a logged-out user to approve the MR' do
@@ -526,6 +528,8 @@ describe ApprovalState do
               create(:approval, user: approver2, merge_request: merge_request)
             end
 
+            it_behaves_like 'a MR that all members with write access can approve'
+
             it 'requires the original number of approvals' do
               expect(subject.approvals_left).to eq(1)
             end
@@ -537,14 +541,6 @@ describe ApprovalState do
             it 'does not allow the approvers to approve the MR again' do
               expect(subject.can_approve?(approver)).to be_falsey
               expect(subject.can_approve?(approver2)).to be_falsey
-            end
-
-            it 'allows any other project member with write access to approve the MR' do
-              expect(subject.can_approve?(developer)).to be_truthy
-
-              expect(subject.can_approve?(reporter)).to be_falsey
-              expect(subject.can_approve?(stranger)).to be_falsey
-              expect(subject.can_approve?(nil)).to be_falsey
             end
           end
 
@@ -1031,15 +1027,10 @@ describe ApprovalState do
 
           it_behaves_like 'authors self-approval authorization'
 
+          it_behaves_like 'a MR that all members with write access can approve'
+
           it 'requires one approval' do
             expect(subject.approvals_left).to eq(1)
-          end
-
-          it 'allows any other project member with write access to approve the MR' do
-            expect(subject.can_approve?(developer)).to be_truthy
-
-            expect(subject.can_approve?(reporter)).to be_falsey
-            expect(subject.can_approve?(stranger)).to be_falsey
           end
 
           it 'does not allow a logged-out user to approve the MR' do
@@ -1096,6 +1087,8 @@ describe ApprovalState do
               create(:approval, user: approver2, merge_request: merge_request)
             end
 
+            it_behaves_like 'a MR that all members with write access can approve'
+
             it 'requires the original number of approvals' do
               expect(subject.approvals_left).to eq(1)
             end
@@ -1107,14 +1100,6 @@ describe ApprovalState do
             it 'does not allow the approvers to approve the MR again' do
               expect(subject.can_approve?(approver)).to be_falsey
               expect(subject.can_approve?(approver2)).to be_falsey
-            end
-
-            it 'allows any other project member with write access to approve the MR' do
-              expect(subject.can_approve?(developer)).to be_truthy
-
-              expect(subject.can_approve?(reporter)).to be_falsey
-              expect(subject.can_approve?(stranger)).to be_falsey
-              expect(subject.can_approve?(nil)).to be_falsey
             end
           end
 
