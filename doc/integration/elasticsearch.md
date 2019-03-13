@@ -108,7 +108,7 @@ total are being tracked in this epic: [gitlab-org&153](https://gitlab.com/groups
 ## Enabling Elasticsearch
 
 In order to enable Elasticsearch, you need to have admin access. Go to
-**Admin > Settings** and find the "Elasticsearch" section.
+**Admin > Settings > Integrations** and find the "Elasticsearch" section.
 
 The following Elasticsearch settings are available:
 
@@ -127,7 +127,7 @@ The following Elasticsearch settings are available:
 
 To disable the Elasticsearch integration:
 
-1. Navigate to the **Admin area > Settings**
+1. Navigate to the **Admin > Settings > Integrations**
 1. Find the 'Elasticsearch' section and uncheck 'Search with Elasticsearch enabled'
    and 'Elasticsearch indexing'
 1. Click **Save** for the changes to take effect
@@ -136,7 +136,7 @@ To disable the Elasticsearch integration:
 
 ### Indexing small instances (database size less than 500 MiB, size of repos less than 5 GiB)
 
-Configure Elasticsearch's host and port in **Admin > Settings**. Then create empty indexes using one of the following commands:
+Configure Elasticsearch's host and port in **Admin > Settings > Integrations**. Then create empty indexes using one of the following commands:
 
 ```sh
 # Omnibus installations
@@ -163,7 +163,7 @@ Enable Elasticsearch search.
 NOTE: **Note**:
 After indexing the repositories asynchronously, you MUST index the database to be able to search.
 
-Configure Elasticsearch's host and port in **Admin > Settings**. Then create empty indexes using one of the following commands:
+Configure Elasticsearch's host and port in **Admin > Settings > Integrations**. Then create empty indexes using one of the following commands:
 
 ```sh
 # Omnibus installations
@@ -314,7 +314,7 @@ A force merge should be called after enabling the refreshing above:
 curl --request POST 'http://localhost:9200/_forcemerge?max_num_segments=5'
 ```
 
-Enable Elasticsearch search in **Admin > Settings**. That's it. Enjoy it!
+Enable Elasticsearch search in **Admin > Settings > Integrations**. That's it. Enjoy it!
 
 ## Tuning
 
