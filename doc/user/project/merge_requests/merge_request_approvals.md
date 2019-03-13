@@ -293,6 +293,8 @@ Approvers are suggested for merge requests based on the previous authors of the 
 
 ## Filtering merge requests by approvers
 
+> [Introduced](https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/9468) in [GitLab Starter](https://about.gitlab.com/pricing/) 11.9.
+
 To filter merge requests by an individual approver, you can type (or select from
 the dropdown) `approver` and select the user.
 
