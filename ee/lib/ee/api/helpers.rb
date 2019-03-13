@@ -136,7 +136,7 @@ module EE
       end
 
       def check_group_scim_enabled(group)
-        forbidden!('Group SCIM not enabled.') unless Feature.enabled?(:group_scim, group)
+        forbidden!('Group SCIM not enabled.') unless ::Feature.enabled?(:group_scim, group)
       end
 
       def check_group_saml_configured

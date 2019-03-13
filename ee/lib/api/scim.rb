@@ -36,6 +36,8 @@ module API
 
         # rubocop: disable CodeReuse/ActiveRecord
         def email_taken?(email, identity)
+          return unless email
+
           User.by_any_email(email.downcase).where.not(id: identity.user.id).count > 0
         end
         # rubocop: enable CodeReuse/ActiveRecord
