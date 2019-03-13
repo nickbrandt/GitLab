@@ -1581,6 +1581,14 @@ ActiveRecord::Schema.define(version: 20190301182457) do
     t.index ["updated_by_id"], name: "index_issues_on_updated_by_id", where: "(updated_by_id IS NOT NULL)", using: :btree
   end
 
+  create_table "jira_connect_installations", id: :bigserial, force: :cascade do |t|
+    t.string "client_key"
+    t.string "encrypted_shared_secret"
+    t.string "encrypted_shared_secret_iv"
+    t.string "base_url"
+    t.index ["client_key"], name: "index_jira_connect_installations_on_client_key", unique: true, using: :btree
+  end
+
   create_table "keys", force: :cascade do |t|
     t.integer "user_id"
     t.datetime "created_at"
