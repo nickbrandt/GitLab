@@ -17,7 +17,7 @@ module API
         end
 
         def destroy_identity(identity)
-          GroupSaml::Identity::DestroyService.new(identity).execute
+          GroupSaml::Identity::DestroyService.new(identity).execute(transactional: true)
 
           true
         rescue => e
@@ -34,9 +34,11 @@ module API
           error!({ with: EE::Gitlab::Scim::Error }.merge(detail: message), 409)
         end
 
+        # rubocop: disable CodeReuse/ActiveRecord
         def email_taken?(email, identity)
           User.by_any_email(email.downcase).where.not(id: identity.user.id).count > 0
         end
+        # rubocop: enable CodeReuse/ActiveRecord
       end
 
       resource :Users do
