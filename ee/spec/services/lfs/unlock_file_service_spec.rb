@@ -18,8 +18,11 @@ describe Lfs::UnlockFileService do
       describe 'File Locking integraction' do
         let(:params) { { id: lock.id } }
         let(:current_user) { lock_author }
+        let(:file_locks_license) { true }
 
         before do
+          stub_licensed_features(file_locks: file_locks_license)
+
           project.add_developer(lock_author)
           project.path_locks.create(path: lock.path, user: lock_author)
         end
@@ -31,9 +34,7 @@ describe Lfs::UnlockFileService do
         end
 
         context 'when File Locking is not available' do
-          before do
-            allow(project).to receive(:feature_available?).with(:file_locks).and_return(false)
-          end
+          let(:file_locks_license) { false }
 
           it 'does not delete the Path Lock' do
             expect { subject.execute }.not_to change { PathLock.count }
