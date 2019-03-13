@@ -12,13 +12,11 @@ namespace :gitlab do
       end
 
       ::Packages::PackageFile.with_files_stored_locally.find_each(batch_size: 10) do |package_file|
-        begin
-          package_file.file.migrate!(::Packages::PackageFileUploader::Store::REMOTE)
+        package_file.file.migrate!(::Packages::PackageFileUploader::Store::REMOTE)
 
-          logger.info("Transferred package file #{package_file.id} of size #{package_file.size.to_i.bytes} to object storage")
-        rescue => e
-          logger.error("Failed to transfer package file #{package_file.id} with error: #{e.message}")
-        end
+        logger.info("Transferred package file #{package_file.id} of size #{package_file.size.to_i.bytes} to object storage")
+      rescue => e
+        logger.error("Failed to transfer package file #{package_file.id} with error: #{e.message}")
       end
     end
   end

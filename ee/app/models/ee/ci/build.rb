@@ -68,13 +68,11 @@ module EE
               ::Feature.disabled?(:parse_dast_reports, default_enabled: false)
 
           security_reports.get_report(file_type).tap do |security_report|
-            begin
-              next unless project.feature_available?(LICENSED_PARSER_FEATURES.fetch(file_type))
+            next unless project.feature_available?(LICENSED_PARSER_FEATURES.fetch(file_type))
 
-              ::Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, security_report)
-            rescue => e
-              security_report.error = e
-            end
+            ::Gitlab::Ci::Parsers.fabricate!(file_type).parse!(blob, security_report)
+          rescue => e
+            security_report.error = e
           end
         end
       end

@@ -46,18 +46,16 @@ class FixImportDataAuthMethodForMirrors < ActiveRecord::Migration[5.0]
     # Only 129 had this issue, so most of the time will be spent decrypting secrets.
     # It took about 3 minutes to complete.
     Project.where(mirror: true).where("import_url LIKE 'http%'").preload(:import_data).find_each do |project|
-      begin
-        import_data = project.import_data
+      import_data = project.import_data
 
-        next unless import_data
+      next unless import_data
 
-        if import_data.auth_method == 'ssh_public_key'
-          import_data.auth_method = 'password'
-          import_data.save
-        end
-      rescue OpenSSL::Cipher::CipherError
-        Rails.logger.warn "Error decrypting credentials in import data #{import_data&.id}"
+      if import_data.auth_method == 'ssh_public_key'
+        import_data.auth_method = 'password'
+        import_data.save
       end
+    rescue OpenSSL::Cipher::CipherError
+      Rails.logger.warn "Error decrypting credentials in import data #{import_data&.id}"
     end
   end
 end
