@@ -297,7 +297,7 @@ namespace :geo do
     puts  geo_node.namespaces.any? ? 'Selective' : 'Full'
 
     print 'Database replication lag: '.rjust(COLUMN_WIDTH)
-    puts "#{Gitlab::Geo::HealthCheck.db_replication_lag_seconds} seconds"
+    puts "#{Gitlab::Geo::HealthCheck.new.db_replication_lag_seconds} seconds"
 
     print 'Last event ID seen from primary: '.rjust(COLUMN_WIDTH)
     last_event = Geo::EventLog.last
