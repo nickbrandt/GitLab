@@ -1,4 +1,5 @@
 <script>
+import envrionmentsAppMixin from 'ee_else_ce/environments/mixins/environments_app_mixin';
 import Flash from '../../flash';
 import { s__ } from '../../locale';
 import emptyState from './empty_state.vue';
@@ -15,7 +16,7 @@ export default {
     ConfirmRollbackModal,
   },
 
-  mixins: [CIPaginationMixin, environmentsMixin],
+  mixins: [CIPaginationMixin, environmentsMixin, envrionmentsAppMixin],
 
   props: {
     endpoint: {
@@ -42,49 +43,17 @@ export default {
       type: String,
       required: true,
     },
-    // ee-only start
-    canaryDeploymentFeatureId: {
-      type: String,
-      required: true,
-    },
-    showCanaryDeploymentCallout: {
-      type: Boolean,
-      required: true,
-    },
-    userCalloutsPath: {
-      type: String,
-      required: true,
-    },
-    lockPromotionSvgPath: {
-      type: String,
-      required: true,
-    },
-    helpCanaryDeploymentsPath: {
-      type: String,
-      required: true,
-    },
-    // ee-only end
   },
 
   created() {
     eventHub.$on('toggleFolder', this.toggleFolder);
-    eventHub.$on('toggleDeployBoard', this.toggleDeployBoard);
   },
 
   beforeDestroy() {
     eventHub.$off('toggleFolder');
-    eventHub.$off('toggleDeployBoard');
   },
 
   methods: {
-    /**
-     * Toggles the visibility of the deploy boards of the clicked environment.
-     * @param {Object} model
-     */
-    toggleDeployBoard(model) {
-      this.store.toggleDeployBoard(model.id);
-    },
-
     toggleFolder(folder) {
       this.store.toggleFolder(folder);
 
@@ -127,9 +96,9 @@ export default {
       <tabs :tabs="tabs" scope="environments" @onChangeTab="onChangeTab" />
 
       <div v-if="canCreateEnvironment && !isLoading" class="nav-controls">
-        <a :href="newEnvironmentPath" class="btn btn-success">{{
-          s__('Environments|New environment')
-        }}</a>
+        <a :href="newEnvironmentPath" class="btn btn-success">
+          {{ s__('Environments|New environment') }}
+        </a>
       </div>
     </div>
 
