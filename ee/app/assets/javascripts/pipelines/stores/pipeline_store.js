@@ -6,6 +6,11 @@ import CePipelineStore from '~/pipelines/stores/pipeline_store';
  * Extends CE store with the logic to handle the upstream/downstream pipelines
  */
 export default class PipelineStore extends CePipelineStore {
+  constructor() {
+    super();
+
+    this.state.expandedPipelines = [];
+  }
   /**
    * For the triggered pipelines adds the `isExpanded` key
    *
@@ -15,17 +20,31 @@ export default class PipelineStore extends CePipelineStore {
    * @param {Object} pipeline
    */
   storePipeline(pipeline = {}) {
-    super.storePipeline(pipeline);
+    const pipelineCopy = Object.assign({}, pipeline);
 
-    if (pipeline.triggered_by) {
-      this.state.pipeline.triggered_by = [pipeline.triggered_by];
+    if (pipelineCopy.triggered_by) {
+      pipelineCopy.triggered_by = [pipelineCopy.triggered_by];
 
-      this.parseTriggeredByPipelines(this.state.pipeline.triggered_by[0]);
+      const oldTriggeredBy =
+        this.state.pipeline &&
+        this.state.pipeline.triggered_by &&
+        this.state.pipeline.triggered_by[0];
+
+      this.parseTriggeredByPipelines(oldTriggeredBy, pipelineCopy.triggered_by[0]);
     }
 
-    if (pipeline.triggered && pipeline.triggered.length) {
-      this.state.pipeline.triggered.forEach(el => this.parseTriggeredPipelines(el));
+    if (pipelineCopy.triggered && pipelineCopy.triggered.length) {
+      pipelineCopy.triggered.forEach(el => {
+        const oldPipeline =
+          this.state.pipeline &&
+          this.state.pipeline.triggered &&
+          this.state.pipeline.triggered.find(element => element.id === el.id);
+
+        this.parseTriggeredPipelines(oldPipeline, el);
+      });
     }
+
+    this.state.pipeline = pipelineCopy;
   }
 
   /**
@@ -38,15 +57,18 @@ export default class PipelineStore extends CePipelineStore {
    * @param {Array} parentPipeline
    * @param {Object} pipeline
    */
-  parseTriggeredByPipelines(pipeline) {
+  parseTriggeredByPipelines(oldPipeline = {}, newPipeline) {
     // keep old value in case it's opened because we're polling
-    Vue.set(pipeline, 'isExpanded', pipeline.isExpanded || false);
 
-    if (pipeline.triggered_by) {
-      if (!_.isArray(pipeline.triggered_by)) {
-        Object.assign(pipeline, { triggered_by: [pipeline.triggered_by] });
+    Vue.set(newPipeline, 'isExpanded', oldPipeline.isExpanded || false);
+    // add isLoading property
+    Vue.set(newPipeline, 'isLoading', false);
+
+    if (newPipeline.triggered_by) {
+      if (!_.isArray(newPipeline.triggered_by)) {
+        Object.assign(newPipeline, { triggered_by: [newPipeline.triggered_by] });
       }
-      this.parseTriggeredByPipelines(pipeline.triggered_by[0]);
+      this.parseTriggeredByPipelines(oldPipeline, newPipeline.triggered_by[0]);
     }
   }
 
@@ -55,12 +77,19 @@ export default class PipelineStore extends CePipelineStore {
    * @param {Array} parentPipeline
    * @param {Object} pipeline
    */
-  parseTriggeredPipelines(pipeline) {
+  parseTriggeredPipelines(oldPipeline = {}, newPipeline) {
     // keep old value in case it's opened because we're polling
-    Vue.set(pipeline, 'isExpanded', pipeline.isExpanded || false);
+    Vue.set(newPipeline, 'isExpanded', oldPipeline.isExpanded || false);
 
-    if (pipeline.triggered && pipeline.triggered.length > 0) {
-      pipeline.triggered.forEach(el => this.parseTriggeredPipelines(el));
+    // add isLoading property
+    Vue.set(newPipeline, 'isLoading', false);
+
+    if (newPipeline.triggered && newPipeline.triggered.length > 0) {
+      newPipeline.triggered.forEach(el => {
+        const oldTriggered =
+          oldPipeline.triggered && oldPipeline.triggered.find(element => element.id === el.id);
+        this.parseTriggeredPipelines(oldTriggered, el);
+      });
     }
   }
 
@@ -70,7 +99,7 @@ export default class PipelineStore extends CePipelineStore {
    * @param {Object} pipeline
    */
   resetTriggeredByPipeline(parentPipeline, pipeline) {
-    parentPipeline.triggered_by.forEach(el => PipelineStore.closePipeline(el));
+    parentPipeline.triggered_by.forEach(el => this.closePipeline(el));
 
     if (pipeline.triggered_by && pipeline.triggered_by) {
       this.resetTriggeredByPipeline(pipeline, pipeline.triggered_by);
@@ -85,7 +114,7 @@ export default class PipelineStore extends CePipelineStore {
     // first we need to reset all triggeredBy pipelines
     this.resetTriggeredByPipeline(parentPipeline, pipeline);
 
-    PipelineStore.openPipeline(pipeline);
+    this.openPipeline(pipeline);
   }
 
   /**
@@ -94,7 +123,7 @@ export default class PipelineStore extends CePipelineStore {
    * @param {Object} pipeline
    */
   closeTriggeredByPipeline(pipeline) {
-    PipelineStore.closePipeline(pipeline);
+    this.closePipeline(pipeline);
 
     if (pipeline.triggered_by && pipeline.triggered_by.length) {
       pipeline.triggered_by.forEach(triggeredBy => this.closeTriggeredByPipeline(triggeredBy));
@@ -121,7 +150,8 @@ export default class PipelineStore extends CePipelineStore {
    */
   openTriggeredPipeline(parentPipeline, pipeline) {
     this.resetTriggeredPipelines(parentPipeline, pipeline);
-    PipelineStore.openPipeline(pipeline);
+
+    this.openPipeline(pipeline);
   }
 
   /**
@@ -129,7 +159,7 @@ export default class PipelineStore extends CePipelineStore {
    * @param {Object} pipeline
    */
   closeTriggeredPipeline(pipeline) {
-    PipelineStore.closePipeline(pipeline);
+    this.closePipeline(pipeline);
 
     if (pipeline.triggered && pipeline.triggered.length) {
       pipeline.triggered.forEach(triggered => this.closeTriggeredPipeline(triggered));
@@ -140,15 +170,31 @@ export default class PipelineStore extends CePipelineStore {
    * Utility function, Closes the given pipeline
    * @param {Object} pipeline
    */
-  static closePipeline(pipeline) {
+  closePipeline(pipeline) {
     Vue.set(pipeline, 'isExpanded', false);
+    // remove the pipeline from the parameters
+    this.removeExpandedPipelineToRequestData(pipeline.id);
   }
 
   /**
    * Utility function, Opens the given pipeline
    * @param {Object} pipeline
    */
-  static openPipeline(pipeline) {
+  openPipeline(pipeline) {
     Vue.set(pipeline, 'isExpanded', true);
+    // add the pipeline to the parameters
+    this.addExpandedPipelineToRequestData(pipeline.id);
+  }
+  // eslint-disable-next-line class-methods-use-this
+  toggleLoading(pipeline) {
+    Vue.set(pipeline, 'isLoading', !pipeline.isLoading);
+  }
+
+  addExpandedPipelineToRequestData(id) {
+    this.state.expandedPipelines.push(id);
+  }
+
+  removeExpandedPipelineToRequestData(id) {
+    this.state.expandedPipelines.splice(this.state.expandedPipelines.findIndex(el => el === id), 1);
   }
 }
