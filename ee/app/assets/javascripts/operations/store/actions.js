@@ -1,8 +1,25 @@
+import Visibility from 'visibilityjs';
 import Api from '~/api';
 import axios from '~/lib/utils/axios_utils';
+import Poll from '~/lib/utils/poll';
 import createFlash from '~/flash';
 import { __, s__, n__, sprintf } from '~/locale';
 import * as types from './mutation_types';
+
+let eTagPoll;
+
+export const clearProjectsEtagPoll = () => {
+  eTagPoll = null;
+};
+export const stopProjectsPolling = () => {
+  if (eTagPoll) eTagPoll.stop();
+};
+export const restartProjectsPolling = () => {
+  if (eTagPoll) eTagPoll.restart();
+};
+export const forceProjectsRequest = () => {
+  if (eTagPoll) eTagPoll.makeRequest();
+};
 
 export const addProjectsToDashboard = ({ state, dispatch }) => {
   axios
@@ -51,7 +68,9 @@ export const requestAddProjectsToDashboardSuccess = ({ dispatch, state }, data) 
         s__(
           'OperationsDashboard|Unable to add %{invalidProjects}. The Operations Dashboard is available for public projects, and private projects in groups with a Gold plan.',
         ),
-        { invalidProjects },
+        {
+          invalidProjects,
+        },
       ),
     );
     dispatch('filterProjectTokensById', invalid);
@@ -82,17 +101,34 @@ export const clearProjectSearchResults = ({ commit }) => {
 };
 
 export const fetchProjects = ({ state, dispatch }) => {
+  if (eTagPoll) return;
+
   dispatch('requestProjects');
-  axios
-    .get(state.projectEndpoints.list)
-    .then(response => dispatch('receiveProjectsSuccess', response.data))
-    .catch(() => dispatch('receiveProjectsError'))
-    .then(() => dispatch('requestProjects'))
-    .catch(() => {});
+
+  eTagPoll = new Poll({
+    resource: {
+      fetchProjects: () => axios.get(state.projectEndpoints.list),
+    },
+    method: 'fetchProjects',
+    successCallback: ({ data }) => dispatch('receiveProjectsSuccess', data),
+    errorCallback: () => dispatch('receiveProjectsError'),
+  });
+
+  if (!Visibility.hidden()) {
+    eTagPoll.makeRequest();
+  }
+
+  Visibility.change(() => {
+    if (!Visibility.hidden()) {
+      dispatch('restartProjectsPolling');
+    } else {
+      dispatch('stopProjectsPolling');
+    }
+  });
 };
 
 export const requestProjects = ({ commit }) => {
-  commit(types.TOGGLE_IS_LOADING_PROJECTS);
+  commit(types.REQUEST_PROJECTS);
 };
 
 export const receiveProjectsSuccess = ({ commit }, data) => {
@@ -112,7 +148,7 @@ export const removeProject = ({ dispatch }, removePath) => {
 };
 
 export const requestRemoveProjectSuccess = ({ dispatch }) => {
-  dispatch('fetchProjects');
+  dispatch('forceProjectsRequest');
 };
 
 export const requestRemoveProjectError = () => {

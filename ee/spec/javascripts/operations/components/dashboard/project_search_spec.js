@@ -13,7 +13,10 @@ describe('project search component', () => {
   const mockProjects = mockProjectData(1);
   const [mockOneProject] = mockProjects;
   const mockInputValue = 'mock-inputValue';
-  const mount = () => mountComponentWithStore(ProjectSearchComponent, { store });
+  const mount = () =>
+    mountComponentWithStore(ProjectSearchComponent, {
+      store,
+    });
   let vm;
 
   beforeEach(() => {
@@ -55,7 +58,9 @@ describe('project search component', () => {
 
     it('renders search description', () => {
       store.state.inputValue = mockInputValue;
-      vm = mountComponentWithStore(ProjectSearchComponent, { store });
+      vm = mountComponentWithStore(ProjectSearchComponent, {
+        store,
+      });
 
       expect(vm.$el.querySelector('.js-search-results').innerText.trim()).toBe(
         `"${mockInputValue}" ${mockText.SEARCH_DESCRIPTION_SUFFIX}`,

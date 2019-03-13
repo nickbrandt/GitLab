@@ -14,25 +14,6 @@
   }
 }
 
-.operations-dashboard {
-  .branch-commit {
-    * {
-      vertical-align: middle;
-    }
-
-    .icon-container,
-    .commit-icon {
-      display: inline;
-      color: $gl-text-color-tertiary;
-    }
-
-    .ref-name {
-      font-weight: $gl-font-weight-bold;
-      color: $gl-text-color;
-    }
-  }
-}
-
 .tokenized-input-wrapper {
   height: auto;
   padding: 2px $gl-padding-8;
