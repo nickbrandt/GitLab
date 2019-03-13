@@ -1,5 +1,15 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 11.8.2 (2019-03-13)
+
+### Fixed (4 changes)
+
+- Fix 500 error when visiting merged merge request. !9648
+- Fix bridge jobs than can be hidden keys too. !9796
+- Fix approval-related UI showing up in free plan. !9819
+- Add 'No approvals required' view to approval rules (behind feature flag). !9899
+
+
 ## 11.8.1 (2019-02-28)
 
 ### Security (5 changes)
