@@ -9,11 +9,13 @@ class OperationsController < ApplicationController
 
   respond_to :json, only: [:list]
 
+  POLLING_INTERVAL = 120_000
+
   def index
   end
 
   def list
-    Gitlab::PollingInterval.set_header(response, interval: 120_000)
+    Gitlab::PollingInterval.set_header(response, interval: POLLING_INTERVAL)
     projects = load_projects(current_user)
 
     render json: { projects: serialize_as_json(projects) }
