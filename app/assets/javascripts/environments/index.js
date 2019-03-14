@@ -1,11 +1,8 @@
 import Vue from 'vue';
+import canaryCalloutMixin from 'ee_else_ce/environments/mixins/canary_callout_mixin';
 import environmentsComponent from './components/environments_app.vue';
 import { parseBoolean } from '../lib/utils/common_utils';
 import Translate from '../vue_shared/translate';
-
-// ee-only start
-import CanaryCalloutMixin from 'ee/environments/mixins/canary_callout_mixin'; // eslint-disable-line import/order
-// ee-only end
 
 Vue.use(Translate);
 
@@ -15,9 +12,7 @@ export default () =>
     components: {
       environmentsComponent,
     },
-    // ee-only start
-    mixins: [CanaryCalloutMixin],
-    // ee-only end
+    mixins: [canaryCalloutMixin],
     data() {
       const environmentsData = document.querySelector(this.$options.el).dataset;
 
@@ -39,13 +34,7 @@ export default () =>
           cssContainerClass: this.cssContainerClass,
           canCreateEnvironment: this.canCreateEnvironment,
           canReadEnvironment: this.canReadEnvironment,
-          // ee-only start
-          canaryDeploymentFeatureId: this.canaryDeploymentFeatureId,
-          showCanaryDeploymentCallout: this.showCanaryDeploymentCallout,
-          userCalloutsPath: this.userCalloutsPath,
-          lockPromotionSvgPath: this.lockPromotionSvgPath,
-          helpCanaryDeploymentsPath: this.helpCanaryDeploymentsPath,
-          // ee-only end
+          ...this.canaryCalloutProps,
         },
       });
     },
