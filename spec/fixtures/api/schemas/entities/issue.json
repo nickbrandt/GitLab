@@ -10,7 +10,6 @@
     "title": { "type": "string" },
     "moved_to_id": { "type": ["integer", "null"] },
     "project_id": { "type": "integer" },
-    "weight": { "type": ["integer", "null"] },
     "web_url": { "type": "string" },
     "state": { "type": "string" },
     "create_note_path": { "type": "string" },
@@ -39,6 +38,5 @@
       "items": { "$ref": "label.json" }
     },
     "assignees": { "type": ["array", "null"] }
-  },
-  "additionalProperties": false
+  }
 }

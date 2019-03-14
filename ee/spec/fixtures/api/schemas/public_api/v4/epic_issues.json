@@ -1,4 +1,5 @@
 {
+  "type": "array",
   "allOf": [
     { "$ref": "./issues.json" },
     {
