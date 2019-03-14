@@ -3,6 +3,7 @@
 module EE
   module PreferencesHelper
     extend ::Gitlab::Utils::Override
+    include ::Groups::Security::DashboardHelper
 
     override :excluded_dashboard_choices
     def excluded_dashboard_choices
@@ -13,9 +14,10 @@ module EE
 
     def group_view_choices
       strong_memoize(:group_view_choices) do
-        [[_('Details (default)'), :details]].tap do |choices|
-          choices << [_('Security dashboard'), :security_dashboard] if group_view_security_dashboard_enabled?
-        end
+        choices = []
+        choices << [_('Details (default)'), :details]
+        choices << [_('Security dashboard'), :security_dashboard] if group_view_security_dashboard_enabled?
+        choices
       end
     end
 
