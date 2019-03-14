@@ -6,7 +6,7 @@
     "issue": { "type": "object" },
     "epic": {
        "allOf": [
-        { "$ref": "../../../../../../../ee/spec/fixtures/api/schemas/public_api/v4/epic.json" }
+        { "$ref": "./epic.json" }
       ]
     },
     "issue": {
