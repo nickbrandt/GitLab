@@ -2,17 +2,17 @@
 - if Gitlab::CurrentSettings.should_check_namespace_plan?
   - namespace = @project&.namespace || @group
   - if can?(current_user, :admin_namespace, namespace)
-    = link_to 'Upgrade your plan', upgrade_plan_url, class: 'btn btn-primary'
+    = link_to _('Upgrade your plan'), upgrade_plan_url, class: 'btn btn-primary'
   - elsif namespace.is_a?(Group)
-    %p Contact an owner of group #{ namespace.name } to upgrade the plan.
+    %p= _('Contact an owner of group %{namespace_name} to upgrade the plan.') % { namespace_name: namespace.name }
   - else
     - owner = namespace.owner
-    %p Contact owner #{ link_to(owner.name, user_path(owner)) } to upgrade the plan.
+    - link_start = "<a href='#{user_path(owner)}' rel='noowner noreferrer' target='_blank'>".html_safe
+    %p= _('Contact owner %{link_start}%{owner_name}%{link_end} to upgrade the plan.').html_safe % { owner_name: owner.name, link_start: link_start, link_end: '</a>'.html_safe }
 - elsif current_user&.admin?
   - if License.current&.expired?
-    = link_to (!short_form ? 'Buy GitLab Enterprise Edition' : 'Buy EE'), ::EE::SUBSCRIPTIONS_PLANS_URL, class: 'btn btn-primary'
+    = link_to (!short_form ? _('Buy GitLab Enterprise Edition') : _('Buy EE')), ::EE::SUBSCRIPTIONS_PLANS_URL, class: 'btn btn-primary'
   - else
-    = link_to (!short_form ? 'Start GitLab Ultimate trial' : 'Start GitLab Ultimate trial'), new_trial_url, class: 'btn btn-primary'
+    = link_to _('Start GitLab Ultimate trial'), new_trial_url, class: 'btn btn-primary'
 - else
-  %p
-    Contact your Administrator to upgrade your license.
+  %p= _('Contact your Administrator to upgrade your license.')

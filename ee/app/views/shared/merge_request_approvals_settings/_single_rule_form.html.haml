@@ -1,14 +1,16 @@
 .form-group
   = form.label :approver_ids, class: 'label-bold' do
-    = _("Approvers")
+    = _("Add approvers")
   = hidden_field_tag "project[approver_ids]"
   = hidden_field_tag "project[approver_group_ids]"
-  .input-group.input-btn-group
-    = hidden_field_tag :approver_user_and_group_ids, '', { class: 'js-select-user-and-group input-large', tabindex: 1, 'data-name': 'project', :style => "max-width: unset;" }
-    %button.btn.btn-success.js-add-approvers{ type: 'button', title: _('Add approver(s)') }
-      = _("Add")
-  .form-text.text-muted
-    = _("Add users or groups who are allowed to approve every merge request")
+  .row
+    .col-md-9
+      .input-group.input-btn-group
+        = hidden_field_tag :approver_user_and_group_ids, '', { class: 'js-select-user-and-group input-large', tabindex: 1, 'data-name': 'project', :style => "max-width: unset;" }
+        %button.btn.btn-success.js-add-approvers.js-dirty-submit{ type: 'button', title: _('Add approver(s)') }
+          = _("Add")
+      .form-text.text-muted
+        = _("Add users or groups who are allowed to approve every merge request")
 
   .card.prepend-top-10.js-current-approvers
     .load-wrapper.hidden
@@ -50,6 +52,6 @@
 .form-group
   = form.label :approvals_before_merge, class: 'label-bold' do
     = _("Approvals required")
-  = form.number_field :approvals_before_merge, class: "form-control", min: 0
+  = form.number_field :approvals_before_merge, class: "form-control w-auto", min: 0
   .form-text.text-muted
     = _("Set number of approvers required before open merge requests can be merged")
