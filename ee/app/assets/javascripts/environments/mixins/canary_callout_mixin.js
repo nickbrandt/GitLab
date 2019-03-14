@@ -12,4 +12,15 @@ export default {
       helpCanaryDeploymentsPath: data.environmentsDataHelpCanaryDeploymentsPath,
     };
   },
+  computed: {
+    canaryCalloutProps() {
+      return {
+        canaryDeploymentFeatureId: this.canaryDeploymentFeatureId,
+        showCanaryDeploymentCallout: this.showCanaryDeploymentCallout,
+        userCalloutsPath: this.userCalloutsPath,
+        lockPromotionSvgPath: this.lockPromotionSvgPath,
+        helpCanaryDeploymentsPath: this.helpCanaryDeploymentsPath,
+      };
+    },
+  },
 };
