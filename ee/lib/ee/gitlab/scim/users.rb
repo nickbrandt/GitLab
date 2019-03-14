@@ -9,7 +9,7 @@ module EE
         expose :items_per_page, as: :itemsPerPage
         expose :start_index, as: :startIndex
 
-        expose :resources, as: :Resources, using: ::EE::Gitlab::Scim::User #, if: ->(identity, _) { identity.present? }
+        expose :resources, as: :Resources, using: ::EE::Gitlab::Scim::User
 
         private
 
