@@ -1,4 +1,4 @@
-- if can?(current_user, :read_group_security_dashboard, @group)
+- if @group.feature_available?(:security_dashboard)
   = nav_link(path: 'groups/security/dashboard#show') do
     = link_to group_security_dashboard_path(@group), title: _('Security Dashboard') do
       %span= _('Security Dashboard')
