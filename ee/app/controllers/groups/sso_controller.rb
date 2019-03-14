@@ -6,6 +6,7 @@ class Groups::SsoController < Groups::ApplicationController
   before_action :check_group_saml_configured
   before_action :check_group_saml_available!
   before_action :require_configured_provider
+  before_action :require_enabled_provider, except: [:unlink]
   before_action :authenticate_user!, only: [:unlink]
   before_action :check_user_can_sign_in_with_provider, only: [:saml]
   before_action :redirect_if_group_moved
@@ -50,6 +51,16 @@ class Groups::SsoController < Groups::ApplicationController
   def require_configured_provider
     return if @unauthenticated_group.saml_provider
 
+    redirect_settings_or_not_found
+  end
+
+  def require_enabled_provider
+    return if @unauthenticated_group.saml_provider&.enabled?
+
+    redirect_settings_or_not_found
+  end
+
+  def redirect_settings_or_not_found
     if can?(current_user, :admin_group_saml, @unauthenticated_group)
       flash[:notice] = 'SAML sign on has not been configured for this group'
 
