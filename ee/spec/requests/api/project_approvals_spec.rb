@@ -70,12 +70,14 @@ describe API::ProjectApprovals do
           project.approvals_before_merge = 2
           project.reset_approvals_on_push = false
           project.disable_overriding_approvers_per_merge_request = true
+          project.merge_requests_author_approval = false
           project.save
 
           settings = {
             approvals_before_merge: 4,
             reset_approvals_on_push: true,
-            disable_overriding_approvers_per_merge_request: false
+            disable_overriding_approvers_per_merge_request: false,
+            merge_requests_author_approval: true
           }
 
           post api(url, current_user), params: settings
