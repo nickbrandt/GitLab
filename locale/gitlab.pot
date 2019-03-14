@@ -5758,10 +5758,7 @@ msgstr ""
 msgid "Label"
 msgstr ""
 
-msgid "Modify commit message"
-msgstr ""
-
-msgid "Modify commit messages"
+msgid "Label actions dropdown"
 msgstr ""
 
 msgid "Label lists show all issues with the selected label."
@@ -6471,6 +6468,9 @@ msgid "Modal|Cancel"
 msgstr ""
 
 msgid "Modal|Close"
+msgstr ""
+
+msgid "Modify commit message"
 msgstr ""
 
 msgid "Modify commit messages"
